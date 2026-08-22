@@ -5,46 +5,51 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-22 (Batch DG).*
+*Last rewritten: 2026-08-22 (Batch DH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DG — THE RULING QUEUE OF TEN IS CLOSED, AND THE BATTERY FOUND AN ELEVENTH RED.**
-  Two of the ten were the game being wrong and both were prose: Consecrated Ground's card now reads
-  "kindled 1 Faith" (**the constant did NOT move** — DA's revert stands), and `data/glossary.json`'s
-  last common-noun "beast" reads "companion". Six asked about a feature that has not existed for
-  dozens of batches and are **DELETED as a recorded exception**; two pinned milestones inside a
-  standing block that stated the draft's size twice with different answers, and are **INVERTED**.
-  Both instrument faults DF reported out of scope are closed too. **`an`'s floor needed nothing —
-  DF had already widened it.**
-- **THE ELEVENTH RED IS NEW, AND IT IS NOT DG's.** `test_batch_at` read 1 failure against a
-  predicted 0 and **`check_de` reported it as an error**, which is exactly what DE built it for.
-  It is the §1 damage-curve ratio and it is **unseeded** — see the open queue below. **DG's own
-  edits to that file were three deleted file-reading assertions, which consume no RNG, and its
-  check count landed exactly on prediction.**
-- **Next letter: DH.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
-  out of `(Batch XX)` and compares lexically — `DH` sorts after `DG`, so it still works. **A
+- **Last batch: DH — NINE CROSS-SPEC CLAUSES ON NINE EXISTING CARDS.** No new abilities, no new
+  statuses, no pool depth change: `SPEC_DRAFT_POOLS` is still 96, the draft is still 120 of 120 and
+  the corpus is still 216. Every one of the 120 draft abilities had been authored inside its own
+  spec, so the pools never referenced each other and **drafting was a decision about one hero
+  rather than about the party**. Nine cards now name a partner spec in their own text.
+- **THREE OF THE BRIEF'S CLAIMS WERE WRONG AGAINST THE REPO, AND ONE WOULD HAVE SHIPPED A
+  DUPLICATE.** The brief asked for "Canis's strikes apply Bleed"; **`Summon Canis` has read
+  *"building 20 Bleed"* for many batches** and is a base-kit enabler rather than a draft card, so
+  writing it would have been BD's Deadfall duplication reproduced inside the batch that warned
+  about it. **The gap was Ursus and Aguila**, so the clause went onto Savage Sweep. The brief also
+  called Bleed a status Battle Shout reads — **it is a METER (`bleed_buildup`) and has had no
+  `STATUS_INFO` row since BJ §1** — and expected statuses to carry no source, when
+  **`_apply_status` has stamped `src_name` since Batch W**. Full statements in `docs/reports/DH.md`
+  §0.
+- **THE STANDING RULE DH RECORDED:** a cross-spec coupling is **named in the card text** and is a
+  **bonus on a card that already works alone**. Four of twelve specs are fielded in a run, so a
+  clause that needs a specific partner is dead most of the time. In `CLAUDE.md`.
+- **Next letter: DI.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
+  out of `(Batch XX)` and compares lexically — `DI` sorts after `DH`, so it still works. **A
   THREE-letter code would break all fourteen.**
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
   (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
   split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
   one of them, DB's and DD's `_spawn` consolidations, DC's threshold repairs, DE's move of the
-  count differ into the runner, DF's sort of the 47, and DG's close of the ten.
-- **THE STALE-ASSERTION QUEUE AND THE RULING QUEUE ARE BOTH EMPTY.** What replaces them is **one
-  uncharacterised flake and a short list of small owed things**, all below. Every red in the
-  project is in `baselines.json` with the reason beside it, so **a twelfth would be visible
-  immediately.**
+  count differ into the runner, DF's sort of the 47, DG's close of the ten — and **DH is the first
+  batch in many that added PLAY rather than repaired it.**
+- **THE BATTERY READ ZERO SUITE FAILURES, AND THE ZERO IS NOT DH's.** `test_batch_at`'s unseeded
+  ratio — the one red DG left open — **simply did not fire**, and neither did `bo`'s. Both are
+  still open, still unseeded and still banded in `baselines.json`. **A zero that arrives because a
+  flake was quiet is not a zero that was earned.**
 
 ---
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE ONE RED THAT IS NEW, AND IT IS A THIRD OF ITS SPECIES IN ONE SUITE
+### THE FLAKE THAT DG FOUND, AND IT DID NOT FIRE AT DH
 
-- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED AND WENT RED AT DG.** `_live_curve()`
+- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND READ 0 AT DH — STILL OPEN, STILL UNSEEDED.** `_live_curve()`
   sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
   a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
   DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
@@ -65,7 +70,9 @@ in `docs/master.html`.
     rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
     comment says checks that care must do — do NOT widen the band, because the band IS the
     question.**
-  - **REPORTED AND DELIBERATELY NOT FIXED AT DG.** It is not one of the ten, and **one flake at a
+  - **REPORTED AND DELIBERATELY NOT FIXED AT DG, AND NOT AT DH EITHER.** **DH's zero on this row
+    is the flake being quiet, not the flake being fixed** — its rate is about one red in eighteen
+    readings, so a clean run is the common case and proves nothing. **One flake at a
     time is how the effect stays attributable** — `bo`'s is still open and `test_rune_battle`'s is
     two batches old. Its band and its readings are in `baselines.json`.
 
@@ -78,16 +85,29 @@ in `docs/master.html`.
   **They were not deleted because six was the only sanctioned fall in that batch**, and deleting
   them would have broken the two-sided acceptance test that made the deletion safe. **A check that
   passes for no reason is worse than a red**, so this is owed rather than settled.
+- **`_apply_status`'s `src` COVERAGE IS 53 OF 204, AND SINCE DH IT IS LOAD-BEARING FOR A
+  MAGNITUDE.** The `src_name` stamp has existed since Batch W, but only sites that PASS `src` write
+  it. Until DH it fed attribution and mitigation credit, where a miss is cosmetic; **Harvest's ally
+  term now pays off it**, so an unstamped status silently pays the base rate. **The under-payment is
+  invisible by construction** — an unstamped status is indistinguishable from one he applied
+  himself — which makes this the Stalking Horse species one layer in. Widening the call sites is a
+  mechanical sweep and a batch of its own.
+- **`FIREDRAW_TAKE` (4) IS DEAD, AND WAS DEAD BEFORE DH.** `firedraw` uses
+  `FIREDRAW_TAKE_PERFECT` (6) unconditionally. **DH deliberately did not collapse it** — that would
+  move a magnitude on an existing effect — but it is a real dead symbol that `test_batch_cd`'s
+  sweep does not catch.
+- **`shared_grief`'s SOURCE COMMENT SAYS THE CARD PAYS "EXACTLY 3" AND `sg_grant` IS 4.**
+  Pre-existing stale prose, now sitting directly above DH's clause. One line.
 - **`_run`'S SAVE-BACKUP PREAMBLE IS STILL THE NEXT COPIED HELPER AND IS STILL NOT TAKEN.**
   Re-derived at DF: **`_run` is 39 bodies in 39 suites and is correctly 39** — it is each suite's own
   driver. **38 of the 39 open with the same `_had_save` backup block. 38 swap `Profile.save_path` to
   a per-suite file — not the 37 every document has carried — and 33 of those 38 swap it back**;
   `bn`, `bo`, `bp`, `bq` and `br` do not. `test_run_harness.gd` restores the real path without ever
   swapping away from it. Same shape as `_spawn`, one layer in.
-- **`CLAUDE.md` IS FURTHER OVER CW's OWN TARGET.** CW set *"under 3% of the knowledge sync and
-  roughly flat over time"*. It reads **190 KiB of a 5.74 MiB sync = 3.24%**, up from 3.18% at DF —
-  DG added two standing rules and amended two more. Not urgent; **worth a prune when a batch is in
-  the file anyway**, and DG was in the file and did not take it.
+- **`CLAUDE.md` IS STILL OVER CW's OWN TARGET.** CW set *"under 3% of the knowledge sync and
+  roughly flat over time"*. It reads **193 KiB of a 5.81 MiB sync = 3.24%** — DH added one standing
+  rule and the sync grew with it, so **the ratio is flat rather than rising**. Not urgent; **worth a
+  prune when a batch is in the file anyway**, and neither DG nor DH took it.
 - **TEN HAND-BUILT BATTLE BOARDS REMAIN, IN SIX FILES** — `al` (2), `an`, `ax`, `bl`,
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper**: they are bespoke
   boards inside single checks, and two of those files have no `_spawn` at all. `check_da` §3 carries
@@ -254,7 +274,7 @@ in `docs/master.html`.
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DG
+### THE TEST TREE, AS OF DH
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -294,7 +314,7 @@ in `docs/master.html`.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-22 (Batch DG)`.**
+- **master.html stamp: `Last updated: 2026-08-22 (Batch DH)`.**
 
 ### HOW LONG A FIGHT IS
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
@@ -334,22 +354,24 @@ in `docs/master.html`.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 19 entries** (CO → DG), **284 KiB**. The 400 KB
+- **The live file starts at Batch CO and holds 20 entries** (CO → DH), **292 KiB**. The 400 KB
   threshold is still some way off.
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (Batch 1 → CN) and is **1042 KiB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
   bv, bw, bx, cb, ce, bb, bn, bo. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
   correct.
 
-### Knowledge sync, re-measured at DG
+### Knowledge sync, re-measured at DH
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
-**Treat the file COUNT as method-dependent.** **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **124 files, 5.74 MiB** (DF measured 124 files / 5.71 MiB; DG added prose to four documents and
-  one report).
-- Heaviest: `scripts/battle.gd` **1149**, `docs/master.html` **320**, `docs/design-notes.md`
-  **317**, `docs/changelog.html` **284**, `scripts/classes.gd` **274**, `CLAUDE.md` **190**,
+**Treat the file COUNT as method-dependent** — DH's walk reads 126 where DG's read 124 and DH added
+one file, so the walks differ by one and the SIZES are the comparable half. **ALL SIZES BELOW ARE
+KiB (1024 bytes)**.*
+- **126 files, 5.81 MiB** (DG measured 124 files / 5.74 MiB; DH added `docs/reports/DH.md`, the
+  nine clauses' comments, and prose to four documents).
+- Heaviest: `scripts/battle.gd` **1163**, `docs/master.html` **324**, `docs/design-notes.md`
+  **323**, `docs/changelog.html` **292**, `scripts/classes.gd` **275**, `CLAUDE.md` **193**,
   `scripts/talents.gd` **181**, `scripts/unit.gd` **174**.
-- **The 47 suite files total 1808 KiB — 30.8% of the sync**, still the single largest block. **They
+- **The 47 suite files total 1810 KiB — 30.4% of the sync**, still the single largest block. **They
   cannot be archived (they must be in the repo to run) but they CAN be deselected from the sync.**
   The 20 gates add **177 KiB**.
 - **`scripts/` contains ZERO test suites.** All game code.
@@ -358,13 +380,14 @@ in `docs/master.html`.
 
 ## KNOWN-BROKEN AND DELIBERATELY UNFIXED
 
-### THE ONE SUITE RED, AND IT IS NOT ONE OF THE TEN
+### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED
 
 **DB measured 72 across 26 suites. DC repaired 23. DD and DE deliberately repaired none. DF sorted
-all 47 and repaired the 37 that were STALE. DG closed the remaining ten.** What is left is **one
-suite failure, in `test_batch_at`, and it is an unseeded ratio that no batch had seen go red
-before** — the full statement is at the top of this file. **THE COUNTS AND THE BAND ARE IN
-`baselines.json` AND ARE NOT REPEATED HERE.**
+all 47 and repaired the 37 that were STALE. DG closed the remaining ten.** **THE DH BATTERY READ
+ZERO SUITE FAILURES — AND THAT IS NOT A REPAIR.** The one row DG left open, `test_batch_at`'s
+unseeded ratio, **did not fire**; `bo`'s did not either. **Both are still open and still
+unseeded.** A row that reads clean at a rate of about seventeen in eighteen has told you nothing
+when it reads clean. **THE COUNTS AND THE BANDS ARE IN `baselines.json` AND ARE NOT REPEATED HERE.**
 
 ### THE REST
 
@@ -412,45 +435,41 @@ before** — the full statement is at the top of this file. **THE COUNTS AND THE
 
 ### Last measurements
 
-**ONE FULL BATTERY AT DG — a VERIFICATION run against the final tree.** A before-battery was not
-needed and could not have been run honestly: DF's own after-battery established the starting figure
-of 10 on the tree DG inherited, and `docs/state.md` and `docs/reports/DG.md` are the only documents
-written after the run — **neither is read by any suite and `check_de` reads neither** — so the
-verification battery supervised every file the tree actually reads. **`baselines.json` was written
-with the PREDICTED after-values BEFORE the run**, per the rule DG recorded in `CLAUDE.md`, so the
-run tested the prediction rather than recording it.
+**ONE FULL BATTERY AT DH — a VERIFICATION run against the final tree**, 29m 13s. `baselines.json`
+carried the **PREDICTED** after-values before it started, and the documentation was written before
+it too; `docs/state.md` and `docs/reports/DH.md` are the only files written after, **and no suite
+reads either**.
 
-| | before (DF's after-battery) | after |
+| | before (DG's after-battery) | after |
 |---|---|---|
-| **suite failures** | **10 across 7** | **1 across 1** |
-| the ten | | **all closed** |
-| the one | | **`test_batch_at`, an unseeded ratio, NEW and not predicted** |
-| `check_cm_live` (deliberate) | 4 | 4 |
+| **suite failures** | **1 across 1** | **0 — and see the caveat below** |
+| `check_cm_live` (deliberate) | 4 | **4** |
 | **throws, grepped from the stream** | **0** | **0** |
 | check counts outside their band | 0 | **0** |
-| `check_de` | 273 / 0 / 0 | **273 / 1 / 0** |
-| wall clock | 29m 18s | **29m 19s** |
+| `check_de` | 273 / 1 / 0 | **273 / 0 / 0** |
+| wall clock | 29m 18s | **29m 13s** |
 
-**THE PREDICTION HELD ON EVERY COUNT AND FAILED ON ONE FAILURE FIGURE, WHICH IS THE INSTRUMENT
-WORKING.** `check_de`'s single failure reads *"test_batch_at went REDDER: 1 failures, recorded 0 —
-a red suite going redder is exactly the movement an aggregate hides"*. **DG predicted 0 for that
-row before the run; the run disagreed; the differ said so.** Had the table been written from the
-log afterwards it would have recorded 1 and reported nothing at all — which is precisely the case
-§7's new rule exists to make impossible, on the first batch bound by it.
+**`check_de` READ 0 FAILURES AND 0 NOTICES**, which is the differ saying that no count fell, no
+failure count rose, and **nothing rose unexpectedly either** — all 65 rows inside their bands, and
+the one row predicted to move landed exactly on the predicted value.
 
-**THE TWO SANCTIONED MOVEMENTS LANDED EXACTLY AND NOTHING ELSE MOVED.**
+**THE ONE SANCTIONED MOVEMENT:**
 
 | suite | before | after | movement |
 |---|---|---|---|
-| `as` | 396 | **394** | −2, §2's deletion |
-| `at` | 470 | **467** | −3, §2's deletion |
-| `aw` | 350 | **349** | −1, §2's deletion |
-| `cd` | 71 | **72** | **+1, §5's repair** |
+| `test_batch_cb` | 1184 | **1185** | **+1, DH §2's guard — predicted before the run** |
 
-**§2's fall is 6 on the nose and §5's rise is 1.** **Every other check count in the project — all
-46 suites, all 14 gate lines, the harness at 22 / 165 / 8, `check_ct_map` at 83 / 0 and
-`check_map_screen` at its `OK` — is inside its recorded band**, which `check_de` reports as **0
-notices**. That is the audit saying no assertion was removed except the six that were meant to be,
-and it is the whole reason CQ's rule asks for the count either side.
+`cb` asserted *"a SECOND applier's Burn is not doubled"*, which is exactly the rule DH §2 inverts,
+so that assertion was **INVERTED rather than deleted** (count-neutral, on `ce`'s idiom). **The +1
+is a new assertion beside it — an ENEMY's Burn is still not doubled** — which pins the
+`src.is_hero` guard that makes "anyone" mean "anyone in the party". The old src-scoping hid that
+question because only the Pyromancer could ever hold the status.
 
-**`throws=0` ON EVERY TARGET, grepped from the stream and never read off a tally.**
+**AND THE ZERO IN THE FAILURE ROW IS NOT A REPAIR.** `test_batch_at`'s unseeded ratio did not fire
+and `bo`'s did not fire. Both are open, both are unseeded, both are banded. **The next batch should
+expect either to come back.**
+
+**`throws=0` ON EVERY TARGET, and 0 `Parse Error` and 0 `SCRIPT ERROR` across all 66 logs** —
+grepped from the logs, never read off a tally and never off `$?`. The negative control bit: a
+deliberate syntax error appended to `battle.gd` produced 2 `Parse Error` lines, and 0 again once
+removed.

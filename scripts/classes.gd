@@ -1686,7 +1686,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "aoe": true, "anim": "attack03",
 				"special": "choking_smoke",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Foul the air: EVERY enemy is Blinded\nfor 3 turns — 50% more likely to miss.\nArea attacks never miss, so it blanks\nsingle-target blows only."})
+				"description": "Foul the air: EVERY enemy is Blinded\nfor 3 turns — 50% more likely to miss.\nArea attacks never miss, so it blanks\nsingle-target blows only.\nThe smoke also sets EVERY enemy\nBurning 2 turns — fuel for a\nPyromancer's Ember Debt, and one more\naffliction under your own Trapper."})
 		# AXIS: the traps stop waiting.
 		"Snare Line":
 			return Ability.make({"display_name": "Snare Line",
@@ -1694,7 +1694,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "anim": "attack03",
 				"special": "snare_line",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Run a line across the whole field: for\ntwo turns EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap."})
+				"description": "Run a line across the whole field: for\ntwo turns EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap.\nThe line binds a CHILLED enemy harder:\nthe spring holds it 2 turns, not 1.\nA Cryomancer lays that ice."})
 		# ================= BATCH BQ: THE CLASS-WIDE TWELVE =================
 		#
 		# SIX MAGE AND SIX CLERIC, filling half the seam BO opened: one card in
@@ -2339,7 +2339,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
 				"cooldown": 4, "anim": "attack03", "special": "firedraw",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Pull the field's fire into one body:\nconsume 6 turns of Burn from every\nOTHER enemy and add all of it here.\nIt takes what is there or 6, whichever\nis less, and never touches this\nenemy's own Burn."})
+				"description": "Pull the field's fire into one body:\nconsume 6 turns of Burn from every\nOTHER enemy and add all of it here.\nIt takes what is there or 6, whichever\nis less, and never touches this\nenemy's own Burn.\nAn enemy already carrying ANOTHER\nspec's debuff gives up 9, not 6."})
 		# AXIS: the bank SCATTERED rather than cashed. A twelve-turn stack
 		# becomes twelve small fires and 96% of Attack spread across the board —
 		# the only card in the game that converts DEPTH into WIDTH.
@@ -2376,7 +2376,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 20, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "emberkeep",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Keep the embers: for 4 turns every\nBurn YOU apply lands at DOUBLE\nduration.\nIt changes what ARRIVES, not what is\nalready burning — fire already on the\nboard is untouched."})
+				"description": "Keep the embers: for 4 turns every\nBurn ANY HERO applies lands at DOUBLE\nduration — a Survivalist's Choking\nSmoke burns twice as long beside you.\nIt changes what ARRIVES, not what is\nalready burning — fire already on the\nboard is untouched."})
 		# ----- CRYOMANCER: copy wide, hit the prisoner, chain two bodies. His
 		# pool assumes a hold and acts on ONE enemy, and his control has always
 		# been one enemy at a time.
@@ -2594,7 +2594,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "hurt",
 				"special": "shared_grief",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Take the wound yourself: lose 25% of\nyour MAXIMUM health and gain 4 Mercy.\nIt can never take you below 1.\nThe grief is the price — the Mercy is\nyours to spend at once."})
+				"description": "Take the wound yourself: lose 25% of\nyour MAXIMUM health and gain 4 Mercy,\n+1 for every OTHER ally already below\nhalf health.\nIt can never take you below 1.\nA Berserker lives down there — his\nfrenzy band is your Mercy."})
 		# AXIS: her healing becomes a weapon. This is her ONLY offence and the
 		# answer to the turn where nobody is hurt — the turn a healer has
 		# nothing to do is the turn she has done her job.
@@ -2721,7 +2721,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "anim": "attack01",
 				"special": "suffering",
 				"perfect_id": "", "perfect_text": "3 Ruin a turn",
-				"description": "Open a wound that thinks: 20% of Attack,\nand you are healed for ALL of the damage\nit deals.\nFor 4 turns the enemy gains 2 Ruin at\nthe start of each of ITS turns — eight\nstacks bought with one turn of yours."})
+				"description": "Open a wound that thinks: 20% of Attack,\nand you are healed for ALL of the damage\nit deals.\nFor 4 turns the enemy gains 2 Ruin at\nthe start of each of ITS turns — eight\nstacks bought with one turn of yours.\nAgainst a BROKEN enemy the wound runs\ndeeper: 3 Ruin a turn. Whoever breaks\nthem feeds your madness."})
 		# AXIS: corruption relocated rather than spent. His worst case is a deep
 		# mark on something about to die — twelve stacks of work wasted when the
 		# party finishes it. This carries the pile to the boss instead.
@@ -2850,7 +2850,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02", "special": "savage_sweep",
 				"perfect_id": "", "perfect_text": "5 Loyalty",
-				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs."})
+				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs.\nThe run opens 12 Bleed on each, ANY\ncompanion — feeding a Berserker's\nBattle Shout and a Survivalist's\nTrapper."})
 		# AXIS: what rotating actually buys. FERAL MOMENTUM and MENAGERIE both
 		# already reward having cycled, but both are small passive trickles; this
 		# is the Pack build's PAYOFF, and it is deliberately near-worthless to a
@@ -3275,7 +3275,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "breaking_darkness",
 				"perfect_id": "", "perfect_text": "Holds 4 turns",
-				"description": "Break the dark over it: 20 Break\ndamage, and for 3 turns EVERY source\nof Break damage lands on it 25%\nharder. Break is what opens the madness\na boss would otherwise refuse."})
+				"description": "Break the dark over it: 20 Break\ndamage, and for 3 turns EVERY source\nof Break damage lands on it 25%\nharder. Break is what opens the madness\na boss would otherwise refuse.\nEVERY source means allies too: a\nSharpshooter's Fault Line and a\nWarden's Turn the Blade both land\nharder while this holds."})
 		# AXIS: the detonation cadence, and the lever nothing pulls. Ruin
 		# detonates on every TENTH stack and the stacks SURVIVE the blast, so a
 		# deep mark is an accumulation the game never lets him cash. This trades
@@ -3791,7 +3791,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Heals 150% of the damage",
-				"description": "CONSUME every status on one enemy:\n12% of Attack per status REMOVED,\nand you heal the same amount.\nA poison that cannot be cleansed\nstays — and is not paid for.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely."})
+				"description": "CONSUME every status on one enemy:\n12% of Attack per status REMOVED,\nand you heal the same amount.\nA poison that cannot be cleansed\nstays — and is not paid for.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely.\nA wound an ALLY opened reaps richer:\nup to 18% a status when the whole\nboard is the party's work."})
 	return null
 
 

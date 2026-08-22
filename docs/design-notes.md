@@ -4906,3 +4906,82 @@ danger is not only that a NEW red hides behind an old one; it is that a *plausib
 to a red stops anyone reading it. **`bi` hid behind an unrelated failure for four batches. `bo` hid
 behind an explanation.** The second is harder to see, because it does not look like an
 unanswered question — it looks like a settled one.
+
+
+---
+
+## BATCH DH — WHAT A CROSS-SPEC CLAUSE IS ACTUALLY FOR, AND THE THREE THINGS THE BRIEF HAD WRONG
+
+The gap the batch closed is easy to state and was invisible for the whole life of the draft: **all
+120 abilities were authored inside their own spec**, one pool at a time, so no card ever referred
+to another spec's vocabulary. Nothing was broken by that. It just meant the draft screen asked
+"what does this hero want?" and never "what does this *party* want?", which is the more interesting
+question and the one a four-of-twelve spec selection was built to pose.
+
+Two cards already crossed the line by accident. Fault Line gives the Sharpshooter Break, and
+Breaking Darkness amplifies every source of Break; Downwind copies whatever debuff an ally applied.
+Neither was authored as a coupling — they are couplings because their authors reached for general
+vocabulary instead of spec-local vocabulary. **That is the whole technique, and it costs nothing:
+write the clause against the game's shared nouns rather than against the spec's own.**
+
+**The rule that matters most is the one about naming, and it is not documentation.** A coupling the
+player cannot see on the draft card is not a coupling, because the draft is where the decision
+happens and the decision is made under time pressure against two other cards. Breaking Darkness is
+the proof: DH changed nothing mechanical about it. It amplified allies' Break the day it shipped.
+The clause is four lines of card text naming Fault Line and Turn the Blade, and it converts a
+combo people found by accident into one they can draft toward. **Discoverability was the whole
+deliverable and it was worth a slot in the batch.**
+
+### The three claims that did not survive contact with the repo
+
+The brief was careful and specific, and three of its load-bearing statements were wrong. All three
+were wrong in the same direction — **they described the game as of a mental model, not as of the
+code** — and each would have produced a different kind of damage.
+
+**"Canis's strikes apply Bleed."** Asked for as new work. `Summon Canis` has read *"attacks with
+you for 20% of your Attack, building 20 Bleed"* since the Beastmaster shipped, its arrival lays
+Bloodhowl's 15 on every enemy, and its Loyalty gift is +2 Bleed a stack. Writing this would have
+been **BD's Deadfall/Snare Trap duplication exactly** — the fault the brief's own §0 warned about,
+reproduced in the same batch that warned about it. The tell was cheap: the clause named a card, and
+nobody read that card's text. **The roster BR §1 tells you to sweep includes what the cards already
+say they do.**
+
+**"Battle Shout already reads enemy Bleed."** Battle Shout reads `bleed_buildup`, an integer meter
+on the unit that bleeds out at 100. There is no `bleed` row in `STATUS_INFO` at all — it was
+deleted at BJ §1 as unreachable, and the chip a player sees is *synthesized* from the meter in
+`unit.gd`. An implementation that took the brief at its word would have called
+`_apply_status(_, "bleed", …)` and indexed a table with no such key. **The distinction between a
+meter and a status is invisible in prose and total in code.**
+
+**"If statuses do not currently carry a source, say so and report the cost."** They have carried
+one since Batch W — `_apply_status` stamps `src_name` so that later mitigation can credit its
+caster. The brief had budgeted this clause as possibly-too-expensive-to-build and had given it
+permission to wait; it cost a read. **The interesting half is that the brief was right to ask.**
+The infrastructure exists but is *partial*: 53 of 204 single-line call sites pass `src`, so a
+status applied by one of the other 151 reads as unattributed and Harvest pays it the base rate.
+That is the safe direction — a missed bonus rather than a false one — but it is a real
+under-payment, and it is the kind of fact that only appears if you measure the call sites instead
+of confirming the field exists. **"Does the data exist" and "is the data populated" are two
+questions and the second one is the one that bites.**
+
+### The coupling that is worth more than the other eight
+
+Shared Grief reads how many allies stand below half health, and it is the only clause in the batch
+that couples two *engines* rather than two vocabularies.
+
+Mercy accrues on the **crossing** below half — `_check_below_half` fires once, gated on
+`was_above`. A hero who drops below half pays Holy one stack and then, for as long as they stay
+there, pays her nothing at all. Meanwhile the Berserker's entire Blood Frenzy band **lives** below
+half on purpose: Blood Offering exists to buy the band deliberately, and the spec is built to sit
+in it. So the party composition that keeps a hero parked in Holy's generator is precisely the one
+her generator cannot see, because it measures a transition and he is a steady state.
+
+**The two specs are inverted from each other and that is what makes them fuel.** She is starved
+when the party is healthy; he is strongest when it is not. One clause reading a *level* rather than
+an *edge* converts his standing state into her resource. Nothing else in the batch has that
+property — the other eight couple a status one spec applies to a status another spec reads, which
+is useful and mechanical. This one couples two design intentions that were authored years apart and
+never told about each other.
+
+**The general form is worth keeping: when a meter pays on a transition, ask which spec parks in the
+state it transitions into.** That spec is a partner nobody has written down.

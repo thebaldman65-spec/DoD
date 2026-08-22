@@ -2338,6 +2338,34 @@ PLAN IS A CARD THAT FILLS A SLOT.**
   forced the comparison. See the BT block for the resolution (the acquisition channel is the
   distinction, and the perfect is what stops it being dominated outright).
 
+## STANDING RULE — A CROSS-SPEC COUPLING IS NAMED IN THE CARD TEXT, AND IS A BONUS ON A CARD THAT ALREADY WORKS ALONE (Batch DH)
+**A RUN FIELDS FOUR OF TWELVE SPECS, SO A CLAUSE THAT NEEDS A SPECIFIC PARTNER IS DEAD MOST OF THE
+TIME.** Every one of the 120 draft abilities was authored inside its own spec, so for most of the
+draft's life the pools never referenced each other and drafting was a decision about ONE HERO
+rather than about the party. Two accidental exceptions proved the shape works — Fault Line hands
+the Sharpshooter the Break that Breaking Darkness amplifies, and Downwind copies whatever debuff
+an ally applied — and both are among the most interesting cards in their pools. DH made nine
+deliberate. The two halves of the rule are not separable:
+· **NAMED IN THE CARD TEXT.** If it is not visible on the draft card the player cannot draft FOR
+  it, and **the draft screen is the only place the decision happens**. A quiet synergy is a
+  coincidence, not a design. Naming it is sometimes the WHOLE change: DH's Breaking Darkness clause
+  is text only — the card already amplified every source of Break, including allies', and had done
+  since it shipped.
+· **HUB AND SPOKE, NOT PAIRS.** The clause runs ONE WAY into a spec already built to be fed
+  (the Survivalist's Trapper counts statuses from any source; the Pyromancer consumes Burn
+  whoever lit it). **A two-way pair is two dead cards when either partner is absent.**
+· **A BONUS ON TOP, NEVER A CONDITION.** No magnitude on the existing effect moves. A lone
+  Pyromancer draws exactly what he always drew; a Holy beside a healthy party gains exactly the
+  4 Mercy she always gained.
+· **ANY STATUS A FEEDER APPLIES MUST BE IN `DEBUFF_IDS`** — the Survivalist's breadth term and
+  the Swordmaster's Overwhelm both count that curated list and nothing else, so a status outside
+  it applies, logs, reads as working and feeds them **nothing**. This is silent.
+· **AND CHECK THE CLAUSE AGAINST WHAT IS ALREADY SHIPPED, NOT ONLY AGAINST THE TALENT TREES.**
+  DH's brief asked for "Canis's strikes apply Bleed"; `Summon Canis` has read *"attacks with you
+  for 20% of your Attack, building 20 Bleed"* for many batches. **A card's own text is part of
+  the roster BR §1 tells you to sweep.** The gap was the OTHER TWO companions, and the clause
+  moved to the card that sends any of them.
+
 ## STANDING RULE — SWEEP A NAME AGAINST THE WHOLE ROSTER BEFORE AUTHORING IT (Batch BR §1)
 **Every ability, talent node, status and rune.** An ABILITY-vs-ABILITY duplicate is a real break —
 `Classes.pool_ability` is keyed on `display_name`, so two abilities sharing one make the resolver

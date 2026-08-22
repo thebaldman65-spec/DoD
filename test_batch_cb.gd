@@ -666,7 +666,15 @@ func _live_emberkeep() -> void:
 	ok(_burn_turns(new_fire) == 3 * EMBERKEEP_MULT_TEST,
 		"Burn applied inside the window lands at DOUBLE duration (want %d, got %d)"
 			% [3 * EMBERKEEP_MULT_TEST, _burn_turns(new_fire)])
-	# SCOPED TO THE SRC: a SECOND applier's fire is not his and is not doubled.
+	# BATCH DH §2 — INVERTED, AND THE INVERSION IS THE BATCH. This assertion
+	# read "a SECOND applier's Burn is not doubled" from CB until DH: the keep
+	# was scoped to the SRC, so a Burn any other hero applied burned at its own
+	# length while the Pyromancer stood beside it holding the window open. DH
+	# makes him the PARTY'S Burn amplifier — the whole point of the clause is
+	# that an ally's fire now rides it — so the old assertion pinned exactly the
+	# rule the batch changed. It is inverted rather than deleted: the question
+	# ("whose fire does the window reach?") is still worth asking, and only the
+	# answer moved.
 	var other := _mage(scene, "")
 	if other == null:
 		for h in scene.get("heroes"):
@@ -677,8 +685,22 @@ func _live_emberkeep() -> void:
 		var third: BattleUnit = foes[0]
 		third.remove_status("burn")
 		scene.call("_apply_status", third, "burn", 3, 0, 6, other)
-		ok(_burn_turns(third) == 3,
-			"a SECOND applier's Burn is not doubled (got %d)" % _burn_turns(third))
+		ok(_burn_turns(third) == 3 * EMBERKEEP_MULT_TEST,
+			"a SECOND HERO's Burn IS doubled now — the keep is the party's (want %d, got %d)"
+				% [3 * EMBERKEEP_MULT_TEST, _burn_turns(third)])
+	# AND THE GUARD THAT MAKES THAT SAFE: "anyone" MEANS ANYONE IN THE PARTY.
+	# `_apply_status`'s clause reads `src.is_hero`, so an ENEMY's fire — an
+	# Ashblade's, a rune's — still lands at its own length. Without this the
+	# card would double the fire eating the heroes, and the old src-scoping hid
+	# that question because only he could ever hold the status. NEW AT DH, and
+	# it is the +1 on this suite.
+	var e_src: BattleUnit = foes[1]
+	var e_mark: BattleUnit = foes[0]
+	e_mark.remove_status("burn")
+	scene.call("_apply_status", e_mark, "burn", 3, 0, 6, e_src)
+	ok(_burn_turns(e_mark) == 3,
+		"an ENEMY's Burn is NOT doubled by the party's keep (want 3, got %d)"
+			% _burn_turns(e_mark))
 	# AND A BATTLE-LONG FIRE IS NOT TURNED INTO -2. A negative turn count is a
 	# PERMANENCE FLAG rather than a duration (BV's `full_turns` lesson).
 	var perm: BattleUnit = foes[1]

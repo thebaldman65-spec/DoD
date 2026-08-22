@@ -14,6 +14,108 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-22 &mdash; Batch DH: CROSS-SPEC SYNERGY</h2>
+<p><i><b>Nine clauses on nine existing cards. No new abilities, no new statuses, no pool depth
+change</b> &mdash; <code>SPEC_DRAFT_POOLS</code> stays at 96 and the draft stays at <b>120 of
+120</b>. Every one of the 120 draft abilities was authored inside its own spec, so the pools
+never referenced each other and <b>drafting was a decision about one hero rather than about the
+party</b>. Two accidental exceptions proved the shape worked &mdash; Fault Line hands the
+Sharpshooter the Break that Breaking Darkness amplifies, and Downwind copies whatever debuff an
+ally applied. These nine are deliberate. <b>Three of the brief&rsquo;s own claims were wrong
+against the repo and are corrected below.</b> <b>No save version moves (still v10).</b> The full
+report is <code>docs/reports/DH.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; THE FOUR RULES, AND THE ONE THAT BIT</h3>
+<p><b>Every coupling is named in the card text</b> (the draft screen is the only place the
+decision happens); <b>hub and spoke, not pairs</b> (a run fields four of twelve specs, so a
+clause that needs a named partner is dead most of the time &mdash; every one of the nine is a
+bonus on a card that already works alone); <b>any status a feeder applies must be in
+<code>DEBUFF_IDS</code></b>, or it applies, logs, reads as working and feeds the Survivalist&rsquo;s
+breadth term nothing; and <b>no clause may duplicate an existing talent</b>.</p>
+<p><b>THE FOURTH RULE BIT, AND IT BIT ON THE CARD THE BRIEF WAS MOST CONFIDENT ABOUT.</b> The
+brief asked for &ldquo;Canis&rsquo;s strikes apply Bleed&rdquo;. <b><code>Summon Canis</code> already
+reads &ldquo;attacks with you for 20% of your Attack, <i>building 20 Bleed</i>&rdquo;</b>, its arrival
+lays Bloodhowl&rsquo;s 15 on every enemy, and its Loyalty gift is +2 Bleed a stack &mdash; shipped,
+and <code>_companion_strike</code>&rsquo;s <code>canis</code> branch has carried it for many batches.
+Writing that clause would have been <b>BD&rsquo;s Deadfall/Snare Trap duplication exactly</b>:
+fourteen batches of a duplicate nobody read. <b>The gap is the other two companions</b> &mdash;
+Ursus builds no Bleed and Aguila lays Exposed &mdash; so the clause moved to the card instead.</p>
+
+<h3>&sect;1 &mdash; FEEDING THE SURVIVALIST</h3>
+<p>His Trapper counts <b>different</b> statuses from any source, allies&rsquo; included; he is the one
+spec already built to be fed. <b>Choking Smoke also sets every enemy Burning 2 turns</b> &mdash;
+one clause, two couplings: it widens his own breadth (<code>burn</code> is in
+<code>DEBUFF_IDS</code>) and it arms the Pyromancer&rsquo;s Ember Debt and Funeral Pyre, which
+consume Burn and have never had a second applier in the party. <b>Snare Line&rsquo;s spring holds a
+Chilled enemy 2 turns instead of 1</b>; the Cryomancer lays that ice and nothing in the
+Survivalist&rsquo;s own kit does. The clause is written at the <i>line&rsquo;s</i> spring site and
+<b>not inside <code>_spring_trap</code></b>, which is shared with the placed deadfall and Snare
+Trap &mdash; a clause in the helper would have moved a magnitude on two existing effects.</p>
+<p><b>HARVEST IS THE HUB STATED OUTRIGHT, AND THE BRIEF EXPECTED IT TO BE UNAFFORDABLE.</b> It
+now pays up to <b>18% of Attack a status</b> against its base 12, scaled by the share of the
+reaped board that somebody <i>else</i> opened. The brief asked for the cost of knowing who
+applied each status to be reported before building it, on the assumption statuses carry no
+source. <b>They have carried one since Batch W</b>: <code>_apply_status</code> stamps
+<code>src_name</code> onto the status it just applied so later mitigation can credit its caster.
+The clause cost <b>a read, not a signature change across 244 call sites</b>. <b>The caveat is
+real and is recorded rather than hidden:</b> only sites that pass <code>src</code> stamp it
+&mdash; <b>53 of 204</b> single-line <code>_apply_status</code> calls do &mdash; so an unstamped
+status reads as &ldquo;not an ally&rsquo;s&rdquo; and pays the base rate. That is the safe direction
+(a missed bonus, never a false one), but it is an under-payment.</p>
+
+<h3>&sect;2 &mdash; FEEDING THE PYROMANCER</h3>
+<p><b>Emberkeep extends Burn any HERO applies</b>, not only his own, which makes him the
+party&rsquo;s Burn amplifier and the consuming end of &sect;1&rsquo;s Choking Smoke. The whole mechanic
+is still one clause at <code>_apply_status</code>&rsquo;s <code>eff_turns</code> block.
+<b><code>src.is_hero</code> is the guard and it is load-bearing</b>: &ldquo;anyone&rdquo; means anyone
+in the <i>party</i>, or the card would double the fire eating the heroes. The old scoping did
+that work by accident, because only he could ever hold the status. <b>Firedraw draws 9 turns
+instead of 6 from an enemy already carrying another spec&rsquo;s debuff</b>, read off the curated
+<code>DEBUFF_IDS</code> list minus his own vocabulary (<code>burn</code>, <code>slow_burn</code>)
+and minus <code>broken</code>, which is a Break-meter state rather than an affliction anybody
+applied.</p>
+
+<h3>&sect;3 &mdash; FEEDING THE OCCULTIST</h3>
+<p><b>Breaking Darkness names its partners in the text, and nothing mechanical moves.</b> The
+card already amplified <i>every</i> source of Break by 25%; it now says so, and names the
+Sharpshooter&rsquo;s Fault Line and the Warden&rsquo;s Turn the Blade. The combo existed and was found
+by accident &mdash; this is discoverability. <b>Suffering&rsquo;s drip pays 3 Ruin a turn against a
+Broken enemy instead of 2</b>, tying his Madness gate to whoever is generating Break; CR made
+hard control Broken-gated, so Broken is already the axis the party works toward.</p>
+
+<h3>&sect;4 &mdash; THE TWO THAT COUPLE PLAYSTYLES RATHER THAN STATUSES</h3>
+<p><b>Savage Sweep&rsquo;s run opens 12 Bleed on each enemy it reaches, whichever companion runs
+it.</b> The consuming end is a Berserker card that exists today: Battle Shout pays +1% party
+damage per 20 of the enemy party&rsquo;s bleed buildup, summed across every living enemy, so three
+bleeding bodies is the widest single contribution to that sum in the game. It feeds Trapper too
+&mdash; the chip <code>log_bleed_chip</code> synthesizes carries id <code>bleed</code>, which is
+in <code>DEBUFF_IDS</code>. <b>It goes through <code>_add_bleed_with_burst</code> and never
+<code>_apply_status</code></b>: Bleed is a <i>meter</i>, and its <code>STATUS_INFO</code> row was
+deleted at BJ &sect;1 as unreachable, so an <code>_apply_status(_, &quot;bleed&quot;, &hellip;)</code>
+would index a table with no such key. <b>That is the brief&rsquo;s second wrong claim</b> &mdash; it
+described Bleed as a status Battle Shout reads; Battle Shout reads <code>bleed_buildup</code>.</p>
+<p><b>SHARED GRIEF READS HOW MANY ALLIES STAND BELOW HALF, AND IT IS THE BEST COUPLING IN THE
+BATCH FOR A STRUCTURAL REASON.</b> Mercy accrues only on the <i>crossing</i> below half
+(<code>_check_below_half</code> fires once, on <code>was_above</code>), so a hero who <i>parks</i>
+in that band pays her exactly once and then nothing &mdash; and the Berserker&rsquo;s entire Blood
+Frenzy band lives down there on purpose. <b>The two specs whose engines are inverted from each
+other become each other&rsquo;s fuel.</b> She gains +1 Mercy per other living ally below the window,
+on top of her 4. It reads <code>mercy_threshold</code> rather than a literal half, because
+<b>Guardian Angel raises that stamp party-wide</b> and a literal would silently disagree with the
+passive the card is named after. Companions are excluded, and so is she &mdash; paying her for
+her own wound would let the card fund its own price.</p>
+
+<h3>&sect;5 &mdash; THE ONE SUITE MOVEMENT, AND IT IS AN INVERSION PLUS A GUARD</h3>
+<p><b><code>test_batch_cb</code> goes 1184 &rarr; 1185, and it is the only check count in the
+project that moves.</b> That suite asserted <i>&ldquo;a SECOND applier&rsquo;s Burn is not
+doubled&rdquo;</i> &mdash; exactly the rule &sect;2 inverts &mdash; so the assertion is
+<b>INVERTED rather than deleted</b>, on <code>ce</code>&rsquo;s idiom: the question (whose fire does
+the window reach?) is still worth asking and only the answer moved. That edit is count-neutral.
+<b>The +1 is a new assertion beside it: an ENEMY&rsquo;s Burn is still not doubled</b>, which pins
+the <code>src.is_hero</code> guard. The old src-scoping hid that question because only he could
+ever hold the status, and without the pin a later batch could drop the guard silently.
+<b>Predicted in <code>baselines.json</code> before the battery ran, and the battery agreed.</b></p>
+
 <h2>2026-08-22 &mdash; Batch DG: THE LAST TEN</h2>
 <p><i>DF sorted the battery&rsquo;s 47 reds and repaired 37 of them; <b>these are the ten that
 needed a ruling, and all ten are closed</b>. Two were the game being wrong and both were prose;

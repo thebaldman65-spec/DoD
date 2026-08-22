@@ -454,7 +454,7 @@ const STATUS_INFO := {
 	# `resonant_field` DELIBERATELY CARRIES NO NUMBER, which is Null Field's rule:
 	# the share is computed at the attacker block off the Arcanist's LIVE meter,
 	# so stamping a value here would freeze it at cast time and delete the card.
-	"emberkeep": ["Emberkeep", "Ek", Color(1.0, 0.68, 0.30), "The embers are kept: every Burn HE\napplies lands at DOUBLE duration.\nIt changes what ARRIVES — fire already\nstanding on the board is untouched."],
+	"emberkeep": ["Emberkeep", "Ek", Color(1.0, 0.68, 0.30), "The embers are kept: every Burn ANY\nHERO applies lands at DOUBLE duration.\nIt changes what ARRIVES — fire already\nstanding on the board is untouched."],
 	"frostbind": ["Frostbind", "Fb", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
 	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
 	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
@@ -2817,8 +2817,30 @@ func _run_battle() -> void:
 				_log("%s's snare line springs on %s" % [heroes[sl_idx2].unit_name,
 					u.unit_name], "#c8a860")
 				_stat("snare_line_springs")
+				var sl_cold := u.has_status("chilled")
 				_spring_trap(heroes[sl_idx2], u,
 					DEADFALL_SPRING_PCT * heroes[sl_idx2].attack)
+				# BATCH DH §1 — THE LINE BINDS A CHILLED BODY HARDER, and the
+				# feeder is the CRYOMANCER: Chilled is everywhere in that spec
+				# and nothing in the Survivalist's kit applies it, so this is a
+				# bonus he can only reach by drafting beside one. NAMED on the
+				# card, per §0.
+				#
+				# IT IS WRITTEN HERE AND NOT IN `_spring_trap`, WHICH IS THE
+				# WHOLE CARE OF THIS CLAUSE: that helper is shared with the
+				# placed deadfall and Snare Trap, so a clause inside it would
+				# move a magnitude on TWO existing effects — exactly what §5
+				# forbids. Only the LINE binds harder.
+				#
+				# `add_status` MAXES turns, so re-applying `stunned` at 2 raises
+				# the spring's own 1 rather than stacking a second stun; and the
+				# boss refusal in `_apply_status` still stands, so an unbroken
+				# boss shrugs this off exactly as it shrugs off the spring.
+				if sl_cold and not u.dead:
+					_apply_status(u, "stunned", SNARE_LINE_COLD_STUN, 0, 0,
+						heroes[sl_idx2])
+					_log("   → the ice holds it: the line binds %s %d turns" % [
+						u.unit_name, SNARE_LINE_COLD_STUN], "#8fc8e0")
 		# BATCH BD — the placed deadfall rests and springs at one site, and that
 		# site is ITS OWN FUNCTION rather than a clause buried in this loop:
 		# `_run_battle` cannot be driven headlessly (the AR trap), so a rule with a
@@ -11699,8 +11721,20 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# rather than a duration, so doubling it would turn -1 into -2 — a number
 	# nothing downstream understands — and would quietly un-permanent a
 	# battle-long fire.
-	if id == "burn" and turns > 0 and src != null \
-			and src.has_status("emberkeep"):
+	#
+	# BATCH DH §2 — THE KEEP IS THE PARTY'S NOW, NOT ONLY HIS. It used to read
+	# `src.has_status("emberkeep")`, so a Burn any OTHER hero applied burned at
+	# its own length while the Pyromancer stood beside it holding the window
+	# open. He becomes the party's Burn AMPLIFIER, which is what makes §1's
+	# Choking Smoke worth drafting beside him — the two clauses are one loop.
+	#
+	# `src.is_hero` IS THE GUARD AND IT IS LOAD-BEARING. "Anyone" means anyone
+	# in the PARTY: an enemy Ashblade's burn, and a rune's, must still land at
+	# its own length, or the card would double the fire eating the heroes. The
+	# old scoping did that work by accident (only he held the status); saying it
+	# outright is what lets the holder be someone else.
+	if id == "burn" and turns > 0 and src != null and src.is_hero \
+			and _emberkeep_holder() != null:
 		eff_turns = turns * EMBERKEEP_MULT
 	# BATCH BM §2 — THE THREE "IT STOPS EXPIRING" ROW-8 NODES, at ONE site,
 	# because they are one rule pointed at three status families and three
@@ -12047,6 +12081,32 @@ const ARCANE_ECHO_TURNS := 3
 # FIREDRAW: how many turns of Burn it pulls from EACH other enemy. It takes
 # what is there or this, WHICHEVER IS LESS — an enemy holding 2 gives 2, never
 # a debt — and the target's own Burn is never touched.
+# BATCH DH §1 — what a Snare Line spring holds a CHILLED enemy for, against
+# the spring's own 1. A named constant rather than a literal because it is a
+# MAGNITUDE a later batch may want to tune, and the card states the number.
+const SNARE_LINE_COLD_STUN := 2
+# BATCH DH §1 — HARVEST'S ALLY TERM. The base is 12% of Attack per status
+# reaped; this is what is ADDED when every status reaped was opened by someone
+# else, scaled by the ally SHARE, so a full board of the party's work pays 18%
+# a status and a board he opened alone still pays exactly the 12% it always
+# did. The base does not move — §5's rule.
+const HARVEST_ALLY_BONUS := 0.06
+# BATCH DH §2 — the EXTRA turns of Burn Firedraw pulls out of an enemy another
+# spec has already afflicted, on top of the 6 it takes from a clean one. The
+# base does not move: a lone Pyromancer draws exactly what he always drew.
+const FIREDRAW_DEEP_BONUS := 3
+# BATCH DH §3 — the EXTRA Ruin a turn Suffering's drip pays while the body it
+# rides is BROKEN. The base rate (2, or 3 on a perfect) does not move.
+const SUFFERING_BROKEN_BONUS := 1
+# BATCH DH §4 — the Bleed Savage Sweep's run opens on each enemy it reaches,
+# whichever companion runs the line. It is deliberately UNDER the wolf's own 20
+# a strike: this is the card bleeding, not the animal, and Canis still bleeds
+# harder than the other two because its own line stacks on top of this one.
+const SAVAGE_SWEEP_BLEED := 12
+# BATCH DH §4 — the EXTRA Mercy Shared Grief pays per OTHER living ally
+# standing below the Mercy window. The base 4 does not move: a Holy alone with
+# a healthy party gains exactly what she always did.
+const SHARED_GRIEF_PER_WOUNDED := 1
 const FIREDRAW_TAKE := 4
 const FIREDRAW_TAKE_PERFECT := 6
 # PYRE WAKE: how long each scattered fire burns. ONE turn, deliberately — the
@@ -15491,19 +15551,41 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# on top of the base 5 (and Dazed's 20), never as a multiplier.
 			# Priced honestly: AoE attacks roll no miss at all, so this blanks
 			# single-target blows only.
+			#
+			# BATCH DH §1 — THE SMOKE ALSO BURNS, and this is the batch's first
+			# CROSS-SPEC clause: one line, two couplings, both NAMED on the card
+			# (§0's rule — a synergy the draft screen cannot see is a
+			# coincidence). It widens HIS OWN Trapper breadth, because `burn` is
+			# in `DEBUFF_IDS` and `_status_count` reads that curated list; and it
+			# ARMS THE PYROMANCER'S Ember Debt and Funeral Pyre, which consume
+			# Burn and have never had a second applier in the party.
+			#
+			# IT GOES THROUGH `_apply_status` WITH `attacker` AS SRC, which is
+			# load-bearing twice over: the burn branch in `add_status` EXTENDS a
+			# running fire rather than replacing it, and passing src is what lets
+			# a Pyromancer's Emberkeep see this fire at all (§2's clause reads
+			# the same door). The tick comes from `_dot_tick` so the smoke burns
+			# at the SURVIVALIST'S Attack, not at a literal.
 			var cs_turns := 3
+			var cs_burn := 2
 			var cs_hit := 0
+			var cs_lit := 0
 			for foe4 in enemies:
 				if foe4.dead:
 					continue
 				_apply_status(foe4, "blind", cs_turns, 0, 0, attacker)
 				if foe4.has_status("blind"):
 					cs_hit += 1
+				_apply_status(foe4, "burn", cs_burn, 0,
+					_dot_tick("burn", attacker), attacker)
+				if foe4.has_status("burn"):
+					cs_lit += 1
 			_sfx("bomb", -9.0, 0.7)
 			_message("%s fouls the air" % attacker.unit_name)
-			_log("%s: Choking Smoke — %d %s Blinded for %d turns" % [
+			_log("%s: Choking Smoke — %d %s Blinded for %d turns, and %d set Burning %d" % [
 				attacker.unit_name, cs_hit,
-				"enemy" if cs_hit == 1 else "enemies", cs_turns], "#8fa070")
+				"enemy" if cs_hit == 1 else "enemies", cs_turns,
+				cs_lit, cs_burn], "#8fa070")
 		"snare_line":
 			# AXIS: the traps stop waiting. It fills NO trap slot and spends no
 			# placed trap — it is its own line, and that is stated on the card
@@ -16876,6 +16958,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var fd_binfo: Array = STATUS_INFO["burn"]
 				var fd_moved := 0
 				var fd_from := 0
+				var fd_deep := 0
 				for foe in enemies:
 					if foe.dead or foe == target:
 						continue
@@ -16883,7 +16966,21 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var fd_left: int = maxi(int(fd_st.get("turns", 0)), 0)
 					if fd_left <= 0:
 						continue
-					var fd_spent: int = mini(fd_take, fd_left)
+					# BATCH DH §2 — THE DRAW RUNS DEEPER OUT OF A BODY ANOTHER
+					# SPEC HAS ALREADY WORKED. `_other_spec_debuff` reads the
+					# CURATED `DEBUFF_IDS` LIST — §0's rule, and the same list
+					# Trapper and Overwhelm count — rather than a second
+					# hand-rolled table that would drift away from it.
+					#
+					# IT IS A PROPERTY OF EACH SOURCE BODY, NOT OF THE TARGET,
+					# which is what makes it a DRAW clause rather than a damage
+					# one: a field the Cryomancer has chilled and the Occultist
+					# has marked gives up its fire faster than a clean one.
+					var fd_this := fd_take
+					if _other_spec_debuff(foe):
+						fd_this += FIREDRAW_DEEP_BONUS
+						fd_deep += 1
+					var fd_spent: int = mini(fd_this, fd_left)
 					if fd_left - fd_spent <= 0:
 						foe.remove_status("burn")
 					else:
@@ -16908,10 +17005,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						attacker.unit_name, "#909090")
 				else:
 					_message("%s draws the field's fire together" % attacker.unit_name)
-					_log("%s: Firedraw — %d turn%s of Burn pulled from %d %s onto %s" % [
+					_log("%s: Firedraw — %d turn%s of Burn pulled from %d %s onto %s (%d gave up more, already worked by another spec)" % [
 						attacker.unit_name, fd_moved,
 						"" if fd_moved == 1 else "s", fd_from,
-						"enemy" if fd_from == 1 else "enemies", target.unit_name], "#e08850")
+						"enemy" if fd_from == 1 else "enemies", target.unit_name,
+						fd_deep], "#e08850")
 		"pyre_wake":
 			# AXIS: the bank SCATTERED rather than cashed — the only card in the
 			# game that converts DEPTH into WIDTH. A twelve-turn stack becomes
@@ -16996,7 +17094,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -9.0, 0.8)
 			attacker.float_text("EMBERKEEP", Color(1.0, 0.68, 0.30))
 			_message("%s banks the heat" % attacker.unit_name)
-			_log("%s: Emberkeep — for %d turns every Burn HE applies lands at DOUBLE duration (fire already burning is untouched)" % [
+			_log("%s: Emberkeep — for %d turns every Burn ANY HERO applies lands at DOUBLE duration (fire already burning is untouched)" % [
 				attacker.unit_name, ek_turns], "#e08850")
 		"deep_winter":
 			# AXIS: the hold as a TEMPLATE, applied wide. Rimebinding copies the
@@ -17656,12 +17754,67 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						target.unit_name], "#909090")
 				else:
 					var hv_before := _status_count(target)
+					# BATCH DH §1 — THE HUB CLAUSE, STATED OUTRIGHT: he is paid
+					# MORE for a wound an ALLY opened than for one he opened
+					# himself. Trapper already counts statuses from any source;
+					# this is the first card that pays for WHOSE they are.
+					#
+					# THE SOURCE WAS ALREADY THERE AND THE BRIEF EXPECTED IT NOT
+					# TO BE. `_apply_status` has stamped `src_name` onto the
+					# status since BATCH W ("the src name also rides the status
+					# so mitigation it later performs can credit its caster") —
+					# so this clause costs a READ, not a signature change across
+					# 244 call sites. Nothing new is threaded anywhere.
+					#
+					# THE CAVEAT, AND IT IS REAL: only sites that PASS src stamp
+					# it — 53 of 204 single-line `_apply_status` calls do. An
+					# unstamped status therefore reads as "not an ally's" and
+					# pays the BASE rate. That is the safe direction (a missed
+					# bonus, never a false one), but it IS an under-payment and
+					# it is recorded rather than hidden.
+					#
+					# The snapshot is taken BEFORE the purge because the purge is
+					# what destroys the evidence, and it counts only what
+					# `_harvest_yield` would actually take — the same filter, so
+					# a sticky poison that survives is not credited to an ally
+					# any more than it is billed for.
+					#
+					# THE NAME IS RESOLVED AGAINST THE PARTY, NOT MERELY
+					# COMPARED TO HIS OWN. `_apply_status` stamps `src_name`
+					# for ANY source, an enemy's included, so a bare
+					# `src != attacker.unit_name` would read a debuff one enemy
+					# laid on another as the party's work and pay him for it.
+					# Resolving by name through the array is `_frostbind_partner`'s
+					# idiom exactly. `heroes` CARRIES THE COMPANIONS, which is
+					# correct rather than incidental: Aguila's Exposed is the
+					# Beastmaster's work, and a hero who has since DIED still
+					# opened the wound, so neither is filtered on `dead`.
+					var hv_ally := 0
+					for hv_s in target.statuses:
+						if hv_s.id == "broken" or bool(hv_s.get("sticky", false)):
+							continue
+						if not BattleUnit.DEBUFF_IDS.has(hv_s.id):
+							continue
+						var hv_src := String(hv_s.get("src_name", ""))
+						if hv_src == "" or hv_src == attacker.unit_name:
+							continue
+						for hv_h in heroes:
+							if hv_h != attacker and hv_h.unit_name == hv_src:
+								hv_ally += 1
+								break
 					target.purge_debuffs()
 					# The real count, measured rather than predicted: what the
 					# purge TOOK. It cannot exceed the prediction, and it charges
 					# for nothing that is still standing on the body.
 					hv_n = maxi(hv_before - _status_count(target), 0)
-					var hv_raw := 0.12 * attacker.attack * hv_n * randf_range(0.9, 1.1)
+					# The ally share can never exceed what the purge actually
+					# took — BA's rule for the base count, applied to the bonus
+					# so the two can never disagree about how many wounds there
+					# were.
+					hv_ally = mini(hv_ally, hv_n)
+					var hv_pct := 0.12 + HARVEST_ALLY_BONUS * (
+						float(hv_ally) / float(hv_n) if hv_n > 0 else 0.0)
+					var hv_raw := hv_pct * attacker.attack * hv_n * randf_range(0.9, 1.1)
 					hv_raw *= 1.0 - float(target.resists.get("nature", 0.0))
 					var hv_final := maxi(int(round(hv_raw \
 						* (1.0 - target.effective_armor()))), 1)
@@ -17672,8 +17825,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.float_text("+%d" % hv_heal, Color(0.4, 0.9, 0.45))
 					_sfx("crit", -6.0, 0.7)
 					_message("%s reaps the rot!" % attacker.unit_name)
-					_log("%s: Harvest — %d statuses consumed, %d damage, %d healed" % [
-						attacker.unit_name, hv_n, hv_final, hv_heal], "#70d878")
+					_log("%s: Harvest — %d statuses consumed (%d an ally opened), %d damage, %d healed" % [
+						attacker.unit_name, hv_n, hv_ally, hv_final,
+						hv_heal], "#70d878")
 					attacker.refresh_bars()
 					if hv_res.died:
 						_stat("enemy_deaths")
@@ -18657,7 +18811,33 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# hit routed through `take_hit` would sometimes pay a fourth one and
 			# the card would stop paying "exactly 3".
 			var sg_cost := maxi(int(round(attacker.max_hp * 0.25)), 1)
-			var sg_grant := 4
+			# BATCH DH §4 — THE BEST COUPLING IN THE BATCH, AND THE REASON IS
+			# STRUCTURAL. Mercy accrues on the CROSSING below half
+			# (`_check_below_half` fires once, on `was_above`), so a hero who
+			# PARKS in that band pays her exactly once and then nothing — and
+			# the Berserker's entire Blood Frenzy band lives down there on
+			# purpose. Her engine and his are inverted, and this is the line
+			# that makes each the other's fuel: she is starved when the party is
+			# healthy, and paid when it is not.
+			#
+			# IT READS `mercy_threshold` RATHER THAN A LITERAL HALF, which is
+			# the rule `_check_below_half` and `take_hit` already keep — the
+			# stamp is party-wide and GUARDIAN ANGEL RAISES IT, so a literal
+			# 0.5 here would silently disagree with the passive it is named
+			# after the moment that node is learned.
+			#
+			# COMPANIONS ARE EXCLUDED and SHE IS EXCLUDED. A companion is not
+			# an ally Mercy has ever counted (`_check_below_half` gates on
+			# `is_hero and not is_companion`), and paying her for her OWN
+			# wound would double-count the 25% she just paid — the card would
+			# fund its own price.
+			var sg_low := 0
+			for sg_h in heroes:
+				if sg_h.dead or sg_h.is_companion or sg_h == attacker:
+					continue
+				if sg_h.hp <= sg_h.max_hp * sg_h.mercy_threshold:
+					sg_low += 1
+			var sg_grant := 4 + sg_low * SHARED_GRIEF_PER_WOUNDED
 			attacker.hp = maxi(attacker.hp - sg_cost, 1)
 			attacker.refresh_bars()
 			attacker.float_text("-%d" % sg_cost, Color(0.85, 0.35, 0.35))
@@ -18673,9 +18853,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+%d Mercy" % sg_got, Color(0.95, 0.8, 0.3))
 				_sfx("heal", -9.0, 0.6)
 				_message("%s takes the grief upon herself" % attacker.unit_name)
-				_log("%s: Shared Grief — %d health for %d Mercy (%d/%d)" % [
+				_log("%s: Shared Grief — %d health for %d Mercy (%d/%d)%s" % [
 					attacker.unit_name, sg_cost, sg_got,
-					attacker.second_resource, attacker.second_max], "#e8c860")
+					attacker.second_resource, attacker.second_max,
+					" — %d ally below half, and the grief is shared" % sg_low \
+						if sg_low == 1 else \
+					(" — %d allies below half, and the grief is shared" % sg_low \
+						if sg_low > 1 else "")], "#e8c860")
 		"reprisal":
 			# HEALING LANDED IN THE LAST TWO TURNS, read off the ledger
 			# `_book_healing` keeps — never off the contribution stat, which is
@@ -18837,10 +19021,31 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			else:
 				# THE DRIP RIDES THE ENEMY AND PAYS ON THE ENEMY'S CLOCK, which
 				# is the axis: eight stacks bought with one turn of his.
+				# BATCH DH §3 — THE WOUND RUNS DEEPER IN A BROKEN BODY, and
+				# this ties his MADNESS GATE to whoever is generating Break.
+				# CR made hard control Broken-gated, so Broken is already the
+				# axis the party works toward; nothing in the Occultist's own
+				# kit is the fastest way there. A Warden, a Sharpshooter or an
+				# Inquisitor breaking the target now pays HIM.
+				#
+				# IT IS READ ON `target.broken`, THE METER STATE, NOT ON A
+				# STATUS — `broken` is deliberately outside `DEBUFF_IDS`'s
+				# reach for counting purposes (`_status_count` excludes it by
+				# name) because it is a Break-METER state rather than an
+				# affliction anybody applied. This is the same distinction
+				# `_other_spec_debuff` keeps one screen up.
+				#
+				# THE PERFECT AND THE BREAK STACK, and deliberately: a perfect
+				# cast into a broken body is the best this card has, and both
+				# halves are stated on the draft card.
 				var su_rate := 3 if is_perfect else 2
+				if target.broken:
+					su_rate += SUFFERING_BROKEN_BONUS
 				_apply_status(target, "suffering", 4, su_rate, 0, attacker)
-				_log("   → Suffering: %s gains %d Ruin at the start of each of its next 4 turns" % [
-					target.unit_name, su_rate], "#a050b0")
+				_log("   → Suffering: %s gains %d Ruin at the start of each of its next 4 turns%s" % [
+					target.unit_name, su_rate,
+					" (the body is BROKEN — the wound runs deeper)" \
+						if target.broken else ""], "#a050b0")
 		"transference":
 			# A MOVE IS NOT A GAIN. It deliberately does NOT go through
 			# `_gain_ruin` — that function arms the detonation threshold on
@@ -18953,15 +19158,46 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					ss_pool.erase(ss_pick)
 				_message("%s looses %s down the line!" % [attacker.unit_name,
 					ss_b.unit_name])
-				_log("%s: Savage Sweep — %s runs at the %d lowest-health enem%s" % [
+				_log("%s: Savage Sweep — %s runs at the %d lowest-health enem%s, opening %d Bleed on each" % [
 					attacker.unit_name, ss_b.unit_name, ss_marks.size(),
-					"y" if ss_marks.size() == 1 else "ies"], "#e0a050")
+					"y" if ss_marks.size() == 1 else "ies",
+					SAVAGE_SWEEP_BLEED], "#e0a050")
+				# BATCH DH §4 — THE RUN OPENS A WOUND WHATEVER RUNS IT, and the
+				# consuming end is a BERSERKER card that already exists: Battle
+				# Shout pays +1% party damage per 20 of the enemy party's
+				# `bleed_buildup`, summed across every living enemy. Three
+				# bleeding bodies is the widest single contribution to that sum
+				# in the game. It feeds the SURVIVALIST too — the bleed chip
+				# `log_bleed_chip` synthesizes carries id `bleed`, which IS in
+				# `DEBUFF_IDS`, so Trapper counts it.
+				#
+				# WHY THE CARD AND NOT THE WOLF, WHICH IS WHAT THE BRIEF ASKED
+				# FOR: CANIS ALREADY BLEEDS. `Summon Canis` reads "attacks with
+				# you for 20% of your Attack, building 20 Bleed", its arrival
+				# lays Bloodhowl's 15 on every enemy, and its Loyalty gift is
+				# +2 Bleed a stack — shipped, and `_companion_strike`'s `canis`
+				# branch has carried it for many batches. A clause making the
+				# wolf bleed would have been §0's fourth rule broken exactly as
+				# BD broke it on Deadfall: fourteen batches of a duplicate
+				# nobody read. THE GAP IS THE OTHER TWO — Ursus builds no Bleed
+				# and Aguila lays Exposed — so this is what the coupling was
+				# actually missing, and it is additive for two companions of
+				# three rather than a second copy of the wolf's own line.
+				#
+				# IT GOES THROUGH `_add_bleed_with_burst`, NEVER `_apply_status`:
+				# Bleed is a METER (`bleed_buildup`, bleeding out at 100) and
+				# its `STATUS_INFO` row was DELETED at BJ §1 as unreachable, so
+				# an `_apply_status(_, "bleed", …)` here would index a table that
+				# has no such key. That wrapper is also what carries the rune
+				# and Slaughterhouse clauses hanging off a bleedout.
 				for ss_t in ss_marks:
 					if ss_b.dead:
 						break
 					if ss_t.dead:
 						continue
 					await _companion_strike(ss_b, ss_t, 1.0, false)
+					if not ss_t.dead:
+						_add_bleed_with_burst(ss_t, SAVAGE_SWEEP_BLEED)
 				var ss_gain := 5 if is_perfect else 3
 				_gain_loyalty(attacker, ss_b.companion_kind, ss_gain)
 				_log("   → Savage Sweep: the run deepens the bond (+%d Loyalty on %s)%s" % [
@@ -19655,6 +19891,35 @@ func _harvest_yield(u: BattleUnit) -> int:
 		if BattleUnit.DEBUFF_IDS.has(s.id):
 			n += 1
 	return n
+
+
+# BATCH DH §2 — THE FIRST LIVING HERO HOLDING THE KEEP OPEN. It mirrors
+# `_living_hero_with` below exactly, and for that function's own reason: the
+# effect now outlives the APPLIER'S identity, so the question "is the keep
+# open" has to be asked of the party rather than of whoever struck. Companions
+# are excluded on the same rule `_living_hero_with` uses.
+# BATCH DH §2 — DOES THIS BODY CARRY WORK THAT IS NOT THE PYROMANCER'S? It
+# reads the CURATED `DEBUFF_IDS` list, exactly as `_status_count` does, and
+# subtracts only his own vocabulary: `burn` is the fire this card is moving and
+# `slow_burn` is the Pyromancer's own card holding that fire still, so neither
+# is "another spec's". `broken` is excluded on `_status_count`'s standing rule —
+# it is a Break-METER state rather than an affliction anybody applied.
+func _other_spec_debuff(u: BattleUnit) -> bool:
+	if u == null:
+		return false
+	for s2 in u.statuses:
+		if s2.id in ["burn", "slow_burn", "broken"]:
+			continue
+		if BattleUnit.DEBUFF_IDS.has(s2.id):
+			return true
+	return false
+
+
+func _emberkeep_holder() -> BattleUnit:
+	for h in heroes:
+		if not h.dead and not h.is_companion and h.has_status("emberkeep"):
+			return h
+	return null
 
 
 # The first living hero carrying a talent field (Necrosis, Force of

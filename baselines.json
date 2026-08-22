@@ -786,16 +786,16 @@
   "test_batch_cb": {
    "kind": "suite",
    "checks": [
-    1184,
-    1184
+    1185,
+    1185
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "DH §2 PREDICTION, WRITTEN BEFORE THE BATTERY. 1184 -> 1185, A RISE, AND IT IS THE ONLY SANCTIONED MOVEMENT IN THIS BATCH. DH makes Emberkeep extend Burn any HERO applies rather than only the Pyromancer's own, so this suite's `a SECOND applier's Burn is not doubled` pinned exactly the rule the batch changed: it is INVERTED (same question, moved answer) on `ce`'s idiom, which is a count-neutral edit. The +1 is a NEW assertion beside it — an ENEMY's Burn is still not doubled, the `src.is_hero` guard that makes 'anyone' mean 'anyone in the party'. The old src-scoping hid that question because only he could ever hold the status. Every OTHER row in this table is predicted UNMOVED: DH adds no ability, no status and no assertion anywhere else."
   },
   "test_batch_cd": {
    "kind": "suite",

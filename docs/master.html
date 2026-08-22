@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-22 (Batch DG)</b></p>
+<p align="right"><b>Last updated: 2026-08-22 (Batch DH)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1292,6 +1292,36 @@ rolls an empty pool and no offer loses its class card. <b>The draft stands at 12
 <b>Nothing is owed.</b> A hero who has refused his way down can still be offered two cards or
 one: that is the ledger of refusals working, not the draft misbehaving, and it is now the only
 thing that can make an offer fill short.</p>
+<p><b>NINE CARDS NAME A PARTNER SPEC, AND THAT IS THE ONLY PLACE THE PARTY IS DRAFTED
+FOR.</b> Every one of the 120 cards was authored inside its own spec, so for most of the draft's
+life the pools never referenced each other and a draft was a decision about <i>one hero</i>
+rather than about the warband. Two accidental exceptions showed the shape worked — Fault Line
+hands the Sharpshooter the Break that Breaking Darkness amplifies, and Downwind copies whatever
+debuff an ally applied — and both are among the most interesting cards in their pools. Batch DH
+made nine of them deliberate. <b>Every coupling is written on the draft card</b>, because the
+draft screen is the only place the decision happens and a synergy a player cannot see is a
+coincidence rather than a design; and <b>every clause is a bonus on a card that already works
+alone</b>, because <b>a run fields four of twelve specs</b> and a card that is dead without a
+named partner is dead most of the time.</p>
+<table>
+<tr><th>Card</th><th>Clause</th><th>What it reads, and who feeds it</th></tr>
+<tr><td><b>Choking Smoke</b> (Survivalist)</td><td>Also sets every enemy Burning 2 turns</td><td>Widens his own Trapper breadth (<code>burn</code> is in <code>DEBUFF_IDS</code>) <i>and</i> arms the <b>Pyromancer's</b> Ember Debt and Funeral Pyre, which consume Burn</td></tr>
+<tr><td><b>Snare Line</b> (Survivalist)</td><td>The spring holds a Chilled enemy 2 turns, not 1</td><td>Reads <code>chilled</code> — the <b>Cryomancer</b> lays it, and nothing in the Survivalist's own kit does</td></tr>
+<tr><td><b>Harvest</b> (Survivalist)</td><td>Up to 18% of Attack a status, rising with the share an ally opened</td><td>Reads the <code>src_name</code> every status has carried since Batch W. <b>The hub stated outright</b> — he is paid for the party working a target rather than for doing it alone</td></tr>
+<tr><td><b>Emberkeep</b> (Pyromancer)</td><td>Doubles Burn <i>any hero</i> applies, not only his own</td><td>He becomes the party's Burn amplifier — the consuming end of Choking Smoke above. Guarded on <code>src.is_hero</code>, so an enemy's fire still lands at its own length</td></tr>
+<tr><td><b>Firedraw</b> (Pyromancer)</td><td>Draws 9 turns, not 6, from an enemy carrying another spec's debuff</td><td>Reads the curated <code>DEBUFF_IDS</code> list minus his own vocabulary — a field the party has already worked gives up its fire faster</td></tr>
+<tr><td><b>Breaking Darkness</b> (Occultist)</td><td>Names its partners in the card text. <b>No mechanical change</b></td><td>The combo already existed and was found by accident: the <b>Sharpshooter's</b> Fault Line and the <b>Warden's</b> Turn the Blade both land harder under it. Discoverability, not a buff</td></tr>
+<tr><td><b>Suffering</b> (Occultist)</td><td>3 Ruin a turn against a Broken enemy, not 2</td><td>Ties his Madness gate to <i>whoever is generating Break</i> — and CR made hard control Broken-gated, so Broken is already the axis the party works toward</td></tr>
+<tr><td><b>Savage Sweep</b> (Beastmaster)</td><td>The run opens 12 Bleed on each enemy, whichever companion runs it</td><td>Feeds the <b>Berserker's</b> Battle Shout (which pays per 20 of the enemy party's bleed buildup) and the Survivalist's Trapper. Canis already bled; <b>Ursus and Aguila are the gap this closes</b></td></tr>
+<tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other ally already below half health</td><td><b>The best coupling in the batch, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the party is healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
+</table>
+<p><b>What the nine deliberately do not do.</b> No new abilities (the pools are complete at 120
+and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
+vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
+so no card is dead when its partner is absent), and <b>no magnitude on an existing effect
+moves</b> — a lone Pyromancer draws exactly what he always drew, and a Holy beside a healthy
+party gains exactly the 4 Mercy she always gained.</p>
+
 <p><b>All twelve specs draft from eight, and no pool in the game is thin.</b> The asymmetry
 that shaped the draft from its first tranche onward — some specs drawing from a deeper pool than
 others — is gone: the Mage completed first, then the Cleric, then the Hunter, and the Warrior
