@@ -4627,3 +4627,66 @@ none of them is a bug in the game: they are suites asserting a Faith threshold o
 that releases at 3, and initiative literals that CY moved. **The stale-assertion bill is not paid
 by the batch that runs the battery; it is paid by the batch that repairs them**, and DB deliberately
 did not, because §0 bound it to changing no behaviour and a repair pass is a ruling per assertion.
+
+---
+
+## Batch DC — the Faith threshold assertions
+
+### Why these came out ahead of the consolidation
+
+Twenty-three of DB's seventy-two failures were one cause, and **none of them needed a ruling**.
+CZ moved `FAITH_RELEASE` to 3, the code has been right ever since, and the assertions were simply
+behind. The other forty-nine each need a decision about what the check should ask *instead*, which
+is a different kind of work and a different kind of risk. **Taking the free ones first shrinks the
+pile that needs judgement without spending any judgement**, and it leaves a known red rather than
+a green that blesses an unreviewed value.
+
+### Repairing to intent, when intent and the code agree anyway
+
+Every one of the twenty-three was repointed to 3 because that is what the designer ruled — not
+because that is what `battle.gd` currently does. Here the two agree, so the distinction bought
+nothing on the day. It is still the right habit: the one time it matters is the time the code is
+wrong, and you cannot tell which time that is while you are repairing. **CQ §3 learned this on a
+talent that had been changed by accident, and re-pointing the assertion at the accident would have
+made the accident permanent.**
+
+The corollary is the reason the check counts are published beside the failure counts. A repair
+that leaves the count alone is a repoint; a repair that lowers it is a deletion wearing a repair's
+clothes. **Publishing both numbers makes the difference impossible to hide, including from
+yourself** — which matters most when the temptation is strongest, at the end of a long pass with
+one stubborn check left.
+
+### The half of "stale" that was not stale
+
+`test_batch_bi` asks that the Devout's passive block say his shield pays **2 Faith an absorbed
+hit**. It was red, and every other red in that suite was an assertion that had fallen behind the
+code. This one was the opposite: **the assertion was right and the game's own text was wrong.**
+
+DA rolled the builders back from CZ's tripled rates and rolled back the constants only. The
+Devout's passive description and his in-battle status chip both went on promising three. What
+makes it worth writing down is *why it survived four batches*: the master document already said
+two, so a reader comparing the docs to the game would have caught it in a second — but nothing
+compares them automatically, and the suite that asks the question directly was already failing for
+an unrelated reason. **A red check does not announce a second, different problem hiding underneath
+it.** That is an argument for keeping the red pile small, and it is the second argument for doing
+this batch before the consolidation rather than after.
+
+### A moved threshold moves the instrument, not only the number
+
+The repair that did not work first time is the one worth keeping. `be` measures how often
+Communion advances an ally, by parking one at the top of the eligible band and counting fires. The
+band moved from four down to two with the threshold, the literal was repointed — and the row still
+read zero percent, next to a measurement of the same node at 29.8%.
+
+At four-of-five, an advance left the ally at five and his stack count rose, so counting stacks
+detected the fire. At **two-of-three, an advance takes him TO the threshold, which releases and
+resets him to zero** — so counting stacks reads every fire as a miss. The detector had to become
+the release counter.
+
+**A threshold does not only invalidate the numbers an assertion pins; it can invalidate the way
+the assertion looks at all.** The uncomfortable part is that `bf` already knew this — BF moved the
+same band once before and left a comment saying the release counter is the only honest witness
+there. The comment was in the right file, attached to the right function, and the repair was made
+without reading it. Notes only work where somebody looks; **the ones that survive are the ones
+attached to the thing that fails, and even then only if the reader is looking for a reason rather
+than a value.**

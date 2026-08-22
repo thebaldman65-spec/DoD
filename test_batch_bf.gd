@@ -32,7 +32,12 @@ const REAL_SAVE := "user://run_save.bin"
 # §2's design numbers, in one place. The chance is (15 x the recipient's own
 # stacks)%, so four stacks is 60% — and five is now nothing at all.
 const COMMUNION := 15
-const RATE_AT_FOUR := 0.60
+# BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can HOLD; at RELEASE he releases
+# BATCH DC: the peak of the roll moved down with the threshold — the chance is
+# (COMMUNION x stacks)%% and the top of the eligible band is HELD_MAX, so 30, not 60.
+const RATE_AT_PEAK := 0.01 * COMMUNION * HELD_MAX
 # Trials per measured rate. At p=0.60 the 3-sigma band is +/-4.2 points against
 # the +/-5 asserted below, so the band cannot flap.
 const TRIALS := 1200
@@ -83,7 +88,7 @@ func _run() -> void:
 	await _live_bulwark_reaches_the_prevented_door()
 	await _live_break_never_enters_the_contribution_slice()
 	await _live_break_dealt_pools_apart_from_damage()
-	await _live_rate_at_four_stacks()
+	await _live_rate_at_the_top_of_the_band()
 	await _live_never_rolls_at_five()
 	await _live_guard_is_still_a_reentrancy_lock()
 	ok(_live_ran == LIVE_CHECKS,
@@ -335,8 +340,11 @@ func _every_reducer_has_a_term() -> void:
 
 func _the_condition_is_at_the_gate() -> void:
 	var src := _src("res://scripts/battle.gd")
-	ok(src.contains("or h.faith_stacks >= 5:"),
-		"§2: an ally at five stacks is skipped by the Communion walk")
+	# BATCH DC: CZ §2 replaced the literal 5 with the named threshold — the walk
+	# gates on `FAITH_RELEASE` now, so the assertion names it too. A suite that
+	# pinned the digit would have to be repaired again on the next ruling.
+	ok(src.contains("or h.faith_stacks >= FAITH_RELEASE:"),
+		"§2: an ally AT THE THRESHOLD is skipped by the Communion walk")
 	# It sits on the EXISTING gate rather than beside it, so there is still one
 	# place the walk decides who is eligible.
 	ok(src.contains("if h == u or h.dead or h.is_companion or h.faith_stacks <= 0 \\"),
@@ -361,9 +369,13 @@ func _the_tooltip_states_the_cliff() -> void:
 	var txt := Talents.desc_for(n, 1)
 	ok(txt.contains("still BUILDING Faith"),
 		"§2: the tooltip frames it as an inclusion (reads: %s)" % txt)
-	ok(txt.contains("60%"), "§2: it names the peak chance at four stacks")
+	# BATCH DC: the tooltip states WHERE the chance peaks rather than printing the
+	# product, because the product moves with the threshold and the position does
+	# not. One below `FAITH_RELEASE` is the peak, and CZ §2 made that two.
+	ok(txt.contains("peaks on a hero holding %d" % HELD_MAX),
+		"§2: it names the peak chance at two stacks, one below the threshold")
 	ok(txt.contains("not rolled for at all"),
-		"§2: and it states the cliff at five outright")
+		"§2: and it states the cliff at the threshold outright")
 	# The reprice BE shipped is still rendered by the same tooltip.
 	ok(txt.contains("(%d x their own Faith stacks)%%" % COMMUNION),
 		"§2: the %d still renders" % COMMUNION)
@@ -503,12 +515,14 @@ func _live_break_dealt_pools_apart_from_damage() -> void:
 # warrior, report whether Communion fired. Two detectors, and WHICH ONE IS
 # CORRECT DEPENDS ON WHERE THE ALLY SITS — BE's suite measured 1 and 3 stacks
 # and only ever needed the first:
-#   below 4 — the ally's own stack count went up and stayed up;
-#   at 4 or 5 — the advance takes the ally TO five, which RELEASES. Without
-#     Apostle the stacks then reset to 0, so a stack-count detector reads a
-#     fire as a miss; the release counter is the only honest witness there.
+#   below HELD_MAX — the ally's own stack count went up and stayed up;
+#   at HELD_MAX or above — the advance takes the ally TO the threshold, which
+#     RELEASES. Without Apostle the stacks then reset to 0, so a stack-count
+#     detector reads a fire as a miss; the release counter is the only honest
+#     witness there.
 # `by_release` picks the second. The warrior's own release is always one of
 # them, hence the >= 2.
+# BATCH DC: those bands were 4/5 and are now HELD_MAX/RELEASE, per CZ §2.
 func _measure(scene: Node, ally: BattleUnit, stacks: int, by_release: bool) -> float:
 	var war: BattleUnit = scene.get("heroes")[0]
 	var fired := 0
@@ -516,7 +530,7 @@ func _measure(scene: Node, ally: BattleUnit, stacks: int, by_release: bool) -> f
 		_isolate(scene, ally, stacks)
 		var before := _stat_of(scene, "faith_releases")
 		war.faith_stacks = 0
-		scene.call("_gain_faith", war, 5, "absorb")
+		scene.call("_gain_faith", war, RELEASE, "absorb")
 		if by_release:
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
 				fired += 1
@@ -525,25 +539,29 @@ func _measure(scene: Node, ally: BattleUnit, stacks: int, by_release: bool) -> f
 	return float(fired) / float(TRIALS)
 
 
-# THE TOP OF THE CLIFF. Four stacks is where the chance peaks, and the node has
-# to keep paying there — a condition that quietly killed the whole roll would
-# also read as "0% at five" and pass the check below it.
-func _live_rate_at_four_stacks() -> void:
+# THE TOP OF THE CLIFF. One stack below the threshold is where the chance peaks,
+# and the node has to keep paying there — a condition that quietly killed the
+# whole roll would also read as "0% at the threshold" and pass the check below it.
+#
+# BATCH DC: CZ §2 ruled `FAITH_RELEASE` = 3, so the top of the band fell from
+# four to two and the rate with it, 60% -> 30%. The literal outlived the ruling
+# and this row read 0.0% against a node that was working.
+func _live_rate_at_the_top_of_the_band() -> void:
 	var scene := await _spawn({"dv_communion": 1})
 	var dv := _devout(scene)
 	ok(dv != null and dv.communion_ranks == COMMUNION,
 		"§2: the Devout has learned Communion at %d" % COMMUNION)
 	if dv != null:
-		# Detected by RELEASE, not by stack count: four plus one is five, which
-		# releases and (with no Apostle) resets the ally to zero. A stack-count
-		# detector would read every single fire as a miss and this row would
-		# print 0% next to a node working perfectly.
-		var rate := _measure(scene, scene.get("heroes")[1], 4, true)
-		ok(absf(rate - RATE_AT_FOUR) < 0.05,
-			"§2: an ally at FOUR stacks still advances %d%% of the time (read %.1f%%)" % [
-				int(100.0 * RATE_AT_FOUR), 100.0 * rate])
-		_report.append("Communion at 4 stacks: %.1f%% over %d trials (want 60%%)" % [
-			100.0 * rate, TRIALS])
+		# Detected by RELEASE, not by stack count: HELD_MAX plus one IS the
+		# threshold, which releases and (with no Apostle) resets the ally to zero.
+		# A stack-count detector would read every single fire as a miss and this
+		# row would print 0% next to a node working perfectly.
+		var rate := _measure(scene, scene.get("heroes")[1], HELD_MAX, true)
+		ok(absf(rate - RATE_AT_PEAK) < 0.05,
+			"§2: an ally at TWO stacks still advances %d%% of the time (read %.1f%%)" % [
+				int(100.0 * RATE_AT_PEAK), 100.0 * rate])
+		_report.append("Communion at %d stacks (the top of the band): %.1f%% over %d trials (want 30%%)" % [
+			HELD_MAX, 100.0 * rate, TRIALS])
 	await _kill(scene)
 	_live_ran += 1
 
@@ -565,15 +583,15 @@ func _live_never_rolls_at_five() -> void:
 	var heroes: Array = scene.get("heroes")
 	ok(dv != null and dv.apostle > 0, "§2: Apostle is learned")
 	if dv != null:
-		var rate := _measure(scene, heroes[1], 5, true)
+		var rate := _measure(scene, heroes[1], RELEASE, true)
 		ok(rate == 0.0,
-			"§2: an ally at FIVE is never rolled for — was 75%% (read %.1f%%)" % \
+			"§2: an ally AT THE THRESHOLD is never rolled for — was 75%% (read %.1f%%)" % \
 				(100.0 * rate))
 		# The whole party parked, which is the state Apostle actually produces.
 		var worst := 0.0
 		for _i in 200:
 			for h in heroes:
-				h.faith_stacks = 5
+				h.faith_stacks = RELEASE
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
@@ -581,17 +599,20 @@ func _live_never_rolls_at_five() -> void:
 			worst = maxf(worst, _stat_of(scene, "faith_releases"))
 		ok(worst == 1.0,
 			"§2: a fully parked party banks the driven release and nothing else (worst %.0f)" % worst)
-		_report.append("Apostle-parked ally at 5 stacks: %.1f%% over %d trials (was 75%%); fully parked party, worst releases from one call: %.0f" % [
-			100.0 * rate, TRIALS, worst])
+		_report.append("Apostle-parked ally at %d stacks (the threshold): %.1f%% over %d trials (was 75%%); fully parked party, worst releases from one call: %.0f" % [
+			RELEASE, 100.0 * rate, TRIALS, worst])
 	await _kill(scene)
 	_live_ran += 1
 
 
 # THE GUARD SURVIVES THE CONDITION. It was load-bearing against a cascade
 # through PARKED allies, and parked allies are now skipped — so the check moves
-# to four stacks, where a chain can still form (60% apiece takes an ally to 5,
-# which releases, which without the latch would roll again). A guard that has
-# quietly become unreachable is a guard nobody will notice removing.
+# to one stack below the threshold, where a chain can still form (30% apiece
+# takes an ally to the threshold, which releases, which without the latch would
+# roll again). A guard that has quietly become unreachable is a guard nobody
+# will notice removing.
+#
+# BATCH DC: the band moved with CZ §2's ruling, four-below-five to two-below-three.
 func _live_guard_is_still_a_reentrancy_lock() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)
@@ -602,17 +623,17 @@ func _live_guard_is_still_a_reentrancy_lock() -> void:
 		var spread := 0
 		for _i in 200:
 			for h in heroes:
-				h.faith_stacks = 4
+				h.faith_stacks = HELD_MAX
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5, "absorb")
+			scene.call("_gain_faith", heroes[0], RELEASE, "absorb")
 			var rel := _stat_of(scene, "faith_releases")
 			worst = maxf(worst, rel)
 			if rel > 1.0:
 				spread += 1
 		ok(spread > 0,
-			"§2: a cascade is still REACHABLE from four stacks (%d of 200)" % spread)
+			"§2: a cascade is still REACHABLE from two stacks (%d of 200)" % spread)
 		ok(worst <= float(heroes.size()),
 			"§2: and one call still banks at most one release per hero (worst %.0f, cap %d)" % [
 				worst, heroes.size()])
@@ -621,18 +642,18 @@ func _live_guard_is_still_a_reentrancy_lock() -> void:
 		# A latch, not a limiter: a SECOND, separate release must roll too.
 		var fired_late := 0
 		for _i in 60:
-			_isolate(scene, heroes[1], 4)
+			_isolate(scene, heroes[1], HELD_MAX)
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5, "absorb")
-			_isolate(scene, heroes[1], 4)
+			scene.call("_gain_faith", heroes[0], RELEASE, "absorb")
+			_isolate(scene, heroes[1], HELD_MAX)
 			var before := _stat_of(scene, "faith_releases")
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5, "absorb")
+			scene.call("_gain_faith", heroes[0], RELEASE, "absorb")
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
 				fired_late += 1
 		ok(fired_late > 0,
 			"§2: a second release still rolls — the guard is a re-entrancy lock, not a limiter")
-		_report.append("guard at the new condition: cascade reachable in %d/200 from four stacks (worst %.0f of cap %d), second-release fires %d/60" % [
-			spread, worst, heroes.size(), fired_late])
+		_report.append("guard at the new condition: cascade reachable in %d/200 from %d stacks (worst %.0f of cap %d), second-release fires %d/60" % [
+			spread, HELD_MAX, worst, heroes.size(), fired_late])
 	await _kill(scene)
 	_live_ran += 1

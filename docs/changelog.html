@@ -14,6 +14,159 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch DC: THE FAITH THRESHOLD ASSERTIONS</h2>
+<p><i>Small and mechanical, and it found two things that were not. <b>The 23 assertions pinning
+<code>FAITH_RELEASE</code> at 5 against the 3 the designer ruled at CZ are repaired to the ruled
+value</b> across <code>be</code>, <code>bf</code>, <code>bg</code>, <code>bh</code> and
+<code>bi</code>; <b>every one was REPOINTED and none deleted &mdash; all five check counts are
+byte-identical before and after</b>. <b>Two pieces of in-game prose still promised 3 Faith an
+absorbed hit against a constant that pays 2</b>, which DA&rsquo;s revert moved and left behind. And
+<b>a detector had to move with the threshold</b>, which is the transferable finding. <b>The
+battery fell from DB&rsquo;s 72 failures to 49 &mdash; by exactly 23, and by nothing else &mdash;
+with zero throws and every check count in the project identical.</b> <b>No save version moves
+(still v10).</b> The full report is <code>docs/reports/DC.md</code>.
+<b>The suite consolidation is still owed and is still ten times DB&rsquo;s.</b></i></p>
+
+<h3>&sect;0 &mdash; THE BATTERY LANDED EXACTLY WHERE IT SHOULD: 72 &rarr; 49</h3>
+<p><b>45 suites, ZERO THROWS, 49 failures across 21 suites</b> &mdash; down from DB&rsquo;s 72
+across 26, <b>by exactly 23</b>. It fell by the threshold family <b>and by nothing else</b>, which
+was the acceptance test: <b>an improvement LARGER than the family would have meant something was
+repaired by accident</b>, and would have been reported rather than banked.</p>
+<p><b>EVERY CHECK COUNT IN THE BATTERY IS IDENTICAL TO DB&rsquo;S</b>, with <code>an</code> (6053)
+and <code>bk</code> (129) inside their bands. <b>The only lines that moved are the five repaired
+suites&rsquo; FAILURE counts, all to zero.</b> Every gate&rsquo;s failure count is identical,
+<code>check_cm_live</code>&rsquo;s four deliberate reds included, and
+<b><code>check_cl_width</code>&rsquo;s log is byte-identical before and after the two prose
+edits</b> &mdash; which matters, because that gate reports <code>fails=?</code> and the battery
+cannot see whether it passed.</p>
+<p><b>The comparison is like-for-like on the two flakes:</b> measured with <code>at</code> at the
+low end of its band (3) and <code>bo</code>&rsquo;s flake present (1), the same condition
+DB&rsquo;s 72 was measured under. <b>If <code>at</code> flakes high the total reads 50 and that is
+not a regression.</b></p>
+
+<h3>&sect;1 &mdash; TWENTY-THREE ASSERTIONS, REPOINTED TO THE RULED VALUE</h3>
+<p><b>CZ &sect;2 ruled <code>battle.FAITH_RELEASE</code> = 3 and DB measured what that cost the
+suites: 23 of the 72 failing assertions, all one family.</b> An ally&rsquo;s count is clamped at
+the threshold and releases the moment it reaches it, so <b>every assertion written against a ladder
+that reaches four and five stacks read <code>0.0%</code></b> against nodes that were working
+perfectly.</p>
+<p><b>THE RULE APPLIED THROUGHOUT IS CQ &sect;3&rsquo;S: REPAIR TO THE INTENDED VALUE, NEVER TO
+WHATEVER THE CODE HAPPENS TO DO.</b> They agree here &mdash; the code is right and the assertions
+were behind &mdash; but the habit is what matters, because repairing to the code is how an accident
+gets blessed and the evidence disappears.</p>
+<p><b>AND NOT ONE ASSERTION WAS DELETED TO MAKE A SUITE PASS.</b> A suite that stops asserting is
+the failure being fixed, not a way of fixing it. <b>The proof is the counts, which is why they are
+published: a repaired assertion leaves the count unchanged, and a count that MOVES is an assertion
+that was removed rather than repointed.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>suite</th><th>failures before</th><th>failures after</th><th>checks before</th><th>checks after</th></tr>
+<tr><td><code>test_batch_be</code></td><td>3</td><td><b>0</b></td><td>34</td><td><b>34</b></td></tr>
+<tr><td><code>test_batch_bf</code></td><td>5</td><td><b>0</b></td><td>78</td><td><b>78</b></td></tr>
+<tr><td><code>test_batch_bg</code></td><td>5</td><td><b>0</b></td><td>47</td><td><b>47</b></td></tr>
+<tr><td><code>test_batch_bh</code></td><td>4</td><td><b>0</b></td><td>233</td><td><b>233</b></td></tr>
+<tr><td><code>test_batch_bi</code></td><td>6</td><td><b>0</b></td><td>91</td><td><b>91</b></td></tr>
+<tr><td><b>total</b></td><td><b>23</b></td><td><b>0</b></td><td colspan="2"><b>every count identical</b></td></tr>
+</table>
+<p><b>THE BRIEF SAID &ldquo;23 PLUS <code>bi</code>&rsquo;S SIX IF THOSE ARE DISTINCT&rdquo;. THEY
+ARE NOT DISTINCT.</b> <code>state.md</code>&rsquo;s own breakdown is <code>be</code> 3,
+<code>bf</code> 5, <code>bg</code> 5, <code>bh</code> 4, <code>bi</code> 6, which sums to exactly
+23. <b>The family is 23, not 29</b>, and the battery total was expected to fall to 49 rather than
+to 43.</p>
+
+<h4>What each repair actually asks now</h4>
+<p><b>THE ELIGIBLE BAND FOR COMMUNION MOVED DOWN WITH THE THRESHOLD.</b> The walk skips a hero at
+<code>faith_stacks &gt;= FAITH_RELEASE</code>, so the band was 1&ndash;4 under a threshold of five
+and is <b>1&ndash;2</b> under three. The roll is <code>(15 &times; stacks)%</code>, so <b>the peak
+chance is 30% at two stacks, not 60% at four</b>, and the cliff sits at three.
+<b>Measured after the repair: 29.8% over 1200 trials.</b></p>
+<p><b>THE THRESHOLD IS NAMED RATHER THAN SPELLED, IN EVERY SUITE THAT TOUCHES IT.</b> Each of the
+five now carries <code>const RELEASE := 3</code> and <code>const HELD_MAX := RELEASE - 1</code>
+once, and the checks are written against those. <b>The next threshold ruling costs one line a suite
+instead of a dozen literals</b> &mdash; which is the same lesson the master.html stamp gate learned
+at CP when it stopped being a literal.</p>
+<p><b>THE SOURCE CHECKS NOW NAME THE CONSTANTS TOO.</b> <code>bh</code> and <code>bi</code> both
+grepped <code>battle.gd</code> for <code>_gain_faith(u, 1, "ground")</code> and for
+<code>h.faith_stacks &gt;= 5</code>; CZ replaced those literals with
+<code>FAITH_PER_GROUND_TURN</code> and <code>FAITH_RELEASE</code>, so the assertions name the
+constants.</p>
+<p><b>AND ONE REPAIR IS A <code>mini()</code> RATHER THAN A SHORTER LOOP, DELIBERATELY.</b>
+<code>bi</code> &sect;1 ratchets the peak over four gains and asserted <code>peak == i + 1</code>;
+the third gain now releases, so the fourth cannot lift the peak past three. <b>Dropping the fourth
+iteration would have made it pass and stopped it asking its question.</b> It asserts
+<code>peak == mini(i + 1, RELEASE)</code> and still runs four times.</p>
+
+<h3>&sect;2 &mdash; TWO PIECES OF PROSE DA&rsquo;S REVERT LEFT BEHIND</h3>
+<p><b>THE ASSERTION WAS RIGHT AND THE GAME&rsquo;S OWN TEXT WAS WRONG, WHICH IS THE ONE CASE
+&ldquo;REPAIR THE ASSERTION&rdquo; MUST NOT BE APPLIED TO.</b> <code>test_batch_bi</code> asks that
+Conviction&rsquo;s passive block state <b>&ldquo;2 a hit&rdquo;</b>. It read <b>&ldquo;3 a
+hit&rdquo;</b>, and so did the Faith status chip:</p>
+<ul>
+<li><code>scripts/classes.gd</code> &mdash; the Devout&rsquo;s <code>passive_desc</code>:
+<i>&ldquo;allies build Faith whenever Divine Shield absorbs damage for them &mdash; <b>3 a
+hit</b>&rdquo;</i></li>
+<li><code>scripts/battle.gd</code> &mdash; the <code>faith</code> status default, the chip a player
+reads mid-fight: <i>&ldquo;Divine Shield absorbs build Faith, <b>3 a hit</b>&rdquo;</i></li>
+</ul>
+<p><b><code>battle.FAITH_PER_ABSORB</code> IS 2.</b> CZ tripled the builders to 3 and DA rolled the
+CODE back to 2 and did not roll the TEXT back with it, so <b>the Devout&rsquo;s passive and his
+status chip have both been overstating his own rate by half since DA</b>. Both now read &ldquo;2 a
+hit&rdquo;. <b><code>docs/master.html</code> already said <code>(2 a hit)</code></b>, which is how
+the two disagreed without anything noticing: <b>the documentation was right and the game was
+wrong</b>, and the suites that would have caught it were the ones already red for the threshold.</p>
+<p><b>THE SWEEP FOR OTHERS WAS RUN AND IS EMPTY.</b> <code>3 a hit</code> appears nowhere else in
+<code>.gd</code>, <code>.md</code>, <code>.html</code> or <code>.json</code>, and only
+<code>bg</code> and <code>bi</code> read that <code>passive_desc</code> at all. <b>Both edits are a
+single digit and are length-neutral</b>, so <code>check_cl_width</code>&rsquo;s wrapping
+measurements are untouched by construction.</p>
+
+<h3>&sect;3 &mdash; WHEN THE THRESHOLD MOVES, THE DETECTOR MOVES WITH IT</h3>
+<p><b>THE ONE REPAIR THAT DID NOT WORK FIRST TIME, AND IT IS THE FINDING WORTH KEEPING.</b>
+<code>test_batch_be</code>&rsquo;s Communion rate check was repointed from three stacks to two and
+still read <b>0.0%</b> &mdash; against a node measured at 29.8% one line later.</p>
+<p><b>THE ASSERTION WAS RIGHT AND THE INSTRUMENT WAS BROKEN.</b> <code>_measure</code> has two
+detectors: the ally&rsquo;s stack count going up, or a SECOND release being banked. At
+three-of-five an advance left the ally at four and the stack count saw it. <b>At two-of-three an
+advance takes the ally TO the threshold, which releases and resets him to zero &mdash; so the
+stack-count detector reads every single fire as a miss.</b></p>
+<p><b>A MOVED THRESHOLD DOES NOT ONLY INVALIDATE THE NUMBERS AN ASSERTION PINS; IT CAN INVALIDATE
+THE WAY THE ASSERTION LOOKS.</b> <code>test_batch_bf</code> had written that rule down when BF
+moved the same band &mdash; <i>&ldquo;the release counter is the only honest witness there&rdquo;</i>
+&mdash; and <code>be</code> was repaired without reading it. <b>Both suites now say so at the
+function that needs it.</b></p>
+
+<h3>&sect;4 &mdash; THREE THINGS INTO THE RECORD, AND TWO OF THEM WERE ALREADY THERE</h3>
+<p><b><code>test_batch_at</code> IS A SECOND FLAKE AND IS RECORDED BESIDE <code>bo</code>.</b> It
+reads <b>3 failures or 4</b>, the fourth flaking in <b>2 of 5 dedicated runs</b> &mdash; far worse
+than <code>bo</code>&rsquo;s roughly 1 in 13. The flaking check is
+<i>&ldquo;Cannon at 8 stacks scales by the PASSIVE alone&rdquo;</i>, a damage-scaling assertion;
+<b><code>test_batch_at.gd</code> calls <code>seed()</code> zero times and its check count is rock
+steady at 470</b>, so only the FAILURE count moves. <b>A count-diffing rule reads <code>at</code>
+3 &rarr; 4 as a regression and it is not one.</b> <b>It is NOT repaired here</b> &mdash; the fix is
+to seed the suite or to assert a ratio with a margin instead of a bare comparison, and that is its
+own small job.</p>
+<p><b><code>an</code>&rsquo;S BAND WAS ALREADY CORRECTED AT DB; WHAT WAS WRONG WAS THE OBSERVATION
+COUNT.</b> The brief asked for 6047&ndash;6054 to replace 6052&ndash;6054, and
+<code>state.md</code> has carried <b>6047&ndash;6054</b> since DB. Its sentence said &ldquo;five
+observations&rdquo; and then listed <b>six readings</b> &mdash; 6047, 6051, 6052, 6054, 6048, 6054.
+<b>The band rests on six, and it says six now, because a band written from too few readings reads a
+normal run as a regression.</b></p>
+<p><b>AND A FOURTH, FOUND WHILE CHECKING THE FIRST THREE: <code>cd</code> FLAGS TWO SUITES, NOT
+ONE.</b> <code>state.md</code> carried CW&rsquo;s knock-on as
+<i>&ldquo;<code>FAIL: test_batch_bb.gd reports zero failures</code>&rdquo;</i>, naming one suite;
+<b><code>cd</code> reports two and always has &mdash; <code>bb</code> and <code>bj</code></b>.
+<b><code>cd</code>&rsquo;s <code>REPAIRED</code> table holds FIVE suites only</b> (<code>ah</code>,
+<code>an</code>, <code>bb</code>, <code>bj</code>, <code>test_runes</code>). <b>That subset is also
+why repairing <code>be</code>&ndash;<code>bi</code> did not move <code>cd</code>&rsquo;s count:
+none of the five Faith suites is in it</b>, so the count-differ never saw the largest single family
+of failures in the project. <b>It watches five suites, not forty-five</b> &mdash; worth knowing
+before the next batch leans on it as a safety net.</p>
+<p><b>THE <code>--script</code> BASE-CLASS TRAP NEEDED NOTHING: DB ALREADY RECORDED IT, TWICE.</b>
+CLAUDE.md carries it in the traps &mdash; with the reproduction, the <code>exits 0</code> and the
+note that <code>throws=</code> is the only thing standing between the fault and a green report
+&mdash; and again in the fixture rule, <b>including that a <code>preload</code>ed
+<code>RefCounted</code> with no <code>class_name</code> is the working form</b>. <b>Nothing was
+added, because a rule written twice is not made truer by writing it a third time.</b></p>
+
 <h2>2026-08-21 &mdash; Batch DB: ONE <code>_spawn</code> FOR THE GATES</h2>
 <p><i>One consolidation and one battery. <b>The battle fixture and the tally are authored once, in
 <code>gate_fixture.gd</code>, and all seven gates go through it</b>; <b>the battery ran for the

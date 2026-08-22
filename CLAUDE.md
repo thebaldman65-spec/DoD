@@ -52,6 +52,9 @@ accumulate far more slowly than batches do.
   on the same integer. **A bare `<` or `>` between two blows is not a check, it is a coin flip
   with good odds** — assert a RATIO with a margin instead. A suite that calls `seed()` zero times
   has a different stream every run, which is what makes the flake intermittent.
+  **THERE ARE TWO KNOWN FLAKES, NOT ONE — `bo` AND `at` — and `at` is much the worse of them.**
+  Both are recorded with their rates in `docs/state.md`; **a count-diffing rule must read their
+  FAILURE counts as bands too, not only their check counts.**
 - **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
@@ -780,6 +783,42 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   rung 2, against 4.24 for the threshold plus tripled builders. Measured at every rung in
   `docs/reports/DA.md`. **Elevation (2 of 3) and Blessing of the Faithful (3 of 3) were reported
   and deliberately not changed at either batch.**
+- **THE SUITES WERE PAID AT DC, AND THE DERIVED BAND IS WHAT MOVED.** An ally's count is clamped
+  at the threshold and releases on reaching it, so **the deepest an ally can HOLD is 2**, and
+  Communion — which skips `faith_stacks >= FAITH_RELEASE` — **rolls over a 1–2 band, peaking at
+  30% rather than 60%.** Each of `be`, `bf`, `bg`, `bh`, `bi` carries `const RELEASE := 3` and
+  `const HELD_MAX := RELEASE - 1` **once**, so the next ruling costs one line a suite.
+- **AND DA'S REVERT MOVED THE CODE AND LEFT TWO PIECES OF PROSE BEHIND, FOR FOUR BATCHES.** The
+  Devout's `passive_desc` in `classes.gd` and the `faith` status chip in `battle.gd` both read
+  **"3 a hit"** against `FAITH_PER_ABSORB` = **2**; `docs/master.html` said `(2 a hit)` the whole
+  time. **The documentation was right and the game was wrong**, and the suite that asks the
+  question was already red for the threshold, so nothing announced it. **When a batch reverts a
+  constant, sweep the PROSE for the number it reverted** — the code change is the easy half.
+
+## A STALE ASSERTION IS REPAIRED TO INTENT, NEVER DELETED (STANDING — CQ §3's RULE, RE-PAID AT DC)
+> **Repair an assertion to the value the ruling establishes as INTENDED, never to whatever the
+> code happens to do. Repoint it; do not remove it. And publish the check count either side,
+> because the count is the proof.**
+
+- **REPAIRING TO THE CODE IS HOW AN ACCIDENT GETS BLESSED AND THE EVIDENCE DISAPPEARS.** CQ §3's
+  case is the one to remember: `test_batch_ce` asserted "a perfect hands over 3 stacks" and
+  rewriting that to 3 would have made a bug permanent. **Where the intended value and the code
+  agree, repair to the intended value anyway — the habit is the point.**
+- **A SUITE THAT STOPS ASSERTING IS THE FAILURE BEING FIXED, NOT A WAY OF FIXING IT.** Deleting a
+  check to reach green destroys exactly the thing that would have caught the next regression.
+- **THE CHECK COUNT EITHER SIDE IS THE AUDIT, AND IT IS CHEAP.** A repaired assertion leaves the
+  count UNCHANGED. **If a suite's count moves across a repair pass, an assertion was removed
+  rather than repointed** — report the count before and after, per suite. DC's five moved by zero
+  (34 / 78 / 47 / 233 / 91) while 23 failures went to none.
+- **KEEP THE SHAPE WHEN YOU LOWER THE RUNG.** `bi` §1 ratchets a peak over four gains; under the
+  new threshold the fourth cannot lift it. **Shortening the loop would have passed and stopped
+  asking the question** — it asserts `mini(i + 1, RELEASE)` and still runs four times.
+- **AND A MOVED THRESHOLD CAN INVALIDATE HOW AN ASSERTION LOOKS, NOT ONLY WHAT IT PINS.** DC's one
+  failed repair: `be`'s Communion rate was repointed from three stacks to two and still read
+  **0.0%** — because at one stack below the threshold an advance RELEASES and resets the count, so
+  **the stack-count detector reads every fire as a miss.** The release counter is the only honest
+  witness there. **`test_batch_bf` had written that rule at the function that needed it and `be`
+  was repaired without reading it.** When you move a driven depth, ask what the drive now DOES.
 
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
@@ -918,8 +957,11 @@ wrong, none of them diffed against anything.
   a `preload`ed `RefCounted` for that reason, and it carries **no `class_name`** — that registration
   lives in the gitignored `.godot/global_script_class_cache.cfg`, so it would resolve here and fail
   on a fresh clone.
-- **STILL OWED, AND TEN TIMES LARGER — THIS IS BATCH DC.** In the SUITES: **`_spawn` in 37 suites
-  as 34 distinct bodies, `_run` in 39 as 39, `_kill` byte-identical in 14.**
+- **STILL OWED, AND TEN TIMES LARGER.** In the SUITES: **`_spawn` in 37 suites as 34 distinct
+  bodies, `_run` in 39 as 39, `_kill` byte-identical in 14.** **DC took the Faith threshold
+  assertions instead** — they needed no ruling and the consolidation will move the same files —
+  **so the suite consolidation is the next letter's**, and the remaining stale assertions, which
+  DO need rulings, follow it.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the

@@ -5,45 +5,62 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-21 (Batch DB).*
+*Last rewritten: 2026-08-21 (Batch DC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DB** — the gate fixture consolidated, and the first full battery since CS.
-  **`_spawn` and the tally are authored once in `gate_fixture.gd` and all seven gates go through
-  it; `check_da` §3 asserts there are no copies rather than counting them; and the battery ran
-  twice, before and after, to prove the consolidation inert.** No save version moves (still v10).
-- **Next letter: DC**, and **it is already specified: the SUITES.** The two-letter stamp gate in
+- **Last batch: DC** — the Faith threshold assertions repaired. **23 of DB's 72 failures were one
+  family, none of them needed a ruling, and all 23 are repointed to `FAITH_RELEASE` = 3 with
+  ZERO deleted — every one of the five suites' check counts is identical before and after
+  (34 / 78 / 47 / 233 / 91).** It also found **two pieces of in-game prose promising 3 Faith an
+  absorbed hit against a constant that pays 2**, which DA's revert left behind. No save version
+  moves (still v10).
+- **Next letter: DD, and it is already specified: the SUITES.** The two-letter stamp gate in
   fourteen suites reads `substr(_code_at + 7, 2)` out of `(Batch XX)` and compares lexically —
-  `DC` sorts after `DB`, so it still works. **A THREE-letter code would break all fourteen.**
+  `DD` sorts after `DC`, so it still works. **A THREE-letter code would break all fourteen.**
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
   (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
   split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
-  one of them, and DB's consolidation.
+  one of them, DB's gate consolidation and DC's threshold repairs.
 - **THE OPEN WORK IS NO LONGER MOSTLY DESIGN DECISIONS.** DB measured a debt that was previously
-  an estimate: **72 failing assertions across 26 suites**, and **DC's consolidation is ten times
-  the size of DB's**. Those two are the queue now; the design decisions are behind them.
+  an estimate and DC paid the free third of it: **49 failing assertions across 21 suites remain**,
+  and **the suite consolidation is still ten times DB's**. Those two are the queue; the design
+  decisions are behind them.
 
 ---
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-**DB named two large items and closed one. Nothing else was added.**
+**DC closed one item and added one small one. Nothing else was added.**
 
-### THE TWO THAT ARE NOW THE QUEUE
+### THE TWO THAT ARE THE QUEUE
 
-- **BATCH DC — THE SUITES, AND IT IS TEN TIMES DB's.** `_spawn` in **37 suites as 34 distinct
+- **BATCH DD — THE SUITES, AND IT IS TEN TIMES DB's.** `_spawn` in **37 suites as 34 distinct
   bodies**, `_run` in **39 as 39**, `_kill` **byte-identical in 14**. **`gate_fixture.gd` is the
   proven shape and the `--script` base-class trap is already paid for**, but 34 bodies is not 4,
   and suites do not share one battle fixture the way seven gates did. **It wants its own
   verification pass.**
-- **THE STALE-ASSERTION PASS — MEASURED, NOT ESTIMATED: 72 FAILURES ACROSS 26 SUITES.** See
-  KNOWN-BROKEN below for the breakdown. **It should follow DC, because DC will move the same
-  files.** Each one needs a ruling on what it should ask INSTEAD, which is why DB, DA and CX all
-  left them standing.
+- **THE REST OF THE STALE-ASSERTION PASS — 49 FAILURES ACROSS 21 SUITES.** See KNOWN-BROKEN below
+  for the breakdown. **It should follow DD, because DD will move the same files.** **Unlike the 23
+  DC took, each of these needs a ruling on what the check should ask INSTEAD** — which is exactly
+  why the threshold family came out first.
+
+### Small, and named by DC
+
+- **`test_batch_at`'s FLAKE WANTS SEEDING OR A MARGIN, AND THAT IS A DECISION.** See KNOWN-BROKEN.
+  The fix is to call `seed()` or to assert a ratio with a margin instead of a bare comparison;
+  **which of the two is a ruling**, so DC recorded it and did not take it.
+- **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
+  `STACKS := 4` is a **direct-write probe depth** now, not a carry ceiling — those checks write
+  `faith_stacks`/`faith_peak` onto the unit, bypass `_gain_faith`'s clamp, and measure a per-stack
+  rate against **fixed percentage-point tolerances** (`< 2.0`, `< 2.5`, `> 2.5`). **Halving the
+  depth halves the effect size against tolerances that do not move with it**, across roughly
+  thirty currently-green live measurements. **Moving them down is a re-derivation of tolerances,
+  which is a ruling, not a repair.** The comment at each constant now says which of the two things
+  it is.
 
 ### Carried, with measurements attached
 
@@ -51,14 +68,19 @@ in `docs/master.html`.
   is 5% of a full bar, the health term's own rate). Peak Frenzy 13.4 → 20.9 of 40 at rung 2 under
   CZ, and **DA re-measured it unchanged at 20.7**. **Reckless Abandon dumping a full bar books all
   twenty steps at once** — named, not discovered later.
-- **THE FAITH LANE IS SETTLED FOR NOW AND THE NUMBERS ARE IN `docs/reports/DA.md`.** Threshold 3,
-  builders 2 and 1, releases **1.93 / 2.60 / 2.48 / 3.62** across the four arms. **Elevation (2 of
-  3) and Blessing of the Faithful (3 of 3) were reported at both CZ and DA and deliberately changed
-  at neither.** If either is revisited, Elevation is the one with a history of being moved by
-  accident (CG set 2, CN's fold pushed 3, CQ reverted it).
-  - **BUT THE THRESHOLD HAS NEVER BEEN PAID FOR IN THE SUITES**, and DB measured what that costs:
-    **`be`, `bf`, `bg`, `bh` and `bi` are 23 of the 72 failures**, all of them asserting a ladder
-    that reaches four and five stacks. **At `FAITH_RELEASE` = 3 an ally can never stand at four.**
+- **THE FAITH LANE IS SETTLED AND THE SUITES NOW AGREE WITH IT.** Numbers in `docs/reports/DA.md`:
+  threshold 3, builders 2 and 1, releases **1.93 / 2.60 / 2.48 / 3.62** across the four arms.
+  **Elevation (2 of 3) and Blessing of the Faithful (3 of 3) were reported at both CZ and DA and
+  deliberately changed at neither.** If either is revisited, Elevation is the one with a history of
+  being moved by accident (CG set 2, CN's fold pushed 3, CQ reverted it).
+  - **THE THRESHOLD WAS PAID FOR IN THE SUITES AT DC.** `be`, `bf`, `bg`, `bh` and `bi` are green.
+    **The derived band is what moved and it is worth having at hand: the deepest an ally can HOLD
+    is 2** (at 3 he releases), **Communion's eligible band is 1–2 and its roll peaks at 30%**, not
+    60% at four, and **two absorbs are a release, not three.**
+  - **AND DA'S REVERT HAD LEFT THE PROSE BEHIND FOR FOUR BATCHES.** The Devout's `passive_desc`
+    (`classes.gd`) and the `faith` status chip (`battle.gd`) both read **"3 a hit"** against
+    `FAITH_PER_ABSORB` = 2, while `docs/master.html` read `(2 a hit)` throughout. **Both are fixed.
+    When a batch reverts a constant, sweep the PROSE for the number it reverted.**
 
 ### Named by the designer, carried from CX
 
@@ -126,7 +148,7 @@ in `docs/master.html`.
 
 ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND
 
-*Re-derive these before quoting them in a brief; they move. DB re-derived every figure below.*
+*Re-derive these before quoting them in a brief; they move. DC re-derived every figure below.*
 
 - **THE TEMPO LADDER HAS THREE RUNGS AND EACH IS WRITTEN AGAINST THE ONE ABOVE.**
   `Ability.BASIC_DELAY` = **2.0** (the one authored copy in the project; `battle.BASIC_DELAY` is an
@@ -148,6 +170,12 @@ in `docs/master.html`.
   `JUBILEE_MIN_FAITH` is **3**, which is the WHOLE bar. `ELEVATION_STACKS` is **2**, which is **67%
   of a release**. **An absorbed hit pays LESS than a release costs, and `check_da` asserts that
   RELATIONSHIP rather than the numbers.**
+  - **THE DERIVED BAND, WHICH IS WHAT THE SUITES ASSERT ON SINCE DC:** the deepest an ally can
+    **HOLD is 2** (`FAITH_RELEASE - 1`); **Communion's eligible band is 1–2** (the walk skips
+    `faith_stacks >= FAITH_RELEASE`) and its roll `0.01 * 15 * stacks` **peaks at 30%**, measured
+    at **29.8% over 1200 trials**; **two absorbs are a release.** Each of the five Faith suites
+    carries `const RELEASE := 3` and `const HELD_MAX := RELEASE - 1` **once**, so the next
+    threshold ruling costs one line a suite.
 - **The ability draft is COMPLETE at 120 of 120** — `SPEC_DRAFT_POOLS` is **96** (12 specs × 8)
   and `CLASS_DRAFT_POOLS` is **24** (4 classes × 6).
 - **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
@@ -166,11 +194,12 @@ in `docs/master.html`.
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the
   repo ROOT, not in `scripts/`.**
 - **`run_battery.sh` runs 45 suites and MISSES ONE: `test_batch_cp` is not in its `SUITES`
-  array.** Its `GATES` array is **fourteen**. **There are 19 `check_*.gd` files, so five gates are
-  not in the battery** (`check_ck_width`, `check_cu`, `check_cv`, `check_ct_map`,
-  `check_map_screen`). **`gate_fixture.gd` is NOT a gate and is deliberately not named `check_*`**
-  — `test_batch_cd` and `check_da` both glob `check_*`/`test_*`, and a `check_`-prefixed helper
-  would have joined the gate census as a nineteenth-and-a-half gate.
+  array.** Its `GATES` array is **fourteen**. **There are 19 `check_*.gd` files, so five are not in
+  `GATES`** (`check_ck_width`, `check_cu`, `check_cv`, `check_ct_map`, `check_map_screen`) —
+  **`check_ct_map` and `check_map_screen` do still run, in the SCENE RUNS section**, so the three
+  that run nowhere are `check_ck_width`, `check_cu` and `check_cv`. **`gate_fixture.gd` is NOT a
+  gate and is deliberately not named `check_*`** — `test_batch_cd` and `check_da` both glob
+  `check_*`/`test_*`, and a `check_`-prefixed helper would have joined the gate census.
 - **`run_battery.sh`'s check-count grep is GENERAL and must stay that way.** It matches three
   shapes because **45 suites print at least five between them**. The `grep -E "checks,"` in its
   header is a comment recording a scar CP already fixed — **it is not live code, and narrowing the
@@ -178,12 +207,12 @@ in `docs/master.html`.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-21 (Batch DB)`.**
+- **master.html stamp: `Last updated: 2026-08-21 (Batch DC)`.**
 
 ### HOW LONG A FIGHT IS
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
-  both halves), over four `--run 25` sims, **after DA** — **DB ran no sims and these are carried
-  unchanged**:
+  both halves), over four `--run 25` sims, **after DA** — **neither DB nor DC ran a sim and these
+  are carried unchanged**:
 
   | party / rung | trash | elite | boss |
   |---|---|---|---|
@@ -220,22 +249,25 @@ in `docs/master.html`.
   `releases/battle` is the row that does. **CY's two headline figures were both instrument faults.**
 
 ### The changelog
-- **The live file starts at Batch CO and holds 14 entries** (CO → DB), **220.0 KB**. The 400 KB
+- **The live file starts at Batch CO and holds 15 entries** (CO → DC), **229 KiB**. The 400 KB
   threshold is a long way off.
-- **`DoD-archive/changelog-archive.html` holds 131 entries** (BP → CN) and is **1042.0 KB**.
+- **`DoD-archive/changelog-archive.html` holds 131 entries** (BP → CN) and is **1042 KiB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
   bv, bw, bx, cb, ce, bb, bn, bo. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
   correct.
 
-### Knowledge sync, re-measured at DB
+### Knowledge sync, re-measured at DC
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
-**Treat the file COUNT as method-dependent** — CW's filter counted 126 and CX's 108.*
-- **117 files, 5.74 MB.** DB adds `gate_fixture.gd` and `docs/reports/DB.md`.
-- Heaviest: `scripts/battle.gd` **~1152 KB**, `docs/design-notes.md` **~356 KB**,
-  `docs/master.html` **~324 KB**, `scripts/classes.gd` **~276 KB**,
-  `docs/changelog.html` **220 KB**, `scripts/talents.gd` **~184 KB**, `scripts/unit.gd` **~176 KB**,
-  `CLAUDE.md` **168 KB**.
-- **The 47 suite files total ~1,888 KB**, still the single largest block. **They cannot be
+**Treat the file COUNT as method-dependent** — CW's filter counted 126 and CX's 108.
+**ALL SIZES BELOW ARE KiB (1024 bytes), STATED SO A LATER BATCH CAN COMPARE LIKE WITH LIKE** —
+DB's list mixed units, and its `design-notes.md` figure (~356 KB) does not reproduce at DB's own
+HEAD, where the file was **298 KiB**.*
+- **118 files, 5.51 MiB.** DC adds `docs/reports/DC.md`.
+- Heaviest: `scripts/battle.gd` **1149 KiB**, `docs/master.html` **320 KiB**,
+  `docs/design-notes.md` **302 KiB**, `scripts/classes.gd` **274 KiB**,
+  `docs/changelog.html` **229 KiB**, `scripts/talents.gd` **181 KiB**, `scripts/unit.gd` **174 KiB**,
+  `CLAUDE.md` **170 KiB**.
+- **The 47 suite files total 1807 KiB**, still the single largest block. **They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.**
 - **`scripts/` contains ZERO test suites.** All game code. **`gate_fixture.gd` is test-harness code
   and lives at the repo ROOT with the gates**, deliberately, to keep that true.
@@ -244,30 +276,31 @@ in `docs/master.html`.
 
 ## KNOWN-BROKEN AND DELIBERATELY UNFIXED
 
-### THE 72, MEASURED AT DB — 26 SUITES, ZERO THROWS
+### THE 49 THAT REMAIN — MEASURED AT DC, ZERO THROWS
 
-**This replaces every estimate this file has carried.** None of the 72 is a bug in the game; they
-are assertions that CY, CZ, DA and CW deliberately made false. **Not one was repaired at DB**,
-because §0 bound that batch to changing no behaviour and each needs a ruling on what it should ask
-INSTEAD.
+**DB measured 72 across 26 suites. DC repaired the 23 that needed no ruling.** None of the 49 is a
+bug in the game; they are assertions that CY, CZ, DA and CW deliberately made false. **Each needs
+a ruling on what it should ask INSTEAD**, which is why DB, DA and CX all left them standing and why
+DC took only the family that did not.
 
-- **THE FAITH THRESHOLD IS THE DOMINANT CAUSE — 23 OF THE 72.** `FAITH_RELEASE` is **3**, so an
-  ally can never stand at four or five stacks and every assertion written against that ladder
-  reads `0.0%`: **`be` 3, `bf` 5, `bg` 5, `bh` 4, `bi` 6.**
-  - **`test_batch_bi` IS THE CASE TO READ FIRST.** DA's revert **did** un-break the two checks it
-    was credited with — `FAITH_PER_ABSORB` appears in no FAIL line. **`bi` is red on six OTHERS**,
-    all threshold consequences (*"two absorbs are four Faith and do not release yet"* — four is
-    above three, so it releases). **The revert paid for CZ's builders; nothing has paid for CZ's
-    threshold.**
-- **CY'S 52 MOVED DELAYS AND CZ'S SIX MORE ARE THE SECOND CAUSE** — `av` 1 (Intercession's 2.0
+- **THE FAITH THRESHOLD FAMILY IS CLOSED.** `be`, `bf`, `bg`, `bh` and `bi` are green, all 23
+  repointed to `FAITH_RELEASE` = 3 and **not one deleted** — the check counts (34 / 78 / 47 /
+  233 / 91) are identical before and after, which is the audit.
+- **CY'S 52 MOVED DELAYS AND CZ'S SIX MORE ARE NOW THE LARGEST CAUSE** — `av` 1 (Intercession's 2.0
   initiative), `bd` 1 (reads 1.0 where 2.0 is asserted), and others among the mid-alphabet suites.
-- **CW'S `CLAUDE.md` SPLIT IS THE THIRD**, and its eleven are still red exactly as CX found them:
-  `bb` 2, `bn` 2, `bq` 1, `br` 2, `bx` 2, `ce` 9, **plus `cd`'s knock-on** — cd is the count-differ,
-  so `FAIL: test_batch_bb.gd reports zero failures` is CW's damage arriving a second time through
-  the one gate built to notice it.
-- **AND TWO THAT PASS BY ACCIDENT, WHICH IS WORSE.** `contains("BATCH BN")` and
-  `contains("BATCH BS")` still match — a passing mention inside two surviving rules, not a batch
-  block. **A check that has stopped asking its question, with no red to announce it.**
+- **CW'S `CLAUDE.md` SPLIT IS THE SECOND**, and its eleven are still red exactly as CX found them:
+  `bb` 2, `bn` 2, `bq` 1, `br` 2, `bx` 2, `ce` 9, **plus `cd`'s knock-on.**
+  - **AND `cd` FLAGS TWO SUITES, NOT ONE — `bb` AND `bj`.** DB's file named only `bb`. `cd` is the
+    count-differ and its `REPAIRED` table holds **five suites only** (`ah`, `an`, `bb`, `bj`,
+    `runes`), each asserted to report zero failures; **`bb` is CW's damage arriving a second time
+    and `bj` is a CY delay failure arriving the same way.** That five-suite subset is also why
+    repairing `be`–`bi` did not move `cd`'s count: **none of the five Faith suites is in it**, so
+    `cd` never saw the threshold family at all.
+- **AND TWO THAT PASS BY ACCIDENT, WHICH IS WORSE.** `test_batch_bn.gd:505`
+  `contains("BATCH BN")` and `test_batch_bs.gd:409` `contains("BATCH BS")` still match — a passing
+  mention inside two surviving rules, not a batch block, **re-verified at DC: each string appears
+  twice in `CLAUDE.md` and neither is a batch block.** **A check that has stopped asking its
+  question, with no red to announce it.**
 - **`data/glossary.json` still reads "beast" once in prose** — "pay the four and not the beast",
   inside CV's own hero/ally entry. `test_batch_bx` §4 catches it.
 
@@ -275,39 +308,49 @@ INSTEAD.
 
 - **`check_cm_live` reports 4 failures. THIS IS THE ONE RED THAT IS ON PURPOSE.** Identical on
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
-  before and after the consolidation.** It is the only thing that presses the defensive bar.
+  before and after the consolidation, and DC confirms them again.** It is the only thing that
+  presses the defensive bar.
 - **THERE ARE TWO FLAKY SUITES, NOT ONE. `test_batch_at` IS THE SECOND AND IT IS FAR WORSE THAN
-  `bo`.** DB found it by running the battery three times: **`at` reads 3 failures or 4, and the
-  fourth flaked in 2 of 5 dedicated runs (~40%)**. The flaking check is
+  `bo`.** DB found it by running the battery three times; **DC records it here for the first
+  time.** `at` reads **3 failures or 4**, and the fourth flaked in **2 of 5 dedicated runs
+  (~40%)**. The flaking check is
   `Cannon at 8 stacks scales by the PASSIVE alone (1.27x, not ~2.5x)` — a damage-scaling
   assertion, and `test_batch_at.gd` calls `seed()` **zero** times. **Its check count is rock
   steady at 470**, so only the FAILURE count moves. **A count-diffing rule reads `at` 3 → 4 as a
-  regression and it is not one** — this is the same fault as `bo`, three times more often, and it
-  had never been recorded.
+  regression and it is not one** — the same fault as `bo`, three times more often.
+  **NOT REPAIRED AT DC:** the fix is to seed the suite or to assert a ratio with a margin instead
+  of a bare comparison, and **which of the two is a ruling.**
 - **`test_batch_bo` has a flaky assertion — roughly 1 failure in 13 runs**, and **it flaked in
   DB's run**. Its check count is rock steady at 1025; the §5 NULL FIELD check requires
   `deep < shallow` and the damage carries a 0.9–1.1 variance roll, so both can land on the same
   integer. `test_batch_bo.gd` calls `seed()` zero times. **A count-diffing rule reads this as a
   regression and it is not one.**
-- **THE SUITES THAT DRIFT IN THEIR CHECK COUNT — AND `an`'s BAND WAS WRONG UNTIL DB.**
-  **`an` is 6047–6054**, not the 6052–6054 this file carried: five observations of unmodified code
-  read **6047, 6051, 6052, 6054, 6048, 6054** across six, and *three fell below the old floor*. **`bk` is
-  129–130** and holds. Both are always 0 failures, and both call `seed()` zero times.
+- **THE SUITES THAT DRIFT IN THEIR CHECK COUNT, AND THE OBSERVATION COUNT EACH BAND RESTS ON.**
+  **`an` is 6047–6054, and that band now rests on SEVEN observations** — DB's six (6047, 6051,
+  6052, 6054, 6048, 6054) plus DC's **6053**. *DB's own sentence said "five observations" and then
+  listed six readings; the band itself was already right.* **`bk` is 129–130** and holds, on
+  DB's observations plus DC's. **A band written from too few readings reads a normal run as a
+  regression, which is the same failure as a wrong count in the opposite direction.** Both suites
+  are always 0 failures, and both call `seed()` zero times.
 - **TWO COUNTS MOVED FOR GOOD REASONS AND NOBODY WROTE THEM DOWN. BOTH ARE CORRECT AND ARE NOW
   THE BASELINE.**
   - **`al` is 559, not CS's 560.** Batch **CV** changed `PROSE_NUMBERS["wd_shieldwall"]` from
     `["4 turns", "5"]` to `["5 turns"]`, and the inner loop runs once per fragment.
   - **`bx` is 147, not CS's 142.** **CX re-pointed ELEVEN suites, not nine plus `ce`** — its own
-    commit names `bp bq br bs bt bu bv bw bx cb ce`. This file previously omitted `bx`.
+    commit names `bp bq br bs bt bu bv bw bx cb ce`.
 - **`check_map` is NOT a hang** — 99% CPU for ~5 minutes. The battery gives it a 600s bound.
 - **`check_parse` does not cover the test suites.** It walks `res://scripts` and `res://scenes`
   only — **and never at all for `test_batch_cp`, which the battery does not run.** **It does not
   cover the GATES or `gate_fixture.gd` either**, but a broken fixture fails all seven gates loudly.
-- **A GATE THAT EXITS 0 IS NOT A GATE THAT PASSED, AND DB REPRODUCED IT DELIBERATELY.** `check_da`
-  hit it at DA. DB hit it again from a different direction: **a `--script` target whose base class
-  does not resolve prints `Parse Error`, runs not one line, and exits 0.** Grep the stderr; never
-  trust the tally and never trust `$?`. **`run_battery.sh`'s `throws=` column is the only thing
-  standing between this fault and a green report.**
+  **DC parse-checked its five edited suites by running them and grepping stderr**, which is the
+  only cover those files have.
+- **A GATE THAT EXITS 0 IS NOT A GATE THAT PASSED.** `check_da` hit it at DA; DB reproduced it
+  deliberately from a different direction: **a `--script` target whose base class does not resolve
+  prints `Parse Error`, runs not one line, and exits 0.** Grep the stderr; never trust the tally
+  and never trust `$?`. **`run_battery.sh`'s `throws=` column is the only thing standing between
+  this fault and a green report.** **It is written down twice in `CLAUDE.md`** — in the traps and
+  in the fixture rule, the latter with the working form (**a `preload`ed `RefCounted` with no
+  `class_name`**) — **and DC deliberately added no third copy.**
 - **The `_hint_done` / `_skill_done` deadlock is real and is NOT currently biting.** Both
   skill-check orientation cards `await` a signal only a real click or key press emits. **A future
   headless modal will hit this again** — `_nobody_can_press()` is the one place the question is
@@ -315,30 +358,35 @@ INSTEAD.
 
 ### Last measurements
 
-**DB RAN THE FULL BATTERY TWICE — ONCE BEFORE THE CONSOLIDATION AND ONCE AFTER — AND 43 OF 45
-SUITES ARE BYTE-IDENTICAL ACROSS THE TWO.** The only two lines that differ are `an` and `bk`, the
-two documented drifters, both at zero failures. **Every gate's failure count is identical.**
+**FULL BATTERY AT DC. 45 suites, ZERO THROWS, 49 FAILURES ACROSS 21 SUITES** — down from DB's 72
+across 26, **by exactly the 23 of the threshold family and by nothing else.** Every check count in
+the battery is identical to DB's, `an` and `bk` inside their bands; **the only lines that moved are
+the five repaired suites' FAILURE counts, all to zero.** Every gate's failure count is identical
+too, and `check_cl_width`'s log is **byte-identical** before and after DC's two prose edits (they
+are length-neutral by construction).
 
-**Full-battery baseline, at DB. 45 suites, ZERO THROWS, 72 failures.** Counts, with failures marked:
+*Measured with `at` at the low end of its band (3) and `bo`'s flake present (1) — **the same
+conditions as DB's 72**, so the two totals compare like with like. If `at` flakes high the total
+reads 50 and that is not a regression.*
+
+Counts, with failures marked:
 
 ```
-ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, al 559, an 6047–6054, ar 735 /1
-as 396 /3, at 470 /3-or-4 (flake), au 336, av 324 /1, aw 350 /3, ax 345 /2, ay 484
-az 519, ba 690, bb 177 /2, bc 91, bd 71 /1, be 34 /3, bf 78 /5, bg 47 /5
-bh 233 /4, bi 91 /6, bj 67 /1, bk 129–130, bl 88, bm 1891, bn 81 /2
-bo 1025 /1 (the known flake), bp 275, bq 742 /1, br 1450 /2, bs 266, bt 458 /1
-bu 480 /5, bv 900 /2, bw 551 /3, bx 147 /2, cb 1184 /2, cd 86 /2, ce 1116 /9
-runes 3121, rune_battle 97
+ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, al 559, an 6047–6054, ar 735 /1, as 396 /3
+at 470 /3 (flake, 3-or-4), au 336, av 324 /1, aw 350 /3, ax 345 /2, ay 484, az 519, ba 690
+bb 177 /2, bc 91, bd 71 /1, be 34, bf 78, bg 47, bh 233, bi 91, bj 67 /1, bk 129–130
+bl 88, bm 1891, bn 81 /2, bo 1025 /1 (the known flake), bp 275, bq 742 /1, br 1450 /2
+bs 266, bt 458 /1, bu 480 /5, bv 900 /2, bw 551 /3, bx 147 /2, cb 1184 /2, cd 86 /2
+ce 1116 /9, runes 3121, rune_battle 97
 ```
 
-**Gates, at DB — and four of them report a check count for the first time:**
+**Gates, at DC — every one identical to DB:**
 `check_cm_live` **13 / 4** (the deliberate red), `check_co` **297 / 0**, `check_cs` **104 / 0**,
-`check_ct` **113 / 0**, `check_cy` **2704 / 0**, `check_cz` **131 / 0**, `check_da` **33 / 0**
-(30 before — §3's two census assertions and §1's `flags_are_inert` are the one deliberate movement).
+`check_ct` **113 / 0**, `check_cy` **2704 / 0**, `check_cz` **131 / 0**, `check_da` **33 / 0**.
 `check_parse` 0 failures (stderr grepped for `Parse Error`, never the tally), `check_flow`,
 `check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn` all 0 failures but
 **still report no check count**. `check_ct_map` **83 / 0**. **Run harness 22 / 165 / 8, all PASS,
 throws=0.**
 
-**NO SIM HAS BEEN RUN SINCE DA.** DB is a consolidation and a test batch; every ramp and depth
-figure above is DA's, carried unchanged and re-derived from `docs/reports/DA.md`.
+**NO SIM HAS BEEN RUN SINCE DA.** DB and DC are both test batches; every ramp and depth figure
+above is DA's, carried unchanged and re-derived from `docs/reports/DA.md`.

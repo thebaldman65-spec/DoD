@@ -41,7 +41,18 @@ const REAL_SAVE := "user://run_save.bin"
 const BASE_MITIGATION := 2.0    # % per stack (Batch BI §1: was 3)
 const BASE_DAMAGE := 1.5        # % per stack (Batch BI §1: was 2)
 const APOSTLE_MULT := 2
-const STACKS := 4               # the deepest an ally can CARRY — five releases
+# BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
+# STACKS IS A DIRECT-WRITE PROBE DEPTH, NOT A REACHABLE CARRY CEILING. It used
+# to be both — the comment said "the deepest an ally can CARRY" and CZ §2's
+# threshold made that false. The arithmetic checks below write `faith_stacks`
+# and `faith_peak` straight onto the unit, bypassing `_gain_faith`'s clamp, and
+# they measure a PER-STACK rate against fixed percentage-point tolerances; a
+# deeper probe is simply a better signal-to-noise ratio for that question.
+# Anything that goes THROUGH `_gain_faith` uses HELD_MAX instead, because that
+# is the only depth the game can actually produce.
+const STACKS := 4               # probe depth for the per-stack arithmetic only
 # Casts per measured rate. Damage rolls uniform ±10% (SD 5.8% of the mean), so
 # a 400-cast sum has an SE of 0.29% and a ratio of two sums 0.41%. The bands
 # asserted below are ±2 points, ~5 sigma — they cannot flap.
@@ -52,7 +63,9 @@ const HITS := 400
 # arms: they are 8 points apart, and a 3%-became-4% slip would be 4 points.
 const BAND := 0.03
 # Communion's rate at four stacks, the BF figure this batch must not disturb.
-const RATE_AT_FOUR := 0.60
+# BATCH DC: the roll is (15 x stacks)%% and the top of the eligible band fell
+# from four stacks to two with the threshold, so the peak rate is 30, not 60.
+const RATE_AT_PEAK := 0.30
 const TRIALS := 600
 
 var checks := 0
@@ -481,21 +494,26 @@ func _live_release_still_consumes() -> void:
 # THE CHIP MUST SAY WHAT THE ARITHMETIC DOES. A tooltip built from the base
 # rates while the damage used the doubled ones would be invisible in every
 # report and obvious to the first player who took the node.
+# BATCH DC — DRIVEN AT HELD_MAX, NOT AT STACKS. This is the one chip check that
+# goes THROUGH `_gain_faith`, so it is bound by the threshold: gaining STACKS
+# (4) now clamps to 3, RELEASES on the spot and leaves the count at zero, and
+# the chip rendered "Faith x0 (peak 3)" while the assertion asked for four
+# stacks' worth of doubled rates. HELD_MAX is the deepest a chip can ever show.
 func _live_the_chip_states_the_doubled_numbers() -> void:
 	var scene := await _spawn({"dv_apostle": 1})
 	var ally: BattleUnit = scene.get("heroes")[0]
 	ally.faith_stacks = 0
 	# BATCH BI §1: the chip prints what the PEAK pays, so the peak has to be
-	# cleared with the count or a previous test's five would be rendered here.
+	# cleared with the count or a previous test's peak would be rendered here.
 	ally.faith_peak = 0
-	scene.call("_gain_faith", ally, STACKS, "absorb")
+	scene.call("_gain_faith", ally, HELD_MAX, "absorb")
 	var s: Dictionary = ally.get_status("faith")
 	var desc := String(s.get("desc", ""))
-	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * APOSTLE_MULT * STACKS)),
-		"§2: the chip at four stacks reads its doubled mitigation (got \"%s\")" % desc)
-	ok(desc.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT * STACKS)),
+	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * APOSTLE_MULT * HELD_MAX)),
+		"§2: the chip at two stacks reads its doubled mitigation (got \"%s\")" % desc)
+	ok(desc.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT * HELD_MAX)),
 		"§2: ...and its doubled damage dealt")
-	ok(String(s.get("short", "")) == "F%d" % STACKS,
+	ok(String(s.get("short", "")) == "F%d" % HELD_MAX,
 		"§2: ...and the visible text is still the stack count")
 	await _kill(scene)
 	# The same chip without the capstone, which is the control.
@@ -503,19 +521,22 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 	ally = scene.get("heroes")[0]
 	ally.faith_stacks = 0
 	ally.faith_peak = 0
-	scene.call("_gain_faith", ally, STACKS, "absorb")
+	scene.call("_gain_faith", ally, HELD_MAX, "absorb")
 	desc = String(ally.get_status("faith").get("desc", ""))
-	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * STACKS)),
+	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * HELD_MAX)),
 		"§2: without Apostle the same chip reads the undoubled rate (got \"%s\")" % desc)
 	await _kill(scene)
 	_live_ran += 1
 
 
 # COMMUNION STILL ROLLS FOR THE CARRIER, and this is where the two nodes stop
-# cancelling. BF's condition skips an ally already at five; under the OLD
-# capstone that was every ally, all the time. Now a release drops the carrier
-# back into the 1-4 band that Communion pays for — both nodes want the same
-# thing.
+# cancelling. BF's condition skips an ally already AT THE THRESHOLD; under the
+# OLD capstone that was every ally, all the time. Now a release drops the
+# carrier back into the eligible band that Communion pays for — both nodes want
+# the same thing.
+#
+# BATCH DC: that band was 1-4 under a threshold of five and is 1-2 under CZ §2's
+# three, so the driven depth and the expected rate both move.
 func _live_communion_still_rolls_for_the_carrier() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)
@@ -528,29 +549,29 @@ func _live_communion_still_rolls_for_the_carrier() -> void:
 	# comes out eligible. Under the old capstone he would sit at five and
 	# Communion would skip him forever after.
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, 5, "absorb")
-	ok(ally.faith_stacks < 5,
-		"§2: an ally who has released is below five again (at %d)" % ally.faith_stacks)
+	scene.call("_gain_faith", ally, RELEASE, "absorb")
+	ok(ally.faith_stacks < RELEASE,
+		"§2: an ally who has released is below the threshold again (at %d)" % ally.faith_stacks)
 	var fired := 0
 	for _i in TRIALS:
 		for h in heroes:
 			h.faith_stacks = 0
 			h.remove_status("faith")
 			h.hp = h.max_hp
-		ally.faith_stacks = STACKS
+		ally.faith_stacks = HELD_MAX
 		var before := _stat_of(scene, "faith_releases")
 		war.faith_stacks = 0
-		scene.call("_gain_faith", war, 5, "absorb")
-		# The advance takes the ally to five, which RELEASES — so the release
-		# counter is the only honest witness at four stacks (BF's rule).
+		scene.call("_gain_faith", war, RELEASE, "absorb")
+		# The advance takes the ally TO the threshold, which RELEASES — so the
+		# release counter is the only honest witness at HELD_MAX (BF's rule).
 		if _stat_of(scene, "faith_releases") - before >= 2.0:
 			fired += 1
 	var rate := float(fired) / float(TRIALS)
-	ok(absf(rate - RATE_AT_FOUR) < 0.06,
-		"§2: Communion still rolls %d%% for a carrier at four (read %.1f%%)" % [
-			int(100.0 * RATE_AT_FOUR), 100.0 * rate])
-	_report.append("Communion at 4 stacks WITH the new Apostle: %.1f%% over %d trials (BF read 58.8%% without it)" % [
-		100.0 * rate, TRIALS])
+	ok(absf(rate - RATE_AT_PEAK) < 0.06,
+		"§2: Communion still rolls %d%% for a carrier at two (read %.1f%%)" % [
+			int(100.0 * RATE_AT_PEAK), 100.0 * rate])
+	_report.append("Communion at %d stacks WITH the new Apostle: %.1f%% over %d trials (BF read 58.8%% at four, under the old threshold)" % [
+		HELD_MAX, 100.0 * rate, TRIALS])
 	await _kill(scene)
 	_live_ran += 1
 

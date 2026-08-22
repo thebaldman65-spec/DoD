@@ -43,7 +43,13 @@ const BASE_DAMAGE := 1.5        # % per peak stack
 const APOSTLE_MULT := 2         # base 1x + Apostle's 1x
 const FERVOR_MULT := 2          # base 1x + Fervor's 1x
 const BOTH_MULT := 3            # ADDITIVE — never 4
-const STACKS := 4               # the deepest an ally can CARRY; five releases
+# BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
+# STACKS is a DIRECT-WRITE PROBE DEPTH for the per-stack arithmetic (see bg's
+# note): those checks write `faith_stacks`/`faith_peak` onto the unit and bypass
+# `_gain_faith`'s clamp. Anything driven THROUGH `_gain_faith` uses HELD_MAX.
+const STACKS := 4               # probe depth for the per-stack arithmetic only
 # §2's one rate change.
 const PER_ABSORB := 2
 # Casts per measured rate. Damage rolls uniform ±10% (SD 5.8% of the mean), so
@@ -390,7 +396,8 @@ func _every_gain_names_its_source() -> void:
 	var src := _src("res://scripts/battle.gd")
 	ok(src.contains("func _gain_faith(u: BattleUnit, n: int, source: String) -> void:"),
 		"§2: `_gain_faith` takes a source and does not default it")
-	for pair in [["_gain_faith(u, 1, \"ground\")", "the ground's drip"],
+	# BATCH DC: the drip's rate is `FAITH_PER_GROUND_TURN` now, not a literal 1.
+	for pair in [["_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")", "the ground's drip"],
 			["_gain_faith(holder, FAITH_PER_ABSORB, \"absorb\")", "Conviction's absorbs"],
 			["_gain_faith(h, 1, \"communion\")", "Communion"],
 			["_gain_faith(saved, maxi(devout.covenant_faith, 1), \"covenant\")", "Sacred Covenant"],
@@ -433,17 +440,24 @@ func _live_the_peak_rises_with_the_stacks() -> void:
 	var scene := await _spawn()
 	var ally: BattleUnit = scene.get("heroes")[0]
 	_neutral(scene)
+	# BATCH DC — THE RATCHET STOPS AT THE THRESHOLD, AND THAT IS THE RULE, not
+	# the four the literal used to promise. The count caps at `FAITH_RELEASE`
+	# and the peak is raised FROM the count, so the peak caps there too; the
+	# fourth gain lands on an ally who has already released and cannot lift it.
+	# Written as `mini(...)` so the row still runs four times — the question is
+	# "does the peak follow the count", and deleting the fourth iteration would
+	# stop asking it.
 	for i in 4:
 		scene.call("_gain_faith", ally, 1, "absorb")
-		ok(ally.faith_peak == i + 1,
+		ok(ally.faith_peak == mini(i + 1, RELEASE),
 			"§1: %d gain(s) put the peak at %d (reads %d)"
-				% [i + 1, i + 1, ally.faith_peak])
-	# A gain that the cap throws away must not raise the peak past five.
+				% [i + 1, mini(i + 1, RELEASE), ally.faith_peak])
+	# A gain that the cap throws away must not raise the peak past the threshold.
 	ally.faith_stacks = 0
-	ally.faith_peak = 5
-	scene.call("_gain_faith", ally, 3, "absorb")
-	ok(ally.faith_peak == 5,
-		"§1: the peak is capped at five with the count (reads %d)" % ally.faith_peak)
+	ally.faith_peak = RELEASE
+	scene.call("_gain_faith", ally, RELEASE, "absorb")
+	ok(ally.faith_peak == RELEASE,
+		"§1: the peak is capped at the threshold with the count (reads %d)" % ally.faith_peak)
 	await _kill(scene)
 	_live_ran += 1
 
@@ -455,15 +469,15 @@ func _live_the_peak_survives_a_release() -> void:
 	var scene := await _spawn()
 	var ally: BattleUnit = scene.get("heroes")[0]
 	_neutral(scene)
-	ally.faith_stacks = 4
-	ally.faith_peak = 4
+	ally.faith_stacks = HELD_MAX
+	ally.faith_peak = HELD_MAX
 	scene.get("sim_stats").clear()
 	scene.call("_gain_faith", ally, 1, "absorb")
 	ok(_stat_of(scene, "faith_releases") == 1.0,
-		"§1: the fifth stack released (%d)" % int(_stat_of(scene, "faith_releases")))
+		"§1: the threshold stack released (%d)" % int(_stat_of(scene, "faith_releases")))
 	ok(ally.faith_stacks == 0,
 		"§1: ...the COUNT resets to zero (left at %d)" % ally.faith_stacks)
-	ok(ally.faith_peak == 5,
+	ok(ally.faith_peak == RELEASE,
 		"§1: ...and the PEAK does not fall with it (reads %d)" % ally.faith_peak)
 	ok(ally.has_status("faith"),
 		"§1: ...and the chip stays up, because the peak still pays")
@@ -667,15 +681,18 @@ func _live_conviction_pays_two_per_absorb() -> void:
 	ok(_stat_of(scene, "faith_absorb_hits") == 1.0,
 		"§2: ...and the absorb denominator counted the HIT, not the Faith (%.0f)"
 			% _stat_of(scene, "faith_absorb_hits"))
-	# Three absorbs reach five and release — the whole point of the change.
-	scene.call("_on_shield_absorbed", ally)
+	# BATCH DC — THE LADDER IS TWO ABSORBS NOW, NOT THREE. At PER_ABSORB 2
+	# against CZ §2's threshold of 3, one absorb HOLDS at two and the second
+	# reaches the threshold and releases. The row still asks both halves of the
+	# original question — "does the one before release hold, and does the next
+	# one fire" — one rung lower.
 	ok(_stat_of(scene, "faith_releases") == 0.0,
-		"§2: two absorbs are four Faith and do not release yet")
+		"§2: one absorb is two Faith and does not release yet")
 	scene.call("_on_shield_absorbed", ally)
 	ok(_stat_of(scene, "faith_releases") == 1.0,
-		"§2: ...and the THIRD releases, where it used to take five (%.0f)"
+		"§2: ...and the SECOND releases, where it used to take five (%.0f)"
 			% _stat_of(scene, "faith_releases"))
-	_report.append("§2 absorbs to a release: 3 (was 5); Faith banked from absorbs across the three: %.0f (the third is capped at five)"
+	_report.append("§2 absorbs to a release: 2 (was 5, was 3 under CZ's tripled builders); Faith banked from absorbs across the two: %.0f (the second is capped at the threshold)"
 		% _stat_of(scene, "faith_gained_absorb"))
 	await _kill(scene)
 	_live_ran += 1
@@ -748,7 +765,7 @@ func _live_the_ground_and_absorb_denominators() -> void:
 
 
 # Faith paid onto the DEVOUT buys held value and can never become a release
-# (his count holds at five, Batch BH §2). A table that mixed the two would read
+# (his count holds at the threshold, Batch BH §2). A table that mixed the two would read
 # as a healthy gain rate feeding a dry payout — which is the shape §2 is trying
 # to diagnose, so it must not be able to fake it.
 func _live_the_devout_split_is_banked() -> void:
@@ -758,8 +775,10 @@ func _live_the_devout_split_is_banked() -> void:
 	ok(dv != null and dv.oath_faith > 0, "§2: Binding Oath is learned")
 	_neutral(scene)
 	scene.get("sim_stats").clear()
-	ally.faith_stacks = 4
-	ally.faith_peak = 4
+	# BATCH DC: HELD_MAX, not 4 — a gain from 4 clamps DOWN to the threshold and
+	# books a NEGATIVE stack, which is why `faith_gained_absorb` read 0 here.
+	ally.faith_stacks = HELD_MAX
+	ally.faith_peak = HELD_MAX
 	scene.call("_gain_faith", ally, 1, "absorb")
 	ok(_stat_of(scene, "faith_gained_oath") == 1.0,
 		"§2: the release swore the Devout a stack, booked to `oath` (%.0f)"

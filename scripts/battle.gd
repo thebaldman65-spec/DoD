@@ -309,7 +309,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 3 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 3 the bearer is healed and the\ncount resets; the peak keeps paying."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 3 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],

@@ -47,6 +47,13 @@ const BASE_DAMAGE := 1.5        # % per stack (BI: was 2)
 const APOSTLE_MULT := 2         # base 1x + Apostle's 1x
 const FERVOR_MULT := 2          # base 1x + Fervor's 1x
 const BOTH_MULT := 3            # Batch BI §1: ADDITIVE — never 4
+# BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
+# STACKS is a DIRECT-WRITE PROBE DEPTH for the per-stack arithmetic (see bg's
+# note): those checks write `faith_stacks`/`faith_peak` onto the unit and
+# bypass `_gain_faith`'s clamp. Anything driven THROUGH `_gain_faith` uses
+# HELD_MAX, because that is the only depth the game can produce.
 const STACKS := 4
 # Casts per measured rate. See the BG note: a 400-cast sum has an SE of ~0.3%,
 # so the ±2-point bands below are ~5 sigma and cannot flap.
@@ -621,8 +628,10 @@ func _the_deleted_fields_are_gone() -> void:
 		"§2: battle.gd reads neither deleted field")
 	ok(not bsrc.contains("1 + devout.fervor_step"),
 		"§2: the ground's drip no longer adds Fervor to it")
-	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")"),
-		"§2: ...it is a flat 1 per ally per turn, Batch AW §2's base, unchanged")
+	# BATCH DC: the drip is written against `FAITH_PER_GROUND_TURN` now — CZ §2
+	# named every Faith rate — so the assertion names the constant, not the digit.
+	ok(bsrc.contains("_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")"),
+		"§2: ...it is a flat FAITH_PER_GROUND_TURN per ally per turn, Batch AW §2's base, unchanged")
 	var tsrc := _src("res://scripts/talents.gd")
 	ok(not tsrc.contains("\"fervor_step\":") and not tsrc.contains("\"oath_ranks\":"),
 		"§2: no tree node writes either deleted field")
@@ -831,8 +840,11 @@ func _live_the_devout_accrues_his_own_faith() -> void:
 	ok(dv != null and dv.oath_faith == 1, "§2: Binding Oath is stamped on the Devout")
 	_neutral(scene)
 	for i in 3:
-		ally.faith_stacks = 4
-		scene.call("_gain_faith", ally, 1, "absorb")   # the fifth stack: a release
+		# BATCH DC: HELD_MAX, not 4. Under CZ §2's threshold a gain from 4 clamps
+		# DOWN to 3, so `_faith_gained` was booking a NEGATIVE stack into the
+		# source table on every iteration while the release still fired.
+		ally.faith_stacks = HELD_MAX
+		scene.call("_gain_faith", ally, 1, "absorb")   # the threshold stack: a release
 		ok(dv.faith_stacks == i + 1,
 			"§2: ally release %d leaves the Devout holding %d Faith (holds %d)"
 				% [i + 1, i + 1, dv.faith_stacks])
@@ -843,7 +855,7 @@ func _live_the_devout_accrues_his_own_faith() -> void:
 	var b_ally: BattleUnit = bare.get("heroes")[0]
 	_neutral(bare)
 	for _i in 3:
-		b_ally.faith_stacks = 4
+		b_ally.faith_stacks = HELD_MAX
 		bare.call("_gain_faith", b_ally, 1, "absorb")
 	ok(b_dv.faith_stacks == 0,
 		"§2: WITHOUT the node an ally's release swears him nothing (holds %d)"
@@ -893,12 +905,12 @@ func _live_his_own_faith_never_releases() -> void:
 	_neutral(scene)
 	scene.get("sim_stats").clear()
 	var hp_before := dv.max_hp
-	# Twenty stacks' worth, one at a time. An ALLY would have released four
-	# times over.
+	# Twenty stacks' worth, one at a time. An ALLY would have released six times
+	# over — BATCH DC: four under a threshold of five, six under CZ §2's three.
 	for _i in 20:
 		scene.call("_gain_faith", dv, 1, "absorb")
-	ok(dv.faith_stacks == 5,
-		"§2: the Devout's own Faith HOLDS at five (holds %d)" % dv.faith_stacks)
+	ok(dv.faith_stacks == RELEASE,
+		"§2: the Devout's own Faith HOLDS at the threshold (holds %d)" % dv.faith_stacks)
 	ok(_stat_of(scene, "faith_releases") == 0.0,
 		"§2: ...twenty gains produce ZERO releases (%d)"
 			% int(_stat_of(scene, "faith_releases")))
@@ -913,16 +925,16 @@ func _live_his_own_faith_never_releases() -> void:
 			chip_desc = String(s.get("desc", ""))
 	ok(chip_desc.to_lower().contains("never releases"),
 		"§2: ...and its tooltip says so rather than promising a payout")
-	# The same twenty gains on an ALLY release four times — the pair is what
+	# The same twenty gains on an ALLY release 20/RELEASE times — the pair is what
 	# proves the rule is about WHO holds the Faith, not about the amount.
 	var ally: BattleUnit = scene.get("heroes")[0]
 	_neutral(scene)
 	scene.get("sim_stats").clear()
 	for _i2 in 20:
 		scene.call("_gain_faith", ally, 1, "absorb")
-	ok(_stat_of(scene, "faith_releases") == 4.0,
-		"§2: ...while an ALLY's twenty gains release four times (%d)"
-			% int(_stat_of(scene, "faith_releases")))
+	ok(_stat_of(scene, "faith_releases") == float(20 / RELEASE),
+		"§2: ...while an ALLY's twenty gains release %d times (%d)"
+			% [20 / RELEASE, int(_stat_of(scene, "faith_releases"))])
 	await _kill(scene)
 	_live_ran += 1
 
@@ -933,7 +945,7 @@ func _live_an_ally_release_resets_to_zero() -> void:
 	var scene := await _spawn({"dv_oath": 1})
 	var ally: BattleUnit = scene.get("heroes")[0]
 	_neutral(scene)
-	ally.faith_stacks = 4
+	ally.faith_stacks = HELD_MAX
 	scene.call("_gain_faith", ally, 1, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release resets the ally to ZERO even with Binding Oath (left %d)"
@@ -943,8 +955,8 @@ func _live_an_ally_release_resets_to_zero() -> void:
 	# would hide a live benefit rather than report an empty meter.
 	ok(ally.has_status("faith"),
 		"§2/BI: ...and the chip STAYS, at zero stacks, because the peak pays on")
-	ok(ally.faith_peak == 5,
-		"§2/BI: ...with the peak standing at five (reads %d)" % ally.faith_peak)
+	ok(ally.faith_peak == RELEASE,
+		"§2/BI: ...with the peak standing at the threshold (reads %d)" % ally.faith_peak)
 	var bsrc := _src("res://scripts/battle.gd")
 	ok(bsrc.contains("_conviction_growth(devout, true)"),
 		"§2: ...so the growth is always a full step — nothing consumes nothing now")
