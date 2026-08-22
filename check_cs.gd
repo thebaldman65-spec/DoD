@@ -11,15 +11,17 @@
 #       --script check_cs.gd
 extends SceneTree
 
-var _fails := 0
-var _checks := 0
+# BATCH DB — the battle fixture and the tally are authored ONCE, in
+# `gate_fixture.gd`. This gate had its own copy of both until this batch.
+const Gate = preload("res://gate_fixture.gd")
+
+var _g := Gate.new()
 
 
+# BATCH DB — the tally is the fixture's. This delegates rather than
+# re-implements: FOUR gates' copies of this never counted a check at all.
 func ok(cond: bool, what: String) -> void:
-	_checks += 1
-	if not cond:
-		_fails += 1
-		print("  FAIL: %s" % what)
+	_g.ok(cond, what)
 
 
 func _initialize() -> void:
@@ -29,7 +31,10 @@ func _initialize() -> void:
 
 	# ---------- §1 — THE PRESS TABLE, AND THE CAP ----------
 	print("BATCH CS §1 — the press table")
-	var scene := await _spawn()
+	# Determinism forced: the floor check asserts his basic DEALS DAMAGE at
+	# every press count, and a miss or a block would make that a coin toss.
+	var scene: Node = await Gate.spawn(self,
+		["warden", "pyromancer", "holy", "sharpshooter"], {"deterministic": true})
 	var ss: BattleUnit = null
 	for h in scene.get("heroes"):
 		if not h.is_companion and String(h.passive_id) == "lethal_aim":
@@ -344,44 +349,7 @@ func _drive_and_resolve(scene: Node, ss: BattleUnit, focus: int, n: int) -> Dict
 	return {"dealt": before - foe.hp, "focus": int(bar["focus"])}
 
 
+# BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
 func _report() -> void:
-	print("check_cs: %d checks, %d failures" % [_checks, _fails])
-	quit(1 if _fails > 0 else 0)
+	_g.report(self)
 
-
-func _spawn() -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["warden", "pyromancer", "holy", "sharpshooter"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband",
-		"enemies": ["raider", "raider", "archer"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	Engine.time_scale = 50.0
-	for _i in 90:
-		await process_frame
-	Engine.time_scale = 1.0
-	# Determinism, forced rather than retried (the AK/AL/AR discipline that
-	# check_cm_live records). The floor check below asserts that his basic
-	# DEALS DAMAGE at every press count, and a miss, a parry or a block would
-	# make that assertion a coin toss — n=3 failed exactly once this way before
-	# these four lines existed. `no_cover` is the Sharpshooter's own bypass and
-	# the block field goes far negative because `_live_block_chance` adds a
-	# slice on top of it and the sum is clamped to [0,1].
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = -10.0
-		u.crit_bonus = -1.0
-	return scene

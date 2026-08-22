@@ -878,7 +878,7 @@ both grant shapes go through. **The corpus is 216; the CL walk alone reaches 211
   actually cost** — the criterion could not be applied to an ability no walk in the project could
   see, so the defect was invisible rather than merely unfixed.
 
-## A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS AND DIVERGES SILENTLY (STANDING, SET AT DA §3)
+## A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS AND DIVERGES SILENTLY (STANDING, SET AT DA §3, THE GATES CONSOLIDATED AT DB §1)
 > **Enumerate the ability corpus through `Classes.ability_corpus()`. Never copy another gate's
 > walk.** A talent can grant an ability that lives in no pool, and a hand-rolled walk misses five.
 > **A helper copied between gates inherits its bugs silently and diverges from its origin without
@@ -897,17 +897,29 @@ wrong, none of them diffed against anything.
 - **CZ's `_cl_only_corpus` IS THE ONE ALLOWED COPY** and it is allowed because being a copy is its
   job: it is the negative control that proves the old walk still misses the five. **`check_da`
   names it as the exemption, so a later reader cannot "consolidate" it into uselessness.**
-- **THE SWEEP RAN AT DA §3 AND FOUND ONE MORE, REPORTED AND NOT CONSOLIDATED: `_spawn`, THE BATTLE
-  FIXTURE, IS COPIED INTO SEVEN GATES AS FOUR DIVERGENT BODIES.** It has already cost twice — the
-  copied `_report` diverged into `"N checks, M failures"` and `"N checks / M failures"`, which is
-  the exact `grep -E "checks,"` scar recorded in `run_battery.sh`'s own header; and CQ §1 removed
-  the two hand-set `Profile` flags from `check_cm_live`'s copy and left them standing in
-  `check_co`'s and `check_ct`'s, with nothing anywhere reporting the divergence. **`check_da` §3
-  prints the census every run so the number cannot rot into a sentence nobody re-checks.**
-- **CONSOLIDATING THEM IS ITS OWN BATCH.** A shared fixture has to serve four legitimately
-  different needs (a party parameter, `check_cs`'s determinism forcing, `check_ct`'s pre-loaded
-  pouch, `check_cm_live`'s deliberately absent flags) and getting that wrong breaks every gate at
-  once.
+- **DONE AT BATCH DB: `_spawn` IS AUTHORED ONCE, IN `gate_fixture.gd`, AND ALL SEVEN GATES GO
+  THROUGH IT.** The fixture carries the tally too (`ok` / `report`). **`check_da` §3 no longer
+  COUNTS the copies — it ASSERTS there are none**: a gate that authors its own `_spawn`, or that
+  instantiates the battle scene by hand, fails it by name. Both marks are joined at runtime so the
+  gate does not accuse itself.
+- **THE THREE DIFFERENCES THAT WERE REAL ARE NAMED ARGUMENTS NOW**, not invisible edits inside a
+  copy: `deterministic` (the AK/AL/AR damage forcing — `check_cm_live`, `check_cs`), `items`
+  (`check_ct`'s held empty slot) and `run` (a gate that already holds the node).
+- **AND THE ONE THAT WAS NOT REAL WAS RULED DEAD.** Five copies hand-set `skill_check_taught` and
+  `defensive_check_taught`; two did not. **The flags are unreachable in a gate** —
+  `_nobody_can_press()` is `sim or autoplay or headless`, so the read site is never entered and the
+  brace always takes the bot branch. **Their only live effect was `Profile._save()` writing the
+  player's `user://profile.json` on every gate run.** They are gone from all five. **DA's own
+  write-up of this said "two others"; it was five** — the census counted bodies correctly and
+  described them from memory.
+- **WHAT DB LEARNED BUILDING IT, AND IT IS A TRAP: A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT
+  COMPILE.** `extends GateBase` (or `extends "res://gate_base.gd"`) on a `--script` SceneTree
+  target fails with `Could not find base class` **and exits 0 having run nothing**. The fixture is
+  a `preload`ed `RefCounted` for that reason, and it carries **no `class_name`** — that registration
+  lives in the gitignored `.godot/global_script_class_cache.cfg`, so it would resolve here and fail
+  on a fresh clone.
+- **STILL OWED, AND TEN TIMES LARGER — THIS IS BATCH DC.** In the SUITES: **`_spawn` in 37 suites
+  as 34 distinct bodies, `_run` in 39 as 39, `_kill` byte-identical in 14.**
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
@@ -1034,6 +1046,21 @@ have been lost with it. **Live counts belong in `docs/state.md`; the rule is wha
   reported "0 failures" on a tree with a real Parse Error in it. `check_parse.gd` asks
   `can_instantiate()` now, which is false exactly when the parse is broken; **grep the stream
   anyway. A gate that can only pass is a gap.**
+- **AND THE EXIT CODE IS NOT A SIGNAL EITHER — IT IS THE SAME DEFECT ONE LAYER OUT.** `load()`
+  handing back a broken script and the process handing back `0` are one fault wearing two faces:
+  **the tool reports success for work it did not do.** `check_da`'s first run printed a
+  clean-looking report and **exited 0 with two `Parse Error` lines on stderr**; only the stderr
+  grep caught it. **Batch DB reproduced it deliberately and it is trivial to hit** — a `--script`
+  target whose BASE CLASS does not resolve prints
+  `Parse Error: Could not find base class`, runs **not one line** of the gate, and **exits 0**:
+  ```
+  Godot --headless --path . --script probe_gate.gd ; echo $?
+  SCRIPT ERROR: Parse Error: Could not find base class "ProbeBase".
+  0
+  ```
+  **A gate that never ran cannot fail, and a runner that trusts `$?` will call that a pass.**
+  `run_battery.sh` is right to print `throws=` beside every count and that column is not
+  decoration — **`throws=` is the only thing standing between this fault and a green report.**
 - **A CHECK THAT PASSES FOR A REASON IT IS NOT TESTING IS THE SAME GAP, AND ONLY A NEGATIVE
   CONTROL FINDS IT.** Deleting an ability's no-chain refusal did not trip the check written to
   catch it — the cast had just started a 5-turn cooldown, so the refusal came from the COOLDOWN
@@ -1200,6 +1227,21 @@ have been lost with it. **Live counts belong in `docs/state.md`; the rule is wha
   steps a real choice, and the three policies walk 6.5 / 6.0 / 2.2 elites a
   run. A pre-BK three-policy row is still a triplicate, not a bracket; a
   post-BK one is a bracket.
+  **BATCH DB §3 — AND THE HARDER HALF OF THAT, WHICH IS A COVERAGE FACT
+  RATHER THAN A COMPARISON ONE: TWO THIRDS OF EVERY TALENT TREE IS OUTSIDE
+  EVERY MEASUREMENT EVER TAKEN IN THIS PROJECT.** `Talents.LANES` is **3**
+  and there are **twelve specs**, so the project has **36 lanes and every
+  figure it has ever published was walked on the same 12**. **NO SIM NUMBER
+  HERE HAS EVER INVOLVED GLACIAL PRISON** — the Cryomancer's Deep Freeze lane
+  has never run outside DA's single smoke arm — and the same is true of
+  Second Prison, Cold Snap, Glacial Economy and Absolute Zero. **THIS IS NOT
+  A BUG AND IT IS NOT A BACKLOG ITEM**: a fixed default party is precisely
+  what makes arms comparable across batches. It is a **permanent caveat on
+  every sim figure**, and the rule that follows from it is narrow and
+  absolute: **no sim figure may be quoted about a card in a non-default lane,
+  and several have been.** The sim's own report prints the unmeasured count
+  beside `builds=` since DB, so the caveat arrives with the number instead of
+  living only here.
   **BATCH BG §1 STANDING CAUTION ON EVERY RUN BAND: `DOD_SIM_BUILDS`
   DEFAULTS TO EACH TREE'S FIRST LANE, AND THAT IS A CONFOUND WITH A KNOWN
   SIGN.** For the default party the first lane is Berserker Bloodletting,

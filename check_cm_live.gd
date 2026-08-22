@@ -11,21 +11,28 @@
 #       --script check_cm_live.gd
 extends SceneTree
 
+# BATCH DB — the battle fixture and the tally are authored ONCE, in
+# `gate_fixture.gd`. This gate had its own copy of both until this batch.
+const Gate = preload("res://gate_fixture.gd")
+
 const SAMPLES := 40
 
-var _fails := 0
+var _g := Gate.new()
 
 
+# BATCH DB — the tally is the fixture's. This delegates rather than
+# re-implements: FOUR gates' copies of this never counted a check at all.
 func ok(cond: bool, what: String) -> void:
-	if not cond:
-		_fails += 1
-		print("  FAIL: %s" % what)
+	_g.ok(cond, what)
 
 
 func _initialize() -> void:
 	await process_frame
 	seed(20260817)
-	var scene := await _spawn()
+	# Determinism forced (the AK/AL/AR discipline) and NO Profile flags —
+	# CQ §1 removed them from this copy first, and DB removed the other five.
+	var scene: Node = await Gate.spawn(self,
+		["warden", "pyromancer", "holy", "beastmaster"], {"deterministic": true})
 	var warden: BattleUnit = null
 	var other: BattleUnit = null
 	for h in scene.get("heroes"):
@@ -100,14 +107,11 @@ func _initialize() -> void:
 	_report()
 
 
+# BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
 func _report() -> void:
-	print("check_cm_live: %d failures" % _fails)
-	quit(1 if _fails > 0 else 0)
+	_g.report(self)
 
 
-# One attack, with the bar pressed dead centre (Perfect) or at the far end
-# (Sloppy — which for a defensive check must be identical to Good). Returns
-# what was observed about the bar plus the health the victim lost.
 func _attack(scene: Node, foe: BattleUnit, victim: BattleUnit,
 		perfect: bool, press := -1.0) -> Dictionary:
 	var ab: Ability = foe.abilities[0]
@@ -140,72 +144,3 @@ func _attack(scene: Node, foe: BattleUnit, victim: BattleUnit,
 	out["bd"] = victim.pressure
 	return out
 
-
-func _spawn() -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["warden", "pyromancer", "holy", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband",
-		"enemies": ["raider", "raider", "archer"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	# BATCH CQ §1 — THE HAND-SET FLAGS ARE GONE. CM set both Profile flags here
-	# because the orientation cards are modal and `await _hint_done` waits on a
-	# button press no headless run can produce. That was one file knowing about
-	# a trap rather than a guard against it — A PROFILE FLAG IS NOT A BOT GUARD
-	# — and the same missing guard on `_defensive_brace` is what hung al, bp,
-	# br and bw for five batches. `battle._nobody_can_press()` answers the
-	# question in one place now, so the flags have nothing left to dodge.
-	#
-	# **FOUR CHECKS IN THIS GATE ARE RED AND HAVE BEEN SINCE CM. THEY ARE NOT
-	# DIAGNOSED BY BATCH CQ AND ARE RECORDED AS OWED.** The identical four fail
-	# on unmodified HEAD, so the guard did not cause them — but the guard does
-	# change what they COULD ever have measured, and that is the honest thing
-	# to write down here rather than leave for the next reader to rediscover:
-	#
-	#   · This harness is built to BE the player — it polls `scene.sc_active`,
-	#     writes `sc_pos` and calls `_grade_skill_check()` itself. That is a
-	#     legitimate way to answer a modal await, and it is why this gate was
-	#     never one of the four that hung.
-	#   · `_nobody_can_press()` is TRUE here (headless), so the defensive brace
-	#     takes the bot branch and rolls `randf() < DEF_BOT_PERFECT` instead of
-	#     raising a bar. **The bar can no longer appear in a headless run at
-	#     all**, so "the bar appeared" and "the top line names the incoming
-	#     blow" are now unsatisfiable rather than merely failing, and the two
-	#     ratio checks measure a 20%-Perfect BOT MIX rather than a forced brace.
-	#   · The repair is to re-point all four at what IS observable — the bot's
-	#     own brace rate and its effect — or to give the guard an explicit
-	#     opt-in that a harness willing to press can set. **Neither is done
-	#     here**: an opt-in that this harness then failed to drive would turn
-	#     four known reds into a HANG, which is strictly worse, and choosing
-	#     between them needs the diagnosis of the original four that this batch
-	#     did not do. Repair only what is understood.
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	Engine.time_scale = 50.0
-	for _i in 90:
-		await process_frame
-	Engine.time_scale = 1.0
-	# Determinism, forced rather than retried (the AK/AL/AR discipline): a
-	# blocked, parried or critical blow would swamp a 15% difference.
-	#
-	# `block_chance = 0.0` IS NOT ENOUGH ON A WARDEN, and that is the trap this
-	# harness fell into first. `_live_block_chance` adds `_plating_slice` — 0.15
-	# plus Heavy Plating's climb — on top of the field, so zeroing the field
-	# leaves him blocking one hit in six and climbing. The sum is clamped to
-	# [0,1], so a large negative field is what actually turns the roll off.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = -10.0
-		u.crit_bonus = -1.0
-	return scene

@@ -14,6 +14,10 @@
 #       --script check_co.gd
 extends SceneTree
 
+# BATCH DB — the battle fixture and the tally are authored ONCE, in
+# `gate_fixture.gd`. This gate had its own copy of both until this batch.
+const Gate = preload("res://gate_fixture.gd")
+
 # Cards whose payload is NOT only the status, verified by walking
 # `_resolve_special`: each does something a refusal would destroy.
 const MUST_NOT_GATE := {
@@ -36,13 +40,13 @@ const MUST_NOT_GATE := {
 # §2 says that bespoke path is not subsumed.
 const ALWAYS_IMPROVES := ["interpose"]
 
-var _fails := 0
+var _g := Gate.new()
 
 
+# BATCH DB — the tally is the fixture's. This delegates rather than
+# re-implements: FOUR gates' copies of this never counted a check at all.
 func ok(cond: bool, what: String) -> void:
-	if not cond:
-		_fails += 1
-		print("  FAIL: %s" % what)
+	_g.ok(cond, what)
 
 
 func _initialize() -> void:
@@ -99,9 +103,9 @@ func _initialize() -> void:
 	# DEVOUT (`inquisitor`) for `_living_devout` to answer. A one-party sweep
 	# reports the cards it cannot reach as "untested", which is the fixture's
 	# limit quietly reading as coverage.
-	var first := await _sweep(await _spawn(["warden", "pyromancer", "holy",
+	var first := await _sweep(await Gate.spawn(self, ["warden", "pyromancer", "holy",
 		"beastmaster"]), gated, by_special, [])
-	var second := await _sweep(await _spawn(["warden", "pyromancer",
+	var second := await _sweep(await Gate.spawn(self, ["warden", "pyromancer",
 		"inquisitor", "beastmaster"]), gated, by_special, first["untested"])
 	var refused_after: int = int(first["refused"]) + int(second["refused"])
 	var untested: Array = second["untested"]
@@ -178,36 +182,9 @@ func _sweep(scene: Node, gated: Array, by_special: Dictionary,
 	return {"refused": refused_after, "untested": untested}
 
 
+# BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
 func _report() -> void:
-	print("check_co: %d failures" % _fails)
-	quit(1 if _fails > 0 else 0)
-
-
-func _spawn(specs: Array) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband",
-		"enemies": ["raider", "raider", "archer"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	Profile.set_flag("skill_check_taught")
-	Profile.set_flag("defensive_check_taught")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	Engine.time_scale = 50.0
-	for _i in 90:
-		await process_frame
-	Engine.time_scale = 1.0
-	return scene
+	_g.report(self)
 
 
 # BATCH CZ §0 — THE ENUMERATION IS `Classes.ability_corpus()` NOW, AND THIS

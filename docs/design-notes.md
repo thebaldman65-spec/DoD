@@ -4562,3 +4562,68 @@ formats and the battery's grep silently missed one of them, and once when CQ rem
 reporting the split. **Neither was found by a test. Both were found by someone reading two files
 side by side**, which is the strongest argument for the rule: this defect class has no detector,
 so it needs a habit instead.
+
+## Batch DB — what a copied helper actually costs, and the shape that would not compile
+
+DA named the failure mode and refused to fix it in the same batch, which was right: **a shared
+fixture serving four legitimately different needs is a design problem, and getting it wrong breaks
+seven gates at once.** This is the note on what the fix turned out to be, and on the two things
+that were only visible from inside it.
+
+### The divergence was worse than the census said, in a direction nobody would guess
+
+DA reported `_spawn` as **seven copies, four bodies**, and that was exact. What it got wrong was
+the *flag* half: it recorded CQ's removal as leaving the two `Profile.set_flag` lines standing in
+**two** other copies. They were standing in **five**. The census counted bodies correctly and
+described the divergence from memory, and the memory was wrong — **which is the copied-helper
+failure arriving one level up, in the prose about the copies.**
+
+### The interesting part is that the flags were dead, and had been for four batches
+
+CQ removed them from `check_cm_live` because `battle._nobody_can_press()` had just made them
+unnecessary. It is the same reason in the other five, and it was already true when CQ wrote it —
+`_nobody_can_press()` is `sim or autoplay or headless`, and a gate is always headless. **So five
+gates spent four batches executing two lines that could not affect any check they ran.**
+
+They were not, however, inert. `Profile.set_flag` calls `_save()`. **The five gates were writing
+the player's `profile.json` on every run** — a side effect nobody asked for, in a file no gate
+reads, two hundred lines away from `check_ct` asserting that it leaves the player's save exactly
+as it found it. **A dead line and a harmless line are not the same thing**, and the only way to
+tell them apart is to follow the call rather than read the name.
+
+### The shape that would not compile, and why that matters more than the fixture
+
+The obvious consolidation is a base class: `extends GateBase`, every gate inherits `ok`, `_report`
+and `_spawn`, **and not one of the several hundred `ok(...)` call sites moves.** It is the right
+design and it does not work — **a `--script` SceneTree target cannot resolve its own base class**,
+in either spelling, with the class cache present and correct.
+
+**The way it fails is the point.** It prints `Parse Error: Could not find base class` on stderr,
+runs **not one line** of the gate, and **exits 0**. A runner that trusts the exit code sees a pass.
+A runner that greps for a check count sees nothing and prints `checks=?` — which four gates were
+*already* printing for unrelated reasons, so it would not even have looked new. **The project has
+been recording this fault since CP under `load()` returning a broken script; it is the same fault,
+and the exit code is simply where it surfaces when the broken thing is the entry point.**
+
+The fixture is a `preload`ed `RefCounted` instead, and it carries no `class_name` — that
+registration lives in a gitignored cache only the editor regenerates, so a `class_name` here would
+resolve on this machine and fail on a fresh clone. **Preloading by path needs no cache and cannot
+rot.**
+
+### A rule whose mechanism is right and whose list is wrong
+
+CT's rule — *a `--script` harness can only compile files that name no autoload* — is correct and
+was load-bearing here. Its written form lists "`Run`, `Profile`, `Talents`, `Classes` or `Relics`".
+**`project.godot` registers three autoloads: `Run`, `Settings` and `Music`.** The other four are
+`class_name` script classes, safe at compile time, and the gates have been naming `Talents` since
+before the rule was written. **A rule that over-reaches gets quietly disbelieved**, which is worse
+than one that is narrow and exact — the fixture needed to name `Talents`, and a literal reading of
+the rule says it may not.
+
+### What the battery cost, and why it is the batch's real finding
+
+Five implement-only batches banked **72 failing assertions across 26 suites**, zero throws. Almost
+none of them is a bug in the game: they are suites asserting a Faith threshold of 5 against a game
+that releases at 3, and initiative literals that CY moved. **The stale-assertion bill is not paid
+by the batch that runs the battery; it is paid by the batch that repairs them**, and DB deliberately
+did not, because §0 bound it to changing no behaviour and a repair pass is a ruling per assertion.

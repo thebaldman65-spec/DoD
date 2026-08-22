@@ -15,15 +15,17 @@
 #       --script check_ct.gd 2>&1 | grep -cE "Parse Error|SCRIPT ERROR"
 extends SceneTree
 
-var _fails := 0
-var _checks := 0
+# BATCH DB — the battle fixture and the tally are authored ONCE, in
+# `gate_fixture.gd`. This gate had its own copy of both until this batch.
+const Gate = preload("res://gate_fixture.gd")
+
+var _g := Gate.new()
 
 
+# BATCH DB — the tally is the fixture's. This delegates rather than
+# re-implements: FOUR gates' copies of this never counted a check at all.
 func ok(cond: bool, what: String) -> void:
-	_checks += 1
-	if not cond:
-		_fails += 1
-		print("  FAIL: %s" % what)
+	_g.ok(cond, what)
 
 
 func _initialize() -> void:
@@ -198,10 +200,14 @@ func _initialize() -> void:
 		"the gate leaves the player's save exactly as it found it")
 
 	# ---------- the battle half: each new item, on live units ----------
-	var scene: Node = await _spawn(run)
+	# A HELD, EMPTY SLOT goes in deliberately: "the pouch renders full and
+	# empty", and empty only exists because a drained stack keeps its slot.
+	# `run` is passed in because this gate already holds it.
+	var scene: Node = await Gate.spawn(self,
+		["warden", "pyromancer", "holy", "beastmaster"],
+		{"run": run, "items": {"bomb": 0}})
 	if scene == null:
-		print("  FAIL: the battle never spawned")
-		_fails += 1
+		ok(false, "the battle never spawned")
 		_report()
 		return
 	var heroes: Array = scene.heroes
@@ -311,37 +317,7 @@ func _initialize() -> void:
 	_report()
 
 
+# BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
 func _report() -> void:
-	print("check_ct: %d checks / %d failures" % [_checks, _fails])
-	quit(1 if _fails > 0 else 0)
+	_g.report(self)
 
-
-func _spawn(run: Node) -> Node:
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["warden", "pyromancer", "holy", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	# A HELD, EMPTY SLOT goes into the battle deliberately: "the pouch renders
-	# full and empty" is the brief's floor, and empty is the half that only
-	# exists because a drained stack keeps its slot.
-	run.items["bomb"] = 0
-	run.encounter = {"type": "fight", "theme": "Warband",
-		"enemies": ["raider", "raider", "archer"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	Profile.set_flag("skill_check_taught")
-	Profile.set_flag("defensive_check_taught")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	Engine.time_scale = 50.0
-	for _i in 90:
-		await process_frame
-	Engine.time_scale = 1.0
-	return scene

@@ -27,6 +27,10 @@
 #       --script check_da.gd
 extends SceneTree
 
+# BATCH DB — the battle fixture and the tally are authored ONCE, in
+# `gate_fixture.gd`. This gate had its own copy of both until this batch.
+const Gate = preload("res://gate_fixture.gd")
+
 # §3 — THE FINGERPRINT OF A HAND-ROLLED CORPUS WALK is assembled in
 # `_walk_marks()` below rather than held as a literal, because a gate whose
 # source contains its own fingerprint accuses itself on the first run and gets
@@ -34,12 +38,15 @@ extends SceneTree
 
 # The one file allowed to carry it, and why. NOT a suppression: the copy is the
 # point there.
+# BATCH DB — the one authored battle fixture. Named as a const so the failure
+# messages and the census cannot drift apart from each other.
+const FIXTURE := "gate_fixture.gd"
+
 const WALK_EXEMPT := {
 	"check_cz.gd": "`_cl_only_corpus` is §0's negative control — its job is to still be missing the five",
 }
 
-var _fails := 0
-var _checks := 0
+var _g := Gate.new()
 
 
 # BOTH halves are required to accuse a file, so a gate that mentions one pool
@@ -48,11 +55,19 @@ func _walk_marks() -> Array:
 	return ["Classes.class_draft" + "_pool(", "Classes.spec_draft" + "_pool("]
 
 
+# BATCH DB — THE FIXTURE MARKS, JOINED AT RUNTIME FOR THE SAME REASON. DA
+# counted the `_spawn` copies and reported them; DB deleted all seven, and this
+# is what keeps them deleted. A gate that authors its own battle fixture again
+# trips [0]; a gate that skips the fixture and instantiates the scene by hand
+# trips [1], which is the same defect wearing a different name.
+func _fixture_marks() -> Array:
+	return ["\nfunc _spa" + "wn(", "res://scenes/bat" + "tle.tscn"]
+
+
+# BATCH DB — the tally is the fixture's. This delegates rather than
+# re-implements: FOUR gates' copies of this never counted a check at all.
 func ok(cond: bool, what: String) -> void:
-	_checks += 1
-	if not cond:
-		_fails += 1
-		print("  FAIL: %s" % what)
+	_g.ok(cond, what)
 
 
 func _initialize() -> void:
@@ -129,6 +144,7 @@ func _s3_enumeration_rule() -> void:
 	var rolled: Array = []
 	var spawn_bodies := {}
 	var spawn_files: Array = []
+	var fixture_users: Array = []
 	for f in gates:
 		var s := FileAccess.get_file_as_string("res://" + f)
 		var hand := true
@@ -137,25 +153,16 @@ func _s3_enumeration_rule() -> void:
 				hand = false
 		if hand and not WALK_EXEMPT.has(f):
 			rolled.append(f)
-		# The census: how many gates carry their own copy of the battle fixture,
-		# and how many DISTINCT copies that is. A number, so it cannot rot into
-		# a sentence nobody re-checks.
-		# The LEADING NEWLINE matters: without it this gate matches the search
-		# string in this very function and censuses itself wrongly. It did.
-		var at := s.find("\nfunc _spawn(")
-		if at >= 0:
+		# BATCH DB — THE CENSUS IS AN ASSERTION NOW. DA could only count the
+		# copies, because consolidating them was its own batch; this is that
+		# batch's enforcement. The LEADING NEWLINE in mark [0] matters — without
+		# it this gate matches the string in its own source and accuses itself.
+		if s.contains(_fixture_marks()[0]):
 			spawn_files.append(f)
-			var end := s.find("\nfunc ", at + 8)
-			if end < 0:
-				end = s.length()
-			var body := s.substr(at, end - at)
-			var key := ""
-			for line in body.split("\n"):
-				var t := line.strip_edges()
-				if t == "" or t.begins_with("#"):
-					continue
-				key += t + "\n"
-			spawn_bodies[key] = true
+		if s.contains(_fixture_marks()[1]):
+			spawn_bodies[f] = true
+		if s.contains(FIXTURE):
+			fixture_users.append(f)
 	for f in rolled:
 		ok(false, "%s hand-rolls the ability corpus — `Classes.ability_corpus()` is the walk (BATCH DA §3)" % f)
 	ok(rolled.is_empty(), "every gate enumerates abilities through `Classes.ability_corpus()`")
@@ -166,10 +173,20 @@ func _s3_enumeration_rule() -> void:
 			if not s2.contains(mark):
 				still = false
 		ok(still, "%s no longer carries the old walk — %s" % [f, WALK_EXEMPT[f]])
-	print("  %d gates; %d carry their own `_spawn` battle fixture, in %d DISTINCT bodies" % [
+	# BATCH DB — DA PRINTED THESE TWO NUMBERS; NOW THEY ARE BOTH ASSERTED ZERO.
+	# The census stays printed beside them: a rule with a number under it cannot
+	# rot into a sentence nobody re-checks, and the number is the tell if the
+	# marks ever stop matching what they are meant to match.
+	for f in spawn_files:
+		ok(false, "%s authors its own `_spawn` — `%s` is the one fixture (BATCH DB §1)" % [f, FIXTURE])
+	ok(spawn_files.is_empty(), "no gate authors its own `_spawn` battle fixture")
+	for f in spawn_bodies:
+		ok(false, "%s instantiates the battle scene by hand — go through `%s` (BATCH DB §1)" % [f, FIXTURE])
+	ok(spawn_bodies.is_empty(), "no gate instantiates the battle scene outside the fixture")
+	print("  %d gates; %d author their own `_spawn`, %d instantiate the battle by hand" % [
 		gates.size(), spawn_files.size(), spawn_bodies.size()])
-	print("  copies: %s" % ", ".join(PackedStringArray(spawn_files)))
-	print("  REPORTED, NOT CONSOLIDATED — §3 says that is its own batch.")
+	print("  %d go through `%s`: %s" % [
+		fixture_users.size(), FIXTURE, ", ".join(PackedStringArray(fixture_users))])
 
 
 # ---------------- THE LIVE HALF ----------------
@@ -178,7 +195,19 @@ func _live(battle_gd) -> void:
 	# hold limit never evicts anything. That is the board on which "saturate
 	# every enemy" is actually reachable, and it exercises `_freeze_turns`'s
 	# boss/ordinary branch. It also carries the DEVOUT for §1's live half.
-	var scene := await _spawn(["warden", "pyromancer", "inquisitor", "beastmaster"])
+	var scene: Node = await Gate.spawn(self,
+		["warden", "pyromancer", "inquisitor", "beastmaster"])
+	# BATCH DB §1 — THE GROUND THE MERGE STANDS ON, ASSERTED RATHER THAN ARGUED.
+	# Five gates hand-set `skill_check_taught` and `defensive_check_taught` and
+	# two did not; the fixture sets neither, because `_nobody_can_press()` makes
+	# both unreachable in a gate — the read site is never entered and the
+	# defensive brace always takes the bot branch. **That is the whole
+	# justification for dropping ten lines from five gates**, so it is checked
+	# here rather than left as a paragraph: the day it stops being true, this
+	# fails instead of the gates quietly measuring a bot mix they did not mean to.
+	ok(Gate.flags_are_inert(scene),
+		"`_nobody_can_press()` is true in a gate — the Profile flags the fixture "
+		+ "no longer sets are unreachable (BATCH DB §1)")
 	await _live_faith(scene, battle_gd)
 	await _live_prison_timed(scene)
 	scene.queue_free()
@@ -186,7 +215,8 @@ func _live(battle_gd) -> void:
 	# `_freeze_turns` returns -1 here and the eviction loop is live, which is
 	# exactly why the saturation test cannot run on this board: a hold limit of
 	# one means freezing the second enemy releases the first.
-	var held_scene := await _spawn(["warden", "cryomancer", "inquisitor", "beastmaster"])
+	var held_scene: Node = await Gate.spawn(self,
+		["warden", "cryomancer", "inquisitor", "beastmaster"])
 	await _live_prison_held(held_scene)
 	held_scene.queue_free()
 
@@ -331,39 +361,7 @@ func _prison():
 	return null
 
 
+# BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
 func _report() -> void:
-	print("check_da: %d checks / %d failures" % [_checks, _fails])
-	quit(1 if _fails > 0 else 0)
+	_g.report(self)
 
-
-# THE SEVENTH COPY OF THIS FIXTURE, AND §3 IS ABOUT EXACTLY THAT. It is written
-# here rather than shared because §3 rules that consolidating the copies is its
-# own batch — and a gate that reported the census while quietly inventing an
-# eighth shape would be worse than one that copies the prevailing one honestly.
-# This is v1 of the four (`check_co` / `check_cy` / `check_cz`), unmodified apart
-# from the party being a parameter, which v1 already made it.
-func _spawn(specs: Array) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband",
-		"enemies": ["raider", "raider", "archer"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	Profile.set_flag("skill_check_taught")
-	Profile.set_flag("defensive_check_taught")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	Engine.time_scale = 50.0
-	for _i in 90:
-		await process_frame
-	Engine.time_scale = 1.0
-	return scene

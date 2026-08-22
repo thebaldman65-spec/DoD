@@ -14,6 +14,130 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch DB: ONE <code>_spawn</code> FOR THE GATES</h2>
+<p><i>One consolidation and one battery. <b>The battle fixture and the tally are authored once, in
+<code>gate_fixture.gd</code>, and all seven gates go through it</b>; <b>the battery ran for the
+first time since CS</b> and the bill for five implement-only batches is <b>72 failing assertions
+across 26 suites, zero throws</b>; and two rules go into the traps. <b>Behaviour did not change and
+the proof is the counts.</b> <b>No save version moves (still v10).</b> The full report is
+<code>docs/reports/DB.md</code>. <b>DC is owed and is ten times larger: the suites.</b></i></p>
+
+<h3>&sect;1 &mdash; ONE FIXTURE, SEVEN GATES</h3>
+<p><b><code>_spawn</code> was copied into seven gates as four divergent bodies</b>
+(<code>check_cm_live</code>, <code>check_co</code>, <code>check_cs</code>, <code>check_ct</code>,
+<code>check_cy</code>, <code>check_cz</code>, <code>check_da</code>). It is authored once now.
+<b>345 lines deleted, 135 added.</b> <b><code>check_da</code> &sect;3 no longer COUNTS the copies
+&mdash; it ASSERTS there are none</b>: a gate that authors its own <code>_spawn</code>, or that
+instantiates the battle scene by hand, fails it by name.</p>
+<p><b>THE THREE DIFFERENCES THAT WERE REAL ARE NAMED ARGUMENTS NOW</b> rather than invisible edits
+inside a copy: <code>deterministic</code> (the AK/AL/AR damage forcing &mdash;
+<code>check_cm_live</code> and <code>check_cs</code>), <code>items</code>
+(<code>check_ct</code>&rsquo;s held empty slot) and <code>run</code>. <b>No gate needed an
+exemption</b>; CZ&rsquo;s <code>_cl_only_corpus</code> remains the one deliberate copy in the
+project.</p>
+<p><b>AND THE ONE THAT WAS NOT REAL WAS RULED DEAD RATHER THAN AVERAGED.</b> Five copies hand-set
+<code>skill_check_taught</code> and <code>defensive_check_taught</code>; two did not.
+<b><code>_nobody_can_press()</code> is <code>sim or autoplay or headless</code> and a gate is always
+headless</b>, so the read site is never entered and the defensive brace always takes the bot
+branch: <b>the flags could not affect any check any gate ran, and had not been able to since
+CQ.</b> Their one live effect was <code>Profile._save()</code> &mdash; <b>five gates writing the
+player&rsquo;s <code>user://profile.json</code> on every run</b>, two hundred lines from
+<code>check_ct</code> asserting it leaves the player&rsquo;s save as it found it. They are gone,
+and <b><code>profile.json</code>&rsquo;s mtime is now unchanged across a gate run</b>, measured
+before and after. <b>DA recorded this divergence as &ldquo;two other copies&rdquo;; it was
+five.</b></p>
+<p><b><code>_report</code> HAD DRIFTED INTO FOUR SHAPES, NOT TWO</b> &mdash;
+<code>N failures</code> with no count at all (cm_live, co), <code>N checks, M failures</code> (cs),
+<code>N checks / M failures</code> (ct, da), and <b>no <code>_report</code> at all</b>, printed and
+quit inline (cy, cz). <b><code>ok()</code> had to come with it: four gates&rsquo; copies never
+incremented a check counter</b>, which is why <code>check_cm_live</code>, <code>check_co</code>,
+<code>check_cy</code> and <code>check_cz</code> have read <code>checks=?</code> in every battery
+ever run. <b>A count that reads <code>?</code> is the one thing a count-diffing rule cannot
+compare.</b> The tally is one object now and <b>not one of the several hundred
+<code>ok(...)</code> call sites moved.</b></p>
+<p><b>THE SCAR, AND WHY IT STAYS.</b> The brief asked for <code>run_battery.sh</code>&rsquo;s
+hand-rolled <code>grep -E &quot;checks,&quot;</code> to be narrowed to the one format now that
+<code>_report</code> is single. <b>That grep does not exist</b> &mdash; the only occurrence of
+<code>checks,</code> in the file is <b>the header comment recording it as a scar CP already
+fixed</b>. The live matcher is general, <b>and it must stay general: it also reads 45 SUITES, which
+print at least four other shapes.</b> Narrowing it would re-open BQ&rsquo;s scar and CS&rsquo;s
+&mdash; the third time that grep has been too narrow. <b>One shape for the gates; a grep that reads
+everything for the battery.</b></p>
+<p><b>THE SHAPE THAT WOULD NOT COMPILE, WHICH IS ITSELF A TRAP.</b> A base class
+(<code>extends GateBase</code>) is the right design and would have changed zero call sites.
+<b>A <code>--script</code> SceneTree target cannot resolve its own base class</b>, in either
+spelling, with the class cache present &mdash; it prints <code>Parse Error</code>, runs not one
+line, <b>and exits 0</b>. The fixture is a <code>preload</code>ed <code>RefCounted</code>, and it
+carries <b>no <code>class_name</code></b>: that registration lives in the gitignored
+<code>.godot/global_script_class_cache.cfg</code>, so it would resolve here and fail on a fresh
+clone.</p>
+
+<h3>&sect;2 &mdash; THE BATTERY, RUN TWICE</h3>
+<p><b>Once before the consolidation and once after, because &sect;0&rsquo;s proof IS the counts.</b>
+<b>43 of 45 suites are byte-identical across the two runs</b>; the only two that differ are
+<code>an</code> and <code>bk</code>, <b>the exact two suites already recorded as bands</b>, both at
+zero failures. <b>Every gate&rsquo;s failure count is identical</b>, and
+<code>check_cm_live</code>&rsquo;s four known-reds are byte-identical. The one deliberate movement
+is <b><code>check_da</code> 30 &rarr; 33 checks</b> &mdash; &sect;3&rsquo;s two census assertions and &sect;1&rsquo;s <code>flags_are_inert</code>.
+Run harness <b>22 / 165 / 8</b>, all PASS. <b><code>throws=0</code> everywhere, in both runs,
+grepped from the stream and never read off a tally.</b></p>
+<p><b>THE BILL FOR FIVE IMPLEMENT-ONLY BATCHES: 72 FAILURES ACROSS 26 SUITES.</b> None is
+DB&rsquo;s and none is a bug in the game. <b>The dominant cause is the Faith threshold</b>:
+<code>FAITH_RELEASE</code> is 3, so an ally can never stand at four or five stacks and every
+assertion written against that ladder reads <code>0.0%</code> &mdash; <code>be</code>,
+<code>bf</code>, <code>bg</code>, <code>bh</code> and <code>bi</code> are 23 of the 72 alone. The
+rest are CY&rsquo;s moved initiative literals and CW&rsquo;s split. <b><code>state.md</code>&rsquo;s
+claim that DA&rsquo;s revert un-breaks <code>test_batch_bi</code> is half right</b>: the two checks
+it names are green, and <b><code>bi</code> is red on six others</b>, all threshold consequences.
+<b>The revert paid for CZ&rsquo;s builders; nothing has yet paid for CZ&rsquo;s threshold.</b></p>
+<p><b>THREE COUNTS READ DIFFERENTLY FROM CS&rsquo;S TABLE AND ALL THREE ARE EXPLAINED &mdash; NONE
+IS A REGRESSION.</b></p>
+<ul>
+<li><b><code>al</code> 560 &rarr; 559, stable across five runs &mdash; a real fall and a CORRECT
+one.</b> <b>Batch CV</b> changed <code>PROSE_NUMBERS[&quot;wd_shieldwall&quot;]</code> from
+<code>[&quot;4 turns&quot;, &quot;5&quot;]</code> to <code>[&quot;5 turns&quot;]</code>, and the
+inner loop runs once per fragment. <b>One fewer fragment is one fewer check</b>, and nobody wrote
+down that it moved a count.</li>
+<li><b><code>bx</code> 142 &rarr; 147, stable across five runs.</b> <b>CX re-pointed it at the
+archive</b> &mdash; CX&rsquo;s own commit names <b>eleven</b> suites. <b><code>state.md</code>
+records nine at +3 plus <code>ce</code> at +4 and omits <code>bx</code> entirely.</b> The document
+was wrong, not the suite.</li>
+<li><b><code>an</code> is NOT a regression and its recorded band is WRONG.</b> Five observations of
+unmodified code: <b>6047, 6051, 6054, 6048, 6054</b>. The recorded band is <b>6052&ndash;6054</b>
+and <b>three of the five fall below its floor</b>. <code>an</code> calls <code>seed()</code> zero
+times and counts over live units. <b>The real spread is at least 6047&ndash;6054.</b></li>
+</ul>
+<p><b>THE BATTERY RAN A THIRD TIME</b> because <code>CLAUDE.md</code>, <code>master.html</code>
+and the changelog were edited after the second and <b>~35 suites assert against those three
+files</b>. <b>It caught a second flaky suite that nobody had recorded.</b>
+<b><code>test_batch_at</code> reads 3 failures or 4</b>; the fourth is
+<code>Cannon at 8 stacks scales by the PASSIVE alone</code>, which <b>flaked in 2 of 5 dedicated
+runs &mdash; roughly 40%, against <code>bo</code>&rsquo;s 1-in-13</b>. It calls <code>seed()</code>
+zero times and its check count is rock steady at 470, <b>so only the failure count moves &mdash;
+the exact shape a count-diffing rule misreads as a regression.</b> The three stable failures are
+<code>CLAUDE.md</code> assertions and are byte-identical before and after every documentation edit
+in this batch.</p>
+<p><b>NOT ONE OF THE 72 WAS REPAIRED, DELIBERATELY.</b> &sect;0 bound this batch to changing no
+behaviour, and each of those assertions needs a ruling on what it should ask instead &mdash; the
+same reason CX and DA left CW&rsquo;s eleven standing. <b>That is a batch, and it should follow
+DC.</b></p>
+
+<h3>&sect;3 &mdash; TWO THINGS INTO THE TRAPS</h3>
+<p><b>THE EXIT CODE IS NOT A SIGNAL, AND IT IS THE SAME DEFECT AS <code>load()</code> RETURNING A
+BROKEN SCRIPT.</b> Recorded beside CP&rsquo;s parse rule so the reason travels with it, and with a
+reproduction from this batch: an unresolvable base class prints <code>Parse Error</code> on stderr,
+runs nothing, and exits <b>0</b>. <b><code>run_battery.sh</code>&rsquo;s <code>throws=</code>
+column is the only thing standing between that fault and a green report.</b></p>
+<p><b>TWO THIRDS OF EVERY TALENT TREE IS OUTSIDE EVERY MEASUREMENT EVER TAKEN IN THIS PROJECT.</b>
+<code>Talents.LANES</code> is <b>3</b> and there are <b>twelve specs</b>, so the project has
+<b>36 lanes and every figure it has ever published was walked on the same 12</b>. <b>No sim number
+here has ever involved Glacial Prison.</b> It is not a bug &mdash; a fixed default party is what
+makes arms comparable &mdash; but filing it in a document is what let it go unnoticed, so <b>the
+sim now prints it beside the number</b>: <code>builds=default(FIRST LANE of each tree &mdash; 24 of
+36 lanes NEVER MEASURED)</code>. <b>The count is derived</b> from <code>Talents.LANES</code> and
+<code>Classes.all_specs()</code>, so a lane or spec added later moves it without anybody
+remembering to.</p>
+
 <h2>2026-08-21 &mdash; Batch DA: ROLL BACK FAITH&rsquo;S BUILDERS, REFUSE GLACIAL PRISON</h2>
 <p><i>Two corrections and one standing rule. <b>Faith&rsquo;s two builders go back to their pre-CZ
 rates and the release threshold stays at 3</b>; <b>Glacial Prison joins CO&rsquo;s recast

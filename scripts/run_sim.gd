@@ -1036,8 +1036,22 @@ static func _print_report(battle) -> void:
 	var items_desc := "on(drink Health Potion <35% HP)" \
 		if items_on else "OFF(v1 floor: never drinks)"
 	print("Policies: route=%s shops=%s" % [route, shops_desc])
-	print("          items=%s builds=%s relics=%s" % [items_desc,
-		builds_env if builds_env != "" else "default(first lane)",
+	# BATCH DB §3 — THE CAVEAT IS PRINTED BESIDE THE FIGURE, NOT FILED AWAY.
+	# `DOD_SIM_BUILDS` defaults to each tree's FIRST lane, so the other two
+	# thirds of every talent tree have never appeared in ANY measurement taken
+	# in this project — Glacial Prison, Second Prison, Cold Snap, Glacial
+	# Economy and Absolute Zero among them. THIS IS NOT A BUG: a fixed default
+	# party is exactly what makes arms comparable across batches. It is a
+	# permanent caveat on every sim figure, and it belongs where the next person
+	# reading one will actually meet it. The counts are DERIVED, so a lane or a
+	# spec added later moves them without anybody remembering to.
+	var lanes_total := Talents.LANES * Classes.all_specs().size()
+	var lanes_seen := Classes.all_specs().size()
+	var builds_desc := builds_env
+	if builds_desc == "":
+		builds_desc = "default(FIRST LANE of each tree — %d of %d lanes NEVER MEASURED)" % [
+			lanes_total - lanes_seen, lanes_total]
+	print("          items=%s builds=%s relics=%s" % [items_desc, builds_desc,
 		relics_env if relics_env != "" else "none"])
 	print("          trophies=%s runes=elite-pick(lane>spec>first)+auto-equip(2/3/4 slots) events=first-valid" % [
 		troph if troph != "" else "first-in-pool"])
