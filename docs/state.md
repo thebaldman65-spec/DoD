@@ -5,56 +5,67 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-21 (Batch DD).*
+*Last rewritten: 2026-08-22 (Batch DE).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DD** — the suite consolidation, and it was ten times DB's. **`_spawn` stood in 37
-  suites and `_kill` in 14; both are authored once now, in `suite_fixture.gd`** — **1,128 lines
-  deleted against 391 added across those 37 suites**, **not one of the 389 call sites moved**, and **no exemption was
-  needed**: all 22 differences between the copies are named arguments. It also **widened
-  `test_batch_cd` from five suites to forty-five** (it had been watching a ninth of the project) and
-  **seeded `test_batch_at`**, which turned out to be two flaky checks rather than the one on record.
-  No save version moves (still v10).
-- **Next letter: DE, and the queue names it: THE REMAINING RED ASSERTIONS.** The two-letter stamp
-  gate in fourteen suites reads `substr(_code_at + 7, 2)` out of `(Batch XX)` and compares
-  lexically — `DE` sorts after `DD`, so it still works. **A THREE-letter code would break all
+- **Last batch: DE** — the count differ moved out of a suite and into the run. DD had widened
+  `test_batch_cd` to forty-five suites, and because §1 answered its question by **spawning
+  forty-five child Godots** the battery went **29.6 minutes → 49.9**. **The differ is
+  `check_de.gd` now**: a post-pass over the logs `run_battery.sh` already writes, which **spawns
+  nothing**, so the nesting is **structurally impossible rather than merely avoided**. The
+  baselines are **`baselines.json`** — one machine-readable file, and **THE ONLY PLACE THE COUNTS
+  LIVE**; this file points at it and does not restate it. **The FAILURE count is baselined per
+  target now, which is worth more than the check-count diffing that prompted the batch.** The
+  battery is back to **29.0 minutes**. No save version moves (still v10).
+- **Next letter: DF, and the queue still names it: THE REMAINING RED ASSERTIONS.** The two-letter
+  stamp gate in fourteen suites reads `substr(_code_at + 7, 2)` out of `(Batch XX)` and compares
+  lexically — `DF` sorts after `DE`, so it still works. **A THREE-letter code would break all
   fourteen.**
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
   (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
   split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
-  one of them, DB's gate consolidation, DC's threshold repairs and DD's suite consolidation.
+  one of them, DB's gate consolidation, DC's threshold repairs, DD's suite consolidation and DE's
+  move of the count differ into the runner.
 - **THE CONSOLIDATION QUEUE IS EMPTY AND THE RULING QUEUE IS NOT.** DB and DD between them paid the
-  whole `_spawn` debt. **What remains is 46 failing assertions across 19 suites, and every one needs
-  a ruling on what it should ask INSTEAD** — which is why four batches have left them standing.
-  **That is the next batch, and the design decisions are behind it.**
+  whole `_spawn` debt; DE paid the instrument's own. **What remains is 47 failing assertions across
+  20 suites** — **48 across 20 when `bo`'s flake fires, 48 across 21 when `test_rune_battle`'s
+  does, 49 across 21 when both do** — **and every one needs a ruling on what it
+  should ask INSTEAD** — which is why five
+  batches have left them standing. **That is the next batch, and the design decisions are behind
+  it.** **DE makes them safer to leave than they have ever been**: every one is now baselined by
+  COUNT, so a 47th arriving inside an already-red suite is reported instead of absorbed.
 
 ---
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-**DD closed two items (the suite consolidation and `at`'s flake) and added four small ones.**
+**DE closed the largest small item — the ~50-minute battery — and added none.**
 
 ### THE ONE THAT IS THE QUEUE
 
-- **THE STALE-ASSERTION PASS — 46 FAILURES ACROSS 19 SUITES.** See KNOWN-BROKEN below for the
+- **THE STALE-ASSERTION PASS — 47 FAILURES ACROSS 20 SUITES.** See KNOWN-BROKEN below for the
   breakdown. **Unlike the 23 DC took, each of these needs a ruling on what the check should ask
-  INSTEAD.** DD moved the same files and deliberately repaired none of them. **`test_batch_cd` now
-  records where every one of them is**, so a repair that moves a count says so on the next run.
+  INSTEAD.** DD and DE both moved the same files and deliberately repaired none of them.
+  **`baselines.json` now records where every one of them is, per target**, so a repair that moves a
+  count says so on the next run — and so does a NEW failure arriving underneath an existing one,
+  which is the case that hid `test_batch_bi` for four batches.
 
-### Small, and named by DD
+### CLOSED AT DE
 
-- **THE BATTERY IS ~50 MINUTES NOW, NOT ~30, AND WHETHER THAT PRICE BELONGS INSIDE IT IS A
-  DECISION.** `test_batch_cd` §1 runs 45 suites — **it runs the battery inside the battery** — which
-  is about 22 minutes on top of a 29.6-minute run. `run_battery.sh` carries
-  `TMO[test_batch_cd]=2400` so the watchdog does not kill it mid-sweep. The alternatives were
-  considered and rejected *here*, not ruled out: running `cd` outside the battery hides it, and
-  having it read the battery's logs couples the differ to a run it did not supervise. **A parallel
-  sweep was rejected on measurement grounds** — several suites time real `SceneTreeTimer` waits, so
-  loading the machine is how a count-differ acquires its own flakes.
+- **~~THE BATTERY IS ~50 MINUTES~~ — CLOSED.** DD left this as an open decision: `test_batch_cd`
+  §1 ran 45 suites inside the battery, about 22 minutes on top of a 29.6-minute run. **DD's
+  write-up rejected the log-reading alternative on the grounds that it "couples the differ to a run
+  it did not supervise". That objection did not survive being looked at** — the runner ALREADY
+  spawns every target and ALREADY captures every stream including stderr, so the differ was
+  re-running the tree in order to look at it. **The one real hazard in reading logs is a STALE log
+  from a previous run, because `run_battery.sh` does not clear `$OUT`; the manifest (`$OUT/.ran`)
+  closes it.** Battery back to 29.0 minutes.
+
+### Small, and still owed
 - **`_run`'S SAVE-BACKUP PREAMBLE IS THE NEXT COPIED HELPER, AND IT IS 38 SUITES WIDE.** `_run`
   itself is 39 bodies in 39 suites and is correctly 39 — it is each suite's own driver. **But 38 of
   the 39 open with the same `_had_save` backup block and 37 swap `Profile.save_path` to a per-suite
@@ -63,6 +74,15 @@ in `docs/master.html`.
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper**: they are bespoke
   boards inside single checks, and two of those files have no `_spawn` at all. `check_da` §3 carries
   them as a **named ratchet** (by file AND by count), so a new copy cannot hide among them.
+- **`test_rune_battle` IS A NEWLY FOUND FLAKE — `check_de` CAUGHT IT ON ITS FIRST ACCEPTANCE
+  RUN.** 97 checks, rock steady; only the failure moves. The pyromancer `rune_resist_pierce` check
+  drives a live battle against a fire-resistant warband and needs the proc to LAND; the suite calls
+  `seed()` zero times. **2 red in 15 readings — clean in DE's first two batteries, RED in the
+  acceptance battery, RED on the next ad-hoc run, then ten consecutive clean runs on an idle
+  machine. BOTH REDS LANDED UNDER LOAD**, which is a hypothesis worth one experiment and not a
+  finding: the assertion's own comment says its snapshot "is the one that cannot race". Band
+  `0–1` in `baselines.json`. **Repair is the `at`/`bo` shape and is deliberately left** — one flake
+  at a time.
 - **`bo`'s FLAKE IS STILL OPEN**, at roughly 1 failure in 13 runs. Its repair is the same shape as
   `at`'s — seed both blows of the compared pair — and it was left alone deliberately, because one
   flake at a time is how the effect stays attributable.
@@ -127,12 +147,16 @@ in `docs/master.html`.
 
 ### Carried from the code, reported and deliberately not fixed
 
-- **TEN OF NINETEEN GATES STILL CANNOT REPORT A CHECK COUNT.** DB fixed the seven it consolidated.
-  `check_parse`, `check_flow`, `check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm` and
-  `check_cn` still read `checks=?` in the battery, **and `check_cl_width` reports `fails=?` as
-  well** — the battery cannot see whether it passed at all. **A count that reads `?` is the one
-  thing a count-diffing rule cannot compare**, and `test_batch_cd`'s table cannot take them for the
-  same reason.
+- **EIGHT TARGETS STILL CANNOT REPORT A CHECK COUNT, AND IT IS A RATCHET NOW RATHER THAN A
+  SENTENCE.** `check_parse`, `check_flow`, `check_map`, `check_cl_resolver`, `check_cl_width`,
+  `check_cm`, `check_cn` and `check_map_screen` read `checks=?`. **Two of them —
+  `check_cl_width` and `check_map_screen` — report `fails=?` as well**, so the battery cannot see
+  whether either passed at all. **A count that reads `?` is the one thing a count-diffing rule
+  cannot compare.** DE records that state as `null` in `baselines.json` and asserts the SET in both
+  directions: **a target that LOSES its count is an error, and one that GAINS a count is a notice
+  telling the next batch to record the number.** `check_map_screen`'s whole verdict is the single
+  line `check_map_screen: OK`, so that line is pinned as its `expect` field — otherwise nothing at
+  all stood between it and a silent pass.
 - **THE DEFAULT SIM BUILD HAS NEVER MEASURED A NON-FIRST LANE, FOR ANY OF THE TWELVE SPECS.**
   `Talents.LANES` is **3** and there are twelve specs, so **24 of the project's 36 lanes have never
   appeared in any measurement taken here** — Glacial Prison, Second Prison, Cold Snap, Glacial
@@ -204,7 +228,7 @@ found that one of them — the `_spawn` census — had been wrong in four docume
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DD
+### THE TEST TREE, AS OF DE
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -217,21 +241,41 @@ found that one of them — the `_spawn` census — had been wrong in four docume
 - **`_run` IS 39 BODIES IN 39 SUITES AND THAT IS CORRECT** — it is each suite's own driver. **The
   copied helper is inside it: 38 open with the same save-backup preamble, 37 swap
   `Profile.save_path`.**
-- **`run_battery.sh` runs 45 suites and MISSES ONE: `test_batch_cp` is not in its `SUITES`
-  array** — but **`test_batch_cd` watches it now**, so it is no longer un-run. Its first recorded
-  measurement is **697 checks / 0 failures**. The battery's `GATES` array is **fourteen**.
-  **There are 19 `check_*.gd` files, so five are not in `GATES`** (`check_ck_width`, `check_cu`,
-  `check_cv`, `check_ct_map`, `check_map_screen`) — **`check_ct_map` and `check_map_screen` do still
-  run, in the SCENE RUNS section**, so the three that run nowhere are `check_ck_width`, `check_cu`
-  and `check_cv`.
+- **`run_battery.sh` RUNS 46 SUITES NOW AND MISSES NONE.** `test_batch_cp` was in no array at all
+  and only `test_batch_cd` ran it privately; **DE put it in `SUITES`**, which is why `cd`'s table
+  had 45 rows against the battery's 45 and they were not the same 45. The `GATES` array is still
+  **fourteen**. **There are 20 `check_*.gd` files** (DE adds `check_de.gd`), so **six are not in
+  `GATES`** — `check_ck_width`, `check_cu`, `check_cv`, `check_ct_map`, `check_map_screen` and
+  `check_de`. **`check_ct_map` and `check_map_screen` run in the SCENE RUNS section and `check_de`
+  runs in its own post-pass section AFTER them**, so the three that run nowhere are still
+  `check_ck_width`, `check_cu` and `check_cv`.
+- **THE BATTERY WRITES A MANIFEST, `$OUT/.ran`, AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
+  LISTING.** `run_battery.sh` does NOT clear `$OUT` between runs, so a target that failed to launch
+  would otherwise be blessed by its PREVIOUS run's log — **the one fault a count-differ must never
+  commit, and a hazard that only exists because the differ reads logs now.** A name is appended
+  immediately before its target is launched and `run_one` truncates the log at spawn, so **a log
+  named in the manifest is always this run's**. A subset invocation (`./run_battery.sh bo bp`)
+  writes a short manifest and **the differ reports the rest as DID NOT RUN instead of certifying a
+  clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes, and a
   `check_`-prefixed helper would have joined the gate census.
-- **`test_batch_cd`'s TABLE IS 45 ROWS AND THEY ARE NOT THE BATTERY'S 45**: the battery's suites
-  minus `cd` itself (a suite that drives itself does not terminate) plus `test_batch_cp`. Each row
-  is `[checks_lo, checks_hi, fails_lo, fails_hi]`. **It costs ~22 minutes — it runs the battery
-  inside the battery** — and `run_battery.sh` carries `TMO[test_batch_cd]=2400` so the watchdog
-  cannot kill it mid-sweep.
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 65 ROWS: 46 suites, 14 gates, 2 scene runs
+  and 3 harness gates.** **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
+  number is this project's oldest recurring defect, and the file that catches drift must not seed
+  it. Per target it carries the expected check count (a number or a band), **the expected FAILURE
+  count**, **how many readings the row rests on**, any known flake and its rate, and an optional
+  verdict string. **Nineteen of those 65 targets were outside `test_batch_cd`'s old table
+  entirely** — every gate, the harness, both scene runs, and `test_batch_cd` itself, which the old
+  design could not watch because a suite that drives itself does not terminate.
+- **`test_batch_cd` IS 71 CHECKS NOW, DOWN FROM 207**, and it is the hygiene suite it was before DD
+  widened it: the dead-symbol sweep, the draft-target sweep and the pool measurement. **Those three
+  stay a suite because the runner genuinely cannot do them** — they resolve `Classes`, walk the
+  twelve spec pools and read prose in four documents. **Only the differ moved.**
+- **`check_de.gd` IS THE DIFFER AND IT SPAWNS NOTHING.** It runs last, reads the logs and the
+  baseline file, and reports. **It is re-runnable in seconds over a log directory that already
+  exists**, which is what makes a baseline table safe to correct — re-checking the old differ's
+  answer cost 22 minutes.
 - **`run_battery.sh`'s check-count grep is GENERAL and must stay that way.** It matches three
   shapes because **45 suites print at least five between them**. `test_batch_cd` carries the same
   matcher, and the same per-suite FLAGS table (`test_batch_bl` under-runs silently without
@@ -310,27 +354,38 @@ found that one of them — the `_spawn` census — had been wrong in four docume
 
 ## KNOWN-BROKEN AND DELIBERATELY UNFIXED
 
-### THE 46 THAT REMAIN — MEASURED AT DD, ZERO THROWS
+### THE 47 THAT REMAIN — MEASURED TWICE AT DE, ZERO THROWS
 
 **DB measured 72 across 26 suites. DC repaired the 23 that needed no ruling. DD repaired none of
 them** — it is a consolidation batch, and every one of these needs a ruling on what the check should
 ask INSTEAD.
 
-**DC's total was 49 across 21. DD's is 46 across 19, and NOTHING WAS REPAIRED TO GET THERE:** the
-three that left are **`cd`'s own two** — which were `bb` and `bj` being reported red a second time,
-and are now recorded baselines rather than failures — and **`bo`'s flake**, which simply did not
-appear in this run. **On a run where `bo` flakes the total reads 47 across 20 and that is not a
-regression.**
+**DC's total was 49 across 21. DD PUBLISHED 46 ACROSS 19 AND THAT FIGURE IS WRONG BY ONE SUITE AND
+ONE FAILURE. THE TOTAL IS 47 ACROSS 20**, measured twice at DE — once on unmodified HEAD before
+anything was touched.
+
+- **THE TWO THAT LEFT AT DD ARE REAL:** `cd`'s own two, which were `bb` and `bj` being reported red
+  a second time and are recorded baselines now rather than failures.
+- **THE THIRD WAS NOT.** DD recorded `bo` dropping to 0 because "`bo`'s flake simply did not appear
+  in this run". **`bo` IS NOT AT 0 AND WAS NOT AT DD EITHER.** It carries a DETERMINISTIC red: §6
+  asserts `CLAUDE.md` contains the literal `TRANCHES 2 AND 3`, and **CW's split removed that
+  string** — it is absent from `CLAUDE.md` at DD's own commit, checked. So `bo` belongs to CW's
+  family (`bb`, `bn`, `bq`, `br`, `bx`, `ce`) and **its flake is a SECOND failure on top, which
+  would read 2.**
+- **THE BAND `0–1` ADMITTED THE OBSERVED VALUE, SO NOTHING EVER CONTRADICTED THE LABEL.** That is
+  §3's thesis exactly — a red check does not announce a second problem underneath it — **found by
+  §3's own instrument on its first run.** `baselines.json` carries `bo` at **1–2** now, with the
+  floor observed twice and the ceiling named as the flake's contribution.
 
 - **CY'S 52 MOVED DELAYS AND CZ'S SIX MORE ARE THE LARGEST CAUSE** — `av` 1 (Intercession's 2.0
   initiative), `bd` 1 (reads 1.0 where 2.0 is asserted), and others among the mid-alphabet suites.
 - **CW'S `CLAUDE.md` SPLIT IS THE SECOND**, and its eleven are still red exactly as CX found them:
   `bb` 2, `bn` 2, `bq` 1, `br` 2, `bx` 2, `ce` 9. **`at`'s three are the same family.**
-- **`cd` NO LONGER FLAGS `bb` AND `bj` AS FAILURES — IT RECORDS THEM.** Its table holds every
-  suite's expected failure count now, so a red suite at its recorded count is not news and a red
-  suite that MOVES is. That is the whole point of the widening: **a failure count moving inside an
+- **THE FAILURE COUNTS ARE BASELINED PER TARGET IN `baselines.json`**, so a red suite at its
+  recorded count is not news and a red suite that MOVES is. **A failure count moving inside an
   already-red suite is invisible in an aggregate**, which is how `test_batch_bi` stayed wrong for
-  four batches.
+  four batches — and **a RISING failure count is an ERROR while a falling one is a NOTICE**, because
+  the two are not the same event.
 - **AND TWO THAT PASS BY ACCIDENT, WHICH IS WORSE.** `test_batch_bn.gd:505`
   `contains("BATCH BN")` and `test_batch_bs.gd:409` `contains("BATCH BS")` still match — a passing
   mention inside two surviving rules, not a batch block. **A check that has stopped asking its
@@ -357,22 +412,24 @@ regression.**
   0.9–1.1 variance roll, so both can land on the same integer. `test_batch_bo.gd` calls `seed()`
   zero times. **`test_batch_cd` carries its FAILURE count as a band (0–1) for exactly this reason.**
 - **THE SUITES THAT DRIFT IN THEIR CHECK COUNT, AND THE OBSERVATION COUNT EACH BAND RESTS ON.**
-  **`an` is 6047–6063 on TEN observations** — DB's six (6047, 6051, 6052, 6054, 6048, 6054), DC's
-  6053, DD's two batteries at 6053, and **DD's first widened `cd` sweep at 6055, which is ONE ABOVE
-  the 6047–6054 band written from the other nine.** That band was exceeded inside the batch that
-  wrote it. **THE RULE NOW, AND IT IS ASYMMETRIC ON PURPOSE: floor = the lowest observation, ceiling
-  = the highest PLUS the observed spread.** The floor is the half that catches a real fault — a
-  section of `an` that stopped running costs hundreds of checks, not five — so it stays tight and
-  the ceiling takes the headroom.
-  **`bk` is 129–130 on FIVE** — DB's 129 and 130, DC's 129, and DD's two batteries, which read
-  **130 and then 129**. **It is NOT widened, because it has not been exceeded**: headroom goes where
-  a reading demands it, so every number in `cd`'s table stays traceable to a run.
-  - **AND ONE OBSERVATION ABOUT `an` THAT FOUR READINGS CANNOT YET SETTLE: both of DD's batteries
-    read 6053 and both of `cd`'s sweeps read 6055.** `run_battery.sh` launches a suite from the
-    shell; `cd` launches it with `OS.execute` from inside a Godot process, which hands the child a
-    different environment. **Whether the two-check gap is draft randomness or a launcher difference
-    is not distinguishable on four readings** — worth one deliberate experiment before anyone treats
-    `an`'s spread as pure noise.
+  **The bands themselves are in `baselines.json`, with the observation count beside each** — that
+  field exists because **`an`'s nine-observation band was exceeded on its TENTH reading, inside the
+  batch that wrote it** (6055 against a 6047–6054 band). **A band is a claim about a distribution
+  nobody has characterised, and the number of readings behind it is part of the claim.**
+  **THE RULE, ASYMMETRIC ON PURPOSE: floor = the lowest observation, ceiling = the highest PLUS the
+  observed spread** — the floor is the half that catches a real fault (a section of `an` that
+  stopped running costs hundreds of checks, not five), so it stays tight and the ceiling takes the
+  headroom. **`check_de` now RUNS on that asymmetry rather than merely being written by it: it
+  asserts the floor and reports a rise as a notice.** `bk` is **not** widened, because it has not
+  been exceeded: headroom goes where a reading demands it.
+  - **AND THE `an` LAUNCHER QUESTION IS ANSWERED, NOT MERELY DISSOLVED.** DD recorded that its
+    batteries read `an` at 6053 while `test_batch_cd`'s `OS.execute` sweeps read 6055, and that
+    whether the two-check gap was draft randomness or a launcher difference "is not distinguishable
+    on four readings" — worth a deliberate experiment. **DE's three batteries, ALL on the shell
+    launcher, read 6051, 6050 and 6055.** The shell launcher produced 6055 by itself, so **the gap
+    is draft randomness and the launcher hypothesis is dead.** **6050 is a new low**, comfortably
+    inside the 6047 floor. There is only one launcher now in any case, so the question could not
+    have recurred — but it is answered rather than merely retired, which is better.
   **A band written from too few readings reads a normal run as a regression, which is the same
   failure as a wrong count in the opposite direction.** Both suites are always 0 failures, and both
   call `seed()` zero times.
@@ -394,56 +451,60 @@ regression.**
 
 ### Last measurements
 
-**TWO FULL BATTERIES AT DD — one on unmodified HEAD before anything was touched, one after.**
-**THE BEFORE-BATTERY REPRODUCED DC'S TABLE EXACTLY** (45 suites, zero throws, 49 failures across 21,
-`an` 6053 and `bk` 130 inside their bands, every gate identical), so the two runs compare like with
-like on this machine rather than only against a document.
+**THREE FULL BATTERIES AT DE — one on unmodified HEAD before anything was touched, one after, and
+an ACCEPTANCE run against the final tree.** The third was paid for deliberately: the `bo`
+correction needed a late `CLAUDE.md` edit, and **a run that did not supervise the final tree cannot
+certify it** — this batch's own principle, applied to itself.
+**THE BEFORE-BATTERY REPRODUCED DD'S TABLE EXACTLY**, and not by eye: the baseline builder parsed
+DD's own `BASELINE` out of the pre-patch `test_batch_cd.gd` and diffed it against every count the
+run produced — **zero disagreements across 45 suites, on both halves of every row.** So the two
+runs compare like with like on this machine rather than only against a document.
 
-**ACROSS 45 SUITES AND 14 GATES, EXACTLY THREE LINES DIFFER, AND ALL THREE ARE DELIBERATE:**
+**THE COUNTS THEMSELVES ARE IN `baselines.json` AND ARE NOT REPEATED HERE.** That is the point of
+the batch: one machine-readable file, read by `check_de`, with the observation count beside every
+band. **Re-derive from there; a second copy of a number is this project's oldest recurring
+defect.**
 
-| line | before | after | why |
-|---|---|---|---|
-| `bk` | 130 | **129** | inside its recorded band, 0 failures — not a regression |
-| `test_batch_cd` | 86 / 2 | **207 / 0** | the table went from 5 rows to 45 |
-| `check_da` | 33 / 0 | **36 / 0** | §3's three suite-census assertions |
+**ACROSS 46 SUITES, 14 GATES, 3 HARNESS GATES AND 2 SCENE RUNS, EXACTLY FIVE LINES DIFFER BETWEEN
+THE TWO RUNS, AND ALL FIVE ARE ACCOUNTED FOR:**
 
-**Everything else is byte-identical** — 43 of 45 suite lines, 13 of 14 gate lines,
-`check_cm_live`'s four deliberate reds, the harness at 22 / 165 / 8, `check_ct_map` at 83 / 0, and
-**`throws=0` everywhere in both runs**, grepped from the stream and never read off a tally.
-**37 suites had their `_spawn` replaced and not one check count moved.**
+| line | before | after | acceptance | why |
+|---|---|---|---|---|
+| `an` | 6051 | 6050 | **6055** | inside its band, 0 failures throughout — the known drifter |
+| `bk` | 129 | 130 | **129** | both ends of its recorded band, twice over, 0 failures |
+| `test_batch_cd` | 207 / 0 | **71 / 0** | 71 / 0 | the differ moved out — 136 checks went with it |
+| `test_batch_cp` | *(not run)* | **697 / 0** | 697 / 0 | it is in `SUITES` now; agrees with DD's private sweep |
+| `test_rune_battle` | 97 / 0 | 97 / 0 | **97 / 1** | **a flake `check_de` found — see the queue above** |
+| `check_de` | *(did not exist)* | 273 / 0 / 0 | **273 / 1 / 0** | the post-pass, reporting the row above |
 
-**THE FAILURE TOTAL IS 47 ACROSS 20 SUITES** (46 across 19 on a run where `bo` does not flake),
-**down from DC's 49 across 21 with nothing repaired**: the two that left are `cd`'s own, which were
-`bb` and `bj` reported red a second time and are recorded baselines now.
+**Everything else is byte-identical** — 43 of the 45 shared suite lines, **all 14 gate lines**,
+`check_cm_live`'s four deliberate reds, the harness at 22 / 165 / 8, `check_ct_map` at 83 / 0,
+`check_map_screen` at its `OK`, and **`throws=0` everywhere in both runs**, grepped from the stream
+and never read off a tally.
 
-Counts, with failures marked:
+**THE DIFFER'S OWN VERDICT ON THE ACCEPTANCE RUN: `check_de` 273 checks / 1 failure / 0 notices —
+65 of 65 recorded targets swept, zero throw markers, 0 unwatched and 0 un-run.** The one failure is
+`test_rune_battle`'s newly-found flake, which is the instrument doing exactly the job it was built
+for. **With that band recorded, the same logs re-read 273 / 0 / 0 in 0.63 seconds** — which is the
+other half of the point: correcting a baseline no longer costs a battery.
 
-```
-ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, al 559, an 6047–6063, ar 735 /1, as 396 /3
-at 470 /3 (SEEDED AT DD — pinned over five runs, no longer a flake), au 336, av 324 /1
-aw 350 /3, ax 345 /2, ay 484, az 519, ba 690, bb 177 /2, bc 91, bd 71 /1, be 34, bf 78
-bg 47, bh 233, bi 91, bj 67 /1, bk 129–130, bl 88, bm 1891, bn 81 /2
-bo 1025 /0–1 (the known flake), bp 275, bq 742 /1, br 1450 /2, bs 266, bt 458 /1, bu 480 /5
-bv 900 /2, bw 551 /3, bx 147 /2, cb 1184 /2, cd 207, ce 1116 /9, runes 3121, rune_battle 97
-cp 697 — NOT in the battery's SUITES array; `test_batch_cd` is the only thing that runs it
-```
+**AND THE ACCEPTANCE RUN PROVED THE LATE DOC EDITS MOVED NOTHING.** Between the after-battery and
+the acceptance battery, the only changes were to `CLAUDE.md`, `changelog.html` and
+`design-notes.md`. **Four lines differ between those two runs** — `an` and `bk` inside their bands,
+`test_rune_battle`'s flake, and `check_de` reporting it. **Not one line moved because of a
+document**, and 35 suites read `CLAUDE.md`.
 
-**Gates, at DD — every one identical to DC except `check_da`:**
-`check_cm_live` **13 / 4** (the deliberate red), `check_co` **297 / 0**, `check_cs` **104 / 0**,
-`check_ct` **113 / 0**, `check_cy` **2704 / 0**, `check_cz` **131 / 0**, **`check_da` 36 / 0**.
-`check_parse` 0 failures (stderr grepped for `Parse Error`, never the tally), `check_flow`,
-`check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn` all 0 failures but
-**still report no check count**. `check_ct_map` **83 / 0**. **Run harness 22 / 165 / 8, all PASS,
-throws=0.**
+**WALL CLOCK — THE POINT OF THE BATCH:**
 
-**`test_batch_cd`'s FINAL SWEEP, run last of all against the complete tree: 207 checks / 0
-failures — 45 suites swept, 0 off their recorded line, zero throw markers.** It is the batch's
-acceptance test and it covers the documentation edits too, because 39 suites read `CLAUDE.md`,
-`docs/master.html` or `docs/changelog.html`.
+| | wall clock | |
+|---|---|---|
+| before DD | 29.6 min | the differ watched five suites |
+| **before DE (measured, unmodified HEAD)** | **2,996 s — 49.9 min** | `test_batch_cd` §1 spawning 45 child Godots |
+| **after DE (measured)** | **1,738 s — 29.0 min** | the differ is a post-pass |
+| **acceptance DE (measured)** | **1,750 s — 29.2 min** | the final tree, documentation included |
 
-**WALL CLOCK: the battery was 29.6 minutes before DD and is about 50 after**, because
-`test_batch_cd` §1 now runs 45 suites inside it (the suite section alone is 22.2 minutes). See the
-queue above — whether that price belongs inside every battery is a decision.
+**It is BELOW the 29.6 it started at, and that is with `test_batch_cp`'s 697 checks added to the
+run.** The 22-minute nested sweep is gone; what replaced it costs 0.63 seconds.
 
-**NO SIM HAS BEEN RUN SINCE DA.** DB, DC and DD are all test batches; every ramp and depth figure
-above is DA's, carried unchanged and re-derived from `docs/reports/DA.md`.
+**NO SIM HAS BEEN RUN SINCE DA.** DB, DC, DD and DE are all test batches; every ramp and depth
+figure above is DA's, carried unchanged and re-derived from `docs/reports/DA.md`.

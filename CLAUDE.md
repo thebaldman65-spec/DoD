@@ -46,7 +46,13 @@ accumulate far more slowly than batches do.
   `an` and `bk` both drift — `bk` generates real zone maps and then walks them, so its count is a
   function of the topology it rolled. **A count-diffing rule reads a drift as a regression**, so a
   suite known to drift must carry its band beside it. **The live counts and bands live in
-  `docs/state.md`, never here.**
+  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; neither this
+  file nor `docs/state.md` restates it, they point at it.**
+  - **A BAND ALSO CARRIES THE NUMBER OF OBSERVATIONS BEHIND IT (STANDING, DE §1).** A band is a
+    claim about a distribution nobody has characterised, and **the number of readings behind it is
+    part of the claim.** `an`'s nine-observation band was exceeded on its TENTH reading, inside the
+    batch that wrote it. **Widen where a reading demands it and nowhere else**, so every number in
+    the table stays traceable to a run.
 - **A FLAKY ASSERTION IS A THIRD KIND OF INSTABILITY AND IS NOT A DRIFT.** A suite whose COUNT is
   rock steady can still fail by chance when an assertion compares two damage rolls that can land
   on the same integer. **A bare `<` or `>` between two blows is not a check, it is a coin flip
@@ -58,6 +64,13 @@ accumulate far more slowly than batches do.
     against bands of ±20% and ±7%. **THE NOISE WAS THE WIDTH OF THE QUESTION**, and widening the
     band far enough to swallow it would have stopped the check telling apart the two answers it
     exists to separate.
+  - **COMPUTE THE PROPAGATED NOISE BEFORE CHOOSING THE BAND (STANDING, DE §4).** **A margin
+    only works if it is WIDER than the noise it sits on**, and **a ratio of two rolled quantities
+    carries roughly twice the variance of either** — ±10% on each blow is ±22% on the ratio, not
+    ±10%. **Do that arithmetic first, not after the flake.** If the propagated noise is wider than
+    the band the question needs, **THE BAND IS NOT AVAILABLE**: seed the pair and assert exactly.
+    **The recommendation to assert ratios with margins is incomplete without this and must not
+    stand unqualified** — followed on its own it produced both of `at`'s flakes.
   - **SEED THE PAIR, NOT THE SUITE.** `seed()` the same value immediately before EACH blow of a
     compared pair, so both draw the same variance and the only thing left between them is what is
     under test (the AV/BS/BT idiom). **Where the check averages a LOOP of pairs, vary the seed per
@@ -65,8 +78,26 @@ accumulate far more slowly than batches do.
     the same measurement N times.
   - **`at` IS SEEDED AND PINNED AS OF DD (470 / 3 over five runs), AND IT WAS TWO CHECKS, NOT
     ONE** — seeding the recorded one exposed a second nobody had recorded. **`bo` REMAINS A KNOWN
-    FLAKE** at roughly 1 in 13; its rate is in `docs/state.md` and its FAILURE count is carried as
-    a band, not a number.
+    FLAKE** at roughly 1 in 13; its rate and its band live in `baselines.json`, and its FAILURE
+    count is carried as a band, not a number.
+  - **`test_rune_battle` IS A SECOND KNOWN FLAKE, FOUND BY `check_de` ON ITS FIRST ACCEPTANCE RUN
+    (DE §7).** Its check count is rock steady at 97 and only the FAILURE moves — the pyromancer
+    `rune_resist_pierce` check drives a LIVE battle and requires the proc to actually land, and the
+    suite calls `seed()` zero times. **2 red in 15 readings, and BOTH reds landed under machine
+    load** (during the acceptance battery and on the run immediately after it), against ten
+    consecutive clean runs on an idle machine. **That the load matters is a HYPOTHESIS, not a
+    finding** — the assertion's own comment says its snapshot "is the one that cannot race", so a
+    race is the first thing to look at. Band `0–1`, rate in `baselines.json`.
+  - **AND A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE (STANDING, FOUND AT DE §6).** `bo` was
+    recorded as `0–1 (the known flake)` in every document. **It is not.** Its floor of **1 is
+    DETERMINISTIC and is not the flake**: §6 asserts `CLAUDE.md` contains the literal `TRANCHES 2
+    AND 3`, which **CW's split removed** — so it belongs to CW's family alongside `bb`, `bn`, `bq`,
+    `br`, `bx` and `ce`. **The flake is a SECOND failure on top of it, which reads 2.** The band
+    `0–1` happened to admit the observed value, so nothing ever contradicted the label, and **the
+    project's standing failure total was under-stated by one suite and one failure.** It is **47
+    across 20**, and 48 on a run where the flake fires. **WHEN A SUITE IS EXCUSED BY A KNOWN CAUSE,
+    CHECK THAT THE RED IN FRONT OF YOU IS THAT CAUSE** — this is §3's own thesis, found by §3's
+    instrument on its first run.
 - **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
@@ -668,6 +699,58 @@ that needs no indent**. Two are CP's own:
   FAILED` / `N checks / M failures` / `checks: N  failures: M` / `sections: S  checks: N
   failures: M`), so any single grep reports `?` for some. **A COUNT THE HARNESS CANNOT PARSE IS
   WORSE THAN A COUNT NOBODY DIFFS** — CD's rule, one layer further out.
+- **BATCH DE ADDED THREE THINGS AND REMOVED ONE.** `test_batch_cp` is in `SUITES` at last (it was
+  in no array and only `test_batch_cd` ran it); the script writes a **manifest** of what it ran;
+  and the **count differ runs as a post-pass at the end** (`check_de`). **`TMO[test_batch_cd]=2400`
+  is gone** — that bound existed only because the suite spawned forty-five child Godots, and
+  nothing in `SUITES` spawns a suite any more.
+
+## THE COUNT DIFFER IS A PROPERTY OF THE RUN, NOT OF A SUITE IN IT (STANDING, SET AT BATCH DE)
+> **Comparing this run's counts to recorded ones belongs to the RUNNER.** A suite that spawns
+> suites **squares the work when you widen it**, so the instrument gets more expensive exactly as
+> it gets more useful — and the only lever left is to watch less.
+
+`test_batch_cd` §1 spawned forty-five child Godots from inside a suite the battery was itself
+running. DD widened its table from five suites to forty-five and **the battery went from 29.6
+minutes to about 50.** That was a design error in the brief, not in the implementation.
+
+- **ASK WHAT THE SUITE DOES THAT THE RUNNER CANNOT, AND ACCEPT "NOTHING" AS AN ANSWER.** For the
+  differ half it was nothing: `run_battery.sh` already spawns every target, already captures every
+  stream INCLUDING STDERR (`>"$log" 2>&1`), already greps the same three count shapes and already
+  counts the same two throw markers. **The only thing it did not do was COMPARE.**
+- **THE DIFFER IS `check_de.gd`, A POST-PASS THAT READS THE LOGS THE RUNNER WROTE AND SPAWNS
+  NOTHING.** It runs once, last of all, so it covers the gates, the harness and the scene runs too
+  — none of which the old table held. **Reading a file cannot nest, so the nesting is structurally
+  impossible now rather than merely avoided**, and the table may hold `test_batch_cd` itself, which
+  the old design could never watch (a suite that drives itself does not terminate).
+- **IT IS RE-RUNNABLE IN SECONDS.** Re-checking the old differ's answer cost 22 minutes because it
+  re-ran the tree. Over a log directory that already exists the answer is instant, and it cannot
+  drift, because the evidence is fixed.
+- **WRITTEN IN GDSCRIPT, NOT IN SHELL.** Bash string handling is how the battery's count grep came
+  to be too narrow three times, and how a message spelling a throw marker out in full would make
+  the battery accuse the differ of throwing. **The count-differ has been mis-instrumented twice; it
+  is not a place to be clever.**
+- **A FALL AND A RISE ARE NOT THE SAME EVENT, AND THE POLARITY INVERTS BETWEEN THE TWO HALVES.**
+  - A **FALLING CHECK COUNT** is this project's signature failure — `bb` 172→168, `bo` 505→495,
+    harness gate 2 at CA, and the seven `SCRIPT ERROR`s that hid 2,714 assertions. **ERROR.** A
+    **RISING** one is usually a suite's own loop walking new content. **NOTICE.** So **the FLOOR of
+    a band is asserted and the ceiling is not** — the same asymmetry `an`'s band rule already had.
+  - A **RISING FAILURE COUNT** is the 48th failure among 47. **ERROR.** A **FALLING** one means
+    something was repaired. **NOTICE.**
+- **BASELINE THE FAILURE COUNT PER SUITE — IT IS WORTH MORE THAN THE CHECK COUNT (DE §3).** With 47
+  known failures across 20 suites **a 48th is invisible**. `test_batch_bi` was right and the game
+  was wrong **for four batches**, and it hid because that suite was already red for an unrelated
+  reason. **A red check does not announce a second problem underneath it.** A suite going from 6
+  red to 7 is now reported exactly as loudly as one going from 0 to 1.
+- **A NOTICE IS NOT SILENCE. A BASELINE MOVES ONLY IN THE BATCH THAT CAUSES THE MOVEMENT, AND THE
+  CHANGELOG SAYS WHY.** Otherwise the table drifts into whatever the code happens to do, which is
+  CQ §3's failure arriving in a new place.
+- **THE RUNNER WRITES A MANIFEST (`$OUT/.ran`) AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
+  LISTING.** `run_battery.sh` does not clear `$OUT` between runs, so a target that failed to launch
+  would otherwise be blessed by its PREVIOUS run's log — **the one fault a count-differ must never
+  commit.** A log named in the manifest is always this run's, because `run_one` truncates it at
+  spawn. A subset invocation (`./run_battery.sh bo bp`) writes a short manifest and **the differ
+  says so instead of reporting a clean tree.**
 
 ## HARD CONTROL LANDS ON A BOSS ONLY ONCE IT IS BROKEN (STANDING, SET AT BATCH CR §1)
 > **Hard control lands on a boss only once that boss is BROKEN. Never before.**

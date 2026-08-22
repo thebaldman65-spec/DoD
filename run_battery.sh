@@ -33,6 +33,18 @@ if ! mkdir "$LOCK" 2>/dev/null; then
 fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT INT TERM
 
+# BATCH DE — WHAT THIS RUN ACTUALLY RAN, WRITTEN DOWN AS IT GOES.
+# The count differ is a post-pass over these logs now (`check_de.gd`), and
+# THIS SCRIPT DOES NOT CLEAR $OUT BETWEEN RUNS — so a target that failed to
+# launch would otherwise be blessed by its PREVIOUS run's log, which is the
+# one fault a count-differ must never commit. A name lands here immediately
+# before its target is launched, and `run_one` truncates the log at spawn, so
+# a log named in the manifest is always this run's. A subset invocation
+# (`./run_battery.sh bo bp`) writes a short manifest and the differ says so
+# rather than reporting a clean tree.
+RAN="$OUT/.ran"
+: > "$RAN"
+
 # Suite -> extra flags. zsh does NOT word-split an unquoted string expansion,
 # so flags live in an ARRAY and are expanded "${(@)...}" or the flag arrives
 # as one token and is rejected.
@@ -48,7 +60,8 @@ SUITES=(
   test_batch_bj test_batch_bk test_batch_bl test_batch_bm test_batch_bn
   test_batch_bo test_batch_bp test_batch_bq test_batch_br test_batch_bs
   test_batch_bt test_batch_bu test_batch_bv test_batch_bw test_batch_bx
-  test_batch_cb test_batch_cd test_batch_ce test_runes test_rune_battle
+  test_batch_cb test_batch_cd test_batch_ce test_batch_cp
+  test_runes test_rune_battle
 )
 GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_cm check_cm_live check_cn check_co check_cs check_ct check_cy
@@ -80,18 +93,16 @@ TIMEOUT=${DOD_SUITE_TIMEOUT:-240}
 # per-target, the same shape `EXTRA` already uses for flags.
 typeset -A TMO
 TMO[check_map]=600
-# BATCH DD — `test_batch_cd` RUNS THE BATTERY INSIDE THE BATTERY. Its table was
-# five suites and is FORTY-FIVE now, so the count-differ sweeps every suite the
-# battery runs (plus `test_batch_cp`, which this array misses) rather than a
-# ninth of them. That costs it about 22 minutes of wall clock, against a 240s
-# default that would kill it before it printed a single row — and a killed suite
-# reports NO COUNT, which is the one outcome a count-diffing rule cannot read.
-# The bound is per-target for the same reason `check_map`'s is: "timed out" and
-# "hung" are different outcomes and the watchdog cannot tell them apart.
-TMO[test_batch_cd]=2400
+# BATCH DE — `TMO[test_batch_cd]=2400` IS GONE AND SO IS THE REASON FOR IT.
+# DD gave that suite a 2400s bound because its §1 spawned forty-five child
+# Godots — it ran the battery inside the battery, about 22 minutes of a run
+# that had been 29.6. The differ is a post-pass over this script's own logs
+# now (`check_de.gd`, baselines in `baselines.json`), so nothing in SUITES
+# spawns a suite and the default 240s bound covers the lot again.
 
 run_one() {
   local name=$1 log="$OUT/$1.log"
+  echo "$name" >> "$RAN"
   local -a flags
   flags=(${=EXTRA[$name]})
   local limit=${TMO[$name]:-$TIMEOUT}
@@ -139,6 +150,7 @@ echo "=== GATES ==="
 for g in $GATES; do run_one $g; done
 echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/165/8) ==="
 for n in 1 2 3; do
+  echo "harness_$n" >> "$RAN"
   DOD_GATE=$n "$GODOT" --headless --path . --script test_run_harness.gd \
     >"$OUT/harness_$n.log" 2>&1
   printf 'GATE %s  %s  throws=%s\n' "$n" \
@@ -146,6 +158,7 @@ for n in 1 2 3; do
     "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/harness_$n.log")"
 done
 echo "=== SCENE RUNS (autoloads do not resolve under --script) ==="
+echo "check_map_screen" >> "$RAN"
 "$GODOT" --headless --path . res://check_map_screen.tscn >"$OUT/check_map_screen.log" 2>&1
 printf 'check_map_screen        %s  throws=%s\n' \
   "$(grep -oE '[0-9]+ checks[^:]*' "$OUT/check_map_screen.log" | tail -1)" \
@@ -154,9 +167,20 @@ printf 'check_map_screen        %s  throws=%s\n' \
 # 1280-wide viewport at 4, 5 and 6 slots — an off-screen button is a DRAW-time
 # fact no parse gate and no source read can see, which is exactly how CT's brief
 # came to assert that six buttons fit a row that holds five.
+echo "check_ct_map" >> "$RAN"
 "$GODOT" --headless --path . --quit-after 900 res://check_ct_map.tscn \
   >"$OUT/check_ct_map.log" 2>&1
 printf 'check_ct_map            %s  throws=%s\n' \
   "$(grep -oE '[0-9]+ checks / [0-9]+ failures' "$OUT/check_ct_map.log" | tail -1)" \
   "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_ct_map.log")"
+# BATCH DE — THE COUNT DIFFER, AND IT IS A PROPERTY OF THE RUN.
+# It reads the logs above and `baselines.json`; it spawns nothing, so the
+# nesting DD paid 20 minutes for is now structurally impossible rather than
+# merely avoided. Its verdict is echoed here because it is this run's verdict
+# — a FALL in a check count or a RISE in a failure count is the thing the
+# battery exists to notice, and an aggregate hides both.
+echo "=== THE COUNT DIFFER (post-pass over the logs above; spawns nothing) ==="
+run_one check_de
+grep -E '^(FAIL|NOTICE): ' "$OUT/check_de.log" || true
+grep -E '^check_de: ' "$OUT/check_de.log"
 echo "=== DONE. Logs in $OUT ==="

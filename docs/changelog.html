@@ -14,6 +14,163 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-22 &mdash; Batch DE: THE DIFFER BELONGS TO THE RUN, NOT TO A SUITE</h2>
+<p><i>DD widened <code>test_batch_cd</code>&rsquo;s table from five suites to forty-five and
+<b>the battery went from 29.6 minutes to about 50</b>, because §1 answered its question by
+SPAWNING FORTY-FIVE CHILD GODOTS &mdash; it ran the battery inside the battery. <b>A suite that
+spawns suites squares the work when you widen it</b>, so the instrument got more expensive exactly
+as it got more useful, and the only lever left was to watch less. <b>Comparing this run&rsquo;s
+counts to recorded ones is a property of the RUN.</b> The differ is a post-pass now
+(<code>check_de.gd</code>) over the logs <code>run_battery.sh</code> already writes; the baselines
+are one machine-readable file (<code>baselines.json</code>); and <b>the nesting is structurally
+impossible rather than merely avoided</b>, because reading a file is not running a suite.
+<b>THE FAILURE COUNT IS BASELINED PER SUITE NOW, AND THAT IS WORTH MORE THAN THE CHECK-COUNT
+DIFFING THAT PROMPTED THE BATCH.</b> No save version moves (still v10). The full report is
+<code>docs/reports/DE.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; WHAT DOES <code>cd</code> DO THAT THE RUNNER CANNOT? FOR HALF OF IT, NOTHING</h3>
+<p><code>test_batch_cd</code> did two unrelated jobs. It <b>diffed check counts</b> against a
+recorded table, and it <b>detected that another suite threw</b> &mdash; which it did by spawning
+child Godots with stderr captured, because a script error is invisible to the suite it happens in.
+<b>Both jobs were redundant, and twice over.</b></p>
+<p><code>run_battery.sh</code> <b>already spawns every target</b>, <b>already captures every stream
+including stderr</b> (<code>&gt;"$log" 2&gt;&amp;1</code>), <b>already greps the same three count
+shapes</b> and <b>already counts the same two throw markers</b>. <code>test_batch_cd</code>&rsquo;s
+matcher is that grep, transcribed; its throw count is that grep, transcribed. <b>The only thing
+the runner did not do was COMPARE.</b> So the honest answer for the differ half was nothing, and
+it is reported as nothing.</p>
+<p><b>THE OTHER THREE SECTIONS STAY A SUITE, AND THE REASON IS NOT SENTIMENT.</b> The dead-symbol
+sweep, the draft-target sweep and the pool measurement read the project&rsquo;s SOURCE and its
+DATA &mdash; they resolve <code>Classes</code>, they walk the twelve spec pools, they read prose in
+four documents. <b>A shell runner has no <code>Classes</code> and no opinion about prose.</b> Those
+are assertions about the tree and they belong in a suite; <b>only the differ moved.</b></p>
+
+<h3>&sect;1 &mdash; THE BASELINES ARE DATA, IN ONE FILE, AND A BAND CARRIES ITS OWN EVIDENCE</h3>
+<p><code>baselines.json</code> at the repo root, beside <code>run_battery.sh</code> and the gates.
+<b>One place, and nothing duplicates it</b> &mdash; <code>docs/state.md</code> and
+<code>CLAUDE.md</code> point at it rather than restating it, because <b>a second copy of a number
+is this project&rsquo;s oldest recurring defect</b> and the instrument built to catch drift must
+not be the thing that seeds it.</p>
+<p>Per target it carries the <b>expected check count</b> (a number, or a band where the count
+legitimately varies), the <b>expected FAILURE count</b>, the <b>known flake and its observed
+rate</b> &mdash; and <b>THE NUMBER OF OBSERVATIONS EACH BAND RESTS ON</b>. That last field is the
+one worth arguing for: <b><code>an</code>&rsquo;s nine-observation band was exceeded on its tenth
+reading, inside the batch that widened it.</b> A band is a claim about a distribution nobody has
+characterised, and <b>the number of readings behind it is part of the claim</b>. A row written
+from four readings and a row written from twelve are not the same assertion, and until now nothing
+recorded which was which.</p>
+<p><b>A BASELINE MOVES ONLY IN THE BATCH THAT CAUSES THE MOVEMENT, AND THE CHANGELOG SAYS WHY.</b>
+Otherwise the table drifts into whatever the code happens to do, which is CQ §3&rsquo;s failure
+arriving in a new place.</p>
+
+<h3>&sect;2 &mdash; THE DIFFER IS A POST-PASS, RUN ONCE, AND IT SPAWNS NOTHING</h3>
+<p><code>check_de.gd</code> runs last of all, reads <code>$OUT/*.log</code> and
+<code>baselines.json</code>, and reports. <b>It is written in GDScript and not in shell</b>, for
+the reason the batch keeps re-learning: bash string handling is how the battery&rsquo;s count grep
+came to be too narrow three times, and how a message spelling a throw marker out in full would
+make the battery accuse the differ of throwing. <b>The count-differ has been mis-instrumented
+twice. It is not a place to be clever</b> &mdash; so the parser carries positive controls for all
+three log shapes, <b>including <code>bm</code>&rsquo;s scar as a regression case</b> (written
+<code>[ \t]+</code> instead of a single space, the matcher reads <code>sections: 8   checks:
+1891</code> as 8 checks and 1891 failures).</p>
+<p><b>A FALL AND A RISE ARE NOT THE SAME EVENT, AND THE POLARITY INVERTS BETWEEN THE TWO
+HALVES.</b> A <b>falling check count</b> is this project&rsquo;s signature failure &mdash;
+<code>bb</code> 172&rarr;168, <code>bo</code> 505&rarr;495, harness gate 2 at CA, and the seven
+<code>SCRIPT ERROR</code>s that hid 2,714 assertions &mdash; and it is an <b>ERROR</b>. A
+<b>rising</b> one is usually a suite&rsquo;s own loop walking new content and is a <b>NOTICE</b>.
+So <b>the FLOOR of a band is asserted and the ceiling is not</b>, which turns out to be the same
+asymmetry <code>an</code>&rsquo;s band rule already had written into it. <b>A rising FAILURE count
+inverts it</b>: that is the 48th failure among 47, and it is an <b>ERROR</b>; a falling one means
+something was repaired, and it is a <b>NOTICE</b>. <b>The instrument&rsquo;s own asymmetry is
+driven through the real functions by four probes, so a control cannot pass by accident.</b></p>
+<p><b>AND THE HAZARD THE NEW SHAPE INTRODUCES, NAMED AND CLOSED.</b> Reading logs instead of
+spawning means a target that failed to launch would be blessed by <b>its previous run&rsquo;s
+log</b> &mdash; <code>run_battery.sh</code> does not clear <code>$OUT</code>. So the runner
+<b>writes a manifest</b> (<code>$OUT/.ran</code>) naming each target immediately before launching
+it, and the differ trusts that rather than the directory listing. A log named in the manifest is
+always this run&rsquo;s, because <code>run_one</code> truncates it at spawn. <b>A subset
+invocation writes a short manifest and the differ says so instead of reporting a clean tree.</b></p>
+
+<h3>&sect;3 &mdash; THE FAILURE BASELINES, WHICH ARE THE REAL PRIZE</h3>
+<p><b>With 47 known failures across 20 suites, a 48th is invisible.</b> That is not hypothetical:
+DC found that <code>test_batch_bi</code> was right and the game was wrong <b>for four
+batches</b>, and it hid because that suite was already red for an unrelated reason. <b>A red check
+does not announce a second problem underneath it.</b></p>
+<p>Every target now carries an expected failure count, so <b>a suite going from 6 red to 7 is
+reported exactly as loudly as one going from 0 to 1</b>. This is the fix for the exact failure
+mode that let a lying passive survive four batches, and it is worth more than the check-count
+diffing that prompted the batch.</p>
+
+<h3>&sect;4 &mdash; THE MARGIN CAVEAT, GENERALISED FROM AN ANECDOTE INTO A METHOD</h3>
+<p><b>The brief asked for a caveat that DD had already half-recorded</b>, and the half that was
+missing is the useful half. <code>CLAUDE.md</code> already carried the arithmetic for
+<code>at</code> specifically &mdash; a blow rolls <code>randf_range(0.9, 1.1)</code>, so one blow
+carries ±10% and a ratio of two carries up to 22%, against bands of ±20% and ±7%. What it did not
+carry was <b>the instruction to do that arithmetic BEFORE choosing the band</b> rather than after
+the flake.</p>
+<p>Recorded beside the recommendation: <b>a margin only works if it is WIDER than the noise it
+sits on, and a ratio of two rolled quantities carries roughly twice the variance of either.
+Compute the propagated noise first. If it is wider than the band the question needs, THE BAND IS
+NOT AVAILABLE</b> &mdash; seed the pair and assert exactly. The recommendation to assert ratios
+with margins <b>must not stand unqualified</b>: followed on its own, it produced both of
+<code>at</code>&rsquo;s flakes.</p>
+
+<h3>&sect;5 &mdash; WHAT THIS DELIBERATELY DID NOT DO</h3>
+<ul>
+<li><b>THE 47 FAILING ASSERTIONS ARE NOT REPAIRED.</b> Each needs a ruling on what it should ask
+INSTEAD, and they are the next batch&rsquo;s. <b>Left red on purpose</b> &mdash; §3 makes them
+safer to leave than they have ever been.</li>
+<li><b>NEITHER FLAKE IS REPAIRED &mdash; <code>bo</code>&rsquo;S OR
+<code>test_rune_battle</code>&rsquo;S</b>, and neither is the stale assertion §6 found underneath
+<code>bo</code>&rsquo;s. One flake at a time is how the effect stays attributable; both failure
+counts are carried as bands for that reason.</li>
+<li><b><code>_run</code>&rsquo;S SAVE-BACKUP PREAMBLE IS STILL OWED AND WAS ALREADY RECORDED AS
+OWED</b> &mdash; 38 of 39 suites open with it and 37 swap <code>Profile.save_path</code>. It is
+the next copied helper, one layer inside a driver that is correctly 39 bodies.</li>
+</ul>
+
+<h3>&sect;6 &mdash; AND §3 CAUGHT ONE ON ITS FIRST RUN: <code>bo</code>&rsquo;S RED IS NOT ITS FLAKE</h3>
+<p><b>Every document in the project records <code>test_batch_bo</code> as
+<code>1025 /0&ndash;1 (the known flake)</code>. It is not.</b> Its floor of <b>1 is DETERMINISTIC</b>:
+§6 of that suite asserts <code>CLAUDE.md</code> contains the literal <code>TRANCHES 2 AND 3</code>,
+and <b>CW&rsquo;s split removed that string</b> &mdash; it is absent from <code>CLAUDE.md</code> at
+DD&rsquo;s own commit, checked rather than assumed. So <code>bo</code> belongs to CW&rsquo;s family
+alongside <code>bb</code>, <code>bn</code>, <code>bq</code>, <code>br</code>, <code>bx</code> and
+<code>ce</code>, and <b>its flake is a SECOND failure on top of it, which reads 2.</b></p>
+<p><b>THE BAND <code>0&ndash;1</code> ADMITTED THE OBSERVED VALUE, SO NOTHING EVER CONTRADICTED THE
+LABEL.</b> DD read <code>bo</code> at 1 and recorded 0, reasoning that the flake had not appeared;
+the arithmetic worked either way and nobody looked at WHICH check was red. <b>That is §3&rsquo;s
+thesis exactly &mdash; a red check does not announce a second problem underneath it &mdash; and it
+was found by §3&rsquo;s own instrument on its first run.</b></p>
+<p><b>SO THE PROJECT&rsquo;S STANDING FAILURE TOTAL WAS UNDER-STATED BY ONE SUITE AND ONE FAILURE.
+IT IS 47 ACROSS 20</b>, measured twice at DE (once on unmodified HEAD), <b>and 48 on a run where
+the flake fires.</b> <code>baselines.json</code> carries <code>bo</code> at <b>1&ndash;2</b>, with
+the floor observed twice and the ceiling named as the flake&rsquo;s contribution rather than
+guessed at. <b>The standing rule: when a suite is excused by a known cause, check that the red in
+front of you IS that cause.</b></p>
+
+<h3>&sect;7 &mdash; AND IT CAUGHT A SECOND ONE, ON THE ACCEPTANCE RUN ITSELF</h3>
+<p><b>The final battery &mdash; the acceptance run for this batch &mdash; came back with
+<code>check_de: 273 checks / 1 failure</code>, and the failure was real:</b></p>
+<pre>FAIL: test_rune_battle went REDDER: 1 failures, recorded 0</pre>
+<p><b><code>test_rune_battle</code> had been 97 / 0 in every recorded run of the project.</b> It
+reads none of the documents this batch edited, and its CHECK count is rock steady at 97 across
+every reading &mdash; <b>only the failure moves, which is the flake signature
+<code>CLAUDE.md</code> names.</b> The check is the pyromancer&rsquo;s
+<code>rune_resist_pierce</code>: it drives a <b>live battle</b> against a fire-resistant warband
+and requires the proc to actually land. <b>The suite calls <code>seed()</code> zero times.</b></p>
+<p><b>MEASURED RATHER THAN ASSUMED: 2 red in 15 readings.</b> Clean in DE&rsquo;s first two
+batteries, RED in the acceptance battery, RED on the next ad-hoc run, then <b>ten consecutive clean
+runs on an idle machine</b>. <b>BOTH REDS LANDED UNDER MACHINE LOAD</b> &mdash; which is stated as
+a <b>hypothesis and not a finding</b>, because two observations do not make a mechanism, and
+because the assertion&rsquo;s own comment says its snapshot <i>&ldquo;is the one that cannot
+race&rdquo;</i>, so a race is the first thing the next batch should look at.</p>
+<p><b>It is recorded, not repaired</b> &mdash; band <code>0&ndash;1</code>, rate in
+<code>baselines.json</code>, and the repair is the <code>at</code>/<code>bo</code> shape. <b>One
+flake at a time is how the effect stays attributable.</b> <b>The point is that an instrument built
+this batch found, on its first acceptance run, a red that every previous battery had either not
+produced or not noticed.</b></p>
+
 <h2>2026-08-21 &mdash; Batch DD: ONE <code>_spawn</code> FOR THE SUITES</h2>
 <p><i>The second half of DB&rsquo;s consolidation and ten times its size. <b><code>_spawn</code>
 stood in 37 suites as 36 distinct bodies and <code>_kill</code> in 14; both are authored once now,

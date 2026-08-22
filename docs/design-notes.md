@@ -4751,3 +4751,63 @@ there. The comment was in the right file, attached to the right function, and th
 without reading it. Notes only work where somebody looks; **the ones that survive are the ones
 attached to the thing that fails, and even then only if the reader is looking for a reason rather
 than a value.**
+
+### Batch DE — an instrument that got more expensive exactly as it got more useful
+
+CD's count-differ watched five suites. DD widened it to forty-five, which was plainly the right
+direction, and the battery went from 29.6 minutes to about fifty. Nothing was implemented badly.
+The suite answered its question by running the suites, so **widening the coverage nine-fold
+widened the cost nine-fold**, and the only lever anyone had left was to watch less.
+
+That is worth naming as a shape rather than as an incident. **A test that spawns tests squares the
+work when you widen it.** The tell is not slowness — slowness is ordinary — it is that the price
+tracks the coverage one-for-one, so every improvement to the instrument argues against itself.
+Once the cost curve looks like that, the fix is never a faster implementation.
+
+The question that dissolved it was not "how do we make this cheaper" but **"what does this suite do
+that the runner cannot?"** For the differ half the answer was *nothing*, and it had been nothing
+all along: `run_battery.sh` was already spawning every target, already capturing stderr, already
+running the same two greps. `test_batch_cd` was re-doing the run in order to look at it. The
+comparison — the one thing the runner genuinely did not do — is about four hundred lines of
+GDScript over files that already exist on disk.
+
+**Redundancy is hard to see when the duplicate is in a different language.** The grep is in bash in
+one file and a `RegEx` in GDScript in the other; the spawn is `"$GODOT" ... &` in one and
+`OS.execute` in the other. Nothing greps as a duplicate. The comment at the top of `cd` explained
+at length *why* a suite must run the suites to see a throw, and the explanation was correct and
+the conclusion did not follow, because the runner was already doing the running.
+
+Two smaller things fell out of it, neither of them planned.
+
+**The asymmetry was already there.** The brief asked that a falling count be an error and a rising
+one a notice. Writing it, it turned out to be the rule `an`'s band already carried — floor tight,
+ceiling generous, "the floor is the half that catches a real fault". A convention for how to WRITE
+a band and a rule for how to READ one are the same rule, and it had been sitting in a comment
+being applied by hand.
+
+**And one open question closed itself.** `state.md` carried an observation nobody could settle: the
+battery read `an` at 6053 and `cd`'s sweep read 6055, and whether the two-check gap was draft
+randomness or a difference between launching from the shell and launching with `OS.execute` needed
+a deliberate experiment. There is one launcher now. The question is not answered; it is gone, which
+is the better outcome and was not the reason for the change.
+
+The part that should stay uncomfortable: **the failure baselines are worth more than the check
+counts, and the check counts are what the brief was about.** With 47 known failures across 20
+suites a 48th is invisible, and that is not a hypothetical — `bi` was right and the game was wrong
+for four batches, hidden behind a suite that was already red for an unrelated reason. Baselining
+the failure count per suite was three fields in a JSON file and one comparison. It closes a hole
+that four batches walked past, and it arrived as a §3.
+
+And it proved the point on itself within the hour. `test_batch_bo` has been recorded in every
+document as `1025 /0–1 (the known flake)`. It is not: its floor of 1 is a stale documentation
+assertion from CW's split, and the flake is a *second* failure that would read 2. **The band
+admitted the observed value, so nothing ever contradicted the label** — DD read `bo` at 1, recorded
+0, and reasoned that the flake had not appeared that run. The arithmetic worked either way, and
+nobody looked at which check was red, because **a suite already excused by a known cause does not
+invite the question.**
+
+That is the failure mode the §3 field was built for, arriving from an unexpected direction. The
+danger is not only that a NEW red hides behind an old one; it is that a *plausible reason* attached
+to a red stops anyone reading it. **`bi` hid behind an unrelated failure for four batches. `bo` hid
+behind an explanation.** The second is harder to see, because it does not look like an
+unanswered question — it looks like a settled one.

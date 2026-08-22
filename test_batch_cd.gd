@@ -1,153 +1,44 @@
-# test_batch_cd.gd — HYGIENE: seven script errors, one wrong target count.
+# test_batch_cd.gd — HYGIENE: the dead test symbols, and the draft target.
 # Run:
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script test_batch_cd.gd
 #
 # NO --quit-after: it kills a --script run mid-way and prints nothing (the AN
 # gotcha). Nothing here spawns a scene or touches an autoload, so the whole
-# suite is safe in `_initialize` — but §1 SPAWNS FORTY-FIVE CHILD GODOTS SINCE
-# BATCH DD and is by a wide margin the slowest suite in the battery by wall
-# clock: about 22 minutes of a battery that was 30. IT RUNS THE WHOLE BATTERY
-# INSIDE THE BATTERY, and that is the deliberate price of the one question this
-# suite exists to answer. `run_battery.sh` carries a per-target watchdog bound
-# for it (`TMO[test_batch_cd]`) for the same reason `check_map` has one.
+# suite is safe in `_initialize`.
 #
-# WHY §1 RUNS THE SUITES INSTEAD OF GREPPING THEM. A GDScript runtime error
-# inside a `--script` suite is INVISIBLE TO THAT SUITE: the error aborts the
-# function it happened in, execution resumes in the caller, and the suite goes
-# on to print a clean "N checks, 0 failures" with every check below the throw
-# silently missing. That is the BC trap, it is what CA found gate 2 doing with
-# a WORD instead of a number, and at the CB battery it was still standing in
-# five suites. NO SOURCE-LEVEL CHECK CAN SEE IT — a grep for the dead call this
-# batch repaired would pass the day a different dead call arrives. The only
-# instrument that sees a throw is stderr, and the only way to read a suite's
-# stderr from inside a suite is to run it. So §1 runs them.
+# BATCH DE — THE COUNT DIFFER HAS LEFT THIS FILE, AND THAT IS THE WHOLE BATCH.
 #
-# THE RECURSION HAZARD, NAMED SO IT IS NOT DISCOVERED: `BASELINE` must never
-# hold this file. A suite that drives itself does not terminate.
+# §1 USED TO SPAWN FORTY-FIVE CHILD GODOTS from inside a suite the battery was
+# itself running — the battery inside the battery — because a GDScript runtime
+# error is invisible to the suite it happens in and the only instrument that
+# sees a throw is stderr. It cost about 22 minutes and took the run from 29.6
+# minutes to roughly 50. DD widened it from five suites to forty-five and the
+# price went up with the coverage, WHICH IS THE TELL: a suite that spawns suites
+# squares the work when you widen it, so the instrument got more expensive
+# exactly as it got more useful.
+#
+# DE ASKED WHAT THIS FILE DID THAT THE RUNNER COULD NOT, AND FOR THAT HALF THE
+# HONEST ANSWER WAS NOTHING. `run_battery.sh` already spawns every target and
+# already captures every stream, stderr included (`>"$log" 2>&1`); it already
+# greps the same three count shapes and already counts the same two throw
+# markers. The only thing it did not do was COMPARE — and comparing this run's
+# counts to recorded ones is a property of the RUN, not of any suite in it. So
+# the differ is `check_de.gd` now: a post-pass that reads the logs the runner
+# has already written, spawns nothing, and cannot nest because reading a file is
+# not running a suite. The baselines are `baselines.json`.
+#
+# WHAT STAYED, AND WHY IT HAD TO. The other three sections are not the differ
+# and the runner cannot do them: they read the project's SOURCE and its DATA —
+# the dead symbols pinned absent across the test tree, the draft target stated
+# in four documents, and the pools measured through `Classes`. A shell runner
+# has no `Classes` and no opinion about prose. They are assertions about the
+# tree, they belong in a suite, and this is that suite.
+#
+# THIS FILE IS WATCHED BY `check_de` NOW, WHICH THE OLD DESIGN COULD NOT DO:
+# `BASELINE` could never hold `test_batch_cd.gd`, because a suite that drives
+# itself does not terminate. A post-pass has no such hazard.
 extends SceneTree
-
-# BATCH DD — THE TABLE IS THE WHOLE BATTERY NOW, AND IT WAS A NINTH OF IT.
-#
-# CD wrote five rows and they were the five suites CD had just repaired. That is
-# FIVE OF THE FORTY-FIVE `run_battery.sh` RUNS, and what it cost was measured
-# rather than argued: repairing `be` through `bi` at Batch DC did not move this
-# suite by one line, BECAUSE NOT ONE OF THE FIVE FAITH SUITES WAS IN THE TABLE.
-# The project's count-differ — the one instrument built for its signature failure
-# — was watching a ninth of the project.
-#
-# EVERY SUITE THE BATTERY RUNS IS HERE NOW, MINUS THIS FILE, PLUS `test_batch_cp`
-# — which the battery's own `SUITES` array misses, so nothing watched it at all
-# until now. Forty-five rows either way; they are not the same forty-five, and
-# saying "all 45" without saying which is how a gap survives a headline.
-#
-# A ROW IS [checks_lo, checks_hi, fails_lo, fails_hi], AND BOTH HALVES ARE BANDS
-# because three suites legitimately move and a band written too tight is a false
-# alarm generator:
-#
-#   `an` 6047–6063 checks — it counts `for ab in u.abilities` over live units, so
-#          the total follows the draft. TEN observations: DB's six (6047, 6051,
-#          6052, 6054, 6048, 6054), DC's 6053, DD's two batteries at 6053, and
-#          **DD's first widened sweep at 6055 — ONE ABOVE the 6047–6054 band that
-#          had just been written from the other nine.** A band written to a
-#          sample's exact extremes is exceeded by roughly two runs in eleven, and
-#          this one was exceeded inside the batch that wrote it.
-#          **THE RULE, APPLIED WHEN A BAND IS EXCEEDED AND NOT BEFORE:** floor =
-#          the lowest observation; ceiling = the highest PLUS the observed spread
-#          (6055 + 8). **The floor is the half that catches a real fault** — a
-#          section of `an` that stopped running costs hundreds of checks, not
-#          five — so it stays tight while the ceiling gets the headroom.
-#   `bk` 129–130 checks, on FIVE observations: DB's 129 and 130, DC's 129, and
-#          DD's two batteries, which read 130 and then 129. **Both ends were
-#          observed in one batch. It is NOT widened**, because it has not been
-#          exceeded: headroom is added where the evidence demands it, so that
-#          every number here is traceable to a reading.
-#   `bo` 0–1 failures — a known flake at roughly 1 run in 13: §5's NULL FIELD
-#          check requires `deep < shallow` and the damage carries a 0.9–1.1
-#          variance roll, so both can land on the same integer.
-#
-#   `at` IS NO LONGER ONE OF THEM. It read 3 failures or 4 — the fourth in 2 runs
-#          of 5 — and BATCH DD SEEDED IT: both blows of each compared pair now
-#          draw the same variance. It is pinned at 470 / 3 over five consecutive
-#          runs, and it turned out to be TWO flaky checks rather than the one
-#          that had been recorded.
-#
-# EVERYTHING ELSE IS EXACT ON BOTH HALVES, AND THAT IS THE INSTRUMENT.
-# A COUNT THAT RISES IS AS MUCH NEWS AS ONE THAT FALLS — `bx` gained five checks
-# at CX and `al` lost one at CV, and both were found batches later, by accident,
-# by somebody verifying something else. And A FAILURE COUNT THAT MOVES INSIDE AN
-# ALREADY-RED SUITE IS INVISIBLE IN AN AGGREGATE, which is exactly how
-# `test_batch_bi` stayed wrong for four batches while its suite was red for an
-# unrelated reason. When a row moves for a good reason, MOVE THE ROW — in the
-# same commit, with the reason beside it.
-#
-# THE FAILURE COUNTS ARE NOT ZERO AND ARE NOT SUPPOSED TO BE. 46 assertions
-# across 19 suites are deliberately red, each needing a ruling on what it should
-# ask INSTEAD, and `bo`'s flake makes it 47 across 20 on the runs it appears.
-# DC published 49 across 21: the two that are not in this table are THIS SUITE'S
-# OWN, and they were `bb` and `bj` being reported red a second time. The widening
-# turns those two from failures into recorded baselines — an ACCOUNTING change
-# and the only movement in the project's failure total at DD.
-# This table records WHERE THE REDS ARE so the next one is visible the day it
-# arrives. Repairing them is its own batch; reading their count as a regression
-# is the fault this file exists to prevent.
-const BASELINE := {
-	"test_batch_ah.gd":        [5625, 5625, 0, 0],
-	"test_batch_ah_battle.gd": [65, 65, 0, 0],
-	"test_batch_ai.gd":        [2217, 2217, 0, 0],
-	"test_batch_aj.gd":        [418, 418, 0, 0],
-	"test_batch_ak.gd":        [528, 528, 0, 0],
-	"test_batch_al.gd":        [559, 559, 0, 0],
-	"test_batch_an.gd":        [6047, 6063, 0, 0],
-	"test_batch_ar.gd":        [735, 735, 1, 1],
-	"test_batch_as.gd":        [396, 396, 3, 3],
-	"test_batch_at.gd":        [470, 470, 3, 3],
-	"test_batch_au.gd":        [336, 336, 0, 0],
-	"test_batch_av.gd":        [324, 324, 1, 1],
-	"test_batch_aw.gd":        [350, 350, 3, 3],
-	"test_batch_ax.gd":        [345, 345, 2, 2],
-	"test_batch_ay.gd":        [484, 484, 0, 0],
-	"test_batch_az.gd":        [519, 519, 0, 0],
-	"test_batch_ba.gd":        [690, 690, 0, 0],
-	"test_batch_bb.gd":        [177, 177, 2, 2],
-	"test_batch_bc.gd":        [91, 91, 0, 0],
-	"test_batch_bd.gd":        [71, 71, 1, 1],
-	"test_batch_be.gd":        [34, 34, 0, 0],
-	"test_batch_bf.gd":        [78, 78, 0, 0],
-	"test_batch_bg.gd":        [47, 47, 0, 0],
-	"test_batch_bh.gd":        [233, 233, 0, 0],
-	"test_batch_bi.gd":        [91, 91, 0, 0],
-	"test_batch_bj.gd":        [67, 67, 1, 1],
-	"test_batch_bk.gd":        [129, 130, 0, 0],
-	"test_batch_bl.gd":        [88, 88, 0, 0],
-	"test_batch_bm.gd":        [1891, 1891, 0, 0],
-	"test_batch_bn.gd":        [81, 81, 2, 2],
-	"test_batch_bo.gd":        [1025, 1025, 0, 1],
-	"test_batch_bp.gd":        [275, 275, 0, 0],
-	"test_batch_bq.gd":        [742, 742, 1, 1],
-	"test_batch_br.gd":        [1450, 1450, 2, 2],
-	"test_batch_bs.gd":        [266, 266, 0, 0],
-	"test_batch_bt.gd":        [458, 458, 1, 1],
-	"test_batch_bu.gd":        [480, 480, 5, 5],
-	"test_batch_bv.gd":        [900, 900, 2, 2],
-	"test_batch_bw.gd":        [551, 551, 3, 3],
-	"test_batch_bx.gd":        [147, 147, 2, 2],
-	"test_batch_cb.gd":        [1184, 1184, 2, 2],
-	"test_batch_ce.gd":        [1116, 1116, 9, 9],
-	"test_batch_cp.gd":        [697, 697, 0, 0],
-	"test_runes.gd":           [3121, 3121, 0, 0],
-	"test_rune_battle.gd":     [97, 97, 0, 0],
-}
-
-# THE BATTERY'S PER-SUITE FLAGS, AND THIS TABLE IS NOT OPTIONAL.
-# `test_batch_bl` SILENTLY UNDER-RUNS WITHOUT `--fixed-fps 12` — that is one of
-# the three scars `run_battery.sh`'s header records, and a driver that forgets it
-# reads a real 88 as a smaller number and calls the difference a regression.
-# `run_battery.sh` holds the same table in its `EXTRA` array; if a second entry
-# is ever added there, it belongs here on the same day.
-const SUITE_FLAGS := {
-	"test_batch_bl.gd": ["--fixed-fps", "12"],
-}
 
 # Every site that was aborting, by the symbol that aborted it. Pinned ABSENT
 # from the test tree so the same dead name cannot come back in a sixth suite.
@@ -184,7 +75,6 @@ var fails: Array = []
 
 
 func _initialize() -> void:
-	_throws()
 	_dead_calls()
 	_target()
 	_pools()
@@ -261,97 +151,6 @@ func _test_tree() -> Array:
 			out.append(String(f))
 	out.sort()
 	return out
-
-
-# ---------- §1: every suite runs, at the count it is recorded at ----------
-
-# Joined at runtime, for the same reason `check_da`'s census marks are: THIS
-# SUITE PRINTS ITS OWN FAILURE MESSAGES, and a message that spelled either marker
-# out would put the words in this suite's log — where `run_battery.sh`'s
-# `throws=` column would count THIS suite as the one that threw. The gate that
-# reports the fault must not be the one that trips it.
-func _throw_marks() -> Array:
-	return ["SCRIPT " + "ERROR", "Parse " + "Error"]
-
-
-# The LAST match, and whichever of the two alternation groups actually fired: a
-# suite is free to print a running figure mid-run, and the summary line is the
-# one that means "this is what ran". -1 when nothing matched, which fails the
-# band rather than passing it — a count that cannot be READ is exactly the state
-# a count-differ must refuse to bless.
-func _last_int(re: RegEx, text: String) -> int:
-	var all_m := re.search_all(text)
-	if all_m.is_empty():
-		return -1
-	var m: RegExMatch = all_m[-1]
-	for g in [1, 2]:
-		if m.get_string(g) != "":
-			return int(m.get_string(g))
-	return -1
-
-
-func _band(lo: int, hi: int) -> String:
-	return str(lo) if lo == hi else "%d-%d" % [lo, hi]
-
-
-func _throws() -> void:
-	print("\n§1 every suite runs, and reports the count it is recorded at")
-	var exe := OS.get_executable_path()
-	var proj := ProjectSettings.globalize_path("res://")
-	# THE BATTERY'S OWN SHAPES, AND THEY MUST STAY GENERAL. `[0-9]+ checks` alone
-	# is NOT enough: SIX suites print `checks: N   failures: N` (bm, bn, bo, bp,
-	# bq, br) and TWO print `BATCH XX: N passed, N FAILED` (ai, an), and every one
-	# of those is a suite CLAUDE.md pins with a number. **CS's scar is recorded
-	# everywhere as "seven suites print the colon shape"; the seven is the set the
-	# narrow grep MISSED, and only six of them print that shape.** This grep has been too narrow three times — BQ's scar,
-	# CS's and CP's — and each time the report read `checks=?`, which is the one
-	# thing a count-diffing rule cannot compare.
-	# THE SINGLE SPACE IN `([0-9]+) checks` IS LOAD-BEARING AND DD PAID FOR IT.
-	# Written as `[ \t]+` instead, the FIRST alternative eats the wrong number out
-	# of the colon shape: `sections: 8   checks: 1891   failures: 0` matches
-	# "8   checks" and "1891   failures", so `bm` reported **8 checks / 1891
-	# failures** on its first widened run. `run_battery.sh`'s grep has one space
-	# and is right; this is that grep, transcribed.
-	var count_re := RegEx.create_from_string(
-		"([0-9]+) (?:checks|passed)|checks: *([0-9]+)")
-	var fail_re := RegEx.create_from_string(
-		"(?i)([0-9]+) (?:failures|failed)|(?:failures|failed): *([0-9]+)")
-	var names: Array = BASELINE.keys()
-	names.sort()
-	var moved: Array = []
-	for suite in names:
-		var out: Array = []
-		var args: Array = ["--headless", "--path", proj]
-		args.append_array(SUITE_FLAGS.get(suite, []))
-		args.append_array(["--script", String(suite)])
-		# read_stderr = true: a script error goes to stderr and NOWHERE ELSE.
-		# The suite's own stdout says nothing about it, which is the point.
-		OS.execute(exe, args, out, true)
-		var text := "\n".join(out)
-		# BOTH markers, the way `run_battery.sh` counts them. A parse failure runs
-		# not one line and EXITS 0 (DB's trap), so neither the tally nor the exit
-		# code is evidence — the stream is.
-		var marks := _throw_marks()
-		var throws := text.count(marks[0]) + text.count(marks[1])
-		ok(throws == 0, "%s runs without a throw (got %d)" % [suite, throws])
-		var row: Array = BASELINE[suite]
-		var n := _last_int(count_re, text)
-		var fl := _last_int(fail_re, text)
-		var n_ok := n >= int(row[0]) and n <= int(row[1])
-		var f_ok := fl >= int(row[2]) and fl <= int(row[3])
-		ok(n_ok, "%s reports %d checks, recorded %s — MOVE THE ROW and say why, or find what stopped running"
-			% [suite, n, _band(int(row[0]), int(row[1]))])
-		ok(f_ok, "%s reports %d failures, recorded %s — a red suite going redder or greener is news either way"
-			% [suite, fl, _band(int(row[2]), int(row[3]))])
-		if not (n_ok and f_ok):
-			moved.append(suite)
-		print("  %-24s %5d checks / %2d failures   (recorded %s / %s)"
-			% [suite, n, fl, _band(int(row[0]), int(row[1])),
-				_band(int(row[2]), int(row[3]))])
-	ok(names.size() >= 45, "the table watches %d suites" % names.size())
-	print("  %d suites swept, %d off their recorded line%s" % [names.size(),
-		moved.size(),
-		"" if moved.is_empty() else ": " + ", ".join(PackedStringArray(moved))])
 
 
 # ---------- §1: and the dead names cannot come back ----------
