@@ -1113,7 +1113,18 @@ func _docs() -> void:
 	var claude := _src("res://CLAUDE.md")
 	ok(claude.contains("CLASS_DRAFT_POOLS"),
 		"§5: CLAUDE.md records CLASS_DRAFT_POOLS")
-	ok(claude.contains("BATCH BQ"), "§5: ...in a Batch BQ block")
+	# RE-POINTED AT BATCH DF. THE OLD CHECK CANNOT PASS AND MUST NOT: CW §1 split
+	# this file into standing rules only and dropped every batch narrative with
+	# the rest, so "CLAUDE.md carries the batch block" now asserts the opposite
+	# of the architecture. WHAT REPLACED IT IS A RULE, and that is what is
+	# asserted here — the one line CW wrote to stop the blocks coming back. The
+	# batch's own narrative is asserted against the changelog below, on CD's `<h2>` pattern.
+	# (INVERTING to `not contains("BATCH BQ")` was refused: a batch code is
+	# legitimately named in passing inside surviving rules — CLAUDE.md names
+	# BATCH BN twice and BATCH CE once that way — so the inverse would fail on
+	# an ordinary citation. Anchor on the rule, not on the absence.)
+	ok(claude.contains("DO NOT ADD A BATCH BLOCK TO THIS FILE"),
+		"§5: ...and CLAUDE.md states the rule that replaced the batch block (CW §1)")
 
 
 # ---------- harness ----------

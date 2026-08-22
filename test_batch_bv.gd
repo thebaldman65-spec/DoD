@@ -94,10 +94,18 @@ var _had_save := false
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # The machine-checkable half of "the batch shipped what it said".
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Bloodbond, Ghostpack.
 const NINE := {
-	"Bloodbond":        ["beastmaster", 20, 2.0, 4, 0],
+	"Bloodbond":        ["beastmaster", 20, 1.0, 4, 0],
 	"Savage Sweep":     ["beastmaster", 25, 2.5, 4, 0],
-	"Ghostpack":        ["beastmaster", 25, 2.5, 5, 0],
+	"Ghostpack":        ["beastmaster", 25, 1.0, 5, 0],
 	"Crossfire":        ["sharpshooter", 25, 2.5, 4, 10],
 	"Calibrating Shot": ["sharpshooter", 20, 1.5, 3, 8],
 	"Trophy Shot":      ["sharpshooter", 25, 2.5, 4, 12],

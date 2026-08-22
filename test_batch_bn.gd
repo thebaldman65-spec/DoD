@@ -488,13 +488,28 @@ func _docs() -> void:
 		"...and rung 2 still reads x1.00 in the same table")
 	var claude := _src("res://CLAUDE.md")
 	ok(claude.contains("BATCH BN"), "CLAUDE.md carries a Batch BN block")
-	ok(claude.to_lower().contains("rungs 2 and 3 were not touched")
-			or claude.to_lower().contains("rungs 2 and 3 are untouched"),
-		"CLAUDE.md says explicitly that rungs 2 and 3 were not touched")
+	# RE-POINTED AT BATCH DF. CLAUDE.md STILL SAYS THIS — in other words. CW §1
+	# dropped the narrative that carried the phrase, but the difficulty ladder
+	# survived as a STANDING REFERENCE and says the same thing twice over: rung 1
+	# is attributed to BN §2 and named as the ONLY number on the ladder chosen by
+	# measurement, and rung 2 is "the present balance BYTE FOR BYTE". Anchor on
+	# the surviving wording rather than on a phrase that no longer exists.
+	ok(claude.contains("BATCH BN §2 — WAS x0.70")
+			and claude.contains("THE ONLY THING ON")
+			and claude.contains("the present balance BYTE FOR BYTE"),
+		"CLAUDE.md still says rung 1 alone moved and rung 2 is untouched")
 	# The mechanism is kept after the fix, because the guard is the only thing
 	# preventing it and a later batch could remove it for looking redundant.
-	ok(claude.contains("_releasing"),
-		"CLAUDE.md names the guard, so a later batch meets it before deleting it")
+	# RE-POINTED AT BATCH DF, FROM THE DOCUMENT TO THE SITE, AND THE QUESTION IS
+	# WHY IT MOVED. The point was never "CLAUDE.md contains a string" — it was
+	# that a later batch MEETS the guard before deleting it for looking
+	# redundant. CW §1 dropped this batch's narrative; `battle.gd` did not, and
+	# the block above the field writes the cycle out in full. That is the copy
+	# an editor is actually standing in front of when the temptation arrives.
+	var bsrc2 := _src("res://scripts/battle.gd")
+	ok(bsrc2.contains("var _releasing := false")
+			and bsrc2.contains("THE CYCLE `_releasing` BREAKS"),
+		"battle.gd names the guard AND writes out the cycle it breaks, so a later batch meets it")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CE §5, AND THE OLD CHECK IS THE REASON
 	# THE PATTERN EXISTS. It read `changelog.contains("Batch BN")` against the
 	# LIVE file — and BATCH BZ split the changelog at a batch boundary, moving

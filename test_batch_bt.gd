@@ -87,13 +87,21 @@ var _had_save := false
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # This table is the machine-checkable half of "the batch shipped what it said".
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Hoarfrost Armor.
 const NINE := {
 	"Slow Burn":       ["pyromancer", 15, 1.5, 4, 0],
 	"Stoke":           ["pyromancer", 20, 2.0, 3, 8],
 	"Funeral Pyre":    ["pyromancer", 25, 2.5, 4, 0],
 	"Flash Freeze":    ["cryomancer", 30, 3.0, 5, 0],
 	"Killing Frost":   ["cryomancer", 20, 2.0, 3, 6],
-	"Hoarfrost Armor": ["cryomancer", 20, 2.0, 4, 0],
+	"Hoarfrost Armor": ["cryomancer", 20, 1.0, 4, 0],
 	"Arcane Bolt":     ["arcanist", 30, 2.5, 4, 8],
 	"Inner Arcane":    ["arcanist", 15, 1.0, 3, 0],
 	"Arcane Echo":     ["arcanist", 25, 2.0, 4, 6],

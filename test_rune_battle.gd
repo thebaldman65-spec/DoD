@@ -14,6 +14,26 @@ extends SceneTree
 const REAL_SAVE := "user://run_save.bin"
 
 var _pierce_log := ""
+var _pierce_why := ""
+
+
+# BATCH DF §0 — THE SEED, AND WHY IT IS PER-SITE RATHER THAN PER-SUITE.
+# `check_de` found this suite failing 2 in 15 with a rock-steady check count of
+# 97, which is the flake signature: only the White Flame check moves. It calls
+# `seed()` zero times, so every run draws a different stream.
+#
+# THE SEED GOES IMMEDIATELY BEFORE THE FORCED HIT AND NOWHERE ELSE — the
+# AT/AV/BS/BT idiom of forcing determinism at the site under test rather than
+# widening a tolerance until the noise fits. Seeding the whole suite would have
+# fixed the draw for 96 other checks that never asked for it, which is the
+# widening this project refuses; it would also have hidden WHICH draw mattered.
+#
+# AND IT IS A DIAGNOSTIC AS MUCH AS A FIX. The assertion's own comment says its
+# snapshot "is the one that cannot race", so if this still reds when seeded the
+# cause is NOT the draw and `_pierce_why` below says what it was instead —
+# which is the reading Batch DF wanted and could not get by looking at source.
+func _seeded() -> void:
+	seed(20260822)
 var checks := 0
 var fails: Array = []
 var _save_backup: PackedByteArray = PackedByteArray()
@@ -449,7 +469,19 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		var wf_foes: Array = scene.get("enemies").filter(func(e): return not e.dead)
 		ok(not wf_foes.is_empty(), "pyromancer: no living enemy left to force a hit onto")
 		if not wf_foes.is_empty():
-			await scene._resolve(wf_py, wf_py.abilities[0], wf_foes[0], "good")
+			var wf_tgt: BattleUnit = wf_foes[0]
+			var wf_ab: Ability = wf_py.abilities[0]
+			# BANKED BEFORE THE HIT, because a failure has to be able to say
+			# which precondition was missing. Every one of these is a read.
+			_pierce_why = (" [forced hit: over=%s py_dead=%s tgt=%s hp=%d/%d dead=%s"
+				+ " type=%s resist=%.2f pierce=%.2f]") % [
+					str(scene.get("battle_over")), str(wf_py.dead),
+					wf_tgt.unit_name, wf_tgt.hp, wf_tgt.max_hp, str(wf_tgt.dead),
+					String(wf_ab.dmg_type),
+					float(wf_tgt.resists.get(wf_ab.dmg_type, 0.0)),
+					wf_py.rune_resist_pierce]
+			_seeded()
+			await scene._resolve(wf_py, wf_ab, wf_tgt, "good")
 			# SNAPSHOT THE LOG HERE, not after the fight. Reading it 900 frames
 			# later made this a race against how long the battle runs, which is
 			# exactly the flake Batch AH thought it had closed by forcing the
@@ -480,7 +512,8 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		# either is proof, and the snapshot is the one that cannot race.
 		ok(_pierce_log.find("Rune: the flame bites through resistance") >= 0
 			or log_text.find("Rune: the flame bites through resistance") >= 0,
-			"pyromancer: rune_resist_pierce never fired against a resistant warband")
+			"pyromancer: rune_resist_pierce never fired against a resistant warband"
+				+ _pierce_why)
 	for spec in specs:
 		var missing: Array = []
 		for rune_name in equipped[spec]:

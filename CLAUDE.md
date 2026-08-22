@@ -92,12 +92,27 @@ accumulate far more slowly than batches do.
     recorded as `0–1 (the known flake)` in every document. **It is not.** Its floor of **1 is
     DETERMINISTIC and is not the flake**: §6 asserts `CLAUDE.md` contains the literal `TRANCHES 2
     AND 3`, which **CW's split removed** — so it belongs to CW's family alongside `bb`, `bn`, `bq`,
-    `br`, `bx` and `ce`. **The flake is a SECOND failure on top of it, which reads 2.** The band
+    `br` and `bx`. **The flake is a SECOND failure on top of it, which reads 2.** The band
     `0–1` happened to admit the observed value, so nothing ever contradicted the label, and **the
-    project's standing failure total was under-stated by one suite and one failure.** It is **47
+    project's standing failure total was under-stated by one suite and one failure.** It was **47
     across 20**, and 48 on a run where the flake fires. **WHEN A SUITE IS EXCUSED BY A KNOWN CAUSE,
     CHECK THAT THE RED IN FRONT OF YOU IS THAT CAUSE** — this is §3's own thesis, found by §3's
     instrument on its first run.
+    (**CORRECTED AT DF: `ce` WAS NEVER IN CW's FAMILY** and was named in it here and in
+    `docs/state.md` for two batches. `BATCH CE` is still in this file — a passing mention inside a
+    surviving rule — so that check PASSES, and passes by accident. CW's family was eight
+    assertions, not eleven: `bb` 2, `bn` 2, `bq` 1, `br` 2, `bx` 1.)
+  - **A BAND WIDE ENOUGH TO COVER A GENUINE FAILURE CANNOT REPORT ONE (STANDING, SET AT DF §0).**
+    This is the general rule underneath `bo`, and it is about what a band is FOR. **A band is for a
+    count that legitimately varies — a suite that walks generated content, a draw that differs run
+    to run. It is never a place to admit a red.** The moment a floor is set above zero to stop a
+    known failure from shouting, the row has stopped being a measurement and become an excuse, and
+    **the one thing it can no longer do is tell you the failure is still there** — nor that a
+    second has arrived beneath it. **A FAILURE COUNT'S FLOOR AND A CHECK COUNT'S FLOOR ARE NOT THE
+    SAME KIND OF NUMBER.** A check-count floor is the lowest value a healthy run produced. A
+    FAILURE-count floor is a promise that exactly that many reds are known, named and deliberate —
+    so it belongs in `baselines.json` **with the reason written beside it**, and a band around it
+    is only ever a FLAKE's contribution, never a deterministic red's.
 - **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
@@ -914,6 +929,40 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   **the stack-count detector reads every fire as a miss.** The release counter is the only honest
   witness there. **`test_batch_bf` had written that rule at the function that needed it and `be`
   was repaired without reading it.** When you move a driven depth, ask what the drive now DOES.
+- **A CONSTANT'S BLAST RADIUS IS EVERY ASSERTION THAT PINS A CONSEQUENCE OF IT, NOT ONLY THE ONES
+  THAT NAME IT (STANDING, SET AT DF §1).** DC swept `FAITH_RELEASE` 5 → 3 and repaired 23
+  assertions across `be`, `bf`, `bg`, `bh` and `bi` — **and left eight more standing in `bu` and
+  `ce` for three batches.** The eight do not contain the words `FAITH_RELEASE` or the number 5 in
+  any greppable place: they read `w.faith_peak == 5`, `m.faith_stacks == 4`, `1 +
+  ELEVATION_STACKS_TEST`. **They are arithmetic ABOUT the threshold, so a search for the threshold
+  cannot find them.** Sweep by driving the constant, not by grepping its name: change it, run
+  everything, and let the failures enumerate the radius.
+- **AND WHEN A THRESHOLD FALLS, A PROBE THAT PARKED BELOW IT MAY NOW CROSS IT — WHICH CAN MAKE THE
+  CHECK STRONGER (DF §2).** `ce`'s Elevation probe drove three allies at 0, 1 and 2 to prove the
+  card ADDS a count rather than writing a floor. At `RELEASE` = 3 two of the three now release
+  instead of coming to rest — and **the release is a better discriminator than the old one**,
+  because a floor-write of 2 would leave all three at 2 and nobody would release at all. **Ask what
+  the new threshold makes VISIBLE before assuming it has taken something away.**
+
+## A REVERTED CONSTANT MUST BE SWEPT THROUGH THE ABILITY CARD TOO (STANDING, SET AT DF §1)
+> **When a batch reverts a magnitude, sweep every place the number is SPOKEN — the passive text,
+> the status chip, the design doc, AND THE ABILITY'S OWN CARD. The card is the copy the player
+> reads while deciding, and it is the one that gets missed.**
+
+- **THE CASE: CONSECRATED GROUND PROMISED DOUBLE WHAT IT PAID FOR FOUR BATCHES.** CZ raised
+  `FAITH_PER_GROUND_TURN` 1 → 2 and moved the card's "kindled 1 Faith" to "kindled 2" **with it,
+  correctly**. DA reverted the constant to 1 and **left the card at 2.** DC then swept exactly this
+  defect and fixed two instances — the Devout's `passive_desc` and the `faith` status chip — and
+  **did not reach the third.** `docs/master.html` read "(1 an ally a turn)" throughout and was
+  right the whole time, so the design doc and the game disagreed and only a suite noticed.
+- **THE SUITE THAT NOTICED WAS READ AS STALE FOR FOUR BATCHES.** `test_batch_bj` §2 asserts
+  `classes.gd` contains "kindled 1 Faith" and it is **correct** — the code pays 1, and
+  `test_batch_aw`'s live checks measure it landing 1 at a time through a real turn. **A red that
+  sits in a pile of stale reds is invisible**, which is the whole reason a failure total gets
+  sorted before it gets repaired.
+- **THE ORDER THAT CATCHES IT: the constant, then every call site, then every STRING that states
+  the number.** Grep the number, not the field — the card says "2 Faith", not
+  `FAITH_PER_GROUND_TURN`.
 
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs

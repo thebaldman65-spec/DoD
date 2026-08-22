@@ -834,9 +834,30 @@ func _docs() -> void:
 		"§7: the glossary does not enumerate modifiers, so Rot correctly has no entry (%d found)"
 		% enumerated)
 	var cm := _src("res://CLAUDE.md")
-	ok(cm.contains("rot_hp_lost"),
-		"§7: CLAUDE.md states the three-field ordering at the victory sync")
-	ok(cm.contains("BATCH BB"), "§7: CLAUDE.md carries the batch block")
+	# RE-POINTED AT BATCH DF, FROM THE DOCUMENT TO THE SITE. CW §1 dropped this
+	# batch's narrative and the three-field ordering went with it — but the rule
+	# never lived only in prose: `BattleUnit.sync_victory_state` authors the
+	# expression AND carries the sign of each term in a comment above it, which
+	# is the copy a later batch actually meets before editing. `test_batch_aw`
+	# already asserts this same file in this same idiom. THE QUESTION IS
+	# UNCHANGED: all three fields are present, separate, and signed the way W,
+	# AW and BB §5 each ruled — rot ADDED BACK, the other two SUBTRACTED.
+	var usrc := _src("res://scripts/unit.gd")
+	ok(usrc.contains("max_hp - tenacity_hp_gained - conviction_hp_gained")
+			and usrc.contains("+ rot_hp_lost"),
+		"§7: unit.gd states the three-field ordering at the victory sync")
+	# RE-POINTED AT BATCH DF. THE OLD CHECK CANNOT PASS AND MUST NOT: CW §1 split
+	# this file into standing rules only and dropped every batch narrative with
+	# the rest, so "CLAUDE.md carries the batch block" now asserts the opposite
+	# of the architecture. WHAT REPLACED IT IS A RULE, and that is what is
+	# asserted here — the one line CW wrote to stop the blocks coming back. The
+	# batch's own narrative is asserted against the changelog below, on CD's `<h2>` pattern.
+	# (INVERTING to `not contains("BATCH BB")` was refused: a batch code is
+	# legitimately named in passing inside surviving rules — CLAUDE.md names
+	# BATCH BN twice and BATCH CE once that way — so the inverse would fail on
+	# an ordinary citation. Anchor on the rule, not on the absence.)
+	ok(cm.contains("DO NOT ADD A BATCH BLOCK TO THIS FILE"),
+		"§7: CLAUDE.md states the rule that replaced the batch block (CW §1)")
 	var log := _src("res://docs/changelog.html")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CD. BATCH BZ SPLIT THE CHANGELOG at a
 	# batch boundary: the live file starts at Batch BP and everything older —

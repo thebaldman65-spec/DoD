@@ -14,6 +14,186 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-22 &mdash; Batch DF: THE FORTY-SEVEN, SORTED</h2>
+<p><i>The 47 failing assertions that five implement-only batches left standing are <b>sorted
+before any of them was touched: 37 STALE, 2 WRONG, 8 UNDECIDED</b>. The 37 are repaired and
+<b>the failure total falls 47 &rarr; 10, by exactly 37 and by nothing else</b>, with <b>every
+check count in the project unmoved</b>. <b>The sort found a real bug</b> &mdash; Consecrated
+Ground&rsquo;s card has promised DOUBLE the Faith it pays for four batches &mdash; and it is
+<b>reported, not fixed</b>, because it is a design question. <b>No save version moves (still
+v10).</b> The full report is <code>docs/reports/DF.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; <code>test_rune_battle</code> IS SEEDED, AND <code>bo</code> WAS ALREADY MOVED</h3>
+<p><b>The seed is PER-SITE, not per-suite</b> &mdash; <code>_seeded()</code> immediately before the
+forced White Flame hit and nowhere else, on the AT/AV/BS/BT idiom. Seeding the whole suite would
+have fixed the draw for 96 checks that never asked for it. <b>The check count is unchanged at
+97</b> and two post-seed runs read 97/0. <b>THE BAND IS DELIBERATELY NOT TIGHTENED</b>: two clean
+readings cannot retire a rate measured over fifteen, and tightening on that evidence is the same
+fault as writing a band from too few readings, pointing the other way. <b>The failure message now
+carries the state the forced hit happened in</b> &mdash; <code>battle_over</code>, both units&rsquo;
+liveness, the target&rsquo;s fire resist, the pierce fraction &mdash; so the NEXT red says what was
+missing rather than only that it was missing.</p>
+<p><b>THE BRIEF&rsquo;S SECOND ITEM WAS ALREADY PAID.</b> It says <code>bo</code>&rsquo;s band is
+<code>0&ndash;1</code> and asks for it to be re-classified. <b>DE had already done both</b>:
+<code>baselines.json</code> carries <code>bo</code> at <b>1&ndash;2</b> with the floor named as the
+deterministic CW red and the ceiling as the flake&rsquo;s contribution. Re-derived rather than
+recalled, so the red was not counted twice. <b>What was still owed is the general rule, and it is
+written now</b>: <i>a band wide enough to cover a genuine failure cannot report one.</i> A
+FAILURE-count floor is not the same kind of number as a CHECK-count floor &mdash; the first is a
+promise that exactly that many reds are known and deliberate, the second is the lowest a healthy
+run produced.</p>
+
+<h3>&sect;1 &mdash; THE SORT, AND IT WAS NOT THE SORT THE DOCUMENTS DESCRIBED</h3>
+<p><b>All 47 were bucketed off a battery run on unmodified HEAD before anything was edited</b>,
+which reproduced the recorded figure exactly: <b>47 across 20</b>. Five families carried the 37
+stale ones. <b>CY&rsquo;s buff-delay cap is the largest at 16</b> &mdash; and every one was
+verified rather than assumed: each ability&rsquo;s <code>special</code> is in
+<code>Ability.PURE_BUFFS</code> and each def carries <code>"delay":
+Ability.BUFF_DELAY_CAP</code> written in at the def, so the code was right and the pin was pre-CY.
+<b>DA&rsquo;s constants and refactors are five</b>, <b>CW&rsquo;s split is eight</b>, and
+<b><code>FAITH_RELEASE</code> 5 &rarr; 3 is eight more that DC&rsquo;s sweep never reached.</b></p>
+<p><b>THAT LAST FAMILY IS THE TRANSFERABLE FINDING.</b> DC repaired 23 threshold assertions across
+<code>be</code>, <code>bf</code>, <code>bg</code>, <code>bh</code> and <code>bi</code> and reported
+the sweep complete. <b><code>bu</code> and <code>ce</code> carried eight more of the identical
+defect and still do not contain the words <code>FAITH_RELEASE</code> or the number 5 anywhere a
+grep would find them</b>: they read <code>w.faith_peak == 5</code>, <code>m.faith_stacks == 4</code>,
+<code>1 + ELEVATION_STACKS_TEST</code>. <b>They are arithmetic ABOUT the threshold, so a search for
+the threshold cannot see them.</b> The rule is now in <code>CLAUDE.md</code>: <b>a constant&rsquo;s
+blast radius is every assertion that pins a CONSEQUENCE of it</b> &mdash; drive the constant and
+let the failures enumerate the radius.</p>
+<p><b>AND THREE DOCUMENTED FACTS DID NOT SURVIVE BEING CHECKED.</b> <code>docs/state.md</code> and
+<code>CLAUDE.md</code> both placed <code>ce</code>&rsquo;s nine failures in CW&rsquo;s family.
+<b><code>BATCH CE</code> is still in <code>CLAUDE.md</code></b>, so that check passes &mdash; and
+passes BY ACCIDENT, a passing mention inside a surviving rule. <code>ce</code>&rsquo;s nine are four
+CY pins, four threshold assertions and one milestone. <b>CW&rsquo;s family is eight, not eleven.</b>
+<b>And there are FOUR checks passing by accident, not the two on record</b> &mdash;
+<code>test_batch_ce.gd</code>&rsquo;s <code>BATCH CE</code> and <code>test_batch_br.gd</code>&rsquo;s
+<code>Arcane Arrows</code> join <code>bn</code>&rsquo;s and <code>bs</code>&rsquo;s. Of BR&rsquo;s
+twelve class-draft cards exactly four survive in <code>CLAUDE.md</code> as incidental mentions, so
+one half of that pair failed while the other went on passing without its subject being enumerated
+at all. <b>Both are repaired here as part of their suites&rsquo; repairs</b>, at no cost to the
+failure count.</p>
+
+<h3>&sect;2 &mdash; WHAT WAS REPAIRED, AND THE TWO THAT NEEDED MORE THAN A LITERAL</h3>
+<p>Every repair is a 1-for-1 replacement inside an existing <code>ok()</code>, so <b>no check count
+moves and no assertion was deleted</b>. Where a pinned string moved because a value gained a NAME,
+the repair asserts BOTH halves rather than following the code&rsquo;s spelling: the ground drip is
+now checked as <code>_gain_faith(u, FAITH_PER_GROUND_TURN, "ground")</code> <b>and</b>
+<code>const FAITH_PER_GROUND_TURN := 1</code>, because the question is &ldquo;a flat 1&rdquo;, not
+&ldquo;however <code>battle.gd</code> spells it&rdquo;.</p>
+<p><b>THE CW BATCH-BLOCK PINS COULD NOT BE REPOINTED AND COULD NOT BE INVERTED EITHER.</b>
+&ldquo;<code>CLAUDE.md</code> carries the batch block&rdquo; asserts the opposite of the
+architecture CW §1 set, and the batch&rsquo;s narrative is already asserted against the changelog a
+few lines below in each suite, so repointing there would only duplicate. <b>Inverting to
+<code>not contains("BATCH BB")</code> was refused</b>: a batch code is legitimately named in passing
+inside surviving rules &mdash; <code>CLAUDE.md</code> names <code>BATCH BN</code> twice that way
+&mdash; so the inverse would fail on an ordinary citation. <b>They anchor on the rule that replaced
+them</b>: <code>DO NOT ADD A BATCH BLOCK TO THIS FILE</code>, the one line CW wrote to stop the
+blocks coming back.</p>
+<p><b>AND FOUR PINS MOVED FROM THE DOCUMENT TO THE SITE, WHICH IS WHERE THE RULE ALWAYS LIVED.</b>
+The three-field victory ordering is authored in <code>unit.gd</code> with the sign of each term in a
+comment above it; <code>_releasing</code>&rsquo;s cycle is written out in full in
+<code>battle.gd</code>. <b>Those are the copies a later batch is actually standing in front of when
+the temptation to delete arrives</b>, which was the point of the check.</p>
+<p><b>THE EIGHT THRESHOLD ASSERTIONS NEEDED THE PROBE RE-DERIVED, NOT THE LITERAL SWAPPED</b>, and
+that is stated rather than buried. Under <code>RELEASE</code> = 3 a grant of 4 no longer comes to
+REST at 4 &mdash; it clamps and releases &mdash; so the floor is read off the PEAK, which is exactly
+the reasoning CQ already wrote into the first of them. <b>One of the re-derivations makes the check
+STRONGER.</b> <code>ce</code>&rsquo;s Elevation probe drove allies at 0, 1 and 2 to prove the card
+ADDS rather than writing a floor; two of the three now release instead, and <b>a floor-write of 2
+would leave all three at 2 with nobody releasing at all</b> &mdash; so the release is a
+discriminator the old construction did not have. <code>bu</code> and <code>ce</code> each gain
+DC&rsquo;s two constants (<code>RELEASE</code>, <code>HELD_MAX</code>) so the next threshold ruling
+costs them one line apiece.</p>
+
+<h3>&sect;3 &mdash; THE ONE THE SORT EXISTED TO FIND: CONSECRATED GROUND PROMISES DOUBLE</h3>
+<p><b><code>classes.gd</code> tells the player &ldquo;every ally is kindled <b>2</b> Faith at the
+start of their turn&rdquo;. <code>battle.FAITH_PER_GROUND_TURN</code> is <b>1</b></b>, and
+<code>_ground_faith_tick</code> pays exactly it. <code>_gain_faith</code> doubles under
+<code>zeal</code> and under nothing else &mdash; not Fervor, not Apostle.
+<b><code>test_batch_aw</code>&rsquo;s LIVE checks pass and measure it landing one at a time through
+a real turn.</b> <code>docs/master.html</code> reads &ldquo;(1 an ally a turn)&rdquo; and has been
+right throughout, <b>so the design document and the game have disagreed for four batches and only a
+suite noticed.</b></p>
+<p><b>THE HISTORY IS UNAMBIGUOUS AND IT IS A REVERT THAT DID NOT SWEEP.</b> Batch BJ authored the
+card as &ldquo;kindled 1 Faith&rdquo;. <b>CZ raised the constant 1 &rarr; 2 and moved the card WITH
+it, correctly.</b> <b>DA reverted the constant 2 &rarr; 1 and left the card at 2.</b> <b>DC then
+swept this exact defect and fixed two instances</b> &mdash; the Devout&rsquo;s
+<code>passive_desc</code> and the <code>faith</code> status chip &mdash; <b>and did not reach the
+third.</b> <code>test_batch_bj</code> §2 has been red and saying so ever since, inside a pile of 47
+reds nobody had sorted. <b>A red that sits among stale reds is invisible, which is the whole reason
+a failure total gets sorted before it gets repaired.</b></p>
+<p><b>IT IS REPORTED AND NOT FIXED, because which side is wrong is the designer&rsquo;s call.</b>
+The code is what DA ruled and the card is what CZ wrote; either the card returns to 1, or the revert
+went a step too deep and the ground drip was meant to stay at 2. <b>Editing the card would have
+written a green check over a live question.</b> The rule that would have caught it is now standing:
+<b>a reverted constant must be swept through the ability CARD too</b>, not only the passive and the
+chip &mdash; and grep the NUMBER, not the field, because the card says &ldquo;2 Faith&rdquo; and
+never says <code>FAITH_PER_GROUND_TURN</code>.</p>
+<p>The second WRONG is older and one word: <b><code>data/glossary.json</code> still reads
+&ldquo;pay the four and not the <b>beast</b>&rdquo;</b>, inside CV&rsquo;s own hero/ally entry.
+<code>test_batch_bx</code> §4 catches it and is right; it belongs to the prose-rename pass, which is
+deliberately separate from the field rename.</p>
+
+<h3>&sect;4 &mdash; THE EIGHT THAT NEED A RULING, AND WHY NEITHER COULD BE GUESSED</h3>
+<p><b>SIX ARE ONE SUBJECT: the exclusive-pair list</b> (<code>as</code> 2, <code>at</code> 3,
+<code>aw</code> 1). CW&rsquo;s split removed <code>CLAUDE.md</code>&rsquo;s <code>EXCLUSIVE talent
+pair (heat_haze/scorched, cascade/overflow, pact_flesh/barter &mdash; cold_snap/bitter_cold
+DISSOLVED IN BATCH AS &hellip;)</code> block along with Batch AA&rsquo;s narrative, and <b>the
+strings exist NOWHERE</b> &mdash; not in <code>CLAUDE.md</code>, <code>master.html</code>, the live
+changelog or <code>changelog-archive.html</code>. <b>There is nothing to repoint at.</b> And the
+rule they guard was already dead: <b>the removed block&rsquo;s own closing sentence says so</b>
+&mdash; <i>&ldquo;the rule itself is no longer a live TEST: Batch AI retired
+<code>test_runes._exclusives</code> to a <code>pass</code> because at row granularity it would fire
+on nearly every spec rune in the game&rdquo;.</i> <b>TWO MORE ASSERTIONS IN THE SAME BLOCK NOW PASS
+VACUOUSLY</b>, which is the tell: <code>as</code>&rsquo;s &ldquo;the pair left the ACTIVE list&rdquo;
+passes because the whole list left, and <code>at</code>&rsquo;s reads a substring of an empty string.
+<b>THE QUESTION: does the no-rune-writes-an-exclusive-half rule still bind?</b> If it does it belongs
+in <code>CLAUDE.md</code>&rsquo;s TRAPS section, which is CW §1&rsquo;s own mechanism for rules that
+were buried in batch blocks, and the dissolution history belongs in <code>docs/state.md</code>. If it
+does not, the six should point at <code>talents.gd</code> &mdash; where &ldquo;these two nodes share
+a lane and sit in different rows&rdquo; is actually true and checkable, and where <code>as</code> §6&rsquo;s
+first two assertions already ask it and already pass.</p>
+<p><b>THE OTHER TWO PIN MILESTONES INSIDE A STANDING REFERENCE THAT IS ITSELF STALE</b>
+(<code>bo</code>, <code>ce</code>). <code>bo</code> asks <code>CLAUDE.md</code> to name
+<code>TRANCHES 2 AND 3</code> as &ldquo;the debt that remains&rdquo;; <code>ce</code> asks it to
+record the Cleric as &ldquo;the second class complete&rdquo;. <b>THE DEBT DOES NOT REMAIN.</b>
+Counted out of <code>classes.gd</code>: <code>SPEC_DRAFT_POOLS</code> is <b>96</b> (12 specs
+&times; 8) and <code>CLASS_DRAFT_POOLS</code> is <b>24</b> (4 classes &times; 6) &mdash; <b>120 of
+120</b>, which is what <code>master.html</code> already says. <b>But <code>CLAUDE.md</code>&rsquo;s
+<code>STANDING REFERENCE &mdash; THE ABILITY DRAFT</code> block still reads &ldquo;the draft holds 66
+of a target 120 (Batch BU)&rdquo;, &ldquo;<code>SPEC_DRAFT_POOLS</code> is 24 entries&rdquo; and
+&ldquo;the HUNTER and WARRIOR six are still at TWO&rdquo;.</b> It survived CW&rsquo;s split because
+it sits under a STANDING heading rather than in a batch block. <b>THE QUESTION: correct the block to
+the completed draft and invert both assertions to protect the record of COMPLETION</b> &mdash; which
+is the idiom <code>bo</code>&rsquo;s own comments show BP, BQ and BR using three times as each debt
+was paid &mdash; <b>or rule that the block should be cut and the assertions pointed at
+<code>classes.gd</code>.</b> Rewriting a STANDING REFERENCE is a documentation ruling and this batch
+does not take it.</p>
+
+<h3>&sect;5 &mdash; THE VERIFICATION, AND A BASELINE THAT MOVED FOR A READING</h3>
+<p><b><code>baselines.json</code> was written with the PREDICTED after-values BEFORE the
+verification battery ran</b>, so the run tests the prediction instead of merely recording it: a row
+that disagreed would be <code>check_de</code>&rsquo;s error, not a note in a report. <b>The
+prediction is 47 &rarr; 10 across 7 suites</b> &mdash; <code>as</code> 2, <code>at</code> 3,
+<code>aw</code> 1, <code>bj</code> 1, <code>bo</code> 1, <code>bx</code> 1, <code>ce</code> 1 &mdash;
+<b>a fall of exactly 37, which is the STALE count</b>, with every check count in the project
+unmoved. <b>THE ACCEPTANCE TEST IS TWO-SIDED and the second half is the one that matters</b>: a fall
+SMALLER than 37 means a repair did not land, and <b>a fall LARGER than 37 means something was
+repaired by accident</b> &mdash; which would be reported rather than banked, because an improvement
+nobody aimed at is a change nobody understands. <b>The measured result is in
+<code>docs/reports/DF.md</code> and <code>docs/state.md</code></b>, which are written after the run
+for the reason DE established: <b>a run that did not supervise the final tree cannot certify
+it</b>, and those two files are read by nothing and by <code>check_de</code> alone respectively, so
+writing them last costs a seconds-long re-read of the logs rather than another battery.</p>
+<p><b><code>test_batch_an</code> FELL TO 6046 ON THE BEFORE-BATTERY, ON UNMODIFIED HEAD.</b> That is
+one below a floor which was itself the lowest of thirteen readings, and <code>check_de</code>
+reported it as an error, which is exactly the asymmetry DE built. <b>It is drift, not a fault</b>:
+0 failures, 0 throws, and all thirteen of the suite&rsquo;s section headers printed, so nothing
+stopped running. <b>The floor moves to 6046 and the observation count to 14</b>, per the rule that a
+band widens where a reading demands it and nowhere else. <b>Nothing this batch did could have caused
+it &mdash; the reading predates the first edit.</b></p>
+
 <h2>2026-08-22 &mdash; Batch DE: THE DIFFER BELONGS TO THE RUN, NOT TO A SUITE</h2>
 <p><i>DD widened <code>test_batch_cd</code>&rsquo;s table from five suites to forty-five and
 <b>the battery went from 29.6 minutes to about 50</b>, because §1 answered its question by

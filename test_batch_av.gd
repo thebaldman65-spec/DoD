@@ -197,9 +197,15 @@ func _kit_and_pool() -> void:
 	var icept: Ability = Classes.pending_talent_ability("Intercession")
 	ok(icept != null, "Intercession has a def")
 	if icept != null:
+		# RE-POINTED AT BATCH DF. CY §1 capped a PURE BUFF at half a swing and
+		# Intercession is one: its `special` is in `Ability.PURE_BUFFS` and its
+		# def carries `"delay": Ability.BUFF_DELAY_CAP` outright, so the 2.0 this
+		# pinned is a pre-CY number. The literal is kept rather than read off the
+		# constant — a check that reads the number it is checking has stopped
+		# asking its question (CE's rule).
 		ok(icept.cost == 25 and icept.cooldown == 4
-			and is_equal_approx(icept.delay, 2.0),
-			"Intercession is 25 Mana, 2.0 initiative, 4cd")
+			and is_equal_approx(icept.delay, 1.0),
+			"Intercession is 25 Mana, 1.0 initiative, 4cd")
 		ok(icept.faith_cost == 0,
 			"Intercession carries NO faith_cost — the Mercy is paid on trigger")
 

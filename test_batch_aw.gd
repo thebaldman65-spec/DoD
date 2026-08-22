@@ -671,7 +671,13 @@ func _negative_control_source() -> void:
 	# BATCH BH §2 STRENGTHENED THIS RATHER THAN RE-POINTING IT. AW's question
 	# was "the drip is not GATED on Fervor"; the drip is not touched by Fervor
 	# at all now, so the check asserts the stronger thing — the flat 1.
-	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")")
+	# RE-POINTED AT BATCH DF, AND STRENGTHENED RATHER THAN FOLLOWED. DA §1 gave
+	# the drip a NAMED constant, so the literal `1` left the call site — but the
+	# question is "a flat 1", not "however battle.gd spells it". Both halves are
+	# asserted: the call goes through the constant, AND the constant is 1. The
+	# LIVE checks above measure the same thing through a real turn.
+	ok(bsrc.contains("_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")")
+		and bsrc.contains("const FAITH_PER_GROUND_TURN := 1")
 		and not bsrc.contains("devout.fervor_step"),
 		"NEGATIVE CONTROL: the ground's Faith drip is a flat 1, un-gated and un-deepened")
 
@@ -851,7 +857,13 @@ func _live_ground_drip() -> void:
 	ok(bsrc.count("func _ground_faith_tick") == 1
 		and bsrc.count("_ground_faith_tick(u)") == 1,
 		"the drip has one implementation and one caller")
-	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")"),
+	# RE-POINTED AT BATCH DF, AND STRENGTHENED RATHER THAN FOLLOWED. DA §1 gave
+	# the drip a NAMED constant, so the literal `1` left the call site — but the
+	# question is "a flat 1", not "however battle.gd spells it". Both halves are
+	# asserted: the call goes through the constant, AND the constant is 1. The
+	# LIVE checks above measure the same thing through a real turn.
+	ok(bsrc.contains("_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")")
+		and bsrc.contains("const FAITH_PER_GROUND_TURN := 1"),
 		"...and it is a flat 1, which is the whole of AW §2's base kit")
 	await _kill(bare)
 	# BATCH BH §2 RE-POINTED THE SECOND HALF OF THIS CHECK, and INVERTED it

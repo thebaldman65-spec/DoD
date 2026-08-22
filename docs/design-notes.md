@@ -4,6 +4,58 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A red that sits among stale reds is invisible (Batch DF) — 2026-08-22
+
+Forty-seven assertions had been failing for five batches. Every batch since DB knew the number,
+carried it in `docs/state.md`, and moved on — correctly, each time: DD and DE were consolidation
+batches and the standing instruction was that each of the 47 needed a ruling on what it should ask
+INSTEAD. Nobody was being careless. The pile was deliberate.
+
+**The pile was also the hiding place.** Sorting it turned up one assertion that was not stale at
+all: `test_batch_bj` §2 asserts that Consecrated Ground's card reads "kindled 1 Faith", and the card
+reads "kindled 2" against a constant that pays 1. The check was right. It had been right, and red,
+and saying so, since Batch DA — through DB, DC, DD and DE.
+
+The mechanism is worth naming because it is not a mistake anyone made. **A failing check
+communicates by failing.** That is its entire vocabulary. Put it in a set of 47 other failing checks
+that are all known to be stale, and the signal it emits is identical to the noise around it — so the
+one honest red in the pile is not merely overlooked, it is *unable to speak*. The batch that
+declared the other 46 stale did not need to be wrong about any of them for this to happen. It only
+needed to be right about them collectively and never ask individually.
+
+`baselines.json` was DE's answer to a near neighbour of this: a red suite at its recorded count is
+not news, and a red suite that MOVES is. That closes the case where a NEW failure arrives underneath
+an old one. It does not close this one, because here nothing moved — the count was 1 at DA and 1 at
+DE, faithfully recorded, correct in every document, and wrong about what it meant.
+
+**What actually closes it is the sort.** Not the repair — the sort. Bucketing all 47 before touching
+any of them is what forced the question "is this one stale?" to be asked forty-seven separate times
+instead of once, and the answer differed on two of them. The brief that commissioned this batch said
+so in advance and was right: *if a failure's bucket is not obvious, it is bucket 2 or 3, and the cost
+of misfiling a WRONG as a STALE is that a real bug gets a green check written over it.* Had the 37
+been repaired without sorting, `bj` would have been repaired too — its assertion rewritten to match
+the card — and the game would have gone on paying half what it promises, with a green check over it
+and the evidence gone.
+
+There is a second-order lesson about *why* the Consecrated Ground defect existed at all, and it is
+the more transferable half. CZ raised `FAITH_PER_GROUND_TURN` from 1 to 2 and moved the card's text
+with it, correctly, in the same commit. DA reverted the constant and did not move the text back.
+**A revert is not the inverse of a change** — a change is written by someone thinking about the
+number, and a revert is written by someone thinking about the constant. DC later swept exactly this
+defect, found the Devout's `passive_desc` and the `faith` status chip, fixed both, and did not reach
+the ability's own card. All three sweeps were competent. None of them was a grep for the *number*,
+which is the only search that finds prose: the card says "2 Faith" and never says
+`FAITH_PER_GROUND_TURN`.
+
+The same shape appears one layer out in DC's threshold sweep. DC moved `FAITH_RELEASE` 5 → 3 and
+repaired 23 assertions across five suites, thoroughly and with the counts published either side.
+Eight more sat in `bu` and `ce` the whole time, and they were unreachable by any search DC could
+have run: they read `w.faith_peak == 5` and `1 + ELEVATION_STACKS_TEST`. **They are arithmetic
+about the threshold rather than references to it.** A constant's blast radius is every assertion
+that pins a consequence of it, and the only reliable way to enumerate that radius is to change the
+constant and let the failures name themselves — which is what a battery is for, and why an
+implement-only batch defers the finding rather than avoiding it.
+
 ## An instrument's scope is part of its reading (Batch DD) — 2026-08-21
 
 `test_batch_cd` is the only thing in the project that compares a check count to what it should be.

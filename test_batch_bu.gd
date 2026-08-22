@@ -78,8 +78,22 @@ var fails: Array = []
 var _save_backup: PackedByteArray = PackedByteArray()
 var _had_save := false
 
+# BATCH DF: `battle.FAITH_RELEASE`, ruled at CZ §2 and re-affirmed at DA §1,
+# mirrored ONCE per suite — DC's device, extended here to the suite its sweep
+# did not reach. The next threshold ruling costs this file one line.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
+
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # The machine-checkable half of "the batch shipped what it said".
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Anointing.
 const NINE := {
 	"Recant":           ["holy", 25, 2.0, 4, 0],
 	"Shared Grief":     ["holy", 20, 2.0, 4, 0],
@@ -89,7 +103,7 @@ const NINE := {
 	"Reliquary":        ["inquisitor", 30, 2.5, 5, 0],
 	"Suffering":        ["occultist", 25, 2.5, 4, 8],
 	"Transference":     ["occultist", 20, 2.0, 3, 0],
-	"Anointing":        ["occultist", 30, 2.5, 5, 0],
+	"Anointing":        ["occultist", 30, 1.0, 5, 0],
 }
 
 
@@ -792,7 +806,13 @@ func _live_ordination() -> void:
 	# reaches FIVE — the cap — and RELEASES on the spot: the count resets to
 	# zero and the PEAK keeps the five (BI §1). The floor is still what the
 	# card found; the peak is what proves it, because the count no longer can.
-	ok(m.faith_stacks == 0 and m.faith_peak >= 5,
+	# RE-POINTED AT BATCH DF, TO THE THRESHOLD THE DESIGNER RULED. CQ's reasoning
+	# below is unchanged and is now MORE true, not less: the mage standing on 1
+	# takes 4, crosses the cap and RELEASES, so the count cannot show what the
+	# card found and the PEAK is the proof. Only the cap moved — 5 became
+	# RELEASE. (The stacks written above are DIRECT-WRITE PROBE DEPTHS, not held
+	# values: an ally can only CARRY HELD_MAX.)
+	ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
 		"Ordination found the FLOOR — the mage on 1 took 4, hit the cap and RELEASED (count %d, peak %d)"
 			% [m.faith_stacks, m.faith_peak])
 	ok(w.faith_stacks == 3 and hn.faith_stacks == 2,
@@ -802,9 +822,14 @@ func _live_ordination() -> void:
 	m.faith_stacks = 0
 	m.faith_peak = 0
 	await scene.call("_resolve", dv, _card("Ordination"), w, "good")
-	ok(m.faith_stacks == 4,
-		"aiming it elsewhere changes nothing — it still finds the floor (got %d)"
-			% m.faith_stacks)
+	# RE-POINTED AT BATCH DF, FOR THE SAME REASON AND WITH THE SAME ANSWER. Under
+	# the ruled threshold a grant of 4 onto an ally at 0 does not COME TO REST at
+	# 4 — it clamps at RELEASE and releases him on the spot. So the floor is read
+	# off the peak here too. A card that had aimed where it was pointed would
+	# leave the mage at 0 AND at peak 0, which is what this still separates.
+	ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
+		"aiming it elsewhere changes nothing — it still finds the floor (count %d, peak %d)"
+			% [m.faith_stacks, m.faith_peak])
 	# THE CASTER IS EXCLUDED. His own Faith holds at five and never releases, so
 	# a stack spent on him buys none of the engine this card exists to start.
 	dv.faith_stacks = 0
@@ -823,15 +848,24 @@ func _live_ordination() -> void:
 	# Apostle onto the HELD half and BH §2 deleted Binding Oath's remnant —
 	# corrected toward the code, and pinned here so it cannot come back.)
 	dv.apostle = 1
-	w.faith_stacks = 4
-	w.faith_peak = 4
-	scene.call("_gain_faith", w, 3, "ordination")
+	# BATCH DF: the probe starts at the deepest an ally can actually CARRY. It
+	# was 4 against a threshold of 5; both moved together.
+	w.faith_stacks = HELD_MAX
+	w.faith_peak = HELD_MAX
+	scene.call("_gain_faith", w, RELEASE, "ordination")
 	ok(w.faith_stacks == 0,
 		"under APOSTLE a release still resets an ally to ZERO (got %d)"
 			% w.faith_stacks)
-	ok(w.faith_peak == 5, "and the peak stands at 5 (got %d)" % w.faith_peak)
-	scene.call("_gain_faith", w, 3, "ordination")
-	ok(w.faith_stacks == 3,
+	ok(w.faith_peak == RELEASE,
+		"and the peak stands at the %d he reached (got %d)" % [RELEASE, w.faith_peak])
+	# AND THE SECOND GRANT MUST BE SMALLER THAN THE THRESHOLD OR IT ANSWERS
+	# NOTHING. The question is whether a released ally builds FROM ZERO; under
+	# the ruled threshold a repeat of the first grant would simply release him
+	# again and both answers would read 0. HELD_MAX is the largest grant that
+	# can come to rest, so it is the one that can tell "built from zero" from
+	# "never reset".
+	scene.call("_gain_faith", w, HELD_MAX, "ordination")
+	ok(w.faith_stacks == HELD_MAX,
 		"so the next grant builds from zero rather than re-releasing (got %d)"
 			% w.faith_stacks)
 	scene.queue_free()

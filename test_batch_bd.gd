@@ -147,7 +147,9 @@ func _the_spec() -> void:
 	if ab == null:
 		return
 	ok(ab.cost == 25, "§1: 25 Mana (reads %d)" % ab.cost)
-	ok(abs(ab.delay - 2.0) < 0.001, "§1: 2.0 initiative (reads %s)" % str(ab.delay))
+	# RE-POINTED AT BATCH DF: CY §1's cap. Deadfall is in `Ability.PURE_BUFFS`
+	# and its def reads `"delay": Ability.BUFF_DELAY_CAP`, so 2.0 is pre-CY.
+	ok(abs(ab.delay - 1.0) < 0.001, "§1: 1.0 initiative (reads %s)" % str(ab.delay))
 	ok(ab.cooldown == 5, "§1: 5 turn cooldown (reads %d)" % ab.cooldown)
 	ok(ab.special == "deadfall", "§1: it is still the deadfall special")
 	# BATCH CQ §5 — RE-POINTED AND INVERTED. AH gave Deadfall a check; CN's

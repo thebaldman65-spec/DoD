@@ -306,7 +306,16 @@ func _ability_nodes() -> void:
 	Talents.apply_payload(cc, by_id["cr_lance_focus"]["payload"], 1, {})
 	ok(cc["abilities"][0].special == "cryoclasm", "Cryoclasm carries its special")
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	ok(src.count('"glacial_prison":') == 1, "exactly one glacial_prison handler")
+	# RE-POINTED 1 -> 3 AT BATCH DF, AND THE QUESTION IS THE SAME QUESTION. What
+	# this refuses is a SECOND COPY of a handler that could drift from the first.
+	# DA §2 put Glacial Prison into `RECAST_GATED` and said so in writing —
+	# "three edits and no fourth" — so the name now appears in three DIFFERENT
+	# tables rather than twice in one: `_recast_targets`' living-enemies pool,
+	# `_recast_writes`' proposal (the one member whose handler guards its own
+	# write), and the effect handler itself. A FOURTH still fails, which is what
+	# the check is for. Cryoclasm did not join the gate and is still 1 below.
+	ok(src.count('"glacial_prison":') == 3,
+		"exactly three glacial_prison arms — targets, writes, handler (DA §2)")
 	ok(src.count('"cryoclasm":') == 1, "exactly one cryoclasm handler")
 
 

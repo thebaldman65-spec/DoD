@@ -137,9 +137,17 @@ const SCALE_VALUES := {
 # The four nodes that grant an ability, and the four numbers each one's def
 # has to carry. §2 and §3 both name these, so they are pinned rather than
 # eyeballed.
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Immolate (1.5 -> 1.0).
 const ABILITY_NODES := {
 	"py_melt": ["Backdraft", 20, 2.0, 3],
-	"py_flame_shield": ["Immolate", 15, 1.5, 2],
+	"py_flame_shield": ["Immolate", 15, 1.0, 2],
 	"py_focused": ["Pyroblast", 45, 6.0, 0],
 	"py_firestorm": ["Firestorm", 30, 3.5, 4],
 	"py_rebirth": ["Phoenix Rebirth", 0, 2.0, 4],

@@ -1431,9 +1431,32 @@ func _docs() -> void:
 	ok(glossary.contains("ALL FOUR CLASS POOLS ARE WRITTEN"),
 		"§5: ...and the class-draft entry no longer says two are owed")
 	var claude := _src("res://CLAUDE.md")
-	ok(claude.contains("BATCH BR"), "§5: CLAUDE.md has a Batch BR block")
-	ok(claude.contains("Battle Trance"), "§5: ...naming the twelve")
-	ok(claude.contains("Arcane Arrows"), "§5: ...both halves of them")
+	# RE-POINTED AT BATCH DF. THE OLD CHECK CANNOT PASS AND MUST NOT: CW §1 split
+	# this file into standing rules only and dropped every batch narrative with
+	# the rest, so "CLAUDE.md carries the batch block" now asserts the opposite
+	# of the architecture. WHAT REPLACED IT IS A RULE, and that is what is
+	# asserted here — the one line CW wrote to stop the blocks coming back. The
+	# batch's own narrative is asserted against the changelog above, on CD's `<h2>` pattern.
+	# (INVERTING to `not contains("BATCH BR")` was refused: a batch code is
+	# legitimately named in passing inside surviving rules — CLAUDE.md names
+	# BATCH BN twice and BATCH CE once that way — so the inverse would fail on
+	# an ordinary citation. Anchor on the rule, not on the absence.)
+	ok(claude.contains("DO NOT ADD A BATCH BLOCK TO THIS FILE"),
+		"§5: CLAUDE.md states the rule that replaced the batch block (CW §1)")
+	# RE-POINTED AT BATCH DF, AND THE SECOND OF THE PAIR WAS PASSING BY ACCIDENT.
+	# CW §1 ruled that CLAUDE.md holds RULES and not content, so an enumeration of
+	# twelve card names does not belong in it — master.html is current truth and
+	# the loop above already asserts all twelve there, `classes.gd` authors them.
+	# Of the twelve, exactly FOUR survived in CLAUDE.md as incidental mentions
+	# inside other rules (Rally, Ironclad, Bola, Arcane Arrows), which is why
+	# `contains("Battle Trance")` failed while `contains("Arcane Arrows")` went on
+	# passing WITHOUT ITS SUBJECT BEING ENUMERATED AT ALL — the same fault BE
+	# found in test_batch_bb and CD in test_batch_bo, arriving through a document.
+	# WHAT CLAUDE.md SHOULD CARRY IS THE RULE THE TWELVE PAID FOR, and it does.
+	ok(claude.contains("THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR"),
+		"§5: ...and CLAUDE.md carries the class-seam rule the twelve paid for")
+	ok(claude.contains("is 24 of a target 24"),
+		"§5: ...recording both halves of them as paid")
 
 
 # ---------- harness ----------

@@ -75,6 +75,11 @@ const DIVINE_PRESENCE_MERCY_TEST := 2
 const DIVINE_PRESENCE_EVERY_TEST := 2
 const VESPERS_PCT_TEST := 0.20
 const ELEVATION_STACKS_TEST := 2
+# BATCH DF: `battle.FAITH_RELEASE`, ruled at CZ §2 and re-affirmed at DA §1,
+# mirrored ONCE per suite — DC's device, extended here to the second suite its
+# sweep did not reach. The next threshold ruling costs this file one line.
+const RELEASE := 3
+const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 const BREAKING_DARKNESS_BD_PCT_TEST := 25
 const PENANCE_MIRROR_TEST := 0.50
 
@@ -85,13 +90,21 @@ var _had_save := false
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # This table is the machine-checkable half of "the batch shipped what it said".
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Divine Presence, Alms, Vespers, Mantle.
 const NINE := {
-	"Divine Presence": ["holy", 20, 2.0, 4, 0],
-	"Alms":            ["holy", 20, 2.0, 4, 0],
-	"Vespers":         ["holy", 25, 2.0, 4, 0],
+	"Divine Presence": ["holy", 20, 1.0, 4, 0],
+	"Alms":            ["holy", 20, 1.0, 4, 0],
+	"Vespers":         ["holy", 25, 1.0, 4, 0],
 	"Elevation":       ["inquisitor", 35, 2.5, 5, 0],
 	"Blessing of the Faithful": ["inquisitor", 20, 2.0, 4, 0],
-	"Mantle":          ["inquisitor", 25, 2.5, 4, 0],
+	"Mantle":          ["inquisitor", 25, 1.0, 4, 0],
 	"Breaking Darkness": ["occultist", 25, 2.0, 4, 20],
 	"Requiem":         ["occultist", 30, 3.0, 5, 8],
 	"Penance":         ["occultist", 25, 2.5, 4, 0],
@@ -927,8 +940,14 @@ func _live_elevation() -> void:
 	for h in scene.get("heroes"):
 		h.faith_stacks = 0
 		h.faith_peak = 0
-	# NOBODY MAY BE PARKED AT THE THRESHOLD FOR THE FIRST DRIVE: three allies at
-	# 0, 1 and 2 so every gain lands on the bar and nothing releases yet.
+	# RE-POINTED AT BATCH DF, AND THE THRESHOLD RULING TURNED THE PROOF INSIDE
+	# OUT WITHOUT CHANGING THE QUESTION. Three allies at 0, 1 and 2 still, but at
+	# RELEASE = 3 only the one at 0 can take ELEVATION_STACKS_TEST and come to
+	# rest; the other two cross the cap and release. THAT IS A BETTER
+	# DISCRIMINATOR THAN THE OLD ONE, not a worse one: a version that wrote a
+	# FLOOR of 2 rather than ADDING 2 would leave all three sitting at 2 with a
+	# peak of 2 and NOBODY WOULD RELEASE. So the release itself is now the thing
+	# a floor-write cannot fake, and the peak carries the rest.
 	low.faith_stacks = 0
 	mid.faith_stacks = 1
 	high.faith_stacks = 2
@@ -938,41 +957,44 @@ func _live_elevation() -> void:
 	ok(low.faith_stacks == ELEVATION_STACKS_TEST,
 		"an ally at 0 is handed %d stacks (%d)"
 			% [ELEVATION_STACKS_TEST, low.faith_stacks])
-	ok(mid.faith_stacks == 1 + ELEVATION_STACKS_TEST,
-		"an ally at 1 is handed %d MORE, not raised to a floor (%d)"
-			% [ELEVATION_STACKS_TEST, mid.faith_stacks])
-	ok(high.faith_stacks == 2 + ELEVATION_STACKS_TEST,
-		"an ally at 2 likewise (%d)" % high.faith_stacks)
+	ok(mid.faith_stacks == 0 and mid.faith_peak == RELEASE,
+		"an ally at 1 is handed %d MORE — he crosses the cap and RELEASES, which a floor could not do (count %d, peak %d)"
+			% [ELEVATION_STACKS_TEST, mid.faith_stacks, mid.faith_peak])
+	ok(high.faith_stacks == 0 and high.faith_peak == RELEASE,
+		"an ally at 2 likewise (count %d, peak %d)" % [high.faith_stacks, high.faith_peak])
 	# AND THE PEAK FOLLOWS THE COUNT rather than being written on its own. This
 	# is BI §1's one ratchet doing the work: no second writer exists any more.
+	# For the two who released, the count it just gained IS the threshold.
 	ok(low.faith_peak == low.faith_stacks
-			and mid.faith_peak == mid.faith_stacks
-			and high.faith_peak == high.faith_stacks,
+			and mid.faith_peak == RELEASE
+			and high.faith_peak == RELEASE,
 		"every peak follows the count it just gained (%d/%d/%d)"
 			% [low.faith_peak, mid.faith_peak, high.faith_peak])
 	# THE CONSEQUENCE TO IMPLEMENT RATHER THAN GUARD AGAINST: an ally already
-	# holding 3 crosses the cap and RELEASES — healed, count reset, the Devout
+	# holding HELD_MAX crosses the cap and RELEASES — healed, count reset, the Devout
 	# paid. Driven with the ally on 1 HP so the heal is unmistakable.
 	dv.cooldowns.clear()
 	for h in scene.get("heroes"):
 		h.faith_stacks = 0
 		h.faith_peak = 0
-	low.faith_stacks = 3
-	low.faith_peak = 3
+	# BATCH DF: the deepest an ally can CARRY, so the grant below crosses the cap.
+	# It was 3 against a threshold of 5; both moved together.
+	low.faith_stacks = HELD_MAX
+	low.faith_peak = HELD_MAX
 	low.hp = 1
 	var dv_mana: int = dv.resource
 	dv.resource = 0
 	await scene.call("_resolve", dv, _card("Elevation"), dv, "good")
 	ok(low.faith_stacks == 0,
-		"an ally at 3 crosses the cap and RELEASES — the count resets (%d)"
-			% low.faith_stacks)
+		"an ally at %d crosses the cap and RELEASES — the count resets (%d)"
+			% [HELD_MAX, low.faith_stacks])
 	ok(low.hp > 1, "...he is healed for it (%d)" % low.hp)
 	ok(dv.resource > 0,
 		"...and the Devout is paid his share of Mana (%d)" % dv.resource)
 	# THE PEAK IS UNTOUCHED BY THE RELEASE, so the release is pure upside — the
 	# property BI §1 shipped and the reason this card can be a plain grant.
-	ok(low.faith_peak == 5,
-		"...while his PEAK stands at the 5 he reached (%d)" % low.faith_peak)
+	ok(low.faith_peak == RELEASE,
+		"...while his PEAK stands at the %d he reached (%d)" % [RELEASE, low.faith_peak])
 	dv.resource = dv_mana
 	# BATCH CQ §2 — THERE IS NO PERFECT TO HAND ONE MORE. CN §2 took Elevation's
 	# timing bar off (it resolves nothing a grade could multiply), and CN §3

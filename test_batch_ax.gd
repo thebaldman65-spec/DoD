@@ -430,7 +430,14 @@ func _boss_legibility() -> void:
 	# the next line is what says so.
 	ok(bsrc.count("force := false") == 2,
 		"...and `force` is still an explicit argument (2 declarations: _apply_status, _hold_freeze)")
-	ok(bsrc.contains('_apply_status(target, "frozen", 1 if timed else -1, 0, 0, null, force)'),
+	# RE-POINTED AT BATCH DF, AND THE QUESTION IS UNCHANGED AGAIN. DA §2 gave the
+	# freeze ONE authored duration — `_freeze_turns()` — because Glacial Prison's
+	# recast refusal PROPOSES the number this line WRITES, and CR §3's defect was
+	# exactly a duration authored in the handler and again in the gate's table.
+	# So `1 if timed else -1` became `frozen_turns`. What this check refuses is
+	# unchanged: a boss exception decided by a NAME TEST inside `_apply_status`
+	# rather than by the explicit `force` argument threaded from the call site.
+	ok(bsrc.contains('_apply_status(target, "frozen", frozen_turns, 0, 0, null, force)'),
 		"...and _hold_freeze THREADS it rather than deciding by name")
 	# BATCH CR §1 — THE TWO CLOSED DOORS, ASSERTED SHUT.
 	ok(not bsrc.contains("_hold_freeze(target, attacker, true)"),
@@ -594,7 +601,14 @@ func _fervor_unmoved() -> void:
 	ok(not Talents.desc_for(fervor, 1).contains("per ally per turn"),
 		"...and its text no longer promises a deeper drip")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")") and not bsrc.contains("devout.fervor_step"),
+	# RE-POINTED AT BATCH DF, AND STRENGTHENED RATHER THAN FOLLOWED. DA §1 gave
+	# the drip a NAMED constant, so the literal `1` left the call site — but the
+	# question is "a flat 1", not "however battle.gd spells it". Both halves are
+	# asserted: the call goes through the constant, AND the constant is 1. The
+	# LIVE checks above measure the same thing through a real turn.
+	ok(bsrc.contains("_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")")
+		and bsrc.contains("const FAITH_PER_GROUND_TURN := 1")
+		and not bsrc.contains("devout.fervor_step"),
 		"...the ground pays a flat 1, AW §2's base kit, un-deepened")
 	_report.append("§7 was a NO-OP at AX (Fervor already paid +1). BATCH BH §2 then took "
 		+ "Fervor off the drip entirely; the ground pays 1 with the node or without it.")

@@ -80,14 +80,22 @@ var _had_save := false
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # This table is the machine-checkable half of "the batch shipped what it said".
+# BATCH DF RE-POINTED THE DELAY COLUMN FOR THE PURE BUFFS IN THIS TABLE.
+# CY §1 capped a pure buff at half a swing (`Ability.BUFF_DELAY_CAP` = 1.0) and
+# each name changed below is in `Ability.PURE_BUFFS` with `"delay":
+# Ability.BUFF_DELAY_CAP` written into its own def — so the old number was a
+# pre-CY one and the code was right. The column stays a LITERAL rather than
+# reading the constant: a check that reads the number it is checking has
+# stopped asking its question.
+# Moved here: Emberkeep, Resonant Field.
 const NINE := {
 	"Firedraw":       ["pyromancer", 25, 2.5, 4, 0],
 	"Pyre Wake":      ["pyromancer", 25, 2.5, 4, 0],
-	"Emberkeep":      ["pyromancer", 20, 1.5, 4, 0],
+	"Emberkeep":      ["pyromancer", 20, 1.0, 4, 0],
 	"Deep Winter":    ["cryomancer", 25, 2.5, 4, 0],
 	"Cold Iron":      ["cryomancer", 20, 2.0, 3, 6],
 	"Frostbind":      ["cryomancer", 25, 2.5, 4, 0],
-	"Resonant Field": ["arcanist", 25, 2.0, 4, 0],
+	"Resonant Field": ["arcanist", 25, 1.0, 4, 0],
 	"Threshold":      ["arcanist", 20, 1.5, 5, 0],
 	"Unmaking":       ["arcanist", 30, 3.0, 5, 8],
 }
