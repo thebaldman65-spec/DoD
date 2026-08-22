@@ -901,24 +901,32 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND ELEVEN OF A TARGET 120 (BO..CH) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND TWENTY OF A TARGET 120 (BO..CI) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
 # BATCH BP CLOSED THAT DEBT: six more, two per Warrior spec, so all twelve
-# specs have a draft and `SPEC_DRAFT_POOLS` is 24 entries.
+# specs had a draft and `SPEC_DRAFT_POOLS` stood at 24 entries.
 # BATCH BQ ADDED THE FIRST TWELVE CLASS-WIDE ONES — six MAGE, six CLERIC.
 # BATCH BR ADDS THE OTHER TWELVE — six HUNTER, six WARRIOR — so
 # `CLASS_DRAFT_POOLS` IS FULL AT 24 AND THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL
 # ENTRY FOR EVERY HERO IN THE GAME.
 # TRANCHE 2 IS COMPLETE: BATCH BT the MAGE nine, BATCH BU the CLERIC nine,
 # BATCH BV the HUNTER nine and BATCH BW the WARRIOR nine — nine spec cards
-# apiece, three per spec — so all twelve specs draft from at least FIVE and no
+# apiece, three per spec — so all twelve specs drafted from at least FIVE and no
 # offer fills short for a SPEC reason any more.
-# TRANCHE 3 IS THREE QUARTERS PAID: BATCH CB took the three MAGE pools to EIGHT,
-# BATCH CE the three CLERIC pools and BATCH CH the three HUNTER pools, so THE
-# HUNTER IS THE THIRD CLASS COMPLETE. The WARRIOR third is what is left — 9
-# cards, and it is the last debt the draft carries.
+# TRANCHE 3 IS PAID IN FULL: BATCH CB took the three MAGE pools to EIGHT,
+# BATCH CE the three CLERIC pools, BATCH CH the three HUNTER pools and BATCH CI
+# the three WARRIOR pools. ALL FOUR CLASSES ARE COMPLETE, `SPEC_DRAFT_POOLS`
+# IS 96, AND THE DRAFT CARRIES NO DEBT AT ALL.
+#
+# BATCH DG §3 CORRECTED THIS HEADER, AND IT WAS FOUND BY A SWEEP RATHER THAN BY
+# A FAILING CHECK. It read "ONE HUNDRED AND ELEVEN" in its first line, called
+# tranche 3 "THREE QUARTERS PAID", and named the WARRIOR third as the last debt
+# the draft carries — three statements superseded by CI, sitting in the file the
+# count is derived FROM. The same sweep cut a BU-era snapshot out of CLAUDE.md's
+# standing block. **A SIZE WRITTEN INTO A HEADER IS A SIZE NOBODY RE-DERIVES:
+# grep for the NUMBER when a tranche lands, not for the array's name.**
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -4353,7 +4361,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 3 turns — and every ally is\nkindled 2 Faith at the start of\ntheir turn while it holds."}),
+					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 3 turns — and every ally is\nkindled 1 Faith at the start of\ntheir turn while it holds."}),
 				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
 					"target": Ability.Target.ALLY, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "",

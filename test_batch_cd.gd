@@ -232,8 +232,27 @@ func _target() -> void:
 	ok(at >= 0, "CLAUDE.md carries the standing draft reference")
 	# End the slice at the next standing block, so a later batch's prose cannot
 	# quietly extend what this check is reading (the BE anchor lesson).
+	# REPAIRED BY BATCH DG §5, AND IT HAD NEVER ONCE BITTEN. It searched for
+	# "### STANDING" — THREE hashes — against a file in which every heading is
+	# "## STANDING", TWO. `find` returned -1, the guard fell through to the
+	# `stop <= 0` arm, and the slice ran to END OF FILE: 20,949 characters
+	# against the block's 10,337. The assertions below went on passing because
+	# the correct sentence also lives inside the true block, so this was A
+	# CHECK THAT HAD STOPPED ASKING ITS QUESTION WITH NO FAILURE TO ANNOUNCE
+	# IT — in the suite whose whole job is finding exactly that.
+	# THE LEADING NEWLINE IS LOAD-BEARING: `tail` opens mid-heading at the
+	# anchor, so the "## STANDING" it must not match is its OWN, and a leading
+	# "\n" is what excludes it. Anchoring on the bare heading would slice the
+	# block to nothing and every assertion below would go red at once.
 	var tail := cm.substr(at)
-	var stop := tail.find("### STANDING")
+	var stop := tail.find("\n## STANDING")
+	# AND THE GUARD ASSERTS THAT IT RESOLVED, which is the half that was
+	# missing. A fall-through is only silent while nothing asks; an anchor that
+	# stops matching is RED now rather than quietly wide. CP's rule — an
+	# instrument repaired without a negative control is an instrument nobody
+	# has tested — and the control was run: changing the "##" back to "###"
+	# turns this line red on its own.
+	ok(stop > 0, "...and the block's END anchor resolves, so the slice is bounded")
 	var block := tail if stop <= 0 else tail.substr(0, stop)
 	ok(block.length() > 500, "...and the slice covers it (%d chars)" % block.length())
 	for phrase in STALE_TARGET_PHRASES:
@@ -241,8 +260,9 @@ func _target() -> void:
 			"the standing reference states no \"%s\"" % phrase)
 	# RE-POINTED BY BATCH CE, and the question is unchanged: does the STANDING
 	# reference carry the LIVE count against the REAL target? Only the correct
-	# answer moved — CE paid tranche 3's second third, so the draft is 102 and
-	# what is owed is the Hunter and Warrior thirds.
+	# answer moved. COMMENT CORRECTED BY BATCH DG §3 — it still read "the draft
+	# is 102 and what is owed is the Hunter and Warrior thirds", which CH and CI
+	# paid; the draft is 120 of 120 and nothing is owed.
 	ok(block.contains("120 OF 120") or block.contains("120 of 120"),
 		"...it states 120 of 120")
 	# RE-POINTED BY BATCH CI, AND IT IS AN INVERSION: the Warrior third is paid,

@@ -4,6 +4,49 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A check that cannot fail is not a check you still have (Batch DG) — 2026-08-22
+
+Two of the ten reds DG closed were the game being wrong, and both were one word of prose. The other
+eight were not about the game at all. They were checks that had lost their subject.
+
+That is the distinction this batch turned out to be about, and it cuts two ways that look opposite
+and are the same thing.
+
+**Six of them could not pass.** They pinned a list in `CLAUDE.md` that CW's split removed — and the
+rule that list described had been retired to a bare `pass` by Batch AI, long before. So the six had
+no true answer available to them. They were deleted. That breaks a standing rule this project takes
+seriously, "never delete an assertion", and the reason it survives the exception is that the rule
+was written to stop a *live* question being silenced. A question about something that does not
+exist is not a live question. It cannot pass, it cannot fail in a way that means anything, and there
+is nothing to repoint it at. Keeping it red is not evidence of anything; it is a red that the next
+real red gets to hide behind — which is precisely what DF spent a whole batch undoing.
+
+**And one of them could not fail.** `test_batch_cd` sliced `CLAUDE.md` from an anchor and stopped at
+the next standing heading, searching for three hashes in a file that uses two. The search failed
+every time it ran, the guard fell through, and the slice quietly ran to end of file — twice the
+intended reach. Every assertion under it went on passing, because the sentence it was looking for
+happened to live inside the true block as well. Nothing was ever red. The check had stopped asking
+its question and the only symptom was silence.
+
+Those two are the same defect wearing opposite colours: **an assertion whose outcome no longer
+depends on the thing it was written to watch.** One announces itself constantly and means nothing;
+the other says nothing and means nothing. The second is worse, and it was found in the suite whose
+entire job is finding checks that cannot fail — which is the real lesson, because it means the
+hygiene suite had no hygiene check pointed at itself.
+
+The repair is the general answer rather than the specific one: the guard now asserts that it
+*resolved*. A fall-through is only silent while nothing asks. That is one extra check, and it makes
+an anchor that stops matching a red instead of a quiet widening — which is the only reason anyone
+would ever find out.
+
+There is a smaller note underneath all of it about counting. One `CLAUDE.md` block stated the
+draft's size twice, forty-nine lines apart, with different answers, and had done for many batches.
+Grepping for other copies found three more, one of them in the header of the very file the count is
+derived from. **A number written into prose is a number nobody re-derives.** The project already
+knew this — "a second copy of a number is this project's oldest recurring defect" is written into
+`baselines.json` itself — and it still had five live copies of one figure. Knowing the rule and
+holding the copies are apparently not the same skill.
+
 ## A red that sits among stale reds is invisible (Batch DF) — 2026-08-22
 
 Forty-seven assertions had been failing for five batches. Every batch since DB knew the number,

@@ -15,30 +15,30 @@
   "check_cl_resolver": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_cl_width": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": null,
-   "fails_obs": 6,
+   "fails_obs": 7,
    "note": "REPORTS NEITHER COUNT NOR FAILURES — the battery cannot see whether it passed at all. Recorded so the state is a ratchet rather than a blind spot."
   },
   "check_cm": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_cm_live": {
    "kind": "gate",
@@ -46,23 +46,23 @@
     13,
     13
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     4,
     4
    ],
-   "fails_obs": 8,
+   "fails_obs": 9,
    "note": "THE ONE RED THAT IS ON PURPOSE. Identical on unmodified HEAD, recorded as owed in the gate itself. It is the only thing pressing the defensive bar."
   },
   "check_cn": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_co": {
    "kind": "gate",
@@ -70,12 +70,12 @@
     297,
     297
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_cs": {
    "kind": "gate",
@@ -83,12 +83,12 @@
     104,
     104
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_ct": {
    "kind": "gate",
@@ -96,12 +96,12 @@
     113,
     113
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_ct_map": {
    "kind": "scene",
@@ -109,12 +109,12 @@
     83,
     83
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_cy": {
    "kind": "gate",
@@ -122,12 +122,12 @@
     2704,
     2704
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_cz": {
    "kind": "gate",
@@ -135,12 +135,12 @@
     131,
     131
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_da": {
    "kind": "gate",
@@ -148,52 +148,52 @@
     36,
     36
    ],
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 6
+   "fails_obs": 7
   },
   "check_flow": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "check_map": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8,
+   "fails_obs": 9,
    "note": "ITS `fails` FIGURE IS ITS OWN `reach-contiguity failures: N` LINE, not a suite tally — that is what the battery's grep reads here too, and it is a real number worth ratcheting. Not a hang: ~99% CPU for about five minutes. The battery gives it a 600s bound."
   },
   "check_map_screen": {
    "kind": "scene",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": null,
-   "fails_obs": 6,
+   "fails_obs": 7,
    "expect": "check_map_screen: OK",
    "note": "REPORTS NEITHER COUNT NOR FAILURES. Its whole verdict is the one line in `expect`, which is why that line is pinned."
   },
   "check_parse": {
    "kind": "gate",
    "checks": null,
-   "checks_obs": 6,
+   "checks_obs": 7,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8,
+   "fails_obs": 9,
    "note": "Walks res://scripts and res://scenes only — it does NOT cover the suites, the gates or the two fixtures. Its verdict is read off stderr, never off a tally: a --script target whose base class does not resolve prints a parse error, runs not one line, and EXITS 0."
   },
   "harness_1": {
@@ -202,12 +202,12 @@
     22,
     22
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "harness_2": {
    "kind": "harness",
@@ -215,12 +215,12 @@
     165,
     165
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "harness_3": {
    "kind": "harness",
@@ -228,12 +228,12 @@
     8,
     8
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_ah": {
    "kind": "suite",
@@ -241,12 +241,12 @@
     5625,
     5625
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_ah_battle": {
    "kind": "suite",
@@ -254,12 +254,12 @@
     65,
     65
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_ai": {
    "kind": "suite",
@@ -267,12 +267,12 @@
     2217,
     2217
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_aj": {
    "kind": "suite",
@@ -280,12 +280,12 @@
     418,
     418
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_ak": {
    "kind": "suite",
@@ -293,12 +293,12 @@
     528,
     528
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_al": {
    "kind": "suite",
@@ -306,12 +306,12 @@
     559,
     559
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_an": {
    "kind": "suite",
@@ -319,12 +319,12 @@
     6046,
     6063
    ],
-   "checks_obs": 15,
+   "checks_obs": 16,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 15,
+   "fails_obs": 16,
    "note": "THE KNOWN DRIFTER. DF's before-battery read 6046 on UNMODIFIED HEAD — one below a floor that was the lowest of thirteen readings — with 0 failures, 0 throws and all thirteen section headers printed, so nothing stopped running. The floor moves to the reading, per the rule that a band widens where a reading demands it and nowhere else."
   },
   "test_batch_ar": {
@@ -333,41 +333,45 @@
     735,
     735
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_as": {
    "kind": "suite",
    "checks": [
-    396,
-    396
+    394,
+    394
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    2,
-    2
+    0,
+    0
    ],
-   "fails_obs": 1,
-   "note": "TWO OF THE THREE REPAIRED AT DF (the glacial_prison arm count, DA §2). The two that remain are BUCKET 3: they pin CLAUDE.md's EXCLUSIVE-PAIR LIST, which CW §1 dropped with Batch AA's narrative and which exists nowhere in the repo or the archive. See docs/reports/DF.md §3."
+   "fails_obs": 2,
+   "note": "DG §2 PREDICTION, WRITTEN BEFORE THE RUN. Two assertions DELETED — the deliberate, recorded exception to 'never delete an assertion': they pinned CLAUDE.md's EXCLUSIVE-PAIR LIST, which CW's split removed and whose strings exist nowhere in the repo or the archive, guarding a rule Batch AI had already retired to a bare `pass`. 396 -> 394 is the predicted fall; ANY OTHER SIZE MEANS SOMETHING ELSE WAS DELETED TOO. One sibling assertion in the same block is LEFT STANDING and passes VACUOUSLY (it reads a substring of a string that is now empty) — named at its site and carried in docs/state.md as owed, because six is the only sanctioned fall in this batch."
   },
   "test_batch_at": {
    "kind": "suite",
    "checks": [
-    470,
-    470
+    467,
+    467
    ],
-   "checks_obs": 10,
+   "checks_obs": 17,
    "fails": [
-    3,
-    3
+    0,
+    1
    ],
-   "fails_obs": 11,
-   "note": "ALL THREE ARE BUCKET 3 AND UNCHANGED BY DF: the same exclusive-pair list as `as` and `aw`. The suite is otherwise seeded and pinned at 470 since DD."
+   "fails_obs": 18,
+   "note": "FOUND BY THE DG BATTERY DISAGREEING WITH DG'S OWN PREDICTION, AND PREVIOUSLY UNRECORDED. The three exclusive-pair reds are DELETED at DG §2 (470 -> 467, part of the sanctioned fall of six); this row's remaining ceiling of 1 is a DIFFERENT and NEW failure. IT IS NOT DG's: DG's only edits to this file were three deleted file-reading assertions, which consume no RNG, and the check count landed exactly on prediction. THE ±10% DAMAGE ROLL ALONE DOES NOT EXPLAIN 2.40 — modelled over 200,000 trials, ten summed casts a side put the 5th-95th percentile at 2.08-2.26 and P(over the 2.35 ceiling) at 0.1%, about one run in a thousand. So there is a SECOND random term. THE SUITE'S OWN `_spawn` NAMES THE CANDIDATE, on the very helper this check calls: 'THE CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway Resonance adds +1% crit PER STACK, so a same-cast-at-0-vs-12 comparison silently compares 10% crit against 22% crit.' The fixture passes crit:-10.0, which removes the BASE and not the PER-STACK term, so the two populations differ in crit chance as well as in the curve the check means to measure. A model carrying the FULL differential over-predicts (32% red against 1 in 18 observed), so the live term is smaller than that and larger than zero, and ITS SIZE IS NOT ESTABLISHED — do not guess it. THE FIX IS THE DD SHAPE, WHICH DD APPLIED TWICE IN THIS SUITE AND DID NOT REACH THIS ONE: seed both blows of the compared pair, or set crit_bonus back as the file's own comment says checks that care must do. DO NOT WIDEN THE BAND — the band IS the question. DELIBERATELY LEFT FOR ITS OWN BATCH: one flake at a time is how the effect stays attributable, and `bo`'s and `test_rune_battle`'s are both still open.",
+   "flake": {
+    "rate": "1 red in 18 readings — 11 recorded before DG, DG's battery (RED), and six clean ad-hoc re-runs at DG. THE CHECK COUNT IS ROCK STEADY AT 467 ACROSS ALL SEVEN DG READINGS; only the failure moves, which is the flake signature CLAUDE.md names.",
+    "what": "§1 `_live_curve`: `12 stacks roughly DOUBLE his damage` — it sums TEN casts at 0 Resonance and ten at 12 and asserts the ratio is >2.0 and <2.35 against a table value of 2.17. It read 2.40 at DG. THE CHECK IS UNSEEDED: every `_seeded()` call in the file is DOWNSTREAM of it."
+   }
   },
   "test_batch_au": {
    "kind": "suite",
@@ -375,12 +379,12 @@
     336,
     336
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_av": {
    "kind": "suite",
@@ -388,27 +392,27 @@
     324,
     324
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_aw": {
    "kind": "suite",
    "checks": [
-    350,
-    350
+    349,
+    349
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    1,
-    1
+    0,
+    0
    ],
-   "fails_obs": 1,
-   "note": "TWO OF THE THREE REPAIRED AT DF (the ground drip's named constant, DA §1). The one that remains is BUCKET 3 — the exclusive-pair list."
+   "fails_obs": 2,
+   "note": "DG §2 PREDICTION, WRITTEN BEFORE THE RUN. One assertion DELETED, same exclusive-pair subject as `as` and `at`. 350 -> 349. One sibling is LEFT STANDING and passes VACUOUSLY — `claude.find(\"no rune may write\")` is -1, so Godot's substr returns \"\" and every substring is absent from it. THIS THIRD VACUOUS SIBLING WAS FOUND AT DG; DF recorded two."
   },
   "test_batch_ax": {
    "kind": "suite",
@@ -416,12 +420,12 @@
     345,
     345
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_ay": {
@@ -430,12 +434,12 @@
     484,
     484
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_az": {
    "kind": "suite",
@@ -443,12 +447,12 @@
     519,
     519
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_ba": {
    "kind": "suite",
@@ -456,12 +460,12 @@
     690,
     690
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bb": {
    "kind": "suite",
@@ -469,12 +473,12 @@
     177,
     177
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bc": {
@@ -483,12 +487,12 @@
     91,
     91
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bd": {
    "kind": "suite",
@@ -496,12 +500,12 @@
     71,
     71
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_be": {
@@ -510,12 +514,12 @@
     34,
     34
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bf": {
    "kind": "suite",
@@ -523,12 +527,12 @@
     78,
     78
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bg": {
    "kind": "suite",
@@ -536,12 +540,12 @@
     47,
     47
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bh": {
    "kind": "suite",
@@ -549,12 +553,12 @@
     233,
     233
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bi": {
    "kind": "suite",
@@ -562,12 +566,12 @@
     91,
     91
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bj": {
    "kind": "suite",
@@ -575,13 +579,13 @@
     67,
     67
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    1,
-    1
+    0,
+    0
    ],
-   "fails_obs": 9,
-   "note": "BUCKET 2 AND DELIBERATELY NOT REPAIRED. THE ASSERTION IS RIGHT AND THE GAME IS WRONG: Consecrated Ground's card in classes.gd reads 'kindled 2 Faith' where FAITH_PER_GROUND_TURN pays 1. CZ raised the constant 1->2 and moved the card with it; DA reverted the constant and left the card. master.html says 1 and is right. A design question, reported at DF."
+   "fails_obs": 10,
+   "note": "DG §1 REPAIR, PREDICTED BEFORE THE RUN. The assertion was RIGHT and the game was WRONG: Consecrated Ground's card in classes.gd read 'kindled 2 Faith' where FAITH_PER_GROUND_TURN pays 1. THE RULING WENT TO THE CARD — it reads 'kindled 1 Faith' now and the constant did NOT move, because DA's revert was deliberate and raising the drip would partly reopen what it closed. Check count unmoved at 67: the assertion is unchanged, the file it reads was corrected."
   },
   "test_batch_bk": {
    "kind": "suite",
@@ -589,12 +593,12 @@
     129,
     130
    ],
-   "checks_obs": 10,
+   "checks_obs": 11,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 10,
+   "fails_obs": 11,
    "note": "Generates real zone maps and then walks them, so its count is a function of the topology it rolled. BOTH ENDS WERE OBSERVED IN ONE BATCH AND IT IS NOT WIDENED, because it has not been exceeded: headroom goes where a reading demands it."
   },
   "test_batch_bl": {
@@ -603,12 +607,12 @@
     88,
     88
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bm": {
    "kind": "suite",
@@ -616,12 +620,12 @@
     1891,
     1891
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bn": {
    "kind": "suite",
@@ -629,12 +633,12 @@
     81,
     81
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bo": {
@@ -643,17 +647,17 @@
     1025,
     1025
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    1,
-    2
+    0,
+    1
    ],
-   "fails_obs": 5,
+   "fails_obs": 6,
    "flake": {
     "rate": "~1 failure in 13 runs",
     "what": "§5's NULL FIELD check compares two variance-rolled blows with a bare `<`"
    },
-   "note": "UNCHANGED AT DF AND STILL TWO SEPARATE REDS. The floor of 1 is BUCKET 3 — `TRANCHES 2 AND 3` names a debt that no longer exists (the draft is 120 of 120, counted from classes.gd) inside the same stale CLAUDE.md block as `ce`'s. The ceiling of 2 is the known §5 NULL FIELD flake, still unseeded and deliberately left."
+   "note": "DG §3 REPAIR, PREDICTED BEFORE THE RUN. THE FLOOR OF 1 IS REPAIRED AND THE CEILING OF 1 IS THE FLAKE. §6's `TRANCHES 2 AND 3` pin is INVERTED: it asserted CLAUDE.md named them as the debt that REMAINS; the draft is 120 of 120, so it asserts they are recorded as PAID. REPOINTING WAS NOT OPTIONAL — DG's corrected prose contains the phrase 'TRANCHES 2 AND 3', so the old assertion would have gone GREEN carrying a message that states a dead debt, which is a check passing by accident. The remaining ceiling of 1 is the known §5 NULL FIELD flake, still unseeded and deliberately left: one flake at a time is how the effect stays attributable. Check count unmoved at 1025."
   },
   "test_batch_bp": {
    "kind": "suite",
@@ -661,12 +665,12 @@
     275,
     275
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bq": {
    "kind": "suite",
@@ -674,12 +678,12 @@
     742,
     742
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_br": {
@@ -688,12 +692,12 @@
     1450,
     1450
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bs": {
@@ -702,12 +706,12 @@
     266,
     266
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   },
   "test_batch_bt": {
    "kind": "suite",
@@ -715,12 +719,12 @@
     458,
     458
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bu": {
@@ -729,12 +733,12 @@
     480,
     480
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bv": {
@@ -743,12 +747,12 @@
     900,
     900
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bw": {
@@ -757,12 +761,12 @@
     551,
     551
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bx": {
@@ -771,13 +775,13 @@
     147,
     147
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    1,
-    1
+    0,
+    0
    ],
-   "fails_obs": 1,
-   "note": "ONE OF THE TWO REPAIRED AT DF (the CW batch-block pin). The one that remains is BUCKET 2: data/glossary.json still reads 'beast' once in prose, which belongs to the prose-rename pass."
+   "fails_obs": 2,
+   "note": "DG §4 REPAIR, PREDICTED BEFORE THE RUN. data/glossary.json's hero_vs_ally entry read 'pay the four and not the beast' — the COMMON NOUN, in player-facing prose, a straggler from the prose-rename pass. It reads 'the companion' now. THE IDENTIFIERS WERE NOT TOUCHED: beastmaster/Beastmaster/BEASTMASTER are on the do-not-rename list and bm_beast_within / bm_no_beast_left move the save format. Check count unmoved at 147."
   },
   "test_batch_cb": {
    "kind": "suite",
@@ -785,27 +789,27 @@
     1184,
     1184
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 1,
+   "fails_obs": 2,
    "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_cd": {
    "kind": "suite",
    "checks": [
-    71,
-    71
+    72,
+    72
    ],
-   "checks_obs": 5,
+   "checks_obs": 6,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 5,
-   "note": "TWO READINGS, both at DE. The count is NEW at DE — the differ moved out into check_de, taking 136 checks with it (207 -> 71). What remains reads the project SOURCE and DATA, which the runner cannot do."
+   "fails_obs": 6,
+   "note": "DG §5 PREDICTION, WRITTEN BEFORE THE RUN. 71 -> 72, A RISE, AND IT IS THE REPAIR WORKING. §2's anchor guard searched for '### STANDING' against a file whose seventeen headings are all '## STANDING', so find() returned -1, the guard fell through and the slice ran to end of file: 21,532 chars against the block's 10,917. Nothing was red — the correct sentence also lives inside the true block — so it was a check that had stopped asking its question with nothing to announce it, inside the suite whose job is finding exactly that. The anchor is repaired AND the guard now asserts that it RESOLVED (`stop > 0`), which is the +1: a fall-through is only silent while nothing asks. NEGATIVE CONTROL RUN AT DG: reverting the anchor to three hashes turns that one line red at 72 checks / 1 failure, where the same break previously produced zero failures."
   },
   "test_batch_ce": {
    "kind": "suite",
@@ -813,13 +817,13 @@
     1116,
     1116
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
-    1,
-    1
+    0,
+    0
    ],
-   "fails_obs": 1,
-   "note": "EIGHT OF THE NINE REPAIRED AT DF — four CY delay pins and four FAITH_RELEASE 5->3 assertions DC's sweep did not reach. The one that remains is BUCKET 3: `SECOND CLASS COMPLETE` pins a progress milestone inside CLAUDE.md's ABILITY DRAFT block, which is itself a stale BU-era snapshot (it reads '66 of a target 120'; the draft is 120 of 120)."
+   "fails_obs": 2,
+   "note": "DG §3 REPAIR, PREDICTED BEFORE THE RUN. §5's `SECOND CLASS COMPLETE` pin is INVERTED rather than deleted, on the idiom BP/BQ/BR used as each debt was paid: it asserts the completion ORDER now (THE CLERIC SECOND, ALL FOUR ARE COMPLETE), because all four classes are complete and a progress milestone is no longer the thing a later batch could break. The stale BU-era half of CLAUDE.md's ABILITY DRAFT block — which stated the draft's size a second time, 49 lines below the correct one — is cut. Check count unmoved at 1116."
   },
   "test_batch_cp": {
    "kind": "suite",
@@ -827,12 +831,12 @@
     697,
     697
    ],
-   "checks_obs": 5,
+   "checks_obs": 6,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 5,
+   "fails_obs": 6,
    "note": "In no SUITES array until DE, and run only by test_batch_cd's private sweep before that. DE puts it in the battery, so this is its first reading from the runner and it agrees with the sweep's."
   },
   "test_rune_battle": {
@@ -841,12 +845,12 @@
     97,
     97
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     1
    ],
-   "fails_obs": 17,
+   "fails_obs": 18,
    "flake": {
     "rate": "2 red in 15 readings — roughly 1 in 7, and BOTH reds landed under machine load",
     "what": "§ pyromancer: `rune_resist_pierce never fired against a resistant warband` — the White Flame's only read site, asserted by driving a LIVE battle against a fire-resistant warband and looking for `Rune: the flame bites through resistance` in a snapshot or the log. The proc has to actually land; test_rune_battle calls seed() ZERO times."
@@ -859,12 +863,12 @@
     3121,
     3121
    ],
-   "checks_obs": 8,
+   "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 8
+   "fails_obs": 9
   }
  }
 }

@@ -520,16 +520,28 @@ func _claude_md() -> void:
 	# The pair must leave the ACTIVE list — read out of the parenthetical the
 	# rule names, not the whole file, because the dissolution itself is recorded
 	# in prose right after it (the AS pattern: never let an entry quietly vanish).
+	# BATCH DG §2 — ASSERTIONS DELETED HERE, AND IT IS A DELIBERATE EXCEPTION TO
+	# "NEVER DELETE AN ASSERTION", RECORDED AS ONE. They pinned CLAUDE.md's
+	# EXCLUSIVE-PAIR LIST. CW §1 removed that list along with Batch AA's
+	# narrative, and THE STRINGS EXIST NOWHERE — not in CLAUDE.md, master.html,
+	# the live changelog, or changelog-archive.html, which reaches back to Batch
+	# 1, so this is not an archiving gap. The rule they guarded was already dead
+	# when CW dropped it: the removed block's own closing sentence records that
+	# Batch AI retired `test_runes._exclusives` to a bare `pass`.
+	# THE NEVER-DELETE RULE PROTECTS A LIVE QUESTION FROM BEING SILENCED, AND
+	# THIS IS NOT ONE. A check asking about a deleted feature cannot pass, cannot
+	# fail meaningfully, and cannot be repointed at anything. The live half of
+	# the question survives above, asserted off the TREE, where "these two nodes
+	# share a lane and sit in different rows" is true and checkable.
+	# CARRIED AND NAMED: the assertion below now passes VACUOUSLY — `at` is -1,
+	# so `active` is the empty string and every substring is absent from it. It
+	# is left standing rather than deleted because DG's sanctioned fall is the
+	# six REDS and nothing else, and it is recorded as owed in docs/state.md
+	# with its two siblings in `as` and `aw`.
 	var at := claude.find("EXCLUSIVE talent pair (")
-	ok(at >= 0, "CLAUDE.md still states the no-rune-writes-an-exclusive-half rule")
 	var active := claude.substr(at, claude.find(" — cold_snap", at) - at) if at >= 0 else ""
 	ok(not active.contains("arcane_ward/still_mind"),
 		"the arcane_ward/still_mind pair is gone from the ACTIVE list")
-	ok(claude.contains("arcane_ward/still_mind DISSOLVED IN BATCH AT"),
-		"...and it says so, rather than the entry quietly vanishing")
-	ok(claude.contains("heat_haze/scorched") and claude.contains("cascade/overflow")
-			and claude.contains("stalwart/bastion") and claude.contains("pact_flesh/barter"),
-		"...and the remaining pairs are left alone")
 
 
 # ---------- live ----------

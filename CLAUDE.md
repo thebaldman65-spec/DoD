@@ -767,6 +767,27 @@ minutes to about 50.** That was a design error in the brief, not in the implemen
   spawn. A subset invocation (`./run_battery.sh bo bp`) writes a short manifest and **the differ
   says so instead of reporting a clean tree.**
 
+## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
+> **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline
+> written afterwards records whatever happened; written first, it is a test. **The difference is
+> whether the batch can fail.**
+
+- **A BASELINE WRITTEN AFTER THE RUN CANNOT DISAGREE WITH IT.** Filling `baselines.json` in from
+  the log is bookkeeping wearing the clothes of a check: every row matches, because every row was
+  copied from the thing it claims to verify. **The file is only an instrument while the numbers in
+  it were committed to in advance.**
+- **PREDICT EVERY ROW YOU EXPECT TO MOVE, AND SAY WHICH DIRECTION AND BY HOW MUCH.** "The count
+  falls" is not a prediction; "`as` falls by exactly two, `at` by three, `aw` by one, and nothing
+  else moves" is. **A fall of the wrong SIZE is the same alarm as a fall nobody sanctioned** —
+  it means something was deleted that the batch did not mean to delete.
+- **THE TWO-SIDED FORM IS WHAT MAKES IT AN ACCEPTANCE TEST.** A smaller movement than predicted
+  means a repair did not land. A LARGER one means something was repaired, deleted or broken by
+  accident. **Both are reported rather than banked**, and neither is visible at all if the table
+  was written from the run.
+- **THIS EXTENDS THE RULE THAT A BASELINE MOVES ONLY IN THE BATCH THAT CAUSES THE MOVEMENT.** That
+  rule says WHEN a row may move; this one says WHEN IT MAY BE WRITTEN. Together they are what stop
+  the table drifting into whatever the code happens to do.
+
 ## HARD CONTROL LANDS ON A BOSS ONLY ONCE IT IS BROKEN (STANDING, SET AT BATCH CR §1)
 > **Hard control lands on a boss only once that boss is BROKEN. Never before.**
 
@@ -916,6 +937,21 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   agree, repair to the intended value anyway — the habit is the point.**
 - **A SUITE THAT STOPS ASSERTING IS THE FAILURE BEING FIXED, NOT A WAY OF FIXING IT.** Deleting a
   check to reach green destroys exactly the thing that would have caught the next regression.
+- **THE ONE EXCEPTION, AND IT IS NARROW (STANDING, SET AT DG §2): A CHECK ASKING ABOUT A DELETED
+  FEATURE IS NOT A LIVE QUESTION.** This rule exists to stop a live question being silenced. A
+  check whose SUBJECT no longer exists anywhere — not in the code, not in the documents, not in
+  the archive — **cannot pass, cannot fail meaningfully, and cannot be repointed at anything**,
+  and keeping it red is not evidence: it is noise that hides the next real red. DG deleted six
+  assertions pinning `CLAUDE.md`'s **exclusive-pair list**, whose strings CW's split removed and
+  whose rule Batch AI had already retired to a bare `pass`.
+  - **THE EXCEPTION IS PAID FOR WITH A PREDICTION, NOT WITH A JUDGEMENT.** State the exact
+    post-deletion count in `baselines.json` BEFORE the run. **A fall of the wrong SIZE is the same
+    alarm as an unsanctioned one** — it means something else went with it — and that prediction is
+    the only thing standing between this exception and the failure the rule exists to prevent.
+  - **RECORD IT AT THE DELETION SITE**, in a comment where the assertions stood, naming what they
+    asked and why the subject is gone. A reader who finds a gap learns nothing.
+  - **IF THE SUBJECT EXISTS ANYWHERE AT ALL, THIS IS NOT THE EXCEPTION — REPOINT INSTEAD.** The
+    test is whether a true answer is available to the check, not whether one is convenient.
 - **THE CHECK COUNT EITHER SIDE IS THE AUDIT, AND IT IS CHEAP.** A repaired assertion leaves the
   count UNCHANGED. **If a suite's count moves across a repair pass, an assertion was removed
   rather than repointed** — report the count before and after, per suite. DC's five moved by zero
@@ -963,6 +999,17 @@ places** — the cap on the count, the release branch, and Communion's "still bu
 - **THE ORDER THAT CATCHES IT: the constant, then every call site, then every STRING that states
   the number.** Grep the number, not the field — the card says "2 Faith", not
   `FAITH_PER_GROUND_TURN`.
+- **THE CASE IS CLOSED AT DG §1, AND THE RULING WENT TO THE CARD.** The card reads "kindled 1
+  Faith" again and **`FAITH_PER_GROUND_TURN` did not move**. DA's revert was deliberate: at the
+  reverted magnitudes an absorbed hit was very nearly a whole release and a shielded ally never
+  held Faith at all, so **raising the ground drip to match the card would have partly reopened
+  what that revert closed**. The prose was wrong, not the constant.
+- **AND THE SWEEP FOUND THE CARD WAS THE ONLY STALE SURFACE.** Five places speak this number —
+  the card, the Devout's `passive_desc`, the `faith` status chip, `data/glossary.json` and
+  `docs/master.html` — **and the other four all read 1 already.** DC's two repairs were to the
+  ABSORB magnitude, a different constant reverted in the same batch. **When a batch reverts two
+  constants at once, sweep them as two sweeps**, or the one with fewer surfaces looks finished
+  because the other one was.
 
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
@@ -2143,33 +2190,39 @@ and needed no repair at all. **A later tranche that deepened a pool would move t
 NOT their answers**, which is what makes this the last time they could need it. **A construction
 that has to relocate is how a paid debt announces itself; one that can no longer relocate is how
 a finished one does.**
-**TRANCHE 2 IS COMPLETE (BT the Mage nine, BU the Cleric nine, BV the Hunter nine, BW the WARRIOR
-nine) — IT TOOK `SPEC_DRAFT_POOLS` TO 60 AND THE DRAFT TO 84 OF 120, AND ALL TWELVE SPECS DRAFTED
-FROM FIVE.** The Warrior deficit that had been the visible shape of the debt since BP
-is paid; what is still owed is TRANCHE 3, and it is owed by all twelve equally rather than by three
-of them. **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has
-refused or taken most of a pool, which is the no-return ledger working. Every draft suite's
-per-spec depth loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche
-asserted its own asymmetry), and **test_batch_bo's fill-short construction had to move for the
-THIRD time** — onto a hero worn down by `draft_refused`, because there is no thin pool left in the
-game to build it on. **BV PREDICTED THAT FORCED MOVE IN WRITING and called it the honest signal
-that the debt is paid. It is.**
+**TRANCHES 2 AND 3 ARE BOTH PAID, AND THE SPEC-DEPTH DEBT THEY MEASURED IS CLOSED (Batch DG §3).**
+Tranche 2 took `SPEC_DRAFT_POOLS` to 60 and every spec to FIVE (BT the Mage nine, BU the Cleric
+nine, BV the Hunter nine, BW the WARRIOR nine); tranche 3 took it to 96 and every spec to EIGHT
+(CB the Mage nine, CE the Cleric nine, CH the Hunter nine, CI the WARRIOR nine). **THE FOUR
+CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTER THIRD AND THE
+WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
+SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, IS 120 OF 120.**
+**NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
+or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
+loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own
+asymmetry), and **test_batch_bo's fill-short construction had to move for the THIRD time** — onto
+a hero worn down by `draft_refused`, because there is no thin pool left in the game to build it
+on. **BV PREDICTED THAT FORCED MOVE IN WRITING and called it the honest signal that the debt is
+paid. It is.**
 **THE WARRIOR POOLS WERE OWED AND ARE PAID (Batch BP) — do not re-record them as empty.** All
 three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
 two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
-Swordmaster Precision Strike / Feint), so **`SPEC_DRAFT_POOLS` is 24 entries and every spec has a
-draft.** **THE CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT RE-RECORD ANY OF IT
-AS OWED.** BQ shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so
-`CLASS_DRAFT_POOLS` is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
-EVERY HERO IN THE GAME** — no class rolls an empty pool and no offer loses its class card. The
-draft holds **66 of a target 120 (Batch BU)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
-SHAPE OF THE DEBT RATHER THAN A BUG: the three MAGE specs and the three CLERIC specs draft from
-FIVE apiece; the HUNTER and WARRIOR six are still at TWO.** BT paid the first third of tranche 2
-and BU the second; the Hunter and Warrior thirds are owed next, and tranche 3 after them. So a
-Cryomancer's or a Devout's offer comes up FULL where a Warden's still fills SHORT —
-test_batch_bu asserts both halves (five for the six deep pools, two for the other six) and
-test_batch_br still drives the fill-short rule on a worn-down pool, so the debt stays visible in
-code rather than only in prose.
+Swordmaster Precision Strike / Feint), which took `SPEC_DRAFT_POOLS` to 24 entries and gave every
+spec a draft. **It stands at 96 now, and 24 is the CLASS-WIDE figure** — the two were one digit
+apart in one paragraph, which is how the stale half below went unread for so long. **THE
+CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT RE-RECORD ANY OF IT AS OWED.** BQ
+shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so `CLASS_DRAFT_POOLS`
+is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR EVERY HERO IN THE
+GAME** — no class rolls an empty pool and no offer loses its class card.
+**AND THE SNAPSHOT THAT SAT HERE IS CUT (Batch DG §3), WHICH IS THE ACTUAL FINDING.** This
+paragraph used to read that the draft held sixty-six of a target 120 (Batch BU), that
+`SPEC_DRAFT_POOLS` was 24 entries, and that the HUNTER and WARRIOR six were still at two — **a
+BU-era snapshot sitting 49 lines below the line that already said 120 OF 120, inside one standing
+block, with different answers.** **IT SURVIVED CW's SPLIT BECAUSE THAT SWEEP WAS FOR NARRATIVE
+FORM AND THIS WAS NARRATIVE IN EVERY WAY BUT ITS FORMATTING** — a superseded snapshot wearing a
+STANDING heading. **A STANDING BLOCK STATES A NUMBER ONCE.** Two assertions pinned phrases from
+this half — `test_batch_bo` §6 and `test_batch_ce` §5 — and both are INVERTED to protect the
+record of COMPLETION instead, which is the idiom BP, BQ and BR each used as a debt was paid.
 **CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
 read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND

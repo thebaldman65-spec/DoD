@@ -412,8 +412,24 @@ func _dissolved_pair() -> void:
 	# has to stop claiming it (test_runes._exclusives has been a bare `pass`
 	# since Batch AI, so nothing else was watching).
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
-	ok(claude.contains("stalwart/bastion DISSOLVED IN BATCH AW"),
-		"CLAUDE.md's exclusive list records the pair as DISSOLVED, not live")
+	# BATCH DG §2 — ASSERTIONS DELETED HERE, AND IT IS A DELIBERATE EXCEPTION TO
+	# "NEVER DELETE AN ASSERTION", RECORDED AS ONE. They pinned CLAUDE.md's
+	# EXCLUSIVE-PAIR LIST. CW §1 removed that list along with Batch AA's
+	# narrative, and THE STRINGS EXIST NOWHERE — not in CLAUDE.md, master.html,
+	# the live changelog, or changelog-archive.html, which reaches back to Batch
+	# 1, so this is not an archiving gap. The rule they guarded was already dead
+	# when CW dropped it: the removed block's own closing sentence records that
+	# Batch AI retired `test_runes._exclusives` to a bare `pass`.
+	# THE NEVER-DELETE RULE PROTECTS A LIVE QUESTION FROM BEING SILENCED, AND
+	# THIS IS NOT ONE. A check asking about a deleted feature cannot pass, cannot
+	# fail meaningfully, and cannot be repointed at anything. The live half of
+	# the question survives above, asserted off the TREE, where "these two nodes
+	# share a lane and sit in different rows" is true and checkable.
+	# CARRIED AND NAMED: the assertion below now passes VACUOUSLY — `find` is
+	# -1, so Godot's `substr` returns "" and every substring is absent from it.
+	# It is left standing rather than deleted because DG's sanctioned fall is
+	# the six REDS and nothing else, and it is recorded as owed in
+	# docs/state.md with its two siblings in `as` and `at`.
 	var live_list := claude.substr(claude.find("no rune may write"), 120)
 	ok(not live_list.contains("stalwart/bastion"),
 		"...and it is out of the LIVE half of that list")

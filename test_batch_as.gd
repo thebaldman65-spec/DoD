@@ -449,16 +449,25 @@ func _dissolved_pair() -> void:
 	ok(int(by_id["cr_cold_snap"]["row"]) != int(by_id["cr_bitter"]["row"]),
 		"...and different rows, so BOTH are reachable")
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
+	# BATCH DG §2 — ASSERTIONS DELETED HERE, AND IT IS A DELIBERATE EXCEPTION TO
+	# "NEVER DELETE AN ASSERTION", RECORDED AS ONE. They pinned CLAUDE.md's
+	# EXCLUSIVE-PAIR LIST. CW §1 removed that list along with Batch AA's
+	# narrative, and THE STRINGS EXIST NOWHERE — not in CLAUDE.md, master.html,
+	# the live changelog, or changelog-archive.html, which reaches back to Batch
+	# 1, so this is not an archiving gap. The rule they guarded was already dead
+	# when CW dropped it: the removed block's own closing sentence records that
+	# Batch AI retired `test_runes._exclusives` to a bare `pass`.
+	# THE NEVER-DELETE RULE PROTECTS A LIVE QUESTION FROM BEING SILENCED, AND
+	# THIS IS NOT ONE. A check asking about a deleted feature cannot pass, cannot
+	# fail meaningfully, and cannot be repointed at anything. The live half of
+	# the question survives above, asserted off the TREE, where "these two nodes
+	# share a lane and sit in different rows" is true and checkable.
+	# CARRIED AND NAMED: the assertion below now passes VACUOUSLY — the pair is
+	# absent because the WHOLE LIST is. It is left standing rather than deleted
+	# because DG's sanctioned fall is the six REDS and nothing else, and it is
+	# recorded as owed in docs/state.md with its two siblings in `at` and `aw`.
 	ok(not claude.contains("(heat_haze/scorched, cold_snap/"),
 		"CLAUDE.md's exclusive-pair LIST no longer names the dissolved pair")
-	ok(claude.contains("cold_snap/bitter_cold DISSOLVED"),
-		"...and it says so, rather than the entry quietly vanishing")
-	ok(claude.contains("heat_haze/scorched")
-			and claude.contains("arcane_ward/still_mind")
-			and claude.contains("cascade/overflow")
-			and claude.contains("stalwart/bastion")
-			and claude.contains("pact_flesh/barter"),
-		"...and the other five pairs are left alone")
 
 
 # ---------- live ----------

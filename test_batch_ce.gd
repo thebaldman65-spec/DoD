@@ -546,9 +546,15 @@ func _docs() -> void:
 	var cm := _src("res://CLAUDE.md")
 	ok(cm.contains("BATCH CE"), "CLAUDE.md carries the batch block")
 	ok(cm.contains("BATCH CG"), "...and CG's, which revised it")
-	ok(cm.contains("SECOND CLASS COMPLETE") or cm.contains("second complete class")
-		or cm.contains("SECOND COMPLETE CLASS"),
-		"...and records that the Cleric is the second class complete")
+	# INVERTED BY BATCH DG §3, on the same idiom as test_batch_bo §6. This
+	# asserted that CLAUDE.md recorded the Cleric as the SECOND CLASS COMPLETE —
+	# a progress milestone in a draft that was still in progress. All four
+	# classes are complete now, so the milestone is not the thing a later batch
+	# could break; the ORDER they completed in is, and the Cleric's place in it
+	# is what this suite's own batch bought. The phrase had also left the file
+	# with CW's split, so this had been red rather than merely stale.
+	ok(cm.contains("THE CLERIC SECOND") and cm.contains("ALL FOUR ARE COMPLETE"),
+		"...and records the completion ORDER, the Cleric second of four")
 	var notes := _src("res://docs/design-notes.md")
 	ok(notes.contains("Batch CE"), "design-notes.md carries a why entry")
 	var gl := _src("res://data/glossary.json")

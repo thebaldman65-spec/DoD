@@ -212,8 +212,12 @@ func _pools() -> void:
 	# pools are 60 plus the Mage nine and the whole draft is 93. The check is
 	# what would catch a pool quietly EMPTYING, which is why it is a pinned
 	# count rather than a range.
+	# RE-POINTED BY BATCH CI and the MESSAGE CORRECTED BY BATCH DG §3: it named
+	# 60 plus two nines — 78 — while asserting 96, because CH's and CI's thirds
+	# landed after it was last rewritten. The count was right and the sentence
+	# beside it was three tranches old.
 	ok(spec_total == 96,
-		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine and CE's Cleric nine (%d)"
+		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus the Mage, Cleric, Hunter and Warrior nines (%d)"
 			% spec_total)
 	ok(spec_total + total == 120,
 		"§0+tranche 3: the draft holds 120 of a target 120 (%d)" % (spec_total + total))

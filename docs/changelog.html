@@ -14,6 +14,137 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-22 &mdash; Batch DG: THE LAST TEN</h2>
+<p><i>DF sorted the battery&rsquo;s 47 reds and repaired 37 of them; <b>these are the ten that
+needed a ruling, and all ten are closed</b>. Two were the game being wrong and both were prose;
+six asked about a feature that has not existed for dozens of batches and are <b>deleted, as a
+recorded exception</b>; two pinned milestones inside a standing block that <b>stated the draft&rsquo;s
+size twice, 49 lines apart, with different answers</b>. Two instrument faults DF reported out of
+scope are also closed: <b><code>test_batch_cd</code>&rsquo;s anchor guard had never once bitten</b>,
+and <code>an</code>&rsquo;s floor was already widened. <b>No save version moves (still v10).</b> The
+full report is <code>docs/reports/DG.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; CONSECRATED GROUND&rsquo;S CARD GOES BACK TO 1, AND THE CONSTANT DOES NOT MOVE</h3>
+<p><b>The card is the half that was wrong.</b> <code>classes.gd</code> told the player &ldquo;every
+ally is kindled <b>2</b> Faith at the start of their turn&rdquo; while
+<code>battle.FAITH_PER_GROUND_TURN</code> paid <b>1</b>. CZ raised the constant 1 &rarr; 2 and moved
+the card with it, correctly; <b>DA reverted the constant and left the card behind.</b> The card now
+reads &ldquo;kindled 1 Faith&rdquo; and <b><code>FAITH_PER_GROUND_TURN</code> is untouched.</b></p>
+<p><b>DA&rsquo;S REVERT WAS DELIBERATE AND IS NOT REOPENED.</b> At the reverted magnitudes an
+absorbed hit was very nearly a whole release and a shielded ally never held Faith at all &mdash;
+<b>raising the ground drip to match the card would have partly reopened exactly what that revert
+closed</b>, which is why the prose moved and the number did not.</p>
+<p><b>AND THE SWEEP FOUND THE CARD WAS THE ONLY STALE SURFACE.</b> Five places speak this number
+&mdash; the card, the Devout&rsquo;s <code>passive_desc</code>, the <code>faith</code> status chip,
+<code>data/glossary.json</code> and <code>docs/master.html</code> &mdash; <b>and the other four all
+read 1 already.</b> DC&rsquo;s two repairs were to the ABSORB magnitude, a <i>different</i> constant
+reverted in the same batch. <b>When a batch reverts two constants at once, sweep them as two
+sweeps</b>, or the one with fewer surfaces looks finished because the other one was.</p>
+
+<h3>&sect;2 &mdash; THE EXCLUSIVE-PAIR SIX ARE DELETED, AS A RECORDED EXCEPTION</h3>
+<p>Six assertions (<code>as</code> 2, <code>at</code> 3, <code>aw</code> 1) pinned
+<code>CLAUDE.md</code>&rsquo;s EXCLUSIVE-PAIR LIST. <b>CW&rsquo;s split removed that list with Batch
+AA&rsquo;s narrative and the strings exist nowhere</b> &mdash; not in <code>CLAUDE.md</code>,
+<code>master.html</code>, the live changelog or <code>changelog-archive.html</code>, which reaches
+back to Batch 1. <b>And the rule they guarded was already dead when CW dropped it: the removed
+block&rsquo;s own closing sentence records that Batch AI retired
+<code>test_runes._exclusives</code> to a bare <code>pass</code>.</b></p>
+<p><b>THIS IS A DELIBERATE EXCEPTION TO &ldquo;NEVER DELETE AN ASSERTION&rdquo;, AND IT IS RECORDED
+AS ONE</b> &mdash; in <code>CLAUDE.md</code> beside the rule it excepts, and in a comment at each of
+the three deletion sites. That rule protects a live question from being silenced. <b>A check asking
+about a deleted feature is not a live question</b>: it cannot pass, cannot fail meaningfully, and
+cannot be repointed at anything. <b>THE EXCEPTION IS PAID FOR WITH A PREDICTION</b> &mdash; the
+post-deletion counts were written into <code>baselines.json</code> BEFORE the verification run, so
+<b>a fall of any size other than exactly six is the alarm</b>, meaning something else went with
+them.</p>
+<p><b>THREE SIBLINGS IN THE SAME BLOCKS PASS VACUOUSLY AND ARE DELIBERATELY LEFT STANDING</b>
+&mdash; one each in <code>as</code>, <code>at</code> and <code>aw</code>, each reading a substring
+of a string that is now empty. <b>DF recorded two of them; the third, in <code>aw</code>, is found
+here.</b> They are not deleted because <b>six is the only sanctioned fall in this batch</b>, and
+they are named at their sites and carried in <code>docs/state.md</code> as owed.</p>
+
+<h3>&sect;3 &mdash; ONE STANDING BLOCK STATED THE DRAFT&rsquo;S SIZE TWICE, AND THE SWEEP FOUND THREE MORE</h3>
+<p><code>CLAUDE.md</code>&rsquo;s <code>STANDING REFERENCE &mdash; THE ABILITY DRAFT</code> block
+said <b>&ldquo;120 OF 120 AND NOTHING IS OWED&rdquo; at line 2116</b> and, <b>49 lines further
+down</b>, that the draft held sixty-six of a target 120, that <code>SPEC_DRAFT_POOLS</code> was 24
+entries, and that the HUNTER and WARRIOR six were still at two. <b>The superseded half is cut</b>
+and replaced with the record of COMPLETION: <b>96 spec across twelve specs at eight, plus 24
+class-wide across four pools of six, is 120 of 120.</b> <b>It survived CW&rsquo;s split because that
+sweep was for narrative FORM, and a superseded snapshot wearing a STANDING heading is narrative in
+every way but its formatting.</b></p>
+<p><b>THE TWO ASSERTIONS ARE INVERTED RATHER THAN DELETED</b>, on the idiom BP, BQ and BR each used
+as a debt was paid: <code>test_batch_bo</code> §6 asserted that <code>CLAUDE.md</code> named
+<code>TRANCHES 2 AND 3</code> as the debt that <i>remains</i> and now asserts they are recorded as
+PAID; <code>test_batch_ce</code> §5 asserted the Cleric was the &ldquo;second class complete&rdquo;
+and now asserts the completion ORDER, the Cleric second of four. <b>Repointing was not optional:
+the corrected prose contains the phrase <code>TRANCHES 2 AND 3</code>, so the old assertion would
+have gone green with a message stating a debt that does not exist</b> &mdash; a check passing by
+accident, which this project treats as worse than a red.</p>
+<p><b>AND THE GREP FOR OTHER STATEMENTS OF THE SIZE FOUND THREE MORE, ALL IN LIVE PROSE.</b>
+<code>scripts/classes.gd</code> &mdash; <b>the file the count is derived FROM</b> &mdash; headed its
+draft section <b>&ldquo;ONE HUNDRED AND ELEVEN OF A TARGET 120&rdquo;</b>, called tranche 3
+&ldquo;THREE QUARTERS PAID&rdquo;, and named the Warrior third as the last debt the draft carries;
+all three were superseded by CI. Three assertion MESSAGES stated stale sizes beside correct counts
+(<code>bv</code> and <code>bw</code> read &ldquo;102 of a target 120&rdquo; while asserting 120;
+<code>br</code> named 60 plus two nines while asserting 96). <b>A message that states a wrong size
+teaches it to whoever reads the failure</b> &mdash; CD §2&rsquo;s rule, applied to the size rather
+than to the old target it was written for. <b>Every one of these is prose: no count moves.</b></p>
+
+<h3>&sect;4 &mdash; THE GLOSSARY&rsquo;S LAST &ldquo;beast&rdquo; WAS PROSE</h3>
+<p><b>It was PROSE, so it was fixed.</b> <code>data/glossary.json</code>&rsquo;s
+<code>hero_vs_ally</code> entry read &ldquo;most party-wide talents deliberately pay the four and not
+the <b>beast</b>&rdquo; &mdash; the common noun, in player-facing text, a straggler from the prose
+rename. It reads &ldquo;the companion&rdquo; now. <b>THE IDENTIFIERS WERE NOT TOUCHED</b>:
+<code>beastmaster</code>/<code>Beastmaster</code>/<code>BEASTMASTER</code> are on the deliberate
+do-not-rename list, and <code>bm_beast_within</code> and <code>bm_no_beast_left</code> <b>move the
+save format</b>. <b>A missed rename in prose is a typo; a missed rename in a field is a bug</b>,
+which is why the two were given separate passes.</p>
+
+<h3>&sect;5 &mdash; A CHECK THAT COULD NOT FAIL, INSIDE THE SUITE THAT LOOKS FOR THOSE</h3>
+<p><code>test_batch_cd</code> slices <code>CLAUDE.md</code> from the draft anchor and stops at the
+next standing block, &ldquo;so a later batch&rsquo;s prose cannot quietly extend what this check is
+reading&rdquo;. <b>It searched for <code>&quot;### STANDING&quot;</code> &mdash; THREE hashes &mdash;
+against a file in which all seventeen headings are <code>## STANDING</code>, TWO.</b>
+<code>find()</code> returned &minus;1, the guard fell through, and <b>the slice ran to end of file:
+21,532 characters against the block&rsquo;s 10,917.</b> Nothing was red, because the correct
+sentence also lives inside the true block.</p>
+<p><b>THE ANCHOR IS REPAIRED AND THE GUARD NOW ASSERTS THAT IT RESOLVED.</b> A fall-through is only
+silent while nothing asks, so <code>stop &gt; 0</code> is now a check in its own right: an anchor
+that stops matching is RED rather than quietly wide. <b>The negative control was run</b> &mdash;
+reverting the anchor to three hashes turns that one line red, where before the same break produced
+zero failures. <b>The check count RISES 71 &rarr; 72, and that rise is the repair working.</b></p>
+
+<h3>&sect;6 &mdash; <code>an</code>&rsquo;S FLOOR WAS ALREADY WIDENED AT DF</h3>
+<p><b>Reported rather than repeated.</b> The brief called for widening the floor 6047 &rarr; 6046
+and recording an eleventh observation. <b><code>baselines.json</code> already carries the floor at
+6046</b>, widened by DF for the same reading on unmodified HEAD, <b>and the row already rests on
+fifteen observations, not eleven.</b> Derived from the file rather than recalled, per the rule at
+the top of every brief. <b>DE&rsquo;s asymmetric rule stands and nothing moves: the floor is the
+half that catches a real fault</b>, so it widens only to the observed value and no further.</p>
+
+<h3>&sect;7 &mdash; ONE STANDING RULE, EARNED AT DF</h3>
+<p><b>&ldquo;In a repair batch, write the predicted baselines BEFORE the verification run.&rdquo;</b>
+A baseline written afterwards records whatever happened; written first, it is a test. <b>The
+difference is whether the batch can fail.</b> DF wrote <code>baselines.json</code> with the
+predicted after-values before its verification run and every row confirmed. <b>It is in
+<code>CLAUDE.md</code> now, with the two-sided form spelled out</b>: predict every row you expect to
+move, and by how much, because <b>a movement of the wrong SIZE is the same alarm as an unsanctioned
+one.</b></p>
+
+<h3>&sect;8 &mdash; THE VERIFICATION, AND WHAT WAS PREDICTED</h3>
+<p><b><code>baselines.json</code> was written with the PREDICTED after-values BEFORE the
+verification battery ran</b>, per §7&rsquo;s own new rule, so the run tests the prediction rather
+than recording it. <b>THE PREDICTION: the failure total falls 10 &rarr; 0</b>, and <b>exactly two
+check counts move &mdash; <code>as</code> 396 &rarr; 394, <code>at</code> 470 &rarr; 467,
+<code>aw</code> 350 &rarr; 349 (a fall of exactly six, §2&rsquo;s sanctioned deletion) and
+<code>cd</code> 71 &rarr; 72 (§5&rsquo;s repair).</b> <b>Anything else that moves is a defect</b>,
+including a larger fall. <b>Zero is not the goal</b> &mdash; &ldquo;every remaining red is
+deliberate and recorded&rdquo; is &mdash; it simply happens that after this there are none left
+except <code>check_cm_live</code>&rsquo;s four, which are on purpose. <b>The measured result is in
+<code>docs/reports/DG.md</code> and <code>docs/state.md</code></b>, written after the run for the
+reason DE established: neither is read by any suite, and <code>check_de</code> reads neither, so the
+verification battery supervised every file the tree actually reads.</p>
+
 <h2>2026-08-22 &mdash; Batch DF: THE FORTY-SEVEN, SORTED</h2>
 <p><i>The 47 failing assertions that five implement-only batches left standing are <b>sorted
 before any of them was touched: 37 STALE, 2 WRONG, 8 UNDECIDED</b>. The 37 are repaired and

@@ -234,8 +234,13 @@ func _pools() -> void:
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
+	# MESSAGE CORRECTED BY BATCH DG §3 (the assertion is unmoved): it read "102
+	# of a target 120" while asserting 120, a CE-era figure left behind when CI
+	# closed the draft. A message that states a wrong size teaches it to whoever
+	# reads the failure — CD §2's rule, applied to the size rather than to the
+	# old target it was written for.
 	ok(draft_total == 120,
-		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
+		"the whole draft is 120 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.

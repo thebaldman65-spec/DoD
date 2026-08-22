@@ -1249,8 +1249,19 @@ func _docs() -> void:
 		"§6: ...while the class-wide tranche is still recorded")
 	ok(claude.contains("PAID IN FULL"),
 		"§6: ...as PAID IN FULL (BQ then BR)")
-	ok(claude.contains("TRANCHES 2 AND 3"),
-		"§6: ...and the spec pools' depth named as the debt that remains")
+	# INVERTED BY BATCH DG §3, and it is the fourth turn of the same screw — BP,
+	# BQ and BR each inverted this check as the debt it named was paid. It
+	# asserted that CLAUDE.md named TRANCHES 2 AND 3 as the spec-depth debt that
+	# REMAINS. The debt does not remain: the draft is 120 of 120, counted out of
+	# classes.gd, and the phrase itself had already left the file with CW's
+	# split, so the check had been red with no true answer available to it.
+	# WHAT A LATER BATCH COULD ACTUALLY BREAK IS THE RECORD OF COMPLETION, so
+	# that is what is pinned. NOTE THE STRING ALONE WOULD NOW PASS AGAIN — DG's
+	# corrected prose contains "TRANCHES 2 AND 3" — which is why the MESSAGE and
+	# the phrase both had to move: a check whose message states a dead debt
+	# teaches it to whoever reads the failure.
+	ok(claude.contains("TRANCHES 2 AND 3 ARE BOTH PAID"),
+		"§6: ...and CLAUDE.md records both depth tranches as PAID, not as owed")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CE §5, and this copy was the worse of
 	# the two: `contains("BATCH BO") or contains("Batch BO")` against the LIVE
 	# file, which BATCH BZ split at a batch boundary — BO is the LAST entry in
