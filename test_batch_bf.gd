@@ -27,6 +27,11 @@
 #     bracket and look like a mis-tune rather than a missing condition).
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 # §2's design numbers, in one place. The chance is (15 x the recipient's own
@@ -131,47 +136,15 @@ func _devout(scene: Node) -> BattleUnit:
 # One spawn for every live check. `learned` lands on the Cleric slot, which is
 # where the Devout stands.
 func _spawn(learned := {}) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == 2 else {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.slot_idx = 0
-	run.combat_wins = 0
-	run.pending_modifier = ""
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": ["raider"]}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.healing_received_mult = 1.0
-	# `_stat` only banks into sim_stats while `sim` is true.
-	scene.set("sim", true)
-	scene.get("sim_stats").clear()
-	scene.get("_b_slice").clear()
-	scene.get("_b_bd_slice").clear()
-	return scene
+	# `_stat` only banks into `sim_stats` while `sim` is true.
+	return await Fixture.spawn(self,
+		["berserker", "cryomancer", "inquisitor", "beastmaster"],
+		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "heal_mult": 1.0, "sim": true, "slices": true})
 
 
 func _kill(scene: Node) -> void:
-	scene.queue_free()
-	# queue_free is DEFERRED (the AS gotcha) — give it a frame before the next
-	# spawn, or two battle scenes briefly share the tree.
-	await process_frame
-	await process_frame
+	await Fixture.kill(self, scene)
 
 
 func _stat_of(scene: Node, key: String) -> float:

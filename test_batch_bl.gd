@@ -30,6 +30,11 @@
 # BUILDING the broken state and proving the checker rejects it.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -102,24 +107,8 @@ func _run() -> void:
 # the scene before the autoplay loop has resolved much, which is what the
 # declaration checks need. `frames` lets a caller run the fight out instead.
 func _spawn(lineup: Array, frames := 6, node_type := "fight") -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["berserker", "cryomancer", "holy", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": node_type, "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in frames:
-		await process_frame
-	return scene
+	return await Fixture.spawn(self, ["berserker", "cryomancer", "holy", "beastmaster"],
+		{"enemies": lineup, "node_type": node_type, "autoplay": true, "frames": frames})
 
 
 # Runs a spawned battle until it ends (or the budget runs out) and returns the

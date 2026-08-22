@@ -43,6 +43,11 @@
 # tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -530,42 +535,14 @@ func _claude_md() -> void:
 # ---------- live ----------
 
 func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight") -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == 1 else {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": ty, "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# DETERMINISM, FORCED RATHER THAN RETRIED (the AK/AL/AR/AS discipline). Every
-	# check below drives _resolve by hand, and a 5% miss or a 5% parry skips the
-	# whole damage path — which reads exactly like "the node did nothing".
-	#
-	# THE CRIT IS THE THIRD COIN, AND ON THIS SPEC IT IS THE WORST ONE: Runaway
+	# THE CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway
 	# Resonance adds +1% crit PER STACK, so a "same cast at 0 stacks vs 12"
-	# comparison silently compares 10% crit against 22% crit and the 1.5x spikes
-	# land only in the high sample. A build-rate check has the same problem from
-	# the other side — a crit builds 2 where a normal hit builds 1, so ONE
-	# unlucky roll turns "Harmonics grants 1 extra" into "it granted 2". A big
-	# negative crit_bonus drives the roll below zero on both sides, so
-	# `randf() < chance` can never be true. Tests that WANT a crit set it back.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.crit_bonus = -10.0
-	return scene
+	# comparison silently compares 10% crit against 22% crit. A build-rate check
+	# has the same problem from the other side — a crit builds 2 where a normal
+	# hit builds 1. Checks that WANT a crit set `crit_bonus` back themselves.
+	return await Fixture.spawn(self, specs,
+		{"enemies": lineup, "node_type": ty, "talents": {1: learned.duplicate()},
+		"deterministic": true, "crit": -10.0})
 
 
 func _arc(scene: Node) -> BattleUnit:
@@ -580,6 +557,29 @@ func _find(u: BattleUnit, name: String) -> Ability:
 		if ab.display_name == name:
 			return ab
 	return null
+
+
+# BATCH DD §2 — THE SEED, AND WHY THE FLAKE WAS NOT WIDENED AWAY.
+# §2's Cannon check reads a RATIO between two blows, and the FIRST line of the
+# strike block is `randf_range(0.9, 1.1)` — so each blow carries a +/-10% swing
+# and the ratio of two carries up to 22%. The band it asserts is 1.35-1.85
+# around a passive that pays 1.54, which is +/-20%: THE NOISE IS THE WIDTH OF THE
+# QUESTION. That is why it failed in 2 of 5 dedicated runs while its check count
+# never moved, and why a count-diffing rule read `at` 3 -> 4 as a regression.
+#
+# WIDENING THE BAND WOULD HAVE CHANGED WHAT THE CHECK ASKS. The band exists to
+# separate 1.54 (the passive alone) from 2.46 (the passive TIMES the old ability
+# term); open it far enough to swallow the variance and it stops telling those
+# two apart, which is the whole assertion. Seeding both blows to the same value
+# makes them draw the SAME variance, so the only thing left between them is the
+# eight stacks — the AK/AL/AR/AV/BS discipline of forcing determinism rather than
+# widening the tolerance until the noise fits inside it.
+# `n` varies the draw across a LOOP of pairs while keeping each PAIR matched:
+# §1's take-damage check sums ten blows a side, and averaging ten different
+# variances is what makes its band meaningful. Seeding the whole loop to one
+# value would collapse it into the same measurement ten times.
+func _seeded(n := 0) -> void:
+	seed(20260821 + n)
 
 
 # §1's curve at the two LIVE read sites — the same numbers the table promises,
@@ -629,10 +629,12 @@ func _live_curve() -> void:
 	for _i in 10:
 		arc.second_resource = 0
 		arc.hp = 999999
+		_seeded(_i)
 		await scene.call("_resolve", hitter, swing, arc, "good")
 		took0 += 999999 - arc.hp
 		arc.second_resource = 12
 		arc.hp = 999999
+		_seeded(_i)
 		await scene.call("_resolve", hitter, swing, arc, "good")
 		took12 += 999999 - arc.hp
 	ok(took0 > 0 and took12 > took0,
@@ -672,11 +674,13 @@ func _live_no_per_stack() -> void:
 	arc.resource = 9999
 	arc.second_resource = 0
 	foe.hp = 999999
+	_seeded()
 	await scene.call("_resolve", arc, cannon, foe, "good")
 	var c0 := 999999 - foe.hp
 	arc.second_resource = 8
 	foe.hp = 999999
 	foe.pressure = 0
+	_seeded()
 	await scene.call("_resolve", arc, cannon, foe, "good")
 	var c8 := 999999 - foe.hp
 	if c0 > 0:

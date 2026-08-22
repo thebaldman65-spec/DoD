@@ -80,6 +80,15 @@ TIMEOUT=${DOD_SUITE_TIMEOUT:-240}
 # per-target, the same shape `EXTRA` already uses for flags.
 typeset -A TMO
 TMO[check_map]=600
+# BATCH DD — `test_batch_cd` RUNS THE BATTERY INSIDE THE BATTERY. Its table was
+# five suites and is FORTY-FIVE now, so the count-differ sweeps every suite the
+# battery runs (plus `test_batch_cp`, which this array misses) rather than a
+# ninth of them. That costs it about 22 minutes of wall clock, against a 240s
+# default that would kill it before it printed a single row — and a killed suite
+# reports NO COUNT, which is the one outcome a count-diffing rule cannot read.
+# The bound is per-target for the same reason `check_map`'s is: "timed out" and
+# "hung" are different outcomes and the watchdog cannot tell them apart.
+TMO[test_batch_cd]=2400
 
 run_one() {
   local name=$1 log="$OUT/$1.log"
@@ -99,8 +108,11 @@ run_one() {
   # with no indent is still a failure (BK's swallowed reason).
   #
   # BATCH CS — AND A COUNT WITH A COLON IS STILL A COUNT. THIS IS THE THIRD TIME
-  # THIS GREP HAS BEEN TOO NARROW. Seven suites print `checks: N   failures: N`
-  # and two print `BATCH XX: N passed, N FAILED`; `[0-9]+ checks` matches
+  # THIS GREP HAS BEEN TOO NARROW. SEVEN SUITES READ `checks=?` — ai, bm, bn, bo,
+  # bp, bq, br — and BATCH DD re-derived which shape each one prints, because the
+  # sentence below has been read as "seven print the colon shape" ever since:
+  # SIX print `checks: N   failures: N` (bm..br) and TWO print
+  # `BATCH XX: N passed, N FAILED` (ai, an); `[0-9]+ checks` matches
   # neither, so the report showed `checks=? fails=?` for ai, bm, bn, bo, bp, bq
   # and br — **every one of which CLAUDE.md pins with a number.** A count-diffing
   # rule cannot see a regression in a suite whose count reads `?`, which is the

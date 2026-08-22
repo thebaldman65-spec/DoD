@@ -56,6 +56,11 @@
 # SAME variance. Forced determinism, never a retry (the AK/AL/AR discipline).
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 # Backblast's arming threshold, mirrored from battle.gd so the check states
@@ -424,39 +429,14 @@ func _docs() -> void:
 # ---------- the live harness ----------
 
 func _spawn(learned: Dictionary, lineup: Array) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["berserker", "pyromancer", "inquisitor", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == 1 else {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# DETERMINISM, FORCED RATHER THAN RETRIED (the AK/AL/AR discipline). Every
-	# check below drives `_resolve` or `take_hit` by hand, and a 5% miss or a
-	# 5% parry skips the whole damage path — which reads as "the node did
-	# nothing" and turns a real assertion into a coin flip.
 	# ONE DELIBERATE EXCEPTION, AND IT IS THE POINT OF `_live_heat_haze`:
-	# `no_cover` is a miss BYPASS, so a suite that arms it on everybody can
-	# never see Heat Haze work at all (BQ's Mirror Image lesson, arriving
-	# through the other door). That check reads `_miss_chance` directly instead.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.crit_bonus = -1.0   # BQ: a live crit roll flips any one-blow comparison
-	return scene
+	# `no_cover` is a miss BYPASS, so a suite that arms it on everybody can never
+	# see Heat Haze work at all (BQ's Mirror Image lesson, arriving through the
+	# other door). That check reads `_miss_chance` directly instead.
+	return await Fixture.spawn(self,
+		["berserker", "pyromancer", "inquisitor", "beastmaster"],
+		{"enemies": lineup, "talents": {1: learned.duplicate()}, "deterministic": true,
+		"crit": -1.0})
 
 
 func _py(scene: Node) -> BattleUnit:

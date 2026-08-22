@@ -50,11 +50,23 @@ accumulate far more slowly than batches do.
 - **A FLAKY ASSERTION IS A THIRD KIND OF INSTABILITY AND IS NOT A DRIFT.** A suite whose COUNT is
   rock steady can still fail by chance when an assertion compares two damage rolls that can land
   on the same integer. **A bare `<` or `>` between two blows is not a check, it is a coin flip
-  with good odds** — assert a RATIO with a margin instead. A suite that calls `seed()` zero times
-  has a different stream every run, which is what makes the flake intermittent.
-  **THERE ARE TWO KNOWN FLAKES, NOT ONE — `bo` AND `at` — and `at` is much the worse of them.**
-  Both are recorded with their rates in `docs/state.md`; **a count-diffing rule must read their
-  FAILURE counts as bands too, not only their check counts.**
+  with good odds.** A suite that calls `seed()` zero times has a different stream every run, which
+  is what makes the flake intermittent.
+  - **AND A RATIO WITH A MARGIN IS NOT THE ANSWER ON ITS OWN — DD MEASURED THAT.** Both of `at`'s
+    flaky checks WERE ratios with margins. The first line of the strike block is
+    `randf_range(0.9, 1.1)`, so **one blow carries ±10% and a RATIO of two carries up to 22%**,
+    against bands of ±20% and ±7%. **THE NOISE WAS THE WIDTH OF THE QUESTION**, and widening the
+    band far enough to swallow it would have stopped the check telling apart the two answers it
+    exists to separate.
+  - **SEED THE PAIR, NOT THE SUITE.** `seed()` the same value immediately before EACH blow of a
+    compared pair, so both draw the same variance and the only thing left between them is what is
+    under test (the AV/BS/BT idiom). **Where the check averages a LOOP of pairs, vary the seed per
+    iteration** (`seed(base + i)`) or the averaging that makes its band meaningful collapses into
+    the same measurement N times.
+  - **`at` IS SEEDED AND PINNED AS OF DD (470 / 3 over five runs), AND IT WAS TWO CHECKS, NOT
+    ONE** — seeding the recorded one exposed a second nobody had recorded. **`bo` REMAINS A KNOWN
+    FLAKE** at roughly 1 in 13; its rate is in `docs/state.md` and its FAILURE count is carried as
+    a band, not a number.
 - **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
@@ -957,11 +969,25 @@ wrong, none of them diffed against anything.
   a `preload`ed `RefCounted` for that reason, and it carries **no `class_name`** — that registration
   lives in the gitignored `.godot/global_script_class_cache.cfg`, so it would resolve here and fail
   on a fresh clone.
-- **STILL OWED, AND TEN TIMES LARGER.** In the SUITES: **`_spawn` in 37 suites as 34 distinct
-  bodies, `_run` in 39 as 39, `_kill` byte-identical in 14.** **DC took the Faith threshold
-  assertions instead** — they needed no ruling and the consolidation will move the same files —
-  **so the suite consolidation is the next letter's**, and the remaining stale assertions, which
-  DO need rulings, follow it.
+- **DONE AT BATCH DD, AND IT WAS TEN TIMES DB's: `_spawn` IS AUTHORED ONCE FOR THE SUITES TOO**, in
+  `suite_fixture.gd`, and `_kill` with it. **1,128 lines deleted against 391 added across the 37
+  suites, and not one of the 389 call sites moved** — a suite keeps its OWN `_spawn` signature and delegates, because
+  **thirty-seven signatures are not one signature** (`learned`, `granted`, `member_patch`, `prep`,
+  `learner`, `mod_id`, `cleric_spec`, `earned`, `runes`, `frames` between them). **`check_da` §3
+  asserts the suites now as well as the gates**: a suite carrying a `_spawn` that does not reach the
+  fixture fails by name, and the ten hand-built boards that remain — in `al`, `an`, `ax`, `bl`,
+  `test_rune_battle` and `test_run_harness`, none of them a copied helper — are a **named ratchet**
+  rather than a wildcard.
+- **AND THE CENSUS NUMBER EVERY DOCUMENT CARRIED WAS WRONG IN BOTH DIRECTIONS.** "34 distinct
+  bodies" reproduces neither way it can be measured: **36 raw, 33 once comments and blank lines are
+  stripped** (four pairs are twins — bh/bi, bo/bp, bq/br, bt/cb). **`_kill` "byte-identical in 14"
+  is true only after normalising** — four raw bodies, and every difference between them was the
+  wording of one comment. **DERIVE A CENSUS BEFORE QUOTING IT**; this one travelled from DA through
+  DB, this file, `state.md` and DD's own brief unchecked.
+- **`_run` IS 39 BODIES IN 39 SUITES AND IS NOT THE SAME PROBLEM.** It is each suite's own driver.
+  **The copied helper is hiding INSIDE it: 38 of the 39 open with the same save-backup preamble and
+  37 swap `Profile.save_path` to a per-suite file and back.** That is the next duplication of this
+  shape and it is owed, not taken.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
@@ -1080,8 +1106,33 @@ have been lost with it. **Live counts belong in `docs/state.md`; the rule is wha
 - **A COUNT THAT NOBODY DIFFS IS A WORD.** Printing a number is not enough: two suites printed
   counts that were wrong by 125 and 2,434 checks and nobody saw it for twelve batches. **A count
   is only visible at a glance if something is comparing it to what it should be.**
-  test_batch_cd §1 is what diffs them, as a FLOOR per suite — extend it rather than trusting a
-  reader.
+  `test_batch_cd` §1 is what diffs them.
+- **AND AN INSTRUMENT'S SCOPE IS PART OF ITS READING (STANDING, SET AT DD §1).** `cd`'s table held
+  **five suites out of forty-five** from CD until DD — **a ninth of the project** — and the cost was
+  measured rather than argued: **repairing five suites at DC did not move `cd` by one line, because
+  none of the five was in the table.** A green differ over a ninth of the tree reads exactly like a
+  green differ over the tree. **When a rule says "nothing moved", ask what it was watching.**
+  - **IT IS `[checks_lo, checks_hi, fails_lo, fails_hi]` PER SUITE NOW, NOT A FLOOR.** A floor
+    cannot see a count that RISES, and `bx` gained five checks at CX and `al` lost one at CV —
+    both found batches later, by accident, by somebody verifying something else.
+  - **THE FAILURE HALF IS THE HALF A FLOOR NEVER HAD.** **A failure count moving inside an
+    already-red suite is invisible in an aggregate**, and that is exactly how `test_batch_bi` stayed
+    wrong for four batches while its suite was red for an unrelated reason.
+  - **BANDS, WITH THE OBSERVATION COUNT BESIDE THEM.** `an` **6047–6063** (ten observations), `bk`
+    129–130 (five), `bo` 0–1 failures. **A band written from too few readings reads a normal run as
+    a regression** — the same failure as a wrong count, in the opposite direction.
+  - **AND A BAND WRITTEN TO A SAMPLE'S EXACT EXTREMES IS ONE OF THOSE. DD MEASURED IT.** `an`'s
+    band was written from nine observations as 6047–6054 and **was exceeded on its tenth reading,
+    inside the same batch** (6055, at zero failures). A sample's extremes are exceeded by roughly
+    two runs in eleven. **THE RULE, APPLIED WHEN A BAND IS EXCEEDED AND NOT BEFORE: floor = the
+    lowest observation; ceiling = the highest PLUS the observed spread.** It is asymmetric because
+    **the floor is the half that catches a real fault** — a section that stopped running costs
+    hundreds of checks, not five — so the floor stays tight and the ceiling takes the headroom.
+    **Headroom goes where a reading demands it**, so every number in the table is traceable to a
+    run: `bk` has not been exceeded and was not widened.
+  - **AND IT COSTS 22 MINUTES: IT RUNS THE BATTERY INSIDE THE BATTERY.** `run_battery.sh` carries
+    `TMO[test_batch_cd]=2400` for that, because **at the 240s default the sweep is killed before it
+    prints a row, and a killed suite reports NO COUNT.**
 - **VERIFY A PARSE BY GREPPING STDERR, NEVER BY A TALLY.** `grep -cE "Parse Error|SCRIPT ERROR"`
   over the run's own stream is the authority. **Godot returns a NON-NULL GDScript for a file whose
   parse failed** — it prints the error and hands back the resource anyway — so `load(path) != null`

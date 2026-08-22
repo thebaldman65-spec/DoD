@@ -46,6 +46,27 @@ const WALK_EXEMPT := {
 	"check_cz.gd": "`_cl_only_corpus` is §0's negative control — its job is to still be missing the five",
 }
 
+# BATCH DD — the suites' half of the same fixture, and the same enforcement.
+# `_spawn` stood in 37 suites as 36 bodies; it is authored once now and each
+# suite keeps a thin delegating `_spawn` with its OWN signature, because the 37
+# signatures are not one signature and several hundred call sites read them.
+const SUITE_FIXTURE := "suite_fixture.gd"
+
+# THE RESIDUE, NAMED RATHER THAN LEFT TO A WILDCARD — the sites that still build
+# a battle by hand OUTSIDE any `_spawn`, with the count each file carries. They
+# are bespoke boards inside single checks rather than a copied helper, so they
+# are not what the consolidation was about; they are listed so that a NEW copy
+# cannot hide among them, and so the next batch can find them. **A file that
+# gains a site, or a file that is not on this list, fails the check below.**
+const HAND_SPAWN_SITES := {
+	"test_batch_al.gd": 2,        # an autoplay history probe and its control
+	"test_batch_an.gd": 1,        # `_battle()`, its own differently-named helper
+	"test_batch_ax.gd": 1,        # a second board inside one check
+	"test_batch_bl.gd": 1,        # the DOD_SIM probe, stopped part-way on purpose
+	"test_rune_battle.gd": 3,     # no `_spawn` at all; three bespoke boards
+	"test_run_harness.gd": 2,     # the harness is not a suite and has no `_spawn`
+}
+
 var _g := Gate.new()
 
 
@@ -62,6 +83,26 @@ func _walk_marks() -> Array:
 # trips [1], which is the same defect wearing a different name.
 func _fixture_marks() -> Array:
 	return ["\nfunc _spa" + "wn(", "res://scenes/bat" + "tle.tscn"]
+
+
+# BATCH DD — the suite tree, read off the DIRECTORY rather than a list, so a
+# suite added later is covered by doing nothing.
+func _total(d: Dictionary) -> int:
+	var n := 0
+	for k in d:
+		n += int(d[k])
+	return n
+
+
+func _suites() -> Array:
+	var out: Array = []
+	var d := DirAccess.open("res://")
+	if d != null:
+		for f in d.get_files():
+			if f.begins_with("test_") and f.ends_with(".gd"):
+				out.append(String(f))
+	out.sort()
+	return out
 
 
 # BATCH DB — the tally is the fixture's. This delegates rather than
@@ -187,6 +228,39 @@ func _s3_enumeration_rule() -> void:
 		gates.size(), spawn_files.size(), spawn_bodies.size()])
 	print("  %d go through `%s`: %s" % [
 		fixture_users.size(), FIXTURE, ", ".join(PackedStringArray(fixture_users))])
+	# BATCH DD — THE SUITES' HALF. A suite KEEPS its `_spawn` (37 signatures are
+	# not one signature), so the mark that means "authored its own" is a `_spawn`
+	# in a file that does NOT reach the fixture.
+	var suites := _suites()
+	ok(not suites.is_empty(), "no `test_*.gd` files found — the suite sweep read nothing")
+	var rolled_suites: Array = []
+	var suite_users: Array = []
+	var hand: Dictionary = {}
+	for f in suites:
+		var src := FileAccess.get_file_as_string("res://" + f)
+		var has_spawn := src.contains(_fixture_marks()[0])
+		var uses := src.contains(SUITE_FIXTURE)
+		if uses:
+			suite_users.append(f)
+		if has_spawn and not uses:
+			rolled_suites.append(f)
+		var n := src.count(_fixture_marks()[1])
+		if n > 0:
+			hand[f] = n
+	for f in rolled_suites:
+		ok(false, "%s authors its own `_spawn` — `%s` is the one fixture (BATCH DD)" % [f, SUITE_FIXTURE])
+	ok(rolled_suites.is_empty(),
+		"no suite authors its own `_spawn` — all %d go through `%s`"
+		% [suite_users.size(), SUITE_FIXTURE])
+	# The residue is a RATCHET, not a wildcard: the named files at the named
+	# counts, and nothing else. A new hand-built board anywhere in the suites
+	# trips this, which is the whole point of writing the six down.
+	ok(hand == HAND_SPAWN_SITES,
+		"the hand-built battle sites are exactly the %d named ones (found %s)"
+		% [HAND_SPAWN_SITES.size(), JSON.stringify(hand)])
+	print("  %d suites; %d go through `%s`, %d author their own; %d hand-built boards remain in %d files" % [
+		suites.size(), suite_users.size(), SUITE_FIXTURE, rolled_suites.size(),
+		_total(hand), hand.size()])
 
 
 # ---------------- THE LIVE HALF ----------------

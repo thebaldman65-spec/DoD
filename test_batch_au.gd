@@ -32,6 +32,11 @@
 #      back on Singularity, and the fallback consuming a mini-boss slot.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -469,36 +474,12 @@ func _negative_control_source() -> void:
 
 func _spawn(learned: Dictionary, specs: Array, member_patch := {},
 		lineup := ["raider"]) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == 1 else {}
-		run.sync_spec_hp(i)
-	for key in member_patch:
-		run.party[1][key] = member_patch[key]
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# Determinism FORCED, not retried (the AK/AL/AR/AS/AT discipline): miss,
-	# parry and — on this spec above all — the CRIT roll. A crit builds 2 where
-	# an ordinary hit builds 1, so one unlucky coin turns "Singularity grants 2
-	# extra" into "it granted 4". Checks that WANT a crit set crit_bonus back.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.crit_bonus = -10.0
-	return scene
+	# THE CRIT ABOVE ALL ON THIS SPEC: a crit builds 2 where an ordinary hit
+	# builds 1, so one unlucky coin turns "Singularity grants 2 extra" into "it
+	# granted 4". Checks that WANT a crit set `crit_bonus` back themselves.
+	return await Fixture.spawn(self, specs,
+		{"enemies": lineup, "talents": {1: learned.duplicate()}, "patch": {1: member_patch},
+		"deterministic": true, "crit": -10.0})
 
 
 func _hero(scene: Node, idx: int) -> BattleUnit:

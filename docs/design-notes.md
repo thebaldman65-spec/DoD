@@ -4,6 +4,67 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An instrument's scope is part of its reading (Batch DD) — 2026-08-21
+
+`test_batch_cd` is the only thing in the project that compares a check count to what it should be.
+It exists because two suites once printed counts wrong by 125 and 2,434 checks and nobody saw it
+for twelve batches. It is, in other words, the instrument built for the project's signature
+failure — and from CD until DD its table held **five suites out of forty-five**.
+
+Nothing about that was hidden. The five were written out in a const at the top of the file, in
+alphabetical order, with a comment explaining the floor. Anybody could read it. What nobody did was
+ask what the five were a sample *of*.
+
+The cost came due at DC. Five suites were repaired — every Faith threshold assertion in `be`
+through `bi`, twenty-three of them — and `cd` did not move by one line. That is not a bug in `cd`;
+it is `cd` correctly reporting on the five suites it watches, none of which was one of the five that
+changed. But the sentence it produced in the report — *the count-differ is unchanged* — reads
+exactly like the sentence a differ over the whole tree would have produced. **A green instrument
+over a ninth of the tree is indistinguishable, in prose, from a green instrument over the tree.**
+
+The generalisable part is not "widen the table". It is that **a verification result carries a scope
+that the result itself does not state**, and prose drops it every time. "Every count is identical"
+means every count *the thing that measured it was looking at*. "Zero throws" means zero throws *in
+the 45 things the battery runs*, which is not the 47 files that exist. "The gates all pass" meant,
+for ten of the nineteen, that nobody could see their check counts at all.
+
+So the rule this batch is written against: **when a verification says nothing moved, the next
+question is what it was watching** — and the answer belongs beside the result, not in the reader's
+head. `cd`'s table is forty-five rows now and says in its own comment that they are not the
+battery's forty-five: a suite cannot drive itself, so `cd` is missing, and `test_batch_cp` is
+present because the battery's own array misses it. Saying "all 45" without saying which 45 is how a
+gap survives a headline.
+
+## The noise was the width of the question (Batch DD) — 2026-08-21
+
+`CLAUDE.md` has said for several batches that a bare `<` between two damage rolls is a coin flip
+with good odds, and that the fix is to assert a ratio with a margin. `test_batch_at`'s flaky check
+*was* a ratio with a margin. So was the second flaky check in the same suite that nobody had
+recorded until seeding the first one exposed it.
+
+The arithmetic is what makes it interesting. The first line of the strike block is
+`randf_range(0.9, 1.1)`. One blow therefore carries ±10%; a **ratio of two blows carries up to
+22%**. The Cannon check's band is 1.35–1.85 around a passive that pays 1.54 — ±20%. The band was
+*narrower than the noise it was written to tolerate*, and it failed in two runs of five while its
+check count never moved by one, which is exactly the shape a count-diffing rule misreads as a
+regression.
+
+The tempting fix is to open the band. It is the wrong one, and the reason is worth writing down:
+**the band is not a tolerance, it is the question**. It exists to separate 1.54 — the passive alone
+— from 2.46, the passive times the ability term that Batch AU removed. Open it far enough to
+swallow ±22% and it stops telling those two apart, at which point the check passes forever and
+means nothing. **A margin wide enough to absorb the noise is a margin wide enough to absorb the
+bug.**
+
+The fix that keeps the question is to remove the noise instead: seed the same value immediately
+before *each blow of the compared pair*, so both draw the identical variance and the only thing
+left between them is the eight stacks under test. That is the AK/AL/AR discipline — force
+determinism rather than retry until it passes — applied one level down, to the pair rather than to
+the suite. And where a check averages a *loop* of pairs, the seed varies per iteration, because
+seeding the whole loop to one value would collapse ten measurements into the same measurement ten
+times: the averaging is doing real work and pinning it away would be another way of narrowing what
+the check asks.
+
 ## A passive paid in what the party is trying to prevent will fight every batch that helps (Batch CZ) — 2026-08-21
 
 Blood Frenzy pays the Berserker for health he has already lost. That reads as a clean risk-reward

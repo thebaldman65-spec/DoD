@@ -68,6 +68,11 @@
 # (the AK/AL/AR discipline).
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 # Mirrored from battle.gd so each check states what it depends on rather than
@@ -502,35 +507,9 @@ func _docs() -> void:
 # ---------- the live harness ----------
 
 func _spawn(spec: String, lineup: Array, learned := {}) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["berserker", spec, "inquisitor", "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == 1 else {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# DETERMINISM, FORCED RATHER THAN RETRIED (the AK/AL/AR discipline). Every
-	# check below drives `_resolve` or `take_hit` by hand, and a 5% miss or a 5%
-	# parry skips the whole damage path — which reads as "the clause did
-	# nothing" and turns a real assertion into a coin flip.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.crit_bonus = -1.0   # BQ: a live crit roll flips any one-blow comparison
-	return scene
+	return await Fixture.spawn(self, ["berserker", spec, "inquisitor", "beastmaster"],
+		{"enemies": lineup, "talents": {1: learned.duplicate()}, "deterministic": true,
+		"crit": -1.0})
 
 
 func _mage(scene: Node, passive: String) -> BattleUnit:

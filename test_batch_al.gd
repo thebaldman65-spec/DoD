@@ -34,6 +34,11 @@
 # tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -480,28 +485,8 @@ func _kit_unchanged() -> void:
 # acts on its own and every cast below is one this test drove.
 func _spawn(learned: Dictionary, lineup: Array, earned: Array = [],
 		runes: Array = []) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["warden", "cryomancer", "holy", "mystic"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.sync_spec_hp(i)
-	run.party[0]["talents"] = learned
-	run.party[0]["bm_abilities"] = earned
-	run.party[0]["runes"] = runes
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	return scene
+	return await Fixture.spawn(self, ["warden", "cryomancer", "holy", "mystic"],
+		{"enemies": lineup, "talents": {0: learned}, "bm": {0: earned}, "runes": {0: runes}})
 
 
 func _wd(scene: Node) -> BattleUnit:

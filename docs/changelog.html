@@ -14,6 +14,200 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch DD: ONE <code>_spawn</code> FOR THE SUITES</h2>
+<p><i>The second half of DB&rsquo;s consolidation and ten times its size. <b><code>_spawn</code>
+stood in 37 suites as 36 distinct bodies and <code>_kill</code> in 14; both are authored once now,
+in <code>suite_fixture.gd</code></b> &mdash; <b>1,128 lines deleted against 391 added across the 37 suites</b>, and <b>not one
+of the 389 call sites moved</b>, because each suite keeps its own signature and delegates.
+<b>NO EXEMPTION WAS NEEDED: every one of the 22 differences between the 37 copies is a named
+argument now</b>, including the two that look like slips and are not. <b>The project&rsquo;s
+count-differ was watching a ninth of the project</b> &mdash; <code>test_batch_cd</code>&rsquo;s
+table held five suites and holds forty-five. <b><code>test_batch_at</code>&rsquo;s flake is seeded
+and it was never one check</b>: it was two, and it settles at 3 failures, so the fourth was a
+flake and not a finding. <b>No save version moves (still v10).</b> The full report is
+<code>docs/reports/DD.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; THE CENSUS, DERIVED RATHER THAN RECALLED &mdash; AND IT IS NOT 34</h3>
+<p><b>Every document in the project says &ldquo;37 suites as 34 distinct bodies&rdquo;. The number
+does not reproduce either way it can be measured.</b> Hashing the 37 <code>_spawn</code> bodies
+verbatim gives <b>36</b> (only <code>bh</code>/<code>bi</code> are literally identical); stripping
+comments and blank lines first gives <b>33</b>, because four pairs are twins &mdash;
+<code>bh</code>/<code>bi</code>, <code>bo</code>/<code>bp</code>, <code>bq</code>/<code>br</code>
+and <code>bt</code>/<code>cb</code>. <b>34 is neither.</b> The figure travelled from DA&rsquo;s
+census through DB&rsquo;s report, <code>CLAUDE.md</code>, <code>docs/state.md</code> and this
+batch&rsquo;s brief without anybody re-deriving it.</p>
+<p><b>AND <code>_kill</code>&rsquo;S &ldquo;BYTE-IDENTICAL IN 14&rdquo; IS TRUE ONLY AFTER
+NORMALISING.</b> There are <b>four</b> raw bodies and <b>one</b> normalised one: every difference
+between the fourteen was the wording of the comment above <code>await</code>, which said the same
+thing four ways. It was still the right one to do first &mdash; there is no ruling in it &mdash;
+and it went in and was verified on three suites before the 37 were touched.</p>
+<p><b><code>_run</code> IS 39 BODIES IN 39 SUITES AND IS DELIBERATELY UNTOUCHED.</b> It is not a
+copied helper: it is each suite&rsquo;s own driver, naming its own sections and printing its own
+summary line. <b>But a copied helper IS hiding inside it</b> &mdash; <b>38 of the 39 open with the
+same save-backup preamble</b> and <b>37 swap <code>Profile.save_path</code> to a per-suite file and
+swap it back</b>. That is the next duplication of this shape, and it is recorded as owed rather
+than taken here.</p>
+
+<h3>&sect;1 &mdash; TWENTY-TWO AXES, ZERO EXEMPTIONS, AND FOUR DIFFERENCES THAT WERE NOT REAL</h3>
+<p><b>DB&rsquo;s four gate bodies diverged on five axes. Thirty-seven suite bodies diverge on
+twenty-two</b>, and every one is now a key in an options dictionary at the call site instead of an
+invisible edit inside a copy: the difficulty, the lineup, the encounter type, which member learns
+which talents, granted abilities, runes, arbitrary member patches, a <code>prep</code> callable,
+<code>slot_idx</code>, the pending modifier, the autoplay/enemies-off pair, the frame count, the
+50&times; time scale, the determinism forcing, the crit and healing pins, and the two sim blocks.</p>
+<p><b>FOUR DIFFERENCES WERE MEASURED TO BE NO-OPS AND DROPPED &mdash; measured, not ruled.</b>
+<code>run.combat_wins = 0</code>, <code>party[i]["runes"] = []</code> and
+<code>party[i]["talents"] = {}</code> are all things <code>new_run</code> has already done by the
+time the copy does them again; and <code>bh</code>/<code>bi</code>&rsquo;s <code>_run_obj()</code>
+is a one-line helper returning exactly the <code>root.get_node("/root/Run")</code> the other
+thirty-five write out. <b>One ORDERING difference went the same way</b>: <code>al</code> wrote its
+member-0 talents after the loop rather than inside it, and <code>sync_spec_hp</code> reads
+<code>spec</code>, <code>max_hp</code> and <code>hp</code> and nothing else, so the two orders
+cannot differ. <b>The <code>patch</code> option is the one that genuinely must stay after the loop,
+and it does.</b></p>
+<p><b>AND THE TWO THAT LOOK LIKE COPY SLIPS ARE DELIBERATE, SO THEY ARE PRESERVED RATHER THAN
+MERGED.</b> <code>bq</code> and <code>br</code> arm <code>no_cover</code> on the HEROES only where
+the other thirty-two arm it on both sides &mdash; and both suites say why in their own comments:
+<b><code>no_cover</code> is an absolute miss BYPASS and Mirror Image IS a miss</b>, so arming it on
+the enemy side makes every image look broken. <b>Merging to the majority would have changed what
+two suites measure.</b> The same reasoning made <code>crit</code> an argument rather than a
+constant: two live values, <b>-10.0</b> and <b>-1.0</b>, and which one a suite wants is a
+measurement decision.</p>
+
+<h3>&sect;2 &mdash; THE COUNT-DIFFER WAS WATCHING A NINTH OF THE PROJECT</h3>
+<p><b><code>test_batch_cd</code> is the one instrument in the repo built for the project&rsquo;s
+signature failure &mdash; a check count that moves without anybody noticing &mdash; and its table
+held the five suites CD had just repaired.</b> The cost is measured rather than argued:
+<b>repairing <code>be</code> through <code>bi</code> at DC did not move <code>cd</code> by one
+line, because not one of the five Faith suites was in the table.</b></p>
+<p><b>IT HOLDS FORTY-FIVE ROWS NOW, AND THEY ARE NOT THE BATTERY&rsquo;S FORTY-FIVE.</b> A suite
+that drives itself does not terminate, so <code>cd</code> cannot watch <code>cd</code>; and the
+battery&rsquo;s own <code>SUITES</code> array misses <code>test_batch_cp</code>, which therefore
+ran nowhere at all. The table is <b>the battery&rsquo;s 45 minus this file, plus
+<code>test_batch_cp</code></b>. <b>Saying &ldquo;all 45&rdquo; without saying WHICH 45 is how a gap
+survives a headline.</b></p>
+<p><b>EACH ROW IS <code>[checks_lo, checks_hi, fails_lo, fails_hi]</code> AND THE FAILURE COUNTS
+ARE NOT ZERO.</b> 46 assertions across 19 suites are deliberately red, each needing a ruling on
+what it should ask instead; this table records WHERE they are, so <b>a failure count moving INSIDE
+an already-red suite</b> &mdash; which is invisible in an aggregate, and is exactly how
+<code>test_batch_bi</code> stayed wrong for four batches &mdash; <b>is caught</b>. Three rows are
+bands because three suites legitimately move: <code>an</code> checks, <code>bk</code>
+<b>129&ndash;130</b>, and <code>bo</code> <b>0&ndash;1</b> failures. <b><code>an</code>'s band was
+written from nine observations as 6047&ndash;6054 and the sweep exceeded it on the tenth &mdash;
+see &sect;5.</b></p>
+<p><b>IT COSTS ABOUT 22 MINUTES AND IT RUNS THE BATTERY INSIDE THE BATTERY.</b> The suite section
+of <code>run_battery.sh</code> is 22.2 minutes of a 29.6-minute run, and <code>cd</code> now
+repeats nearly all of it, so <b>a full battery goes from about 30 minutes to about 50</b>.
+<code>run_battery.sh</code> carries a per-target watchdog bound for it
+(<code>TMO[test_batch_cd]=2400</code>) for the same reason <code>check_map</code> has one &mdash;
+<b>at the 240s default the widened sweep would be killed before printing a row, and a killed suite
+reports NO COUNT, which is the one outcome a count-diffing rule cannot read.</b> <b>Whether that
+price is worth paying inside every battery is a decision, and it is recorded as owed.</b></p>
+<p><b>THREE THINGS THE WIDENING FOUND IN <code>cd</code> ITSELF.</b> Its check message spelled
+<code>SCRIPT&nbsp;ERROR</code> out in full &mdash; so the day any suite threw, <code>cd</code> would
+print those words into its own log and <code>run_battery.sh</code>&rsquo;s <code>throws=</code>
+column would have counted <b><code>cd</code></b> as the suite that threw. <b>The marks are joined
+at runtime now, which is the discipline <code>check_da</code> already used for the same reason.</b>
+And its count grep matched <code>N&nbsp;checks</code> and nothing else, so <b>it could not read
+the SIX rows that print <code>checks:&nbsp;N&nbsp;&nbsp;&nbsp;failures:&nbsp;N</code> at all</b>
+&mdash; <code>bm</code>, <code>bn</code>, <code>bo</code>, <code>bp</code>, <code>bq</code>,
+<code>br</code>. It carries the battery&rsquo;s general matcher now, and the battery&rsquo;s
+per-suite FLAGS with it, because <b><code>test_batch_bl</code> silently under-runs without
+<code>--fixed-fps 12</code></b>.</p>
+<p><b>AND THE FIX FOR A TOO-NARROW GREP WAS A TOO-GREEDY ONE, WHICH THE INSTRUMENT CAUGHT ON ITS
+OWN FIRST RUN.</b> Transcribed with <code>[ \t]+</code> where the battery has a single space, the
+first alternative eats the wrong number out of the colon shape: <code>sections: 8&nbsp;&nbsp;
+checks: 1891&nbsp;&nbsp; failures: 0</code> matches <i>&ldquo;8&nbsp;&nbsp;&nbsp;checks&rdquo;</i>
+and <i>&ldquo;1891&nbsp;&nbsp;&nbsp;failures&rdquo;</i>, so <code>bm</code> was reported as
+<b>8 checks / 1891 failures</b> against a recorded 1891 / 0. <b>The single space in
+<code>([0-9]+) checks</code> is load-bearing</b>, and it is written down beside the regex now.
+(<b>CS&rsquo;s scar is recorded in three places as &ldquo;seven suites print the colon
+shape&rdquo;</b> &mdash; the seven is the set whose count read <code>?</code>, and only six of them
+print that shape. Re-derived here and corrected in <code>run_battery.sh</code> and
+<code>test_batch_cd.gd</code>.)</p>
+
+<h3>&sect;3 &mdash; <code>test_batch_at</code> WAS NEVER ONE FLAKY CHECK</h3>
+<p><b>It read 3 failures or 4, the fourth flaking in 2 runs of 5 &mdash; far worse than
+<code>bo</code>&rsquo;s 1 in 13 &mdash; with <code>seed()</code> called zero times and its check
+count rock steady at 470.</b> Seeding the recorded offender fixed it and <b>immediately exposed a
+second one that nobody had recorded</b>: <code>&hellip;by roughly the table&rsquo;s +59% (ratio
+1.44)</code>, which sums ten blows a side and still carries more noise than its band. <b>Both are
+the same shape</b> &mdash; a RATIO between two drives, where the first line of the strike block is
+<code>randf_range(0.9, 1.1)</code>, so each blow carries &plusmn;10% and a ratio of two carries up
+to 22% against a band of &plusmn;20%. <b>THE NOISE WAS THE WIDTH OF THE QUESTION.</b></p>
+<p><b>THE FIX IS THE SEED, NOT A WIDER BAND, AND THAT IS THE POINT.</b> The Cannon band exists to
+separate <b>1.54</b> (the passive alone) from <b>2.46</b> (the passive times the old ability term);
+open it far enough to swallow the variance and it stops telling those two apart, which is the whole
+assertion. Both blows of each pair draw the same variance now &mdash; and the ten-pair loop varies
+its seed PER ITERATION, so the averaging that makes its band meaningful survives. <b>The check
+count is unchanged at 470</b>: nothing was added and nothing was deleted.</p>
+<p><b>IT SETTLES AT 3, OVER FIVE CONSECUTIVE RUNS. So the fourth failure was a flake and not a
+finding</b>, and the three that remain are the stable <code>CLAUDE.md</code> assertions CW&rsquo;s
+split made false &mdash; which need rulings and are not this batch&rsquo;s. <b><code>bo</code> is
+deliberately left alone</b>: its repair is the same shape, and one flake at a time is how the
+effect stays attributable.</p>
+
+<h3>&sect;4 &mdash; THE CENSUS IS AN ASSERTION, AND THE RESIDUE IS NAMED</h3>
+<p><b><code>check_da</code> &sect;3 asserts the suites now, not just the gates</b>: a suite that
+carries a <code>_spawn</code> without reaching <code>suite_fixture.gd</code> fails by name. That is
+DB&rsquo;s rule applied to the other side &mdash; <b>a rule with no number under it rots into a
+sentence nobody re-checks.</b> The gate reads <b>36 checks</b> where it read 33, and those three
+are the only deliberate movement in any gate this batch.</p>
+<p><b>AND THE RESIDUE IS A RATCHET RATHER THAN A WILDCARD. Ten hand-built battle boards remain, in
+six files</b> &mdash; <code>al</code> (2), <code>an</code>, <code>ax</code>, <code>bl</code>,
+<code>test_rune_battle</code> (3) and <code>test_run_harness</code> (2). <b>None of them is a
+copied helper</b>: they are bespoke boards inside single checks, and two of the files have no
+<code>_spawn</code> at all. They are listed by name and by COUNT, so a new copy cannot hide among
+them.</p>
+
+<h3>&sect;5 &mdash; THE BATTERY: THREE LINES MOVED IN THE WHOLE PROJECT, AND ALL THREE WERE MEANT TO</h3>
+<p><b>Run twice &mdash; once on unmodified HEAD before anything was touched, once after &mdash;
+because &sect;0's proof IS the counts and a single run proves nothing about a change.</b>
+<code>user://</code> was backed up first and no run was in flight (<code>run_save.bin</code> does
+not exist). <b>THE BEFORE-BATTERY REPRODUCED DC'S TABLE EXACTLY</b>: 45 suites, zero throws, 49
+failures across 21 suites, <code>an</code> 6053 and <code>bk</code> 130 inside their bands, every
+gate identical. So the two runs compare like with like on this machine, not just against a
+document.</p>
+<p><b>ACROSS 45 SUITES AND 14 GATES, EXACTLY THREE LINES DIFFER:</b></p>
+<ul>
+<li><b><code>bk</code> 130 &rarr; 129</b> &mdash; inside its recorded band, zero failures. Not a
+regression, and it is the reason that band exists.</li>
+<li><b><code>test_batch_cd</code> 86 &rarr; 207 checks</b> &mdash; &sect;2's widening, five rows to
+forty-five. <b>The one large deliberate movement.</b></li>
+<li><b><code>check_da</code> 33 &rarr; 36 checks</b> &mdash; &sect;4's three census assertions.
+<b>The only movement in any gate.</b></li>
+</ul>
+<p><b>EVERY OTHER LINE IS BYTE-IDENTICAL</b> &mdash; 43 of 45 suite lines, 13 of 14 gate lines,
+<code>check_cm_live</code>'s four deliberate reds, the run harness at <b>22 / 165 / 8</b>,
+<code>check_ct_map</code> at <b>83 / 0</b>, and <b><code>throws=0</code> everywhere in both
+runs</b>, grepped from the stream and never read off a tally. <b>37 suites had their `_spawn`
+replaced and not one check count moved.</b></p>
+<p><b>THE FAILURE TOTAL IS 47 ACROSS 20 SUITES, DOWN FROM DC'S 49 ACROSS 21 &mdash; AND NOTHING WAS
+REPAIRED TO GET THERE.</b> The two that left are <b><code>cd</code>'s own</b>: they were
+<code>bb</code> and <code>bj</code> being reported red a second time, and the widened table records
+their failure counts as baselines instead. <b>It is an accounting change and it is the only
+movement in the project's failure total.</b> Measured with <code>bo</code>'s flake PRESENT (1), the
+same condition DB's 72 and DC's 49 were measured under; on a run where it does not flake the total
+reads 46 across 19.</p>
+<p><b>AND THE WIDENED TABLE CAUGHT ITS OWN AUTHOR&rsquo;S BUG ON THE RUN IT WAS INTRODUCED</b>
+&mdash; seven failures in <code>cd</code>, every one of them the greedy-space regex above, on the
+six suites that print the colon shape. <b>A count-differ that could not find a fault in itself would
+not be worth 22 minutes.</b></p>
+<p><b>AND ON THE RUN AFTER THAT, IT FOUND A SECOND THING &mdash; THIS TIME IN THE BRIEF&rsquo;S OWN
+INSTRUCTION.</b> Re-run with the regex fixed, the sweep read <b>45 suites, 1 off its recorded
+line: <code>an</code> at 6055 checks against the 6047&ndash;6054 band, and 0 failures.</b> That band
+had just been written from nine observations &mdash; <b>and it was exceeded inside the batch that
+wrote it</b>, which is precisely the failure &sect;1 of the brief warned about from the other
+direction. <b>A band written to a sample&rsquo;s exact extremes is exceeded by roughly two runs in
+eleven.</b></p>
+<p><b>SO THE BAND CARRIES A RULE NOW, AND THE RULE IS ASYMMETRIC ON PURPOSE:</b> floor = the lowest
+observation, ceiling = the highest PLUS the observed spread &mdash; <code>an</code> is
+<b>6047&ndash;6063</b> on ten readings. <b>The floor is the half that catches a real fault</b>: a
+section of <code>an</code> that stopped running costs hundreds of checks, not five, so the floor
+stays tight and the ceiling takes the headroom. <b><code>bk</code> is NOT widened</b>, because it
+has not been exceeded &mdash; headroom goes where a reading demands it, so every number in the table
+stays traceable to a run.</p>
+
 <h2>2026-08-21 &mdash; Batch DC: THE FAITH THRESHOLD ASSERTIONS</h2>
 <p><i>Small and mechanical, and it found two things that were not. <b>The 23 assertions pinning
 <code>FAITH_RELEASE</code> at 5 against the 3 the designer ruled at CZ are repaired to the ruled

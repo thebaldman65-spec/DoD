@@ -38,6 +38,11 @@
 # tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -156,37 +161,11 @@ func _find(u: BattleUnit, name: String) -> Ability:
 # `learned` lands on HIM; `cleric_learned` on the Cleric, for §8/§9.
 func _spawn(learned: Dictionary, cleric_spec := "occultist",
 		cleric_learned := {}, lineup := ["raider"]) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	var specs := ["berserker", "pyromancer", cleric_spec, "beastmaster"]
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = {}
-		if i == 2:
-			run.party[i]["talents"] = cleric_learned.duplicate()
-		elif i == 3:
-			run.party[i]["talents"] = learned.duplicate()
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# Determinism FORCED, not retried (the AK/AL/AR/AS/AT/AU/AV/AW/AX
-	# discipline). A driven _resolve still rolls miss, parry AND crit.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-		u.crit_bonus = -10.0
-	return scene
+	return await Fixture.spawn(self,
+		["berserker", "pyromancer", cleric_spec, "beastmaster"],
+		{"enemies": lineup,
+		"talents": {2: cleric_learned.duplicate(), 3: learned.duplicate()},
+		"deterministic": true, "crit": -10.0})
 
 
 func _summon(scene: Node, hunter: BattleUnit, kind: String) -> void:
@@ -196,11 +175,7 @@ func _summon(scene: Node, hunter: BattleUnit, kind: String) -> void:
 
 
 func _kill(scene: Node) -> void:
-	scene.queue_free()
-	# queue_free is DEFERRED (the AS gotcha) — give it a frame before the next
-	# spawn, or two battle scenes briefly share the tree.
-	await process_frame
-	await process_frame
+	await Fixture.kill(self, scene)
 
 
 # ---------- §3 the tree's shape ----------

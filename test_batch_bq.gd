@@ -45,6 +45,11 @@
 #     known health and asserted not to have been touched.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 # The twelve, by pool. Held here as a literal so the live dict and this file
@@ -1115,39 +1120,15 @@ func _docs() -> void:
 
 func _spawn(specs: Array, granted: Dictionary, lineup: Array,
 		learned := {}) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
-	for i in run.party.size():
-		run.party[i]["spec"] = specs[i]
-		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.get(specs[i], {})
-		run.party[i]["bm_abilities"] = granted.get(specs[i], [])
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# FORCE DETERMINISM rather than retrying until it passes (the AK/AL/AR
-	# discipline). NOTE THE DELIBERATE ASYMMETRY, AND IT IS THIS SUITE'S ONE
-	# DEPARTURE FROM test_batch_bp's harness: `no_cover` is armed on the HEROES
-	# only. It is an absolute miss BYPASS, and Mirror Image is a miss — arming
-	# it on the enemies too would make every image look broken. The enemy side
-	# gets it back, per unit, at the exact checks that need a blow to land.
-	for u in scene.get("heroes"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-	for e in scene.get("enemies"):
-		e.parry_chance = 0.0
-		e.block_chance = 0.0
-	return scene
+	# NOTE THE DELIBERATE ASYMMETRY, AND IT IS THIS SUITE'S ONE DEPARTURE FROM
+	# test_batch_bp's harness: `no_cover` is armed on the HEROES only, which is
+	# what `enemies_keep_cover` buys. It is an absolute miss BYPASS, and Mirror
+	# Image IS a miss — arming it on the enemies too would make every image look
+	# broken. The enemy side gets it back, per unit, at the exact checks that
+	# need a blow to land.
+	return await Fixture.spawn(self, specs,
+		{"difficulty": "wanderer", "enemies": lineup, "talents_by_spec": learned,
+		"bm_by_spec": granted, "deterministic": true, "enemies_keep_cover": true})
 
 
 func _hero(scene: Node, passive: String) -> BattleUnit:

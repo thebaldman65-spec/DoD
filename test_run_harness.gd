@@ -27,7 +27,10 @@
 #      doing the same thing. A QUANTITY IS ONLY AUDITABLE AT A GLANCE IF
 #      SOMETHING IS COMPARING IT TO WHAT IT SHOULD BE. Until CD nothing was.
 #      A COUNT THAT NOBODY DIFFS IS A WORD — test_batch_cd §1 is what diffs
-#      the repaired five, as a FLOOR per suite; extend it, do not trust a reader.
+#      them. IT WATCHED FIVE SUITES OUT OF FORTY-FIVE UNTIL BATCH DD, which is
+#      why repairing five suites at DC did not move it by one line; it carries
+#      every suite the battery runs now, as a BAND on the check count AND on the
+#      failure count. An instrument's scope is part of its reading.
 #   2. A GATE THAT RUNS ZERO CHECKS MUST FAIL. An empty gate is a broken gate,
 #      and it is the one case where silence has to be loud. A gate printing a
 #      count of zero is VISIBLY broken; the same gate printing PASS is not.

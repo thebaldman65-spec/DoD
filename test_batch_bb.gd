@@ -27,6 +27,11 @@
 #      Creeping Death stacking once per STATUS rather than once per TURN.
 extends SceneTree
 
+# BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
+# 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
+# This suite keeps its own SIGNATURE and delegates, so not one call site moved.
+const Fixture = preload("res://suite_fixture.gd")
+
 const REAL_SAVE := "user://run_save.bin"
 
 var checks := 0
@@ -122,43 +127,13 @@ func _const(scene: Node, name: String) -> int:
 # the scene is instantiated.
 func _spawn(specs: Array, learned := {}, learner := 3, mod_id := "",
 		lineup := ["raider", "raider"]) -> Node:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = String(specs[i])
-		run.party[i]["tree"] = Talents.generate_tree(String(specs[i]),
-			run.party[i]["key"])
-		run.party[i]["runes"] = []
-		run.party[i]["talents"] = learned.duplicate() if i == learner else {}
-		run.sync_spec_hp(i)
-	run.specs_chosen = true
-	run.active = true
-	run.slot_idx = 0
-	run.combat_wins = 0
-	run.pending_modifier = mod_id
-	run.encounter = {"type": "fight", "theme": "Warband", "enemies": lineup}
-	OS.set_environment("DOD_AUTOPLAY", "")
-	OS.set_environment("DOD_ENEMIES_OFF", "1")
-	var scene: Node = load("res://scenes/battle.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 20:
-		await process_frame
-	# Determinism FORCED, not retried (the AK/AL/AR/../BA discipline). A driven
-	# _resolve still rolls miss, parry AND crit.
-	for u in scene.get("heroes") + scene.get("enemies"):
-		u.no_cover = 1
-		u.parry_chance = 0.0
-		u.block_chance = 0.0
-	return scene
+	return await Fixture.spawn(self, specs,
+		{"enemies": lineup, "talents": {learner: learned.duplicate()}, "slot_idx": 0,
+		"modifier": mod_id, "deterministic": true})
 
 
 func _kill(scene: Node) -> void:
-	scene.queue_free()
-	# queue_free is DEFERRED (the AS gotcha) — give it a frame before the next
-	# spawn, or two battle scenes briefly share the tree.
-	await process_frame
-	await process_frame
+	await Fixture.kill(self, scene)
 
 
 func _kinds(hunter: BattleUnit, scene: Node) -> Array:
