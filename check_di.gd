@@ -26,9 +26,11 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-# The floor DI leaves behind. A ratchet, not an equality: a later batch widening
-# the sweep must not trip this, but one that DELETES a `src` must.
-const SRC_FLOOR := 99
+# The floor the last batch to touch it leaves behind. A ratchet, not an
+# equality: a later batch widening the sweep must not trip this, but one that
+# DELETES a `src` must. **DI left it at 99; DJ stamped the seven companion
+# sites and left it at 106.**
+const SRC_FLOOR := 106
 const CALL_SITES := 204
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
@@ -294,19 +296,22 @@ func _stamped(foe: BattleUnit, id: String, who: BattleUnit, why: String) -> void
 		"%s — `%s` reads `%s`" % [why, id, String(st.get("src_name", ""))])
 
 
-# ── §4 — THE COMPANION GAP, FOUND AT DI AND DELIBERATELY LEFT OPEN ──────────
-# DH's Harvest comment states: *"`heroes` CARRIES THE COMPANIONS, which is
+# ── §4 — THE COMPANION GAP, FOUND AT DI AND CLOSED AT DJ ───────────────────
+# DH's Harvest comment stated: *"`heroes` CARRIES THE COMPANIONS, which is
 # correct rather than incidental: Aguila's Exposed is the Beastmaster's work."*
 # **IT DOES NOT.** `heroes.append` is reached at exactly ONE site — the party
-# spawn — and a companion is appended to `companions`. Four sites in `battle.gd`
-# write `heroes + companions` precisely because the union is not free, and
-# `_hero_side()` exists to build it.
+# spawn — and a companion is appended to `companions`.
 #
-# THE CONSEQUENCE IS THAT HARVEST'S ALLY LOOP CANNOT RESOLVE A COMPANION NAME,
-# so a wound Aguila opened pays the BASE rate however it is stamped. DI did not
-# close it: the fix is one word in DH's loop and it MOVES A MAGNITUDE, which is
-# what §4 of this batch's brief forbids. It is asserted here so the day someone
-# rules on it, the assertion is what changes rather than the belief.
+# DI ASSERTED THE GAP RATHER THAN CLOSING IT, because closing it moves a
+# magnitude and DI's brief forbade that. **BATCH DJ RULED ON IT**: Harvest's
+# ally loop now walks `heroes + companions`, and the seven companion call sites
+# are stamped. **THIS SECTION IS WHAT CHANGED, WHICH IS WHY IT WAS WRITTEN THIS
+# WAY** — the belief was already asserted, so the ruling cost an assertion
+# rather than a discovery.
+#
+# THE FIRST TWO ASSERTIONS DID NOT MOVE and must not: `heroes` still does not
+# hold the companion and `_hero_side()` still does. **What moved is the third,
+# from 1.0 (paying nothing) to 1.5 (paying what a hero's wound pays).**
 func _companions(scene: Node) -> void:
 	var bm := _hero(scene, "pack_bond")
 	if bm == null:
@@ -325,9 +330,10 @@ func _companions(scene: Node) -> void:
 		"`heroes` now carries the companion — DH's comment has become true and §4's assertion is stale")
 	ok(scene._hero_side().has(comp),
 		"`_hero_side()` is the union and must still reach the companion")
-	# And the consequence, measured rather than argued: a companion-stamped
-	# affliction pays nothing, which is why DI left these sites unstamped
-	# instead of stamping them and calling the gap closed.
+	# And the consequence, measured rather than argued. BEFORE DJ this read
+	# 1.0000 — a companion-stamped affliction paid nothing at all, which is why
+	# DI left the seven companion sites unstamped rather than stamping them and
+	# calling the sweep complete. It now pays what a HERO's wound pays.
 	var harvest = _ability("Harvest")
 	var caster := _hero_not(scene, comp)
 	if harvest == null or caster == null:
@@ -335,9 +341,13 @@ func _companions(scene: Node) -> void:
 	var self_dmg := await _arm(scene, caster, harvest, caster)
 	var comp_dmg := await _arm(scene, caster, harvest, comp)
 	var r := float(comp_dmg) / float(self_dmg) if self_dmg > 0 else 0.0
-	print("  a companion-opened board pays %.4f of a self-opened one (1.0 = nothing)" % r)
-	ok(r > 0.98 and r < 1.02,
-		"a companion-opened wound now pays %.4f — the gap DI reported has been closed and this assertion is stale" % r)
+	print("  a companion-opened board pays %.4f of a self-opened one (1.0 = nothing, 1.5 = a hero's)" % r)
+	# THE SAME BAND §2 USES FOR A HERO, and deliberately the same: the point of
+	# the ruling is that the two are now indistinguishable to the clause. A band
+	# that admitted anything between 1.0 and 1.5 would pass with the fix half
+	# applied — the exact state DI found the game in one layer up.
+	ok(r > 1.48 and r < 1.52,
+		"a companion-opened wound pays %.4f of a self-opened one — DJ ruled it should pay a hero's 1.5" % r)
 
 
 # ── helpers ────────────────────────────────────────────────────────────────

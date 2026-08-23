@@ -18,7 +18,7 @@ CQ's rule is that fixing a value destroys that evidence. <b>What CV did to each 
 <tr><td>&sect;1.5 Rime</td><td><b>The code is right: 4 turns</b> &mdash; which is what the ability description in its own payload already said.</td><td>Node text 3&rarr;4; the two strings agree now.</td></tr>
 <tr><td>&sect;1.7 High Guard</td><td><b>The code is right: 3 turns.</b></td><td>Text 2&rarr;3, and <code>test_batch_ak</code>'s assertion, which had been pinning the wrong number.</td></tr>
 <tr><td>&sect;3 &mdash; unreachable clauses</td><td><b>Intercession's <code>perfect_text</code> cleared</b>, and the corpus swept for others.</td><td>The sweep ran over <b>all 220 ability definitions</b> rather than the 37 named here &mdash; a NAMED list cannot audit itself &mdash; and found <b>one more: Backdraft</b>. Both cleared; the corpus now measures zero. Mass Hysteria's description also ended "Cooldown 3.", the dead perfect's number rather than the base's 4.</td></tr>
-<tr><td>&sect;4.1 &mdash; "every ally" means the party minus companions</td><td><b>HERO = the four party members. ALLY = heroes and companions.</b> No read site moved.</td><td><b>Twenty-eight texts, not sixteen</b>: this report's scope sweep asked 20 nodes, CV asked all 41 that use ally/party language. 23 are shorted by an explicit <code>is_companion</code> filter, 2 more by <code>unit.gd:1320</code>'s gate on <code>below_half_cb</code>, and 3 more because <code>_gain_faith</code> refuses companions so no beast can hold Faith. <b>Four MORE moved the other way, to <i>ally</i></b>, their read sites genuinely including companions &mdash; 32 node texts in all.</td></tr>
+<tr><td>&sect;4.1 &mdash; "every ally" means the party minus companions</td><td><b>HERO = the four party members. ALLY = heroes and companions.</b> No read site moved.</td><td><b>Twenty-eight texts, not sixteen</b>: this report's scope sweep asked 20 nodes, CV asked all 41 that use ally/party language. 23 carry an explicit <code>is_companion</code> filter, 2 more are gated by <code>unit.gd:1320</code>'s <code>below_half_cb</code>, and 3 more because <code>_gain_faith</code> refuses companions so no beast can hold Faith. <b>Four MORE moved the other way, to <i>ally</i></b> &mdash; 32 node texts in all. <b>BATCH DJ &sect;1/&sect;2 corrected the mechanism and re-derived the four:</b> all 23 filters walk <code>heroes</code>, which never holds a companion, so the filter removes nothing and the COLLECTION is what excludes; and none of the four read sites moved to <i>ally</i> actually reaches a companion either. Reported there, ruled on nowhere.</td></tr>
 <tr><td>&sect;4.2 &mdash; undeclared caps and exclusions</td><td><b>Both sweeps run over all 324.</b></td><td>Caps declared on <code>sm_dominant</code>, <code>cr_winters_depth</code>, <code>ss_sunder_shot</code>, <code>wd_iron_will</code>. Exclusions declared on <code>sm_momentum_sm</code>, <code>sv_cocktail</code>, <code>sv_vulture</code>, <code>sv_creeping</code>.</td></tr>
 <tr><td>&sect;4.3 &mdash; interactions stated on one partner only</td><td><b>Stated on both.</b></td><td><code>dv_apostle</code> names Fervor now; <code>ar_conduit</code> and <code>ar_wrath</code> name each other and the 3.5% step they add up to.</td></tr>
 <tr><td>&sect;4.4 &mdash; adjacent surfaces</td><td><b>Blood Frenzy's floor interpolated; Guard Change reported and left.</b></td><td><code>party_screen.gd</code> reads the same <code>[50, 85, 100]</code> table the in-battle chip has always read.</td></tr>
@@ -247,8 +247,13 @@ trace a node to the wrong site.</p>
 <h3>4.1 — Sixteen nodes promise the party and mean the party minus companions</h3>
 <p><b>The largest single population in this audit.</b> Of 20 nodes whose text says "every ally",
 "the whole party", "every hero" or "each ally", <b>16 have read sites that explicitly skip
-<code>is_companion</code> units</b>, and <b>not one says so</b>. A Beastmaster's beast stands in
-<code>heroes</code>, is visibly on the player's side, and receives none of it.</p>
+<code>is_companion</code> units</b>, and <b>not one says so</b>. A Beastmaster's beast is visibly
+on the player's side and receives none of it.</p>
+<p><b>CORRECTED AT BATCH DJ &sect;1:</b> this section said the beast <i>stands in</i>
+<code>heroes</code>. It does not &mdash; it is appended to <code>companions</code>. <b>The finding
+below is unchanged and the mechanism behind it is not</b>: those 16 read sites exclude companions
+because they walk <code>heroes</code>, and the <code>is_companion</code> clauses on them remove
+nothing. The clause still reads as the author's INTENT; it is simply not what does the work.</p>
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>Node</th><th>Tree</th><th>Read site</th></tr>
 <tr><td><code>wd_stomp_drill</code> Rallying Cry</td><td>warden</td><td><code>battle.gd:2899</code></td></tr>

@@ -15152,7 +15152,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 								await _companion_hit(comp, kc_t,
 									0.25 * comp.attack * kc_mult, 0, 0.20 * kc_l)
 								if not kc_t.dead:
-									_apply_status(kc_t, "blind", 3)
+									# BATCH DJ §1 — the EAGLE blinded it, not the
+									# hunter who gave the order.
+									_apply_status(kc_t, "blind", 3, 0, 0, comp)
 					# A perfect order deepens the bond.
 					if is_perfect:
 						_gain_loyalty(attacker, comp.companion_kind)
@@ -17766,14 +17768,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					# status since BATCH W ("the src name also rides the status
 					# so mitigation it later performs can credit its caster") —
 					# so this clause costs a READ, not a signature change across
-					# 244 call sites. Nothing new is threaded anywhere.
+					# every call site. Nothing new is threaded anywhere.
 					#
 					# THE CAVEAT, AND IT IS REAL: only sites that PASS src stamp
-					# it — 53 of 204 single-line `_apply_status` calls do. An
-					# unstamped status therefore reads as "not an ally's" and
-					# pays the BASE rate. That is the safe direction (a missed
-					# bonus, never a false one), but it IS an under-payment and
-					# it is recorded rather than hidden.
+					# it, and not all of them do. An unstamped status therefore
+					# reads as "not an ally's" and pays the BASE rate. That is
+					# the safe direction (a missed bonus, never a false one),
+					# but it IS an under-payment and it is recorded rather than
+					# hidden.
+					#
+					# BATCH DJ §3 — AND THE COVERAGE FIGURE IS NOT WRITTEN HERE.
+					# This comment carried "53 of 204" from DH to DI to DJ; the
+					# 53 was a single-line grep and the real number was 63, and
+					# DI moved it again without this copy following. A number
+					# quoted from one document into another stops being a
+					# measurement. `check_di` §1 walks `battle.gd` and PRINTS the
+					# live count on every battery run — read it there.
 					#
 					# The snapshot is taken BEFORE the purge because the purge is
 					# what destroys the evidence, and it counts only what
@@ -17787,10 +17797,28 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					# `src != attacker.unit_name` would read a debuff one enemy
 					# laid on another as the party's work and pay him for it.
 					# Resolving by name through the array is `_frostbind_partner`'s
-					# idiom exactly. `heroes` CARRIES THE COMPANIONS, which is
-					# correct rather than incidental: Aguila's Exposed is the
-					# Beastmaster's work, and a hero who has since DIED still
-					# opened the wound, so neither is filtered on `dead`.
+					# idiom exactly.
+					#
+					# BATCH DJ §1 — AND THE ARRAY IS `heroes + companions`,
+					# BECAUSE `heroes` DOES NOT CARRY THE COMPANIONS. DH's
+					# comment here said it did; `heroes.append` is reached at
+					# exactly one site (the party spawn) and a summoned beast
+					# goes to `companions`. The clause says ALLY, and CV §4's
+					# standing convention is that ally means heroes AND
+					# companions — so a wound Aguila opened is the Beastmaster's
+					# pack's work and pays the bonus. Until DJ it paid the base
+					# rate however it was stamped, measured live at exactly
+					# 1.0000 of a self-opened board.
+					#
+					# IT IS NOT `_hero_side()`, AND THAT IS THE WHOLE CARE HERE.
+					# That helper filters `dead`, and this loop deliberately does
+					# not: a hero who has since FALLEN still opened the wound.
+					# Swapping the helper in would have closed the companion gap
+					# and silently opened a second one.
+					#
+					# THE UNION IS BUILT ONCE, ABOVE THE STATUS LOOP — it is the
+					# same array for every status on the body, and `+` allocates.
+					var hv_party: Array = heroes + companions
 					var hv_ally := 0
 					for hv_s in target.statuses:
 						if hv_s.id == "broken" or bool(hv_s.get("sticky", false)):
@@ -17800,7 +17828,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						var hv_src := String(hv_s.get("src_name", ""))
 						if hv_src == "" or hv_src == attacker.unit_name:
 							continue
-						for hv_h in heroes:
+						for hv_h in hv_party:
 							if hv_h != attacker and hv_h.unit_name == hv_src:
 								hv_ally += 1
 								break
@@ -17893,7 +17921,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 							if bw_taunted >= 3:
 								break
 							if bw_idx >= 0:
-								_apply_status(bw_e, "mocked", 2, 100 + bw_idx)
+								# BATCH DJ §1 — the BEAR drags them onto itself;
+								# the power still encodes the hunter's index,
+								# which is who the taunt PULLS TO, not who
+								# applied it.
+								_apply_status(bw_e, "mocked", 2, 100 + bw_idx,
+									0, bw_comp)
 								bw_taunted += 1
 						_log("%s: Bestial Wrath — doubled health, +50%% armor, %d enemies taunted" % [
 							bw_comp.unit_name, bw_taunted], "#e0a050")
@@ -19588,10 +19621,15 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 				if h_idx >= 0:
 					# Companion taunts encode as 100 + the hunter's index; a
 					# bodiless roar pulls to the active beast, else the hunter.
+					# BATCH DJ §1 — THE SOURCE IS THE ROARER AND THE POWER IS THE
+					# PULL, and they are not the same question. A bear on the
+					# field roared it; a bodiless roar (Call of the Wild) has no
+					# beast to credit, so it is the hunter's.
+					var gr_src: BattleUnit = body if body != null else hunter
 					if body != null or not _beasts(hunter).is_empty():
-						_apply_status(tgt, "mocked", 2, 100 + h_idx)
+						_apply_status(tgt, "mocked", 2, 100 + h_idx, 0, gr_src)
 					else:
-						_apply_status(tgt, "mocked", 2, h_idx)
+						_apply_status(tgt, "mocked", 2, h_idx, 0, gr_src)
 				taunted_names.append(tgt.unit_name)
 			if body != null:
 				_apply_status(body, "roar", 2)
@@ -19643,7 +19681,10 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 				else:
 					await _ghost_hit(hunter, kind, d, 0.15 * hunter.attack)
 				if not d.dead:
-					_apply_status(d, "dazed", 2)
+					# BATCH DJ §1 — whoever actually dived: the eagle if one
+					# stands, else the hunter whose spirit answered.
+					_apply_status(d, "dazed", 2, 0, 0,
+						body if body != null else hunter)
 					_log("   → %s is Dazed by the dive" % d.unit_name, "#e0a050")
 
 
@@ -19726,10 +19767,14 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 			await _companion_hit(comp, victim, 0.20 * comp.attack * dmg_mult, 0,
 				0.20 * l)
 			# Every eagle strike lays the prey open — and Blinds under Wrath.
+			# BATCH DJ §1 — THE EAGLE IS THE SOURCE, and this is the pair the
+			# whole batch is named after: DH's Harvest clause promised a bonus
+			# for "a wound an ALLY opened" and Aguila's Exposed is the one it
+			# was written around.
 			if not victim.dead:
-				_apply_status(victim, "exposed", 4 if boosted else 2)
+				_apply_status(victim, "exposed", 4 if boosted else 2, 0, 0, comp)
 				if comp.has_status("bestial"):
-					_apply_status(victim, "blind", 2)
+					_apply_status(victim, "blind", 2, 0, 0, comp)
 
 
 # All beasts deal physical damage using the hunter's inherited crit chance.

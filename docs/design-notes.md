@@ -5027,3 +5027,56 @@ party" will eventually have a walk that picks the wrong one, and the walk that p
 the one deciding whether Aguila's Exposed counts as the party's work. **DI did not fix it**, because
 fixing it moves a magnitude and this batch forbade itself that; it asserted it instead. An assertion
 is how a belief stops being a belief.
+
+## BATCH DJ — THE FIX THE LAST BATCH RECOMMENDED WAS THE WRONG ONE
+
+DI ended by naming the thing it would not do and writing down how to do it: *"the fix is one word in
+DH's loop (`heroes` → `_hero_side()`)"*. It was right that the batch should stop, right about why,
+and **wrong about the word** — and the way it was wrong is the whole lesson of this batch.
+
+`_hero_side()` is the union of the *living*. Harvest's loop is deliberately not: DH's own comment,
+three lines above the line DI was proposing to change, says *"a hero who has since DIED still opened
+the wound, so neither is filtered on `dead`"*. Taking the recommendation would have closed the
+companion gap and opened a fresh one **in the same loop, in the same shape, in the same batch** —
+a wound opened by a fallen hero would have dropped from paying 1.5 to paying 1.0, measured here at
+**0.6664**. The second defect would have been introduced by the fix for the first, and it would have
+been just as invisible, because the same thing is true of both: nothing logs it, nothing tests it,
+and the number it produces is a perfectly ordinary number.
+
+**A recommendation from the batch that found the bug is not evidence, and it is the most persuasive
+kind of non-evidence there is.** It arrives with the finding, in the same voice, from the process
+that was demonstrably paying attention. DI's report was careful, correct about the diagnosis, and
+correct to refuse the fix. It still got the fix wrong, in one word, in a place where being wrong
+costs nothing visible. The only reason DJ did not simply apply it is that the union had to be
+*written out* to be typed at all, and typing it out is what made the `dead` question appear.
+
+**That is the argument for spelling a thing rather than calling a helper.** `heroes + companions` is
+uglier than `_hero_side()` and it is four characters longer. It also states, at the site, the two
+decisions the site is actually making — which collections, and whether the dead count — where the
+helper states one of them and hides the other behind a name that does not mention it. **The helper
+is not wrong. It answers a different question, and its name does not say which.** A codebase with
+three idioms for "the party" does not need a fourth; it needs the three to be distinguishable at the
+point of use, and `_hero_side()` is only distinguishable if you go and read it.
+
+**The second thing this batch found is what an `is_companion` filter is worth.** CV §4 recorded that
+23 nodes are *"shorted by an explicit `is_companion` filter"*, and the sweep behind that number was
+real — all 23 filters exist, exactly where it said. Every one of them filters `heroes`, which cannot
+contain a companion. **They remove nothing.** They are, all 23, the author writing down an intention
+against an array that had already satisfied it.
+
+This is a nicer kind of wrong than it looks. The filters are *evidence of intent* — someone thought
+about companions at that site and decided against them — and that is genuinely useful when you are
+trying to sort a deliberate exclusion from an accident. What they are not is a mechanism, and the
+consequence runs the other way and bites: **a site with no such filter is not thereby including
+companions.** CV read the presence of the filter as the exclusion and, reasonably, read its absence
+as inclusion — which is how four node texts came to be moved *to* "ally" on the strength of read
+sites that reach no companion, and how `wd_tank_spank` came to be cited in the rule file as the
+proof that the distinction works.
+
+**None of those four were reverted here.** Reverting the text is one ruling; fixing the code is the
+opposite one; and a sweep is not entitled to make either. What a sweep is entitled to do is put the
+eleven sites in a table, say which each one *looks* like and why, and pin every one of them so the
+table cannot rot — which is what `check_dj` §5 does. **A finding that is only prose has a half-life.**
+DI's own §3 is the proof: it recorded the companion gap accurately, in three documents, and it also
+recorded the fix, and one batch later the accurate part was still accurate and the fix was still
+wrong, and nothing in the repository could tell the difference between them.

@@ -5,32 +5,47 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-22 (Batch DI).*
+*Last rewritten: 2026-08-23 (Batch DJ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DI — `src` MADE HONEST WHERE HARVEST READS IT.** 36 `_apply_status` call sites now
-  pass the unit that applied the status. **No status behaviour changed, no magnitude moved and no
-  clause from DH was retuned** — the batch supplies an argument that was already accepted and
-  already read. Coverage goes **63 → 99 of 204**, and the two sites passing an explicit `null` are
-  gone. **One new gate, `check_di` (44 checks).**
-- **THE RECORDED COVERAGE FIGURE — 53 of 204 — WAS WRONG, AND IT WAS WRONG BECAUSE IT WAS A GREP.**
-  It sat in this file, in DH's own source comment and in DI's brief. **25 of the 204 calls wrap
-  across lines and TWELVE OF THOSE ALREADY PASSED A SOURCE**, so the true figure was **63**. A
-  single-line grep cannot see a call that wraps. `check_di` §1 balances parens instead — and skips
-  the two COMMENTS that name `_apply_status(`, which is the same fault one layer down.
-- **THE UNDER-PAYMENT WAS REAL AND IT WAS 35%.** On a board laid by real casts through the changed
-  sites, eight reapable statuses carried **one** source before and **eight** after; the ally
-  fraction goes 1/8 → 7/8, the rate 0.1275 → 0.1725, and **Harvest's payout 3923 → 5308**.
-  Predicted ratio 1.3529 against a measured 1.3530. **The sites that mattered were not already
-  among the 63.**
-- **THE STANDING RULE DI RECORDED:** a status is applied with its `src`. A site that omits it does
-  not fail — it silently mis-credits anything reading the source. In `CLAUDE.md`, with the
-  companion caveat and the walk-don't-grep clause.
-- **Next letter: DJ.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
-  out of `(Batch XX)` and compares lexically — `DJ` sorts after `DI`, so it still works. **A
+- **Last batch: DJ — HARVEST'S ALLY LOOP READS `companions`.** DH's clause pays more for a wound an
+  ALLY opened and its loop walked `heroes`, which **does not carry the companions** — so a wound
+  Aguila opened paid the base rate however it was stamped, measured live at **exactly 1.0000** of a
+  self-opened board. **DJ closes both halves DI left open**: the loop reads `heroes + companions`
+  and the seven withheld companion call sites are stamped. **A companion-opened board now pays
+  1.5000, which is what a hero's wound pays.** `src` coverage **99 → 106 of 204**. **One new gate,
+  `check_dj` (54 checks).**
+- **THE FIX DI RECOMMENDED WAS THE WRONG ONE, AND THAT IS THIS BATCH'S HEADLINE.**
+  `docs/reports/DI.md` §3 wrote it as *"one word: `heroes` → `_hero_side()`"*. **`_hero_side()`
+  filters `dead` and this loop deliberately does not** — DH's own comment, three lines up, says a
+  hero who has since fallen still opened the wound. **Measured: the recommended fix passes the
+  companion check at 1.5005 and drops a FALLEN opener's board to 0.6664** — a fresh 33%
+  under-payment in the same loop, in the same shape, introduced by the fix for the first one.
+  `check_dj` §4 is the control that rejects it, and the union is spelled out rather than delegated
+  so the `dead` decision is stated at the site.
+- **THE WRONG BELIEF WAS WRITTEN DOWN IN FOUR LIVE PLACES AND `CLAUDE.md` CONTRADICTED ITSELF.**
+  `battle.gd`'s Harvest comment, **CV §4's own convention block in `CLAUDE.md`**,
+  `docs/text-standard.html` §4.9 and `docs/talent-audit.html` §4.1 all said a Beastmaster's beast
+  *stands in `heroes`*; DI had already recorded the correct fact 1900 lines further down the same
+  rule file. All four are corrected. **The changelog and the batch reports are HISTORY and were
+  deliberately not swept.**
+- **AND THE MECHANISM IN THAT BELIEF WAS WRONG TOO: ALL 23 `is_companion` FILTERS OVER `heroes` ARE
+  NO-OPS.** CV §4 recorded 23 nodes "shorted by an explicit `is_companion` filter"; the filters are
+  real and every one of them filters an array that cannot hold a companion. **The COLLECTION is what
+  excludes.** The filters still read as the author's INTENT, which is worth having — but the
+  corollary is the one that bites: **a walk with no such filter is not thereby including
+  companions**, which is how four node texts came to be moved TO "ally" on read sites that reach
+  none.
+- **DJ RULED ON HARVEST AND ON NOTHING ELSE.** §2 swept every broad ally-worded card and node:
+  **eleven besides Harvest walk bare `heroes`**, including all four CV moved TO "ally" and
+  `wd_tank_spank`, which `CLAUDE.md` cited as the proof the distinction works. The table is in
+  `docs/reports/DJ.md` §2 with which each one *looks* like; **`check_dj` §5 pins all eleven by their
+  own read lines so the table cannot rot.**
+- **Next letter: DK.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
+  out of `(Batch XX)` and compares lexically — `DK` sorts after `DJ`, so it still works. **A
   THREE-letter code would break all fourteen.**
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
@@ -38,22 +53,17 @@ in `docs/master.html`.
   split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
   one of them, DB's and DD's `_spawn` consolidations, DC's threshold repairs, DE's move of the
   count differ into the runner, DF's sort of the 47, DG's close of the ten, **DH's nine cross-spec
-  clauses — the first batch in many that added PLAY — and DI paying the plumbing debt DH shipped
-  one batch ahead of.**
-- **TWO BATTERIES RAN AND THE FIRST ONE CAUGHT A DEFECT OF THIS BATCH.** `test_batch_ax` pins the
-  exact source line `_hold_freeze` hands to `_apply_status`, `null` and all. Repaired to intent,
-  count-neutral at 345. **The literal sweep that was supposed to catch it had two holes** — it read
-  only literals written inline inside `.contains(...)`, and only DOUBLE-quoted ones. Both are
-  closed; the full sweep now reports exactly two flipped literals across all 47 suites and 21
-  gates, which are the two that were repaired.
-
----
+  clauses — the first batch in many that added PLAY — DI's payment of the plumbing debt DH shipped
+  one batch ahead of, and DJ's close of the half DI would not take.**
+- **TWO BATTERIES RAN AND BOTH WERE CLEAN.** The only red in either is `check_cm_live`'s four,
+  which is the standing deliberate one. **`check_de` moved 277 → 281 and it was predicted** — four
+  assertions per baseline row, and DJ adds one row.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
 ### THE FLAKE THAT DG FOUND, AND IT DID NOT FIRE AT DH OR AT DI
 
-- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND READ 0 AT DH AND IN BOTH DI BATTERIES — STILL OPEN, STILL UNSEEDED.** `_live_curve()`
+- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND READ 0 AT DH AND IN BOTH THE DI AND THE DJ BATTERIES — STILL OPEN, STILL UNSEEDED.** `_live_curve()`
   sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
   a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
   DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
@@ -74,7 +84,7 @@ in `docs/master.html`.
     rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
     comment says checks that care must do — do NOT widen the band, because the band IS the
     question.**
-  - **REPORTED AND DELIBERATELY NOT FIXED AT DG, AND NOT AT DH OR DI EITHER.** **The zeros on this
+  - **REPORTED AND DELIBERATELY NOT FIXED AT DG, AND NOT AT DH, DI OR DJ EITHER.** **The zeros on this
     row are the flake being quiet, not the flake being fixed** — its rate is about one red in eighteen
     readings, so a clean run is the common case and proves nothing. **One flake at a
     time is how the effect stays attributable** — `bo`'s is still open and `test_rune_battle`'s is
@@ -89,28 +99,40 @@ in `docs/master.html`.
   **They were not deleted because six was the only sanctioned fall in that batch**, and deleting
   them would have broken the two-sided acceptance test that made the deletion safe. **A check that
   passes for no reason is worse than a red**, so this is owed rather than settled.
-- **`_apply_status`'s `src` COVERAGE IS 99 OF 204, AND THE REMAINING 105 ARE OWED.** DI stamped the
-  36 sites that can apply a status **Harvest reads**; the rest apply buffs, marks and hero-side
-  wards, so **nothing currently mis-credits off them**. The standing rule now covers them and the
-  full sweep stays visible. **No site passes an explicit `null` any more.**
+- **`_apply_status`'s `src` COVERAGE IS 106 OF 204, AND THE REMAINING 98 ARE OWED.** DI stamped the
+  36 sites that can apply a status **Harvest reads** and DJ added the seven companion sites; the
+  rest apply buffs, marks and hero-side wards, so **nothing currently mis-credits off them**. The
+  standing rule covers them and the full sweep stays visible. **No site passes an explicit `null`.**
+  **Do not quote this figure without re-deriving it** — `check_di` §1 walks the file and PRINTS the
+  live count on every battery run, which is the whole point of DJ's second standing rule.
 - **AND ONE SITE IS OUT OF REACH BY SHAPE RATHER THAN BY SCOPE.** `melted` is applied through
   `unit.add_status` (`battle.gd:2553`), which **accepts no source argument at all** — stamping it
   is a signature change, not an argument. **It is the only Harvest-readable status applied outside
   `_apply_status`.**
-- **`heroes` DOES NOT CARRY THE COMPANIONS, DH'S COMMENT SAYS IT DOES, AND HARVEST UNDER-PAYS FOR
-  IT.** `heroes.append` is reached at exactly ONE site — the party spawn — and a companion goes to
-  `companions`; four sites in `battle.gd` write `heroes + companions` precisely because the union
-  is not free, and `_hero_side()` exists to build it. **Harvest's ally loop walks `heroes`, so a
-  wound Aguila opened pays the base rate however it is stamped** — measured live at exactly 1.0000
-  of a self-opened board. **DI DID NOT CLOSE IT**: the fix is one word in DH's loop and it moves a
-  magnitude. **This is why DI left the seven companion sites unstamped** — stamping them without
-  the loop fix would make the sweep look complete while the wound still paid nothing.
-  `check_di` §4 asserts both halves, so a ruling changes an assertion rather than a belief.
-- **FOURTEEN SITES ARE DELIBERATELY UNSTAMPED BECAUSE THEIR TRUE SOURCE IS AMBIGUOUS**, and all
-  fourteen are named in `docs/reports/DI.md` §2: Umbral Mirror's rebound, Chain Ignition, the
-  Cursed Visage (an item — `_use_item` takes no user), Spread of Madness, the bewitched strike,
-  Hemorrhage, the Hoarfrost modifier stamp, and the seven companion sites. **Getting the source
-  wrong is worse than leaving it absent.**
+- **ELEVEN ALLY-WORDED EFFECTS BESIDES HARVEST STILL WALK BARE `heroes`, AND DJ RULED ON NONE OF
+  THEM.** The table is in `docs/reports/DJ.md` §2, with each site's read line and which it *looks*
+  like. **An exclusion that is INTENDED needs its TEXT corrected to say "hero"; one that is
+  ACCIDENTAL needs its CODE corrected** — and that is the designer's call, not a sweep's. Seven look
+  accidental (Tank and Spank, Rally, Hold the Line, Sanctuary, Field Medic, Last Hope, Devoutness)
+  and four look intended or structural (Rallying Cry and War Stomp refuel a resource bar a beast
+  does not have; Cleansing Waters runs per-TURN and a companion takes none). **`check_dj` §5 pins
+  all eleven by their own read lines**, so a site that changes reports itself as a NOTICE to
+  re-derive the table.
+  - **TWO OF THEM CARRY A SECOND OBSTACLE:** Devoutness and Last Hope are stamped **once at party
+    spawn**, before any companion exists, so widening the collection alone would not reach a beast
+    summoned later.
+  - **`master.html` STATES HOLD THE LINE'S AS "(companions included)", WHICH IS FALSE TODAY.** It is
+    flagged in place pointing at DJ §2 rather than corrected in either direction, because
+    correcting it IS the ruling.
+  - **AND CV §4's FOUR "PRECISION RUNS BOTH DIRECTIONS" MOVES ALL REST ON A FALSE PREMISE.**
+    `wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters` were moved TO *ally* because their
+    read sites "genuinely include companions". None does. **Reported, not reverted** — reverting
+    the text is one ruling and fixing the code is the opposite one.
+- **SEVEN SITES ARE DELIBERATELY UNSTAMPED BECAUSE THEIR TRUE SOURCE IS AMBIGUOUS**, and all seven
+  are named in `docs/reports/DI.md` §2: Umbral Mirror's rebound, Chain Ignition, the Cursed Visage
+  (an item — `_use_item` takes no user), Spread of Madness, the bewitched strike, Hemorrhage and
+  the Hoarfrost modifier stamp. **DI listed fourteen; the other seven were the companion sites,
+  which DJ stamped.** **Getting the source wrong is worse than leaving it absent.**
 - **`FIREDRAW_TAKE` (4) IS DEAD, AND WAS DEAD BEFORE DH.** `firedraw` uses
   `FIREDRAW_TAKE_PERFECT` (6) unconditionally. **DH deliberately did not collapse it** — that would
   move a magnitude on an existing effect — but it is a real dead symbol that `test_batch_cd`'s
@@ -124,9 +146,10 @@ in `docs/master.html`.
   `bn`, `bo`, `bp`, `bq` and `br` do not. `test_run_harness.gd` restores the real path without ever
   swapping away from it. Same shape as `_spawn`, one layer in.
 - **`CLAUDE.md` IS STILL OVER CW's OWN TARGET.** CW set *"under 3% of the knowledge sync and
-  roughly flat over time"*. It reads **195 KiB of a 5.85 MiB sync = 3.25%** — DI added one standing
-  rule and the sync grew with it, so **the ratio is still flat rather than rising**. Not urgent;
-  **worth a prune when a batch is in the file anyway**, and DG, DH and DI all declined it.
+  roughly flat over time"*. It reads **200 KiB of a 5.93 MiB sync = 3.30%** — DJ added two standing
+  rules and the sync grew with them, so **the ratio is still flat rather than rising** (3.25% at
+  DI). Not urgent; **worth a prune when a batch is in the file anyway**, and DG, DH, DI and DJ all
+  declined it.
 - **TEN HAND-BUILT BATTLE BOARDS REMAIN, IN SIX FILES** — `al` (2), `an`, `ax`, `bl`,
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper**: they are bespoke
   boards inside single checks, and two of those files have no `_spawn` at all. `check_da` §3 carries
@@ -293,7 +316,7 @@ in `docs/master.html`.
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DI
+### THE TEST TREE, AS OF DJ
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -301,8 +324,8 @@ in `docs/master.html`.
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **fifteen** — DI added
-  `check_di`. **There are 21 `check_*.gd` files**, so **six are not in `GATES`** — `check_ck_width`,
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **sixteen** — DJ added
+  `check_dj`. **There are 22 `check_*.gd` files**, so **six are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the three that run nowhere are `check_ck_width`, `check_cu` and `check_cv`.
@@ -314,7 +337,7 @@ in `docs/master.html`.
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 66 ROWS: 46 suites, 15 gates, 2 scene runs
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 67 ROWS: 46 suites, 16 gates, 2 scene runs
   and 3 harness gates.** **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
   number is this project's oldest recurring defect, and **DG found five live copies of one figure
   and two disagreeing copies of another.** Per target it carries the expected check count (a number
@@ -324,8 +347,9 @@ in `docs/master.html`.
   draft-target sweep and the pool measurement. **DG repaired its §2 anchor guard and added the
   assertion that the guard RESOLVED**, which is the +1.
 - **`check_de.gd` IS THE DIFFER, IT SPAWNS NOTHING, AND IT HAS NO ROW OF ITS OWN** — it excludes
-  itself from its own sweep, which is why its count moving 273 → 277 at DI (four assertions per
-  baseline row, and DI added one row) was reported by nothing. It It runs last, reads the logs and the
+  itself from its own sweep, which is why its count moving 277 → 281 at DJ (four assertions per
+  baseline row, and DJ added one row) is reported by nothing. **DI's report made the same movement
+  and did not predict it; DJ's prediction table carries it.** It It runs last, reads the logs and the
   baseline file, and reports. **It is re-runnable in seconds over a log directory that already
   exists**, which is what lets a batch write `docs/state.md` and its report AFTER the battery and
   still certify the tree — neither is read by any suite, and `check_de` reads neither.
@@ -335,7 +359,7 @@ in `docs/master.html`.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-22 (Batch DI)`.**
+- **master.html stamp: `Last updated: 2026-08-23 (Batch DJ)`.**
 
 ### HOW LONG A FIGHT IS
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
@@ -375,25 +399,25 @@ in `docs/master.html`.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 21 entries** (CO → DI), **304 KiB**. The 400 KB
+- **The live file starts at Batch CO and holds 22 entries** (CO → DJ), **310 KiB**. The 400 KB
   threshold is still some way off.
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (Batch 1 → CN) and is **1042 KiB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
   bv, bw, bx, cb, ce, bb, bn, bo. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
   correct.
 
-### Knowledge sync, re-measured at DI
+### Knowledge sync, re-measured at DJ
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **128 files, 5.85 MiB** (DH measured 126 files / 5.81 MiB; DI added `check_di.gd` and
-  `docs/reports/DI.md`, plus prose to four documents).
-- Heaviest: `scripts/battle.gd` **1164**, `docs/design-notes.md` **326**, `docs/master.html`
-  **324**, `docs/changelog.html` **304**, `scripts/classes.gd` **275**, `CLAUDE.md` **195**,
+- **130 files, 5.93 MiB** (DI measured 128 files / 5.85 MiB; DJ added `check_dj.gd` and
+  `docs/reports/DJ.md`, plus prose to six documents).
+- Heaviest: `scripts/battle.gd` **1166**, `docs/design-notes.md` **330**, `docs/master.html`
+  **325**, `docs/changelog.html` **310**, `scripts/classes.gd` **275**, `CLAUDE.md` **200**,
   `scripts/talents.gd` **181**, `scripts/unit.gd` **174**.
-- **The 47 suite files total 1810 KiB — 30.2% of the sync**, still the single largest block. **They
+- **The 47 suite files total 1811 KiB — 29.8% of the sync**, still the single largest block. **They
   cannot be archived (they must be in the repo to run) but they CAN be deselected from the sync.**
-  The 21 gates add **192 KiB**.
+  The 22 gates add **212 KiB**.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -403,22 +427,20 @@ SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
 ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED
 
 **DB measured 72 across 26 suites. DC repaired 23. DD and DE deliberately repaired none. DF sorted
-all 47 and repaired the 37 that were STALE. DG closed the remaining ten.** **THE DI ACCEPTANCE
-BATTERY READ ZERO SUITE FAILURES — AND THAT IS NOT A REPAIR EITHER.** `test_batch_at`'s unseeded
-ratio, `bo`'s NULL FIELD flake and `test_rune_battle`'s pierce **all simply did not fire**, in
-either DI battery. **All three are still open and still unseeded.** A row that reads clean at a
-rate of about seventeen in eighteen has told you nothing when it reads clean.
-**THE ONE RED DI'S FIRST BATTERY DID FIND WAS DI'S OWN** — `test_batch_ax` pinning the source line
-`_hold_freeze` hands to `_apply_status`, `null` and all — and it is repaired to intent,
-count-neutral at 345. **THE COUNTS AND THE BANDS ARE IN `baselines.json` AND ARE NOT REPEATED
-HERE.**
+all 47 and repaired the 37 that were STALE. DG closed the remaining ten.** **BOTH DJ BATTERIES READ
+ZERO SUITE FAILURES, AND SO DID BOTH DI BATTERIES AFTER THE FIRST — AND THAT IS NOT A REPAIR.**
+`test_batch_at`'s unseeded ratio, `bo`'s NULL FIELD flake and `test_rune_battle`'s pierce **all
+simply did not fire**, in any of the four. **All three are still open and still unseeded.** A row
+that reads clean at a rate of about seventeen in eighteen has told you nothing when it reads clean —
+**four consecutive quiet readings are the expected outcome, not evidence.**
+**THE COUNTS AND THE BANDS ARE IN `baselines.json` AND ARE NOT REPEATED HERE.**
 
 ### THE REST
 
 - **`check_cm_live` reports 4 failures. THIS IS THE ONE RED THAT IS ON PURPOSE.** Identical on
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
-  before and after the gate consolidation; DC, DD, DE, DF, DG, DH and DI confirm them again.** It is the
-  only thing that presses the defensive bar.
+  before and after the gate consolidation; DC, DD, DE, DF, DG, DH, DI and DJ confirm them again.** It
+  is the only thing that presses the defensive bar.
 - **AND CHECKS THAT PASS BY ACCIDENT ARE STILL WORSE THAN A RED.** `bs`'s `contains("BATCH XX")`
   against `CLAUDE.md` is the one on record and is the same one-line shape DF repaired in `bn`, `ce`
   and `br`; it is left for the batch that next opens that suite. **The three vacuous exclusive-pair
@@ -459,44 +481,57 @@ HERE.**
 
 ### Last measurements
 
-**TWO FULL BATTERIES AT DI. THE FIRST FOUND A DEFECT OF THIS BATCH; THE SECOND IS THE ACCEPTANCE
-RUN AGAINST THE FINAL TREE.** `baselines.json` carried the **PREDICTED** after-values before both,
-and the documentation was written before both; `docs/state.md` and `docs/reports/DI.md` are the
-only files written after, **and no suite reads either**.
+**TWO FULL BATTERIES AT DJ AND BOTH WERE CLEAN.** `baselines.json` carried the **PREDICTED**
+after-values before both, and `CLAUDE.md`, `docs/changelog.html` and `docs/master.html` were written
+before both; `docs/state.md`, `docs/design-notes.md` and `docs/reports/DJ.md` are the only files
+written after, **and no suite reads any of the three** (the four `state.md` mentions in suites are
+all in comments).
 
-| | before (DH's after-battery) | DI battery 1 | DI battery 2 (acceptance) |
+| | before (DI's acceptance) | DJ battery 1 | DJ battery 2 (acceptance) |
 |---|---|---|---|
-| **suite failures** | **0** | **1 across 1** | **0 — and see the caveat below** |
+| **suite failures** | 0 | **0** | **0 — and see the caveat below** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
 | **throws, grepped from the stream** | 0 | 0 | **0** |
 | check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 273 / 0 / 0 | 277 / 1 / 0 | **277 / 0 / 0** |
+| `check_de` | 277 / 0 / 0 | 281 / 0 / 0 | **281 / 0 / 0** |
 
-**`check_de` READ 0 FAILURES AND 0 NOTICES** on the acceptance run — no count fell, no failure
-count rose, and nothing rose unexpectedly. All 66 rows inside their bands.
+**`check_de` READ 0 FAILURES AND 0 NOTICES ON BOTH RUNS** — no count fell, no failure count rose,
+and nothing rose unexpectedly. All 67 rows inside their bands.
 
 **THE SANCTIONED MOVEMENTS, PREDICTED BEFORE THE RUN:**
 
 | target | before | after | movement |
 |---|---|---|---|
-| `check_di` | — | **44 / 0** | **NEW: DI's gate, predicted at 44 over six ad-hoc readings** |
-| `check_de` | 273 | **277** | **+4, four assertions per baseline row and DI adds one row** |
+| `check_dj` | — | **54 / 0** | **NEW: DJ's gate.** It read **43** in battery 1 and grew to 54 between the two runs when §5's eleven-site ratchet was added — **battery 2 is the acceptance run against the final tree, and it is the only battery reading that supports the 54** |
+| `check_de` | 277 | **281** | **+4, four assertions per baseline row and DJ adds one row.** Predicted this time; DI made the same movement and did not predict it |
+| `check_di` | 44 / 0 | **44 / 0** | **unmoved. Its §4 changed its VALUE (1.0 → 1.5), not its count**, which is what DI built that section for; its §1 floor moved 99 → 106 |
 
-**AND THE PREDICTION MISSED ONE ROW.** It said *"every other row UNMOVED"*; `test_batch_ax` went
-**345 / 1** in battery 1, on a needle DI's own edit invalidated. **The literal sweep meant to catch
-it had two holes** — it read only literals written inline inside `.contains(...)` (`ba`'s needle is
-a dictionary KEY fed through a loop) and only DOUBLE-quoted ones (`ax`'s is single-quoted, because
-it contains embedded quotes). Both are closed. **The full sweep over all 47 suites and 21 gates now
-reports exactly two flipped literals across this batch, which are the two that were repaired**,
-both count-neutral.
+**THE PREDICTION WAS RIGHT ON EVERY ROW.** No suite moved, and the literal sweep is why that was
+knowable in advance rather than discovered: every string literal in all 47 suites and 22 gates was
+evaluated against `battle.gd` and against the documents, before and after, at a 5-character floor
+over ~20,000 literals. **Zero flipped anywhere outside `check_dj`'s own needles**, which flipped in
+exactly the direction they were written (three GAINED that §1/§3 assert are present, two LOST that
+§6 asserts are gone). **The instrument was positive-controlled rather than trusted** — replayed
+against DI's own change it correctly reports `test_batch_ax`'s needle, the one DI's first sweep
+missed for being single-quoted.
 
-**AND THE ZERO IN THE FAILURE ROW IS NOT A REPAIR.** Three known flakes were quiet in both
-batteries. **The next batch should expect any of them back.**
+**AND THE ZERO IN THE FAILURE ROW IS NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio, `bo`'s §5
+NULL FIELD flake and `test_rune_battle`'s pierce were quiet in both DJ batteries and in both DI
+batteries. **All three are still open, still unseeded and still banded. The next batch should
+expect any of them back, and a red from any of them is not that batch's.**
 
-**`throws=0` ON EVERY TARGET, and 0 `Parse Error` and 0 `SCRIPT ERROR` across all 67 logs** —
-grepped from the logs, never read off a tally and never off `$?`. **The negative controls bit, four
-times**: a deliberate syntax error in `battle.gd` produced a `Parse Error` line and none once
-removed; reverting all 36 `src` edits turns `check_di` red in ten places; reverting ONE
-(`_hold_freeze`) turns it red in three; and zeroing `HARVEST_ALLY_BONUS` reds §2's payout band on
-its own. **`check_di`'s own first run exited 0 while printing two `Parse Error` lines**, which is
-the trap this project has a rule about, hit live in this batch.
+**`throws=0` ON EVERY TARGET, and 0 `Parse Error` and 0 `SCRIPT ERROR` across all 68 logs of each
+run** — grepped from the logs, never read off a tally and never off `$?`. **The negative controls
+bit, five times:**
+
+| control | result |
+|---|---|
+| revert Harvest's loop to bare `heroes` (DH's state) | `check_dj` **4 failures**, and the ratio reads **1.0000** — DI's measurement reproduced on a second instrument |
+| take DI's proposed `_hero_side()` fix | `check_dj` **3 failures**; the companion arm passes at 1.5005 and a FALLEN opener's board drops to **0.6664** |
+| un-stamp one of the seven (the eagle's Exposed) | `check_dj` **2 failures** — the live arm and the driven site |
+| un-stamp Kill Command's Blind | `check_di` **1 failure** — the coverage ratchet reds at 105 of 204 |
+| widen one of §2's eleven (Tank and Spank → `_hero_side()`) | `check_dj` **1 failure**, worded as a NOTICE to re-derive DJ §2's table rather than as a regression |
+
+**THE SECOND CONTROL IS THE ONE THAT MATTERS**: it is the control that rejects the fix the previous
+batch recommended, and without it this batch would have shipped a fresh under-payment in the loop it
+was repairing.

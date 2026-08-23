@@ -14,6 +14,118 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-23 &mdash; Batch DJ: HARVEST READS <code>companions</code></h2>
+<p><i><b>DH&rsquo;s clause pays more for a wound an ALLY opened, and its loop walked
+<code>heroes</code> &mdash; which does not carry the companions.</b> A wound Aguila opened
+therefore paid the base rate however it was stamped, measured live at <b>exactly 1.0000</b> of a
+self-opened board. DI found it, refused to close it (the fix moves a magnitude, which its own
+&sect;4 forbade) and <b>deliberately left seven companion call sites unstamped so the sweep would
+not look complete while the wound still paid nothing</b>. <b>DJ closes both halves: the loop reads
+<code>heroes + companions</code> and the seven sites are stamped. A companion-opened board now pays
+1.5000, which is what a hero&rsquo;s wound pays.</b> <code>src</code> coverage 99 &rarr; 106 of 204.
+<b>No save version moves (still v10).</b> One new gate, <code>check_dj</code>. The full report is
+<code>docs/reports/DJ.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; THE ALLY LOOP READS <code>companions</code> TOO</h3>
+<p><b>CV &sect;4&rsquo;s convention is that HERO means the four and ALLY means heroes and
+companions together.</b> Harvest&rsquo;s clause says <i>ally</i>, so it must resolve a
+companion&rsquo;s work; it did not, and the failure was invisible by construction &mdash; an
+unstamped status and a companion-stamped one are the same value to that loop.</p>
+<p><b>THE FIX IS NOT THE ONE DI PROPOSED, AND THAT IS THE CARE OF THIS BATCH.</b>
+<code>docs/reports/DI.md</code> &sect;3 wrote it as <i>&ldquo;one word in DH&rsquo;s loop
+(<code>heroes</code> &rarr; <code>_hero_side()</code>)&rdquo;</i>. <b>That word would have been
+wrong.</b> <code>_hero_side()</code> filters <code>dead</code> and this loop deliberately does not
+&mdash; DH&rsquo;s own comment says <i>&ldquo;a hero who has since DIED still opened the
+wound&rdquo;</i>. <b>Measured: the proposed fix passes the companion check at 1.5000 and drops a
+FALLEN opener&rsquo;s board to 0.6664</b> &mdash; a fresh 33% under-payment in the same loop, in
+the same shape, introduced by the fix for the first one. The union is written out as
+<code>heroes + companions</code>, hoisted above the status loop, and <code>check_dj</code>
+&sect;4 is the control that catches the substitution.</p>
+<p><b>THE SEVEN WITHHELD SITES ARE STAMPED.</b> Kill Command&rsquo;s Blind and the eagle&rsquo;s
+Exposed and Wrath-Blind take <code>comp</code>; Bestial Wrath&rsquo;s taunt takes the BEAR that
+swelled (the <code>100 + index</code> power still encodes who the taunt PULLS TO, which is a
+different question from who applied it); Guardian&rsquo;s Roar and the arrival dive take the body
+if one stands and the hunter if the roar was bodiless. <b>Coverage 99 &rarr; 106 of 204</b>, and
+<code>check_di</code>&rsquo;s ratchet moves with it.</p>
+<p><b>THE MEASURED RATIO, BEFORE AND AFTER.</b> On a board of four plain afflictions, seeded on
+both blows of the compared pair:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>arm</th><th>before DJ</th><th>after DJ</th></tr>
+<tr><td>companion-opened vs self-opened (hand-stamped)</td><td><b>1.0000</b></td><td><b>1.5005</b></td></tr>
+<tr><td>one wound opened by a real <code>_companion_strike</code></td><td><b>1.0000</b></td><td><b>1.1254</b></td></tr>
+<tr><td>opened by a hero who has since FALLEN</td><td>1.0000</td><td><b>1.0000</b> (unmoved, deliberately)</td></tr>
+</table>
+<p>1.5 is the card&rsquo;s own 18%/12%; 1.125 is one of four wounds being the ally&rsquo;s
+(0.12 + 0.06/4 against 0.12). <b>It landed where a hero&rsquo;s does, which is what the brief said
+it must.</b></p>
+<p><b>DH&rsquo;S COMMENT IS CORRECTED, AND SO ARE THE THREE OTHER LIVE PLACES THE SAME BELIEF WAS
+WRITTEN DOWN.</b> A comment is not evidence &mdash; CU&rsquo;s method &mdash; and this one was
+asserted in four places at once: <code>battle.gd</code>&rsquo;s Harvest block, <b><code>CLAUDE.md</code>&rsquo;s
+own CV &sect;4 convention block</b>, <code>docs/text-standard.html</code> and
+<code>docs/talent-audit.html</code>. <b>The rule file contradicted itself</b>: DI had already
+recorded the correct fact 1900 lines further down. The changelog and the batch reports are HISTORY
+and were deliberately not swept.</p>
+<p><b>AND THE MECHANISM IN THAT BELIEF WAS WRONG TOO.</b> CV &sect;4 recorded 23 nodes
+&ldquo;shorted by an explicit <code>is_companion</code> filter&rdquo;. <b>All 23 filters walk
+<code>heroes</code>, which never holds a companion, so not one of them removes anything.</b> The
+exclusion CV measured is real; the COLLECTION is what does it. The filters still read as the
+author&rsquo;s intent, which is worth having &mdash; they are simply not the mechanism, and
+<b>a walk with no such filter is not thereby including companions.</b></p>
+
+<h3>&sect;2 &mdash; EVERY OTHER SITE THAT LOOPS &ldquo;ALLIES&rdquo;, REPORTED AND NOT RULED ON</h3>
+<p><b>Harvest is the one that was caught and it is not the only one.</b> Sweeping every broad
+ally-worded card and node against its read site: <b>ELEVEN walk bare <code>heroes</code></b> and
+eight carry an explicit <code>is_companion</code> clause. <b>Only Harvest is changed here.</b></p>
+<p><b>THE FOUR TEXTS CV &sect;4 MOVED <i>TO</i> &ldquo;ALLY&rdquo; ARE ALL ON THE BARE LIST.</b>
+<code>wd_rally</code>, <code>wd_hold_line</code> and <code>dv_devoutness</code> walk
+<code>heroes</code>; <code>dv_waters</code> runs per-TURN, and <code>_next_unit()</code> walks
+<code>heroes + enemies</code>, so a companion takes no turns at all. <b>And
+<code>wd_tank_spank</code> &mdash; cited in <code>CLAUDE.md</code> as the proof the distinction is
+worth having &mdash; is on it too.</b></p>
+<p><b>THE DISTINCTION IS THE POINT OF THE SWEEP AND IT IS THE DESIGNER&rsquo;S TO DRAW:</b> an
+exclusion that is INTENDED needs its <i>text</i> corrected to say &ldquo;hero&rdquo;; one that is
+ACCIDENTAL needs its <i>code</i> corrected. <b>Nothing here is ruled on.</b> The full table, with
+each site&rsquo;s read line and which it looks like, is in <code>docs/reports/DJ.md</code>
+&sect;2.</p>
+
+<h3>&sect;3 &mdash; THE TWO RULES THIS EARNS</h3>
+<p><b><code>heroes</code> does not contain the companions; <code>companions</code> does.</b> Any
+loop implementing the <i>ally</i> convention must read both. A loop over <code>heroes</code> alone
+silently excludes companions and reports nothing &mdash; it looks like a balance quirk, not a bug.
+The rule carries the three idioms (<code>heroes + companions</code> is dead or alive,
+<code>_hero_side()</code> is the living only, bare <code>heroes</code> is the four), the fourth
+exclusion nobody writes down (a per-turn effect never reaches one), and the 0.6664 measurement
+behind &ldquo;picking the union is a decision about <code>dead</code>&rdquo;.</p>
+<p><b>A number quoted from one document into another stops being a measurement.</b> DI&rsquo;s
+53/204 was a single-line grep that missed 25 wrapped calls; the true figure was 63, and it had been
+quoted into three documents without re-derivation. <b>Re-derive a figure at the point of use, or
+cite where it was measured and when.</b> <b>And the copy in the source comment outlived the batch
+that corrected the others</b> &mdash; DI moved the figure in <code>docs/state.md</code> and left
+<code>battle.gd</code> reading 53, one line under a <code>244 call sites</code> that had been 204
+since before DH. DJ deleted both from that comment and pointed it at <code>check_di</code>
+&sect;1, which walks the file and prints the live count on every battery run.</p>
+
+<h3>&sect;4 &mdash; THE GATE, AND THE CONTROLS</h3>
+<p><b><code>check_dj</code>, 43 checks, in <code>run_battery.sh</code>&rsquo;s <code>GATES</code>
+array and in <code>baselines.json</code>.</b> Six sections: the loop&rsquo;s COLLECTION read out of
+the source; the payout hand-stamped and again on a wound a real eagle strike opened; four of the
+seven call sites driven live and three asserted off the source, with which is which said rather
+than blurred; the FALLEN-hero control; the &sect;2 sweep as a ratchet; and the belief&rsquo;s
+absence from the four live prose sites.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>control</th><th>result</th></tr>
+<tr><td>revert the loop to bare <code>heroes</code> (DH&rsquo;s state)</td><td><code>check_dj</code> <b>43 / 4 failures</b> &mdash; and the ratio reads 1.0000, reproducing DI&rsquo;s measurement on a second instrument</td></tr>
+<tr><td>take DI&rsquo;s proposed <code>_hero_side()</code> fix</td><td><code>check_dj</code> <b>43 / 3 failures</b> &mdash; &sect;2 passes at 1.5005 and the fallen opener drops to <b>0.6664</b></td></tr>
+<tr><td>un-stamp ONE of the seven (the eagle&rsquo;s Exposed)</td><td><code>check_dj</code> <b>43 / 2 failures</b> &mdash; caught by the live arm and by the driven site</td></tr>
+<tr><td>un-stamp Kill Command&rsquo;s Blind</td><td><code>check_di</code> <b>44 / 1 failure</b> &mdash; the coverage ratchet reds at 105 of 204</td></tr>
+</table>
+<p><b>The parse check was read off the stderr grep and never off the exit code</b>, which is
+<code>CLAUDE.md</code>&rsquo;s rule and the trap DI hit live. <b>Every string literal in all 47
+suites and 22 gates was evaluated against <code>battle.gd</code> before and after</b>, with both of
+DI&rsquo;s holes closed (single quotes as well as double, indirect literals as well as inline):
+<b>zero flipped</b>. The instrument was positive-controlled by replaying DI&rsquo;s own change
+through it, where it correctly reports <code>test_batch_ax</code>&rsquo;s needle.</p>
+
 <h2>2026-08-22 &mdash; Batch DI: MAKING <code>src</code> HONEST WHERE HARVEST READS IT</h2>
 <p><i><b>36 call sites now pass the unit that applied the status. No status behaviour changes, no
 magnitude is retuned and no clause from DH is touched</b> &mdash; this batch supplies an argument

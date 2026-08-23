@@ -458,12 +458,19 @@ moved with them. **The one place the old reading was written down as a rule was
 ## HERO AND ALLY ARE NOT SYNONYMS (STANDING, SET AT BATCH CV §4)
 > **HERO — the four party members. ALLY — heroes and companions together.**
 
-A Beastmaster's beast stands in `heroes`, is visibly on the player's side, and is skipped by
-`is_companion` filters all over `battle.gd`. **Twenty-eight node texts promised "every ally" or
-"the whole party" and paid only the four**; all twenty-eight now say *hero*. **CV's brief said
+**CORRECTED AT DJ §1 — THE BEAST DOES NOT STAND IN `heroes`.** This block said it did, and so did
+DH's Harvest comment; `heroes.append` is reached at exactly one site (the party spawn) and a
+summoned beast goes to `companions`. **The exclusion CV measured is real, but the mechanism is the
+COLLECTION, not the filter**: all **23** `heroes` walks carrying an explicit `not h.is_companion`
+are filtering an array that can never hold one, so the filter removes nothing. It is still worth
+reading as INTENT — an author who wrote it meant to exclude — but it is not the thing doing the
+excluding, and **a walk with no such filter is not thereby including companions.**
+
+A Beastmaster's beast is visibly on the player's side and gets none of what "ally" promises.
+**Twenty-eight node texts promised "every ally" or "the whole party" and paid only the four**; all twenty-eight now say *hero*. **CV's brief said
 sixteen — the mechanical sweep of all 41 ally/party-worded nodes found twenty-eight**, and the
-three extra populations are why: **23** are shorted by an explicit `is_companion` filter in
-`battle.gd`, **2 more** (`hl_guardian`, `hl_resurrection`) by `unit.gd:1320`'s
+three extra populations are why: **23** carry an explicit `is_companion` filter in
+`battle.gd` (which, per DJ §1 above, records intent rather than doing the excluding), **2 more** (`hl_guardian`, `hl_resurrection`) by `unit.gd:1320`'s
 `is_hero and not is_companion` gate on `below_half_cb` — a Mercy generator, not a filter — and
 **3 more** (`dv_apostle`, `dv_fervor`, `dv_oath`) because `_gain_faith` refuses companions
 outright, so a beast can never hold the stack the node is written around.
@@ -472,15 +479,26 @@ outright, so a beast can never hold the stack the node is written around.
 would otherwise reach six units.
 
 **FOUR TEXTS MOVED THE OTHER WAY.** `wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters`
-said "party" and their read sites genuinely include companions, so they say *ally* now. Precision
-runs both directions or the two words are decoration. **Thirty-two node texts in total.**
+said "party" and were moved to *ally* on the reading that their read sites include companions.
+Precision runs both directions or the two words are decoration. **Thirty-two node texts in total.**
+**DJ §2 RE-DERIVED ALL FOUR READ SITES AND NONE OF THEM REACHES A COMPANION** — three walk bare
+`heroes` (`battle.gd` 8083, 18232, 1343/1348) and `dv_waters` runs per-TURN on a unit that takes
+none. **The four moves are reported, not reverted**: reverting the text is one ruling and fixing
+the code is the opposite one, and DJ §2 was scoped to draw the distinction rather than make it.
 
-`wd_tank_spank` was already right and is the proof the distinction is worth having: it says "ally", and `heroes.filter(func(h): return not
-h.dead)` is the whole of its filter.
+**`wd_tank_spank` WAS CITED HERE AS THE PROOF THE DISTINCTION IS WORTH HAVING, AND DJ §2 FOUND IT
+IS THE OPPOSITE.** It says "ally" and its read site is `heroes.filter(func(h): return not h.dead)`
+— which reaches no companion, because `heroes` holds none. **The same is true of all four texts CV
+moved TO "ally"** (`wd_rally`, `wd_hold_line`, `dv_devoutness`, `dv_waters`). DJ §2 reports the
+full list and **rules on none of it**: an intended exclusion needs its TEXT corrected to say
+"hero", an accidental one needs its CODE corrected, and which is which is a designer's call.
 
-**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S FILTER, NOT THE SENTENCE'S RHYTHM.**
-`_hero_side()` includes companions; a bare `heroes.filter(... not h.is_companion)` does not;
-`_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally".
+**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S COLLECTION, NOT ITS FILTER AND NOT THE
+SENTENCE'S RHYTHM.** `_hero_side()` includes companions (living ones only); `heroes + companions`
+includes them dead or alive; **a walk over bare `heroes` never does, filter or no filter**;
+`_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally"; and a
+per-TURN effect can never reach one either, because `_next_unit()` walks `heroes + enemies` and a
+companion takes no turns.
 
 ## A SUITE MUST NOT PIN THE SAVE VERSION LITERAL (STANDING — BK §6's RULE, RE-LEARNED AT CT)
 **Three batches have now broken a sibling suite by bumping the save version.** BL's recap ledgers
@@ -2358,16 +2376,62 @@ be found by counting call sites, never by playing.
 · **AND RESOLVE THE NAME AGAINST THE PARTY, NEVER MERELY COMPARE IT TO YOUR OWN.** `_apply_status`
   stamps for ANY source, an enemy's included, so `src != self.unit_name` reads one enemy's debuff
   on another as the party's work.
-· **`heroes` DOES NOT CARRY THE COMPANIONS.** `heroes.append` is reached at exactly one site, the
-  party spawn; a companion goes to `companions`, and `_hero_side()` is the union. Four sites in
-  `battle.gd` write `heroes + companions` precisely because it is not free. **Any walk that means
-  "the party" and writes `heroes` silently excludes the beasts** — Harvest's ally loop does, which
-  is why a wound Aguila opened still pays the base rate. `check_di` §4 asserts that state, so the
-  day it is ruled on the assertion is what changes rather than the belief.
-· **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`.** The figure DI inherited — 53 of 204 — was a
-  single-line grep. **25 of the 204 calls wrap, and twelve of those already passed a source**, so
-  the true figure was 63 and the recorded one had been quoted into three documents. `check_di` §1
-  balances parens and skips comments.
+· **`heroes` DOES NOT CARRY THE COMPANIONS** — see the standing rule of its own below, which DJ
+  earned by closing this. Harvest's ally loop walked `heroes`, so a wound Aguila opened paid the
+  base rate however it was stamped; **DI left the seven companion sites unstamped rather than let
+  the sweep look complete while the wound still paid nothing**, and DJ stamped them with the loop.
+· **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`** — see the second standing rule below, which
+  DJ earned from this. `check_di` §1 balances parens, skips comments, and PRINTS the live figure
+  on every battery run.
+
+## STANDING RULE — `heroes` DOES NOT CONTAIN THE COMPANIONS; `companions` DOES (Batch DJ §1)
+> **Any loop implementing the *ally* convention must read BOTH.** A loop over `heroes` alone
+> silently excludes companions and **reports nothing** — it looks like a balance quirk, not a bug.
+
+**`heroes.append` is reached at exactly ONE site**, the party spawn (`battle.gd:1337`); a summoned
+beast is appended to `companions` (`battle.gd:19519`). Nothing else ever writes either array.
+· **THE THREE IDIOMS, AND THEY ARE NOT INTERCHANGEABLE.** `heroes + companions` is the union **dead
+  or alive**; `_hero_side()` is the union **of the living only**; bare `heroes` is the four, and no
+  `not h.is_companion` clause on it changes that — **all 23 such filters in `battle.gd` are
+  filtering an array that cannot hold one.** They record the author's INTENT, which is worth
+  reading. They are not what does the excluding.
+· **AND A PER-TURN EFFECT IS A FOURTH EXCLUSION NOBODY WRITES DOWN.** `_next_unit()` walks
+  `heroes + enemies`, so a companion takes no turns — a "each ally, each turn" clause can never
+  reach one however its collection is spelled.
+· **PICKING THE UNION IS A DECISION ABOUT `dead`, NOT ONLY ABOUT COMPANIONS.** `docs/reports/DI.md`
+  proposed DJ's fix as *"one word: `heroes` → `_hero_side()`"*. **That word would have been
+  wrong.** Harvest's loop deliberately does not filter `dead` — a hero who has since fallen still
+  opened the wound — and `_hero_side()` does. Measured: the suggested fix passes the companion
+  check at 1.5000 and drops a fallen opener's board to **0.6664**, a fresh 33% under-payment in the
+  same loop, in the same shape, introduced by the fix for the first one. **`check_dj` §4 is the
+  control that catches it.**
+· **THE COST OF GETTING IT WRONG IS SILENCE.** Before DJ, a companion-opened board paid **exactly
+  1.0000** of a self-opened one — the bonus simply did not arrive, and no log, no test and no
+  battery said so. It now pays **1.5000**, which is what a hero's wound pays.
+· **WHEN WRITING A NEW ALLY-WORDED EFFECT, THE TEST IS THE READ SITE'S COLLECTION.** DJ §2 swept
+  every broad ally-worded card and node: **eleven walk bare `heroes`**, four of which are the four
+  texts CV §4 moved TO "ally" on the belief their read sites reach companions. The list is in
+  `docs/reports/DJ.md` §2 and **nothing in it is ruled on** — an intended exclusion wants its TEXT
+  corrected to say "hero", an accidental one wants its CODE corrected, and that is the designer's
+  call, not a sweep's.
+
+## STANDING RULE — A NUMBER QUOTED FROM ONE DOCUMENT INTO ANOTHER STOPS BEING A MEASUREMENT (Batch DJ §3)
+> **Re-derive a figure at the point of use, or cite where it was measured and when.**
+
+DI's `src` coverage figure — **53 of 204** — was a single-line grep that could not see the 25 calls
+that wrap across lines; **twelve of those already passed a source, so the true figure was 63.** It
+had been quoted into `docs/state.md`, into DH's own source comment and into DI's brief without ever
+being re-taken.
+· **AND THE COPY IN THE SOURCE COMMENT SURVIVED THE BATCH THAT CORRECTED THE OTHERS.** DI moved the
+  figure in `docs/state.md` and left `battle.gd`'s Harvest comment reading 53, one line above a
+  `244 call sites` that had been 204 since before DH. **A batch that corrects a number owes a sweep
+  for its other copies**, and the copy in the code is the one nobody greps.
+· **THE FIX IS NOT A BETTER NUMBER, IT IS FEWER COPIES.** DJ deleted both figures from that comment
+  and pointed it at `check_di` §1, which walks the file and prints the live count on every battery
+  run. **A number with an instrument behind it cannot rot; a number in prose always can.**
+· **IT IS THE SAME DEFECT AS THE SECOND COPY RULE** (`docs/state.md` and `CLAUDE.md` point at
+  `baselines.json` rather than restating it) — this is that rule applied to measurements taken
+  inside a batch rather than to the baseline table.
 
 ## STANDING RULE — A CROSS-SPEC COUPLING IS NAMED IN THE CARD TEXT, AND IS A BONUS ON A CARD THAT ALREADY WORKS ALONE (Batch DH)
 **A RUN FIELDS FOUR OF TWELVE SPECS, SO A CLAUSE THAT NEEDS A SPECIFIC PARTNER IS DEAD MOST OF THE

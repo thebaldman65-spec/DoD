@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-22 (Batch DI)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DJ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1307,7 +1307,7 @@ named partner is dead most of the time.</p>
 <tr><th>Card</th><th>Clause</th><th>What it reads, and who feeds it</th></tr>
 <tr><td><b>Choking Smoke</b> (Survivalist)</td><td>Also sets every enemy Burning 2 turns</td><td>Widens his own Trapper breadth (<code>burn</code> is in <code>DEBUFF_IDS</code>) <i>and</i> arms the <b>Pyromancer's</b> Ember Debt and Funeral Pyre, which consume Burn</td></tr>
 <tr><td><b>Snare Line</b> (Survivalist)</td><td>The spring holds a Chilled enemy 2 turns, not 1</td><td>Reads <code>chilled</code> — the <b>Cryomancer</b> lays it, and nothing in the Survivalist's own kit does</td></tr>
-<tr><td><b>Harvest</b> (Survivalist)</td><td>Up to 18% of Attack a status, rising with the share an ally opened</td><td>Reads the <code>src_name</code> every status has carried since Batch W. <b>The hub stated outright</b> — he is paid for the party working a target rather than for doing it alone</td></tr>
+<tr><td><b>Harvest</b> (Survivalist)</td><td>Up to 18% of Attack a status, rising with the share an ally opened</td><td>Reads the <code>src_name</code> every status has carried since Batch W. <b>The hub stated outright</b> &mdash; he is paid for the party working a target rather than for doing it alone. <b>ALLY means heroes AND companions (Batch DJ)</b>: the loop resolves against <code>heroes + companions</code>, so a wound <b>Aguila</b> opened pays the same bonus a hero&rsquo;s does. <b>A fallen hero&rsquo;s wound still pays</b> &mdash; neither half is filtered on <code>dead</code>, because he still opened it</td></tr>
 <tr><td><b>Emberkeep</b> (Pyromancer)</td><td>Doubles Burn <i>any hero</i> applies, not only his own</td><td>He becomes the party's Burn amplifier — the consuming end of Choking Smoke above. Guarded on <code>src.is_hero</code>, so an enemy's fire still lands at its own length</td></tr>
 <tr><td><b>Firedraw</b> (Pyromancer)</td><td>Draws 9 turns, not 6, from an enemy carrying another spec's debuff</td><td>Reads the curated <code>DEBUFF_IDS</code> list minus his own vocabulary — a field the party has already worked gives up its fire faster</td></tr>
 <tr><td><b>Breaking Darkness</b> (Occultist)</td><td>Names its partners in the card text. <b>No mechanical change</b></td><td>The combo already existed and was found by accident: the <b>Sharpshooter's</b> Fault Line and the <b>Warden's</b> Turn the Blade both land harder under it. Discoverability, not a buff</td></tr>
@@ -1548,7 +1548,10 @@ ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect:
 Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
 only guaranteed blocks in the game.<br>
 <i>Earnable (§6a) and talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, every ALLY
-(companions included) takes 50% less Break damage for 2 turns, cannot die for 2 turns, and
+(<b>companions NOT included — reported at Batch DJ §2 and deliberately not ruled on</b>: the
+card says "ally" and the read site is <code>heroes.filter(func(he): return not he.dead)</code>,
+which reaches no companion. Whether the TEXT is wrong or the CODE is, is the designer's call)
+takes 50% less Break damage for 2 turns, cannot die for 2 turns, and
 it refunds 5 Rage; self-cast, no target selection. A Hold the Line earned from an ability
 pick and THEN taken as the capstone is UPGRADED instead: 80% less Break damage, and the
 no-death window lasts 3 turns.<br>
@@ -1969,10 +1972,12 @@ victim: it takes whoever walks the trail. Bosses shrug the stun unless Broken. <
 one trap slot until its last spring is spent</b>, which is the cost of a trap that stays on
 the board.<br>
 Harvest — 25 Mana, 3.0, 4cd: CONSUME every status on one enemy — 12% Atk per status
-REMOVED, healing yourself the same amount (Perfect: heals 150%). It is paid for what the
-cleanse actually took: a poison that cannot be cleansed (Slow Acting, Perfected Toxin)
-stays on the body and is not billed for. Cashing out strips your own Trapper bonus from
-the target.<br>
+REMOVED, <b>rising toward 18% with the share an ALLY opened</b>, healing yourself the same
+amount (Perfect: heals 150%). It is paid for what the cleanse actually took: a poison that
+cannot be cleansed (Slow Acting, Perfected Toxin) stays on the body and is not billed for.
+<b>ALLY is heroes AND companions</b> — a wound the Beastmaster's eagle opened pays what a
+hero's does, and a hero who has since fallen still opened his. Cashing out strips your own
+Trapper bonus from the target.<br>
 <b>Talent lanes:</b> see §7 — Venom / Snares / Guerilla.</li>
 </ul>
 

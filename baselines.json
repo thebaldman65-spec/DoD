@@ -167,7 +167,21 @@
     0
    ],
    "fails_obs": 8,
-   "note": "NEW AT DI, AND THE ROW IS A RATCHET RATHER THAN A MEASUREMENT. §1 counts `_apply_status` call sites out of battle.gd's own text with a BALANCED-PAREN WALK and asserts `src` coverage never falls below 99 of 204 and that no site passes an explicit `null`. IT WALKS RATHER THAN GREPS BECAUSE THE FIGURE THIS BATCH INHERITED — 53 of 204, in docs/state.md and in DH's own comment — WAS A GREP AND WAS WRONG: 25 of the 204 calls wrap across lines and twelve of those already passed a source, so real coverage before DI was 63. §2 measures Harvest's ally term on a SEEDED pair (both arms draw the same stream, per DD's rule) and asserts the ratio is 1.5 exactly, with a self-vs-self arm and an enemy-source arm as the negative halves. §3 drives the changed call sites through real casts. §4 asserts the COMPANION GAP DI FOUND AND DID NOT CLOSE — `heroes` does NOT carry companions, so a wound Aguila opened pays the base rate; when that is ruled on, §4's two assertions are what change. Count is rock steady at 44 over 8 readings — six ad-hoc plus both DI batteries and the gate takes ~3s."
+   "note": "NEW AT DI, AND THE ROW IS A RATCHET RATHER THAN A MEASUREMENT. §1 counts `_apply_status` call sites out of battle.gd's own text with a BALANCED-PAREN WALK and asserts `src` coverage never falls below the floor the last batch left (DI 99, DJ 106) and that no site passes an explicit `null`. IT WALKS RATHER THAN GREPS BECAUSE THE FIGURE DI INHERITED — 53 of 204, in docs/state.md and in DH's own comment — WAS A GREP AND WAS WRONG: 25 of the 204 calls wrap across lines and twelve of those already passed a source, so real coverage before DI was 63. §2 measures Harvest's ally term on a SEEDED pair (both arms draw the same stream, per DD's rule) and asserts the ratio is 1.5 exactly, with a self-vs-self arm and an enemy-source arm as the negative halves. §3 drives the changed call sites through real casts. §4 ASSERTED THE COMPANION GAP DI FOUND AND DELIBERATELY DID NOT CLOSE, AND DJ RULED ON IT: its third assertion moved from 1.0 (a companion-opened wound paid nothing) to 1.5 (it pays what a hero's pays). THE FIRST TWO DID NOT MOVE — `heroes` still does not hold the companion and `_hero_side()` still does. Count is unchanged at 44 across the ruling, over 10 readings."
+  },
+  "check_dj": {
+   "kind": "gate",
+   "checks": [
+    54,
+    54
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 2,
+   "note": "NEW AT DJ. THE GATE FOR “an ally loop reads `companions` too”. §1 reads Harvest's ally loop out of battle.gd's own text and asserts it walks the written-out union `heroes + companions` — NOT `_hero_side()`, which filters `dead` and would silently stop paying for a wound a FALLEN hero opened. §2 measures the payout twice: hand-stamped to a companion (1.5, the same band check_di §2 gives a hero) and on a wound opened by a REAL `_companion_strike` (1.125 — one of four wounds is the ally's), so a site that stops passing its source reds even though the arithmetic still works. §3 drives four of the seven companion call sites live and asserts the other three off the source, and SAYS WHICH IS WHICH. §4 IS THE NEGATIVE CONTROL ON THE COLLECTION ITSELF: a fallen hero's wound must still pay 1.0 of a living one — DI's proposed one-word `_hero_side()` fix passes §2 and reads 0.6664 here. §5 ratchets the DJ §2 sweep population so it cannot move in silence — the 23 no-op `is_companion` filters over `heroes`, and the ELEVEN other ally-worded effects each pinned by its own read line. It RULES ON NONE OF IT: a fragment that stops matching is a NOTICE to re-derive DJ §2's table, not a regression. §6 asserts the wrong belief is gone from the four LIVE prose sites, and deliberately does not sweep the changelog or the batch reports, which are history. Gate takes ~4s. COUNTED LOW ON PURPOSE: the gate ran eight times in DJ, but five of those were at 43 checks, BEFORE §5 grew the eleven-site ratchet. Only THREE readings support the 54, and only TWO of those are clean (the third is negative control 5, which reads 54 / 1 by design). A row rests on the readings of the shape it records, not on the batch's total."
   },
   "check_flow": {
    "kind": "gate",

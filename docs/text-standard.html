@@ -276,15 +276,18 @@ ceiling that does not bind them would be work with no reader.</p>
 <h2>4.9 HERO AND ALLY ARE NOT SYNONYMS (BINDING, SET AT BATCH CV &sect;4)</h2>
 <blockquote><b>HERO</b> &mdash; the four party members. <b>ALLY</b> &mdash; heroes and
 companions together.</blockquote>
-<p>A Beastmaster's beast stands in <code>heroes</code>, is visibly on the player's side, and is
-skipped by <code>is_companion</code> filters throughout <code>battle.gd</code>. Twenty-five node
-texts promised "every ally" or "the whole party" and paid only the four. <b>The exclusion is
-intended</b> &mdash; under The Pack a party-wide buff would otherwise reach six units &mdash;
-<b>so the words move, never the read site.</b></p>
+<p><b>CORRECTED AT BATCH DJ &sect;1 &mdash; the beast does NOT stand in <code>heroes</code>.</b>
+It is appended to <code>companions</code>; <code>heroes.append</code> is reached at exactly one
+site, the party spawn. The beast is visibly on the player's side and is skipped by
+<code>is_companion</code> filters throughout <code>battle.gd</code> &mdash; but those filters are
+reading an array that never held one, so <b>the collection is what excludes, not the filter</b>.
+Twenty-five node texts promised "every ally" or "the whole party" and paid only the four. <b>The
+exclusion is intended</b> &mdash; under The Pack a party-wide buff would otherwise reach six units
+&mdash; <b>so the words move, never the read site.</b></p>
 <p><b>THE TEST IS THE READ SITE'S FILTER, NOT THE SENTENCE'S RHYTHM.</b>
 <code>_hero_side()</code> includes companions, so an ability that targets through it says
-<i>ally</i>. A bare <code>heroes.filter(func(h): return not h.dead and not h.is_companion)</code>
-does not, so it says <i>hero</i>. <code>_gain_faith</code> refuses companions outright, so
+<i>ally</i>. <b>Any walk over bare <code>heroes</code> does not</b> &mdash; with or without a
+<code>not h.is_companion</code> clause &mdash; so it says <i>hero</i>. <code>_gain_faith</code> refuses companions outright, so
 nothing Faith-flavoured can ever say <i>ally</i>. <b>"Party" is not one of the two words</b>;
 it reads as either and is what let twenty-five texts drift.</p>
 <p><b>Precision runs both directions.</b> Four texts that said "party" while their read sites
