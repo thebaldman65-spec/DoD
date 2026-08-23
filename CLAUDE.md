@@ -2338,6 +2338,37 @@ PLAN IS A CARD THAT FILLS A SLOT.**
   forced the comparison. See the BT block for the resolution (the acquisition channel is the
   distinction, and the perfect is what stops it being dominated outright).
 
+## STANDING RULE — A STATUS IS APPLIED WITH ITS `src` (Batch DI)
+**`_apply_status`'s sixth argument is not optional in spirit.** It has stamped `src_name` onto the
+status since Batch W, and a site that omits it does not fail — it silently mis-credits everything
+that reads the source. **A missing `src` is invisible by construction**: an unstamped status and
+one the reader applied himself are the same value to every consumer, so the defect can only ever
+be found by counting call sites, never by playing.
+· **DH's HARVEST CLAUSE IS THE FIRST THING IN THE GAME WHOSE MAGNITUDE DEPENDS ON IT**, and it
+  shipped one batch ahead of the plumbing. It pays 12% a status rising to 18% when the whole board
+  is the party's work; against a realistic board DI measured the under-payment at **3923 → 5308,
+  a 35% correction**. It was not a rounding error and it was not visible anywhere.
+· **A CLAUSE WHOSE MAGNITUDE DEPENDS ON INCOMPLETE PLUMBING IS WORSE THAN ONE THAT DOES NOT
+  EXIST**, because it looks like it works. When a clause starts reading a field, the same batch
+  owes a count of how many writers actually write it.
+· **WHERE THE TRUE SOURCE IS AMBIGUOUS, REPORT IT — DO NOT PICK.** A status applied BY a status, a
+  reflected effect, an item nobody holds, an environmental stamp. **Getting the source wrong is
+  worse than leaving it absent**: absent under-pays, wrong mis-credits. DI left fourteen sites
+  unstamped for exactly this reason and named every one in `docs/reports/DI.md` §2.
+· **AND RESOLVE THE NAME AGAINST THE PARTY, NEVER MERELY COMPARE IT TO YOUR OWN.** `_apply_status`
+  stamps for ANY source, an enemy's included, so `src != self.unit_name` reads one enemy's debuff
+  on another as the party's work.
+· **`heroes` DOES NOT CARRY THE COMPANIONS.** `heroes.append` is reached at exactly one site, the
+  party spawn; a companion goes to `companions`, and `_hero_side()` is the union. Four sites in
+  `battle.gd` write `heroes + companions` precisely because it is not free. **Any walk that means
+  "the party" and writes `heroes` silently excludes the beasts** — Harvest's ally loop does, which
+  is why a wound Aguila opened still pays the base rate. `check_di` §4 asserts that state, so the
+  day it is ruled on the assertion is what changes rather than the belief.
+· **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`.** The figure DI inherited — 53 of 204 — was a
+  single-line grep. **25 of the 204 calls wrap, and twelve of those already passed a source**, so
+  the true figure was 63 and the recorded one had been quoted into three documents. `check_di` §1
+  balances parens and skips comments.
+
 ## STANDING RULE — A CROSS-SPEC COUPLING IS NAMED IN THE CARD TEXT, AND IS A BONUS ON A CARD THAT ALREADY WORKS ALONE (Batch DH)
 **A RUN FIELDS FOUR OF TWELVE SPECS, SO A CLAUSE THAT NEEDS A SPECIFIC PARTNER IS DEAD MOST OF THE
 TIME.** Every one of the 120 draft abilities was authored inside its own spec, so for most of the

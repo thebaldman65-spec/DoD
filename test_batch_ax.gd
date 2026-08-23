@@ -437,7 +437,16 @@ func _boss_legibility() -> void:
 	# So `1 if timed else -1` became `frozen_turns`. What this check refuses is
 	# unchanged: a boss exception decided by a NAME TEST inside `_apply_status`
 	# rather than by the explicit `force` argument threaded from the call site.
-	ok(bsrc.contains('_apply_status(target, "frozen", frozen_turns, 0, 0, null, force)'),
+	# RE-POINTED AGAIN AT BATCH DI, THE THIRD TIME, AND THE QUESTION IS STILL
+	# UNCHANGED. DI made `_hold_freeze` pass its OWN `src` through to
+	# `_apply_status` — it had held one in its signature since BT and threw it
+	# away, which is why the sixth argument reads `src` now and not `null`.
+	# `force` is threaded exactly as before, in the same position, from the same
+	# call site. **The needle now pins the SOURCE SLOT TOO**, which is DI's
+	# standing rule ("a status is applied with its `src`") made testable at the
+	# one site in this file that can see it: a later batch reverting either
+	# argument to `null` fails here.
+	ok(bsrc.contains('_apply_status(target, "frozen", frozen_turns, 0, 0, src, force)'),
 		"...and _hold_freeze THREADS it rather than deciding by name")
 	# BATCH CR §1 — THE TWO CLOSED DOORS, ASSERTED SHUT.
 	ok(not bsrc.contains("_hold_freeze(target, attacker, true)"),

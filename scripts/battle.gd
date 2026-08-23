@@ -7972,7 +7972,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							and randf() < 0.35 * strike_target.ricochet_ranks:
 						_log("   → Talent: Richocet — the block staggers %s" % \
 							attacker.unit_name, "#b0a8e0")
-						_apply_status(attacker, "stunned", 1)
+						_apply_status(attacker, "stunned", 1, 0, 0, strike_target)
 					# Battered Not Broken: a Broken unit cannot Block at all,
 					# so blocking works to hold that fate off.
 					if strike_target.battered_ranks > 0 and strike_target.pressure > 0:
@@ -9758,7 +9758,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.take_hit(0, attacker.sundering_shot)
 					_stat_bd(attacker, attacker.sundering_shot)
 				if attacker.exposed_nerve > 0 and not strike_target.dead:
-					_apply_status(strike_target, "exposed", 3)
+					_apply_status(strike_target, "exposed", 3, 0, 0, attacker)
 				if attacker.follow_through > 0 and not attacker.cooldowns.is_empty():
 					# BATCH BQ: one implementation (`_tick_cooldowns`). It used
 					# to walk every entry including the ones already at zero,
@@ -9891,7 +9891,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						well, "#b0a8e0")
 				# Judgement: the ground passes sentence on the attacker.
 				if cg_dv != null and cg_dv.judgement > 0 and not attacker.dead:
-					_apply_status(attacker, "sunder", 2)
+					_apply_status(attacker, "sunder", 2, 0, 0, cg_dv)
 					var jd_bd := maxi(int(round(final * 0.01 * cg_dv.judgement)), 1)
 					var jd_result: Dictionary = attacker.take_hit(0, jd_bd)
 					_stat_bd(cg_dv, jd_bd)
@@ -9995,7 +9995,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.display_name == "Hex of Ruin" and attacker.emp_hex_ranks > 0 \
 						and not strike_target.dead \
 						and randf() < 0.01 * attacker.emp_hex_ranks:
-					_apply_status(strike_target, "decay", 3)
+					_apply_status(strike_target, "decay", 3, 0, 0, attacker)
 					_gain_ruin(strike_target, OLD_GODS_MARK)
 					_log("   → Talent: Empowered Hex — Decay takes root in %s" % \
 						strike_target.unit_name, "#b0a8e0")
@@ -10011,7 +10011,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.lunge_upgraded > 0 \
 					else ["exposed" if _eff_stance(attacker) == "aggressive" else "cripple"]
 				for lunge_status in lunge_hits:
-					_apply_status(strike_target, lunge_status, 3)
+					_apply_status(strike_target, lunge_status, 3, 0, 0, attacker)
 					_note_debuff_applied(attacker, lunge_status)
 			# BATCH BW — SEVER'S COOLDOWN CLEARS AGAINST A BROKEN TARGET, and it
 			# is an ordinary attack rider for the same reason Blood Debt's mark
@@ -10083,7 +10083,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
 				var shred := 20 * attacker.elem_weak_ranks
-				_apply_status(strike_target, "elem_weak", 3, shred)
+				_apply_status(strike_target, "elem_weak", 3, shred, 0, attacker)
 				# The chip carries the talent-scaled number.
 				strike_target.update_status("elem_weak", "-%d%%" % shred,
 					"Elemental Weakness: all non-physical\nresistances reduced by %d%%." % shred,
@@ -10161,19 +10161,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_apply_status(pal, "empower", 2)
 			# Shrapnel: the second debuff (Cripple rides applies_status above).
 			if ab.display_name == "Shrapnel" and not strike_target.dead:
-				_apply_status(strike_target, "slow", 4 if is_perfect else 3)
+				_apply_status(strike_target, "slow", 4 if is_perfect else 3,
+					0, 0, attacker)
 			# Poisoned Arrow: layers several stacks at once.
 			if ab.display_name == "Poisoned Arrow" and not strike_target.dead:
 				for stack_i in (4 if is_perfect else 3):
 					_apply_status(strike_target, "poison", 5, 0,
-						_dot_tick("poison", attacker))
+						_dot_tick("poison", attacker), attacker)
 			# (Permafrost's old on-hit Frostbite clause left in Batch O — the
 			# status lives on where it is CHOSEN: Rime applies it on cast.)
 			# Trapper: striking the Survivalist risks a poisoned barb.
 			if strike_target.passive_id == "trapper" and not attacker.is_hero \
 					and not attacker.dead and randf() < 0.25:
 				_apply_status(attacker, "poison", 5, 0,
-					_dot_tick("poison", strike_target))
+					_dot_tick("poison", strike_target), strike_target)
 			# BATCH CH — STALKING HORSE PAYS OUT HERE, BESIDE TRAPPER'S OWN BARB,
 			# and the position IS the card: it fires when an attack actually LANDS
 			# on him, not when one was declared at him. BL §1 declares an enemy's
@@ -10212,7 +10213,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead:
 				_apply_status(attacker, "burn", 3,
 					int(round((CRIT_CHANCE + strike_target.crit_bonus) * 100)),
-					_dot_tick("burn", strike_target))
+					_dot_tick("burn", strike_target), strike_target)
 			# BATCH BT — HOARFROST ARMOR's retaliation half, beside Immolate's
 			# for the reason it belongs there: same shape, other element, and
 			# the pair is why the two cards are siblings rather than duplicates
@@ -10290,13 +10291,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and ab.display_name == "Detonation" and not strike_target.dead:
 				_apply_status(strike_target, "burn", 2,
 					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
-					_dot_tick("burn", attacker))
+					_dot_tick("burn", attacker), attacker)
 			# Aftershock: the trigger re-lights what it just emptied — and the
 			# refund is what pays for the fire it starts again.
 			if ab.display_name == "Detonation" and attacker.aftershock > 0 \
 					and not strike_target.dead:
 				_apply_status(strike_target, "burn", attacker.aftershock, 0,
-					_dot_tick("burn", attacker))
+					_dot_tick("burn", attacker), attacker)
 				_log("   → Talent: Aftershock — the fire relights (%d turns)" % \
 					attacker.aftershock, "#b0a8e0")
 			if ab.display_name == "Flamewave" and not strike_target.dead:
@@ -10316,7 +10317,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name, fw_turns], "#e08850")
 				else:
 					_apply_status(strike_target, "burn", fw_turns, 0,
-						_dot_tick("burn", attacker))
+						_dot_tick("burn", attacker), attacker)
 			# RUNE-ONLY since Batch AR: the Rune of the Cinder Trail was
 			# RE-POINTED off cinder_trail_ranks (which the node took for a new
 			# meaning) onto its own term, so it still pays the effect it
@@ -10331,7 +10332,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Rune: the Cinder Trail — embers drift onto %s" % \
 						ct_t.unit_name, "#b0a8e0")
 					_apply_status(ct_t, "burn", attacker.rune_cinder_ember, 0,
-						_dot_tick("burn", attacker))
+						_dot_tick("burn", attacker), attacker)
 			# Blizzard: 1-2 stacks of Chilled settle on each victim.
 			if ab.display_name == "Blizzard" and not strike_target.dead:
 				# The perfect buys RELIABILITY, not magnitude (Batch AH): the
@@ -10857,10 +10858,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.display_name == "Shrapnel Charge":
 					_apply_poison(attacker, sv_t, sv_turns)
 					if is_perfect:
-						_apply_status(sv_t, "slow", sv_turns)
+						_apply_status(sv_t, "slow", sv_turns, 0, 0, attacker)
 				if ab.display_name == "Hamstring":
-					_apply_status(sv_t, "slow", sv_turns)
-					_apply_status(sv_t, "exposed", sv_turns)
+					_apply_status(sv_t, "slow", sv_turns, 0, 0, attacker)
+					_apply_status(sv_t, "exposed", sv_turns, 0, 0, attacker)
 					_hit_and_run(attacker)
 				if attacker.coated_blades > 0 and ab.cost == 0:
 					_apply_poison(attacker, sv_t, 2)
@@ -10964,7 +10965,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Calibrating Shot: %s was unhurt when the shot left, so the range pays nothing" % \
 						target.unit_name, "#909090")
 			if ab.display_name == "Pinning Shot" and not target.dead:
-				_apply_status(target, "dazed", 3)
+				_apply_status(target, "dazed", 3, 0, 0, attacker)
 			if ab.display_name == "Called Shot" and not target.dead:
 				match called_mode:
 					"break":
@@ -10973,9 +10974,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						target.float_text("+30 BD", Color(0.8, 0.35, 1.0))
 						_log("   → Called Shot cracks the Break meter", "#e0a050")
 					"exposed":
-						_apply_status(target, "exposed", 3)
+						_apply_status(target, "exposed", 3, 0, 0, attacker)
 					_:
-						_apply_status(target, "sunder", 2)
+						_apply_status(target, "sunder", 2, 0, 0, attacker)
 				called_mode = ""
 			if attacker.has_status("held_breath"):
 				var hb_left := attacker.status_power("held_breath") - 1
@@ -11113,7 +11114,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.take_hit(0, trapper.bone_breaker)
 					_stat_bd(trapper, trapper.bone_breaker)
 				if trapper.caught_fast > 0 and not attacker.dead:
-					_apply_status(attacker, "caught", trapper.caught_fast)
+					_apply_status(attacker, "caught", trapper.caught_fast,
+						0, 0, trapper)
 				if ret_result.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
@@ -11427,7 +11429,7 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	# The boss carve-out: one turn of ice, then it acts again on its own.
 	var frozen_turns := _freeze_turns(target)
 	var timed := frozen_turns > 0
-	_apply_status(target, "frozen", frozen_turns, 0, 0, null, force)
+	_apply_status(target, "frozen", frozen_turns, 0, 0, src, force)
 	if not target.has_status("frozen"):
 		return                      # boss immunity bounced it; the stacks sit
 	# (`was_frozen` was stamped here until Batch BJ §1 — the old "shattering"
@@ -13797,7 +13799,7 @@ func _on_status_expired(u: BattleUnit, id: String) -> void:
 	if occ == null or occ.torment_ranks == 0:
 		return
 	var torment_turns := occ.torment_ranks
-	_apply_status(u, "decay", torment_turns)
+	_apply_status(u, "decay", torment_turns, 0, 0, occ)
 	_log("   → Talent: Lingering Torment — the madness curdles into Decay on %s (%d turns)" % [
 		u.unit_name, torment_turns], "#b0a8e0")
 
@@ -15005,7 +15007,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, bw_turns], "#8c9cc8")
 		"bewitch":
 			_sfx("break", -8.0, 1.4)
-			_apply_status(target, "bewitch", 3)
+			_apply_status(target, "bewitch", 3, 0, 0, attacker)
 			_gain_ruin(target, OLD_GODS_MARK)
 			_message("%s bewitches %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Bewitch — %s will turn on its allies (3 turns)" % [
@@ -15062,7 +15064,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"hysteria":
 			_sfx("break", -6.0, 1.2)
 			for e in enemies.filter(func(en): return not en.dead):
-				_apply_status(e, "hysteria", -1)
+				_apply_status(e, "hysteria", -1, 0, 0, attacker)
 			_message("%s unleashes MASS HYSTERIA!" % attacker.unit_name)
 			_log("%s: Mass Hysteria — the warband turns on itself next turn" % \
 				attacker.unit_name, "#c070e0")
@@ -15157,7 +15159,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"snare_trap":
 			if target != null and not target.dead:
 				var sn_i := heroes.find(attacker)
-				_apply_status(target, "snared", -1, sn_i)
+				_apply_status(target, "snared", -1, sn_i, 0, attacker)
 				# BATCH CR §1 — THE `perfect` STAMP IS GONE. It was the PERFECT's
 				# clause (the spring's Stun holding an unbroken boss); CN took the
 				# bar off this card, so the stamp became unconditional and boss
@@ -16743,7 +16745,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for foe in enemies:
 				if foe.dead:
 					continue
-				_apply_status(foe, "slow_burn", sb_turns)
+				_apply_status(foe, "slow_burn", sb_turns, 0, 0, attacker)
 				sb_n += 1
 			_sfx("bomb", -10.0, 0.7)
 			attacker.float_text("SLOW BURN", Color(1.0, 0.72, 0.35))
@@ -18277,7 +18279,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, "#70d878")
 		"umbral_sigil":
 			_sfx("break", -10.0, 0.7)
-			_apply_status(target, "umbral_sigil", 4)
+			_apply_status(target, "umbral_sigil", 4, 0, 0, attacker)
 			_message("%s brands %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Umbral Sigil on %s — its party shares its pain" % [
 				attacker.unit_name, target.unit_name], "#c070e0")
@@ -18425,7 +18427,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					if foe.dead or foe.has_status("burn"):
 						continue
 					_apply_status(foe, "burn", attacker.wildfire_spread, 0,
-						_dot_tick("burn", attacker))
+						_dot_tick("burn", attacker), attacker)
 					wf_lit += 1
 				if wf_lit > 0:
 					_log("   → Talent: Wildfire Spread — %d fresh %s catches" % [
@@ -18524,7 +18526,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Icy Resolve (talent): the hoarfrost roots deeper.
 			var rime_turns := 4 + attacker.icy_resolve_ranks
 			_apply_status(target, "rime", rime_turns)
-			_apply_status(target, "frostbite", 2)
+			_apply_status(target, "frostbite", 2, 0, 0, attacker)
 			_message("%s rimes %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
 				attacker.unit_name, target.unit_name, rime_turns], "#7cc8f0")
@@ -19956,7 +19958,7 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 		p_turns = -1
 		sticky = true
 	for _i in 1 + src.virulence_ranks:
-		_apply_status(victim, "poison", p_turns, 0, tick)
+		_apply_status(victim, "poison", p_turns, 0, tick, src)
 	var ps: Dictionary = victim.get_status("poison")
 	if not ps.is_empty():
 		if sticky:
@@ -20261,9 +20263,9 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 			_log("† %s dies" % victim.unit_name, "#e05050")
 			_on_enemy_death(victim)
 			return
-	_apply_status(victim, "stunned", 1, 0, 0, null, force_stun)
+	_apply_status(victim, "stunned", 1, 0, 0, placer, force_stun)
 	if placer.quick_rigging > 0:
-		_apply_status(victim, "cripple", 3)
+		_apply_status(victim, "cripple", 3, 0, 0, placer)
 	# ADDITIVE (Batch BA): each counter IS the number its clause pays — Break
 	# damage (90) and the turns the teeth hold the wound open (5).
 	if placer.bone_breaker > 0:
@@ -20271,7 +20273,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 		_stat_bd(placer, placer.bone_breaker)
 		victim.float_text("+%d BD" % placer.bone_breaker, Color(0.8, 0.35, 1.0))
 	if placer.caught_fast > 0:
-		_apply_status(victim, "caught", placer.caught_fast)
+		_apply_status(victim, "caught", placer.caught_fast, 0, 0, placer)
 	_hit_and_run(placer)
 
 
@@ -20943,10 +20945,11 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			_log("   → %s recovers %d HP" % [attacker.unit_name, sh_got], "#b0a8e0")
 		"sunder":
 			if not target_died:
-				_apply_status(target, "sunder", 2)
+				_apply_status(target, "sunder", 2, 0, 0, attacker)
 		"burn":
 			if not target_died:
-				_apply_status(target, "burn", 2, 0, _dot_tick("burn", attacker))
+				_apply_status(target, "burn", 2, 0, _dot_tick("burn", attacker),
+					attacker)
 
 
 # ---------- skill check ----------

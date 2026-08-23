@@ -4985,3 +4985,45 @@ never told about each other.
 
 **The general form is worth keeping: when a meter pays on a transition, ask which spec parks in the
 state it transitions into.** That spec is a partner nobody has written down.
+
+## BATCH DI — A CLAUSE THAT LOOKS LIKE IT WORKS
+
+DH shipped a good rule and half a mechanism, and the half that was missing could not be seen from
+anywhere. Harvest pays the Survivalist more for a wound an ally opened than for one he opened
+himself. The clause is four lines, it reads a field that has existed since Batch W, and it is
+correct. It was also, in practice, paying almost nothing — because only a quarter of the code that
+applies a status was telling the status who applied it.
+
+**The interesting property is not the bug. It is that the bug had no symptom.** An unstamped status
+and a status the Survivalist laid himself are the same value to that loop: both are skipped, both
+pay the base rate. There is no log line, no warning, no visible difference between "the party
+opened seven wounds and you were paid for one" and "you opened them yourself". A player would have
+read the card, watched the number, and concluded the bonus was small. **The mechanism degrades into
+a plausible design.** That is a much worse failure mode than a crash, and it is the one this
+project keeps finding: BA's Harvest over-count, the Stalking Horse species, the vacuous assertions
+in `as`/`at`/`aw`. A thing that is wrong loudly gets fixed in the batch that ships it.
+
+**So the general rule is about ORDER, not about `src`.** When a clause starts reading a field it
+did not previously read, the batch that writes the clause owes a count of how many writers actually
+write that field. Not a survey of the field's existence — DH's comment correctly noted that
+`src_name` had been stamped since Batch W, and that was true and useless. The question is never
+"does this field exist"; it is "what fraction of the paths that should write it do". DH asked the
+first question and got a reassuring answer.
+
+**The second lesson is about how the coverage figure itself rotted.** The recorded number was 53
+of 204. It had been quoted into `docs/state.md`, into DH's own source comment, and into this
+batch's brief, and it was wrong — the true figure was 63, because 25 of the calls wrap across lines
+and a single-line grep cannot see them. Nobody introduced an error; the measurement was simply
+never re-derived, and a measurement that is easy to take badly will be taken badly and then
+propagated. `check_di` §1 balances parentheses instead, and it skips the two *comments* that name
+the function — which is the same fault one layer down, and would have made the new number wrong by
+two.
+
+**And the third is about what "the party" means.** DH's comment states that `heroes` carries the
+companions. It does not, and the belief is not silly: `_living_hero_with` filters
+`not h.is_companion` as though it might, four sites write `heroes + companions` because the union
+is real, and `_hero_side()` exists solely to build it. A codebase that has *three* idioms for "the
+party" will eventually have a walk that picks the wrong one, and the walk that picked wrong here is
+the one deciding whether Aguila's Exposed counts as the party's work. **DI did not fix it**, because
+fixing it moves a magnitude and this batch forbade itself that; it asserted it instead. An assertion
+is how a belief stops being a belief.

@@ -14,6 +14,111 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-22 &mdash; Batch DI: MAKING <code>src</code> HONEST WHERE HARVEST READS IT</h2>
+<p><i><b>36 call sites now pass the unit that applied the status. No status behaviour changes, no
+magnitude is retuned and no clause from DH is touched</b> &mdash; this batch supplies an argument
+that was already accepted and already read. <b><code>src</code> coverage goes 63 &rarr; 99 of 204
+call sites</b>, and against a realistic board <b>Harvest&rsquo;s payout goes 3923 &rarr; 5308, a
+35% correction</b> that was invisible by construction. <b>No save version moves (still v10).</b>
+One new gate, <code>check_di</code>. The full report is <code>docs/reports/DI.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; THE RECORDED COVERAGE FIGURE WAS WRONG, AND IT WAS WRONG BECAUSE IT WAS A GREP</h3>
+<p><b><code>docs/state.md</code>, DH&rsquo;s own source comment and this batch&rsquo;s brief all
+said <i>53 of 204</i>.</b> Counted properly &mdash; balancing parentheses across the whole file
+rather than reading one line at a time &mdash; <b>the figure was 63</b>. <b>25 of the 204 calls
+wrap across lines and TWELVE OF THOSE ALREADY PASSED A SOURCE</b>, and a single-line grep cannot
+see any of them. The number had been quoted into three documents without anyone re-deriving it.
+<code>check_di</code> &sect;1 walks rather than greps, and it skips the two COMMENTS that name
+<code>_apply_status(</code> &mdash; the same fault one layer down.</p>
+
+<h3>&sect;1 &mdash; WHICH STATUSES HARVEST ACTUALLY READS, DERIVED FROM THE CLAUSE</h3>
+<p>Harvest reads a status on its target if it is in <code>DEBUFF_IDS</code> (33 ids), is not
+<code>broken</code>, is not <code>sticky</code>, and its <code>src_name</code> resolves to a member
+of <code>heroes</code> other than the caster. <b>Of the 141 unstamped sites, 50 could apply one of
+those</b> &mdash; 48 with a literal id and 2 computed. <b>The narrow scope held comfortably: this
+was never most of the 151.</b> The population was derived by walking
+<code>_resolve_special</code>&rsquo;s call graph, not the ability fields.</p>
+
+<h3>&sect;2 &mdash; 36 STAMPED, 14 REPORTED RATHER THAN GUESSED</h3>
+<p><b>Two of the 36 had the real source sitting unused in their own signature.</b>
+<code>_hold_freeze(target, src, force)</code> passed <code>null</code> to <code>_apply_status</code>
+while holding <code>src</code>; <code>_apply_poison(src, victim, turns)</code> did the same. Both
+were the two sites in the file passing an EXPLICIT <code>null</code>, which reads as deliberate and
+was not.</p>
+<p><b>FOURTEEN SITES ARE DELIBERATELY LEFT UNSTAMPED AND ALL FOURTEEN ARE NAMED IN THE REPORT.</b>
+Umbral Mirror&rsquo;s rebound (an enemy&rsquo;s own debuff, reflected by a talent no single hero
+owns), Chain Ignition (a dead foe&rsquo;s fire passed on), the Cursed Visage (an item; nobody uses
+it), Spread of Madness and the bewitched strike (an enemy applying to an enemy under the party&rsquo;s
+influence), Hemorrhage (a threshold on collective bleed), the Hoarfrost modifier stamp (no unit
+applies it), and <b>seven companion sites</b>. <b>Getting the source wrong is worse than leaving it
+absent</b>: absent under-pays, wrong mis-credits.</p>
+
+<h3>&sect;3 &mdash; <code>heroes</code> DOES NOT CARRY THE COMPANIONS, AND DH&rsquo;S COMMENT SAYS IT DOES</h3>
+<p>DH&rsquo;s Harvest comment reads <i>&ldquo;<code>heroes</code> CARRIES THE COMPANIONS, which is
+correct rather than incidental: Aguila&rsquo;s Exposed is the Beastmaster&rsquo;s work&rdquo;</i>.
+<b>It does not.</b> <code>heroes.append</code> is reached at exactly ONE site &mdash; the party
+spawn &mdash; and a companion is appended to <code>companions</code>. Four sites in
+<code>battle.gd</code> write <code>heroes + companions</code> precisely because the union is not
+free, and <code>_hero_side()</code> exists to build it. <b>The consequence is that Harvest&rsquo;s
+ally loop cannot resolve a companion&rsquo;s name, so a wound Aguila opened pays the base rate
+however it is stamped</b> &mdash; measured live at exactly 1.0000 of a self-opened board.
+<b>DI DID NOT CLOSE IT.</b> The fix is one word in DH&rsquo;s loop and it MOVES A MAGNITUDE, which
+this batch forbids itself. <code>check_di</code> &sect;4 asserts the gap so a future ruling changes
+an assertion rather than a belief.</p>
+
+<h3>&sect;4 &mdash; THE SIZE OF THE CORRECTION, AND THE NEGATIVE CONTROLS</h3>
+<p>On a board laid by real casts through the changed sites &mdash; Bewitch, Umbral Sigil, Mass
+Hysteria, Slow Burn, a poison, a hold-freeze and one wound the Survivalist opened himself &mdash;
+<b>eight reapable statuses carried ONE source before this batch and carry EIGHT after</b>. The ally
+fraction goes 1/8 to 7/8, so the rate goes <b>0.1275 &rarr; 0.1725</b> and the payout goes
+<b>3923 &rarr; 5308</b>. <b>The predicted ratio 1.3529 and the measured 1.3530 agree to rounding.</b>
+The number did NOT barely move: the sites that mattered were not already among the 63.</p>
+<p><b>THREE NEGATIVE CONTROLS, ALL RUN.</b> Reverting all 36 edits turns <code>check_di</code> red
+in TEN places; reverting ONE site (<code>_hold_freeze</code>) turns it red in THREE independent
+ones; and zeroing <code>HARVEST_ALLY_BONUS</code> turns &sect;2&rsquo;s payout band red on its own,
+which is what proves that band is not vacuous. <b>The parse check was proved to bite too</b>: a
+deliberate syntax error appended to <code>battle.gd</code> produced a <code>Parse Error</code> line
+and none once removed &mdash; and the gate&rsquo;s own first run <b>exited 0 while printing two
+<code>Parse Error</code> lines</b>, which is the trap the project has a rule about.</p>
+<p><b>&sect;2 IS SEEDED ON BOTH BLOWS OF THE COMPARED PAIR</b>, which is DD&rsquo;s rule and the
+repair <code>test_batch_at</code>&rsquo;s &sect;1 ratio still owes. Harvest rolls
+<code>randf_range(0.9, 1.1)</code>, so an unseeded ally-versus-self comparison would differ in the
+roll as well as in the term being measured. Both arms draw the same stream and the ratio reads
+1.5000 exactly, over seven readings.</p>
+
+<h3>&sect;4b &mdash; THE BATTERY, AND THE ONE THING THE PREDICTION MISSED</h3>
+<p><b>TWO FULL BATTERIES RAN, AND THE FIRST CAUGHT A DEFECT OF THIS BATCH.</b>
+<code>test_batch_ax</code> pins the exact source line <code>_hold_freeze</code> passes to
+<code>_apply_status</code>, <code>null</code> and all, so threading the real source turned it red.
+<b>Its own comment records that it has been re-pointed twice already</b> &mdash; at BT and at DF
+&mdash; &ldquo;and the question is unchanged&rdquo; both times. This is the third, for the same
+structural reason: it pins a whole call line and the call line keeps legitimately changing.
+<b>Repaired to intent and count-neutral at 345</b>, and the needle now pins the source slot too.</p>
+<p><b>THE PRE-RUN PREDICTION SAID &ldquo;every other row UNMOVED&rdquo; AND THAT WAS WRONG IN ONE
+PLACE.</b> The literal sweep meant to catch exactly this had two holes: it read only literals
+written inline inside <code>.contains(...)</code> (<code>test_batch_ba</code>&rsquo;s needle is a
+dictionary KEY fed through a loop), and only DOUBLE-quoted strings (<code>test_batch_ax</code>&rsquo;s
+is single-quoted, because it contains embedded quotes). With both closed, the sweep over all 47
+suites and 21 gates reports <b>exactly two</b> flipped literals &mdash; precisely the two that had
+to be repaired.</p>
+<p><b>THE ACCEPTANCE RUN: 0 suite failures, 0 throws, and 0 <code>Parse Error</code> / 0
+<code>SCRIPT ERROR</code> across all 67 logs</b>, grepped from the logs and never read off a tally
+or an exit code. <code>check_cm_live</code> reports its 4 deliberate reds as always.
+<b><code>check_de</code> reads 277 / 0 / 0</b> &mdash; no count fell, no failure count rose, and
+nothing rose unexpectedly. <b>And the zero in the failure row is not a repair</b>:
+<code>test_batch_at</code>&rsquo;s unseeded ratio, <code>bo</code>&rsquo;s NULL FIELD flake and
+<code>test_rune_battle</code>&rsquo;s pierce all simply did not fire. All three remain open,
+unseeded and banded.</p>
+
+<h3>&sect;5 &mdash; WHAT THIS DELIBERATELY DOES NOT DO</h3>
+<p><b>105 call sites still pass no source and are recorded as owed.</b> They apply statuses Harvest
+does not read &mdash; buffs, marks, hero-side wards &mdash; so nothing currently mis-credits off
+them, but the standing rule now covers them and the full sweep stays visible. <b>One further site
+is out of reach by shape rather than by scope</b>: <code>melted</code> is applied through
+<code>unit.add_status</code>, which accepts no source at all, so stamping it is a signature change
+rather than an argument. <b>No status behaviour changed, no magnitude moved, and no clause from DH
+was retuned.</b></p>
+
 <h2>2026-08-22 &mdash; Batch DH: CROSS-SPEC SYNERGY</h2>
 <p><i><b>Nine clauses on nine existing cards. No new abilities, no new statuses, no pool depth
 change</b> &mdash; <code>SPEC_DRAFT_POOLS</code> stays at 96 and the draft stays at <b>120 of

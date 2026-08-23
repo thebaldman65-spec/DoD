@@ -298,7 +298,15 @@ func _additive_units() -> void:
 			"...and it is one function, shared with Camouflage (Batch BR)",
 		"maxi(u.deadfall_network, 1)": "the trap gate reads the counter, not a hardcoded 2",
 		"placer.bone_breaker)": "Bone Breaker's Break damage comes off the counter",
-		"placer.caught_fast)": "Caught Fast's duration comes off the counter",
+		# BATCH DI — REPAIRED TO INTENT, NOT DELETED. The needle used to be
+		# `placer.caught_fast)` and the closing paren was doing the work by
+		# accident: DI passes the trap's PLACER as the status source, so the
+		# call reads `..., placer.caught_fast, 0, 0, placer)` and the old
+		# fragment stopped matching. The QUESTION is unchanged — does Caught
+		# Fast's duration come off its own counter rather than a hardcoded
+		# number — so the needle is anchored on the id and the counter
+		# instead, which no further argument can break.
+		"\"caught\", placer.caught_fast": "Caught Fast's duration comes off the counter",
 		"_apply_status(src, \"elusive\", src.hit_and_run)":
 			"Hit and Run's duration comes off the counter",
 	}
