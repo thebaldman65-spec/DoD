@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DK)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1548,9 +1548,11 @@ ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect:
 Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
 only guaranteed blocks in the game.<br>
 <i>Earnable (§6a) and talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, every ALLY
-(<b>companions NOT included — reported at Batch DJ §2 and deliberately not ruled on</b>: the
-card says "ally" and the read site is <code>heroes.filter(func(he): return not he.dead)</code>,
-which reaches no companion. Whether the TEXT is wrong or the CODE is, is the designer's call)
+(<b>companions INCLUDED as of Batch DK</b>: the read site is <code>_hero_side()</code>, so a
+Beastmaster's companion takes the cut and the no-death window with everyone else. Measured on a
+summoned bear — a 40-BD blow banks 20 under the base cut against an unheld 40, and a lethal
+blow leaves it at 1 HP. <b>The living only</b>: a receive-site takes <code>_hero_side()</code>
+where Harvest's union deliberately does not, because Harvest asks who <i>opened</i> a wound)
 takes 50% less Break damage for 2 turns, cannot die for 2 turns, and
 it refunds 5 Rage; self-cast, no target selection. A Hold the Line earned from an ability
 pick and THEN taken as the capstone is UPGRADED instead: 80% less Break damage, and the
@@ -1995,6 +1997,18 @@ Owning all three cells in a row makes that row a real three-way argument; owning
 no argument in it.</p>
 <p><b>Cells cost by tier: rows 1–3 cost 1 point, rows 4–6 cost 2, rows 7–9 cost 3.</b>
 27 cells is <b>54 points to fill one spec</b>.</p>
+<p><b>HERO AND ALLY ARE NOT INTERCHANGEABLE ON A CARD, AND AS OF BATCH DK EVERY CARD MEANS
+WHAT IT SAYS.</b> A <b>HERO</b> is one of your four. An <b>ALLY</b> is a hero or a
+Beastmaster's companion. <b>Five effects in the game say ALLY and pay a companion too</b>:
+Rally's +30% healing received, Hold the Line's Break cut and its no-death window,
+Sanctuary's heal, the Field Medic's cleanses, and Harvest's reading of who opened a wound.
+<b>Everything else party-wide says HERO, and each has a reason</b> — Rallying Cry, War Stomp
+and Rallying Shout refuel a resource bar a companion does not have; Devoutness and Last Hope
+are stamped on the party before any companion is called; Cleansing Waters rolls once a turn and a
+companion never takes one; Tank and Spank's Empower would land on a companion and pay it nothing,
+because a companion's blows are resolved on their own path. <b>Faith is heroes-only outright</b>
+— a companion can never hold a stack. The wording tells you which you are getting, and under
+<b>The Pack</b> the difference is two extra bodies rather than one.</p>
 <p><b>Earning: 1 talent point per spec per ZONE BOSS defeated.</b> Three zone bosses, so
 <b>3 points per spec per completed run</b> — and a run that dies in zone 2 still banks 1 or
 2. Only the specs that were in the party earn; a spec that did not play banks nothing.
@@ -2058,15 +2072,15 @@ plainly that it cannot be changed.</p>
 <p><b>Warden</b> — <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) · <b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) · <b>BANNER</b> (the half that protects other people)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Plate</th><th>Threat</th><th>Banner</th></tr>
-<tr><td>1</td><td><b>Unkillable</b> — Every time you Block an attack, heal for 8% of the health you brought into the battle.</td><td><b>Ricochet</b> — Blocking an attack has a 35% chance to Stun the attacker.</td><td><b>Tank and Spank</b> — Mocking Blow ALWAYS Empowers a random ally (2 turns).</td></tr>
+<tr><td>1</td><td><b>Unkillable</b> — Every time you Block an attack, heal for 8% of the health you brought into the battle.</td><td><b>Ricochet</b> — Blocking an attack has a 35% chance to Stun the attacker.</td><td><b>Tank and Spank</b> — Mocking Blow ALWAYS Empowers a random hero (2 turns).</td></tr>
 <tr><td>2</td><td><b>Toughness</b> — Constitution is increased by 25% of maximum HP.</td><td><b>Provoke</b> — Mocking Blow taunts 2 additional foes.</td><td><b>Rally</b> — Every attack Blocked by Heavy Plating grants every ally +30% healing received for 3 turns.</td></tr>
-<tr><td>3</td><td><b>Endurance</b> — +3% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).</td><td><b>Iron Will</b> — The Warden takes 12% less damage for every debuff currently on him, to a maximum of 90%.</td><td><b>Rallying Cry</b> — At the start of each of the Warden&#x27;s turns, every ally regains 4% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.</td></tr>
+<tr><td>3</td><td><b>Endurance</b> — +3% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).</td><td><b>Iron Will</b> — The Warden takes 12% less damage for every debuff currently on him, to a maximum of 90%.</td><td><b>Rallying Cry</b> — At the start of each of the Warden&#x27;s turns, every hero regains 4% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.</td></tr>
 <tr><td>4</td><td><b>Tenacity</b> — Every attack Blocked by Heavy Plating increases maximum health by 15 for the rest of the battle.</td><td><b>Sundering</b> — Crushing Blow deals 100% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).</td><td><b>Elemental Weakness</b> — Crushing Blow also reduces all elemental resistances of the target by 20% (3 turns).</td></tr>
 <tr><td>5</td><td><b>Shield Mastery</b> — Shieldwall&#x27;s stance holds 2 turns longer — 5 turns.</td><td><b>Spite</b> — Attackers that damage the Warden take 30% of that damage back.</td><td><b>Bulwark Line</b> — Shieldwall also grants every other hero +10% Block chance for its duration. If he owns Interpose, each hero gains 1 additional shield charge from it as well.</td></tr>
 <tr><td>6</td><td><b>Plate Discipline</b> — Heavy Plating&#x27;s climbing Block bonus grows +12% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).</td><td><b>Bruising Guard</b> — Blocking an attack deals 30 Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.</td><td><b>Shared Vigil</b> — Heroes take 12% less damage while the Warden is above 50% health.</td></tr>
 <tr><td>7</td><td><b>Battered Not Broken</b> — Blocking an attack removes 30 Break from the Warden&#x27;s own meter.</td><td><b>Grudge</b> — +25% damage against enemies currently taunted by the Warden.</td><td><b>Steadfast</b> — When damage would drop a hero below 20% health, the Warden absorbs 60% of it instead.</td></tr>
 <tr><td>8</td><td><b>Debt of Iron</b> — Every point of damage his armor and Blocks refuse is banked. Crushing Blow spends the bank, dealing 10% of it as bonus damage.</td><td><b>The Whole Room</b> — Taunts the Warden applies never expire.</td><td><b>Standard Bearer</b> — Every other hero is protected by 50% of the Warden&#x27;s own armor value, on top of their own.</td></tr>
-<tr><td>CAPSTONE</td><td><b>Immovable</b> — The Warden cannot be Broken, and his Block chance is increased by 20%.</td><td><b>Vengeful Guardian</b> — The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td><td><b>Hold the Line</b> — New ability: Hold the Line — every ally takes 50% less Break damage for 2 turns and cannot die for 2 turns (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 3 turns.</td></tr>
+<tr><td>CAPSTONE</td><td><b>Immovable</b> — The Warden cannot be Broken, and his Block chance is increased by 20%.</td><td><b>Vengeful Guardian</b> — The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td><td><b>Hold the Line</b> — New ability: Hold the Line — every ally (companions included, Batch DK) takes 50% less Break damage for 2 turns and cannot die for 2 turns (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 3 turns.</td></tr>
 </table>
 <p><b>Holy</b> — <b>RADIANCE</b> (throughput: bigger heals, cheaper heals, less waste) · <b>MERCY</b> (the resource economy: earning stacks, holding them, spending them, and
 Empower) · <b>VIGIL</b> (reversal: the fallen and the nearly-fallen)</p>
@@ -2119,7 +2133,7 @@ build lands three distinct statuses.</p>
 <tr><th>Row</th><th>Radiance</th><th>Mercy</th><th>Vigil</th></tr>
 <tr><td>1</td><td><b>Triage</b> — Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by 15%.</td><td><b>Heavenly Aura</b> — Each stack of Mercy grants 12% healing done, up from the base 5%.</td><td><b>Guardian Angel</b> — Heroes falling below 65% health earn you a stack of Mercy, up from 50%.</td></tr>
 <tr><td>2</td><td><b>Soothing Touch</b> — Heal and Renewal each cost 10 less Mana.</td><td><b>Holy Light</b> — Perfect casts restore 8% of your maximum Mana.</td><td><b>Divine Presence</b> — At the end of your turn, the lowest-health hero is healed for 8% of their maximum health.</td></tr>
-<tr><td>3</td><td><b>On the Mend</b> — Renewal ticks have a 35% chance to dispel one harmful effect from the bearer.</td><td><b>Zealous Light</b> — The Cleric begins each battle with 2 Mercy.</td><td><b>Last Hope</b> — Allies under 25% of their maximum health receive 40% more healing.</td></tr>
+<tr><td>3</td><td><b>On the Mend</b> — Renewal ticks have a 35% chance to dispel one harmful effect from the bearer.</td><td><b>Zealous Light</b> — The Cleric begins each battle with 2 Mercy.</td><td><b>Last Hope</b> — Heroes under 25% of their maximum health receive 40% more healing.</td></tr>
 <tr><td>4</td><td><b>Divine Plea</b> — New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Hallow them against new ones for 3 turns (3.0 int, 2cd). If Divine Plea was already earned, it costs 1 Mercy instead of 2.</td><td><b>Sanctified</b> — Spending Mercy has a 35% chance to consume no stacks.</td><td><b>Intercession</b> — New ability: Intercession — for 2 turns the next lethal blow against any hero is refused: they survive at 1 health and you lose 1 Mercy (25 Mana, 1.0 int, 4cd). If Intercession was already earned, its window lasts 3 turns instead.</td></tr>
 <tr><td>5</td><td><b>Swift Mending</b> — Heal has no cooldown at all, and Hymn of Hope&#x27;s drops by 1.</td><td><b>Grace</b> — When a hero would earn you a stack of Mercy while you are at maximum, the stack instead heals that hero for 20% of your maximum health.</td><td><b>Hour of Need</b> — While any hero is below 30% health, every hero takes 15% less damage.</td></tr>
 <tr><td>6</td><td><b>Radiant Cascade</b> — A CRITICAL heal also splashes 75% of its value onto the lowest-health other hero.</td><td><b>Ardor</b> — While the Cleric holds 3 or more Mercy, Empowering consumes no stack.</td><td><b>Blessed Vestments</b> — Your healing also grants the recipient a shield worth 25% of the heal&#x27;s value for 2 turns.</td></tr>
@@ -2130,9 +2144,9 @@ build lands three distinct statuses.</p>
 <p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one companion, further) · <b>THE PACK</b> (partnership in breadth: many companions, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bulwark</th><th>Faith</th><th>Zeal</th></tr>
-<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each ally has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
+<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each hero has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
 <tr><td>2</td><td><b>Radient Aegis</b> — Casting Divine Shield has a 60% chance to cast it again on another hero.</td><td><b>Unwavering Faith</b> — Increases the Devout&#x27;s maximum health by 20%.</td><td><b>Righteous Fire</b> — Consecrated Ground reflects 35% of damage taken (up from the base 10%).</td></tr>
-<tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — Every ally takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.</td></tr>
+<tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — Every hero takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.</td></tr>
 <tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 3 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, every hero heals 8% of the Devout&#x27;s max health each turn.</td></tr>
 <tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 55% of the Devout&#x27;s max health (up from the base 35%).</td><td><b>Sacred Covenant</b> — Should a shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
 <tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>

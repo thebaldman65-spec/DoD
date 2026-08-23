@@ -478,24 +478,43 @@ outright, so a beast can never hold the stack the node is written around.
 **THE EXCLUSION ITSELF IS INTENDED AND NO READ SITE MOVED.** Under The Pack a party-wide buff
 would otherwise reach six units.
 
-**FOUR TEXTS MOVED THE OTHER WAY.** `wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters`
-said "party" and were moved to *ally* on the reading that their read sites include companions.
-Precision runs both directions or the two words are decoration. **Thirty-two node texts in total.**
-**DJ §2 RE-DERIVED ALL FOUR READ SITES AND NONE OF THEM REACHES A COMPANION** — three walk bare
-`heroes` (`battle.gd` 8083, 18232, 1343/1348) and `dv_waters` runs per-TURN on a unit that takes
-none. **The four moves are reported, not reverted**: reverting the text is one ruling and fixing
-the code is the opposite one, and DJ §2 was scoped to draw the distinction rather than make it.
+**FOUR TEXTS MOVED THE OTHER WAY, AND CV'S STATED TEST FOR MOVING THEM WAS WRONG.**
+`wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters` said "party" and were moved to *ally*
+because **"their read sites genuinely include companions"**. **NONE OF THE FOUR DID** — DJ §2
+re-derived every one. **THAT SENTENCE IS THE THING TO DELETE FROM YOUR HEAD**, because it is the
+test a future author would apply and it was never run: three of the four walked bare `heroes`, and
+`dv_waters` runs per-TURN on a unit that takes none. **DK RULED ON ALL FOUR AND THEY SPLIT
+TWO AND TWO** — `wd_rally` and `wd_hold_line` had their CODE corrected and are *ally* truthfully
+now; `dv_devoutness` and `dv_waters` had their TEXT corrected to *hero*. **All four land correctly
+for the first time, and by a different route than CV recorded.** Precision runs both directions or
+the two words are decoration.
 
-**`wd_tank_spank` WAS CITED HERE AS THE PROOF THE DISTINCTION IS WORTH HAVING, AND DJ §2 FOUND IT
-IS THE OPPOSITE.** It says "ally" and its read site is `heroes.filter(func(h): return not h.dead)`
-— which reaches no companion, because `heroes` holds none. **The same is true of all four texts CV
-moved TO "ally"** (`wd_rally`, `wd_hold_line`, `dv_devoutness`, `dv_waters`). DJ §2 reports the
-full list and **rules on none of it**: an intended exclusion needs its TEXT corrected to say
-"hero", an accidental one needs its CODE corrected, and which is which is a designer's call.
+**THE TEST IS NOT "DOES THE COLLECTION REACH ONE". IT IS "DOES THE EFFECT ARRIVE".** DK found the
+third failure mode with `wd_tank_spank`: the collection can be widened, the status applies
+cleanly, and the beast is still paid nothing, because the READ SITE downstream never runs for it.
+**Walk the chain from the loop to the number that moves, and measure it on a live beast.** A
+widening that changes no measurement is a widening that did not land — and it is worse than the
+narrow word, because a chip appears and it reads as working.
 
-**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S COLLECTION, NOT ITS FILTER AND NOT THE
-SENTENCE'S RHYTHM.** `_hero_side()` includes companions (living ones only); `heroes + companions`
-includes them dead or alive; **a walk over bare `heroes` never does, filter or no filter**;
+**`wd_tank_spank` WAS CITED HERE AS THE PROOF THE DISTINCTION IS WORTH HAVING, DJ §2 FOUND IT WAS
+THE OPPOSITE, AND DK REPAIRED IT — AS THE TEXT, NOT THE CODE.** It said "ally" and walked bare
+`heroes`. **It now says HERO, and the reason is the one worth carrying**: widening it would have
+been a NO-OP. `empower` applies to a companion perfectly well and pays it nothing, because a beast
+strikes through `_companion_hit` — its own damage path, which reads none of the hero strike loop's
+multiplier block. **Measured at DK over 40 seeded blows with the chip standing: 34392 damage
+against 34392, a ratio of exactly 1.0000.** `check_dk` §4 measures that ratio on every run, so the
+day somebody gives `_companion_hit` an `empower` read, the gate says this ruling is stale instead
+of staying quietly true.
+
+**A RULE WHOSE WORKED EXAMPLE WAS WRONG NEEDS ITS EXAMPLE REPAIRED AS LOUDLY AS THE RULE.** The
+distinction IS worth having — it is just that this was never the proof of it. **The proof is now
+`wd_hold_line`**: it says "ally", it reads `_hero_side()`, and a summoned bear measurably banks 20
+Break from a 40-BD blow against an unheld 40.
+
+**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S COLLECTION *AND THEN THE CHAIN BELOW IT*,
+NOT ITS FILTER AND NOT THE SENTENCE'S RHYTHM.** `_hero_side()` includes companions (living ones
+only); `heroes + companions` includes them dead or alive; **a walk over bare `heroes` never does,
+filter or no filter**;
 `_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally"; and a
 per-TURN effect can never reach one either, because `_next_unit()` walks `heroes + enemies` and a
 companion takes no turns.
@@ -2388,8 +2407,10 @@ be found by counting call sites, never by playing.
 > **Any loop implementing the *ally* convention must read BOTH.** A loop over `heroes` alone
 > silently excludes companions and **reports nothing** — it looks like a balance quirk, not a bug.
 
-**`heroes.append` is reached at exactly ONE site**, the party spawn (`battle.gd:1337`); a summoned
-beast is appended to `companions` (`battle.gd:19519`). Nothing else ever writes either array.
+**`heroes.append` is reached at exactly ONE site**, the party spawn; a summoned beast is appended
+to `companions` at the one place a companion is built. Nothing else ever writes either array.
+**The line numbers that used to stand here are deleted rather than re-numbered** — DK's own edits
+moved one of them, which is this block's neighbouring rule met in the wild.
 · **THE THREE IDIOMS, AND THEY ARE NOT INTERCHANGEABLE.** `heroes + companions` is the union **dead
   or alive**; `_hero_side()` is the union **of the living only**; bare `heroes` is the four, and no
   `not h.is_companion` clause on it changes that — **all 23 such filters in `battle.gd` are
@@ -2408,12 +2429,52 @@ beast is appended to `companions` (`battle.gd:19519`). Nothing else ever writes 
 · **THE COST OF GETTING IT WRONG IS SILENCE.** Before DJ, a companion-opened board paid **exactly
   1.0000** of a self-opened one — the bonus simply did not arrive, and no log, no test and no
   battery said so. It now pays **1.5000**, which is what a hero's wound pays.
-· **WHEN WRITING A NEW ALLY-WORDED EFFECT, THE TEST IS THE READ SITE'S COLLECTION.** DJ §2 swept
-  every broad ally-worded card and node: **eleven walk bare `heroes`**, four of which are the four
-  texts CV §4 moved TO "ally" on the belief their read sites reach companions. The list is in
-  `docs/reports/DJ.md` §2 and **nothing in it is ruled on** — an intended exclusion wants its TEXT
-  corrected to say "hero", an accidental one wants its CODE corrected, and that is the designer's
-  call, not a sweep's.
+· **DJ SWEPT ELEVEN AND RULED ON NONE; DK RULED ON ALL ELEVEN AND THEY SPLIT FOUR AND SEVEN.**
+  **FOUR had their CODE corrected** and now read `_hero_side()` — Rally, Hold the Line, Sanctuary,
+  Field Medic. **SEVEN had their TEXT corrected to "hero"** — Rallying Cry, War Stomp and Rallying
+  Shout (a beast has no resource bar), Devoutness and Last Hope (stamped at party spawn, before a
+  beast exists), Cleansing Waters (per-turn, and a companion takes none) and Tank and Spank (the
+  chip lands and pays nothing). **The reason is recorded beside each one in the source**, because
+  "hero" alone is a decision the next author re-litigates. `check_dk` §1 pins both populations by
+  their own read lines, so neither half can rot without saying so.
+
+## STANDING RULE — A WIDENING IS DONE WHEN THE EFFECT ARRIVES, NOT WHEN THE COLLECTION WIDENS (Batch DK §1)
+> **Widen the loop, then walk the chain to the number that moves, then measure it on a live body.**
+> A widening that changes no measurement is not a smaller fix — it is **worse than the narrow
+> word**, because a chip appears on the unit and it reads as working.
+
+DK widened five candidates and **only four of them landed**. The fifth, `wd_tank_spank`, applies
+`empower` to a companion perfectly cleanly: the status attaches, the chip renders, the tooltip
+reads. **It pays exactly nothing.** A beast strikes through `_companion_hit`, which is its own
+damage path and reads none of the hero strike loop's multiplier block — measured over 40 seeded
+blows with the chip standing, **34392 damage against 34392, ratio 1.0000.** Its TEXT was corrected
+instead.
+· **THE THREE PLACES A WIDENING DIES, AND ONLY THE FIRST IS THE COLLECTION.** (1) the loop walks
+  bare `heroes`; (2) a filter downstream removes it — this is the one CV §4 believed was the
+  mechanism and it never was, since **all 23 `is_companion` filters walk `heroes` and remove
+  nothing**; (3) **the READ SITE below simply never runs for that body.** The third is invisible to
+  every source grep and to every check that asserts on a collection.
+· **SO THE EVIDENCE IS A LIVE MEASUREMENT ON THE ACTUAL BODY, NOT A COLLECTION ASSERTION.**
+  `check_dk` §2 summons a real bear and reads what each of the four pays it: Sanctuary heals it
+  **1200 of a 10000 body**, Hold the Line leaves it at **20 Break from a 40-BD blow** against an
+  unheld 40 and holds it at 1 HP through a lethal one, Rally turns a 1000 heal into **1300**, and
+  the Field Medic's pool holds it once it is poisoned.
+· **AND THE CONTROL IS NOT OPTIONAL, BECAUSE THE BUG WAS INVISIBLE.** Four effects paid four units
+  instead of five for the life of the project and no log, no suite and no battery ever said so — so
+  a check that passes on the fixed tree proves nothing. `check_dk` §2 empties `companions` for the
+  length of one arm, which is exactly the pre-DK collection, and asserts the beast is untouched:
+  **Sanctuary heals it 0, Hold the Line leaves it the full 40.**
+· **PIN THE REASON YOU DID *NOT* WIDEN, AS A MEASUREMENT.** `check_dk` §4 re-measures Tank and
+  Spank's 1.0000 on every battery run. A ruling of the form "we left this narrow BECAUSE widening
+  would pay nothing" is a claim about a code path, and a claim about a code path rots — pinned this
+  way, the day somebody gives `_companion_hit` an `empower` read the gate says the ruling is stale
+  instead of staying quietly true.
+· **A RECEIVE-SITE TAKES `_hero_side()`; A SITE ASKING WHO *DID* SOMETHING TAKES `heroes +
+  companions`.** All four of DK's widenings ask who RECEIVES an effect, and a corpse receives
+  nothing — so all four take the living, by the authored name rather than by a fifth hand-rolled
+  copy of the predicate. **Harvest is the counter-case and must not be dragged along**: it asks who
+  *opened* a wound, and a hero who has since fallen still opened it, so it spells its union out.
+  Both are `heroes + companions`; only one filters `dead`.
 
 ## STANDING RULE — A NUMBER QUOTED FROM ONE DOCUMENT INTO ANOTHER STOPS BEING A MEASUREMENT (Batch DJ §3)
 > **Re-derive a figure at the point of use, or cite where it was measured and when.**

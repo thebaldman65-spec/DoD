@@ -2762,8 +2762,18 @@ func _run_battle() -> void:
 		# two off one unlucky hero.
 		if u.is_hero and not u.dead and u.field_medic > 0:
 			for _fm in u.field_medic:
-				var fm_pool: Array = heroes.filter(
-					func(h): return not h.dead and _status_count(h) > 0)
+				# BATCH DK §1 — `_hero_side()`, SO A BEAST'S AFFLICTIONS COUNT.
+				# The card says "random allies" and this walked bare `heroes`. A
+				# companion carries debuffs like anything else — it is targetable,
+				# so enemies land them on it — and `dispel_one_debuff` is on
+				# `BattleUnit` and asks nothing about what the body is. Measured:
+				# a poisoned beast went 1 debuff to 0.
+				#
+				# `dead` IS EXCLUDED, and here the reason is sharper than "a corpse
+				# receives nothing": the pick is RANDOM out of the pool, so a dead
+				# body in it would spend one of his two washes on nobody.
+				var fm_pool: Array = _hero_side().filter(
+					func(h): return _status_count(h) > 0)
 				if fm_pool.is_empty():
 					break
 				var fm_ally: BattleUnit = fm_pool.pick_random()
@@ -8080,10 +8090,25 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 								strike_target.unit_name, "#b0a8e0")
 						if strike_target.rally > 0:
 							var rinfo: Array = STATUS_INFO["rally_heal"]
-							for h in heroes:
-								if not h.dead:
-									h.add_status("rally_heal", rinfo[0], rinfo[1],
-										rinfo[2], 3, rinfo[3])
+							# BATCH DK §1 — `_hero_side()`, SO THE BEAST IS RALLIED TOO.
+							# The card says "every ALLY" and this walked bare `heroes`,
+							# which holds none (DJ §1). +30% healing RECEIVED is a thing
+							# a beast plainly takes: `heal_amount` reads `rally_heal` on
+							# whoever holds it and asks nothing about what they are.
+							# Measured on a beast: a 1000 heal became 1300.
+							#
+							# `dead` IS EXCLUDED, and `_hero_side()` is the name of that
+							# decision rather than a fifth hand-rolled copy of it. The
+							# guard was already here (`if not h.dead`); it is kept, not
+							# dropped, because a corpse receives no healing to deepen.
+							# HARVEST IS THE OPPOSITE CASE AND SPELLS ITS UNION OUT: it
+							# asks who OPENED a wound, and a hero who has since fallen
+							# still opened it. A site that asks who RECEIVES an effect
+							# takes the living; a site that asks who DID something takes
+							# the union. Both are `heroes + companions`; only one filters.
+							for h in _hero_side():
+								h.add_status("rally_heal", rinfo[0], rinfo[1],
+									rinfo[2], 3, rinfo[3])
 							_log("   → Talent: Rally — the party is Rallied (+30% healing, 3 turns)",
 								"#b0a8e0")
 					await _wait(0.4)
@@ -10148,10 +10173,25 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.provoke_ranks > 0 and taunt_extra > 1:
 						_log("   → Talent: Provoke — the taunt drags in %d more foes" % \
 							taunt_extra, "#b0a8e0")
-				# Tank and Spank: the taunt Empowers a random ally — ALWAYS
+				# Tank and Spank: the taunt Empowers a random HERO — ALWAYS
 				# since Batch AL. Mocking Blow is free and on his rotation
 				# constantly, so a chance roll here read as noise rather than
 				# tension; nothing was ever planned around it.
+				#
+				# BATCH DK §2 — BARE `heroes` IS DELIBERATE HERE, AND IT IS THE
+				# ONE OF THE FIVE DK LOOKED AT THAT DID NOT WIDEN. The card said
+				# "ally" and `CLAUDE.md` cited it as the proof the distinction
+				# works; DJ §2 found it walks the four. The TEXT was corrected
+				# rather than this collection, because Empower on a beast pays
+				# NOTHING: a companion's blows go through `_companion_hit`,
+				# which is its own damage path and reads none of the strike
+				# loop's multiplier block (the `last_howl_dmg` comment below
+				# states the same fact from the other side). MEASURED over 40
+				# seeded blows with the chip standing: 34392 against 34392,
+				# ratio exactly 1.0000. **DO NOT WIDEN THIS WITHOUT FIRST
+				# GIVING `_companion_hit` AN `empower` READ** — widening alone
+				# hangs a visible chip on a beast and changes no number, which
+				# reads as working and is worse than the narrow word.
 				if attacker.tank_spank_ranks > 0:
 					var pals := heroes.filter(func(h): return not h.dead)
 					if not pals.is_empty():
@@ -14929,7 +14969,16 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# status is gone with the fossil, so the vault keeps the heal only.
 			var sanct_pct := (0.18 if is_perfect else 0.12) * _healing_done_mult(attacker)
 			_sfx("heal", -4.0, 0.8)
-			for h in heroes.filter(func(he): return not he.dead):
+			# BATCH DK §1 — `_hero_side()`, SO THE BEAST IS HEALED. The card says
+			# "every ally heals 12% of their max health"; a companion has a max
+			# health and `heal_amount` mends it (Hunter's Instinct already does).
+			# Measured: 1200 off a 10000 body, which is the 12% the card promises.
+			# ANCIENT PACT STILL REFUSES IT — `no_heals` sits at the top of the
+			# heal pipeline — and that is the node doing its job, not this loop
+			# missing the beast.
+			#
+			# `dead` IS EXCLUDED — a corpse is revived, not healed.
+			for h in _hero_side():
 				var amt := int(h.max_hp * sanct_pct)
 				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
@@ -18262,7 +18311,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var hl_cut := 80 if hl_up else 50
 			var hl_undying := 3 if hl_up else 2
 			_sfx("heal", -5.0, 0.6)
-			for h in heroes.filter(func(he): return not he.dead):
+			# BATCH DK §1 — `_hero_side()`, SO THE LINE COVERS THE BEAST. Both
+			# halves land on one: `hold_bd`'s cut is read in `unit.take_hit`'s
+			# Break block, and a companion HAS a Break meter (its Constitution is
+			# the hunter's, inherited at summon) and is targetable — enemies pick
+			# out of `_hero_side()`. Measured on a beast: a 40-BD blow banked 40
+			# plain, 20 under the 50% cut and 8 under the upgraded 80%. `undying`
+			# holds it at 1 HP through a lethal blow, same as a hero.
+			#
+			# `dead` IS EXCLUDED — the filter that was here is kept, by name. A
+			# corpse has no meter running and cannot be held from a death it has
+			# already taken. See the Rally site above for why a RECEIVE site takes
+			# the living where Harvest's union does not.
+			for h in _hero_side():
 				_apply_status(h, "hold_bd", 2, hl_cut)
 				h.update_status("hold_bd", "HL",
 					"Takes %d%% less Break damage." % hl_cut, hl_cut)

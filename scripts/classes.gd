@@ -3611,11 +3611,21 @@ static func draft_ability(display_name: String) -> Ability:
 # NUMBERS ARE NEW — the one balance judgment this batch made.
 static func vault_ability(display_name: String) -> Ability:
 	match display_name:
+		# BATCH DK §2 — HERO ON THE RESOURCE CLAUSE ONLY, and the scope of that is
+		# worth stating because this card is not the pure refuel the other two are.
+		# It does TWO things and only the second was ally-worded: the whole party
+		# sheds 30 Pressure, and every OTHER member regains 30% of their resource.
+		# The RESOURCE half is a hero's, for the usual reason — a beast has no bar.
+		# **THE PRESSURE HALF IS A SEPARATE QUESTION AND IS DELIBERATELY NOT
+		# ANSWERED HERE** — a companion HAS a Break meter and can plainly shed it,
+		# so "the whole party" is arguably false today. But "party" is not one of
+		# the ally-worded texts DJ §2 swept, and ruling on it is a new ruling
+		# rather than this batch's. Recorded as owed in `docs/state.md`.
 		"Rallying Shout":
 			return Ability.make({"display_name": "Rallying Shout", "cost": 25,
 				"special": "rally", "delay": 2.5, "anim": "attack03", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise the line: the whole party sheds\n30 Pressure, and every other ally\nregains 30% of their resource."})
+				"description": "Raise the line: the whole party sheds\n30 Pressure, and every other hero\nregains 30% of their resource."})
 		"Retaliation":
 			return Ability.make({"display_name": "Retaliation", "cost": 20,
 				"special": "retaliate", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01", "cooldown": 3,
@@ -3702,12 +3712,15 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Open his own veins: pays 7.5% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."})
+		# BATCH DK §2 — HERO ON BOTH SURFACES, for Rallying Cry's reason: the
+		# rider refuels a resource bar and a beast has none. Its loop's own
+		# `resource_name == ""` guard already skipped one.
 		"War Stomp":
 			return Ability.make({"display_name": "War Stomp", "cost": 20, "damage": 15,
 				"pressure": 15, "delay": 3.0, "anim": "attack03", "cooldown": 3,
 				"random_hits": 3, "perfect_extra_hit": false,
-				"perfect_id": "", "perfect_text": "Allies regain 20% of their resource",
-				"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."})
+				"perfect_id": "", "perfect_text": "Heroes regain 20% of their resource",
+				"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Heroes regain 10%\nof their resource."})
 		"Interpose":
 			return Ability.make({"display_name": "Interpose", "cost": 25,
 				"special": "interpose", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",

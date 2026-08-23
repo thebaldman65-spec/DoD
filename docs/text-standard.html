@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-20 (Batch CV &mdash; &sect;4.5a and &sect;4.9)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DK &mdash; &sect;4.9)</b></p>
 <h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
 <p><i>The rules every player-facing string is written to. Binding on every batch from CJ
 forward, including any tuning that comes out of playtesting. This document says how text is
@@ -284,16 +284,35 @@ reading an array that never held one, so <b>the collection is what excludes, not
 Twenty-five node texts promised "every ally" or "the whole party" and paid only the four. <b>The
 exclusion is intended</b> &mdash; under The Pack a party-wide buff would otherwise reach six units
 &mdash; <b>so the words move, never the read site.</b></p>
-<p><b>THE TEST IS THE READ SITE'S FILTER, NOT THE SENTENCE'S RHYTHM.</b>
-<code>_hero_side()</code> includes companions, so an ability that targets through it says
-<i>ally</i>. <b>Any walk over bare <code>heroes</code> does not</b> &mdash; with or without a
-<code>not h.is_companion</code> clause &mdash; so it says <i>hero</i>. <code>_gain_faith</code> refuses companions outright, so
-nothing Faith-flavoured can ever say <i>ally</i>. <b>"Party" is not one of the two words</b>;
-it reads as either and is what let twenty-five texts drift.</p>
-<p><b>Precision runs both directions.</b> Four texts that said "party" while their read sites
-genuinely included companions were moved TO <i>ally</i> (<code>wd_rally</code>,
-<code>wd_hold_line</code>, <code>dv_devoutness</code>, <code>dv_waters</code>), because two words
-that only ever narrow are one word with extra steps.</p>
+<p><b>THE TEST IS THE READ SITE'S COLLECTION AND THEN THE CHAIN BELOW IT, NOT ITS FILTER AND NOT
+THE SENTENCE'S RHYTHM.</b> <code>_hero_side()</code> includes companions (the living ones), so an
+ability that targets through it says <i>ally</i>. <b>Any walk over bare <code>heroes</code> does
+not</b> &mdash; with or without a <code>not h.is_companion</code> clause &mdash; so it says
+<i>hero</i>. <code>_gain_faith</code> refuses companions outright, so nothing Faith-flavoured can
+ever say <i>ally</i>; and <b>a per-TURN effect can never reach one either</b>, because
+<code>_next_unit()</code> walks <code>heroes + enemies</code> and a beast takes no turns.
+<b>"Party" is not one of the two words</b>; it reads as either and is what let twenty-five texts
+drift.</p>
+<p><b>AND A THIRD FAILURE, FOUND AT BATCH DK: THE COLLECTION CAN REACH A BEAST AND THE EFFECT
+STILL NOT ARRIVE.</b> <code>wd_tank_spank</code> was widened, measured, and reverted to
+<i>hero</i>: <code>empower</code> attaches to a companion cleanly &mdash; chip, tooltip and all
+&mdash; and pays it nothing, because a beast's blows resolve through
+<code>_companion_hit</code>, which reads none of the hero strike loop's multipliers. Measured over
+40 seeded blows, <b>ratio exactly 1.0000</b>. <b>So the evidence for <i>ally</i> is a live
+measurement on a summoned beast, not an assertion about a collection.</b></p>
+<p><b>Precision runs both directions, and Batch CV's four were moved on a test that was never
+run.</b> <code>wd_rally</code>, <code>wd_hold_line</code>, <code>dv_devoutness</code> and
+<code>dv_waters</code> were moved TO <i>ally</i> because "their read sites genuinely include
+companions". <b>None of the four did</b> (DJ &sect;2). <b>DK ruled on all four and they split two
+and two</b>: <code>wd_rally</code> and <code>wd_hold_line</code> had their CODE corrected and are
+<i>ally</i> truthfully now; <code>dv_devoutness</code> and <code>dv_waters</code> had their TEXT
+corrected to <i>hero</i>, the first because it is stamped at party spawn before a beast exists and
+the second because it is per-turn. <b>All four land correctly for the first time, by a different
+route than CV recorded.</b></p>
+<p><b>THE LIVE SPLIT, AS OF DK.</b> Five effects say <i>ally</i> and mean it: Rally, Hold the Line,
+Sanctuary, the Field Medic's cleanses and Harvest. Everything else party-wide says <i>hero</i>, and
+<b>each carries its reason in the source beside it</b> &mdash; "hero" alone is a decision the next
+author re-litigates.</p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

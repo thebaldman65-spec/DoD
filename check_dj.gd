@@ -15,7 +15,7 @@
 #   §2  the payout, on a wound a REAL COMPANION STRIKE opened
 #   §3  the seven companion call sites, driven the way the game drives them
 #   §4  a FALLEN hero's wound still pays — the `_hero_side()` trap, asserted
-#   §5  the §2 sweep's ratchet: ally-worded effects that walk bare `heroes`
+#   §5  the `is_companion` count (the §2 site ratchet moved to `check_dk` at DK)
 #   §6  the belief is gone from the LIVE prose
 #
 # WHY §4 EXISTS AT ALL, AND IT IS THE CARE THIS BATCH IS ACTUALLY ABOUT.
@@ -41,37 +41,17 @@ const Gate = preload("res://gate_fixture.gd")
 # arithmetic is only honest if `hv_n` is identical in both arms.
 const MIX := ["exposed", "sunder", "slow", "dazed"]
 
-# §5's RATCHET — THE ELEVEN OTHER ALLY-WORDED EFFECTS THAT WALK BARE `heroes`,
-# each pinned by its own read line. **IT IS A REPORT, NOT A RULING** — every one
-# of them may be a deliberate exclusion whose TEXT is wrong rather than an
-# accidental one whose CODE is, and DJ ruled on none of them. What this forbids
-# is the population moving without anybody noticing: **a fragment that stops
-# matching is a NOTICE to re-derive `docs/reports/DJ.md` §2's table, not a
-# failure of this batch.** The table is prose; without this it rots.
-const BARE_ALLY_SITES := {
-	"wd_tank_spank Tank and Spank":
-		"var pals := heroes.filter(func(h): return not h.dead)",
-	"wd_rally Rally":
-		"var rinfo: Array = STATUS_INFO[\"rally_heal\"]\n\t\t\t\t\t\t\tfor h in heroes:",
-	"wd_hold_line Hold the Line":
-		"for h in heroes.filter(func(he): return not he.dead):\n\t\t\t\t_apply_status(h, \"hold_bd\", 2, hl_cut)",
-	"dv_devoutness Devoutness":
-		"for h in heroes:\n\t\t\t_apply_status(h, \"devotion\", -1, dvn_pct)",
-	"dv_waters Cleansing Waters":
-		"if zl_dv.waters_ranks > 0 and randf() < 0.01 * zl_dv.waters_ranks:",
-	"wd_stomp_drill Rallying Cry":
-		"for rc_h in heroes:",
-	"War Stomp's ally rider":
-		"for h in heroes:\n\t\t\t\tif h.dead or h == attacker or h.resource_name == \"\":",
-	"rally Rallying Shout":
-		"for h in heroes.filter(func(he): return not he.dead):\n\t\t\t\th.pressure = maxi(h.pressure - pressure_cut, 0)",
-	"sanctuary Sanctuary":
-		"for h in heroes.filter(func(he): return not he.dead):\n\t\t\t\tvar amt := int(h.max_hp * sanct_pct)",
-	"sv_medic Field Medic":
-		"var fm_pool: Array = heroes.filter(",
-	"hl_last_hope Last Hope":
-		"for h in heroes:\n\t\tga_step = maxi(ga_step, h.guardian_step)",
-}
+# §5's RATCHET — **RETIRED AT DK, AND THE REASON IS THE POINT.** DJ pinned all
+# ELEVEN ally-worded effects that walk bare `heroes` by their own read lines,
+# with a message telling the next batch to re-derive §2's table if one moved.
+# **DK IS THAT BATCH.** It ruled on all eleven — four widened to `_hero_side()`
+# and seven had their TEXT moved to "hero" — and `check_dk` §1 pins BOTH
+# populations, in both directions, with messages that say which half broke.
+#
+# THE TABLE IS DELETED RATHER THAN UPDATED because keeping it would be a SECOND
+# COPY of one fact in a second gate, which is this project's oldest recurring
+# defect and the thing DJ's own §3 rule is about. The `is_companion` count below
+# STAYS — that is DJ's own finding and no other gate asserts it.
 
 var _g := Gate.new()
 
@@ -357,12 +337,14 @@ func _sweep_ratchet(src: String) -> void:
 		walks, filtered])
 	ok(filtered == 23,
 		"the `is_companion`-over-`heroes` population is %d, not the 23 CV measured and DJ re-derived" % filtered)
-	# AND THE ELEVEN, EACH BY ITS OWN READ LINE. Harvest is deliberately not
-	# among them — it is the one this batch changed, and §1 pins it instead.
-	for what in BARE_ALLY_SITES:
-		ok(src.contains(BARE_ALLY_SITES[what]),
-			"NOTICE, NOT A REGRESSION: %s's read site has changed, so `docs/reports/DJ.md` §2's table needs re-deriving" % what)
-	print("  %d ally-worded effects besides Harvest still walk bare `heroes` — reported at DJ §2, ruled on nowhere" % BARE_ALLY_SITES.size())
+	# **AND DK ASKED THE QUESTION THIS COUNT EXISTS FOR, AND THE ANSWER WAS
+	# NONE.** DK widened four ally-worded read sites to `_hero_side()`, which
+	# genuinely does hold companions — so a filter sitting on one of them would
+	# have stopped being decoration and started removing a beast, and the
+	# widening would have been a no-op wearing a fix's clothes. Not one of the
+	# four carried an `is_companion` clause, and this count holding at 23 across
+	# DK is how that is checkable rather than merely stated.
+	print("  the eleven bare-`heroes` ally effects are ruled and pinned by `check_dk` §1 since DK")
 
 
 # ── §6 — THE BELIEF IS GONE FROM THE LIVE PROSE ─────────────────────────────

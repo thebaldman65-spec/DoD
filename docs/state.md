@@ -5,65 +5,77 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-23 (Batch DJ).*
+*Last rewritten: 2026-08-23 (Batch DK).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DJ — HARVEST'S ALLY LOOP READS `companions`.** DH's clause pays more for a wound an
-  ALLY opened and its loop walked `heroes`, which **does not carry the companions** — so a wound
-  Aguila opened paid the base rate however it was stamped, measured live at **exactly 1.0000** of a
-  self-opened board. **DJ closes both halves DI left open**: the loop reads `heroes + companions`
-  and the seven withheld companion call sites are stamped. **A companion-opened board now pays
-  1.5000, which is what a hero's wound pays.** `src` coverage **99 → 106 of 204**. **One new gate,
-  `check_dj` (54 checks).**
-- **THE FIX DI RECOMMENDED WAS THE WRONG ONE, AND THAT IS THIS BATCH'S HEADLINE.**
-  `docs/reports/DI.md` §3 wrote it as *"one word: `heroes` → `_hero_side()`"*. **`_hero_side()`
-  filters `dead` and this loop deliberately does not** — DH's own comment, three lines up, says a
-  hero who has since fallen still opened the wound. **Measured: the recommended fix passes the
-  companion check at 1.5005 and drops a FALLEN opener's board to 0.6664** — a fresh 33%
-  under-payment in the same loop, in the same shape, introduced by the fix for the first one.
-  `check_dj` §4 is the control that rejects it, and the union is spelled out rather than delegated
-  so the `dead` decision is stated at the site.
-- **THE WRONG BELIEF WAS WRITTEN DOWN IN FOUR LIVE PLACES AND `CLAUDE.md` CONTRADICTED ITSELF.**
-  `battle.gd`'s Harvest comment, **CV §4's own convention block in `CLAUDE.md`**,
-  `docs/text-standard.html` §4.9 and `docs/talent-audit.html` §4.1 all said a Beastmaster's beast
-  *stands in `heroes`*; DI had already recorded the correct fact 1900 lines further down the same
-  rule file. All four are corrected. **The changelog and the batch reports are HISTORY and were
-  deliberately not swept.**
-- **AND THE MECHANISM IN THAT BELIEF WAS WRONG TOO: ALL 23 `is_companion` FILTERS OVER `heroes` ARE
-  NO-OPS.** CV §4 recorded 23 nodes "shorted by an explicit `is_companion` filter"; the filters are
-  real and every one of them filters an array that cannot hold a companion. **The COLLECTION is what
-  excludes.** The filters still read as the author's INTENT, which is worth having — but the
-  corollary is the one that bites: **a walk with no such filter is not thereby including
-  companions**, which is how four node texts came to be moved TO "ally" on read sites that reach
-  none.
-- **DJ RULED ON HARVEST AND ON NOTHING ELSE.** §2 swept every broad ally-worded card and node:
-  **eleven besides Harvest walk bare `heroes`**, including all four CV moved TO "ally" and
-  `wd_tank_spank`, which `CLAUDE.md` cited as the proof the distinction works. The table is in
-  `docs/reports/DJ.md` §2 with which each one *looks* like; **`check_dj` §5 pins all eleven by their
-  own read lines so the table cannot rot.**
-- **Next letter: DK.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
-  out of `(Batch XX)` and compares lexically — `DK` sorts after `DJ`, so it still works. **A
+- **Last batch: DK — THE ELEVEN ALLY-WORDED EFFECTS ARE RULED, AND THEY SPLIT FOUR AND SEVEN.**
+  DJ §2 swept them and ruled on none, because an intended exclusion wants its TEXT corrected and an
+  accidental one wants its CODE corrected. **FOUR had their code corrected and now read
+  `_hero_side()`** — Rally, Hold the Line, Sanctuary, Field Medic. **SEVEN had their text corrected
+  to "hero", and the REASON is recorded beside each one in the source.** One new gate, `check_dk`
+  (64 checks); `check_dj`'s site ratchet is retired into it, 54 → 43.
+- **THE BRIEF NAMED FIVE TO WIDEN AND ONE OF THEM DOES NOT, AND THAT IS THIS BATCH'S HEADLINE.**
+  **Tank and Spank was measured rather than assumed.** `empower` attaches to a companion perfectly
+  cleanly — status, chip, tooltip — and pays it **nothing**: a beast's blows resolve through
+  `_companion_hit`, its own damage path, which reads none of the hero strike loop's multiplier
+  block. **Measured over 40 seeded blows: 34392 damage against 34392, ratio exactly 1.0000.**
+  Its TEXT moved instead. **`battle.gd` already said so from the other side**, 180 lines below the
+  `empower` read — so the brief's *"nothing in the code ever said it shouldn't"* was false for it.
+- **THE NEW TEST IS "DOES THE EFFECT ARRIVE", NOT "DOES THE COLLECTION REACH ONE".** There are
+  **three places a widening dies and only the first is the collection**: the loop walks bare
+  `heroes`; a filter downstream removes it (**never actually the mechanism** — all 23
+  `is_companion` filters walk `heroes` and remove nothing); or **the read site below simply never
+  runs for that body**, which is invisible to every source grep. The rule is in `CLAUDE.md`.
+- **ALL FOUR WIDENINGS WERE VERIFIED TO ARRIVE ON A LIVE SUMMONED BEAR, WITH A NEGATIVE CONTROL.**
+  Sanctuary heals it **1200 of a 10000 body**; Hold the Line leaves it **20 Break from a 40-BD
+  blow** (against an unheld 40) and holds it at **1 HP** through a lethal one; Rally turns a 1000
+  heal into **1300**; the Field Medic's pool holds it once poisoned. **`check_dk` §2 empties
+  `companions` for the length of one arm** — precisely the pre-DK collection — and asserts the
+  beast is untouched. **The failure was invisible in every battery ever run**, so a check that
+  passes on the fixed tree proves nothing without it.
+- **THE `dead` DECISION WAS TAKEN AT EACH SITE, NOT COPIED.** All four exclude the dead and say so
+  by NAME: `_hero_side()` is the authored name for "the union, living only". **The reasons differ**
+  — a corpse is revived rather than healed (Sanctuary), has no meter running (Hold the Line), takes
+  no healing to deepen (Rally); and Field Medic's is sharper than all three, because **its pick is
+  RANDOM**, so a dead body in the pool would spend one of two washes on nobody. **Harvest is the
+  counter-case and was not dragged along** — it asks who *opened* a wound, so it keeps its union
+  spelled out and filters nothing.
+- **CV §4's STATED TEST IS CORRECTED, NOT JUST ITS FACTS.** Its four moves rested on *"their read
+  sites genuinely include companions"*, false for all four. After DK, `wd_rally` and `wd_hold_line`
+  are genuinely *ally* and `dv_devoutness` and `dv_waters` are *hero* — **all four land correctly
+  for the first time, by a different route than CV recorded.** Corrected in `CLAUDE.md`,
+  `docs/text-standard.html` §4.9 and `docs/talent-audit.html` §4.1. **And the glossary was the one
+  actively misleading a player**: its `hero_vs_ally` entry named five examples of what "ally" pays
+  and **four of the five were false when it was written.**
+- **`CLAUDE.md`'s WORKED EXAMPLE IS REPAIRED AS LOUDLY AS THE RULE.** `wd_tank_spank` was cited
+  there as the proof the distinction works. **The proof is now `wd_hold_line`** — it says "ally",
+  it reads `_hero_side()`, and a bear measurably banks 20 Break where it used to bank 40.
+- **NONE OF THE 23 `is_companion` FILTERS CHANGED MEANING.** A filter sitting on one of the four
+  widened sites would have started removing the beast and made the widening a no-op; not one of the
+  four carried one, and `check_dj` §5's count holding at 23 across DK is how that is checkable.
+- **Next letter: DL.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
+  out of `(Batch XX)` and compares lexically — `DL` sorts after `DK`, so it still works. **A
   THREE-letter code would break all fourteen.**
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
   (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
   split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
   one of them, DB's and DD's `_spawn` consolidations, DC's threshold repairs, DE's move of the
-  count differ into the runner, DF's sort of the 47, DG's close of the ten, **DH's nine cross-spec
-  clauses — the first batch in many that added PLAY — DI's payment of the plumbing debt DH shipped
-  one batch ahead of, and DJ's close of the half DI would not take.**
-- **TWO BATTERIES RAN AND BOTH WERE CLEAN.** The only red in either is `check_cm_live`'s four,
-  which is the standing deliberate one. **`check_de` moved 277 → 281 and it was predicted** — four
-  assertions per baseline row, and DJ adds one row.
+  count differ into the runner, DF's sort of the 47, DG's close of the ten, DH's nine cross-spec
+  clauses — the first batch in many that added PLAY — DI's payment of the plumbing debt, DJ's close
+  of the half DI would not take, **and DK's ruling on the eleven DJ deliberately left standing.**
+- **THE BATTERY WAS CLEAN AND ALL THREE PREDICTED MOVEMENTS LANDED EXACTLY.** Sixty-nine targets
+  ran and the manifest names all sixty-nine. The only red is `check_cm_live`'s four, which is the
+  standing deliberate one. `check_de` reports **285 / 0 failures / 0 NOTICES**.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE FLAKE THAT DG FOUND, AND IT DID NOT FIRE AT DH OR AT DI
+### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET SIX TIMES RUNNING
 
-- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND READ 0 AT DH AND IN BOTH THE DI AND THE DJ BATTERIES — STILL OPEN, STILL UNSEEDED.** `_live_curve()`
+- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN EVERY BATTERY SINCE — DH, DI, DJ AND DK — STILL OPEN, STILL UNSEEDED.** At a rate of about one red in eighteen, six quiet readings is the common case and proves nothing. `_live_curve()`
   sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
   a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
   DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
@@ -84,7 +96,7 @@ in `docs/master.html`.
     rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
     comment says checks that care must do — do NOT widen the band, because the band IS the
     question.**
-  - **REPORTED AND DELIBERATELY NOT FIXED AT DG, AND NOT AT DH, DI OR DJ EITHER.** **The zeros on this
+  - **REPORTED AND DELIBERATELY NOT FIXED AT DG, AND NOT AT DH, DI, DJ OR DK EITHER.** **The zeros on this
     row are the flake being quiet, not the flake being fixed** — its rate is about one red in eighteen
     readings, so a clean run is the common case and proves nothing. **One flake at a
     time is how the effect stays attributable** — `bo`'s is still open and `test_rune_battle`'s is
@@ -109,25 +121,27 @@ in `docs/master.html`.
   `unit.add_status` (`battle.gd:2553`), which **accepts no source argument at all** — stamping it
   is a signature change, not an argument. **It is the only Harvest-readable status applied outside
   `_apply_status`.**
-- **ELEVEN ALLY-WORDED EFFECTS BESIDES HARVEST STILL WALK BARE `heroes`, AND DJ RULED ON NONE OF
-  THEM.** The table is in `docs/reports/DJ.md` §2, with each site's read line and which it *looks*
-  like. **An exclusion that is INTENDED needs its TEXT corrected to say "hero"; one that is
-  ACCIDENTAL needs its CODE corrected** — and that is the designer's call, not a sweep's. Seven look
-  accidental (Tank and Spank, Rally, Hold the Line, Sanctuary, Field Medic, Last Hope, Devoutness)
-  and four look intended or structural (Rallying Cry and War Stomp refuel a resource bar a beast
-  does not have; Cleansing Waters runs per-TURN and a companion takes none). **`check_dj` §5 pins
-  all eleven by their own read lines**, so a site that changes reports itself as a NOTICE to
-  re-derive the table.
-  - **TWO OF THEM CARRY A SECOND OBSTACLE:** Devoutness and Last Hope are stamped **once at party
-    spawn**, before any companion exists, so widening the collection alone would not reach a beast
-    summoned later.
-  - **`master.html` STATES HOLD THE LINE'S AS "(companions included)", WHICH IS FALSE TODAY.** It is
-    flagged in place pointing at DJ §2 rather than corrected in either direction, because
-    correcting it IS the ruling.
-  - **AND CV §4's FOUR "PRECISION RUNS BOTH DIRECTIONS" MOVES ALL REST ON A FALSE PREMISE.**
-    `wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters` were moved TO *ally* because their
-    read sites "genuinely include companions". None does. **Reported, not reverted** — reverting
-    the text is one ruling and fixing the code is the opposite one.
+- **THE ELEVEN ARE RULED (DK) AND THREE THINGS FALL OUT OF THE RULING, ALL OWED.**
+  - **`_companion_hit` READS NO `empower`, AND THAT IS THE ONLY THING BETWEEN TANK AND SPANK AND
+    THE WORD "ALLY".** A beast's blows resolve on their own damage path and read none of the hero
+    strike loop's multipliers, so widening the loop alone would hang a visible chip on a beast and
+    move no number. **Measured at 1.0000 over 40 seeded blows, and `check_dk` §4 re-measures it
+    every run** — so the day the read site is added, the gate says the ruling is stale rather than
+    staying quietly true. **Adding it is a magnitude change on beast damage — new PLAY — not a
+    widening**, which is why DK did not take it.
+  - **RALLYING SHOUT SHEDS 30 PRESSURE FROM "THE WHOLE PARTY" AND PAYS FOUR.** A companion HAS a
+    Break meter and can plainly shed it, so the card's first clause is arguably false today. **Only
+    its ally-worded RESOURCE clause was moved** — "party" is not one of the two words DJ §2 swept,
+    so ruling on it is a new ruling. One loop, and it is the designer's call.
+  - **DEVOUTNESS AND LAST HOPE ARE RECEIVABLE AND ARE NOT RECEIVED**, because both are stamped once
+    in the party-spawn block before any companion exists. **Measured: a beast wearing `devotion` at
+    20 banks 32 Break from a 40-BD blow.** Reaching a beast summoned later wants a **re-stamp on
+    summon** — a second write site for one node's worth of effect.
+- **NO SIM HAS RUN SINCE THE FOUR WIDENINGS, SO EVERY CARRIED SIM FIGURE PREDATES THEM.** Sanctuary,
+  Hold the Line, Rally and the Field Medic now reach a fifth body in a Beastmaster party, so the
+  healing-per-battle and Break-prevented columns will move the next time a sim runs. **The tables at
+  the foot of this file are from DA and are flagged, not corrected** — correcting them means running
+  the sim, which DK did not.
 - **SEVEN SITES ARE DELIBERATELY UNSTAMPED BECAUSE THEIR TRUE SOURCE IS AMBIGUOUS**, and all seven
   are named in `docs/reports/DI.md` §2: Umbral Mirror's rebound, Chain Ignition, the Cursed Visage
   (an item — `_use_item` takes no user), Spread of Madness, the bewitched strike, Hemorrhage and
@@ -146,10 +160,10 @@ in `docs/master.html`.
   `bn`, `bo`, `bp`, `bq` and `br` do not. `test_run_harness.gd` restores the real path without ever
   swapping away from it. Same shape as `_spawn`, one layer in.
 - **`CLAUDE.md` IS STILL OVER CW's OWN TARGET.** CW set *"under 3% of the knowledge sync and
-  roughly flat over time"*. It reads **200 KiB of a 5.93 MiB sync = 3.30%** — DJ added two standing
-  rules and the sync grew with them, so **the ratio is still flat rather than rising** (3.25% at
-  DI). Not urgent; **worth a prune when a batch is in the file anyway**, and DG, DH, DI and DJ all
-  declined it.
+  roughly flat over time"*. It reads **205 KiB of a 6.00 MiB sync = 3.34%** — DK added one standing
+  rule and corrected two blocks in place, and the sync grew with it, so **the ratio is still
+  roughly flat rather than rising** (3.25% at DI, 3.30% at DJ). Not urgent; **worth a prune when a
+  batch is in the file anyway**, and DG, DH, DI, DJ and DK have all now declined it.
 - **TEN HAND-BUILT BATTLE BOARDS REMAIN, IN SIX FILES** — `al` (2), `an`, `ax`, `bl`,
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper**: they are bespoke
   boards inside single checks, and two of those files have no `_spawn` at all. `check_da` §3 carries
@@ -324,8 +338,8 @@ in `docs/master.html`.
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **sixteen** — DJ added
-  `check_dj`. **There are 22 `check_*.gd` files**, so **six are not in `GATES`** — `check_ck_width`,
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **seventeen** — DK
+  added `check_dk`. **There are 23 `check_*.gd` files**, so **six are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the three that run nowhere are `check_ck_width`, `check_cu` and `check_cv`.
@@ -337,7 +351,7 @@ in `docs/master.html`.
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 67 ROWS: 46 suites, 16 gates, 2 scene runs
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 68 ROWS: 46 suites, 17 gates, 2 scene runs
   and 3 harness gates.** **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
   number is this project's oldest recurring defect, and **DG found five live copies of one figure
   and two disagreeing copies of another.** Per target it carries the expected check count (a number
@@ -347,7 +361,7 @@ in `docs/master.html`.
   draft-target sweep and the pool measurement. **DG repaired its §2 anchor guard and added the
   assertion that the guard RESOLVED**, which is the +1.
 - **`check_de.gd` IS THE DIFFER, IT SPAWNS NOTHING, AND IT HAS NO ROW OF ITS OWN** — it excludes
-  itself from its own sweep, which is why its count moving 277 → 281 at DJ (four assertions per
+  itself from its own sweep, which is why its count moving 281 → 285 at DK (four assertions per
   baseline row, and DJ added one row) is reported by nothing. **DI's report made the same movement
   and did not predict it; DJ's prediction table carries it.** It It runs last, reads the logs and the
   baseline file, and reports. **It is re-runnable in seconds over a log directory that already
@@ -359,7 +373,7 @@ in `docs/master.html`.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-23 (Batch DJ)`.**
+- **master.html stamp: `Last updated: 2026-08-23 (Batch DK)`.**
 
 ### HOW LONG A FIGHT IS
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from

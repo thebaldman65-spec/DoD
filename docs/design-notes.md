@@ -5080,3 +5080,60 @@ table cannot rot — which is what `check_dj` §5 does. **A finding that is only
 DI's own §3 is the proof: it recorded the companion gap accurately, in three documents, and it also
 recorded the fix, and one batch later the accurate part was still accurate and the fix was still
 wrong, and nothing in the repository could tell the difference between them.
+
+---
+
+## Batch DK — the widening that did not land, and why it is the one worth writing down
+
+DJ put eleven ally-worded effects in a table and ruled on none of them, because sorting a deliberate
+exclusion from an accident is a designer's question. DK is the answer, and the answer was four and
+seven. That part is bookkeeping. **The part worth recording is the one the brief got wrong.**
+
+The brief listed five to widen and said of them: *"Empowerment, healing received, Break reduction,
+healing and cleansing are all things a beast can plainly receive. Nothing in the code ever said it
+shouldn't."* Four of those five are exactly right. The fifth is Tank and Spank, and the code did say
+it shouldn't — in a comment, in the same function, a hundred and eighty lines below the line that
+reads the status: *"a beast's blows go through `_companion_hit`, which never reads this block, so the
+companions are correctly untouched."*
+
+**Empower applies to a companion perfectly cleanly.** The status attaches. The chip renders. The
+tooltip is correct. Forty seeded blows with it standing dealt exactly the same damage as forty
+without it — not approximately, exactly, because the beast's damage path never asks. Widening that
+loop would have produced a card that says "ally", a collection that contains the beast, a status that
+lands on it, a visible chip, and no change to any number in the game.
+
+**That is worse than leaving the word narrow**, and the reason is not subtle: a narrow word is
+honest and a chip that does nothing is a lie the player can see. Somebody would have drafted around
+it.
+
+So the rule DK earns is not about companions at all. It is that **a widening is finished when the
+effect arrives, not when the collection widens** — walk the chain from the loop to the number that
+moves, and measure it on a live body. There are three places a widening dies and only the first is
+the collection: the loop is narrow; a filter downstream removes it; or the read site below never runs
+for that body. CV believed the second was the mechanism. DJ proved it never was — all 23
+`is_companion` filters walk `heroes` and remove nothing. **DK found the third, which is the one no
+source grep can see**, because there is nothing at the site to grep: the absence is a hundred and
+eighty lines away, in a function with a different name.
+
+**The second thing worth recording is what the ruling cost the rule file.** `CLAUDE.md` cited
+`wd_tank_spank` as the worked example of why hero and ally are worth distinguishing. It was the
+example precisely because it reads so cleanly — a party buff, an obvious beneficiary, a word that
+tells you which. It was also, for the whole time it was cited, false. The distinction is still worth
+having; this was never the proof of it, and a rule whose worked example is wrong is a rule people
+half-remember. The example is Hold the Line now, and it is the example because it can be *measured*:
+a summoned bear banks 20 Break from a blow that used to cost it 40.
+
+**And the negative control is the whole of why any of this is believable.** Four effects paid four
+units instead of five for the life of the project, and nothing anywhere said so — not a log, not a
+suite, not a battery. A check written after the fix passes on the fixed tree, which is no evidence at
+all. So `check_dk` empties `companions` for the length of one arm — precisely the collection these
+sites walked before this batch — and asserts the beast gets nothing: Sanctuary heals it 0, Hold the
+Line leaves it the full 40. **The control is what makes the measurement a measurement rather than a
+description**, and on a failure this quiet it is not optional.
+
+The last thing is small and is the kind of thing that comes back. Rallying Shout was grouped with the
+two pure resource refuels, on the reasoning that a beast has no resource bar. True — and the card
+also sheds 30 Pressure from *"the whole party"*, which a beast can plainly receive. Only the
+ally-worded clause moved, because "party" is not one of the two words the sweep was about, and a
+batch that quietly rules on a third word is a batch nobody can audit. **It is recorded as owed,
+which is the honest place for it.**

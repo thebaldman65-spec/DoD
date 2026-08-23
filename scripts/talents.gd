@@ -661,8 +661,19 @@ const LANE_TREES := {
 		# his rotation constantly, so a chance roll there is noise rather
 		# than tension — you cannot plan around it and you barely notice it
 		# fire. No {v}: the node has no number left to render.
+		# BATCH DK §2 — HERO, BECAUSE A BEAST'S BLOWS READ NO EMPOWER. The status
+		# applies to a companion perfectly well; it is the PAYOUT that never
+		# arrives. A beast strikes through `_companion_hit`, which is its own
+		# damage path and reads none of the hero strike loop's multiplier block —
+		# `battle.gd` says so at the `last_howl_dmg` site: "a beast's blows go
+		# through `_companion_hit`, which never reads this block". MEASURED over
+		# 40 seeded blows with the chip standing: 34392 damage against 34392, a
+		# ratio of exactly 1.0000. Widening the loop would have hung a visible
+		# chip on a beast and changed nothing, which is worse than the narrow
+		# word — it would READ as working.
+		# **THIS WAS `CLAUDE.md`'s WORKED EXAMPLE OF THE ALLY/HERO DISTINCTION.**
 		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 1, "lane": "Banner", "row": 1,
-			"desc": "Mocking Blow ALWAYS Empowers a random ally (2 turns).",
+			"desc": "Mocking Blow ALWAYS Empowers a random hero (2 turns).",
 			"payload": {"stat": {"tank_spank_ranks": 1}}},
 		{"id": "wd_rally", "name": "Rally", "ranks": 1, "lane": "Banner", "row": 2,
 			"desc": "Every attack Blocked by Heavy Plating grants every ally +30% healing received for 3 turns.",
@@ -676,8 +687,12 @@ const LANE_TREES := {
 		# has it. `owns_ability` is the honest instrument here because NO
 		# node grants War Stomp — the only question is whether the kit holds
 		# it (the AK correction).
+		# BATCH DK §2 — HERO, BECAUSE A BEAST HAS NO RESOURCE BAR. A companion is
+		# built with no `resource_name` and `max_resource` 0, so a refuel would
+		# restore nothing. The loop's own `resource_name == ""` guard already says
+		# this; the word now agrees with it.
 		{"id": "wd_stomp_drill", "name": "Rallying Cry", "ranks": 1, "lane": "Banner", "row": 3,
-			"desc": "At the start of each of the Warden's turns, every ally regains {v}% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.",
+			"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.",
 			"scale": {"step": 4},
 			"payload": {"stat": {"rallying_cry": 4},
 				"also": [
@@ -1506,8 +1521,12 @@ const LANE_TREES := {
 		{"id": "hl_presence", "name": "Divine Presence", "ranks": 1, "lane": "Vigil", "row": 2,
 			"desc": "At the end of your turn, the lowest-health hero is healed for 8% of their maximum health.",
 			"payload": {"stat": {"divine_presence_pct": 8}}},
+		# BATCH DK §2 — HERO, FOR DEVOUTNESS'S REASON EXACTLY: `last_hope_bonus`
+		# is stamped party-wide in the same spawn block, before a companion is on
+		# the field. The field itself is read in `heal_amount` and would pay a
+		# beast if it were ever set on one.
 		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 1, "lane": "Vigil", "row": 3,
-			"desc": "Allies under 25% of their maximum health receive 40% more healing.",
+			"desc": "Heroes under 25% of their maximum health receive 40% more healing.",
 			"payload": {"stat": {"last_hope_pct": 40}}},
 		# RE-SPEC of hl_inner_faith (+5% max health), a FORCED ASSIGNMENT
 		# reported rather than hidden: Intercession has no ancestor, and this
@@ -1674,8 +1693,15 @@ const LANE_TREES := {
 			"desc": "Increases the Devout's maximum health by {v}%.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"max_hp_pct": 0.20}}},
+		# BATCH DK §2 — HERO, AND THE OBSTACLE IS THE STAMP'S TIMING RATHER THAN
+		# THE EFFECT. The aura IS receivable: measured on a beast wearing
+		# `devotion` at 20, a 40-BD blow banked 32. But it is stamped ONCE in the
+		# party-spawn block, before any companion exists, so widening the
+		# collection there would reach an empty array — a beast summoned on turn
+		# four would still get nothing. Reaching it wants a re-stamp on summon,
+		# which is a second write site for one node's worth of effect.
 		{"id": "dv_devoutness", "name": "Devoutness", "ranks": 1, "lane": "Faith", "row": 3,
-			"desc": "Every ally takes {v}% less Break damage.",
+			"desc": "Every hero takes {v}% less Break damage.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"devoutness_ranks": 20}}},
 		# The counter holds the INCREASE on the release's base 15%.
@@ -1737,8 +1763,15 @@ const LANE_TREES := {
 		# --- Lane ZEAL — EVERYONE, SHALLOWLY: invest a little in the whole
 		# party. (Its old thesis was "everything else he casts", which is the
 		# fault Holy's Sanctuary had — a lane named after the leftovers.) ---
+		# BATCH DK §2 — HERO, BECAUSE THE EFFECT FIRES PER TURN AND A COMPANION
+		# TAKES NONE. It rolls on the ACTING unit at its turn start, and
+		# `_next_unit()` walks `heroes + enemies`; a beast is summoned with
+		# `next_time = INF` and is drawn from the timeline never. This one is
+		# STRUCTURAL rather than a scope choice — no collection anywhere reaches
+		# it, so "fixing the code" would mean moving the effect off turns
+		# entirely, which is a different card.
 		{"id": "dv_waters", "name": "Cleansing Waters", "ranks": 1, "lane": "Zeal", "row": 1,
-			"desc": "While Consecrated Ground or Sacred Resolve holds, each ally has a {v}% chance each turn to be cleansed of one harmful effect.",
+			"desc": "While Consecrated Ground or Sacred Resolve holds, each hero has a {v}% chance each turn to be cleansed of one harmful effect.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"waters_ranks": 50}}},
 		# The counter holds the INCREASE on the ground's base 10% reflect.

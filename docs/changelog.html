@@ -14,6 +14,142 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-23 &mdash; Batch DK: THE ELEVEN ALLY-WORDED EFFECTS, RULED</h2>
+<p><i><b>DJ &sect;2 swept every broad ally-worded card and node and found ELEVEN besides Harvest
+walking bare <code>heroes</code>, which holds no companion &mdash; and ruled on none of them</b>,
+because an exclusion that is INTENDED wants its TEXT corrected and one that is ACCIDENTAL wants its
+CODE corrected. <b>DK is that ruling, and the eleven split FOUR and SEVEN.</b> Rally, Hold the Line,
+Sanctuary and the Field Medic now read <code>_hero_side()</code> and genuinely pay a beast; the other
+seven say <i>hero</i>, each with its reason recorded beside it. <b>The fifth candidate to widen was
+Tank and Spank and it was measured, not assumed: <code>empower</code> lands on a companion cleanly
+and pays it NOTHING</b> &mdash; a beast strikes through <code>_companion_hit</code>, its own damage
+path, which reads none of the hero strike loop&rsquo;s multipliers. Measured over 40 seeded blows,
+<b>ratio exactly 1.0000</b>. Its text moved instead. <b>No save version moves (still v10).</b> One
+new gate, <code>check_dk</code>; <code>check_dj</code>&rsquo;s site ratchet is retired into it. The
+full report is <code>docs/reports/DK.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; THE FOUR THAT WIDEN</h3>
+<p><b>Rally, Hold the Line, Sanctuary and Field Medic read <code>_hero_side()</code>.</b> Healing
+received, Break reduction, healing and cleansing are all things a beast plainly receives, and each
+was verified to arrive on a live summoned bear rather than assumed:</p>
+<ul>
+<li><b>Sanctuary</b> heals it <b>1200 of a 10000 body</b> &mdash; the 12% the card promises.</li>
+<li><b>Hold the Line</b> leaves it at <b>20 Break from a 40-BD blow</b> against an unheld 40 (the
+base 50% cut; 8 under the upgraded 80%), and its <code>undying</code> half holds the beast at
+<b>1 HP</b> through a lethal blow.</li>
+<li><b>Rally</b> turns a 1000 heal into <b>1300</b>.</li>
+<li><b>The Field Medic&rsquo;s pool</b> holds a poisoned beast, and the wash takes the affliction
+off it.</li>
+</ul>
+<p><b>KNOWN AND ACCEPTED: under The Pack this reaches six units instead of four</b>, so four
+party-wide effects get roughly 50% more coverage in that build alone. <b>That is a deliberate buff
+to one build.</b> &ldquo;Your bear doesn&rsquo;t get healed by the party heal&rdquo; is a rule
+players discover by being confused.</p>
+<p><b>ALL FOUR TAKE THE LIVING, AND THAT IS A DECISION ABOUT <code>dead</code> RATHER THAN A
+DEFAULT.</b> Each asks who RECEIVES an effect and a corpse receives nothing, so each calls
+<code>_hero_side()</code> &mdash; the authored name for &ldquo;the union, living only&rdquo;
+&mdash; instead of a fifth hand-rolled copy of the predicate. <b>Harvest is the counter-case and was
+deliberately not dragged along</b>: it asks who <i>opened</i> a wound, a hero who has since fallen
+still opened it, and it keeps its union spelled out. Both are <code>heroes + companions</code>; only
+one filters <code>dead</code>. (DI proposed <code>_hero_side()</code> for Harvest one batch ago and
+it would have dropped a fallen opener&rsquo;s board to 0.6664.)</p>
+
+<h3>&sect;2 &mdash; THE SEVEN THAT CHANGE ONLY THEIR WORDS</h3>
+<p><b>No read site moves. The texts say <i>hero</i>, and the REASON is recorded beside each one
+in the source</b> &mdash; &ldquo;hero&rdquo; alone is a decision the next author re-litigates.</p>
+<ul>
+<li><b>Rallying Cry, War Stomp, Rallying Shout</b> &mdash; a beast is built with no
+<code>resource_name</code> and <code>max_resource</code> 0, so a refuel restores nothing. Two of the
+three already carried a <code>resource_name == &quot;&quot;</code> guard; the word now agrees with
+it.</li>
+<li><b>Cleansing Waters</b> &mdash; it rolls per-turn on the ACTING unit, and
+<code>_next_unit()</code> walks <code>heroes + enemies</code>. A companion is summoned with
+<code>next_time = INF</code> and takes no turns ever. <b>Structural</b>: no collection anywhere
+reaches it, so &ldquo;fixing the code&rdquo; would mean moving the effect off turns entirely.</li>
+<li><b>Devoutness and Last Hope</b> &mdash; both are stamped ONCE in the party-spawn block, before
+any companion exists, so widening the collection there would reach an empty array and a beast
+summoned on turn four would still get nothing. <b>The effects themselves are receivable</b> &mdash;
+a beast wearing <code>devotion</code> at 20 banks 32 Break from a 40-BD blow &mdash; so the obstacle
+is the stamp&rsquo;s timing, and reaching it wants a re-stamp on summon.</li>
+<li><b>Tank and Spank</b> &mdash; see &sect;3.</li>
+</ul>
+<p><b>ONE THING THIS DELIBERATELY DOES NOT RULE ON.</b> Rallying Shout is not the pure refuel the
+other two are: it also sheds 30 Pressure from <b>&ldquo;the whole party&rdquo;</b>, and a companion
+HAS a Break meter and can plainly shed it. Only the ally-worded resource clause moved.
+<b>&ldquo;Party&rdquo; is not one of the two words DJ &sect;2 swept</b>, so ruling on it is a new
+ruling; it is recorded as owed.</p>
+
+<h3>&sect;3 &mdash; TANK AND SPANK WAS THE FIFTH TO WIDEN, AND IT WAS MEASURED INSTEAD</h3>
+<p><b>It says &ldquo;Empowers a random ally&rdquo;, it walked bare <code>heroes</code>, and
+<code>CLAUDE.md</code> cited it as the proof the hero/ally distinction is worth having.</b> It was
+the most obvious of the five to widen. <b>Widening it would have been a no-op.</b></p>
+<p><code>empower</code> attaches to a companion perfectly cleanly &mdash; the status applies, the
+chip renders, the tooltip reads. The payout never arrives: <b>a beast&rsquo;s blows resolve through
+<code>_companion_hit</code></b>, which is its own damage path and reads none of the hero strike
+loop&rsquo;s multiplier block. <code>battle.gd</code> already said so from the other side, at the
+<code>last_howl_dmg</code> site: <i>&ldquo;a beast&rsquo;s blows go through
+<code>_companion_hit</code>, which never reads this block, so the companions are correctly
+untouched.&rdquo;</i> <b>Measured over 40 seeded blows with the chip standing: 34392 damage against
+34392, a ratio of exactly 1.0000.</b></p>
+<p><b>SO THE TEXT WAS CORRECTED AND THE COLLECTION WAS NOT</b>, and the ruling is pinned as a
+MEASUREMENT rather than an assertion &mdash; <code>check_dk</code> &sect;4 re-reads that ratio on
+every battery run. A ruling of the form &ldquo;we left this narrow BECAUSE widening would pay
+nothing&rdquo; is a claim about a code path, and a claim about a code path rots. <b>Pinned this way,
+the day somebody gives <code>_companion_hit</code> an <code>empower</code> read, the gate says the
+ruling is stale instead of staying quietly true.</b></p>
+<p><b>A RULE WHOSE WORKED EXAMPLE WAS WRONG NEEDS ITS EXAMPLE REPAIRED AS LOUDLY AS THE RULE.</b>
+The distinction is still worth having; this was simply never the proof of it. <b>The proof is now
+Hold the Line</b> &mdash; it says &ldquo;ally&rdquo;, it reads <code>_hero_side()</code>, and a
+summoned bear measurably banks 20 Break where it used to bank 40.</p>
+
+<h3>&sect;4 &mdash; CV &sect;4 IS CORRECTED, NOT JUST SUPPLEMENTED</h3>
+<p><b>CV moved four texts TO &ldquo;ally&rdquo; on the stated test that <i>&ldquo;their read sites
+genuinely include companions&rdquo;</i>. It was false for all four</b> (DJ &sect;2). After DK,
+<code>wd_rally</code> and <code>wd_hold_line</code> are genuinely <i>ally</i> and
+<code>dv_devoutness</code> and <code>dv_waters</code> are <i>hero</i> &mdash; <b>so all four land
+correctly for the first time, but by a different route than CV recorded.</b></p>
+<p><b>THE TEST ITSELF IS WHAT A FUTURE AUTHOR WOULD APPLY, SO THE TEST IS WHAT WAS CORRECTED</b>
+&mdash; in <code>CLAUDE.md</code>, <code>docs/text-standard.html</code> &sect;4.9 and
+<code>docs/talent-audit.html</code> &sect;4.1. <b>The new test is not &ldquo;does the collection
+reach one&rdquo;. It is &ldquo;does the effect ARRIVE&rdquo;</b>, and the evidence is a live
+measurement on a summoned beast. There are three places a widening dies and only the first is the
+collection: the loop walks bare <code>heroes</code>; a filter downstream removes it (never actually
+the mechanism &mdash; all 23 <code>is_companion</code> filters walk <code>heroes</code> and remove
+nothing); or <b>the read site below simply never runs for that body</b>, which is invisible to every
+source grep.</p>
+<p><b>AND THE GLOSSARY WAS THE ONE ACTIVELY MISLEADING A PLAYER.</b> Its <code>hero_vs_ally</code>
+entry named five effects as examples of what &ldquo;ally&rdquo; pays &mdash; <b>Tank and
+Spank&rsquo;s Empower, Rally&rsquo;s healing bonus, Hold the Line, Devoutness, Cleansing Waters
+&mdash; and four of the five were false when it was written.</b> Rewritten to the live split, with
+the reason attached to each. <code>master.html</code>&rsquo;s Hold the Line flag, which DJ left
+saying &ldquo;companions NOT included&rdquo;, now says they are.</p>
+<p><b>The changelog and the batch reports are history and were deliberately not swept.</b></p>
+
+<h3>&sect;5 &mdash; THE FILTERS THAT REMOVE NOTHING, AND THE QUESTION DK ASKED OF THEM</h3>
+<p><b>All 23 <code>is_companion</code> filters walk <code>heroes</code>, which never holds one, so
+not one of them excludes anything.</b> They record intent and are kept as such. <b>DK asked the
+question that count exists for: does any of them now sit on a collection that DOES hold a
+companion?</b> A filter on one of the four widened sites would have stopped being decoration and
+started removing the beast &mdash; <b>the widening would have done nothing and the batch would have
+shipped a no-op wearing a fix&rsquo;s clothes.</b></p>
+<p><b>NONE of the four carried one, so none of the 23 changed meaning</b>, and the count holding at
+23 across DK is how that is checkable rather than merely stated. The real no-op risk turned out to
+be somewhere else entirely &mdash; a missing READ SITE rather than a surviving filter, which is
+&sect;3.</p>
+
+<h3>&sect;6 &mdash; VERIFICATION</h3>
+<p><b>THE NEGATIVE CONTROL IS THE POINT, BECAUSE THE FAILURE WAS INVISIBLE.</b> Four effects paid
+four units instead of five for the life of the project and no log, no suite and no battery ever said
+so &mdash; so a check that passes on the fixed tree proves nothing on its own. <code>check_dk</code>
+&sect;2 empties <code>companions</code> for the length of one arm, which is precisely the pre-DK
+collection at these sites, and asserts the beast is untouched: <b>Sanctuary heals it 0 and Hold the
+Line leaves it the full 40 Break.</b> Field Medic&rsquo;s pool gets the same treatment.</p>
+<p><code>check_dj</code>&rsquo;s &sect;5 site ratchet is <b>retired into <code>check_dk</code>
+&sect;1</b> rather than updated: DJ pinned the eleven with a message asking the next batch to rule,
+DK ruled, and keeping both would be two copies of one fact in two gates. Its
+<code>is_companion</code> count stays &mdash; that is DJ&rsquo;s own finding and nothing else
+asserts it. <code>check_dj</code> 54 &rarr; 43 checks, predicted.</p>
+
 <h2>2026-08-23 &mdash; Batch DJ: HARVEST READS <code>companions</code></h2>
 <p><i><b>DH&rsquo;s clause pays more for a wound an ALLY opened, and its loop walked
 <code>heroes</code> &mdash; which does not carry the companions.</b> A wound Aguila opened
