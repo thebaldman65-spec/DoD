@@ -144,15 +144,15 @@ const LANE_TREES := {
 		# fires on BOTH paths (apply_payload runs it outside the branch), so
 		# the upgrade path lands on 2 and battle.gd reads the one field.
 		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "lane": "Fury", "row": 3,
-			"desc": "New ability: Battle Shout — the whole party gains +12% damage, plus 1% for every 20 points of blood buildup on the enemy party, for 3 turns (15 Rage, 2cd). If Battle Shout was already earned, this UPGRADES it instead: +18% base and 4 turns.",
+			"desc": "New ability: Battle Shout — every hero gains +12% damage, plus 1% for every 20 points of blood buildup on the warband, for 3 turns (15 Rage, 2cd). If Battle Shout was already earned, this UPGRADES it instead: +18% base and 4 turns.",
 			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
 				"special": "battle_shout", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "",
-				"description": "A roar the whole party answers: +12%\ndamage, plus 1% per 20 blood buildup\non the enemy party, and 5 Rage.\nLasts 3 turns."},
+				"description": "A roar every hero answers: +12%\ndamage, plus 1% per 20 blood buildup\non the warband, and 5 Rage.\nLasts 3 turns."},
 				"upgrade": [
 					{"stat": {"battle_shout_node": 1}},
 					{"ability": "Battle Shout", "set": {
-						"description": "A roar the whole party answers: +18%\ndamage, plus 1% per 20 blood buildup\non the enemy party. Lasts 4 turns."}},
+						"description": "A roar every hero answers: +18%\ndamage, plus 1% per 20 blood buildup\non the warband. Lasts 4 turns."}},
 				],
 				"also": [
 					{"stat": {"battle_shout_node": 1}},
@@ -688,9 +688,16 @@ const LANE_TREES := {
 		# node grants War Stomp — the only question is whether the kit holds
 		# it (the AK correction).
 		# BATCH DK §2 — HERO, BECAUSE A BEAST HAS NO RESOURCE BAR. A companion is
-		# built with no `resource_name` and `max_resource` 0, so a refuel would
-		# restore nothing. The loop's own `resource_name == ""` guard already says
-		# this; the word now agrees with it.
+		# built with no `resource_name`, and `unit.gd` renders its plate without a
+		# resource bar, so a refuel would restore nothing anyone could spend. The
+		# loop's own `resource_name == ""` guard already says this; the word now
+		# agrees with it.
+		# **CORRECTED AT DL §1: `max_resource` IS NOT 0 ON A COMPANION.** This
+		# comment said it was. It is `unit.gd`'s default **100**, never overridden
+		# at the summon — measured on a live Ursus. So `resource_name == ""` is the
+		# ONLY thing standing between these loops and a beast banking 30 points of
+		# a bar that does not exist, and the guard is the ruling rather than a
+		# decoration on it.
 		{"id": "wd_stomp_drill", "name": "Rallying Cry", "ranks": 1, "lane": "Banner", "row": 3,
 			"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.",
 			"scale": {"step": 4},
@@ -785,11 +792,11 @@ const LANE_TREES := {
 				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
 				"cooldown": 6,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn. Refunds 5 Rage."},
+				"description": "Embolden every ally: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn. Refunds 5 Rage."},
 				"upgrade": [
 					{"stat": {"hold_line_upgraded": 1}},
 					{"ability": "Hold the Line", "set": {
-						"description": "Embolden the party: 80% less Break\ndamage for 2 turns, and no one can die\nfor two turns."}},
+						"description": "Embolden every ally: 80% less Break\ndamage for 2 turns, and no one can die\nfor two turns."}},
 				]}},
 	],
 	"pyromancer": [
@@ -1041,7 +1048,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"splinter_ranks": 1}}},
 		# --- Lane DEEP FREEZE — spend it on denial. ---
 		{"id": "cr_frostbite", "name": "Brittle Ice", "ranks": 1, "lane": "Deep Freeze", "row": 1,
-			"desc": "Held enemies are {v}% likelier to be struck by a critical hit, party-wide.",
+			"desc": "Every hero is {v}% likelier to land a critical hit on a Held enemy.",
 			"scale": {"step": 6},
 			"payload": {"stat": {"frostbite_ranks": 6}}},
 		{"id": "cr_bitter", "name": "Bitter Cold", "ranks": 1, "lane": "Deep Freeze", "row": 2,

@@ -120,7 +120,7 @@ func _draw_screen() -> void:
 		# after payment would be theft with a message attached.
 		var why := ""
 		if full:
-			why = "\n\nThe party can carry %d of these, and already does." % cap
+			why = "\n\nThe heroes can carry %d of these, and already do." % cap
 		elif no_slot:
 			why = "\n\nThe pouch is full at %d kinds. Sell or discard\na stack to make room." % \
 				Run.item_slots()
@@ -209,7 +209,7 @@ func _draw_screen() -> void:
 		vbox.add_theme_constant_override("separation", 6)
 		panel.add_child(vbox)
 		var label := Label.new()
-		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from the Party tab" % [rune["name"],
+		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
 			rune["rarity"], member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]
 		label.add_theme_font_size_override("font_size", 14)
 		label.add_theme_color_override("font_color", rune["rarity_color"])

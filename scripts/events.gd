@@ -165,17 +165,17 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 	if req.is_empty():
 		return ""
 	if req.has("min_gold") and int(run.get("gold")) < int(req["min_gold"]):
-		return "Needs %d gold (party has %d)." % [int(req["min_gold"]),
+		return "Needs %d gold (the heroes have %d)." % [int(req["min_gold"]),
 			int(run.get("gold"))]
 	if req.has("max_gold") and int(run.get("gold")) > int(req["max_gold"]):
-		return "Needs %d gold or less (party has %d)." % [int(req["max_gold"]),
+		return "Needs %d gold or less (the heroes have %d)." % [int(req["max_gold"]),
 			int(run.get("gold"))]
 	if req.has("zone_slot") and not _slot_listed(req["zone_slot"],
 			int(run.get("zone_idx")) + 1):
 		var slots := PackedStringArray()
 		for slot in req["zone_slot"]:
 			slots.append(str(int(slot)))
-		return "Only in zone %s (party is in zone %d)." % [
+		return "Only in zone %s (the heroes are in zone %d)." % [
 			"/".join(slots), int(run.get("zone_idx")) + 1]
 	if req.has("has_item"):
 		var items: Dictionary = run.get("items")
@@ -191,7 +191,7 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 			if req["spec_in_party"].has(String(member.get("spec", ""))):
 				found = true
 		if not found:
-			return "Needs one of: %s, in the party." % ", ".join(names)
+			return "Needs one of: %s, among the heroes." % ", ".join(names)
 	if req.has("fallen_hero"):
 		var any_fallen := false
 		for member in run.get("party"):
@@ -199,7 +199,7 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 				any_fallen = true
 		if bool(req["fallen_hero"]) != any_fallen:
 			return "Needs a fallen hero." if bool(req["fallen_hero"]) \
-				else "Needs the whole party standing."
+				else "Needs every hero standing."
 	return ""
 
 
@@ -280,7 +280,7 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				return "%s — no room in the pouch; choose on the map" % run.ITEM_INFO[id][0]
 			var landed: int = run.add_item(id, count)
 			if landed < 1:
-				return "%s — the party can carry no more" % run.ITEM_INFO[id][0]
+				return "%s — the heroes can carry no more" % run.ITEM_INFO[id][0]
 			return "%+d %s" % [landed, run.ITEM_INFO[id][0]]
 		"random_item":
 			var got := PackedStringArray()

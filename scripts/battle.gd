@@ -158,8 +158,8 @@ const STATUS_INFO := {
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
 	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
 	"mana_shield": ["Mana Shield", "MS", Color(0.35, 0.6, 1.0), "50% of damage taken converts\ninto Mana."],
-	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy party (at cast time)."],
-	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the party."],
+	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy warband (at cast time)."],
+	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the heroes."],
 	"bewitch": ["Bewitched", "Bw", Color(0.75, 0.35, 0.85), "Charmed: basic-attacks its own\nallies, Dazing them with every\nstrike."],
 	"psychosis": ["Psychosis", "Py", Color(0.82, 0.42, 0.92), "Madness: 50% each turn to turn on\nits own — attacking a fellow, or\ncasting its helpful magic on the\nenemy side."],
 	"decay": ["Decay", "Dc", Color(0.62, 0.52, 0.35), "Rotting: takes 10 Break damage at\nthe start of each turn."],
@@ -193,7 +193,7 @@ const STATUS_INFO := {
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
-	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
+	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole warband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
 	# THE WHOLE REASON IT WAS TOUCHED. It read "+8% damage, plus 1% per 20 blood
 	# buildup on the enemy party (at cast time)": correct for `battle_shout_node`
@@ -206,7 +206,7 @@ const STATUS_INFO := {
 	# later batch retuning the tiers would not think to come here. A fallback
 	# with no numbers in it cannot drift. `master.html`'s §4.6 row is correct and
 	# lists all three tiers; it was deliberately left alone.
-	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "More damage dealt, to every hero and\nno companion. The more Bleed the enemy\nparty carried when the shout went up,\nthe larger the bonus."],
+	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "More damage dealt, to every hero and\nno companion. The more Bleed the enemy\nwarband carried when the shout went up,\nthe larger the bonus."],
 	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
 	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
 	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
@@ -322,7 +322,7 @@ const STATUS_INFO := {
 	"spirit_heal": ["Spirit Bond", "SB", Color(0.45, 0.90, 0.70), "The bond mends: heals 10% of max\nhealth at the next turn start."],
 	"spirit_mana": ["Spirit Flow", "SM", Color(0.40, 0.65, 0.95), "The bond restores 5% max Mana at\neach turn start."],
 	"vigor": ["Vigor", "Vg", Color(0.60, 0.90, 0.45), "Spirit Bond perfected: +10% max\nhealth while it lasts."],
-	"keen_eyes": ["Eagle Eyes", "EE", Color(0.65, 0.85, 0.95), "Aguila watches over the party:\nincreased crit chance."],
+	"keen_eyes": ["Eagle Eyes", "EE", Color(0.65, 0.85, 0.95), "Aguila watches over the heroes:\nincreased crit chance."],
 	"primal_surge": ["Primal Surge", "PS", Color(0.95, 0.60, 0.25), "The spent Loyalty burns on:\n+10% damage dealt."],
 	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their companion deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
 	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen companion's boon lives on in\nthe hunter at FULL strength for the\nrest of the battle, and he strikes\nharder for the loss."],
@@ -370,7 +370,7 @@ const STATUS_INFO := {
 	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns."],
 	"feigned_guard": ["Feigned Guard", "FG", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
 	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
-	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals the whole party\nfor a share of his maximum health. A\nblow that gets THROUGH pays nothing."],
+	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals every hero for\na share of his maximum health. A blow\nthat gets THROUGH pays nothing."],
 	# ---- BATCH CI: the tranche-3 Warrior's statuses ----
 	# TEN CHIPS FOR NINE ABILITIES AND EVERY ONE OF THEM SITS ON A HERO, so all
 	# ten are correctly ABSENT from `DEBUFF_IDS` — this is the first Warrior
@@ -426,7 +426,7 @@ const STATUS_INFO := {
 	# carries a clock because it is time it buys.
 	"arrows": ["Arcane Arrows", "AA", Color(0.72, 0.62, 0.95), "Quenched in raw magic: each attack\nalso strikes an additional random\nenemy for half damage. ONE CHARGE PER\nHIT — a three-shot volley spends\nthree. They wait until spent."],
 	"camouflage": ["Camouflage", "Cm", Color(0.55, 0.72, 0.50), "Gone to ground: enemies are far less\nlikely to aim here. It stacks with\nGhillie Suit rather than replacing it."],
-	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: the WHOLE PARTY deals 15%\nmore damage to this enemy — every\nhero and every companion, not just the one\nwho marked it."],
+	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: EVERY ALLY deals 15% more\ndamage to this enemy — heroes and\ncompanions alike, not just the one who\nmarked it."],
 	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
 	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
 	# BATCH CK §2: the label and the tag follow the id now. This chip read "Iron
@@ -1974,7 +1974,7 @@ func _debug_full_restore() -> void:
 			u.second_resource = int(BattleUnit.FOCUS_BAR_REF) \
 				if u.second_max < 0 else u.second_max
 		u.refresh_bars()
-	_log("DEBUG: party fully restored", "#e0a050")
+	_log("DEBUG: allies fully restored", "#e0a050")
 
 
 # Batch AO §3: reach the victory screen on demand. It is a SWITCH, not a hit
@@ -3130,7 +3130,7 @@ func _update_talent_chips() -> void:
 			continue
 		if ee_bonus > 0.0:
 			var ee_pct := int(round(ee_bonus * 100))
-			var ee_desc := "Eagle Eyes: Aguila's bond watches over\nthe party — +%d%% crit chance." % ee_pct
+			var ee_desc := "Eagle Eyes: Aguila's bond watches over\nthe heroes — +%d%% crit chance." % ee_pct
 			if not h.update_status("keen_eyes", "+%d%%" % ee_pct, ee_desc, ee_pct):
 				var ee_info: Array = STATUS_INFO["keen_eyes"]
 				h.add_status("keen_eyes", ee_info[0], "+%d%%" % ee_pct,
@@ -3320,7 +3320,7 @@ func _row8_turn_start(u: BattleUnit) -> void:
 				* u.cold_storage * held)), 1)
 			ally.resource = mini(ally.resource + back, ally.max_resource)
 			ally.refresh_bars()
-		_log("   → Talent: Cold Storage — the prison feeds the party (%d held)" % \
+		_log("   → Talent: Cold Storage — the prison feeds the heroes (%d held)" % \
 			held, "#b0a8e0")
 	# KINDRED (Beastmaster, devotion row 8): Loyalty buys a KIND rather than a
 	# quantity — past a depth the arrival effect stops being something the
@@ -3817,7 +3817,7 @@ func _player_turn(u: BattleUnit) -> void:
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
 				pp_h.float_text("+%d" % pp_got, Color(0.7, 0.4, 0.9))
 				_stat_heal(u, pp_got, pp_h)
-			_log("   → Talent: Pleasure from Pain — %d unique debuff%s feed the party (%d each)" % [
+			_log("   → Talent: Pleasure from Pain — %d unique debuff%s feed the heroes (%d each)" % [
 				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
 	# as the Cleric's turn ends.
@@ -4962,8 +4962,8 @@ func _use_item(item_id: String) -> void:
 			await _wait(0.6)
 		"defense":
 			_sfx("potion", -6.0, 0.9)
-			_message("The party braces!")
-			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
+			_message("The heroes brace!")
+			_log("Item: Defense Potion — heroes gain Fortify", "#e0c060")
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "fortify", 3)
 			await _wait(0.6)
@@ -6375,7 +6375,7 @@ func _build_items_menu() -> Button:
 	btn.add_theme_font_size_override("font_size", 13)
 	btn.disabled = item_used
 	btn.tooltip_text = "Already used an item this turn." if item_used \
-		else "Shared party inventory.\nAlt opens · Tab cycles · Space uses · X closes."
+		else "Shared hero inventory.\nAlt opens · Tab cycles · Space uses · X closes."
 	btn.pressed.connect(_open_item_picker)
 	return btn
 
@@ -8034,7 +8034,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							aw_h.float_text("+%d" % aw_heal, Color(0.7, 0.85, 0.95))
 							aw_n += 1
 						_log("   → Aegis Wall: the block mends %d %s for %d each (%d%% of his %d maximum)" % [
-							aw_n, "ally" if aw_n == 1 else "allies", aw_heal,
+							aw_n, "hero" if aw_n == 1 else "heroes", aw_heal,
 							int(round(AEGIS_WALL_PCT * 100.0)),
 							strike_target.max_hp], "#8c9cc8")
 					# BATCH CI — TURN THE BLADE. **IT PAYS ON A BLOCK, NOT ON A HIT
@@ -8109,7 +8109,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							for h in _hero_side():
 								h.add_status("rally_heal", rinfo[0], rinfo[1],
 									rinfo[2], 3, rinfo[3])
-							_log("   → Talent: Rally — the party is Rallied (+30% healing, 3 turns)",
+							_log("   → Talent: Rally — every ally is Rallied (+30% healing, 3 turns)",
 								"#b0a8e0")
 					await _wait(0.4)
 					# Vengeful Guardian (capstone): the FIRST block each turn
@@ -9242,7 +9242,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var pv_was := raw
 					raw *= 1.0 - 0.01 * hv_c.holy_vigil_pct
 					_prev(hv_c, pv_was - raw)
-					_log("   → Talent: Hour of Need — the party closes ranks around %s (-%d%%)" % [
+					_log("   → Talent: Hour of Need — the heroes close ranks around %s (-%d%%)" % [
 						strike_target.unit_name, hv_c.holy_vigil_pct], "#b0a8e0")
 			# BATCH BM §2 — COMMUNION OF MERCY (Holy, Mercy row 8). Mercy
 			# HELD has only ever paid HER (Heavenly Aura's healing-done
@@ -9653,7 +9653,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							var sg_got: int = sg_h.heal_amount(rl_heal, sg_h != occ_leech)
 							sg_h.float_text("+%d" % sg_got, Color(0.7, 0.4, 0.9))
 							_stat_heal(occ_leech, sg_got, sg_h)
-						_log("   → Talent: Soul Glut — the whole party drinks (+%d each)" % \
+						_log("   → Talent: Soul Glut — every hero drinks (+%d each)" % \
 							rl_heal, "#b0a8e0")
 			# Madness plumbing (Batch L): an enemy striking its FELLOW feeds
 			# the engine — the victim's wound festers into Ruin (Delirium)
@@ -9673,7 +9673,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							var ck_got: int = ck_h.heal_amount(ck_amt, ck_h != mad_occ)
 							ck_h.float_text("+%d" % ck_got, Color(0.7, 0.4, 0.9))
 							_stat_heal(mad_occ, ck_got, ck_h)
-						_log("   → Talent: Cackling Mirror — the party drinks %d from the wound" % \
+						_log("   → Talent: Cackling Mirror — the heroes drink %d from the wound" % \
 							ck_amt, "#b0a8e0")
 			# Unity: the bound party splits incoming damage evenly (Pressure
 			# still lands on the struck hero alone).
@@ -9912,7 +9912,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						var well_got: int = wh.heal_amount(well, wh != cg_dv)
 						wh.float_text("+%d" % well_got, Color(0.4, 0.9, 0.45))
 						_devout_heal(cg_dv, well_got, "lifewell", wh)
-					_log("   → Talent: Lifewell — the reflected pain mends the party for %d" % \
+					_log("   → Talent: Lifewell — the reflected pain mends the heroes for %d" % \
 						well, "#b0a8e0")
 				# Judgement: the ground passes sentence on the attacker.
 				if cg_dv != null and cg_dv.judgement > 0 and not attacker.dead:
@@ -14051,7 +14051,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 		var rw_got: int = h.heal_amount(rw_heal, h != occ)
 		h.float_text("+%d" % rw_got, Color(0.7, 0.4, 0.9))
 		_stat_heal(occ, rw_got, h)
-	_log("   → the party feasts on the ruin (25% of the Occultist's health each)",
+	_log("   → the heroes feast on the ruin (25% of the Occultist's health each)",
 		"#b070d0")
 	# Unraveling: the blast seeds Ruin in every OTHER enemy. One propagation
 	# per detonation BY CONSTRUCTION: a seeded enemy only gets PRIMED here —
@@ -14811,16 +14811,46 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var pressure_cut := 30
 			var res_pct := 0.30
 			_sfx("heal", -9.0, 0.7)
-			_message("%s rallies the party!" % attacker.unit_name)
-			for h in heroes.filter(func(he): return not he.dead):
+			_message("%s rallies every ally!" % attacker.unit_name)
+			# BATCH DL §1 — THE PRESSURE CLAUSE READS `_hero_side()`, SO THE BEAST
+			# SHEDS TOO. **THIS CARD CARRIES TWO CLAUSES OF DIFFERENT SHAPE UNDER
+			# ONE WORD AND THAT IS WHY IT SURVIVED TWO SWEEPS** — DJ §2 read the
+			# ability and DK §2 ruled on the ability, and both were looking at the
+			# ally-worded RESOURCE half. The Pressure half said "the whole party",
+			# which is neither of the two words, so nothing was sweeping for it.
+			#
+			# A companion HAS a Break meter — `pressure`, against its own
+			# `stability` — so this is a payload it can plainly receive, and DK's
+			# own Hold the Line is the precedent: Break relief already widened to
+			# companions on that same meter. MEASURED on a live summoned bear:
+			# 0 Pressure shed before, 30 after, against a hero's 30 either way.
+			#
+			# `dead` IS EXCLUDED and `_hero_side()` is the authored name for that
+			# decision. The reason is Hold the Line's exactly: a corpse has no
+			# meter running, and the loop already filtered `not he.dead`.
+			for h in _hero_side():
 				h.pressure = maxi(h.pressure - pressure_cut, 0)
 				h.float_text("-%d Pressure" % pressure_cut, Color(0.8, 0.5, 1.0))
-				if h != attacker:
-					var gain := int(h.max_resource * res_pct)
-					h.resource = mini(h.resource + gain, h.max_resource)
-					h.float_text("+%d %s" % [gain, h.resource_name], Color(0.5, 0.8, 1.0))
 				h.refresh_bars()
-			_log("%s: Rallying Shout — party -%d Pressure, allies +%d%% resource" % [
+			# AND THE RESOURCE CLAUSE DOES NOT MOVE — it walks the four, for
+			# Rallying Cry's and War Stomp's reason: a companion carries no
+			# resource bar to fill (`resource_name` is "", and `unit.gd` renders
+			# its plate without one). **THE GUARD IS NEW AND IS NOT DECORATION**:
+			# those two refuel loops both carry it and DK cited its presence as
+			# the evidence for their ruling; this was the one of the three that
+			# lacked it. `max_resource` is NOT 0 on a companion — it is
+			# `unit.gd`'s default 100, never overridden at the summon — so a
+			# widening of THIS loop would have paid a beast 30 points of a bar
+			# that does not exist. The guard is what makes the recorded reason
+			# true at the site rather than only in a comment.
+			for h in heroes:
+				if h.dead or h == attacker or h.resource_name == "":
+					continue
+				var gain := int(h.max_resource * res_pct)
+				h.resource = mini(h.resource + gain, h.max_resource)
+				h.float_text("+%d %s" % [gain, h.resource_name], Color(0.5, 0.8, 1.0))
+				h.refresh_bars()
+			_log("%s: Rallying Shout — allies -%d Pressure, heroes +%d%% resource" % [
 				attacker.unit_name, pressure_cut, int(res_pct * 100)], "#70d878")
 		"barrier":
 			var power := 50 if is_perfect else int(35 * mult)
@@ -14961,7 +14991,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				if h_crit > 1.0:
 					_radiant_cascade(attacker, got, h)
 			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
-			_log("%s: Hymn of Hope — party heals %d%%%s" % [attacker.unit_name,
+			_log("%s: Hymn of Hope — heroes heal %d%%%s" % [attacker.unit_name,
 				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
 		"sanctuary":
 			# VAULTED ability's machinery (kept): Mercy-scaled like all heals.
@@ -14984,7 +15014,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
 				_stat_heal(attacker, amt, h)
 			_message("Sanctuary!")
-			_log("%s: Sanctuary — party healed" % attacker.unit_name, "#70d878")
+			_log("%s: Sanctuary — every ally healed" % attacker.unit_name, "#70d878")
 		"unity":
 			# Sacred Resolve (talent ability). Healing Pulse and Cleansing
 			# Waters are no longer snapshotted here — they read the living
@@ -14997,15 +15027,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var res_turns := 4 + attacker.resolve_extra_turns
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "unity", res_turns)
-			_message("%s binds the party as one!" % attacker.unit_name)
-			_log("%s: Sacred Resolve — the party's souls are bound (%d turns)" % [
+			_message("%s binds the heroes as one!" % attacker.unit_name)
+			_log("%s: Sacred Resolve — the heroes' souls are bound (%d turns)" % [
 				attacker.unit_name, res_turns], "#70d878")
 		"cons_ground":
 			_sfx("heal", -5.0, 0.6)
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				_apply_status(h, "cons_ground", 3, 0, 0, attacker)
 			_message("%s consecrates the ground!" % attacker.unit_name)
-			_log("%s: Consecrated Ground — the party takes 15%% less damage and reflects 10%% (%d turns)" % [
+			_log("%s: Consecrated Ground — every hero takes 15%% less damage and reflects 10%% (%d turns)" % [
 				attacker.unit_name, 3], "#c8b880")
 		"zeal":
 			_sfx("heal", -6.0, 1.2)
@@ -15091,7 +15121,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
 				_stat_heal(attacker, dp_hgot, h)
 			if attacker.barter_step > 0:
-				_log("   → Talent: Dark Barter — the party drinks %d%% (up from 15%%)" % \
+				_log("   → Talent: Dark Barter — the heroes drink %d%% (up from 15%%)" % \
 					int(round(pact_heal_pct * 100)), "#b0a8e0")
 			# The Occultist knits back together over 3 turns (10%/turn).
 			var pact_tick := maxi(int(round(attacker.max_hp * 0.10)), 1)
@@ -15108,7 +15138,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+5 Mana", Color(0.5, 0.7, 1.0))
 				attacker.refresh_bars()
 			_message("%s seals the Dark Pact!" % attacker.unit_name)
-			_log("%s: Dark Pact — bleeds %d; the party heals %d%% of max health" % [
+			_log("%s: Dark Pact — bleeds %d; the heroes heal %d%% of max health" % [
 				attacker.unit_name, pact_cost, int(round(pact_heal_pct * 100))], "#b070d0")
 		"hysteria":
 			_sfx("break", -6.0, 1.2)
@@ -15126,7 +15156,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("crit", -8.0, 0.7)
 			_apply_status(attacker, "rampage", 2, pct)
 			_message("%s scents the blood!" % attacker.unit_name)
-			_log("%s: Rampage — +%d%% damage from the enemy party's wounds" % [
+			_log("%s: Rampage — +%d%% damage from the warband's wounds" % [
 				attacker.unit_name, pct], "#70d878")
 		"mana_shield":
 			_sfx("parry", -8.0, 1.2)
@@ -16153,7 +16183,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var aw_turns := 4
 			_apply_status(attacker, "aegis_wall", aw_turns)
 			attacker.update_status("aegis_wall", "AW",
-				"Aegis Wall: every attack he BLOCKS heals\nthe whole party for %d%% of his maximum\nhealth (%d right now). A blow that gets\nTHROUGH pays nothing — only a block." % [
+				"Aegis Wall: every attack he BLOCKS heals\nevery hero for %d%% of his maximum\nhealth (%d right now). A blow that gets\nTHROUGH pays nothing — only a block." % [
 					int(round(AEGIS_WALL_PCT * 100.0)),
 					maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1)])
 			_sfx("parry", -7.0, 0.6)
@@ -16577,9 +16607,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				ex_h.float_text("+%d%% next hit" % ex_val, Color(0.98, 0.88, 0.55))
 				ex_n += 1
 			_sfx("heal", -8.0, 1.3)
-			_message("%s calls the party on!" % attacker.unit_name)
+			_message("%s calls every hero on!" % attacker.unit_name)
 			_log("%s: Exhortation — %d %s called on: each one's NEXT attack deals %d%% more damage (banked, not timed)" % [
-				attacker.unit_name, ex_n, "ally is" if ex_n == 1 else "allies are",
+				attacker.unit_name, ex_n, "hero is" if ex_n == 1 else "heroes are",
 				ex_pct], "#70d878")
 		"undying_vigil":
 			# AXIS: making one heal into two, and THE ONE CLASS ABILITY THAT
@@ -16672,7 +16702,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("crit", -8.0, 1.15)
 				target.float_text("MARKED", Color(0.85, 0.60, 0.30))
 				_message("%s calls %s out!" % [attacker.unit_name, target.unit_name])
-				_log("%s: Hunter's Mark — the whole party deals %d%% more damage to %s (%d turns)" % [
+				_log("%s: Hunter's Mark — every ally deals %d%% more damage to %s (%d turns)" % [
 					attacker.unit_name, PARTY_MARK_PCT, target.unit_name,
 					hm_turns], "#e0a050")
 		"arcane_arrows":
@@ -17268,7 +17298,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.float_text("RESONANT FIELD", Color(0.80, 0.55, 1.0))
 			var rf_share := int(round(attacker.resonance_dmg_bonus()
 				* RESONANT_FIELD_SHARE * 100.0))
-			_message("%s tunes the party to the storm" % attacker.unit_name)
+			_message("%s tunes the heroes to the storm" % attacker.unit_name)
 			# LOG HONESTY, FOUND BY WATCHING A SMOKE — Inner Arcane's lesson one
 			# tranche later, and it needed saying twice because the failure is the
 			# same shape from the other end. `DOD_SIM_ABILITIES` hands every card to
@@ -17596,7 +17626,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("crit", -7.0, 0.5)
 				_message("%s sings the ruin out of %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Requiem — %d stacks of Ruin consumed for %d shadow, and %d ally(s) mended %d in all (2%% of his maximum a stack)%s" % [
+				_log("%s: Requiem — %d stacks of Ruin consumed for %d shadow, and %d hero(es) mended %d in all (2%% of his maximum a stack)%s" % [
 					attacker.unit_name, rq_stacks, rq_final, rq_paid, rq_total,
 					" [PERFECT]" if is_perfect else ""], "#a050b0")
 				if rq_hit.died:
@@ -18121,7 +18151,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var shout_pct := shout_base + int(shout_bleed / 20.0)
 			_sfx("crit", -8.0, 0.7)
 			# The chip shows the damage gained at the moment of the shout.
-			var shout_desc := "Battle Shout: +%d%% damage for %d turns\n(+%d%% base, plus 1%% per 20 of the %d\nblood buildup on the enemy party at\nthe time of the shout)." % [
+			var shout_desc := "Battle Shout: +%d%% damage for %d turns\n(+%d%% base, plus 1%% per 20 of the %d\nblood buildup on the warband at\nthe time of the shout)." % [
 				shout_pct, shout_turns, shout_base, shout_bleed]
 			var shout_n := 0
 			for h in heroes:
@@ -18337,7 +18367,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 			attacker.refresh_bars()
 			_message("%s HOLDS THE LINE!" % attacker.unit_name)
-			_log("%s: Hold the Line — party takes %d%% less BD and cannot die%s" % [
+			_log("%s: Hold the Line — every ally takes %d%% less BD and cannot die%s" % [
 				attacker.unit_name, hl_cut,
 				" for two turns [UPGRADED]" if hl_up else ""], "#70d878")
 		"resurrection":
@@ -18369,13 +18399,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "wrath", 4)
 			_message("%s calls down Divine Wrath!" % attacker.unit_name)
-			_log("%s: Divine Wrath — party deals +15%% damage, +15%% speed" % \
+			_log("%s: Divine Wrath — the heroes deal +15%% damage, +15%% speed" % \
 				attacker.unit_name, "#70d878")
 		"umbral_sigil":
 			_sfx("break", -10.0, 0.7)
 			_apply_status(target, "umbral_sigil", 4, 0, 0, attacker)
 			_message("%s brands %s!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Umbral Sigil on %s — its party shares its pain" % [
+			_log("%s: Umbral Sigil on %s — its warband shares its pain" % [
 				attacker.unit_name, target.unit_name], "#c070e0")
 		"enemy_shield":
 			# The Shieldmaster's ward: one ally holds it at a time.
@@ -18451,7 +18481,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# (the turn loop owns both the landing and the cancel).
 			_sfx("break", -10.0, 0.5)
 			attacker.add_status("charging", "Charging", "!!", Color(1.0, 0.62, 0.3), -1,
-				"%s lands at this unit's next turn:\nheavy damage to the whole party.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % ab.display_name)
+				"%s lands at this unit's next turn:\nheavy damage to every ally.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % ab.display_name)
 			# BATCH BL §1 — THE WIND-UP IS A DECLARATION, stored in the same one
 			# place every other declaration is stored. The status used to carry
 			# an "ability" name of its own; it does not any more, because two
@@ -19201,7 +19231,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"Every hit this ally lands applies\n1 Ruin. It counts HITS, not casts.")
 				an_n += 1
 			_sfx("break", -9.0, 1.2)
-			_message("%s anoints the party's blades" % attacker.unit_name)
+			_message("%s anoints the heroes' blades" % attacker.unit_name)
 			_log("%s: Anointing — %d allies' attacks apply 1 Ruin per HIT for %d turns" % [
 				attacker.unit_name, an_n, an_turns], "#a050b0")
 		# ========== BATCH BV: THE HUNTER FOUR THAT ARE PURE EFFECT ==========
@@ -21928,7 +21958,7 @@ func _check_end() -> void:
 				[["Fight Again", func(): get_tree().reload_current_scene()]], true)
 		else:
 			_sfx("defeat", -4.0)
-			_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.",
+			_show_end("THE HEROES HAVE FALLEN", "The cycle begins anew.",
 				[["Fight Again", func(): get_tree().reload_current_scene()]])
 		return
 
@@ -22060,7 +22090,7 @@ func _check_end() -> void:
 		if node_type in ["boss", "endboss"]:
 			_resolve_boss(gold_gain, node_type == "endboss")
 		else:
-			var win_text := "+%d gold. The party recovers %d%%." % [
+			var win_text := "+%d gold. The heroes recover %d%%." % [
 				gold_gain, int(round(Run.victory_heal_pct() * 100))]
 			# BATCH BK §3/§5: NOTHING is rolled behind a cleared fight any more.
 			# The merchant and the event are MAP NODES the player routed to, or
@@ -22170,7 +22200,7 @@ func _drop_item_line(id: String) -> String:
 		return "\n+1 %s" % Run.ITEM_INFO[id][0]
 	# The type's OWN stack cap, not a hardcoded six — three of the eight items
 	# carry smaller ones since §4.
-	return "\n%s — the party already carries %d, and cannot hold more." % [
+	return "\n%s — the heroes already carry %d, and cannot hold more." % [
 		Run.ITEM_INFO[id][0], Run.item_stack_cap(id)]
 
 
@@ -22455,7 +22485,7 @@ static func cy_report_line(stats: Dictionary) -> String:
 		kinds.append("%s %.1f (n=%d)" % [kind,
 			stats.get("cy_rounds_" + kind, 0.0) / n, int(n)])
 	if any_kind:
-		lines.append("BATCH CY §0 — rounds to resolution (turns per party member): "
+		lines.append("BATCH CY §0 — rounds to resolution (turns per living hero): "
 			+ " | ".join(kinds))
 	for m in CY_METERS:
 		var mn: float = stats.get("cy_meter_n_" + String(m[0]), 0.0)
@@ -22803,8 +22833,8 @@ func _contrib_table(s: Dictionary) -> String:
 	if bun > 0.0:
 		lines.append("  Break prevented, unattributed: %.0f/battle" % \
 			(bun / maxf(s.get("battles", 0.0), 1.0)))
-	lines.append("  d+h+p% = (damage + healing + damage prevented) / the party's total of the SAME THREE.")
-	lines.append("           It is NOT a share of the party's work: Break points, dealt or refused,")
+	lines.append("  d+h+p% = (damage + healing + damage prevented) / the heroes' total of the SAME THREE.")
+	lines.append("           It is NOT a share of the heroes' work: Break points, dealt or refused,")
 	lines.append("           are outside it by design and are the BD% and BDprev/b columns instead.")
 	return "\n".join(lines)
 
@@ -22968,7 +22998,7 @@ func _summary_lines(snap: Dictionary) -> Array:
 			lines.append(["p", "Reason given: %s." % \
 				String(snap.get("forfeit_reason", "not stated"))])
 		else:
-			lines.append(["h", "THE PARTY HAS FALLEN"])
+			lines.append(["h", "THE HEROES HAVE FALLEN"])
 			lines.append(["p", "Wiped — Zone %d (%s), %s (%s difficulty)." % [
 				snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
 	# The honesty flag (Batch AC), directly under the title so it cannot be
@@ -22994,7 +23024,7 @@ func _summary_lines(snap: Dictionary) -> Array:
 		lines.append(["s", "The final victory"])
 		lines.append(["p", String(snap["closing_text"]).replace("\n\n", "\n")])
 	# --- the party as it stood ---
-	lines.append(["s", "The party as it stood"])
+	lines.append(["s", "The heroes as they stood"])
 	for member in snap["party"]:
 		lines.append(["p", _member_summary(member)])
 	# --- damage share ---

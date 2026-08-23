@@ -5137,3 +5137,62 @@ also sheds 30 Pressure from *"the whole party"*, which a beast can plainly recei
 ally-worded clause moved, because "party" is not one of the two words the sweep was about, and a
 batch that quietly rules on a third word is a batch nobody can audit. **It is recorded as owed,
 which is the honest place for it.**
+
+---
+
+## BATCH DL — THE CLAUSE IS THE UNIT, AND A WORD THAT MEANS EITHER IS A WORD NO SWEEP CAN CHECK
+
+DK's last note ends with "it is recorded as owed, which is the honest place for it." This batch is
+that debt paid, and paying it turned out to say something larger than the card.
+
+**The interesting thing is not that Rallying Shout was wrong. It is that it was wrong in a place two
+consecutive sweeps were standing in.** DJ §2 swept every broad ally-worded text in the project and
+found eleven. DK §2 ruled on all eleven. Rallying Shout was *in both passes* — it was named, read,
+and ruled — and the clause that was actually broken was never looked at. Not overlooked: **not
+visible**. Both sweeps were sweeping for the word *ally*, and the broken clause said "the whole
+party", which is neither of the two words. It was the half of the card nothing in the project was
+searching for.
+
+**So the failure was not a missed site. It was a unit-of-analysis error.** A sweep that iterates
+abilities finds the ability, reads it, sees an ally-worded clause, rules on that clause, and moves
+on satisfied — and the card is now half-ruled, in a way that looks exactly like a card that has been
+ruled. The gate that pinned it made this worse rather than better: `check_dk`'s entry for Rallying
+Shout pinned the PRESSURE loop as evidence the card was correctly narrow, while the ruling it was
+recording was about the RESOURCE loop. **A pin on the wrong clause of a two-clause card is a pin
+that certifies the thing you did not check.**
+
+**The rule that falls out is one line: read a card clause by clause.** It is in `CLAUDE.md` now, and
+the survey that came with it found six more cards with two clauses of different shape under one
+word — Bulwark of Fortitude carries three shapes in a single sentence. None were ruled on. Naming
+them is the work; ruling on six cards in a batch scoped to one is how a sweep becomes a rewrite.
+
+**The second half of the batch is a vocabulary retirement, and it is instrumental rather than
+tidy.** "Party" reads as either *hero* or *ally*. That is not a style complaint: it is precisely why
+this clause survived. A word that means either cannot be swept for, cannot be checked, and cannot be
+wrong in a way anybody notices — a text saying "the whole party" is *unfalsifiable* against its read
+site, because whichever collection the code walks, the word was arguably right. **Retiring it is
+what converts a judgment call into a check.** Every use is now *hero* or *ally* (or *warband*, where
+the group is the enemy side), and `test_batch_bx` §4b keeps it retired in the same place and by the
+same construction §4 already keeps "beast" retired.
+
+**The check was shown to bite before it was trusted, on three surfaces**, because an instrument
+added without a control is an instrument nobody has tested — and the previous retired word's check
+had already earned that discipline by catching seven live uses in DK before its battery.
+
+**And a smaller thing worth keeping, because it is the second time this shape has appeared in three
+batches.** DK recorded the reason for the resource clause as *"a companion is built with no
+`resource_name` and `max_resource` 0"*. The first half is true. **The second is not** —
+`max_resource` is `unit.gd`'s default 100 on a companion, never overridden at the summon. Nothing
+depended on it being 0, so nothing failed, and the sentence sat there reading as an explanation. It
+would have become load-bearing the first time somebody widened that loop "because a beast's bar is
+zero anyway". **A reason recorded beside a decision is a good practice that creates a new place to
+be wrong**, and the fix is the same one the project already applies to numbers: derive it, do not
+recall it. Rallying Shout's resource loop now carries the `resource_name` guard the other two
+refuels already had, so the reason is true *at the site* rather than only in a comment.
+
+**One admitted asymmetry.** §2 corrected four false *ally* words it did not strictly own — three
+battle-log lines and Consecrated Ground's Faith clause — because each sat in the same card or one
+screen away from a text §2 was moving, and leaving them would have made those cards newly
+misleading rather than merely imprecise. Texts with a false *ally* and no "party" anywhere near them
+were reported instead. **That line is arbitrary in the small and defensible in the large**: the
+batch's remit was one word, and every departure from it is named.

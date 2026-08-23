@@ -932,7 +932,7 @@
     "delay": 4.0,
     "anim": "attack02",
     "aoe": true,
-    "description": "Hoists a burning stone. It lands next\nturn: heavy damage to the whole party.\nBreak, Freeze, or Stun the Hurler\nto cancel the throw."
+    "description": "Hoists a burning stone. It lands next\nturn: heavy damage to every ally.\nBreak, Freeze, or Stun the Hurler\nto cancel the throw."
    }
   ]
  },

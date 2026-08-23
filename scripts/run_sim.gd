@@ -1169,7 +1169,7 @@ static func _print_report(battle) -> void:
 			z, bands["t1-3"], bands["t4-7"], bands["t8-10"], bands["boss"]])
 
 	print("\nPer-tier averages (all runs reaching that tier):")
-	print("  zone tier   fights   win%   deaths/fight   party HP% entering")
+	print("  zone tier   fights   win%   deaths/fight   hero HP% entering")
 	for z in range(1, 4):
 		for ft in range(1, 12):
 			var key := "%d,%d" % [z, ft]
@@ -1185,8 +1185,8 @@ static func _print_report(battle) -> void:
 	# THE DELIVERABLE: both power curves measured with progression live.
 	# Ratio = sqrt(Atk x effHP / Atk x effHP) — flat-ish means progression
 	# keeps pace with the enemy ladder; collapsing means the gap is real.
-	print("\nParty power vs warband power, measured (not modelled):")
-	print("  zone tier   party Atk   party effHP   warband Atk   warband effHP   ratio")
+	print("\nHero power vs warband power, measured (not modelled):")
+	print("  zone tier   hero Atk    hero effHP    warband Atk   warband effHP   ratio")
 	for z in range(1, 4):
 		for ft in range(1, 12):
 			var key := "%d,%d" % [z, ft]
@@ -1447,5 +1447,5 @@ static func _print_report(battle) -> void:
 		r8_desc, 100.0 * completed / runs, med_desc,
 		100.0 * choice_steps / steps])
 
-	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; potions are never drunk ON THE MAP (Batch AN made them usable there and the bot does not); the bargain policy is severity-extreme only, never a read of the modifier against the party; shop rune picks ignore build synergy (priciest first).")
+	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; potions are never drunk ON THE MAP (Batch AN made them usable there and the bot does not); the bargain policy is severity-extreme only, never a read of the modifier against the heroes; shop rune picks ignore build synergy (priciest first).")
 	print("=============================================\n")

@@ -157,7 +157,7 @@ func _maybe_show_framing() -> bool:
 		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
 		"condition that binds both sides of the battle, and what clearing it\n" +
 		"under that condition pays — one of the three is always survivable.\n\n" +
-		"Clearing any encounter heals the party 15%. There is no resting.\n" +
+		"Clearing any encounter heals every hero 15%. There is no resting.\n" +
 		"Death ends the run and takes everything, but every boss you fell\n" +
 		"leaves a RELIC behind, unlocked forever.")
 	body.add_theme_font_size_override("font_size", 15)
@@ -267,7 +267,7 @@ func _draw_header() -> void:
 		bpop.add_separator("DEBUG")
 		bpop.add_item("+200 Gold", 10)
 		bpop.add_item("+200 Talent Points (all)", 11)
-		bpop.add_item("Full Heal Party", 12)
+		bpop.add_item("Full Heal Heroes", 12)
 		bpop.add_item("Jump to Boss Slot", 13)
 		bpop.add_item("Advance to Next Zone", 14)
 		bpop.add_item("Reroll Specs", 15)
@@ -471,7 +471,7 @@ func _draw_node(inner: Node2D, s: int, j: int, is_next: bool, reach: Array,
 func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 	var ty := String(node["type"])
 	var closed := "" if reachable_still or bool(node["visited"]) \
-		else "\n\nNo longer reachable from where the party stands."
+		else "\n\nNo longer reachable from where the heroes stand."
 	if ty in ["miniboss", "boss"]:
 		var what := "A mini-boss holds the middle of the zone." if ty == "miniboss" \
 			else "The zone's boss. Nothing goes around it."
@@ -1387,7 +1387,7 @@ func _confirm_party_draft() -> void:
 	Run.save_run()
 	_draw_screen()
 	if took.is_empty():
-		_toast("The party keeps its kits as they are.")
+		_toast("The heroes keep their kits as they are.")
 	else:
 		_toast(" · ".join(took))
 	# BATCH CT §3: the same elite victory that owed this draft can also have

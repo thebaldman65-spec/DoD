@@ -80,7 +80,7 @@
 	},
 	"binding_souls": {
 		"name": "Rune of Binding Souls", "rarity": "epic", "scope": "class:cleric", "price": 160,
-		"desc": "Grants SACRED RESOLVE: bind the party's souls, splitting all damage taken for 3 turns.",
+		"desc": "Grants SACRED RESOLVE: bind the heroes' souls, splitting all damage taken for 3 turns.",
 		"payload": {"grant_ability": "Sacred Resolve"}
 	},
 
@@ -296,13 +296,13 @@
 	"burning_censer": {
 		"name": "Rune of the Burning Censer", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 75, "scarred": true, "lane": "Zeal",
-		"desc": "Consecrated Ground reflects 10% more and the reflection mends the party for a fifth of it — but -12% max health.",
+		"desc": "Consecrated Ground reflects 10% more and the reflection mends every hero for a fifth of it — but -12% max health.",
 		"payload": {"stat": {"righteous_step": 10, "lifewell_ranks": 20, "max_hp_pct": -0.12}}
 	},
 	"standing_vow": {
 		"name": "Rune of the Standing Vow", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100,
-		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% party Break damage, holy ground mends 2% each turn.",
+		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% hero Break damage, holy ground mends 2% each turn.",
 		"payload": {"stat": {"blessed_barrier_ranks": 4, "devoutness_ranks": 5, "pulse_ranks": 2}}
 	},
 
@@ -327,7 +327,7 @@
 	"whispering_dark": {
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily and marks the newly maddened with 1 Ruin, enemy afflictions mend the party each turn.",
+		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily and marks the newly maddened with 1 Ruin, enemy afflictions mend the heroes each turn.",
 		"payload": {"stat": {"broken_will_ranks": 5, "spread_ranks": 15, "spread_ruin": 1, "pleasure_pct": 0.5}}
 	},
 

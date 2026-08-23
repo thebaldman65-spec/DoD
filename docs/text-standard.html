@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DK &mdash; &sect;4.9)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DL &mdash; &sect;4.9)</b></p>
 <h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
 <p><i>The rules every player-facing string is written to. Binding on every batch from CJ
 forward, including any tuning that comes out of playtesting. This document says how text is
@@ -273,16 +273,16 @@ renders <code>perfect_text</code> without wrapping is the battle tooltip, which 
 rather than clipping. <b>Recorded as measured, not filed as owed</b> — rewrapping 76 lines to a
 ceiling that does not bind them would be work with no reader.</p>
 
-<h2>4.9 HERO AND ALLY ARE NOT SYNONYMS (BINDING, SET AT BATCH CV &sect;4)</h2>
-<blockquote><b>HERO</b> &mdash; the four party members. <b>ALLY</b> &mdash; heroes and
-companions together.</blockquote>
+<h2>4.9 HERO AND ALLY ARE THE ONLY TWO WORDS (BINDING, SET AT BATCH CV &sect;4, CLOSED AT DL)</h2>
+<blockquote><b>HERO</b> &mdash; one of the four. <b>ALLY</b> &mdash; heroes and
+companions together. <b>AND THERE IS NO THIRD WORD.</b></blockquote>
 <p><b>CORRECTED AT BATCH DJ &sect;1 &mdash; the beast does NOT stand in <code>heroes</code>.</b>
 It is appended to <code>companions</code>; <code>heroes.append</code> is reached at exactly one
-site, the party spawn. The beast is visibly on the player's side and is skipped by
+site, the block where the four are built. The beast is visibly on the player's side and is skipped by
 <code>is_companion</code> filters throughout <code>battle.gd</code> &mdash; but those filters are
 reading an array that never held one, so <b>the collection is what excludes, not the filter</b>.
 Twenty-five node texts promised "every ally" or "the whole party" and paid only the four. <b>The
-exclusion is intended</b> &mdash; under The Pack a party-wide buff would otherwise reach six units
+exclusion is intended</b> &mdash; under The Pack a buff for everyone would otherwise reach six units
 &mdash; <b>so the words move, never the read site.</b></p>
 <p><b>THE TEST IS THE READ SITE'S COLLECTION AND THEN THE CHAIN BELOW IT, NOT ITS FILTER AND NOT
 THE SENTENCE'S RHYTHM.</b> <code>_hero_side()</code> includes companions (the living ones), so an
@@ -293,6 +293,17 @@ ever say <i>ally</i>; and <b>a per-TURN effect can never reach one either</b>, b
 <code>_next_unit()</code> walks <code>heroes + enemies</code> and a beast takes no turns.
 <b>"Party" is not one of the two words</b>; it reads as either and is what let twenty-five texts
 drift.</p>
+<p><b>AND AT BATCH DL IT IS RETIRED OUTRIGHT: THE WORD "PARTY" MUST NOT APPEAR IN ANY
+PLAYER-FACING TEXT.</b> Not in a description, a <code>perfect_text</code>, a node text, a status
+chip, a <code>passive_desc</code>, a battle-log line, a glossary entry, a rune or relic text, an
+event label, a map or shop string, or <code>master.html</code>. <b>Every use becomes
+<i>hero</i> or <i>ally</i>, decided by its read site</b> &mdash; and where the group is the ENEMY
+side the word is <i>warband</i>, which the game already used. <b>The rule is kept by a check</b>:
+<code>test_batch_bx</code> &sect;4 sweeps string literals for it exactly as it sweeps for "beast",
+and the only survivors are identifiers (<code>party_mark</code>, the <code>party</code> event
+target, <code>spec_in_party</code>, <code>party.tscn</code>). <b>Prose ABOUT the game is not
+player-facing</b> &mdash; <code>CLAUDE.md</code>, the changelog, the design notes and the batch
+reports are exempt, and history is not swept.</p>
 <p><b>AND A THIRD FAILURE, FOUND AT BATCH DK: THE COLLECTION CAN REACH A BEAST AND THE EFFECT
 STILL NOT ARRIVE.</b> <code>wd_tank_spank</code> was widened, measured, and reverted to
 <i>hero</i>: <code>empower</code> attaches to a companion cleanly &mdash; chip, tooltip and all
@@ -306,13 +317,21 @@ run.</b> <code>wd_rally</code>, <code>wd_hold_line</code>, <code>dv_devoutness</
 companions". <b>None of the four did</b> (DJ &sect;2). <b>DK ruled on all four and they split two
 and two</b>: <code>wd_rally</code> and <code>wd_hold_line</code> had their CODE corrected and are
 <i>ally</i> truthfully now; <code>dv_devoutness</code> and <code>dv_waters</code> had their TEXT
-corrected to <i>hero</i>, the first because it is stamped at party spawn before a beast exists and
+corrected to <i>hero</i>, the first because it is stamped where the four are built, before a beast exists and
 the second because it is per-turn. <b>All four land correctly for the first time, by a different
 route than CV recorded.</b></p>
-<p><b>THE LIVE SPLIT, AS OF DK.</b> Five effects say <i>ally</i> and mean it: Rally, Hold the Line,
-Sanctuary, the Field Medic's cleanses and Harvest. Everything else party-wide says <i>hero</i>, and
+<p><b>THE LIVE SPLIT, AS OF DL.</b> <b>Six</b> effects say <i>ally</i> and mean it:
+Rally, Hold the Line, Sanctuary, the Field Medic's cleanses, Harvest, and <b>Rallying Shout's Pressure clause</b>.
+Everything else that reaches more than one body says <i>hero</i>, and
 <b>each carries its reason in the source beside it</b> &mdash; "hero" alone is a decision the next
 author re-litigates.</p>
+<p><b>AND A FOURTH FAILURE, FOUND AT BATCH DL: THE UNIT OF THE RULING IS THE CLAUSE, NOT THE
+CARD.</b> Rallying Shout carries two clauses of different shape in one sentence &mdash; it sheds
+Pressure, which a companion's Break meter takes, and it refuels a resource, which a companion has
+no bar to hold. <b>DJ &sect;2 and DK &sect;2 both read the ABILITY</b>, found its ally-worded
+resource half, ruled on that, and never saw the Pressure half, which carried neither of the two
+words. It paid four for the life of the project while its card promised the shed to everyone.
+<b>So the card now carries BOTH words in one sentence, and a text is read clause by clause.</b></p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

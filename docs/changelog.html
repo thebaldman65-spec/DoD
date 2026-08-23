@@ -14,6 +14,101 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-23 &mdash; Batch DL: RALLYING SHOUT'S PRESSURE, AND "PARTY" IS RETIRED</h2>
+<p><i><b>One card carried two clauses of different shape under one word, and that is how it hid
+from two consecutive sweeps.</b> Rallying Shout reads <i>"the whole party sheds 30 Pressure, and
+every other ally regains 30% of their resource"</i>. DJ &sect;2 swept every ally-worded text and
+DK &sect;2 ruled on eleven of them &mdash; both found the RESOURCE half, ruled it a hero's for the
+right reason, and never saw the Pressure half, <b>because it carried neither of the two words</b>.
+It paid four bodies for the life of the project. <b>DL widens it: the Pressure clause reads
+<code>_hero_side()</code> and a companion sheds the 30 like anyone else</b>, measured on a live
+summoned Ursus at <b>0 before and 30 after</b>. And <b>"party" is retired from every player-facing
+surface</b>, kept retired by a check. <b>No save version moves (still v10).</b> One new gate,
+<code>check_dl</code>. The full report is <code>docs/reports/DL.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; The Pressure clause widens; the resource clause does not</h3>
+<ul>
+<li><b>A COMPANION HAS A BREAK METER, so the Pressure clause is genuinely ally-shaped.</b> It is
+the same axis DK had already widened Hold the Line along &mdash; Break relief to companions on
+that meter &mdash; so this is consistency rather than a new principle. The site takes
+<code>_hero_side()</code>, <b>the authored name</b>, not a fifth hand-rolled predicate, and
+<code>dead</code> is excluded for Hold the Line's reason exactly: a corpse has no meter running.</li>
+<li><b>MEASURED ON A LIVE BODY, NOT ASSERTED (DK &sect;1's rule).</b> A summoned Ursus shed
+<b>0</b> Pressure before and <b>30</b> after; a hero shed 30 either way. <b>A widening that changes
+no measurement did not land</b>, and DK's Tank and Spank is why that sentence exists.</li>
+<li><b>THE CLAUSES ARE TWO LOOPS NOW, NOT ONE LOOP WITH A FILTER.</b> Each clause's collection is
+visible where the clause is read. A filter hung off a shared union would put the resource clause's
+answer somewhere the resource clause is not.</li>
+<li><b><code>resource_name == ""</code> IS THE RULING AT THE RESOURCE SITE, AND IT IS NEW HERE.</b>
+Rallying Cry and War Stomp both carried that guard and DK cited its presence as the evidence for
+their ruling; <b>this was the one of the three that lacked it</b>.</li>
+<li><b>AND DK'S RECORDED REASON WAS HALF WRONG.</b> It read <i>"a companion is built with no
+<code>resource_name</code> and <code>max_resource</code> 0"</i>. <b><code>max_resource</code> is
+NOT 0 on a companion</b> &mdash; it is <code>unit.gd</code>'s default <b>100</b>, never overridden
+at the summon, measured on a live one. So the <code>resource_name</code> guard is the only thing
+between that loop and a beast banking 30 points of a bar it does not have. Corrected at the site.</li>
+</ul>
+
+<h3>&sect;2 &mdash; "Party" is retired from player-facing text</h3>
+<ul>
+<li><b>HERO means the four. ALLY means heroes and companions. THERE IS NO THIRD WORD.</b> Every
+player-facing use of "party" is now <i>hero</i> or <i>ally</i>, decided by its read site &mdash;
+and where the group is the ENEMY side, <b><i>warband</i></b>, which the game already used.</li>
+<li><b>THE READ SITE'S COLLECTION IS THE TEST, not the sentence's rhythm.</b> A walk over bare
+<code>heroes</code> says <i>hero</i> with or without an <code>is_companion</code> clause; three
+further exclusions mean <i>hero</i> however the collection is spelled (stamped once where the four
+are built, per-turn, or Faith-flavoured); and a clause whose payload a companion structurally
+cannot receive says <i>hero</i> <b>with its reason recorded beside it</b>.</li>
+<li><b>SWEPT: ability descriptions, <code>perfect_text</code>, node text, status chips,
+<code>passive_desc</code>, battle-log lines, the glossary, the rune, relic, item, event, map, shop
+and blacksmith strings, the run summary, and <code>master.html</code>.</b> The surviving uses are
+identifiers and are named: <code>party_mark</code>, the <code>party</code> event target,
+<code>spec_in_party</code>, <code>party.tscn</code>.</li>
+<li><b>THE RULE IS BINDING AND IS KEPT BY A CHECK.</b> <code>CLAUDE.md</code> and
+<code>text-standard.html</code> &sect;4.9 carry it; <code>test_batch_bx</code> &sect;4b sweeps for
+it exactly as &sect;4 sweeps for "beast" &mdash; same place, same construction, string literals
+only. <b>It was shown to bite before it was trusted</b>: a "party" planted in a live ability
+description, in the glossary and in <code>master.html</code> each red it.</li>
+<li><b>THREE FALSE "ALLY"s WERE CORRECTED IN THE SAME PASS</b>, where leaving them would have made
+a card newly misleading: Aegis Wall's and Exhortation's log lines and Requiem's, all three of which
+walk <code>heroes</code>. <b>Consecrated Ground's Faith clause too</b> &mdash; it said "every ally
+is kindled 1 Faith" and <code>_gain_faith</code> refuses companions outright.</li>
+<li><b>PROSE ABOUT THE GAME IS NOT PLAYER-FACING.</b> <code>CLAUDE.md</code>, this changelog, the
+design notes and the batch reports are exempt. <b>History was not swept.</b></li>
+</ul>
+
+<h3>&sect;3 &mdash; The other cards with two clauses of different shape, reported and not ruled</h3>
+<p><b>Six, and the brief asked for the list rather than the ruling.</b> <b>Bulwark of
+Fortitude</b> (Break immunity and armor are receivable, the per-turn heal structurally is not, the
+cast's instant heal is); <b>Consecrated Ground</b> (mitigation and reflect are receivable, Faith is
+refused outright); <b>Divine Wrath</b> (both halves die, for two <i>different</i> reasons &mdash;
+the damage term is read in the hero strike loop and the speed term only matters to a turn order a
+companion is never in); <b>Sacred Resolve</b> (the split is receivable, the Break carve-out is
+already worded separately); <b>Battle Shout</b> and <b>Hold the Line</b> (a group clause and a
+self-clause &mdash; the +5 Rage &mdash; under one word). <b>And one text is wrong on its own
+terms:</b> the Warrior's <b>Rally</b> says "shout one ALLY forward" and its picker filters
+companions out at three sites. <b>All seven are recorded in <code>docs/state.md</code> as owed.</b></p>
+
+<h3>&sect;4 &mdash; Verification</h3>
+<ul>
+<li><b>THE NEGATIVE CONTROL ON &sect;1.</b> <code>check_dl</code> &sect;3 empties
+<code>companions</code> for the length of one cast, which is precisely the pre-DL collection, and
+the beast sheds <b>0</b> against 30 with the union. Reverting the widening in the source reds three
+of the gate's checks.</li>
+<li><b>AND THE HALF THAT DID NOT MOVE IS MEASURED TOO.</b> &sect;4 reads the beast's resource after
+a cast (<b>0</b>, off a <b>100</b> bar it cannot spend) and asserts <code>max_resource</code> is
+NON-zero, so the day a companion is built with a real bar the gate says the ruling is stale.</li>
+<li><b>THE LITERAL SWEEP CAUGHT TWO BREAKS BEFORE THE BATTERY.</b> Every string literal in the 47
+suites and 23 gates was evaluated against the documents and the sources, before the edits and
+again after. Two suite needles had stopped matching: <code>test_batch_bj</code>'s
+"kindled 1 Faith" (a line-wrap split it &mdash; the CARD was rewrapped, not the suite) and
+<code>test_batch_bf</code>'s pin on the sim table's disclaimer (the string genuinely moved &mdash;
+the needle followed it).</li>
+<li><b><code>check_dk</code>'s TWO REFUEL PINS WERE EXTENDED BY A LINE.</b> Giving Rallying Shout's
+resource loop War Stomp's guard made the two loops share a fragment, so <b>either could have been
+deleted with both entries still green</b>. Both now carry the line that names their clause.</li>
+</ul>
+
 <h2>2026-08-23 &mdash; Batch DK: THE ELEVEN ALLY-WORDED EFFECTS, RULED</h2>
 <p><i><b>DJ &sect;2 swept every broad ally-worded card and node and found ELEVEN besides Harvest
 walking bare <code>heroes</code>, which holds no companion &mdash; and ruled on none of them</b>,

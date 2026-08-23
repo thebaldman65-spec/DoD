@@ -113,6 +113,7 @@ func _run() -> void:
 	await _live_deepest_bond()
 	await _live_twin_hunt()
 	_rename()
+	_retired_word()
 	_docs()
 
 	if FileAccess.file_exists("user://profile_batch_bx_test.json"):
@@ -890,6 +891,111 @@ func _rename() -> void:
 		"§4: ...and no rune does either")
 	ok(rune_names.size() > 40,
 		"§4: ...checked against the whole rune pool (%d)" % rune_names.size())
+
+
+# ---------- §4b: THE RETIRED WORD (Batch DL §2) ----------
+
+# NO PLAYER-FACING STRING READS "party". Same rule as §4's "beast" above, same
+# construction, and it is here rather than in a gate of its own for exactly that
+# reason: one place where the project's retired words are kept retired.
+#
+# WHY THE WORD WAS RETIRED, because a check whose reason is not written down gets
+# deleted by the next author who trips on it. HERO means the four; ALLY means
+# heroes and companions. **"Party" reads as either**, and that is not a style
+# complaint — Rallying Shout's Pressure clause said "the whole party sheds 30
+# Pressure" and paid four for the life of the project. DJ §2 swept every
+# ally-worded text and DK §2 ruled on eleven of them; NEITHER COULD SEE IT,
+# because both were sweeping for the word `ally` and this clause carried neither
+# of the two words. A word that means either is a word no sweep can check.
+#
+# THE ENEMY SIDE IS A WARBAND, which the game already said in several places, so
+# a group word aimed at the enemies is not stranded by this rule.
+#
+# STRING LITERALS ONLY, and comments are skipped — §4's discipline exactly. A
+# comment naming `party_mark` or explaining this rule is not a card a player
+# reads, and a sweep that read them would report itself.
+const PARTY_IDENTS := ["party_mark", "spec_in_party", "party.tscn",
+	"party_screen", "<code>party</code>"]
+
+func _retired_word() -> void:
+	# THE FILE LIST IS WIDER THAN §4's, because "party" reached surfaces "beast"
+	# never did: the relics, the events, the shop and the blacksmith all speak
+	# about the four.
+	var files := ["res://scripts/battle.gd", "res://scripts/classes.gd",
+		"res://scripts/talents.gd", "res://scripts/unit.gd",
+		"res://scripts/run_state.gd", "res://scripts/map_screen.gd",
+		"res://scripts/run_sim.gd", "res://scripts/party_screen.gd",
+		"res://scripts/relics.gd", "res://scripts/relics_screen.gd",
+		"res://scripts/events.gd", "res://scripts/shop_screen.gd",
+		"res://scripts/blacksmith_screen.gd"]
+	var strays: Array = []
+	for f in files:
+		for ln in _src(f).split("\n"):
+			if ln.strip_edges().begins_with("#"):
+				continue
+			# ONLY THE ODD SEGMENTS ARE INSIDE A STRING LITERAL — §4's rule, and
+			# for §4's reason: reading every segment sweeps the CODE too, which
+			# is how a check written to ask about prose starts reporting
+			# `_party_mark_mult`.
+			var parts := ln.split("\"")
+			for pi in parts.size():
+				if pi % 2 == 0:
+					continue
+				var part := String(parts[pi])
+				var low := part.to_lower()
+				if not low.contains("party"):
+					continue
+				var probe := _strip_idents(low)
+				# THE BARE KEY IS AN IDENTIFIER TOO: `"party"` is an events.json
+				# effect TARGET and a run-snapshot field name, and it is the whole
+				# literal when it is one.
+				if probe.strip_edges() == "party":
+					continue
+				if probe.contains("party"):
+					strays.append("%s: %s" % [f.get_file(), part.substr(0, 60)])
+	ok(strays.is_empty(),
+		"§4b: no player-facing string still reads 'party' (%d: %s)"
+			% [strays.size(), ", ".join(strays.slice(0, 3))])
+	# The data files, same rule. `events.json` carries the `party` effect target
+	# eighteen times, so it is stripped by the same list rather than exempted.
+	for path in ["res://data/glossary.json", "res://data/runes.json",
+			"res://data/enemies.json", "res://data/events.json"]:
+		var body := _strip_idents(_src(path).to_lower()).replace("\"party\"", "")
+		ok(not body.contains("party"),
+			"§4b: %s says hero or ally" % path.get_file())
+	# AND THE DOCUMENT. `master.html` is a player-facing surface by the text
+	# standard's own §0, and its four surviving uses are identifiers marked as
+	# code so this strip is exact rather than a guess.
+	var master := _strip_idents(_src("res://docs/master.html").to_lower())
+	ok(not master.contains("party"),
+		"§4b: master.html says hero or ally everywhere it is prose")
+	# THE RULE IS WRITTEN DOWN WHERE A FUTURE AUTHOR LOOKS FOR IT. A check with
+	# no stated rule behind it gets deleted the first time it is inconvenient.
+	ok(_src("res://CLAUDE.md").contains(
+		"\"PARTY\" IS RETIRED FROM PLAYER-FACING TEXT"),
+		"§4b: CLAUDE.md still carries the standing rule this check keeps")
+	ok(_src("res://docs/text-standard.html").contains(
+		"MUST NOT APPEAR IN ANY"),
+		"§4b: text-standard.html §4.9 still carries it too")
+	# AND THE ONE CARD THE RULE CAME OUT OF, BOTH HALVES. Rallying Shout carries
+	# two clauses of different shape in one sentence: the Pressure half is an
+	# ALLY's (a companion has a Break meter) and the resource half is a HERO's (it
+	# has no resource bar). A batch that re-flattens it to one word has undone the
+	# ruling, whichever word it picks.
+	var cls := _src("res://scripts/classes.gd")
+	ok(cls.contains("Raise the line: every ally sheds 30"),
+		"§4b: Rallying Shout's Pressure clause stopped saying `ally` — DL §1 widened its read site")
+	ok(cls.contains("every other hero\\nregains 30% of their resource"),
+		"§4b: Rallying Shout's resource clause stopped saying `hero` — a companion still has no bar")
+
+
+# The identifiers that are NOT the common noun. Stripped by exact token, the way
+# §4 strips `beastmaster`, so the sweep cannot be quietly widened into passing.
+func _strip_idents(low: String) -> String:
+	var out := low
+	for ident in PARTY_IDENTS:
+		out = out.replace(ident, "")
+	return out
 
 
 # ---------- §5: the documentation ----------

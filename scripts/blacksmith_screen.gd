@@ -74,7 +74,7 @@ func _draw_screen() -> void:
 		# already carries every upgrade that fits it — rare, and not an error.
 		var none := Label.new()
 		none.text = ("Nothing on the rack fits anything you carry.\n" +
-			"Every upgrade the party's abilities can take, they already have.")
+			"Every upgrade the heroes' abilities can take, they already have.")
 		none.add_theme_font_size_override("font_size", 17)
 		none.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
 		none.position = Vector2(0, 300)
@@ -155,7 +155,7 @@ func _draw_pairing(i: int, price: int) -> void:
 	buy.custom_minimum_size = Vector2(335, 44)
 	buy.disabled = Run.gold < price
 	if buy.disabled:
-		buy.tooltip_text = "The party carries %d gold; he wants %d." % [
+		buy.tooltip_text = "The heroes carry %d gold; he wants %d." % [
 			Run.gold, price]
 	buy.pressed.connect(Music.click)
 	buy.pressed.connect(_buy.bind(i))

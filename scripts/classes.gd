@@ -1277,7 +1277,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "aegis_wall",
 				"perfect_id": "", "perfect_text": "",
-				"description": "The wall answers for everyone: for 4\nturns every attack you BLOCK heals the\nwhole party for 8% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
+				"description": "The wall answers for everyone: for 4\nturns every attack you BLOCK heals\nevery hero for 8% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
 		# ===== BATCH CI — TRANCHE 3, THE WARRIOR NINE. THE DRAFT IS COMPLETE. =====
 		#
 		# A CONTIGUOUS BLOCK rather than interleaved with BP's and BW's entries
@@ -1817,7 +1817,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 5, "anim": "attack03",
 				"special": "consecration",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Bless the ground you all stand on: for\n4 turns the WHOLE PARTY regains 5% of\nmaximum health at the start of each of\ntheir turns."})
+				"description": "Bless the ground you all stand on: for\n4 turns EVERY HERO regains 5% of their\nmaximum health at the start of each of\ntheir turns."})
 		# AXIS: something to do with a turn. All three Clerics have turns where
 		# nobody needs healing and their engine is not ready, and the Break
 		# means that turn still contributes.
@@ -1856,7 +1856,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "exhortation",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call them on: the WHOLE PARTY's next\nattack deals 35% more damage. It is\nBANKED, not timed — it waits for each\nhero's next swing however long they\ntake to take it."})
+				"description": "Call them on: EVERY HERO's next attack\ndeals 35% more damage. It is BANKED,\nnot timed — it waits for each hero's\nnext swing however long they take to\ntake it."})
 		# AXIS: making one heal into two. IT IS THE ONE CLASS ABILITY THAT GETS
 		# BETTER THE MORE SPEC-SPECIFIC THE BUILD IS, a deliberate inversion of
 		# the unconditional-floor role the other five play: Holy's big heals
@@ -1965,7 +1965,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
 				"anim": "attack01", "special": "hunters_mark",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call the target out: for 6 turns the\nWHOLE PARTY deals 15% more damage to\nit. One mark at a time — the point is\nthat everyone shoots the same thing."})
+				"description": "Call the target out: for 6 turns EVERY\nALLY deals 15% more damage to it. One\nmark at a time — the point is that\neveryone shoots the same thing."})
 		# AXIS: a charge BANK, which the class has never had. BANKED, NOT TIMED
 		# — the charges wait until spent, on the Interpose/`shield_charges`
 		# precedent BQ used for Mirror Image, so a cast into a lull is not
@@ -2469,7 +2469,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 25, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "resonant_field",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Tune the party to the storm: for 4\nturns every ALLY deals bonus damage\nequal to HALF your current Resonance\nbonus.\nIt reads the meter LIVE — keep\nbuilding and their share climbs too."})
+				"description": "Tune the others to the storm: for 4\nturns every other HERO deals bonus\ndamage equal to HALF your current\nResonance bonus.\nIt reads the meter LIVE — keep\nbuilding and their share climbs too."})
 		# AXIS: the late game bought early, at the cost of the ramp. Below 15 it
 		# is a huge jump; above 15 it is a nerf he would never take — so it
 		# RESCUES A SLOW START and becomes dead weight in a long fight, which is
@@ -3307,7 +3307,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 3.0, "cooldown": 5, "anim": "attack03",
 				"special": "requiem", "gated": true,
 				"perfect_id": "", "perfect_text": "{atk:10} per stack",
-				"description": "Sing it out: CONSUMES every stack of\nRuin on one enemy for 8% of Attack\neach, and the party is healed 2% of\nyour maximum per stack.\nNothing detonates — the mark is spent."})
+				"description": "Sing it out: CONSUMES every stack of\nRuin on one enemy for 8% of Attack\neach, and every hero is healed 2% of\nyour maximum per stack.\nNothing detonates — the mark is spent."})
 		# AXIS: the free one, and it is aimed at the half of the game his spec
 		# cannot reach. IT IS THE ONLY CARD OF HIS THAT READS NO RUIN AT ALL —
 		# no stacks to build, no threshold to reach, no mark to spend — so it is
@@ -3558,7 +3558,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack01", "special": "downwind",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nHis engine, fed by the whole party."})
+				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nHis engine, fed by every hero."})
 		# AXIS: spending the breadth. It DELIBERATELY FIGHTS HIS OWN PASSIVE —
 		# what Trapper spent the fight building is what this eats — and that
 		# tension is the point of the card rather than a cost to be smoothed
@@ -3625,7 +3625,7 @@ static func vault_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Rallying Shout", "cost": 25,
 				"special": "rally", "delay": 2.5, "anim": "attack03", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise the line: the whole party sheds\n30 Pressure, and every other hero\nregains 30% of their resource."})
+				"description": "Raise the line: every ally sheds 30\nPressure, and every other hero\nregains 30% of their resource."})
 		"Retaliation":
 			return Ability.make({"display_name": "Retaliation", "cost": 20,
 				"special": "retaliate", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01", "cooldown": 3,
@@ -3691,7 +3691,7 @@ static func vault_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Divine Wrath", "cost": 25,
 				"special": "divine_wrath", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack03", "cooldown": 4,
 				"perfect_id": "", "perfect_text": "",
-				"description": "The light answers: the whole party\ndeals +15% damage and acts 15%\nfaster for 4 turns."})
+				"description": "The light answers: every hero deals\n+15% damage and acts 15% faster\nfor 4 turns."})
 		"Umbral Sigil":
 			return Ability.make({"display_name": "Umbral Sigil", "cooldown": 4,
 				"cost": 20, "special": "umbral_sigil", "delay": 3.0, "anim": "attack03",
@@ -3804,7 +3804,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Heals 150% of the damage",
-				"description": "CONSUME every status on one enemy:\n12% of Attack per status REMOVED,\nand you heal the same amount.\nA poison that cannot be cleansed\nstays — and is not paid for.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely.\nA wound an ALLY opened reaps richer:\nup to 18% a status when the whole\nboard is the party's work."})
+				"description": "CONSUME every status on one enemy:\n12% of Attack per status REMOVED,\nand you heal the same amount.\nA poison that cannot be cleansed\nstays — and is not paid for.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely.\nA wound an ALLY opened reaps richer:\nup to 18% a status when the whole\nboard is the allies' work."})
 	return null
 
 
@@ -3915,7 +3915,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Sacred Resolve", "cooldown": 5,
 				"cost": 25, "special": "unity", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 4 turns (Break damage still lands\non the struck hero)."})
+				"description": "Bind the heroes' souls — all damage\nreceived is split evenly among them\nfor 4 turns (Break damage still lands\non the struck hero)."})
 		"Mind Flay":
 			return Ability.make({"display_name": "Mind Flay", "cooldown": 2,
 				"dmg_type": "shadow", "cost": 25, "damage": 30, "pressure": 15,
@@ -3932,7 +3932,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
 				"cost": 30, "special": "bulwark", "delay": 3.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "The unbreakable stand: for 3 turns\nthe party takes NO Break damage, has\nits armor increased by 50%, and heals\n10% of max health each turn.\nThe party heals {mhp:5} at once."})
+				"description": "The unbreakable stand: for 3 turns\nevery hero takes NO Break damage, has\ntheir armor increased by 50%, and\nheals 10% of max health each turn.\nThe cast heals them {mhp:5} at once."})
 	return null
 
 
@@ -4144,11 +4144,11 @@ const SPEC_INFO := {
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
 		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 3 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. Apostle adds another 1x and Fervor another\non Consecrated Ground, so both together are triple, not\nquadruple. At 3 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
-		"blurb": "A living shrine — faith made armor for the whole party."},
+		"blurb": "A living shrine — faith made armor for every hero."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,
 		"resists": {"shadow": 0.25, "nature": 0.10, "fire": -0.20},
-		"passive_desc": "Wrath of the Old Gods: every debuff applied marks the\ntarget with 2 Ruin. The marks have NO MAXIMUM and never\nwash off. Each stack: +2% damage taken, and heroes\nstriking a Ruined target heal 2% of the damage dealt per\nstack (up to 40%). One turn after every tenth stack, Ruin\ndetonates — 90% of Attack as shadow damage, the party\nheals {mhp:25}, and THE STACKS SURVIVE IT.",
+		"passive_desc": "Wrath of the Old Gods: every debuff applied marks the\ntarget with 2 Ruin. The marks have NO MAXIMUM and never\nwash off. Each stack: +2% damage taken, and heroes\nstriking a Ruined target heal 2% of the damage dealt per\nstack (up to 40%). One turn after every tenth stack, Ruin\ndetonates — 90% of Attack as shadow damage, the heroes\nheal {mhp:25}, and THE STACKS SURVIVE IT.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
 	# Hunter stat blocks (Batch Q). The Beastmaster's armor is a multiplier
 	# across up to three bodies — companions inherit it at summon — so it
@@ -4156,7 +4156,7 @@ const SPEC_INFO := {
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
 		"max_hp": 160, "armor": 0.15,
 		"resists": {"nature": 0.20, "physical": 0.05},
-		"passive_desc": "Pack Bond — the active companion grants its boon. Ursus,\nSavage Presence: enemies are drawn to the bear and the\nBeastmaster takes 10% less damage. Canis: +15% damage per\nenemy under 35% health. Aguila: the whole party gains\n+10% crit. LOYALTY (per companion, NO MAXIMUM): +1 each\nturn the companion stands, and on summon or swap; +5%\nstrike damage per stack plus a companion-specific gift,\nand the boon itself grows 20% a stack — x2 at five. A\nmeter dies with its companion.",
+		"passive_desc": "Pack Bond — the active companion grants its boon. Ursus,\nSavage Presence: enemies are drawn to the bear and the\nBeastmaster takes 10% less damage. Canis: +15% damage per\nenemy under 35% health. Aguila: every hero gains\n+10% crit. LOYALTY (per companion, NO MAXIMUM): +1 each\nturn the companion stands, and on summon or swap; +5%\nstrike damage per stack plus a companion-specific gift,\nand the boon itself grows 20% a stack — x2 at five. A\nmeter dies with its companion.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
 	# The lightest Hunter: a marksman who wants to be at range and pays for
 	# being reached.
@@ -4374,7 +4374,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 3 turns — and every ally is\nkindled 1 Faith at the start of\ntheir turn while it holds."}),
+					"description": "Holy ground blooms underfoot: every\nhero takes 15% less damage and\nreflects 10% of damage taken, for 3\nturns — and each is kindled 1 Faith\nat the start of their turn while it\nholds."}),
 				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
 					"target": Ability.Target.ALLY, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "",
@@ -4413,7 +4413,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Summon Aguila", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: the whole\nparty gains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
+					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: every hero\ngains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
 				Ability.make({"display_name": "Hunter's Instinct", "cooldown": 3, "cost": 20, "special": "instinct",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
@@ -4461,5 +4461,5 @@ const CLASS_BLURBS := {
 	"hunter": "Ranged damage. Mana fuels precision payoffs\nand primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
 	"mage": "Glass cannon. Fire that spreads, frost that controls, and\nraw Resonance banked for devastating payoffs.",
-	"cleric": "Divine vessel of the light — smite, mend, and shepherd the party.",
+	"cleric": "Divine vessel of the light — smite, mend, and shepherd every ally.",
 }

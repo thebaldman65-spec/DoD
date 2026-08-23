@@ -89,7 +89,7 @@ const ITEM_INFO := {
 	"mana": ["Mana Potion", "Restores 40% of one ally's maximum Mana (or Rage)."],
 	"bomb": ["Bomb", "Deals 50 damage to all enemies, +2% per victory this run."],
 	"revive": ["Revive Potion", "Revives a fallen ally at 50% HP."],
-	"defense": ["Defense Potion", "+10% armor to all living party members for 3 turns."],
+	"defense": ["Defense Potion", "+10% armor to every living hero for 3 turns."],
 	# BATCH CT §4 — the three new ones. All BATTLE ONLY: on the map they sit
 	# in the pouch with a disabled button that says why, which is the BOMB's
 	# idiom (`_usable_on_map`), not the Defense Potion's (that one is enabled
@@ -2236,7 +2236,7 @@ func claim_reward() -> Dictionary:
 				return {"text": "The bargain offered a %s — no room in the pouch.\nChoose on the map." \
 					% ITEM_INFO[id][0], "shop": false}
 			if add_item(id) < 1:
-				return {"text": "The bargain offered a %s — the party is already carrying %d."
+				return {"text": "The bargain offered a %s — the heroes are already carrying %d."
 					% [ITEM_INFO[id][0], item_stack_cap(id)], "shop": false}
 			return {"text": "+1 %s (the bargain)" % ITEM_INFO[id][0], "shop": false}
 		"rune":

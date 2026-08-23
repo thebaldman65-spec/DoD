@@ -22,7 +22,7 @@ func _ready() -> void:
 	add_child(title)
 
 	var hint := Label.new()
-	hint.text = "Slay zone bosses to unlock relics. Assign up to 3 when drafting a party."
+	hint.text = "Slay zone bosses to unlock relics. Assign up to 3 when drafting your heroes."
 	# The persistent profile's public face: pure chronicle, gates nothing.
 	if Profile.completions_total() + Profile.wipes_total() > 0:
 		hint.text += "\nCycles survived: %d   •   Cycles lost: %d   •   Events witnessed: %d of %d" % [

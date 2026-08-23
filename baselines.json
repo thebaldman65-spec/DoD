@@ -197,6 +197,20 @@
    "fails_obs": 1,
    "note": "NEW AT DK. THE GATE FOR “four ally-worded effects reach the beast, and seven say hero because they cannot”. DJ §2 swept eleven ally-worded effects walking bare `heroes` and ruled on none; DK ruled, and they split FOUR and SEVEN. §1 pins BOTH populations by their own read lines and asserts each in the direction that can break it — a widened site going back to bare `heroes` is a REGRESSION, and a narrow site widening makes its `hero` text wrong. It also re-asserts that Harvest still spells its union out, because a receive-site's `dead` answer is not Harvest's. §2 IS THE LIVE HALF AND IT SUMMONS A REAL BEAR: Sanctuary heals it 1200 of a 10000 body, Hold the Line leaves it 20 Break from a 40-BD blow (exactly the base 50% cut) and holds it at 1 HP through a lethal one, Rally turns a 1000 heal into 1300, and the Field Medic's pool holds it once poisoned. SANCTUARY AND HOLD THE LINE ARE DRIVEN THROUGH `_resolve_special`; RALLY AND FIELD MEDIC LIVE INSIDE `_resolve`'s block branch and `_run_battle`'s turn-start block and cannot be called, so those evaluate the loop's own expression live — WHICH IS WHICH IS SAID RATHER THAN BLURRED. §2 ALSO CARRIES THE NEGATIVE CONTROL AND IT IS NOT OPTIONAL: the failure DK repairs was invisible in every battery ever run, so a check that passes on the fixed tree proves nothing. It empties `companions` for the length of one arm — precisely the pre-DK collection — and asserts the beast is untouched (Sanctuary heals it 0, Hold the Line leaves the full 40). §4 IS THE BATCH'S ACTUAL CARE: Tank and Spank was the fifth candidate to widen and was MEASURED instead. `empower` attaches to a companion cleanly and pays it nothing, because a beast's blows resolve through `_companion_hit`, its own damage path, which reads none of the hero strike loop's multipliers — 40 seeded blows read 34392 against 34392, ratio 1.0000. THE RULING IS PINNED AS THAT MEASUREMENT rather than as an assertion, so the day `_companion_hit` grows an `empower` read the gate says the ruling is stale instead of staying quietly true. §5 asserts the eleven texts — seven `hero`, four `ally` — in both directions, plus that no §2 text still carries its pre-DK wording. §6 asserts CV §4's false test is gone from CLAUDE.md, that master.html no longer flags Hold the Line as excluding companions, and that the glossary no longer lists Tank and Spank's Empower as an `ally` effect. Gate takes ~5s. ONE READING SUPPORTS THE 64."
   },
+  "check_dl": {
+   "kind": "gate",
+   "checks": [
+    24,
+    24
+   ],
+   "checks_obs": 1,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 1,
+   "note": "BATCH DL's gate. §1 pins BOTH of Rallying Shout's clauses by their own read lines (the Pressure walk is `_hero_side()`, the resource walk is bare `heroes` plus its `resource_name` guard); §2 measures 30 Pressure shed on a live summoned Ursus; §3 is the NEGATIVE CONTROL — `companions` emptied for one cast, which is exactly the pre-DL collection, and the beast sheds 0; §4 measures the clause that did NOT move (the beast banks 0 resource, and `max_resource` is asserted NON-zero because DK recorded it as 0 and that was false)."
+  },
   "check_flow": {
    "kind": "gate",
    "checks": null,
@@ -814,16 +828,16 @@
   "test_batch_bx": {
    "kind": "suite",
    "checks": [
-    147,
-    147
+    157,
+    157
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "DG §4 REPAIR, PREDICTED BEFORE THE RUN. data/glossary.json's hero_vs_ally entry read 'pay the four and not the beast' — the COMMON NOUN, in player-facing prose, a straggler from the prose-rename pass. It reads 'the companion' now. THE IDENTIFIERS WERE NOT TOUCHED: beastmaster/Beastmaster/BEASTMASTER are on the do-not-rename list and bm_beast_within / bm_no_beast_left move the save format. Check count unmoved at 147."
+   "note": "BATCH DL §2 — 147 -> 157, and the nine prior readings support the 147 rather than this. §4b sweeps every player-facing surface for the retired word \"party\" — the same construction §4 uses for \"beast\", string literals only, comments skipped, identifiers (`party_mark`, the `party` event target, `spec_in_party`, `party.tscn`) stripped by exact token. Its file list is WIDER than §4's, because \"party\" reached relics.gd, events.gd, shop_screen.gd, blacksmith_screen.gd and relics_screen.gd, which \"beast\" never did. SHOWN TO BITE ON THREE SURFACES BEFORE IT WAS TRUSTED: a \"party\" planted in a live ability description, in the glossary, and in master.html each red it, and each reverted clean. §4's own rule for the previous retired word is unchanged, and DG's repair to the glossary's hero_vs_ally entry still stands under it."
   },
   "test_batch_cb": {
    "kind": "suite",

@@ -121,7 +121,7 @@
   "term": "Fallen Heroes",
   "category": "combat",
   "short": "The dead sit the fight out - but victory brings everyone back at 20%.",
-  "long": "A hero at 0 HP falls: they lose every status, take no turns, and contribute nothing until raised. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 20-25%. If the party WINS the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least 20% of their max HP. Only losing everyone ends the run.",
+  "long": "A hero at 0 HP falls: they lose every status, take no turns, and contribute nothing until raised. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 20-25%. If the heroes WIN the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least 20% of their max HP. Only losing everyone ends the run.",
   "see_also": [
    "wipe",
    "consumables"
@@ -131,8 +131,8 @@
   "id": "hero_vs_ally",
   "term": "Hero and Ally",
   "category": "combat",
-  "short": "A HERO is one of your four party members. An ALLY is a hero OR a companion - the two words are not interchangeable.",
-  "long": "Your side of the field can hold more than four bodies. The four party members are HEROES. A Beastmaster's companion - Ursus, Canis or Aguila - fights beside them, takes hits, and can be healed, but it is NOT a hero: it is an ALLY, and so is every hero. The distinction is load-bearing because most party-wide talents deliberately pay the four and not the companion; under THE PACK a Beastmaster fields two companions at once, and a buff that reached all six would be worth half again as much in his party as in anyone else's. So the wording tells you which you are getting. A talent that says HERO pays the four - Standard Bearer's lent armor, Bulwark of Fortitude, the Devout's Healing Pulse, the Occultist's party heals, Rallying Cry and War Stomp's refuels (a companion has no resource bar to fill), Devoutness and Last Hope (both stamped on the party before any companion is called), Cleansing Waters (it rolls once a turn and a companion never takes one) and Tank and Spank's Empower (a companion's blows are paid on their own path and read no Empower). A talent that says ALLY pays companions too - Rally's healing bonus, Hold the Line's Break cut and its no-death window, Sanctuary's heal, the Field Medic's cleanses, and Harvest's reading of who opened a wound. Targeting follows the same rule: a single-target support ability you aim by hand CAN be aimed at a companion, so Divine Shield on the bear is a legal and sometimes correct play, while the same shield's Radient Aegis echo can only land on a hero. Faith is heroes-only outright - a companion can never hold a stack of it.",
+  "short": "A HERO is one of your four. An ALLY is a hero OR a companion - the two words are not interchangeable, and there is no third word.",
+  "long": "Your side of the field can hold more than four bodies. The four are HEROES. A Beastmaster's companion - Ursus, Canis or Aguila - fights beside them, takes hits, and can be healed, but it is NOT a hero: it is an ALLY, and so is every hero. The distinction is load-bearing because most broad talents deliberately pay the four and not the companion; under THE PACK a Beastmaster fields two companions at once, and a buff that reached all six would be worth half again as much in his build as in anyone else's. So the wording tells you which you are getting. A talent that says HERO pays the four - Standard Bearer's lent armor, Bulwark of Fortitude, the Devout's Healing Pulse, the Occultist's Ruin heals, Rallying Cry, War Stomp and Rallying Shout's RESOURCE clause (a companion has no resource bar to fill), Devoutness and Last Hope (both stamped on the four before any companion is called), Cleansing Waters (it rolls once a turn and a companion never takes one) and Tank and Spank's Empower (a companion's blows are paid on their own path and read no Empower). An effect that says ALLY pays companions too - Rally's healing bonus, Hold the Line's Break cut and its no-death window, Sanctuary's heal, the Field Medic's cleanses, Harvest's reading of who opened a wound, and Rallying Shout's Pressure clause (a companion has a Break meter, so it sheds the 30 like anyone else). Targeting follows the same rule: a single-target support ability you aim by hand CAN be aimed at a companion, so Divine Shield on the bear is a legal and sometimes correct play, while the same shield's Radient Aegis echo can only land on a hero. Faith is heroes-only outright - a companion can never hold a stack of it. AND THERE ARE ONLY THE TWO WORDS: no vaguer third word appears anywhere player-facing, because a vaguer word reads as EITHER - and that ambiguity is what let Rallying Shout pay only the four for the life of the project while its card promised the shed to everyone standing. THAT CARD IS NOW THE WORKED EXAMPLE OF A CARD WITH TWO CLAUSES OF DIFFERENT SHAPE: its Pressure half says ALLY and reaches a companion's Break meter, and its resource half says HERO in the same sentence, because a companion has no resource bar.",
   "see_also": [
    "pack_bond",
    "fallen"
@@ -199,7 +199,7 @@
   "term": "Glacial Hold",
   "category": "statuses",
   "short": "The Cryomancer's freeze: indefinite, and only he can end it.",
-  "long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy, two with Second Prison, any number under Absolute Zero; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source (+30% with Killing Frost), so the hold is a party-wide damage window as well as a lockdown. A released enemy comes back on 1 stack of Chilled. GLACIAL PRISON WILL NOT BE CAST ONTO A HELD ENEMY: the ice is already as deep as it goes, so the button greys out once every enemy in front of you is frozen rather than spending the turn on nothing. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
+  "long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy, two with Second Prison, any number under Absolute Zero; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source (+30% with Killing Frost), so the hold is a damage window as well as a lockdown - a HERO's window: the multiplier is read in the hero strike loop only, and a companion's jaws never see it. A released enemy comes back on 1 stack of Chilled. GLACIAL PRISON WILL NOT BE CAST ONTO A HELD ENEMY: the ice is already as deep as it goes, so the button greys out once every enemy in front of you is frozen rather than spending the turn on nothing. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
   "see_also": [
    "status_chilled",
    "status_frozen",
@@ -278,7 +278,7 @@
   "term": "Mocked",
   "category": "statuses",
   "short": "Must attack the taunter.",
-  "long": "A mocked enemy can only aim its attacks at whoever taunted it - the Warden's Mocking Blow and the bear's Guardian's Roar both force the fight onto the party's sturdiest shoulders.",
+  "long": "A mocked enemy can only aim its attacks at whoever taunted it - the Warden's Mocking Blow and the bear's Guardian's Roar both force the fight onto the sturdiest ally on the field.",
   "see_also": []
  },
  {
@@ -307,7 +307,7 @@
   "term": "Hexed",
   "category": "statuses",
   "short": "-15% damage dealt, for the rest of the battle.",
-  "long": "A hexed unit deals 15% less damage with everything, and it never fades - the hex lasts as long as the battle does. It is the Cursed Visage's whole payload: one item, no turn spent, every living enemy hexed at once. That reach is why the number is small where Cripple's is large; permanent and universal is worth far more than deep and brief, and the two stack when both land. Hexed is a debuff, so a Survivalist's Trapper counts it and a mender's Cleansing Rite could take it off an enemy - but a Mage's Dispel never can, which is what keeps the party's own hundred gold of work from being stripped back off by their own spell.",
+  "long": "A hexed unit deals 15% less damage with everything, and it never fades - the hex lasts as long as the battle does. It is the Cursed Visage's whole payload: one item, no turn spent, every living enemy hexed at once. That reach is why the number is small where Cripple's is large; permanent and universal is worth far more than deep and brief, and the two stack when both land. Hexed is a debuff, so a Survivalist's Trapper counts it and a mender's Cleansing Rite could take it off an enemy - but a Mage's Dispel never can, which is what keeps the heroes' own hundred gold of work from being stripped back off by their own spell.",
   "see_also": [
    "status_cripple",
    "pouch_slots"
@@ -372,7 +372,7 @@
   "term": "Ruin",
   "category": "statuses",
   "short": "Marked 2 per debuff: +2% damage taken per stack; no cap, never clears.",
-  "long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken (5% with Deeper Hex), and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the party is mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten - and the Avatar of Ruin capstone moves that to every fifth.",
+  "long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken (5% with Deeper Hex), and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the heroes are mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten - and the Avatar of Ruin capstone moves that to every fifth.",
   "see_also": [
    "res_ruin",
    "dmg_shadow"
@@ -393,8 +393,8 @@
   "id": "status_umbral_sigil",
   "term": "Umbral Sigil",
   "category": "statuses",
-  "short": "Branded: half its damage taken echoes to its whole party.",
-  "long": "A branded unit becomes a conduit: half of all attack damage it takes echoes out to every member of its party. Focus fire on the sigil and the whole warband pays.",
+  "short": "Branded: half its damage taken echoes to its whole warband.",
+  "long": "A branded unit becomes a conduit: half of all attack damage it takes echoes out to every member of its warband. Focus fire on the sigil and the whole warband pays.",
   "see_also": [
    "dmg_shadow"
   ]
@@ -563,7 +563,7 @@
   "term": "Mana",
   "category": "resources",
   "short": "The casters' pool: regenerates slowly, restored by potions and victories.",
-  "long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that), and potions and victory relics refill it between fights. Unlike Rage it carries over between battles - a drained Cleric stays drained until the party recovers.",
+  "long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that), and potions and victory relics refill it between fights. Unlike Rage it carries over between battles - a drained Cleric stays drained until the heroes recover.",
   "see_also": [
    "res_rage",
    "node_types"
@@ -585,7 +585,7 @@
   "term": "Mercy",
   "category": "resources",
   "short": "The Holy cleric's stacks, earned when allies fall into danger.",
-  "long": "Whenever any party member drops below half health, the Holy cleric gains a stack of Mercy (cap 5). Each held stack adds +5% to all healing done, and stacks are the fuel for Empowering casts. Mercy rewards the healer who waits for the moment of need.",
+  "long": "Whenever any hero drops below half health, the Holy cleric gains a stack of Mercy (cap 5). Each held stack adds +5% to all healing done, and stacks are the fuel for Empowering casts. Mercy rewards the healer who waits for the moment of need.",
   "see_also": [
    "mercy_window",
    "res_empower"
@@ -596,7 +596,7 @@
   "term": "The Mercy Window",
   "category": "resources",
   "short": "Mercy is paid for CROSSING below half health, once - and at the cap the stack is simply lost.",
-  "long": "Mercy has two edges and both are easy to meet without ever being told about them. THE FIRST IS THAT IT PAYS FOR A CROSSING, NOT FOR A STATE: an ally earns the Holy cleric a stack at the moment they fall below half of their maximum health, and never again while they stay there. A party already bloodied is a party paying her nothing. GUARDIAN ANGEL WIDENS THAT WINDOW - the line moves up from 50% toward 65%, so allies cross it sooner and cross it more often. THE SECOND EDGE IS THE CAP: she holds at most 5 (MARTYR'S VIGOR raises the ceiling), and a stack earned while she is full is thrown away entirely. Two things catch it - the GRACE talent turns the wasted stack into healing for the ally who earned it, and the drafted ALMS turns it into a ward on the same ally - and they stack, because one pays health a full bar discards and the other pays a barrier a full bar keeps. The drafted DIVINE PRESENCE answers the first edge from the other side: it pays her 2 Mercy on every second turn of hers on which nobody crossed at all, which is exactly the turn the passive leaves her empty - and two stacks arriving together can cross the cap from below, which is what hands the spare one to Alms. The drafted VESPERS is the one card that refuses a crossing outright: it absorbs the blow that would take an ally below the line, and a crossing that never happens earns her nothing.",
+  "long": "Mercy has two edges and both are easy to meet without ever being told about them. THE FIRST IS THAT IT PAYS FOR A CROSSING, NOT FOR A STATE: an ally earns the Holy cleric a stack at the moment they fall below half of their maximum health, and never again while they stay there. Heroes already bloodied are heroes paying her nothing. GUARDIAN ANGEL WIDENS THAT WINDOW - the line moves up from 50% toward 65%, so allies cross it sooner and cross it more often. THE SECOND EDGE IS THE CAP: she holds at most 5 (MARTYR'S VIGOR raises the ceiling), and a stack earned while she is full is thrown away entirely. Two things catch it - the GRACE talent turns the wasted stack into healing for the ally who earned it, and the drafted ALMS turns it into a ward on the same ally - and they stack, because one pays health a full bar discards and the other pays a barrier a full bar keeps. The drafted DIVINE PRESENCE answers the first edge from the other side: it pays her 2 Mercy on every second turn of hers on which nobody crossed at all, which is exactly the turn the passive leaves her empty - and two stacks arriving together can cross the cap from below, which is what hands the spare one to Alms. The drafted VESPERS is the one card that refuses a crossing outright: it absorbs the blow that would take an ally below the line, and a crossing that never happens earns her nothing.",
   "see_also": [
    "res_mercy",
    "res_empower"
@@ -640,7 +640,7 @@
   "term": "Pack Bond",
   "category": "combat",
   "short": "The Beastmaster's passive: each active companion grants its own boon.",
-  "long": "Every companion the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts the whole party's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE COMPANION; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent companion's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one companion, arriving deep, growing twice as fast.",
+  "long": "Every companion the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts every hero's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE COMPANION; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent companion's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one companion, arriving deep, growing twice as fast.",
   "see_also": [
    "res_loyalty"
   ]
@@ -662,7 +662,7 @@
   "term": "Enemy Intent",
   "category": "combat",
   "short": "Every enemy shows what it is about to do, and it can be denied.",
-  "long": "Each enemy picks its next action the moment its turn ends - and every enemy picks once before the first turn of a fight - then shows that choice until it acts. The icon appears twice: under the enemy's portrait in the turn bar (on its next turn's slot only) and on its nameplate, where it is written out. Seven categories: Strike (single-target damage), Sweep (an attack that hits the whole party or several of it), Crush (more Break damage than health damage), Afflict (applies a status, and the status is named), Bolster (buffs, wards or cleanses its own side), Mend (heals) and Wind-up (a charged blow landing on a later turn, with the turns remaining).\n\nNO DAMAGE NUMBER IS SHOWN, deliberately. The only honest preview would be one produced by the same code the real hit runs, and that code cannot be run twice for the same answer - it rolls damage variance and a critical on the way through. A number worked out a second way would drift from the ability it claims to describe, so the category and the ability's own name are shown instead.\n\nA DECLARED ACTION CAN BE DENIED, and that is the point. Stun, Freeze, Break or hold the enemy and the announced action is DISCARDED - not saved for later, exactly as cancelling a wind-up has always worked. Hysteria, Bewitch and Psychosis take the turn the same way. Two softer cases: kill the target it named and it re-targets WITH THE SAME ABILITY (the plan holds, only the victim changes); leave it unable to pay for the ability and it falls back to its basic attack, and the combat log says so rather than substituting in silence.",
+  "long": "Each enemy picks its next action the moment its turn ends - and every enemy picks once before the first turn of a fight - then shows that choice until it acts. The icon appears twice: under the enemy's portrait in the turn bar (on its next turn's slot only) and on its nameplate, where it is written out. Seven categories: Strike (single-target damage), Sweep (an attack that hits every ally or several of them), Crush (more Break damage than health damage), Afflict (applies a status, and the status is named), Bolster (buffs, wards or cleanses its own side), Mend (heals) and Wind-up (a charged blow landing on a later turn, with the turns remaining).\n\nNO DAMAGE NUMBER IS SHOWN, deliberately. The only honest preview would be one produced by the same code the real hit runs, and that code cannot be run twice for the same answer - it rolls damage variance and a critical on the way through. A number worked out a second way would drift from the ability it claims to describe, so the category and the ability's own name are shown instead.\n\nA DECLARED ACTION CAN BE DENIED, and that is the point. Stun, Freeze, Break or hold the enemy and the announced action is DISCARDED - not saved for later, exactly as cancelling a wind-up has always worked. Hysteria, Bewitch and Psychosis take the turn the same way. Two softer cases: kill the target it named and it re-targets WITH THE SAME ABILITY (the plan holds, only the victim changes); leave it unable to pay for the ability and it falls back to its basic attack, and the combat log says so rather than substituting in silence.",
   "see_also": [
    "pressure_break",
    "initiative"
@@ -715,7 +715,7 @@
   "term": "Talent Points",
   "category": "progression",
   "short": "Earned per spec, per zone boss, and banked forever. A run pays none.",
-  "long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER SPEC PER ZONE BOSS DEFEATED - three zone bosses, so 3 a spec for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the specs that were in the party earn. Points are per spec and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
+  "long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER SPEC PER ZONE BOSS DEFEATED - three zone bosses, so 3 a spec for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the specs among your heroes earn. Points are per spec and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
   "see_also": [
    "talent_cost",
    "elites"
@@ -726,7 +726,7 @@
   "term": "Boss Trophies",
   "category": "progression",
   "short": "Each zone boss grants every hero a new ability from their spec pool.",
-  "long": "Felling a zone boss lets EVERY hero claim a trophy: one new ability, offered as a pick from their own spec's pool on the Party screen. All twelve specs carry a pool (one to five abilities deep). The end boss instead leaves a relic and gold - the run's final prize.",
+  "long": "Felling a zone boss lets EVERY hero claim a trophy: one new ability, offered as a pick from their own spec's pool on that hero's sheet. All twelve specs carry a pool (one to five abilities deep). The end boss instead leaves a relic and gold - the run's final prize.",
   "see_also": [
    "talent_points",
    "relics_vs_runes",
@@ -738,7 +738,7 @@
   "term": "Ability Upgrades",
   "category": "progression",
   "short": "Every mini-boss hands each hero one; the blacksmith sells more.",
-  "long": "Clearing a MINI-BOSS awards every hero an ability upgrade - a pick of three, resolved on that hero's map card. An upgrade is a permanent change to ONE ability the hero already owns, and it lasts the rest of the run. There are eight: HONED (+50% damage), QUICKENED (-2 turns of cooldown, minimum 0), EFFORTLESS (costs no Rage / Mana / Focus - Mercy is unaffected), SWIFT (arrives 25% sooner, never below 0.5 initiative - half the setup cap), WEIGHTED (Break damage doubled), WIDENED (one more target, or one more hit), PIERCING (ignores half the target's armor) and CERTAIN (its status application always lands). Three mini-bosses a run means three upgrades per hero, twelve across the party - and the BLACKSMITH sells more on top of that, for gold. Upgrades STACK on a single ability - one ability can end a run Honed and Swift at once - but the SAME upgrade never comes twice to the same hero from a mini-boss. (The blacksmith is not that pool: it will sell you a second Honed for a different ability, and buying one never uses up a mini-boss pick.) They apply LAST, after talents and after equipped runes, so an upgrade always wins over a talent that sets the same field. You are only ever offered an upgrade that has something to change: Honed is never offered on a heal, Effortless never on a free ability, Weighted never on something that deals no Break damage, Widened never on a single-target attack (nor on an area attack, which already hits everything), Certain never on a status that already always lands, and Swift never on an ability already sitting at the 0.5 initiative floor. Because three are drawn from eight, any one upgrade turns up about half as often as it used to - a hero can finish a run having never been offered the one their build wanted, which is the variety working rather than a fault. An upgraded ability wears a gold diamond on its button in battle and on its chip on the hero sheet; hovering it names the upgrades.",
+  "long": "Clearing a MINI-BOSS awards every hero an ability upgrade - a pick of three, resolved on that hero's map card. An upgrade is a permanent change to ONE ability the hero already owns, and it lasts the rest of the run. There are eight: HONED (+50% damage), QUICKENED (-2 turns of cooldown, minimum 0), EFFORTLESS (costs no Rage / Mana / Focus - Mercy is unaffected), SWIFT (arrives 25% sooner, never below 0.5 initiative - half the setup cap), WEIGHTED (Break damage doubled), WIDENED (one more target, or one more hit), PIERCING (ignores half the target's armor) and CERTAIN (its status application always lands). Three mini-bosses a run means three upgrades per hero, twelve across the four - and the BLACKSMITH sells more on top of that, for gold. Upgrades STACK on a single ability - one ability can end a run Honed and Swift at once - but the SAME upgrade never comes twice to the same hero from a mini-boss. (The blacksmith is not that pool: it will sell you a second Honed for a different ability, and buying one never uses up a mini-boss pick.) They apply LAST, after talents and after equipped runes, so an upgrade always wins over a talent that sets the same field. You are only ever offered an upgrade that has something to change: Honed is never offered on a heal, Effortless never on a free ability, Weighted never on something that deals no Break damage, Widened never on a single-target attack (nor on an area attack, which already hits everything), Certain never on a status that already always lands, and Swift never on an ability already sitting at the 0.5 initiative floor. Because three are drawn from eight, any one upgrade turns up about half as often as it used to - a hero can finish a run having never been offered the one their build wanted, which is the variety working rather than a fault. An upgraded ability wears a gold diamond on its button in battle and on its chip on the hero sheet; hovering it names the upgrades.",
   "see_also": [
    "boss_trophies",
    "talent_points",
@@ -750,8 +750,8 @@
   "id": "node_scaling",
   "term": "Node Scaling",
   "category": "progression",
-  "short": "Every combat win makes the party permanently stronger this run.",
-  "long": "Each battle won grants every hero +2% of their base Attack and HP for the rest of the run. Enemies climb their own ladder - roughly +2% Attack and +2.5% HP per slot, with a hard jump between zones - so the party and the map rise together, and every slot fought feeds the curve. A route that takes more fights arrives stronger; a route that takes fewer arrives sooner.",
+  "short": "Every combat win makes every hero permanently stronger this run.",
+  "long": "Each battle won grants every hero +2% of their base Attack and HP for the rest of the run. Enemies climb their own ladder - roughly +2% Attack and +2.5% HP per slot, with a hard jump between zones - so the heroes and the map rise together, and every slot fought feeds the curve. A route that takes more fights arrives stronger; a route that takes fewer arrives sooner.",
   "see_also": [
    "zones_tiers",
    "elites"
@@ -783,7 +783,7 @@
   "term": "Relics vs Runes",
   "category": "gear",
   "short": "Relics outlive the run; runes die with it.",
-  "long": "The two are easy to confuse and could not be more different. RELICS are permanent: every zone boss you fell unlocks one FOREVER, and at the draft you choose up to 3 unlocked relics to carry - party-wide effects for the whole run. RUNES are of the run: bought and found along the way, worn by one hero, and gone the moment the run ends - by death or by victory. When you wipe, the relic you unlocked stays; the runes you were wearing do not.",
+  "long": "The two are easy to confuse and could not be more different. RELICS are permanent: every zone boss you fell unlocks one FOREVER, and at the draft you choose up to 3 unlocked relics to carry - effects that pay every hero, for the whole run. RUNES are of the run: bought and found along the way, worn by one hero, and gone the moment the run ends - by death or by victory. When you wipe, the relic you unlocked stays; the runes you were wearing do not.",
   "see_also": [
    "runes",
    "wipe"
@@ -793,8 +793,8 @@
   "id": "consumables",
   "term": "Consumables",
   "category": "gear",
-  "short": "The party's shared satchel, used in battle.",
-  "long": "Five items, shared by the whole party and used in battle (press ALT or use the Items action): Health Potion (40 HP), Mana Potion (40 Mana or Rage), Bomb (50 damage to all enemies), Revive Potion (raise a fallen ally at 50% HP), and Defense Potion (+10% armor to the party, 3 turns). Loot nodes, shops, and elite spoils refill the satchel.",
+  "short": "The heroes' shared satchel, used in battle.",
+  "long": "Five items, shared by all four heroes and used in battle (press ALT or use the Items action): Health Potion (40 HP), Mana Potion (40 Mana or Rage), Bomb (50 damage to all enemies), Revive Potion (raise a fallen ally at 50% HP), and Defense Potion (+10% armor to every hero, 3 turns). Loot nodes, shops, and elite spoils refill the satchel.",
   "see_also": [
    "fallen",
    "node_types"
@@ -805,7 +805,7 @@
   "term": "Zones & Tiers",
   "category": "run",
   "short": "Three zones, each a generated 16-slot map to its boss.",
-  "long": "A run is three zones and 48 encounters. Each zone is a GENERATED MAP, not a road: 16 slots deep and three rows wide, branching from slot 1 to slot 7, converging on the MINI-BOSS at slot 8, branching again to slot 15, and converging on the ZONE BOSS at slot 16. You walk one node per column - 14 free encounters plus the two that everything funnels into. Enemies grow with every slot and take a hard step up each zone; killing a boss fully restores the party and sends you into the next zone. The third boss ends the run in victory.",
+  "long": "A run is three zones and 48 encounters. Each zone is a GENERATED MAP, not a road: 16 slots deep and three rows wide, branching from slot 1 to slot 7, converging on the MINI-BOSS at slot 8, branching again to slot 15, and converging on the ZONE BOSS at slot 16. You walk one node per column - 14 free encounters plus the two that everything funnels into. Enemies grow with every slot and take a hard step up each zone; killing a boss fully restores the heroes and sends you into the next zone. The third boss ends the run in victory.",
   "see_also": [
    "node_types",
    "node_scaling",
@@ -869,7 +869,7 @@
   "term": "The Bargain",
   "category": "run",
   "short": "Three offers before every elite and mini-boss: a modifier plus a reward.",
-  "long": "Before every ELITE and every MINI-BOSS - one to four a zone now that elites are routed to rather than fixed, and never before a plain fight or a boss - the road stops and offers three bargains. Each is one MODIFIER plus one REWARD, both shown before you choose. There is no decline: one of the three is taken. The modifier is the price and binds the coming battle only; the reward pays ON VICTORY, which is why 'a merchant follows the fight' is a reward you have to earn rather than a shop you walk into. Lose the fight and you paid the price for nothing. The offer screen shows the warband you are about to face and your party's health alongside the three cards, because choosing a severity-4 bargain at 30% health should be a decision, not a surprise.",
+  "long": "Before every ELITE and every MINI-BOSS - one to four a zone now that elites are routed to rather than fixed, and never before a plain fight or a boss - the road stops and offers three bargains. Each is one MODIFIER plus one REWARD, both shown before you choose. There is no decline: one of the three is taken. The modifier is the price and binds the coming battle only; the reward pays ON VICTORY, which is why 'a merchant follows the fight' is a reward you have to earn rather than a shop you walk into. Lose the fight and you paid the price for nothing. The offer screen shows the warband you are about to face and your heroes' health alongside the three cards, because choosing a severity-4 bargain at 30% health should be a decision, not a surprise.",
   "see_also": [
    "modifier",
    "severity",
@@ -892,7 +892,7 @@
   "term": "Severity",
   "category": "run",
   "short": "1-4: how harsh a modifier is, and the only thing the reward reads.",
-  "long": "Every modifier carries a severity of 1 to 4, shown as pips on its bargain card. The REWARD TABLE READS SEVERITY AND NOTHING ELSE: a 1 pays 40 gold, a 2 pays 80 gold or a potion, a 3 pays 140 gold or a rune, a 4 pays 220 gold, a rune, or a merchant after the fight. Severity is FLAT and deliberately ignores your party: a modifier that happens to be cheap for your build is a good deal you earned by building that way, and a severity that read the party would quietly tax every build for being good at something. EVERY OFFER HOLDS AT LEAST ONE OPTION OF SEVERITY 1 OR 2, guaranteed by how the cards are dealt rather than by luck, so a party on its last legs always has a survivable choice - and the other two cards are always 3s and 4s, so every bargain reads the same way: one safe option, two gambles.",
+  "long": "Every modifier carries a severity of 1 to 4, shown as pips on its bargain card. The REWARD TABLE READS SEVERITY AND NOTHING ELSE: a 1 pays 40 gold, a 2 pays 80 gold or a potion, a 3 pays 140 gold or a rune, a 4 pays 220 gold, a rune, or a merchant after the fight. Severity is FLAT and deliberately ignores your heroes: a modifier that happens to be cheap for your build is a good deal you earned by building that way, and a severity that read your heroes would quietly tax every build for being good at something. EVERY OFFER HOLDS AT LEAST ONE OPTION OF SEVERITY 1 OR 2, guaranteed by how the cards are dealt rather than by luck, so heroes on their last legs always have a survivable choice - and the other two cards are always 3s and 4s, so every bargain reads the same way: one safe option, two gambles.",
   "see_also": [
    "bargain",
    "modifier"
@@ -914,7 +914,7 @@
   "term": "The Wipe",
   "category": "run",
   "short": "All four down ends the run - relics and the chronicle survive.",
-  "long": "When the whole party falls, the run is over: gold, talents, runes, items, and the map are all lost. Two things survive every death - the RELICS you have unlocked (yours forever, pickable at the next draft) and the chronicle of cycles survived and lost. The run summary lays out how the attempt ended and what the party had built; the next climb starts wiser.",
+  "long": "When every hero falls, the run is over: gold, talents, runes, items, and the map are all lost. Two things survive every death - the RELICS you have unlocked (yours forever, pickable at the next draft) and the chronicle of cycles survived and lost. The run summary lays out how the attempt ended and what the heroes had built; the next climb starts wiser.",
   "see_also": [
    "relics_vs_runes",
    "fallen"
@@ -959,7 +959,7 @@
   "term": "The Difficulty Ladder",
   "category": "run",
   "short": "Three rungs, chosen at the draft. Each above the first adds a named twist.",
-  "long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so an untalented party can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every spec at once.",
+  "long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so untalented heroes can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every spec at once.",
   "see_also": [
    "talent_rows",
    "end_boss",
@@ -984,7 +984,7 @@
   "term": "Pouch Slots",
   "category": "run",
   "short": "The pouch holds a limited number of item KINDS: 4, then 5, then 6.",
-  "long": "A slot holds one item TYPE and its whole stack - six Health Potions are one slot, not six. The party opens with four slots and four kinds, and a slot is added on clearing each zone boss, to five and then six. Because items cost no turn, the shop used to ask only whether you could afford a thing; the slot cap turns that into what you make room for. A stack running to zero does NOT free its slot - only discarding it from the pouch, or selling it back at a merchant for a fraction of its price, releases one. A drop with nowhere to go is not refused: it is offered, and you choose what to give up or walk away. A stack that is simply FULL is still refused outright, which is a different thing. The three items added alongside the slots are battle-only and shop-priced against it: the Cleansing Draught (35g, stacks to 4) strips every debuff from one hero and is the answer a party without a Cleric never had; the Cursed Visage (100g, stacks to 2) hexes every living enemy for the whole fight; the Resonating Hourglass (90g, stacks to 2) pulls any living hero to the front of the queue. The last two never drop - shop-only, so what they cost is what they are worth.",
+  "long": "A slot holds one item TYPE and its whole stack - six Health Potions are one slot, not six. The heroes open with four slots and four kinds, and a slot is added on clearing each zone boss, to five and then six. Because items cost no turn, the shop used to ask only whether you could afford a thing; the slot cap turns that into what you make room for. A stack running to zero does NOT free its slot - only discarding it from the pouch, or selling it back at a merchant for a fraction of its price, releases one. A drop with nowhere to go is not refused: it is offered, and you choose what to give up or walk away. A stack that is simply FULL is still refused outright, which is a different thing. The three items added alongside the slots are battle-only and shop-priced against it: the Cleansing Draught (35g, stacks to 4) strips every debuff from one hero and is the answer heroes without a Cleric never had; the Cursed Visage (100g, stacks to 2) hexes every living enemy for the whole fight; the Resonating Hourglass (90g, stacks to 2) pulls any living hero to the front of the queue. The last two never drop - shop-only, so what they cost is what they are worth.",
   "see_also": [
    "merchant",
    "elites"
@@ -1054,7 +1054,7 @@
   "term": "Blood Frenzy's floor",
   "category": "combat",
   "short": "The Berserker keeps HALF the biggest Frenzy bonus he reaches, even after he is healed back up.",
-  "long": "Blood Frenzy pays the Berserker +2% damage for every 5% of maximum health he is MISSING, so his power rises as he falls - AND +2% for every 5 Rage he has SPENT this battle, which is the half of it he controls. Five Rage is 5% of a full Rage bar, so both terms pay at the same rate off their own bar. The two are ADDED and then capped at twenty steps, which is exactly where the missing-health term already topped out: spending Rage fills the band SOONER, never deeper, so a Berserker already at death's door gains nothing from it and one who is untouched is no longer stuck at zero. Rage spent counts what actually left the bar, so a card that hands some back is worth only the difference and a waived cost is worth nothing. The floor is the half of it people miss: the highest bonus he reaches in a battle leaves a permanent mark worth HALF of it, and his live bonus never drops below that mark for the rest of the fight. Heal him to full and he keeps the floor. It is why diving early is worth something even if the party pulls him straight back out, and it resets with each new battle. THREE THINGS CHANGE IT. Scar Tissue (talent) makes the floor keep 85% of the peak instead of half - or all of it alongside Unstoppable. UNSLAKED (draft card) makes it keep the FULL bonus for a few turns, so the play is to cast it and then dive. BOIL OVER (draft card) spends the live bonus as damage and then leaves him receiving ONLY the floor for two turns - the floor itself is untouched, which is exactly why a deep one makes that recovery cost almost nothing.",
+  "long": "Blood Frenzy pays the Berserker +2% damage for every 5% of maximum health he is MISSING, so his power rises as he falls - AND +2% for every 5 Rage he has SPENT this battle, which is the half of it he controls. Five Rage is 5% of a full Rage bar, so both terms pay at the same rate off their own bar. The two are ADDED and then capped at twenty steps, which is exactly where the missing-health term already topped out: spending Rage fills the band SOONER, never deeper, so a Berserker already at death's door gains nothing from it and one who is untouched is no longer stuck at zero. Rage spent counts what actually left the bar, so a card that hands some back is worth only the difference and a waived cost is worth nothing. The floor is the half of it people miss: the highest bonus he reaches in a battle leaves a permanent mark worth HALF of it, and his live bonus never drops below that mark for the rest of the fight. Heal him to full and he keeps the floor. It is why diving early is worth something even if the heroes pull him straight back out, and it resets with each new battle. THREE THINGS CHANGE IT. Scar Tissue (talent) makes the floor keep 85% of the peak instead of half - or all of it alongside Unstoppable. UNSLAKED (draft card) makes it keep the FULL bonus for a few turns, so the play is to cast it and then dive. BOIL OVER (draft card) spends the live bonus as damage and then leaves him receiving ONLY the floor for two turns - the floor itself is untouched, which is exactly why a deep one makes that recovery cost almost nothing.",
   "see_also": [
    "stance",
    "protected_core"
@@ -1065,7 +1065,7 @@
   "term": "Heavy Plating's climb",
   "category": "combat",
   "short": "The Warden's Block chance rises with every hit that gets through - and a successful Block throws all of it away.",
-  "long": "Heavy Plating gives the Warden a flat 15% Block chance, and adds another 8% every time an attack gets THROUGH him (Plate Discipline steepens that to 20% a hit), up to +40%. It is bad-luck protection: the longer he goes without blocking, the likelier the next block becomes. THE CATCH IS THAT BLOCKING RESETS THE CLIMB TO ZERO, which is what makes his defence a sawtooth rather than a ramp - and several of his talents (Tenacity's +15 maximum health, Rally's party-wide healing bonus) only fire on a Heavy Plating block, so he wants the blocks and pays for them. THREE DRAFT CARDS ANSWER THE RESET AND TWO OF THEM CANNOT BE USED TOGETHER. ANVIL stops Blocking resetting the climb at all, so it reaches its ceiling and stays there. RECOMPENSE is paid BY the reset instead, returning Rage equal to the percentage points it took. Holding both means the second is paid nothing while the first is up - they are two answers to the same problem rather than a stack. TURN THE BLADE ignores the reset entirely and makes each Block deal Break damage back to the attacker.",
+  "long": "Heavy Plating gives the Warden a flat 15% Block chance, and adds another 8% every time an attack gets THROUGH him (Plate Discipline steepens that to 20% a hit), up to +40%. It is bad-luck protection: the longer he goes without blocking, the likelier the next block becomes. THE CATCH IS THAT BLOCKING RESETS THE CLIMB TO ZERO, which is what makes his defence a sawtooth rather than a ramp - and several of his talents (Tenacity's +15 maximum health, Rally's healing bonus to every ally) only fire on a Heavy Plating block, so he wants the blocks and pays for them. THREE DRAFT CARDS ANSWER THE RESET AND TWO OF THEM CANNOT BE USED TOGETHER. ANVIL stops Blocking resetting the climb at all, so it reaches its ceiling and stays there. RECOMPENSE is paid BY the reset instead, returning Rage equal to the percentage points it took. Holding both means the second is paid nothing while the first is up - they are two answers to the same problem rather than a stack. TURN THE BLADE ignores the reset entirely and makes each Block deal Break damage back to the attacker.",
   "see_also": [
    "pressure_break",
    "res_rage",

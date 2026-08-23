@@ -117,7 +117,7 @@
                 "outcome": "The stone drinks. Something old and approving looks back."
             },
             {
-                "label": "Open every vein (party -30% health, +10% Attack each)",
+                "label": "Open every vein (every hero -30% health, +10% Attack each)",
                 "effects": [
                     {
                         "effect": "damage_pct",
@@ -146,7 +146,7 @@
         "weight": 8,
         "choices": [
             {
-                "label": "Take it (+80 gold, party -10% max health)",
+                "label": "Take it (+80 gold, every hero -10% max health)",
                 "effects": [
                     {
                         "effect": "gold",
@@ -161,7 +161,7 @@
                 "outcome": "The grin widens a fraction. Surely a trick of the light."
             },
             {
-                "label": "Take the whole hoard (+200 gold, party -20% max health)",
+                "label": "Take the whole hoard (+200 gold, every hero -20% max health)",
                 "effects": [
                     {
                         "effect": "gold",
@@ -244,7 +244,7 @@
                 "outcome": "The heat taxes you sorely \u2014 but the strongbox was real."
             },
             {
-                "label": "Run it down (party -25% health, +190 gold)",
+                "label": "Run it down (every hero -25% health, +190 gold)",
                 "effects": [
                     {
                         "effect": "damage_pct",
@@ -438,7 +438,7 @@
                 "outcome": "By dusk one of you moves differently. Sharper. Older."
             },
             {
-                "label": "Pay 150 gold and drill the whole party",
+                "label": "Pay 150 gold and drill every hero",
                 "requires": {
                     "min_gold": 150
                 },

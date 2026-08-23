@@ -455,8 +455,8 @@ brief — `wd_hold_line` (the undying window, 1/2→2/3). The Tempo chip's legen
 moved with them. **The one place the old reading was written down as a rule was
 `battle.gd`'s `hold_the_line` comment**; it now records the ruling instead.
 
-## HERO AND ALLY ARE NOT SYNONYMS (STANDING, SET AT BATCH CV §4)
-> **HERO — the four party members. ALLY — heroes and companions together.**
+## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DL §2)
+> **HERO — one of the four. ALLY — heroes and companions together. AND THERE IS NO THIRD WORD.**
 
 **CORRECTED AT DJ §1 — THE BEAST DOES NOT STAND IN `heroes`.** This block said it did, and so did
 DH's Harvest comment; `heroes.append` is reached at exactly one site (the party spawn) and a
@@ -518,6 +518,60 @@ filter or no filter**;
 `_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally"; and a
 per-TURN effect can never reach one either, because `_next_unit()` walks `heroes + enemies` and a
 companion takes no turns.
+
+## STANDING RULE — "PARTY" IS RETIRED FROM PLAYER-FACING TEXT (Batch DL §2)
+> **The word "party" must not appear in any player-facing string. Every use becomes *hero* or
+> *ally*, decided by its READ SITE — and where the group is the ENEMY side, *warband*.**
+
+**IT READS AS EITHER, AND THAT IS NOT A STYLE COMPLAINT.** Rallying Shout's Pressure clause said
+*"the whole party sheds 30 Pressure"* and paid four for the life of the project. **DJ §2 swept
+every ally-worded text and DK §2 ruled on eleven of them, and NEITHER SWEEP COULD SEE IT**, because
+both were sweeping for the word *ally* and this clause carried neither of the two words. **A word
+that means either is a word no sweep can check.**
+
+- **THE READ SITE'S COLLECTION IS THE TEST, not the sentence's rhythm.** `_hero_side()` includes
+  companions, so an effect reaching through it says *ally*. **A walk over bare `heroes` says
+  *hero*, with or without an `is_companion` clause** — all 23 of those filter an array that never
+  holds one.
+- **THREE FURTHER EXCLUSIONS MEAN *hero* HOWEVER THE COLLECTION IS SPELLED:** an effect stamped
+  once where the four are built (no companion exists yet); a per-turn effect (`_next_unit()` walks
+  `heroes + enemies`, so a companion never takes a turn); and anything Faith-flavoured
+  (`_gain_faith` refuses companions outright).
+- **A CLAUSE WHOSE PAYLOAD A COMPANION STRUCTURALLY CANNOT RECEIVE SAYS *hero*, AND THE REASON IS
+  RECORDED BESIDE IT** — "no resource bar", "reads no Empower via `_companion_hit`". A word without
+  its reason gets re-litigated.
+- **THE SURVIVING USES ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the `party`
+  event target, `spec_in_party` (an event condition), and `party.tscn`. Nothing else.
+- **PROSE ABOUT THE GAME IS NOT PLAYER-FACING.** This file, `docs/changelog.html`,
+  `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
+- **THE RULE IS KEPT BY A CHECK, IN THE PLACE THE LAST ONE WENT.** `test_batch_bx` §4 already
+  forbids "beast" in player-facing prose and caught seven uses in DK before the battery; DL §2 adds
+  the same sweep for "party", over the same file set. **It was shown to bite before it was
+  trusted** — a "party" planted in a live description reds it.
+
+## STANDING RULE — THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE, NOT THE ABILITY (Batch DL §1)
+> **Read a card clause by clause. Two clauses under one word can have two different answers, and
+> the one that carries neither word is the one no sweep will find.**
+
+**RALLYING SHOUT IS THE WORKED EXAMPLE AND IT COST TWO SWEEPS.** One card, one sentence, two
+clauses: *"the whole party sheds 30 Pressure, and every other ally regains 30% of their
+resource."* The resource half is a hero's — a companion has no bar. **The Pressure half is an
+ally's — a companion HAS a Break meter**, on the very axis DK had already widened Hold the Line
+along. DJ §2 and DK §2 both looked at the ABILITY, found the ally-worded half, ruled on it, and
+left the other half standing.
+- **THE CARD NOW CARRIES BOTH WORDS IN ONE SENTENCE**, and the source carries the reason for each
+  beside its own loop. **The two clauses are two loops** — the Pressure walk and the resource walk
+  are separate, so each site's collection is visible where it is read rather than being a filter
+  hung off a shared one.
+- **MEASURED, NOT ASSERTED (the DK §1 rule applied):** on a live summoned Ursus, the beast shed
+  **0** Pressure before and **30** after, against a hero's 30 either way. `check_dl` §2 re-measures
+  it every run, with the union broken as its control.
+- **`resource_name == ""` IS THE RULING AT THE RESOURCE SITE, NOT DECORATION ON IT.** DK recorded
+  the reason as *"a companion is built with no `resource_name` and `max_resource` 0"*. **The second
+  half was false** — `max_resource` is `unit.gd`'s default **100** on a companion, never overridden
+  at the summon. Rallying Shout's resource loop was the one of the three that carried no guard, so
+  a careless widening of it would have paid a beast 30 points of a bar that does not exist. **The
+  guard is what makes the recorded reason true at the site.**
 
 ## A SUITE MUST NOT PIN THE SAVE VERSION LITERAL (STANDING — BK §6's RULE, RE-LEARNED AT CT)
 **Three batches have now broken a sibling suite by bumping the save version.** BL's recap ledgers
@@ -2432,7 +2486,8 @@ moved one of them, which is this block's neighbouring rule met in the wild.
 · **DJ SWEPT ELEVEN AND RULED ON NONE; DK RULED ON ALL ELEVEN AND THEY SPLIT FOUR AND SEVEN.**
   **FOUR had their CODE corrected** and now read `_hero_side()` — Rally, Hold the Line, Sanctuary,
   Field Medic. **SEVEN had their TEXT corrected to "hero"** — Rallying Cry, War Stomp and Rallying
-  Shout (a beast has no resource bar), Devoutness and Last Hope (stamped at party spawn, before a
+  Shout's RESOURCE clause (a beast has no resource bar — **its Pressure clause is a separate
+  ruling and DL §1 widened it**), Devoutness and Last Hope (stamped at party spawn, before a
   beast exists), Cleansing Waters (per-turn, and a companion takes none) and Tank and Spank (the
   chip lands and pays nothing). **The reason is recorded beside each one in the source**, because
   "hero" alone is a decision the next author re-litigates. `check_dk` §1 pins both populations by

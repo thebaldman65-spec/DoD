@@ -224,7 +224,11 @@ func _the_share_is_labelled_for_what_it_is() -> void:
 	ok(src.contains("d+h+p%"), "§1: the column is named for its three terms")
 	ok(not src.contains("st/b  contrib%"),
 		"§1: and `contrib%` no longer heads it")
-	ok(src.contains("It is NOT a share of the party's work"),
+	# BATCH DL §2 — THE NEEDLE MOVED WITH THE STRING. The sim's contribution
+	# table is console output rather than a player-facing surface, but it was
+	# swept anyway so that §2's check needs no exclusion list beyond the
+	# identifiers — "the party's work" reads "the heroes' work" now.
+	ok(src.contains("It is NOT a share of the heroes' work"),
 		"§1: the table says outright what it is not")
 	# One table, three reports — so the label reaches all of them and cannot be
 	# added to one and forgotten in another.

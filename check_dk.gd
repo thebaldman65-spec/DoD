@@ -60,10 +60,22 @@ const NARROW := {
 		"var pals := heroes.filter(func(h): return not h.dead)",
 	"wd_stomp_drill Rallying Cry":
 		"for rc_h in heroes:",
+	# BATCH DL §1 — EXTENDED BY ONE LINE, AND NOT COSMETICALLY. DL gave Rallying
+	# Shout's resource loop the SAME guard War Stomp already carried, so this
+	# fragment stopped being unique: it matched both loops, and either could have
+	# been deleted with this entry still green. Both entries now carry the line
+	# below the guard, which is the one that names the clause.
 	"War Stomp's resource rider":
-		"for h in heroes:\n\t\t\t\tif h.dead or h == attacker or h.resource_name == \"\":",
-	"rally Rallying Shout":
-		"for h in heroes.filter(func(he): return not he.dead):\n\t\t\t\th.pressure = maxi(h.pressure - pressure_cut, 0)",
+		"if h.dead or h == attacker or h.resource_name == \"\":\n\t\t\t\t\tcontinue\n\t\t\t\tvar stomp_gain := maxi(int(h.max_resource * stomp_pct), 1)",
+	# BATCH DL §1 — RE-POINTED AT THE CLAUSE DK ACTUALLY RULED ON. This entry used
+	# to pin the PRESSURE loop, which was the wrong half: DK ruled Rallying Shout
+	# a hero effect for its RESOURCE clause ("a beast has no resource bar"), and
+	# its Pressure clause was a separate question DK explicitly recorded as owed.
+	# DL answered it and the Pressure walk is `_hero_side()` now — pinned in
+	# `check_dl` §1, not here, because two copies of one fact in two gates is DJ
+	# §3's own rule. What DK ruled is the line below, and it has not moved.
+	"rally Rallying Shout (the RESOURCE clause)":
+		"if h.dead or h == attacker or h.resource_name == \"\":\n\t\t\t\t\tcontinue\n\t\t\t\tvar gain := int(h.max_resource * res_pct)",
 	"dv_devoutness Devoutness":
 		"for h in heroes:\n\t\t\t_apply_status(h, \"devotion\", -1, dvn_pct)",
 	"hl_last_hope Last Hope":

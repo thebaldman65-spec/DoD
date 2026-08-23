@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Talent Audit (Batch CU)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-20 (Batch CV &mdash; every finding ruled)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DL &mdash; &sect;4.1 re-ruled at the CLAUSE)</b></p>
 <h1>DAWN OF DECAY — THE TALENT AUDIT</h1>
 
 <div style="border:2px solid #444; padding:8px; margin:8px 0">
@@ -275,11 +275,22 @@ for all of them &mdash; it is <b>per-effect, and the REASON is what got recorded
 ally-worded effects had their code widened to <code>_hero_side()</code> and now genuinely pay a
 beast (Rally, Hold the Line, Sanctuary, the Field Medic). Seven had their text moved to
 <i>hero</i>, and <b>the reasons are three different ones</b>: a beast has no resource bar
-(Rallying Cry, War Stomp, Rallying Shout), the effect is stamped at party spawn before any beast
+(Rallying Cry, War Stomp, Rallying Shout's RESOURCE clause &mdash; see the DL note below), the effect is stamped at party spawn before any beast
 exists (Devoutness, Last Hope), the effect fires per-turn and a companion takes none (Cleansing
 Waters) &mdash; and one that is none of the above, <code>wd_tank_spank</code>, whose
 <code>empower</code> lands on a beast and pays it nothing because a beast's blows resolve on their
-own damage path (measured at ratio 1.0000 over 40 seeded blows). <b>"Hero" alone is a decision the
+own damage path (measured at ratio 1.0000 over 40 seeded blows). <p><b>AND ONE OF DK'S SEVEN WAS HALF A RULING, CORRECTED AT BATCH DL.</b> <b>Rallying Shout
+carries TWO clauses of different shape in one sentence</b> &mdash; it sheds 30 Pressure and it
+refuels 30% of a resource. Only the resource half was ally-worded, so both sweeps found that one
+and neither saw the other, which said "the whole party" and therefore carried <b>neither of the two
+words</b>. <b>A companion HAS a Break meter</b>, so DL widened the Pressure clause to
+<code>_hero_side()</code> &mdash; measured on a live Ursus at <b>0 shed before, 30 after</b>. The
+card carries both words now. <b>THE UNIT OF THE RULING IS THE CLAUSE, NOT THE ABILITY</b>, and
+&sect;3 of <code>docs/reports/DL.md</code> lists six more cards with clauses of two shapes under one
+word &mdash; reported, not ruled. <b>"Party" is retired from player-facing text outright at DL
+&sect;2</b>, which is what makes a sweep like this one possible at all: a word that means either is
+a word no sweep can check.</p>
+<b>"Hero" alone is a decision the
 next author re-litigates; the reason is the thing that stops them.</b> The read-site line numbers
 in the table above are as of CV and several have moved since &mdash; re-derive before quoting
 one.</p>
