@@ -3611,16 +3611,22 @@ static func draft_ability(display_name: String) -> Ability:
 # NUMBERS ARE NEW — the one balance judgment this batch made.
 static func vault_ability(display_name: String) -> Ability:
 	match display_name:
-		# BATCH DK §2 — HERO ON THE RESOURCE CLAUSE ONLY, and the scope of that is
-		# worth stating because this card is not the pure refuel the other two are.
-		# It does TWO things and only the second was ally-worded: the whole party
-		# sheds 30 Pressure, and every OTHER member regains 30% of their resource.
-		# The RESOURCE half is a hero's, for the usual reason — a beast has no bar.
-		# **THE PRESSURE HALF IS A SEPARATE QUESTION AND IS DELIBERATELY NOT
-		# ANSWERED HERE** — a companion HAS a Break meter and can plainly shed it,
-		# so "the whole party" is arguably false today. But "party" is not one of
-		# the ally-worded texts DJ §2 swept, and ruling on it is a new ruling
-		# rather than this batch's. Recorded as owed in `docs/state.md`.
+		# BATCH DM §1 — THE DK COMMENT THAT STOOD HERE DESCRIBED A STATE DL
+		# ENDED, AND IT IS REPLACED RATHER THAN APPENDED TO. It said the Pressure
+		# half was "a separate question ... deliberately not answered here" and
+		# pointed at `docs/state.md` for the owed item. DL §1 answered it: the
+		# Pressure walk reads `_hero_side()` and a beast sheds the 30. **A REASON
+		# RECORDED BESIDE A DECISION IS A GOOD PRACTICE THAT CREATES A NEW PLACE
+		# TO BE WRONG** — DL wrote that sentence about DK's `max_resource` slip
+		# and this is the same file's second instance of it.
+		#
+		# WHAT IS TRUE NOW: the card carries BOTH words in one sentence. Every
+		# ALLY sheds 30 Pressure (a companion has a Break meter); every other
+		# HERO regains 30% of their resource (a companion has no bar —
+		# `resource_name` is "", and `max_resource` is `unit.gd`'s default 100,
+		# never overridden at the summon, so the NAME guard is the only thing
+		# refusing it). Both clauses are pinned by their own read lines in
+		# `check_dl` §1 and measured live in §2 and §4.
 		"Rallying Shout":
 			return Ability.make({"display_name": "Rallying Shout", "cost": 25,
 				"special": "rally", "delay": 2.5, "anim": "attack03", "cooldown": 3,

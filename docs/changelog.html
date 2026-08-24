@@ -14,6 +14,111 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-23 &mdash; Batch DM: THE SIX SPLIT-CLAUSE CARDS, AND THE ALLY/HERO THREAD CLOSES</h2>
+<p><i><b>DL listed six more cards carrying clauses of two different shapes under one word and
+ruled on none of them. DM reads all six clause by clause &mdash; sixteen clauses, fourteen of
+which carry a collection &mdash; and ALL FOURTEEN COLLECTIONS WERE ALREADY CORRECT.</b> The two
+clauses that mis-said were of a <b>third scope this thread had no word for</b>: Battle Shout and
+Hold the Line each hand <b>five Rage to the CASTER</b>, one body, and Battle Shout's card put it
+inside <i>"A roar every hero answers:"</i>. <b>Hold the Line already worded the identical payload
+correctly, so the fix was to copy the sibling card rather than invent a phrasing.</b> Every
+<i>hero</i> ruling on the six now carries its structural reason in the source beside it, and
+<b>DL's own Consecrated Ground correction had left four prose copies behind</b> &mdash; three in
+<code>master.html</code>, one in the glossary &mdash; still saying <i>ally</i> for a clause
+<code>_gain_faith</code> refuses outright. <b>NO GAME CODE MOVED: the diff to
+<code>battle.gd</code> is comments.</b> <b>No save version moves (still v10).</b> One new gate,
+<code>check_dm</code> (92 checks). <b>The ally/hero thread is CLOSED.</b> The full report is
+<code>docs/reports/DM.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; The six, clause by clause</h3>
+<ul>
+<li><b>THE FOURTEEN COLLECTIONS WERE RIGHT AND THAT IS THE BATCH'S PRINCIPAL MEASUREMENT.</b>
+Bulwark of Fortitude 4, Consecrated Ground 3, Divine Wrath 2, Battle Shout 1 group, Hold the Line
+2 group, Sacred Resolve 2 &mdash; each says what its read site walks. <b>A batch that finds
+nothing to widen has still measured something</b>, and this is what lets the thread close rather
+than be abandoned.</li>
+<li><b>BATTLE SHOUT'S RAGE CLAUSE WAS THE ONE REAL DISAGREEMENT, AND IT IS A SCOPE NEITHER WORD
+COVERS.</b> The card read <i>"A roar every hero answers: +12% damage, plus 1% per 20 blood buildup
+on the warband, and 5 Rage."</i> &mdash; the Rage sits in the group clause's colon-list and is paid
+to <b>exactly one unit</b>. It now reads <b><i>"Refunds 5 Rage."</i> as its own sentence</b>, which
+is Hold the Line's existing wording for the identical payload. <b><code>check_co</code> and
+<code>check_cy</code> have both recorded it as "hands the caster +5 Rage" since CO; the card was
+the only surface that disagreed.</b> Measured: one shout, <b>one</b> unit paid, caster <b>+5</b>.</li>
+<li><b>AND CV &sect;1's DURATION RULING HAD REACHED HOLD THE LINE'S NODE TEXT AND NOT ITS CARD.</b>
+CV moved <code>wd_hold_line</code>'s no-death window 1/2 &rarr; 2/3 &mdash; and the
+<code>description</code> <i>inside that node's own payload</i> still said "for a turn" and "for two
+turns" against the <b>2 and 3</b> the code applies. <b>That is <code>cr_rime</code>'s shape
+exactly</b>, the one CU found. Both card lines now state the applied number. <b>No code moved and
+no sweep was opened</b> &mdash; this is CV's ruling reaching the one surface it missed, on a card
+this batch was reading clause by clause anyway.</li>
+<li><b>EVERY <i>hero</i> CLAUSE NOW CARRIES ITS REASON AT ITS SITE.</b> Five reasons and no sixth:
+no resource bar to refuel; <code>_companion_hit</code> reads none of the hero strike loop's
+multiplier block; stamped once where the four are built, before a companion exists; <b>per-turn</b>
+&mdash; <code>_next_unit()</code> walks <code>heroes + enemies</code> and a summon carries
+<code>next_time = INF</code>; and <code>_gain_faith</code> refuses companions outright.</li>
+<li><b>TWO OF THE SIX ARE NARROW BY CHOICE AND SAY SO, RATHER THAN IMPLYING AN IMPOSSIBILITY.</b>
+Bulwark's Break immunity, armor and cast heal, and Consecrated Ground's mitigation and reflect, are
+all plainly receivable. <b>Bulwark is the sharpest case: widening its loop would ship three
+quarters of a card</b>, because the 10%-a-turn regen &mdash; the sustain the card is named for
+&mdash; can never arrive. <b>A partial arrival reads as working</b>, which is Tank and Spank's
+failure in a new shape.</li>
+<li><b>FOUR PROSE COPIES OF ONE CLAUSE WERE STILL SAYING <i>ally</i>.</b> DL corrected Consecrated
+Ground's Faith kindle <b>on the card</b>; <code>master.html</code> kept it in three places and the
+glossary in one. <b>The DA/DC/DG shape exactly</b> &mdash; one surface fixed, the rest carried.
+<b>When a clause moves, sweep the CLAUSE across every surface, not the card across one.</b> Two
+stale <b>Perfect</b> claims in the same two <code>master.html</code> sentences went with them
+(Battle Shout's +5 Rage and Consecrated Ground's third turn are both unconditional since the
+fold), and Consecrated Ground's duration there read 2 against the 3 applied.</li>
+<li><b>AND THE DK COMMENT ON RALLYING SHOUT WAS DESCRIBING A STATE DL ENDED.</b> It still said the
+Pressure half was <i>"a separate question ... deliberately not answered here"</i>. Replaced, not
+appended to. <b>A reason recorded beside a decision is a good practice that creates a new place to
+be wrong</b> &mdash; DL wrote that about DK's <code>max_resource</code> slip and this is the same
+file's second instance.</li>
+</ul>
+
+<h3>&sect;2 &mdash; A pin must name its clause, and two of <code>check_dk</code>'s did not</h3>
+<ul>
+<li><b><code>wd_hold_line</code> PINNED ONE OF ITS CARD'S TWO GROUP CLAUSES AND READ LIKE A PIN ON
+THE CARD.</b> It fixes <code>hold_bd</code>; <code>undying</code> is applied in the same loop, was
+ruled <i>ally</i> by the same DK decision, and <b>could have been moved onto bare
+<code>heroes</code> with that entry still green</b>. Proved: narrowing it reds
+<code>check_dm</code> twice, once at the chip and once at a beast that dies instead of holding at
+1 HP.</li>
+<li><b><code>dv_waters</code> PINNED THE RANK-AND-ROLL GATE, WHICH KEEPS NOTHING NARROW.</b> The
+table's own heading is <i>"each by the read line that keeps them narrow"</i> and that fragment
+would have stayed green with the whole turn-start block deleted. <b>Re-pointed at
+<code>_next_unit()</code>'s walk</b>, which is what actually excludes a companion &mdash; and
+which serves Bulwark's regen and the Faith drip too, so one pin replaces three copies.</li>
+<li><b>ANCHOR ON THE CLAUSE AND SEARCH BACKWARD FOR THE WALK.</b> <b>FIVE sites spell
+<code>heroes.filter(func(he): return not he.dead and not he.is_companion)</code> byte for
+byte</b>, so a forward <code>find</code> from the walk reads the wrong site four times in five
+&mdash; the fault that bit DL at War Stomp's guard, fixed in the <i>direction</i> rather than in
+the fragment. <b><code>check_dm</code> asserted TWO of those five on its first run and its own
+gate caught it</b>; the live count is printed now and the assertion is the property, not a
+number.</li>
+</ul>
+
+<h3>&sect;3 &mdash; What closes, and what is reported and deliberately not taken</h3>
+<ul>
+<li><b>THE ALLY/HERO THREAD IS CLOSED</b>, recorded in <code>CLAUDE.md</code> and in
+<code>text-standard.html</code> &sect;4.9. <b>Rule on CLAUSES, not on abilities.</b> "Party" is
+retired; <i>hero</i> means the four, <i>ally</i> means heroes and companions, and every <i>hero</i>
+ruling carries the structural reason a companion cannot receive it.</li>
+<li><b>THE FIVE ALLY-WORDED TEXTS DL LISTED SEPARATELY ARE RULED ON NOWHERE.</b> The Warrior's
+Rally, the Health/Mana/Revive Potions, Shared Grief's log, the Mercy <code>passive_desc</code> and
+glossary entry, and Glacial Hold's <i>"+15% damage from EVERY source"</i>. <b>None is a
+clause-level scope disagreement of the kind &sect;1 rules on</b> &mdash; each is a single-shape
+text saying <i>ally</i> where its read site means <i>hero</i>, on an effect that already behaves
+correctly. They stay owed.</li>
+<li><b>A SEVENTH FAMILY WAS FOUND AND IS REPORTED RATHER THAN SWEPT: a text that under-states its
+own payload.</b> <b>Both UPGRADED cards drop "Refunds 5 Rage" while the code still pays it</b> —
+Battle Shout's and Hold the Line's. An absent clause does not mis-say, so &sect;1's test does not
+reach it; <b>adding a clause to a card is authoring, and correcting a wrong word is repair.</b>
+Reported and not taken. <b>And the pool-pick Battle Shout shows the NODE's numbers</b>: there is
+one <code>description</code> in the project and the pick pays +8% for 2 turns while the card
+promises +12% for 3.</li>
+</ul>
+
 <h2>2026-08-23 &mdash; Batch DL: RALLYING SHOUT'S PRESSURE, AND "PARTY" IS RETIRED</h2>
 <p><i><b>One card carried two clauses of different shape under one word, and that is how it hid
 from two consecutive sweeps.</b> Rallying Shout reads <i>"the whole party sheds 30 Pressure, and

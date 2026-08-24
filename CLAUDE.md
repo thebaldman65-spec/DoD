@@ -455,7 +455,7 @@ brief — `wd_hold_line` (the undying window, 1/2→2/3). The Tempo chip's legen
 moved with them. **The one place the old reading was written down as a rule was
 `battle.gd`'s `hold_the_line` comment**; it now records the ruling instead.
 
-## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DL §2)
+## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DM §3)
 > **HERO — one of the four. ALLY — heroes and companions together. AND THERE IS NO THIRD WORD.**
 
 **CORRECTED AT DJ §1 — THE BEAST DOES NOT STAND IN `heroes`.** This block said it did, and so did
@@ -572,6 +572,69 @@ left the other half standing.
   at the summon. Rallying Shout's resource loop was the one of the three that carried no guard, so
   a careless widening of it would have paid a beast 30 points of a bar that does not exist. **The
   guard is what makes the recorded reason true at the site.**
+
+## THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES
+> **A card can carry two clauses of different shape under one word, and a sweep that reads the
+> ability will not see it. "Party" is retired; HERO means the four, ALLY means heroes and
+> companions, and every *hero* ruling carries the structural reason a companion cannot receive it.**
+
+**NINE BATCHES: CV, DH, DI, DJ, DK, DL AND DM, WITH DF AND DG'S SORTS UNDER THEM.** Each one found
+the next thing, and the reason it took nine is in the shape of the question rather than in any
+batch's care: **CV swept for a claim about read sites and never ran the test; DJ swept ABILITIES;
+DK ruled on ABILITIES; DL found that the unit is the CLAUSE.** DM read the last six cards clause by
+clause and the thread ends there.
+
+- **THE SIX ARE SIXTEEN CLAUSES; FOURTEEN CARRY A COLLECTION AND ALL FOURTEEN WERE ALREADY
+  RIGHT.** Bulwark of Fortitude 4, Consecrated Ground 3, Divine Wrath 2, Battle Shout 1 group +
+  1 self, Hold the Line 2 group + 1 self, Sacred Resolve 2. Every one of the fourteen says what
+  its read site walks. **A batch that finds nothing to widen has still measured something**, and
+  this is the measurement that lets the thread close instead of being abandoned.
+- **WHAT WAS WRONG WAS A THIRD SCOPE, AND IT HAS NO WORD HERE. A CLAUSE CAN BE NARROWER THAN
+  EITHER.** Battle Shout and Hold the Line each hand **five Rage to the CASTER** — one body.
+  Battle Shout's card put it inside *"A roar every hero answers:"*, so a group clause's colon-list
+  promised four heroes a payload that reaches one. **Hold the Line already worded the identical
+  payload correctly** (`Refunds 5 Rage.` as its own sentence) — **so the fix was to copy the sibling
+  card, not to invent a phrasing.** `check_co` and `check_cy` had both recorded it as "hands the
+  caster +5 Rage" since CO; **the card was the only surface that disagreed.**
+- **A WORD WITHOUT ITS REASON GETS RE-LITIGATED, SO ALL FIFTEEN CARRY ONE.** There are **five**
+  reasons and no sixth: no resource bar to refuel; `_companion_hit` reads none of the hero strike
+  loop's multiplier block; stamped once at party spawn before a companion exists; **per-turn** —
+  `_next_unit()` walks `heroes + enemies` and a summon carries `next_time = INF`; and `_gain_faith`
+  refuses companions outright. **Two of the six are narrow by CHOICE and say so** rather than
+  implying an impossibility — Bulwark's Break immunity, armor and cast heal and Consecrated
+  Ground's mitigation and reflect are all plainly receivable, and widening them is a magnitude
+  change on beast survivability, which is DK's "new PLAY, not a widening".
+- **BULWARK IS THE SHARPEST OF THE SIX: WIDENING ITS LOOP WOULD SHIP THREE QUARTERS OF A CARD.**
+  Three of its four clauses would arrive and the fourth — the 10%-a-turn regen, the sustain the
+  card is named for — never can. **A partial arrival reads as working**, which is the Tank and
+  Spank failure in a new shape.
+- **AND THE SURFACES NOBODY SWEEPS ARE STILL DOCUMENTS.** DL corrected Consecrated Ground's Faith
+  clause on the CARD and left **three copies in `master.html` and one in the glossary** still
+  saying *ally* for a clause `_gain_faith` refuses outright — the DA/DC/DG shape exactly, one
+  surface fixed and the rest carried. **When a clause moves, sweep the CLAUSE across every surface,
+  not the card across one.**
+
+## ON A SPLIT-CLAUSE CARD, EVERY PIN NAMES THE CLAUSE IT PINS (STANDING, Batch DM §2)
+> **A pin that matches the CARD rather than the CLAUSE can go red for the wrong reason, or stay
+> green while its subject moves — which is the failure pin-as-measurement exists to prevent.**
+
+- **ANCHOR ON THE CLAUSE LINE AND SEARCH BACKWARD FOR THE WALK.** The clause line is the unique
+  half; the walk is often shared. **FIVE sites in `battle.gd` spell
+  `heroes.filter(func(he): return not he.dead and not he.is_companion)` byte for byte** — Bulwark
+  and Consecrated Ground among them — so a forward `find` from the walk reads the wrong site four
+  times in five. **`check_dm` §1 asserted TWO on its first run and the gate caught it**, which is
+  the count-in-a-brief fault landing inside the instrument written to prevent it; the live count is
+  PRINTED now and the assertion is the property (`> 1`) rather than a number. **DL was bitten by exactly this** — a
+  forward `find` on War Stomp's guard measured a site 200k characters earlier — and fixed the
+  fragments rather than the direction. `check_dm` §1 fixes the direction, and asserts that the two
+  walks are STILL shared so the hazard cannot quietly disappear.
+- **TWO OF `check_dk`'s ELEVEN PINS WERE AUDITED AND BOTH MOVED.** Its `wd_hold_line` entry pinned
+  the `hold_bd` clause and stopped — **`undying` is a second group clause in the same loop and
+  could have been moved onto bare `heroes` with that entry still green.** Its `dv_waters` entry
+  pinned the rank-and-roll gate, which keeps nothing narrow: **the table's heading says "the read
+  line that keeps them narrow" and that fragment would have stayed green with the whole turn-start
+  block deleted.** Re-pointed at `_next_unit()`'s walk, which is what actually excludes a companion
+  — and which serves the whole per-turn family, so one pin replaces three copies.
 
 ## A SUITE MUST NOT PIN THE SAVE VERSION LITERAL (STANDING — BK §6's RULE, RE-LEARNED AT CT)
 **Three batches have now broken a sibling suite by bumping the save version.** BL's recap ledgers
@@ -1081,7 +1144,11 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   correctly**. DA reverted the constant to 1 and **left the card at 2.** DC then swept exactly this
   defect and fixed two instances — the Devout's `passive_desc` and the `faith` status chip — and
   **did not reach the third.** `docs/master.html` read "(1 an ally a turn)" throughout and was
-  right the whole time, so the design doc and the game disagreed and only a suite noticed.
+  right about the NUMBER the whole time, so the design doc and the game disagreed and only a suite
+  noticed. **AND IT WAS WRONG ABOUT THE WORD FOR JUST AS LONG, WHICH NOBODY LOOKED AT** — the drip
+  is refused to a companion twice over, so *ally* was never available to it. **DM §1 corrected
+  that half**, in three `master.html` copies and one glossary copy; the quoted string above is
+  history and no longer appears in the file.
 - **THE SUITE THAT NOTICED WAS READ AS STALE FOR FOUR BATCHES.** `test_batch_bj` §2 asserts
   `classes.gd` contains "kindled 1 Faith" and it is **correct** — the code pays 1, and
   `test_batch_aw`'s live checks measure it landing 1 at a time through a real turn. **A red that

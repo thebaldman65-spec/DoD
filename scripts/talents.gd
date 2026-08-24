@@ -148,7 +148,7 @@ const LANE_TREES := {
 			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
 				"special": "battle_shout", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "",
-				"description": "A roar every hero answers: +12%\ndamage, plus 1% per 20 blood buildup\non the warband, and 5 Rage.\nLasts 3 turns."},
+				"description": "A roar every hero answers: +12%\ndamage, plus 1% per 20 blood buildup\non the warband. Lasts 3 turns.\nRefunds 5 Rage."},
 				"upgrade": [
 					{"stat": {"battle_shout_node": 1}},
 					{"ability": "Battle Shout", "set": {
@@ -792,11 +792,11 @@ const LANE_TREES := {
 				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
 				"cooldown": 6,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Embolden every ally: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn. Refunds 5 Rage."},
+				"description": "Embolden every ally: 50% less Break\ndamage for 2 turns, and no one can die\nfor 2 turns. Refunds 5 Rage."},
 				"upgrade": [
 					{"stat": {"hold_line_upgraded": 1}},
 					{"ability": "Hold the Line", "set": {
-						"description": "Embolden every ally: 80% less Break\ndamage for 2 turns, and no one can die\nfor two turns."}},
+						"description": "Embolden every ally: 80% less Break\ndamage for 2 turns, and no one can die\nfor 3 turns."}},
 				]}},
 	],
 	"pyromancer": [

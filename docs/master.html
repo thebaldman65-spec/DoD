@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DL)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DM)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -762,7 +762,7 @@ health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 <tr><td>Hallowed</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
 <tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (2 a hit) AND
-standing on Consecrated Ground (1 an ally a turn) build stacks, max 3.
+standing on Consecrated Ground (1 a hero a turn) build stacks, max 3.
 <b>WHAT A STACK PAYS IS READ OFF THE HIGHEST COUNT THE CARRIER HAS HELD THIS BATTLE, NOT
 THE COUNT HELD RIGHT NOW</b> — 2% damage mitigation and +1.5% damage dealt per PEAK stack.
 The Apostle capstone adds another 1× and Fervor another again while the carrier stands on
@@ -1515,8 +1515,10 @@ damage dealt for 2 turns; the chip shows the buff and turns remaining
 <i>Talent-granted, and earnable (§6a):</i> Battle Shout — 15 Rage, 1.5, 2cd;
 EVERY HERO (companions excluded)
 gains +8% damage, plus 1% for every 20 points of blood buildup on the warband, for
-2 turns (Perfect: +5 Rage); casts with no target selection, and every hero's chip shows the
-% gained. Rampage — 40 Rage, 3 × 20 physical +
+2 turns; casts with no target selection, and every hero's chip shows the
+% gained. <b>It also refunds the CASTER 5 Rage &mdash; one body, not the group</b> (Batch DM
+&sect;1): the payload is unconditional since CN took this card's bar off, and the card now says so
+in its own sentence instead of inside <i>"a roar every hero answers"</i>. There is no Perfect. Rampage — 40 Rage, 3 × 20 physical +
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
 <li><b>Warden (Tank)</b> — <b>Stat block:</b> 200 HP / 32% armor / <b>10% base Block</b>
@@ -1756,7 +1758,7 @@ three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith releas
 out percentages of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
 <b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
-a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 3 stacks; doubled
+a turn standing on <b>Consecrated Ground</b> (1 per hero per turn) — max 3 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands.
 <b>THE HELD VALUE IS PAID ON THE PEAK — the highest Faith the carrier has held this
 battle — RATHER THAN ON THE CURRENT COUNT.</b> That is what stops Conviction's two halves
@@ -1783,9 +1785,11 @@ the fight.<br>
 Divine Shield — 15 Mana, 1.0, 2cd; an ally shield absorbing 35% of the Devout's max
 health, then it breaks.<br>
 Consecrated Ground — 25 Mana, 1.0, 3cd; every hero takes 15% less damage, reflects
-10% of damage taken, and <b>every ally gains 1 Faith at the start of their turn</b>, for
-2 turns (Perfect: 3 turns). The Faith drip needs no talent — it is Conviction's only
-source that reaches every hero.<br>
+10% of damage taken, and <b>every hero gains 1 Faith at the start of their turn</b>, for
+3 turns. There is no Perfect. The Faith drip needs no talent — it is Conviction's only
+source that reaches every hero, and <b>it is two exclusions from ever reaching a companion</b>
+(Batch DM &sect;1): it is paid at a turn start, and a companion takes no turns, and
+<code>_gain_faith</code> refuses one outright even if it did.<br>
 Blessing of Zeal — 20 Mana, 2.0, 2cd; an ally deals +15% damage for 3 turns, their
 cooldowns tick down 1 turn immediately, and their Faith gain is doubled while it holds
 (Perfect: 4 turns).<br>

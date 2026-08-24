@@ -5196,3 +5196,62 @@ screen away from a text §2 was moving, and leaving them would have made those c
 misleading rather than merely imprecise. Texts with a false *ally* and no "party" anywhere near them
 were reported instead. **That line is arbitrary in the small and defensible in the large**: the
 batch's remit was one word, and every departure from it is named.
+
+---
+
+## Batch DM — a batch that widened nothing, and why that is the measurement
+
+DL listed six more cards carrying clauses of two different shapes under one word and ruled on none
+of them. DM read all six clause by clause: **sixteen clauses, fourteen of which carry a collection,
+and all fourteen collections were already correct.** Bulwark of Fortitude's four, Consecrated
+Ground's three, Divine Wrath's two, Battle Shout's group clause, Hold the Line's two group clauses,
+Sacred Resolve's two — every one of them says what its read site walks.
+
+**That is a finding, not an absence of one.** A thread that has run nine batches, each finding the
+next thing, has no way to end except by someone doing the work and reporting that the work came
+back clean. The alternative is abandonment, which reads identically from outside and leaves the
+next author to start again from the same suspicion. **A batch that widens nothing has still
+measured something, and the measurement is what closes the thread.**
+
+**What was actually wrong was a scope this thread had no word for.** Battle Shout and Hold the Line
+each hand five Rage to the *caster* — one body, which is neither the four nor the five. The whole
+vocabulary the thread built (hero, ally, and no third word) is about groups, and a payload that
+reaches exactly one unit sits underneath it. Battle Shout's card put that payload inside "A roar
+every hero answers:", so the group clause's colon-list promised four heroes something one unit
+gets. **Nothing in nine batches of sweeping for *hero* and *ally* could have caught that**, because
+neither word was wrong; the card had a clause with no word at all.
+
+The fix is the most reassuring kind available: **Hold the Line already worded the identical payload
+correctly**, one tree over, as its own sentence — "Refunds 5 Rage." So the correction was to copy
+the sibling card rather than to invent a phrasing, and the wording is one the project had already
+chosen and lived with. It is also worth noting where the fact *was* recorded correctly:
+`check_co` and `check_cy` have both carried "hands the caster +5 Rage" since CO. **Two gates knew.
+The card was the only surface that disagreed** — which is the inverse of the usual failure, where
+the code is right and every document is stale.
+
+**The other correction is the one that should be uncomfortable.** DL fixed Consecrated Ground's
+Faith clause on the card and left four prose copies of the same clause saying *ally* — three in
+`master.html`, one in the glossary — for a payload `_gain_faith` refuses outright. This is the
+DA/DC/DG shape for the third time: **one surface of a clause gets fixed, the batch feels finished,
+and the rest are carried.** The rule the project already has ("sweep the number, not the field")
+turns out to need its twin: **when a clause moves, sweep the clause across every surface, not the
+card across one.** The instrument that found these was the literal sweep run before and after, and
+it found them because it pairs every suite needle against every document — the same instrument
+that then caught a claim in this batch's own gate.
+
+**Which is the last thing worth recording, because it happened to this batch and not to a previous
+one.** `check_dm` §1 asserts that Bulwark and Consecrated Ground share their walk byte for byte,
+and it asserted the count was **two**, because two is how many of them the batch was looking at.
+**There are five.** The gate failed on its first run, on its own author's unverified number — the
+count-in-a-brief fault landing inside the instrument written to prevent it. The assertion is now
+the property the reasoning actually rests on (the walk is *not* unique, so the anchor must be the
+clause) and the live count is printed rather than written down. **A number you did not derive is a
+number you are quoting**, wherever you happen to be writing it.
+
+**And a seventh family was found and deliberately not swept.** Both *upgraded* cards drop "Refunds
+5 Rage" while the code still pays it, and the pool-pick Battle Shout shows the node's numbers
+because there is one `description` in the project for three magnitudes. Neither is a clause that
+mis-says; both are clauses that under-say. **Adding a clause to a card is authoring, and correcting
+a wrong word is repair** — so both are reported and neither is taken. The thread ends here on
+purpose: nine batches of "and then we found the next thing" is long enough that the discipline
+worth keeping is the one that says where to stop.

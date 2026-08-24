@@ -15025,6 +15025,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Sacred Resolve — its node pays a longer split instead of a
 			# grant it cannot make (resolve_extra_turns, +2).
 			var res_turns := 4 + attacker.resolve_extra_turns
+			# BATCH DM §1 — TWO WORDS, ONE SHAPE, AND THE WORDS ARE RIGHT. This
+			# card LOOKS like the split-clause family and is not: the card says
+			# "the heroes'" for the split and "the struck hero" for the Break
+			# carve-out, and BOTH halves are the same four.
+			# **THE COLLECTION IS ASSERTED IN TWO PLACES AND THEY MUST AGREE.**
+			# This apply walks bare `heroes`, and all three trigger sites gate
+			# again on `is_hero and not is_companion` (the strike split, the
+			# recoil split and the bleedout split) over their own
+			# `heroes.filter(not dead)` pool. A widening here alone would hang
+			# the chip on a beast and split nothing — the gates below would still
+			# refuse it — which is why the card is pinned by its APPLY and its
+			# SPLIT together in `check_dm` §1 rather than by either one.
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "unity", res_turns)
 			_message("%s binds the heroes as one!" % attacker.unit_name)
@@ -15032,6 +15044,20 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, res_turns], "#70d878")
 		"cons_ground":
 			_sfx("heal", -5.0, 0.6)
+			# BATCH DM §1 — HERO ON ALL THREE CLAUSES, AND THE FAITH ONE IS TWO
+			# EXCLUSIONS DEEP WHILE THE OTHER TWO ARE ONE CHOICE DEEP.
+			#   · mitigation (`strike_target.has_status("cons_ground")`) and
+			#     reflect are RECEIVABLE — a companion takes hits and could carry
+			#     the banner. They are narrow by choice, and widening them is a
+			#     magnitude change on beast survivability rather than a widening.
+			#   · **THE FAITH KINDLE CANNOT ARRIVE BY EITHER OF TWO ROUTES.** It
+			#     is paid in `_ground_faith_tick`, inside the turn-start block —
+			#     and `_next_unit()` walks `heroes + enemies`, so a summon
+			#     (`next_time = INF`) never takes a turn. Even if it did,
+			#     `_gain_faith` refuses `u.is_companion` on its first line.
+			#     **Two independent refusals, so no Faith-flavoured text can ever
+			#     say `ally`** — which is text-standard §4.9's binding rule, and
+			#     DM §1 corrected the three surfaces that still did.
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				_apply_status(h, "cons_ground", 3, 0, 0, attacker)
 			_message("%s consecrates the ground!" % attacker.unit_name)
@@ -15068,6 +15094,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# capstones across the roster already did — see talents.gd) —
 			# already owned, it pays +1 turn instead.
 			var bw_turns := 3 + attacker.bulwark_extra_turns
+			# BATCH DM §1 — HERO ON ALL FOUR CLAUSES, AND THE FOUR DO NOT SHARE A
+			# REASON. **THREE OF THEM A COMPANION COULD PLAINLY RECEIVE** and the
+			# honest record says so rather than implying an impossibility:
+			#   · Break immunity is read in `unit.take_hit`, and a companion HAS
+			#     a Break meter — `pressure` against its own `stability`. DK's
+			#     Hold the Line already cuts Break for one on that same meter.
+			#   · armor +50% is read in `unit.effective_armor()`, which every
+			#     unit on the field runs.
+			#   · the cast's instant 5% is `heal_amount` on the body in hand.
+			# **THE FOURTH CANNOT ARRIVE AT ALL**: the 10%-a-turn regen is paid
+			# in the turn-start block (`u.has_status("bulwark")`, above), and
+			# `_next_unit()` walks `heroes + enemies` — a summon carries
+			# `next_time = INF` and never takes a turn, so the tick never runs
+			# for it. **So widening this loop would ship three-quarters of a
+			# card**, and the missing quarter is the sustain the card is named
+			# for. That is a magnitude change on beast survivability — new PLAY,
+			# DK's rule — not a widening, so the collection stays the four and
+			# the card says HERO. `check_dm` §2 measures the turn tick's absence.
+			#
+			# THE `not he.is_companion` TERM REMOVES NOTHING and is kept as
+			# INTENT, which is CLAUDE.md's standing reading of all 23 of them:
+			# `heroes.append` is reached at exactly one site and a summon goes to
+			# `companions`, so the COLLECTION is what excludes here.
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				_apply_status(h, "bulwark", bw_turns)
 				# BATCH BF §1: three turns of NO Break damage, party-wide, and
@@ -18154,6 +18203,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var shout_desc := "Battle Shout: +%d%% damage for %d turns\n(+%d%% base, plus 1%% per 20 of the %d\nblood buildup on the warband at\nthe time of the shout)." % [
 				shout_pct, shout_turns, shout_base, shout_bleed]
 			var shout_n := 0
+			# BATCH DM §1 — THE GROUP CLAUSE IS HERO, AND FOR DIVINE WRATH'S
+			# REASON EXACTLY: `battle_shout`'s power is read at `_resolve`'s
+			# `raw *= 1.0 + status_power("battle_shout") / 100.0`, inside the
+			# hero strike loop. `_companion_hit` never enters it, so a beast
+			# wearing the chip would strike for the same number it strikes for
+			# now. The chip's own tooltip already says "to every hero and no
+			# companion"; the collection below is what makes that true.
 			for h in heroes:
 				if h.dead:
 					continue
@@ -18174,6 +18230,21 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					h.update_status("battle_shout", "+%d%%" % shout_pct,
 						shout_desc, shout_pct)
 				shout_n += 1
+			# BATCH DM §1 — AND THE SECOND CLAUSE IS THE CASTER'S ALONE, WHICH
+			# THE CARD DID NOT SAY. It read "A roar every hero answers: +12%
+			# damage ... and 5 Rage" — the Rage sat inside the group clause's
+			# colon-list and is paid to exactly one unit, on the line below.
+			# **A CLAUSE CAN DISAGREE WITH ITS CARD BY SCOPE WITHOUT EITHER OF
+			# THE TWO WORDS BEING WRONG**: "hero" is right for the damage and
+			# there is no word at all for a payload that reaches ONE body. The
+			# card now says "Refunds 5 Rage." as its own sentence — which is
+			# Hold the Line's existing wording for this identical payload, so
+			# the sibling card is the precedent rather than a new phrasing.
+			# `check_co` and `check_cy` have both recorded it as "hands the
+			# caster +5 Rage" since CO; the card was the only surface that
+			# disagreed. IT IS OUTSIDE THE CLAMP BRANCH ABOVE and must stay
+			# there — CP's note says so, and it is why CO's refusal cannot
+			# reach this card.
 			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 			attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 			attacker.refresh_bars()
@@ -18337,6 +18408,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# "two turns" for the tick that runs before the hero acts; that
 			# translation is the convention CV abolished. A duration is stated
 			# as APPLIED, because the chip counts down the applied number.
+			# BATCH DM §1 — AND CV §1's DURATION RULING REACHED THE NODE TEXT AND
+			# NOT THE CARD. CV moved `wd_hold_line`'s no-death window 1/2 -> 2/3
+			# and the comment below records it, but the `description` INSIDE
+			# that node's own payload still said "for a turn" / "for two turns"
+			# against the 2 and 3 applied here — `cr_rime`'s shape exactly, the
+			# node and the description inside its payload disagreeing. Both card
+			# lines now say the applied number. **NO CODE MOVED AND NO SWEEP WAS
+			# OPENED**: this is CV's ruling reaching the one surface it missed on
+			# a card this batch was already reading clause by clause.
 			var hl_up := attacker.hold_line_upgraded > 0
 			var hl_cut := 80 if hl_up else 50
 			var hl_undying := 3 if hl_up else 2
@@ -18362,7 +18442,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var hl_st: Dictionary = h.get_status("hold_bd")
 				if not hl_st.is_empty():
 					hl_st["src_name"] = attacker.unit_name
+				# BATCH DM §2 — **THE SECOND GROUP CLAUSE, AND IT WAS THE ONE NO
+				# PIN NAMED.** `check_dk`'s WIDENED entry pins the `hold_bd`
+				# line above and stops there, so `undying` could have been moved
+				# out of this loop onto bare `heroes` with that entry still
+				# green — a pin that stays green while its subject moves, which
+				# is the exact fault DL found on the other half of this same
+				# card. It is `ally` for the same reason `hold_bd` is: it holds
+				# a body at 1 HP through a lethal blow and a beast has a body.
+				# Pinned by its own line in `check_dm` §1.
 				_apply_status(h, "undying", hl_undying)
+			# BATCH DM §1 — AND THE THIRD CLAUSE IS THE CASTER'S. "Refunds 5
+			# Rage." is its own sentence on the card, outside "Embolden every
+			# ally", and a refund returns to whoever paid the 30 — so the card
+			# was already right here. **THIS IS THE WORDING BATTLE SHOUT NOW
+			# BORROWS**, because the two cards carry the identical payload and
+			# only this one said so.
 			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 			attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 			attacker.refresh_bars()
@@ -18395,6 +18490,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					" with Renewal (Empowered)" if empowered else ""], "#70d878")
 				_rebuild_turn_bar()
 		"divine_wrath":
+			# BATCH DM §1 — HERO ON BOTH CLAUSES, AND THEY DIE FOR TWO DIFFERENT
+			# REASONS. This card is Tank and Spank's finding twice over in one
+			# sentence: `wrath` carries +15% damage AND +15% speed, and widening
+			# the collection would deliver NEITHER to a beast.
+			#   · THE DAMAGE TERM is read at `_resolve`'s `raw *= 1.15` — inside
+			#     the hero strike loop, which `_companion_hit` never enters. A
+			#     beast's blows resolve on their own path and read none of that
+			#     multiplier block (DK measured the same gap on `empower` at
+			#     exactly 1.0000 over 40 seeded blows).
+			#   · THE SPEED TERM is read in `unit.effective_speed()`, which only
+			#     ever matters to a turn order a companion is not in:
+			#     `_next_unit()` walks `heroes + enemies` and a summon is built
+			#     with `next_time = INF`.
+			# So the chip would attach cleanly and pay nothing twice — the no-op
+			# that reads as working, which is worse than the narrow word.
+			# `check_dm` §2 MEASURES both rather than asserting them.
 			_sfx("heal", -5.0, 0.85)
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "wrath", 4)

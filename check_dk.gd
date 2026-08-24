@@ -44,7 +44,17 @@ const Gate = preload("res://gate_fixture.gd")
 const WIDENED := {
 	"wd_rally Rally":
 		"for h in _hero_side():\n\t\t\t\t\t\t\t\th.add_status(\"rally_heal\", rinfo[0], rinfo[1],",
-	"wd_hold_line Hold the Line":
+	# BATCH DM §2 — THIS ENTRY PINS ONE OF THIS CARD'S TWO GROUP CLAUSES, AND
+	# THE SECOND IS NOT PINNED HERE. `hold_bd` is the cut; `undying` is the
+	# no-death window, applied in the SAME loop and ruled `ally` by the same DK
+	# decision — and it could have been moved onto bare `heroes` with this entry
+	# still green. **A pin that covers a card's first clause reads exactly like
+	# a pin that covers the card.** The second clause is pinned by its own read
+	# line in `check_dm` §1 rather than here, because two copies of one fact in
+	# two gates is DJ §3's rule; what this entry now carries is the fact that it
+	# is HALF of a split-clause card, so the next author does not read it as the
+	# whole of one.
+	"wd_hold_line Hold the Line (the BREAK-CUT clause; `undying` is check_dm §1)":
 		"for h in _hero_side():\n\t\t\t\t_apply_status(h, \"hold_bd\", 2, hl_cut)",
 	"sanctuary Sanctuary":
 		"for h in _hero_side():\n\t\t\t\tvar amt := int(h.max_hp * sanct_pct)",
@@ -80,8 +90,20 @@ const NARROW := {
 		"for h in heroes:\n\t\t\t_apply_status(h, \"devotion\", -1, dvn_pct)",
 	"hl_last_hope Last Hope":
 		"for h in heroes:\n\t\tga_step = maxi(ga_step, h.guardian_step)",
-	"dv_waters Cleansing Waters":
-		"if zl_dv.waters_ranks > 0 and randf() < 0.01 * zl_dv.waters_ranks:",
+	# BATCH DM §2 — RE-POINTED AT THE LINE THAT ACTUALLY KEEPS IT NARROW. This
+	# entry used to pin `if zl_dv.waters_ranks > 0 and randf() < ...`, which is
+	# the RANK-AND-ROLL gate: it decides whether the cleanse fires at all and
+	# says nothing whatever about who can receive it. The table's own heading is
+	# "each by the read line that keeps them narrow" and that fragment kept
+	# nothing narrow — deleting the enclosing turn-start block would have left
+	# this entry green. **What keeps Cleansing Waters narrow is that it is a
+	# PER-TURN effect**: it runs inside the block a unit enters when its turn
+	# starts, and `_next_unit()` walks `heroes + enemies`, so a summon
+	# (`next_time = INF`) never arrives. THAT walk is the pin — and it is the
+	# same reason Bulwark's regen and Consecrated Ground's Faith drip are hero,
+	# so one pin serves the whole per-turn family rather than three copies.
+	"dv_waters Cleansing Waters (per-turn: the walk a companion is not in)":
+		"var alive := (heroes + enemies).filter(func(u): return not u.dead)",
 }
 
 # The node/ability texts, and which WORD each must carry now. The four widened

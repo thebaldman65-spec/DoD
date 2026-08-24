@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DL &mdash; &sect;4.9)</b></p>
+<p align="right"><b>Last updated: 2026-08-23 (Batch DM &mdash; &sect;4.9)</b></p>
 <h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
 <p><i>The rules every player-facing string is written to. Binding on every batch from CJ
 forward, including any tuning that comes out of playtesting. This document says how text is
@@ -273,7 +273,7 @@ renders <code>perfect_text</code> without wrapping is the battle tooltip, which 
 rather than clipping. <b>Recorded as measured, not filed as owed</b> — rewrapping 76 lines to a
 ceiling that does not bind them would be work with no reader.</p>
 
-<h2>4.9 HERO AND ALLY ARE THE ONLY TWO WORDS (BINDING, SET AT BATCH CV &sect;4, CLOSED AT DL)</h2>
+<h2>4.9 HERO AND ALLY ARE THE ONLY TWO WORDS (BINDING, SET AT BATCH CV &sect;4, CLOSED AT DM)</h2>
 <blockquote><b>HERO</b> &mdash; one of the four. <b>ALLY</b> &mdash; heroes and
 companions together. <b>AND THERE IS NO THIRD WORD.</b></blockquote>
 <p><b>CORRECTED AT BATCH DJ &sect;1 &mdash; the beast does NOT stand in <code>heroes</code>.</b>
@@ -332,6 +332,32 @@ no bar to hold. <b>DJ &sect;2 and DK &sect;2 both read the ABILITY</b>, found it
 resource half, ruled on that, and never saw the Pressure half, which carried neither of the two
 words. It paid four for the life of the project while its card promised the shed to everyone.
 <b>So the card now carries BOTH words in one sentence, and a text is read clause by clause.</b></p>
+
+<p><b>AND AT BATCH DM THE THREAD CLOSES, ON THE SIX CARDS DL LISTED AND COULD NOT RULE ON.</b>
+Read clause by clause &mdash; <b>sixteen clauses across six cards, fourteen of which carry a
+collection</b> &mdash; and <b>all fourteen collections were correct</b>. Bulwark of Fortitude's four clauses, Consecrated Ground's three, Divine
+Wrath's two, Battle Shout's group clause, Hold the Line's two group clauses and Sacred Resolve's
+two all say what their read site walks. <b>What was wrong was two clauses of a THIRD scope</b>, and
+the lesson is the one this section keeps learning in a new place each batch:</p>
+<blockquote><b>A CLAUSE CAN BE NARROWER THAN EITHER WORD.</b> Battle Shout and Hold the Line each
+hand <b>five Rage to the CASTER</b> &mdash; one body, which is neither the four nor the five and
+has no word in this section at all. Battle Shout's card put it inside "A roar every hero answers:",
+so the one surface a player reads promised four heroes a payload that reaches one. <b>Hold the Line
+already worded the identical payload correctly</b> ("Refunds 5 Rage." as its own sentence), so the
+fix was to copy the sibling card rather than to invent a phrasing. <b>Where a clause reaches ONE
+body it gets its own sentence, outside the group clause.</b></blockquote>
+<p><b>AND EVERY <i>hero</i> RULING ON THE SIX NOW CARRIES ITS REASON IN THE SOURCE BESIDE IT</b>,
+because a word without its reason is re-litigated &mdash; which is how this thread ran nine
+batches. There are five reasons and no sixth: <b>no resource bar to refuel</b>;
+<code>_companion_hit</code> <b>reads none of the hero strike loop's multiplier block</b>;
+<b>stamped once at party spawn, before a companion exists</b>; <b>per-turn &mdash;</b>
+<code>_next_unit()</code> <b>walks</b> <code>heroes + enemies</code> <b>and a summon carries</b>
+<code>next_time = INF</code>; and <code>_gain_faith</code> <b>refuses companions outright</b>.
+<b>Two of the six are narrow by CHOICE rather than by structure and say so</b> &mdash; Bulwark's
+Break immunity, armor and cast heal, and Consecrated Ground's mitigation and reflect, are all
+plainly receivable, and widening them is a magnitude change on beast survivability rather than a
+widening. <b>Bulwark is the sharpest case: widening its loop would ship three quarters of a card</b>,
+because the 10%-a-turn regen &mdash; the sustain the card is named for &mdash; can never arrive.</p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

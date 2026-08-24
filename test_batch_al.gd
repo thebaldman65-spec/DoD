@@ -388,8 +388,8 @@ func _upgrade_path() -> void:
 		if a.display_name == "Hold the Line":
 			ok(a.description.contains("80%"),
 				"...and the description states the 80% cut")
-			ok(a.description.contains("two turns"),
-				"...and the doubled no-death window")
+			ok(a.description.contains("die\nfor 3 turns"),
+				"...and the doubled no-death window, stated as APPLIED (CV §1, reached at DM §1)")
 
 	# The reverse order — capstone first, pick second — cannot reach the
 	# upgrade, and must not double-grant either. That is a property of the
@@ -870,7 +870,8 @@ func _live_taunt() -> void:
 # ---------- 14. the capstone, granted and upgraded ----------
 
 func _live_hold_the_line() -> void:
-	# Granted: the base 50% cut, one turn of Undying.
+	# Granted: the base 50% cut, TWO turns of Undying — the applied number, which
+	# is CV §1's convention. This comment said "one turn" until DM §1.
 	var scene := await _spawn({"wd_hold_line": 1}, ["raider"])
 	var wd := _wd(scene)
 	ok(wd != null, "the Hold the Line Warden spawned")
@@ -881,7 +882,7 @@ func _live_hold_the_line() -> void:
 			"the granted cast cuts 50%% of Break damage (got %d)" % \
 				wd.status_power("hold_bd"))
 		ok(int(wd.get_status("undying").get("turns", 0)) == 2,
-			"...and holds death off for one turn")
+			"...and holds death off for 2 turns (stated as APPLIED, CV §1)")
 		# The cut is real: unit.gd reads the status' power at ONE site.
 		wd.pressure = 0
 		wd.constitution = 100
@@ -891,7 +892,7 @@ func _live_hold_the_line() -> void:
 	scene.free()
 	await process_frame
 
-	# Upgraded: 80%, and two turns of Undying.
+	# Upgraded: 80%, and THREE turns of Undying (applied).
 	var earned := Classes.spec_pool_ability("warden", "Hold the Line")
 	var up := await _spawn({"wd_hold_line": 1}, ["raider"], ["Hold the Line"])
 	var wd2 := _wd(up)
@@ -905,7 +906,7 @@ func _live_hold_the_line() -> void:
 			"the upgraded cast cuts 80%% of Break damage (got %d)" % \
 				wd2.status_power("hold_bd"))
 		ok(int(wd2.get_status("undying").get("turns", 0)) == 3,
-			"...and holds death off for two turns")
+			"...and holds death off for 3 turns (stated as APPLIED, CV §1)")
 		wd2.pressure = 0
 		wd2.constitution = 100
 		wd2.take_hit(0, 100)

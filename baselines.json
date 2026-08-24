@@ -211,6 +211,20 @@
    "fails_obs": 1,
    "note": "BATCH DL's gate. §1 pins BOTH of Rallying Shout's clauses by their own read lines (the Pressure walk is `_hero_side()`, the resource walk is bare `heroes` plus its `resource_name` guard); §2 measures 30 Pressure shed on a live summoned Ursus; §3 is the NEGATIVE CONTROL — `companions` emptied for one cast, which is exactly the pre-DL collection, and the beast sheds 0; §4 measures the clause that did NOT move (the beast banks 0 resource, and `max_resource` is asserted NON-zero because DK recorded it as 0 and that was false)."
   },
+  "check_dm": {
+   "kind": "gate",
+   "checks": [
+    92,
+    92
+   ],
+   "checks_obs": 1,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 1,
+   "note": "BATCH DM's gate, and it is the gate for a batch that WIDENED NOTHING. §1 reads all six of DL's split-clause cards CLAUSE BY CLAUSE and pins fourteen collection-bearing clauses plus two self clauses by their own read lines — AND IT ANCHORS ON THE CLAUSE AND SEARCHES BACKWARD FOR THE WALK, because FIVE sites in `battle.gd` spell `heroes.filter(func(he): return not he.dead and not he.is_companion)` byte for byte, so a forward `find` from the walk reads the wrong site four times in five (the fault that bit DL at War Stomp's guard, fixed in the DIRECTION rather than in the fragment). The shared-walk COUNT is printed live and the assertion is the property (`> 1`) rather than a number — this gate asserted TWO on its first run and caught its own author. §2 IS THE LIVE HALF ON A REAL SUMMONED URSUS and it MEASURES all five recorded reasons rather than asserting them: `_gain_faith` pays the beast 0 and a hero 2 off the same call; `wrath` and `battle_shout` each attach to the beast cleanly and move 40 seeded blows by ratio 1.0000 (DK's Tank and Spank instrument pointed at two more statuses); the summon's `next_time` is INF and it is outside `_next_unit()`'s walk, which is what makes every per-turn clause hero; and Bulwark, Consecrated Ground, Divine Wrath, Sacred Resolve and Battle Shout each reach their caster and NOT the beast. §2 also measures HOLD THE LINE'S `undying` CLAUSE, which nothing had ever pinned — `check_dk`'s entry covers `hold_bd` only — and the beast holds at 1 HP through a lethal blow. AND IT MEASURES THE CLAUSE DM'S TEXT MOVED: one Battle Shout, EXACTLY ONE unit paid, caster +5 Rage, beast 0. §4 asserts the six cards' words in both directions plus the four prose surfaces DM corrected (three `master.html` copies and one glossary copy of Consecrated Ground's Faith drip, which said `ally` for a payload `_gain_faith` refuses outright). §5 asserts the thread's close is written down. SIX NEGATIVE CONTROLS WERE RUN AND ALL SIX BIT: the two pre-DM card wordings restored (2 and 3 failures), the two prose surfaces reverted to `ally` (2 each), Bulwark's loop WIDENED to `_hero_side()` (2), and Hold the Line's `undying` NARROWED to bare `heroes` (2). Gate takes ~40s. ONE READING SUPPORTS THE 92."
+  },
   "check_flow": {
    "kind": "gate",
    "checks": null,
