@@ -5,60 +5,92 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-23 (Batch DM).*
+*Last rewritten: 2026-08-27 (Batch DN).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DM — THE SIX SPLIT-CLAUSE CARDS, AND THE ALLY/HERO THREAD IS CLOSED.**
-  DL listed six cards carrying clauses of two different shapes under one word and ruled on none of
-  them. DM read all six clause by clause — **sixteen clauses, fourteen of which carry a
-  collection — and ALL FOURTEEN COLLECTIONS WERE ALREADY CORRECT.** One new gate, `check_dm`
-  (92 checks). **NO GAME CODE MOVED**: the diff to `battle.gd` and `classes.gd` is comments, and
-  that is proved with a comment-stripped diff rather than claimed.
-- **A BATCH THAT WIDENED NOTHING IS THE MEASUREMENT THAT LETS THE THREAD END.** Nine batches each
-  found the next thing; the only way out other than abandonment is somebody doing the work and
-  reporting that it came back clean. **Bulwark of Fortitude 4 clauses, Consecrated Ground 3,
-  Divine Wrath 2, Battle Shout 1 group, Hold the Line 2 group, Sacred Resolve 2** — every one says
-  what its read site walks.
-- **WHAT WAS WRONG WAS A THIRD SCOPE THIS THREAD HAD NO WORD FOR.** Battle Shout and Hold the Line
-  each hand **five Rage to the CASTER** — one body, which is neither the four nor the five.
-  **Battle Shout's card put it inside "A roar every hero answers:"**, so a group clause's
-  colon-list promised four heroes a payload that reaches one. **Hold the Line already worded the
-  identical payload correctly** (`Refunds 5 Rage.` as its own sentence), so the fix was to copy the
-  sibling card rather than invent a phrasing. **`check_co` and `check_cy` had both recorded it as
-  "hands the caster +5 Rage" since CO; the card was the only surface that disagreed.**
-- **AND CV §1's DURATION RULING HAD REACHED HOLD THE LINE'S NODE TEXT AND NOT ITS CARD.** CV moved
-  `wd_hold_line`'s no-death window 1/2 → 2/3; the `description` inside that node's own payload
-  still said "for a turn" and "for two turns" against the **2 and 3** applied — `cr_rime`'s shape,
-  the one CU found. Both card lines now state the applied number. **No code moved and no sweep was
-  opened.**
-- **DL FIXED CONSECRATED GROUND'S FAITH CLAUSE ON THE CARD AND LEFT FOUR PROSE COPIES SAYING
-  *ally*** — three in `master.html`, one in the glossary — for a payload `_gain_faith` refuses
-  outright. **The DA/DC/DG shape for the third time.** The rule that falls out is in `CLAUDE.md`:
-  **when a clause moves, sweep the CLAUSE across every surface, not the card across one.** Two
-  stale **Perfect** claims in the same two `master.html` sentences went with them, and Consecrated
-  Ground's duration there read 2 against the 3 applied.
-- **EVERY *hero* CLAUSE ON THE SIX NOW CARRIES ITS REASON AT ITS SITE, AND THERE ARE FIVE REASONS
-  AND NO SIXTH** — no resource bar; `_companion_hit` reads none of the hero strike loop's
-  multiplier block; stamped once where the four are built; per-turn (`_next_unit()` walks
-  `heroes + enemies`, a summon carries `next_time = INF`); `_gain_faith` refuses companions
-  outright. **Two of the six are narrow by CHOICE and say so** rather than implying an
-  impossibility. **Bulwark is the sharpest: widening its loop would ship three quarters of a card**,
-  because the 10%-a-turn regen it is named for can never arrive.
-- **TWO OF `check_dk`'s ELEVEN PINS WERE FAULTY AND BOTH MOVED (§2).** `wd_hold_line` pinned
-  `hold_bd` and stopped — **`undying` is a second group clause in the same loop and nothing
-  anywhere pinned it**; `dv_waters` pinned the rank-and-roll gate, which keeps nothing narrow and
-  would have stayed green with the whole turn-start block deleted. **And the deeper fault was the
-  search DIRECTION**: five sites spell `heroes.filter(not dead and not is_companion)` byte for
-  byte, so `check_dm` §1 anchors on the CLAUSE and `rfind`s the walk.
-- **`check_dm` ASSERTED THAT SHARED-WALK COUNT AS TWO AND ITS OWN GATE CAUGHT IT.** There are five.
-  The count-in-a-brief fault landing inside the instrument written to prevent it. The assertion is
-  the property (`> 1`) now and the live count is printed.
-- **Next letter: DN.** The two-letter stamp gate in fourteen suites reads `substr(_code_at + 7, 2)`
-  out of `(Batch XX)` and compares lexically — `DN` sorts after `DM`, so it still works. **A
-  THREE-letter code would break all fourteen.**
+- **Last batch: DN — THE TALENT NODES AGAINST THE NEW CHARTER. A REPORT.** Nothing was
+  re-authored, no tree was restructured, no node moved. One new instrument, `check_dn.gd`,
+  **read-only and NOT in `GATES`** — the standing `check_cu` and `check_cv` already have, for the
+  same reason. **The audit is a new §8 inside `docs/talent-audit.html`** rather than a second
+  document, so CU's reading (does the text match the code?) and DN's (guaranteed, or drawn?) sit
+  together over the same 324 nodes.
+- **THE TWO HALVES OF THE ANSWER DISAGREE, AND THAT IS THE FINDING.** **The CONTENT is almost
+  clean: SIX of 324 nodes depend on something drawn, and only TWO are dead without the draw**
+  (`bm_devoted_fury` and `bm_reserves`, both whole nodes about a `SPEC_POOLS` ability). The other
+  four carry a bonus CLAUSE that is drawn and stand up without it. **The repair bill on the existing
+  text is two re-authors and four clause cuts.**
+- **BUT THE SHAPE CANNOT BE BUILT FROM THEM: ZERO OF TWELVE SPECS CAN FILL THREE NINE-CELL LANES,
+  AND 97 NEW NODES — 30% OF THE LAYER — WOULD HAVE TO BE AUTHORED.** **Two specs hold a lane at
+  ZERO**: the Cleric has no offensive node in 27 and the Sharpshooter no defensive one. **Even at
+  ONE row per lane — a three-cell tree — those two still cannot fill**, so no shrinking rescues it.
+  The curve bends at four rows per lane (22 nodes short, 4 of 12 specs filling).
+- **TWO OF THE BRIEF'S COUNTS WERE WRONG AGAINST THE REPO AND BOTH ARE IN THE AUDIT'S §8.0.**
+  **There are THIRTY-SIX capstones, not twelve** — `CAPSTONE_ROW` is 9 and `LANES` is 3, so row 9
+  is three cells wide per spec; the build screens' *"ONE PER HERO, EVER · any lane"* is a PICK of
+  one from a SHELF of three. And **CV cut THREE dead Perfect clauses, not four** — the audit's own
+  disposition table reads *"CUT THREE; `dv_bulwark` IS NOT ONE OF THEM"*, its 5% party heal having
+  been ruled UNCONDITIONAL rather than dead. **`dv_bulwark` is a capstone, so a re-author working
+  from "four" would re-commit the error CV ruled against.**
+- **THE CHARTER CONTRADICTS ITSELF ABOUT 75 NODES AND SOMEBODY HAS TO RULE.** Its §0 permits a node
+  to be general in two ways only — *a STAT, or the spec's OWN resource and passive*; its §1 says
+  *a node modifying a CORE KIT ability is guaranteed*. **The gap is 235 clean versus 318 clean, and
+  it is a wording question rather than a code question.** §1's reading is the one the audit uses,
+  because it is the one with a mechanical test behind it.
+- **THE CAPSTONES ARE THE CLEANEST PART OF THE LAYER, NOT THE DIRTIEST.** **33 of 36 are
+  GUARANTEED, 3 are tree-internal, NOT ONE IS DRAWN**; nine grant an ability outright, which makes
+  them the most guaranteed nodes in the game — the talent IS the source. **The sanctioned exception
+  the brief was preparing to grant does not appear to be needed.** Ruled on nowhere, as instructed.
+- **THE SAVED-ALLOCATION RISK WAS MEASURED, NOT REASONED ABOUT.** A Berserker with all 27 cells
+  bought reads spent 54 / available 0. Move ONE node from row 1 to row 9 and it reads **spent 56,
+  available −2 — a NEGATIVE purse, with nothing to refuse it, clamp it or log it.** Delete an id
+  and its point is silently refunded while the dead cell stays in the save forever. **`Profile`
+  is v2, the load is TOLERANT, `version` is stamped unconditionally, and there is no migration step
+  in the file** — so there is currently nothing a migration could hang on. **`cells_spent` prices
+  each owned cell off the row it CURRENTLY sits in, which is why a MOVE is the dangerous edit and a
+  RENAME is not.**
+- **THE `lane` FIELD IS THE COUPLING, AND IT IS SIX LIVE SITES.** `data/runes.json` carries **36
+  `lane` fields, every lane name exactly once**; `runes.gd`, `run_sim.gd`, `talents_screen.gd`,
+  `party_screen.gd` and `battle.gd` read one. **The two screens keep working and read BETTER**;
+  `run_sim` is the casualty — **every `DOD_SIM_BUILDS` value ever typed becomes invalid**, and
+  `_target_lane`'s `tree[0].lane` fallback stops being twelve distinct arms. **The test tree is the
+  larger surface and is not in that six: TWENTY-FIVE `test_batch_*` files reference a lane**, some
+  with hard-coded name tables beside every node id.
+- **CU'S CROSS-ROW CONDITIONALS ARE FIVE, NOT THREE, AND ALL SIXTEEN CROSS-NODE DEPENDENCIES
+  SURVIVE.** The brief names the Berserker's three; `sm_guarded`→`sm_punish` and
+  `wd_shatter_guard`→`wd_spiked` carry the same payload `condition`. **A cross-row conditional is a
+  bet on a node the player CHOOSES, not on a card they are DEALT**, so it is not the defect this
+  audit was looking for even though it looks like one.
+- **ONE MATCHING RULE EARNED ITS PLACE THE HARD WAY: SAME-TREE NAMES BEAT THE CORPUS.** The Warden
+  node `wd_spiked` is *named* **Spite** and the Berserker has a *drafted ability* called Spite; the
+  first pass reported a cross-spec bet that does not exist. The same pass matched "Berserk" inside
+  "Berserker" seven times and "Heal" inside "Health". **Word boundaries plus same-tree precedence
+  removed all nine false bets** — the DoD-standard needle-floor fault, in a new place.
+- **`master.html` DID NOT MOVE AND ITS STAMP IS STILL `(Batch DM)`.** DN changes nothing about what
+  the game IS, so the fourteen self-comparing stamp gates are correct to read DM. **The two-letter
+  stamp gate reads `substr(_code_at + 7, 2)` and compares lexically** — a THREE-letter code would
+  break all fourteen.
+- **TWO BATTERIES AT DN, AND THE FIRST ONE FOUND A REAL RED THAT WAS THE INSTRUMENT'S OWN FAULT.**
+  Battery 1 ran frozen and reported **`check_da` 37 / 2** — §3's hand-rolled-corpus fingerprint is
+  the two draft-pool calls, and **`check_dn.gd` carries both**, because the membership tables are
+  the whole audit. **IT IS A FALSE POSITIVE AND THE FIX RECORDS WHY RATHER THAN SUPPRESSING IT:**
+  `check_dn` calls `Classes.ability_corpus()` outright for the walk and reads the pools only for
+  which BUCKET a named ability sits in, which the flat 216 cannot answer. `WALK_EXEMPT` holds two
+  files now, and **the loop that asserts each exempt file STILL carries the marks is what makes the
+  count 37** — the +1 is the exempt list, not new coverage. `baselines.json` moved 36 → 37 with
+  `checks_obs` reset to 1, in a **five-line diff**.
+- **BATTERY 2 RAN AGAINST A TREE FROZEN BEFORE IT BEGAN AND UNEDITED UNTIL IT FINISHED** — 153
+  files MD5-stamped at the freeze and identical after — **and it is the acceptance run. Seventy-one
+  targets ran and the manifest names all seventy-one.** `check_de` reports **293 checks / 0
+  failures / 0 NOTICES**, and **zero throws anywhere.** The only red is `check_cm_live`'s four, the
+  standing deliberate one.
+- **`check_dn` IS NOT IN THE BATTERY AND OWES NO BASELINE ROW.** It is not in `GATES`, so it writes
+  no log, so the differ never sees it — which is why `baselines.json` is still **70 rows** after a
+  batch that added a `check_*.gd` file. Run it by hand:
+  `DOD_DN_DUMP=<path> Godot --headless --path . --script check_dn.gd`.
+- **Next letter: DO.** `DO` sorts after `DN`, so the stamp gates still work.
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
   purpose-authored. Recent batches are correction and consolidation: the skill-check rework
   (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
@@ -66,21 +98,42 @@ in `docs/master.html`.
   one of them, DB's and DD's `_spawn` consolidations, DC's threshold repairs, DE's move of the
   count differ into the runner, DF's sort of the 47, DG's close of the ten, DH's nine cross-spec
   clauses, DI's payment of the plumbing debt, DJ's close of the half DI would not take, DK's ruling
-  on the eleven, DL's close of the clause DK recorded as owed, **and DM's close of the thread**.
-- **TWO BATTERIES AT DM AND THE FIRST ONE FOUND A REAL BREAK.** Battery 1 ran frozen and reported
-  `check_de` **293 / 1** — `test_batch_al` asserted the upgraded Hold the Line card contains
-  "two turns" and DM had moved that string. **The needle followed the string** (bf's case, not
-  bj's: the string moved for a binding ruling, not a reflow), and the new needle names its clause.
-  **Battery 2 ran against a tree frozen before it began and unedited until it finished** —
-  fourteen files MD5-stamped at the freeze and identical after — and it is the acceptance run.
-  **Seventy-one targets ran and the manifest names all seventy-one.** `check_de` reports
-  **293 / 0 failures / 0 NOTICES**. The only red is `check_cm_live`'s four, the standing deliberate
-  one.
+  on the eleven, DL's close of the clause DK recorded as owed, DM's close of the ally/hero thread,
+  **and DN's sizing of the talent charter.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
 **THE ALLY/HERO THREAD IS CLOSED AND NOTHING FROM IT IS CORRECTNESS-SHAPED ANY MORE.** What is
 below is design, prose, and the standing owed items.
+
+### THE TALENT CHARTER — SIZED AT DN, AWAITING A DESIGNER DECISION
+
+**Nothing here is correctness-shaped. All of it is a decision, and the audit exists so the decision
+is made on numbers.** Full evidence: `docs/talent-audit.html` §8 and `docs/reports/DN.md`.
+
+- **THE ANSWER TO "IS IT WORTH IT" IS: NOT AS A RE-SORT.** 318 of 324 nodes need no charter-driven
+  change; **97 NEW nodes do.** And 97 is a LARGER authoring job than the original twelve-tree pass,
+  because those were written to a THEME each spec already had and these must be written to a
+  CATEGORY the spec demonstrably has no material for — nine offensive nodes for a Cleric who has
+  never had one, nine defensive nodes for a Sharpshooter who has never had one.
+- **THREE THINGS WANT SETTLING FIRST, AND ONLY THE SECOND IS CODE.**
+  1. **§0-versus-§1 of the charter** — one sentence, worth 83 nodes (235 clean or 318 clean).
+  2. **The saved-allocation drift** (`Profile` v2, no migration hook, a MOVE mis-prices a cell).
+     **Fix it BEFORE any restructure ships, not after** — meta progression is the one thing in this
+     game that cannot be re-earned quickly, at 1 point per spec per ZONE BOSS.
+  3. **Whether the tree shrinks at all.** Worth deciding on its own merits; it does not solve this.
+- **THE SIX DRAWN NODES, IF THE CHARTER PROCEEDS AT ALL:** `bm_devoted_fury` and `bm_reserves`
+  re-authored (each is one sentence about a `SPEC_POOLS` ability and does nothing without it);
+  `sm_blade_dance`, `wd_stomp_drill`, `wd_bannerman` and `bm_ancient_pact` reworded (each stands
+  without its drawn clause). **And a seventh the ability pass cannot see:** `sm_precision` reads
+  Dazed, Crippled and Exposed, and the Swordmaster guarantees NONE of the three — Dazed comes only
+  from Charge (class draft) or Sweeping Strikes (spec pool), the other two only from `sm_lunge`.
+- **THE ONE THING THAT MUST NOT BE SILENTLY UNDONE:** CV ruled `dv_bulwark`'s 5% party heal
+  **UNCONDITIONAL**, not a dead Perfect. It is a capstone, so a re-author is likely to touch it.
+- **AND THE EXPENSIVE CONVENTION IS NOT AT RISK FROM THE RE-SORT — IT IS AT RISK FROM THE 97.**
+  HERO-versus-ALLY took five batches (CV, DJ, DK, DL, DM). A re-sort re-opens none of it.
+  **Authoring 97 new nodes writes 97 new chances to get *ally* wrong**, and
+  `docs/text-standard.html` §4.9 is the test.
 
 ### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET EIGHT TIMES RUNNING
 
@@ -308,8 +361,9 @@ re-derived from the source at DM; not one was moved.**
   is the designer's call which way.
 - **No spec pool has ever been checked for redundancy against its own base kit.**
 - **Two specs still take the generic talent fallback**, nine nodes between them.
-- **`docs/text-audit.html` and `docs/talent-audit.html` hold findings that have been ruled on and
-  applied.** Once the designer confirms, both can leave the knowledge sync.
+- **`docs/text-audit.html` holds findings that have been ruled on and applied.** Once the designer
+  confirms, it can leave the knowledge sync. **`docs/talent-audit.html` CANNOT: DN's §8 is an open
+  question, not a closed one**, and the file went 37 → 158 KiB carrying it.
 
 ---
 
@@ -358,7 +412,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DM
+### THE TEST TREE, AS OF DN
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -367,10 +421,10 @@ re-derived from the source at DM; not one was moved.**
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
 - **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **nineteen** — DM
-  added `check_dm`. **There are 25 `check_*.gd` files**, so **six are not in `GATES`** — `check_ck_width`,
-  `check_cu`, `check_cv`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
+  added `check_dm`. **There are 26 `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
+  `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
-  AFTER them**, so the three that run nowhere are `check_ck_width`, `check_cu` and `check_cv`.
+  AFTER them**, so the four that run nowhere are `check_ck_width`, `check_cu`, `check_cv` and `check_dn`.
 - **THE BATTERY WRITES A MANIFEST, `$OUT/.ran`, AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
   LISTING.** `run_battery.sh` does NOT clear `$OUT` between runs, so a target that failed to launch
   would otherwise be blessed by its PREVIOUS run's log. A name is appended immediately before its
@@ -453,19 +507,20 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 25 entries** (CO → DM), **337 KiB**. The 400 KB
+- **The live file starts at Batch CO and holds 26 entries** (CO → DN), **339 KiB**. The 400 KB
   threshold is now close: **one more batch of this size reaches it**, and CX's cut point is CN/CO.
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (Batch 1 → CN) and is **1042 KiB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
   bv, bw, bx, cb, ce, bb, bn, bo. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
   correct.
 
-### Knowledge sync, re-measured at DM
+### Knowledge sync, re-measured at DN
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **136 files, 6.14 MiB** (DL measured 133 files / 6.04 MiB; DM added a gate and a report and
-  wrote prose into six documents).
+- **138 files, 6.29 MiB** (DM measured 136 files / 6.14 MiB; DN added an instrument and a report
+  and wrote 124 KiB of audit into `docs/talent-audit.html`, which is where almost all of the
+  growth is).
 - Heaviest: `scripts/battle.gd` **1179**, `docs/changelog.html` **337**, `docs/design-notes.md`
   **343**, `docs/master.html` **328**, `scripts/classes.gd` **276**, `CLAUDE.md` **215**,
   `scripts/talents.gd` **184**, `scripts/unit.gd` **174**.

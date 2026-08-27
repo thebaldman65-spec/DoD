@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Talent Audit (Batch CU)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DL &mdash; &sect;4.1 re-ruled at the CLAUSE)</b></p>
+<p align="right"><b>Last updated: 2026-08-27 (Batch DN &mdash; &sect;8, the second reading: the 324 against the O/D/U charter)</b></p>
 <h1>DAWN OF DECAY — THE TALENT AUDIT</h1>
 
 <div style="border:2px solid #444; padding:8px; margin:8px 0">
@@ -421,5 +421,750 @@ than nine more specs read by hand. <b>CV took that advice and asked two: undecla
 undeclared exclusions. It also hand-read the Mystic's 27</b> — the spec that produced zero
 automated hits, so not one node had ever been opened — and that hand-read found two things
 neither sweep could have.</p>
+
+
+<hr>
+<h1>&sect;8 &mdash; THE SECOND READING: THE 324 AGAINST THE OFFENSE / DEFENSE / UTILITY CHARTER <i>(Batch DN, 2026-08-27)</i></h1>
+
+<div style="border:2px solid #444; padding:8px; margin:8px 0">
+<p><b>THIS IS A REPORT. NOTHING WAS RE-AUTHORED, NO TREE WAS RESTRUCTURED, NO NODE MOVED.</b>
+CU read all 324 for whether each node's text matched its code. <b>DN reads the same 324 for a
+different question:</b> does the node depend on something the hero is GUARANTEED to have, or on
+something it must be DEALT? Both readings are in this one document on purpose.</p>
+<p><b>The instrument is <code>check_dn.gd</code></b> &mdash; read-only, like <code>check_cu.gd</code>
+and <code>check_cv.gd</code>, and not in <code>run_battery.sh</code>'s <code>GATES</code> array for
+the same reason they are not: <b>it reports, it does not gate.</b></p>
+<pre>/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script check_dn.gd</pre>
+</div>
+
+<h2>&sect;8.0 &mdash; TWO CLAIMS IN THE BRIEF ARE WRONG AGAINST THE REPO, AND BOTH ARE COUNTS</h2>
+
+<p><b>1. "The twelve capstones" &mdash; THERE ARE THIRTY-SIX.</b> <code>Talents.CAPSTONE_ROW</code>
+is <b>9</b> and <code>Talents.LANES</code> is <b>3</b>, so row 9 holds <b>three</b> capstone cells
+per spec, one per lane &mdash; <b>36 across twelve trees</b>, not twelve. The three the brief names
+are real capstones and they are all in the same row: <code>bm_the_pack</code> (The Pack) is the
+Beastmaster's <i>pack</i> capstone, <code>cr_absolute</code> (Absolute Zero) the Cryomancer's
+<i>Deep Freeze</i> capstone, <code>dv_apostle</code> (Apostle) the Inquisitor's <i>Faith</i>
+capstone. <b>Each of those specs has two more.</b> The party and talent screens both label row 9
+"CAPSTONE &middot; ONE PER HERO, EVER &middot; any lane" &mdash; the <i>shelf</i> is three wide and
+the <i>pick</i> is one, which is where a count of twelve most likely came from.</p>
+
+<p><b>2. "CV cut four dead Perfect clauses" &mdash; IT CUT THREE.</b> This document's own
+disposition table, twelve lines above, reads
+<b>"&sect;1.1 &mdash; four dead Perfect clauses &rarr; CUT THREE; <code>dv_bulwark</code> IS NOT ONE
+OF THEM."</b> CU <i>found</i> four; CV cut <code>dv_resolve</code>, <code>oc_hysteria</code> and
+<code>wd_shieldwall</code>, and ruled <code>dv_bulwark</code>'s 5% party heal UNCONDITIONAL rather
+than dead. <b>A restructure that "puts CV's rulings back in play" must not put that fourth one back
+in play as a cut</b>, which is exactly the error the brief's own &sect;3 asks to be protected
+against.</p>
+
+<p><i>Everything else the brief asserts checked out: <code>runes.json</code> does carry a
+<code>lane</code> field on spec runes (36 of them); the party screen does render live lane-point
+headers; CV did correct six nodes; CU's three named cross-row conditionals are all live and all
+three read the spec's own mechanics.</i></p>
+
+<h2>&sect;8.1 &mdash; THE SORTING AXIS: GUARANTEED, OR DRAWN?</h2>
+
+<p><b>The distinction cannot be read off the node text</b> &mdash; "Deep Freeze deals +30%" tells
+you nothing about whether Deep Freeze is guaranteed. Every ability name each node mentions is
+resolved against the LIVE tables: <code>Classes.protected_names()</code>,
+<code>spec_draft_pool()</code>, <code>class_draft_pool()</code>, <code>spec_pool()</code> and
+<code>class_pool()</code>. <b>Same-tree names beat the corpus</b> &mdash; the Warden node
+<code>wd_spiked</code> is <i>named</i> "Spite" and the Berserker has a <i>drafted</i> ability
+called Spite; a matcher without that rule reports a cross-spec bet that does not exist.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What the node depends on</th><th>Count</th><th>Charter verdict</th></tr>
+<tr><td>No ability at all &mdash; a stat, the spec's own passive, its own resource</td><td><b>235</b></td><td><b>Clean.</b> This is the charter's own definition of general.</td></tr>
+<tr><td>An ability in the spec's <b>PROTECTED CORE</b></td><td><b>75</b></td><td><b>Guaranteed by &sect;1, but see &sect;8.1.1.</b></td></tr>
+<tr><td>Another node in its <b>OWN TREE</b></td><td><b>17</b></td><td>Not luck &mdash; a build choice. Reported, not ruled.</td></tr>
+<tr><td>Something <b>DRAWN</b> &mdash; a zone-boss pool ability</td><td><b>6</b></td><td><b>These are the bets.</b></td></tr>
+</table>
+<p><i>The rows overlap &mdash; a node can name a core ability and a tree node both &mdash; so they
+sum past 324. The population that matters is the last row, and it is <b>six</b>.</i></p>
+
+<h3>&sect;8.1.1 &mdash; THE CHARTER CONTRADICTS ITSELF ABOUT THOSE 75, AND SOMEBODY HAS TO RULE</h3>
+<p>The brief says two different things:</p>
+<ul>
+<li><b>&sect;0:</b> "A node may be general in two ways only: <b>a STAT, or the spec's OWN resource
+and passive</b>." Under that sentence a node that modifies <i>Frostbolt</i> is out, because
+Frostbolt is neither a stat nor the passive.</li>
+<li><b>&sect;1:</b> "A node modifying a <b>CORE KIT</b> ability is guaranteed." Under that sentence
+the same node is in.</li>
+</ul>
+<p><b>The gap between those two readings is 75 nodes &mdash; 23% of the layer.</b> Under &sect;1 the
+trees are 318/324 clean. Under &sect;0 they are 235/324. <b>This is the single largest number in
+the audit and it is a wording question, not a code question.</b> &sect;1's reading is the one this
+report uses, because it is the one with a mechanical test behind it.</p>
+
+<h2>&sect;8.2 &mdash; THE SIX DRAWN NODES, IN FULL</h2>
+<p><b>Every one of the six depends on a <code>SPEC_POOLS</code> ability &mdash; the zone-boss
+pick.</b> Not one depends on a draft-pool ability, an item, a rune, a relic or a status another
+spec produces. Those searches were run and returned nothing.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Spec / lane / row</th><th>Depends on</th><th>Is the WHOLE node the bet?</th></tr>
+<tr><td><code>bm_devoted_fury</code><br><i>Devoted Fury</i></td><td>beastmaster / devotion / 4</td><td><code>Bestial Wrath</code><br><small>Bestial Wrath lasts 1 turn(s) longer per Loyalty stack on the companion.</small></td><td><b>YES.</b> The node is one sentence and Bestial Wrath is its subject. Without the draw it does nothing at all. <b>&rarr; RE-AUTHOR</b></td></tr>
+<tr><td><code>bm_reserves</code><br><i>Deep Reserves</i></td><td>beastmaster / handler / 3</td><td><code>Spirit Bond</code><br><small>Spirit Bond restores +30% more maximum Mana.</small></td><td><b>YES.</b> "Spirit Bond restores +30% more maximum Mana" is the entire node. <b>&rarr; RE-AUTHOR</b></td></tr>
+<tr><td><code>sm_blade_dance</code><br><i>Sunder Guard</i></td><td>swordmaster / Breaker / 2</td><td><code>Shatterpoint</code><br><small>Guard Change deals 40 Break damage to EVERY enemy (up from 15 to one). If he also owns Shatterpoint, that deals +40 Break damage as well.</small></td><td>No. Guard Change is PROTECTED CORE; the Shatterpoint line is a bonus clause. <b>&rarr; REWORD</b></td></tr>
+<tr><td><code>wd_stomp_drill</code><br><i>Rallying Cry</i></td><td>warden / Banner / 3</td><td><code>War Stomp</code><br><small>At the start of each of the Warden&#x27;s turns, every hero regains 4% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.</small></td><td>No. The turn-start resource drip is a stat; the War Stomp line is a bonus clause. <b>&rarr; REWORD</b></td></tr>
+<tr><td><code>wd_bannerman</code><br><i>Bulwark Line</i></td><td>warden / Banner / 5</td><td><code>Interpose</code><br><small>Shieldwall also grants every other hero +10% Block chance for its duration. If he owns Interpose, each hero gains 1 additional shield charge from it as well.</small></td><td>No. Shieldwall is PROTECTED CORE; the Interpose line is a bonus clause. <b>&rarr; REWORD</b></td></tr>
+<tr><td><code>bm_ancient_pact</code><br><i>Ancient Pact</i></td><td>beastmaster / devotion / 6</td><td><code>Spirit Bond</code><br><small>The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</small></td><td>No. The Pack Bond doubling is the passive; Spirit Bond is named as an EXAMPLE inside the drawback, and Hunter's Instinct beside it is core. <b>&rarr; REWORD</b></td></tr>
+</table>
+
+<p><b>SO: TWO NODES NEED RE-AUTHORING AND FOUR NEED A CLAUSE CUT.</b> That is the entire
+charter-driven repair bill on the existing text.</p>
+
+<h3>&sect;8.2.1 &mdash; A SEVENTH, WHICH THE ABILITY PASS DOES NOT REACH</h3>
+<p><code>sm_precision</code> (Swordmaster / Blade / 4) reads <b>"+20% critical strike chance
+against Dazed, Crippled, and Exposed targets."</b> It names no ability, so the ability pass calls it
+clean. <b>But the Swordmaster cannot apply Dazed from anything guaranteed:</b> the only two
+appliers in the game are <b>Charge</b> (warrior <code>CLASS_DRAFT_POOLS</code>) and <b>Sweeping
+Strikes</b> (<code>SPEC_POOLS["swordmaster"]</code>), and his core kit's only status is
+<code>stunned</code>, off Pommel Strike. <b>Crippled and Exposed he gets only from Lunge</b>, which
+is a TREE node (<code>sm_lunge</code>). <b>Take neither Lunge nor a Dazed source and the node does
+nothing whatsoever.</b> This is the shape a text-only search cannot find, and it is reported rather
+than ruled.</p>
+
+<h2>&sect;8.3 &mdash; DO THE THREE LANES FILL? NO. NOT ONE SPEC. NOT AT ANY SIZE.</h2>
+<p><b>This is the finding.</b> The guaranteed/drawn sort came back almost clean; the SHAPE did
+not.</p>
+<p><i>Method: a weighted keyword classifier over each node's rendered text (the rule table is in
+<code>check_dn.gd</code>), then <b>all 324 read by hand</b>. 261 cells were left where the rule put
+them and <b>63 were moved</b>, each with its reason recorded. The corrections are systematic rather
+than scattered &mdash; "Burning" scored Offense, so the Pyromancer's entire defensive
+<i>Inferno</i> lane landed wrong; "heal" plus "critical" scored Offense, so the Cleric's did.</i></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Spec</th><th>Offense</th><th>Defense</th><th>Utility</th><th>Shortfall against 9 / 9 / 9</th></tr>
+<tr><td><b>arcanist</b></td><td>14</td><td>4</td><td>9</td><td><b>Defense short 5</b></td></tr>
+<tr><td><b>beastmaster</b></td><td>8</td><td style="background:#fdd">2</td><td>17</td><td><b>Offense short 1</b>, <b>Defense short 7</b></td></tr>
+<tr><td><b>berserker</b></td><td>16</td><td>5</td><td>6</td><td><b>Defense short 4</b>, <b>Utility short 3</b></td></tr>
+<tr><td><b>cryomancer</b></td><td>11</td><td style="background:#fdd">1</td><td>15</td><td><b>Defense short 8</b></td></tr>
+<tr><td><b>holy</b></td><td style="background:#fdd">0</td><td>15</td><td>12</td><td><b>Offense short 9</b></td></tr>
+<tr><td><b>inquisitor</b></td><td style="background:#fdd">1</td><td>20</td><td>6</td><td><b>Offense short 8</b>, <b>Utility short 3</b></td></tr>
+<tr><td><b>mystic</b></td><td>18</td><td>4</td><td>5</td><td><b>Defense short 5</b>, <b>Utility short 4</b></td></tr>
+<tr><td><b>occultist</b></td><td>12</td><td>11</td><td>4</td><td><b>Utility short 5</b></td></tr>
+<tr><td><b>pyromancer</b></td><td>16</td><td>8</td><td>3</td><td><b>Defense short 1</b>, <b>Utility short 6</b></td></tr>
+<tr><td><b>sharpshooter</b></td><td>18</td><td style="background:#fdd">0</td><td>9</td><td><b>Defense short 9</b></td></tr>
+<tr><td><b>swordmaster</b></td><td>16</td><td>10</td><td style="background:#fdd">1</td><td><b>Utility short 8</b></td></tr>
+<tr><td><b>warden</b></td><td>5</td><td>20</td><td style="background:#fdd">2</td><td><b>Offense short 4</b>, <b>Utility short 7</b></td></tr>
+<tr><td><b>TOTAL</b></td><td><b>135</b></td><td><b>100</b></td><td><b>89</b></td><td><b>97 new nodes</b></td></tr>
+</table>
+
+<p style="border:2px solid #900; padding:6px"><b>ZERO OF TWELVE SPECS CAN FILL THREE NINE-CELL
+LANES. A 27-cell tree at 9 / 9 / 9 NEEDS 97 NEW NODES AUTHORED &mdash; 30% OF THE ENTIRE TALENT
+LAYER.</b></p>
+
+<h3>&sect;8.3.1 &mdash; TWO SPECS HOLD A STRUCTURAL ZERO</h3>
+<ul>
+<li><b>The Cleric (holy) has NO offensive node. Not one of 27.</b> Offense 0 / Defense 15 /
+Utility 12.</li>
+<li><b>The Sharpshooter has NO defensive node. Not one of 27.</b> Offense 18 / Defense 0 /
+Utility 9.</li>
+<li>The Inquisitor has <b>one</b> offensive node (<code>dv_judgement</code>, the Zeal capstone) and
+the Cryomancer <b>one</b> defensive node (<code>cr_hungering</code>).</li>
+</ul>
+
+<h3>&sect;8.3.2 &mdash; SHRINKING THE TREE DOES NOT RESCUE IT</h3>
+<p>&sect;3 of the brief asks what the tree looks like at a smaller size. <b>The answer is that the
+shortfall shrinks but never reaches zero</b>, because two of the holes are structural rather than
+numeric:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Rows per lane</th><th>Cells per spec</th><th>Points to fill</th><th>Specs that fill all three</th><th>New nodes needed</th></tr>
+<tr style="background:#fdd"><td><b>9</b> <i>(today)</i></td><td>27</td><td>54</td><td><b>0 of 12</b></td><td>97</td></tr>
+<tr style="background:#fdd"><td><b>8</b></td><td>24</td><td>45</td><td><b>0 of 12</b></td><td>79</td></tr>
+<tr style="background:#fdd"><td><b>7</b></td><td>21</td><td>36</td><td><b>0 of 12</b></td><td>63</td></tr>
+<tr style="background:#fdd"><td><b>6</b></td><td>18</td><td>27</td><td><b>0 of 12</b></td><td>47</td></tr>
+<tr><td><b>5</b></td><td>15</td><td>21</td><td><b>1 of 12</b></td><td>33</td></tr>
+<tr><td><b>4</b></td><td>12</td><td>15</td><td><b>4 of 12</b></td><td>22</td></tr>
+<tr><td><b>3</b></td><td>9</td><td>9</td><td><b>5 of 12</b></td><td>14</td></tr>
+<tr><td><b>2</b></td><td>6</td><td>6</td><td><b>7 of 12</b></td><td>7</td></tr>
+<tr style="background:#dfd"><td><b>1</b></td><td>3</td><td>3</td><td><b>10 of 12</b></td><td>2</td></tr>
+</table>
+<p><b>EVEN AT ONE ROW PER LANE &mdash; A THREE-CELL TREE &mdash; TWO SPECS STILL CANNOT
+FILL.</b> The Cleric would have an empty Offense cell and the Sharpshooter an empty Defense cell,
+because neither holds a single node of that kind to put there. <b>No amount of shrinking sorts
+this; it can only be authored.</b></p>
+
+<h2>&sect;8.4 &mdash; THE THIRTY-SIX CAPSTONES</h2>
+<p><b>The brief expects these to be the problem and they are the cleanest part of the layer.</b>
+<b>33 of 36 are GUARANTEED, 3 are tree-internal, and NOT ONE IS DRAWN.</b> Twenty-five read nothing
+but a stat or the spec's own passive; eight name a PROTECTED CORE ability; three name another node
+in their own tree. <b>Nine grant a new ability outright</b>, which makes them the most guaranteed
+nodes in the game rather than the least &mdash; the talent IS the source.</p>
+<p><b>Ruling on none, as instructed.</b> The observation the designer may want is that <b>the
+sanctioned exception the brief was preparing to grant does not appear to be needed.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Spec</th><th>Lane</th><th>Capstone</th><th>Axis</th><th>Lands</th><th>Grants?</th><th>What it reads</th></tr>
+<tr><td>arcanist</td><td>Entropy</td><td><b>Perfect Conversion</b> <code>ar_timelord</code></td><td>GUARANTEED</td><td>Utility</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>arcanist</td><td>Overload</td><td><b>Magi&#x27;s Wrath</b> <code>ar_wrath</code></td><td>TREE</td><td>Offense</td><td>YES</td><td><code>Conduit</code> <small>[tree-node]</small></td></tr>
+<tr><td>arcanist</td><td>Resonance</td><td><b>Singularity</b> <code>ar_singularity</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>beastmaster</td><td>devotion</td><td><b>One Soul</b> <code>bm_one_soul</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>beastmaster</td><td>handler</td><td><b>Apex Predator</b> <code>bm_apex</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Kill Command</code> <small>[core]</small>, <code>Quick Shot</code> <small>[core]</small></td></tr>
+<tr><td>beastmaster</td><td>pack</td><td><b>The Pack</b> <code>bm_the_pack</code></td><td>TREE</td><td>Utility</td><td>&mdash;</td><td><code>Lone Bond</code> <small>[tree-node]</small></td></tr>
+<tr><td>berserker</td><td>Bloodletting</td><td><b>Exsanguination</b> <code>bz_exsanguinate</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>berserker</td><td>Fury</td><td><b>Undying Rage</b> <code>bz_undying</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>berserker</td><td>Warpath</td><td><b>Rampage</b> <code>bz_rampage</code></td><td>GUARANTEED</td><td>Offense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>cryomancer</td><td>Deep Freeze</td><td><b>Absolute Zero</b> <code>cr_absolute</code></td><td>GUARANTEED</td><td>Utility</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>cryomancer</td><td>Thaw</td><td><b>Shatter</b> <code>cr_shatter</code></td><td>GUARANTEED</td><td>Offense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>cryomancer</td><td>Winter</td><td><b>Eternal Winter</b> <code>cr_eternal</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>holy</td><td>Mercy</td><td><b>Avatar of Mercy</b> <code>hl_avatar</code></td><td>GUARANTEED</td><td>Utility</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>holy</td><td>Radiance</td><td><b>Sanctum</b> <code>hl_sanctum</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>holy</td><td>Vigil</td><td><b>Martyrdom</b> <code>hl_capacitor</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><code>Resurrection</code> <small>[core]</small></td></tr>
+<tr><td>inquisitor</td><td>Bulwark</td><td><b>Bulwark of Fortitude</b> <code>dv_bulwark</code></td><td>GUARANTEED</td><td>Defense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>inquisitor</td><td>Faith</td><td><b>Apostle</b> <code>dv_apostle</code></td><td>TREE</td><td>Defense</td><td>&mdash;</td><td><code>Consecrated Ground</code> <small>[core]</small>, <code>Fervor</code> <small>[tree-node]</small></td></tr>
+<tr><td>inquisitor</td><td>Zeal</td><td><b>Judgement</b> <code>dv_judgement</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Consecrated Ground</code> <small>[core]</small></td></tr>
+<tr><td>mystic</td><td>Guerilla</td><td><b>Force of Nature</b> <code>sv_force</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>mystic</td><td>Snares</td><td><b>The Whole Forest</b> <code>sv_forest</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Tripwire</code> <small>[core]</small></td></tr>
+<tr><td>mystic</td><td>Venom</td><td><b>Perfected Toxin</b> <code>sv_epidemic</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>occultist</td><td>Leech</td><td><b>Soul Glut</b> <code>oc_soul_glut</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>occultist</td><td>Madness</td><td><b>Mass Hysteria</b> <code>oc_hysteria</code></td><td>GUARANTEED</td><td>Utility</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>occultist</td><td>Ruin</td><td><b>Avatar of Ruin</b> <code>oc_avatar_ruin</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>pyromancer</td><td>Detonation</td><td><b>Cataclysm</b> <code>py_hellfire</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Detonation</code> <small>[core]</small></td></tr>
+<tr><td>pyromancer</td><td>Inferno</td><td><b>Phoenix Rebirth</b> <code>py_rebirth</code></td><td>GUARANTEED</td><td>Utility</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>pyromancer</td><td>Kindling</td><td><b>Firestorm</b> <code>py_firestorm</code></td><td>GUARANTEED</td><td>Offense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>sharpshooter</td><td>Penetration</td><td><b>Through and Through</b> <code>ss_tnt</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>sharpshooter</td><td>Precision</td><td><b>One Shot</b> <code>ss_one_shot</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Aimed Shot</code> <small>[core]</small></td></tr>
+<tr><td>sharpshooter</td><td>Tempo</td><td><b>Rapid Fire</b> <code>ss_rapid</code></td><td>GUARANTEED</td><td>Utility</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>swordmaster</td><td>Blade</td><td><b>Execute</b> <code>sm_execute</code></td><td>GUARANTEED</td><td>Offense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>swordmaster</td><td>Breaker</td><td><b>Guard Breaker</b> <code>sm_en_garde</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>swordmaster</td><td>Poise</td><td><b>Untouchable</b> <code>sm_untouchable</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><code>Pommel Strike</code> <small>[core]</small></td></tr>
+<tr><td>warden</td><td>Banner</td><td><b>Hold the Line</b> <code>wd_hold_line</code></td><td>GUARANTEED</td><td>Defense</td><td>YES</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>warden</td><td>Plate</td><td><b>Immovable</b> <code>wd_mountain</code></td><td>GUARANTEED</td><td>Defense</td><td>&mdash;</td><td><i>stat / own passive only</i></td></tr>
+<tr><td>warden</td><td>Threat</td><td><b>Vengeful Guardian</b> <code>wd_avenger</code></td><td>GUARANTEED</td><td>Offense</td><td>&mdash;</td><td><code>Crushing Blow</code> <small>[core]</small></td></tr>
+</table>
+
+<h2>&sect;8.5 &mdash; WHAT BREAKS OUTSIDE THE TREES: EVERY SITE THAT READS A LANE NAME</h2>
+<p><b>There are 36 distinct lane names in the trees and the charter replaces them with three.</b>
+Six live code sites read a lane name; the rest of the word's ~1,100 occurrences across the repo are
+comments and test fixtures.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Site</th><th>What it does with the name</th><th>What three names does to it</th></tr>
+<tr><td><code>data/runes.json</code><br><b>36 <code>lane</code> fields</b></td>
+<td>One spec rune per lane, each carrying that lane's exact name &mdash; Rune of Exsanguination
+&rarr; <code>"lane": "Bloodletting"</code>. All 36 names appear exactly once.</td>
+<td><b>THE COUPLING THE DESIGN REMOVES.</b> 36 unique values collapse to 3 repeated twelve times.
+The rune stays identifiable because <code>scope: "spec:berserker"</code> already disambiguates
+&mdash; but <b>the <code>lane</code> field stops naming the rune's THEME and names only its
+category</b>, and "Rune of Exsanguination, Berserker, Offense" says strictly less than "Rune of
+Exsanguination, Bloodletting" did. Not collateral. The point.</td></tr>
+<tr><td><code>scripts/runes.gd:353,373</code></td><td>Carries <code>lane</code> off the JSON onto
+the live rune record; default <code>""</code>.</td><td>Unchanged mechanically.</td></tr>
+<tr><td><code>scripts/run_sim.gd:86,943,962,971</code><br><code>_target_lane</code>,
+<code>_pick_rune_candidate</code></td>
+<td><code>builds</code> maps <b>spec &rarr; target lane NAME</b> (the <code>DOD_SIM_BUILDS</code>
+env var). Talent picks are chosen by <code>t.lane == target</code>; the elite rune pick is
+<code>lane &gt; spec &gt; first</code>.</td>
+<td><b>EVERY VALUE OF <code>DOD_SIM_BUILDS</code> EVER TYPED BECOMES INVALID</b>
+(<code>cryomancer:Deep Freeze</code> and the rest). And <code>_target_lane</code> falls back to
+<code>tree[0].lane</code> &mdash; today that is twelve DIFFERENT lanes, after the change it is
+"Offense" twelve times, so <b>the default sim build stops being twelve distinct arms and becomes
+one arm run twelve ways.</b></td></tr>
+<tr><td><code>scripts/talents_screen.gd:186-191, 199-209, 243</code></td>
+<td><code>_lane_order</code> derives the three columns from first-appearance in the tree;
+<code>lanes.find()</code> picks a node's COLUMN.</td>
+<td><b>Keeps working, and gets simpler.</b> Three repeated names still resolve to three columns.
+The header text changes from a spec flavour to a category.</td></tr>
+<tr><td><code>scripts/party_screen.gd:470-475, 518-525, 541</code></td>
+<td><b>The live lane-point headers</b> the brief names: per lane, the count of nodes the hero has
+taken, rendered <code>"%s %d"</code> upper-cased.</td>
+<td>Keeps working. <b>Reads better, not worse</b> &mdash; "OFFENSE 4 / DEFENSE 2 / UTILITY 1" is a
+build summary; "BLOODLETTING 4 / FURY 2 / WARPATH 1" is a lane tally.</td></tr>
+<tr><td><code>scripts/battle.gd:23281-23293</code></td>
+<td>The party log line: one lane-count summary per member, through
+<code>Talents.LANE_NAMES</code>.</td><td>Keeps working.</td></tr>
+<tr><td><code>Talents.LANE_NAMES</code> <i>(talents.gd:30)</i></td>
+<td>Maps the Beastmaster's three lowercase keys &mdash; <code>devotion</code>, <code>pack</code>,
+<code>handler</code> &mdash; to display names. <b>The other eleven specs store display names
+directly.</b></td>
+<td><b>Becomes dead, or becomes the whole mechanism.</b> If lanes become keys
+(<code>offense</code>/<code>defense</code>/<code>utility</code>) this table is where the display
+names live for all twelve; if they stay display strings it has nothing left to translate.</td></tr>
+</table>
+<p><b>THE TEST TREE IS THE LARGER SURFACE AND IS NOT COUNTED ABOVE.</b> <b>Twenty-five</b>
+<code>test_batch_*</code> files reference a lane, several with hard-coded name tables
+&mdash; <code>test_batch_ak.gd</code>'s per-node fixture carries the lane string beside every id
+(<code>"sm_punish": [6, "Breaker", "Punishment", ...]</code>). Those are assertions, not
+collateral: <b>a rename moves them all, and each one is a place a wrong new value would go
+unnoticed.</b></p>
+
+<h2>&sect;8.6 &mdash; SAVED ALLOCATIONS: WHERE THEY LIVE, AND WHAT A RESTRUCTURE DOES TO THEM</h2>
+<p><b>Measured by <code>check_dn.gd</code> against a scratch profile, not reasoned about.</b>
+<code>Profile.save_path</code> is a <code>var</code> precisely so a headless check can redirect
+it.</p>
+<ul>
+<li><b><code>Profile.talent_cells</code></b> &mdash; <code>spec &rarr; {node id: true}</code>. The
+permanent unlock ledger. <b>Keyed by NODE ID.</b></li>
+<li><b><code>Profile.talent_equipped</code></b> &mdash; <code>spec &rarr; {row (as String): node
+id}</code>. <b>Keyed by ROW NUMBER.</b> One node per row is enforced by the KEY, not by a check.</li>
+<li><b><code>Profile.talent_points</code></b> &mdash; <code>spec &rarr; points EARNED, ever.</b>
+There is no second accounting: <b>available = earned &minus;
+<code>Talents.cells_spent(tree, cells)</code></b>, and <code>cells_spent</code> prices each owned
+cell off <b>the row it currently sits in</b>.</li>
+<li><b><code>Profile.VERSION</code> is 2 and THE LOAD IS TOLERANT</b> &mdash; keys are merged over
+defaults and <code>data["version"] = VERSION</code> is stamped unconditionally. <b>There is no
+migration step anywhere in the file, and no version a restructure could bump to trigger one.</b></li>
+</ul>
+<p><b>THE MEASUREMENT.</b> A Berserker with all 27 cells bought (spent 54 of 54, available 0), then
+three edits a restructure makes:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>The edit</th><th>spent</th><th>available</th><th>What the player sees</th></tr>
+<tr><td>&mdash; <i>(before)</i></td><td>54</td><td>0</td><td>&mdash;</td></tr>
+<tr><td>One row-1 id <b>DELETED</b></td><td>53</td><td><b>1</b></td><td>The point is silently
+refunded and <b>the dead cell stays in the save forever</b> &mdash; <code>cells_spent</code> skips
+ids the tree no longer holds, so it stops being charged for and is never cleaned up.</td></tr>
+<tr><td>One row-1 node <b>MOVED to row 9</b> <i>(tier 1 &rarr; tier 3, 1 point &rarr; 3)</i></td>
+<td>56</td><td style="background:#fdd"><b>&minus;2</b></td><td><b>A NEGATIVE PURSE. Nothing refuses
+it, nothing clamps it, nothing logs it.</b> The player keeps every cell and simply cannot buy
+again until they refund something.</td></tr>
+<tr><td>One row-9 node <b>MOVED to row 1</b></td><td>52</td><td><b>2</b></td><td>Two points
+gifted.</td></tr>
+</table>
+<p><b>NOTHING ABOVE THROWS AND <code>version</code> IS STAMPED 2 EITHER WAY.</b> That is the whole
+danger: <b>meta progression is the one thing in this game that cannot be re-earned quickly</b>
+(1 point per spec per ZONE BOSS), and every failure mode here is silent.</p>
+<p><b>What a migration would have to do,</b> given the above:</p>
+<ol>
+<li><b>Bump <code>Profile.VERSION</code> to 3</b> &mdash; there is currently nothing to hang a
+migration on, because a tolerant merge cannot tell a v2 save from a v3 one.</li>
+<li><b>Re-price, not re-key.</b> Ids are stable across a re-sort (the trees' own convention since
+Batch AJ is "every node keeps its id so saved trees migrate"). <b>The rows are what move, and the
+row IS the price.</b> A migration must recompute <code>cells_spent</code> under the NEW rows and
+grant or reclaim the difference explicitly.</li>
+<li><b>Rebuild <code>talent_equipped</code> from its VALUES.</b> Its keys are stale row numbers the
+moment a node changes row. <code>equipped_talents()</code> already drops ids the tree no longer
+holds, so a DELETION is survivable; a MOVE is not, because the id validates fine under the wrong
+row key.</li>
+<li><b>Decide what happens to a node that is CUT.</b> Today its point is refunded by accident, as a
+side effect of <code>cells_spent</code> skipping unknown ids. That is the right outcome reached by
+the wrong mechanism, and it should be made deliberate.</li>
+</ol>
+<p><b>Two node ids cannot be renamed without moving the save format regardless:</b>
+<code>bm_beast_within</code> and <code>bm_no_beast_left</code>, already on the standing list in
+<code>docs/state.md</code>.</p>
+
+<h2>&sect;8.7 &mdash; CU'S CROSS-ROW CONDITIONALS, AND CV'S RULINGS, UNDER THE CHARTER</h2>
+<p><b>THE BRIEF NAMES THREE CROSS-ROW CONDITIONALS. THERE ARE FIVE ENFORCED BY A PAYLOAD, AND
+SIXTEEN CROSS-NODE DEPENDENCIES ALTOGETHER.</b> <i>The five are checkable:
+<code>grep -c '"has_node":' scripts/talents.gd</code> returns <b>6</b>, of which five are payload
+clauses and the sixth is the doc comment above <code>Talents.condition_met</code>.</i></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Reads</th><th>Enforced by</th><th>Survives the charter?</th></tr>
+<tr><td><code>bz_crushing_blows</code> <i>(Crushing Blows)</i><br><small>berserker / Bloodletting / 3</small></td><td><code>Savagery</code></td><td>YES &mdash; <code>condition: {has_node: bz_savagery}</code> named by the brief</td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>bz_frenzied_edge</code> <i>(Scar Tissue)</i><br><small>berserker / Fury / 5</small></td><td><code>Unstoppable</code></td><td>YES &mdash; <code>condition: {has_node: bz_unstoppable}</code> named by the brief</td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>bz_measured</code> <i>(Measured Rage)</i><br><small>berserker / Fury / 6</small></td><td><code>Reckless Fury</code></td><td>YES &mdash; <code>condition: {has_node: bz_reckless}</code> named by the brief</td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>sm_guarded</code> <i>(Off Balance)</i><br><small>swordmaster / Breaker / 7</small></td><td><code>Punishment</code></td><td>YES &mdash; <code>condition: {has_node: sm_punish}</code> <b>NOT named by the brief</b></td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>wd_shatter_guard</code> <i>(Bruising Guard)</i><br><small>warden / Threat / 6</small></td><td><code>Spite</code></td><td>YES &mdash; <code>condition: {has_node: wd_spiked}</code> <b>NOT named by the brief</b></td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>ar_conduit</code> <i>(Conduit)</i><br><small>arcanist / Overload / 1</small></td><td><code>Magi&#x27;s Wrath</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>ar_wrath</code> <i>(Magi&#x27;s Wrath)</i><br><small>arcanist / Overload / 9</small></td><td><code>Conduit</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>bm_absolute</code> <i>(Absolute Devotion)</i><br><small>beastmaster / devotion / 3</small></td><td><code>The Pack</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>bm_lone_bond</code> <i>(Lone Bond)</i><br><small>beastmaster / devotion / 7</small></td><td><code>The Pack</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>bm_the_pack</code> <i>(The Pack)</i><br><small>beastmaster / pack / 9</small></td><td><code>Lone Bond</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>cr_icy_resolve</code> <i>(Icy Resolve)</i><br><small>cryomancer / Winter / 5</small></td><td><code>Rime</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>dv_fervor</code> <i>(Fervor)</i><br><small>inquisitor / Faith / 6</small></td><td><code>Apostle</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>dv_waters</code> <i>(Cleansing Waters)</i><br><small>inquisitor / Zeal / 1</small></td><td><code>Sacred Resolve</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>dv_pulse</code> <i>(Healing Pulse)</i><br><small>inquisitor / Zeal / 4</small></td><td><code>Sacred Resolve</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>dv_apostle</code> <i>(Apostle)</i><br><small>inquisitor / Faith / 9</small></td><td><code>Fervor</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+<tr><td><code>sm_seasoned_node</code> <i>(Seasoned Fighter)</i><br><small>swordmaster / Blade / 5</small></td><td><code>Lunge</code></td><td>no &mdash; the interaction lives in <code>battle.gd</code> </td><td><b>Yes.</b> Reads only the spec's own tree.</td></tr>
+</table>
+<p><b>All sixteen survive.</b> Every one reads a node in its OWN tree, which is the spec's own
+mechanics &mdash; the thing the charter explicitly permits. <b>Reported, not ruled,</b> as
+instructed. The one observation worth having: <b>a cross-row conditional is a bet on a node the
+player CHOOSES, not on a card they are DEALT</b>, so it is not the defect this audit was looking
+for even though it looks like one.</p>
+
+<h3>&sect;8.7.1 &mdash; WHICH OF CV'S RULINGS A RESTRUCTURE PUTS BACK IN PLAY</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>CV ruling</th><th>Back in play?</th></tr>
+<tr><td><b>A duration is stated as APPLIED</b> (the calendar count) &mdash; 5 node texts</td>
+<td><b>NO.</b> A convention about what a number MEANS survives any re-sort. The five texts move
+lanes; their numbers do not.</td></tr>
+<tr><td><b>HERO = the four party members; ALLY = heroes and companions</b> &mdash; 32 node texts,
+extended by DJ, DK, DL and DM</td>
+<td><b>NO, and it must be kept that way.</b> This is the most expensive convention in the document
+&mdash; five batches of work &mdash; and it is about WORDING, not placement. <b>The risk is not
+that a restructure re-opens it; it is that re-authoring 97 new nodes writes 97 new chances to get
+<i>ally</i> wrong.</b> <code>docs/text-standard.html</code> &sect;4.9 is the test.</td></tr>
+<tr><td><b>Four dead Perfect clauses &mdash; CUT THREE</b>; <code>dv_bulwark</code>'s 5% party heal
+is UNCONDITIONAL</td>
+<td><b>YES, and this is the one to watch.</b> <code>dv_bulwark</code> is a CAPSTONE
+(inquisitor / Bulwark / 9). Any re-author of that node that treats its heal as a Perfect re-commits
+the exact error CV ruled against. <b>See &sect;8.0.</b></td></tr>
+<tr><td><b>Six wrong nodes corrected toward the code</b> (Stalwart, Shield Mastery, Phoenix
+Rebirth, Rime, Sacred Resolve, High Guard)</td>
+<td><b>Only if those nodes are re-authored.</b> Four of the six &mdash; <code>dv_stalwart</code>,
+<code>wd_shieldwall</code>, <code>cr_rime</code>, <code>sm_high_guard</code> &mdash; are
+mid-tree and would be re-sorted rather than rewritten. <code>py_rebirth</code> and
+<code>dv_resolve</code> are the two that carry granted abilities, so they are the two most likely
+to be touched.</td></tr>
+<tr><td><b>Undeclared caps and exclusions declared</b> &mdash; 8 nodes</td>
+<td><b>NO for the existing eight. YES for anything new</b>: the sweep was over all 324, so a 325th
+node is outside it.</td></tr>
+<tr><td><b>Four read-site comments corrected</b></td><td><b>NO.</b> Comments sit beside the code,
+and no code moves in a re-sort.</td></tr>
+</table>
+
+<h2>&sect;8.8 &mdash; THE HONEST ANSWER</h2>
+<p style="border:2px solid #900; padding:8px"><b>THIS IS NOT A RE-SORT AND A RENAME. IT IS A
+RE-AUTHOR OF ROUGHLY A THIRD OF THE TALENT LAYER, AND THE DESIGNER SHOULD KNOW THAT BEFORE
+STARTING.</b></p>
+<p><b>The two halves of the audit disagree, and that is the finding.</b></p>
+<ul>
+<li><b>THE CONTENT IS ALMOST CLEAN.</b> Of 324 nodes, <b>six</b> depend on something drawn, and
+only <b>two</b> are dead without the draw. <b>318 need no charter-driven change at all</b> under
+&sect;1's reading. The trees were purpose-authored against their specs' own mechanics and it
+shows.</li>
+<li><b>THE SHAPE CANNOT BE BUILT FROM THEM.</b> <b>Zero of twelve specs</b> can fill three
+nine-cell lanes. <b>97 new nodes</b> &mdash; 30% of the layer &mdash; would have to be written, and
+<b>two specs hold a lane at zero</b>, which no shrinking of the tree can rescue.</li>
+</ul>
+<p><b>Which means the cost is not in the 324. It is in the 97.</b> And 97 new nodes is a larger
+authoring job than the original twelve-tree pass, because those were written to a THEME the spec
+already had, and these must be written to a CATEGORY the spec demonstrably has no material for
+&mdash; nine offensive nodes for a Cleric who has never had one, nine defensive nodes for a
+Sharpshooter who has never had one.</p>
+<p><b>Three things fall out of that, and none of them is a ruling:</b></p>
+<ol>
+<li><b>The charter's own &sect;0 and &sect;1 disagree about 75 nodes</b> (&sect;8.1.1). Settle that
+sentence before anything else, because it is the difference between 235 clean and 318 clean.</li>
+<li><b>The saved-allocation risk is real, silent, and cheap to fix</b> (&sect;8.6) &mdash; but only
+if it is fixed BEFORE the restructure ships, not after. There is currently no version a migration
+could hang on.</li>
+<li><b>A smaller tree is worth considering on its own merits and does not solve this one.</b> At
+four rows per lane the shortfall falls from 97 to 22 and four specs fill &mdash; a real
+improvement, and still 22 nodes and eight specs short.</li>
+</ol>
+
+<h2>&sect;8.9 &mdash; THE FULL SORT: ALL 324</h2>
+<p><b>id, spec, current lane, guaranteed or drawn, and which of Offense / Defense / Utility it
+would land in</b>, as asked. <b><code>hand</code></b> in the last column marks a cell the keyword
+rule got wrong and a reading moved; the reason is recorded. Regenerate with
+<code>DOD_DN_DUMP=&lt;path&gt; ... --script check_dn.gd</code>.</p>
+<table border="1" cellpadding="3" cellspacing="0" style="font-size:90%">
+<tr><th>id</th><th>spec</th><th>lane</th><th>row</th><th>axis</th><th>lands</th><th>by</th><th>node text</th></tr>
+<tr><td><code>ar_conversion</code></td><td>arcanist</td><td>Entropy</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>30% of damage taken is paid as Mana instead of health.</td></tr>
+<tr><td><code>ar_on_edge</code></td><td>arcanist</td><td>Entropy</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Surviving an attack below 35% health builds 4 Resonance.</td></tr>
+<tr><td><code>ar_meltdown</code></td><td>arcanist</td><td>Entropy</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>recoil paid in Mana is mitigation</i></td><td>30% of recoil damage is paid as Mana instead of health.</td></tr>
+<tr><td><code>ar_stable</code></td><td>arcanist</td><td>Entropy</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>No single attack can take more than 25% of your maximum health.</td></tr>
+<tr><td><code>ar_still</code></td><td>arcanist</td><td>Entropy</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Resonance also builds when he takes damage: 1 stack per hit received.</td></tr>
+<tr><td><code>ar_attunement</code></td><td>arcanist</td><td>Entropy</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>20% of the damage his strikes deal is restored as Mana.</td></tr>
+<tr><td><code>ar_ward</code></td><td>arcanist</td><td>Entropy</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>no attack can reduce him below 1 health</i></td><td>While at 15 or more Resonance, no single attack can reduce him below 1 health.</td></tr>
+<tr><td><code>ar_entropy_toll</code></td><td>arcanist</td><td>Entropy</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>pays health to bank Resonance — an economy node</i></td><td>At the end of each of his turns the Arcanist pays 5% of his current health and banks 3 Resonance.</td></tr>
+<tr><td><code>ar_timelord</code></td><td>arcanist</td><td>Entropy</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.</td></tr>
+<tr style="background:#ffd"><td><code>ar_conduit</code></td><td>arcanist</td><td>Overload</td><td>1</td><td><b>TREE</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>raises the damage curve step</i></td><td>The damage curve&#x27;s step rises from 1.5% to 2% per stack. With Magi&#x27;s Wrath, which adds another 1.5 points, the step is 3.5% per stack.</td></tr>
+<tr><td><code>ar_volatility</code></td><td>arcanist</td><td>Overload</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Arcane Cannon deals +30% damage, and its recoil rises from 15% to 25%.</td></tr>
+<tr><td><code>ar_temporal</code></td><td>arcanist</td><td>Overload</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>A critical hit echoes for 40% of its damage against a random enemy.</td></tr>
+<tr><td><code>ar_suppressing</code></td><td>arcanist</td><td>Overload</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Each bolt of Arcane Barrage deals 2% of Attack more than the previous one.</td></tr>
+<tr><td><code>ar_cannoneer</code></td><td>arcanist</td><td>Overload</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Arcane Cannon&#x27;s Break damage rises from 5 to 9 per Resonance stack.</td></tr>
+<tr><td><code>ar_barrister</code></td><td>arcanist</td><td>Overload</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Arcane Barrage fires 3 additional bolts.</td></tr>
+<tr><td><code>ar_mindfulness</code></td><td>arcanist</td><td>Overload</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>At 15 or more Resonance, Death Ray has no cooldown.</td></tr>
+<tr><td><code>ar_blowback</code></td><td>arcanist</td><td>Overload</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>100% of all recoil is dealt to the enemy team instead of to him, split evenly between them.</td></tr>
+<tr style="background:#ffd"><td><code>ar_wrath</code></td><td>arcanist</td><td>Overload</td><td>9</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve&#x27;s step: 1.5% to 3% per stack, or 3.5% with Conduit.</td></tr>
+<tr><td><code>ar_harmonics</code></td><td>arcanist</td><td>Resonance</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Arcane Explosion builds 2 Resonance instead of 1.</td></tr>
+<tr><td><code>ar_mastery</code></td><td>arcanist</td><td>Resonance</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>A critical hit builds 3 Resonance instead of 2.</td></tr>
+<tr><td><code>ar_charged</code></td><td>arcanist</td><td>Resonance</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Every damaging cast restores 5% of maximum Mana per 4 stacks held.</td></tr>
+<tr><td><code>ar_overcharge</code></td><td>arcanist</td><td>Resonance</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd). If you already have it, it becomes usable TWICE per battle.</td></tr>
+<tr><td><code>ar_core</code></td><td>arcanist</td><td>Resonance</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The first damaging cast of each of his turns builds 1 additional Resonance.</td></tr>
+<tr><td><code>ar_critical_mass</code></td><td>arcanist</td><td>Resonance</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Every third critical hit builds 4 Resonance.</td></tr>
+<tr><td><code>ar_unlimited</code></td><td>arcanist</td><td>Resonance</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>At 10 or more stacks, every damaging cast builds 1 additional Resonance.</td></tr>
+<tr><td><code>ar_convergence</code></td><td>arcanist</td><td>Resonance</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Every 10 stacks of Resonance he holds, all Resonance gains are increased by 1.</td></tr>
+<tr><td><code>ar_singularity</code></td><td>arcanist</td><td>Resonance</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Critical hits build 2 ADDITIONAL Resonance, and every enemy killed builds 3.</td></tr>
+<tr><td><code>bm_communion</code></td><td>beastmaster</td><td>devotion</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>companion strike damage</i></td><td>Companion strike damage per Loyalty stack rises to 12% (from the base 5%).</td></tr>
+<tr><td><code>bm_unbroken</code></td><td>beastmaster</td><td>devotion</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The active companion gains +1 additional Loyalty on any turn it took no damage.</td></tr>
+<tr style="background:#ffd"><td><code>bm_absolute</code></td><td>beastmaster</td><td>devotion</td><td>3</td><td><b>TREE</b></td><td><b>Utility</b></td><td>rule</td><td>The Pack Bond boon grows 35% per Loyalty stack instead of the base 20%.</td></tr>
+<tr style="background:#fdd"><td><code>bm_devoted_fury</code></td><td>beastmaster</td><td>devotion</td><td>4</td><td><b>DRAWN</b></td><td><b>Utility</b></td><td>rule</td><td>Bestial Wrath lasts 1 turn(s) longer per Loyalty stack on the companion.</td></tr>
+<tr><td><code>bm_steadfast</code></td><td>beastmaster</td><td>devotion</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>the Loyalty METER survives, not the companion</i></td><td>A companion&#x27;s death returns 100% of its Loyalty rather than breaking it — the meter survives it whole.</td></tr>
+<tr style="background:#fdd"><td><code>bm_ancient_pact</code></td><td>beastmaster</td><td>devotion</td><td>6</td><td><b>DRAWN</b></td><td><b>Utility</b></td><td>rule</td><td>The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</td></tr>
+<tr style="background:#ffd"><td><code>bm_lone_bond</code></td><td>beastmaster</td><td>devotion</td><td>7</td><td><b>TREE</b></td><td><b>Utility</b></td><td>rule</td><td>One companion per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at 6 Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.</td></tr>
+<tr><td><code>bm_kindred</code></td><td>beastmaster</td><td>devotion</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>At 8 or more Loyalty the companion&#x27;s arrival effect fires again at the start of each of the Beastmaster&#x27;s turns.</td></tr>
+<tr><td><code>bm_one_soul</code></td><td>beastmaster</td><td>devotion</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>one shared health pool</i></td><td>You and every companion you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td></tr>
+<tr><td><code>bm_masters_aim</code></td><td>beastmaster</td><td>handler</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Quick Shot deals +25% of your Attack.</td></tr>
+<tr><td><code>bm_beast_within</code></td><td>beastmaster</td><td>handler</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+40% companion maximum health.</td></tr>
+<tr style="background:#fdd"><td><code>bm_reserves</code></td><td>beastmaster</td><td>handler</td><td>3</td><td><b>DRAWN</b></td><td><b>Utility</b></td><td>rule</td><td>Spirit Bond restores +30% more maximum Mana.</td></tr>
+<tr><td><code>bm_instinctive</code></td><td>beastmaster</td><td>handler</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Hunter&#x27;s Instinct empowers 8 Quick Shots instead of 3.</td></tr>
+<tr><td><code>bm_symbiosis</code></td><td>beastmaster</td><td>handler</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Whenever your companion strikes, you restore 6% maximum Mana.</td></tr>
+<tr><td><code>bm_vengeance</code></td><td>beastmaster</td><td>handler</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>boon retention after a death</i></td><td>When a companion dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the companion — and deal +30% damage while it holds.</td></tr>
+<tr><td><code>bm_lone_hunter</code></td><td>beastmaster</td><td>handler</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>While no companion stands, your abilities cost 50% less and you deal +30% damage.</td></tr>
+<tr><td><code>bm_ghost_pack</code></td><td>beastmaster</td><td>handler</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>While no companion stands, the Beastmaster&#x27;s attacks still draw a companion strike at 60% power.</td></tr>
+<tr><td><code>bm_apex</code></td><td>beastmaster</td><td>handler</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
+<tr><td><code>bm_whistle</code></td><td>beastmaster</td><td>pack</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Swap Companion has NO cooldown (it shaves 3 turns off the shared 3).</td></tr>
+<tr><td><code>bm_momentum</code></td><td>beastmaster</td><td>pack</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+25% companion damage for each DIFFERENT companion summoned this fight.</td></tr>
+<tr><td><code>bm_shared</code></td><td>beastmaster</td><td>pack</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Summoning or swapping grants +2 Loyalty to EVERY companion, not only the arriving one.</td></tr>
+<tr><td><code>bm_herald</code></td><td>beastmaster</td><td>pack</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Arrival effects strike 2 ADDITIONAL targets: Guardian&#x27;s Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.</td></tr>
+<tr><td><code>bm_menagerie</code></td><td>beastmaster</td><td>pack</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>boon retention while away</i></td><td>Every companion summoned this fight keeps its Pack Bond boon at 50% strength while it is away.</td></tr>
+<tr><td><code>bm_no_beast_left</code></td><td>beastmaster</td><td>pack</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>A companion&#x27;s death makes your next 2 summons cost no Mana and ignore their cooldown, and each arriving companion enters at 5 Loyalty.</td></tr>
+<tr><td><code>bm_wild_rotation</code></td><td>beastmaster</td><td>pack</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Swap Companion has no cooldown — rotate every turn, each arrival effect firing as it comes. Loyalty caps at 3.</td></tr>
+<tr><td><code>bm_free_swap</code></td><td>beastmaster</td><td>pack</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Swapping a companion no longer costs the Beastmaster his turn — he acts again immediately.</td></tr>
+<tr style="background:#ffd"><td><code>bm_the_pack</code></td><td>beastmaster</td><td>pack</td><td>9</td><td><b>TREE</b></td><td><b>Utility</b></td><td>rule</td><td>TWO companions may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.</td></tr>
+<tr><td><code>bz_savagery</code></td><td>berserker</td><td>Bloodletting</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>All bleed-building Berserker abilities build +15 more Bleed.</td></tr>
+<tr><td><code>bz_hemorrhage</code></td><td>berserker</td><td>Bloodletting</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Enemies at 60 or more bloodloss are Crippled.</td></tr>
+<tr style="background:#ffd"><td><code>bz_crushing_blows</code></td><td>berserker</td><td>Bloodletting</td><td>3</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>For every 20 points of bloodloss on the enemy team, gain 9% armor penetration. With Savagery, every 15 points instead.</td></tr>
+<tr><td><code>bz_arterial</code></td><td>berserker</td><td>Bloodletting</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>When an enemy bleeds out, 100% of its blood buildup transfers to another living enemy.</td></tr>
+<tr><td><code>bz_gushing</code></td><td>berserker</td><td>Bloodletting</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+10% damage for each enemy that has bled out this battle.</td></tr>
+<tr><td><code>bz_bloodcraze</code></td><td>berserker</td><td>Bloodletting</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When an enemy bleeds out, the Berserker heals 12% of max HP.</td></tr>
+<tr><td><code>bz_feast</code></td><td>berserker</td><td>Bloodletting</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>An enemy bleeding out grants the Berserker 45 Rage.</td></tr>
+<tr><td><code>bz_slaughterhouse</code></td><td>berserker</td><td>Bloodletting</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Blood buildup no longer resets when an enemy bleeds out — it falls to 50 instead, so the same enemy can bleed out again and again.</td></tr>
+<tr><td><code>bz_exsanguinate</code></td><td>berserker</td><td>Bloodletting</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Bleedout deals 35% of max HP (up from 20%), and the victim&#x27;s full blood buildup surges to another living enemy — chaining across the field.</td></tr>
+<tr><td><code>bz_unstoppable</code></td><td>berserker</td><td>Fury</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Blood Frenzy grants 3.5% damage for every 5% of health missing (up from the base 2%).</td></tr>
+<tr><td><code>bz_reckless</code></td><td>berserker</td><td>Fury</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+20% damage dealt AND +15% damage taken.</td></tr>
+<tr><td><code>bz_battle_shout</code></td><td>berserker</td><td>Fury</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Battle Shout — every hero gains +12% damage, plus 1% for every 20 points of blood buildup on the warband, for 3 turns (15 Rage, 2cd). If Battle Shout was already earned, this UPGRADES it instead: +18% base and 4 turns.</td></tr>
+<tr><td><code>bz_deathwish</code></td><td>berserker</td><td>Fury</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+25% damage dealt while below 35% health.</td></tr>
+<tr style="background:#ffd"><td><code>bz_frenzied_edge</code></td><td>berserker</td><td>Fury</td><td>5</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>The Blood Frenzy floor holds 85% of your peak bonus (instead of 50%). With Unstoppable, it holds 100% and never falls at all.</td></tr>
+<tr style="background:#ffd"><td><code>bz_measured</code></td><td>berserker</td><td>Fury</td><td>6</td><td><b>TREE</b></td><td><b>Defense</b></td><td>rule</td><td>Take 20% less damage. With Reckless Fury, it cancels that node&#x27;s +15% damage taken entirely instead — leaving the +20% dealt clean.</td></tr>
+<tr><td><code>bz_enraged</code></td><td>berserker</td><td>Fury</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Dropping below 50% health grants a +12% damage buff for 5 turns (stacks up to 3 times).</td></tr>
+<tr><td><code>bz_last_rites</code></td><td>berserker</td><td>Fury</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Rage as a damage SINK — an effective-HP node</i></td><td>While below 25% health, damage is taken out of Rage first — 1 Rage per point of damage — and only bites health once the tank is empty.</td></tr>
+<tr><td><code>bz_undying</code></td><td>berserker</td><td>Fury</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>&quot;cannot die&quot; is the headline; the +50% rides it</i></td><td>While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).</td></tr>
+<tr><td><code>bz_vitality</code></td><td>berserker</td><td>Warpath</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The Berserker begins every battle with 40 Rage.</td></tr>
+<tr><td><code>bz_bloodlust_node</code></td><td>berserker</td><td>Warpath</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Hack and Slash strikes 2 additional times (5 in total).</td></tr>
+<tr><td><code>bz_thick_skin</code></td><td>berserker</td><td>Warpath</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>When an enemy is slain, the Berserker gains 40 Rage.</td></tr>
+<tr><td><code>bz_relentless</code></td><td>berserker</td><td>Warpath</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Hack and Slash costs 15 less Rage, and its bleed rolls ALWAYS land.</td></tr>
+<tr><td><code>bz_bloodied_hide</code></td><td>berserker</td><td>Warpath</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The first time you drop below 25% health each battle, immediately gain 60 Rage and clear every cooldown.</td></tr>
+<tr><td><code>bz_unrelenting</code></td><td>berserker</td><td>Warpath</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>+40 Constitution is survivability, not damage</i></td><td>Dropping below 25% health grants +40 Constitution for 3 turns (at most once every 5 turns).</td></tr>
+<tr><td><code>bz_warcry</code></td><td>berserker</td><td>Warpath</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Killing an enemy clears the cooldowns of Hack and Slash and Wildstrikes.</td></tr>
+<tr><td><code>bz_bloodwake</code></td><td>berserker</td><td>Warpath</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+1% damage for every 4 Rage the Berserker is currently holding.</td></tr>
+<tr><td><code>bz_rampage</code></td><td>berserker</td><td>Warpath</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd). If Rampage was already earned, this UPGRADES it instead: the free recast may chain TWICE per turn rather than once.</td></tr>
+<tr><td><code>cr_frostbite</code></td><td>cryomancer</td><td>Deep Freeze</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Every hero is 6% likelier to land a critical hit on a Held enemy.</td></tr>
+<tr><td><code>cr_bitter</code></td><td>cryomancer</td><td>Deep Freeze</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Freezing an enemy applies 2 stacks of Chilled to every other enemy.</td></tr>
+<tr><td><code>cr_frigid</code></td><td>cryomancer</td><td>Deep Freeze</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Every stack of Chilled slows 10% harder.</td></tr>
+<tr><td><code>cr_numbing</code></td><td>cryomancer</td><td>Deep Freeze</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Glacial Prison — Freeze the target outright, whatever its stacks (25 Mana, 2.5 int, 4cd).</td></tr>
+<tr><td><code>cr_frost_ward</code></td><td>cryomancer</td><td>Deep Freeze</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>a second hold is control, not damage</i></td><td>He can hold TWO enemies at once instead of one.</td></tr>
+<tr><td><code>cr_cold_snap</code></td><td>cryomancer</td><td>Deep Freeze</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>A held enemy&#x27;s Break meter fills 15 at the start of each of his turns.</td></tr>
+<tr><td><code>cr_glacial</code></td><td>cryomancer</td><td>Deep Freeze</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Freezing an enemy restores 15% of his maximum Mana.</td></tr>
+<tr><td><code>cr_cold_storage</code></td><td>cryomancer</td><td>Deep Freeze</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>At the start of each of his turns every hero regains 5% of their maximum resource for each enemy he is holding.</td></tr>
+<tr><td><code>cr_absolute</code></td><td>cryomancer</td><td>Deep Freeze</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>unlimited holds is control</i></td><td>No limit on how many enemies he can hold at once.</td></tr>
+<tr><td><code>cr_hypothermia</code></td><td>cryomancer</td><td>Thaw</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>enemies take 3% more damage per stack</i></td><td>Enemies take 3% more damage per stack of Chilled.</td></tr>
+<tr><td><code>cr_freezing</code></td><td>cryomancer</td><td>Thaw</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The held-enemy damage bonus rises from +15% to +30%.</td></tr>
+<tr><td><code>cr_crystal</code></td><td>cryomancer</td><td>Thaw</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Ice Lance deals an extra 15% of Attack per Chilled stack (on top of the base 5%).</td></tr>
+<tr><td><code>cr_lance_focus</code></td><td>cryomancer</td><td>Thaw</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Cryoclasm — move the hold and its remaining stacks onto a different enemy (20 Mana, 2.0 int, 3cd).</td></tr>
+<tr><td><code>cr_piercing</code></td><td>cryomancer</td><td>Thaw</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Ice Lance gains 30% critical strike damage.</td></tr>
+<tr><td><code>cr_razor_hone</code></td><td>cryomancer</td><td>Thaw</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>A release applies 3 stacks of Chilled to the thawed enemy.</td></tr>
+<tr><td><code>cr_icy_veins</code></td><td>cryomancer</td><td>Thaw</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Releasing a hold pushes every OTHER enemy back 2 on the initiative timeline.</td></tr>
+<tr><td><code>cr_frostbound</code></td><td>cryomancer</td><td>Thaw</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Releasing a hold takes one turn off every hero&#x27;s cooldowns for every 3 turns the enemy spent held.</td></tr>
+<tr><td><code>cr_shatter</code></td><td>cryomancer</td><td>Thaw</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Shatter — release EVERY hold at once for 10% of Attack per TURN it spent held, capped at 12 turns (30 Mana, 4.0 int, 5cd).</td></tr>
+<tr><td><code>cr_hungering</code></td><td>cryomancer</td><td>Winter</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Chilled enemies deal less damage — mitigation</i></td><td>Chilled enemies deal 3% less damage per stack of Chilled.</td></tr>
+<tr><td><code>cr_emp_frostbolt</code></td><td>cryomancer</td><td>Winter</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Frostbolt applies 2 stacks of Chilled instead of 1.</td></tr>
+<tr><td><code>cr_grasp</code></td><td>cryomancer</td><td>Winter</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>At the start of each of his turns, 2 random Chilled enemies gain a stack.</td></tr>
+<tr><td><code>cr_rime</code></td><td>cryomancer</td><td>Winter</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 4 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).</td></tr>
+<tr style="background:#ffd"><td><code>cr_icy_resolve</code></td><td>cryomancer</td><td>Winter</td><td>5</td><td><b>TREE</b></td><td><b>Utility</b></td><td>rule</td><td>Rime lasts 2 additional turns.</td></tr>
+<tr><td><code>cr_whiteout</code></td><td>cryomancer</td><td>Winter</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Blizzard applies 3 stacks of Chilled to every enemy instead of 1-2.</td></tr>
+<tr><td><code>cr_splinter</code></td><td>cryomancer</td><td>Winter</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.</td></tr>
+<tr><td><code>cr_winters_depth</code></td><td>cryomancer</td><td>Winter</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>strips enemy Constitution</i></td><td>Every stack of Chilled lowers its bearer&#x27;s Constitution by 8%, by at most 75% and never below 10 Constitution — the colder they are, the easier they Break.</td></tr>
+<tr><td><code>cr_eternal</code></td><td>cryomancer</td><td>Winter</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>EVERY enemy gains 1 stack of Chilled at the start of each of his turns.</td></tr>
+<tr><td><code>hl_heavenly</code></td><td>holy</td><td>Mercy</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>12% healing done</i></td><td>Each stack of Mercy grants 12% healing done, up from the base 5%.</td></tr>
+<tr><td><code>hl_holy_light</code></td><td>holy</td><td>Mercy</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Perfect casts restore 8% of your maximum Mana.</td></tr>
+<tr><td><code>hl_zealous</code></td><td>holy</td><td>Mercy</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The Cleric begins each battle with 2 Mercy.</td></tr>
+<tr><td><code>hl_sanctified</code></td><td>holy</td><td>Mercy</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Spending Mercy has a 35% chance to consume no stacks.</td></tr>
+<tr><td><code>hl_resurrection</code></td><td>holy</td><td>Mercy</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When a hero would earn you a stack of Mercy while you are at maximum, the stack instead heals that hero for 20% of your maximum health.</td></tr>
+<tr><td><code>hl_ardor</code></td><td>holy</td><td>Mercy</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>While the Cleric holds 3 or more Mercy, Empowering consumes no stack.</td></tr>
+<tr><td><code>hl_martyr</code></td><td>holy</td><td>Mercy</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Mercy&#x27;s maximum rises to 8.</td></tr>
+<tr><td><code>hl_communion_mercy</code></td><td>holy</td><td>Mercy</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>2% damage reduction per stack</i></td><td>Every stack of Mercy the Cleric holds grants every hero 2% damage reduction.</td></tr>
+<tr><td><code>hl_avatar</code></td><td>holy</td><td>Mercy</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Empowering never consumes a stack, and every Empowered cast GRANTS 1 Mercy instead.</td></tr>
+<tr><td><code>hl_triage</code></td><td>holy</td><td>Radiance</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>all healing +15%; the crit is the vehicle</i></td><td>Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by 15%.</td></tr>
+<tr><td><code>hl_soothe</code></td><td>holy</td><td>Radiance</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Heal and Renewal each cost 10 less Mana.</td></tr>
+<tr><td><code>hl_on_mend</code></td><td>holy</td><td>Radiance</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>dispels a harmful effect</i></td><td>Renewal ticks have a 35% chance to dispel one harmful effect from the bearer.</td></tr>
+<tr><td><code>hl_divine_plea</code></td><td>holy</td><td>Radiance</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>fully heals an ally</i></td><td>New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Hallow them against new ones for 3 turns (3.0 int, 2cd). If Divine Plea was already earned, it costs 1 Mercy instead of 2.</td></tr>
+<tr><td><code>hl_swift</code></td><td>holy</td><td>Radiance</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Heal has no cooldown at all, and Hymn of Hope&#x27;s drops by 1.</td></tr>
+<tr><td><code>hl_brilliance</code></td><td>holy</td><td>Radiance</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>A CRITICAL heal also splashes 75% of its value onto the lowest-health other hero.</td></tr>
+<tr><td><code>hl_overflow</code></td><td>holy</td><td>Radiance</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>overhealing spills onto the lowest hero</i></td><td>60% of any overhealing spills onto the lowest-health other hero immediately.</td></tr>
+<tr><td><code>hl_font</code></td><td>holy</td><td>Radiance</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Overhealing is drawn back as Mana — 1 Mana for every 2 points wasted.</td></tr>
+<tr><td><code>hl_sanctum</code></td><td>holy</td><td>Radiance</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Your healing is increased by 60%, and ALL of your overhealing spills onto the lowest-health other hero.</td></tr>
+<tr><td><code>hl_guardian</code></td><td>holy</td><td>Vigil</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Heroes falling below 65% health earn you a stack of Mercy, up from 50%.</td></tr>
+<tr><td><code>hl_presence</code></td><td>holy</td><td>Vigil</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>At the end of your turn, the lowest-health hero is healed for 8% of their maximum health.</td></tr>
+<tr><td><code>hl_last_hope</code></td><td>holy</td><td>Vigil</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Heroes under 25% of their maximum health receive 40% more healing.</td></tr>
+<tr><td><code>hl_inner_faith</code></td><td>holy</td><td>Vigil</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Intercession refuses a lethal blow</i></td><td>New ability: Intercession — for 2 turns the next lethal blow against any hero is refused: they survive at 1 health and you lose 1 Mercy (25 Mana, 1.0 int, 4cd). If Intercession was already earned, its window lasts 3 turns instead.</td></tr>
+<tr><td><code>hl_beacon</code></td><td>holy</td><td>Vigil</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>While any hero is below 30% health, every hero takes 15% less damage.</td></tr>
+<tr><td><code>hl_vestments</code></td><td>holy</td><td>Vigil</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Your healing also grants the recipient a shield worth 25% of the heal&#x27;s value for 2 turns.</td></tr>
+<tr><td><code>hl_serenity</code></td><td>holy</td><td>Vigil</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Resurrection costs no Mercy, and its cooldown drops to 1.</td></tr>
+<tr><td><code>hl_watchtower</code></td><td>holy</td><td>Vigil</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>moves the Cleric up the turn order</i></td><td>When any hero drops below 25% health the Cleric&#x27;s turn comes immediately (at most once a turn).</td></tr>
+<tr><td><code>hl_capacitor</code></td><td>holy</td><td>Vigil</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>a free automatic resurrection</i></td><td>Resurrection has no cooldown and costs no Mercy, and the first hero to fall each battle is returned automatically at 30% health.</td></tr>
+<tr><td><code>dv_barrier</code></td><td>inquisitor</td><td>Bulwark</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td></tr>
+<tr><td><code>dv_aegis</code></td><td>inquisitor</td><td>Bulwark</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Casting Divine Shield has a 60% chance to cast it again on another hero.</td></tr>
+<tr><td><code>dv_afterglow</code></td><td>inquisitor</td><td>Bulwark</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td></tr>
+<tr><td><code>dv_warded</code></td><td>inquisitor</td><td>Bulwark</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>While Divine Shield holds, its holder has +25% armor.</td></tr>
+<tr><td><code>dv_stalwart</code></td><td>inquisitor</td><td>Bulwark</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Divine Shield absorbs 55% of the Devout&#x27;s max health (up from the base 35%).</td></tr>
+<tr><td><code>dv_bastion</code></td><td>inquisitor</td><td>Bulwark</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Divine Shield has no cooldown at all.</td></tr>
+<tr><td><code>dv_unyielding</code></td><td>inquisitor</td><td>Bulwark</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td></tr>
+<tr><td><code>dv_layered</code></td><td>inquisitor</td><td>Bulwark</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>A Divine Shield cast on an ally who already holds one ADDS to it instead of replacing it, with no limit.</td></tr>
+<tr><td><code>dv_bulwark</code></td><td>inquisitor</td><td>Bulwark</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>New ability: Bulwark of Fortitude — for 3 turns every hero takes NO Break damage, has their armor increased by 50%, and heals 10% of max health each turn; the cast itself heals every hero 5% at once (30 Mana, 3.0 int, 3cd). Already owned: it lasts 4 turns instead.</td></tr>
+<tr><td><code>dv_communion</code></td><td>inquisitor</td><td>Faith</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.</td></tr>
+<tr><td><code>dv_unwavering</code></td><td>inquisitor</td><td>Faith</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Increases the Devout&#x27;s maximum health by 20%.</td></tr>
+<tr><td><code>dv_devoutness</code></td><td>inquisitor</td><td>Faith</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>every hero takes 20% less Break damage</i></td><td>Every hero takes 20% less Break damage.</td></tr>
+<tr><td><code>dv_faithful</code></td><td>inquisitor</td><td>Faith</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>the 3-stack heal</i></td><td>The heal at 3 stacks of Faith restores 35% max health (up from the base 15%).</td></tr>
+<tr><td><code>dv_covenant</code></td><td>inquisitor</td><td>Faith</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Should a shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td></tr>
+<tr style="background:#ffd"><td><code>dv_fervor</code></td><td>inquisitor</td><td>Faith</td><td>6</td><td><b>TREE</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>mitigation is the first term</i></td><td>While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.</td></tr>
+<tr><td><code>dv_oath</code></td><td>inquisitor</td><td>Faith</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Whenever a hero&#x27;s Faith releases, the Devout gains 1 stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.</td></tr>
+<tr><td><code>dv_creed</code></td><td>inquisitor</td><td>Faith</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Faith is held in common: every hero is paid for the HIGHEST peak any hero has reached this battle, not their own.</td></tr>
+<tr style="background:#ffd"><td><code>dv_apostle</code></td><td>inquisitor</td><td>Faith</td><td>9</td><td><b>TREE</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>mitigation is the first term</i></td><td>Every stack of Faith a hero carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. With Fervor, on Consecrated Ground, they count TRIPLE. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.</td></tr>
+<tr style="background:#ffd"><td><code>dv_waters</code></td><td>inquisitor</td><td>Zeal</td><td>1</td><td><b>TREE</b></td><td><b>Defense</b></td><td>rule</td><td>While Consecrated Ground or Sacred Resolve holds, each hero has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
+<tr><td><code>dv_righteous</code></td><td>inquisitor</td><td>Zeal</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Consecrated Ground reflects 35% of damage taken (up from the base 10%).</td></tr>
+<tr><td><code>dv_resolve</code></td><td>inquisitor</td><td>Zeal</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Sacred Resolve splits incoming damage</i></td><td>New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.</td></tr>
+<tr style="background:#ffd"><td><code>dv_pulse</code></td><td>inquisitor</td><td>Zeal</td><td>4</td><td><b>TREE</b></td><td><b>Defense</b></td><td>rule</td><td>While Consecrated Ground or Sacred Resolve holds, every hero heals 8% of the Devout&#x27;s max health each turn.</td></tr>
+<tr><td><code>dv_crusade</code></td><td>inquisitor</td><td>Zeal</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
+<tr><td><code>dv_purity</code></td><td>inquisitor</td><td>Zeal</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
+<tr><td><code>dv_lifewell</code></td><td>inquisitor</td><td>Zeal</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Damage reflected by Consecrated Ground heals every hero for 80% of the amount reflected.</td></tr>
+<tr><td><code>dv_eternal_ground</code></td><td>inquisitor</td><td>Zeal</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Consecrated Ground never expires.</td></tr>
+<tr><td><code>dv_judgement</code></td><td>inquisitor</td><td>Zeal</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
+<tr><td><code>sv_woodcraft</code></td><td>mystic</td><td>Guerilla</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+20% maximum Health.</td></tr>
+<tr><td><code>sv_hitrun</code></td><td>mystic</td><td>Guerilla</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Elusive is evasion</i></td><td>Whenever you apply a status to an enemy, you gain Elusive for 2 turns.</td></tr>
+<tr><td><code>sv_scavenger</code></td><td>mystic</td><td>Guerilla</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Restore 25% maximum Mana whenever an enemy dies.</td></tr>
+<tr><td><code>sv_medic</code></td><td>mystic</td><td>Guerilla</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>At the start of your turn, cleanse 2 debuffs from random allies.</td></tr>
+<tr><td><code>sv_vulture</code></td><td>mystic</td><td>Guerilla</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+60% damage against enemies afflicted by 3 or more different statuses. Broken is not one of them.</td></tr>
+<tr><td><code>sv_ghillie</code></td><td>mystic</td><td>Guerilla</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>65% less likely to be targeted</i></td><td>Enemies are 65% less likely to target you while another ally lives.</td></tr>
+<tr><td><code>sv_improvised</code></td><td>mystic</td><td>Guerilla</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The first 2 abilities you use each fight do not start their cooldowns.</td></tr>
+<tr><td><code>sv_practised</code></td><td>mystic</td><td>Guerilla</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Every ability the Survivalist uses takes 1 turn off all his OTHER cooldowns.</td></tr>
+<tr><td><code>sv_force</code></td><td>mystic</td><td>Guerilla</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Trapper&#x27;s bonus rises to +20% per different status — Broken excluded — and applies to every hero&#x27;s damage.</td></tr>
+<tr><td><code>sv_wire</code></td><td>mystic</td><td>Snares</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Tripwire&#x27;s retaliation deals +35% of your Attack.</td></tr>
+<tr><td><code>sv_rigging</code></td><td>mystic</td><td>Snares</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Snare Trap&#x27;s cooldown is reduced by 2, and its spring also applies Cripple.</td></tr>
+<tr><td><code>sv_cruel</code></td><td>mystic</td><td>Snares</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your traps deal +50% damage.</td></tr>
+<tr><td><code>sv_snap_shut</code></td><td>mystic</td><td>Snares</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Tripwire also retaliates against RANGED attackers, not only melee.</td></tr>
+<tr><td><code>sv_caught</code></td><td>mystic</td><td>Snares</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>denying enemy healing is pressure</i></td><td>Enemies caught by your traps cannot be healed for 5 turns.</td></tr>
+<tr><td><code>sv_bone</code></td><td>mystic</td><td>Snares</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your traps apply 90 Break damage when they spring.</td></tr>
+<tr><td><code>sv_network</code></td><td>mystic</td><td>Snares</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>You may have THREE traps active at once.</td></tr>
+<tr><td><code>sv_set_forget</code></td><td>mystic</td><td>Snares</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>A sprung trap re-arms itself at the start of the Survivalist&#x27;s next turn.</td></tr>
+<tr><td><code>sv_forest</code></td><td>mystic</td><td>Snares</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td></tr>
+<tr><td><code>sv_potent</code></td><td>mystic</td><td>Venom</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your Poison deals +8 damage per stack.</td></tr>
+<tr><td><code>sv_coated</code></td><td>mystic</td><td>Venom</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your basic attack applies Poison for 2 turns and Cripple for 2 turns.</td></tr>
+<tr><td><code>sv_virulence</code></td><td>mystic</td><td>Venom</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your Poison applications add +2 extra stacks and apply Exposed for 3 turns.</td></tr>
+<tr><td><code>sv_slow_acting</code></td><td>mystic</td><td>Venom</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your Poison deals HALF damage but lasts TWICE as long, cannot be cleansed, and applies Slowed for 3 turns.</td></tr>
+<tr><td><code>sv_creeping</code></td><td>mystic</td><td>Venom</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Applying any status OTHER than the Poison itself to a Poisoned enemy refreshes its Poison to full duration — or, if that Poison is permanent, adds a stack instead (once per enemy per turn).</td></tr>
+<tr><td><code>sv_necrosis</code></td><td>mystic</td><td>Venom</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Poisoned enemies take +35% damage from ALL sources, not just yours.</td></tr>
+<tr><td><code>sv_plague</code></td><td>mystic</td><td>Venom</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Every other hero&#x27;s basic attacks also apply your Poison.</td></tr>
+<tr><td><code>sv_cocktail</code></td><td>mystic</td><td>Venom</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>At the start of a Poisoned enemy&#x27;s turn its Poison gains a stack for every 2 OTHER statuses it carries. Broken is not counted.</td></tr>
+<tr><td><code>sv_epidemic</code></td><td>mystic</td><td>Venom</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your Poison cannot be cleansed, never expires, and its tick rises by 2 each turn it persists.</td></tr>
+<tr><td><code>oc_soul_leech</code></td><td>occultist</td><td>Leech</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Ruin lifesteal is his sustain</i></td><td>The Ruin lifesteal rises to 5% per stack (up from the base 2%). Capped at 40% of the damage dealt.</td></tr>
+<tr><td><code>oc_invigoration</code></td><td>occultist</td><td>Leech</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Dark Pact also restores 8% of the Occultist&#x27;s maximum Mana each turn for 3 turns.</td></tr>
+<tr><td><code>oc_gluttony</code></td><td>occultist</td><td>Leech</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>more Ruin lifesteal</i></td><td>The Ruin lifesteal drinks another 3% per stack. Capped at 40% of the damage dealt.</td></tr>
+<tr><td><code>oc_pleasure</code></td><td>occultist</td><td>Leech</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>At the end of the Occultist&#x27;s turn, every hero heals 2.5% of his maximum health for every UNIQUE debuff on the enemy team.</td></tr>
+<tr><td><code>oc_murderous</code></td><td>occultist</td><td>Leech</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When a Bewitched enemy kills one of its fellows, the lowest-health hero heals 35% of the Occultist&#x27;s maximum health.</td></tr>
+<tr><td><code>oc_pact_flesh</code></td><td>occultist</td><td>Leech</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Dark Pact bleeds 15% less of the Occultist&#x27;s maximum health — a cost of 5% rather than 20%.</td></tr>
+<tr><td><code>oc_barter</code></td><td>occultist</td><td>Leech</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Dark Pact heals every other hero 35% of their maximum health (up from the base 15%).</td></tr>
+<tr><td><code>oc_blood_communion</code></td><td>occultist</td><td>Leech</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>heals the lowest-health hero</i></td><td>Every point of Break damage the Occultist deals heals the lowest-health hero for 20% of its value.</td></tr>
+<tr><td><code>oc_soul_glut</code></td><td>occultist</td><td>Leech</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Whenever a hero heals by striking a Ruined target, every hero heals for the same amount. Still under the 40% cap.</td></tr>
+<tr><td><code>oc_spread</code></td><td>occultist</td><td>Madness</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Psychosis has a 60% chance each turn to leap to a fellow minion — the newly maddened gain 2 Ruin. Bosses resist until Broken.</td></tr>
+<tr><td><code>oc_whispers</code></td><td>occultist</td><td>Madness</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Psychosis seizes its victim 95% of the time (up from the base 50%). Bosses resist Psychosis until Broken.</td></tr>
+<tr><td><code>oc_mind_flay</code></td><td>occultist</td><td>Madness</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken. Already owned: it flays THREE minds instead.</td></tr>
+<tr><td><code>oc_mirror</code></td><td>occultist</td><td>Madness</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>rebounds a debuff off a hero</i></td><td>When an enemy would debuff a hero, there is a 45% chance the debuff rebounds onto the attacker instead (and counts toward Ruin).</td></tr>
+<tr><td><code>oc_delirium</code></td><td>occultist</td><td>Madness</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim is marked with 3 Ruin.</td></tr>
+<tr><td><code>oc_cackling</code></td><td>occultist</td><td>Madness</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>every hero heals</i></td><td>When an enemy strikes a fellow, every hero heals 15% of the damage dealt.</td></tr>
+<tr><td><code>oc_torment</code></td><td>occultist</td><td>Madness</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>An expiring madness effect leaves Decay behind for 5 turns (10 Break damage per turn).</td></tr>
+<tr><td><code>oc_permanent</code></td><td>occultist</td><td>Madness</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Psychosis, Bewitchment and Hysteria the Occultist applies never expire.</td></tr>
+<tr><td><code>oc_hysteria</code></td><td>occultist</td><td>Madness</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd). Bosses resist until Broken. Already owned: its cooldown falls to 2.</td></tr>
+<tr><td><code>oc_emp_hex</code></td><td>occultist</td><td>Ruin</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Hex of Ruin ALWAYS applies Decay to each target it curses (10 Break damage per turn, 3 turns).</td></tr>
+<tr><td><code>oc_deep_hex</code></td><td>occultist</td><td>Ruin</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>bearers take 5% more damage per stack</i></td><td>Each stack of Ruin makes its bearer take 5% more damage (up from the base 2%).</td></tr>
+<tr><td><code>oc_channeling</code></td><td>occultist</td><td>Ruin</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>a random hero heals</i></td><td>Whenever a Crippled enemy attacks, a random hero heals for 60% of the damage it dealt.</td></tr>
+<tr><td><code>oc_broken_will</code></td><td>occultist</td><td>Ruin</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The Occultist deals 25% more Break damage.</td></tr>
+<tr><td><code>oc_grim</code></td><td>occultist</td><td>Ruin</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Ruin detonations deal 80% more damage.</td></tr>
+<tr><td><code>oc_entropy</code></td><td>occultist</td><td>Ruin</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Enemies bearing any Ruin take 20 Break damage at the start of each of their turns.</td></tr>
+<tr><td><code>oc_unravel</code></td><td>occultist</td><td>Ruin</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>When Ruin detonates, every other enemy gains 4 Ruin.</td></tr>
+<tr><td><code>oc_weight</code></td><td>occultist</td><td>Ruin</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>half speed and no healing is control</i></td><td>An enemy bearing 8 or more Ruin moves at half speed and cannot be healed.</td></tr>
+<tr><td><code>oc_avatar_ruin</code></td><td>occultist</td><td>Ruin</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Ruin detonates every 5th stack instead of every 10th.</td></tr>
+<tr><td><code>py_shockwave</code></td><td>pyromancer</td><td>Detonation</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Detonation&#x27;s Burn bonus rises from 250% to 325%.</td></tr>
+<tr><td><code>py_supernova</code></td><td>pyromancer</td><td>Detonation</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Detonation deals +25 Break damage to a Burning target.</td></tr>
+<tr><td><code>py_implosion</code></td><td>pyromancer</td><td>Detonation</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Detonation re-applies 2 turns of Burn to the target after consuming.</td></tr>
+<tr><td><code>py_focused</code></td><td>pyromancer</td><td>Detonation</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Pyroblast — a slow, enormous bolt for 55% of Attack, +50% against a Burning target (45 Mana, 6.0 int).</td></tr>
+<tr><td><code>py_seeding</code></td><td>pyromancer</td><td>Detonation</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Consuming Burn refunds 2 Mana per turn instead of 1.</td></tr>
+<tr><td><code>py_rekindle</code></td><td>pyromancer</td><td>Detonation</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Detonation&#x27;s cooldown drops to 1.</td></tr>
+<tr><td><code>py_warm_glow</code></td><td>pyromancer</td><td>Detonation</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Detonation consumes Burn from the target and the two enemies adjacent to it.</td></tr>
+<tr><td><code>py_powder_keg</code></td><td>pyromancer</td><td>Detonation</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>30% of the damage each Detonation deals is banked and added to the next one.</td></tr>
+<tr><td><code>py_hellfire</code></td><td>pyromancer</td><td>Detonation</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.</td></tr>
+<tr><td><code>py_pyromaniac</code></td><td>pyromancer</td><td>Inferno</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>take 8% less damage</i></td><td>While ANY enemy is Burning, you take 8% less damage.</td></tr>
+<tr><td><code>py_invigorating</code></td><td>pyromancer</td><td>Inferno</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+25% fire resistance, and every Burn tick YOU applied heals you for 10% of it.</td></tr>
+<tr><td><code>py_firebrand</code></td><td>pyromancer</td><td>Inferno</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>20% chance to miss YOU</i></td><td>Enemies that are Burning have a 20% chance to miss you.</td></tr>
+<tr><td><code>py_flame_shield</code></td><td>pyromancer</td><td>Inferno</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Immolate is a 20%-mitigation stance</i></td><td>New ability: Immolate — for 4 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.0 int, 2cd).</td></tr>
+<tr><td><code>py_molten</code></td><td>pyromancer</td><td>Inferno</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>a once-per-battle heal at 40%</i></td><td>Once per battle, the first time you drop below 40% health: every enemy is set Burning 4 turns and you heal 15% of maximum.</td></tr>
+<tr><td><code>py_undying_flame</code></td><td>pyromancer</td><td>Inferno</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>cannot be reduced below 1 health</i></td><td>You cannot be reduced below 1 health by any single hit while 3 or more enemies are Burning.</td></tr>
+<tr><td><code>py_cauterize</code></td><td>pyromancer</td><td>Inferno</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>mitigation is named first and is uncapped</i></td><td>For every Burning enemy you take 4% less damage and deal 4% more. Uncapped.</td></tr>
+<tr><td><code>py_forge_body</code></td><td>pyromancer</td><td>Inferno</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>damage taken reduced up to 50%</i></td><td>Damage taken is reduced 1% per remaining Burn turn on the field, up to 50% — and the damage prevented is dealt to a random Burning enemy as fire.</td></tr>
+<tr><td><code>py_rebirth</code></td><td>pyromancer</td><td>Inferno</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>New ability: Phoenix Rebirth — sacrifice 15% of current health and your Mana returns to full (2.0 int, 4cd).</td></tr>
+<tr><td><code>py_kindling</code></td><td>pyromancer</td><td>Kindling</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Fireball&#x27;s Burn lasts 1 turn longer — 4 turns instead of 3.</td></tr>
+<tr><td><code>py_accelerant</code></td><td>pyromancer</td><td>Kindling</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your Burn ticks deal +4% of Attack, on top of the base 6%.</td></tr>
+<tr><td><code>py_arson</code></td><td>pyromancer</td><td>Kindling</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Flamewave applies +2 turns of Burn, fresh fires and extensions alike.</td></tr>
+<tr><td><code>py_melt</code></td><td>pyromancer</td><td>Kindling</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Backdraft — add 2 turns of Burn to every burning enemy (20 Mana, 2.0 int, 3cd).</td></tr>
+<tr><td><code>py_ashes</code></td><td>pyromancer</td><td>Kindling</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Wildfire applies 1 turn of Burn to non-burning enemies before it consumes.</td></tr>
+<tr><td><code>py_explosive</code></td><td>pyromancer</td><td>Kindling</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Critical hits with fire abilities extend the target&#x27;s Burn by 2 turns.</td></tr>
+<tr><td><code>py_spreading</code></td><td>pyromancer</td><td>Kindling</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>An enemy that dies Burning splits its remaining Burn turns among the survivors.</td></tr>
+<tr><td><code>py_sea_of_flame</code></td><td>pyromancer</td><td>Kindling</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+7% fire damage for every enemy currently Burning.</td></tr>
+<tr><td><code>py_firestorm</code></td><td>pyromancer</td><td>Kindling</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).</td></tr>
+<tr><td><code>ss_piercer</code></td><td>sharpshooter</td><td>Penetration</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>ignoring armor is penetration</i></td><td>Your attacks ignore 30% of the target&#x27;s armor.</td></tr>
+<tr><td><code>ss_sundering</code></td><td>sharpshooter</td><td>Penetration</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Critical hits apply 45 Break damage.</td></tr>
+<tr><td><code>ss_bonecracker</code></td><td>sharpshooter</td><td>Penetration</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+40% damage against Broken enemies.</td></tr>
+<tr><td><code>ss_opp_aim</code></td><td>sharpshooter</td><td>Penetration</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Powershot&#x27;s Break scaling TRIPLES: +6% damage per full point instead of +2%.</td></tr>
+<tr><td><code>ss_exposed_nerve</code></td><td>sharpshooter</td><td>Penetration</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Critical hits apply Exposed for 3 turns, and you deal +15% damage to Exposed enemies.</td></tr>
+<tr><td><code>ss_no_cover</code></td><td>sharpshooter</td><td>Penetration</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>accuracy, not mitigation</i></td><td>Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.</td></tr>
+<tr><td><code>ss_overkill</code></td><td>sharpshooter</td><td>Penetration</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>excess damage carries to another enemy</i></td><td>Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.</td></tr>
+<tr><td><code>ss_sunder_shot</code></td><td>sharpshooter</td><td>Penetration</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The armor the Sharpshooter ignores is also Constitution he ignores: a target resists his Break damage 100% less for each point of his armor penetration, by at most 75% and never below 10 Constitution.</td></tr>
+<tr><td><code>ss_tnt</code></td><td>sharpshooter</td><td>Penetration</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>ignores ALL armor</i></td><td>Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.</td></tr>
+<tr><td><code>ss_steady</code></td><td>sharpshooter</td><td>Precision</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+15% critical chance.</td></tr>
+<tr><td><code>ss_perfect_form</code></td><td>sharpshooter</td><td>Precision</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Critical hits grant +40 Focus.</td></tr>
+<tr><td><code>ss_deep_focus</code></td><td>sharpshooter</td><td>Precision</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Focus turns into force sooner: the conversion point falls from 100 Focus to 60.</td></tr>
+<tr><td><code>ss_exec_eye</code></td><td>sharpshooter</td><td>Precision</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Lethal Aim&#x27;s critical multiplier rises to x2.5.</td></tr>
+<tr><td><code>ss_consistent</code></td><td>sharpshooter</td><td>Precision</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your critical multiplier is reduced by 0.5 — but you gain +60% critical chance.</td></tr>
+<tr><td><code>ss_unwavering</code></td><td>sharpshooter</td><td>Precision</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Each consecutive turn attacking the same enemy grants +10 additional Focus, rising by 10 again each turn to a maximum of +50. Switching resets it.</td></tr>
+<tr><td><code>ss_tunnel</code></td><td>sharpshooter</td><td>Precision</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+100% critical chance against the enemy you attacked last turn; -100% against every other enemy.</td></tr>
+<tr><td><code>ss_continuous</code></td><td>sharpshooter</td><td>Precision</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>every Focus point is +0.6% damage</i></td><td>Focus pays without a threshold: every point grants +0.6% damage, on top of everything the conversion already buys.</td></tr>
+<tr><td><code>ss_one_shot</code></td><td>sharpshooter</td><td>Precision</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>At 200 or more Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.</td></tr>
+<tr><td><code>ss_fletcher</code></td><td>sharpshooter</td><td>Tempo</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>+18 Speed is turn economy</i></td><td>+18 Speed.</td></tr>
+<tr><td><code>ss_snap</code></td><td>sharpshooter</td><td>Tempo</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>The first 2 abilities you use each fight cost no Mana and do not start their cooldowns.</td></tr>
+<tr><td><code>ss_muscle</code></td><td>sharpshooter</td><td>Tempo</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Focus gain per attack increases by 30.</td></tr>
+<tr><td><code>ss_volley</code></td><td>sharpshooter</td><td>Tempo</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>You begin every fight with 150 Focus.</td></tr>
+<tr><td><code>ss_follow</code></td><td>sharpshooter</td><td>Tempo</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Critical hits reduce ALL your cooldowns by 2.</td></tr>
+<tr><td><code>ss_second_nature</code></td><td>sharpshooter</td><td>Tempo</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Hold Breath&#x27;s guaranteed critical applies to your next 4 attacks.</td></tr>
+<tr><td><code>ss_spray</code></td><td>sharpshooter</td><td>Tempo</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Your single-target attacks strike 2 additional random enemies for 50% damage — but Focus can never exceed 50.</td></tr>
+<tr><td><code>ss_metronome</code></td><td>sharpshooter</td><td>Tempo</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>When Focus is spent it falls to 50% of what it was rather than to zero.</td></tr>
+<tr><td><code>ss_rapid</code></td><td>sharpshooter</td><td>Tempo</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Each ability you use has a 50% chance not to consume its cooldown.</td></tr>
+<tr><td><code>sm_agg_stance</code></td><td>swordmaster</td><td>Blade</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The Aggressive stance grants an additional 12% damage dealt.</td></tr>
+<tr><td><code>sm_lunge</code></td><td>swordmaster</td><td>Blade</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td><b>hand</b> &mdash; <i>a new 35-damage strike; the cost text pulled Utility</i></td><td>New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int). If Lunge was already earned, this UPGRADES it instead: 15 Rage, and it applies BOTH Exposed and Crippled whatever the guard.</td></tr>
+<tr><td><code>sm_keen_edge</code></td><td>swordmaster</td><td>Blade</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+15% critical strike chance while in the Aggressive stance.</td></tr>
+<tr><td><code>sm_precision</code></td><td>swordmaster</td><td>Blade</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+20% critical strike chance against Dazed, Crippled, and Exposed targets.</td></tr>
+<tr style="background:#ffd"><td><code>sm_seasoned_node</code></td><td>swordmaster</td><td>Blade</td><td>5</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>Overpower gains +15% critical strike chance — and Lunge too, if he has it.</td></tr>
+<tr><td><code>sm_momentum_sm</code></td><td>swordmaster</td><td>Blade</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+8% damage for every debuff on the target. Broken is a Break-meter state rather than an affliction and is not one of them.</td></tr>
+<tr><td><code>sm_deep_thrust</code></td><td>swordmaster</td><td>Blade</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Switching stance grants +30% damage for 2 turns.</td></tr>
+<tr><td><code>sm_whetstone</code></td><td>swordmaster</td><td>Blade</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Every critical strike permanently raises the Swordmaster&#x27;s Attack by 3 for the rest of the battle.</td></tr>
+<tr><td><code>sm_execute</code></td><td>swordmaster</td><td>Blade</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd). If Execute was already earned, this UPGRADES it instead: the threshold rises to 35% health, and it costs NO Rage against a Broken target.</td></tr>
+<tr><td><code>sm_flourish</code></td><td>swordmaster</td><td>Breaker</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Pommel Strike deals +30 Break damage.</td></tr>
+<tr style="background:#fdd"><td><code>sm_blade_dance</code></td><td>swordmaster</td><td>Breaker</td><td>2</td><td><b>DRAWN</b></td><td><b>Offense</b></td><td>rule</td><td>Guard Change deals 40 Break damage to EVERY enemy (up from 15 to one). If he also owns Shatterpoint, that deals +40 Break damage as well.</td></tr>
+<tr><td><code>sm_dominant</code></td><td>swordmaster</td><td>Breaker</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Armor value is increased by 15% for every debuff the Swordmaster has applied this battle. The growth is unbounded but armor is not: no amount of it reduces a blow by more than 85%.</td></tr>
+<tr><td><code>sm_opportunist</code></td><td>swordmaster</td><td>Breaker</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>When an enemy attack MISSES the Swordmaster or is PARRIED, he counter attacks with Overpower (free).</td></tr>
+<tr><td><code>sm_perfect_form</code></td><td>swordmaster</td><td>Breaker</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td>rule</td><td>Breaking an enemy grants the Swordmaster 45 Rage.</td></tr>
+<tr><td><code>sm_punish</code></td><td>swordmaster</td><td>Breaker</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Overpower deals +60% damage against Broken targets.</td></tr>
+<tr style="background:#ffd"><td><code>sm_guarded</code></td><td>swordmaster</td><td>Breaker</td><td>7</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>All the Swordmaster&#x27;s damage is increased by 20% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.</td></tr>
+<tr><td><code>sm_overpressure</code></td><td>swordmaster</td><td>Breaker</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Break damage the Swordmaster deals past a full meter is not wasted — it lands as damage instead, 100% of a point apiece.</td></tr>
+<tr><td><code>sm_en_garde</code></td><td>swordmaster</td><td>Breaker</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.</td></tr>
+<tr><td><code>sm_def_stance</code></td><td>swordmaster</td><td>Poise</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>The Defensive stance blocks an additional 12% damage taken.</td></tr>
+<tr><td><code>sm_sword_mastery</code></td><td>swordmaster</td><td>Poise</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+12% parry chance.</td></tr>
+<tr><td><code>sm_footwork</code></td><td>swordmaster</td><td>Poise</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+30 Constitution while in the Defensive stance.</td></tr>
+<tr><td><code>sm_swordsmanship</code></td><td>swordmaster</td><td>Poise</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>A PERFECT Guard Change grants +25% parry chance for 2 turns, instead of the usual 10%.</td></tr>
+<tr><td><code>sm_high_guard</code></td><td>swordmaster</td><td>Poise</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Take 40% less damage for 3 turns after parrying an attack.</td></tr>
+<tr><td><code>sm_riposte</code></td><td>swordmaster</td><td>Poise</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Counter Attack: immediately answer every parry with a free Overpower.</td></tr>
+<tr><td><code>sm_composure</code></td><td>swordmaster</td><td>Poise</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td></tr>
+<tr><td><code>sm_waiting_guard</code></td><td>swordmaster</td><td>Poise</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>banks an automatic parry</i></td><td>Every turn the Swordmaster is not struck, he banks a Guard — the next attack against him is parried automatically. He may bank 3.</td></tr>
+<tr><td><code>sm_untouchable</code></td><td>swordmaster</td><td>Poise</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.</td></tr>
+<tr><td><code>wd_tank_spank</code></td><td>warden</td><td>Banner</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Utility</b></td><td><b>hand</b> &mdash; <i>Empower is an ally buff, not the Warden hitting harder</i></td><td>Mocking Blow ALWAYS Empowers a random hero (2 turns).</td></tr>
+<tr><td><code>wd_rally</code></td><td>warden</td><td>Banner</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Every attack Blocked by Heavy Plating grants every ally +30% healing received for 3 turns.</td></tr>
+<tr style="background:#fdd"><td><code>wd_stomp_drill</code></td><td>warden</td><td>Banner</td><td>3</td><td><b>DRAWN</b></td><td><b>Utility</b></td><td>rule</td><td>At the start of each of the Warden&#x27;s turns, every hero regains 4% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.</td></tr>
+<tr><td><code>wd_elem_weak</code></td><td>warden</td><td>Banner</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Crushing Blow also reduces all elemental resistances of the target by 20% (3 turns).</td></tr>
+<tr style="background:#fdd"><td><code>wd_bannerman</code></td><td>warden</td><td>Banner</td><td>5</td><td><b>DRAWN</b></td><td><b>Defense</b></td><td>rule</td><td>Shieldwall also grants every other hero +10% Block chance for its duration. If he owns Interpose, each hero gains 1 additional shield charge from it as well.</td></tr>
+<tr><td><code>wd_fortress</code></td><td>warden</td><td>Banner</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Heroes take 12% less damage while the Warden is above 50% health.</td></tr>
+<tr><td><code>wd_veteran</code></td><td>warden</td><td>Banner</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>When damage would drop a hero below 20% health, the Warden absorbs 60% of it instead.</td></tr>
+<tr><td><code>wd_standard</code></td><td>warden</td><td>Banner</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Every other hero is protected by 50% of the Warden&#x27;s own armor value, on top of their own.</td></tr>
+<tr><td><code>wd_hold_line</code></td><td>warden</td><td>Banner</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>&quot;cannot die for 2 turns&quot; is the payload</i></td><td>New ability: Hold the Line — every ally takes 50% less Break damage for 2 turns and cannot die for 2 turns (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 3 turns.</td></tr>
+<tr><td><code>wd_unkillable</code></td><td>warden</td><td>Plate</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Every time you Block an attack, heal for 8% of the health you brought into the battle.</td></tr>
+<tr><td><code>wd_toughness</code></td><td>warden</td><td>Plate</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>Constitution off max HP</i></td><td>Constitution is increased by 25% of maximum HP.</td></tr>
+<tr><td><code>wd_endurance</code></td><td>warden</td><td>Plate</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>+3% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).</td></tr>
+<tr><td><code>wd_tenacity</code></td><td>warden</td><td>Plate</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Every attack Blocked by Heavy Plating increases maximum health by 15 for the rest of the battle.</td></tr>
+<tr><td><code>wd_shieldwall</code></td><td>warden</td><td>Plate</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Shieldwall&#x27;s stance holds 2 turns longer — 5 turns.</td></tr>
+<tr><td><code>wd_plating</code></td><td>warden</td><td>Plate</td><td>6</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Heavy Plating&#x27;s climbing Block bonus grows +12% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).</td></tr>
+<tr><td><code>wd_immovable</code></td><td>warden</td><td>Plate</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>clears his OWN Break meter</i></td><td>Blocking an attack removes 30 Break from the Warden&#x27;s own meter.</td></tr>
+<tr><td><code>wd_iron_debt</code></td><td>warden</td><td>Plate</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Every point of damage his armor and Blocks refuse is banked. Crushing Blow spends the bank, dealing 10% of it as bonus damage.</td></tr>
+<tr><td><code>wd_mountain</code></td><td>warden</td><td>Plate</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>cannot be Broken, +20% Block</i></td><td>The Warden cannot be Broken, and his Block chance is increased by 20%.</td></tr>
+<tr><td><code>wd_ricochet</code></td><td>warden</td><td>Threat</td><td>1</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td><b>hand</b> &mdash; <i>a Stun on Block stops the next attack</i></td><td>Blocking an attack has a 35% chance to Stun the attacker.</td></tr>
+<tr><td><code>wd_taunt_master</code></td><td>warden</td><td>Threat</td><td>2</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Mocking Blow taunts 2 additional foes.</td></tr>
+<tr><td><code>wd_iron_will</code></td><td>warden</td><td>Threat</td><td>3</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>The Warden takes 12% less damage for every debuff currently on him, to a maximum of 90%.</td></tr>
+<tr><td><code>wd_sundering</code></td><td>warden</td><td>Threat</td><td>4</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Crushing Blow deals 100% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).</td></tr>
+<tr><td><code>wd_spiked</code></td><td>warden</td><td>Threat</td><td>5</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>Attackers that damage the Warden take 30% of that damage back.</td></tr>
+<tr style="background:#ffd"><td><code>wd_shatter_guard</code></td><td>warden</td><td>Threat</td><td>6</td><td><b>TREE</b></td><td><b>Offense</b></td><td>rule</td><td>Blocking an attack deals 30 Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.</td></tr>
+<tr><td><code>wd_grudge</code></td><td>warden</td><td>Threat</td><td>7</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>+25% damage against enemies currently taunted by the Warden.</td></tr>
+<tr><td><code>wd_whole_room</code></td><td>warden</td><td>Threat</td><td>8</td><td><b>GUARANTEED</b></td><td><b>Defense</b></td><td>rule</td><td>Taunts the Warden applies never expire.</td></tr>
+<tr><td><code>wd_avenger</code></td><td>warden</td><td>Threat</td><td>9</td><td><b>GUARANTEED</b></td><td><b>Offense</b></td><td>rule</td><td>The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td></tr>
+</table>
 
 </body></html>

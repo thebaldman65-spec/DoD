@@ -145,15 +145,16 @@
   "check_da": {
    "kind": "gate",
    "checks": [
-    36,
-    36
+    37,
+    37
    ],
-   "checks_obs": 7,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 7
+   "fails_obs": 8,
+   "note": "36 -> 37 AT DN, AND THE +1 IS THE EXEMPT-LIST LOOP RATHER THAN NEW COVERAGE. DN added `check_dn.gd`, whose membership tables call `Classes.class_draft_pool(` and `Classes.spec_draft_pool(` — §3's fingerprint for a hand-rolled corpus walk. IT IS A FALSE POSITIVE AND THE EXEMPTION SAYS SO: `check_dn` calls `Classes.ability_corpus()` outright for the walk and reads the pools only for which BUCKET a named ability sits in, which the flat 216 cannot answer. `WALK_EXEMPT` now holds two files, and the loop that asserts each still carries the marks is one check longer. `checks_obs` resets to 1 because the number is new."
   },
   "check_di": {
    "kind": "gate",

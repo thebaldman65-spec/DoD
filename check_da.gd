@@ -44,6 +44,17 @@ const FIXTURE := "gate_fixture.gd"
 
 const WALK_EXEMPT := {
 	"check_cz.gd": "`_cl_only_corpus` is §0's negative control — its job is to still be missing the five",
+	# BATCH DN — THE MARK OVER-FIRES HERE, AND THE EXEMPTION RECORDS WHY RATHER
+	# THAN HIDING IT. The fingerprint is the two draft-pool calls, and it stands
+	# in for the defect "this gate re-derived the corpus and is therefore missing
+	# the five talent grants that live in no pool". `check_dn.gd` calls
+	# `Classes.ability_corpus()` OUTRIGHT — that is the list it matches node text
+	# against — and reads the pools for a DIFFERENT question the corpus cannot
+	# answer: which BUCKET a named ability is in. `ability_corpus()` returns a
+	# flat 216 with no membership, so "is Frostbolt core or drafted?" has no
+	# other source. A gate that uses the canonical walk AND the buckets is not
+	# the thing this rule is looking for.
+	"check_dn.gd": "reads the pools for BUCKET membership, and calls `Classes.ability_corpus()` for the walk itself",
 }
 
 # BATCH DD — the suites' half of the same fixture, and the same enforcement.
