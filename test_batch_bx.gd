@@ -62,6 +62,15 @@ var _had_save := false
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -237,7 +246,7 @@ func _own_pools() -> void:
 	# must never be shown — is unchanged, so it is written against the LIVE pool
 	# rather than a literal, which is the shape the rest of this suite already
 	# uses and the reason it needed no other repair this batch.
-	ok(warden_cards.size() == 8, "§2: the Warden has eight spec cards to be offered")
+	ok(warden_cards.size() >= 8, "§2: the Warden has at least eight spec cards to be offered")
 	var leaked := 0
 	for _i in 200:
 		for card in run.roll_draft_offer(pyro):

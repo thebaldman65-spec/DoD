@@ -108,6 +108,15 @@ const NINE := {
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -182,18 +191,18 @@ func _pools() -> void:
 	var five := ["holy", "inquisitor", "occultist"]
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 8, "%s drafts EIGHT since Batch CE (got %d)" % [spec, pool.size()])
+		ok(pool.size() >= 8, "%s drafts at least EIGHT since Batch CE (got %d)" % [spec, pool.size()])
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT since Batch CB (got %d)"
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT since Batch CB (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
 	# RE-POINTED BY BATCH BV, which paid the HUNTER third: those three joined the
 	# Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at two. Kept
 	# as an inversion rather than deleted — what matters is that the LAST unpaid
 	# third stays visible in code rather than only in prose.
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT since Batch CH — the Hunter is the third class complete" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT since Batch CH — the Hunter is the third class complete" % spec)
 	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
 	# three were still at TWO because that debt was real and had to stay visible
 	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
@@ -219,12 +228,12 @@ func _pools() -> void:
 	# the reason it inverts rather than being deleted — the question is still
 	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s joined them at FIVE in Batch BW — tranche 2 is complete" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT (BW's five, CI's eight, DO's more)" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d" % total)
+	ok(total == 118, "the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -523,7 +532,7 @@ func _docs() -> void:
 		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("120 of"), "master.html states the current draft count")
+	ok(master.contains("142 of"), "master.html states the current draft count")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BU — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

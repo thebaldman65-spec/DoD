@@ -224,11 +224,18 @@ func _difficulty_table() -> void:
 
 # Same shape as test_batch_as's: a real battle scene with the enemies' turns
 # off, determinism forced rather than retried (the AK/AL/AR discipline).
-func _spawn(learned: Dictionary, lineup: Array, ty := "fight") -> Node:
+# BATCH DO added `earned`. Cryoclasm used to arrive from `cr_lance_focus`'s
+# GRANT; a talent may not grant an ability any more, so the card is a draft
+# entry and a suite that needs it on the bar has to say so — which is what a
+# player now has to do too.
+func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
+		earned: Array = []) -> Node:
+	var opts := {"difficulty": "wanderer", "enemies": lineup, "node_type": ty,
+		"talents": {1: learned.duplicate()}, "deterministic": true}
+	if not earned.is_empty():
+		opts["bm"] = {1: earned}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"difficulty": "wanderer", "enemies": lineup, "node_type": ty,
-		"talents": {1: learned.duplicate()}, "deterministic": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
 
 func _cryo(scene: Node) -> BattleUnit:
@@ -357,7 +364,7 @@ func _live_ice_lance_no_retake() -> void:
 # pass on an ability that does nothing, so the moved hold is asserted to LAND.
 func _live_cryoclasm_unaffected() -> void:
 	var scene := await _spawn({"cr_razor_hone": 1, "cr_lance_focus": 1, "cr_icy_veins": 1},
-		["raider", "archer", "shaman"])
+		["raider", "archer", "shaman"], "fight", ["Cryoclasm"])
 	var cryo := _cryo(scene)
 	if cryo == null:
 		scene.queue_free()

@@ -63,9 +63,12 @@ const NODES := {
 	"py_arson": [3, "Kindling", "Conflagration"],
 	"py_firebrand": [3, "Inferno", "Heat Haze"],
 	"py_implosion": [3, "Detonation", "Aftershock"],
-	"py_melt": [4, "Kindling", "Backdraft"],
-	"py_flame_shield": [4, "Inferno", "Immolate"],
-	"py_focused": [4, "Detonation", "Pyroblast"],
+	# BATCH DO renamed all five ability cells when their cards left for the
+	# draft — a node named after a live DRAFT CARD is the `wd_spiked`/Spite
+	# collision DN documented.
+	"py_melt": [4, "Kindling", "Melt"],
+	"py_flame_shield": [4, "Inferno", "Emberwall"],
+	"py_focused": [4, "Detonation", "Concussion"],
 	"py_ashes": [5, "Kindling", "Wildfire Spread"],
 	"py_molten": [5, "Inferno", "Backblast"],
 	"py_seeding": [5, "Detonation", "Crucible"],
@@ -75,8 +78,8 @@ const NODES := {
 	"py_spreading": [7, "Kindling", "Chain Ignition"],
 	"py_cauterize": [7, "Inferno", "Ash Lung"],
 	"py_warm_glow": [7, "Detonation", "Total Commitment"],
-	"py_firestorm": [9, "Kindling", "Firestorm"],
-	"py_rebirth": [9, "Inferno", "Phoenix Rebirth"],
+	"py_firestorm": [9, "Kindling", "Sky Ablaze"],
+	"py_rebirth": [9, "Inferno", "Rekindled"],
 	"py_hellfire": [9, "Detonation", "Cataclysm"],
 }
 
@@ -359,36 +362,47 @@ func _magnitudes() -> void:
 # ---------- the four ability grants ----------
 
 func _ability_nodes() -> void:
+	# BATCH DO — THE FIVE STOPPED BEING GRANTS AND THE FOUR NUMBERS DID NOT
+	# MOVE. Each definition was lifted VERBATIM out of its node payload into
+	# `Classes.draft_ability`, so cost, initiative and cooldown are asserted
+	# against exactly the values the node used to carry: a drift in the move
+	# shows up here.
 	for id in ABILITY_NODES:
 		var n := _node(String(id))
 		if n.is_empty():
 			continue
 		var want: Array = ABILITY_NODES[id]
-		var nab: Dictionary = n["payload"].get("new_ability", {})
-		ok(not nab.is_empty(), "%s grants an ability" % id)
-		if nab.is_empty():
+		ok(Talents.granted_name(n["payload"]) == "",
+			"%s grants NOTHING — a talent may not (DO's charter)" % id)
+		ok(Classes.spec_draft_pool("pyromancer").has(String(want[0])),
+			"%s's card, %s, drafts from the Pyromancer" % [id, want[0]])
+		var ab: Ability = Classes.spec_pool_ability("pyromancer", String(want[0]))
+		ok(ab != null, "%s resolves to a real ability" % want[0])
+		if ab == null:
 			continue
-		ok(String(nab["display_name"]) == String(want[0]),
-			"%s grants %s (got %s)" % [id, want[0], nab["display_name"]])
-		ok(int(nab.get("cost", -1)) == int(want[1]),
-			"%s costs %d Mana" % [want[0], int(want[1])])
-		ok(is_equal_approx(float(nab.get("delay", -1.0)), float(want[2])),
+		ok(ab.cost == int(want[1]), "%s costs %d Mana" % [want[0], int(want[1])])
+		ok(is_equal_approx(ab.delay, float(want[2])),
 			"%s arrives at %s initiative" % [want[0], str(want[2])])
-		ok(int(nab.get("cooldown", -1)) == int(want[3]),
+		ok(ab.cooldown == int(want[3]),
 			"%s has a %d-turn cooldown" % [want[0], int(want[3])])
-		# ...and the tree is the ONE place each def lives, so the earnable
-		# pools cannot drift from the copy a talent hands out.
-		var resolved: Ability = Talents.granted_ability(String(want[0]))
-		ok(resolved != null, "%s resolves through Talents.granted_ability" % want[0])
-	# Phoenix Rebirth came out of the vault and the TREE owns it now. Its old
+		# ...and there is still exactly ONE place each def lives, so the pools
+		# cannot drift from each other. It is the DRAFT now, not the tree.
+		ok(Talents.granted_ability(String(want[0])) == null,
+			"%s is no longer handed out by any talent" % want[0])
+	# Phoenix Rebirth came out of the vault and the DRAFT owns it now. Its old
 	# vault def must be gone, or two copies exist and one will drift.
 	ok(Classes.vault_ability("Phoenix Rebirth") == null,
-		"Phoenix Rebirth's vault copy is gone — the tree owns the only def")
+		"Phoenix Rebirth's vault copy is gone — the draft owns the only def")
 	ok(Classes.pool_ability("Phoenix Rebirth") != null,
-		"...and the mage class pool still resolves it")
+		"...and it still resolves")
+	# AND IT IS EARNABLE FOR THE FIRST TIME. Batch AN retired the class draw, so
+	# its `CLASS_POOLS["mage"]` entry reached no roller at all — `py_rebirth`'s
+	# grant was its ONLY source in the game until DO put it in a draft pool.
+	ok(Classes.spec_draft_pool("pyromancer").has("Phoenix Rebirth"),
+		"...through the Pyromancer's draft pool, which is new at DO")
 	# THE EMPOWER CLAUSE IS DROPPED (§2): Empower is a named mechanic of the
 	# Holy Cleric's Mercy system and this ability never should have granted it.
-	var phoenix: Ability = Talents.granted_ability("Phoenix Rebirth")
+	var phoenix: Ability = Classes.spec_pool_ability("pyromancer", "Phoenix Rebirth")
 	if phoenix != null:
 		ok(not phoenix.description.contains("Empower"),
 			"Phoenix Rebirth's text no longer promises Empower")
@@ -514,7 +528,7 @@ func _no_defence() -> void:
 		"the Inferno lane really does defend him (%d mitigating nodes)" % mitigating)
 	# Immolate keeps its id and its slot and is a DEFENSIVE ability now: the
 	# Overburn clauses went with the drain and the cap.
-	var imm: Ability = Talents.granted_ability("Immolate")
+	var imm: Ability = Classes.spec_pool_ability("pyromancer", "Immolate")
 	ok(imm != null, "Immolate exists")
 	if imm != null:
 		ok(imm.description.contains("LESS damage"),
@@ -595,13 +609,18 @@ func _rune_audit() -> void:
 
 # ---------- the live half ----------
 
-func _spawn(learned: Dictionary, lineup: Array) -> Node:
+# BATCH DO added `earned`: the five Pyromancer cards are drafted now, so a
+# suite that needs one on the bar earns it exactly as a player does.
+func _spawn(learned: Dictionary, lineup: Array, earned: Array = []) -> Node:
 	# CAPTURED, NOT GUESSED, and it is why `deterministic` is armed: before it,
 	# "Fireball lit the target" failed 1 run in 8 and Total Commitment's three
 	# checks failed together on a parried Detonation.
+	var opts := {"enemies": lineup, "talents": {1: learned.duplicate()},
+		"deterministic": true}
+	if not earned.is_empty():
+		opts["bm"] = {1: earned}
 	return await Fixture.spawn(self,
-		["berserker", "pyromancer", "inquisitor", "beastmaster"],
-		{"enemies": lineup, "talents": {1: learned.duplicate()}, "deterministic": true})
+		["berserker", "pyromancer", "inquisitor", "beastmaster"], opts)
 
 
 func _py(scene: Node) -> BattleUnit:
@@ -839,7 +858,7 @@ func _live_chip() -> void:
 
 
 func _live_immolate() -> void:
-	var scene := await _spawn({"py_flame_shield": 1}, ["raider", "raider"])
+	var scene := await _spawn({"py_flame_shield": 1}, ["raider", "raider"], ["Immolate"])
 	var py := _py(scene)
 	if py == null:
 		scene.queue_free()
@@ -876,7 +895,7 @@ func _live_immolate() -> void:
 	scene.queue_free()
 	await process_frame
 	# CONTROL: the same strike with no Immolate up ignites nobody.
-	var plain := await _spawn({"py_flame_shield": 1}, ["raider", "raider"])
+	var plain := await _spawn({"py_flame_shield": 1}, ["raider", "raider"], ["Immolate"])
 	var py2 := _py(plain)
 	if py2 != null:
 		var foe2: BattleUnit = plain.get("enemies")[0]
@@ -975,7 +994,7 @@ func _live_kit_nodes() -> void:
 	scene.queue_free()
 	await process_frame
 	# Backdraft deepens only what is already alight.
-	var bd := await _spawn({"py_melt": 1}, ["raider", "raider"])
+	var bd := await _spawn({"py_melt": 1}, ["raider", "raider"], ["Backdraft"])
 	var py2 := _py(bd)
 	if py2 != null:
 		var bfoes: Array = bd.get("enemies")
@@ -995,7 +1014,7 @@ func _live_kit_nodes() -> void:
 	bd.queue_free()
 	await process_frame
 	# Pyroblast: half again into a burning target, and no more into a cold one.
-	var pb := await _spawn({"py_focused": 1}, ["raider", "raider"])
+	var pb := await _spawn({"py_focused": 1}, ["raider", "raider"], ["Pyroblast"])
 	var py3 := _py(pb)
 	if py3 != null:
 		var blast: Ability = null

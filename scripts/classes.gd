@@ -283,11 +283,17 @@ const SPEC_DRAFT_POOLS := {
 	# and `swordmaster` are the real keys AND the real display names, unlike the
 	# Devout (`inquisitor`) and the Survivalist (`mystic`) above.
 	"berserker": ["Blood Offering", "Gut Rip", "Reckless Abandon", "Berserk",
-		"Blood Debt", "Unslaked", "Spite", "Boil Over"],
+		"Blood Debt", "Unslaked", "Spite", "Boil Over",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Battle Shout", "Rampage"],
 	"warden": ["Covering Guard", "Eye of the Storm", "Shield Slam", "Vendetta",
-		"Aegis Wall", "Anvil", "Recompense", "Turn the Blade"],
+		"Aegis Wall", "Anvil", "Recompense", "Turn the Blade",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Hold the Line"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
-		"Feigned Guard", "Discipline", "Answering Steel", "Formless"],
+		"Feigned Guard", "Discipline", "Answering Steel", "Formless",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Lunge", "Execute"],
 	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
@@ -295,12 +301,18 @@ const SPEC_DRAFT_POOLS := {
 	# its last. **ALL TWELVE SPECS NOW DRAFT FROM EIGHT** — the asymmetry that
 	# ran from BO to CH pointed at the Warrior for its whole life and is dead.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
-		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep"],
+		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Backdraft", "Immolate", "Pyroblast", "Firestorm", "Phoenix Rebirth"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
 		"Killing Frost", "Hoarfrost Armor", "Deep Winter", "Cold Iron",
-		"Frostbind"],
+		"Frostbind",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Rime", "Glacial Prison", "Cryoclasm", "Shatter"],
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
-		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking"],
+		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Overcharge", "Magi's Wrath"],
 	# CLERIC — EIGHT APIECE SINCE BATCH CE, AND THE CLERIC IS THE SECOND CLASS
 	# COMPLETE. BU took the three pools to five (tranche 2's second third); CE
 	# lands tranche 3's second third here. THE DEVOUT'S KEY IS `inquisitor` AND
@@ -310,12 +322,18 @@ const SPEC_DRAFT_POOLS := {
 	# raise nothing, resolve nothing, and ship three cards no hero could ever be
 	# offered.
 	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
-		"Reprisal", "Divine Presence", "Alms", "Vespers"],
+		"Reprisal", "Divine Presence", "Alms", "Vespers",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Divine Plea", "Intercession"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
 		"Fortified Spirit", "Reliquary", "Elevation",
-		"Blessing of the Faithful", "Mantle"],
+		"Blessing of the Faithful", "Mantle",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Sacred Resolve", "Bulwark of Fortitude"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
-		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance"],
+		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance",
+		# BATCH DO — moved out of the talent tree, unchanged.
+		"Mind Flay", "Mass Hysteria"],
 	# HUNTER — EIGHT APIECE SINCE BATCH CH, AND THE HUNTER IS THE THIRD CLASS
 	# COMPLETE. BV took the three pools to five (tranche 2's third third); CH
 	# lands tranche 3's third third here. THE SURVIVALIST'S KEY IS `mystic` AND
@@ -339,10 +357,11 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# **THE DRAFT IS 120 OF A TARGET 120 AS OF BATCH CI (96 spec + 24 class-wide),
-# AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third; every one of
-# the twelve spec pools is eight deep and every one of the four class pools is
-# six deep.
+# **THE DRAFT IS 142 OF A TARGET 142 AS OF BATCH DO (118 spec + 24 class-wide),
+# AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third at 120 of 120,
+# every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
+# half to 118. Every one of the four class pools is still six deep, and no
+# spec pool is below eight.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
@@ -901,7 +920,7 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND TWENTY OF A TARGET 120 (BO..CI) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-TWO OF A TARGET 142 (BO..DO) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -917,8 +936,18 @@ static func talent_granted_names() -> Array:
 # offer fills short for a SPEC reason any more.
 # TRANCHE 3 IS PAID IN FULL: BATCH CB took the three MAGE pools to EIGHT,
 # BATCH CE the three CLERIC pools, BATCH CH the three HUNTER pools and BATCH CI
-# the three WARRIOR pools. ALL FOUR CLASSES ARE COMPLETE, `SPEC_DRAFT_POOLS`
-# IS 96, AND THE DRAFT CARRIES NO DEBT AT ALL.
+# the three WARRIOR pools. ALL FOUR CLASSES ARE COMPLETE AND THE DRAFT CARRIES
+# NO DEBT AT ALL.
+#
+# **BATCH DO MOVED THE TOTAL FOR THE FIRST TIME SINCE CI, AND IT IS NOT A NEW
+# TRANCHE.** Twenty-two TALENT NODES granted an ability; the charter forbids
+# that outright now, so all twenty-two cards moved here rather than being
+# deleted. `SPEC_DRAFT_POOLS` IS 118 AND THE DRAFT IS 142 OF 142. **NO POOL
+# LOST ANYTHING AND THE FLOOR IS STILL EIGHT** — nine pools are deeper, and
+# beastmaster, sharpshooter and mystic still read exactly eight because their
+# trees granted nothing to move. **THE PER-SPEC EXPECTATION IS A TABLE NOW,
+# NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH` is the one authoritative
+# copy); every other suite asserts the FLOOR and the TOTAL.
 #
 # BATCH DG §3 CORRECTED THIS HEADER, AND IT WAS FOUND BY A SWEEP RATHER THAN BY
 # A FAILING CHECK. It read "ONE HUNDRED AND ELEVEN" in its first line, called
@@ -3592,6 +3621,134 @@ static func draft_ability(display_name: String) -> Ability:
 				"cooldown": 5, "anim": "attack03", "special": "cull",
 				"perfect_id": "", "perfect_text": "{atk:12} a status",
 				"description": "CONSUME every affliction on one enemy:\nEVERY enemy takes 10% of Attack in\nnature damage per status removed.\nA poison that cannot be cleansed stays\n— and is not paid for. It strips your\nown Trapper bonus from that body."})
+		# ================== BATCH DO — THE TWENTY-TWO THAT LEFT THE TREES ==================
+		#
+		# **A TALENT MAY NOT GRANT AN ABILITY.** Twenty-two talent nodes did,
+		# and every one of their abilities is authored, working content — so
+		# the charter's objection is to WHERE THEY COME FROM, not to what they
+		# are, and they move here rather than being deleted.
+		#
+		# SIXTEEN DEFINITIONS MOVED AND SIX DID NOT. The six `grant_ability`
+		# nodes (Divine Plea, Intercession, Sacred Resolve, Bulwark of
+		# Fortitude, Mind Flay, Mass Hysteria) named a card defined in
+		# `pending_talent_ability` already — outside the tree, which is why
+		# they needed no move. The sixteen below carried their whole
+		# definition INSIDE the node payload, so removing the payload would
+		# have deleted the ability with it: `Talents.granted_ability` reads
+		# `LANE_TREES`, and `pool_ability` falls through to it. EIGHT OF THEM
+		# ARE NAMED IN `SPEC_POOLS` TODAY, so that fall-through was the only
+		# thing making the zone-boss pick resolve at all.
+		#
+		# THEY ARE VERBATIM. Not one number, `special`, `perfect_id` or line of
+		# `description` was re-typed — they were lifted out of the payloads
+		# whole, so the draft card and the talent grant cannot have drifted in
+		# the move. **ONE TEXT CHANGED AND IT IS A CORRECTION, NOT A DRIFT:**
+		# Battle Shout's card promised "+12% ... Lasts 3 turns", which were
+		# `battle_shout_node`'s magnitudes — index 1 of `[8, 12, 18]`. Nothing
+		# writes that counter now, so the card says what the handler pays.
+		# `docs/state.md` has carried that mismatch as an open defect since DM.
+		#
+		# WHAT A DRAFTED COPY LOSES: the `upgrade` arms. Nine of the
+		# twenty-two carried one, and an `upgrade` fires only where a node's
+		# grant COLLIDES with an earned copy. No node grants, so no collision
+		# happens, so `battle_shout_node`, `lunge_upgraded`, `execute_upgraded`,
+		# `hold_line_upgraded`, `rampage_upgraded`, `overcharge_extra`,
+		# `intercession_long`, `resolve_extra_turns` and `bulwark_extra_turns`
+		# are read-only-zero now. THE FIELDS AND THEIR READ SITES ARE LEFT
+		# STANDING: every one of them reads a BASE beside it, deleting a
+		# branch is deleting a mechanic, and two are already in `runes.gd`'s
+		# coercion list against the day a rune writes them.
+		"Battle Shout":
+			return Ability.make({"display_name": "Battle Shout", "cost": 15,
+				"special": "battle_shout", "delay": 1.5, "anim": "attack03", "cooldown": 2,
+				"perfect_id": "", "perfect_text": "",
+				"description": "A roar every hero answers: +8%\ndamage, plus 1% per 20 blood buildup\non the warband. Lasts 2 turns.\nRefunds 5 Rage."})
+		"Rampage":
+			return Ability.make({"display_name": "Rampage", "cost": 40,
+				"damage": 20, "pressure": 10, "multi_hits": 3, "bleed_build": 10,
+				"delay": 4.0, "anim": "attack01", "cooldown": 4,
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."})
+		"Lunge":
+			return Ability.make({"display_name": "Lunge", "cost": 25,
+				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
+				"resource_gain": 10,
+				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
+				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them for\n3 turns. Builds 10 Rage."})
+		"Execute":
+			return Ability.make({"display_name": "Execute", "cost": 30,
+				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
+				"cooldown": 3,
+				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
+				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."})
+		"Hold the Line":
+			return Ability.make({"display_name": "Hold the Line", "cost": 30,
+				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
+				"cooldown": 6,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Embolden every ally: 50% less Break\ndamage for 2 turns, and no one can die\nfor 2 turns. Refunds 5 Rage."})
+		"Backdraft":
+			return Ability.make({"display_name": "Backdraft", "cost": 20,
+				"special": "backdraft", "delay": 2.0, "anim": "attack03", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Feed the fire air: every burning enemy\ngains 2 more turns of Burn. It starts\nno fires — it only deepens the ones\nalready lit, drain and all."})
+		"Immolate":
+			return Ability.make({"display_name": "Immolate", "cost": 15,
+				"special": "immolate", "delay": Ability.BUFF_DELAY_CAP,
+				"anim": "attack03", "cooldown": 2,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Wrap yourself in it: for 4 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning for\n3 turns."})
+		"Pyroblast":
+			return Ability.make({"display_name": "Pyroblast", "cost": 45,
+				"dmg_type": "fire", "damage": 55, "pressure": 25, "delay": 6.0,
+				"anim": "attack03", "cooldown": 0,
+				"perfect_id": "", "perfect_text": "",
+				"description": "The long cast: 55% of Attack in fire,\nand HALF AGAIN against a target that\nis already Burning. It consumes\nnothing — it simply asks you to have\nlit the fire first."})
+		"Firestorm":
+			return Ability.make({"display_name": "Firestorm", "cost": 30,
+				"dmg_type": "fire", "damage": 12, "pressure": 8, "random_hits": 6,
+				"perfect_extra_hit": false, "delay": 3.5, "anim": "attack03", "cooldown": 4,
+				"applies_status": {"id": "burn", "turns": 2},
+				"perfect_id": "", "perfect_text": "Every enemy takes an even share.",
+				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning for 2 turns\nper bolt — repeats stack. Twelve to\nsixteen turns of drain in one cast."})
+		"Phoenix Rebirth":
+			return Ability.make({"display_name": "Phoenix Rebirth", "cost": 0,
+				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Burn your own life for fuel: pay 15%\nof current health and your Mana\nreturns to FULL. Under Overburn a full\npool is exactly the relief the drain\ndenies you — and the price is a choice\nyou make, not a clock you carry."})
+		"Rime":
+			return Ability.make({"display_name": "Rime", "cost": 25,
+				"special": "rime", "delay": 3.0, "anim": "attack02", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Hoarfrost takes root: Frostbites the\ntarget — 50% less healing received,\nfor 2 turns. For 4 turns, every stack\nof Chilled this enemy gains also\nchills one other random enemy."})
+		"Glacial Prison":
+			return Ability.make({"display_name": "Glacial Prison", "cost": 25,
+				"special": "glacial_prison", "delay": 2.5, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "",
+				"description": "The air closes like a fist: the target\nis Frozen OUTRIGHT, whatever its\nChilled stacks, and joins the Glacial\nHold. Bosses still resist until Broken."})
+		"Cryoclasm":
+			return Ability.make({"display_name": "Cryoclasm", "cost": 20,
+				"special": "cryoclasm", "delay": 2.0, "anim": "attack02", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Control as a verb: the prison and the\ncold inside it are torn loose and\ndriven onto a DIFFERENT enemy. The\nlockdown relocates without being\nspent, so no release payoff fires."})
+		"Shatter":
+			return Ability.make({"display_name": "Shatter", "cost": 30,
+				"dmg_type": "frost", "damage": 10, "pressure": 10, "aoe": true,
+				"delay": 4.0, "anim": "attack03", "cooldown": 5,
+				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
+				"description": "Every prison breaks at once: each held\nenemy takes 10% of Attack PER TURN it\nspent frozen (max 12), and is\nreleased. Release now for a modest\nhit, or hold longer and hit harder."})
+		"Overcharge":
+			return Ability.make({"display_name": "Overcharge", "cost": 20,
+				"special": "overcharge", "delay": 1.5, "anim": "attack02", "cooldown": 5,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Feed the storm on itself: gain\nResonance equal to the FULL stacks you\nalready hold. Once per battle — the\nhigher you are, the more it pays."})
+		"Magi's Wrath":
+			return Ability.make({"display_name": "Magi's Wrath", "cost": 30,
+				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
+				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
+				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
+				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."})
 	return null
 
 

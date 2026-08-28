@@ -390,14 +390,21 @@ func _texts() -> void:
 		ok(tal.contains(t) or cls.contains(t),
 			"a DK §2 text no longer says `hero`: %s" % t)
 	# AND THE FOUR THAT KEEP "ALLY", which are only correct because §1 widened.
+	# BATCH DO — THE HOLD THE LINE NEEDLE FOLLOWED ITS TEXT INTO `classes.gd`.
+	# The wording is DK's, unedited; what moved is the FILE. A talent may not
+	# grant an ability, so `wd_hold_line`'s card left the node payload for
+	# `Classes.draft_ability` — verbatim, which is why the same words are still
+	# there to pin. The read site did not move at all, so DK's ruling stands
+	# exactly as it was: `_hero_side()` still covers a beast.
 	var allies := {
 		"wd_rally Rally": "grants every ally +30% healing received",
-		"wd_hold_line Hold the Line": "every ally takes 50% less Break damage",
 		"sv_medic Field Medic": "cleanse {v} debuffs from random allies",
 	}
 	for what in allies:
 		ok(tal.contains(allies[what]),
 			"%s stopped saying `ally`, but its read site still reaches companions" % what)
+	ok(cls.contains("Embolden every ally: 50% less Break"),
+		"Hold the Line stopped saying `ally`, but its read site still reaches companions")
 	ok(cls.contains("Ground made safe: every ally heals"),
 		"sanctuary Sanctuary stopped saying `ally`, but its read site still reaches companions")
 	# NO §2 TEXT MAY STILL CARRY THE OLD WORD. The seven were moved one at a

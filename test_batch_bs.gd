@@ -80,7 +80,8 @@ const INFERNO := {
 	"py_pyromaniac":    [1, "Ember Shroud", "ember_shroud", 8],
 	"py_invigorating":  [2, "Ashen Skin", "ashen_skin", 25],
 	"py_firebrand":     [3, "Heat Haze", "heat_haze", 20],
-	"py_flame_shield":  [4, "Immolate", "", 0],
+	# BATCH DO: the card moved into the draft and the CELL was re-authored.
+	"py_flame_shield":  [4, "Emberwall", "", 0],
 	"py_molten":        [5, "Backblast", "backblast", 15],
 	"py_undying_flame": [6, "Kiln-Forged", "kiln_forged_at", 3],
 	"py_cauterize":     [7, "Ash Lung", "ash_lung_pct", 4],
@@ -664,11 +665,15 @@ func _live_immolate() -> void:
 	if py == null:
 		scene.queue_free()
 		return
+	# BATCH DO — INVERTED. `py_flame_shield` granted Immolate; a talent may not
+	# grant an ability, so the card is a draft entry and the node is `Emberwall`.
+	# The rest of this check drives the `immolate` STATUS directly, which is
+	# what it was always really about, so it is unaffected.
 	var has_it := false
 	for ab in py.abilities:
 		if ab.display_name == "Immolate":
 			has_it = true
-	ok(has_it, "the node still grants Immolate")
+	ok(not has_it, "the node no longer grants Immolate — it is drafted now (DO)")
 	var foe: BattleUnit = scene.get("enemies")[0]
 	py.hp = py.max_hp
 	_seeded()

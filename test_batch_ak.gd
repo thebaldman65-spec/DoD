@@ -49,7 +49,9 @@ const NODES := {
 	"sm_agg_stance": [1, "Blade", "Aggressive Stance", "seasoned_off_bonus", 0.12],
 	"sm_def_stance": [1, "Poise", "Defensive Stance", "seasoned_def_bonus", 0.12],
 	"sm_flourish": [1, "Breaker", "Pressure Point", "pressure_point_ranks", 1],
-	"sm_lunge": [2, "Blade", "Lunge", "", 0],
+	# BATCH DO renamed both cells when their cards left for the draft — a node
+	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
+	"sm_lunge": [2, "Blade", "Committed Thrust", "", 0],
 	"sm_sword_mastery": [2, "Poise", "Sword Mastery", "parry_bonus", 0.12],
 	"sm_blade_dance": [2, "Breaker", "Sunder Guard", "guard_change_bd", 40],
 	"sm_keen_edge": [3, "Blade", "Killing Edge", "killing_edge_ranks", 1],
@@ -67,7 +69,7 @@ const NODES := {
 	"sm_deep_thrust": [7, "Blade", "Tempo", "tempo_ranks", 1],
 	"sm_composure": [7, "Poise", "Deflection", "deflection", 1],
 	"sm_guarded": [7, "Breaker", "Off Balance", "off_balance_ranks", 1],
-	"sm_execute": [9, "Blade", "Execute", "", 0],
+	"sm_execute": [9, "Blade", "Finisher", "", 0],
 	"sm_untouchable": [9, "Poise", "Untouchable", "untouchable", 1],
 	"sm_en_garde": [9, "Breaker", "Guard Breaker", "guard_breaker", 1],
 }
@@ -313,18 +315,27 @@ func _applied(learned: Dictionary, earned: Array = [],
 
 
 func _conditional_halves() -> void:
-	# --- Sunder Guard: the Guard Change half is unconditional, the
-	# Shatterpoint half rides owns_ability.
+	# --- Sunder Guard: the Guard Change half is all there is now.
+	# BATCH DO INVERTED THE SECOND HALF RATHER THAN DELETING IT. Shatterpoint
+	# is a `SPEC_POOLS` trophy, so the rider paid only a Swordmaster who had
+	# DRAWN one — the bet the talent charter forbids. The clause is cut from
+	# the text and `sunder_guard_bd` is cut from the payload, so what these
+	# lines assert now is that the rider CANNOT COME BACK: earning
+	# Shatterpoint must change nothing about this node.
 	var plain := _applied({"sm_blade_dance": 1})
 	ok(int(plain.get("guard_change_bd", 0)) == 40,
 		"Sunder Guard loads Guard Change unconditionally (40 BD)")
 	ok(int(plain.get("sunder_guard_bd", 0)) == 0,
-		"...and pays nothing toward a Shatterpoint he does not own")
+		"...and writes no Shatterpoint rider at all")
 	var with_sp := _applied({"sm_blade_dance": 1}, ["Shatterpoint"])
 	ok(int(with_sp.get("guard_change_bd", 0)) == 40,
 		"with Shatterpoint earned, Guard Change still gets its 40")
-	ok(int(with_sp.get("sunder_guard_bd", 0)) == 40,
-		"...and the ability hook pays its +40 as well")
+	ok(int(with_sp.get("sunder_guard_bd", 0)) == 0,
+		"...and earning Shatterpoint pays NOTHING — the clause is gone (DO)")
+	ok(not JSON.stringify(Talents.node_in_tree(
+			Talents.generate_tree("swordmaster", "warrior"),
+			"sm_blade_dance")["payload"]).contains("Shatterpoint"),
+		"...and the payload no longer names Shatterpoint anywhere")
 	# The hook must read the LIVE ability list, so the base kit alone is
 	# not enough — Shatterpoint left it in §1.
 	ok(not Talents.owns_ability(_member({}), "Shatterpoint"),
@@ -347,12 +358,17 @@ func _conditional_halves() -> void:
 
 	# An empty ctx leaves a conditional half INERT — the Batch AI §5 rule:
 	# an effect that fails to appear is a bug you can see.
+	# BATCH DO: `sm_blade_dance` LEFT THIS LOOP. It has no second half any
+	# more, so asserting that its second half is inert would pass for no
+	# reason — the failure mode this project rates worse than a red. What
+	# replaces it is the assertion that it carries no `also` at all.
 	var tree: Array = Talents.generate_tree("swordmaster", "warrior")
-	for id in ["sm_blade_dance", "sm_guarded"]:
+	ok(not (Talents.node_in_tree(tree, "sm_blade_dance")["payload"] as Dictionary).has("also"),
+		"Sunder Guard carries no conditional half at all now (DO)")
+	for id in ["sm_guarded"]:
 		var bare := {"abilities": []}
 		Talents.apply_payload(bare, Talents.node_in_tree(tree, id)["payload"], 1)
-		ok(int(bare.get("sunder_guard_bd", 0)) == 0 \
-			and int(bare.get("off_balance_wide", 0)) == 0,
+		ok(int(bare.get("off_balance_wide", 0)) == 0,
 			"'%s' second half is inert on an empty ctx" % id)
 		# ...but the UNCONDITIONAL half still lands, or the node is broken.
 		ok(bare.size() > 1, "'%s' first half still lands on an empty ctx" % id)
@@ -361,45 +377,58 @@ func _conditional_halves() -> void:
 # ---------- 6. grant, or upgrade ----------
 
 func _upgrade_paths() -> void:
-	# Lunge, unowned: the node grants it at full price and nothing upgrades.
+	# **BATCH DO INVERTED THIS SECTION.** AK built the grant-or-upgrade pattern
+	# and this is where it was proved. DO's charter ends the premise — a talent
+	# may not grant an ability — so both cards moved into `SPEC_DRAFT_POOLS`
+	# and both cells were re-authored. What is asserted now is the three things
+	# that would break if a grant came back: the cell hands out NOTHING, the
+	# card is still reachable, and the `_upgraded` flag that counted which path
+	# ran is READ-ONLY-ZERO. The flag is the sharp one: only a collision can
+	# write it, so it catches a regression however it is reintroduced.
 	var fresh := _applied({"sm_lunge": 1})
-	var fresh_names := _ability_names(fresh["abilities"])
-	ok(fresh_names.count("Lunge") == 1, "the node grants Lunge when he has none")
-	ok(int(fresh.get("lunge_upgraded", 0)) == 0, "...and marks no upgrade")
-	for a in fresh["abilities"]:
-		if a.display_name == "Lunge":
-			ok(a.cost == 25, "...at the ordinary 25 Rage (got %d)" % a.cost)
-
-	# Lunge, already earned from a pool pick: upgraded, never duplicated.
-	# Earned picks go on BEFORE the tree at both real call sites, which is
-	# what this arrangement reproduces.
+	ok(_ability_names(fresh["abilities"]).is_empty(),
+		"the Lunge cell hands out NOTHING (DO's charter)")
+	ok(int(fresh.get("lunge_upgraded", 0)) == 0,
+		"...and `lunge_upgraded` is read-only-zero — only a grant could write it")
+	ok(Classes.spec_draft_pool("swordmaster").has("Lunge"),
+		"...while the card itself drafts from the Swordmaster")
+	# The card keeps its base numbers: they were lifted VERBATIM out of the
+	# payload, so 25 Rage here is the same 25 the node used to hand out.
 	var earned_lunge := Classes.spec_pool_ability("swordmaster", "Lunge")
 	ok(earned_lunge != null, "Lunge resolves out of the spec pool")
+	ok(earned_lunge != null and earned_lunge.cost == 25,
+		"...at the ordinary 25 Rage (got %d)" % (earned_lunge.cost if earned_lunge else -1))
+	# An earned copy plus the cell is still exactly one copy.
 	var up := _applied({"sm_lunge": 1}, ["Lunge"], [earned_lunge])
-	var up_names := _ability_names(up["abilities"])
-	ok(up_names.count("Lunge") == 1, "an earned Lunge is not granted a second time")
-	ok(int(up.get("lunge_upgraded", 0)) == 1, "...the node marks the UPGRADE instead")
+	ok(_ability_names(up["abilities"]).count("Lunge") == 1,
+		"an earned Lunge is never doubled by the cell")
+	ok(int(up.get("lunge_upgraded", 0)) == 0,
+		"...and the flag STILL reads zero — no collision happened")
+	# ...and the upgraded wording has no source any more, so it is asserted
+	# ABSENT: a card promising what nothing can grant is the DM defect.
 	for a in up["abilities"]:
 		if a.display_name == "Lunge":
-			ok(a.cost == 15, "...the cost drops to 15 Rage (got %d)" % a.cost)
-			ok(a.description.contains("Exposes AND"),
-				"...and the description says it applies both wounds")
+			ok(not a.description.contains("Exposes AND"),
+				"...and the card no longer promises the node's upgrade")
 
 	# Execute, the same shape one row later.
 	var cap_fresh := _applied({"sm_execute": 1})
-	ok(_ability_names(cap_fresh["abilities"]).count("Execute") == 1,
-		"the capstone grants Execute when he has none")
-	ok(int(cap_fresh.get("execute_upgraded", 0)) == 0, "...and marks no upgrade")
+	ok(_ability_names(cap_fresh["abilities"]).is_empty(),
+		"the Execute capstone hands out NOTHING (DO's charter)")
+	ok(int(cap_fresh.get("execute_upgraded", 0)) == 0,
+		"...and `execute_upgraded` is read-only-zero")
+	ok(Classes.spec_draft_pool("swordmaster").has("Execute"),
+		"...while the card itself drafts from the Swordmaster")
 	var earned_exec := Classes.spec_pool_ability("swordmaster", "Execute")
 	var cap_up := _applied({"sm_execute": 1}, ["Execute"], [earned_exec])
 	ok(_ability_names(cap_up["abilities"]).count("Execute") == 1,
-		"an earned Execute is not granted a second time")
-	ok(int(cap_up.get("execute_upgraded", 0)) == 1,
-		"...the capstone marks the UPGRADE instead")
+		"an earned Execute is never doubled by the cell")
+	ok(int(cap_up.get("execute_upgraded", 0)) == 0,
+		"...and its flag reads zero too")
 	for a in cap_up["abilities"]:
 		if a.display_name == "Execute":
-			ok(a.description.contains("35%") and a.description.contains("FREE"),
-				"...and the description states the 35% threshold and the free cast")
+			ok(not (a.description.contains("35%") and a.description.contains("FREE")),
+				"...and the card no longer states an upgrade nothing can grant")
 
 	# The two names are in the pools that make this reachable at all.
 	ok(Classes.spec_pool("swordmaster").has("Lunge") \
@@ -624,7 +653,13 @@ func _live_execute() -> void:
 	var sm := _sm(scene)
 	ok(sm != null, "the upgraded-Execute Swordmaster spawned")
 	if sm != null:
-		ok(sm.execute_upgraded == 1, "LIVE: the capstone upgraded the earned Execute")
+		# BATCH DO: the capstone grants nothing, so there is no collision and no
+		# upgrade. The threshold/free-cast BRANCHES below are still live code
+		# (nothing writes the flag, so they are exercised by setting it here),
+		# which is why they are driven rather than deleted.
+		ok(sm.execute_upgraded == 0,
+			"LIVE: `execute_upgraded` is read-only-zero — the capstone grants nothing")
+		sm.execute_upgraded = 1
 		var ex := _find(sm, "Execute")
 		ok(ex != null, "...and there is exactly one Execute on the bar")
 		var names := _ability_names(sm.abilities)
@@ -669,7 +704,11 @@ func _live_lunge() -> void:
 	var foe: BattleUnit = scene.get("enemies")[0]
 	ok(sm != null, "the upgraded-Lunge Swordmaster spawned")
 	if sm != null and foe != null:
-		ok(sm.lunge_upgraded == 1, "LIVE: the node upgraded the earned Lunge")
+		# BATCH DO: same shape. The flag has no writer, so the branch is driven
+		# from here rather than left unreachable and unproved.
+		ok(sm.lunge_upgraded == 0,
+			"LIVE: `lunge_upgraded` is read-only-zero — the cell grants nothing")
+		sm.lunge_upgraded = 1
 		ok(_ability_names(sm.abilities).count("Lunge") == 1,
 			"...and there is still one Lunge on the bar")
 		foe.hp = foe.max_hp * 4  # survive the thrust so the statuses can be read
@@ -683,21 +722,25 @@ func _live_lunge() -> void:
 
 	# The un-upgraded Lunge still picks by stance — the node's base grant
 	# must not have quietly inherited the upgrade.
+	# BATCH DO: the "granted" copy no longer exists — a talent grants nothing —
+	# so the control earns the card and leaves the flag alone. It is the same
+	# question: an un-upgraded Lunge picks its wound by STANCE.
 	var prep_plain := func(run):
+		run.party[0]["bm_abilities"] = ["Lunge"]
 		run.party[0]["talents"] = {"sm_lunge": 1}
 	var plain := await _spawn(["swordmaster", "cryomancer", "holy", "mystic"],
 		["raider"], prep_plain)
 	var sm2 := _sm(plain)
 	var foe2: BattleUnit = plain.get("enemies")[0]
 	if sm2 != null and foe2 != null:
-		ok(sm2.lunge_upgraded == 0, "a granted Lunge is not upgraded")
+		ok(sm2.lunge_upgraded == 0, "a drafted Lunge is not upgraded")
 		foe2.hp = foe2.max_hp * 4
 		foe2.max_hp = foe2.hp
 		sm2.no_cover = 1
 		sm2.stance = "aggressive"
 		await plain._resolve(sm2, _find(sm2, "Lunge"), foe2, "good")
 		ok(foe2.has_status("exposed") and not foe2.has_status("cripple"),
-			"the granted Lunge still Exposes only, from the Aggressive guard")
+			"the drafted Lunge still Exposes only, from the Aggressive guard")
 	plain.free()
 
 

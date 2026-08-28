@@ -2263,6 +2263,61 @@ cards drafted with no damage figure at all.
   Perfect visible also exposed 107 strings in the "60 Rage instead of 40" shape the standard
   rejects. They were not wrong before; they were invisible.** CL cleans them up.
 
+## STANDING RULE — A TALENT MAY NOT GRANT AN ABILITY, NOR DEPEND ON ONE THE HERO IS NOT GUARANTEED (Batch DO)
+
+> **A talent may not grant an ability, and may not depend on an ability or status the hero is not
+> guaranteed to have.** Talents are chosen before the run knowing nothing; abilities come from the
+> draft, runes sharpen them.
+> **A talent modifying the spec's PROTECTED CORE is guaranteed and permitted.**
+
+**THE LAST SENTENCE IS THE RULING, AND IT IS WORTH 83 NODES.** The charter as first written said
+two different things: one clause permitted a node to be general in two ways only — *a STAT, or the
+spec's OWN resource and passive* — and another said *a node modifying a CORE KIT ability is
+guaranteed*. Under the first reading the trees were 235 of 324 clean; under the second, 318.
+**THE SECOND READING STANDS: the hero owns its core kit in EVERY run, so modifying it is not a
+bet.** The looser sentence is corrected wherever it was written down so it cannot be quoted back.
+**DO NOT RE-OPEN THIS AS AN OPEN QUESTION** — `docs/talent-audit.html` §8 records it as settled.
+
+· **WHAT IS PERMITTED, IN FULL:** a STAT; the spec's own PASSIVE; the spec's own RESOURCE; the
+  spec's PROTECTED CORE (`Classes.protected_names` plus `core_enablers`); and **another node in
+  the same tree** — a cross-row conditional bets on a node the player CHOOSES, not on a card they
+  are DEALT, so the seventeen tree-internal dependencies are not the defect and all of them stay.
+· **WHAT IS FORBIDDEN:** granting an ability at all, and naming any ability from a draft pool, a
+  spec pool (the zone-boss trophy), a class pool or another spec — **including as a bonus clause
+  on a node that works without it.** A bonus clause on a drawn card is still a bet; §2's four
+  rewords cut exactly that shape.
+· **RUNES MAY STILL GRANT, AND FOUR DO** — Comet (a `new_ability`), Binding Souls, the Last Rites
+  and the Flayed Mind (`grant_ability`). A rune is BOUGHT with knowledge of the run in front of
+  you, which is the whole distinction. **`Talents.apply_payload`'s two grant branches and
+  `_collided` are therefore NOT dead and must not be deleted** even though no talent reaches them.
+· **CUTTING A CLAUSE MEANS CUTTING ITS PAYLOAD TERM.** A node whose text loses a clause while its
+  code keeps paying it is the defect this project has found five times. DO cut three terms with
+  three clauses (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`), field and read
+  site together, and `check_do` §3 asserts all three are absent from the whole of `scripts/`.
+· **A RE-AUTHORED CELL KEEPS ITS ID, ITS LANE AND ITS ROW.** `Talents.cells_spent` prices each
+  owned cell off the row it CURRENTLY sits in, so a node that MOVES row mis-prices a saved
+  allocation — DN measured a full Berserker ledger at **−2 available points**, with nothing to
+  refuse it, clamp it or log it. **Nothing in DO moved a cell, so no save migration was needed
+  and `Profile` is still v2.** `check_do` §3 asserts the twenty-five re-authored cells are all in
+  their original lane and row.
+· **THE GATE ASSERTS THE PROPERTY AND PRINTS THE COUNT, NEVER THE REVERSE.** DN's own gate
+  asserted a NUMBER and its first battery caught it, costing a second thirty-five-minute frozen
+  run. `check_do` §1 asserts *no node grants* and *no node names an ability outside its protected
+  core*, and prints 324 / 0 / 98 / 1 / 0 beside them.
+· **NAME A RE-AUTHORED NODE SO IT CANNOT BE CONFUSED WITH THE CARD IT REPLACED.** A talent tree is
+  a namespace and the matcher resolves same-tree names first — but a node NAMED "Overcharge" beside
+  a draft card called Overcharge is the `wd_spiked`/Spite trap DN documented, in a new place. The
+  Arcanist's row-4 Resonance cell is **Overdraw** for that reason. Five nodes were already named
+  after live abilities before DO (Second Wind, Spite, Rally, Killing Frost, Divine Presence);
+  **DO added no sixth.**
+· **WHAT THE MOVE COSTS, RECORDED RATHER THAN HIDDEN: nine abilities lost their upgraded
+  variant.** An `upgrade` arm fires only where a node's grant COLLIDES with an earned copy, and no
+  node grants — so `battle_shout_node`, `lunge_upgraded`, `execute_upgraded`, `hold_line_upgraded`,
+  `rampage_upgraded`, `overcharge_extra`, `intercession_long`, `resolve_extra_turns` and
+  `bulwark_extra_turns` are read-only-zero now. **The fields and their read sites are LEFT
+  STANDING** — each reads a base beside it, deleting a branch is deleting a mechanic, and two are
+  already in `runes.gd`'s coercion list against the day a rune writes them.
+
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO (Batch BX §2), on ONE SCREEN of four columns,
 each hero drawing from their OWN pools and keeping their OWN no-return ledger.** BO offered to
@@ -2317,8 +2372,17 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**THE TARGET IS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
-CLASS-WIDE = 120; THE DRAFT STANDS AT 120 OF 120 AND NOTHING IS OWED (Batch CI).** The ~96 came from an older
+**BATCH DO MOVED THE TOTAL FOR THE FIRST TIME SINCE CI, AND IT IS NOT A NEW TRANCHE. THE DRAFT
+STANDS AT 142 OF 142 AND NOTHING IS OWED — 118 SPEC + 24 CLASS-WIDE.** Twenty-two talent nodes
+GRANTED an ability; the charter forbids that outright now, so all twenty-two cards moved into
+their spec's draft pool rather than being deleted. **NO POOL LOST ANYTHING AND THE FLOOR IS STILL
+EIGHT** — nine specs are deeper than eight and three (beastmaster, sharpshooter, mystic) still
+read exactly eight, because those three trees granted nothing to move. **THE PER-SPEC
+EXPECTATION IS A TABLE NOW, NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH`): writing `12 * 8`
+again would re-assert the CI-era shape over a tree that has moved past it.
+**THE TARGET WAS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
+CLASS-WIDE = 120; THE DRAFT STOOD AT 120 OF 120 AND NOTHING WAS OWED (Batch CI), AND DO'S
+TWENTY-TWO TOOK IT TO 142 OF 142.** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -2327,8 +2391,9 @@ for it rather than fixing the two known sites. **DO NOT QUOTE ~96 AGAIN.** Dated
 keep it as written (they are the record of what each batch believed — CA's rule); this is
 the correction.
 **TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
-nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` IS 96 AND THE DRAFT IS 120 OF
-120. ALL TWELVE SPECS DRAFT FROM EIGHT, ALL FOUR CLASS POOLS HOLD SIX, AND NOTHING IS OWED.**
+nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` REACHED 96 AND THE DRAFT
+REACHED 120 OF 120 THERE. **SINCE BATCH DO IT IS 118 AND 142 OF 142: ALL TWELVE SPECS DRAFT FROM
+AT LEAST EIGHT, NINE OF THEM FROM MORE, ALL FOUR CLASS POOLS HOLD SIX, AND NOTHING IS OWED.**
 **THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
 DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
 that sentence is dead in master.html §6b, in `classes.gd`'s header comment and here.
@@ -2354,7 +2419,8 @@ nine, BV the Hunter nine, BW the WARRIOR nine); tranche 3 took it to 96 and ever
 (CB the Mage nine, CE the Cleric nine, CH the Hunter nine, CI the WARRIOR nine). **THE FOUR
 CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTER THIRD AND THE
 WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
-SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, IS 120 OF 120.**
+SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, WAS 120 OF 120 — AND DO'S TWENTY-TWO
+TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142.**
 **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
 or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
 loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own

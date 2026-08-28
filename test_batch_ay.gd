@@ -248,8 +248,15 @@ func _magnitudes() -> void:
 		"Unbroken Watch: +1 additional Loyalty on an unbloodied turn (the +2 was a lie — BJ §2)")
 	ok(_stat_of("bm_absolute", "absolute_step") == 15.0,
 		"Absolute Devotion: the boon step rises to 35%% (base 20 + 15)")
-	ok(_stat_of("bm_devoted_fury", "devoted_fury") == 1,
-		"Devoted Fury: +1 Wrath turn PER stack, not per two")
+	# BATCH DO RE-AUTHORED THIS CELL AND THE STAT WENT WITH IT. It read
+	# "Bestial Wrath lasts 1 turn longer per Loyalty stack" — and Bestial Wrath
+	# is a `SPEC_POOLS` trophy, so the whole node did nothing without the draw.
+	# It points at KILL COMMAND now, which is PROTECTED CORE, through
+	# `apply_payload`'s ability branch rather than through a stat.
+	ok(_payload("bm_devoted_fury").get("ability", "") == "Kill Command",
+		"Devoted Fury modifies Kill Command, which every Beastmaster owns")
+	ok(_stat_of("bm_devoted_fury", "devoted_fury") == null,
+		"...and writes no `devoted_fury` counter at all now")
 	ok(_stat_of("bm_steadfast", "steadfast_bond") == 100,
 		"Steadfast Bond: the Loyalty returns in FULL (100%%)")
 	ok(_stat_of("bm_ancient_pact", "ancient_pact") == 1, "Ancient Pact is a flag")
@@ -277,8 +284,13 @@ func _magnitudes() -> void:
 		"Master's Aim: +25%% of Attack on Quick Shot")
 	ok(abs(float(_stat_of("bm_beast_within", "companion_hp_pct")) - 0.40) < 0.001,
 		"The Wild Within (was Beast Within, BX §4): +40%% companion max health")
-	ok(_stat_of("bm_reserves", "deep_reserves_ranks") == 30,
-		"Deep Reserves: +30%% max Mana on Spirit Bond")
+	# BATCH DO: same shape. "Spirit Bond restores +30% more maximum Mana" was
+	# the ENTIRE node and Spirit Bond is a `SPEC_POOLS` trophy. It points at
+	# HUNTER'S INSTINCT now, which is PROTECTED CORE.
+	ok(_payload("bm_reserves").get("ability", "") == "Hunter's Instinct",
+		"Deep Reserves modifies Hunter's Instinct, which every Beastmaster owns")
+	ok(_stat_of("bm_reserves", "deep_reserves_ranks") == null,
+		"...and writes no `deep_reserves_ranks` counter at all now")
 	ok(_stat_of("bm_instinctive", "instinctive") == 8,
 		"Instinctive: 8 empowered Quick Shots")
 	ok(_stat_of("bm_symbiosis", "symbiosis") == 6,

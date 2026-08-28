@@ -2646,10 +2646,12 @@ func _run_battle() -> void:
 			_log("%s stands fortified — regains %d HP (Bulwark)" % [
 				u.unit_name, bw_tick], "#8c9cc8")
 		# Zeal-lane riders (Batch K): Healing Pulse drips and Cleansing
-		# Waters wash while EITHER banner — Sacred Resolve or Consecrated
-		# Ground — holds. Ranks read live off the living Devout, so his
-		# fall silences them (the Conviction rule).
-		if u.has_status("unity") or u.has_status("cons_ground"):
+		# Waters wash while CONSECRATED GROUND holds. Ranks read live off the
+		# living Devout, so his fall silences them (the Conviction rule).
+		# BATCH DO: the `unity` half is CUT WITH THE CLAUSE THAT PROMISED IT.
+		# Sacred Resolve is a draft card now, so a node reading its banner
+		# would be a bet; Consecrated Ground is PROTECTED CORE.
+		if u.has_status("cons_ground"):
 			var zl_dv := _living_devout()
 			if zl_dv != null:
 				if zl_dv.pulse_ranks > 0 and not u.is_companion:
@@ -5422,7 +5424,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			var ip_held: int = maxi(t.status_power("shield_charges"), 0) \
 				if t.has_status("shield_charges") else 0
 			return [{"id": "shield_charges", "turns": -1,
-				"power": ip_held + 1 + u.bulwark_line_ranks}]
+				"power": ip_held + 1}]
 		"magic_barrier":
 			return [{"id": "barrier", "turns": 3,
 				"power": maxi(int(round(u.max_hp * 0.20)), 1)}]
@@ -8285,14 +8287,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# (+10% crit, scaled by the bond tier — doubled/tripled/half).
 			if attacker.is_hero and not attacker.is_companion:
 				crit_chance += _party_crit_bonus()
-			# Precision Strikes: exploits Dazed / Crippled / Exposed targets.
-			if attacker.precision_ranks > 0 and (strike_target.has_status("dazed")
-					or strike_target.has_status("cripple")
-					or strike_target.has_status("exposed")):
+			# Precision Strikes: exploits the opening Pommel Strike makes.
+			# BATCH DO re-pointed it off Dazed / Crippled / Exposed, none of
+			# which the Swordmaster can guarantee, onto STUNNED — which his
+			# PROTECTED CORE applies. The text moved with the read site.
+			if attacker.precision_ranks > 0 and strike_target.has_status("stunned"):
 				crit_chance += 0.20 * attacker.precision_ranks
-			# Seasoned Fighter (talent node): sharpens Lunge and Overpower.
+			# Seasoned Fighter (talent node): sharpens Overpower. BATCH DO cut
+			# the Lunge half with the clause — Lunge is a draft card now, so
+			# naming it made a guaranteed node pay a drawn one.
 			if attacker.blade_crit_ranks > 0 \
-					and ab.display_name in ["Lunge", "Overpower"]:
+					and ab.display_name == "Overpower":
 				crit_chance += 0.15 * attacker.blade_crit_ranks
 			# Killing Edge: the Aggressive guard hunts the opening.
 			if attacker.killing_edge_ranks > 0 and attacker.stance == "aggressive":
@@ -9545,14 +9550,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pr += 30 * attacker.pressure_point_ranks
 				_log("   → Talent: Pressure Point — +%d BD" % (
 					30 * attacker.pressure_point_ranks), "#b0a8e0")
-			# Sunder Guard's ability hook: the node is pointed at Guard
-			# Change (see the guard_change handler), and pays this second
-			# time only if he also drew Shatterpoint from a pool.
-			if attacker.sunder_guard_bd > 0 \
-					and ab.display_name == "Shatterpoint":
-				pr += attacker.sunder_guard_bd
-				_log("   → Talent: Sunder Guard — +%d BD" % \
-					attacker.sunder_guard_bd, "#b0a8e0")
+			# BATCH DO: Sunder Guard's SHATTERPOINT rider is gone with the
+			# clause that promised it. Shatterpoint is a `SPEC_POOLS` trophy,
+			# so the rider paid only a Swordmaster who had drawn one — the
+			# node's Guard Change body (see the guard_change handler) is
+			# PROTECTED CORE and is the whole node now.
 			# Pressure Cooker: the trigger cracks the guard as well as the
 			# flesh. It reads the CAPTURED flag, not the status, because
 			# Detonation has already eaten the Burn by the time this runs.
@@ -10718,14 +10720,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
 		# party refuel is the real payload).
 		if ab.display_name == "War Stomp" and attacker.is_hero and not attacker.dead:
-			# Rallying Cry's ABILITY RIDER (Batch AL): the node's body fires
-			# at his turn now, and this is the extra it pays a Warden who
-			# also owns the stomp.
-			var stomp_pct := (0.20 if is_perfect else 0.10) \
-				+ 0.20 * attacker.rallying_stomp_ranks
-			if attacker.rallying_stomp_ranks > 0:
-				_log("   → Talent: Rallying Cry — War Stomp's refuel deepens (+%d%%)" % (
-					20 * attacker.rallying_stomp_ranks), "#b0a8e0")
+			# BATCH DO: Rallying Cry's WAR STOMP rider is gone with the clause
+			# that promised it — War Stomp is a `SPEC_POOLS` trophy. The
+			# node's turn-start drip is a stat and stands on its own.
+			var stomp_pct := 0.20 if is_perfect else 0.10
 			for h in heroes:
 				if h.dead or h == attacker or h.resource_name == "":
 					continue
@@ -18376,11 +18374,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the ally is holding. Since Batch AB this is the ONLY source of
 			# guaranteed charges, which is why the block log names it.
 			_sfx("parry", -6.0, 0.5)
-			# Bulwark Line's ABILITY RIDER thickens the cover: +1 charge per
-			# ally, and only when the hero actually owns Interpose (Batch AL
-			# — the node's main body moved to Shieldwall, which he always
-			# has; this half is the bonus for having drawn Interpose too).
-			var sw_grant := 1 + attacker.bulwark_line_ranks
+			# BATCH DO: Bulwark Line's INTERPOSE rider is gone with the clause
+			# that promised it — Interpose is a `SPEC_POOLS` trophy. The
+			# node's body is pointed at Shieldwall, which is PROTECTED CORE.
+			var sw_grant := 1
 			for h in heroes:
 				if h.dead or h.is_companion:
 					continue
@@ -18392,9 +18389,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"Interpose: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % sw_total,
 					sw_total)
 				h.float_text("COVERED", Color(0.75, 0.8, 0.95))
-			if attacker.bulwark_line_ranks > 0:
-				_log("   → Talent: Bulwark Line — each ally gains %d charges" % \
-					sw_grant, "#b0a8e0")
 			_message("%s covers the line!" % attacker.unit_name)
 			_log("%s: Interpose — every ally gains a shield charge, the Warden included" % \
 				attacker.unit_name, "#8c9cc8")

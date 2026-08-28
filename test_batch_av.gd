@@ -273,7 +273,10 @@ func _tree_shape() -> void:
 	# took the designer's call — his triggers on standing strong and keeps the
 	# name; hers is "Hour of Need". A LABEL ONLY: `holy_vigil_pct` and every
 	# read site are untouched, and the magnitude check below still reads 15.
-	for pair in [["hl_resurrection", "Grace"], ["hl_inner_faith", "Intercession"],
+	# BATCH DO: `hl_inner_faith` keeps its id and its cell and is "Inner Faith"
+	# now — its card left for the draft, and a node named after a live DRAFT
+	# CARD is the `wd_spiked`/Spite collision.
+	for pair in [["hl_resurrection", "Grace"], ["hl_inner_faith", "Inner Faith"],
 			["hl_beacon", "Hour of Need"], ["hl_capacitor", "Martyrdom"],
 			["hl_sanctum", "Sanctum"], ["hl_serenity", "Serenity"],
 			["hl_vestments", "Blessed Vestments"]]:
@@ -412,27 +415,30 @@ func _additive_units() -> void:
 
 # ---------- §4 the two authored fallbacks ----------
 
+# **BATCH DO INVERTED THIS SECTION.** AV authored two fallbacks so that a node
+# granting what the hero already held would not be dead. DO's charter removes
+# the premise — a talent may not grant an ability at all — so both cards moved
+# into `SPEC_DRAFT_POOLS` and both cells were re-authored. There is no collision
+# left to fall back FROM, and a fallback for a grant that cannot happen would be
+# machinery nothing can reach.
 func _authored_fallbacks() -> void:
 	var plea := _payload("hl_divine_plea")
-	ok(Talents.collision_kind(plea) == "authored",
-		"Divine Plea's node carries an AUTHORED fallback, not the generic")
-	var plea_up: Array = plea.get("upgrade", [])
-	ok(plea_up.size() == 1
-		and String(plea_up[0].get("ability", "")) == "Divine Plea"
-		and int(plea_up[0].get("set", {}).get("faith_cost", -1)) == 1,
-		"...already owned -> Divine Plea costs 1 Mercy instead of 2")
+	ok(Talents.granted_name(plea) == "",
+		"Divine Plea's cell hands out NOTHING (DO's charter)")
+	ok(not plea.has("upgrade"),
+		"...so it carries no collision fallback either")
+	ok(Classes.spec_draft_pool("holy").has("Divine Plea"),
+		"...while the card itself drafts from the Cleric")
 	var ice := _payload("hl_inner_faith")
-	ok(Talents.collision_kind(ice) == "authored",
-		"Intercession's node carries an AUTHORED fallback")
-	var ice_up: Array = ice.get("upgrade", [])
-	ok(ice_up.size() == 1
-		and int(ice_up[0].get("stat", {}).get("intercession_long", 0)) == 1,
-		"...already owned -> the window lasts a turn longer")
-	# Her three capstones are passives or ability edits, so none of them grants
-	# an ability and none of them needs a fallback at all.
-	for cap in ["hl_sanctum", "hl_avatar", "hl_capacitor"]:
-		ok(Talents.granted_name(_payload(cap)) == "",
-			"%s grants no ability, so it owes no fallback" % cap)
+	ok(Talents.granted_name(ice) == "",
+		"Intercession's cell hands out NOTHING (DO's charter)")
+	ok(not ice.has("upgrade"), "...so it carries no fallback either")
+	ok(Classes.spec_draft_pool("holy").has("Intercession"),
+		"...and Intercession drafts from the Cleric — earnable for the first time")
+	# NOW EVERY CELL IN HER TREE IS IN THAT POSITION, not just the capstones.
+	for cap in Talents.LANE_TREES["holy"]:
+		ok(Talents.granted_name(cap.get("payload", {})) == "",
+			"%s grants no ability, so it owes no fallback" % String(cap["id"]))
 	# AU §1's rule reaching a RUNE grant needed no new machinery, and that is
 	# the finding: runes share Talents.apply_payload, so _collided already
 	# fires for them and Run.apply_upgrades already runs after the rune pass.
@@ -565,8 +571,10 @@ func _live_kit_at_spawn() -> void:
 	var built := await _spawn({"hl_divine_plea": 1, "hl_inner_faith": 1,
 		"hl_zealous": 1, "hl_martyr": 1, "hl_soothe": 1, "hl_swift": 1})
 	var c2 := _hero(built, 2)
-	ok(_find(c2, "Divine Plea") != null, "the row-4 node grants Divine Plea")
-	ok(_find(c2, "Intercession") != null, "the Vigil row-4 node grants Intercession")
+	# BATCH DO: the two cards are DRAFTED now, so a build that buys the cells
+	# and nothing else holds neither. That is the charter working, not a gap.
+	ok(_find(c2, "Divine Plea") == null, "the row-4 cell grants no Divine Plea (DO)")
+	ok(_find(c2, "Intercession") == null, "the Vigil row-4 cell grants no Intercession (DO)")
 	ok(c2.second_resource == 2, "Zealous Light opens her on 2 Mercy (got %d)" % c2.second_resource)
 	ok(c2.second_max == 8, "Martyr's Vigor raises the ceiling to 8 (got %d)" % c2.second_max)
 	var heal := _find(c2, "Heal")
@@ -648,8 +656,12 @@ func _live_intercession() -> void:
 	var long_w := await _spawn({"hl_inner_faith": 1},
 		{"bm_abilities": ["Intercession"]})
 	var c4 := _hero(long_w, 2)
-	ok(c4.intercession_long == 1,
-		"AUTHORED FALLBACK: already owned -> the window lasts a turn longer")
+	# BATCH DO: `intercession_long` is READ-ONLY-ZERO — an `upgrade` arm fires
+	# only on a grant collision, and no talent grants. The read site below is
+	# still live code, so the branch is driven from here rather than left
+	# unreachable and unproved.
+	ok(c4.intercession_long == 0,
+		"`intercession_long` is read-only-zero — nothing grants (DO's charter)")
 	ok(_find(c4, "Intercession") != null, "...and she still holds exactly one copy")
 	var copies := 0
 	for ab in c4.abilities:

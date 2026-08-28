@@ -61,6 +61,15 @@ var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -147,8 +156,8 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 96,
-		"§5+BP+tranche 3: ninety-six ship — BO's 18, BP's 6, tranche 2's 36, and tranche 3's 36 (got %d)"
+	ok(total == 118,
+		"§5+DO: one hundred and eighteen ship — CI's ninety-six plus DO's twenty-two (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -182,8 +191,8 @@ func _pools() -> void:
 	for spec in ["pyromancer", "cryomancer", "arcanist",
 			"holy", "inquisitor", "occultist",
 			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"§5+tranche 3: %s drafts EIGHT" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"§5+tranche 3: %s drafts at least EIGHT" % spec)
 	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
 	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
 	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
@@ -205,16 +214,16 @@ func _pools() -> void:
 	# the reason it inverts rather than being deleted — the question is still
 	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"§5+tranche 3: %s drafts EIGHT — the Warrior third is paid" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"§5+tranche 3: %s drafts at least EIGHT — the Warrior third is paid" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
 	# two at BP, and five at BW. One of four heroes in every party had no draft
 	# at all until BP, and had the shallowest one in the game until BW.
 	for w in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.SPEC_DRAFT_POOLS.has(w),
 			"§5: %s's draft pool is NAMED" % w)
-		ok(Classes.spec_draft_pool(w).size() == 8,
-			"CI: ...and FULL — %s drafts EIGHT of its own" % w)
+		ok(Classes.spec_draft_pool(w).size() >= 8,
+			"CI: ...and FULL — %s drafts at least EIGHT of its own" % w)
 	# CLASS-WIDE: four keys, ALL FOUR FILLED.
 	# RE-POINTED IN PLACE TWICE, AND BOTH RE-POINTS ARE INVERSIONS — the honest
 	# treatment when a later batch pays a debt an older suite was recording.
@@ -248,18 +257,72 @@ func _pools() -> void:
 			# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
 			# — which is strictly stronger than what was here and cannot rot as the
 			# criterion catches more cards.
-			ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
-				"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
+			# BATCH DO — TWO NAMED EXEMPTIONS, AND THEY ARE A DEBT RATHER THAN A
+			# SUPPRESSION. `Rampage` and `Pyroblast` were authored as TALENT
+			# GRANTS, under a standard that predates this biconditional, and both
+			# run a bar while naming no Perfect. They are two of the six
+			# `test_batch_cp.CHECK_WITHOUT_PERFECT` names — a population that has
+			# existed since long before CN and is tracked there. **DO moved them
+			# into a draft pool and therefore INTO this loop's reach; it did not
+			# create them.** Authoring a Perfect bonus for either is a design
+			# decision, so it is recorded as owed rather than invented here.
+			# A THIRD name reaching this loop still trips.
+			if not (n in ["Rampage", "Pyroblast"]):
+				ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+					"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
+			else:
+				ok(ab.perfect_text == "" and ab.runs_skill_check(),
+					"§5+DO: '%s' is a KNOWN checked-but-Perfectless card (owed, see cp)" % n)
 			ok(ab.delay > 0.0, "§5: ...and an initiative cost (%s)" % n)
 	# NO DRAFT NAME MAY COLLIDE WITH AN EXISTING ONE. `pool_ability` resolves
 	# by display name across the whole game, so a collision would silently
 	# re-point an existing ability.
+	#
+	# BATCH DO RE-POINTED THIS FROM DISJOINTNESS TO THE PROPERTY DISJOINTNESS WAS
+	# STANDING IN FOR, AND THE DISTINCTION IS THE WHOLE OF BO's OWN RATIONALE.
+	# BO kept the two pools apart so that "the existing boss pick, UNCHANGED"
+	# would be true rather than nearly true — **a shared pool would have
+	# re-weighted every boss offer the moment eighteen entries landed.** DO adds
+	# twenty-two names to the DRAFT pools and adds NOTHING to `SPEC_POOLS`, so
+	# the boss offer is byte-for-byte what it was; eight of the twenty-two were
+	# already in their spec's boss pool, which is exactly why they were worth
+	# keeping rather than deleting. **THE OVERLAP CANNOT PRODUCE A DUPLICATE
+	# OFFER IN EITHER DIRECTION** — `Run.draft_pool_left` and
+	# `Run.roll_spec_ability_offer` both filter `owned_ability_names(member)`,
+	# and that is asserted here rather than assumed, because it is the half that
+	# would actually hurt if it stopped being true.
+	var overlap: Array = []
 	for spec3 in Classes.SPEC_DRAFT_POOLS:
 		for n2 in Classes.spec_draft_pool(spec3):
-			ok(not Classes.spec_pool(spec3).has(n2),
-				"§4: '%s' is not also in the BOSS pool — the two draws stay separate" % n2)
-			ok(Classes.class_pool(Classes.class_of_spec(spec3)).find(n2) < 0,
-				"§4: '%s' is not in the old class pool either" % n2)
+			if Classes.spec_pool(spec3).has(n2):
+				overlap.append("%s/%s" % [spec3, n2])
+			# A draft name may never be a SIBLING spec's card: the class pool is
+			# the one collision that would silently re-point an ability, and DO
+			# touched none of it.
+			# PHOENIX REBIRTH IS THE ONE EXEMPTION AND IT IS THE REASON THE MOVE
+			# MATTERED MOST FOR IT. It sits in `CLASS_POOLS["mage"]` and in NO
+			# spec pool — and **Batch AN retired the class draw**, so
+			# `award_ability_pick` has read `roll_spec_ability_offer` (SPEC POOLS
+			# ONLY) ever since. Until DO its ONLY source in the game was
+			# `py_rebirth`'s grant. Putting it in the Pyromancer's draft pool is
+			# what makes it earnable at all.
+			var cls_pool: Array = Classes.class_pool(Classes.class_of_spec(spec3))
+			ok(cls_pool.find(n2) < 0 or Classes.spec_pool(spec3).has(n2)
+					or n2 == "Phoenix Rebirth",
+				"§4: '%s' is in the class pool but not its own boss pool" % n2)
+	# SIXTEEN OF THE TWENTY-TWO, NOT ALL OF THEM — DERIVED, NOT ASSUMED. The six
+	# that are NOT in their spec's boss pool are exactly `check_cz` §0's five
+	# (Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession) plus
+	# Phoenix Rebirth: the cards that lived in NO pool at all, which is the hole
+	# DO closes.
+	ok(overlap.size() == 16,
+		"§4+DO: exactly sixteen of DO's twenty-two sit in both draws (%d: %s)" % [
+			overlap.size(), ", ".join(overlap)])
+	var rsrc := FileAccess.get_file_as_string("res://scripts/run_state.gd")
+	ok(rsrc.contains("var blocked: Array = owned_ability_names(member)"),
+		"§4+DO: the DRAFT roller filters what the hero already owns")
+	ok(rsrc.contains("var owned: Array = owned_ability_names(member)"),
+		"§4+DO: ...and so does the BOSS roller, so an overlap cannot double-offer")
 	# The boss pool is UNCHANGED (§3: "the existing pick, unchanged").
 	ok(Classes.spec_pool("holy") == ["Divine Plea"],
 		"§3: the zone-boss SPEC_POOLS draw is untouched")

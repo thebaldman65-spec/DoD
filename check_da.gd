@@ -43,7 +43,13 @@ const Gate = preload("res://gate_fixture.gd")
 const FIXTURE := "gate_fixture.gd"
 
 const WALK_EXEMPT := {
-	"check_cz.gd": "`_cl_only_corpus` is §0's negative control — its job is to still be missing the five",
+	# BATCH DO CORRECTED THIS REASON RATHER THAN THE EXEMPTION. `_cl_only_corpus`
+	# is still §0's re-derivation of the Batch CL walk and still needs the pools
+	# directly — but its JOB has inverted: DO moved all twenty-two talent grants
+	# into `SPEC_DRAFT_POOLS`, which the CL walk reads, so the five it used to be
+	# missing are now inside it and §0 asserts the two walks AGREE. The old
+	# reason would have read as current truth for as long as nobody re-derived it.
+	"check_cz.gd": "`_cl_only_corpus` re-derives the Batch CL walk directly — since DO it asserts the two walks agree",
 	# BATCH DN — THE MARK OVER-FIRES HERE, AND THE EXEMPTION RECORDS WHY RATHER
 	# THAN HIDING IT. The fingerprint is the two draft-pool calls, and it stands
 	# in for the defect "this gate re-derived the corpus and is therefore missing

@@ -62,7 +62,10 @@ const NODES := {
 	"ar_harmonics": [1, "Resonance", "Harmonics"],
 	"ar_mastery": [2, "Resonance", "Attunement"],
 	"ar_charged": [3, "Resonance", "Charged Bolts"],
-	"ar_overcharge": [4, "Resonance", "Overcharge"],
+	# BATCH DO re-authored both cells. `ar_overcharge` is "Overdraw" rather
+	# than "Overcharge" ON PURPOSE: a node named after a live DRAFT CARD is
+	# the `wd_spiked`/Spite collision, and DN paid for finding that one.
+	"ar_overcharge": [4, "Resonance", "Overdraw"],
 	"ar_core": [5, "Resonance", "Resonant Core"],
 	"ar_critical_mass": [6, "Resonance", "Critical Mass"],
 	"ar_unlimited": [7, "Resonance", "Cascade"],
@@ -81,7 +84,7 @@ const NODES := {
 	"ar_attunement": [6, "Entropy", "Siphon"],
 	"ar_ward": [7, "Entropy", "Event Horizon"],
 	"ar_singularity": [9, "Resonance", "Singularity"],
-	"ar_wrath": [9, "Overload", "Magi's Wrath"],
+	"ar_wrath": [9, "Overload", "Unchained"],
 	"ar_timelord": [9, "Entropy", "Perfect Conversion"],
 }
 
@@ -546,15 +549,21 @@ func _claude_md() -> void:
 
 # ---------- live ----------
 
-func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight") -> Node:
+# BATCH DO added `earned`. Shatter used to arrive from `cr_shatter`'s GRANT;
+# a talent may not grant an ability now, so a suite that needs the card on the
+# bar has to earn it, exactly as a player does.
+func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight",
+		earned: Array = []) -> Node:
 	# THE CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway
 	# Resonance adds +1% crit PER STACK, so a "same cast at 0 stacks vs 12"
 	# comparison silently compares 10% crit against 22% crit. A build-rate check
 	# has the same problem from the other side — a crit builds 2 where a normal
 	# hit builds 1. Checks that WANT a crit set `crit_bonus` back themselves.
-	return await Fixture.spawn(self, specs,
-		{"enemies": lineup, "node_type": ty, "talents": {1: learned.duplicate()},
-		"deterministic": true, "crit": -10.0})
+	var opts := {"enemies": lineup, "node_type": ty,
+		"talents": {1: learned.duplicate()}, "deterministic": true, "crit": -10.0}
+	if not earned.is_empty():
+		opts["bm"] = {1: earned}
+	return await Fixture.spawn(self, specs, opts)
 
 
 func _arc(scene: Node) -> BattleUnit:
@@ -898,7 +907,7 @@ func _live_entropy() -> void:
 
 func _live_shatter() -> void:
 	var scene := await _spawn({"cr_shatter": 1}, ["raider", "archer", "shaman"],
-		["berserker", "cryomancer", "inquisitor", "beastmaster"])
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], "fight", ["Shatter"])
 	var cryo: BattleUnit = null
 	for h in scene.get("heroes"):
 		if not h.is_companion and String(h.passive_id) == "permafrost":

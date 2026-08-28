@@ -104,10 +104,19 @@ func _hooks(run: Node) -> void:
 	var m := {"key": "warrior", "spec": "berserker", "talents": {},
 		"tree": Talents.generate_tree("berserker", "warrior")}
 	ok(not Talents.has_node(m["talents"], "bz_battle_shout"), "has_node: false when untaken")
-	ok(not Talents.owns_ability(m, "Battle Shout"), "owns_ability: false for an unlearned grant")
+	ok(not Talents.owns_ability(m, "Battle Shout"), "owns_ability: false for an unowned card")
 	m["talents"] = {"bz_battle_shout": 1}
 	ok(Talents.has_node(m["talents"], "bz_battle_shout"), "has_node: true when taken")
-	ok(Talents.owns_ability(m, "Battle Shout"), "owns_ability: true for a learned grant")
+	# BATCH DO — RE-POINTED TO THE OTHER DOOR, BECAUSE THE FIRST ONE IS SHUT.
+	# `owns_ability` used to be reachable two ways: the kit held the card, or a
+	# TALENT granted it. No talent grants anything now, so buying the node can
+	# no longer make this true — and the EARNED path is the one that still
+	# matters, because it is the only one a payload condition could ever read.
+	ok(not Talents.owns_ability(m, "Battle Shout"),
+		"owns_ability: still false — buying a node grants nothing (DO's charter)")
+	m["bm_abilities"] = ["Battle Shout"]
+	ok(Talents.owns_ability(m, "Battle Shout"),
+		"owns_ability: TRUE once the card is actually earned")
 	ok(Talents.owns_ability(m, "Hack and Slash"),
 		"owns_ability: true for a STARTING KIT piece (any source, not just talents)")
 	ok(not Talents.owns_ability(m, "Not An Ability"), "owns_ability: false for a stranger")
@@ -136,9 +145,24 @@ func _conditions() -> void:
 	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_battle_shout"},
 		"stat": {"p2": 5}}, 1, ctx)
 	ok(int(cfg.get("p2", 0)) == 5, "condition has_node MET: the payload applies")
+	# BATCH DO — the CONDITION KIND is still live machinery and is exercised
+	# here, but it has NO PAYLOAD USER IN THE TREES any more: the three
+	# `owns_ability` riders (Sunder Guard's Shatterpoint, Rallying Cry's War
+	# Stomp, Bulwark Line's Interpose) were the only ones and all three were
+	# clause-cuts. It is kept and tested rather than deleted — deleting a
+	# condition kind is a design change, and it is the natural mechanism for a
+	# rune. The member has to EARN the card for the condition to read true.
+	m["bm_abilities"] = ["Battle Shout"]
 	Talents.apply_payload(cfg, {"condition": {"owns_ability": "Battle Shout"},
 		"stat": {"p3": 3}}, 1, ctx)
 	ok(int(cfg.get("p3", 0)) == 3, "condition owns_ability MET: the payload applies")
+	var owns_users := 0
+	for spec2 in Talents.LANE_TREES:
+		for n2 in Talents.LANE_TREES[spec2]:
+			if JSON.stringify(n2.get("payload", {})).contains("owns_ability"):
+				owns_users += 1
+	ok(owns_users == 0,
+		"...and no talent payload reads it any more (%d do)" % owns_users)
 	Talents.apply_payload(cfg, {"condition": {"owns_ability": "Nope"},
 		"stat": {"p4": 3}}, 1, ctx)
 	ok(not cfg.has("p4"), "condition owns_ability UNMET: the payload does nothing")

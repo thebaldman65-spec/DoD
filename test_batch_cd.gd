@@ -46,24 +46,32 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 	"start_rune_enabled"]
 
 # §2's arithmetic, transcribed once so every check below reads the same table.
-const SPEC_TARGET := 96      # 12 specs x 8
-const CLASS_TARGET := 24     # 4 classes x 6
-const DRAFT_TARGET := 120    # 96 + 24
-# RE-POINTED BY BATCH CE: the CLERIC three joined the Mage three at eight
-# when tranche 3's second third landed, so what this list names is "the pools
-# tranche 3 has already paid" rather than one class.
-# RE-POINTED AGAIN BY BATCH CH: the HUNTER three joined them, so the list is
-# NINE and what is left outside it is the WARRIOR three alone.
-# RE-POINTED BY BATCH CI, AND IT IS THE LAST TIME — the WARRIOR three joined
-# too, so the list is ALL TWELVE and there is nothing left outside it. **WHAT
-# IT NAMES IS NO LONGER "the pools tranche 3 has paid" BUT SIMPLY THE POOLS**,
-# and what the loop below guards changes with it: it asserted an ASYMMETRY for
-# three batches and it asserts the FLATNESS now, so a pool that quietly empties
-# trips where before it would have read as the old debt returning.
-const DEEP_SPECS := ["berserker", "warden", "swordmaster",
-	"pyromancer", "cryomancer", "arcanist",
-	"holy", "inquisitor", "occultist",
-	"beastmaster", "sharpshooter", "mystic"]
+#
+# BATCH DO MOVED THE TARGET FOR THE FIRST TIME SINCE CI, AND IT IS NO LONGER A
+# FLAT MULTIPLE. Twenty-two talent nodes GRANTED an ability; the charter now
+# forbids that outright, so all twenty-two cards moved into their spec's draft
+# pool instead of being deleted. THE FLOOR IS STILL EIGHT EVERYWHERE — no pool
+# lost anything — but nine specs are DEEPER than eight now and three are not,
+# so the per-spec expectation is a TABLE rather than one number. Writing it as
+# `12 * 8` again would be the CI-era shape re-asserted over a tree that has
+# moved past it, which is the exact fault this file exists to catch.
+const SPEC_TARGET := 118     # the twelve pools, summed from PER_SPEC_DEPTH
+const CLASS_TARGET := 24     # 4 classes x 6, untouched by DO
+const DRAFT_TARGET := 142    # 118 + 24
+const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
+# What each spec drafts from now. The nine that grew are the nine that HAD an
+# ability-granting talent node; beastmaster, sharpshooter and mystic had none,
+# which is why they alone still read eight.
+const PER_SPEC_DEPTH := {
+	"berserker": 10, "warden": 9, "swordmaster": 10,
+	"pyromancer": 13, "cryomancer": 12, "arcanist": 10,
+	"holy": 10, "inquisitor": 10, "occultist": 10,
+	"beastmaster": 8, "sharpshooter": 8, "mystic": 8,
+}
+# BATCH DO DELETED `DEEP_SPECS`, AND DELETED IT RATHER THAN LEAVING IT.
+# It listed all twelve specs and existed only to answer "eight or five?" — a
+# question CI ended and DO replaced outright with `PER_SPEC_DEPTH` above. A
+# const nothing reads is the dead symbol this very file sweeps for.
 
 # The forms the dead denominator was written in, across four files. Matched as
 # PHRASES rather than as the bare number, for the reason at `_target` below.
@@ -193,12 +201,18 @@ func _dead_calls() -> void:
 # ---------- §2: the draft target ----------
 
 func _target() -> void:
-	print("\n§2 the draft target is 120, and ~96 is stated nowhere live")
+	print("\n§2 the draft target is 142, and ~96 is stated nowhere live")
 	# The arithmetic itself, so a later batch moving the target has to move a
 	# number here and read the reason beside it.
-	ok(SPEC_TARGET == 12 * 8, "the spec pool target is 12 specs x 8 = 96")
+	# The table and the total must agree, or one of them is a stale copy.
+	var depth_sum := 0
+	for k in PER_SPEC_DEPTH:
+		depth_sum += int(PER_SPEC_DEPTH[k])
+	ok(PER_SPEC_DEPTH.size() == 12, "the depth table names all twelve specs")
+	ok(SPEC_TARGET == depth_sum,
+		"the spec pool target is the table summed (%d)" % depth_sum)
 	ok(CLASS_TARGET == 4 * 6, "the class-wide target is 4 classes x 6 = 24")
-	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET, "the draft target is 120")
+	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET, "the draft target is 142")
 	# THE LIVE SITES. `~96` came from an older assumption of six spec cards per
 	# spec; CB completed the Mage at EIGHT and test_batch_bt has asserted depth
 	# 8 ever since, so the tests have encoded the right figure while the prose
@@ -216,13 +230,13 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("120 of 120"), "master.html states 120 of 120")
-	ok(master.contains("96 spec"), "...and names the 96-card spec half")
+	ok(master.contains("142 of 142"), "master.html states 142 of 142")
+	ok(master.contains("118 spec"), "...and names the 118-card spec half")
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
 		ok(not _states_stale_target(classes, phrase),
 			"classes.gd states no \"%s\"" % phrase)
-	ok(classes.contains("A TARGET 120"), "...it carries the real target")
+	ok(classes.contains("A TARGET 142"), "...it carries the real target")
 	# CLAUDE.md keeps its dated batch blocks as written — they are the record
 	# of what each batch believed, and rewriting them destroys it (CA's rule).
 	# What must be current is the STANDING REFERENCE, so that is what is read.
@@ -263,8 +277,8 @@ func _target() -> void:
 	# answer moved. COMMENT CORRECTED BY BATCH DG §3 — it still read "the draft
 	# is 102 and what is owed is the Hunter and Warrior thirds", which CH and CI
 	# paid; the draft is 120 of 120 and nothing is owed.
-	ok(block.contains("120 OF 120") or block.contains("120 of 120"),
-		"...it states 120 of 120")
+	ok(block.contains("142 OF 142") or block.contains("142 of 142"),
+		"...it states 142 of 142")
 	# RE-POINTED BY BATCH CI, AND IT IS AN INVERSION: the Warrior third is paid,
 	# so the standing block must no longer name ANYTHING as owed. Asserting the
 	# absence of a debt is what keeps §6's "rewrite rather than patch" honest —
@@ -301,26 +315,34 @@ func _pools() -> void:
 	for spec in specs:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		spec_total += pool.size()
-		var want := 8 if DEEP_SPECS.has(spec) else 5
+		# BATCH DO: the expectation is the TABLE now, and the FLOOR is asserted
+		# beside it — a pool quietly emptying trips the floor even if a later
+		# batch forgets to move the table with it.
+		var want := int(PER_SPEC_DEPTH.get(spec, SPEC_FLOOR))
 		ok(pool.size() == want, "%s drafts %d (want %d)" % [spec, pool.size(), want])
+		ok(pool.size() >= SPEC_FLOOR,
+			"...and %s is still at or above CI's flat floor of %d" % [spec, SPEC_FLOOR])
 		# A pool with a repeat would keep the count and change the draft.
 		var seen := {}
 		for n in pool:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(), "%s's pool holds no duplicate" % spec)
-	ok(spec_total == 96, "SPEC_DRAFT_POOLS holds 96 entries (got %d)" % spec_total)
-	ok(spec_total == 12 * 8,
-		"...which is ALL TWELVE at eight — the draft is complete (Batch CI)")
+	ok(spec_total == SPEC_TARGET,
+		"SPEC_DRAFT_POOLS holds %d entries (got %d)" % [SPEC_TARGET, spec_total])
+	ok(spec_total > 12 * 8,
+		"...which is ABOVE CI's flat ninety-six — DO's twenty-two landed here")
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
-	ok(spec_total + class_total == 120, "the draft stands at 120 of 120")
+	ok(spec_total + class_total == DRAFT_TARGET,
+		"the draft stands at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
 	# INVERTED BY BATCH CI RATHER THAN DELETED. This asserted a DEBT for four
 	# batches; the debt is paid, so what it asserts now is that there is none —
 	# which is the thing a later batch could actually break (a pool emptying, a
 	# card quietly removed), and it is still the same question.
 	ok(DRAFT_TARGET - (spec_total + class_total) == 0,
-		"NOTHING is owed — the draft is complete at 120 of 120")
-	ok(SPEC_TARGET - spec_total == 0, "...and the spec half is full at 96")
+		"NOTHING is owed — the draft is complete at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
+	ok(SPEC_TARGET - spec_total == 0,
+		"...and the spec half is full at %d" % SPEC_TARGET)

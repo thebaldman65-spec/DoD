@@ -53,7 +53,9 @@ const NODES := {
 	"bz_reckless": [2, "Fury", "Reckless Fury"],
 	"bz_bloodlust_node": [2, "Warpath", "Flurry"],
 	"bz_crushing_blows": [3, "Bloodletting", "Crushing Blows"],
-	"bz_battle_shout": [3, "Fury", "Battle Shout"],
+	# BATCH DO renamed both cells when their cards left for the draft — a node
+	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
+	"bz_battle_shout": [3, "Fury", "Battle Roar"],
 	"bz_thick_skin": [3, "Warpath", "Bloodied Momentum"],
 	"bz_arterial": [4, "Bloodletting", "Arterial Spray"],
 	"bz_deathwish": [4, "Fury", "Deathwish"],
@@ -70,7 +72,7 @@ const NODES := {
 	# BATCH BM moved the capstone shelf to row 9 (rows 1-8 are lanes now).
 	"bz_exsanguinate": [9, "Bloodletting", "Exsanguination"],
 	"bz_undying": [9, "Fury", "Undying Rage"],
-	"bz_rampage": [9, "Warpath", "Rampage"],
+	"bz_rampage": [9, "Warpath", "Bloodstorm"],
 }
 
 # id -> [stat field, value the PAYLOAD writes]. Only the nodes whose
@@ -396,55 +398,74 @@ func _conditional_halves() -> void:
 		"empty ctx: Measured Rage raises no flag")
 
 
-# ---------- 6. the two upgrade paths ----------
+# ---------- 6. the two upgrade paths, and the charter that closed them ----------
+#
+# **BATCH DO INVERTED THIS SECTION RATHER THAN DELETING IT.** AJ built the two
+# grant-or-upgrade paths and this is where they were proved: a hero without the
+# card got a GRANT (index 1), a hero who had earned it got an UPGRADE (index 2),
+# and the acquisition ORDER decided which — "was it in the kit when the tree
+# ran". DO's charter ends the premise: **a talent may not grant an ability.**
+# Both cards moved into `SPEC_DRAFT_POOLS` and both cells were re-authored.
+#
+# So there is no collision left to have a path for, and what is asserted now is
+# the three things that would break if a grant came back: the node hands out
+# NOTHING, the card is still reachable, and the read-site index that counted
+# which path ran is READ-ONLY-ZERO. **The index is the sharp one** — a 1 or a 2
+# is only writable by a grant, so it is the single value that catches a
+# regression here no matter how it is reintroduced.
 
 func _upgrade_paths() -> void:
-	# --- Battle Shout. Unowned: the node GRANTS it and the read-site index
-	# lands on 1 (+12%, 3 turns).
+	# --- Battle Shout: the node grants nothing and the card is drafted.
 	var bs_grant := _applied({"bz_battle_shout": 1}, [], [])
-	var bs_names := _names(bs_grant["abilities"])
-	ok(bs_names.count("Battle Shout") == 1,
-		"Battle Shout is granted once to a hero who did not own it")
-	ok(int(bs_grant.get("battle_shout_node", 0)) == 1,
-		"...and the read-site index reads 1 (the granted numbers)")
-	# Already earned from a pool pick: the node UPGRADES instead. The earned
-	# copy goes on FIRST, which is the ordering battle.gd uses at spawn.
+	ok(_names(bs_grant["abilities"]).is_empty(),
+		"Battle Shout's node hands out NOTHING (DO's charter)")
+	ok(int(bs_grant.get("battle_shout_node", 0)) == 0,
+		"...and `battle_shout_node` is read-only-zero — only a grant could write it")
+	ok(Classes.spec_draft_pool("berserker").has("Battle Shout"),
+		"...while the card itself drafts from the Berserker")
+	# It stays in the BOSS pool too, untouched: DO added to the draft and took
+	# nothing away, which is what "the existing pick, unchanged" means.
 	var earned := [Classes.spec_pool_ability("berserker", "Battle Shout")]
-	ok(earned[0] != null, "Battle Shout resolves out of the Berserker pool")
+	ok(earned[0] != null, "Battle Shout still resolves out of the Berserker pool")
+	# A hero who has EARNED it and also buys the cell keeps exactly one copy —
+	# the same anti-double-grant property, reached the other way.
 	var bs_up := _applied({"bz_battle_shout": 1}, ["Battle Shout"], earned)
 	ok(_names(bs_up["abilities"]).count("Battle Shout") == 1,
-		"an earned Battle Shout is never double-granted")
-	ok(int(bs_up.get("battle_shout_node", 0)) == 2,
-		"...the read-site index reads 2 (the upgraded numbers)")
-	var bs_up_ab := _find_in(bs_up["abilities"], "Battle Shout")
-	ok(bs_up_ab != null and String(bs_up_ab.description).contains("18%"),
-		"...and the upgraded description states +18%")
-	ok(bs_up_ab != null and String(bs_up_ab.description).contains("4 turns"),
-		"...and 4 turns")
-	# The granted copy must NOT carry the upgraded text.
-	var bs_grant_ab := _find_in(bs_grant["abilities"], "Battle Shout")
-	ok(bs_grant_ab != null and String(bs_grant_ab.description).contains("12%"),
-		"the granted Battle Shout states +12%")
+		"an earned Battle Shout is never doubled by the cell")
+	ok(int(bs_up.get("battle_shout_node", 0)) == 0,
+		"...and the index STILL reads zero — no collision happened")
+	# THE CARD CARRIES ONE MAGNITUDE NOW, AND IT IS THE ONE THE HANDLER PAYS.
+	# `[8, 12, 18][battle_shout_node]` can only ever index 0, so the +12% and
+	# +18% the node used to buy have no source — and the description said +12%,
+	# which `docs/state.md` has carried as an open defect since DM. It says +8%.
+	var bs_ab := _find_in(bs_up["abilities"], "Battle Shout")
+	ok(bs_ab != null and String(bs_ab.description).contains("+8%"),
+		"the drafted Battle Shout states +8%, which is what the handler pays")
+	ok(bs_ab != null and String(bs_ab.description).contains("2 turns"),
+		"...and 2 turns")
+	ok(bs_ab != null and not String(bs_ab.description).contains("18%"),
+		"...and promises no upgrade nothing can grant")
 	# --- Rampage, the capstone, same shape.
 	var rp_grant := _applied({"bz_rampage": 1}, [], [])
-	ok(_names(rp_grant["abilities"]).count("Rampage") == 1,
-		"Rampage is granted once to a hero who did not own it")
+	ok(_names(rp_grant["abilities"]).is_empty(),
+		"Rampage's capstone hands out NOTHING (DO's charter)")
 	ok(int(rp_grant.get("rampage_upgraded", 0)) == 0,
-		"...and the granted copy chains once a turn")
+		"...and `rampage_upgraded` is read-only-zero")
 	var rp_earned := [Classes.spec_pool_ability("berserker", "Rampage")]
-	ok(rp_earned[0] != null, "Rampage resolves out of the Berserker pool")
+	ok(rp_earned[0] != null, "Rampage still resolves out of the Berserker pool")
+	ok(Classes.spec_draft_pool("berserker").has("Rampage"),
+		"...and drafts from the Berserker as well")
 	var rp_up := _applied({"bz_rampage": 1}, ["Rampage"], rp_earned)
 	ok(_names(rp_up["abilities"]).count("Rampage") == 1,
-		"an earned Rampage is never double-granted")
-	ok(int(rp_up.get("rampage_upgraded", 0)) == 1,
-		"...the capstone upgrades it to two chains a turn instead")
-	# --- BOTH acquisition orders. The question the upgrade asks is "was it
-	# in the kit when the tree ran", so a hero who takes the node FIRST and
-	# earns the pick LATER must end up with one copy and no upgrade — the
-	# tree ran against an empty kit.
+		"an earned Rampage is never doubled by the cell")
+	ok(int(rp_up.get("rampage_upgraded", 0)) == 0,
+		"...and its index reads zero too")
+	# --- BOTH ACQUISITION ORDERS STILL MATTER, AND THE ANSWER IS NOW THE SAME
+	# EITHER WAY, which is the point: the order used to decide grant-versus-
+	# upgrade, and there is nothing left for it to decide.
 	var node_first := _applied({"bz_battle_shout": 1}, [], [])
-	ok(int(node_first.get("battle_shout_node", 0)) == 1,
-		"node first, pick later: the tree granted, so the index stays 1")
+	ok(int(node_first.get("battle_shout_node", 0)) == 0,
+		"node first, pick later: still zero — the cell grants nothing to count")
 	var pool_ab := Classes.spec_pool_ability("berserker", "Battle Shout")
 	var after: Array = node_first["abilities"]
 	var dupe := false

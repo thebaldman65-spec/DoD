@@ -360,21 +360,40 @@ func _texts() -> void:
 		"Divine Wrath stopped saying `hero` while neither of its clauses can reach a beast")
 	ok(cls.contains("Bind the heroes' souls"),
 		"Sacred Resolve stopped saying `heroes` while its apply and all three of its splits walk the four")
-	ok(tal.contains("Embolden every ally: 50% less Break"),
+	# BATCH DO — THREE NEEDLES FOLLOWED THEIR TEXT FROM `talents.gd` INTO
+	# `classes.gd`, AND NOT ONE WORD OF THE TEXT ITSELF MOVED. A talent may not
+	# grant an ability, so the sixteen `new_ability` definitions were lifted out
+	# of the node payloads VERBATIM — which is exactly why DM's wording, and
+	# CV §1's duration ruling inside it, are still there to pin. **The read
+	# sites did not move at all**, so every DM ruling stands as written.
+	ok(cls.contains("Embolden every ally: 50% less Break"),
 		"Hold the Line stopped saying `ally` while `_hero_side()` still covers a beast")
 
 	# ── THE TWO CLAUSES DM MOVED ────────────────────────────────────────────
 	# BATTLE SHOUT: the Rage is the caster's and now says so, in Hold the Line's
 	# own words for the identical payload.
-	ok(tal.contains("on the warband. Lasts 3 turns.\\nRefunds 5 Rage."),
+	# DM'S SELF-CLAUSE WORDING IS UNCHANGED; ONLY THE MAGNITUDE BESIDE IT MOVED.
+	# `battle_shout_node` counted which acquisition path ran and indexed
+	# `[8, 12, 18]` / `[2, 3, 4]`; no talent grants, so it is read-only-zero and
+	# the card states the ONE magnitude the handler pays. **THAT CLOSES A DEFECT
+	# `docs/state.md` HAS CARRIED SINCE DM** — the card promised +12% for 3
+	# turns, which were the NODE's numbers, while a pool pick paid +8% for 2.
+	ok(cls.contains("on the warband. Lasts 2 turns.\\nRefunds 5 Rage."),
 		"Battle Shout's SELF clause is not worded as one — the +5 Rage is back inside `every hero answers`")
-	ok(not tal.contains("on the warband, and 5 Rage."),
+	ok(not cls.contains("on the warband, and 5 Rage."),
 		"THE NEGATIVE CONTROL FAILED: Battle Shout's pre-DM wording is still in the file")
+	ok(not cls.contains("A roar every hero answers: +12%"),
+		"...and the card no longer states a magnitude nothing can pay (DO)")
 	# HOLD THE LINE: CV §1's duration ruling, reaching the surface it missed.
-	ok(tal.contains("no one can die\\nfor 2 turns. Refunds 5 Rage."),
+	ok(cls.contains("no one can die\\nfor 2 turns. Refunds 5 Rage."),
 		"Hold the Line's base card no longer states its no-death window as APPLIED (CV §1)")
-	ok(tal.contains("no one can die\\nfor 3 turns."),
-		"Hold the Line's UPGRADED card no longer states its no-death window as APPLIED (CV §1)")
+	# THE UPGRADED CARD IS GONE WITH THE COLLISION THAT WROTE IT. An `upgrade`
+	# arm fires only where a node's GRANT meets an earned copy; no node grants,
+	# so the 3-turn wording had no source left. **A card that promises what
+	# nothing can grant is the defect DM's own §4 exists to catch**, so its
+	# absence is asserted rather than merely allowed.
+	ok(not cls.contains("no one can die\\nfor 3 turns."),
+		"the UPGRADED Hold the Line card is gone with the collision that wrote it (DO)")
 	ok(not tal.contains("for a turn. Refunds 5 Rage.") and not tal.contains("die\\nfor two turns."),
 		"THE NEGATIVE CONTROL FAILED: Hold the Line's pre-CV translated durations are still in the file")
 

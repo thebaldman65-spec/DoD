@@ -133,6 +133,15 @@ const NO_SPECIAL := ["Blood Debt", "Sever"]
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -212,8 +221,8 @@ func _pools() -> void:
 	for spec in ["pyromancer", "cryomancer", "arcanist",
 			"holy", "inquisitor", "occultist",
 			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT (got %d)"
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
 	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
 	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
@@ -237,12 +246,12 @@ func _pools() -> void:
 	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
+		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d" % total)
+	ok(total == 118, "the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
@@ -251,8 +260,8 @@ func _pools() -> void:
 	# closed the draft. A message that states a wrong size teaches it to whoever
 	# reads the failure — CD §2's rule, applied to the size rather than to the
 	# old target it was written for.
-	ok(draft_total == 120,
-		"the whole draft is 120 of a target 120 (got %d)" % draft_total)
+	ok(draft_total == 142,
+		"the whole draft is 142 of a target 142 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -704,7 +713,7 @@ func _docs() -> void:
 		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("120 of"), "master.html states the new draft count")
+	ok(master.contains("142 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB

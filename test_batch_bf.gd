@@ -135,12 +135,18 @@ func _devout(scene: Node) -> BattleUnit:
 
 # One spawn for every live check. `learned` lands on the Cleric slot, which is
 # where the Devout stands.
-func _spawn(learned := {}) -> Node:
+# BATCH DO added `earned`. Bulwark of Fortitude used to arrive from
+# `dv_bulwark`'s GRANT; a talent may not grant an ability now, so a suite that
+# needs the card on the bar has to earn it — which is what a player does too.
+func _spawn(learned := {}, earned: Array = []) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
+	var opts := {"enemies": ["raider"], "talents": {2: learned.duplicate()},
+		"slot_idx": 0, "deterministic": true, "heal_mult": 1.0, "sim": true,
+		"slices": true}
+	if not earned.is_empty():
+		opts["bm"] = {2: earned}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "heal_mult": 1.0, "sim": true, "slices": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
 
 func _kill(scene: Node) -> void:
@@ -364,12 +370,12 @@ func _the_tooltip_states_the_cliff() -> void:
 # AND IT WAS COUNTED NOWHERE IN THE GAME. Driven through the real ability, so
 # the src stamp, the refusal and the booking are all the shipped path.
 func _live_bulwark_reaches_the_prevented_door() -> void:
-	var scene := await _spawn({"dv_bulwark": 1})
+	var scene := await _spawn({"dv_bulwark": 1}, ["Bulwark of Fortitude"])
 	var dv := _devout(scene)
 	var war: BattleUnit = scene.get("heroes")[0]
 	if dv != null:
 		var ab = scene.call("_find_ability", dv, "Bulwark of Fortitude")
-		ok(ab != null, "§1: the capstone granted the ability")
+		ok(ab != null, "§1: the DRAFTED ability is on the bar (DO: the capstone no longer grants)")
 		if ab != null:
 			# NOT awaited: `_resolve_special` is a coroutine overall, but the
 			# "bulwark" branch has no `await` in it, so it runs to completion
@@ -403,7 +409,8 @@ func _live_bulwark_reaches_the_prevented_door() -> void:
 # that would catch the negative control (Break folded into the share) even if
 # the fold happened somewhere other than the table.
 func _live_break_never_enters_the_contribution_slice() -> void:
-	var scene := await _spawn({"dv_bulwark": 1, "dv_devoutness": 1})
+	var scene := await _spawn({"dv_bulwark": 1, "dv_devoutness": 1},
+		["Bulwark of Fortitude"])
 	var dv := _devout(scene)
 	var war: BattleUnit = scene.get("heroes")[0]
 	if dv != null:

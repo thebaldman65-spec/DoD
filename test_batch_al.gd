@@ -75,7 +75,9 @@ const NODES := {
 	"wd_veteran": [7, "Banner", "Steadfast", "steadfast_ranks", 1],
 	"wd_mountain": [9, "Plate", "Immovable", "immovable", 1],
 	"wd_avenger": [9, "Threat", "Vengeful Guardian", "vengeful_guardian", 1],
-	"wd_hold_line": [9, "Banner", "Hold the Line", "", 0],
+	# BATCH DO renamed the capstone when its card left for the draft — a node
+	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
+	"wd_hold_line": [9, "Banner", "Braced", "", 0],
 }
 
 # The number the tooltip must render for every node whose content is a
@@ -260,14 +262,20 @@ func _tooltips() -> void:
 	# player cannot see the cross-row decision at all.
 	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_shatter_guard"), 1)
 		.contains("Spite"), "Bruising Guard's tooltip names Spite")
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_stomp_drill"), 1)
-		.contains("War Stomp"), "Rallying Cry's tooltip names War Stomp")
+	# BATCH DO — INVERTED, AND THE RULE IS THE SAME RULE. A node must ADVERTISE
+	# what it does; two of these advertised a clause that paid only a Warden who
+	# had DRAWN War Stomp or Interpose, which the charter forbids. The clauses
+	# are cut, so what must be true now is that the tooltips DO NOT name them —
+	# a text that kept the promise while the payload dropped it is the exact
+	# defect this project has found five times.
+	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_stomp_drill"), 1)
+		.contains("War Stomp"), "Rallying Cry's tooltip no longer names War Stomp (DO)")
+	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_bannerman"), 1)
+		.contains("Interpose"), "Bulwark Line's tooltip no longer names Interpose (DO)")
 	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_bannerman"), 1)
-		.contains("Interpose"), "Bulwark Line's tooltip names Interpose")
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_bannerman"), 1)
-		.contains("Shieldwall"), "...and names Shieldwall as its own trigger")
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_hold_line"), 1)
-		.contains("UPGRADES"), "the capstone tooltip states the upgrade path")
+		.contains("Shieldwall"), "...and still names Shieldwall, which is PROTECTED CORE")
+	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_hold_line"), 1)
+		.contains("UPGRADES"), "the capstone tooltip states no upgrade path — it grants nothing")
 
 
 # ---------- 4. the conditional halves ----------
@@ -303,36 +311,37 @@ func _conditional_halves() -> void:
 	ok(int(spite_only.get("spite_break", 0)) == 0,
 		"Spite on its own arms nothing — Bruising Guard buys the rider")
 
-	# --- Rallying Cry: the ability rider on owns_ability. No node grants
-	# War Stomp, so owns_ability is the honest instrument here (the Batch
-	# AK correction — a node's own grant is in ability_names too).
+	# --- Rallying Cry and Bulwark Line: BOTH ABILITY RIDERS ARE CUT (BATCH DO).
+	# War Stomp and Interpose are `SPEC_POOLS` trophies, so each rider paid
+	# only a Warden who had DRAWN one. The clauses are cut from the texts and
+	# `rallying_stomp_ranks` / `bulwark_line_ranks` from the payloads; these
+	# lines are INVERTED rather than deleted, so what they assert now is that
+	# earning the ability changes nothing.
 	var cry := _applied({"wd_stomp_drill": 1})
 	ok(int(cry.get("rallying_cry", 0)) == 4,
 		"Rallying Cry loads its own refuel unconditionally")
 	ok(int(cry.get("rallying_stomp_ranks", 0)) == 0,
-		"...and pays nothing toward a War Stomp he does not own")
+		"...and writes no War Stomp rider at all")
 	var cry_stomp := _applied({"wd_stomp_drill": 1}, ["War Stomp"])
 	ok(int(cry_stomp.get("rallying_cry", 0)) == 4,
 		"with War Stomp earned the refuel is unchanged")
-	ok(int(cry_stomp.get("rallying_stomp_ranks", 0)) == 1,
-		"...and the ability hook deepens the stomp as well")
+	ok(int(cry_stomp.get("rallying_stomp_ranks", 0)) == 0,
+		"...and earning War Stomp pays NOTHING — the clause is gone (DO)")
 
-	# --- Bulwark Line: same shape, Interpose.
 	var wall := _applied({"wd_bannerman": 1})
 	ok(int(wall.get("bulwark_ally_block", 0)) == 10,
 		"Bulwark Line loads the Shieldwall grant unconditionally")
 	ok(int(wall.get("bulwark_line_ranks", 0)) == 0,
-		"...and pays nothing toward an Interpose he does not own")
+		"...and writes no Interpose rider at all")
 	var wall_ip := _applied({"wd_bannerman": 1}, ["Interpose"])
 	ok(int(wall_ip.get("bulwark_ally_block", 0)) == 10,
 		"with Interpose earned the Shieldwall grant is unchanged")
-	ok(int(wall_ip.get("bulwark_line_ranks", 0)) == 1,
-		"...and each ally gains the extra charge")
+	ok(int(wall_ip.get("bulwark_line_ranks", 0)) == 0,
+		"...and earning Interpose pays NOTHING — the clause is gone (DO)")
 
-	# Both riders point at abilities Batch AH made EARNABLE — which is the
-	# whole reason the two nodes were re-specced. If either drifts back
-	# into the opening kit the riders become unconditional and the re-spec
-	# was pointless; if either leaves the pool they become unreachable.
+	# The two abilities stay EARNABLE and stay out of the opening kit — that
+	# is unchanged by DO, and it is what makes "the node may not read them"
+	# the right ruling rather than an arbitrary one.
 	ok(not Talents.owns_ability(_member({}), "War Stomp"),
 		"a fresh Warden does NOT own War Stomp (Batch AH trimmed it)")
 	ok(not Talents.owns_ability(_member({}), "Interpose"),
@@ -348,48 +357,57 @@ func _conditional_halves() -> void:
 	# An empty ctx leaves a conditional half INERT — the Batch AI §5 rule:
 	# an effect that fails to appear is a bug you can see.
 	var tree: Array = Talents.generate_tree("warden", "warrior")
-	for id in ["wd_shatter_guard", "wd_stomp_drill", "wd_bannerman"]:
+	# BATCH DO: only `wd_shatter_guard` still HAS a second half — its partner
+	# is `wd_spiked`, a node in its own tree, which the charter permits. The
+	# other two lost theirs, so asserting inertness on them would pass for no
+	# reason; they are asserted to carry no `also` at all instead.
+	for id in ["wd_shatter_guard"]:
 		var bare := {"abilities": []}
 		Talents.apply_payload(bare, Talents.node_in_tree(tree, id)["payload"], 1)
-		ok(int(bare.get("spite_break", 0)) == 0 \
-			and int(bare.get("rallying_stomp_ranks", 0)) == 0 \
-			and int(bare.get("bulwark_line_ranks", 0)) == 0,
+		ok(int(bare.get("spite_break", 0)) == 0,
 			"'%s' second half is inert on an empty ctx" % id)
 		ok(bare.size() > 1, "'%s' first half still lands on an empty ctx" % id)
+	for id2 in ["wd_stomp_drill", "wd_bannerman"]:
+		ok(not (Talents.node_in_tree(tree, id2)["payload"] as Dictionary).has("also"),
+			"'%s' carries no conditional half at all now (DO)" % id2)
 
 
 # ---------- 5. grant, or upgrade ----------
 
 func _upgrade_path() -> void:
-	# Unowned: the capstone grants Hold the Line and marks no upgrade.
+	# **BATCH DO INVERTED THIS SECTION.** The capstone grants nothing — a talent
+	# may not — so the card moved into `SPEC_DRAFT_POOLS` and the cell became
+	# `Braced`. What is asserted now is the three things that would break if a
+	# grant came back, plus the card's own numbers, which were lifted VERBATIM
+	# out of the payload and must not have drifted in the move.
 	var fresh := _applied({"wd_hold_line": 1})
-	var fresh_names := _ability_names(fresh["abilities"])
-	ok(fresh_names.count("Hold the Line") == 1,
-		"the capstone grants Hold the Line when he has none")
-	ok(int(fresh.get("hold_line_upgraded", 0)) == 0, "...and marks no upgrade")
-	for a in fresh["abilities"]:
-		if a.display_name == "Hold the Line":
-			ok(a.cost == 30 and a.cooldown == 6,
-				"...at the ordinary 30 Rage / 6cd")
-			ok(a.description.contains("50%"),
-				"...and its description states the base 50% cut")
-
-	# Already earned from a pool pick: upgraded, never duplicated. Earned
-	# picks go on BEFORE the tree at both real call sites (the Batch AH
-	# ordering fix), which is what this arrangement reproduces.
+	ok(_ability_names(fresh["abilities"]).is_empty(),
+		"the capstone hands out NOTHING (DO's charter)")
+	ok(int(fresh.get("hold_line_upgraded", 0)) == 0,
+		"...and `hold_line_upgraded` is read-only-zero — only a grant could write it")
+	ok(Classes.spec_draft_pool("warden").has("Hold the Line"),
+		"...while the card itself drafts from the Warden")
 	var earned := Classes.spec_pool_ability("warden", "Hold the Line")
 	ok(earned != null, "Hold the Line resolves out of the spec pool")
+	if earned != null:
+		ok(earned.cost == 30 and earned.cooldown == 6,
+			"...at the ordinary 30 Rage / 6cd, unchanged by the move")
+		ok(earned.description.contains("50%"),
+			"...and its description states the base 50% cut")
+		# CV §1 — A DURATION IS STATED AS APPLIED, and that ruling rides the
+		# card, so it survived the move into `Classes.draft_ability` unedited.
+		ok(earned.description.contains("die\nfor 2 turns"),
+			"...and its no-death window is stated as APPLIED (CV §1)")
+	# An earned copy plus the cell is still exactly one copy, and no upgrade.
 	var up := _applied({"wd_hold_line": 1}, ["Hold the Line"], [earned])
 	ok(_ability_names(up["abilities"]).count("Hold the Line") == 1,
-		"an earned Hold the Line is not granted a second time")
-	ok(int(up.get("hold_line_upgraded", 0)) == 1,
-		"...the capstone marks the UPGRADE instead")
+		"an earned Hold the Line is never doubled by the cell")
+	ok(int(up.get("hold_line_upgraded", 0)) == 0,
+		"...and the flag STILL reads zero — no collision happened")
 	for a in up["abilities"]:
 		if a.display_name == "Hold the Line":
-			ok(a.description.contains("80%"),
-				"...and the description states the 80% cut")
-			ok(a.description.contains("die\nfor 3 turns"),
-				"...and the doubled no-death window, stated as APPLIED (CV §1, reached at DM §1)")
+			ok(not a.description.contains("80%"),
+				"...and the card promises no upgrade nothing can grant")
 
 	# The reverse order — capstone first, pick second — cannot reach the
 	# upgrade, and must not double-grant either. That is a property of the
@@ -399,8 +417,8 @@ func _upgrade_path() -> void:
 	var late := {"abilities": []}
 	Talents.apply_from_tree(late, member["tree"], member["talents"], member)
 	var late_names := _ability_names(late["abilities"])
-	ok(late_names.count("Hold the Line") == 1,
-		"tree-first still leaves exactly one Hold the Line")
+	ok(late_names.count("Hold the Line") == 0,
+		"tree-first grants nothing at all now — the order has nothing to decide")
 	ok(int(late.get("hold_line_upgraded", 0)) == 0,
 		"...and no upgrade, because nothing was in the kit when the tree ran")
 
@@ -521,7 +539,8 @@ func _live_fields() -> void:
 	var build := {"wd_unkillable": 1, "wd_toughness": 1, "wd_stomp_drill": 1,
 		"wd_tenacity": 1, "wd_bannerman": 1, "wd_shatter_guard": 1,
 		"wd_grudge": 1, "wd_hold_line": 1}
-	var scene := await _spawn(build, ["raider", "archer", "archer"])
+	var scene := await _spawn(build, ["raider", "archer", "archer"],
+		["Hold the Line"])
 	var wd := _wd(scene)
 	ok(wd != null, "the Warden spawned")
 	if wd != null:
@@ -534,8 +553,13 @@ func _live_fields() -> void:
 		ok(wd.spite_break == 0,
 			"LIVE: ...with the Spite rider dark, because Spite was not taken")
 		ok(wd.grudge_ranks == 1, "LIVE: Grudge reached the unit")
+		# BATCH DO: the capstone grants nothing, so the card is EARNED above.
+		# What this proves is unchanged — the bar carries it — and it now also
+		# proves the cell did not quietly hand out a second copy.
 		ok(_find(wd, "Hold the Line") != null,
-			"LIVE: the capstone put Hold the Line on his bar")
+			"LIVE: the DRAFTED Hold the Line is on his bar")
+		ok(_ability_names(wd.abilities).count("Hold the Line") == 1,
+			"LIVE: ...exactly once — the cell grants nothing (DO)")
 		# Toughness reads the UNSCALED pool at spawn — 25% of max HP on top
 		# of the spec's own Constitution.
 		ok(wd.constitution > 100,
@@ -870,13 +894,17 @@ func _live_taunt() -> void:
 # ---------- 14. the capstone, granted and upgraded ----------
 
 func _live_hold_the_line() -> void:
-	# Granted: the base 50% cut, TWO turns of Undying — the applied number, which
-	# is CV §1's convention. This comment said "one turn" until DM §1.
-	var scene := await _spawn({"wd_hold_line": 1}, ["raider"])
+	# BATCH DO: EARNED rather than granted, because a talent may not grant an
+	# ability. The base 50% cut and TWO turns of Undying are unchanged — the
+	# applied number, which is CV §1's convention, and the card carried that
+	# wording verbatim into `Classes.draft_ability`. This comment said "one
+	# turn" until DM §1.
+	var scene := await _spawn({"wd_hold_line": 1}, ["raider"], ["Hold the Line"])
 	var wd := _wd(scene)
 	ok(wd != null, "the Hold the Line Warden spawned")
 	if wd != null:
-		ok(wd.hold_line_upgraded == 0, "LIVE: nothing upgraded on the grant path")
+		ok(wd.hold_line_upgraded == 0,
+			"LIVE: `hold_line_upgraded` is read-only-zero — nothing grants (DO)")
 		await scene._resolve_special(wd, _find(wd, "Hold the Line"), wd, "good", 1.0)
 		ok(wd.status_power("hold_bd") == 50,
 			"the granted cast cuts 50%% of Break damage (got %d)" % \
@@ -892,18 +920,23 @@ func _live_hold_the_line() -> void:
 	scene.free()
 	await process_frame
 
-	# Upgraded: 80%, and THREE turns of Undying (applied).
+	# THE UPGRADED ARM: 80% and THREE turns. **No collision can write
+	# `hold_line_upgraded` any more**, so the branch is driven from here rather
+	# than left unreachable and unproved — the handler code is still live and a
+	# rune could reach it, and an unexercised branch is a branch nobody knows
+	# still works. What is asserted FIRST is that nothing wrote the flag.
 	var earned := Classes.spec_pool_ability("warden", "Hold the Line")
 	var up := await _spawn({"wd_hold_line": 1}, ["raider"], ["Hold the Line"])
 	var wd2 := _wd(up)
 	if wd2 != null:
-		ok(wd2.hold_line_upgraded == 1,
-			"LIVE: the capstone upgraded the earned copy")
+		ok(wd2.hold_line_upgraded == 0,
+			"LIVE: the flag is zero on an earned copy too — no collision (DO)")
 		ok(_ability_names(wd2.abilities).count("Hold the Line") == 1,
-			"...and there is still exactly one on his bar")
+			"...and there is exactly one on his bar")
+		wd2.hold_line_upgraded = 1
 		await up._resolve_special(wd2, _find(wd2, "Hold the Line"), wd2, "good", 1.0)
 		ok(wd2.status_power("hold_bd") == 80,
-			"the upgraded cast cuts 80%% of Break damage (got %d)" % \
+			"the upgraded cast still cuts 80%% of Break damage (got %d)" % \
 				wd2.status_power("hold_bd"))
 		ok(int(wd2.get_status("undying").get("turns", 0)) == 3,
 			"...and holds death off for 3 turns (stated as APPLIED, CV §1)")

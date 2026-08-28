@@ -249,10 +249,12 @@ func _tree_shape() -> void:
 			["dv_faithful", "Blessed are the Faithful"],
 			["dv_covenant", "Sacred Covenant"], ["dv_fervor", "Fervor"],
 			["dv_oath", "Binding Oath"], ["dv_waters", "Cleansing Waters"],
-			["dv_righteous", "Righteous Fire"], ["dv_resolve", "Sacred Resolve"],
+			# BATCH DO renamed both cells when their cards left for the draft — a
+			# node named after a live DRAFT CARD is the `wd_spiked`/Spite trap.
+			["dv_righteous", "Righteous Fire"], ["dv_resolve", "Unshaken"],
 			["dv_pulse", "Healing Pulse"], ["dv_crusade", "Crusader's Tempo"],
 			["dv_purity", "Purity"], ["dv_lifewell", "Lifewell"],
-			["dv_bulwark", "Bulwark of Fortitude"], ["dv_apostle", "Apostle"],
+			["dv_bulwark", "Wardstone"], ["dv_apostle", "Apostle"],
 			["dv_judgement", "Judgement"]]:
 		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
 			"%s is named %s" % [pair[0], pair[1]])
@@ -438,24 +440,30 @@ func _dissolved_pair() -> void:
 # ---------- §5 the two authored fallbacks ----------
 
 func _authored_fallbacks() -> void:
+	# **BATCH DO INVERTED THIS SECTION.** AW authored two fallbacks so that a
+	# node granting what the hero already held would not be dead; DO's charter
+	# removes the premise. Both cards moved into `SPEC_DRAFT_POOLS` and both
+	# cells were re-authored.
+	#
+	# **`dv_bulwark` IS THE ONE TO WATCH AND IT IS UNTOUCHED WHERE IT MATTERS.**
+	# CV ruled Bulwark of Fortitude's 5% party heal UNCONDITIONAL (CR §7), and
+	# that ruling lives in the ABILITY'S text, in `Classes.pending_talent_ability`
+	# — which DO did not open. The card moved by NAME only.
 	var res := _payload("dv_resolve")
-	ok(Talents.granted_name(res) == "Sacred Resolve",
-		"the Zeal row-3 node grants Sacred Resolve")
-	ok(Talents.collision_kind(res) == "authored",
-		"...and carries an AUTHORED fallback, not the generic")
-	var res_up: Array = res.get("upgrade", [])
-	ok(res_up.size() == 1
-		and int(res_up[0].get("stat", {}).get("resolve_extra_turns", 0)) == 2,
-		"...already owned -> its split lasts 5 turns instead of 3")
+	ok(Talents.granted_name(res) == "",
+		"the Zeal row-3 cell hands out NOTHING (DO's charter)")
+	ok(not res.has("upgrade"), "...so it carries no collision fallback either")
+	ok(Classes.spec_draft_pool("inquisitor").has("Sacred Resolve"),
+		"...while the card itself drafts from the Devout")
 	var bul := _payload("dv_bulwark")
-	ok(Talents.granted_name(bul) == "Bulwark of Fortitude",
-		"the Bulwark capstone grants Bulwark of Fortitude")
-	ok(Talents.collision_kind(bul) == "authored",
-		"...and carries an AUTHORED fallback")
-	var bul_up: Array = bul.get("upgrade", [])
-	ok(bul_up.size() == 1
-		and int(bul_up[0].get("stat", {}).get("bulwark_extra_turns", 0)) == 1,
-		"...already owned -> its effect lasts 4 turns instead of 3")
+	ok(Talents.granted_name(bul) == "",
+		"the Bulwark capstone hands out NOTHING (DO's charter)")
+	ok(not bul.has("upgrade"), "...so it carries no fallback either")
+	ok(Classes.spec_draft_pool("inquisitor").has("Bulwark of Fortitude"),
+		"...while the card itself drafts from the Devout")
+	var card: Ability = Classes.pending_talent_ability("Bulwark of Fortitude")
+	ok(card != null and card.description.contains("{mhp:5}"),
+		"CV'S RULING SURVIVES THE MOVE: the cast still heals every hero 5% at once")
 	# CORRECTION TO THE BATCH BRIEF, reported rather than glossed: §5 calls this
 	# "the first capstone in the game that grants an ability and therefore needs
 	# a fallback at all". IT IS NOT — NINE capstones grant one (the list is
@@ -465,16 +473,29 @@ func _authored_fallbacks() -> void:
 	# across every tree, which is how the miscount surfaced.
 	# NOTE Classes.SPEC_IDS is keyed by CLASS, not by spec — Talents.LANE_TREES
 	# is the one place that holds every tree by spec id.
+	# THE MISCOUNT THIS LOOP FOUND IS WORTH KEEPING AND IS INVERTED, NOT CUT.
+	# AW's brief called dv_bulwark "the first capstone in the game that grants
+	# an ability"; the loop showed NINE did. **DO took all nine — and the other
+	# thirteen granting nodes in rows 2, 3 and 4 that a capstone-only count
+	# never sees.** The loop now asserts the population is EMPTY, over the whole
+	# layer rather than over row 9, and prints the live figure beside it.
 	var granting_caps: Array = []
+	var granting_all: Array = []
 	for spec in Talents.LANE_TREES:
 		for t in Talents.LANE_TREES[spec]:
-			if int(t.get("row", 0)) != Talents.CAPSTONE_ROW:
+			if Talents.granted_name(t.get("payload", {})) == "":
 				continue
-			if Talents.granted_name(t.get("payload", {})) != "":
+			granting_all.append(String(t.get("id", "")))
+			if int(t.get("row", 0)) == Talents.CAPSTONE_ROW:
 				granting_caps.append(String(t.get("id", "")))
-	ok(granting_caps.has("dv_bulwark"),
-		"dv_bulwark is an ability-granting capstone")
-	_report.append("ability-granting capstones in the game: %s" % str(granting_caps))
+	ok(granting_caps.is_empty(),
+		"NO capstone grants an ability any more (%d do: %s)" % [
+			granting_caps.size(), ", ".join(granting_caps)])
+	ok(granting_all.is_empty(),
+		"...and no node at ANY row does either (%d do: %s)" % [
+			granting_all.size(), ", ".join(granting_all)])
+	_report.append("ability-granting talent nodes in the game: %d (DO's charter)"
+		% granting_all.size())
 	# The other two Devout capstones grant nothing, so they owe nothing.
 	for cap in ["dv_apostle", "dv_judgement"]:
 		ok(Talents.granted_name(_payload(cap)) == "",
@@ -904,12 +925,14 @@ func _live_ground_drip() -> void:
 
 func _live_fallbacks() -> void:
 	# The node GRANTS when the ability was not already in hand.
+	# BATCH DO: buying the cells hands out nothing, so a build with no earned
+	# cards holds neither ability. That is the charter working.
 	var granted := await _spawn({"dv_resolve": 1, "dv_bulwark": 1})
 	var dv := _hero(granted, 2)
-	ok(_find(dv, "Sacred Resolve") != null, "the row-3 node grants Sacred Resolve")
-	ok(_find(dv, "Bulwark of Fortitude") != null, "the capstone grants Bulwark")
+	ok(_find(dv, "Sacred Resolve") == null, "the row-3 cell grants no Sacred Resolve (DO)")
+	ok(_find(dv, "Bulwark of Fortitude") == null, "the capstone grants no Bulwark (DO)")
 	ok(dv.resolve_extra_turns == 0 and dv.bulwark_extra_turns == 0,
-		"...and neither fallback fired, because neither collided")
+		"...and neither counter is written, because nothing can collide")
 	await _kill(granted)
 	# EARNED FIRST, then the node: it upgrades instead of granting. Earned
 	# picks go on BEFORE the tree at both kit-assembly sites (the AH ordering
@@ -917,10 +940,17 @@ func _live_fallbacks() -> void:
 	var owned := await _spawn({"dv_resolve": 1, "dv_bulwark": 1},
 		{"bm_abilities": ["Sacred Resolve", "Bulwark of Fortitude"]})
 	var dv2 := _hero(owned, 2)
-	ok(dv2.resolve_extra_turns == 2,
-		"Sacred Resolve already owned -> the node pays +2 turns (got %d)" % dv2.resolve_extra_turns)
-	ok(dv2.bulwark_extra_turns == 1,
-		"Bulwark already owned -> the node pays +1 turn (got %d)" % dv2.bulwark_extra_turns)
+	# BATCH DO: both counters are READ-ONLY-ZERO — an `upgrade` arm fires only
+	# on a grant collision, and no talent grants. Their read sites in
+	# `battle.gd` are still live (and both names are in `runes.gd`'s coercion
+	# list against the day a rune writes them), so the branches are DRIVEN from
+	# here rather than left unreachable and unproved.
+	ok(dv2.resolve_extra_turns == 0,
+		"`resolve_extra_turns` is read-only-zero — nothing grants (got %d)" % dv2.resolve_extra_turns)
+	ok(dv2.bulwark_extra_turns == 0,
+		"`bulwark_extra_turns` is read-only-zero — nothing grants (got %d)" % dv2.bulwark_extra_turns)
+	dv2.resolve_extra_turns = 2
+	dv2.bulwark_extra_turns = 1
 	var res_count := 0
 	for ab in dv2.abilities:
 		if ab.display_name == "Sacred Resolve":

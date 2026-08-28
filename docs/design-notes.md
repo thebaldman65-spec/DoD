@@ -4,6 +4,51 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Closing a bet can open one, and the ledger has to say so (Batch DO) — 2026-08-27
+
+The charter is one sentence and it reads as an obvious tidy-up: a talent may not grant an ability,
+and may not depend on one the hero might never receive. Talents are chosen before the run knowing
+nothing. Twenty-two nodes broke it. Move their cards into the draft, re-author the cells to modify
+something the hero owns in every run, and the layer is clean.
+
+It is clean. `check_do` §1 reads 324 nodes, 0 granting, 0 naming a drawn ability. But the thing
+worth writing down is what the move did on its way there, because it was not visible from the
+brief and it will happen again to whoever takes the Occultist's Madness lane next.
+
+**A dependency's category is not a property of the node. It is a property of where the thing it
+names lives.** `oc_permanent` says *"Psychosis, Bewitchment and Hysteria the Occultist applies
+never expire."* Before this batch that was a **tree-internal** dependency — Psychosis came from
+`oc_mind_flay`, three rows up in its own lane, and Hysteria from `oc_hysteria` at the top of it.
+The charter permits that explicitly, and for a good reason: a cross-row dependency bets on a node
+the player **chooses**, not on a card they are **dealt**. Two nodes in one lane arguing with each
+other is a build.
+
+Moving Mind Flay and Mass Hysteria into the draft did not touch `oc_permanent`. It did not touch
+`oc_spread`, `oc_whispers` or `oc_delirium` either. All four went from permitted to forbidden
+without a character of their text changing, because **the only two appliers of Psychosis and
+Hysteria in the entire game stopped being reachable without a draw.** Six node/status pairs, made
+by an edit somewhere else.
+
+That is the shape: **a charter violation can be created by fixing a different one**, and the
+instrument that finds ability-name bets cannot see it, because these nodes name a *status*, not an
+ability. `sm_precision` is the same species and the brief had already found it by reading — and
+it, too, got worse rather than better here. It read Dazed, Crippled and Exposed; the Swordmaster
+guarantees none of the three, and the last non-drawn source of the other two was `sm_lunge`, which
+left the tree **in this batch**. The brief's guess that "cutting Dazed may be the whole repair" was
+right when it was written and wrong by the time the repair was made.
+
+**So the rule is: after moving anything out of a tree, re-run the sweep, and sweep for statuses as
+well as for names.** `check_do` §4 does it on every battery and prints the whole list rather than
+asserting a number, because the number is the thing that moves.
+
+The second note is smaller and is about restraint. The brief said *"report the list; rule on
+nothing"* for the status sweep, and six of the twelve pairs are this batch's own fault. The
+temptation to fix what you just broke is strong and it is usually right. It is not right here:
+re-pointing four Madness-lane nodes off Psychosis and onto Bewitchment is a re-author of a lane's
+whole subject, and that is a design decision with a designer attached to it. **A cost you created
+and named is a decision waiting to be made. A cost you created and quietly repaired is a decision
+you made on someone else's behalf.** The six are in the open queue, labelled as DO's.
+
 ## A check that cannot fail is not a check you still have (Batch DG) — 2026-08-22
 
 Two of the ten reds DG closed were the game being wrong, and both were one word of prose. The other

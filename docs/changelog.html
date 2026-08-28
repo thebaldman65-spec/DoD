@@ -14,6 +14,134 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-27 &mdash; Batch DO: TALENTS STOP GRANTING ABILITIES, AND STOP BETTING ON THE DRAW</h2>
+<p><i><b>THE CHARTER IS SETTLED AND IMPLEMENTED.</b> A talent may not grant an ability, and may
+not depend on an ability the hero is not guaranteed to have; <b>a talent modifying the spec's
+PROTECTED CORE is guaranteed and permitted</b>, which is the ruling that settles DN's
+&sect;0-versus-&sect;1 contradiction and is worth 83 nodes. <b>NO LANE IS RENAMED, NO TREE IS
+RESTRUCTURED, AND NO NODE CHANGES ROW OR LANE</b> &mdash; DN's 97-node restructure is NOT taken
+here, and because nothing moves a cell, <b>no save migration is needed and <code>Profile</code>
+is still v2</b>.</i></p>
+
+<p><b>&sect;0 &mdash; TWENTY-TWO NODES GRANTED AN ABILITY, NOT NINE, AND THE BRIEF'S OWN RULE IS
+WHAT CATCHES THE OTHER THIRTEEN.</b> DN reported "nine grant a new ability outright" about the
+<b>36 capstones</b>; the brief generalised that to the whole layer. <code>Talents.LANE_TREES</code>
+holds <b>22</b> ability-granting nodes &mdash; nine in row 9 and <b>thirteen in rows 2, 3 and
+4</b>. <b>All twenty-two are taken</b>, on the designer's ruling.</p>
+
+<p><b>&sect;1 &mdash; THE RUNE CHECK, RUN BEFORE ANYTHING MOVED, AND THE ANSWER IS NO BY ONE
+ROW.</b> Four runes grant an ability and the brief names all four correctly: <b>Comet</b> carries
+a <code>new_ability</code>; <b>Binding Souls</b>, the <b>Last Rites</b> and the <b>Flayed Mind</b>
+carry a <code>grant_ability</code>. <b>NOT ONE OF THEM NAMES A CAPSTONE GRANT.</b> But two name a
+grant from the thirteen the brief's list does not reach: <b>Binding Souls and
+<code>dv_resolve</code> both granted Sacred Resolve, and the Flayed Mind and
+<code>oc_mind_flay</code> both granted Mind Flay</b> &mdash; <b>two live duplications, and the
+Flayed Mind's own <code>lane</code> field says "Madness", the lane its twin sits in</b>. Both are
+resolved by the move: the rune keeps its grant, the talent does not. <b>Runes may still grant, and
+that is the distinction the charter is built on</b> &mdash; a rune is BOUGHT with knowledge of the
+run in front of you; a talent is chosen before the run knowing nothing.</p>
+
+<p><b>&sect;2 &mdash; THE TWENTY-TWO ABILITIES MOVED INTO THE DRAFT, VERBATIM, AND THE DRAFT WENT
+120 &rarr; 142.</b> <code>SPEC_DRAFT_POOLS</code> is <b>118</b> (was 96) and the whole draft is
+<b>142 of 142</b>. <b>The floor is still EIGHT and no pool lost anything</b>: nine specs are
+deeper than eight, and the Beastmaster, Sharpshooter and Survivalist still read exactly eight
+because their trees granted nothing to move. Per spec &mdash; berserker 10, warden 9,
+swordmaster 10, pyromancer 13, cryomancer 12, arcanist 10, holy 10, inquisitor 10, occultist 10.
+<b>SIXTEEN DEFINITIONS ACTUALLY MOVED AND SIX DID NOT</b>: the six <code>grant_ability</code>
+nodes named a card defined in <code>Classes.pending_talent_ability</code> already, outside the
+tree. The sixteen <code>new_ability</code> nodes carried their whole definition INSIDE the payload
+&mdash; and <b>eight of those were reachable ONLY through <code>pool_ability</code>'s fall-through
+to the trees</b>, so deleting a payload would silently have emptied a <code>SPEC_POOLS</code>
+entry the zone boss offers. They were lifted out whole: <b>not one number,
+<code>special</code>, <code>perfect_id</code> or line of <code>description</code> was re-typed.</b>
+<b>The ability corpus is still 216 and nothing became unresolvable.</b></p>
+
+<p><b>&sect;3 &mdash; TWENTY-FIVE CELLS RE-AUTHORED, EVERY ONE KEEPING ITS ID, ITS LANE AND ITS
+ROW.</b> Twenty-two are the granting nodes; three more read a drawn ability outright
+(<code>bm_devoted_fury</code> on Bestial Wrath, <code>bm_reserves</code> on Spirit Bond, and
+<code>cr_icy_resolve</code>, which read <b>Rime</b> &mdash; a card that left the tree in this same
+batch). <b>EVERY REPLACEMENT MODIFIES THE SPEC'S PROTECTED CORE, ITS PASSIVE OR ITS RESOURCE, AND
+NOT ONE NEEDED A NEW <code>battle.gd</code> READ SITE</b> &mdash; <code>apply_payload</code>'s
+<code>{"ability": &hellip;, "add"/"set": &hellip;}</code> branch has been the mechanism since
+Batch AI and nine nodes already used it. <b><code>ar_wrath</code> lost almost nothing</b>: its
+step-doubling was an <code>also</code> payload beside the grant and is the whole node now, with
+<code>wrath_step_double</code>'s name, unit and single read site untouched, so AU &sect;4's
+negative control still bites.</p>
+
+<p><b>&sect;4 &mdash; FOUR CLAUSE-CUTS, AND THE PAYLOAD TERM GOES WITH THE TEXT EVERY TIME.</b>
+<code>sm_blade_dance</code> loses its Shatterpoint rider, <code>wd_stomp_drill</code> its War
+Stomp rider and <code>wd_bannerman</code> its Interpose rider &mdash; each named a
+<code>SPEC_POOLS</code> trophy, so each paid only a hero who had DRAWN one.
+<b><code>sunder_guard_bd</code>, <code>rallying_stomp_ranks</code> and
+<code>bulwark_line_ranks</code> are deleted outright</b>, field and read site together, and
+<code>check_do</code> &sect;3 asserts all three are absent from the whole of
+<code>scripts/</code>. <b>Four more cuts came from the move itself</b>:
+<code>dv_waters</code> and <code>dv_pulse</code> stop reading Sacred Resolve's banner (Consecrated
+Ground is protected core and is the whole condition now), <code>sm_seasoned_node</code> stops
+sharpening Lunge, and <code>ar_conduit</code>'s clause is <b>RE-POINTED rather than cut</b>
+&mdash; its partner is still a node in its own tree, one row up, renamed <b>Unchained</b>.
+<b><code>bm_ancient_pact</code> is the one where the brief's blanket rule does not apply</b>: it
+names Spirit Bond in an illustrative list, its single <code>ancient_pact</code> term carries both
+halves, and <code>battle.gd</code> refuses ALL healing rather than naming a source &mdash; so the
+text is corrected and there is <b>no payload term to remove</b>.</p>
+
+<p><b>&sect;5 &mdash; <code>sm_precision</code> WAS WORSE THAN THE BRIEF THOUGHT, AND THIS BATCH IS
+WHY.</b> It read <i>"Dazed, Crippled and Exposed"</i> and the Swordmaster guarantees none of the
+three: Dazed comes only from Charge (class draft) or Sweeping Strikes (a <code>SPEC_POOLS</code>
+trophy), and Crippled and Exposed came only from <code>sm_lunge</code> &mdash; <b>which left the
+tree in this same batch, taking the last non-drawn source with it</b>. So cutting Dazed alone was
+never the whole repair, and by the end of the batch it was none of it. <b>Re-pointed onto
+STUNNED, which POMMEL STRIKE applies and Pommel Strike is protected core</b>; the
+<code>battle.gd</code> read site moved with the text.</p>
+
+<p><b>&sect;6 &mdash; THE STATUS SWEEP: TWELVE PAIRS, REPORTED AND RULED ON NOWHERE, AND SIX OF
+THEM ARE THIS BATCH'S OWN.</b> <code>check_do</code> &sect;4 prints every node reading a status its
+own spec cannot guarantee. <b>Six are pre-existing</b> &mdash; <code>sm_guarded</code> (Crippled,
+Exposed), <code>sv_virulence</code> (Exposed), <code>ss_exposed_nerve</code> (Exposed),
+<code>ss_no_cover</code> (Dazed, Blind). <b>SIX WERE CREATED BY THIS BATCH AND ARE NAMED AS
+SUCH</b>: <b>Psychosis and Hysteria have no applier in the game but Mind Flay and Mass Hysteria</b>,
+and both moved into the draft, so <code>oc_spread</code>, <code>oc_whispers</code>,
+<code>oc_delirium</code> and <code>oc_permanent</code> read a status the Occultist can no longer
+guarantee. Before DO those were TREE-INTERNAL dependencies, which the charter permits; the move
+converted them into draws. <b>The brief says "report the list; rule on nothing", so nothing is
+ruled</b> &mdash; but the cost is the ruling's, not an oversight, and it is in the open queue.</p>
+
+<p><b>&sect;7 &mdash; WHAT THE MOVE COSTS, RECORDED RATHER THAN HIDDEN: nine abilities lost their
+upgraded variant.</b> An <code>upgrade</code> arm fires only where a node's grant COLLIDES with an
+earned copy. No node grants, so <code>battle_shout_node</code>, <code>lunge_upgraded</code>,
+<code>execute_upgraded</code>, <code>hold_line_upgraded</code>, <code>rampage_upgraded</code>,
+<code>overcharge_extra</code>, <code>intercession_long</code>, <code>resolve_extra_turns</code>
+and <code>bulwark_extra_turns</code> are read-only-zero. <b>The fields and read sites are LEFT
+STANDING</b> &mdash; each reads a base beside it, deleting a branch is deleting a mechanic, and
+two are in <code>runes.gd</code>'s coercion list already. <b>ONE CARD TEXT MOVED AND IT CLOSES A
+DEFECT DM RECORDED:</b> Battle Shout's description promised <i>"+12% &hellip; Lasts 3 turns"</i>,
+which were <code>battle_shout_node</code>'s magnitudes &mdash; index 1 of <code>[8, 12, 18]</code>.
+<b>There is one magnitude now and the card states it: +8%, 2 turns.</b></p>
+
+<p><b>&sect;8 &mdash; A HOLE THE PROJECT HAS CARRIED SINCE BATCH CL IS CLOSED AS A SIDE EFFECT, AND
+<code>check_cz</code>'s OWN FAILURE MESSAGE IS THE ONE THAT CAME TRUE.</b> The Batch CL
+enumeration reached <b>211 of 216</b>; the five it missed &mdash; Backdraft, Pyroblast, Glacial
+Prison, Cryoclasm, Intercession &mdash; were talent grants living in no pool. <b>All five are in a
+draft pool now, so the two walks agree.</b> &sect;0's assertion read <i>"%s IS in the CL walk
+&mdash; &sect;0's premise has changed and the report is stale"</i>, had never fired in eight
+batches, and is <b>INVERTED rather than deleted</b>: it fires as its opposite now, so a batch that
+put one of the five back outside every pool is still caught.</p>
+
+<p><b>&sect;9 &mdash; ONE NEW GATE, <code>check_do.gd</code>, AND IT ASSERTS THE PROPERTY AND
+PRINTS THE COUNT.</b> DN's own gate asserted a NUMBER and its first battery caught it, costing a
+second frozen run; this one asserts <i>no node grants</i> and <i>no node names an ability outside
+its protected core</i>, and prints <b>324 nodes / 0 granting / 98 naming a protected core / 1
+naming its own tree / 0 naming something drawn</b> beside them. <b>It deliberately does not call
+<code>Classes.class_draft_pool(</code></b>, so it needs no <code>check_da</code>
+<code>WALK_EXEMPT</code> entry at all &mdash; which is better than having one, and is DN's lesson
+paid forward. It is in <code>GATES</code> and owes a baseline row.</p>
+
+<p><b>&sect;10 &mdash; NAMING, AND THE TRAP THAT WAS AVOIDED RATHER THAN HIT.</b> A node named
+"Overcharge" beside a draft card called Overcharge is exactly the <code>wd_spiked</code>/Spite
+collision DN documented. The Arcanist's row-4 Resonance cell is <b>Overdraw</b> for that reason.
+<b>Five nodes were already named after live abilities before DO</b> &mdash; Second Wind, Spite,
+Rally, Killing Frost, Divine Presence &mdash; <b>and DO added no sixth.</b></p>
+
 <h2>2026-08-27 &mdash; Batch DN: THE TALENT NODES AGAINST THE NEW CHARTER</h2>
 <p><i><b>A REPORT. NOTHING WAS RE-AUTHORED, NO TREE WAS RESTRUCTURED, NO NODE MOVED.</b> The
 charter under audit: twelve trees, each <b>Offense / Defense / Utility</b>, where a talent may be

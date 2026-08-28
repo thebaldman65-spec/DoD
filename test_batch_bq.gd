@@ -91,6 +91,15 @@ var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -237,7 +246,7 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 96,
+	ok(spec_total == 118,
 		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
 			% spec_total)
 

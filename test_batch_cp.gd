@@ -78,11 +78,27 @@ const AUTHORED_DIGIT_CORPUS_CEILING := 89
 # CP §3 — the five abilities that RUN a check and state no Perfect. Named, so a
 # SIXTH trips. See `_perfect_biconditional` for why this is a list rather than
 # a violation count of zero.
+# BATCH DO ADDED PYROBLAST, AND IT IS NOT A NEW AUTHORING FAULT. Pyroblast has
+# carried an empty `perfect_text` since Batch AR authored it out of the vault;
+# what changed is that THIS FILE'S WALK COULD NOT REACH IT. It was a talent
+# grant living in NO POOL — one of `check_cz` §0's five — and DO moved it into
+# `SPEC_DRAFT_POOLS`, so the walk sees it for the first time. **The population
+# did not grow; the instrument's reach did.** The list is SIX now and a SEVENTH
+# still has to be a decision.
 const CHECK_WITHOUT_PERFECT := ["Called Shot", "Coup de Grâce", "Pinning Shot",
-	"Powershot", "Rampage"]
+	"Powershot", "Pyroblast", "Rampage"]
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -143,11 +159,11 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
+		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
 		total += pool.size()
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"twelve spec draft pools (got %d)" % Classes.SPEC_DRAFT_POOLS.size())
-	ok(total == 96, "SPEC_DRAFT_POOLS holds 96 (got %d)" % total)
+	ok(total == 118, "SPEC_DRAFT_POOLS holds 118 (got %d)" % total)
 
 
 # ---------- §2: the standard shape, all twenty-seven ----------
@@ -348,7 +364,7 @@ func _perfect_biconditional() -> void:
 	# it is the direction `check_cn.gd` gates.
 	#
 	# THE CONVERSE — every ability that runs a check STATES a Perfect — is NOT a
-	# project rule and never has been. Five abilities run a bar and name no
+	# project rule and never has been. Six abilities run a bar and name no
 	# Perfect, and their bar is not idle: the grade still multiplies damage
 	# (x1.15 / x0.6). All five have carried an empty `perfect_text` since long
 	# before CN (checked against `8c3c676`, and their introducing commits are
@@ -372,7 +388,7 @@ func _perfect_biconditional() -> void:
 	var expected: Array = CHECK_WITHOUT_PERFECT.duplicate()
 	expected.sort()
 	ok(check_no_perfect == expected,
-		"the five checked-but-Perfectless abilities are exactly the named five (got %s)"
+		"the checked-but-Perfectless abilities are exactly the named six (got %s)"
 			% ", ".join(check_no_perfect))
 	# And the corpus is big enough that the loop above really walked it.
 	ok(corpus.size() > 150,

@@ -5,141 +5,175 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-27 (Batch DN).*
+*Last rewritten: 2026-08-27 (Batch DO).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DN — THE TALENT NODES AGAINST THE NEW CHARTER. A REPORT.** Nothing was
-  re-authored, no tree was restructured, no node moved. One new instrument, `check_dn.gd`,
-  **read-only and NOT in `GATES`** — the standing `check_cu` and `check_cv` already have, for the
-  same reason. **The audit is a new §8 inside `docs/talent-audit.html`** rather than a second
-  document, so CU's reading (does the text match the code?) and DN's (guaranteed, or drawn?) sit
-  together over the same 324 nodes.
-- **THE TWO HALVES OF THE ANSWER DISAGREE, AND THAT IS THE FINDING.** **The CONTENT is almost
-  clean: SIX of 324 nodes depend on something drawn, and only TWO are dead without the draw**
-  (`bm_devoted_fury` and `bm_reserves`, both whole nodes about a `SPEC_POOLS` ability). The other
-  four carry a bonus CLAUSE that is drawn and stand up without it. **The repair bill on the existing
-  text is two re-authors and four clause cuts.**
-- **BUT THE SHAPE CANNOT BE BUILT FROM THEM: ZERO OF TWELVE SPECS CAN FILL THREE NINE-CELL LANES,
-  AND 97 NEW NODES — 30% OF THE LAYER — WOULD HAVE TO BE AUTHORED.** **Two specs hold a lane at
-  ZERO**: the Cleric has no offensive node in 27 and the Sharpshooter no defensive one. **Even at
-  ONE row per lane — a three-cell tree — those two still cannot fill**, so no shrinking rescues it.
-  The curve bends at four rows per lane (22 nodes short, 4 of 12 specs filling).
-- **TWO OF THE BRIEF'S COUNTS WERE WRONG AGAINST THE REPO AND BOTH ARE IN THE AUDIT'S §8.0.**
-  **There are THIRTY-SIX capstones, not twelve** — `CAPSTONE_ROW` is 9 and `LANES` is 3, so row 9
-  is three cells wide per spec; the build screens' *"ONE PER HERO, EVER · any lane"* is a PICK of
-  one from a SHELF of three. And **CV cut THREE dead Perfect clauses, not four** — the audit's own
-  disposition table reads *"CUT THREE; `dv_bulwark` IS NOT ONE OF THEM"*, its 5% party heal having
-  been ruled UNCONDITIONAL rather than dead. **`dv_bulwark` is a capstone, so a re-author working
-  from "four" would re-commit the error CV ruled against.**
-- **THE CHARTER CONTRADICTS ITSELF ABOUT 75 NODES AND SOMEBODY HAS TO RULE.** Its §0 permits a node
-  to be general in two ways only — *a STAT, or the spec's OWN resource and passive*; its §1 says
-  *a node modifying a CORE KIT ability is guaranteed*. **The gap is 235 clean versus 318 clean, and
-  it is a wording question rather than a code question.** §1's reading is the one the audit uses,
-  because it is the one with a mechanical test behind it.
-- **THE CAPSTONES ARE THE CLEANEST PART OF THE LAYER, NOT THE DIRTIEST.** **33 of 36 are
-  GUARANTEED, 3 are tree-internal, NOT ONE IS DRAWN**; nine grant an ability outright, which makes
-  them the most guaranteed nodes in the game — the talent IS the source. **The sanctioned exception
-  the brief was preparing to grant does not appear to be needed.** Ruled on nowhere, as instructed.
-- **THE SAVED-ALLOCATION RISK WAS MEASURED, NOT REASONED ABOUT.** A Berserker with all 27 cells
-  bought reads spent 54 / available 0. Move ONE node from row 1 to row 9 and it reads **spent 56,
-  available −2 — a NEGATIVE purse, with nothing to refuse it, clamp it or log it.** Delete an id
-  and its point is silently refunded while the dead cell stays in the save forever. **`Profile`
-  is v2, the load is TOLERANT, `version` is stamped unconditionally, and there is no migration step
-  in the file** — so there is currently nothing a migration could hang on. **`cells_spent` prices
-  each owned cell off the row it CURRENTLY sits in, which is why a MOVE is the dangerous edit and a
-  RENAME is not.**
-- **THE `lane` FIELD IS THE COUPLING, AND IT IS SIX LIVE SITES.** `data/runes.json` carries **36
-  `lane` fields, every lane name exactly once**; `runes.gd`, `run_sim.gd`, `talents_screen.gd`,
-  `party_screen.gd` and `battle.gd` read one. **The two screens keep working and read BETTER**;
-  `run_sim` is the casualty — **every `DOD_SIM_BUILDS` value ever typed becomes invalid**, and
-  `_target_lane`'s `tree[0].lane` fallback stops being twelve distinct arms. **The test tree is the
-  larger surface and is not in that six: TWENTY-FIVE `test_batch_*` files reference a lane**, some
-  with hard-coded name tables beside every node id.
-- **CU'S CROSS-ROW CONDITIONALS ARE FIVE, NOT THREE, AND ALL SIXTEEN CROSS-NODE DEPENDENCIES
-  SURVIVE.** The brief names the Berserker's three; `sm_guarded`→`sm_punish` and
-  `wd_shatter_guard`→`wd_spiked` carry the same payload `condition`. **A cross-row conditional is a
-  bet on a node the player CHOOSES, not on a card they are DEALT**, so it is not the defect this
-  audit was looking for even though it looks like one.
-- **ONE MATCHING RULE EARNED ITS PLACE THE HARD WAY: SAME-TREE NAMES BEAT THE CORPUS.** The Warden
-  node `wd_spiked` is *named* **Spite** and the Berserker has a *drafted ability* called Spite; the
-  first pass reported a cross-spec bet that does not exist. The same pass matched "Berserk" inside
-  "Berserker" seven times and "Heal" inside "Health". **Word boundaries plus same-tree precedence
-  removed all nine false bets** — the DoD-standard needle-floor fault, in a new place.
-- **`master.html` DID NOT MOVE AND ITS STAMP IS STILL `(Batch DM)`.** DN changes nothing about what
-  the game IS, so the fourteen self-comparing stamp gates are correct to read DM. **The two-letter
-  stamp gate reads `substr(_code_at + 7, 2)` and compares lexically** — a THREE-letter code would
-  break all fourteen.
-- **TWO BATTERIES AT DN, AND THE FIRST ONE FOUND A REAL RED THAT WAS THE INSTRUMENT'S OWN FAULT.**
-  Battery 1 ran frozen and reported **`check_da` 37 / 2** — §3's hand-rolled-corpus fingerprint is
-  the two draft-pool calls, and **`check_dn.gd` carries both**, because the membership tables are
-  the whole audit. **IT IS A FALSE POSITIVE AND THE FIX RECORDS WHY RATHER THAN SUPPRESSING IT:**
-  `check_dn` calls `Classes.ability_corpus()` outright for the walk and reads the pools only for
-  which BUCKET a named ability sits in, which the flat 216 cannot answer. `WALK_EXEMPT` holds two
-  files now, and **the loop that asserts each exempt file STILL carries the marks is what makes the
-  count 37** — the +1 is the exempt list, not new coverage. `baselines.json` moved 36 → 37 with
-  `checks_obs` reset to 1, in a **five-line diff**.
-- **BATTERY 2 RAN AGAINST A TREE FROZEN BEFORE IT BEGAN AND UNEDITED UNTIL IT FINISHED** — 153
-  files MD5-stamped at the freeze and identical after — **and it is the acceptance run. Seventy-one
-  targets ran and the manifest names all seventy-one.** `check_de` reports **293 checks / 0
-  failures / 0 NOTICES**, and **zero throws anywhere.** The only red is `check_cm_live`'s four, the
-  standing deliberate one.
-- **`check_dn` IS NOT IN THE BATTERY AND OWES NO BASELINE ROW.** It is not in `GATES`, so it writes
-  no log, so the differ never sees it — which is why `baselines.json` is still **70 rows** after a
-  batch that added a `check_*.gd` file. Run it by hand:
-  `DOD_DN_DUMP=<path> Godot --headless --path . --script check_dn.gd`.
-- **Next letter: DO.** `DO` sorts after `DN`, so the stamp gates still work.
-- **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
-  purpose-authored. Recent batches are correction and consolidation: the skill-check rework
-  (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
-  split (CW), the archive cut (CX), the tempo rule (CY), CZ's two ramp repairs, DA's correction of
-  one of them, DB's and DD's `_spawn` consolidations, DC's threshold repairs, DE's move of the
-  count differ into the runner, DF's sort of the 47, DG's close of the ten, DH's nine cross-spec
-  clauses, DI's payment of the plumbing debt, DJ's close of the half DI would not take, DK's ruling
-  on the eleven, DL's close of the clause DK recorded as owed, DM's close of the ally/hero thread,
-  **and DN's sizing of the talent charter.**
+- **Last batch: DO — TALENTS STOP GRANTING ABILITIES, AND STOP BETTING ON THE DRAW. THE CHARTER IS
+  SETTLED AND IMPLEMENTED.** No lane is renamed, no tree is restructured, **no node changes row or
+  lane**. DN's 97-node restructure is NOT taken.
+- **THE RULING THAT SETTLES DN's §0-VERSUS-§1 CONTRADICTION, AND IT IS WORTH 83 NODES: a talent
+  modifying the spec's PROTECTED CORE is GUARANTEED and permitted.** The hero owns its core kit in
+  every run, so modifying it is not a bet. The trees were therefore **318 of 324 clean, not 235**,
+  and after DO's own work they are **324 of 324**. **It is recorded as a standing rule in
+  `CLAUDE.md`, stamped into `docs/talent-audit.html` §8.1.1, and asserted by `check_do` §1 — do not
+  re-open it as an open question.**
+- **TWENTY-TWO NODES GRANTED AN ABILITY, NOT NINE, AND THE BRIEF'S OWN RULE IS WHAT CATCHES THE
+  OTHER THIRTEEN.** DN's "nine grant a new ability outright" is a statement about the **36
+  capstones** and is correct as such; the brief generalised it to the whole layer. Nine were
+  capstones and **thirteen sat in rows 2, 3 and 4**. **The designer ruled ALL TWENTY-TWO**, and
+  ruled that the replacement cells be AUTHORED rather than presented as options.
+- **THE RUNE CHECK WAS RUN BEFORE ANYTHING MOVED AND THE ANSWER IS NO — BY ONE ROW.** Four runes
+  grant an ability and the brief names all four correctly (Comet carries a `new_ability`; Binding
+  Souls, the Last Rites and the Flayed Mind carry a `grant_ability`). **NOT ONE NAMES A CAPSTONE
+  GRANT.** But two name a grant from the thirteen the brief's list does not reach: **Binding Souls
+  and `dv_resolve` both granted Sacred Resolve, and the Flayed Mind and `oc_mind_flay` both granted
+  Mind Flay** — two LIVE DUPLICATIONS, and the Flayed Mind's own `lane` field reads "Madness", the
+  lane its twin sits in. Both are resolved by the move: **the rune keeps its grant, the talent does
+  not.** A rune is BOUGHT with knowledge of the run in front of you; that is the whole distinction.
+- **THE DRAFT IS 142 OF 142 — `SPEC_DRAFT_POOLS` 96 → 118, `CLASS_DRAFT_POOLS` untouched at 24.**
+  Per spec: pyromancer 13, cryomancer 12, berserker / swordmaster / arcanist / holy / inquisitor /
+  occultist 10, warden 9, and **beastmaster, sharpshooter and mystic still exactly 8** because
+  their trees granted nothing to move. **NO POOL LOST ANYTHING AND THE FLOOR IS STILL EIGHT.**
+  **The per-spec expectation is a TABLE now, not a multiple** — `test_batch_cd.PER_SPEC_DEPTH` is
+  the one authoritative copy and every other suite asserts the FLOOR and the TOTAL.
+- **SIXTEEN DEFINITIONS ACTUALLY MOVED AND SIX DID NOT, AND EIGHT OF THE SIXTEEN WERE THE SHARP
+  ONES.** The six `grant_ability` nodes named a card defined in `Classes.pending_talent_ability`
+  already — outside the tree. The sixteen `new_ability` nodes carried their whole `Ability` dict in
+  the payload, and **eight of those were reachable ONLY through `pool_ability`'s fall-through to
+  `Talents.granted_ability`** — so deleting a payload would silently have emptied a `SPEC_POOLS`
+  entry the zone boss offers. They were lifted into `Classes.draft_ability` **verbatim**: not one
+  number, `special`, `perfect_id` or line of `description` re-typed. **The corpus is still 216.**
+- **PHOENIX REBIRTH WAS NOT EARNABLE AT ALL AND IS NOW.** It sat in `CLASS_POOLS["mage"]` and in no
+  spec pool, and **Batch AN retired the class draw** — so `award_ability_pick` has read
+  `roll_spec_ability_offer` (SPEC POOLS ONLY) ever since, and `py_rebirth`'s grant was its only
+  source in the game.
+- **TWENTY-FIVE CELLS RE-AUTHORED, EVERY ONE KEEPING ITS ID, ITS LANE AND ITS ROW.** Twenty-two are
+  the granting nodes; three more read a drawn ability outright — `bm_devoted_fury` (Bestial Wrath),
+  `bm_reserves` (Spirit Bond) and `cr_icy_resolve`, which read **Rime**, a card that left the tree
+  in this same batch. **EVERY REPLACEMENT MODIFIES THE SPEC'S PROTECTED CORE, ITS PASSIVE OR ITS
+  RESOURCE, AND NOT ONE NEEDED A NEW `battle.gd` READ SITE** — `apply_payload`'s
+  `{"ability": …, "add"/"set": …}` branch has been the mechanism since Batch AI and nine nodes
+  already used it. **Field collisions were checked before anything was authored**: no replacement
+  writes a field another node already writes, because two nodes on one field is a silent
+  order-dependence nobody would find.
+- **`ar_wrath` LOST ALMOST NOTHING** — its step-doubling was an `also` payload beside the grant and
+  is the whole node now, with `wrath_step_double`'s name, unit and single read site untouched, so
+  AU §4's negative control still bites. **`dv_bulwark` WAS NOT TOUCHED IN THE WAY A RE-AUTHOR WOULD
+  REACH FOR**: CV ruled its 5% party heal UNCONDITIONAL, and that ruling lives in the ABILITY'S
+  text in `Classes.pending_talent_ability`, which DO did not open. The card moved by NAME only.
+- **EIGHT CLAUSE-CUTS, AND THE PAYLOAD TERM GOES WITH THE TEXT — EXCEPT ONCE.**
+  `sm_blade_dance`, `wd_stomp_drill` and `wd_bannerman` lose their Shatterpoint / War Stomp /
+  Interpose riders, and **`sunder_guard_bd`, `rallying_stomp_ranks` and `bulwark_line_ranks` are
+  deleted outright** — field, payload and read site. **`bm_ancient_pact` IS THE EXCEPTION AND IT IS
+  NOT A LOOPHOLE**: its single `ancient_pact` flag carries BOTH halves and `battle.gd` refuses ALL
+  healing rather than naming a source, so Spirit Bond appeared in an illustrative list and there
+  was **no payload term to remove**. Removing `ancient_pact` would have deleted the node.
+  **FOUR MORE CUTS CAME FROM THE MOVE ITSELF**: `dv_waters` and `dv_pulse` stop reading Sacred
+  Resolve's banner, `sm_seasoned_node` stops sharpening Lunge, and `ar_conduit` is **RE-POINTED
+  rather than cut** — its partner is still a node in its own tree, renamed **Unchained**.
+- **`sm_precision` WAS WORSE THAN THE BRIEF THOUGHT, AND THIS BATCH IS WHY.** It read Dazed,
+  Crippled and Exposed; Dazed came only from Charge or Sweeping Strikes (both drawn), and Crippled
+  and Exposed only from `sm_lunge` — **which left the tree in this same batch, taking the last
+  non-drawn source with it.** So "cutting Dazed may be the whole repair" was true when written and
+  false by the time the repair was made. **Re-pointed onto STUNNED, which Pommel Strike applies and
+  Pommel Strike is PROTECTED CORE**; the `battle.gd` read site moved with the text.
+- **A HOLE OPEN SINCE BATCH CL IS CLOSED AS A SIDE EFFECT, AND `check_cz`'s OWN FAILURE MESSAGE IS
+  THE ONE THAT CAME TRUE.** The Batch CL enumeration reached **211 of 216**; the five it missed —
+  Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession — were talent grants living in no
+  pool. **All five are in a draft pool now, so the two walks agree.** §0's assertion read *"%s IS
+  in the CL walk — §0's premise has changed and the report is stale"*, had never fired in eight
+  batches, and is **INVERTED rather than deleted**.
+- **NINE ABILITIES LOST THEIR UPGRADED VARIANT, AND THAT IS RECORDED RATHER THAN HIDDEN.** An
+  `upgrade` arm fires only where a node's grant COLLIDES with an earned copy, so
+  `battle_shout_node`, `lunge_upgraded`, `execute_upgraded`, `hold_line_upgraded`,
+  `rampage_upgraded`, `overcharge_extra`, `intercession_long`, `resolve_extra_turns` and
+  `bulwark_extra_turns` are **read-only-zero**. **The fields and their read sites are LEFT
+  STANDING** — each reads a BASE beside it, deleting a branch is deleting a mechanic, and two are
+  already in `runes.gd`'s `STAT_INT_KEYS`. **The suites DRIVE those branches from the test rather
+  than leaving them unreachable and unproved.**
+- **ONE CARD TEXT MOVED, AND IT CLOSES A DEFECT THIS FILE HAS CARRIED SINCE DM.** Battle Shout's
+  `description` promised *"+12% … Lasts 3 turns"* — index **1** of `[8, 12, 18]`, the magnitudes
+  the NODE paid. A pool pick has always paid **+8% for 2 turns**. There is one magnitude now and
+  **the card states it**. The "one description for three magnitudes" thread is closed by
+  subtraction rather than by authoring.
+- **NO NODE MOVED ROW OR LANE, SO NO SAVE MIGRATION IS NEEDED AND `Profile` IS STILL v2.**
+  `Talents.cells_spent` prices each owned cell off the row it CURRENTLY sits in, and DN measured a
+  MOVE driving a full Berserker ledger to **−2 available points**, silently. **`check_do` §3
+  asserts all twenty-five re-authored cells are in their original lane and row.**
+- **THE `owns_ability` PAYLOAD CONDITION NOW HAS ZERO LIVE USERS.** The three riders DO cut were
+  the only ones. **The condition kind and `Talents.owns_ability` are KEPT and still tested**
+  (`test_batch_ai`) — deleting a condition kind is a design change, and it is the natural mechanism
+  for a rune.
+- **ONE NEW GATE, `check_do.gd`, IN `GATES`, WITH A BASELINE ROW.** It asserts the PROPERTY and
+  PRINTS the count — DN's own gate asserted a NUMBER and its first battery caught it. **It reads
+  only the SPEC draft pool, never the class one, so it needs no `check_da` `WALK_EXEMPT` entry at
+  all** — better than having one, and DN's lesson paid forward. Its first draft went `check_da`
+  37/2 anyway, because **its header NAMED the forbidden call in a sentence saying it did not make
+  it**, which is the self-accusation trap `check_da`'s own header warns about.
+- **Next letter: DP.** `DP` sorts after `DO`, so the stamp gates still work.
+- **Phase.** The ability draft is **COMPLETE at 142 of 142** and all twelve talent trees are
+  purpose-authored and charter-clean. Recent batches are correction and consolidation: the talent
+  audit (CU/CV), the documentation split (CW), the archive cut (CX), the tempo rule (CY), CZ's two
+  ramp repairs, DA's correction of one of them, DB's and DD's `_spawn` consolidations, DC's
+  threshold repairs, DE's move of the count differ into the runner, DF's sort of the 47, DG's close
+  of the ten, DH's nine cross-spec clauses, DI's payment of the plumbing debt, DJ's close of the
+  half DI would not take, DK's ruling on the eleven, DL's close of the clause DK recorded as owed,
+  DM's close of the ally/hero thread, DN's sizing of the talent charter, **and DO's settling and
+  implementation of it.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
 **THE ALLY/HERO THREAD IS CLOSED AND NOTHING FROM IT IS CORRECTNESS-SHAPED ANY MORE.** What is
 below is design, prose, and the standing owed items.
 
-### THE TALENT CHARTER — SIZED AT DN, AWAITING A DESIGNER DECISION
+### THE TALENT CHARTER — SETTLED AND IMPLEMENTED AT DO; WHAT IS LEFT IS SIX STATUS BETS
 
-**Nothing here is correctness-shaped. All of it is a decision, and the audit exists so the decision
-is made on numbers.** Full evidence: `docs/talent-audit.html` §8 and `docs/reports/DN.md`.
+**The charter question is closed.** Full evidence: `docs/talent-audit.html` §8 and
+`docs/reports/DO.md`. What follows is what DO deliberately did NOT rule on.
 
-- **THE ANSWER TO "IS IT WORTH IT" IS: NOT AS A RE-SORT.** 318 of 324 nodes need no charter-driven
-  change; **97 NEW nodes do.** And 97 is a LARGER authoring job than the original twelve-tree pass,
-  because those were written to a THEME each spec already had and these must be written to a
-  CATEGORY the spec demonstrably has no material for — nine offensive nodes for a Cleric who has
-  never had one, nine defensive nodes for a Sharpshooter who has never had one.
-- **THREE THINGS WANT SETTLING FIRST, AND ONLY THE SECOND IS CODE.**
-  1. **§0-versus-§1 of the charter** — one sentence, worth 83 nodes (235 clean or 318 clean).
-  2. **The saved-allocation drift** (`Profile` v2, no migration hook, a MOVE mis-prices a cell).
-     **Fix it BEFORE any restructure ships, not after** — meta progression is the one thing in this
-     game that cannot be re-earned quickly, at 1 point per spec per ZONE BOSS.
-  3. **Whether the tree shrinks at all.** Worth deciding on its own merits; it does not solve this.
-- **THE SIX DRAWN NODES, IF THE CHARTER PROCEEDS AT ALL:** `bm_devoted_fury` and `bm_reserves`
-  re-authored (each is one sentence about a `SPEC_POOLS` ability and does nothing without it);
-  `sm_blade_dance`, `wd_stomp_drill`, `wd_bannerman` and `bm_ancient_pact` reworded (each stands
-  without its drawn clause). **And a seventh the ability pass cannot see:** `sm_precision` reads
-  Dazed, Crippled and Exposed, and the Swordmaster guarantees NONE of the three — Dazed comes only
-  from Charge (class draft) or Sweeping Strikes (spec pool), the other two only from `sm_lunge`.
-- **THE ONE THING THAT MUST NOT BE SILENTLY UNDONE:** CV ruled `dv_bulwark`'s 5% party heal
-  **UNCONDITIONAL**, not a dead Perfect. It is a capstone, so a re-author is likely to touch it.
-- **AND THE EXPENSIVE CONVENTION IS NOT AT RISK FROM THE RE-SORT — IT IS AT RISK FROM THE 97.**
-  HERO-versus-ALLY took five batches (CV, DJ, DK, DL, DM). A re-sort re-opens none of it.
-  **Authoring 97 new nodes writes 97 new chances to get *ally* wrong**, and
-  `docs/text-standard.html` §4.9 is the test.
+- **SIX NODE/STATUS PAIRS WENT FROM PERMITTED TO FORBIDDEN WITHOUT A CHARACTER OF THEIR TEXT
+  CHANGING, AND THEY ARE THIS BATCH'S OWN COST.** **Psychosis and Hysteria have no applier in the
+  game but Mind Flay and Mass Hysteria**, and DO moved both into the draft — so `oc_spread`,
+  `oc_whispers`, `oc_delirium` and `oc_permanent` now read a status the Occultist cannot guarantee.
+  **Before DO those were TREE-INTERNAL dependencies, which the charter explicitly permits** (a
+  cross-row dependency bets on a node the player CHOOSES, not on a card they are DEALT).
+  **The brief says "report the list; rule on nothing", so nothing is ruled** — but the cost is the
+  ruling's, not an oversight.
+  - **`oc_delirium` and `oc_permanent` also name Bewitched, which IS core**, so both still work
+    without the draw. They are the §2 "cut the bonus clause" shape and would be a REWORD.
+  - **`oc_spread` and `oc_whispers` are whole-node bets** and would need re-authoring. Re-pointing
+    them off Psychosis and onto Bewitchment is a re-author of the Madness lane's whole subject,
+    which is why it was not taken quietly.
+- **AND SIX MORE PAIRS ARE PRE-EXISTING, FOUND BY THE SAME SWEEP AND ALSO NOT RULED ON:**
+  `sm_guarded` (Crippled, Exposed), `sv_virulence` (Exposed), `ss_exposed_nerve` (Exposed) and
+  `ss_no_cover` (Dazed, Blind). **`check_do` §4 prints all twelve on every battery run** and
+  asserts only `sm_precision`, which the brief singled out.
+- **THE `owns_ability` PAYLOAD CONDITION HAS NO USER LEFT.** Kept and still tested; deleting a
+  condition kind is a design change and it is the natural mechanism for a rune.
+- **TWO ABILITIES RUN A SKILL CHECK AND ADVERTISE NO PERFECT, INSIDE A DRAFT POOL FOR THE FIRST
+  TIME.** `Rampage` and `Pyroblast` are two of the six `test_batch_cp.CHECK_WITHOUT_PERFECT` names
+  — a population that predates CN — and DO brought them into `test_batch_bo` §5's reach without
+  creating them. **Both are NAMED exemptions there rather than suppressed**, and authoring a
+  Perfect bonus for either is a design decision. **A THIRD name reaching that loop still trips.**
+- **FIVE NODES ARE NAMED AFTER LIVE ABILITIES AND DO ADDED NO SIXTH** — Second Wind, Spite, Rally,
+  Killing Frost, Divine Presence. That is the `wd_spiked`/Spite trap DN documented, and it is why
+  the Arcanist's row-4 Resonance cell is **Overdraw** rather than Overcharge. Renaming the existing
+  five is a save-format question and a separate pass.
+- **DN'S OTHER TWO FINDINGS ARE UNTOUCHED AND STILL OPEN.** (1) **The three-lane restructure needs
+  97 NEW nodes** — 30% of the layer — and **two specs hold a lane at zero** (the Cleric has no
+  offensive node in 27, the Sharpshooter no defensive one), which no shrinking of the tree rescues.
+  (2) **The saved-allocation drift is real, silent and cheap**: `Profile` is v2, the load is
+  TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
+  moved a cell** — but a restructure would need both.
 
-### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET EIGHT TIMES RUNNING
+### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET TEN TIMES RUNNING
 
 - **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN
   EVERY BATTERY SINCE — DH, DI, DJ, DK, DL AND DM — STILL OPEN, STILL UNSEEDED.** At a rate of about
-  one red in eighteen, eight quiet readings is the common case and proves nothing. `_live_curve()`
+  one red in eighteen, ten quiet readings is the common case and proves nothing. `_live_curve()`
   sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
   a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
   DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
@@ -171,10 +205,12 @@ repair.** Both are reported and neither was taken.
 - **BOTH *UPGRADED* CARDS DROP "Refunds 5 Rage" WHILE THE CODE STILL PAYS IT.** Battle Shout's and
   Hold the Line's upgraded `description`s both omit it; `attacker.resource = mini(attacker.resource
   + 5, …)` is outside every branch in both handlers.
-- **AND THE POOL-PICK BATTLE SHOUT SHOWS THE NODE'S NUMBERS.** `pool_ability` falls through to
-  `Talents.granted_ability`, so **there is one `description` in the project for three magnitudes**:
-  a pick pays **+8% for 2 turns** (`shout_base[0]`, `shout_turns[0]`) and the card promises +12%
-  for 3. `master.html` records the pool figures correctly; the card does not.
+- **THE POOL-PICK BATTLE SHOUT HALF IS CLOSED AT DO, BY SUBTRACTION RATHER THAN BY AUTHORING.**
+  It read: one `description` in the project for three magnitudes, a pick paying +8% for 2 turns
+  while the card promised +12% for 3. `battle_shout_node` indexed `[8, 12, 18]`, and **no talent
+  grants any more, so it is read-only-zero — there is ONE magnitude and the card states it.**
+  The Hold the Line half of this family is closed the same way: its UPGRADED card was written by a
+  collision that can no longer happen, and `check_dm` asserts it ABSENT.
 - **NO SYSTEMATIC SWEEP FOR EITHER WAS RUN.** DM found both by reading six cards, not by sweeping,
   and the thread stops there on purpose.
 
@@ -378,11 +414,15 @@ re-derived from the source at DM; not one was moved.**
 - **THE CAP BINDS 58 ABILITIES IN TWO POPULATIONS.** `Ability.PURE_BUFFS` holds **52** specials
   and `Ability.SHIELD_SPECIALS` holds **6**. **`Ability.takes_delay_cap()` is the one function that
   unions them** and `Ability.make()` applies the clamp.
-- **THE ABILITY CORPUS IS 216, AND `Classes.ability_corpus()` IS THE ONLY WALK THAT REACHES IT.**
-  The Batch CL enumeration alone reaches **211**; the five it misses (Backdraft, Pyroblast, Glacial
-  Prison, Cryoclasm, Intercession) are talent grants that live in no pool. **22 talent-granted
-  names in total**, all resolving. **`check_da` §3 asserts that no gate hand-rolls the walk**, with
-  `check_cz`'s `_cl_only_corpus` named as the one deliberate exemption.
+- **THE ABILITY CORPUS IS 216 AND THE TWO WALKS NOW AGREE.** The Batch CL enumeration reached
+  **211** for as long as talents granted abilities; the five it missed — Backdraft, Pyroblast,
+  Glacial Prison, Cryoclasm, Intercession — were talent grants living in no pool. **DO put all
+  twenty-two talent grants into `SPEC_DRAFT_POOLS`, which the CL walk reads, so it reaches all 216
+  and `Classes.talent_granted_names()` is EMPTY.** `check_cz` §0 asserts the agreement — its old
+  assertion is INVERTED, not deleted, so a card put back outside every pool is still caught.
+  **`check_da` §3 asserts that no gate hand-rolls the walk**, with `check_cz`'s `_cl_only_corpus`
+  named as the one deliberate exemption (its REASON string was corrected at DO: its job inverted
+  with the premise).
 - **`RECAST_GATED` HOLDS 59 ABILITIES.** `check_co` refuses 58 of the 59 after saturation;
   Interpose is additive and correctly never refuses. **Glacial Prison is the newest member and the
   reason its name appears in THREE tables in `battle.gd`** — `_recast_targets`, `_recast_writes`
@@ -396,9 +436,11 @@ re-derived from the source at DM; not one was moved.**
   else** — not Fervor, not Apostle. **ALL NINE PLACES THAT SPEAK EITHER MAGNITUDE NOW AGREE**, as
   of DG §1: the two cards, the `passive_desc`, the `faith` chip, the glossary, two `master.html`
   sites and two source comments.
-- **The ability draft is COMPLETE at 120 of 120** — `SPEC_DRAFT_POOLS` is **96** (12 specs × 8)
-  and `CLASS_DRAFT_POOLS` is **24** (4 classes × 6), counted out of `classes.gd`. **DG corrected
-  the last five prose copies of that figure**, one of which was `classes.gd`'s own draft header.
+- **The ability draft is COMPLETE at 142 of 142** — `SPEC_DRAFT_POOLS` is **118** and
+  `CLASS_DRAFT_POOLS` is **24** (4 classes × 6), counted out of `classes.gd`. **The spec half is no
+  longer a flat multiple**: DO's twenty-two ex-talent-grants took nine pools past eight and left
+  three at exactly eight. **The one authoritative per-spec table is `test_batch_cd.PER_SPEC_DEPTH`;
+  every other suite asserts the FLOOR (>= 8) and the TOTAL.** Do not write `12 * 8` again.
 - **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
 - **The pouch: 4 → 5 → 6 slots by zone** (`ITEM_SLOTS_BY_ZONE`), a slot holding one item TYPE and
   its whole stack. **Default per-type stack cap `ITEM_CAP` = 6**, with three exceptions
@@ -412,7 +454,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DN
+### THE TEST TREE, AS OF DO
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -420,8 +462,8 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **nineteen** — DM
-  added `check_dm`. **There are 26 `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty** — DO
+  added `check_do`. **There are 27 `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the four that run nowhere are `check_ck_width`, `check_cu`, `check_cv` and `check_dn`.
@@ -433,8 +475,9 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 70 ROWS: 46 suites, 19 gates, 2 scene runs
-  and 3 harness gates.** **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 71 ROWS: 46 suites, 20 gates, 2 scene runs
+  and 3 harness gates.** DO added `check_do` and moved **seventeen** existing rows, every one with
+  its reason written into the row. **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
   number is this project's oldest recurring defect, and **DG found five live copies of one figure
   and two disagreeing copies of another.** Per target it carries the expected check count (a number
   or a band), **the expected FAILURE count**, **how many readings the row rests on**, any known
@@ -592,88 +635,64 @@ went 0 → 1 on a needle DM's own text edit moved, repaired before battery 2.
 
 ### Last measurements
 
-**TWO BATTERIES AT DM, BOTH RUN ON A FROZEN TREE, AND THE FIRST ONE FOUND A REAL BREAK.** Battery 1
-is an honest complete reading — of a tree with a defect in it. It reported `check_de` **293 / 1**:
-`test_batch_al went REDDER: 1 failures, recorded 0`. `al` §3 asserted the UPGRADED Hold the Line
-card contains `"two turns"`, and DM's CV §1 correction had moved that string to "for 3 turns".
-**THE NEEDLE FOLLOWED THE STRING** — `test_batch_bf`'s case at DL, not `test_batch_bj`'s: the
-string moved because a binding ruling says a duration is stated as APPLIED, not for a reflow. **The
-new needle names its clause** (`"die\nfor 3 turns"`). `al` is 559 either way.
+**TWO BATTERIES AT DO, BOTH ON A FROZEN TREE. BATTERY 1 WAS THE DIAGNOSTIC AND IT FOUND 245
+FAILURES ACROSS 30 TARGETS AND THREE THROWS; BATTERY 2 IS THE ACCEPTANCE RUN AND IT IS CLEAN.**
+**140 files were MD5-stamped before battery 2 and re-compared after — the only two that moved are
+`baselines.json` and `docs/state.md`**, and no suite reads either (`baselines.json` is read by
+`check_de` alone; `test_batch_cd` mentions it in a comment and does not open it), which is exactly
+what makes the differ re-runnable over a frozen log directory.
 
-**BATTERY 2 RAN AGAINST A TREE FROZEN BEFORE IT BEGAN AND UNEDITED UNTIL IT FINISHED, AND IT IS THE
-ACCEPTANCE RUN.** Fourteen files were MD5-stamped at the freeze and re-compared after: identical.
-`baselines.json` carried the **PREDICTED** after-values before both, and `CLAUDE.md`,
-`docs/changelog.html`, `docs/master.html`, `docs/text-standard.html`, `docs/design-notes.md` and
-`data/glossary.json` were written before both; **`docs/state.md` and `docs/reports/DM.md` are the
-only files written after, and no suite and no gate reads either.**
-
-| | before (DL's acceptance) | DM battery 1 (found the break) | DM battery 2 (acceptance) |
+| | DN's acceptance | DO battery 1 | DO battery 2 (acceptance) |
 |---|---|---|---|
-| **suite failures** | 0 | 1 (`al`, repaired) | **0** |
+| **suite failures** | 0 | 245 across 30 targets | **0** |
+| **throws, grepped from the stream** | 0 | 3 (`ak`, `al`, `as`) | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
-| **throws, grepped from the stream** | 0 | 0 | **0** |
-| check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 289 / 0 / 0 | 293 / 1 / 0 | **293 / 0 / 0** |
+| check counts outside their band | 0 | many | **0** |
+| `check_de` | 293 / 0 / 0 | 293 / 45 / 6 | **297 / 0 / 0** |
+| targets in the manifest | 71 | 72 | **72** |
 
-**SEVENTY-ONE TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-ONE** — seventy at DL, plus
-`check_dm`. **0 `Parse Error` and 0 `SCRIPT ERROR` across every log**, grepped from the logs rather
-than read off a tally or off `$?`. `test_batch_an` read **6050**, inside its band; `check_de`
-reported **0 notices**, so nothing rose unexpectedly either.
+**SEVENTY-TWO TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-TWO. 0 `Parse Error` and 0
+`SCRIPT ERROR` in every log.** `test_batch_an` read **6049**, inside its band.
 
-**THE SANCTIONED MOVEMENTS, PREDICTED BEFORE THE RUN:**
+**THE THREE THROWS WERE ONE FAULT.** All three suites applied a granting node's payload and then
+read the ability out of `cfg["abilities"]`; with nothing granted the array is empty. **A suite that
+needs a moved card now EARNS it**, through `suite_fixture`'s existing `bm` option — which is what a
+player does.
 
-| target | before | after | movement |
-|---|---|---|---|
-| `check_dm` | — | **92 / 0** | **NEW: DM's gate.** §1 pins fourteen collection-bearing clauses and two self clauses by their own read lines, anchoring on the CLAUSE and searching BACKWARD for the walk; §2 measures all five recorded reasons on a live Ursus; §4 asserts the six cards' words and the four prose surfaces DM corrected; §5 asserts the thread's close is written down |
-| `check_de` | 289 | **293** | **+4, four assertions per target, and DM adds one gate.** Predicted, as at DJ, DK and DL |
-| `check_dk` | 64 / 0 | **64 / 0** | **unmoved, and that was predicted too.** Two entries renamed and one re-pointed; the table's SIZE did not change |
-| `test_batch_al` | 559 / 0 | **559 / 0** | **unmoved.** One needle re-pointed and two failure messages corrected; no assertion added or removed |
-| every other row | — | unchanged | unchanged |
+**ONE ROW MOVED AFTER THE RUN AND THE CODE DID NOT.** `check_de` read **297 / 1** in the battery:
+*"test_batch_bm FELL to 1888 checks, recorded 1891"* — a fall with zero failures, in a suite DO
+never edited. Its §1 row-8 duplicate-detector emits one check per **TOP-LEVEL `payload.stat`
+field** of every rows-1-to-7 node in a row-8 node's own lane, and **three mid-tree cells stopped
+writing one because DO re-authored them onto a PROTECTED CORE ability**: `cr_icy_resolve`,
+`bm_devoted_fury` and `bm_reserves`. **Measured rather than reasoned: the loop reads 238 live and
+241 with the three restored — a delta of exactly 3.** The `also`-borne terms DO also cut do not
+appear, because the loop reads the top level only. **The row moved with that reason and the differ,
+re-run over the same frozen logs, reads 297 / 0 / 0.** It was the one movement not predicted.
 
-**EVERY PREDICTION LANDED.** `check_da` (36) and `test_batch_cd` (72) both walk the gate directory
-and were checked against the new gate BEFORE the run — neither emits a per-file `ok()` except on a
-violation, and `check_dm` hand-rolls no corpus, authors no `_spawn` and instantiates no battle
-scene. Both were unmoved.
+**EIGHT NEGATIVE CONTROLS, AND ALL EIGHT BIT** — the three cut terms restored, a grant put back on
+`ar_wrath`, a cell MOVED from row 3 to row 7, `sm_precision`'s Dazed restored, Backdraft pulled
+from its draft pool, and a deliberate syntax error in `relics.gd` (26 `Parse Error` on the stderr
+grep, 0 once reverted). Every probed file was restored from a **scratchpad copy** and re-compared
+byte-for-byte — never `git checkout`.
+**AND THE THIRD CONTROL FOUND A FAULT IN THE GATE RATHER THAN IN THE CODE**: arming the first made
+`check_do` §3 report all THREE terms surviving, because the other two matched DO's own COMMENTS —
+the prose recording a cut necessarily names what was cut. That is `check_da`'s self-accusation trap
+in a second place; **the gate strips comment lines before the sweep now**, and only a negative
+control could have shown it.
 
-**THE LITERAL SWEEP WAS REBUILT MID-BATCH, BECAUSE ITS FIRST VERSION MISSED THE ONE REAL BREAK.**
-Its minimum needle length was **12 characters** and `"two turns"` is nine. The rebuilt sweep
-evaluates every literal **≥ 4 characters** in all 47 suites and 25 gates against **both** the
-`git show HEAD` version and the working version of every document in one pass — **13,781
-literals**. **Eleven pairs were LOST and all eleven are accounted for**: eight are `check_dm`'s own
-negative assertions (LOST by design), one is `check_dk`'s deliberately re-pointed `dv_waters` pin,
-one is `test_batch_ax`'s `"per ally per turn"` (a NEGATIVE assertion reading a talent node's
-`desc`, not `master.html` — `ax` read 345/0), and one is `test_batch_bx`'s `"party"` data-file
-strip literal co-occurring with the replaced DK comment (`bx` read 157/0). **The twelfth was the
-real one and the battery caught what the instrument did not.**
+**THE LITERAL SWEEP: 9,948 literals at a floor of 4**, from all 74 suites and gates, evaluated
+against **both** the `git show HEAD` and working versions of thirteen documents in one pass.
+**52 LOST pairs, all accounted for** — almost all are definitions that moved from `talents.gd` into
+`classes.gd` and appear in the GAINED list there; the rest are the three cut terms, the nine
+read-only-zero flags, and two pins this batch deliberately INVERTED. **181 GAINED pairs, and the
+dangerous kind is ZERO: all 254 negative `contains` assertions in the tree were cross-checked
+against all 181 gained pairs and none collides.**
 
-**THE CARD WIDTHS DID NOT MOVE.** Measured directly over `classes.gd` and `talents.gd` on the
-authored `description` and `perfect_text` lines, before and after: **1284 lines, 3 over the
-44-character ceiling, widest 55 — identical on both sides.**
-
-**NO GAME CODE MOVED, AND IT IS PROVED RATHER THAN CLAIMED.** `git diff` on `scripts/battle.gd` and
-`scripts/classes.gd` with comment and blank lines stripped from both sides is **empty**. **The
-check was worth running**: its first pass showed one removed line — `_sfx("heal", -5.0, 0.6)`,
-dropped from the `cons_ground` arm by a comment insertion that swallowed it. Restored before either
-battery.
-
-**SEVEN NEGATIVE CONTROLS, AND ALL SEVEN BIT:**
-
-| control | result |
-|---|---|
-| restore Battle Shout's pre-DM Rage wording | `check_dm` **2 failures** |
-| restore Hold the Line's pre-CV translated durations | `check_dm` **3 failures** |
-| put *ally* back in `master.html`'s Faith drip | `check_dm` **2 failures** |
-| put *ally* back in the glossary's Faith drip | `check_dm` **2 failures** |
-| **WIDEN Bulwark's loop to `_hero_side()`** | `check_dm` **2 failures** — the §1 gap check (3512 characters against a 120 ceiling) and the live measurement, the beast now wearing `bulwark` |
-| **NARROW Hold the Line's `undying` back to bare `heroes`** | `check_dm` **2 failures** — the chip does not reach the beast, and **the beast dies at 0 HP** instead of holding at 1 |
-| restore the pre-DM upgraded wording after the `al` repair | `test_batch_al` **1 failure**, on the re-pointed needle |
-| *(separately)* a deliberate syntax error in `scripts/relics.gd` | the `check_parse` **stderr** grep reports **19 `Parse Error`**, and **0** once reverted |
-
-**THE SIXTH IS THE ONE THAT MATTERS.** Hold the Line's `undying` clause says *ally* on the card and
-was pinned by nothing anywhere — `check_dk`'s entry covers `hold_bd` alone. **A clause that nothing
-pins is a clause that can be un-ruled silently**, which is §2's whole subject.
+**THE CARD WIDTHS DID NOT MOVE**, by construction: the census counts `description` and
+`perfect_text` lines over `classes.gd` and `talents.gd` together, and DO moved sixteen
+`description` blocks from one to the other verbatim.
 
 **AND THE ZERO IN THE FAILURE ROW IS NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio, `bo`'s §5
-NULL FIELD flake and `test_rune_battle`'s pierce were quiet in both DM runs, in DL's, in DK's, in
-DJ's and in DI's. **All three are still open, still unseeded and still banded. The next batch
-should expect any of them back, and a red from any of them is not that batch's.**
+NULL FIELD flake and `test_rune_battle`'s pierce were quiet in both DO runs — the **tenth**
+consecutive quiet reading. **All three are still open, still unseeded and still banded. A red from
+any of them is not the next batch's.**

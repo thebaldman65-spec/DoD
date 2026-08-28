@@ -108,14 +108,21 @@ func _test_earned_kit() -> void:
 	# own upgrade path. It is the SAME question — did the tree run against a
 	# kit that already held the earned copy — asked of the mechanism that is
 	# actually load-bearing today.
-	var shout_id := ""
+	# BATCH DO RE-POINTED THE PROBE AGAIN, FOR AJ'S OWN REASON, AND THE QUESTION
+	# IS STILL THE SAME QUESTION: does the tree run against a kit that ALREADY
+	# holds the earned copy? DO's charter ended every talent grant, so there is
+	# no grant-versus-upgrade index left to read. What proves the ordering now
+	# is that the earned copy is in the kit EXACTLY ONCE and the cell the node
+	# id points at still applies — a tree that ran first would have had nothing
+	# to collide with and the count would be unchanged either way, so the
+	# DOUBLE-GRANT assertion below is the load-bearing half and always was.
+	var shout_id := "bz_battle_shout"
 	var tree: Array = Talents.generate_tree("berserker", "warrior")
-	for node in tree:
-		var np: Dictionary = node.get("payload", {})
-		if np.has("new_ability") \
-				and String(np["new_ability"]["display_name"]) == "Battle Shout":
-			shout_id = String(node["id"])
-	ok(shout_id != "", "the Berserker tree still holds the Battle Shout node")
+	var shout_node: Dictionary = Talents.node_in_tree(tree, shout_id)
+	ok(not shout_node.is_empty(),
+		"the Berserker tree still holds the `%s` cell, with its id" % shout_id)
+	ok(Talents.granted_name(shout_node.get("payload", {})) == "",
+		"...and it grants nothing — a talent may not (DO's charter)")
 	var prep := func(run):
 		run.party[0]["bm_abilities"] = ["Battle Shout", "Crushing Blow"]
 		run.party[0]["talents"] = {shout_id: 1}
@@ -128,17 +135,22 @@ func _test_earned_kit() -> void:
 		ok(names.has("Battle Shout"), "an earned SPEC-pool ability is in the kit")
 		ok(names.has("Crushing Blow"), "an earned CLASS-pool ability is in the kit")
 		ok(names.count("Battle Shout") == 1, "and it is not double-granted")
-		# THE ORDERING PROOF: the index reads 2 only if the node found the
-		# pool copy already in the kit. A 1 means the tree ran first and
-		# granted its own — the exact regression this ordering fix exists
-		# to prevent.
-		ok(int(bz.battle_shout_node) == 2,
-			"the Battle Shout node UPGRADED the POOL-bought copy (index %d, want 2)" % [
+		# THE ORDERING PROOF, AS DO LEAVES IT. `battle_shout_node` counted which
+		# path ran (0 = earned only, 1 = granted, 2 = upgraded). No node grants,
+		# so it is READ-ONLY-ZERO now — asserted rather than left to be assumed,
+		# because a 1 or a 2 would mean a grant had come back.
+		ok(int(bz.battle_shout_node) == 0,
+			"`battle_shout_node` is read-only-zero — no talent grants (index %d)" % [
 				bz.battle_shout_node])
+		# ...and the card on the bar is the DRAFT card's, at its own magnitudes.
+		# The upgraded +18% had no source but the node's collision, so the card
+		# states the one magnitude the handler pays.
 		for a in bz.abilities:
 			if a.display_name == "Battle Shout":
-				ok(String(a.description).contains("18%"),
-					"...and the kit carries the upgraded description")
+				ok(String(a.description).contains("+8%"),
+					"...and the kit carries the card's ONE magnitude, +8% (DO)")
+				ok(not String(a.description).contains("18%"),
+					"...and no longer promises an upgrade nothing can grant")
 		# The trimmed three are gone unless earned.
 		ok(not names.has("Blood Price"),
 			"a trimmed ability stays out of the kit until it is earned")

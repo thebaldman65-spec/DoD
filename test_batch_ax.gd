@@ -246,14 +246,15 @@ func _tree_shape() -> void:
 			["oc_channeling", "Corrupted Channeling"], ["oc_broken_will", "Broken Will"],
 			["oc_grim", "Grim Focus"], ["oc_entropy", "Entropy"],
 			["oc_unravel", "Unraveling"], ["oc_spread", "Spread of Madness"],
-			["oc_whispers", "Whispers"], ["oc_mind_flay", "Mind Flay"],
+			# BATCH DO renamed both cells when their cards left for the draft.
+			["oc_whispers", "Whispers"], ["oc_mind_flay", "Bedlam"],
 			["oc_mirror", "Umbral Mirror"], ["oc_delirium", "Delirium"],
 			["oc_cackling", "Cackling Mirror"], ["oc_torment", "Lingering Torment"],
 			["oc_soul_leech", "Soul Leech"], ["oc_invigoration", "Invigoration"],
 			["oc_gluttony", "Gluttony"], ["oc_pleasure", "Pleasure from Pain"],
 			["oc_murderous", "Murderous Intent"], ["oc_pact_flesh", "Pact of Flesh"],
 			["oc_barter", "Dark Barter"], ["oc_avatar_ruin", "Avatar of Ruin"],
-			["oc_hysteria", "Mass Hysteria"], ["oc_soul_glut", "Soul Glut"]]:
+			["oc_hysteria", "Pandemonium"], ["oc_soul_glut", "Soul Glut"]]:
 		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
 			"%s is named %s (got %s)" % [pair[0], pair[1],
 				_node(String(pair[0])).get("name", "")])
@@ -457,10 +458,21 @@ func _boss_legibility() -> void:
 	ok(bsrc.contains('is_perfect and ab.display_name == "Pommel Strike"'),
 		"POMMEL STRIKE is the one ability left buying past the carve-out (it kept its bar)")
 	# THE LANE TEXT says it, where a player picking talents reads it.
-	for id in ["oc_spread", "oc_whispers", "oc_mind_flay", "oc_hysteria"]:
+	# BATCH DO REMOVED TWO FROM THIS LIST AND IT IS NOT A WEAKENING. The boss
+	# rule ("a boss resists until Broken") belongs to the CARD that applies the
+	# madness, and `oc_mind_flay` and `oc_hysteria` stopped being those cards —
+	# both moved into `SPEC_DRAFT_POOLS` and both cells were re-authored onto
+	# the Occultist's protected core. **The rule is asserted on the cards
+	# instead, which is where a player actually reads it**, and the two nodes
+	# that still MODIFY the madness keep their text.
+	for id in ["oc_spread", "oc_whispers"]:
 		var txt := Talents.desc_for(_node(id), 1)
 		ok(txt.contains("Broken"),
 			"%s's node text states the boss rule (got: %s)" % [id, txt])
+	for card in ["Mind Flay", "Mass Hysteria"]:
+		var ab: Ability = Classes.spec_pool_ability("occultist", card)
+		ok(ab != null and ab.description.contains("BROKEN"),
+			"%s's CARD states the boss rule" % card)
 	# THE GLOSSARY says it, and NAMES BREAK AS THE KEY.
 	var gsrc := FileAccess.get_file_as_string("res://data/glossary.json")
 	var gloss: Array = JSON.parse_string(gsrc)
@@ -881,15 +893,21 @@ func _live_amplification() -> void:
 # ---------- live: §4 both authored fallbacks ----------
 
 func _live_fallbacks() -> void:
-	# The node GRANTS when the ability was not already in hand.
+	# **BATCH DO INVERTED THIS SECTION.** Buying the cells hands out nothing —
+	# a talent may not grant an ability — so a build with no earned cards holds
+	# neither. THE RUNE OF THE FLAYED MIND STILL GRANTS MIND FLAY, and that is
+	# the distinction the charter is built on: a rune is bought with knowledge
+	# of the run in front of you.
 	var granted := await _spawn({"oc_mind_flay": 1, "oc_hysteria": 1})
 	var occ := _hero(granted, 2)
-	var mf := _find(occ, "Mind Flay")
-	var mh := _find(occ, "Mass Hysteria")
-	ok(mf != null and mh != null, "the row-3 node and the capstone grant their abilities")
-	ok(mf != null and mf.choose_two and not mf.choose_three,
-		"...and Mind Flay still takes TWO minds, because nothing collided")
-	ok(mh != null and mh.cooldown == 4, "...and Mass Hysteria keeps its 4 cooldown")
+	ok(_find(occ, "Mind Flay") == null, "the row-3 cell grants no Mind Flay (DO)")
+	ok(_find(occ, "Mass Hysteria") == null, "the capstone grants no Mass Hysteria (DO)")
+	var base_mf: Ability = Classes.spec_pool_ability("occultist", "Mind Flay")
+	ok(base_mf != null and base_mf.choose_two and not base_mf.choose_three,
+		"...and the CARD still takes TWO minds, unchanged by the move")
+	var base_mh: Ability = Classes.spec_pool_ability("occultist", "Mass Hysteria")
+	ok(base_mh != null and base_mh.cooldown == 4,
+		"...and Mass Hysteria keeps its 4 cooldown")
 	await _kill(granted)
 	# EARNED FIRST, then the node: it upgrades instead of granting. Earned picks
 	# go on BEFORE the tree at both kit-assembly sites (the AH ordering fix),
@@ -900,12 +918,16 @@ func _live_fallbacks() -> void:
 	var mf2 := _find(occ2, "Mind Flay")
 	var mh2 := _find(occ2, "Mass Hysteria")
 	ok(mf2 != null and mh2 != null, "the earned abilities are in the kit")
-	ok(mf2 != null and mf2.choose_three and not mf2.choose_two,
-		"MIND FLAY ALREADY OWNED -> it strikes THREE minions instead of two")
-	ok(mf2 != null and mf2.description.contains("THREE"),
-		"...and its tooltip says so")
-	ok(mh2 != null and mh2.cooldown == 2,
-		"MASS HYSTERIA ALREADY OWNED -> its cooldown drops 4 -> 2 (got %d)" % (
+	# BATCH DO: an `upgrade` arm fires only on a grant collision and no talent
+	# grants, so the earned cards keep their BASE shape. The upgraded variants
+	# had no source but the collision, so they are asserted ABSENT — a card
+	# promising what nothing can grant is the DM defect.
+	ok(mf2 != null and mf2.choose_two and not mf2.choose_three,
+		"an earned Mind Flay stays at TWO minds — nothing upgrades it (DO)")
+	ok(mf2 != null and not mf2.description.contains("THREE"),
+		"...and its tooltip promises no third")
+	ok(mh2 != null and mh2.cooldown == 4,
+		"an earned Mass Hysteria keeps its 4 cooldown (got %d)" % (
 			mh2.cooldown if mh2 != null else -1))
 	# The kit holds ONE of each — an upgrade must never double-grant.
 	var n_flay := 0
@@ -914,10 +936,12 @@ func _live_fallbacks() -> void:
 			n_flay += 1
 	ok(n_flay == 1, "...and neither node double-granted (%d Mind Flays)" % n_flay)
 	await _kill(owned)
-	# NEITHER NODE OWES A GENERIC ANY MORE — the Cleric class is done.
+	# NEITHER CELL OWES A FALLBACK ANY MORE, BECAUSE NEITHER CAN COLLIDE.
 	for id in ["oc_mind_flay", "oc_hysteria"]:
-		ok(Talents.collision_kind(_payload(id)) == "authored",
-			"%s carries an AUTHORED fallback" % id)
+		ok(Talents.granted_name(_payload(id)) == "",
+			"%s grants nothing, so it owes no fallback (DO's charter)" % id)
+		ok(not (_payload(id) as Dictionary).has("upgrade"),
+			"...and carries no `upgrade` arm either")
 
 
 # ---------- live: §7 the ground still pays 2 a turn with Fervor ----------

@@ -228,89 +228,91 @@ func _fallback_no_double_spend() -> void:
 	ok(landed4.is_empty(), "a fallback for an ability the hero lost is silent")
 
 
-# ---------- §1 the Arcanist's two, authored ----------
-
+# ---------- §1 the collision machinery, and the charter that emptied it ----------
+#
+# BATCH DO INVERTED THIS SECTION RATHER THAN DELETING IT. AU §1 built the
+# collision site so that no ability-granting TALENT could be silently dead:
+# an authored `upgrade`, an opt-out, or the generic fallback. **DO'S CHARTER
+# REMOVED THE POPULATION** — a talent may not grant an ability at all now, so
+# there is no talent collision left to have a fallback for.
+#
+# The machinery itself is NOT dead and must not be deleted: `apply_payload`'s
+# two grant branches are how RUNES grant, and four runes do (Comet carries a
+# `new_ability`; Binding Souls, the Last Rites and the Flayed Mind carry a
+# `grant_ability`). So what this section asserts now is BOTH halves — that no
+# talent grants, and that the site a rune reaches still works.
 func _arcanist_authored() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["arcanist"]:
-		by_id[String(n["id"])] = n
-	var oc: Dictionary = by_id["ar_overcharge"].get("payload", {})
-	ok(Talents.collision_kind(oc) == "authored",
-		"Overcharge's node carries an AUTHORED fallback")
-	ok(Talents.granted_name(oc) == "Overcharge",
-		"...on the ability it grants")
-	var oc_up: Array = oc.get("upgrade", [])
-	ok(oc_up.size() == 1
-		and int((oc_up[0].get("stat", {}) as Dictionary).get("overcharge_extra", 0)) == 1,
-		"...and it buys exactly one EXTRA use per battle")
-	var wr: Dictionary = by_id["ar_wrath"].get("payload", {})
-	ok(Talents.collision_kind(wr) == "none",
-		"Magi's Wrath deliberately owes NOTHING on a collision")
-	# ...and that is only honest because §4 gave it a passive half. A node that
-	# opted out AND had nothing else would be exactly the dead node §1 exists
-	# to close, so the two assertions belong together.
-	var wr_also: Array = wr.get("also", [])
-	ok(wr_also.size() == 1
-		and int((wr_also[0].get("stat", {}) as Dictionary).get("wrath_step_double", 0)) == 1,
-		"...because the node carries the step-doubling as a PASSIVE regardless")
-	# Every OTHER ability-granting node in the game gets the generic — the
-	# mechanism is game-wide, and a node left on nothing is what AU §1 fixes.
-	var granting := 0
-	var generic := 0
-	var generic_ids: Array = []
+	# THE CHARTER, AS A PROPERTY RATHER THAN AS A COUNT. The live number is
+	# printed beside it so a regression names itself instead of just failing.
+	var granting: Array = []
 	for spec in Talents.LANE_TREES:
 		for n in Talents.LANE_TREES[spec]:
 			var pay: Dictionary = n.get("payload", {})
-			if Talents.granted_name(pay) == "":
-				continue
-			granting += 1
-			var kind := Talents.collision_kind(pay)
-			ok(kind in ["authored", "generic", "none"],
-				"%s's collision behaviour is one of the three" % n["id"])
-			if kind == "generic":
-				generic += 1
-				generic_ids.append(String(n["id"]))
-			elif kind == "none":
-				ok(String(n["id"]) == "ar_wrath",
-					"%s is the only node that opts out entirely" % n["id"])
-	ok(granting >= 20,
-		"the roster really does hold a pile of ability-granting nodes (%d)" % granting)
-	# RE-POINTED IN PLACE BY BATCH AX, with the reason here: this floor FALLS
-	# on purpose, one class batch at a time. AU shipped it at 15 generics with
-	# only the Arcanist's two authored; AV authored Holy's two (13), AW the
-	# Devout's two (11), AX the Occultist's two (9) — and with that the CLERIC
-	# CLASS IS DONE. A bare ">= 11" would have read as a regression rather
-	# than as the mechanism working, so the floor moves WITH the reason and the
-	# survivors are NAMED below so it cannot be lowered again by attrition.
-	ok(generic >= 9,
-		"most of them fall back on the GENERIC, which is the point (%d)" % generic)
-	# THE DURABLE HALF: a class whose re-author batch has landed owes no
-	# generics at all. ALL THREE Cleric specs are authored now.
-	for done_spec in ["arcanist", "holy", "inquisitor", "occultist",
-			"berserker", "swordmaster", "warden"]:
-		for n2 in Talents.LANE_TREES.get(done_spec, []):
-			var pay2: Dictionary = n2.get("payload", {})
-			if Talents.granted_name(pay2) == "":
-				continue
-			ok(Talents.collision_kind(pay2) != "generic",
-				"%s (%s) has an AUTHORED fallback — its class batch landed" % [
-					n2["id"], done_spec])
-	# THE OTHER DURABLE HALF, ADDED BY BATCH BA now that all twelve trees are
-	# authored and the ledger is complete: THREE SPECS OWE NOTHING BECAUSE THEIR
-	# TREES GRANT NO ABILITIES AT ALL. That is a structural property, not an
-	# authoring choice, and it is worth pinning HERE as well as in each spec's
-	# own batch test — this is the file a later batch reads when it wonders
-	# whose fallbacks are outstanding, and a grant quietly added to one of these
-	# three would otherwise only move the count above.
-	for exempt in ["beastmaster", "sharpshooter", "mystic"]:
-		for n3 in Talents.LANE_TREES.get(exempt, []):
-			ok(Talents.granted_name(n3.get("payload", {})) == "",
-				"%s (%s) grants no ability — this spec owes no fallback in either direction" % [
-					n3["id"], exempt])
-	_report.append("ability-granting nodes: %d, of which %d take the generic" % [
-		granting, generic])
-	_report.append("the ledger is COMPLETE (Batch BA): Pyromancer and Cryomancer "
-		+ "are the only specs still owed authored fallbacks")
+			if Talents.granted_name(pay) != "":
+				granting.append("%s/%s -> %s" % [
+					spec, n["id"], Talents.granted_name(pay)])
+	ok(granting.is_empty(),
+		"NO talent node grants an ability (%d do: %s)" % [
+			granting.size(), ", ".join(granting)])
+	ok(Classes.talent_granted_names().is_empty(),
+		"...and `Classes.talent_granted_names()` agrees, at %d" % \
+			Classes.talent_granted_names().size())
+	# The two nodes this section was named for keep their ids and their cells
+	# and now modify the PROTECTED CORE instead of handing out a card.
+	var by_id := {}
+	for n2 in Talents.LANE_TREES["arcanist"]:
+		by_id[String(n2["id"])] = n2
+	var oc: Dictionary = by_id["ar_overcharge"].get("payload", {})
+	ok(String(oc.get("ability", "")) == "Arcane Cannon",
+		"ar_overcharge points at Arcane Cannon, which every Arcanist owns")
+	ok(not oc.has("upgrade") and not oc.has("new_ability"),
+		"...and carries neither a grant nor a collision fallback")
+	# ar_wrath kept the half that was already charter-clean: the step-doubling
+	# was an `also` payload beside the grant, and it is the whole node now.
+	# The FIELD and its one read site did not move, so AU §4's negative control
+	# (putting the doubling back on Singularity) still bites.
+	var wr: Dictionary = by_id["ar_wrath"].get("payload", {})
+	ok(int((wr.get("stat", {}) as Dictionary).get("wrath_step_double", 0)) == 1,
+		"ar_wrath still carries the step-doubling, as its whole payload now")
+	ok(not wr.has("no_fallback"),
+		"...and its `no_fallback` opt-out went with the grant it opted out of")
+	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
+	ok(usrc.count("wrath_step_double") == 2,
+		"`wrath_step_double` still has exactly its field and its one read site")
+	# THE MACHINERY SURVIVES FOR RUNES. Deleting it would have been the tidy
+	# edit and the wrong one — four runes reach these branches.
+	var tsrc := FileAccess.get_file_as_string("res://scripts/talents.gd")
+	ok(tsrc.contains("static func _collided("),
+		"the collision site is still authored, for the runes that reach it")
+	var rune_grants := 0
+	var runes_raw = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/runes.json"))
+	for key in runes_raw:
+		var pay3: Dictionary = (runes_raw[key] as Dictionary).get("payload", {})
+		if pay3.has("grant_ability") or pay3.has("new_ability"):
+			rune_grants += 1
+			var nm3 := String(pay3.get("grant_ability", ""))
+			if nm3 != "":
+				ok(Classes.pending_talent_ability(nm3) != null,
+					"rune grant `%s` still resolves outside the trees" % nm3)
+	ok(rune_grants == 4,
+		"FOUR runes grant an ability and they are the only grants left (%d)" % rune_grants)
+	# ...AND NO SPEC IS EXEMPT ANY MORE. BA pinned three specs whose trees
+	# granted nothing; that is every spec now. **IT IS ONE ASSERTION OVER ALL
+	# TWELVE RATHER THAN 324 SEPARATE ONES** — the property is the same either
+	# way, and 324 green lines that can only move together are 324 lines that
+	# say one thing. The offenders are NAMED in the message, so a regression
+	# still arrives with its spec and its id attached.
+	for exempt in Talents.LANE_TREES:
+		var bad: Array = []
+		for n3 in Talents.LANE_TREES[exempt]:
+			if Talents.granted_name(n3.get("payload", {})) != "":
+				bad.append(String(n3["id"]))
+		ok(bad.is_empty(),
+			"%s grants no ability from any of its 27 cells (%s)" % [
+				exempt, ", ".join(bad)])
+	_report.append("ability-granting talent nodes: %d (DO's charter); "
+		% granting.size() + "ability-granting RUNES: %d" % rune_grants)
 
 
 # ---------- §3 Death Ray ----------
@@ -535,26 +537,30 @@ func _live_fallback_generic() -> void:
 			if a.display_name == name:
 				copies += 1
 		ok(copies == 1, "exactly one copy of %s — no double grant (got %d)" % [name, copies])
+		# **BATCH DO INVERTED THE PAYOUT.** The generic fallback fires on a
+		# GRANT COLLISION, and no talent grants any more — so an earned card
+		# plus its old cell is just an earned card, at its BASE numbers. The
+		# `◆` mark reads `apply_upgrades`' return, so it is empty for the same
+		# reason. Both are asserted rather than removed: they are the pair that
+		# would move first if a grant came back.
 		if ab != null:
-			ok(int(ab.get(String(probe["field"]))) == int(probe["after"]),
-				"THE NODE PAID ITS FALLBACK: %s %s %d -> %s" % [name, probe["field"],
-					probe["before"], ab.get(String(probe["field"]))])
-		# The battle tooltip's ◆ reads apply_upgrades' RETURN, so a talent
-		# fallback is legible the moment it fires with nothing new to build.
+			ok(int(ab.get(String(probe["field"]))) == int(probe["before"]),
+				"NO FALLBACK FIRES: %s %s stays at its base %d (got %s)" % [
+					name, probe["field"], probe["before"],
+					ab.get(String(probe["field"]))])
 		var marks: Dictionary = h.ability_upgrades
-		ok((marks.get(name, []) as Array) == [String(probe["mark"])],
-			"...and is marked ◆ %s on the unit, off the same return (got %s)" % [
-				probe["mark"], marks.get(name, [])])
+		ok((marks.get(name, []) as Array).is_empty(),
+			"...and nothing is marked ◆ on it, because nothing collided (got %s)" % [
+				marks.get(name, [])])
 		both.queue_free()
 		await process_frame
-		# (iii) NODED WITHOUT EARNING IT: the ordinary grant, untouched by §1.
+		# (iii) THE CELL WITHOUT THE CARD: it hands out nothing at all now.
 		var plain := await _spawn({String(probe["node"]): 1}, specs)
 		var h_p := _hero(plain, 1)
-		var ab_p := _find(h_p, name)
-		ok(ab_p != null, "%s is granted normally when it was not owned" % name)
-		if ab_p != null:
-			ok(int(ab_p.get(String(probe["field"]))) == int(probe["before"]),
-				"...and is NOT upgraded — a grant is not a collision")
+		ok(_find(h_p, name) == null,
+			"%s is NOT granted by its old cell — a talent may not (DO)" % name)
+		ok(Classes.spec_draft_pool(String(probe["spec"])).has(name),
+			"...it drafts from the %s instead" % probe["spec"])
 		ok((h_p.ability_upgrades as Dictionary).get(name, []).is_empty(),
 			"...and nothing is marked on it")
 		plain.queue_free()
@@ -569,8 +575,12 @@ func _live_fallback_overcharge() -> void:
 	var arc := _hero(scene, 1)
 	var oc := _find(arc, "Overcharge")
 	ok(oc != null, "Overcharge is in the kit")
-	ok(arc.overcharge_extra == 1,
-		"THE AUTHORED FALLBACK FIRED: one extra Overcharge (got %d)" % arc.overcharge_extra)
+	# BATCH DO: `overcharge_extra` is READ-ONLY-ZERO — the arm fires on a grant
+	# collision and no talent grants. The read site (`unit.can_overcharge`) is
+	# live code, so the branch is driven from here rather than left unproved.
+	ok(arc.overcharge_extra == 0,
+		"`overcharge_extra` is read-only-zero — nothing grants (got %d)" % arc.overcharge_extra)
+	arc.overcharge_extra = 1
 	ok(oc != null and oc.cost == 20,
 		"...and the generic did NOT also fire (cost still 20)")
 	ok(not (arc.ability_upgrades as Dictionary).has("Overcharge"),
@@ -635,8 +645,13 @@ func _live_fallback_dead_end() -> void:
 	var member: Dictionary = run.party[1]
 	var node := Talents.node_in_tree(member.get("tree", []), "cr_rime")
 	var line: String = run.fallback_line(member, node.get("payload", {}))
-	ok(line.contains("NOTHING"),
-		"THE DEAD END IS STATED: '%s'" % line)
+	# BATCH DO: the tooltip line describes what a node's grant does when it
+	# COLLIDES, and `cr_rime` grants nothing, so there is no collision line to
+	# render. An empty line is the correct answer, and it is asserted rather
+	# than left to be assumed — a stale "NOTHING extra" line on a cell that
+	# hands out nothing at all would be prose describing dead machinery.
+	ok(line == "",
+		"a cell that grants nothing renders no collision line at all: '%s'" % line)
 	# A node whose grant is NOT owned says nothing at all — the line only
 	# appears when it would actually apply.
 	var unowned: Dictionary = member.duplicate(true)
@@ -658,7 +673,13 @@ func _live_capstones() -> void:
 	arc.second_resource = 12
 	ok(int(arc.resonance_dmg_bonus() * 100.0) == 234,
 		"...so at 12 stacks he reads +234%% (got %d)" % int(arc.resonance_dmg_bonus() * 100.0))
-	ok(_find(arc, "Magi's Wrath") != null, "...and the ability came with it")
+	# BATCH DO: the capstone is `Unchained` and carries ONLY the step-doubling —
+	# which is why AU §4's whole point survives: the node was never dead without
+	# the grant, and now the grant is what went.
+	ok(_find(arc, "Magi's Wrath") == null,
+		"...and the ability did NOT come with it — a talent may not grant (DO)")
+	ok(Classes.spec_draft_pool("arcanist").has("Magi's Wrath"),
+		"...it drafts from the Arcanist instead")
 	wr.queue_free()
 	await process_frame
 	# §4 AND §1 CLOSE EACH OTHER'S WORST CASE, and this is the check that says so:

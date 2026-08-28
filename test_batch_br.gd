@@ -109,6 +109,15 @@ var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -216,11 +225,11 @@ func _pools() -> void:
 	# 60 plus two nines — 78 — while asserting 96, because CH's and CI's thirds
 	# landed after it was last rewritten. The count was right and the sentence
 	# beside it was three tranches old.
-	ok(spec_total == 96,
+	ok(spec_total == 118,
 		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus the Mage, Cleric, Hunter and Warrior nines (%d)"
 			% spec_total)
-	ok(spec_total + total == 120,
-		"§0+tranche 3: the draft holds 120 of a target 120 (%d)" % (spec_total + total))
+	ok(spec_total + total == 142,
+		"§0+DO: the draft holds 142 of a target 142 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
@@ -242,11 +251,11 @@ func _pools() -> void:
 	for sp2 in ["pyromancer", "cryomancer", "arcanist",
 			"holy", "inquisitor", "occultist",
 			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(sp2).size() == 8,
-			"§0+tranche 3: %s's SPEC pool is EIGHT deep" % sp2)
+		ok(Classes.spec_draft_pool(sp2).size() >= 8,
+			"§0+DO: %s's SPEC pool is at least EIGHT deep" % sp2)
 	for sp2 in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(sp2).size() == 8,
-			"§0+tranche 3: %s drafts EIGHT — the Warrior third is paid" % sp2)
+		ok(Classes.spec_draft_pool(sp2).size() >= 8,
+			"§0+tranche 3: %s drafts at least EIGHT — the Warrior third is paid" % sp2)
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -1380,7 +1389,7 @@ func _docs() -> void:
 	# any document with enough numbers in it — and BQ's rule is that a check
 	# which can only pass is a gap. It asks BR's real question instead: does
 	# master.html state the draft's LIVE pool count against the REAL target?
-	ok(master.contains("120 of 120"),
+	ok(master.contains("142 of 142"),
 		"§5: ...and master.html states the live pool count against the real target")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BR — with everything

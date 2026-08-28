@@ -137,11 +137,20 @@ func _test_pools() -> void:
 		and pool_hs.cost == kit_hs.cost and pool_hs.damage == kit_hs.damage
 		and pool_hs.multi_hits == kit_hs.multi_hits,
 		"the pool's Hack and Slash is the kit's Hack and Slash")
+	# BATCH DO RE-POINTED THIS AND THE QUESTION IS UNCHANGED: is there ONE copy
+	# of Battle Shout, or two that can drift? AH asserted the pool copy equals
+	# the TALENT'S copy, because the definition lived in `bz_battle_shout`'s
+	# payload. DO moved that definition into `Classes.draft_ability` — a talent
+	# may not grant an ability — so the single source is the DRAFT card, and
+	# `Talents.granted_ability` correctly returns null for it now.
 	var pool_bs: Ability = Classes.pool_ability("Battle Shout")
-	var talent_bs: Ability = Talents.granted_ability("Battle Shout")
-	ok(pool_bs != null and talent_bs != null and pool_bs.cost == talent_bs.cost
-		and pool_bs.cooldown == talent_bs.cooldown,
-		"the pool's Battle Shout is the talent's Battle Shout")
+	var draft_bs: Ability = Classes.draft_ability("Battle Shout")
+	ok(pool_bs != null and draft_bs != null and pool_bs.cost == draft_bs.cost
+		and pool_bs.cooldown == draft_bs.cooldown
+		and pool_bs.description == draft_bs.description,
+		"the pool's Battle Shout is the DRAFT card's Battle Shout — one copy")
+	ok(Talents.granted_ability("Battle Shout") == null,
+		"...and no talent hands out a second one (DO's charter)")
 
 
 # ---------- §3: offer composition ----------

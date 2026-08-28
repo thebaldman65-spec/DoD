@@ -101,17 +101,49 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 	# assertion CY ran inline inside its own corpus walk; it moved here when the
 	# walk moved onto `Classes`, because a function returning a corpus should
 	# not also be the thing that shouts about a broken one.
+	# BATCH DO EMPTIED THIS LIST AND THE LOOP IS KEPT WITH AN ASSERTION IN
+	# FRONT OF IT. A `for` over an empty array is a check that has stopped
+	# asking its question, which this project rates worse than a red — so the
+	# EMPTINESS is now asserted outright, and the loop stays live behind it so
+	# the day a grant comes back it is still resolved rather than assumed.
 	var granted: Array = Classes.talent_granted_names()
+	ok(granted.is_empty(),
+		"NO talent node grants an ability (DO's charter); the list holds %d" % granted.size())
 	for nm in granted:
 		ok(Talents.granted_ability(String(nm)) != null,
 			"talent grant `%s` resolves to nothing" % nm)
 		ok(by_name.has(nm),
 			"talent grant `%s` is not in the corpus — the walk has a hole again" % nm)
-	print("  talent-granted names: %d, all resolved and all in the corpus" % granted.size())
+	print("  talent-granted names: %d (DO moved all twenty-two into the draft)" % granted.size())
+	# THE TWENTY-TWO ARE STILL IN THE CORPUS, and that is the half worth
+	# asserting now: they moved home, they did not stop existing. The corpus
+	# reaching them through `spec_draft_pool` instead of through the trees is
+	# exactly what "the draft is where abilities come from" means.
+	for moved in ["Battle Shout", "Rampage", "Lunge", "Execute", "Hold the Line",
+			"Backdraft", "Immolate", "Pyroblast", "Firestorm", "Phoenix Rebirth",
+			"Rime", "Glacial Prison", "Cryoclasm", "Shatter", "Overcharge",
+			"Magi's Wrath", "Divine Plea", "Intercession", "Sacred Resolve",
+			"Bulwark of Fortitude", "Mind Flay", "Mass Hysteria"]:
+		ok(by_name.has(moved),
+			"`%s` left the trees and is still in the corpus" % moved)
+		var homes: Array = []
+		for spec2 in Classes.all_specs():
+			if Classes.spec_draft_pool(spec2).has(moved):
+				homes.append(spec2)
+		ok(homes.size() == 1,
+			"...and it drafts from exactly one spec pool (%s)" % str(homes))
 
-	# THE FIVE, AND THE COUNT THAT PROVES THEY WERE MISSING. The CL walk is
-	# re-derived here rather than trusted: the gap is the whole point of §0, and
-	# a gap you assert from memory is a gap you stop measuring.
+	# THE FIVE, AND THE HOLE THEY MEASURED — **CLOSED BY BATCH DO.** This block
+	# asserted, for eight batches, that the Batch CL walk could NOT reach these
+	# five, because each was granted by a talent node and lived in no pool. DO
+	# moved all twenty-two talent grants into `SPEC_DRAFT_POOLS`, and the CL
+	# walk reads the draft pools — so the gap it was measuring is gone.
+	#
+	# **THE ASSERTION IS INVERTED, NOT DELETED, AND THE MESSAGE IT USED TO
+	# CARRY IS THE ONE THAT CAME TRUE:** "§0's premise has changed and the
+	# report is stale". It had never fired. It fires as its opposite now, so a
+	# batch that put one of the five back outside every pool would be caught by
+	# the same line reading the other way.
 	var cl := _cl_only_corpus()
 	var cl_names := {}
 	for ab in cl:
@@ -120,8 +152,14 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 		cl.size(), corpus.size()])
 	for nm in TALENT_ONLY:
 		ok(by_name.has(nm), "%s is not in the complete corpus" % nm)
-		ok(not cl_names.has(nm),
-			"%s IS in the CL walk — §0's premise has changed and the report is stale" % nm)
+		ok(cl_names.has(nm),
+			"%s is NOT in the CL walk — DO put it in a draft pool, so it must be" % nm)
+	# AND THE WHOLE POINT, AS ONE LINE: the two walks agree now. CL's
+	# enumeration reached 211 of 216 for as long as talents granted abilities;
+	# nothing lives outside a kit or a pool any more.
+	ok(cl.size() == corpus.size(),
+		"the CL walk and the complete walk now agree (%d vs %d)" % [
+			cl.size(), corpus.size()])
 
 	# ---- CN's CRITERION AND CO's, RE-RUN OVER THE FIVE. REPORT, NOT REPAIR ----
 	# CN decides whether a card runs a TIMING BAR; CO decides whether a recast

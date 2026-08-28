@@ -58,27 +58,30 @@ const NODES := {
 	"cr_hungering": [1, "Winter", "Hungering Cold"],
 	"cr_emp_frostbolt": [2, "Winter", "Deep Chill"],
 	"cr_grasp": [3, "Winter", "Winter's Grasp"],
-	"cr_rime": [4, "Winter", "Rime"],
+	# BATCH DO renamed all four ability cells. A node named after a live DRAFT
+	# CARD is the `wd_spiked`/Spite collision DN documented, so each cell took
+	# a name of its own when its card left for the pool.
+	"cr_rime": [4, "Winter", "Snowblind"],
 	"cr_icy_resolve": [5, "Winter", "Icy Resolve"],
 	"cr_whiteout": [6, "Winter", "Whiteout"],
 	"cr_splinter": [7, "Winter", "Splintering Shards"],
 	"cr_frostbite": [1, "Deep Freeze", "Brittle Ice"],
 	"cr_bitter": [2, "Deep Freeze", "Bitter Cold"],
 	"cr_frigid": [3, "Deep Freeze", "Frigid Grip"],
-	"cr_numbing": [4, "Deep Freeze", "Glacial Prison"],
+	"cr_numbing": [4, "Deep Freeze", "Numbing Cold"],
 	"cr_frost_ward": [5, "Deep Freeze", "Second Prison"],
 	"cr_cold_snap": [6, "Deep Freeze", "Cold Snap"],
 	"cr_glacial": [7, "Deep Freeze", "Glacial Economy"],
 	"cr_hypothermia": [1, "Thaw", "Hypothermia"],
 	"cr_freezing": [2, "Thaw", "Killing Frost"],
 	"cr_crystal": [3, "Thaw", "Crystal Edge"],
-	"cr_lance_focus": [4, "Thaw", "Cryoclasm"],
+	"cr_lance_focus": [4, "Thaw", "Focused Lance"],
 	"cr_piercing": [5, "Thaw", "Piercing Ice"],
 	"cr_razor_hone": [6, "Thaw", "Honed Shards"],
 	"cr_icy_veins": [7, "Thaw", "Shattered Tempo"],
 	"cr_eternal": [9, "Winter", "Eternal Winter"],
 	"cr_absolute": [9, "Deep Freeze", "Absolute Zero"],
-	"cr_shatter": [9, "Thaw", "Shatter"],
+	"cr_shatter": [9, "Thaw", "Shardfall"],
 }
 
 # id -> [stat field, the value the PAYLOAD writes]. ADDITIVE units: each is
@@ -88,7 +91,10 @@ const PAYLOADS := {
 	"cr_hungering": ["hungering_ranks", 3],
 	"cr_emp_frostbolt": ["deep_chill_ranks", 1],
 	"cr_grasp": ["grasp_ranks", 2],
-	"cr_icy_resolve": ["icy_resolve_ranks", 2],
+	# BATCH DO RE-AUTHORED `cr_icy_resolve`. It read "Rime lasts 2 additional
+	# turns" — and Rime left the tree for the draft in the same batch, so the
+	# whole node became a bet. It modifies BLIZZARD now, which is PROTECTED
+	# CORE, through the ability branch rather than through a stat.
 	"cr_whiteout": ["whiteout_ranks", 3],
 	"cr_splinter": ["splinter_ranks", 1],
 	"cr_frostbite": ["frostbite_ranks", 6],
@@ -110,7 +116,7 @@ const PAYLOADS := {
 # of their read sites lives in battle.gd.
 const TOOLTIPS := {
 	"cr_hungering": "3", "cr_emp_frostbolt": "2", "cr_grasp": "2",
-	"cr_icy_resolve": "2", "cr_whiteout": "3", "cr_frostbite": "6",
+	"cr_whiteout": "3", "cr_frostbite": "6",
 	"cr_bitter": "2", "cr_frigid": "10", "cr_cold_snap": "15",
 	"cr_glacial": "15", "cr_hypothermia": "3", "cr_freezing": "30",
 	"cr_crystal": "15", "cr_piercing": "30", "cr_razor_hone": "3",
@@ -281,30 +287,36 @@ func _ability_nodes() -> void:
 	var by_id := {}
 	for n in Talents.LANE_TREES["cryomancer"]:
 		by_id[String(n["id"])] = n
+	# BATCH DO — THE NODES STOPPED GRANTING AND THE CARDS DID NOT STOP EXISTING,
+	# SO THIS SECTION ASKS THE SAME FOUR QUESTIONS OF THE DRAFT POOL. Every
+	# number below is the number the node's payload used to carry — they were
+	# lifted VERBATIM into `Classes.draft_ability`, so a drift between the two
+	# would show up here as a changed cost, initiative or cooldown.
 	for id in ABILITY_NODES:
 		if not by_id.has(id):
 			continue
 		var want: Array = ABILITY_NODES[id]
 		var cfg := {"abilities": []}
 		Talents.apply_payload(cfg, by_id[id]["payload"], 1, {})
-		var abs_list: Array = cfg["abilities"]
-		ok(abs_list.size() == 1, "%s grants exactly one ability" % id)
-		if abs_list.is_empty():
+		ok(cfg["abilities"].is_empty(),
+			"%s grants NOTHING — a talent may not (DO's charter)" % id)
+		var ab: Ability = Classes.spec_pool_ability("cryomancer", String(want[0]))
+		ok(ab != null, "%s's card, %s, is drafted now" % [id, want[0]])
+		if ab == null:
 			continue
-		var ab: Ability = abs_list[0]
-		ok(ab.display_name == want[0], "%s grants %s (got %s)" % [id, want[0], ab.display_name])
+		ok(Classes.spec_draft_pool("cryomancer").has(String(want[0])),
+			"%s is in the Cryomancer's draft pool" % want[0])
 		ok(ab.cost == want[1], "%s costs %d (got %d)" % [want[0], want[1], ab.cost])
 		ok(abs(ab.delay - want[2]) < 0.001,
 			"%s costs %.1f initiative (got %.1f)" % [want[0], want[2], ab.delay])
 		ok(ab.cooldown == want[3],
 			"%s cools down in %d (got %d)" % [want[0], want[3], ab.cooldown])
 	# The two NEW abilities carry their specials; nothing else claims them.
-	var gp := {"abilities": []}
-	Talents.apply_payload(gp, by_id["cr_numbing"]["payload"], 1, {})
-	ok(gp["abilities"][0].special == "glacial_prison", "Glacial Prison carries its special")
-	var cc := {"abilities": []}
-	Talents.apply_payload(cc, by_id["cr_lance_focus"]["payload"], 1, {})
-	ok(cc["abilities"][0].special == "cryoclasm", "Cryoclasm carries its special")
+	var gp: Ability = Classes.spec_pool_ability("cryomancer", "Glacial Prison")
+	ok(gp != null and gp.special == "glacial_prison",
+		"Glacial Prison carries its special")
+	var cc: Ability = Classes.spec_pool_ability("cryomancer", "Cryoclasm")
+	ok(cc != null and cc.special == "cryoclasm", "Cryoclasm carries its special")
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	# RE-POINTED 1 -> 3 AT BATCH DF, AND THE QUESTION IS THE SAME QUESTION. What
 	# this refuses is a SECOND COPY of a handler that could drift from the first.
@@ -472,11 +484,16 @@ func _dissolved_pair() -> void:
 
 # ---------- live ----------
 
-func _spawn(learned: Dictionary, lineup: Array, ty := "fight") -> Node:
+# BATCH DO added `earned`: the four Cryomancer cards are drafted now, so a
+# suite that needs one on the bar earns it exactly as a player does.
+func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
+		earned: Array = []) -> Node:
+	var opts := {"enemies": lineup, "node_type": ty,
+		"talents": {1: learned.duplicate()}, "deterministic": true}
+	if not earned.is_empty():
+		opts["bm"] = {1: earned}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": lineup, "node_type": ty, "talents": {1: learned.duplicate()},
-		"deterministic": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
 
 func _cryo(scene: Node) -> BattleUnit:
@@ -892,7 +909,7 @@ func _live_releases() -> void:
 	await process_frame
 	# Cryoclasm MOVES a hold without spending it — no release payoff fires.
 	var cc := await _spawn({"cr_lance_focus": 1, "cr_icy_veins": 1},
-		["raider", "raider", "raider"])
+		["raider", "raider", "raider"], "fight", ["Cryoclasm"])
 	var c4 := _cryo(cc)
 	if c4 != null:
 		var cfoes: Array = cc.get("enemies")
@@ -914,7 +931,7 @@ func _live_releases() -> void:
 	await process_frame
 	# Shatter is the MASS release, paid on the pile each prison carried.
 	var sh := await _spawn({"cr_shatter": 1, "cr_absolute": 1},
-		["raider", "raider", "raider"])
+		["raider", "raider", "raider"], "fight", ["Shatter"])
 	var c5 := _cryo(sh)
 	if c5 != null:
 		var hfoes: Array = sh.get("enemies")

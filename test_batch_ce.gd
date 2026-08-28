@@ -119,6 +119,15 @@ const DEVOUT_KEY := "inquisitor"
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -201,7 +210,7 @@ func _pools() -> void:
 			"holy", "inquisitor", "occultist",
 			"beastmaster", "sharpshooter", "mystic"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
+		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
 		var seen := {}
 		for n in pool:
 			seen[String(n)] = 1
@@ -228,27 +237,27 @@ func _pools() -> void:
 	# the reason it inverts rather than being deleted — the question is still
 	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT — tranche 3 is complete" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT — tranche 3 is complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d"
+	ok(total == 118, "the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d"
 		% total)
-	ok(total == 12 * 8,
-		"...which is ALL TWELVE at eight — the draft is complete (Batch CI)")
+	ok(total > 12 * 8,
+		"...which is ABOVE CI's flat ninety-six — DO's twenty-two landed here")
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 120, "the draft holds 120 of a target 120 (got %d)"
+	ok(draft_total == 142, "the draft holds 142 of a target 142 (got %d)"
 		% draft_total)
 	# INVERTED BY BATCH CI RATHER THAN DELETED. These asserted a DEBT for three
 	# batches; CI paid it, so what they assert now is that there is none — which
 	# is the thing a later batch could break (a pool emptying, a card removed),
 	# and it is the same question with the correct answer moved.
-	ok(120 - draft_total == 0,
-		"NOTHING is owed — the draft is complete at 120 of 120")
-	ok(96 - total == 0, "...and the spec half is full at 96")
+	ok(142 - draft_total == 0,
+		"NOTHING is owed — the draft is complete at 142 of 142")
+	ok(118 - total == 0, "...and the spec half is full at 118")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
@@ -537,7 +546,7 @@ func _docs() -> void:
 	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
 	ok(_stamped >= "CE",
 		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
-	ok(doc.contains("120 of 120") or doc.contains("120 of a target 120"),
+	ok(doc.contains("142 of 142") or doc.contains("142 of a target 142"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:
 		ok(doc.contains(n), "master.html's draft table lists %s" % n)

@@ -134,29 +134,13 @@ const LANE_TREES := {
 		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 1, "lane": "Fury", "row": 2,
 			"desc": "+20% damage dealt AND +15% damage taken.",
 			"payload": {"stat": {"dmg_bonus": 0.20, "dmg_taken_bonus": 0.15}}},
-		# Stays in Fury: a Rage-spent buff. Its bleed scaling is deliberate
-		# cross-lane synergy — splashing into Bloodletting makes it better.
-		#
-		# Battle Shout also sits in the Berserker spec pool (Batch AH), so
-		# this node GRANTS it when unowned and UPGRADES it when the hero
-		# earned it from a pick — the AK pattern. `battle_shout_node` counts
-		# which happened: 1 = granted here, 2 = upgraded. The `also` half
-		# fires on BOTH paths (apply_payload runs it outside the branch), so
-		# the upgrade path lands on 2 and battle.gd reads the one field.
-		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "lane": "Fury", "row": 3,
-			"desc": "New ability: Battle Shout — every hero gains +12% damage, plus 1% for every 20 points of blood buildup on the warband, for 3 turns (15 Rage, 2cd). If Battle Shout was already earned, this UPGRADES it instead: +18% base and 4 turns.",
-			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
-				"special": "battle_shout", "delay": 1.5, "anim": "attack03", "cooldown": 2,
-				"perfect_id": "", "perfect_text": "",
-				"description": "A roar every hero answers: +12%\ndamage, plus 1% per 20 blood buildup\non the warband. Lasts 3 turns.\nRefunds 5 Rage."},
-				"upgrade": [
-					{"stat": {"battle_shout_node": 1}},
-					{"ability": "Battle Shout", "set": {
-						"description": "A roar every hero answers: +18%\ndamage, plus 1% per 20 blood buildup\non the warband. Lasts 4 turns."}},
-				],
-				"also": [
-					{"stat": {"battle_shout_node": 1}},
-				]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Battle Shout; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies BLOODLUST, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "bz_battle_shout", "name": "Battle Roar", "ranks": 1, "lane": "Fury", "row": 3,
+			"desc": "Bloodlust costs {v} less Rage and deals +8% of Attack.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Bloodlust", "add": {"cost": -10, "damage": 8}}},
 		# Re-spec (was a flat +4% damage dial): same name, now conditional.
 		{"id": "bz_deathwish", "name": "Deathwish", "ranks": 1, "lane": "Fury", "row": 4,
 			"desc": "+{v}% damage dealt while below 35% health.",
@@ -273,28 +257,14 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).",
 			"payload": {"stat": {"undying_rage": 1}}},
-		# Moved from Fury: chain-on-kill is momentum's payoff.
-		#
-		# Batch AJ: Rampage also sits in the Berserker spec pool, so the
-		# capstone UPGRADES an already-earned copy instead of granting a
-		# second one — the AK pattern, same as Battle Shout above. The
-		# upgrade buys a second chain per turn; the grant path is capped at
-		# one, which is the cap this batch introduces (the recast used to
-		# chain without any bound at all).
-		{"id": "bz_rampage", "name": "Rampage", "ranks": 1, "lane": "Warpath", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Rampage; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies WILDSTRIKES, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "bz_rampage", "name": "Bloodstorm", "ranks": 1, "lane": "Warpath", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd). If Rampage was already earned, this UPGRADES it instead: the free recast may chain TWICE per turn rather than once.",
-			"payload": {"new_ability": {"display_name": "Rampage", "cost": 40,
-				"damage": 20, "pressure": 10, "multi_hits": 3, "bleed_build": 10,
-				"delay": 4.0, "anim": "attack01", "cooldown": 4,
-				"perfect_extra_hit": false,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."},
-				"upgrade": [
-					{"stat": {"rampage_upgraded": 1}},
-					{"ability": "Rampage", "set": {
-						"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nrecasts on another enemy — twice a turn."}},
-				]}},
+			"desc": "Wildstrikes deals +{v}% of Attack to every enemy, and its cooldown falls to 1.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Wildstrikes", "add": {"damage": 10}, "set": {"cooldown": 1}}},
 	],
 	"swordmaster": [
 		# Purpose-designed lanes (Batch F, 07-30); Batch AI re-cut the tiers
@@ -326,21 +296,13 @@ const LANE_TREES := {
 			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
 			"scale": {"step": 12},
 			"payload": {"stat": {"seasoned_off_bonus": 0.12}}},
-		# Batch AK: the grant is unchanged, but Lunge also sits in the spec
-		# pool — so a hero who earned it there gets the node's UPGRADE
-		# instead of a second copy of the same button.
-		{"id": "sm_lunge", "name": "Lunge", "ranks": 1, "lane": "Blade", "row": 2,
-			"desc": "New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int). If Lunge was already earned, this UPGRADES it instead: 15 Rage, and it applies BOTH Exposed and Crippled whatever the guard.",
-			"payload": {"new_ability": {"display_name": "Lunge", "cost": 25,
-				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
-				"resource_gain": 10,
-				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
-				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them for\n3 turns. Builds 10 Rage."},
-				"upgrade": [
-					{"stat": {"lunge_upgraded": 1}},
-					{"ability": "Lunge", "set": {"cost": 15,
-						"description": "A committed thrust that Exposes AND\nCripples the target for 3 turns —\nwhatever guard he holds.\nBuilds 10 Rage."}},
-				]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Lunge; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies OVERPOWER, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "sm_lunge", "name": "Committed Thrust", "ranks": 1, "lane": "Blade", "row": 2,
+			"desc": "Overpower costs {v} less Rage and builds 10 Rage on the blow.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Overpower", "add": {"cost": -10, "resource_gain": 10}}},
 		# Re-spec (was Keen Edge, flat +2% crit; same id, so saved ranks
 		# carry): keyed to the stance — Aggressive gets an identity past
 		# its flat +15%.
@@ -348,8 +310,14 @@ const LANE_TREES := {
 			"desc": "+{v}% critical strike chance while in the Aggressive stance.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"killing_edge_ranks": 1}}},
+		# BATCH DO — RE-POINTED. It read *"Dazed, Crippled and Exposed"* and the
+		# Swordmaster guarantees NONE of the three: Dazed comes only from Charge
+		# (class draft) or Sweeping Strikes (a `SPEC_POOLS` trophy), and Crippled
+		# and Exposed came only from `sm_lunge` — WHICH LEFT THE TREE IN THIS SAME
+		# BATCH, so the last non-drawn source went with it. STUNNED is what POMMEL
+		# STRIKE applies, and Pommel Strike is PROTECTED CORE.
 		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 1, "lane": "Blade", "row": 4,
-			"desc": "+{v}% critical strike chance against Dazed, Crippled, and Exposed targets.",
+			"desc": "+{v}% critical strike chance against Stunned targets.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"precision_ranks": 1}}},
 		# The Lunge half is an ability hook resolved at the CAST site, not
@@ -357,7 +325,7 @@ const LANE_TREES := {
 		# pool entry, so a Lunge earned AFTER this node was taken has to
 		# benefit too — which a stat written once at spawn could not do.
 		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 1, "lane": "Blade", "row": 5,
-			"desc": "Overpower gains +{v}% critical strike chance — and Lunge too, if he has it.",
+			"desc": "Overpower gains +{v}% critical strike chance.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"blade_crit_ranks": 1}}},
 		# Re-spec (was Momentum, a flat +3% damage dial): pairs with
@@ -434,13 +402,9 @@ const LANE_TREES := {
 		# the ability the kit correction GUARANTEES him, and the `also`
 		# half pays extra if he draws the other anyway.
 		{"id": "sm_blade_dance", "name": "Sunder Guard", "ranks": 1, "lane": "Breaker", "row": 2,
-			"desc": "Guard Change deals {v} Break damage to EVERY enemy (up from 15 to one). If he also owns Shatterpoint, that deals +40 Break damage as well.",
+			"desc": "Guard Change deals {v} Break damage to EVERY enemy (up from 15 to one).",
 			"scale": {"step": 40},
-			"payload": {"stat": {"guard_change_bd": 40},
-				"also": [
-					{"condition": {"owns_ability": "Shatterpoint"},
-						"stat": {"sunder_guard_bd": 40}},
-				]}},
+			"payload": {"stat": {"guard_change_bd": 40}}},
 		# Moved from Poise: debuff-fed armor is pressure bookkeeping.
 		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 1, "lane": "Breaker", "row": 3,
 			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle. The growth is unbounded but armor is not: no amount of it reduces a blow by more than 85%.",
@@ -502,21 +466,14 @@ const LANE_TREES := {
 			"scale": {"step": 100},
 			"payload": {"stat": {"overpressure": 100}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# Batch AK: Execute also sits in the spec pool, so a hero who
-		# earned it there gets the UPGRADE instead of a second copy.
-		{"id": "sm_execute", "name": "Execute", "ranks": 1, "lane": "Blade", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Execute; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies POMMEL STRIKE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "sm_execute", "name": "Finisher", "ranks": 1, "lane": "Blade", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd). If Execute was already earned, this UPGRADES it instead: the threshold rises to 35% health, and it costs NO Rage against a Broken target.",
-			"payload": {"new_ability": {"display_name": "Execute", "cost": 30,
-				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
-				"cooldown": 3,
-				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
-				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."},
-				"upgrade": [
-					{"stat": {"execute_upgraded": 1}},
-					{"ability": "Execute", "set": {
-						"description": "End them. Usable against targets below\n35% health — or Broken ones, and\nagainst a Broken target it is FREE."}},
-				]}},
+			"desc": "Pommel Strike deals +{v}% of Attack, and its cooldown falls to 1.",
+			"scale": {"step": 30},
+			"payload": {"ability": "Pommel Strike", "add": {"damage": 30}, "set": {"cooldown": 1}}},
 		# Re-spec (was +5% parry / -5% damage taken): the Defensive stance
 		# becomes a genuine wall against melee — and every parry a stun.
 		{"id": "sm_untouchable", "name": "Untouchable", "ranks": 1, "lane": "Poise", "row": 9,
@@ -554,8 +511,12 @@ const LANE_TREES := {
 		# ability they modified into the earnable spec pool, so each was
 		# dead on a Warden who never drew it. wd_stomp_drill (War Stomp's
 		# refuel) and wd_bannerman (Interpose's charges) now key to
-		# something he always has, and the old ability rides on top as an
-		# `owns_ability` rider.
+		# something he always has.
+		# **BATCH DO CUT THE `owns_ability` RIDERS THAT USED TO SIT ON TOP.**
+		# A rider that pays only a Warden who DREW War Stomp or Interpose is
+		# the bet the talent charter forbids — a bonus clause on a drawn card
+		# is still a bet. The clauses went, and `rallying_stomp_ranks` and
+		# `bulwark_line_ranks` went with them: field, payload and read site.
 		#
 		# ONE CROSS-ROW CONDITION: Spite and Bruising Guard used to be an
 		# exclusive fork (reflect the damage, or convert the blocks into
@@ -683,10 +644,11 @@ const LANE_TREES := {
 		# saved picks migrate. Batch AH made War Stomp EARNABLE rather than
 		# part of the opening kit, which left this node dead on a Warden who
 		# never drew it. The party refuel is Banner's real cargo, so it now
-		# happens on its own, at his turn, and War Stomp deepens it if he
-		# has it. `owns_ability` is the honest instrument here because NO
-		# node grants War Stomp — the only question is whether the kit holds
-		# it (the AK correction).
+		# happens on its own, at his turn.
+		# **BATCH DO: THE "AND WAR STOMP DEEPENS IT IF HE HAS IT" HALF IS GONE.**
+		# It rode an `owns_ability` condition, which was the honest instrument
+		# for the question it asked — but the question itself is the one the
+		# charter forbids a talent to ask.
 		# BATCH DK §2 — HERO, BECAUSE A BEAST HAS NO RESOURCE BAR. A companion is
 		# built with no `resource_name`, and `unit.gd` renders its plate without a
 		# resource bar, so a refuel would restore nothing anyone could spend. The
@@ -699,13 +661,9 @@ const LANE_TREES := {
 		# a bar that does not exist, and the guard is the ruling rather than a
 		# decoration on it.
 		{"id": "wd_stomp_drill", "name": "Rallying Cry", "ranks": 1, "lane": "Banner", "row": 3,
-			"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.",
+			"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource.",
 			"scale": {"step": 4},
-			"payload": {"stat": {"rallying_cry": 4},
-				"also": [
-					{"condition": {"owns_ability": "War Stomp"},
-						"stat": {"rallying_stomp_ranks": 1}},
-				]}},
+			"payload": {"stat": {"rallying_cry": 4}}},
 		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 1, "lane": "Banner", "row": 4,
 			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
 			"scale": {"step": 20},
@@ -720,13 +678,9 @@ const LANE_TREES := {
 		# that Shieldwall's own stance does, so the cover is real Block, not
 		# a separate mitigation site.
 		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 1, "lane": "Banner", "row": 5,
-			"desc": "Shieldwall also grants every other hero +{v}% Block chance for its duration. If he owns Interpose, each hero gains 1 additional shield charge from it as well.",
+			"desc": "Shieldwall also grants every other hero +{v}% Block chance for its duration.",
 			"scale": {"step": 10},
-			"payload": {"stat": {"bulwark_ally_block": 10},
-				"also": [
-					{"condition": {"owns_ability": "Interpose"},
-						"stat": {"bulwark_line_ranks": 1}},
-				]}},
+			"payload": {"stat": {"bulwark_ally_block": 10}}},
 		# Re-spec (was Fortress, a flat max-HP dial): conditional on the
 		# Warden being healthy — the party's mitigation depends on keeping
 		# him standing, so healing him is protecting everyone.
@@ -778,26 +732,14 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "The first attack the Warden Blocks each turn is answered with a free Crushing Blow.",
 			"payload": {"stat": {"vengeful_guardian": 1}}},
-		# Batch AL: Hold the Line also sits in the Warden spec pool (Batch
-		# AH), so the capstone GRANTS it when unowned and UPGRADES it when
-		# the hero already earned it from a pick — the AK pattern, exactly
-		# as Battle Shout and Rampage do in the Berserker tree. A capstone
-		# that hands you a second copy of an ability you already cast is the
-		# worst pick in the row; this makes drawing it early a reason to
-		# take the capstone rather than a reason to avoid it.
-		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "lane": "Banner", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Hold the Line; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies SHIELDWALL, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "wd_hold_line", "name": "Braced", "ranks": 1, "lane": "Banner", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Hold the Line — every ally takes 50% less Break damage for 2 turns and cannot die for 2 turns (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 3 turns.",
-			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
-				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
-				"cooldown": 6,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Embolden every ally: 50% less Break\ndamage for 2 turns, and no one can die\nfor 2 turns. Refunds 5 Rage."},
-				"upgrade": [
-					{"stat": {"hold_line_upgraded": 1}},
-					{"ability": "Hold the Line", "set": {
-						"description": "Embolden every ally: 80% less Break\ndamage for 2 turns, and no one can die\nfor 3 turns."}},
-				]}},
+			"desc": "Shieldwall costs no Rage at all, and its cooldown falls to {v}.",
+			"scale": {"step": 1},
+			"payload": {"ability": "Shieldwall", "set": {"cost": 0, "cooldown": 1}}},
 	],
 	"pyromancer": [
 		# Purpose-designed lanes (Batch N, 07-31), re-cut into 7 exclusive rows
@@ -833,14 +775,13 @@ const LANE_TREES := {
 			"desc": "Flamewave applies +{v} turns of Burn, fresh fires and extensions alike.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"conflagration_ranks": 2}}},
-		# Backdraft lights NOTHING new — it only deepens what already burns,
-		# which is what makes it a commitment button rather than a spreader.
-		{"id": "py_melt", "name": "Backdraft", "ranks": 1, "lane": "Kindling", "row": 4,
-			"desc": "New ability: Backdraft — add 2 turns of Burn to every burning enemy (20 Mana, 2.0 int, 3cd).",
-			"payload": {"new_ability": {"display_name": "Backdraft", "cost": 20,
-				"special": "backdraft", "delay": 2.0, "anim": "attack03", "cooldown": 3,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Feed the fire air: every burning enemy\ngains 2 more turns of Burn. It starts\nno fires — it only deepens the ones\nalready lit, drain and all."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Backdraft; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies WILDFIRE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "py_melt", "name": "Melt", "ranks": 1, "lane": "Kindling", "row": 4,
+			"desc": "Wildfire's cooldown falls to {v}.",
+			"scale": {"step": 1},
+			"payload": {"ability": "Wildfire", "set": {"cooldown": 1}}},
 		{"id": "py_ashes", "name": "Wildfire Spread", "ranks": 1, "lane": "Kindling", "row": 5,
 			"desc": "Wildfire applies {v} turn of Burn to non-burning enemies before it consumes.",
 			"scale": {"step": 1},
@@ -877,19 +818,13 @@ const LANE_TREES := {
 			"desc": "Enemies that are Burning have a {v}% chance to miss you.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"heat_haze": 20}}},
-		# Immolate keeps its id AND its ability slot and loses both Overburn
-		# clauses — the drain-doubling with the drain, and the "no damage cap"
-		# half because the cap is Detonation's subject rather than this lane's.
-		# What is left is retaliation plus mitigation, both pointing the same
-		# way, which is the AR standard for this node read against a lane that
-		# now defends instead of paying.
-		{"id": "py_flame_shield", "name": "Immolate", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "New ability: Immolate — for 4 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.0 int, 2cd).",
-			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
-				"special": "immolate", "delay": Ability.BUFF_DELAY_CAP,
-				"anim": "attack03", "cooldown": 2,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Wrap yourself in it: for 4 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning for\n3 turns."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Immolate; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies FLAMEWAVE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "py_flame_shield", "name": "Emberwall", "ranks": 1, "lane": "Inferno", "row": 4,
+			"desc": "Flamewave costs {v} less Mana and deals 15 more Break damage.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Flamewave", "add": {"cost": -10, "pressure": 15}}},
 		{"id": "py_molten", "name": "Backblast", "ranks": 1, "lane": "Inferno", "row": 5,
 			"desc": "Once per battle, the first time you drop below 40% health: every enemy is set Burning 4 turns and you heal {v}% of maximum.",
 			"scale": {"step": 15},
@@ -915,15 +850,13 @@ const LANE_TREES := {
 			"desc": "Detonation re-applies {v} turns of Burn to the target after consuming.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"aftershock": 2}}},
-		# Out of the vault (Batch AR). No cooldown by design: 45 Mana under a
-		# drain, arriving 6.0 down the initiative bar, is the whole limiter.
-		{"id": "py_focused", "name": "Pyroblast", "ranks": 1, "lane": "Detonation", "row": 4,
-			"desc": "New ability: Pyroblast — a slow, enormous bolt for 55% of Attack, +50% against a Burning target (45 Mana, 6.0 int).",
-			"payload": {"new_ability": {"display_name": "Pyroblast", "cost": 45,
-				"dmg_type": "fire", "damage": 55, "pressure": 25, "delay": 6.0,
-				"anim": "attack03", "cooldown": 0,
-				"perfect_id": "", "perfect_text": "",
-				"description": "The long cast: 55% of Attack in fire,\nand HALF AGAIN against a target that\nis already Burning. It consumes\nnothing — it simply asks you to have\nlit the fire first."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Pyroblast; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies DETONATION, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "py_focused", "name": "Concussion", "ranks": 1, "lane": "Detonation", "row": 4,
+			"desc": "Detonation deals +{v}% of Attack.",
+			"scale": {"step": 15},
+			"payload": {"ability": "Detonation", "add": {"damage": 15}}},
 		{"id": "py_seeding", "name": "Crucible", "ranks": 1, "lane": "Detonation", "row": 5,
 			"desc": "Consuming Burn refunds {v} Mana per turn instead of 1.",
 			"scale": {"base": 1, "step": 1},
@@ -967,25 +900,21 @@ const LANE_TREES := {
 			"scale": {"step": 30},
 			"payload": {"stat": {"powder_keg": 30}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
-		{"id": "py_firestorm", "name": "Firestorm", "ranks": 1, "lane": "Kindling", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Firestorm; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies FLAMEWAVE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "py_firestorm", "name": "Sky Ablaze", "ranks": 1, "lane": "Kindling", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).",
-			"payload": {"new_ability": {"display_name": "Firestorm", "cost": 30,
-				"dmg_type": "fire", "damage": 12, "pressure": 8, "random_hits": 6,
-				"perfect_extra_hit": false, "delay": 3.5, "anim": "attack03", "cooldown": 4,
-				"applies_status": {"id": "burn", "turns": 2},
-				"perfect_id": "", "perfect_text": "Every enemy takes an even share.",
-				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning for 2 turns\nper bolt — repeats stack. Twelve to\nsixteen turns of drain in one cast."}}},
-		# Out of the vault (Batch AR), minus its Empower clause — Empower is a
-		# named mechanic belonging to the Holy Cleric's Mercy system, and this
-		# ability never should have granted it.
-		{"id": "py_rebirth", "name": "Phoenix Rebirth", "ranks": 1, "lane": "Inferno", "row": 9,
+			"desc": "Flamewave deals +{v}% of Attack, and its cooldown falls to 1.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Flamewave", "add": {"damage": 10}, "set": {"cooldown": 1}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Phoenix Rebirth; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies DETONATION, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "py_rebirth", "name": "Rekindled", "ranks": 1, "lane": "Inferno", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Phoenix Rebirth — sacrifice 15% of current health and your Mana returns to full (2.0 int, 4cd).",
-			"payload": {"new_ability": {"display_name": "Phoenix Rebirth", "cost": 0,
-				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Burn your own life for fuel: pay 15%\nof current health and your Mana\nreturns to FULL. Under Overburn a full\npool is exactly the relief the drain\ndenies you — and the price is a choice\nyou make, not a clock you carry."}}},
+			"desc": "Detonation costs no Mana at all.",
+			"payload": {"ability": "Detonation", "set": {"cost": 0}}},
 		{"id": "py_hellfire", "name": "Cataclysm", "ranks": 1, "lane": "Detonation", "row": 9,
 			"capstone": true,
 			"desc": "Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.",
@@ -1024,16 +953,21 @@ const LANE_TREES := {
 			"desc": "At the start of each of his turns, {v} random Chilled enemies gain a stack.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"grasp_ranks": 2}}},
-		{"id": "cr_rime", "name": "Rime", "ranks": 1, "lane": "Winter", "row": 4,
-			"desc": "New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 4 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).",
-			"payload": {"new_ability": {"display_name": "Rime", "cost": 25,
-				"special": "rime", "delay": 3.0, "anim": "attack02", "cooldown": 3,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Hoarfrost takes root: Frostbites the\ntarget — 50% less healing received,\nfor 2 turns. For 4 turns, every stack\nof Chilled this enemy gains also\nchills one other random enemy."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Rime; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies BLIZZARD, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "cr_rime", "name": "Snowblind", "ranks": 1, "lane": "Winter", "row": 4,
+			"desc": "Blizzard costs {v} less Mana, and its cooldown falls to 2.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Blizzard", "add": {"cost": -10}, "set": {"cooldown": 2}}},
+		# BATCH DO — RE-AUTHORED. It read *"Rime lasts 2 additional turns"*,
+		# and Rime left the tree for the draft in this batch, so the whole node
+		# became a bet on a card the hero may never be dealt. Blizzard is
+		# PROTECTED CORE and is the lane's own subject.
 		{"id": "cr_icy_resolve", "name": "Icy Resolve", "ranks": 1, "lane": "Winter", "row": 5,
-			"desc": "Rime lasts {v} additional turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"icy_resolve_ranks": 2}}},
+			"desc": "Blizzard strikes for +{v}% of Attack.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Blizzard", "add": {"damage": 10}}},
 		# Re-spec (was a Daze roll on Blizzard, in the wrong lane): the storm
 		# stops being a chance at a status and becomes three quarters of a hold
 		# across the WHOLE field.
@@ -1062,15 +996,13 @@ const LANE_TREES := {
 			"desc": "Every stack of Chilled slows {v}% harder.",
 			"scale": {"step": 10},
 			"payload": {"stat": {"frigid_ranks": 10}}},
-		# Re-spec (was Numbing Veil, a miss chance on Chilled enemies — denial
-		# by attrition; this is denial by decision). The counter it used to
-		# write is RUNE-ONLY now and its read site is kept.
-		{"id": "cr_numbing", "name": "Glacial Prison", "ranks": 1, "lane": "Deep Freeze", "row": 4,
-			"desc": "New ability: Glacial Prison — Freeze the target outright, whatever its stacks (25 Mana, 2.5 int, 4cd).",
-			"payload": {"new_ability": {"display_name": "Glacial Prison", "cost": 25,
-				"special": "glacial_prison", "delay": 2.5, "anim": "attack03", "cooldown": 4,
-				"perfect_id": "", "perfect_text": "",
-				"description": "The air closes like a fist: the target\nis Frozen OUTRIGHT, whatever its\nChilled stacks, and joins the Glacial\nHold. Bosses still resist until Broken."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Glacial Prison; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies ICE LANCE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "cr_numbing", "name": "Numbing Cold", "ranks": 1, "lane": "Deep Freeze", "row": 4,
+			"desc": "Ice Lance costs {v} less Mana, and its cooldown falls to 1.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Ice Lance", "add": {"cost": -10}, "set": {"cooldown": 1}}},
 		# FORCED ASSIGNMENT, reported not hidden (Batch AS §9): Second Prison
 		# has no ancestor in this tree. cr_frost_ward held a damage reduction
 		# against Chilled attackers — the closest thing to "fewer enemies get to
@@ -1104,14 +1036,13 @@ const LANE_TREES := {
 			"desc": "Ice Lance deals an extra {v}% of Attack per Chilled stack (on top of the base 5%).",
 			"scale": {"step": 15},
 			"payload": {"stat": {"crystal_edge_ranks": 15}}},
-		# Re-spec (was Lance Focus, a Mana discount on Ice Lance — the closest
-		# remaining Ice Lance node, and a forced-ish assignment reported as one).
-		{"id": "cr_lance_focus", "name": "Cryoclasm", "ranks": 1, "lane": "Thaw", "row": 4,
-			"desc": "New ability: Cryoclasm — move the hold and its remaining stacks onto a different enemy (20 Mana, 2.0 int, 3cd).",
-			"payload": {"new_ability": {"display_name": "Cryoclasm", "cost": 20,
-				"special": "cryoclasm", "delay": 2.0, "anim": "attack02", "cooldown": 3,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Control as a verb: the prison and the\ncold inside it are torn loose and\ndriven onto a DIFFERENT enemy. The\nlockdown relocates without being\nspent, so no release payoff fires."}}},
+		# BATCH DO — RE-AUTHORED. This cell granted Cryoclasm; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies ICE LANCE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "cr_lance_focus", "name": "Focused Lance", "ranks": 1, "lane": "Thaw", "row": 4,
+			"desc": "Ice Lance deals +{v}% of Attack and 15 more Break damage.",
+			"scale": {"step": 15},
+			"payload": {"ability": "Ice Lance", "add": {"damage": 15, "pressure": 15}}},
 		{"id": "cr_piercing", "name": "Piercing Ice", "ranks": 1, "lane": "Thaw", "row": 5,
 			"desc": "Ice Lance gains {v}% critical strike damage.",
 			"scale": {"step": 30},
@@ -1156,21 +1087,14 @@ const LANE_TREES := {
 			"scale": {"step": 3},
 			"payload": {"stat": {"frostbound_hours": 3}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# Re-specced into the MASS RELEASE (Batch AS): it used to detonate the
-		# Chilled; it breaks every prison at once now. BATCH AT RE-SPECCED WHAT
-		# IT SCALES ON — TIME HELD, NOT STACKS HELD. Under an indefinite hold
-		# every prison sits pinned at 4 stacks, so the old reading made Shatter a
-		# dearer Ice Lance and AS's smoke never cast it once. Charging on turns
-		# resolves that without touching either capstone, and it turns the hold
-		# from a binary state into a CHARGE the player decides when to spend.
-		{"id": "cr_shatter", "name": "Shatter", "ranks": 1, "lane": "Thaw", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Shatter; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies RAZOR ICE, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "cr_shatter", "name": "Shardfall", "ranks": 1, "lane": "Thaw", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Shatter — release EVERY hold at once for 10% of Attack per TURN it spent held, capped at 12 turns (30 Mana, 4.0 int, 5cd).",
-			"payload": {"new_ability": {"display_name": "Shatter", "cost": 30,
-				"dmg_type": "frost", "damage": 10, "pressure": 10, "aoe": true,
-				"delay": 4.0, "anim": "attack03", "cooldown": 5,
-				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
-				"description": "Every prison breaks at once: each held\nenemy takes 10% of Attack PER TURN it\nspent frozen (max 12), and is\nreleased. Release now for a modest\nhit, or hold longer and hit harder."}}},
+			"desc": "Razor Ice strikes {v} additional times, and its cooldown falls to 1.",
+			"scale": {"step": 3},
+			"payload": {"ability": "Razor Ice", "add": {"multi_hits": 3}, "set": {"cooldown": 1}}},
 		# Re-specced (Batch AS): "freezing no longer reduces stacks" is
 		# redundant under an indefinite hold, so the capstone buys CAPACITY.
 		{"id": "cr_absolute", "name": "Absolute Zero", "ranks": 1, "lane": "Deep Freeze", "row": 9,
@@ -1214,21 +1138,16 @@ const LANE_TREES := {
 			"desc": "Every damaging cast restores {v}% of maximum Mana per 4 stacks held.",
 			"scale": {"step": 5},
 			"payload": {"stat": {"charged_bolts_ranks": 5}}},
-		# RE-SPECCED, NOT REPRICED. Raising a cap to 8 is meaningless once
-		# there is no cap; compounding the ramp is the escalation version of
-		# the same button. At ten stacks it grants five.
-		# AUTHORED FALLBACK (Batch AU §1): Overcharge is in SPEC_POOLS, so a zone
-		# boss can hand it over before this node is reached. Taking the node on
-		# an Overcharge he already owns buys a SECOND use per battle rather
-		# than doing nothing — the node still answers its own question ("how
-		# much more storm can I feed on?"), just in the other currency.
-		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Resonance", "row": 4,
-			"desc": "New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd). If you already have it, it becomes usable TWICE per battle.",
-			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
-				"special": "overcharge", "delay": 1.5, "anim": "attack02", "cooldown": 5,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Feed the storm on itself: gain\nResonance equal to the FULL stacks you\nalready hold. Once per battle — the\nhigher you are, the more it pays."},
-				"upgrade": [{"stat": {"overcharge_extra": 1}}]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Overcharge; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies ARCANE CANNON, a PROTECTED CORE ability, which the hero owns in every run.
+		# THE NAME MOVED TOO. A node called "Overcharge" beside a DRAFT CARD
+		# called Overcharge is the `wd_spiked`/Spite trap DN documented — a
+		# matcher reading node text cannot tell which one is meant.
+		{"id": "ar_overcharge", "name": "Overdraw", "ranks": 1, "lane": "Resonance", "row": 4,
+			"desc": "Arcane Cannon costs {v} less Mana, and its cooldown falls to 1.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Arcane Cannon", "add": {"cost": -10}, "set": {"cooldown": 1}}},
 		# Re-spec (was +1 maximum Resonance — a ceiling that no longer exists).
 		# Straightforward runway, paid on the turn rather than the cast.
 		{"id": "ar_core", "name": "Resonant Core", "ranks": 1, "lane": "Resonance", "row": 5,
@@ -1255,7 +1174,7 @@ const LANE_TREES := {
 		# POINTS on the curve's step, and it is a FLOAT, so it must never be
 		# named "_ranks" (Runes.STAT_INT_KEYS would coerce 0.5 to 0).
 		{"id": "ar_conduit", "name": "Conduit", "ranks": 1, "lane": "Overload", "row": 1,
-			"desc": "The damage curve's step rises from 1.5% to {v}% per stack. With Magi's Wrath, which adds another 1.5 points, the step is 3.5% per stack.",
+			"desc": "The damage curve's step rises from 1.5% to {v}% per stack. With Unchained, which adds another 1.5 points, the step is 3.5% per stack.",
 			"scale": {"base": 1.5, "step": 0.5},
 			"payload": {"stat": {"conduit_step": 0.5}}},
 		# Re-spec in place (it was Cannon AND Wrath, +5%/rank each way): the
@@ -1390,29 +1309,17 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "Critical hits build 2 ADDITIONAL Resonance, and every enemy killed builds 3.",
 			"payload": {"stat": {"singularity_crit_build": 2, "singularity_kill_build": 3}}},
-		# The existing granted ability, per Batch AT §2's per-stack removal: its
-		# +4% per stack is GONE (the passive does that now, and leaving it on
-		# would square the compounding). BD = 2.5 x stacks and the recoil stay,
-		# and IT STILL GETS NO PER-STACK DAMAGE TERM BACK — that is the squaring
-		# trap AT exists around.
-		# BATCH AU §4: IT ALSO DOUBLES THE DAMAGE CURVE'S STEP, 1.5% -> 3%. That
-		# clause used to be Singularity's, in the Resonance lane, which is
-		# backwards — "each stack worth more" is what the Overload lane sells.
-		# The doubling rides `also`, so it lands whether the ability is granted
-		# here or was already earned.
-		# NO FALLBACK, DELIBERATELY (Batch AU §1): the passive half is why. A
-		# hero who already owns Magi's Wrath still gets the step-doubling out
-		# of this node, so it is not dead and owes nothing extra.
-		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "lane": "Overload", "row": 9,
+		# BATCH DO — RE-AUTHORED, AND IT IS THE ONE THAT LOST ALMOST NOTHING.
+		# It granted Magi's Wrath AND carried the step-doubling on `also`; the
+		# card moved into `SPEC_DRAFT_POOLS` and THE PASSIVE HALF IS NOW THE
+		# WHOLE NODE. `wrath_step_double` keeps its name, its unit and its one
+		# read site in `unit.resonance_dmg_step()` — nothing there moved, which
+		# is why AU §4's negative control still bites. `no_fallback` goes with
+		# the grant it opted out of.
+		{"id": "ar_wrath", "name": "Unchained", "ranks": 1, "lane": "Overload", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve's step: 1.5% to 3% per stack, or 3.5% with Conduit.",
-			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
-				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
-				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
-				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
-				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."},
-				"no_fallback": true,
-				"also": [{"stat": {"wrath_step_double": 1}}]}},
+			"desc": "The damage curve's step DOUBLES: 1.5% to 3% per stack, or 3.5% with Conduit.",
+			"payload": {"stat": {"wrath_step_double": 1}}},
 		# RE-SPECCED FROM MASTER OF MOMENTS, whose free venting died with
 		# Stabilize — it was the most anti-escalation node in the game. The id
 		# is kept; the name had to change because it no longer described
@@ -1461,14 +1368,14 @@ const LANE_TREES := {
 		{"id": "hl_on_mend", "name": "On the Mend", "ranks": 1, "lane": "Radiance", "row": 3,
 			"desc": "Renewal ticks have a 35% chance to dispel one harmful effect from the bearer.",
 			"payload": {"stat": {"on_mend_pct": 35}}},
-		# HOMED HERE from the capstone shelf (id hl_divine_plea, same lane).
-		# AUTHORED FALLBACK (AU §1): she can earn Divine Plea from a boss, and
-		# a node granting what she already holds must not be dead — it makes
-		# the cast cost 1 Mercy instead of 2.
-		{"id": "hl_divine_plea", "name": "Divine Plea", "ranks": 1, "lane": "Radiance", "row": 4,
-			"desc": "New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Hallow them against new ones for 3 turns (3.0 int, 2cd). If Divine Plea was already earned, it costs 1 Mercy instead of 2.",
-			"payload": {"grant_ability": "Divine Plea",
-				"upgrade": [{"ability": "Divine Plea", "set": {"faith_cost": 1}}]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Divine Plea; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies HYMN OF HOPE, a PROTECTED CORE ability, which the hero owns in every run.
+		# It spends MERCY, which is the spec's own resource — the second of the
+		# charter's three permitted subjects rather than the first.
+		{"id": "hl_divine_plea", "name": "Benediction", "ranks": 1, "lane": "Radiance", "row": 4,
+			"desc": "Hymn of Hope costs no Mercy at all.",
+			"payload": {"ability": "Hymn of Hope", "set": {"faith_cost": 0}}},
 		# Re-priced: -1 turn on a 1-turn cooldown was the whole cooldown, said
 		# small. Say it plainly, and give the Hymn the turn as well.
 		{"id": "hl_swift", "name": "Swift Mending", "ranks": 1, "lane": "Radiance", "row": 5,
@@ -1535,14 +1442,13 @@ const LANE_TREES := {
 		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 1, "lane": "Vigil", "row": 3,
 			"desc": "Heroes under 25% of their maximum health receive 40% more healing.",
 			"payload": {"stat": {"last_hope_pct": 40}}},
-		# RE-SPEC of hl_inner_faith (+5% max health), a FORCED ASSIGNMENT
-		# reported rather than hidden: Intercession has no ancestor, and this
-		# id held the same row of the same lane. AUTHORED FALLBACK (AU §1):
-		# already owned -> the window lasts 3 turns instead of 2.
-		{"id": "hl_inner_faith", "name": "Intercession", "ranks": 1, "lane": "Vigil", "row": 4,
-			"desc": "New ability: Intercession — for 2 turns the next lethal blow against any hero is refused: they survive at 1 health and you lose 1 Mercy (25 Mana, 1.0 int, 4cd). If Intercession was already earned, its window lasts 3 turns instead.",
-			"payload": {"grant_ability": "Intercession",
-				"upgrade": [{"stat": {"intercession_long": 1}}]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Intercession; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies RENEWAL, a PROTECTED CORE ability, which the hero owns in every run.
+		{"id": "hl_inner_faith", "name": "Inner Faith", "ranks": 1, "lane": "Vigil", "row": 4,
+			"desc": "Renewal's cooldown falls to {v}.",
+			"scale": {"step": 1},
+			"payload": {"ability": "Renewal", "set": {"cooldown": 1}}},
 		# RE-SPEC of hl_beacon (turn-start pulse on the nearly-dead) — the
 		# nearest surviving intent: something automatic that fires because a
 		# hero is at death's door, without a cast.
@@ -1778,7 +1684,7 @@ const LANE_TREES := {
 		# it, so "fixing the code" would mean moving the effect off turns
 		# entirely, which is a different card.
 		{"id": "dv_waters", "name": "Cleansing Waters", "ranks": 1, "lane": "Zeal", "row": 1,
-			"desc": "While Consecrated Ground or Sacred Resolve holds, each hero has a {v}% chance each turn to be cleansed of one harmful effect.",
+			"desc": "While Consecrated Ground holds, each hero has a {v}% chance each turn to be cleansed of one harmful effect.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"waters_ranks": 50}}},
 		# The counter holds the INCREASE on the ground's base 10% reflect.
@@ -1786,14 +1692,18 @@ const LANE_TREES := {
 			"desc": "Consecrated Ground reflects {v}% of damage taken (up from the base 10%).",
 			"scale": {"base": 10, "step": 25},
 			"payload": {"stat": {"righteous_step": 25}}},
-		# §5: the authored fallback for a hero who already EARNED Sacred Resolve
-		# — the node pays a longer split instead of a grant it cannot make.
-		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "row": 3,
-			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.",
-			"payload": {"grant_ability": "Sacred Resolve",
-				"upgrade": [{"stat": {"resolve_extra_turns": 2}}]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Sacred Resolve; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies BLESSING OF ZEAL, a PROTECTED CORE ability, which the hero owns in every run.
+		# THE RUNE OF BINDING SOULS ALSO GRANTS SACRED RESOLVE, so this node and
+		# that rune were a LIVE DUPLICATION until this batch. The rune keeps its
+		# grant — runes are allowed to grant, talents are not.
+		{"id": "dv_resolve", "name": "Unshaken", "ranks": 1, "lane": "Zeal", "row": 3,
+			"desc": "Blessing of Zeal costs {v} less Mana.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Blessing of Zeal", "add": {"cost": -10}}},
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,
-			"desc": "While Consecrated Ground or Sacred Resolve holds, every hero heals {v}% of the Devout's max health each turn.",
+			"desc": "While Consecrated Ground holds, every hero heals {v}% of the Devout's max health each turn.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"pulse_ranks": 8}}},
 		{"id": "dv_crusade", "name": "Crusader's Tempo", "ranks": 1, "lane": "Zeal", "row": 5,
@@ -1832,17 +1742,18 @@ const LANE_TREES := {
 			"desc": "Consecrated Ground never expires.",
 			"payload": {"stat": {"eternal_ground": 1}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# §5: the batch calls this "the first capstone in the game that grants
-		# an ability". IT IS NOT — nine do (bz_rampage, sm_execute, wd_hold_line,
-		# py_firestorm, py_rebirth, cr_shatter, ar_wrath, oc_hysteria and this
-		# one), and eight predate Batch AW. The half that IS true is the reason
-		# the brief gives: Holy's three granted none, so this is the first
-		# CLERIC capstone to owe a fallback at all. Corrected toward the code.
-		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "lane": "Bulwark", "row": 9,
+		# BATCH DO — RE-AUTHORED, AND CV'S RULING IS PRESERVED BY NOT BEING
+		# TOUCHED. CV ruled Bulwark of Fortitude's 5% party heal UNCONDITIONAL
+		# (CR §7) rather than a dead Perfect clause, and that ruling lives in the
+		# ABILITY'S text, in `Classes.pending_talent_ability` — which this batch
+		# does not open. The card moved into `SPEC_DRAFT_POOLS` by NAME only.
+		# `dv_bastion` (row 6) already takes Divine Shield's COOLDOWN, so the
+		# capstone takes its COST: the two together are a free shield every turn,
+		# which is the Faith engine this lane has always been selling.
+		{"id": "dv_bulwark", "name": "Wardstone", "ranks": 1, "lane": "Bulwark", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Bulwark of Fortitude — for 3 turns every hero takes NO Break damage, has their armor increased by 50%, and heals 10% of max health each turn; the cast itself heals every hero 5% at once (30 Mana, 3.0 int, 3cd). Already owned: it lasts 4 turns instead.",
-			"payload": {"grant_ability": "Bulwark of Fortitude",
-				"upgrade": [{"stat": {"bulwark_extra_turns": 1}}]}},
+			"desc": "Divine Shield costs no Mana at all.",
+			"payload": {"ability": "Divine Shield", "set": {"cost": 0}}},
 		# BATCH BG §2 — RE-SPECCED OFF THE FREQUENCY AXIS, and the id, the lane
 		# and the payload field all survive so no save migrates. It used to
 		# park allies at 5 so every further gain re-triggered a release; BF
@@ -2254,10 +2165,14 @@ const LANE_TREES := {
 			"desc": "The Pack Bond boon grows {v}% per Loyalty stack instead of the base 20%.",
 			"scale": {"base": 20, "step": 15},
 			"payload": {"stat": {"absolute_step": 15}}},
+		# BATCH DO — RE-AUTHORED. It read *"Bestial Wrath lasts 1 turn longer per
+		# Loyalty stack"*, and Bestial Wrath is a `SPEC_POOLS` entry — a zone-boss
+		# trophy. The whole node did nothing without the draw. Kill Command is
+		# PROTECTED CORE and is the devotion lane's own payoff button.
 		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "row": 4,
-			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack on the companion.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"devoted_fury": 1}}},
+			"desc": "Kill Command costs {v} less Mana, and its cooldown falls to 2.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Kill Command", "add": {"cost": -10}, "set": {"cooldown": 2}}},
 		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "row": 5,
 			"desc": "A companion's death returns {v}% of its Loyalty rather than breaking it — the meter survives it whole.",
 			"scale": {"step": 100},
@@ -2267,7 +2182,7 @@ const LANE_TREES := {
 		# Devotion made it — the deep-partnership build, terrifying and fragile
 		# in equal measure.
 		{"id": "bm_ancient_pact", "name": "Ancient Pact", "ranks": 1, "lane": "devotion", "row": 6,
-			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source, Spirit Bond and Hunter's Instinct included.",
+			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source at all.",
 			"payload": {"stat": {"ancient_pact": 1}}},
 		# RE-SPECCED PAYOFF: a higher ceiling was its reward and there is no
 		# ceiling. It arrives deep and grows twice as fast instead. THE FIELD IS
@@ -2326,10 +2241,14 @@ const LANE_TREES := {
 			"desc": "+{v}% companion maximum health.",
 			"scale": {"step": 40},
 			"payload": {"stat": {"companion_hp_pct": 0.40}}},
+		# BATCH DO — RE-AUTHORED. It read *"Spirit Bond restores +30% more maximum
+		# Mana"* and nothing else; Spirit Bond is a `SPEC_POOLS` entry, so the node
+		# was one sentence about a card the hero may never be dealt. Hunter's
+		# Instinct is PROTECTED CORE and `bm_instinctive` (row 4) already reads it.
 		{"id": "bm_reserves", "name": "Deep Reserves", "ranks": 1, "lane": "handler", "row": 3,
-			"desc": "Spirit Bond restores +{v}% more maximum Mana.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"deep_reserves_ranks": 30}}},
+			"desc": "Hunter's Instinct costs {v} less Mana.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Hunter's Instinct", "add": {"cost": -10}}},
 		{"id": "bm_instinctive", "name": "Instinctive", "ranks": 1, "lane": "handler", "row": 4,
 			"desc": "Hunter's Instinct empowers {v} Quick Shots instead of 3.",
 			"scale": {"step": 8},
@@ -2457,14 +2376,15 @@ const LANE_TREES := {
 			"desc": "Psychosis seizes its victim {v}% of the time (up from the base 50%). Bosses resist Psychosis until Broken.",
 			"scale": {"base": 50, "step": 45},
 			"payload": {"stat": {"whispers_step": 45}}},
-		# §4's authored fallback (AU §1): a hero who already EARNED Mind Flay
-		# gets a THIRD mind instead of a grant it cannot make.
-		{"id": "oc_mind_flay", "name": "Mind Flay", "ranks": 1, "lane": "Madness", "row": 3,
-			"desc": "New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken. Already owned: it flays THREE minds instead.",
-			"payload": {"grant_ability": "Mind Flay",
-				"upgrade": [{"ability": "Mind Flay",
-					"set": {"choose_two": false, "choose_three": true,
-						"description": "Flay THREE chosen minds: 30% of\nAttack in shadow each and Psychosis\nfor 3 turns — madness that turns\nthem on their own."}}]}},
+		# BATCH DO — RE-AUTHORED. This cell granted Mind Flay; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies BEWITCH, a PROTECTED CORE ability, which the hero owns in every run.
+		# THE RUNE OF THE FLAYED MIND ALSO GRANTS MIND FLAY — the second of the
+		# two live duplications, and it sits in this same Madness lane.
+		{"id": "oc_mind_flay", "name": "Bedlam", "ranks": 1, "lane": "Madness", "row": 3,
+			"desc": "Bewitch costs {v} less Mana.",
+			"scale": {"step": 10},
+			"payload": {"ability": "Bewitch", "add": {"cost": -10}}},
 		{"id": "oc_mirror", "name": "Umbral Mirror", "ranks": 1, "lane": "Madness", "row": 4,
 			"desc": "When an enemy would debuff a hero, there is a {v}% chance the debuff rebounds onto the attacker instead (and counts toward Ruin).",
 			"scale": {"step": 45},
@@ -2557,13 +2477,16 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "Ruin detonates every 5th stack instead of every 10th.",
 			"payload": {"stat": {"avatar_ruin": 5}}},
-		# §4's second authored fallback: a hero who already EARNED Mass Hysteria
-		# gets it back twice as often instead of a grant it cannot make.
-		{"id": "oc_hysteria", "name": "Mass Hysteria", "ranks": 1, "lane": "Madness", "row": 9,
+		# BATCH DO — RE-AUTHORED. This cell granted Mass Hysteria; a talent may not
+		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
+		# the cell now modifies HEX OF RUIN, a PROTECTED CORE ability, which the hero owns in every run.
+		# Every debuff applied marks 2 Ruin, so an AoE Hex is the passive's own
+		# multiplier rather than a new mechanic.
+		{"id": "oc_hysteria", "name": "Pandemonium", "ranks": 1, "lane": "Madness", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd). Bosses resist until Broken. Already owned: its cooldown falls to 2.",
-			"payload": {"grant_ability": "Mass Hysteria",
-				"upgrade": [{"ability": "Mass Hysteria", "set": {"cooldown": 2}}]}},
+			"desc": "Hex of Ruin curses EVERY enemy, and its Break damage rises from 15 to {v}.",
+			"scale": {"base": 15, "step": 25},
+			"payload": {"ability": "Hex of Ruin", "set": {"aoe": true}, "add": {"pressure": 25}}},
 		{"id": "oc_soul_glut", "name": "Soul Glut", "ranks": 1, "lane": "Leech", "row": 9,
 			"capstone": true,
 			"desc": "Whenever a hero heals by striking a Ruined target, every hero heals for the same amount. Still under the 40% cap.",

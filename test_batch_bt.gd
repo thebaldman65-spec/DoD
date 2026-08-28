@@ -109,6 +109,15 @@ const NINE := {
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -177,10 +186,10 @@ func _pools() -> void:
 	# APPENDS — it does not rewrite.
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
+		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
 	for spec in ["holy", "inquisitor", "occultist"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s joined them at EIGHT in Batch CE" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT (CE took it to eight; DO deepened it)" % spec)
 	# RE-POINTED BY BATCH BV, which paid the HUNTER third: the three Hunter pools
 	# joined the Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at
 	# two. Kept as an inversion rather than deleted — the half of this check that
@@ -224,16 +233,16 @@ func _pools() -> void:
 	# the reason it inverts rather than being deleted — the question is still
 	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT — tranche 3 is complete" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT — tranche 3 is complete" % spec)
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 8,
-			"%s drafts EIGHT since Batch CH — the Hunter is the third class complete" % spec)
+		ok(Classes.spec_draft_pool(spec).size() >= 8,
+			"%s drafts at least EIGHT since Batch CH — the Hunter is the third class complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 96,
-		"the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d"
+	ok(total == 118,
+		"the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR negative control.

@@ -59,6 +59,15 @@ var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func _initialize() -> void:
+	# BATCH DO — THE FLATNESS ENDED AND THE FLOOR IS WHAT SURVIVES IT.
+	# Twenty-two talent nodes GRANTED an ability; the charter forbids that now,
+	# so all twenty-two cards moved into their spec's draft pool. Nine pools are
+	# DEEPER than CI's flat eight and three still read exactly eight (the three
+	# whose trees granted nothing). **NO POOL LOST ANYTHING**, so `== 8` becomes
+	# `>= 8` — the FLOOR is the durable invariant and a pool that quietly empties
+	# still trips it. The exact per-spec table lives in ONE place,
+	# `test_batch_cd.PER_SPEC_DEPTH`; twelve copies of it would be this project's
+	# oldest defect. The TOTAL is asserted here as well, so any depth change trips.
 	_run.call_deferred()
 
 
@@ -128,8 +137,8 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 96,
-		"§5+tranche 3: BO's eighteen, BP's six, tranche 2's thirty-six, CB's nine and CE's nine (got %d)" % total)
+	ok(total == 118,
+		"§5+DO: CI's ninety-six plus DO's twenty-two (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
