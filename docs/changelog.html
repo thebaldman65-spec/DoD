@@ -14,6 +14,165 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-27 &mdash; Batch DP: THE MADNESS LANE COMES OFF THE DRAW</h2>
+<p><i><b>DO's OWN COST, PAID.</b> Mind Flay and Mass Hysteria are the only appliers of Psychosis
+and Hysteria in the game, and DO moved both into the draft &mdash; so four Occultist Madness cells
+read a status he can no longer guarantee. <b>Before DO those dependencies were TREE-INTERNAL,
+which the charter explicitly permits</b>: a ruling created this without anyone making a mistake.
+All four are re-pointed onto <b>RUIN</b>, his own passive, guaranteed in every run.
+<b>NO CELL CHANGES ROW OR LANE, so no save migration is needed and <code>Profile</code> is still
+v2.</b></i></p>
+
+<p><b>&sect;0 &mdash; THE BRIEF SAID "THE OTHER EIGHT" AND THERE ARE SIX, WHICH IS WHY EVERY BRIEF
+IS TOLD TO DERIVE.</b> <code>check_do</code> &sect;4 printed <b>twelve node/status pairs across
+eight nodes</b>, and the Occultist's four cells account for <b>six</b> of the twelve, not four
+&mdash; <code>oc_delirium</code> and <code>oc_permanent</code> each read TWO un-guaranteed
+statuses. That leaves <b>six</b> pre-existing pairs, which is what <code>docs/state.md</code>
+said and what the brief did not. <b>The sweep is 12 &rarr; 6 now.</b></p>
+
+<p><b>&sect;1 &mdash; AND FOUR OF THE SIX SURVIVORS ARE INSTRUMENT ARTEFACTS RATHER THAN BETS.</b>
+The sweep matches a rendered WORD, so it cannot tell a node READING a status from a node APPLYING
+one: <b><code>sv_virulence</code></b> ("Your Poison applications &hellip; apply Exposed for 3
+turns") and <b><code>ss_exposed_nerve</code></b> ("Critical hits apply Exposed &hellip; and you
+deal +15% damage to Exposed enemies") are each their OWN source. Nor can it tell an enemy's debuff
+landing on the HERO from a hero's landing on an enemy: <b><code>ss_no_cover</code></b> is an
+IMMUNITY ("Blind and Dazed do not affect you"). <b>Only <code>sm_guarded</code> is a real bet</b>,
+and it is a bonus clause gated on <code>sm_punish</code> &mdash; a TREE-INTERNAL condition the
+charter permits &mdash; sitting beside an unconditional "vs Broken" base clause, so the node
+cannot go dead. <b>Ruled on: none, as the brief instructed.</b> Each of the six is carried in
+<code>check_dp.KNOWN_PAIRS</code> with the reason it is tolerated.</p>
+
+<p><b>&sect;2 &mdash; THE FOUR, AND THEY READ FOUR DIFFERENT THINGS ON PURPOSE.</b> Four cells all
+reading "stacks of Ruin" would flatten a lane authored as a theme into one idea repeated four
+times, so each reads a different quantity &mdash; and <b>none of the four reads a DETONATION</b>,
+because Grim Focus (Ruin&nbsp;5), Unraveling (Ruin&nbsp;7) and Avatar of Ruin (Ruin&nbsp;9)
+already own that event. <code>check_dp</code> &sect;2 asserts the four are distinct.</p>
+<ul>
+<li><b>Spread of Madness</b> (row 1) &mdash; <b>reads an APPLICATION, probabilistically.</b> Was:
+Psychosis leaps to a fellow at 60% a turn. Is: <i>"Each mark of Ruin the Occultist lands has a 60%
+chance to leap to another enemy, which catches 2 Ruin."</i> <b>It fires on a mark LANDING where
+Unraveling fires on a DETONATION</b>, so the lane's two propagation nodes never read the same
+event.</li>
+<li><b>Whispers</b> (row 2) &mdash; <b>reads an APPLICATION MAGNITUDE.</b> Was: +45 percentage
+points on Psychosis's 50% seize chance. Is: <i>"Every debuff the Occultist applies marks 4 Ruin
+instead of the base 2."</i> This is the lever <b>AY &sect;8</b> identified as the real constraint
+&mdash; generation, not the threshold &mdash; and the field keeps its <code>_step</code> name
+because it keeps its SHAPE: an increase on a base the kit already pays. Only the base moved, from
+Psychosis's 50% to <code>OLD_GODS_MARK</code>.</li>
+<li><b>Delirium</b> (row 5) &mdash; <b>reads an EVENT, and NOT ONE LINE OF CODE CHANGED.</b> Its
+text named Psychotic and Hysterical; <b>its read site names no status and never has</b>
+(<code>not attacker.is_hero and not strike_target.is_hero</code>). The text now says what the code
+does &mdash; and says it in <code>oc_cackling</code>'s words, one row down, because the same
+trigger deserves the same sentence. <b>It was NOT narrowed to "Bewitched"</b>: that would
+UNDER-state the payload the moment Mind Flay is drafted, which is DM's seventh family, and an
+absent clause does not mis-say so no test catches it.</li>
+<li><b>Ruined Mind</b> (row 8, was <b>Permanent Delusion</b>) &mdash; <b>reads the STACK COUNT, as
+a threshold.</b> Was: Psychosis, Bewitchment and Hysteria never expire &mdash; two thirds of it a
+bet. Is: <i>"A boss bearing 10 or more Ruin can no longer resist the Occultist's Bewitchment."</i>
+<b>This is the row-8 shape exactly: it REMOVES THE CONSTRAINT THE LANE HAS WORKED AROUND ALL
+GAME</b>, stated in the lane's own header. <b>It is self-enabling by construction and nothing had
+to be added to make that true</b> &mdash; the boss refuses the charm inside
+<code>_apply_status</code>, but the <code>bewitch</code> handler marks Ruin on the very next line
+regardless, so a REFUSED cast still deepens the mark that eventually opens the gate.</li>
+</ul>
+
+<p><b>&sect;3 &mdash; THE COST THE BRIEF DID NOT NAME: A RUNE WRITES TWO OF THESE FIELDS.</b> The
+<b>Rune of the Whispering Dark</b> (100g, spec:occultist) writes <code>spread_ranks</code> AND
+<code>spread_ruin</code> and its card sells both clauses. <b>Re-pointing Spread of Madness onto a
+fresh field name would have left two of that rune's four clauses paying nothing, in silence</b>
+&mdash; the exact dud the rune schema exists to prevent. <b>Both fields were KEPT and their
+MEANING re-pointed instead</b>, which cost one line of card text and no payload edit at all.
+<code>check_dp</code> &sect;4 now asserts the general property: <b>every stat field any rune
+writes has a live read site in <code>scripts/</code></b> &mdash; 116 fields across 65 runes, 0
+dead.</p>
+
+<p><b>&sect;4 &mdash; ONE CONSTANT, FIVE CALL SITES, AND A FUNCTION BETWEEN THEM.</b>
+<code>OLD_GODS_MARK</code> is the passive's mark and was quoted at five <code>_gain_ruin</code>
+calls, every one of them "the passive marking a debuff the Occultist applied" &mdash; the
+constant's own comment says so. Whispers moves that number, so the five call
+<b><code>_old_gods_mark()</code></b> now: <b><code>_ruin_threshold()</code>'s shape exactly</b>,
+which Avatar of Ruin has used since AX. <b>The base stays the one authored copy</b>, and
+<code>check_dp</code> &sect;3 asserts no <code>_gain_ruin</code> call quotes it directly, <b>so a
+sixth passive site cannot be added that the node silently fails to reach</b>. Deepening the mark
+inside <code>_gain_ruin</code> instead would have inflated Delirium, Unraveling and Spread of
+Madness off one node, because all three pass their OWN counts to it.</p>
+
+<p><b>&sect;5 &mdash; A CONTAGION THROUGH THE FUNCTION THAT MARKS IT NEEDS A GUARD, AND IDENTITY
+IS NOT ENOUGH.</b> <b>Covenant of Ash</b> already recurses through <code>_gain_ruin</code> and
+breaks the recursion BY IDENTITY &mdash; the ash always lands on ONE known bearer, so
+<code>mirror == target</code> stops it. <b>A contagion lands on a RANDOM enemy and has no such
+property</b>, so <code>_ruin_spreading</code> is the equivalent. <b>It is bounded rather than
+absolute and that is stated rather than glossed</b>: a covenant mirror re-enters before the flag
+is ever set, so the ceiling is <b>two</b> contagion rolls per originating mark and no chain can
+run past them. The spread goes THROUGH <code>_gain_ruin</code>, which is the point &mdash; a
+caught mark arms the threshold, deepens the chip and books the AX depth reading exactly as a
+directly-applied one does.</p>
+
+<p><b>&sect;6 &mdash; THE BOSS-IMMUNITY EXCEPTION LIVES INSIDE THE REFUSAL, NOT IN ITS
+CONDITION, AND THAT IS NOT COSMETIC.</b> <code>test_batch_ah</code> &sect;4 and
+<code>test_batch_ax</code> &sect;4 <b>both pin that <code>if</code> line as a literal</b>, because
+the boss rule is the kind of promise a later batch could dissolve by widening one condition. An
+exception spliced into the line would have moved the needle out from under both suites; nested
+inside the refusal, <b>both literals survive untouched</b>. The exception is scoped three ways and
+every one matters: to <code>bewitch</code> alone (the only one of the three statuses he can apply
+without drawing a card, and the only one his node's text names), to a HERO <code>src</code>
+holding the node (an enemy's charm still meets the boss's own immunity), and to a target already
+bearing the depth.</p>
+
+<p><b>&sect;7 &mdash; THE TWO LIVE DUPLICATIONS ARE RESOLVED, AND THE SECOND HALF OF THAT
+QUESTION IS ANSWERED "NO".</b> <code>dv_resolve</code> and <code>oc_mind_flay</code> no longer
+grant, the runes keep their grants, and <b>all four rune grants still resolve</b> &mdash; a rune's
+grant goes through <code>Classes.pending_talent_ability</code> and NOT the draft resolver, so DO
+moving twenty-two card NAMES into <code>SPEC_DRAFT_POOLS</code> while the six
+<code>grant_ability</code> DEFINITIONS stayed put is the only reason nothing went dead. <b>But
+"no rune now duplicates a draft card's grant" is FALSE, and this is a state the game could not
+previously reach</b>: <b>Binding Souls</b> grants Sacred Resolve and <b>the Flayed Mind</b> grants
+Mind Flay, and both cards are draftable by their spec since DO. <b>Holding both is not a wasted
+rune</b> &mdash; measured, not reasoned: the grant collides, <code>_collided</code> finds no
+authored <code>upgrade</code> arm and no <code>no_fallback</code>, so the rune owes its generic
+and <code>Run.apply_upgrades</code> (which runs last) turns it into an upgrade on the very card it
+would have granted &mdash; <b>Honed</b> (&times;1.5 damage) for Mind Flay, <b>Quickened</b>
+(&minus;2 cooldown) for Sacred Resolve. That is <b>the Rune of the Last Rites' shipped behaviour
+since AV</b>, now reachable by two more runes. <b>OWED, NOT TAKEN:</b> both descs still open
+"Grants &hellip;", which is wrong whenever the card was drafted &mdash; the Last Rites is the one
+that says so honestly ("She already knows Resurrection, so this hones it instead").</p>
+
+<p><b>&sect;8 &mdash; ONE NEW GATE, <code>check_dp.gd</code>, AND IT READS
+<code>check_do</code>'s TABLES RATHER THAN COPYING THEM.</b> <code>GUARANTEED_STATUS</code> and
+<code>STATUS_FORMS</code> are hand-authored maps of what each spec can reach without a draw, and a
+second copy would be this project's oldest recurring defect wearing a new hat. <b>The load is
+asserted</b>, so the day that file moves the gate says so rather than sweeping against an empty
+table. <b>It asserts the PROPERTY and PRINTS the count</b>, and its ratchet is asymmetric for
+<code>baselines.json</code>'s reason one layer up: <b>a pair not in <code>KNOWN_PAIRS</code> is an
+ERROR; a known pair that has GONE is a NOTICE</b>, because that is a repair and a gate that reds
+on a repair teaches the next batch to leave the defect alone. <b>It needs no <code>check_da</code>
+<code>WALK_EXEMPT</code> entry</b> &mdash; it reads only the SPEC draft pool &mdash; and its
+header does not name the other call either, which is the self-accusation trap DO paid 37/2 to
+learn.</p>
+
+<p><b>&sect;9 &mdash; NINE NEGATIVE CONTROLS, AND ALL NINE BEHAVED.</b> Each of the four cells had
+its old text restored (5, 5, 6 and 6 failures); the Ruined Mind read site was defeated (3); the
+Whispering Dark's <code>spread_ruin</code> was renamed, standing in for the dud the batch nearly
+shipped (5); and a sixth <code>_gain_ruin</code> call was made to quote the constant directly (3).
+<b>THE COMMENT-STRIPPING TRAP WAS CONTROLLED FROM BOTH SIDES, WHICH IS DO's SCAR:</b> a COMMENT
+naming the retired <code>permanent_delusion</code> left the gate <b>green</b> (comments are
+stripped, as they must be &mdash; prose recording a removal necessarily names what was removed),
+and the same identifier added as CODE turned it <b>red</b>. <b>Every probed file was restored from
+a scratchpad copy and re-compared by MD5, never <code>git checkout</code>.</b></p>
+
+<p><b>&sect;10 &mdash; WHAT IS DELIBERATELY NOT DONE.</b> <b>No cell moves row or lane</b>, so no
+save migration is needed and <code>Profile</code> is still v2 &mdash; DN measured a move driving a
+full Berserker ledger to <b>&minus;2 available points</b>, silently. <b>The 97-node restructure is
+not taken</b>; three-ways-playable remains a separate, undecided goal. <b><code>sm_lunge</code> is
+not restored</b> &mdash; it left the tree at DO, and <code>sm_precision</code> was re-pointed onto
+Stunned, which Pommel Strike applies. <b>The six pre-existing pairs are reported and ruled on
+nowhere.</b> <b>No magnitude was re-derived by measurement</b>: Spread of Madness keeps 60/2 and
+Delirium keeps 3, so the Whispering Dark's +15/+1 keeps its proportion, and Whispers's +2 doubles
+a base of 2 as its old +45 nearly doubled a base of 50. <b>Both nodes now feed generation and
+they stack</b>, which is the number most worth a sim &mdash; and <b>no sim has been run since
+DK</b>, so every sim figure in <code>docs/state.md</code> was already stale before this batch
+touched anything.</p>
+
 <h2>2026-08-27 &mdash; Batch DO: TALENTS STOP GRANTING ABILITIES, AND STOP BETTING ON THE DRAW</h2>
 <p><i><b>THE CHARTER IS SETTLED AND IMPLEMENTED.</b> A talent may not grant an ability, and may
 not depend on an ability the hero is not guaranteed to have; <b>a talent modifying the spec's

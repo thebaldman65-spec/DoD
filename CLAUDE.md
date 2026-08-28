@@ -2263,7 +2263,7 @@ cards drafted with no damage figure at all.
   Perfect visible also exposed 107 strings in the "60 Rage instead of 40" shape the standard
   rejects. They were not wrong before; they were invisible.** CL cleans them up.
 
-## STANDING RULE — A TALENT MAY NOT GRANT AN ABILITY, NOR DEPEND ON ONE THE HERO IS NOT GUARANTEED (Batch DO)
+## STANDING RULE — A TALENT MAY NOT GRANT AN ABILITY, NOR DEPEND ON ONE THE HERO IS NOT GUARANTEED (Batch DO, status half at DP)
 
 > **A talent may not grant an ability, and may not depend on an ability or status the hero is not
 > guaranteed to have.** Talents are chosen before the run knowing nothing; abilities come from the
@@ -2317,6 +2317,68 @@ bet.** The looser sentence is corrected wherever it was written down so it canno
   `bulwark_extra_turns` are read-only-zero now. **The fields and their read sites are LEFT
   STANDING** — each reads a base beside it, deleting a branch is deleting a mechanic, and two are
   already in `runes.gd`'s coercion list against the day a rune writes them.
+
+### THE STATUS HALF, ADDED AT DP — AND IT IS THE SAME RULE, NOT A SECOND ONE
+
+> **A talent may not read a status the spec has no guaranteed way to apply.**
+> The ability rule and the status rule are the same rule — `sm_precision` named no ability and
+> was still a bet, and the ability-matching instrument could not see it.
+
+**THIS COST WAS DO's OWN AND IT WAS REPORTED RATHER THAN HIDDEN.** Mind Flay and Mass Hysteria are
+the only appliers of Psychosis and Hysteria in the game, and DO moved both into the draft — so four
+Occultist Madness cells (`oc_spread`, `oc_whispers`, `oc_delirium`, `oc_permanent`) read a status
+he can no longer guarantee. **Before DO those dependencies were TREE-INTERNAL, which the charter
+explicitly permits.** A ruling can create a defect without anyone making a mistake.
+
+· **AN INSTRUMENT THAT MATCHES ABILITY NAMES CANNOT SEE THIS CLASS OF BET AT ALL.** A node can
+  name no ability whatsoever and still bet on the draw, because a STATUS has appliers and a node
+  reads the status rather than the card. `check_dp` §1 sweeps every node's rendered text against
+  every status form and asserts the PROPERTY.
+· **THE RATCHET IS ASYMMETRIC, FOR `baselines.json`'s REASON ONE LAYER UP.** A pair NOT in
+  `check_dp.KNOWN_PAIRS` is an **error** — it is a new bet. A known pair that has GONE is a
+  **notice** — that is a repair, and a gate that reds on a repair teaches the next batch to leave
+  the defect alone.
+· **FOUR OF THE SIX TOLERATED PAIRS ARE INSTRUMENT ARTEFACTS, NOT BETS, AND EACH SAYS WHICH.**
+  The sweep matches a rendered WORD, so it cannot tell a node READING a status from one APPLYING
+  it (`sv_virulence` and `ss_exposed_nerve` both apply the Exposed they then read), nor an enemy's
+  debuff landing on the HERO from a hero's landing on an enemy (`ss_no_cover` is an IMMUNITY).
+  **Only `sm_guarded` is a real bet, and it is a bonus clause gated on a tree-internal node with
+  an unconditional base clause — the node cannot go dead.**
+· **RE-POINTING A LANE ONTO ONE QUANTITY FLATTENS IT.** Madness was authored as a theme, and four
+  cells all reading "stacks of Ruin" would be one idea repeated four times. The four read four
+  DIFFERENT quantities — an application, an application's magnitude, an event, and a depth
+  threshold — and **none reads a detonation**, because Grim Focus, Unraveling and Avatar of Ruin
+  already own that event. `check_dp` §2 asserts the four are distinct.
+· **BEFORE RE-POINTING A NODE OFF A FIELD, CHECK WHETHER A RUNE WRITES IT.** The Rune of the
+  Whispering Dark writes `spread_ranks` AND `spread_ruin`; a fresh field name would have left two
+  of that rune's four clauses paying nothing, in silence — the exact dud the rune schema exists to
+  prevent. **Both fields were KEPT and their meaning re-pointed instead**, which cost one line of
+  card text. `check_dp` §4 now asserts the general property: **every stat field any rune writes
+  has a live read site in `scripts/`** (116 fields, 0 dead).
+· **A CONSTANT QUOTED AT MORE THAN ONE SITE MOVES IN A FUNCTION, NEVER AT THE SITES.**
+  `OLD_GODS_MARK` is the passive's mark and was quoted at five call sites; Whispers moves it, so
+  the five call `_old_gods_mark()` now — `_ruin_threshold()`'s shape exactly, which Avatar of Ruin
+  has used since AX. **The base stays the one authored copy**, and `check_dp` §3 asserts no
+  `_gain_ruin` call quotes it directly, so a sixth site cannot be added that the node silently
+  fails to reach.
+· **A CONTAGION THAT MARKS THROUGH THE FUNCTION THAT MARKS IT NEEDS A RE-ENTRY GUARD.** Covenant
+  of Ash breaks its recursion BY IDENTITY (the ash always lands on one known bearer, so
+  `mirror == target` stops it); a contagion lands on a RANDOM enemy and has no such property.
+  `_ruin_spreading` is the equivalent, and it is bounded rather than absolute — a covenant mirror
+  can still roll its own contagion, so the ceiling is two rolls per originating mark.
+· **A RUNE GRANT RESOLVES THROUGH `Classes.pending_talent_ability`, NOT THROUGH THE DRAFT
+  RESOLVER.** DO moved twenty-two card NAMES into `SPEC_DRAFT_POOLS` while the six `grant_ability`
+  DEFINITIONS stayed where they were, which is the only reason four granting runes still work.
+  **Had a definition moved with its name, its rune would grant nothing, silently.** `check_dp` §5
+  asserts every rune grant still resolves.
+· **TWO RUNES NOW DUPLICATE A DRAFT CARD'S GRANT, AND THAT IS NOT A DEAD RUNE.** Binding Souls
+  grants Sacred Resolve and Flayed Mind grants Mind Flay; both cards are in their spec's draft
+  pool since DO. Holding both COLLIDES: `_collided` finds no authored `upgrade` arm and no
+  `no_fallback`, so the rune owes its generic and `Run.apply_upgrades` — which runs last — turns
+  it into an upgrade on the very card it would have granted (**Honed** and **Quickened**
+  respectively). That is the Rune of the Last Rites' shipped behaviour since AV, now reachable by
+  two more. **Both descs still open "Grants …", which is wrong whenever the card was drafted** —
+  the Last Rites is the one that says so honestly, and the other two are owed a sentence.
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO (Batch BX §2), on ONE SCREEN of four columns,

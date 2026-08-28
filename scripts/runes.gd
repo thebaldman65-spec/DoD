@@ -132,10 +132,17 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# the Deepening Ruin's `deep_hex_step`, the Hollow Chalice's `soul_leech_step`
 	# and the Whispering Dark's `spread_ruin` — and the other two are listed for
 	# the same durability AW listed its unwritten ones with.
+	# BATCH DP: TWO OF THE FIVE CHANGED WHAT THEY MEAN AND NOT ONE CHANGED SHAPE,
+	# which is why this list did not move. `whispers_step` steps `OLD_GODS_MARK`
+	# now instead of Psychosis's 50%, and `spread_ranks`/`spread_ruin` describe a
+	# landing MARK leaping instead of a Psychosis leaping — all three still int,
+	# still additive, still written by the Whispering Dark. `broken_mind` JOINS
+	# for AW's durability reason: it is a Ruin DEPTH, no rune writes it today,
+	# and it does not end in `_ranks` so nothing would coerce it if one did.
 	# NOT HERE ON PURPOSE: `pleasure_pct` is FRACTIONAL (2.5), so coercing it to
 	# an int would silently halve Pleasure from Pain.
 	"deep_hex_step", "soul_leech_step", "whispers_step", "barter_step",
-	"spread_ruin",
+	"spread_ruin", "broken_mind",
 	# BATCH BS §3: the re-authored Inferno lane's counters. NONE IS WRITTEN BY A
 	# RUNE TODAY — the audit in §4 came back clean, and the four spec:pyromancer
 	# runes ride `accelerant_ranks`, `conflagration_ranks`, `molten_ranks`,

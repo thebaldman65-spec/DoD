@@ -327,7 +327,7 @@
 	"whispering_dark": {
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily and marks the newly maddened with 1 Ruin, enemy afflictions mend the heroes each turn.",
+		"desc": "A little of every rite: +5% Break damage, each mark of Ruin has a 15% chance to leap to another enemy, which catches 1 Ruin, enemy afflictions mend the heroes each turn.",
 		"payload": {"stat": {"broken_will_ranks": 5, "spread_ranks": 15, "spread_ruin": 1, "pleasure_pct": 0.5}}
 	},
 

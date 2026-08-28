@@ -274,7 +274,10 @@ func _magnitudes() -> void:
 			["oc_unravel", "unravel_ranks", 4],
 			["oc_spread", "spread_ranks", 60],
 			["oc_spread", "spread_ruin", 2],
-			["oc_whispers", "whispers_step", 45],
+			# BATCH DP: 45 percentage points on Psychosis's 50% seize chance became
+			# +2 Ruin on `OLD_GODS_MARK`'s 2. THE FIELD KEPT ITS NAME because it
+			# kept its SHAPE — an INCREASE on a base the kit already pays.
+			["oc_whispers", "whispers_step", 2],
 			["oc_mirror", "mirror_ranks", 45],
 			["oc_delirium", "delirium_ranks", 3],
 			["oc_cackling", "cackling_ranks", 15],
@@ -311,7 +314,7 @@ func _magnitudes() -> void:
 		"spread_ruin is registered too — a rune writes it")
 	# The rendered tooltip, which is what a player actually reads.
 	for pair in [["oc_deep_hex", "take 5% more damage"],
-			["oc_whispers", "seizes its victim 95% of the time"],
+			["oc_whispers", "marks 4 Ruin instead of the base 2"],
 			["oc_soul_leech", "rises to 5% per stack"],
 			["oc_barter", "heals every other hero 35%"],
 			["oc_pact_flesh", "a cost of 5% rather than 20%"],
@@ -337,10 +340,15 @@ func _additive_units() -> void:
 			["0.01 * occ.grim_ranks", "Grim Focus"],
 			["u.take_hit(0, ent_occ.entropy_ranks)", "Entropy"],
 			["_gain_ruin(e, occ.unravel_ranks)", "Unraveling"],
-			["0.01 * spread_r", "Spread of Madness"],
-			['_gain_ruin(infected, _max_hero_rank("spread_ruin"))',
+			# BATCH DP — THREE NEEDLES FOLLOWED THEIR NODES ONTO RUIN. Spread of
+			# Madness and Whispers both read PSYCHOSIS, which only Mind Flay applies
+			# and DO moved that card into the draft; both are re-pointed onto the
+			# passive, which the Occultist owns in every run. THE COUNTERS ARE STILL
+			# ADDITIVE, which is what this section exists to prove.
+			["randf() < 0.01 * occ.spread_ranks", "Spread of Madness"],
+			["_gain_ruin(caught, occ.spread_ruin)",
 				"Spread of Madness (the Ruin it marks)"],
-			["0.01 * psy_occ.whispers_step", "Whispers"],
+			["return OLD_GODS_MARK + occ.whispers_step", "Whispers"],
 			["0.01 * mirror_r", "Umbral Mirror"],
 			["_gain_ruin(strike_target, mad_occ.delirium_ranks)", "Delirium"],
 			["0.01 * mad_occ.cackling_ranks", "Cackling Mirror"],
@@ -463,12 +471,22 @@ func _boss_legibility() -> void:
 	# madness, and `oc_mind_flay` and `oc_hysteria` stopped being those cards —
 	# both moved into `SPEC_DRAFT_POOLS` and both cells were re-authored onto
 	# the Occultist's protected core. **The rule is asserted on the cards
-	# instead, which is where a player actually reads it**, and the two nodes
-	# that still MODIFY the madness keep their text.
-	for id in ["oc_spread", "oc_whispers"]:
-		var txt := Talents.desc_for(_node(id), 1)
-		ok(txt.contains("Broken"),
-			"%s's node text states the boss rule (got: %s)" % [id, txt])
+	# instead, which is where a player actually reads it.**
+	#
+	# BATCH DP EMPTIED THE NODE HALF OF THIS LIST, AND THAT IS THE SAME
+	# MOVEMENT ONE STEP FURTHER. `oc_spread` and `oc_whispers` were the last
+	# two nodes stating the rule, and they stated it because they MODIFIED
+	# PSYCHOSIS — a status only Mind Flay applies. Both are re-pointed onto
+	# RUIN, which no boss resists at all, so repeating the boss rule on them
+	# would now be false rather than redundant.
+	#
+	# WHAT REPLACES IT IS STRONGER: the lane's row-8 cell is the EXCEPTION to
+	# the boss rule now, so it is the one node that must still name it, and
+	# naming a rule you are the exception to cannot be done vacuously.
+	var rm_txt := Talents.desc_for(_node("oc_permanent"), 1)
+	ok(rm_txt.contains("boss"), "Ruined Mind names the boss rule it excepts (got: %s)" % rm_txt)
+	ok(rm_txt.contains("Ruin"),
+		"...and pays for the exception in RUIN, which the passive guarantees (got: %s)" % rm_txt)
 	for card in ["Mind Flay", "Mass Hysteria"]:
 		var ab: Ability = Classes.spec_pool_ability("occultist", card)
 		ok(ab != null and ab.description.contains("BROKEN"),
@@ -542,6 +560,7 @@ func _rune_audit() -> void:
 		"spread_ranks", "spread_ruin", "mirror_ranks", "broken_will_ranks",
 		"deep_hex_step", "grim_ranks", "entropy_ranks", "unravel_ranks",
 		"whispers_step", "delirium_ranks", "cackling_ranks", "torment_ranks",
+		"broken_mind",  # BATCH DP: Ruined Mind's depth gate
 		"gluttony_ranks", "pact_flesh_ranks", "barter_step", "avatar_ruin",
 		"soul_glut"]
 	for rid in data:

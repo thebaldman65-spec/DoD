@@ -31,7 +31,20 @@ const Gate = preload("res://gate_fixture.gd")
 # DELETES a `src` must. **DI left it at 99; DJ stamped the seven companion
 # sites and left it at 106.**
 const SRC_FLOOR := 106
-const CALL_SITES := 204
+# BATCH DP MOVED THIS BY ONE, AND THE MOVEMENT IS A COVERAGE IMPROVEMENT.
+# The re-pointed Spread of Madness deleted `_apply_status(infected,
+# "psychosis", 3)` — a site that carried NO source — so the population is
+# 203 and the unstamped remainder is 97 rather than 98. `with_src` did not
+# move: it is still 106, and SRC_FLOOR still holds it.
+#
+# **THIS EQUALITY IS THE ONE ASSERTION IN THIS FILE THAT IS A NUMBER RATHER
+# THAN A PROPERTY, AND IT EARNED ITS KEEP HERE** — it is a tripwire saying
+# "the population this gate was written against has moved, come and look",
+# and DP's battery is exactly the case it exists for. Its sibling three
+# lines up is deliberately a RATCHET (`with_src >= SRC_FLOOR`) because that
+# one measures progress; this one measures the ground the progress is
+# against. **A batch that changes it must say why, here, in this comment.**
+const CALL_SITES := 203
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

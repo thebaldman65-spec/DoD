@@ -5300,3 +5300,59 @@ mis-says; both are clauses that under-say. **Adding a clause to a card is author
 a wrong word is repair** — so both are reported and neither is taken. The thread ends here on
 purpose: nine batches of "and then we found the next thing" is long enough that the discipline
 worth keeping is the one that says where to stop.
+
+---
+
+## BATCH DP — WHEN A RULING MAKES THE DEFECT
+
+DO settled the talent charter and implemented it, and in doing so it broke four cells that were
+correct the day before. Mind Flay and Mass Hysteria are the only appliers of Psychosis and Hysteria
+in the game; DO moved both into the draft; four Occultist Madness nodes that had been reading a
+**tree-internal** dependency — which the charter explicitly permits, because a cross-row condition
+bets on a node the player *chooses* rather than a card they are *dealt* — were reading a **drawn**
+one by the time the batch ended. Nobody made a mistake. **A ruling can manufacture a defect, and
+the batch that makes the ruling is the one that owes the report.** DO reported it and left it
+unruled, which is the whole reason this batch had somewhere to start.
+
+**The instrument could not have found this, and that is the more useful half.** DN's pass matched
+ability NAMES against node text, and every one of these four cells names no ability whatsoever.
+`sm_precision` was the same shape and was found by a person reading. A status has appliers the way
+an ability has a source, but the node reads the *status*, so a name-matching sweep looks straight
+through it. **The ability rule and the status rule were always one rule; only the instrument made
+them look like two.**
+
+**Four cells re-pointed onto one currency is how you flatten a lane, so the brief asked for the
+difference and it was worth asking for.** Madness was authored as a theme — enemies turned on each
+other — and "stacks of Ruin" four times would be one idea with four price tags. The four read an
+application, that application's magnitude, an event, and a depth threshold; and **none of them
+reads a detonation**, because three cells in the Ruin lane already do. The constraint that produced
+that spread was not aesthetic: every one of those quantities was *already spoken for* somewhere,
+and finding the four unclaimed ones is most of the design work.
+
+**Two of the four turned out not to need code at all, and one of those was invisible from the
+text.** `oc_delirium`'s card named Psychotic and Hysterical enemies; its read site names no status
+and never has — it fires on any enemy strikes-a-fellow, which the code's own comment explains is
+madness-driven by construction. **The bet was three words of prose over a correct implementation.**
+The repair was to make the text say what the code does, in the words the node one row down already
+uses for the same trigger. It was deliberately *not* narrowed to "Bewitched", which would have been
+the obvious minimal edit: that would under-state the payload the moment Mind Flay is drafted, and
+an absent clause does not mis-say, so no test in the project would ever catch it. **The cheapest
+correct edit and the smallest edit were not the same edit.**
+
+**The cost nobody had written down was a rune.** The Rune of the Whispering Dark writes
+`spread_ranks` and `spread_ruin` — the two fields Spread of Madness owns — and sells both clauses
+on its card. Re-pointing the node onto a fresh field name would have left two of that rune's four
+clauses paying nothing, silently, for a 100g purchase. The fix was not to notice it in review; the
+fix was to keep both fields and re-point their *meaning*, which cost one line of card text and no
+payload edit. **The general property is asserted now** — every stat field any rune writes has a
+live read site — because the next batch to re-point a node will not remember this one. That is the
+same lesson as "cutting a clause means cutting its payload term", read backwards: **a field is a
+contract with everything that writes it, not just with the node that named it.**
+
+**And the boss-immunity exception is where to put a thing, not what to put there.** The obvious
+implementation splices a condition into the `if` that refuses the status. Two suites pin that `if`
+line as a literal, on purpose, because the boss rule is exactly the kind of promise a later batch
+dissolves by widening one condition — so the obvious implementation would have moved the needle out
+from under both tests while looking like a clean one-line change. Nested inside the refusal, both
+literals survive and the exception reads better besides. **When a test pins a line, the line is
+load-bearing prose as well as code.**

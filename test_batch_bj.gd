@@ -245,7 +245,13 @@ func _initialize() -> void:
 		"§2: the Weeping Wound states its Cripple carrier")
 	ok(runes_json.contains("swells his maximum Mana 10%"),
 		"§2: the Wide Current states its Mana clause")
-	ok(runes_json.contains("marks the newly maddened with 1 Ruin"),
+	# BATCH DP — THE NEEDLE FOLLOWED ITS TEXT, WHICH IS DM's `test_batch_al`
+	# REPAIR IN A SECOND PLACE. The assertion is that the rune STATES the Ruin
+	# it marks, and it still does; what moved is who catches it. Spread of
+	# Madness was re-pointed off PSYCHOSIS (no guaranteed applier) onto the
+	# passive's own mark, so there is no "newly maddened" left to name. The
+	# needle names the CLAUSE rather than a bare number, for AL's reason.
+	ok(runes_json.contains("which catches 1 Ruin"),
 		"§2: the Whispering Dark states the Ruin mark AX said it must")
 	ok(runes_json.contains("drinks 6% more per stack"),
 		"§2: the Hollow Chalice states its true per-stack rate")

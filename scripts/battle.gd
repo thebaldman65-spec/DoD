@@ -6780,24 +6780,17 @@ func _enemy_turn(u: BattleUnit) -> void:
 			_intent_hijacked(u)
 			return
 	# Psychosis: 50% each turn the madness takes the wheel — supports aid
-	# the heroes; the rest maul their own. Spread of Madness is contagious.
+	# the heroes; the rest maul their own.
+	# BATCH DP — THE TWO TALENT READS THAT LIVED HERE ARE GONE. Spread of
+	# Madness dialled the leap and Whispers dialled this very chance, and both
+	# nodes were re-pointed onto Ruin because PSYCHOSIS HAS NO GUARANTEED
+	# APPLIER: Mind Flay is the only card that applies it and DO moved that card
+	# into the draft. The seize chance is the flat 50% the status has always
+	# carried, with no talent behind it — `spread_ranks`, `spread_ruin` and
+	# `whispers_step` all read at their new sites now, and NOWHERE ELSE. A field
+	# read in two places under two meanings is a silent order-dependence.
 	if u.has_status("psychosis"):
-		var spread_r := _max_hero_rank("spread_ranks")
-		if spread_r > 0 and randf() < 0.01 * spread_r:
-			var sane := enemies.filter(func(e): return not e.dead and e != u and not e.has_status("psychosis") and (not e.is_boss or e.broken))
-			if not sane.is_empty():
-				var infected: BattleUnit = sane.pick_random()
-				_log("   → Talent: Spread of Madness — the psychosis leaps to %s" % \
-					infected.unit_name, "#b0a8e0")
-				_apply_status(infected, "psychosis", 3)
-				_gain_ruin(infected, _max_hero_rank("spread_ruin"))
-		# Whispers (talent): the madness speaks louder — 50% base, +10%/rank.
-		var psy_occ := _living_occultist()
-		var psy_chance := 0.5 + ((0.01 * psy_occ.whispers_step) if psy_occ != null else 0.0)
-		if randf() < psy_chance:
-			if psy_occ != null and psy_occ.whispers_step > 0:
-				_log("   → Talent: Whispers — the madness needs no coaxing (%d%% seized)" % \
-					int(round(psy_chance * 100)), "#b0a8e0")
+		if randf() < 0.5:
 			var psy_support := _psychotic_support(u)
 			if not psy_support.is_empty():
 				_message("%s aids the enemy in its madness!" % u.unit_name)
@@ -9997,7 +9990,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						"#b0a8e0")
 					_apply_status(attacker, ab.applies_status["id"], turns, status_meta,
 						_dot_tick(ab.applies_status["id"], attacker))
-					_gain_ruin(attacker, OLD_GODS_MARK)
+					_gain_ruin(attacker, _old_gods_mark())
 				else:
 					# Pommel Strike's perfect (Batch AH) is the Stun landing on an
 					# unbroken boss — reliability where it was a parry buff.
@@ -10017,13 +10010,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
 					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
 							and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]):
-						_gain_ruin(strike_target, OLD_GODS_MARK)
+						_gain_ruin(strike_target, _old_gods_mark())
 				# Empowered Hex: the curse can set the rot in.
 				if ab.display_name == "Hex of Ruin" and attacker.emp_hex_ranks > 0 \
 						and not strike_target.dead \
 						and randf() < 0.01 * attacker.emp_hex_ranks:
 					_apply_status(strike_target, "decay", 3, 0, 0, attacker)
-					_gain_ruin(strike_target, OLD_GODS_MARK)
+					_gain_ruin(strike_target, _old_gods_mark())
 					_log("   → Talent: Empowered Hex — Decay takes root in %s" % \
 						strike_target.unit_name, "#b0a8e0")
 			# Lunge: the stance decides the wound — Aggressive Exposes,
@@ -11696,12 +11689,39 @@ func _hold_sync() -> void:
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		tick := 0, src: BattleUnit = null, force := false) -> void:
 	# Bosses shrug off Stuns, Freezes, and mind magic until Broken.
+	#
+	# BATCH DP — RUINED MIND (Occultist, Madness row 8) IS THE ONE EXCEPTION,
+	# AND IT IS THE NODE'S WHOLE JOB. The Madness lane's own header states the
+	# constraint — every effect in it is refused by a boss until Broken — and a
+	# row-8 cell is the cell that REMOVES the constraint its lane has worked
+	# around all game. It pays for it in RUIN, the one currency the passive
+	# guarantees, so the node is not a bet on the draw.
+	#
+	# SCOPED THREE WAYS AND EVERY ONE OF THEM MATTERS: to `bewitch` alone (the
+	# only one of the three the Occultist can apply without drawing a card, and
+	# the only one his node's text names); to a HERO src holding the node (an
+	# enemy's charm keeps meeting the boss's own immunity); and to a target
+	# already bearing the depth. IT IS SELF-ENABLING BY CONSTRUCTION: the
+	# `bewitch` handler marks Ruin on the line after this refusal, so a refused
+	# cast still deepens the mark that eventually opens the gate.
+	#
+	# THE EXCEPTION LIVES INSIDE THE REFUSAL RATHER THAN IN ITS CONDITION, AND
+	# THAT IS NOT COSMETIC: `test_batch_ah` §4 and `test_batch_ax` §4 both pin
+	# this `if` line as a LITERAL, because the boss rule is the kind of promise
+	# a later batch could dissolve by widening one condition. An exception
+	# spliced into the line would have moved the needle out from under both.
 	if not force and id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \
 			and target.is_boss and not target.broken:
-		target.float_text("IMMUNE", Color(0.75, 0.75, 0.75))
-		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
-			String(STATUS_INFO[id][0])], "#909090")
-		return
+		var mind_open := id == "bewitch" and src != null and src.is_hero \
+			and src.broken_mind > 0 \
+			and target.status_stacks("ruin") >= src.broken_mind
+		if not mind_open:
+			target.float_text("IMMUNE", Color(0.75, 0.75, 0.75))
+			_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
+				String(STATUS_INFO[id][0])], "#909090")
+			return
+		_log("   → Talent: Ruined Mind — %d Ruin has hollowed %s out; the charm holds" % [
+			target.status_stacks("ruin"), target.unit_name], "#b0a8e0")
 	# BATCH BR — IRONCLAD refuses the three statuses that COST HIM A TURN,
 	# and nothing else. It sits beside the boss immunity because it is the
 	# same kind of rule (this unit does not take that status) and above
@@ -11776,22 +11796,24 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	if id == "burn" and turns > 0 and src != null and src.is_hero \
 			and _emberkeep_holder() != null:
 		eff_turns = turns * EMBERKEEP_MULT
-	# BATCH BM §2 — THE THREE "IT STOPS EXPIRING" ROW-8 NODES, at ONE site,
-	# because they are one rule pointed at three status families and three
-	# copies of it would drift. -1 is the project's existing battle-long
-	# marker (the same one Permafrost sets one line above), so nothing
-	# downstream needed teaching.
+	# BATCH BM §2 — THE "IT STOPS EXPIRING" ROW-8 NODES, at ONE site, because
+	# they are one rule pointed at more than one status family and two copies of
+	# it would drift. -1 is the project's existing battle-long marker (the same
+	# one Permafrost sets one line above), so nothing downstream needed teaching.
 	#   THE WHOLE ROOM   (Warden, Threat row 8)   — his taunts never lapse
 	#   ETERNAL GROUND   (Devout, Zeal row 8)     — the banner never expires
-	#   PERMANENT DELUSION (Occultist, Madness 8) — his madness never lifts
+	# BATCH DP — IT WAS THREE AND IS TWO. Permanent Delusion was the third and it
+	# kept PSYCHOSIS, BEWITCH and HYSTERIA alive; two of those three have no
+	# applier the Occultist is guaranteed, so the cell was re-pointed onto Ruin
+	# and renamed RUINED MIND. Its new read is the boss-immunity gate at the top
+	# of this function, not this one. THE SHAPE OF THE SITE IS UNCHANGED and a
+	# third family can still join it.
 	# Scoped to the SRC in every case, exactly as Permafrost is: an enemy's
-	# taunt or an enemy's madness keeps its clock.
+	# taunt keeps its clock.
 	if src != null and src.is_hero:
 		if id == "mocked" and src.whole_room > 0:
 			eff_turns = -1
 		elif id == "cons_ground" and src.eternal_ground > 0:
-			eff_turns = -1
-		elif id in ["psychosis", "bewitch", "hysteria"] and src.permanent_delusion > 0:
 			eff_turns = -1
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
@@ -13867,6 +13889,24 @@ const RUIN_THRESHOLD := 10
 const RUIN_LEECH_CAP := 0.40
 
 
+# BATCH DP — WHISPERS'S NEW HOME, AND IT IS `_ruin_threshold()`'s SHAPE ON
+# PURPOSE. `OLD_GODS_MARK` is quoted at five sites and every one of them is
+# "the passive marking a debuff the Occultist applied" — the constant's own
+# comment says so. A talent moving that number therefore has to move it at all
+# five or at none, so it moves in ONE function the five call instead, exactly
+# as Avatar of Ruin moves the threshold.
+#
+# NODE MAGNITUDES ARE UNAFFECTED AND THAT IS THE WHOLE REASON THIS IS NOT A
+# CHANGE INSIDE `_gain_ruin`: Delirium, Unraveling and Spread of Madness pass
+# their OWN counts to that function, and deepening it there would have
+# silently inflated all three off one node.
+func _old_gods_mark() -> int:
+	var occ := _living_occultist()
+	if occ != null and occ.whispers_step > 0:
+		return OLD_GODS_MARK + occ.whispers_step
+	return OLD_GODS_MARK
+
+
 func _ruin_threshold() -> int:
 	var occ := _living_occultist()
 	# `avatar_ruin` is the GATE AND THE MAGNITUDE in one field (AW's `judgement`
@@ -13887,7 +13927,18 @@ func _ruin_threshold() -> int:
 # own. THE VARIANT AX NAMED — first detonation at 5, every 10 after — IS
 # STILL NOT SHIPPED: this attacks generation, which is the thing the data
 # indicted. RUIN_THRESHOLD stays 10 and Avatar of Ruin stays 5.
+# BATCH DP: THE FIVE SITES CALL `_old_gods_mark()` NOW rather than quoting
+# this constant directly, because Whispers moves the number. THE BASE IS
+# STILL HERE and is still the only authored copy of it.
 const OLD_GODS_MARK := 2
+
+
+# BATCH DP — SPREAD OF MADNESS'S RE-ENTRY GUARD. The re-pointed node makes a
+# LANDING MARK contagious, and a contagion that marks through this same
+# function is a recursion Covenant of Ash's identity trick cannot break: the
+# ash always lands on ONE known bearer, a contagion lands on a RANDOM enemy,
+# so `mirror == target` has no equivalent here. The flag is the equivalent.
+var _ruin_spreading := false
 
 
 # Wrath of the Old Gods: every Occultist-applied debuff marks its victim.
@@ -13936,6 +13987,34 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 		_log("   → Covenant of Ash: the ash claims %d stack%s on %s too" % [
 			n, "" if n == 1 else "s", mirror.unit_name], "#a050b0")
 		_gain_ruin(mirror, n)
+	# BATCH DP — SPREAD OF MADNESS, RE-POINTED ONTO RUIN. The node read
+	# PSYCHOSIS, which only Mind Flay applies and DO moved into the draft; it
+	# reads AN APPLICATION now — this one — which the passive guarantees.
+	#
+	# IT FIRES ON A MARK LANDING, WHERE UNRAVELING FIRES ON A DETONATION, so the
+	# lane's two propagation nodes never read the same event.
+	#
+	# THE SPREAD GOES THROUGH THIS FUNCTION, WHICH IS THE POINT — a caught mark
+	# arms the threshold, deepens the chip and books the AX depth reading exactly
+	# as a directly-applied one does. THE GUARD IS WHAT MAKES THAT SAFE, and it
+	# is bounded rather than absolute: a covenant mirror can still roll its own
+	# contagion (its `_gain_ruin` re-enters before the flag is ever set), so the
+	# ceiling is TWO rolls per originating mark and no chain can run past them.
+	#
+	# BOTH FIELDS SURVIVED THE RE-POINT DELIBERATELY. The Rune of the Whispering
+	# Dark writes `spread_ranks` AND `spread_ruin`, so a new field name would
+	# have left two of that rune's four clauses paying nothing, in silence —
+	# which is the exact dud the rune schema exists to prevent.
+	if not _ruin_spreading and occ.spread_ranks > 0 and occ.spread_ruin > 0 \
+			and randf() < 0.01 * occ.spread_ranks:
+		var catchers := enemies.filter(func(e): return not e.dead and e != target)
+		if not catchers.is_empty():
+			var caught: BattleUnit = catchers.pick_random()
+			_log("   → Talent: Spread of Madness — the mark leaps to %s (+%d Ruin)" % [
+				caught.unit_name, occ.spread_ruin], "#b0a8e0")
+			_ruin_spreading = true
+			_gain_ruin(caught, occ.spread_ruin)
+			_ruin_spreading = false
 	# BATCH AX §0 — THE SECOND NEW NUMBER: how deep the mark actually gets now
 	# that it has no ceiling. Banked at the gain site rather than at battle end
 	# because a target that DIES holding twenty stacks still measured twenty.
@@ -15134,7 +15213,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"bewitch":
 			_sfx("break", -8.0, 1.4)
 			_apply_status(target, "bewitch", 3, 0, 0, attacker)
-			_gain_ruin(target, OLD_GODS_MARK)
+			_gain_ruin(target, _old_gods_mark())
 			_message("%s bewitches %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Bewitch — %s will turn on its allies (3 turns)" % [
 				attacker.unit_name, target.unit_name], "#c070e0")
@@ -15547,7 +15626,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# — through the same call the generic hook makes, at the same
 				# magnitude, rather than a second rule of its own.
 				if attacker.passive_id == "old_gods":
-					_gain_ruin(target, OLD_GODS_MARK)
+					_gain_ruin(target, _old_gods_mark())
 				_sfx("bomb", -9.0, 0.7)
 				_message("%s poisons the well beneath %s" % [attacker.unit_name,
 					target.unit_name])

@@ -1233,7 +1233,10 @@ var prep_pending := 0
 # THREE HOLD THE INCREASE ON A BASE THE KIT ALREADY PAYS and are named `_step`
 # for it (AV's `guardian_step` precedent, AW's four): `deep_hex_step` on the
 # passive's 2%-per-stack, `soul_leech_step` on its 2%-per-stack lifesteal,
-# `whispers_step` on Psychosis's own 50%. A FOURTH has the same shape and takes
+# `whispers_step` on `OLD_GODS_MARK`, the 2 Ruin every debuff he applies marks
+# (BATCH DP re-pointed it there off Psychosis's own 50% — the SHAPE of the
+# field is unchanged, which is why it keeps its `_step` name and its
+# STAT_INT_KEYS entry). A FOURTH has the same shape and takes
 # the same treatment — `barter_step` on Dark Pact's base 15% — reported in the
 # changelog rather than silently generalised.
 var emp_hex_ranks := 0        # Empowered Hex: % chance Hex applies Decay (100 = always)
@@ -1243,16 +1246,16 @@ var pleasure_pct := 0.0       # Pleasure from Pain: % max HP per unique debuff (
 var channeling_ranks := 0     # Corrupted Channeling: crippled attackers feed
 var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
 var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
-var spread_ranks := 0         # Spread of Madness: % chance Psychosis leaps
-var spread_ruin := 0          # Spread of Madness: Ruin the newly maddened take
+var spread_ranks := 0         # Spread of Madness: % chance a landing mark leaps
+var spread_ruin := 0          # Spread of Madness: Ruin the enemy it leaps to catches
 var mirror_ranks := 0         # Umbral Mirror: % chance enemy debuffs reflect
 var broken_will_ranks := 0    # Broken Will: +% Break damage dealt
 var deep_hex_step := 0        # Deeper Hex: +% damage per Ruin stack on the base 2%
 var grim_ranks := 0           # Grim Focus: +% detonation damage
 var entropy_ranks := 0        # Entropy: Break damage any Ruin grinds each turn
 var unravel_ranks := 0        # Unraveling: Ruin a detonation seeds in others
-var whispers_step := 0        # Whispers: +% seize chance on Psychosis's base 50%
-var delirium_ranks := 0       # Delirium: Ruin a maddened strike marks
+var whispers_step := 0        # Whispers: +Ruin per debuff on the passive's base 2
+var delirium_ranks := 0       # Delirium: Ruin an enemy-on-enemy strike marks
 var cackling_ranks := 0       # Cackling Mirror: % of a fellow-strike healed
 var torment_ranks := 0        # Lingering Torment: Decay turns expired madness leaves
 var gluttony_ranks := 0       # Gluttony: +% per Ruin stack (its own dial)
@@ -1303,7 +1306,8 @@ var layered_faith := 0        # Layered Faith: a shield ADDS rather than replace
 var creed := 0                # Creed: Faith is paid on the party's highest peak
 var eternal_ground := 0       # Eternal Ground: Consecrated Ground never expires
 var weight_of_ruin := 0       # Weight of Ruin: the Ruin depth that halves and seals
-var permanent_delusion := 0   # Permanent Delusion: his madness never expires
+var broken_mind := 0          # Ruined Mind: the Ruin depth past which a boss
+                              # can no longer resist his Bewitchment
 var blood_communion := 0      # Blood Communion: % of his Break dealt, healed
 # --- Hunter ---
 var cocktail := 0             # Cocktail: other statuses per extra Poison stack

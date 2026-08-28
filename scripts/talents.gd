@@ -2367,15 +2367,31 @@ const LANE_TREES := {
 		# the rule is stated here, in the glossary and in the tooltips. ---
 		# Two magnitudes, two fields: a chance and a stack count, and one counter
 		# cannot honestly hold both (AW's `covenant` precedent).
+		# BATCH DP — RE-POINTED ONTO RUIN. It read PSYCHOSIS, which only Mind Flay
+		# applies, and DO moved that card into the draft — so the node became a bet
+		# on a card the Occultist may never be dealt. IT READS AN APPLICATION NOW:
+		# the passive's own mark, which he is guaranteed in every run. THE TWO
+		# FIELDS ARE KEPT ON PURPOSE — the Rune of the Whispering Dark writes BOTH,
+		# so re-pointing onto a new field would have left two thirds of a 100g rune
+		# paying nothing, in silence.
+		# THE CONTAGION FIRES ON A MARK, WHERE UNRAVELING (Ruin row 7) FIRES ON A
+		# DETONATION. The two never read the same event.
 		{"id": "oc_spread", "name": "Spread of Madness", "ranks": 1, "lane": "Madness", "row": 1,
-			"desc": "Psychosis has a {v}% chance each turn to leap to a fellow minion — the newly maddened gain 2 Ruin. Bosses resist until Broken.",
+			"desc": "Each mark of Ruin the Occultist lands has a {v}% chance to leap to another enemy, which catches 2 Ruin.",
 			"scale": {"step": 60},
 			"payload": {"stat": {"spread_ranks": 60, "spread_ruin": 2}}},
-		# The counter holds the INCREASE on Psychosis's own 50%.
+		# BATCH DP — RE-POINTED ONTO RUIN. Same bet as Spread of Madness and the
+		# same repair: it dialled PSYCHOSIS's seize chance, and Psychosis left the
+		# tree with Mind Flay at DO. IT READS AN APPLICATION MAGNITUDE NOW — how
+		# deep the passive's own mark bites — which is the lever AY §8 identified as
+		# the real constraint (generation, not the threshold).
+		# THE FIELD KEEPS ITS `_step` NAME AND ITS MEANING: it still holds the
+		# INCREASE on a base the kit already pays, so its STAT_INT_KEYS entry stays
+		# honest. Only the base moved, 50% -> `OLD_GODS_MARK`.
 		{"id": "oc_whispers", "name": "Whispers", "ranks": 1, "lane": "Madness", "row": 2,
-			"desc": "Psychosis seizes its victim {v}% of the time (up from the base 50%). Bosses resist Psychosis until Broken.",
-			"scale": {"base": 50, "step": 45},
-			"payload": {"stat": {"whispers_step": 45}}},
+			"desc": "Every debuff the Occultist applies marks {v} Ruin instead of the base 2.",
+			"scale": {"base": 2, "step": 2},
+			"payload": {"stat": {"whispers_step": 2}}},
 		# BATCH DO — RE-AUTHORED. This cell granted Mind Flay; a talent may not
 		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
 		# the cell now modifies BEWITCH, a PROTECTED CORE ability, which the hero owns in every run.
@@ -2390,8 +2406,16 @@ const LANE_TREES := {
 			"scale": {"step": 45},
 			"payload": {"stat": {"mirror_ranks": 45}}},
 		# THE cross-lane node — every maddened strike builds toward a detonation.
+		# BATCH DP — TEXT ONLY, AND THE CODE WAS ALREADY RIGHT. It named Psychotic
+		# and Hysterical, two statuses only drawn cards apply; its READ SITE names
+		# no status at all and never has (`not attacker.is_hero and not
+		# strike_target.is_hero`). The text now says what the code does, which is
+		# also what `oc_cackling` one row down has always said — the same trigger
+		# deserves the same sentence. NOT NARROWED TO "Bewitched": that would have
+		# UNDER-stated the payload the moment Mind Flay is drafted, which is DM's
+		# seventh family, and an absent clause does not mis-say so no test catches it.
 		{"id": "oc_delirium", "name": "Delirium", "ranks": 1, "lane": "Madness", "row": 5,
-			"desc": "When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim is marked with {v} Ruin.",
+			"desc": "When an enemy strikes a fellow, the victim is marked with {v} Ruin.",
 			"scale": {"step": 3},
 			"payload": {"stat": {"delirium_ranks": 3}}},
 		{"id": "oc_cackling", "name": "Cackling Mirror", "ranks": 1, "lane": "Madness", "row": 6,
@@ -2455,10 +2479,26 @@ const LANE_TREES := {
 			"desc": "An enemy bearing {v} or more Ruin moves at half speed and cannot be healed.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"weight_of_ruin": 8}}},
-		# THE MADDENED STOP NEEDING TO BE MADDENED AGAIN.
-		{"id": "oc_permanent", "name": "Permanent Delusion", "ranks": 1, "lane": "Madness", "row": 8,
-			"desc": "Psychosis, Bewitchment and Hysteria the Occultist applies never expire.",
-			"payload": {"stat": {"permanent_delusion": 1}}},
+		# BATCH DP — RE-POINTED ONTO RUIN, AND RENAMED WITH IT. "Permanent Delusion"
+		# made Psychosis, Bewitchment and Hysteria eternal; two of the three are
+		# drawn, so two thirds of the node was a bet on the draw.
+		# IT READS THE STACK COUNT NOW, AS A THRESHOLD — the only row-8 read in the
+		# lane, and the row-8 shape exactly: it REMOVES THE CONSTRAINT THIS LANE HAS
+		# WORKED AROUND ALL GAME, stated six comment-lines above ('EVERY EFFECT IN
+		# THIS LANE IS REFUSED BY A BOSS UNTIL IT IS BROKEN'), and pays for it out of
+		# the one currency the passive guarantees.
+		# IT IS SELF-ENABLING AND THAT IS DELIBERATE: the boss refuses the charm
+		# inside `_apply_status`, but the `bewitch` handler marks Ruin on the very
+		# next line REGARDLESS — so a refused cast still deepens the mark that will
+		# eventually open the gate. Nothing had to be added to make that true.
+		# SCOPED TO BEWITCH ALONE, matching the text word for word. Widening it to
+		# Psychosis and Hysteria would be a BONUS rather than a bet (Bewitch carries
+		# the node on its own) — but a clause the text does not state is DM's seventh
+		# family, so it is a decision, not a freebie.
+		{"id": "oc_permanent", "name": "Ruined Mind", "ranks": 1, "lane": "Madness", "row": 8,
+			"desc": "A boss bearing {v} or more Ruin can no longer resist the Occultist's Bewitchment.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"broken_mind": 10}}},
 		# THE PARTY DRINKS FROM SOMETHING OTHER THAN HIS MARKS — his Break, which
 		# Broken Will and Entropy spend the lane above building.
 		{"id": "oc_blood_communion", "name": "Blood Communion", "ranks": 1, "lane": "Leech", "row": 8,
