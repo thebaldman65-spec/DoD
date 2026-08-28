@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Draft Audit (Batch DQ)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-08-28 (Batch DQ &mdash; first pass)</b></p>
+<h1>DAWN OF DECAY — THE DRAFT AUDIT</h1>
+
+<p><i>Every one of the 142 draft cards, compared against every other card it can be offered
+beside, against the protected core kit of the hero who would be offered it, and against the
+talent tree that hero allocates into. <b>This is a REPORT. Nothing here was fixed</b> — no card
+was retired, no magnitude moved, no description edited. Every finding is a design question, and
+each is written so the remedy can be ruled on directly.</i></p>
+
+<h2>COVERAGE, STATED BEFORE ANY FINDING</h2>
+<p><b>An audit that overstates its reach is worse than a narrow one that admits its edges.</b>
+Batch CJ reported 120 of 120 clean and was later found to have had no check at all for the failure
+mode it missed. So: this is what was compared, how, and what was not.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>How it was compared</th><th>Reached?</th></tr>
+<tr><td><b>142 draft cards</b> (118 spec + 24 class-wide)</td>
+<td>Every card built through <code>Classes.spec_pool_ability</code> / <code>pool_ability</code>
+and dumped live from a running engine — cost, cooldown, initiative, target flags, statuses,
+<code>special</code>. Not read out of the source by hand.</td><td><b>142 / 142</b></td></tr>
+<tr><td><b>113 cards with a <code>special</code></b></td>
+<td>The handler body was lifted out of <code>battle._resolve_special</code>'s match block, comments
+and every cosmetic call (<code>_log</code>, <code>_message</code>, <code>_sfx</code>,
+<code>float_text</code>, <code>refresh_bars</code>) stripped, and the remainder compared pairwise
+inside every offer space. <b>This is what makes two cards with different descriptions comparable.</b>
+</td><td><b>113 / 113</b>, and every <code>special</code> named by a draft card resolves to an arm</td></tr>
+<tr><td><b>29 cards with no <code>special</code></b></td>
+<td>Compared on their fields, plus the bespoke <code>display_name ==</code> code each one has in
+<code>battle.gd</code> &mdash; counted per card, from 0 (six cards are pure field vectors) to 7
+(Unmaking).</td><td><b>29 / 29</b></td></tr>
+<tr><td><b>27 pure self-flag cards</b> whose entire handler is
+<code>_apply_status(attacker, &hellip;)</code></td>
+<td>The flag's READ SITES were followed, because the payload is not in the handler. This is where
+finding 2 came from and it would have been invisible any other way.</td><td><b>27 / 27</b></td></tr>
+<tr><td><b>Draft card vs protected core kit</b></td>
+<td>Both by identifier (no draft card shares a name or a <code>special</code> id with any core
+ability &mdash; asserted, not assumed) and by decision, hero by hero.</td><td><b>12 / 12 specs</b></td></tr>
+<tr><td><b>Draft card vs talent node</b></td>
+<td>All 324 nodes tagged by mechanism family and read against the pool of the spec that allocates
+them. <b>The node payloads were read, not the node names</b> &mdash; several node <i>ids</i> still
+carry the name of the ability they were re-pointed off at DO.</td><td><b>324 / 324</b></td></tr>
+<tr><td><b>Class pool vs spec pool</b></td>
+<td>Every class card compared against every spec card of the three specs that can draw it.</td>
+<td><b>4 &times; 3 offer spaces</b></td></tr>
+</table>
+
+<p><b>WHAT WAS NOT CHECKED, AND SHOULD NOT BE READ AS CLEAN.</b></p>
+<ul>
+<li><b>Nothing here is a balance judgement and no simulation was run.</b> "Too strong" appears only
+where it means <i>strictly dominates another card in the same pool</i>, which is a correctness
+matter. Whether any card is well-tuned is the designer's, and <b>no sim has run since Batch DK</b>
+&mdash; every carried figure in <code>docs/state.md</code> is already stale.</li>
+<li><b>The two Grade-1/2 findings were confirmed by reading code. The Grade-3 and Grade-4 findings
+were not measured</b> &mdash; they are structural claims about what a card decides, argued from the
+payload. A sim could refute one.</li>
+<li><b>The axis vocabulary is this audit's own and is defensible rather than canonical.</b> It was
+derived from the corpus; a different cut would move some cards by one column. The <i>clusters</i>
+are robust to that; the exact per-pool axis counts are not.</li>
+<li><b>Enemy abilities, relics, runes and items were not compared against draft cards at all.</b>
+The rune half in particular is a live question: <code>docs/state.md</code> already records that two
+runes grant a card their own hero can now draft.</li>
+<li><b>Boss-pick pools (<code>SPEC_POOLS</code> / <code>CLASS_POOLS</code>) were dumped but not
+audited.</b> They are a separate offer with a separate population and they were out of scope.</li>
+</ul>
+
+<h2>&sect;0 — THE POPULATION, DERIVED</h2>
+<p><b>The draft is 142 and the spec half is no longer a flat multiple.</b> 118 spec cards + 24
+class-wide (4 classes &times; 6). <b>Nine of the twelve spec pools took one or more of DO's
+twenty-two ex-talent-grants and three took none</b> &mdash; and the three that took none are the
+whole Hunter class.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>class</th><th>spec</th><th>pool before DO</th><th>DO added</th><th>pool now</th></tr>
+<tr><td rowspan="3">Mage</td><td>Pyromancer</td><td align="center">8</td><td align="center"><b>+5</b></td><td align="center"><b>13</b></td></tr>
+<tr><td>Cryomancer</td><td align="center">8</td><td align="center"><b>+4</b></td><td align="center"><b>12</b></td></tr>
+<tr><td>Arcanist</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td rowspan="3">Cleric</td><td>Holy Cleric</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td>Devout</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td>Occultist</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td rowspan="3">Warrior</td><td>Berserker</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td>Swordmaster</td><td align="center">8</td><td align="center">+2</td><td align="center">10</td></tr>
+<tr><td>Warden</td><td align="center">8</td><td align="center">+1</td><td align="center">9</td></tr>
+<tr><td rowspan="3">Hunter</td><td>Beastmaster</td><td align="center">8</td><td align="center"><b>&mdash;</b></td><td align="center"><b>8</b></td></tr>
+<tr><td>Sharpshooter</td><td align="center">8</td><td align="center"><b>&mdash;</b></td><td align="center"><b>8</b></td></tr>
+<tr><td>Survivalist</td><td align="center">8</td><td align="center"><b>&mdash;</b></td><td align="center"><b>8</b></td></tr>
+<tr><td colspan="2"><b>spec total</b></td><td align="center"><b>96</b></td><td align="center"><b>+22</b></td><td align="center"><b>118</b></td></tr>
+</table>
+
+<p><b>THE DISTRIBUTION IS THE FIRST FINDING AND NOBODY ASKED FOR IT.</b> The deepest pool is now
+<b>62% deeper</b> than the shallowest, and the split is not random &mdash; <b>it lands on class
+lines</b>. The Mage took nine of the twenty-two, the Hunter took none. A Pyromancer's spec draw is
+spread over thirteen cards and a Sharpshooter's over eight, so the Pyromancer sees more of the game
+per run and repeats himself less, from a change that was never about the draft.</p>
+
+<h2>&sect;1 — GRADE 1 AND GRADE 2: THE TWO CORRECTNESS FINDINGS</h2>
+<p><i>Grade 1 is the same card twice. Grade 2 is one card strictly better than another in the same
+pool, which the standing rule in <code>classes.gd</code> already forbids &mdash;
+<b>"NO ABILITY MAY BE A STRICTLY BETTER VERSION OF ANOTHER IN THE SAME POOL"</b>. Both findings
+below are Grade 2, so both are a rule that has not been enforced rather than a matter of taste.</i></p>
+
+<h3>FINDING 1 &mdash; GLACIAL PRISON AND FLASH FREEZE ARE ONE CARD AT TWO PRICES, AND THE DEARER
+ONE IS ALSO THE SLOWER, THE RARER AND THE ONLY ONE THAT CAN BE WASTED</h3>
+<p><b>Both are in the Cryomancer's pool. Their handlers are the same three steps in the same
+order.</b> Comments and cosmetics stripped, this is the whole of both:</p>
+<pre>
+"flash_freeze":                                "glacial_prison":
+  if target != null and not target.dead:         if not target.has_status("chilled"):
+    if not target.has_status("chilled"):           _apply_status(target, "chilled", 3, 0, 0, attacker)
+      _apply_status(target, "chilled", 3, ...)      _note_debuff_applied(attacker, "chilled")
+      _note_debuff_applied(attacker, "chilled")  _hold_freeze(target, attacker)
+    _hold_freeze(target, attacker)
+</pre>
+<p>Nothing else. Flash Freeze computes one extra local, <code>ff_boss</code>, and <b>uses it
+only inside its log string</b>. The boss rule both cards advertise ("a boss resists until Broken",
+"the ice holds it one turn only") lives inside <code>_hold_freeze</code> and belongs to neither
+&mdash; <b>Flash Freeze's card sells a shared property as though it were its own</b>, which is why
+the two read as different cards and are not.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th></th><th>Mana</th><th>cooldown</th><th>initiative</th><th>in <code>RECAST_GATED</code>?</th><th>effect</th></tr>
+<tr><td><b>Glacial Prison</b> (DO's)</td><td align="center"><b>25</b></td><td align="center"><b>4</b></td><td align="center"><b>2.5</b></td><td align="center"><b>YES</b></td><td rowspan="2" align="center">identical</td></tr>
+<tr><td>Flash Freeze</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td align="center">no</td></tr>
+</table>
+
+<p><b>Glacial Prison is better on all four columns.</b> The fourth is the one that is easy to miss
+and is not cosmetic: <code>RECAST_GATED</code> is what makes the game <i>refuse</i> a cast that
+would do nothing. Glacial Prison cannot be spent on an enemy already held; <b>Flash Freeze can, and
+the turn is gone.</b> The dearer card is the one with no safety on it.</p>
+<p><b>THIS WAS CREATED BY BATCH DO AND BY NOTHING ELSE.</b> Glacial Prison was a talent grant, in
+no pool, until DO moved it into the pool that had held Flash Freeze since Batch CB. Neither batch
+did anything wrong on its own terms; the collision only exists once both are draftable.</p>
+
+<h4>AND THE SOURCE ALREADY SAYS ALL OF THIS &mdash; IN A COMMENT WHOSE BOTH REASONS HAVE SINCE BEEN
+RETIRED</h4>
+<p><b>This finding was not discovered. It was recorded, deliberately suspended, and then left
+standing while the two things holding it up were removed by other batches.</b> The comment above
+Flash Freeze in <code>classes.gd</code> reads, in full:</p>
+<pre>
+# REPORTED, NOT RE-TUNED: on every number this is a strictly worse
+# GLACIAL PRISON (Deep Freeze row 4 &mdash; 25 Mana, 2.5, 4cd for the same
+# outright freeze). The distinction is the ACQUISITION CHANNEL, which is
+# real: the node is a bought cell in ONE lane of ONE tree, so a Winter or
+# Thaw Cryomancer can never have it, while this is drafted by any of
+# them. Its PERFECT is what keeps it from being dominated outright &mdash; see
+# `_hold_freeze`'s `force` argument, which no node buys.
+</pre>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>the defence</th><th>what happened to it</th></tr>
+<tr><td><b>1. The acquisition channel.</b> <i>"the node is a bought cell in ONE lane of ONE tree, so
+a Winter or Thaw Cryomancer can never have it."</i></td>
+<td><b>DIED AT DO.</b> Glacial Prison is a draft card in the Cryomancer's own pool now, available to
+every Cryomancer whatever lane he allocates. <b>Deep Freeze row 4 is <code>cr_numbing</code>
+"Numbing Cold"</b> (Ice Lance costs less, cooldown falls to 1) &mdash; the cell the comment points
+at grants nothing any more, because no node grants anything any more.</td></tr>
+<tr><td><b>2. The Perfect.</b> <i>"Its PERFECT is what keeps it from being dominated outright &mdash;
+see <code>_hold_freeze</code>'s <code>force</code> argument."</i></td>
+<td><b>DIED AT CR, AND A SUITE PINS IT SHUT.</b> <code>test_batch_ax</code> asserts the absence of
+<code>_hold_freeze(target, attacker, true)</code> with the message <i>"Flash Freeze no longer FORCES
+the freeze &mdash; a boss resists until Broken"</i>, and all four <code>_hold_freeze</code> call
+sites in <code>battle.gd</code> pass two arguments. <b>And the card carries
+<code>perfect_id ""</code> and <code>perfect_text ""</code></b>, with no <code>is_perfect</code>
+branch anywhere in its handler &mdash; <b>it has no Perfect at all.</b></td></tr>
+</table>
+<p><b>So the standing rule was consciously suspended for two stated reasons, and both reasons were
+later removed by batches that had no cause to look at this card.</b> That is a more useful finding
+than "two cards are the same": <b>the mechanism that failed is a justification outliving its
+premises</b> &mdash; the same species as the stale <code>~96</code> denominator CD swept and the
+<code>53 of 204</code> figure DJ pinned. <b>Correcting the comment is one edit and is owed whatever
+the designer rules on the cards.</b></p>
+<p><b>THE CHOICE:</b> <i>retire one</i> (Flash Freeze is the one with nothing of its own);
+<i>differentiate</i> (give Flash Freeze the clause its card already implies &mdash; a Broken boss
+held for a turn is a real effect no other card buys, and it is currently only a log line); or
+<i>move Glacial Prison</i> out of the spec pool. <b>Doing nothing ships a card that is never the
+right pick.</b></p>
+
+<h3>FINDING 2 &mdash; BATTLE POISE'S ENTIRE PAYLOAD IS A SUBSET OF ANSWERING STEEL'S, AND THEY SIT
+IN THE SAME POOL</h3>
+<p>Both are Swordmaster draft cards. Both are pure self-flags, so the payload is not in the handler
+&mdash; it is at the parry site in <code>battle.gd</code>, where <b>both fire on the same event,
+eleven lines apart</b>:</p>
+<pre>
+if strike_target.has_status("answering_steel"):
+    ... resource += ANSWERING_RAGE          # 15 Rage
+    _tick_cooldowns(strike_target, ANSWERING_TICK, "Answering Steel")      # ANSWERING_TICK == 1
+if strike_target.has_status("battle_poise"):
+    _tick_cooldowns(strike_target, BATTLE_POISE_TICK, "Battle Poise")      # BATTLE_POISE_TICK == 1
+</pre>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th></th><th>Rage</th><th>cooldown</th><th>turns</th><th>stance required</th><th>parry chance</th><th>per parry</th></tr>
+<tr><td><b>Answering Steel</b></td><td align="center"><b>20</b></td><td align="center">4</td><td align="center"><b>6</b></td><td align="center"><b>none</b></td><td align="center"><b>+20%</b></td><td><b>1 turn off every cooldown, and 15 Rage</b></td></tr>
+<tr><td>Battle Poise</td><td align="center">25</td><td align="center">4</td><td align="center">4</td><td align="center"><b>Defensive</b></td><td align="center">&mdash;</td><td>1 turn off every cooldown</td></tr>
+</table>
+<p><b>Answering Steel is cheaper, lasts half again as long, has no stance requirement, pays the
+same cooldown tick from the same constant, and adds two clauses Battle Poise has not got</b> &mdash;
+one of which (<code>+20%</code> parry) makes its own payoff fire more often. There is no board state
+in which Battle Poise is the better pick.</p>
+<p><b>The source anticipates the pairing and answers a different question.</b> The comment at the
+parry site says the two are <i>"DELIBERATE STACKING PARTNERS rather than rivals &mdash; a single
+parry held under both takes TWO turns off everything he holds."</i> That is a good reason to hold
+both once you own both. <b>It is not a reason for the pool to offer both</b>: in a three-card offer
+you take one, and Answering Steel is never the worse of the two. The stacking argument only starts
+paying after the domination has already decided the pick.</p>
+<p><b>This one predates DO and neither card is one of the twenty-two</b> &mdash; nothing moved them
+together, and it stood through every draft batch since. <b>The source shows why it was missed, and
+the reason generalises.</b> Answering Steel's own comment names Battle Poise explicitly:
+<i>"BATTLE POISE is the deliberate stacking partner rather than a rival: both pay per parry, so a
+single turned blade takes TWO turns off every cooldown he holds."</i> <b>The author asked whether
+the two stack and never asked which of the two you take.</b> Those are different questions, and
+<b>a three-card offer only ever asks the second one</b> &mdash; the stacking question does not arise
+until after a pick Answering Steel always wins.</p>
+<p><b>THE CHOICE:</b> <i>differentiate</i> &mdash; Battle Poise's stance requirement is currently a
+pure cost with nothing bought by it, so the obvious repair is to make the Defensive guard buy
+something Answering Steel cannot have (a second tick, or a parry that also refunds the ability);
+or <i>retire Battle Poise</i>; or <i>move one of the two</i> so the pool never offers the pair.</p>
+
+<h3>AND ONE GRADE-1 PAIR THAT NEVER COMPETES, REPORTED BECAUSE IT IS STILL THE SAME CARD TWICE</h3>
+<p><b>Aimed Volley (Hunter class-wide) and Magic Missiles (Mage class-wide) are the same card.</b>
+Both are pure field vectors &mdash; zero bespoke code, no <code>special</code> &mdash; and both are
+"three strikes at one enemy for 12% of Attack each": Aimed Volley 20 Mana / cd 3 / init 2.5 / 8
+Break a shot, Magic Missiles 15 Mana / cd 2 / init 2.0 / 3 Break a shot. <b>They are in different
+class pools, so no hero is ever offered both</b>, and the same is true of
+<b>Hoarfrost Armor</b> (Cryomancer: &minus;25% damage taken, attackers gain Chilled) and
+<b>Immolate</b> (Pyromancer, one of DO's: &minus;20% damage taken, attackers are set Burning),
+which are one card wearing two elements. <b>Neither is a live collision.</b> They are reported
+because a designer counting how many <i>different</i> things the game contains should know that
+the 142 hold fewer than 142 ideas.</p>
+
+<h2>&sect;2 — PER-POOL AXIS COVERAGE, WHICH IS THE REAL ANSWER</h2>
+<p><b>The question is not whether two cards are duplicates. It is whether a pool holds more than
+one build.</b> Two measures are given below because they disagree, and the disagreement is itself
+the finding.</p>
+<ul>
+<li><b>DISTINCT DECISIONS</b> &mdash; how many different <i>(effect axis &times; target shape)</i>
+pairs a pool covers. This is the answer to <i>"how many cards would a player have to draft before
+the pool stops offering them anything new?"</i>: <b>once a player holds one card per decision, the
+rest of the pool is variations on what they already own.</b></li>
+<li><b>ENGINE-BOUND</b> &mdash; how many of the pool's cards read or write the spec's own system.
+A pool can offer ten different decisions and still hold one build, if all ten are made with the same
+fuel.</li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>pool</th><th>cards</th><th>of them<br>DO's</th><th>distinct<br>axes</th><th>distinct DECISIONS<br>(axis &times; target shape)</th><th>largest single decision</th><th>bound to the spec's own engine</th></tr>
+<tr><td><b>Swordmaster</b></td><td align="center">10</td><td align="center">2</td><td align="center">4</td><td align="center"><b>4</b></td><td>4 &times; DMG-ST / ENEMY-ONE</td><td>9 of 10 &mdash; stance 7, parry 2</td></tr>
+<tr><td><b>Beastmaster</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>5</b></td><td>3 &times; PET / SELF</td><td>8 of 8 &mdash; companion 8</td></tr>
+<tr><td><b>Sharpshooter</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>5</b></td><td>4 &times; DMG-ST / ENEMY-ONE</td><td>6 of 8 &mdash; Focus 6</td></tr>
+<tr><td><b>Arcanist</b></td><td align="center">10</td><td align="center">2</td><td align="center">6</td><td align="center"><b>7</b></td><td>3 &times; METER-GEN / SELF</td><td>9 of 10 &mdash; Resonance 9</td></tr>
+<tr><td><b>Berserker</b></td><td align="center">10</td><td align="center">2</td><td align="center">7</td><td align="center"><b>7</b></td><td>3 &times; DMG-ST / ENEMY-ONE</td><td>10 of 10 &mdash; Frenzy 5, Bleed 4, Rage 1</td></tr>
+<tr><td><b>Cryomancer</b></td><td align="center">12</td><td align="center">4</td><td align="center">5</td><td align="center"><b>7</b></td><td>3 &times; DMG-AOE / ENEMY-ALL</td><td>12 of 12 &mdash; hold 6, Chilled 6</td></tr>
+<tr><td><b>Holy Cleric</b></td><td align="center">10</td><td align="center">2</td><td align="center">6</td><td align="center"><b>7</b></td><td>2 &times; HEAL / ALLY-ONE</td><td>6 of 10 &mdash; Mercy 5, healing 1</td></tr>
+<tr><td><b>Survivalist</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>7</b></td><td>2 &times; DMG-ST / ENEMY-ONE</td><td>7 of 8 &mdash; statuses 6, traps 1</td></tr>
+<tr><td><b>Devout</b></td><td align="center">10</td><td align="center">2</td><td align="center">5</td><td align="center"><b>8</b></td><td>2 &times; METER-GEN / PARTY</td><td>7 of 10 &mdash; Faith 5, Divine Shield 2</td></tr>
+<tr><td><b>Occultist</b></td><td align="center">10</td><td align="center">2</td><td align="center">8</td><td align="center"><b>9</b></td><td>2 &times; METER-GEN / ENEMY-ONE</td><td>7 of 10 &mdash; Ruin 6, Break 1</td></tr>
+<tr><td><b>Warden</b></td><td align="center">9</td><td align="center">1</td><td align="center">8</td><td align="center"><b>9</b></td><td>1 &times; MIT-ALLY / ALLY-ONE</td><td>8 of 9 &mdash; Block 5, taunt 2, Heavy Plating 1</td></tr>
+<tr><td><b>Pyromancer</b></td><td align="center">13</td><td align="center">5</td><td align="center">8</td><td align="center"><b>10</b></td><td>3 &times; DMG-AOE / ENEMY-ALL</td><td>12 of 13 &mdash; Burn 12</td></tr>
+<tr><td><i>class-wide: cleric</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">4</td><td align="center"><b>5</b></td><td>2 &times; HEAL / ALLY-ONE</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: hunter</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; HEAL / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: mage</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; SHIELD / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: warrior</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; HEAL / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+</table>
+
+<h3>THE TWO EXTREMES, LOUDLY</h3>
+
+<p><b>THE MOST CONCENTRATED POOL IN THE GAME IS THE SWORDMASTER'S: TEN CARDS, FOUR DECISIONS.</b>
+Every card he can draft is one of four things &mdash; <i>strike one enemy</i> (Precision Strike,
+Feint, Sever, Lunge), <i>change or hold a stance</i> (Feigned Guard, Discipline, Formless),
+<i>buy tempo off a parry</i> (Battle Poise, Answering Steel &mdash; and one of those two is
+Finding 2), or <i>execute</i> (Execute). <b>A Swordmaster who has drafted four cards has seen
+everything his pool decides.</b> The eleventh through the sixteenth cards he could be offered are
+the Warrior class pool, which is where his healing, his area damage, his control and his party buff
+all live &mdash; his own spec pool contains none of those four.</p>
+
+<p><b>THE MOST CONCENTRATED BY ENGINE IS THE BEASTMASTER'S, AND IT IS ABSOLUTE: 8 OF 8.</b>
+Every card in his pool requires a living companion or reads the Loyalty a companion earned, and
+<b>none of the eight is a heal, a shield, or damage mitigation for the hunter himself.</b> Bloodbond
+is the closest and it points the other way: it refuses the blow that would fell the companion and
+moves a quarter of it onto the hunter, <b>where it can kill him</b>. His entire defensive option set
+for a whole run is two of the six Hunter class cards (Field Dressing, Camouflage). <b>He also
+received none of DO's twenty-two</b>, so nothing has been added to his pool since Batch CI.</p>
+
+<p><b>THE CRYOMANCER'S 12 ARE 12 OF 12 ON THE ICE</b> &mdash; six read or write the Glacial Hold,
+six spread or exploit Chilled, and there is not one card in the pool that works on a board with no
+Chilled on it. <b>Four of the twelve do one thing: propagate Chilled from somewhere to somewhere
+else</b> (Rimebinding, Deep Winter, Rime, Killing Frost), and two more freeze outright and are the
+same card (Finding 1). <b>DO added four cards to this pool and none of them opened a new decision:</b>
+Rime spreads Chilled, Glacial Prison freezes, Cryoclasm relocates a freeze, Shatter cashes the
+holds &mdash; the pool already did all four.</p>
+
+<p><b>THE PYROMANCER IS THE CASE WHERE THE TWO MEASURES DISAGREE, AND BOTH ARE TRUE.</b>
+His thirteen cards cover <b>ten distinct decisions</b>, the widest in the game &mdash; and
+<b>twelve of the thirteen read or write Burn</b>, the narrowest binding in the game. Overburn's
+multiplier is literally <code>_total_burn_turns()</code>, the sum of Burn turns standing on living
+enemies, so <b>five cards in the pool are the same lever on the passive's own input</b>: Ember Debt
+(lay 12 turns), Backdraft (+2 turns on everything alight), Stoke (double one target's), Slow Burn
+(stop the clock), Emberkeep (double what arrives). <b>He has ten things to decide and one currency
+to decide them in.</b> Whether that is a rich pool or a single build depends on a judgement this
+audit cannot make for the designer &mdash; but the numbers should not be read as ten builds.</p>
+
+<p><b>THE LEAST CONCENTRATED IS THE WARDEN'S: NINE CARDS, NINE DECISIONS &mdash; NO TWO CARDS IN
+HIS POOL MAKE THE SAME ONE.</b> That is the only pool in the game of which that is true, and it is
+worth saying plainly because the rest of this document is a list of problems. <b>But the second
+measure catches what the first misses: four of his nine hang off one trigger.</b> Aegis Wall, Anvil,
+Recompense and Turn the Blade all pay out on <i>a block happening</i> &mdash; they pay four
+genuinely different things (party healing, a Heavy Plating rule change, Rage, Break onto the
+attacker), which is why they score as four decisions, but a Warden who is not blocking holds four
+dead cards. <b>Anvil and Recompense additionally cancel each other by design</b> and both cards say
+so.</p>
+
+<p><b>AND THE HUNTER CLASS IS THE STRUCTURAL FINDING UNDERNEATH ALL OF IT.</b> Its three specs
+hold the three shallowest pools (8 each), received none of DO's twenty-two, and
+<b>not one of the twenty-four Hunter spec cards is a heal, a shield, or damage mitigation for the
+hero</b>. That is not a coincidence of three separate authoring passes: it lines up with
+<code>docs/state.md</code>'s standing note that <b>the Sharpshooter has no defensive node in his
+27</b>. <b>For a Sharpshooter, both halves of his progression &mdash; the tree and the draft &mdash;
+offer him nothing defensive at all</b>, and the only two cards in the game that can change that are
+Field Dressing and Camouflage, which he must be lucky enough to be offered from a pool that is one
+card in four.</p>
+
+<h3>WHAT THE AXES ACTUALLY ARE, AND HOW THE BRIEF'S LIST COMPARED</h3>
+<p>The brief expected <i>"something like: single-target damage, area damage, sustained damage over
+time, burst, mitigation, healing, shielding, control, tempo and initiative, resource generation,
+status application, meter manipulation"</i>. <b>Eleven of those twelve are real and one is not.</b>
+"Sustained damage over time" is <b>not a draft axis</b>: exactly one card in 142 has a damage-over-
+time field as its primary payload (Penance), because in this game the DoTs are the <i>engines</i>
+&mdash; Burn, Bleed, Poison and Ruin are what the passives read &mdash; so a card that touches one
+is doing meter manipulation, not damage over time. It appears as a secondary tag on 13 cards and as
+a primary axis on one.</p>
+<p><b>Five axes the brief did not name carry 16 cards between them</b> and every one of them is
+load-bearing: <b>Break/Pressure</b> (3), <b>damage amplification</b> (12, split self and team &mdash;
+the third-largest axis in the game and absent from the brief's list entirely), <b>death denial</b>
+(3 &mdash; the Holy Cleric's largest cluster), <b>cleanse</b> (2), and <b>the companion</b> (3
+primary, 5 more secondary). <b>Mitigation had to be split three ways</b> to say anything useful:
+self, one ally, and the whole hero side are three different cards, and the Devout's pool holds all
+three.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>axis</th><th>cards</th><th>share of 142</th><th>note</th></tr>
+<tr><td>DMG-ST &mdash; damage, one enemy</td><td align="center">22</td><td align="center">15%</td><td>the single largest, and 4 of the Sharpshooter's 8</td></tr>
+<tr><td>METER-GEN &mdash; make more of the spec's own currency</td><td align="center">15</td><td align="center">11%</td><td>4 of the Arcanist's 10 are this alone</td></tr>
+<tr><td>DMG-AOE &mdash; damage, several enemies</td><td align="center">11</td><td align="center">8%</td><td></td></tr>
+<tr><td>HEAL</td><td align="center">11</td><td align="center">8%</td><td>3 of the 6 Cleric class cards</td></tr>
+<tr><td>CTRL &mdash; take an enemy's turn away</td><td align="center">10</td><td align="center">7%</td><td>4 of the Cryomancer's 12</td></tr>
+<tr><td>AMP &mdash; make damage bigger (7 self, 5 team)</td><td align="center">12</td><td align="center">8%</td><td><b>not on the brief's list</b></td></tr>
+<tr><td>MIT &mdash; take less damage (7 self, 4 party, 1 ally)</td><td align="center">12</td><td align="center">8%</td><td>three different cards, not one</td></tr>
+<tr><td>DMG-BURST &mdash; spend a meter for one blow</td><td align="center">7</td><td align="center">5%</td><td></td></tr>
+<tr><td>STATUS &mdash; debuffs as the payload</td><td align="center">6</td><td align="center">4%</td><td></td></tr>
+<tr><td>RESOURCE / METER-RULE / TEMPO</td><td align="center">15</td><td align="center">11%</td><td>5 each</td></tr>
+<tr><td>SHIELD</td><td align="center">4</td><td align="center">3%</td><td></td></tr>
+<tr><td>DEATH-DENY / BREAK / STANCE / PET</td><td align="center">12</td><td align="center">8%</td><td>3 each; the first three are not on the brief's list</td></tr>
+<tr><td>METER-MOVE / STRIP</td><td align="center">4</td><td align="center">3%</td><td>2 each</td></tr>
+<tr><td>DOT &mdash; sustained damage as the payload</td><td align="center"><b>1</b></td><td align="center"><b>1%</b></td><td><b>the brief expected an axis; it is one card</b></td></tr>
+</table>
+
+<h2>&sect;3 — GRADE 3: CARDS THAT MAKE THE SAME DECISION</h2>
+<p><i>Different flavour, different numbers, same decision &mdash; same target shape, same effect
+type, same cost and cooldown bracket, same build axis. <b>Drafting either produces the same run.</b>
+None of these is a rule violation. Each is a slot the pool spent twice.</i></p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>pair</th><th>pool</th><th>what makes it the same decision</th><th>what differs</th></tr>
+
+<tr><td><b>Quarry's Mark<br>&harr; Reacquire</b></td><td>Sharpshooter</td>
+<td><b>The handlers are the same three statements.</b> Clear every existing mark of this kind, apply
+a permanent one-at-a-time mark to the picked enemy, then <code>_gain_focus</code> a lump on the
+spot. Same target shape, same initiative (1.5), adjacent cost (15/20) and cooldown (3/4). Both
+answer the one question the Sharpshooter's meter asks: <i>how do I stop switching targets from
+costing me?</i></td>
+<td>Quarry's Mark doubles Focus <i>gained</i> on the mark (+20 on the cast); Reacquire <i>banks</i>
+Focus when you leave and returns it (+25 on the cast). <b>One rewards committing, the other
+forgives leaving</b> &mdash; a real distinction on paper that resolves to the same play.</td></tr>
+
+<tr><td><b>Rimebinding<br>&harr; Deep Winter</b></td><td>Cryomancer</td>
+<td>Both walk <code>_holds</code> for the deepest Chilled stack standing, then apply Chilled from
+that template. Same source, same effect, same bracket (20/25 Mana, cd 3/4, init 2.0/2.5). Both do
+<b>nothing at all</b> when he holds nobody, and both say so.</td>
+<td>Rimebinding gives <code>deepest + 1</code> to ONE enemy &mdash; enough to put it in the ice
+outright. Deep Winter gives <code>ceil(deepest / 2)</code> to EVERY enemy. <b>Depth against
+breadth</b>, which is a genuine choice; it is listed here because the pool <i>also</i> holds Rime
+and Killing Frost on the same verb.</td></tr>
+
+<tr><td><b>Ordination<br>&harr; Elevation</b></td><td>Devout</td>
+<td><b>The identical shape one floor up:</b> both call <code>_gain_faith</code> on allies and
+nothing else. Same axis, same target family, same build.</td>
+<td>Ordination puts 4 Faith on the ally holding the LEAST (25 Mana); Elevation puts 2 on EVERY ally
+(35 Mana). With <code>FAITH_RELEASE</code> at 3, Ordination always crosses and Elevation crosses
+only for an ally already carrying one. <b>Depth against breadth again</b> &mdash; the same pair of
+cards the Cryomancer has, in a different currency.</td></tr>
+
+<tr><td><b>Battle Shout<br>&harr; Warcry</b></td><td>Berserker<br><i>(spec &times; class)</i></td>
+<td><b>A live cross-pool collision, and one of the three the brief predicted.</b> Both apply a flat
+damage-percentage status to every hero for N turns, and nothing else. Same target shape, same effect
+type, same cost bracket (15/20 Rage). A Berserker is offered both.</td>
+<td>Warcry is +20% for 4 turns on cd 5. Battle Shout is +8% for 2 turns on cd 2, +1% per 20 Bleed
+buildup across the enemy team, and refunds 5 Rage. <b>Battle Shout needs 240 buildup on the board to
+match Warcry's magnitude</b> and still lasts half as long &mdash; it is not dominated (it is far more
+castable) but it is the same turn spent on the same thing. <b>Battle Shout is one of DO's
+twenty-two</b>; before DO it lived in the boss-pick pool and never met Warcry in an offer.</td></tr>
+
+<tr><td><b>Drumfire<br>&harr; Aimed Volley</b></td><td>Sharpshooter<br><i>(spec &times; class)</i></td>
+<td>Both are three strikes at one enemy with no condition, in the same offer. Same cooldown (3),
+adjacent cost (25/20) and initiative (3.0/2.5).</td>
+<td>Drumfire's three hits each count separately for Focus, where every other volley counts once.
+That is a real spec payoff &mdash; but it is bought at +5 Mana, +0.5 initiative and &minus;2 Break a
+shot, so the two cards are the same card at two prices with the meter as the tiebreak.</td></tr>
+
+<tr><td><b>Stalking Horse<br>&harr; Downwind</b></td><td>Survivalist</td>
+<td>Both are 4-turn self-flags whose whole payload is <i>more different afflictions on more
+enemies</i>, which is exactly what Trapper's breadth term counts. Same cost (25), same shape, same
+axis.</td>
+<td>Stalking Horse pulls attacks onto him and applies a rotating affliction to each attacker;
+Downwind copies every debuff any hero lands onto a second enemy. <b>One buys breadth with his own
+body, the other with the party's output.</b> Genuinely two mechanisms, one decision.</td></tr>
+
+<tr><td><b>Arcane Bolt<br>&harr; Unmaking</b></td><td>Arcanist</td>
+<td>Both are a single-target blow whose damage is <code>ab.damage &times; Resonance stacks</code>,
+written at the same site in the same block, at the same cost (30) and adjacent cooldown (4/5).</td>
+<td><b>The source names the distinction and it is real:</b> Bolt HALVES the meter and Unmaking reads
+it without spending. <i>"Two cards reading one meter with one shape would be one card with two
+prices; these are a spender and a reader."</i> <b>Listed anyway</b>, because the pool ALSO holds
+Boil Over's shape one spec over and the Arcanist's protected core holds Death Ray &mdash; see
+&sect;5.</td></tr>
+</table>
+
+<h2>&sect;4 — GRADE 4: THE SAME AXIS, MANY TIMES</h2>
+<p><i>Genuinely different cards that all push one build direction, so a pool offering three of them
+offers one direction three times. <b>This is the grade that decides whether a pool holds more than
+one build, and it is where the population is.</b></i></p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>cluster</th><th>pool</th><th>cards</th><th>the one thing they all do</th></tr>
+<tr><td><b>Raise the total Burn turns on the board</b></td><td>Pyromancer</td><td align="center"><b>5 of 13</b></td>
+<td>Ember Debt, Backdraft, Stoke, Slow Burn, Emberkeep. Overburn's multiplier is
+<code>_total_burn_turns()</code>, so all five are the same lever on the same number at five prices.</td></tr>
+<tr><td><b>Spend the Burn field for damage</b></td><td>Pyromancer</td><td align="center">4 of 13</td>
+<td>Cinderfall, Pyre Wake, Firedraw, Funeral Pyre &mdash; and the protected core already holds two
+(Detonation, Wildfire).</td></tr>
+<tr><td><b>Propagate Chilled</b></td><td>Cryomancer</td><td align="center">4 of 12</td>
+<td>Rimebinding, Deep Winter, Rime, Killing Frost.</td></tr>
+<tr><td><b>Put an enemy in, or move, the ice</b></td><td>Cryomancer</td><td align="center">4 of 12</td>
+<td>Flash Freeze, Glacial Prison (the same card &mdash; Finding 1), Cryoclasm, Frostbind.</td></tr>
+<tr><td><b>Gain Resonance</b></td><td>Arcanist</td><td align="center"><b>4 of 10</b></td>
+<td>Kindled Mind (+3), Inner Arcane (+alive&nbsp;+1, doubled low), Threshold (SET to 15), Overcharge
+(double what you hold). <b>Four different curves; one decision.</b> Nine of his ten cards read or
+write the meter at all.</td></tr>
+<tr><td><b>Attack, and build Focus while doing it</b></td><td>Sharpshooter</td><td align="center"><b>6 of 8</b></td>
+<td>Quarry's Mark, Calibrating Shot, Trophy Shot, Reacquire, Fault Line, Drumfire. <b>Four of the
+eight are the same decision outright</b> &mdash; single-target damage at one enemy.</td></tr>
+<tr><td><b>Everything, through the companion</b></td><td>Beastmaster</td><td align="center"><b>8 of 8</b></td>
+<td>No exception exists.</td></tr>
+<tr><td><b>Pay out on a block</b></td><td>Warden</td><td align="center">4 of 9</td>
+<td>Aegis Wall, Anvil, Recompense, Turn the Blade &mdash; four different payouts, one trigger, and
+two of them (Anvil, Recompense) cancel each other by design.</td></tr>
+<tr><td><b>Read or hold the stance</b></td><td>Swordmaster</td><td align="center">7 of 10</td>
+<td>Precision Strike, Feint, Sever, Feigned Guard, Discipline, Formless, Lunge. Three of those seven
+(Feigned Guard, Discipline, Formless) are <i>stance rules</i> rather than actions.</td></tr>
+<tr><td><b>Make, move or spend Ruin</b></td><td>Occultist</td><td align="center">6 of 10</td>
+<td>Covenant of Ash, Suffering, Transference, Anointing, Requiem, Blight the Well.</td></tr>
+<tr><td><b>Stop the heroes dying</b></td><td>Holy Cleric</td><td align="center">3 of 10</td>
+<td>Rite of Return (refuse the felling blow, one ally), Vespers (absorb the blow that would cross
+half, one ally), Intercession (refuse the lethal blow, every hero). <b>Three cards, one promise.</b></td></tr>
+<tr><td><b>Keep the heroes standing</b></td><td>Devout</td><td align="center">3 of 10</td>
+<td>Vow of Suffering (redirect), Sacred Resolve (split), Bulwark of Fortitude (armour + no Break +
+regen). <b>Two of the three are DO's</b>, landing on a pool that already had the third.</td></tr>
+<tr><td><b>Heal somebody</b></td><td>Devout offer space<br><i>(spec + Cleric class)</i></td><td align="center"><b>6 of 16</b></td>
+<td>Fortified Spirit, Reliquary, Blessing of the Faithful + Ministration, Consecration, Undying
+Vigil. <b>The largest single-axis cluster in any offer space in the game</b>, and half of it comes
+from the class pool, which is 3-of-6 healing.</td></tr>
+<tr><td><b>Name one enemy</b></td><td>Sharpshooter offer space</td><td align="center">3</td>
+<td>Quarry's Mark, Reacquire, Hunter's Mark &mdash; three separate one-at-a-time marks with three
+separate statuses. They stack, but they are one idiom offered three times.</td></tr>
+</table>
+
+<h2>&sect;5 — THE TWENTY-TWO, SEPARATELY</h2>
+<p><i>DO moved twenty-two abilities into the draft pools and not one was authored as a draft card.
+They were written to sit at the end of a talent lane, where being a capstone-scale effect was the
+point and the node was the price. They now sit beside eight to twelve cards priced as draft cards.
+<b>They are the highest-risk population by construction and this section is their own.</b></i></p>
+
+<h3>THE SCALE TABLE &mdash; EACH AGAINST THE MEDIAN OF THE POOL IT LANDED IN</h3>
+<p><i>Medians computed over the pool's OTHER cards, so a card is never compared against itself.</i></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>card</th><th>pool</th><th>cost</th><th>cd</th><th>init</th><th>dmg</th><th>pool median<br>(cost/cd/init)</th><th>out of scale?</th></tr>
+<tr><td><b>Pyroblast</b></td><td>Pyromancer</td><td align="center">45</td><td align="center"><b>0</b></td><td align="center"><b>6.0</b></td><td align="center"><b>55</b></td><td align="center">22 / 4 / 2.2</td><td><b>YES, on every column at once</b> &mdash; dearest card in the draft, slowest in the draft, joint-hardest-hitting, and one of only two with no cooldown.</td></tr>
+<tr><td><b>Lunge</b></td><td>Swordmaster</td><td align="center">25</td><td align="center"><b>0</b></td><td align="center">3.5</td><td align="center">35</td><td align="center">25 / 4 / 1.0</td><td><b>YES</b> &mdash; the other no-cooldown card. 35% of Attack, 20 Break, +10 Rage and a stance-keyed debuff, repeatable every turn.</td></tr>
+<tr><td>Shatter</td><td>Cryomancer</td><td align="center">30</td><td align="center">5</td><td align="center">4.0</td><td align="center">10</td><td align="center">22 / 4 / 2.2</td><td>dear, slow, long cooldown &mdash; priced as a capstone but paid for</td></tr>
+<tr><td>Rampage</td><td>Berserker</td><td align="center">40</td><td align="center">4</td><td align="center">4.0</td><td align="center">20</td><td align="center">22 / 4 / 1.5</td><td>dear and slow; in bracket for what it does</td></tr>
+<tr><td>Mass Hysteria</td><td>Occultist</td><td align="center">30</td><td align="center">4</td><td align="center">4.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 2.2</td><td>dear and slow</td></tr>
+<tr><td>Magi's Wrath</td><td>Arcanist</td><td align="center">30</td><td align="center">4</td><td align="center">4.0</td><td align="center">15</td><td align="center">25 / 4 / 1.5</td><td>dear and slow</td></tr>
+<tr><td>Firestorm</td><td>Pyromancer</td><td align="center">30</td><td align="center">4</td><td align="center">3.5</td><td align="center">12</td><td align="center">22 / 4 / 2.2</td><td>dear and slow</td></tr>
+<tr><td>Hold the Line</td><td>Warden</td><td align="center">30</td><td align="center"><b>6</b></td><td align="center">3.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 1.0</td><td>the longest cooldown in the draft (with Formless)</td></tr>
+<tr><td>Bulwark of Fortitude</td><td>Devout</td><td align="center">30</td><td align="center">3</td><td align="center">3.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 2.0</td><td>dear, but a <b>short</b> cooldown for a party-wide three-clause buff</td></tr>
+<tr><td>Execute</td><td>Swordmaster</td><td align="center">30</td><td align="center">3</td><td align="center">2.0</td><td align="center"><b>55</b></td><td align="center">25 / 4 / 1.0</td><td>joint-hardest-hitting card in the draft; conditional (below 20% or Broken)</td></tr>
+<tr><td><b>Immolate</b></td><td>Pyromancer</td><td align="center">15</td><td align="center"><b>2</b></td><td align="center">1.0</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td><b>YES, downward</b> &mdash; cheapest, fastest and shortest cooldown in its pool, for 4 turns of &minus;20% damage taken plus Burn on attackers</td></tr>
+<tr><td><b>Battle Shout</b></td><td>Berserker</td><td align="center">15</td><td align="center"><b>2</b></td><td align="center">1.5</td><td align="center">&mdash;</td><td align="center">22 / 4 / 1.5</td><td><b>YES, downward</b> &mdash; and see &sect;3: it is Warcry's decision at a third of the cooldown</td></tr>
+<tr><td><b>Divine Plea</b></td><td>Holy Cleric</td><td align="center"><b>0</b></td><td align="center">2</td><td align="center">3.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 1.5</td><td><b>Its price is 2 Mercy, not Mana</b> &mdash; the only card in the draft priced in a spec meter. A FULL heal on a 2-turn cooldown.</td></tr>
+<tr><td>Phoenix Rebirth</td><td>Pyromancer</td><td align="center">0</td><td align="center">4</td><td align="center">2.0</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td>priced in health rather than Mana</td></tr>
+<tr><td>Backdraft</td><td>Pyromancer</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td>in bracket</td></tr>
+<tr><td>Rime</td><td>Cryomancer</td><td align="center">25</td><td align="center">3</td><td align="center">3.0</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td>in bracket</td></tr>
+<tr><td>Glacial Prison</td><td>Cryomancer</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td>in bracket &mdash; <b>and it is Finding 1</b></td></tr>
+<tr><td>Cryoclasm</td><td>Cryomancer</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td align="center">&mdash;</td><td align="center">22 / 4 / 2.2</td><td>in bracket</td></tr>
+<tr><td>Overcharge</td><td>Arcanist</td><td align="center">20</td><td align="center">5</td><td align="center">1.5</td><td align="center">&mdash;</td><td align="center">25 / 4 / 1.5</td><td>in bracket; once per battle by its own rule</td></tr>
+<tr><td>Intercession</td><td>Holy Cleric</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 1.5</td><td>in bracket</td></tr>
+<tr><td>Sacred Resolve</td><td>Devout</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td align="center">&mdash;</td><td align="center">25 / 4 / 2.0</td><td>in bracket</td></tr>
+<tr><td>Mind Flay</td><td>Occultist</td><td align="center">25</td><td align="center">2</td><td align="center">3.0</td><td align="center">30</td><td align="center">25 / 4 / 2.2</td><td>in bracket &mdash; <b>but see &sect;6, it is a narrower Hex of Ruin</b></td></tr>
+</table>
+
+<h3>THE FINDING THE SCALE TABLE MAKES: A COOLDOWN OF ZERO MEANS SOMETHING IN THIS GAME, AND TWO OF
+THE TWENTY-TWO HAVE ONE</h3>
+<p><b>Every one of the twelve cooldown-zero abilities in the protected core kits is the hero's free
+basic attack</b> &mdash; Strike, Smite, Fireball, Frostbolt, Quick Shot, Shadowrend, Arcane
+Explosion. Nothing else in the game is repeatable every turn. <b>Of the 142 draft cards, exactly two
+have no cooldown, and both are DO's: Pyroblast and Lunge.</b></p>
+<p>That is not an oversight in DO. <b>It is the shape of a talent grant arriving intact</b>: at the
+end of a lane the price was the node &mdash; nine rows of points &mdash; so no cooldown was needed
+to bound it. In a pool where every other card pays a cooldown, a repeatable card is a different kind
+of object, and the player is choosing between two objects that are not the same kind.</p>
+<p><b>THE CHOICE:</b> <i>price them as draft cards</i> (give both a cooldown, which is a retune and
+therefore the designer's), or <i>rule that a repeatable card is a legitimate draft shape</i> and say
+so in <code>CLAUDE.md</code> so the next author knows it is allowed. <b>What should not happen is
+that it stays undecided</b>, because the next batch that adds a card will copy whichever precedent
+it happens to read.</p>
+
+<h3>AND NINE OF THE TWENTY-TWO SHIPPED WITH A CLAUSE THEY CAN NO LONGER HAVE &mdash; THE COUNT IS
+TEN</h3>
+<p>DO recorded this honestly in <code>classes.gd</code>: an <code>upgrade</code> arm fires only
+where a node's GRANT collides with an earned copy, no node grants any more, so the nine fields those
+arms wrote are <b>read-only-zero</b>: <code>battle_shout_node</code>, <code>lunge_upgraded</code>,
+<code>execute_upgraded</code>, <code>hold_line_upgraded</code>, <code>rampage_upgraded</code>,
+<code>overcharge_extra</code>, <code>intercession_long</code>, <code>resolve_extra_turns</code> and
+<code>bulwark_extra_turns</code>. The fields and their read sites were deliberately left standing.
+<b>That is a sound decision and it is not the finding.</b></p>
+<p><b>The finding is that there is a tenth, and it is not in DO's list.</b>
+<code>icy_resolve_ranks</code> is read twice &mdash; Rime's duration is
+<code>4 + attacker.icy_resolve_ranks</code>, and the recast-refusal preview quotes the same
+expression &mdash; and <b>nothing in the project writes it</b>. Not <code>talents.gd</code>, not
+<code>runes.gd</code>, not <code>relics.gd</code>, not <code>events.gd</code>. The
+<code>cr_icy_resolve</code> node still exists and still carries that id, but DO re-pointed it onto
+<b>Blizzard</b> (protected core) for exactly the right reason, written in its own comment:
+<i>"became a bet on a card the hero may never be dealt."</i> The re-point was correct; the field it
+used to write was left behind.</p>
+<p><b>Nothing is currently wrong at runtime</b> &mdash; zero is the base, so Rime lasts its authored
+4 turns. It is reported because it is a dead read of exactly the species DO enumerated as nine, no
+gate catches it (<code>test_batch_cd</code>'s dead-symbol sweep does not reach it, the same way it
+does not reach <code>FIREDRAW_TAKE</code>), and <b>the number "nine" will be quoted by the next
+batch that opens this thread.</b></p>
+
+<h3>DO'S TWENTY-TWO AGAINST THE POOLS THEY LANDED IN: WHERE THE SLOT WAS ALREADY COVERED</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>card</th><th>what the pool already had</th></tr>
+<tr><td><b>Glacial Prison</b></td><td><b>Flash Freeze &mdash; the identical handler.</b> Finding 1.</td></tr>
+<tr><td><b>Rime</b></td><td>Rimebinding, Deep Winter and Killing Frost were already three cards that
+spread Chilled. Rime's own contribution is Frostbite (a healing cut), which nothing else in the pool
+does &mdash; <b>the differentiator is the clause the card mentions second.</b></td></tr>
+<tr><td><b>Shatter</b></td><td>Winter's Toll already cashed the holds for damage per turn frozen.
+Shatter releases them and Winter's Toll does not, which is the distinction &mdash; and Ice Lance in
+the protected core is already the release.</td></tr>
+<tr><td><b>Battle Shout</b></td><td><b>Warcry, in the class pool it shares an offer with.</b> &sect;3.</td></tr>
+<tr><td><b>Sacred Resolve</b> and<br><b>Bulwark of Fortitude</b></td><td>Vow of Suffering. <b>Two
+party-mitigation capstones into a pool that had one</b>, making three of ten.</td></tr>
+<tr><td><b>Mind Flay</b></td><td><b>Hex of Ruin, in the protected core.</b> Pick N enemies, shadow
+damage each, a 3-turn debuff each: Hex takes THREE for 20% at 20 Mana on cd 2, Mind Flay takes TWO
+for 30% at 25 Mana on cd 2. <b>The core card is cheaper, faster and hits one more.</b> The whole
+difference is the status &mdash; Exposed against Psychosis &mdash; and Psychosis is now the reason
+four Occultist talent cells had to be re-pointed at Batch DP.</td></tr>
+<tr><td><b>Rampage</b></td><td><b>Hack and Slash, in the protected core</b> &mdash; three strikes at
+one target, each building Bleed. Rampage is the same shape at twice the damage, certain Bleed and a
+recast-on-kill, for twice the Mana and a full extra swing of initiative.</td></tr>
+<tr><td><b>Divine Plea</b></td><td><b>Heal, in the protected core.</b> One ally, healed, with a
+cleanse available for one more Mercy. Divine Plea is the same card at full magnitude with the price
+moved from Mana to Mercy.</td></tr>
+<tr><td><b>Immolate</b></td><td>Nothing in the Pyromancer's pool mitigated damage before it &mdash;
+<b>this one opened a decision the pool did not have</b>, and it is the clearest case of DO adding
+something the pool needed.</td></tr>
+<tr><td><b>Intercession</b></td><td>Rite of Return and Vespers &mdash; the pool's third card that
+refuses a blow, though the only one that covers every hero at once.</td></tr>
+<tr><td><b>Overcharge</b></td><td>Kindled Mind, Inner Arcane and Threshold &mdash; <b>the fourth
+"gain Resonance" card in a ten-card pool.</b></td></tr>
+<tr><td><b>Backdraft</b></td><td>Stoke and Slow Burn were already lengthening Burn; Ember Debt and
+Emberkeep make five.</td></tr>
+<tr><td><b>Pyroblast, Firestorm, Magi's Wrath,<br>Mass Hysteria, Execute, Lunge,<br>Phoenix Rebirth,
+Cryoclasm, Hold the Line</b></td><td><b>Each opened something its pool did not have.</b> Nine of the
+twenty-two are additions rather than repeats, which is the honest other half of this table.</td></tr>
+</table>
+
+<h2>&sect;6 — THE THREE PLACES A COLLISION HIDES</h2>
+
+<h3>1. THE CLASS POOL AGAINST THE SPEC POOL</h3>
+<p><b>The class pools are the healthiest thing in the draft and the audit should say so.</b> The
+authoring rule &mdash; <i>a class-wide ability is deliberately untied and general; it feeds no
+passive</i> &mdash; is honoured at <b>0 of 24</b>: not one class card reads any spec's engine.
+Three of the four cover six distinct decisions with six cards, which no spec pool does.</p>
+<p><b>Two live cross-pool collisions were found</b>, both in &sect;3: <b>Battle Shout &harr;
+Warcry</b> (Berserker) and <b>Drumfire &harr; Aimed Volley</b> (Sharpshooter). <b>And one structural
+one:</b> the Cleric class pool is <b>3 of 6 healing</b> (Ministration, Consecration, Undying Vigil),
+and it lands on top of two Cleric spec pools that already heal &mdash; giving the Devout six healing
+cards in a sixteen-card offer space, the largest single-axis cluster anywhere in the game. <b>The
+Occultist is the one Cleric spec that wants none of them</b>, and for him the class pool is a
+quarter of every offer.</p>
+
+<h3>2. THE PROTECTED CORE KIT</h3>
+<p><b>This is the check <code>docs/state.md</code> has recorded as never having been done</b>
+(<i>"No spec pool has ever been checked for redundancy against its own base kit"</i>). It has now
+been done, and it is where the second-largest crop of findings is &mdash; <b>because a core ability
+can never be dropped, a draft card that duplicates one can never be a meaningful pick.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>draft card</th><th>core ability</th><th>the overlap</th></tr>
+<tr><td><b>Killing Frost</b></td><td><b>Blizzard</b> (Cryomancer)</td>
+<td><b>The sharpest one.</b> Blizzard: 30 Mana, cd 4, init 3.5, 15% of Attack to all,
+<code>randi_range(1, 2)</code> Chilled each. Killing Frost: 20 Mana, cd 3, init 2.0, 20% of Attack,
+a flat 2 Chilled each. <b>Cheaper, faster, shorter cooldown, more damage and more stacks</b> &mdash;
+its one limitation is that it only touches enemies already Chilled, and the Cryomancer's free basic
+attack applies Chilled. <b>After turn one, the drafted card is better than the undroppable one on
+every column</b> &mdash; and <code>_ability_usable</code> gates Killing Frost so it cannot even be
+wasted on an unchilled field, <b>a protection Blizzard does not have.</b></td></tr>
+<tr><td><b>Mind Flay</b></td><td><b>Hex of Ruin</b> (Occultist)</td>
+<td>Same shape, and the core card is cheaper, faster and hits one more enemy. See &sect;5.</td></tr>
+<tr><td><b>Cinderfall</b></td><td><b>Wildfire</b> (Pyromancer)</td>
+<td>Both rake the field and cash Burn turns into damage, both refund Overburn for what they take.
+Wildfire spends 1 turn an enemy at 18%; Cinderfall spends 2 and doubles a 20% base. <b>Cinderfall is
+Wildfire one bracket up</b>, at 30 Mana against 20.</td></tr>
+<tr><td><b>Rampage</b></td><td><b>Hack and Slash</b> (Berserker)</td><td>See &sect;5.</td></tr>
+<tr><td><b>Divine Plea</b></td><td><b>Heal</b> (Holy Cleric)</td><td>See &sect;5.</td></tr>
+<tr><td><b>Arcane Bolt</b> and<br><b>Unmaking</b></td><td><b>Death Ray</b> (Arcanist)</td>
+<td><b>Three cards on one decision, and one of the three cannot be dropped.</b> Death Ray: 150% of
+Attack, unusable below 8 Resonance, consumes nothing, 55 Mana. Unmaking: 10% per stack, ignoring
+armour AND resistances, consuming nothing, 30 Mana. <b>Resonance has no maximum</b>, so the drafted
+card matches Death Ray's flat 150% at 15 stacks and passes it after &mdash; sooner in effect,
+because it ignores both mitigations. Arcane Bolt is the third.</td></tr>
+<tr><td><b>Snare Line</b></td><td><b>Snare Trap</b> (Survivalist)</td>
+<td>Snare Line is Snare Trap made field-wide and duration-bounded &mdash; a real widening rather
+than a repeat, listed because the idiom is the core card's.</td></tr>
+<tr><td><b>Mantle</b></td><td><b>Divine Shield</b> (Devout)</td>
+<td>Mantle grants a Divine Shield at 25% of the Devout's max health that hops three times when it
+breaks; Divine Shield grants one at 35% that does not. <b>Same status, same target shape</b> &mdash;
+and because Conviction builds ONLY on Divine Shield absorbs, Mantle is a Faith engine as well as a
+shield. A widening, not a repeat.</td></tr>
+<tr><td><b>Lunge</b></td><td><b>Overpower</b> (Swordmaster)</td>
+<td><b>Checked and NOT a finding, recorded so the next pass does not re-derive it.</b> Same cost,
+same Break, same Rage build, more than twice the damage, and no cooldown against Overpower's 1
+&mdash; but Lunge pays a full extra swing of initiative (3.5 against 2.5), and Overpower's damage
+scales with the target's Break meter. <b>They converge on a Broken target and diverge on a fresh
+one</b>, which is a decision.</td></tr>
+</table>
+
+<h3>3. THE TALENT NODES</h3>
+<p><b>The good news first, because it is the load-bearing half, and it was derived rather than
+assumed: THIRTY-SIX NODES CARRY AN <code>"ability"</code> PAYLOAD AND ZERO OF THEM POINT AT A CARD
+THE HERO MUST BE DEALT.</b> All thirty-six name a PROTECTED CORE ability. <b>DO's re-point was
+complete on this shape</b>, and it holds even where the node's id says otherwise: nine node ids
+still name a now-drafted ability &mdash; <code>wd_hold_line</code>, <code>bz_rampage</code>,
+<code>cr_shatter</code>, <code>ar_overcharge</code>, <code>py_firestorm</code>,
+<code>sm_execute</code>, <code>oc_hysteria</code>, <code>cr_rime</code>, <code>bz_warcry</code>
+&mdash; and every one of their payloads points elsewhere. "Braced" buys Shieldwall, not Hold the
+Line. "Bloodstorm" buys Wildstrikes, not Rampage. "Shardfall" buys Razor Ice, not Shatter.
+<b>Node ids and node payloads have drifted apart</b>, which is a save-format question and is already
+recorded in <code>docs/state.md</code> as one.</p>
+
+<p><b>AND THREE OF THE FIVE NODES NAMED AFTER LIVE ABILITIES SHARE A DRAW SPACE WITH THEIR
+NAMESAKE, WHICH IS SHARPER THAN THE GENERAL CASE ALREADY RECORDED.</b>
+<code>docs/state.md</code> carries five nodes named after live abilities (Second Wind, Spite, Rally,
+Killing Frost, Divine Presence) as a rename question. <b>Two of the five are harmless</b> &mdash;
+the "Second Wind" node is the Berserker's and the card is the Holy Cleric's; the "Spite" node is the
+Warden's and the card is the Berserker's, so no hero can ever hold both. <b>The other three can be
+held together, and the node does something different from the card in all three cases:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>name</th><th>the node does</th><th>the card does</th></tr>
+<tr><td><b>Killing Frost</b><br><i>Cryomancer, Thaw 2</i></td><td>raises the held-enemy damage bonus
+from +15%</td><td>hits every Chilled enemy for 20% of Attack and adds 2 more stacks</td></tr>
+<tr><td><b>Divine Presence</b><br><i>Holy Cleric, Vigil 2</i></td><td>heals the lowest hero 8% of
+their maximum at the end of your turn</td><td>gains 2 Mercy every second turn on which nobody
+fell below the window</td></tr>
+<tr><td><b>Rally</b><br><i>Warden, Banner 2 &mdash; the card is Warrior class-wide, so he draws
+it</i></td><td>a Heavy Plating block grants every ally +30% healing received</td><td>shouts one ally
+to the front of the initiative order and refills 15% of their resource</td></tr>
+</table>
+<p><b>A Cryomancer can hold a talent called Killing Frost and a card called Killing Frost at the
+same time, and they are unrelated.</b> Renaming is a save-format question for the node ids; renaming
+the DISPLAY names is not, and it is one line each.</p>
+
+<p><b>The remaining finding is the other direction &mdash; a draft card doing what a node already
+does.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>draft card</th><th>node</th><th>the overlap</th></tr>
+<tr><td><b>Backdraft</b><br><i>(+2 Burn turns on every burning enemy)</i></td>
+<td><b>py_ashes "Wildfire Spread"</b> and <b>py_kindling "Cinder Trail"</b></td>
+<td>Three separate purchases of "more Burn turns on the board" across two systems. The node is
+bought once with points and is permanent; the card is drawn and costs a turn each time. <b>A player
+who allocates the Kindling lane has already bought the card's direction.</b></td></tr>
+<tr><td><b>Quarry's Mark</b>, <b>Reacquire</b>,<br><b>Fault Line</b>, <b>Drumfire</b>,<br><b>Calibrating Shot</b>, <b>Trophy Shot</b></td>
+<td><b>Ten Sharpshooter nodes</b> &mdash; Perfect Form, Deep Focus, Unwavering, Overkill, Muscle
+Memory, Opening Volley, Spray of Arrows, Continuous Aim, Metronome, One Shot</td>
+<td><b>Six of the eight cards and ten of the twenty-seven nodes are the same subject.</b> Both halves
+of the Sharpshooter's progression answer "how do I get more Focus and keep it", and neither answers
+anything else. <b>This is the strongest instance of the failure in the game</b> and it is not a
+duplicate anywhere &mdash; it is sixteen purchases of one idea.</td></tr>
+<tr><td><b>Eye of the Storm</b>, <b>Vendetta</b></td>
+<td><b>wd_taunt_master "Provoke"</b>, <b>wd_grudge "Grudge"</b>, <b>wd_whole_room "The Whole Room"</b></td>
+<td>The Threat lane buys taunt breadth, taunt permanence and damage against the taunted; the two
+cards buy taunt breadth (all enemies) and taunt permanence (one enemy, forever). <b>The Whole Room
+makes the Warden's taunts never expire, which is most of what Vendetta buys.</b></td></tr>
+<tr><td><b>Rimebinding</b>, <b>Deep Winter</b>,<br><b>Rime</b>, <b>Killing Frost</b></td>
+<td><b>Ten Cryomancer nodes</b> naming Chilled</td>
+<td>The same shape as the Sharpshooter's, one currency over: fourteen purchases of "more Chilled on
+more enemies" across a 12-card pool and a 27-cell tree.</td></tr>
+<tr><td><b>Covenant of Ash</b>, <b>Suffering</b>,<br><b>Transference</b>, <b>Anointing</b></td>
+<td><b>Thirteen Occultist nodes</b> naming Ruin</td>
+<td>Likewise.</td></tr>
+</table>
+<p><b>None of the above is a defect and none is a rule violation.</b> A tree and a pool are allowed
+to serve one theme &mdash; that is what a spec is. It is reported because <b>the two systems are
+sized independently and nobody has ever looked at them together</b>, and where they agree this
+strongly the player's whole progression makes one decision repeatedly.</p>
+
+<h2>&sect;7 — WHAT THE PER-CARD READING PRODUCED</h2>
+<p><i>Every card, its axis, its target shape, and the engine it reads or writes. This is the working
+table the sections above were argued from; it is included so a later pass can disagree with a
+specific row rather than with the conclusion.</i></p>
+<h4>Arcanist &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Null Field</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Resonance</td></tr>
+<tr><td>Kindled Mind</td><td align="center">15</td><td align="center">2</td><td align="center">1.5</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Resonance</td></tr>
+<tr><td>Arcane Bolt</td><td align="center">30</td><td align="center">4</td><td align="center">2.5</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Resonance</td></tr>
+<tr><td>Inner Arcane</td><td align="center">15</td><td align="center">3</td><td align="center">1.0</td><td>METER-GEN</td><td>SELF</td><td>Resonance</td></tr>
+<tr><td>Arcane Echo</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>AMP-SELF</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Resonant Field</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>AMP-TEAM</td><td>PARTY</td><td>Resonance</td></tr>
+<tr><td>Threshold</td><td align="center">20</td><td align="center">5</td><td align="center">1.5</td><td>METER-GEN</td><td>SELF</td><td>Resonance</td></tr>
+<tr><td>Unmaking</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Resonance</td></tr>
+<tr><td>Overcharge</td><td align="center">20</td><td align="center">5</td><td align="center">1.5</td><td>METER-GEN</td><td>SELF</td><td>Resonance</td></tr>
+<tr><td>Magi&#x27;s Wrath</td><td align="center">30</td><td align="center">4</td><td align="center">4.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Resonance</td></tr>
+</table>
+<h4>Beastmaster &mdash; 8 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Twin Hunt</td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>companion</td></tr>
+<tr><td>Call the Wilds</td><td align="center">20</td><td align="center">5</td><td align="center">2.0</td><td>PET</td><td>SELF</td><td>companion</td></tr>
+<tr><td>Bloodbond</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>PET</td><td>SELF</td><td>companion</td></tr>
+<tr><td>Savage Sweep</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-MANY</td><td>companion</td></tr>
+<tr><td>Ghostpack</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>companion</td></tr>
+<tr><td>Last Howl</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>companion</td></tr>
+<tr><td>Succession</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>PET</td><td>SELF</td><td>companion</td></tr>
+<tr><td>Unleash</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>companion</td></tr>
+</table>
+<h4>Berserker &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Blood Offering</td><td align="center">0</td><td align="center">3</td><td align="center">1.5</td><td>RESOURCE</td><td>SELF</td><td>Frenzy</td></tr>
+<tr><td>Gut Rip</td><td align="center">30</td><td align="center">4</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Bleed</td></tr>
+<tr><td>Reckless Abandon</td><td align="center">0</td><td align="center">4</td><td align="center">1.5</td><td>AMP-SELF</td><td>SELF</td><td>Rage</td></tr>
+<tr><td>Berserk</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>Frenzy</td></tr>
+<tr><td>Blood Debt</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Bleed</td></tr>
+<tr><td>Unslaked</td><td align="center">30</td><td align="center">5</td><td align="center">1.0</td><td>METER-RULE</td><td>SELF</td><td>Frenzy</td></tr>
+<tr><td>Spite</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Frenzy</td></tr>
+<tr><td>Boil Over</td><td align="center">40</td><td align="center">5</td><td align="center">2.5</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Frenzy</td></tr>
+<tr><td>Battle Shout</td><td align="center">15</td><td align="center">2</td><td align="center">1.5</td><td>AMP-TEAM</td><td>PARTY</td><td>Bleed</td></tr>
+<tr><td>Rampage</td><td align="center">40</td><td align="center">4</td><td align="center">4.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Bleed</td></tr>
+</table>
+<h4>Cryomancer &mdash; 12 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Winter&#x27;s Toll</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>hold</td></tr>
+<tr><td>Rimebinding</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>STATUS</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
+<tr><td>Flash Freeze</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>hold</td></tr>
+<tr><td>Killing Frost</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
+<tr><td>Hoarfrost Armor</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Chilled</td></tr>
+<tr><td>Deep Winter</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>STATUS</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
+<tr><td>Cold Iron</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>hold</td></tr>
+<tr><td>Frostbind</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>CTRL</td><td>ENEMY-MANY</td><td>Chilled</td></tr>
+<tr><td>Rime</td><td align="center">25</td><td align="center">3</td><td align="center">3.0</td><td>STATUS</td><td>ENEMY-ONE</td><td>Chilled</td></tr>
+<tr><td>Glacial Prison</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>CTRL</td><td>ENEMY-ONE</td><td>hold</td></tr>
+<tr><td>Cryoclasm</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>hold</td></tr>
+<tr><td>Shatter</td><td align="center">30</td><td align="center">5</td><td align="center">4.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>hold</td></tr>
+</table>
+<h4>Devout &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Vow of Suffering</td><td align="center">20</td><td align="center">3</td><td align="center">1.0</td><td>MIT-PARTY</td><td>ALLY-ONE</td><td>Faith</td></tr>
+<tr><td>Aegis Reversal</td><td align="center">30</td><td align="center">4</td><td align="center">2.5</td><td>AMP-SELF</td><td>ALLY-ONE</td><td>Divine Shield</td></tr>
+<tr><td>Ordination</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>METER-GEN</td><td>PARTY</td><td>Faith</td></tr>
+<tr><td>Fortified Spirit</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>HEAL</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Reliquary</td><td align="center">30</td><td align="center">5</td><td align="center">2.5</td><td>HEAL</td><td>PARTY</td><td>Faith</td></tr>
+<tr><td>Elevation</td><td align="center">35</td><td align="center">5</td><td align="center">2.5</td><td>METER-GEN</td><td>PARTY</td><td>Faith</td></tr>
+<tr><td>Blessing of the Faithful</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>HEAL</td><td>SELF</td><td>Faith</td></tr>
+<tr><td>Mantle</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>SHIELD</td><td>ALLY-ONE</td><td>Divine Shield</td></tr>
+<tr><td>Sacred Resolve</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Bulwark of Fortitude</td><td align="center">30</td><td align="center">3</td><td align="center">3.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>Holy Cleric &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Second Wind</td><td align="center">30</td><td align="center">4</td><td align="center">2.5</td><td>HEAL</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Rite of Return</td><td align="center">35</td><td align="center">5</td><td align="center">1.0</td><td>DEATH-DENY</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Recant</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>RESOURCE</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Shared Grief</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>METER-GEN</td><td>SELF</td><td>Mercy</td></tr>
+<tr><td>Reprisal</td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>healing</td></tr>
+<tr><td>Divine Presence</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>METER-GEN</td><td>SELF</td><td>Mercy</td></tr>
+<tr><td>Alms</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>SHIELD</td><td>SELF</td><td>Mercy</td></tr>
+<tr><td>Vespers</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>DEATH-DENY</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Divine Plea</td><td align="center">0</td><td align="center">2</td><td align="center">3.0</td><td>HEAL</td><td>ALLY-ONE</td><td>Mercy</td></tr>
+<tr><td>Intercession</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>DEATH-DENY</td><td>PARTY</td><td>Mercy</td></tr>
+</table>
+<h4>Occultist &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Blight the Well</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>STATUS</td><td>ENEMY-ONE</td><td>Ruin</td></tr>
+<tr><td>Covenant of Ash</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Ruin</td></tr>
+<tr><td>Suffering</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Ruin</td></tr>
+<tr><td>Transference</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>METER-MOVE</td><td>ENEMY-ONE</td><td>Ruin</td></tr>
+<tr><td>Anointing</td><td align="center">30</td><td align="center">5</td><td align="center">1.0</td><td>METER-GEN</td><td>PARTY</td><td>Ruin</td></tr>
+<tr><td>Breaking Darkness</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>BREAK</td><td>ENEMY-ONE</td><td>Break</td></tr>
+<tr><td>Requiem</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Ruin</td></tr>
+<tr><td>Penance</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DOT</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Mind Flay</td><td align="center">25</td><td align="center">2</td><td align="center">3.0</td><td>DMG-ST</td><td>ENEMY-MANY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Mass Hysteria</td><td align="center">30</td><td align="center">4</td><td align="center">4.0</td><td>CTRL</td><td>ENEMY-ALL</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>Pyromancer &mdash; 13 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Cinderfall</td><td align="center">30</td><td align="center">3</td><td align="center">3.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Ember Debt</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Burn</td></tr>
+<tr><td>Slow Burn</td><td align="center">15</td><td align="center">4</td><td align="center">1.5</td><td>METER-RULE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Stoke</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Burn</td></tr>
+<tr><td>Funeral Pyre</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>SHIELD</td><td>SELF</td><td>Burn</td></tr>
+<tr><td>Firedraw</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>METER-MOVE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Pyre Wake</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Emberkeep</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>METER-RULE</td><td>SELF</td><td>Burn</td></tr>
+<tr><td>Backdraft</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>METER-GEN</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Immolate</td><td align="center">15</td><td align="center">2</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Burn</td></tr>
+<tr><td>Pyroblast</td><td align="center">45</td><td align="center">0</td><td align="center">6.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Burn</td></tr>
+<tr><td>Firestorm</td><td align="center">30</td><td align="center">4</td><td align="center">3.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
+<tr><td>Phoenix Rebirth</td><td align="center">0</td><td align="center">4</td><td align="center">2.0</td><td>RESOURCE</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>Sharpshooter &mdash; 8 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Called Volley</td><td align="center">30</td><td align="center">4</td><td align="center">3.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Quarry&#x27;s Mark</td><td align="center">15</td><td align="center">3</td><td align="center">1.5</td><td>METER-GEN</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+<tr><td>Crossfire</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Calibrating Shot</td><td align="center">20</td><td align="center">3</td><td align="center">1.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+<tr><td>Trophy Shot</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+<tr><td>Reacquire</td><td align="center">20</td><td align="center">4</td><td align="center">1.5</td><td>METER-RULE</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+<tr><td>Fault Line</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>BREAK</td><td>SELF</td><td>Focus</td></tr>
+<tr><td>Drumfire</td><td align="center">25</td><td align="center">3</td><td align="center">3.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+</table>
+<h4>Survivalist &mdash; 8 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Choking Smoke</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>STATUS</td><td>ENEMY-ALL</td><td>statuses</td></tr>
+<tr><td>Snare Line</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>CTRL</td><td>ENEMY-ALL</td><td>traps</td></tr>
+<tr><td>Loaded Shot</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>statuses</td></tr>
+<tr><td>Hunt</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>statuses</td></tr>
+<tr><td>Preparation</td><td align="center">25</td><td align="center">5</td><td align="center">2.0</td><td>TEMPO</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Stalking Horse</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>CTRL</td><td>SELF</td><td>statuses</td></tr>
+<tr><td>Downwind</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>STATUS</td><td>SELF</td><td>statuses</td></tr>
+<tr><td>Cull</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>statuses</td></tr>
+</table>
+<h4>Swordmaster &mdash; 10 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Precision Strike</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
+<tr><td>Feint</td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
+<tr><td>Sever</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
+<tr><td>Battle Poise</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>TEMPO</td><td>SELF</td><td>parry</td></tr>
+<tr><td>Feigned Guard</td><td align="center">20</td><td align="center">3</td><td align="center">1.0</td><td>STANCE</td><td>SELF</td><td>stance</td></tr>
+<tr><td>Discipline</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>STANCE</td><td>SELF</td><td>stance</td></tr>
+<tr><td>Answering Steel</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>TEMPO</td><td>SELF</td><td>parry</td></tr>
+<tr><td>Formless</td><td align="center">35</td><td align="center">6</td><td align="center">1.0</td><td>STANCE</td><td>SELF</td><td>stance</td></tr>
+<tr><td>Lunge</td><td align="center">25</td><td align="center">0</td><td align="center">3.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
+<tr><td>Execute</td><td align="center">30</td><td align="center">3</td><td align="center">2.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>Warden &mdash; 9 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Covering Guard</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>MIT-ALLY</td><td>ALLY-ONE</td><td>Block</td></tr>
+<tr><td>Eye of the Storm</td><td align="center">20</td><td align="center">4</td><td align="center">2.0</td><td>CTRL</td><td>ENEMY-ALL</td><td>taunt</td></tr>
+<tr><td>Shield Slam</td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Heavy Plating</td></tr>
+<tr><td>Vendetta</td><td align="center">20</td><td align="center">4</td><td align="center">1.5</td><td>CTRL</td><td>ENEMY-ONE</td><td>taunt</td></tr>
+<tr><td>Aegis Wall</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>HEAL</td><td>SELF</td><td>Block</td></tr>
+<tr><td>Anvil</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>METER-RULE</td><td>SELF</td><td>Block</td></tr>
+<tr><td>Recompense</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>RESOURCE</td><td>SELF</td><td>Block</td></tr>
+<tr><td>Turn the Blade</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>BREAK</td><td>SELF</td><td>Block</td></tr>
+<tr><td>Hold the Line</td><td align="center">30</td><td align="center">6</td><td align="center">3.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>class-wide: cleric &mdash; 6 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Ministration</td><td align="center">20</td><td align="center">2</td><td align="center">2.0</td><td>HEAL</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Consecration</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>HEAL</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Chastise</td><td align="center">15</td><td align="center">2</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Unburden</td><td align="center">20</td><td align="center">4</td><td align="center">1.5</td><td>STRIP</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Exhortation</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>AMP-TEAM</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Undying Vigil</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>HEAL</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>class-wide: hunter &mdash; 6 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Field Dressing</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>HEAL</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Camouflage</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Aimed Volley</td><td align="center">20</td><td align="center">3</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Bola</td><td align="center">15</td><td align="center">3</td><td align="center">1.5</td><td>CTRL</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Hunter&#x27;s Mark</td><td align="center">15</td><td align="center">4</td><td align="center">1.5</td><td>AMP-TEAM</td><td>ENEMY-ALL</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Arcane Arrows</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>class-wide: mage &mdash; 6 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Magic Barrier</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>SHIELD</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Mirror Image</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Magic Missiles</td><td align="center">15</td><td align="center">2</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Mana Well</td><td align="center">20</td><td align="center">5</td><td align="center">1.0</td><td>RESOURCE</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Dispel</td><td align="center">15</td><td align="center">3</td><td align="center">1.5</td><td>STRIP</td><td>EITHER-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Blink</td><td align="center">10</td><td align="center">3</td><td align="center">1.0</td><td>TEMPO</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+</table>
+<h4>class-wide: warrior &mdash; 6 cards</h4>
+<table border="1" cellpadding="3" cellspacing="0">
+<tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
+<tr><td>Battle Trance</td><td align="center">15</td><td align="center">4</td><td align="center">1.0</td><td>HEAL</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Rally</td><td align="center">15</td><td align="center">4</td><td align="center">1.5</td><td>TEMPO</td><td>ALLY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Charge</td><td align="center">20</td><td align="center">3</td><td align="center">1.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Cleave</td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-MANY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Warcry</td><td align="center">20</td><td align="center">5</td><td align="center">1.0</td><td>AMP-TEAM</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td>Ironclad</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+</table>
+
+<hr>
+<p><i><b>END OF THE AUDIT.</b> Nothing in this document was applied. The two Grade-2 findings are
+correctness matters against a standing rule and are the only two items here that are not purely a
+design question. Everything else is an option, and each is written with its remedy attached so it
+can be ruled on rather than re-investigated.</i></p>
+</body></html>

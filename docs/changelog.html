@@ -14,6 +14,112 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-28 &mdash; Batch DQ: DO THE DRAFT POOLS ACTUALLY CONTAIN DIFFERENT BUILDS?</h2>
+<p><i><b>A REPORT. NOTHING WAS RETIRED, RE-AUTHORED OR RETUNED.</b> All 142 draft cards compared
+against every card they can be offered beside, against the protected core kit of the hero who would
+be offered them, and against that hero's talent tree. <b>The comparison is on what the card DOES</b>
+&mdash; handler bodies lifted out of <code>_resolve_special</code> with comments and every cosmetic
+call stripped, plus the read sites of the 27 cards whose whole handler is a self-flag. The audit is
+<b><code>docs/draft-audit.html</code></b>; this entry is the summary.</i></p>
+
+<p><b>&sect;1 &mdash; TWO GRADE-2 FINDINGS, AND BOTH ARE THE STANDING RULE NOT BEING ENFORCED.</b>
+<code>classes.gd</code> already says <i>"NO ABILITY MAY BE A STRICTLY BETTER VERSION OF ANOTHER IN
+THE SAME POOL"</i>, so these are correctness rather than taste.</p>
+<ul>
+<li><b>GLACIAL PRISON AND FLASH FREEZE ARE ONE CARD AT TWO PRICES.</b> Comments and cosmetics
+stripped, both handlers are the same three steps in the same order: apply 3 Chilled if the target
+has none, note the debuff, <code>_hold_freeze</code>. Flash Freeze computes one extra local and
+<b>uses it only inside its log string</b>. Glacial Prison is cheaper (25 against 30), shorter on
+cooldown (4 against 5), faster (2.5 against 3.0), <b>and it is in <code>RECAST_GATED</code> while
+Flash Freeze is not</b> &mdash; so the dearer card is also the only one of the two that can be spent
+on an enemy already held. <b>Batch DO created this and nothing else did</b>: Glacial Prison was a
+talent grant in no pool until DO moved it into the pool Flash Freeze had held since CB.</li>
+<li><b>BATTLE POISE'S ENTIRE PAYLOAD IS A SUBSET OF ANSWERING STEEL'S.</b> Both are Swordmaster
+self-flags; both fire at the same parry site eleven lines apart; both call
+<code>_tick_cooldowns</code> with a constant of <b>1</b>. Answering Steel is cheaper (20 against 25),
+lasts 6 turns against 4, <b>has no stance requirement at all</b>, and adds +20% parry chance and 15
+Rage a parry. <b>There is no board state in which Battle Poise is the better pick.</b> The source
+comment calls the two <i>"DELIBERATE STACKING PARTNERS rather than rivals"</i>, which is a good
+reason to hold both and not a reason for the pool to OFFER both. <b>This one predates DO</b>, and the source
+shows why it was missed: Answering Steel's own comment names Battle Poise as <i>"the deliberate
+stacking partner rather than a rival"</i>. <b>It asks whether the two stack and never asks which of
+the two you take</b>, and a three-card offer only ever asks the second question.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; AND THE ANSWER TO THE QUESTION THAT MATTERS IS THAT THE POOLS VARY ENORMOUSLY,
+IN TWO MEASURES THAT DISAGREE.</b> Each pool was scored on <b>distinct decisions</b> (effect axis
+&times; target shape &mdash; how many cards a player must draft before the pool stops offering
+anything new) and on <b>engine dependence</b> (how many cards read or write the spec's own system).
+<b>The two disagree on the Pyromancer and both readings are true.</b></p>
+<ul>
+<li><b>THE SWORDMASTER IS THE MOST CONCENTRATED POOL IN THE GAME: TEN CARDS, FOUR DECISIONS.</b>
+Strike one enemy, change or hold a stance, buy tempo off a parry, or execute. <b>Four cards see all
+of it</b>, and his healing, area damage, control and party buff are all in the Warrior class pool
+&mdash; his own spec pool holds none of the four.</li>
+<li><b>THE BEASTMASTER IS 8 OF 8 ON ONE ENGINE.</b> Every card requires a living companion or reads
+its Loyalty. <b>Not one card in his pool does anything for the hunter himself</b> &mdash; no
+mitigation, no heal, no shield, no control, no Break, no tempo.</li>
+<li><b>THE CRYOMANCER IS 12 OF 12 ON THE ICE</b>, and <b>none of DO's four opened a new decision</b>
+&mdash; the pool already spread Chilled, already froze, already relocated and already cashed a hold.</li>
+<li><b>THE PYROMANCER COVERS THE MOST DECISIONS (10 of 13) AND IS THE MOST NARROWLY BOUND (12 of 13
+touch Burn).</b> Overburn's multiplier is literally <code>_total_burn_turns()</code>, so <b>five of
+the thirteen are the same lever on the passive's own input</b> at five prices. Ten things to decide,
+one currency to decide them in.</li>
+<li><b>THE WARDEN IS THE HEALTHIEST: NINE CARDS, NINE DECISIONS &mdash; no two make the same one</b>,
+the only pool in the game of which that is true. <b>But four of the nine hang off one trigger</b>
+(a block), and two of those four cancel each other by design.</li>
+<li><b>THE CLASS POOLS ARE THE HEALTHIEST THING IN THE DRAFT AND THE AUDIT SAYS SO.</b> The
+authoring rule &mdash; <i>untied and general, feeds no passive</i> &mdash; is honoured at <b>0 of
+24</b>, and three of the four cover six decisions with six cards, which no spec pool does.</li>
+</ul>
+
+<p><b>&sect;3 &mdash; THE DISTRIBUTION OF DO's TWENTY-TWO LANDED ON CLASS LINES AND NOBODY ASKED FOR
+IT.</b> Derived from the <code>BATCH DO</code> markers in <code>classes.gd</code>: the spec half went
+<b>96 &rarr; 118</b>, the Mage took <b>nine</b> of the twenty-two and <b>the Hunter took none</b>.
+The deepest pool is now <b>62% deeper than the shallowest</b> and the three shallowest are the three
+Hunter specs. <b>Not one of the twenty-four Hunter spec cards is a heal, a shield, or mitigation for
+the hero</b> &mdash; which lines up with the standing note that the Sharpshooter has no defensive
+node in his 27, so <b>both halves of his progression offer him nothing defensive at all.</b></p>
+
+<p><b>&sect;4 &mdash; A COOLDOWN OF ZERO MEANS SOMETHING IN THIS GAME AND TWO DRAFT CARDS HAVE
+ONE.</b> All twelve cooldown-zero abilities in the protected cores are the hero's free basic attack.
+<b>Of 142 draft cards exactly two are repeatable every turn &mdash; Pyroblast and Lunge &mdash; and
+both are DO's.</b> That is the shape of a talent grant arriving intact: at the end of a lane the
+price was the node, so no cooldown was needed to bound it. Pyroblast is simultaneously the dearest
+card in the draft (45), the slowest (6.0), joint-hardest-hitting (55) and repeatable.</p>
+
+<p><b>&sect;5 &mdash; NINE READ-ONLY-ZERO FIELDS WERE RECORDED AT DO AND THERE ARE TEN.</b>
+<code>icy_resolve_ranks</code> is read twice &mdash; Rime's duration is
+<code>4 + attacker.icy_resolve_ranks</code>, and the recast preview quotes the same expression
+&mdash; and <b>nothing in the project writes it</b>. <code>cr_icy_resolve</code> still exists and DO
+re-pointed it onto Blizzard for exactly the right reason; the field it used to write was left
+behind. <b>Nothing is wrong at runtime</b> (zero is the base) and no gate catches it, which is the
+<code>FIREDRAW_TAKE</code> shape.</p>
+
+<p><b>&sect;6 &mdash; THE CORE-KIT CHECK HAD NEVER BEEN RUN AND IT IS WHERE THE SECOND-LARGEST CROP
+IS.</b> <code>docs/state.md</code> has carried <i>"No spec pool has ever been checked for redundancy
+against its own base kit"</i> as an open item. <b>The sharpest result is KILLING FROST against
+BLIZZARD:</b> the drafted card is cheaper, faster, shorter on cooldown, higher in damage and lays
+more Chilled (a flat 2 against a 1&ndash;2 roll) than the core ability the Cryomancer can never drop.
+Its one limitation is that it touches only already-Chilled enemies, and his free basic attack applies
+Chilled. <b>Mind Flay against Hex of Ruin</b> is the same story one spec over: the core card is
+cheaper, faster and hits one more enemy, and the whole difference is Exposed against Psychosis.
+<b>Arcane Bolt, Unmaking and Death Ray are three cards on one decision</b> and Resonance has no
+maximum, so the drafted one overtakes the core one at 15 stacks.</p>
+
+<p><b>&sect;7 &mdash; AND THE TALENT HALF CAME BACK CLEAN ON THE SHAPE THAT MATTERED, DERIVED
+RATHER THAN ASSUMED.</b> <b>Thirty-six nodes carry an <code>"ability"</code> payload and ZERO point
+at a drafted card</b> &mdash; all thirty-six name a protected core ability, including the nine whose
+node <i>id</i> still names the ability DO moved. <b>The finding there is smaller and is player-facing:
+three of the five nodes named after live abilities share a draw space with their namesake</b> and do
+something different from it &mdash; a Cryomancer can hold a talent called Killing Frost and a card
+called Killing Frost at once.</p>
+
+<p><b>&sect;8 &mdash; NO <code>CLAUDE.md</code> RULE WAS ADDED AND NO GATE WAS WRITTEN.</b> Nothing
+is settled until the report is read, and a gate encodes a ruling. <b>No <code>.gd</code> file was
+touched at all</b>, which is why the parse floor is met by construction and the battery is a
+regression check on the documentation rather than on the code.</p>
+
 <h2>2026-08-27 &mdash; Batch DP: THE MADNESS LANE COMES OFF THE DRAW</h2>
 <p><i><b>DO's OWN COST, PAID.</b> Mind Flay and Mass Hysteria are the only appliers of Psychosis
 and Hysteria in the game, and DO moved both into the draft &mdash; so four Occultist Madness cells
