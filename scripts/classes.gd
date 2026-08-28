@@ -292,8 +292,15 @@ const SPEC_DRAFT_POOLS := {
 		"Hold the Line"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
 		"Feigned Guard", "Discipline", "Answering Steel", "Formless",
-		# BATCH DO — moved out of the talent tree, unchanged.
-		"Lunge", "Execute"],
+		# BATCH DO — moved out of the talent tree. EXECUTE IS STILL VERBATIM;
+		# LUNGE IS NOT, and DR §4 re-authored it (see its def).
+		"Lunge", "Execute",
+		# BATCH DR §4 — THE POOL GAINS FOUR AXES ON THREE CARDS. DQ measured
+		# this as the most concentrated pool in the game: ten cards making FOUR
+		# decisions, so a player who has drafted four has seen everything it
+		# decides. Lunge re-authored carries BREAK, Wheeling Cut carries AREA
+		# DAMAGE and SELF-MITIGATION, and Counter Time carries CONTROL.
+		"Wheeling Cut", "Counter Time"],
 	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
@@ -304,7 +311,13 @@ const SPEC_DRAFT_POOLS := {
 		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep",
 		# BATCH DO — moved out of the talent tree, unchanged.
 		"Backdraft", "Immolate", "Pyroblast", "Firestorm", "Phoenix Rebirth"],
-	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
+	# BATCH DR — FLASH FREEZE IS RETIRED. DQ's Finding 1: comments and cosmetics
+	# stripped, its handler and Glacial Prison's were the same three steps in the
+	# same order, and Glacial Prison is cheaper (25 v 30), shorter on cooldown
+	# (4 v 5), faster (2.5 v 3.0) AND in `RECAST_GATED` where Flash Freeze was
+	# not — so the dearer card was also the only one of the two that could be
+	# spent on an enemy already held. The pool can afford the loss at twelve.
+	"cryomancer": ["Winter's Toll", "Rimebinding",
 		"Killing Frost", "Hoarfrost Armor", "Deep Winter", "Cold Iron",
 		"Frostbind",
 		# BATCH DO — moved out of the talent tree, unchanged.
@@ -357,11 +370,13 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# **THE DRAFT IS 142 OF A TARGET 142 AS OF BATCH DO (118 spec + 24 class-wide),
+# **THE DRAFT IS 143 OF A TARGET 143 AS OF BATCH DR (119 spec + 24 class-wide),
 # AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third at 120 of 120,
 # every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
-# half to 118. Every one of the four class pools is still six deep, and no
-# spec pool is below eight.
+# half to 118. **DR MOVED IT TWICE IN ONE BATCH AND THE NET IS +1**: down one
+# for the retirement of a strict duplicate in the Cryomancer's pool (§2), up
+# two for the Swordmaster's new axes (§4). Every one of the four class pools is
+# still six deep, and no spec pool is below eight.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
@@ -920,7 +935,7 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-TWO OF A TARGET 142 (BO..DO) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-THREE OF A TARGET 143 (BO..DR) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -942,7 +957,7 @@ static func talent_granted_names() -> Array:
 # **BATCH DO MOVED THE TOTAL FOR THE FIRST TIME SINCE CI, AND IT IS NOT A NEW
 # TRANCHE.** Twenty-two TALENT NODES granted an ability; the charter forbids
 # that outright now, so all twenty-two cards moved here rather than being
-# deleted. `SPEC_DRAFT_POOLS` IS 118 AND THE DRAFT IS 142 OF 142. **NO POOL
+# deleted. `SPEC_DRAFT_POOLS` IS 119 AND THE DRAFT IS 143 OF 143. **NO POOL
 # LOST ANYTHING AND THE FLOOR IS STILL EIGHT** — nine pools are deeper, and
 # beastmaster, sharpshooter and mystic still read exactly eight because their
 # trees granted nothing to move. **THE PER-SPEC EXPECTATION IS A TABLE NOW,
@@ -1154,6 +1169,40 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack03",
 				"perfect_id": "", "perfect_text": "Also strips 35% armor for 3 turns",
 				"description": "REQUIRES THE AGGRESSIVE GUARD.\nCut deep for 40% of Attack. If the\ntarget is BROKEN this ability's\ncooldown is cleared outright, so the\nwindow can be swung through again\nand again."})
+		# BATCH DR §3 — THE DEFENSIVE GUARD NOW BUYS SOMETHING, AND THAT IS WHAT
+		# ENDS DQ's FINDING 2. Its stance requirement was pure cost with nothing
+		# bought by it, so ANSWERING STEEL — cheaper (20 v 25), longer (6 turns
+		# v 4), ungated, and paying the SAME `_tick_cooldowns` constant PLUS
+		# +20% parry and 15 Rage — held its whole payload as a subset. There was
+		# no board state in which this was the better pick, which the standing
+		# rule in this file already forbids.
+		#
+		# WHAT IT BUYS: **ONCE A TURN, A PARRY LETS HIM GUARD CHANGE WITHOUT
+		# SPENDING AN ACTION.** Answering Steel cannot have it — it has no
+		# stance requirement to reward — so the two are no longer nested. The
+		# stacking-partners comment at the parry site stands and is still true;
+		# it answered "do these combine" and never answered "which do you take",
+		# and a three-card offer only ever asks the second.
+		#
+		# FOUR THINGS ARE DELIBERATELY BOUNDED, ALL FOUR THE DESIGNER'S RULING:
+		# · **THE PIVOT ONLY.** `_swordmaster_switch`, not the Guard Change
+		#   ability's payload — its 15 BD, SUNDER GUARD's 40 BD to every enemy,
+		#   NO QUARTER and TEMPO are on that card and stay on it. A Defensive
+		#   Swordmaster holding Sunder Guard and parrying twice a turn would
+		#   otherwise land 80 free Break damage across the field every turn.
+		# · **ONCE A TURN**, not once a parry, and it does not bank.
+		# · **THE COOLDOWN TICK STAYS** and still pays on EVERY parry.
+		# · **IT RESPECTS GUARD CHANGE'S OWN 1-TURN COOLDOWN.** That cooldown is
+		#   what the core card's comment says "stops spam", and a free pivot
+		#   that ignored it would delete the sentence.
+		#
+		# AND IT GOES THROUGH `_ability_usable`, THE SAME DOOR — so FORMLESS
+		# still refuses it (there is no stance to change), and it refuses it in
+		# ONE place rather than growing a second path that could disagree.
+		#
+		# THE COST IT CARRIES IS NOT FREE: the pivot runs `_swordmaster_switch`,
+		# which THROWS AWAY DISCIPLINE'S ACCUMULATION. A Discipline build wants
+		# the free change refused, and gets that for nothing by not pressing it.
 		# AXIS: defence buys tempo. He is the only parry-STAT hero in the game —
 		# 12% base, plus Sword Mastery and High Guard — and every point of it
 		# currently just makes hits smaller. THIS IS THE CONNECTION HIS THREE
@@ -1167,13 +1216,15 @@ static func draft_ability(display_name: String) -> Ability:
 		# SEVER, SHATTERPOINT, EXECUTE and GUARD CHANGE all come off cooldown
 		# faster. IT GOES THROUGH `_tick_cooldowns` — BQ's one implementation of
 		# cooldown reduction — rather than writing a second walk of the same
-		# dictionary.
+		# dictionary. **AND SINCE DR §3 IT BUYS THE PIVOT ITSELF**, so FEIGNED
+		# GUARD, DISCIPLINE and FORMLESS all argue with it: the first two want
+		# the guard where it is, and the third refuses the change outright.
 		"Battle Poise":
 			return Ability.make({"display_name": "Battle Poise", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "battle_poise",
 				"perfect_id": "", "perfect_text": "",
-				"description": "REQUIRES THE DEFENSIVE GUARD.\nFor 4 turns every attack he PARRIES\ntakes a turn off all his cooldowns.\nThe more often he turns a blade, the\nfaster the rest of his kit comes back."})
+				"description": "REQUIRES THE DEFENSIVE GUARD.\nFor 4 turns every attack he PARRIES\ntakes a turn off all his cooldowns —\nand ONCE A TURN a parry also buys a\nfree GUARD CHANGE that costs no action.\nThe guard he needs is never a turn away."})
 		# AXIS: the only card in the game that lets a build have BOTH HALVES of
 		# its own toggle.
 		#
@@ -1559,6 +1610,107 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack03", "special": "formless",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Hold no guard at all. For 4 turns you\ndeal +15% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for 2 turns."})
+		# ----- SWORDMASTER, BATCH DR §4: THE FOUR AXES HIS POOL NEVER HAD.
+		#
+		# DQ MEASURED THIS POOL AS THE MOST CONCENTRATED IN THE GAME: ten cards
+		# making FOUR decisions — strike one enemy (four cards), change or hold
+		# a stance (three), buy tempo off a parry (two), execute (one) — so a
+		# player who had drafted four cards had seen everything it decides. His
+		# healing, his area damage, his control and his party buff were all in
+		# the WARRIOR CLASS pool, which is one card in four.
+		#
+		# THE FRAMEWORK THIS IS AUTHORED AGAINST, recorded in `CLAUDE.md`: an
+		# ENGINE is the spec's own currency and is exclusive by construction —
+		# here it is the STANCE, and it still gates everything below. An AXIS is
+		# an effect type and is SHARED, deliberately. **Adding axes to a spec
+		# does not dilute its identity**; a pool covering few axes holds one
+		# build however strong its engine is. So all three cards read the
+		# stance: Lunge and Wheeling Cut BRANCH on it, Counter Time REQUIRES it,
+		# and BW's rule decides which is which — **READERS BRANCH AND FLIP;
+		# GATED ONES REQUIRE AND STAY.**
+		#
+		# ----- AXIS: the blade goes round, and the guard decides what he comes
+		# up holding. His pool had NO area damage at all — his only field-wide
+		# option for a whole run was CLEAVE out of the Warrior class pool.
+		#
+		# **THE ARRIVING-STANCE PRINCIPLE DECIDES BOTH BRANCHES AND IT IS THE
+		# THING THAT WOULD MOST EASILY BE GOT BACKWARDS** (BP's rule, on the
+		# card that established it): cast from AGGRESSIVE he lands in DEFENSIVE,
+		# so the branch hands him DEFENCE; cast from DEFENSIVE he lands in
+		# AGGRESSIVE, so it hands him OFFENCE. He is never stranded — he always
+		# arrives holding something.
+		#
+		# THE SWEEP ITSELF IS THE PIPELINE'S, not the handler's: `aoe` with real
+		# `damage` and `pressure`, exactly as Cinderfall and Blizzard are, so
+		# the crit, the armour read, the variance roll, OVERWHELM, OFF BALANCE
+		# and WHETSTONE all come free and the handler only grants and flips.
+		#
+		# SYNERGY: DISCIPLINE argues with it, which is the tension worth having
+		# — this is a reader, so casting it throws the accumulation away.
+		# FEIGNED GUARD changes which branch fires without moving his real
+		# guard; FORMLESS does not, because `_eff_stance` returns one guard and
+		# a Formless Swordmaster is standing in neither. OVERPRESSURE cashes the
+		# Break this spreads onto meters that are already full.
+		"Wheeling Cut":
+			return Ability.make({"display_name": "Wheeling Cut", "cost": 30,
+				"damage": 20, "pressure": 12, "delay": 2.5, "cooldown": 4,
+				"aoe": true, "anim": "attack03", "special": "wheeling_cut",
+				# IT RUNS A BAR (real damage), SO IT MUST STATE A PERFECT —
+				# `test_batch_bo` §5's biconditional, which DO left two debts
+				# against and this card does not add a third. **THE PERFECT IS
+				# BOTH GIFTS AT ONCE**, which is the one bonus that could only
+				# belong to this card: the wheel came round so cleanly that
+				# neither guard had to be given up. Implemented on the
+				# `is_perfect` branch in the handler, on Precision Strike's
+				# precedent (`perfect_id` empty, the clause in the code).
+				"perfect_id": "", "perfect_text": "Both guards' gifts at once",
+				"description": "Bring the blade all the way round:\nEVERY enemy takes 20% of Attack and\n12 Break.\nFROM AGGRESSIVE: you come up covered —\ntake 20% less damage for 3 turns.\nFROM DEFENSIVE: you come up on the\nfront foot — deal +20% damage for\n3 turns.\nEither way the stance then SWITCHES."})
+		# ----- AXIS: taking the turn instead of the blow. **HIS POOL COULD NOT
+		# TAKE AN ENEMY'S TURN AWAY AT ALL** — ten cards and not one of them was
+		# control. POMMEL STRIKE is his only Stun and it is PROTECTED CORE, so
+		# the whole of his control for a run was one core ability's one-turn
+		# rider.
+		#
+		# GATED, NOT A READER: it is REFUSED OUTRIGHT in the wrong guard and
+		# casting it moves nothing, which is BW's other half. `_ability_usable`
+		# IS THE DOOR — the same one SEVER and BATTLE POISE are refused at — so
+		# the greyed button, the bot's pool and the cast can never disagree, a
+		# FEIGNED GUARD genuinely lets an Aggressive Swordmaster cast it, and a
+		# FORMLESS one satisfies it outright.
+		#
+		# **IT MUST NOT BE A SECOND POMMEL STRIKE (§3), AND IT IS NOT.** Pommel
+		# Strike is cheaper (20 v 25), ungated, deals 25% of Attack, lands 30
+		# Break, builds 10 Rage, carries a keen 25% crit and Stuns for ONE turn.
+		# This deals NOTHING — no damage, no Break, no Rage — and buys a SECOND
+		# turn of it for a stance and a whole action. Neither dominates: the
+		# core card is the better attack and this is the better answer, and the
+		# only board on which this is the pick is one where a turn is worth more
+		# than a blow.
+		#
+		# THE BOSS RULE IS INHERITED AND NOT RE-WRITTEN. `stunned` is one of the
+		# five ids `_apply_status`'s carve-out refuses on an unbroken boss, and
+		# this card passes no `force` — CR §1's standing rule is that hard
+		# control lands on a boss only once it is Broken, and POMMEL STRIKE's
+		# perfect is the one exception left in the game. The card says so, in
+		# the corpus's standing phrasing.
+		#
+		# IT RUNS NO BAR AND SO ADVERTISES NO PERFECT (CV §3): no damage, no
+		# heal, no Break damage and `counter_time` is in neither DAMAGE_SPECIALS
+		# nor HEAL_SPECIALS, so `runs_skill_check()` is false and a promise here
+		# would be unreachable.
+		#
+		# SYNERGY: the POISE lane is what makes the Defensive guard worth
+		# standing in — WAITING GUARD, HIGH GUARD, RIPOSTE and OPPORTUNIST all
+		# pay while he is there — and BATTLE POISE's free Guard Change (DR §3)
+		# is now how an Aggressive build reaches this without spending a turn.
+		# The stolen turn is the BREAKER lane's setup: it is a turn the enemy
+		# does not spend closing the window LUNGE just opened.
+		"Counter Time":
+			return Ability.make({"display_name": "Counter Time", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack02", "special": "counter_time",
+				"perfect_id": "", "perfect_text": "",
+				"description": "REQUIRES THE DEFENSIVE GUARD.\nRead the attack and answer it before it\nlands: one enemy loses its next TWO\nturns. It deals nothing at all — the\nturn IS the payload.\nA BOSS RESISTS UNTIL BROKEN."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
 		# this skims every bank, and Overburn refunds every turn it takes.
@@ -2213,25 +2365,19 @@ static func draft_ability(display_name: String) -> Ability:
 		# copies one — so against a boss, which resists Frozen until Broken,
 		# both are dead cards for most of the fight.
 		#
-		# AXIS: the hold WITHOUT the build, on a card rather than a bought cell.
-		# SYNERGY: Cold Snap (Deep Freeze row 6) fills a held enemy's Break
-		# meter 15 a turn, so a boss frozen once tends to stay freezable, and
-		# Second Prison (row 5) makes a second hold worth having. Expensive and
-		# slow on purpose — THE EMERGENCY, NOT THE OPENER.
+		# BATCH DR §2 — THE CARD THAT ANSWERED THAT IS GONE, AND ITS ANSWER IS
+		# NOT. Batch BT authored an outright freeze here ("the hold WITHOUT the
+		# build, on a card rather than a bought cell"); DO then moved GLACIAL
+		# PRISON into this same pool, which does the identical three steps for
+		# less Mana, less initiative and less cooldown, and which `RECAST_GATED`
+		# protects from being spent on an enemy already held. The axis this
+		# section opened is still covered — by the better of the two cards. The
+		# def AND the comment that suspended the standing rule over it are both
+		# deleted rather than updated: DR's own trap note says a documented
+		# exception outliving its justifications is worse than an undocumented
+		# one, and both of that comment's two reasons had already died (the
+		# acquisition channel at DO, the Perfect at CR).
 		#
-		# REPORTED, NOT RE-TUNED: on every number this is a strictly worse
-		# GLACIAL PRISON (Deep Freeze row 4 — 25 Mana, 2.5, 4cd for the same
-		# outright freeze). The distinction is the ACQUISITION CHANNEL, which is
-		# real: the node is a bought cell in ONE lane of ONE tree, so a Winter or
-		# Thaw Cryomancer can never have it, while this is drafted by any of
-		# them. Its PERFECT is what keeps it from being dominated outright — see
-		# `_hold_freeze`'s `force` argument, which no node buys.
-		"Flash Freeze":
-			return Ability.make({"display_name": "Flash Freeze", "dmg_type": "frost",
-				"cost": 30, "damage": 0, "pressure": 0, "delay": 3.0,
-				"cooldown": 5, "anim": "attack03", "special": "flash_freeze",
-				"perfect_id": "", "perfect_text": "",
-				"description": "Seal it now: the target is Frozen\noutright whatever its Chilled stacks,\nand joins the Glacial Hold.\nA BOSS RESISTS UNTIL BROKEN — and even\nthen the ice holds it ONE turn only.\nThat turn is what this buys against\none; it is not a lockdown."})
 		# AXIS: the accumulation pays on its own. His stacks currently do
 		# nothing but count toward a freeze, so a fight where the freeze never
 		# lands is a fight where his build did nothing.
@@ -3639,10 +3785,20 @@ static func draft_ability(display_name: String) -> Ability:
 		# ARE NAMED IN `SPEC_POOLS` TODAY, so that fall-through was the only
 		# thing making the zone-boss pick resolve at all.
 		#
-		# THEY ARE VERBATIM. Not one number, `special`, `perfect_id` or line of
+		# THEY WERE VERBATIM. Not one number, `special`, `perfect_id` or line of
 		# `description` was re-typed — they were lifted out of the payloads
 		# whole, so the draft card and the talent grant cannot have drifted in
-		# the move. **ONE TEXT CHANGED AND IT IS A CORRECTION, NOT A DRIFT:**
+		# the move.
+		#
+		# **BATCH DR §4 BROKE THAT FOR EXACTLY ONE OF THEM, DELIBERATELY, AND
+		# THE HEADER SAYS SO RATHER THAN LEAVING THE CLAIM TO ROT.** LUNGE is
+		# re-authored below and is no longer its talent grant's twin. The reason
+		# is the one DQ measured: it arrived carrying **cooldown 0**, and of 142
+		# draft cards only it and Pyroblast repeat every turn, where all twelve
+		# cooldown-zero abilities in the protected cores are the free basic
+		# attack. At the end of a lane the price was the node; in a pool there
+		# is no price. The other twenty-one are untouched and still verbatim.
+		# **ONE OTHER TEXT CHANGED AND IT IS A CORRECTION, NOT A DRIFT:**
 		# Battle Shout's card promised "+12% ... Lasts 3 turns", which were
 		# `battle_shout_node`'s magnitudes — index 1 of `[8, 12, 18]`. Nothing
 		# writes that counter now, so the card says what the handler pays.
@@ -3670,12 +3826,56 @@ static func draft_ability(display_name: String) -> Ability:
 				"perfect_extra_hit": false,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."})
+		# BATCH DR §4 — RE-AUTHORED ONTO **BREAK**, AND IT IS THE SHARPEST GAP
+		# IN THE POOL. He has an entire BREAKER lane built around a Break window
+		# — Punishment, Off Balance, Guard Breaker, Overpressure and No Quarter
+		# all live inside it, and SEVER's own cooldown clears against a Broken
+		# target so the window can be swung through — and **not one card in his
+		# draft pool opened it.** SHATTERPOINT does, and Shatterpoint is a
+		# `SPEC_POOLS` boss pick rather than a draft card, so the lane depended
+		# on an offer he may never see.
+		#
+		# TWO CHANGES AND NOTHING ELSE MOVED.
+		# · **COOLDOWN 0 -> 3.** This is the whole reason DQ named this card:
+		#   a repeatable draft card is a talent grant that never paid for its
+		#   node. A Break-window opener with no cooldown is also the shape that
+		#   never lets the window close.
+		# · **THE STANCE BRANCH IS DEPTH OR BREADTH**, on top of the wound it
+		#   already left. From the front foot he commits and all the Break goes
+		#   into one guard; from the back foot he does not overreach, so the
+		#   thrust takes less off the one in front and leaves the WHOLE LINE off
+		#   balance. That is the spec's own signature — the same blade, two
+		#   intentions — applied to the one lane no card served.
+		#
+		# ITS DAMAGE CAME DOWN 35 -> 30 because it is a Break card now and not a
+		# damage card, and **SHATTERPOINT KEEPS ITS TITLE**: 40 Break in one
+		# blow against this card's 35 in Aggressive, so the boss pick is still
+		# "his heaviest Break blow" and its own text stays true.
+		#
+		# IT IS AN ORDINARY ATTACK AND MUST STAY ONE. A `special` would
+		# hand-roll the blow and lose the crit, the armour read, the Break, the
+		# parry roll, Overwhelm, Off Balance and Whetstone — BT's Arcane Bolt
+		# rule. Both riders live where the wound rider already lives, in the
+		# strike pipeline, and both read `_eff_stance` so a FEIGNED GUARD
+		# changes which one fires exactly as it changes Precision Strike's.
+		#
+		# AXIS: the committed thrust, and the guard decides where the Break
+		# lands — depth into one guard, or breadth across the whole line. It is
+		# the card that OPENS the Breaker lane's window, which nothing in his
+		# pool did.
+		#
+		# SYNERGY: SUNDER GUARD is the deliberate partner and not a duplicate —
+		# that node re-points GUARD CHANGE into a field-wide Break blow, this is
+		# a STRIKE whose recovery spreads a smaller one, and a Breaker build
+		# holding both is the build working. OVERPRESSURE turns the overflow on
+		# an already-deep meter into damage, and OFF BALANCE pays on the Exposed
+		# and Crippled this leaves as well as on the Broken it makes.
 		"Lunge":
 			return Ability.make({"display_name": "Lunge", "cost": 25,
-				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
-				"resource_gain": 10,
+				"damage": 30, "pressure": 20, "delay": 3.5, "anim": "attack02",
+				"cooldown": 3, "resource_gain": 10,
 				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
-				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them for\n3 turns. Builds 10 Rage."})
+				"description": "A committed thrust, and the guard\ndecides where the Break lands.\nAGGRESSIVE: +15 more Break into that\none enemy, and it leaves them Exposed.\nDEFENSIVE: he does not overreach — 12\nBreak to EVERY other enemy, and the\ntarget is Crippled. 3 turns either way.\nBuilds 10 Rage."})
 		"Execute":
 			return Ability.make({"display_name": "Execute", "cost": 30,
 				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",

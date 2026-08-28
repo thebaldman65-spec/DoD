@@ -176,6 +176,16 @@ held for a turn is a real effect no other card buys, and it is currently only a 
 <i>move Glacial Prison</i> out of the spec pool. <b>Doing nothing ships a card that is never the
 right pick.</b></p>
 
+<p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>RESOLVED AT BATCH DR
+&sect;2 &mdash; FLASH FREEZE IS RETIRED.</b> The choice taken was <i>retire one</i>, and Flash
+Freeze was the one with nothing of its own. <b>The suspension comment was DELETED rather than
+updated</b>, because both of its stated reasons were already dead &mdash; the finding this audit
+called <i>"a justification outliving its premises"</i> is now a standing trap in
+<code>CLAUDE.md</code>. The Cryomancer's pool goes 12 &rarr; 11 and the draft 142 &rarr; 141
+before &sect;4 takes it to 143. <b>One further stale count of the same species was found while
+removing it</b>: <code>_hold_freeze</code>'s header said THREE callers when DO's Cryoclasm had
+made it four, and named a <code>force</code> no caller has passed since CR. See
+<code>docs/reports/DR.md</code> &sect;2.</p>
 <h3>FINDING 2 &mdash; BATTLE POISE'S ENTIRE PAYLOAD IS A SUBSET OF ANSWERING STEEL'S, AND THEY SIT
 IN THE SAME POOL</h3>
 <p>Both are Swordmaster draft cards. Both are pure self-flags, so the payload is not in the handler
@@ -216,6 +226,16 @@ pure cost with nothing bought by it, so the obvious repair is to make the Defens
 something Answering Steel cannot have (a second tick, or a parry that also refunds the ability);
 or <i>retire Battle Poise</i>; or <i>move one of the two</i> so the pool never offers the pair.</p>
 
+<p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>RESOLVED AT BATCH DR
+&sect;3 &mdash; THE DEFENSIVE GUARD NOW BUYS SOMETHING.</b> The choice taken was
+<i>differentiate</i>, on this section's own diagnosis that the stance requirement was <b>pure cost
+with nothing bought by it</b>. <b>Once a turn, a parry under Battle Poise lets him GUARD CHANGE
+without spending an action</b> &mdash; a clause Answering Steel cannot have, because it has no
+requirement to reward. It is the <b>pivot alone</b> (Guard Change's 15 BD, Sunder Guard's 40 to
+every enemy, No Quarter and Tempo stay on that card), it is bounded to once a turn, the cooldown
+tick still pays on every parry, and it asks <code>_ability_usable</code> about the REAL Guard
+Change &mdash; so Formless refuses it and its own 1-turn cooldown is respected, at one door rather
+than two. <b>Answering Steel is untouched.</b> See <code>docs/reports/DR.md</code> &sect;3.</p>
 <h3>AND ONE GRADE-1 PAIR THAT NEVER COMPETES, REPORTED BECAUSE IT IS STILL THE SAME CARD TWICE</h3>
 <p><b>Aimed Volley (Hunter class-wide) and Magic Missiles (Mage class-wide) are the same card.</b>
 Both are pure field vectors &mdash; zero bespoke code, no <code>special</code> &mdash; and both are
@@ -261,6 +281,16 @@ fuel.</li>
 <tr><td><i>class-wide: warrior</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; HEAL / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
 </table>
 
+<p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>ADDRESSED AT BATCH DR
+&sect;4 &mdash; THE SWORDMASTER'S POOL GOES 10 &rarr; 12 AND FOUR &rarr; EIGHT DECISIONS.</b>
+<b>LUNGE was re-authored onto BREAK</b> (its cooldown 0 &rarr; 3, and the guard now decides depth
+or breadth), <b>WHEELING CUT</b> adds area damage and self-mitigation, and <b>COUNTER TIME</b>
+adds control. <b>The framework this section made visible is now a standing rule in
+<code>CLAUDE.md</code></b>: an ENGINE is exclusive, an AXIS is shared, and adding axes to a spec
+does not dilute its identity. <b>The other concentration findings are reported and unruled</b>
+&mdash; the Beastmaster's 8-of-8, the Cryomancer's remaining 11-of-11, the Pyromancer's one
+currency, and the Hunter class gap, which is bigger than this one and is next. See
+<code>docs/reports/DR.md</code> &sect;4.</p>
 <h3>THE TWO EXTREMES, LOUDLY</h3>
 
 <p><b>THE MOST CONCENTRATED POOL IN THE GAME IS THE SWORDMASTER'S: TEN CARDS, FOUR DECISIONS.</b>

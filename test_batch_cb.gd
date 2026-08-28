@@ -211,12 +211,12 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 118, "the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d"
+	ok(total == 119, "the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d"
 		% total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 142, "the draft holds 142 of a target 142 (got %d)"
+	ok(draft_total == 143, "the draft holds 143 (got %d)"
 		% draft_total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.
@@ -748,8 +748,10 @@ func _live_deep_winter() -> void:
 			% any_chill)
 	# BUILD A HOLD AT FOUR, then copy HALF of it.
 	var prisoner: BattleUnit = foes[0]
-	# A DIRECT `_hold_freeze` NEEDS THE CHILL FIRST, which is Flash Freeze's
-	# own idiom rather than a harness quirk: the ordinary road into a hold is
+	# A DIRECT `_hold_freeze` NEEDS THE CHILL FIRST, which is GLACIAL PRISON's
+	# own idiom rather than a harness quirk (BATCH DR §2 re-pointed this off the
+	# card it retired; the idiom is unchanged and both cards used it): the
+	# ordinary road into a hold is
 	# the Chilled-4 branch of `_apply_status`, so a unit arriving without a
 	# chilled status has no pile for `set_chilled_stacks` to write to and the
 	# prison reads EMPTY. Skipping this is why the first draft of this check

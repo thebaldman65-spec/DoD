@@ -42,7 +42,7 @@ const NAMES := [
 	"Cold Iron", "Consecrated Ground", "Consecration",
 	"Coup de Grâce", "Covenant of Ash", "Covering Guard",
 	"Crossfire", "Crushing Blow", "Cryoclasm",
-	"Cull", "Dark Pact", "Dawnbreak",
+	"Counter Time", "Cull", "Dark Pact", "Dawnbreak",
 	"Deadfall", "Death Ray", "Deep Winter",
 	"Detonation", "Discipline", "Dispel",
 	"Divine Plea", "Divine Presence", "Divine Shield",
@@ -52,7 +52,7 @@ const NAMES := [
 	"Eye of the Storm", "Fault Line", "Feigned Guard",
 	"Feint", "Field Dressing", "Fireball",
 	"Firedraw", "Firestorm", "Flamewave",
-	"Flash Freeze", "Formless", "Fortified Spirit",
+	"Formless", "Fortified Spirit",
 	"Frostbind", "Frostbolt", "Funeral Pyre",
 	"Ghostpack", "Glacial Prison", "Guard Change",
 	"Gut Rip", "Hack and Slash", "Hamstring",
@@ -96,7 +96,7 @@ const NAMES := [
 	"Unslaked", "Vendetta", "Venom Coating",
 	"Vespers", "Vow of Suffering", "War Stomp",
 	"Warcry", "Wildfire", "Wildstrikes",
-	"Winter's Toll",]
+	"Wheeling Cut", "Winter's Toll",]
 
 
 func _find(n: String):

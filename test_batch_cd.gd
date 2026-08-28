@@ -55,16 +55,20 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # so the per-spec expectation is a TABLE rather than one number. Writing it as
 # `12 * 8` again would be the CI-era shape re-asserted over a tree that has
 # moved past it, which is the exact fault this file exists to catch.
-const SPEC_TARGET := 118     # the twelve pools, summed from PER_SPEC_DEPTH
+const SPEC_TARGET := 119     # the twelve pools, summed from PER_SPEC_DEPTH
 const CLASS_TARGET := 24     # 4 classes x 6, untouched by DO
-const DRAFT_TARGET := 142    # 118 + 24
+const DRAFT_TARGET := 143    # 119 + 24
 const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
 # which is why they alone still read eight.
 const PER_SPEC_DEPTH := {
-	"berserker": 10, "warden": 9, "swordmaster": 10,
-	"pyromancer": 13, "cryomancer": 12, "arcanist": 10,
+	# BATCH DR: the Swordmaster 10 -> 12 (§4's two new cards) and the Cryomancer
+	# 12 -> 11 (§2 retired Flash Freeze). This table is the ONE authoritative
+	# per-spec depth in the project; every other suite asserts the FLOOR and the
+	# TOTAL, which is why those two movements cost one edit here and not twelve.
+	"berserker": 10, "warden": 9, "swordmaster": 12,
+	"pyromancer": 13, "cryomancer": 11, "arcanist": 10,
 	"holy": 10, "inquisitor": 10, "occultist": 10,
 	"beastmaster": 8, "sharpshooter": 8, "mystic": 8,
 }
@@ -201,7 +205,7 @@ func _dead_calls() -> void:
 # ---------- §2: the draft target ----------
 
 func _target() -> void:
-	print("\n§2 the draft target is 142, and ~96 is stated nowhere live")
+	print("\n§2 the draft target is 143, and ~96 is stated nowhere live")
 	# The arithmetic itself, so a later batch moving the target has to move a
 	# number here and read the reason beside it.
 	# The table and the total must agree, or one of them is a stale copy.
@@ -212,7 +216,7 @@ func _target() -> void:
 	ok(SPEC_TARGET == depth_sum,
 		"the spec pool target is the table summed (%d)" % depth_sum)
 	ok(CLASS_TARGET == 4 * 6, "the class-wide target is 4 classes x 6 = 24")
-	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET, "the draft target is 142")
+	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET, "the draft target is 143")
 	# THE LIVE SITES. `~96` came from an older assumption of six spec cards per
 	# spec; CB completed the Mage at EIGHT and test_batch_bt has asserted depth
 	# 8 ever since, so the tests have encoded the right figure while the prose
@@ -230,13 +234,13 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("142 of 142"), "master.html states 142 of 142")
-	ok(master.contains("118 spec"), "...and names the 118-card spec half")
+	ok(master.contains("143 of 143"), "master.html states 143 of 143")
+	ok(master.contains("119 spec"), "...and names the 119-card spec half")
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
 		ok(not _states_stale_target(classes, phrase),
 			"classes.gd states no \"%s\"" % phrase)
-	ok(classes.contains("A TARGET 142"), "...it carries the real target")
+	ok(classes.contains("A TARGET 143"), "...it carries the real target")
 	# CLAUDE.md keeps its dated batch blocks as written — they are the record
 	# of what each batch believed, and rewriting them destroys it (CA's rule).
 	# What must be current is the STANDING REFERENCE, so that is what is read.
@@ -277,8 +281,8 @@ func _target() -> void:
 	# answer moved. COMMENT CORRECTED BY BATCH DG §3 — it still read "the draft
 	# is 102 and what is owed is the Hunter and Warrior thirds", which CH and CI
 	# paid; the draft is 120 of 120 and nothing is owed.
-	ok(block.contains("142 OF 142") or block.contains("142 of 142"),
-		"...it states 142 of 142")
+	ok(block.contains("143 OF 143") or block.contains("143 of 143"),
+		"...it states 143 of 143")
 	# RE-POINTED BY BATCH CI, AND IT IS AN INVERSION: the Warrior third is paid,
 	# so the standing block must no longer name ANYTHING as owed. Asserting the
 	# absence of a debt is what keeps §6's "rewrite rather than patch" honest —

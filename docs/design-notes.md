@@ -4,6 +4,92 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A single implementation reads like a single owner, and is not one (Batch DR) — 2026-08-28
+
+The brief for this batch said cooldown manipulation belonged to the Swordmaster, and gave a good
+reason: *"Answering Steel and Battle Poise are the only cards in the game that do it, both through
+`_tick_cooldowns`, which BQ made the one implementation."* Both halves of that sentence are true.
+The conclusion does not follow, and it took thirty seconds of `grep` to find out — `_tick_cooldowns`
+has seven callers, one of them a Mage class-wide draft card whose own comment names tempo as its
+axis, and another the Devout's protected core.
+
+**The mistake is worth naming because it is structural rather than careless.** BQ's consolidation
+is exactly the right engineering: four hand-written copies of "walk the dictionary and decrement"
+became one function, and every later effect that wanted the behaviour reached for it. That is what
+made the axis *legible* — and legibility is what made it look owned. **A one-door helper collects
+its callers from everywhere, so the door being singular says nothing at all about who walks
+through it.** The rule now in `CLAUDE.md` is one line: before declaring an axis exclusive, derive
+the population that touches it. Not the implementations — the callers.
+
+**The distinction the batch actually needed was a different one, and separating it is what made
+the rest of the work decidable.** Two things were both being called "axis": the spec's own
+currency (stances, Loyalty, Faith, Burn — exclusive by construction, one per spec) and the effect
+type (area damage, control, mitigation, Break — shared, deliberately). Once those are two words,
+the Swordmaster's problem states itself. His engine is as strong as any in the game and his pool
+made four decisions across ten cards, because *depth of engine is not breadth of pool*, and a draft
+offer only ever asks about the second. **Adding area damage to a Swordmaster does not make him less
+of a Swordmaster; the stance still gates everything.** That sentence is the whole licence for §4,
+and without the engine/axis split it reads like dilution.
+
+## A suspension is a promise with an expiry date nobody wrote down (Batch DR) — 2026-08-28
+
+`classes.gd` has carried, for several batches, a comment suspending the standing rule that no
+ability may be a strictly better version of another in the same pool. It was honest work: it named
+the dominated card, named the domination, and gave two specific reasons the exception was
+acceptable — the two cards were acquired through different channels, and the weaker one had a
+Perfect the stronger could not buy.
+
+Both reasons were then removed by batches that had no cause to look at that card. DO made the
+stronger card draftable, which killed the channel argument. CR took the Perfect off, and a suite
+now asserts its absence. Neither batch was wrong on its own terms. **Nothing pointed back at the
+comment, so it stood — and it stood as a live decision rather than as a defect, which is exactly
+the problem.** An undocumented exception gets found by the next audit. A documented one gets
+believed.
+
+**The shape to sweep for is "strictly worse, but acceptable because X and Y".** It is the same
+species as a stale denominator, and the same species as `_hold_freeze`'s header, which this batch
+found three hundred lines away while removing the card: it said three callers when a later batch
+had made it four, and named an argument no caller had passed in two batches. Neither was findable
+from the other. **The repair is not to update the justification. It is to notice that when the
+reasons are dead the exception is dead**, and this batch deleted both the comment and the card.
+
+**And there is a trap inside the trap, which a negative control caught.** The batch's own prose
+records the retirement, and prose recording a removal necessarily *names the thing removed* — so an
+absence check reads the record as the removal not having happened. The gate strips comments before
+it looks, and the control was run from both sides: the name put back as a comment leaves it green,
+the same name put back in code turns it red. **A gate that cannot tell a record from a relapse is
+not a gate.**
+
+## A gate that buys nothing is a domination waiting to be measured (Batch DR) — 2026-08-28
+
+Battle Poise required the Defensive guard. Answering Steel required nothing, cost less, lasted
+half again as long, paid the same cooldown tick from the same constant, and added two clauses
+Battle Poise had not got. The audit called it a subset and it was right, but the interesting part
+is not the arithmetic — it is that the two cards were authored deliberately as *stacking partners*,
+and the comment saying so is still true. A single parry held under both does take two turns off
+everything he holds.
+
+**The author asked whether the two combine and never asked which of the two you take.** Those are
+different questions, and a three-card offer only ever asks the second. The stacking argument only
+starts paying after the domination has already decided the pick.
+
+**The repair was not a retune, because the defect was not a number.** The stance requirement was
+pure cost with nothing bought by it — and a requirement that buys nothing is a domination waiting
+for someone to measure it, whatever the numbers happen to be that week. So the guard buys
+something: once a turn, a parry lets him change stance without spending an action, which is a
+clause Answering Steel structurally cannot have, because it has no requirement to reward.
+
+**Three things about the implementation are worth keeping.** It is the pivot and not the ability —
+Guard Change's own Break damage, and the talent that turns that into forty points against every
+enemy, stay on the card they are printed on, or a Defensive build parrying twice a turn lands
+eighty free Break across the field every turn and the clause is a different card entirely. It asks
+the existing door rather than deciding for itself, so Formless refusing the pivot and the
+cooldown being respected are the same one call rather than two rules that will eventually
+disagree. And it is not free of consequence: the pivot throws away Discipline's accumulation, like
+every other call to the one pivot, so a Discipline build wants it refused and gets that by not
+holding the card. **Written down at the site, because the batch that discovers it by accident will
+read it as a bug.**
+
 ## Closing a bet can open one, and the ledger has to say so (Batch DO) — 2026-08-27
 
 The charter is one sentence and it reads as an obvious tidy-up: a talent may not grant an ability,

@@ -239,7 +239,7 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 118, "the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d" % total)
+	ok(total == 119, "the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
@@ -248,8 +248,8 @@ func _pools() -> void:
 	# closed the draft. A message that states a wrong size teaches it to whoever
 	# reads the failure — CD §2's rule, applied to the size rather than to the
 	# old target it was written for.
-	ok(draft_total == 142,
-		"the whole draft is 142 of a target 142 (got %d)" % draft_total)
+	ok(draft_total == 143,
+		"the whole draft is 143 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -654,7 +654,7 @@ func _docs() -> void:
 		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("142 of"), "master.html states the new draft count")
+	ok(master.contains("143 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB

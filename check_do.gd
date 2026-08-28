@@ -346,7 +346,7 @@ func _s5_recorded() -> void:
 		or cm.contains("protected core is guaranteed and permitted"),
 		"CLAUDE.md does not carry the ruling that settles §0 versus §1")
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("142 of 142"), "master.html does not state the new draft total")
+	ok(master.contains("143 of 143"), "master.html does not state the current draft total")
 
 
 func _initialize() -> void:

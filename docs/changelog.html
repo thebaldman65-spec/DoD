@@ -14,6 +14,153 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-28 &mdash; Batch DR: THE ENGINE / AXIS FRAMEWORK, AND THE SWORDMASTER'S POOL</h2>
+<p><i>DQ found two grade-2 dominations and measured that the pools vary enormously. This batch
+repairs both, widens the most concentrated pool in the game, and records the framework the audit
+made visible so future pools are authored against it rather than by feel. <b>The draft moves twice
+and the net is +1: 142 &rarr; 143.</b></i></p>
+
+<p><b>&sect;1 &mdash; THE FRAMEWORK, AND ONE OF THE THREE "EXCLUSIVE AXES" WAS NOT ONE.</b>
+Recorded in <code>CLAUDE.md</code>: <b>an ENGINE is the spec's own currency</b> (stances, Loyalty,
+Focus, Resonance, Ruin, Faith, Mercy, Burn, Chilled, Frenzy, Block) and is <b>exclusive by
+construction</b>; <b>an AXIS is an effect type</b> (single-target damage, area damage, healing,
+shielding, mitigation, control, tempo, Break, resource generation, meter manipulation) and is
+<b>shared, deliberately</b>. A pool is one exclusive engine plus a selection of shared axes, and
+<b>adding axes to a spec does not dilute its identity &mdash; the engine still gates
+everything</b>.</p>
+<ul>
+<li><b>COMPANION SUMMONING &mdash; the Beastmaster. TRUE</b>, verified over the whole corpus:
+<code>special: "summon"</code> exists on exactly three abilities, all of them his protected core,
+and <code>_do_summon</code>'s only other caller is his own draft card Call the Wilds.</li>
+<li><b>REVIVAL &mdash; the Holy Cleric. TRUE AMONG ABILITIES, and the brief asked this be verified
+and reported.</b> <code>BattleUnit.revive()</code> has <b>two</b> callers &mdash;
+<code>resurrection</code> (hers) and the <b>REVIVE POTION</b> &mdash; and the
+<code>revive_pct</code> map event is a third channel. <b>Exclusive as an ability; not exclusive as
+a channel.</b></li>
+<li><b>COOLDOWN MANIPULATION IS NOT THE SWORDMASTER'S, AND THE ASSERTION WAS NOT AUTHORED.</b> The
+brief held that Answering Steel and Battle Poise are "the only cards in the game that do it".
+<code>_tick_cooldowns</code> has <b>SEVEN</b> callers: those two, <b>BLINK &mdash; a MAGE
+CLASS-WIDE DRAFT CARD whose own comment names tempo as its axis</b>, <b>BLESSING OF ZEAL &mdash;
+the Devout's PROTECTED CORE</b>, and three talent nodes (Frostbound Hours, which ticks EVERY
+hero's; Practised Hands; Follow-Through). Five more sites clear a cooldown outright through
+<code>cooldowns.erase</code>. <b>What is one implementation is the FUNCTION</b> (BQ extracted four
+hand-written copies); what is shared is the axis. <b>A single implementation reads like a single
+owner and is not the same thing</b> &mdash; that is the rule now recorded.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; FLASH FREEZE IS RETIRED, AND THE COMMENT SUSPENDING THE RULE OVER IT WAS
+DELETED RATHER THAN UPDATED.</b> DQ's Finding 1: comments and cosmetics stripped, its handler and
+Glacial Prison's were the same three steps in the same order, and Glacial Prison is cheaper (25 v
+30), shorter on cooldown (4 v 5), faster (2.5 v 3.0) <b>and is in <code>RECAST_GATED</code> where
+Flash Freeze was not</b> &mdash; so the dearer card was also the only one of the two that could be
+spent on an enemy already held. The Cryomancer's pool goes 12 &rarr; 11.</p>
+<p>The comment suspended <i>"no ability may be a strictly better version of another in the same
+pool"</i> <b>for two named reasons, and both were dead</b>: the acquisition channel died at DO and
+the Perfect at CR, and neither batch touched the comment. <b>A DOCUMENTED EXCEPTION THAT OUTLIVES
+ITS JUSTIFICATIONS IS WORSE THAN AN UNDOCUMENTED ONE, BECAUSE IT READS AS DELIBERATE</b> &mdash;
+recorded in <code>CLAUDE.md</code>'s traps. <b>Thirteen live sites read the card by name</b>
+(classes.gd &times;3, battle.gd &times;5, <code>test_batch_bt</code> &times;5 including
+<code>_one_shield_door</code>'s slice anchor, <code>test_batch_cb</code>,
+<code>test_batch_ax</code>, <code>check_cv</code>, CLAUDE.md &times;3, master.html &times;2); none
+in runes, talents or the glossary. <b>The mechanic is untouched</b> &mdash; four Chilled stacks
+still flash-freeze, which is <code>_apply_status</code>'s branch and belongs to no card.</p>
+<p><b>AND ONE MORE STALE COUNT OF THE SAME SPECIES, FOUND WHILE REMOVING IT.</b>
+<code>_hold_freeze</code>'s header said <b>THREE callers</b> while DO's Cryoclasm had quietly made
+it four, and named a <code>force</code> argument <b>no caller has passed since CR</b>. Corrected
+with its reason.</p>
+
+<p><b>&sect;3 &mdash; BATTLE POISE: THE DEFENSIVE GUARD BUYS A FREE GUARD CHANGE.</b> DQ's Finding
+2 was that its whole payload was a subset of Answering Steel's &mdash; cheaper (20 v 25), longer (6
+turns v 4), ungated, paying the same <code>_tick_cooldowns</code> constant plus +20% parry and 15
+Rage a parry. Its stance requirement was <b>pure cost with nothing bought by it</b>.
+<b>ONCE A TURN, A PARRY NOW LETS HIM GUARD CHANGE WITHOUT SPENDING AN ACTION.</b> Answering Steel
+cannot have it &mdash; it has no requirement to reward &mdash; so the two are no longer nested, and
+the stacking-partners comment at the parry site stands: it answered <i>do these combine</i> and
+never answered <i>which do you take</i>.</p>
+<ul>
+<li><b>THE PIVOT ONLY</b>, <code>_swordmaster_switch</code>. Guard Change's own payload &mdash; its
+15 BD, <b>SUNDER GUARD's 40 BD to every enemy</b>, No Quarter, Tempo &mdash; stays on that card. A
+Defensive Swordmaster holding Sunder Guard and parrying twice a turn would otherwise land <b>80
+free Break damage across the field every turn</b>.</li>
+<li><b>ONCE A TURN</b>, not once a parry, and it does not bank. <b>The cooldown tick stays</b> and
+still pays on every parry.</li>
+<li><b>IT ASKS <code>_ability_usable</code> ABOUT THE REAL GUARD CHANGE</b> &mdash; the same door
+&mdash; which makes three promises true at once and keeps them from disagreeing: <b>FORMLESS
+refuses it</b> (there is no stance to change), <b>Guard Change's own 1-turn cooldown is
+respected</b>, and it <b>starts</b> that cooldown, because respecting a cooldown a use does not pay
+into is respecting it exactly once.</li>
+<li><b>THE PIVOT IS NOT FREE OF CONSEQUENCE:</b> it throws away DISCIPLINE's accumulation, like
+every other call to the one pivot. A Discipline build wants it refused and gets that by not
+holding the card.</li>
+</ul>
+
+<p><b>&sect;4 &mdash; THE SWORDMASTER GAINS FOUR AXES ON THREE CARDS, 10 &rarr; 12.</b> DQ measured
+his as the most concentrated pool in the game: <b>ten cards making four decisions</b> &mdash;
+strike one enemy (four), change or hold a stance (three), buy tempo off a parry (two), execute
+(one) &mdash; so a player who had drafted four had seen everything it decides. <b>Every one of the
+three reads the stance engine, because that is what makes it his</b>, and BW's rule decides how:
+<b>READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY.</b></p>
+<ul>
+<li><b>LUNGE, RE-AUTHORED ONTO BREAK &mdash; the sharpest gap in the pool.</b> An entire BREAKER
+lane is built around a Break window (Punishment, Off Balance, Guard Breaker, Overpressure, No
+Quarter all live inside it, and Sever's cooldown clears against a Broken target so it can be swung
+through) and <b>not one draft card opened it</b>. <b>Two changes and nothing else moved:</b>
+<b>cooldown 0 &rarr; 3</b> &mdash; of 142 cards only it and Pyroblast repeated every turn, where all
+twelve cooldown-zero abilities in the protected cores are the free basic attack, and at the end of
+a lane the price was the node &mdash; and <b>the guard now decides where the Break lands</b>:
+AGGRESSIVE puts 15 more into that one enemy, DEFENSIVE puts 12 on <b>every other</b> enemy, because
+he does not overreach and the recovery leaves the whole line off balance. Damage 35 &rarr; 30,
+because it is a Break card now; <b>Shatterpoint keeps its title as his heaviest single Break blow
+at 40</b>. <b>THE BRIEF SAID SHATTERPOINT IS A TALENT AND IT IS NOT</b> &mdash; it is a
+<code>SPEC_POOLS</code> boss pick, which is why the lane depended on an offer he may never see.
+The card stays an ORDINARY ATTACK (a <code>special</code> would hand-roll the blow and lose the
+crit, the armour read, the parry roll, Overwhelm, Off Balance and Whetstone), and both riders read
+<code>_eff_stance</code> beside the wound it already left.</li>
+<li><b>WHEELING CUT &mdash; AREA DAMAGE and SELF-MITIGATION, the two axes on one card.</b> 30 Rage,
+2.5, 4cd, <b>every enemy takes 20% of Attack and 12 Break</b>. His pool had <b>no area damage at
+all</b>; his only field-wide option for a whole run was Cleave out of the Warrior class pool. A
+<b>reader</b>, so BP's arriving-stance principle decides both branches &mdash; <b>the thing that
+would most easily be got backwards</b>: cast from AGGRESSIVE he lands DEFENSIVE, so it hands him
+<b>defence</b> (20% less damage taken, 3 turns); cast from DEFENSIVE he lands AGGRESSIVE, so it
+hands him <b>offence</b> (+20% damage dealt, 3 turns). <b>Perfect: both guards' gifts at once</b>
+&mdash; it runs a bar, so <code>test_batch_bo</code> &sect;5's biconditional requires it to state
+one, and this batch adds no third name to DO's two debts there.</li>
+<li><b>COUNTER TIME &mdash; CONTROL, and his pool could not take an enemy's turn away at all.</b>
+25 Rage, 2.0, 5cd, <b>requires the Defensive guard</b>: one enemy loses its next TWO turns and the
+card deals <b>nothing</b>. Pommel Strike is his only Stun and it is protected core, so a whole
+run's control was one core ability's one-turn rider. <b>It is not a second Pommel Strike:</b> that
+card is cheaper, ungated, deals 25% of Attack, lands 30 Break, builds Rage and Stuns for ONE turn;
+this buys a SECOND turn for a stance and a whole action that pays nothing. <b>The boss rule is
+inherited, not re-written</b> &mdash; <code>stunned</code> is one of the five ids
+<code>_apply_status</code>'s carve-out refuses on an unbroken boss and this passes no
+<code>force</code>. It joins <code>RECAST_GATED</code> (its entire payload is a status, so a recast
+onto a saturated field buys nothing); <b>Wheeling Cut deliberately does not</b>, because a card
+that deals damage is never a wasted cast.</li>
+</ul>
+<p><b>PRECISION STRIKE AND FEINT ARE UNTOUCHED</b> &mdash; BW's original readers, and the
+branch-and-flip pattern is the spec's signature. <b>His pool now makes eight decisions across
+twelve cards where it made four across ten.</b></p>
+
+<p><b>&sect;5 &mdash; WHAT IS DELIBERATELY NOT DONE.</b> <b>No other pool is touched</b>: the
+Beastmaster's 8-of-8 companion binding, the Cryomancer's remaining 11-of-11 ice and the
+Pyromancer's one-currency problem are reported and unruled. <b>The Hunter class gap is not
+addressed</b> &mdash; three shallowest pools, none of DO's twenty-two, and not one of its
+twenty-four spec cards is a heal, a shield or mitigation. It is bigger than the Swordmaster's and
+it is next, not now. <b>NO TALENT MOVES. No cell changes row or lane, so no migration is
+needed</b>, and no save version moves. <b>Pyroblast is still cooldown-zero</b> and that ruling
+stays open.</p>
+
+<p><b>&sect;6 &mdash; VERIFICATION.</b> <code>check_dr.gd</code> joins <code>GATES</code> (22 now)
+and asserts <b>the exclusives as PROPERTIES, never as counts</b> &mdash; DN's gate asserted two and
+there were five, DO's brief nine and there were twenty-two, and this batch's own brief asserted
+three exclusive axes when one of the three was false. It drives all three cards and Battle Poise's
+free pivot on a live board. <b>FOUR NEGATIVE CONTROLS WERE RUN AND ALL FOUR BEHAVED</b>: a summon
+authored onto the Sharpshooter, a third <code>revive</code> call site, a cooldown site removed, and
+<b>the comment-stripping trap controlled from BOTH sides</b> &mdash; the retired card's name put
+back as a COMMENT left the gate GREEN, the same name put back in CODE turned it RED. The BR
+&sect;1 name sweep was run for both new names against <b>1,127 labels</b> (every ability, talent
+node, status and rune) and both come back clean on exact match, containment and shared word.</p>
+
 <h2>2026-08-28 &mdash; Batch DQ: DO THE DRAFT POOLS ACTUALLY CONTAIN DIFFERENT BUILDS?</h2>
 <p><i><b>A REPORT. NOTHING WAS RETIRED, RE-AUTHORED OR RETUNED.</b> All 142 draft cards compared
 against every card they can be offered beside, against the protected core kit of the hero who would

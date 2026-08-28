@@ -1302,6 +1302,10 @@ var font_of_light := 0        # Font of Light: Mana per 2 points of overheal
 var mercy_aegis := 0          # Communion of Mercy: party -% damage per Mercy held
 var watchtower := 0           # Watchtower: the health % that pulls her turn forward
 var watchtower_used := false  # ...at most once a turn
+# BATCH DR §3 — BATTLE POISE's free Guard Change, spent at most once a turn.
+# Cleared at the top of each of HIS turns in `_player_turn`, beside
+# `watchtower_used`, which is the same shape for the same reason.
+var poise_pivot_used := false
 var layered_faith := 0        # Layered Faith: a shield ADDS rather than replaces
 var creed := 0                # Creed: Faith is paid on the party's highest peak
 var eternal_ground := 0       # Eternal Ground: Consecrated Ground never expires

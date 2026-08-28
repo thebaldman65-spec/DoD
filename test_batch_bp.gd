@@ -137,7 +137,7 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 118,
+	ok(total == 119,
 		"§5+DO: CI's ninety-six plus DO's twenty-two (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
@@ -323,7 +323,21 @@ func _warrior_draft_flow() -> void:
 	# abilities fill him and the fifth needs a drop.
 	ok(run.ability_slots_used(m) == 4,
 		"§7: 3 core + 1 earned = 4 of 7 (got %d)" % run.ability_slots_used(m))
-	m["bm_abilities"] = [cands[0], "Lunge", "Execute", "Sweeping Strikes"]
+	# BATCH DR — **THE THREE FILLER NAMES MUST NOT BE DRAFTABLE, AND TWO OF
+	# THEM WERE.** This kit is hand-built to reach the cap, and §7 then TAKES
+	# `cands[1]` — a card drawn at random from his live draft pool. LUNGE and
+	# EXECUTE have been IN that pool since DO, so a draw landing on either made
+	# this hand-built kit already own the card the take is about, and
+	# `take_draft_ability` correctly refused it with "already known". **Three
+	# §7 checks went red on roughly a one-in-eight draw with nothing whatever
+	# wrong in the product**, and DR's battery is the run that happened to hit
+	# it. All three replacements are `SPEC_POOLS`/`CLASS_POOLS` BOSS-PICK cards
+	# and are in no DRAFT pool at all, so no draw can collide with them —
+	# which is the durable fix rather than swapping one draftable name for
+	# another. **DR's own two new cards made the collision LESS likely (the
+	# pool went 10 -> 12), not more; the flake predates this batch entirely.**
+	m["bm_abilities"] = [cands[0], "Sweeping Strikes", "Shatterpoint",
+		"Rallying Shout"]
 	ok(run.ability_slots_used(m) == CAP,
 		"§7: four earned fills the cap at 7 (got %d)" % run.ability_slots_used(m))
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
@@ -338,13 +352,13 @@ func _warrior_draft_flow() -> void:
 		"§7: his protected enabler can never be dropped")
 	ok(not run.drop_earned_ability(m, "Overpower"),
 		"§7: ...nor any other opening ability")
-	ok(run.take_draft_ability(m, cands[1], "Execute") == "",
+	ok(run.take_draft_ability(m, cands[1], "Shatterpoint") == "",
 		"§7: naming an EARNED ability to drop works")
-	ok(not run.earned_ability_names(m).has("Execute"),
+	ok(not run.earned_ability_names(m).has("Shatterpoint"),
 		"§7: ...and the dropped one is gone")
 	ok(run.earned_ability_names(m).has(cands[1]),
 		"§7: ...replaced by the card taken")
-	ok(run.draft_refused(m).has("Execute"),
+	ok(run.draft_refused(m).has("Shatterpoint"),
 		"§7: ...and a DROP writes the no-return ledger too")
 	ok(run.ability_slots_used(m) == CAP,
 		"§7: the cap still binds after the swap")

@@ -246,7 +246,7 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 118,
+	ok(spec_total == 119,
 		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
 			% spec_total)
 

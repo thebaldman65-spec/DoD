@@ -95,11 +95,14 @@ var _had_save := false
 # reading the constant: a check that reads the number it is checking has
 # stopped asking its question.
 # Moved here: Hoarfrost Armor.
-const NINE := {
+# BATCH DR §2 — **EIGHT NOW, AND THE CONST SAYS SO.** Flash Freeze was retired
+# as a strict duplicate of Glacial Prison (DQ's Finding 1), so BT's nine are
+# eight. The name moved with the population rather than a `NINE` holding eight,
+# which is the shape this project's oldest recurring defect takes.
+const BT_CARDS := {
 	"Slow Burn":       ["pyromancer", 15, 1.5, 4, 0],
 	"Stoke":           ["pyromancer", 20, 2.0, 3, 8],
 	"Funeral Pyre":    ["pyromancer", 25, 2.5, 4, 0],
-	"Flash Freeze":    ["cryomancer", 30, 3.0, 5, 0],
 	"Killing Frost":   ["cryomancer", 20, 2.0, 3, 6],
 	"Hoarfrost Armor": ["cryomancer", 20, 1.0, 4, 0],
 	"Arcane Bolt":     ["arcanist", 30, 2.5, 4, 8],
@@ -146,7 +149,6 @@ func _run() -> void:
 	await _live_slow_burn()
 	await _live_stoke()
 	await _live_funeral_pyre()
-	await _live_flash_freeze()
 	await _live_killing_frost()
 	await _live_hoarfrost()
 	await _live_arcane_bolt()
@@ -241,15 +243,15 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 118,
-		"the spec pools hold 118 (CI's 96 plus DO's twenty-two), got %d"
+	ok(total == 119,
+		"the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		ok(Classes.class_draft_pool(cls).size() == 6,
 			"%s's class pool is still SIX" % cls)
-		for n in NINE:
+		for n in BT_CARDS:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
 	# CLASS_POOLS FEEDS THE BOSS PICK and must not move either (BO's rule, kept
@@ -257,7 +259,7 @@ func _pools() -> void:
 	# names would keep the count and change every boss draw in the game.
 	ok(Classes.CLASS_POOLS["mage"].size() == 12,
 		"CLASS_POOLS['mage'] is byte-untouched at 12")
-	for n in NINE:
+	for n in BT_CARDS:
 		for cls in Classes.CLASS_POOLS:
 			ok(not Classes.CLASS_POOLS[cls].has(n),
 				"%s did not leak into the BOSS pool %s" % [n, cls])
@@ -267,25 +269,25 @@ func _pools() -> void:
 
 
 func _definitions() -> void:
-	for n in NINE:
-		var spec: String = NINE[n][0]
+	for n in BT_CARDS:
+		var spec: String = BT_CARDS[n][0]
 		ok(Classes.spec_draft_pool(spec).has(n),
 			"%s is in the %s draft pool" % [n, spec])
 		var ab: Ability = Classes.draft_ability(n)
 		ok(ab != null, "%s has a definition" % n)
 		if ab == null:
 			continue
-		ok(ab.cost == NINE[n][1], "%s costs %d (got %d)" % [n, NINE[n][1], ab.cost])
-		ok(is_equal_approx(ab.delay, NINE[n][2]),
-			"%s arrives at %s (got %s)" % [n, NINE[n][2], ab.delay])
-		ok(ab.cooldown == NINE[n][3],
-			"%s cools %d (got %d)" % [n, NINE[n][3], ab.cooldown])
+		ok(ab.cost == BT_CARDS[n][1], "%s costs %d (got %d)" % [n, BT_CARDS[n][1], ab.cost])
+		ok(is_equal_approx(ab.delay, BT_CARDS[n][2]),
+			"%s arrives at %s (got %s)" % [n, BT_CARDS[n][2], ab.delay])
+		ok(ab.cooldown == BT_CARDS[n][3],
+			"%s cools %d (got %d)" % [n, BT_CARDS[n][3], ab.cooldown])
 		# BREAK DAMAGE ASSIGNED DELIBERATELY, NOT BY OMISSION — the BO/BP/BQ/BR
 		# rule. The four attacks carry it; the five that never strike carry
 		# none, because Break from an ability that lands no blow is Break from
 		# nowhere.
-		ok(ab.pressure == NINE[n][4],
-			"%s carries %d Break (got %d)" % [n, NINE[n][4], ab.pressure])
+		ok(ab.pressure == BT_CARDS[n][4],
+			"%s carries %d Break (got %d)" % [n, BT_CARDS[n][4], ab.pressure])
 		ok(ab.description != "", "%s has a description" % n)
 		# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
 		# perfect. As of CN that is false by design: 113 of the 211 abilities run no
@@ -307,7 +309,7 @@ func _definitions() -> void:
 		ok(Classes.draft_ability(n).special == "",
 			"%s is an ordinary attack, not a special" % n)
 		ok(Classes.draft_ability(n).damage > 0, "%s deals damage" % n)
-	for n in ["Slow Burn", "Funeral Pyre", "Flash Freeze", "Killing Frost",
+	for n in ["Slow Burn", "Funeral Pyre", "Killing Frost",
 			"Hoarfrost Armor", "Inner Arcane"]:
 		ok(Classes.draft_ability(n).special != "",
 			"%s resolves through a special" % n)
@@ -328,7 +330,7 @@ func _synergy_rule() -> void:
 	var block := src.substr(src.find("BATCH BT: TRANCHE 2, THE MAGE NINE"))
 	ok(block.contains("SYNERGY RULE STARTS HERE AND IS STANDING"),
 		"the synergy rule is recorded with the content it governs")
-	for n in NINE:
+	for n in BT_CARDS:
 		var at := block.find('"%s":' % n)
 		ok(at > 0, "%s sits inside the BT block" % n)
 		if at <= 0:
@@ -440,7 +442,13 @@ func _one_shield_door() -> void:
 	# a check that has stopped asking its question (BE's changelog-anchor
 	# lesson, through a source-code door).
 	var pyre := src.substr(src.find('\n\t\t"funeral_pyre":'))
-	pyre = pyre.substr(0, pyre.find('\n\t\t"flash_freeze":'))
+	# BATCH DR §2 — RE-POINTED, AND THE QUESTION IS UNCHANGED. The anchor was
+	# the case that used to follow this one; DR retired that ability, so the
+	# slice now ends at the case that follows it NOW. It would have failed
+	# LOUDLY rather than silently — `find` returns -1 and the length assertion
+	# below catches a slice that ran to the end of the file — which is what an
+	# anchored slice is for.
+	pyre = pyre.substr(0, pyre.find('\n\t\t"killing_frost":'))
 	ok(pyre.length() > 200 and pyre.length() < 4000,
 		"the Funeral Pyre slice is the case body and nothing else (%d chars)" % pyre.length())
 	ok(pyre.contains('_apply_status(attacker, "barrier"'),
@@ -485,7 +493,7 @@ func _docs() -> void:
 	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
 	ok(_stamped >= "BT",
 		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
-	for n in NINE:
+	for n in BT_CARDS:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so
 	# the doc that a player reads has to carry it rather than only the numbers.
@@ -517,7 +525,7 @@ func _docs() -> void:
 		"CX moved this batch's entry OUT of the live changelog")
 	ok(chlog.contains("<h2>2026-08-14 &mdash; Batch BT"),
 		"...and the archive carries the Batch BT entry")
-	for n in NINE:
+	for n in BT_CARDS:
 		ok(chlog.contains(n), "the changelog names %s" % n)
 
 
@@ -731,117 +739,6 @@ func _live_funeral_pyre() -> void:
 	ok(py.resource == mana_before - 25,
 		"...and pays the cost with NO refund, because it consumed nothing (got %d)" % py.resource)
 	scene.queue_free()
-	await process_frame
-
-
-# ---------- §3 live: the Cryomancer three ----------
-
-func _live_flash_freeze() -> void:
-	# §6'S FOURTH CLAUSE: BEHAVING EXACTLY AS THE CARVE-OUT ALLOWS, DRIVEN AT
-	# ALL THREE STATES. "It froze something" is trivially true against a raider;
-	# what §3 asked to verify is the boss interaction, so that is what is
-	# measured.
-	var scene := await _spawn("cryomancer", ["raider", "raider"])
-	var cryo := _mage(scene, "permafrost")
-	ok(cryo != null, "the Cryomancer spawned")
-	if cryo == null:
-		scene.queue_free()
-		return
-	var victim: BattleUnit = _live_foes(scene)[0]
-	ok(not victim.has_status("chilled"),
-		"the target starts with no stacks at all")
-	await scene.call("_resolve", cryo, _card("Flash Freeze"), victim, "good")
-	ok(victim.has_status("frozen"),
-		"Flash Freeze freezes OUTRIGHT, whatever the stacks")
-	ok(scene.call("_is_held", victim), "...and it joins the Glacial Hold")
-	ok(is_inf(victim.next_time),
-		"...off the turn order entirely, which is what a hold is")
-	scene.queue_free()
-	await process_frame
-
-	# THE BOSS, UNBROKEN: the carve-out REFUSES it, and the card says so.
-	var bscene := await _spawn("cryomancer", ["boss", "raider"])
-	var bcryo := _mage(bscene, "permafrost")
-	if bcryo == null:
-		bscene.queue_free()
-		return
-	var boss: BattleUnit = null
-	for e in _live_foes(bscene):
-		if e.is_boss:
-			boss = e
-	ok(boss != null, "a boss stands")
-	if boss == null:
-		bscene.queue_free()
-		return
-	boss.broken = false
-	await bscene.call("_resolve", bcryo, _card("Flash Freeze"), boss, "good")
-	# BATCH CR §1 — INVERTED BACK, AND CQ'S NOTE IS WHY THIS WORKED. CQ inverted
-	# this check to the folded behaviour and wrote that it was "the assertion
-	# that would catch the carve-out coming back"; the designer then ruled the
-	# carve-out out entirely. The gate is BROKEN now, not a Perfect and not
-	# nothing: hard control lands on a boss only once that boss is Broken. The
-	# ruling is what this pins, and it is the same `target.broken` check in
-	# `_apply_status` that the Madness lane reads.
-	ok(not boss.has_status("frozen"),
-		"an UNBROKEN boss REFUSES the ice — CR §1 gates hard control on Broken")
-	ok(not bscene.call("_is_held", boss), "...and is not held")
-	# THE BOSS, BROKEN: it takes hold — and it is TIMED, one turn, not a
-	# lockdown. That distinction is the whole of what §3 asked be verified
-	# before the card's text was written.
-	boss.broken = true
-	await bscene.call("_resolve", bcryo, _card("Flash Freeze"), boss, "good")
-	ok(boss.has_status("frozen"), "a BROKEN boss takes the ice")
-	ok(int(boss.get_status("frozen").get("turns", -1)) == 1,
-		"...for exactly ONE turn — a boss shrugs it off, which is not a lockdown")
-	ok(not is_inf(boss.next_time),
-		"...and it keeps its place on the timeline, unlike an ordinary hold")
-	# BATCH CR §1 — THERE IS NO PERFECT EXCEPTION LEFT TO ASSERT. The card runs
-	# no bar, so a "perfect" cast is an ordinary one; the section below pins
-	# that it is ordinary AGAINST THE BROKEN GATE rather than against `force`.
-	bscene.queue_free()
-	await process_frame
-	# THE PERFECT, ON A FRESH BATTLE. The boss above is still in `_holds`, and
-	# removing its status by hand while leaving the ledger standing makes the
-	# next freeze evict itself past the limit — a HARNESS artefact rather than a
-	# product fault (in play a held enemy never reaches `_hold_freeze` again,
-	# because it still carries `frozen`). A clean battle is the honest fix.
-	var pscene := await _spawn("cryomancer", ["boss", "raider"])
-	var pcryo := _mage(pscene, "permafrost")
-	if pcryo == null:
-		pscene.queue_free()
-		return
-	var pboss: BattleUnit = null
-	for e in _live_foes(pscene):
-		if e.is_boss:
-			pboss = e
-	ok(pboss != null, "a second boss stands")
-	if pboss == null:
-		pscene.queue_free()
-		return
-	pboss.broken = false
-	await pscene.call("_resolve", pcryo, _card("Flash Freeze"), pboss, "perfect")
-	# BATCH CR §1 — A "PERFECT" CAST BUYS NOTHING HERE AND THAT IS THE CHECK.
-	# The card runs no bar, so the grade string is inert; `force` is no longer
-	# passed, so the Broken gate answers every cast the same way. This is the
-	# assertion that catches a future batch re-opening the door with `force`.
-	ok(not pboss.has_status("frozen"),
-		"a 'perfect' Flash Freeze still REFUSES an unbroken boss — no bar, no exception")
-	# THE DESCRIPTION MUST SAY SO. §3: the card must not promise more than it
-	# delivers, and a boss clause is exactly where that goes wrong.
-	# BATCH CR §1 — RE-POINTED AGAIN, TO THE RULING. CQ pointed this at the
-	# fold's promise ("the ice takes even an UNBROKEN boss"); that promise is
-	# withdrawn, and the card now carries the corpus's standing phrasing, the
-	# same sentence Mind Flay and Bewitch already use. Newlines are flattened
-	# first — the description wraps at authored line breaks, so "ONE\nturn"
-	# is the same sentence as "ONE turn".
-	var desc := _card("Flash Freeze").description.replace("\n", " ")
-	ok(desc.contains("A BOSS RESISTS UNTIL BROKEN"),
-		"the card's text states the boss rule — a boss resists until Broken")
-	ok(not desc.contains("UNBROKEN boss"),
-		"...and no longer promises the ice takes one unbroken")
-	ok(desc.contains("ONE turn"),
-		"...and that it buys one turn against one, not a lockdown")
-	pscene.queue_free()
 	await process_frame
 
 

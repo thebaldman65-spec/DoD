@@ -1403,6 +1403,28 @@ answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
 **Every one of these cost a batch something.** They were stated inside a narrative and would
 have been lost with it. **Live counts belong in `docs/state.md`; the rule is what is here.**
 
+### A DOCUMENTED EXCEPTION THAT OUTLIVES ITS JUSTIFICATIONS (Batch DR §2)
+**A SUSPENSION OF A STANDING RULE MUST BE DELETED WITH ITS REASONS, NOT UPDATED AROUND THEM.**
+`classes.gd` carried a comment suspending *"no ability may be a strictly better version of another
+in the same pool"* over one card, **for two named reasons — and both reasons were later removed by
+batches that had no cause to look at that card.** The acquisition channel died at DO (the ability
+it was distinguished from became draftable); the Perfect died at CR (a suite asserts the `force`
+argument gone). Neither batch touched the comment, so the exception stood for two batches reading
+as a live decision.
+· **A DOCUMENTED EXCEPTION THAT OUTLIVES ITS JUSTIFICATIONS IS WORSE THAN AN UNDOCUMENTED ONE,
+  BECAUSE IT READS AS DELIBERATE.** An undocumented one gets found by the next audit; a documented
+  one gets believed.
+· **THE SHAPE TO SWEEP FOR: "strictly worse, but acceptable because X and Y".** When a later batch
+  deletes X or Y, nothing points back at the comment. Same species as the stale ~96 denominator CD
+  swept, the `53 of 204` figure DJ pinned, and `_hold_freeze`'s header — which said THREE callers
+  while there were four, and named a `force` no caller had passed since CR.
+· **WHEN THE REASONS ARE DEAD, THE EXCEPTION IS DEAD.** DR deleted the comment AND retired the
+  card rather than re-justifying either.
+· **AND A COMMENT RECORDING A REMOVAL NAMES THE THING REMOVED**, so an absence check must strip
+  comments first or the record reads exactly like the removal not having happened. `check_dr` §4
+  strips, and its negative control puts the name back in a comment and confirms the gate stays
+  quiet, then puts it back in code and confirms it reds.
+
 ### NAMES THAT LOOK WRONG AND ARE RIGHT — NEVER "CORRECT" THEM
 - **THE DEVOUT'S POOL KEY IS `inquisitor`, NOT `devout`.** `SPEC_INFO["inquisitor"]` carries the
   display name "Devout" and master.html's draft table prints "Devout", so **the docs and the code
@@ -2434,8 +2456,11 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**BATCH DO MOVED THE TOTAL FOR THE FIRST TIME SINCE CI, AND IT IS NOT A NEW TRANCHE. THE DRAFT
-STANDS AT 142 OF 142 AND NOTHING IS OWED — 118 SPEC + 24 CLASS-WIDE.** Twenty-two talent nodes
+**BATCH DR MOVED THE TOTAL TWICE IN ONE BATCH AND THE NET IS +1. THE DRAFT
+STANDS AT 143 OF 143 AND NOTHING IS OWED — 119 SPEC + 24 CLASS-WIDE.** §2 retired one Cryomancer
+card as an exact duplicate at a worse price (12 → 11) and §4 gave the Swordmaster two (10 → 12).
+**BATCH DO MOVED IT BEFORE THAT, FOR THE FIRST TIME SINCE CI, AND IT WAS NOT A NEW TRANCHE
+EITHER** — it stood at 142 of 142 with 118 spec. Twenty-two talent nodes
 GRANTED an ability; the charter forbids that outright now, so all twenty-two cards moved into
 their spec's draft pool rather than being deleted. **NO POOL LOST ANYTHING AND THE FLOOR IS STILL
 EIGHT** — nine specs are deeper than eight and three (beastmaster, sharpshooter, mystic) still
@@ -2444,7 +2469,7 @@ EXPECTATION IS A TABLE NOW, NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH`): w
 again would re-assert the CI-era shape over a tree that has moved past it.
 **THE TARGET WAS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
 CLASS-WIDE = 120; THE DRAFT STOOD AT 120 OF 120 AND NOTHING WAS OWED (Batch CI), AND DO'S
-TWENTY-TWO TOOK IT TO 142 OF 142.** The ~96 came from an older
+TWENTY-TWO TOOK IT TO 142 OF 142 — AND DR'S NET +1 TO 143 OF 143.** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -2454,7 +2479,7 @@ keep it as written (they are the record of what each batch believed — CA's rul
 the correction.
 **TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
 nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` REACHED 96 AND THE DRAFT
-REACHED 120 OF 120 THERE. **SINCE BATCH DO IT IS 118 AND 142 OF 142: ALL TWELVE SPECS DRAFT FROM
+REACHED 120 OF 120 THERE. **SINCE BATCH DR IT IS 119 AND 143 OF 143: ALL TWELVE SPECS DRAFT FROM
 AT LEAST EIGHT, NINE OF THEM FROM MORE, ALL FOUR CLASS POOLS HOLD SIX, AND NOTHING IS OWED.**
 **THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
 DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
@@ -2482,7 +2507,8 @@ nine, BV the Hunter nine, BW the WARRIOR nine); tranche 3 took it to 96 and ever
 CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTER THIRD AND THE
 WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
 SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, WAS 120 OF 120 — AND DO'S TWENTY-TWO
-TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142.**
+TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142, AND DR'S NET +1 TO 119 AND
+143 OF 143.**
 **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
 or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
 loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own
@@ -2544,14 +2570,76 @@ exactly the inverted card, and it would still read fine on the tooltip.
   UNCONDITIONAL swap — the other two are DRAFTED (he may never be offered either), cost Rage, and
   sit on 3- and 4-turn cooldowns.
 
+## STANDING RULE — AN ENGINE IS EXCLUSIVE, AN AXIS IS SHARED (Batch DR §1)
+
+**TWO THINGS WERE BOTH BEING CALLED "AXIS" AND SEPARATING THEM IS WHAT MAKES THE RULE WORKABLE.**
+
+> **An ENGINE is the spec's own currency** — stances, Loyalty, Focus, Resonance, Ruin, Faith,
+> Mercy, Burn, Chilled, Frenzy, Block. **Exclusive by construction, one per spec.** This is where
+> identity lives.
+>
+> **An AXIS is an effect type** — single-target damage, area damage, healing, shielding,
+> mitigation, control, tempo, Break, resource generation, meter manipulation. **Shared, and
+> deliberately so.**
+>
+> **A pool is one exclusive engine plus a selection of shared axes.** A pool covering few axes
+> holds one build no matter how strong its engine is.
+>
+> **Adding axes to a spec does not dilute its identity; the engine still gates everything.**
+
+**THIS IS THE RULE POOLS ARE AUTHORED AGAINST NOW, INSTEAD OF BY FEEL.** DQ measured the
+Swordmaster at ten cards making FOUR decisions — a player who had drafted four had seen everything
+his pool decides — while his engine (the stance) was as strong as any in the game. **Depth of
+engine is not breadth of pool, and only the second one is what a draft offer is asking about.**
+
+### THE EXCLUSIVE AXES, AND THERE ARE TWO — NOT THREE
+
+**ASSERTED AS PROPERTIES IN `check_dr`, NEVER AS COUNTS.** DN's gate asserted two exclusives and
+there were five; DO's brief asserted nine grant-capstones and there were twenty-two; **DR's own
+brief asserted three exclusive axes and one of the three was false.** A count is a fact about
+today; a property is the thing worth pinning.
+
+· **COMPANION SUMMONING — THE BEASTMASTER.** True, and verified over the whole corpus: `special:
+  "summon"` exists on exactly three abilities and all three are his protected core, and
+  `_do_summon`'s only other caller is his own draft card Call the Wilds.
+· **REVIVAL — THE HOLY CLERIC, AMONG ABILITIES.** True with a qualifier the gate prints rather
+  than hides: `BattleUnit.revive()` has **two** callers, `resurrection` (hers) and the **REVIVE
+  POTION**, and the `revive_pct` map event is a third channel. **Exclusive as an ability; not
+  exclusive as a channel.**
+· **COOLDOWN MANIPULATION IS *NOT* THE SWORDMASTER'S, AND THE CLAIM THAT IT WAS IS THE USEFUL
+  RECORD.** `_tick_cooldowns` has **SEVEN** callers: Answering Steel and Battle Poise (his),
+  **BLINK — a MAGE CLASS-WIDE DRAFT CARD whose own comment names tempo as its axis**, **BLESSING OF
+  ZEAL — the Devout's PROTECTED CORE**, and three talent nodes (Frostbound Hours, Cryomancer Thaw
+  r8, which ticks EVERY hero's; Practised Hands, Survivalist Guerilla r8; Follow-Through,
+  Sharpshooter Tempo r5). Five more sites clear a cooldown outright through `cooldowns.erase` —
+  Sever on a Broken target, Hex of Ruin's perfect, Apex Predator, Overkill, Mark of the Hunt —
+  plus Terminal Velocity. **What IS one implementation is the FUNCTION** (BQ extracted four
+  hand-written copies); what is shared is the axis.
+
+**BEFORE DECLARING AN AXIS EXCLUSIVE, DERIVE THE POPULATION THAT TOUCHES IT.** A one-door helper
+that "only two cards call" is the shape this went wrong in: **a single implementation reads like a
+single owner and is not the same thing.**
+
+
 ## STANDING RULE — READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY (Batch BW §3)
 **THERE ARE NOW TWO KINDS OF STANCE CARD AND THE DISTINCTION GOVERNS EVERY FUTURE SWORDMASTER
 ABILITY.** A **READER** works in either guard, does something DIFFERENT in each (BP's
 arriving-stance principle decides which branch buys what), and then **SWITCHES** him — Precision
 Strike and Feint. A **GATED** card **REQUIRES** a guard: in the wrong one it is **REFUSED OUTRIGHT**
 — unavailable, not a weaker branch — and casting it **MOVES NOTHING**. Sever (Aggressive) and
-Battle Poise (Defensive) are the first two. **GETTING THE TWO CARD TYPES BACKWARDS IS THE EASIEST
-MISTAKE TO MAKE ON THIS SPEC**, and both wrong versions read fine on a tooltip.
+Battle Poise (Defensive) were the first two, and **COUNTER TIME (Defensive, Batch DR §4) is the
+third**. **GETTING THE TWO CARD TYPES BACKWARDS IS THE EASIEST MISTAKE TO MAKE ON THIS SPEC**, and
+both wrong versions read fine on a tooltip.
+· **A GATE MUST BUY SOMETHING (Batch DR §3).** Battle Poise's Defensive requirement was pure cost
+  with nothing bought by it, which is precisely why ANSWERING STEEL — cheaper, longer, ungated,
+  paying the same cooldown tick plus two clauses more — held its whole payload as a subset. **A
+  stance requirement with no payoff is a domination waiting to be measured.** It buys a free GUARD
+  CHANGE once a turn off a parry now, which Answering Steel cannot have because it has no
+  requirement to reward. **The free pivot asks `_ability_usable` about the REAL Guard Change** —
+  the same door — so Formless refuses it and Guard Change's own 1-turn cooldown is respected, in
+  one place rather than two that could disagree. **It is the PIVOT and not the ability**: Guard
+  Change's own 15 BD, Sunder Guard's 40-to-every-enemy, No Quarter and Tempo stay on that card, or
+  a Defensive build parrying twice a turn lands 80 free Break across the field every turn.
 · **`_ability_usable` IS THE DOOR**, matching how Death Ray's Resonance gate and BV's nine are
   refused — so the greyed button, the bot's drafted-pick wrapper and the cast itself can never
   disagree. A gate written at resolution instead would be a different, much smaller ability.
@@ -2564,8 +2652,9 @@ MISTAKE TO MAKE ON THIS SPEC**, and both wrong versions read fine on a tooltip.
 · **IT DOES NOT SWITCH THE STANCE AND MUST NOT BE BUILT TO.** There is deliberately no
   `_swordmaster_switch` call in its branch and test_batch_bw asserts the absence; a later author
   adding one "for consistency with the other two stance cards" deletes the ability.
-· **ONE HELPER, `_eff_stance(u)`, AND ITS SCOPE IS ABILITIES ONLY.** Four callers: the two gates in
-  `_ability_usable`, the `precision_strike` and `feint` branches, and Lunge's stance-keyed wound.
+· **ONE HELPER, `_eff_stance(u)`, AND ITS SCOPE IS ABILITIES ONLY.** Callers: the stance gates in
+  `_ability_usable` (Sever, Battle Poise and DR's Counter Time), the `precision_strike`, `feint`
+  and `wheeling_cut` branches, and Lunge's stance-keyed wound and its Break rider.
   **SEASONED FIGHTER (the passive), KILLING EDGE, BRACING AND UNTOUCHABLE ALL KEEP READING
   `u.stance` DIRECTLY**, so an Aggressive build under a Feigned Guard keeps Aggressive's damage
   bonus the whole time — which is the synergy the card is sold on. **Widening the helper to the

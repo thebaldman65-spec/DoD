@@ -422,11 +422,18 @@ func _boss_legibility() -> void:
 	# statuses on an unbroken boss, and `force` is still the only way past it —
 	# no Occultist workaround was added.
 	# BATCH CR §1 — RE-POINTED: "two callers, both Batch AH perfects" IS NOW
-	# ONE. Flash Freeze and Snare Trap bought the carve-out with perfects CN
-	# orphaned, so both were re-gated on BROKEN; only Pommel Strike still buys
-	# it, and only because it KEPT its bar. The three checks below pin that
-	# both doors are shut, because CR's standing rule is that nothing else may
-	# pass `force` and prose alone has never held a rule on this project.
+	# ONE. Two abilities bought the carve-out with perfects CN orphaned, so both
+	# were re-gated on BROKEN; only Pommel Strike still buys it, and only
+	# because it KEPT its bar. The three checks below pin that both doors are
+	# shut, because CR's standing rule is that nothing else may pass `force` and
+	# prose alone has never held a rule on this project.
+	#
+	# BATCH DR §2 — **ONE OF THOSE TWO ABILITIES IS RETIRED AND THIS CHECK IS
+	# NOT.** The assertion below was never about that card: it refuses a
+	# `_hold_freeze` call that FORCES the freeze, from ANY caller, and Glacial
+	# Prison and Cryoclasm are the two that reach that function now. Only the
+	# message moved, because a failure naming a card that no longer exists
+	# sends the next batch looking for the wrong thing.
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bsrc.contains('if not force and id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \\'),
 		"the boss guard still refuses all three madness statuses")
@@ -459,7 +466,7 @@ func _boss_legibility() -> void:
 		"...and _hold_freeze THREADS it rather than deciding by name")
 	# BATCH CR §1 — THE TWO CLOSED DOORS, ASSERTED SHUT.
 	ok(not bsrc.contains("_hold_freeze(target, attacker, true)"),
-		"Flash Freeze no longer FORCES the freeze — a boss resists until Broken")
+		"a freeze is being FORCED past the carve-out — a boss resists until Broken")
 	ok(not bsrc.contains('sn_st["perfect"] = true'),
 		"Snare Trap no longer stamps its spring PERFECT — the Stun waits on Broken")
 	# ...and the one door that stays open, named so a sixth caller is visible.

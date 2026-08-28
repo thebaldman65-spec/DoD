@@ -44,7 +44,20 @@ const SRC_FLOOR := 106
 # lines up is deliberately a RATCHET (`with_src >= SRC_FLOOR`) because that
 # one measures progress; this one measures the ground the progress is
 # against. **A batch that changes it must say why, here, in this comment.**
-const CALL_SITES := 203
+#
+# **BATCH DR MOVED IT 203 -> 205, AND SAYS WHY.** Net +2, from four sites:
+# `flash_freeze`'s `_apply_status(target, "chilled", 3, 0, 0, attacker)` went
+# with the retired card (§2, a STAMPED site — so the denominator fell and
+# `with_src` fell with it), and §4's three new ones arrived — Wheeling Cut's
+# two arriving-stance grants and Counter Time's Stun.
+#
+# **`with_src` DID NOT MOVE AND THAT IS ARITHMETIC RATHER THAN LUCK.** Counter
+# Time passes `attacker` (DI's rule: a status is applied with its `src`), and
+# it exactly replaces the stamped site the retirement took. The two Wheeling
+# Cut grants are SELF-BUFFS on the hero — nothing Harvest reads, nothing
+# `_note_debuff_applied` counts — so they are correctly unstamped and the
+# unstamped remainder goes 97 -> 99.
+const CALL_SITES := 205
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

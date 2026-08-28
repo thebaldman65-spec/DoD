@@ -367,7 +367,7 @@ const STATUS_INFO := {
 	"berserk": ["Berserk", "Bk", Color(0.90, 0.25, 0.25), "Strikes banked: each of these lands\nTWICE. They count HITS, not casts, so\na multi-hit blow spends one a strike —\nand they wait until they are spent."],
 	"berserk_risk": ["Berserk", "Bk!", Color(0.75, 0.20, 0.25), "Nothing held back: takes 30% MORE\ndamage. Blood Frenzy pays for missing\nhealth, so this is the way into his\nown power band."],
 	"blood_debt": ["Blood Debt", "BD!", Color(0.85, 0.20, 0.30), "The debt is named: every time this\nenemy BLEEDS OUT the Berserker heals.\nThe mark SURVIVES the bleedout, so a\nre-opened wound pays again."],
-	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns."],
+	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns, and ONCE A TURN a parry also\nbuys a free GUARD CHANGE — the pivot\nalone, and it still respects that\nability's own cooldown."],
 	"feigned_guard": ["Feigned Guard", "FG", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
 	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
 	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals every hero for\na share of his maximum health. A blow\nthat gets THROUGH pays nothing."],
@@ -390,6 +390,13 @@ const STATUS_INFO := {
 	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage — Riposte still answers too."],
 	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends he pays\nboth downsides."],
 	"formless_recoil": ["Formless", "Fm!", Color(0.55, 0.65, 0.80), "The form is paid for: he suffers BOTH\nstances' downsides at once — more\ndamage taken and less dealt — for two\nturns."],
+	# ---- BATCH DR §4: WHEELING CUT's two arrivals ----
+	# TWO CHIPS FOR ONE CARD, on FORMLESS's precedent directly above: the two
+	# are mutually exclusive per cast but a player can hold both across two, and
+	# a single chip could not say which guard bought it. Neither is in
+	# `DEBUFF_IDS` — both sit on the hero.
+	"wheeling_guard": ["Wheeling Cut", "WC-", Color(0.60, 0.82, 0.98), "Came up covered: the wheel finished in\nthe Defensive guard, so he takes less\ndamage while it holds."],
+	"wheeling_edge": ["Wheeling Cut", "WC+", Color(0.70, 0.90, 1.0), "Came up on the front foot: the wheel\nfinished in the Aggressive guard, so he\ndeals more damage while it holds."],
 	# ---- BATCH BP: the Warrior draft's statuses ----
 	# Five of the six carry one; Gut Rip is an instant. Feint carries TWO,
 	# because its branches land on opposite sides of the board.
@@ -710,6 +717,16 @@ const ANSWERING_TICK := 1         # turns off every cooldown, per PARRY
 # numbers below are Seasoned Fighter's own — read at the passive's two read
 # sites rather than at a third, so the card cannot drift from the thing it is
 # quoting. The recoil is the exact pair of downsides it refused.
+# ---- BATCH DR §4: the Swordmaster's four new axes, three cards ----
+# READ AWAY FROM THE CAST, all four, on CI's rule: the two Wheeling Cut grants
+# are read in the strike loop's mitigation and damage blocks, and Lunge's two
+# riders in the strike pipeline beside the wound it already left.
+const WHEELING_GUARD_PCT := 20    # damage TAKEN, from the Aggressive branch
+const WHEELING_EDGE_PCT := 20     # damage DEALT, from the Defensive branch
+const WHEELING_GRANT_TURNS := 3   # both of them, and the card says so
+const LUNGE_DEPTH_BD := 15        # AGGRESSIVE: extra Break into the one target
+const LUNGE_BREADTH_BD := 12      # DEFENSIVE: Break to every OTHER enemy
+const COUNTER_TIME_TURNS := 2     # the stolen turns — Pommel Strike's is ONE
 const FORMLESS_DEALT := 1.15      # the Aggressive upside...
 const FORMLESS_TAKEN := 0.85      # ...and the Defensive one, held together
 const FORMLESS_RECOIL_DEALT := 0.90   # the Defensive downside...
@@ -3352,6 +3369,7 @@ func _player_turn(u: BattleUnit) -> void:
 	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
 	u.res_cast_this_turn = false  # Resonant Core pays the FIRST cast of a turn
 	u.watchtower_used = false     # Watchtower pulls her turn forward once a turn
+	u.poise_pivot_used = false    # BATCH DR §3: Battle Poise buys ONE free pivot a turn
 	_row8_turn_start(u)           # BATCH BM §2's five turn-start row-8 nodes
 	# Thin Air (Batch AQ): THE one read site for mod_no_regen. It stops the
 	# DRIP and nothing else — attacks that BUILD resource are untouched, which
@@ -3497,9 +3515,11 @@ func _player_turn(u: BattleUnit) -> void:
 				# two are self, so none of the three has anything to click.
 				# `killing_frost` is NOT here: it carries `aoe`, so it falls
 				# through to the aoe branch below and auto-targets exactly as
-				# Cinderfall and Blizzard already do. `funeral_pyre`,
-				# `flash_freeze`, Stoke, Arcane Bolt and Arcane Echo all name
-				# ONE enemy and fall through to the ordinary target picker.
+				# Cinderfall and Blizzard already do. BATCH DR's `wheeling_cut`
+				# is the same shape and is likewise absent. `funeral_pyre`,
+				# Stoke, Arcane Bolt and Arcane Echo all name ONE enemy and fall
+				# through to the ordinary target picker, and so does
+				# `counter_time`.
 				"slow_burn", "hoarfrost_armor", "inner_arcane",
 				# BATCH BU. `shared_grief` is self; `ordination` picks the
 				# LOWEST-Faith ally by rule rather than by click, which is the
@@ -5281,8 +5301,15 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 # grants into no pool, so CO's criterion was never run over them. `check_cz`
 # re-ran the criterion once `Classes.ability_corpus()` reached 216 and named this
 # one; DA takes it.
+# BATCH DR §4 — `counter_time` JOINS, AND `wheeling_cut` DELIBERATELY DOES NOT.
+# The rule is BO §5's: refuse a cast that could only ever do nothing. Counter
+# Time's ENTIRE payload is a status, so a recast onto a field that already holds
+# it at full depth buys literally nothing. Wheeling Cut deals real AoE damage
+# and Break, so a recast is never wasted however long its grant has left — the
+# same reason no damaging card in this list is one.
 const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
 	"anvil", "arcane_arrows", "battle_poise", "bloodbond", "bola", "camouflage",
+	"counter_time",
 	"choking_smoke", "cons_ground", "consecration", "covering_guard",
 	"divine_presence", "divine_shield", "divine_wrath", "downwind", "emberkeep",
 	"exhortation", "feigned_guard", "formless", "ghostpack", "glacial_prison",
@@ -5334,7 +5361,7 @@ func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
 			return heroes.filter(func(h): return not h.dead and not h.is_companion \
 				and h != u)
 		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
-				"penance", "bola", "glacial_prison":
+				"penance", "bola", "counter_time", "glacial_prison":
 			return enemies.filter(func(e): return not e.dead)
 		"covering_guard":
 			return _hero_side().filter(func(h): return h != u)
@@ -5516,6 +5543,8 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"bola":
 			return [{"id": "slow", "turns": 4, "power": 0},
 				{"id": "cripple", "turns": 4, "power": 0}]
+		"counter_time":
+			return [{"id": "stunned", "turns": COUNTER_TIME_TURNS, "power": 0}]
 		"vespers":
 			return [{"id": "vespers", "turns": 4,
 				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1)}]
@@ -5709,6 +5738,13 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.display_name == "Sever" and not _stance_satisfies(u, "aggressive"):
 		return false
 	if ab.special == "battle_poise" and not _stance_satisfies(u, "defensive"):
+		return false
+	# BATCH DR §4 — COUNTER TIME IS THE THIRD GATED CARD AND THE SECOND ON THE
+	# DEFENSIVE GUARD. Same door for the same reason: a FEIGNED GUARD genuinely
+	# lets an Aggressive Swordmaster cast it, a FORMLESS one satisfies it
+	# outright, and the greyed button, the bot's pool and the cast can never
+	# disagree about which.
+	if ab.special == "counter_time" and not _stance_satisfies(u, "defensive"):
 		return false
 	# ...AND FORMLESS REFUSES THE PIVOT: there is no stance to change while
 	# he holds neither and both. Refused at this same door rather than at
@@ -5925,8 +5961,8 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# omission. Its marker rides enemies not yet alight, so casting it into an
 	# unlit field and THEN casting Firestorm is a real line of play — gating on
 	# "something is burning" would refuse the setup half of the card's own
-	# strongest sequence. Stoke and Flash Freeze are ungated for the ordinary
-	# reason: both deal or do something to any legal target.
+	# strongest sequence. Stoke is ungated for the ordinary reason: it does
+	# something to any legal target.
 	# Stabilize: nothing to vent unless stacks sit above the floor (2, plus
 	# Still Mind ranks).
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
@@ -8265,6 +8301,54 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if bp_n > 0:
 						_log("   → Battle Poise: the parry takes a turn off %d cooldown%s" % [
 							bp_n, "" if bp_n == 1 else "s"], "#7cc8f0")
+					# BATCH DR §3 — **THE DEFENSIVE GUARD FINALLY BUYS SOMETHING,
+					# AND THAT IS WHAT ENDS DQ's FINDING 2.** The tick above is a
+					# strict subset of ANSWERING STEEL's payload, so until this
+					# line existed there was no board on which Battle Poise was
+					# the better pick and the standing rule in `classes.gd` was
+					# simply not being enforced. Answering Steel cannot have this
+					# clause: it has no stance requirement to reward.
+					#
+					# **IT IS THE PIVOT AND NOT THE ABILITY** — `_swordmaster_switch`,
+					# the one implementation of "flip it, restamp the chip, pay
+					# Tempo". Guard Change's OWN payload (15 BD to the enemy
+					# nearest Breaking, SUNDER GUARD's 40 BD to EVERY enemy, NO
+					# QUARTER, the parry perfect) stays on that card, for the
+					# reason `_swordmaster_switch`'s own header gives: those are
+					# on its card and on no other. A Defensive Swordmaster
+					# holding Sunder Guard and parrying twice a turn would
+					# otherwise land 80 free Break damage across the field every
+					# turn, which is a different and much larger card.
+					#
+					# **`_ability_usable` IS THE DOOR AND IT IS ASKED ABOUT THE
+					# REAL ABILITY**, not re-implemented here. That one call is
+					# what makes three separate promises true at once and keeps
+					# them from ever disagreeing: FORMLESS refuses the pivot
+					# (there is no stance to change), Guard Change's OWN 1-turn
+					# cooldown is respected — the core card's comment says that
+					# cooldown is what "stops spam", and a free pivot ignoring it
+					# would delete the sentence — and its cost is checked even
+					# though it is zero today.
+					#
+					# **AND IT STARTS THAT COOLDOWN.** Respecting a cooldown a
+					# use does not pay into is respecting it exactly once.
+					#
+					# ONCE A TURN, and the flag is per-HIS-turn (cleared in
+					# `_player_turn`) rather than per parry: a Waiting Guard
+					# build parries on demand, and one free pivot a turn is the
+					# clause the designer priced.
+					#
+					# THE PIVOT IS NOT FREE OF CONSEQUENCE: `_swordmaster_switch`
+					# throws away DISCIPLINE'S ACCUMULATION. A Discipline build
+					# wants this refused and gets that by not holding the card.
+					if not strike_target.poise_pivot_used:
+						var bp_gc := _find_ability(strike_target, "Guard Change")
+						if bp_gc != null and _ability_usable(strike_target, bp_gc):
+							strike_target.poise_pivot_used = true
+							strike_target.start_cooldown(bp_gc)
+							_log("   → Battle Poise: the parry buys a free GUARD CHANGE — no action spent",
+								"#7cc8f0")
+							_swordmaster_switch(strike_target)
 			# Pommel Strike carries its own keen 25% crit base.
 			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
 				+ (0.25 if strike_target.broken else 0.0)
@@ -8849,6 +8933,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# card compose additively rather than one silently winning.
 			if attacker.has_status("warcry"):
 				raw *= 1.0 + attacker.status_power("warcry") / 100.0
+			# BATCH DR §4 — WHEELING CUT's DEFENSIVE arrival, the other half of
+			# the same principle: he lands AGGRESSIVE, so that branch hands him
+			# offence. Same block as Warcry, so it composes with every other
+			# multiplier here exactly as a player would expect and needs no read
+			# site of its own.
+			if attacker.has_status("wheeling_edge"):
+				raw *= 1.0 + WHEELING_EDGE_PCT / 100.0
 			# BATCH CB — RESONANT FIELD (Arcanist draft, tranche 3) RIDES THE SAME
 			# READ, and it is the FOURTH user of the one implementation of "this
 			# unit deals N% more damage" — so it composes ADDITIVELY with Battle
@@ -9143,6 +9234,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 - IRONCLAD_CUT_PCT / 100.0
 				if strike_target.is_hero:
 					_prev(strike_target, iw_was - raw)
+			# BATCH DR §4 — WHEELING CUT's AGGRESSIVE arrival. He lands in the
+			# DEFENSIVE guard, so the branch hands him defence: BP's
+			# arriving-stance principle, read at the same site every other
+			# instrumented mitigation is and booked to the prevented ledger the
+			# same way. It stacks MULTIPLICATIVELY with SEASONED FIGHTER's own
+			# Defensive cut rather than adding into it — two separate windows,
+			# and the passive's read site is untouched.
+			if strike_target.has_status("wheeling_guard"):
+				var wg_was := raw
+				raw *= 1.0 - WHEELING_GUARD_PCT / 100.0
+				if strike_target.is_hero:
+					_prev(strike_target, wg_was - raw)
 			# BATCH BT — HOARFROST ARMOR's mitigation half. Its RETALIATION half
 			# — whoever strikes him gains 2 stacks of Chilled — is in the
 			# post-strike block beside Immolate's ignite, and the two point the
@@ -10023,16 +10126,61 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Defensive Cripples; Guard Change is how the player picks.
 			# UPGRADED (the sm_lunge node landing on a Lunge he already
 			# earned): both wounds, whatever guard he holds.
+			#
+			# BATCH DR §4 — **AND THE STANCE NOW DECIDES WHERE THE BREAK LANDS
+			# TOO, WHICH IS THE CARD'S NEW AXIS.** His BREAKER lane is built
+			# around a window — Punishment, Off Balance, Guard Breaker,
+			# Overpressure and No Quarter all live inside it, and SEVER's
+			# cooldown clears against a Broken target so it can be swung through
+			# — and not one card in his draft pool opened it. This is that card.
+			# The wound above is UNTOUCHED and both riders read the same
+			# `_eff_stance`, so a Feigned Guard moves them together.
 			if ab.display_name == "Lunge" and not strike_target.dead:
 				# BATCH BW: `_eff_stance` — Lunge is an ABILITY whose branch reads
 				# the stance, so a Feigned Guard changes which wound it leaves,
 				# exactly as it changes Precision Strike's and Feint's branches.
+				var lunge_aggr := _eff_stance(attacker) == "aggressive"
 				var lunge_hits: Array = ["exposed", "cripple"] \
 					if attacker.lunge_upgraded > 0 \
-					else ["exposed" if _eff_stance(attacker) == "aggressive" else "cripple"]
+					else ["exposed" if lunge_aggr else "cripple"]
 				for lunge_status in lunge_hits:
 					_apply_status(strike_target, lunge_status, 3, 0, 0, attacker)
 					_note_debuff_applied(attacker, lunge_status)
+				# DEPTH: he commits, and all of it goes into the one guard.
+				# `take_hit(0, bd)` is the house idiom for Break with no damage
+				# — Guard Change's own 15, and Sunder Guard's 40, both land this
+				# way — so Overpressure's overflow and the Break announcement
+				# behave exactly as they do everywhere else.
+				var lg_marks: Array = []
+				if lunge_aggr:
+					lg_marks = [strike_target]
+				else:
+					# BREADTH: he does not overreach, so the recovery leaves the
+					# whole line off balance. EVERY OTHER enemy — the target
+					# already took the cast's own `pressure`, and paying it
+					# twice would make the Defensive branch the deeper one and
+					# delete the trade the card is sold on.
+					lg_marks = enemies.filter(func(e): \
+						return not e.dead and e != strike_target)
+				var lg_bd: int = LUNGE_DEPTH_BD if lunge_aggr else LUNGE_BREADTH_BD
+				for lg_hit in lg_marks:
+					var lg_res: Dictionary = lg_hit.take_hit(0, lg_bd)
+					_stat_bd(attacker, lg_bd)
+					lg_hit.float_text("+%d BD" % int(lg_res["bd"]),
+						Color(0.8, 0.35, 1.0))
+					if lg_res["broke"]:
+						_stat("breaks_on_enemies")
+						_sfx("break", -3.0)
+						_message("%s BREAKS!" % lg_hit.unit_name)
+						_log("!! %s BREAKS" % lg_hit.unit_name, "#c070e0")
+						await _break_impact()
+				if not lg_marks.is_empty():
+					_log("   → Lunge from the %s guard — %s" % [
+						"Aggressive" if lunge_aggr else "Defensive",
+						("%d more Break into %s" % [lg_bd, strike_target.unit_name]) \
+						if lunge_aggr else \
+						("%d Break to %d other enem%s" % [lg_bd, lg_marks.size(),
+							"y" if lg_marks.size() == 1 else "ies"])], "#7cc8f0")
 			# BATCH BW — SEVER'S COOLDOWN CLEARS AGAINST A BROKEN TARGET, and it
 			# is an ordinary attack rider for the same reason Blood Debt's mark
 			# below is: it is a 40% strike and a `special` would cost it the
@@ -11421,18 +11569,23 @@ func _freeze_turns(target: BattleUnit) -> int:
 	return 1 if (target.is_boss or not _freeze_holds(target)) else -1
 
 
-# THE ONE PLACE A HOLD BEGINS. THREE callers: the Chilled-4 branch of
-# _apply_status, Glacial Prison, and Batch BT's Flash Freeze (both of the
-# latter skip straight to it).
+# THE ONE PLACE A HOLD BEGINS. **THREE callers, AND THEY ARE NOT THE THREE
+# THIS HEADER USED TO NAME** — the Chilled-4 branch of `_apply_status`,
+# GLACIAL PRISON and CRYOCLASM (the latter two skip straight to it).
 #
-# BATCH BT — `force` IS AN OPTIONAL ARGUMENT DEFAULTED OFF, so the two older
-# callers are byte-identical in behaviour and the boss carve-out is exactly
-# where it was. It threads to the ONE `_apply_status` call below, which is the
-# call-site-visible boss exception Pommel Strike's and Snare Trap's perfects
-# already buy: EXACTLY ONE caller arms it, a PERFECT Flash Freeze. What it buys
-# is the freeze landing on an UNBROKEN boss — never a longer one, because
-# `timed` below is true for any boss however it got here, so a forced boss
-# still shrugs the ice off after a single turn.
+# BATCH DR CORRECTED THIS COUNT TWICE OVER, AND BOTH HALVES WERE STALE PROSE
+# OF THE SAME SPECIES THE BATCH EXISTS TO SWEEP. It read THREE while DO's
+# Cryoclasm had quietly made it FOUR, and it named Flash Freeze, which DR §2
+# retired as a strict duplicate of Glacial Prison.
+#
+# `force` IS AN OPTIONAL ARGUMENT DEFAULTED OFF (Batch BT) and it threads to
+# the ONE `_apply_status` call below — the call-site-visible boss exception.
+# **NO CALLER OF THIS FUNCTION ARMS IT.** Batch CR §1 took it off the one that
+# did, `test_batch_ax` asserts the absence, and the standing rule is that hard
+# control lands on a boss only once that boss is Broken. Were one ever to arm
+# it again, what it would buy is the freeze landing on an UNBROKEN boss — never
+# a longer one, because `timed` below is true for any boss however it got here,
+# so a forced boss still shrugs the ice off after a single turn.
 func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	# BATCH BN §1 — THE RE-ENTRANCY GUARD, AND IT IS THE FIRST LINE ON PURPOSE.
 	# A release can chill its own target back to four stacks (Honed Shards), and
@@ -11738,10 +11891,13 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# different promise.
 	# BATCH CR §1 — EXACTLY ONE CALLER PASSES IT NOW: Pommel Strike's perfect,
 	# which is still expressible because that card KEPT ITS BAR (25 damage, so
-	# `runs_skill_check()` is true). Flash Freeze and Snare Trap bought the same
-	# carve-out with perfects CN orphaned, and both are BROKEN-gated from CR §1
-	# instead. A future caller passing `true` is re-opening that door: the
-	# standing rule is that hard control lands on a boss only once it is Broken.
+	# `runs_skill_check()` is true). Two abilities bought the same carve-out
+	# with perfects CN orphaned and both were BROKEN-gated from CR §1 instead;
+	# Snare Trap is the one of those two still standing, and the other was
+	# retired at DR §2. A future caller passing `true` is re-opening that door:
+	# the standing rule is that hard control lands on a boss only once it is
+	# Broken. **BATCH DR's COUNTER TIME IS A NEW `stunned` APPLIER AND PASSES
+	# NOTHING**, so it inherits the refusal rather than arguing with it.
 	if target.has_status("ironclad") and id in ["stunned", "frozen", "dazed"]:
 		target.float_text("IRONCLAD", Color(0.80, 0.80, 0.88))
 		_log("   → %s refuses the %s (Ironclad)" % [target.unit_name,
@@ -16125,7 +16281,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("parry", -7.0, 0.9)
 			attacker.float_text("BATTLE POISE", Color(0.45, 0.88, 1.0))
 			_message("%s settles into the guard" % attacker.unit_name)
-			_log("%s: Battle Poise — for %d turns every attack he PARRIES takes a turn off all his cooldowns" % [
+			_log("%s: Battle Poise — for %d turns every attack he PARRIES takes a turn off all his cooldowns, and once a turn buys a free Guard Change" % [
 				attacker.unit_name, bp_turns], "#7cc8f0")
 		"feigned_guard":
 			# AXIS: the only card in the game that lets a build have BOTH HALVES
@@ -16503,6 +16659,86 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, fm_turns,
 				int(round((FORMLESS_DEALT - 1.0) * 100.0)),
 				int(round((1.0 - FORMLESS_TAKEN) * 100.0))], "#7cc8f0")
+		# ============ BATCH DR §4: THE TWO NEW SWORDMASTER CARDS ============
+		"wheeling_cut":
+			# AXIS: the blade goes round, and the guard decides what he comes up
+			# holding. **THE SWEEP ITSELF IS NOT HERE** — the card carries `aoe`
+			# with real `damage` and `pressure`, so the strike pipeline has
+			# already hit every enemy by the time this runs, with the crit, the
+			# armour read, the variance roll, Overwhelm, Off Balance and
+			# Whetstone all applied. This handler only GRANTS and FLIPS, which
+			# is why it is nine lines and not ninety.
+			#
+			# **THE ARRIVING-STANCE PRINCIPLE, AND IT IS THE THING THAT WOULD
+			# MOST EASILY BE GOT BACKWARDS** (BP's rule, from the card that
+			# established it): cast from AGGRESSIVE he lands in DEFENSIVE, so
+			# the branch hands him DEFENCE; cast from DEFENSIVE he lands in
+			# AGGRESSIVE, so it hands him OFFENCE. He is never stranded.
+			#
+			# `_eff_stance` and not `stance`, on Precision Strike's and Feint's
+			# precedent: a FEIGNED GUARD changes which branch fires. THE STANCE
+			# IS READ FIRST AND SWITCHED LAST, so the branch and the arrival can
+			# never disagree.
+			var wc_aggressive := _eff_stance(attacker) == "aggressive"
+			# THE PERFECT IS BOTH GIFTS AT ONCE — the one bonus that could only
+			# belong to this card, because the branch is the card. It does NOT
+			# lengthen either window: a perfect buys the other half, not more of
+			# the same half, which is Discipline's rule (a perfect arrives
+			# sooner, it does not raise the ceiling) applied sideways.
+			if wc_aggressive or is_perfect:
+				_apply_status(attacker, "wheeling_guard", WHEELING_GRANT_TURNS,
+					WHEELING_GUARD_PCT)
+			if not wc_aggressive or is_perfect:
+				_apply_status(attacker, "wheeling_edge", WHEELING_GRANT_TURNS,
+					WHEELING_EDGE_PCT)
+			_sfx("parry", -6.0, 0.85)
+			attacker.float_text("WHEELING CUT", Color(0.65, 0.88, 1.0))
+			_message("%s brings the blade all the way round" % attacker.unit_name)
+			_log("%s: Wheeling Cut from the %s guard — %s for %d turns" % [
+				attacker.unit_name,
+				"Aggressive" if wc_aggressive else "Defensive",
+				("he comes up covered, taking %d%% less damage" % WHEELING_GUARD_PCT) \
+				if wc_aggressive \
+				else ("he comes up on the front foot, dealing +%d%% damage" % WHEELING_EDGE_PCT),
+				WHEELING_GRANT_TURNS], "#7cc8f0")
+			if is_perfect:
+				_log("   → PERFECT: the wheel came round clean — he takes BOTH guards' gifts",
+					"#70d878")
+			# IT IS A READER, SO IT FLIPS. `_swordmaster_switch` is the ONE
+			# pivot (Guard Change, Precision Strike, Feint — and now this), so
+			# Tempo pays, the chip restamps and DISCIPLINE'S ACCUMULATION dies
+			# here exactly as it does for the other three. A fourth copy of the
+			# flip is how the four would start to disagree.
+			_swordmaster_switch(attacker)
+			_log("   → Wheeling Cut: the guard changes — he comes up %s" % (
+				"Aggressive" if attacker.stance == "aggressive" else "Defensive"),
+				"#7cc8f0")
+		"counter_time":
+			# AXIS: taking the turn instead of the blow. His pool could not take
+			# an enemy's turn away at all — POMMEL STRIKE is his only Stun and it
+			# is PROTECTED CORE, so his whole control for a run was one core
+			# ability's one-turn rider.
+			#
+			# **IT IS GATED, NOT A READER** (BW's rule): refused outright in the
+			# wrong guard at `_ability_usable`, and casting it moves nothing. It
+			# does NOT call `_swordmaster_switch` and must not be built to — a
+			# reader that flips plus a window that does not is the whole
+			# distinction between the two card types.
+			#
+			# **THE BOSS RULE IS INHERITED, NOT RE-WRITTEN.** `stunned` is one of
+			# the five ids `_apply_status`'s carve-out refuses on an unbroken
+			# boss, and NOTHING HERE PASSES `force` — CR §1's standing rule, and
+			# Pommel Strike's perfect is the one exception left in the game. The
+			# refusal logs itself inside `_apply_status`, which is why there is
+			# no boss branch here: a second test would be a second rule.
+			if target != null and not target.dead:
+				_apply_status(target, "stunned", COUNTER_TIME_TURNS, 0, 0, attacker)
+				_note_debuff_applied(attacker, "stunned")
+				_sfx("parry", -5.0, 0.7)
+				_message("%s answers before the blow lands!" % attacker.unit_name)
+				_log("%s: Counter Time — %s loses its next %d turns" % [
+					attacker.unit_name, target.unit_name, COUNTER_TIME_TURNS],
+					"#7cc8f0")
 		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
 		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
 		# ordinary attacks and need no case at all — which is the point of a
@@ -17012,40 +17248,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# A FIFTH consumer arriving and inheriting it is that rule
 				# working — test_batch_ar's pinned call-site count goes 4 -> 5.
 				_overburn_refund(attacker, fp_turns)
-		"flash_freeze":
-			# AXIS: the hold WITHOUT the build, on a drafted card rather than a
-			# bought cell. It goes through `_hold_freeze` like every other
-			# freeze in the game, so the limit eviction, Glacial Economy, Bitter
-			# Cold AND THE BOSS CARVE-OUT all come free.
-			#
-			# BATCH CR §1 — IT NO LONGER PASSES `force`, AND THAT IS A RULING
-			# RATHER THAN A TIDY-UP. The `force` was the PERFECT's clause; CN
-			# took the bar off this card, so the perfect became the base and
-			# boss immunity to hard control silently ceased to exist. "Only on a
-			# Perfect" is not expressible on an ability with no bar, so the gate
-			# moved to the mechanic that already exists: the ice takes a boss
-			# ONLY ONCE IT IS BROKEN. That is the same `target.broken` test the
-			# Madness lane reads, applied in `_apply_status` — ONE check, not a
-			# second one written here. IT IS STILL ONLY ONE TURN against a boss:
-			# a held boss is `timed`, so this buys the turn, never a lockdown.
-			if target != null and not target.dead:
-				if not target.has_status("chilled"):
-					_apply_status(target, "chilled", 3, 0, 0, attacker)
-					_note_debuff_applied(attacker, "chilled")
-				_sfx("break", -9.0, 0.7)
-				_message("%s seals %s in ice!" % [attacker.unit_name,
-					target.unit_name])
-				# LOG HONESTY, found by watching a smoke: the boss clause is
-				# about a BOSS, so claiming it against a raider announces a bigger
-				# effect than the one that fired. Say it only when it is the thing
-				# that actually happened — and after CR §1 the thing that happens
-				# is a BROKEN boss taking the ice. An unbroken one bounces inside
-				# `_apply_status`, which logs its own refusal.
-				var ff_boss := target.is_boss and target.broken
-				_log("%s: Flash Freeze closes on %s%s" % [attacker.unit_name,
-					target.unit_name,
-					" — and a BROKEN boss takes the ice for one turn" if ff_boss else ""], "#7cc8f0")
-				_hold_freeze(target, attacker)
 		"killing_frost":
 			# AXIS: the accumulation pays on its own. His stacks have only ever
 			# counted toward a freeze, so a fight where the freeze never lands
