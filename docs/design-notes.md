@@ -4,6 +4,65 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A price paid in tempo is still a price (Batch DT) — 2026-08-29
+
+Pyroblast is the last cooldown-zero card in the draft, and the obvious move is to do to it what DR
+did to Lunge: 0 → 3, on the reasoning that **at the end of a talent lane the price was the node,
+and in a pool there is no price.** The provenance is identical — both were talent grants DO moved
+wholesale into `SPEC_DRAFT_POOLS`, and both walked in still carrying the cooldown a gated lane-end
+ability never needed.
+
+**The reasoning does not transfer, and the measurement is what says so.** Lunge cost 25 mana of a
+100 bar at 3.5 delay: ordinary on both axes, so "in a pool there is no price" was literally true of
+it. Pyroblast costs **45 mana at 6.0 delay**, and derived across the whole 223-ability corpus those
+are not ordinary numbers — **6.0 is the longest delay in the project, with nothing above it**, and
+**45 is the second-highest cost in the game.** The only ability that costs more is Death Ray at 55,
+and Death Ray carries a cooldown of 3. So the two heaviest casts in the game sit side by side and
+exactly one of them is repeatable.
+
+**A cooldown is not the only rate limiter, and this project has three.** Mana gates how many casts
+a bar buys — two, here, with ten to spare. Delay gates how soon the caster acts again, and
+cooldowns tick *in the unit's own turns*, so a 6.0-delay cast has already spent three basic
+attacks' worth of tempo before any cooldown would begin counting. What a cooldown of 3 would add on
+top is three further turns of his own between casts, each of them a real action he would rather
+have spent on Pyroblast — call it halving its frequency, on a card whose whole identity is the one
+enormous slow blow.
+
+**The general form, and the reason this is a note rather than a ruling:** *repeatable* and *unpriced*
+are not the same property, and DQ's finding measured the first. A card can be the only repeatable
+thing in the draft and still be the most expensive thing in the draft. **Whether the delay and the
+mana are the right two prices, or whether a third is owed, is a design question about how much a
+Pyromancer should be able to lean on one button — and that is the designer's call, not a batch's.**
+The options and the full derivation are in `docs/reports/DT.md` §2. Nothing was authored.
+
+## The second damage path reads none of the first one's multipliers, and the list is long (Batch DT) — 2026-08-29
+
+DK found that Empower attaches to a companion perfectly and pays it nothing, because a beast's
+blows resolve through `_companion_hit` and that function reads none of the hero strike loop's
+multiplier block. It ruled Empower to *text* rather than teaching the read, precisely because
+teaching it would have been a magnitude change on beast damage.
+
+**Empower was not the only term, and it was not close.** The attacker-side block runs 84
+`raw`-mutation sites. `_companion_hit` reads **three** of them.
+
+What makes the list less alarming than the count is that most of the misses are unreachable **by
+shape rather than by oversight**, and the shape is in the signature: `_companion_hit` takes a
+*float*, not an `Ability`. Every term keyed on a card — a `display_name`, a `dmg_type`, a
+`special`, the grade multiplier — cannot apply to a blow that has no card behind it. A beast also
+carries no `passive_id` and no talent ranks at all, which removes most of the rest.
+
+**What is left is the honest finding: a small set of terms a beast can genuinely wear today, all of
+which pay nothing.** Two of them arrive through doors nobody was watching — an enemy's Cripple,
+because enemies target `_hero_side()` and that holds the beast; and Chilled, because the Hoarfrost
+battle modifier stamps a summoned companion on purpose. **A Crippled beast bites at full strength.**
+Measured at ratio 1.0000 over 40 seeded blows, which is DK's number exactly.
+
+**These are DK's ruling repeating, not a bug found.** Whether a beast *should* feel a Cripple is a
+design question with a real answer either way — a companion is an extension of the hunter's action,
+and a malus that lands on it and does nothing is a promise the chip makes and the arithmetic
+refuses. **Reported and not fixed, because every one of them is a magnitude change on beast damage
+and that is new play.** The full enumeration is in `docs/reports/DT.md` §4.
+
 ## An absence is a measurement, and nobody measures the thing they already believe (Batch DS) — 2026-08-29
 
 DR's brief was wrong about an axis being *exclusive*. DS's brief was wrong about one being

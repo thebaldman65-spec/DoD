@@ -834,6 +834,35 @@ func _live_cryomancer() -> void:
 
 # ---------- §5 ARCANIST ----------
 
+# BATCH DT §3 — THE SEED FOR §5's NULL FIELD PAIR, AND WHY IT IS PER-PAIR
+# RATHER THAN PER-SUITE. This suite called `seed()` ZERO times, so the two
+# blows the NULL FIELD check compares drew a different stream each run and the
+# row failed about one reading in thirteen. It is DF §0's idiom in
+# `test_rune_battle`, applied to the second of the three flakes: force
+# determinism AT THE SITE UNDER TEST rather than widening a tolerance until the
+# noise fits. Seeding the whole suite would fix the draw for 1104 other checks
+# that never asked for it, and it would hide WHICH draw mattered.
+#
+# **BOTH BLOWS TAKE THE SAME SEED, WHICH IS THE HALF THAT MATTERS.** The two
+# arms are the same enemy swinging the same ability at the same hero, and the
+# only thing that differs between them is his Resonance. Handing them one
+# stream makes every coin identical in each — the variance roll, the crit, the
+# parry — so what is left in the difference is the stack count and nothing
+# else. That is DD's method, and it is why the BAND is not touched: the band
+# IS the question this check asks.
+#
+# **AND THE ±10% ROLL WAS NEVER THE WHOLE STORY.** Measured over six readings
+# before the seed went in, the shallow blow ranged 16 to 28 and the deep blow
+# 9 to 11. A ±10% roll on a mean of 18 spans 16.4 to 19.8 and cannot reach 28;
+# a crit is ×1.5 and reaches exactly there. So this is `at`'s shape — a second,
+# larger coin behind a variance roll that was being blamed for all of it — and
+# it is the reason a per-pair seed is the right instrument and a wider band
+# would have been the wrong one.
+func _nf_seeded() -> void:
+	seed(20260829)
+
+
+
 func _live_arcanist() -> void:
 	var scene := await _spawn(["berserker", "arcanist", "holy", "mystic"],
 		{"arcanist": ["Null Field", "Kindled Mind"]}, ["raider"])
@@ -862,11 +891,13 @@ func _live_arcanist() -> void:
 	arc.max_hp = 99999
 	arc.hp = 99999
 	var hp0 := arc.hp
+	_nf_seeded()
 	await scene.call("_resolve", foe, foe.abilities[0], arc, "good")
 	var shallow := hp0 - arc.hp
 	arc.second_resource = 14
 	arc.hp = 99999
 	var hp1 := arc.hp
+	_nf_seeded()
 	await scene.call("_resolve", foe, foe.abilities[0], arc, "good")
 	var deep := hp1 - arc.hp
 	ok(shallow > 0 and deep >= 0, "§5: the enemy can reach him at all")

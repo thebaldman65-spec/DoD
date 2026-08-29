@@ -14,6 +14,88 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-29 &mdash; Batch DT: LOOSE ENDS</h2>
+<p><i>Four items and no new play. A gate for the two DS specials that shipped with no permanent
+cover, the second of the three flakes seeded, and two reports &mdash; one of which came back
+recommending that the obvious change NOT be made.</i></p>
+
+<p><b>&sect;1 &mdash; <code>check_ds.gd</code>, AND THE ONE ASSERTION A STATIC CHECK COULD NOT
+MAKE.</b> DS authored six Hunter cards and added no gate; <code>check_co</code>'s saturation sweep
+reaches four of the six as a side effect and <b>BRING IT DOWN and HEADS DOWN were covered by
+nothing at all.</b> Both are driven through a real battle now, on two fixtures &mdash; the two
+cards belong to two different Hunter specs and the fixture fields one hunter slot.
+<b>57 checks, and four negative controls, all of which bit.</b></p>
+<ul>
+<li><b>BRING IT DOWN is MEASURED, not asserted.</b> The card is stamped in one place and read three
+thousand lines away, which is exactly the shape that produced DK's Empower defect. Ten seeded Warden
+strikes read <b>8526 plain against 10233 under the capped +20% &mdash; ratio 1.2002</b>. The gate
+also pins the snapshot (deepening the bond after the cast moves nothing), the cap, the no-bond
+refusal, and that the <b>beast does not wear the amp it earned</b>, which is the one property the
+card text does not state and the handler does.</li>
+<li><b>A THIRD ARM EXISTS BECAUSE THE FIRST TWO WOULD PASS A PARTY-WIDE GLOBAL READ.</b> Stripping
+the amp from the striker alone, while the rest of the party keeps it, must put the ratio back at
+1.0. The negative control that replaced the per-wearer read with a global one <b>passed both other
+arms and failed only this one.</b></li>
+<li><b>THE HEADS DOWN ASSERTION IS THE POINT OF THE BATCH.</b> The card's first version refused any
+ability with <code>cost &gt; 0</code>, and <b>46 of the 50 enemy abilities cost zero</b> &mdash;
+derived on every run, not quoted &mdash; so it would have suppressed four abilities in the whole
+game while reading as working. <b>A static check would have called that correct:</b> both versions
+refuse abilities, both name a criterion, both log a fallback. The only assertion that separates them
+is live &mdash; run a real enemy's real kit through <code>_intent_ability_usable</code> and require
+that <b>at least one REFUSED ability costs ZERO</b>. Under the shipped identity test that is true on
+<b>14 of the 21 kits in the game</b>; under <code>cost &gt; 0</code> it is false on all but two. The
+control put the fault back and the gate went red with six failures, the raider reading <b>"2 kept,
+0 refused"</b>.</li>
+<li><b>AND THE GATE TRIPPED <code>check_da</code> &sect;3 ON ITS FIRST RUN, ON ITS OWN COMMENT.</b>
+The header explained that the file does not hand-roll the ability corpus &mdash; and named both of
+&sect;3's fingerprint strings in order to say so, which is what the fingerprint matches.
+<b>No exemption was granted:</b> an exemption granted to a sentence blinds the rule to a real
+violation arriving in that file later. The names came out of the prose instead. The mirror of the
+comments-record-removals rule is now in <code>CLAUDE.md</code> beside it.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; PYROBLAST'S COOLDOWN: PRESENTED, AND THE ANALOGY BREAKS.</b> The brief asked
+whether DR's Lunge reasoning &mdash; <i>at the end of a talent lane the price was the node, and in a
+pool there is no price</i> &mdash; applies. <b>The provenance is identical and the reasoning does
+not transfer.</b> Derived across all 223 abilities: Pyroblast's <b>6.0 delay is the longest in the
+project with nothing above it</b>, and its <b>45 mana is the second-highest cost in the game</b>.
+The only card that costs more is Death Ray at 55 &mdash; which carries cooldown 3. Lunge was 25 mana
+at 3.5 delay, ordinary on both axes, so "there is no price" was literally true of it; it is false of
+Pyroblast, which is priced twice and simply not with a cooldown. <b>Nothing was authored.</b>
+The other six cooldown-zero abilities are reported with them: <b>four are the free basic attacks
+where zero is correct</b> (Strike, Quick Shot, Smite, Magic Bolt &mdash; twelve instances across the
+twelve specs), and <b>two are BOSS-PICK cards that are not basic attacks and were not on anyone's
+list</b> &mdash; Ashes of Al'ar and Sweeping Strikes.</p>
+
+<p><b>&sect;3 &mdash; THE SECOND FLAKE IS SEEDED, AND THE BRIEF WAS WRONG ABOUT THE OTHER ONE.</b>
+<code>test_rune_battle</code> is <b>not</b> unseeded: DF &sect;0 put <code>_seeded()</code>
+immediately before the forced White Flame hit, which is the exact site that flaked, and its own
+baseline row records it. Nothing was owed there and nothing was done. <b><code>test_batch_bo</code>
+was the real one</b> &mdash; it called <code>seed()</code> zero times &mdash; and its &sect;5 NULL
+FIELD pair is seeded now, per-pair and not per-suite, so 1104 other checks keep their own stream.
+<b>The row settles at ZERO, not at a red: six consecutive readings of 1106 checks / 0 failures, and
+the compared pair now reads 17 against 10 EVERY time.</b> <b>And the documented cause was
+incomplete:</b> before the seed the same pair ranged 16&ndash;28 against 9&ndash;11 over six
+readings, and a &plusmn;10% roll on a mean of 18 cannot reach 28. <b>A crit is &times;1.5 and reaches
+exactly there</b> &mdash; so this was <code>at</code>'s shape, a second and larger coin behind a
+variance roll that was taking all the blame, which is precisely why a per-pair seed was the right
+instrument and a wider band would have been the wrong one.</p>
+
+<p><b>&sect;4 &mdash; WHAT ELSE <code>_companion_hit</code> MISSES: 84 TERMS, THREE READ.</b> The
+hero strike loop's attacker-side block runs <b>84 <code>raw</code>-mutation sites</b> and
+<code>_companion_hit</code> reads <b>three</b> of them &mdash; Mark of the Hunt, the party-wide
+Hunter's Mark, and Necrosis. <b>Most of the misses are unreachable by SHAPE rather than by
+oversight</b>, and the shape is in the signature: the function takes a float, not an
+<code>Ability</code>, so every term keyed on a card cannot apply; a beast carries no
+<code>passive_id</code> and no talent ranks at all, which removes most of the rest.
+<b>What is left is the finding.</b> Nine terms were driven onto a live summoned bear and every one
+of them attached and paid <b>ratio 1.0000 over 40 seeded blows</b>, DK's number exactly. <b>Two of
+them can reach a beast in a real run today</b>: an enemy's <b>Cripple</b>, because enemies target
+<code>_hero_side()</code> and that holds the beast &mdash; <b>so a Crippled beast bites at full
+strength</b> &mdash; and <b>Chilled</b>, because the Hoarfrost modifier stamps a summoned companion
+deliberately. <b>REPORTED AND NOT FIXED</b>, because each is a magnitude change on beast damage and
+that is new play, which is the same reason DK ruled Empower to text.</p>
+
 <h2>2026-08-29 &mdash; Batch DS: THE HUNTER CLASS GAP</h2>
 <p><i>DQ's largest structural finding, ruled and paid. The three Hunter specs held the three
 shallowest pools in the game (eight apiece), received <b>none</b> of DO's twenty-two, and

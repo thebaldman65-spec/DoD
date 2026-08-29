@@ -1424,6 +1424,15 @@ as a live decision.
   comments first or the record reads exactly like the removal not having happened. `check_dr` §4
   strips, and its negative control puts the name back in a comment and confirms the gate stays
   quiet, then puts it back in code and confirms it reds.
+· **AND THE MIRROR OF IT, WHICH COST BATCH DT A RED: A COMMENT EXPLAINING THAT A FILE DOES NOT DO
+  X NAMES X, AND A FINGERPRINT THAT MATCHES ON X THEREFORE MATCHES THE COMMENT.** `check_ds`'s
+  header set out to record that the gate does not hand-roll the ability corpus, spelled both of
+  `check_da` §3's marks to say so, and `check_da` went red on the first run naming `check_ds` as a
+  hand-rolled walk. **THE FIX IS NEVER THE EXEMPTION** — an exemption granted to a sentence blinds
+  the rule to a real violation arriving in that file later. `check_da` solves it for its own source
+  by splitting the literals at runtime; a COMMENT cannot concatenate, so the names stay out of the
+  prose and the paragraph says why they are absent. **The general form: before writing a comment
+  that names a banned string, ask whether anything greps for it.**
 
 ### NAMES THAT LOOK WRONG AND ARE RIGHT — NEVER "CORRECT" THEM
 - **THE DEVOUT'S POOL KEY IS `inquisitor`, NOT `devout`.** `SPEC_INFO["inquisitor"]` carries the

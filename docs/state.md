@@ -5,15 +5,34 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-29 (Batch DS).*
+*Last rewritten: 2026-08-29 (Batch DT).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DS — THE HUNTER CLASS GAP.** DQ's largest structural finding, ruled and paid.
-  **All three Hunter pools go 8 → 10 and the draft goes 143 → 149** (125 spec + 24 class-wide).
-  **Report: `docs/reports/DS.md`.**
+- **Last batch: DT — LOOSE ENDS.** Four items, **no new play, no magnitude moved and no card
+  authored.** A gate for the two DS specials nothing covered, the second of the three flakes
+  seeded, and two reports. **Report: `docs/reports/DT.md`.**
+- **`check_ds.gd` IS THE PERMANENT COPY OF DS'S THROWAWAY FIXTURE — 57 checks, 4 negative
+  controls, and `GATES` goes 22 → 23.** `bring_it_down` and `heads_down` had no live coverage at
+  all. **BRING IT DOWN IS MEASURED RATHER THAN ASSERTED** — 10 seeded Warden strikes read 8526
+  plain against 10233 under the capped +20%, ratio **1.2002** — because a status stamped in one
+  place and read three thousand lines away is exactly DK's Empower shape. **A THIRD ARM STRIPS THE
+  AMP FROM THE STRIKER ALONE AND REQUIRES THE RATIO BACK AT 1.0**, and the control that replaced
+  the per-wearer read with a party-wide global **passed both other arms and failed only that one.**
+- **AND THE HEADS DOWN ASSERTION IS THE ONE A STATIC CHECK COULD NOT MAKE.** Both versions of the
+  card refuse abilities, name a criterion and log a fallback; the only thing that separates the
+  shipped identity test from the `cost > 0` fault is **how many REFUSED abilities cost nothing**.
+  The gate walks a live kit through `_intent_ability_usable` and asserts that count is positive.
+  **Derived on every run, not quoted: 46 of 50 enemy abilities are free, and 14 of the 21 KITS
+  carry a zero-cost damaging ability that is not the basic** — those are the kits a cost test
+  suppresses nothing on. The control put the fault back and the raider read **"2 kept, 0 refused"**.
+- **THE GATE TRIPPED `check_da` §3 ON ITS FIRST RUN, ON ITS OWN COMMENT, AND NO EXEMPTION WAS
+  GRANTED.** The header named both fingerprint strings in the course of explaining that the gate
+  does not use them. **An exemption granted to a sentence blinds the rule to a real walk arriving
+  in that file later** — the names came out of the prose instead. The rule is in `CLAUDE.md` beside
+  the comments-record-removals one it mirrors.
 - **WHAT THE GAP WAS, DERIVED RATHER THAN QUOTED.** The three Hunter specs held the three
   **shallowest pools in the game** (8 apiece; next was the Warden's 9), received **none** of DO's
   twenty-two, and **not one of their twenty-four spec cards was a heal, a shield or hero-side
@@ -70,7 +89,7 @@ in `docs/master.html`.
   CLASS-WIDE draft card, and Smoke Bomb's function shipped at BO as Choking Smoke. **DS did not
   spend the Sharpshooter's three reserved boss-pool names** (Disengage, Suppressing Fire, Piercing
   Arrow) on its own draft cards.
-- **Next letter: DT.** `DT` sorts after `DS`, so the stamp gates still work.
+- **Next letter: DU.** `DU` sorts after `DT`, so the stamp gates still work.
 - **Phase.** The ability draft is **COMPLETE at 149 of 149** and all twelve talent trees are
   purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit
   of whether the pools hold more than one build each, DR's ruling on the two things that audit found
@@ -85,14 +104,55 @@ in `docs/master.html`.
 `docs/reports/DQ.md`.** Everything below is still open and **no gate encodes any of it**, because
 a gate encodes a ruling.
 
+**AND ITS ARITHMETIC IS MARKED STALE AS OF DT — READ THE BANNERS BEFORE QUOTING A NUMBER FROM IT.**
+The audit measured the draft at **142**; **eight cards have been authored and one retired since**
+(DR net +1, DS +6) and it is **149** now. **Five of the twelve pool rows in §2 have moved and three
+of those grew** — Swordmaster 10 → 12 and Cryomancer 12 → 11 at DR, and the three Hunter pools
+8 → 10 at DS — and every *share of 142* in the axis table is a share of the wrong denominator.
+**DT MARKED THEM RATHER THAN REFRESHING THEM, DELIBERATELY: re-deriving the counts means
+re-assigning an axis to each of the nine new cards, which is that audit's own judgement call and is
+authoring rather than repair.** The banners name DR and DS as the batches that superseded them and
+point at `test_batch_cd.PER_SPEC_DEPTH` as the one authoritative depth table — this page is not an
+instrument and nothing re-derives it, which is exactly the hazard DJ recorded a rule about.
+**One thing the banner corrects outright: the Beastmaster's 8-of-8 engine binding is NOT weakened
+by its row being stale — it reads 10-of-10 now**, because both of DS's cards read the companion.
+
 - **THE TWO GRADE-2 FINDINGS ARE CLOSED.** Flash Freeze ← Glacial Prison was answered by
   **retirement**; Battle Poise ← Answering Steel by **differentiation**. `check_dr` §4 and §6 pin
   both, and §4 asserts the SURVIVOR of the pair is still there — retiring the wrong half would
   pass every other assertion.
-- **THE COOLDOWN-ZERO QUESTION IS HALF ANSWERED AND SHOULD NOT STAY OPEN.** **Lunge is off the
-  list; PYROBLAST IS STILL ON IT** and is now the only repeatable draft card in the game.
-  `check_dr` §5 prints the live list every battery run. Either price it as a draft card or write
-  down that a repeatable card is a legitimate draft shape.
+- **THE COOLDOWN-ZERO QUESTION IS PRESENTED AT DT AND IS THE DESIGNER'S TO CLOSE.** Pyroblast is
+  still the only repeatable DRAFT card and `check_dr` §5 still prints the live list every run.
+  **DT DERIVED IT AND CAME BACK RECOMMENDING THAT THE OBVIOUS CHANGE NOT BE MADE — options and
+  full working in `docs/reports/DT.md` §2, nothing authored.**
+  - **LUNGE'S REASONING DOES NOT TRANSFER, AND THE MEASUREMENT IS WHAT SAYS SO.** DR's argument
+    was *at the end of a talent lane the price was the node, and in a pool there is no price*. The
+    PROVENANCE is identical — both were talent grants DO moved into `SPEC_DRAFT_POOLS`. **The
+    premise is not.** Lunge cost 25 of a 100 bar at 3.5 delay, ordinary on both axes. **Pyroblast's
+    6.0 delay is the LONGEST IN THE PROJECT with nothing above it** (3× `BASIC_DELAY`), and its
+    **45 mana is the SECOND-HIGHEST COST IN THE GAME** — the only card above it is Death Ray at 55,
+    **which carries cooldown 3**. It is priced twice, just not with a cooldown.
+  - **AND COOLDOWNS TICK IN THE UNIT'S OWN TURNS**, so a 6.0-delay cast has already spent three
+    basic attacks' worth of tempo before a cooldown would start counting. If one is taken anyway on
+    the UNIQUENESS argument rather than the price one, **2 rather than DR's 3** — 3 would price
+    Pyroblast strictly above the strictly heavier card.
+  - **SIX OTHER ABILITIES CARRY COOLDOWN ZERO AND FIVE ARE FREE BASIC ATTACKS WHERE IT IS
+    CORRECT** (Strike, Quick Shot, Smite, Magic Bolt). **THE OTHER TWO ARE BOSS-PICK CARDS THAT
+    HAVE NEVER BEEN IN THE CENSUS** — Ashes of Al'ar and Sweeping Strikes — because `check_dr` §5
+    walks `SPEC_DRAFT_POOLS` only. Both are repeatable, both cost real mana, neither is a basic
+    attack. That is the boss-pick-pools-were-never-audited thread producing its second thing.
+- **AND THE CENSUS HAS A BLIND SPOT DT FOUND WHILE DERIVING IT: FOUR LIVE PROTECTED-CORE BASIC
+  ATTACKS ARE NOT IN `Classes.ability_corpus()` AT ALL.** `apply_kit_overrides` builds the four
+  mage specs' `abilities[0]` at spawn — **Shadowrend, Fireball, Frostbolt and Arcane Explosion**,
+  all cost 0 and cooldown 0 — and **none sits in any pool or is returned by `spec_abilities()`**,
+  so the corpus walk reads `kit("mage")` and gets the UNOVERRIDDEN Magic Bolt instead. Their NAMES
+  are reachable through `Classes.protected_names()`; their `Ability` objects are not reachable
+  anywhere. **This is why the recorded figure is "twelve": twelve INSTANCES across twelve specs but
+  only SEVEN distinct names, and Magic Bolt — the one the corpus does carry — is nobody's live
+  basic.** **Nothing is wrong at runtime.** What is worth knowing is that any sweep built on
+  `ability_corpus()` has four live cards it structurally cannot see. **Widening the walk is a
+  change to the one authored enumeration this project has a standing rule about, so DT reported it
+  and did not take it.**
 - **THE HUNTER CLASS GAP IS RULED AT DS AND ITS DRAFT HALF IS CLOSED.** All three pools are 10
   now and the class has its first heal and its first hero-side mitigation. **ONE HALF OF THE
   FINDING IS DELIBERATELY STILL OPEN AND THE AUDIT'S BANNER SAYS SO**: the Sharpshooter still has
@@ -171,7 +231,7 @@ way to apply. The ability rule and the status rule are the same rule.*
   TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
   moved a cell** — but a restructure would need both.
 
-### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET SIXTEEN TIMES RUNNING
+### THE FLAKE THAT DG FOUND — AND SINCE DT IT IS **THE LAST ONE LEFT IN THE PROJECT**
 
 - **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN
   EVERY BATTERY SINCE — DH THROUGH DS, BOTH OF DR'S TWO AND BOTH OF DS'S — STILL OPEN, STILL
@@ -192,9 +252,18 @@ way to apply. The ability rule and the status rule are the same rule.*
     against ONE RED IN EIGHTEEN READINGS observed — so the live term is smaller than that and
     larger than zero.** The size of it is not established and should not be guessed.
   - **DD FIXED TWO CHECKS OF EXACTLY THIS SPECIES IN THIS SUITE AND DID NOT REACH THIS ONE.** Its
-    rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
+    Its rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
     comment says checks that care must do — do NOT widen the band, because the band IS the
     question.**
+  - **DT APPLIED THAT RULE TO `bo` AND IT WORKED, WHICH RAISES THE PRIOR ON THE CRIT HERE.** `bo`'s
+    documented cause was the ±10% roll alone and **that was incomplete in exactly this file's way**:
+    its compared pair ranged 16–28 over six readings, a ±10% roll on a mean of 18 spans 16.4–19.8
+    and cannot reach 28, **and a crit is ×1.5 and reaches exactly there.** A per-pair seed
+    neutralised every coin at once without anyone having to identify which one was biting, and the
+    row settled at ZERO. **The same four lines are almost certainly this row's repair too.**
+  - **AND IT IS DELIBERATELY NOT TAKEN AT DT.** `bo` was this batch's one. **One flake at a time is
+    how the effect stays attributable**, and with `bo` closed and `test_rune_battle` needing
+    nothing, **this is now the only unseeded flake in the project.**
   - **The zeros on this row are the flake being quiet, not the flake being fixed.** **One flake at
     a time is how the effect stays attributable** — `bo`'s is still open and `test_rune_battle`'s
     is three batches old. Its band and its readings are in `baselines.json`.
@@ -262,8 +331,40 @@ re-derived from the source at DM; not one was moved.**
 - **AND ONE SITE IS OUT OF REACH BY SHAPE RATHER THAN BY SCOPE.** `melted` is applied through
   `unit.add_status`, which **accepts no source argument at all** — stamping it is a signature
   change. **It is the only Harvest-readable status applied outside `_apply_status`.**
-- **`_companion_hit` READS NO `empower`, NO `wrath` AND NO `battle_shout`, AND THAT IS THE LAST
-  LIVE ITEM OUT OF THE ALLY/HERO THREAD.** A beast's blows resolve on their own damage path and
+- **`_companion_hit` READS 3 OF THE HERO STRIKE LOOP'S 84 MULTIPLIER TERMS, ENUMERATED AT DT.**
+  The attacker-side block is `battle.gd` **8613–9299** and runs **84 `raw`-mutation sites**; the
+  three it reads are **Mark of the Hunt, the party-wide Hunter's Mark and Necrosis**. **MOST OF THE
+  MISSES ARE UNREACHABLE BY SHAPE RATHER THAN BY OVERSIGHT, AND THE SHAPE IS IN THE SIGNATURE**: the
+  function takes a FLOAT, not an `Ability`, so all 26 ability-keyed terms cannot apply; a beast's
+  `passive_id` is `""` (10 more) and **every talent-rank field on it is zero, always** (20 more).
+  **Of the 78 genuinely absent terms, 76 fail the brief's own test — a term no companion can
+  receive is a non-issue.**
+  - **TWO GET THROUGH, AND NEITHER USES A DOOR ANYBODY WAS WATCHING.** **`cripple`** — enemies
+    target `_hero_side()`, which holds the living beast, and `_apply_status` lands the rider with no
+    companion filter; **two enemy abilities carry it** (Ride-by Slash, Grasping Roots). In the hero
+    loop Cripple is `raw *= 0.75`. **A CRIPPLED BEAST BITES AT FULL STRENGTH.** And **`chilled`** —
+    the HOARFROST modifier stamps a summoned companion deliberately and its branch carries no
+    `inherited` guard; **measured at 1 stack**, which misses the `>= 3` term but reaches Hungering
+    Cold's, gated `atk_chill > 0`.
+  - **MEASURED, NOT ARGUED: 40 seeded blows, ratio 1.0000 on every one of nine statuses driven onto
+    a live bear** — 30268 in every arm, which is DK's 34392-against-34392 repeating. `cripple`,
+    `chilled`, `hexed`, `battle_shout`, `warcry`, `reckless_abandon`, `blood_price`, `tempo` and
+    `wheeling_edge` all attach perfectly and move nothing.
+  - **AND ONE IS INERT TWICE OVER.** `type_dmg_bonus` CAN reach a beast — the TINDERBOX modifier
+    writes `{"fire": 0.25}` onto a summoned companion, measured — but a companion's blow carries no
+    `dmg_type` at all, so even adding the read would find nothing to apply. **`dmg_bonus` cannot
+    reach one**: the summon copies Attack, armour, speed, crit and `companion_power` off the hunter
+    and not that, and the relic hooks run at hero spawn where no companion exists.
+  - **`empower`, `wrath` AND `battle_shout` ARE THREE OF THE 76 AND ARE INSTRUMENTED; THE TWO LIVE
+    ONES ARE NOT.** `check_dk` §4 and `check_dm` §2 re-measure those three every run, so the day a
+    read site appears the gates say the ruling is stale. **`cripple` and `chilled` have no gate**,
+    and adding one is the natural companion to whatever ruling is taken.
+  - **NOTHING WAS FIXED AND THAT IS DELIBERATE.** Each is a magnitude change on beast damage — DK's
+    reason for ruling Empower to *text* — and **DS has since given the Beastmaster an interception
+    card and Bring It Down, so companions carry more of the party's output than they did at DK.**
+    That makes the decision more clearly the designer's, not less. Full enumeration in
+    `docs/reports/DT.md` §4.
+- **THE ORIGINAL DK LINE, KEPT BECAUSE THE THREE IT NAMES ARE THE INSTRUMENTED ONES.** A beast's blows resolve on their own damage path and
   read none of the hero strike loop's multiplier block, so widening any of those three would hang
   a visible chip on a beast and move no number. **Measured at 1.0000 over 40 seeded blows for all
   three — `check_dk` §4 re-measures `empower` every run and `check_dm` §2 re-measures `wrath` and
@@ -301,14 +402,31 @@ re-derived from the source at DM; not one was moved.**
 - **TEN HAND-BUILT BATTLE BOARDS REMAIN, IN SIX FILES** — `al` (2), `an`, `ax`, `bl`,
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper.** `check_da` §3
   carries them as a **named ratchet** (by file AND by count), so a new copy cannot hide among them.
-- **`test_rune_battle` IS SEEDED AND THE BAND IS NOT TIGHTENED.** DF §0 put `_seeded()` immediately
-  before the forced White Flame hit and nowhere else. **The check count is unchanged at 97.**
+- **`test_rune_battle` IS SEEDED AND THE BAND IS NOT TIGHTENED — AND DT'S BRIEF ASSERTED THE
+  OPPOSITE, SO THIS LINE IS LOAD-BEARING.** DT §3 was briefed to seed it as an unseeded suite
+  *"with `seed()` never called"*. **IT IS SEEDED**: DF §0 put `_seeded()` immediately before the
+  forced White Flame hit — **the exact site that flakes** — and nowhere else, and this row and the
+  `baselines.json` note both already said so. **Nothing was owed and nothing was done.** The one
+  stale artefact is a comment at `test_rune_battle.gd:23` still reading *"`seed()` zero times"*,
+  four lines above the fix that answers it; it is pre-DF prose inside DF's own header and was left
+  alone. **The check count is unchanged at 97.**
   **Readings cannot retire a rate measured over fifteen on this evidence.** **The seed cannot fix a
   race**, and the failure message now carries the state the forced hit happened in.
-- **`bo`'s FLAKE IS STILL OPEN**, and is **deliberately unseeded** — one flake at a time is how the
-  effect stays attributable. Its repair is `at`'s shape: seed both blows of the compared pair. Its
-  rate is in `baselines.json`. **Its floor red is REPAIRED at DG**, so the row is now the flake
-  alone.
+- **`bo`'s FLAKE IS CLOSED AT DT, AND IT SETTLED AT ZERO RATHER THAN AT A RED — SO IT WAS A FLAKE
+  AND NOT A FINDING.** `test_batch_bo.gd` called `seed()` zero times; **`_nf_seeded()` is now called
+  immediately before EACH of §5's two compared blows with the same constant**, so both arms draw one
+  identical stream and the only difference left between them is the Resonance stack count. **The
+  other 1104 checks keep their own draw** — per-pair, not per-suite, which is DF's idiom and DD's
+  method, and the reason the band was not touched: **the band is the question.**
+  - **THE PAIR IS EXACTLY REPEATABLE NOW.** Six readings before the seed: shallow 18/16/23/18/28/17
+    against deep 10/10/11/11/9/10. Six after: **17 against 10, every time.** 1106 checks / 0
+    failures on all six.
+  - **AND THE DOCUMENTED CAUSE WAS INCOMPLETE, WHICH IS WORTH MORE THAN THE FIX.** The recorded
+    reason was the ±10% roll alone. **It spans 16.4–19.8 on a mean of 18 and cannot reach 28; a crit
+    is ×1.5 and reaches exactly there.** A second and larger coin was hiding behind a variance roll
+    that was taking all the blame — `at`'s shape precisely.
+  - **The change is FOUR lines of code**, proven with a comment-stripped diff against `HEAD`: a
+    two-line helper and its two call sites. The check count does not move.
 
 ### Carried, and still awaiting a ruling
 
@@ -503,7 +621,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DS
+### THE TEST TREE, AS OF DT
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -511,18 +629,23 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-two** and
-  **DS ADDED NONE** — the brief enumerated its deliverables and a new gate is a scope decision
-  (it also risks `check_da` §3, which refuses a gate that hand-rolls the corpus walk). **THE COST
-  OF THAT IS NAMED RATHER THAN HIDDEN: `bring_it_down` AND `heads_down` HAVE NO PERMANENT LIVE
-  COVERAGE.** `check_co`'s saturation sweep exercises the other four specials as a side effect.
-  All six WERE driven through a real battle in a scratch fixture (19 checks, 0 failures) and that
-  is what found the `cost > 0` fault — but the fixture is not in the repo, so a gate is the
-  obvious next step. **There are 29 `check_*.gd`
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-three** —
+  **DT ADDED `check_ds`, WHICH IS THE COVERAGE DS NAMED AS ITS OWN COST AND DID NOT PAY.**
+  `bring_it_down` and `heads_down` had no permanent live cover; `check_co`'s saturation sweep
+  exercises the other four specials as a side effect. **THE SCRATCH FIXTURE IS NOT IN THE REPO AND
+  NEVER WAS — `ds_live.gd` IS UNTRACKED AND UNCOMMITTED** (a stray headless process was still
+  running it 98 minutes into DT, on a script that no longer exists on disk, which is its own
+  argument for a gate). **There are 30 `check_*.gd`
   files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the four that run nowhere are `check_ck_width`, `check_cu`, `check_cv` and `check_dn`.
+- **`check_ds` NEEDS NO `check_da` §3 EXEMPTION AND IT TOOK A RED TO ESTABLISH THAT.** It calls
+  neither draft-pool accessor; its **header comment named both of them** while explaining that it
+  does not, and §3's fingerprint is a substring match over the whole source. **The names came out of
+  the prose rather than an exemption being granted** — an exemption granted to a sentence would
+  blind §3 to a real walk arriving in that file later, which is worse than the violation it covers.
+  `check_da` reads 37/0 again.
 - **THE BATTERY WRITES A MANIFEST, `$OUT/.ran`, AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
   LISTING.** `run_battery.sh` does NOT clear `$OUT` between runs, so a target that failed to launch
   would otherwise be blessed by its PREVIOUS run's log. A name is appended immediately before its
@@ -531,8 +654,13 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 73 ROWS: 46 suites, 22 gates, 2 scene runs
-  and 3 harness gates.** **DR ADDED `check_dr` AND MOVED FIVE ROWS** — `test_batch_bt`, `check_co`,
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 74 ROWS: 46 suites, 23 gates, 2 scene runs
+  and 3 harness gates.** **DT ADDED `check_ds` AND MOVED NO OTHER ROW** — the `bo` seed does not
+  move its count (1106) and no other target's arithmetic changed. **`check_de` HAS NO ROW OF ITS
+  OWN, SO ITS OWN +4 FOR THE NEW GATE IS REPORTED BY NOTHING**, as always; and the battery's first
+  pass necessarily reads one `check_de` failure — a target that ran with no row is UNWATCHED, which
+  is that assertion working — so the row is added and `check_de` re-run over the same log directory,
+  which is what it is built for. **DR ADDED `check_dr` AND MOVED FIVE ROWS** — `test_batch_bt`, `check_co`,
   and the three its own first battery NOTICED and it had not predicted (`bo`, `cb`, `ce`). **IT IS
   `indent=1` AND MUST BE RE-DUMPED THAT WAY** — Python's default churns 1742 lines for a
   four-line change. **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
@@ -567,7 +695,8 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-29 (Batch DS)`** — DS moved the three Hunter pool
+- **master.html stamp: `Last updated: 2026-08-29 (Batch DT)`** — **DT MOVED THE STAMP AND NOTHING
+  ELSE IN THAT FILE**, because it adds no card, moves no magnitude and retires nothing. DS moved the three Hunter pool
   rows, the count block, Field Dressing's gloss, the stale boss-pool backlog list and Bloodbond's
   self-contradicting row (it said a QUARTER in one clause and "the half he takes can kill him" in
   the next; the code pays a quarter), and added six card rows.
@@ -615,8 +744,9 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 31 entries** (CO → DS), **389 KiB**. **The 400 KiB
-  threshold is about eleven KiB away** — DS's entry is 6 KiB. CX's cut point is CN/CO.
+- **The live file starts at Batch CO and holds 32 entries** (CO → DT), **395 KiB**. **The 400 KiB
+  threshold is about five KiB away** — DT's entry is 6 KiB, so **the next batch of any size crosses
+  it**. CX's cut point is CN/CO.
   **Re-derive this before acting on it; five batches running have now mis-predicted it, so the
   honest statement is that the NEXT ruling batch of DR's size probably reaches it.**
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (Batch 1 → CN) and is **1042 KiB**.
@@ -628,18 +758,23 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **147 files, 6.80 MiB** (DR measured 146 / 6.71 MiB). DS added `docs/reports/DS.md` and grew
-  `battle.gd`, `classes.gd`, `unit.gd`, `ability.gd`, `CLAUDE.md`, `master.html`, `design-notes.md`
-  and the changelog.
-- Heaviest: `scripts/battle.gd` **1219**, `docs/changelog.html` **389**, `docs/design-notes.md`
-  **359**, `docs/master.html` **335**, `scripts/classes.gd` **312**, `CLAUDE.md` **236**,
-  `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
-- **The 47 suite files total 1851 KiB — 26.6% of the sync**, still the single largest block. **They
-  cannot be archived (they must be in the repo to run) but they CAN be deselected from the sync.**
-  The **29** gates add **350 KiB**.
-- **`CLAUDE.md` IS 236 KiB = 3.39%**, level with DP and up from 3.37% at DR, because DS added two
-  standing rules. CW's *"under 3% and roughly flat"* target is still met on the second half and
-  missed on the first. DG through DS have all declined the prune.
+- **149 files, 6.89 MiB** (DS measured 147 / 6.80 MiB). **DT added TWO files — `check_ds.gd` and
+  `docs/reports/DT.md` — and grew no source file at all**, because it authored no game code: the
+  only `scripts/` change this batch would have been a §4 fix, and §4 was report-only. It grew
+  `CLAUDE.md`, `design-notes.md`, `draft-audit.html`, the changelog and `test_batch_bo.gd`.
+- Heaviest: `scripts/battle.gd` **1218**, `docs/changelog.html` **395**, `docs/design-notes.md`
+  **363**, `docs/master.html` **335**, `scripts/classes.gd` **312**, `CLAUDE.md` **236**,
+  `scripts/talents.gd` **178**, `scripts/unit.gd` **176**, `docs/talent-audit.html` **165**.
+- **The 47 suite files are unchanged in number and still the single largest block. They cannot be
+  archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
+  are **30** now — `check_ds.gd` is the thirtieth, at **22 KiB**.
+- **`CLAUDE.md` IS 236 KiB = 3.35%**, down from 3.39% at DS — **not because the file shrank but
+  because DT's one added clause is smaller than the sync's growth around it**, which is the same
+  reason the ratio fell at DQ. CW's *"under 3% and roughly flat"* target is still met on the second
+  half and missed on the first. **DG through DT have all declined the prune**, and DT declined it
+  while being in the file, which is the condition state.md says makes it worth taking — the reason
+  is that DT's clause belongs beside an existing rule rather than in a new section, so the file was
+  open for four lines and not for a pass.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -649,11 +784,12 @@ SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
 ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED
 
 **DB measured 72 across 26 suites. DC repaired 23. DF sorted all 47 and repaired the 37 that were
-STALE. DG closed the remaining ten.** **EVERY ACCEPTANCE BATTERY FROM DI FORWARD HAS READ ZERO
-SUITE FAILURES FROM THE THREE FLAKES, AND THAT IS NOT A REPAIR.** `test_batch_at`'s unseeded ratio,
-`bo`'s NULL FIELD flake and `test_rune_battle`'s pierce **all simply did not fire**, in any of
-them. **All three are still open and still unseeded.** A row that reads clean at a rate of about
-seventeen in eighteen has told you nothing when it reads clean.
+STALE. DG closed the remaining ten.** **EVERY ACCEPTANCE BATTERY FROM DI FORWARD READ ZERO FROM THE THREE FLAKES, AND THAT WAS NOT A
+REPAIR — IT IS A REPAIR NOW FOR TWO OF THE THREE.** `test_rune_battle`'s pierce was seeded at DF §0
+at the site that flakes, and **`bo`'s NULL FIELD flake is seeded and closed at DT, settling at ZERO
+over six readings.** **`test_batch_at`'s unseeded §1 ratio is the ONLY ONE LEFT**, it is still
+unseeded, and a row that reads clean at a rate of about seventeen in eighteen has still told you
+nothing when it reads clean.
 
 **DS's BATTERY 1 READ FOUR SUITE FAILURES AND ALL FOUR WERE DS'S OWN — `test_batch_bx`'s
 RETIRED-WORD SWEEP BITING EXACTLY AS DESIGNED.** "beast" is retired from player-facing prose, and
@@ -688,10 +824,10 @@ reach `bp` §7 at all: it is a Warrior flow.**
   instances**, named at their sites and in the open queue above.
 - **`test_batch_at` IS SEEDED IN PLACES AND NOT IN OTHERS**, and its check count is rock steady at
   **467** across every reading including both of DR's.
-- **`test_batch_bo` STILL HAS ITS FLAKY ASSERTION.** Its count is **1106** since DS moved it with
-  the pool; the §5 NULL FIELD check requires `deep < shallow` and the damage carries a 0.9–1.1
-  variance roll, so both can land on the same integer. `test_batch_bo.gd` calls `seed()` zero
-  times.
+- **`test_batch_bo`'s FLAKY ASSERTION IS FIXED AT DT AND THE COUNT DID NOT MOVE — still 1106.**
+  §5's NULL FIELD check still requires `deep < shallow`; both blows are seeded per-pair now, so the
+  pair reads 17 against 10 on every run. **`test_batch_bo.gd` called `seed()` zero times before DT
+  and calls it twice now, both in `_nf_seeded()` at that one site.**
 - **THE SUITES THAT DRIFT IN THEIR CHECK COUNT, AND THE OBSERVATION COUNT EACH BAND RESTS ON.**
   **The bands are in `baselines.json`, with the observation count beside each.**
   **THE RULE, ASYMMETRIC ON PURPOSE: floor = the lowest observation, ceiling = the highest PLUS the
