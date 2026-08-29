@@ -14,6 +14,137 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-29 &mdash; Batch DU: TWO TERMS A COMPANION SHOULD READ, AND A HOLE IN THE ONE
+AUTHORIZED WALK</h2>
+<p><i>Five items. <b>One magnitude moved and it was an ENEMY's</b>, one blind spot closed in the
+enumeration every gate is built on, one open ruling closed by declining to change anything, and one
+audit that changes nothing on purpose. No card was authored.</i></p>
+
+<p><b>&sect;1 &mdash; PYROBLAST KEEPS COOLDOWN ZERO, AND THE REASONING IS RECORDED WITH THE
+RULING.</b> DQ found it was one of only two repeatable draft cards; DR gave the other one (Lunge) a
+cooldown for exactly that shape. <b>The provenance is identical and the premise is not.</b> Lunge
+cost 25 of a 100 bar at 3.5 delay &mdash; ordinary on both axes, so DR's <i>"in a pool there is no
+price"</i> was literally true of it. <b>Pyroblast's 6.0 delay is the longest in the project with
+nothing above it</b> (three times <code>BASIC_DELAY</code>) and <b>its 45 mana is the second-highest
+cost in the game</b> &mdash; the only card above it is Death Ray at 55, which carries cooldown 3.
+<b>It is priced twice, just not with a cooldown</b>, and cooldowns tick in the unit's own turns, so
+a 6.0-delay cast has already spent three basic attacks' worth of tempo before one would begin
+counting. <b>Nothing under <code>scripts/</code> changed for this section.</b> The ruling AND its
+reasoning are in <code>CLAUDE.md</code> beside DR's framework, so the inconsistency cannot be read
+as an oversight later; <code>check_dr</code> &sect;5 keeps printing the live list every run.</p>
+
+<p><b>&sect;2 &mdash; A CRIPPLED COMPANION BIT AT FULL STRENGTH, AND THAT IS AN EXPLOIT RATHER THAN
+A DEAD CARD.</b> Enemies aim at <code>_hero_side()</code>, which holds the living companion;
+<code>_apply_status</code> lands the rider with no companion filter; and <code>_companion_hit</code>
+never read it. <b>Two enemy abilities carry Cripple</b> &mdash; the Wolfrider's Ride-by Slash and
+the Grave Totem's Grasping Roots &mdash; and in the hero strike loop Cripple is a flat quarter off.
+So an enemy debuff attached, chipped, logged and did nothing, <b>in the player's favour</b>.
+<b>MEASURED, NOT ASSERTED: 40 seeded blows read 30268 in both arms before, ratio 1.0000; they read
+30268 against 22703 after, ratio 0.7501.</b></p>
+<ul>
+<li><b>THIS IS THE LINE THAT SEPARATES IT FROM DK's REFUSAL TO WIDEN, AND BOTH DECISIONS ARE
+CORRECT UNDER IT.</b> DK found Empower attaching to a companion and paying nothing and ruled the
+card's TEXT narrow rather than teaching the read, because widening a damage loop moves a balance
+number. <b>A player effect that lands and pays nothing costs the player a card; an ENEMY effect
+that lands and pays nothing costs the player nothing.</b> The first is a dead card, the second is
+an exploit, and only one of them is fixed by narrowing the words.</li>
+<li><b>THE LOOP IS NOT WIDENED GENERALLY, AND THE REASON IS IN THE SIGNATURE.</b> DT enumerated the
+attacker-side block at <b>84 multiplier terms</b>, of which <code>_companion_hit</code> read three.
+<b>76 of the 78 genuinely absent terms are unreachable by SHAPE</b>: the function takes a float and
+not an <code>Ability</code> (26 ability-keyed terms), a companion's <code>passive_id</code> is
+always empty (10 more), and every talent-rank field on one is always zero (20 more). <b>A general
+widening would hang visible chips on a companion that change nothing, which is worse than the
+narrow miss because it reads as working.</b></li>
+</ul>
+
+<p><b>&sect;3 &mdash; CHILLED, WITH THE SAME DISCIPLINE, AND THE HALF THAT IS UNREACHABLE IS
+REPORTED RATHER THAN ENGINEERED AROUND.</b> The HOARFROST battle modifier stamps a summoned
+companion deliberately and its branch carries no <code>inherited</code> guard, so a companion can
+hold Chilled. <b>Both of the hero loop's chilled terms are read now</b> &mdash; the threshold arm
+at three stacks and Hungering Cold's per-stack arm &mdash; and all four measured arms land on their
+arithmetic exactly: 1.0000 at one stack with no node, 0.8500 at three, 0.9700 at one stack under
+the node, and <b>0.7735 with both terms live</b>.</p>
+<ul>
+<li><b>ONE STACK IS THE CEILING IN PLAY AND SAYING SO IS THE FINDING.</b> Every other application
+of Chilled in the file targets an enemy, so the frost bargain's single stack is all a companion can
+ever hold and <b>the threshold arm is unreachable today</b>. <b>The stack count was NOT raised to
+make it reachable</b> &mdash; that would be authoring. The arm is written anyway, because the hero
+loop's two terms are one rule and half a rule here is the next thing to diverge.</li>
+<li><b>TYPED RELIC DAMAGE IS DELIBERATELY STILL UNREAD, AND IS INERT TWICE OVER.</b> The Tinderbox
+modifier really can write a fire bonus onto a companion &mdash; measured &mdash; but <b>a
+companion's blow carries no damage type at all</b>, so the read would find nothing to apply.
+Fixing half of that would read as working while paying exactly what it pays now.</li>
+<li><b><code>check_du.gd</code> IS THE GATE THE RULING NEEDED, AND IT ASSERTS THE RATIO RATHER THAN
+THE READ.</b> 32 checks. <code>check_dk</code> &sect;4 and <code>check_dm</code> &sect;2 already
+re-measure <code>empower</code>, <code>wrath</code> and <code>battle_shout</code> every run;
+Cripple and Chilled had no instrument in either direction, <b>so removing these reads again would
+have been silent</b>. <b>Four negative controls, all four bit, and each bit on different arms</b>
+&mdash; deleting the threshold arm and deleting the per-stack arm fail different assertions, which
+is what proves both are load-bearing.</li>
+</ul>
+
+<p><b>&sect;4 &mdash; THE ONE AUTHORIZED CORPUS WALK COULD NOT SEE FOUR LIVE BASIC ATTACKS.</b>
+<code>apply_kit_overrides</code> replaces <code>abilities[0]</code> for each of the four mage specs
+at spawn &mdash; <b>Shadowrend, Fireball, Frostbolt and Arcane Explosion</b> &mdash; and none of the
+four sits in any pool or is returned by <code>spec_abilities()</code>. So
+<code>Classes.ability_corpus()</code> read <code>kit("mage")</code> and got the <b>unoverridden
+Magic Bolt, which is nobody's live basic attack</b>. Nothing was wrong at runtime; what was wrong is
+that DA &sect;3 makes this the one walk every gate must use, so <b>every gate built on it inherited
+the blind spot</b>. The walk applies the overrides now, using <code>protected_names</code>'s own
+idiom one function up. <b>The corpus goes 223 &rarr; 227.</b></p>
+<ul>
+<li><b>WHAT MOVED, RE-RUN THROUGH EVERY CRITERION DERIVED FROM THE WALK &mdash; AND THE ANSWER IS
+ALMOST NOTHING, WHICH IS THE USEFUL RESULT.</b> Fifteen gates read the corpus. <b>CN's population
+goes 223 &rarr; 227 and its "runs no timing bar" count does not move at all</b> (121 either way):
+all four overrides attack, so all four correctly run a bar. <b>CO's refusal population and CY's
+delay-cap population do not move</b> &mdash; neither of the four is a pure buff or a shield, so
+neither table reaches them. <b>DR's cooldown-zero census does not move either, and the brief said
+it would</b>: that census walks the draft pools directly and never touched the corpus.</li>
+<li><b>ONE BRIEF CLAIM DID NOT SURVIVE: DP's rune-field sweep is not derived through the corpus at
+all.</b> It walks <code>runes.json</code> against the source text of five scripts. It does not move
+and it could not have.</li>
+<li><b>ONE THING THE FIX MAKES VISIBLE FOR THE FIRST TIME.</b> The width sweep now measures the
+four descriptions and three <code>perfect_text</code>s it never could. <b>All twelve description
+lines are inside the 44-character ceiling; Shadowrend's <code>perfect_text</code> renders at 45,
+one over.</b> It is pre-existing, it joins a standing population of authored overruns the gate
+already reports, and it is <b>reported rather than fixed</b>.</li>
+<li><b>AND THE RECORDED FIGURE IS CORRECTED.</b> "Twelve cooldown-zero abilities in the protected
+cores" is twelve INSTANCES across twelve specs and only <b>SEVEN distinct names</b> &mdash; Strike
+&times;3, Quick Shot &times;3, Smite &times;2 and the four overrides. The claim the sentence makes
+is true either way; the number was the misleading half. <b><code>check_cz</code> &sect;0's walk
+agreement is a SET IDENTITY now rather than an equality</b>, derived off
+<code>apply_kit_overrides</code> itself so a fifth override is covered by doing nothing.</li>
+</ul>
+
+<p><b>&sect;5 &mdash; THE BOSS-PICK POOLS, AUDITED THE WAY DQ AUDITED THE DRAFT, AND RULED ON
+NOWHERE.</b> <code>check_dr</code> &sect;5 walks the draft pools only, so <code>SPEC_POOLS</code>
+had never been in any census. <b>42 entries across twelve specs, 40 distinct names.</b> Full tables
+in <code>docs/reports/DU.md</code> &sect;5. <b>Nothing was changed and no ruling was taken</b>
+&mdash; DQ's value was that it changed nothing, and DR then ruled on what it found.</p>
+<ul>
+<li><b>THE BIGGEST THING IN IT IS NOT ON THE BRIEF'S LIST: <code>CLASS_POOLS</code> IS DEAD.</b>
+Batch AN re-pointed the zone-boss award at the spec pool alone, and <code>run_state.gd</code>'s own
+comment says nothing in a run reads the class pools any more. <b>61 authored abilities sit in a
+channel no run can reach</b>, and re-opening it is one line.</li>
+<li><b>THE DEPTHS ARE THE DRAFT'S SHAPE INVERTED, AND TWO POOLS CAN EMPTY.</b> Three zone bosses
+award one pick per hero each, and a drafted card removes itself from the offer (both channels write
+the same <code>bm_abilities</code> list). <b>The Holy Cleric's boss pool is ONE card and that card
+is also in his draft pool</b> &mdash; so two of his three picks always roll empty and, if he
+drafted it, all three do. The Inquisitor's is two, both draftable. <b>The three Hunter specs &mdash;
+the ones DS had to deepen because their DRAFT pools were the shallowest in the game &mdash; hold
+the DEEPEST boss pools at five apiece, with no overlap at all.</b></li>
+<li><b>THE TWO COOLDOWN-ZERO BOSS CARDS ARE NOT THE SAME CASE, WHICH IS WHY NEITHER IS RULED ON
+HERE.</b> <b>Ashes of Al'ar rate-limits itself</b> &mdash; <code>ashes_used</code> makes it once a
+battle by construction, which its own card text states. <b>Sweeping Strikes does not</b>: 20 Rage a
+cast while building 10, at cooldown 0, with a 3-turn Daze rider.</li>
+<li><b>AND A CO-SHAPED FINDING NOBODY HAD LOOKED FOR.</b> <code>ashes</code> is <b>not</b> in
+<code>RECAST_GATED</code>, and its handler writes the same constant unconditionally &mdash; so
+recasting it while already armed costs 30 Mana and a turn and writes nothing. <b>The autoplay
+heuristic already knows not to</b> (<code>u.ashes_return &lt;= 0 and not u.ashes_used</code>); the
+player's door does not. <code>check_co</code> could not have found it: <b>it saturates the members
+of <code>RECAST_GATED</code>, so it measures the list rather than the candidates for it.</b></li>
+</ul>
+
 <h2>2026-08-29 &mdash; Batch DT: LOOSE ENDS</h2>
 <p><i>Four items and no new play. A gate for the two DS specials that shipped with no permanent
 cover, the second of the three flakes seeded, and two reports &mdash; one of which came back

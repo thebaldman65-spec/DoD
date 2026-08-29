@@ -246,9 +246,19 @@ func _s5_new_axes() -> void:
 		ok(ab != null, "%s does not resolve through `draft_ability`" % n)
 	# **THE COOLDOWN-ZERO POPULATION IS THE REASON LUNGE WAS THE ONE TO
 	# RE-AUTHOR.** DQ measured exactly two repeatable draft cards in 142 where
-	# all twelve cooldown-zero abilities in the protected cores are the free
-	# basic attack. Lunge is off that list now; Pyroblast is not, and that is
-	# still an open ruling rather than this batch's business.
+	# every cooldown-zero ability in the protected cores is the free basic
+	# attack. Lunge is off that list now; Pyroblast is not, and DU §1 RULED
+	# THAT IT STAYS THERE — priced twice, on tempo and on mana, just not with
+	# a cooldown. The list below keeps printing every run all the same.
+	#
+	# **BATCH DU CORRECTED THE FIGURE THIS COMMENT CARRIED**, which read "all
+	# twelve": twelve is the count of INSTANCES across twelve specs, and there
+	# are SEVEN distinct names behind them. The claim is true either way.
+	#
+	# **AND THE WALK BELOW IS STILL THE DRAFT POOLS AND NOTHING ELSE**, which
+	# is deliberate and is why DU §5 audited the boss-pick pools separately
+	# rather than folding them in here: a census that silently changed
+	# population would make every earlier reading of this line incomparable.
 	var zero: Array = []
 	for spec in Classes.SPEC_INFO:
 		for n2 in Classes.spec_draft_pool(spec):

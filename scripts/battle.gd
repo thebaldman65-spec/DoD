@@ -20689,6 +20689,53 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	var is_crit := randf() < CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
 	if is_crit:
 		raw *= 1.5
+	# BATCH DU §2/§3 — THE TWO TERMS OF THE HERO STRIKE LOOP'S EIGHTY-FOUR THAT
+	# A COMPANION CAN ACTUALLY WEAR. DT enumerated that block and found 78
+	# genuinely absent from this function; SEVENTY-SIX ARE UNREACHABLE BY SHAPE
+	# RATHER THAN BY OVERSIGHT, and the shape is in this signature — it takes a
+	# float and not an `Ability`, so 26 ability-keyed terms cannot apply; a
+	# companion's `passive_id` is always the empty string (10 more); and every
+	# talent-rank field on one is always zero, because a companion is never
+	# allocated a tree (20 more). A TERM NOTHING CAN RECEIVE IS A NON-ISSUE, so
+	# the loop is deliberately NOT widened generally: a general widening would
+	# hang visible chips on a companion that change nothing, which is worse than
+	# the narrow miss because it reads as working.
+	#
+	# THESE TWO ARE DIFFERENT. Both attach to a live companion today, both hang
+	# a chip, and before this batch both moved nothing — measured at 40 seeded
+	# blows, ratio 1.0000 on each.
+	#
+	# CRIPPLE IS AN *ENEMY'S* EFFECT FAILING, WHICH IS WHY IT IS REPAIRED HERE
+	# WHERE DK RULED A PARTY-WIDE BUFF TO *TEXT* INSTEAD. `_choose_enemy_action`
+	# picks its target from `_hero_side()`, which holds the living companion,
+	# and `_apply_status` lands the rider on whatever was struck with no
+	# companion filter — so the Wolfrider's Ride-by Slash and the Grave Totem's
+	# Grasping Roots each landed a -25% that paid nothing, in the PLAYER's
+	# favour. A dead player card is a dead card; a dead enemy debuff is an
+	# exploit, and that is the whole distinction.
+	#
+	# CHILLED REACHES A COMPANION THROUGH THE HOARFROST MODIFIER, which stamps a
+	# summoned one deliberately (AQ §4 — it joins a fight already under a
+	# bargain) on a branch that carries no `inherited` guard. **MEASURED AT ONE
+	# STACK, AND ONE IS THE CEILING IN PRACTICE**: every other application of
+	# this status in the file targets an enemy, so the `>= 3` arm below is
+	# UNREACHABLE on this path today. It is written anyway rather than dropped —
+	# the hero loop's two chilled terms are one rule, and half a rule here is
+	# the next thing to diverge — and the stack count was NOT raised to make it
+	# reachable, which would be authoring rather than repair.
+	#
+	# `type_dmg_bonus` IS DELIBERATELY NOT READ, AND IT IS INERT TWICE OVER. The
+	# Tinderbox modifier really can write a fire bonus onto a companion, but a
+	# companion's blow carries no damage type at all — see the flat physical
+	# resist read below — so the term would find nothing to apply to. Fixing
+	# half of that would read as working while paying exactly what it pays now.
+	if comp.has_status("cripple"):
+		raw *= 0.75
+	var comp_chill := comp.status_stacks("chilled")
+	if comp_chill >= 3:
+		raw *= 0.85
+	if comp_chill > 0:
+		raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * comp_chill
 	# Mark of the Hunt: the pack tears at the marked prey.
 	var pm: BattleUnit = comp.pack_master
 	if pm != null and victim.has_status("hunt_mark") \

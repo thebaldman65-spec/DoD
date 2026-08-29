@@ -940,6 +940,34 @@ static func ability_corpus() -> Array:
 		for nm in class_draft_pool(key):
 			add.call(pool_ability(String(nm)))
 	for spec in SPEC_INFO:
+		# BATCH DU §4 — THE HOLE THAT WAS LEFT AFTER CZ CLOSED THE OTHER ONE.
+		# `apply_kit_overrides` REPLACES `abilities[0]` for each of the four mage
+		# specs at spawn — Shadowrend, Fireball, Frostbolt and Arcane Explosion —
+		# and NONE of the four sits in any pool or is returned by
+		# `spec_abilities()`. The `kit(key)` loop above reads the class kit
+		# UNOVERRIDDEN, so it got Magic Bolt, **which is nobody's live basic
+		# attack**, and four live protected-core cards were structurally
+		# invisible to every sweep built on this walk.
+		#
+		# THE FIX IS `protected_names`'s OWN IDIOM, one function up: build a cfg
+		# off the class kit, apply the overrides, read what comes out. It is not
+		# a second enumeration — `kit()` returns FRESH `Ability` objects on every
+		# call, so replacing an element of that array mutates nothing shared, and
+		# the eight specs that override nothing simply re-offer names `add` has
+		# already seen and deduplicates.
+		#
+		# NOTHING WAS WRONG AT RUNTIME AND NOTHING ABOUT THE GAME CHANGES HERE.
+		# What changes is what the sweeps can SEE: this walk is the one
+		# authorised enumeration (DA §3), so every gate built on it inherited the
+		# blind spot, and `check_dr` §5's own comment still records the figure
+		# that blind spot produced — twelve INSTANCES across twelve specs, but
+		# only SEVEN distinct names.
+		var du_class := class_of_spec(spec)
+		if du_class != "":
+			var du_cfg := {"abilities": kit(du_class)}
+			apply_kit_overrides(du_cfg, spec)
+			for du_ab in du_cfg["abilities"]:
+				add.call(du_ab)
 		for ab in spec_abilities(spec):
 			add.call(ab)
 		for nm in spec_pool(spec):
@@ -3844,10 +3872,17 @@ static func draft_ability(display_name: String) -> Ability:
 		# THE HEADER SAYS SO RATHER THAN LEAVING THE CLAIM TO ROT.** LUNGE is
 		# re-authored below and is no longer its talent grant's twin. The reason
 		# is the one DQ measured: it arrived carrying **cooldown 0**, and of 142
-		# draft cards only it and Pyroblast repeat every turn, where all twelve
-		# cooldown-zero abilities in the protected cores are the free basic
+		# draft cards only it and Pyroblast repeat every turn, where every
+		# cooldown-zero ability in the protected cores is the free basic
 		# attack. At the end of a lane the price was the node; in a pool there
 		# is no price. The other twenty-one are untouched and still verbatim.
+		# **BATCH DU CORRECTED THE COUNT THIS SENTENCE USED TO CARRY.** It said
+		# "all twelve", and twelve is the number of INSTANCES across twelve
+		# specs — there are only SEVEN distinct names behind them (Strike x3,
+		# Quick Shot x3, Smite x2 and the four kit overrides), and Magic Bolt,
+		# the one the corpus walk carried before DU §4 applied the overrides,
+		# is nobody's live basic attack at all. The claim the sentence is making
+		# is true either way; the number was the misleading half.
 		# **ONE OTHER TEXT CHANGED AND IT IS A CORRECTION, NOT A DRIFT:**
 		# Battle Shout's card promised "+12% ... Lasts 3 turns", which were
 		# `battle_shout_node`'s magnitudes — index 1 of `[8, 12, 18]`. Nothing

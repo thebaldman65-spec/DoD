@@ -2657,6 +2657,67 @@ clause already in its own pool — a BD §4 violation authored on the strength o
   DOT, METER-MOVE and DEATH-DENY. **Nine absent axes, not three** — so the brief's diagnosis was
   right and its remedy was aimed at the one axis the class already had.
 
+### A REPEATABLE DRAFT CARD IS A LEGITIMATE SHAPE WHEN IT IS PRICED ELSEWHERE (Batch DU §1)
+
+**PYROBLAST KEEPS COOLDOWN ZERO, AND THE REASONING IS RECORDED BESIDE THE RULING RATHER THAN LEFT
+TO BE RE-DERIVED.** DQ's finding was that it is the only repeatable card in the draft; DR then gave
+LUNGE a cooldown for exactly that shape. **Without the reasoning written down, the next batch reads
+the two decisions as an inconsistency and "fixes" the wrong one.**
+
+> **A cooldown is not this project's only rate limiter.** A card priced hard enough on TEMPO or on
+> RESOURCE is already bounded, and a cooldown laid on top of that prices it twice.
+
+· **DR's PRECEDENT DOES NOT TRANSFER, AND THE MEASUREMENT IS WHAT SAYS SO.** The PROVENANCE is
+  identical — both were talent grants DO moved wholesale into `SPEC_DRAFT_POOLS`, and both walked
+  in still carrying the cooldown a gated lane-end ability never needed. **The premise is not.** DR's
+  argument was *at the end of a talent lane the price was the node, and in a pool there is no
+  price*. Lunge cost 25 of a 100 bar at 3.5 delay — **ordinary on both axes**, so that was
+  literally true of it. **PYROBLAST'S 6.0 DELAY IS THE LONGEST IN THE PROJECT with nothing above
+  it** (three times `Ability.BASIC_DELAY`), and **its 45 mana is the SECOND-HIGHEST COST IN THE
+  GAME** — the only card above it is Death Ray at 55, **which carries cooldown 3**. A full
+  Pyromancer bar buys two casts with ten to spare.
+· **AND COOLDOWNS TICK IN THE UNIT'S OWN TURNS.** A 6.0-delay cast has already spent three basic
+  attacks' worth of tempo before a cooldown would begin counting down, so a cooldown of 3 would
+  roughly HALVE the frequency of a card whose entire identity is the one enormous slow blow.
+· **IF ONE IS EVER TAKEN ANYWAY IT IS ON THE UNIQUENESS ARGUMENT AND NOT THE PRICE ONE, AND IT IS
+  2 RATHER THAN DR's 3** — 3 would price Pyroblast strictly above the card that is strictly
+  heavier on both of the axes a cooldown is not measuring.
+· **THE POPULATION IS RE-DERIVED EVERY RUN AND NOT REMEMBERED.** `check_dr` §5 prints the live
+  cooldown-zero draft list on every battery. **It walks the DRAFT pools only**, deliberately — the
+  boss-pick pools are a separate census, and folding them in would make every earlier reading of
+  that line incomparable. DU §5 audited them separately and ruled on nothing.
+
+### A DEAD PLAYER CARD IS A DEAD CARD; A DEAD ENEMY DEBUFF IS AN EXPLOIT (Batch DU §2)
+
+**THIS IS THE LINE THAT SEPARATES DU's WIDENING FROM DK's REFUSAL TO WIDEN, AND BOTH DECISIONS ARE
+CORRECT UNDER IT.** DK found Empower attaching perfectly to a companion and paying nothing, and
+ruled the CARD's text narrow rather than teaching `_companion_hit` to read it — because widening a
+damage loop moves a balance number, which is the designer's. **DU widened it for Cripple and
+Chilled.** The difference is not size and it is not confidence:
+
+> **A player effect that lands and pays nothing costs the player a card.**
+> **An ENEMY effect that lands and pays nothing costs the player nothing — it is a malus the
+> player is escaping, and the chip says otherwise.** The first is a dead card; the second is an
+> exploit, and only one of them is fixed by narrowing the words.
+
+· **WHAT IT REACHED THROUGH.** `_choose_enemy_action` picks its target from `_hero_side()`, which
+  holds the living companion, and `_apply_status` lands the rider on whatever was struck **with no
+  companion filter** — so two enemy abilities landed a -25% that never applied. Chilled reaches one
+  through the frost battle modifier, which stamps a summoned companion deliberately.
+· **NARROW, AND NAMED.** `_companion_hit` reads those two statuses and nothing else. **Of the hero
+  strike loop's 84 multiplier terms, 76 of the misses are unreachable BY SHAPE** — the function
+  takes a float and not an `Ability`, a companion's `passive_id` is always empty, and every
+  talent-rank field on one is always zero. **A GENERAL WIDENING WOULD HANG VISIBLE CHIPS ON A
+  COMPANION THAT CHANGE NOTHING, WHICH IS WORSE THAN THE NARROW MISS BECAUSE IT READS AS WORKING.**
+· **A MAGNITUDE CHANGE IS MEASURED, NOT ASSERTED, AND THE GATE IS PART OF THE RULING.**
+  `check_du` §1 and §2 measure the ratios on forty seeded blows every battery run — 1.0000 before,
+  0.7501 after for Cripple — because a gate that asserted the READ SITE EXISTS would have passed on
+  every one of the nine statuses DT measured attaching and paying nothing.
+· **AND AN EFFECT CAN BE INERT TWICE OVER.** Typed relic damage CAN be written onto a companion,
+  and is still deliberately unread: **a companion's blow carries no damage type at all**, so the
+  read would find nothing to apply. Fixing half of that would read as working while paying exactly
+  what it pays now.
+
 ## STANDING RULE — THE THREE DOORS THAT BITE A NEW DRAFT CARD (Batch DS §2)
 
 **ALL THREE ARE MECHANICAL, ALL THREE WENT RED ON DS'S FIRST RUN, AND ALL THREE ARE CHEAPER TO

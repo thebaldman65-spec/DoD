@@ -47,9 +47,15 @@ const WALK_EXEMPT := {
 	# is still §0's re-derivation of the Batch CL walk and still needs the pools
 	# directly — but its JOB has inverted: DO moved all twenty-two talent grants
 	# into `SPEC_DRAFT_POOLS`, which the CL walk reads, so the five it used to be
-	# missing are now inside it and §0 asserts the two walks AGREE. The old
-	# reason would have read as current truth for as long as nobody re-derived it.
-	"check_cz.gd": "`_cl_only_corpus` re-derives the Batch CL walk directly — since DO it asserts the two walks agree",
+	# missing are now inside it. The old reason would have read as current truth
+	# for as long as nobody re-derived it.
+	# **BATCH DU CORRECTED IT A SECOND TIME, FOR THE SAME REASON.** DU §4 taught
+	# `Classes.ability_corpus()` to apply the kit overrides, which the CL walk
+	# structurally cannot — so §0 no longer asserts the two walks AGREE; it
+	# asserts the difference between them is EXACTLY the overridden basics,
+	# derived rather than listed. The exemption itself is untouched: the reason
+	# it exists is the direct pool reads, and those have not moved.
+	"check_cz.gd": "`_cl_only_corpus` re-derives the Batch CL walk directly — since DU it asserts the two walks differ by exactly the kit overrides",
 	# BATCH DN — THE MARK OVER-FIRES HERE, AND THE EXEMPTION RECORDS WHY RATHER
 	# THAN HIDING IT. The fingerprint is the two draft-pool calls, and it stands
 	# in for the defect "this gate re-derived the corpus and is therefore missing

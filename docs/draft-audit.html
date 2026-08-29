@@ -576,10 +576,18 @@ point and the node was the price. They now sit beside eight to twelve cards pric
 
 <h3>THE FINDING THE SCALE TABLE MAKES: A COOLDOWN OF ZERO MEANS SOMETHING IN THIS GAME, AND TWO OF
 THE TWENTY-TWO HAVE ONE</h3>
-<p><b>Every one of the twelve cooldown-zero abilities in the protected core kits is the hero's free
-basic attack</b> &mdash; Strike, Smite, Fireball, Frostbolt, Quick Shot, Shadowrend, Arcane
-Explosion. Nothing else in the game is repeatable every turn. <b>Of the 142 draft cards, exactly two
-have no cooldown, and both are DO's: Pyroblast and Lunge.</b></p>
+<p><b>Every cooldown-zero ability in the protected core kits is the hero's free basic attack</b>
+&mdash; Strike, Smite, Fireball, Frostbolt, Quick Shot, Shadowrend, Arcane Explosion. Nothing else
+in the game is repeatable every turn. <b>Of the 142 draft cards, exactly two have no cooldown, and
+both are DO's: Pyroblast and Lunge.</b></p>
+<p style="border:1px dashed #888;padding:6px;background:#fafafa"><b>THE COUNT IN THAT SENTENCE WAS
+CORRECTED AT BATCH DU AND THE CLAIM WAS NOT.</b> It read <i>"the twelve"</i>, which is the number
+of INSTANCES across twelve specs; the list beside it is <b>seven distinct names</b>, and both
+figures are right about different things. <b>DU &sect;4 also found why the seven were never easy to
+count:</b> four of them &mdash; Shadowrend, Fireball, Frostbolt and Arcane Explosion &mdash; are
+built by <code>apply_kit_overrides</code> at spawn, sit in no pool, and were invisible to
+<code>Classes.ability_corpus()</code> entirely, so the walk carried <b>Magic Bolt</b> instead,
+which is nobody's live basic attack. The walk applies the overrides now.</p>
 <p>That is not an oversight in DO. <b>It is the shape of a talent grant arriving intact</b>: at the
 end of a lane the price was the node &mdash; nine rows of points &mdash; so no cooldown was needed
 to bound it. In a pool where every other card pays a cooldown, a repeatable card is a different kind
@@ -589,6 +597,22 @@ therefore the designer's), or <i>rule that a repeatable card is a legitimate dra
 so in <code>CLAUDE.md</code> so the next author knows it is allowed. <b>What should not happen is
 that it stays undecided</b>, because the next batch that adds a card will copy whichever precedent
 it happens to read.</p>
+<p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>RESOLVED, IN TWO HALVES, AT
+BATCHES DR AND DU &mdash; AND THE TWO HALVES WENT OPPOSITE WAYS ON PURPOSE.</b>
+<b>LUNGE TOOK THE FIRST CHOICE at DR &sect;4</b>: cooldown 0 &rarr; 3, on the reasoning this
+audit stated &mdash; at the end of a lane the price was the node, and in a pool there is no price.
+<b>PYROBLAST TOOK THE SECOND AT DU &sect;1</b>, and the derivation is what separates them.
+Lunge cost 25 of a 100 bar at 3.5 delay, <b>ordinary on both axes</b>. <b>Pyroblast's 6.0 delay is
+the longest in the project with nothing above it</b> &mdash; three times <code>BASIC_DELAY</code>
+&mdash; and <b>its 45 mana is the second-highest cost in the game</b>; the only card above it is
+Death Ray at 55, <i>which carries cooldown 3</i>. <b>It is priced twice, just not with a
+cooldown</b>, and cooldowns tick in the unit's own turns, so a 6.0-delay cast has already spent
+three basic attacks' worth of tempo before one would begin counting. <b>The rule this audit asked
+for is in <code>CLAUDE.md</code>, with its reasoning beside it</b>, so the next author reads why the
+two cards differ instead of reading an inconsistency: <i>a repeatable draft card is a legitimate
+shape when it is priced elsewhere.</i> <b>If a cooldown is ever taken on Pyroblast anyway it is on
+the UNIQUENESS argument and it is 2, not 3</b> &mdash; 3 would price it strictly above the card that
+is strictly heavier.</p>
 
 <h3>AND NINE OF THE TWENTY-TWO SHIPPED WITH A CLAUSE THEY CAN NO LONGER HAVE &mdash; THE COUNT IS
 TEN</h3>

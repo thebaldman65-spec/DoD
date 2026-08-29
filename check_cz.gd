@@ -154,12 +154,48 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 		ok(by_name.has(nm), "%s is not in the complete corpus" % nm)
 		ok(cl_names.has(nm),
 			"%s is NOT in the CL walk — DO put it in a draft pool, so it must be" % nm)
-	# AND THE WHOLE POINT, AS ONE LINE: the two walks agree now. CL's
-	# enumeration reached 211 of 216 for as long as talents granted abilities;
-	# nothing lives outside a kit or a pool any more.
-	ok(cl.size() == corpus.size(),
-		"the CL walk and the complete walk now agree (%d vs %d)" % [
-			cl.size(), corpus.size()])
+	# AND THE WHOLE POINT. CL's enumeration reached 211 of 216 for as long as
+	# talents granted abilities; DO put all twenty-two into pools and the two
+	# walks agreed on a COUNT from DO to DT.
+	#
+	# **BATCH DU §4 SEPARATED THEM AGAIN, ON PURPOSE, AND THE EQUALITY IS
+	# REPLACED BY A SET IDENTITY RATHER THAN LOOSENED.** `apply_kit_overrides`
+	# builds four mage specs' `abilities[0]` at spawn and none of the four sits
+	# in any pool; the complete walk applies the overrides now and reaches them,
+	# and the CL walk reads the class kit UNOVERRIDDEN and structurally cannot.
+	# A bare `!=` here would have said nothing about WHICH four, and a hard `+ 4`
+	# would rot the day a fifth override is authored — so the difference is
+	# DERIVED off `apply_kit_overrides` itself and asserted as a set. An ability
+	# that fell outside every kit and pool would still be caught: it would be in
+	# NEITHER walk, so it cannot hide inside this difference.
+	var over_names := {}
+	for spec3 in Classes.SPEC_INFO:
+		var ck3 := Classes.class_of_spec(spec3)
+		if ck3 == "":
+			continue
+		var plain_kit: Array = Classes.kit(ck3)
+		var cfg3 := {"abilities": Classes.kit(ck3)}
+		Classes.apply_kit_overrides(cfg3, spec3)
+		var over_kit: Array = cfg3["abilities"]
+		for i3 in over_kit.size():
+			var nm3: String = over_kit[i3].display_name
+			if i3 >= plain_kit.size() or nm3 != String(plain_kit[i3].display_name):
+				over_names[nm3] = true
+	var only_complete: Array = []
+	for ab3 in corpus:
+		if not cl_names.has(ab3.display_name):
+			only_complete.append(ab3.display_name)
+	only_complete.sort()
+	var expected: Array = over_names.keys()
+	expected.sort()
+	ok(only_complete == expected,
+		"the walks differ by %s; the ONLY difference may be the kit overrides %s" % [
+			str(only_complete), str(expected)])
+	ok(cl.size() + expected.size() == corpus.size(),
+		"the CL walk reaches %d and the complete walk %d — that is %d apart, not the %d overrides" % [
+			cl.size(), corpus.size(), corpus.size() - cl.size(), expected.size()])
+	print("  the complete walk reaches %d the CL walk cannot: %s" % [
+		expected.size(), ", ".join(expected)])
 
 	# ---- CN's CRITERION AND CO's, RE-RUN OVER THE FIVE. REPORT, NOT REPAIR ----
 	# CN decides whether a card runs a TIMING BAR; CO decides whether a recast

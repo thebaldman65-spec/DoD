@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A dead player card and a dead enemy debuff are not the same defect (Batch DU) — 2026-08-29
+
+DK found Empower attaching perfectly to a companion, hanging a chip, and moving no number. It ruled
+the CARD's text narrow rather than teaching `_companion_hit` to read it, and the reason it gave was
+right: **widening a damage loop moves a balance number, which is the designer's call and not a
+repair.** DT then measured seven more statuses doing exactly the same thing, all at ratio 1.0000.
+
+**DU widened the loop for two of them, and the difference is not size and not confidence.**
+
+> A player effect that lands and pays nothing **costs the player a card**.
+> An ENEMY effect that lands and pays nothing **costs the player nothing** — it is a malus they are
+> escaping while the chip says otherwise.
+
+The first is a dead card, and narrowing the words fixes it honestly. The second is an exploit, and
+narrowing the words does not fix anything at all: you would be writing down that the enemy's debuff
+is not supposed to work. **Two enemy abilities land Cripple, an enemy aims at the whole hero side
+including the companion, and a crippled companion bit at full strength.** That is the whole
+argument, and it is why the same evidence produced opposite decisions two batches apart.
+
+**The corollary is the part worth keeping.** The test is not "does this effect reach the loop" — it
+is **who is being paid when it fails**. Applied to the other 76 misses the answer comes back the
+other way at once: they are terms a companion cannot receive at all, and a general widening would
+hang visible chips on it that change nothing. **A promise that reads as working is worse than a
+promise that is visibly absent**, which is the same reason DK's ruling was correct on its own case.
+
+## An enumeration everything is built on is worth more than the thing it enumerates (Batch DU) — 2026-08-29
+
+DA §3 ruled that `Classes.ability_corpus()` is the one authorized walk and made a gate fingerprint
+anything hand-rolled. That was the right ruling and it had an unbudgeted cost nobody priced:
+**every criterion in the project now inherits whatever that one walk cannot see.**
+
+What it could not see was four live basic attacks. `apply_kit_overrides` replaces `abilities[0]`
+for the four mage specs at spawn; none of the four replacements sits in a pool, so the walk read
+the class kit unoverridden and came back holding **Magic Bolt, which is nobody's live basic
+attack.** Nothing was wrong at runtime. Fifteen gates were quietly measuring a corpus with a hole
+in it, and the recorded figure the hole produced — *"twelve cooldown-zero abilities in the
+protected cores"* — is twelve INSTANCES and seven distinct names.
+
+**The result of re-running every criterion through the fixed walk is that almost nothing moved, and
+that is the finding rather than an anticlimax.** The four are basic attacks: they run a timing bar
+(correctly), they are not pure buffs, they are not shields, and they carry no cooldown. **The value
+was never going to be in what the correction changed** — it is that the sweeps can now be believed,
+and that the one thing that DID surface was a text-standard overrun no width sweep had ever been
+able to reach.
+
+**And the lesson generalises past this walk.** A shared enumeration is a single point of
+correctness for everything downstream of it, so the cost of a blind spot in it is not one defect —
+it is one defect times the number of consumers, **all of which report green.** The place to look
+for the next one is the same place this was: a piece of state built at RUNTIME that the authored
+data does not carry.
+
 ## A price paid in tempo is still a price (Batch DT) — 2026-08-29
 
 Pyroblast is the last cooldown-zero card in the draft, and the obvious move is to do to it what DR

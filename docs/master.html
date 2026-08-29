@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-29 (Batch DT)</b></p>
+<p align="right"><b>Last updated: 2026-08-29 (Batch DU)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -607,6 +607,15 @@ Cannon; Fireball perfects at 25% of Attack. <b>Neither Arcane Cannon nor Magi's 
 carries a per-stack damage term</b> — the passive compounds, and an ability-side per-stack
 multiplier on top of it would square the escalation. Both keep their Break terms, which
 ride stacks on a different axis.</li>
+<li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
+carry their own damage roll and their own flat critical, and of the strike loop's terms they read
+<b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, <b>Necrosis</b>, and &mdash; since
+Batch DU &mdash; <b>Cripple and Chilled</b>. <b>The rest is unreachable rather than omitted</b>:
+almost every remaining term is keyed on the ability being cast, on a specialization passive, or on
+a talent rank, and a summoned companion has none of the three. <b>Cripple was the one that
+mattered</b>: two enemy abilities land it, an enemy aims at the whole hero side including the
+companion, and until DU a Crippled companion bit at full strength &mdash; a malus the chip
+promised and the arithmetic refused.</li>
 <li><b>Target modifiers:</b> Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Arcanist Resonance +0.75% × N(N+1)/2 damage
 <i>taken</i> at N stacks — the same compounding curve at half the step, and uncapped
@@ -795,7 +804,7 @@ survive at 1 HP and the Cleric loses 1 Mercy. She must be holding one when it la
 <tr><td>Shieldwall</td><td>+25% Block chance while the stance holds.</td></tr>
 <tr><td>Empower</td><td>+25% damage dealt.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
-<tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
+<tr><td>Cripple</td><td>−25% damage dealt. <b>A summoned companion pays it too (Batch DU)</b>.</td></tr>
 <tr><td><b>Hexed</b></td><td><b>−15% damage dealt, for the rest of the battle.</b> The
 Cursed Visage's payload (&sect;4.7), laid on every living enemy at once for no turn &mdash; which is
 why the number is small where Cripple's is large. <b>The two stack</b> when both land: separate
