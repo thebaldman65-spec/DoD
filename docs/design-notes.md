@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An absence is a measurement, and nobody measures the thing they already believe (Batch DS) — 2026-08-29
+
+DR's brief was wrong about an axis being *exclusive*. DS's brief was wrong about one being
+*missing* — and the second mistake is the more dangerous of the two, because an exclusivity claim
+invites you to go looking for a second owner while an absence claim invites you to go build the
+thing.
+
+The sentence was *"the Hunter class has no Break generation anywhere, and a bear breaking armour is
+the most natural source in the game."* The second clause is good design; the first is false by a
+distance. **Twelve of the thirty Hunter draft cards generate Break.** The Beastmaster's own Unleash
+lands it behind the companion's strike, and the Sharpshooter's Fault Line is a *dedicated* Break
+card that the draft audit scores as one of his five distinct decisions. Had the card been authored
+as briefed, it would have been a second copy of a clause already sitting in its own pool — the
+thing BD §4 forbids — and it would have been authored on the strength of a sentence nobody checked.
+
+**What made it invisible is that the field is not called what the mechanic is called.** `pressure`
+IS Break. A card generates Break without its description ever using the word: Twin Hunt says
+nothing about it and carries 12, Calibrating Shot says nothing and carries 8. So a careful reading
+of all thirty *descriptions* — which is what a brief is written from — returns the wrong answer
+confidently. The only reading that works is a sweep of the data.
+
+**And the diagnosis underneath the wrong remedy was right, which is what makes this worth
+recording rather than just correcting.** Nine effect axes were genuinely absent from all
+twenty-four Hunter spec cards: HEAL, SHIELD, all three MIT- axes, AMP-TEAM, RESOURCE, STRIP, DOT,
+METER-MOVE. The brief named three of them and then spent its sixth card on the one axis the class
+was already well supplied with. **A correct diagnosis does not make the prescription correct** —
+which is DI's lesson from the other direction, where the finding was right and the fix would have
+opened a second hole.
+
+The rule that came out of it is a mirror of DR's and lives beside it: *before declaring an axis
+absent from a class, derive it — from the data, not from the prose.* The two together are one
+rule with two faces. **An axis claim in either direction is a population question, and a
+population question is answered by counting.**
+
 ## A single implementation reads like a single owner, and is not one (Batch DR) — 2026-08-28
 
 The brief for this batch said cooldown manipulation belonged to the Swordmaster, and gave a good

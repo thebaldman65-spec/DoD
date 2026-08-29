@@ -2456,9 +2456,17 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**BATCH DR MOVED THE TOTAL TWICE IN ONE BATCH AND THE NET IS +1. THE DRAFT
-STANDS AT 143 OF 143 AND NOTHING IS OWED — 119 SPEC + 24 CLASS-WIDE.** §2 retired one Cryomancer
-card as an exact duplicate at a worse price (12 → 11) and §4 gave the Swordmaster two (10 → 12).
+**BATCH DS CLOSED THE HUNTER CLASS GAP. THE DRAFT STANDS AT 149 OF 149 AND NOTHING IS OWED
+— 125 SPEC + 24 CLASS-WIDE.** Its three specs held the three SHALLOWEST pools in the game (eight
+apiece), received NONE of DO's twenty-two, and **not one of their twenty-four cards was a heal, a
+shield or hero-side mitigation.** All three read TEN now, matching the Cleric class, and each
+spec's defence is shaped by its own engine — the companion for the Beastmaster, the Focus meter
+for the Sharpshooter, the affliction board for the Survivalist. **THE FLOOR STAYS AT EIGHT AND IS
+NOW SLACK EVERYWHERE**: the Warden's nine is the shallowest pool in the game, and `SPEC_FLOOR`
+catches a pool that EMPTIES rather than tracking the deepening.
+**BATCH DR MOVED THE TOTAL TWICE IN ONE BATCH AND THE NET WAS +1, TO 143 OF 143.** §2 retired one
+Cryomancer card as an exact duplicate at a worse price (12 → 11) and §4 gave the Swordmaster
+two (10 → 12).
 **BATCH DO MOVED IT BEFORE THAT, FOR THE FIRST TIME SINCE CI, AND IT WAS NOT A NEW TRANCHE
 EITHER** — it stood at 142 of 142 with 118 spec. Twenty-two talent nodes
 GRANTED an ability; the charter forbids that outright now, so all twenty-two cards moved into
@@ -2469,7 +2477,7 @@ EXPECTATION IS A TABLE NOW, NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH`): w
 again would re-assert the CI-era shape over a tree that has moved past it.
 **THE TARGET WAS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
 CLASS-WIDE = 120; THE DRAFT STOOD AT 120 OF 120 AND NOTHING WAS OWED (Batch CI), AND DO'S
-TWENTY-TWO TOOK IT TO 142 OF 142 — AND DR'S NET +1 TO 143 OF 143.** The ~96 came from an older
+TWENTY-TWO TOOK IT TO 142 OF 142, DR'S NET +1 TO 143 OF 143 AND DS'S SIX TO 149 OF 149.** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -2479,8 +2487,10 @@ keep it as written (they are the record of what each batch believed — CA's rul
 the correction.
 **TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
 nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` REACHED 96 AND THE DRAFT
-REACHED 120 OF 120 THERE. **SINCE BATCH DR IT IS 119 AND 143 OF 143: ALL TWELVE SPECS DRAFT FROM
-AT LEAST EIGHT, NINE OF THEM FROM MORE, ALL FOUR CLASS POOLS HOLD SIX, AND NOTHING IS OWED.**
+REACHED 120 OF 120 THERE. **SINCE BATCH DS IT IS 125 AND 149 OF 149: ALL TWELVE SPECS DRAFT FROM
+AT LEAST NINE — ELEVEN OF THEM FROM TEN OR MORE — ALL FOUR CLASS POOLS HOLD SIX, AND
+NOTHING IS OWED.** The asserted FLOOR is still eight and is deliberately slack; the Warden's
+nine is the live minimum.
 **THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
 DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
 that sentence is dead in master.html §6b, in `classes.gd`'s header comment and here.
@@ -2507,8 +2517,8 @@ nine, BV the Hunter nine, BW the WARRIOR nine); tranche 3 took it to 96 and ever
 CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTER THIRD AND THE
 WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
 SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, WAS 120 OF 120 — AND DO'S TWENTY-TWO
-TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142, AND DR'S NET +1 TO 119 AND
-143 OF 143.**
+TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142, DR'S NET +1 TO 119 AND
+143 OF 143, AND DS'S SIX HUNTER CARDS TO 125 AND 149 OF 149.**
 **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
 or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
 loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own
@@ -2619,6 +2629,46 @@ today; a property is the thing worth pinning.
 **BEFORE DECLARING AN AXIS EXCLUSIVE, DERIVE THE POPULATION THAT TOUCHES IT.** A one-door helper
 that "only two cards call" is the shape this went wrong in: **a single implementation reads like a
 single owner and is not the same thing.**
+
+### AND THE SAME RULE POINTED THE OTHER WAY — BEFORE DECLARING AN AXIS *ABSENT*, DERIVE IT TOO (Batch DS §1)
+
+**DR'S BRIEF WAS WRONG ABOUT AN AXIS BEING EXCLUSIVE; DS'S WAS WRONG ABOUT ONE BEING MISSING, AND
+THE SECOND ERROR IS THE EASIER ONE TO SHIP.** DS's brief held that *"the Hunter class has no Break
+generation anywhere"* and asked for a Beastmaster card to be the class's first. **TWELVE OF THE
+THIRTY HUNTER DRAFT CARDS GENERATE BREAK** — `pressure` IS Break, so a card generates it without
+ever saying the word, which is exactly why an eyeball over the descriptions missed it. **UNLEASH
+ALREADY LANDS BREAK ON THAT VERY POOL** and FAULT LINE is a dedicated Break card the audit scores
+as one of the Sharpshooter's five decisions. The proposed card would have been a second copy of a
+clause already in its own pool — a BD §4 violation authored on the strength of a sentence.
+· **THE MEASUREMENT IS A FIELD SWEEP, NOT A READING.** An absence claim is only as good as the
+  field it was derived from; derive it from the DATA (`pressure > 0`, `heal > 0`, the `special`),
+  never from the card text, because a card's payload and its prose are different populations.
+· **THE AXIS THAT REALLY WAS ABSENT WAS A DIFFERENT ONE.** HEAL, SHIELD and every MIT- axis were
+  genuinely missing from all twenty-four Hunter spec cards, and so were AMP-TEAM, RESOURCE, STRIP,
+  DOT, METER-MOVE and DEATH-DENY. **Nine absent axes, not three** — so the brief's diagnosis was
+  right and its remedy was aimed at the one axis the class already had.
+
+## STANDING RULE — THE THREE DOORS THAT BITE A NEW DRAFT CARD (Batch DS §2)
+
+**ALL THREE ARE MECHANICAL, ALL THREE WENT RED ON DS'S FIRST RUN, AND ALL THREE ARE CHEAPER TO
+READ HERE THAN TO REDISCOVER.**
+· **A PURE BUFF ADVERTISES NO PERFECT.** `Ability.runs_skill_check()` gives a bar to damage,
+  Break damage, healing, a `gated` card, and the named `DAMAGE_SPECIALS`/`HEAL_SPECIALS` — and to
+  nothing else. `test_batch_bo` §5 asserts the BICONDITIONAL, so a buff carrying `perfect_text`
+  trips. **Four of DS's six were authored with a Perfect and had to lose it**; SALVE kept its by
+  joining `HEAL_SPECIALS`, which is honest rather than a workaround — its heal rides a status it
+  applies, which is RENEWAL's shape, and that list is the answer to *"is this card a heal"*.
+· **A RECAST PROPOSAL MUST EQUAL WHAT A *GOOD* CAST WRITES.** `check_co` saturates by casting at
+  grade `"good"`, so `_recast_writes` proposing the PERFECT's duration improves on what is
+  standing every time and the card never refuses a wasted recast. `emberkeep` looks like a
+  counter-example and is not — its handler writes `EMBERKEEP_TURNS + 1` unconditionally.
+  **A card whose `special` carries a POWER needs its own arm rather than a `RECAST_SELF_PLAIN`
+  row**, because that table writes `power: 0`.
+· **`DEBUFF_IDS` IS FOR ENEMY-SIDE AFFLICTIONS AND A HERO-SIDE BUFF MUST NEVER BE LISTED.** DS's
+  brief asked for all six of its statuses there; five sit on a HERO, and listing one puts the
+  party's own work inside the cleansable set for a mender's Cleansing Rite. `unit.gd`'s list names
+  five existing deliberate absences for this reason. **The one that did belong is the one that
+  lands on an enemy** — and being listed is what makes it feed a Survivalist's Trapper breadth.
 
 
 ## STANDING RULE — READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY (Batch BW §3)

@@ -337,17 +337,21 @@ func _s7_names_and_total() -> void:
 		if labels.get(n, "") == "talent node":
 			dupes.append(n)
 	ok(dupes.is_empty(), "new card names colliding with a talent node: %s" % ", ".join(dupes))
-	# THE TOTAL, DERIVED. 142 - 1 (Flash Freeze) + 2 (the Swordmaster's two) = 143.
+	# THE TOTAL, DERIVED. 142 - 1 (Flash Freeze) + 2 (the Swordmaster's two) = 143
+	# at DR, and BATCH DS's six Hunter cards take it to 149. This gate asserts
+	# the LIVE total rather than DR's, on purpose: its subject is the two
+	# movements DR made, and a later batch adding cards elsewhere must not read
+	# as DR's work coming undone.
 	var spec_total := 0
 	for spec in Classes.SPEC_INFO:
 		spec_total += Classes.spec_draft_pool(spec).size()
 	var class_total := 0
 	for k in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[k] as Array).size()
-	ok(spec_total == 119, "the spec draft half is %d, not 119" % spec_total)
+	ok(spec_total == 125, "the spec draft half is %d, not 125" % spec_total)
 	ok(class_total == 24, "the class draft half is %d, not 24" % class_total)
-	ok(spec_total + class_total == 143,
-		"the draft is %d, not 143" % (spec_total + class_total))
+	ok(spec_total + class_total == 149,
+		"the draft is %d, not 149" % (spec_total + class_total))
 	print("  draft: %d spec + %d class-wide = %d" % [spec_total, class_total,
 		spec_total + class_total])
 	ok(Classes.talent_granted_names().is_empty(),

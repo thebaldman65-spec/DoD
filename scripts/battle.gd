@@ -351,6 +351,33 @@ const STATUS_INFO := {
 	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
 	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for 40%,\nincluding the ones no longer standing."],
 	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor 40% of that crit's damage."],
+	# ---- BATCH DS: the Hunter draft's defensive statuses ----
+	# SIX FOR SIX ABILITIES, and five of the six sit on the HERO — which is why
+	# only ONE of them (`heads_down`) is in `DEBUFF_IDS`. §4 of the brief asked
+	# for all of them there; that rule governs ENEMY-SIDE AFFLICTIONS, and
+	# listing a hero-side buff would put it inside the cleansable set and hand
+	# a mender's Cleansing Rite the party's own work. `unit.gd`'s own list says
+	# so five times over — `emberkeep`, `resonant_field`, `threshold_lock`,
+	# `anointed` and `fortified` are all named there as deliberate absences for
+	# exactly this reason.
+	#
+	# `bear_brunt` IS BATTLE-LONG (-1) FOR BLOODBOND'S REASON, and it is the
+	# same reason inverted: a placed guard that waits until it FIRES is not a
+	# window that expires, and the two cards are meant to read as a pair.
+	# THE SHARE RIDES THE STATUS rather than a second field, so the chip a
+	# player reads and the bill the callback sends are one value.
+	"bear_brunt": ["Bear the Brunt", "BB", Color(0.80, 0.55, 0.30), "The companion stands in front: the\nnext blow that would fell the hunter is\nrefused, and his deepest bond takes it\ninstead. It waits until it is needed —\nand what it takes can kill it."],
+	"bring_it_down": ["Bring It Down", "BiD", Color(0.85, 0.72, 0.35), "The horn has sounded: every hero deals\nmore damage while it holds. The number\nwas read off the deepest bond's\nLoyalty as it was called."],
+	# `dug_in` AND `thick_hide` CARRY NO POWER FOR THEIR CUT AND THAT IS THE
+	# DESIGN. Both are read LIVE at the blow — one off the Focus standing at
+	# that moment, one off the afflictions standing on whoever is swinging — so
+	# a number stored at cast would be a second copy that could disagree with
+	# the bill. `thick_hide`'s power IS used, for the per-affliction RATE the
+	# perfect raises; the cap is a constant.
+	"dug_in": ["Dug In", "DI", Color(0.55, 0.70, 0.85), "Feet set: he takes less damage the\ndeeper his Focus stands — a quarter of\nit, up to 25% less. Breaking the mark\nbreaks the cover with it."],
+	"heads_down": ["Heads Down", "HD", Color(0.70, 0.60, 0.45), "Pinned by fire: it can bring NOTHING\nbut its basic attack to bear. It still\nacts — it simply cannot reach for\nanything better."],
+	"thick_hide": ["Thick Hide", "TH", Color(0.60, 0.72, 0.45), "Toughened by his own trade: he takes\nless damage for every DIFFERENT\naffliction standing on whoever is\nstriking him."],
+	"salve": ["Salve", "Sv", Color(0.50, 0.85, 0.60), "Distilled from what he laid: he heals\nat the start of his turn for every\nDIFFERENT affliction standing on the\nenemies. Nothing is consumed."],
 	# ---- BATCH BW: the Warrior draft's tranche-2 statuses ----
 	# SEVEN FOR NINE ABILITIES, and BERSERK CARRIES TWO OF THEM BECAUSE IT HAS
 	# TWO CLOCKS: `berserk` is a CHARGE COUNT that waits until spent (the
@@ -754,6 +781,34 @@ const BATTLE_TRANCE_FLOOR := 0.03 # of maximum health, the tick's floor
 const BATTLE_TRANCE_SHARE := 0.5  # of the damage taken since his last turn
 const WARCRY_PCT := 20            # more damage dealt, party-wide
 const IRONCLAD_CUT_PCT := 15     # less damage taken while it holds
+# BATCH DS — THE HUNTER SIX. Same rule as the block above: every one of these
+# is read at a site the ability's own `special` never touches, so the literal
+# lives here once and the log, the chip and the bill all read the same value.
+#
+# **THE TWO LIVE-READ CARDS CARRY A DIVISOR AND A CAP RATHER THAN A PERCENTAGE,
+# AND THAT IS WHAT MAKES THEM ENGINE CARDS.** Dug In's cut is a quarter of
+# whatever Focus stands AT THE BLOW, so it rises as he commits and falls to
+# nothing the moment a switch breaks the meter — the spec's existing cost made
+# real rather than a new one bolted on. Thick Hide's is a rate per DIFFERENT
+# affliction on the ATTACKER, which is the same measurement `_status_count`
+# already runs for the Trapper, read on the way IN for the first time.
+const DUG_IN_DIVISOR := 4        # Focus / this = the cut, in percentage points
+const DUG_IN_CAP := 25           # the most Dug In can ever cut, in points
+const THICK_HIDE_PER := 6        # points of cut per DIFFERENT affliction
+const THICK_HIDE_CAP := 30       # the most Thick Hide can ever cut, in points
+const BRUNT_SHARE := 100         # of the refused blow, onto the deepest bond
+const BRING_IT_DOWN_PER := 2     # party damage, in points per Loyalty stack
+const BRING_IT_DOWN_CAP := 20
+const SALVE_PER := 2             # of MAXIMUM health, per DIFFERENT affliction
+const SALVE_CAP := 10            # the most one turn-start can heal, in points
+# **FOUR OF THE SIX CARRY NO `_PERFECT` CONSTANT, AND THAT IS THE CRITERION.**
+# Bear the Brunt, Bring It Down, Dug In and Thick Hide are PURE BUFFS, so
+# `Ability.runs_skill_check()` gives them no bar and `test_batch_bo` §5
+# requires them to advertise no Perfect — the rule every pure buff in the three
+# Hunter pools already follows. A perfect-only magnitude here would have been a
+# number no cast could ever reach. SALVE and HEADS DOWN do run a bar, and both
+# spend their Perfect on a FOURTH TURN rather than on a bigger number, which is
+# Crossfire's shape.
 # BATCH CM §2 — THE DEFENSIVE CHECK. PURE MITIGATION: these are the only two
 # numbers it can ever apply, both of them below 1.0, so the bar can reduce an
 # incoming blow and can never raise one. Good and Sloppy are IDENTICAL — there
@@ -1435,6 +1490,17 @@ func _spawn_units() -> void:
 	if heroes.any(func(h): return _find_ability(h, "Rite of Return") != null):
 		for h in heroes:
 			h.rite_cb = _on_rite_return
+	# BATCH DS — BEAR THE BRUNT's hook, and it is the FIRST of these that is
+	# stamped on the CASTER alone rather than on the whole party. Every hook
+	# above is party-wide because the check runs on whoever is hit and any hero
+	# could be that; this one is different in kind — the guard moves the blow
+	# onto THE CASTER'S OWN COMPANION, so a hook on a hero who has no bond could
+	# never fire and a hook on a SECOND Beastmaster would let one hunter's card
+	# spend the other hunter's beast. `pack_master` is the relationship the
+	# callback walks back down, so the arming has to agree with it.
+	for h in heroes:
+		if _find_ability(h, "Bear the Brunt") != null:
+			h.brunt_cb = _on_brunt_guard
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -2802,6 +2868,46 @@ func _run_battle() -> void:
 						Color(0.5, 0.95, 0.6))
 					_log("   → Field Medic: %s washes %s off %s" % [
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
+		# BATCH DS — SALVE (Survivalist draft), and it is the first HEAL in any
+		# of the twenty-four Hunter spec cards. It sits here, in his turn-start
+		# upkeep beside the Field Medic, rather than hooking every affliction's
+		# own tick: the card asks the board ONE question once a turn, so there
+		# is one read site to reason about instead of a rider on every DoT.
+		#
+		# **THE UNION, NOT THE SUM.** It counts each affliction ID once across
+		# the whole enemy side, so Downwind copying a poison onto a second body
+		# does NOT pay him twice for the same poison — a sum would have made
+		# the widest board and the deepest board the same number, and breadth
+		# is the thing this spec is built on. It is `_status_count`'s question
+		# asked of the field instead of a unit, and it excludes `broken` for
+		# `_status_count`'s own reason.
+		#
+		# NOTHING IS CONSUMED, which is what makes it HARVEST'S INVERSE: Harvest
+		# burns the whole board for one burst and strips his own Trapper bonus
+		# doing it, this drinks and leaves every affliction standing so Vulture,
+		# Hunt and Cull all keep paying.
+		if u.is_hero and not u.dead and u.has_status("salve"):
+			var sv2_ids := {}
+			for sv2_e in enemies:
+				if sv2_e.dead:
+					continue
+				for sv2_id in BattleUnit.DEBUFF_IDS:
+					if sv2_id != "broken" and sv2_e.has_status(sv2_id):
+						sv2_ids[sv2_id] = true
+			var sv2_n: int = sv2_ids.size()
+			var sv2_pct: int = mini(sv2_n * u.status_power("salve"), SALVE_CAP)
+			if sv2_pct <= 0:
+				_log("   → Salve: nothing standing on the enemies, so there is nothing to draw from",
+					"#909090")
+			else:
+				var sv2_heal: int = u.heal_amount(
+					maxi(int(round(u.max_hp * sv2_pct / 100.0)), 1))
+				if sv2_heal > 0:
+					u.float_text("+%d" % sv2_heal, Color(0.4, 0.9, 0.45))
+					_stat_heal(u, sv2_heal, u)
+					_log("   → Salve: %d different afflictions on the field heal %s for %d (%d%%)" % [
+						sv2_n, u.unit_name, sv2_heal, sv2_pct], "#60d890")
+					u.refresh_bars()
 		# Beacon: as the Cleric's turn begins, her light reaches everyone at
 		# death's door — no cast spent. RUNE-ONLY SINCE BATCH AV (the node
 		# became Hour of Need): the Rune of the Sleepless Vigil is the last
@@ -5307,9 +5413,19 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 # it at full depth buys literally nothing. Wheeling Cut deals real AoE damage
 # and Break, so a recast is never wasted however long its grant has left — the
 # same reason no damaging card in this list is one.
+# BATCH DS §1 — FOUR OF THE HUNTER SIX JOIN AND TWO DELIBERATELY DO NOT, on
+# BO §5's rule: refuse a cast that could only ever do nothing. `bear_brunt`,
+# `dug_in`, `thick_hide` and `salve` are entirely a status on the caster, so a
+# recast onto one already standing buys nothing but a duration the card never
+# promised. **`bring_it_down` DOES NOT JOIN and it is the interesting one**:
+# its number is SNAPSHOT off the deepest bond's Loyalty at the cast, and Loyalty
+# is uncapped, so a recast on a deeper bond genuinely buys a bigger party-wide
+# amp — it can never do nothing. **`Heads Down` is not in this system at all**,
+# because it deals damage and Break like Wheeling Cut, which is the reason no
+# damaging card is in this list.
 const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
-	"anvil", "arcane_arrows", "battle_poise", "bloodbond", "bola", "camouflage",
-	"counter_time",
+	"anvil", "arcane_arrows", "battle_poise", "bear_brunt", "bloodbond", "bola",
+	"camouflage", "counter_time", "dug_in", "salve", "thick_hide",
 	"choking_smoke", "cons_ground", "consecration", "covering_guard",
 	"divine_presence", "divine_shield", "divine_wrath", "downwind", "emberkeep",
 	"exhortation", "feigned_guard", "formless", "ghostpack", "glacial_prison",
@@ -5339,6 +5455,10 @@ const RECAST_SELF_PLAIN := {
 
 # The specials in the set that write to the caster and to nobody else.
 const RECAST_SELF_ONLY := ["alms", "answering_steel", "arcane_arrows",
+	# BATCH DS — four of the six write to the caster and nobody else.
+	# `bring_it_down` is absent because it stamps every living hero (Warcry's
+	# shape), and `heads_down` because it writes to an ENEMY.
+	"bear_brunt", "dug_in", "salve", "thick_hide",
 	"bloodbond", "camouflage", "divine_presence", "emberkeep", "hoarfrost_armor",
 	"instinct", "last_howl", "magic_barrier", "mirror_image", "spite",
 	"stalking_horse", "succession", "tripwire"]
@@ -5403,6 +5523,33 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			return [{"id": "stalking_horse", "turns": 4, "power": STALKING_PULL}]
 		"camouflage":
 			return [{"id": "camouflage", "turns": 3, "power": CAMOUFLAGE_PCT}]
+		# BATCH DS — THE FOUR DS SELF-BUFFS THAT CARRY A POWER GET ARMS HERE
+		# RATHER THAN A ROW IN `RECAST_SELF_PLAIN`, for the reason the three
+		# above them do: that table writes `power: 0`, and every one of these
+		# stores a real number the recast check has to compare against. A row
+		# there would have proposed a weaker write than the handler performs and
+		# read a genuine improvement as waste — §1 calls that the worse of the
+		# two bugs, and it is the fault this function's own header records.
+		#
+		# `salve` PROPOSES THE BASE THREE TURNS AND NOT THE PERFECT'S FOUR, and
+		# it is the one of the four that had to be measured rather than reasoned
+		# about. **`check_co` SATURATES BY CASTING AT GRADE "good"**, so the
+		# handler writes three; a proposal of four then improves on what is
+		# standing every single time and the card would never refuse a recast.
+		# It read exactly that way on the first run — 1 failure, "Salve still
+		# casts after landing on every target it can reach". THE RULE THE FIX
+		# ENCODES: a proposal must equal what a GOOD cast writes, which is why
+		# `emberkeep` above proposes `EMBERKEEP_TURNS + 1` — its handler writes
+		# that unconditionally, perfect or not. The perfect's fourth turn is
+		# bought at the bar, after this door.
+		"bear_brunt":
+			return [{"id": "bear_brunt", "turns": -1, "power": BRUNT_SHARE}]
+		"dug_in":
+			return [{"id": "dug_in", "turns": 4, "power": DUG_IN_CAP}]
+		"thick_hide":
+			return [{"id": "thick_hide", "turns": 4, "power": THICK_HIDE_PER}]
+		"salve":
+			return [{"id": "salve", "turns": 3, "power": SALVE_PER}]
 		"spite":
 			return [{"id": "spite", "turns": 6, "power": SPITE_PERFECT_CAP}]
 		"answering_steel":
@@ -6742,6 +6889,35 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	if int(u.cooldowns.get(ab.display_name, 0)) > 0:
 		return false
+	# BATCH DS — HEADS DOWN (Sharpshooter draft). THE ONE CONDITION THE WHOLE
+	# CARD IS, and its position is the entire design. `_choose_enemy_action` is
+	# BYTE-UNTOUCHED: BL §1's header states that a diff which touches the rules
+	# inside it is a diff that broke the promise, so the enemy still SELECTS
+	# freely a turn ahead and the suppression lands here, at re-validation,
+	# where the caller already logs "cannot bring X to bear — it falls back to
+	# Y" and already counts `intent_fallback`. A new refusal reuses a shipped
+	# announcement rather than inventing a second one.
+	#
+	# **IT REFUSES EVERYTHING BUT THE UNIT'S OWN BASIC ATTACK, AND THE TEST IS
+	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
+	# version of this clause tested cost, on the assumption that an enemy's
+	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50
+	# ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning,
+	# Healing Wave, Sundering Strike and Poison Arrow among them — so a cost
+	# test would have left the card refusing FOUR abilities in the whole game
+	# and reading as working the entire time. Measured, not assumed: a live
+	# fixture put a suppressed enemy at "0 refused, 2 kept".
+	#
+	# THE IDENTITY TEST CANNOT STARVE THE FALLBACK, which is the property that
+	# keeps this a downgrade rather than a Stun with extra steps: the one
+	# ability it never refuses IS the one `_revalidate_intent` falls back to,
+	# so the enemy always has exactly one legal action. A kit with no 0-cost
+	# attack at all keeps everything, because there would be nothing to fall
+	# back to.
+	if u.has_status("heads_down"):
+		var hd_basic := _cheapest_attack(u)
+		if hd_basic != null and ab != hd_basic:
+			return false
 	return true
 
 
@@ -8933,6 +9109,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# card compose additively rather than one silently winning.
 			if attacker.has_status("warcry"):
 				raw *= 1.0 + attacker.status_power("warcry") / 100.0
+			# BATCH DS — BRING IT DOWN rides the same read, for the same reason
+			# and one line below it. The number was snapshot off the deepest
+			# bond's Loyalty at the cast and stamped on every hero, so this line
+			# does not know or care that a beast is what paid for it — which is
+			# what lets an 8-of-8 companion engine pay the OTHER THREE HEROES
+			# without a single one of them reading Loyalty.
+			if attacker.has_status("bring_it_down"):
+				raw *= 1.0 + attacker.status_power("bring_it_down") / 100.0
 			# BATCH DR §4 — WHEELING CUT's DEFENSIVE arrival, the other half of
 			# the same principle: he lands AGGRESSIVE, so that branch hands him
 			# offence. Same block as Warcry, so it composes with every other
@@ -9258,6 +9442,46 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 - HOARFROST_CUT
 				if strike_target.is_hero:
 					_prev(strike_target, hf_was - raw)
+			# BATCH DS — DUG IN (Sharpshooter draft). THE CUT IS READ LIVE OFF
+			# THE FOCUS STANDING AT THIS BLOW, which is the entire card: it is
+			# not a number the cast chose, it is the meter he has actually
+			# built, so it rises as he commits to one mark and FALLS TO NOTHING
+			# the moment a switch clears it. The spec's existing cost made real
+			# rather than a second one bolted on.
+			#
+			# `second_resource` IS THE FOCUS METER and it is read through the
+			# same guard every other Focus reader uses — the resource NAME —
+			# so a non-Sharpshooter who somehow wore the chip cuts nothing
+			# rather than reading a foreign meter as Focus.
+			if strike_target.has_status("dug_in") \
+					and strike_target.second_resource_name == "Focus":
+				var di_pct: int = mini(
+					strike_target.second_resource / DUG_IN_DIVISOR,
+					strike_target.status_power("dug_in"))
+				if di_pct > 0:
+					var di_was := raw
+					raw *= 1.0 - di_pct / 100.0
+					if strike_target.is_hero:
+						_prev(strike_target, di_was - raw)
+			# BATCH DS — THICK HIDE (Survivalist draft). Read off the DIFFERENT
+			# afflictions standing on WHOEVER IS SWINGING, through the same
+			# `_status_count` the Trapper's own breadth uses — the first card in
+			# the game that reads that measurement on the way IN. STALKING HORSE
+			# is what fills it: that card puts a different affliction on every
+			# attacker in turn, so the two compound by construction.
+			#
+			# THE RATE RIDES THE STATUS AND THE CAP IS THE CONSTANT, which is
+			# the mirror of Dug In directly above — there the perfect raises the
+			# ceiling, here it reaches the same ceiling on a narrower board.
+			if strike_target.has_status("thick_hide") and attacker != null:
+				var th_pct: int = mini(
+					_status_count(attacker) * strike_target.status_power("thick_hide"),
+					THICK_HIDE_CAP)
+				if th_pct > 0:
+					var th_was := raw
+					raw *= 1.0 - th_pct / 100.0
+					if strike_target.is_hero:
+						_prev(strike_target, th_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				var pv_was := raw
@@ -11085,6 +11309,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Crossfire: for %d turns every CRIT also rakes 2 other enemies for %d%% of it%s" % [
 				cf_turns, int(round(CROSSFIRE_SHARE * 100.0)),
 				" [PERFECT]" if is_perfect else ""], "#e08840")
+		# BATCH DS — HEADS DOWN (Sharpshooter draft), riding the same site as
+		# Crossfire directly above and for the same reason: it is an ORDINARY
+		# ATTACK with a status rider, so keying on `display_name` here keeps the
+		# crit, the armour read, the parry roll, the Break and every talent
+		# rider that reads a strike. A `special` would have hand-rolled the blow
+		# and lost all of it.
+		#
+		# **THE STATUS IS THE FIRST SILENCE IN THE PROJECT** and it is written
+		# as a DOWNGRADE rather than a lost turn — the enemy still acts, it
+		# simply cannot reach past its basic attack. That is what keeps it from
+		# being a fourth Stun beside Bola, Deadfall and Pommel Strike, and it is
+		# why it is NOT in `_apply_status`'s boss carve-out: a boss that loses
+		# its whole turn is the thing that carve-out exists to refuse, and this
+		# never takes one.
+		#
+		# THE REFUSAL ITSELF IS ONE CONDITION IN `_intent_ability_usable` and
+		# NOTHING IN `_choose_enemy_action` — BL §1 forbids touching the
+		# selection policy, so the enemy still chooses freely and the
+		# downgrade happens at re-validation, where the existing fallback log
+		# and `intent_fallback` counter already say what happened.
+		if ab.display_name == "Heads Down" and attacker.is_hero \
+				and not is_counter and target != null and not target.is_hero \
+				and not target.dead:
+			var hd_turns := 4 if is_perfect else 3
+			_apply_status(target, "heads_down", hd_turns, 0, 0, attacker)
+			_log("   → Heads Down: for %d turns %s can bring nothing but its basic attack to bear%s" % [
+				hd_turns, target.unit_name,
+				" [PERFECT]" if is_perfect else ""], "#b09070")
 		# QUARTERMASTER (Batch BA §2, replacing Plague Bearer): his ALLIES' basic
 		# attacks also carry his poison — he oils their blades before the fight.
 		# It is party-wide CRAFT with nothing self-propagating, which is what
@@ -13537,6 +13789,67 @@ func _on_bloodbond_guard(comp: BattleUnit, amount: int) -> bool:
 	hunter.take_tick_damage(share, "-%d" % share, Color(0.85, 0.30, 0.35))
 	if hunter.dead:
 		_log("† %s falls paying the bond" % hunter.unit_name, "#e05050")
+	return true
+
+
+# BATCH DS — BEAR THE BRUNT, AND IT IS `_on_bloodbond_guard` ABOVE POINTED THE
+# OTHER WAY. The pair is meant to read as deliberate opposites: that one refuses
+# the blow that would fell the COMPANION and bills the hunter a quarter, this
+# refuses the blow that would fell the HUNTER and bills his deepest bond the
+# whole of it. Same placed-guard shape, same battle-long duration, same "it
+# waits until it is needed", same "and it can kill the payer".
+#
+# THE DEEPEST BOND PAYS, WHICH IS `_deepest_bond` AND NOT `beasts[0]`. This is
+# an ORDERED action in the sense this file's Beastmaster header settles — one
+# companion, not the whole pack — so under The Pack it takes the animal the
+# player has actually invested in, exactly as Unleash does.
+#
+# IT GOES THROUGH `take_tick_damage` FOR THE VOW'S REASON, inherited from
+# Bloodbond rather than re-derived: a redirect is not an attack, so it must not
+# roll a parry, feed a counter or wake an on-being-struck talent. That is also
+# what makes the pair loop-proof — the `bloodbond_cb` question is asked inside
+# `take_hit` and a tick never re-enters it, so a beast felled paying this cannot
+# bounce a share back onto the hunter.
+#
+# THE GUARD IS SPENT WHETHER OR NOT THE BEAST SURVIVES PAYING, which is
+# Bloodbond's own rule: "it holds until it fires" is ONE firing, and a
+# Beastmaster who loses the animal covering him has still been covered.
+func _on_brunt_guard(hunter: BattleUnit, amount: int) -> bool:
+	if hunter == null or amount <= 0:
+		return false
+	if not hunter.has_status("bear_brunt"):
+		return false
+	var comp: BattleUnit = _deepest_bond(hunter)
+	if comp == null or comp.dead:
+		# NOTHING STANDS TO TAKE IT, SO THE GUARD IS NOT SPENT. A refusal that
+		# never landed must not also swallow the wound (Bloodbond's own rule for
+		# a missing hunter), and it must not silently burn the card either —
+		# this is the one branch where the beast is the thing that is absent.
+		return false
+	var share_pct: int = hunter.status_power("bear_brunt")
+	if share_pct <= 0:
+		share_pct = BRUNT_SHARE
+	var share := maxi(int(round(amount * share_pct / 100.0)), 1)
+	hunter.remove_status("bear_brunt")
+	_sfx("crit", -6.0, 0.8)
+	_message("%s takes the blow meant for %s!" % [comp.unit_name,
+		hunter.unit_name])
+	_log("%s: Bear the Brunt — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
+		hunter.unit_name, hunter.unit_name, comp.unit_name, share], "#e0a050")
+	_dmg_frame(comp, "Bear the Brunt")
+	comp.take_tick_damage(share, "-%d" % share, Color(0.80, 0.55, 0.30))
+	if comp.dead:
+		# A COMPANION KILLED BY A TICK IS ANNOUNCED AND BOOKED BY ITS CALLER,
+		# never by `take_tick_damage` — the bleed-out site is the precedent and
+		# this mirrors it. `_on_beast_death` is the part that matters: Last
+		# Howl, Steadfast Bond and Vengeance all read the meter as it stood when
+		# the body fell, and skipping it would leave a beast dead with its
+		# Loyalty silently intact.
+		_sfx("death", -4.0)
+		_message("%s falls!" % comp.unit_name)
+		_log("† %s falls covering %s" % [comp.unit_name, hunter.unit_name],
+			"#e05050")
+		_on_beast_death(comp)
 	return true
 
 
@@ -18143,6 +18456,118 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_message("%s falls!" % cu_e.unit_name)
 						_log("† %s dies" % cu_e.unit_name, "#e05050")
 						_on_enemy_death(cu_e)
+		# ========== BATCH DS: THE HUNTER SIX, THE FIVE THAT ARE PURE EFFECT ==========
+		# HEADS DOWN carries no `special` and is not here — it is an ordinary
+		# attack with a status rider, so it keys on `display_name` beside
+		# Crossfire's and keeps the whole pipeline. See `Classes.draft_ability`.
+		#
+		# FOUR OF THE FIVE WRITE TO THE CASTER AND NOBODY ELSE, which is why
+		# those four are in `RECAST_SELF_ONLY`. `bring_it_down` is the one that
+		# is NOT: it stamps every living hero, which is WARCRY'S shape and the
+		# project's one implementation of "this unit deals N% more damage" —
+		# read off each wearer's own status power at the strike site, so the
+		# class card and this one compose additively instead of one winning.
+		"bear_brunt":
+			# A PLACED GUARD, BATTLE-LONG (-1), SPENT BY `_on_brunt_guard`.
+			# Bloodbond's shape pointed the other way, and the two are meant to
+			# read as a pair on the draft screen.
+			#
+			# IT IS APPLIED WHETHER OR NOT A COMPANION STANDS, exactly as
+			# Bloodbond is — the guard is placed on the BOND, and a beast
+			# summoned after the cast can still answer it. The log says so when
+			# nothing is standing, because a guard that quietly does nothing
+			# reads as an ability that does not work.
+			var bb2_pct: int = BRUNT_SHARE
+			var bb2_info: Array = STATUS_INFO["bear_brunt"]
+			attacker.add_status("bear_brunt", bb2_info[0], bb2_info[1],
+				bb2_info[2], -1,
+				"The companion stands in front: the\nnext blow that would fell the hunter is\nrefused, and his deepest bond takes\n%d%% of it instead. It waits until it\nis needed — and it can kill the bond." % bb2_pct,
+				bb2_pct)
+			_sfx("heal", -8.0, 0.7)
+			_message("%s puts the companion in front" % attacker.unit_name)
+			_log("%s: Bear the Brunt — the next killing blow against him is refused; his deepest bond takes %d%% of it, and it waits until it is needed" % [
+				attacker.unit_name, bb2_pct], "#e0a050")
+			if _deepest_bond(attacker) == null:
+				_log("   → no companion stands yet — the guard is placed on the BOND and waits for one",
+					"#909090")
+		"bring_it_down":
+			# THE NUMBER IS SNAPSHOT AT CAST AND THE CARD SAYS SO. Reading
+			# Loyalty live at every strike would make a party-wide multiplier
+			# wobble on the beast's own bookkeeping mid-window, and it would let
+			# a swap silently rewrite a buff four heroes are already fighting
+			# under. Snapshotting also makes the recast meaningful, which is why
+			# this is the one DS card NOT in `RECAST_GATED`: cast again on a
+			# deeper bond and it really does buy a bigger number.
+			var bid_cap: int = BRING_IT_DOWN_CAP
+			var bid_beast: BattleUnit = _deepest_bond(attacker)
+			var bid_stacks := 0
+			if bid_beast != null:
+				bid_stacks = int(attacker.loyalty.get(bid_beast.companion_kind, 0))
+			var bid_pct: int = mini(bid_stacks * BRING_IT_DOWN_PER, bid_cap)
+			if bid_pct <= 0:
+				_log("%s: Bring It Down — no bond deep enough to call on, so the horn buys nothing" % \
+					attacker.unit_name, "#909090")
+			else:
+				# STAMPED ON EVERY LIVING HERO, WARCRY'S SHAPE EXACTLY — the
+				# `heroes` walk rather than `_hero_side()`, so the beast that
+				# earned the Loyalty does not also collect on it. It is one of
+				# five party-wide effects that would otherwise reach a fifth
+				# body in a Beastmaster party, and this one deliberately does
+				# not: the card says EVERY HERO.
+				var bid_turns := 4
+				var bid_n := 0
+				for bid_h in heroes:
+					if bid_h.dead:
+						continue
+					bid_n += 1
+					_apply_status(bid_h, "bring_it_down", bid_turns, bid_pct)
+					bid_h.update_status("bring_it_down", "+%d%%" % bid_pct,
+						String(STATUS_INFO["bring_it_down"][3]), bid_pct)
+				_sfx("crit", -7.0, 0.8)
+				attacker.float_text("BRING IT DOWN", Color(0.85, 0.72, 0.35), true)
+				_message("%s calls the kill!" % attacker.unit_name)
+				_log("%s: Bring It Down — %d Loyalty on %s, so %d %s deal +%d%% for %d turns" % [
+					attacker.unit_name, bid_stacks, bid_beast.unit_name, bid_n,
+					"hero" if bid_n == 1 else "heroes", bid_pct, bid_turns],
+					"#e0c060")
+		"dug_in":
+			# THE CAP RIDES THE STATUS, THE DIVISOR IS THE CONSTANT. The cut
+			# itself is computed at the blow off the Focus standing THEN — see
+			# the raw-damage block — so there is exactly one number stored and
+			# it is the one the chip prints.
+			var di_cap: int = DUG_IN_CAP
+			var di_turns := 4
+			_apply_status(attacker, "dug_in", di_turns, di_cap)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s sets his feet" % attacker.unit_name)
+			_log("%s: Dug In — for %d turns he takes a quarter of his standing Focus less damage, up to %d%%" % [
+				attacker.unit_name, di_turns, di_cap], "#8ab0d8")
+		"thick_hide":
+			# THE PER-AFFLICTION RATE RIDES THE STATUS AND THE CAP IS THE
+			# CONSTANT — the mirror of Dug In above, and deliberately so: there
+			# the perfect buys a higher ceiling, here it buys REACHING the same
+			# ceiling on a narrower board (four afflictions instead of five).
+			var th2_per: int = THICK_HIDE_PER
+			var th2_turns := 4
+			_apply_status(attacker, "thick_hide", th2_turns, th2_per)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s toughens against the work" % attacker.unit_name)
+			_log("%s: Thick Hide — for %d turns he takes %d%% less damage per DIFFERENT affliction on his attacker, up to %d%%" % [
+				attacker.unit_name, th2_turns, th2_per, THICK_HIDE_CAP],
+				"#90b878")
+		"salve":
+			# THE HEAL IS A TURN-START TICK, NOT A DoT HOOK, and that is the
+			# whole reason this card is one read site rather than a hook in
+			# every affliction's tick: it asks the board ONE question, at the
+			# same place the rest of his turn-start bookkeeping is asked.
+			# NOTHING IS CONSUMED — it is Harvest's deliberate inverse.
+			var sv_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "salve", sv_turns, SALVE_PER)
+			_sfx("heal", -8.0, 0.8)
+			_message("%s distils a salve" % attacker.unit_name)
+			_log("%s: Salve — for %d turns he heals %d%% of maximum health at the start of his turn per DIFFERENT affliction on the enemies, up to %d%%%s" % [
+				attacker.unit_name, sv_turns, SALVE_PER, SALVE_CAP,
+				" [PERFECT]" if is_perfect else ""], "#60d890")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)

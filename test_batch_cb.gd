@@ -211,12 +211,12 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 119, "the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d"
+	ok(total == 125, "the spec pools hold 125 (CI's 96, DO's twenty-two, DR's net +1, DS's six), got %d"
 		% total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 143, "the draft holds 143 (got %d)"
+	ok(draft_total == 149, "the draft holds 149 (got %d)"
 		% draft_total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.

@@ -163,7 +163,7 @@ func _pools() -> void:
 		total += pool.size()
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"twelve spec draft pools (got %d)" % Classes.SPEC_DRAFT_POOLS.size())
-	ok(total == 119, "SPEC_DRAFT_POOLS holds 119 (got %d)" % total)
+	ok(total == 125, "SPEC_DRAFT_POOLS holds 125 (got %d)" % total)
 
 
 # ---------- §2: the standard shape, all twenty-seven ----------

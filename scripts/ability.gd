@@ -156,6 +156,12 @@ const DELAY_FLOOR := BUFF_DELAY_CAP * 0.5
 #     a heal card, and none heals a point at cast, so the authored answer stands.
 const PURE_BUFFS := ["aegis_wall", "alms", "anointing", "answering_steel",
 	"anvil", "arcane_arrows", "ashes", "battle_poise", "battle_trance",
+	# BATCH DS — three of the Hunter six are pure buffs and take the cap. BRING
+	# IT DOWN is deliberately NOT here: it is a pure buff too, but it is the
+	# strongest of the six (a party-wide amp scaling off an UNCAPPED meter) and
+	# it is priced at initiative 2.0 for that, on PREPARATION's precedent —
+	# membership of this table would clamp it to 1.0 as a side effect.
+	"bear_brunt", "dug_in", "thick_hide",
 	"berserk", "bloodbond", "camouflage", "cons_ground", "consecration",
 	"covering_guard", "deadfall", "discipline", "divine_presence",
 	"divine_wrath", "downwind", "emberkeep", "exhortation", "fault_line",
@@ -265,6 +271,11 @@ const DAMAGE_SPECIALS := ["blood_tribute", "breaking_darkness", "call_wild",
 const HEAL_SPECIALS := ["dark_pact", "dawnbreak", "divine_plea",
 	"field_dressing", "fortified_spirit", "healing_wave", "holy_heal", "hymn",
 	"jubilee", "ministration", "renewal", "reliquary", "sanctuary",
+	# BATCH DS — SALVE. Its heal RIDES A STATUS IT APPLIES rather than landing
+	# at cast, which is exactly RENEWAL's shape two lines up, and this list is
+	# the answer to "is this ability a heal" — a question about the card. Being
+	# here is what earns it a bar, and therefore what lets it state a Perfect.
+	"salve",
 	"second_wind_holy", "spirit_bond", "totem_pulse", "wild_growth"]
 
 

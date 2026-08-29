@@ -355,13 +355,49 @@ const SPEC_DRAFT_POOLS := {
 	# docs and the code disagree BY DESIGN, exactly as they do for the Devout.
 	# A `"survivalist":` entry here would raise nothing, resolve nothing, and
 	# ship three cards no hero could ever be offered.
+	# BATCH DS — THE HUNTER CLASS GAP, AND ALL THREE POOLS GO 8 -> 10. DQ
+	# measured the structural finding under the whole audit: these were the
+	# three SHALLOWEST pools in the game, they received NONE of DO's
+	# twenty-two, and **not one of the twenty-four cards below was a heal, a
+	# shield or hero-side mitigation** — a hunter's entire defensive option set
+	# for a run was two of the six Hunter CLASS cards he had to be lucky enough
+	# to be offered. It compounded with the Sharpshooter holding no defensive
+	# node in his 27, so both halves of his progression offered him nothing.
+	#
+	# EACH SPEC'S DEFENCE IS SHAPED BY ITS OWN ENGINE, which is DR's standing
+	# rule applied: MIT-SELF is a shared AXIS and adding it dilutes nothing,
+	# because the engine still gates every one of them. The companion pays for
+	# the Beastmaster, the Focus meter pays for the Sharpshooter, and the
+	# affliction board pays for the Survivalist.
+	#
+	# **THE SECOND CARD ON EACH POOL IS THE ONE THAT BUYS BREADTH**, and the
+	# brief's proposal for the Beastmaster's was withdrawn on measurement: it
+	# asked for BREAK, on the premise that "the Hunter class has no Break
+	# generation anywhere". **TWELVE OF THE THIRTY HUNTER DRAFT CARDS GENERATE
+	# BREAK** — Unleash already lands it behind the companion's strike on THIS
+	# pool, and Fault Line is a dedicated Break card the audit scores as one of
+	# the Sharpshooter's five distinct decisions. A Break card here would have
+	# been a second copy of Unleash's own clause. AMP-TEAM was taken instead:
+	# it is absent from all twenty-four, and it makes an 8-of-8 companion
+	# binding pay the OTHER THREE HEROES, which is the sharpest available
+	# answer to the concentration DQ measured.
 	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
-		"Ghostpack", "Last Howl", "Succession", "Unleash"],
+		"Ghostpack", "Last Howl", "Succession", "Unleash",
+		# BATCH DS — MIT-SELF and AMP-TEAM, both read off Loyalty.
+		"Bear the Brunt", "Bring It Down"],
 	"sharpshooter": ["Called Volley", "Quarry's Mark", "Crossfire",
 		"Calibrating Shot", "Trophy Shot", "Reacquire", "Fault Line",
-		"Drumfire"],
+		"Drumfire",
+		# BATCH DS — MIT-SELF and CTRL, both read off Focus. THE NAMES ARE NOT
+		# THE BACKLOG'S: `master.html` and `sharpshooter_pool_ability`'s header
+		# record DISENGAGE, SUPPRESSING FIRE and PIERCING ARROW as designed and
+		# unwritten, and those three are owed to the BOSS pool rather than to
+		# the draft. Spending them here would have paid one debt with another.
+		"Dug In", "Heads Down"],
 	"mystic": ["Choking Smoke", "Snare Line", "Loaded Shot", "Hunt",
-		"Preparation", "Stalking Horse", "Downwind", "Cull"],
+		"Preparation", "Stalking Horse", "Downwind", "Cull",
+		# BATCH DS — MIT-SELF and HEAL, both read off the affliction board.
+		"Thick Hide", "Salve"],
 }
 
 # CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class,
@@ -370,13 +406,16 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# **THE DRAFT IS 143 OF A TARGET 143 AS OF BATCH DR (119 spec + 24 class-wide),
+# **THE DRAFT IS 149 OF A TARGET 149 AS OF BATCH DS (125 spec + 24 class-wide),
 # AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third at 120 of 120,
 # every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
-# half to 118. **DR MOVED IT TWICE IN ONE BATCH AND THE NET IS +1**: down one
+# half to 118. **DR MOVED IT TWICE IN ONE BATCH AND THE NET WAS +1**: down one
 # for the retirement of a strict duplicate in the Cryomancer's pool (§2), up
-# two for the Swordmaster's new axes (§4). Every one of the four class pools is
-# still six deep, and no spec pool is below eight.
+# two for the Swordmaster's new axes (§4). **DS ADDS SIX AT ONCE — two to each
+# of the three HUNTER pools**, which were the three shallowest in the game and
+# the only three still reading eight; they read TEN now, matching the Cleric
+# class. Every one of the four class pools is still six deep, and no spec pool
+# is below eight.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
@@ -935,7 +974,7 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-THREE OF A TARGET 143 (BO..DR) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-NINE OF A TARGET 149 (BO..DS) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -957,10 +996,13 @@ static func talent_granted_names() -> Array:
 # **BATCH DO MOVED THE TOTAL FOR THE FIRST TIME SINCE CI, AND IT IS NOT A NEW
 # TRANCHE.** Twenty-two TALENT NODES granted an ability; the charter forbids
 # that outright now, so all twenty-two cards moved here rather than being
-# deleted. `SPEC_DRAFT_POOLS` IS 119 AND THE DRAFT IS 143 OF 143. **NO POOL
-# LOST ANYTHING AND THE FLOOR IS STILL EIGHT** — nine pools are deeper, and
-# beastmaster, sharpshooter and mystic still read exactly eight because their
-# trees granted nothing to move. **THE PER-SPEC EXPECTATION IS A TABLE NOW,
+# deleted. THAT TOOK `SPEC_DRAFT_POOLS` TO 119 AND THE DRAFT TO 143 OF 143.
+# **BATCH DS MOVES IT AGAIN AND THE THREE THAT DO's PASS COULD NOT REACH ARE
+# EXACTLY THE THREE IT MOVES**: `SPEC_DRAFT_POOLS` IS 125 AND THE DRAFT IS 149
+# OF 149. **NO POOL LOST ANYTHING AND THE FLOOR IS STILL EIGHT** — every pool
+# is deeper than eight now except the Warden's nine, and beastmaster,
+# sharpshooter and mystic read TEN, because DS gave each of them the two cards
+# DO's twenty-two never could (their trees granted nothing to move). **THE PER-SPEC EXPECTATION IS A TABLE NOW,
 # NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH` is the one authoritative
 # copy); every other suite asserts the FLOOR and the TOTAL.
 #
@@ -2089,15 +2131,23 @@ static func draft_ability(display_name: String) -> Ability:
 		# switched, the Survivalist needs statuses already on the board — so all
 		# three have opening turns where the engine is not running.
 		#
-		# AXIS: the only self-heal a Hunter can get. THE ONE UNCONDITIONAL
-		# ANSWER TO A CLASS-WIDE HOLE — every other class can mend itself
-		# somewhere; this one cannot, at all, in any of its three trees.
+		# AXIS: the only UNCONDITIONAL self-heal a Hunter can get, and BATCH DS
+		# CORRECTED THAT SENTENCE RATHER THAN LEAVING IT TO ROT. It read "the
+		# only self-heal a Hunter can get" from BR until DS, and it was ALREADY
+		# FALSE when it was written: HARVEST heals him for the same amount it
+		# deals, and Harvest sits in `SPEC_POOLS["mystic"]` AND in
+		# `CLASS_POOLS["hunter"]`, so a Survivalist can be offered it by a zone
+		# boss. DS's SALVE is a second heal in the class and would have made the
+		# claim wrong a third way. **THE TREE HALF OF THE CLAIM IS TRUE AND IS
+		# KEPT**: no Hunter talent node heals in any of the three trees — Field
+		# Medic CLEANSES, which is a different thing — so what is unconditional
+		# here really is the only unconditional one.
 		"Field Dressing":
 			return Ability.make({"display_name": "Field Dressing", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 3,
 				"anim": "attack02", "special": "field_dressing",
 				"perfect_id": "", "perfect_text": "Heals {mhp:24}",
-				"description": "Bind the wound where you stand: heal\n18% of your maximum health and shake\noff one harmful effect. The only\nself-heal a Hunter can get."})
+				"description": "Bind the wound where you stand: heal\n18% of your maximum health and shake\noff one harmful effect. The only\nself-heal a Hunter needs nothing set\nup for."})
 		# AXIS: buying TIME rather than absorbing damage — the defensive shape
 		# the class does not have, stated as evasion so it never overlaps the
 		# Mage's Barrier or the Warden's Block.
@@ -3949,6 +3999,142 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
 				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
 				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."})
+		# ========== BATCH DS: THE HUNTER SIX ==========
+		#
+		# TWO PER SPEC, EVERY ONE READING ITS OWN ENGINE. See the header on
+		# `SPEC_DRAFT_POOLS["beastmaster"]` for the finding these answer.
+		#
+		# **FOUR OF THE SIX STATE NO PERFECT, AND THAT IS THE CRITERION RATHER
+		# THAN AN OMISSION.** `Ability.runs_skill_check()` gives a bar to an
+		# ability with damage, Break damage or healing, to a GATED one, and to
+		# the named `DAMAGE_SPECIALS`/`HEAL_SPECIALS`; BEAR THE BRUNT, BRING IT
+		# DOWN, DUG IN and THICK HIDE are none of those, so they run no bar and
+		# `test_batch_bo` §5's biconditional requires an EMPTY `perfect_text`.
+		# It is the rule every pure buff in these three pools already follows —
+		# Bloodbond, Ghostpack, Last Howl, Succession, Stalking Horse, Downwind,
+		# Fault Line, Reacquire and Quarry's Mark all state none. **SALVE keeps
+		# its Perfect by being added to `HEAL_SPECIALS`**, which is honest and
+		# is RENEWAL's precedent: its heal rides a status it applies, and that
+		# list is the answer to "is this card a heal". **HEADS DOWN keeps its
+		# Perfect for free**, because it deals damage.
+		#
+		# FOUR OF THE SIX CARRY A `special` AND TWO DO NOT, on the BV rule this
+		# file already states: `_resolve` sends anything holding a `special`
+		# down `_resolve_special`, which hand-rolls the blow and loses the whole
+		# attack pipeline with it. HEADS DOWN is an ordinary attack with a
+		# status rider, so it keys on `display_name` at the rider site and keeps
+		# its crit, armour read, parry roll and Break — Crossfire's shape
+		# exactly. The other five do nothing but their own effect.
+		#
+		# ----- BEASTMASTER: the bond, pointed back at the hunter and outward
+		# at the party.
+		#
+		# AXIS: MIT-SELF — absent from all twenty-four Hunter spec cards.
+		# SYNERGY: BLOODBOND, deliberately and exactly inverted. That card
+		# refuses the blow that would fell the COMPANION and moves a quarter
+		# onto the hunter, where it can kill him; this refuses the blow that
+		# would fell the HUNTER and moves the whole of it onto the companion,
+		# where it can kill the beast. Same placed-guard shape, same battle-long
+		# duration, same "it waits until it is needed", opposite direction — and
+		# the pair is meant to read as opposites on the draft screen. It also
+		# pays off THE PACK (a second body to spend) and STEADFAST BOND.
+		#
+		# THE DEEPEST BOND TAKES IT, which is Unleash's own answer to "which
+		# companion" rather than a new one — an ORDERED action goes to one
+		# companion, and this file's BV header settles that for every card that
+		# names the beast.
+		"Bear the Brunt":
+			return Ability.make({"display_name": "Bear the Brunt", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
+				"cooldown": 4, "anim": "attack01", "special": "bear_brunt",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Put the companion between you and it:\nthe next blow that would fell YOU is\nREFUSED, and your deepest bond takes\nall of it instead.\nIt waits until it is needed — and what\nit takes can kill the companion."})
+		# AXIS: AMP-TEAM — absent from all twenty-four, and the answer to an
+		# 8-of-8 engine binding: it makes the other three heroes care what the
+		# Loyalty meter reads.
+		# SYNERGY: every Loyalty builder in the tree — STEADFAST BOND, ABSOLUTE
+		# DEVOTION and WILD ROTATION — because the number is snapshot from the
+		# deepest bond AT CAST. It is the card that gives the Pack lane an
+		# outward payout, beside UNLEASH, which is the inward one: Unleash
+		# SPENDS the meter for one huge blow, this SPENDS NOTHING and rents the
+		# meter to the party for four turns. Holding both is a real decision
+		# about which way a deep bond cashes out.
+		"Bring It Down":
+			return Ability.make({"display_name": "Bring It Down", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "bring_it_down",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Call the kill: for 4 turns EVERY hero\ndeals 2% more damage per stack of\nLoyalty on your deepest bond, up to\n+20%. The bond is not spent — the\nnumber is read as the horn sounds."})
+		# ----- SHARPSHOOTER: the meter as armour, and the marksman dictating
+		# what an enemy is allowed to bring.
+		#
+		# AXIS: MIT-SELF. NOT EVASION, AND THAT IS DELIBERATE — Camouflage's own
+		# header reserves evasion as the CLASS's defensive shape "so it never
+		# overlaps the Mage's Barrier or the Warden's Block", and Ghillie Suit
+		# already stacks with it. A third copy would have been the same card a
+		# third time.
+		# SYNERGY: THE FOCUS METER ITSELF, read LIVE at the blow rather than
+		# snapshot. The deeper he has committed the harder he is to put down,
+		# and a target switch that breaks the meter takes his defence with it —
+		# so this card makes the spec's existing cost REAL instead of adding a
+		# new one. It is the reason to hold REACQUIRE and TROPHY SHOT, the two
+		# cards that keep the meter across a switch, and it is at its worst on
+		# the turn he arrives at a fresh mark.
+		"Dug In":
+			return Ability.make({"display_name": "Dug In", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
+				"cooldown": 4, "anim": "attack01", "special": "dug_in",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Set your feet: for 4 turns you take\nless damage — a QUARTER of whatever\nFocus stands when the blow lands, up\nto 25% less.\nBreak the mark and you break the\ncover with it."})
+		# AXIS: CTRL, which his pool did not have. It is a genuinely new control
+		# in the project: NOTHING silences an ability today, and it is written
+		# as a downgrade rather than a lost turn precisely so it is not a fourth
+		# Stun beside Bola, Deadfall and Pommel Strike.
+		# SYNERGY: DUG IN, by construction — blunt what it can bring, then set
+		# your feet. It is also the answer to a wind-up: an enemy that cannot
+		# reach its ability cannot open the charge that DUG IN would have to eat.
+		# The status is in `DEBUFF_IDS`, so it counts toward a SURVIVALIST'S
+		# TRAPPER breadth in the same party and a mender can cleanse it.
+		"Heads Down":
+			return Ability.make({"display_name": "Heads Down", "cost": 25,
+				"damage": 20, "pressure": 8, "delay": 2.0, "cooldown": 4,
+				"anim": "attack02",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Keep them pinned: 20% of Attack, and\nfor 3 turns that enemy can bring\nNOTHING but its basic attack to bear.\nIt still acts — it simply cannot\nreach for anything better."})
+		# ----- SURVIVALIST: the affliction board, read as defence and as
+		# sustain. Both are the same measurement the Trapper already runs.
+		#
+		# AXIS: MIT-SELF. His passive pays him 25% Poison on any attacker and
+		# STALKING HORSE pulls the field onto him, and until now NOTHING in his
+		# kit or his pool supported being in the fray at all.
+		# SYNERGY: STALKING HORSE above everything — that card puts a DIFFERENT
+		# affliction on every attacker in turn, which is precisely the number
+		# this one reads, so the two compound by construction. Also VULTURE (the
+		# +60% at three-plus) and FORCE OF NATURE, which read the same breadth
+		# on the way out; this is the first card that reads it on the way in.
+		"Thick Hide":
+			return Ability.make({"display_name": "Thick Hide", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
+				"cooldown": 4, "anim": "attack01", "special": "thick_hide",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Toughened by your own trade: for 4\nturns you take 6% less damage for\nevery DIFFERENT affliction standing on\nwhoever is striking you, up to 30%.\nThe wider the board, the harder you\nare to put down."})
+		# AXIS: HEAL — absent from all twenty-four, and the axis the whole class
+		# was shortest of. `Field Dressing`'s claim to be "the only self-heal a
+		# Hunter can get" was ALREADY FALSE before this card (Harvest heals, and
+		# it sits in his own boss pool and in `CLASS_POOLS["hunter"]`); this
+		# batch corrects that sentence rather than adding a second wrong one.
+		# SYNERGY: HARVEST, as its deliberate inverse — Harvest CONSUMES the
+		# whole board for one burst and strips his own Trapper bonus doing it,
+		# this one takes a smaller drink every turn and leaves every affliction
+		# standing, so the board keeps paying VULTURE, HUNT and CULL. Holding
+		# both is the decision "cash out now or drink from it". CHOKING SMOKE
+		# and DOWNWIND are what make the board wide enough to be worth drinking.
+		"Salve":
+			return Ability.make({"display_name": "Salve", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "salve",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Distil what you have been laying: for\n3 turns you heal 2% of maximum health\nat the start of your turn for every\nDIFFERENT affliction standing on the\nenemies, up to 10%.\nNothing is consumed — the board keeps\npaying everything else."})
 	return null
 
 
@@ -4129,6 +4315,17 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 # Field Dressing are still unwritten (Batch AH asked for them and its own
 # opening line forbade authoring new abilities; the header won). Adding
 # them later is a list edit and a def, no restructuring.
+#
+# **BATCH DS: TWO OF THOSE THREE NAMES ARE NO LONGER AVAILABLE AND THE LIST IS
+# STALE RATHER THAN OWED.** FIELD DRESSING was written by BR — as a HUNTER
+# CLASS-WIDE DRAFT card, not as this pool's — so the name is spent and the
+# BOSS pool still has nothing by it. SMOKE BOMB's function shipped at BO as
+# CHOKING SMOKE in his DRAFT pool (blind the field, plus Burn). **BLIGHT is
+# the only one of the three still genuinely unwritten**, and even that name is
+# now a live status id in `DEBUFF_IDS` and a word in the Occultist's Blight
+# the Well. DS did NOT take any of them: its two Survivalist cards are draft
+# cards on new names (Thick Hide, Salve), because paying a BOSS-pool debt with
+# DRAFT cards would have closed neither.
 static func survivalist_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Explosive Shot":
@@ -4173,6 +4370,13 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 
 # The Sharpshooter's spec pool — 5 of the designed 8, for the same reason
 # as the Survivalist's above (Disengage, Suppressing Fire, Piercing Arrow).
+#
+# **BATCH DS DELIBERATELY DID NOT SPEND THESE THREE NAMES**, and the reason is
+# worth having beside them: DS's brief asked for a Sharpshooter DISENGAGE and
+# a Sharpshooter SUPPRESSION card, which is two thirds of this list by name.
+# They are owed to the BOSS pool, so spending them on draft cards would have
+# paid one debt by opening another and left this header lying. The draft got
+# DUG IN and HEADS DOWN instead; all three names below are still free.
 static func sharpshooter_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Quick Draw":

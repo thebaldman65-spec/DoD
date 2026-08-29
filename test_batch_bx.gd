@@ -681,8 +681,18 @@ func _deepest_bond_source() -> void:
 	# the drift BX existed to close. The COUNT is what moved; the question did
 	# not, and a card added later that reads list order still trips the pins
 	# below.
-	ok(bat.count("_deepest_bond(attacker)") == 3,
-		"§3: ...and ALL THREE cards call it — Twin Hunt, Savage Sweep, Unleash (got %d)"
+	#
+	# RE-POINTED AGAIN BY BATCH DS, AND THE SAME WAY: a FOURTH and a FIFTH
+	# caller arrived, both of them ordered actions and both of them asking
+	# through this function rather than reaching for list order. **BEAR THE
+	# BRUNT** moves a killing blow off the hunter and onto one companion, and
+	# **BRING IT DOWN** reads one companion's Loyalty to price a party-wide amp.
+	# Neither is the strike-alongside case, which correctly loops the whole pack;
+	# this file's own rule is that an ORDERED action goes to ONE companion, and
+	# five cards now obey it at one door. **THE COUNT IS THE THING THAT MOVED**,
+	# and a sixth card reading `beasts[0]` still trips the pins below.
+	ok(bat.count("_deepest_bond(attacker)") == 5,
+		"§3: ...and ALL FIVE cards call it — Twin Hunt, Savage Sweep, Unleash, Bear the Brunt, Bring It Down (got %d)"
 			% bat.count("_deepest_bond(attacker)"))
 	# THE TWO THINGS IT REPLACED ARE GONE, not left beside it. A list-order read
 	# surviving anywhere on this path is the exact drift BV reported and BW

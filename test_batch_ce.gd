@@ -242,22 +242,22 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 119, "the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d"
+	ok(total == 125, "the spec pools hold 125 (CI's 96, DO's twenty-two, DR's net +1, DS's six), got %d"
 		% total)
 	ok(total > 12 * 8,
 		"...which is ABOVE CI's flat ninety-six — DO's twenty-two landed here")
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 143, "the draft holds 143 (got %d)"
+	ok(draft_total == 149, "the draft holds 149 (got %d)"
 		% draft_total)
 	# INVERTED BY BATCH CI RATHER THAN DELETED. These asserted a DEBT for three
 	# batches; CI paid it, so what they assert now is that there is none — which
 	# is the thing a later batch could break (a pool emptying, a card removed),
 	# and it is the same question with the correct answer moved.
-	ok(143 - draft_total == 0,
-		"NOTHING is owed — the draft is complete at 143 of 143")
-	ok(119 - total == 0, "...and the spec half is full at 119")
+	ok(149 - draft_total == 0,
+		"NOTHING is owed — the draft is complete at 149 of 149")
+	ok(125 - total == 0, "...and the spec half is full at 125")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
@@ -546,7 +546,7 @@ func _docs() -> void:
 	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
 	ok(_stamped >= "CE",
 		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
-	ok(doc.contains("143 of 143") or doc.contains("143 of a target 143"),
+	ok(doc.contains("149 of 149") or doc.contains("149 of a target 149"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:
 		ok(doc.contains(n), "master.html's draft table lists %s" % n)

@@ -67,16 +67,16 @@
   "check_co": {
    "kind": "gate",
    "checks": [
-    301,
-    301
+    321,
+    321
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 9,
-   "note": " **BATCH DR: 297 -> 301.** COUNTER TIME joins `RECAST_GATED` — its entire payload is a status, so a recast onto a field that already holds it at full depth buys literally nothing (BO §5's rule). WHEELING CUT deliberately does NOT join: it deals real AoE damage and Break, so a recast is never wasted however long its grant has left, which is why no damaging card is in that list."
+   "note": " **BATCH DR: 297 -> 301.** COUNTER TIME joins `RECAST_GATED` — its entire payload is a status, so a recast onto a field that already holds it at full depth buys literally nothing (BO §5's rule). WHEELING CUT deliberately does NOT join: it deals real AoE damage and Break, so a recast is never wasted however long its grant has left, which is why no damaging card is in that list. **BATCH DS: 301 -> 321.** Four of the six new Hunter cards join `RECAST_GATED` (Bear the Brunt, Dug In, Thick Hide, Salve — each is entirely a status on the caster, so a recast buys nothing but a duration the card never promised). BRING IT DOWN deliberately does NOT join: its number is snapshot off the deepest bond's Loyalty, which is uncapped, so a recast on a deeper bond genuinely buys a bigger party-wide amp. HEADS DOWN is not in the system at all — it deals damage, and no damaging card is in that list. **THIS GATE CAUGHT A REAL FAULT BEFORE THE BATTERY**: Salve's `_recast_writes` first proposed the PERFECT's four turns while `check_co` saturates at grade \"good\", which writes three — so the proposal improved on what was standing every time and the card never refused. The rule it produced is in CLAUDE.md: a proposal must equal what a GOOD cast writes."
   },
   "check_cs": {
    "kind": "gate",
@@ -120,15 +120,16 @@
   "check_cy": {
    "kind": "gate",
    "checks": [
-    2704,
-    2704
+    2857,
+    2857
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": "**BATCH DS: 2704 -> 2857.** Three of the six new Hunter cards join `Ability.PURE_BUFFS` (Bear the Brunt, Dug In, Thick Hide) and this gate runs its whole per-ability rule over every member. **BRING IT DOWN IS DELIBERATELY NOT A MEMBER**: it is a pure buff by shape, but it is the strongest of the six — a party-wide amp scaling off an UNCAPPED meter — and is priced at initiative 2.0 for that, on PREPARATION's precedent; membership would have clamped it to 1.0 as a side effect. **THIS ROW WAS NOT PREDICTED.** DS predicted `bo`, `cb` and `ce` exactly and missed this one, which its own first battery reported as a notice."
   },
   "check_cz": {
    "kind": "gate",
@@ -170,7 +171,7 @@
     0
    ],
    "fails_obs": 8,
-   "note": "NEW AT DI, AND THE ROW IS A RATCHET RATHER THAN A MEASUREMENT. §1 counts `_apply_status` call sites out of battle.gd's own text with a BALANCED-PAREN WALK and asserts `src` coverage never falls below the floor the last batch left (DI 99, DJ 106) and that no site passes an explicit `null`. IT WALKS RATHER THAN GREPS BECAUSE THE FIGURE DI INHERITED — 53 of 204, in docs/state.md and in DH's own comment — WAS A GREP AND WAS WRONG: 25 of the 204 calls wrap across lines and twelve of those already passed a source, so real coverage before DI was 63. §2 measures Harvest's ally term on a SEEDED pair (both arms draw the same stream, per DD's rule) and asserts the ratio is 1.5 exactly, with a self-vs-self arm and an enemy-source arm as the negative halves. §3 drives the changed call sites through real casts. §4 ASSERTED THE COMPANION GAP DI FOUND AND DELIBERATELY DID NOT CLOSE, AND DJ RULED ON IT: its third assertion moved from 1.0 (a companion-opened wound paid nothing) to 1.5 (it pays what a hero's pays). THE FIRST TWO DID NOT MOVE — `heroes` still does not hold the companion and `_hero_side()` still does. Count is unchanged at 44 across the ruling, over 10 readings. **BATCH DP MOVED `CALL_SITES` 204 -> 203 AND THE COUNT IS UNCHANGED AT 44.** The re-pointed Spread of Madness deleted `_apply_status(infected, \"psychosis\", 3)`, a site carrying NO source, so the population fell by one and the unstamped remainder is 97 rather than 98. `with_src` did not move — still 106, still above SRC_FLOOR. **DP's first battery read 1 failure here and it was NOT a flake**: the equality is a tripwire for exactly this, and it fired on the batch that moved the ground under it. THIS WAS THE ONE MOVEMENT DP DID NOT PREDICT. **BATCH DR MOVED `CALL_SITES` 203 -> 205 AND SAID WHY IN THE GATE'S OWN COMMENT, WHICH IS WHAT THAT EQUALITY IS FOR.** Net +2 from four sites: the retired card's stamped `chilled` application went with it, and §4's three arrived — Wheeling Cut's two arriving-stance grants and Counter Time's Stun. **`with_src` DID NOT MOVE, AND THAT IS ARITHMETIC RATHER THAN LUCK**: Counter Time passes its `attacker` and exactly replaces the stamped site the retirement took, while the two Wheeling Cut grants are self-buffs on the hero that nothing Harvest-shaped reads. The unstamped remainder goes 97 -> 99."
+   "note": "NEW AT DI, AND THE ROW IS A RATCHET RATHER THAN A MEASUREMENT. §1 counts `_apply_status` call sites out of battle.gd's own text with a BALANCED-PAREN WALK and asserts `src` coverage never falls below the floor the last batch left (DI 99, DJ 106) and that no site passes an explicit `null`. IT WALKS RATHER THAN GREPS BECAUSE THE FIGURE DI INHERITED — 53 of 204, in docs/state.md and in DH's own comment — WAS A GREP AND WAS WRONG: 25 of the 204 calls wrap across lines and twelve of those already passed a source, so real coverage before DI was 63. §2 measures Harvest's ally term on a SEEDED pair (both arms draw the same stream, per DD's rule) and asserts the ratio is 1.5 exactly, with a self-vs-self arm and an enemy-source arm as the negative halves. §3 drives the changed call sites through real casts. §4 ASSERTED THE COMPANION GAP DI FOUND AND DELIBERATELY DID NOT CLOSE, AND DJ RULED ON IT: its third assertion moved from 1.0 (a companion-opened wound paid nothing) to 1.5 (it pays what a hero's pays). THE FIRST TWO DID NOT MOVE — `heroes` still does not hold the companion and `_hero_side()` still does. Count is unchanged at 44 across the ruling, over 10 readings. **BATCH DP MOVED `CALL_SITES` 204 -> 203 AND THE COUNT IS UNCHANGED AT 44.** The re-pointed Spread of Madness deleted `_apply_status(infected, \"psychosis\", 3)`, a site carrying NO source, so the population fell by one and the unstamped remainder is 97 rather than 98. `with_src` did not move — still 106, still above SRC_FLOOR. **DP's first battery read 1 failure here and it was NOT a flake**: the equality is a tripwire for exactly this, and it fired on the batch that moved the ground under it. THIS WAS THE ONE MOVEMENT DP DID NOT PREDICT. **BATCH DR MOVED `CALL_SITES` 203 -> 205 AND SAID WHY IN THE GATE'S OWN COMMENT, WHICH IS WHAT THAT EQUALITY IS FOR.** Net +2 from four sites: the retired card's stamped `chilled` application went with it, and §4's three arrived — Wheeling Cut's two arriving-stance grants and Counter Time's Stun. **`with_src` DID NOT MOVE, AND THAT IS ARITHMETIC RATHER THAN LUCK**: Counter Time passes its `attacker` and exactly replaces the stamped site the retirement took, while the two Wheeling Cut grants are self-buffs on the hero that nothing Harvest-shaped reads. The unstamped remainder goes 97 -> 99. **BATCH DS MOVED `CALL_SITES` 205 -> 210 AND `SRC_FLOOR` 106 -> 107, AND THE COUNT IS UNCHANGED AT 44.** Net +5 sites, all arrivals: the six new Hunter cards apply five statuses through `_apply_status` (`heads_down` onto an enemy; `bring_it_down`, `dug_in`, `thick_hide` and `salve` onto heroes). BEAR THE BRUNT is the sixth card and is NOT a site — it goes through `add_status` directly, which is BLOODBOND's shape and for Bloodbond's reason. **`with_src` MOVES BY EXACTLY ONE AND THAT IS THE RULE WORKING**: `heads_down` is the only one of the five that lands on an ENEMY, so it is the only one that passes `attacker`; the other four are hero-side buffs that nothing Harvest-shaped reads, exactly as DR's two Wheeling Cut grants were. **DS PREDICTED THIS MOVEMENT AND THE GATE CAUGHT IT BEFORE THE BATTERY.** The unstamped remainder goes 99 -> 103."
   },
   "check_dj": {
    "kind": "gate",
@@ -725,8 +726,8 @@
   "test_batch_bo": {
    "kind": "suite",
    "checks": [
-    1070,
-    1070
+    1106,
+    1106
    ],
    "checks_obs": 1,
    "fails": [
@@ -738,7 +739,7 @@
     "rate": "~1 failure in 13 runs",
     "what": "§5's NULL FIELD check compares two variance-rolled blows with a bare `<`"
    },
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +39. §5's per-card loop walks the draft pools, so it grows with them. §4's DISJOINTNESS assertion is RE-POINTED to the property disjointness stood for: BO kept the pools apart so the BOSS pick would be unchanged, and DO adds nothing to `SPEC_POOLS` — so what is asserted now is that exactly sixteen of the twenty-two sit in both draws, and that BOTH rollers filter `owned_ability_names`, which is what makes an overlap unable to double-offer. Rampage and Pyroblast are NAMED exemptions from the states-a-perfect biconditional: both are `test_batch_cp.CHECK_WITHOUT_PERFECT` names that DO brought into reach without creating. **BATCH DR: 1064 -> 1070.** Its §5 loop walks every spec draft-pool entry and checks four things about each; DR's net +1 card moves it, and its §4 class-pool and per-spec-depth loops add the rest. The row moved in the batch that caused it."
+   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +39. §5's per-card loop walks the draft pools, so it grows with them. §4's DISJOINTNESS assertion is RE-POINTED to the property disjointness stood for: BO kept the pools apart so the BOSS pick would be unchanged, and DO adds nothing to `SPEC_POOLS` — so what is asserted now is that exactly sixteen of the twenty-two sit in both draws, and that BOTH rollers filter `owned_ability_names`, which is what makes an overlap unable to double-offer. Rampage and Pyroblast are NAMED exemptions from the states-a-perfect biconditional: both are `test_batch_cp.CHECK_WITHOUT_PERFECT` names that DO brought into reach without creating. **BATCH DR: 1064 -> 1070.** Its §5 loop walks every spec draft-pool entry and checks four things about each; DR's net +1 card moves it, and its §4 class-pool and per-spec-depth loops add the rest. The row moved in the batch that caused it. **BATCH DS: 1070 -> 1106.** Its §5 per-card loop checks SIX things about every spec draft-pool entry and its §4 loop one more, and DS adds six cards to three Hunter pools at once. **THE RATE WAS DERIVED BEFORE THE RUN FROM DR'S OWN MOVEMENT** (net +1 card moved this row +6) and the prediction was exact."
   },
   "test_batch_bp": {
    "kind": "suite",
@@ -863,13 +864,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DL §2 — 147 -> 157, and the nine prior readings support the 147 rather than this. §4b sweeps every player-facing surface for the retired word \"party\" — the same construction §4 uses for \"beast\", string literals only, comments skipped, identifiers (`party_mark`, the `party` event target, `spec_in_party`, `party.tscn`) stripped by exact token. Its file list is WIDER than §4's, because \"party\" reached relics.gd, events.gd, shop_screen.gd, blacksmith_screen.gd and relics_screen.gd, which \"beast\" never did. SHOWN TO BITE ON THREE SURFACES BEFORE IT WAS TRUSTED: a \"party\" planted in a live ability description, in the glossary, and in master.html each red it, and each reverted clean. §4's own rule for the previous retired word is unchanged, and DG's repair to the glossary's hero_vs_ally entry still stands under it."
+   "note": "BATCH DL §2 — 147 -> 157, and the nine prior readings support the 147 rather than this. §4b sweeps every player-facing surface for the retired word \"party\" — the same construction §4 uses for \"beast\", string literals only, comments skipped, identifiers (`party_mark`, the `party` event target, `spec_in_party`, `party.tscn`) stripped by exact token. Its file list is WIDER than §4's, because \"party\" reached relics.gd, events.gd, shop_screen.gd, blacksmith_screen.gd and relics_screen.gd, which \"beast\" never did. SHOWN TO BITE ON THREE SURFACES BEFORE IT WAS TRUSTED: a \"party\" planted in a live ability description, in the glossary, and in master.html each red it, and each reverted clean. §4's own rule for the previous retired word is unchanged, and DG's repair to the glossary's hero_vs_ally entry still stands under it. **BATCH DS: THE COUNT DID NOT MOVE (157) BUT THIS SUITE WENT 0 -> 4 FAILURES ON DS'S FIRST BATTERY AND ALL FOUR WERE DS'S OWN.** Three were §4's retired-word sweep biting exactly as designed: Bear the Brunt's card text, its live chip text and its cast message all read \"beast\", which is retired from player-facing prose, and two of the four were master.html — §4 for \"beast\" and §4b for \"party\" in the six new card rows. The fourth was §3's `_deepest_bond` caller count, re-pointed 3 -> 5 (Bear the Brunt and Bring It Down are both ORDERED actions and both ask through the one door rather than reading list order). **THE SWEEP EARNED ITS KEEP: a batch adding Beastmaster content is exactly the batch that reintroduces the retired word, and nothing else in the tree would have said so.**"
   },
   "test_batch_cb": {
    "kind": "suite",
    "checks": [
-    1197,
-    1197
+    1203,
+    1203
    ],
    "checks_obs": 1,
    "fails": [
@@ -877,7 +878,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +11. The per-spec depth loops grow with the pools. **CB'S BACKDRAFT COLLISION SECTION IS INVERTED**: `py_melt` both carried the name Backdraft and granted an ability of that name, which is why CB renamed the draft card to Firedraw. DO ended the grant, so the collision is gone — the node is `Melt`, Backdraft is a real draft card, and Firedraw ships beside it. **BATCH DR: 1196 -> 1197.** Its pool loop walks one more draft card than it did (net +1: two Swordmaster cards in, one Cryomancer card out)."
+   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +11. The per-spec depth loops grow with the pools. **CB'S BACKDRAFT COLLISION SECTION IS INVERTED**: `py_melt` both carried the name Backdraft and granted an ability of that name, which is why CB renamed the draft card to Firedraw. DO ended the grant, so the collision is gone — the node is `Melt`, Backdraft is a real draft card, and Firedraw ships beside it. **BATCH DR: 1196 -> 1197.** Its pool loop walks one more draft card than it did (net +1: two Swordmaster cards in, one Cryomancer card out). **BATCH DS: 1197 -> 1203.** Its pool loop walks one assertion per draft card and DS adds six. Predicted before the run at the rate DR's net +1 established, and exact."
   },
   "test_batch_cd": {
    "kind": "suite",
@@ -896,8 +897,8 @@
   "test_batch_ce": {
    "kind": "suite",
    "checks": [
-    1139,
-    1139
+    1145,
+    1145
    ],
    "checks_obs": 1,
    "fails": [
@@ -905,7 +906,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +22. The per-spec depth loops walk the pools and grow with them. Its arithmetic assertions moved 96/120 -> 118/142 with the reason beside them. **BATCH DR: 1138 -> 1139.** Same shape as `cb` — its pool loop walks the net +1 draft card."
+   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +22. The per-spec depth loops walk the pools and grow with them. Its arithmetic assertions moved 96/120 -> 118/142 with the reason beside them. **BATCH DR: 1138 -> 1139.** Same shape as `cb` — its pool loop walks the net +1 draft card. **BATCH DS: 1139 -> 1145.** Same shape as `cb` — one assertion per draft card, six cards added. Predicted before the run, and exact."
   },
   "test_batch_cp": {
    "kind": "suite",

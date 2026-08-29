@@ -233,7 +233,7 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 119, "the spec pools hold 119 (CI's 96, DO's twenty-two, DR's net +1), got %d" % total)
+	ok(total == 125, "the spec pools hold 125 (CI's 96, DO's twenty-two, DR's net +1, DS's six), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -532,7 +532,7 @@ func _docs() -> void:
 		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("143 of"), "master.html states the current draft count")
+	ok(master.contains("149 of"), "master.html states the current draft count")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BU — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

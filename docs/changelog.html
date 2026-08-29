@@ -14,6 +14,85 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-29 &mdash; Batch DS: THE HUNTER CLASS GAP</h2>
+<p><i>DQ's largest structural finding, ruled and paid. The three Hunter specs held the three
+shallowest pools in the game (eight apiece), received <b>none</b> of DO's twenty-two, and
+<b>not one of their twenty-four spec cards was a heal, a shield or hero-side mitigation</b> &mdash;
+a hunter's entire defensive option set for a whole run was two of the six Hunter class cards he had
+to be lucky enough to be offered. It compounded with the Sharpshooter holding <b>no defensive node
+in his 27</b>, so both halves of his progression offered him nothing. <b>Six cards, all three pools
+8 &rarr; 10, matching the Cleric class. The draft goes 143 &rarr; 149.</b></i></p>
+
+<p><b>&sect;1 &mdash; SIX CARDS, TWO PER SPEC, AND EACH SPEC'S DEFENCE IS SHAPED BY ITS OWN
+ENGINE.</b> That is DR's standing rule applied rather than a new one: <b>MIT-SELF is a shared AXIS
+and adding it dilutes nothing, because the engine still gates every one of them.</b></p>
+<ul>
+<li><b>BEAR THE BRUNT</b> (Beastmaster, 20 Mana, 1.0, 4cd) &mdash; the next blow that would fell
+<i>him</i> is REFUSED and his deepest bond takes all of it, and it can kill the beast. Battle-long,
+waits until it fires. <b>It is BLOODBOND exactly inverted</b>, clause for clause, and the pair is
+meant to be read together on the draft screen.</li>
+<li><b>BRING IT DOWN</b> (Beastmaster, 25 Mana, 2.0, 5cd) &mdash; for 4 turns EVERY hero deals 2%
+more damage per stack of Loyalty on his deepest bond, up to +20%, snapshot at cast and the bond is
+not spent. <b>AMP-TEAM, absent from all twenty-four</b>, and the answer to a pool measured 8-of-8
+on one engine: it makes the other three heroes care what the Loyalty meter reads.</li>
+<li><b>DUG IN</b> (Sharpshooter, 20 Mana, 1.0, 4cd) &mdash; for 4 turns he takes a quarter of
+whatever Focus stands <i>when the blow lands</i> less damage, up to 25%. Read live, so it rises as
+he commits and <b>falls to nothing when a switch breaks the meter</b>. Deliberately <b>not
+evasion</b>: Camouflage and Ghillie Suit already stack, and Camouflage's own header reserves evasion
+as the class's shape so it never overlaps a Barrier or a Block.</li>
+<li><b>HEADS DOWN</b> (Sharpshooter, 25 Mana, 2.0, 4cd, 20 dmg / 8 BD) &mdash; for 3 turns
+(Perfect: 4) that enemy can bring <b>nothing but its basic attack</b> to bear. <b>The first silence
+in the project</b>, written as a downgrade rather than a lost turn so it is not a fourth Stun.</li>
+<li><b>THICK HIDE</b> (Survivalist, 20 Mana, 1.0, 4cd) &mdash; for 4 turns he takes 6% less damage
+per DIFFERENT affliction standing on <i>whoever is striking him</i>, up to 30%. <b>The first card
+that reads Trapper breadth on the way IN</b>, and Stalking Horse is what fills it.</li>
+<li><b>SALVE</b> (Survivalist, 25 Mana, 2.0, 5cd) &mdash; for 3 turns (Perfect: 4) he heals 2% of
+maximum health at the start of his turn per DIFFERENT affliction on the enemies, up to 10%, counted
+<b>once each across the field</b> so a copied poison does not pay twice. <b>The first heal in any of
+the twenty-four Hunter spec cards</b>, and HARVEST's deliberate inverse: that one burns the board
+for a burst and strips his own Trapper bonus, this drinks and consumes nothing.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; THE BRIEF ASKED FOR A BREAK CARD AND THE MEASUREMENT REFUSED IT.</b> The
+premise was <i>"the Hunter class has no Break generation anywhere"</i>. <b>Twelve of the thirty
+Hunter draft cards generate Break</b> &mdash; <code>pressure</code> IS Break, so a card generates it
+without ever saying the word. <b>UNLEASH already lands Break on the Beastmaster's own pool</b> and
+<b>FAULT LINE</b> is a dedicated Break card the audit scores as one of the Sharpshooter's five
+distinct decisions. The proposed card would have been a second copy of a clause already in its own
+pool. <b>AMP-TEAM was taken instead</b>, and the rule is in <code>CLAUDE.md</code>: before
+declaring an axis ABSENT from a class, derive it from the DATA, never from the card text.</p>
+
+<p><b>&sect;3 &mdash; THE SHARPSHOOTER RE-AUTHOR WAS MEASURED AND DECLINED.</b> Four of his eight
+cards are single-target strikes, the concentration the Swordmaster had at DR. Compared <b>at the
+read site</b> rather than by shape, they are four different decisions: <b>Crossfire</b> converts
+crits into area damage and reads no Focus at all; <b>Trophy Shot</b> is a decay-RULE change read
+inside <code>_sharpshooter_focus</code>'s <code>victim.dead</code> branch; <b>Calibrating Shot</b>
+and <b>Drumfire</b> are the only two that are alike, both being meter GENERATION on a strike &mdash;
+and they are not a domination, splitting on tempo (initiative 1.5 against 3.0) and on damage.
+<b>Nothing was re-authored</b>, which is what the brief's own escape clause asked for if the four
+turned out distinct. One thing the audit's DMG-ST label hides is recorded instead: <b>Trophy Shot
+and Reacquire are near-siblings</b> &mdash; both are "do not lose Focus when the target changes".</p>
+
+<p><b>&sect;4 &mdash; TWO STALE CLAIMS CORRECTED, BOTH FOUND BY THIS BATCH'S OWN WORK.</b>
+<b>FIELD DRESSING said "The only self-heal a Hunter can get" and it was already false when BR wrote
+it</b>: HARVEST heals, and it sits in the Survivalist's boss pool and in
+<code>CLASS_POOLS["hunter"]</code>. Salve would have made it wrong a third way. Corrected on the
+card, in <code>classes.gd</code>'s AXIS comment and in master.html &mdash; and <b>the tree half of
+the claim is TRUE and is kept</b>: no Hunter talent node heals (Field Medic <i>cleanses</i>).
+<b>AND THE "SIX DESIGNED ABILITIES NOT YET WRITTEN" LIST IS FOUR, NOT SIX</b>: Field Dressing was
+written at BR as a CLASS-WIDE draft card rather than as the Survivalist's boss-pool one, and Smoke
+Bomb's function shipped at BO as Choking Smoke. <b>DS deliberately did not spend the Sharpshooter's
+three reserved names</b> (Disengage, Suppressing Fire, Piercing Arrow) on its own two draft cards,
+which would have paid one debt by opening another.</p>
+
+<p><b>&sect;5 &mdash; WHAT IS DELIBERATELY NOT DONE.</b> <b>No talent node moves</b> &mdash; the
+Sharpshooter's missing defensive node is real and is not this batch's, because a cell that changes
+row mis-prices the ledger. <b>Pyroblast's cooldown of zero stays open</b>, DO's last loose end.
+<b>No other pool is touched</b>; the Cryomancer's 11-of-11 and the Pyromancer's one-currency
+finding are still reported and unruled. And one correction in passing: <b>Bloodbond's master.html
+row contradicted itself</b>, saying a QUARTER in one clause and "the half he takes can kill him" in
+the next. The code pays a quarter; the sentence is fixed.</p>
+
 <h2>2026-08-28 &mdash; Batch DR: THE ENGINE / AXIS FRAMEWORK, AND THE SWORDMASTER'S POOL</h2>
 <p><i>DQ found two grade-2 dominations and measured that the pools vary enormously. This batch
 repairs both, widens the most concentrated pool in the game, and records the framework the audit

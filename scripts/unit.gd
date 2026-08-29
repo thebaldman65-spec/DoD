@@ -30,6 +30,25 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# `_dispellable_buffs` set, so a Mage's own Dispel can never strip the
 	# party's work off the enemy carrying it. `emberkeep`, `resonant_field` and
 	# `threshold_lock` are NOT here and must not be: all three sit on a HERO.
+	# BATCH DS — `heads_down` IS THE ONLY ONE OF THE HUNTER SIX THAT BELONGS
+	# HERE, and the other five are named below as deliberate absences. It is a
+	# genuine ENEMY-SIDE affliction — the first silence in the project, holding
+	# an enemy to its basic attack for three turns — so it is listed for both of
+	# the usual two consequences: a mender's Cleansing Rite can take it (real
+	# counterplay, and it is not battle-long so it is never picked first every
+	# time), and listing it keeps it OUT of the derived `_dispellable_buffs`
+	# set, so a Mage's own Dispel can never strip the party's work off the
+	# enemy carrying it. It also means a SURVIVALIST in the same party counts it
+	# toward his Trapper breadth, which is intended and is the shared-axis rule
+	# working: the Sharpshooter's card feeds another spec's engine.
+	#
+	# `bear_brunt`, `bring_it_down`, `dug_in`, `thick_hide` AND `salve` ARE NOT
+	# HERE AND MUST NOT BE — all five sit on a HERO, and listing any of them
+	# would put a hero's own buff inside the cleansable set and hand a mender's
+	# Cleansing Rite the party's work. Same rule as `emberkeep`,
+	# `resonant_field` and `threshold_lock` above and `anointed`/`fortified`
+	# below; DS's brief asked for all six here and that was over-broad.
+	"heads_down",
 	"frostbind", "unmade",
 	# BATCH CE — `breaking_darkness` (Anathema, renamed at CG §3) AND `penance`
 	# are the tranche-3 Cleric draft's two enemy-side statuses and both are
@@ -1212,6 +1231,13 @@ var vigil_cb := Callable()
 # KILL the hunter and a death has to route through the battle's own handling.
 # It is the `vow_cb` shape aimed at the other side of the bond.
 var bloodbond_cb := Callable()
+# BATCH DS — BEAR THE BRUNT (Beastmaster) — the same shape pointed the other
+# way, and a SECOND Callable rather than a flag on the first, because the two
+# guards ask about different bodies: this one is asked when a blow would fell
+# the HUNTER, and battle.gd bills his deepest companion the whole of it. Two
+# hooks means a hunter holding both cards is covered in both directions and
+# neither can be mistaken for the other at the read site.
+var brunt_cb := Callable()
 # PREPARATION (Survivalist) — the first extra-turn mechanic in the game.
 #
 # A COUNTER RATHER THAN A BOOL, AND THAT IS WHAT MAKES THE DELAY EXACT: the cast
@@ -2732,6 +2758,20 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		if bool(bloodbond_cb.call(self, amount)):
 			amount = maxi(hp - 1, 0)
 			float_text("BLOODBOND", Color(0.85, 0.30, 0.35))
+	# BATCH DS — BEAR THE BRUNT, IMMEDIATELY BELOW BLOODBOND AND FOR ITS REASONS.
+	# Same position for the same promise ("the blow that would fell him is
+	# REFUSED", so nothing downstream may ever see a lethal number), same
+	# callback-decides rule, same "a relocation that never landed must not also
+	# refuse the wound".
+	#
+	# THE TWO CANNOT BOTH FIRE ON ONE BLOW AND THE GUARD IS THE `is_companion`
+	# TEST EACH ALREADY CARRIES: a body is a companion or it is not. The other
+	# direction is loop-proof at the battle side instead — both callbacks pay
+	# through `take_tick_damage`, which never re-enters this function.
+	if not is_companion and amount > 0 and amount >= hp and brunt_cb.is_valid():
+		if bool(brunt_cb.call(self, amount)):
+			amount = maxi(hp - 1, 0)
+			float_text("BEAR THE BRUNT", Color(0.80, 0.55, 0.30))
 	# BATCH CG §1 — VESPERS (Holy draft, tranche 3, replacing Observance). THE
 	# BLOW THAT WOULD CROSS THE WINDOW IS THE ONE IT CATCHES, and its position is
 	# the whole card: it sits ABOVE the subtraction and therefore above

@@ -5,85 +5,77 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-28 (Batch DR).*
+*Last rewritten: 2026-08-29 (Batch DS).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DR — THE ENGINE/AXIS FRAMEWORK, AND THE SWORDMASTER'S POOL.** DQ's two grade-2
-  dominations are both **repaired**, the most concentrated pool in the game is widened, and the
-  framework the audit made visible is recorded as a standing rule. **The draft moved TWICE in one
-  batch and the net is +1: 142 → 143** (119 spec + 24 class-wide). **Report: `docs/reports/DR.md`.**
-- **THE FRAMEWORK, AND IT IS THE THING FUTURE POOLS ARE AUTHORED AGAINST.** In `CLAUDE.md`: **an
-  ENGINE is the spec's own currency and is exclusive by construction; an AXIS is an effect type and
-  is SHARED, deliberately. Adding axes to a spec does not dilute its identity — the engine still
-  gates everything.** A pool covering few axes holds one build however strong its engine is, and
-  depth of engine is not breadth of pool.
-- **ONE OF THE THREE "EXCLUSIVE AXES" THE BRIEF NAMED WAS NOT ONE, AND THAT IS THE BATCH'S SHARPEST
-  FINDING.** The brief held that cooldown manipulation is the Swordmaster's — *"Answering Steel and
-  Battle Poise are the only cards in the game that do it"*. **`_tick_cooldowns` HAS SEVEN CALLERS**,
-  one of them **BLINK, a MAGE CLASS-WIDE DRAFT CARD whose own comment names tempo as its axis**, and
-  another **BLESSING OF ZEAL, the Devout's PROTECTED CORE**; the other three are talent nodes
-  (Frostbound Hours, which ticks EVERY hero's; Practised Hands; Follow-Through). Five more sites
-  clear a cooldown outright through `cooldowns.erase`. **The assertion was not authored**;
-  `check_dr` §3 asserts the axis is SHARED and names all seven. **The rule it produced: before
-  declaring an axis exclusive, derive the population that touches it — a one-door helper that "only
-  two cards call" reads like a single owner and is not the same thing.**
-- **THE TWO THAT SURVIVED VERIFICATION ARE ASSERTED AS PROPERTIES, NEVER AS COUNTS.** **COMPANION
-  SUMMONING is the Beastmaster's** — `special: "summon"` is on exactly three abilities, all his
-  protected core, and `_do_summon`'s only other caller is his own Call the Wilds. **REVIVAL is the
-  Holy Cleric's AMONG ABILITIES, with a qualifier the gate prints**: `.revive(` has TWO callers,
-  `resurrection` and the **REVIVE POTION**, and `events.gd`'s `revive_pct` is a third channel —
-  exclusive as an ability, not as a channel.
-- **FLASH FREEZE IS RETIRED AND THE COMMENT SUSPENDING THE RULE OVER IT WAS DELETED, NOT UPDATED.**
-  Its handler and Glacial Prison's were the same three steps in the same order and Glacial Prison
-  is better on all four columns. **Both of the suspension's stated reasons were already dead** —
-  the acquisition channel at DO, the Perfect at CR — and neither batch touched the comment.
-  **A DOCUMENTED EXCEPTION THAT OUTLIVES ITS JUSTIFICATIONS IS WORSE THAN AN UNDOCUMENTED ONE,
-  BECAUSE IT READS AS DELIBERATE**, and that is now a trap in `CLAUDE.md`. **The MECHANIC is
-  untouched**: four Chilled stacks still flash-freeze, which is `_apply_status`'s branch and
-  belonged to no card. Cryomancer pool 12 → 11.
-- **BATTLE POISE'S DEFENSIVE GUARD NOW BUYS SOMETHING, AND THAT IS WHAT ENDS THE SECOND
-  DOMINATION.** Once a turn a parry lets him **GUARD CHANGE without spending an action** — a clause
-  Answering Steel cannot have, because it has no requirement to reward. **It is the PIVOT alone**
-  (Guard Change's 15 BD, **Sunder Guard's 40 BD to every enemy**, No Quarter and Tempo stay on that
-  card — a Defensive build holding Sunder Guard and parrying twice a turn would otherwise land 80
-  free Break across the field every turn), it is bounded to once a turn, the cooldown tick still
-  pays on every parry, and **it asks `_ability_usable` about the REAL Guard Change**, so Formless
-  refuses it and the 1-turn cooldown is respected at one door rather than two. **Answering Steel is
-  untouched.** The pivot throws away **Discipline's** accumulation, like every other call to the
-  one pivot.
-- **THE SWORDMASTER'S POOL GOES 10 → 12 AND FOUR DECISIONS → EIGHT.** All three cards read the
-  stance engine and BW's rule decides how.
-  - **LUNGE, RE-AUTHORED ONTO BREAK.** An entire Breaker lane is built around a window and **not
-    one draft card opened it**. **Cooldown 0 → 3** (it was one of only two repeatable draft cards
-    in the game) and **the guard decides where the Break lands**: Aggressive puts 15 more into one
-    enemy, Defensive puts 12 on **every other** enemy. Damage 35 → 30; **Shatterpoint keeps its
-    title at 40**. It stays an ordinary attack, so the crit, armour read, parry roll, Overwhelm,
-    Off Balance and Whetstone all still apply.
-  - **WHEELING CUT — AREA DAMAGE and SELF-MITIGATION, the card carrying two axes.** 30/2.5/4cd,
-    `aoe`, 20% of Attack and 12 Break to every enemy. A **reader**: from Aggressive he lands
-    Defensive and arrives holding **defence** (−20% damage taken, 3 turns); from Defensive he lands
-    Aggressive and arrives holding **offence** (+20% dealt). Perfect: both at once.
-  - **COUNTER TIME — CONTROL, on a pool that had none.** 25/2.0/5cd, **requires Defensive**, one
-    enemy loses its next TWO turns and the card deals nothing. Pommel Strike is his only Stun and
-    it is protected core. The boss rule is **inherited** (`stunned` is in `_apply_status`'s
-    carve-out; nothing here passes `force`). It joins `RECAST_GATED`; Wheeling Cut deliberately
-    does not, because a card that deals damage is never a wasted cast.
-- **THE BRIEF SAID SHATTERPOINT IS A TALENT AND IT IS NOT** — it is a `SPEC_POOLS` boss pick (and a
-  `CLASS_POOLS["warrior"]` one). The substantive point survived: no *draft* card opened the Break
-  window, and the lane depended on an offer he may never see.
-- **AND ONE MORE STALE COUNT, FOUND WHILE REMOVING SOMETHING ELSE.** `_hold_freeze`'s header said
-  **THREE callers** while DO's Cryoclasm had made it four, and named a `force` argument **no caller
-  has passed since CR**. Corrected with its reason. Same species as the comment §2 deleted, three
-  hundred lines away, and neither was findable from the other.
-- **Next letter: DS.** `DS` sorts after `DR`, so the stamp gates still work.
-- **Phase.** The ability draft is **COMPLETE at 143 of 143** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: DN's sizing
-  of the talent charter, DO's settling and implementation of it, DP's payment of the cost DO's own
-  ruling created, DQ's audit of whether the pools those two reshaped hold more than one build each,
-  **and DR's ruling on the two things that audit found were correctness rather than taste.**
+- **Last batch: DS — THE HUNTER CLASS GAP.** DQ's largest structural finding, ruled and paid.
+  **All three Hunter pools go 8 → 10 and the draft goes 143 → 149** (125 spec + 24 class-wide).
+  **Report: `docs/reports/DS.md`.**
+- **WHAT THE GAP WAS, DERIVED RATHER THAN QUOTED.** The three Hunter specs held the three
+  **shallowest pools in the game** (8 apiece; next was the Warden's 9), received **none** of DO's
+  twenty-two, and **not one of their twenty-four spec cards was a heal, a shield or hero-side
+  mitigation** — a hunter's whole defensive option set for a run was two of the six Hunter class
+  cards he had to be lucky enough to be offered. It compounded with the Sharpshooter holding no
+  defensive node in his 27.
+- **SIX CARDS, TWO PER SPEC, EACH READING ITS OWN ENGINE** — DR's rule applied, not a new one:
+  MIT-SELF is a shared AXIS and adding it dilutes nothing, because the engine still gates all of it.
+  - **BEAR THE BRUNT** (Beastmaster, MIT-SELF) — the next blow that would fell HIM is refused and
+    his deepest bond takes all of it. **It is BLOODBOND inverted clause for clause** — same placed
+    guard, same battle-long duration, same "and it can kill the payer", opposite direction.
+  - **BRING IT DOWN** (Beastmaster, AMP-TEAM) — 4 turns, every hero +2% damage per Loyalty stack on
+    his deepest bond, cap +20%, **snapshot at cast and the bond is not spent**. AMP-TEAM was absent
+    from all twenty-four, and it makes an 8-of-8 engine binding pay the other three heroes.
+  - **DUG IN** (Sharpshooter, MIT-SELF) — 4 turns, damage taken cut by a quarter of whatever Focus
+    stands **at the blow**, cap 25%. Read live, so it rises as he commits and **falls to nothing
+    when a switch breaks the meter**. Deliberately NOT evasion: Camouflage and Ghillie Suit already
+    stack, and Camouflage's own header reserves evasion as the class's shape.
+  - **HEADS DOWN** (Sharpshooter, CTRL) — 20 dmg / 8 BD, and 3 turns (Perfect: 4) in which that
+    enemy can bring nothing but its basic attack to bear. **THE FIRST SILENCE IN THE PROJECT.**
+  - **THICK HIDE** (Survivalist, MIT-SELF) — 4 turns, 6% less damage per DIFFERENT affliction on
+    **whoever is striking him**, cap 30%. The first card that reads Trapper breadth on the way IN.
+  - **SALVE** (Survivalist, HEAL) — 3 turns (Perfect: 4), 2% max health a turn per DIFFERENT
+    affliction on the enemies, cap 10%, **counted as a UNION across the field** so a copied poison
+    does not pay twice. **The first heal in any of the twenty-four**, and HARVEST's inverse.
+- **THE BRIEF'S BREAK CARD WAS REFUSED ON MEASUREMENT, AND THAT IS THE BATCH'S SHARPEST FINDING.**
+  It held that *"the Hunter class has no Break generation anywhere"*. **`pressure` IS Break, and
+  TWELVE OF THE THIRTY HUNTER DRAFT CARDS GENERATE IT** — **Unleash already lands Break on the
+  Beastmaster's own pool** and **Fault Line is a dedicated Break card** the audit scores as one of
+  the Sharpshooter's five decisions. The proposed card would have been a second copy of a clause
+  already in its own pool. **The rule it produced, in `CLAUDE.md` beside DR's:** *before declaring
+  an axis ABSENT from a class, derive it — from the DATA, never from the card text*, because a card
+  carries Break without its description ever using the word.
+- **HEADS DOWN WOULD HAVE SHIPPED VIRTUALLY INERT AND ONLY DRIVING IT LIVE FOUND IT.** Its first
+  version refused any ability with `cost > 0`. **46 of the 50 enemy abilities in `data/enemies.json`
+  cost ZERO** — Chain Lightning and Healing Wave among them — so it would have refused four
+  abilities in the whole game while reading as working. The criterion is identity against
+  `_cheapest_attack` now, which is what the card text always said, and it **cannot starve the
+  fallback** because the one ability it never refuses is the one the caller falls back to.
+  **The refusal is one condition in `_intent_ability_usable` and NOTHING in `_choose_enemy_action`**,
+  whose header forbids touching the selection policy.
+- **THE SHARPSHOOTER RE-AUTHOR WAS MEASURED AND DECLINED.** Four of his eight are single-target
+  strikes, but at the READ SITE they are four different decisions: Crossfire converts crits into
+  area damage and reads no Focus at all, Trophy Shot is a decay-RULE change, and **Calibrating Shot
+  and Drumfire are the only two alike** — both meter GENERATION, and not a domination (Drumfire
+  wins damage and Focus, Calibrating Shot wins cost and **initiative 1.5 against 3.0**). Nothing was
+  re-authored. **One adjacency the audit's DMG-ST label hides is recorded instead: TROPHY SHOT AND
+  REACQUIRE are near-siblings** — both are "do not lose Focus when the target changes".
+- **TWO STALE CLAIMS CORRECTED.** **FIELD DRESSING's "the only self-heal a Hunter can get" was
+  already false when BR wrote it** — Harvest heals and sits in the Survivalist's boss pool AND in
+  `CLASS_POOLS["hunter"]`. Corrected on the card, in `classes.gd` and in `master.html`; **the TREE
+  half is true and is kept** (no Hunter node heals — Field Medic *cleanses*). And the **"six
+  designed abilities not yet written" list is FOUR**: Field Dressing was written at BR as a
+  CLASS-WIDE draft card, and Smoke Bomb's function shipped at BO as Choking Smoke. **DS did not
+  spend the Sharpshooter's three reserved boss-pool names** (Disengage, Suppressing Fire, Piercing
+  Arrow) on its own draft cards.
+- **Next letter: DT.** `DT` sorts after `DS`, so the stamp gates still work.
+- **Phase.** The ability draft is **COMPLETE at 149 of 149** and all twelve talent trees are
+  purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit
+  of whether the pools hold more than one build each, DR's ruling on the two things that audit found
+  were correctness rather than taste, **and DS's ruling on the largest thing it found that was
+  structure rather than either.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -101,12 +93,18 @@ a gate encodes a ruling.
   list; PYROBLAST IS STILL ON IT** and is now the only repeatable draft card in the game.
   `check_dr` §5 prints the live list every battery run. Either price it as a draft card or write
   down that a repeatable card is a legitimate draft shape.
-- **THE OTHER CONCENTRATION FINDINGS ARE DESIGN AND ARE UNRULED.** The Beastmaster's 8-of-8
-  companion binding, the Cryomancer's remaining **11-of-11** ice and the Pyromancer's 12-of-13 Burn
-  are all reported with their card lists. **THE HUNTER CLASS IS THE STRUCTURAL ONE AND IT IS
-  BIGGER THAN THE SWORDMASTER'S WAS**: three shallowest pools (8 each), none of DO's twenty-two,
-  and **not one of the twenty-four Hunter spec cards is a heal, a shield or hero-side mitigation**.
-  It compounds with the Sharpshooter having no defensive node in his 27. **It is next, not now.**
+- **THE HUNTER CLASS GAP IS RULED AT DS AND ITS DRAFT HALF IS CLOSED.** All three pools are 10
+  now and the class has its first heal and its first hero-side mitigation. **ONE HALF OF THE
+  FINDING IS DELIBERATELY STILL OPEN AND THE AUDIT'S BANNER SAYS SO**: the Sharpshooter still has
+  **no defensive node in his 27**, because DS moved no talent cell — a cell that changes row
+  mis-prices the ledger. Only the DRAFT half of "both halves of his progression offer him nothing"
+  is answered.
+- **THE OTHER CONCENTRATION FINDINGS ARE DESIGN AND ARE UNRULED.** The Cryomancer's remaining
+  **11-of-11** ice and the Pyromancer's 12-of-13 Burn are reported with their card lists.
+  **THE BEASTMASTER'S 8-OF-8 IS NOW 10-OF-10 AND THAT IS NOT THE SAME FINDING WEAKENED** — DS's
+  two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
+  what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
+  problem at all is still unruled**, and DR's framework says it is not by itself.
 - **`SPEC_POOLS` STILL HOLDS LUNGE AND EXECUTE ALONGSIDE THE DRAFT POOL**, so both are reachable
   through two channels. Reported at DR, out of its scope, and worth a ruling with the rest of the
   boss-pick pools DQ dumped and did not audit.
@@ -173,11 +171,12 @@ way to apply. The ability rule and the status rule are the same rule.*
   TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
   moved a cell** — but a restructure would need both.
 
-### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET FIFTEEN TIMES RUNNING
+### THE FLAKE THAT DG FOUND, AND IT HAS NOW READ QUIET SIXTEEN TIMES RUNNING
 
 - **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN
-  EVERY BATTERY SINCE — DH THROUGH DR, BOTH OF DR'S TWO — STILL OPEN, STILL UNSEEDED.** At a rate
-  of about one red in eighteen, fifteen quiet readings is the common case and proves nothing. `_live_curve()`
+  EVERY BATTERY SINCE — DH THROUGH DS, BOTH OF DR'S TWO AND BOTH OF DS'S — STILL OPEN, STILL
+  UNSEEDED.** At a rate of about one red in eighteen, sixteen quiet readings is the common case and
+  proves nothing. `_live_curve()`
   sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
   a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
   DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
@@ -435,11 +434,18 @@ re-derived from the source at DM; not one was moved.**
   `Ability.BASIC_DELAY` = **2.0** (the one authored copy in the project; `battle.BASIC_DELAY` is an
   alias) → `Ability.BUFF_DELAY_CAP` = `BASIC_DELAY * 0.5` = **1.0** → `Ability.DELAY_FLOOR` =
   `BUFF_DELAY_CAP * 0.5` = **0.5**, the cheapest an ability UPGRADE can buy.
-- **THE CAP BINDS 58 ABILITIES IN TWO POPULATIONS.** `Ability.PURE_BUFFS` holds **52** specials
-  and `Ability.SHIELD_SPECIALS` holds **6**. **`Ability.takes_delay_cap()` is the one function that
+- **THE CAP BINDS 61 ABILITIES IN TWO POPULATIONS.** `Ability.PURE_BUFFS` holds **55** specials
+  (DS added `bear_brunt`, `dug_in`, `thick_hide`) and `Ability.SHIELD_SPECIALS` holds **6**.
+  **BRING IT DOWN IS A PURE BUFF BY SHAPE AND IS DELIBERATELY NOT A MEMBER** — it is the strongest
+  of DS's six, a party-wide amp scaling off an uncapped meter, and is priced at initiative 2.0 for
+  that on PREPARATION's precedent; membership would have clamped it to 1.0 as a side effect.
+  **AND A PURE BUFF ADVERTISES NO PERFECT**: `Ability.runs_skill_check()` gives it no bar and
+  `test_batch_bo` §5 asserts the biconditional, which is what four of DS's six tripped on before
+  losing theirs. SALVE kept its by joining `HEAL_SPECIALS` — its heal rides a status it applies,
+  which is RENEWAL's shape. **`Ability.takes_delay_cap()` is the one function that
   unions them** and `Ability.make()` applies the clamp.
-- **THE ABILITY CORPUS IS 217 AND THE TWO WALKS NOW AGREE.** DR moved it net +1 (one card
-  retired, two authored). The Batch CL enumeration reached
+- **THE ABILITY CORPUS IS 223 AND THE TWO WALKS NOW AGREE.** DR moved it net +1 (one card
+  retired, two authored) and **DS moved it +6**. The Batch CL enumeration reached
   **211** for as long as talents granted abilities; the five it missed — Backdraft, Pyroblast,
   Glacial Prison, Cryoclasm, Intercession — were talent grants living in no pool. **DO put all
   twenty-two talent grants into `SPEC_DRAFT_POOLS`, which the CL walk reads, so it reaches all 216
@@ -448,8 +454,18 @@ re-derived from the source at DM; not one was moved.**
   **`check_da` §3 asserts that no gate hand-rolls the walk**, with `check_cz`'s `_cl_only_corpus`
   named as the one deliberate exemption (its REASON string was corrected at DO: its job inverted
   with the premise).
-- **`RECAST_GATED` HOLDS 60 ABILITIES** — DR's COUNTER TIME is the newest member, because its
-  entire payload is a status and a recast onto a saturated field buys literally nothing.
+- **`RECAST_GATED` HOLDS 64 ABILITIES** — DS added four (Bear the Brunt, Dug In, Thick Hide,
+  Salve), each of them entirely a status on the caster. **BRING IT DOWN DELIBERATELY DID NOT
+  JOIN**: its number is snapshot off the deepest bond's Loyalty, which is uncapped, so a recast on
+  a deeper bond genuinely buys a bigger amp and can never do nothing. **HEADS DOWN is not in the
+  system at all**, because it deals damage. DR's COUNTER TIME joined for the same reason the four
+  did.
+- **AND A PROPOSAL MUST EQUAL WHAT A *GOOD* CAST WRITES, WHICH DS LEARNED FROM A RED.**
+  `check_co` saturates by casting at grade `"good"`, so a `_recast_writes` entry proposing the
+  PERFECT's duration improves on what is standing every time and the card never refuses. Salve did
+  exactly that on the first run. `emberkeep` is not a counter-example — its handler writes
+  `EMBERKEEP_TURNS + 1` unconditionally. **A `special` carrying a POWER needs its own arm rather
+  than a `RECAST_SELF_PLAIN` row**, because that table writes `power: 0`.
   **WHEELING CUT DELIBERATELY DID NOT JOIN**: it deals real AoE damage and Break, so a recast is
   never wasted, which is why no damaging card is in that list. `check_co` refuses all but
   Interpose after saturation;
@@ -465,12 +481,15 @@ re-derived from the source at DM; not one was moved.**
   else** — not Fervor, not Apostle. **ALL NINE PLACES THAT SPEAK EITHER MAGNITUDE NOW AGREE**, as
   of DG §1: the two cards, the `passive_desc`, the `faith` chip, the glossary, two `master.html`
   sites and two source comments.
-- **The ability draft is COMPLETE at 143 of 143** — `SPEC_DRAFT_POOLS` is **119** and
+- **The ability draft is COMPLETE at 149 of 149** — `SPEC_DRAFT_POOLS` is **125** and
   `CLASS_DRAFT_POOLS` is **24** (4 classes × 6), counted out of `classes.gd`. **The spec half is no
-  longer a flat multiple**: DO's twenty-two ex-talent-grants took nine pools past eight and left
-  three at exactly eight, and **DR moved two of those nine — the Swordmaster to TWELVE and the
-  Cryomancer down to ELEVEN**. **The one authoritative per-spec table is `test_batch_cd.PER_SPEC_DEPTH`;
-  every other suite asserts the FLOOR (>= 8) and the TOTAL.** Do not write `12 * 8` again.
+  longer a flat multiple**: DO's twenty-two took nine pools past eight and left three at exactly
+  eight, DR moved two of those nine (Swordmaster to TWELVE, Cryomancer down to ELEVEN), and **DS
+  took the three that were still at eight — beastmaster, sharpshooter and mystic — to TEN apiece**.
+  **THE SHALLOWEST POOL IN THE GAME IS THE WARDEN'S NINE NOW**, so the asserted FLOOR of 8 is slack
+  everywhere; it stays there because it catches a pool that EMPTIES rather than tracking the
+  deepening. **The one authoritative per-spec table is `test_batch_cd.PER_SPEC_DEPTH`; every other
+  suite asserts the FLOOR (>= 8) and the TOTAL.** Do not write `12 * 8` again.
 - **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
 - **The pouch: 4 → 5 → 6 slots by zone** (`ITEM_SLOTS_BY_ZONE`), a slot holding one item TYPE and
   its whole stack. **Default per-type stack cap `ITEM_CAP` = 6**, with three exceptions
@@ -484,7 +503,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DR
+### THE TEST TREE, AS OF DS
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -492,8 +511,14 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-two** —
-  **DR added `check_dr`**, because DR ruled where DQ only reported. **There are 29 `check_*.gd`
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-two** and
+  **DS ADDED NONE** — the brief enumerated its deliverables and a new gate is a scope decision
+  (it also risks `check_da` §3, which refuses a gate that hand-rolls the corpus walk). **THE COST
+  OF THAT IS NAMED RATHER THAN HIDDEN: `bring_it_down` AND `heads_down` HAVE NO PERMANENT LIVE
+  COVERAGE.** `check_co`'s saturation sweep exercises the other four specials as a side effect.
+  All six WERE driven through a real battle in a scratch fixture (19 checks, 0 failures) and that
+  is what found the `cost > 0` fault — but the fixture is not in the repo, so a gate is the
+  obvious next step. **There are 29 `check_*.gd`
   files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -542,8 +567,10 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-28 (Batch DR)`** — DR moved the draft tables, the
-  count, the retired card's row, Battle Poise's row, §6b's Lunge entry and added two card rows.
+- **master.html stamp: `Last updated: 2026-08-29 (Batch DS)`** — DS moved the three Hunter pool
+  rows, the count block, Field Dressing's gloss, the stale boss-pool backlog list and Bloodbond's
+  self-contradicting row (it said a QUARTER in one clause and "the half he takes can kill him" in
+  the next; the code pays a quarter), and added six card rows.
 
 ### HOW LONG A FIGHT IS
 **STALE SINCE DK. NOT ONE FIGURE BELOW HAS BEEN RE-MEASURED SINCE FIVE PARTY-WIDE EFFECTS BEGAN
@@ -588,33 +615,31 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 30 entries** (CO → DR), **382 KiB**. **The 400 KiB
-  threshold is now about eighteen KiB away** — DR's entry is 12 KiB. CX's cut point is CN/CO.
-  **Re-derive this before acting on it; four batches running have now mis-predicted it, so the
-  honest statement is that the NEXT ruling batch of DR's size probably reaches it and a
-  documentation batch probably does not.**
+- **The live file starts at Batch CO and holds 31 entries** (CO → DS), **389 KiB**. **The 400 KiB
+  threshold is about eleven KiB away** — DS's entry is 6 KiB. CX's cut point is CN/CO.
+  **Re-derive this before acting on it; five batches running have now mis-predicted it, so the
+  honest statement is that the NEXT ruling batch of DR's size probably reaches it.**
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (Batch 1 → CN) and is **1042 KiB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
   bv, bw, bx, cb, ce, bb, bn, bo. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
   correct.
 
-### Knowledge sync, re-measured at DR
+### Knowledge sync, re-measured at DS
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **146 files, 6.71 MiB** (DQ measured 144 / 6.61 MiB). DR added `check_dr.gd` and
-  `docs/reports/DR.md`, and grew `battle.gd`, `classes.gd`, `CLAUDE.md`, `master.html` and the
-  changelog.
-- Heaviest: `scripts/battle.gd` **1194**, `docs/changelog.html` **382**, `docs/design-notes.md`
-  **350**, `docs/master.html` **329**, `scripts/classes.gd` **299**, `CLAUDE.md` **232**,
-  `scripts/talents.gd` **179**, `scripts/unit.gd` **174**, `docs/talent-audit.html` **165**.
-- **The 47 suite files total 1850 KiB — 26.9% of the sync**, still the single largest block. **They
+- **147 files, 6.80 MiB** (DR measured 146 / 6.71 MiB). DS added `docs/reports/DS.md` and grew
+  `battle.gd`, `classes.gd`, `unit.gd`, `ability.gd`, `CLAUDE.md`, `master.html`, `design-notes.md`
+  and the changelog.
+- Heaviest: `scripts/battle.gd` **1219**, `docs/changelog.html` **389**, `docs/design-notes.md`
+  **359**, `docs/master.html` **335**, `scripts/classes.gd` **312**, `CLAUDE.md` **236**,
+  `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
+- **The 47 suite files total 1851 KiB — 26.6% of the sync**, still the single largest block. **They
   cannot be archived (they must be in the repo to run) but they CAN be deselected from the sync.**
-  The **29** gates add **348 KiB**.
-- **`CLAUDE.md` IS 232 KiB = 3.37% AND THE RATIO ROSE FOR THE FIRST TIME SINCE DL** (3.33% at DQ,
-  3.39% at DP), because **DR added two standing rules and a trap** where DQ added none. CW's
-  *"under 3% and roughly flat"* target is still met on the second half and missed on the first.
-  DG through DR have all declined the prune.
+  The **29** gates add **350 KiB**.
+- **`CLAUDE.md` IS 236 KiB = 3.39%**, level with DP and up from 3.37% at DR, because DS added two
+  standing rules. CW's *"under 3% and roughly flat"* target is still met on the second half and
+  missed on the first. DG through DS have all declined the prune.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -630,16 +655,24 @@ SUITE FAILURES FROM THE THREE FLAKES, AND THAT IS NOT A REPAIR.** `test_batch_at
 them. **All three are still open and still unseeded.** A row that reads clean at a rate of about
 seventeen in eighteen has told you nothing when it reads clean.
 
-**DR's BATTERY 1 READ ONE SUITE FAILURE AND IT WAS NOT ONE OF THE THREE, AND IT WAS NOT DR'S
-EITHER.** `test_batch_bp` went 0 → 3 on a **latent draw collision that predates the batch**: §7
-hand-builds a Warrior kit to reach the 7-slot cap and then TAKES `cands[1]`, a card drawn at random
-from his live draft pool — and two of the three hand-written filler names, **LUNGE and EXECUTE,
-have been IN that pool since DO**. A draw landing on either made the hand-built kit already own the
-card the take is about, so `take_draft_ability` correctly returned *"already known"*. **DR's own
-two new cards made the collision LESS likely, not more** (the pool went 10 → 12). **Repaired
-before battery 2**: all three fillers are boss-pick cards now (Sweeping Strikes, Shatterpoint,
-Rallying Shout), **none of them in ANY draft pool**, so no draw can collide — the durable fix
-rather than swapping one draftable name for another. The check count does not move.
+**DS's BATTERY 1 READ FOUR SUITE FAILURES AND ALL FOUR WERE DS'S OWN — `test_batch_bx`'s
+RETIRED-WORD SWEEP BITING EXACTLY AS DESIGNED.** "beast" is retired from player-facing prose, and
+**Bear the Brunt's card text, its live chip and its cast message all used it**; two more were the
+six new `master.html` rows, §4 for "beast" and §4b for "party". The fourth was §3's `_deepest_bond`
+caller count, re-pointed 3 → 5 (Bear the Brunt and Bring It Down are both ORDERED actions and both
+ask through the one door rather than reading list order). **A batch adding Beastmaster content is
+precisely the batch that reintroduces the retired word, and nothing else in the tree would have
+said so.** All four repaired before battery 2; the check count does not move (157).
+
+**AND DR's BATTERY 1 FOUND `test_batch_bp` §7's LATENT DRAW COLLISION, WHICH IS REPAIRED AND IS
+RECORDED HERE BECAUSE THE SHAPE RECURS.** §7 hand-builds a Warrior kit and then TAKES `cands[1]`,
+a card drawn from his live draft pool, and two of the three hand-written fillers were IN that pool.
+It is fixed with boss-pick names no draw can reach. **DS RE-DERIVED THE UNDERLYING RULE AND IT IS
+ABOUT ORDER, NOT FILLER CHOICE**: `bp` §7 stuffed `bm_abilities` *after* `award_draft_pick` had
+already rolled, and `draft_pool_left` filters owned names — so a kit built BEFORE the roll can never
+collide. `test_batch_bx` §2 and `check_map_screen` already do that and are safe, and
+`test_batch_bo` §2's Sharpshooter block uses boss-pick names. **DS's three growing pools could not
+reach `bp` §7 at all: it is a Warrior flow.**
 
 **THE COUNTS AND THE BANDS ARE IN `baselines.json` AND ARE NOT REPEATED HERE.**
 
@@ -655,7 +688,7 @@ rather than swapping one draftable name for another. The check count does not mo
   instances**, named at their sites and in the open queue above.
 - **`test_batch_at` IS SEEDED IN PLACES AND NOT IN OTHERS**, and its check count is rock steady at
   **467** across every reading including both of DR's.
-- **`test_batch_bo` STILL HAS ITS FLAKY ASSERTION.** Its count is **1070** since DR moved it with
+- **`test_batch_bo` STILL HAS ITS FLAKY ASSERTION.** Its count is **1106** since DS moved it with
   the pool; the §5 NULL FIELD check requires `deep < shallow` and the damage carries a 0.9–1.1
   variance roll, so both can land on the same integer. `test_batch_bo.gd` calls `seed()` zero
   times.
@@ -688,62 +721,57 @@ rather than swapping one draftable name for another. The check count does not mo
 
 ### Last measurements
 
-**TWO BATTERIES AT DR. BATTERY 2 IS THE ACCEPTANCE RUN BECAUSE IT CAME BACK CLEAN.**
+**TWO BATTERIES AT DS. BATTERY 2 IS THE ACCEPTANCE RUN BECAUSE IT CAME BACK CLEAN.**
 **161 files were MD5-stamped before it and re-compared after, and NOT ONE MOVED.**
-**Battery 1 was NOT discarded** — it is what found `test_batch_bp`'s latent draw collision and the
-three baseline rows DR had not predicted, and both were repaired or recorded before battery 2.
-**The documents written after the acceptance run — `docs/state.md`, `docs/reports/DR.md`,
-`docs/draft-audit.html`'s resolution banners and `docs/design-notes.md`'s entry — are read by no
-suite and by no gate**, which is the same allowance DP and DQ used.
+**Battery 1 was NOT discarded** — it is what found `test_batch_bx`'s four reds (three of them the
+retired-word sweep biting on DS's own new prose) and the two baseline rows DS had not predicted.
 
-| | DQ's acceptance | DR battery 1 | DR battery 2 (acceptance) |
+| | DR's acceptance | DS battery 1 | DS battery 2 (acceptance) |
 |---|---|---|---|
-| **suite failures** | 0 | **3** (`bp`, pre-existing, repaired) | **0** |
+| **suite failures** | 0 | **4** (`bx`, all DS's own, repaired) | **0** |
 | **throws, grepped from the stream** | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 301 / 0 / 0 | 305 / 1 / 3 | **305 / 0 / 0 — exactly the prediction** |
-| targets in the manifest | 73 | 74 | **74** |
+| `check_de` | 305 / 0 / 0 | 305 / 1 / 5 | **305 / 0 / 0 — exactly the prediction** |
+| targets in the manifest | 74 | 74 | **74** |
 
 **SEVENTY-FOUR TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-FOUR. 0 `Parse Error` and 0
-`SCRIPT ERROR` in every log.** `test_batch_an` read **6051**, inside its band; `test_batch_bk` read
-**129**, likewise. Harness gates **22 / 165 / 8**, `check_ct_map` 83 / 0, `check_dr` **79 / 0**.
+`SCRIPT ERROR` in every log.**
 
-**FIVE BASELINE ROWS MOVED AND DR PREDICTED TWO OF THEM.** Predicted: `test_batch_bt` 458 → **407**
-and `check_co` 297 → **301**, plus the new `check_dr` row and `check_de` 301 → **305** (four
-assertions per target, one target added). **UNPREDICTED, AND BATTERY 1's NOTICES ARE WHAT CAUGHT
-THEM: `test_batch_bo` 1064 → 1070, `test_batch_cb` 1196 → 1197, `test_batch_ce` 1138 → 1139** —
-all three are their own loops walking the net +1 draft card, and all three moved in the batch that
-caused them. **`check_di`'s `CALL_SITES` equality also tripped in battery 1 and DR HAD predicted
-it**: 203 → **205**, with the reason written into the gate's own comment as that const's header
-demands.
+**FIVE BASELINE ROWS MOVED AND DS PREDICTED THREE OF THEM EXACTLY.** The method was to derive the
+per-card rate from DR's OWN movement rather than guess: DR moved the draft net +1 and moved `bo`
++6, `cb` +1, `ce` +1, so six cards give **+36 / +6 / +6**. Read: `test_batch_bo` 1070 → **1106**,
+`test_batch_cb` 1197 → **1203**, `test_batch_ce` 1139 → **1145**. `check_co` 301 → **321** was
+predicted in direction only. **`check_cy` 2704 → 2857 WAS NOT PREDICTED** — three of the six join
+`Ability.PURE_BUFFS` and that gate runs its whole per-ability rule over every member; DS predicted
+the three draft-pool loops and did not think about the buff table. **`bp`, `bq`, `br` and `cp` were
+correctly predicted NOT to move**: they iterate per-*spec* or class×spec, so pool depth cannot
+reach them. **`check_di`'s `CALL_SITES` equality also tripped in battery 1 and DS HAD predicted
+it**: 205 → **210**, `SRC_FLOOR` 106 → **107**, with the reason written into the gate's own comment
+as that const's header demands.
 
 **AND THE ZERO IN THE FAILURE ROW IS STILL NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio
-(read 467), `bo`'s §5 NULL FIELD flake (read 1070) and `test_rune_battle`'s pierce (read 97) were
-quiet again in both runs — the **fifteenth** consecutive quiet reading. **All three are still open,
-still unseeded and still banded. A red from any of them is not the next batch's.** At a rate of
-about one in eighteen, fifteen quiet readings is the common case and proves nothing.
+(read 467), `bo`'s §5 NULL FIELD flake (read 1106) and `test_rune_battle`'s pierce (read 97) were
+quiet again in both runs — the **sixteenth** consecutive quiet reading. **All three are still open,
+still unseeded and still banded. A red from any of them is not the next batch's.**
 
-**FOUR NEGATIVE CONTROLS WERE RUN AND ALL FOUR BEHAVED.** A `special: "summon"` authored onto the
-Sharpshooter (1 failure), a third `.revive(` call site (1), a `_tick_cooldowns` caller removed (1),
-and **the comment-stripping trap controlled from BOTH sides** — the retired card's name put back as
-a COMMENT left `check_dr` GREEN, the same name put back in CODE turned it RED (4 failures). **That
-last pair is the one that mattered**: this batch's own `classes.gd` prose records the retirement by
-naming the card, so an un-stripped absence check would have read the record as the removal not
-having happened.
+**THE LITERAL SWEEP: 10,589 literals at a floor of 4**, from all 76 suites and gates, evaluated
+against twenty documents and sources and diffed against `git show HEAD` in one pass. **0 LOST.**
+**5 GAINED and the dangerous kind is zero** — `125 spec`, `149 of`, `149 of 149`, `149 OF 149` and
+`A TARGET 149`, every one a needle this batch re-pointed itself, each cross-referenced against the
+tree's negative `contains` assertions with no match.
 
-**THE LITERAL SWEEP: 10,415 literals at a floor of 4**, from all 78 suites and gates, evaluated
-against twenty documents and sources and diffed against `git show HEAD` in one pass. **7 LOST and
-every one is accounted for** — two were in the retired card's SYNERGY comment and are read by
-`test_batch_as`'s node table against `talents.gd`, one was Lunge's old description and is read by
-`check_do`'s `STATUS_FORMS` against `Talents.desc_for` output, one is a `scene.call` string rather
-than a source `contains`, and the remaining two are **`check_dr`'s own NEGATIVE needles**, whose
-absence IS the assertion. **No document edit lost a single literal.** **69 GAINED and the dangerous
-kind is zero**: every negative `contains` in the tree was cross-referenced against the gained set,
-five matched, and all five are **scoped to a slice or read the runtime combat log** rather than a
-whole document.
+**THE COMMENT-STRIPPED DIFF WAS TAKEN.** With every line-leading `#` stripped, `battle.gd` lost
+**2** code lines and `classes.gd` **4**; all six are accounted for — the two `RECAST_GATED` array
+lines rewritten to take four entries, the three pool arrays rewritten to take six cards, and Field
+Dressing's deliberately corrected description. `unit.gd` and `ability.gd` lost none.
+**Nothing was swallowed.**
 
-**THE COMMENT-STRIPPED DIFF WAS TAKEN, WHICH IS HOW "NO COMMENT INSERT ATE CODE" IS PROVED.** With
-every line-leading `#` stripped, `battle.gd` lost **17** code lines and gained 93; all seventeen are
-the retired handler (13) plus four lines deliberately replaced. `classes.gd`'s losses are the
-retired def and pool entry and three replaced descriptions. **Nothing was swallowed.**
+**THE PARSE CHECK WAS CONTROLLED FROM BOTH SIDES.** A deliberate `func _ds_negative_control(:`
+produced `Parse Error: Expected parameter name.`; removing it restored a **byte-identical** file
+(verified by `diff` against a scratchpad copy, **not** by `git checkout`), and the tree read 0.
+
+**ONE PRE-EXISTING NAME NEAR-MISS WAS FOUND AND IS REPORTED, NOT FIXED.** The Beastmaster's draft
+card **Ghostpack** and his own row-8 talent node **Ghost Pack** differ by one space, on the same
+spec — a sixth member of the "five nodes named after live abilities" list below, which records only
+exact matches.

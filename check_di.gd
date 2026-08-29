@@ -30,7 +30,7 @@ const Gate = preload("res://gate_fixture.gd")
 # equality: a later batch widening the sweep must not trip this, but one that
 # DELETES a `src` must. **DI left it at 99; DJ stamped the seven companion
 # sites and left it at 106.**
-const SRC_FLOOR := 106
+const SRC_FLOOR := 107
 # BATCH DP MOVED THIS BY ONE, AND THE MOVEMENT IS A COVERAGE IMPROVEMENT.
 # The re-pointed Spread of Madness deleted `_apply_status(infected,
 # "psychosis", 3)` — a site that carried NO source — so the population is
@@ -57,7 +57,24 @@ const SRC_FLOOR := 106
 # Cut grants are SELF-BUFFS on the hero — nothing Harvest reads, nothing
 # `_note_debuff_applied` counts — so they are correctly unstamped and the
 # unstamped remainder goes 97 -> 99.
-const CALL_SITES := 205
+#
+# **BATCH DS MOVED IT 205 -> 210, AND SAYS WHY.** Net +5, all arrivals and no
+# departures: the six new Hunter cards apply five statuses through this door —
+# `heads_down` onto an enemy, and `bring_it_down`, `dug_in`, `thick_hide` and
+# `salve` onto heroes. **BEAR THE BRUNT IS THE SIXTH CARD AND IT IS NOT A SITE**,
+# because it goes through `add_status` directly, which is BLOODBOND'S shape and
+# for Bloodbond's reason: it writes its own live chip text so the number a player
+# reads and the number the callback bills are one value.
+#
+# **`with_src` MOVES BY EXACTLY ONE AND THAT IS THE RULE WORKING RATHER THAN A
+# COINCIDENCE.** `heads_down` is the only one of the five that lands on an ENEMY,
+# so it is the only one that passes `attacker` — DI's rule is that a status
+# applied to an enemy carries its source, and the Survivalist's Trapper reads it.
+# The other four are HERO-SIDE self-buffs and party buffs: nothing Harvest reads,
+# nothing `_note_debuff_applied` counts, so they are correctly unstamped, exactly
+# as DR's two Wheeling Cut grants were. **SRC_FLOOR therefore moves 106 -> 107**
+# and the unstamped remainder goes 99 -> 103.
+const CALL_SITES := 210
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

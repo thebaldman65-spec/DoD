@@ -225,11 +225,11 @@ func _pools() -> void:
 	# 60 plus two nines — 78 — while asserting 96, because CH's and CI's thirds
 	# landed after it was last rewritten. The count was right and the sentence
 	# beside it was three tranches old.
-	ok(spec_total == 119,
+	ok(spec_total == 125,
 		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus the Mage, Cleric, Hunter and Warrior nines (%d)"
 			% spec_total)
-	ok(spec_total + total == 143,
-		"§0+DO+DR: the draft holds 143 (%d)" % (spec_total + total))
+	ok(spec_total + total == 149,
+		"§0+DO+DR+DS: the draft holds 149 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
@@ -1389,7 +1389,7 @@ func _docs() -> void:
 	# any document with enough numbers in it — and BQ's rule is that a check
 	# which can only pass is a gap. It asks BR's real question instead: does
 	# master.html state the draft's LIVE pool count against the REAL target?
-	ok(master.contains("143 of 143"),
+	ok(master.contains("149 of 149"),
 		"§5: ...and master.html states the live pool count against the real target")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BR — with everything
