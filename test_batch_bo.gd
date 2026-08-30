@@ -156,8 +156,15 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 125,
-		"§5+DO: one hundred and eighteen ship — CI's ninety-six plus DO's twenty-two (got %d)"
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 125,
+		"§5+DO: the spec half has FALLEN to %d, below the 125 that shipped"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -236,8 +243,8 @@ func _pools() -> void:
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§4: all four class-wide pools are named")
 	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() == 6,
-			"§4: the %s class pool is FILLED at six (BQ, then BR)" % ck)
+		ok(Classes.class_draft_pool(ck).size() >= 6,
+			"§4: the %s class pool has FALLEN below the six BQ and BR filled it to" % ck)
 	ok(is_equal_approx(Classes.CLASS_DRAFT_SHARE, CLASS_SHARE),
 		"§4: roughly one card in four is class-wide")
 	# EVERY ENTRY RESOLVES. A pool name that does not resolve is an offer that
@@ -326,8 +333,8 @@ func _pools() -> void:
 	# The boss pool is UNCHANGED (§3: "the existing pick, unchanged").
 	ok(Classes.spec_pool("holy") == ["Divine Plea"],
 		"§3: the zone-boss SPEC_POOLS draw is untouched")
-	ok(Classes.spec_pool("beastmaster").size() == 5,
-		"§3: ...for every spec (the Beastmaster still has five)")
+	ok(Classes.spec_pool("beastmaster").size() >= 5,
+		"§3: ...for every spec (the Beastmaster's boss pool has fallen below five)")
 
 
 # ---------- §2 THE TWELVE CORES ----------

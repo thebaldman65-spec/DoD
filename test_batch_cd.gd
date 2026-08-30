@@ -55,6 +55,24 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # so the per-spec expectation is a TABLE rather than one number. Writing it as
 # `12 * 8` again would be the CI-era shape re-asserted over a tree that has
 # moved past it, which is the exact fault this file exists to catch.
+# BATCH DX §1 — THESE THREE ARE THE PROJECT'S ONLY SURVIVING EQUALITY AGAINST
+# THE DRAFT, AND THAT IS THE RULING RATHER THAN AN OVERSIGHT.
+#
+# The draft GROWS: DO added twenty-two, DR a net +1, DS six. Until DX the total
+# was pinned as an EQUALITY at **forty-one sites across thirteen files** — `>=`
+# nowhere — so every one of those three batches had to hand-bump a dozen files
+# at once, and a batch that forgot one would read as a regression rather than as
+# a bump owed. That is CD §1's fault, and `check_dv` §4's changelog span was the
+# sixth instance of it. **THIRTY-FIVE OF THEM ASSERT A FLOOR NOW, ACROSS TWELVE
+# FILES; the six that remain are the six below and they are all in this one.**
+#
+# THE EQUALITY STAYS HERE BECAUSE THIS FILE IS THE AUTHORITY AND BECAUSE ONE OF
+# THEM IS WORTH HAVING. A floor cannot see a card ARRIVING, and a card arriving
+# unannounced is exactly what `PER_SPEC_DEPTH` exists to force a batch to state.
+# So the signal is kept — at ONE site, beside the table a new card must move
+# anyway, where the failure costs one edit in one file instead of thirty-five
+# across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
+# THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
 const SPEC_TARGET := 125     # the twelve pools, summed from PER_SPEC_DEPTH
 const CLASS_TARGET := 24     # 4 classes x 6, untouched by DO and by DS
 const DRAFT_TARGET := 149    # 125 + 24
@@ -347,13 +365,19 @@ func _pools() -> void:
 		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
+	# BATCH DX §1 — THE MESSAGE PRINTED THE TARGET TWICE, so the one assertion
+	# left to announce a moved draft could never say what it had moved TO. That
+	# is the second-copy-of-a-count defect sitting inside the tripwire written
+	# to catch drift — DW found the identical shape in two `test_batch_cp`
+	# messages. Both figures are live now.
 	ok(spec_total + class_total == DRAFT_TARGET,
-		"the draft stands at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
+		"the draft stands at %d of %d" % [spec_total + class_total, DRAFT_TARGET])
 	# INVERTED BY BATCH CI RATHER THAN DELETED. This asserted a DEBT for four
 	# batches; the debt is paid, so what it asserts now is that there is none —
 	# which is the thing a later batch could actually break (a pool emptying, a
 	# card quietly removed), and it is still the same question.
 	ok(DRAFT_TARGET - (spec_total + class_total) == 0,
-		"NOTHING is owed — the draft is complete at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
+		"NOTHING is owed — the draft is complete at %d of %d" % [
+			spec_total + class_total, DRAFT_TARGET])
 	ok(SPEC_TARGET - spec_total == 0,
-		"...and the spec half is full at %d" % SPEC_TARGET)
+		"...and the spec half is at %d of %d" % [spec_total, SPEC_TARGET])

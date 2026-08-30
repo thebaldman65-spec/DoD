@@ -14,6 +14,137 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-29 &mdash; Batch DX: A SIXTH INSTANCE EARNS A CONSTRUCTION RULE</h2>
+<p><i>Three items. <b>A rule, its first sweep, and the thirty-one sites that sweep found; the
+project's second unseeded flake, seeded; and a decision the designer is owed.</b> No ability
+magnitude moved and the draft is untouched at 149.</i></p>
+
+<p><b>&sect;1 &mdash; NEVER ASSERT AN EQUALITY AGAINST A COLLECTION THAT GROWS.</b>
+<code>check_dv</code> &sect;4 asserted <code>live_span == 16</code> against a changelog that gains
+an entry every batch, and <b>DW's own entry broke it</b>. That was CD &sect;1's fault written for
+the sixth time, so it is a construction rule now rather than a sixth trap:</p>
+<blockquote><p><b>Never assert an equality against a collection that grows.</b> Changelog entries,
+corpus size, pool depth, suite counts, call-site counts &mdash; <b>assert a floor, or assert a
+property.</b> An equality against a growing set fails on the next batch that does its job, and the
+failure looks like a regression.</p></blockquote>
+
+<p><b>THE SWEEP FOUND FORTY-ONE SITES ACROSS THIRTEEN FILES, ALL PINNING ONE THING: THE DRAFT.</b>
+The spec half at 125 (fifteen sites), each class pool at six (eleven), the whole draft at 149
+(nine), the class half at 24 (four), the per-spec depth table (one) and the Beastmaster's boss pool
+at five (one) &mdash; and <b><code>&gt;=</code> appeared nowhere</b>. DO added twenty-two cards, DR a net +1 and DS six, so <b>each of the last three
+batches to author a card had to hand-bump a dozen files at once</b>, and a batch that missed one
+would have read as a regression rather than as a bump owed. <b>Thirty-five assert a
+FLOOR now</b>, across twelve files, each with a message that names the live figure and the
+direction of travel.</p>
+
+<p><b>THE REMAINING SIX ARE KEPT ON PURPOSE, ALL SIX IN ONE FILE, AND THAT IS THE RULE'S OWN FIRST
+CORRECTION.</b> A
+floor cannot see a card <i>arriving</i>, and a card arriving unannounced is exactly what
+<code>test_batch_cd.PER_SPEC_DEPTH</code> exists to force a batch to state. So the equality
+survives in <b><code>test_batch_cd</code> alone</b> &mdash; beside the table a new card must move
+anyway, where the failure costs one edit in one file instead of thirty-five across twelve. <b>The sharpened rule: a
+staleness tripwire is a SINGLE site whose message says the ground moved and names what to
+re-derive. Thirty copies of one is not a tripwire, it is a tax.</b> Four other single-site
+tripwires were swept, examined and deliberately left standing for the same reason &mdash;
+<code>check_di</code>'s <code>CALL_SITES</code>, <code>check_dv</code>'s two boss-pool census pins
+and its Holy-pool pin, and <code>check_cz</code>'s <code>SHIELD_SPECIALS</code> registry.</p>
+
+<p><b>AND THE ONE SURVIVING EQUALITY COULD NOT SAY WHAT HAD MOVED.</b> Its failure message read
+<code>"the draft stands at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET]</code> &mdash; the target
+printed twice, so the single assertion left to announce a moved draft would have reported
+<i>149 of 149</i> while the draft stood at 150. That is the second-copy-of-a-count defect sitting
+inside the tripwire written to catch drift, and DW found the identical shape in two
+<code>test_batch_cp</code> messages one batch earlier. Three messages print live figures now.</p>
+
+<p><b>BOTH DIRECTIONS ARE PROVEN ON DEMAND.</b> Remove one card from the Warden's pool and every
+floor reds &mdash; <code>check_dr</code> 2, <code>test_batch_cd</code> 5, <code>cp</code> 2,
+<code>bt</code> 1, <code>ce</code> 4, each naming <i>124</i> and <i>148</i>. <b>Add one and all twelve
+floor files stay silent while <code>test_batch_cd</code> alone reds with four messages</b>,
+the sharpest being <code>warden drafts 10 (want 9)</code> &mdash; the batch is told which pool
+moved and where to record it. <b>A floor that can never fail is the hollow check this project has
+spent twenty batches removing; these fail.</b></p>
+
+<p><b>&sect;2 &mdash; THE SECOND UNSEEDED FLAKE IS SEEDED, AND IT SETTLED AT ZERO.</b>
+<code>test_run_harness</code> gate 2 walks a randomly generated map by taking
+<code>reachable()[0]</code> at every step and asserts each of six node types was crossed;
+<code>seed()</code> was called zero times in the file. <b>Thirty seeded runs, thirty
+byte-identical walks, 165 checks and 0 failures every time</b> &mdash; so it was a flake and not a
+finding, which is the half that had to be measured rather than assumed.</p>
+
+<p><b>DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.</b> Over 400 unseeded walks the length
+is 49 every time and <code>fight</code>, <code>elite</code> and <code>miniboss</code> never come
+close to zero &mdash; but <b><code>blacksmith</code> reached zero once, and <code>merchant</code>
+and <code>event</code> each came within one of it.</b> So <b>three of the six types are at risk,
+not the one that happened to fail</b>, and the rate is well under DW's estimated 3%: two
+observed in roughly 474 readings, counting DW's own and 40 clean standalone re-runs at HEAD.</p>
+
+<p><b>THE ASSERTION IS NOT WIDENED AND THE SEED GOES AT EVERY BOARD GENERATION, NOT ONCE.</b>
+Relaxing six types to five would delete the check rather than repair it &mdash; the six being
+present is the question. Both seeding shapes were measured and both are exactly repeatable; the
+per-generation one is repeatable for a reason that cannot be broken from a distance, because
+seeding once would leave zones 1 and 2 drawing off whatever the loop consumed before them. <b>The
+three boards stay different from one another</b> (<code>_generate_map</code> reads
+<code>zone_idx</code>), so this buys determinism without buying one map walked three times.
+<b>The negative control is a seed that misses a type: <code>seed(101)</code> fails gate 2 on
+<i>the walk crossed a event</i> &mdash; DW's own red, reproduced on demand.</b></p>
+
+<p><b><code>test_batch_at</code> &sect;1's ratio is the last unseeded flake in the project
+&mdash; AND THE SWEEP THE BRIEF ASKED FOR CANNOT ESTABLISH THAT, WHICH IS THE MORE USEFUL
+ANSWER.</b> A source sweep fails in both directions: <b>twenty suites and gates make unseeded
+random draws and are perfectly stable</b> (<code>bk</code> and <code>an</code> generate whole maps),
+so <code>seed()</code>-count is not evidence of a flake &mdash; and <b><code>test_batch_at</code>
+calls no RNG function at all.</b> Its one <code>seed()</code> is at line 603 and every use is
+DOWNSTREAM of the check that flakes; the noise itself comes from <code>battle.gd</code>'s
+<code>randf_range(0.9, 1.1)</code> in the strike loop, which no sweep of the suite tree can see.
+<b>Only readings find a flake, and the readings are in <code>baselines.json</code>: three rows
+carry a flake band, and after this batch two of the three are seeded and closed</b> &mdash;
+<code>test_rune_battle</code> at DF &sect;0 and <code>harness_2</code> here. <b>The claim is true
+and it rests on the readings, not on a grep.</b></p>
+
+<p><b>&sect;3 &mdash; <code>CLASS_POOLS</code>: THE SEVEN ARE THE VAULT, AND OPTIONS ARE PRICED
+WITH NOTHING AUTHORED.</b> DV established it is a lost feature rather than scaffolding. <b>The
+sharper diagnosis is that the seven unreachable entries are not orphans of a pool &mdash; they are
+the contents of <code>Classes.vault_ability()</code>, and <code>CLASS_POOLS</code> is its
+manifest.</b> That function holds 38 definitions kept deliberately, its header saying they
+<i>&quot;return as earnable picks without a line of new mechanics&quot;</i>; later batches re-homed
+31 of them into spec draft pools and boss pools, and <b>AN &sect;4 closed the class draw, which was
+the vault's only remaining exit</b>. Full options, prices and card text in
+<code>docs/reports/DX.md</code>; <b>nothing was authored and no ruling was taken.</b></p>
+
+<p><b>ONE OF DV'S PREMISES IS CORRECTED AND IT CHANGES A PRICE.</b> DV recorded that deleting the
+container <i>&quot;would delete the last listing of seven finished abilities&quot;</i>.
+<b>The definitions survive deletion:</b> <code>Classes.pool_ability()</code> resolves by name
+through a chain that reads the vault and <b>never consults <code>CLASS_POOLS</code> at all</b>, so
+all seven still resolve with the container gone. What deletion actually costs is the
+<i>manifest</i> &mdash; the only place they are enumerated as a group &mdash; and their membership
+in <code>ability_corpus()</code>, <b>which would fall 227 &rarr; 220</b>. That is a real cost and
+a smaller one than recorded.</p>
+
+<p><b>AND THE ORPHANS ARE NOT INERT &mdash; THEY HAVE BEEN ABSORBING MAINTENANCE FOR FOUR
+BATCHES.</b> <b>DK &sect;1 widened <code>sanctuary</code>'s heal to <code>_hero_side()</code> and
+measured it on a live bear</b> (1200 off a 10000 body); <b>DL &sect;1 widened Rallying Shout's
+Pressure clause and measured 30 shed on a summoned Ursus</b>, authoring a new guard on its
+resource loop; <b>DM &sect;3 read Divine Wrath's two clauses in its hero/ally audit.</b> Two of
+the seven also sit inside <code>Ability.PURE_BUFFS</code> and two inside
+<code>HEAL_SPECIALS</code>, so CY's and CZ's cap passes priced them too. <b>Three recent batches
+spent measured, documented engineering on cards no player can obtain, and nothing said so.</b>
+That is the cost of leaving the question open, stated as what has already happened.</p>
+
+<p><b>AND THE CURATION DEBT UNDER &quot;restore the draw is one line&quot; IS MEASURED.</b>
+<code>run_state.gd</code>'s own comment says re-opening it is one line, and that is true of the
+code. Across the twelve specs, <b>56 of the 183 hero-and-entry pairs a reopened draw could offer
+duplicate something that hero can already reach, and 27 of those are the hero's own protected
+core</b> &mdash; a card held on turn one. The Mystic would see 8 of 17 duplicated, the Holy Cleric
+2 of 14. <b>The line is one line; the curation behind it is 61 entries against twelve specs.</b></p>
+
+<p><b>VERIFICATION.</b> Documents written before the run. Baseline movements predicted in
+<code>baselines.json</code> before it. Parse checked by grepping stderr after every edit, never a
+tally and never an exit code, with a deliberate <code>func _dx_negative_control(:</code> proving
+the check bites. Every backed-up file restored by <code>cp</code> and md5-verified, never by
+<code>git checkout</code>. <b>Two runs of six suites were discarded and re-taken</b> because the
+negative controls were mutating <code>scripts/classes.gd</code> underneath them &mdash; the tree
+has to be frozen for a reading to mean anything, which is DL's lesson met again.</p>
+
 <h2>2026-08-29 &mdash; Batch DW: THE WALK, THE FINGERPRINT THAT SHOULD HAVE CAUGHT IT, AND THE
 OVERRUNS</h2>
 <p><i>Three items. <b>The brief named one hand-rolled corpus walk and two holes in the rule that

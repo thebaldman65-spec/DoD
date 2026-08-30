@@ -170,8 +170,15 @@ func _pools() -> void:
 	# later batch could break is no longer "did the remaining twelve arrive" but
 	# "did any of the twenty-four quietly leave". BQ's own twelve are still
 	# asserted by name below, so this batch's content is not measured by BR's.
-	ok(total == 24,
-		"§3/§4+BR: twenty-four class-wide abilities ship (read off the live dict: %d)" % total)
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 24,
+		"§3/§4+BR: the class-wide half has FALLEN to %d, below the 24 that shipped" % total)
 	for cls in TRANCHE_3:
 		var live: Array = Classes.class_draft_pool(cls)
 		ok(live.size() == 6, "§3/§4: the %s class pool holds six (%d)" % [cls, live.size()])
@@ -182,10 +189,10 @@ func _pools() -> void:
 	# than being deleted — "the Hunter and Warrior pools emptied again" is the
 	# thing a later batch could actually break, and BQ's twelve are still pinned
 	# by name above, so nothing this suite was written to protect is lost.
-	ok(Classes.class_draft_pool("hunter").size() == 6,
-		"§0+BR: the HUNTER class pool is PAID at six")
-	ok(Classes.class_draft_pool("warrior").size() == 6,
-		"§0+BR: the WARRIOR class pool is PAID at six")
+	ok(Classes.class_draft_pool("hunter").size() >= 6,
+		"§0+BR: the HUNTER class pool has FALLEN below the six BR paid")
+	ok(Classes.class_draft_pool("warrior").size() >= 6,
+		"§0+BR: the WARRIOR class pool has FALLEN below the six BR paid")
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -246,8 +253,8 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 125,
-		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
+	ok(spec_total >= 125,
+		"§1: the spec half has FALLEN to %d, below the 125 that shipped"
 			% spec_total)
 
 

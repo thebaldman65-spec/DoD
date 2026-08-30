@@ -184,14 +184,21 @@ func _pools() -> void:
 	var total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		total += Classes.CLASS_DRAFT_POOLS[cls].size()
-	ok(total == 24,
-		"§0: the class-wide pool is FULL at twenty-four (read off the live dict: %d)" % total)
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 24,
+		"§0: the class-wide pool has FALLEN to %d, below the twenty-four that shipped" % total)
 	# EVERY class pool holds six — the seam is closed, and this is the assertion
 	# that keeps it closed. BQ's own suite recorded the debt as an assertion so
 	# it stayed visible; this is the same discipline pointed the other way.
 	for cls2 in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls2).size() == 6,
-			"§0: the %s class pool holds six (%d)" % [
+		ok(Classes.class_draft_pool(cls2).size() >= 6,
+			"§0: the %s class pool has FALLEN below six (%d)" % [
 				cls2, Classes.class_draft_pool(cls2).size()])
 	for cls3 in TRANCHE_4:
 		var live: Array = Classes.class_draft_pool(cls3)
@@ -225,11 +232,11 @@ func _pools() -> void:
 	# 60 plus two nines — 78 — while asserting 96, because CH's and CI's thirds
 	# landed after it was last rewritten. The count was right and the sentence
 	# beside it was three tranches old.
-	ok(spec_total == 125,
-		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus the Mage, Cleric, Hunter and Warrior nines (%d)"
+	ok(spec_total >= 125,
+		"§4+tranche 3: SPEC_DRAFT_POOLS has FALLEN to %d, below the 125 that shipped"
 			% spec_total)
-	ok(spec_total + total == 149,
-		"§0+DO+DR+DS: the draft holds 149 (%d)" % (spec_total + total))
+	ok(spec_total + total >= 149,
+		"§0+DO+DR+DS: the draft has FALLEN to %d, below the 149 that shipped" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is

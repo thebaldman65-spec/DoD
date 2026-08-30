@@ -189,7 +189,14 @@ func _pools() -> void:
 		total += pool.size()
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"twelve spec draft pools (got %d)" % Classes.SPEC_DRAFT_POOLS.size())
-	ok(total == 125, "SPEC_DRAFT_POOLS holds 125 (got %d)" % total)
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 125, "SPEC_DRAFT_POOLS has FALLEN to %d, below the 125 that shipped" % total)
 
 
 # ---------- §2: the standard shape, all twenty-seven ----------

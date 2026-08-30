@@ -242,27 +242,34 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 125, "the spec pools hold 125 (CI's 96, DO's twenty-two, DR's net +1, DS's six), got %d"
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 125, "the spec pools have FALLEN to %d, below the 125 that shipped"
 		% total)
 	ok(total > 12 * 8,
 		"...which is ABOVE CI's flat ninety-six — DO's twenty-two landed here")
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 149, "the draft holds 149 (got %d)"
+	ok(draft_total >= 149, "the draft has FALLEN to %d, below the 149 that shipped"
 		% draft_total)
 	# INVERTED BY BATCH CI RATHER THAN DELETED. These asserted a DEBT for three
 	# batches; CI paid it, so what they assert now is that there is none — which
 	# is the thing a later batch could break (a pool emptying, a card removed),
 	# and it is the same question with the correct answer moved.
-	ok(149 - draft_total == 0,
-		"NOTHING is owed — the draft is complete at 149 of 149")
-	ok(125 - total == 0, "...and the spec half is full at 125")
+	ok(draft_total >= 149,
+		"NOTHING is owed — and the draft has fallen below the 149 that shipped")
+	ok(total >= 125, "...and the spec half has fallen below the 125 that shipped")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() == 6,
-			"%s's class pool is still SIX" % cls)
+		ok(Classes.class_draft_pool(cls).size() >= 6,
+			"%s's class pool has FALLEN below SIX" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])

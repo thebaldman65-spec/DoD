@@ -137,8 +137,15 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 125,
-		"§5+DO: CI's ninety-six plus DO's twenty-two (got %d)" % total)
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 125,
+		"§5+DO: the spec half has FALLEN to %d, below the 125 that shipped" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
@@ -164,8 +171,8 @@ func _pools() -> void:
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§5: the four class-wide pools are still named")
 	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() == 6,
-			"§5: ...the %s one is FILLED at six (BQ, then BR)" % ck)
+		ok(Classes.class_draft_pool(ck).size() >= 6,
+			"§5: ...the %s one has FALLEN below the six BQ and BR filled it to" % ck)
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
 	# name that does not resolve is an offer that hands out nothing.
 	for spec3 in TRANCHE_2:

@@ -216,6 +216,46 @@ func _gate_win_scaling() -> void:
 	_finish()
 
 
+# ---------- gate 2's seed ----------
+#
+# BATCH DX §2 — THE SECOND UNSEEDED FLAKE, AND IT IS SEEDED AT THE SITE THAT
+# GENERATES THE BOARD RATHER THAN AT THE TOP OF THE FILE.
+#
+# Gate 2 walks a randomly GENERATED map by taking `reachable()[0]` at every
+# step and then asserts each of six node types was crossed at least once. An
+# unsteered greedy route can miss the rarest, and DW's acceptance battery is
+# where it finally did — on *"the walk crossed a event"*, with `seed()` called
+# zero times in this file.
+#
+# **DW's CHARACTERISATION OF THE FAILURE WAS TOO NARROW IN BOTH HALVES, AND
+# THE MEASUREMENT IS WHY THE SEED GOES WHERE IT DOES.** Over 400 unseeded
+# walks: the walk length is 49 EVERY time, `fight` never fell below 9, `elite`
+# below 2 or `miniboss` below 3 — but **`blacksmith` reached ZERO once**, and
+# `merchant` and `event` each came within one of it. So the at-risk population
+# is THREE of the six types and not the one that happened to fail, and the rate
+# is well under DW's estimated 3% (2 observed in ~474 readings, counting DW's
+# own and 40 clean standalone re-runs at HEAD).
+#
+# **THE ASSERTION IS NOT WIDENED, AND THAT IS THE RULING RATHER THAN A DETAIL.**
+# The six types being present is the QUESTION — a walk that met no elite proves
+# nothing about elites, which is what the loop's own comment above says — so
+# relaxing it to five would delete the check instead of repairing it. DD's
+# method: force determinism AT THE SITE UNDER TEST.
+#
+# **AND IT IS SEEDED BEFORE EVERY GENERATION, NOT ONCE BEFORE THE WALK.** Both
+# shapes were measured and both are exactly repeatable; this one is repeatable
+# for a reason that cannot be broken from a distance. Seeding once would leave
+# zones 1 and 2 drawing off whatever the loop consumed before them, so a later
+# batch adding one RNG draw inside the walk would silently re-roll two of the
+# three boards and could re-flake this gate with nothing in the diff to
+# explain it. That is `bo`'s per-pair seed one layer out: the guarantee is
+# per-BOARD, not per-suite. The three boards are still DIFFERENT from one
+# another — `_generate_map` reads `zone_idx` — so this buys determinism
+# without buying a degenerate map walked three times.
+func _seeded() -> void:
+	seed(20260829)
+
+
 # ---------- gate 2: talent conservation ----------
 #
 # BATCH CA — READ THIS BEFORE CHANGING ANYTHING BELOW. This gate's first
@@ -257,6 +297,7 @@ func _gate_talent_conservation() -> void:
 	# The ledger is redirected BEFORE anything can read it, and restored at the
 	# end of the gate.
 	_profile_scratch()
+	_seeded()
 	run.new_run()
 	for i in run.party.size():
 		run.party[i]["spec"] = SPECS[i]
@@ -283,6 +324,7 @@ func _gate_talent_conservation() -> void:
 		run.slot_idx = -1
 		run.node_idx = 0
 		if zone > 0:
+			_seeded()
 			run._generate_map()
 		while true:
 			var reach: Array = run.reachable()

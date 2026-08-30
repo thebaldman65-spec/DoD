@@ -4,6 +4,62 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Six instances is not a trap, it is a construction rule (Batch DX) — 2026-08-29
+
+`check_dv` §4 asserted `live_span == 16` against a changelog that gains an entry every batch. DV's
+own acceptance was the only run that could ever satisfy it, and **DW's own entry is what broke it.**
+That is the sixth time this project has shipped an equality against a collection that grows — the
+shape that turned five suites red at once at CJ.
+
+The reason it kept recurring is that **each instance looked like a local mistake.** A hardcoded
+batch stamp, a pinned population, a changelog span: each was repaired in place, each repair was
+correct, and none of them was written down as a *kind* of mistake. So the rule is the batch:
+
+> Never assert an equality against a collection that grows. Assert a floor, or assert a property.
+
+**The harm is not the failing. It is the failing's disguise.** A red that means *a batch did its
+job* is indistinguishable from a red that means *something was deleted*, and the reader has to
+re-derive which. A floor's failure has exactly one meaning.
+
+**AND THE FIRST SWEEP IS WHERE THE RULE FINDS OUT HOW BIG IT IS.** DX expected the changelog span
+and a handful of siblings. The sweep found **thirty-one equalities across twelve files pinning one
+number** — the draft total — with `>=` nowhere in any of them. DO, DR and DS each authored cards and
+each hand-bumped a dozen files to keep the tree green. Nobody had recorded that as a cost, because
+each batch paid it once and it looked like bookkeeping.
+
+**THE RULE CORRECTED ITSELF ON ITS OWN SWEEP, AND THAT IS THE PART WORTH KEEPING.** Applied
+literally it would have deleted five working instruments — `check_di`'s `CALL_SITES` equality among
+them, which caught DP silently deleting an `_apply_status` site and is precisely what that equality
+is for. So the rule grew an exemption with a name and a two-question test: **a staleness tripwire is
+a single site whose failure message says the ground moved and names what to re-derive.** One is an
+instrument; thirty copies of one is a tax. The surviving equality lives beside
+`test_batch_cd.PER_SPEC_DEPTH`, the table a new card has to move anyway, so tripping it costs one
+edit instead of twelve.
+
+**A tripwire that cannot say what moved is not one.** That same assertion's message read
+`"the draft stands at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET]` — the target printed twice. The one
+check left to announce a moved draft would have reported *149 of 149* while the draft stood at 150.
+The second-copy-of-a-count defect, sitting inside the instrument written to catch drift.
+
+## Only readings find a flake; no sweep of the source can (Batch DX) — 2026-08-29
+
+The brief asked whether `test_batch_at` §1 is the last unseeded flake in the project. It is — and
+**the sweep that would establish it does not exist**, which is the more useful answer.
+
+A source sweep fails in both directions. **Twenty suites and gates make unseeded random draws and
+are perfectly stable** — `bk` and `an` generate whole maps — so `seed()`-count is not evidence of a
+flake. And **`test_batch_at` calls no RNG function at all**: its one `seed()` is downstream of the
+check that flakes, and the noise is `battle.gd`'s `randf_range(0.9, 1.1)` in the strike loop, which
+nothing in the suite tree can see. The instrument that answers the question is the readings, and
+they live in `baselines.json` — three rows carry a flake field, and after this batch two of the
+three are seeded and closed.
+
+**And a flake's recorded character is worth re-measuring before it is repaired.** DW recorded the
+harness flake as an `event` miss at roughly 3%, off one observation. Over 400 walks the type that
+actually reached zero was **`blacksmith`**, with `merchant` and `event` each within one of it, at
+well under 1%. Three of the six node types are at risk, not the one that happened to fail — and a
+repair aimed at the recorded symptom rather than the measured population is how a flake comes back.
+
 ## A rule that matches source text can only see one shape of violation (Batch DW) — 2026-08-29
 
 `check_da` §3 was authored at Batch DA to catch a gate that hand-rolls the ability corpus instead of

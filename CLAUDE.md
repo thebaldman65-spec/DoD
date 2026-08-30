@@ -88,6 +88,24 @@ accumulate far more slowly than batches do.
     consecutive clean runs on an idle machine. **That the load matters is a HYPOTHESIS, not a
     finding** — the assertion's own comment says its snapshot "is the one that cannot race", so a
     race is the first thing to look at. Band `0–1`, rate in `baselines.json`.
+  - **A SOURCE SWEEP CANNOT FIND A FLAKE, IN EITHER DIRECTION (STANDING, MEASURED AT DX §2).**
+    **`seed()`-count is not evidence.** TWENTY suites and gates make unseeded random draws and are
+    perfectly stable — `bk` and `an` generate whole maps — so an unseeded file is not thereby
+    flaky. And **`test_batch_at` calls no RNG function at all**: its one `seed()` is downstream of
+    the check that flakes, and the noise is `battle.gd`'s `randf_range(0.9, 1.1)` in the strike
+    loop, which no sweep of the suite tree can see. **ONLY READINGS FIND A FLAKE, AND THE READINGS
+    ARE IN `baselines.json`** — the rows carrying a `flake` field are the answer to "how many are
+    there", and nothing else is.
+  - **AND WHERE A GENERATED WALK IS THE SUBJECT, SEED AT EVERY GENERATION RATHER THAN ONCE (DX §2).**
+    `test_run_harness` gate 2 walks three generated maps and asserts six node types were crossed.
+    Seeding once before the walk is repeatable **today** and leaves zones 1 and 2 drawing off
+    whatever the loop consumed before them, so one added RNG draw inside the loop silently re-rolls
+    two of the three boards. **Seed immediately before each generation: the guarantee is
+    per-BOARD, which is `bo`'s per-pair seed one layer out.** The boards stay different from each
+    other because `_generate_map` reads `zone_idx`. **AND CHARACTERISE THE FAILURE BEFORE NAMING
+    IT** — DW recorded this as an `event` flake at ~3%; over 400 walks the type that actually
+    reached zero was **`blacksmith`**, with `merchant` and `event` each within one of it, at well
+    under 1%. **Three of the six types are at risk, not the one that happened to fail.**
   - **AND A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE (STANDING, FOUND AT DE §6).** `bo` was
     recorded as `0–1 (the known flake)` in every document. **It is not.** Its floor of **1 is
     DETERMINISTIC and is not the flake**: §6 asserts `CLAUDE.md` contains the literal `TRANCHES 2
@@ -920,6 +938,73 @@ minutes to about 50.** That was a design error in the brief, not in the implemen
   commit.** A log named in the manifest is always this run's, because `run_one` truncates it at
   spawn. A subset invocation (`./run_battery.sh bo bp`) writes a short manifest and **the differ
   says so instead of reporting a clean tree.**
+
+## NEVER ASSERT AN EQUALITY AGAINST A COLLECTION THAT GROWS (STANDING, SET AT DX §1)
+> **Changelog entries, corpus size, pool depth, suite counts, call-site counts — assert a FLOOR,
+> or assert a PROPERTY.** An equality against a growing set fails on the next batch that does its
+> job, and **the failure looks like a regression.**
+
+**THIS IS CD §1's FAULT AND DX IS ITS SIXTH INSTANCE, WHICH IS WHY IT IS A CONSTRUCTION RULE
+RATHER THAN A SIXTH TRAP.** The shape turned five suites red at once at CJ; `check_dv` §4 read
+`live_span == 16` against a changelog that gains an entry every batch, so **DV's own acceptance was
+the only run that could ever satisfy it and DW's own entry broke it.**
+
+- **THE HARM IS NOT THE FAILING, IT IS THE FAILING'S DISGUISE.** A red that means *"a batch did its
+  job"* is indistinguishable from a red that means *"something was deleted"*, and the next reader
+  has to re-derive which. **A floor's failure has exactly one meaning: something LEFT.**
+- **AND THE SECOND HARM IS THE COUNT OF SITES.** DX's sweep found **forty-one equalities across
+  thirteen files pinning ONE growing number** — the draft total — with `>=` nowhere. DO, DR and DS
+  each authored cards and each had to hand-bump a dozen files, and **a batch that missed one would
+  have shipped a red that read as a regression.** **THIRTY-FIVE ASSERT A FLOOR NOW; the six that stay
+  are all in `test_batch_cd`.**
+- **THE MESSAGE MOVES WITH THE OPERATOR.** A floor whose message still says *"holds 149"* has been
+  half-repaired: it must name the **live figure** and the **direction** — *"has FALLEN to %d, below
+  the 149 that shipped"* — or the reader still cannot tell the two meanings apart.
+
+### THE ONE EXEMPTION, AND IT IS NARROW: A STALENESS TRIPWIRE
+
+> **A staleness tripwire is a SINGLE site whose failure message says the ground moved and names
+> what to re-derive.** It is a property assertion wearing an equality's clothes, and it is
+> legitimate. **Thirty copies of one is not a tripwire, it is a tax.**
+
+**A FLOOR CANNOT SEE A THING ARRIVING, AND SOMETIMES THE ARRIVAL IS THE EVENT WORTH CATCHING.**
+`check_di`'s `CALL_SITES` equality caught DP silently deleting an `_apply_status` site, which is
+exactly what it is for — and its sibling `SRC_FLOOR` is a ratchet, because that one measures
+progress. **The pair is the model: the tripwire and the ratchet, side by side, each doing the job
+the other cannot.**
+
+- **THE TEST FOR THE EXEMPTION IS TWO QUESTIONS, AND BOTH MUST PASS.** *Is this the only site that
+  pins this number?* and *does its failure message read as a notice rather than as a regression?*
+  DX's sweep left five instruments standing on that test — `test_batch_cd`'s draft targets (beside
+  `PER_SPEC_DEPTH`, the authoritative table a new card must move anyway), `check_di`'s
+  `CALL_SITES`, `check_dv`'s two boss-pool census pins and its Holy-pool pin, and `check_cz`'s
+  `SHIELD_SPECIALS` registry. **Count the SITES, not the files** — `test_batch_cd` holds six
+  assertions and is one instrument.
+- **PUT THE TRIPWIRE WHERE THE EDIT ALREADY HAS TO LAND.** The equality that survives belongs
+  beside the authoritative table, so a batch that trips it makes ONE edit rather than twelve.
+- **AND A TRIPWIRE THAT CANNOT SAY WHAT MOVED IS NOT ONE.** `test_batch_cd`'s message read
+  `"the draft stands at %d of %d" % [DRAFT_TARGET, DRAFT_TARGET]` — the target twice, so the single
+  assertion left to announce a moved draft would have reported *149 of 149* while the draft stood
+  at 150. **That is the second-copy-of-a-count defect sitting inside the instrument written to
+  catch drift**, and DW found the identical shape in two `test_batch_cp` messages one batch
+  earlier. **When you keep an equality, make its message print the live figure.**
+
+### REPAIR TO A FLOOR OR A PROPERTY, NEVER BY DELETING THE CHECK
+
+**A count that FALLS is still the signal worth having; what must go is the ceiling that no longer
+means anything.** This is CQ §3's rule applied to an operator rather than to a value.
+- **NEGATIVE-CONTROL A FLOOR IN BOTH DIRECTIONS, BECAUSE A FLOOR THAT CAN NEVER FAIL IS THE HOLLOW
+  CHECK THIS PROJECT HAS SPENT TWENTY BATCHES REMOVING.** Take one item OUT and confirm every floor
+  reds; put one IN and confirm the floors stay silent **while the one surviving tripwire still
+  fires.** DX ran both: a removal reds `check_dr` (2), `test_batch_cd` (5), `cp` (2), `bt` (1) and
+  `ce` (4); an addition leaves all eleven floor files green and reds `test_batch_cd` alone, most
+  sharply as `warden drafts 10 (want 9)`.
+- **CONVERTING `==` TO `>=` MOVES NO CHECK COUNT** — one `ok()` before, one after — so a count that
+  moves across this repair means an assertion was removed rather than re-pointed. All thirteen
+  targets DX touched read their baselines exactly.
+- **A FROZEN COLLECTION IS NOT A GROWING ONE AND ITS EQUALITY IS CORRECT.** The changelog ARCHIVE
+  keeps `== 149` because only a cut moves it; `CLASS_POOLS`' byte-freeze pins are the point of
+  those checks. **Ask whether a batch doing its job would ADD to it — that is the whole test.**
 
 ## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
 > **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline

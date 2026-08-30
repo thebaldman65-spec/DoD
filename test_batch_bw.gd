@@ -251,7 +251,14 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 125, "the spec pools hold 125 (CI's 96, DO's twenty-two, DR's net +1, DS's six), got %d" % total)
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(total >= 125, "the spec pools have FALLEN to %d, below the 125 that shipped" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
@@ -260,8 +267,8 @@ func _pools() -> void:
 	# closed the draft. A message that states a wrong size teaches it to whoever
 	# reads the failure — CD §2's rule, applied to the size rather than to the
 	# old target it was written for.
-	ok(draft_total == 149,
-		"the whole draft is 149 (got %d)" % draft_total)
+	ok(draft_total >= 149,
+		"the whole draft has FALLEN to %d, below the 149 that shipped" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -283,8 +290,8 @@ func _pools() -> void:
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BU/BV negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() == 6,
-			"%s's class pool is still SIX" % cls)
+		ok(Classes.class_draft_pool(cls).size() >= 6,
+			"%s's class pool has FALLEN below SIX" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])

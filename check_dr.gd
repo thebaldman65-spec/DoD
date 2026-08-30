@@ -358,10 +358,19 @@ func _s7_names_and_total() -> void:
 	var class_total := 0
 	for k in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[k] as Array).size()
-	ok(spec_total == 125, "the spec draft half is %d, not 125" % spec_total)
-	ok(class_total == 24, "the class draft half is %d, not 24" % class_total)
-	ok(spec_total + class_total == 149,
-		"the draft is %d, not 149" % (spec_total + class_total))
+	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that
+	# GROWS — DO added twenty-two, DR a net +1, DS six — and each time, this
+	# line had to be hand-bumped in a dozen files at once. An equality here reds
+	# on the next batch that authors a card, and that failure reads exactly like
+	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
+	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
+	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
+	ok(spec_total >= 125,
+		"the spec draft half has FALLEN to %d, below the 125 that shipped" % spec_total)
+	ok(class_total >= 24,
+		"the class draft half has FALLEN to %d, below the 24 that shipped" % class_total)
+	ok(spec_total + class_total >= 149,
+		"the draft has FALLEN to %d, below the 149 that shipped" % (spec_total + class_total))
 	print("  draft: %d spec + %d class-wide = %d" % [spec_total, class_total,
 		spec_total + class_total])
 	ok(Classes.talent_granted_names().is_empty(),
