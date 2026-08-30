@@ -6161,6 +6161,40 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# negative control test_batch_bv drives directly.
 	if ab.special == "preparation" and u.prep_pending > 0:
 		return false
+	# ---- BATCH DV §3 — ASHES OF AL'AR, AND WHY IT IS HERE AND NOT IN THE LIST ----
+	# CO's criterion, sitting in the wrong place: `_resolve_special` writes
+	# `attacker.ashes_return = ASHES_RETURN_PERFECT` unconditionally, so a hero
+	# who has already armed the phoenix could recast it for 30 Mana and a turn,
+	# writing the same constant and changing nothing — every turn, at cooldown 0.
+	# THE BOT ALREADY REFUSED IT (`u.ashes_return <= 0 and not u.ashes_used` in
+	# the Mage branch) and the player's door did not, so the autoplay heuristic
+	# was playing better than the player was permitted to.
+	#
+	# **IT IS NOT IN `RECAST_GATED` BECAUSE MEMBERSHIP THERE WOULD BE INERT, AND
+	# THAT WAS MEASURED RATHER THAN ASSUMED.** That system reasons about STATUS
+	# writes: `_recast_refused` asks `_recast_targets` for a pool and
+	# `_recast_writes` for the chips a cast would lay, and `ashes` writes neither
+	# — it writes an integer FIELD. `_recast_targets` has no arm for it and
+	# returns `[]`, so the loop never runs, `saw_write` stays false and the
+	# function returns false. Adding the string to the list changes no behaviour
+	# whatever; it would only have taught `check_co` to report the card as never
+	# exercised. Inventing a pseudo-status to carry the field would put a name in
+	# `_recast_refusal_note` that `STATUS_INFO` cannot render and that the player
+	# holds no chip for — a second path wearing the first one's clothes.
+	#
+	# THE TEST IS EXACT AND COMPUTED AT CAST TIME, WHICH IS CO §1's WHOLE RULE:
+	# a refusal that blocks a cast which would in fact have done something is
+	# strictly worse than the waste it fixes. So it compares against WHAT THIS
+	# CAST WOULD WRITE rather than against zero — `> 0` would refuse a genuine
+	# 25 → 40 improvement the day `ASHES_RETURN` acquires a caller (it has none
+	# today, and that dead constant is reported rather than collapsed). And
+	# `ashes_used` is its own arm because `unit._ashes_guard()` returns early
+	# forever once the phoenix has risen: re-arming after that is inert whatever
+	# the field says. The two arms agree with the bot's guard in every state the
+	# game can currently produce, and this one stays right if that stops being so.
+	if ab.special == "ashes" \
+			and (u.ashes_used or u.ashes_return >= ASHES_RETURN_PERFECT):
+		return false
 	# ---- BATCH CO — THE RECAST THAT WOULD DO NOTHING ----
 	# LAST, AND DELIBERATELY LAST: every gate above answers "can this be cast at
 	# all", and this one answers "would casting it change anything". Asking the
@@ -6268,6 +6302,18 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
 	if ab.special == "preparation" and u.prep_pending > 0:
 		ab_btn.tooltip_text += "\n(An extra turn is already pending)"
+	# BATCH DV §3 — THE PHOENIX SAYS WHY, and it is TWO reasons rather than one.
+	# Death Ray's rule, and the CO §3 rule the general refusal already follows:
+	# a button this gate darkens has to explain itself, or the fix for a wasted
+	# cast ships as a button that reads broken. The two arms are genuinely
+	# different states to be in — the phoenix STANDING is a resource the player
+	# still holds, the phoenix SPENT is gone for the battle — so they do not
+	# share a sentence.
+	if ab.special == "ashes" and u.ashes_used:
+		ab_btn.tooltip_text += "\n(The phoenix has already risen this battle)"
+	elif ab.special == "ashes" and u.ashes_return >= ASHES_RETURN_PERFECT:
+		ab_btn.tooltip_text += "\n(Already wreathed — the next lethal blow returns you at %d%%)" % \
+			u.ashes_return
 	_mark_upgraded(ab_btn, u, ab)
 	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))

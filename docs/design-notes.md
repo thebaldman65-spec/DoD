@@ -5586,3 +5586,74 @@ dissolves by widening one condition — so the obvious implementation would have
 from under both tests while looking like a clean one-line change. Nested inside the refusal, both
 literals survive and the exception reads better besides. **When a test pins a line, the line is
 load-bearing prose as well as code.**
+
+---
+
+## Batch DV — why a lost feature is not dead code, and why a list can be a no-op
+
+**The brief made a deletion conditional on its own provenance, and that condition is the whole
+value of the section.** `CLASS_POOLS` presents as textbook dead code: 61 authored entries no run
+can reach, with the file's own comment saying nothing reads them. The standing rule is that dead
+code is deleted rather than zeroed, and applying it here would have been defensible and wrong.
+**What separates the two cases is not visible in the structure — it is visible in what happened to
+its READER.** Batch AH built an award that drew one card from the spec pool and two from the class
+pool; Batch AN §4 re-pointed the award and deleted `roll_ability_offer` outright. So the pools are
+not scaffolding that was never wired, they are **the surviving half of a feature that was
+deliberately switched off**, and `test_batch_an` asserting the function *absent* is what makes that
+checkable rather than remembered.
+
+**The second reason not to delete is one the brief did not anticipate, and it only appears if you
+ask what is reachable ONLY through the dead structure.** Of the 61 names, 27 are some spec's opening
+kit and 27 sit in a live pool — but **seven are reachable nowhere else in the game**. Rallying
+Shout, Mana Shield, Arcane Surge, Reality Fracture, Dawnbreak, Sanctuary and Divine Wrath are all
+authored, all resolve, and all have handlers, chips and glossary prose; the dead pool is the only
+list in the project that names them. Deleting the container would have deleted the record of the
+contents, and nothing would have reported it. **A census of a dead structure should count what dies
+with it, not only what it holds.**
+
+**§3 is the other half of the same lesson, one layer down: a membership list is only a door where
+the machinery behind it reaches the member's shape.** The brief said `ashes` joins `RECAST_GATED`,
+which is the right instinct and the wrong mechanism — that system reasons about status writes, and
+`ashes` writes an integer field. Driven live on an armed Mage, `_recast_targets` returns an empty
+array and `_recast_refused` returns **false** with the phoenix fully armed. **The change would have
+been a string in a table and nothing else**, and its one visible effect would have been `check_co`
+listing the card as never exercised — which reads like coverage rather than like a no-op. The
+honest place was a bespoke condition in `_ability_usable`, beside the ones Overcharge and
+Preparation already use, which is the same door rather than a second path.
+
+**And the exactness of that condition is not pedantry — the negative control shows it changing the
+answer.** CO §1's rule is that refusing a cast which would have done something is strictly worse
+than the waste being fixed. Written `ashes_return > 0` the refusal is one character shorter and
+refuses a genuine 25→40 improvement; written `>= ASHES_RETURN_PERFECT` it does not. The two forms
+agree in every state the game can currently produce, because `ASHES_RETURN` has no caller — **so
+the difference between them is invisible today and the cheap version rots the day that changes.**
+
+**What the bot knew that the door did not is a source worth mining and a source worth distrusting.**
+The autoplay heuristic has refused an armed phoenix since BB, so the bot has been playing better
+than the player was permitted to, and `check_co` could never have found it — it saturates the
+members of the list, which measures the list rather than the candidates for it. Comparing the two
+lists across the whole population turned up two more abilities whose entire payload is a status and
+which are not gated (Mark of the Hunt, Intercession) and one narrow case under a talent (Deadfall
+under Deadfall Network). **It also turned up four guards that look identical and are not**: the bot
+refuses Hold Breath on a standing trance, but the handler also pays 40 Focus, so promoting that
+guard into a refusal would have been the strictly-worse bug arriving through the fix for the first
+one. **The bot tells you where to look; only the handler tells you what the condition is.**
+
+**§4 is procedure rather than design, and the one thing worth recording is what the verification is
+for.** The rule forbids asserting file sizes, and the reason is precise: sizes agreeing is entirely
+consistent with a duplicated entry and a dropped one. So the assertion that matters is that the two
+halves rejoin **byte-identical to the original**, checked by a second script reading untouched
+backups rather than by the splitter checking its own arithmetic. The cut cost nothing beyond that,
+and **the reason it cost nothing is CX's work rather than this batch's**: all fourteen
+changelog-reading suites already anchor on their own `<h2>` heading and follow the archive path out
+of the live file's own header, so a cut that moves eighteen entries re-points none of them.
+
+**§5 is the one that changes what to distrust.** DU taught the corpus walk to apply the kit
+overrides, and fifteen gates inherited the fix by doing nothing — but `test_batch_cp` carries its
+own hand-rolled walk, so its literal-digit rule still cannot see any of the four abilities DU made
+visible, nor the twelve spec-kit abilities that were never in a pool. It pins its population as
+exactly `["Shatter"]`; run over the real corpus the answer is eight. **Nothing went red, because a
+green equality over a short walk reads exactly like a green equality over the right one.** The rule
+against hand-rolled walks exists and is enforced — it just sweeps gates, and matches the accessors
+where this walk reads the constants. **An enforcement rule has a scope, and the scope is part of
+the rule; the place a defect survives is the place nobody thought to point the instrument.**

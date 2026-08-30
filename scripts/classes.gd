@@ -941,13 +941,23 @@ static func ability_corpus() -> Array:
 			add.call(pool_ability(String(nm)))
 	for spec in SPEC_INFO:
 		# BATCH DU §4 — THE HOLE THAT WAS LEFT AFTER CZ CLOSED THE OTHER ONE.
-		# `apply_kit_overrides` REPLACES `abilities[0]` for each of the four mage
-		# specs at spawn — Shadowrend, Fireball, Frostbolt and Arcane Explosion —
+		# `apply_kit_overrides` REPLACES `abilities[0]` for FOUR SPECS at spawn,
 		# and NONE of the four sits in any pool or is returned by
 		# `spec_abilities()`. The `kit(key)` loop above reads the class kit
-		# UNOVERRIDDEN, so it got Magic Bolt, **which is nobody's live basic
-		# attack**, and four live protected-core cards were structurally
+		# UNOVERRIDDEN, so it got the class basic — **which is nobody's live
+		# basic attack** — and four live protected-core cards were structurally
 		# invisible to every sweep built on this walk.
+		#
+		# **BATCH DV §5 CORRECTED WHICH SPECS THEY ARE, AND IT IS NOT A COSMETIC
+		# CORRECTION.** DU recorded them as "the four MAGE specs". THERE ARE ONLY
+		# THREE MAGE SPECS. Fireball (pyromancer), Frostbolt (cryomancer) and
+		# Arcane Explosion (arcanist) override **Magic Bolt** out of
+		# `kit("mage")`; **SHADOWREND IS THE OCCULTIST'S, WHICH IS A CLERIC SPEC,
+		# AND IT OVERRIDES SMITE OUT OF `kit("cleric")`.** So TWO class kits were
+		# being misread, not one — and a later reader re-deriving the hole from
+		# DU's sentence would check the Mage kit, find it fixed, and never learn
+		# that the Cleric kit was in it too. Derived off `apply_kit_overrides`
+		# itself, not counted off the list of names.
 		#
 		# THE FIX IS `protected_names`'s OWN IDIOM, one function up: build a cfg
 		# off the class kit, apply the overrides, read what comes out. It is not

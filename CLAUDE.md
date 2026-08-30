@@ -1325,6 +1325,18 @@ wrong, none of them diffed against anything.
   **The copied helper is hiding INSIDE it: 38 of the 39 open with the same save-backup preamble and
   37 swap `Profile.save_path` to a per-suite file and back.** That is the next duplication of this
   shape and it is owed, not taken.
+- **AND THE RULE'S ENFORCEMENT HAS A BLIND SPOT IN EXACTLY THE PLACE THE LAST HAND-ROLLED WALK
+  LIVES (Batch DV §5).** `check_da` §3 catches a gate that re-derives the corpus, and it misses this
+  one **twice over**: its walk sweep reads **`check_*.gd` ONLY** — the suite half of §3 is about
+  `_spawn`, not the walk — and its fingerprint matches the two pool **ACCESSORS**, where
+  `test_batch_cp._corpus()` reads the pool **CONSTANTS** and `Classes.kit(cls)`. **That walk reaches
+  211 names where `Classes.ability_corpus()` reaches 227**, and the 16 it misses are every spec-kit
+  ability living in no pool, DU's four kit overrides among them. **A GATE THAT COUNTS A POPULATION
+  IS ONLY AS GOOD AS ITS ENUMERATION, AND A GREEN EQUALITY OVER A SHORT WALK READS EXACTLY LIKE A
+  GREEN EQUALITY.** §3's own `ability_hits == ["Shatter"]` is the case: **run over the whole corpus
+  the true figure is EIGHT.** Repointing it is a ruling (it turns that equality red on seven
+  pre-existing offenders), so it is reported rather than taken — **but no NEW hand-rolled walk may
+  be written, in a suite or a gate.**
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
@@ -1397,6 +1409,61 @@ answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
   power where `add_status` maxes it — so on those three a weaker recast **overwrites the standing
   buff downward**. All three carry a second payload, so the refusal cannot reach them; widening
   scope to catch them would delete a resource conversion the player wanted.
+
+### ADDING A NAME TO A TABLE IS NOT A CHANGE UNTIL THE MACHINERY REACHES ITS SHAPE (Batch DV §3)
+> **Before recording that an ability "joins `RECAST_GATED`", drive the refusal live and watch it
+> fire. That table reasons about STATUS writes; a payload of any other shape passes straight
+> through it and the membership does nothing at all.**
+
+`_recast_refused` asks `_recast_targets` for a pool and `_recast_writes` for the chips a cast
+would lay. **`ashes` writes an integer FIELD**, so `_recast_targets` has no arm for it and returns
+`[]`, the loop never runs, and the function returns **false with the card fully armed** — measured,
+not reasoned. Adding the string to the list changes no behaviour; its only visible effect would be
+`check_co` reporting the card as never exercised, **which reads like coverage.**
+- **THE REFUSAL STILL GOES THROUGH `_ability_usable` AND THAT IS NOT A SECOND PATH.** That function
+  is the door; `_recast_refused` is one condition inside it, and a bespoke condition beside the
+  others (`overcharge`, `preparation`, `reckless_abandon`) is the same door. **A second path would
+  be a refusal written at resolution, or in the popup builder.**
+- **DO NOT INVENT A PSEUDO-STATUS TO CARRY A FIELD INTO THAT TABLE.** It puts a name in
+  `_recast_refusal_note` that `STATUS_INFO` cannot render and the player holds no chip for.
+- **AND THE BESPOKE CONDITION OWES THE TOOLTIP LINE, LIKE EVERY OTHER ONE.** CO §3's rule: a
+  darkened button with no reason reads as a bug. Where the refusal has two genuinely different
+  causes they get two sentences — an armed phoenix is a resource still held; a spent one is gone.
+
+### THE AUTOPLAY HEURISTIC'S REFUSAL LIST IS AN ORACLE FOR PLAYER-DOOR GAPS (Batch DV §3)
+> **The bot's rotation refuses things the player's door permits. Where the bot's guard means "this
+> cast would do nothing", that is a defect in the door. Where it means "this cast is a bad idea",
+> it is policy and must NOT be promoted into a refusal.**
+
+`ashes` was found by accident during an audit of something else, and **`check_co` structurally
+could not have found it: it saturates the MEMBERS of `RECAST_GATED`, so it measures the list rather
+than the candidates for it.** The bot's list is the other half of that question and is free.
+- **THE TEST IS THE HANDLER, NOT THE GUARD'S SHAPE.** Hold Breath's bot guard reads
+  `not u.has_status("held_breath")` and looks identical to a waste refusal — but the handler also
+  pays **+40 Focus**, so a recast is never nothing. Snare Trap also fires `_hit_and_run`; Renewal's
+  Perfect pays a burst. **Refusing any of those is the strictly-worse bug arriving through the fix
+  for the first one.**
+- **AND THE BOT'S GUARD IS NOT AN EXACT ORACLE EVEN WHERE IT POINTS AT A REAL GAP.** Deadfall's
+  `deadfall_armed <= 0` also refuses a part-spent or DORMANT deadfall, and a recast on either
+  genuinely restores charges and clears the rest. **Derive the exact condition from the handler;
+  the bot only tells you where to look.**
+
+### ESTABLISH WHY A STRUCTURE IS DEAD BEFORE DELETING IT (Batch DV §1)
+> **Dead code is deleted rather than zeroed — but a structure ORPHANED by a later change is a LOST
+> FEATURE, and one that was never wired is scaffolding. Only the second is a deletion. The first is
+> a design question, and answering it by deleting is answering it.**
+
+**`CLASS_POOLS` is the worked example and it reads exactly like scaffolding**: 61 entries no run
+can reach, and `run_state.gd`'s own comment saying nothing reads them. **It was live** — Batch AH's
+award drew 1 from the spec pool and 2 from the class pool, and **Batch AN §4 re-pointed the award
+and DELETED `roll_ability_offer`**, leaving the pools standing on purpose.
+- **THE PROVENANCE IS THE TEST, NOT THE CURRENT REACHABILITY.** Both cases look identical today.
+  Ask what deleted the reader, and name the batch; `test_batch_an` §1 asserting a function *absent*
+  is the kind of evidence that settles it.
+- **AND A DEAD STRUCTURE CAN BE THE LAST LISTING OF LIVE CONTENT.** Seven abilities are authored,
+  resolving and fully implemented, and **`CLASS_POOLS` is the only list in the game that names
+  them** — deleting the container would delete the record of the contents. **Before deleting a
+  structure, ask what is reachable ONLY through it**, and count it.
 
 ## THE TRAPS — RULES THAT WERE BURIED IN BATCH BLOCKS (GATHERED AT BATCH CW §1)
 
