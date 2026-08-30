@@ -5817,3 +5817,52 @@ into the same page, and the page has been quoted from since.** The refresh keeps
 names the disagreement at the site, because a per-card table exists precisely so a later pass can
 disagree with a row rather than with a conclusion — and it cannot do that if two counting rules are
 in the document without labels.
+
+---
+
+## Batch DZ — why the fallback comes back as options, why §2 names no culprit, and why the prune
+
+**§1 is priced and not built, and the reason is that the four options are not four
+implementations of one idea — they are four different answers to "what is a zone boss for".**
+A card from the hero's own draft pool is the closest thing to what the screen promises, and it is
+also the option that dissolves the distinction between a boss and an elite; a rune changes what the
+reward *is*, which is either the point or the objection; gold is the only one that leaves the
+fourteen empty awards empty. **Nothing in the code decides between those, so nothing was built.**
+
+**What did change is the argument, and it changed because a previous batch fixed something.**
+DV priced these same four when the Holy Cleric's boss pool was one card, and its sharpest point was
+that the card-shaped options were worth least to exactly the hero who needed them most — she carries
+four protected cores and has the fewest earnable slots in the game. **DY closed her half, and the
+worst case moved to the Devout, who has the normal four slots.** So the objection survives only
+against Holy's single remaining award. **A ruling's supporting argument can expire without the
+ruling being revisited**, and this is the second time that shape has shown up in three batches.
+
+**§2 was asked which of two cards is mispriced and the honest answer is neither, because only one
+of them has a price.** Divine Wrath's initiative is written as `Ability.BUFF_DELAY_CAP` and it is a
+member of the table that clamps to it, so the number is a consequence of membership rather than a
+decision anybody made. **A comparison between a clamped number and an authored one is not a
+comparison.** What the measurement did settle is that both memberships are *correct* — Zeal moves a
+cooldown at cast and Arcane Surge moves Resonance, and the table's own header names exactly those
+two exclusions for other cards — so the thing worth reporting is structural: **the delay cap is the
+only instrument in this project that prices an initiative, and it only binds the cards it does not
+need to.** Every card excluded for carrying a second payload is priced by hand against nothing.
+
+**That is why the family table is the deliverable rather than a verdict.** Read across the eleven
+cards `ability.gd` itself names as second-payload exclusions, Mana tracks initiative — and the one
+card that breaks the pattern is Arcane Surge, not either of the two the brief was about. **A
+population is what makes a single card's price legible**, and neither of the two open pricing
+questions could be answered without one.
+
+**§3 was owed for eleven batches and the reason it kept being declined is worth recording: it is
+not a risky edit, it is an edit whose risk is invisible.** Roughly thirty-five suites assert against
+`CLAUDE.md`, and a broken assertion there does not look like a broken assertion — it looks like a
+suite going red for a reason nobody caused. **So the prune was built around its instruments rather
+than around the cutting**: a needle verifier green at HEAD before a line moved, a literal sweep, and
+a subset battery run *before* the certification run. **The last one is what earned its keep** — it
+found the assertion the first two were structurally unable to see, and it cost minutes.
+
+**The gather found two things the brief did not ask for and they are the more interesting half.**
+The file stated six of its own rules twice, in two sections that had drifted into being copies of
+each other — in the file whose oldest recorded defect is a second copy of a number. And it carried
+eight live counts that had gone stale against its own rule that live counts belong in `state.md`.
+**Both were removed rather than corrected**, because correcting a second copy is how you get a third.

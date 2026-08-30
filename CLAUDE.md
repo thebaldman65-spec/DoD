@@ -43,94 +43,56 @@ accumulate far more slowly than batches do.
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - **A SUITE'S CHECK COUNT CAN DRIFT, AND A DRIFTING SUITE IS RECORDED AS A BAND, NOT A NUMBER.**
-  `an` and `bk` both drift — `bk` generates real zone maps and then walks them, so its count is a
-  function of the topology it rolled. **A count-diffing rule reads a drift as a regression**, so a
-  suite known to drift must carry its band beside it. **The live counts and bands live in
-  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; neither this
-  file nor `docs/state.md` restates it, they point at it.**
+  A suite that walks generated content has a count that is a function of what it rolled, and
+  **a count-diffing rule reads a drift as a regression.** **The live counts and bands live in
+  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; neither
+  this file nor `docs/state.md` restates it, they point at it.**
   - **A BAND ALSO CARRIES THE NUMBER OF OBSERVATIONS BEHIND IT (STANDING, DE §1).** A band is a
     claim about a distribution nobody has characterised, and **the number of readings behind it is
-    part of the claim.** `an`'s nine-observation band was exceeded on its TENTH reading, inside the
-    batch that wrote it. **Widen where a reading demands it and nowhere else**, so every number in
-    the table stays traceable to a run.
+    part of the claim.** **A band written to a sample's exact extremes is exceeded by roughly two
+    runs in eleven**, so: **floor = the lowest observation; ceiling = the highest PLUS the observed
+    spread.** It is asymmetric because **the floor is the half that catches a real fault** — a
+    section that stopped running costs hundreds of checks, not five. **Widen where a reading
+    demands it and nowhere else**, so every number stays traceable to a run.
 - **A FLAKY ASSERTION IS A THIRD KIND OF INSTABILITY AND IS NOT A DRIFT.** A suite whose COUNT is
   rock steady can still fail by chance when an assertion compares two damage rolls that can land
   on the same integer. **A bare `<` or `>` between two blows is not a check, it is a coin flip
-  with good odds.** A suite that calls `seed()` zero times has a different stream every run, which
-  is what makes the flake intermittent.
-  - **AND A RATIO WITH A MARGIN IS NOT THE ANSWER ON ITS OWN — DD MEASURED THAT.** Both of `at`'s
-    flaky checks WERE ratios with margins. The first line of the strike block is
-    `randf_range(0.9, 1.1)`, so **one blow carries ±10% and a RATIO of two carries up to 22%**,
-    against bands of ±20% and ±7%. **THE NOISE WAS THE WIDTH OF THE QUESTION**, and widening the
-    band far enough to swallow it would have stopped the check telling apart the two answers it
-    exists to separate.
-  - **COMPUTE THE PROPAGATED NOISE BEFORE CHOOSING THE BAND (STANDING, DE §4).** **A margin
-    only works if it is WIDER than the noise it sits on**, and **a ratio of two rolled quantities
-    carries roughly twice the variance of either** — ±10% on each blow is ±22% on the ratio, not
-    ±10%. **Do that arithmetic first, not after the flake.** If the propagated noise is wider than
-    the band the question needs, **THE BAND IS NOT AVAILABLE**: seed the pair and assert exactly.
-    **The recommendation to assert ratios with margins is incomplete without this and must not
-    stand unqualified** — followed on its own it produced both of `at`'s flakes.
+  with good odds.**
+  - **A RATIO WITH A MARGIN IS NOT THE ANSWER ON ITS OWN, AND COMPUTING THE PROPAGATED NOISE
+    FIRST IS (STANDING, DE §4).** The first line of the strike block is `randf_range(0.9, 1.1)`,
+    so **one blow carries ±10% and a RATIO of two carries up to 22%.** **A margin only works if it
+    is WIDER than the noise it sits on. Do that arithmetic before choosing the band, not after
+    the flake.** If the propagated noise is wider than the band the question needs, **THE BAND IS
+    NOT AVAILABLE**: seed the pair and assert exactly.
   - **SEED THE PAIR, NOT THE SUITE.** `seed()` the same value immediately before EACH blow of a
     compared pair, so both draw the same variance and the only thing left between them is what is
-    under test (the AV/BS/BT idiom). **Where the check averages a LOOP of pairs, vary the seed per
-    iteration** (`seed(base + i)`) or the averaging that makes its band meaningful collapses into
-    the same measurement N times.
-  - **`at` IS SEEDED AND PINNED AS OF DD (470 / 3 over five runs), AND IT WAS TWO CHECKS, NOT
-    ONE** — seeding the recorded one exposed a second nobody had recorded. **`bo` REMAINS A KNOWN
-    FLAKE** at roughly 1 in 13; its rate and its band live in `baselines.json`, and its FAILURE
-    count is carried as a band, not a number.
-  - **`test_rune_battle` IS A SECOND KNOWN FLAKE, FOUND BY `check_de` ON ITS FIRST ACCEPTANCE RUN
-    (DE §7).** Its check count is rock steady at 97 and only the FAILURE moves — the pyromancer
-    `rune_resist_pierce` check drives a LIVE battle and requires the proc to actually land, and the
-    suite calls `seed()` zero times. **2 red in 15 readings, and BOTH reds landed under machine
-    load** (during the acceptance battery and on the run immediately after it), against ten
-    consecutive clean runs on an idle machine. **That the load matters is a HYPOTHESIS, not a
-    finding** — the assertion's own comment says its snapshot "is the one that cannot race", so a
-    race is the first thing to look at. Band `0–1`, rate in `baselines.json`.
+    under test. **Where the check averages a LOOP of pairs, vary the seed per iteration**
+    (`seed(base + i)`) or the averaging that makes its band meaningful collapses into the same
+    measurement N times. **Where a GENERATED WALK is the subject, seed at every generation** —
+    the guarantee is per-BOARD.
+  - **THE BAND IS THE QUESTION. DO NOT WIDEN IT TO SWALLOW A FLAKE** — that deletes the check
+    rather than repairing it.
   - **A SOURCE SWEEP CANNOT FIND A FLAKE, IN EITHER DIRECTION (STANDING, MEASURED AT DX §2).**
-    **`seed()`-count is not evidence.** TWENTY suites and gates make unseeded random draws and are
-    perfectly stable — `bk` and `an` generate whole maps — so an unseeded file is not thereby
-    flaky. And **`test_batch_at` calls no RNG function at all**: its one `seed()` is downstream of
-    the check that flakes, and the noise is `battle.gd`'s `randf_range(0.9, 1.1)` in the strike
-    loop, which no sweep of the suite tree can see. **ONLY READINGS FIND A FLAKE, AND THE READINGS
-    ARE IN `baselines.json`** — the rows carrying a `flake` field are the answer to "how many are
-    there", and nothing else is.
-  - **AND WHERE A GENERATED WALK IS THE SUBJECT, SEED AT EVERY GENERATION RATHER THAN ONCE (DX §2).**
-    `test_run_harness` gate 2 walks three generated maps and asserts six node types were crossed.
-    Seeding once before the walk is repeatable **today** and leaves zones 1 and 2 drawing off
-    whatever the loop consumed before them, so one added RNG draw inside the loop silently re-rolls
-    two of the three boards. **Seed immediately before each generation: the guarantee is
-    per-BOARD, which is `bo`'s per-pair seed one layer out.** The boards stay different from each
-    other because `_generate_map` reads `zone_idx`. **AND CHARACTERISE THE FAILURE BEFORE NAMING
-    IT** — DW recorded this as an `event` flake at ~3%; over 400 walks the type that actually
-    reached zero was **`blacksmith`**, with `merchant` and `event` each within one of it, at well
-    under 1%. **Three of the six types are at risk, not the one that happened to fail.**
-  - **AND A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE (STANDING, FOUND AT DE §6).** `bo` was
-    recorded as `0–1 (the known flake)` in every document. **It is not.** Its floor of **1 is
-    DETERMINISTIC and is not the flake**: §6 asserts `CLAUDE.md` contains the literal `TRANCHES 2
-    AND 3`, which **CW's split removed** — so it belongs to CW's family alongside `bb`, `bn`, `bq`,
-    `br` and `bx`. **The flake is a SECOND failure on top of it, which reads 2.** The band
-    `0–1` happened to admit the observed value, so nothing ever contradicted the label, and **the
-    project's standing failure total was under-stated by one suite and one failure.** It was **47
-    across 20**, and 48 on a run where the flake fires. **WHEN A SUITE IS EXCUSED BY A KNOWN CAUSE,
-    CHECK THAT THE RED IN FRONT OF YOU IS THAT CAUSE** — this is §3's own thesis, found by §3's
-    instrument on its first run.
-    (**CORRECTED AT DF: `ce` WAS NEVER IN CW's FAMILY** and was named in it here and in
-    `docs/state.md` for two batches. `BATCH CE` is still in this file — a passing mention inside a
-    surviving rule — so that check PASSES, and passes by accident. CW's family was eight
-    assertions, not eleven: `bb` 2, `bn` 2, `bq` 1, `br` 2, `bx` 1.)
+    **`seed()`-count is not evidence**: twenty suites and gates make unseeded draws and are
+    perfectly stable, and a suite can call no RNG function at all while flaking on
+    `battle.gd`'s own roll, which no sweep of the suite tree can see. **ONLY READINGS FIND A
+    FLAKE, AND THE READINGS ARE IN `baselines.json`** — the rows carrying a `flake` field are the
+    answer to "how many are there", and nothing else is.
+  - **CHARACTERISE A FAILURE BEFORE NAMING IT.** A flake recorded as one thing at one rate has
+    twice turned out to be a different thing at a different rate once it was measured at scale.
+  - **A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE (STANDING, FOUND AT DE §6).** A row banded
+    `0–1` "for the known flake" hid a DETERMINISTIC failure at its floor for batches, because the
+    band happened to admit the observed value and nothing ever contradicted the label. **WHEN A
+    SUITE IS EXCUSED BY A KNOWN CAUSE, CHECK THAT THE RED IN FRONT OF YOU IS THAT CAUSE.**
   - **A BAND WIDE ENOUGH TO COVER A GENUINE FAILURE CANNOT REPORT ONE (STANDING, SET AT DF §0).**
-    This is the general rule underneath `bo`, and it is about what a band is FOR. **A band is for a
-    count that legitimately varies — a suite that walks generated content, a draw that differs run
-    to run. It is never a place to admit a red.** The moment a floor is set above zero to stop a
-    known failure from shouting, the row has stopped being a measurement and become an excuse, and
-    **the one thing it can no longer do is tell you the failure is still there** — nor that a
-    second has arrived beneath it. **A FAILURE COUNT'S FLOOR AND A CHECK COUNT'S FLOOR ARE NOT THE
-    SAME KIND OF NUMBER.** A check-count floor is the lowest value a healthy run produced. A
-    FAILURE-count floor is a promise that exactly that many reds are known, named and deliberate —
-    so it belongs in `baselines.json` **with the reason written beside it**, and a band around it
-    is only ever a FLAKE's contribution, never a deterministic red's.
+    **A band is for a count that legitimately varies. It is never a place to admit a red.** The
+    moment a floor is set above zero to stop a known failure from shouting, the row has stopped
+    being a measurement and become an excuse — and **the one thing it can no longer do is tell you
+    the failure is still there**, nor that a second has arrived beneath it. **A FAILURE COUNT'S
+    FLOOR AND A CHECK COUNT'S FLOOR ARE NOT THE SAME KIND OF NUMBER**: a failure floor is a promise
+    that exactly that many reds are known, named and deliberate, so it belongs in `baselines.json`
+    **with the reason written beside it**, and a band around it is only ever a FLAKE's
+    contribution, never a deterministic red's.
 - **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
@@ -328,31 +290,20 @@ watch. Live sizes and percentages live in `docs/state.md`, not here** — they m
 
 ## The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM, CN AND CS)
 `docs/master.html` §4.2 documents all four cases: the normal check, the gated check, the
-defensive check, and **BATCH CS's SHARPSHOOTER SEQUENCE**. **They share ONE bar and ONE set of
-zones — and as of BATCH CN those are a PROFILE rather than constants.**
-- **THE DEFAULT PROFILE IS AUTHORITATIVE, NOT A FALLBACK.** `battle.SC_PROFILE_DEFAULT` holds
-  `perfect_half` 0.045, `good_half` 0.16, `centre` 0.5, `sweep_time` 0.72, `presses` 1,
-  `press_taper` 1.0 — today's numbers exactly — and **every caller uses it except the
-  Sharpshooter's basic attack.** **A LATER BATCH THAT EDITS A VALUE THERE CHANGES EVERY CHECK IN
-  THE GAME AT ONCE.** `check_cn.gd` asserts the six values AND THE FIELD COUNT, and asserts that
-  the zone rects and the grade boundaries the profile produces are the ones the pre-CN formulas
-  drew. **CS ADDED THE SIXTH FIELD AND check_cn CAUGHT IT ON THE FIRST RUN, WHICH IS THE GATE
-  WORKING** — `press_taper` 1.0 is the NO-OP, so nothing else moved.
-- **`centre` IS WIRED AND UNUSED; `presses` IS USED BY EXACTLY ONE ABILITY.** Nothing in the game
-  moves the window off 0.5. **`presses` > 1 is the Sharpshooter's basic attack and nothing else
-  (BATCH CS).** CN's worst-grade combine was a placeholder and **CS deleted it** — a sequence is
-  now the SUM OF WHAT LANDED, and `_worse_grade` / `_GRADE_ORDER` are gone rather than left
-  reachable. CN's comment saying "CO's Sharpshooter basic is the first" was wrong about the
-  batch — CO was the recast refusal — and is corrected in place.
+defensive check, and the Sharpshooter's SEQUENCE. **They share ONE bar and ONE set of zones, and
+those are a PROFILE rather than constants.**
+- **THE DEFAULT PROFILE IS AUTHORITATIVE, NOT A FALLBACK.** `battle.SC_PROFILE_DEFAULT` is what
+  every caller uses except the Sharpshooter's basic attack. **A LATER BATCH THAT EDITS A VALUE
+  THERE CHANGES EVERY CHECK IN THE GAME AT ONCE.** `check_cn.gd` asserts the values AND THE FIELD
+  COUNT, and asserts that the zone rects and grade boundaries the profile produces are the ones
+  the pre-CN formulas drew. **The live values are in `docs/state.md`.**
+- **`centre` IS WIRED AND UNUSED; `presses` > 1 IS THE SHARPSHOOTER'S BASIC AND NOTHING ELSE.**
 - **THE ZONE RECTS ARE RESIZED PER CAST** (`_apply_sc_profile`), not built once at UI setup.
   Grading and drawing come off the same dictionary on the same line of execution — split them and
   a profile that widens the window grades one thing and draws another, and **the player would be
   aiming at a lie.**
-- **`up_sure` IS NOW WRITABLE AND WAS DELIBERATELY NOT WRITTEN AT CN.** The comment in
-  `run_state.gd` explaining why it was refused (the window is not a parameter) **is out of date
-  as of CN** on that count. Its second objection still stands and is the harder one: **the bot
-  never runs the bar** — it rolls a grade off hardcoded probabilities — so a widened window is
-  invisible to every instrument the project owns.
+- **A WIDENED WINDOW IS INVISIBLE TO EVERY INSTRUMENT THE PROJECT OWNS**, because the bot never
+  runs the bar — it rolls a grade off hardcoded probabilities.
 
 ### THE RULE EVERY PROFILE IS AUTHORED TO (STANDING, SET AT CN, BINDING ON CO)
 > **VARY THE CHARACTER, HOLD THE DIFFICULTY CONSTANT.** A profile expresses a spec's identity,
@@ -365,93 +316,72 @@ zones — and as of BATCH CN those are a PROFILE rather than constants.**
 > **TWO DELIBERATE EXCEPTIONS, BOTH OPT-IN:** the **Sharpshooter**, whose bar is meant to be
 > harder and to pay more, and the **relic that swaps a hero's bar for a riskier one while held.**
 >
-> **THE SHARPSHOOTER'S EXCEPTION IS SPENT AS OF CS, AND IT IS A FIXED OFFSET RATHER THAN A
-> SLOPE: 15% less timing tolerance than everybody else's, THE SAME 15% AT ONE PRESS AND AT
-> FOUR.** Harder than everyone else's, not harder the better you play. It is taken against
-> `SC_PROFILE_DEFAULT` in `_sharpshooter_basic_profile` rather than written as a literal, so it
-> survives a change to the default as an offset.
+> **THE SHARPSHOOTER'S EXCEPTION IS SPENT, AND IT IS A FIXED OFFSET RATHER THAN A SLOPE:** 15%
+> less timing tolerance than everybody else's, the same 15% at one press and at four. Harder than
+> everyone else's, not harder the better you play. **It is taken against `SC_PROFILE_DEFAULT` in
+> `_sharpshooter_basic_profile` rather than written as a literal**, so it survives a change to the
+> default as an offset.
 
 ### WHERE THE CHECK COMES OFF (STANDING, SET AT BATCH CN §2)
-**113 of the 211 drafted abilities now run no bar at all.** `Ability.runs_skill_check()` is the
-ONE answer, asked by the cast path and by the draft card alike.
+**`Ability.runs_skill_check()` is the ONE answer**, asked by the cast path and by the draft card
+alike. **The live population is in `docs/state.md`.**
 - **THE CRITERION IS MECHANICAL: remove the check wherever the grade multiplier has nothing to
-  multiply.** No damage and no Break damage means ×1.15 and ×0.6 both resolve to nothing.
+  multiply.** No damage and no Break damage means the Perfect and Sloppy multipliers both resolve
+  to nothing.
 - **THE FIELDS ALONE ARE NOT THE CRITERION, AND THIS IS THE TRAP CN FOUND.** Half the corpus does
-  its work inside a `special` handler, so `damage: 0, pressure: 0` is TRUE of **Feint, Guard
-  Change, Kill Command, Savage Sweep, Precision Strike, Harvest, Primal Surge, Call the Wilds**
-  and others that hit hard. `Ability.DAMAGE_SPECIALS` names the handlers that actually resolve
-  damage or BD; **a field-only test would have stripped the bar off every one of them.**
+  its work inside a `special` handler, so `damage: 0, pressure: 0` is TRUE of Feint, Guard Change,
+  Kill Command, Harvest and others that hit hard. `Ability.DAMAGE_SPECIALS` names the handlers
+  that actually resolve damage or BD; **a field-only test would have stripped the bar off every
+  one of them.**
 - **ONLY THE BASE EFFECT COUNTS.** A handler whose only damage sits inside `if is_perfect` is
-  caught — that branch is the orphaned bonus, not a reason to keep grading. **BEWITCH is the
-  whole of that case**: its strike was Perfect-only, so it lost its bar.
-  · **THE STRIKE IS REMOVED, NOT FOLDED (BATCH CR §2).** Losing the bar is still right — there
-    is no base damage for a grade to multiply. Folding the strike in was the separate mistake:
-    it handed the card a free extra ENEMY attack with no natural gate, acquired by accident.
-    **THE CRITERION DECIDES WHETHER AN ABILITY GRADES; IT DOES NOT DECIDE WHAT AN ORPHANED BONUS
-    BECOMES. Those are two questions and CN answered only the first.**
+  caught — that branch is the orphaned bonus, not a reason to keep grading.
+  · **AN ORPHANED BONUS IS REMOVED OR FOLDED, AND THAT IS A SECOND QUESTION.** **THE CRITERION
+    DECIDES WHETHER AN ABILITY GRADES; IT DOES NOT DECIDE WHAT AN ORPHANED BONUS BECOMES.**
+    Folding one in handed a card a free extra enemy attack with no natural gate, acquired by
+    accident.
 - **FOUR OVERRIDES.** **Heals keep their check** (`Ability.HEAL_SPECIALS`, an authored list
-  because "is this a heal" is a question about the card — RENEWAL heals through a status, so
-  nothing heals at cast time and a purely mechanical read would have taken its bar away while
-  HEAL beside it kept one). **Shields lose theirs** whether or not the absorb scaled with the
-  grade. **Pure debuff appliers lose theirs** — the grade has never affected whether a status
-  lands. **Break damage counts as something to multiply**, so an ability with BD and no HP damage
-  KEEPS its bar (Breaking Darkness at 20 BD is the case to check against).
-- **A GATED ABILITY ALWAYS KEEPS ITS BAR, and this clause is CN's own addition.** CM's **Reckless
-  Abandon** has no damage and no BD, so the criterion catches it cleanly — and obeying it there
-  would have deleted a CM feature in silence. **An ability whose Sloppy loses the cast cannot
-  lose the check that produces the Sloppy.**
+  because "is this a heal" is a question about the card — Renewal heals through a status, so
+  nothing heals at cast time and a purely mechanical read would take its bar away while HEAL
+  beside it kept one). **Shields lose theirs.** **Pure debuff appliers lose theirs** — the grade
+  has never affected whether a status lands. **Break damage counts as something to multiply**, so
+  an ability with BD and no HP damage KEEPS its bar.
+- **A GATED ABILITY ALWAYS KEEPS ITS BAR.** **An ability whose Sloppy loses the cast cannot lose
+  the check that produces the Sloppy**, and obeying the bare criterion there would have deleted a
+  feature in silence.
 - **BASIC ATTACKS RESOLVE AT A FIXED GOOD, EXCEPT THE SHARPSHOOTER'S.** Read off **slot 0** and
-  off the **hero's passive** (`lethal_aim`), not off a name: his basic IS Quick Shot, the same
-  object the Beastmaster and Mystic carry, so there is no card to flag. **CS made his the
-  SEQUENCE and `_is_sharpshooter_basic` is the one answer to "is this it"**, asked by all three
-  grade branches and by the payout so none of them can decide it differently.
+  off the **hero's passive**, not off a name: his basic IS Quick Shot, the same object two other
+  specs carry, so there is no card to flag.
 - **THE NO-CHECK TEST SITS ABOVE THE AUTOPLAY ROLL AND THAT ORDER IS LOAD-BEARING.** Leave the
-  bot's 20%-Perfect roll on top and it still rolls Perfects nobody can press for, **every folded
-  bonus gets paid twice in a sim**, and the balance numbers stop describing the player's game.
-- **EVERY ORPHANED PERFECT WAS FOLDED INTO THE BASE EFFECT, NOT DELETED** (105 abilities), and
-  **`perfect_text`/`perfect_id` were cleared on all of them** — CK taught the draft card to render
-  Perfect, so an orphan would advertise a bonus that can never fire. `check_cn.gd` gates it.
-- **NOTHING IS CONSUMED UNTIL AFTER THE GRADE, AND BOTH CM FEATURES ARE BUILT ON THAT.** The
-  Cancel button already returned to the action bar "with nothing spent" even after a target was
-  chosen, so consumption has always happened downstream of the grade. **Neither feature has or
-  needs a refund path.** A gated failure is the existing cancel path with the turn spent instead
-  of returned. **That is what makes three of the five expressible at all**: Requiem eats Ruin off
-  the *enemy*, Unleash eats the *companion's* Loyalty, Boil Over drops the Berserker's live
-  Frenzy bonus — "refund the resource" is undefined for every one of them.
+  bot's Perfect roll on top and it rolls Perfects nobody can press for, **every folded bonus gets
+  paid twice in a sim**, and the balance numbers stop describing the player's game.
+- **CLEAR `perfect_text` / `perfect_id` WHEREVER A BONUS WAS FOLDED**, or the draft card
+  advertises a bonus that can never fire.
+- **NOTHING IS CONSUMED UNTIL AFTER THE GRADE**, so a gated failure is the existing cancel path
+  with the turn spent instead of returned. **Neither gated feature has or needs a refund path** —
+  "refund the resource" is undefined for a card that eats an enemy's meter or a companion's.
 - **`_grade_skill_check()` TAKES NO ARGUMENTS AND MUST NOT LEARN WHICH ABILITY IT IS GRADING.**
-  The caller knows; the flag is tested at the call site in `_hero_turn`. `_run_skill_check`'s one
-  new argument, `mode`, names *what* is being graded ("" / "gated" / "defensive") and picks only
-  the top line, the tint and which orientation card is owed.
+  The caller knows; the flag is tested at the call site. `_run_skill_check`'s `mode` argument names
+  *what* is being graded ("" / "gated" / "defensive") and picks only the top line, the tint and
+  which orientation card is owed.
 - **STANDING RULE: NO HEALING OR REVIVAL ABILITY IS EVER GATED.** Resurrection is deliberately
   excluded and this is a rule, not a scoping choice — **losing a resurrection to a hand slip is
   the worst outcome the system could produce.** A later batch extending the gated set **must not
-  reach for one**. `check_cm.gd` asserts it over the whole 211-ability corpus, not over the five.
+  reach for one**. `check_cm.gd` asserts it over the whole corpus, not over the gated five.
 - **STANDING RULE: THE DEFENSIVE CHECK CAN ONLY MITIGATE.** Perfect is ×0.85 damage and ×0.75
-  Break; **Good and Sloppy are IDENTICAL and never worse.** `_defensive_brace` returns a
-  *boolean* rather than a grade, so the absence of a third outcome is structural rather than a
-  convention somebody has to remember. **A defensive check must never be able to make an incoming
-  blow larger.**
-- **The gated five are `Ability.gated`: Death Ray, Requiem, Reckless Abandon, Boil Over,
-  Unleash.** The tell is `Classes.GATED_TELL`, ONE string on four surfaces (ability button,
-  battle tooltip, draft card, the bar while it sweeps) and **never authored into a description**
-  — CL §1's rule applied to a sentence.
-- **`_has_defensive_check` IS THE ONE ANSWER TO "does this unit get a defensive bar"** (Warden
-  always; Swordmaster only in the Defensive guard; Formless counts as both). **It reads
-  `u.stance` DIRECTLY and deliberately NOT through `_stance_satisfies`** — that helper is for
-  ABILITY gates, and Feigned Guard's scope is abilities and nothing else, so a Feigned Guard does
-  not conjure a defensive check any more than it moves Bracing or Untouchable.
-- **TWO NARROWINGS OF "every qualifying incoming attack", both reported at CM:** a **counter**
-  raises no bar (a free swing drawn by the hero's own action; the offensive bar does not run for
-  one either), and an attack carrying a **`special`** raises none (it never reaches the ordinary
-  strike loop, which is the only place the mitigation is applied). **Exactly one enemy attack is
-  skipped by the second clause today — the Bloodcaller's Blood Tribute.** The Hurler's Siege
-  Stone is NOT skipped: its `windup` deals nothing, and the landing returns a turn later as a
-  plain attack copy.
-- **PACING IS THE KNOWN RISK AND THE NUMBER EXISTS NOW: 6.9–9.4 defensive checks a battle with a
-  Warden in the party, against 22.8–27.3 hero actions.** The party's presses rise about a third;
-  **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
-  for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
-
+  Break; **Good and Sloppy are IDENTICAL and never worse.** `_defensive_brace` returns a *boolean*
+  rather than a grade, so **the absence of a third outcome is structural** rather than a convention
+  somebody has to remember. **A defensive check must never be able to make an incoming blow
+  larger.**
+- **THE GATED TELL IS `Classes.GATED_TELL`, ONE string on four surfaces** (ability button, battle
+  tooltip, draft card, the bar while it sweeps) and **never authored into a description**.
+- **`_has_defensive_check` IS THE ONE ANSWER TO "does this unit get a defensive bar".** It reads
+  `u.stance` DIRECTLY and deliberately NOT through `_stance_satisfies` — that helper is for
+  ABILITY gates, so a Feigned Guard does not conjure a defensive check.
+- **TWO NARROWINGS OF "every qualifying incoming attack":** a **counter** raises no bar (a free
+  swing drawn by the hero's own action), and an attack carrying a **`special`** raises none (it
+  never reaches the ordinary strike loop, which is the only place the mitigation is applied).
+- **PACING IS THE KNOWN RISK AND IT IS UNCAPPED ON PURPOSE FOR THE FIRST PASS** — a cap is a
+  retreat available afterwards, and it is a designer's call.
 ## A DURATION IS STATED AS APPLIED (STANDING, SET AT BATCH CV §1)
 > **"N turns" is the number the code passes to `_apply_status`. It is never the acting-turn
 > count, and `tick_statuses()` running before a unit acts is an implementation detail rather
@@ -475,163 +405,65 @@ moved with them. **The one place the old reading was written down as a rule was
 
 ## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DM §3)
 > **HERO — one of the four. ALLY — heroes and companions together. AND THERE IS NO THIRD WORD.**
+> Where the group is the ENEMY side, *warband*.
 
-**CORRECTED AT DJ §1 — THE BEAST DOES NOT STAND IN `heroes`.** This block said it did, and so did
-DH's Harvest comment; `heroes.append` is reached at exactly one site (the party spawn) and a
-summoned beast goes to `companions`. **The exclusion CV measured is real, but the mechanism is the
-COLLECTION, not the filter**: all **23** `heroes` walks carrying an explicit `not h.is_companion`
-are filtering an array that can never hold one, so the filter removes nothing. It is still worth
-reading as INTENT — an author who wrote it meant to exclude — but it is not the thing doing the
-excluding, and **a walk with no such filter is not thereby including companions.**
+**THE TEST IS NOT "DOES THE COLLECTION REACH ONE". IT IS "DOES THE EFFECT ARRIVE."** Walk the
+chain from the loop to the number that moves, and **measure it on a live companion**. A widening
+that changes no measurement is worse than the narrow word, because a chip appears and it reads as
+working — a PARTIAL arrival reads as working too, which is the same failure one step along.
 
-A Beastmaster's beast is visibly on the player's side and gets none of what "ally" promises.
-**Twenty-eight node texts promised "every ally" or "the whole party" and paid only the four**; all twenty-eight now say *hero*. **CV's brief said
-sixteen — the mechanical sweep of all 41 ally/party-worded nodes found twenty-eight**, and the
-three extra populations are why: **23** carry an explicit `is_companion` filter in
-`battle.gd` (which, per DJ §1 above, records intent rather than doing the excluding), **2 more** (`hl_guardian`, `hl_resurrection`) by `unit.gd:1320`'s
-`is_hero and not is_companion` gate on `below_half_cb` — a Mercy generator, not a filter — and
-**3 more** (`dv_apostle`, `dv_fervor`, `dv_oath`) because `_gain_faith` refuses companions
-outright, so a beast can never hold the stack the node is written around.
-
-**THE EXCLUSION ITSELF IS INTENDED AND NO READ SITE MOVED.** Under The Pack a party-wide buff
-would otherwise reach six units.
-
-**FOUR TEXTS MOVED THE OTHER WAY, AND CV'S STATED TEST FOR MOVING THEM WAS WRONG.**
-`wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters` said "party" and were moved to *ally*
-because **"their read sites genuinely include companions"**. **NONE OF THE FOUR DID** — DJ §2
-re-derived every one. **THAT SENTENCE IS THE THING TO DELETE FROM YOUR HEAD**, because it is the
-test a future author would apply and it was never run: three of the four walked bare `heroes`, and
-`dv_waters` runs per-TURN on a unit that takes none. **DK RULED ON ALL FOUR AND THEY SPLIT
-TWO AND TWO** — `wd_rally` and `wd_hold_line` had their CODE corrected and are *ally* truthfully
-now; `dv_devoutness` and `dv_waters` had their TEXT corrected to *hero*. **All four land correctly
-for the first time, and by a different route than CV recorded.** Precision runs both directions or
-the two words are decoration.
-
-**THE TEST IS NOT "DOES THE COLLECTION REACH ONE". IT IS "DOES THE EFFECT ARRIVE".** DK found the
-third failure mode with `wd_tank_spank`: the collection can be widened, the status applies
-cleanly, and the beast is still paid nothing, because the READ SITE downstream never runs for it.
-**Walk the chain from the loop to the number that moves, and measure it on a live beast.** A
-widening that changes no measurement is a widening that did not land — and it is worse than the
-narrow word, because a chip appears and it reads as working.
-
-**`wd_tank_spank` WAS CITED HERE AS THE PROOF THE DISTINCTION IS WORTH HAVING, DJ §2 FOUND IT WAS
-THE OPPOSITE, AND DK REPAIRED IT — AS THE TEXT, NOT THE CODE.** It said "ally" and walked bare
-`heroes`. **It now says HERO, and the reason is the one worth carrying**: widening it would have
-been a NO-OP. `empower` applies to a companion perfectly well and pays it nothing, because a beast
-strikes through `_companion_hit` — its own damage path, which reads none of the hero strike loop's
-multiplier block. **Measured at DK over 40 seeded blows with the chip standing: 34392 damage
-against 34392, a ratio of exactly 1.0000.** `check_dk` §4 measures that ratio on every run, so the
-day somebody gives `_companion_hit` an `empower` read, the gate says this ruling is stale instead
-of staying quietly true.
-
-**A RULE WHOSE WORKED EXAMPLE WAS WRONG NEEDS ITS EXAMPLE REPAIRED AS LOUDLY AS THE RULE.** The
-distinction IS worth having — it is just that this was never the proof of it. **The proof is now
-`wd_hold_line`**: it says "ally", it reads `_hero_side()`, and a summoned bear measurably banks 20
-Break from a 40-BD blow against an unheld 40.
-
-**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S COLLECTION *AND THEN THE CHAIN BELOW IT*,
-NOT ITS FILTER AND NOT THE SENTENCE'S RHYTHM.** `_hero_side()` includes companions (living ones
-only); `heroes + companions` includes them dead or alive; **a walk over bare `heroes` never does,
-filter or no filter**;
-`_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally"; and a
-per-TURN effect can never reach one either, because `_next_unit()` walks `heroes + enemies` and a
-companion takes no turns.
-
-## STANDING RULE — "PARTY" IS RETIRED FROM PLAYER-FACING TEXT (Batch DL §2)
-> **The word "party" must not appear in any player-facing string. Every use becomes *hero* or
-> *ally*, decided by its READ SITE — and where the group is the ENEMY side, *warband*.**
-
-**IT READS AS EITHER, AND THAT IS NOT A STYLE COMPLAINT.** Rallying Shout's Pressure clause said
-*"the whole party sheds 30 Pressure"* and paid four for the life of the project. **DJ §2 swept
-every ally-worded text and DK §2 ruled on eleven of them, and NEITHER SWEEP COULD SEE IT**, because
-both were sweeping for the word *ally* and this clause carried neither of the two words. **A word
-that means either is a word no sweep can check.**
-
-- **THE READ SITE'S COLLECTION IS THE TEST, not the sentence's rhythm.** `_hero_side()` includes
-  companions, so an effect reaching through it says *ally*. **A walk over bare `heroes` says
-  *hero*, with or without an `is_companion` clause** — all 23 of those filter an array that never
-  holds one.
+- **THE READ SITE'S COLLECTION IS THE TEST, NOT THE SENTENCE'S RHYTHM.** `_hero_side()` includes
+  living companions; `heroes + companions` includes them dead or alive; **a walk over bare
+  `heroes` never does, filter or no filter** — every `not h.is_companion` clause on a `heroes`
+  walk is filtering an array that cannot hold one, so it records INTENT and does no excluding.
 - **THREE FURTHER EXCLUSIONS MEAN *hero* HOWEVER THE COLLECTION IS SPELLED:** an effect stamped
-  once where the four are built (no companion exists yet); a per-turn effect (`_next_unit()` walks
-  `heroes + enemies`, so a companion never takes a turn); and anything Faith-flavoured
+  once where the four are built (no companion exists yet); a **per-turn** effect (`_next_unit()`
+  walks `heroes + enemies` and a summon carries `next_time = INF`); and anything Faith-flavoured
   (`_gain_faith` refuses companions outright).
-- **A CLAUSE WHOSE PAYLOAD A COMPANION STRUCTURALLY CANNOT RECEIVE SAYS *hero*, AND THE REASON IS
-  RECORDED BESIDE IT** — "no resource bar", "reads no Empower via `_companion_hit`". A word without
-  its reason gets re-litigated.
-- **THE SURVIVING USES ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the `party`
-  event target, `spec_in_party` (an event condition), and `party.tscn`. Nothing else.
+- **THE UNIT OF A RULING IS THE CLAUSE, NOT THE ABILITY.** Two clauses under one word can have two
+  different answers, and **the clause carrying NEITHER word is the one no sweep will find** —
+  Rallying Shout's *"the whole party sheds 30 Pressure, and every other ally regains 30% of their
+  resource"* is one sentence whose halves are an ally's and a hero's, and two sweeps that read the
+  ABILITY each ruled on one half and left the other standing.
+- **A WORD WITHOUT ITS REASON GETS RE-LITIGATED, SO EVERY *hero* RULING CARRIES THE STRUCTURAL
+  REASON A COMPANION CANNOT RECEIVE IT.** There are **five** and no sixth: no resource bar to
+  refuel; `_companion_hit` reads none of the hero strike loop's multiplier block; stamped once at
+  party spawn; per-turn; `_gain_faith` refuses them. **A clause that is narrow by CHOICE says so**
+  rather than implying an impossibility — widening one of those is a magnitude change on companion
+  survivability, which is new PLAY rather than a widening.
+- **A GUARD AT THE SITE IS WHAT MAKES A RECORDED REASON TRUE.** A companion is built with no
+  `resource_name`, but `max_resource` is `unit.gd`'s default **100** — so "it has no bar" is only
+  true because the loop tests the name.
+- **WHEN A CLAUSE MOVES, SWEEP THE CLAUSE ACROSS EVERY SURFACE, NOT THE CARD ACROSS ONE.** The
+  card, `master.html` and the glossary each carry copies, and fixing one while the rest carry the
+  old word is this project's oldest recurring defect.
+- **THE SURVIVING USES OF "party" ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the
+  `party` event target, `spec_in_party` (an event condition), and `party.tscn`. Nothing else.
 - **PROSE ABOUT THE GAME IS NOT PLAYER-FACING.** This file, `docs/changelog.html`,
   `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
-- **THE RULE IS KEPT BY A CHECK, IN THE PLACE THE LAST ONE WENT.** `test_batch_bx` §4 already
-  forbids "beast" in player-facing prose and caught seven uses in DK before the battery; DL §2 adds
-  the same sweep for "party", over the same file set. **It was shown to bite before it was
-  trusted** — a "party" planted in a live description reds it.
+- **THE RULE IS KEPT BY A CHECK.** `test_batch_bx` §4 forbids "beast" in player-facing prose and
+  §4b keeps **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT** over the same file set. **Each was
+  shown to bite before it was trusted.**
 
 ## STANDING RULE — THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE, NOT THE ABILITY (Batch DL §1)
 > **Read a card clause by clause. Two clauses under one word can have two different answers, and
 > the one that carries neither word is the one no sweep will find.**
-
-**RALLYING SHOUT IS THE WORKED EXAMPLE AND IT COST TWO SWEEPS.** One card, one sentence, two
-clauses: *"the whole party sheds 30 Pressure, and every other ally regains 30% of their
-resource."* The resource half is a hero's — a companion has no bar. **The Pressure half is an
-ally's — a companion HAS a Break meter**, on the very axis DK had already widened Hold the Line
-along. DJ §2 and DK §2 both looked at the ABILITY, found the ally-worded half, ruled on it, and
-left the other half standing.
-- **THE CARD NOW CARRIES BOTH WORDS IN ONE SENTENCE**, and the source carries the reason for each
-  beside its own loop. **The two clauses are two loops** — the Pressure walk and the resource walk
-  are separate, so each site's collection is visible where it is read rather than being a filter
-  hung off a shared one.
-- **MEASURED, NOT ASSERTED (the DK §1 rule applied):** on a live summoned Ursus, the beast shed
-  **0** Pressure before and **30** after, against a hero's 30 either way. `check_dl` §2 re-measures
-  it every run, with the union broken as its control.
-- **`resource_name == ""` IS THE RULING AT THE RESOURCE SITE, NOT DECORATION ON IT.** DK recorded
-  the reason as *"a companion is built with no `resource_name` and `max_resource` 0"*. **The second
-  half was false** — `max_resource` is `unit.gd`'s default **100** on a companion, never overridden
-  at the summon. Rallying Shout's resource loop was the one of the three that carried no guard, so
-  a careless widening of it would have paid a beast 30 points of a bar that does not exist. **The
-  guard is what makes the recorded reason true at the site.**
 
 ## THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES
 > **A card can carry two clauses of different shape under one word, and a sweep that reads the
 > ability will not see it. "Party" is retired; HERO means the four, ALLY means heroes and
 > companions, and every *hero* ruling carries the structural reason a companion cannot receive it.**
 
-**NINE BATCHES: CV, DH, DI, DJ, DK, DL AND DM, WITH DF AND DG'S SORTS UNDER THEM.** Each one found
-the next thing, and the reason it took nine is in the shape of the question rather than in any
-batch's care: **CV swept for a claim about read sites and never ran the test; DJ swept ABILITIES;
-DK ruled on ABILITIES; DL found that the unit is the CLAUSE.** DM read the last six cards clause by
-clause and the thread ends there.
+**IT TOOK NINE BATCHES, AND THE REASON IS IN THE SHAPE OF THE QUESTION RATHER THAN IN ANY BATCH'S
+CARE:** one swept for a claim about read sites and never ran the test; the next swept ABILITIES;
+the next ruled on ABILITIES; the next found that the unit is the CLAUSE. **A BATCH THAT FINDS
+NOTHING TO WIDEN HAS STILL MEASURED SOMETHING** — that is what lets a thread close rather than be
+abandoned.
 
-- **THE SIX ARE SIXTEEN CLAUSES; FOURTEEN CARRY A COLLECTION AND ALL FOURTEEN WERE ALREADY
-  RIGHT.** Bulwark of Fortitude 4, Consecrated Ground 3, Divine Wrath 2, Battle Shout 1 group +
-  1 self, Hold the Line 2 group + 1 self, Sacred Resolve 2. Every one of the fourteen says what
-  its read site walks. **A batch that finds nothing to widen has still measured something**, and
-  this is the measurement that lets the thread close instead of being abandoned.
-- **WHAT WAS WRONG WAS A THIRD SCOPE, AND IT HAS NO WORD HERE. A CLAUSE CAN BE NARROWER THAN
-  EITHER.** Battle Shout and Hold the Line each hand **five Rage to the CASTER** — one body.
-  Battle Shout's card put it inside *"A roar every hero answers:"*, so a group clause's colon-list
-  promised four heroes a payload that reaches one. **Hold the Line already worded the identical
-  payload correctly** (`Refunds 5 Rage.` as its own sentence) — **so the fix was to copy the sibling
-  card, not to invent a phrasing.** `check_co` and `check_cy` had both recorded it as "hands the
-  caster +5 Rage" since CO; **the card was the only surface that disagreed.**
-- **A WORD WITHOUT ITS REASON GETS RE-LITIGATED, SO ALL FIFTEEN CARRY ONE.** There are **five**
-  reasons and no sixth: no resource bar to refuel; `_companion_hit` reads none of the hero strike
-  loop's multiplier block; stamped once at party spawn before a companion exists; **per-turn** —
-  `_next_unit()` walks `heroes + enemies` and a summon carries `next_time = INF`; and `_gain_faith`
-  refuses companions outright. **Two of the six are narrow by CHOICE and say so** rather than
-  implying an impossibility — Bulwark's Break immunity, armor and cast heal and Consecrated
-  Ground's mitigation and reflect are all plainly receivable, and widening them is a magnitude
-  change on beast survivability, which is DK's "new PLAY, not a widening".
-- **BULWARK IS THE SHARPEST OF THE SIX: WIDENING ITS LOOP WOULD SHIP THREE QUARTERS OF A CARD.**
-  Three of its four clauses would arrive and the fourth — the 10%-a-turn regen, the sustain the
-  card is named for — never can. **A partial arrival reads as working**, which is the Tank and
-  Spank failure in a new shape.
-- **AND THE SURFACES NOBODY SWEEPS ARE STILL DOCUMENTS.** DL corrected Consecrated Ground's Faith
-  clause on the CARD and left **three copies in `master.html` and one in the glossary** still
-  saying *ally* for a clause `_gain_faith` refuses outright — the DA/DC/DG shape exactly, one
-  surface fixed and the rest carried. **When a clause moves, sweep the CLAUSE across every surface,
-  not the card across one.**
-
+- **A CLAUSE CAN BE NARROWER THAN EITHER WORD, AND THAT SCOPE HAS NO NAME HERE.** Battle Shout and
+  Hold the Line each hand **five Rage to the CASTER** — one body — and one of the two wrote it
+  inside a group clause's colon-list, promising four heroes a payload that reaches one. **The fix
+  was to copy the sibling card that already worded it correctly, not to invent a phrasing.**
 ## ON A SPLIT-CLAUSE CARD, EVERY PIN NAMES THE CLAUSE IT PINS (STANDING, Batch DM §2)
 > **A pin that matches the CARD rather than the CLAUSE can go red for the wrong reason, or stay
 > green while its subject moves — which is the failure pin-as-measurement exists to prevent.**
@@ -785,66 +617,43 @@ and five wrong claims, and every one was caught this way.**
 The brief is the shared record; leaving an error in it means the next brief inherits it.
 
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
-**His BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
+**HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
 `_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's passive
-(`lethal_aim`) and off **slot 0**, never off a name, because his basic IS Quick Shot and the
-Beastmaster and Survivalist carry the same object.
-- **ONE PRESS, PLUS ONE PER 50 FOCUS HELD, CAPPED AT FOUR.** 0–49 → 1, 50–99 → 2, 100–149 → 3,
-  150+ → 4. Read **at the moment the bar opens**, from Focus held at that instant.
-- **THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE. DO NOT RAISE IT.** Focus has no ceiling
-  (`FOCUS_UNCAPPED`), so an uncapped rule makes 400 Focus a NINE-press sequence with a tightening
-  window **on the action he presses most** — an ability a player without the reflexes cannot use.
-  That is the failure that sank timed hits in Legend of Dragoon and Mother 3. `check_cs.gd`
-  asserts the cap, and the reason sits beside `SS_SEQ_MAX_PRESSES` in `battle.gd`.
+(`lethal_aim`) and off **slot 0**, never off a name, because his basic IS Quick Shot and two other
+specs carry the same object.
+- **ONE PRESS, PLUS ONE PER 50 FOCUS HELD, CAPPED AT FOUR**, read at the moment the bar opens.
+- **THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE. DO NOT RAISE IT.** Focus has no ceiling,
+  so an uncapped rule makes deep Focus a nine-press sequence with a tightening window **on the
+  action he presses most** — an ability a player without the reflexes cannot use. `check_cs.gd`
+  asserts the cap and the reason sits beside `SS_SEQ_MAX_PRESSES`.
 - **PARTIAL CREDIT: every landed press counts, a miss ENDS the sequence and keeps what came
-  before.** "Landed" is **Good or better**. A four-press attempt missing on the second is worth
-  ONE press. **This REPLACED CN's worst-grade combine rather than joining it — `_worse_grade` and
-  `_GRADE_ORDER` are deleted, so both behaviours are not left reachable.**
-- **IT PAYS IN FOCUS, NOT DAMAGE.** `SS_SEQ_FOCUS_PER_PRESS` (8) a landed press, plus
-  `SS_SEQ_FULL_BONUS` (20) for a full sequence. **Damage resolves off the FIRST press's grade**
-  and presses two through four add none — a deep-Focus Sharpshooter **ramps faster, he does not
-  hit harder per swing**, because Focus already converts to crit chance and then crit multiplier.
-- **THE PAYOUT IS AFTER `_resolve`, NOT BEFORE IT.** `_sharpshooter_focus` runs inside `_resolve`
-  and **dumps the meter to zero on a target switch**; paying first would delete the points the
-  same shot just earned. `_gain_focus` is the only way in, so Spray of Arrows' ceiling, the
-  conversion signature and the deepest-Focus ledger all see it as they see the engine's.
-- **THE WINDOW TIGHTENS 15% A PRESS, AND THE OPENING WINDOW WIDENS WITH THE COUNT** (1.00 / 1.31 /
-  1.57 / 1.86) so the whole sequence stays about as achievable at four presses as at one.
-  **ONLY THE GOOD WINDOW WIDENS. THE PERFECT WINDOW IS DELIBERATELY HELD FIXED** — the first
-  press's Perfect sets the damage, so widening it with the count would let depth buy damage
+  before.** "Landed" is Good or better. **This REPLACED CN's worst-grade combine rather than
+  joining it** — `_worse_grade` and `_GRADE_ORDER` are deleted, so both behaviours are not left
+  reachable.
+- **IT PAYS IN FOCUS, NOT DAMAGE.** Damage resolves off the FIRST press's grade and later presses
+  add none — a deep-Focus Sharpshooter **ramps faster, he does not hit harder per swing**, because
+  Focus already converts to crit chance and then crit multiplier.
+- **THE PAYOUT IS AFTER `_resolve`, NOT BEFORE IT.** `_sharpshooter_focus` dumps the meter to zero
+  on a target switch; paying first would delete the points the same shot just earned. `_gain_focus`
+  is the only way in, so every ledger sees it as it sees the engine's.
+- **ONLY THE GOOD WINDOW WIDENS WITH THE PRESS COUNT. THE PERFECT WINDOW IS DELIBERATELY HELD
+  FIXED** — the first press's Perfect sets the damage, so widening it would let depth buy damage
   directly, which is the thing "ramp faster, not hit harder" exists to prevent.
-- **THE §4 NUMBERS COME FROM A STATED MODEL, NOT FROM PLAY DATA, AND NOTHING IN THIS REPO CAN
-  MEASURE THEM.** The bot never runs the bar, so a widened window is invisible to every instrument
-  the project owns. The model: difficulty is **time inside the window**; the player's timing error
-  is Gaussian with **SD ≈ 60 ms**; a press's risk is that tail and a sequence's risk is the sum of
-  its presses'. Under it the sequence lands **89.7 / 90.0 / 90.0 / 90.0%** at 1–4 presses.
-  `check_cs.gd` re-derives the table from the constants so a hand-edited row cannot pass silently
-  — **but the 60 ms is a guess about human reflexes and the gate cannot check it.**
-- **THE PAYOUT CONSTANTS ARE PINNED IN `check_cs.gd`, AND THE REASON IS A GAP THAT GATE HAD.**
-  Every payout assertion is written as `landed * SS_SEQ_FOCUS_PER_PRESS`, so a negative control
-  that moved 8 to 9 **passed clean**. The changelog, master.html §4.2 and the glossary all quote
-  the figure; pinning it means moving it is one line here and four in the docs, together.
-- **THE TELL IS KEYED ON THE PRESS COUNT, NOT ON A NEW `mode`.** At 0–49 Focus his basic IS a
-  one-press check and reads as the ordinary bar. Above that the bar says "SHOT n OF N" before the
-  first press and on every one, and an early end reads as **"CHAIN BROKEN 2 / 4 — Good"** rather
-  than vanishing, because a sequence that just stops reads as dropped input.
+- **THE §4 LANDING-RATE TABLE COMES FROM A STATED MODEL, NOT FROM PLAY DATA, AND NOTHING IN THIS
+  REPO CAN MEASURE IT.** The bot never runs the bar, so a widened window is invisible to every
+  instrument the project owns. `check_cs.gd` re-derives the table from the constants so a
+  hand-edited row cannot pass silently — **but the timing-error SD is a guess about human reflexes
+  and the gate cannot check it.**
+- **PIN THE PAYOUT CONSTANTS, NOT JUST THE ARITHMETIC.** Every payout assertion written as
+  `landed * SS_SEQ_FOCUS_PER_PRESS` passes a negative control that moves the constant.
+- **THE TELL IS KEYED ON THE PRESS COUNT, NOT ON A NEW `mode`**, and an early end reads as
+  **"CHAIN BROKEN 2 / 4 — Good"** rather than vanishing, because a sequence that just stops reads
+  as dropped input.
 - **THE BOT ROLLS PER PRESS AND STOPS AT THE FIRST FAILURE.** At one press it is byte-for-byte the
-  line it always was — one `randf()`, the same thresholds — so no other hero's grade moves.
-- **`check_cs.gd` IS A LIVE GATE (104 checks) BECAUSE IT HAS TO BE.** The bot cannot press a bar,
-  so nothing else in the battery reaches partial credit, the taper or the tell. It spawns a real
-  battle, drives the bar by hand at every press count, and resolves the basic for real at each.
-- **OPEN, REPORTED AT CS AND NOT ACTED ON: the gold Perfect zone is drawn on presses 2–4 and buys
-  nothing there.** "Landed" is Good or better and the damage is on the first press, so a Perfect
-  on a later press is worth exactly a Good. It is still drawn and still graded — one code path,
-  no special case. **Hiding it after the first press is the obvious fix and would also make "the
-  first press sets the damage" visible without text**, but that is a design change and the
-  designer's call.
-- **THREE THINGS THE BRIEF DID NOT ACCOUNT FOR ARE REPORTED IN THE CHANGELOG §7.** The largest:
-  the brief called the full-sequence reward "the Perfect bonus, +20 Focus", but **Quick Shot's
-  Perfect bonus is +10 Mana** (`perfect_id: "mana"`) and the +20 Focus (`focus20`) belongs to
-  **Aimed Shot**. Quick Shot is a protected core the Beastmaster and Survivalist also carry, so
-  the +20 shipped as a NAMED full-sequence bonus and Quick Shot's own Perfect is untouched.
-
+  line it always was, so no other hero's grade moves.
+- **OPEN, REPORTED AND NOT ACTED ON: the gold Perfect zone is drawn on presses 2–4 and buys
+  nothing there.** Hiding it after the first press is the obvious fix and would make "the first
+  press sets the damage" visible without text — a design change and the designer's call.
 ## THE THREE CLAMPED CALL SITES, AND WHY `update_status` IS NOT CLAMPED (STANDING, SET AT CP §0)
 **`update_status` ASSIGNS power where `add_status` MAXES it.** On the three sites whose power is
 computed from LIVE STATE, that let a weaker recast overwrite a standing buff DOWNWARD — worse than
@@ -897,48 +706,36 @@ that needs no indent**. Two are CP's own:
 > suites **squares the work when you widen it**, so the instrument gets more expensive exactly as
 > it gets more useful — and the only lever left is to watch less.
 
-`test_batch_cd` §1 spawned forty-five child Godots from inside a suite the battery was itself
-running. DD widened its table from five suites to forty-five and **the battery went from 29.6
-minutes to about 50.** That was a design error in the brief, not in the implementation.
-
-- **ASK WHAT THE SUITE DOES THAT THE RUNNER CANNOT, AND ACCEPT "NOTHING" AS AN ANSWER.** For the
-  differ half it was nothing: `run_battery.sh` already spawns every target, already captures every
-  stream INCLUDING STDERR (`>"$log" 2>&1`), already greps the same three count shapes and already
-  counts the same two throw markers. **The only thing it did not do was COMPARE.**
+- **ASK WHAT THE SUITE DOES THAT THE RUNNER CANNOT, AND ACCEPT "NOTHING" AS AN ANSWER.**
+  `run_battery.sh` already spawns every target, captures every stream INCLUDING STDERR, greps the
+  count shapes and counts the throw markers. **The only thing it did not do was COMPARE.**
 - **THE DIFFER IS `check_de.gd`, A POST-PASS THAT READS THE LOGS THE RUNNER WROTE AND SPAWNS
-  NOTHING.** It runs once, last of all, so it covers the gates, the harness and the scene runs too
-  — none of which the old table held. **Reading a file cannot nest, so the nesting is structurally
-  impossible now rather than merely avoided**, and the table may hold `test_batch_cd` itself, which
-  the old design could never watch (a suite that drives itself does not terminate).
-- **IT IS RE-RUNNABLE IN SECONDS.** Re-checking the old differ's answer cost 22 minutes because it
-  re-ran the tree. Over a log directory that already exists the answer is instant, and it cannot
-  drift, because the evidence is fixed.
-- **WRITTEN IN GDSCRIPT, NOT IN SHELL.** Bash string handling is how the battery's count grep came
-  to be too narrow three times, and how a message spelling a throw marker out in full would make
-  the battery accuse the differ of throwing. **The count-differ has been mis-instrumented twice; it
-  is not a place to be clever.**
+  NOTHING.** It runs last, so it covers the gates, the harness and the scene runs too. **Reading a
+  file cannot nest, so the nesting is structurally impossible rather than merely avoided**, and the
+  table may hold the suite that could never watch itself.
+- **IT IS RE-RUNNABLE IN SECONDS** over a log directory that already exists, and the answer cannot
+  drift because the evidence is fixed. **That is what lets a batch write `docs/state.md` and its
+  report AFTER the battery and still certify the tree.**
+- **WRITTEN IN GDSCRIPT, NOT IN SHELL.** Bash string handling is how the count grep came to be too
+  narrow three times, and how a message spelling a throw marker out in full would make the battery
+  accuse the differ of throwing. **The count-differ has been mis-instrumented twice; it is not a
+  place to be clever.**
 - **A FALL AND A RISE ARE NOT THE SAME EVENT, AND THE POLARITY INVERTS BETWEEN THE TWO HALVES.**
-  - A **FALLING CHECK COUNT** is this project's signature failure — `bb` 172→168, `bo` 505→495,
-    harness gate 2 at CA, and the seven `SCRIPT ERROR`s that hid 2,714 assertions. **ERROR.** A
-    **RISING** one is usually a suite's own loop walking new content. **NOTICE.** So **the FLOOR of
-    a band is asserted and the ceiling is not** — the same asymmetry `an`'s band rule already had.
-  - A **RISING FAILURE COUNT** is the 48th failure among 47. **ERROR.** A **FALLING** one means
-    something was repaired. **NOTICE.**
-- **BASELINE THE FAILURE COUNT PER SUITE — IT IS WORTH MORE THAN THE CHECK COUNT (DE §3).** With 47
-  known failures across 20 suites **a 48th is invisible**. `test_batch_bi` was right and the game
-  was wrong **for four batches**, and it hid because that suite was already red for an unrelated
-  reason. **A red check does not announce a second problem underneath it.** A suite going from 6
-  red to 7 is now reported exactly as loudly as one going from 0 to 1.
+  A **FALLING CHECK COUNT** is this project's signature failure — **ERROR**; a RISING one is
+  usually a suite's own loop walking new content — **NOTICE**. So **the FLOOR of a band is
+  asserted and the ceiling is not.** A **RISING FAILURE COUNT** is the extra red nobody named —
+  **ERROR**; a FALLING one means something was repaired — **NOTICE**.
+- **BASELINE THE FAILURE COUNT PER SUITE — IT IS WORTH MORE THAN THE CHECK COUNT.** Among dozens of
+  known failures **one more is invisible**, and a suite already red for an unrelated reason is
+  where a real finding hides for batches. **A red check does not announce a second problem
+  underneath it.** A suite going 6 red to 7 is reported exactly as loudly as one going 0 to 1.
 - **A NOTICE IS NOT SILENCE. A BASELINE MOVES ONLY IN THE BATCH THAT CAUSES THE MOVEMENT, AND THE
-  CHANGELOG SAYS WHY.** Otherwise the table drifts into whatever the code happens to do, which is
-  CQ §3's failure arriving in a new place.
+  CHANGELOG SAYS WHY.** Otherwise the table drifts into whatever the code happens to do.
 - **THE RUNNER WRITES A MANIFEST (`$OUT/.ran`) AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
-  LISTING.** `run_battery.sh` does not clear `$OUT` between runs, so a target that failed to launch
-  would otherwise be blessed by its PREVIOUS run's log — **the one fault a count-differ must never
-  commit.** A log named in the manifest is always this run's, because `run_one` truncates it at
-  spawn. A subset invocation (`./run_battery.sh bo bp`) writes a short manifest and **the differ
-  says so instead of reporting a clean tree.**
-
+  LISTING.** `$OUT` is not cleared between runs, so a target that failed to launch would otherwise
+  be blessed by its PREVIOUS run's log — **the one fault a count-differ must never commit.** A
+  subset invocation writes a short manifest and **the differ says so instead of reporting a clean
+  tree.**
 ## NEVER ASSERT AN EQUALITY AGAINST A COLLECTION THAT GROWS (STANDING, SET AT DX §1)
 > **Changelog entries, corpus size, pool depth, suite counts, call-site counts — assert a FLOOR,
 > or assert a PROPERTY.** An equality against a growing set fails on the next batch that does its
@@ -1339,141 +1136,91 @@ and conflating them is why they sat unruled for a batch.
 
 ## THE ENUMERATION IS `Classes.ability_corpus()` AND IT IS THE ONLY ONE (STANDING, SET AT CZ §0)
 **"What are all the abilities in the game?" has exactly one answer and it lives on `Classes`, not
-in a gate.** It walks the kits, the class pools and the spec pools (the Batch CL enumeration) and
-then walks `Classes.talent_granted_names()` through **`Talents.granted_ability`**, the one resolver
-both grant shapes go through. **The corpus is 216; the CL walk alone reaches 211.**
-- **DO NOT WRITE A SECOND COPY OF IT IN A GATE.** Five gates each held their own — `check_cm`,
-  `check_cn`, `check_co`, `check_cy` and **`check_cl_width`, the original the other four copied** —
-  and the first three plus the original all carried the same hole for as long as they existed:
-  **a talent node that GRANTS an ability which is in no pool was invisible to every one of them.**
-  The five it missed are **Backdraft, Pyroblast, Glacial Prison, Cryoclasm and Intercession**.
+in a gate.** It walks the kits and the pools (the Batch CL enumeration), applies
+`apply_kit_overrides` so the four overridden basics are reached, and resolves talent grants through
+**`Talents.granted_ability`**. **The live corpus size is in `docs/state.md`, not here.**
+- **DO NOT WRITE A SECOND COPY OF IT IN A GATE.** Five gates each held their own and four of them
+  carried one hole for as long as they existed: **a talent node granting an ability that is in no
+  pool was invisible to every one of them.**
 - **IT LIVES ON THE GAME'S DATA RATHER THAN ON THE TEST**, because a gate that owns the answer is a
-  second authority the game itself never consults. `Classes.pool_ability` already falls through to
-  `Talents.granted_ability`, so this is a dependency the file had, used a second time.
+  second authority the game itself never consults.
 - **`check_cz.gd` KEEPS THE OLD CL WALK AS A NEGATIVE CONTROL.** Its whole job is to still be
-  missing the five; if it ever stops being, the gap closed itself and every report about it is
-  stale.
-- **CN's CRITERION OWES NOTHING** — re-run over the five it answers all of them correctly, and only
-  its printed population was ever short. **CO's ONE RULING WAS TAKEN AT DA §1: GLACIAL PRISON IS
-  GATED**, and it is the first talent-grant in `RECAST_GATED`. **That is what the enumeration hole
-  actually cost** — the criterion could not be applied to an ability no walk in the project could
-  see, so the defect was invisible rather than merely unfixed.
+  missing what the complete walk reaches; if it ever stops being, the gap closed itself and every
+  report about it is stale. **It asserts a SET IDENTITY, not an equality**, so a fifth kit override
+  is covered by doing nothing — and an ability outside every kit and pool is in NEITHER walk and
+  cannot hide inside the difference.
 
 ## A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS AND DIVERGES SILENTLY (STANDING, SET AT DA §3, THE GATES CONSOLIDATED AT DB §1)
 > **Enumerate the ability corpus through `Classes.ability_corpus()`. Never copy another gate's
-> walk.** A talent can grant an ability that lives in no pool, and a hand-rolled walk misses five.
+> walk.** A talent can grant an ability that lives in no pool, and a hand-rolled walk misses it.
 > **A helper copied between gates inherits its bugs silently and diverges from its origin without
 > anything reporting it.**
 
-**THIS IS A DIFFERENT FAILURE FROM EVERY OTHER TRAP IN THIS FILE AND IT IS THE FIRST CONFIRMED CASE
-IN THE PROJECT.** The rest are DRIFT: one authority, edited, and a second copy left behind. This is
-**PROPAGATION BY COPY** — five gates were wrong in five places from birth, because four of them
-copied `check_cl_width`'s walk rather than deriving one. **Fixing the origin leaves four.** Drift
-gives you one stale copy and a chance that a diff notices; a copied helper gives you N, all born
-wrong, none of them diffed against anything.
+**THIS IS A DIFFERENT FAILURE FROM EVERY OTHER TRAP IN THIS FILE.** The rest are DRIFT: one
+authority, edited, and a second copy left behind. This is **PROPAGATION BY COPY** — gates wrong in
+N places from birth, because they copied a walk rather than deriving one. **Fixing the origin
+leaves the rest.** Drift gives you one stale copy and a chance a diff notices; a copied helper
+gives you N, all born wrong, none of them diffed against anything.
 
-- **THE TELL IS A HELPER WITH THE SAME NAME IN THREE OR MORE GATES.** Ask whether the answer belongs
-  to the GAME's data rather than to the test — `ability_corpus` did, which is why it lives on
-  `Classes` and not in a gate.
-- **CZ's `_cl_only_corpus` IS THE ONE ALLOWED COPY** and it is allowed because being a copy is its
-  job: it is the negative control that proves the old walk still misses the five. **`check_da`
-  names it as the exemption, so a later reader cannot "consolidate" it into uselessness.**
-- **DONE AT BATCH DB: `_spawn` IS AUTHORED ONCE, IN `gate_fixture.gd`, AND ALL SEVEN GATES GO
-  THROUGH IT.** The fixture carries the tally too (`ok` / `report`). **`check_da` §3 no longer
-  COUNTS the copies — it ASSERTS there are none**: a gate that authors its own `_spawn`, or that
-  instantiates the battle scene by hand, fails it by name. Both marks are joined at runtime so the
-  gate does not accuse itself.
-- **THE THREE DIFFERENCES THAT WERE REAL ARE NAMED ARGUMENTS NOW**, not invisible edits inside a
-  copy: `deterministic` (the AK/AL/AR damage forcing — `check_cm_live`, `check_cs`), `items`
-  (`check_ct`'s held empty slot) and `run` (a gate that already holds the node).
-- **AND THE ONE THAT WAS NOT REAL WAS RULED DEAD.** Five copies hand-set `skill_check_taught` and
-  `defensive_check_taught`; two did not. **The flags are unreachable in a gate** —
-  `_nobody_can_press()` is `sim or autoplay or headless`, so the read site is never entered and the
-  brace always takes the bot branch. **Their only live effect was `Profile._save()` writing the
-  player's `user://profile.json` on every gate run.** They are gone from all five. **DA's own
-  write-up of this said "two others"; it was five** — the census counted bodies correctly and
-  described them from memory.
-- **WHAT DB LEARNED BUILDING IT, AND IT IS A TRAP: A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT
-  COMPILE.** `extends GateBase` (or `extends "res://gate_base.gd"`) on a `--script` SceneTree
-  target fails with `Could not find base class` **and exits 0 having run nothing**. The fixture is
-  a `preload`ed `RefCounted` for that reason, and it carries **no `class_name`** — that registration
-  lives in the gitignored `.godot/global_script_class_cache.cfg`, so it would resolve here and fail
-  on a fresh clone.
-- **DONE AT BATCH DD, AND IT WAS TEN TIMES DB's: `_spawn` IS AUTHORED ONCE FOR THE SUITES TOO**, in
-  `suite_fixture.gd`, and `_kill` with it. **1,128 lines deleted against 391 added across the 37
-  suites, and not one of the 389 call sites moved** — a suite keeps its OWN `_spawn` signature and delegates, because
-  **thirty-seven signatures are not one signature** (`learned`, `granted`, `member_patch`, `prep`,
-  `learner`, `mod_id`, `cleric_spec`, `earned`, `runes`, `frames` between them). **`check_da` §3
-  asserts the suites now as well as the gates**: a suite carrying a `_spawn` that does not reach the
-  fixture fails by name, and the ten hand-built boards that remain — in `al`, `an`, `ax`, `bl`,
-  `test_rune_battle` and `test_run_harness`, none of them a copied helper — are a **named ratchet**
-  rather than a wildcard.
-- **AND THE CENSUS NUMBER EVERY DOCUMENT CARRIED WAS WRONG IN BOTH DIRECTIONS.** "34 distinct
-  bodies" reproduces neither way it can be measured: **36 raw, 33 once comments and blank lines are
-  stripped** (four pairs are twins — bh/bi, bo/bp, bq/br, bt/cb). **`_kill` "byte-identical in 14"
-  is true only after normalising** — four raw bodies, and every difference between them was the
-  wording of one comment. **DERIVE A CENSUS BEFORE QUOTING IT**; this one travelled from DA through
-  DB, this file, `state.md` and DD's own brief unchecked.
-- **`_run` IS 39 BODIES IN 39 SUITES AND IS NOT THE SAME PROBLEM.** It is each suite's own driver.
-  **The copied helper is hiding INSIDE it: 38 of the 39 open with the same save-backup preamble and
-  37 swap `Profile.save_path` to a per-suite file and back.** That is the next duplication of this
-  shape and it is owed, not taken.
-- **AND THE RULE'S ENFORCEMENT HAD A BLIND SPOT (Batch DV §5), WHICH IS CLOSED AT DW §1 — AND THE
-  DIAGNOSIS WAS ONE HOLE SHORT.** DV found `test_batch_cp._corpus()` hand-rolling the walk while
-  `check_da` §3 read 37/0, and named two reasons: the walk sweep read **`check_*.gd` ONLY**, and the
-  fingerprint matched the two pool **ACCESSORS** where that walk read the **CONSTANTS**. Both held.
-  **THE THIRD WAS BIGGER THAN EITHER AND NO POPULATION AXIS WOULD HAVE FOUND IT: the fingerprint
-  assumed a corpus walk touches the DRAFT pools at all.** `check_cl_resolver._every_ability()` is a
-  walk **in a gate** — inside the swept population, read on every battery run since DA — and it
-  reads only `Classes.kit()` and `Classes.spec_abilities()`. **It reached 43 of 227.**
-  **THREE WALKS, NOT ONE, AND THE TWO DV HAD NOT FOUND WERE THE TWO THAT REACHED LESS: 43, 91
-  (`test_batch_bh._all_ability_names`, which reads NEITHER draft pool) and 207.** All three are
-  delegations now.
-- **THE WIDENED RULE ASKS WHAT A WALK IS RATHER THAN WHICH CALLS IT MAKES (Batch DW §1).** *A
-  function that RETURNS a collection built out of two or more of the game's seven ability-source
-  families is answering "what abilities exist?", and `Classes.ability_corpus()` is the one
-  authorised answer.* **THE RETURN IS THE DISCRIMINATOR AND IT IS DOING REAL WORK**: a body that
-  reads a pool and ASSERTS on it returns void and is not a walk. A flat union of marks over gates
-  and suites accuses **sixteen** files, and sixteen exemptions is not a rule — **an exemption
-  granted to a genuine violation is worse than the violation it covers**, so the fingerprint has to
-  be sharp enough that its catches are real. This one carries **ONE** exemption
-  (`check_cz::_cl_only_corpus`, the deliberate CL negative control) and it is keyed `file::func`,
-  **never by file**: a file-scoped exemption blinds the rule to a new walk arriving in that file
-  later. **COMMENTS ARE STRIPPED BEFORE THE MATCH** — `check_ds` took a red for a header comment
-  that named two accessors while explaining that it does not call them, and prose describing a walk
-  is not a walk.
-- **A GATE THAT COUNTS A POPULATION IS ONLY AS GOOD AS ITS ENUMERATION, AND A GREEN EQUALITY OVER A
-  SHORT WALK READS EXACTLY LIKE A GREEN EQUALITY.** `test_batch_cp` §3's `ability_hits ==
-  ["Shatter"]` is the case, and DW paid it out: over the real corpus that population is **EIGHT**,
-  and the biconditional beside it was **SIX where the truth is EIGHT**. Both are corrected, both
-  print the live figure, and **`check_dw` re-derives each one live and asserts the suite's named
-  table equals it** — a named population is only useful while it is still the real one. **ARCANE
-  EXPLOSION BROKE BOTH RULES ON ARRIVAL AT DU §4 AND NOTHING WENT RED**, because the rules that
-  would have caught it could not see it.
-- **AND THE COST OF THE HOLE WAS NOT THE VIOLATION, IT WAS THE SEVENTEEN QUIET READINGS.** `check_da`
-  read **37/0 on every battery since DA** with three hand-rolled walks standing in the tree. **A
-  fingerprint with a hole does not fail loudly and does not fail slowly — it passes.** Proved by a
-  one-character control: with the smallest walk restored, changing the family threshold from `2` to
-  `3` returns `check_da` to a clean 39/0 with a 43-of-227 walk in the tree.
-
+- **THE TELL IS A HELPER WITH THE SAME NAME IN THREE OR MORE GATES.** Ask whether the answer
+  belongs to the GAME's data rather than to the test.
+- **`check_cz`'s `_cl_only_corpus` IS THE ONE ALLOWED COPY**, because being a copy is its job — it
+  is the negative control. **`check_da` names it as the exemption**, so a later reader cannot
+  "consolidate" it into uselessness.
+- **`_spawn` IS AUTHORED ONCE FOR THE GATES (`gate_fixture.gd`) AND ONCE FOR THE SUITES
+  (`suite_fixture.gd`), AND `_kill` WITH IT.** Each suite keeps its OWN `_spawn` SIGNATURE and
+  delegates — **thirty-seven signatures are not one signature** — so no call site moved.
+  **`check_da` §3 no longer COUNTS the copies, it ASSERTS there are none**: a gate or suite that
+  authors its own `_spawn`, or instantiates the battle scene by hand, fails it by name, and the
+  hand-built boards that remain are a **named ratchet** rather than a wildcard.
+- **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
+  `deterministic`, `items`, `run`.
+- **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
+  SceneTree target fails with `Could not find base class` **and exits 0 having run nothing**. The
+  fixture is a `preload`ed `RefCounted` for that reason, and carries **no `class_name`** — that
+  registration lives in the gitignored `.godot` cache, so it would resolve here and fail on a
+  fresh clone.
+- **A FINGERPRINT IS ONLY AS WIDE AS THE POPULATION IT SWEEPS AND THE CONVENTION IT MATCHES.**
+  Three hand-rolled walks stood in the tree for seventeen quiet readings: the sweep read
+  `check_*.gd` only, the fingerprint matched the pool ACCESSORS where a walk read the CONSTANTS,
+  and — the largest — it assumed a corpus walk touches the draft pools at all, so a walk reaching
+  43 of 227 sat inside the swept population unseen. **THE WAY TO FIND THE NEXT HOLE IS TO ASK WHAT
+  THE RULE IS ABOUT AND RE-DERIVE THE FINGERPRINT FROM THAT**, not to patch the holes you were
+  told about.
+- **THE WIDENED RULE ASKS WHAT A WALK IS RATHER THAN WHICH CALLS IT MAKES.** *A function that
+  RETURNS a collection built out of two or more of the game's ability-source families is answering
+  "what abilities exist?"* **THE RETURN IS THE DISCRIMINATOR** — a body that reads a pool and
+  ASSERTS on it returns void and is not a walk.
+- **A COUNT OF EXEMPTIONS MEASURES A FINGERPRINT'S SHARPNESS.** If widening a rule means exempting
+  most of what it catches, the fingerprint is wrong and the exemptions are hiding it. **An
+  exemption granted to a genuine violation is worse than the violation it covers**, and an
+  exemption is keyed `file::func`, **never by file** — a file-scoped one blinds the rule to a new
+  walk arriving in that file later. **COMMENTS ARE STRIPPED BEFORE THE MATCH**: prose describing a
+  walk is not a walk.
+- **AND THE REPAIR IS AN ADDED INSTRUMENT, NOT A LOOSENED ONE.** Loosening a rule to cover a new
+  case re-argues every case it already settled; adding a second question beside it does not, and
+  the two can disagree usefully. **ASSERT THE EXEMPTION TABLE'S SIZE FROM OUTSIDE**, so a batch
+  adding one has to move a line in another file and say why.
+- **A GATE THAT COUNTS A POPULATION IS ONLY AS GOOD AS ITS ENUMERATION, AND A GREEN EQUALITY OVER
+  A SHORT WALK READS EXACTLY LIKE A GREEN EQUALITY.** **A named population is only useful while it
+  is still the real one**, so a gate re-derives it live and requires the suite's table to equal it.
+- **A FINGERPRINT WITH A HOLE DOES NOT FAIL LOUDLY AND DOES NOT FAIL SLOWLY — IT PASSES.**
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
 refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE
-answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
+answer and `RECAST_GATED` is the set; **its live size is in `docs/state.md`, not here.**
 
 - **WHY IT EXISTS.** `add_status` resolves a re-application as `max()` on duration and power, so a
   status whose power is a **snapshot of live state** could be recast at a weaker value, have that
   value discarded by the max, and still charge full resource, a full cooldown and the turn.
-  Vespers reads the Cleric's current maximum health, Magic Barrier the Mage's, Divine Shield the
-  Devout's — all three move during a fight.
 - **THE SCOPE LIMIT MATTERS MORE THAN THE RULE.** An ability that also deals damage, heals, or
   converts a resource **must still cast** when its buff would not improve: that half is worth the
   turn on its own, and refusing it would be a worse bug than the one being fixed.
   **FUNERAL PYRE, STABILIZE, BATTLE SHOUT, RECKLESS ABANDON and BLESSING OF ZEAL are excluded for
-  exactly that reason** — four of them were the cards that motivated the batch.
+  exactly that reason.**
 - **DERIVE MEMBERSHIP BY WALKING `_resolve_special`, NEVER BY READING `damage`/`pressure`** — CN's
   trap, and it is the same trap here: those fields are zero on Feint, Guard Change and Kill
-  Command. 211 abilities → 134 with no field-level payload → 58 that qualify.
+  Command, all of which hit hard from inside their handlers.
 - **NEVER GATE ON A `power` THAT IS NOT A MAGNITUDE.** Mark of the Hunt, Snare Line, Eye of the
   Storm and Vendetta store `heroes.find(attacker)` in the status power; a numeric test there
   refuses on a hero's slot number. They are excluded and must stay excluded.
@@ -1483,51 +1230,46 @@ answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
   `mod_status_turns`, as `add_status` applies it); **a negative turn count is permanence, not a
   duration**, so nothing lengthens a battle-long status.
 - **RIDERS COUNT AS IMPROVEMENT.** `barrier` is SHARED and `_grant_divine_shield` stamps `divine`,
-  Blessed Barrier, Afterglow, Warded Robes, Unyielding (Mantle its hops). A Devout casting over a
-  Mage's LARGER barrier improves it — it becomes divine, which feeds Faith — with neither duration
-  nor power moving.
-- **LAYERED FAITH IS NOT SUBSUMED AND MUST BE READ BY THE GATE.** BM's bespoke path is not a
-  refusal: it pre-adds the standing pool so the recast is **additive**, always improves, and is
-  never refused. The two compose. **Interpose is the same shape** and is the one member of the set
-  that can never refuse.
-- **ONE RULE, NOT ONE STRING PER CARD.** No ability description says anything about a second cast.
-  It is stated once in the **glossary** (`recast_refused`) and carried in the moment by the tell,
+  so a Devout casting over a Mage's LARGER barrier improves it — it becomes divine, which feeds
+  Faith — with neither duration nor power moving.
+- **LAYERED FAITH IS NOT SUBSUMED AND MUST BE READ BY THE GATE.** BM's bespoke path pre-adds the
+  standing pool, so the recast is **additive**, always improves, and is never refused.
+  **Interpose is the same shape** and is the one member of the set that can never refuse.
+- **ONE RULE, NOT ONE STRING PER CARD.** No ability description says anything about a second cast:
+  it is stated once in the **glossary** (`recast_refused`) and carried in the moment by the tell,
   which lives in `_ability_tooltip` — the one site every surface reads.
 - **AN ABILITY THAT PROPOSES NO WRITE AT ALL IS NOT THIS GATE'S QUESTION** (Alms and Divine
   Presence in a kit without Mercy): the handler already logs why, and refusing there would darken
   a button with a reason this rule cannot state.
 - **A STATUS DURATION IS DECLARED TWICE AND BOTH COPIES MUST MOVE (STANDING, FOUND AT CR §3).**
   The cast handler writes it, and **`_recast_writes` declares it again** so the gate can predict
-  what a recast would do. CR reverted three durations 6 → 4 in the handlers and left the table at
-  6; the gate then proposed a longer write than the handler performs, read every recast as an
-  improvement, and **stopped refusing a saturated recast on Alms, Divine Presence and Vespers.**
-  **`check_co` FAILED ALL THREE BY NAME**, which is what a gate that spawns real battles buys over
-  one that reads the table. **ANY EDIT TO A DURATION, POWER OR RIDER ON A `RECAST_GATED` ABILITY
-  OWES THE SAME EDIT AT `_recast_writes`** — it is Batch BP's Eye of the Storm (two copies of one
-  figure) one door along.
+  what a recast would do. Leave the table behind and the gate proposes a longer write than the
+  handler performs, reads every recast as an improvement, and stops refusing altogether.
+  **ANY EDIT TO A DURATION, POWER OR RIDER ON A `RECAST_GATED` ABILITY OWES THE SAME EDIT AT
+  `_recast_writes`.**
 - **A HANDLER THAT GUARDS ITS OWN WRITE NEEDS THE GUARD MIRRORED, NOT THE VALUE (STANDING, DA §2).**
   Every other member of the set calls `_apply_status` unconditionally and lets `add_status`'s
   `max()` discard the weaker value; **Glacial Prison does not** — it reads
   `if not target.has_status("chilled")` and never calls it at all. `_recast_writes` therefore
-  proposes the Chilled half **only when it would land**, and proposes the freeze half
-  unconditionally so `_status_write_improves` can decide it. Get this backwards and the table reads
-  its own optimism as an improvement — **CR §3 from the other direction.**
+  proposes the Chilled half **only when it would land**, and the freeze half unconditionally.
+  Get this backwards and the table reads its own optimism as an improvement.
+- **AND A PROPOSAL MUST EQUAL WHAT A *GOOD* CAST WRITES.** `check_co` saturates by casting at
+  grade `"good"`, so an entry proposing the PERFECT's duration improves on what is standing every
+  time and the card never refuses. **A `special` carrying a POWER needs its own arm** rather than
+  a `RECAST_SELF_PLAIN` row, because that table writes `power: 0`.
 - **THE REFUSAL DARKENS A BUTTON, NOT A PICK, AND THAT BOUNDS WHAT IT CAN EVER BUY.** For a
   picked-target card the pool is every legal target, so the button dims only when **no** legal pick
-  would improve. On Glacial Prison one unfrozen enemy anywhere keeps it lit; the refusal is real but
-  it fires on single-enemy boards and little else. **That is the honest scope of the rule and not a
-  defect in it** — Rime, Bola and Hysteria have carried the same scope since CO. **A per-pick
-  refusal would be a second path, which CO forbids: one door, `_ability_usable`.**
-- **`check_co.gd` IS THE ANTI-ROT PROOF AND IT IS A LIVE ONE.** It spawns **two** real battles —
-  Alms and Divine Presence need Mercy, Mantle needs a living Devout, so one party cannot write the
-  whole set — casts all 59 onto every unit each can reach, and asserts the gate's prediction
-  against what actually landed. It also asserts the excluded cards OUT by name.
+  would improve. **That is the honest scope of the rule and not a defect in it** — a per-pick
+  refusal would be a second path, which CO forbids: **one door, `_ability_usable`.**
+- **`check_co.gd` IS THE ANTI-ROT PROOF AND IT IS A LIVE ONE.** It spawns **two** real battles
+  (one party cannot write the whole set), casts every member onto every unit each can reach, and
+  asserts the gate's prediction against what actually landed. It also asserts the excluded cards
+  OUT by name.
 - **KNOWN, RECORDED, NOT FIXED:** Battle Shout, Stabilize and Eye of the Storm call
   `update_status` with a *computed* power after `_apply_status`, and `update_status` **assigns**
   power where `add_status` maxes it — so on those three a weaker recast **overwrites the standing
   buff downward**. All three carry a second payload, so the refusal cannot reach them; widening
   scope to catch them would delete a resource conversion the player wanted.
-
 ### A FINGERPRINT INSPECTS A POPULATION AND A CONVENTION, AND EACH IS A PLACE TO HIDE (Batch DW §1)
 **THE RULE: a rule enforced by matching source text is only as wide as the population it sweeps and
 the calling convention it matches, and a violation that avoids either one is invisible to it — so
@@ -1883,247 +1625,62 @@ as a live decision.
   against a real in-flight run at three positions and opens both overlays.
   It is a SCENE run, not `--script`: **autoloads (`Run`) do not resolve in a
   `--script` SceneTree.**
-- **`test_batch_bl.gd` NEEDS `--fixed-fps 12` AND IT IS NOT THE sim.sh FLAG.** sim.sh passes
-  240 to make frames run back-to-back in WALL time; this suite passes 12 to make each frame a
-  big TIME step, because a real-play battle paces itself with `create_timer` waits and §2's
-  ledger can only be read after a fight ENDS. At the default step a three-orc fight does not
-  finish inside any sane frame budget; at 12 it finishes in ~700 frames and nothing the battle
-  computes reads delta. Any future suite that has to run a REAL-PLAY battle to completion wants
-  the same trick.
-- New `class_name` files need `--headless --import` before they resolve.
-- **RUNNING THE FULL SUITE BATTERY DESTROYS THE PLAYER'S IN-PROGRESS RUN (Batch BN, learned the
-  expensive way).** Twenty-five suites spawn a live battle, which means `Run.new_run` and
-  `clear_save`, and **`user://run_save.bin` is simply gone afterwards** — several suites back it
-  up and restore it, but a LATER suite in the battery then wipes it again, so the individual
-  backups buy nothing when the whole battery runs. `profile.json` survives with a few counters
-  incremented (runs_started, occasionally a forfeit) and `relics.json` is byte-identical, so the
-  META layer is safe; it is the run in flight that is lost. **Copy `run_save.bin` aside before a
-  battery run if the designer has a run going**, and say so afterwards either way.
-- Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
-  lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
-  difficulty signal (Batch R). **sim.sh passes `--fixed-fps 240` since Batch
-  BJ §1 — 5.3x faster (headless frame-sync sleep removed), nothing the sim
-  computes changes; a --run 100 is ~8 minutes. Every report ends with the
-  BJ §3a signature-payoff table (per-spec signature moments, trash | boss).** `./sim.sh --sweep N` (DOD_SIM_SWEEP=1) = N
-  battles at EACH budget 3/6/9/12, fresh fight-theme warband per battle,
-  enemies unscaled (`DOD_SIM_ZONE` picks the roster); per budget it also
-  prints avg enemy count, avg enemies alive entering round 3, and per-hero
-  damage share (Batch S — a DOD_SIM_THEME'd sweep = per-theme share for
-  free). `./sim.sh --run N` (DOD_SIM_RUN=N, def 50) = N COMPLETE runs with
-  progression BOTH sides (tier scaling + slot mult, HP/mana/item carry,
-  points earned AND spent, elite runes auto-equipped, trophies) → run
-  report: wipe distribution, per-tier averages, measured party-vs-warband
-  power table + run economy (gold earned/spent/unspent, items used/left,
-  merchants/events/**blacksmiths**/bargains per run — **NOT rests: Batch AN
-  deleted them and the "taken vs offered" row reads 0.0/0.0 forever**) + a
-  per-invocation "Matrix row" line for cross-policy assembly. Policies
-  env-set + printed: DOD_SIM_ROUTE (**greedy|balanced|cautious** since Batch
-  BK, one axis — how much ELITE the bot accepts; `default` ALIASES balanced
-  and `elites` ALIASES greedy so old scripts and Matrix rows still resolve).
-  **BATCH BG §1 MEASURED WHAT THE THREE POLICIES WERE WORTH ON THE LINE AND
-  THE ANSWER WAS NOTHING** ("Reachable nodes per step: 1.00 — steps offering
-  a real choice: 0% (0 of 2764)", every node type taken == offered): from AN
-  to BJ the three route rows were THREE SAMPLES OF ONE CONFIGURATION.
-  **BATCH BK MADE THEM A REAL BAND AGAIN** — 1.61 reachable per step, 41% of
-  steps a real choice, and the three policies walk 6.5 / 6.0 / 2.2 elites a
-  run. A pre-BK three-policy row is still a triplicate, not a bracket; a
-  post-BK one is a bracket.
-  **BATCH DB §3 — AND THE HARDER HALF OF THAT, WHICH IS A COVERAGE FACT
-  RATHER THAN A COMPARISON ONE: TWO THIRDS OF EVERY TALENT TREE IS OUTSIDE
-  EVERY MEASUREMENT EVER TAKEN IN THIS PROJECT.** `Talents.LANES` is **3**
-  and there are **twelve specs**, so the project has **36 lanes and every
-  figure it has ever published was walked on the same 12**. **NO SIM NUMBER
-  HERE HAS EVER INVOLVED GLACIAL PRISON** — the Cryomancer's Deep Freeze lane
-  has never run outside DA's single smoke arm — and the same is true of
-  Second Prison, Cold Snap, Glacial Economy and Absolute Zero. **THIS IS NOT
-  A BUG AND IT IS NOT A BACKLOG ITEM**: a fixed default party is precisely
-  what makes arms comparable across batches. It is a **permanent caveat on
-  every sim figure**, and the rule that follows from it is narrow and
-  absolute: **no sim figure may be quoted about a card in a non-default lane,
-  and several have been.** The sim's own report prints the unmeasured count
-  beside `builds=` since DB, so the caveat arrives with the number instead of
-  living only here.
-  **BATCH BG §1 STANDING CAUTION ON EVERY RUN BAND: `DOD_SIM_BUILDS`
-  DEFAULTS TO EACH TREE'S FIRST LANE, AND THAT IS A CONFOUND WITH A KNOWN
-  SIGN.** For the default party the first lane is Berserker Bloodletting,
-  Cryomancer Winter, **Devout BULWARK — the lane BF measured at 14% against
-  FAITH's 33%** — and Beastmaster devotion. Two of those four ARE the lanes
-  their own batches measured as standouts, so a default-vs-named comparison
-  is a two-hero difference, not a four-hero one. **Always print the build
-  string beside a run number**, DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off
-  (both default ON: shops heal-first — hero <50% buys a Health Potion each —
-  then priciest affordable offer not carried, runes incl. but only onto a
-  free slot + equipped at purchase, never dipping under the 40g reserve;
-  battle bot drinks a carried Health Potion opening a turn <35% HP, run
-  sims ONLY — sweep/standalone stay dry so R/S baselines hold),
-  DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft),
-  DOD_SIM_ROTATE=1 (Batch W: rotate all twelve specs; shares then carry
-  sample counts — see Batch W in the changelog),
-  DOD_SIM_DIFFICULTY=wanderer|warden|ruin — a RUNG of BM's ladder
-  (x0.50 / x1.00 / x1.30 through zone_base_mult; "standard" still
-  resolves and maps to warden). **THE DEFAULT IS RUNG 1 SINCE BATCH BM
-  AND THAT IS THE TRAP: an unset flag is NOT the old baseline.** A row
-  meant to compare against a pre-BM number must set warden explicitly,
-  and BATCH BN MOVED RUNG 1 FROM x0.70 TO x0.50, so an unset-flag row
-  taken before BN is not comparable with one taken after it either),
-  DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult> (Batch AD
-  EXPERIMENT ARMS — measurement only, never shipped; UNLIKE every other
-  flag here they are gated on Run.sim_run as well as the env, so a stale
-  export cannot put a real run in an arm. rich = all slots from t1 + a
-  spec-eligible authored rune granted at each zone half-mark; power = a
-  multiplier on authored payload UPSIDE only, costs held, tpl_* stat
-  sticks untouched).
-  RETIRED IN BATCH AN, along with the features they controlled, and NOT
-  revived by BK: DOD_SIM_MAP, DOD_SIM_MINIBOSS (the mini-boss is structural
-  — slot 8 of every zone), DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING
-  (heroes begin with no runes). Matrix rows read **`map=branch`** since
-  Batch BK (`map=line` = an AN-to-BJ row), carry no start=/specopen=/mb=
-  field, and report depth out of **48 SLOTS** — so NO PRE-BK ROW IS
-  COMPARABLE WITH A POST-BK ONE, and no pre-AN row with either.
-  RunSim
-  (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
-  walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
-  sim branch → RunSim.on_battle_end. Run.sim_run=true makes
-  save_run/clear_save NO-OPS (sims can never touch the real save) and no
-  Profile/Relics.unlock calls exist in RunSim. GOTCHA: children added in a
-  SceneTree script's _initialize never fire _ready (root not ready) — park
-  scene-spawning tests on the first process_frame (scratchpad
-  test_run_harness.gd = the 3 correctness gates: hero win scaling, talent
-  spend conservation, enemy tier×slot scaling — rerun it before trusting
-  any --run report after touching spawn/scaling code).
-- **QUOTE THE RUN HARNESS AS "GATES 1/2/3" AGAIN — BATCH CA REPAIRED GATE 2, AND BY'S INSTRUCTION
-  TO QUOTE ONLY 1 AND 3 IS SUPERSEDED. THE REASON IT EXISTED IS WHY THE HARNESS NOW PRINTS A
-  COUNT.** From BM to BY, `test_run_harness.gd:125` called `run.award_spec_point` — **deleted by
-  BM §6** — from **above every `_check` in the function**. The error aborted
-  `_gate_talent_conservation` outright: zero checks ran, zero failed, and it printed `GATE 2 PASS`
-  on the way out. **129 of BM's own replacement assertions had never executed once**, and twelve
-  batches of VERIFIED blocks quoted "gates 1/2/3" on the strength of a word that was never earned.
-  **A COUNT OF ZERO FAILURES IS NOT EVIDENCE WHEN THE COUNT OF CHECKS IS ALSO ZERO**, and this one
-  printed a WORD rather than a number, which is why it outlived the `ah` and `an` cases.
-  **CA'S NEXT CLAUSE READ "those print counts, and a count that reads wrong is visible at a
-  glance", AND BATCH CD DISPROVED IT — THE CORRECTION IS THE MORE USEFUL HALF OF THE RULE.** `ah`
-  and `an` DID print counts, those counts WERE wrong by 125 and 2,434 checks, and nobody saw it
-  for twelve batches; three more suites were doing the same thing. **A COUNT IS ONLY VISIBLE AT A
-  GLANCE IF SOMETHING IS COMPARING IT TO WHAT IT SHOULD BE** — and until CD nothing was, because
-  the battery's counts lived in prose in this file and were transcribed forward by hand. **THE
-  REAL RULE: A COUNT THAT NOBODY DIFFS IS A WORD.** test_batch_cd §1 is what diffs the five, as a
-  FLOOR per suite; extend it rather than trusting a reader.
-  **THE TWO STANDING RULES CA SHIPPED BIND EVERY GATE IN THE HARNESS, PRESENT AND FUTURE. They live
-  in `_check` / `_check_range` / `_go`, so a gate added later inherits both by doing nothing:**
-  **(1) A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165 checks)`, never a bare
-  `GATE 2 PASS`. **(2) A GATE THAT RUNS ZERO CHECKS MUST FAIL** — an empty gate is a broken gate,
-  and it is the one case where silence has to be loud. **THE LIVE COUNTS ARE 22 / 165 / 8.** Quote
-  them beside the verdict, and treat a moved count as something to explain rather than a nuisance. Matrix rows come from
-  the per-invocation "Matrix row:" report line — assemble across
-  runs, never rerun one row against another batch's flags. test_run_harness.gd RECREATED (scratchpad dies with its
-  session): gate 1 win scaling + HP-sync asserts, gate 2 talent
-  conservation via ceil(N/3) price replay (converted lane trees KEEP
-  multi-rank nodes — extra ranks cost 1), gate 3 enemy tier×slot at
-  the new rates; plus probes for ramp rolls and theme satisfiability
-  (elite themes need budget ≥6 in every roster — hence the elite
-  floor).
-  **TUNE AGAINST THE CURVE, NEVER ONE POINT** — the ~85% win-rate target
-  describes TOP-BAND (budget 10-12) encounters only, and attrition
-  (deaths/battle) is the sensitive dial. `DOD_AUTOPLAY=1` = 1 debug battle
-  (echoes every combat-log line as "[LOG] ..." — grep it in headless tests;
-  NOTE: the end screen waits for input, so headless autoplay runs never exit
-  on their own — run with a timeout/kill or they pile up as zombies).
-  `DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster"` picks the bot's
-  specs (warrior,mage,cleric,hunter order). `DOD_SIM_ENEMIES="boss,shaman,..."`
-  forces the enemy lineup in test battles. `DOD_SIM_TALENTS="bz_bloodcraze:3"`
-  force-learns talents on bot heroes whose spec tree has the id.
-  **STANDING NOTE — HOW TO READ A LANE ROW (Batch BC §0). THE HARNESS IS
-  PER-HERO; THE FLAG STRING IS WHAT HAS ALWAYS BEEN ONE-SPEC.** It walks EVERY
-  hero and keeps whichever named ids appear in THAT hero's own tree — but all
-  **288 node ids across the twelve trees are disjoint** (asserted in
-  test_batch_bc), so a string naming one spec's lane builds exactly ONE hero.
-  **THERE IS NOTHING TO FIX HERE AND FIXING IT WOULD BE WRONG** — name four
-  lanes and four heroes build. What it means is that **EVERY LANE ROW EVER
-  REPORTED — the Warden's Threat at 30%, Holy's Radiance at 50%, the Devout's
-  Faith at 80% — IS A FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.**
-  Those rows are honest A/B comparisons of one spec's lanes AGAINST EACH OTHER,
-  which is mostly what they were used for; they are NOT "how much of a real
-  party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE THAT WAY,
-  and the second half is the one nobody expects**: three unbuilt allies shrink
-  the DENOMINATOR, and they also feed the NUMERATOR for a support, because they
-  take more punishment and fights run longer. Measured on the Devout: enemy
-  damage/battle 207 -> 74 and rounds/battle 7.8 -> 5.4 once the other three are
-  built, and his releases fall 32.2 -> 11.1 with them. **THE LEVEL MOVES A LOT
-  AND THE LANE RANKING BARELY MOVES** (FAITH/ungeared is 4.4x one-hero and 5.0x
-  all-four), so a re-measure is only owed where a row was read as an absolute.
-  **BATCH BE BUILT THE ALL-FOUR LANE CONTROL SET FOR THE DEVOUT, which BC's grid
-  lacked — use it rather than re-deriving it** (n=200, same lineup, other three
-  on berserker Bloodletting + cryomancer Thaw + beastmaster devotion): **FAITH
-  33% | ZEAL 31% | BULWARK 14% | ungeared 11%**, against the one-hero 54/42/23/18.
-  **The FAITH cell is BF's re-measure (BE read 45 / 73 before its §2 condition);
-  ZEAL, BULWARK and ungeared are BE's and are byte-identical by construction —
-  a build without `dv_communion` makes no Communion draw at all.**
-  **STANDING NOTE — WHAT A CONTRIBUTION SHARE CAN AND CANNOT SEE. THE BLIND SPOT
-  BE §4 FOUND (Batch BE) IS CLOSED (Batch BF §1), AND WHAT CLOSED IT WAS TWO NEW
-  COLUMNS, NOT A NEW SHARE.**
-  **WHAT THE OLD COLUMN IS, AND IT IS NOW LABELLED AS SUCH: `d+h+p%` (it was
-  called `contrib%`, and at least one number in this project's history was read
-  the second way) = `(dmg + heal + prev) / pool`, pool built in `_stat` from
-  exactly three key prefixes — `dmg_hero_`, `heal_hero_`, `prev_hero_`. THAT
-  COLUMN DID NOT MOVE BY A POINT IN BF and must not: it is the control that makes
-  every pre-BF row comparable with every post-BF one.** The table prints a legend
-  under itself saying outright that it is not a share of the party's work.
-  **WHAT IS NEW: `BD%` (a hero's Break DEALT over the party's, off its own
-  `pool_bd_hero_` pool and its own `_b_bd_slice`) and `BDprev/b` (Break refused or
-  reduced), plus a `break_prevented_line` audit under the table naming which
-  effect refused what.**
-  **BREAK IS STILL NOT FOLDED INTO `d+h+p%` AND MUST NOT BE** — that needs an
-  exchange rate between a Break point and a hit point (one? a tenth?) that nobody
-  can defend, and inventing it buries a guess inside every measurement taken
-  afterwards. The two slices are SEPARATE DICTS for this reason: `_b_slice` is
-  summed wholesale into the d+h+p pool, so a Break key living in it would fold
-  Break in through nothing more than a `for` loop.
-  **BREAK PREVENTED NOW HAS ONE DOOR — `_prev_bd`, on BC's `_devout_prev` pattern
-  (per-hero total and named term written by the SAME call, so parts can never
-  disagree with the total). SIX REDUCERS BOOK THROUGH IT** via `unit.gd`'s
-  `_credit_bd` and the `bd_` term prefix that routes them: **Devoutness, Bulwark
-  of Fortitude, Hold the Line, Ward, Immovable, Bracing.** Before BF exactly ONE
-  of the six was booked anywhere. `faith_break_cut` survives as the Devoutness
-  term's alias so `faith_report_line` and BC's test read on.
-  **TWO DELIBERATE EXCLUSIONS, PINNED IN test_batch_bf SO THEY CANNOT BE QUIETLY
-  REVERSED: base Constitution** (a stat block is not a contribution — the same
-  rule that keeps base armor and resists out of `prev_hero_`; BRACING *is* booked,
-  because a stance a talent bought is exactly what the damage side counts) **and
-  the run modifiers `mod_bd_mult`/`mod_no_break`** (nobody in the party did that).
-  **TWO MORE ARE ADJACENT AND ARE NOT IN THE COLUMN: Rallying Shout removes 30-50
-  BANKED Break from each hero, and Battered Not Broken shrugs 30/rank off a
-  blocker's meter.** Those are Break *healing*, not Break refused — a different
-  question from "how much never landed" — so they are not booked; if a later batch
-  wants them it wants a new column, not this one. **Nothing else in the game
-  writes `pressure` downward except `revive` and `recover_from_break`, which are
-  structural.**
-  **WHY IT MATTERED, AND IT REACHED WELL PAST THE DEVOUT: BC's grid read
-  −Devoutness at 80% — a zero — and that zero was the instrument, not the node.**
-  The Warden's whole THREAT lane is Break (AL measured his BD/battle 104 -> 320
-  and the party's Breaks/battle 1.02 -> 2.35), the Occultist's Broken Will and
-  Entropy exist to grind a boss's meter, and BD gave a single deadfall 270 Break
-  points. **A BUILD THAT PAYS IN BREAK STILL READS LOW IN `d+h+p%` BY
-  CONSTRUCTION — read it in `BD%` and `BDprev/b`, and never call such a build weak
-  off the d+h+p column alone.**
-  `DOD_SIM_ABILITIES="Resurrection,Divine Plea"` appends pending
-  talent-gated abilities (Classes.pending_talent_ability; Holy only).
-  `DOD_ENEMIES_OFF=1` arms the enemy-skip debug toggle headlessly.
-  `DOD_DEBUG=1` adds map-burger debug items (gold/points/heal/
-  jump-to-boss/next-zone; the talent grant is +200) in an EXPORTED build;
-  `DOD_DEBUG=0` FORCES THE GATE SHUT in a dev build (Batch AC — the only
-  way a headless test can stand where an exported build stands).
-- GDScript gotchas that bit us: multiline lambdas in call args (use named
-  methods), ternaries need parens for type inference, `:=` can't infer from
-  untyped funcs, edits via python heredocs (apostrophes!) — use chr(39),
-  min()/max() are numeric-only (String args = runtime error mid-_init and
-  a headless --script run then idles forever — compare with < instead).
-- **EVERY data/*.json FILE IS TAB-INDENTED, so `json.dumps(..., indent=2)`
-  REWRITES THE WHOLE FILE** — a one-entry glossary edit came out as a 1,966-line
-  diff that buried the change and reset a shipped file's formatting convention.
-  Use `indent="\t"` and `ensure_ascii=False`, and ROUND-TRIP FIRST (dump the
-  unmodified parse and assert it equals the file byte for byte) before writing.
-  Caught at review, not by a test — nothing asserts a data file's whitespace.
-
+- **`test_batch_bl.gd` NEEDS `--fixed-fps 12`, AND IT IS NOT THE `sim.sh` FLAG** (which passes
+  240, for wall-clock speed). 12 makes each frame a big TIME step, because a real-play battle
+  paces itself with `create_timer` waits. **Any future suite that must run a REAL-PLAY battle to
+  completion wants the same trick.**
+- **RUNNING THE FULL BATTERY DESTROYS THE PLAYER'S IN-PROGRESS RUN.** Many suites spawn a live
+  battle, so `user://run_save.bin` is gone afterwards and per-suite backups buy nothing (a later
+  suite wipes it again). **Copy it aside before a battery run if the designer has a run going**,
+  and say so afterwards either way. The META layer (`profile.json`, `relics.json`) is safe.
+- **THE SIM IS `./sim.sh`.** `N` = N battles of the fixed raider/chief/archer/archer lineup (kit
+  smoke only — **its win% carries NO difficulty signal**); `--sweep N` = N battles at each budget
+  3/6/9/12; `--run N` = N complete runs with progression both sides, ending in the run report and
+  a per-invocation `Matrix row:` line. **Assemble Matrix rows across runs; never re-run one row
+  against another batch's flags.** Every flag is listed once, in the DEBUG SURFACES table below —
+  **that table is the reference; do not restate it here.**
+  · **TUNE AGAINST THE CURVE, NEVER ONE POINT.** The ~85% win-rate target describes TOP-BAND
+    (budget 10-12) encounters only, and attrition (deaths/battle) is the sensitive dial.
+  · **ALWAYS PRINT THE BUILD STRING BESIDE A RUN NUMBER.** `DOD_SIM_BUILDS` defaults to each
+    tree's FIRST lane, so a default-vs-named comparison is a two-hero difference, not a
+    four-hero one — a confound with a known sign.
+  · **NO SIM FIGURE MAY BE QUOTED ABOUT A CARD IN A NON-DEFAULT LANE, AND SEVERAL HAVE BEEN.**
+    `Talents.LANES` is 3 across twelve specs, so two thirds of the lanes have never appeared in
+    any measurement taken here. That is not a bug — a fixed default party is what makes arms
+    comparable — it is a permanent caveat, and the sim prints the unmeasured count beside
+    `builds=` so it arrives with the number.
+  · **A ROW IS ONLY COMPARABLE WITH ROWS TAKEN UNDER THE SAME STRUCTURE.** No pre-BK row is
+    comparable with a post-BK one (`map=branch`, 48 slots, three real route policies rather
+    than three samples of one), and **`DOD_SIM_DIFFICULTY` DEFAULTS TO RUNG 1 — an unset flag is
+    NOT the old baseline.** Set `warden` explicitly for a baseline row.
+  · **A LANE ROW IS ONE FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.** Those rows are
+    honest A/B comparisons of a spec's lanes against each other; they are NOT "how much of a
+    real party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE** — unbuilt allies
+    shrink the denominator and, for a support, feed the numerator. The lane RANKING barely
+    moves, so a re-measure is owed only where a row was read as an absolute.
+  · **`d+h+p%` IS NOT A SHARE OF THE PARTY'S WORK, AND BREAK IS NOT IN IT.** Break has its own
+    columns (`BD%`, `BDprev/b`) and **must not be folded in** — that needs an exchange rate
+    between a Break point and a hit point that nobody can defend, and inventing it buries a
+    guess inside every later measurement. **A BUILD THAT PAYS IN BREAK READS LOW IN `d+h+p%` BY
+    CONSTRUCTION** — read it in `BD%` and never call such a build weak off `d+h+p%` alone.
+  · **BREAK PREVENTED HAS ONE DOOR, `_prev_bd`** (per-hero total and named term written by the
+    same call, so parts can never disagree with the total). **Break HEALING is a different
+    question from Break refused** — Rallying Shout and Battered Not Broken remove BANKED Break
+    and are deliberately not booked; a batch that wants them wants a new column.
+  · **RunSim CALLS `Profile` NOWHERE** — a sim that read the player's ledger would make every
+    baseline depend on whoever ran it. `Run.sim_run = true` makes `save_run`/`clear_save`
+    no-ops, so a sim can never touch the real save.
+- **QUOTE THE RUN HARNESS AS "GATES 1/2/3", AND QUOTE THE COUNTS BESIDE THE VERDICT.** Its two
+  standing rules live in `_check` / `_check_range` / `_go`, so a gate added later inherits both
+  by doing nothing: **(1) A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165
+  checks)`, never a bare `GATE 2 PASS` — and **(2) A GATE THAT RUNS ZERO CHECKS MUST FAIL.**
+  **A COUNT OF ZERO FAILURES IS NOT EVIDENCE WHEN THE COUNT OF CHECKS IS ALSO ZERO**, and a
+  gate that printed a WORD outlived two that printed wrong numbers. **THE LIVE COUNTS ARE IN
+  `baselines.json`; treat a moved count as something to explain rather than a nuisance.**
+- **A COUNT THAT NOBODY DIFFS IS A WORD.** Printing a number is not enough — two suites printed
+  counts wrong by 125 and 2,434 checks and nobody saw it for twelve batches. **A count is only
+  visible at a glance if something is comparing it to what it should be**, which is what
+  `check_de` is for.
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
   save (user://run_save.bin v10, auto-saved after every slot), relic slots
@@ -2239,127 +1796,76 @@ third included, which used to BE the end boss — now pay a point, a relic and a
 open what follows them.
 
 ## STANDING REFERENCE — ENEMY INTENT: ONE DECLARED-ACTION STORE, THREE RE-VALIDATION BRANCHES (Batch BL §1)
-**DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted
-out of `_enemy_turn` **byte-for-byte** — §1 forbade an AI rewrite and that function is where the
-promise is kept, so a diff touching the rules inside it broke the promise. Only *when* it runs
-moved. Sites:
-· **Declaration**: `_declare_intent(u)` (writes `BattleUnit.intent` + the plate).
-  Called from **`_declare_all_intents()`** at battle start (in `_run_battle`, after the opening
-  oath/Faith hooks — they move state the policy reads) and from **the turn loop right after
-  `await _enemy_turn(u)`**, NOT from the bottom of `_enemy_turn`: that function has eight
-  returns and a declaration owed on all of them is a declaration owed by the caller. Also on
-  each lost-turn branch (stun/freeze/broken, after the discard) and in `_hold_release`.
-· **Re-validation** at resolution, `_revalidate_intent(u)`, in this fixed order — (1) **target
-  gone → re-target within the SAME ability** (`_istat("intent_retarget")`); (2) **ability
-  unusable → fall back to `_cheapest_attack` AND LOG IT** (`intent_fallback`; a silent
-  substitution is the intent system lying); (3) **cannot act → `_discard_intent`, DISCARDED NOT
-  BANKED** (`intent_discarded` + `intent_discard_<cause>`; stunned/frozen/broken/held).
-  **READ THE TARGET UNTYPED FIRST** — a declared beast can be `queue_free`d between declaration
-  and resolution, and a typed assignment of a freed instance errors BEFORE `is_instance_valid`
-  can run. Found in a live 50-run measurement; pinned in test_batch_bl.
-· **A FOURTH counter, deliberately not one of the three**: `intent_hijacked` — Hysteria,
-  Bewitch and Psychosis take the turn, so the unit ACTS but not as declared. Counted at the
-  moment each branch COMMITS (Psychosis is a coin-flip; clearing on the status alone would
-  throw away declarations on the half of turns the madness does not take).
-· **THE `charging` STATUS IS THE SAME MECHANISM, NOT A SECOND ONE.** The wind-up stores its
-  blow in `intent` like everything else; the status survives only as the chip and the cancel
-  hook. **Nothing reads an ability name off the status any more** (asserted). `_declare_intent`
-  returns early on `has_status("charging")` — that ONE line is why a charging enemy declares
-  once, not twice. `_cancel_charge` routes through `_discard_intent`, so a cancelled wind-up
-  counts as exactly one discard. **A later batch wanting a multi-turn declaration sets
-  `intent.turns` and adds a chip. IT DOES NOT ADD A SECOND STORE.**
+**DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted out
+of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff touching the rules
+inside it breaks that promise.
+· **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
+  (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
+  **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which has
+  eight returns, and a declaration owed on all of them is a declaration owed by the caller — on
+  each lost-turn branch after the discard, and in `_hold_release`.
+· **Re-validation** at resolution, `_revalidate_intent(u)`, in this fixed order: (1) target gone
+  → **re-target within the SAME ability**; (2) ability unusable → fall back to `_cheapest_attack`
+  **AND LOG IT** (a silent substitution is the intent system lying); (3) cannot act →
+  `_discard_intent`, **DISCARDED NOT BANKED**. **READ THE TARGET UNTYPED FIRST** — a declared
+  companion can be `queue_free`d between declaration and resolution, and a typed assignment of a
+  freed instance errors BEFORE `is_instance_valid` can run.
+· **A FOURTH counter, deliberately not one of the three**: `intent_hijacked` — Hysteria, Bewitch
+  and Psychosis take the turn, so the unit ACTS but not as declared. Counted at the moment each
+  branch COMMITS, never on the status alone.
+· **THE `charging` STATUS IS THE SAME MECHANISM, NOT A SECOND ONE.** The wind-up stores its blow
+  in `intent` like everything else. `_declare_intent` returns early on `has_status("charging")` —
+  that ONE line is why a charging enemy declares once, not twice. **A later batch wanting a
+  multi-turn declaration sets `intent.turns` and adds a chip. IT DOES NOT ADD A SECOND STORE.**
 · **Counters go through `_istat`, NOT `_stat`** — unconditional, not sim-gated, because the
-  re-validation rates are a property of the MECHANISM and must be observable in real play or
-  "a stun really discards" is only checkable by trusting the code that does it. In sim they
-  land in the same `sim_stats` dict, so there is still exactly one counter.
-  `intent_report_line(stats)` is a static and prints in BOTH reports.
+  re-validation rates are a property of the MECHANISM and must be observable in real play.
 · **Categories are DATA-DRIVEN** (`_intent_category`): windup → mend → ally-target → aoe →
-  `pressure > damage` → applies_status-and-not-this-unit's-hardest-hit → strike. Order IS the
-  classification. An enemy added to enemies.json classifies itself; there is no name table.
-**NO PREDICTED NUMBER SHIPPED, AND THIS IS THE FINDING RATHER THAN AN OMISSION.** §1 required
-the number come from the same call the real hit makes, run dry, and named the escape hatch. The
-strike block is `battle.gd` ~4990-5670 (~680 lines) and fails on two counts, either fatal
-alone: (a) it mutates on the way through — `crit_streak`, resource restores, `float_text`, and
-writes to THREE ledgers (`_prev`, `_devout_prev`, `_stat`); (b) its FIRST line is
-`randf_range(0.9, 1.1)` and a crit rolls inside it, so **the same call with identical inputs
-returns a different number**, and §4's "predicted equals dealt" could not hold even after a
-perfect extraction. Icon + the ABILITY'S OWN NAME is shown instead — read off the declaration,
-so it cannot drift. **The negative control changed shape to match**: test_batch_bl greps the
-intent block for `attacker.attack` / `effective_armor` / `randf_range` / `resists.get` and
-fails if a later batch adds a preview by reimplementing the maths.
-**TWO THINGS §1 DELIBERATELY DID NOT BUILD — NOT BUILT, NOT MISSED:**
-· **HIDDEN INTENT** (an enemy whose intent is concealed, making information a resource the
-  player fights for). A good mechanic and a DIFFERENT one; author it once the baseline is
-  legible. Flagged, not built.
-**MEASURED AT BL (150 runs, 50 per policy, 50,799 declarations) — the baseline a later batch
-compares against.** Re-targeted **3.2 / 3.5 / 5.9%** (greedy/balanced/cautious); **fell back to
-basic 0.0% in all three** (the number §1 said to watch — the declaration is NOT happening too
-early); discarded **16.1 / 15.1 / 11.2%**, and it is **almost all the Cryomancer's hold** (3014
-/ 2598 / 1365) with Break the remainder (103 / 94 / 162) and **zero plain stun or freeze** —
-in this party his freeze always becomes a hold. **ONE IN SIX DECLARED ENEMY ACTIONS NEVER
-HAPPENS.** `intent_hijacked` reads **0.0% and that is a MEASUREMENT HOLE, NOT A RESULT**: the
-standard test party carries no Occultist, so no madness status was ever applied — the counter
-is asserted in the suite but has never run at scale. **Completions 52 / 46 / 20% against BK's
-39.3 / 43.3 / 21.3.** All three inside their 95% bands, **but greedy is +12.7 pts and near the
-edge of its own, so it is a signal rather than noise.** The bot cannot benefit from SEEING an
-intent, so if it is real the mechanism must be the one behavioural shift below — an enemy that
-declared before a Break window opened does not take it. **NOTHING WAS TUNED**; BK's baselines
-are two batches old and correcting inside the batch that moves them is the Devout mistake.
-· **AN AI REWRITE.** Selection logic is untouched. **What DID change is that state-sensitive
-  policies now read the board ONE TURN EARLIER** — reported, corrected nowhere: the whole of
-  `_enemy_support_action` (Healing Wave <40%, Regenerate <50%, Cleansing Rite, Shielding, Wild
-  Growth <70%, Dark Vigil), the **Broken-hero exploit** (the most sensitive of all — a Break
-  window is short and a declaration made before it opens will not take it), `_lowest_hp` /
-  `_threat_pick`, the taunt narrowing, and the Savage Presence / Ghillie Suit rolls.
+  `pressure > damage` → applies-status-and-not-this-unit's-hardest-hit → strike. **Order IS the
+  classification**, so an enemy added to `enemies.json` classifies itself and there is no name
+  table.
+**NO PREDICTED DAMAGE NUMBER MAY SHIP, AND THAT IS A FINDING RATHER THAN AN OMISSION.** The strike
+block fails on two counts, either fatal alone: it MUTATES on the way through (`crit_streak`,
+resource restores, `float_text`, three ledgers), and its FIRST line is `randf_range(0.9, 1.1)`
+with a crit rolling inside it — **the same call with identical inputs returns a different
+number.** Icon plus the ability's own name is shown instead, read off the declaration so it cannot
+drift. **`test_batch_bl` greps the intent block for `attacker.attack` / `effective_armor` /
+`randf_range` / `resists.get` and fails if a later batch adds a preview by reimplementing the
+maths.**
+· **HIDDEN INTENT IS FLAGGED, NOT BUILT** — a good mechanic and a DIFFERENT one; author it once
+  the baseline is legible.
+· **STATE-SENSITIVE POLICIES NOW READ THE BOARD ONE TURN EARLIER**, reported and corrected
+  nowhere: `_enemy_support_action`'s thresholds, the Broken-hero exploit (the most sensitive — a
+  Break window is short and a declaration made before it opens will not take it), `_lowest_hp` /
+  `_threat_pick`, the taunt narrowing and the presence rolls. **Selection logic itself is
+  untouched; an AI rewrite is out of scope.**
 
 ## STANDING REFERENCE — THE RECAP LEDGERS AND THEIR BOUND (Batch BL §2)
-**DAMAGE TAKEN WAS TRACKED NOWHERE BEFORE BL** — `_stat` knew `dmg_hero_` / `heal_hero_` /
-`prev_hero_` / `bd_hero_` / `st_hero_` and nothing taken. It now hangs off ONE door:
-**`BattleUnit.damage_taken_cb`**, fired by `_report_taken` from the only two places health
-leaves a unit (`take_hit`, `take_tick_damage`). It reports the **DELTA, not the argument** (a
-52 into a hero on 40 is 40 taken, or the column would disagree with the health bar) and sits
-**BELOW ALL FOUR DEATH-REFUSALS** — Hold the Line, Undying Rage, Ashes of Al'ar,
-Intercession/Martyrdom. Above them it would count health handed straight back AND file a
-refused death as a killing blow. A future damage source cannot forget to report: it cannot
-remove health without one of those two functions.
-· **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry**
-  — one site covering the strike, its splash, echoes, the reflect/retaliation it draws and the
-  recoil/Blood Price it costs — **re-established after each of the TEN nested `await _resolve`
-  calls** (a counter leaves the frame pointing at itself) and set explicitly at the two damage
-  sites outside `_resolve`: the **DoT tick loop** (from the status's `src_name`, which
-  `_apply_status` already stamps — the applier may be dead). **THE THIRD SITE WAS THE
-  OVERBURN/CAUTERISE DRAIN AND BATCH BS DELETED IT WITH THE DRAIN.** **SELF-INFLICTED IS DECIDED BY IDENTITY** (`victim == _dmg_src`), which covers Blood
-  Price, Dark Pact and recoil in one rule and cannot go stale
-  the way a name list would.
-· **BY KIND, NEVER BY INSTANCE** — `_taken_source` reads the new `BattleUnit.enemy_kind`
-  (stamped in `_enemy_config` AFTER the "boss" alias resolves, so a boss books as what it is).
-  `unit_name` happens to agree today; keying on that agreement would make the aggregation an
-  accident the first uniquely-named enemy breaks. Negative control renames two same-kind
-  instances and asserts one row.
-· **New tally keys** (`Run.tally`): `dealt` hero→ability→amount, `taken`
-  hero→"`<kind> / <ability>`"→amount, `taken_total` hero→amount (**exact, never folded**),
-  `kills` (list), `final` (a whole copy of the other four, **overwritten every battle — so at
-  run end it IS the final battle** and nothing has to know which fight that was).
-  Writers `tally_dealt` / `tally_taken` / `tally_kill` / `tally_bank_final`, all through the
-  ONE bounded writer `_tally_book`.
-· **THE BOUND: `TALLY_KEYS_PER_HERO = 24` rows per hero per map, INCLUDING the `(other)` row**
-  (so "at most 24", not "24 plus one"); `TALLY_KILLS_MAX = 12`, oldest kept. Overflow FOLDS
-  into `(other)` rather than being dropped — the total stays exact and only the breakdown gets
-  coarser, which is the right way round when the panel reports a top 5.
-· **Banked by `_bank_run_ledgers()`**, called from `_check_end`'s run branch AND from
-  `_do_forfeit` (a forfeit never reaches `_check_end`, and the abandoned fight is exactly what
-  the tester wants explained). **Idempotent** — it clears the slices as it banks.
-· **SAVE VERSION 8 → 9, TOLERANT** (unlike BK's v8 refusal): these are counters, not structure,
-  so a v8 save loads and seeds the new keys at zero mid-run. A recap that starts counting
-  halfway beats a wiped run.
-· **BL DROPPED A `sim and` GUARD IN THE DoT TICK LOOP and it was a real hole, not a tidy-up**:
-  in REAL PLAY a Pyromancer's Burn and a Survivalist's Poison reached neither the run summary's
-  damage share nor anything else. **Sim totals are untouched** — that path already counted the
-  ticks — so **no baseline moves**.
+**DAMAGE TAKEN HANGS OFF ONE DOOR: `BattleUnit.damage_taken_cb`**, fired by `_report_taken` from
+the only two places health leaves a unit (`take_hit`, `take_tick_damage`). It reports the **DELTA,
+not the argument** (a 52 into a hero on 40 is 40 taken, or the column disagrees with the health
+bar) and sits **BELOW ALL FOUR DEATH-REFUSALS** — above them it would count health handed straight
+back AND file a refused death as a killing blow. **A future damage source cannot forget to report:
+it cannot remove health without one of those two functions.**
+· **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry** —
+  one site covering the strike, its splash, echoes, the reflect/retaliation it draws and the
+  recoil it costs — **re-established after each nested `await _resolve`** (a counter leaves the
+  frame pointing at itself) and set explicitly at the DoT tick loop, from the status's `src_name`,
+  because the applier may be dead. **SELF-INFLICTED IS DECIDED BY IDENTITY** (`victim ==
+  _dmg_src`), which covers Blood Price, Dark Pact and recoil in one rule and cannot go stale the
+  way a name list would.
+· **BY KIND, NEVER BY INSTANCE** — `_taken_source` reads `BattleUnit.enemy_kind`, stamped AFTER
+  the "boss" alias resolves. `unit_name` happens to agree today; keying on that agreement would
+  make the aggregation an accident the first uniquely-named enemy breaks.
+· **THE BOUND: `TALLY_KEYS_PER_HERO = 24` rows per hero per map, INCLUDING the `(other)` row**;
+  `TALLY_KILLS_MAX = 12`, oldest kept. **Overflow FOLDS into `(other)` rather than being
+  dropped** — the total stays exact and only the breakdown gets coarser, which is the right way
+  round when the panel reports a top five.
+· **Banked by `_bank_run_ledgers()`**, from `_check_end`'s run branch AND from `_do_forfeit` (a
+  forfeit never reaches `_check_end`, and the abandoned fight is exactly what the tester wants
+  explained). **Idempotent** — it clears the slices as it banks.
 · Renderer `_append_breakdown(...)` is written ONCE and called TWICE (whole run, final battle);
   everything goes into the SAME line list `_summary_plain_text` walks, so the Copy button stays
   complete. **Not a defeat-only screen** — wipes, forfeits and completions all get it.
-
 ## STANDING RULE — FIFTEEN POINTS UNDER LEAVE-ONE-OUT IS WHAT MAKES A LANE A LANE (Batch BH §2)
 **If withholding any single node moves a lane's headline contribution by more than about fifteen
 points, that lane is not a set of choices — it is ONE choice with several prices, and no amount
@@ -2541,52 +2047,39 @@ cards drafted with no damage figure at all.
 > draft, runes sharpen them.
 > **A talent modifying the spec's PROTECTED CORE is guaranteed and permitted.**
 
-**THE LAST SENTENCE IS THE RULING, AND IT IS WORTH 83 NODES.** The charter as first written said
-two different things: one clause permitted a node to be general in two ways only — *a STAT, or the
-spec's OWN resource and passive* — and another said *a node modifying a CORE KIT ability is
-guaranteed*. Under the first reading the trees were 235 of 324 clean; under the second, 318.
-**THE SECOND READING STANDS: the hero owns its core kit in EVERY run, so modifying it is not a
-bet.** The looser sentence is corrected wherever it was written down so it cannot be quoted back.
+**THE LAST SENTENCE IS THE RULING AND IT IS WORTH 83 NODES.** The charter as first written said two
+different things — one clause permitting a node to be general only as a STAT or the spec's own
+resource and passive, another saying a node modifying a CORE KIT ability is guaranteed. **THE
+SECOND READING STANDS: the hero owns its core kit in EVERY run, so modifying it is not a bet.**
 **DO NOT RE-OPEN THIS AS AN OPEN QUESTION** — `docs/talent-audit.html` §8 records it as settled.
 
 · **WHAT IS PERMITTED, IN FULL:** a STAT; the spec's own PASSIVE; the spec's own RESOURCE; the
   spec's PROTECTED CORE (`Classes.protected_names` plus `core_enablers`); and **another node in
   the same tree** — a cross-row conditional bets on a node the player CHOOSES, not on a card they
-  are DEALT, so the seventeen tree-internal dependencies are not the defect and all of them stay.
+  are DEALT.
 · **WHAT IS FORBIDDEN:** granting an ability at all, and naming any ability from a draft pool, a
-  spec pool (the zone-boss trophy), a class pool or another spec — **including as a bonus clause
-  on a node that works without it.** A bonus clause on a drawn card is still a bet; §2's four
-  rewords cut exactly that shape.
-· **RUNES MAY STILL GRANT, AND FOUR DO** — Comet (a `new_ability`), Binding Souls, the Last Rites
-  and the Flayed Mind (`grant_ability`). A rune is BOUGHT with knowledge of the run in front of
-  you, which is the whole distinction. **`Talents.apply_payload`'s two grant branches and
-  `_collided` are therefore NOT dead and must not be deleted** even though no talent reaches them.
+  spec pool or another spec — **including as a bonus clause on a node that works without it.** A
+  bonus clause on a drawn card is still a bet.
+· **RUNES MAY STILL GRANT.** A rune is BOUGHT with knowledge of the run in front of you, which is
+  the whole distinction. **`Talents.apply_payload`'s two grant branches and `_collided` are
+  therefore NOT dead and must not be deleted** even though no talent reaches them.
 · **CUTTING A CLAUSE MEANS CUTTING ITS PAYLOAD TERM.** A node whose text loses a clause while its
-  code keeps paying it is the defect this project has found five times. DO cut three terms with
-  three clauses (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`), field and read
-  site together, and `check_do` §3 asserts all three are absent from the whole of `scripts/`.
+  code keeps paying it is the defect this project has found five times — cut the field and the
+  read site together, and assert the field absent from the whole of `scripts/`.
 · **A RE-AUTHORED CELL KEEPS ITS ID, ITS LANE AND ITS ROW.** `Talents.cells_spent` prices each
-  owned cell off the row it CURRENTLY sits in, so a node that MOVES row mis-prices a saved
-  allocation — DN measured a full Berserker ledger at **−2 available points**, with nothing to
-  refuse it, clamp it or log it. **Nothing in DO moved a cell, so no save migration was needed
-  and `Profile` is still v2.** `check_do` §3 asserts the twenty-five re-authored cells are all in
-  their original lane and row.
-· **THE GATE ASSERTS THE PROPERTY AND PRINTS THE COUNT, NEVER THE REVERSE.** DN's own gate
-  asserted a NUMBER and its first battery caught it, costing a second thirty-five-minute frozen
-  run. `check_do` §1 asserts *no node grants* and *no node names an ability outside its protected
-  core*, and prints 324 / 0 / 98 / 1 / 0 beside them.
+  owned cell off the row it CURRENTLY sits in, so **a node that MOVES row mis-prices a saved
+  allocation** — measured at a full ledger of −2 available points, with nothing to refuse it, clamp
+  it or log it. Moving a cell owes a save migration; not moving one owes nothing.
+· **THE GATE ASSERTS THE PROPERTY AND PRINTS THE COUNT, NEVER THE REVERSE.** A gate that asserted
+  a NUMBER here cost a second thirty-five-minute frozen run on its own first battery.
 · **NAME A RE-AUTHORED NODE SO IT CANNOT BE CONFUSED WITH THE CARD IT REPLACED.** A talent tree is
-  a namespace and the matcher resolves same-tree names first — but a node NAMED "Overcharge" beside
-  a draft card called Overcharge is the `wd_spiked`/Spite trap DN documented, in a new place. The
-  Arcanist's row-4 Resonance cell is **Overdraw** for that reason. Five nodes were already named
-  after live abilities before DO (Second Wind, Spite, Rally, Killing Frost, Divine Presence);
+  a namespace and the matcher resolves same-tree names first — but a node named after a live draft
+  card is a trap in a new place. Five nodes were already named after live abilities before DO and
   **DO added no sixth.**
 · **WHAT THE MOVE COSTS, RECORDED RATHER THAN HIDDEN: nine abilities lost their upgraded
   variant.** An `upgrade` arm fires only where a node's grant COLLIDES with an earned copy, and no
-  node grants — so `battle_shout_node`, `lunge_upgraded`, `execute_upgraded`, `hold_line_upgraded`,
-  `rampage_upgraded`, `overcharge_extra`, `intercession_long`, `resolve_extra_turns` and
-  `bulwark_extra_turns` are read-only-zero now. **The fields and their read sites are LEFT
-  STANDING** — each reads a base beside it, deleting a branch is deleting a mechanic, and two are
+  node grants — so those fields are read-only-zero now. **The fields and their read sites are LEFT
+  STANDING**: each reads a base beside it, deleting a branch is deleting a mechanic, and two are
   already in `runes.gd`'s coercion list against the day a rune writes them.
 
 ### THE STATUS HALF, ADDED AT DP — AND IT IS THE SAME RULE, NOT A SECOND ONE
@@ -2595,225 +2088,114 @@ bet.** The looser sentence is corrected wherever it was written down so it canno
 > The ability rule and the status rule are the same rule — `sm_precision` named no ability and
 > was still a bet, and the ability-matching instrument could not see it.
 
-**THIS COST WAS DO's OWN AND IT WAS REPORTED RATHER THAN HIDDEN.** Mind Flay and Mass Hysteria are
-the only appliers of Psychosis and Hysteria in the game, and DO moved both into the draft — so four
-Occultist Madness cells (`oc_spread`, `oc_whispers`, `oc_delirium`, `oc_permanent`) read a status
-he can no longer guarantee. **Before DO those dependencies were TREE-INTERNAL, which the charter
-explicitly permits.** A ruling can create a defect without anyone making a mistake.
+**A RULING CAN CREATE A DEFECT WITHOUT ANYONE MAKING A MISTAKE.** Moving the only two appliers of a
+status into the draft turned four tree-internal dependencies — which the charter explicitly permits
+— into bets, in the same batch that wrote the charter.
 
 · **AN INSTRUMENT THAT MATCHES ABILITY NAMES CANNOT SEE THIS CLASS OF BET AT ALL.** A node can
-  name no ability whatsoever and still bet on the draw, because a STATUS has appliers and a node
-  reads the status rather than the card. `check_dp` §1 sweeps every node's rendered text against
-  every status form and asserts the PROPERTY.
-· **THE RATCHET IS ASYMMETRIC, FOR `baselines.json`'s REASON ONE LAYER UP.** A pair NOT in
-  `check_dp.KNOWN_PAIRS` is an **error** — it is a new bet. A known pair that has GONE is a
-  **notice** — that is a repair, and a gate that reds on a repair teaches the next batch to leave
-  the defect alone.
-· **FOUR OF THE SIX TOLERATED PAIRS ARE INSTRUMENT ARTEFACTS, NOT BETS, AND EACH SAYS WHICH.**
-  The sweep matches a rendered WORD, so it cannot tell a node READING a status from one APPLYING
-  it (`sv_virulence` and `ss_exposed_nerve` both apply the Exposed they then read), nor an enemy's
-  debuff landing on the HERO from a hero's landing on an enemy (`ss_no_cover` is an IMMUNITY).
-  **Only `sm_guarded` is a real bet, and it is a bonus clause gated on a tree-internal node with
-  an unconditional base clause — the node cannot go dead.**
-· **RE-POINTING A LANE ONTO ONE QUANTITY FLATTENS IT.** Madness was authored as a theme, and four
-  cells all reading "stacks of Ruin" would be one idea repeated four times. The four read four
-  DIFFERENT quantities — an application, an application's magnitude, an event, and a depth
-  threshold — and **none reads a detonation**, because Grim Focus, Unraveling and Avatar of Ruin
-  already own that event. `check_dp` §2 asserts the four are distinct.
-· **BEFORE RE-POINTING A NODE OFF A FIELD, CHECK WHETHER A RUNE WRITES IT.** The Rune of the
-  Whispering Dark writes `spread_ranks` AND `spread_ruin`; a fresh field name would have left two
-  of that rune's four clauses paying nothing, in silence — the exact dud the rune schema exists to
-  prevent. **Both fields were KEPT and their meaning re-pointed instead**, which cost one line of
-  card text. `check_dp` §4 now asserts the general property: **every stat field any rune writes
-  has a live read site in `scripts/`** (116 fields, 0 dead).
-· **A CONSTANT QUOTED AT MORE THAN ONE SITE MOVES IN A FUNCTION, NEVER AT THE SITES.**
-  `OLD_GODS_MARK` is the passive's mark and was quoted at five call sites; Whispers moves it, so
-  the five call `_old_gods_mark()` now — `_ruin_threshold()`'s shape exactly, which Avatar of Ruin
-  has used since AX. **The base stays the one authored copy**, and `check_dp` §3 asserts no
-  `_gain_ruin` call quotes it directly, so a sixth site cannot be added that the node silently
-  fails to reach.
-· **A CONTAGION THAT MARKS THROUGH THE FUNCTION THAT MARKS IT NEEDS A RE-ENTRY GUARD.** Covenant
-  of Ash breaks its recursion BY IDENTITY (the ash always lands on one known bearer, so
-  `mirror == target` stops it); a contagion lands on a RANDOM enemy and has no such property.
-  `_ruin_spreading` is the equivalent, and it is bounded rather than absolute — a covenant mirror
-  can still roll its own contagion, so the ceiling is two rolls per originating mark.
+  name no ability whatsoever and still bet on the draw, because a STATUS has appliers and the node
+  reads the status rather than the card. Sweep every node's rendered text against every status
+  form and assert the PROPERTY.
+· **THE RATCHET IS ASYMMETRIC.** A pair NOT in `check_dp.KNOWN_PAIRS` is an **error** — it is a
+  new bet. A known pair that has GONE is a **notice** — that is a repair, and **a gate that reds on
+  a repair teaches the next batch to leave the defect alone.**
+· **A TEXT SWEEP CANNOT TELL A NODE READING A STATUS FROM ONE APPLYING IT**, nor an enemy's debuff
+  landing on the HERO from a hero's landing on an enemy. **Every tolerated pair carries which of
+  those it is**, so the next batch reads why rather than re-deriving it.
+· **RE-POINTING A LANE ONTO ONE QUANTITY FLATTENS IT.** Four cells all reading one number are one
+  idea repeated four times; re-point them onto four DIFFERENT quantities and assert the four are
+  distinct.
+· **BEFORE RE-POINTING A NODE OFF A FIELD, CHECK WHETHER A RUNE WRITES IT.** A fresh field name
+  leaves that rune's clauses paying nothing, in silence — the exact dud the rune schema exists to
+  prevent. **Keep the field and re-point its MEANING.** `check_dp` §4 asserts the general property:
+  **every stat field any rune writes has a live read site in `scripts/`.**
+· **A CONSTANT QUOTED AT MORE THAN ONE SITE MOVES IN A FUNCTION, NEVER AT THE SITES**, and a gate
+  asserts no caller quotes it directly, so a new site cannot be added that a node silently fails to
+  reach.
+· **A CONTAGION THAT MARKS THROUGH THE FUNCTION THAT MARKS IT NEEDS A RE-ENTRY GUARD.** An effect
+  that always lands on one known bearer breaks its own recursion BY IDENTITY; one that lands on a
+  RANDOM target has no such property and needs an explicit bound.
 · **A RUNE GRANT RESOLVES THROUGH `Classes.pending_talent_ability`, NOT THROUGH THE DRAFT
-  RESOLVER.** DO moved twenty-two card NAMES into `SPEC_DRAFT_POOLS` while the six `grant_ability`
-  DEFINITIONS stayed where they were, which is the only reason four granting runes still work.
-  **Had a definition moved with its name, its rune would grant nothing, silently.** `check_dp` §5
-  asserts every rune grant still resolves.
-· **TWO RUNES NOW DUPLICATE A DRAFT CARD'S GRANT, AND THAT IS NOT A DEAD RUNE.** Binding Souls
-  grants Sacred Resolve and Flayed Mind grants Mind Flay; both cards are in their spec's draft
-  pool since DO. Holding both COLLIDES: `_collided` finds no authored `upgrade` arm and no
-  `no_fallback`, so the rune owes its generic and `Run.apply_upgrades` — which runs last — turns
-  it into an upgrade on the very card it would have granted (**Honed** and **Quickened**
-  respectively). That is the Rune of the Last Rites' shipped behaviour since AV, now reachable by
-  two more. **Both descs still open "Grants …", which is wrong whenever the card was drafted** —
-  the Last Rites is the one that says so honestly, and the other two are owed a sentence.
+  RESOLVER.** Moving a card NAME into a draft pool while its `grant_ability` DEFINITION stays put
+  is the only reason granting runes still work — **had a definition moved with its name, its rune
+  would grant nothing, silently.** Assert every rune grant still resolves.
+· **A RUNE THAT DUPLICATES A DRAFT CARD'S GRANT IS NOT A DEAD RUNE.** Holding both collides,
+  `_collided` finds no authored `upgrade` arm, so the rune owes its generic and `Run.apply_upgrades`
+  turns it into an upgrade on the very card it would have granted. **A "Grants …" desc is wrong
+  whenever the card was drafted**, and the honest wording already exists on one of them.
+
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
-**AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO (Batch BX §2), on ONE SCREEN of four columns,
-each hero drawing from their OWN pools and keeping their OWN no-return ledger.** BO offered to
-one hero drawn at random; that is history. Everything else in this block is BO's and still
-current.
+**AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, on ONE SCREEN of four columns, each hero drawing
+from their OWN pools and keeping their OWN no-return ledger.**
+
 **A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
 `Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites, merchants and events offer;
-`SPEC_POOLS` is still what a ZONE BOSS offers and it is byte-untouched. Sharing one pool would
-have re-weighted every boss offer in the game the moment eighteen entries landed, which is what
-"the existing pick, unchanged" forbids. **A drafted ability lands in `member["bm_abilities"]`,
-the SAME list a boss pick writes**, so the battle spawn, the hero sheet, `Talents.ability_names`,
-the rune eligibility filter and the upgrade pairing all pick it up with no new plumbing —
-**NO SAVE VERSION MOVES (still v10)**; the new member keys (`draft_candidates`,
-`draft_picks_owed`, `draft_refused`) ride the party dict, which is saved wholesale.
-· **THE CAP IS 7 (`Run.ABILITY_SLOT_CAP`) AND IT BINDS EVERY SOURCE**, the boss pick included.
-  §3 leaves the boss OFFER unchanged, but a cap that one pool can walk past is not a cap: a
-  Beastmaster's five spec-pool entries alone reach eight. `Run.ability_slots_used` =
-  `Classes.core_slots(spec)` + earned.size().
-· **PROTECTED = THE OPENING KIT. EARNED = DROPPABLE.** `Run.drop_earned_ability` is THE ONE
-  PLACE a drop is written and it refuses anything not in `bm_abilities` — so "a protected
-  ability can never be dropped" is not a branch that could be got wrong, it is the absence of
-  the name from the list. Both pick paths call it.
+`SPEC_POOLS` is what a ZONE BOSS offers. **Sharing one pool would re-weight every boss offer in
+the game**, which is what "the existing pick, unchanged" forbids. **A drafted ability lands in
+`member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero sheet,
+`Talents.ability_names`, the rune filter and the upgrade pairing all pick it up with no new
+plumbing — **NO SAVE VERSION MOVES**; the member keys (`draft_candidates`, `draft_picks_owed`,
+`draft_refused`) ride the party dict, which is saved wholesale. **A drafted card removes itself
+from the boss offer and vice versa; that one shared list is what lets a boss pool empty below its
+own depth.**
+· **THE CAP IS SEVEN (`Run.ABILITY_SLOT_CAP`) AND IT BINDS EVERY SOURCE**, the boss pick included:
+  a cap one pool can walk past is not a cap. `Run.ability_slots_used` = `Classes.core_slots(spec)`
+  + earned.
+· **PROTECTED = THE OPENING KIT. EARNED = DROPPABLE.** `Run.drop_earned_ability` is THE ONE PLACE
+  a drop is written and it refuses anything not in `bm_abilities` — so "a protected ability can
+  never be dropped" is not a branch that could be got wrong, it is the absence of the name from
+  the list. Both pick paths call it.
 · **DECLINING REFUSES THE WHOLE OFFER; TAKING ONE REFUSES NOTHING.** `draft_refused` is the
   no-return ledger, per hero per run. A DROP writes it too.
-· **THE OFFER FILLS SHORT rather than padding with repeats** (AP §3's rule, unchanged), and
-  `Run.draft_card_is_class` is the one-in-four seam — **its own function precisely so a test
-  can drive it 4000 times while both class pools are still empty.** A check on the roller could
-  only ever measure zero today, and a check that can only pass is a gap (BK's zero-blacksmith
-  lesson).
-· **THE UI IS THE EXISTING OVERLAY, NOT A SECOND ONE.** `map_screen._open_pick_overlay` gained
-  a "draft" kind and a `pending` argument; the drop step is the same overlay redrawn.
-**THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE
-THING A LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and
-test_batch_bo asserts every named enabler is in that spec's opening kit and in NO pool. The
-failure it prevents is SILENT: a spine that stops working because its enabler became draftable.
-`slots` | spec | what the passive cannot function without:
-· 3 **Berserker** — nothing (Blood Frenzy reads his own health bar).
-· 3 **Warden** — nothing (Heavy Plating is a Block rule, it reads no ability).
-· 3 **Swordmaster** — **Guard Change**. AK called it "the only stance swap in the game" and
-  **BATCH BP MADE THAT FALSE** (Precision Strike and Feint both switch). It is still the
-  enabler for a sharper reason: it is his only UNCONDITIONAL swap — the other two are
-  drafted, cost Rage and carry cooldowns.
-· 3 **Pyromancer** — **Fireball, Detonation** (Overburn needs an applier AND a spender).
-· 3 **Cryomancer** — **Frostbolt, Ice Lance** (a Chilled applier, and a release).
-· 3 **Arcanist** — **Arcane Explosion** (the free cast that guarantees a build every turn).
-· 4 **Holy** — **Heal, Hymn of Hope** (Mercy must be spendable; Empower needs a heal).
-· 3 **Devout** — **Divine Shield, Consecrated Ground** (the only Faith trigger, and the drip BI
-  measured at 66% of all Faith).
-· 3 **Occultist** — **Shadowrend, Hex of Ruin** (the debuffs the passive marks off).
-· 3 **Beastmaster** — **all three summons**. **FIVE ABILITIES IN THREE SLOTS** — the summon
-  picker has been ONE bar entry since AH, and counting three would take a spec to two draftable
-  picks for a bookkeeping reason.
-· 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
-· 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**BATCH DY EMPTIED THE VAULT. THE DRAFT STANDS AT 154 OF 154 AND NOTHING IS OWED — 129 SPEC +
-25 CLASS-WIDE.** Five finished abilities that no run could reach were re-homed into live pools —
-**Rallying Shout** to the Warden (9 → 10), **Arcane Surge** and **Reality Fracture** to the
-Arcanist (10 → 12), **Divine Wrath** to the Devout (10 → 11) and **Mana Shield** to the MAGE class
-pool (6 → 7) — and two more, **Dawnbreak** and **Sanctuary**, to the Holy Cleric's ZONE-BOSS pool.
-**NOT ONE CARD WAS AUTHORED**: all seven came out of `Classes.vault_ability()` with their handlers,
-their card text and their Perfects already live. **THE CLASS HALF IS NO LONGER A FLAT MULTIPLE
-EITHER**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
-`SPEC_TARGET` has been since DO — **do not write `4 * 6` again.** **THE SHALLOWEST SPEC POOL IN THE
-GAME IS TEN NOW**; the floor stays at EIGHT because it catches a pool that EMPTIES.
-**BATCH DS CLOSED THE HUNTER CLASS GAP AND TOOK IT TO 149 OF 149 — 125 SPEC + 24 CLASS-WIDE.** Its three specs held the three SHALLOWEST pools in the game (eight
-apiece), received NONE of DO's twenty-two, and **not one of their twenty-four cards was a heal, a
-shield or hero-side mitigation.** All three read TEN now, matching the Cleric class, and each
-spec's defence is shaped by its own engine — the companion for the Beastmaster, the Focus meter
-for the Sharpshooter, the affliction board for the Survivalist. **THE FLOOR STAYS AT EIGHT AND IS
-NOW SLACK EVERYWHERE**, and `SPEC_FLOOR` catches a pool that EMPTIES rather than tracking the
-deepening. (The Warden's nine was the shallowest pool in the game from DS to DY; it is ten now.)
-**BATCH DR MOVED THE TOTAL TWICE IN ONE BATCH AND THE NET WAS +1, TO 143 OF 143.** §2 retired one
-Cryomancer card as an exact duplicate at a worse price (12 → 11) and §4 gave the Swordmaster
-two (10 → 12).
-**BATCH DO MOVED IT BEFORE THAT, FOR THE FIRST TIME SINCE CI, AND IT WAS NOT A NEW TRANCHE
-EITHER** — it stood at 142 of 142 with 118 spec. Twenty-two talent nodes
-GRANTED an ability; the charter forbids that outright now, so all twenty-two cards moved into
-their spec's draft pool rather than being deleted. **NO POOL LOST ANYTHING AND THE FLOOR IS STILL
-EIGHT** — nine specs are deeper than eight and three (beastmaster, sharpshooter, mystic) still
-read exactly eight, because those three trees granted nothing to move. **THE PER-SPEC
-EXPECTATION IS A TABLE NOW, NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH`): writing `12 * 8`
-again would re-assert the CI-era shape over a tree that has moved past it.
-**THE TARGET WAS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
-CLASS-WIDE = 120; THE DRAFT STOOD AT 120 OF 120 AND NOTHING WAS OWED (Batch CI), AND DO'S
-TWENTY-TWO TOOK IT TO 142 OF 142, DR'S NET +1 TO 143 OF 143, DS'S SIX TO 149 OF 149 AND DY'S FIVE
-RE-HOMED VAULT CARDS TO 154 OF 154.** The ~96 came from an older
-assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
-spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
-figure while the prose contradicted it for a whole batch** — the stale denominator was in
-master.html §6b, in this file, AND in three comments in `classes.gd`, which is why CD's §2 swept
-for it rather than fixing the two known sites. **DO NOT QUOTE ~96 AGAIN.** Dated changelog entries
-keep it as written (they are the record of what each batch believed — CA's rule); this is
-the correction.
-**TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
-nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` REACHED 96 AND THE DRAFT
-REACHED 120 OF 120 THERE. **SINCE BATCH DY IT IS 129 AND 154 OF 154: ALL TWELVE SPECS DRAFT FROM
-AT LEAST TEN, THE MAGE CLASS POOL HOLDS SEVEN AND THE OTHER THREE HOLD SIX, AND NOTHING IS OWED.**
-The asserted FLOORS are still eight (spec) and six (class) and both are deliberately slack; **ten
-is the live spec minimum and six the live class minimum.**
-**THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
-DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
-that sentence is dead in master.html §6b, in `classes.gd`'s header comment and here.
-· **WHAT THE SUITES GUARD FROM HERE ON IS THE FLATNESS, NOT A DEBT.** Every draft suite's per-spec
-  depth loop inverted for the SEVENTH and LAST time at CI. It has asserted, in order: each earlier
-  tranche's own asymmetry, then the flatness tranche 2 achieved, then CB's new asymmetry, that
-  asymmetry halved at CE, quartered at CH, and now gone. A pool that quietly EMPTIES now trips,
-  where before it would have read as the old debt coming back.
-**THE FILL-SHORT CONSTRUCTIONS HAD NOWHERE LEFT TO GO, SO THE ARITHMETIC MOVED INSTEAD (Batch CI
-§5), AND THE SHAPE THEY LANDED IN IS THE ONE A LATER BATCH MUST KEEP.** Three of the four
-(test_batch_bo, bq, br) refused the whole class pool plus a HARDCODED three of the hero's own
-cards — an arithmetic that assumed a five-deep pool, and at eight it leaves FIVE standing so the
-offer comes up FULL and the check stops measuring the fill-short rule. **There is no thin pool and
-no hero left to relocate to**, so the refusal is written RELATIVE TO THE LIVE POOL SIZE now
-(refuse everything but two), which is test_batch_bx's shape — bx was already pool-size-relative
-and needed no repair at all. **A later tranche that deepened a pool would move those setups and
-NOT their answers**, which is what makes this the last time they could need it. **A construction
-that has to relocate is how a paid debt announces itself; one that can no longer relocate is how
-a finished one does.**
-**TRANCHES 2 AND 3 ARE BOTH PAID, AND THE SPEC-DEPTH DEBT THEY MEASURED IS CLOSED (Batch DG §3).**
-Tranche 2 took `SPEC_DRAFT_POOLS` to 60 and every spec to FIVE (BT the Mage nine, BU the Cleric
-nine, BV the Hunter nine, BW the WARRIOR nine); tranche 3 took it to 96 and every spec to EIGHT
-(CB the Mage nine, CE the Cleric nine, CH the Hunter nine, CI the WARRIOR nine). **THE FOUR
-CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTER THIRD AND THE
-WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
-SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, WAS 120 OF 120 — AND DO'S TWENTY-TWO
-TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142, DR'S NET +1 TO 119 AND
-143 OF 143, DS'S SIX HUNTER CARDS TO 125 AND 149 OF 149, AND DY'S FIVE RE-HOMED VAULT CARDS TO
-129 AND 154 OF 154.**
-**NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
-or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
-loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own
-asymmetry), and **test_batch_bo's fill-short construction had to move for the THIRD time** — onto
-a hero worn down by `draft_refused`, because there is no thin pool left in the game to build it
-on. **BV PREDICTED THAT FORCED MOVE IN WRITING and called it the honest signal that the debt is
-paid. It is.**
-**THE WARRIOR POOLS WERE OWED AND ARE PAID (Batch BP) — do not re-record them as empty.** All
-three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
-two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
-Swordmaster Precision Strike / Feint), which took `SPEC_DRAFT_POOLS` to 24 entries and gave every
-spec a draft. **It stands at 96 now, and 24 is the CLASS-WIDE figure** — the two were one digit
-apart in one paragraph, which is how the stale half below went unread for so long. **THE
-CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT RE-RECORD ANY OF IT AS OWED.** BQ
-shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so `CLASS_DRAFT_POOLS`
-is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR EVERY HERO IN THE
-GAME** — no class rolls an empty pool and no offer loses its class card.
-**AND THE SNAPSHOT THAT SAT HERE IS CUT (Batch DG §3), WHICH IS THE ACTUAL FINDING.** This
-paragraph used to read that the draft held sixty-six of a target 120 (Batch BU), that
-`SPEC_DRAFT_POOLS` was 24 entries, and that the HUNTER and WARRIOR six were still at two — **a
-BU-era snapshot sitting 49 lines below the line that already said 120 OF 120, inside one standing
-block, with different answers.** **IT SURVIVED CW's SPLIT BECAUSE THAT SWEEP WAS FOR NARRATIVE
-FORM AND THIS WAS NARRATIVE IN EVERY WAY BUT ITS FORMATTING** — a superseded snapshot wearing a
-STANDING heading. **A STANDING BLOCK STATES A NUMBER ONCE.** Two assertions pinned phrases from
-this half — `test_batch_bo` §6 and `test_batch_ce` §5 — and both are INVERTED to protect the
-record of COMPLETION instead, which is the idiom BP, BQ and BR each used as a debt was paid.
-**CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
-deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
-read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
-UNCONDITIONAL** — they feed no passive, so at equal power they would be a safe default that
-dilutes every build. **BQ ADDS A THIRD RULE, LEARNED BY BREAKING IT: verify the "weaker" half
-against the LIVE spec kits rather than trusting the brief, AND CHECK IT AGAINST THE FREE CORE
-ATTACK TOO** — Chastise is dominated by Smite, and no comparison against spec ABILITIES alone
-would ever have caught it.
+· **THE OFFER FILLS SHORT rather than padding with repeats**, and `Run.draft_card_is_class` is the
+  one-in-four seam — **its own function precisely so a test can drive it 4000 times.** A check on
+  the roller that could only ever measure zero is a check that can only pass, which is a gap.
+· **THE UI IS THE EXISTING OVERLAY, NOT A SECOND ONE.**
 
+**THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE THING A
+LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `test_batch_bo`
+asserts every named enabler is in that spec's opening kit and in NO pool. **The failure it prevents
+is SILENT: a spine that stops working because its enabler became draftable.** Holy is the only spec
+at FOUR slots (Heal, Hymn of Hope), so she has the fewest earnable slots in the game; the
+Beastmaster's three summons are FIVE ABILITIES IN THREE SLOTS, because the summon picker has been
+one bar entry since AH. **The table itself is in `classes.gd` with a `why` on every row — read it
+there rather than copying it here.**
+
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 154 of 154, 129 spec + 25 class-wide.** All twelve
+specs draft from at least TEN; the Mage class pool holds seven and the other three hold six.
+**DO NOT RE-RECORD ANY PART OF THE DRAFT AS OWED.** In particular:
+· **THE WARRIOR POOLS WERE OWED AND ARE PAID** — Berserker Blood Offering / Gut Rip, Warden
+  Covering Guard / Eye of the Storm, Swordmaster Precision Strike / Feint.
+· **THE CLASS-WIDE TRANCHE IS PAID IN FULL**: `CLASS_DRAFT_POOLS` is 24 of a target 24 against its
+  own original target, and
+  **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME** — no class rolls an
+  empty pool and no offer loses its class card.
+· **TRANCHES 2 AND 3 ARE BOTH PAID**, the four classes completing in order — the Mage first,
+  **THE CLERIC SECOND**, the Hunter third and the Warrior last, and **ALL FOUR ARE COMPLETE**.
+· **NEITHER HALF IS A FLAT MULTIPLE ANY MORE.** Both expectations are summed tables
+  (`test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`) — **do not write `12 * 8` or `4 * 6`
+  again**, and do not quote the old ninety-six-card denominator, which died at CD §2.
+· **THE ASSERTED FLOORS ARE EIGHT (spec) AND SIX (class), AND BOTH ARE DELIBERATELY SLACK.** They
+  catch a pool that EMPTIES rather than tracking the deepening. **Every draft suite asserts the
+  FLOOR and the TOTAL; the two tables above are the only authoritative depths.**
+· **A STANDING BLOCK STATES A NUMBER ONCE.** A superseded snapshot once sat forty-nine lines below
+  the line that contradicted it, inside this block, and **survived CW's split because that sweep
+  was for narrative FORM and this was narrative in every way but its formatting.**
+· **WHAT THE SUITES GUARD FROM HERE ON IS THE FLATNESS, NOT A DEBT.** A pool that quietly empties
+  trips, where before it would have read as an old debt coming back.
+· **A CONSTRUCTION THAT HAS TO RELOCATE IS HOW A PAID DEBT ANNOUNCES ITSELF; ONE THAT CAN NO
+  LONGER RELOCATE IS HOW A FINISHED ONE DOES.** Write a suite's refusal setup RELATIVE TO THE LIVE
+  POOL SIZE, never against a hardcoded count of the hero's own cards — the hardcoded shape stops
+  measuring the fill-short rule the moment a pool deepens under it.
+
+**CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
+deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would read
+as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL** —
+they feed no passive, so at equal power they would be a safe default that dilutes every build.
+**VERIFY THE "WEAKER" HALF AGAINST THE LIVE SPEC KITS RATHER THAN TRUSTING THE BRIEF, AND CHECK IT
+AGAINST THE FREE CORE ATTACK TOO** — a comparison against spec ABILITIES alone misses a card
+dominated by a basic.
 ## STANDING DESIGN RULE — THE ARRIVING-STANCE PRINCIPLE (Batch BP §3)
 **EVERY STANCE ABILITY MUST BUY WHAT THE STANCE IT LEAVES HIM IN WANTS.** The Swordmaster's
 stances were a binary toggle with passive numbers on each side and NOTHING in his kit ever

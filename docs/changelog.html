@@ -14,6 +14,106 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-30 &mdash; Batch DZ: THE FALLBACK, THE PRICING, AND THE PRUNE</h2>
+<p><i>Three sections. <b>The zone-boss fallback is priced as four options and nothing is authored;
+Divine Wrath, Blessing of Zeal and Arcane Surge are measured against each other and ruled on
+nowhere; and <code>CLAUDE.md</code> is pruned to the rule Batch CW wrote for it.</b> <b>NO CODE
+MOVED, NO MAGNITUDE MOVED AND NO CARD WAS AUTHORED.</b> <code>CLAUDE.md</code> goes <b>261.77 KiB
+&rarr; 210.59 KiB</b> and the knowledge-sync ratio <b>3.639% &rarr; 2.948%</b> &mdash; under CW's
+3% target for the first time since it was set. Full report:
+<code>docs/reports/DZ.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; A ZONE-BOSS AWARD THAT PAYS NOTHING: FOUR OPTIONS, PRICED AT 154, NOTHING
+AUTHORED.</b> The award count is <b>THREE</b>, derived from <code>Run.SLOT_COUNT</code>, and both
+channels write the same <code>bm_abilities</code> list &mdash; so a drafted card removes itself from
+the boss offer. <b>Eight of the twelve specs can lose an award, and the figure nobody had put a
+number on is that <b>14 OF THE GAME'S 36 ZONE-BOSS AWARDS CAN PAY NOTHING</b></b> in a run where
+every hero drafts against their own boss pool. <b>What happens today is not a weak reward, it is no
+acknowledgement at all</b>: <code>award_ability_pick</code> returns false and
+<code>_award_ability_picks</code> silently skips the hero, so the victory card does not name them.
+The four candidates are re-priced against the live game, each with what it feels like as the boss
+dies, and <b>the depth table is re-derived for every spec AFTER each fallback</b>: under a
+spec-draft card or a class-wide card <b>no spec can lose an award and the fallback pool's own worst
+case is six cards and two cards respectively</b>; under a rune the same, <b>except that
+<code>roll_rune_candidates</code> returns empty in a runes-off run, so that option needs its own
+fallback</b>; under gold <b>all fourteen awards are still lost as ability awards</b> and the table
+does not move at all. <b>Nothing was authored and the decision is the designer's.</b></p>
+
+<p><b>&sect;1b &mdash; AND THE ARGUMENT THAT MADE THE CARD-SHAPED OPTIONS LOOK WORST BROKE AT DY,
+WHICH THIS IS THE FIRST DOCUMENT TO SAY.</b> Batch DV recorded that the spec most likely to need a
+fallback also had the fewest slots to receive one &mdash; true while the Holy Cleric's boss pool was
+one card. <b>After DY she can lose ONE award of three and the Devout can lose ALL THREE</b>, and the
+Devout carries the normal <b>four</b> earnable slots against her three. <b>The deepest hole is now on
+a spec with as much room as anybody</b>, so that objection applies to Holy's single award rather
+than to the fix in general. <code>docs/state.md</code> carried the old coupling as current and is
+corrected.</p>
+
+<p><b>&sect;2 &mdash; DIVINE WRATH AGAINST BLESSING OF ZEAL: THE INITIATIVE IS NOT A PRICE, IT IS A
+CLAMP.</b> <code>divine_wrath</code> is a member of <code>Ability.PURE_BUFFS</code> and
+<code>Ability.make()</code> clamps every member to <code>BUFF_DELAY_CAP</code> &mdash; the definition
+even writes the constant rather than a number. <b>Whatever anyone typed there, the card reads 1.0</b>,
+so Divine Wrath was never priced against the Devout's protected core; it was never priced at all.
+<b>AND BOTH MEMBERSHIPS ARE CORRECT, DRIVEN LIVE RATHER THAN ARGUED</b>: cast in a real battle with
+cooldowns snapshotted, <b>Blessing of Zeal moves the target's COOLDOWNS at cast</b> (the same
+exclusion the table's own header already names for Blink) and <b>Arcane Surge moves the caster's
+Resonance 0 &rarr; 2</b> (the exclusion it names for Stabilize), while <b>Divine Wrath writes one
+status to four heroes and moves nothing else.</b> So there is no membership error and no magnitude
+error &mdash; <b>what there is, is that the cap is the only instrument in the project that prices an
+initiative, and it binds by table membership, so a card excluded for carrying a second payload gets
+no price at all.</b> That is why Arcane Surge's open 3.0 is the same question asked twice.</p>
+
+<p><b>&sect;2b &mdash; SO THE FAMILY PRICES THEM, AND IT IS ARCANE SURGE THAT BREAKS THE PATTERN,
+NOT ZEAL.</b> Across the eleven second-payload exclusions <code>ability.gd</code>'s own header names,
+<b>Mana rises with initiative</b> &mdash; and <b>Arcane Surge carries the family's TOP initiative
+(3.0) on 15 Mana and cooldown 3, against Hold the Line's 30 and 6 at the same 3.0.</b> It is priced
+like a 1.5 card on Mana and a 3.0 card on tempo. <b>Blessing of Zeal sits ON the line on initiative
+and UNDER it on the other two axes</b> &mdash; cheapest at its tempo and by far the shortest cooldown
+there &mdash; so <b>if either of the two is mispriced it is the protected core, and it is mispriced
+LOW.</b> <b>AND THE TWO DAMAGE TERMS STACK, MEASURED</b>: they are adjacent <code>if</code> blocks in
+the hero strike loop with no <code>elif</code> between them, and twelve seeded blows read
+<b>1.1509 / 1.1509 / 1.3333</b> against the arithmetic 1.15 / 1.15 / 1.3225 &mdash; <b>a Devout who
+drafts Divine Wrath and casts Zeal on the same hero pays both.</b> Speed reads
+<b>95.000 &rarr; 109.250, exactly &times;1.15.</b> <b>Reported; nothing was retuned and
+<code>PURE_BUFFS</code> was not widened.</b></p>
+
+<p><b>&sect;3 &mdash; <code>CLAUDE.md</code> IS PRUNED, AND THE TEST WAS CW'S OWN.</b>
+<i>Does this line tell a future session what to do or not to do?</i> Every rule stayed; every batch
+narrative attached to one went, with the reason kept to a sentence. <b>261.77 &rarr; 210.59 KiB, a
+cut of 51.2 KiB (19.6%), taking the sync ratio to 2.948%.</b> The arithmetic of the target is worth
+recording because it is not obvious: <b>pruning the file shrinks the denominator too, so clearing 3%
+needed more than 47.8 KiB rather than the 46.4 the naive subtraction gives.</b></p>
+
+<p><b>&sect;3b &mdash; THE SAME TRAP APPLIED AGAIN AND THE GATHER FOUND MORE THAN THE BRIEF NAMED.</b>
+<b>Twelve rules were stated inside a narrative and would have gone with it</b>, and they are in the
+file's own voice now &mdash; among them <i>a standing block states a number once</i> (buried in the
+paragraph explaining how a superseded snapshot survived CW's split, inside the very block that then
+restated the draft total six times at four historical values), <i>write a suite's refusal setup
+relative to the LIVE pool size</i>, <i>to find the next hole in a fingerprint ask what the rule is
+about and re-derive it</i>, and <i>an exemption is keyed file::func, never by file</i>.
+<b>TWO THINGS THE BRIEF DID NOT NAME:</b> the file <b>stated six rules TWICE</b> &mdash;
+&quot;Verify before shipping&quot; and &quot;THE TRAPS&quot; each carried the same six &mdash; so
+<b>the file enforcing &quot;one authored copy&quot; was carrying six second copies of its own
+rules</b>; and it <b>carried live counts that had gone stale against its own rule that live counts
+belong in <code>docs/state.md</code></b> (the corpus at 216 where it is 227,
+<code>RECAST_GATED</code> at 59 where it is 64, <code>CLASS_DRAFT_POOLS</code> at 24 where it is 25,
+and five more). <b>Those were removed rather than corrected</b>, because correcting them creates the
+second copy again; each is a pointer now.</p>
+
+<p><b>&sect;3c &mdash; HOW IT WAS PROVED SAFE, AND THE INSTRUMENT THAT FOUND WHAT THE OTHERS COULD
+NOT.</b> Roughly thirty-five suites assert against this file. A <b>needle verifier built from the
+tree and green at HEAD before a line was cut</b> &mdash; every literal any suite asserts against
+<code>CLAUDE.md</code>, plus <code>test_batch_cd</code>'s structural slice &mdash; was re-run after
+every edit and <b>caught two real breaks</b>, both a needle split across a line wrap, which is
+invisible to reading and fatal to a <code>contains</code>. A <b>literal sweep at a four-character
+floor</b> over 10,948 literals read <b>174 lost, 0 gained</b>. <b>AND BOTH WERE GREEN WHEN A
+17-SUITE SUBSET BATTERY, RUN BEFORE THE CERTIFICATION RUN, CAME BACK WITH
+<code>test_batch_ce</code> AT 1114 / 1.</b> The extractor had taken only the FIRST literal out of
+each <code>contains(</code> call and <code>ce</code>'s assertion is an <b>AND of two</b>; the first
+survived the rewrite and the second did not. Restored, and <code>ce</code> re-reads <b>1114 / 0</b>.
+<b>A sweep is only as wide as the convention it matches, and neither hole was knowable from inside
+the instrument &mdash; the run is what finds them</b>, and a subset costs minutes against the
+thirty-five a full battery costs.</p>
+
 <h2>2026-08-30 &mdash; Batch DY: THE VAULT IS EMPTIED</h2>
 <p><i>Six sections. <b>The seven abilities no run could reach are re-homed into live pools,
 <code>CLASS_POOLS</code> is retired, Holy's empty boss awards close as a consequence, the last
