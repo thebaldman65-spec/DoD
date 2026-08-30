@@ -1199,12 +1199,14 @@ func _spawn_units() -> void:
 		# which meant testing the Arcanist put Pyromancer abilities in his
 		# hands. Now: this spec's tree grants, this spec's capstones, and
 		# `SPEC_POOLS[spec]`. Nothing from another spec.
-		# `CLASS_POOLS` IS EXCLUDED, AND THAT IS THE TRADE-OFF: the sibling
-		# abilities showing up ARE the class pool's contents (Flamewave and
-		# Firestorm are in CLASS_POOLS["mage"]), so excluding it is what fixes
-		# the complaint. The cost is that a legitimately earnable class-pool
-		# ability is no longer covered by the toggle — the node summoner and a
-		# real boss reward still reach them. DO NOT BUILD A SECOND TOGGLE.
+		# THE CLASS-WIDE BOSS POOL WAS EXCLUDED, AND THAT WAS THE TRADE-OFF:
+		# the sibling abilities showing up WERE that pool's contents, so
+		# excluding it is what fixed the complaint. **THAT DICT (`CLASS_POOLS`)
+		# IS DELETED AS OF BATCH DY §3 and this exclusion is structural now
+		# rather than a choice** — there is no class-wide BOSS pool to include.
+		# The class-wide DRAFT pool is a different structure and is likewise
+		# not pre-granted here. The node summoner and a real reward still reach
+		# every one of them. DO NOT BUILD A SECOND TOGGLE.
 		if Run.debug_grant_all and spec != "":
 			for tn in Talents.generate_tree(spec, hero_keys[i]):
 				var tn_pay: Dictionary = tn.get("payload", {})

@@ -805,14 +805,26 @@ func _test_rewards(RunState) -> void:
 		{"id": "up_free", "ability": "Overpower"}]
 	# ZONE BOSSES: the ability pick is SPEC-POOL ONLY now.
 	var spec_pool: Array = Classes.spec_pool("berserker")
-	var class_pool: Array = Classes.class_pool("warrior")
-	var class_only: Array = class_pool.filter(func(n): return not spec_pool.has(n))
-	ok(not class_only.is_empty(), "the warrior class pool holds spec-foreign entries")
+	# **DY §3 DELETED `CLASS_POOLS`, AND AN's OWN CHECK IS WHAT SURVIVES IT.**
+	# AN §4 re-pointed the award at the spec pool and deleted `roll_ability_offer`;
+	# this loop then proved the roller never returns a name only a SIBLING can
+	# reach. The spec-foreign set is derived from the siblings' own pools now,
+	# which is what "spec-foreign" always meant — the class pool was only ever
+	# the list that happened to hold them.
+	var class_only: Array = []
+	for sib in ["warden", "swordmaster"]:
+		for n in Classes.spec_pool(String(sib)):
+			if not spec_pool.has(n) and not class_only.has(n):
+				class_only.append(n)
+		for n2 in Classes.spec_draft_pool(String(sib)):
+			if not spec_pool.has(n2) and not class_only.has(n2):
+				class_only.append(n2)
+	ok(not class_only.is_empty(), "the Warrior siblings hold spec-foreign entries")
 	for trial2 in 300:
 		var ab_offer: Array = run.roll_spec_ability_offer(run.party[1])
 		for n in ab_offer:
 			ok(spec_pool.has(n), "%s is in the spec pool" % n)
-			ok(not class_only.has(n), "%s never arrives via the class pool" % n)
+			ok(not class_only.has(n), "%s never arrives from a sibling spec" % n)
 	run.free()
 
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Draft Audit (Batch DQ)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-28 (Batch DQ &mdash; first pass)</b></p>
+<p align="right"><b>Last updated: 2026-08-30 (Batch DY &mdash; &sect;2 and &sect;2b re-derived; first pass Batch DQ)</b></p>
 <h1>DAWN OF DECAY — THE DRAFT AUDIT</h1>
 
 <p><i>Every one of the 142 draft cards, compared against every other card it can be offered
@@ -13,7 +13,7 @@ each is written so the remedy can be ruled on directly.</i></p>
 <p style="border:2px solid #a00; padding:8px"><b>THE BOSS-PICK CHANNEL IS NOT IN THIS
 DOCUMENT AND IT HAS ITS OWN AUDIT.</b> This page audits <code>SPEC_DRAFT_POOLS</code> and
 <code>CLASS_DRAFT_POOLS</code> &mdash; what an <b>elite</b> offers. The <b>zone-boss</b> pick reads
-<code>SPEC_POOLS</code>, a separate 42-entry table, and <b>both channels write the same
+<code>SPEC_POOLS</code>, a separate <b>44</b>-entry table, and <b>both channels write the same
 <code>bm_abilities</code> list</b>, so a drafted card removes itself from the boss offer and vice
 versa. <b>Nothing on this page accounts for that.</b> The boss channel was audited at
 <b>Batch DU &sect;5</b> (<code>docs/reports/DU.md</code>) and measured again at <b>Batch DV
@@ -21,7 +21,12 @@ versa. <b>Nothing on this page accounts for that.</b> The boss channel was audit
 open</b>. Two of them bear directly on the numbers below: <b>the boss-pool depths are this
 document's shape INVERTED</b> &mdash; the three Hunter specs whose draft pools DS had to deepen
 hold the deepest boss pools, and the two Cleric specs hold the shallowest &mdash; and <b>the Holy
-Cleric's boss pool is ONE card, so two of his three zone-boss awards always roll empty.</b>
+Cleric's boss pool was ONE card, so two of his three zone-boss awards always rolled empty
+&mdash; <b>closed at Batch DY &sect;2</b>, which put Dawnbreak and Sanctuary in beside Divine Plea
+and took it to THREE. <b>THE GENERAL PROBLEM SURVIVED THAT FIX AND THE DEVOUT IS THE SHARPEST CASE
+NOW</b>: his pool is TWO against three awards, and <b>both of his two are also draftable</b>, so all
+three of his awards can pay nothing. Re-measured at DY &sect;2 and asserted live in
+<code>check_dv</code> &sect;2.</b>
 <b>DO NOT READ A POOL DEPTH HERE AS THE NUMBER OF CARDS A HERO CAN ACQUIRE</b>; it is one of two
 channels, and the other one is where the holes are.</p>
 
@@ -77,13 +82,26 @@ are robust to that; the exact per-pool axis counts are not.</li>
 <li><b>Enemy abilities, relics, runes and items were not compared against draft cards at all.</b>
 The rune half in particular is a live question: <code>docs/state.md</code> already records that two
 runes grant a card their own hero can now draft.</li>
-<li><b>Boss-pick pools (<code>SPEC_POOLS</code> / <code>CLASS_POOLS</code>) were dumped but not
-audited.</b> They are a separate offer with a separate population and they were out of scope.</li>
+<li><b>Boss-pick pools (<code>SPEC_POOLS</code>) were dumped but not audited</b> in this pass.
+They are a separate offer with a separate population and they were out of scope; DU &sect;5 and DV
+&sect;2 audited them since. <i>(This line named a second table, <code>CLASS_POOLS</code>, which
+Batch DY &sect;3 DELETED &mdash; it was the class-wide half of the boss pick, dead since AN &sect;4
+re-pointed the award, and it held seven abilities listed in no other pool.)</i></li>
 </ul>
 
 <h2>&sect;0 — THE POPULATION, DERIVED</h2>
-<p><b>The draft is 142 and the spec half is no longer a flat multiple.</b> 118 spec cards + 24
-class-wide (4 classes &times; 6). <b>Nine of the twelve spec pools took one or more of DO's
+<p style="border:2px solid #060; padding:8px"><b>THE TABLE BELOW IS DQ's SNAPSHOT AT 142 AND IS
+KEPT AS THE RECORD OF WHAT DO's TWENTY-TWO DID. THE LIVE DRAFT IS 154</b> &mdash; <b>129 spec</b>
+plus <b>25 class-wide</b>, and <b>the class half is no longer a flat multiple either</b>: Batch DY
+put Mana Shield in the MAGE class pool, so it draws SEVEN where the other three draw six. Since
+this snapshot: DR net +1 (Flash Freeze retired, two Swordmaster cards written), DS +6 (two apiece
+to the three Hunter pools) and <b>DY +5, none of them authored</b> &mdash; four to spec pools and
+one class-wide, all five lifted out of <code>Classes.vault_ability()</code>, where they had been
+finished and unreachable since Batch AN closed the class draw.
+<b>Warden 9 &rarr; 10, Arcanist 10 &rarr; 12, Devout 10 &rarr; 11, Mage class 6 &rarr; 7.</b>
+The current per-spec depths live in <code>test_batch_cd.PER_SPEC_DEPTH</code>.</p>
+<p><b>The draft was 142 at DQ and the spec half was already no longer a flat multiple.</b> 118 spec
+cards + 24 class-wide (4 classes &times; 6). <b>Nine of the twelve spec pools took one or more of DO's
 twenty-two ex-talent-grants and three took none</b> &mdash; and the three that took none are the
 whole Hunter class.</p>
 
@@ -264,23 +282,32 @@ because a designer counting how many <i>different</i> things the game contains s
 the 142 hold fewer than 142 ideas.</p>
 
 <h2>&sect;2 — PER-POOL AXIS COVERAGE, WHICH IS THE REAL ANSWER</h2>
-<p style="border:2px solid #a00; padding:8px"><b>STALE SINCE BATCH DR AND SUPERSEDED AGAIN BY
-BATCH DS. MARKED AT BATCH DT RATHER THAN REFRESHED &mdash; DO NOT QUOTE A NUMBER FROM THIS SECTION
-OR FROM &sect;2b's AXIS-SHARE TABLE AS CURRENT.</b> This audit measured the draft at <b>142</b>.
-<b>Eight cards have been authored and one retired since</b>: DR was net +1 (Flash Freeze retired,
-two Swordmaster cards written) and DS was +6 (two apiece to the three Hunter pools). <b>The draft
-is 149 of 149 now &mdash; 125 spec and 24 class-wide.</b>
-<b>FIVE OF THE TWELVE POOL ROWS BELOW HAVE MOVED, THREE OF THEM GROWN:</b> Swordmaster 10 &rarr;
-<b>12</b> and Cryomancer 12 &rarr; <b>11</b> at DR; Beastmaster 8 &rarr; <b>10</b>, Sharpshooter
-8 &rarr; <b>10</b> and Mystic 8 &rarr; <b>10</b> at DS. <b>The one authoritative per-spec depth
-table is <code>test_batch_cd.PER_SPEC_DEPTH</code></b>, which is re-derived on every battery run;
-this page is not an instrument and nothing re-derives it.
-<b>THE AXIS AND DECISION COUNTS BESIDE EACH MOVED ROW ARE STALE IN THE SAME WAY AND ARE WORSE THAN
-THE CARD COUNTS</b>, because a new card can add a decision without adding an axis &mdash; DS's own
-BRING IT DOWN is exactly that case, and the Beastmaster's <b>5 decisions</b> below is <b>7</b> now
-by DS's own count. <b>The 8-of-8 engine binding on that row is NOT weakened by the row being
-stale</b>: it reads 10-of-10 now, because both of DS's cards read the companion too.
-<b>WHAT IS STILL TRUE HERE IS THE METHOD AND THE SHAPE OF THE FINDINGS, NOT THE ARITHMETIC.</b></p>
+<p style="border:2px solid #060; padding:8px"><b>RE-DERIVED AT BATCH DY &sect;5. THE NUMBERS BELOW
+ARE CURRENT AS OF THE 154-CARD DRAFT.</b> DT marked this section stale rather than refreshing it,
+deliberately &mdash; re-deriving means re-assigning an axis to every card authored since, which is
+this audit's own judgement call. DY was asked to do exactly that and did.
+<b>THE METHOD IS DQ's, UNCHANGED AND STATED SO THE REFRESH CAN BE DISAGREED WITH:</b> each card
+carries ONE PRIMARY axis and one target shape, taken from the per-card appendix in &sect;6, and the
+eleven cards authored since DQ were assigned inside that same vocabulary. Nothing was re-cut.
+<b>ONE DISAGREEMENT IS RECORDED RATHER THAN SMOOTHED OVER:</b> Batch DR reported its own repair as
+taking the Swordmaster "four &rarr; eight decisions"; by DQ's one-primary-axis method it is
+<b>seven</b>. DR counted Wheeling Cut's self-mitigation as a second axis on one card, which is a
+different count, not a wrong one &mdash; and it is why a per-card table exists to argue with.
+<b>NINE OF THE SIXTEEN ROWS MOVED AND SEVEN DID NOT.</b> Moved: Swordmaster and Cryomancer (DR),
+Beastmaster, Sharpshooter and Survivalist (DS), Warden, Arcanist, Devout and the Mage class pool
+(DY). Unchanged: Berserker, Holy Cleric, Occultist, Pyromancer and the Cleric, Hunter and Warrior
+class pools. <b>The one authoritative per-spec depth table is still
+<code>test_batch_cd.PER_SPEC_DEPTH</code></b> &mdash; re-derived on every battery run &mdash; and
+this page is still not an instrument.</p>
+
+<p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>DQ's QUESTION, ANSWERED AGAIN:
+&ldquo;HOW MANY CARDS WOULD A PLAYER HAVE TO DRAFT BEFORE THE POOL STOPS OFFERING THEM ANYTHING
+NEW?&rdquo;</b> It is the DECISIONS column, and the answer has risen everywhere it moved.
+<b>The floor is the CLERIC class pool at FIVE</b> and the ceiling is the Warden's and the
+Pyromancer's <b>TEN</b>. <b>THE WARDEN IS THE SHARPEST CHANGE IN THIS TABLE AND IT IS NOT THE ONE
+DY SET OUT TO MAKE</b>: he was the shallowest pool in the game at nine cards, and he now holds the
+JOINT-WIDEST decision spread in it &mdash; ten decisions across ten cards, the only pool in the
+game where every card makes a different decision. <b>Reported. Ruled on nowhere.</b></p>
 <p><b>The question is not whether two cards are duplicates. It is whether a pool holds more than
 one build.</b> Two measures are given below because they disagree, and the disagreement is itself
 the finding.</p>
@@ -295,22 +322,22 @@ fuel.</li>
 </ul>
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>pool</th><th>cards</th><th>of them<br>DO's</th><th>distinct<br>axes</th><th>distinct DECISIONS<br>(axis &times; target shape)</th><th>largest single decision</th><th>bound to the spec's own engine</th></tr>
-<tr><td><b>Swordmaster</b></td><td align="center">10</td><td align="center">2</td><td align="center">4</td><td align="center"><b>4</b></td><td>4 &times; DMG-ST / ENEMY-ONE</td><td>9 of 10 &mdash; stance 7, parry 2</td></tr>
-<tr><td><b>Beastmaster</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>5</b></td><td>3 &times; PET / SELF</td><td>8 of 8 &mdash; companion 8</td></tr>
-<tr><td><b>Sharpshooter</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>5</b></td><td>4 &times; DMG-ST / ENEMY-ONE</td><td>6 of 8 &mdash; Focus 6</td></tr>
-<tr><td><b>Arcanist</b></td><td align="center">10</td><td align="center">2</td><td align="center">6</td><td align="center"><b>7</b></td><td>3 &times; METER-GEN / SELF</td><td>9 of 10 &mdash; Resonance 9</td></tr>
+<tr><td><b>Cryomancer</b></td><td align="center">11</td><td align="center">4</td><td align="center">5</td><td align="center"><b>7</b></td><td>3 &times; DMG-AOE / ENEMY-ALL</td><td>11 of 11 &mdash; hold 5, Chilled 6</td></tr>
+<tr><td><b>Swordmaster</b></td><td align="center">12</td><td align="center">2</td><td align="center">7</td><td align="center"><b>7</b></td><td>3 &times; DMG-ST / ENEMY-ONE</td><td>9 of 12 &mdash; stance 7, parry 2</td></tr>
+<tr><td><b>Beastmaster</b></td><td align="center">10</td><td align="center">&mdash;</td><td align="center">7</td><td align="center"><b>7</b></td><td>3 &times; PET / SELF</td><td>10 of 10 &mdash; companion 10</td></tr>
+<tr><td><b>Sharpshooter</b></td><td align="center">10</td><td align="center">&mdash;</td><td align="center">7</td><td align="center"><b>7</b></td><td>4 &times; DMG-ST / ENEMY-ONE</td><td>8 of 10 &mdash; Focus 8</td></tr>
 <tr><td><b>Berserker</b></td><td align="center">10</td><td align="center">2</td><td align="center">7</td><td align="center"><b>7</b></td><td>3 &times; DMG-ST / ENEMY-ONE</td><td>10 of 10 &mdash; Frenzy 5, Bleed 4, Rage 1</td></tr>
-<tr><td><b>Cryomancer</b></td><td align="center">12</td><td align="center">4</td><td align="center">5</td><td align="center"><b>7</b></td><td>3 &times; DMG-AOE / ENEMY-ALL</td><td>12 of 12 &mdash; hold 6, Chilled 6</td></tr>
 <tr><td><b>Holy Cleric</b></td><td align="center">10</td><td align="center">2</td><td align="center">6</td><td align="center"><b>7</b></td><td>2 &times; HEAL / ALLY-ONE</td><td>6 of 10 &mdash; Mercy 5, healing 1</td></tr>
-<tr><td><b>Survivalist</b></td><td align="center">8</td><td align="center">&mdash;</td><td align="center">5</td><td align="center"><b>7</b></td><td>2 &times; DMG-ST / ENEMY-ONE</td><td>7 of 8 &mdash; statuses 6, traps 1</td></tr>
-<tr><td><b>Devout</b></td><td align="center">10</td><td align="center">2</td><td align="center">5</td><td align="center"><b>8</b></td><td>2 &times; METER-GEN / PARTY</td><td>7 of 10 &mdash; Faith 5, Divine Shield 2</td></tr>
 <tr><td><b>Occultist</b></td><td align="center">10</td><td align="center">2</td><td align="center">8</td><td align="center"><b>9</b></td><td>2 &times; METER-GEN / ENEMY-ONE</td><td>7 of 10 &mdash; Ruin 6, Break 1</td></tr>
-<tr><td><b>Warden</b></td><td align="center">9</td><td align="center">1</td><td align="center">8</td><td align="center"><b>9</b></td><td>1 &times; MIT-ALLY / ALLY-ONE</td><td>8 of 9 &mdash; Block 5, taunt 2, Heavy Plating 1</td></tr>
+<tr><td><b>Survivalist</b></td><td align="center">10</td><td align="center">&mdash;</td><td align="center">7</td><td align="center"><b>9</b></td><td>2 &times; DMG-ST / ENEMY-ONE</td><td>9 of 10 &mdash; statuses 8, traps 1</td></tr>
+<tr><td><b>Devout</b></td><td align="center">11</td><td align="center">2</td><td align="center">6</td><td align="center"><b>9</b></td><td>2 &times; METER-GEN / PARTY</td><td>7 of 11 &mdash; Faith 5, Divine Shield 2</td></tr>
+<tr><td><b>Arcanist</b></td><td align="center">12</td><td align="center">2</td><td align="center">7</td><td align="center"><b>9</b></td><td>3 &times; METER-GEN / SELF</td><td>10 of 12 &mdash; Resonance 10</td></tr>
+<tr><td><b>Warden</b></td><td align="center">10</td><td align="center">1</td><td align="center">8</td><td align="center"><b>10</b></td><td>1 &times; each &mdash; no repeat anywhere</td><td>8 of 10 &mdash; Block 5, taunt 2, Heavy Plating 1</td></tr>
 <tr><td><b>Pyromancer</b></td><td align="center">13</td><td align="center">5</td><td align="center">8</td><td align="center"><b>10</b></td><td>3 &times; DMG-AOE / ENEMY-ALL</td><td>12 of 13 &mdash; Burn 12</td></tr>
 <tr><td><i>class-wide: cleric</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">4</td><td align="center"><b>5</b></td><td>2 &times; HEAL / ALLY-ONE</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
-<tr><td><i>class-wide: hunter</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; HEAL / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
-<tr><td><i>class-wide: mage</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; SHIELD / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
-<tr><td><i>class-wide: warrior</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; HEAL / SELF</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: hunter</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; each</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: mage</i></td><td align="center"><b>7</b></td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>2 &times; RESOURCE / SELF</td><td><b>0 of 7</b> &mdash; untied by the authoring rule</td></tr>
+<tr><td><i>class-wide: warrior</i></td><td align="center">6</td><td align="center">&mdash;</td><td align="center">6</td><td align="center"><b>6</b></td><td>1 &times; each</td><td><b>0 of 6</b> &mdash; untied by the authoring rule</td></tr>
 </table>
 
 <p style="border:2px solid #444;padding:8px;background:#f4f4f4"><b>ADDRESSED AT BATCH DR
@@ -322,10 +349,24 @@ adds control. <b>The framework this section made visible is now a standing rule 
 does not dilute its identity. <b>The other concentration findings are reported and unruled</b>
 &mdash; the Beastmaster's 8-of-8, the Cryomancer's remaining 11-of-11, the Pyromancer's one
 currency, and the Hunter class gap, which is bigger than this one and is next. See
-<code>docs/reports/DR.md</code> &sect;4.</p>
+<code>docs/reports/DR.md</code> &sect;4.
+<b>RE-MEASURED AT DY &sect;5:</b> the Swordmaster reads <b>12 cards, 7 axes, 7 decisions</b> by
+this page's own one-primary-axis method &mdash; DR's "eight" counted Wheeling Cut twice, which is a
+different count rather than a wrong one. <b>THE BEASTMASTER'S BINDING IS TIGHTER, NOT LOOSER:</b>
+his 8-of-8 is <b>10 of 10</b>, because both of DS's cards read the companion too; what widened is
+his AXIS spread, 5 &rarr; 7. <b>The Cryomancer's is 11 of 11 exactly as reported.</b></p>
 <h3>THE TWO EXTREMES, LOUDLY</h3>
 
-<p><b>THE MOST CONCENTRATED POOL IN THE GAME IS THE SWORDMASTER'S: TEN CARDS, FOUR DECISIONS.</b>
+<p style="border:2px solid #060; padding:8px"><b>THIS SUBSECTION IS DQ's AND IT IS KEPT AS
+WRITTEN, BECAUSE IT IS THE ARGUMENT DR ACTED ON. BOTH EXTREMES HAVE MOVED SINCE.</b>
+<b>The Swordmaster is no longer the most concentrated pool in the game</b> &mdash; DR's three cards
+took him to 12 cards and SEVEN decisions, and the tightest ratio now belongs to the CRYOMANCER
+(11 cards, 7 decisions, and 11 of 11 bound to one engine). <b>And the Warden is no longer the
+shallowest</b>: DY's Rallying Shout took him to ten cards and <b>ten decisions</b>, the only pool in
+the game with no repeated decision at all. Read the numbers off &sect;2's table above; read this
+subsection for the method.</p>
+
+<p><b>THE MOST CONCENTRATED POOL IN THE GAME WAS THE SWORDMASTER'S: TEN CARDS, FOUR DECISIONS.</b>
 Every card he can draft is one of four things &mdash; <i>strike one enemy</i> (Precision Strike,
 Feint, Sever, Lunge), <i>change or hold a stance</i> (Feigned Guard, Discipline, Formless),
 <i>buy tempo off a parry</i> (Battle Poise, Answering Steel &mdash; and one of those two is
@@ -375,8 +416,8 @@ so.</p>
 HERO-SIDE MITIGATION.</b> Six cards, two per spec, each spec's defence shaped by its own engine:
 <b>BEAR THE BRUNT</b> and <b>BRING IT DOWN</b> (Beastmaster, off Loyalty), <b>DUG IN</b> and
 <b>HEADS DOWN</b> (Sharpshooter, off Focus), <b>THICK HIDE</b> and <b>SALVE</b> (Survivalist, off
-the affliction board). The three pools now match the Cleric class and the draft stands at
-<b>149 of 149</b>. <b>ONE CLAIM IN THIS SECTION SURVIVES AND IS DELIBERATELY NOT CLOSED:</b> the
+the affliction board). The three pools now match the Cleric class and the draft stood at
+<b>149 of 149</b> when DS closed it &mdash; <b>it is 154 as of Batch DY</b>. <b>ONE CLAIM IN THIS SECTION SURVIVES AND IS DELIBERATELY NOT CLOSED:</b> the
 Sharpshooter still has <b>no defensive node in his 27</b> &mdash; DS moved no talent cell, because
 a cell that changes row mis-prices the ledger. Only the DRAFT half of "both halves of his
 progression offer him nothing" is answered. <b>AND ONE PREMISE OF THE FOLLOW-UP BRIEF WAS FALSE:</b>
@@ -411,29 +452,33 @@ primary, 5 more secondary). <b>Mitigation had to be split three ways</b> to say 
 self, one ally, and the whole hero side are three different cards, and the Devout's pool holds all
 three.</p>
 
-<p style="border:2px solid #a00; padding:8px"><b>STALE — SAME BANNER AS &sect;2 ABOVE.
-EVERY <i>share of 142</i> BELOW IS A SHARE OF A DENOMINATOR THAT IS 149 NOW</b>, and eight of the
-nine cards authored since land on axes this table already counts &mdash; DS's six were deliberately
-MIT-SELF, AMP-TEAM, CTRL and HEAL, so the two rows most understated here are <b>MIT</b> and
-<b>AMP</b>. <b>Marked at DT rather than refreshed: re-deriving these counts means re-assigning an
-axis to every one of the nine new cards, which is this audit's own judgement call and is authoring
-rather than repair.</b></p>
+<p style="border:2px solid #060; padding:8px"><b>RE-DERIVED AT BATCH DY &sect;5 OVER THE 154-CARD
+DRAFT.</b> Every share below is a share of <b>154</b>. The rows are the same axes DQ cut; what moved
+is the arithmetic, and the movement is almost entirely DS's and DY's. <b>THE TWO ROWS DT PREDICTED
+WOULD BE MOST UNDERSTATED WERE THE TWO THAT MOVED MOST</b> &mdash; <b>MIT</b> 12 &rarr; <b>15</b>
+and <b>AMP</b> 12 &rarr; <b>15</b> &mdash; and DT called that from the shape of DS's six without
+counting them. <b>DMG-ST FELL FROM 22 TO 21 AND STAYED THE LARGEST AXIS</b>: DR re-authored Lunge
+onto BREAK, so the biggest cluster in the game shrank by one card and no new card joined it.
+<b>AND THE SMALLEST ROW DID NOT MOVE AT ALL: DOT IS STILL ONE CARD IN THE WHOLE DRAFT.</b></p>
 <table border="1" cellpadding="4" cellspacing="0">
-<tr><th>axis</th><th>cards</th><th>share of 142 <b>(STALE — 149 now)</b></th><th>note</th></tr>
-<tr><td>DMG-ST &mdash; damage, one enemy</td><td align="center">22</td><td align="center">15%</td><td>the single largest, and 4 of the Sharpshooter's 8</td></tr>
-<tr><td>METER-GEN &mdash; make more of the spec's own currency</td><td align="center">15</td><td align="center">11%</td><td>4 of the Arcanist's 10 are this alone</td></tr>
-<tr><td>DMG-AOE &mdash; damage, several enemies</td><td align="center">11</td><td align="center">8%</td><td></td></tr>
-<tr><td>HEAL</td><td align="center">11</td><td align="center">8%</td><td>3 of the 6 Cleric class cards</td></tr>
-<tr><td>CTRL &mdash; take an enemy's turn away</td><td align="center">10</td><td align="center">7%</td><td>4 of the Cryomancer's 12</td></tr>
-<tr><td>AMP &mdash; make damage bigger (7 self, 5 team)</td><td align="center">12</td><td align="center">8%</td><td><b>not on the brief's list</b></td></tr>
-<tr><td>MIT &mdash; take less damage (7 self, 4 party, 1 ally)</td><td align="center">12</td><td align="center">8%</td><td>three different cards, not one</td></tr>
-<tr><td>DMG-BURST &mdash; spend a meter for one blow</td><td align="center">7</td><td align="center">5%</td><td></td></tr>
-<tr><td>STATUS &mdash; debuffs as the payload</td><td align="center">6</td><td align="center">4%</td><td></td></tr>
-<tr><td>RESOURCE / METER-RULE / TEMPO</td><td align="center">15</td><td align="center">11%</td><td>5 each</td></tr>
-<tr><td>SHIELD</td><td align="center">4</td><td align="center">3%</td><td></td></tr>
-<tr><td>DEATH-DENY / BREAK / STANCE / PET</td><td align="center">12</td><td align="center">8%</td><td>3 each; the first three are not on the brief's list</td></tr>
-<tr><td>METER-MOVE / STRIP</td><td align="center">4</td><td align="center">3%</td><td>2 each</td></tr>
-<tr><td>DOT &mdash; sustained damage as the payload</td><td align="center"><b>1</b></td><td align="center"><b>1%</b></td><td><b>the brief expected an axis; it is one card</b></td></tr>
+<tr><th>axis</th><th>cards</th><th>share of 154</th><th>note</th><th>DQ had (of 142)</th></tr>
+<tr><td>DMG-ST &mdash; damage, one enemy</td><td align="center">21</td><td align="center">14%</td><td>still the single largest, and 4 of the Sharpshooter's 10</td><td align="center">22</td></tr>
+<tr><td>METER-GEN &mdash; make more of the spec's own currency</td><td align="center">15</td><td align="center">10%</td><td>4 of the Arcanist's 12 are this alone</td><td align="center">15</td></tr>
+<tr><td>AMP &mdash; make damage bigger (8 self, 7 team)</td><td align="center"><b>15</b></td><td align="center">10%</td><td><b>not on the brief's list, and joint second now</b> &mdash; DS's Bring It Down and DY's Divine Wrath are both AMP-TEAM</td><td align="center">12</td></tr>
+<tr><td>MIT &mdash; take less damage (10 self, 4 party, 1 ally)</td><td align="center"><b>15</b></td><td align="center">10%</td><td>three different cards, not one; DS added three MIT-SELF in one batch</td><td align="center">12</td></tr>
+<tr><td>HEAL</td><td align="center">12</td><td align="center">8%</td><td>3 of the 6 Cleric class cards</td><td align="center">11</td></tr>
+<tr><td>DMG-AOE &mdash; damage, several enemies</td><td align="center">12</td><td align="center">8%</td><td>DR's Wheeling Cut</td><td align="center">11</td></tr>
+<tr><td>CTRL &mdash; take an enemy's turn away</td><td align="center">11</td><td align="center">7%</td><td>3 of the Cryomancer's 11 &mdash; DR's retirement took one</td><td align="center">10</td></tr>
+<tr><td>DMG-BURST &mdash; spend a meter for one blow</td><td align="center">7</td><td align="center">5%</td><td></td><td align="center">7</td></tr>
+<tr><td>RESOURCE &mdash; give a resource back</td><td align="center"><b>7</b></td><td align="center">5%</td><td>DY's Rallying Shout and Mana Shield are both here</td><td align="center">5</td></tr>
+<tr><td>STATUS &mdash; debuffs as the payload</td><td align="center">6</td><td align="center">4%</td><td></td><td align="center">6</td></tr>
+<tr><td>TEMPO &mdash; buy or take a turn</td><td align="center"><b>6</b></td><td align="center">4%</td><td>DY's Reality Fracture is the only one that shoves an ENEMY down the order</td><td align="center">5</td></tr>
+<tr><td>METER-RULE &mdash; change how the meter behaves</td><td align="center">5</td><td align="center">3%</td><td></td><td align="center">5</td></tr>
+<tr><td>SHIELD</td><td align="center">4</td><td align="center">3%</td><td></td><td align="center">4</td></tr>
+<tr><td>BREAK &mdash; Break/Pressure as the payload</td><td align="center"><b>4</b></td><td align="center">3%</td><td>DR moved Lunge onto this axis</td><td align="center">3</td></tr>
+<tr><td>DEATH-DENY / STANCE / PET</td><td align="center">9</td><td align="center">6%</td><td>3 each; the first two are not on the brief's list</td><td align="center">9</td></tr>
+<tr><td>METER-MOVE / STRIP</td><td align="center">4</td><td align="center">3%</td><td>2 each</td><td align="center">4</td></tr>
+<tr><td>DOT &mdash; sustained damage as the payload</td><td align="center"><b>1</b></td><td align="center"><b>&lt;1%</b></td><td><b>the brief expected an axis; it is still one card in 154</b></td><td align="center">1</td></tr>
 </table>
 
 <h2>&sect;3 — GRADE 3: CARDS THAT MAKE THE SAME DECISION</h2>
@@ -824,7 +869,14 @@ strongly the player's whole progression makes one decision repeatedly.</p>
 <p><i>Every card, its axis, its target shape, and the engine it reads or writes. This is the working
 table the sections above were argued from; it is included so a later pass can disagree with a
 specific row rather than with the conclusion.</i></p>
-<h4>Arcanist &mdash; 10 cards</h4>
+<p style="border:2px solid #060; padding:8px"><b>BROUGHT FORWARD TO 154 CARDS AT BATCH DY &sect;5.
+THE ELEVEN ROWS ADDED SINCE DQ ARE IN BOLD AND THE ONE RETIREMENT IS STRUCK THROUGH.</b> DR added
+Wheeling Cut and Counter Time and re-authored Lunge onto BREAK; DS added six; DY added five out of
+the vault. <b>Every added row was assigned inside DQ's OWN vocabulary rather than a re-cut one</b>,
+because a refresh that also moves the axis definitions cannot be compared with what it replaced.
+<b>Lunge's row below still reads DMG-ST and that is DQ's snapshot</b>; &sect;2's counts use its
+re-authored BREAK, which is the one place this table and that one deliberately disagree.</p>
+<h4>Arcanist &mdash; 12 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Null Field</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Resonance</td></tr>
@@ -837,8 +889,10 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Unmaking</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>Resonance</td></tr>
 <tr><td>Overcharge</td><td align="center">20</td><td align="center">5</td><td align="center">1.5</td><td>METER-GEN</td><td>SELF</td><td>Resonance</td></tr>
 <tr><td>Magi&#x27;s Wrath</td><td align="center">30</td><td align="center">4</td><td align="center">4.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Resonance</td></tr>
+<tr><td><b>Arcane Surge</b></td><td align="center">15</td><td align="center">3</td><td align="center">3.0</td><td>AMP-SELF</td><td>SELF</td><td>Resonance</td></tr>
+<tr><td><b>Reality Fracture</b></td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>TEMPO</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
 </table>
-<h4>Beastmaster &mdash; 8 cards</h4>
+<h4>Beastmaster &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Twin Hunt</td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>companion</td></tr>
@@ -849,6 +903,8 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Last Howl</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>companion</td></tr>
 <tr><td>Succession</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>PET</td><td>SELF</td><td>companion</td></tr>
 <tr><td>Unleash</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>companion</td></tr>
+<tr><td><b>Bear the Brunt</b></td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>companion</td></tr>
+<tr><td><b>Bring It Down</b></td><td align="center">25</td><td align="center">5</td><td align="center">2.0</td><td>AMP-TEAM</td><td>PARTY</td><td>companion</td></tr>
 </table>
 <h4>Berserker &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
@@ -864,12 +920,12 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Battle Shout</td><td align="center">15</td><td align="center">2</td><td align="center">1.5</td><td>AMP-TEAM</td><td>PARTY</td><td>Bleed</td></tr>
 <tr><td>Rampage</td><td align="center">40</td><td align="center">4</td><td align="center">4.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Bleed</td></tr>
 </table>
-<h4>Cryomancer &mdash; 12 cards</h4>
+<h4>Cryomancer &mdash; 11 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Winter&#x27;s Toll</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>hold</td></tr>
 <tr><td>Rimebinding</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>STATUS</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
-<tr><td>Flash Freeze</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>hold</td></tr>
+<tr><td><s>Flash Freeze</s></td><td colspan="6"><b>RETIRED at Batch DR &sect;2</b> &mdash; an exact duplicate of Glacial Prison at a worse price on every axis. Its CTRL / ENEMY-ONE decision survives: Glacial Prison and Cryoclasm both make it.</td></tr>
 <tr><td>Killing Frost</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
 <tr><td>Hoarfrost Armor</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Chilled</td></tr>
 <tr><td>Deep Winter</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>STATUS</td><td>ENEMY-ALL</td><td>Chilled</td></tr>
@@ -880,7 +936,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Cryoclasm</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>hold</td></tr>
 <tr><td>Shatter</td><td align="center">30</td><td align="center">5</td><td align="center">4.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>hold</td></tr>
 </table>
-<h4>Devout &mdash; 10 cards</h4>
+<h4>Devout &mdash; 11 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Vow of Suffering</td><td align="center">20</td><td align="center">3</td><td align="center">1.0</td><td>MIT-PARTY</td><td>ALLY-ONE</td><td>Faith</td></tr>
@@ -893,6 +949,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Mantle</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>SHIELD</td><td>ALLY-ONE</td><td>Divine Shield</td></tr>
 <tr><td>Sacred Resolve</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
 <tr><td>Bulwark of Fortitude</td><td align="center">30</td><td align="center">3</td><td align="center">3.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td><b>Divine Wrath</b></td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>AMP-TEAM</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
 </table>
 <h4>Holy Cleric &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
@@ -939,7 +996,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Firestorm</td><td align="center">30</td><td align="center">4</td><td align="center">3.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>Burn</td></tr>
 <tr><td>Phoenix Rebirth</td><td align="center">0</td><td align="center">4</td><td align="center">2.0</td><td>RESOURCE</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
 </table>
-<h4>Sharpshooter &mdash; 8 cards</h4>
+<h4>Sharpshooter &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Called Volley</td><td align="center">30</td><td align="center">4</td><td align="center">3.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>&mdash; <i>none</i></td></tr>
@@ -950,8 +1007,10 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Reacquire</td><td align="center">20</td><td align="center">4</td><td align="center">1.5</td><td>METER-RULE</td><td>ENEMY-ONE</td><td>Focus</td></tr>
 <tr><td>Fault Line</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>BREAK</td><td>SELF</td><td>Focus</td></tr>
 <tr><td>Drumfire</td><td align="center">25</td><td align="center">3</td><td align="center">3.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>Focus</td></tr>
+<tr><td><b>Dug In</b></td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>Focus</td></tr>
+<tr><td><b>Heads Down</b></td><td align="center">25</td><td align="center">4</td><td align="center">2.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
 </table>
-<h4>Survivalist &mdash; 8 cards</h4>
+<h4>Survivalist &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Choking Smoke</td><td align="center">25</td><td align="center">4</td><td align="center">2.5</td><td>STATUS</td><td>ENEMY-ALL</td><td>statuses</td></tr>
@@ -962,8 +1021,10 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Stalking Horse</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>CTRL</td><td>SELF</td><td>statuses</td></tr>
 <tr><td>Downwind</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>STATUS</td><td>SELF</td><td>statuses</td></tr>
 <tr><td>Cull</td><td align="center">30</td><td align="center">5</td><td align="center">3.0</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>statuses</td></tr>
+<tr><td><b>Thick Hide</b></td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>MIT-SELF</td><td>SELF</td><td>afflictions</td></tr>
+<tr><td><b>Salve</b></td><td align="center">25</td><td align="center">5</td><td align="center">2.0</td><td>HEAL</td><td>SELF</td><td>afflictions</td></tr>
 </table>
-<h4>Swordmaster &mdash; 10 cards</h4>
+<h4>Swordmaster &mdash; 12 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Precision Strike</td><td align="center">20</td><td align="center">3</td><td align="center">2.0</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
@@ -976,8 +1037,10 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Formless</td><td align="center">35</td><td align="center">6</td><td align="center">1.0</td><td>STANCE</td><td>SELF</td><td>stance</td></tr>
 <tr><td>Lunge</td><td align="center">25</td><td align="center">0</td><td align="center">3.5</td><td>DMG-ST</td><td>ENEMY-ONE</td><td>stance</td></tr>
 <tr><td>Execute</td><td align="center">30</td><td align="center">3</td><td align="center">2.0</td><td>DMG-BURST</td><td>ENEMY-ONE</td><td>&mdash; <i>none</i></td></tr>
+<tr><td><b>Wheeling Cut</b></td><td align="center">30</td><td align="center">4</td><td align="center">2.5</td><td>DMG-AOE</td><td>ENEMY-ALL</td><td>stance</td></tr>
+<tr><td><b>Counter Time</b></td><td align="center">25</td><td align="center">5</td><td align="center">2.0</td><td>CTRL</td><td>ENEMY-ONE</td><td>stance</td></tr>
 </table>
-<h4>Warden &mdash; 9 cards</h4>
+<h4>Warden &mdash; 10 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Covering Guard</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>MIT-ALLY</td><td>ALLY-ONE</td><td>Block</td></tr>
@@ -989,6 +1052,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Recompense</td><td align="center">20</td><td align="center">4</td><td align="center">1.0</td><td>RESOURCE</td><td>SELF</td><td>Block</td></tr>
 <tr><td>Turn the Blade</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>BREAK</td><td>SELF</td><td>Block</td></tr>
 <tr><td>Hold the Line</td><td align="center">30</td><td align="center">6</td><td align="center">3.0</td><td>MIT-PARTY</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
+<tr><td><b>Rallying Shout</b></td><td align="center">25</td><td align="center">3</td><td align="center">2.5</td><td>RESOURCE</td><td>PARTY</td><td>&mdash; <i>none</i></td></tr>
 </table>
 <h4>class-wide: cleric &mdash; 6 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
@@ -1010,7 +1074,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Hunter&#x27;s Mark</td><td align="center">15</td><td align="center">4</td><td align="center">1.5</td><td>AMP-TEAM</td><td>ENEMY-ALL</td><td>&mdash; <i>none</i></td></tr>
 <tr><td>Arcane Arrows</td><td align="center">25</td><td align="center">5</td><td align="center">1.0</td><td>AMP-SELF</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
 </table>
-<h4>class-wide: mage &mdash; 6 cards</h4>
+<h4>class-wide: mage &mdash; 7 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">
 <tr><th>card</th><th>cost</th><th>cd</th><th>init</th><th>axis</th><th>target shape</th><th>engine it reads or writes</th></tr>
 <tr><td>Magic Barrier</td><td align="center">25</td><td align="center">4</td><td align="center">1.0</td><td>SHIELD</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
@@ -1019,6 +1083,7 @@ specific row rather than with the conclusion.</i></p>
 <tr><td>Mana Well</td><td align="center">20</td><td align="center">5</td><td align="center">1.0</td><td>RESOURCE</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
 <tr><td>Dispel</td><td align="center">15</td><td align="center">3</td><td align="center">1.5</td><td>STRIP</td><td>EITHER-ONE</td><td>&mdash; <i>none</i></td></tr>
 <tr><td>Blink</td><td align="center">10</td><td align="center">3</td><td align="center">1.0</td><td>TEMPO</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
+<tr><td><b>Mana Shield</b></td><td align="center">15</td><td align="center">3</td><td align="center">1.0</td><td>RESOURCE</td><td>SELF</td><td>&mdash; <i>none</i></td></tr>
 </table>
 <h4>class-wide: warrior &mdash; 6 cards</h4>
 <table border="1" cellpadding="3" cellspacing="0">

@@ -520,7 +520,9 @@ var melted := 0.0             # armor shredded off THIS unit by Melt Armor
 # ASHES OF AL'AR (Batch BB §6). It was a Pyromancer talent until AR removed
 # every defensive option from that spec, and its field sat here with NO WRITER
 # AT ALL — kept, gated `> 0`, waiting for a home. It has one now: the ability of
-# the same name in `CLASS_POOLS["mage"]`, earnable by any Mage from a boss.
+# the same name in all three MAGE SPEC POOLS, earnable by any Mage from a zone
+# boss. (BB put it in `CLASS_POOLS["mage"]` as well; DY §3 deleted that dict,
+# and the three spec-pool entries are the ones the live draw has always read.)
 # `ashes_return` HOLDS A REAL MAGNITUDE (the percentage of maximum health handed
 # back) rather than the old rank count behind a `randf() < 0.11 * ranks` roll —
 # the additive form every batch since AR has used, and the roll had no business

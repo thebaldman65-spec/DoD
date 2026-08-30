@@ -233,14 +233,24 @@ func _pools() -> void:
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
-	# CLASS_POOLS AND SPEC_POOLS FEED THE BOSS PICK and must not move (BO's
-	# rule, kept by BQ, BR, BT, BU, BV and BW).
-	ok(Classes.CLASS_POOLS["mage"].size() == 12,
-		"CLASS_POOLS['mage'] is byte-untouched at 12")
+	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
+	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
+	# pin standing correctly; DY deletes the collection, so the strongest thing
+	# that can be said about it is that it is gone. Read off the SOURCE, in the
+	# shape `test_batch_an` uses for `roll_ability_offer`.
+	ok(not FileAccess.get_file_as_string("res://scripts/classes.gd").contains(
+			"const CLASS_POOLS"),
+		"CLASS_POOLS is DELETED (DY §3) — the class-wide BOSS pool is gone, not zeroed")
+	# **BATCH DY §3 — `CLASS_POOLS` IS DELETED AND THE LEAK LOOP OVER IT GOES
+	# WITH IT.** It was the CLASS-WIDE half of the zone-boss pick, dead since
+	# AN §4 re-pointed the award at `SPEC_POOLS` alone, and DY retired it after
+	# re-homing the seven abilities it alone listed. **THE CLAIM THIS SUITE
+	# OWNS IS INTACT AND IS ASSERTED TWICE OVER**: these cards are not in the
+	# class-wide DRAFT pool (the loop just above) and not in any spec BOSS pool
+	# (the loop just below). What is gone is a third loop against a structure
+	# that no longer exists — which would have passed for no reason, and this
+	# project holds a vacuous pass to be worse than a red.
 	for n in NINE:
-		for cls in Classes.CLASS_POOLS:
-			ok(not Classes.CLASS_POOLS[cls].has(n),
-				"%s did not leak into the BOSS pool %s" % [n, cls])
 		for spec in Classes.SPEC_POOLS:
 			ok(not Classes.SPEC_POOLS[spec].has(n),
 				"%s did not leak into the boss SPEC pool %s" % [n, spec])

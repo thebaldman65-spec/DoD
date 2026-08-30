@@ -1417,9 +1417,19 @@ func owned_ability_names(member: Dictionary) -> Array:
 #
 # BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class
 # draw Batch AH built is dropped, because abilities are spec-locked now.
-# `Classes.CLASS_POOLS` / `class_pool()` are left standing and still resolve;
-# nothing in the run reads them any more, so re-opening the class draw is a
-# one-line change if the designer wants it back.
+#
+# **AND BATCH DY §3 DELETED THE OTHER HALF OF THAT DRAW.** This comment used to
+# end "`Classes.CLASS_POOLS` / `class_pool()` are left standing and still
+# resolve ... re-opening the class draw is a one-line change if the designer
+# wants it back." Both are gone. The one-line claim was true of the CODE and
+# was always the smallest part of the price: the container held 61 curated
+# entries against twelve specs, 56 of the 183 hero-and-entry pairs a reopened
+# draw could offer duplicated something that hero can already reach, and 27 of
+# those were the hero's own PROTECTED CORE. **RE-OPENING A CLASS DRAW IS A
+# DESIGN DECISION WITH A CURATION BILL, NOT A ONE-LINE CHANGE**, and if it is
+# ever taken it reads `Classes.CLASS_DRAFT_POOLS` — which is live and curated —
+# rather than a second dict rebuilt from scratch. The award below is
+# SPEC_POOLS-only and that is the standing ruling.
 func award_ability_pick(member: Dictionary) -> bool:
 	var offer := roll_spec_ability_offer(member)
 	if offer.is_empty():

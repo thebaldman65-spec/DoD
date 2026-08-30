@@ -26,8 +26,10 @@
 #      crit building sums to 5 with Attunement (additive, one read site); and
 #      the kill clause fires ONCE PER DEATH.
 #   §5 THE DEBUG GRANT, spec-scoped: with the toggle on an Arcanist holds no
-#      Pyromancer ability and no CLASS_POOLS entry, and each hero holds every
-#      ability of their own spec.
+#      Pyromancer ability and nothing from a class-wide pool, and each hero
+#      holds every ability of their own spec. (The class-wide BOSS pool it
+#      named, `CLASS_POOLS`, was deleted at DY §3; the assertion is kept and a
+#      second one pins the accessor's absence.)
 #   NEGATIVE CONTROLS for the two that would fail silently — the step-doubling
 #      back on Singularity, and the fallback consuming a mini-boss slot.
 extends SceneTree
@@ -421,9 +423,16 @@ func _source_audit() -> void:
 		"...and that is its ONLY read site (a second would double it)")
 	ok(bsrc.count("_gain_resonance(sg_h") == 1,
 		"the kill clause is paid in exactly one place")
-	# §5: the class pool is gone from the debug grant.
+	# §5: the class pool is gone from the debug grant. **AND AS OF DY §3 IT IS
+	# GONE FROM THE GAME** — `class_pool()` was deleted with `CLASS_POOLS`, so
+	# this negative can no longer be made false by re-adding the call: the
+	# symbol it names does not resolve. Both halves are asserted, because the
+	# second one is what makes the first permanent.
 	ok(not bsrc.contains("+ Classes.class_pool(Classes.class_of_spec(spec))"),
-		"the debug grant no longer walks CLASS_POOLS")
+		"the debug grant does not walk a class-wide boss pool")
+	ok(not FileAccess.get_file_as_string("res://scripts/classes.gd").contains(
+			"static func class_pool("),
+		"...and `class_pool()` itself is DELETED (DY §3), so it cannot come back by accident")
 	# §1: the grant site records a fallback rather than doing nothing.
 	ok(tsrc.contains("static func _collided("),
 		"there is ONE collision site in talents.gd")
@@ -809,8 +818,22 @@ func _live_debug_grant() -> void:
 			if granted != "":
 				ok(names.has(granted),
 					"%s holds their own tree grant %s" % [spec, granted])
-		# ...and NOTHING from the class pool, which is where the siblings live.
-		for entry2 in Classes.class_pool(Classes.class_of_spec(spec)):
+		# ...and NOTHING a SIBLING SPEC owns. **DY §3 deleted `CLASS_POOLS`,
+		# which is the list this walked**; the siblings' own boss and draft
+		# pools are where those names live, and they are what the complaint
+		# (testing the Arcanist put Pyromancer abilities in his hands) was
+		# always about.
+		var sibling_names: Array = []
+		for sib in Classes.SPEC_IDS.get(Classes.class_of_spec(spec), []):
+			if String(sib) == spec:
+				continue
+			for sn in Classes.spec_pool(String(sib)):
+				if not sibling_names.has(sn):
+					sibling_names.append(sn)
+			for sn2 in Classes.spec_draft_pool(String(sib)):
+				if not sibling_names.has(sn2):
+					sibling_names.append(sn2)
+		for entry2 in sibling_names:
 			if Classes.spec_pool(spec).has(entry2):
 				continue
 			if Classes.spec_abilities(spec).any(func(a): return a.display_name == entry2):
@@ -820,7 +843,7 @@ func _live_debug_grant() -> void:
 						return Talents.granted_name(n.get("payload", {})) == entry2):
 				continue
 			ok(not names.has(entry2),
-				"%s does NOT hold class-pool entry %s" % [spec, entry2])
+				"%s does NOT hold sibling-spec entry %s" % [spec, entry2])
 	# The named complaint, stated as its own check: the Arcanist and the
 	# Pyromancer's signature abilities.
 	var arc := _hero(scene, 1)

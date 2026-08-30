@@ -180,11 +180,16 @@ func _kit_correction() -> void:
 			and sp.cooldown == 4,
 			"the earnable Shatterpoint carries the kit's numbers (30/20/40/4cd)")
 
-	# The class pool's stance exclusion (Batch AH's curation rule) survives.
-	var warrior: Array = Classes.class_pool("warrior")
-	ok(warrior.has("Shatterpoint"), "the warrior class pool still holds Shatterpoint")
+	# The class-wide curation rule (Batch AH's) survives, over the pool that is
+	# still live. **DY §3 DELETED `CLASS_POOLS`**, so "Shatterpoint is in the
+	# warrior class pool" has no subject any more; what AK actually protects is
+	# that the STANCE PIECES are never offered to a sibling who has no stance to
+	# swap, and that claim is asserted against the class-wide DRAFT.
+	var warrior: Array = Classes.class_draft_pool("warrior")
+	ok(Classes.spec_pool("swordmaster").has("Shatterpoint"),
+		"Shatterpoint is still EARNABLE from the Swordmaster's boss pool")
 	ok(not warrior.has("Guard Change") and not warrior.has("Lunge"),
-		"the stance pieces stay out of the class pool — a sibling has no stance to swap")
+		"the stance pieces stay out of the class-wide draft — a sibling has no stance to swap")
 
 	# The passive blurb must not still advertise Guard Change as earnable.
 	var blurb := String(Classes.SPEC_INFO["swordmaster"]["passive_desc"])
@@ -200,10 +205,15 @@ func _pools_resolve() -> void:
 		for name in Classes.SPEC_POOLS[spec]:
 			ok(Classes.spec_pool_ability(spec, String(name)) != null,
 				"spec pool %s: '%s' resolves" % [spec, name])
-	for class_key in Classes.CLASS_POOLS:
-		for name in Classes.CLASS_POOLS[class_key]:
+	# **DY §3 — RE-POINTED FROM `CLASS_POOLS` (deleted) TO `CLASS_DRAFT_POOLS`.**
+	# The question this loop asks is "does every name a class-wide offer can
+	# produce resolve to a real Ability", and the class-wide offer is the DRAFT
+	# seam now. A pool naming an ability nothing defines is an offer that pays
+	# nothing, whichever dict it lives in.
+	for class_key in Classes.CLASS_DRAFT_POOLS:
+		for name in Classes.CLASS_DRAFT_POOLS[class_key]:
 			ok(Classes.pool_ability(String(name)) != null,
-				"class pool %s: '%s' resolves" % [class_key, name])
+				"class draft %s: '%s' resolves" % [class_key, name])
 
 
 # ---------- 3. the tree still fits the Batch AI mould ----------

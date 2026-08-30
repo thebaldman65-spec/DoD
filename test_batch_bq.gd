@@ -61,11 +61,19 @@ const TRANCHE_3 := {
 		"Exhortation", "Undying Vigil"],
 }
 
-# THE NEGATIVE CONTROL THAT MATTERS (§6). `CLASS_POOLS` feeds the BOSS pick,
-# and the whole reason `CLASS_DRAFT_POOLS` is a separate structure is that
-# dropping twelve entries into this one would silently re-weight every boss
-# offer in the game. Asserted as a literal, not as a size: a swap of two names
-# would keep the count and change every draw.
+# **THE NEGATIVE CONTROL THAT MATTERED (§6), AND ITS SUBJECT IS DELETED.**
+# `CLASS_POOLS` fed the CLASS-WIDE half of the zone-boss pick, and the whole
+# reason `CLASS_DRAFT_POOLS` is a separate structure is that dropping twelve
+# entries into that one would silently re-weight every boss offer in the game.
+# The literal freeze below is what said so — asserted as a LITERAL rather than
+# as a size, because a swap of two names keeps the count and changes every draw.
+#
+# **BATCH DY §3 DELETED `CLASS_POOLS`, SO THE FREEZE HAS NOTHING LEFT TO
+# FREEZE.** The table is KEPT AS A RECORD OF WHAT IT HELD — the only place in
+# the repo that still enumerates the 61 entries — and it is no longer compared
+# against anything live. **THE CONTROL ITSELF IS NOT LOST**: what it protected
+# was "this batch's twelve did not leak into the boss channel", and the boss
+# channel is `SPEC_POOLS` alone now, which is what is asserted below.
 const CLASS_POOLS_AT_BQ := {
 	"warrior": ["Bloodlust", "Wildstrikes", "Hack and Slash", "Blood Price",
 		"Battle Shout", "Rampage", "Mocking Blow", "Crushing Blow", "War Stomp",
@@ -124,7 +132,7 @@ func _run() -> void:
 	Profile.data = {}
 
 	_pools()
-	_class_pools_untouched()
+	_class_pools_deleted()
 	_break_damage()
 	_weaker_half()
 	_draft_flow()
@@ -179,9 +187,19 @@ func _pools() -> void:
 	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
 	ok(total >= 24,
 		"§3/§4+BR: the class-wide half has FALLEN to %d, below the 24 that shipped" % total)
+	# **BATCH DY §1 — A FLOOR, NOT AN EQUALITY, AND DX'S OWN SWEEP MISSED THIS
+	# SITE.** DX §1 converted thirty-five draft equalities to floors and left
+	# exactly six, all in `test_batch_cd`. This was a seventh: the condition
+	# reads `live`, a variable accumulated from `class_draft_pool()`, so a sweep
+	# matching the accessor by name could not see it. **IT IS THE EXACT SITE THE
+	# NEXT BATCH TO AUTHOR A CLASS-WIDE CARD WOULD TRIP**, and DY is that batch
+	# — Mana Shield takes the Mage class pool to SEVEN. The floor is what this
+	# suite owns; the authoritative per-class table is `test_batch_cd`'s.
 	for cls in TRANCHE_3:
 		var live: Array = Classes.class_draft_pool(cls)
-		ok(live.size() == 6, "§3/§4: the %s class pool holds six (%d)" % [cls, live.size()])
+		ok(live.size() >= 6,
+			"§3/§4: the %s class pool has FALLEN to %d, below the six that shipped" % [
+				cls, live.size()])
 		for nm in TRANCHE_3[cls]:
 			ok(live.has(nm), "§3/§4: %s is in the %s class pool" % [nm, cls])
 	# THE DEBT WAS STATED AS AN ASSERTION rather than as prose, so that it stayed
@@ -258,19 +276,23 @@ func _pools() -> void:
 			% spec_total)
 
 
-func _class_pools_untouched() -> void:
-	# §6's NAMED NEGATIVE CONTROL, asserted directly rather than by a count.
-	ok(Classes.CLASS_POOLS.size() == 4, "§1: CLASS_POOLS still keys four classes")
-	for cls in CLASS_POOLS_AT_BQ:
-		var live: Array = Classes.CLASS_POOLS.get(cls, [])
-		ok(live == CLASS_POOLS_AT_BQ[cls],
-			"§1: CLASS_POOLS[%s] is BYTE-UNTOUCHED by this batch" % cls)
-	# And the twelve are NOT in it — the tidy-looking edit a later batch would
-	# make is exactly the one this asserts against.
+func _class_pools_deleted() -> void:
+	# §6's NAMED NEGATIVE CONTROL, RE-POINTED AT THE LIVE BOSS CHANNEL (DY §3).
+	# `CLASS_POOLS` is deleted, so "byte-untouched" is replaced by "gone", read
+	# off the source; `CLASS_POOLS_AT_BQ` above is kept as the record of what it
+	# held and is compared against nothing.
+	ok(not _src("res://scripts/classes.gd").contains("const CLASS_POOLS"),
+		"§1+DY: CLASS_POOLS is DELETED — the class-wide BOSS pool is gone, not zeroed")
+	ok(CLASS_POOLS_AT_BQ.size() == 4,
+		"§1: ...and this suite still records all four of its classes")
+	# And the twelve are NOT in the boss channel — the tidy-looking edit a later
+	# batch would make is exactly the one this asserts against. That channel is
+	# `SPEC_POOLS` alone now.
 	for cls2 in TRANCHE_3:
 		for nm in TRANCHE_3[cls2]:
-			ok(not Classes.CLASS_POOLS[cls2].has(nm),
-				"§1: %s did NOT leak into the boss pool CLASS_POOLS[%s]" % [nm, cls2])
+			for spec in Classes.SPEC_POOLS:
+				ok(not Classes.SPEC_POOLS[spec].has(nm),
+					"§1: %s did NOT leak into the boss pool SPEC_POOLS[%s]" % [nm, spec])
 
 
 # ---------- §2 BREAK DAMAGE, ASSIGNED RATHER THAN OMITTED ----------
@@ -384,17 +406,17 @@ func _draft_flow() -> void:
 	var hunter: Dictionary = run.party[3]
 	hunter["spec"] = "sharpshooter"
 	var mage_left: Dictionary = run.draft_pool_left(mage)
-	ok(mage_left["class"].size() == 6,
-		"§1: a Cryomancer's class side of the draft holds six (%d)" % \
+	ok(mage_left["class"].size() >= 6,
+		"§1: a Cryomancer's class side of the draft has FALLEN to %d, below six (DY took the Mage pool to seven)" % \
 			mage_left["class"].size())
 	var cleric_left: Dictionary = run.draft_pool_left(cleric)
-	ok(cleric_left["class"].size() == 6,
-		"§1: an Occultist's class side holds six (%d)" % cleric_left["class"].size())
+	ok(cleric_left["class"].size() >= 6,
+		"§1: an Occultist's class side has FALLEN below six (%d)" % cleric_left["class"].size())
 	var hunter_left: Dictionary = run.draft_pool_left(hunter)
 	# INVERTED BY BATCH BR, same reason as the pool check above: this recorded
 	# the debt in the ROLL rather than in the array, and the debt is paid.
-	ok(hunter_left["class"].size() == 6,
-		"§0+BR: a Sharpshooter's class side holds six now — the debt, paid (%d)" % \
+	ok(hunter_left["class"].size() >= 6,
+		"§0+BR: a Sharpshooter's class side has FALLEN below the six BR paid (%d)" % \
 			hunter_left["class"].size())
 	# The no-return ledger covers a class card exactly as it covers a spec one.
 	mage["draft_refused"] = ["Magic Barrier"]

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-29 (Batch DX)</b></p>
+<p align="right"><b>Last updated: 2026-08-30 (Batch DY)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1141,28 +1141,25 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Immolate, Firestorm, Ashes of Al'ar</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter, Ashes of Al'ar</td></tr>
 <tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Death Ray</td><td>Overcharge, Magi's Wrath, Stabilize, Ashes of Al'ar</td></tr>
-<tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope, Resurrection (four — see §6.3)</td><td>Divine Plea</td></tr>
+<tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope, Resurrection (four — see §6.3)</td><td>Divine Plea, Dawnbreak, Sanctuary</td></tr>
 <tr><td><b>Devout</b></td><td>Divine Shield, Consecrated Ground, Blessing of Zeal</td><td>Sacred Resolve, Bulwark of Fortitude</td></tr>
 <tr><td><b>Occultist</b></td><td>Hex of Ruin, Bewitch, Dark Pact</td><td>Mind Flay, Mass Hysteria, Umbral Sigil</td></tr>
 <tr><td><b>Beastmaster</b></td><td>Summon Companion (the three-companion picker counts as one), Hunter's Instinct, Kill Command</td><td>Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild, Mark of the Hunt</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Aimed Shot, Powershot, Hold Breath</td><td>Quick Draw, Triple Shot, Coup de Grâce, Pinning Shot, Called Shot</td></tr>
 <tr><td><b>Survivalist</b></td><td>Tripwire, Shrapnel Charge, Snare Trap</td><td>Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
-<p><b>The CLASS pool</b> holds what any spec of that class can earn: the sibling specs'
-abilities plus the class's vaulted ones. <b>Curation rule — an entry has to FUNCTION for a
-sibling.</b> Anything that costs a spec-exclusive secondary resource (Mercy, Faith), reads a
-passive the taker will not have (Burn to consume, Resonance to spend, Loyalty or a living
-companion, the Swordmaster's stance), or is a spec's signature identity piece (the three summons,
-Kill Command, Hex of Ruin) is spec-pool-only. <b>The zone-boss draw reads the SPEC pool
-alone</b>; the class pool is the standing statement of what an ability could legally be
-offered to, and it is what a re-opened class draw would read.</p>
-<table border="1" cellpadding="4">
-<tr><th>Class</th><th>Class pool (earnable by all three specs)</th></tr>
-<tr><td><b>Warrior</b></td><td>Bloodlust, Wildstrikes, Hack and Slash, Blood Price, Battle Shout, Rampage, Mocking Blow, Crushing Blow, War Stomp, Shieldwall, Interpose, Hold the Line, Overpower, Pommel Strike, Shatterpoint, Sweeping Strikes, Execute, Rallying Shout</td></tr>
-<tr><td><b>Mage</b></td><td>Flamewave, Firestorm, Razor Ice, Blizzard, Ice Lance, Rime, Arcane Barrage, Mana Shield, Arcane Surge, Reality Fracture, Phoenix Rebirth, Ashes of Al'ar</td></tr>
-<tr><td><b>Cleric</b></td><td>Heal, Renewal, Divine Shield, Consecrated Ground, Blessing of Zeal, Sacred Resolve, Bulwark of Fortitude, Bewitch, Dark Pact, Mind Flay, Mass Hysteria, Dawnbreak, Sanctuary, Divine Wrath</td></tr>
-<tr><td><b>Hunter</b></td><td>Hunter's Instinct, Mark of the Hunt, Aimed Shot, Powershot, Hold Breath, Quick Draw, Triple Shot, Pinning Shot, Called Shot, Tripwire, Shrapnel Charge, Snare Trap, Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
-</table>
+<p><b>THE ZONE-BOSS DRAW READS THE SPEC POOL ALONE, AND THERE IS NO SECOND POOL BESIDE
+IT ANY MORE.</b> A <b>CLASS pool</b> stood here from Batch AH: one list per class, holding the
+sibling specs' abilities plus the class's vaulted ones, from which the award drew two of every
+three cards. <b>Batch AN retired that draw</b> — abilities are spec-locked — and <b>Batch DY
+deleted the list</b>. It had held <b>seven finished abilities named in no other pool</b>, so they
+were unreachable by any run while every audit in the project kept measuring them; DY re-homed all
+seven into live draft and boss pools first and removed the container behind them.
+<b>The curation rule the list carried is not lost</b> — it governs the CLASS-WIDE DRAFT pools in
+§6b, which are live: an ability offered class-wide has to FUNCTION for a sibling, so anything
+costing a spec-exclusive resource (Mercy, Faith), reading a passive the taker will not have (Burn,
+Resonance, Loyalty, a living companion, the Swordmaster's stance), or carrying a spec's signature
+identity (the three summons, Kill Command, Hex of Ruin) stays spec-only.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
 yourself in embers and the next blow that would kill you this battle returns you at 40% of
 maximum health instead. Once per battle. It is the Mage class's only refusal of
@@ -1279,27 +1276,37 @@ SPEC_POOLS, the draft reads these.</p>
 <table border="1" cellpadding="4">
 <tr><th>Spec</th><th>Draft pool</th></tr>
 <tr><td><b>Berserker</b></td><td>Blood Offering, Gut Rip, Reckless Abandon, Berserk, Blood Debt, Unslaked, Spite, Boil Over, <b>Battle Shout</b>, <b>Rampage</b></td></tr>
-<tr><td><b>Warden</b></td><td>Covering Guard, Eye of the Storm, Shield Slam, Vendetta, Aegis Wall, Anvil, Recompense, Turn the Blade, <b>Hold the Line</b></td></tr>
+<tr><td><b>Warden</b></td><td>Covering Guard, Eye of the Storm, Shield Slam, Vendetta, Aegis Wall, Anvil, Recompense, Turn the Blade, <b>Hold the Line</b>, <b>Rallying Shout</b></td></tr>
 <tr><td><b>Swordmaster</b></td><td>Precision Strike, Feint, Sever, Battle Poise, Feigned Guard, Discipline, Answering Steel, Formless, <b>Lunge</b>, <b>Execute</b>, <b>Wheeling Cut</b>, <b>Counter Time</b></td></tr>
 <tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt, Slow Burn, Stoke, Funeral Pyre, Firedraw, Pyre Wake, Emberkeep, <b>Backdraft</b>, <b>Immolate</b>, <b>Pyroblast</b>, <b>Firestorm</b>, <b>Phoenix Rebirth</b></td></tr>
 <tr><td><b>Cryomancer</b></td><td>Winter&#x27;s Toll, Rimebinding, Killing Frost, Hoarfrost Armor, Deep Winter, Cold Iron, Frostbind, <b>Rime</b>, <b>Glacial Prison</b>, <b>Cryoclasm</b>, <b>Shatter</b></td></tr>
-<tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind, Arcane Bolt, Inner Arcane, Arcane Echo, Resonant Field, Threshold, Unmaking, <b>Overcharge</b>, <b>Magi&#x27;s Wrath</b></td></tr>
+<tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind, Arcane Bolt, Inner Arcane, Arcane Echo, Resonant Field, Threshold, Unmaking, <b>Overcharge</b>, <b>Magi&#x27;s Wrath</b>, <b>Arcane Surge</b>, <b>Reality Fracture</b></td></tr>
 <tr><td><b>Holy</b></td><td>Second Wind, Rite of Return, Recant, Shared Grief, Reprisal, Divine Presence, Alms, Vespers, <b>Divine Plea</b>, <b>Intercession</b></td></tr>
-<tr><td><b>Devout</b></td><td>Vow of Suffering, Aegis Reversal, Ordination, Fortified Spirit, Reliquary, Elevation, Blessing of the Faithful, Mantle, <b>Sacred Resolve</b>, <b>Bulwark of Fortitude</b></td></tr>
+<tr><td><b>Devout</b></td><td>Vow of Suffering, Aegis Reversal, Ordination, Fortified Spirit, Reliquary, Elevation, Blessing of the Faithful, Mantle, <b>Sacred Resolve</b>, <b>Bulwark of Fortitude</b>, <b>Divine Wrath</b></td></tr>
 <tr><td><b>Occultist</b></td><td>Blight the Well, Covenant of Ash, Suffering, Transference, Anointing, Breaking Darkness, Requiem, Penance, <b>Mind Flay</b>, <b>Mass Hysteria</b></td></tr>
 <tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds, Bloodbond, Savage Sweep, Ghostpack, Last Howl, Succession, Unleash, <b>Bear the Brunt</b>, <b>Bring It Down</b></td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry&#x27;s Mark, Crossfire, Calibrating Shot, Trophy Shot, Reacquire, Fault Line, Drumfire, <b>Dug In</b>, <b>Heads Down</b></td></tr>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b></td></tr>
 <tr><td colspan="2"><b>Class-wide pools</b> — drawn by every spec of the class, at roughly one card in four</td></tr>
-<tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink</td></tr>
+<tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink, <b>Mana Shield</b> (seven — the one class pool that is not six)</td></tr>
 <tr><td><b>Cleric</b> (all three specs)</td><td>Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
 <tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> All four class pools hold six, so <b>one card in four is
+<p><b>THE DRAFT IS COMPLETE.</b> Every class pool holds at least six, so <b>one card in four is
 class-wide</b> and that seam draws a real entry for <b>every hero in the game</b> — no class
-rolls an empty pool and no offer loses its class card. <b>The draft stands at 149 of 149</b>
-&mdash; <b>125 spec</b> cards plus the <b>24 class-wide</b> ones.
+rolls an empty pool and no offer loses its class card. <b>The draft stands at 154 of 154</b>
+&mdash; <b>129 spec</b> cards plus <b>25 class-wide</b> ones.
+<b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
+finished abilities had sat in a class-wide BOSS pool that no run could reach since Batch AN closed
+the class draw: <b>RALLYING SHOUT</b> to the Warden, <b>ARCANE SURGE</b> and <b>REALITY
+FRACTURE</b> to the Arcanist, <b>DIVINE WRATH</b> to the Devout, <b>MANA SHIELD</b> to the Mage
+class pool, and <b>DAWNBREAK</b> and <b>SANCTUARY</b> to the Holy Cleric's zone-boss pool in §6a,
+which had held one card against three awards. Every one already had its handler, its card text and
+its Perfect; not a line of new mechanics was written for any of them.
+<b>THE CLASS HALF IS NO LONGER A FLAT MULTIPLE</b> — the Mage draws seven, the other three six —
+and <b>the shallowest spec pool in the game is TEN now</b>, where the Warden's nine had been the
+floor.
 <b>BATCH DS CLOSED THE HUNTER CLASS GAP AND IS WHAT TOOK IT PAST 143.</b> Its three specs held
 the three <b>shallowest pools in the game</b> (eight apiece), received <b>none</b> of DO&#x27;s
 twenty-two, and <b>not one of their twenty-four cards was a heal, a shield or hero-side

@@ -346,7 +346,19 @@ func _s5_recorded() -> void:
 		or cm.contains("protected core is guaranteed and permitted"),
 		"CLAUDE.md does not carry the ruling that settles §0 versus §1")
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("149 of 149"), "master.html does not state the current draft total")
+	# **BATCH DY §1 — THE NEEDLE IS RENDERED FROM THE LIVE POOLS, NOT AUTHORED.**
+	# It read the literal "149 of 149". That is a SECOND COPY OF A COUNT inside the check
+	# written to catch a stale one, which is this project's oldest recurring
+	# defect and the one CL §1 wrote a rule about — and it cost six files a
+	# hand-edit the moment DY moved the draft 149 -> 154. **The DOCUMENT still
+	# has to carry the figure; this file no longer carries a copy of it.**
+	var dy_draft := 0
+	for dy_s in Classes.SPEC_DRAFT_POOLS:
+		dy_draft += (Classes.SPEC_DRAFT_POOLS[dy_s] as Array).size()
+	for dy_c in Classes.CLASS_DRAFT_POOLS:
+		dy_draft += (Classes.CLASS_DRAFT_POOLS[dy_c] as Array).size()
+	ok(master.contains("%d of %d" % [dy_draft, dy_draft]),
+		"master.html does not state the current draft total (%d)" % dy_draft)
 
 
 func _initialize() -> void:

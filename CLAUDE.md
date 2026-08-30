@@ -1003,8 +1003,16 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   moves across this repair means an assertion was removed rather than re-pointed. All thirteen
   targets DX touched read their baselines exactly.
 - **A FROZEN COLLECTION IS NOT A GROWING ONE AND ITS EQUALITY IS CORRECT.** The changelog ARCHIVE
-  keeps `== 149` because only a cut moves it; `CLASS_POOLS`' byte-freeze pins are the point of
-  those checks. **Ask whether a batch doing its job would ADD to it — that is the whole test.**
+  keeps `== 149` because only a cut moves it. **Ask whether a batch doing its job would ADD to it
+  — that is the whole test.** (`CLASS_POOLS`' byte-freeze pins were the other example DX named;
+  **DY §3 deleted that dict**, and those six pins assert its ABSENCE off the source now, which is
+  the same claim made about a structure that is gone.)
+- **AND THE FIRST SWEEP MISSED ONE, WHICH IS THE LIMIT OF A SWEEP BY ACCESSOR NAME.** DX's sweep
+  matched `ok()` conditions that name a pool accessor, and `test_batch_bq` §3/§4 reads
+  `live.size() == 6` where `live` was assigned from `class_draft_pool()` two lines up. **It was the
+  exact site the next batch to author a class-wide card would trip**, and DY was that batch.
+  **A CONDITION READING A LOCAL IS STILL A CONDITION READING THE POOL** — sweep the variable, not
+  just the call.
 
 ## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
 > **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline
@@ -1581,6 +1589,25 @@ than the candidates for it.** The bot's list is the other half of that question 
   genuinely restores charges and clears the rest. **Derive the exact condition from the handler;
   the bot only tells you where to look.**
 
+### THE VAULT'S EXIT IS THE POOLS, AND A VAULT ENTRY IS OWED ONE (Batch DY §3)
+> **`Classes.vault_ability()` holds the ONE definition of ten live cards. Its exit is the draft and
+> boss pools, and nothing else. A definition here that no pool names is reachable by NOTHING.**
+
+`vault_ability()`'s own header promised for eighteen batches that its entries *"return as earnable
+picks without a line of new mechanics"*. **THE PROMISE WAS TRUE AND THE EXIT WAS SHUT**: the only
+route out was `CLASS_POOLS`, and AN §4 closed the draw that read it. Seven finished abilities sat
+there, and **DK, DL and DM each spent measured engineering on one of them** — a widened heal driven
+on a live bear, a widened Pressure clause with a new guard authored for it, a two-clause card read
+in a scope audit — with nothing anywhere saying the cards were unreachable.
+- **THE COST OF AN UNREACHABLE DEFINITION IS PAID BY EVERY SWEEP, SILENTLY.** All seven were in
+  `ability_corpus()`, so the width gates, the text rules, `check_cn`'s bar criterion and
+  `check_dw`'s two populations had all been auditing cards no player could obtain.
+- **SO: A NEW VAULT ENTRY IS OWED A POOL IN THE SAME BATCH.** The header says so at the site.
+  DY §1/§2 re-homed all seven and `CLASS_POOLS` was deleted behind them.
+- **AND THE VAULT IS KEPT, BECAUSE IT IS NOT A HOLDING PEN ANY MORE.** It is the single-source
+  definition table those ten cards resolve through; a second copy in a pool is the drift the
+  resolver exists to prevent.
+
 ### ESTABLISH WHY A STRUCTURE IS DEAD BEFORE DELETING IT (Batch DV §1)
 > **Dead code is deleted rather than zeroed — but a structure ORPHANED by a later change is a LOST
 > FEATURE, and one that was never wired is scaffolding. Only the second is a deletion. The first is
@@ -1593,10 +1620,23 @@ and DELETED `roll_ability_offer`**, leaving the pools standing on purpose.
 - **THE PROVENANCE IS THE TEST, NOT THE CURRENT REACHABILITY.** Both cases look identical today.
   Ask what deleted the reader, and name the batch; `test_batch_an` §1 asserting a function *absent*
   is the kind of evidence that settles it.
-- **AND A DEAD STRUCTURE CAN BE THE LAST LISTING OF LIVE CONTENT.** Seven abilities are authored,
-  resolving and fully implemented, and **`CLASS_POOLS` is the only list in the game that names
-  them** — deleting the container would delete the record of the contents. **Before deleting a
+- **AND A DEAD STRUCTURE CAN BE THE LAST LISTING OF LIVE CONTENT.** Seven abilities were authored,
+  resolving and fully implemented, and **`CLASS_POOLS` was the only list in the game that named
+  them** — deleting the container would have deleted the record of the contents. **Before deleting a
   structure, ask what is reachable ONLY through it**, and count it.
+- **THE WORKED EXAMPLE IS CLOSED AT BATCH DY §3, AND THE ORDER IS THE RULE IT LEAVES BEHIND.**
+  **RE-HOME WHAT IS REACHABLE ONLY THROUGH A STRUCTURE BEFORE YOU DELETE THE STRUCTURE, AND IN THAT
+  ORDER.** All seven went into live pools first — five draft, two boss — and the container was
+  removed behind them, so `ability_corpus()` read **227 on both sides of the batch**. Deleting
+  first would have dropped it to 220 mid-batch and moved the printed population of roughly fifteen
+  gates for no reason at all, and every one of those movements would have had to be un-moved.
+- **AND THE DELETION'S REAL COST WAS THE READERS, NOT THE CONTENTS.** Nothing in a run read
+  `CLASS_POOLS`, and `pool_ability()` never consulted it — but **eighteen suites and gates did**,
+  and a grep for the constant found only some of them: `class_pool()`, its accessor, had callers
+  the constant's name never appears beside. **SWEEP FOR THE ACCESSOR AS WELL AS THE CONSTANT.**
+  Each reader is re-pointed at the live structure that answers the same question, or inverted to
+  assert the container's ABSENCE off the source (`test_batch_an`'s idiom for `roll_ability_offer`);
+  **a check that survives deletion by asking an empty dict a question is worse than a red.**
 
 ## THE TRAPS — RULES THAT WERE BURIED IN BATCH BLOCKS (GATHERED AT BATCH CW §1)
 
@@ -2665,14 +2705,23 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**BATCH DS CLOSED THE HUNTER CLASS GAP. THE DRAFT STANDS AT 149 OF 149 AND NOTHING IS OWED
-— 125 SPEC + 24 CLASS-WIDE.** Its three specs held the three SHALLOWEST pools in the game (eight
+**BATCH DY EMPTIED THE VAULT. THE DRAFT STANDS AT 154 OF 154 AND NOTHING IS OWED — 129 SPEC +
+25 CLASS-WIDE.** Five finished abilities that no run could reach were re-homed into live pools —
+**Rallying Shout** to the Warden (9 → 10), **Arcane Surge** and **Reality Fracture** to the
+Arcanist (10 → 12), **Divine Wrath** to the Devout (10 → 11) and **Mana Shield** to the MAGE class
+pool (6 → 7) — and two more, **Dawnbreak** and **Sanctuary**, to the Holy Cleric's ZONE-BOSS pool.
+**NOT ONE CARD WAS AUTHORED**: all seven came out of `Classes.vault_ability()` with their handlers,
+their card text and their Perfects already live. **THE CLASS HALF IS NO LONGER A FLAT MULTIPLE
+EITHER**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
+`SPEC_TARGET` has been since DO — **do not write `4 * 6` again.** **THE SHALLOWEST SPEC POOL IN THE
+GAME IS TEN NOW**; the floor stays at EIGHT because it catches a pool that EMPTIES.
+**BATCH DS CLOSED THE HUNTER CLASS GAP AND TOOK IT TO 149 OF 149 — 125 SPEC + 24 CLASS-WIDE.** Its three specs held the three SHALLOWEST pools in the game (eight
 apiece), received NONE of DO's twenty-two, and **not one of their twenty-four cards was a heal, a
 shield or hero-side mitigation.** All three read TEN now, matching the Cleric class, and each
 spec's defence is shaped by its own engine — the companion for the Beastmaster, the Focus meter
 for the Sharpshooter, the affliction board for the Survivalist. **THE FLOOR STAYS AT EIGHT AND IS
-NOW SLACK EVERYWHERE**: the Warden's nine is the shallowest pool in the game, and `SPEC_FLOOR`
-catches a pool that EMPTIES rather than tracking the deepening.
+NOW SLACK EVERYWHERE**, and `SPEC_FLOOR` catches a pool that EMPTIES rather than tracking the
+deepening. (The Warden's nine was the shallowest pool in the game from DS to DY; it is ten now.)
 **BATCH DR MOVED THE TOTAL TWICE IN ONE BATCH AND THE NET WAS +1, TO 143 OF 143.** §2 retired one
 Cryomancer card as an exact duplicate at a worse price (12 → 11) and §4 gave the Swordmaster
 two (10 → 12).
@@ -2686,7 +2735,8 @@ EXPECTATION IS A TABLE NOW, NOT A MULTIPLE** (`test_batch_cd.PER_SPEC_DEPTH`): w
 again would re-assert the CI-era shape over a tree that has moved past it.
 **THE TARGET WAS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
 CLASS-WIDE = 120; THE DRAFT STOOD AT 120 OF 120 AND NOTHING WAS OWED (Batch CI), AND DO'S
-TWENTY-TWO TOOK IT TO 142 OF 142, DR'S NET +1 TO 143 OF 143 AND DS'S SIX TO 149 OF 149.** The ~96 came from an older
+TWENTY-TWO TOOK IT TO 142 OF 142, DR'S NET +1 TO 143 OF 143, DS'S SIX TO 149 OF 149 AND DY'S FIVE
+RE-HOMED VAULT CARDS TO 154 OF 154.** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -2696,10 +2746,10 @@ keep it as written (they are the record of what each batch believed — CA's rul
 the correction.
 **TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
 nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` REACHED 96 AND THE DRAFT
-REACHED 120 OF 120 THERE. **SINCE BATCH DS IT IS 125 AND 149 OF 149: ALL TWELVE SPECS DRAFT FROM
-AT LEAST NINE — ELEVEN OF THEM FROM TEN OR MORE — ALL FOUR CLASS POOLS HOLD SIX, AND
-NOTHING IS OWED.** The asserted FLOOR is still eight and is deliberately slack; the Warden's
-nine is the live minimum.
+REACHED 120 OF 120 THERE. **SINCE BATCH DY IT IS 129 AND 154 OF 154: ALL TWELVE SPECS DRAFT FROM
+AT LEAST TEN, THE MAGE CLASS POOL HOLDS SEVEN AND THE OTHER THREE HOLD SIX, AND NOTHING IS OWED.**
+The asserted FLOORS are still eight (spec) and six (class) and both are deliberately slack; **ten
+is the live spec minimum and six the live class minimum.**
 **THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
 DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
 that sentence is dead in master.html §6b, in `classes.gd`'s header comment and here.
@@ -2727,7 +2777,8 @@ CLASSES COMPLETED IN THAT ORDER — THE MAGE FIRST, THE CLERIC SECOND, THE HUNTE
 WARRIOR LAST — AND ALL FOUR ARE COMPLETE.** **NO PART OF THE DRAFT IS OWED: 96 SPEC ACROSS TWELVE
 SPECS AT EIGHT, PLUS 24 CLASS-WIDE ACROSS FOUR POOLS OF SIX, WAS 120 OF 120 — AND DO'S TWENTY-TWO
 TOOK THE SPEC HALF TO 118 AND THE WHOLE DRAFT TO 142 OF 142, DR'S NET +1 TO 119 AND
-143 OF 143, AND DS'S SIX HUNTER CARDS TO 125 AND 149 OF 149.**
+143 OF 143, DS'S SIX HUNTER CARDS TO 125 AND 149 OF 149, AND DY'S FIVE RE-HOMED VAULT CARDS TO
+129 AND 154 OF 154.**
 **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has refused
 or taken most of a pool, which is the no-return ledger working. Every draft suite's per-spec depth
 loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche asserted its own

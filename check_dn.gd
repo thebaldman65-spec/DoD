@@ -153,7 +153,6 @@ func _initialize() -> void:
 			"spec_draft": Classes.spec_draft_pool(spec),
 			"class_draft": Classes.class_draft_pool(ck),
 			"spec_pool": Classes.spec_pool(spec),
-			"class_pool": Classes.class_pool(ck),
 			"passive": String(Classes.SPEC_INFO[spec].get("passive", "")),
 			"passive_desc": String(Classes.SPEC_INFO[spec].get("passive_desc", "")),
 		}
@@ -249,7 +248,6 @@ func _initialize() -> void:
 			"spec-draft": Classes.spec_draft_pool(spec),
 			"class-draft": Classes.class_draft_pool(ck),
 			"spec-pool": Classes.spec_pool(spec),
-			"class-pool": Classes.class_pool(ck),
 		}
 		# THE CORE IS BUILT THE WAY `protected_names` BUILDS IT — class kit
 		# THROUGH `apply_kit_overrides`, then the spec's own openers. Resolving

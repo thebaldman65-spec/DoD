@@ -5763,3 +5763,57 @@ green equality over a short walk reads exactly like a green equality over the ri
 against hand-rolled walks exists and is enforced — it just sweeps gates, and matches the accessors
 where this walk reads the constants. **An enforcement rule has a scope, and the scope is part of
 the rule; the place a defect survives is the place nobody thought to point the instrument.**
+
+---
+
+## Batch DY — THE VAULT IS EMPTIED
+
+**The thing worth recording is not that seven abilities got homes. It is that "kept, ready to
+return" was a decision that outlived its own reasoning by eighteen batches, and nothing in the
+project was built to notice.** `vault_ability()`'s header promised its entries would *"return as
+earnable picks without a line of new mechanics"* — true, and the promise came with an exit,
+`CLASS_POOLS`, which Batch AN §4 closed while re-pointing something else. From that day the vault
+was a room with no door, and the header still read like a plan. **Three separate batches then spent
+measured engineering inside it**: DK widened `sanctuary`'s heal and drove it on a live bear, DL
+widened Rallying Shout's Pressure clause and authored a new guard for it, DM read Divine Wrath's
+two clauses in a scope audit. Not one of them was wrong, and not one of them could have known.
+**A KEEP IS A DECISION, AND A DECISION WITH A REASON ATTACHED TO IT NEEDS THE REASON RE-READ, NOT
+JUST THE DECISION HONOURED.** `test_batch_bj` is the sharpest artefact of this: it swept for dead
+symbols, deliberately KEPT `CLASS_POOLS`, and wrote the keep's reason into its own failure message
+— *"stands ready for the day the class draw reopens"* — beside a second assertion whose message
+said the seven were *"reachable only through the dead class draw"*. **The suite recorded both
+halves of the problem in adjacent lines and neither line could see the other.**
+
+**§0's ordering is the transferable part and it is smaller than it looks.** Re-home first, delete
+second, and the corpus never moves. Backwards, the corpus drops 227 → 220 for the length of one
+batch, and roughly fifteen gates print a different population — every one of which would have to be
+moved and then moved back, and any real movement hiding among them would be indistinguishable from
+the bookkeeping. **The cost of the wrong order is not a failure; it is that a batch full of
+expected movement cannot see an unexpected one.**
+
+**§3's real cost was the readers, and the shape of the miss is worth more than the count.** Nothing
+in a run read `CLASS_POOLS` and `pool_ability()` never consulted it, so the deletion looked cheap.
+Eighteen suites and gates read it — and a grep for the CONSTANT found only some of them, because
+`class_pool()`, its accessor, had callers whose lines never mention the constant at all. **The
+symbol you delete and the symbol people call are not the same symbol.** The same shape turned up
+one layer further out: DX's sweep for equalities against the draft matched conditions naming a pool
+accessor, and missed `test_batch_bq`'s `live.size() == 6`, where `live` was assigned from
+`class_draft_pool()` two lines above. It was the exact site the next batch to author a class-wide
+card would trip, and this was that batch.
+
+**§2 is where the fix and the finding point in opposite directions, which is the useful part.**
+Holy's boss pool held one card against three awards, and two vault heals closed it for free. But
+re-measuring every spec afterwards says the Devout is worse off than Holy ever was: two cards
+against three awards, **and both of them draftable**, so all three of his awards can pay nothing.
+Holy's was the visible case because it was structurally short; his is invisible because it depends
+on what the player drafted. **A fix that closes the loudest instance of a problem is the moment the
+problem is most likely to be recorded as closed.** So the re-measurement was the deliverable, not
+the fix, and `check_dv` §2 derives all twelve every run.
+
+**§5 turned up a disagreement rather than a number.** The draft audit's §2 counts decisions at one
+primary axis per card; Batch DR reported its own repair to the Swordmaster as "four → eight
+decisions" by counting one card's secondary clause as well. Neither is wrong. **Both were written
+into the same page, and the page has been quoted from since.** The refresh keeps DQ's method and
+names the disagreement at the site, because a per-card table exists precisely so a later pass can
+disagree with a row rather than with a conclusion — and it cannot do that if two counting rules are
+in the document without labels.

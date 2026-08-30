@@ -478,21 +478,28 @@ func _pools() -> void:
 	# of a re-specced node rather than an unread field.
 	ok(not Classes.SPEC_POOLS["pyromancer"].has("Flame Shield"),
 		"Flame Shield left the Pyromancer spec pool")
-	ok(not Classes.CLASS_POOLS["mage"].has("Flame Shield"),
-		"Flame Shield left the mage class pool")
+	# **DY §3 — `CLASS_POOLS` IS DELETED, so "Flame Shield left the mage class
+	# pool" is now true by the pool not existing.** AR's real claim is that the
+	# NAME is dead everywhere, and that is what is asserted: it resolves to
+	# nothing, so no pool anywhere could offer it.
+	ok(Classes.pool_ability("Flame Shield") == null,
+		"Flame Shield resolves to NOTHING — the name is dead in every pool")
 	ok(Classes.SPEC_POOLS["pyromancer"].has("Immolate"),
 		"Immolate took its place in the spec pool")
-	# Immolate reads Overburn, so it must NOT be class-pool eligible.
-	ok(not Classes.CLASS_POOLS["mage"].has("Immolate"),
+	# Immolate reads Overburn, so it must NOT be offered class-wide. **DY §3
+	# re-points both from `CLASS_POOLS["mage"]` (deleted) to
+	# `CLASS_DRAFT_POOLS["mage"]`, which is the live class-wide offer** — the
+	# curation rule is the same rule and it now has a structure that exists.
+	ok(not Classes.class_draft_pool("mage").has("Immolate"),
 		"Immolate is spec-only — it reads a passive a sibling will not have")
-	ok(not Classes.CLASS_POOLS["mage"].has("Pyroblast"),
+	ok(not Classes.class_draft_pool("mage").has("Pyroblast"),
 		"Pyroblast is spec-only for the same reason")
 	# ...and every entry that remains still resolves.
 	for name in Classes.SPEC_POOLS["pyromancer"]:
 		ok(Classes.spec_pool_ability("pyromancer", name) != null,
 			"spec pool -> %s resolves" % name)
-	for name in Classes.CLASS_POOLS["mage"]:
-		ok(Classes.pool_ability(name) != null, "mage class pool -> %s resolves" % name)
+	for name in Classes.class_draft_pool("mage"):
+		ok(Classes.pool_ability(name) != null, "mage class draft -> %s resolves" % name)
 
 
 func _no_defence() -> void:

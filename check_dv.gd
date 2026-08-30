@@ -2,7 +2,7 @@
 # AND THE CHANGELOG CUT.
 #
 #   §0  the premises §1's ruling stands on, re-derived rather than inherited
-#   §1  `CLASS_POOLS` is dead, and SEVEN abilities die with it
+#   §1  the dead pool is DELETED (DY §3) and the vault's exit is the pools
 #   §2  every spec's boss pool against the award count, derived from both ends
 #   §3  the phoenix door — measured on a real cast, and the exactness controlled
 #   §4  the cut — headings, disjointness, order, and the archive still reachable
@@ -51,12 +51,13 @@ func _initialize() -> void:
 
 
 # ── §0 — THE PREMISES §1's RULING STANDS ON ─────────────────────────────────
-# §1 rules that `CLASS_POOLS` is an ORPHANED FEATURE rather than scaffolding,
-# and that ruling rests entirely on three facts about the code rather than on
-# anything in the structure itself. They are asserted here so that the day the
-# class draw is re-opened — which `run_state.gd` says is one line — this gate
-# fails and says the report is stale, instead of the report quietly describing
-# a game that has moved.
+# §1 ruled `CLASS_POOLS` an ORPHANED FEATURE rather than scaffolding, and that
+# ruling rested entirely on three facts about the code rather than on anything
+# in the structure itself. **BATCH DY §3 ACTED ON IT AND DELETED THE
+# CONTAINER**, so the third premise INVERTS: what would make the ruling stale
+# is now the class-wide boss pool COMING BACK. The premises are still asserted
+# here, so the day someone re-opens that channel this gate fails and says the
+# report is stale, instead of the report quietly describing a game that moved.
 func _s0_premises() -> void:
 	print("\n§0 — the premises the §1 ruling rests on")
 	var rs := FileAccess.get_file_as_string("res://scripts/run_state.gd")
@@ -75,42 +76,39 @@ func _s0_premises() -> void:
 		"§0: the award no longer reads `roll_spec_ability_offer` — the channel has changed")
 	ok(not body.contains("class_pool"),
 		"§0: the award reads a class pool again — the class draw is BACK and §1 is stale")
-	# (3) THE STRUCTURE ITSELF STILL RESOLVES, which is why deleting it was
-	# ever a live proposal.
-	ok(Classes.CLASS_POOLS.size() == 4, "§0: `CLASS_POOLS` still keys four classes")
+	# (3) THE STRUCTURE IS GONE. **BATCH DY §3 RULED AND DELETED IT**, so the
+	# premise inverts: what would make §1 stale now is the container COMING
+	# BACK. Read off the source, because a deleted symbol cannot be sized.
+	var cs := FileAccess.get_file_as_string("res://scripts/classes.gd")
+	ok(not cs.contains("const CLASS_POOLS"),
+		"§0: `CLASS_POOLS` is BACK — the class-wide boss pool has returned and §1 is stale")
+	ok(not cs.contains("static func class_pool("),
+		"§0: `class_pool()` is BACK — its accessor has returned and §1 is stale")
 
 
-# ── §1 — THE DEAD POOL, AND WHAT DIES WITH IT ───────────────────────────────
-# The count is DU's and is re-derived rather than quoted. What is new here is
-# the second question: of the 61 names, how many are reachable through NO other
-# channel? Deleting a container deletes the record of its contents, and that is
-# an independent reason not to delete this one.
+# ── §1 — THE DEAD POOL IS DELETED, AND THE SEVEN HAVE HOMES ────────────────
+# **DV RULED `CLASS_POOLS` A LOST FEATURE AND DELETED NOTHING; DX PRICED THE
+# OPTIONS AND AUTHORED NOTHING; DY §3 TOOK OPTION B.** So this section stops
+# measuring a container and starts asserting the two things that make its
+# deletion safe — and would say so if either stopped being true.
 #
-# THE POOL TABLES ARE READ FOR BUCKET MEMBERSHIP AND NOT AS AN ENUMERATION.
-# The corpus question — "what are all the abilities in the game" — has exactly
-# one answer and this gate asks it through `Classes.ability_corpus()` below.
-# What the tables answer is a different question the corpus cannot: WHICH
-# bucket a given name sits in. That is `check_dn`'s distinction and it is why
-# this gate carries no walk of its own.
+# THE SEVEN ARE DERIVED, NEVER LISTED, EXACTLY AS THEY WERE BEFORE. A
+# hard-coded list would go stale the moment one lost its home, and it would go
+# stale SILENTLY, which is the whole failure mode this gate is about. What is
+# walked now is the VAULT — `vault_ability()` is the single-source definition
+# table those seven live in — and the question asked of every entry is the one
+# that mattered: **does a live pool name it?** A vault definition in no pool is
+# reachable by nothing, which is the state that cost this project eighteen
+# batches of silent audit and three batches of measured engineering.
 func _s1_class_pools() -> void:
-	print("\n§1 — `CLASS_POOLS` is dead, and seven abilities are dead with it")
+	print("\n§1 — the dead pool is deleted, and the vault's exit is the pools")
 	var corpus_names := {}
 	for ab in Classes.ability_corpus():
 		corpus_names[ab.display_name] = true
 
-	var total := 0
-	var distinct := {}
-	for cls in Classes.CLASS_POOLS:
-		for n in Classes.CLASS_POOLS[cls]:
-			total += 1
-			distinct[n] = true
-			ok(corpus_names.has(n),
-				"§1: `%s` is in a class pool and resolves to nothing" % n)
-	ok(total == 61, "§1: `CLASS_POOLS` is %d entries, not the 61 on record" % total)
-	ok(distinct.size() == total,
-		"§1: the 61 entries are no longer 61 DISTINCT names (%d)" % distinct.size())
-
-	# Every channel a name can arrive by, OTHER than the dead pool.
+	# Every channel a name can arrive by. THE CLASS-WIDE BOSS POOL IS NOT ONE
+	# OF THEM ANY MORE — that is the change, and this dict is what proves the
+	# seven did not need it.
 	var elsewhere := {}
 	for cls2 in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[cls2]:
@@ -125,22 +123,63 @@ func _s1_class_pools() -> void:
 		for n4 in Classes.CLASS_DRAFT_POOLS[cls3]:
 			elsewhere[n4] = true
 
+	# THE VAULT, WALKED OFF ITS OWN SOURCE rather than off a name list. Every
+	# `match` arm in `vault_ability()` is a definition; every definition is
+	# owed a pool.
+	var cs := FileAccess.get_file_as_string("res://scripts/classes.gd")
+	var vi := cs.find("static func vault_ability(display_name: String) -> Ability:")
+	ok(vi >= 0, "§1: `vault_ability()` is gone — the definitions the seven live in have moved")
+	var vend := cs.find("\nstatic func ", vi + 20)
+	var vbody := cs.substr(vi, vend - vi) if (vi >= 0 and vend > vi) else ""
+	var vault_names: Array = []
+	for line in vbody.split("\n"):
+		var t := line.strip_edges()
+		if t.begins_with("\"") and t.ends_with("\":") and not t.contains(" := "):
+			var nm := t.substr(1, t.length() - 3)
+			if nm != "" and not vault_names.has(nm):
+				vault_names.append(nm)
+	ok(vault_names.size() == 10,
+		"§1: the vault holds %d definitions, not the 10 on record — re-derive before quoting it" % vault_names.size())
+
 	var homeless: Array = []
-	for n5 in distinct:
-		if not elsewhere.has(n5):
-			homeless.append(n5)
+	for nm2 in vault_names:
+		ok(corpus_names.has(nm2),
+			"§1: vault entry `%s` resolves to nothing" % nm2)
+		if not elsewhere.has(nm2):
+			homeless.append(String(nm2))
 	homeless.sort()
-	# DERIVED, NEVER LISTED. A hard-coded list of seven names would go stale the
-	# moment one of them is given a home, and would go stale SILENTLY — which is
-	# the whole failure mode §1 is about.
-	ok(homeless.size() == 7,
-		"§1: %d abilities are reachable ONLY through the dead class pool, not the 7 on record — %s" % [
+	# THE ASSERTION DY EARNED. It read `homeless.size() == 7` before this batch,
+	# against a container that gave those seven no exit at all.
+	ok(homeless.size() == 0,
+		"§1: %d vault definitions are named by NO live pool — a card reachable by nothing is back (%s)" % [
 			homeless.size(), ", ".join(PackedStringArray(homeless))])
-	ok(homeless.size() > 0,
-		"§1: NOTHING is reachable only through the dead pool any more — the second reason not to delete it is gone")
-	print("  CLASS_POOLS: %d entries, %d distinct, %d reachable NOWHERE else" % [
-		total, distinct.size(), homeless.size()])
-	print("  the homeless: %s" % ", ".join(PackedStringArray(homeless)))
+	# AND WHERE THE SEVEN LANDED, ASSERTED BY SHAPE RATHER THAN BY NAME: five
+	# entered draft pools and two a boss pool, so both channels are used and
+	# neither absorbed the whole vault.
+	var in_draft := 0
+	var in_boss := 0
+	for nm3 in vault_names:
+		var d := false
+		var b := false
+		for spec2 in Classes.SPEC_DRAFT_POOLS:
+			if Classes.SPEC_DRAFT_POOLS[spec2].has(nm3):
+				d = true
+		for cls4 in Classes.CLASS_DRAFT_POOLS:
+			if Classes.CLASS_DRAFT_POOLS[cls4].has(nm3):
+				d = true
+		for spec3 in Classes.SPEC_POOLS:
+			if Classes.SPEC_POOLS[spec3].has(nm3):
+				b = true
+		if d:
+			in_draft += 1
+		if b:
+			in_boss += 1
+	ok(in_draft >= 5,
+		"§1: only %d vault definitions are DRAFTABLE — DY re-homed five that way" % in_draft)
+	ok(in_boss >= 5,
+		"§1: only %d vault definitions sit in a BOSS pool — DY re-homed two that way beside the three already there" % in_boss)
+	print("  vault: %d definitions, %d draftable, %d in a boss pool, %d homeless" % [
+		vault_names.size(), in_draft, in_boss, homeless.size()])
 
 
 # ── §2 — THE AWARD COUNT AND THE POOLS THAT CANNOT FILL IT ──────────────────
@@ -171,25 +210,56 @@ func _s2_boss_depth() -> void:
 				short.append("%s(%d)" % [spec, pool.size()])
 			print("    %-13s pool=%d  shortfall=%d" % [
 				spec, pool.size(), maxi(0, awards - pool.size())])
-	ok(total == 42, "§2: `SPEC_POOLS` is %d entries, not the 42 on record" % total)
-	ok(distinct.size() == 40,
-		"§2: the 42 entries are %d distinct names, not the 40 on record" % distinct.size())
+	# BATCH DY §2 moved both: Dawnbreak and Sanctuary joined Holy's pool, so
+	# 42 -> 44 entries and 40 -> 42 distinct.
+	ok(total == 44, "§2: `SPEC_POOLS` is %d entries, not the 44 on record" % total)
+	ok(distinct.size() == 42,
+		"§2: the 44 entries are %d distinct names, not the 42 on record" % distinct.size())
 
-	# THE FINDING ITSELF, ASSERTED AS A PROPERTY AND PRINTED AS A LIST. If a
-	# later batch deepens Holy's pool this goes red and says so, which is the
-	# ruling arriving rather than the gate being wrong.
+	# THE FINDING ITSELF, ASSERTED AS A PROPERTY AND PRINTED AS A LIST.
+	# **BATCH DY §2 CLOSED HOLY'S HALF AND THE GATE SAID SO BY GOING RED, WHICH
+	# IS EXACTLY WHAT THIS TRIPWIRE IS FOR** — DX examined it and left it
+	# standing on that reasoning. It reads ONE now, not two: **the Devout is the
+	# only spec left with a structural shortfall**, and he is the sharpest case
+	# in the game on the other measure too (both of his two boss cards are
+	# draftable, so all three of his awards can pay nothing).
 	short.sort()
-	ok(short.size() == 2,
-		"§2: %d specs hold a boss pool thinner than the %d awards, not the 2 on record — %s" % [
+	ok(short.size() == 1,
+		"§2: %d specs hold a boss pool thinner than the %d awards, not the 1 on record — %s" % [
 			short.size(), awards, ", ".join(PackedStringArray(short))])
-	ok(Classes.SPEC_POOLS.get("holy", []).size() == 1,
-		"§2: the Holy Cleric's boss pool is no longer ONE card — the sharpest case has moved")
-	# AND THE HALF THAT MAKES IT BITE: his one card is also draftable, so the
-	# third award can go empty too.
+	ok(Classes.SPEC_POOLS.get("holy", []).size() == 3,
+		"§2: the Holy Cleric's boss pool is no longer THREE cards — DY §2's fix has moved")
+	ok(Classes.SPEC_POOLS.get("inquisitor", []).size() == 2,
+		"§2: the Devout's boss pool is no longer TWO — the remaining shortfall has moved")
+	# **AND THE GENERAL PROBLEM SURVIVES HOLY'S FIX, WHICH IS THE HALF A READER
+	# WOULD OTHERWISE ASSUME WAS CLOSED.** A boss card that is ALSO draftable
+	# removes itself from the offer, so a pool can empty below its own depth.
+	# Derived, never listed: this counts the specs whose whole boss pool is
+	# draftable, and the Devout is one of them.
+	var emptiable: Array = []
+	for cls2 in Classes.SPEC_IDS:
+		for spec2 in Classes.SPEC_IDS[cls2]:
+			var bp: Array = Classes.SPEC_POOLS.get(spec2, [])
+			var dp: Array = Classes.SPEC_DRAFT_POOLS.get(spec2, [])
+			var left := 0
+			for n2 in bp:
+				if not dp.has(n2):
+					left += 1
+			if left < awards:
+				emptiable.append("%s(%d of %d safe)" % [spec2, left, bp.size()])
+	emptiable.sort()
+	ok(emptiable.size() == 8,
+		"§2: %d specs can be short of a full award set once drafting is accounted for, not the 8 on record — %s" % [
+			emptiable.size(), ", ".join(PackedStringArray(emptiable))])
 	var holy_pool: Array = Classes.SPEC_POOLS.get("holy", [])
 	var holy_draft: Array = Classes.SPEC_DRAFT_POOLS.get("holy", [])
-	ok(holy_draft.has(holy_pool[0]),
-		"§2: the Holy Cleric's one boss card is no longer draftable — his third award can no longer empty")
+	var holy_safe := 0
+	for n3 in holy_pool:
+		if not holy_draft.has(n3):
+			holy_safe += 1
+	ok(holy_safe == 2,
+		"§2: the Holy Cleric's un-draftable boss cards are %d, not the 2 DY §2 left her" % holy_safe)
+	print("    emptiable by drafting: %s" % ", ".join(PackedStringArray(emptiable)))
 	# The slot arithmetic that prices §2's card-shaped options.
 	ok(Classes.core_slots("holy") == 4,
 		"§2: Holy no longer carries four protected cores — the slot half of the pricing has moved")
@@ -438,11 +508,27 @@ func _s5_reported_not_fixed() -> void:
 
 	# (2) THE LAST HAND-ROLLED WALK, PINNED BY ITS BLIND SPOT RATHER THAN BY ITS
 	# SOURCE. Reproducing the walk here would be writing a second copy of the
-	# thing being complained about, so what is asserted is the CONSEQUENCE: the
-	# corpus reaches abilities that live in no pool and in no class kit, and
-	# every one of them is invisible to any walk built the old way. The day that
-	# population is empty, a short walk and the real one agree and this report
-	# is stale.
+	# thing being complained about, so what is asserted is the CONSEQUENCE: how
+	# many abilities the corpus reaches that live in no POOL and in no CLASS
+	# KIT. The day that population is empty, a short walk and the real one agree
+	# and this report is stale.
+	#
+	# **BATCH DY §3 MOVED THIS FIGURE 16 -> 43 WITHOUT MOVING ANYTHING ABOUT THE
+	# GAME, AND THAT IS WORTH MORE THAN THE NUMBER.** `CLASS_POOLS` was the ONE
+	# structure in the project that named the SIBLING SPECS' KIT ABILITIES as
+	# pool entries — Bloodlust, Mocking Blow, Hex of Ruin and twenty-four more
+	# were "in a pool" only because the class-wide boss pool listed them. It is
+	# deleted, so those twenty-seven now sit outside every pool by this walk's
+	# definition, exactly as they always did by the game's. **NOT ONE ABILITY
+	# BECAME LESS REACHABLE**: every one of them is in its own spec's opening
+	# kit, which `Classes.spec_abilities()` returns and this deliberately narrow
+	# walk does not read.
+	#
+	# THE CONSEQUENCE FOR THE OLD SENTENCE, CORRECTED RATHER THAN LEFT TO ROT:
+	# this population is no longer "invisible to a walk built the old way". The
+	# CL walk reads `spec_abilities()` too, so it reaches 223 of 227 and misses
+	# exactly the FOUR kit overrides — which is `check_cz` §0's set identity and
+	# is asserted there, once, rather than a second time here.
 	var pooled := {}
 	for cls in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[cls]:
@@ -450,9 +536,9 @@ func _s5_reported_not_fixed() -> void:
 				pooled[n] = true
 			for n2 in Classes.SPEC_DRAFT_POOLS.get(spec, []):
 				pooled[n2] = true
-	for cls2 in Classes.CLASS_POOLS:
-		for n3 in Classes.CLASS_POOLS[cls2]:
-			pooled[n3] = true
+	# DY §3: the `CLASS_POOLS` arm of this walk is gone with the dict. The
+	# figure below did not move — every name it contributed is in a spec pool,
+	# a draft pool or a class kit as well.
 	for cls3 in Classes.CLASS_DRAFT_POOLS:
 		for n4 in Classes.CLASS_DRAFT_POOLS[cls3]:
 			pooled[n4] = true
@@ -464,8 +550,8 @@ func _s5_reported_not_fixed() -> void:
 		if not pooled.has(ab2.display_name):
 			unseen.append(ab2.display_name)
 	unseen.sort()
-	ok(unseen.size() == 16,
-		"§5: %d abilities sit outside every pool and every class kit, not the 16 on record — the blind-spot figure is stale (%s)" % [
+	ok(unseen.size() == 43,
+		"§5: %d abilities sit outside every pool and every class kit, not the 43 on record — re-derive it (%s)" % [
 			unseen.size(), ", ".join(PackedStringArray(unseen))])
 	ok(unseen.size() > 0,
 		"§5: every ability is now in a pool or a class kit — a walk built the old way would agree with the corpus, and §5's finding is stale")

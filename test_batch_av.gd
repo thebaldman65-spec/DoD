@@ -179,9 +179,13 @@ func _kit_and_pool() -> void:
 	# eligible and is deliberately not in the spec pool either.
 	ok(not Classes.SPEC_POOLS["holy"].has("Intercession"),
 		"Intercession is a tree grant only, not a pool entry")
-	ok(not Classes.CLASS_POOLS["cleric"].has("Resurrection")
-		and not Classes.CLASS_POOLS["cleric"].has("Intercession"),
-		"neither Mercy spender leaked into CLASS_POOLS[cleric]")
+	# **DY §3 — re-pointed from `CLASS_POOLS["cleric"]` (deleted) to the live
+	# class-wide offer.** Both read Mercy on trigger, so neither can ever be
+	# offered to a sibling Cleric who has no stacks to pay them with — the same
+	# rule, over the structure that still exists.
+	ok(not Classes.class_draft_pool("cleric").has("Resurrection")
+		and not Classes.class_draft_pool("cleric").has("Intercession"),
+		"neither Mercy spender leaked into the CLERIC class-wide draft")
 	# EXACTLY ONE DEF (the AK resolver rule): the kit list calls
 	# pending_talent_ability rather than holding a second copy, so the rune
 	# grant, the pool resolver and the kit can never drift apart.

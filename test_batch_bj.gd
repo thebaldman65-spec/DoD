@@ -75,12 +75,37 @@ func _initialize() -> void:
 	# ---------- §1: the deliberate keeps are PRESENT (decisions, not oversights) ----------
 	ok(bsrc.contains("const CONVICTION_NO_CONSUME_SHARE := 0.5"),
 		"§1 KEEP: the AY §9 half-growth rule stands (test_batch_ay drives it; revived by any future partial-consume release)")
-	ok(csrc.contains("const CLASS_POOLS"),
-		"§1 KEEP: CLASS_POOLS stands ready for the day the class draw reopens (AN §4)")
-	for vname in ["Rallying Shout", "Mana Shield", "Arcane Surge", "Reality Fracture",
-			"Dawnbreak", "Sanctuary", "Divine Wrath"]:
+	# **BATCH DY §3 — THE KEEP BECAME A DELETION, AND THIS IS THE SITE THAT
+	# RECORDS IT.** BJ swept for dead symbols and DELIBERATELY KEPT
+	# `CLASS_POOLS`, on the stated reason that it "stands ready for the day the
+	# class draw reopens". That reason stood for eighteen batches while the
+	# container held SEVEN abilities reachable by nothing — DV named them, DX
+	# priced the options, DY ruled. **A KEEP IS A DECISION AND IT CAN EXPIRE**;
+	# BJ's assertion is inverted rather than deleted, so this file still records
+	# what happened to a symbol it once protected.
+	ok(not csrc.contains("const CLASS_POOLS"),
+		"§1 KEEP EXPIRED: CLASS_POOLS is DELETED (DY §3) — the seven it alone listed were re-homed first")
+	# **AND THE SEVEN ARE NOT JUST 'STANDING' ANY MORE — THEY ARE REACHABLE.**
+	# BJ's message read "reachable only through the dead class draw", which was
+	# the true and damning half of the keep. Each one is now in a live pool, and
+	# THAT is the claim worth pinning: a vault entry with no pool is the state
+	# this project spent eighteen batches paying for.
+	var dy_homes := {
+		"Rallying Shout": "warden", "Arcane Surge": "arcanist",
+		"Reality Fracture": "arcanist", "Divine Wrath": "inquisitor",
+	}
+	for vname in dy_homes:
 		ok(csrc.contains("\"%s\":" % vname),
-			"§1 KEEP: vault entry %s stands (design inventory; reachable only through the dead class draw)" % vname)
+			"§1 KEEP: vault entry %s still holds the ONE def of a live card" % vname)
+		ok(Classes.spec_draft_pool(String(dy_homes[vname])).has(vname),
+			"§1+DY: ...and it is DRAFTABLE from the %s pool" % dy_homes[vname])
+	ok(Classes.class_draft_pool("mage").has("Mana Shield"),
+		"§1+DY: Mana Shield is drawn class-wide by every Mage spec")
+	for bossname in ["Dawnbreak", "Sanctuary"]:
+		ok(csrc.contains("\"%s\":" % bossname),
+			"§1 KEEP: vault entry %s still holds the ONE def of a live card" % bossname)
+		ok(Classes.spec_pool("holy").has(bossname),
+			"§1+DY: ...and Holy earns it from a zone boss")
 	ok(usrc.contains("var icy_veins_charge"),
 		"§1 KEEP: the AS vault-pattern cryo family stands (documented keeps)")
 	ok(usrc.contains("var pyromaniac_ranks"),

@@ -220,8 +220,8 @@ func _pools() -> void:
 		for n3 in TRANCHE_2[spec5]:
 			ok(not Classes.spec_pool(spec5).has(n3),
 				"§5: '%s' is not also in the BOSS pool — the two draws stay separate" % n3)
-			ok(Classes.class_pool("warrior").find(n3) < 0,
-				"§5: '%s' is not in the old class pool either" % n3)
+			ok(Classes.class_draft_pool("warrior").find(n3) < 0,
+				"§5: '%s' is not in the class-wide draft either" % n3)
 			ok(not Classes.protected_names(spec5).has(n3),
 				"§5: '%s' is not in the opening kit either" % n3)
 	# NO ENTRY IS A STRICTLY BETTER VERSION OF ITS SIBLING (BD's Deadfall

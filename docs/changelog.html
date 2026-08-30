@@ -14,6 +14,122 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-30 &mdash; Batch DY: THE VAULT IS EMPTIED</h2>
+<p><i>Six sections. <b>The seven abilities no run could reach are re-homed into live pools,
+<code>CLASS_POOLS</code> is retired, Holy's empty boss awards close as a consequence, the last
+unseeded flake is seeded, and the draft audit's arithmetic is re-derived.</b> <b>NOT ONE CARD WAS
+AUTHORED AND NOT ONE MAGNITUDE MOVED</b> &mdash; every card moved already had its handler, its text
+and its Perfect. The draft goes 149 &rarr; 154 and <b>the ability corpus reads 227 on both sides of
+the batch.</b></i></p>
+
+<p><b>&sect;0 &mdash; THE ORDER WAS THE WHOLE OF IT.</b> Re-home first, retire the container
+second. All seven lived in <code>ability_corpus()</code> through <code>CLASS_POOLS</code> alone, so
+deleting the container first would have dropped the corpus <b>227 &rarr; 220 mid-batch</b> and moved
+the printed population of roughly fifteen gates for no reason. Done in this order <b>the corpus
+never moved</b>, and that was stated as the expected result before the run rather than discovered
+after it. It is recorded in <code>CLAUDE.md</code> as a rule: <b>re-home what is reachable only
+through a structure before you delete the structure.</b></p>
+
+<p><b>&sect;1 &mdash; FIVE CARDS INTO DRAFT POOLS.</b> Each home was verified against the LIVE pool
+before it was taken, because the pools had moved twice since the homes were priced.
+<b>RALLYING SHOUT &rarr; the Warden</b> (9 &rarr; 10, the shallowest pool in the game): its two
+clauses exist separately in his TALENT TREE and its refuel clause on a boss card, but
+<b>nothing in his draft pool did either</b>.
+<b>MANA SHIELD &rarr; the MAGE CLASS pool</b> (6 &rarr; 7): untied, general, reads no passive, and
+<b>derived over the whole corpus it is the only ability in the game that converts damage taken into
+Mana</b>.
+<b>ARCANE SURGE and REALITY FRACTURE &rarr; the Arcanist</b> (10 &rarr; 12): Reality Fracture is
+<b>the only ability in the 227-card corpus carrying a non-zero <code>delay_push</code></b>, an axis
+nothing else touches.
+<b>DIVINE WRATH &rarr; the Devout</b> (10 &rarr; 11).</p>
+
+<p><b>THE THREE PRICING QUESTIONS SHIP AS AUTHORED AND ARE FLAGGED RATHER THAN RETUNED.</b> Nothing
+was re-priced in this batch. (1) <b>Arcane Surge's 3.0 initiative is three times
+<code>BUFF_DELAY_CAP</code></b> and has never been priced against it; it sits outside
+<code>PURE_BUFFS</code> legitimately, because its Resonance bank is a second cast-time payload, but
+"legitimately outside the cap" is not "priced". (2) <b>Divine Wrath is party-wide +15% damage and
++15% speed at initiative 1.0 &mdash; and the sharper comparison is not the one on record.</b>
+<b>BLESSING OF ZEAL IS THE DEVOUT'S OWN PROTECTED CORE</b>: +15% damage on ONE ally at initiative
+2.0. Divine Wrath is that card made party-wide at HALF the initiative, in the same hero's kit.
+DS's BRING IT DOWN is priced at 2.0 for being party-wide, <b>but it is a BEASTMASTER card, so the
+two are not siblings and never meet in one offer</b> &mdash; the brief's claim that they would is
+corrected. (3) <b>SANCTUARY OVERLAPS HYMN OF HOPE</b>, Holy's protected core party-heal: a
+different shape (12% of max against 20/35%, Mana against Mercy) doing the same job. All three are
+reported in <code>docs/reports/DY.md</code> &sect;1 with options. <b>Ruled on nowhere.</b></p>
+
+<p><b>&sect;2 &mdash; HOLY'S BOSS POOL GOES 1 &rarr; 3, AND THE GENERAL PROBLEM SURVIVES IT.</b>
+DV &sect;2 measured it: three zone bosses award one pick each from this pool, and the pool held ONE
+card &mdash; so <b>two of her three awards paid nothing, and all three paid nothing if she drafted
+Divine Plea</b>, which is also draftable. <b>DAWNBREAK and SANCTUARY join it</b>, both Cleric heals
+out of the vault with handlers, text and a Perfect apiece. <b>The four fallback candidates DV
+priced are no longer needed for Holy.</b>
+<b>BUT THE QUESTION IS NOT CLOSED AND EVERY SPEC WAS RE-MEASURED.</b> <b>THE DEVOUT IS THE
+SHARPEST CASE NOW</b>: his pool is TWO against three awards, and <b>both of his two are also
+draftable</b>, so all three of his awards can pay nothing &mdash; worse than Holy's position ever
+was. <b>EIGHT of the twelve specs can be short of a full award set once drafting is accounted
+for</b>; the three Hunter specs and the Warden are the only four that cannot.
+<code>check_dv</code> &sect;2 derives both ends every run and <b>went red on Holy's fix, which is
+exactly what that tripwire is for.</b>
+<b>AND THE SHARP POINT:</b> <code>ABILITY_SLOT_CAP</code> is 7 and <b>the Holy Cleric carries FOUR
+protected cores, the only spec that does</b> &mdash; so the spec with the emptiest pool also had
+the fewest slots to receive a card.</p>
+
+<p><b>&sect;3 &mdash; <code>CLASS_POOLS</code> IS DELETED, NOT ZEROED.</b> 61 entries across four
+classes, every one authored and resolving, feeding an award <b>Batch AN &sect;4 re-pointed away
+eighteen batches ago</b>. <code>pool_ability()</code> never read it, so all seven of its exclusive
+entries still resolve with it gone; what was lost is the MANIFEST &mdash; the only place they were
+enumerated as a group &mdash; <b>and that is the point: they are no longer a group.</b>
+<b>THE READERS WERE THE REAL COST, AND A GREP FOR THE CONSTANT FOUND ONLY SOME OF THEM.</b>
+Eighteen suites and gates read it, and <code>class_pool()</code> &mdash; its accessor &mdash; had
+callers the constant's name never appears beside: <code>test_batch_ah</code>,
+<code>ah_battle</code>, <code>ak</code>, <code>an</code>, <code>au</code>, <code>bp</code> and
+<code>check_dn</code> among them. Each is re-pointed at the live structure that answers the same
+question, or inverted to assert the container's ABSENCE off the source &mdash;
+<code>test_batch_an</code>'s idiom for <code>roll_ability_offer</code>. <b>A check that survives a
+deletion by asking an empty dict a question is worse than a red.</b>
+<b><code>vault_ability()</code>'s HEADER IS HISTORY NOW RATHER THAN A PLAN</b>: it promised its
+entries would "return as earnable picks without a line of new mechanics", and all ten have
+returned. <b>AND ITS OWN COUNT WAS WRONG ON RECORD</b> &mdash; DX &sect;3 and <code>state.md</code>
+both said the vault held <b>38</b> definitions with 31 re-homed; <b>the live function holds TEN</b>,
+seven of which were the orphans. Derived, not recalled.</p>
+
+<p><b>&sect;4 &mdash; THE LAST UNSEEDED FLAKE IS SEEDED, AND IT SETTLED AT ZERO.</b>
+<code>test_batch_at</code> &sect;1's live damage-curve ratio drew off whatever the startup RNG
+happened to be: the file calls <code>seed()</code> in four places and <b>every one of them is
+downstream of this check</b>. Seeded <b>per-pair</b> &mdash; DD's method, the same two lines the
+TAKEN loop twelve lines below has used since DD &mdash; so both arms of a pair draw one identical
+stream and the only difference left between them is the Resonance stack count.
+<b>MEASURED: six unseeded readings spanned 2.1189&ndash;2.2463; six seeded readings all read
+2.1799, byte-identical</b>, against a band of 2.0&ndash;2.35 and a table value of 2.17. <b>The band
+was NOT widened</b> &mdash; the band is the question. <b>So it was a flake and not a finding</b>,
+and <code>test_batch_at</code> is 467 checks / 0 failures, its count unmoved.
+<b>THERE ARE NO UNSEEDED FLAKES LEFT IN THE PROJECT.</b>
+<b>AND THE FLAKE CENSUS WAS TWO ROWS, NOT ONE, WHICH THE RECORD GOT WRONG.</b>
+<code>docs/state.md</code> said <code>test_batch_at</code> was the one row still carrying a
+<code>flake</code> field; <code>test_rune_battle</code> carries one too, and it is <b>kept on
+purpose</b> &mdash; DF &sect;0 seeded that suite at the site that flakes, but the field records a
+<b>race under machine load</b>, and a seed does not fix a race. <b>One row carries a
+<code>flake</code> field now and it is a seeded one.</b> Its own text still read <i>"calls
+<code>seed()</code> ZERO times"</i>, false since DF; corrected toward the code.</p>
+
+<p><b>&sect;5 &mdash; THE DRAFT AUDIT'S ARITHMETIC IS RE-DERIVED.</b>
+<code>docs/draft-audit.html</code> &sect;2 and &sect;2b were marked STALE at DT and have been passed
+by DR, DS and this batch. Both are refreshed over the live 154, <b>using DQ's own one-primary-axis
+vocabulary rather than a re-cut one</b>, because a refresh that also moves the definitions cannot
+be compared with what it replaced. <b>NINE OF THE SIXTEEN POOL ROWS MOVED AND SEVEN DID NOT.</b>
+<b>THE WARDEN IS THE SHARPEST RESULT AND IT IS NOT THE ONE THE BATCH SET OUT TO GET</b>: he was the
+shallowest pool in the game, and he now holds the <b>joint-widest decision spread in it &mdash; ten
+decisions across ten cards, the only pool where every card makes a different decision.</b>
+<b>THE MAGE CLASS POOL IS THE OPPOSITE RESULT AND IS REPORTED AS SUCH</b>: Mana Shield is
+RESOURCE / SELF, which Mana Well already is, so <b>that pool gains a card and NOT a decision</b>
+&mdash; seven cards, six decisions. <b>Reality Fracture adds an axis the Arcanist did not have and
+Divine Wrath adds one the Devout did not.</b>
+<b>AND TWO COUNTS IN THAT DOCUMENT WERE PRODUCED BY DIFFERENT METHODS</b>: DR reported its own
+repair as taking the Swordmaster "four &rarr; eight decisions"; by DQ's method it is <b>seven</b>,
+because DR counted Wheeling Cut's self-mitigation as a second axis on one card. Recorded rather
+than smoothed over. <b>Reported. Ruled on nowhere</b> &mdash; DQ's value was that it changed
+nothing and DR then ruled.</p>
+
 <h2>2026-08-29 &mdash; Batch DX: A SIXTH INSTANCE EARNS A CONSTRUCTION RULE</h2>
 <p><i>Three items. <b>A rule, its first sweep, and the thirty-one sites that sweep found; the
 project's second unseeded flake, seeded; and a decision the designer is owed.</b> No ability

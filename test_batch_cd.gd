@@ -73,9 +73,9 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # anyway, where the failure costs one edit in one file instead of thirty-five
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
-const SPEC_TARGET := 125     # the twelve pools, summed from PER_SPEC_DEPTH
-const CLASS_TARGET := 24     # 4 classes x 6, untouched by DO and by DS
-const DRAFT_TARGET := 149    # 125 + 24
+const SPEC_TARGET := 129     # the twelve pools, summed from PER_SPEC_DEPTH
+const CLASS_TARGET := 25     # summed from PER_CLASS_DEPTH — no longer 4 x 6
+const DRAFT_TARGET := 154    # 129 + 25
 const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -92,11 +92,30 @@ const PER_SPEC_DEPTH := {
 	# the shallowest pool in the game now — and it stays there deliberately:
 	# `SPEC_FLOOR` catches a pool that EMPTIES, and ratcheting it to nine would
 	# buy nothing but a re-edit next time a pool moves.
-	"berserker": 10, "warden": 9, "swordmaster": 12,
-	"pyromancer": 13, "cryomancer": 11, "arcanist": 10,
-	"holy": 10, "inquisitor": 10, "occultist": 10,
+	# BATCH DY §1: the WARDEN 9 -> 10 (Rallying Shout), the ARCANIST 10 -> 12
+	# (Arcane Surge and Reality Fracture) and the DEVOUT 10 -> 11 (Divine
+	# Wrath). All four cards came OUT OF THE VAULT rather than being authored —
+	# they were listed only in `CLASS_POOLS`, which had no exit, and DY §3
+	# deleted that container behind them. **THE WARDEN WAS THE SHALLOWEST POOL
+	# IN THE GAME AT NINE AND IS NOT ANY MORE**; ten is the floor across the
+	# board now, and `SPEC_FLOOR` stays at EIGHT for the reason below.
+	"berserker": 10, "warden": 10, "swordmaster": 12,
+	"pyromancer": 13, "cryomancer": 11, "arcanist": 12,
+	"holy": 10, "inquisitor": 11, "occultist": 10,
 	"beastmaster": 10, "sharpshooter": 10, "mystic": 10,
 }
+# **BATCH DY §1 — THE CLASS HALF STOPPED BEING A FLAT MULTIPLE, SO IT BECAME A
+# TABLE TOO.** `CLASS_TARGET` was written `4 * 6` and asserted as such; Mana
+# Shield takes the Mage pool to SEVEN, so that arithmetic is the CI-era shape
+# re-asserted over a tree that has moved past it — the exact fault the header
+# above names for the SPEC half. It is the same repair DO made there: one
+# authoritative table, summed, with every other suite asserting the FLOOR.
+# `CLASS_FLOOR` stays at SIX for `SPEC_FLOOR`'s reason — it catches a pool that
+# EMPTIES rather than tracking the deepening.
+const PER_CLASS_DEPTH := {
+	"warrior": 6, "mage": 7, "cleric": 6, "hunter": 6,
+}
+const CLASS_FLOOR := 6
 # BATCH DO DELETED `DEEP_SPECS`, AND DELETED IT RATHER THAN LEAVING IT.
 # It listed all twelve specs and existed only to answer "eight or five?" — a
 # question CI ended and DO replaced outright with `PER_SPEC_DEPTH` above. A
@@ -230,18 +249,24 @@ func _dead_calls() -> void:
 # ---------- §2: the draft target ----------
 
 func _target() -> void:
-	print("\n§2 the draft target is 149, and ~96 is stated nowhere live")
+	print("\n§2 the draft target is %d, and ~96 is stated nowhere live" % DRAFT_TARGET)
 	# The arithmetic itself, so a later batch moving the target has to move a
 	# number here and read the reason beside it.
 	# The table and the total must agree, or one of them is a stale copy.
 	var depth_sum := 0
 	for k in PER_SPEC_DEPTH:
 		depth_sum += int(PER_SPEC_DEPTH[k])
+	var class_sum := 0
+	for k2 in PER_CLASS_DEPTH:
+		class_sum += int(PER_CLASS_DEPTH[k2])
 	ok(PER_SPEC_DEPTH.size() == 12, "the depth table names all twelve specs")
 	ok(SPEC_TARGET == depth_sum,
 		"the spec pool target is the table summed (%d)" % depth_sum)
-	ok(CLASS_TARGET == 4 * 6, "the class-wide target is 4 classes x 6 = 24")
-	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET, "the draft target is 149")
+	ok(PER_CLASS_DEPTH.size() == 4, "the class depth table names all four classes")
+	ok(CLASS_TARGET == class_sum,
+		"the class-wide target is ITS table summed (%d) — it is no longer 4 x 6 (DY §1)" % class_sum)
+	ok(DRAFT_TARGET == SPEC_TARGET + CLASS_TARGET,
+		"the draft target is %d + %d = %d" % [SPEC_TARGET, CLASS_TARGET, DRAFT_TARGET])
 	# THE LIVE SITES. `~96` came from an older assumption of six spec cards per
 	# spec; CB completed the Mage at EIGHT and test_batch_bt has asserted depth
 	# 8 ever since, so the tests have encoded the right figure while the prose
@@ -259,13 +284,23 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("149 of 149"), "master.html states 149 of 149")
-	ok(master.contains("125 spec"), "...and names the 125-card spec half")
+	# **BATCH DY §1 — THE NEEDLES ARE RENDERED FROM THE CONSTANTS NOW, NOT
+	# AUTHORED.** They read `"149 of 149"` and `"125 spec"` as literals, so the
+	# batch that moved the draft had to find and hand-edit them here as well as
+	# in the document — a second copy of a count, which is this project's oldest
+	# recurring defect and the one CL §1 wrote a rule about. The DOCUMENT still
+	# carries the figure (that is the point of the check); this file no longer
+	# carries a second copy of it.
+	ok(master.contains("%d of %d" % [DRAFT_TARGET, DRAFT_TARGET]),
+		"master.html states %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
+	ok(master.contains("%d spec" % SPEC_TARGET),
+		"...and names the %d-card spec half" % SPEC_TARGET)
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
 		ok(not _states_stale_target(classes, phrase),
 			"classes.gd states no \"%s\"" % phrase)
-	ok(classes.contains("A TARGET 149"), "...it carries the real target")
+	ok(classes.contains("A TARGET %d" % DRAFT_TARGET),
+		"...it carries the real target (%d)" % DRAFT_TARGET)
 	# CLAUDE.md keeps its dated batch blocks as written — they are the record
 	# of what each batch believed, and rewriting them destroys it (CA's rule).
 	# What must be current is the STANDING REFERENCE, so that is what is read.
@@ -306,8 +341,9 @@ func _target() -> void:
 	# answer moved. COMMENT CORRECTED BY BATCH DG §3 — it still read "the draft
 	# is 102 and what is owed is the Hunter and Warrior thirds", which CH and CI
 	# paid; the draft is 120 of 120 and nothing is owed.
-	ok(block.contains("149 OF 149") or block.contains("149 of 149"),
-		"...it states 149 of 149")
+	ok(block.contains("%d OF %d" % [DRAFT_TARGET, DRAFT_TARGET])
+			or block.contains("%d of %d" % [DRAFT_TARGET, DRAFT_TARGET]),
+		"...it states %d of %d" % [DRAFT_TARGET, DRAFT_TARGET])
 	# RE-POINTED BY BATCH CI, AND IT IS AN INVERSION: the Warrior third is paid,
 	# so the standing block must no longer name ANYTHING as owed. Asserting the
 	# absence of a debt is what keeps §6's "rewrite rather than patch" honest —
@@ -360,11 +396,38 @@ func _pools() -> void:
 		"SPEC_DRAFT_POOLS holds %d entries (got %d)" % [SPEC_TARGET, spec_total])
 	ok(spec_total > 12 * 8,
 		"...which is ABOVE CI's flat ninety-six — DO's twenty-two landed here")
+	# **AND THE SHALLOWEST POOL IN THE GAME IS NAMED RATHER THAN LEFT TO BE
+	# RE-DERIVED.** DS deepened the three Hunter pools because they were the
+	# shallowest; DY deepened the Warden's nine for the same reason. Whichever
+	# pool is thinnest is the one a card is owed to next, so this prints it.
+	var thinnest := 99
+	var thin_who := ""
+	for spec9 in PER_SPEC_DEPTH:
+		var d9 := int(PER_SPEC_DEPTH[spec9])
+		if d9 < thinnest:
+			thinnest = d9
+			thin_who = String(spec9)
+	ok(thinnest >= 10,
+		"the shallowest spec pool is %s at %d — it has fallen below the ten DY left" % [
+			thin_who, thinnest])
+	print("  shallowest spec pool: %s at %d" % [thin_who, thinnest])
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
+		var cpool: Array = Classes.class_draft_pool(String(cls))
+		class_total += cpool.size()
+		# THE PER-CLASS EQUALITY, FOR `PER_SPEC_DEPTH`'S REASON: a floor cannot
+		# see a card ARRIVING, and this file is where a batch is made to say so.
+		var cwant := int(PER_CLASS_DEPTH.get(cls, CLASS_FLOOR))
+		ok(cpool.size() == cwant,
+			"%s draws %d class-wide (want %d)" % [cls, cpool.size(), cwant])
+		ok(cpool.size() >= CLASS_FLOOR,
+			"...and %s is still at or above BR's floor of %d" % [cls, CLASS_FLOOR])
+		var cseen := {}
+		for cn in cpool:
+			cseen[String(cn)] = 1
+		ok(cseen.size() == cpool.size(), "%s's class pool holds no duplicate" % cls)
 	ok(class_total == CLASS_TARGET,
-		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
+		"CLASS_DRAFT_POOLS holds %d entries (got %d)" % [CLASS_TARGET, class_total])
 	# BATCH DX §1 — THE MESSAGE PRINTED THE TARGET TWICE, so the one assertion
 	# left to announce a moved draft could never say what it had moved TO. That
 	# is the second-copy-of-a-count defect sitting inside the tripwire written

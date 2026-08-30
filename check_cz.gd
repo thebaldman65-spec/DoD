@@ -528,11 +528,17 @@ func _cl_only_corpus() -> Array:
 			return
 		seen[ab.display_name] = true
 		out.append(ab)
+	# **BATCH DY §3 — THE `class_pool(key)` ARM IS GONE WITH `CLASS_POOLS`, AND
+	# THE SET IDENTITY BELOW STILL HOLDS EXACTLY.** That arm named the sibling
+	# specs' KIT abilities, every one of which this walk already reaches through
+	# `spec_abilities()` two loops down — so the walk narrows from 227-minus-4
+	# to the same 223, and the four names it still cannot see are the same four
+	# kit overrides. Measured, not assumed: the difference is DERIVED off
+	# `apply_kit_overrides` at the assertion site, so this deletion could only
+	# have been silent if it had changed nothing, and it did not change it.
 	for key in ["warrior", "mage", "cleric", "hunter"]:
 		for ab in Classes.kit(key):
 			add.call(ab)
-		for nm in Classes.class_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
 		for nm in Classes.class_draft_pool(key):
 			add.call(Classes.pool_ability(String(nm)))
 	for spec in Classes.SPEC_INFO:

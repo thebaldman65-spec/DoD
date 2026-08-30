@@ -19,7 +19,10 @@ const FONT_SIZE := 11    # the block label's font_size override
 func _initialize() -> void:
 	var font := ThemeDB.fallback_font
 	var seen := {}
-	for src in [Classes.SPEC_POOLS, Classes.CLASS_POOLS, Classes.SPEC_DRAFT_POOLS,
+	# BATCH DY §3: `Classes.CLASS_POOLS` was the second entry in this list and
+	# is DELETED. Every name it held is in one of the other three, so the
+	# population this gate measures does not shrink.
+	for src in [Classes.SPEC_POOLS, Classes.SPEC_DRAFT_POOLS,
 			Classes.CLASS_DRAFT_POOLS]:
 		for k in src:
 			for nm in src[k]:

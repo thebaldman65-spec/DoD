@@ -5,83 +5,98 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-29 (Batch DX).*
+*Last rewritten: 2026-08-30 (Batch DY).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DX — A SIXTH INSTANCE EARNS A CONSTRUCTION RULE.** Three items: a rule with its
-  first sweep, a flake seeded, and a decision reported. **NO ABILITY MAGNITUDE MOVED, NO CARD WAS
-  AUTHORED OR RE-HOMED, AND `scripts/` IS BYTE-UNTOUCHED — the draft stands at 149.**
-  **Report: `docs/reports/DX.md`.**
-- **THE RULE: NEVER ASSERT AN EQUALITY AGAINST A COLLECTION THAT GROWS.** `check_dv` §4 asserted
-  `live_span == 16` against a changelog that gains an entry every batch and **DW's own entry broke
-  it** — CD §1's fault for the sixth time, so it is recorded in `CLAUDE.md` as a construction rule
-  rather than a sixth trap. **Assert a floor, or assert a property.** The harm named is not the
-  failing but its DISGUISE: a red meaning *a batch did its job* is indistinguishable from a red
-  meaning *something was deleted*.
-  - **THE FIRST SWEEP FOUND FORTY-ONE SITES ACROSS THIRTEEN FILES AND EVERY ONE PINS THE DRAFT.**
-    The spec half at 125 (fifteen sites), each class pool at six (eleven), the whole draft at 149
-    (nine), the class half at 24 (four), the per-spec depth table (one) and the Beastmaster's boss
-    pool at five (one). **`>=` APPEARED NOWHERE.** DO added twenty-two cards, DR a net +1 and DS six,
-    so **each of the last three batches to author a card hand-bumped a dozen files**, and nobody had
-    recorded that as a cost. `test_batch_bo`'s site carries five re-pointings in its own comment and
-    its message still read *"one hundred and eighteen ship"* against a live 125.
-  - **THIRTY-FIVE ASSERT A FLOOR NOW; THE REMAINING SIX ARE KEPT ON PURPOSE AND ALL SIX ARE IN ONE
-    FILE.** A floor cannot see a card ARRIVING, which is what `test_batch_cd.PER_SPEC_DEPTH` exists
-    to force a batch to state — so the equality survives in **`test_batch_cd` alone**, beside the
-    authoritative table, **so the failure costs one edit in one file instead of thirty-five across
-    twelve.** Every floor's message names the live figure and the direction.
-  - **THE RULE CORRECTED ITSELF ON ITS OWN SWEEP.** Applied literally it deletes five working
-    instruments, `check_di`'s `CALL_SITES` among them. **The exemption has a name and a
-    two-question test: a STALENESS TRIPWIRE is a SINGLE site whose failure message says the ground
-    moved and names what to re-derive.** Five passed it — `test_batch_cd`'s draft targets,
-    `check_di`'s `CALL_SITES`, `check_dv`'s two boss-pool census pins and its Holy-pool pin, and
-    `check_cz`'s `SHIELD_SPECIALS`. **A frozen collection is not a growing one**, so the changelog
-    archive's `== 149` and the `CLASS_POOLS` byte-freeze pins are correct as they stand.
-  - **AND THE SURVIVING EQUALITY COULD NOT SAY WHAT HAD MOVED.** Its message printed
-    `[DRAFT_TARGET, DRAFT_TARGET]` — the target twice — so the one check left to announce a moved
-    draft would have said *149 of 149* while the draft stood at 150. **The second-copy-of-a-count
-    defect inside the tripwire written to catch drift**, which is the shape DW fixed twice in
-    `test_batch_cp` one batch earlier. Three messages print live figures now.
-  - **NOT ONE CHECK WAS DELETED AND NOT ONE COUNT MOVED.**
-- **`test_run_harness` GATE 2 IS SEEDED AND IT SETTLED AT ZERO, SO IT WAS A FLAKE AND NOT A
-  FINDING.** Thirty seeded runs, thirty byte-identical walks, 165 / 0 every time.
-  - **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.** Over 400 unseeded walks the length is
-    49 every time and `fight`, `elite` and `miniboss` never approach zero — **but `blacksmith`
-    reached ZERO once, and `merchant` and `event` each came within one of it.** **Three of the six
-    types are at risk, not the one that happened to fail**, and the rate is well under DW's
-    estimated 3%: 2 in ~474 readings, counting 40 clean standalone re-runs at HEAD.
-  - **THE ASSERTION IS NOT WIDENED AND THE SEED IS PER-BOARD, NOT PER-WALK.** Seeding once leaves
-    zones 1 and 2 drawing off whatever the loop consumed before them, so one added draw inside the
-    walk would silently re-roll two of three boards; per-generation is `bo`'s per-pair seed one
-    layer out. **The three boards stay DIFFERENT** — `_generate_map` reads `zone_idx`. Negative
-    control: `seed(101)` misses `event` and reproduces DW's own red on demand. **FOUR CODE LINES.**
-- **`CLASS_POOLS` IS REPORTED WITH ITS OPTIONS PRICED AND NOTHING AUTHORED — AND THE DIAGNOSIS IS
-  SHARPER THAN "SEVEN ORPHANS".** They are the contents of **`Classes.vault_ability()`**, which
-  holds 38 definitions kept deliberately so they *"return as earnable picks without a line of new
-  mechanics"*; **`CLASS_POOLS` is its MANIFEST.** Later batches re-homed 31 of the 38; **AN §4
-  closed the class draw, which was the vault's only exit.** Full options and prices in
-  `docs/reports/DX.md` §3.
-  - **DV'S PREMISE IS CORRECTED AND IT CHANGES A PRICE.** Deleting the container would **not**
-    delete the definitions — `pool_ability()` resolves through the vault and **never reads
-    `CLASS_POOLS`**. What is lost is the manifest and their place in the corpus, **227 → 220**.
-  - **THE SEVEN ARE NOT INERT — THREE RECENT BATCHES SPENT MEASURED ENGINEERING ON THEM.** DK §1
-    widened `sanctuary` and measured it on a live bear; **DL §1 widened Rallying Shout's Pressure
-    clause** (`special: "rally"`, which is NOT Rally's `rally_ally`) and authored a new guard on its
-    resource loop; DM §3 read Divine Wrath's two clauses. **Two sit in `PURE_BUFFS` and two in
-    `HEAL_SPECIALS`, and all seven are in `ability_corpus()`** — so every population sweep in the
-    project has been auditing cards no player can obtain.
-  - **AND TWO OF THE SEVEN WOULD CLOSE HOLY'S BOSS-POOL SHORTFALL FOR FREE.** Dawnbreak and
-    Sanctuary are Cleric heals; moving them takes that pool 1 → 3 without authoring anything. **That
-    is new information for a decision that is still the designer's, not a ruling on it.**
-- **Next letter: DY.** `DY` sorts after `DX`, so the stamp gates still work.
-- **Phase.** The ability draft is **COMPLETE at 149 of 149** and all twelve talent trees are
+- **Last batch: DY — THE VAULT IS EMPTIED.** Six sections. **THE SEVEN ABILITIES NO RUN COULD REACH
+  ARE RE-HOMED INTO LIVE POOLS, `CLASS_POOLS` IS RETIRED, HOLY'S EMPTY BOSS AWARDS CLOSE AS A
+  CONSEQUENCE, THE LAST UNSEEDED FLAKE IS SEEDED, AND THE DRAFT AUDIT'S ARITHMETIC IS RE-DERIVED.**
+  **NOT ONE CARD WAS AUTHORED AND NOT ONE MAGNITUDE MOVED** — every card that moved already had its
+  handler, its text and its Perfect. **The draft is 154 (129 spec + 25 class-wide) and the ability
+  corpus reads 227 on both sides of the batch.** **Report: `docs/reports/DY.md`.**
+- **§0 — THE ORDER WAS THE WHOLE OF IT, AND IT IS THE RULE THE BATCH LEAVES BEHIND.** Re-home first,
+  retire the container second. All seven reached `ability_corpus()` through `class_pool(key)` and no
+  other route, so deleting first would have dropped the corpus **227 → 220 mid-batch** and moved the
+  printed population of roughly fifteen gates for nothing. **Measured at three points: 227 at HEAD,
+  227 after §1/§2 with the container standing, 227 after §3 deleted it.** In `CLAUDE.md` under DV
+  §1's block. **The wrong order does not fail — it fills a batch with expected movement, and a real
+  movement hiding among fifteen expected ones is indistinguishable from bookkeeping.**
+- **§1 — FIVE CARDS INTO DRAFT POOLS, EACH HOME VERIFIED AGAINST THE LIVE POOL BEFORE IT WAS TAKEN.**
+  **Rallying Shout → Warden** (9 → 10), **Mana Shield → the MAGE CLASS pool** (6 → 7),
+  **Arcane Surge and Reality Fracture → Arcanist** (10 → 12), **Divine Wrath → Devout** (10 → 11).
+  - **TWO DUPLICATION CLAIMS CAME OUT SHARPER THAN THE RECORD'S.** Rallying Shout's two clauses are
+    **Warden TALENT nodes** (Battered Not Broken, Rallying Cry) plus a BOSS card (War Stomp) —
+    **nothing in his draft pool does either**. And **Reality Fracture is the only ability in the
+    227-card corpus carrying a non-zero `delay_push`**, derived over the whole corpus.
+  - **THE THREE PRICING QUESTIONS SHIP AS AUTHORED AND ARE THE DESIGNER'S.** Options in
+    `docs/reports/DY.md` §1. (1) **Arcane Surge sits at initiative 3.0, three times
+    `BUFF_DELAY_CAP`**, legitimately outside `PURE_BUFFS` and never priced against the cap.
+    (2) **Divine Wrath is party-wide +15%/+15% at 1.0 — and the sharp comparison is NOT the one the
+    brief named.** DS's Bring It Down is a **BEASTMASTER** card, so the two are not siblings and
+    never meet in an offer; **BLESSING OF ZEAL IS THE DEVOUT'S OWN PROTECTED CORE**, +15% on ONE ally
+    at initiative **2.0**, and Divine Wrath is that card made party-wide at half the price in the
+    same hero's kit. (3) **Sanctuary overlaps Hymn of Hope**, Holy's protected core party-heal —
+    12% of max against 20/35%, Mana against Mercy. **It clears the LETTER of the no-duplication rule**
+    (that rule forbids a strictly BETTER card in the same pool, and Sanctuary is strictly worse on
+    magnitude and pays a different currency) **and raises the question the rule exists for.**
+    **The report recommends moving Sanctuary to the DEVOUT's boss pool instead** — it answers §2's
+    surviving finding and this question with one move — **and it is not taken.**
+- **§2 — HOLY'S BOSS POOL IS 1 → 3, AND THE GENERAL PROBLEM SURVIVES THE FIX.** Dawnbreak and
+  Sanctuary joined Divine Plea, so **the four fallbacks DV priced are no longer needed for Holy**.
+  **BUT THE DEVOUT IS THE SHARPEST CASE IN THE GAME NOW AND IS WORSE OFF THAN HOLY EVER WAS**: two
+  cards against three awards — the only structural shortfall left — **and both of his two are also
+  draftable**, so all three of his awards can pay nothing. **EIGHT OF THE TWELVE SPECS CAN BE SHORT
+  ONCE DRAFTING IS ACCOUNTED FOR**; only the Warden and the three Hunter specs cannot, and that
+  population did not move. **The fallback question stays OPEN** — see the queue below.
+  `check_dv` §2 derives the whole table every run and prints it.
+  - **AND THE TRIPWIRE DID ITS JOB: `check_dv:185` PINNED HOLY'S POOL AT ONE AND WENT RED ON THE
+    FIX.** DX examined that equality in its sweep and left it standing on exactly that reasoning.
+- **§3 — `CLASS_POOLS` IS DELETED, NOT ZEROED, AND THE READERS WERE THE REAL COST.** 61 entries
+  feeding an award AN §4 re-pointed eighteen batches ago. **EIGHTEEN FILES READ IT AND A GREP FOR
+  THE CONSTANT FOUND ONLY ELEVEN** — `class_pool()`, its accessor, had callers whose lines never
+  name the constant. **The symbol you delete and the symbol people call are not the same symbol.**
+  Every reader is re-pointed at the live structure that answers the same question (AH's CURATION
+  RULE binds `CLASS_DRAFT_POOLS` now; the leak controls ask `SPEC_POOLS`) or INVERTED to pin the
+  container's absence off the source — `test_batch_an`'s idiom. **A check that survives a deletion
+  by asking an empty dict a question is worse than a red.**
+  - **`test_batch_bj` IS THE SHARPEST ARTEFACT AND IS WORTH MORE THAN THE DELETION.** It swept for
+    dead symbols, deliberately KEPT `CLASS_POOLS` with the reason in its own failure message
+    (*"stands ready for the day the class draw reopens"*) and **directly beneath it** asserted the
+    seven vault entries with the message *"reachable only through the dead class draw"*. **Both
+    halves of the problem, in adjacent lines, and neither could see the other. A KEEP IS A DECISION
+    AND IT CAN EXPIRE.**
+  - **`vault_ability()`'s HEADER IS HISTORY NOW RATHER THAN A PLAN.** All ten of its definitions have
+    returned. The rule it leaves: **a new vault entry is owed a pool in the same batch.**
+  - **AND ITS COUNT WAS WRONG ON RECORD, TWICE.** DX §3 and this file both said the vault held **38**
+    definitions with 31 re-homed. **IT HOLDS TEN** — counted off its own `match` arms — of which
+    seven were the orphans and three were already in `SPEC_POOLS`.
+- **§4 — THE LAST UNSEEDED FLAKE IS SEEDED AND IT SETTLED AT ZERO, SO IT WAS A FLAKE AND NOT A
+  FINDING.** `test_batch_at` §1 is seeded **per-pair** — DD's method, and literally the two lines the
+  TAKEN loop twelve lines below has used since DD. **Six unseeded readings spanned 2.1189–2.2463;
+  six seeded readings all read 2.1799**, against a band of 2.0–2.35 and a table value of 2.17.
+  **The band was NOT widened — the band is the question.** The check count did not move (467).
+  **THERE ARE NO UNSEEDED FLAKES LEFT IN THE PROJECT.**
+- **§5 — THE DRAFT AUDIT'S §2 AND §2b ARE RE-DERIVED OVER 154, USING DQ's OWN VOCABULARY.**
+  **Nine of the sixteen pool rows moved and seven did not.** **THE WARDEN IS THE SHARPEST RESULT AND
+  IS NOT THE ONE THE BATCH SET OUT TO GET**: the shallowest pool in the game now holds the
+  **joint-widest decision spread in it — ten decisions across ten cards, the only pool where every
+  card makes a different decision.** **THE MAGE CLASS POOL IS THE OPPOSITE AND IS REPORTED AS SUCH**:
+  Mana Shield is RESOURCE / SELF, which Mana Well already is, so **that pool gains a card and NOT a
+  decision.** DT predicted MIT and AMP would be the two most understated rows; **they were, and they
+  are the two that moved most** (12 → 15 each). **Reported, ruled on nowhere.**
+- **Next letter: DZ.** `DZ` sorts after `DY`, so the stamp gates still work. **AFTER DZ THE
+  TWO-LETTER SEQUENCE ENDS AT `EA`, WHICH SORTS BEFORE `DZ`** — the `>=` stamp comparisons in
+  fourteen suites are a STRING compare, so the batch that rolls past `DZ` has to move them all or
+  change the scheme. **That is a real, dated debt and this is the first file to say so.**
+- **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
   purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit,
   DR's rulings, DS's Hunter gap, DT's loose ends, DU's corpus fix, DV's rulings and the changelog
-  cut, DW closing the enumeration rule's blind spot, **and DX turning a six-times-repeated defect
-  into a rule and paying its sweep.**
+  cut, DW closing the enumeration rule's blind spot, DX turning a six-times-repeated defect into a
+  rule, **and DY emptying the vault the first three of those had been quietly maintaining.**
+
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -91,18 +106,24 @@ in `docs/master.html`.
 `docs/reports/DQ.md`.** Everything below is still open and **no gate encodes any of it**, because
 a gate encodes a ruling.
 
-**AND ITS ARITHMETIC IS MARKED STALE AS OF DT — READ THE BANNERS BEFORE QUOTING A NUMBER FROM IT.**
-The audit measured the draft at **142**; **eight cards have been authored and one retired since**
-(DR net +1, DS +6) and it is **149** now. **Five of the twelve pool rows in §2 have moved and three
-of those grew** — Swordmaster 10 → 12 and Cryomancer 12 → 11 at DR, and the three Hunter pools
-8 → 10 at DS — and every *share of 142* in the axis table is a share of the wrong denominator.
-**DT MARKED THEM RATHER THAN REFRESHING THEM, DELIBERATELY: re-deriving the counts means
-re-assigning an axis to each of the nine new cards, which is that audit's own judgement call and is
-authoring rather than repair.** The banners name DR and DS as the batches that superseded them and
-point at `test_batch_cd.PER_SPEC_DEPTH` as the one authoritative depth table — this page is not an
-instrument and nothing re-derives it, which is exactly the hazard DJ recorded a rule about.
-**One thing the banner corrects outright: the Beastmaster's 8-of-8 engine binding is NOT weakened
-by its row being stale — it reads 10-of-10 now**, because both of DS's cards read the companion.
+**ITS ARITHMETIC WAS MARKED STALE AT DT AND IS RE-DERIVED AT DY §5. §2 AND §2b ARE CURRENT OVER
+THE LIVE 154.** The audit measured the draft at **142**; DR was net +1, DS +6 and DY +5.
+**NINE OF THE SIXTEEN POOL ROWS MOVED AND SEVEN DID NOT** — Swordmaster and Cryomancer (DR),
+Beastmaster, Sharpshooter and Survivalist (DS), Warden, Arcanist, Devout and the Mage class pool
+(DY); Berserker, Holy Cleric, Occultist, Pyromancer and the Cleric, Hunter and Warrior class pools
+did not. **THE METHOD IS DQ's, UNCHANGED AND DELIBERATELY SO** — one primary axis per card, and the
+eleven cards authored since were assigned inside that vocabulary rather than a re-cut one, because a
+refresh that also moves the definitions cannot be compared with what it replaced.
+- **THE WARDEN IS THE SHARPEST RESULT: the shallowest pool in the game now holds the JOINT-WIDEST
+  decision spread in it — ten decisions across ten cards, the only pool where every card makes a
+  different decision.** **THE MAGE CLASS POOL IS THE OPPOSITE**: seven cards, six decisions.
+- **AND TWO COUNTS IN THAT DOCUMENT WERE PRODUCED BY DIFFERENT METHODS, WHICH IS NOW LABELLED.**
+  DR reported its own repair as taking the Swordmaster *"four → eight decisions"*; by DQ's method it
+  is **seven**, because DR counted Wheeling Cut's self-mitigation as a second axis on one card.
+  Neither is wrong and both were in the page unlabelled.
+- **`test_batch_cd.PER_SPEC_DEPTH` IS STILL THE ONE AUTHORITATIVE DEPTH TABLE** — this page is not
+  an instrument and nothing re-derives it, which is exactly the hazard DJ recorded a rule about.
+  **The Beastmaster's 8-of-8 engine binding reads 10-of-10** and is if anything tighter.
 
 - **THE TWO GRADE-2 FINDINGS ARE CLOSED.** Flash Freeze ← Glacial Prison was answered by
   **retirement**; Battle Poise ← Answering Steel by **differentiation**. `check_dr` §4 and §6 pin
@@ -162,73 +183,60 @@ by its row being stale — it reads 10-of-10 now**, because both of DS's cards r
 ### THE BOSS-PICK POOLS — AUDITED AT DU §5, RULED ON NOWHERE
 
 **Full tables and working in `docs/reports/DU.md` §5.** DQ dumped them and did not audit them; this
-is the audit, and like DQ's it changed nothing. **`SPEC_POOLS` is 42 entries across twelve specs,
-40 distinct names.** A zone boss awards ONE pick per hero from that hero's spec pool alone, there
+is the audit, and like DQ's it changed nothing. **`SPEC_POOLS` is 44 entries across twelve specs,
+42 distinct names** (DY §2 added Dawnbreak and Sanctuary to Holy's). A zone boss awards ONE pick per hero from that hero's spec pool alone, there
 are THREE zone bosses, and **both channels write the same `bm_abilities` list — so a drafted card
 removes itself from the boss offer and vice versa.**
 
-- **`CLASS_POOLS` IS A LOST FEATURE (DV §1) AND ITS OPTIONS ARE PRICED AT DX §3 WITH NOTHING
-  AUTHORED. THE RULING IS STILL THE DESIGNER'S.** 61 authored, resolving entries no run can reach.
-  **Batch AH's award drew 1 from the spec pool and 2 from the class pool; Batch AN §4 re-pointed it
-  and DELETED `roll_ability_offer`** — asserted absent by `test_batch_an` §1 — leaving the pools
-  standing on purpose. **SEVEN of the 61 are reachable NOWHERE ELSE**: Rallying Shout, Mana Shield,
-  Arcane Surge, Reality Fracture, Dawnbreak, Sanctuary, Divine Wrath. `check_dv` §0 re-asserts the
-  three premises live.
-  - **THE SEVEN ARE THE VAULT, AND THAT IS A SHARPER DIAGNOSIS THAN "ORPHANS OF A POOL".**
-    `Classes.vault_ability()` holds **38 definitions kept deliberately**, its header saying they
-    *"return as earnable picks without a line of new mechanics"*, and **`CLASS_POOLS`' own curation
-    comment calls its contents "the sibling specs' abilities plus the class's VAULTED ones".** Later
-    batches re-homed **31 of the 38** into spec draft and boss pools; **AN §4 closed the class draw,
-    which was the vault's only remaining exit.** The seven still inside are exactly the seven listed
-    nowhere else.
-  - **DV'S PREMISE THAT DELETION WOULD "DELETE THE LAST LISTING" IS CORRECTED, AND IT CHANGES A
-    PRICE.** `Classes.pool_ability()` resolves by name through a chain that reads the vault and
-    **never consults `CLASS_POOLS` at all** — all seven still resolve with the container gone. What
-    deletion costs is the **manifest** (the only place they are enumerated as a group) and their
-    place in the corpus, **227 → 220**, which would move the printed population of roughly fifteen
-    gates at once. Real, and smaller than recorded.
-  - **THE SEVEN ARE NOT INERT — THREE RECENT BATCHES SPENT MEASURED ENGINEERING ON THEM AND NOTHING
-    SAID SO.** **DK §1** widened `sanctuary`'s heal to `_hero_side()` and measured 1200 off a 10000
-    body on a live bear, over a handler whose own comment reads *"VAULTED ability's machinery
-    (kept)"*. **DL §1** widened **Rallying Shout's** Pressure clause — `special: "rally"`, which is
-    **NOT** Rally's `rally_ally` — measured 30 Pressure shed on a summoned Ursus, and authored a new
-    `resource_name == ""` guard on its resource loop. **DM §3** read **Divine Wrath's** two clauses
-    in the hero/ally audit. **Two of the seven sit in `Ability.PURE_BUFFS` (Mana Shield, Divine
-    Wrath, both capped at 1.0 by CY/CZ) and two in `HEAL_SPECIALS` (Sanctuary, Dawnbreak)**, and all
-    seven are walked by `ability_corpus()`. **That is the measured cost of leaving the question
-    open.**
-  - **"RESTORING IS ONE LINE" IS TRUE OF THE CODE AND IS THE SMALLEST PART OF THE PRICE.** Across the
-    twelve specs, **56 of the 183 hero-and-entry pairs a reopened draw could offer duplicate
-    something that hero can already reach, and 27 of those are the hero's OWN PROTECTED CORE** — a
-    card held on turn one. The Mystic would see 8 of 17 duplicated, the Holy Cleric 2 of 14. It also
-    reverses AN §4's stated ruling (*"abilities are spec-locked now"*), and **the slot arithmetic is
-    the hard part**: `ABILITY_SLOT_CAP` is 7 with 3–4 earnable slots, and AH's 1-spec-plus-2-class
-    draw would make it **nine boss picks per hero per run** into them.
-  - **AND TWO OF THE SEVEN WOULD CLOSE HOLY'S BOSS-POOL SHORTFALL WITHOUT AUTHORING ANYTHING.**
-    Dawnbreak and Sanctuary are Cleric heals with handlers, text and a Perfect; moving them takes
-    that pool **1 → 3**. **New information for the ruling below, not a ruling on it.**
-- **TWO POOLS ARE THINNER THAN THE AWARD COUNT AND SIX MORE CAN BE EMPTIED BY DRAFTING (MEASURED
-  AT DV §2).** **The award count is THREE, derived from `Run.SLOT_COUNT` and `_resolve_boss`'s own
-  header rather than recalled.** **Holy's pool is 1 (structural shortfall 2, and 3 if he drafts
-  Divine Plea); the Inquisitor's is 2 (shortfall 1, up to 3).** Berserker, Pyromancer, Cryomancer
-  and Occultist are 3 with two draftable apiece, so up to 2 can empty; Warden, Swordmaster and
-  Arcanist are 4; **the three Hunter specs are 5 with NO overlap, so all three of their picks always
-  land.** **The shape is the draft's INVERTED** — DS deepened the Hunter pools because they were the
-  shallowest in the game. **The size of the problem is measured rather than assumed and Holy is not
-  alone**, which is what the brief asked for. `check_dv` §2 derives both ends every run.
-  - **THE FALLBACK IS A DESIGN DECISION, FOUR CANDIDATES ARE PRICED IN `docs/reports/DV.md` §2, AND
-    NOTHING WAS AUTHORED** — the brief withheld the ruling, and the fallback's DESTINATION is the
-    entire change. **A spec-draft card** costs nothing to build and dissolves the distinction
-    between the two channels; **a class-wide card** is the only option that gives the dead class
-    channel a live purpose, but class-wide cards are authored WEAKER on purpose so it reads as a
-    consolation prize; **a rune** is mechanically cheapest (`roll_rune_candidates` and
-    `rune_picks_owed` already exist) and changes what the reward IS; **gold** is free and weakest,
-    since a zone boss already pays `randi_range(110, 130)`.
-  - **AND THE CARD-SHAPED OPTIONS ARE WORTH LEAST EXACTLY WHERE THE HOLE IS WORST.**
-    `ABILITY_SLOT_CAP` is 7 and **the Holy Cleric carries FOUR protected cores, the only spec that
-    does — so he has THREE earnable slots, the fewest in the game.** Gold and a rune cost no slot;
-    both card options do.
-- **26 of the 42 are boss-only; 16 are also in the same spec's draft pool.** The only name in more
+- **`CLASS_POOLS` IS DELETED AT DY §3 AND THE THREAD IS CLOSED.** DV ruled it a lost feature and
+  deleted nothing; DX priced the options and authored nothing; **DY took option B — re-home the
+  seven, retire the container.** 61 authored entries feeding an award AN §4 re-pointed eighteen
+  batches ago. **`pool_ability()` never read it, so nothing stopped resolving**; what was lost is
+  the manifest, and that is the point — they are no longer a group.
+  - **THE SEVEN WERE THE VAULT, AND ALL SEVEN HAVE HOMES NOW.** `Classes.vault_ability()` holds the
+    ONE definition of **TEN** live cards (not the 38 this file and DX §3 both recorded — counted off
+    its own `match` arms). Five went to draft pools and two to Holy's boss pool; the other three
+    were already in `SPEC_POOLS`. **Its header's promise — that its entries *"return as earnable
+    picks without a line of new mechanics"* — is history rather than a plan, and it cost exactly
+    that: not a line.**
+  - **THE STANDING RULE IT LEAVES, IN `CLAUDE.md`: A NEW VAULT ENTRY IS OWED A POOL IN THE SAME
+    BATCH.** A definition no pool names is reachable by nothing, which is the state that cost this
+    project eighteen batches of silent audit and three batches of measured engineering — DK widened
+    `sanctuary` and drove it on a live bear, DL widened Rallying Shout's Pressure clause and authored
+    a new guard for it, DM read Divine Wrath's two clauses. **Not one of them was wrong and not one
+    could have known.**
+  - **AND THE DELETION'S REAL COST WAS THE READERS.** **EIGHTEEN FILES read it and a grep for the
+    CONSTANT found only eleven** — `class_pool()`, its accessor, had callers whose lines never name
+    it. **Sweep for the accessor as well as the constant.** Every reader is re-pointed or inverted;
+    none was left to pass vacuously.
+  - **ONE DERIVED FIGURE MOVED FOR A REASON THAT IS NOT ABOUT THE GAME.** `check_dv` §5 counts the
+    abilities outside every pool and every class kit: **16 → 43**, because `CLASS_POOLS` was the only
+    structure naming the SIBLING SPECS' KIT ABILITIES as pool entries. **Nothing became less
+    reachable** — all of them are in their own spec's opening kit. `check_cz`'s set identity held
+    through the deletion, measured: the CL walk still reaches **223 of 227** and still misses exactly
+    the four kit overrides.
+- **ONE POOL IS STILL THINNER THAN THE AWARD COUNT AND EIGHT SPECS CAN BE SHORT ONCE DRAFTING IS
+  ACCOUNTED FOR — RE-MEASURED AT DY §2 AFTER HOLY'S FIX.** **The award count is THREE**, derived from
+  `Run.SLOT_COUNT`. **HOLY'S HALF IS CLOSED** (1 → 3, Dawnbreak and Sanctuary), **AND THE GENERAL
+  PROBLEM SURVIVED IT, WHICH IS THE HALF A READER WOULD OTHERWISE ASSUME WAS CLOSED.**
+  - **THE DEVOUT IS THE SHARPEST CASE IN THE GAME NOW AND IS WORSE OFF THAN HOLY EVER WAS.** His pool
+    is **2** — the only structural shortfall left — and **BOTH of his two are also draftable**, so
+    all three of his zone-boss awards can pay nothing. Holy's was visible because it was
+    structurally short; his is invisible because it depends on what the player drafted.
+  - **EIGHT OF THE TWELVE CAN BE SHORT.** Devout 3 awards at risk; Berserker, Pyromancer, Cryomancer
+    and Occultist 2 apiece; Swordmaster, Arcanist and Holy 1 apiece. **Only the Warden and the three
+    Hunter specs cannot lose an award.** That population did not move — DY changed Holy's severity,
+    not the count.
+  - **THE FALLBACK QUESTION IS STILL OPEN AND FOUR CANDIDATES ARE STILL PRICED IN
+    `docs/reports/DV.md` §2** — a spec-draft card, a class-wide card, a rune, or gold. **It is no
+    longer needed for HOLY**, which is what DY changed. **And the card-shaped options are worth least
+    exactly where the hole is worst**: `ABILITY_SLOT_CAP` is 7 and the Holy Cleric carries FOUR
+    protected cores, the only spec that does, so she has THREE earnable slots, the fewest in the
+    game. Gold and a rune cost no slot; both card options do.
+  - **AND DY §1 RECOMMENDS ONE MOVE THAT WOULD CLOSE THE DEVOUT'S HALF AND THE SANCTUARY OVERLAP AT
+    ONCE — PUTTING SANCTUARY IN HIS BOSS POOL RATHER THAN HOLY'S. It is not taken.**
+  - `check_dv` §2 derives every end of this every run and prints the table.
+- **28 of the 44 are boss-only; 16 are also in the same spec's draft pool** (DY's two are boss-only). The only name in more
   than one spec pool is **Ashes of Al'ar** (pyromancer, cryomancer, arcanist), which is coherent —
   it is a Mage-wide death-save rather than a spec piece. Lunge and Execute are two of the sixteen.
 - **AXIS COVERAGE: the Beastmaster's five deal no damage and no Break at all** — every one is a
@@ -323,78 +331,46 @@ way to apply. The ability rule and the status rule are the same rule.*
   TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
   moved a cell** — but a restructure would need both.
 
-### THE FLAKES — **AND THERE IS ONE. DX SEEDED THE SECOND.**
+### THE FLAKES — **AND THERE ARE NONE. DY SEEDED THE LAST ONE.**
 
-**`test_run_harness` GATE 2 IS SEEDED AND CLOSED AT DX §2, AND IT SETTLED AT ZERO — SO IT WAS A
-FLAKE AND NOT A FINDING.** Thirty seeded runs, **thirty byte-identical walks**, 165 / 0 every time.
-`_seeded()` calls `seed(20260829)` immediately before **each of the three board generations** and
-nowhere else. The check count did not move.
+**`test_batch_at` §1 IS SEEDED AND CLOSED AT DY §4, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND
+NOT A FINDING.** **THERE ARE NO UNSEEDED FLAKES LEFT IN THE PROJECT.**
+**AND THE CENSUS WAS TWO ROWS, NOT ONE — THIS FILE SAID ONE AND WAS WRONG.** DX recorded
+*"`test_batch_at` is the one row still carrying a `flake` field"*; **`test_rune_battle` carries one
+too**, and it is KEPT ON PURPOSE. DF §0 seeded that suite at the site that flakes, but its recorded
+rate is a RACE UNDER MACHINE LOAD — 2 red in 15, both under load — and **a seed does not fix a
+race**, so the field and the `[0,1]` band both stand. **ONE ROW CARRIES A `flake` FIELD NOW AND IT
+IS A SEEDED ONE.** Its own `what` text still read *"test_rune_battle calls `seed()` ZERO times"*,
+which DF made false and DT corrected in this file but not there; **DY corrected the record itself.**
 
-- **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES, AND THE MEASUREMENT IS WHY THE SEED GOES
-  WHERE IT DOES.** Over **400 unseeded walks** the length is 49 every time and `fight` (min 9),
-  `elite` (min 2) and `miniboss` (min 3) never approach zero — **but `blacksmith` reached ZERO once,
-  and `merchant` and `event` each came within ONE of it.** **THREE of the six types are at risk, not
-  the one that happened to fail**, and the rate is well under DW's estimated 3%: **2 observed in
-  ~474 readings**, counting DW's own and 40 clean standalone re-runs at HEAD.
-- **THE ASSERTION WAS NOT WIDENED** — the six being present is the question, so relaxing it to five
-  would delete the check rather than repair it. DD's rule.
-- **AND THE SEED IS PER-BOARD RATHER THAN PER-WALK, WHICH IS THE PART A LATER BATCH COULD UNDO.**
-  Both shapes are exactly repeatable today; seeding once would leave zones 1 and 2 drawing off
-  whatever the loop consumed before them, so **one added RNG draw inside the walk would silently
-  re-roll two of the three boards.** Per-generation makes the guarantee per-BOARD — `bo`'s per-pair
-  seed one layer out. **The three boards stay DIFFERENT from one another** because `_generate_map`
-  reads `zone_idx` (12 fights / 6 elites / 3 minibosses / 9 blacksmiths / 12 merchants / 3 events).
-- **NEGATIVE CONTROL: `seed(101)` misses `event` and fails gate 2 on *"the walk crossed a event"*** —
-  DW's own red, reproduced on demand.
+- **WHAT IT WAS.** §1's live damage-curve check sums ten casts of Arcane Explosion at 0 Resonance
+  against ten at 12 and asserts the ratio is `> 2.0 and < 2.35` against a table value of **2.17**. It
+  read **2.40** at DG and clean in every battery since — **twenty consecutive quiet readings at an
+  observed rate of about one in eighteen, which proves nothing.** **The file calls `seed()` in four
+  places and every one of them is DOWNSTREAM of this check.**
+- **THE FIX IS TWO LINES AND THEY ALREADY EXISTED TWELVE LINES BELOW.** The TAKEN half of the same
+  function has called `_seeded(_i)` before each of its two compared blows since DD; the DAMAGE half
+  never did. Per-PAIR, not per-loop: both arms draw one identical stream so the ±10% roll cancels,
+  and `_i` varies the draw across the ten pairs so the sum is still an average of ten variances.
+- **MEASURED, WITH THE STARTUP STREAM VARIED BETWEEN TRIALS: six unseeded readings spanned
+  2.1189–2.2463; six seeded readings all read 2.1799.** Exactly repeatable, and it lands on the
+  table's 2.17.
+- **THE BAND WAS NOT WIDENED — the band IS the question** (DD's rule). Opening it to swallow a 2.40
+  would delete the check rather than repair it.
+- **THE CHECK COUNT DID NOT MOVE: 467.** A seed is not an assertion.
 
-### **AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO THIRD — ONLY READINGS CAN (DX §2)**
+### **AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO NEXT ONE — ONLY READINGS CAN (DX §2)**
 
 **A source sweep fails in BOTH directions and this is worth more than the answer it was asked for.**
 **TWENTY suites and gates make unseeded random draws and are perfectly stable** (`bk` and `an`
 generate whole maps), so `seed()`-count is not evidence of a flake. And **`test_batch_at` calls no
-RNG function at all** — its one `seed()` is at line 603 and every use is DOWNSTREAM of the check
-that flakes; the noise is `battle.gd`'s `randf_range(0.9, 1.1)` in the strike loop, which nothing in
-the suite tree can see. **THE INSTRUMENT THAT ANSWERS THIS QUESTION IS `baselines.json`: the rows
-carrying a `flake` field are the answer, and nothing else is.** Three rows carried one;
-`test_rune_battle` was seeded at DF §0 and `harness_2` here, so **`test_batch_at` §1 is the only one
-left.**
-
-### THE OTHER FLAKE — DG'S, AND STILL THE OLDER ONE
-
-- **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN
-  EVERY BATTERY SINCE — DH THROUGH DU, BOTH OF DR'S TWO AND BOTH OF DS'S — STILL OPEN, STILL
-  UNSEEDED.** At a rate of about one red in eighteen, **seventeen** quiet readings is the common
-  case and proves nothing. `_live_curve()`
-  sums TEN casts at 0 Resonance and ten at 12, and asserts the ratio is `> 2.0 and < 2.35` against
-  a table value of **2.17**. It read **2.40**. **The `_seeded()` calls in that file are all
-  DOWNSTREAM of it**, so the check runs on whatever the startup RNG happens to be.
-  - **THE ±10% DAMAGE ROLL ALONE DOES NOT EXPLAIN IT.** Modelled over 200,000 trials, ten summed
-    casts a side put the ratio's 5th–95th percentile at **2.08–2.26** and P(over the 2.35 ceiling)
-    at **0.1%**, about one run in a thousand. **2.40 is off that distribution entirely, so there is
-    a SECOND random term.**
-  - **THE SUITE'S OWN `_spawn` NAMES THE CANDIDATE, ON THE VERY HELPER THIS CHECK CALLS:** *"THE
-    CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway Resonance adds +1% crit
-    PER STACK, so a 'same cast at 0 stacks vs 12' comparison silently compares 10% crit against
-    22% crit."* The fixture passes `"crit": -10.0`, which removes the **base** and not the
-    **per-stack** term. **A model carrying the full differential over-predicts badly — 32% red
-    against ONE RED IN EIGHTEEN READINGS observed — so the live term is smaller than that and
-    larger than zero.** The size of it is not established and should not be guessed.
-  - **DD FIXED TWO CHECKS OF EXACTLY THIS SPECIES IN THIS SUITE AND DID NOT REACH THIS ONE.** Its
-    Its rule stands: **seed both blows of the compared pair, or neutralise the crit as the file's own
-    comment says checks that care must do — do NOT widen the band, because the band IS the
-    question.**
-  - **DT APPLIED THAT RULE TO `bo` AND IT WORKED, WHICH RAISES THE PRIOR ON THE CRIT HERE.** `bo`'s
-    documented cause was the ±10% roll alone and **that was incomplete in exactly this file's way**:
-    its compared pair ranged 16–28 over six readings, a ±10% roll on a mean of 18 spans 16.4–19.8
-    and cannot reach 28, **and a crit is ×1.5 and reaches exactly there.** A per-pair seed
-    neutralised every coin at once without anyone having to identify which one was biting, and the
-    row settled at ZERO. **The same four lines are almost certainly this row's repair too.**
-  - **AND IT IS DELIBERATELY NOT TAKEN AT DT.** `bo` was this batch's one. **One flake at a time is
-    how the effect stays attributable**, and with `bo` closed and `test_rune_battle` needing
-    nothing, **this is now the only unseeded flake in the project.**
-  - **The zeros on this row are the flake being quiet, not the flake being fixed.** **One flake at
-    a time is how the effect stays attributable** — `bo`'s is still open and `test_rune_battle`'s
-    is three batches old. Its band and its readings are in `baselines.json`.
+RNG function at all** — the noise was `battle.gd`'s `randf_range(0.9, 1.1)` in the strike loop, which
+nothing in the suite tree can see. **THE INSTRUMENT THAT ANSWERS THIS QUESTION IS `baselines.json`:
+the rows carrying a `flake` field are the answer, and nothing else is.** Four rows have carried one
+in the project's history and **all four have been seeded** — `test_rune_battle` at DF §0, `bo` at
+DT, `harness_2` at DX and `test_batch_at` at DY. **THREE SETTLED AT ZERO AND HAD THEIR FIELD
+REMOVED; `test_rune_battle` KEEPS ITS FIELD AND ITS `[0,1]` BAND** because what it records is a race
+under machine load rather than an unseeded draw.
 
 ### THE SEVENTH FAMILY, FOUND AT DM AND DELIBERATELY NOT SWEPT
 
@@ -692,7 +668,11 @@ re-derived from the source at DM; not one was moved.**
   losing theirs. SALVE kept its by joining `HEAL_SPECIALS` — its heal rides a status it applies,
   which is RENEWAL's shape. **`Ability.takes_delay_cap()` is the one function that
   unions them** and `Ability.make()` applies the clamp.
-- **THE ABILITY CORPUS IS 227, AND THE TWO WALKS DELIBERATELY DO NOT AGREE ANY MORE.** DR moved it
+- **THE ABILITY CORPUS IS 227 AND DY DID NOT MOVE IT — THAT WAS §0's WHOLE POINT.** Seven names
+  reached it through `class_pool()` and no other route; re-homing them before deleting the container
+  is why it reads 227 on both sides. **`Classes.vault_ability()` HOLDS TEN DEFINITIONS** and every
+  one of them is now named by a live pool.
+- **AND THE TWO WALKS DELIBERATELY DO NOT AGREE.** DR moved it
   net +1 (one card retired, two authored), **DS moved it +6, and DU §4 moved it +4 WITHOUT
   AUTHORING ANYTHING** — `apply_kit_overrides` builds FOUR SPECS' `abilities[0]` at spawn (**THREE Mage and ONE CLERIC — DV §5 corrected DU's "four Mage specs"; Shadowrend is the OCCULTIST's and overrides Smite out of `kit("cleric")`, so TWO class kits were misread, not one**)
   and none of them sits in any pool, so the walk read `kit("mage")` and carried the **unoverridden
@@ -738,15 +718,19 @@ re-derived from the source at DM; not one was moved.**
   else** — not Fervor, not Apostle. **ALL NINE PLACES THAT SPEAK EITHER MAGNITUDE NOW AGREE**, as
   of DG §1: the two cards, the `passive_desc`, the `faith` chip, the glossary, two `master.html`
   sites and two source comments.
-- **The ability draft is COMPLETE at 149 of 149** — `SPEC_DRAFT_POOLS` is **125** and
-  `CLASS_DRAFT_POOLS` is **24** (4 classes × 6), counted out of `classes.gd`. **The spec half is no
-  longer a flat multiple**: DO's twenty-two took nine pools past eight and left three at exactly
-  eight, DR moved two of those nine (Swordmaster to TWELVE, Cryomancer down to ELEVEN), and **DS
-  took the three that were still at eight — beastmaster, sharpshooter and mystic — to TEN apiece**.
-  **THE SHALLOWEST POOL IN THE GAME IS THE WARDEN'S NINE NOW**, so the asserted FLOOR of 8 is slack
-  everywhere; it stays there because it catches a pool that EMPTIES rather than tracking the
-  deepening. **The one authoritative per-spec table is `test_batch_cd.PER_SPEC_DEPTH`; every other
-  suite asserts the FLOOR (>= 8) and the TOTAL.** Do not write `12 * 8` again.
+- **The ability draft is COMPLETE at 154 of 154** — `SPEC_DRAFT_POOLS` is **129** and
+  `CLASS_DRAFT_POOLS` is **25**, counted out of `classes.gd`. **NEITHER HALF IS A FLAT MULTIPLE ANY
+  MORE.** DO's twenty-two took nine spec pools past eight, DR moved two of those nine (Swordmaster to
+  TWELVE, Cryomancer down to ELEVEN), DS took the last three at eight to TEN, and **DY took the
+  Warden to TEN, the Arcanist to TWELVE and the Devout to ELEVEN**. **THE SHALLOWEST SPEC POOL IN THE
+  GAME IS TEN NOW** — the Warden's nine was the floor from DS to DY.
+  **AND THE CLASS HALF STOPPED BEING 4 × 6 AT DY: the MAGE pool draws SEVEN and the other three draw
+  six**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
+  `SPEC_TARGET` has been since DO. **Do not write `12 * 8` or `4 * 6` again.**
+  The asserted FLOORS are **8** (spec) and **6** (class) and both are slack everywhere; they stay
+  there because they catch a pool that EMPTIES rather than tracking the deepening.
+  **The one authoritative tables are `test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`; every
+  other suite asserts a FLOOR and the TOTAL.**
 - **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
 - **The pouch: 4 → 5 → 6 slots by zone** (`ITEM_SLOTS_BY_ZONE`), a slot holding one item TYPE and
   its whole stack. **Default per-type stack cap `ITEM_CAP` = 6**, with three exceptions
@@ -760,7 +744,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DX
+### THE TEST TREE, AS OF DY
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -769,7 +753,7 @@ re-derived from the source at DM; not one was moved.**
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
 - **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-six** —
-  **DW ADDED `check_dw`**, and before it DV added `check_dv` and DU `check_du`. **`check_dw` ASSERTS
+  **DY ADDED NONE**; DW added `check_dw`, and before it DV added `check_dv` and DU `check_du`. **`check_dw` ASSERTS
   THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
@@ -806,7 +790,10 @@ re-derived from the source at DM; not one was moved.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
 - **THE BASELINE TABLE IS `baselines.json` AND IT IS 77 ROWS: 46 suites, 26 gates, 2 scene runs
-  and 3 harness gates.** **DX ADDED NO ROW AND MOVED EXACTLY ONE FIELD** — `harness_2`'s failure
+  and 3 harness gates.** **DY ADDED NO ROW EITHER, AND MOVED MANY** — a batch that grows two pools
+  and deletes a third moves every loop that walks one, which is what its prediction table is for.
+  **THE `flake` FIELD IS GONE FROM THE LAST ROW THAT CARRIED IT** (`test_batch_at`), so the census
+  is empty. Before it, **DX ADDED NO ROW AND MOVED EXACTLY ONE FIELD** — `harness_2`'s failure
   band, `[0,1]` → `[0,0]`, with its `flake` field REMOVED because the flake is repaired rather than
   quiet. **A BATCH THAT MOVES A FAILURE BAND DOWN IS THE ONLY KIND THAT SHOULD**, and DE's polarity
   rule is why: a FALLING failure count is a notice, a rising one is an error. DV added `check_dv`
@@ -849,14 +836,22 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-29 (Batch DV)`** — **DV MOVED THE STAMP AND TWO REAL
-  THINGS, ONE OF WHICH WAS A DEFECT RATHER THAN AN ADDITION.** (1) The Ashes of Al'ar paragraph says
-  the phoenix cannot be recast while it stands or after it has risen, and that the button says which
-  — the player-facing half of §3. (2) **THAT PARAGRAPH SAID THE PHOENIX RETURNS AT 25% AND BOTH THE
-  CARD AND THE CODE PAY 40**: it was quoting `ASHES_RETURN`, the dead constant, against the
-  `ASHES_RETURN_PERFECT` the handler writes unconditionally. **Corrected toward the code**, which is
-  the standing direction. **THE RETIRED-WORD SWEEP WAS RUN OVER THE EDITED PROSE BEFORE THE BATTERY
-  AND READ 0 BOTH WAYS** — DU was caught by that sweep and DS took four reds from it.
+- **master.html stamp: `Last updated: 2026-08-30 (Batch DY)`** — **AND THIS LINE READ "Batch DV"
+  WHILE THE FILE SAID "Batch DX", SO IT WAS ONE BATCH STALE ON A FIGURE NOTHING ASSERTS.** DY moved
+  the stamp and four real things in §6a/§6b: (1) **Holy's boss-pool row goes to
+  `Divine Plea, Dawnbreak, Sanctuary`** — `test_batch_ah` asserts that row VERBATIM off
+  `SPEC_POOLS`, so it had to move with the code; (2) **the §6a CLASS-POOL PARAGRAPH AND TABLE ARE
+  DELETED** with the dict, replaced by a paragraph saying the boss draw reads the spec pool alone and
+  that the curation rule now governs the class-wide DRAFT; (3) **the §6b draft table gains the five
+  re-homed cards** and the Mage row says it is the one class pool that is not six; (4) **the totals
+  read 154 of 154, 129 spec, 25 class-wide.**
+  **THE RETIRED-WORD SWEEP WAS RUN OVER THE EDITED PROSE BEFORE THE BATTERY AND READ 0 BOTH WAYS**,
+  using `test_batch_bx` §4b's own `PARTY_IDENTS` strip and §4's `Beastmaster` strip — DU was caught
+  by that sweep and DS took four reds from it.
+  **AND THE LITERAL SWEEP FOUND WHAT THE RETIRED-WORD SWEEP COULD NOT: SIX FILES CARRYING A
+  HARD-CODED `"149 of"` NEEDLE AGAINST `master.html`** — `bu`, `bv`, `bw`, `br`, `ce` and
+  `check_do` — every one of which would have gone red on the document changing. **They are rendered
+  from the live pool count now**, so the next batch to move the draft edits none of them.
 
 ### HOW LONG A FIGHT IS
 **STALE SINCE DK. NOT ONE FIGURE BELOW HAS BEEN RE-MEASURED SINCE FIVE PARTY-WIDE EFFECTS BEGAN
@@ -902,7 +897,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **18 entries** (DG → DX), **169.4 KiB**. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
+  **19 entries** (DG → DY), **178.2 KiB**. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
   added, so an entry VANISHING still fails) **and prints the live figure; the ARCHIVE keeps its
@@ -925,27 +920,26 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at DX
+### Knowledge sync, re-measured at DY
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **156 files, 6.93 MiB** (DW measured 156 / 6.86). **The file COUNT did not move: DX added one file
-  (`docs/reports/DX.md`) and deleted none**, so the walk reads the same 156 it did at DW — the
-  growth is all in existing documents.
-- Heaviest: `scripts/battle.gd` **1225**, `docs/design-notes.md` **380**, `docs/master.html`
-  **336**, `scripts/classes.gd` **315**, `CLAUDE.md` **257**, `scripts/talents.gd` **179**,
-  `scripts/unit.gd` **177**, `docs/changelog.html` **169**, `docs/talent-audit.html` **165**.
-  **`docs/changelog.html` HAS OVERTAKEN `talent-audit.html` INTO EIGHTH** and grows about 10 KiB a
-  batch, so CW's 400 threshold is roughly twenty-three batches away.
+- **157 files, 7.01 MiB** (DX measured 156 / 6.93). **DY added one file** (`docs/reports/DY.md`) and
+  deleted none.
+- Heaviest: `scripts/battle.gd` **1225**, `docs/design-notes.md` **384**, `docs/master.html`
+  **337**, `scripts/classes.gd` **322**, `CLAUDE.md` **262**, `scripts/talents.gd` **179**,
+  `docs/changelog.html` **178**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
+  **`docs/changelog.html` HAS OVERTAKEN `talent-audit.html` INTO SEVENTH** and grows about 9 KiB a
+  batch, so CW's 400 threshold is roughly twenty-five batches away.
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **33** — **DX ADDED NO GATE**, deliberately: a gate for §1's rule would need a derived corpus
-  of which collections grow, and nothing in the project derives that.
-- **`CLAUDE.md` IS 257 KiB = 3.63%**, up from DW's 3.56% — **DX is the first batch since DQ to add a
-  rule, and this is what a rule costs.** CW's *"under 3% and roughly flat"* is now missed on both
-  halves for the first time. **DG THROUGH DX HAVE ALL DECLINED THE PRUNE**, and DV recorded that the
-  next batch in this file cannot decline it on the old arithmetic; **DX is the third to leave that
-  standing, and it is the one that moved the ratio.** The prune is genuinely owed now.
+  are **33** — **DY ADDED NO GATE**, deliberately: §2's re-measurement and §3's absence pins landed
+  in `check_dv`, which is the gate that already owns both questions, and a second gate asserting the
+  same thing is the duplication this project keeps paying for.
+- **`CLAUDE.md` IS 262 KiB = 3.65%**, up from DX's 3.63%. CW's *"under 3% and roughly flat"* is
+  missed on both halves for the second batch running. **DG THROUGH DY HAVE ALL DECLINED THE PRUNE**,
+  and **DY is the second batch in a row to move the ratio while declining it.** The prune is
+  genuinely owed and is now the oldest untouched item in this file.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -956,14 +950,17 @@ SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
 
 **DB measured 72 across 26 suites. DC repaired 23. DF sorted all 47 and repaired the 37 that were
 STALE. DG closed the remaining ten.** **THERE WERE FOUR UNSEEDED FLAKES IN THE PROJECT'S HISTORY AND
-THREE OF THEM ARE NOW REPAIRED RATHER THAN QUIET.** `test_rune_battle`'s pierce was seeded at DF §0
-at the site that flakes; **`bo`'s NULL FIELD flake is seeded and closed at DT**, settling at ZERO
-over six readings; and **`test_run_harness` gate 2 is seeded and closed at DX §2**, settling at zero
-over thirty. **`test_batch_at`'s unseeded §1 ratio is the ONLY ONE LEFT**, it is still unseeded, and
-a row that reads clean at a rate of about seventeen in eighteen has still told you nothing when it
-reads clean. **AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO FIFTH** — twenty suites draw
-without seeding and are stable, and `at` itself calls no RNG at all. **`baselines.json`'s `flake`
-fields are the census; `test_batch_at` is the one row still carrying one.**
+ALL FOUR ARE NOW REPAIRED RATHER THAN QUIET.** `test_rune_battle`'s pierce was seeded at DF §0 at
+the site that flakes; **`bo`'s NULL FIELD flake is seeded and closed at DT**, settling at ZERO over
+six readings; **`test_run_harness` gate 2 is seeded and closed at DX §2**, settling at zero over
+thirty; and **`test_batch_at`'s §1 ratio is seeded and closed at DY §4**, six seeded readings all
+reading 2.1799 against six unseeded ones spanning 2.1189–2.2463. **EVERY ONE OF THE FOUR SETTLED AT
+ZERO, SO ALL FOUR WERE FLAKES AND NONE WAS A FINDING** — which is worth stating as a pattern rather
+than four times separately: **a band that has held over hundreds of readings is not usually hiding a
+defect, and the way to establish that is to seed it, not to widen it.**
+**AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO FIFTH** — twenty suites draw without seeding
+and are stable, and `at` itself calls no RNG at all. **`baselines.json`'s `flake` fields are the
+census; no row carries one now.**
 
 **THE RETIRED-WORD SWEEP CAUGHT DU TOO, AND IT WAS CAUGHT BEFORE THE BATTERY RATHER THAN BY IT.**
 `test_batch_bx` §4 keeps *beast* out of player-facing prose and §4b keeps *party* out; both read
@@ -996,8 +993,10 @@ reach `bp` §7 at all: it is a Warrior flow.**
   against `CLAUDE.md` is the one on record and is the same one-line shape DF repaired in `bn`, `ce`
   and `br`. **The three vacuous exclusive-pair siblings in `as`, `at` and `aw` are the other live
   instances**, named at their sites and in the open queue above.
-- **`test_batch_at` IS SEEDED IN PLACES AND NOT IN OTHERS**, and its check count is rock steady at
-  **467** across every reading including both of DR's.
+- **`test_batch_at` IS SEEDED THROUGHOUT AS OF DY §4** — §1's damage loop was the last unseeded
+  compared pair in the file, and every `_seeded()` call in it used to sit DOWNSTREAM of that check.
+  Its check count is rock steady at **467** across every reading including both of DR's and all
+  three of DY's.
 - **`test_batch_bo`'s FLAKY ASSERTION IS FIXED AT DT AND THE COUNT DID NOT MOVE — still 1106.**
   §5's NULL FIELD check still requires `deep < shallow`; both blows are seeded per-pair now, so the
   pair reads 17 against 10 on every run. **`test_batch_bo.gd` called `seed()` zero times before DT
@@ -1031,82 +1030,73 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT DX, AND IT FOUND NOTHING.** No suite failure, no throw, no notice, and the only red
-is the one that is on purpose. **169 files were MD5-stamped before it and re-compared after; TWO
-moved — `docs/state.md` and `docs/reports/DX.md`, both written during the run and BOTH READ BY
-NOTHING**, which is exactly why this project writes them last. **167 of 169 did not move.**
+**TWO BATTERIES AT DY. THE ACCEPTANCE RUN FOUND NOTHING.** No suite failure, no throw, no notice,
+and the only red is the one that is on purpose. **169 files were MD5-stamped before the acceptance
+run and re-compared after; ALL 37 EDITED FILES ARE BYTE-IDENTICAL ACROSS IT** — `docs/state.md` and
+`docs/reports/DY.md` were written during it and are **READ BY NOTHING**, which is exactly why this
+project writes them last.
 
-| | DV's acceptance | DW's acceptance | DX's acceptance |
+| | DW's acceptance | DX's acceptance | DY's acceptance |
 |---|---|---|---|
 | **suite failures** | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 317 / 0 / 0 | 321 / 0 / 0 | **321 / 0 / 0 — exactly the prediction** |
-| targets in the manifest | 77 | 78 | **78** |
+| `check_de` | 321 / 0 / 0 | 321 / 0 / 0 | **321 / 0 / 0** |
+| targets in the manifest | 78 | 78 | **78** |
 
 **SEVENTY-EIGHT TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-EIGHT. 0 `Parse Error` and 0
 `SCRIPT ERROR` in every log** — grepped from the streams rather than read off a tally or an exit
-code, and **not one of the 78 logs contains either marker.** `check_map_screen: OK`; the run harness
-reads **22 / 165 / 8**, with **GATE 2 PASSING SEEDED**.
+code, and **not one of the 78 logs contains either marker.** `check_map_screen: OK`;
+`check_ct_map` 83 / 0; the run harness reads **22 / 165 / 8**, all three gates passing seeded.
 
-**THE BASELINE PREDICTION HELD IN FULL, AND IT PREDICTED A BATCH THAT MOVES NOTHING.**
+**TWO BATTERIES, AND THE SECOND IS THE CERTIFICATION.** Battery 1 measured the movements a batch
+that grows two pools and deletes a third necessarily causes; **seventeen baseline rows were then
+moved WITH A REASON ON EVERY ONE**; the acceptance run read `check_de` at **321 / 0 / 0**. Of 72
+comparable targets, **70 read byte-identical figures across the two runs.** The two that differ are
+`test_batch_an` (**6046 → 6052**, the known drifter, inside its recorded [6046, 6063] band) and
+`check_de` itself (**10 → 0**, which is the baselines moving between the runs and is the point of
+the second one).
 
-| row | predicted | read |
-|---|---|---|
-| `harness_2` | **`fails` [0,1] → [0,0]**, `flake` field removed | **0 failures** |
-| every other row | **no movement whatsoever** | **none** |
-| `check_de` (no row of its own) | **321, unchanged** — DX adds no target | **321 / 0 / 0** |
-| `GATES` / manifest / rows | **26 / 78 / 77, unchanged** | **26 / 78 / 77** |
+**THE ROWS THAT MOVED, AND WHY — SEVENTEEN, PLUS THE FLAKE FIELD.**
+**UP, because a loop walks a grown pool:** `bq` 742 → **883** and `br` 1450 → **1592** (their leak
+controls moved from the deleted 4-key dict to `SPEC_POOLS`' twelve), `bo` 1106 → **1131**,
+`cd` 85 → **99** (`PER_CLASS_DEPTH` is new), `bj` 67 → **73**, `au` 231 → **288**,
+`al` 559 → **561**.
+**DOWN, because a walk over `CLASS_POOLS`' 61 entries is gone:** `check_dv` 130 → **83**,
+`ah` 5626 → **5575**, `ak` 529 → **495**, `bt` 407 → **375**, `bu` 480 → **444**,
+`bv` 900 → **864**, `bw` 551 → **515**, `cb` 1203 → **1172**, `ce` 1145 → **1114**,
+`ar` 740 → **735**.
+**AND `test_batch_at`'s `flake` FIELD IS REMOVED AND ITS FAILURE BAND TIGHTENED [0,1] → [0,0].**
 
-**`check_de` READ ZERO NOTICES**, so not one check count in the tree drifted outside its band —
-which is the assertion that matters for a batch whose whole §1 was an operator change: **converting
-`==` to `>=` is one `ok()` either way, so a moved count would have meant an assertion was deleted
-rather than re-pointed.** All thirteen touched targets read exactly: `check_dr` 79, `cd` 85,
-`cp` 697, `bo` 1106, `bp` 275, `bq` 742, `br` 1450, `bt` 407, `bu` 480, `bv` 900, `bw` 551,
-`cb` 1203, `ce` 1145, all at zero failures.
+**THE PREDICTION WAS WRITTEN BEFORE THE FIRST READING AND TWO OF ITS ROWS WERE WRONG.** Every
+direction held for the rows it named, `bq`'s +141 was predicted exactly and `br`'s +142 to within
+one — **but `test_batch_al` was predicted UNCHANGED on the reason "nothing it reads was touched",
+and it walks `SPEC_POOLS`, which §2 grew.** `test_batch_au`'s direction was left uncertain and it
+rose 57. **Both are one shape: a batch that grows a shared structure moves every loop that walks it,
+and the set of those loops is NOT the set of files the batch edited.**
 
-**FOUR NEGATIVE CONTROLS, ALL FOUR BIT, AND TWO OF THEM ARE THE POINT OF THE BATCH.** Removing one
-card from the Warden's pool reds **every floor** — `check_dr` 2, `test_batch_cd` 5, `cp` 2, `bt` 1,
-`ce` 4 — each naming the live 124 / 148 and the direction. **Adding one leaves all twelve floor
-files SILENT and reds `test_batch_cd` alone**, most sharply as `warden drafts 10 (want 9)`: growth
-no longer costs a dozen red files, and the signal that a card ARRIVED is not gone — it moved to the
-one place the edit has to land. **`seed(101)` reproduces DW's own red on demand**, and a deliberate
-`func _dx_negative_control(:` proves the parse grep bites. **All backed-up files were restored by
-`cp` and md5-verified, never by `git checkout`.**
+**FOUR NEGATIVE CONTROLS, AND ONE OF THEM WAS FREE.** A deliberate `func _dy_negative_control(:`
+produced one `Parse Error` against zero clean (restored by `cp`, md5 verified, never by
+`git checkout`). **`check_dv` §2's Holy tripwire went red on DY's own fix**, which is exactly what
+DX left it standing for. `test_batch_at` seeded against unseeded: six readings spanning
+2.1189–2.2463 against six reading **2.1799**. **And the deletion produced its own control without
+being asked**: a deleted `const` is a compile error at every reader, so no reader could have been
+left silently passing.
 
-**AND TWO READINGS WERE DISCARDED BEFORE THE BATTERY, WHICH IS RECORDED BECAUSE IT IS DL'S LESSON
-MET AGAIN.** A first run of six suites was taken **while the negative controls were mutating
-`scripts/classes.gd` underneath them**; `bu`, `bv` and `bw` reported 1, 2 and 2 failures that were
-the race and not the tree. Re-taken on the frozen tree, all six read their baselines at zero.
-**A reading taken over a moving tree is not a reading.**
+**THE LITERAL SWEEP: 10,427 literals at a floor of 4**, from all 81 suites, gates and fixtures,
+against all five edited documents. **33 needles GAINED presence and 2 were LOST**, every one
+cross-referenced against the **220** `not <x>.contains(L)` assertions in the tree; **five gained
+literals are the subject of a negative assertion and all five were run down and cleared.**
+**AND THE SWEEP EARNED ITS KEEP TWICE OVER: it is what found the six hard-coded `"149 of"` needles**
+in `bu`, `bv`, `bw`, `br`, `ce` and `check_do`, which nothing else in this batch would have caught
+before the run.
 
-**THE POST-RUN EDITS ARE ACCOUNTED FOR AND WERE RE-VERIFIED.** A hand-tallied site count in this
-batch's own prose read *thirty-one* where the diff says **forty-one**; the correction touched
-`CLAUDE.md`, `docs/changelog.html` and `test_batch_cd.gd` **after** the run. **The literal sweep was
-re-run against the exact copies the battery read and flipped ZERO needles**, so no suite's verdict
-can differ from the one recorded; `test_batch_cd` is **code-identical** to what ran (177 code lines
-either side, comment-only change) and re-reads 85 / 0; `check_da` re-reads 39 / 0 and `check_dw`
-35 / 0, because both read suite SOURCE; and **`check_de` was re-run over the same log directory and
-still reads 321 / 0 / 0.**
-
-**THE LITERAL SWEEP: 10,912 literals at a floor of 4**, from all 82 suites, gates and fixtures,
-evaluated against all four edited documents. **17 needles GAINED presence and 0 were LOST**, and
-every one was cross-referenced against the **241** `not <x>.contains(L)` assertions in the tree.
-**One hit, and it is not the dangerous kind**: `test_batch_bw:680` `not vd_body.contains("func ")`
-reads a 1600-character slice of `battle.gd` SOURCE, not a document — and `battle.gd` is untouched.
-
-**THE COMMENT-STRIPPED DIFF WAS TAKEN AGAINST `HEAD`.** Every repaired suite gained exactly as many
-code lines as it lost; `check_dr` +6/−4 and `test_batch_cd` +4/−3, both because a one-line `ok()`
-became two. **`test_run_harness.gd` gained exactly FOUR code lines and lost none.** **`scripts/classes.gd`
-is 1935 code lines before and after with +0/−0, and `scripts/battle.gd` 14,132 with +0/−0** — the
-proof that the negative controls left no trace and that **no game code moved in this batch at all.**
+**THE COMMENT-STRIPPED DIFF WAS TAKEN AGAINST `HEAD`.** **`scripts/battle.gd` (14,132 code lines),
+`scripts/run_state.gd` (1,370) and `scripts/unit.gd` (1,759) are +0/−0** — comment-only, proven
+rather than claimed. **`scripts/classes.gd` is 1935 → 1917 with +8/−26**, and the 26 are exactly
+`CLASS_POOLS`' 22 body lines, `class_pool()`'s 2 and `ability_corpus()`'s 2-line loop.
 
 **AND THE RETIRED-WORD SWEEP WAS RUN BEFORE THE BATTERY**, using `test_batch_bx` §4b's own
 `PARTY_IDENTS` strip over the edited `master.html`: **0 occurrences of *party* and 0 of *beast*
 (with `Beastmaster` removed), in the edited file and at HEAD alike.**
-
-**THE OLDER FLAKE ROW IS STILL NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio read **467 / 0**,
-the **twentieth** consecutive quiet reading. Still open, still unseeded, still banded. `bo` read
-**1106** and `test_rune_battle` **97**, both seeded and both closed — **and `harness_2` joins them at
-165 / 0.**

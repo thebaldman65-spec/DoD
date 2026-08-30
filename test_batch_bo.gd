@@ -303,20 +303,30 @@ func _pools() -> void:
 		for n2 in Classes.spec_draft_pool(spec3):
 			if Classes.spec_pool(spec3).has(n2):
 				overlap.append("%s/%s" % [spec3, n2])
-			# A draft name may never be a SIBLING spec's card: the class pool is
-			# the one collision that would silently re-point an ability, and DO
-			# touched none of it.
-			# PHOENIX REBIRTH IS THE ONE EXEMPTION AND IT IS THE REASON THE MOVE
-			# MATTERED MOST FOR IT. It sits in `CLASS_POOLS["mage"]` and in NO
-			# spec pool — and **Batch AN retired the class draw**, so
-			# `award_ability_pick` has read `roll_spec_ability_offer` (SPEC POOLS
-			# ONLY) ever since. Until DO its ONLY source in the game was
-			# `py_rebirth`'s grant. Putting it in the Pyromancer's draft pool is
-			# what makes it earnable at all.
-			var cls_pool: Array = Classes.class_pool(Classes.class_of_spec(spec3))
-			ok(cls_pool.find(n2) < 0 or Classes.spec_pool(spec3).has(n2)
-					or n2 == "Phoenix Rebirth",
-				"§4: '%s' is in the class pool but not its own boss pool" % n2)
+			# A draft name may never be a SIBLING spec's card — the one
+			# collision that would silently re-point an ability.
+			#
+			# **BATCH DY §3 RE-POINTED THIS ASSERTION RATHER THAN LETTING IT GO
+			# VACUOUS, AND THAT IS THE WHOLE OF THE EDIT.** It used to read
+			# `Classes.class_pool(...)`, the accessor on the class-wide BOSS
+			# pool; DY deleted that dict, so the check as written would have
+			# compared against an empty array and passed for no reason —
+			# which this project holds to be worse than a red. **THE QUESTION IS
+			# UNCHANGED AND THE LIVE STRUCTURE ANSWERS IT**: the sibling's card
+			# is its `SPEC_POOLS` entry, so that is what a draft name must not
+			# collide with. Derived live at DY: ZERO such collisions exist.
+			#
+			# PHOENIX REBIRTH NEEDED THE OLD EXEMPTION AND NEEDS NONE NOW. It
+			# sat in `CLASS_POOLS["mage"]` and in NO spec pool, so until DO its
+			# ONLY source was `py_rebirth`'s grant; putting it in the
+			# Pyromancer's draft pool is what makes it earnable at all. Against
+			# the SIBLING boss pools it was never a collision.
+			var sib_hit := false
+			for sib in Classes.SPEC_IDS.get(Classes.class_of_spec(spec3), []):
+				if String(sib) != spec3 and Classes.spec_pool(String(sib)).has(n2):
+					sib_hit = true
+			ok(not sib_hit,
+				"§4: '%s' is a %s draft card and a SIBLING spec's boss card" % [n2, spec3])
 	# SIXTEEN OF THE TWENTY-TWO, NOT ALL OF THEM — DERIVED, NOT ASSUMED. The six
 	# that are NOT in their spec's boss pool are exactly `check_cz` §0's five
 	# (Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession) plus
@@ -330,9 +340,21 @@ func _pools() -> void:
 		"§4+DO: the DRAFT roller filters what the hero already owns")
 	ok(rsrc.contains("var owned: Array = owned_ability_names(member)"),
 		"§4+DO: ...and so does the BOSS roller, so an overlap cannot double-offer")
-	# The boss pool is UNCHANGED (§3: "the existing pick, unchanged").
-	ok(Classes.spec_pool("holy") == ["Divine Plea"],
-		"§3: the zone-boss SPEC_POOLS draw is untouched")
+	# The boss pool still holds what BO shipped (§3: "the existing pick,
+	# unchanged"). **BATCH DY §2 ADDED TO IT AND THIS ASSERTS CONTAINMENT
+	# RATHER THAN IDENTITY BECAUSE OF IT.** Holy's pool held ONE card against
+	# THREE zone-boss awards, so two of her three awards paid nothing — and
+	# Divine Plea is also draftable, so a hero who drafted it emptied the pool
+	# and all three paid nothing. DY put Dawnbreak and Sanctuary in beside it.
+	# **WHAT BO OWNS HERE IS THAT ITS OWN ENTRY SURVIVED**, which containment
+	# says and identity would have turned into a re-edit every time the pool
+	# deepens. The DEPTH is asserted in `check_dv` §2, which is the one
+	# instrument that owns the boss-pool census.
+	ok(Classes.spec_pool("holy").has("Divine Plea"),
+		"§3: the zone-boss SPEC_POOLS draw still holds BO's own entry")
+	ok(Classes.spec_pool("holy").size() >= 1,
+		"§3: ...and Holy's boss pool has not emptied (%d)" %
+			Classes.spec_pool("holy").size())
 	ok(Classes.spec_pool("beastmaster").size() >= 5,
 		"§3: ...for every spec (the Beastmaster's boss pool has fallen below five)")
 

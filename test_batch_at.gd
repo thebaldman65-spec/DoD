@@ -396,7 +396,10 @@ func _kit() -> void:
 		"...and it resolves out of the pool with its machinery intact")
 	ok(Classes.trimmed_kit_ability("Stabilize") != null,
 		"...from trimmed_kit_ability, which is its ONE def")
-	ok(not Classes.CLASS_POOLS["mage"].has("Stabilize"),
+	# **DY §3 — re-pointed from `CLASS_POOLS["mage"]` (deleted) to the live
+	# class-wide offer.** AH's curation rule is unchanged and Stabilize still
+	# fails it: it reads Resonance, which a sibling Mage does not have.
+	ok(not Classes.class_draft_pool("mage").has("Stabilize"),
 		"...and it is spec-only: it reads Resonance, so AH's curation rule bars it")
 	# Every pool entry still resolves (a pool naming an ability nothing defines
 	# is an offer that pays nothing).
@@ -622,15 +625,39 @@ func _live_curve() -> void:
 	# table's +117%. Each hit still carries a +/-10% variance roll, so this SUMS
 	# TEN CASTS at each level — one pair of samples has a +/-22% envelope, which
 	# is wide enough to pass a wrong curve.
+	#
+	# **BATCH DY §4 — THE PROJECT'S LAST UNSEEDED FLAKE, SEEDED PER-PAIR.**
+	# This loop drew off whatever the startup RNG happened to be: `at` calls
+	# `_seeded()` in four places and EVERY ONE OF THEM IS DOWNSTREAM of this
+	# check, so the one measurement in the file that most needed determinism
+	# was the one running on nothing. It went red at DG on a ratio of 2.40
+	# against a ceiling of 2.35 and has read clean in every battery since —
+	# twenty consecutive quiet readings, at an observed rate of about one in
+	# eighteen, which proves nothing.
+	#
+	# THE SEED IS PER-PAIR AND NOT PER-LOOP, WHICH IS DD's METHOD AND THE HALF
+	# A LATER BATCH COULD UNDO. Both arms of one pair draw the SAME stream, so
+	# the ±10% variance roll cancels between them and the only thing left is the
+	# stack count; `_i` varies the draw ACROSS the ten pairs, so the sum is
+	# still an average of ten different variances rather than one measurement
+	# taken ten times. **THE TAKEN LOOP BELOW HAS DONE EXACTLY THIS SINCE DD AND
+	# THIS ONE NEVER DID** — the fix is that loop's own two lines, moved up.
+	#
+	# AND THE BAND IS NOT WIDENED. DD's rule, and the reason is the same here as
+	# there: the band IS the question. 2.0-2.35 is what separates the table's
+	# 2.17 from a curve that is not compounding, and opening it to swallow a
+	# 2.40 would delete the check rather than repair it.
 	var at0 := 0
 	var at12 := 0
 	for _i in 10:
 		arc.second_resource = 0
 		foe.hp = 999999
+		_seeded(_i)
 		await scene.call("_resolve", arc, explosion, foe, "good")
 		at0 += 999999 - foe.hp
 		arc.second_resource = 12
 		foe.hp = 999999
+		_seeded(_i)
 		await scene.call("_resolve", arc, explosion, foe, "good")
 		at12 += 999999 - foe.hp
 	ok(at0 > 0 and at12 > 0, "both casts landed")

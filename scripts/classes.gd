@@ -146,15 +146,28 @@ static func cleric_kit() -> Array:
 #
 # Every hero starts with its core attack plus exactly 3 spec abilities and
 # EARNS 6 more over a run — two per zone, one from the mini-boss and one
-# from the zone boss. Each award offers 3 abilities the hero does not own:
-# 1 from its SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry
-# (Run.roll_ability_offer). Nothing here is new content: a pool entry is
-# either an ability trimmed out of a starting kit, an ability a talent node
-# grants, an ability another spec of the same class starts with, or a
-# vaulted ability whose machinery never left battle.gd.
+# from the zone boss. Nothing here is new content: a pool entry is either an
+# ability trimmed out of a starting kit, an ability a talent node grants, an
+# ability another spec of the same class starts with, or a vaulted ability
+# whose machinery never left battle.gd.
+#
+# **BATCH AH'S AWARD DREW 1 FROM `SPEC_POOLS` AND 2 FROM A SECOND DICT,
+# `CLASS_POOLS`, THROUGH `Run.roll_ability_offer`. BATCH AN §4 RE-POINTED THE
+# AWARD AT THE SPEC POOL ALONE AND DELETED THAT ROLLER; BATCH DY §3 DELETED
+# `CLASS_POOLS` ITSELF.** It stood for eighteen batches as a manifest nothing
+# read, and it held seven finished abilities listed in no other pool — so
+# every population sweep in the project audited cards no run could reach, and
+# three separate batches spent measured engineering on them. The seven were
+# re-homed into live draft and boss pools by DY §1/§2 FIRST, so the corpus
+# never moved: **227 before, 227 after.** `pool_ability()` never read the
+# container, so nothing else needed re-pointing to keep resolving.
+#
+# **THE VAULT'S EXIT IS THE POOLS NOW.** `vault_ability()` still holds the
+# definitions, and a definition that leaves it leaves for a named pool.
 #
 # SPEC_POOLS — what only THIS spec can earn: its own trims, its own
-# talent-granted abilities, and its own vaulted ones.
+# talent-granted abilities, and its own vaulted ones. THE ZONE-BOSS AWARD
+# READS THIS DICT AND NOTHING ELSE.
 const SPEC_POOLS := {
 	# Warrior.
 	"berserker": ["Blood Price", "Battle Shout", "Rampage"],
@@ -166,18 +179,15 @@ const SPEC_POOLS := {
 	# Overburn and so can only ever be a spec pick.
 	#
 	# ASHES OF AL'AR IS IN ALL THREE MAGE POOLS (Batch BB §6), AND THAT IS A
-	# CORRECTION TO THE BRIEF RATHER THAN A LIBERTY. §6 says the ability "joins
-	# CLASS_POOLS["mage"]" and calls that one array entry; it IS one array entry
-	# and it is made below — but **BATCH AN §4 RETIRED THE CLASS DRAW**, and
-	# `award_ability_pick` has read `roll_spec_ability_offer` (SPEC POOLS ONLY)
-	# ever since. `CLASS_POOLS` still resolves and nothing reads it, so the
-	# class-pool entry ALONE would have given the ability a home no boss can
-	# reach — an unearnable answer to a homelessness thread, which is not what
-	# §6 asked for. The entry the LIVE draw needs is a spec-pool one per Mage
-	# spec; the class-pool entry is made as instructed and stands ready for the
-	# day the class draw reopens. "Any Mage may earn it" is the design either
-	# way, and re-opening the class draw is a live change to how every one of
-	# the twelve specs is offered abilities — far past this section's scope.
+	# CORRECTION TO THE BRIEF RATHER THAN A LIBERTY. §6 said the ability "joins
+	# CLASS_POOLS["mage"]" and called that one array entry — but **BATCH AN §4
+	# HAD ALREADY RETIRED THE CLASS DRAW**, and `award_ability_pick` has read
+	# `roll_spec_ability_offer` (SPEC POOLS ONLY) ever since, so a class-pool
+	# entry ALONE would have given the ability a home no boss could reach. The
+	# three entries here are what the LIVE draw needs, one per Mage spec.
+	# **BATCH DY §3 DELETED `CLASS_POOLS`, AND THESE THREE ARE WHY NOTHING WAS
+	# LOST WHEN IT WENT**: Ashes of Al'ar was already reachable from all three
+	# Mage boss pools. "Any Mage may earn it" is the design either way.
 	"pyromancer": ["Immolate", "Firestorm", "Ashes of Al'ar"],
 	"cryomancer": ["Rime", "Shatter", "Ashes of Al'ar"],
 	# Batch AT: STABILIZE joins the pool — it left the opening three because it
@@ -190,7 +200,18 @@ const SPEC_POOLS := {
 	# because it joined her opening kit — a boss cannot offer what she starts
 	# with. Intercession is deliberately NOT here: it is the Vigil row-4 node's
 	# grant and reads Mercy on trigger, so a sibling could not pay it either.
-	"holy": ["Divine Plea"],
+	# BATCH DY §2 — HOLY'S BOSS POOL GOES 1 -> 3, AND IT CLOSES A STRUCTURAL
+	# SHORTFALL WITHOUT AUTHORING ANYTHING. DV §2 measured it: a run has THREE
+	# zone bosses and each awards ONE pick from this pool, so a pool of one
+	# card meant **two of the Holy Cleric's three zone-boss awards gave her
+	# nothing** — and worse, Divine Plea is also DRAFTABLE, so a hero who
+	# drafted it emptied the pool outright and all three awards paid nothing.
+	# Dawnbreak and Sanctuary are Cleric heals out of the vault with live
+	# handlers, card text and a Perfect apiece, so this costs no new mechanics.
+	# **SANCTUARY OVERLAPS HYMN OF HOPE**, her own protected core party-heal —
+	# a different shape (12% of max against Hymn's 20/35%, Mana against Mercy)
+	# doing the same job. Reported in `docs/reports/DY.md` §1, ruled on nowhere.
+	"holy": ["Divine Plea", "Dawnbreak", "Sanctuary"],
 	"inquisitor": ["Sacred Resolve", "Bulwark of Fortitude"],
 	"occultist": ["Mind Flay", "Mass Hysteria", "Umbral Sigil"],
 	# Hunter — the three pools that shipped in Batch 30/32, unchanged.
@@ -202,43 +223,30 @@ const SPEC_POOLS := {
 		"Deadfall", "Harvest"],
 }
 
-# CLASS_POOLS — what ANY spec of the class can earn: the sibling specs'
-# abilities plus the class's vaulted ones. CURATION RULE: an entry has to
-# FUNCTION for a sibling. Anything that costs a spec-exclusive secondary
-# resource (faith_cost), reads a passive the taker will not have (Burn to
-# consume, Resonance to spend, Loyalty or a living beast, the Swordmaster's
-# stance), or is a spec's signature identity piece (the summons, Kill
-# Command, Hex of Ruin) stays in SPEC_POOLS only. The changelog lists every
-# exclusion and its reason.
-const CLASS_POOLS := {
-	"warrior": ["Bloodlust", "Wildstrikes", "Hack and Slash", "Blood Price",
-		"Battle Shout", "Rampage", "Mocking Blow", "Crushing Blow", "War Stomp",
-		"Shieldwall", "Interpose", "Hold the Line", "Overpower", "Pommel Strike",
-		"Shatterpoint", "Sweeping Strikes", "Execute", "Rallying Shout"],
-	# Batch AR: "Flame Shield" LEFT this pool because it stopped existing —
-	# the node that defined it is Immolate now, and Immolate reads Overburn,
-	# so it fails the curation rule that a class-pool entry must FUNCTION for
-	# a sibling. Pyroblast is a Pyromancer tree node and is deliberately NOT
-	# listed: its bonus reads a Burn the taker cannot apply.
-	# BATCH BB §6: ASHES OF AL'AR TAKES THE SLOT FLAME SHIELD LEFT, putting the
-	# pool back at twelve. It passes AH's curation rule cleanly — a self-revive
-	# reads nothing but the taker's own health, so it FUNCTIONS for any Mage —
-	# and it is the designer's answer to the homeless-ability thread AR opened.
-	# It is EARNABLE, never default: the Pyromancer can have his escape hatch
-	# back only by spending a boss pick on it, which is a choice against his own
-	# spine rather than the hole AR deliberately left.
-	"mage": ["Flamewave", "Firestorm", "Razor Ice", "Blizzard",
-		"Ice Lance", "Rime", "Arcane Barrage", "Mana Shield", "Arcane Surge",
-		"Reality Fracture", "Phoenix Rebirth", "Ashes of Al'ar"],
-	"cleric": ["Heal", "Renewal", "Divine Shield", "Consecrated Ground",
-		"Blessing of Zeal", "Sacred Resolve", "Bulwark of Fortitude", "Bewitch",
-		"Dark Pact", "Mind Flay", "Mass Hysteria", "Dawnbreak", "Sanctuary",
-		"Divine Wrath"],
-	"hunter": ["Hunter's Instinct", "Mark of the Hunt", "Aimed Shot", "Powershot",
-		"Hold Breath", "Quick Draw", "Triple Shot", "Pinning Shot", "Called Shot",
-		"Tripwire", "Shrapnel Charge", "Snare Trap", "Explosive Shot",
-		"Venom Coating", "Hamstring", "Deadfall", "Harvest"],
-}
+# **`CLASS_POOLS` STOOD HERE UNTIL BATCH DY §3 AND IT IS DELETED, NOT ZEROED.**
+# It listed, per class, "the sibling specs' abilities plus the class's VAULTED
+# ones" — 61 entries across four classes, every one authored and resolving. It
+# fed Batch AH's award (2 of every 3 offers); **AN §4 re-pointed that award at
+# `SPEC_POOLS` alone and deleted `roll_ability_offer`**, and from that day it
+# was a manifest nothing read.
+#
+# WHAT IT COST TO LEAVE STANDING, MEASURED RATHER THAN ASSERTED: **SEVEN of
+# the 61 were listed in no other pool**, so they were finished, resolving,
+# maintained abilities no run could reach — and DK, DL and DM each spent
+# measured engineering on one of them without anything saying so. **DY §1/§2
+# re-homed all seven into live pools BEFORE this was deleted**, which is why
+# `ability_corpus()` reads 227 on both sides of the batch.
+#
+# WHAT WAS LOST WITH IT IS THE MANIFEST — the only place the seven were
+# enumerated as a group — **AND THAT IS THE POINT: THEY ARE NO LONGER A
+# GROUP.** Each one lives in the pool of the spec or class that draws it.
+# `pool_ability()` never consulted this dict (it resolves by name through
+# `vault_ability()` and the live kits), so deleting it changed no resolution.
+#
+# **DO NOT RE-CREATE IT.** A second dict of ability names keyed by class is
+# the shape this project spent eighteen batches carrying for nothing. If the
+# class draw is ever re-opened, it reads `CLASS_DRAFT_POOLS` below — which is
+# live, curated, and already drawn from.
 
 
 # ---------- THE ABILITY DRAFT (Batch BO) ----------
@@ -289,7 +297,21 @@ const SPEC_DRAFT_POOLS := {
 	"warden": ["Covering Guard", "Eye of the Storm", "Shield Slam", "Vendetta",
 		"Aegis Wall", "Anvil", "Recompense", "Turn the Blade",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Hold the Line"],
+		"Hold the Line",
+		# BATCH DY §1 — OUT OF THE VAULT, INTO THE SHALLOWEST POOL IN THE GAME.
+		# Rallying Shout was one of seven abilities listed nowhere but
+		# `CLASS_POOLS`, whose only exit (the class draw) AN §4 closed — so it
+		# was finished, resolving, maintained content no run could reach. This
+		# pool was the shallowest at nine, which is why it takes the one
+		# WARRIOR card of the seven.
+		#
+		# THE OVERLAP IS PARTIAL AND THE MEASUREMENT IS THE POINT: its two
+		# clauses exist separately in the WARDEN'S TALENT TREE (Battered Not
+		# Broken sheds banked Break, Rallying Cry refuels allies) and its
+		# refuel clause exists on a BOSS card (War Stomp) — but **NOTHING IN
+		# THIS DRAFT POOL DOES EITHER**, and no card anywhere does both. It
+		# brings two axes the Warden's draft has never offered.
+		"Rallying Shout"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
 		"Feigned Guard", "Discipline", "Answering Steel", "Formless",
 		# BATCH DO — moved out of the talent tree. EXECUTE IS STILL VERBATIM;
@@ -325,7 +347,25 @@ const SPEC_DRAFT_POOLS := {
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
 		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Overcharge", "Magi's Wrath"],
+		"Overcharge", "Magi's Wrath",
+		# BATCH DY §1 — TWO OF THE VAULTED SEVEN, AND THEY ARE HERE FOR
+		# OPPOSITE REASONS.
+		#
+		# ARCANE SURGE is spec-locked IN EFFECT rather than by rule: its amp
+		# clause overlaps Overcharge on the same axis, but its second clause
+		# banks Resonance, which is this spec's own engine and nobody else's.
+		# **ITS 3.0 INITIATIVE IS THREE TIMES `BUFF_DELAY_CAP` AND HAS NEVER
+		# BEEN PRICED AGAINST IT.** It sits outside `PURE_BUFFS` legitimately —
+		# the Resonance bank is a second, cast-time payload, so the cap does not
+		# bind it — but "legitimately outside the cap" is not the same as
+		# "priced", and it SHIPS AT ITS AUTHORED VALUE HERE. See
+		# `docs/reports/DY.md` §1 for the question and its options.
+		#
+		# REALITY FRACTURE COVERS AN AXIS NOTHING ELSE IN THE GAME TOUCHES: it
+		# is the only ability in the whole 227-card corpus carrying a non-zero
+		# `delay_push`, derived rather than recalled. Its damage/Break profile
+		# is ordinary; the initiative shove is the card.
+		"Arcane Surge", "Reality Fracture"],
 	# CLERIC — EIGHT APIECE SINCE BATCH CE, AND THE CLERIC IS THE SECOND CLASS
 	# COMPLETE. BU took the three pools to five (tranche 2's second third); CE
 	# lands tranche 3's second third here. THE DEVOUT'S KEY IS `inquisitor` AND
@@ -342,7 +382,25 @@ const SPEC_DRAFT_POOLS := {
 		"Fortified Spirit", "Reliquary", "Elevation",
 		"Blessing of the Faithful", "Mantle",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Sacred Resolve", "Bulwark of Fortitude"],
+		"Sacred Resolve", "Bulwark of Fortitude",
+		# BATCH DY §1 — THE LAST OF THE VAULTED SEVEN TO TAKE A DRAFT SEAT, AND
+		# THE ONE CARRYING AN OPEN PRICING QUESTION INTO IT.
+		#
+		# **IT SHIPS AT ITS AUTHORED VALUES AND NOTHING IS RETUNED HERE.**
+		# Divine Wrath is a flat party-wide +15% damage and +15% speed for 4
+		# turns at initiative **1.0** (it is in `PURE_BUFFS`, so the cap
+		# clamps it there). TWO LIVE COMPARISONS SAY THAT MAY BE UNDERPRICED,
+		# and the sharper one is NOT the one recorded before this batch:
+		#   · **BLESSING OF ZEAL IS THIS SPEC'S OWN PROTECTED CORE** — +15%
+		#     damage on ONE ally at initiative 2.0. Divine Wrath is that card
+		#     made party-wide at HALF the initiative, and it lands in the same
+		#     hero's kit.
+		#   · **BRING IT DOWN** (DS's party-wide amp) is priced at initiative
+		#     **2.0** on PREPARATION's precedent that party-wide costs more —
+		#     but it is a BEASTMASTER card, so the two are NOT siblings and
+		#     never meet in one offer.
+		# Reported with options in `docs/reports/DY.md` §1; ruled on nowhere.
+		"Divine Wrath"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
 		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance",
 		# BATCH DO — moved out of the talent tree, unchanged.
@@ -400,22 +458,34 @@ const SPEC_DRAFT_POOLS := {
 		"Thick Hide", "Salve"],
 }
 
-# CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class,
+# CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class at BR,
 # twenty-four in all. BQ shipped the MAGE and CLERIC twelve and named the
 # HUNTER and WARRIOR twelve as owed; BR pays that debt, so THE ONE-IN-FOUR
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# **THE DRAFT IS 149 OF A TARGET 149 AS OF BATCH DS (125 spec + 24 class-wide),
-# AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third at 120 of 120,
+# **BATCH DY §1 ENDED THE FLATNESS: THE MAGE POOL DRAWS SEVEN AND THE OTHER
+# THREE DRAW SIX.** Mana Shield joined it — one of seven finished abilities
+# that lived only in `CLASS_POOLS`, which had no exit and is deleted (§3). It
+# meets this block's own authoring rule without an argument: untied, general,
+# reading no passive, and off-theme for no Mage spec. **THE PER-CLASS
+# EXPECTATION IS A TABLE NOW RATHER THAN A MULTIPLE** —
+# `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
+# one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
+#
+# **THE DRAFT IS 154 OF A TARGET 154 AS OF BATCH DY (129 spec + 25 class-wide),
+# AND NOTHING IS OWED.** It was 149 of 149 at DS (125 + 24). Tranche 3 closed with the Warrior third at 120 of 120,
 # every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
 # half to 118. **DR MOVED IT TWICE IN ONE BATCH AND THE NET WAS +1**: down one
 # for the retirement of a strict duplicate in the Cryomancer's pool (§2), up
 # two for the Swordmaster's new axes (§4). **DS ADDS SIX AT ONCE — two to each
 # of the three HUNTER pools**, which were the three shallowest in the game and
 # the only three still reading eight; they read TEN now, matching the Cleric
-# class. Every one of the four class pools is still six deep, and no spec pool
-# is below eight.
+# class. **DY ADDS FOUR MORE TO THE SPEC HALF AND ONE TO THE CLASS HALF, NONE
+# OF THEM AUTHORED** — Rallying Shout to the Warden (9 -> 10), Arcane Surge and
+# Reality Fracture to the Arcanist (10 -> 12), Divine Wrath to the Devout
+# (10 -> 11), Mana Shield to the Mage class pool (6 -> 7). **THE SHALLOWEST
+# SPEC POOL IN THE GAME IS TEN NOW**, and no spec pool is below eight.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
@@ -432,15 +502,18 @@ const SPEC_DRAFT_POOLS := {
 # quartered at CH, and now GONE. It asserts a flat EIGHT now, so a pool that
 # quietly empties trips rather than reading as the old debt returning.
 #
-# THIS IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` ABOVE AND IT MUST STAY ONE.
-# The reason is BO's own, applied to the other pool: `CLASS_POOLS` feeds the
-# BOSS pick today, so dropping six abilities into it would silently re-weight
-# every boss offer in the game as a side effect of a draft change. THE
-# TIDY-LOOKING EDIT A LATER BATCH WOULD MAKE — folding two class pools into one
-# — IS EXACTLY THE ONE THIS COMMENT EXISTS TO REFUSE. `CLASS_POOLS` is
-# byte-untouched by Batch BQ AND by Batch BR; test_batch_bq and test_batch_br
-# both assert it AS LITERALS rather than by size, because a swap of two names
-# would keep the count and change every boss draw in the game.
+# THIS IS A SEPARATE STRUCTURE FROM `SPEC_POOLS` ABOVE AND IT MUST STAY ONE.
+# The reason is BO's own: `SPEC_POOLS` feeds the ZONE-BOSS pick, so dropping
+# draft cards into it would silently re-weight every boss offer in the game as
+# a side effect of a draft change. THE TIDY-LOOKING EDIT A LATER BATCH WOULD
+# MAKE — folding the boss pools and the draft pools into one — IS EXACTLY THE
+# ONE THIS COMMENT EXISTS TO REFUSE.
+#
+# **THE SISTER WARNING THIS BLOCK CARRIED FROM BQ TO DX NAMED A THIRD DICT,
+# `CLASS_POOLS`, AND THAT DICT IS GONE (DY §3).** The warning is kept, pointed
+# at the structure that is still live, because the hazard was never about which
+# dict it was: it is that two pools feeding two different channels look like
+# duplication to anyone who has not read which channel reads which.
 #
 # THE AUTHORING RULES, RECORDED WITH THE CONTENT THEY GOVERN: a class-wide
 # ability is DELIBERATELY UNTIED AND GENERAL — Magic Barrier, not Frostbolt.
@@ -454,8 +527,17 @@ const SPEC_DRAFT_POOLS := {
 const CLASS_DRAFT_POOLS := {
 	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
 		"Ironclad"],
+	# BATCH DY §1 — THE CLASS HALF STOPS BEING A FLAT MULTIPLE, AND MANA SHIELD
+	# IS WHY. It was one of the seven vaulted abilities reachable nowhere, and
+	# it is the ONE of the seven that meets this block's own authoring rule
+	# without an argument: untied, general, and off-theme for no Mage spec. It
+	# reads no passive — damage taken becomes Mana — so it feeds nothing and
+	# dilutes nothing, which is exactly what a class-wide card is for.
+	# **NO DUPLICATION EXISTS ANYWHERE**: derived over the whole corpus, it is
+	# the only ability in the game that converts damage taken into Mana.
+	# The Mage pool reads SEVEN; the other three still read six.
 	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
-		"Dispel", "Blink"],
+		"Dispel", "Blink", "Mana Shield"],
 	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
 		"Exhortation", "Undying Vigil"],
 	"hunter": ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
@@ -572,8 +654,10 @@ static func spec_pool(spec: String) -> Array:
 	return SPEC_POOLS.get(spec, [])
 
 
-static func class_pool(class_name_key: String) -> Array:
-	return CLASS_POOLS.get(class_name_key, [])
+# `class_pool()` STOOD HERE AND WENT WITH `CLASS_POOLS` AT BATCH DY §3. It was
+# the container's only accessor and it had exactly two live callers left: the
+# debug grant (deleted at AU §5) and `ability_corpus()` below. Nothing in a run
+# ever called it after AN §4.
 
 
 # The class a spec belongs to ("" when the spec is unknown/unawakened).
@@ -932,11 +1016,17 @@ static func ability_corpus() -> Array:
 			return
 		seen[ab.display_name] = true
 		out.append(ab)
+	# BATCH DY §3 — THE `class_pool(key)` LOOP THAT STOOD HERE IS GONE WITH
+	# `CLASS_POOLS`. **THE CORPUS DID NOT MOVE**: it reads 227 before and after,
+	# because §1 and §2 re-homed the seven names that were reachable through
+	# this loop and no other into live draft and boss pools FIRST. Every other
+	# name the loop reached is in a kit, a spec pool or a draft pool as well.
+	# THE ORDER WAS THE WHOLE OF IT — deleting the container first would have
+	# dropped the corpus to 220 mid-batch and moved the printed population of
+	# roughly fifteen gates for no reason.
 	for key in ["warrior", "mage", "cleric", "hunter"]:
 		for ab in kit(key):
 			add.call(ab)
-		for nm in class_pool(key):
-			add.call(pool_ability(String(nm)))
 		for nm in class_draft_pool(key):
 			add.call(pool_ability(String(nm)))
 	for spec in SPEC_INFO:
@@ -1012,7 +1102,7 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-NINE OF A TARGET 149 (BO..DS) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FIFTY-FOUR OF A TARGET 154 (BO..DY) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -2173,9 +2263,10 @@ static func draft_ability(display_name: String) -> Ability:
 		# CORRECTED THAT SENTENCE RATHER THAN LEAVING IT TO ROT. It read "the
 		# only self-heal a Hunter can get" from BR until DS, and it was ALREADY
 		# FALSE when it was written: HARVEST heals him for the same amount it
-		# deals, and Harvest sits in `SPEC_POOLS["mystic"]` AND in
-		# `CLASS_POOLS["hunter"]`, so a Survivalist can be offered it by a zone
-		# boss. DS's SALVE is a second heal in the class and would have made the
+		# deals, and Harvest sits in `SPEC_POOLS["mystic"]`, so a Survivalist
+		# can be offered it by a zone boss. (It was in `CLASS_POOLS["hunter"]`
+		# too until DY §3 deleted that dict; the spec-pool half is what made
+		# the claim false and it is untouched.) DS's SALVE is a second heal in the class and would have made the
 		# claim wrong a third way. **THE TREE HALF OF THE CLAIM IS TRUE AND IS
 		# KEPT**: no Hunter talent node heals in any of the three trees — Field
 		# Medic CLEANSES, which is a different thing — so what is unconditional
@@ -3827,8 +3918,8 @@ static func draft_ability(display_name: String) -> Ability:
 		# tension is the point of the card rather than a cost to be smoothed
 		# away.
 		# THE BRIEF CALLED THIS ONE HARVEST AND HARVEST IS A LIVE ABILITY, IN THE
-		# VERY POOL THIS SPEC DRAWS FROM AT A ZONE BOSS (`SPEC_POOLS["mystic"]`
-		# and `CLASS_POOLS["hunter"]`). That is not a label collision to flag:
+		# VERY POOL THIS SPEC DRAWS FROM AT A ZONE BOSS
+		# (`SPEC_POOLS["mystic"]`). That is not a label collision to flag:
 		# `pool_ability` is keyed on `display_name`, so a second Harvest makes
 		# the resolver answer the wrong question — a REAL BREAK by BR §1 — and
 		# the MECHANIC duplicated too, which is the Deadfall/Snare Trap failure
@@ -4166,7 +4257,7 @@ static func draft_ability(display_name: String) -> Ability:
 		# AXIS: HEAL — absent from all twenty-four, and the axis the whole class
 		# was shortest of. `Field Dressing`'s claim to be "the only self-heal a
 		# Hunter can get" was ALREADY FALSE before this card (Harvest heals, and
-		# it sits in his own boss pool and in `CLASS_POOLS["hunter"]`); this
+		# it sits in his own boss pool); this
 		# batch corrects that sentence rather than adding a second wrong one.
 		# SYNERGY: HARVEST, as its deliberate inverse — Harvest CONSUMES the
 		# whole board for one burst and strips his own Trapper bonus doing it,
@@ -4185,18 +4276,35 @@ static func draft_ability(display_name: String) -> Ability:
 
 # ---------- the vault, unsealed ----------
 #
-# Abilities that left a kit but never left the code: every one of these
-# still has its `special` handler in battle.gd, so they return as earnable
-# picks without a line of new mechanics. FIVE could NOT come back, because
+# Abilities that left a kit but never left the code: every one of these still
+# has its `special` handler in battle.gd. FIVE could NOT come back, because
 # their machinery went with them: Pyroblast, Flame Surge, Frost Bolt, Death
-# Ray and Mend Wounds are prose in a comment, not code, and reviving them
-# would mean AUTHORING them. BATCH AR AUTHORED PYROBLAST — it is a plain
+# Ray and Mend Wounds were prose in a comment, not code, and reviving them
+# would have meant AUTHORING them. BATCH AR AUTHORED PYROBLAST — it is a plain
 # damage ability plus one conditional in the existing damage block, which is
-# why it needed no subsystem; the other four are still prose. Three of the ten below (Mana Shield, Arcane
-# Surge, Reality Fracture) kept their full dicts in the vault comments and
-# come back verbatim; the other seven needed a cost/cooldown/initiative
-# wrapper around effects the handler already defines exactly, and THOSE
-# NUMBERS ARE NEW — the one balance judgment this batch made.
+# why it needed no subsystem; the other four are still prose. Three of the ten
+# below (Mana Shield, Arcane Surge, Reality Fracture) kept their full dicts in
+# the vault comments and came back verbatim; the other seven needed a
+# cost/cooldown/initiative wrapper around effects the handler already defines
+# exactly, and THOSE NUMBERS ARE AH's.
+#
+# **BATCH DY §1/§2 — "THEY RETURN AS EARNABLE PICKS WITHOUT A LINE OF NEW
+# MECHANICS" WAS THIS HEADER'S PLAN FOR EIGHTEEN BATCHES AND IT IS HISTORY
+# NOW: ALL TEN HAVE RETURNED.** Seven of them were listed only in
+# `CLASS_POOLS`, whose one exit AN §4 closed, so "returnable" quietly meant
+# "unreachable" — and DK, DL and DM each spent measured engineering on one of
+# them anyway. DY re-homed those seven into live pools (five draft, two boss),
+# `CLASS_POOLS` was deleted behind them, and the promise cost exactly what it
+# said: not a line of new mechanics. Retaliation, Ashes of Al'ar and Umbral
+# Sigil had already gone to `SPEC_POOLS` in earlier batches.
+#
+# **THE FUNCTION IS KEPT AND IT IS NOT A HOLDING PEN ANY MORE — IT IS A
+# SINGLE-SOURCE DEFINITION TABLE.** `pool_ability()` resolves through it, so
+# these ten defs are the ONE copy of ten live cards; a second copy in a pool
+# would be the drift this whole resolver exists to prevent. **A NEW ENTRY HERE
+# IS OWED A POOL IN THE SAME BATCH.** An ability defined here and named in no
+# pool is reachable by nothing, which is the state that cost this project
+# eighteen batches of silent audit.
 static func vault_ability(display_name: String) -> Ability:
 	match display_name:
 		# BATCH DM §1 — THE DK COMMENT THAT STOOD HERE DESCRIBED A STATE DL
@@ -4235,9 +4343,11 @@ static func vault_ability(display_name: String) -> Ability:
 		# difference is worth stating rather than quietly absorbing. Ashes of
 		# Al'ar has never been an Ability — it was a Pyromancer TALENT, a passive
 		# guard in `unit.take_hit` / `unit.take_tick_damage`, and AR removed the
-		# node with every other defensive option in that spec. A CLASS_POOLS
-		# entry has to resolve through `pool_ability` to an Ability, so putting
-		# the self-revive Mage-wide means authoring the cast that arms it.
+		# node with every other defensive option in that spec. A POOL entry has
+		# to resolve through `pool_ability` to an Ability, so putting the
+		# self-revive Mage-wide meant authoring the cast that arms it. (BB put
+		# it in `CLASS_POOLS["mage"]` as well as in all three Mage boss pools;
+		# DY §3 deleted that dict and the three boss entries are what carry it.)
 		#
 		# THAT IS EXACTLY THE VAULT'S OWN PRECEDENT (Batch AH): seven of the ten
 		# entries below "needed a cost/cooldown/initiative wrapper around effects
@@ -4268,8 +4378,10 @@ static func vault_ability(display_name: String) -> Ability:
 		# PHOENIX REBIRTH IS NOT HERE ANY MORE. Batch AR made it the
 		# Pyromancer's Inferno capstone, so the TREE owns the only copy and
 		# pool_ability finds it through Talents.granted_ability — the same
-		# single-source rule every other talent grant follows. It stays in
-		# CLASS_POOLS["mage"] and still resolves; only the def moved.
+		# single-source rule every other talent grant follows. It is in the
+		# PYROMANCER'S DRAFT POOL now (DO moved it out of the tree) and still
+		# resolves; only the def moved. It was in `CLASS_POOLS["mage"]` too
+		# until DY §3 deleted that dict.
 		"Dawnbreak":
 			return Ability.make({"display_name": "Dawnbreak", "cost": 20,
 				"special": "dawnbreak", "target": Ability.Target.ALLY,

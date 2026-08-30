@@ -667,12 +667,27 @@ func _live_three_fields_one_sync() -> void:
 # ---------- §6: Ashes of Al'ar has a home ----------
 
 func _ashes_pools() -> void:
-	var mage: Array = Classes.class_pool("mage")
-	ok(mage.has("Ashes of Al'ar"),
-		"§6: Ashes of Al'ar is in CLASS_POOLS[mage], as §6 instructed")
-	ok(mage.size() == 12,
-		"§6: THE MAGE CLASS POOL IS TWELVE AGAIN (got %d) — it lost one when Flame Shield stopped existing"
-		% mage.size())
+	# **BATCH DY §3 — THE TWO ASSERTIONS THAT STOOD HERE READ A DICT THAT NO
+	# LONGER EXISTS, AND WHAT REPLACES THEM IS THE CORRECTION BB ITSELF WROTE
+	# ONE PARAGRAPH DOWN.** They were `Classes.class_pool("mage").has(...)` and
+	# `.size() == 12`. BB's brief said Ashes of Al'ar "joins CLASS_POOLS[mage]"
+	# and BB made that entry as instructed — while recording, correctly, that
+	# **AN §4 had already retired the class draw, so the class-pool entry alone
+	# would have been unreachable** and the three SPEC-pool entries below are
+	# what the live draw reads. DY §3 deleted the container; the entry that was
+	# never reachable went with it and **the three that ARE reachable are
+	# untouched**. So the claim BB was protecting is intact and is asserted
+	# below, by the loop that was always the real one.
+	#
+	# THE SOURCE CHECK IS THE PART THAT WOULD OTHERWISE BE LOST: a suite can no
+	# longer say "and it is NOT in the class pool" once the class pool is gone,
+	# so it says the container is gone instead — the same shape
+	# `test_batch_an` uses for `roll_ability_offer`.
+	var csrc := _src("res://scripts/classes.gd")
+	ok(not csrc.contains("const CLASS_POOLS"),
+		"§6+DY: the class-wide BOSS pool is DELETED, so no entry can hide in it")
+	ok(not csrc.contains("static func class_pool("),
+		"§6+DY: ...and its accessor went with it")
 	# THE CORRECTION §6 NEEDED, PINNED: the class draw was retired in Batch AN
 	# §4, so a class-pool entry alone would be unreachable. The live draw reads
 	# SPEC pools, and all three Mage specs carry it.
@@ -809,8 +824,14 @@ func _docs() -> void:
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
 	# the early warning rather than the only guard.
-	ok(doc.contains(", ".join(Classes.CLASS_POOLS["mage"])),
-		"§7: §6a lists the mage class pool verbatim, Ashes of Al'ar included")
+	# **BATCH DY §3 — THE MAGE CLASS-POOL ROW IS GONE FROM §6a WITH THE DICT
+	# THAT FED IT.** This read `doc.contains(", ".join(CLASS_POOLS["mage"]))`.
+	# What survives is the claim that actually matters to §7: the document
+	# still lists the three MAGE SPEC pools verbatim, Ashes of Al'ar included,
+	# and it no longer carries a table describing a structure the code has not
+	# had since DY.
+	ok(not doc.contains("Class pool (earnable by all three specs)"),
+		"§7+DY: §6a no longer prints a class-pool table for a deleted dict")
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
 		ok(doc.contains(", ".join(Classes.spec_pool(spec))),
 			"§7: §6a lists %s's spec pool verbatim" % spec)

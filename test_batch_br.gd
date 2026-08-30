@@ -79,7 +79,12 @@ const AS_BR_SHIPPED := ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
 	"Hunter's Mark", "Arcane Arrows", "Battle Trance", "Rally", "Charge",
 	"Cleave", "Warcry", "Iron Will"]
 
-# THE NEGATIVE CONTROL THAT MATTERS (§6). `CLASS_POOLS` feeds the BOSS pick,
+# **THE NEGATIVE CONTROL THAT MATTERED (§6), AND ITS SUBJECT IS DELETED (DY
+# §3).** The table below is kept as the record of what `CLASS_POOLS` held and
+# is compared against nothing live; the control it carried — "this batch's
+# twelve did not leak into the boss channel" — is asserted against `SPEC_POOLS`,
+# which is the whole boss channel now.
+# THE ORIGINAL HEADER, FOR THE REASONING: `CLASS_POOLS` fed the BOSS pick,
 # and the whole reason `CLASS_DRAFT_POOLS` is a separate structure is that
 # dropping twelve entries into this one would silently re-weight every boss
 # offer in the game. Asserted as a literal, not as a size: a swap of two names
@@ -142,7 +147,7 @@ func _run() -> void:
 	Profile.data = {}
 
 	_pools()
-	_class_pools_untouched()
+	_class_pools_deleted()
 	_break_damage()
 	_weaker_half()
 	_names_swept()
@@ -328,19 +333,19 @@ func _pools() -> void:
 					"§4: %s is class-wide only, never in %s's spec draft" % [nm3, spec3])
 
 
-func _class_pools_untouched() -> void:
+func _class_pools_deleted() -> void:
 	# §6's NAMED NEGATIVE CONTROL, asserted directly rather than by a count.
-	ok(Classes.CLASS_POOLS.size() == 4, "§4: CLASS_POOLS still keys four classes")
-	for cls in CLASS_POOLS_AT_BR:
-		var live: Array = Classes.CLASS_POOLS.get(cls, [])
-		ok(live == CLASS_POOLS_AT_BR[cls],
-			"§4: CLASS_POOLS[%s] is BYTE-UNTOUCHED by this batch" % cls)
+	ok(not _src("res://scripts/classes.gd").contains("const CLASS_POOLS"),
+		"§4+DY: CLASS_POOLS is DELETED — the class-wide BOSS pool is gone, not zeroed")
+	ok(CLASS_POOLS_AT_BR.size() == 4,
+		"§4: ...and this suite still records all four of its classes")
 	# And the twelve are NOT in it — the tidy-looking edit a later batch would
 	# make is exactly the one this asserts against.
 	for cls2 in TRANCHE_4:
 		for nm in TRANCHE_4[cls2]:
-			ok(not Classes.CLASS_POOLS[cls2].has(nm),
-				"§4: %s did NOT leak into the boss pool CLASS_POOLS[%s]" % [nm, cls2])
+			for spec in Classes.SPEC_POOLS:
+				ok(not Classes.SPEC_POOLS[spec].has(nm),
+					"§4: %s did NOT leak into the boss pool SPEC_POOLS[%s]" % [nm, spec])
 
 
 # ---------- §4 BREAK DAMAGE, ASSIGNED RATHER THAN OMITTED ----------
@@ -1396,8 +1401,19 @@ func _docs() -> void:
 	# any document with enough numbers in it — and BQ's rule is that a check
 	# which can only pass is a gap. It asks BR's real question instead: does
 	# master.html state the draft's LIVE pool count against the REAL target?
-	ok(master.contains("149 of 149"),
-		"§5: ...and master.html states the live pool count against the real target")
+	# **BATCH DY §1 — THE NEEDLE IS RENDERED FROM THE LIVE POOLS, NOT AUTHORED.**
+	# It read the literal "149 of 149". That is a SECOND COPY OF A COUNT inside the check
+	# written to catch a stale one, which is this project's oldest recurring
+	# defect and the one CL §1 wrote a rule about — and it cost six files a
+	# hand-edit the moment DY moved the draft 149 -> 154. **The DOCUMENT still
+	# has to carry the figure; this file no longer carries a copy of it.**
+	var dy_draft := 0
+	for dy_s in Classes.SPEC_DRAFT_POOLS:
+		dy_draft += (Classes.SPEC_DRAFT_POOLS[dy_s] as Array).size()
+	for dy_c in Classes.CLASS_DRAFT_POOLS:
+		dy_draft += (Classes.CLASS_DRAFT_POOLS[dy_c] as Array).size()
+	ok(master.contains("%d of %d" % [dy_draft, dy_draft]),
+		"§5: ...and master.html states the live pool count (%d) against the real target" % dy_draft)
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BR — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

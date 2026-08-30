@@ -273,14 +273,24 @@ func _pools() -> void:
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
-	# CLASS_POOLS AND SPEC_POOLS FEED THE BOSS PICK and must not move (BO's
-	# rule, kept by every tranche since).
-	ok(Classes.CLASS_POOLS["cleric"].size() == 14,
-		"CLASS_POOLS['cleric'] is byte-untouched at 14")
+	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
+	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
+	# pin standing correctly; DY deletes the collection, so the strongest thing
+	# that can be said about it is that it is gone. Read off the SOURCE, in the
+	# shape `test_batch_an` uses for `roll_ability_offer`.
+	ok(not FileAccess.get_file_as_string("res://scripts/classes.gd").contains(
+			"const CLASS_POOLS"),
+		"CLASS_POOLS is DELETED (DY §3) — the class-wide BOSS pool is gone, not zeroed")
+	# **BATCH DY §3 — `CLASS_POOLS` IS DELETED AND THE LEAK LOOP OVER IT GOES
+	# WITH IT.** It was the CLASS-WIDE half of the zone-boss pick, dead since
+	# AN §4 re-pointed the award at `SPEC_POOLS` alone, and DY retired it after
+	# re-homing the seven abilities it alone listed. **THE CLAIM THIS SUITE
+	# OWNS IS INTACT AND IS ASSERTED TWICE OVER**: these cards are not in the
+	# class-wide DRAFT pool (the loop just above) and not in any spec BOSS pool
+	# (the loop just below). What is gone is a third loop against a structure
+	# that no longer exists — which would have passed for no reason, and this
+	# project holds a vacuous pass to be worse than a red.
 	for n in NINE:
-		for cls in Classes.CLASS_POOLS:
-			ok(not Classes.CLASS_POOLS[cls].has(n),
-				"%s did not leak into the BOSS pool %s" % [n, cls])
 		for spec in Classes.SPEC_POOLS:
 			ok(not Classes.SPEC_POOLS[spec].has(n),
 				"%s did not leak into the boss SPEC pool %s" % [n, spec])
@@ -553,8 +563,20 @@ func _docs() -> void:
 	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
 	ok(_stamped >= "CE",
 		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
-	ok(doc.contains("149 of 149") or doc.contains("149 of a target 149"),
-		"master.html states the LIVE draft count against the REAL target")
+	# **BATCH DY §1 — THE NEEDLE IS RENDERED FROM THE LIVE POOLS, NOT AUTHORED.**
+	# It read the literal "149 of 149". That is a SECOND COPY OF A COUNT inside the check
+	# written to catch a stale one, which is this project's oldest recurring
+	# defect and the one CL §1 wrote a rule about — and it cost six files a
+	# hand-edit the moment DY moved the draft 149 -> 154. **The DOCUMENT still
+	# has to carry the figure; this file no longer carries a copy of it.**
+	var dy_draft := 0
+	for dy_s in Classes.SPEC_DRAFT_POOLS:
+		dy_draft += (Classes.SPEC_DRAFT_POOLS[dy_s] as Array).size()
+	for dy_c in Classes.CLASS_DRAFT_POOLS:
+		dy_draft += (Classes.CLASS_DRAFT_POOLS[dy_c] as Array).size()
+	ok(doc.contains("%d of %d" % [dy_draft, dy_draft])
+			or doc.contains("%d of a target %d" % [dy_draft, dy_draft]),
+		"master.html states the LIVE draft count (%d) against the REAL target" % dy_draft)
 	for n in NINE:
 		ok(doc.contains(n), "master.html's draft table lists %s" % n)
 	ok(doc.contains("Devout"),

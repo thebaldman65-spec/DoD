@@ -313,8 +313,8 @@
   "test_batch_ah": {
    "kind": "suite",
    "checks": [
-    5626,
-    5626
+    5575,
+    5575
    ],
    "checks_obs": 1,
    "fails": [
@@ -322,7 +322,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +1. AH asserted the pool's Battle Shout equals the TALENT'S copy, because the definition lived in `bz_battle_shout`'s payload. DO moved it into `Classes.draft_ability`, so the single source is the DRAFT card — and the +1 is the second half, that no talent hands out a rival copy."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [5626, 5626] -> 5575. -51. AH BUILT BOTH POOLS AND IS THE OLDEST READER OF THE ONE DY DELETED. Its class-pool walk moved from `CLASS_POOLS` (61 names, 4 assertions each) to `CLASS_DRAFT_POOLS` (25), and §6a's verbatim class-pool table check became a single ABSENCE pin. Against that, Holy's boss pool 1 -> 3 triples her offer loop (40 trials). The two directions cancel to -51. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_ah_battle": {
    "kind": "suite",
@@ -369,8 +369,8 @@
   "test_batch_ak": {
    "kind": "suite",
    "checks": [
-    529,
-    529
+    495,
+    495
    ],
    "checks_obs": 1,
    "fails": [
@@ -378,20 +378,21 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +1. §6 inverted the same way; the payload is asserted to name Shatterpoint NOWHERE, and `sm_blade_dance` left the inert-on-empty-ctx loop because it has no second half any more (a check that passes for no reason is worse than a red)."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [529, 529] -> 495. -34. §2's class-pool resolve loop moved from `CLASS_POOLS` (61 names) to `CLASS_DRAFT_POOLS` (25). The stance-exclusion claim is re-pointed at the class-wide DRAFT, which is the live class-wide offer. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_al": {
    "kind": "suite",
    "checks": [
-    559,
-    559
+    561,
+    561
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [559, 559] -> 561. +2. §5's `SPEC_POOLS` resolve loop walks 44 entries where it walked 42 — Holy's boss pool gained Dawnbreak and Sanctuary. **THIS ROW WAS PREDICTED UNCHANGED AND THE PREDICTION WAS WRONG**: DY's own table listed `al` as reading nothing DY touched, and it walks the BOSS pools. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_an": {
    "kind": "suite",
@@ -410,8 +411,8 @@
   "test_batch_ar": {
    "kind": "suite",
    "checks": [
-    740,
-    740
+    735,
+    735
    ],
    "checks_obs": 1,
    "fails": [
@@ -419,7 +420,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +5. The five Pyromancer grants became five DRAFT entries and the four numbers per card are asserted against exactly the values the node used to carry. Phoenix Rebirth is asserted EARNABLE for the first time: AN retired the class draw, so its `CLASS_POOLS` entry reached no roller and `py_rebirth`'s grant was its only source in the game."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [740, 740] -> 735. -5. The mage class-pool resolve loop moved from `CLASS_POOLS['mage']` (12) to `CLASS_DRAFT_POOLS['mage']` (7). Flame Shield's absence is asserted as `pool_ability() == null` now — the name is dead in EVERY pool, which is AR's real claim. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_as": {
    "kind": "suite",
@@ -444,20 +445,16 @@
    "checks_obs": 17,
    "fails": [
     0,
-    1
+    0
    ],
-   "fails_obs": 18,
-   "note": "FOUND BY THE DG BATTERY DISAGREEING WITH DG'S OWN PREDICTION, AND PREVIOUSLY UNRECORDED. The three exclusive-pair reds are DELETED at DG §2 (470 -> 467, part of the sanctioned fall of six); this row's remaining ceiling of 1 is a DIFFERENT and NEW failure. IT IS NOT DG's: DG's only edits to this file were three deleted file-reading assertions, which consume no RNG, and the check count landed exactly on prediction. THE ±10% DAMAGE ROLL ALONE DOES NOT EXPLAIN 2.40 — modelled over 200,000 trials, ten summed casts a side put the 5th-95th percentile at 2.08-2.26 and P(over the 2.35 ceiling) at 0.1%, about one run in a thousand. So there is a SECOND random term. THE SUITE'S OWN `_spawn` NAMES THE CANDIDATE, on the very helper this check calls: 'THE CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway Resonance adds +1% crit PER STACK, so a same-cast-at-0-vs-12 comparison silently compares 10% crit against 22% crit.' The fixture passes crit:-10.0, which removes the BASE and not the PER-STACK term, so the two populations differ in crit chance as well as in the curve the check means to measure. A model carrying the FULL differential over-predicts (32% red against 1 in 18 observed), so the live term is smaller than that and larger than zero, and ITS SIZE IS NOT ESTABLISHED — do not guess it. THE FIX IS THE DD SHAPE, WHICH DD APPLIED TWICE IN THIS SUITE AND DID NOT REACH THIS ONE: seed both blows of the compared pair, or set crit_bonus back as the file's own comment says checks that care must do. DO NOT WIDEN THE BAND — the band IS the question. DELIBERATELY LEFT FOR ITS OWN BATCH: one flake at a time is how the effect stays attributable, and `bo`'s and `test_rune_battle`'s are both still open.",
-   "flake": {
-    "rate": "1 red in 18 readings — 11 recorded before DG, DG's battery (RED), and six clean ad-hoc re-runs at DG. THE CHECK COUNT IS ROCK STEADY AT 467 ACROSS ALL SEVEN DG READINGS; only the failure moves, which is the flake signature CLAUDE.md names.",
-    "what": "§1 `_live_curve`: `12 stacks roughly DOUBLE his damage` — it sums TEN casts at 0 Resonance and ten at 12 and asserts the ratio is >2.0 and <2.35 against a table value of 2.17. It read 2.40 at DG. THE CHECK IS UNSEEDED: every `_seeded()` call in the file is DOWNSTREAM of it."
-   }
+   "fails_obs": 19,
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** **THE `flake` FIELD IS REMOVED AND THE FAILURE BAND TIGHTENED [0,1] -> [0,0]: DY §4 SEEDED §1's DAMAGE-CURVE PAIR AND IT SETTLED AT ZERO, SO IT WAS A FLAKE AND NOT A FINDING.** It is the LAST UNSEEDED flake in the project. **AND THE CENSUS WAS TWO ROWS, NOT ONE, WHICH THE RECORD GOT WRONG**: `docs/state.md` said `test_batch_at` was the only row still carrying a `flake` field, and `test_rune_battle` carries one too. Its field is KEPT deliberately — DF §0 seeded it at the site that flakes, but the recorded rate is a RACE UNDER MACHINE LOAD that a seed cannot fix. **So one row carries a `flake` field now and it is a seeded one.** Seeded PER-PAIR (DD's method, and literally the two lines the TAKEN loop twelve lines below has used since DD): both arms of a pair draw one identical stream, `_i` varies the draw across the ten pairs. **Six unseeded readings spanned 2.1189-2.2463; six seeded readings all read 2.1799**, against a band of 2.0-2.35 and a table value of 2.17. **THE BAND WAS NOT WIDENED — the band is the question.** The check count did not move: 467 over three standalone readings and battery 1. A seed is not an assertion."
   },
   "test_batch_au": {
    "kind": "suite",
    "checks": [
-    231,
-    231
+    288,
+    288
    ],
    "checks_obs": 1,
    "fails": [
@@ -465,7 +462,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. A FALL OF 105, AND THE ROW MOVES WITH ITS REASON. AU §1 built the collision machinery so no ability-granting TALENT could be silently dead; DO's charter removed the POPULATION, not the machinery. Three loops asserted per-node over a set that is now empty (22 granting nodes, 7 done-specs, and 3 exempt specs at 27 cells each). What replaces them is the PROPERTY — no talent grants, one assertion per spec with the offenders named in the message — plus the four ability-granting RUNES, which is where `_collided` is still reached. The machinery is asserted PRESENT and is not deleted."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [231, 231] -> 288. +57. §5's debug-grant control walked `CLASS_POOLS[class_of_spec(spec)]` — one list per spec, 12-18 names. It walks the SIBLING SPECS' own boss and draft pools now, which is what 'spec-foreign' always meant and is a wider set. A second assertion pins `class_pool()` itself DELETED, so the negative cannot be made false by re-adding the call. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_av": {
    "kind": "suite",
@@ -658,16 +655,16 @@
   "test_batch_bj": {
    "kind": "suite",
    "checks": [
-    67,
-    67
+    73,
+    73
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 10,
-   "note": "BATCH DP: UNMOVED AT 67, AND THAT WAS PREDICTED — the same shape as DM's `test_batch_al` repair. §2 asserts the Rune of the Whispering Dark STATES the Ruin it marks, and it still does; what moved is who catches it. Spread of Madness was re-pointed off Psychosis (no guaranteed applier) onto the passive's own mark, so there is no 'newly maddened' left to name and the needle reads `which catches 1 Ruin` — naming the CLAUSE rather than a bare number, for AL's reason. THE ASSERTION IS UNCHANGED; THE FILE IT READS WAS CORRECTED."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [67, 67] -> 73. +6. §1's dead-symbol KEEP for `CLASS_POOLS` is INVERTED to a deletion pin, and each of the seven vault entries is now asserted with its HOME as well as its definition. BJ recorded the keep's reason and the seven's unreachability in adjacent lines; both are answered here. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bk": {
    "kind": "suite",
@@ -727,8 +724,8 @@
   "test_batch_bo": {
    "kind": "suite",
    "checks": [
-    1106,
-    1106
+    1131,
+    1131
    ],
    "checks_obs": 1,
    "fails": [
@@ -736,7 +733,7 @@
     0
    ],
    "fails_obs": 7,
-   "note": "BATCH DT SEEDED §5's NULL FIELD PAIR AND THE ROW IS NO LONGER FLAKY — `flake` REMOVED AND THE FAILURE CEILING TIGHTENED 1 -> 0, WHICH IS HOW THE FIX GETS ENFORCED. The suite called `seed()` ZERO times; `_nf_seeded()` is now called immediately before EACH of the two compared blows with the same constant, so both arms draw one identical stream and the only difference left between them is the Resonance stack count. PER-PAIR AND NOT PER-SUITE: the other 1104 checks keep their own draw, because widening the seed changes what the rest of the file measures and the BAND IS THE QUESTION. THE EVIDENCE IS DETERMINISM RATHER THAN SAMPLE SIZE, which is why `fails_obs` is only 7: six direct readings plus DT's battery, but the compared pair now reads 17 against 10 on EVERY run where before the seed it ranged shallow 18/16/23/18/28/17 against deep 10/10/11/11/9/10. AND THE DOCUMENTED CAUSE WAS INCOMPLETE, WHICH IS WORTH MORE THAN THE FIX: the recorded reason was the ±10% damage roll alone, and a ±10% roll on a mean of 18 spans 16.4-19.8 and CANNOT REACH 28 — a crit is x1.5 and reaches exactly there. So this was `at`'s shape, a second and larger coin hiding behind a variance roll that was taking all the blame, and it is precisely why a per-pair seed was the right instrument: it neutralises every coin at once without anyone having to identify which one was biting. A widened band would have had to be widened to fit a crit, and that band is the assertion. THE CHECK COUNT DOES NOT MOVE (1106) — the change is four lines of code, proven with a comment-stripped diff against HEAD: a two-line helper and its two call sites. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +39. §5's per-card loop walks the draft pools, so it grows with them. §4's DISJOINTNESS assertion is RE-POINTED to the property disjointness stood for: BO kept the pools apart so the BOSS pick would be unchanged, and DO adds nothing to `SPEC_POOLS` — so what is asserted now is that exactly sixteen of the twenty-two sit in both draws, and that BOTH rollers filter `owned_ability_names`, which is what makes an overlap unable to double-offer. Rampage and Pyroblast are NAMED exemptions from the states-a-perfect biconditional: both are `test_batch_cp.CHECK_WITHOUT_PERFECT` names that DO brought into reach without creating. **BATCH DR: 1064 -> 1070.** Its §5 loop walks every spec draft-pool entry and checks four things about each; DR's net +1 card moves it, and its §4 class-pool and per-spec-depth loops add the rest. The row moved in the batch that caused it. **BATCH DS: 1070 -> 1106.** Its §5 per-card loop checks SIX things about every spec draft-pool entry and its §4 loop one more, and DS adds six cards to three Hunter pools at once. **THE RATE WAS DERIVED BEFORE THE RUN FROM DR'S OWN MOVEMENT** (net +1 card moved this row +6) and the prediction was exact."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1106, 1106] -> 1131. +25. §4's draft/boss collision walk and §5's resolve/Perfect loops run once per spec-draft entry (125 -> 129), and §3's Holy boss pin became two assertions (containment plus non-empty) because DY §2 deepened that pool. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bp": {
    "kind": "suite",
@@ -755,30 +752,30 @@
   "test_batch_bq": {
    "kind": "suite",
    "checks": [
-    742,
-    742
+    883,
+    883
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [742, 742] -> 883. +141. §1's leak control moved from `CLASS_POOLS` (4 iterations) to `SPEC_POOLS` (12), so TRANCHE_3's twelve names are checked against twelve boss pools instead of four class pools. **AND §3/§4's `live.size() == 6` BECAME A FLOOR** — DX's sweep missed it because the condition reads a local, and it is the exact site DY's Mage class card would have tripped. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_br": {
    "kind": "suite",
    "checks": [
-    1450,
-    1450
+    1592,
+    1592
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1450, 1450] -> 1592. +142. TRANCHE_4's leak control moved to `SPEC_POOLS` as in `bq` (+132), and §4's class-draft x spec-draft cross product grew with the Mage pool, 24 x 12 -> 25 x 12 (+12). DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bs": {
    "kind": "suite",
@@ -796,58 +793,58 @@
   "test_batch_bt": {
    "kind": "suite",
    "checks": [
-    407,
-    407
+    375,
+    375
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2. **BATCH DR: 458 -> 407.** §2 retired FLASH FREEZE as an exact duplicate of Glacial Prison at a worse price, so its row left this suite's card table (renamed `NINE` -> `BT_CARDS`, because a const named NINE holding eight is this project's oldest recurring defect), its name left the `_definitions` loop, and `_live_flash_freeze` — the whole boss-carve-out drive — was deleted. `_one_shield_door`'s slice anchor was RE-POINTED off the case that is gone and onto the one that follows Funeral Pyre now; it would have failed LOUDLY rather than silently, which is what an anchored slice is for. The spec-pool total moved 118 -> 119 here as everywhere."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [407, 407] -> 375. -32. The leak control over `CLASS_POOLS` is gone (BT_CARDS x 4 classes); the `SPEC_POOLS` half beside it is untouched and still asserts the same claim about the boss channel. The byte-freeze size pin is replaced by a source pin on the container's ABSENCE. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bu": {
    "kind": "suite",
    "checks": [
-    480,
-    480
+    444,
+    444
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [480, 480] -> 444. -36. As `bt`: NINE x 4 leak assertions against the deleted dict, and the `CLASS_POOLS['cleric']` non-empty pin replaced by the absence pin. Its pool census loses its `CLASS_POOLS` arm; the other three arms are every pool a name can now live in. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bv": {
    "kind": "suite",
    "checks": [
-    900,
-    900
+    864,
+    864
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [900, 900] -> 864. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bw": {
    "kind": "suite",
    "checks": [
-    551,
-    551
+    515,
+    515
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [551, 551] -> 515. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bx": {
    "kind": "suite",
@@ -866,8 +863,8 @@
   "test_batch_cb": {
    "kind": "suite",
    "checks": [
-    1203,
-    1203
+    1172,
+    1172
    ],
    "checks_obs": 1,
    "fails": [
@@ -875,13 +872,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +11. The per-spec depth loops grow with the pools. **CB'S BACKDRAFT COLLISION SECTION IS INVERTED**: `py_melt` both carried the name Backdraft and granted an ability of that name, which is why CB renamed the draft card to Firedraw. DO ended the grant, so the collision is gone — the node is `Melt`, Backdraft is a real draft card, and Firedraw ships beside it. **BATCH DR: 1196 -> 1197.** Its pool loop walks one more draft card than it did (net +1: two Swordmaster cards in, one Cryomancer card out). **BATCH DS: 1197 -> 1203.** Its pool loop walks one assertion per draft card and DS adds six. Predicted before the run at the rate DR's net +1 established, and exact."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1203, 1203] -> 1172. -31. NINE x 4 leak assertions gone, less the source pin; `CLASS_POOLS['mage'] == 12` replaced by the absence pin. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_cd": {
    "kind": "suite",
    "checks": [
-    85,
-    85
+    99,
+    99
    ],
    "checks_obs": 1,
    "fails": [
@@ -889,13 +886,13 @@
     0
    ],
    "fails_obs": 6,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +13. The hygiene suite carries the ONE authoritative per-spec depth table (`PER_SPEC_DEPTH`), because twelve copies of it would be this project's oldest defect; every other suite asserts the FLOOR and the TOTAL instead. `DEEP_SPECS` was DELETED with its premise rather than left — a const nothing reads is the dead symbol this very file sweeps for."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [85, 85] -> 99. +14. THE AUTHORITATIVE TABLES. `PER_SPEC_DEPTH` moves (warden 9 -> 10, arcanist 10 -> 12, inquisitor 10 -> 11) and **`PER_CLASS_DEPTH` IS NEW** — the class half stopped being 4 x 6 when Mana Shield took the Mage pool to seven, so it became a summed table exactly as the spec half did at DO. The +14 is that table's per-class equality, floor and duplicate check, plus the shallowest-pool print. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_ce": {
    "kind": "suite",
    "checks": [
-    1145,
-    1145
+    1114,
+    1114
    ],
    "checks_obs": 1,
    "fails": [
@@ -903,7 +900,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +22. The per-spec depth loops walk the pools and grow with them. Its arithmetic assertions moved 96/120 -> 118/142 with the reason beside them. **BATCH DR: 1138 -> 1139.** Same shape as `cb` — its pool loop walks the net +1 draft card. **BATCH DS: 1139 -> 1145.** Same shape as `cb` — one assertion per draft card, six cards added. Predicted before the run, and exact."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1145, 1145] -> 1114. -31. As `cb`, with `CLASS_POOLS['cleric'] == 14` replaced by the absence pin. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_cp": {
    "kind": "suite",
@@ -932,8 +929,8 @@
    ],
    "fails_obs": 18,
    "flake": {
-    "rate": "2 red in 15 readings — roughly 1 in 7, and BOTH reds landed under machine load",
-    "what": "§ pyromancer: `rune_resist_pierce never fired against a resistant warband` — the White Flame's only read site, asserted by driving a LIVE battle against a fire-resistant warband and looking for `Rune: the flame bites through resistance` in a snapshot or the log. The proc has to actually land; test_rune_battle calls seed() ZERO times."
+    "rate": "2 red in 15 readings — roughly 1 in 7, and BOTH reds landed under machine load — SEEDED AT DF §0 AND THE FIELD IS KEPT ANYWAY (DY): a seed does not fix a race.",
+    "what": "§ pyromancer: `rune_resist_pierce never fired against a resistant warband` — the White Flame's only read site, asserted by driving a LIVE battle against a fire-resistant warband and looking for `Rune: the flame bites through resistance` in a snapshot or the log. The proc has to actually land. **THIS SENTENCE READ 'test_rune_battle calls seed() ZERO times' UNTIL BATCH DY AND DF §0 HAD ALREADY MADE IT FALSE**: `_seeded()` is called immediately before the forced White Flame hit — the exact site that flakes — and nowhere else. DT re-derived that and corrected `docs/state.md`; this record was the copy nobody swept. **THE FIELD IS KEPT ON PURPOSE**: the rate above is a RACE UNDER MACHINE LOAD, which a seed cannot fix, and readings cannot retire a rate measured over fifteen. **SO THIS IS THE ONE ROW STILL CARRYING A `flake` FIELD, AND IT IS NOT AN UNSEEDED ONE.**"
    },
    "note": "FOUND BY `check_de` ON ITS FIRST ACCEPTANCE RUN AND PREVIOUSLY UNRECORDED. Its CHECK count is rock steady at 97 across all 15 readings — only the failure moves, which is the flake signature CLAUDE.md names. READINGS: clean in DE's before- and after-batteries, RED in the final acceptance battery, RED on the next ad-hoc run, then TEN CONSECUTIVE CLEAN runs on an idle machine. BOTH REDS LANDED UNDER LOAD, which is a hypothesis and not a finding — the assertion's own comment says the snapshot 'is the one that cannot race', so a race is the thing to look at first. THE FIX IS THE `at`/`bo` SHAPE (seed the draw, or assert on the snapshot alone) AND IT IS DELIBERATELY LEFT FOR ITS OWN BATCH: one flake at a time is how the effect stays attributable. SEEDED AT DF §0, per-site: `_seeded()` immediately before the forced hit and nowhere else, so the other 96 checks keep their own stream. THE BAND IS DELIBERATELY NOT TIGHTENED — two clean post-seed readings cannot retire a rate measured over fifteen, and tightening on that evidence is the same fault as writing a band from too few readings, in the opposite direction. The failure message now carries the state the forced hit happened in (battle_over, both units' liveness, the target's fire resist, the pierce fraction), so the NEXT red says what was missing instead of only that it was missing."
   },
@@ -1023,8 +1020,8 @@
   "check_dv": {
    "kind": "gate",
    "checks": [
-    130,
-    130
+    83,
+    83
    ],
    "checks_obs": 1,
    "fails": [
@@ -1032,7 +1029,7 @@
     0
    ],
    "fails_obs": 3,
-   "note": "128 -> 130 AT DW, AND THE MOVEMENT IS §5's SHADOWREND PIN INVERTING RATHER THAN GOING AWAY. DV pinned the RENDERED Perfect as OVER at 49 against the 44 ceiling, with its own failure message saying that if it ever fits the report is stale. DW §3 repaired it, so that check now asserts it FITS — deleted, the overrun could come back silently. **AND DV's FRAMING OF IT DID NOT SURVIVE, WHICH IS THE +2.** The overrun was recorded as the one thing DU §4's corpus fix made visible. It was not: `\"Cleric recovers {mhp:5}\"` was authored TWICE — on Shadowrend and on SMITE, the Cleric class basic — and `ability_corpus()` has walked `kit(\"cleric\")` since long before DU, so the identical 49-character breach was ALREADY in the corpus under Smite's name. DU added a second instance of a breach that was never hidden. **PROVED MECHANICALLY, NOT ARGUED**: `check_cl_width`'s `perfect_text` overrun count falls 56 -> 48 when both are repaired, and 8 is 4 render contexts x 2 abilities — had only Shadowrend been over, it would have fallen by 4. So §5 asserts BOTH sites now (+1 for Smite being in the corpus, +1 for the second ceiling check). `checks_obs` resets to 1. THE EARLIER NOTE IS SUPERSEDED IN ITS §5 HALF ONLY; §0 through §4 are untouched by DW and their reasoning stands as written at DV."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [130, 130] -> 83. -47. §1 stopped walking `CLASS_POOLS`' 61 entries: it walks `vault_ability()`'s TEN definitions instead and asserts every one is named by a live pool (homeless == 0, where it read 7). §2 gained the emptiable-by-drafting derivation. **§2's Holy pin WENT RED ON DY's OWN FIX, WHICH IS WHAT THAT TRIPWIRE IS FOR** — DX examined it and left it standing on exactly that reasoning. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "check_dw": {
    "kind": "gate",

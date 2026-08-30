@@ -261,13 +261,24 @@ func _pools() -> void:
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
-	# CLASS_POOLS FEEDS THE BOSS PICK and must not move either (BO's rule).
-	ok(Classes.CLASS_POOLS["cleric"].size() > 0,
-		"CLASS_POOLS['cleric'] is byte-untouched and non-empty")
+	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
+	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
+	# pin standing correctly; DY deletes the collection, so the strongest thing
+	# that can be said about it is that it is gone. Read off the SOURCE, in the
+	# shape `test_batch_an` uses for `roll_ability_offer`.
+	ok(not FileAccess.get_file_as_string("res://scripts/classes.gd").contains(
+			"const CLASS_POOLS"),
+		"CLASS_POOLS is DELETED (DY §3) — the class-wide BOSS pool is gone, not zeroed")
+	# **BATCH DY §3 — `CLASS_POOLS` IS DELETED AND THE LEAK LOOP OVER IT GOES
+	# WITH IT.** It was the CLASS-WIDE half of the zone-boss pick, dead since
+	# AN §4 re-pointed the award at `SPEC_POOLS` alone, and DY retired it after
+	# re-homing the seven abilities it alone listed. **THE CLAIM THIS SUITE
+	# OWNS IS INTACT AND IS ASSERTED TWICE OVER**: these cards are not in the
+	# class-wide DRAFT pool (the loop just above) and not in any spec BOSS pool
+	# (the loop just below). What is gone is a third loop against a structure
+	# that no longer exists — which would have passed for no reason, and this
+	# project holds a vacuous pass to be worse than a red.
 	for n in NINE:
-		for cls in Classes.CLASS_POOLS:
-			ok(not Classes.CLASS_POOLS[cls].has(n),
-				"%s did not leak into the BOSS pool %s" % [n, cls])
 		for spec in Classes.SPEC_POOLS:
 			ok(not Classes.SPEC_POOLS[spec].has(n),
 				"%s did not leak into the boss SPEC pool %s" % [n, spec])
@@ -365,8 +376,9 @@ func _names() -> void:
 		pools.append_array(Classes.class_draft_pool(cls))
 	for spec in Classes.SPEC_POOLS:
 		pools.append_array(Classes.SPEC_POOLS[spec])
-	for cls in Classes.CLASS_POOLS:
-		pools.append_array(Classes.CLASS_POOLS[cls])
+	# DY §3: the `CLASS_POOLS` arm of this census is gone with the dict. The
+	# other three arms are every pool a name can now live in, so "exactly ONE
+	# pool" is still the whole question.
 	for n in pools:
 		seen[n] = int(seen.get(n, 0)) + 1
 	for n in NINE:
@@ -539,7 +551,19 @@ func _docs() -> void:
 		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("149 of"), "master.html states the current draft count")
+	# **BATCH DY §1 — THE NEEDLE IS RENDERED FROM THE LIVE POOLS, NOT AUTHORED.**
+	# It read the literal "149 of". That is a SECOND COPY OF A COUNT inside the check
+	# written to catch a stale one, which is this project's oldest recurring
+	# defect and the one CL §1 wrote a rule about — and it cost six files a
+	# hand-edit the moment DY moved the draft 149 -> 154. **The DOCUMENT still
+	# has to carry the figure; this file no longer carries a copy of it.**
+	var dy_draft := 0
+	for dy_s in Classes.SPEC_DRAFT_POOLS:
+		dy_draft += (Classes.SPEC_DRAFT_POOLS[dy_s] as Array).size()
+	for dy_c in Classes.CLASS_DRAFT_POOLS:
+		dy_draft += (Classes.CLASS_DRAFT_POOLS[dy_c] as Array).size()
+	ok(master.contains("%d of " % dy_draft),
+		"master.html states the current draft count (%d)" % dy_draft)
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BU — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

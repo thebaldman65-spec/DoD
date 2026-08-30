@@ -88,7 +88,16 @@ func _test_kits() -> void:
 func _test_pools() -> void:
 	print("\n§2 pools")
 	ok(Classes.SPEC_POOLS.size() == 12, "SPEC_POOLS covers all 12 specs")
-	ok(Classes.CLASS_POOLS.size() == 4, "CLASS_POOLS covers all 4 classes")
+	# **BATCH DY §3 — `CLASS_POOLS` IS DELETED AND THIS SUITE IS ITS OLDEST
+	# READER.** AH built BOTH pools and an award that drew 1 from the spec pool
+	# and 2 from the class pool; AN §4 re-pointed the award at the spec pool
+	# alone and deleted the roller, and DY deleted the container. The size
+	# assertion is replaced by the ABSENCE assertion, in the shape
+	# `test_batch_an` already uses for `roll_ability_offer` — a suite that
+	# built a thing is the right place to record that it is gone.
+	var csrc_dy := FileAccess.get_file_as_string("res://scripts/classes.gd")
+	ok(not csrc_dy.contains("const CLASS_POOLS"),
+		"CLASS_POOLS is DELETED (DY §3) — AH's second pool is gone, not zeroed")
 	var seen := {}
 	for spec in Classes.SPEC_POOLS:
 		ok(Classes.SPEC_IDS.values().any(func(v): return v.has(spec)),
@@ -99,18 +108,27 @@ func _test_pools() -> void:
 			var key := "%s/%s" % [spec, name]
 			ok(not seen.has(key), "no duplicate entry %s" % key)
 			seen[key] = true
-	for class_key in Classes.CLASS_POOLS:
-		ok(Classes.SPEC_IDS.has(class_key), "CLASS_POOLS key %s is a real class" % class_key)
-		for name in Classes.CLASS_POOLS[class_key]:
+	# **THE CLASS-POOL WALK THAT STOOD HERE IS RE-POINTED, NOT DELETED (DY §3).**
+	# It asserted three things of every class-pool entry — that it resolves,
+	# that it resolves to its own name, and AH's CURATION RULE (no
+	# spec-exclusive secondary resource). The container is gone; **the curation
+	# rule is not, and it has a live subject**: `CLASS_DRAFT_POOLS`, the
+	# class-wide DRAFT pool, is authored under the same rule and DY §1 just put
+	# a card into it. So the walk moves one structure across rather than
+	# lapsing, and the rule keeps a population to bind.
+	for class_key in Classes.CLASS_DRAFT_POOLS:
+		ok(Classes.SPEC_IDS.has(class_key),
+			"CLASS_DRAFT_POOLS key %s is a real class" % class_key)
+		for name in Classes.CLASS_DRAFT_POOLS[class_key]:
 			var ab: Ability = Classes.pool_ability(name)
-			ok(ab != null, "class pool %s -> %s resolves" % [class_key, name])
+			ok(ab != null, "class draft %s -> %s resolves" % [class_key, name])
 			if ab == null:
 				continue
 			ok(ab.display_name == name, "%s resolves to its own name" % name)
-			# THE CURATION RULE, asserted rather than trusted: nothing in a
-			# class pool may cost a spec-exclusive secondary resource.
+			# THE CURATION RULE, asserted rather than trusted: nothing offered
+			# class-wide may cost a spec-exclusive secondary resource.
 			ok(ab.faith_cost == 0,
-				"%s costs no Mercy/Faith (class pool %s)" % [name, class_key])
+				"%s costs no Mercy/Faith (class draft %s)" % [name, class_key])
 			# ...nor be one of the named signature identity pieces.
 			ok(ab.special != "summon" and ab.special != "call_wild"
 				and ab.special != "kill_command",
@@ -126,7 +144,10 @@ func _test_pools() -> void:
 			ok(Classes.class_of_spec(spec) == class_key,
 				"class_of_spec(%s) == %s" % [spec, class_key])
 	ok(Classes.class_of_spec("") == "", "class_of_spec('') is empty, not a crash")
-	ok(Classes.class_pool("nonsense").is_empty(), "an unknown class has no pool")
+	# DY §3: `class_pool()` went with `CLASS_POOLS`. The tolerant-lookup claim
+	# this asserted is kept, over the accessor that is still live.
+	ok(Classes.class_draft_pool("nonsense").is_empty(),
+		"an unknown class has no class-wide draft pool")
 	# A pool copy must be the SAME ability the kit or the talent hands out.
 	var pool_hs: Ability = Classes.pool_ability("Hack and Slash")
 	var kit_hs: Ability = null
@@ -161,10 +182,12 @@ func _test_offers(RunState) -> void:
 	for class_key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[class_key]:
 			var spec_pool: Array = Classes.spec_pool(spec)
-			var class_pool: Array = Classes.class_pool(class_key)
 			# BATCH AN §4 RE-POINTED THIS IN PLACE. AH offered 1 spec + 2
 			# class; abilities are SPEC-LOCKED now, so every entry must come
 			# from the spec pool and the class pool is not consulted at all.
+			# **DY §3 DELETED THE CLASS POOL OUTRIGHT**, so the unused local
+			# that held it is gone too — a variable read by nothing is the dead
+			# symbol `test_batch_cd`'s own sweep exists to catch.
 			# The question the check asks is unchanged — "is the offer drawn
 			# from the pool the design says it is" — so it rides the
 			# mechanism that is load-bearing today rather than being deleted.
@@ -181,8 +204,17 @@ func _test_offers(RunState) -> void:
 				for n in offer:
 					ok(spec_pool.has(n),
 						"%s draws only from its SPEC pool (got %s)" % [spec, n])
-					ok(not class_pool.has(n) or spec_pool.has(n),
-						"%s: nothing arrives via the class pool alone" % spec)
+					# DY §3: this read `class_pool`, a local off the deleted
+					# `CLASS_POOLS`. The claim — an offer never carries a name
+					# only a SIBLING can reach — is derived off the siblings'
+					# own pools now, which is what it always meant.
+					var sib_only := false
+					for sib in Classes.SPEC_IDS[class_key]:
+						if String(sib) != spec and not spec_pool.has(n) \
+								and Classes.spec_pool(String(sib)).has(n):
+							sib_only = true
+					ok(not sib_only,
+						"%s: nothing arrives from a sibling spec alone" % spec)
 				ok(offer.size() == _unique(offer).size(),
 					"%s offer holds no duplicate" % spec)
 			# Batch AN: TWO awards over a run, not six — the mini-boss pays
@@ -482,10 +514,12 @@ func _test_doc_matches_code() -> void:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])
 		ok(doc.contains(listed),
 			"§6a lists %s's spec pool verbatim (%s)" % [spec, listed])
-	for class_key in Classes.CLASS_POOLS:
-		var listed2: String = ", ".join(Classes.CLASS_POOLS[class_key])
-		ok(doc.contains(listed2),
-			"§6a lists the %s class pool verbatim" % class_key)
+	# **DY §3: §6a's CLASS-POOL TABLE IS GONE WITH THE DICT.** What replaces the
+	# verbatim check is the assertion that the document does not still describe
+	# a structure the code no longer has — the Flash Freeze trap DR recorded,
+	# applied to a table instead of a comment.
+	ok(not doc.contains("Class pool (earnable by all three specs)"),
+		"§6a no longer prints a class-pool table for a deleted dict (DY §3)")
 	# And the eight converted perfects read the same in both places.
 	for spec2 in Classes.SPEC_IDS:
 		for spec_id in Classes.SPEC_IDS[spec2]:
