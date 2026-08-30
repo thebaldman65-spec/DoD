@@ -105,15 +105,23 @@ func _initialize() -> void:
 	quit(1 if bad > 0 else 0)
 
 
+# BATCH DW §1 — THE SMALLEST WALK IN THE PROJECT, AND IT WAS IN A GATE.
+# This read the four class kits and `spec_abilities` and NOTHING ELSE: no pool
+# of any kind, no talent grant, no kit override. **It reached 43 of 227.**
+#
+# THAT IS THE FINDING THAT OUTRANKS THE ONE DW WAS BRIEFED ON. `check_da` §3
+# has swept `check_*.gd` since DA and read 37/0 over this file on every battery
+# run since — because its fingerprint was the two draft-pool ACCESSORS, and a
+# walk touching no draft pool at all cannot match it. The population axis was
+# never the reason this one hid.
+#
+# AND THE SWEEP IT FEEDS IS THE ASSERTED HALF OF CL §1. The unexpanded-token
+# check (`bad += unresolved`) is a real gate, and it was running over 19% of
+# the corpus. **RE-RUN OVER ALL 227 IT STILL READS ZERO** — no token survives
+# resolution anywhere in the game — so nothing was hiding, which is worth
+# stating plainly: the instrument was blind and the thing it was blind to was
+# not there. The REPORTED half moves: the authored-parenthetical list goes
+# 6 -> 8, and the two it could never see are Arcane Explosion and **Shatter** —
+# the one name `test_batch_cp` §3 pinned its whole population on.
 func _every_ability() -> Array:
-	var out: Array = []
-	var seen := {}
-	for key in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(key):
-			out.append(ab)
-	for spec in Classes.SPEC_INFO:
-		for ab in Classes.spec_abilities(spec):
-			if not seen.has(ab.display_name):
-				seen[ab.display_name] = true
-				out.append(ab)
-	return out
+	return Classes.ability_corpus()

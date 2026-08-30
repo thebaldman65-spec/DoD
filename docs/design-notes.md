@@ -4,6 +4,56 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A rule that matches source text can only see one shape of violation (Batch DW) — 2026-08-29
+
+`check_da` §3 was authored at Batch DA to catch a gate that hand-rolls the ability corpus instead of
+calling `Classes.ability_corpus()`. `test_batch_cp._corpus()` is a hand-rolled ability corpus. The
+two existed side by side for their whole lives and the gate read **37/0** on every battery run in
+between. DV found the walk by accident, while auditing something else.
+
+DV's diagnosis was that the fingerprint had two holes — the wrong **population** (it swept
+`check_*.gd` only) and the wrong **calling convention** (it matched the pool accessors where that
+walk read the constants). Both were real. **But there was a third, and it was the one that mattered
+most: the fingerprint assumed that a corpus walk touches the draft pools at all.**
+
+> `check_cl_resolver._every_ability()` is a corpus walk **in a gate** — inside the population
+> `check_da` had been sweeping since DA — and it reads only `Classes.kit()` and
+> `Classes.spec_abilities()`. **It reached 43 of 227.** No widening of the population would ever
+> have found it, because it was never outside the population.
+
+**The lesson is not "widen the fingerprint".** It is that a fingerprint encodes a guess about what
+the violation looks like, and the guess is invisible from inside the rule. Patching the two holes
+you were told about leaves the third. The way to find it is to go back to what the rule is *about* —
+"is this function answering the question `ability_corpus()` exists to answer?" — and re-derive the
+fingerprint from that.
+
+**And the sharpness of a fingerprint is measurable: count the exemptions it needs.** The obvious
+widening — union every mark, sweep every file — accuses **sixteen** files. Sixteen exemptions is not
+a rule; it is a rule with a list of the places it has agreed not to look, and **an exemption granted
+to a genuine violation is worse than the violation it covers**, because the violation is at least
+visible. Sharpening the question until the catches are real took it to three catches and one
+exemption:
+
+> A function that **RETURNS** a collection built out of two or more of the game's ability-source
+> families is answering *"what abilities exist?"*. A function that reads a pool and **asserts** on
+> it returns void, and is not.
+
+The return type is doing the discriminating, and that is not a trick — it is the actual difference
+between enumerating and asserting.
+
+**Two smaller things fall out of it, both about how this failure hides.** First, the cost was never
+a red: a fingerprint with a hole does not fail slowly or loudly, it **passes**, and seventeen quiet
+readings of 37/0 said nothing at all. Proved on demand — with the smallest walk restored, moving the
+family threshold from `2` to `3` returns the gate to a clean 39/0 with a 43-of-227 walk sitting in
+the tree.
+
+Second, **a green equality over a short walk reads exactly like a green equality.** `test_batch_cp`
+§3 pinned its literal-digit population as `== ["Shatter"]` and the real figure is eight; the
+biconditional beside it pinned six where the truth is eight. Neither was a lie and neither could
+have known. The repair is not just repointing the walk — it is that `check_dw` now **re-derives both
+populations live and asserts the suite's named table equals them**, because a named population is
+only useful for as long as it is still the real one.
+
 ## A dead player card and a dead enemy debuff are not the same defect (Batch DU) — 2026-08-29
 
 DK found Empower attaching perfectly to a companion, hanging a chip, and moving no number. It ruled

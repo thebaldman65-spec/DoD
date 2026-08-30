@@ -5,137 +5,87 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-29 (Batch DV).*
+*Last rewritten: 2026-08-29 (Batch DW).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: DV — THREE THINGS DU FOUND, AND THE CHANGELOG CUT.**
-  Four items. **ONE THING CHANGED IN THE GAME** — a door that let the player waste a turn the bot
-  had refused since BB — and **the other three resolved to measurement, because the brief withheld
-  the ruling each of them needed.** No card was authored and the draft is untouched at 149.
-  **Report: `docs/reports/DV.md`.**
-- **`CLASS_POOLS` IS A LOST FEATURE, NOT SCAFFOLDING, AND NOTHING WAS DELETED.** The standing rule
-  is that dead code is deleted rather than zeroed; **the brief made the deletion conditional on
-  establishing WHY it is dead, and the condition fired.** Three independent sources agree it was
-  WIRED and LIVE: `classes.gd`'s own header describes the Batch AH award as *"1 from its SPEC_POOLS
-  entry and 2 from its class's CLASS_POOLS entry (`Run.roll_ability_offer`)"*; `run_state.gd`
-  records that **Batch AN §4 re-pointed the award and left the structure standing**; and
-  `test_batch_an` §1 asserts **`roll_ability_offer()` is DELETED**. **The reader was deleted and the
-  pools were left on purpose — that is an orphaning, so it is a design question and this batch has
-  no ruling on it.**
-  - **AND A SECOND REASON THE BRIEF DID NOT ANTICIPATE: SEVEN ABILITIES DIE WITH IT.** Of the 61
-    distinct names, **27 are some spec's opening kit**, **27 sit in a live pool**, and **SEVEN are
-    reachable NOWHERE ELSE AT ALL** — Rallying Shout, Mana Shield, Arcane Surge, Reality Fracture,
-    Dawnbreak, Sanctuary, Divine Wrath. Each is authored, resolving and fully implemented down to
-    its handler, chip and glossary prose; **no rune grants any of them and
-    `Classes.talent_granted_names()` is empty.** **Deleting the container would delete the record of
-    the contents.** `Classes.ability_corpus()` walks `class_pool()`, so **the 227 includes seven
-    abilities no run can reach.** `check_dv` §1 DERIVES the seven rather than listing them.
-  - **WHAT AN ACTUALLY RETIRED WAS CROSS-SPEC ACQUISITION INSIDE A CLASS** — a Devout could once
-    earn the Holy Cleric's Heal. That is a larger thing than the structure looks like from outside.
-- **THE PHOENIX DOOR IS CLOSED AND THE BOT NO LONGER PLAYS BETTER THAN THE PLAYER MAY.**
-  `_resolve_special` writes `ashes_return = ASHES_RETURN_PERFECT` unconditionally, so an armed hero
-  could recast Ashes of Al'ar for **30 Mana and a turn, writing the same constant, every turn at
-  cooldown 0**. The bot has refused exactly that since BB. It is refused at `_ability_usable` now.
-  - **IT IS NOT IN `RECAST_GATED` AND THAT WAS MEASURED, NOT ARGUED.** That system reasons about
-    STATUS writes and `ashes` writes an integer FIELD: driven live on a fully-armed Mage,
-    **`_recast_targets` returns `[]` and `_recast_refused` returns FALSE.** **Membership would have
-    changed no behaviour at all**, and its one visible effect would have been `check_co` reporting
-    the card as never exercised — which reads like coverage. Both facts are asserted in `check_dv`
-    §3.
-  - **THE TEST IS EXACT AND FOUR STATES ARE DRIVEN**: unarmed **OPEN**, armed **REFUSED**, armed
-    BELOW what the cast writes **OPEN**, spent **REFUSED**. **The third is CO §1's whole rule** —
-    written `ashes_return > 0` it refuses a genuine 25 → 40 improvement, and the negative control
-    fails exactly that one check and nothing else.
-  - **`ASHES_RETURN` (25) IS A DEAD CONSTANT** — `FIREDRAW_TAKE`'s shape — and **it had already cost
-    a documentation defect**: `master.html` said the phoenix returns at 25% where the card and the
-    code both pay 40. Corrected toward the code.
-- **THE CHANGELOG IS CUT AT THE DF/DG BOUNDARY AND THE SYNC FELL FOR THE FIRST TIME.** 406.0 KiB
-  against CW's 400 threshold. With DV's entry the file held 34 entries; **16 stay and 18 move.**
-  Live **DV → DG at 150.0 KiB**; archive **DF → Batch 1 at 1314.3 KiB and 149 entries**. **The two
-  bodies rejoined are byte-identical to the original**, verified by a second script reading
-  untouched backups — **and no file size was asserted anywhere**, because sizes agreeing is
-  consistent with a duplicated entry and a dropped one. **ALL FOURTEEN CHANGELOG-READING TARGETS
-  NEEDED NO RE-POINTING**, and that is CX's work rather than this batch's.
-- **`check_dv.gd` IS THE GATE THE RULINGS NEEDED — 128 checks, `GATES` goes 24 → 25.** **FOUR
-  NEGATIVE CONTROLS, ALL FOUR BIT, AND ALL FOUR ON DIFFERENT ASSERTIONS.**
-- **Next letter: DW.** `DW` sorts after `DV`, so the stamp gates still work.
+- **Last batch: DW — THE WALK, THE FINGERPRINT THAT SHOULD HAVE CAUGHT IT, AND THE OVERRUNS.**
+  Three items, all instruments and text. **NO ABILITY MAGNITUDE MOVED AND THE DRAFT IS UNTOUCHED AT
+  149.** **Report: `docs/reports/DW.md`.**
+- **`check_da` §3's FINGERPRINT HAD THREE HOLES, NOT THE TWO DV NAMED, AND THERE WERE THREE
+  HAND-ROLLED WALKS, NOT ONE.** DV found `test_batch_cp._corpus()` while auditing something else and
+  diagnosed two reasons the rule could not see it: the sweep read **`check_*.gd` only**, and the
+  fingerprint matched the two draft-pool **ACCESSORS** where that walk reads the **CONSTANTS**.
+  **Both held. THE THIRD WAS LARGER THAN EITHER AND NO POPULATION AXIS WOULD HAVE FOUND IT: the
+  fingerprint assumed a corpus walk touches the DRAFT pools at all.**
+  - **THE CENSUS, TAKEN BEFORE ANY REPAIR — 43, 91 AND 207 OF 227.**
+    **`check_cl_resolver._every_ability()` reaches 43**, reads only `Classes.kit()` and
+    `Classes.spec_abilities()`, and **is a gate** — inside the swept population, read on every
+    battery run since DA. **`test_batch_bh._all_ability_names()` reaches 91 and reads NEITHER DRAFT
+    POOL**, so no fingerprint built on those two calls could ever have accused it.
+    **`test_batch_cp._corpus()` reaches 207** — 211 NAMES, of which four class basics do not resolve
+    through `pool_ability` and fall out, so **DV's 211 and this 207 are both real and measure
+    different things.** All three are delegations now.
+  - **THE RULE ASKS WHAT A WALK IS RATHER THAN WHICH CALLS IT MAKES**: *a function that RETURNS a
+    collection built out of two or more of the seven ability-source families is answering "what
+    abilities exist?"* **The RETURN is the discriminator and it is load-bearing** — a body that reads
+    a pool and ASSERTS on it returns void. **A flat union of marks accuses SIXTEEN files, and
+    sixteen exemptions is not a rule**; sharpened, it catches three and carries **ONE** exemption
+    (`check_cz::_cl_only_corpus`), keyed `file::func` and never by file. **Comments are stripped
+    before the match** — `check_ds`'s red.
+  - **THE OLD SWEEP AND BOTH ITS EXEMPTIONS ARE UNTOUCHED**; this is an ADDED instrument, not a
+    loosened one. **`check_da` goes 37 → 39** (a run that ACCUSES reads 40). **The source scanner is
+    authored once in `gate_fixture.gd`**, because two gates need it.
+  - **THE COST WAS NEVER A RED. `check_da` READ 37/0 ON EVERY BATTERY SINCE DA** with three walks
+    standing. **A fingerprint with a hole does not fail loudly — it passes**, and one character
+    proves it: with the smallest walk restored, `families < 2` → `< 3` returns the gate to a clean
+    39/0 with a 43-of-227 walk in the tree.
+- **TWO POPULATIONS WERE PINNED AS EQUALITIES OVER A WALK THAT COULD NOT SEE THEM, AND BOTH WERE
+  WRONG.** `test_batch_cp` walks the real corpus now.
+  - **The literal-digit rule pinned `["Shatter"]`; the population is EIGHT** — Arcane Explosion,
+    Detonation, Hymn of Hope, Resurrection, Shatter, Summon Aguila, Summon Canis, Summon Ursus.
+    Seven were always invisible and DU's fix added the eighth.
+  - **The checked-but-Perfectless biconditional pinned SIX; the population is EIGHT** — Arcane
+    Explosion and Death Ray join it.
+  - **ARCANE EXPLOSION IS IN BOTH AND IS THE ARCANIST'S LIVE BASIC ATTACK.** It runs a skill check,
+    so the player gets a timing bar, and advertises no Perfect at all. **It broke both rules on
+    arrival at DU §4 with nothing going red.** **Both populations are REPORTED, not rewritten** —
+    authoring a Perfect, or rewording shipped card text, is the designer's.
+  - **AND BOTH FAILURE MESSAGES CARRIED A SECOND COPY OF A COUNT** — *"the recorded fourteen"*
+    against a table of one, *"the named six"* against a table of six that should be eight. **Both
+    count the table now and print the live figure.**
+- **THE 49-CHARACTER OVERRUN WAS AUTHORED TWICE AND THE OLDER COPY WAS NEVER HIDDEN.** DV recorded
+  Shadowrend's rendered Perfect as *the one thing DU's corpus fix made visible*. **It was not.**
+  `"Cleric recovers {mhp:5}"` is authored on **SMITE** as well — the Cleric class basic — and
+  `ability_corpus()` has walked `kit("cleric")` since long before DU. **PROVED MECHANICALLY:
+  repairing both drops `check_cl_width`'s `perfect_text` overrun count 56 → 48, and 8 is four render
+  contexts × TWO abilities.**
+  - **Both sites read `{mhp:5}` now and render at 33**, which is the file's own dominant idiom for a
+    bare magnitude (`{mhp:35}`, `{mhp:20}`, `{atk:22}`). **The magnitude, the `perfect_id` and the
+    behaviour are untouched.**
+  - **`check_dv` §5's pin is INVERTED rather than deleted — 128 → 130.** It asserted the overrun and
+    asserts the fit now; a deleted check lets it come back silently. **`check_dw` §3 asserts the two
+    strings AGREE**, because fixing one of two copies is how two copies start, and it asserts the
+    asymmetry the correction rests on: **Smite is in the unoverridden `kit("cleric")` and Shadowrend
+    is not.**
+  - **AND ALL FOUR OF DU'S OVERRIDES WERE MEASURED, WHICH NOBODY HAD DONE. THREE WERE CLEAN** —
+    Fireball (35 / 33), Frostbolt (40 / 33) and Arcane Explosion (34, no Perfect) are inside the
+    ceiling on every field. **That is only visible because all four were measured rather than the
+    one that failed.**
+- **`check_dw.gd` IS THE GATE — 35 checks, `GATES` goes 25 → 26.** **FOUR NEGATIVE CONTROLS, ALL
+  FOUR BIT.** Its §1 and §2 **re-derive both populations live and assert the suite's named table
+  equals them**, because a named population is only useful while it is still the real one.
+- **THIS FILE HAD GROWN A HISTORY SECTION, WHICH ITS OWN HEADER SAYS MEANS IT IS WRONG.** DV's
+  rewrite left **DU's entire `WHERE THE PROJECT IS` block standing underneath its own**, second
+  *"Next letter"* and *"Phase"* bullets included. **Removed at DW.** Nothing asserts on this file, so
+  it went unreported for a batch — which is the argument for reading it rather than appending to it.
+- **Next letter: DX.** `DX` sorts after `DW`, so the stamp gates still work.
 - **Phase.** The ability draft is **COMPLETE at 149 of 149** and all twelve talent trees are
   purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit,
-  DR's rulings, DS's Hunter gap, DT's loose ends, DU's corpus fix and boss-pick audit, **and DV
-  ruling on one of DU's three findings and measuring the other two.**
-- **PYROBLAST KEEPS COOLDOWN ZERO, AND THE RULING IS IN `CLAUDE.md` WITH ITS REASONING.** *A
-  repeatable draft card is a legitimate shape when it is priced elsewhere.* **The provenance is
-  identical to Lunge's and the premise is not**: Lunge cost 25 of a 100 bar at 3.5 delay, ordinary
-  on both axes, so DR's *"in a pool there is no price"* was literally true of it. **Pyroblast's 6.0
-  delay is the longest in the project with nothing above it** (3× `BASIC_DELAY`) and **its 45 mana
-  is the second-highest cost in the game** — the only card above it is Death Ray at 55, *which
-  carries cooldown 3*. **It is priced twice, just not with a cooldown**, and cooldowns tick in the
-  unit's own turns. **NOTHING UNDER `scripts/` WAS TOUCHED FOR THIS.** `check_dr` §5 keeps printing
-  the live list; `docs/draft-audit.html` carries a RESOLVED banner naming both halves.
-- **A CRIPPLED COMPANION BIT AT FULL STRENGTH, AND `_companion_hit` READS `cripple` AND `chilled`
-  NOW.** Enemies aim at `_hero_side()`, which holds the living companion; `_apply_status` lands the
-  rider with no companion filter; two enemy abilities carry Cripple (Ride-by Slash, Grasping Roots).
-  **MEASURED, NOT ASSERTED: 40 seeded blows read 30268 in both arms before — ratio 1.0000 — and
-  30268 against 22703 after, ratio 0.7501.**
-  - **THE LINE THAT SEPARATES THIS FROM DK's REFUSAL TO WIDEN IS IN `CLAUDE.md`, AND BOTH DECISIONS
-    ARE CORRECT UNDER IT.** *A player effect that lands and pays nothing costs the player a card; an
-    ENEMY effect that lands and pays nothing costs the player nothing.* The first is a dead card and
-    narrowing the words fixes it honestly; the second is an exploit.
-  - **BOTH CHILLED TERMS ARE READ AND ALL FOUR ARMS LAND ON THEIR ARITHMETIC EXACTLY** — 1.0000 at
-    one stack with no node, 0.8500 at three, 0.9700 at one stack under the node, **0.7735 with both
-    terms live.** The node's rank is read off `Talents.LANE_TREES` at run time rather than typed in.
-  - **ONE STACK IS THE CEILING IN PLAY AND SAYING SO IS THE FINDING.** The frost bargain's stamp is
-    the only application of Chilled that reaches a companion — every other one in the file targets
-    an enemy — so **the `>= 3` arm is UNREACHABLE today.** It is written anyway, because the hero
-    loop's two terms are one rule and half a rule here is the next thing to diverge, and **the stack
-    count was NOT raised to make it reachable.**
-  - **THE LOOP IS NOT WIDENED GENERALLY.** 76 of the 78 absent terms are unreachable by shape, and
-    a general widening would hang visible chips on a companion that change nothing — worse than the
-    narrow miss, because it reads as working. **`type_dmg_bonus` is still unread and is inert twice
-    over**: a companion's blow carries no `dmg_type` at all.
-- **`check_du.gd` IS THE GATE THE RULING NEEDED AND IT ASSERTS THE RATIO, NOT THE READ — 32 checks,
-  `GATES` goes 23 → 24.** `check_dk` §4 and `check_dm` §2 already re-measure three statuses every
-  run; `cripple` and `chilled` had no instrument in either direction, **so removing these reads
-  again would have been silent.** **FOUR NEGATIVE CONTROLS, ALL FOUR BIT, AND CONTROLS 2 AND 3 BIT
-  ON DIFFERENT ASSERTIONS** — which is what proves each chilled arm is separately load-bearing.
-- **`Classes.ability_corpus()` COULD NOT SEE FOUR LIVE BASIC ATTACKS, AND FIFTEEN GATES INHERITED
-  THAT.** `apply_kit_overrides` builds FOUR SPECS' `abilities[0]` at spawn (**THREE Mage and ONE CLERIC — DV §5 corrected DU's "four Mage specs"; Shadowrend is the OCCULTIST's and overrides Smite out of `kit("cleric")`, so TWO class kits were misread, not one**) — Shadowrend,
-  Fireball, Frostbolt and Arcane Explosion — and none sits in any pool, so the walk read
-  `kit("mage")` and got the **unoverridden Magic Bolt, which is nobody's live basic attack.** The
-  walk applies the overrides now, using `protected_names`'s own idiom one function up. **The corpus
-  goes 223 → 227.**
-  - **RE-RUN THROUGH EVERY CRITERION DERIVED FROM IT, ALMOST NOTHING MOVED, AND THAT IS THE
-    RESULT.** CN's population goes 223 → 227 and its no-bar count does not move at all (121 either
-    way — all four attack, so all four correctly run a bar). CO's, CY's and nine others are
-    unmoved. **TWO OF THE BRIEF'S FIVE NAMED CRITERIA ARE NOT DERIVED THROUGH THE CORPUS AT ALL** —
-    `check_dp`'s rune-field sweep walks `runes.json` against source text, and **`check_dr` §5's
-    cooldown-zero census walks the DRAFT POOLS directly**, deliberately, so that earlier readings of
-    that printed line stay comparable.
-  - **`check_cz` §0's WALK AGREEMENT IS A SET IDENTITY NOW RATHER THAN AN EQUALITY**, derived off
-    `apply_kit_overrides` itself so a fifth override is covered by doing nothing. **The control's
-    job is intact**: an ability outside every kit and pool would be in NEITHER walk and cannot hide
-    inside the difference. 133 → **134**. `check_da`'s exemption REASON for that file was corrected
-    for the second time; the exemption itself is untouched.
-  - **THE ONE THING THE FIX MADE VISIBLE.** The width sweep now measures four descriptions and three
-    `perfect_text`s it never could. **All twelve description lines are inside the 44-character
-    ceiling; Shadowrend's `perfect_text` renders at 45, one over.** Pre-existing, it joins a standing
-    population of authored overruns, and it is **reported rather than fixed.**
-  - **THE RECORDED FIGURE IS CORRECTED IN THREE PLACES.** *"Twelve cooldown-zero abilities in the
-    protected cores"* is twelve INSTANCES across twelve specs and **seven distinct names**. The
-    claim is true either way; the number was the misleading half. **`check_du` §5 derives both
-    numbers every run and asserts they disagree.**
-- **THE BOSS-PICK POOLS ARE AUDITED AND RULED ON NOWHERE, WHICH IS DQ'S SEQUENCE ONE CHANNEL OVER.**
-  Full tables in `docs/reports/DU.md` §5. Everything it found is open; **the two cooldowns the brief
-  named turned out to be two different questions and neither was ruled on.**
-- **Next letter: DV.** `DV` sorts after `DU`, so the stamp gates still work.
-- **Phase.** The ability draft is **COMPLETE at 149 of 149** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit of
-  the draft pools, DR's ruling on two of its findings, DS's Hunter gap, DT's loose ends, **and DU
-  closing the last two cooldown-zero questions the draft had while opening a channel's worth of new
-  ones next door.**
+  DR's rulings, DS's Hunter gap, DT's loose ends, DU's corpus fix, DV's rulings and the changelog
+  cut, **and DW closing the enumeration rule's own blind spot and the two populations it hid.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -346,7 +296,25 @@ way to apply. The ability rule and the status rule are the same rule.*
   TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
   moved a cell** — but a restructure would need both.
 
-### THE FLAKE THAT DG FOUND — AND SINCE DT IT IS **THE LAST ONE LEFT IN THE PROJECT**
+### THE FLAKES — **AND THERE ARE TWO, NOT ONE. DW FOUND THE SECOND.**
+
+**THE STANDING RECORD FROM DT FORWARD WAS THAT `test_batch_at` §1 IS THE LAST UNSEEDED FLAKE IN THE
+PROJECT. IT IS NOT.** DW's acceptance battery went red on **`test_run_harness` gate 2**, on
+*"the walk crossed a event"*. **`test_run_harness.gd` calls `seed()` ZERO times**: gate 2 walks a
+randomly GENERATED map by taking `reachable()[0]` at every step and then asserts each of six node
+types was crossed at least once, and an unsteered greedy route can miss the rarest of them.
+**OBSERVED ONCE IN 34 READINGS** (the battery, plus 32 clean standalone re-runs and one earlier), so
+the rate is roughly 3%.
+- **IT IS NOT DW'S.** `test_run_harness.gd` is **byte-identical to `HEAD`**, and the batch's only
+  change under `scripts/` is two `perfect_text` strings, which map generation cannot read.
+- **AND IT IS DELIBERATELY NOT SEEDED.** **One flake at a time is how the effect stays
+  attributable** — DT's rule, the one that worked on `bo` — and `at`'s is still open. **The repair
+  is known and it is DD's: seed the walk, do NOT widen the assertion**, because the six types being
+  present is the question and relaxing it to five deletes the check rather than fixing it.
+- Recorded in `baselines.json` as a band with its rate, so the next battery reports it as the known
+  flake it is rather than as a new red.
+
+### THE OTHER FLAKE — DG'S, AND STILL THE OLDER ONE
 
 - **`test_batch_at`'s §1 LIVE DAMAGE-CURVE RATIO IS UNSEEDED. IT WENT RED AT DG AND HAS READ 0 IN
   EVERY BATTERY SINCE — DH THROUGH DU, BOTH OF DR'S TWO AND BOTH OF DS'S — STILL OPEN, STILL
@@ -684,7 +652,9 @@ re-derived from the source at DM; not one was moved.**
   AUTHORING ANYTHING** — `apply_kit_overrides` builds FOUR SPECS' `abilities[0]` at spawn (**THREE Mage and ONE CLERIC — DV §5 corrected DU's "four Mage specs"; Shadowrend is the OCCULTIST's and overrides Smite out of `kit("cleric")`, so TWO class kits were misread, not one**)
   and none of them sits in any pool, so the walk read `kit("mage")` and carried the **unoverridden
   Magic Bolt, which is nobody's live basic attack.** The walk applies the overrides now. The Batch
-  CL enumeration reached **211** for as long as talents granted abilities; the five it missed —
+  CL enumeration reached **211** for as long as talents granted abilities (and `test_batch_cp`'s
+  copy of it **returned 207**, because four class basics it names do not resolve through
+  `pool_ability` — DW §1); the five it missed —
   Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession — were talent grants living in no
   pool. **DO put all twenty-two into `SPEC_DRAFT_POOLS`, which the CL walk reads, so it reaches all
   of those and `Classes.talent_granted_names()` is EMPTY.**
@@ -745,7 +715,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DV
+### THE TEST TREE, AS OF DW
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -753,11 +723,13 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-five** —
-  **DV ADDED `check_dv`, THE COMPANION TO ITS OWN RULINGS**, and before it DU added `check_du`. `cripple` and `chilled` had no instrument in either direction, so the day the read was
-  ADDED nothing would have noticed, and removing it again would have been silent. **IT ASSERTS THE
-  RATIO AND NOT THE READ SITE** — a gate that checked `battle.gd` *contains* a cripple read would
-  have passed on all nine of the statuses DT drove onto a live companion at 1.0000. **There are 32
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-six** —
+  **DW ADDED `check_dw`**, and before it DV added `check_dv` and DU `check_du`. **`check_dw` ASSERTS
+  THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
+  populations LIVE and require the suite's table to equal them, because a named population is only
+  useful while it is still the real one — which is what stopped being true between CN and DW. **It
+  also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
+  move a line in another file and say why. **There are 33
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -771,11 +743,15 @@ re-derived from the source at DM; not one was moved.**
   applied rather than re-learned: it reads neither draft-pool accessor and its comments name
   neither. **`check_dv` NEEDED NONE EITHER**, for the same reason, and was run standalone before the
   battery to prove it: `check_da` reads **37/0 over 32 gates**.
-  - **AND §3 HAS A BLIND SPOT DV §5 FOUND, WHICH IS WHERE THE LAST HAND-ROLLED WALK LIVES.** Its
-    walk sweep reads **`check_*.gd` ONLY** — the suite half of §3 is about `_spawn` — and its
-    fingerprint matches the two pool **ACCESSORS**, where `test_batch_cp._corpus()` reads the pool
-    **CONSTANTS** and `Classes.kit(cls)`. **That walk reaches 211 where the corpus reaches 227**, so
-    `check_da` reads 37/0 with a real violation standing in the tree. **Reported, not fixed.**
+  - **AND §3's BLIND SPOT IS CLOSED AT DW §1, WITH ONE MORE HOLE THAN DV DIAGNOSED.** Its walk
+    sweep read **`check_*.gd` ONLY** and its fingerprint matched the two pool **ACCESSORS** where
+    `test_batch_cp._corpus()` reads the **CONSTANTS** — both real. **THE THIRD WAS LARGER AND SAT
+    INSIDE THE POPULATION IT ALREADY SWEPT**: the fingerprint assumed a corpus walk touches the
+    DRAFT pools at all, and `check_cl_resolver._every_ability()` reads only `Classes.kit()` and
+    `Classes.spec_abilities()` and reached **43 of 227**. **THREE WALKS: 43, 91 and 207.** A SECOND
+    sweep runs over gates AND suites now, matching constants as well as accessors, and asks whether
+    a function **RETURNS** a collection built from two or more ability-source families. **37 → 39,
+    one exemption, and the old sweep is untouched.**
 - **THE BATTERY WRITES A MANIFEST, `$OUT/.ran`, AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
   LISTING.** `run_battery.sh` does NOT clear `$OUT` between runs, so a target that failed to launch
   would otherwise be blessed by its PREVIOUS run's log. A name is appended immediately before its
@@ -784,7 +760,7 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 76 ROWS: 46 suites, 25 gates, 2 scene runs
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 77 ROWS: 46 suites, 26 gates, 2 scene runs
   and 3 harness gates.** **DV ADDED `check_dv` AND MOVED NOTHING ELSE AT ALL** — the only row this
   batch touched is the new one, and `check_de` read ZERO NOTICES, so not one check count in the tree
   moved outside its band. DU added `check_du` and moved `check_cz`. **`check_de` HAS NO ROW OF ITS
@@ -879,7 +855,12 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **16 entries** (DG → DV), **150.0 KiB**. **406.0 KiB crossed CW's 400 threshold at DU exactly as
+  **17 entries** (DG → DW), **159.2 KiB**. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
+  PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
+  DW's own changelog entry.** That is CD §1's fault, the shape that turned five suites red at once
+  at CJ. **It asserts a FLOOR now** (the cut left 16 and entries are only ever added, so an entry
+  VANISHING still fails) **and prints the live figure; the ARCHIVE keeps its equality at 149**,
+  because that file only moves when a cut moves it. **406.0 KiB crossed CW's 400 threshold at DU exactly as
   DU predicted.** With DV's entry the file held 34; **16 stay and 18 move.**
 - **`DoD-archive/changelog-archive.html` holds 149 entries** (Batch 1 → **DF**) and is
   **1314.3 KiB**. **IT IS OUTSIDE THE REPO, SO IT IS NOT IN VERSION CONTROL AND NOT BACKED UP BY
@@ -897,27 +878,25 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at DV
+### Knowledge sync, re-measured at DW
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **152 files, 6.77 MiB** (DU measured 151 / 6.97). **THE SYNC FELL FOR THE FIRST TIME IN THE
-  PROJECT'S HISTORY**, and it fell because **DV §4 moved 256 KiB of changelog OUT OF THE REPO.**
-  DV added two files — `check_dv.gd` and `docs/reports/DV.md`.
-- Heaviest: `scripts/battle.gd` **1225**, `docs/design-notes.md` **373**, `docs/master.html`
-  **336**, `scripts/classes.gd` **315**, `CLAUDE.md` **247**, `scripts/talents.gd` **179**,
-  `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**, `docs/changelog.html` **150**.
-  **`docs/changelog.html` WAS THE SECOND-HEAVIEST FILE IN THE SYNC AND IS NOW THE NINTH** (406 →
-  150).
+- **156 files, 6.86 MiB** (DV measured 152 / 6.77). It rose again — the cut was a one-off and the
+  ordinary growth resumed. DW added two files, `check_dw.gd` and `docs/reports/DW.md`.
+- Heaviest: `scripts/battle.gd` **1225**, `docs/design-notes.md` **377**, `docs/master.html`
+  **336**, `scripts/classes.gd` **315**, `CLAUDE.md` **250**, `scripts/talents.gd` **179**,
+  `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**, `docs/changelog.html` **159**.
+  **`docs/changelog.html` IS STILL THE NINTH-HEAVIEST** and grows about 9 KiB a batch, so CW's 400
+  threshold is roughly twenty-six batches away.
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **32** now — `check_dv.gd` is the thirty-second.
-- **`CLAUDE.md` IS 247 KiB = 3.56%**, up from 3.38% at DU. **THE RATIO ROSE FOR TWO REASONS AT
-  ONCE**: DV added three rules, **and the denominator shrank underneath it.** CW's *"under 3% and
-  roughly flat"* is still met on the second half and missed on the first. **DG THROUGH DV HAVE ALL
-  DECLINED THE PRUNE**, and DV declined it while being in the file for DT's and DU's reason — the
-  rules belong beside the blocks they extend. **But the fall in the denominator means the next
-  batch in this file cannot decline it on the old arithmetic.**
+  are **33** now — `check_dw.gd` is the thirty-third.
+- **`CLAUDE.md` IS 250 KiB = 3.56%**, level with DV's 3.56%. CW's *"under 3% and roughly flat"* is
+  met on the second half and missed on the first. **DG THROUGH DW HAVE ALL DECLINED THE PRUNE.**
+  DW declined it while being in the file for DT's, DU's and DV's reason — the rules belong beside
+  the blocks they extend — **but DV already recorded that the next batch in this file cannot decline
+  it on the old arithmetic, and DW is the second to leave that standing.**
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -1000,59 +979,69 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT DV, AND IT CERTIFIED CLEAN ON THE FIRST RUN.** **151 files were MD5-stamped before
-it and re-compared after, and NOT ONE MOVED.**
+**ONE BATTERY AT DW. IT FOUND TWO REDS, ONE OF THEM DW'S OWN AND ONE A FLAKE NOBODY KNEW EXISTED.**
+**168 files were MD5-stamped before it and re-compared after; TWO moved, both edited AFTER the run
+and both re-verified** — `check_dv.gd` (the §4 repair below, after which `check_dv`, `check_da` and
+`check_dw` were all re-run) and `baselines.json` (the flake row, read only by `check_de`, which was
+re-run over the same log directory, which is what it is built for).
 
-| | DT's acceptance | DU's acceptance | DV's acceptance |
+| | DU's acceptance | DV's acceptance | DW's acceptance |
 |---|---|---|---|
 | **suite failures** | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 309 / 0 / 0 | 313 / 0 / 0 | **317 / 0 / 0 — exactly the prediction** |
-| targets in the manifest | 75 | 76 | **77** |
+| `check_de` | 313 / 0 / 0 | 317 / 0 / 0 | **321 / 0 / 0 — exactly the prediction** |
+| targets in the manifest | 76 | 77 | **78** |
 
-**SEVENTY-SEVEN TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-SEVEN. 0 `Parse Error` and 0
+**SEVENTY-EIGHT TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-EIGHT. 0 `Parse Error` and 0
 `SCRIPT ERROR` in every log**, grepped from the streams rather than read off a tally or an exit
 code. `check_map_screen: OK`; the run harness reads 22 / 165 / 8.
 
-**ONE BASELINE ROW MOVED AND IT IS THE NEW ONE.** `check_dv` **NEW at 128 / 0**, and **nothing else
-in the table moved at all** — `check_de` read **ZERO NOTICES**, so not one check count in the tree
-drifted outside its band, the fourteen changelog-reading suites included. **`check_de` CERTIFIED ON
-ITS FIRST PASS**, because the row was added BEFORE the battery from three identical standalone runs
-of the new gate. Its own +4 for the new target is reported by nothing but this line.
+**THE TWO REDS, AND WHAT EACH ONE WAS.**
+- **`check_dv` §4 — DW'S OWN, AND IT IS A DEFECT IN DV'S GATE RATHER THAN IN DW'S WORK.** It
+  asserted `live_span == 16` against a changelog that gains an entry every batch, so **DV's own
+  acceptance was the only run that could ever satisfy it** — CD §1's fault, the shape that turned
+  five suites red at once at CJ. **DW is the batch it broke on and DW's own entry is what broke it.**
+  It asserts a FLOOR now and prints the live figure; the archive keeps its equality at 149.
+- **`test_run_harness` gate 2 — A SECOND UNSEEDED FLAKE, AND THIS FILE SAID THERE WAS ONLY ONE.**
+  See the flake section above. **Not DW's** — the file is byte-identical to `HEAD`. Recorded with
+  its rate; deliberately not seeded, because one flake at a time is how the effect stays
+  attributable.
 
-**THE FLAKE ROW IS STILL NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio read **467 / 0**, the
-**eighteenth** consecutive quiet reading. **It is still open, still unseeded and still banded, and a
-red from it is not the next batch's.** `bo` read **1106** and `test_rune_battle` **97**, both seeded
-and both closed.
+**THREE BASELINE ROWS MOVED AND ALL THREE WERE PREDICTED EXCEPT THE FLAKE BAND.** `check_dw`
+**NEW at 35 / 0**; `check_da` **37 → 39**; `check_dv` **128 → 130**. **`check_de` READ ZERO
+NOTICES**, so not one check count in the tree drifted outside its band. **`test_batch_cp` HELD AT
+697 — THE BRIEF PREDICTED IT WOULD MOVE AND IT DID NOT**: the walk grew 207 → 227, but both
+populations are single equalities, so twenty more abilities walked produce no new checks.
 
-**FOUR NEGATIVE CONTROLS, ALL FOUR BIT, AND ALL FOUR BIT ON DIFFERENT ASSERTIONS.** Deleting the
-phoenix door's condition failed 2 (the armed and spent arms); **loosening it to `ashes_return > 0`
-failed exactly 1 — the below-value arm alone**, which is what proves the exactness arm is separately
-load-bearing; duplicating a heading across the two changelog halves failed 3 (the archive count, the
-boundary check and the disjointness sweep); and giving one homeless ability a live home failed 4
-(across §1 and §2). **`battle.gd`, `classes.gd` and the changelog archive were backed up to the
-scratchpad and restored by `cp`, never by `git checkout`**, and all three md5s verified identical
-afterwards.
+**FOUR NEGATIVE CONTROLS, ALL FOUR BIT.** Re-hand-rolling `test_batch_cp._corpus()` failed **three
+targets at once** (2 / 2 / 2). **The sharpest was one character**: with the smallest walk restored,
+`families < 2` → `< 3` returns `check_da` to a clean **39/0 with a 43-of-227 walk standing in the
+tree** — the exact defect DV found, reproduced on demand — while `check_dw` stays red, which is what
+proves the two gates are not redundant. Diverging Shadowrend's Perfect from Smite's to a string that
+still FITS failed **exactly one check**, the divergence guard alone. And the legitimate side: a
+**void** function reading **both** pool constants added to a gate is **not** accused. **All eight
+backed-up files were restored by `cp`, never by `git checkout`**, md5s verified identical.
 
-**THE LITERAL SWEEP: 10,828 literals at a floor of 4**, from all 81 suites, gates and fixtures,
-diffed against `git show HEAD` in one pass. **436 LOST, every one of them in `docs/changelog.html`,
-and NOT ONE OF THEM ASSERTED THERE** — proved mechanically: every live-changelog assertion in the
-tree is either the archive-path anchor or a **negative**, which the cut can only make more true.
-**58 GAINED and the dangerous kind is ZERO**: every `not <doc>.contains(L)` in the tree was
-cross-referenced against the gained literals, with one hit — `bx`'s identifier-stripped
-`not master.contains("party")` — which the pre-battery strip cleared at 0 both now and at HEAD.
+**THE OLDER FLAKE ROW IS STILL NOT A REPAIR.** `test_batch_at`'s unseeded §1 ratio read **467 / 0**,
+the **nineteenth** consecutive quiet reading. Still open, still unseeded, still banded. `bo` read
+**1106** and `test_rune_battle` **97**, both seeded and both closed.
 
-**THE COMMENT-STRIPPED DIFF WAS TAKEN AGAINST `HEAD`.** `battle.gd` GAINED exactly **8** code lines
-and lost 0 (the three-line refusal and the five-line tooltip block); **`classes.gd` GAINED 0 AND
-LOST 0**, which is the proof its edit really was comments-only; `run_battery.sh` changed one line.
-**Nothing was swallowed.**
+**THE LITERAL SWEEP: 12,694 literals at a floor of 4**, from all 82 suites, gates and fixtures,
+diffed against `git show HEAD` in one pass. **159 GAINED, 43 LOST, and the dangerous kind is ZERO**
+— every `not <doc>.contains(L)` in the tree (217 of them) was cross-referenced against the gained
+literals with no hits. The 43 LOST are the three deleted walk bodies and prose inside two rewritten
+`baselines.json` notes, **and nothing reads that file by literal**.
+
+**THE COMMENT-STRIPPED DIFF WAS TAKEN AGAINST `HEAD`.** `check_da.gd` **GAINED 53 code lines and
+LOST 0**; `gate_fixture.gd` **GAINED 46, LOST 0**; and **`scripts/classes.gd` is 1935 code lines
+before and after with exactly ONE distinct line gained and ONE lost** — the proof that the two-site
+text repair was those two sites and nothing was swallowed.
 
 **THE PARSE CHECK WAS GREPPED FROM STDERR AFTER EVERY EDIT**, never from the tally and never from
 the exit code.
 
-**AND THE RETIRED-WORD SWEEP WAS RUN BEFORE THE BATTERY RATHER THAN BY IT**, using `test_batch_bx`
-§4b's own `PARTY_IDENTS` strip over the edited `master.html`: **0 surviving occurrences of *party*
-now and at HEAD**, and 0 of *beast* with `Beastmaster` removed. DU was caught by this sweep and DS
-took four reds from it.
+**AND THE RETIRED-WORD SWEEP WAS RUN BEFORE THE BATTERY**, using `test_batch_bx` §4b's own
+`PARTY_IDENTS` strip over the edited `master.html`: **0 surviving occurrences of *party* now and at
+HEAD**, and 0 of *beast* with `Beastmaster` removed.

@@ -1325,18 +1325,43 @@ wrong, none of them diffed against anything.
   **The copied helper is hiding INSIDE it: 38 of the 39 open with the same save-backup preamble and
   37 swap `Profile.save_path` to a per-suite file and back.** That is the next duplication of this
   shape and it is owed, not taken.
-- **AND THE RULE'S ENFORCEMENT HAS A BLIND SPOT IN EXACTLY THE PLACE THE LAST HAND-ROLLED WALK
-  LIVES (Batch DV §5).** `check_da` §3 catches a gate that re-derives the corpus, and it misses this
-  one **twice over**: its walk sweep reads **`check_*.gd` ONLY** — the suite half of §3 is about
-  `_spawn`, not the walk — and its fingerprint matches the two pool **ACCESSORS**, where
-  `test_batch_cp._corpus()` reads the pool **CONSTANTS** and `Classes.kit(cls)`. **That walk reaches
-  211 names where `Classes.ability_corpus()` reaches 227**, and the 16 it misses are every spec-kit
-  ability living in no pool, DU's four kit overrides among them. **A GATE THAT COUNTS A POPULATION
-  IS ONLY AS GOOD AS ITS ENUMERATION, AND A GREEN EQUALITY OVER A SHORT WALK READS EXACTLY LIKE A
-  GREEN EQUALITY.** §3's own `ability_hits == ["Shatter"]` is the case: **run over the whole corpus
-  the true figure is EIGHT.** Repointing it is a ruling (it turns that equality red on seven
-  pre-existing offenders), so it is reported rather than taken — **but no NEW hand-rolled walk may
-  be written, in a suite or a gate.**
+- **AND THE RULE'S ENFORCEMENT HAD A BLIND SPOT (Batch DV §5), WHICH IS CLOSED AT DW §1 — AND THE
+  DIAGNOSIS WAS ONE HOLE SHORT.** DV found `test_batch_cp._corpus()` hand-rolling the walk while
+  `check_da` §3 read 37/0, and named two reasons: the walk sweep read **`check_*.gd` ONLY**, and the
+  fingerprint matched the two pool **ACCESSORS** where that walk read the **CONSTANTS**. Both held.
+  **THE THIRD WAS BIGGER THAN EITHER AND NO POPULATION AXIS WOULD HAVE FOUND IT: the fingerprint
+  assumed a corpus walk touches the DRAFT pools at all.** `check_cl_resolver._every_ability()` is a
+  walk **in a gate** — inside the swept population, read on every battery run since DA — and it
+  reads only `Classes.kit()` and `Classes.spec_abilities()`. **It reached 43 of 227.**
+  **THREE WALKS, NOT ONE, AND THE TWO DV HAD NOT FOUND WERE THE TWO THAT REACHED LESS: 43, 91
+  (`test_batch_bh._all_ability_names`, which reads NEITHER draft pool) and 207.** All three are
+  delegations now.
+- **THE WIDENED RULE ASKS WHAT A WALK IS RATHER THAN WHICH CALLS IT MAKES (Batch DW §1).** *A
+  function that RETURNS a collection built out of two or more of the game's seven ability-source
+  families is answering "what abilities exist?", and `Classes.ability_corpus()` is the one
+  authorised answer.* **THE RETURN IS THE DISCRIMINATOR AND IT IS DOING REAL WORK**: a body that
+  reads a pool and ASSERTS on it returns void and is not a walk. A flat union of marks over gates
+  and suites accuses **sixteen** files, and sixteen exemptions is not a rule — **an exemption
+  granted to a genuine violation is worse than the violation it covers**, so the fingerprint has to
+  be sharp enough that its catches are real. This one carries **ONE** exemption
+  (`check_cz::_cl_only_corpus`, the deliberate CL negative control) and it is keyed `file::func`,
+  **never by file**: a file-scoped exemption blinds the rule to a new walk arriving in that file
+  later. **COMMENTS ARE STRIPPED BEFORE THE MATCH** — `check_ds` took a red for a header comment
+  that named two accessors while explaining that it does not call them, and prose describing a walk
+  is not a walk.
+- **A GATE THAT COUNTS A POPULATION IS ONLY AS GOOD AS ITS ENUMERATION, AND A GREEN EQUALITY OVER A
+  SHORT WALK READS EXACTLY LIKE A GREEN EQUALITY.** `test_batch_cp` §3's `ability_hits ==
+  ["Shatter"]` is the case, and DW paid it out: over the real corpus that population is **EIGHT**,
+  and the biconditional beside it was **SIX where the truth is EIGHT**. Both are corrected, both
+  print the live figure, and **`check_dw` re-derives each one live and asserts the suite's named
+  table equals it** — a named population is only useful while it is still the real one. **ARCANE
+  EXPLOSION BROKE BOTH RULES ON ARRIVAL AT DU §4 AND NOTHING WENT RED**, because the rules that
+  would have caught it could not see it.
+- **AND THE COST OF THE HOLE WAS NOT THE VIOLATION, IT WAS THE SEVENTEEN QUIET READINGS.** `check_da`
+  read **37/0 on every battery since DA** with three hand-rolled walks standing in the tree. **A
+  fingerprint with a hole does not fail loudly and does not fail slowly — it passes.** Proved by a
+  one-character control: with the smallest walk restored, changing the family threshold from `2` to
+  `3` returns `check_da` to a clean 39/0 with a 43-of-227 walk in the tree.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
@@ -1409,6 +1434,29 @@ answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
   power where `add_status` maxes it — so on those three a weaker recast **overwrites the standing
   buff downward**. All three carry a second payload, so the refusal cannot reach them; widening
   scope to catch them would delete a resource conversion the player wanted.
+
+### A FINGERPRINT INSPECTS A POPULATION AND A CONVENTION, AND EACH IS A PLACE TO HIDE (Batch DW §1)
+**THE RULE: a rule enforced by matching source text is only as wide as the population it sweeps and
+the calling convention it matches, and a violation that avoids either one is invisible to it — so
+when a fingerprint is written, WRITE DOWN WHAT IT CANNOT SEE.** `check_da` §3 was authored to catch
+exactly what `test_batch_cp` does, the two existed side by side for their whole lives, and it never
+saw it.
+
+- **THE HOLES ARE NOT SYMMETRIC AND THE COUNT OF THEM IS NOT KNOWABLE FROM INSIDE.** DV read the
+  gate and named two; there were three, and the third was the largest — `check_cl_resolver` sat in
+  the swept population the whole time, reading 43 of 227, because the fingerprint took *"a corpus
+  walk reads the draft pools"* as a premise rather than as an assumption. **The way to find the
+  third hole is to ask what the rule IS about and re-derive the fingerprint from that**, not to
+  patch the two you were told about.
+- **AND THE REPAIR IS AN ADDED INSTRUMENT, NOT A LOOSENED ONE.** The old sweep and both its
+  exemptions are untouched at DW. Loosening a rule to cover a new case re-argues every case it
+  already settled; adding a second question beside it does not, and the two can disagree usefully.
+- **A COUNT OF EXEMPTIONS IS A MEASURE OF A FINGERPRINT'S SHARPNESS.** If widening a rule means
+  exempting most of what it catches, the fingerprint is wrong and the exemptions are hiding it.
+  **Sharpen the question until the catches are real** — DW's went from sixteen catches needing
+  sixteen exemptions to three catches and one.
+- **AND ASSERT THE EXEMPTION TABLE'S SIZE FROM OUTSIDE.** `check_dw` §0 pins `check_da`'s at ONE, so
+  a batch that adds a second has to move a line in another file and say why.
 
 ### ADDING A NAME TO A TABLE IS NOT A CHANGE UNTIL THE MACHINERY REACHES ITS SHAPE (Batch DV §3)
 > **Before recording that an ability "joins `RECAST_GATED`", drive the refusal live and watch it

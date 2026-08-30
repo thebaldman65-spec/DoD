@@ -69,6 +69,65 @@ const WALK_EXEMPT := {
 	"check_dn.gd": "reads the pools for BUCKET membership, and calls `Classes.ability_corpus()` for the walk itself",
 }
 
+
+# ═══ BATCH DW §1 — THE SECOND SWEEP, BECAUSE THE FIRST ONE HAD TWO HOLES ═══
+#
+# THE RULE ABOVE IS UNCHANGED AND SO ARE BOTH OF ITS EXEMPTIONS. This is an
+# ADDED instrument, not a loosened one — DV §5 found `test_batch_cp` walking a
+# hand-rolled corpus that `check_da` §3 read 37/0 over, and the reason it could
+# not see it is that the sweep above asks the wrong question in two ways at
+# once:
+#
+#   HOLE 1 — POPULATION. It reads `check_*.gd` ONLY. The suite half of §3 is
+#            about `_spawn`, not about the walk, so a walk living in a SUITE
+#            was never looked at.
+#   HOLE 2 — CALLING CONVENTION. Its fingerprint is the two draft-pool
+#            ACCESSORS, and `test_batch_cp._corpus()` reads the pool CONSTANTS.
+#
+# AND A THIRD THE BRIEF DID NOT NAME, WHICH IS THE ONE THAT MATTERED MOST: the
+# fingerprint assumed a corpus walk touches the DRAFT pools at all.
+# `check_cl_resolver._every_ability()` is a walk in a GATE — inside the swept
+# population, read on every battery run since DA — and it reads only
+# `Classes.kit()` and `Classes.spec_abilities()`. It reaches 43 of 227. The old
+# sweep could never have accused it whatever its population had been.
+#
+# SO THE FINGERPRINT HERE IS NOT A LONGER LIST OF MARKS. It asks what a walk
+# IS: **a function that RETURNS a collection and builds it out of two or more
+# of the game's ability-source families is answering "what abilities exist?",
+# and `Classes.ability_corpus()` is the one authorised answer.** A body that
+# reads a pool and ASSERTS on it returns void and is not what this is looking
+# for — that distinction is what keeps this rule down to one exemption instead
+# of the sixteen a flat mark-union would have needed, and an exemption granted
+# to a genuine violation is worse than the violation it covers.
+#
+# THE EXEMPTION IS KEYED `file::func`, NOT BY FILE. A file-scoped exemption
+# would blind this rule to a NEW walk arriving in that file later — which is
+# the `check_ds` lesson (a REASON, not an exemption, is what a mark firing on
+# prose deserves) one turn further on.
+const RETURN_WALK_EXEMPT := {
+	# The same file and the same reason as `WALK_EXEMPT` above, at function
+	# scope: `_cl_only_corpus` IS the Batch CL walk, deliberately preserved as
+	# the negative control that proves the complete walk reaches names it
+	# cannot. Repointing it at `ability_corpus()` would delete the control.
+	"check_cz.gd::_cl_only_corpus": "the deliberate CL-walk negative control — repointing it would delete the control",
+}
+
+# THE SEVEN SOURCE FAMILIES, ASSEMBLED AT RUNTIME for the reason the marks
+# above are: a gate whose source contains its own fingerprint accuses itself on
+# the first run and gets suppressed on the second. Every one of the twelve
+# needles below is split across a `+` so this file never carries one whole.
+func _walk_families() -> Array:
+	return [
+		["Classes.ki" + "t("],
+		["Classes.class_" + "pool(", "Classes.CLASS_" + "POOLS"],
+		["Classes.class_draft_" + "pool(", "Classes.CLASS_DRAFT_" + "POOLS"],
+		["Classes.spec_abili" + "ties("],
+		["Classes.spec_" + "pool(", "Classes.SPEC_" + "POOLS"],
+		["Classes.spec_draft_" + "pool(", "Classes.SPEC_DRAFT_" + "POOLS"],
+		["Talents.LANE_" + "TREES", "Classes.talent_granted_" + "names("],
+	]
+
+
 # BATCH DD — the suites' half of the same fixture, and the same enforcement.
 # `_spawn` stood in 37 suites as 36 bodies; it is authored once now and each
 # suite keeps a thin delegating `_spawn` with its OWN signature, because the 37
@@ -284,6 +343,63 @@ func _s3_enumeration_rule() -> void:
 	print("  %d suites; %d go through `%s`, %d author their own; %d hand-built boards remain in %d files" % [
 		suites.size(), suite_users.size(), SUITE_FIXTURE, rolled_suites.size(),
 		_total(hand), hand.size()])
+	_s3b_returning_walks(gates, suites)
+
+
+# ── BATCH DW §1 — THE WIDENED SWEEP, ACROSS BOTH POPULATIONS ────────────────
+# Gates AND suites, constants AND accessors, and the discriminator is the
+# RETURN rather than a longer list of needles. See `RETURN_WALK_EXEMPT` above
+# for why this is an added instrument rather than a loosened one.
+#
+# **THE COUNT IS PART OF THE ASSERTION AND IS PRINTED EVERY RUN.** DW found
+# THREE walks where DV had found one, and the two it had not found were the
+# two that reach LESS of the corpus — 43 and 91 against `test_batch_cp`'s 207.
+# A fingerprint with holes does not fail loudly; it reads 37/0.
+func _s3b_returning_walks(gates: Array, suites: Array) -> void:
+	var fams := _walk_families()
+	var files: Array = []
+	files.append_array(gates)
+	files.append_array(suites)
+	files.sort()
+	var accused: Array = []
+	var exempt_seen := {}
+	var scanned := 0
+	for f in files:
+		var src := FileAccess.get_file_as_string("res://" + f)
+		if src == "":
+			continue
+		var bodies := Gate.returning_bodies(src)
+		for fname in bodies:
+			scanned += 1
+			var body: String = bodies[fname]
+			var families := 0
+			for marks in fams:
+				for m in marks:
+					if body.contains(m):
+						families += 1
+						break
+			if families < 2:
+				continue
+			var key := "%s::%s" % [f, fname]
+			if RETURN_WALK_EXEMPT.has(key):
+				exempt_seen[key] = families
+				continue
+			accused.append("%s (%d families)" % [key, families])
+	for a in accused:
+		ok(false,
+			"%s RETURNS a corpus it builds itself — `Classes.ability_corpus()` is the walk (BATCH DW §1)" % a)
+	ok(accused.is_empty(),
+		"no gate or suite RETURNS a hand-rolled ability corpus (%d returning bodies scanned across %d files)"
+			% [scanned, files.size()])
+	# THE EXEMPTIONS ARE ASSERTED LIVE, IN THE SAME SHAPE THE RULE ABOVE USES:
+	# an exemption whose file no longer carries the walk is a stale suppression,
+	# and a stale suppression is the thing that lets the next one through.
+	for key2 in RETURN_WALK_EXEMPT:
+		ok(exempt_seen.has(key2),
+			"%s no longer carries the walk it is exempted for — %s" % [
+				key2, RETURN_WALK_EXEMPT[key2]])
+	print("  %d returning bodies across %d gates and %d suites; %d hand-rolled walks, %d exempt" % [
+		scanned, gates.size(), suites.size(), accused.size(), exempt_seen.size()])
 
 
 # ---------------- THE LIVE HALF ----------------

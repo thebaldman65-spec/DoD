@@ -137,7 +137,7 @@ static func cleric_kit() -> Array:
 		# damage 44 = 44% of the Cleric's 50 Attack -> the familiar 22.
 		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 44, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "self_heal", "perfect_text": "Cleric recovers {mhp:5}",
+			"perfect_id": "self_heal", "perfect_text": "{mhp:5}",
 			"description": "Basic radiant strike."}),
 	]
 
@@ -4557,7 +4557,7 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 			"dmg_type": "shadow", "cost": 0, "damage": 25, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
 			"applies_status": {"id": "cripple", "turns": 2},
-			"perfect_id": "self_heal", "perfect_text": "Cleric recovers {mhp:5}",
+			"perfect_id": "self_heal", "perfect_text": "{mhp:5}",
 			"description": "A rending strike of gnawing shadow:\nCripples the target for 2 turns."})
 	elif spec == "pyromancer":
 		cfg["abilities"][0] = Ability.make({"display_name": "Fireball",

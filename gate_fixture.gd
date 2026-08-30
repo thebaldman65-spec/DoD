@@ -112,6 +112,76 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 # copies. A gate calls this to assert the ground it stands on, so the day
 # `_nobody_can_press()` stops covering headless, the gates say so instead of
 # quietly measuring a bot mix.
+# ── BATCH DW — THE SOURCE SCANNER, AUTHORED ONCE ────────────────────────────
+# `check_da` §3 and `check_dw` both need to read a .gd file as FUNCTION BODIES
+# rather than as one string, and DA/DB/DD's whole lesson is that the second
+# copy of a helper is where the two copies start to disagree. It lives here for
+# the same reason `spawn` does.
+#
+# **COMMENTS ARE STRIPPED FIRST, AND THAT IS THE LOAD-BEARING HALF.**
+# `check_ds` took a red out of §3 for a HEADER COMMENT that named two accessors
+# while explaining that the file does not call them, and the ruling then was
+# that an exemption granted to a SENTENCE blinds the rule to a real walk
+# arriving in that file later. Stripping is that ruling made mechanical: prose
+# describing a walk is not a walk.
+static func strip_comments(src: String) -> String:
+	var out := ""
+	for raw_line in src.split("\n"):
+		var line := String(raw_line)
+		var quote := ""
+		var kept := ""
+		var i := 0
+		while i < line.length():
+			var c := line[i]
+			if quote != "":
+				if c == "\\":
+					kept += line.substr(i, 2)
+					i += 2
+					continue
+				if c == quote:
+					quote = ""
+				kept += c
+			elif c == "\"" or c == "'":
+				quote = c
+				kept += c
+			elif c == "#":
+				break
+			else:
+				kept += c
+			i += 1
+		out += kept + "\n"
+	return out
+
+
+# Every `func` body in a file as {name: body}, with the VOID ones dropped — a
+# function that returns nothing is asserting, not enumerating. An UNANNOTATED
+# `func` counts as returning, because that is the permissive direction: the
+# cost of looking at one extra body is a sentence, and the cost of skipping one
+# is the defect `check_da` §3 exists for.
+static func returning_bodies(src: String) -> Dictionary:
+	var lines := strip_comments(src).split("\n")
+	var starts: Array = []
+	for i in lines.size():
+		if String(lines[i]).begins_with("func "):
+			starts.append(i)
+	var out := {}
+	for n in starts.size():
+		var a: int = starts[n]
+		var b: int = starts[n + 1] if n + 1 < starts.size() else lines.size()
+		var head := String(lines[a])
+		if head.contains("-> void"):
+			continue
+		var fname := head.substr(5, head.length() - 5)
+		var paren := fname.find("(")
+		if paren >= 0:
+			fname = fname.substr(0, paren)
+		var body := ""
+		for k in range(a, b):
+			body += String(lines[k]) + "\n"
+		out[fname.strip_edges()] = body
+	return out
+
+
 static func flags_are_inert(scene: Node) -> bool:
 	return bool(scene.call("_nobody_can_press"))
 

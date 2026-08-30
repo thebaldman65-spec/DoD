@@ -148,8 +148,8 @@
   "check_da": {
    "kind": "gate",
    "checks": [
-    37,
-    37
+    39,
+    39
    ],
    "checks_obs": 1,
    "fails": [
@@ -157,7 +157,7 @@
     0
    ],
    "fails_obs": 8,
-   "note": "36 -> 37 AT DN, AND THE +1 IS THE EXEMPT-LIST LOOP RATHER THAN NEW COVERAGE. DN added `check_dn.gd`, whose membership tables call `Classes.class_draft_pool(` and `Classes.spec_draft_pool(` — §3's fingerprint for a hand-rolled corpus walk. IT IS A FALSE POSITIVE AND THE EXEMPTION SAYS SO: `check_dn` calls `Classes.ability_corpus()` outright for the walk and reads the pools only for which BUCKET a named ability sits in, which the flat 216 cannot answer. `WALK_EXEMPT` now holds two files, and the loop that asserts each still carries the marks is one check longer. `checks_obs` resets to 1 because the number is new."
+   "note": "37 -> 39 AT DW, AND THE +2 IS A SECOND SWEEP RATHER THAN A LOOSENED FIRST ONE. The §3 rule DN moved this row for is UNCHANGED and so are both of its exemptions (`check_cz`, `check_dn`), which is deliberate: DV §5 proved that fingerprint blind and the repair is an ADDED instrument, not a widened one. The new sweep runs over GATES AND SUITES, matches pool CONSTANTS as well as ACCESSORS, and asks what a walk IS rather than which calls it makes: **a function that RETURNS a collection built out of two or more of the game's seven ability-source families is answering 'what abilities exist?', and `Classes.ability_corpus()` is the one authorised answer.** A body that reads a pool and ASSERTS on it returns void and is not what this looks for — that distinction is what keeps the rule at ONE exemption where a flat union of marks would have needed sixteen. THE +2 IS `accused.is_empty()` PLUS THE ONE-ENTRY EXEMPT-ALIVE LOOP, the same shape DN's +1 had. A run that ACCUSES a walk reads 40, because each accusation is its own check. **THE THRESHOLD OF TWO IS LOAD-BEARING AND WAS PROVED SO**: with the smallest walk in the project restored, changing `families < 2` to `< 3` makes this gate read 39/0 — clean, with a 43-of-227 walk standing in the tree, which is the exact defect DV found reproduced by one character. `checks_obs` resets to 1 because the number is new. THE EARLIER NOTE, STILL TRUE: 36 -> 37 at DN was the exempt-list loop for `check_dn`, whose membership tables call both draft-pool accessors — a false positive whose exemption says so, because it calls `Classes.ability_corpus()` outright and reads the pools only for which BUCKET a name sits in."
   },
   "check_di": {
    "kind": "gate",
@@ -292,9 +292,11 @@
    "checks_obs": 9,
    "fails": [
     0,
-    0
+    1
    ],
-   "fails_obs": 9
+   "fails_obs": 34,
+   "flake": "`the walk crossed a event` — UNSEEDED, AND A SECOND ONE. `test_run_harness.gd` calls `seed()` ZERO times, and gate 2 walks a randomly GENERATED map by taking `reachable()[0]` at every step, then asserts each of six node types was crossed at least once. An unsteered greedy route can miss the rarest type. OBSERVED ONCE IN 34 READINGS at DW (the acceptance battery, plus 32 clean standalone re-runs and one earlier), so the rate is roughly 3% and the readings behind that are part of the claim.",
+   "note": "**DW FOUND A SECOND UNSEEDED FLAKE AND `docs/state.md` SAID THERE WAS ONLY ONE.** The standing record from DT forward was that `test_batch_at` §1's ratio is the last unseeded flake in the project. It is not: this row went red in DW's acceptance on `the walk crossed a event`, and **DW DID NOT CAUSE IT** — `test_run_harness.gd` is byte-identical to HEAD, and the batch's only change under `scripts/` is two `perfect_text` strings, which map generation cannot read. **IT IS DELIBERATELY NOT SEEDED HERE.** ONE FLAKE AT A TIME IS HOW THE EFFECT STAYS ATTRIBUTABLE (DT's rule, applied to `bo`), `at`'s is still open, and seeding this one is a change to a file this batch has no other business in. THE REPAIR IS KNOWN AND IS DD's: seed the walk, do not widen the assertion — the six types being present is the question, so relaxing it to five would delete the check rather than fix it. Recorded as a band with its rate so the next battery reports it as the known flake it is rather than as a new red."
   },
   "harness_3": {
    "kind": "harness",
@@ -1022,8 +1024,22 @@
   "check_dv": {
    "kind": "gate",
    "checks": [
-    128,
-    128
+    130,
+    130
+   ],
+   "checks_obs": 1,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "128 -> 130 AT DW, AND THE MOVEMENT IS §5's SHADOWREND PIN INVERTING RATHER THAN GOING AWAY. DV pinned the RENDERED Perfect as OVER at 49 against the 44 ceiling, with its own failure message saying that if it ever fits the report is stale. DW §3 repaired it, so that check now asserts it FITS — deleted, the overrun could come back silently. **AND DV's FRAMING OF IT DID NOT SURVIVE, WHICH IS THE +2.** The overrun was recorded as the one thing DU §4's corpus fix made visible. It was not: `\"Cleric recovers {mhp:5}\"` was authored TWICE — on Shadowrend and on SMITE, the Cleric class basic — and `ability_corpus()` has walked `kit(\"cleric\")` since long before DU, so the identical 49-character breach was ALREADY in the corpus under Smite's name. DU added a second instance of a breach that was never hidden. **PROVED MECHANICALLY, NOT ARGUED**: `check_cl_width`'s `perfect_text` overrun count falls 56 -> 48 when both are repaired, and 8 is 4 render contexts x 2 abilities — had only Shadowrend been over, it would have fallen by 4. So §5 asserts BOTH sites now (+1 for Smite being in the corpus, +1 for the second ceiling check). `checks_obs` resets to 1. THE EARLIER NOTE IS SUPERSEDED IN ITS §5 HALF ONLY; §0 through §4 are untouched by DW and their reasoning stands as written at DV."
+  },
+  "check_dw": {
+   "kind": "gate",
+   "checks": [
+    35,
+    35
    ],
    "checks_obs": 3,
    "fails": [
@@ -1031,7 +1047,7 @@
     0
    ],
    "fails_obs": 3,
-   "note": "NEW AT DV. THE GATE FOR A LOST FEATURE, AN EMPTY AWARD AND A DOOR THE BOT ALREADY HELD SHUT. **§0 ASSERTS THE PREMISES §1's RULING RESTS ON RATHER THAN THE RULING**, because `CLASS_POOLS` is dead by ORPHANING and not by scaffolding, and the whole distinction lives in facts about the READER: `roll_ability_offer` is deleted (Batch AN §1 asserts it absent), `award_ability_pick` reads `roll_spec_ability_offer` and names no class pool, and the structure still resolves. Re-open the class draw — which `run_state.gd` says is one line — and this gate says the report is stale. **§1 RE-DERIVES DU'S 61 AND ADDS THE QUESTION DU DID NOT ASK**: of the 61 entries, how many are reachable through NO other channel? SEVEN — Rallying Shout, Mana Shield, Arcane Surge, Reality Fracture, Dawnbreak, Sanctuary, Divine Wrath — all authored, all resolving, all fully implemented, and the dead pool is the only list in the game that names them. **DERIVED, NEVER LISTED**: a hard-coded seven would go stale silently the day one is given a home, which is the exact failure mode §1 is about. **§2 DERIVES BOTH ENDS**: the award count off `Run.SLOT_COUNT` (3) rather than typed in, and the depths off `SPEC_POOLS` — 42 entries, 40 distinct — so a fourth zone reds this instead of silently invalidating the shortfall table. Two specs hold a pool thinner than the award count (holy 1, inquisitor 2) and it asserts the PROPERTY with the list printed; it also pins that Holy's one card is DRAFTABLE (so his third award can empty too) and that he carries FOUR protected cores, which is the slot arithmetic that prices §2's card-shaped options. **§3 DRIVES A REAL CAST AND THEN ASKS THE REAL DOOR, IN FOUR STATES, AND TWO OF THE FOUR EXIST TO PROVE THE REFUSAL IS NOT A BLANKET ONE**: unarmed OPEN, armed-by-a-real-cast REFUSED, armed BELOW what the cast writes OPEN, spent REFUSED. The below-value arm is CO §1's whole rule in one line and is the only thing that separates the exact test from the cheap `ashes_return > 0`. **IT ALSO ASSERTS THAT `RECAST_GATED` MEMBERSHIP WOULD HAVE BEEN INERT** — `_recast_targets` proposes nothing and `_recast_refused` returns false with the phoenix fully armed — which is why the refusal is a bespoke condition at the one door rather than a string in a table. **§4 VERIFIES THE CUT AND ASSERTS NO FILE SIZE ANYWHERE**, deliberately: sizes agreeing is entirely consistent with a duplicated entry and a dropped one. It counts headings TWO independent ways (a heading does not always fit on one line — CX found exactly that at Batch BF), asserts the two halves are DISJOINT over the whole of both rather than at the boundary alone, and reaches the archive by following the path out of the live file's own header, never hardcoded. **§5 PINS THE TWO THINGS REPORTED AND NOT FIXED AS MEASUREMENTS** on DK §1's rule: Shadowrend's RENDERED Perfect at 49 against the 44 ceiling (the earlier record's 45 is the authored-plus-label figure and understates it by four), and the 16 abilities sitting outside every pool and every class kit — the blind spot that makes `test_batch_cp` §3's hand-rolled walk reach 211 where the corpus reaches 227. It also asserts which CLASS each of the four kit overrides came out of, because DU recorded all four as Mage and SHADOWREND IS THE OCCULTIST'S, a CLERIC spec — so TWO class kits were being misread, not one. **FOUR NEGATIVE CONTROLS, ALL FOUR BIT, AND ALL FOUR BIT ON DIFFERENT ASSERTIONS**: deleting the door's condition (2 — the armed and spent arms), loosening it to `> 0` (1 — the below-value arm alone, which is what proves the exactness arm is separately load-bearing), duplicating a heading across the two halves (3 — the archive count, the boundary check and the disjointness sweep), and giving one homeless ability a live home (4 — across §1 and §2). `battle.gd`, `classes.gd` and the archive were backed up to the scratchpad and restored by `cp`, never by `git checkout`, and all three md5s verified identical afterwards. **IT NEEDS NO `check_da` §3 EXEMPTION AND DID NOT TRIP §3**: it reads neither draft-pool accessor and its comments name neither, and `check_da` was run standalone before the battery reading 37/0 over 32 gates. **THREE READINGS SUPPORT THE 128** — three standalone runs, identical, taken before the battery so the differ can certify on its first pass."
+   "note": "NEW AT DW. THE GATE FOR A FINGERPRINT THAT HAD THREE HOLES, NOT THE TWO ITS BRIEF NAMED. `check_da` §3 has asserted since DA that no gate hand-rolls the ability corpus; DV §5 found `test_batch_cp` doing exactly that while §3 read 37/0, and diagnosed two holes — it swept `check_*.gd` ONLY, and its fingerprint was the two draft-pool ACCESSORS where that walk read the pool CONSTANTS. **BOTH HELD, AND A THIRD WAS LARGER THAN EITHER**: the fingerprint assumed a corpus walk touches the DRAFT pools at all, and `check_cl_resolver._every_ability()` — a walk in a GATE, inside the swept population, read on every battery run since DA — reads only `Classes.kit()` and `Classes.spec_abilities()` and reaches **43 of 227**. No population axis could have caught it. **THREE WALKS, NOT ONE: 43, 91 (`test_batch_bh`) and 207 (`test_batch_cp`).** §0 asserts each is a delegation AND that it carries no source-family mark of its own, because 'it calls `ability_corpus()` now' and 'it no longer walks the pools itself' are two claims and a partial repair satisfies one; it also pins the widened sweep's exemption table at ONE, since an exemption granted to a genuine violation is worse than the violation. §1 and §2 RE-DERIVE the two populations `test_batch_cp` pins and assert the suite's named table equals the live set — the pairing is the point: the suite names a population so a ninth has to be a decision, and this stops the named population quietly ceasing to be the real one, which is what happened between CN and DW. Both are EIGHT; the digit table was `[\"Shatter\"]` and the Perfectless table was six. **ARCANE EXPLOSION IS IN BOTH AND IS A LIVE BASIC ATTACK** — it entered the corpus at DU §4 and broke both rules on arrival with nothing red. §3 is the divergence guard: `\"Cleric recovers {mhp:5}\"` was authored TWICE, on Shadowrend and on SMITE, and asserting the two agree is what stops the next batch repairing one of them. §4 measures all four DU overrides against the ceiling rather than the one that failed. **THREE READINGS SUPPORT THE 35** — three identical standalone runs taken before the battery, so `check_de` can certify on its first pass."
   }
  }
 }

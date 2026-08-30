@@ -68,25 +68,51 @@ const WARRIOR_NINE := ["Unslaked", "Spite", "Boil Over",
 # exact "legitimate prose" shape CP's own report names alongside `(max 5)` and
 # `(0-100)` — it is not a second copy of anything, it bounds the sentence it
 # sits in. It was swept up by the regex rather than by the rule.
-const AUTHORED_DIGIT_ABILITIES := ["Shatter"]
+# BATCH DW §2 — EIGHT, NOT ONE, AND THE RULE HAD NEVER SEEN SEVEN OF THEM.
+# This was `["Shatter"]` as an EQUALITY for as long as `_corpus()` hand-rolled
+# its walk: over the 207 that walk reached, Shatter was the only offender it
+# could see. Over the real 227 the population is EIGHT — and the eighth,
+# ARCANE EXPLOSION, is a live basic attack that entered the corpus at DU §4
+# and broke this rule on arrival without anything going red.
+#
+# THEY ARE RECORDED, NOT REWRITTEN. `check_cl_resolver` §1's own note is the
+# standing ruling: a parenthetical digit is legal in prose that is not a
+# resolved value — "(max 12)", "(80 HP)", "(2 on a critical strike)" — so this
+# is a NAMED population a human has read, and a NINTH trips and has to be a
+# decision. Rewriting shipped player-facing text is authoring.
+const AUTHORED_DIGIT_ABILITIES := ["Arcane Explosion", "Detonation",
+	"Hymn of Hope", "Resurrection", "Shatter", "Summon Aguila", "Summon Canis",
+	"Summon Ursus"]
 # THE BASELINE IS KEPT AT CP'S 89 DELIBERATELY (the brief's instruction). It is
 # a CEILING, not an equality: the corpus count fell when the thirteen were
 # fixed, and holding the old number means the check still catches GROWTH
 # without pretending the remaining prose sites have been audited one by one.
 const AUTHORED_DIGIT_CORPUS_CEILING := 89
 
-# CP §3 — the five abilities that RUN a check and state no Perfect. Named, so a
-# SIXTH trips. See `_perfect_biconditional` for why this is a list rather than
-# a violation count of zero.
+# CP §3 — the abilities that RUN a check and state no Perfect. Named, so one
+# more trips. See `_perfect_biconditional` for why this is a list rather than
+# a violation count of zero. **THE COUNT LIVES IN THE TABLE, NOT IN THIS
+# SENTENCE**: it read "the five" against a table of six from DO until DW, which
+# is the second-copy defect sitting inside the comment that explains the rule.
 # BATCH DO ADDED PYROBLAST, AND IT IS NOT A NEW AUTHORING FAULT. Pyroblast has
 # carried an empty `perfect_text` since Batch AR authored it out of the vault;
 # what changed is that THIS FILE'S WALK COULD NOT REACH IT. It was a talent
 # grant living in NO POOL — one of `check_cz` §0's five — and DO moved it into
 # `SPEC_DRAFT_POOLS`, so the walk sees it for the first time. **The population
-# did not grow; the instrument's reach did.** The list is SIX now and a SEVENTH
-# still has to be a decision.
-const CHECK_WITHOUT_PERFECT := ["Called Shot", "Coup de Grâce", "Pinning Shot",
-	"Powershot", "Pyroblast", "Rampage"]
+# did not grow; the instrument's reach did.** (DO's own count of SIX is left as
+# the record of what that batch measured; DW's block below supersedes it.)
+# BATCH DW §2 — EIGHT, NOT SIX, FOR THE SAME REASON THE DIGIT TABLE WAS ONE
+# AND NOT EIGHT. `_corpus()` reached 207 of 227, so this population was pinned
+# over a walk that could not see either of the two added here.
+# **ARCANE EXPLOSION IS THE ARCANIST'S LIVE BASIC ATTACK**: it runs a skill
+# check, so the player gets a timing bar, and it advertises no Perfect at all —
+# which is the same gap the other six carry, on the card a hero casts most.
+# DEATH RAY is the second. Both entered this loop's reach at DU §4 and DW; the
+# ruling that authoring a Perfect for any of these is a DESIGN decision is
+# unchanged, so they are NAMED here rather than suppressed, and a NINTH trips.
+const CHECK_WITHOUT_PERFECT := ["Arcane Explosion", "Called Shot",
+	"Coup de Grâce", "Death Ray", "Pinning Shot", "Powershot", "Pyroblast",
+	"Rampage"]
 
 
 func _initialize() -> void:
@@ -387,9 +413,11 @@ func _perfect_biconditional() -> void:
 	check_no_perfect.sort()
 	var expected: Array = CHECK_WITHOUT_PERFECT.duplicate()
 	expected.sort()
+	print("  checked-but-Perfectless: %d of %d abilities walked — %s" % [
+		check_no_perfect.size(), corpus.size(), ", ".join(check_no_perfect)])
 	ok(check_no_perfect == expected,
-		"the checked-but-Perfectless abilities are exactly the named six (got %s)"
-			% ", ".join(check_no_perfect))
+		"the checked-but-Perfectless abilities are exactly the named %d (got %d: %s)"
+			% [expected.size(), check_no_perfect.size(), ", ".join(check_no_perfect)])
 	# And the corpus is big enough that the loop above really walked it.
 	ok(corpus.size() > 150,
 		"the corpus walked is the whole corpus (%d)" % corpus.size())
@@ -403,7 +431,8 @@ func _authored_digits() -> void:
 	paren.compile("\\((?:[^()]*[0-9])[^()]*\\)")
 	var ability_hits: Array = []
 	var corpus_hits := 0
-	for ab in _corpus():
+	var corpus := _corpus()
+	for ab in corpus:
 		for f in [ab.description, ab.perfect_text]:
 			var s := String(f)
 			if s != "" and paren.search(s) != null:
@@ -430,9 +459,16 @@ func _authored_digits() -> void:
 	ability_hits.sort()
 	var want: Array = AUTHORED_DIGIT_ABILITIES.duplicate()
 	want.sort()
+	# THE LIVE FIGURE IS PRINTED AND THE MESSAGE COUNTS THE TABLE RATHER THAN
+	# NAMING A NUMBER. It read "the recorded fourteen" against a table holding
+	# ONE for as long as both existed — a second copy of a count, which is this
+	# project's oldest recurring defect, sitting inside the assertion that was
+	# meant to catch drift.
+	print("  ABILITY-level authored digits: %d of %d abilities walked — %s" % [
+		ability_hits.size(), corpus.size(), ", ".join(ability_hits)])
 	ok(ability_hits == want,
-		"the ABILITY-level authored digits are exactly the recorded fourteen (got %d: %s)"
-			% [ability_hits.size(), ", ".join(ability_hits)])
+		"the ABILITY-level authored digits are exactly the recorded %d (got %d: %s)"
+			% [want.size(), ability_hits.size(), ", ".join(ability_hits)])
 	ok(corpus_hits <= AUTHORED_DIGIT_CORPUS_CEILING,
 		"the whole-corpus count has not GROWN (%d against a ceiling of %d)"
 			% [corpus_hits, AUTHORED_DIGIT_CORPUS_CEILING])
@@ -566,22 +602,25 @@ func _live_clamp() -> void:
 
 # ---------- harness ----------
 
+# BATCH DW §2 — THIS WALKED ITSELF UNTIL NOW, AND IT REACHED 207 OF 227.
+# It hand-rolled the Batch CL enumeration: the four pool CONSTANTS plus
+# `Classes.kit(cls)`, with the DU §4 overrides never applied and
+# `Classes.spec_abilities` never read. It collected 211 NAMES and returned 207
+# ABILITIES — the four class basics it does reach (Magic Bolt, Smite, Strike,
+# Quick Shot) do not resolve through `pool_ability`, so they fell out at the
+# resolve step, which is why the two figures differ and why the operative one
+# is 207.
+#
+# THE TWENTY IT COULD NOT SEE were every spec-kit ability living in no pool,
+# and the cost was not theoretical: §3's literal-digit rule pinned a population
+# of ONE against a true population of EIGHT, and §2's biconditional pinned SIX
+# against EIGHT. Both are corrected below and both now derive from this walk.
+#
+# `check_da` §3's fingerprint could not see this: it swept `check_*.gd` only,
+# and it matched the pool ACCESSORS where this read the CONSTANTS. Batch DW
+# widened it on both axes — and found two more walks besides this one.
 func _corpus() -> Array:
-	var seen := {}
-	for src in [Classes.SPEC_POOLS, Classes.CLASS_POOLS, Classes.SPEC_DRAFT_POOLS,
-			Classes.CLASS_DRAFT_POOLS]:
-		for k in src:
-			for nm in src[k]:
-				seen[nm] = true
-	for cls in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(cls):
-			seen[ab.display_name] = true
-	var out: Array = []
-	for nm in seen:
-		var ab := Classes.pool_ability(nm)
-		if ab != null:
-			out.append(ab)
-	return out
+	return Classes.ability_corpus()
 
 
 func _card(n: String) -> Ability:

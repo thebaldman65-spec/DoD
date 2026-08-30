@@ -385,30 +385,24 @@ func _the_refusals() -> void:
 
 
 # Every ability a hero can ever hold, by display name.
+#
+# BATCH DW §1 — THIS HAND-ROLLED THE WALK AND REACHED 91 OF 227. It read the
+# kits, `class_pool`, `spec_abilities`, `spec_pool` and the talent trees, and
+# it read NEITHER DRAFT POOL — so the 136 it could not see were most of the
+# game, the whole draft included. `check_da` §3's fingerprint was the two draft
+# pool ACCESSORS, so a walk that touches neither draft pool was invisible to it
+# whatever population it swept: this is the hole the brief did not name.
+#
+# THE NUMBER IT FEEDS DID NOT MOVE, AND THAT IS THE HONEST RESULT RATHER THAN
+# A LET-OFF. §1 pins "Certain reaches exactly 2 abilities game-wide" as an
+# EQUALITY, and over the real 227 it still reaches exactly two — Hack and Slash
+# and Wildstrikes. The claim was TRUE and the instrument behind it could not
+# have known: 136 abilities were never asked. It is asked over all 227 now, so
+# the day a partial status chance is authored onto any of them, this moves.
 func _all_ability_names() -> Array:
 	var names: Dictionary = {}
-	for ck in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(ck):
-			if ab != null:
-				names[ab.display_name] = true
-	for class_key in Classes.SPEC_IDS:
-		for n in Classes.class_pool(class_key):
-			names[String(n)] = true
-		for spec_id in Classes.SPEC_IDS[class_key]:
-			for ab2 in Classes.spec_abilities(spec_id):
-				if ab2 != null:
-					names[ab2.display_name] = true
-			for n2 in Classes.spec_pool(spec_id):
-				names[String(n2)] = true
-	for spec in Talents.LANE_TREES:
-		for node in Talents.LANE_TREES[spec]:
-			var pay: Dictionary = node.get("payload", {})
-			for key in ["grant_ability", "new_ability"]:
-				var v = pay.get(key, null)
-				if v is String and String(v) != "":
-					names[String(v)] = true
-				elif v is Dictionary and v.has("display_name"):
-					names[String(v["display_name"])] = true
+	for ab in Classes.ability_corpus():
+		names[ab.display_name] = true
 	return names.keys()
 
 

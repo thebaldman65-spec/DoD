@@ -310,8 +310,25 @@ func _s4_the_cut() -> void:
 	ok(arch_line == arch_span,
 		"§4: the archive's two heading counts disagree (%d line-anchored / %d cross-line)" % [
 			arch_line, arch_span])
-	ok(live_span == 16, "§4: the live file holds %d entries, not the 16 the cut left" % live_span)
+	# BATCH DW — THIS WAS `live_span == 16` AND IT COULD ONLY PASS FOR ONE BATCH.
+	# The live file gains an entry every batch, so DV's own acceptance was the
+	# only run that could ever satisfy an equality here: **DW is the batch it
+	# broke on, and it broke on DW's own changelog entry.** That is CD §1's
+	# fault exactly — the shape that turned FIVE suites red at once at CJ when a
+	# hardcoded stamp was re-bumped — and `test_batch_bx` §5 already carries the
+	# repaired version of the same lesson.
+	#
+	# THE FLOOR IS THE DURABLE HALF AND IT IS THE HALF THE CUT WAS ABOUT: the
+	# cut left 16 and entries are only ever ADDED, so an entry VANISHING from
+	# the live file still fails here, which is what this check is for. The
+	# ceiling is not asserted because it is not a claim — it is the batch
+	# number. THE ARCHIVE KEEPS ITS EQUALITY, because that file only moves when
+	# a cut moves it, so 149 is a real invariant rather than a growing count.
+	ok(live_span >= 16,
+		"§4: the live file holds %d entries, FEWER than the 16 the cut left — an entry has been dropped" % live_span)
 	ok(arch_span == 149, "§4: the archive holds %d entries, not the 149 the cut made" % arch_span)
+	print("  live %d entries (floor 16, +1 a batch since the cut), archive %d" % [
+		live_span, arch_span])
 
 	# THE BOUNDARY IS A BATCH BOUNDARY AND IT IS THE ONE INTENDED.
 	ok(live.contains("<h2>2026-08-22 &mdash; Batch DG"),
@@ -382,24 +399,42 @@ func _headings(s: String) -> Array:
 func _s5_reported_not_fixed() -> void:
 	print("\n§5 — the two reported and not fixed")
 
-	# (1) SHADOWREND'S RENDERED PERFECT OVERRUNS THE CEILING, and the figure is
-	# the RENDERED one (49) rather than the authored-plus-label one (45) the
-	# earlier record carried. Measured against a real Cleric, which is what
-	# `check_cl_width` does and what a player actually sees.
+	# (1) SHADOWREND'S RENDERED PERFECT — **REPAIRED AT DW §3, AND THE POLARITY
+	# OF THIS CHECK IS INVERTED RATHER THAN DELETED.** DV pinned it OVER at 49
+	# (the RENDERED figure; the earlier record's 45 was the authored-plus-label
+	# one and understated it by four). It fits now, so the assertion is that it
+	# FITS — a deleted check would let the overrun come back silently.
+	#
+	# **AND DV's FRAMING OF IT WAS WRONG, WHICH IS THE HALF WORTH KEEPING.**
+	# It was recorded as the one thing DU §4's corpus fix made visible. It was
+	# not: `"Cleric recovers {mhp:5}"` was authored TWICE — on Shadowrend and on
+	# **SMITE**, the Cleric class basic — and `ability_corpus()` has read
+	# `kit("cleric")` since long before DU, so **the identical 49-character
+	# overrun was already in the corpus under Smite's name.** DU added a second
+	# instance of a breach that was always visible. Both sites are repaired and
+	# BOTH are asserted below, because fixing one of two copies is how the two
+	# copies started.
 	var sr = null
+	var sm = null
 	for ab in Classes.ability_corpus():
 		if ab.display_name == "Shadowrend":
 			sr = ab
+		elif ab.display_name == "Smite":
+			sm = ab
 	ok(sr != null, "§5: Shadowrend is not in the corpus — DU's fix has been reverted")
-	if sr != null:
-		var cc := Classes.hero_config("cleric")
-		var ctx := Classes.value_ctx_from_config(cc, {"hp": int(cc["max_hp"] * 0.7)})
-		var rendered := "Perfect: " + Classes.resolve_values(sr.perfect_text, ctx)
-		ok(rendered.length() > CEILING,
-			"§5: Shadowrend's rendered Perfect is %d against a ceiling of %d — it fits now, and the report saying it overruns is stale" % [
-				rendered.length(), CEILING])
-		print("  Shadowrend rendered Perfect: %d characters against %d" % [
-			rendered.length(), CEILING])
+	ok(sm != null, "§5: Smite is not in the corpus — the class-kit walk has been reverted")
+	var cc := Classes.hero_config("cleric")
+	var ctx := Classes.value_ctx_from_config(cc, {"hp": int(cc["max_hp"] * 0.7)})
+	for pair in [[sr, "Shadowrend"], [sm, "Smite"]]:
+		var ab2 = pair[0]
+		if ab2 == null:
+			continue
+		var rendered := "Perfect: " + Classes.resolve_values(ab2.perfect_text, ctx)
+		ok(rendered.length() <= CEILING,
+			"§5: %s's rendered Perfect is %d against a ceiling of %d — the DW §3 repair has been reverted" % [
+				pair[1], rendered.length(), CEILING])
+		print("  %s rendered Perfect: %d characters against %d" % [
+			pair[1], rendered.length(), CEILING])
 
 	# (2) THE LAST HAND-ROLLED WALK, PINNED BY ITS BLIND SPOT RATHER THAN BY ITS
 	# SOURCE. Reproducing the walk here would be writing a second copy of the
