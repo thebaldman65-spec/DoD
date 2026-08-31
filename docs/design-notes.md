@@ -4,6 +4,63 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An instrument's territory is a claim (Batch EC) — 2026-08-31
+
+The needle sweep had a bug that no measurement of it could find. Every previous audit counted
+LITERALS, and the literal count was right both before and after: 125 members either way. What was
+wrong was the BOUNDARY between them.
+
+The instrument bucketed all the literals in one statement together and asked whether *any* of them
+was present. That is the right question for `contains(A) or contains(B)` and the wrong one for
+`contains(A) and contains(B)` — and it was asking it of both. The half that was supposed to tell
+them apart looked for an `or` at the top level of the statement, and **every assertion in this tree
+is wrapped in `ok(...)`**, so the operator is one bracket in and the scan found none in 82 files.
+The splitter had never fired. Not once.
+
+**What makes this worth writing down is that fixing it in the obvious direction would have been
+worse than leaving it.** Ten statements in the tree are conjunctions and nine are alternations. Six
+of those nine have a member that is legitimately absent — an HTML entity beside its unicode
+character, an upper-case heading beside its title-case twin. Treat every group as a conjunction and
+six perfectly correct checks go red on the first run. **A false alarm is how an instrument gets
+switched off**, and this project has already declined to gate a sweep for exactly that reason.
+
+So the repair is not "be stricter". It is: *evaluate the group the way its operator joins it*, and
+prove you can tell the two apart before you judge anything. `check_ec` §3 does that on hand-built
+input, in both directions, every run.
+
+---
+
+**The second finding is the shape of the first, one level up.** EB reworded a comment inside
+`battle.gd`. The needle verifier, the literal-flip sweep, the comment-stripped diff and a 39-target
+subset battery all read green, and the full battery took a suite red — because a suite pins a
+literal *inside that comment*, and every document instrument watches the four tracked documents
+only.
+
+That population had never been counted. It is **917** assertions pinning a literal into `.gd`
+source, against **194** into the documents. The instruments were watching the smaller half.
+
+The honest version of a green sweep is therefore not "nothing is broken" but "nothing is broken
+**inside this haystack**" — and the haystack is a claim like any other. Whether to extend the
+instruments, to keep a manifest, or to forbid source pins outright is a real decision with real
+costs on all three sides, so EC measures it and leaves it. The cheapest option to run is also the
+one that invalidates 917 existing pins, which is the kind of trade nobody should make as a side
+effect of a batch about something else.
+
+---
+
+**And a note on the 3% target, which is measured here and ruled on nowhere.** `CLAUDE.md` grows
+whenever a batch earns a standing rule, which is most batches. Three batches in a row have moved
+the ratio, and the last prune took a whole batch of its own. That is not a target being missed; it
+is a target that cannot be held by a file with that growth law.
+
+The number that decides what to do about it is not the ratio — it is how much of the file is dead
+weight. **33.8% of it is neither asserted by any suite nor quoted anywhere else in the repo since
+the batch that wrote it**, and only 4.3 points of that is recent enough to be explained by "not yet
+read". A rule nobody has quoted may still be load-bearing; plenty of rules work by being obeyed.
+But a third of the file being unreferenced is the difference between a dense file that should keep
+its target and a bloated one that needs a different rule, and the designer should get to decide
+which with the number in front of them.
+
 ## Six instances is not a trap, it is a construction rule (Batch DX) — 2026-08-29
 
 `check_dv` §4 asserted `live_span == 16` against a changelog that gains an entry every batch. DV's

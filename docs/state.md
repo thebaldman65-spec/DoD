@@ -5,105 +5,84 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-31 (Batch EB).*
+*Last rewritten: 2026-08-31 (Batch EC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EB — THE CORES ARE THE BASELINE, AND A SWEEP FOR HEADERS THAT NAME THE DEAD.**
-  Two rulings and two instrument repairs. **EA's 13-of-17 IS RULED INTENDED AND ASSERTED AS THE
-  INVERSION RATHER THAN AS THE RATIO; EVERY COMMENT IN THE TREE IS SWEPT FOR A NAME THAT NO LONGER
-  RESOLVES, AND SIXTEEN WERE REPAIRED.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED,
-  `Ability.PURE_BUFFS` WAS NOT WIDENED, AND EVERY `.gd` CHANGE OUTSIDE THE NEW GATE IS COMMENTS
-  ONLY.** **Report: `docs/reports/EB.md`.**
-- **§1 — RULED: THE PROTECTED CORE IS THE BASELINE AND THE DRAFT CARD PAYS FOR ITS SLOT.** A core
-  arrives FREE with the spec; a draft card costs a PICK out of a capped set of slots, so a draft
-  card paying that pick in initiative and resource is the correct relationship. **The 13-of-17 is
-  evidence the layer is consistent, not evidence it is broken.** The ruling is in `CLAUDE.md`
-  **with its reasoning AND with its counter-reading**, because nothing in the code distinguishes
-  the two and the next reader to run the measurement will find the same thirteen.
-  - **WHAT IS ASSERTED IS THE INVERSION, NOT THE RATIO.** `check_eb` §1 catches a draft card
-    **cheaper on resource AND shorter on cooldown** than a comparable core — a card paying no pick
-    and giving none back. **The ratio is PRINTED and asserted nowhere**: `check_ea` §4 owns the
-    aggregate direction, and two copies of one fact in two gates is DJ's defect.
-  - **THE BRIEF'S PROPERTY AS LITERALLY STATED IS RED AT HEAD, AND THAT IS WHY THE CONTROL IS
-    LOAD-BEARING.** Without the equal-initiative control, **21 of 96** same-spec same-role pairs
-    already have a draft card *cheaper and faster* — Kindled Mind at 15 Mana / initiative 1.5
-    against Death Ray at 55 / 5.0, a cantrip beside a nuke. **At equal initiative "faster" is
-    impossible by construction**, so the surviving tempo axis is COOLDOWN.
-  - **EXACTLY ONE CROSSOVER EXISTS AND IT IS NAMED RATHER THAN COUNTED**: Holy's **Divine Plea**
-    (0 Mana, cooldown 2) against **Renewal** (20, cooldown 3) at initiative 3.0 in the heal role.
-    Asserted in BOTH directions — a second crossover reds the gate, and **the named one vanishing
-    reds it too**, because that means the pair was re-priced and the ruling revisited with nothing
-    saying so. **Against Holy's Heal the same card is cheaper and LONGER, which is an ordinary
-    trade** — EA's "both counter-cases are the same draft card" is one crossover and one trade.
-  - **THE CAP BINDING THE LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
-    FINDING.** 29.5% of the draft layer against 12.8% of the cores is what a priced layer looks
-    like beside a baseline one. **Not a defect, and not a reason to widen `Ability.PURE_BUFFS`.**
-- **§2 — 118 NAMES IN COMMENTS NO LONGER RESOLVE; 16 WERE STALE AND 71 WERE CORRECT.** The sweep
-  read **4,049 code-shaped tokens across 111 `.gd` files**. **A comment RECORDING a deletion is
-  correct and must not be swept** — repairing one deletes the project's memory of why a symbol is
-  gone. The remaining 31 are noise: suffix conventions, names composed at runtime, live cards
-  written in id casing, engine names, suite shorthand.
-  - **THE BRIEF'S OWN INSTANCE WAS MIS-ATTRIBUTED AND ALMOST INVISIBLE.**
-    `run_sim._award_trophies` named `Run.roll_ability_offer` — **deleted at AN §4, not by DY** —
-    and `test_batch_an` §1 has asserted its absence ever since.
-  - **THE HAYSTACK CANNOT BE A GREP.** `check_dv` asserts `not rs.contains("func
-    roll_ability_offer")` and `test_batch_an` holds the bare literal in its `gone_fn` list, **so
-    the two checks that prove the function is dead are what make a text sweep report it as alive.**
-    The universe must be a SYMBOL TABLE of declarations matched by equality, read with the string
-    literals **masked** — the needle extractor's bracket-depth bug in a second instrument.
-  - **THE RULE IS SPLIT WHERE DR's WAS NOT: delete where the thing is GONE, correct the name where
-    the thing only MOVED.** A rename leaves a live claim wearing a dead name, and deleting it
-    throws away something true. Three of the sixteen were deletions; thirteen were moves.
-  - **THE SHARPEST OF THE SIXTEEN WAS NOT PROSE AND IT BECAME A GATE.** `test_batch_bp` §7's
-    comment said its three hand-written fillers are *"in no DRAFT pool at all"* — **Rallying Shout
-    is in the WARDEN's.** The repair holds for a narrower reason: §7 is a SWORDMASTER flow and
-    `draft_pool_left` offers his own spec pool and the WARRIOR class pool and nothing else.
-    **`check_eb` §2 asserts it live**, because the pools grow under a hand-written kit and that is
-    exactly how DR's one-in-eight flake arrived.
-  - **IT IS NOT MADE A PERMANENT GATE, AND THE RATIO IS THE REASON.** 118 rows for 16 defects is
-    5.5 false alarms per real one, and a gate cannot tell a deletion RECORD from a stale claim
-    without reading the sentence. **A rule costs nothing on a batch that deletes nothing and lands
-    at the moment the information exists.** Reported, ruled on nowhere.
-- **§3 — THE EXTRACTOR NEVER LOST A LITERAL; IT LOST THE BOUNDARY BETWEEN ASSERTIONS.** EA
-  recorded its needle extractor as reading 32 where there are 95. **Re-measured: with
-  string-masking disabled it finds the SAME 124 distinct asserted literals** (90 positive, 34
-  negative). **What collapses is the GROUPING — 73 positive groups become 45, 30 negative become
-  25 — and an or-group passes when ANY member is present**, so 28 independent assertions were
-  satisfied by a sibling's hit rather than their own. **The count to assert is the GROUP count.**
-  A literal census reads 124 either way and cannot see this at all. **EA's 32-reading build no
-  longer exists and could not be reproduced**, which is stated rather than worked around.
-  - **A RESIDUAL HALF OF THE SAME BUG IS CLOSED AND MOVES NOTHING.** `or_groups()` counted brackets
-    and the bare word `or` inside string literals. 73/22/30/46 before and after.
-  - **AND A PRECONDITION IS ADDED TO THE NEGATIVE-CONTROL RULE**, in `CLAUDE.md`: *arm the control
-    on something a suite demonstrably reads, and confirm the disarmed state is RED before trusting
-    the armed one.* **EB's own parse control failed it** — armed on the new GATE, and `check_parse`
-    does not walk the gates.
-- **AND EB BROKE A SUITE WITH A COMMENT, WHICH IS THE FINDING THAT OUTLIVES THE BATCH.**
-  `test_batch_bl` control 1 pins `THIS BATCH DOES NOT SHIP ONE` inside `battle.gd`. §2 reworded
-  that sentence while deleting the dangling pointer beside it. **The needle verifier stayed green,
-  the literal-flip sweep stayed green, the comment-stripped diff read "comments only", the
-  39-target subset battery stayed green — and the first acceptance battery took `bl` to 88 / 1.**
-  - **THE HOLE IS STRUCTURAL: both document instruments track needles into the four tracked
-    DOCUMENTS, and a suite asserting a literal against `.gd` SOURCE is a haystack neither
-    watches.** `bl` reads no tracked document, so the subset battery did not include it either.
-  - **"COMMENTS ONLY" STOPS BEING A SAFETY ARGUMENT.** The comment-stripped diff proves no CODE
-    moved; it says nothing about whether a suite reads the comment. **Both proofs are owed.**
-  - **THE INSTRUMENT THAT SEES IT IS THE SAME SWEEP WITH THE EDITED SOURCES AS THE DOCUMENTS**, and
-    it is in `CLAUDE.md`. It read **five lost literals**, the first of which is the break; the other
-    four are substring noise with no assertion behind them. **The needle is restored word for word
-    with a note at the site saying why**, and **the tree was re-frozen and the battery run a second
-    time** — a batch that edits behind its own certification run has certified nothing.
-- **Next letter: EC.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EC — THE BOUNDARY THE SWEEP LOST.** One instrument repair and two measurements
+  ruled on nowhere. **THE NEEDLE SWEEP HAS BEEN EVALUATING A CONJUNCTION AS A DISJUNCTION — ITS
+  OR-GROUP SPLITTER HAD NEVER FIRED ONCE — AND THE POPULATION OF ASSERTIONS THAT PIN A LITERAL
+  INTO `.gd` SOURCE IS MEASURED FOR THE FIRST TIME AT 915.** **NO GAME BEHAVIOUR CHANGED, NO
+  ABILITY MOVED, NO CARD WAS AUTHORED, AND NOTHING WAS PRUNED.** **Report: `docs/reports/EC.md`.**
+- **§1 — THE GROUP BOUNDARY, AND THE SPLITTER THAT WAS UNREACHABLE.** The verifier bucketed every
+  literal in a statement together and satisfied the bucket when **ANY** member was present, so
+  `contains(A) and contains(B)` passed on A alone — **a check passing for a reason other than the
+  one it states, inside the instrument built to find exactly that.**
+  - **THE REASON IS NOT THE ONE THE BRIEF GAVE.** `or_groups()` split at a **top-level** `or`, and
+    every assertion in this tree is wrapped in `ok(...)`, so the operator sits one bracket in.
+    **Measured: it returns more than one span for ZERO of the tree's 149 atom-bearing statements.**
+    Nine hold an `or` and ten hold an `and`; all nineteen came back as one bucket. **The splitter
+    was unreachable, not mis-tuned.**
+  - **THE BRIEF'S "73 POSITIVE GROUPS COLLAPSE TO 45" DOES NOT EXIST AT HEAD.** That is EB §3's
+    reading of the extractor with string-masking DISABLED — a build EB had already repaired inside
+    EB. At HEAD it reads **73** and loses no boundary to bracket depth at all.
+  - **WHAT THE 73 TURN UP AT FULL RESOLUTION: 103 statements over 125 members — 10 CONJUNCTIONS
+    and 9 ALTERNATIONS, and ZERO real defects.** All ten conjunctions hold in full, so the
+    blindness had no live defect under it. **Every one of the nineteen is reported with its verdict
+    in `docs/reports/EC.md` §1.**
+  - **THE WRONG REPAIR WOULD HAVE COST SIX.** Six of the nine alternations have a member that is
+    legitimately absent — an HTML entity beside its unicode glyph, an upper-case heading beside its
+    title-case twin — so **treating every group as a conjunction reds six correct checks on the
+    first run**, and a false alarm is how an instrument gets switched off. **The distinction IS the
+    fix**, and `check_ec` §3 proves it discriminates on built input in both directions every run.
+  - **TWO MORE EXTRACTOR BUGS, LATENT IN THE DOCUMENT SWEEP AND LIVE IN THE SOURCE ONE.** The
+    polarity look-behind could not see past a RECEIVER (`not FileAccess.get_file_as_string(…)
+    .contains(…)` read as POSITIVE, six deliberately-absent literals reported as unresolved), and
+    `unescape` ran `\n` before `\\` so a source literal written `\\n` matched nothing — six pins
+    into `classes.gd` unresolved for that reason alone. Both closed.
+- **§2 — 915 ASSERTIONS PIN A LITERAL INTO `.gd` SOURCE, ACROSS 52 SUITES AND 17 SOURCE FILES. THE
+  FOUR TRACKED DOCUMENTS CARRY 196.** **The instruments were watching the smaller half by a factor
+  of 4.7**, which is the structural hole EB's broken suite came out of.
+  - **THE EXPOSED SUB-POPULATION IS 37**: positive pins whose literal resolves ONLY inside a
+    COMMENT — **22 into `classes.gd`, 12 into `battle.gd`, 2 into `run_sim.gd`, 1 into
+    `run_state.gd`.** The rest are anchored to code (499), negative and correctly absent (249 + 13
+    against a slice), or composed at runtime (116).
+  - **TWELVE OF THE 22 IN `classes.gd` ARE THE `AXIS` / `SYNERGY` HEADER CONVENTION**, pinned by
+    six different tranche suites. **One comment convention holds up six suites at once** — worth
+    knowing before anybody tidies those headers.
+  - **THE CENSUS FOUND A LIVE VACUOUS CHECK AND IT IS REPAIRED.** `test_batch_bg` §2 sliced
+    `battle.gd` from `find("# The fifth stack:")`, an anchor **BH had already deleted**. Measured
+    live: **`find` returned -1, Godot's `substr` on a negative offset returns `""`, and
+    `not "".contains(anything)` is true** — **two checks passed while reading nothing at all.**
+    The comment above them already said the question was "asked of the whole branch"; **the
+    sentence was written and the change was never made.** Both are asked of the whole branch now
+    and the property still holds. `test_batch_bg` reads **47 / 0** before and after.
+  - **COVERAGE IS REPORTED AND RULED ON NOWHERE.** Three options with their costs are in the
+    report; **the cheapest to run — a rule forbidding source pins — invalidates all 915.** The
+    decision is the designer's and is carried in the open queue below.
+- **§3 — THE 3% TARGET IS MEASURED AND RULED ON NOWHERE.** DZ pruned to 2.948%; EB put it back over
+  at 3.044% (re-derived); **EC takes it further over.** Live figures are in the knowledge-sync
+  section below. **The file grows by construction — every batch that earns a standing rule adds one
+  — so the target is a treadmill rather than a target.**
+  - **THE MEASUREMENT THAT DECIDES IT: 32.0% of `CLAUDE.md` is neither asserted by any suite or
+    gate nor quoted verbatim anywhere else in the repo since its own batch wrote it** — 42 of 94
+    rule-blocks, 74,398 bytes. **Only 4.2 points of that was written in the last eight batches**
+    and could not yet have been read again; **27.8% is older than that or cites no batch at all.**
+  - **A RULE NOBODY HAS QUOTED MAY STILL BE LOAD-BEARING** — most rules work by being obeyed — so
+    the number does not say what to cut. **It says the pressure on the ratio is not density.**
+  - **FOUR OPTIONS ARE SET OUT WITH THEIR ARITHMETIC AND NONE IS RECOMMENDED.** Carried below.
+  - **NO PRUNE WAS TAKEN.** The bound is unchanged and it is assertions rather than judgement:
+    **61 distinct literals across 25 reader files**, which is its own batch with its own battery.
+- **Next letter: ED.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: DX turning a
-  six-times-repeated defect into a rule, DY emptying the vault, DZ pricing two open questions
-  without ruling on either, EA building the fallback DZ priced and handing the designer a balance
-  finding across twelve specs, **and EB ruling on that finding, sweeping the comment layer for the
-  first time, and discovering that a comment in a `.gd` file is an asserted surface.**
+  purpose-authored and charter-clean. Recent batches are correction and consolidation: DY emptying
+  the vault, DZ pricing two open questions without ruling on either, EA building the fallback DZ
+  priced, EB ruling on that finding and discovering that a comment in a `.gd` file is an asserted
+  surface, **and EC closing the boundary that discovery exposed and measuring, for the first time,
+  how much of the tree the document instruments were never watching.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -651,6 +630,22 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried, and still awaiting a ruling
 
+- **WHAT COVERS THE 915 SOURCE PINS — REPORTED AT EC §2, RULED ON NOWHERE.** Every document
+  instrument watches the four tracked documents; **915 assertions across 52 suites pin a literal
+  into a `.gd` file instead**, and **37 of them resolve only inside a COMMENT**, which is the
+  haystack EB reworded with four instruments green. Three options with their costs are in
+  `docs/reports/EC.md` §2: **extend the sweep to the edited sources** (it exists, it takes seconds,
+  it fires only on files a batch edits and cannot tell a needle from prose); **a manifest of pinned
+  literals** (a second place for the truth to rot); or **a rule forbidding source pins** (costs
+  nothing to run, **invalidates all 915**, and is a rewrite rather than a rule). **The decision is
+  the designer's, and the general shape is already in `CLAUDE.md` either way.**
+- **WHETHER 3% IS STILL THE RIGHT TARGET FOR `CLAUDE.md` — MEASURED AT EC §3, RULED ON NOWHERE.**
+  Three batches running have moved the ratio and the file grows by construction. **32.0% of it has
+  never been asserted or quoted since its own batch wrote it**, so the pressure is not density.
+  **Four options with their arithmetic — keep and prune periodically, raise the target to the
+  measured steady state, cap the rule count so adding one retires one, or split the file the way
+  CW split the changelog — are in `docs/reports/EC.md` §3 with no recommendation.**
+
 - **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
   `STACKS := 4` is a **direct-write probe depth**, not a carry ceiling — those checks write
   `faith_stacks`/`faith_peak` onto the unit, bypass `_gain_faith`'s clamp, and measure a per-stack
@@ -859,7 +854,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF EB
+### THE TEST TREE, AS OF EC
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -867,18 +862,24 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-eight** —
-  **EB ADDED `check_eb`**, and before it EA added `check_ea`, DW `check_dw`, DV `check_dv` and DU
-  `check_du`; **DZ AND DY EACH ADDED NONE.** **EB ADDED ONE BECAUSE §1 IS A RULING** — a gate
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-nine** —
+  **EC ADDED `check_ec`**, and before it EB added `check_eb`, EA `check_ea`, DW `check_dw`, DV
+  `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **EC ADDED ONE BECAUSE §1 IS AN
+  INSTRUMENT REPAIR THAT HAS TO SURVIVE THE BATCH** — the scratchpad sweep is rebuilt every batch
+  and a boundary fixed only there is a fix that expires. **§2 AND §3 ADDED NOTHING**, because both
+  are measurements the brief forbids ruling on and a gate encodes a ruling. **EB ADDED ONE BECAUSE
+  ITS §1 IS A RULING** — a gate
   encodes a ruling, and EB §1 is the ruling on the measurement EA handed over. **EA §3 WAS STILL A
   MEASUREMENT AND RODE IN `check_ea` PINNING A DIRECTION RATHER THAN A COUNT**, which is the
   shape that does not encode a ruling nobody made; `check_eb` §1 is the shape that does, now that
-  the ruling exists. **`check_dw` ASSERTS
+  the ruling exists. **`check_ec` IS A THIRD SHAPE: A PROPERTY OF THE INSTRUMENTS THEMSELVES**, and
+  it carries its own discrimination control on synthetic input because the repair it encodes is
+  dangerous in the opposite direction. **`check_dw` ASSERTS
   THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 35
+  move a line in another file and say why. **There are 36
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -1022,7 +1023,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **22 entries** (DG → EB). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
+  **23 entries** (DG → EC). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
   added, so an entry VANISHING still fails) **and prints the live figure; the ARCHIVE keeps its
@@ -1045,32 +1046,43 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at EB
+### Knowledge sync, re-measured at EC
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **162 files, 7.16 MiB** (EA measured 160 / 7.10). **EB added two files** — `check_eb.gd` and
-  `docs/reports/EB.md` — deleted none, and grew `CLAUDE.md` by **8.1 KiB** with three standing
-  rules and one amendment.
-- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **397**, `docs/master.html`
-  **338**, `scripts/classes.gd` **322**, `CLAUDE.md` **223**, `docs/changelog.html` **201**,
+- **164 files, 7.23 MiB** (EB measured 162 / 7.17 by this same walk). **EC added two
+  files** — `check_ec.gd` and `docs/reports/EC.md` — deleted none, and grew `CLAUDE.md` by
+  **5.49 KiB** with two standing rules and two amendments.
+- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **401**, `docs/master.html`
+  **338**, `scripts/classes.gd` **322**, `CLAUDE.md` **229**, `docs/changelog.html` **205**,
   `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
   **`CLAUDE.md` IS FIFTH AND `docs/changelog.html` SIXTH**; the changelog grows about 8 KiB a
-  batch, so CW's 400 KiB threshold is roughly twenty-five batches away.
+  batch, so CW's 400 KiB threshold is roughly twenty-four batches away.
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **35** — **EB ADDED `check_eb`, EA ADDED `check_ea`, AND DZ AND DY EACH ADDED NONE.**
-- **`CLAUDE.md` IS 223.42 KiB = 3.046%, UP FROM 215.32 KiB = 2.963% AT EA — AND CW's *"under 3%"*
-  IS BREACHED FOR THE FIRST TIME SINCE DZ's PRUNE.** **THIS IS OWED AND IT IS RECORDED RATHER THAN
-  PASSED OVER.** EB adds three standing rules and one amendment for **+8.1 KiB** and **+0.083 of a
-  percentage point**, which is five times the "roughly flat" +0.015 EA moved it. **Getting back
-  under 3% needs roughly 3.5 KiB out of `CLAUDE.md`** — more than that in practice, because pruning
-  this file shrinks the sync's DENOMINATOR too, which is the arithmetic DZ recorded.
+  are **36** — **EC ADDED `check_ec`, EB ADDED `check_eb`, EA ADDED `check_ea`, AND DZ AND DY EACH
+  ADDED NONE.**
+- **`CLAUDE.md` IS 228.91 KiB = 3.093%, UP FROM 223.42 KiB = 3.044% AT EB — SO CW's *"under
+  3%"* IS BREACHED FOR THE SECOND BATCH RUNNING AND BY MORE.** **THIS IS OWED AND IT IS RECORDED
+  RATHER THAN PASSED OVER.** EC adds two standing rules and two amendments for **+5.49 KiB**
+  and **+0.049 of a percentage point**. **Getting back under 3% needs 7.09 KiB out of
+  `CLAUDE.md`** — more than a naive subtraction gives, because pruning this file shrinks the
+  sync's DENOMINATOR too, which is the arithmetic DZ recorded.
+  - **EC MEASURED WHAT THE TARGET CANNOT SAY ON ITS OWN, AND RULED ON NOTHING.** **32.0% of the
+    file — 42 of 94 rule-blocks, 74,398 bytes — is neither asserted by any suite or gate nor quoted
+    verbatim anywhere else in the repo since its own batch wrote it**, and only **4.2 points** of
+    that was written in the last eight batches. **26.2% is asserted; 41.9% is quoted but never
+    asserted.** **A rule nobody has quoted may still be load-bearing** — the number does not say
+    what to cut, it says **the pressure on the ratio is not density.**
   - **THE PRUNE IS NOT TAKEN HERE AND THE REASON IS SCOPE, NOT JUDGEMENT.** It is **bounded by
-    assertions rather than by judgement** — **60 literals must survive verbatim across the 26
-    targets that read the file** — so it is its own batch with its own battery, and EB has already
-    run two. **DG through DY all declined it and DZ took it**; this is the first batch since to
-    make it owed again.
+    assertions rather than by judgement** — **61 distinct literals must survive verbatim across the
+    25 files that read this one**, derived live rather than inherited — so it is its own batch with
+    its own battery. **DG through DY all declined it and DZ took it**; EB and EC have both made it
+    owed again without taking it.
+  - **AND THE TARGET ITSELF IS NOW A QUESTION, NOT ONLY A NUMBER.** Four options — keep and prune
+    periodically, raise the target to the measured steady state, cap the rule count structurally,
+    or split the file the way CW split the changelog — are set out **with their arithmetic and no
+    recommendation** in `docs/reports/EC.md` §3. **The choice is the designer's.**
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---

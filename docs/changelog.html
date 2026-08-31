@@ -14,6 +14,60 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch EC: THE BOUNDARY THE SWEEP LOST</h2>
+<p><i>One instrument repair and two measurements ruled on nowhere. <b>The needle sweep has been
+evaluating a CONJUNCTION as a DISJUNCTION &mdash; its or-group splitter had never fired once
+&mdash; and the population of assertions that pin a literal into <code>.gd</code> SOURCE is
+measured for the first time at 917.</b> <b>NO GAME BEHAVIOUR CHANGED, NO ABILITY MOVED, NO CARD
+WAS AUTHORED, AND NOTHING WAS PRUNED.</b> Full report: <code>docs/reports/EC.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE GROUP BOUNDARY, AND THE SPLITTER THAT WAS UNREACHABLE.</b> The needle
+verifier bucketed every literal in a statement together and satisfied the bucket when <b>ANY</b>
+member was present. <b>So <code>contains(A) and contains(B)</code> passed on A alone</b> &mdash; a
+check passing for a reason other than the one it states, inside the instrument built to find
+exactly that. The <code>or</code>-splitter that was meant to model alternation looked for a
+<b>top-level</b> <code>or</code>, and <b>every assertion in this tree is wrapped in
+<code>ok(...)</code></b>, so the operator sits one bracket in and the scan found none in any of the
+82 files. It was not mis-tuned; it was unreachable. <b>A literal census cannot see this at all
+&mdash; the same 125 members are read either way</b>, which is why every previous measurement of
+the extractor came back clean.</p>
+
+<p><b>WHAT THE SWEEP TURNS UP AT FULL RESOLUTION: NOTHING RED, AND SIX FALSE ALARMS AVOIDED.</b>
+The corrected instrument reads <b>103 asserting statements over 125 members: 10 CONJUNCTIONS and 9
+ALTERNATIONS.</b> All ten conjunctions hold in full, so the blindness had no live defect under it.
+<b>Six of the nine alternations have a member that is legitimately absent</b> &mdash; so a repair
+that treated every group as a conjunction would have raised six false alarms on its first run, and
+a false alarm is how an instrument gets switched off. <b>The distinction between an alternation and
+a conjunction IS the fix</b>, and <code>check_ec</code> proves it discriminates on built input, in
+both directions, before it judges the tree.</p>
+
+<p><b>&sect;2 &mdash; AN INSTRUMENT'S TERRITORY IS A CLAIM.</b> Every document instrument watches
+the four tracked documents; a suite pinning a literal into <code>.gd</code> source is outside all
+of them, which is how EB reworded one comment with four instruments green and took
+<code>test_batch_bl</code> to 88/1. <b>That population had never been measured. It is 917
+assertions, across 52 suites, against 17 source files &mdash; 4.7 times the 194 that pin the four
+documents.</b> <b>The exposed part is 37</b>: positive pins whose literal resolves only inside a
+COMMENT, 22 of them into <code>classes.gd</code> and 12 into <code>battle.gd</code>. <b>Three
+coverage options are reported and none is chosen</b>, because the cheapest one &mdash; a rule
+forbidding source pins &mdash; invalidates all 917.</p>
+
+<p><b>AND THE CENSUS FOUND A LIVE VACUOUS CHECK.</b> <code>test_batch_bg</code> &sect;2 sliced
+<code>battle.gd</code> from <code>find("# The fifth stack:")</code>, an anchor Batch BH had already
+deleted. <b><code>find</code> returned -1, Godot's <code>substr</code> on a negative offset returns
+the empty string, and <code>not "".contains(anything)</code> is true</b> &mdash; so two checks
+passed while reading nothing at all. The comment above them already said the question was "asked of
+the whole branch"; <b>the sentence was written and the change was never made</b>. Both are asked of
+the whole branch now, and the property still holds.</p>
+
+<p><b>&sect;3 &mdash; THE 3% TARGET, MEASURED AND RULED ON NOWHERE.</b> Batch DZ pruned
+<code>CLAUDE.md</code> to 2.948%; EB put it back over at 3.046% in one batch. <b>The file grows by
+construction &mdash; every batch that earns a standing rule adds one &mdash; so the target is a
+treadmill rather than a target.</b> <b>Measured: 33.8% of the file is neither asserted by any suite
+or gate nor quoted verbatim anywhere else in the repo since its own batch wrote it, and only 4.3
+points of that were written in the last seven batches.</b> Four options are set out with their
+arithmetic and <b>none is recommended</b>; the choice is the designer's. <b>No prune was taken here
+&mdash; it is bounded by 60 literals across 26 targets and needs its own battery.</b></p>
+
 <h2>2026-08-31 &mdash; Batch EB: THE CORES ARE THE BASELINE, AND A SWEEP FOR HEADERS THAT NAME THE DEAD</h2>
 <p><i>Two rulings and two instrument repairs. <b>EA's 13-of-17 is ruled INTENDED and asserted as
 the inversion rather than as the ratio; every comment in the tree is swept for a name that no

@@ -263,14 +263,21 @@ func _the_release_branch_no_longer_names_the_capstone() -> void:
 	# question survives and is asked of the whole branch, which is strictly
 	# stronger: NOTHING in the release reads the capstone, and nothing keeps a
 	# remnant at all any more.
+	# **BATCH EC — THE SENTENCE ABOVE WAS WRITTEN AND THE CHANGE WAS NOT MADE.**
+	# BH recorded that the question is "asked of the whole branch", and left the
+	# slice standing: `body.find("# The fifth stack:")` returned -1, Godot's
+	# `substr` on a negative offset returns "", and both questions below were
+	# then asked of an EMPTY string. A `not contains` on "" is true for every
+	# needle there is, so two checks passed while reading nothing. Measured, not
+	# reasoned: rel = -1 and the slice was 0 characters long. Both are asked of
+	# `body` now, which is what the sentence above already claimed, and the
+	# property still holds — `body` contains neither name.
 	var i := src.find("func _gain_faith(")
 	ok(i > 0, "§2: _gain_faith is findable")
 	var body := src.substr(i, src.find("func _conviction_growth(") - i)
-	var rel := body.find("# The fifth stack:")
-	var after := body.substr(rel, body.length() - rel)
-	ok(not after.contains(".apostle"),
+	ok(not body.contains(".apostle"),
 		"§2: nothing in the release branch reads `apostle` — the park is gone")
-	ok(not after.contains("oath_ranks") and not body.contains("var keep"),
+	ok(not body.contains("oath_ranks") and not body.contains("var keep"),
 		"§2: ...and Batch BH deleted the remnant, so a release always resets to zero")
 	ok(body.contains("u.faith_stacks = 0"),
 		"§2: ...which the branch says outright")

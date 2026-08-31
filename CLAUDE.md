@@ -287,6 +287,14 @@ watch. Live sizes and percentages live in `docs/state.md`, not here** — they m
   becomes unworkable.**
 - `addendum.html` is RETIRED (frozen history; do not update it) and lives in the archive folder,
   not in `docs/`.
+- **THE 3% TARGET IS MEASURED AND IS RULED ON NOWHERE (EC §3).** Three batches in a row have moved
+  the ratio and **the file grows by construction** — every batch that earns a standing rule adds
+  one — so "under 3% and roughly flat" is a treadmill rather than a target. **Measured at EC:
+  33.8% of this file is neither asserted by any suite or gate nor quoted verbatim anywhere else in
+  the repo since its own batch wrote it; only 4.3 points of that were written in the last seven
+  batches.** **A rule nobody has quoted may still be load-bearing** — the number says whether the
+  file is dense or bloated, not what to cut. **The four options and the arithmetic are in
+  `docs/reports/EC.md`; the choice is the designer's and nothing here presumes it.**
 
 ## The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM, CN AND CS)
 `docs/master.html` §4.2 documents all four cases: the normal check, the gated check, the
@@ -854,6 +862,67 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   so 28 independent assertions were being satisfied by a sibling's hit rather than their own —
   a check passing for a reason other than the one it states, inside the instrument built to find
   exactly that. **The count to assert is the GROUP count, not the literal count.**
+- **AND EC §1 RE-MEASURED IT A SECOND TIME. THE OR-GROUP SPLITTER HAD NEVER FIRED ONCE.** EB's
+  build modelled `or` by splitting a statement at a TOP-LEVEL `or` — and **every assertion in this
+  tree is wrapped in `ok(...)`, so the operator sits one bracket in and the depth-0 scan found none
+  in any of the 82 files.** Every statement collapsed to a single group, and that group was
+  satisfied when ANY member was present. **So a CONJUNCTION was being evaluated as a DISJUNCTION**:
+  `contains(A) and contains(B)` passed on A alone. The splitter was not mis-tuned, it was
+  unreachable, and a literal census reads the same 125 members either way.
+
+## A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT (STANDING, SET AT EC §1)
+> **A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT.** `and` means EVERY member must
+> hold; `or` means ONE suffices. **Find the operator at the depth of the boolean EXPRESSION, not at
+> the depth of the statement.**
+
+- **THE TWO FAILURES ARE OPPOSITE AND BOTH ARE FATAL.** Satisfying a group when any member holds
+  passes a conjunction on a sibling's hit — a check passing for a reason other than the one it
+  states, silently. Demanding every member reds a genuine alternation — and **a false alarm is how
+  an instrument gets switched off**, which is why the header sweep was left un-gated at 118 rows
+  for 16 defects.
+- **MEASURED, ON THIS TREE: 103 asserting statements, 125 members, 10 CONJUNCTIONS and 9
+  ALTERNATIONS.** Six of the nine alternations have a member that is legitimately absent, so a
+  repair that treated every group as a conjunction would raise **six false alarms on the first
+  run**. All ten conjunctions hold in full, so the hole cost nothing HERE — **it was a live
+  blindness with no live defect under it, and that is a thing worth writing down rather than
+  discovering again.**
+- **ASSERT THAT THE MODEL FITS, DO NOT ASSUME IT.** `check_ec` §1 reds on a statement that mixes
+  `and` and `or` at the boolean depth, because a two-shaped evaluator cannot judge one and
+  guessing is how the first hole was dug.
+- **AND THE SAME BOUNDARY GOVERNS POLARITY.** `not` may sit behind a RECEIVER, not just behind
+  whitespace — `not FileAccess.get_file_as_string(…).contains("const CLASS_POOLS")` — and a fixed
+  look-behind for `not\s*$` reads that as POSITIVE and reports a deliberately-absent literal as a
+  needle that no longer resolves.
+- **UNESCAPE IN ONE LEFT-TO-RIGHT PASS, NEVER AS A CHAIN OF `replace` CALLS.** A chain that runs
+  `\n` before `\\` turns an ESCAPED BACKSLASH followed by `n` into a real newline, so a suite
+  pinning the two raw characters a source file holds matches nothing. Six pins into `classes.gd`
+  read as unresolved for that reason alone.
+
+## AN INSTRUMENT'S TERRITORY IS A CLAIM (STANDING, SET AT EC §2)
+> **AN INSTRUMENT'S TERRITORY IS A CLAIM, and a check living outside it is not protected by it.**
+> Before trusting a green sweep, say what its haystack IS — and what it therefore is not.
+
+- **THE POPULATION NOBODY HAD MEASURED: 915 assertions pin a literal into a `.gd` SOURCE file,
+  across 52 suites and 17 source files** — 917 before this batch repaired one of them. The four
+  tracked documents carry **196**. **Source pins outnumber document pins 4.7 to 1**, and every
+  document instrument this project owns watches only the four documents.
+- **THE EXPOSED SUB-POPULATION IS 37**: positive pins whose literal resolves ONLY inside a COMMENT
+  of the target file — 22 into `classes.gd`, 12 into `battle.gd`, 2 into `run_sim.gd`, 1 into
+  `run_state.gd`. **A batch rewording any of those 37 comments reds a suite with every document
+  instrument green**, which is exactly what happened at EB. The rest are anchored to code
+  (499), are negative and correctly absent (249 + 13 whose haystack is a slice), or are composed at
+  runtime (116).
+- **COVERAGE WAS REPORTED AND RULED ON NOWHERE, DELIBERATELY.** Extending the document instruments
+  to source costs the noise the paragraph above warns about; naming the pinned literals in a
+  manifest costs a file that has to be kept true; **a rule that says "do not pin source" costs
+  nothing to run and invalidates all 915 existing pins**, spread across 52 suites and 17 source
+  files. The options are in `docs/reports/EC.md` and the decision is the designer's.
+- **AND THE CENSUS FOUND A LIVE ONE.** `test_batch_bg` §2 sliced `battle.gd` from
+  `find("# The fifth stack:")`, which BH had already deleted. `find` returned **-1**, Godot's
+  `substr` on a negative offset returns **""**, and `not "".contains(anything)` is true — so **two
+  checks passed while reading nothing at all**, and the comment above them already said the
+  question was "asked of the whole branch". **A slice built from a `find()` is only as real as the
+  anchor: assert the anchor resolved.**
 
 ## A COMMENT NAMING CODE IS A CLAIM, AND IT GOES STALE SILENTLY (STANDING, SET AT EB §2)
 > **A comment naming a function, constant, ability or field is a claim that can go stale silently.
