@@ -1433,6 +1433,20 @@ func owned_ability_names(member: Dictionary) -> Array:
 func award_ability_pick(member: Dictionary) -> bool:
 	var offer := roll_spec_ability_offer(member)
 	if offer.is_empty():
+		# **BATCH EA §1 — A ZONE-BOSS AWARD ALWAYS PAYS.** The line above is
+		# the boss pool and it is UNCHANGED; this is what happens when that
+		# pool comes back empty. It used to `return false`, and
+		# `battle._award_ability_picks` then skipped the hero without a word,
+		# so a boss died and the victory card said nothing about them —
+		# **the baseline was not a weak reward, it was silence.** DZ §1
+		# measured the cost: EIGHT of the twelve specs can empty their boss
+		# pool and **14 of the game's 36 zone-boss awards could pay nothing**,
+		# because both channels write the same `bm_abilities` list, so a
+		# drafted card removes itself from the boss offer. The Devout is the
+		# sharp case, not Holy: his boss pool is 2 and BOTH entries are
+		# draftable, so all three of his awards could pay nothing.
+		offer = roll_spec_fallback_offer(member)
+	if offer.is_empty():
 		return false
 	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
@@ -2807,6 +2821,42 @@ func roll_spec_ability_offer(member: Dictionary) -> Array:
 		return []
 	var owned: Array = owned_ability_names(member)
 	var left: Array = Classes.spec_pool(spec).filter(
+		func(n): return not owned.has(n))
+	left.shuffle()
+	return left.slice(0, 3)
+
+
+# **BATCH EA §1 — THE FALLBACK, AND IT IS A SPEC-DRAFT CARD THE HERO DOES NOT
+# HOLD.** Read ONLY when `roll_spec_ability_offer` comes back empty; the boss
+# pool above is untouched and is still the first thing a zone boss reaches for.
+#
+# WHY THIS POOL AND NOT ANOTHER, RECORDED HERE SO IT IS NOT RE-LITIGATED: it is
+# the only candidate that keeps a zone-boss award feeling like a zone-boss
+# award. A rune returns `[]` in a runes-off run (`roll_rune_candidates` does),
+# which reintroduces the same hole somewhere else, and gold does not move the
+# depth table at all — all fourteen awards stay lost as ABILITY awards. And it
+# is spec-locked, so AN §4's ruling holds: nothing arrives here that a sibling
+# spec alone can reach.
+#
+# THE POOL CANNOT ITSELF EMPTY, AND THAT IS ARITHMETIC RATHER THAN A HOPE. A
+# hero holds at most `ABILITY_SLOT_CAP - Classes.core_slots(spec)` earned
+# abilities — FOUR, or three for Holy — against spec draft pools of 10 to 13.
+# **The floor is SIX cards**, which is twice the three an offer wants.
+#
+# AND IT DELIBERATELY DOES NOT CONSULT `draft_refused`, which is the one
+# judgement call in this function. Three reasons, the last decisive:
+# `roll_spec_ability_offer` has never consulted it either, so filtering here
+# would make the fallback stricter than the channel it belongs to; refusal is
+# the DRAFT channel's own memory, built so the next DRAFT offer does not
+# re-present what was just turned down, and a zone boss is a different and
+# rarer event; and a run that declines enough offers could drain the floor
+# back below three, which is the exact defect this function exists to close.
+func roll_spec_fallback_offer(member: Dictionary) -> Array:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return []
+	var owned: Array = owned_ability_names(member)
+	var left: Array = Classes.spec_draft_pool(spec).filter(
 		func(n): return not owned.has(n))
 	left.shuffle()
 	return left.slice(0, 3)

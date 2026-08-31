@@ -14,6 +14,88 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-30 &mdash; Batch EA: A ZONE-BOSS AWARD ALWAYS PAYS</h2>
+<p><i>Three sections. <b>The fallback DZ priced is BUILT and it is a spec-draft card the hero does
+not hold; six assertions pinning a batch code inside <code>CLAUDE.md</code> are re-pointed at the
+rules they were reaching for; and every protected core is measured against the draft cards that do
+comparable work.</b> <b>NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED AND
+<code>Ability.PURE_BUFFS</code> WAS NOT WIDENED.</b> Full report:
+<code>docs/reports/EA.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE FALLBACK IS BUILT, AND 14 OF THE GAME'S 36 ZONE-BOSS AWARDS GO TO
+0.</b> <code>Run.award_ability_pick</code> used to <code>return false</code> when a hero's spec
+boss pool came back empty, and <code>battle._award_ability_picks</code> then skipped that hero
+without a word &mdash; <b>the baseline was not a weak reward, it was silence</b>: the boss died and
+the victory card did not name them. It now falls back to <b>a card from that hero's own SPEC DRAFT
+pool that they do not already hold</b>, three offered, <b>announced exactly like any other
+award</b>. The boss-pool draw above it is <b>untouched</b>, so AN &sect;4's spec-lock ruling stands
+and the fallback is spec-locked too.</p>
+<p><b>THE DEPTH TABLE AFTER THE FIX, DERIVED LIVE:</b> <b>no spec can be paid nothing</b>, and the
+worst-case fallback pool is <b>SIX cards</b> by slot arithmetic alone &mdash; a hero earns at most
+<code>ABILITY_SLOT_CAP &minus; core_slots</code> = 4 (3 for the Holy Cleric) against spec draft
+pools of 10 to 13. <b>The eight emptiable BOSS pools did not move and are not supposed to</b>:
+what changed is what an emptied pool costs.</p>
+<p><b>AND THE FLOOR IS FIVE, NOT SIX, FOR ONE SPEC &mdash; MEASURED RATHER THAN ASSUMED.</b>
+<code>owned_ability_names</code> cannot see an ability a RUNE grants, because the grant lands on the
+battle <code>cfg</code> and never on the member dict. <b>Four runes grant an ability and two of the
+four name a card in the same hero's draft pool</b> &mdash; the Rune of Binding Souls (Sacred
+Resolve, the Devout) and the Rune of the Flayed Mind (Mind Flay, the Occultist) &mdash; which takes
+the Occultist's fallback floor to <b>FIVE</b>. <b>Both names are also in their own spec's BOSS
+pool, so the fallback exposes nothing the existing channel did not</b>, and five still fills a
+three-card offer twice over. Pre-existing, shared by <code>roll_spec_ability_offer</code> and
+<code>draft_pool_left</code> alike, and reported rather than fixed.</p>
+<p><b>THE FALLBACK DELIBERATELY DOES NOT CONSULT <code>draft_refused</code>.</b> The boss channel
+never has either, refusal is the DRAFT channel's own memory, and a run that declined enough offers
+could drain the floor back below three &mdash; which is the defect the fallback exists to close.
+The reason is at the site.</p>
+
+<p><b>&sect;2 &mdash; SIX ASSERTIONS PINNED A BATCH CODE INSIDE <code>CLAUDE.md</code>, NOT
+THREE.</b> DZ found three by reading and predicted a fourth it would not find. <b>The fourth is
+<code>BATCH CG</code>, one line below the third</b>, in <code>test_batch_ce</code> &mdash; and a
+mechanical sweep found <b>two more of a different shape</b>: rule pins whose LITERAL still carried
+a code (<code>"BATCH BN &sect;2 &mdash; WAS x0.70"</code> and <code>"REWRITTEN AT BATCH BS, NOT
+AMENDED"</code>). <b>All six are re-pointed at the rule each was reaching for</b> &mdash; the
+difficulty ladder's standing heading and its rung-1 number, the uncapped-meter governor table and
+its ceiling-not-a-cost sentence, the re-point-in-place discipline, and the content-batch
+convention. <b>None was deleted: every one of the six had a live rule behind it.</b></p>
+<p><b>AND EVERY ONE OF THE SIX WAS PASSING OFF A DIFFERENT SENTENCE THAN ITS MESSAGE CLAIMED.</b>
+There is no <code>BATCH BS</code> block and no <code>BATCH CE</code> block; the strings were
+satisfied by standing rules that name the batch in passing. <b>A check that passes for a reason
+other than the one it states has stopped asking its question</b> &mdash; and it reads green while
+it does it. The rule is in <code>CLAUDE.md</code>.</p>
+
+<p><b>&sect;3 &mdash; THE PROTECTED CORES ARE SYSTEMATICALLY CHEAPER THAN COMPARABLE DRAFT CARDS.
+MEASURED. RULED ON NOWHERE.</b> DZ found Blessing of Zeal &mdash; a protected core &mdash; sitting
+ON its family's line on initiative and UNDER it on both cost and cooldown. <b>It is not one
+card.</b> Controlled three ways &mdash; same spec (so the resource is one currency), same role
+(derived from the ability's own fields), same initiative, and <code>PURE_BUFFS</code> members
+excluded from both sides because a clamped initiative is not a price anyone chose &mdash; there are
+<b>17 comparable pairs</b>, and in <b>13 of the 17 the core is cheaper on an axis and dearer on
+neither</b>. Resource: core cheaper <b>10</b>, dearer <b>2</b>. Cooldown: core shorter <b>13</b>,
+longer <b>1</b>. <b>Both counter-cases are the same draft card</b> &mdash; Divine Plea against
+Holy's Heal and Renewal &mdash; and it costs <b>0 Mana</b>.</p>
+<p><b>AND THE CAP BINDS THE TWO LAYERS AT DIFFERENT RATES, WHICH EXTENDS DZ's STRUCTURAL FINDING
+RATHER THAN REPEATING IT.</b> <code>Ability.BUFF_DELAY_CAP</code> is the only instrument in the
+project that prices an initiative and it binds by table membership: it reaches <b>29.5% of the
+draft layer against 12.8% of the cores</b>. <b>The counter-argument is recorded with the number so
+it travels with it</b>: a protected core arrives free with the spec and a draft card costs a pick,
+so a core being cheaper to CAST is not by itself a defect. <b>This is a balance finding across
+twelve specs and it needs the designer.</b> Nothing was retuned and
+<code>Ability.PURE_BUFFS</code> was not widened.</p>
+
+<p><b>&sect;4 &mdash; VERIFICATION.</b> A new gate, <b><code>check_ea</code></b>, and its
+&sect;2 <b>drives a real zone boss in two arms and reads the announcement off the end card's own
+Label</b>: arm A empties the boss pools only and requires the card to NAME every hero; arm B empties
+both pools and requires the announcement ABSENT <i>while the end card is still present</i>, which
+is what proves arm B's absence is the award's and not a probe that stopped working. <b>The needle
+verifier's extractor is fixed</b> &mdash; DZ's took only the first literal of an <code>and</code>
+compound &mdash; and the fix found a second, larger hole in EA's own instrument: <b>it read 32
+asserted literals where there are 95</b>, because it counted brackets inside string literals and
+glued every statement after a <code>"("</code> into one. <b>A sweep now asserts its own
+population</b>, and that rule is in <code>CLAUDE.md</code> because EA's own rune control failed the
+same way: it read <code>runes.json</code> as an Array, the walk never ran, and it printed
+<i>"0 granting runes"</i> where the answer is four.</p>
+
 <h2>2026-08-30 &mdash; Batch DZ: THE FALLBACK, THE PRICING, AND THE PRUNE</h2>
 <p><i>Three sections. <b>The zone-boss fallback is priced as four options and nothing is authored;
 Divine Wrath, Blessing of Zeal and Arcane Surge are measured against each other and ruled on

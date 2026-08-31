@@ -313,8 +313,8 @@
   "test_batch_ah": {
    "kind": "suite",
    "checks": [
-    5575,
-    5575
+    5584,
+    5584
    ],
    "checks_obs": 1,
    "fails": [
@@ -322,7 +322,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [5626, 5626] -> 5575. -51. AH BUILT BOTH POOLS AND IS THE OLDEST READER OF THE ONE DY DELETED. Its class-pool walk moved from `CLASS_POOLS` (61 names, 4 assertions each) to `CLASS_DRAFT_POOLS` (25), and §6a's verbatim class-pool table check became a single ABSENCE pin. Against that, Holy's boss pool 1 -> 3 triples her offer loop (40 trials). The two directions cancel to -51. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH EA, WRITTEN BEFORE THE BATTERY.** [5575, 5575] -> 5584. +9. EA §1 ruled that a zone-boss award whose SPEC BOSS POOL is exhausted pays a card from that hero's SPEC DRAFT pool instead of paying nothing, so `Run.award_ability_pick` returns TRUE where it used to return false. **AH's cross-fill block asserted the OLD behaviour outright** — \"award_ability_pick refuses when there is nothing to offer\" and \"...and owes no pick\" — and both went red on the first standalone run, exactly as predicted. **INVERTED IN PLACE RATHER THAN DELETED**, on the standing rule EA §2 re-pointed three suites onto: the two assertions become the award PAYING and OWING ONE, the fallback triple is walked (3 cards × 2 assertions: it comes from the spec draft pool, and it is not something the hero already holds) with its size pinned, and **the refusal arm is kept on the one condition that still reaches it** — a member with no spec, where both rolls return `[]`. Without that arm the new assertion could pass on an award that can never refuse anything. -2 +11 = +9. `roll_spec_ability_offer` is UNTOUCHED and its exhausted-pool assertion above is unchanged, which is why nothing else in this suite moved."
   },
   "test_batch_ah_battle": {
    "kind": "suite",
@@ -1044,6 +1044,20 @@
    ],
    "fails_obs": 3,
    "note": "NEW AT DW. THE GATE FOR A FINGERPRINT THAT HAD THREE HOLES, NOT THE TWO ITS BRIEF NAMED. `check_da` §3 has asserted since DA that no gate hand-rolls the ability corpus; DV §5 found `test_batch_cp` doing exactly that while §3 read 37/0, and diagnosed two holes — it swept `check_*.gd` ONLY, and its fingerprint was the two draft-pool ACCESSORS where that walk read the pool CONSTANTS. **BOTH HELD, AND A THIRD WAS LARGER THAN EITHER**: the fingerprint assumed a corpus walk touches the DRAFT pools at all, and `check_cl_resolver._every_ability()` — a walk in a GATE, inside the swept population, read on every battery run since DA — reads only `Classes.kit()` and `Classes.spec_abilities()` and reaches **43 of 227**. No population axis could have caught it. **THREE WALKS, NOT ONE: 43, 91 (`test_batch_bh`) and 207 (`test_batch_cp`).** §0 asserts each is a delegation AND that it carries no source-family mark of its own, because 'it calls `ability_corpus()` now' and 'it no longer walks the pools itself' are two claims and a partial repair satisfies one; it also pins the widened sweep's exemption table at ONE, since an exemption granted to a genuine violation is worse than the violation. §1 and §2 RE-DERIVE the two populations `test_batch_cp` pins and assert the suite's named table equals the live set — the pairing is the point: the suite names a population so a ninth has to be a decision, and this stops the named population quietly ceasing to be the real one, which is what happened between CN and DW. Both are EIGHT; the digit table was `[\"Shatter\"]` and the Perfectless table was six. **ARCANE EXPLOSION IS IN BOTH AND IS A LIVE BASIC ATTACK** — it entered the corpus at DU §4 and broke both rules on arrival with nothing red. §3 is the divergence guard: `\"Cleric recovers {mhp:5}\"` was authored TWICE, on Shadowrend and on SMITE, and asserting the two agree is what stops the next batch repairing one of them. §4 measures all four DU overrides against the ceiling rather than the one that failed. **THREE READINGS SUPPORT THE 35** — three identical standalone runs taken before the battery, so `check_de` can certify on its first pass."
+  },
+  "check_ea": {
+   "kind": "gate",
+   "checks": [
+    60,
+    60
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "**NEW AT EA. THE GATE FOR A RULING, AND THE RULING IS THAT A ZONE-BOSS AWARD ALWAYS PAYS.** §0 pins the premises the rest reasons from — the award still OPENS on the spec boss pool (AN §4's standing ruling), the fallback is a SECOND draw and is spec-locked, the victory card's announcement line is where §2 expects it, and the award count and slot cap §1's arithmetic rests on are 3 and 7. §1 derives every spec's fallback floor live and asserts none is under the three an offer wants; **the rune drain is derived off `runes.json` rather than assumed**, because `owned_ability_names` cannot see an ability a rune grants (the grant lands on the battle `cfg`, never on the member dict) and that is the only term that can push the floor below the slot arithmetic — it costs the Occultist one, taking the game's thinnest fallback pool to FIVE against a floor of six everywhere else. **§1 ALSO ASSERTS THE BOSS POOLS CAN STILL EMPTY (8 specs)**: if that ever reads 0 the fallback is dead code, which is worth being told rather than discovering. §2 DRIVES A REAL ZONE BOSS IN TWO ARMS and reads the announcement off the end card's own Label, because the defect EA closed was SILENCE and a source-level `contains` would pass on a line no path reaches — arm A empties the boss pools only and requires the card to NAME every hero by `_hero_label`, arm B empties both pools and requires the announcement ABSENT while the end card is still present, which is what proves arm B's absence is the award's and not a probe that stopped working. §3 is EA §2's repair made permanent: it sweeps every identifier ASSIGNED from `res://CLAUDE.md` and then every call on that identifier anywhere in the file, so it sees a needle three hundred lines below the read — DZ §3's own lesson as an instrument. **Its own numbers are asserted (>=20 readers, >=40 literals) because a regex matching nothing reports 'no violations' just as loudly.** §4 is a MEASUREMENT and rules on nothing: it pins the DIRECTION of the core-versus-draft pricing rather than a count, so a pool growing does not red it. **THREE IDENTICAL STANDALONE READINGS OF 60 BEFORE THE BATTERY**, so `check_de` certifies on its first pass. This gate deliberately reads only the SPEC side of the draft pools and every section returns void, so it trips neither of `check_da` §3's two fingerprints and needs no exemption — confirmed live, `check_da` reads 39 / 0 with it in the tree."
   }
  }
 }

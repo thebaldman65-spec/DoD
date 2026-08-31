@@ -5866,3 +5866,57 @@ The file stated six of its own rules twice, in two sections that had drifted int
 each other — in the file whose oldest recorded defect is a second copy of a number. And it carried
 eight live counts that had gone stale against its own rule that live counts belong in `state.md`.
 **Both were removed rather than corrected**, because correcting a second copy is how you get a third.
+
+## Batch EA — why the fallback pays a card, why six pins tested the wrong thing, and why §3 is a measurement
+
+**DZ priced four fallbacks and authored none; EA takes the one it recommended, and the reason it is
+the right one is not that it is the strongest reward — it is that it is the only one that cannot
+reintroduce the hole.** A rune is cheaper to build and costs no ability slot, but
+`roll_rune_candidates` returns `[]` in a runes-off run, so the option that avoids the problem in the
+common case brings it back in a configuration the project already supports. Gold is worse in a
+quieter way: it does not move the depth table at all, because all fourteen awards are still lost
+*as ability awards* — the reward changes and the defect does not. **A spec-draft card is the only
+candidate whose pool can be shown, by arithmetic rather than by hope, never to empty.**
+
+**The thing that made this a one-line change rather than a feature is that both channels already
+write the same list.** `bm_abilities` is what a drafted card and a boss pick both land in, which is
+precisely the mechanism that empties these pools — and it is also why the fallback needed no new
+storage, no new screen and no new save field. The award site already banks a triple; the map's
+owed-pick overlay already resolves one; `_pick_ability` is pool-agnostic and takes a name. **The
+whole ruling cost a second roll and a comment explaining which pool it reads.**
+
+**The half worth stating plainly is that the defect was never the reward, it was the silence.**
+`award_ability_pick` returning false was correct behaviour for the question it was asked. What was
+wrong was one layer up: `_award_ability_picks` skipped that hero and the victory card said nothing,
+so a boss died and a player who had drafted well was told less than a player who had not. That is
+why EA's control drives a real zone boss and reads the announcement off the end card rather than
+asserting that `battle.gd` contains a line — **an announcement is a claim about what a player sees,
+and only a run can make it.** The second arm exists for the same reason: a control that only fires
+in the passing direction cannot tell an announcement apart from a constant.
+
+**§2 looks like tidying and is not.** Six checks read `CLAUDE.md.contains("BATCH XX")` and all six
+passed, which is the only reason they had survived CW's split, DZ's prune and every battery in
+between. They passed off *standing rules that name the batch in passing* — the difficulty ladder's
+attribution line, the governor table's rewrite marker, the content-batch convention. **A check whose
+message describes a structure that no longer exists, and which passes off a sentence about something
+else, is a check that has stopped asking its question while continuing to report an answer.** That
+is worse than a red, because a red gets investigated.
+
+**And the fourth pin is the argument for sweeping mechanically even when the reading feels
+complete.** DZ read the tree carefully, found three, and wrote down that a fourth existed and would
+not be found by reading. It sat one line below the third, in the same suite, in the same block. What
+found it was matching *the variable holding the document* rather than the filename or the literal —
+and scoping that per function, because one suite binds the name `master` three times and two of
+those are stripped copies. **A file-scoped version of the same sweep reports a violation that is not
+there, which is how an instrument gets switched off.**
+
+**§3 is deliberately a measurement, and the discipline that makes it one is the counter-argument
+being recorded beside the number.** Thirteen of seventeen comparable pairs favour the protected
+core, on two axes, with the delay cap controlled out — that is a real and consistent signal, and it
+generalises DZ's single-card finding to the whole layer. **But a protected core arrives free with
+the spec and a draft card costs a pick**, so "cheaper to cast" is exactly what you would author on
+purpose if you thought of the core as the baseline the spec is built around. Nothing in the code
+distinguishes those two readings, and choosing between them is a balance decision across twelve
+specs. **A gate that asserted the numbers would be encoding a ruling nobody made**, so what EA's
+gate pins is the *direction* — enough that the day somebody re-prices a core, the report is
+announced stale instead of quietly describing a game that moved.

@@ -242,17 +242,45 @@ func _test_offers(RunState) -> void:
 			ok(int(m3.get("bm_picks_owed", 0)) == 1, "%s owes one pick" % spec)
 			ok((m3.get("bm_candidates", []) as Array).size() == 1,
 				"%s banked the triple it was shown" % spec)
-	# CROSS-FILL IS GONE WITH THE CLASS DRAW (Batch AN §4). A hero holding
-	# its whole spec pool is offered NOTHING, and award_ability_pick reports
-	# false rather than banking an empty triple the card would then render as
-	# a heading with no buttons under it.
+	# CROSS-FILL IS GONE WITH THE CLASS DRAW (Batch AN §4). A hero holding its
+	# whole spec pool is offered NOTHING by the BOSS pool — that half is
+	# unchanged and is still asserted first.
+	#
+	# **INVERTED IN PLACE BY BATCH EA §1, AND THE INVERSION IS THE WHOLE POINT
+	# OF THAT SECTION.** The next two lines used to read "award_ability_pick
+	# refuses when there is nothing to offer" and "...and owes no pick", which
+	# was true and was the DEFECT: `battle._award_ability_picks` then skipped
+	# that hero without a word, so a zone boss died and the victory card did
+	# not name them. DZ §1 measured the cost — eight of the twelve specs can
+	# empty their boss pool and **14 of the game's 36 zone-boss awards could
+	# pay nothing.** The award falls back to the hero's own spec DRAFT pool
+	# now, so it PAYS and the hero is named. **The refusal arm is kept rather
+	# than deleted** — it moved to the one condition that still reaches it.
 	var mm := {"key": "warrior", "spec": "berserker", "tree": [], "talents": {},
 		"bm_abilities": Classes.spec_pool("berserker").duplicate()}
 	var cross: Array = run.roll_spec_ability_offer(mm)
 	ok(cross.is_empty(), "an exhausted spec pool offers nothing (got %s)" % [cross])
-	ok(not run.award_ability_pick(mm),
-		"award_ability_pick refuses when there is nothing to offer")
-	ok(int(mm.get("bm_picks_owed", 0)) == 0, "...and owes no pick")
+	var fb: Array = run.roll_spec_fallback_offer(mm)
+	ok(fb.size() == 3,
+		"...and the fallback still fills a full triple (got %d: %s)" % [fb.size(), fb])
+	for n in fb:
+		ok(Classes.spec_draft_pool("berserker").has(n),
+			"the fallback draws from the SPEC DRAFT pool (got %s)" % n)
+		ok(not mm["bm_abilities"].has(n),
+			"...and never offers %s, which the hero already holds" % n)
+	ok(run.award_ability_pick(mm),
+		"award_ability_pick PAYS when the boss pool is exhausted")
+	ok(int(mm.get("bm_picks_owed", 0)) == 1,
+		"...and owes exactly one pick, which is what puts the hero on the victory card")
+	# THE REFUSAL ARM, ON THE ONE CONDITION THAT STILL REACHES IT. Both rolls
+	# return `[]` with no spec set, so this is the arm that proves the award
+	# still HAS a false path — without it the assertion above could pass on an
+	# award that can never refuse anything.
+	var nospec := {"key": "warrior", "spec": "", "tree": [], "talents": {},
+		"bm_abilities": []}
+	ok(not run.award_ability_pick(nospec),
+		"award_ability_pick still refuses when the member has no spec")
+	ok(int(nospec.get("bm_picks_owed", 0)) == 0, "...and owes no pick")
 	run.free()
 
 

@@ -412,15 +412,30 @@ func _docs() -> void:
 	var notes := FileAccess.get_file_as_string("res://docs/design-notes.md")
 	ok(notes.contains("Batch BS"), "§5: design-notes has a Batch BS entry")
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
-	ok(claude.contains("BATCH BS"), "§5: CLAUDE.md has a Batch BS block")
+	# **RE-POINTED AT BATCH EA §2, AND THIS ONE WAS ALREADY ON RECORD AS
+	# PASSING BY ACCIDENT.** It read `claude.contains("BATCH BS")` with the
+	# message "CLAUDE.md has a Batch BS block". There is no such block; the
+	# string was satisfied by the GOVERNOR TABLE's own row, which is a
+	# different claim and is the one asserted below. **A check that passes for
+	# a reason other than the one it states has stopped asking its question.**
+	# What BS put in `CLAUDE.md` is a row in a standing table, so the table is
+	# what this asserts — nothing else in the tree pins that heading.
+	ok(claude.contains("## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE"),
+		"§5: CLAUDE.md still carries the uncapped-meter governor table BS's row lives in")
 	# THE GOVERNOR TABLE'S OVERBURN ROW WAS REWRITTEN, NOT AMENDED — its central
 	# claim (a capped reward against an uncapped cost) is false now. It is NOT
 	# checked by grepping for the old sentence: the rewrite QUOTES that sentence
 	# on purpose, so a later reader can see what changed and why. What is
 	# asserted instead is that the row no longer names a DELETED FUNCTION AS A
 	# LIVE GOVERNOR SITE, which is the thing that would actually mislead.
-	ok(claude.contains("REWRITTEN AT BATCH BS, NOT AMENDED"),
-		"§5: CLAUDE.md's governor row says it was rewritten and why")
+	# **RE-POINTED AT BATCH EA §2, ONE SHAPE IN FROM A BARE CODE.** The needle
+	# was `"REWRITTEN AT BATCH BS, NOT AMENDED"` — a real claim, but its literal
+	# carried a batch code, so an edit to the attribution would red it for a
+	# reason unrelated to the governor. **The claim is that this row is a
+	# CEILING and not a COST**, which is exactly what BS §2 changed, so that is
+	# the sentence it reads now.
+	ok(claude.contains("TABLE THAT IS A CEILING RATHER THAN A COST"),
+		"§5: CLAUDE.md's governor row still states Overburn is a ceiling, not a cost")
 	ok(not claude.contains("`_overburn_drain` (uncapped cost)"),
 		"§5: ...and no longer points at _overburn_drain as a live governor")
 	var gloss := FileAccess.get_file_as_string("res://data/glossary.json")

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-30 (Batch DZ)</b></p>
+<p align="right"><b>Last updated: 2026-08-30 (Batch EA)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -82,8 +82,9 @@ boss</b>, the final boss included (§7). Regular fights award none. <b>Since Bat
 per-run total is a function of the route</b>, not a constant: the mini-boss and boss floor is
 6 a run, and every elite the route reaches adds one. The <b>mini-boss</b>
 hands every hero a <b>generic ability upgrade, three offered</b>; <b>zone bosses 1 and 2</b>
-hand every hero an <b>ability pick, three offered, drawn from that hero's spec pool only</b>
-(§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
+hand every hero an <b>ability pick, three offered, drawn from that hero's spec pool only</b>,
+which falls back to that hero's spec draft pool rather than paying nothing when the boss pool
+is spent (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
@@ -1160,6 +1161,20 @@ seven into live draft and boss pools first and removed the container behind them
 costing a spec-exclusive resource (Mercy, Faith), reading a passive the taker will not have (Burn,
 Resonance, Loyalty, a living companion, the Swordmaster's stance), or carrying a spec's signature
 identity (the three summons, Kill Command, Hex of Ruin) stays spec-only.</p>
+<p><b>A ZONE-BOSS AWARD ALWAYS PAYS, AND UNTIL BATCH EA IT COULD PAY NOTHING AT
+ALL.</b> A boss offer is the hero's spec pool minus what they already hold, and
+<b>both channels write the same earned list</b> — so a card taken in the draft
+removes itself from the boss offer. Eight of the twelve specs can be emptied
+that way, and <b>the Devout is the sharp case</b>: his boss pool is two cards
+and both are also draftable, so all three of his awards could come up empty.
+<b>What happened then was not a small reward, it was silence</b> — the hero was
+skipped and the victory card did not name them. The award now falls back to a
+card from <b>that hero's own spec DRAFT pool that they do not already hold</b>,
+offered three at a time and announced exactly like any other award. It stays
+spec-locked, so nothing arrives that a sibling spec alone could reach, and
+<b>the fallback pool cannot itself run out</b>: a hero can earn at most four
+abilities (three for the Holy Cleric) against draft pools of ten to thirteen,
+which floors the fallback at six cards — twice what an offer asks for.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
 yourself in embers and the next blow that would kill you this battle returns you at 40% of
 maximum health instead. Once per battle. It is the Mage class's only refusal of
@@ -2326,11 +2341,14 @@ boss — it awards a relic and opens the tree's row tiers. Every historical per-
 <b>superseded</b>, including 10.9 / 10.8 / 6.0 points per hero per run.</li>
 <li><b>Combat rewards, by node type:</b> a <b>fight</b> pays gold. An <b>elite</b> pays big
 gold, a rune cache and a consumable. A <b>mini-boss</b> pays big gold and an ability-upgrade
-pick. A <b>ZONE BOSS</b> pays gold, a relic unlock, an ability pick from the spec pool, and
-banks <b>one meta talent point per spec</b>. The <b>END BOSS</b> pays gold and a relic,
+pick. A <b>ZONE BOSS</b> pays gold, a relic unlock, an ability pick from the spec pool
+(falling back to that hero's spec draft pool when the boss pool is spent, so the pick always
+lands), and banks <b>one meta talent point per spec</b>. The <b>END BOSS</b> pays gold and a relic,
 always — no ability pick (nothing follows it) and no points.</li>
 <li><b>Abilities:</b> <b>two picks per run</b>, from zone 1's and zone 2's bosses, three
-offered each time and drawn from that hero's <b>spec pool only</b>. The end boss awards none.
+offered each time and drawn from that hero's <b>spec pool only</b> — or from that hero's
+<b>spec draft pool</b> when the boss pool has been emptied, so no award is ever silent
+(§6a). The end boss awards none.
 Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
 run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40,

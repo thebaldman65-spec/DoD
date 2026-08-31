@@ -872,6 +872,14 @@ static func _award_trophies(run: Node) -> void:
 	for m in run.party:
 		var offer: Array = run.roll_spec_ability_offer(m)
 		if offer.is_empty():
+			# BATCH EA §1: the real flow pays a spec-DRAFT card here rather
+			# than skipping the hero, so the bot rolls the same fallback. A
+			# sim that kept skipping would under-measure exactly the
+			# population EA changed — the eight specs that can empty a boss
+			# pool. The sequence is duplicated; the pool and its filter are
+			# authored once, in `Run.roll_spec_fallback_offer`.
+			offer = run.roll_spec_fallback_offer(m)
+		if offer.is_empty():
 			continue
 		var pick := ""
 		for trophy_name in wanted:

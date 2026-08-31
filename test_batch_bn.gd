@@ -494,14 +494,31 @@ func _docs() -> void:
 	ok(doc.contains("&times;1.00") or doc.contains("×1.00"),
 		"...and rung 2 still reads x1.00 in the same table")
 	var claude := _src("res://CLAUDE.md")
-	ok(claude.contains("BATCH BN"), "CLAUDE.md carries a Batch BN block")
+	# **RE-POINTED AT BATCH EA §2, FROM A BATCH CODE TO THE RULE.** It read
+	# `claude.contains("BATCH BN")` with the message "CLAUDE.md carries a Batch
+	# BN block". THERE IS NO BATCH BN BLOCK — CW's split ended batch narratives
+	# in that file and DZ's prune removed the last of them, so this passed off
+	# the DIFFICULTY LADDER's attribution line two assertions below and its
+	# message described a structure that no longer exists. **A pin on a batch
+	# code tests WHEN something was written; a pin on a rule tests that the
+	# rule is still there.** What BN §2 actually put in `CLAUDE.md` is a
+	# STANDING REFERENCE, and that heading is what is asserted now.
+	ok(claude.contains("## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS"),
+		"CLAUDE.md still carries the difficulty ladder as a STANDING REFERENCE")
 	# RE-POINTED AT BATCH DF. CLAUDE.md STILL SAYS THIS — in other words. CW §1
 	# dropped the narrative that carried the phrase, but the difficulty ladder
 	# survived as a STANDING REFERENCE and says the same thing twice over: rung 1
 	# is attributed to BN §2 and named as the ONLY number on the ladder chosen by
 	# measurement, and rung 2 is "the present balance BYTE FOR BYTE". Anchor on
 	# the surviving wording rather than on a phrase that no longer exists.
-	ok(claude.contains("BATCH BN §2 — WAS x0.70")
+	# **AND THE FIRST NEEDLE WAS RE-POINTED AT EA §2 FOR THE SAME REASON, ONE
+	# SHAPE IN.** It read `"BATCH BN §2 — WAS x0.70"` — a rule pin whose LITERAL
+	# still carried a batch code, so the day that attribution is edited out this
+	# would go red for a reason that has nothing to do with the claim. **The
+	# claim is the NUMBER**, so the number is what it reads now. The other two
+	# needles are untouched and are what make this an AND rather than a bare
+	# presence check.
+	ok(claude.contains("rung 1 Wanderer x0.50")
 			and claude.contains("THE ONLY THING ON")
 			and claude.contains("the present balance BYTE FOR BYTE"),
 		"CLAUDE.md still says rung 1 alone moved and rung 2 is untouched")

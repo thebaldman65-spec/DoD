@@ -582,8 +582,22 @@ func _docs() -> void:
 	ok(doc.contains("Devout"),
 		"...and the table still PRINTS 'Devout' for the `inquisitor` pool")
 	var cm := _src("res://CLAUDE.md")
-	ok(cm.contains("BATCH CE"), "CLAUDE.md carries the batch block")
-	ok(cm.contains("BATCH CG"), "...and CG's, which revised it")
+	# **BOTH RE-POINTED AT BATCH EA §2, AND THE SECOND IS THE ONE A READING
+	# MISSES.** They read `cm.contains("BATCH CE")` / `cm.contains("BATCH CG")`,
+	# messages "CLAUDE.md carries the batch block" and "...and CG's, which
+	# revised it". **NEITHER BLOCK EXISTS** — CW's split ended batch narratives
+	# in that file — and each was satisfied by a STANDING RULE that merely names
+	# the batch in passing, so both stated one thing and tested another. DZ
+	# found three pins of this shape by reading and predicted a fourth it would
+	# not find; the fourth is this second line, one row below the third.
+	# **Re-pointed at the two rules those batches actually bought**: the
+	# re-point-in-place discipline three batches closed (CE is one of them, and
+	# it is the rule THIS edit is obeying), and the content-batch convention CG
+	# set and made binding.
+	ok(cm.contains("RE-POINTS IN PLACE, with the reason in the file"),
+		"CLAUDE.md still binds a content batch to re-point in place rather than leave a false check")
+	ok(cm.contains("BINDING ON EVERY CONTENT BATCH FROM IT"),
+		"...and still carries the content-batch convention as BINDING, not as history")
 	# INVERTED BY BATCH DG §3, on the same idiom as test_batch_bo §6. This
 	# asserted that CLAUDE.md recorded the Cleric as the SECOND CLASS COMPLETE —
 	# a progress milestone in a draft that was still in progress. All four

@@ -23832,9 +23832,19 @@ func _show_end(title: String, subtitle: String, buttons: Array,
 # the snapshot is taken BEFORE either. Pure data — safe to hold across
 # the clear and to serialize into the copy-out text.
 # Queue one ability pick on every hero and return the names that got one,
-# for the victory card. A hero whose SPEC pool is exhausted is silently
-# skipped — the offer is rolled here, so "nothing left" is a fact the roll
-# knows and the card never has to guess at. (Batch AN: spec pool only.)
+# for the victory card. The offer is rolled here, so "nothing left" is a fact
+# the roll knows and the card never has to guess at. (Batch AN: spec pool
+# only, and EA's fallback is spec-locked too.)
+#
+# **BATCH EA §1 — THIS LOOP NO LONGER HAS A SILENT ARM, AND THE SILENCE WAS
+# THE DEFECT.** It used to read "a hero whose SPEC pool is exhausted is
+# silently skipped", which was true and was the whole problem: the boss died,
+# `Run.award_ability_pick` returned false, and the victory card did not name
+# that hero at all. It falls back to the hero's own spec DRAFT pool now and
+# **returns true**, so the hero lands in `named` and is announced by the
+# existing line below exactly like every other award — the announcement is
+# the half that was missing, not the grant. `award_ability_pick` still returns
+# false with no spec set, which is the one arm this loop can still skip.
 func _award_ability_picks() -> Array:
 	var named: Array = []
 	for member in Run.party:

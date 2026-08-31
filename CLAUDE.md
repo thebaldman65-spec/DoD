@@ -811,6 +811,42 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   **A CONDITION READING A LOCAL IS STILL A CONDITION READING THE POOL** — sweep the variable, not
   just the call.
 
+## PIN THE RULE, NEVER THE BATCH CODE (STANDING, SET AT EA §2)
+> **A pin on a batch code tests WHEN something was written; a pin on a rule tests that the rule is
+> still there.** `CLAUDE.md` stopped narrating batches at CW's split, so a check reading
+> `contains("BATCH XX")` against it is asserting the presence of a structure that no longer exists.
+
+- **AND EACH ONE PASSED ANYWAY, WHICH IS THE HALF WORTH KEEPING.** All six EA re-pointed were
+  satisfied by a STANDING RULE that names the batch in passing — the difficulty ladder's
+  attribution, the governor table's rewrite marker, the content-batch convention. **A check that
+  passes for a reason other than the one it states has stopped asking its question**, and it reads
+  green while it does it.
+- **THE SHAPE HAS TWO FORMS AND THE SECOND IS THE ONE A READING MISSES.** A BARE pin
+  (`contains("BATCH BS")`) is visible; a pin whose literal merely CARRIES a code
+  (`contains("BATCH BN §2 — WAS x0.70")`) is a real rule pin that still reds the day the
+  attribution is edited. **Re-point both: assert the number, the heading or the sentence — the
+  thing the batch bought, not the batch.**
+- **SWEEP BY THE VARIABLE HOLDING THE DOCUMENT, AND SCOPE IT PER FUNCTION.** Grepping for the
+  filename finds the read, not the needle three hundred lines below it; and `test_batch_bx` binds
+  the name `master` three times in one file — twice to a STRIPPED copy and once to the raw
+  document — so a file-scoped map reports a violation that is not there. **DZ found three of these
+  by reading and predicted a fourth it would not find. The fourth was one line below the third.**
+
+## A SWEEP ASSERTS ITS OWN POPULATION, OR IT CANNOT TELL "CLEAN" FROM "READ NOTHING" (STANDING, EA §5)
+> **Every sweep prints and asserts how much it looked at.** A walk that matched no files, no
+> literals or no rows reports *no violations* in exactly the same words as a clean tree.
+
+- **EA's OWN CONTROL FAILED THIS WAY AND IT IS WHY THE RULE IS HERE.** A probe asking which runes
+  grant an ability read `runes.json` as an Array; it is a **Dictionary**, so the walk never ran and
+  printed *"rune entries naming an ability grant = 0"*. **The real answer is four**, two of which
+  collide with a spec draft pool. The number was wrong in the safe-looking direction.
+- **AND AN EXTRACTOR IS A POPULATION TOO.** EA's needle verifier read **32** asserted literals
+  where there are **95**, because it counted brackets inside string literals and glued every
+  statement after a `"("` into one. **Mask the strings before counting depth**, take EVERY call in
+  the logical statement rather than the first, follow chained calls (`doc.to_lower().contains(…)`),
+  and model `or` groups — demanding both halves of an `or` is a false alarm, and a false alarm is
+  how an instrument gets switched off.
+
 ## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
 > **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline
 > written afterwards records whatever happened; written first, it is a test. **The difference is
@@ -2196,6 +2232,33 @@ they feed no passive, so at equal power they would be a safe default that dilute
 **VERIFY THE "WEAKER" HALF AGAINST THE LIVE SPEC KITS RATHER THAN TRUSTING THE BRIEF, AND CHECK IT
 AGAINST THE FREE CORE ATTACK TOO** — a comparison against spec ABILITIES alone misses a card
 dominated by a basic.
+
+## STANDING DESIGN RULE — A ZONE-BOSS AWARD ALWAYS PAYS (Batch EA §1)
+> **When a hero's SPEC BOSS pool is exhausted, the award pays a card from that hero's SPEC DRAFT
+> pool that they do not already hold.** It is offered three at a time and **announced exactly like
+> any other award.**
+
+- **THE BASELINE IT REPLACED WAS NOT A WEAK REWARD, IT WAS SILENCE.** `award_ability_pick` returned
+  false, `battle._award_ability_picks` skipped that hero, and the victory card did not name them.
+  **Whatever a fallback pays, it must be announced the way a normal award is** — the announcement is
+  the half that was missing, not the grant.
+- **THE MECHANISM THAT EMPTIES THESE POOLS IS THAT `bm_abilities` IS ONE LIST.** A drafted card
+  removes itself from the boss offer and vice versa, so **a fallback must exclude what the hero
+  holds rather than assume the pools are disjoint.** Eight of the twelve specs can be emptied this
+  way; **the Devout is the sharp case, not Holy** — his boss pool is two and both entries are
+  draftable, so all three of his awards could pay nothing.
+- **WHY THIS POOL, RECORDED WITH THE RULING SO IT IS NOT RE-LITIGATED.** It is the only candidate
+  that keeps a zone-boss award feeling like one. A rune returns `[]` in a runes-off run, which
+  reintroduces the hole somewhere else; gold does not move the depth table at all. And it stays
+  SPEC-LOCKED, so AN §4's ruling holds.
+- **THE FALLBACK POOL CANNOT ITSELF EMPTY, AND THAT IS ARITHMETIC.** A hero holds at most
+  `ABILITY_SLOT_CAP - core_slots(spec)` earned abilities against spec draft pools of ten to
+  thirteen. **The live floor is in `docs/state.md`; it is not restated here.**
+- **AND `owned_ability_names` CANNOT SEE AN ABILITY A RUNE GRANTS** — the grant lands on the battle
+  `cfg`, never on the member dict. That is pre-existing and shared by every channel, but it is the
+  one term that can push the floor below the slot arithmetic, so **derive it off `runes.json`
+  rather than assuming it is zero.**
+
 ## STANDING DESIGN RULE — THE ARRIVING-STANCE PRINCIPLE (Batch BP §3)
 **EVERY STANCE ABILITY MUST BUY WHAT THE STANCE IT LEAVES HIM IN WANTS.** The Swordmaster's
 stances were a binary toggle with passive numbers on each side and NOTHING in his kit ever
