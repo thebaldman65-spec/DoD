@@ -14,6 +14,97 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch ED: THE UNREAD THIRD WAS NOT UNREAD, AND THE PINS GET A MANIFEST</h2>
+<p><i>A prune that retired nothing, and the coverage EC reported and ruled on nowhere. <b>All 43
+never-cited blocks of <code>CLAUDE.md</code> were read and every one is live &mdash; zero
+retirements, two stale NAMES repaired instead.</b> <b>The source-pin manifest is built, derived by
+a committed generator and enforced by a new gate every battery.</b> <b>NO GAME BEHAVIOUR CHANGED,
+NO ABILITY MOVED AND NO CARD WAS AUTHORED.</b> Full report:
+<code>docs/reports/ED.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE MEASUREMENT WAS SOUND AND THE INFERENCE WAS NOT.</b> EC measured 32.0% of
+<code>CLAUDE.md</code> as neither asserted by a suite nor quoted anywhere else since its own batch
+wrote it, and the brief ruled the file "a third unread". <b>Re-derived at HEAD it is 43 blocks and
+33.3%, not 42 and 32.0%</b> &mdash; and the block that moved did so because <b>EC's own
+<code>state.md</code> rewrite dropped the only sentence that had ever quoted it</b>. That file is
+rewritten every batch and sits inside the corpus, <b>so "is this rule quoted anywhere?" is partly a
+question about what the last rewrite happened to say.</b></p>
+
+<p><b>ALL 43 WERE READ IN FULL AND NONE WAS RETIRED.</b> Against the brief's three categories:
+<b>zero</b> are a rule nothing needs, <b>zero</b> are narrative the changelog already holds, and
+<b>43 are rules that bind future work and are simply obeyed.</b> Never being cited is what a
+well-obeyed rule looks like. <b>The claim was tested rather than judged</b>: a second sweep asked
+whether each block's SUBJECT still exists, against a declaration table built with string literals
+masked &mdash; because the checks that pin <code>roll_ability_offer</code> ABSENT are exactly what
+make a text grep report it alive. <b>The completeness of the "asserted" half was proved too:</b> an
+independent extraction of every literal tested against <code>CLAUDE.md</code> lands <b>zero</b> in a
+block the census called never-asserted, so no block was load-bearing in a way the measure could not
+see.</p>
+
+<p><b>WHAT THE LIVENESS TEST DID FIND WAS TWO STALE NAMES, AND BOTH ARE REPAIRED.</b> The name-trap
+block named <code>wild_communion_ranks</code> as the Beastmaster's live field; <b>Batch AY replaced
+it with the <code>_step</code> float, and <code>test_batch_ay</code> pins the ranked form ABSENT
+from <code>battle.gd</code></b> &mdash; so the guide named the dead one while a suite asserted it
+dead. The debug-surface table claimed four retired sim flags were "still printed as retired in the
+report header"; <b>the sim prints no such line and <code>scripts/</code> names none of them.</b>
+Both are corrections, not deletions: EB's rule is that a rename leaves a live claim wearing a dead
+name and deleting it throws away something true.</p>
+
+<p><b>AND THE TARGET IS THE THING THAT DOES NOT HOLD.</b> Over eighteen prune-free batches
+<code>CLAUDE.md</code> grows <b>+4.8 KiB</b> against a knowledge sync growing <b>+79.7 KiB</b> &mdash;
+a marginal rate of <b>6.1%</b>, which is where the ratio converges. <b>3% is not a steady state; it
+is a number reachable only by pruning, roughly every eight batches, forever.</b> DZ's cut bought
+eleven batches and cost a whole one. The choice &mdash; move the target to the growth law, or split
+the file the way CW split the changelog &mdash; is the designer's, and it is recorded rather than
+taken.</p>
+
+<p><b>&sect;2 &mdash; THE MANIFEST, AND EC'S OWN CENSUS WAS SHORT BY NINETY-NINE.</b> EC measured
+the source-pin population once and reported it two ways &mdash; the report and
+<code>docs/state.md</code> said 915, the changelog said 917 four times. <b>Both were low. The live
+figure is 1014</b>, and the reason is the defect EC itself closed one instrument earlier: the census
+captured a fixed 600-character window after each locator call, <code>finditer</code> resumes at the
+END of a match, <b>and the second member of every <code>contains(A) and contains(B)</code> fell
+inside the first match and was never seen.</b> Two more holes sat beside it &mdash; a holder bound
+across two lines never bound at all, and a masker that knew only double quotes let an unbalanced
+bracket inside a single-quoted string merge sixty lines into one statement.</p>
+
+<p><b><code>pin-manifest.json</code> RECORDS EVERY PIN WITH THE FILE IT LIVES IN, AND WHERE IN THAT
+FILE IT RESOLVES.</b> 1313 pins: <b>1014 into <code>.gd</code> source</b> across 17 files, 229 into
+the four tracked documents, 70 elsewhere. Each carries a RESIDENCY, re-derived rather than declared:
+<b>600 anchored to code</b> (a rewording cannot move them), <b>39 resolving ONLY inside a
+comment</b>, 285 negative and correctly absent, and <b>88 that carry no static needle at all and are
+recorded as unverifiable rather than quietly counted as covered</b>.</p>
+
+<p><b>THE SPLIT IS WHAT STOPS IT GOING STALE.</b> <code>build_pin_manifest.py</code> DERIVES the
+manifest &mdash; working out which file a literal is pinned into needs holder propagation through
+function parameters, since <code>test_batch_bl</code> reads <code>battle.gd</code> in
+<code>_run()</code> and asserts on it 536 lines later inside a helper it passed the holder to.
+<b><code>check_ed</code> ENFORCES it and re-derives none of that</b>: it re-reads each named haystack
+and asks whether the recorded claim still holds. <b>&sect;1 verifies every recorded pin</b> &mdash;
+code-anchored needles must survive comment-stripping, comment-resident ones must be present raw and
+ABSENT once stripped, negatives must stay absent, <b>and an ALTERNATION is answered by its GROUP</b>,
+because <code>test_batch_bj</code> writes a group of two NEGATIVES and testing each member for
+presence reds a check that is working perfectly. <b>&sect;2 catches a pin added without an
+entry</b>, and <b>what &sect;2 cannot see is written down at &sect;2 itself</b> (DW &sect;1): a
+holder arriving as a parameter, a needle held in a loop list, a needle composed at runtime.</p>
+
+<p><b>THE 39 COMMENT-RESIDENT PINS ARE THE FRAGILE ONES AND THEY ARE NAMED</b> &mdash; 22 into
+<code>classes.gd</code>, 14 into <code>battle.gd</code>, 2 into <code>run_sim.gd</code>, 1 into
+<code>run_state.gd</code>. <b>Thirteen of them are the <code>AXIS</code>/<code>SYNERGY</code> header
+convention, pinned by six different tranche suites</b>, so one tidy-up of those headers reds six
+suites at once. <code>check_ed</code> &sect;3 asserts that fact from outside.</p>
+
+<p><b>EC'S VACUOUS CHECK IS CONFIRMED CLOSED, AND THE SWEEP FOR ITS SHAPE FOUND THREE MORE.</b>
+<code>test_batch_bg</code>'s slice now runs 9,417 characters with its anchor asserted and a POSITIVE
+assertion reading it, which cannot pass on an empty string. <b>Swept tree-wide there are 87
+<code>find</code>-then-<code>substr</code> slices</b>; 51 are guarded, 14 are self-proving, 14 are
+archive-path extraction that fails loudly, and three were live, resolving and UNGUARDED &mdash;
+<code>check_dr</code> &sect;5, <code>test_batch_bm</code>'s negative control 4 and
+<code>test_batch_bs</code>'s kiln tick. <b>All three now assert their anchor</b>, one check each, so
+none can go silently vacuous the day somebody renames what it looks for. The three already-vacuous
+ones in <code>as</code>, <code>at</code> and <code>aw</code> are the documented trio and are
+untouched.</p>
+
 <h2>2026-08-31 &mdash; Batch EC: THE BOUNDARY THE SWEEP LOST</h2>
 <p><i>One instrument repair and two measurements ruled on nowhere. <b>The needle sweep has been
 evaluating a CONJUNCTION as a DISJUNCTION &mdash; its or-group splitter had never fired once

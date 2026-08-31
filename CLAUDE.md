@@ -206,6 +206,26 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   reading the rest.
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
 
+## NEVER-QUOTED IS NOT DEAD, AND 3% IS BELOW THIS FILE'S GROWTH LAW (STANDING, RULED AT ED §1)
+> **Do not prune `CLAUDE.md` by a reference count.** EC measured a third of it as never asserted and
+> never quoted; ED read all 43 of those blocks and retired **NONE**. Every one is a live standing
+> rule or a live reference. **Never being cited is what a well-obeyed rule looks like.**
+
+- **THE MEASUREMENT WAS SOUND AND THE INFERENCE WAS NOT.** "Neither asserted nor quoted" is a fact
+  about citation, not about load. Tested a second way — is the SUBJECT still in the tree? — the 43
+  turned up **zero dead rules and two stale NAMES**, which is a repair, not a retirement.
+- **AND THE TARGET IS THE THING THAT DOES NOT HOLD.** Over eighteen prune-free batches `CLAUDE.md`
+  grows **+4.8 KiB** against a sync growing **+79.7 KiB**: a marginal rate of **6.1%**, which is
+  where the ratio converges. **3% is reachable only by pruning, roughly every eight batches,
+  forever.** DZ's cut bought eleven batches and cost one.
+- **SO: STOP RE-DERIVING THE PRUNE.** Either move the target to the growth law or split the file the
+  way CW split the changelog. Both are the designer's, and neither is a batch's to take silently.
+- **A CORPUS THAT CONTAINS `docs/state.md` DOES NOT MEASURE WHAT IT SAYS IT MEASURES.** That file is
+  rewritten every batch, so "is this rule quoted anywhere?" is partly a question about what the last
+  rewrite happened to say. **One block changed category between EC and ED for exactly that reason** —
+  its only quote lived in EB's `state.md` and EC's own rewrite dropped it. **Exclude the
+  every-batch files, or report the number as the range it is.**
+
 ## THE CHANGELOG IS ARCHIVED ON A SCHEDULE (STANDING, SET AT BATCH CW §4)
 
 BZ split the changelog once, by hand, when it got too large. **This is that split as a rule
@@ -902,27 +922,53 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
 > **AN INSTRUMENT'S TERRITORY IS A CLAIM, and a check living outside it is not protected by it.**
 > Before trusting a green sweep, say what its haystack IS — and what it therefore is not.
 
-- **THE POPULATION NOBODY HAD MEASURED: 915 assertions pin a literal into a `.gd` SOURCE file,
-  across 52 suites and 17 source files** — 917 before this batch repaired one of them. The four
-  tracked documents carry **196**. **Source pins outnumber document pins 4.7 to 1**, and every
-  document instrument this project owns watches only the four documents.
-- **THE EXPOSED SUB-POPULATION IS 37**: positive pins whose literal resolves ONLY inside a COMMENT
-  of the target file — 22 into `classes.gd`, 12 into `battle.gd`, 2 into `run_sim.gd`, 1 into
-  `run_state.gd`. **A batch rewording any of those 37 comments reds a suite with every document
-  instrument green**, which is exactly what happened at EB. The rest are anchored to code
-  (499), are negative and correctly absent (249 + 13 whose haystack is a slice), or are composed at
-  runtime (116).
-- **COVERAGE WAS REPORTED AND RULED ON NOWHERE, DELIBERATELY.** Extending the document instruments
-  to source costs the noise the paragraph above warns about; naming the pinned literals in a
-  manifest costs a file that has to be kept true; **a rule that says "do not pin source" costs
-  nothing to run and invalidates all 915 existing pins**, spread across 52 suites and 17 source
-  files. The options are in `docs/reports/EC.md` and the decision is the designer's.
+- **THE POPULATION NOBODY HAD MEASURED: assertions that pin a literal into a `.gd` SOURCE file
+  outnumber the ones pinning the four tracked documents, and every document instrument this project
+  owns watches only the documents.** **THE LIVE FIGURES ARE NOT WRITTEN HERE**: `pin-manifest.json`
+  carries them and `check_ed` prints them every battery, which is DJ §3's rule — a number with an
+  instrument behind it cannot rot, and a number in prose always can. **EC's own copies proved it
+  inside one batch**: the report and `docs/state.md` said 915, the changelog said 917 four times,
+  and ED's re-derivation says both were low.
+- **THE EXPOSED SUB-POPULATION IS THE COMMENT-RESIDENT ONE**: positive pins whose literal resolves
+  ONLY inside a COMMENT of the target file, most of them into `classes.gd` and `battle.gd`.
+  **A batch rewording one of those comments reds a suite with every document instrument green**,
+  which is exactly what happened at EB. **`check_ed` §3 counts them and names the files**, and it
+  asserts the `AXIS`/`SYNERGY` header convention is pinned by six different tranche suites at once —
+  worth knowing before anybody tidies those headers.
+- **COVERAGE IS RULED ON NOW, AND THE RULING IS THE MANIFEST (ED §2).** Extending the document
+  instruments to source costs the noise the paragraph above warns about, and a rule saying "do not
+  pin source" invalidates every existing pin. **`build_pin_manifest.py` DERIVES the manifest and
+  `check_ed` ENFORCES it**, and that split is what stops it going stale: attribution needs holder
+  propagation through function parameters, enforcement needs none, so the enforcing half cannot
+  drift from the deriving one. **§1 verifies every recorded pin still resolves as recorded; §2
+  catches a pin added without an entry; what §2 CANNOT see is written down at §2 itself.**
 - **AND THE CENSUS FOUND A LIVE ONE.** `test_batch_bg` §2 sliced `battle.gd` from
   `find("# The fifth stack:")`, which BH had already deleted. `find` returned **-1**, Godot's
   `substr` on a negative offset returns **""**, and `not "".contains(anything)` is true — so **two
   checks passed while reading nothing at all**, and the comment above them already said the
   question was "asked of the whole branch". **A slice built from a `find()` is only as real as the
   anchor: assert the anchor resolved.**
+
+## A SCAN THAT CAPTURES A WINDOW IS BLIND TO WHAT THE WINDOW SWALLOWED (STANDING, SET AT ED §2)
+> **Capture the ARGUMENT, never a fixed span after it.** `finditer` resumes at the END of a match,
+> so a greedy tail eats every later call in the same statement — and the second member of a
+> conjunction is exactly what disappears.
+
+- **THIS IS EC §1'S DEFECT IN A SECOND INSTRUMENT, AND EC'S OWN CENSUS WAS THE VICTIM.** EC closed
+  the or-group boundary in the DOCUMENT sweep and measured the source population at **915** with a
+  `.{0,600}` window still open. `ok(src.contains(A) and src.contains(B), …)` yielded A and stepped
+  over B. **The live figure is 1014.** A census cannot audit itself: the same statements are read
+  either way and the total looks plausible at both.
+- **THE TELL IS A COUNT THAT MOVES WHEN THE CAPTURE NARROWS**, not a failure. Nothing errored, and
+  the population was quoted into a brief and a report before anybody re-derived it.
+- **THE SAME BUG HAS A SECOND FORM: A LINE-BOUNDED BINDING.** `var src := _strip_comments(` with
+  the `res://` path on the NEXT line binds nothing under `[^\n]*`, so every pin in that function is
+  invisible. **Bind holders from STATEMENTS, which join continuations, never from lines.**
+- **AND A THIRD, WHICH IS THE ONE THAT LOOKS LIKE PROSE:** masking only double-quoted strings
+  leaves an unbalanced `(` inside a SINGLE-quoted one, depth never returns to zero, and sixty lines
+  join into one statement. **GDScript has both quote styles; a masker that knows one is a
+  statement-merger.** Strip comments first, or an apostrophe in prose opens a string that never
+  closes — that one ate a third of the tree's declarations in ED's first build.
 
 ## A COMMENT NAMING CODE IS A CLAIM, AND IT GOES STALE SILENTLY (STANDING, SET AT EB §2)
 > **A comment naming a function, constant, ability or field is a claim that can go stale silently.
@@ -1590,9 +1636,12 @@ as a live decision.
   whole third of a batch**. test_batch_ce pins all three halves: the key present, `"devout"`
   absent, `SPEC_INFO` still displaying Devout.
 - **THE SURVIVALIST'S SPEC ID IS `mystic` AND MUST NEVER BE RENAMED.** Saves and trees key on it.
-- **`wild_communion_ranks` IS THE BEASTMASTER'S; `communion_ranks` IS THE DEVOUT'S. THEY ARE
+- **`wild_communion_step` IS THE BEASTMASTER'S; `communion_ranks` IS THE DEVOUT'S. THEY ARE
   DIFFERENT SPECS AND SHARE NO COUNTER AT ALL.** They have been crossed once already. The trap is
-  asserted in BOTH directions, and the test walks both trees to prove the separation.
+  asserted in BOTH directions and `test_batch_ay` §6 walks both trees to prove the separation.
+  **The ranked form `wild_communion_ranks` is RETIRED** — AY replaced it with the `_step` float
+  and `test_batch_ay` pins it absent from `battle.gd`; this block named the dead one as the live
+  field until ED.
 - **A `_step` FIELD IS A FLOAT AND IS DELIBERATELY ABSENT FROM `Runes.STAT_INT_KEYS`**
   (`wild_communion_step`, `absolute_step`, `guardian_step`, `conduit_step`). Adding one there
   coerces 1.5 to 1 **with nothing crashing** — the payload silently pays a third less.
@@ -2118,8 +2167,10 @@ sim/autoplay/sim_run).
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
   (randomize zone draws within slot pools).
-· RETIRED, still printed as retired in the report header: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
-  `DOD_SIM_START_RUNE`, `DOD_SIM_SPEC_OPENING` (Batch AN, with their features).
+· RETIRED, and **the record lives in `sim.sh`'s header and master.html — the sim prints no
+  retired line and `scripts/` names none of them**: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
+  `DOD_SIM_START_RUNE`, `DOD_SIM_SPEC_OPENING` (Batch AN, with their features). ED corrected
+  the report-header claim.
 
 ## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE (Batch BJ §3b)
 Six ratcheting accumulators exist; every governor was VERIFIED AT ITS SITE this batch. No

@@ -283,7 +283,14 @@ func _s5_new_axes() -> void:
 		"Lunge's Break rider does not read `_eff_stance`")
 	# AND THE GATED CARD DOES NOT FLIP HIM. Getting the two card types backwards
 	# is the single easiest mistake to make in this spec, so it is asserted.
-	var ct := code.substr(code.find("\"counter_time\":"))
+	# THE LOCATOR IS ASSERTED BEFORE THE SLICE IS TAKEN. `find` returning -1 gives
+	# a `substr` that Godot answers with "", and `not "".contains(X)` is true for
+	# every X there is — the shape that let two of `test_batch_bg`'s checks pass
+	# while reading nothing at all. The anchor resolves today; unguarded, it goes
+	# silent the day somebody renames the special.
+	var ct_at := code.find("\"counter_time\":")
+	ok(ct_at >= 0, "the `counter_time` arm is findable, so the slice below is real")
+	var ct := code.substr(ct_at)
 	ct = ct.substr(0, ct.find("\n\t\t\"") if ct.find("\n\t\t\"") > 0 else ct.length())
 	ok(not ct.contains("_swordmaster_switch"),
 		"Counter Time SWITCHES the stance — it is a GATED card and must require and stay")

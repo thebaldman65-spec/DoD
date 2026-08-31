@@ -4,6 +4,65 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A citation count is not a load-bearing test (Batch ED) — 2026-08-31
+
+EC measured a third of `CLAUDE.md` as never asserted and never quoted since its own batch wrote it,
+and the number was correct. The brief read it as "the file is a third unread" and asked for the 42
+blocks to be retired. **Reading all of them retired none.**
+
+The gap is between two different questions. *Has anybody cited this rule?* is a fact about
+citation. *Would deleting it break something?* is a fact about load. For a rule that works by being
+obeyed those come apart completely — nobody quotes the rule they are following, so a
+well-obeyed rule and a dead one produce identical evidence under a citation count. Every one of the
+43 turned out to be the first kind.
+
+**What made the difference was testing instead of judging.** Reading 43 blocks and forming an
+opinion about each is exactly the "a named list cannot audit itself" trap. So the question was made
+mechanical: does the SUBJECT of this rule still exist in the tree? That has an answer a script can
+give, and it found what reading did not — two blocks naming symbols that had been renamed or
+removed, both live rules wearing a dead name. The prune found nothing; the liveness test found two
+real repairs.
+
+**And the measurement had a second problem worth recording.** The corpus it searches for quotations
+includes `docs/state.md`, which is rewritten from scratch every batch. One block changed category
+between EC and ED with nobody touching it: its only quotation had lived in EB's `state.md`, and
+EC's own rewrite dropped the sentence. A measure whose corpus contains an every-batch file is
+partly measuring the last rewrite.
+
+The arithmetic underneath is the part that settles the recurring argument. Over eighteen prune-free
+batches this file grows 4.8 KiB while the sync grows 79.7 KiB — a marginal rate of 6.1%, which is
+where the ratio converges if nothing is ever cut. **3% is not a steady state the file drifts from
+and can be returned to; it is below the growth law, and the only thing that reaches it is a prune,
+about every eight batches, forever.** That is worth knowing before a fourth batch is spent
+rediscovering that there is nothing dead to cut.
+
+## Two instruments, one analysis (Batch ED) — 2026-08-31
+
+The manifest of pinned literals had an obvious failure mode before it was written, and it is the
+one this project has paid for four times: a file that describes the day it was written and then
+quietly stops being true. A manifest nothing checks is a comment about the tree.
+
+What keeps this one honest is a split. Working out *which* file a literal is pinned into is real
+analysis — holders cross function boundaries as parameters, `test_batch_bl` reads `battle.gd` in
+one function and asserts on it 536 lines away in another — so that lives in one committed generator
+and nowhere else. But *checking* a recorded claim needs none of that: re-read the named file and ask
+whether the literal is still there. The gate does only the second thing. **It cannot drift from the
+generator because it re-derives nothing the generator decided.**
+
+The direction that nearly went wrong was the enforcement half. The first design demanded that every
+literal in a locator call anywhere in the tree have a manifest entry — 663 of 1646 would have needed
+an exemption, because most of those literals are tested against ability descriptions and log lines
+rather than files. A rule needing 663 exemptions is a rule aimed at the wrong thing, and DW's note
+about exemption counts measuring a fingerprint's sharpness applies exactly. Scoping the demand to
+holders bound to a real file brought it to zero exemptions.
+
+**The other lesson is that the census EC took was short by ninety-nine and nothing could have told
+it so.** The extractor captured a fixed window after each match, and `finditer` resumes at the end
+of what it matched, so the second half of every `contains(A) and contains(B)` was swallowed. It is
+the same conjunction blindness EC had just fixed in the document sweep, still open in the source
+census EC used to measure the problem. No error, no failure — just a total that looked plausible,
+got quoted into a brief, and was wrong.
+
 ## An instrument's territory is a claim (Batch EC) — 2026-08-31
 
 The needle sweep had a bug that no measurement of it could find. Every previous audit counted

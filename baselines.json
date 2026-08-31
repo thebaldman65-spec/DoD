@@ -696,8 +696,8 @@
   "test_batch_bm": {
    "kind": "suite",
    "checks": [
-    1888,
-    1888
+    1889,
+    1889
    ],
    "checks_obs": 1,
    "fails": [
@@ -705,7 +705,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, CORRECTED AFTER THE ACCEPTANCE RUN CAUGHT IT — AND THE ROW MOVES RATHER THAN THE CODE, BECAUSE NOTHING STOPPED RUNNING. A FALL OF 3, WITH ZERO FAILURES, AND IT IS FULLY ATTRIBUTED. §1's row-8 duplicate-detector loops over every rows-1-to-7 node in a row-8 node's OWN LANE and emits one check per TOP-LEVEL `payload.stat` FIELD it finds — the instrument for \"a row-8 node must not re-write a field an earlier node in its lane already writes\". **THREE MID-TREE CELLS STOPPED WRITING A TOP-LEVEL STAT BECAUSE DO RE-AUTHORED THEM ONTO A PROTECTED CORE ABILITY INSTEAD**: `cr_icy_resolve` (cryomancer/Winter/5, `icy_resolve_ranks` -> Blizzard), `bm_devoted_fury` (beastmaster/devotion/4, `devoted_fury` -> Kill Command) and `bm_reserves` (beastmaster/handler/3, `deep_reserves_ranks` -> Hunter's Instinct). All three sat below row 8 in a lane that has one, so each contributed exactly one field to the loop. **MEASURED, NOT REASONED: the loop transcribed against the live tree reads 238, and 241 with the three fields restored — a delta of exactly 3.** The `also`-borne terms DO also cut (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`) do NOT appear here: this loop reads the TOP-LEVEL `stat` only, and all three of those nodes keep theirs. `test_batch_bm.gd` itself is byte-unedited by DO."
+   "note": "BATCH DO PREDICTION, CORRECTED AFTER THE ACCEPTANCE RUN CAUGHT IT — AND THE ROW MOVES RATHER THAN THE CODE, BECAUSE NOTHING STOPPED RUNNING. A FALL OF 3, WITH ZERO FAILURES, AND IT IS FULLY ATTRIBUTED. §1's row-8 duplicate-detector loops over every rows-1-to-7 node in a row-8 node's OWN LANE and emits one check per TOP-LEVEL `payload.stat` FIELD it finds — the instrument for \"a row-8 node must not re-write a field an earlier node in its lane already writes\". **THREE MID-TREE CELLS STOPPED WRITING A TOP-LEVEL STAT BECAUSE DO RE-AUTHORED THEM ONTO A PROTECTED CORE ABILITY INSTEAD**: `cr_icy_resolve` (cryomancer/Winter/5, `icy_resolve_ranks` -> Blizzard), `bm_devoted_fury` (beastmaster/devotion/4, `devoted_fury` -> Kill Command) and `bm_reserves` (beastmaster/handler/3, `deep_reserves_ranks` -> Hunter's Instinct). All three sat below row 8 in a lane that has one, so each contributed exactly one field to the loop. **MEASURED, NOT REASONED: the loop transcribed against the live tree reads 238, and 241 with the three fields restored — a delta of exactly 3.** The `also`-borne terms DO also cut (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`) do NOT appear here: this loop reads the TOP-LEVEL `stat` only, and all three of those nodes keep theirs. `test_batch_bm.gd` itself is byte-unedited by DO. **BATCH ED ADDED ONE CHECK, 1888 -> 1889**: NEGATIVE CONTROL 4 sliced `rs.substr(i, 300)` from an unasserted `find`; the anchor is asserted now, so the negative cannot go vacuous in silence."
   },
   "test_batch_bn": {
    "kind": "suite",
@@ -780,15 +780,16 @@
   "test_batch_bs": {
    "kind": "suite",
    "checks": [
-    266,
-    266
+    267,
+    267
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": "**BATCH ED ADDED ONE CHECK, 266 -> 267.** The kiln tick slice took `src.substr(src.find(\"func take_tick_damage\"))` with the locator unasserted, so a renamed function would have made `not tick_body.contains(\"kiln_forged_at\")` true by reading nothing. The anchor is asserted now. ED's sweep found 87 `find`-then-`substr` slices in the tree and this was one of THREE that were live, resolving and unguarded."
   },
   "test_batch_bt": {
    "kind": "suite",
@@ -978,8 +979,8 @@
   "check_dr": {
    "kind": "gate",
    "checks": [
-    79,
-    79
+    80,
+    80
    ],
    "checks_obs": 1,
    "fails": [
@@ -987,7 +988,7 @@
     0
    ],
    "fails_obs": 1,
-   "note": "BATCH DR's gate, and its shape is DP's lesson taken one step further: **it asserts the exclusives as PROPERTIES and PRINTS the counts, because this batch's own brief asserted THREE exclusive axes and one of the three was false.** §1 derives every `special: \"summon\"` in the corpus and asserts all of them are Beastmaster core (3), plus `_do_summon`'s caller count. §2 asserts `.revive(` has exactly two call sites and that the one ABILITY reaching it is the Holy Cleric's, and PRINTS the qualifier the brief asked be reported: the Revive Potion and the `revive_pct` map event are two non-ability channels, so revival is exclusive as an ability and not as a channel. **§3 ASSERTS THE OPPOSITE OF WHAT THE BRIEF ASKED FOR** — cooldown manipulation is SHARED, `_tick_cooldowns` has seven callers including a MAGE CLASS-WIDE DRAFT CARD and the Devout's PROTECTED CORE, and all seven are named in `TICK_SITES` as an asymmetric ratchet. §4 asserts the retired card is gone from CODE WITH COMMENTS STRIPPED (prose recording a removal names the thing removed), that the SURVIVOR of the pair is still there — retiring the wrong half would pass every other assertion — and that the Chilled-4 auto-freeze, which is a MECHANIC and belonged to no card, went nowhere. §5 asserts the pool is 12, that Lunge is off the cooldown-zero list and prints who is left on it, and that each new card reads the stance engine the way BW's rule says its type must. §6 asserts Battle Poise's free pivot resolves the REAL Guard Change through `_ability_usable` rather than a second path, starts its cooldown, is bounded to once a turn, and does NOT pay Sunder Guard. §7 runs BR §1's name sweep and derives the 143. §8 asserts the framework is written down. **§9 DRIVES ALL THREE CARDS AND THE FREE PIVOT ON A LIVE BOARD**, because a def that resolves is not a card that works — including that a GATED card does not flip him, that FORMLESS satisfies Counter Time's gate and REFUSES the free pivot, that a second parry in one turn buys nothing, and that Guard Change's own cooldown is respected. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool and takes the class half off the constant. FOUR NEGATIVE CONTROLS AND ALL FOUR BEHAVED: a summon authored onto the Sharpshooter (1 failure), a third `revive` call site (1), a `_tick_cooldowns` caller removed (1), and **the comment-stripping trap controlled from BOTH sides** — the retired name as a COMMENT left it GREEN, the same name in CODE turned it RED (4)."
+   "note": "BATCH DR's gate, and its shape is DP's lesson taken one step further: **it asserts the exclusives as PROPERTIES and PRINTS the counts, because this batch's own brief asserted THREE exclusive axes and one of the three was false.** §1 derives every `special: \"summon\"` in the corpus and asserts all of them are Beastmaster core (3), plus `_do_summon`'s caller count. §2 asserts `.revive(` has exactly two call sites and that the one ABILITY reaching it is the Holy Cleric's, and PRINTS the qualifier the brief asked be reported: the Revive Potion and the `revive_pct` map event are two non-ability channels, so revival is exclusive as an ability and not as a channel. **§3 ASSERTS THE OPPOSITE OF WHAT THE BRIEF ASKED FOR** — cooldown manipulation is SHARED, `_tick_cooldowns` has seven callers including a MAGE CLASS-WIDE DRAFT CARD and the Devout's PROTECTED CORE, and all seven are named in `TICK_SITES` as an asymmetric ratchet. §4 asserts the retired card is gone from CODE WITH COMMENTS STRIPPED (prose recording a removal names the thing removed), that the SURVIVOR of the pair is still there — retiring the wrong half would pass every other assertion — and that the Chilled-4 auto-freeze, which is a MECHANIC and belonged to no card, went nowhere. §5 asserts the pool is 12, that Lunge is off the cooldown-zero list and prints who is left on it, and that each new card reads the stance engine the way BW's rule says its type must. §6 asserts Battle Poise's free pivot resolves the REAL Guard Change through `_ability_usable` rather than a second path, starts its cooldown, is bounded to once a turn, and does NOT pay Sunder Guard. §7 runs BR §1's name sweep and derives the 143. §8 asserts the framework is written down. **§9 DRIVES ALL THREE CARDS AND THE FREE PIVOT ON A LIVE BOARD**, because a def that resolves is not a card that works — including that a GATED card does not flip him, that FORMLESS satisfies Counter Time's gate and REFUSES the free pivot, that a second parry in one turn buys nothing, and that Guard Change's own cooldown is respected. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool and takes the class half off the constant. FOUR NEGATIVE CONTROLS AND ALL FOUR BEHAVED: a summon authored onto the Sharpshooter (1 failure), a third `revive` call site (1), a `_tick_cooldowns` caller removed (1), and **the comment-stripping trap controlled from BOTH sides** — the retired name as a COMMENT left it GREEN, the same name in CODE turned it RED (4). **BATCH ED ADDED ONE CHECK, 79 -> 80**: §5's `counter_time` slice took `code.substr(code.find(...))` with the locator UNASSERTED. It resolves today, but a `find` of -1 gives Godot an empty `substr` and `not \"\".contains(X)` is true for every X — the shape that let two of `test_batch_bg`'s checks pass while reading nothing. The anchor is asserted now."
   },
   "check_ds": {
    "kind": "gate",
@@ -1086,6 +1087,20 @@
    ],
    "fails_obs": 3,
    "note": "**NEW AT EC. THE GATE FOR A BOUNDARY, AND THE BOUNDARY IS THE OPERATOR THAT JOINS A GROUP OF LITERALS.** The needle sweep EA and EB certified with bucketed every literal in a statement together and satisfied the bucket when ANY member was present — so `contains(A) and contains(B)` passed on A alone, **a check passing for a reason other than the one it states, inside the instrument built to find exactly that.** The half meant to model alternation split a statement at a TOP-LEVEL `or`, and **every assertion in this tree is wrapped in `ok(...)`**, so the operator sits one bracket in and the depth-0 scan found none in any of 82 files: the splitter had never fired once. **A LITERAL CENSUS CANNOT SEE THIS — the same 125 members are read either way**, which is why every previous measurement of the extractor came back clean. §0 asserts the population before anything is concluded from it (>60 files swept, >=80 statements, >=100 members, >=20 readers) because a regex matching nothing reports 'no violations' just as loudly — EA §1's rule. §1 REDS ON A STATEMENT THAT MIXES `and` AND `or` at the boolean depth: §2's model is two-shaped and that simplification is checked rather than assumed. §2 is the boundary itself — every member of a conjunction present, every alternation holding at least one, each failure NAMED with its literal, its polarity and its document. **THE REPAIR IS DANGEROUS IN THE OPPOSITE DIRECTION AND THAT IS WHY §3 EXISTS**: 6 of this tree's 9 alternations have a legitimately absent member, so treating every group as a conjunction would raise six false alarms on the first run, and a false alarm is how an instrument gets switched off — the reason the header sweep was left un-gated at 118 rows for 16 defects. §3 proves on hand-built input, in BOTH directions, that a conjunction with an absent member is judged unsatisfied and an alternation with a present member is not; **its live member is taken out of `CLAUDE.md` at runtime rather than written here**, so it cannot become a third copy of a fact §2 already asserts. §3 deliberately binds NO document holder: holders are function-scoped and this file is swept by its own §2, so synthetic assertion text in a section that also bound a document would be extracted as if a suite had written it. **THIS GATE IS INSIDE ITS OWN POPULATION** — its two `CLAUDE.md` needles are read by its own sweep, which is the gate covering itself rather than a second copy. Reads only the four tracked documents and the suite sources, spawns no battle and walks no ability corpus, so it trips neither of `check_da` §3's fingerprints and needs no exemption — confirmed live before the battery. **THREE IDENTICAL STANDALONE READINGS OF 22 BEFORE THE BATTERY**, so `check_de` certifies on its first pass."
+  },
+  "check_ed": {
+   "kind": "gate",
+   "checks": [
+    18,
+    18
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "**NEW AT ED. THE GATE FOR THE SOURCE-PIN MANIFEST.** 1014 assertions pin a literal into `.gd` source across 17 files; the four tracked documents carry 229, so the document instruments were watching the smaller half — and a comment-only edit to source changes a haystack NEITHER of them reads, which is how EB read green on both sweeps and took `test_batch_bl` red in the battery. **THE MANIFEST IS DERIVED BY `build_pin_manifest.py` AND ENFORCED HERE, AND THE SPLIT IS WHAT STOPS IT GOING STALE**: attribution needs holder propagation through function parameters (`test_batch_bl` reads `battle.gd` in `_run()` and asserts on it 536 lines later inside a helper it passed the holder to), enforcement needs none. §0 asserts the population before anything is concluded from it (EA §1) and reds on a residency class this gate does not read, so a class added by a later generator cannot go unwatched. **§1 IS THE HALF THE BATCH EXISTS FOR**: a code-anchored needle must survive comment-stripping, a COMMENT-RESIDENT one must be present raw and ABSENT once stripped (both halves — a pin that migrated out of a comment is no longer fragile and the manifest should stop saying it is), a negative must stay absent, and an ALTERNATION is answered by its GROUP, because `test_batch_bj` writes a group of two NEGATIVES and testing each member for presence reds a check that is working. §2 catches a pin added without an entry, holder-scoped PER FUNCTION — a file-scoped sweep binds `src` in one function and reads every `src.contains(...)` in the file as a pin into that file, and reds on a clean tree. **WHAT §2 CANNOT SEE IS WRITTEN DOWN AT §2 ITSELF** (DW §1): a holder arriving as a parameter, a needle in a `for x in [...]` list, a needle composed at runtime. §3 counts and names the 39 comment-resident pins — 22 into `classes.gd`, 14 into `battle.gd` — and asserts the AXIS/SYNERGY convention is pinned by six suites at once, so one rewording reds them all. §4 proves the discrimination on synthetic input every run, INCLUDING that a `#` inside a string is not read as a comment — read as one it strips live code and reports a code pin as comment-resident, the exact misreading this gate exists to prevent. **IT EXCLUDES ITSELF FROM ITS OWN SWEEP** the way `check_de` does: a gate that enumerates pins is a file full of pin-shaped literals. Reads the manifest and the suite sources only — spawns no battle, walks no ability corpus, names neither draft-pool accessor — so it needs no `check_da` §3 exemption; run standalone before the battery to prove it. **THREE IDENTICAL STANDALONE READINGS OF 18**, so `check_de` certifies on its first pass. Floors, never equalities (DX §1): the pin population grows with every batch that authors a suite."
   }
  }
 }

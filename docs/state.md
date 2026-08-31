@@ -5,84 +5,97 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-31 (Batch EC).*
+*Last rewritten: 2026-08-31 (Batch ED).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EC — THE BOUNDARY THE SWEEP LOST.** One instrument repair and two measurements
-  ruled on nowhere. **THE NEEDLE SWEEP HAS BEEN EVALUATING A CONJUNCTION AS A DISJUNCTION — ITS
-  OR-GROUP SPLITTER HAD NEVER FIRED ONCE — AND THE POPULATION OF ASSERTIONS THAT PIN A LITERAL
-  INTO `.gd` SOURCE IS MEASURED FOR THE FIRST TIME AT 915.** **NO GAME BEHAVIOUR CHANGED, NO
-  ABILITY MOVED, NO CARD WAS AUTHORED, AND NOTHING WAS PRUNED.** **Report: `docs/reports/EC.md`.**
-- **§1 — THE GROUP BOUNDARY, AND THE SPLITTER THAT WAS UNREACHABLE.** The verifier bucketed every
-  literal in a statement together and satisfied the bucket when **ANY** member was present, so
-  `contains(A) and contains(B)` passed on A alone — **a check passing for a reason other than the
-  one it states, inside the instrument built to find exactly that.**
-  - **THE REASON IS NOT THE ONE THE BRIEF GAVE.** `or_groups()` split at a **top-level** `or`, and
-    every assertion in this tree is wrapped in `ok(...)`, so the operator sits one bracket in.
-    **Measured: it returns more than one span for ZERO of the tree's 149 atom-bearing statements.**
-    Nine hold an `or` and ten hold an `and`; all nineteen came back as one bucket. **The splitter
-    was unreachable, not mis-tuned.**
-  - **THE BRIEF'S "73 POSITIVE GROUPS COLLAPSE TO 45" DOES NOT EXIST AT HEAD.** That is EB §3's
-    reading of the extractor with string-masking DISABLED — a build EB had already repaired inside
-    EB. At HEAD it reads **73** and loses no boundary to bracket depth at all.
-  - **WHAT THE 73 TURN UP AT FULL RESOLUTION: 103 statements over 125 members — 10 CONJUNCTIONS
-    and 9 ALTERNATIONS, and ZERO real defects.** All ten conjunctions hold in full, so the
-    blindness had no live defect under it. **Every one of the nineteen is reported with its verdict
-    in `docs/reports/EC.md` §1.**
-  - **THE WRONG REPAIR WOULD HAVE COST SIX.** Six of the nine alternations have a member that is
-    legitimately absent — an HTML entity beside its unicode glyph, an upper-case heading beside its
-    title-case twin — so **treating every group as a conjunction reds six correct checks on the
-    first run**, and a false alarm is how an instrument gets switched off. **The distinction IS the
-    fix**, and `check_ec` §3 proves it discriminates on built input in both directions every run.
-  - **TWO MORE EXTRACTOR BUGS, LATENT IN THE DOCUMENT SWEEP AND LIVE IN THE SOURCE ONE.** The
-    polarity look-behind could not see past a RECEIVER (`not FileAccess.get_file_as_string(…)
-    .contains(…)` read as POSITIVE, six deliberately-absent literals reported as unresolved), and
-    `unescape` ran `\n` before `\\` so a source literal written `\\n` matched nothing — six pins
-    into `classes.gd` unresolved for that reason alone. Both closed.
-- **§2 — 915 ASSERTIONS PIN A LITERAL INTO `.gd` SOURCE, ACROSS 52 SUITES AND 17 SOURCE FILES. THE
-  FOUR TRACKED DOCUMENTS CARRY 196.** **The instruments were watching the smaller half by a factor
-  of 4.7**, which is the structural hole EB's broken suite came out of.
-  - **THE EXPOSED SUB-POPULATION IS 37**: positive pins whose literal resolves ONLY inside a
-    COMMENT — **22 into `classes.gd`, 12 into `battle.gd`, 2 into `run_sim.gd`, 1 into
-    `run_state.gd`.** The rest are anchored to code (499), negative and correctly absent (249 + 13
-    against a slice), or composed at runtime (116).
-  - **TWELVE OF THE 22 IN `classes.gd` ARE THE `AXIS` / `SYNERGY` HEADER CONVENTION**, pinned by
-    six different tranche suites. **One comment convention holds up six suites at once** — worth
-    knowing before anybody tidies those headers.
-  - **THE CENSUS FOUND A LIVE VACUOUS CHECK AND IT IS REPAIRED.** `test_batch_bg` §2 sliced
-    `battle.gd` from `find("# The fifth stack:")`, an anchor **BH had already deleted**. Measured
-    live: **`find` returned -1, Godot's `substr` on a negative offset returns `""`, and
-    `not "".contains(anything)` is true** — **two checks passed while reading nothing at all.**
-    The comment above them already said the question was "asked of the whole branch"; **the
-    sentence was written and the change was never made.** Both are asked of the whole branch now
-    and the property still holds. `test_batch_bg` reads **47 / 0** before and after.
-  - **COVERAGE IS REPORTED AND RULED ON NOWHERE.** Three options with their costs are in the
-    report; **the cheapest to run — a rule forbidding source pins — invalidates all 915.** The
-    decision is the designer's and is carried in the open queue below.
-- **§3 — THE 3% TARGET IS MEASURED AND RULED ON NOWHERE.** DZ pruned to 2.948%; EB put it back over
-  at 3.044% (re-derived); **EC takes it further over.** Live figures are in the knowledge-sync
-  section below. **The file grows by construction — every batch that earns a standing rule adds one
-  — so the target is a treadmill rather than a target.**
-  - **THE MEASUREMENT THAT DECIDES IT: 32.0% of `CLAUDE.md` is neither asserted by any suite or
-    gate nor quoted verbatim anywhere else in the repo since its own batch wrote it** — 42 of 94
-    rule-blocks, 74,398 bytes. **Only 4.2 points of that was written in the last eight batches**
-    and could not yet have been read again; **27.8% is older than that or cites no batch at all.**
-  - **A RULE NOBODY HAS QUOTED MAY STILL BE LOAD-BEARING** — most rules work by being obeyed — so
-    the number does not say what to cut. **It says the pressure on the ratio is not density.**
-  - **FOUR OPTIONS ARE SET OUT WITH THEIR ARITHMETIC AND NONE IS RECOMMENDED.** Carried below.
-  - **NO PRUNE WAS TAKEN.** The bound is unchanged and it is assertions rather than judgement:
-    **61 distinct literals across 25 reader files**, which is its own batch with its own battery.
-- **Next letter: ED.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: ED — THE UNREAD THIRD WAS NOT UNREAD, AND THE PINS GET A MANIFEST.** A prune that
+  retired nothing, and the coverage EC reported and ruled on nowhere. **ALL 43 NEVER-CITED BLOCKS OF
+  `CLAUDE.md` WERE READ IN FULL AND EVERY ONE IS LIVE — ZERO RETIREMENTS, TWO STALE *NAMES* REPAIRED
+  INSTEAD — AND THE SOURCE-PIN MANIFEST IS BUILT, DERIVED BY A COMMITTED GENERATOR AND ENFORCED BY A
+  NEW GATE EVERY BATTERY.** **NO GAME BEHAVIOUR CHANGED, NO ABILITY MOVED AND NO CARD WAS
+  AUTHORED.** **Report: `docs/reports/ED.md`.**
+- **§1 — THE MEASUREMENT WAS SOUND AND THE INFERENCE WAS NOT.** EC measured a third of `CLAUDE.md`
+  as neither asserted nor quoted since its own batch wrote it, and the brief ruled the file "a third
+  unread". **Re-derived at HEAD it is 43 blocks and 33.3%, not EC's 42 and 32.0%.**
+  - **THE BLOCK THAT MOVED SHOWS WHAT THE MEASURE ACTUALLY MEASURES.** *"THE PROTECTED CORE IS THE
+    BASELINE (EB §1)"* was quoted for EC and is not now: **its only quotation lived in EB's
+    `docs/state.md`, and EC's own rewrite of that file dropped the sentence.** This file is inside
+    the knowledge sync and is rewritten every batch, so **"is this rule quoted anywhere?" is partly a
+    question about what the last rewrite happened to say.**
+  - **ZERO RETIREMENTS, AGAINST THE BRIEF'S THREE CATEGORIES: 0 dead rules, 0 surviving narrative,
+    and 43 rules that bind future work and are simply obeyed.** Nobody quotes the rule they are
+    following, so a well-obeyed rule and a dead one look identical under a citation count.
+  - **BOTH HALVES WERE TESTED RATHER THAN JUDGED.** The *asserted* half is complete — an independent
+    extraction of every literal tested against `CLAUDE.md` lands **ZERO** in a block the census
+    called never-asserted, so nothing is load-bearing in a way the measure cannot see. The *liveness*
+    half asked whether each block's SUBJECT still exists, against a declaration table with string
+    literals masked (the checks that pin `roll_ability_offer` ABSENT are exactly what make a grep
+    report it alive). **Its first build read `'` as a string delimiter, let an apostrophe in one
+    comment swallow every declaration to the next one, and reported `_apply_status` and
+    `vault_ability` as deleted — 4,348 symbols against the real 6,786. The control caught it.**
+  - **TWO STALE NAMES, BOTH REPAIRED, AND BOTH ARE RENAMES RATHER THAN DELETIONS.**
+    **`wild_communion_ranks` has not existed since Batch AY** — the live field is
+    `wild_communion_step`, and `test_batch_ay` pins the ranked form ABSENT from `battle.gd`, so the
+    guide named the dead one while a suite asserted it dead. And **the debug-surface table claimed
+    four retired sim flags are "still printed as retired in the report header"; the sim prints no
+    such line and `scripts/` names none of them.**
+  - **THE 3% TARGET IS BELOW THE GROWTH LAW AND THAT IS NOW MEASURED.** Over **eighteen prune-free
+    batches (DJ→EC)** `CLAUDE.md` grows **+4,835 B** against a sync growing **+79,726 B** — a
+    **marginal rate of 6.06%**, which is where the ratio converges. Post-DZ alone it is **8.70%**.
+    **3% is reachable only by pruning, about every eight batches, forever**, and this batch has
+    established there is no dead weight to take it from. **RULED ON NOWHERE — carried below.**
+- **§2 — THE SOURCE-PIN MANIFEST, AND EC'S CENSUS WAS SHORT BY NINETY-NINE.** EC reported the
+  population two ways — **915** in its report and this file, **917** four times in the changelog.
+  **Both were low. The live figure is 1014**, and the reason is EC §1's own defect in a second
+  instrument: the census captured a fixed 600-character window after each locator, `finditer` resumes
+  at the END of a match, **so the second member of every `contains(A) and contains(B)` fell inside
+  the first match and was never seen.** Three smaller holes sat beside it — a holder bound across two
+  lines never bound at all, a masker that knew only double quotes merging sixty lines into one
+  statement, and format templates dropped rather than recorded.
+  - **`pin-manifest.json` HOLDS 1313 PINS: 1014 INTO `.gd` SOURCE ACROSS 17 FILES, 229 INTO THE FOUR
+    TRACKED DOCUMENTS, 70 ELSEWHERE.** The document instruments watch the smaller half by **4.4×**.
+    **THE LIVE FIGURES ARE NOT RESTATED IN `CLAUDE.md`** — that block points at the instrument now,
+    which is DJ §3's rule applied to the figure that had already rotted three ways inside one batch.
+  - **EACH PIN CARRIES A RESIDENCY, RE-DERIVED RATHER THAN DECLARED: 600 anchored to CODE, 39
+    resolving ONLY inside a COMMENT, 285 negative and correctly absent, 17 whose haystack is
+    narrower than a file, 71 composed at runtime and 2 alternation siblings.** **926 of the 1014 are
+    verified every battery and the other 88 are PRINTED as unverified**, because a coverage figure
+    nobody states reads as full coverage.
+  - **THE 39 COMMENT-RESIDENT PINS ARE THE FRAGILE HALF AND THEY ARE FLAGGED** — 22 into
+    `classes.gd`, 14 into `battle.gd`, 2 into `run_sim.gd`, 1 into `run_state.gd`. **Thirteen are the
+    `AXIS`/`SYNERGY` header convention pinned by six different tranche suites**, so one tidy-up of
+    those headers reds six suites at once, and `check_ed` §3 asserts that from outside.
+  - **THE SPLIT IS WHAT STOPS THE MANIFEST GOING STALE.** `build_pin_manifest.py` DERIVES it —
+    attribution needs holder propagation through function parameters, since `test_batch_bl` reads
+    `battle.gd` in `_run()` and asserts on it 536 lines later inside a helper it passed the holder
+    to. **`check_ed` ENFORCES it and re-derives none of that**, so the enforcing half cannot drift
+    from the deriving one. `build_pin_manifest.py --check` is the exact authority; **what `check_ed`
+    §2 cannot see is written down at §2 itself** (DW §1).
+  - **THE FIRST COMPLETENESS RULE WAS WRONG AND ITS EXEMPTION COUNT SAID SO.** Demanding an entry
+    for every literal in a locator call anywhere would have needed **663 exemptions out of 1646**.
+    Scoping the demand to holders bound to a real file, **per function**, brings it to **zero**;
+    scoping it per FILE reds a clean tree, because `src` is bound to four different documents across
+    `test_batch_bx` alone.
+  - **EC'S VACUOUS CHECK IS CONFIRMED CLOSED, MEASURED RATHER THAN READ**: `test_batch_bg`'s slice
+    runs **9,417 characters**, its opening anchor is asserted, and it carries a POSITIVE assertion
+    that cannot pass on an empty string.
+  - **AND THE SWEEP FOR THAT SHAPE FOUND THREE MORE. 87 `find`-then-`substr` slices in the tree**:
+    51 guarded, 14 self-proving, 14 archive-path extraction that fails loudly, the 3 documented
+    vacuous ones in `as`/`at`/`aw`, and **THREE that were live, resolving and UNGUARDED** —
+    `check_dr` §5, `test_batch_bm`'s negative control 4 and `test_batch_bs`'s kiln tick. None was
+    vacuous; **each was one deleted anchor away from going silent.** All three assert their anchor
+    now, one check each.
+- **Next letter: EE.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: DY emptying
-  the vault, DZ pricing two open questions without ruling on either, EA building the fallback DZ
-  priced, EB ruling on that finding and discovering that a comment in a `.gd` file is an asserted
-  surface, **and EC closing the boundary that discovery exposed and measuring, for the first time,
-  how much of the tree the document instruments were never watching.**
+  purpose-authored and charter-clean. Recent batches are correction and consolidation: DZ pricing two
+  open questions without ruling on either, EA building the fallback DZ priced, EB ruling on that
+  finding and discovering that a comment in a `.gd` file is an asserted surface, EC closing the
+  boundary that discovery exposed, **and ED covering the half the instruments were never watching —
+  and finding that the file everyone assumed was bloated is not.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -854,7 +867,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF EC
+### THE TEST TREE, AS OF ED
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -862,9 +875,12 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-nine** —
-  **EC ADDED `check_ec`**, and before it EB added `check_eb`, EA `check_ea`, DW `check_dw`, DV
-  `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **EC ADDED ONE BECAUSE §1 IS AN
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty** —
+  **ED ADDED `check_ed`**, and before it EC added `check_ec`, EB `check_eb`, EA `check_ea`, DW
+  `check_dw`, DV `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **ED ADDED ONE BECAUSE
+  §2 IS A RULING** — the manifest is the answer to the coverage question EC priced and left open,
+  and a gate encodes a ruling. **§1 ADDED NOTHING, because its ruling is that nothing should
+  change.** **EC ADDED ONE BECAUSE §1 IS AN
   INSTRUMENT REPAIR THAT HAS TO SURVIVE THE BATCH** — the scratchpad sweep is rebuilt every batch
   and a boundary fixed only there is a fix that expires. **§2 AND §3 ADDED NOTHING**, because both
   are measurements the brief forbids ruling on and a gate encodes a ruling. **EB ADDED ONE BECAUSE
@@ -879,7 +895,7 @@ re-derived from the source at DM; not one was moved.**
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 36
+  move a line in another file and say why. **There are 37
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -910,8 +926,12 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 79 ROWS: 46 suites, 28 gates, 2 scene runs
-  and 3 harness gates.** **EB ADDED `check_eb` AND MOVED NOTHING ELSE** — its row was written
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 81 ROWS: 46 suites, 30 gates, 2 scene runs
+  and 3 harness gates.** **ED ADDED `check_ed` AND MOVED THREE ROWS, ALL THREE PREDICTED AND ALL
+  THREE CONFIRMED STANDALONE BEFORE THE BATTERY** — `check_dr` 79 → 80, `test_batch_bm`
+  1888 → 1889 and `test_batch_bs` 266 → 267, one locator guard each. **Its own row was written off
+  three identical standalone readings of 18**, so `check_de` certified on pass one and reported
+  **ZERO NOTICES**. **EB ADDED `check_eb` AND MOVED NOTHING ELSE** — its row was written
   BEFORE the battery off three identical standalone readings of 12, so `check_de` certified on pass
   one instead of reporting an unwatched target, and it reported **ZERO NOTICES**. Before it, **EA
   ADDED `check_ea` AND MOVED EXACTLY ONE OTHER ROW** — `test_batch_ah`, which asserted the OLD
@@ -966,8 +986,11 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-31 (Batch EB)`.** **EB MOVED THE STAMP AND NOTHING
-  ELSE IN THAT DOCUMENT** — §1 is a ruling about how to READ a measurement, §2 is comments and §3
+- **master.html stamp: `Last updated: 2026-08-31 (Batch ED)`.** **ED MOVED THE STAMP AND NOTHING
+  ELSE IN THAT DOCUMENT — a one-line diff** — because nothing about what the game IS changed; the
+  retired-word sweep read **0 *party*** and the same single lower-case `beastmaster` spec id inside a
+  `DOD_SIM_SPECS` example **before and after**, and the literal-flip sweep read **0 gained / 0 lost**.
+  Before it, **EB MOVED THE STAMP AND NOTHING ELSE IN THAT DOCUMENT** — §1 is a ruling about how to READ a measurement, §2 is comments and §3
   is instruments, so nothing about what the game IS moved. **EA moved the stamp and four prose
   sites; DZ moved the stamp and nothing else.** **The retired-word sweep was still run over it before the battery**, using
   `test_batch_bx` §4b's own `PARTY_IDENTS` strip and §4's `Beastmaster` strip: **0 *party* and 0
@@ -1023,7 +1046,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **23 entries** (DG → EC). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
+  **24 entries** (DG → ED). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
   added, so an entry VANISHING still fails) **and prints the live figure; the ARCHIVE keeps its
@@ -1046,43 +1069,48 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at EC
+### Knowledge sync, re-measured at ED
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **164 files, 7.23 MiB** (EB measured 162 / 7.17 by this same walk). **EC added two
-  files** — `check_ec.gd` and `docs/reports/EC.md` — deleted none, and grew `CLAUDE.md` by
-  **5.49 KiB** with two standing rules and two amendments.
-- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **401**, `docs/master.html`
-  **338**, `scripts/classes.gd` **322**, `CLAUDE.md` **229**, `docs/changelog.html` **205**,
-  `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
-  **`CLAUDE.md` IS FIFTH AND `docs/changelog.html` SIXTH**; the changelog grows about 8 KiB a
-  batch, so CW's 400 KiB threshold is roughly twenty-four batches away.
+- **168 files, 7.60 MiB** (EC measured 164 / 7.23 by this same walk). **ED added four
+  files** — `check_ed.gd`, `build_pin_manifest.py`, `pin-manifest.json` and `docs/reports/ED.md` —
+  deleted none, and grew `CLAUDE.md` by **4.17 KiB** with two standing rules, two name repairs and
+  one block re-pointed at its instrument.
+- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **405**, `docs/master.html`
+  **338**, `scripts/classes.gd` **322**, **`pin-manifest.json` 296**, `CLAUDE.md` **233**,
+  `docs/changelog.html` **212**, `scripts/talents.gd` **179**, `scripts/unit.gd` **177**,
+  `docs/talent-audit.html` **165**. **`pin-manifest.json` ARRIVES FIFTH AND `CLAUDE.md` DROPS TO
+  SIXTH**; the changelog grows about 8 KiB a batch, so CW's 400 KiB threshold is roughly
+  twenty-three batches away.
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **36** — **EC ADDED `check_ec`, EB ADDED `check_eb`, EA ADDED `check_ea`, AND DZ AND DY EACH
-  ADDED NONE.**
-- **`CLAUDE.md` IS 228.91 KiB = 3.093%, UP FROM 223.42 KiB = 3.044% AT EB — SO CW's *"under
-  3%"* IS BREACHED FOR THE SECOND BATCH RUNNING AND BY MORE.** **THIS IS OWED AND IT IS RECORDED
-  RATHER THAN PASSED OVER.** EC adds two standing rules and two amendments for **+5.49 KiB**
-  and **+0.049 of a percentage point**. **Getting back under 3% needs 7.09 KiB out of
-  `CLAUDE.md`** — more than a naive subtraction gives, because pruning this file shrinks the
-  sync's DENOMINATOR too, which is the arithmetic DZ recorded.
-  - **EC MEASURED WHAT THE TARGET CANNOT SAY ON ITS OWN, AND RULED ON NOTHING.** **32.0% of the
-    file — 42 of 94 rule-blocks, 74,398 bytes — is neither asserted by any suite or gate nor quoted
-    verbatim anywhere else in the repo since its own batch wrote it**, and only **4.2 points** of
-    that was written in the last eight batches. **26.2% is asserted; 41.9% is quoted but never
-    asserted.** **A rule nobody has quoted may still be load-bearing** — the number does not say
-    what to cut, it says **the pressure on the ratio is not density.**
-  - **THE PRUNE IS NOT TAKEN HERE AND THE REASON IS SCOPE, NOT JUDGEMENT.** It is **bounded by
-    assertions rather than by judgement** — **61 distinct literals must survive verbatim across the
-    25 files that read this one**, derived live rather than inherited — so it is its own batch with
-    its own battery. **DG through DY all declined it and DZ took it**; EB and EC have both made it
-    owed again without taking it.
-  - **AND THE TARGET ITSELF IS NOW A QUESTION, NOT ONLY A NUMBER.** Four options — keep and prune
-    periodically, raise the target to the measured steady state, cap the rule count structurally,
-    or split the file the way CW split the changelog — are set out **with their arithmetic and no
-    recommendation** in `docs/reports/EC.md` §3. **The choice is the designer's.**
+  are **37** — **ED ADDED `check_ed`, EC ADDED `check_ec`, EB ADDED `check_eb`, EA ADDED
+  `check_ea`, AND DZ AND DY EACH ADDED NONE.**
+- **`CLAUDE.md` IS 233.08 KiB = 2.994%, DOWN FROM 228.91 KiB = 3.093% AT EC — SO CW's *"under 3%"*
+  IS MET FOR THE FIRST TIME SINCE DZ. AND IT WAS MET WITHOUT REMOVING A SINGLE BYTE FROM THE
+  FILE.** **THE FILE GREW BY 4.17 KiB AND THE RATIO FELL ANYWAY**, because the DENOMINATOR grew by
+  0.37 MiB — **296 KiB of it `pin-manifest.json`**, a derived instrument with nothing to do with
+  `CLAUDE.md`. **THIS FILE IS ITSELF INSIDE THAT DENOMINATOR**, so the figure moves by about a
+  thousandth of a point as this paragraph is written — measured on the tree that ships.
+  - **A TARGET THAT CAN BE MET BY ADDING AN UNRELATED FILE IS NOT MEASURING WHAT IT NAMES.** This is
+    the second half of §1's finding and it is stronger than the first: the file has no dead weight
+    AND the metric does not track the property anyone cares about. **A batch can satisfy CW's rule by
+    committing a large generated artefact**, which is the opposite of what that rule was written for.
+  - **ED READ ALL 43 NEVER-CITED BLOCKS AND RETIRED NONE.** 0 dead rules, 0 surviving narrative, 43
+    rules that bind future work and are simply obeyed. **The prune is not owed any more; the TARGET
+    is.** The measurement, the liveness test and the growth law are in `docs/reports/ED.md` §1.
+  - **THE GROWTH LAW, DERIVED FROM GIT ACROSS EIGHTEEN PRUNE-FREE BATCHES (DJ→EC): `CLAUDE.md`
+    +4,835 B a batch against a sync +79,726 B a batch — a MARGINAL RATE OF 6.06%**, which is where
+    the ratio converges if nothing is ever cut. Post-DZ alone it is **8.70%**. **3% sits below the
+    growth law**, so it is reachable only by pruning or by denominator growth, neither of which is a
+    statement about density.
+  - **TWO OPTIONS REMAIN AND BOTH ARE THE DESIGNER'S**: move the target to the growth law, or split
+    the file the way CW split the changelog. **The third — keep 3% and prune periodically — now has
+    a measured price: a maintenance batch about every eight passes, and this one found nothing to
+    cut.** **`pin-manifest.json` IS THE FIRST CANDIDATE FOR DESELECTION** from the sync if the
+    denominator is to mean anything: it is derived, re-derivable in seconds, and nothing is lost by
+    regenerating it.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---

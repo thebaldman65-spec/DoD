@@ -524,6 +524,10 @@ func _negative_controls() -> void:
 	# at all, so the control is that the member dict has no field for one.
 	var rs := _src("res://scripts/run_state.gd")
 	var i := rs.find('party.append({"key": key')
+	# GUARDED: an unguarded -1 makes `member_line` empty and the negative below
+	# true for every needle — a check that has stopped asking its question with
+	# nothing to announce it (the `test_batch_bg` shape, EC §2).
+	_check(i >= 0, "NEGATIVE 4: the party-member anchor resolves, so the slice is real")
 	var member_line := rs.substr(i, 300)
 	_check(not member_line.contains("talent_points")
 		and not member_line.contains("talent_flex"),

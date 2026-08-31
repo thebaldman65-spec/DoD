@@ -799,7 +799,11 @@ func _live_kiln_forged() -> void:
 	# It is a HIT rule, not a damage rule: a Burn tick is deliberately not
 	# covered, and that is stated rather than assumed.
 	var src := FileAccess.get_file_as_string("res://scripts/unit.gd")
-	var tick_body := src.substr(src.find("func take_tick_damage"))
+	# GUARDED, for the reason EC §2 recorded: a missing anchor gives an empty
+	# slice and the negative below passes while reading nothing.
+	var tick_at := src.find("func take_tick_damage")
+	ok(tick_at >= 0, "take_tick_damage is findable, so the tick slice is real")
+	var tick_body := src.substr(tick_at)
 	tick_body = tick_body.substr(0, 2000)
 	ok(not tick_body.contains("kiln_forged_at"),
 		"a Burn tick is not a hit — take_tick_damage carries no copy of it")
