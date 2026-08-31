@@ -14,6 +14,95 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch EB: THE CORES ARE THE BASELINE, AND A SWEEP FOR HEADERS THAT NAME THE DEAD</h2>
+<p><i>Two rulings and two instrument repairs. <b>EA's 13-of-17 is ruled INTENDED and asserted as
+the inversion rather than as the ratio; every comment in the tree is swept for a name that no
+longer resolves, and sixteen were repaired.</b> <b>NO ABILITY MAGNITUDE MOVED, NO CARD WAS
+AUTHORED, <code>Ability.PURE_BUFFS</code> WAS NOT WIDENED, AND EVERY <code>.gd</code> CHANGE
+OUTSIDE THE NEW GATE IS COMMENTS ONLY.</b> Full report: <code>docs/reports/EB.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; RULED: THE PROTECTED CORE IS THE BASELINE, AND THE DRAFT CARD PAYS FOR ITS
+SLOT.</b> EA measured 17 comparable pairs controlled for spec, role and initiative and found
+<b>13 favouring the core</b> &mdash; resource cheaper 10 to 2, cooldown shorter 13 to 1. <b>That is
+the design working, not a mispricing</b>: a core arrives free with the spec and a draft card costs
+a pick out of a capped set of slots. The ruling is in <code>CLAUDE.md</code> <b>with its reasoning
+AND with the counter-reading</b>, because nothing in the code distinguishes them and the next
+reader to find the same consistency will reach for a retune. <b>The cap reaching 29.5% of the draft
+layer against 12.8% of the cores is the same relationship expressed through the cap</b> and is
+recorded as such rather than as a second finding.</p>
+
+<p><b>WHAT IS ASSERTED IS THE INVERSION, NOT THE RATIO.</b> <code>check_eb</code> &sect;1 catches a
+draft card that becomes cheaper on resource AND shorter on cooldown than a comparable core &mdash;
+a card paying no pick and giving none back. <b>The brief's property as literally stated is not
+assertable</b>: without the equal-initiative control, <b>21 of 96</b> same-spec same-role pairs
+already have a draft card cheaper and faster, Kindled Mind at 15 Mana and initiative 1.5 against
+Death Ray at 55 and 5.0 &mdash; a cantrip beside a nuke. At equal initiative "faster" is impossible
+by construction, so the surviving tempo axis is cooldown. <b>Exactly ONE crossover exists and it is
+NAMED rather than counted</b>: Holy's Divine Plea (0 Mana, cooldown 2) against Renewal (20,
+cooldown 3). It is asserted in both directions &mdash; a second crossover reds the gate, and the
+named one vanishing reds it too, because that means the pair was re-priced and the ruling revisited
+with nothing saying so.</p>
+
+<p><b>&sect;2 &mdash; A COMMENT NAMING CODE IS A CLAIM, AND 118 OF THEM NO LONGER RESOLVE.</b> The
+fourth instance of one shape earned a sweep: <code>run_sim._award_trophies</code>'s header still
+named <code>Run.roll_ability_offer</code>. <b>The brief said DY deleted it; the deletion was AN
+&sect;4, eighteen batches ago</b>, and <code>test_batch_an</code> &sect;1 has asserted its absence
+ever since. The sweep read <b>4,049 code-shaped tokens across 111 <code>.gd</code> files</b> and
+raised <b>118 unresolved names: 16 stale, 71 correct records of a deletion, 31 noise.</b> <b>A
+comment recording a deletion is CORRECT and must not be swept</b> &mdash; repairing one deletes the
+project's memory of why a symbol is gone.</p>
+
+<p><b>THE HAYSTACK CANNOT BE A GREP, AND THE BRIEF'S OWN INSTANCE PROVES IT.</b>
+<code>check_dv</code> asserts <code>not rs.contains("func roll_ability_offer")</code> and
+<code>test_batch_an</code> holds the bare literal in its <code>gone_fn</code> list &mdash; <b>so the
+two checks that prove the function is dead are exactly what make a text sweep report it as
+alive.</b> The universe has to be a symbol table of declarations matched by equality, and the
+declarations have to be read with string literals MASKED, or an unmasked <code>func</code> scan
+declares the dead name back into existence out of the assertion pinning it absent.</p>
+
+<p><b>THE SHARPEST OF THE SIXTEEN WAS NOT PROSE.</b> <code>test_batch_bp</code> &sect;7's comment
+said its three hand-written fillers are "in no DRAFT pool at all" &mdash; <b>Rallying Shout is in
+the WARDEN's</b>. The repair holds for a narrower reason: &sect;7 is a SWORDMASTER flow, and
+<code>draft_pool_left</code> offers his own spec pool and the WARRIOR class pool and nothing else.
+<b>That invariant is now a gate</b> (<code>check_eb</code> &sect;2, driven through
+<code>draft_pool_left</code> itself), because it is a live property of the pools that can break
+without a line of <code>bp</code> being touched &mdash; which is exactly how DR's one-in-eight flake
+arrived.</p>
+
+<p><b>&sect;3 &mdash; THE EXTRACTOR NEVER LOST A LITERAL; IT LOST THE BOUNDARY BETWEEN
+ASSERTIONS.</b> EA recorded its needle extractor as reading 32 asserted literals where there are
+95. Re-measured: with string-masking disabled the extractor finds the <b>same 124 distinct asserted
+literals</b> (90 positive, 34 negative) as the fixed one. <b>What collapses is the GROUPING</b>
+&mdash; 73 positive groups become 45 and 30 negative become 25 &mdash; and <b>an or-group passes
+when ANY member is present</b>, so 28 independent assertions were being satisfied by a sibling's hit
+rather than their own. That is a check passing for a reason other than the one it states, inside the
+instrument built to find exactly that. <b>The count to assert is the GROUP count, not the literal
+count.</b> A residual half of the same bug was found and closed in <code>or_groups</code>, which
+counted brackets and the word "or" inside string literals; it moved no number on this tree.</p>
+
+<p><b>AND A PRECONDITION IS ADDED TO THE NEGATIVE-CONTROL RULE.</b> <i>Arm the control on something
+a suite demonstrably reads, and confirm the disarmed state is RED before trusting the armed one.</i>
+EA's first control wrapped a <code>CLAUDE.md</code> heading no suite reads, went green correctly,
+and was indistinguishable from a working check.</p>
+
+<p><b>AND EB BROKE A SUITE WITH A COMMENT, WHICH IS THE FINDING THAT OUTLIVES IT.</b>
+<code>test_batch_bl</code> control 1 pins the phrase <code>THIS BATCH DOES NOT SHIP ONE</code>
+inside <code>battle.gd</code>. EB &sect;2 reworded that sentence while deleting the dangling pointer
+beside it &mdash; <b>the needle verifier stayed green, the literal-flip sweep stayed green, the
+comment-stripped diff read "comments only", and the first acceptance battery took <code>bl</code>
+red.</b> Both document instruments track needles into the four tracked DOCUMENTS; <b>a suite that
+asserts a literal against <code>.gd</code> SOURCE is a haystack neither of them watches.</b> The
+needle is restored word for word with a note at the site saying why it must stay, the sweep that
+sees this is recorded in <code>CLAUDE.md</code> &mdash; the same literal sweep with the EDITED
+SOURCES as the documents &mdash; and <b>the tree was re-frozen and the battery run a second
+time</b>.</p>
+
+<p><b>WHAT WAS DELIBERATELY NOT DONE.</b> The comment sweep is <b>not</b> made a permanent gate.
+It is mechanically possible and it was built and run &mdash; but on this tree it raises 118 rows of
+which 16 are defects, so a gate would ship a 5.5-to-1 false-alarm rate and a false alarm is how an
+instrument gets switched off. <b>Reported, and ruled on nowhere.</b> No magnitude moved, no card
+was authored, and <code>Ability.PURE_BUFFS</code> was not widened.</p>
+
 <h2>2026-08-30 &mdash; Batch EA: A ZONE-BOSS AWARD ALWAYS PAYS</h2>
 <p><i>Three sections. <b>The fallback DZ priced is BUILT and it is a spec-draft card the hero does
 not hold; six assertions pinning a batch code inside <code>CLAUDE.md</code> are re-pointed at the

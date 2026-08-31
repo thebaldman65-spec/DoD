@@ -142,7 +142,7 @@ const SUITE_FIXTURE := "suite_fixture.gd"
 # gains a site, or a file that is not on this list, fails the check below.**
 const HAND_SPAWN_SITES := {
 	"test_batch_al.gd": 2,        # an autoplay history probe and its control
-	"test_batch_an.gd": 1,        # `_battle()`, its own differently-named helper
+	"test_batch_an.gd": 1,        # `_spawn_battle()`, its own differently-named helper
 	"test_batch_ax.gd": 1,        # a second board inside one check
 	"test_batch_bl.gd": 1,        # the DOD_SIM probe, stopped part-way on purpose
 	"test_rune_battle.gd": 3,     # no `_spawn` at all; three bespoke boards

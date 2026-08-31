@@ -585,8 +585,9 @@ func _live_fallback_overcharge() -> void:
 	var oc := _find(arc, "Overcharge")
 	ok(oc != null, "Overcharge is in the kit")
 	# BATCH DO: `overcharge_extra` is READ-ONLY-ZERO — the arm fires on a grant
-	# collision and no talent grants. The read site (`unit.can_overcharge`) is
-	# live code, so the branch is driven from here rather than left unproved.
+	# collision and no talent grants. The read site
+	# (`unit.overcharge_ready()`) is live code, so the branch is driven from
+	# here rather than left unproved.
 	ok(arc.overcharge_extra == 0,
 		"`overcharge_extra` is read-only-zero — nothing grants (got %d)" % arc.overcharge_extra)
 	arc.overcharge_extra = 1

@@ -68,7 +68,7 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# Trapper counts it toward his breadth (intended — §5 says so), and listing
 	# it keeps it OUT of the derived `_dispellable_buffs` set, so a Mage's own
 	# Dispel can never strip the party's own hundred-gold work back off the
-	# enemy carrying it. That is the rule CE set for `anathema` and `penance`.
+	# enemy carrying it. That is the rule CE set for `breaking_darkness`/`penance`.
 	#
 	# WHY `hexed` AND NOT `crippled`, WHICH IS WHAT THE BRIEF ASKED FOR: the
 	# status two lines up this list is already `cripple` — "Cripple", -25%
@@ -3277,7 +3277,7 @@ func heal_amount(amount: int, external := false) -> int:
 	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
 	# lane's waste product and seven rows make more of it; here it becomes the
 	# resource that pays for casting. The field is on the CASTER, so battle.gd
-	# stamps `font_of_light` onto the healer and calls `drink_overheal` — this
+	# stamps `font_of_light` onto the healer and calls `_bank_overheal` — this
 	# line only makes the number available.
 	hp = mini(hp + final, max_hp)
 	if external and final > 0:

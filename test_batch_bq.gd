@@ -22,9 +22,12 @@
 #     ally on lower health rather than re-healing the warded one;
 #   · Exhortation BANKING rather than expiring, confirmed with a slow hero who
 #     acts long after any nominal window would have closed;
-#   · `CLASS_POOLS` byte-unchanged, asserted directly — the negative control
-#     that matters, because a boss offer quietly re-weighting is exactly what
-#     the separate structure exists to prevent.
+#   · `CLASS_POOLS` GONE from the source, asserted directly — DY §3 deleted
+#     it, so the byte-freeze this line used to promise has nothing left to
+#     freeze. §1's assertion is inverted in place and `CLASS_POOLS_AT_BQ`
+#     below keeps the record of what it held. The control it replaces was
+#     the one that mattered, because a boss offer quietly re-weighting is
+#     exactly what the separate structure existed to prevent.
 #
 # FIVE OF THEM WOULD PASS ON BROKEN CODE IF WRITTEN THE OBVIOUS WAY, so each is
 # built so a broken implementation still FAILS:

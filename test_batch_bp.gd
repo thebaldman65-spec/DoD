@@ -338,10 +338,15 @@ func _warrior_draft_flow() -> void:
 	# `take_draft_ability` correctly refused it with "already known". **Three
 	# §7 checks went red on roughly a one-in-eight draw with nothing whatever
 	# wrong in the product**, and DR's battery is the run that happened to hit
-	# it. All three replacements are `SPEC_POOLS`/`CLASS_POOLS` BOSS-PICK cards
-	# and are in no DRAFT pool at all, so no draw can collide with them —
-	# which is the durable fix rather than swapping one draftable name for
-	# another. **DR's own two new cards made the collision LESS likely (the
+	# it. **BATCH EB §2 CORRECTED THIS SENTENCE TWICE OVER.** It named
+	# `CLASS_POOLS`, which DY §3 deleted, and it claimed all three replacements
+	# are "in no DRAFT pool at all" — Rallying Shout is in the WARDEN's.
+	# WHAT IS TRUE IS NARROWER AND IS ENOUGH: this is a SWORDMASTER flow, and
+	# `draft_pool_left` offers his own spec pool and the WARRIOR class pool and
+	# nothing else. Sweeping Strikes and Shatterpoint are `SPEC_POOLS` boss-pick
+	# cards in no draft pool anywhere; Rallying Shout drafts from the WARDEN
+	# alone, whom no draw here can reach. That is the durable fix rather than
+	# swapping one draftable name for another. **DR's own two new cards made the collision LESS likely (the
 	# pool went 10 -> 12), not more; the flake predates this batch entirely.**
 	m["bm_abilities"] = [cands[0], "Sweeping Strikes", "Shatterpoint",
 		"Rallying Shout"]

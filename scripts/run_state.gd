@@ -2392,12 +2392,13 @@ func victory_heal_pct() -> float:
 #
 # AND ONE REPLACEMENT, on the brief's own instruction. `up_sure` (Sure — "the
 # Perfect window on its skill check is doubled") WAS NOT WRITTEN. §1 required
-# the window to be verified as a readable value at its site first, and it is
-# not: `PERFECT_HALF` is a bare script constant in battle.gd read at exactly
-# two places — `_grade_skill_check()`, which takes no arguments and cannot see
-# which ability is being cast, and the perfect-zone ColorRect built once during
-# UI setup. It is a fixed fraction shared by every ability and every hero, not
-# a parameter. Worse, the bot never runs the bar at all (it rolls a grade off
+# the window to be verified as a readable value at its site first, and at the
+# time it was not. **THE MECHANISM IS RECORDED ONCE, IN `battle.gd`'s
+# `SC_PROFILE_DEFAULT` HEADER, AND IS NOT RESTATED HERE.** That header also
+# records that BATCH CN §1 made the window a per-cast parameter, which removed
+# the obstacle; the copy that used to stand here did not, and went on
+# describing a constant CN had already deleted.
+# Worse, the bot never runs the bar at all (it rolls a grade off
 # hardcoded probabilities), so a widened window would be invisible to every
 # instrument the project owns and its worth could never be reported. PIERCING
 # takes the slot instead: armor is an axis nothing else in the pool touches,

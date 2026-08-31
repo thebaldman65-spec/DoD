@@ -437,7 +437,7 @@ const STATUS_INFO := {
 	# EXISTING `barrier` (the same absorb pipeline Divine Shield and the vaulted
 	# Arcane Barrier use — a second barrier implementation is the last thing
 	# this file needs), Mirror Image carries a COUNT and a chip of its own
-	# (`mirror_images`, the `feint_guards` shape) because its charges must not
+	# (the `mirror` chip, whose POWER carries them) because its charges must not
 	# tick away on a turn count, Exhortation is banked in a field for the same
 	# reason, and Magic Missiles / Chastise / Dispel / Blink / Ministration
 	# resolve and are done.
@@ -909,7 +909,7 @@ var sc_perfect_zone: ColorRect
 # feature neither has.
 #
 # **IT CANNOT GO STALE, AND THAT IS BUILT RATHER THAN REMEMBERED.** It is
-# cleared at the top of every `_hero_turn` grade attempt and written by
+# cleared at the top of every `_player_turn` grade attempt and written by
 # whichever branch produced the grade — the bar, the bot's roll, or neither.
 # An empty dictionary means NO SEQUENCE RAN, which is what the no-bar branch
 # leaves behind and the one honest answer there.
@@ -6783,8 +6783,15 @@ func _intent_category(u: BattleUnit, ab: Ability) -> String:
 
 
 # The text beside the icon. §1 asks for a predicted number on three of the
-# seven rows and THIS BATCH DOES NOT SHIP ONE — see `_intent_detail_note` and
-# the batch report. The ability's own name goes there instead: it is read off
+# seven rows and THIS BATCH DOES NOT SHIP ONE — see the batch report.
+# **THAT SENTENCE IS A NEEDLE AND MUST STAY WORD FOR WORD**: `test_batch_bl`
+# control 1 asserts it against this file, so it is BL's wording kept on purpose
+# rather than a header that outlived its batch. **BATCH EB §2 REWORDED IT AND
+# TOOK `bl` RED**, which is how the tree learned that a comment in a `.gd` file
+# is an asserted surface — see EB's report. What EB §2 did delete is the
+# pointer that stood beside it, at `_intent_detail_note`: a function BL never
+# wrote and nothing has ever resolved.
+# The ability's own name goes there instead: it is read off
 # the declaration rather than computed, so it cannot drift from the code.
 func _intent_detail(u: BattleUnit, ab: Ability, category: String) -> String:
 	match category:
@@ -24702,8 +24709,9 @@ func _devout_heal(owner, amount: float, term: String,
 
 
 # The prevented half of the same rule. Damage only — Devoutness cuts BREAK
-# points, which are different units and are banked by `_devout_break_cut`
-# rather than folded in here (a Break point added to a damage total would
+# points, which are different units and are banked as `faith_break_cut` in
+# `_on_unit_credit` rather than folded in here (a Break point added to a
+# damage total would
 # quietly inflate the contribution share, which sums damage + heal + prevented).
 func _devout_prev(owner, cut: float, term: String) -> void:
 	_prev(owner, cut)

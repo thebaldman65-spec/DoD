@@ -25,9 +25,11 @@
 #   · Ironclad (BR authored it as IRON WILL; renamed at CK §2) refusing Stun,
 #     Freeze and Daze, and his Break meter reaching
 #     EXACTLY 99 and stopping — then breaking on the first hit after it lapses.
-#   · plus `CLASS_POOLS` byte-unchanged, asserted as literals — the same
-#     negative control BQ used, because a boss offer quietly re-weighting is
-#     the failure the separate structure exists to prevent.
+#   · plus `CLASS_POOLS` GONE from the source, asserted the same way BQ's is
+#     — DY §3 deleted it, so the literals this line used to promise have
+#     nothing left to pin; `CLASS_POOLS_AT_BR` below keeps the record. A boss
+#     offer quietly re-weighting is the failure the separate structure
+#     existed to prevent.
 #
 # SIX OF THEM WOULD PASS ON BROKEN CODE IF WRITTEN THE OBVIOUS WAY, so each is
 # built so a broken implementation still FAILS:

@@ -5920,3 +5920,80 @@ distinguishes those two readings, and choosing between them is a balance decisio
 specs. **A gate that asserted the numbers would be encoding a ruling nobody made**, so what EA's
 gate pins is the *direction* — enough that the day somebody re-prices a core, the report is
 announced stale instead of quietly describing a game that moved.
+
+## Batch EB — why a consistent measurement is a ruling and not a bug, and why a sweep's noise is the finding
+
+**The 13-of-17 was never the thing to assert.** EA measured seventeen comparable pairs and found
+thirteen favouring the protected core, on two axes, with the delay cap controlled out. That is a
+real signal and it is consistent across twelve specs — and consistency is exactly what makes it
+*look* like a systematic mispricing. It is not. A protected core arrives free with the spec; a
+draft card costs a pick out of a capped set of slots. **A draft card paying that pick in initiative
+and in resource is the correct relationship**, and a measurement that finds it is the design
+working.
+
+**What made this worth a ruling rather than a shrug is that nothing in the code distinguishes the
+two readings.** Both fit the same numbers. So the ruling is recorded with its reasoning *and* with
+the counter-reading, because the next reader to run the same measurement will find the same
+thirteen and reach for a retune — and they should know they are overturning a decision rather than
+fixing a defect.
+
+**And then the property to assert is the mirror image of the finding, not the finding.** A gate
+pinning "thirteen of seventeen favour the core" pins the intended state, which moves whenever a
+pool grows. What cannot be allowed to happen silently is the INVERSION: a draft card that is
+cheaper to cast *and* comes back sooner than a comparable core — a card that pays no pick and gives
+none back.
+
+**The brief's version of that property was not assertable, and finding out why was worth the
+detour.** Written without the equal-initiative control it reads *cheaper and faster*, and 21 of 96
+same-spec same-role pairs already satisfy it: Kindled Mind at 15 Mana and initiative 1.5 against
+Death Ray at 55 and 5.0. That is a cantrip beside a nuke, and a gate asserting it is RED on the day
+it is written — which is the fastest way to get an instrument switched off. **At equal initiative
+"faster" is impossible by construction**, so the tempo axis that survives the control is cooldown,
+and that is the axis the gate asserts. Exactly one crossover exists, it is Divine Plea against
+Renewal, and it is NAMED rather than folded into a count — so a second one reds the gate, and the
+named one disappearing reds it too.
+
+---
+
+**§2's real lesson is not that four comments went stale. It is that the assertions proving a symbol
+is dead are what hide it from a sweep.** `check_dv` asserts `not rs.contains("func
+roll_ability_offer")`. `test_batch_an` §1 holds the bare literal `"roll_ability_offer"` in its list
+of deleted functions. Both are correct and both are load-bearing — and together they put the dead
+name into the tree's text twice, so a resolution sweep built on grep reports it as resolving. The
+first version of this sweep did exactly that, and it was the brief's own named instance it missed.
+
+**The universe has to be a symbol table of declarations, matched by equality — and the declarations
+have to be read with the string literals masked.** An unmasked `func\s+(\w+)` scan reads *inside*
+`"func roll_ability_offer"` and declares the dead name back into existence out of the assertion
+that pins it absent. That is the needle extractor's bracket-depth bug wearing a different hat, in a
+different instrument, found the same week: **an extractor that reads inside string literals
+measures the wrong population, and it always errs toward the safe-looking answer.**
+
+**The noise is the finding, not an annoyance to be filtered away.** The sweep raised 118 unresolved
+names. Sixteen were defects. **Seventy-one were correct records of a deletion** — `CLASS_POOLS IS
+DELETED`, `_overburn_drain is deleted` — and repairing one would erase the project's memory of why
+a symbol is gone. Thirty-one were noise of a kind no rule can remove: suffix conventions
+(`the _step house form`), names composed at runtime (`cy_meter_bloodrage`), live cards written in
+id casing (`sever` for Sever), engine identifiers, and suite shorthand.
+
+**That ratio is the whole answer to "should this be an instrument".** It can be built — it was
+built, and it ran. But 118 rows to find 16 defects is 5.5 false alarms per real one, and a check
+that cries wolf gets suppressed rather than investigated. **A rule that a batch applies when it
+deletes something is cheaper and lands at the moment the information exists**, which is why §2
+ships a rule and no gate.
+
+---
+
+**The one §2 finding that was not prose is the one that became a gate.** `test_batch_bp` §7's
+comment explained its three hand-written fillers were chosen because they "are in no DRAFT pool at
+all". Rallying Shout is in the Warden's. The repair is still correct, for a narrower reason the
+comment never gave: §7 is a Swordmaster flow, and `draft_pool_left` offers his own spec pool and
+the Warrior class pool and nothing else.
+
+**A comment stating a stronger invariant than the code has is worse than one stating none**,
+because the next batch relies on the strong version. And this particular invariant is exactly the
+kind that breaks without anybody touching the file that depends on it — the pools grow, and a name
+that no draw could reach becomes a name a draw can. That is how DR's one-in-eight flake arrived in
+the first place. **So it is asserted rather than described**, through `draft_pool_left` itself
+rather than through the two pool accessors, which also keeps the gate clear of `check_da` §3's
+fingerprint.

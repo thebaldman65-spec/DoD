@@ -5,95 +5,105 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-30 (Batch EA).*
+*Last rewritten: 2026-08-31 (Batch EB).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EA — A ZONE-BOSS AWARD ALWAYS PAYS.** Three sections. **THE FALLBACK DZ PRICED IS
-  BUILT AND IT IS A SPEC-DRAFT CARD THE HERO DOES NOT HOLD; SIX ASSERTIONS PINNING A BATCH CODE
-  INSIDE `CLAUDE.md` ARE RE-POINTED AT THE RULES THEY WERE REACHING FOR; AND EVERY PROTECTED CORE
-  IS MEASURED AGAINST THE DRAFT CARDS THAT DO COMPARABLE WORK.** **NO ABILITY MAGNITUDE MOVED, NO
-  CARD WAS AUTHORED AND `Ability.PURE_BUFFS` WAS NOT WIDENED.** **Report: `docs/reports/EA.md`.**
-- **§1 — THE ZONE-BOSS FALLBACK IS BUILT AND 14 OF THE GAME'S 36 AWARDS GO TO 0.** When
-  `roll_spec_ability_offer` comes back empty, `Run.award_ability_pick` now reads
-  `roll_spec_fallback_offer` — the hero's own **SPEC DRAFT pool minus what they already hold**,
-  three offered — instead of returning false. **The boss-pool line above it is byte-identical**, so
-  AN §4's spec-lock ruling stands, `test_batch_bb` §6's pin on that source line stays green, and
-  the fallback is spec-locked too.
-  - **THE DEFECT WAS THE SILENCE, NOT THE REWARD.** `battle._award_ability_picks` skipped that hero
-    and the victory card did not name them, so **a player who had drafted well was told less than
-    one who had not.** The award returning true is what puts the hero into `named`; the existing
-    announcement line does the rest. **The one arm the loop can still skip is a member with no
-    spec.**
-  - **IT IS TWO LINES BECAUSE BOTH CHANNELS ALREADY WRITE `bm_abilities`** — which is exactly the
-    mechanism that empties these pools. No new storage, no new screen, no save-format change:
-    the award site already banks a triple, the map's owed-pick overlay already resolves one, and
-    `_pick_ability` is pool-agnostic and takes a name.
-  - **NO SPEC CAN STILL BE PAID NOTHING, AND THE EIGHT EMPTIABLE BOSS POOLS DID NOT MOVE.**
-    `check_dv` §2 still reads 8; what changed is what an emptied pool COSTS. **`check_ea` §1
-    asserts the 8 in the opposite direction: if it ever reads 0 the fallback is dead code.**
-  - **THE FLOOR IS SIX BY SLOT ARITHMETIC AND FIVE ONCE THE RUNES ARE CARRIED, AND THE BRIEF
-    CARRIED SIX.** `owned_ability_names` cannot see an ability a RUNE grants — the grant lands on
-    the battle `cfg` in `Talents.apply_payload`, never on the member dict. **Four runes grant an
-    ability; two name a card in the same hero's own draft pool** (Binding Souls → Sacred Resolve,
-    the Devout; the Flayed Mind → Mind Flay, the Occultist), which takes the Occultist to **5**
-    against the **3** an offer asks for. **Both names are also in their own spec's BOSS pool, so
-    the fallback exposes nothing the existing channel did not.**
-  - **AND THE FIRST VERSION OF THAT MEASUREMENT WAS VACUOUS, WHICH IS WHERE `CLAUDE.md`'s NEW
-    SWEEP RULE COMES FROM.** The probe read `runes.json` as an Array; it is a **Dictionary**, so
-    the walk never ran and printed *"0 granting runes"* — the wrong answer in the safe-looking
-    direction, from a control that looked like it had passed.
-  - **THE FALLBACK DELIBERATELY DOES NOT CONSULT `draft_refused`**, and the reason is at the site:
-    the boss channel never has either, refusal is the DRAFT channel's own memory, and a run that
-    declined enough offers could drain the floor back below three — the exact defect being closed.
-- **§2 — THERE WERE SIX BATCH-CODE PINS, NOT THREE, AND THE FOURTH WAS ONE LINE BELOW THE THIRD.**
-  DZ found `BATCH BN`, `BATCH BS` and `BATCH CE` by reading and predicted a fourth it would not
-  find. **It is `BATCH CG`, in `test_batch_ce`, one row under `BATCH CE`.** A mechanical sweep
-  found **two more of a different shape**: rule pins whose LITERAL still carried a code
-  (`"BATCH BN §2 — WAS x0.70"`, `"REWRITTEN AT BATCH BS, NOT AMENDED"`).
-  - **ALL SIX RE-POINTED, NONE DELETED — every one had a live rule behind it.** The ladder's
-    standing heading and its rung-1 number; the governor table's heading and its
-    ceiling-not-a-cost sentence; the re-point-in-place discipline; the content-batch convention.
-  - **AND ALL SIX WERE PASSING OFF A DIFFERENT SENTENCE THAN THEIR MESSAGE CLAIMED.** There is no
-    `BATCH BS` block and no `BATCH CE` block. This file recorded `bs`'s as passing by accident;
-    **it was true of all four bare pins.**
-  - **WHAT FOUND THE FOURTH WAS MATCHING THE VARIABLE HOLDING THE DOCUMENT, SCOPED PER FUNCTION.**
-    `test_batch_bx` binds the name `master` three times in one file and two are stripped copies, so
-    a file-scoped sweep reports a violation that is not there. **`check_ea` §3 makes it permanent
-    and asserts its own population** — 25 readers, 61 asserted literals, 0 pins.
-  - **51 OF THE TREE'S 57 BATCH-CODE LITERALS ARE CORRECT AND WERE LEFT ALONE**: they pin the
-    changelog, its archive, `design-notes.md` and `.gd` comments, where a batch code is the entry's
-    identity. **CW's split was about `CLAUDE.md`.**
-- **§3 — THE PROTECTED CORES ARE SYSTEMATICALLY CHEAPER THAN COMPARABLE DRAFT CARDS. MEASURED,
-  RULED ON NOWHERE, AND IT NEEDS THE DESIGNER.** DZ's Blessing of Zeal finding is not one card.
-  Controlled three ways — same spec (one currency), same role (derived from the fields), same
-  initiative with `PURE_BUFFS` excluded from both sides (a clamped initiative is not a price) —
-  **17 comparable pairs, and 13 of the 17 favour the core**: cheaper on an axis and dearer on
-  neither. **Resource: core cheaper 10, dearer 2. Cooldown: shorter 13, longer 1.**
-  - **BOTH COUNTER-CASES ARE THE SAME DRAFT CARD** — Divine Plea against Holy's Heal and Renewal —
-    **and it costs 0 Mana.** Exactly one draft card in the game is cheaper than a comparable core.
-  - **THE THIRD AXIS RUNS THE OTHER WAY AND THAT IS WHY THE CONTROL MATTERS.** Cores are SLOWER in
-    every role bucket. At EQUAL initiative the 13-of-17 stands, so the tempo they pay does not buy
-    back the resource and cooldown they save.
-  - **THE CAP BINDS THE TWO LAYERS AT DIFFERENT RATES, WHICH EXTENDS DZ's STRUCTURAL FINDING.**
-    `BUFF_DELAY_CAP` reaches **29.5% of the draft layer against 12.8% of the cores** — the one
-    instrument that prices tempo reaches the draft side more than twice as often.
-  - **AND THE COUNTER-ARGUMENT IS RECORDED WITH THE NUMBER SO IT TRAVELS WITH IT**: a core arrives
-    free with the spec and a draft card costs a pick, so "cheaper to cast" is what you would author
-    on purpose if the core is the baseline. **Nothing in the code distinguishes the two readings.**
-    `check_ea` §4 pins the DIRECTION rather than the counts, so a pool growing does not red it.
-- **Next letter: EB.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EB — THE CORES ARE THE BASELINE, AND A SWEEP FOR HEADERS THAT NAME THE DEAD.**
+  Two rulings and two instrument repairs. **EA's 13-of-17 IS RULED INTENDED AND ASSERTED AS THE
+  INVERSION RATHER THAN AS THE RATIO; EVERY COMMENT IN THE TREE IS SWEPT FOR A NAME THAT NO LONGER
+  RESOLVES, AND SIXTEEN WERE REPAIRED.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED,
+  `Ability.PURE_BUFFS` WAS NOT WIDENED, AND EVERY `.gd` CHANGE OUTSIDE THE NEW GATE IS COMMENTS
+  ONLY.** **Report: `docs/reports/EB.md`.**
+- **§1 — RULED: THE PROTECTED CORE IS THE BASELINE AND THE DRAFT CARD PAYS FOR ITS SLOT.** A core
+  arrives FREE with the spec; a draft card costs a PICK out of a capped set of slots, so a draft
+  card paying that pick in initiative and resource is the correct relationship. **The 13-of-17 is
+  evidence the layer is consistent, not evidence it is broken.** The ruling is in `CLAUDE.md`
+  **with its reasoning AND with its counter-reading**, because nothing in the code distinguishes
+  the two and the next reader to run the measurement will find the same thirteen.
+  - **WHAT IS ASSERTED IS THE INVERSION, NOT THE RATIO.** `check_eb` §1 catches a draft card
+    **cheaper on resource AND shorter on cooldown** than a comparable core — a card paying no pick
+    and giving none back. **The ratio is PRINTED and asserted nowhere**: `check_ea` §4 owns the
+    aggregate direction, and two copies of one fact in two gates is DJ's defect.
+  - **THE BRIEF'S PROPERTY AS LITERALLY STATED IS RED AT HEAD, AND THAT IS WHY THE CONTROL IS
+    LOAD-BEARING.** Without the equal-initiative control, **21 of 96** same-spec same-role pairs
+    already have a draft card *cheaper and faster* — Kindled Mind at 15 Mana / initiative 1.5
+    against Death Ray at 55 / 5.0, a cantrip beside a nuke. **At equal initiative "faster" is
+    impossible by construction**, so the surviving tempo axis is COOLDOWN.
+  - **EXACTLY ONE CROSSOVER EXISTS AND IT IS NAMED RATHER THAN COUNTED**: Holy's **Divine Plea**
+    (0 Mana, cooldown 2) against **Renewal** (20, cooldown 3) at initiative 3.0 in the heal role.
+    Asserted in BOTH directions — a second crossover reds the gate, and **the named one vanishing
+    reds it too**, because that means the pair was re-priced and the ruling revisited with nothing
+    saying so. **Against Holy's Heal the same card is cheaper and LONGER, which is an ordinary
+    trade** — EA's "both counter-cases are the same draft card" is one crossover and one trade.
+  - **THE CAP BINDING THE LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
+    FINDING.** 29.5% of the draft layer against 12.8% of the cores is what a priced layer looks
+    like beside a baseline one. **Not a defect, and not a reason to widen `Ability.PURE_BUFFS`.**
+- **§2 — 118 NAMES IN COMMENTS NO LONGER RESOLVE; 16 WERE STALE AND 71 WERE CORRECT.** The sweep
+  read **4,049 code-shaped tokens across 111 `.gd` files**. **A comment RECORDING a deletion is
+  correct and must not be swept** — repairing one deletes the project's memory of why a symbol is
+  gone. The remaining 31 are noise: suffix conventions, names composed at runtime, live cards
+  written in id casing, engine names, suite shorthand.
+  - **THE BRIEF'S OWN INSTANCE WAS MIS-ATTRIBUTED AND ALMOST INVISIBLE.**
+    `run_sim._award_trophies` named `Run.roll_ability_offer` — **deleted at AN §4, not by DY** —
+    and `test_batch_an` §1 has asserted its absence ever since.
+  - **THE HAYSTACK CANNOT BE A GREP.** `check_dv` asserts `not rs.contains("func
+    roll_ability_offer")` and `test_batch_an` holds the bare literal in its `gone_fn` list, **so
+    the two checks that prove the function is dead are what make a text sweep report it as alive.**
+    The universe must be a SYMBOL TABLE of declarations matched by equality, read with the string
+    literals **masked** — the needle extractor's bracket-depth bug in a second instrument.
+  - **THE RULE IS SPLIT WHERE DR's WAS NOT: delete where the thing is GONE, correct the name where
+    the thing only MOVED.** A rename leaves a live claim wearing a dead name, and deleting it
+    throws away something true. Three of the sixteen were deletions; thirteen were moves.
+  - **THE SHARPEST OF THE SIXTEEN WAS NOT PROSE AND IT BECAME A GATE.** `test_batch_bp` §7's
+    comment said its three hand-written fillers are *"in no DRAFT pool at all"* — **Rallying Shout
+    is in the WARDEN's.** The repair holds for a narrower reason: §7 is a SWORDMASTER flow and
+    `draft_pool_left` offers his own spec pool and the WARRIOR class pool and nothing else.
+    **`check_eb` §2 asserts it live**, because the pools grow under a hand-written kit and that is
+    exactly how DR's one-in-eight flake arrived.
+  - **IT IS NOT MADE A PERMANENT GATE, AND THE RATIO IS THE REASON.** 118 rows for 16 defects is
+    5.5 false alarms per real one, and a gate cannot tell a deletion RECORD from a stale claim
+    without reading the sentence. **A rule costs nothing on a batch that deletes nothing and lands
+    at the moment the information exists.** Reported, ruled on nowhere.
+- **§3 — THE EXTRACTOR NEVER LOST A LITERAL; IT LOST THE BOUNDARY BETWEEN ASSERTIONS.** EA
+  recorded its needle extractor as reading 32 where there are 95. **Re-measured: with
+  string-masking disabled it finds the SAME 124 distinct asserted literals** (90 positive, 34
+  negative). **What collapses is the GROUPING — 73 positive groups become 45, 30 negative become
+  25 — and an or-group passes when ANY member is present**, so 28 independent assertions were
+  satisfied by a sibling's hit rather than their own. **The count to assert is the GROUP count.**
+  A literal census reads 124 either way and cannot see this at all. **EA's 32-reading build no
+  longer exists and could not be reproduced**, which is stated rather than worked around.
+  - **A RESIDUAL HALF OF THE SAME BUG IS CLOSED AND MOVES NOTHING.** `or_groups()` counted brackets
+    and the bare word `or` inside string literals. 73/22/30/46 before and after.
+  - **AND A PRECONDITION IS ADDED TO THE NEGATIVE-CONTROL RULE**, in `CLAUDE.md`: *arm the control
+    on something a suite demonstrably reads, and confirm the disarmed state is RED before trusting
+    the armed one.* **EB's own parse control failed it** — armed on the new GATE, and `check_parse`
+    does not walk the gates.
+- **AND EB BROKE A SUITE WITH A COMMENT, WHICH IS THE FINDING THAT OUTLIVES THE BATCH.**
+  `test_batch_bl` control 1 pins `THIS BATCH DOES NOT SHIP ONE` inside `battle.gd`. §2 reworded
+  that sentence while deleting the dangling pointer beside it. **The needle verifier stayed green,
+  the literal-flip sweep stayed green, the comment-stripped diff read "comments only", the
+  39-target subset battery stayed green — and the first acceptance battery took `bl` to 88 / 1.**
+  - **THE HOLE IS STRUCTURAL: both document instruments track needles into the four tracked
+    DOCUMENTS, and a suite asserting a literal against `.gd` SOURCE is a haystack neither
+    watches.** `bl` reads no tracked document, so the subset battery did not include it either.
+  - **"COMMENTS ONLY" STOPS BEING A SAFETY ARGUMENT.** The comment-stripped diff proves no CODE
+    moved; it says nothing about whether a suite reads the comment. **Both proofs are owed.**
+  - **THE INSTRUMENT THAT SEES IT IS THE SAME SWEEP WITH THE EDITED SOURCES AS THE DOCUMENTS**, and
+    it is in `CLAUDE.md`. It read **five lost literals**, the first of which is the break; the other
+    four are substring noise with no assertion behind them. **The needle is restored word for word
+    with a note at the site saying why**, and **the tree was re-frozen and the battery run a second
+    time** — a batch that edits behind its own certification run has certified nothing.
+- **Next letter: EC.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: DQ's audit,
-  DR's rulings, DS's Hunter gap, DT's loose ends, DU's corpus fix, DV's rulings and the changelog
-  cut, DW closing the enumeration rule's blind spot, DX turning a six-times-repeated defect into a
-  rule, DY emptying the vault, DZ pricing two open questions without ruling on either, **and EA
-  building the fallback DZ priced, repairing six checks that had stopped asking their question, and
-  handing the designer a balance finding across twelve specs.**
-
+  purpose-authored and charter-clean. Recent batches are correction and consolidation: DX turning a
+  six-times-repeated defect into a rule, DY emptying the vault, DZ pricing two open questions
+  without ruling on either, EA building the fallback DZ priced and handing the designer a balance
+  finding across twelve specs, **and EB ruling on that finding, sweeping the comment layer for the
+  first time, and discovering that a comment in a `.gd` file is an asserted surface.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -316,9 +326,17 @@ removes itself from the boss offer and vice versa.**
   draft. **The boss-pick pools were dumped but not audited.** `perfect_id` bonuses were read but
   not compared as a population.
 
-### THE THREE PRICING QUESTIONS — MEASURED AT DZ AND WIDENED AT EA, ALL THREE STILL THE DESIGNER'S
+### THE THREE PRICING QUESTIONS — THE LAYER-WIDE ONE IS **RULED AT EB §1**; THE OTHER TWO ARE STILL THE DESIGNER'S
 
-**AND EA §3 ANSWERS THE QUESTION DZ's §2 RAISED: IT IS NOT ONE CARD, IT IS THE LAYER.** Every
+**RULED AT EB §1: THE PROTECTED CORE IS THE BASELINE AND THE DRAFT CARD PAYS FOR ITS SLOT.** The
+13-of-17 is the design working, not a mispricing, and `CLAUDE.md` carries the ruling with its
+reasoning AND its counter-reading. **`check_eb` §1 asserts the INVERSION** — a draft card cheaper on
+resource AND shorter on cooldown than a comparable core — **with exactly one crossover named
+(Divine Plea against Renewal), in both directions.** The cap's 29.5%-against-12.8% is the same
+relationship through the cap and is not a second finding. **`Ability.PURE_BUFFS` was not widened
+and no magnitude moved.** The measurement below is kept because the ruling is *about* it.
+
+**AND EA §3 ANSWERED THE QUESTION DZ's §2 RAISED: IT IS NOT ONE CARD, IT IS THE LAYER.** Every
 protected core was compared against the draft cards that do comparable work, controlled for spec
 (one currency), role (derived from the fields) and initiative, with `PURE_BUFFS` members excluded
 from both sides because a clamped initiative is not a price anyone chose. **17 comparable pairs;
@@ -329,8 +347,10 @@ equal-initiative control is the comparison that counts. **`BUFF_DELAY_CAP` binds
 layer against 12.8% of the cores.** **THE COUNTER-ARGUMENT TRAVELS WITH THE NUMBER**: a core
 arrives free with the spec and a draft card costs a pick, so "cheaper to cast" is what a designer
 would author on purpose if the core is the baseline — and nothing in the code distinguishes the two
-readings. **This is a balance finding across twelve specs and it needs the designer, not a batch.**
-`check_ea` §4 pins the DIRECTION rather than the counts, so a pool growing does not red it.
+readings. **EB §1 RULED IT: the first reading is intended, and `CLAUDE.md` carries the ruling with
+the counter-reading beside it.** `check_ea` §4 pins the DIRECTION rather than the counts, so a pool
+growing does not red it, and **`check_eb` §1 pins the per-pair INVERSION the ruling does not
+cover**, with the one crossover named in both directions.
 
 **Full working: `docs/reports/DZ.md` §2 (the first two) and `docs/reports/DY.md` §1 (all three as
 first raised).** DZ measured and ruled on nothing.
@@ -839,7 +859,7 @@ re-derived from the source at DM; not one was moved.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
 
-### THE TEST TREE, AS OF DZ
+### THE TEST TREE, AS OF EB
 
 - **47 `test_*.gd` files**: 44 `test_batch_*` spanning `ah` to `cp` (with gaps — they are NOT one
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the repo
@@ -847,17 +867,18 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-seven** —
-  **EA ADDED `check_ea`**, and before it DW added `check_dw`, DV `check_dv` and DU `check_du`;
-  **DZ AND DY EACH ADDED NONE.** **EA ADDED ONE BECAUSE §1 IS A RULING** — DZ's §1 and §2 were
-  measurements the designer rules on, and a gate encodes a ruling. **EA §3 IS STILL A
-  MEASUREMENT AND RIDES IN THE SAME GATE PINNING A DIRECTION RATHER THAN A COUNT**, which is the
-  shape that does not encode a ruling nobody made. **`check_dw` ASSERTS
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **twenty-eight** —
+  **EB ADDED `check_eb`**, and before it EA added `check_ea`, DW `check_dw`, DV `check_dv` and DU
+  `check_du`; **DZ AND DY EACH ADDED NONE.** **EB ADDED ONE BECAUSE §1 IS A RULING** — a gate
+  encodes a ruling, and EB §1 is the ruling on the measurement EA handed over. **EA §3 WAS STILL A
+  MEASUREMENT AND RODE IN `check_ea` PINNING A DIRECTION RATHER THAN A COUNT**, which is the
+  shape that does not encode a ruling nobody made; `check_eb` §1 is the shape that does, now that
+  the ruling exists. **`check_dw` ASSERTS
   THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 33
+  move a line in another file and say why. **There are 35
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -888,11 +909,12 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 78 ROWS: 46 suites, 27 gates, 2 scene runs
-  and 3 harness gates.** **EA ADDED `check_ea` AND MOVED EXACTLY ONE OTHER ROW** — `test_batch_ah`,
-  which asserted the OLD award behaviour outright and was inverted in place rather than deleted.
-  **Both were written BEFORE the battery**, so `check_de` certifies on pass one instead of
-  reporting an unwatched target. **DZ ADDED NO ROW AND MOVED NONE — IT WAS THE FIRST BATCH IN THIS
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 79 ROWS: 46 suites, 28 gates, 2 scene runs
+  and 3 harness gates.** **EB ADDED `check_eb` AND MOVED NOTHING ELSE** — its row was written
+  BEFORE the battery off three identical standalone readings of 12, so `check_de` certified on pass
+  one instead of reporting an unwatched target, and it reported **ZERO NOTICES**. Before it, **EA
+  ADDED `check_ea` AND MOVED EXACTLY ONE OTHER ROW** — `test_batch_ah`, which asserted the OLD
+  award behaviour outright and was inverted in place rather than deleted. **DZ ADDED NO ROW AND MOVED NONE — IT WAS THE FIRST BATCH IN THIS
   FILE'S RECORD TO PREDICT A COMPLETELY FLAT TABLE AND GET ONE.** It edits no `.gd` file and no data file,
   and **every assertion against the documents it does edit is a `contains` whose COUNT is fixed**,
   so `CLAUDE.md` can lose 51 KiB without moving a single check count. **DY ADDED NO ROW EITHER AND
@@ -904,8 +926,8 @@ re-derived from the source at DM; not one was moved.**
   quiet. **A BATCH THAT MOVES A FAILURE BAND DOWN IS THE ONLY KIND THAT SHOULD**, and DE's polarity
   rule is why: a FALLING failure count is a notice, a rising one is an error. DV added `check_dv`
   and moved nothing else; DU added `check_du` and moved `check_cz`. **`check_de` HAS NO ROW OF ITS
-  OWN, SO ITS OWN +4 FOR A NEW GATE IS REPORTED BY NOTHING** — **EA adds `check_ea` and moves it
-  321 → 325 for exactly that reason**, and DX added no target so it did not move at all; and the battery's first pass after a new gate necessarily reads one `check_de`
+  OWN, SO ITS OWN +4 FOR A NEW GATE IS REPORTED BY NOTHING** — **EB adds `check_eb` and moves it
+  325 → 329, and EA moved it 321 → 325, for exactly that reason**, and DX added no target so it did not move at all; and the battery's first pass after a new gate necessarily reads one `check_de`
   failure — a target that ran with no row is UNWATCHED, which is that assertion working — so the row
   is added and `check_de` re-run over the same log directory, which is what it is built for. **DR ADDED `check_dr` AND MOVED FIVE ROWS** — `test_batch_bt`, `check_co`,
   and the three its own first battery NOTICED and it had not predicted (`bo`, `cb`, `ce`). **IT IS
@@ -943,10 +965,10 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-30 (Batch EA)`.** **EA MOVED THE STAMP AND FOUR
-  PROSE SITES** — §6a gains the fallback paragraph, and the three summary lines that described a
-  zone-boss pick as spec-pool-only now name the fallback too, because EA changes what the game IS.
-  **DZ moved the stamp and nothing else in that document.** **The retired-word sweep was still run over it before the battery**, using
+- **master.html stamp: `Last updated: 2026-08-31 (Batch EB)`.** **EB MOVED THE STAMP AND NOTHING
+  ELSE IN THAT DOCUMENT** — §1 is a ruling about how to READ a measurement, §2 is comments and §3
+  is instruments, so nothing about what the game IS moved. **EA moved the stamp and four prose
+  sites; DZ moved the stamp and nothing else.** **The retired-word sweep was still run over it before the battery**, using
   `test_batch_bx` §4b's own `PARTY_IDENTS` strip and §4's `Beastmaster` strip: **0 *party* and 0
   *beast*, in the edited file and at HEAD alike** — and the literal-flip sweep read **0 gained /
   0 lost**, which is what a two-character edit should read.
@@ -1000,7 +1022,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **21 entries** (DG → EA). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
+  **22 entries** (DG → EB). **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
   added, so an entry VANISHING still fails) **and prints the live figure; the ARCHIVE keeps its
@@ -1023,26 +1045,32 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at EA
+### Knowledge sync, re-measured at EB
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — the walks have differed by one before, and the
 SIZES are the comparable half. **ALL SIZES BELOW ARE KiB (1024 bytes)**.*
-- **160 files, 7.10 MiB** (DZ measured 158 / 7.02). **EA added two files** — `check_ea.gd` and
-  `docs/reports/EA.md` — deleted none, and grew `CLAUDE.md` by **4.7 KiB** with three standing
-  rules.
-- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **392**, `docs/master.html`
-  **338**, `scripts/classes.gd` **322**, `CLAUDE.md` **215**, `docs/changelog.html` **194**,
+- **162 files, 7.16 MiB** (EA measured 160 / 7.10). **EB added two files** — `check_eb.gd` and
+  `docs/reports/EB.md` — deleted none, and grew `CLAUDE.md` by **8.1 KiB** with three standing
+  rules and one amendment.
+- Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **397**, `docs/master.html`
+  **338**, `scripts/classes.gd` **322**, `CLAUDE.md` **223**, `docs/changelog.html` **201**,
   `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `docs/talent-audit.html` **165**.
   **`CLAUDE.md` IS FIFTH AND `docs/changelog.html` SIXTH**; the changelog grows about 8 KiB a
   batch, so CW's 400 KiB threshold is roughly twenty-five batches away.
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **34** — **EA ADDED `check_ea`, AND DZ AND DY EACH ADDED NONE.**
-- **`CLAUDE.md` IS 215.32 KiB = 2.963%, UP FROM 210.59 KiB = 2.948% AT DZ.** **CW's *"under 3% and
-  roughly flat"* still holds on both halves** — EA adds three standing rules and the ratio moves
-  **+0.015 of a percentage point**, which is what "roughly flat" is supposed to look like. **The
-  prune is DZ's and it is closed; what this row measures now is whether it stays paid.** For scale,
-  the ratio rose every batch from 3.25% at DI to 3.639% at DY before that cut.
+  are **35** — **EB ADDED `check_eb`, EA ADDED `check_ea`, AND DZ AND DY EACH ADDED NONE.**
+- **`CLAUDE.md` IS 223.42 KiB = 3.046%, UP FROM 215.32 KiB = 2.963% AT EA — AND CW's *"under 3%"*
+  IS BREACHED FOR THE FIRST TIME SINCE DZ's PRUNE.** **THIS IS OWED AND IT IS RECORDED RATHER THAN
+  PASSED OVER.** EB adds three standing rules and one amendment for **+8.1 KiB** and **+0.083 of a
+  percentage point**, which is five times the "roughly flat" +0.015 EA moved it. **Getting back
+  under 3% needs roughly 3.5 KiB out of `CLAUDE.md`** — more than that in practice, because pruning
+  this file shrinks the sync's DENOMINATOR too, which is the arithmetic DZ recorded.
+  - **THE PRUNE IS NOT TAKEN HERE AND THE REASON IS SCOPE, NOT JUDGEMENT.** It is **bounded by
+    assertions rather than by judgement** — **60 literals must survive verbatim across the 26
+    targets that read the file** — so it is its own batch with its own battery, and EB has already
+    run two. **DG through DY all declined it and DZ took it**; this is the first batch since to
+    make it owed again.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -1134,79 +1162,108 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EA AND IT FOUND NOTHING.** No suite failure, no throw, no notice, and the only red
-is the one that is on purpose. **175 files were MD5-stamped before the acceptance run and
-re-compared after; EXACTLY ONE DIFFERS AND EXACTLY ONE IS NEW — `docs/state.md` and
-`docs/reports/EA.md`** — the two written during it. **Nothing reads either, and that was checked
-rather than recalled**: six files NAME `state.md` and all six mentions are in comments.
+**TWO BATTERIES AT EB. THE FIRST TOOK A SUITE RED AND THE SECOND FOUND NOTHING.** The second run:
+no suite failure, no throw, no notice, and the only red is the one that is on purpose. **177 files
+were MD5-stamped before the acceptance run and re-compared after; EVERY ONE IS BYTE-IDENTICAL.**
 `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, `baselines.json`
-and every `.gd` file are **byte-identical across the run**, so the battery certified what ships.
+and every `.gd` file are unchanged across the run, so the battery certified what ships. **EXACTLY
+TWO FILES DIFFER FROM THE CERTIFIED TREE NOW — this one and `docs/reports/EB.md` — and both are
+read by nothing**, which was checked rather than recalled: six files NAME `state.md` and all six
+mentions are inside comments.
 
-| | DY's acceptance | DZ's acceptance | EA's acceptance |
+| | DZ's acceptance | EA's acceptance | EB's acceptance |
 |---|---|---|---|
 | **suite failures** | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | **0** |
-| `check_de` | 321 / 0 / 0 | 321 / 0 / 0 | **325 / 0 / 0** |
-| targets in the manifest | 78 | 78 | **79** |
+| `check_de` | 321 / 0 / 0 | 325 / 0 / 0 | **329 / 0 / 0** |
+| targets in the manifest | 78 | 79 | **80** |
 
-**SEVENTY-NINE TARGETS RAN AND THE MANIFEST NAMES ALL SEVENTY-NINE. 0 `Parse Error` and 0
-`SCRIPT ERROR` in every log** — grepped from the streams rather than read off a tally or an exit
-code, and **not one of the 79 logs contains either marker.** `check_map_screen: OK`;
-`check_ct_map` 83 / 0; the run harness reads **22 / 165 / 8**, all three passing.
+**EIGHTY TARGETS RAN AND THE MANIFEST NAMES ALL EIGHTY. 0 `Parse Error` and 0 `SCRIPT ERROR` in
+every log** — grepped from the streams rather than read off a tally or an exit code, and **not one
+of the 80 logs contains either marker.** `check_map_screen: OK`; `check_ct_map` 83 / 0; the run
+harness reads **22 / 165 / 8**, all three passing.
 
-**AND THE BASELINE PREDICTION HELD EXACTLY, INCLUDING BOTH MOVEMENTS.** **`check_de` reported ZERO
-NOTICES**: `test_batch_ah` read **5584** and `check_ea` read **60**, which are the two rows written
-BEFORE the run, and **no third row moved.** `check_de` itself went 321 → 325 — four assertions per
-target for the one new gate — which is the movement nothing reports, because it has no row of its
-own. `test_batch_an` read **6047**, inside its recorded [6046, 6063] band, and the differ said so
-by saying nothing.
+**AND THE FIRST BATTERY IS THE ONE WORTH KEEPING.** `test_batch_bl` went **88 / 1** on a needle in
+`battle.gd` that EB §2 reworded — `THIS BATCH DOES NOT SHIP ONE`, control 1's pin — and
+**`check_de` reported it as REDDER, which is exactly the movement that rule exists for.** The
+needle is restored word for word, the tree was re-frozen, and the battery was run again. **A batch
+that edits behind its own certification run has certified nothing.**
 
-**THE CODE CHANGE IS THIRTEEN ADDED LINES AND ZERO DELETIONS, PROVEN WITH A COMMENT-STRIPPED
-DIFF AGAINST `HEAD`.** `scripts/battle.gd` is **comments only — zero code lines** (its silent-skip
-comment was corrected); `scripts/run_state.gd` gains two lines in `award_ability_pick` and the
-nine-line `roll_spec_fallback_offer`; `scripts/run_sim.gd` gains the same two-line sequence so the
-bot rolls what the real flow rolls. **Nothing was deleted and nothing was modified in place.**
+**AND THE BASELINE PREDICTION HELD EXACTLY.** **`check_de` reported ZERO NOTICES**: `check_eb` read
+**12**, the one row written BEFORE the run, and **no other row moved.** `check_de` itself went
+325 → 329 — four assertions for the one new target — which is the movement nothing reports, because
+it has no row of its own. `test_batch_an` read **6054**, inside its recorded [6046, 6063] band, and
+the differ said so by saying nothing.
+
+**THE CODE CHANGE IS ONE NEW FILE AND ZERO CODE LINES ANYWHERE ELSE**, proven with a
+comment-stripped diff against `git show HEAD` over all twelve edited `.gd` files. `check_eb.gd` is
+the new gate at 12 checks; `battle.gd`, `run_state.gd`, `run_sim.gd`, `unit.gd`, `classes.gd`,
+`check_da.gd`, `check_de.gd`, `test_batch_au`, `bp`, `bq`, `br` and `cd` are **comments only, zero
+code lines in every one.** `run_battery.sh` gains `check_eb` in `GATES`; `baselines.json` gains its
+row at `indent=1`, a 14-line insertion with no churn.
 
 **THE NEGATIVE CONTROLS, AND THE FIRST ONE DID NOT BITE — WHICH IS THE ONE WORTH KEEPING.**
-0. **A CONTROL ARMED ON A STRING NOBODY ASSERTS PROVES NOTHING, AND IT REPORTS THE SAME WORD A
-   REAL PASS DOES.** EA's own new `CLAUDE.md` heading was split across a line wrap and both
-   instruments stayed **green**, correctly: it is not in the needle set. **Check the needle is a
-   needle before you break it.**
-1. **RE-ARMED ON ONE OF EA's OWN RE-POINTED NEEDLES, AND BOTH INSTRUMENTS BIT.**
-   `TABLE THAT IS A CEILING RATHER THAN A COST` — the string §2 moved `test_batch_bs:422` onto —
-   split across a line wrap, **not one character deleted**. The verifier named the violation and
-   the file, and **`test_batch_bs` went 266 / 1**. **So EA §2's re-points are live assertions
-   rather than sentences nobody reads**, which is the thing a re-point has to prove and the thing
-   the batch codes it replaced never did. Restored **by `cp` from a scratchpad backup, never by
-   `git checkout`**; `CLAUDE.md`'s md5 returned to the certified `a5960434e60c39e313faa19b78d8316e`.
-2. **THE PARSE CONTROL, WHICH WAS OWED THIS TIME BECAUSE EA EDITS `.gd` FILES.** One closing
-   parenthesis was removed from `roll_spec_fallback_offer`'s signature — the function EA authored.
-   **`check_parse` produced 22 `Parse Error` lines in stderr**, opening *"Expected closing \")\"
-   after function parameters."*, and its tally read 7 failures. **Grepped from stderr, never from
-   the tally and never from the exit code.** Restored by `cp`; md5 back to
-   `ae5bd8ab9aff4daf6df5c66907c5361e`.
+0. **THE PARSE CONTROL WAS ARMED ON THE NEW GATE AND READ CLEAN FOR THE WRONG REASON.** A closing
+   parenthesis was removed from `check_eb`'s own signature and **`check_parse` reported 0
+   `Parse Error` lines**: it walks `res://scripts` and `res://scenes` and **does not cover the
+   gates**. **EB §3's own new rule, biting its author.** Re-armed twice — the broken GATE launched
+   directly prints `Parse Error: Expected parameter name.` to stderr, **prints no tally line at all
+   and still exits 0**, which is what `run_battery.sh`'s `throws=` column exists for; and re-armed
+   inside `check_parse`'s real scope on `run_state.gd`'s `draft_pool_left` signature it produced
+   **22 `Parse Error` lines**, tally 7.
+1. **THE NEEDLE CONTROL, ARMED ON A NEEDLE TAKEN OUT OF THE EXTRACTOR'S OWN DUMP.**
+   `PROTECTED CORE is guaranteed and permitted` — `check_do`'s — split across a line wrap, **not
+   one character deleted.** The verifier went **RED (1 violation)** and **`check_do` went 131 / 1.**
+   Restored **by `cp` from a scratchpad backup, never by `git checkout`**; CLAUDE.md's md5 back to
+   `3ab455561729c06a923b999ea8dadb35`.
+2. **§1's CONTROL: A REAL SECOND CROSSOVER, INJECTED INTO THE DATA.** The Occultist's Suffering
+   moved 25 Mana / cooldown 4 → **15 / cooldown 1** against Hex of Ruin's 20 / cooldown 2 at the
+   same initiative. **`check_eb` went 13 / 2**, naming card, core and spec.
+3. **§2's CONTROL: THE FILLER MADE REACHABLE.** Rallying Shout added to the SWORDMASTER draft pool.
+   **`check_eb` went 12 / 1**, predicting `bp` §7's flake by name. Both restored by `cp`, md5s
+   identical.
 
 **THE PRE-BATTERY INSTRUMENTS, ALL RUN BEFORE THE CERTIFICATION RUN.**
-- **The needle verifier with the extractor FIXED** — DZ's took only the first literal of an `and`
-  compound. This one joins logical statements, takes every call on the identifier, follows chained
-  calls, models `or` groups, records polarity, refuses transformed holders, and separates `find()`
-  locators from assertions: **73 positive groups, 22 or-alternatives, 30 negatives, 46 locators,
-  across 81 files**, against DZ's 57–60. Green at HEAD and green after.
-- **AND ITS OWN SECOND HOLE IS THE RESULT WORTH KEEPING.** The first rebuild read **32** asserted
-  literals where there are **95**: it counted brackets INSIDE string literals, so a `"("` in a
-  failure message left the depth permanently open and glued every following statement into one.
-  **An extractor is a population, and a population has to be asserted like any other.**
-- **The literal-flip sweep**, 10,834 distinct literals at a floor of 4: `CLAUDE.md` **1 gained /
-  0 lost**, `master.html` **1 / 0**, `changelog.html` **16 / 0**, `design-notes.md` **6 / 0**. All
-  24 gained were cross-checked against the tree's **247** distinct negative assertions; one matched
-  by name (`drain`) and **all four of its negatives read ABILITY DESCRIPTIONS**, none of which
-  reads the changelog. **No gained literal is negatively asserted against a document it landed in.**
-- **The retired-word sweep** over the edited `master.html`, using `test_batch_bx` §4b's own
-  `PARTY_IDENTS` strip and §4's `Beastmaster` strip: **0 *party* and 0 *beast*, in the edited file
-  and at HEAD alike.**
-- **A 36-TARGET SUBSET BATTERY** over every live reader of the four edited documents plus
-  `check_da`, `check_dw` and `check_ea`: **all 36 green, 0 `Parse Error`, 0 `SCRIPT ERROR`, 0 FAIL
-  lines**, every count on its baseline. This is DZ's lesson applied — it is the instrument that
-  finds what the sweeps are structurally unable to see, and it costs minutes against thirty-five.
+- **The needle verifier**, with `or_groups()`'s residual string-masking hole closed — it counted
+  brackets and the bare word `or` INSIDE string literals, the second half of the bug EA fixed in
+  `statements()`. **73 positive groups, 22 or-alternatives, 30 negatives, 46 locators across 82
+  files**, green at HEAD and green after; **the fix moves no number on this tree**, so it is a
+  latent hole reported as one rather than a repair with an effect.
+- **AND EB §3 RE-MEASURED EA's HOLE: IT NEVER LOST A LITERAL, IT LOST THE BOUNDARY.** With
+  string-masking disabled the extractor finds the **same 124 distinct asserted literals** (90
+  positive, 34 negative) as the fixed one. **What collapses is the GROUPING — 73 positive groups
+  become 45, 30 negative become 25 — and an or-group passes when ANY member is present**, so 28
+  independent assertions were satisfied by a sibling's hit. **The count to assert is the GROUP
+  count**; a literal census reads 124 either way and cannot see this at all. **EA's 32-reading
+  build no longer exists and could not be reproduced**, which is stated rather than worked around.
+- **THREE OF THE 46 LOCATORS DO NOT RESOLVE AND ALL THREE ARE ALREADY ON RECORD** — `test_batch_at`'s
+  `" — cold_snap"` and `"EXCLUSIVE talent pair ("`, and `test_batch_aw`'s `"no rune may write"`.
+  They are the vacuous trio in the open queue above. **The widened extractor found the population
+  the record already described and nothing the record did not.**
+- **The literal-flip sweep** over the four tracked documents, 10,867 distinct literals at a floor
+  of 4: `CLAUDE.md` **7 gained / 0 lost**, `master.html` **1 / 0**, `changelog.html` **6 / 0**,
+  `design-notes.md` **7 / 0**. Cross-checked against the tree's **275** negative assertions:
+  **0 gained literals are negatively asserted against the document they landed in.** **One gained
+  literal was an accident and was reworded** — `BATCH BR` inside the prose *"AND THE BATCH BROKE A
+  SUITE"*. Harmless, and a batch-code substring landing in a tracked document is not a thing to
+  leave to luck.
+- **AND THE SWEEP THE DOCUMENTS CANNOT DO — THE SAME ONE WITH THE EDITED SOURCES AS THE
+  DOCUMENTS.** Every literal in the tree at a floor of 4, tested for presence in each edited `.gd`
+  file before and after. **Five lost literals, and the first is the one that took `bl` red**:
+  `battle.gd`'s `THIS BATCH DOES NOT SHIP ONE`. The other four (`roll_ability_offer` in
+  `run_sim.gd`; `PERFECT` / `every hero` / `perfect` in `run_state.gd`) are substring noise with no
+  assertion behind them, checked statically and confirmed by a green battery. **`battle.gd` reads
+  0 lost after the repair.**
+- **The retired-word sweep**, re-implemented from `test_batch_bx` §4 and §4b's own strips (the
+  `PARTY_IDENTS` list read OUT of the suite rather than copied): **0 *beast* and 0 *party* across
+  13 `.gd` files and `master.html`.**
+- **A 39-TARGET SUBSET BATTERY** over every live reader of the four documents plus the edited
+  suites and `check_da` / `check_dw` / `check_eb`: **all 39 green, 0 `Parse Error`, 0
+  `SCRIPT ERROR`, every count exactly on its baseline.** **AND IT DID NOT CATCH THE `bl` BREAK** —
+  `bl` reads no tracked document, so it was not in the subset. **A subset chosen by document
+  readership cannot see a source-needle break; the source sweep above is what does.**
+- **A COMMENT-STRIPPED DIFF** over all twelve edited `.gd` files against `git show HEAD`: **zero
+  code lines changed in any of them.** **And that proof is no longer sufficient on its own** —
+  see the WHERE block: it says nothing about whether a suite reads the comment.

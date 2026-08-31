@@ -862,8 +862,11 @@ static func _award_upgrades(run: Node) -> void:
 
 # Ability awards (zone bosses only since Batch AN), resolved instantly
 # instead of owed to the party screen. The bot rolls the SAME offer-of-3 a
-# player would see (Run.roll_ability_offer) and picks from THAT, so a sim
-# can never take an ability the real flow would not have offered it.
+# player would see and picks from THAT, so a sim can never take an ability
+# the real flow would not have offered it. **THE ROLLERS ARE NAMED AT THE
+# SITE BELOW AND NOT HERE.** This header carried a second copy of the name,
+# and a second copy is what goes stale: it went on naming the roller for
+# eighteen batches after AN §4 deleted it.
 # DOD_SIM_TROPHIES names win when they are in the offer, else offer order.
 static func _award_trophies(run: Node) -> void:
 	var wanted: Array = []

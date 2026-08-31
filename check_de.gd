@@ -19,8 +19,9 @@
 # every stream into `$OUT/<name>.log`, stderr included. So the differ needs no
 # child of its own: it needs the logs that already exist. Reading a file cannot
 # nest, so THE NESTING IS NOW IMPOSSIBLE RATHER THAN MERELY AVOIDED — and
-# `BASELINE` may hold every target including `test_batch_cd`, which the old
-# design could not watch at all (a suite that drives itself does not terminate).
+# `baselines.json` may hold every target including `test_batch_cd`, which the
+# old design could not watch at all (a suite that drives itself does not
+# terminate).
 #
 # AND IT IS RE-RUNNABLE IN SECONDS. Re-checking the old differ's answer cost 22
 # minutes because it re-ran the tree. This reads a directory: once the battery

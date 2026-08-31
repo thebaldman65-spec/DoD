@@ -846,6 +846,67 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   the logical statement rather than the first, follow chained calls (`doc.to_lower().contains(…)`),
   and model `or` groups — demanding both halves of an `or` is a false alarm, and a false alarm is
   how an instrument gets switched off.
+- **AND EB §3 RE-MEASURED THAT HOLE: IT NEVER LOST A LITERAL, IT LOST THE BOUNDARY BETWEEN
+  ASSERTIONS — WHICH IS WORSE.** Reading the tree with string-masking disabled finds the **same 124
+  distinct asserted literals** (90 positive, 34 negative) as the fixed extractor. What collapses is
+  the GROUPING: **73 positive groups become 45 and 30 negative become 25**, because an unbalanced
+  `"("` glues the following statements into one. **An or-group passes when ANY member is present**,
+  so 28 independent assertions were being satisfied by a sibling's hit rather than their own —
+  a check passing for a reason other than the one it states, inside the instrument built to find
+  exactly that. **The count to assert is the GROUP count, not the literal count.**
+
+## A COMMENT NAMING CODE IS A CLAIM, AND IT GOES STALE SILENTLY (STANDING, SET AT EB §2)
+> **A comment naming a function, constant, ability or field is a claim that can go stale silently.
+> When a batch deletes or renames something, it sweeps the comments too** — the compiler will not,
+> and nothing else does.
+
+- **FOUR INSTANCES OF ONE SHAPE EARNED THE RULE, AND THE SWEEP FOUND SIXTEEN.** Flash Freeze's
+  suspension comment outlived both its justifications; `_hold_freeze`'s header said three callers
+  where there were four; `battle.gd` listed Regalia as a live shield source that had never fired;
+  `vault_ability()`'s header described the seven as returnable after they had been returned.
+- **REPAIR BY DELETING THE STALE CLAIM WHERE THE THING IS GONE; CORRECT THE NAME WHERE THE THING
+  ONLY MOVED.** DR's rule from Flash Freeze stands — *a comment corrected to describe a deleted
+  feature is still a comment about a deleted feature* — but it is about DELETIONS. A RENAME leaves
+  a live claim wearing a dead name, and deleting it throws away something true.
+- **A COMMENT THAT RECORDS A DELETION IS CORRECT AND MUST NOT BE SWEPT.** Of the 118 unresolved
+  names EB §2's sweep raised, **71 were records** — *"`CLASS_POOLS` IS DELETED"*, *"`_overburn_drain`
+  is deleted"* — and repairing one of those would delete the project's memory of why a symbol is
+  gone. **The stale ones are the comments that make a LIVE claim in a dead name.**
+- **A COMMENT IN A `.gd` FILE IS AN ASSERTED SURFACE, AND EB BROKE A SUITE PROVING IT.** The
+  needle verifier and the literal-flip sweep both track needles into the four tracked DOCUMENTS.
+  **Suites also assert literals against `.gd` SOURCE** — `test_batch_bl` control 1 pins the phrase
+  `THIS BATCH DOES NOT SHIP ONE` inside `battle.gd` — and a comment-only edit changes a haystack
+  neither instrument watches. EB reworded that sentence, **both document instruments stayed green,
+  the comment-stripped diff read "comments only", and the battery took `bl` red.**
+  · **THE SWEEP TO RUN IS THE SAME ONE WITH THE EDITED SOURCES AS THE DOCUMENTS**: every literal in
+    the tree, at a floor of 4, tested for presence in each edited `.gd` file before and after.
+    **A LOST literal is a candidate needle.** It takes seconds and it is the only instrument that
+    can see this.
+  · **AND "COMMENTS ONLY" STOPS BEING A SAFETY ARGUMENT.** The comment-stripped diff proves no CODE
+    moved; it says nothing about whether a suite reads the comment. Both proofs are owed.
+- **THE HAYSTACK CANNOT BE A GREP, AND THIS IS THE SHARP PART.** `check_dv` asserts
+  `not rs.contains("func roll_ability_offer")` and `test_batch_an` §1 holds the bare literal
+  `"roll_ability_offer"` in its `gone_fn` list — **so the two checks that prove the function is
+  deleted are exactly what make a text sweep report it as resolving.** The universe has to be a
+  SYMBOL TABLE of declarations, matched by equality, and the declarations have to be read with the
+  string literals MASKED — an unmasked `func\s+(\w+)` scan declares the dead name back into
+  existence out of the assertion that pins it absent.
+
+## ARM A NEGATIVE CONTROL ON A NEEDLE A SUITE DEMONSTRABLY READS (STANDING, SET AT EB §3)
+> **A control armed on unasserted prose reports the same green a working check does.** Arm it on
+> something a suite demonstrably reads, and **confirm the disarmed state is RED before trusting the
+> armed one.**
+
+- **THIS IS A PRECONDITION ON THE NEGATIVE-CONTROL RULE, NOT A NEW RULE.** A control exists to prove
+  an instrument BITES. One armed on a string nothing asserts proves only that nothing asserts it —
+  and it says so in the same word a real pass does.
+- **EA's FIRST CONTROL FAILED THIS WAY.** It wrapped a `CLAUDE.md` heading no suite reads, went
+  green correctly, and was indistinguishable from a working check. The re-arm on one of EA §2's own
+  re-pointed needles bit immediately, and `test_batch_bs` went 266 / 1.
+- **THE ORDER IS: PICK THE NEEDLE OUT OF THE NEEDLE LIST, BREAK IT, SEE RED, RESTORE, SEE GREEN.**
+  Picking the string first and hoping it is asserted is the step that fails. Restore **by `cp` from
+  a scratchpad backup, never by `git checkout`** — that has cost this project a batch's uncommitted
+  work once already.
 
 ## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
 > **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline
@@ -2258,6 +2319,44 @@ dominated by a basic.
   `cfg`, never on the member dict. That is pre-existing and shared by every channel, but it is the
   one term that can push the floor below the slot arithmetic, so **derive it off `runes.json`
   rather than assuming it is zero.**
+
+## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
+> **A protected core may be cheaper and faster than a comparable draft card. The core is the
+> baseline; the draft card pays for the slot it occupies.** A measurement showing cores are cheaper
+> is the design working. **Do not retune the layer on that measurement alone.**
+
+- **THE REASONING, WHICH HAS TO TRAVEL WITH THE NUMBER.** A protected core arrives FREE with the
+  spec; a draft card costs a PICK out of a capped set of slots. **A draft card paying that pick in
+  initiative and in resource is the correct relationship**, not a mispricing — "cheaper to cast" is
+  exactly what a designer would author on purpose if the core is the baseline the spec is built
+  around.
+- **AND THE COUNTER-READING, RECORDED BECAUSE NOTHING IN THE CODE DISTINGUISHES THE TWO.** EA §3
+  measured **13 of 17** comparable pairs favouring the core — controlled for spec, role and
+  initiative, with `PURE_BUFFS` excluded from both sides — resource cheaper 10 to 2 and cooldown
+  shorter 13 to 1. **A future reader will find that same consistency and read it as a systematic
+  under-pricing of the cores.** Both readings fit the same numbers. This entry is the ruling that
+  the first one is intended; it is not evidence against the second, and a designer who wants to
+  re-price the layer is overturning a ruling rather than fixing a bug.
+- **THE 13-OF-17 IS THE INTENDED STATE AND IS NOT WHAT A GATE SHOULD CATCH.** What is worth
+  catching is the INVERSION: a draft card that is cheaper on resource AND shorter on cooldown than
+  a comparable core, which is a card that pays no pick and gives none back. `check_eb` §1 asserts
+  it per pair, in both directions, and PRINTS the live ratio without asserting it — `check_ea` §4
+  owns the aggregate direction.
+- **THE UNCONTROLLED FORM OF THAT PROPERTY IS NOT A PROPERTY, AND IT IS WORTH KNOWING WHY.**
+  Dropped the equal-initiative control, **21 of 96** same-spec same-role pairs already have a draft
+  card cheaper AND faster — Kindled Mind at 15 Mana and initiative 1.5 against Death Ray at 55 and
+  5.0. That is a cantrip beside a nuke. **At equal initiative "faster" is impossible by
+  construction, so the tempo axis that survives the control is COOLDOWN**, and a gate that asserts
+  the uncontrolled form reads RED the day it is written.
+- **EXACTLY ONE CROSSOVER EXISTS AND IT IS NAMED RATHER THAN COUNTED.** Holy's **Divine Plea**
+  (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative in the heal
+  role. Against Holy's **Heal** the same card is cheaper and LONGER, which is an ordinary trade and
+  not a crossover — EA §3's two counter-cases are one crossover and one trade.
+- **THE CAP BINDING THE TWO LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
+  FINDING.** `Ability.BUFF_DELAY_CAP` reaches **29.5% of the draft layer against 12.8% of the
+  cores**. Under this ruling that is what a priced layer looks like beside a baseline one: the
+  instrument that prices tempo reaches the side that pays. **It is not a defect and it is not a
+  reason to widen `Ability.PURE_BUFFS`** — EB widened nothing and moved no magnitude.
 
 ## STANDING DESIGN RULE — THE ARRIVING-STANCE PRINCIPLE (Batch BP §3)
 **EVERY STANCE ABILITY MUST BUY WHAT THE STANCE IT LEAVES HIM IN WANTS.** The Swordmaster's

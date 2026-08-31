@@ -2893,7 +2893,7 @@ static func draft_ability(display_name: String) -> Ability:
 		# SECOND CORRECTION TOWARD THE CODE: the brief says it reads "Rage, Mana
 		# and Focus alike". THERE ARE ONLY TWO PRIMARY RESOURCES IN THE GAME —
 		# `resource_name` is Rage for the Warrior and Mana for the other three
-		# classes, decided once in `Classes.CONFIGS` with no spec override. FOCUS
+		# classes, decided once in `Classes.hero_config()` with no spec override. FOCUS
 		# IS A SECOND RESOURCE (Batch AZ), i.e. a spec meter, so it falls under
 		# the rule below rather than beside Rage and Mana. The card's own text
 		# says so.

@@ -36,8 +36,8 @@
 # tree, they belong in a suite, and this is that suite.
 #
 # THIS FILE IS WATCHED BY `check_de` NOW, WHICH THE OLD DESIGN COULD NOT DO:
-# `BASELINE` could never hold `test_batch_cd.gd`, because a suite that drives
-# itself does not terminate. A post-pass has no such hazard.
+# `baselines.json` could never hold `test_batch_cd.gd`, because a suite that
+# drives itself does not terminate. A post-pass has no such hazard.
 extends SceneTree
 
 # Every site that was aborting, by the symbol that aborted it. Pinned ABSENT
