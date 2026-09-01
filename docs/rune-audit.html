@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Rune Audit (Batch EJ)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-09-01 (Batch EJ &mdash; first pass)</b></p>
+<h1>DAWN OF DECAY — THE RUNE AUDIT</h1>
+
+<p><i>All 65 authored runes, sorted by what each one actually modifies &mdash; derived from the
+READ SITE in <code>scripts/</code>, never from the rune's description and never from its
+<code>lane</code> field. <b>This is a REPORT. Nothing here was fixed</b> &mdash; no rune was
+re-keyed, re-authored, retuned or retired, no <code>lane</code> field was removed, no magnitude
+moved and no description was edited. The question it answers is one the designer asked before
+starting: <b>how much of the rune layer does the new charter remove?</b></i></p>
+
+<p style="border:2px solid #a00; padding:8px"><b>THE CHARTER THIS PAGE MEASURES AGAINST IS RULED
+AND NOT YET IMPLEMENTED.</b> <i>"Runes are disconnected from talents. They are run-specific items
+only. Their purpose is to modify stats and resources, and to modify the mechanics and values of
+core abilities, draft abilities, and passives."</i> <b>Nothing in the code or the documents is
+wrong against the rule the runes were actually written to</b>, which is the opposite rule:
+<code>master.html</code> and <code>docs/design-notes.md</code> both state it as current &mdash;
+<b>one rune per talent lane plus one splash</b>, each lane rune writing that lane's own counters,
+because <i>"the same rune is worth more to a hero whose points went elsewhere."</i>
+<code>scripts/runes.gd</code>'s own header says the same thing in one line: <i>"talent counter
+fields STACK with the talent &mdash; intended."</i> <b>So no document is corrected on this page.
+The gap is between the code and the NEW rule, and every number below sizes that gap rather than
+reporting a defect.</b></p>
+
+<h2>COVERAGE, STATED BEFORE ANY FINDING</h2>
+<p><b>An audit that overstates its reach is worse than a narrow one that admits its edges.</b>
+Batch CJ reported 120 of 120 clean and was later found to have had no check at all for the failure
+mode it missed. So: this is what was compared, how, and what was not.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>How it was compared</th><th>Reached?</th></tr>
+<tr><td><b>65 runes / 135 clauses</b></td>
+<td>Every payload term in <code>data/runes.json</code> counted separately: 116 <code>stat</code>
+fields (84 distinct names), 15 <code>ability</code> <code>add</code>/<code>set</code> terms, 4
+grants. <b>A rune may sit in several categories at once</b> &mdash; the Whispering Dark writes
+four fields in three of them &mdash; which is why the clause count and the rune count differ
+throughout and both are given.</td><td><b>135 / 135</b></td></tr>
+<tr><td><b>84 distinct stat fields</b></td>
+<td>Every occurrence in all of <code>scripts/</code>, comment-stripped, classified as a
+declaration, a talent-node payload write, or a READ. <b>Both an identifier read
+(<code>attacker.field</code>) and a string-keyed one</b> (<code>cfg.get("field")</code>,
+<code>_max_hero_rank("field")</code>) &mdash; a sweep that masks string literals to find
+identifiers loses eight of these fields entirely, and that hole was found and closed rather than
+shipped.</td><td><b>84 / 84</b></td></tr>
+<tr><td><b>324 talent nodes</b></td>
+<td>Dumped live from <code>Talents.LANE_TREES</code> through a running engine, and re-parsed
+independently from the source so the two could be compared. <b>The two readings are identical on
+all 324</b>, which is what licenses using the source parse on historical commits where no engine
+can be run.</td><td><b>324 / 324</b></td></tr>
+<tr><td><b>The rebuild window</b></td>
+<td>Every one of the 84 fields compared at its read site AND at its enclosing guard chain, against
+the tree as it stood at <code>DN~1</code>. <b>The guard chain is the half that matters</b>: the
+one unrecorded finding on this page has a byte-identical read LINE and a changed
+<code>if</code> above it.</td><td><b>84 / 84</b></td></tr>
+<tr><td><b>What each clause modifies</b></td>
+<td>Read off the arithmetic at the read site and the field's own baseline &mdash; a general stat
+channel (<code>crit_chance += attacker.crit_bonus</code>), a named passive's step, a core ability
+gated by <code>display_name</code>, or a node's own counter. <b>A talent node writing the same
+stat does NOT make the rune talent-keyed</b>: <code>crit_bonus</code>, <code>speed</code> and
+<code>armor</code> are the unit's own math and a node adding to them is a coincidence of
+target.</td><td><b>135 / 135</b></td></tr>
+<tr><td><b>What was NOT reached</b></td>
+<td><b>No sim was run and no balance was judged.</b> Not one magnitude on this page has been
+measured in play &mdash; the talent share is a count of clauses, not of power. <b>Runes were not
+compared against each other</b>, so nothing here says whether two runes in one spec's set overlap;
+<b>nor against relics, items or enemy abilities.</b> <b>The 12 <code>lane</code> fields on the
+splash runes were not audited for accuracy</b>, because the charter deletes the concept and the
+brief forbids removing the field. <b>Rune PRICING is untouched</b> &mdash; a 100g rune whose
+clauses change is a repricing question this page does not open.</td><td><b>stated, not
+covered</b></td></tr>
+</table>
+
+<h2>&sect;1 — THE ANSWER, IN ONE TABLE</h2>
+<p><b>65 runes carry 135 clauses. 59 of them &mdash; across 32 of the 65 runes &mdash; write a
+live talent node's own counter</b>, which is the population the charter removes. The rest are
+already what the charter asks for: <b>46 STAT/RESOURCE, 15 core-ability value edits, 5 CORE, 5
+PASSIVE</b>, plus 4 grants the charter does not name either way and one dead clause.</p>
+
+<p><b>THE UNEVENNESS IS THE FINDING, AND IT IS DO's SHAPE AGAIN.</b> The 5 universal and the 12
+class-wide runes carry <b>ZERO</b> talent clauses between them; every one of the 59 lives in the
+48 spec runes. <b>The Warden's four runes are 0-for-7 and would not be touched at all. The
+Beastmaster's are 8-of-9 and would be re-authored almost entire.</b> The rows at 50% or more are
+shaded.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Class</th><th>Spec</th><th>Runes</th><th>Clauses</th><th>TALENT clauses</th><th>Runes touching a talent</th><th>Talent share</th></tr>
+<tr><td>Universal</td><td><code>&mdash;</code></td><td>5</td><td>8</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr><td>Warrior (class-wide)</td><td><code>&mdash;</code></td><td>3</td><td>5</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr><td>Warrior</td><td><code>berserker</code></td><td>4</td><td>7</td><td><b>2</b></td><td>2</td><td>29%</td></tr>
+<tr><td>Warrior</td><td><code>swordmaster</code></td><td>4</td><td>8</td><td><b>3</b></td><td>2</td><td>38%</td></tr>
+<tr><td>Warrior</td><td><code>warden</code></td><td>4</td><td>7</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr><td>Mage (class-wide)</td><td><code>&mdash;</code></td><td>3</td><td>4</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr><td>Mage</td><td><code>arcanist</code></td><td>4</td><td>9</td><td><b>3</b></td><td>2</td><td>33%</td></tr>
+<tr style="background:#fdd"><td>Mage</td><td><code>cryomancer</code></td><td>4</td><td>10</td><td><b>6</b></td><td>3</td><td>60%</td></tr>
+<tr><td>Mage</td><td><code>pyromancer</code></td><td>4</td><td>10</td><td><b>2</b></td><td>2</td><td>20%</td></tr>
+<tr><td>Cleric (class-wide)</td><td><code>&mdash;</code></td><td>3</td><td>4</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr style="background:#fdd"><td>Cleric</td><td><code>holy</code></td><td>4</td><td>9</td><td><b>5</b></td><td>3</td><td>56%</td></tr>
+<tr style="background:#fdd"><td>Cleric</td><td><code>inquisitor</code></td><td>4</td><td>10</td><td><b>8</b></td><td>4</td><td>80%</td></tr>
+<tr style="background:#fdd"><td>Cleric</td><td><code>occultist</code></td><td>4</td><td>10</td><td><b>8</b></td><td>3</td><td>80%</td></tr>
+<tr><td>Hunter (class-wide)</td><td><code>&mdash;</code></td><td>3</td><td>5</td><td><b>0</b></td><td>0</td><td>0%</td></tr>
+<tr style="background:#fdd"><td>Hunter</td><td><code>beastmaster</code></td><td>4</td><td>9</td><td><b>8</b></td><td>4</td><td>89%</td></tr>
+<tr style="background:#fdd"><td>Hunter</td><td><code>mystic</code></td><td>4</td><td>10</td><td><b>7</b></td><td>3</td><td>70%</td></tr>
+<tr style="background:#fdd"><td>Hunter</td><td><code>sharpshooter</code></td><td>4</td><td>10</td><td><b>7</b></td><td>4</td><td>70%</td></tr>
+<tr><td colspan="2"><b>TOTAL</b></td><td><b>65</b></td><td><b>135</b></td><td><b>59</b></td><td><b>32</b></td><td><b>44%</b></td></tr>
+</table>
+
+<h2>&sect;2 — DID THE TALENT REBUILD BREAK ANY OF THEM?</h2>
+<p><b><code>check_dp</code> &sect;4 asserts that every rune stat field has a live read site &mdash;
+116 fields, 0 dead, confirmed live on this tree. That is a different question.</b> A live read site
+proves the field is read. It does not prove the rune still buys what it was authored to buy: a node
+re-authored from <i>"Rime lasts 2 turns longer"</i> to <i>"Blizzard costs 10 less Mana"</i> leaves
+the counter alive and the rune buying something else.</p>
+
+<p><b>SO ALL 84 FIELDS WERE COMPARED AT THEIR READ SITE AND AT THEIR ENCLOSING GUARD CHAIN AGAINST
+<code>DN~1</code>. FIVE MOVED.</b> Three are unrelated to the rebuild and two are it.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Rune</th><th>What moved</th><th>Batch</th><th>Verdict</th></tr>
+<tr><td><code>hungering_ranks</code></td><td>Rune of the Long Winter</td>
+<td>A SECOND read site was added &mdash; a companion's hit now reads it too</td><td><b>DU</b></td>
+<td>a widening; the rune buys MORE than it did</td></tr>
+<tr><td><code>max_hp</code></td><td>Rune of the Broad Path</td>
+<td>A new unrelated site (the Salve heal) reads the base stat</td><td><b>DS</b></td>
+<td>incidental; <code>max_hp</code> is a universal stat</td></tr>
+<tr style="background:#fdd"><td><code>spread_ranks</code>, <code>spread_ruin</code></td>
+<td><b>Rune of the Whispering Dark</b></td>
+<td>The read site moved from <code>battle.gd:6783</code> to <code>:14542</code> and from a
+party-wide <code>_max_hero_rank("spread_ranks")</code> to the Occultist's own
+<code>occ.spread_ranks</code>. The mechanic went from <b>Psychosis spreading between minions</b> to
+<b>a mark of Ruin leaping to another enemy</b>.</td><td><b>DP</b></td>
+<td><b>KNOWN and handled.</b> DP kept both fields deliberately and rewrote the rune's description
+with the node &mdash; the one line <code>data/runes.json</code> changed in the whole window. The
+rune sells what it now buys.</td></tr>
+<tr style="background:#fdd"><td><code>pulse_ranks</code></td>
+<td><b>Rune of the Standing Vow</b></td>
+<td>The read LINE is byte-identical. The <code>if</code> above it went from
+<code>u.has_status("unity") or u.has_status("cons_ground")</code> to <code>cons_ground</code>
+alone.</td><td><b>DO</b></td>
+<td><b>RECORDED NOWHERE.</b> See below.</td></tr>
+</table>
+
+<h3>THE ONE THAT IS NOT ON ANY RECORD — THE RUNE OF THE STANDING VOW</h3>
+<p>DO cut Sacred Resolve's banner out of Healing Pulse's trigger, for a good and stated reason:
+Sacred Resolve became a DRAFT card at DO, and <i>"a node reading its banner would be a bet;
+Consecrated Ground is PROTECTED CORE."</i> <b>DO reported the node cut in its own &sect;3 table,
+in the row <code>dv_pulse | "or Sacred Resolve" | none | same condition, one site</code>.</b></p>
+<p><b>What is on no record anywhere is that a 100g rune rides that counter.</b> The Rune of the
+Standing Vow writes <code>blessed_barrier_ranks</code>, <code>devoutness_ranks</code> and
+<code>pulse_ranks</code>; its third clause has fired under strictly fewer conditions since DO.
+A grep for <i>"Standing Vow"</i> and for <code>pulse_ranks</code> across every batch report,
+<code>docs/state.md</code> and the changelog returns <b>zero hits</b>.</p>
+<p><b>IT IS A QUIET WEAKENING RATHER THAN A MIS-SALE, AND THE DISTINCTION IS WORTH KEEPING.</b> The
+rune's description reads <i>"holy ground mends 2% each turn"</i> and is byte-identical before and
+after DO &mdash; it never sold the Sacred Resolve half. So the code moved TOWARD the card: the
+rune was over-delivering against its own text and now delivers exactly what it says. <b>Nobody was
+mis-sold; the rune simply got worse than it was, and no instrument could see it.</b></p>
+
+<h3>AND THE SHARPEST LESSON IN THE BATCH IS <code>oc_spread</code></h3>
+<p><b>Its node dictionary changed by DESCRIPTION ONLY at DP.</b> The <code>id</code>, the
+<code>lane</code>, the <code>row</code>, the <code>scale</code> and both payload fields
+(<code>spread_ranks: 60</code>, <code>spread_ruin: 2</code>) are byte-identical across the whole
+rebuild. Underneath it, <code>battle.gd</code>'s read site moved <b>7,225 lines</b> (<code>:6783</code> to
+<code>:14008</code>, measured at DP itself rather than against HEAD) and changed
+which unit it reads from. <b>A diff of the talent trees &mdash; the obvious instrument, and the one
+this audit reached for first &mdash; would have filed <code>oc_spread</code> as a documentation
+edit.</b> What found it was diffing the READ SITE, and what found the Standing Vow beside it was
+diffing the enclosing GUARD CHAIN, because that read line never changed at all.</p>
+
+<h2>&sect;2b — THREE RUNE-ONLY EFFECTS ANNOUNCE THEMSELVES TO THE PLAYER AS TALENTS</h2>
+<p>Twenty-five of the 84 fields are written by <b>no live talent node at all</b>. Most are
+deliberate: six carry a <code>rune_</code> prefix, and <code>scripts/unit.gd</code> marks a further
+block <i>"RUNE-ONLY"</i> with the reason &mdash; <i>"a rune whose node is gone wants re-authoring,
+not silent death (AR &sect;4)"</i>. <b>But three of them still label themselves as talents in the
+combat log, and no node of any of those three names exists in any of the twelve trees</b> &mdash;
+checked against <code>LANE_TREES</code>, not assumed.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Only writer</th><th>What the player is shown</th><th>Live node of that
+name?</th></tr>
+<tr><td><code>beacon_ranks</code></td><td>Rune of the Sleepless Vigil</td>
+<td><i>"&rarr; Talent: Beacon &mdash; the light finds %s"</i></td>
+<td><b>No</b> &mdash; the node became Hour of Need at AV</td></tr>
+<tr><td><code>capacitor_ranks</code></td><td>Rune of the Triage Ward</td>
+<td><i>"&rarr; Talent: Holy Capacitor banks %d overhealing"</i>, plus a status chip named <b>Holy
+Capacitor</b> on the hero's own bar</td><td><b>No</b></td></tr>
+<tr><td><code>mindfulness_ranks</code></td><td>Rune of the Unquiet Mind</td>
+<td><i>"&rarr; Talent: Mindfulness"</i> and a float reading <b>Mindfulness</b>; the source comment
+beside it still reads <i>"(Arcanist talent)"</i></td><td><b>No</b></td></tr>
+</table>
+
+<p><b>THE CONVENTION ALREADY EXISTS AND THESE THREE PREDATE IT.</b> The newer rune-only sites say
+<i>"&rarr; Rune:"</i> in the player's log &mdash; Exsanguination, Critical Mass, the Reaper and the
+Cinder Trail all do. <b>Three more sites are a softer version of the same thing</b>: Grudge, Shared
+Vigil and On the Edge each have a live node AND a separate <code>rune_</code> term, so a hero
+holding only the rune is told a talent fired. <b>All six are REPORTED and none is fixed</b>: a log
+line is player-facing text, and this batch changes none. They are listed because the charter makes
+them worse rather than better &mdash; a rune that is <i>disconnected from talents</i> should not
+announce itself as one.</p>
+
+<h2>&sect;3 — WHAT THE DOCUMENTS SAY, AND THE LADDER THAT HAS NOW BEEN WRONG FOUR TIMES</h2>
+<p><b>THE EQUIP-SLOT COUNT IS THREE, FLAT, FROM RUN START, AND IT DOES NOT GROW.</b> Established
+here from the code and not from any document: <code>Run.rune_slots()</code> returns a literal
+<code>3</code>. Its only other arm is <code>RICH_SLOTS = 4</code>, reached only when
+<code>sim_run</code> is true AND <code>DOD_SIM_RUNE_ECON=rich</code> is set in the environment
+&mdash; a sim lever whose own comment reads <i>"every slot open from tier 1"</i>. <b>That is a flat
+4, not a ladder, and it is unreachable in a played run.</b></p>
+
+<p><b><code>master.html</code> HAS NEVER CARRIED THE GROWTH LADDER, AND THIS IS THE FOURTH BRIEF TO
+SAY IT DOES.</b> Swept on UNWRAPPED text, which is the method EI had to invent for exactly this
+document: the file says <i>"<b>Three equip slots, flat, from run start</b> &mdash; no growth
+ladder"</i> at line 2444, and <b>four further mentions all agree with it</b> &mdash; <i>"heroes
+begin with no runes and three empty slots"</i> (line 32), <i>"three rune slots (filled or
+empty)"</i> (351&ndash;52), <i>"Heroes begin the run with no runes and three empty slots"</i>
+(2448) and <i>"a read-only rune list (three flat slots)"</i> (2714). <b>Five sites, of which a
+line-anchored grep sees only THREE</b> &mdash; one is broken by inline <code>&lt;b&gt;</code> tags
+and one wraps mid-phrase. <b>Zero hits</b> for <i>"Equip slots"</i>, for
+<i>"2 &rarr; 3 &rarr; 4"</i>, and for <i>"starts the run choosing a rune"</i>. <b>NO CORRECTION IS
+OWED AND NONE WAS MADE.</b></p>
+
+<p><b>THE LINEAGE IS NOW FOUR DEEP AND THE REFUTATION HAS BEEN IN THE SOURCE SINCE CT.</b> CT was
+told the ladder existed and caught it; EG's brief asserted it eleven batches later; EH's brief
+blamed <code>master.html</code>; EJ's brief quoted two contradictory descriptions as both live in a
+document that carries only one. <code>battle.gd:23066&ndash;67</code> has read <i>"Batch AN
+&sect;9 deleted the rune ladder outright and <code>rune_slots()</code> has been flat 3 ever
+since"</i> the whole time &mdash; <b>and that comment WRAPS, so a line-anchored grep for it returns
+nothing.</b> The refutation has been as hard to find as the claim.</p>
+
+<p><b>AND THE CONFUSION HAS A SOURCE WORTH NAMING, BECAUSE IT WILL CAUSE A FIFTH.</b> There IS a
+live growth ladder in this part of the game: <b>the ITEM pouch</b>, <code>ITEM_SLOTS_BY_ZONE</code>,
+which grows by zone and announces itself on the zone-boss card. <code>docs/design-notes.md</code>
+sets the two side by side under the heading <i>"Why the ladder is the pouch's shape and not the
+runes'"</i> &mdash; AN deleted the rune ladder because a run that dies in zone 2 never owns the last
+slot and an empty rune slot is dead weight; CT kept the pouch ladder because a pouch slot is filled
+the moment you reach a merchant. <b>Two ladders, one deleted and one kept, one paragraph apart.</b>
+</p>
+
+<p><b>WHAT THE DOCUMENTS DO SAY ABOUT THE SYSTEM &mdash; AND IT IS THE OLD RULE, STATED AS
+CURRENT.</b> <code>master.html</code>: <i>"Each set is built to one rule: one rune per talent lane,
+plus one splash that carries a term from every lane"</i>, and <i>"Rare alters an existing ability's
+numbers or grants a talent-like effect (talent-counter runes STACK with the talent)"</i>, and
+<i>"The per-lane rule is what makes a rune a build decision rather than a power increment."</i>
+<b>All three are accurate descriptions of the code as it stands.</b> The charter contradicts them,
+which is a decision rather than a defect, and is why nothing on this page corrects a document.</p>
+
+<h2>&sect;4 — HOW BIG IT IS</h2>
+
+<h3>MECHANICALLY IT IS A RE-KEY, AND IT HAS A SHIPPED PRECEDENT</h3>
+<p><b>Of the 59 talent clauses, 56 ride something the charter permits anyway.</b> The node's effect
+already attaches to a spec passive, a stat, a protected core or a draft card at the read site; what
+makes the clause talent-keyed is only that the rune and the node write the SAME FIELD. Severing
+them is a second field read at the same line.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What the node's effect rides on</th><th>Clauses</th><th>What a re-key costs there</th></tr>
+<tr><td><b>A spec PASSIVE</b> (Ruin, Burn, Chill, Resonance, Pack Bond, Poison, Break, Blood
+Frenzy, Seasoned Fighter)</td><td><b>31</b></td>
+<td>A <code>rune_</code> field beside the node's, summed at the existing site. Data plus one line
+each.</td></tr>
+<tr><td><b>A STAT or RESOURCE</b> (Focus conversion, Mercy, Faith release, Break-damage cut,
+resource on a kill)</td><td><b>15</b></td>
+<td>The same, and several could simply be re-pointed at an existing general stat instead.</td></tr>
+<tr><td><b>A PROTECTED CORE ability</b> (Divine Shield, Consecrated Ground, Guard Change, Quick
+Shot)</td><td><b>8</b></td>
+<td>Cheapest of all &mdash; <code>apply_payload</code>'s <code>{"ability": …, "add"/"set": …}</code>
+branch already does this with no new mechanics, which is the shape DO itself chose for 25
+cells.</td></tr>
+<tr><td><b>A DRAFT ability</b> (the Survivalist's traps)</td><td><b>2</b></td>
+<td>Permitted by the charter as written; a field of its own at the same site.</td></tr>
+<tr style="background:#fdd"><td><b>THE NODE AND NOTHING ELSE</b></td><td><b>3</b></td>
+<td><b>These need an effect INVENTED, not moved.</b> <code>divine_presence_pct</code> (Divine
+Presence), <code>entropy_ranks</code> (Entropy) and <code>pleasure_pct</code> (Pleasure from Pain)
+are per-turn drips that exist only as their node &mdash; there is no core ability, passive or stat
+underneath them to re-point at.</td></tr>
+</table>
+
+<p><b>BATCH AL ALREADY DID THIS THREE TIMES, FOR THE SAME REASON.</b>
+<code>rune_grudge_bonus</code>, <code>rune_vigil_bonus</code> and <code>rune_on_edge_ranks</code>
+are rune terms split out of a node's counter and read beside it, and the source comments carry both
+the method and the reason: <i>"it used to add a rank to this counter, and re-pricing the node from
+6% to 25% would have quadrupled the rune's number without anyone touching the rune."</i> <b>The
+On the Edge split also records the one non-obvious rule</b> &mdash; <i>"a threshold cannot be summed
+the way a magnitude can (35 + 25 = 60% is not both effects, it is a third effect neither one asked
+for). THE THRESHOLD TAKES THE MAX; THE PAYOUT SUMS."</i> <b>Any re-key that sums a threshold
+instead of maxing it will ship a magnitude nobody authored.</b></p>
+
+<p><b>AND THE COUPLING IS ADDITIVE, NEVER CONDITIONAL, WHICH IS THE FACT THAT MAKES THIS TRACTABLE
+AT ALL.</b> Derived rather than assumed: <b>no rune payload in the file carries a
+<code>condition</code> or a <code>has_node</code> gate</b>, and <b>every one of the 59 talent
+clauses rides a node in the equipping hero's OWN spec tree &mdash; zero cross-spec.</b> There is no
+rune anywhere that is dead without a talent, and none that reaches into another spec's tree.</p>
+
+<h3>THE COST THAT IS NOT THE CODE, AND IT IS THE LARGER ONE</h3>
+<p><b>36 of the 48 spec runes carry a <code>lane</code> field and are lane runes; the other 12 are
+the splashes.</b> The lane runes hold 36 of the 59 talent clauses and the splashes hold 23. <b>The
+authoring rule is what they were built on</b>, and both design documents state it as current: one
+rune per lane, writing that lane's own counters, <i>"worth taking precisely because it is
+off-build, and worth less to the player already deep in that lane."</i></p>
+<p><b>Re-key them and that asymmetry is gone.</b> A rune with its own field is worth the same to
+every hero of that spec, which is the definition of the power increment the rule exists to prevent.
+<b>The splash runes lose more than the lane runes do</b>: a splash <i>"carries a term from every
+lane and pays for reaching outside one"</i>, and with no lanes to reach across it is a bundle of
+three unrelated numbers. <b>16 of the 65 runes are WHOLLY talent-keyed</b> &mdash; every clause they
+own writes a counter &mdash; so those are not trimmed by the charter, they are emptied and must be
+re-authored from nothing:</p>
+<p>Boiling Blood, the Bared Guard, the Bitter Grip, the Deep Bond, the Deep Sight, the Deepening
+Ruin, the Long Hunt, the Long Winter, the Open Hand, the Resonant Core, the Shared Wild, the
+Standing Vow, the Turning Pack, the Warded Robes, the Weeping Wound, the Whispering Dark.</p>
+
+<h3>THE HONEST ANSWER, NOT SOFTENED</h3>
+<p><b>It is not a small batch and a document correction, and it is not a rewrite of the rune layer
+either. It is a re-key of 59 clauses in 32 runes, of which 3 need new mechanics and 16 runes need
+new concepts &mdash; and a deliberate abandonment of the authoring rule that 48 of the 65 were
+designed around.</b></p>
+<p>The engineering is small and well-precedented. <b>The design question is not.</b> Nothing in the
+code decides whether a rune set with no relationship to the talent trees is better or worse than
+one built against them; what the code can say is that the current sets are built on that
+relationship deliberately, that both design documents say so, that the machinery to sever them
+already exists and has been used, and that the Warden's set would not move while the Beastmaster's
+would move almost entirely. <b>The charter is worth taking or not taking on those terms, and this
+page exists so it can be decided before the work starts rather than halfway through.</b></p>
+
+<h2>&sect;5 — WHAT IS DELIBERATELY NOT DONE</h2>
+<ul>
+<li><b>No rune is re-keyed, re-authored, retuned or retired, and no <code>lane</code> field is
+removed.</b> The charter is ruled and not implemented; this page sizes it.</li>
+<li><b>No document is corrected.</b> &sect;3 looked for <code>master.html</code> contradicting the
+code and found the opposite &mdash; the document is accurate, and it is the charter that disagrees
+with both.</li>
+<li><b>The White Flame's middle clause stays inert.</b> <code>pyromaniac_ranks</code> is the one
+rune field in the game that is written and read nowhere &mdash; Inferno Master's per-turn step
+stopped existing at AR. <code>unit.gd</code> already flags it, and inventing a read site is the
+guess AR &sect;4 forbids. <b>It is the 135th clause and it pays nothing today.</b></li>
+<li><b>The six "&rarr; Talent:" log lines on rune-only effects are not changed.</b> Player-facing
+text, and this batch changes none.</li>
+<li><b>No gate is added.</b> A gate encodes a ruling and nothing here is ruled. The one property a
+future gate would want &mdash; that no rune writes a live node's counter &mdash; is derivable in
+about twenty lines from <code>LANE_TREES</code> and <code>runes.json</code>, and belongs in the
+batch that takes the charter.</li>
+<li><b>No <code>CLAUDE.md</code> rule is added.</b> Nothing is settled until this is read.</li>
+</ul>
+
+<h2>APPENDIX — EVERY RUNE, EVERY CLAUSE</h2>
+<p><b>Generated from <code>data/runes.json</code> and <code>Talents.LANE_TREES</code>, not typed.</b>
+The <code>lane</code> column is the rune's own field and is shown for completeness &mdash; it is NOT
+what the classification was derived from. <b>Red is the population the charter removes.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Scope</th><th>Rune</th><th>Lane</th><th>Rarity</th><th>Clause</th><th>Category</th><th>Read site &mdash; what it modifies</th></tr>
+<tr><td rowspan="1">class:cleric</td><td rowspan="1"><b>Rune of Binding Souls</b></td><td rowspan="1">&mdash;</td><td rowspan="1">epic</td><td><code>Sacred Resolve</code></td><td style="color:#a60"><b>GRANT</b></td><td>grants an ability</td></tr>
+<tr><td rowspan="1">class:cleric</td><td rowspan="1"><b>Rune of Zealotry</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>Smite.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="2">class:cleric</td><td rowspan="2"><b>Rune of the Martyr</b></td><td rowspan="2">&mdash;</td><td rowspan="2">rare <b>scarred</b></td><td><code>healing_received_mult</code></td><td style="color:#060"><b>STAT</b></td><td>global healing multiplier (unit.gd:3264)</td></tr>
+<tr><td><code>speed</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, turn order (unit.gd:2330)</td></tr>
+<tr><td rowspan="2">class:hunter</td><td rowspan="2"><b>Rune of Hoarfrost Points</b></td><td rowspan="2">&mdash;</td><td rowspan="2">epic</td><td><code>Quick Shot.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Quick Shot.dmg_type</code></td><td style="color:#060"><b>ABILITY</b></td><td>sets a core ability field</td></tr>
+<tr><td rowspan="1">class:hunter</td><td rowspan="1"><b>Rune of True Flight</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>Quick Shot.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="2">class:hunter</td><td rowspan="2"><b>Rune of the Wolf&#x27;s Hunger</b></td><td rowspan="2">&mdash;</td><td rowspan="2">rare <b>scarred</b></td><td><code>dmg_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global damage multiplier (battle.gd:9364); relic writes it too</td></tr>
+<tr><td><code>armor</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, in every spec stat block</td></tr>
+<tr><td rowspan="2">class:mage</td><td rowspan="2"><b>Rune of Reckless Channeling</b></td><td rowspan="2">&mdash;</td><td rowspan="2">rare <b>scarred</b></td><td><code>dmg_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global damage multiplier (battle.gd:9364); relic writes it too</td></tr>
+<tr><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td rowspan="1">class:mage</td><td rowspan="1"><b>Rune of the Comet</b></td><td rowspan="1">&mdash;</td><td rowspan="1">epic</td><td><code>Comet</code></td><td style="color:#a60"><b>GRANT</b></td><td>grants a rune-exclusive ability</td></tr>
+<tr><td rowspan="1">class:mage</td><td rowspan="1"><b>Rune of the Wellspring</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>mana_regen_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>per-turn regen, 12 + bonus (battle.gd:12830)</td></tr>
+<tr><td rowspan="2">class:warrior</td><td rowspan="2"><b>Emberforged Rune</b></td><td rowspan="2">&mdash;</td><td rowspan="2">epic</td><td><code>Strike.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Strike.dmg_type</code></td><td style="color:#060"><b>ABILITY</b></td><td>sets a core ability field</td></tr>
+<tr><td rowspan="1">class:warrior</td><td rowspan="1"><b>Rune of Old Wrath</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>resource</code></td><td style="color:#060"><b>STAT</b></td><td>opening resource (battle.gd:1419)</td></tr>
+<tr><td rowspan="2">class:warrior</td><td rowspan="2"><b>Rune of the Whetted Edge</b></td><td rowspan="2">&mdash;</td><td rowspan="2">rare</td><td><code>Strike.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Strike.resource_gain</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="2">spec:arcanist</td><td rowspan="2"><b>Rune of the Resonant Core</b></td><td rowspan="2">Resonance</td><td rowspan="2">rare</td><td><code>resonant_core_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ar_core; Resonance gain (11665) &larr; node <b>Resonant Core</b> (arcanist / Resonance)</td></tr>
+<tr><td><code>conduit_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>ar_conduit; Resonance damage step (unit.gd:727) &larr; node <b>Conduit</b> (arcanist / Overload)</td></tr>
+<tr><td rowspan="1">spec:arcanist</td><td rowspan="1"><b>Rune of the Seventh Bolt</b></td><td rowspan="1">Overload</td><td rowspan="1">rare</td><td><code>Arcane Barrage.random_hits</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="3">spec:arcanist</td><td rowspan="3"><b>Rune of the Unquiet Mind</b></td><td rowspan="3">Entropy</td><td rowspan="3">rare <b>scarred</b></td><td><code>mindfulness_ranks</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: cooldowns tick an extra turn (3080)</td></tr>
+<tr><td><code>feedback_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ar_meltdown; recoil paid as Mana (11230) &larr; node <b>Feedback Loop</b> (arcanist / Entropy)</td></tr>
+<tr><td><code>mana_regen_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>per-turn regen, 12 + bonus (battle.gd:12830)</td></tr>
+<tr><td rowspan="3">spec:arcanist</td><td rowspan="3"><b>Rune of the Wide Current</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>arcane_mastery_ranks</code></td><td style="color:#060"><b>PASSIVE</b></td><td>rune-only: crit per Resonance stack (8601)</td></tr>
+<tr><td><code>critical_mass_ranks</code></td><td style="color:#060"><b>PASSIVE</b></td><td>rune-only: every third crit pays damage + Mana (8713)</td></tr>
+<tr><td><code>rune_on_edge_ranks</code></td><td style="color:#060"><b>PASSIVE</b></td><td>rune-only SEPARATE term, Resonance on the brink (AL split, 10241)</td></tr>
+<tr><td rowspan="2">spec:beastmaster</td><td rowspan="2"><b>Rune of the Deep Bond</b></td><td rowspan="2">devotion</td><td rowspan="2">rare</td><td><code>wild_communion_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_communion; companion damage step (20665) &larr; node <b>Wild Communion</b> (beastmaster / devotion)</td></tr>
+<tr><td><code>absolute_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_absolute; Pack Bond boon step (13295) &larr; node <b>Absolute Devotion</b> (beastmaster / devotion)</td></tr>
+<tr><td rowspan="2">spec:beastmaster</td><td rowspan="2"><b>Rune of the Loosened Straps</b></td><td rowspan="2">handler</td><td rowspan="2">rare <b>scarred</b></td><td><code>masters_aim_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_masters_aim; gated on ab.display_name == Quick Shot (8776) &larr; node <b>Master&#x27;s Aim</b> (beastmaster / handler)</td></tr>
+<tr><td><code>armor</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, in every spec stat block</td></tr>
+<tr><td rowspan="3">spec:beastmaster</td><td rowspan="3"><b>Rune of the Shared Wild</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>wild_communion_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_communion; companion damage step (20665) &larr; node <b>Wild Communion</b> (beastmaster / devotion)</td></tr>
+<tr><td><code>momentum_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_momentum; damage per companion kind (20668) &larr; node <b>Feral Momentum</b> (beastmaster / pack)</td></tr>
+<tr><td><code>companion_hp_pct</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_beast_within; companion max HP (20479) &larr; node <b>The Wild Within</b> (beastmaster / handler)</td></tr>
+<tr><td rowspan="2">spec:beastmaster</td><td rowspan="2"><b>Rune of the Turning Pack</b></td><td rowspan="2">pack</td><td rowspan="2">rare</td><td><code>quick_whistle_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_whistle; companion swap cooldown (20459) &larr; node <b>Quick Whistle</b> (beastmaster / pack)</td></tr>
+<tr><td><code>momentum_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>bm_momentum; damage per companion kind (20668) &larr; node <b>Feral Momentum</b> (beastmaster / pack)</td></tr>
+<tr><td rowspan="1">spec:berserker</td><td rowspan="1"><b>Rune of Boiling Blood</b></td><td rowspan="1">Fury</td><td rowspan="1">rare</td><td><code>bloodrage_step_bonus</code></td><td style="color:#b00"><b>TALENT</b></td><td>bz_unstoppable; Blood Frenzy step (unit.gd:1933) &larr; node <b>Unstoppable</b> (berserker / Fury)</td></tr>
+<tr><td rowspan="1">spec:berserker</td><td rowspan="1"><b>Rune of Exsanguination</b></td><td rowspan="1">Bloodletting</td><td rowspan="1">epic <b>scarred</b></td><td><code>blood_pact</code></td><td style="color:#060"><b>PASSIVE</b></td><td>rune-only: bleedout threshold + payout (21810)</td></tr>
+<tr><td rowspan="3">spec:berserker</td><td rowspan="3"><b>Rune of the Broad Path</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>bleed_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>ab.bleed_build + bonus, every bleed-builder (battle.gd:10577)</td></tr>
+<tr><td><code>bloodrage_step_bonus</code></td><td style="color:#b00"><b>TALENT</b></td><td>bz_unstoppable; Blood Frenzy step (unit.gd:1933) &larr; node <b>Unstoppable</b> (berserker / Fury)</td></tr>
+<tr><td><code>max_hp</code></td><td style="color:#060"><b>STAT</b></td><td>base stat</td></tr>
+<tr><td rowspan="2">spec:berserker</td><td rowspan="2"><b>Rune of the Warpath</b></td><td rowspan="2">Warpath</td><td rowspan="2">rare</td><td><code>Hack and Slash.cost</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Hack and Slash.bleed_build</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="2">spec:cryomancer</td><td rowspan="2"><b>Rune of the Bitter Grip</b></td><td rowspan="2">Deep Freeze</td><td rowspan="2">rare</td><td><code>frigid_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_frigid; Chilled slow (12382) &larr; node <b>Frigid Grip</b> (cryomancer / Deep Freeze)</td></tr>
+<tr><td><code>frostbite_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_frostbite; crit vs HELD (8629) &larr; node <b>Brittle Ice</b> (cryomancer / Deep Freeze)</td></tr>
+<tr><td rowspan="2">spec:cryomancer</td><td rowspan="2"><b>Rune of the Honed Lance</b></td><td rowspan="2">Thaw</td><td rowspan="2">rare</td><td><code>Ice Lance.cost</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Ice Lance.damage</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="3">spec:cryomancer</td><td rowspan="3"><b>Rune of the Killing Cold</b></td><td rowspan="3">Winter</td><td rowspan="3">rare <b>scarred</b></td><td><code>hypothermia_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_hypothermia; damage taken per Chill (9797) &larr; node <b>Hypothermia</b> (cryomancer / Thaw)</td></tr>
+<tr><td><code>numbing_ranks</code></td><td style="color:#060"><b>PASSIVE</b></td><td>rune-only: Chilled enemies miss more (7616)</td></tr>
+<tr><td><code>healing_received_mult</code></td><td style="color:#060"><b>STAT</b></td><td>global healing multiplier (unit.gd:3264)</td></tr>
+<tr><td rowspan="3">spec:cryomancer</td><td rowspan="3"><b>Rune of the Long Winter</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>frigid_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_frigid; Chilled slow (12382) &larr; node <b>Frigid Grip</b> (cryomancer / Deep Freeze)</td></tr>
+<tr><td><code>crystal_edge_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_crystal; damage vs Chilled (8797) &larr; node <b>Crystal Edge</b> (cryomancer / Thaw)</td></tr>
+<tr><td><code>hungering_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>cr_hungering; damage cut per Chill (9085/20803) &larr; node <b>Hungering Cold</b> (cryomancer / Winter)</td></tr>
+<tr><td rowspan="1">spec:holy</td><td rowspan="1"><b>Rune of the Last Rites</b></td><td rowspan="1">Mercy</td><td rowspan="1">epic</td><td><code>Resurrection</code></td><td style="color:#a60"><b>GRANT</b></td><td>grants an ability</td></tr>
+<tr><td rowspan="3">spec:holy</td><td rowspan="3"><b>Rune of the Open Hand</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>triage_heal</code></td><td style="color:#b00"><b>TALENT</b></td><td>hl_triage; instant-heal multiplier + crit (13489/13499) &larr; node <b>Triage</b> (holy / Radiance)</td></tr>
+<tr><td><code>zealous_mercy</code></td><td style="color:#b00"><b>TALENT</b></td><td>hl_zealous; opening Mercy (resource) &larr; node <b>Zealous Light</b> (holy / Mercy)</td></tr>
+<tr><td><code>last_hope_pct</code></td><td style="color:#b00"><b>TALENT</b></td><td>hl_last_hope; deeper heals on the nearly-dead (1475) &larr; node <b>Last Hope</b> (holy / Vigil)</td></tr>
+<tr><td rowspan="3">spec:holy</td><td rowspan="3"><b>Rune of the Sleepless Vigil</b></td><td rowspan="3">Vigil</td><td rowspan="3">rare <b>scarred</b></td><td><code>divine_presence_pct</code></td><td style="color:#b00"><b>TALENT</b></td><td>hl_presence; a per-turn drip heal that exists only here (3970) &larr; node <b>Divine Presence</b> (holy / Vigil)</td></tr>
+<tr><td><code>beacon_ranks</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: turn-start heal to allies under 25% (2930)</td></tr>
+<tr><td><code>speed</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, turn order (unit.gd:2330)</td></tr>
+<tr><td rowspan="2">spec:holy</td><td rowspan="2"><b>Rune of the Triage Ward</b></td><td rowspan="2">Radiance</td><td rowspan="2">rare</td><td><code>triage_heal</code></td><td style="color:#b00"><b>TALENT</b></td><td>hl_triage; instant-heal multiplier + crit (13489/13499) &larr; node <b>Triage</b> (holy / Radiance)</td></tr>
+<tr><td><code>capacitor_ranks</code></td><td style="color:#060"><b>CORE</b></td><td>rune-only: overheal banked for the next Heal (13535)</td></tr>
+<tr><td rowspan="2">spec:inquisitor</td><td rowspan="2"><b>Rune of the Binding Oath</b></td><td rowspan="2">Faith</td><td rowspan="2">rare</td><td><code>oath_opening</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: opening Faith (15195)</td></tr>
+<tr><td><code>faithful_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_faithful; Faith-release heal (14991) &larr; node <b>Blessed are the Faithful</b> (inquisitor / Faith)</td></tr>
+<tr><td rowspan="3">spec:inquisitor</td><td rowspan="3"><b>Rune of the Burning Censer</b></td><td rowspan="3">Zeal</td><td rowspan="3">rare <b>scarred</b></td><td><code>righteous_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_righteous; Consecrated Ground reflect (10282) &larr; node <b>Righteous Fire</b> (inquisitor / Zeal)</td></tr>
+<tr><td><code>lifewell_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_lifewell; Consecrated Ground reflection heals (10295) &larr; node <b>Lifewell</b> (inquisitor / Zeal)</td></tr>
+<tr><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td rowspan="3">spec:inquisitor</td><td rowspan="3"><b>Rune of the Standing Vow</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>blessed_barrier_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_barrier; Divine Shield absorb→heal (5738) &larr; node <b>Blessed Barrier</b> (inquisitor / Bulwark)</td></tr>
+<tr><td><code>devoutness_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_devoutness; party-wide BD cut (1428) &larr; node <b>Devoutness</b> (inquisitor / Faith)</td></tr>
+<tr><td><code>pulse_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_pulse; heals while Consecrated Ground holds (2752) &larr; node <b>Healing Pulse</b> (inquisitor / Zeal)</td></tr>
+<tr><td rowspan="2">spec:inquisitor</td><td rowspan="2"><b>Rune of the Warded Robes</b></td><td rowspan="2">Bulwark</td><td rowspan="2">rare</td><td><code>blessed_barrier_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_barrier; Divine Shield absorb→heal (5738) &larr; node <b>Blessed Barrier</b> (inquisitor / Bulwark)</td></tr>
+<tr><td><code>warded_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>dv_warded; Divine Shield armour (14048) &larr; node <b>Warded Robes</b> (inquisitor / Bulwark)</td></tr>
+<tr><td rowspan="3">spec:mystic</td><td rowspan="3"><b>Rune of the Carrion Wake</b></td><td rowspan="3">Guerilla</td><td rowspan="3">rare <b>scarred</b></td><td><code>vulture</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_vulture; damage vs 3+ afflictions (9031) &larr; node <b>Vulture</b> (mystic / Guerilla)</td></tr>
+<tr><td><code>scavenger_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_scavenger; resource on a kill (21769) &larr; node <b>Scavenger</b> (mystic / Guerilla)</td></tr>
+<tr><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td rowspan="3">spec:mystic</td><td rowspan="3"><b>Rune of the Long Hunt</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>potent_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_potent; Poison tick (21008) &larr; node <b>Potent Toxins</b> (mystic / Venom)</td></tr>
+<tr><td><code>cruel_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_cruel; trap damage (11603/21114/21309) &larr; node <b>Cruel Devices</b> (mystic / Snares)</td></tr>
+<tr><td><code>wire_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_wire; tripwire damage (11602/21113) &larr; node <b>Reinforced Wire</b> (mystic / Snares)</td></tr>
+<tr><td rowspan="2">spec:mystic</td><td rowspan="2"><b>Rune of the Quick Spring</b></td><td rowspan="2">Snares</td><td rowspan="2">rare</td><td><code>Snare Trap.cost</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td><code>Snare Trap.cooldown</code></td><td style="color:#060"><b>ABILITY</b></td><td>adds to a core ability field</td></tr>
+<tr><td rowspan="2">spec:mystic</td><td rowspan="2"><b>Rune of the Weeping Wound</b></td><td rowspan="2">Venom</td><td rowspan="2">rare</td><td><code>coated_blades</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_coated; free attacks apply Poison (11334) &larr; node <b>Coated Blades</b> (mystic / Venom)</td></tr>
+<tr><td><code>potent_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>sv_potent; Poison tick (21008) &larr; node <b>Potent Toxins</b> (mystic / Venom)</td></tr>
+<tr><td rowspan="2">spec:occultist</td><td rowspan="2"><b>Rune of the Deepening Ruin</b></td><td rowspan="2">Ruin</td><td rowspan="2">rare</td><td><code>deep_hex_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_deep_hex; damage per Ruin stack (9661) &larr; node <b>Deeper Hex</b> (occultist / Ruin)</td></tr>
+<tr><td><code>entropy_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_entropy; a per-turn Break tick that exists only here (2680) &larr; node <b>Entropy</b> (occultist / Ruin)</td></tr>
+<tr><td rowspan="1">spec:occultist</td><td rowspan="1"><b>Rune of the Flayed Mind</b></td><td rowspan="1">Madness</td><td rowspan="1">epic</td><td><code>Mind Flay</code></td><td style="color:#a60"><b>GRANT</b></td><td>grants an ability</td></tr>
+<tr><td rowspan="3">spec:occultist</td><td rowspan="3"><b>Rune of the Hollow Chalice</b></td><td rowspan="3">Leech</td><td rowspan="3">rare <b>scarred</b></td><td><code>soul_leech_step</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_soul_leech; Ruin leech step (10023) &larr; node <b>Soul Leech</b> (occultist / Leech)</td></tr>
+<tr><td><code>gluttony_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_gluttony; Ruin leech (10023) &larr; node <b>Gluttony</b> (occultist / Leech)</td></tr>
+<tr><td><code>healing_received_mult</code></td><td style="color:#060"><b>STAT</b></td><td>global healing multiplier (unit.gd:3264)</td></tr>
+<tr><td rowspan="4">spec:occultist</td><td rowspan="4"><b>Rune of the Whispering Dark</b></td><td rowspan="4"><i>splash</i></td><td rowspan="4">rare</td><td><code>broken_will_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_broken_will; Break-damage multiplier (9979) &larr; node <b>Broken Will</b> (occultist / Ruin)</td></tr>
+<tr><td><code>spread_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_spread; Ruin marks leap (14543) &larr; node <b>Spread of Madness</b> (occultist / Madness)</td></tr>
+<tr><td><code>spread_ruin</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_spread; Ruin the leap carries (14550) &larr; node <b>Spread of Madness</b> (occultist / Madness)</td></tr>
+<tr><td><code>pleasure_pct</code></td><td style="color:#b00"><b>TALENT</b></td><td>oc_pleasure; a per-turn heal that exists only here (3954) &larr; node <b>Pleasure from Pain</b> (occultist / Leech)</td></tr>
+<tr><td rowspan="2">spec:pyromancer</td><td rowspan="2"><b>Rune of the Blast Radius</b></td><td rowspan="2">Detonation</td><td rowspan="2">rare</td><td><code>blast_radius_ranks</code></td><td style="color:#060"><b>CORE</b></td><td>rune-only: Detonation consumes more Burn (8915)</td></tr>
+<tr><td><code>supernova_ranks</code></td><td style="color:#060"><b>CORE</b></td><td>rune-only: Detonation crit chance (8625)</td></tr>
+<tr><td rowspan="2">spec:pyromancer</td><td rowspan="2"><b>Rune of the Cinder Trail</b></td><td rowspan="2">Kindling</td><td rowspan="2">rare</td><td><code>rune_cinder_ember</code></td><td style="color:#060"><b>CORE</b></td><td>rune-only: Fireball embers a second enemy (10806)</td></tr>
+<tr><td><code>conflagration_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>py_arson; firewall turns (10781) &larr; node <b>Conflagration</b> (pyromancer / Kindling)</td></tr>
+<tr><td rowspan="3">spec:pyromancer</td><td rowspan="3"><b>Rune of the Long Burn</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>accelerant_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>py_accelerant; Burn tick (12491) &larr; node <b>Accelerant</b> (pyromancer / Kindling)</td></tr>
+<tr><td><code>molten_ranks</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: burning attackers bite softer (9786)</td></tr>
+<tr><td><code>supernova_ranks</code></td><td style="color:#060"><b>CORE</b></td><td>rune-only: Detonation crit chance (8625)</td></tr>
+<tr><td rowspan="3">spec:pyromancer</td><td rowspan="3"><b>Rune of the White Flame</b></td><td rowspan="3">Inferno</td><td rowspan="3">epic <b>scarred</b></td><td><code>rune_resist_pierce</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: thins resistance (9811)</td></tr>
+<tr><td><code>pyromaniac_ranks</code></td><td style="color:#a60"><b>DEAD</b></td><td>INERT since AR — written, read nowhere (unit.gd:515)</td></tr>
+<tr><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td rowspan="2">spec:sharpshooter</td><td rowspan="2"><b>Rune of the Deep Sight</b></td><td rowspan="2">Precision</td><td rowspan="2">rare</td><td><code>deep_focus</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_deep_focus; Focus conversion point (unit.gd:774) &larr; node <b>Deep Focus</b> (sharpshooter / Precision)</td></tr>
+<tr><td><code>perfect_form</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_perfect_form; Focus on a crit (10168) &larr; node <b>Perfect Form</b> (sharpshooter / Precision)</td></tr>
+<tr><td rowspan="3">spec:sharpshooter</td><td rowspan="3"><b>Rune of the Level Aim</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>pierce_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>ab.armor_pierce + bonus, every ability (battle.gd:9843)</td></tr>
+<tr><td><code>muscle_memory_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_muscle; Focus gain 20 + ranks (21590) &larr; node <b>Muscle Memory</b> (sharpshooter / Tempo)</td></tr>
+<tr><td><code>bonecracker_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_bonecracker; damage vs Broken (8989) &larr; node <b>Bonecracker</b> (sharpshooter / Penetration)</td></tr>
+<tr><td rowspan="3">spec:sharpshooter</td><td rowspan="3"><b>Rune of the Long Draw</b></td><td rowspan="3">Tempo</td><td rowspan="3">rare <b>scarred</b></td><td><code>opening_volley</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_volley; opening Focus (1307) &larr; node <b>Opening Volley</b> (sharpshooter / Tempo)</td></tr>
+<tr><td><code>muscle_memory_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_muscle; Focus gain 20 + ranks (21590) &larr; node <b>Muscle Memory</b> (sharpshooter / Tempo)</td></tr>
+<tr><td><code>speed</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, turn order (unit.gd:2330)</td></tr>
+<tr><td rowspan="2">spec:sharpshooter</td><td rowspan="2"><b>Rune of the Narrow Gap</b></td><td rowspan="2">Penetration</td><td rowspan="2">rare</td><td><code>pierce_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>ab.armor_pierce + bonus, every ability (battle.gd:9843)</td></tr>
+<tr><td><code>bonecracker_ranks</code></td><td style="color:#b00"><b>TALENT</b></td><td>ss_bonecracker; damage vs Broken (8989) &larr; node <b>Bonecracker</b> (sharpshooter / Penetration)</td></tr>
+<tr><td rowspan="2">spec:swordmaster</td><td rowspan="2"><b>Rune of the Bared Guard</b></td><td rowspan="2">Blade</td><td rowspan="2">rare <b>scarred</b></td><td><code>seasoned_off_bonus</code></td><td style="color:#b00"><b>TALENT</b></td><td>sm_agg_stance; Seasoned Fighter offensive weight (9291) &larr; node <b>Aggressive Stance</b> (swordmaster / Blade)</td></tr>
+<tr><td><code>seasoned_def_bonus</code></td><td style="color:#b00"><b>TALENT</b></td><td>sm_def_stance; Seasoned Fighter defensive weight (9763) &larr; node <b>Defensive Stance</b> (swordmaster / Poise)</td></tr>
+<tr><td rowspan="3">spec:swordmaster</td><td rowspan="3"><b>Rune of the Duelist</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>crit_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global crit chance (battle.gd:8603); relic writes it too</td></tr>
+<tr><td><code>parry_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global parry roll (battle.gd:7668)</td></tr>
+<tr><td><code>rune_bd_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: global Break-damage multiplier (9983)</td></tr>
+<tr><td rowspan="1">spec:swordmaster</td><td rowspan="1"><b>Rune of the Shattered Guard</b></td><td rowspan="1">Breaker</td><td rowspan="1">rare</td><td><code>rune_bd_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: global Break-damage multiplier (9983)</td></tr>
+<tr><td rowspan="2">spec:swordmaster</td><td rowspan="2"><b>Rune of the Still Wrist</b></td><td rowspan="2">Poise</td><td rowspan="2">rare</td><td><code>parry_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global parry roll (battle.gd:7668)</td></tr>
+<tr><td><code>swordsmanship_parry</code></td><td style="color:#b00"><b>TALENT</b></td><td>sm_swordsmanship; Guard Change parry (19081) &larr; node <b>Swordsmanship</b> (swordmaster / Poise)</td></tr>
+<tr><td rowspan="1">spec:warden</td><td rowspan="1"><b>Rune of Grudges</b></td><td rowspan="1">Threat</td><td rowspan="1">rare</td><td><code>rune_grudge_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only SEPARATE term beside grudge_ranks (AL split, 9261)</td></tr>
+<tr><td rowspan="2">spec:warden</td><td rowspan="2"><b>Rune of the Iron Promise</b></td><td rowspan="2">Plate</td><td rowspan="2">rare <b>scarred</b></td><td><code>block_chance</code></td><td style="color:#060"><b>STAT</b></td><td>base defensive stat (classes.gd:4834)</td></tr>
+<tr><td><code>speed</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, turn order (unit.gd:2330)</td></tr>
+<tr><td rowspan="3">spec:warden</td><td rowspan="3"><b>Rune of the Sentinel</b></td><td rowspan="3"><i>splash</i></td><td rowspan="3">rare</td><td><code>block_chance</code></td><td style="color:#060"><b>STAT</b></td><td>base defensive stat (classes.gd:4834)</td></tr>
+<tr><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td><code>rune_bd_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: global Break-damage multiplier (9983)</td></tr>
+<tr><td rowspan="1">spec:warden</td><td rowspan="1"><b>Rune of the Standard</b></td><td rowspan="1">Banner</td><td rowspan="1">rare</td><td><code>rune_vigil_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only SEPARATE term beside shared_vigil_ranks (AL split, 9613)</td></tr>
+<tr><td rowspan="2">universal</td><td rowspan="2"><b>Anchor Rune</b></td><td rowspan="2">&mdash;</td><td rowspan="2">common</td><td><code>armor</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, in every spec stat block</td></tr>
+<tr><td><code>speed</code></td><td style="color:#060"><b>STAT</b></td><td>base stat, turn order (unit.gd:2330)</td></tr>
+<tr><td rowspan="2">universal</td><td rowspan="2"><b>Glass Rune</b></td><td rowspan="2">&mdash;</td><td rowspan="2">rare <b>scarred</b></td><td><code>crit_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global crit chance (battle.gd:8603); relic writes it too</td></tr>
+<tr><td><code>dmg_taken_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>global damage-taken (battle.gd:9689)</td></tr>
+<tr><td rowspan="1">universal</td><td rowspan="1"><b>Rune of the Colossus</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>max_hp_pct</code></td><td style="color:#060"><b>STAT</b></td><td>spawn multiplier on max_hp (battle.gd:1350)</td></tr>
+<tr><td rowspan="1">universal</td><td rowspan="1"><b>Rune of the Reaper</b></td><td rowspan="1">&mdash;</td><td rowspan="1">rare</td><td><code>rune_execute_bonus</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: damage vs targets under 35% (9271)</td></tr>
+<tr><td rowspan="2">universal</td><td rowspan="2"><b>Vampiric Rune</b></td><td rowspan="2">&mdash;</td><td rowspan="2">epic <b>scarred</b></td><td><code>rune_lifesteal</code></td><td style="color:#060"><b>STAT</b></td><td>rune-only: leech on damage dealt (11274)</td></tr>
+<tr><td><code>healing_received_mult</code></td><td style="color:#060"><b>STAT</b></td><td>global healing multiplier (unit.gd:3264)</td></tr>
+</table>
+</body></html>

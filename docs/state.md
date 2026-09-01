@@ -5,106 +5,111 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-01 (Batch EI).*
+*Last rewritten: 2026-09-01 (Batch EJ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EI — THE FLOOR THAT DID NOT COVER THE FLOOR.** **`check_parse.gd` WALKED TWO
-  DIRECTORIES AND THE THINGS IT PROTECTS LIVE IN A THIRD PLACE**, so the acceptance test every
-  implement-only batch has run since CG was blind to all 39 gates, all 47 suites and both fixtures.
-  **41 FILES → 158.** **NO GAME CODE MOVED, NO MAGNITUDE CHANGED, NO CARD WAS TOUCHED AND NO POOL
-  GAINED OR LOST AN ENTRY.** **Report: `docs/reports/EI.md`.**
-- **§1 — THE POPULATION IS DERIVED FROM `run_battery.sh`, IN FOUR LAYERS, AND NO LAYER IS A
-  DIRECTORY.** 82 targets the battery spawns (its own `SUITES` and `GATES` arrays, every literal
-  `--script`, every `run_one`, every scene run) + 57 reached through their
-  `preload` / `ext_resource` / `change_scene_to_file` edges and `project.godot`'s autoloads + 11
-  game-tree files reachable only by a `class_name` identifier + 4 data JSON. **A target added to
-  the battery is covered the same day, with no edit to the gate.**
-  - **THE CAUSE OF ALL THREE SHORTFALLS WAS ONE SENTENCE**, `for dir_path in [...]`. CP repaired
-    the tally, DE found it missed the suites, EH broke `gate_fixture.gd` and **the floor
-    procedure's stderr grep came back CLEAN while 23 gates could not load.** **DO NOT NARROW IT
-    BACK TO A DIRECTORY.**
-  - **LAYER B IS HOW THE FIXTURES ARRIVE.** Nothing names `gate_fixture.gd` or `suite_fixture.gd`
-    and 60 files depend on them, so they are covered *because they are depended upon* — a property
-    that survives somebody moving them.
-  - **THE RESIDUE IS NAMED IN THE OUTPUT EVERY RUN**: `check_ck_width`, `check_cu`, `check_cv`,
-    `check_dn` — the same four this file records as running nowhere. They are loaded like
-    everything else and reported as their OWN population, so *covered* never quietly means
-    *reachable*. **What is still outside is printed too**: the two `.py` instruments, the shell
-    scripts, `shaders/outline.gdshader` (a shader compiles on the rendering server, a stub
-    headless) and the `assets/` binaries no dependency edge reaches. **Nothing the battery spawns
-    is outside it** — the gate counts a battery name with no file behind it and reads `0 missing`.
-  - **THE GATE PRELOADS NOTHING AND MUST NOT START.** A floor that preloads `gate_fixture.gd`
-    cannot report that `gate_fixture.gd` is broken: it fails to compile, prints a Parse Error, runs
-    not one line and **exits 0**.
-  - **THREE HARD FAILURES, BECAUSE A GATE THAT CAN ONLY PASS IS A GAP** — the battery script
-    unreadable (armed: **3 failures**), either array parsing to nothing (armed: **1**), and a
-    battery name with no file. **COVERAGE DOES NOT SHRINK WHEN THE DERIVATION BREAKS**: all three
-    armed runs still checked 159 files, because the residue layer catches whatever falls out. Only
-    the labelling moves, and the guards say so.
-  - **IT PRINTS A CHECK COUNT NOW AND THE COUNT IS THE COVERAGE.** A failure total reads zero
-    whether the walk covers 158 files or 41, which is how it was short three times with nothing
-    going red. **`baselines.json` pins the floor at 158**, written before the battery off three
-    identical standalone readings. **Eight targets could not report a check count; SEVEN cannot
-    now.**
-  - **A MALFORMED DATA FILE WAS THE ONE THING THE FLOOR PROCEDURE COULD NOT SEE** — armed, it
-    reddened the tally and left the stream clean. The JSON failure goes to stderr naming itself a
-    `Parse Error` now, so one procedure covers the whole floor.
-  - **TEN NEGATIVE CONTROLS, EVERY ONE TWO-ARMED AGAINST HEAD'S OWN COPY OF THE GATE.** Arming only
-    the new gate proves a broken file is broken, not that the widening works. `gate_fixture.gd`
-    **24 failures / 74 stderr hits** against HEAD's **0 / 0** — **the 24 are the fixture plus the 23
-    gates EH counted, reproduced without being aimed at**; `suite_fixture.gd` **38 / 39** against
-    **0 / 0**; a gate, a suite, the harness, a scene-run script, a residue file and
-    `data/runes.json` each **1 / 1** against **0 / 0**. **The positive control is
-    `scripts/talents.gd`**, which the OLD gate already covered: **59** against HEAD's **10**, so the
-    widening is a superset rather than a replacement.
-- **§2 — A BRIEF'S PRECEDENT IS A CLAIM AND GETS CHECKED, RECORDED IN `CLAUDE.md`.** *When a brief
-  cites a precedent — a prior ruling, a mechanism, an existing ladder or convention — the batch
-  VERIFIES it against the code before building on it, and reports if it does not hold.* **A wrong
-  precedent is worse than a wrong number: a number gets re-derived, and a precedent gets
-  inherited.**
-  - **THE GAP IS REAL: the standing rules cover FIGURES and a precedent is not a figure.**
-    **Documents get swept and briefs do not**, so a false precedent has no surface an instrument
-    can bite — it propagates by being read.
-  - **THE LINEAGE IS THREE DEEP AND EVERY ERROR LIVED IN A BRIEF.** CT asserted a rune equip ladder
-    deleted at AN §9 and caught it itself; eleven batches later EG's brief asserted the same
-    ladder; EH's brief then blamed `master.html`, **which has never carried the claim.**
-  - **FORWARD-LOOKING ONLY. PAST BRIEFS ARE NOT SWEPT** — they are history and the changelog holds
-    them.
-- **§3 — ONE OF THE TWO CONFIRMATIONS DID NOT CONFIRM.** **A THIRD SECTION OF `master.html` CARRIES
-  EH'S §6a LAG, AND TWO MORE SITES BESIDE IT.** All three corrected toward the code.
-  - **§10 SAID "There is no cap on how many abilities a hero holds"** — BO §2 gave earned abilities
-    a cap and EG made it a ladder (`ABILITY_SLOTS_BY_BOSS` = 7/8/9/10). It is §6a's own sentence
-    standing **1,450 lines away**. **A LINE-BASED SWEEP CANNOT SEE IT BECAUSE THE CLAIM WRAPS**; the
-    re-sweep was run over UNWRAPPED text and that is what found it. The words are true of the POOL
-    and false of the surface they explain — the menu is built from `equipped_ability_names`.
-    **Derived, not asserted: the widest menu any of the twelve can raise is ELEVEN entries**, so
-    ⇧Q and ⇧W are reachable and ⇧E–⇧G are headroom. **TWO `battle.gd` COMMENTS CARRIED THE SAME
-    CLAIM** and were corrected with it — proved comment-only by a comment-stripped diff, **0
-    differing code lines**.
-  - **§6.4 STILL SAID SMOKE BOMB AND FIELD DRESSING "LAND LATER"; §13 SAYS THEY ARE SPENT.** Field
-    Dressing is live in `CLASS_DRAFT_POOLS` (BR) and Smoke Bomb shipped as Choking Smoke (BO), both
-    verified against the pools. **Only Blight is still owed.** DS swept §13 and not the section 975
-    lines above it — the §6a/§6b shape, third instance. The Sharpshooter's three names beside it
-    **really are still owed**, checked rather than assumed.
-  - **§11b DESCRIBED A FIRST-RUN CARD THE GAME NO LONGER SHOWS** — it summarised the framing card
-    as teaching "the two ability picks a zone pays out", and the card's own text in `map_screen.gd`
-    **names no ability pick at all**. Rewritten from the card.
-  - **AND NINE OF EH'S TWELVE CLAIMS RETURN ZERO HITS ANYWHERE IN THE DOCUMENT**, so the population
-    is not read as all-defect: EH's repair holds everywhere it reached, and §8 Economy — the
-    largest concentration outside §6a/§6b — is fully current.
-  - **THE ENABLER COUNT CONFIRMS.** `PROTECTED_CORES` names **sixteen across nine specs**, derived
-    live, and every record that reasons from it says sixteen — `CLAUDE.md`, the changelog's EH
-    entry, this file, and **`check_eh` §3's live `enablers == 16`**. The one surviving "seven" is
-    EG's own changelog entry, which is an accurate record of what EG did and is corrected by the
-    entry fifty lines above it. **History is not rewritten to hide a finding.**
-- **Next letter: EJ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EJ — THE RUNES AGAINST A CHARTER THEY WERE NOT WRITTEN FOR.** **A REPORT.
+  NOTHING WAS RE-KEYED, RE-AUTHORED, RETUNED OR RETIRED**, no `lane` field was removed, no
+  magnitude moved, no document was corrected and **not one line of `.gd`, `.json` or `.tscn`
+  changed.** The deliverable is **`docs/rune-audit.html`** and **`docs/reports/EJ.md`**.
+- **§1 — 59 OF 135 CLAUSES, ACROSS 32 OF THE 65 RUNES, WRITE A LIVE TALENT NODE'S OWN COUNTER.**
+  That is the population the charter removes. Derived from the READ SITE, never from the rune's
+  text or its `lane` field. The rest is already what the charter asks for: **46 STAT/RESOURCE, 15
+  core-ability value edits, 5 CORE, 5 PASSIVE**, 4 grants the charter names neither way, 1 dead.
+  - **THE TWO FIGURES DIFFER BY 27 AND BOTH ARE TRUE.** 59 clauses live in 32 runes because the
+    splash runes carry three or four each. **16 runes are WHOLLY talent-keyed** — emptied by the
+    charter rather than trimmed — **16 partly, and 33 not at all.**
+  - **THE UNEVENNESS IS DO's SHAPE AGAIN AND NOBODY HAD MEASURED IT.** The 5 universal and 12
+    class-wide runes carry **ZERO** talent clauses between them; all 59 live in the 48 spec runes.
+    **The Warden's four are 0-for-7 and would not move. The Beastmaster's are 8-of-9.** Per class:
+    Warrior 5/27, Mage 11/33, **Cleric 21/33, Hunter 22/34.**
+  - **A NODE WRITING THE SAME FIELD DOES NOT MAKE A RUNE TALENT-KEYED**, and that is where this
+    audit could have been wrong. `crit_bonus`, `speed`, `armor`, `max_hp_pct`, `block_chance`,
+    `parry_bonus`, `dmg_bonus`, `dmg_taken_bonus`, `pierce_bonus` and `bleed_bonus` are the unit's
+    own math — global pipelines, several relic-written too — so **nine fields are classed STAT
+    despite having a node.**
+  - **ALL 15 `ability` CLAUSES NAME A PROTECTED CORE OR A CLASS KIT ABILITY**, resolved live
+    against `PROTECTED_CORES` and the kits. That whole family is already charter-clean.
+- **§2 — THE REBUILD TOUCHED TWO RUNES AND ONE OF THEM IS RECORDED NOWHERE.** All 84 fields were
+  compared at their read site **and at their enclosing GUARD CHAIN** against `DN~1`. **Five moved;
+  three are unrelated widenings (DU, DS).**
+  - **THE RUNE OF THE STANDING VOW LOST A TRIGGER WINDOW AT DO AND NOTHING RECORDS IT.** DO cut
+    Sacred Resolve's banner out of Healing Pulse — `has_status("unity") or
+    has_status("cons_ground")` became `cons_ground` alone — and the rune rides `pulse_ranks`.
+    **DO reported the NODE cut in its own §3 table; a grep for "Standing Vow" and `pulse_ranks`
+    across every report, the changelog and this file returns ZERO hits.**
+  - **IT IS A QUIET WEAKENING RATHER THAN A MIS-SALE.** The rune's desc reads *"holy ground mends
+    2% each turn"* and is byte-identical before and after DO — **the code moved TOWARD the card.**
+    The rune was over-delivering against its own text and now delivers exactly what it says.
+  - **`oc_spread` IS THE SHARPEST LESSON: ITS NODE DICT CHANGED BY DESCRIPTION ONLY AT DP** while
+    `battle.gd`'s read site moved **7,225 lines** and changed which unit it reads from. **A diff of
+    the trees — the obvious instrument — would have filed it as a documentation edit.** What found
+    the Standing Vow beside it was the GUARD-CHAIN diff: its read line never changed at all, so a
+    read-line diff returns four fields and misses it.
+  - **`check_dp` §4's 116-fields-0-dead is REAL AND IS A DIFFERENT QUESTION**, confirmed live. A
+    live read site proves the field is read, not that the rune still buys what it was authored to.
+  - **AN EXTRACTOR HOLE WAS FOUND AND CLOSED RATHER THAN SHIPPED.** Masking string literals to find
+    identifier reads reported **eight fields as read by nothing**; seven are read through a string
+    key (`_max_hero_rank("frigid_ranks")`, `cfg.get("max_hp_pct")`). **The eighth is real.**
+- **§2b — THREE RUNE-ONLY EFFECTS ANNOUNCE THEMSELVES TO THE PLAYER AS TALENTS.** `beacon_ranks`
+  (Sleepless Vigil), `capacitor_ranks` (Triage Ward) and `mindfulness_ranks` (Unquiet Mind) are
+  written by a rune and nothing else, and **no node of any of those three names exists in any of
+  the twelve trees** — checked against `LANE_TREES`. Their sites log *"→ Talent: …"*, and the
+  Capacitor raises a status chip under that name. **Three more are softer** — Grudge, Shared Vigil
+  and On the Edge have a live node AND a separate `rune_` term. **The convention already exists**
+  (Exsanguination, Critical Mass, the Reaper and the Cinder Trail all say *"→ Rune:"*). **All six
+  reported, none fixed: a log line is player-facing text.**
+- **§3 — THE SLOT LADDER HAS NOW BEEN WRONG IN FOUR BRIEFS AND `master.html` HAS NEVER CARRIED
+  IT.** **The count is THREE, FLAT, FROM RUN START, AND IT DOES NOT GROW** — `Run.rune_slots()`
+  returns a literal `3`; its only other arm is `RICH_SLOTS = 4` gated on `sim_run` **and**
+  `DOD_SIM_RUNE_ECON=rich`, which is a flat 4 from tier 1 and unreachable in a played run.
+  - **Swept on UNWRAPPED text (EI's method), `master.html` says *"Three equip slots, flat, from run
+    start — no growth ladder"* at line 2444 and agrees with itself in FOUR more places — five
+    sites, of which a line-anchored grep sees only THREE (one broken by inline `<b>` tags, one
+    wrapped mid-phrase). ZERO
+    hits** for *"Equip slots"*, *"2 → 3 → 4"* and *"starts the run choosing a rune"*. **NO
+    CORRECTION WAS OWED AND NONE WAS MADE.** **And `battle.gd:23066-67`'s refutation WRAPS too, so
+    a line grep for it returns nothing — the correction has been as hard to find as the claim.**
+  - **THE LINEAGE IS FOUR DEEP**: CT was told it and caught it; EG asserted it; EH blamed
+    `master.html`; **EJ's brief quoted both halves of a contradiction as live in a document that
+    carries only one.** EI §2's rule caught it on its first application.
+  - **THE CONFUSION HAS A SOURCE AND IT WILL CAUSE A FIFTH IF NOBODY NAMES IT: THE ITEM POUCH
+    LADDER IS REAL** (`ITEM_SLOTS_BY_ZONE`, grows by zone, announced on the boss card).
+    `design-notes.md` sets the two side by side — AN deleted the RUNE ladder because a run that
+    dies in zone 2 never owns the last slot; **CT kept the POUCH ladder** because a pouch slot is
+    filled the moment you reach a merchant. **Two ladders, one paragraph apart.**
+- **§4 — IT IS A RE-KEY OF 59 CLAUSES, NOT A REWRITE OF THE LAYER, AND THE LARGER COST IS NOT THE
+  CODE.** **56 of the 59 ride something the charter permits anyway** — 31 a spec passive, 15 a
+  stat, 8 a protected core, 2 a draft card — so each needs a field of its own read at the site that
+  already exists. **THREE HAVE NO HOME**: `divine_presence_pct`, `entropy_ranks` and `pleasure_pct`
+  are per-turn drips that exist only as their node and need an effect INVENTED.
+  - **BATCH AL SHIPPED THIS REPAIR THREE TIMES** — `rune_grudge_bonus`, `rune_vigil_bonus`,
+    `rune_on_edge_ranks` — with the method and the reason in the source comments. **AND IT LEFT THE
+    ONE NON-OBVIOUS RULE ANY RE-KEY NEEDS**: *a threshold takes the MAX and the payout SUMS*,
+    because 35 + 25 = 60% is a third effect neither half asked for.
+  - **THE COUPLING IS ADDITIVE AND NEVER CONDITIONAL.** Derived: **no rune payload carries a
+    `condition` or `has_node` gate**, and **all 59 talent clauses ride a node in the equipping
+    hero's OWN spec tree — zero cross-spec.** No rune is dead without a talent.
+  - **THE REAL COST IS THE AUTHORING RULE, WHICH BOTH DESIGN DOCUMENTS STATE AS CURRENT AND WHICH
+    IS ACCURATE.** One rune per lane plus one splash, *"worth more to a hero whose points went
+    elsewhere"*. **36 lane runes and 12 splashes are built on it**; severing them makes each a flat
+    power increment, which is the thing the rule exists to prevent. **The splashes lose more than
+    the lane runes** — with no lanes to reach across, a splash is three unrelated numbers.
+  - **THE ANSWER, NOT SOFTENED: a re-key of 59 clauses in 32 runes, of which 3 need new mechanics
+    and 16 runes need new concepts, plus a deliberate abandonment of the rule 48 of the 65 were
+    designed around.** The engineering is small and precedented; the design question is not.
+- **AND TWO OF THE BRIEF'S NINE PREMISES DID NOT HOLD.** **DN changed ZERO nodes** — its own
+  changelog entry says *"NOTHING WAS RE-AUTHORED, NO TREE WAS RESTRUCTURED, NO NODE MOVED"*; the
+  rebuild is DO (34 nodes) and DP (4). And the `master.html` contradiction in §3 above. **The 25
+  re-authored cells and the 22 granting nodes both reproduce exactly.**
+- **Next letter: EK.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. **EH changed what a spent award pays; EI changed nothing the
-  player can see and repaired the instrument every batch stands on.**
+  purpose-authored and charter-clean. **EI changed nothing the player can see and repaired the
+  instrument every batch stands on; EJ changed nothing at all and sized the next decision.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -188,6 +193,53 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
+### THE RUNE CHARTER — AUDITED AT EJ, RULED ON NOWHERE
+
+**Full evidence: `docs/rune-audit.html` (all 65 runes, all 135 clauses, generated from the data
+rather than typed) and `docs/reports/EJ.md`.** **The charter is the designer's and is not
+implemented:** *runes are disconnected from talents; they are run-specific items only, and their
+purpose is to modify stats and resources, and the mechanics and values of core abilities, draft
+abilities and passives.* **Nothing in the code or the documents is wrong against the rule the
+runes were actually written to** — `master.html`, `design-notes.md` and `runes.gd`'s own header all
+state the opposite rule as current and all three are accurate. **The gap is between the code and
+the NEW rule.**
+
+- **THE SIZE: 59 of 135 clauses, in 32 of the 65 runes. 16 runes are WHOLLY talent-keyed.** All 59
+  sit in the 48 spec runes — **the 5 universal and 12 class-wide carry zero.** **Warden 0-of-7,
+  Beastmaster 8-of-9**; per class Warrior 5/27, Mage 11/33, Cleric 21/33, Hunter 22/34.
+- **IT IS A RE-KEY AND NOT A REWRITE — 56 of the 59 ride a passive, a stat, a core or a draft card
+  already**, and **AL shipped the same repair three times** (`rune_grudge_bonus`,
+  `rune_vigil_bonus`, `rune_on_edge_ranks`) with the method in the source comments. **AL's rule
+  travels with it: a THRESHOLD takes the MAX and a PAYOUT SUMS**, or the re-key ships a magnitude
+  nobody authored.
+- **THREE CLAUSES HAVE NO HOME AND NEED AN EFFECT INVENTED**: `divine_presence_pct`,
+  `entropy_ranks`, `pleasure_pct` — per-turn drips that exist only as their node.
+- **THE COST THE CODE CANNOT PRICE IS THE AUTHORING RULE.** 36 lane runes and 12 splashes are built
+  on *"worth more to a hero whose points went elsewhere"*; a rune with its own field is worth the
+  same to every hero of that spec. **The splashes lose most — with no lanes to reach across, a
+  splash is three unrelated numbers.**
+- **TWO RUNES WERE TOUCHED BY THE DO/DP REBUILD AND ONE IS ON NO RECORD.** The **Whispering Dark**
+  is DP's known case and its desc was rewritten with the node. **The RUNE OF THE STANDING VOW lost
+  the `unity` half of Healing Pulse's trigger at DO** and nothing anywhere records it — **not a
+  mis-sale (its desc named only holy ground before and after, so the code moved TOWARD the card),
+  but a silent weakening of a 100g rune's third clause.** Unruled: whether to restore it, re-key it
+  or leave it.
+- **THREE RUNE-ONLY EFFECTS ANNOUNCE THEMSELVES AS TALENTS** — `beacon_ranks`, `capacitor_ranks`,
+  `mindfulness_ranks`, none of which has a node of that name in any tree — **and three more share a
+  label with a node the holder may not own** (Grudge, Shared Vigil, On the Edge). The *"→ Rune:"*
+  convention already exists. **Reported, not fixed; player-facing text.**
+- **`pyromaniac_ranks` IS THE ONE CLAUSE THAT PAYS NOTHING TODAY.** The White Flame writes it and
+  nothing reads it — Inferno Master's per-turn step stopped existing at AR. `unit.gd:515` flags it
+  and AR §4 forbids inventing a read site. **A 120g scarred Epic with two live clauses of three.**
+- **NO GATE ENCODES ANY OF THIS**, because a gate encodes a ruling. The property a future gate
+  wants — *no rune writes a live node's counter* — is about twenty lines from `LANE_TREES` and
+  `runes.json` and belongs in the batch that takes the charter. **Writing it now would encode
+  today's 59 as an expectation.**
+- **WHAT THE AUDIT DID NOT REACH, STATED SO IT IS NOT READ AS CLEAN.** No sim, no balance
+  judgement; not one magnitude was measured in play. **Runes were not compared against each other,
+  nor against relics, items or enemy abilities.** Rune PRICING was not opened. The 12 `lane` fields
+  on the splash runes were not audited for accuracy.
+
 ### THE BOSS-PICK POOLS — AUDITED AT DU §5, RULED ON NOWHERE
 
 **Full tables and working in `docs/reports/DU.md` §5.** DQ dumped them and did not audit them; this
@@ -761,13 +813,24 @@ re-derived from the source at DM; not one was moved.**
   - **The draft assigns relics BEFORE specs are chosen**, which is the point at which "which hero
     gambles" has the least information behind it. Worth deciding whether assignment moves.
 - **Rune content.** The rune economy is measured and the system is built; the content pass has
-  not been authored.
+  not been authored. **AND THE CHARTER DECISION COMES FIRST — see the RUNE AUDIT block below.**
 - **The enemy debuffs whose duration exceeds their own cooldown.** Reported by the fold census.
 - **The design review.**
 - **Browser playtesting with friends.**
 
 ### Carried from the code, reported and deliberately not fixed
 
+- **`test_batch_bk`'s BASELINE ROW WAS WIDENED AT EJ, 129-130 -> 128-130, WHICH IS WHAT ITS OWN
+  NOTE SAID TO DO.** EJ's battery read **128 checks / 0 failures** there. **It is not a regression
+  and it is proved twice rather than argued:** EJ changed four files, all under `docs/`, and that
+  suite reads seven `res://` paths all under `scripts/` and `scenes/` — **the intersection is
+  EMPTY**; and **the count is stochastic by construction**, because `run._generate_map()` is
+  **never seeded anywhere in the tree** and the assertions loop over the nodes the roll produced.
+  **A FALL there is a thinner map, not a lost assertion** — which is why the failure count is the
+  half that matters and it read 0. Two standalone re-runs on the frozen tree read 129.
+  **`baselines.json` HAS EXACTLY ONE READER IN CODE** — `check_de.gd`, proved comment-stripped;
+  `check_dp`, `check_parse`, `test_batch_cd` and `run_battery.sh` name it only in comments — **so
+  `check_de` alone re-certifies it**, and it read 346 / 0 / 0 after the widening.
 - **SEVEN TARGETS STILL CANNOT REPORT A CHECK COUNT, AND IT IS A RATCHET RATHER THAN A SENTENCE.**
   `check_flow`, `check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn` and
   `check_map_screen` read `checks=?`. **`check_parse` LEFT THE SET AT EI**, and its number is its

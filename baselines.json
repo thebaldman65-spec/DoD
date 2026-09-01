@@ -672,16 +672,16 @@
   "test_batch_bk": {
    "kind": "suite",
    "checks": [
-    129,
+    128,
     130
    ],
-   "checks_obs": 11,
+   "checks_obs": 14,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 11,
-   "note": "Generates real zone maps and then walks them, so its count is a function of the topology it rolled. BOTH ENDS WERE OBSERVED IN ONE BATCH AND IT IS NOT WIDENED, because it has not been exceeded: headroom goes where a reading demands it."
+   "fails_obs": 14,
+   "note": "Generates real zone maps and then walks them, so its count is a function of the topology it rolled. BATCH EJ WIDENED THE FLOOR 129 -> 128, which is what the previous note said to do when a reading demanded it. The reading: EJ's battery read 128 with 0 failures, and two standalone re-runs on the same frozen tree read 129. IT IS NOT A REGRESSION AND THAT IS PROVED TWO WAYS RATHER THAN ARGUED. (1) EJ changed four files, all under docs/; this suite reads seven res:// paths, all under scripts/ and scenes/ — the intersection is EMPTY, so its whole input surface was byte-identical to HEAD. (2) The count is stochastic BY CONSTRUCTION: run._generate_map() is never seeded anywhere in the tree, and the assertions loop over the nodes the roll produced. A FALL here is a thinner map, not a lost assertion — which is why the failure count is the half that matters and it is 0."
   },
   "test_batch_bl": {
    "kind": "suite",

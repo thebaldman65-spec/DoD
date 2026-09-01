@@ -14,6 +14,107 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EJ: THE RUNES AGAINST A CHARTER THEY WERE NOT WRITTEN FOR</h2>
+<p><i>A REPORT. <b>No rune was re-keyed, re-authored, retuned or retired; no <code>lane</code>
+field was removed; no magnitude moved and no document was corrected.</b> The designer's new
+charter says <b>runes are disconnected from talents</b> &mdash; run-specific items that modify
+stats and resources, and the mechanics and values of core abilities, draft abilities and passives.
+The 65 authored runes were written to a different rule, and this sizes the gap. <b>The answer is
+59 of 135 clauses across 32 of 65 runes, and it is a RE-KEY rather than a rewrite</b> &mdash; 56
+of the 59 already modify a passive, a stat, a core ability or a draft ability at their read site
+and need only a field of their own. <b>Three do not.</b> Full working:
+<code>docs/rune-audit.html</code> and <code>docs/reports/EJ.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; WHAT EACH RUNE ACTUALLY MODIFIES, DERIVED FROM THE READ SITE.</b> Not from
+the rune's text and not from its <code>lane</code> field. <b>65 runes carry 135 clauses</b> (116
+<code>stat</code> fields across 84 distinct names, 15 <code>ability</code> add/set terms, 4
+grants), and the two figures differ because a rune may sit in several categories at once &mdash;
+the Rune of the Whispering Dark writes four fields in three of them. <b>Talent-keyed: 59 clauses,
+32 runes.</b> Permitted unchanged: <b>46 STAT/RESOURCE, 15 CORE-ABILITY value edits, 5 CORE, 5
+PASSIVE</b>. <b>All 15 <code>ability</code> runes name a PROTECTED CORE or a class kit ability</b>,
+so that whole family is already charter-clean. <b>THE UNEVENNESS IS THE FINDING, AS IT WAS AT
+DO</b>: the 5 universal and 12 class-wide runes carry <b>ZERO</b> talent clauses, and every one of
+the 59 lives in the 48 spec runes &mdash; <b>the Warden's four are 0-for-7 and the Beastmaster's
+are 8-of-9</b>. Per class the talent share runs Warrior 5/27, Mage 11/33, Cleric 21/33, Hunter
+22/34. <b>16 runes are WHOLLY talent-keyed</b> and would be empty rather than trimmed.</p>
+
+<p><b>&sect;2 &mdash; THE REBUILD TOUCHED TWO RUNES, ONE OF THEM UNRECORDED UNTIL NOW.</b> Every
+one of the 84 rune stat fields was compared at its READ SITE and at its enclosing GUARD CHAIN
+against the tree as it stood before DN. <b>Five moved; three are unrelated widenings (DU, DS) and
+two are the rebuild.</b> <b>The Rune of the Whispering Dark is DP's known case</b> &mdash;
+<code>spread_ranks</code> and <code>spread_ruin</code> survived, and DP re-wrote the rune's
+description with the node, so it sells what it now buys. <b>THE RUNE OF THE STANDING VOW IS NOT
+RECORDED ANYWHERE.</b> DO cut the <code>unity</code> half of Healing Pulse's trigger &mdash;
+<code>if u.has_status("unity") or u.has_status("cons_ground")</code> became
+<code>cons_ground</code> alone &mdash; and the rune rides <code>pulse_ranks</code>, so its third
+clause has fired under strictly fewer conditions ever since. <b>DO reported the node cut in its own
+&sect;3 table; the rune consequence appears in no report, no changelog entry and no gate.</b> It is
+a quiet weakening rather than a mis-sale: the rune's description named only holy ground both before
+and after, so the code moved TOWARD the card. <b>And <code>oc_spread</code> is the sharpest lesson
+in the batch</b> &mdash; its node dictionary changed by DESCRIPTION ONLY at DP while
+<code>battle.gd</code>'s read site moved 7,225 lines and changed from a party-wide
+<code>_max_hero_rank</code> to the Occultist's own field. <b>A node-dictionary diff would have
+called it a documentation edit.</b></p>
+
+<p><b>&sect;2b &mdash; THREE RUNE-ONLY EFFECTS ANNOUNCE THEMSELVES TO THE PLAYER AS TALENTS.</b>
+Derived, not assumed: <code>beacon_ranks</code>, <code>capacitor_ranks</code> and
+<code>mindfulness_ranks</code> are written by a rune and by nothing else &mdash; no live node
+carries any of those three names &mdash; and their read sites log <i>"&rarr; Talent: Beacon"</i>,
+<i>"&rarr; Talent: Holy Capacitor banks&hellip;"</i> and <i>"&rarr; Talent: Mindfulness"</i>. The
+Capacitor also raises a status chip under that name. <b>The newer rune-only sites already say
+"&rarr; Rune:"</b> (Exsanguination, Critical Mass, the Reaper, the Cinder Trail), so the
+convention exists and these three predate it. <b>Reported, not fixed</b> &mdash; a log string is
+player-facing text and this batch changes none.</p>
+
+<p><b>&sect;3 &mdash; THE SLOT LADDER IS WRONG IN THE BRIEF FOR THE FOURTH TIME, AND
+<code>master.html</code> HAS NEVER CARRIED IT.</b> The brief quoted two contradictory descriptions
+as both live in that document. <b>Only one of them is in it.</b> Swept on UNWRAPPED text (EI's
+method): <i>"Three equip slots, flat, from run start &mdash; no growth ladder"</i> at line 2444,
+and <b>four more that all agree &mdash; five sites, of which a line-anchored grep sees only
+three</b>. <b>Zero hits</b> for <i>"Equip slots"</i>, for
+<i>"2 &rarr; 3 &rarr; 4"</i> and for <i>"starts the run choosing a rune"</i>. <b>The code agrees:
+<code>Run.rune_slots()</code> returns a flat 3</b> and never grows &mdash; its only other arm is
+<code>RICH_SLOTS = 4</code>, gated on <code>sim_run</code> and a
+<code>DOD_SIM_RUNE_ECON=rich</code> environment flag, and that is a flat 4 from tier 1 rather than
+a ladder. <b>The refutation has been sitting in <code>battle.gd</code>'s own comment since CT</b>:
+<i>"Batch AN &sect;9 deleted the rune ladder outright and rune_slots() has been flat 3 ever
+since."</i> <b>The confusion has a source and it is worth naming</b>: there IS a live growth ladder
+beside the runes &mdash; the ITEM pouch (<code>ITEM_SLOTS_BY_ZONE</code>), kept at CT for the
+opposite reason the rune ladder was deleted at AN, and <code>design-notes.md</code> sets the two
+side by side. <b>NO DOCUMENT WAS CORRECTED, because none is wrong.</b></p>
+
+<p><b>&sect;4 &mdash; HOW BIG IT IS, WITHOUT SOFTENING.</b> <b>Mechanically it is a re-key and it
+has a shipped precedent.</b> Of the 59 talent clauses, <b>56 ride something the charter permits
+anyway</b> &mdash; 31 a spec passive, 15 a stat, 8 a protected core, 2 a draft card &mdash; so each
+needs a field of its own read at the site that is already there. <b>Batch AL did exactly this three
+times</b> (<code>rune_grudge_bonus</code>, <code>rune_vigil_bonus</code>,
+<code>rune_on_edge_ranks</code>), for the same reason and with the method in the source comments,
+and no rune payload anywhere carries a <code>condition</code> or <code>has_node</code> gate, so the
+coupling is additive and never conditional. <b>THREE CLAUSES HAVE NO HOME</b> &mdash;
+<code>divine_presence_pct</code>, <code>entropy_ranks</code> and <code>pleasure_pct</code> are
+per-turn effects that exist only as their node, and each needs an effect invented, not moved.
+<b>AND THE REAL COST IS NOT THE CODE.</b> <code>master.html</code> and
+<code>design-notes.md</code> both state the authoring rule as current &mdash; one rune per talent
+lane plus one splash, <i>"worth more to a hero whose points went elsewhere"</i> &mdash; and
+<b>36 lane runes and 12 splash runes are built on it.</b> Severing them makes each a flat power
+increment, which is the thing design-notes says the rule exists to prevent. <b>The re-key costs 59
+clauses of data work; the charter costs the design premise of 48 of the 65 runes, and that is the
+decision, not the code.</b></p>
+
+<p><b>&sect;5 &mdash; THE ONE FILE THIS BATCH CHANGED THAT IS NOT A DOCUMENT.</b>
+<code>baselines.json</code>'s <code>test_batch_bk</code> row was widened from <b>129&ndash;130 to
+128&ndash;130</b>, which is what its own note said to do <i>"when a reading demands it"</i>. The
+battery read <b>128 checks / 0 failures</b> there. <b>It is not a regression and that is proved
+twice rather than argued</b>: this batch changed four files, all under <code>docs/</code>, and that
+suite reads seven <code>res://</code> paths all under <code>scripts/</code> and
+<code>scenes/</code> &mdash; <b>the intersection is EMPTY</b>; and the count is stochastic by
+construction, because <code>run._generate_map()</code> is <b>never seeded anywhere in the tree</b>
+and the assertions loop over the nodes the roll produced. <b>A fall there is a thinner map, not a
+lost assertion.</b> Two standalone re-runs on the frozen tree read 129. <b><code>baselines.json</code>
+has exactly ONE reader in code</b> &mdash; <code>check_de.gd</code>, proved comment-stripped; the
+four other files naming it mention it only in comments &mdash; so <code>check_de</code> alone
+re-certifies, and it reads <b>346 / 0 / 0 notices</b>.</p>
+
 <h2>2026-09-01 &mdash; Batch EI: THE FLOOR THAT DID NOT COVER THE FLOOR</h2>
 <p><i>Two items, both about the verification floor itself. <b>&sect;1 &mdash;
 <code>check_parse.gd</code> walked <code>res://scripts</code> and <code>res://scenes</code> only,
