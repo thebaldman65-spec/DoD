@@ -169,8 +169,27 @@ static func returning_bodies(src: String) -> Dictionary:
 		var a: int = starts[n]
 		var b: int = starts[n + 1] if n + 1 < starts.size() else lines.size()
 		var head := String(lines[a])
+		# **BATCH EH §4 — THE SIGNATURE IS WHAT IT IS, NOT ITS FIRST LINE.**
+		# This read `lines[a]` alone, so a `-> void` that had been WRAPPED onto
+		# a continuation line was invisible and the function entered `check_da`
+		# §3b's population as if it returned something. **SIX FUNCTIONS ACROSS
+		# THREE FILES WERE IN THAT STATE, FIVE OF THEM SINCE BEFORE THIS BATCH**
+		# — `check_dm`'s three, `test_runes`' two and `check_eh::_arm`, which is
+		# what found it: it is void, it drives the award chain's three arms, and
+		# §3b accused it of returning a hand-rolled corpus. They passed only
+		# because none of the other five touches two walk families, which is a
+		# fingerprint's population being wrong in the direction that does not
+		# fail. The signature is accumulated to the line that closes it, capped
+		# so a malformed head cannot walk into the body.
+		var sig_i := a
+		while sig_i < b and sig_i < a + 8 \
+				and not head.strip_edges().ends_with(":"):
+			sig_i += 1
+			if sig_i < b:
+				head += String(lines[sig_i])
 		if head.contains("-> void"):
 			continue
+		head = String(lines[a])
 		var fname := head.substr(5, head.length() - 5)
 		var paren := fname.find("(")
 		if paren >= 0:

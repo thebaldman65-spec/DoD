@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A floor is arithmetic, not structure (Batch EH) — 2026-08-31
+
+Batch EA gave the zone-boss award a fallback and chose the hero's own spec draft pool for it, on a
+reason it wrote down at the site: **that pool could not itself empty.** A hero carried at most four
+earned cards against a pool of ten to thirteen, so the fallback floored at six — twice what an
+offer asks for. It was a good reason and it was true when it was written.
+
+**Batch EG deleted both halves of it one batch later, and not on purpose.** The slot cap became a
+ladder to ten, so a hero carries seven earned cards rather than four; and a benched card is now
+kept, so what a hero *owns* is every card he has ever taken and is bounded by the pool rather than
+by the cap. Neither change was about the award. The floor fell to three, and to two for the
+Occultist, and the gate that measured it went red — which is the only reason anybody found out.
+
+**So the interesting question is not "what is the next pool down", it is "what kind of claim was
+EA's reason".** It was a structural claim: *this pool cannot empty*. Structural claims about a
+design are hostage to every other batch, because the terms in them are things other people are
+allowed to move. The class-wide pool invites exactly the same claim — six cards per class, shared
+across three specs, no hero can hold another spec's picks — and **the invitation should be
+refused.** No sibling drains it, which is the true half; but roughly one draft card in four is
+class-wide and the seam pays class cards unconditionally once the spec side is dry, so a hero who
+takes at every offer drains his spec pool and then this one.
+
+**What actually holds the floor up is arithmetic, and arithmetic is the kind of claim that
+survives.** Emptying the chain means *owning* every card in both draft pools — fifteen at the
+cheapest spec, twenty at the Pyromancer — and a draft offer pays at most one card. That is a bound
+on the number of events in a run, not a property of a container, and it does not quietly become
+false when somebody widens a pool. It can be re-derived from the code in one line any time
+somebody doubts it, which is the whole difference.
+
+**And the honest version of the ruling is written down rather than the flattering one.** Under a
+fully-held loadout no hero can be paid nothing; under a fully-held pool every hero still can. The
+third tier deepens the floor from three to eight. It does not remove it, and the day someone writes
+that it does, this note is what says otherwise.
+
 ## A pick you cannot take back is not a decision (Batch EG) — 2026-08-31
 
 The draft shipped with four draftable slots and a no-return rule on both ends of it: decline a card

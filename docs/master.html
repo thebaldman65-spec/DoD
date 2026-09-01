@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-31 (Batch EG)</b></p>
+<p align="right"><b>Last updated: 2026-08-31 (Batch EH)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -81,10 +81,11 @@ that matter — <b>1 for confirming a spec, then 1 apiece from every elite, mini
 boss</b>, the final boss included (§7). Regular fights award none. <b>Since Batch BK the
 per-run total is a function of the route</b>, not a constant: the mini-boss and boss floor is
 6 a run, and every elite the route reaches adds one. The <b>mini-boss</b>
-hands every hero a <b>generic ability upgrade, three offered</b>; <b>zone bosses 1 and 2</b>
-hand every hero an <b>ability pick, three offered, drawn from that hero's spec pool only</b>,
-which falls back to that hero's spec draft pool rather than paying nothing when the boss pool
-is spent (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
+hands every hero a <b>generic ability upgrade, three offered</b>; <b>all three zone bosses</b>
+hand every hero an <b>ability pick, three offered</b>, and <b>one more ability slot</b>, drawn
+from that hero's spec pool first — and when that is spent, from his spec draft pool, and when
+that is spent too, from his class-wide draft pool, so the award can never pay nothing
+(§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
@@ -120,7 +121,9 @@ points</b>, and beating it is what <b>opens the meta tree's row tiers</b>.</td><
 <p><b>14 branching columns &times; 3 rows = 42 node positions</b>, of which pruning (below)
 removes two or three &mdash; a real zone holds <b>~39.7 nodes</b> and its columns are 2 or 3
 wide (84% are 3). The player walks <b>one node per column</b>: 14 free encounters plus the
-mini-boss and the boss. Zone 3's boss is the <b>end boss</b>: the run ends on its death.</p>
+mini-boss and the boss. <b>Zone 3's boss is a zone boss like the other two</b> — it pays, it
+banks points and it opens a slot; the <b>end boss</b> is the extra seventeenth slot that follows
+it, and the run ends on <i>its</i> death.</p>
 <p><b>Entry: any of column 1's three nodes may be chosen</b>, and the mini-boss opens the
 whole of column 9 the same way &mdash; so each half of a zone begins with a free pick and
 then narrows.</p>
@@ -1031,9 +1034,11 @@ tabulates is a figure nobody can plan against:
 </table>
 The nameplate readout shows the raw stack count and both live percentages; because there
 is no maximum, its bar fills toward 15 stacks (the depth Terminal Velocity and Event
-Horizon switch on at) and pins there. The one thing that removes Resonance is an EARNED
-Stabilize, which vents everything above 2 — the escape hatch from the ramp, which is why
-it is a spec-pool pick rather than part of the opening three.</li>
+Horizon switch on at) and pins there. <b>Two earned cards remove Resonance and nothing else
+does</b>: <b>Stabilize</b> vents everything above 2 — the escape hatch from the ramp, which is
+why it is a spec-pool pick rather than part of the opening three — and <b>Arcane Bolt</b>
+halves the meter after the blow it is paid out of, which is the card's cost rather than an
+escape.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
@@ -1078,12 +1083,18 @@ Berserker 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist
 Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6a. Ability progression</h3>
-<p>Every hero <b>opens a run with its core attack plus exactly 3 spec abilities</b>, and
-<b>earns 2 more over the run</b> — one from zone 1's boss and one from zone 2's. The end boss
-awards none: the run is over and the pick would be dead value. There is no cap and no swap
-step, so a full run ends at core + 3 + 2 = 6 abilities.</p>
-<p><b>Each award offers up to 3 abilities the hero does not already own, drawn from its SPEC
-pool only.</b> Abilities are spec-locked: the class-pool draw is gone. Spec pools are 2–5
+<p>Every hero <b>opens a run with its core attack plus 3 spec abilities</b> — four for the
+Holy Cleric, and five for the Beastmaster, whose three summons share one bar entry (see the
+protected-core table in §6b) — and <b>earns one boss pick from each of the three zone
+bosses</b>. The end boss awards none: the run is over and the pick would be dead value.
+<b>There is a cap and there is a swap step</b>: the cap is a ladder from seven carried
+abilities to ten, one rung per zone boss, and past the cap an incoming card is taken by
+BENCHING a carried one rather than by losing it. Both are §6b's, and the boss pick obeys the
+same cap the draft does.</p>
+<p><b>Each award offers up to 3 abilities the hero does not already own, and it reads three
+pools in order: his SPEC boss pool, then his spec DRAFT pool, then his CLASS-WIDE draft
+pool.</b> Abilities are spec-locked at the first two tiers and class-locked at the third: the
+old class-pool draw is gone and nothing here reaches a sibling CLASS. Spec pools are 2–5
 deep, so an offer shows what exists rather than padding — a hero deep into its pool may be
 offered two. The pick is resolved on that hero's map card, and the triple is rolled the
 moment the award drops — re-opening the card never rerolls it.</p>
@@ -1149,8 +1160,8 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Sharpshooter</b></td><td>Aimed Shot, Powershot, Hold Breath</td><td>Quick Draw, Triple Shot, Coup de Grâce, Pinning Shot, Called Shot</td></tr>
 <tr><td><b>Survivalist</b></td><td>Tripwire, Shrapnel Charge, Snare Trap</td><td>Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
-<p><b>THE ZONE-BOSS DRAW READS THE SPEC POOL ALONE, AND THERE IS NO SECOND POOL BESIDE
-IT ANY MORE.</b> A <b>CLASS pool</b> stood here from Batch AH: one list per class, holding the
+<p><b>THE ZONE-BOSS DRAW OPENS ON THE SPEC POOL, AND THE OLD CLASS POOL THAT STOOD BESIDE
+IT IS GONE.</b> A <b>CLASS pool</b> stood here from Batch AH: one list per class, holding the
 sibling specs' abilities plus the class's vaulted ones, from which the award drew two of every
 three cards. <b>Batch AN retired that draw</b> — abilities are spec-locked — and <b>Batch DY
 deleted the list</b>. It had held <b>seven finished abilities named in no other pool</b>, so they
@@ -1171,10 +1182,23 @@ and both are also draftable, so all three of his awards could come up empty.
 skipped and the victory card did not name them. The award now falls back to a
 card from <b>that hero's own spec DRAFT pool that they do not already hold</b>,
 offered three at a time and announced exactly like any other award. It stays
-spec-locked, so nothing arrives that a sibling spec alone could reach, and
-<b>the fallback pool cannot itself run out</b>: a hero can earn at most four
-abilities (three for the Holy Cleric) against draft pools of ten to thirteen,
-which floors the fallback at six cards — twice what an offer asks for.</p>
+spec-locked, so nothing arrives that a sibling spec alone could reach.</p>
+<p><b>AND THERE IS A THIRD TIER UNDER IT, BECAUSE THE SECOND ONE CAN RUN OUT.</b> Batch EA
+chose the spec-draft card <i>because</i> that pool could not empty: a hero carried at most
+four earned abilities (three for the Holy Cleric) against draft pools of ten to thirteen, so
+the fallback floored at six. <b>Batch EG broke both halves of that arithmetic one batch
+later</b> — the cap became a ladder to ten, and a benched card is now KEPT, so what a hero
+holds is every card he has ever taken rather than every card he currently carries. The floor
+fell to three, and to two for the Occultist. <b>The chain therefore ends on the hero's
+CLASS-WIDE draft pool</b>, six cards for three of the four classes and seven for the Mage,
+offered three at a time and announced exactly like any other award. It is class-locked
+rather than spec-locked, which is the one thing the third tier gives up — and it is not a
+re-opened class DRAW: it reads the live, curated class draft pools of §6b, not the
+61-entry container Batch DY deleted. <b>What it does not do is make the chain unemptiable.</b>
+No sibling drains it, because every hero filters it against what he himself owns; but roughly
+one draft card in four is class-wide, so a hero who takes at every offer drains his spec pool
+and then this one. What holds the floor up is arithmetic: emptying the chain means owning
+every card in both draft pools — fifteen at the cheapest spec — and an offer pays one card.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
 yourself in embers and the next blow that would kill you this battle returns you at 40% of
 maximum health instead. Once per battle. It is the Mage class's only refusal of
@@ -1191,8 +1215,10 @@ targeting or a skill check.</p>
 <h3>6b. THE ABILITY DRAFT</h3>
 <p>Beside the zone-boss pick sits a second, larger source of abilities: <b>the draft</b>.
 Where a boss pick is rare and drawn from a small spec pool, the draft is frequent, drawn from
-its own pool, and comes with a cost — <b>a kit has room for only seven abilities</b>, so past
-that point every new one replaces an old one.</p>
+its own pool, and comes with a cost — <b>a kit CARRIES seven abilities at the start of a run
+and ten by the end</b>, so past that point every new one benches an old one. <b>Benched, not
+lost</b>: the card stays in the hero's pool and can be swapped back at any time. The cap and
+the ladder are set out in full further down this section.
 
 <p><b>Where picks come from.</b></p>
 <table border="1" cellpadding="4">
@@ -1204,8 +1230,9 @@ are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.<
 by zone</b>. The three cards are drawn at purchase and wait on that hero's card.</td></tr>
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
 new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
-<tr><td><b>Zone bosses</b></td><td>The existing §6a pick, unchanged: same timing, same SPEC
-pool, same overlay.</td></tr>
+<tr><td><b>Zone bosses</b></td><td>The §6a pick: same timing and same overlay. Its draw is
+the three-tier chain — spec boss pool, then spec draft pool, then class-wide draft pool — and
+the last two are the pools on this page.</td></tr>
 </table>
 <p><b>Every offer is 3 cards</b>, and if the pool cannot fill three it <b>fills short rather
 than padding with repeats</b> — the same rule ability upgrades already follow.</p>
@@ -1277,7 +1304,7 @@ not because the passive needs them.</p>
 <tr><th>Spec</th><th>Slots</th><th>Its passive needs</th><th>Why</th></tr>
 <tr><td><b>Berserker</b></td><td>3</td><td>—</td><td>Blood Frenzy reads his own health bar and his own Rage spent, and no ability.</td></tr>
 <tr><td><b>Warden</b></td><td>3</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
-<tr><td><b>Swordmaster</b></td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game.</td></tr>
+<tr><td><b>Swordmaster</b></td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — Precision Strike and Feint switch it too, but both are drafted, cost Rage and sit on cooldowns, so a half-inert passive cannot be left depending on them.</td></tr>
 <tr><td><b>Pyromancer</b></td><td>3</td><td>Fireball, Detonation</td><td>Overburn needs a Burn applier to build the field and a spender to empty it.</td></tr>
 <tr><td><b>Cryomancer</b></td><td>3</td><td>Frostbolt, Ice Lance</td><td>Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</td></tr>
 <tr><td><b>Arcanist</b></td><td>3</td><td>Arcane Explosion</td><td>Runaway Resonance builds on damaging casts; the free core attack guarantees one every turn.</td></tr>
@@ -1549,7 +1576,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Rally</b></td><td>15 Rage, 1.5, 4cd, one ally</td><td>That ally <b>acts next</b>, jumping straight to the front of the initiative order, and regains 15% of their resource. It cannot target the caster.</td><td>Giving away tempo — the only ability in the game that hands an ally a turn, and the only tempo tool a class with none can have.</td></tr>
 <tr><td><b>Charge</b></td><td>20 Rage, <b>1.0</b>, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>20 Break damage</b>; the target is <b>Dazed for 1 turn</b> (Perfect: 2). <b>Builds 30 Rage</b>, so it net-generates 10.</td><td>Reaching something now. The very fast initiative is the point — it is a Warrior's only answer to a caster winding up. It is also the one class-wide card in the game that generates its resource, and the one that beats the free basic rather than sitting under it: Strike wins only on net Rage and on having no cooldown.</td></tr>
 <tr><td><b>Cleave</b></td><td>25 Rage, 2.5, 3cd, three chosen enemies</td><td><b>15% of Attack</b> (Perfect: 22%) and <b>15 Break damage</b> to each of three chosen enemies.</td><td>Breadth from a narrow class. Three <i>chosen</i> enemies rather than three random ones is what separates it from War Stomp.</td></tr>
-<tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>The group buff the class lacks — nothing else a Warrior does improves anyone else's numbers.</td></tr>
+<tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>The group buff the class lacks — the Berserker's Battle Shout is the only other Warrior card that improves anyone else's numbers, and it is spec-locked where this is class-wide.</td></tr>
 <tr><td><b>Ironclad</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 4 turns he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
 </table>
 
@@ -1635,8 +1662,9 @@ parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
 AGGRESSIVE (+15% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
 −10% damage dealt). Every battle opens Aggressive and <b>Guard Change swaps</b> — it is in
-his opening three, because it is the only stance swap in the game and four of his talent
-nodes read the stance. The spec chip
+his opening three, because it is his only <i>unconditional</i> stance swap (Precision Strike
+and Feint switch it as well, but both are drafted, cost Rage and carry cooldowns) and four of
+his talent nodes read the stance. The spec chip
 names the live stance (AGG/DEF) with both stances' numbers in its tooltip, and the
 stance talents deepen each side's upside.<br>
 His kit is one loop: Break is the key, Stun is the door, and the Broken window is the
@@ -1783,8 +1811,9 @@ A genuinely late button — dark until the ramp is deep, and then the only thing
 press. At a Mage's 22 Mana regeneration, 55 is most of three turns' saving with Cannon and
 Barrage competing for the same pool. It carries <b>no Break damage</b>.<br>
 <i>Earnable (spec pool):</i> Stabilize — free, 1.5, 3cd; consumes the Resonance stacks
-ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. The only thing in
-the game that removes Resonance, and the reason it is earned rather than given: it is the
+ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. One of only two
+cards that remove Resonance (Arcane Bolt halves it), and the reason it is earned rather than
+given: it is the
 escape hatch from the ramp, so taking it is a decision (Perfect: also heals 5% of max
 health).<br>
 <i>Talent-granted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: immediately gain
@@ -2351,14 +2380,15 @@ boss — it awards a relic and opens the tree's row tiers. Every historical per-
 <b>superseded</b>, including 10.9 / 10.8 / 6.0 points per hero per run.</li>
 <li><b>Combat rewards, by node type:</b> a <b>fight</b> pays gold. An <b>elite</b> pays big
 gold, a rune cache and a consumable. A <b>mini-boss</b> pays big gold and an ability-upgrade
-pick. A <b>ZONE BOSS</b> pays gold, a relic unlock, an ability pick from the spec pool
-(falling back to that hero's spec draft pool when the boss pool is spent, so the pick always
-lands), and banks <b>one meta talent point per spec</b>. The <b>END BOSS</b> pays gold and a relic,
-always — no ability pick (nothing follows it) and no points.</li>
-<li><b>Abilities:</b> <b>two picks per run</b>, from zone 1's and zone 2's bosses, three
-offered each time and drawn from that hero's <b>spec pool only</b> — or from that hero's
-<b>spec draft pool</b> when the boss pool has been emptied, so no award is ever silent
-(§6a). The end boss awards none.
+pick. A <b>ZONE BOSS</b> pays gold, a relic unlock, <b>one more ability slot</b>, an ability
+pick from the spec pool (falling back to that hero's spec draft pool and then to his
+class-wide draft pool when the pool above is spent, so the pick always lands), and banks
+<b>one meta talent point per spec</b>. The <b>END BOSS</b> pays gold and a relic,
+always — no ability pick (nothing follows it), no slot and no points.</li>
+<li><b>Abilities:</b> <b>three picks per run</b>, one from each zone boss, three
+offered each time and drawn from that hero's <b>spec pool</b> — or from his <b>spec draft
+pool</b> when the boss pool has been emptied, or his <b>class-wide draft pool</b> when that is
+empty too, so no award is ever silent (§6a). The end boss awards none.
 Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
 run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40,

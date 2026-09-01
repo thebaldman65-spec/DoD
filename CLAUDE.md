@@ -227,6 +227,19 @@ here; the two `###` children of the equality rule travel with their parent:
     **THE TWO ARE NOT THE SAME STRING: of 120 draft ability rows in master.html, ZERO carry the
     code's sentence** (independently authored, median 3.0x longer). **Do not calibrate "how the
     cards read" from master.html — it is text no player has ever seen.**
+  · **AND WHEN A CLAIM OF FACT IS CORRECTED, SWEEP FOR EVERY COPY OF IT — THE DOCUMENT IS ONE
+    SURFACE OF THREE (Batch EH §2).** BP corrected *"Guard Change is the only stance swap in the
+    game"* in `PROTECTED_CORES`'s `why` and left the identical sentence **twice in `master.html`
+    and once in a `classes.gd` comment one screen above the line it fixed**, where all three sat
+    for nineteen batches. **`master.html`'S FACTUAL PROSE IS ASSERTED BY NOTHING**, proved by a
+    two-armed control at EH: putting the false sentence back leaves all five of its readers green,
+    while breaking a literal a suite demonstrably reads turns `test_batch_ah` red. **A false claim
+    in that document does not decay and is not caught; it is only ever found by someone looking.**
+  · **A SECTION BEING CURRENT IS NOT EVIDENCE THAT THE SECTION ABOVE IT IS.** EH found `master.html`
+    §6b fully swept for EG's slot ladder and the bench, and **§6a — fifty lines up, describing the
+    same mechanism — still saying "There is no cap and no swap step" and "a full run ends at
+    core + 3 + 2 = 6 abilities", which BO §2 made false**. A batch sweeps the section it is writing
+    in. **Sweep for the MECHANISM across the document, not for the section you edited.**
   · `docs/text-audit.html` is the REPORT of what is currently non-conforming, in three buckets,
     and **IT NOW HOLDS TWO PASSES**: Batch CJ's over abilities, runes, statuses and the length
     ceiling, and **§CK at the foot** over the 93 glossary entries, all enemy text and all event
@@ -623,6 +636,12 @@ and five wrong claims, and every one was caught this way.**
   since. There was nothing to copy at CT and there was nothing to copy at EG. **A FALSE PRECEDENT
   SURVIVES BEING CAUGHT**, because it is caught in a batch report and briefs are written from the
   design document. **When one is found, correct the document it came from, not only the batch.**
+  - **AND EH SWEPT `master.html` FOR THIS ONE AND IT WAS NEVER THERE.** The document says "three
+    flat slots", "no runes and three empty slots" and "three rune slots" in all four places it
+    mentions them. **The false ladder lived in the BRIEFS, not in the document** — so "correct the
+    document it came from" means FINDING which document it came from, and the answer here was
+    neither `master.html` nor any file in the repo. **Do not assume the design document is the
+    source of a false precedent; check it.**
 - **A LAYOUT CLAIM THAT WAS NEVER MEASURED.** "Six buttons fit the existing row" — at the shipped
   pitch, button six spanned x=1270–1452 on a 1280-wide viewport. **Measure it; do not eyeball it.**
 - **A NAME THAT COLLIDES WITH A LIVE ONE.** A requested status id already existed under a
@@ -630,9 +649,15 @@ and five wrong claims, and every one was caught this way.**
 - **TWO MECHANISMS DESCRIBED AS ONE.** "Exactly as the Bomb and Defense Potion already do" — the
   Bomb is refused by `_usable_on_map` (the button never lights); the Defense Potion's button is
   ENABLED and toasts a refusal after the press. **Pick one and say which.**
-- **A COUNT THAT IS LOW.** Re-derived counts have come back LARGER three times (four→five,
-  16→28, 37→220). **A NAMED LIST CANNOT AUDIT ITSELF — the list is the thing under suspicion.**
-  Run the sweep over the whole population, not over the names the brief supplies.
+- **A COUNT THAT IS LOW.** Re-derived counts have come back LARGER four times (four→five,
+  16→28, 37→220, and **7→16 at EH**). **A NAMED LIST CANNOT AUDIT ITSELF — the list is the thing
+  under suspicion.** Run the sweep over the whole population, not over the names the brief supplies.
+  **THE EH INSTANCE IS THE ONE TO REMEMBER, BECAUSE THE AUDIT THAT MISSED IT WAS ITSELF A CHECK OF
+  A BRIEF'S CLAIM.** EG's record reads *"all seven named enablers are in `protected_names` for their
+  spec"*, and every word is true — it audited the seven the brief listed. `PROTECTED_CORES` names
+  **sixteen, across nine specs**; the nine outside the brief's list were outside the audit. All
+  sixteen are protected, so the CONCLUSION held and only the sweep did not. **A right conclusion
+  reached over the wrong population is the hardest kind to catch, because nothing goes red.**
 - **A CLAIM ABOUT A PRIOR BATCH'S OUTCOME.** One brief stated a previous batch "left them red"
   when the battery had been green since. **Check the repo, not the brief's memory of it.**
 
@@ -1771,10 +1796,11 @@ dominated by a basic.
   dict written before EG — a v11 save, and every suite fixture that stuffs `bm_abilities` — means
   exactly what it always meant: everything earned is carried. **Do not "tidy" that default away.**
 
-## STANDING DESIGN RULE — A ZONE-BOSS AWARD ALWAYS PAYS (Batch EA §1)
-> **When a hero's SPEC BOSS pool is exhausted, the award pays a card from that hero's SPEC DRAFT
-> pool that they do not already hold.** It is offered three at a time and **announced exactly like
-> any other award.**
+## STANDING DESIGN RULE — A ZONE-BOSS AWARD ALWAYS PAYS (Batch EA §1, widened at EH §1)
+> **THE AWARD IS A CHAIN OF THREE POOLS AND THE ORDER IS THE RULING: the hero's SPEC BOSS pool,
+> then his SPEC DRAFT pool, then his CLASS-WIDE DRAFT pool.** Each is read only when the one above
+> it comes back empty. Every tier is offered three at a time and **announced exactly like any other
+> award.**
 
 - **THE BASELINE IT REPLACED WAS NOT A WEAK REWARD, IT WAS SILENCE.** `award_ability_pick` returned
   false, `battle._award_ability_picks` skipped that hero, and the victory card did not name them.
@@ -1806,7 +1832,22 @@ dominated by a basic.
 - **AND `owned_ability_names` CANNOT SEE AN ABILITY A RUNE GRANTS** — the grant lands on the battle
   `cfg`, never on the member dict. That is pre-existing and shared by every channel, but it is the
   one term that can push the floor below the slot arithmetic, so **derive it off `runes.json`
-  rather than assuming it is zero.**
+  rather than assuming it is zero.** EH §1 derived it against the class-wide tier as well: **no
+  rune grants a class-pool card**, on all twelve.
+- **BATCH EH §1 TOOK THE THIRD TIER EA PRICED, AND EA'S RULING IS OVERTURNED IN ITS SECOND TIER
+  ONLY, NEVER IN ITS REASONING.** The principle stands unchanged and is the reason the chain exists:
+  a zone-boss award must always pay something real, and the baseline it replaced was silence. **The
+  class-wide tier is class-locked rather than spec-locked, which is the one thing it gives up**, and
+  it is NOT the thing DY §3 forbade — that rule bars re-creating the deleted `CLASS_POOLS`, and its
+  own next sentence says a re-opened class draw reads `CLASS_DRAFT_POOLS`, which is what this reads.
+- **AND THE THIRD TIER DEEPENS THE FLOOR; IT DOES NOT REMOVE IT. DO NOT WRITE THAT IT CANNOT
+  EMPTY.** EA chose the tier above it on exactly that claim, and the claim was true when written and
+  false one batch later. **No SIBLING drains the class pool** — every hero filters it against what
+  he himself owns — **but the hero himself can**: roughly one draft card in four is class-wide, and
+  `draft_card_is_class` returns TRUE unconditionally once the spec side is dry. What holds the floor
+  up is arithmetic, not structure: emptying the chain means OWNING every card in both draft pools,
+  and an offer pays at most one. **Under a fully-held LOADOUT no hero can be paid nothing; under a
+  fully-held POOL every hero still can.** `check_eh` §2 asserts both directions.
 
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the

@@ -899,6 +899,12 @@ static func _award_trophies(run: Node) -> void:
 			# authored once, in `Run.roll_spec_fallback_offer`.
 			offer = run.roll_spec_fallback_offer(m)
 		if offer.is_empty():
+			# BATCH EH §1: and the THIRD tier, for the same reason. A bot that
+			# stopped at two would under-measure the case the third tier was
+			# built for — a hero holding his whole spec draft pool, which EG §2
+			# made reachable by keeping benched cards.
+			offer = run.roll_class_fallback_offer(m)
+		if offer.is_empty():
 			continue
 		var pick := ""
 		for trophy_name in wanted:

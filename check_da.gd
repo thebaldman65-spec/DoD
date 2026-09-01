@@ -67,6 +67,16 @@ const WALK_EXEMPT := {
 	# other source. A gate that uses the canonical walk AND the buckets is not
 	# the thing this rule is looking for.
 	"check_dn.gd": "reads the pools for BUCKET membership, and calls `Classes.ability_corpus()` for the walk itself",
+	# **BATCH EH §1 — A THIRD REASON THE MARK OVER-FIRES, AND IT WILL RECUR.**
+	# The zone-boss award is a CHAIN of three pools now — boss, then the hero's
+	# spec draft pool, then his class-wide one — so a gate that measures the
+	# chain must read every pool the chain reads. That is the opposite of the
+	# defect this rule exists to catch: these two do not enumerate abilities at
+	# all, they measure DEPTH per spec and drive the tiers live, and neither
+	# returns a collection (§3b sees nothing here, which is the check that the
+	# shape is honest rather than merely declared).
+	"check_ea.gd": "measures the AWARD CHAIN's depth per spec — it reads both draft pools because the chain does",
+	"check_eh.gd": "drives the AWARD CHAIN's three tiers live — it reads both draft pools because the chain does",
 }
 
 

@@ -5,78 +5,103 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-31 (Batch EG).*
+*Last rewritten: 2026-08-31 (Batch EH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EG — THE DRAFT STAYS LIVE ALL RUN.** The first behaviour change since DY. **A HERO
-  GAINS AN ABILITY SLOT AFTER EVERY ZONE BOSS (7 → 10 ACROSS A RUN), AND A DRAFTED CARD IS NEVER
-  LOST — BENCHING ONE IS FREE AND REVERSIBLE.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED,
-  `PROTECTED_CORES` IS BYTE-UNCHANGED, THE SPEC PASSIVE IS UNTOUCHED AND DO'S TALENT CHARTER HOLDS
-  UNCHANGED.** **Report: `docs/reports/EG.md`.**
-- **§1 — THE LADDER IS `ABILITY_SLOTS_BY_BOSS` AND IT IS INDEXED BY ZONE BOSSES CLEARED, NOT BY THE
-  ZONE.** `Run.ability_slot_cap()` is its only reader and the old `const ABILITY_SLOT_CAP := 7` is
-  GONE rather than kept beside it. **A LADDER READ OFF `zone_idx` GRANTS TWICE, NOT THREE TIMES** —
-  BM §6 put the end boss on the third zone's own board, so `has_next_zone()` is already false when
-  the third ZONE boss dies and `zone_idx` stays at 2. `Run.zone_bosses_cleared` counts the event and
-  is reset where `zone_idx` is reset (CT's pouch scar, at a second ladder).
-  - **THE SLOT ARRIVES SEPARATELY FROM THE AWARD AND BEFORE IT**, two lines above
-    `_award_ability_picks()` in `_resolve_boss`. It is granted by the boss dying rather than by the
-    award being offered, so a hero whose pools are both dry still gains it — and granting it first
-    is what makes *a hero at cap can receive both* true.
-  - **DRIVEN LIVE THROUGH THREE REAL ZONE BOSSES: the cap reads 7 → 8 → 9 → 10**, and the END boss
-    grants nothing. Identical on three standalone readings of `check_eg`. **NOTHING ELSE IN THE
-    PROJECT REACHES THE THIRD GRANT** — see the sim note below.
-  - **THE BRIEF NAMED A PRECEDENT THAT DOES NOT EXIST, FOR THE SECOND TIME IN ELEVEN BATCHES.** The
-    rune equip ladder was deleted at AN §9 and `rune_slots()` has been a flat 3 ever since; CT §1's
-    header records its own brief making the identical claim. **The ability ladder is the POUCH case
-    and not the rune case**, and the reason is in `run_state.gd` beside the constant: a slot opened
-    here is filled at the next elite, so it is never dead weight.
-- **§2 — THE POOL AND THE LOADOUT ARE TWO SETS, AND `bm_abilities` IS THE POOL.** It keeps its name
-  and nothing ever leaves it; **`bm_equipped` is new, is the LOADOUT, and DEFAULTS TO THE WHOLE
-  POOL** — which is why every v11 save and every one of the ninety-odd suite fixtures that stuff
-  `bm_abilities` means exactly what it meant before.
-  - **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION AND THERE ARE ONLY TWO.** *What can he
-    CAST* → the loadout: `battle.gd`'s spawn and the hero sheet, and nothing else. *What does he OWN,
-    so he is not offered it again* → the pool: `Runes.kit_names` → `Talents.ability_names` →
-    `Run.owned_ability_names`, and through it the draft, the boss award and its fallback.
-    **`owned_ability_names` IS CORRECT BY DOING NOTHING** — it reaches `bm_abilities` three layers
-    down. Reading the loadout there re-offers a benched card as new; that is control E, and it reds.
-  - **THE NO-RETURN LEDGER STILL BITES AND HAS ONE WRITER NOW INSTEAD OF TWO.** A DROP wrote it
-    because a drop was permanent; a BENCH does not, and the card is kept off every offer by
-    OWNERSHIP instead. **`decline_draft` is the only writer**, asserted at the site.
-  - **ALL SEVEN NAMED ENABLERS ARE IN `protected_names` FOR THEIR SPEC** — Quick Shot, Consecrated
-    Ground, Heal, the three summons, Guard Change. **No live brick.** Two of the brief's REASONS are
-    wrong and are corrected in the report (Heal is one of five Mercy outlets, four of them protected;
-    every single-target attack the Sharpshooter makes generates Focus).
-- **§3 — THE SAVE MOVES v11 → v12 AND IS TOLERANT; THE REFUSAL THRESHOLD IS DELIBERATELY UNMOVED AT
-  PRE-v10.** `zone_bosses_cleared` defaults to **`zone_idx`, not zero** — zero would take a resumed
-  zone-3 run back to seven slots — and `bm_equipped` rides the member dict like `draft_refused`.
-  **`check_eg` §3 drives the round trip rather than reading the version literal.**
-  **`docs/state.md` HAD RECORDED THE RUN SAVE AS v10 AND IT HAS BEEN v11 SINCE CT**; corrected in
-  `CLAUDE.md` in both places, with the rule that a tolerant bump does not move the threshold.
-- **§3 — AND THE HERO SHEET'S ABILITY CHIPS ARE IN A SCROLLER NOW, FOR AN OVERFLOW OLDER THAN THIS
-  BATCH.** The absolute layout put a fifth row through the RUNES header, and **a Beastmaster already
-  reached five rows at HEAD** — his protected core is SIX display names in three slots. EG makes it
-  ordinary rather than creating it.
-- **THE OFFER RATE IS RE-MEASURED AND IT IS THE WHOLE JUSTIFICATION FOR THE BATCH: 63% OF DRAFT
-  OFFERS ARRIVED AT A CAPPED HERO AT HEAD; 53% AND 55% ACROSS TWO SAMPLES AFTER.** Four `--run 25`
-  sims at rung 2. **THE SIM ONLY EVER REACHES A CAP OF NINE**, so that is the ladder's two-thirds
-  effect. **A COMPLETION-RATE SCARE WAS RAISED AND RESOLVED**: 21/25 at HEAD against 24/25 and 22/25
-  after — the second sample straddles it, so **nothing here establishes a completion change in
-  either direction** and this batch does not claim one.
-- **AND THE SIM CANNOT SEE THE THIRD ZONE-BOSS GRANT AT ALL — PRE-EXISTING, REPORTED, NOT FIXED.**
-  `run_sim`'s boss branch gates its award on `has_next_zone()`, so the THIRD zone boss sets
-  `run_over` instead of paying, the `endboss` node is never walked, and the bot plays 48 encounters
-  against the game's 49. Its `ceiling 2.00 (zone bosses only)` line was that assumption written as a
-  literal and now says which bosses it means. **Closing it moves every sim baseline in the project.**
-- **Next letter: EH.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EH — THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE.** **THE
+  ZONE-BOSS AWARD IS A CHAIN OF THREE POOLS NOW: BOSS POOL → SPEC DRAFT POOL → CLASS-WIDE DRAFT
+  POOL.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED, NO POOL GAINED OR LOST AN ENTRY, AND
+  EA'S SECOND TIER IS BYTE-UNCHANGED.** **Report: `docs/reports/EH.md`.**
+- **§1 — `roll_class_fallback_offer` IS THE THIRD TIER AND IT IS READ ONLY WHEN BOTH POOLS ABOVE
+  COME BACK EMPTY.** It reads `Classes.class_draft_pool(class_of_spec(spec))` filtered by
+  `owned_ability_names`, exactly as the tier above it reads the spec draft pool, and it
+  deliberately does not consult `draft_refused` for the same three reasons.
+  - **IT IS NOT THE THING DY §3 FORBADE**, which is worth naming because it looks like it: that rule
+    bars re-creating the deleted `CLASS_POOLS`, and its own next sentence says a re-opened class
+    draw reads `CLASS_DRAFT_POOLS` — which is live, curated, and what this reads.
+  - **DRIVEN LIVE IN THREE ARMS ON REAL ZONE BOSSES** (`check_eh` §1): with nothing held the offer
+    comes out of the boss pool; with the boss pool held it comes out of the spec draft pool; with
+    both held it comes out of the CLASS-WIDE pool **and the victory card names every hero.** The
+    arm reads the QUEUED OFFER back, because an announcement cannot tell three tiers apart.
+  - **THE DEPTH RAN 2–6 AND RUNS 8–13 NOW**, against an award that asks for three — Occultist 8,
+    Pyromancer 13. **No rune grants a class-wide card**, derived on all twelve rather than assumed.
+  - **AND THE THIRD TIER DEEPENS THE FLOOR; IT DOES NOT REMOVE IT.** The brief held the class-wide
+    pool cannot empty — six cards a class, shared across three specs, no hero holding another
+    spec's picks. **The second half is true and the first does not follow from it.** No SIBLING
+    drains it; the hero himself can, because roughly one draft card in four is class-wide and
+    `draft_card_is_class` returns TRUE unconditionally once the spec side is dry. **Under a
+    fully-held LOADOUT no hero can be paid nothing; under a fully-held POOL every hero still can**,
+    and emptying the chain costs owning fifteen distinct cards at the cheapest spec. **`check_eh`
+    §2 asserts both directions and `check_ea` §1 prints the pool bound.**
+  - **`check_ea` §1 KEPT EG'S SPLIT AND GAINED A THIRD QUESTION RATHER THAN A WIDENED ONE.**
+    `floor >= 1` per spec is still the RULE, `short_specs == ["occultist"]` is still the named
+    short set, and `floor_all >= awards` is new. **62 → 86 checks.**
+  - **AND `check_ea` §0's WINDOW WAS A DEFECT THIS BATCH TRIPPED TWICE IN ONE EDIT.** It read
+    `rs.substr(aw, 1400)` off the RAW file: the third tier landed at offset 2113, past the end of
+    the window, and the comment explaining it NAMES `CLASS_POOLS`, so the premise that catches the
+    deleted class draw coming back would have read prose about a deletion as the deletion being
+    undone. **The window is the whole function now, out of the comment-stripped source.**
+- **§2 — THE `master.html` SWEEP FOUND SIXTEEN SITES, AND THE BRIEF'S OWN PREMISE DID NOT SURVIVE
+  IT.** The brief held that the false rune-equip-ladder precedent misled two briefs *through that
+  document*. **It did not — `master.html` has never carried the claim**; it says "three flat slots",
+  "no runes and three empty slots" and "three rune slots" in all four places it mentions them. The
+  false ladder lived in the BRIEFS and the correction has been in `CLAUDE.md` since EG.
+  - **THE SECOND SEED WAS REAL AND IS THE PATTERN'S GENUINE INSTANCE.** `master.html` said Guard
+    Change is *"the only stance swap in the game"* in TWO places; BP corrected the code nineteen
+    batches ago, never swept the document, and left **a third copy in `classes.gd`'s own comment,
+    one screen above the `why` it did fix.**
+  - **THE LARGEST GROUP WAS NOT A SUPERLATIVE.** **§6a still described the game before Batch BO** —
+    *"There is no cap and no swap step"*, *"a full run ends at core + 3 + 2 = 6 abilities"*, and two
+    boss picks a run from *"zone 1's boss and zone 2's"* when BM §6 made all three zone bosses pay.
+    It also still carried EA's *"the fallback pool cannot itself run out ... floors the fallback at
+    six cards"*, false since EG. **§6b, fifty lines below, was current the whole time** — EG swept
+    its own section and not the one above it.
+  - **TWO SOURCE COMMENTS WENT WITH IT**: `classes.gd`'s third stance-swap copy, and `unit.gd`'s
+    *"Both ends are uncapped and nothing removes stacks"* — **two earned cards remove Resonance**,
+    Stabilize floors it at 2 and Arcane Bolt halves it, and `master.html` said "the only thing in
+    the game that removes Resonance" in two places.
+  - **CAN IT BE AN INSTRUMENT? REPORTED, RULED ON NOWHERE.** `check_eh` §4 counts **56 uniqueness
+    claims, 12 of them naming a live ability**. **A TWO-ARMED CONTROL SETTLES WHY THE DEFECT
+    SURVIVES**: putting the false stance-swap sentence back leaves all five `master.html` readers
+    green, while breaking a literal a suite demonstrably reads turns `test_batch_ah` red. **The
+    document's factual prose is asserted by nothing.**
+- **§3 — ONE OF EG'S THREE CONFIRMATIONS DID NOT CONFIRM.** The record read *"all seven named
+  enablers are in `protected_names` for their spec"* and every word of it was true — it audited the
+  seven the brief named. **`PROTECTED_CORES` NAMES SIXTEEN, ACROSS NINE SPECS.** All sixteen are
+  protected, so the conclusion held and only the sweep did not; `CLAUDE.md` carries the shape as its
+  fourth instance of *a named list cannot audit itself*.
+  - **THE LADDER AND THE CAP BOTH READ `core_slots`, AND `protected_names` HAS ONE LIVE READER
+    OUTSIDE ITS OWN DEFINITION** — `map_screen.gd`'s CORE rows, the list that cannot be benched.
+    Asserted as the derived reader set, so a second reader trips it.
+  - **`decline_draft` IS THE LEDGER'S ONLY WRITER AND BENCHING WRITES NONE**, driven live on a real
+    member rather than read off the source.
+- **§4 — THE BATTERY FOUND ONE RED AND IT WAS AN INSTRUMENT HOLE, NOT THE BATCH.**
+  `check_da` §3b accused `check_eh::_arm` of returning a hand-rolled corpus, and `_arm` is
+  `-> void`. **`Gate.returning_bodies` TESTED `-> void` AGAINST THE FIRST LINE OF A SIGNATURE**, so
+  a void function whose signature is WRAPPED entered the population as if it returned something —
+  **six functions across three files were in that state, five of them since before this batch**
+  (`check_dm` ×3, `test_runes` ×2). They passed only because none of the other five touches two walk
+  families. **An exemption was not available**: `check_dw` §0 pins `RETURN_WALK_EXEMPT.size() == 1`.
+  The helper accumulates the signature to the line that closes it now, capped at eight lines.
+  **PROVED BY A TWO-ARMED CONTROL — and the first attempt was armed in the wrong direction and
+  proved nothing**: a returning function with a wrapped signature is caught by both helpers. Armed
+  on a wrapped VOID function reading two families, the repaired helper SKIPS it (348 bodies, 0
+  accused) and HEAD's ACCUSES it (355 bodies). **`check_da` 39 → 41**, the +2 being the two
+  `WALK_EXEMPT` rows, which are asserted live.
+- **AND `check_parse.gd` WALKS `res://scripts` AND `res://scenes` ONLY — REPORTED, NOT FIXED.**
+  When `gate_fixture.gd` was briefly broken during that repair, **the stderr grep the floor
+  procedure specifies came back CLEAN**. The repo ROOT is outside the parse gate: `gate_fixture.gd`
+  (preloaded by 23 gates), `suite_fixture.gd`, all 39 gates and all 47 suites live there. It
+  surfaces downstream as every dependent gate failing to load and printing no count, which is late.
+  **Widening it is a baseline move nobody has been briefed for; it is in the open queue.**
+- **Next letter: EI.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. EB through EF were correction and consolidation of the
-  instruments; **EG is the first batch since DY to change what a run plays.**
+  purpose-authored and charter-clean. **EG changed what a run plays; EH changed what a spent award
+  pays and swept the document that describes both.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -207,14 +232,17 @@ removes itself from the boss offer and vice versa.**
     seven the floor was six everywhere and both held. **`check_ea` §1 asserts the first per spec and
     pins the specs that can fill SHORT as a NAMED SET (`[occultist]`)**, so a thirteenth trips and
     the Occultist leaving trips too. **The POOL bound is PRINTED, not asserted.**
-  - **THE OPTION EA ALREADY PRICED IS A CLASS-WIDE THIRD TIER**, which EA recorded as closing the
-    table completely and as NOT the thing DY §3 forbade. **EG DID NOT TAKE IT** — EA chose the
-    spec-draft card deliberately, and the sim read `nothing left to offer` at **0.00 per run in both
-    samples**, so the hole is reachable in principle and was not reached in fifty runs.
-    **It is the designer's.**
-- **THE FALLBACK IS BUILT AT EA §1 AND THIS WHOLE BLOCK IS NOW HISTORY WITH ONE LIVE HALF.**
-  **NO ZONE-BOSS AWARD CAN PAY NOTHING ANY MORE** — an exhausted boss pool falls back to the
-  hero's own spec DRAFT pool, three offered and announced like any other award. **What is still
+  - **THE OPTION EA PRICED IS A CLASS-WIDE THIRD TIER, AND EH §1 TOOK IT.** EG did not, and the
+    sim read `nothing left to offer` at **0.00 per run in both samples** — reachable in principle
+    and not reached in fifty runs. **The chain is boss pool → spec draft pool → class-wide draft
+    pool now, the loadout-bound floor runs 8–13 across the twelve, and EA's second tier is
+    byte-unchanged.** **What EH did NOT take from EA's pricing is the word "completely"**: EA
+    recorded a class-wide card as closing the table, and it does so only under the LOADOUT bound.
+    See the WHERE block at the top of this file.
+- **THE FALLBACK IS BUILT AT EA §1, WIDENED TO THREE TIERS AT EH §1, AND THIS WHOLE BLOCK IS NOW
+  HISTORY WITH ONE LIVE HALF.** **NO ZONE-BOSS AWARD CAN PAY NOTHING UNDER A FULLY-HELD LOADOUT** —
+  an exhausted boss pool falls back to the hero's own spec DRAFT pool and then to his CLASS-WIDE
+  draft pool, three offered and announced like any other award. **What is still
   true, and is why the block below is kept rather than cut:** the boss POOLS are as thin as they
   ever were, eight specs can still empty one, and the Devout's is still 2 with both entries
   draftable. **Deepening a boss pool is still a live design option; it is no longer a defect.**
@@ -510,6 +538,13 @@ re-derived from the source at DM; not one was moved.**
 
 ### Small, and still owed
 
+- **`check_parse.gd` DOES NOT COVER THE REPO ROOT — FOUND AT EH §4, RULED ON NOWHERE.** It walks
+  `res://scripts` and `res://scenes`, so a parse error in `gate_fixture.gd`, `suite_fixture.gd`, any
+  of the 39 gates or any of the 47 suites is invisible to it — **measured, not assumed: a duplicate
+  `var` in `gate_fixture.gd` left the stderr grep clean while 23 gates could not load.** Widening
+  the walk is a few lines and moves `check_parse`'s baseline; whether the gate should compile files
+  the battery already runs is the question nobody has answered.
+
 - **`master.html` SAYS GUARD CHANGE IS "the only stance swap in the game" AND BP CORRECTED THAT IN
   THE CODE.** `PROTECTED_CORES`'s own `why` has read *the only UNCONDITIONAL stance swap* since BP —
   Precision Strike and Feint both switch — and the document's protected-core table was never swept.
@@ -648,13 +683,12 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried, and still awaiting a ruling
 
-- **WHETHER THE ZONE-BOSS FALLBACK NEEDS A THIRD TIER — RAISED BY EG, RULED ON NOWHERE.** EG §1's
-  ladder and §2's kept pool both drain the filter EA §1's guarantee rests on. **Under the LOADOUT
-  bound the fallback still cannot empty (thinnest floor 2, the Occultist); under the POOL bound it
-  can, and floors at zero.** The option EA priced and did not take is a class-wide third tier off
-  `CLASS_DRAFT_POOLS`, which EA recorded as closing the table completely and as NOT the thing DY §3
-  forbade. **Measured: `nothing left to offer` reads 0.00 a run in both post-EG samples**, so it is
-  reachable in principle and was not reached in fifty runs. Full working in `docs/reports/EG.md` §5.
+- **~~WHETHER THE ZONE-BOSS FALLBACK NEEDS A THIRD TIER~~ — RAISED BY EG, RULED AND BUILT AT
+  EH §1.** Closed. The chain is boss pool → spec draft pool → class-wide draft pool; the
+  loadout-bound floor runs 8–13 where it ran 2–6. **What is NOT closed, and is stated here so
+  nobody reads this line as a guarantee: under a fully-held POOL the chain still floors at zero**,
+  and that is a design decision nobody has taken rather than an oversight. Full working in
+  `docs/reports/EH.md` §1.
 - **WHAT COVERS THE 915 SOURCE PINS — REPORTED AT EC §2, RULED ON NOWHERE.** Every document
   instrument watches the four tracked documents; **915 assertions across 52 suites pin a literal
   into a `.gd` file instead**, and **37 of them resolve only inside a COMMENT**, which is the
@@ -900,10 +934,13 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-one** —
-  **EG ADDED `check_eg` BECAUSE §1 AND §2 ARE BOTH RULINGS, AND BECAUSE §1 IS THE ONLY THING IN THE
-  PROJECT THAT DRIVES THE THIRD ZONE-BOSS GRANT.** A slot ladder that never grants would pass every
-  static check in the tree, which is DS's Heads Down arriving at a new mechanic.
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-two** —
+  **EH ADDED `check_eh` BECAUSE §1 IS A RULING AND BECAUSE THE THIRD TIER CAN ONLY BE PROVED
+  LIVE.** A tier that resolves correctly and announces nothing passes every static check in the
+  tree, and silence is the exact defect EA existed to end. **EG ADDED `check_eg` BECAUSE §1 AND §2
+  ARE BOTH RULINGS, AND BECAUSE §1 IS THE ONLY THING IN THE PROJECT THAT DRIVES THE THIRD
+  ZONE-BOSS GRANT.** A slot ladder that never grants would pass every static check in the tree,
+  which is DS's Heads Down arriving at a new mechanic.
   **EF AND EE EACH ADDED NONE, ED ADDED `check_ed`**, and before it EC added `check_ec`, EB `check_eb`, EA `check_ea`, DW
   `check_dw`, DV `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **ED ADDED ONE BECAUSE
   §2 IS A RULING** — the manifest is the answer to the coverage question EC priced and left open,
@@ -954,8 +991,10 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 82 ROWS: 46 suites, 31 gates, 2 scene runs
-  and 3 harness gates.** **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 83 ROWS: 46 suites, 32 gates, 2 scene runs
+  and 3 harness gates.** **EH ADDED `check_eh` AND MOVED EXACTLY ONE OTHER ROW — `check_ea`
+  62 → 86 — BOTH WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS**, so
+  `check_de` certifies on pass one. **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
   BATTERY OFF STANDALONE READINGS** — `test_batch_bo` 1131 → 1140, `test_batch_bx` 157 → 161,
   `check_ea` 60 → 62, `test_batch_bp` 275 → 276, and its own row off THREE identical readings of 68,
   so `check_de` certified on pass one. **THE `bo` DELTA WAS COUNTED OFF THE DIFF RATHER THAN
@@ -1160,8 +1199,8 @@ the number.*
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **38** — **EG ADDED `check_eg`**; EF and EE added none, ED added `check_ed`, EC `check_ec`,
-  EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
+  are **39** — **EH ADDED `check_eh`**, EG `check_eg`; EF and EE added none, ED added `check_ed`,
+  EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---

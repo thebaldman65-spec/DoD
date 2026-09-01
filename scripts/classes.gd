@@ -4441,9 +4441,14 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
 				"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."})
 		# Batch AK: Guard Change went BACK into the opening three and
-		# Shatterpoint took its place here. Guard Change is the only stance
-		# swap in the game, and four nodes of the Swordmaster's tree read
-		# the stance — trimming it turned a quarter of his tree inert.
+		# Shatterpoint took its place here. Guard Change is his only
+		# UNCONDITIONAL stance swap, and four nodes of the Swordmaster's tree
+		# read the stance — trimming it turned a quarter of his tree inert.
+		# **BATCH EH §2 SWEPT THIS SENTENCE.** It read "the only stance swap in
+		# the game" until now; BP corrected the identical claim in
+		# `PROTECTED_CORES`'s `why` one screen up and did not carry the fix
+		# here, so the false form outlived its own correction by nineteen
+		# batches. Precision Strike and Feint both switch the stance.
 		# Shatterpoint only accelerates a Break he reaches by other means,
 		# so it is the safe piece to make earnable.
 		# Batch AT: Stabilize came OUT of the Arcanist's opening three and into

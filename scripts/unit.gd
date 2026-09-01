@@ -688,7 +688,12 @@ const FRENZY_RAGE_PER_STEP := 5  # Rage that must leave the bar to buy one step
 #
 # T(N) = N(N+1)/2 — the triangular number, and the whole design. A linear
 # per-stack term is a SLOPE; this is a CURVE, which is the difference between
-# a ramp and an escalation. Both ends are uncapped and nothing removes stacks.
+# a ramp and an escalation. Both ends are uncapped.
+# **BATCH EH §2 CORRECTED THE SECOND HALF OF THIS SENTENCE, WHICH READ "and
+# nothing removes stacks":** two earned cards do. STABILIZE floors the meter at
+# 2 and pays for every stack above it, and ARCANE BOLT halves it after the blow
+# it is paid out of (`ARCANE_BOLT_KEEP`). Nothing else in the game touches it —
+# no decay, no cleanse, no enemy.
 #   5 stacks  +22% dmg / +11% taken      8 stacks  +54% / +27%
 #  12 stacks +117% dmg / +59% taken     16 stacks +204% / +102%
 const RESONANCE_BAR_REF := 15.0     # what the second-resource bar fills toward:

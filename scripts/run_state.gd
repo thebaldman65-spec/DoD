@@ -1463,6 +1463,24 @@ func award_ability_pick(member: Dictionary) -> bool:
 		# draftable, so all three of his awards could pay nothing.
 		offer = roll_spec_fallback_offer(member)
 	if offer.is_empty():
+		# **BATCH EH §1 — THE THIRD TIER, AND EA PRICED IT.** EA chose the
+		# spec-draft card above SPECIFICALLY BECAUSE THAT POOL FLOORED AT SIX
+		# AND COULD NOT ITSELF EMPTY: a hero carried at most
+		# `ABILITY_SLOT_CAP - core_slots(spec)` earned cards — four, or three
+		# for Holy — against pools of ten to thirteen, and what he CARRIED was
+		# what he HELD. **EG BROKE BOTH TERMS ONE BATCH LATER.** The cap is a
+		# ladder to ten, so the loadout bound alone takes that floor to 3 for
+		# seven specs and 2 for the Occultist; and a benched card is KEPT, so
+		# `owned_ability_names` reads a pool the slot cap does not bound at all
+		# and the true worst case floors at ZERO. **EA's ruling is overturned
+		# in its second tier only and not in its reasoning: a zone-boss award
+		# must always pay something real, and the baseline it replaced was
+		# SILENCE** — `_award_ability_picks` skipped the hero with no
+		# acknowledgement at all, so a boss died and the victory card did not
+		# name them. That requirement carries here unchanged: this tier pays a
+		# real card and is announced like any other award.
+		offer = roll_class_fallback_offer(member)
+	if offer.is_empty():
 		return false
 	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
@@ -3012,5 +3030,47 @@ func roll_spec_fallback_offer(member: Dictionary) -> Array:
 	var owned: Array = owned_ability_names(member)
 	var left: Array = Classes.spec_draft_pool(spec).filter(
 		func(n): return not owned.has(n))
+	left.shuffle()
+	return left.slice(0, 3)
+
+
+# **BATCH EH §1 — THE THIRD TIER, READ ONLY WHEN BOTH POOLS ABOVE COME BACK
+# EMPTY.** The chain is boss pool -> spec draft pool -> class-wide pool, and
+# the two above are BYTE-UNCHANGED: EA's ruling is overturned in its second
+# tier only, never in its reasoning.
+#
+# **AND THIS IS NOT THE THING DY §3 FORBADE, WHICH IS WORTH NAMING BECAUSE IT
+# LOOKS LIKE IT.** That rule says do not re-create `CLASS_POOLS` — the deleted
+# 61-entry container whose curation bill DY priced. Its own next sentence says
+# a re-opened class draw reads `CLASS_DRAFT_POOLS`, which is live, curated, and
+# exactly what this function reads. EA priced this option and recorded the same
+# exemption; nothing here rebuilds a second dict.
+#
+# **WHY THE CLASS-WIDE POOL IS A REAL FLOOR AND WHERE THAT CLAIM STOPS.** No
+# sibling spec can drain it: every hero filters this pool against HIS OWN
+# `owned_ability_names`, and no hero can hold another spec's picks, so three
+# specs sharing six cards is three independent sixes rather than a shared one.
+# **BUT IT IS NOT UNEMPTIABLE, AND SAYING SO WOULD BE EA's OWN MISTAKE AGAIN.**
+# Roughly one draft card in four is class-wide, and `draft_card_is_class`
+# returns TRUE unconditionally once the spec side is dry — so a hero who takes
+# at every offer drains his spec pool and then this one. What actually holds
+# the floor up is arithmetic, not structure: emptying all three tiers means
+# OWNING every name in both draft pools, 16 for nine specs and up to 20 for the
+# Pyromancer, and one draft offer pays at most one card. `check_eh` §1 derives
+# both bounds every run — the LOADOUT bound is asserted, the POOL bound is
+# printed — which is the split EG §1 left behind rather than a new one.
+#
+# AND IT DELIBERATELY DOES NOT CONSULT `draft_refused` EITHER, for the same
+# three reasons the tier above gives: neither channel it belongs to consults
+# it, refusal is the DRAFT's own memory of a rarer event, and a run that
+# declined enough offers could drain the floor back below three — which is the
+# exact defect this chain exists to close.
+func roll_class_fallback_offer(member: Dictionary) -> Array:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return []
+	var owned: Array = owned_ability_names(member)
+	var left: Array = Classes.class_draft_pool(
+		Classes.class_of_spec(spec)).filter(func(n): return not owned.has(n))
 	left.shuffle()
 	return left.slice(0, 3)

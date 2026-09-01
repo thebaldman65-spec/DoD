@@ -14,6 +14,92 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch EH: THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE</h2>
+<p><i>Batch EA gave a spent zone-boss award a fallback and chose a spec-draft card <b>because that
+pool could not itself empty</b>. <b>Batch EG broke that arithmetic one batch later</b> &mdash; the
+slot cap became a ladder to ten and a benched card is now KEPT, so the floor fell from six to three,
+and to two for the Occultist. <b>The award chain gains a third tier: boss pool &rarr; spec draft
+pool &rarr; class-wide draft pool</b>, and every spec is now offered a full three under a
+fully-held loadout. <b>No ability magnitude moved, no card was authored, no pool gained or lost an
+entry, and EA's second tier is byte-unchanged.</b> &sect;2 then swept <code>master.html</code> for
+claims of fact the code had stopped honouring and found <b>sixteen sites across twelve claims</b>.
+Full report: <code>docs/reports/EH.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE THIRD TIER.</b> <code>Run.roll_class_fallback_offer()</code> reads the
+hero's own <code>CLASS_DRAFT_POOLS</code> entry, filtered by <code>owned_ability_names</code>, and
+is reached only when both pools above it come back empty. <b>It is not the thing DY &sect;3
+forbade</b>, which is worth naming because it looks like it: that rule says do not re-create the
+deleted 61-entry <code>CLASS_POOLS</code>, and its own next sentence says a re-opened class draw
+reads <code>CLASS_DRAFT_POOLS</code> &mdash; which is live, curated, and what this reads. <b>EA's
+ruling is overturned in its second tier only and not in its reasoning</b>: a zone-boss award must
+always pay something real, and the baseline it replaced was <i>silence</i> &mdash;
+<code>_award_ability_picks</code> skipped the hero with no acknowledgement at all. That requirement
+carries here and is driven live.</p>
+
+<p><b>AND THE CLASS-WIDE POOL <i>CAN</i> EMPTY, WHICH IS THE OPPOSITE OF WHY IT WAS CHOSEN.</b> The
+brief held that it cannot &mdash; six cards per class, shared across three specs, and no hero can
+hold another spec's picks. <b>The second half is true and the first does not follow from it.</b> No
+SIBLING drains it, because every hero filters it against what he himself owns; but roughly one draft
+card in four is class-wide and <code>draft_card_is_class</code> returns true unconditionally once
+the spec side is dry, so a hero who takes at every offer drains his spec pool and then this one.
+<b>What holds the floor up is arithmetic, not structure</b>: emptying the chain means owning every
+card in both draft pools &mdash; fifteen at the cheapest spec, twenty at the Pyromancer &mdash; and
+an offer pays at most one card. <b>Stated plainly, because EA's identical claim about the tier above
+was true when written and false one batch later: under a fully-held LOADOUT no hero can be paid
+nothing; under a fully-held POOL every hero still can.</b> The loadout bound is asserted and the
+pool bound is printed.</p>
+
+<p><b>THE DEPTH, ACROSS ALL THREE TIERS.</b> The chain's floor under the loadout bound runs
+<b>8 to 13</b> against an award that asks for three &mdash; Occultist 8, the Pyromancer 13 &mdash;
+where the two-tier floor ran 2 to 6. <b>No rune grants a class-wide card</b>, derived rather than
+assumed, so the one term that could push the third tier below its arithmetic reads zero on all
+twelve. <code>check_ea</code> &sect;1 keeps EG's split intact and adds the chain as a <i>third</i>
+question rather than widening either half: <code>floor &gt;= 1</code> per spec is still the RULE,
+<code>[occultist]</code> is still the named short set, and <code>floor_all &gt;= awards</code> is
+new.</p>
+
+<p><b>&sect;2 &mdash; THE DOCUMENT SWEEP, AND THE BRIEF'S OWN PREMISE DID NOT SURVIVE IT.</b> The
+brief held that the false rune-equip-ladder precedent misled two briefs eleven batches apart
+<i>through <code>master.html</code></i>. <b>It did not: <code>master.html</code> has never carried
+that claim.</b> It says &ldquo;three flat slots&rdquo;, &ldquo;no runes and three empty slots&rdquo;
+and &ldquo;three rune slots&rdquo; in the four places it mentions them. The false ladder lived in the
+BRIEFS, and the correction has been in <code>CLAUDE.md</code> since EG. <b>The second seed was real
+and is the pattern's genuine instance</b>: <code>master.html</code> said Guard Change is
+&ldquo;the only stance swap in the game&rdquo; in two places, and BP corrected the code nineteen
+batches ago and never swept the document &mdash; and left a third copy in
+<code>classes.gd</code>'s own comment, one screen from the <code>why</code> it did fix.</p>
+
+<p><b>SIXTEEN SITES, AND THE LARGEST GROUP WAS NOT A SUPERLATIVE AT ALL.</b> &sect;6a of the
+document still described the game before Batch BO: <i>&ldquo;There is no cap and no swap
+step&rdquo;</i>, <i>&ldquo;a full run ends at core + 3 + 2 = 6 abilities&rdquo;</i>, and two boss
+picks a run from <i>&ldquo;zone 1's boss and zone 2's&rdquo;</i> when BM &sect;6 made all three zone
+bosses pay. The same section still carried EA's <i>&ldquo;the fallback pool cannot itself run
+out&hellip; which floors the fallback at six cards&rdquo;</i>, false since EG. <b>&sect;6b, fifty
+lines below, was current the whole time</b> &mdash; EG swept its own section and not the one above
+it. Every site is corrected toward the code, per the standing rule.</p>
+
+<p><b>AND TWO SOURCE COMMENTS WERE SWEPT WITH IT.</b> <code>classes.gd</code>'s third copy of the
+stance-swap claim, and <code>unit.gd</code>'s <i>&ldquo;Both ends are uncapped and nothing removes
+stacks&rdquo;</i> &mdash; <b>two earned cards remove Resonance</b>: Stabilize floors the meter at 2,
+and Arcane Bolt halves it. The document made the same mistake in two places and now names both.</p>
+
+<p><b>CAN IT BE AN INSTRUMENT? REPORTED, RULED ON NOWHERE.</b> <code>check_eh</code> &sect;4 counts
+the document's uniqueness claims and how many name a live ability: <b>56 claims, 12 nameable</b>.
+<b>A TWO-ARMED CONTROL SETTLES WHY THE DEFECT SURVIVED</b> &mdash; putting the false stance-swap
+sentence back leaves all five <code>master.html</code> readers green, while breaking a literal a
+suite demonstrably reads turns <code>test_batch_ah</code> red. The prose is unasserted, and that is
+the finding rather than a proposal.</p>
+
+<p><b>&sect;3 &mdash; AND ONE OF EG'S THREE CONFIRMATIONS DID NOT CONFIRM.</b> The record reads
+&ldquo;all seven named enablers are in <code>protected_names</code> for their spec&rdquo;, and every
+word of it is true &mdash; it audited the seven the brief named. <b><code>PROTECTED_CORES</code>
+names SIXTEEN, across nine specs.</b> All sixteen are protected, so the conclusion held; what did
+not is the sweep, and <code>CLAUDE.md</code>'s own rule names the shape: <b>a named list cannot
+audit itself.</b> The other two confirm: the ladder and the cap both read <code>core_slots</code>
+and <code>protected_names</code> has exactly one live reader outside its own definition (the loadout
+panel's CORE rows), and <code>decline_draft</code> is the ledger's only writer with benching writing
+none, driven live.</p>
+
 <h2>2026-08-31 &mdash; Batch EG: THE DRAFT STAYS LIVE ALL RUN</h2>
 <p><i>Four draftable slots against roughly thirty-seven draft offers a run, <b>63% of them arriving
 at a hero already at the cap</b> &mdash; so the draft was effectively over after zone one and every

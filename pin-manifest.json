@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1329,
-  "source": 1029,
-  "other": 71,
+  "total": 1335,
+  "source": 1034,
+  "other": 72,
   "document": 229
  },
  "source_residency": {
-  "code": 614,
-  "absent": 286,
-  "runtime": 71,
-  "narrow": 17,
+  "code": 616,
+  "absent": 287,
+  "runtime": 72,
+  "narrow": 18,
   "alt-sibling": 2,
   "comment": 39
  },
@@ -1454,35 +1454,13 @@
   {
    "s": "check_ea.gd",
    "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "Classes.spec_draft_pool(spec)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_ea.gd#49"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
    "h": "scripts/battle.gd",
    "n": "boss_text += \"\\n\\nNEW ABILITY: %s may choose one of three",
    "p": "+",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ea.gd#53"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "class_pool",
-   "p": "-",
-   "r": "narrow",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_ea.gd#45"
+   "g": "check_ea.gd#67"
   },
   {
    "s": "check_ea.gd",
@@ -1493,62 +1471,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ea.gd#52"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "func award_ability_pick",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_ea.gd#40"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "func roll_spec_fallback_offer",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_ea.gd#46"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "owned_ability_names(member)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_ea.gd#50"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "roll_spec_fallback_offer(member)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_ea.gd#44"
-  },
-  {
-   "s": "check_ea.gd",
-   "fn": "_s0_premises",
-   "h": "scripts/run_state.gd",
-   "n": "var offer := roll_spec_ability_offer(member)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_ea.gd#43"
+   "g": "check_ea.gd#66"
   },
   {
    "s": "check_ec.gd",
@@ -1682,6 +1605,149 @@
    "k": "literal",
    "how": "stripped",
    "g": "check_eg.gd#141"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/battle.gd",
+   "n": "\"%s\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_eh.gd#170"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "Classes.core_slots(spec)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_eh.gd#140"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/battle.gd",
+   "n": "Quick Shot",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_eh.gd#176"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "_refuse_draft(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#177"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "_refuse_draft(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_eh.gd#180"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "core_slots",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_eh.gd#144"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/battle.gd",
+   "n": "func _consume_empower",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#165"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/battle.gd",
+   "n": "func _sharpshooter_focus",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#173"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "func ability_slot_cap",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#142"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "func ability_slots_used",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#137"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "func decline_draft",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#178"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/run_state.gd",
+   "n": "protected_names",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_eh.gd#141"
+  },
+  {
+   "s": "check_eh.gd",
+   "fn": "_s3_the_record",
+   "h": "scripts/",
+   "n": "protected_names(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_eh.gd#152"
   },
   {
    "s": "test_batch_ah.gd",
