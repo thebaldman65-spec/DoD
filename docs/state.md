@@ -5,103 +5,106 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-31 (Batch EH).*
+*Last rewritten: 2026-09-01 (Batch EI).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EH — THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE.** **THE
-  ZONE-BOSS AWARD IS A CHAIN OF THREE POOLS NOW: BOSS POOL → SPEC DRAFT POOL → CLASS-WIDE DRAFT
-  POOL.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED, NO POOL GAINED OR LOST AN ENTRY, AND
-  EA'S SECOND TIER IS BYTE-UNCHANGED.** **Report: `docs/reports/EH.md`.**
-- **§1 — `roll_class_fallback_offer` IS THE THIRD TIER AND IT IS READ ONLY WHEN BOTH POOLS ABOVE
-  COME BACK EMPTY.** It reads `Classes.class_draft_pool(class_of_spec(spec))` filtered by
-  `owned_ability_names`, exactly as the tier above it reads the spec draft pool, and it
-  deliberately does not consult `draft_refused` for the same three reasons.
-  - **IT IS NOT THE THING DY §3 FORBADE**, which is worth naming because it looks like it: that rule
-    bars re-creating the deleted `CLASS_POOLS`, and its own next sentence says a re-opened class
-    draw reads `CLASS_DRAFT_POOLS` — which is live, curated, and what this reads.
-  - **DRIVEN LIVE IN THREE ARMS ON REAL ZONE BOSSES** (`check_eh` §1): with nothing held the offer
-    comes out of the boss pool; with the boss pool held it comes out of the spec draft pool; with
-    both held it comes out of the CLASS-WIDE pool **and the victory card names every hero.** The
-    arm reads the QUEUED OFFER back, because an announcement cannot tell three tiers apart.
-  - **THE DEPTH RAN 2–6 AND RUNS 8–13 NOW**, against an award that asks for three — Occultist 8,
-    Pyromancer 13. **No rune grants a class-wide card**, derived on all twelve rather than assumed.
-  - **AND THE THIRD TIER DEEPENS THE FLOOR; IT DOES NOT REMOVE IT.** The brief held the class-wide
-    pool cannot empty — six cards a class, shared across three specs, no hero holding another
-    spec's picks. **The second half is true and the first does not follow from it.** No SIBLING
-    drains it; the hero himself can, because roughly one draft card in four is class-wide and
-    `draft_card_is_class` returns TRUE unconditionally once the spec side is dry. **Under a
-    fully-held LOADOUT no hero can be paid nothing; under a fully-held POOL every hero still can**,
-    and emptying the chain costs owning fifteen distinct cards at the cheapest spec. **`check_eh`
-    §2 asserts both directions and `check_ea` §1 prints the pool bound.**
-  - **`check_ea` §1 KEPT EG'S SPLIT AND GAINED A THIRD QUESTION RATHER THAN A WIDENED ONE.**
-    `floor >= 1` per spec is still the RULE, `short_specs == ["occultist"]` is still the named
-    short set, and `floor_all >= awards` is new. **62 → 86 checks.**
-  - **AND `check_ea` §0's WINDOW WAS A DEFECT THIS BATCH TRIPPED TWICE IN ONE EDIT.** It read
-    `rs.substr(aw, 1400)` off the RAW file: the third tier landed at offset 2113, past the end of
-    the window, and the comment explaining it NAMES `CLASS_POOLS`, so the premise that catches the
-    deleted class draw coming back would have read prose about a deletion as the deletion being
-    undone. **The window is the whole function now, out of the comment-stripped source.**
-- **§2 — THE `master.html` SWEEP FOUND SIXTEEN SITES, AND THE BRIEF'S OWN PREMISE DID NOT SURVIVE
-  IT.** The brief held that the false rune-equip-ladder precedent misled two briefs *through that
-  document*. **It did not — `master.html` has never carried the claim**; it says "three flat slots",
-  "no runes and three empty slots" and "three rune slots" in all four places it mentions them. The
-  false ladder lived in the BRIEFS and the correction has been in `CLAUDE.md` since EG.
-  - **THE SECOND SEED WAS REAL AND IS THE PATTERN'S GENUINE INSTANCE.** `master.html` said Guard
-    Change is *"the only stance swap in the game"* in TWO places; BP corrected the code nineteen
-    batches ago, never swept the document, and left **a third copy in `classes.gd`'s own comment,
-    one screen above the `why` it did fix.**
-  - **THE LARGEST GROUP WAS NOT A SUPERLATIVE.** **§6a still described the game before Batch BO** —
-    *"There is no cap and no swap step"*, *"a full run ends at core + 3 + 2 = 6 abilities"*, and two
-    boss picks a run from *"zone 1's boss and zone 2's"* when BM §6 made all three zone bosses pay.
-    It also still carried EA's *"the fallback pool cannot itself run out ... floors the fallback at
-    six cards"*, false since EG. **§6b, fifty lines below, was current the whole time** — EG swept
-    its own section and not the one above it.
-  - **TWO SOURCE COMMENTS WENT WITH IT**: `classes.gd`'s third stance-swap copy, and `unit.gd`'s
-    *"Both ends are uncapped and nothing removes stacks"* — **two earned cards remove Resonance**,
-    Stabilize floors it at 2 and Arcane Bolt halves it, and `master.html` said "the only thing in
-    the game that removes Resonance" in two places.
-  - **CAN IT BE AN INSTRUMENT? REPORTED, RULED ON NOWHERE.** `check_eh` §4 counts **56 uniqueness
-    claims, 12 of them naming a live ability**. **A TWO-ARMED CONTROL SETTLES WHY THE DEFECT
-    SURVIVES**: putting the false stance-swap sentence back leaves all five `master.html` readers
-    green, while breaking a literal a suite demonstrably reads turns `test_batch_ah` red. **The
-    document's factual prose is asserted by nothing.**
-- **§3 — ONE OF EG'S THREE CONFIRMATIONS DID NOT CONFIRM.** The record read *"all seven named
-  enablers are in `protected_names` for their spec"* and every word of it was true — it audited the
-  seven the brief named. **`PROTECTED_CORES` NAMES SIXTEEN, ACROSS NINE SPECS.** All sixteen are
-  protected, so the conclusion held and only the sweep did not; `CLAUDE.md` carries the shape as its
-  fourth instance of *a named list cannot audit itself*.
-  - **THE LADDER AND THE CAP BOTH READ `core_slots`, AND `protected_names` HAS ONE LIVE READER
-    OUTSIDE ITS OWN DEFINITION** — `map_screen.gd`'s CORE rows, the list that cannot be benched.
-    Asserted as the derived reader set, so a second reader trips it.
-  - **`decline_draft` IS THE LEDGER'S ONLY WRITER AND BENCHING WRITES NONE**, driven live on a real
-    member rather than read off the source.
-- **§4 — THE BATTERY FOUND ONE RED AND IT WAS AN INSTRUMENT HOLE, NOT THE BATCH.**
-  `check_da` §3b accused `check_eh::_arm` of returning a hand-rolled corpus, and `_arm` is
-  `-> void`. **`Gate.returning_bodies` TESTED `-> void` AGAINST THE FIRST LINE OF A SIGNATURE**, so
-  a void function whose signature is WRAPPED entered the population as if it returned something —
-  **six functions across three files were in that state, five of them since before this batch**
-  (`check_dm` ×3, `test_runes` ×2). They passed only because none of the other five touches two walk
-  families. **An exemption was not available**: `check_dw` §0 pins `RETURN_WALK_EXEMPT.size() == 1`.
-  The helper accumulates the signature to the line that closes it now, capped at eight lines.
-  **PROVED BY A TWO-ARMED CONTROL — and the first attempt was armed in the wrong direction and
-  proved nothing**: a returning function with a wrapped signature is caught by both helpers. Armed
-  on a wrapped VOID function reading two families, the repaired helper SKIPS it (348 bodies, 0
-  accused) and HEAD's ACCUSES it (355 bodies). **`check_da` 39 → 41**, the +2 being the two
-  `WALK_EXEMPT` rows, which are asserted live.
-- **AND `check_parse.gd` WALKS `res://scripts` AND `res://scenes` ONLY — REPORTED, NOT FIXED.**
-  When `gate_fixture.gd` was briefly broken during that repair, **the stderr grep the floor
-  procedure specifies came back CLEAN**. The repo ROOT is outside the parse gate: `gate_fixture.gd`
-  (preloaded by 23 gates), `suite_fixture.gd`, all 39 gates and all 47 suites live there. It
-  surfaces downstream as every dependent gate failing to load and printing no count, which is late.
-  **Widening it is a baseline move nobody has been briefed for; it is in the open queue.**
-- **Next letter: EI.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EI — THE FLOOR THAT DID NOT COVER THE FLOOR.** **`check_parse.gd` WALKED TWO
+  DIRECTORIES AND THE THINGS IT PROTECTS LIVE IN A THIRD PLACE**, so the acceptance test every
+  implement-only batch has run since CG was blind to all 39 gates, all 47 suites and both fixtures.
+  **41 FILES → 158.** **NO GAME CODE MOVED, NO MAGNITUDE CHANGED, NO CARD WAS TOUCHED AND NO POOL
+  GAINED OR LOST AN ENTRY.** **Report: `docs/reports/EI.md`.**
+- **§1 — THE POPULATION IS DERIVED FROM `run_battery.sh`, IN FOUR LAYERS, AND NO LAYER IS A
+  DIRECTORY.** 82 targets the battery spawns (its own `SUITES` and `GATES` arrays, every literal
+  `--script`, every `run_one`, every scene run) + 57 reached through their
+  `preload` / `ext_resource` / `change_scene_to_file` edges and `project.godot`'s autoloads + 11
+  game-tree files reachable only by a `class_name` identifier + 4 data JSON. **A target added to
+  the battery is covered the same day, with no edit to the gate.**
+  - **THE CAUSE OF ALL THREE SHORTFALLS WAS ONE SENTENCE**, `for dir_path in [...]`. CP repaired
+    the tally, DE found it missed the suites, EH broke `gate_fixture.gd` and **the floor
+    procedure's stderr grep came back CLEAN while 23 gates could not load.** **DO NOT NARROW IT
+    BACK TO A DIRECTORY.**
+  - **LAYER B IS HOW THE FIXTURES ARRIVE.** Nothing names `gate_fixture.gd` or `suite_fixture.gd`
+    and 60 files depend on them, so they are covered *because they are depended upon* — a property
+    that survives somebody moving them.
+  - **THE RESIDUE IS NAMED IN THE OUTPUT EVERY RUN**: `check_ck_width`, `check_cu`, `check_cv`,
+    `check_dn` — the same four this file records as running nowhere. They are loaded like
+    everything else and reported as their OWN population, so *covered* never quietly means
+    *reachable*. **What is still outside is printed too**: the two `.py` instruments, the shell
+    scripts, `shaders/outline.gdshader` (a shader compiles on the rendering server, a stub
+    headless) and the `assets/` binaries no dependency edge reaches. **Nothing the battery spawns
+    is outside it** — the gate counts a battery name with no file behind it and reads `0 missing`.
+  - **THE GATE PRELOADS NOTHING AND MUST NOT START.** A floor that preloads `gate_fixture.gd`
+    cannot report that `gate_fixture.gd` is broken: it fails to compile, prints a Parse Error, runs
+    not one line and **exits 0**.
+  - **THREE HARD FAILURES, BECAUSE A GATE THAT CAN ONLY PASS IS A GAP** — the battery script
+    unreadable (armed: **3 failures**), either array parsing to nothing (armed: **1**), and a
+    battery name with no file. **COVERAGE DOES NOT SHRINK WHEN THE DERIVATION BREAKS**: all three
+    armed runs still checked 159 files, because the residue layer catches whatever falls out. Only
+    the labelling moves, and the guards say so.
+  - **IT PRINTS A CHECK COUNT NOW AND THE COUNT IS THE COVERAGE.** A failure total reads zero
+    whether the walk covers 158 files or 41, which is how it was short three times with nothing
+    going red. **`baselines.json` pins the floor at 158**, written before the battery off three
+    identical standalone readings. **Eight targets could not report a check count; SEVEN cannot
+    now.**
+  - **A MALFORMED DATA FILE WAS THE ONE THING THE FLOOR PROCEDURE COULD NOT SEE** — armed, it
+    reddened the tally and left the stream clean. The JSON failure goes to stderr naming itself a
+    `Parse Error` now, so one procedure covers the whole floor.
+  - **TEN NEGATIVE CONTROLS, EVERY ONE TWO-ARMED AGAINST HEAD'S OWN COPY OF THE GATE.** Arming only
+    the new gate proves a broken file is broken, not that the widening works. `gate_fixture.gd`
+    **24 failures / 74 stderr hits** against HEAD's **0 / 0** — **the 24 are the fixture plus the 23
+    gates EH counted, reproduced without being aimed at**; `suite_fixture.gd` **38 / 39** against
+    **0 / 0**; a gate, a suite, the harness, a scene-run script, a residue file and
+    `data/runes.json` each **1 / 1** against **0 / 0**. **The positive control is
+    `scripts/talents.gd`**, which the OLD gate already covered: **59** against HEAD's **10**, so the
+    widening is a superset rather than a replacement.
+- **§2 — A BRIEF'S PRECEDENT IS A CLAIM AND GETS CHECKED, RECORDED IN `CLAUDE.md`.** *When a brief
+  cites a precedent — a prior ruling, a mechanism, an existing ladder or convention — the batch
+  VERIFIES it against the code before building on it, and reports if it does not hold.* **A wrong
+  precedent is worse than a wrong number: a number gets re-derived, and a precedent gets
+  inherited.**
+  - **THE GAP IS REAL: the standing rules cover FIGURES and a precedent is not a figure.**
+    **Documents get swept and briefs do not**, so a false precedent has no surface an instrument
+    can bite — it propagates by being read.
+  - **THE LINEAGE IS THREE DEEP AND EVERY ERROR LIVED IN A BRIEF.** CT asserted a rune equip ladder
+    deleted at AN §9 and caught it itself; eleven batches later EG's brief asserted the same
+    ladder; EH's brief then blamed `master.html`, **which has never carried the claim.**
+  - **FORWARD-LOOKING ONLY. PAST BRIEFS ARE NOT SWEPT** — they are history and the changelog holds
+    them.
+- **§3 — ONE OF THE TWO CONFIRMATIONS DID NOT CONFIRM.** **A THIRD SECTION OF `master.html` CARRIES
+  EH'S §6a LAG, AND TWO MORE SITES BESIDE IT.** All three corrected toward the code.
+  - **§10 SAID "There is no cap on how many abilities a hero holds"** — BO §2 gave earned abilities
+    a cap and EG made it a ladder (`ABILITY_SLOTS_BY_BOSS` = 7/8/9/10). It is §6a's own sentence
+    standing **1,450 lines away**. **A LINE-BASED SWEEP CANNOT SEE IT BECAUSE THE CLAIM WRAPS**; the
+    re-sweep was run over UNWRAPPED text and that is what found it. The words are true of the POOL
+    and false of the surface they explain — the menu is built from `equipped_ability_names`.
+    **Derived, not asserted: the widest menu any of the twelve can raise is ELEVEN entries**, so
+    ⇧Q and ⇧W are reachable and ⇧E–⇧G are headroom. **TWO `battle.gd` COMMENTS CARRIED THE SAME
+    CLAIM** and were corrected with it — proved comment-only by a comment-stripped diff, **0
+    differing code lines**.
+  - **§6.4 STILL SAID SMOKE BOMB AND FIELD DRESSING "LAND LATER"; §13 SAYS THEY ARE SPENT.** Field
+    Dressing is live in `CLASS_DRAFT_POOLS` (BR) and Smoke Bomb shipped as Choking Smoke (BO), both
+    verified against the pools. **Only Blight is still owed.** DS swept §13 and not the section 975
+    lines above it — the §6a/§6b shape, third instance. The Sharpshooter's three names beside it
+    **really are still owed**, checked rather than assumed.
+  - **§11b DESCRIBED A FIRST-RUN CARD THE GAME NO LONGER SHOWS** — it summarised the framing card
+    as teaching "the two ability picks a zone pays out", and the card's own text in `map_screen.gd`
+    **names no ability pick at all**. Rewritten from the card.
+  - **AND NINE OF EH'S TWELVE CLAIMS RETURN ZERO HITS ANYWHERE IN THE DOCUMENT**, so the population
+    is not read as all-defect: EH's repair holds everywhere it reached, and §8 Economy — the
+    largest concentration outside §6a/§6b — is fully current.
+  - **THE ENABLER COUNT CONFIRMS.** `PROTECTED_CORES` names **sixteen across nine specs**, derived
+    live, and every record that reasons from it says sixteen — `CLAUDE.md`, the changelog's EH
+    entry, this file, and **`check_eh` §3's live `enablers == 16`**. The one surviving "seven" is
+    EG's own changelog entry, which is an accurate record of what EG did and is corrected by the
+    entry fifty lines above it. **History is not rewritten to hide a finding.**
+- **Next letter: EJ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. **EG changed what a run plays; EH changed what a spent award
-  pays and swept the document that describes both.**
+  purpose-authored and charter-clean. **EH changed what a spent award pays; EI changed nothing the
+  player can see and repaired the instrument every batch stands on.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -538,13 +541,6 @@ re-derived from the source at DM; not one was moved.**
 
 ### Small, and still owed
 
-- **`check_parse.gd` DOES NOT COVER THE REPO ROOT — FOUND AT EH §4, RULED ON NOWHERE.** It walks
-  `res://scripts` and `res://scenes`, so a parse error in `gate_fixture.gd`, `suite_fixture.gd`, any
-  of the 39 gates or any of the 47 suites is invisible to it — **measured, not assumed: a duplicate
-  `var` in `gate_fixture.gd` left the stderr grep clean while 23 gates could not load.** Widening
-  the walk is a few lines and moves `check_parse`'s baseline; whether the gate should compile files
-  the battery already runs is the question nobody has answered.
-
 - **`master.html` SAYS GUARD CHANGE IS "the only stance swap in the game" AND BP CORRECTED THAT IN
   THE CODE.** `PROTECTED_CORES`'s own `why` has read *the only UNCONDITIONAL stance swap* since BP —
   Precision Strike and Feint both switch — and the document's protected-core table was never swept.
@@ -772,9 +768,11 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried from the code, reported and deliberately not fixed
 
-- **EIGHT TARGETS STILL CANNOT REPORT A CHECK COUNT, AND IT IS A RATCHET RATHER THAN A SENTENCE.**
-  `check_parse`, `check_flow`, `check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm`,
-  `check_cn` and `check_map_screen` read `checks=?`. **Two of them — `check_cl_width` and
+- **SEVEN TARGETS STILL CANNOT REPORT A CHECK COUNT, AND IT IS A RATCHET RATHER THAN A SENTENCE.**
+  `check_flow`, `check_map`, `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn` and
+  `check_map_screen` read `checks=?`. **`check_parse` LEFT THE SET AT EI**, and its number is its
+  COVERAGE rather than an assertion tally — pinned at 158 with the floor asserted, because a
+  failure total reads zero whether that gate walks 158 files or 41. **Two of them — `check_cl_width` and
   `check_map_screen` — report `fails=?` as well**, so the battery cannot see whether either passed
   at all. **A count that reads `?` is the one thing a count-diffing rule cannot compare.** DE
   records that state as `null` in `baselines.json` and asserts the SET in both directions: **a
@@ -965,6 +963,9 @@ re-derived from the source at DM; not one was moved.**
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the four that run nowhere are `check_ck_width`, `check_cu`, `check_cv` and `check_dn`.
+  **SINCE EI THOSE FOUR ARE PARSE-COVERED AND NAMED IN `check_parse`'s OUTPUT EVERY RUN** as its
+  RESIDUE — in the tree, spawned by nothing, reached by nothing. They are still not in `GATES`,
+  because what a failure in an audit REPORT means is a ruling rather than a detail.
 - **`check_ds` NEEDS NO `check_da` §3 EXEMPTION AND IT TOOK A RED TO ESTABLISH THAT.** It calls
   neither draft-pool accessor; its **header comment named both of them** while explaining that it
   does not, and §3's fingerprint is a substring match over the whole source. **The names came out of
@@ -992,7 +993,13 @@ re-derived from the source at DM; not one was moved.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
 - **THE BASELINE TABLE IS `baselines.json` AND IT IS 83 ROWS: 46 suites, 32 gates, 2 scene runs
-  and 3 harness gates.** **EH ADDED `check_eh` AND MOVED EXACTLY ONE OTHER ROW — `check_ea`
+  and 3 harness gates.** **EI ADDED NO ROW AND MOVED EXACTLY ONE — `check_parse`, `checks: null`
+  → `[158, 158]`** — written before the battery off three identical standalone readings, so
+  `check_de` certified on pass one. **THAT ROW IS A DIFFERENT KIND OF NUMBER FROM EVERY OTHER ONE
+  IN THE TABLE: it is a COVERAGE count, not an assertion tally**, and it is pinned for the reason
+  the batch exists — a failure total reads zero whether that gate walks 158 files or 41, which is
+  how it was found short three times with nothing going red.
+  **EH ADDED `check_eh` AND MOVED EXACTLY ONE OTHER ROW — `check_ea`
   62 → 86 — BOTH WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS**, so
   `check_de` certifies on pass one. **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
   BATTERY OFF STANDALONE READINGS** — `test_batch_bo` 1131 → 1140, `test_batch_bx` 157 → 161,
@@ -1277,12 +1284,13 @@ reach `bp` §7 at all: it is a Warrior flow.**
   - **`bk` is NOT widened**, because it has not been exceeded: headroom goes where a reading demands
     it. It read **129**.
 - **`check_map` is NOT a hang** — 99% CPU for ~5 minutes. The battery gives it a 600s bound.
-- **`check_parse` does not cover the test suites.** It walks `res://scripts` and `res://scenes`
-  only. **It does not cover the GATES, `gate_fixture.gd` or `suite_fixture.gd` either** — but a
-  broken suite fixture fails 37 suites loudly, and **DR parse-checked its edits with a negative
-  control proving the check bites** (a deliberate `func _dr_negative_control(:` produced
-  `Parse Error: Expected parameter name.`, and the tree read clean again once restored **from a
-  scratchpad backup rather than by `git checkout`**).
+- **`check_parse` COVERS THE GATES, THE SUITES, BOTH FIXTURES AND THE DATA JSON SINCE EI**, off a
+  population derived from `run_battery.sh` rather than from a directory list. **It still does not
+  cover the two `.py` instruments, the shell scripts, `shaders/outline.gdshader` or the `assets/`
+  binaries no dependency edge reaches** — printed in its own output every run, so the gap is stated
+  rather than assumed away. **Its verdict is still read off stderr and never off the tally**: DR's
+  control idiom (a deliberate `func _dr_negative_control(:`, restored **from a scratchpad backup
+  rather than by `git checkout`**) is what EI's ten arms use.
 - **A GATE THAT EXITS 0 IS NOT A GATE THAT PASSED.** **A `--script` target whose base class does not
   resolve prints `Parse Error`, runs not one line, and exits 0.** Grep the stderr; never trust the
   tally and never trust `$?`. **`run_battery.sh`'s `throws=` column is the only thing standing
@@ -1294,32 +1302,42 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**TWO BATTERIES AT EG. BATTERY 1 FOUND FOUR INSTRUMENT DEFECTS AND BATTERY 2 FOUND NOTHING.**
-**188 files were MD5-stamped before the acceptance run and re-compared after; EVERY ONE IS
-BYTE-IDENTICAL**, so the battery certified what ships. **BATTERY 1 WAS FROZEN TOO, AND THAT IS WHAT
-MAKES ITS REDS ATTRIBUTABLE**: of the same 188, the only four differing from its pre-run stamp are
-the four repaired after it finished. **EXACTLY TWO FILES DIFFER FROM THE CERTIFIED TREE NOW — this
-one and `docs/reports/EG.md` — and both are read by nothing**, checked rather than recalled.
+**TWO BATTERIES AT EI, BOTH FROZEN, AND BATTERY 1 FOUND NOTHING — WHICH IS THE UNUSUAL PART AND IS
+WHY THE SECOND RAN ANYWAY.** A batch whose whole subject is that the verification floor was not
+what everybody believed does not certify itself on one run. **309 files were MD5-stamped with
+ABSOLUTE paths before each run and re-compared after: battery 1 drifted ZERO, and the acceptance
+run drifted exactly ONE — this file** — which was edited while it ran and which nothing reads.
+**This file and `docs/reports/EI.md` are the only two differing from the certified tree**, checked
+by grep rather than recalled.
 
-| | EE's acceptance | EF's acceptance | **EG battery 1** | **EG's acceptance** |
-|---|---|---|---|---|
-| **suite failures** | 0 | 0 | **1** | **0** |
-| **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
-| `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
-| check counts outside their band | 0 | 0 | 0 | **0** |
-| `check_de` | 337 / 0 / 0 | 337 / 0 / 0 | **341 / 3 / 0** | **341 / 0 / 0** |
-| run harness | 22 / 166 / 8 | 22 / 166 / 8 | **GATE 2 FAIL** | **22 / 166 / 8** |
-| targets in the manifest | 82 | 82 | 83 | **83** |
+| | EF's acceptance | EG's acceptance | EH's acceptance | **EI battery 1** | **EI's acceptance** |
+|---|---|---|---|---|---|
+| **suite failures** | 0 | 0 | 0 | **0** | **0** |
+| **throws, grepped from the stream** | 0 | 0 | 0 | **0** | **0** |
+| `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** | **4** |
+| check counts outside their band | 0 | 0 | 0 | **0** | **0** |
+| `check_de` | 337 / 0 / 0 | 341 / 0 / 0 | 345 / 0 / 0 | **346 / 0 / 0** | **346 / 0 / 0** |
+| run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** | **22 / 166 / 8** |
+| targets in the manifest | 82 | 83 | 84 | **84** | **84** |
 
-**EIGHTY-THREE TARGETS RAN AND THE MANIFEST NAMES ALL EIGHTY-THREE**, compared both ways.
-**0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 83 logs** — grepped from the streams
+**EIGHTY-FOUR TARGETS RAN AND THE MANIFEST NAMES ALL EIGHTY-FOUR**, compared both ways.
+**0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 84 logs** — grepped from the streams
 rather than read off a tally or an exit code. `check_map_screen: OK`; `check_ct_map` 83 / 0.
 
-**AND THE PREDICTION HELD EXACTLY, ON BOTH RUNS.** `check_de` read **341 checks and ZERO NOTICES**,
-so not one unpredicted count moved: `check_eg` **68**, `test_batch_bo` **1140**, `test_batch_bx`
-**161**, `check_ea` **62**, `test_batch_bp` **276**, and every other row on its recorded line.
+**`check_de` READ 346 CHECKS AND ZERO NOTICES ON BOTH RUNS**, so not one unpredicted count moved
+anywhere in the tree. **The +1 over EH's 345 is exactly `check_parse` gaining a comparable count**,
+and it is stated here because **`check_de` HAS NO BASELINE ROW OF ITS OWN**, so its own total moving
+for a gate that gained a count is reported by nothing.
 
-**THE FOUR DEFECTS BATTERY 1 FOUND, BECAUSE THE SHAPES RECUR.**
+**NOTHING WAS FOUND BY EITHER BATTERY, AND THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THEM.** The
+seven targets most likely to move — `check_parse`, `check_da`, `check_dw`, `check_ec`, `check_ed`,
+`check_eh` and the pin manifest — were each run standalone against the edited tree before the first
+battery, and all seven read as predicted. **Two independent needle instruments cleared the document
+edits**: `check_ed` against HEAD's own manifest (**18 / 0**, manifest unchanged at 1335 pins) and a
+raw sweep of all 11,222 gate-and-suite literals, which found **two LOST needles, both traced to
+their pin sites and neither read by the document it left**.
+
+**THE FOUR DEFECTS EG's BATTERY 1 FOUND, BECAUSE THE SHAPES RECUR.**
 - **TWO ARE ONE DEFECT IN TWO COPIES.** `test_batch_bm` §6 and `test_run_harness` gate 2 each slice
   `battle.gd` from `func _resolve_boss` for a fixed **2400 characters**; EG's §1 comment pushed the
   `# The end boss.` anchor from 2130 to **2955** and both went red. **ED §2's rule met in the wild**

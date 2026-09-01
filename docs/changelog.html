@@ -14,6 +14,131 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EI: THE FLOOR THAT DID NOT COVER THE FLOOR</h2>
+<p><i>Two items, both about the verification floor itself. <b>&sect;1 &mdash;
+<code>check_parse.gd</code> walked <code>res://scripts</code> and <code>res://scenes</code> only,
+so the floor procedure every implement-only batch has run since CG was blind to the 39 gates, the
+47 suites and both fixtures</b>: at EH a duplicate <code>var</code> in <code>gate_fixture.gd</code>
+left the stderr grep CLEAN while 23 gates could not load. <b>The walk is 41 files &rarr; 158</b>,
+and its population is DERIVED from <code>run_battery.sh</code> rather than from a list of
+directories &mdash; a directory list is what went stale all three times this gate has been found
+short. <b>&sect;2 &mdash; a brief's PRECEDENT is now a claim that gets checked</b>, written down
+because three errors in one lineage all propagated through briefs, which nothing sweeps. <b>No game
+code moved, no magnitude changed and no card was touched.</b> Full report:
+<code>docs/reports/EI.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE POPULATION IS DERIVED, IN FOUR LAYERS, AND NO LAYER IS A DIRECTORY.</b>
+The gate reads the battery script's own <code>SUITES</code> and <code>GATES</code> arrays, every
+literal <code>--script</code> target, every <code>run_one</code> and every <code>res://</code>
+scene run &mdash; <b>82 targets</b>. It then follows their <code>preload</code> /
+<code>load</code> / <code>ext_resource</code> / <code>change_scene_to_file</code> edges to closure,
+seeded also by <code>project.godot</code>'s three autoloads and its main scene &mdash; <b>57
+more</b>, and this is how <code>gate_fixture.gd</code> and <code>suite_fixture.gd</code> arrive:
+nothing NAMES them and 60 files depend on them. What is left in <code>scripts/</code> and
+<code>scenes/</code> is the old gate's territory and is kept for exactly the files it was right
+about &mdash; <b>11 more</b>, reachable only by a <code>class_name</code> identifier, which no
+textual closure can follow. <b>And <code>res://data/*.json</code></b>, which reach the game through
+a <code>DATA_PATH</code> string constant &mdash; <b>4 more</b>. <b>A target added to the battery is
+covered the same day, with no edit to that gate.</b></p>
+
+<p><b>THE RESIDUE IS NAMED IN THE OUTPUT EVERY RUN, BECAUSE A FLOOR THAT IS NEARLY COMPLETE IS THE
+ONE THAT GETS TRUSTED.</b> Four files are in the tree, spawned by nothing and reached by nothing
+&mdash; <code>check_ck_width</code>, <code>check_cu</code>, <code>check_cv</code> and
+<code>check_dn</code>, the four <code>docs/state.md</code> already records as running nowhere. They
+are loaded like everything else and reported as a separate population, so &ldquo;covered&rdquo; can
+never quietly mean &ldquo;reachable&rdquo;. <b>What is still outside the gate is stated in its own
+output</b>: the two <code>.py</code> instruments, the shell scripts,
+<code>shaders/outline.gdshader</code> (a shader compiles on the rendering server, which is a stub
+under <code>--headless</code>, so <code>load()</code> there would prove only that the file exists)
+and the <code>assets/</code> binaries no dependency edge reaches.</p>
+
+<p><b>THE GATE PRELOADS NOTHING, AND THAT IS THE DESIGN RATHER THAN AN OVERSIGHT.</b> A floor that
+<code>preload</code>s <code>gate_fixture.gd</code> cannot report that <code>gate_fixture.gd</code>
+is broken: it fails to load itself, prints a Parse Error, runs not one line and <b>exits 0</b>.
+<b>And a gate that can only pass is a gap</b>, so three things are hard failures rather than quiet
+skips &mdash; <code>run_battery.sh</code> unreadable, either battery array parsing to nothing, and
+a name in the battery with no file behind it. Each would otherwise shrink the population toward
+zero and print success. Both guards were armed and both red: hiding the script reads <b>3
+failures</b>, renaming <code>SUITES=(</code> reads <b>1</b>. <b>Coverage does not shrink when the
+derivation breaks</b> &mdash; the residue layer catches whatever falls out, so all three armed runs
+still checked 159 files; only the LABELLING moves, and the guards say so.</p>
+
+<p><b>IT PRINTS A CHECK COUNT NOW, AND THE COUNT IS THE COVERAGE.</b> For its whole life this gate
+read <code>checks=?</code>, so the only number it published was a failure total that reads zero
+whether the walk covers 158 files or 41 &mdash; <b>which is exactly how it was short three times
+with nothing going red.</b> <code>baselines.json</code> pins the floor at <b>158</b>, written
+before the battery off three identical standalone readings, so a walk that quietly stops covering
+something is a FALL and <code>check_de</code> reds, while a batch that adds a suite is a RISE and
+reads as a notice. <b>Eight targets could not report a check count; seven can not.</b></p>
+
+<p><b>AND A MALFORMED DATA FILE IS THE ONE POPULATION THE ENGINE SAYS NOTHING ABOUT.</b> Armed, a
+broken <code>runes.json</code> reddened the tally and left the stream CLEAN &mdash; a floor that is
+right only if you read it the way the standing rule says NOT to. The JSON failure goes to stderr
+naming itself a <code>Parse Error</code> now, so the one floor procedure covers the one floor.</p>
+
+<p><b>NEGATIVE CONTROLS &mdash; NINE ARMS, EACH TWO-ARMED AGAINST HEAD'S OWN COPY OF THE GATE</b>,
+because an arm that only reds the new gate proves that a broken file is broken rather than that the
+widening works. Disarmed, both gates read <b>0 failures</b> and <b>0</b> stderr hits. Armed:
+<code>gate_fixture.gd</code> <b>24 failures / 74 stderr hits</b> against HEAD's <b>0 / 0</b> &mdash;
+<b>the 24 are the fixture and the 23 gates EH counted</b>; <code>suite_fixture.gd</code> <b>38 /
+39</b> against <b>0 / 0</b>; a gate (<code>check_dk</code>), a suite
+(<code>test_batch_bf</code>), the run harness, a scene-run script
+(<code>check_map_screen</code>), a residue file (<code>check_dn</code>) and
+<code>data/runes.json</code> each <b>1 / 1</b> against <b>0 / 0</b>. <b>Every one reproduces EH's
+exact failure on HEAD</b>: the tally clean AND the stderr grep clean, with the tree broken. A tenth
+arm is the positive control &mdash; <code>scripts/talents.gd</code>, which the OLD gate already
+covered, reds both (<b>59</b> against HEAD's <b>10</b>), so the new walk is a superset rather than
+a replacement.</p>
+
+<p><b>&sect;2 &mdash; A BRIEF'S PRECEDENT IS A CLAIM, AND CLAIMS GET CHECKED.</b> Recorded in
+<code>CLAUDE.md</code>: <i>when a brief cites a precedent &mdash; a prior ruling, a mechanism, an
+existing ladder or convention &mdash; the batch VERIFIES it against the code before building on it,
+and reports if it does not hold.</i> <b>A wrong precedent is worse than a wrong number: a number
+gets re-derived, and a precedent gets inherited.</b> The standing rules already say to derive a
+FIGURE from the file &mdash; but a precedent is not a figure, and nothing told a batch to check
+one. <b>Documents get swept and briefs do not</b>, so a false precedent has no instrument between
+it and the next batch. <b>THE LINEAGE IS THREE ERRORS DEEP AND EVERY ONE OF THEM LIVED IN A
+BRIEF</b>: CT asserted a rune equip ladder deleted at AN &sect;9 and caught it itself; eleven
+batches later EG's brief asserted the same ladder; EH's brief then blamed <code>master.html</code>,
+<b>which has never carried the claim</b>. <b>It is forward-looking only &mdash; past briefs are
+history and are not swept.</b></p>
+
+<p><b>&sect;3 &mdash; ONE OF THE TWO CONFIRMATIONS DID NOT CONFIRM, AND THAT IS THE FINDING.</b>
+The enabler count holds: <code>PROTECTED_CORES</code> names <b>sixteen across nine specs</b>,
+derived live, and every record that reasons from it &mdash; <code>CLAUDE.md</code>, this file's EH
+entry, <code>docs/state.md</code> and <code>check_eh</code> &sect;3's live
+<code>enablers == 16</code> &mdash; says sixteen. The one surviving &ldquo;seven&rdquo; is EG's own
+changelog entry, which is an accurate record of what EG did and is corrected by the entry fifty
+lines above it. <b>The section lag does NOT hold. A third section carries it, and two more sites
+beside.</b></p>
+
+<p><b>&sect;10 SAID THERE IS NO CAP ON HOW MANY ABILITIES A HERO HOLDS</b> &mdash; the same claim
+EH repaired in &sect;6a, 1,450 lines away, and <b>a line-based sweep cannot see it because the
+sentence wraps</b>. BO &sect;2 gave earned abilities a cap and EG made it a ladder
+(<code>ABILITY_SLOTS_BY_BOSS</code> = 7/8/9/10). The words are true of the POOL and false of the
+surface they explain: the ability menu is built from <code>equipped_ability_names</code>, so it
+shows the LOADOUT. <b>Derived rather than asserted: the widest menu any of the twelve can raise is
+ELEVEN entries</b>, so &sect;10's promised range of 10&ndash;18 reaches &#8679;Q and &#8679;W and
+the rest is headroom. <b>TWO SOURCE COMMENTS CARRIED THE SAME CLAIM</b>, both in
+<code>battle.gd</code> and both attributed to Batch AH &mdash; corrected with it, and proved
+comment-only by a comment-stripped diff against HEAD: <b>0 differing code lines</b>.</p>
+
+<p><b>&sect;6.4 STILL SAID SMOKE BOMB AND FIELD DRESSING &ldquo;LAND LATER&rdquo;, AND &sect;13
+SAYS THEY ARE SPENT.</b> Field Dressing shipped at BR as a Hunter class-wide draft card and Smoke
+Bomb's function shipped at BO as Choking Smoke &mdash; both verified live in the pools rather than
+read off the document. <b>Only Blight is still owed.</b> This is the &sect;6a/&sect;6b shape again:
+DS swept &sect;13 and not the section 975 lines above it. The Sharpshooter's list beside it names
+Disengage, Suppressing Fire and Piercing Arrow, and <b>all three really are still owed</b> &mdash;
+checked, not assumed.</p>
+
+<p><b>AND &sect;11b DESCRIBED A FIRST-RUN CARD THE GAME NO LONGER SHOWS.</b> It summarised the
+framing card as teaching &ldquo;the two ability picks a zone pays out&rdquo;; the card's own text in
+<code>map_screen.gd</code> <b>names no ability pick at all</b>, and does name four node types, the
+three bargains and the 15% clear heal that the summary omits. Rewritten from the card. <b>Line
+1511's &ldquo;the only Break lever&rdquo; is deliberately left standing</b> &mdash; the code cannot
+settle whether a lever DEALS Break or AMPLIFIES it, and a claim no instrument can check is not
+repaired by asserting it harder.</p>
+
 <h2>2026-08-31 &mdash; Batch EH: THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE</h2>
 <p><i>Batch EA gave a spent zone-boss award a fallback and chose a spec-draft card <b>because that
 pool could not itself empty</b>. <b>Batch EG broke that arithmetic one batch later</b> &mdash; the

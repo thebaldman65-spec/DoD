@@ -261,14 +261,17 @@
   },
   "check_parse": {
    "kind": "gate",
-   "checks": null,
-   "checks_obs": 7,
+   "checks": [
+    158,
+    158
+   ],
+   "checks_obs": 3,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9,
-   "note": "Walks res://scripts and res://scenes only — it does NOT cover the suites, the gates or the two fixtures. Its verdict is read off stderr, never off a tally: a --script target whose base class does not resolve prints a parse error, runs not one line, and EXITS 0."
+   "fails_obs": 10,
+   "note": "**GAINED A CHECK COUNT AT EI, AND THE COUNT IS THE COVERAGE.** It read `checks=?` for its whole life, so the only number it printed was a failure total that reads zero whether the gate walks 158 files or 41 — which is why **this gate has been found short three times**: CP repaired the tally after it returned zero on genuinely broken files, DE found it does not cover the suites, and EH broke `gate_fixture.gd` and **the floor procedure's stderr grep came back CLEAN while 23 gates could not load.** The number is the file count now and THE FLOOR IS ASSERTED, so a walk that quietly stops covering something is a FALL and reds here, while a batch that adds a suite is a RISE and reads as a notice telling the next batch to record it. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF `158 checks / 0 failures`**, so `check_de` certifies on pass one. **THE POPULATION IS DERIVED FROM `run_battery.sh`, NEVER FROM A DIRECTORY LIST** — a directory list is the thing that went stale all three times. 82 targets the battery spawns, + 57 reached through their preload / ext_resource / change_scene_to_file edges and project.godot\u0027s autoloads (which is how both fixtures arrive, since nothing names them and 60 files depend on them), + 11 game-tree files reachable only by a class_name identifier, + 4 data JSON. The 4 residue files are NAMED in the output every run. Its verdict is still read off stderr and never off this tally: a --script target whose base class does not resolve prints a parse error, runs not one line, and EXITS 0."
   },
   "harness_1": {
    "kind": "harness",

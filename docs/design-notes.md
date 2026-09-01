@@ -4,6 +4,67 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A floor with a hole is worse than no floor (Batch EI) — 2026-09-01
+
+Every implement-only batch since CG has run the same two-line acceptance test: *it parses — grep
+stderr for `Parse Error`, never a tally — it runs.* That procedure was doing less than everybody
+believed. `check_parse.gd` walked `res://scripts` and `res://scenes`, and the gates, the suites and
+both fixtures live at the repo ROOT — so the floor never touched the files the floor is run to
+protect. At EH a duplicate `var` in `gate_fixture.gd` produced a **clean** stderr grep while
+twenty-three gates could not load.
+
+**The interesting part is not the hole, it is that it was dug three times by the same sentence.**
+CP repaired the gate's tally after it returned zero on genuinely broken files; DE found it did not
+cover the suites; EH found the fixtures. Three different faults, one cause: `for dir_path in
+["res://scripts", "res://scenes"]`. A directory list is a hand-written claim about where things
+that must load happen to live, it goes stale the first time somebody puts one somewhere else, and
+**nothing goes red when it does** — the gate keeps printing `0 failures`, which is what it printed
+when it was right.
+
+So the population is derived from `run_battery.sh` now, and the reason to derive it from *that*
+rather than from a wider set of folders is that the battery is the thing whose targets have to
+load. A folder is a place; the battery is the question. Add a suite to the battery and it is
+covered the same day. What no textual derivation can follow — a `class_name` global, a
+`DATA_PATH` string constant — is kept as its own named layer rather than folded in, and whatever
+is left over is **printed by name every run**, because the fourth instance of this defect will be a
+file sitting in exactly that list and a floor that is nearly complete is the one that gets trusted.
+
+**The gate deliberately preloads nothing, which reads like an omission and is the whole point.** A
+floor that `preload`s `gate_fixture.gd` cannot report that `gate_fixture.gd` is broken: it fails to
+compile itself, prints a Parse Error, runs not one line and exits 0. The instrument that checks the
+fixtures must not be one of the things that depends on them.
+
+**And it prints a check count now, which matters more than the widening.** For its whole life the
+only number this gate published was a failure total — and a failure total reads zero whether the
+walk covers 158 files or 41. That is precisely how it was short three times without anything ever
+going red: *the measurement it published could not express the defect it had.* The count is the
+coverage now, and `baselines.json` asserts the floor, so the fourth narrowing is a red rather than
+a discovery.
+
+## A precedent is inherited; a number is re-derived (Batch EI) — 2026-09-01
+
+The standing rules have said for a long time to derive a figure from the file rather than quote it,
+and the instruments enforce it — the pin manifest, the literal sweeps, `check_ed`. **A precedent is
+not a figure, and nothing was watching it.**
+
+The lineage that made the case is three errors deep and every one of them lived in a brief. CT was
+told to follow "the rune equip-slot ladder"; that ladder was deleted at AN §9 and CT caught it.
+Eleven batches later EG's brief asserted the same ladder. EH's brief then diagnosed where the false
+precedent must have come from — `master.html` — and **that document has never carried the claim**,
+so the correction was aimed at a file that was right the whole time.
+
+**Documents get swept. Briefs do not.** That asymmetry is the mechanism: a false claim in
+`master.html` is at least in a file somebody can sweep, and a false claim in a brief propagates by
+being read, into the next brief, with no surface for an instrument to bite. Writing the rule down
+does not add an instrument — there isn't one to add — but it converts a habit into an obligation.
+It is already what happens, which is the argument for recording it rather than against it: EG
+caught CT's and EH caught EG's, and a practice nobody has stated survives exactly as long as every
+session thinks to do it.
+
+**Past briefs are deliberately not swept.** They are history, the changelog holds them, and the
+reports already record every correction that was made. A rule that starts by re-litigating its own
+back catalogue spends a batch proving something the record already says.
+
 ## A floor is arithmetic, not structure (Batch EH) — 2026-08-31
 
 Batch EA gave the zone-boss award a fallback and chose the hero's own spec draft pool for it, on a

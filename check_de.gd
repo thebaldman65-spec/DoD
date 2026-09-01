@@ -325,10 +325,13 @@ func _sweep(targets: Dictionary) -> void:
 		"every recorded target ran in this battery — %d DID NOT (a subset run cannot certify the tree): %s"
 			% [absent.size(), ", ".join(PackedStringArray(absent))])
 	# THE `checks=?` RATCHET, IN BOTH DIRECTIONS AND THEY ARE NOT THE SAME NEWS.
-	# Ten of nineteen gates cannot report a check count, and a count that reads
-	# `?` is the one thing a count-diffing rule cannot compare. Losing a count
-	# is a regression; gaining one is progress that has to be recorded before
-	# the next run can hold the gate to it.
+	# A count that reads `?` is the one thing a count-diffing rule cannot
+	# compare. Losing a count is a regression; gaining one is progress that has
+	# to be recorded before the next run can hold the gate to it. The live set
+	# is derived from `baselines.json` rather than written here, because the
+	# figure that used to stand in this comment ("ten of nineteen gates") was a
+	# second copy of a number and had been wrong for eleven gates and one batch
+	# by the time EI gave `check_parse` a count.
 	_ratchet_set("check count", recorded_unreadable_checks, seen_unreadable_checks, ran)
 	_ratchet_set("failure count", recorded_unreadable_fails, seen_unreadable_fails, ran)
 

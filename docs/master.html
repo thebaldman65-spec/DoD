@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-31 (Batch EH)</b></p>
+<p align="right"><b>Last updated: 2026-09-01 (Batch EI)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2068,8 +2068,9 @@ STUNNED for 1 turn and Poisoned for 4. <b>A boss shrugs the Stun off until it is
 One trap at a time (three under Deadfall Network). A snare occupies its slot until the
 enemy it is set under acts; <b>a deadfall occupies one for as long as it has springs left</b>,
 so arming one locks out Snare Trap until it is spent.<br>
-<b>Spec pool (earnable, §6a)</b> — five of the designed eight (Blight, Smoke Bomb and
-Field Dressing land later):<br>
+<b>Spec pool (earnable, §6a)</b> — five of the designed eight. <b>Only Blight is still
+owed</b>: Smoke Bomb's function shipped as Choking Smoke in his draft pool and Field
+Dressing shipped as a Hunter class-wide draft card, so both names are spent (§13):<br>
 Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (Perfect: 12
 base).<br>
 Venom Coating — 20 Mana, 1.0, 5cd (no skill check): for 4 turns every attack applies
@@ -2628,9 +2629,11 @@ each entry live-previews its initiative cost on the bar (costs shown, unaffordab
 greyed); <b>[Alt] Items</b> — opens the item picker.</li>
 <li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F / G</b> map to the ability MENU
 slots in order — Q is always the basic attack, the Beastmaster's "Summon Companion" picker
-holds W, and the remaining abilities follow in kit order. <b>There is no cap on how many
-abilities a hero holds</b>, so slot 10 onward binds to <b>Shift + the same key in the same
-order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G). Each button shows its key, e.g.
+holds W, and the remaining abilities follow in kit order. The menu is the hero's
+<b>LOADOUT</b>, which the slot ladder caps at ten (§6b), and slot 10 onward binds to
+<b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G).
+<b>The widest menu any of the twelve can raise is eleven entries</b>, so ⇧Q and ⇧W are
+reachable today and ⇧E through ⇧G are headroom. Each button shows its key, e.g.
 "[W] Bloodlust" or "[⇧Q] Blood Price". A hotkey is ignored when the ability is unaffordable
 or gated (Death Ray below 8 Resonance, Kill Command without a living companion,
 Resurrection with nobody fallen), and hotkeys only work while the action bar is open —
@@ -2775,10 +2778,14 @@ Where an entry and this document disagreed, the code won and the document was co
 <b>once ever</b> (gated on persistent Profile flags, set on dismissal, so a returning player
 is never re-taught):</p>
 <ul>
-<li><b>The framing card,</b> on the first map of a first run: what a run <i>is</i> — climb
-the tiers, the unavoidable mini-boss halfway up, the two ability picks a zone pays out, kill
-the zone boss, three zones, death ends the run, but a felled boss leaves a relic behind
-forever.</li>
+<li><b>The framing card,</b> on the first map of a first run: what a run <i>is</i> — 49
+encounters, three zones of sixteen and then the end boss; a zone is a MAP and not a road,
+three ways forward at a time converging on the mini-boss in the middle and the boss at the
+end; stepping down a row closes the corridor above you; what an elite, the smith, the
+Peddler and ??? each are; the three bargains before every elite and mini-boss; clearing
+anything heals 15% and there is no resting; death ends the run, but a felled boss leaves a
+relic behind forever. <b>It names no ability pick</b> — the picks are taught by the offer
+overlay that hands them over.</li>
 <li><b>The skill-check pointer,</b> at the first timing bar of the first battle: the sweeping
 marker, the gold and green windows, and what each grade is worth (Perfect +15% damage and
 +25% Break plus per-ability bonuses; Sloppy 60% damage and half Break). The design's premise

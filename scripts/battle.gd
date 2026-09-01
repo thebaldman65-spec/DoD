@@ -128,8 +128,10 @@ const SS_SEQ_OFFSET := 0.85
 const SS_SEQ_SWEEP := 0.52
 
 # Ability hotkeys, mapped to ability slots in kit order (shown on the
-# buttons). Batch AH: there is no cap on how many abilities a hero holds,
-# so slot 10 onward binds to SHIFT + the same key in the same order.
+# buttons). Slot 10 onward binds to SHIFT + the same key in the same order.
+# BATCH EI: this read "there is no cap on how many abilities a hero holds"
+# since AH. BO §2 gave earned abilities a cap and EG made it a LADDER; what
+# is uncapped is the POOL, and the menu below is built from the LOADOUT.
 const ABILITY_KEYS: Array = [KEY_Q, KEY_W, KEY_E, KEY_R, KEY_A, KEY_S, KEY_D,
 	KEY_F, KEY_G]
 const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F", "G"]
@@ -22544,8 +22546,13 @@ func _kb_confirm_target() -> bool:
 
 
 # The label a menu slot wears, "" when the slot is past every hotkey.
-# Batch AH: heroes hold as many abilities as they earn, so slots 10-18 bind
-# to SHIFT + the same nine keys in the same order — ability 10 is Shift+Q.
+# Slots 10-18 bind to SHIFT + the same nine keys in the same order — ability
+# 10 is Shift+Q. **BATCH EI: THE SLOTS PAST ELEVEN ARE HEADROOM, NOT USE.**
+# This read "heroes hold as many abilities as they earn" since AH, which is
+# true of the POOL and false of what this menu shows: `_menu_entries` is
+# built from `equipped_ability_names`, and `ability_slot_cap()` tops out at
+# ten, so the widest menu any of the twelve can raise is ELEVEN entries —
+# derived, not guessed. ⇧Q and ⇧W are reachable; ⇧E through ⇧G are not yet.
 # The ⇧ rides the button label because a hotkey nobody can see is not one.
 func _hotkey_name(key_idx: int) -> String:
 	if key_idx < 0:

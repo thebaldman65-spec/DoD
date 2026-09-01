@@ -775,8 +775,11 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     `docs/changelog.html` and its archive. **They are the record of what each batch did, not a
     standard a content batch is now held to.**
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
-  **TWELVE scenes since Batch BK** (blacksmith is new). `check_parse.gd`
-  force-loads every script and scene in one pass and is the faster gate.
+  **THIRTEEN scenes in `scenes/`**, plus the two gate scenes at the repo root.
+  `check_parse.gd` force-loads all of them in one pass and is the faster gate —
+  **and since EI it force-loads the gates, the suites, both fixtures and the
+  data JSON too, off a population derived from `run_battery.sh`.** The rule
+  that binds it is in `CLAUDE.md`; this line is the pointer, not a second copy.
 - **`check_cm.gd` (Batch CM) is the GATED-ABILITY invariant gate**, and it is the enforcement
   behind the no-gated-healing rule in `CLAUDE.md`: it walks the whole 211-ability corpus and fails
   if the gated set is not the five §1 names, if any gated ability heals or revives, if the draft

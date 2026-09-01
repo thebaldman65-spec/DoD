@@ -158,10 +158,29 @@ here; the two `###` children of the equality rule travel with their parent:
   `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
   cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
   that looks like coverage. This was found and fixed three separate times.
-- **`check_parse` DOES NOT COVER THE TEST SUITES.** It walks `res://scripts` and `res://scenes`
-  only, so a syntax error in a root-level `test_batch_*.gd` is invisible to it and surfaces only
-  when the battery reaches that suite — up to forty minutes in. Load them directly when a suite
-  has just been edited.
+- **THE PARSE FLOOR COVERS EVERYTHING THE BATTERY SPAWNS, AND ITS POPULATION IS DERIVED FROM
+  `run_battery.sh` RATHER THAN FROM A LIST OF DIRECTORIES (STANDING, WIDENED AT EI §1).**
+  `check_parse` walks the battery's own `SUITES` and `GATES` arrays, every literal `--script`
+  target, every `run_one`, every scene run, the transitive `preload` / `ext_resource` /
+  `change_scene_to_file` closure of all of them, `project.godot`'s autoloads and main scene, what
+  is left of `scripts/` and `scenes/`, and `res://data/*.json`. **A target added to the battery is
+  covered the same day, without editing that gate.**
+  · **A DIRECTORY LIST IS WHAT WENT STALE, THREE SEPARATE TIMES**, and the third one is the reason
+    this rule is here: `gate_fixture.gd` was briefly broken and **the floor procedure every
+    implement-only batch runs — grep stderr for `Parse Error` — came back CLEAN while 23 gates
+    could not load**, because the repo ROOT was outside the walk. **DO NOT NARROW IT BACK TO A
+    DIRECTORY**, and do not add a population by naming its folder.
+  · **THE GATE MUST NOT `preload` ANYTHING.** A floor that preloads `gate_fixture.gd` cannot report
+    that `gate_fixture.gd` is broken — it fails to load itself, prints a Parse Error, runs not one
+    line and **exits 0**. The gate that checks the fixtures must not be one of the files that
+    depends on them.
+  · **ITS CHECK COUNT IS ITS COVERAGE AND THE FLOOR IS ASSERTED.** A failure total reads zero
+    whether the walk covers 158 files or 41, which is exactly how it was short three times without
+    anything going red. A FALL in that count is an error; a RISE is a notice telling the next batch
+    to record the number in `baselines.json`.
+  · **AND STILL GREP THE STREAM.** The tally is a ratchet on coverage, not the verdict. A data-file
+    JSON error is the one population the engine says nothing about, so the gate prints that one to
+    stderr naming itself a `Parse Error` — the floor procedure is one procedure.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -628,6 +647,29 @@ asked for a second status called `crippled` / "Crippled" at −15%. **It shipped
 time.** This is not scepticism about the designer — a brief is written from a document, and the
 document drifts from the code. **Three consecutive briefs (CR, CT, CV) each carried between three
 and five wrong claims, and every one was caught this way.**
+
+### AND A PRECEDENT IS A CLAIM, SO A PRECEDENT GETS CHECKED (STANDING, SET AT EI §2)
+> **When a brief cites a precedent — a prior ruling, a mechanism, an existing ladder or convention
+> — the batch VERIFIES it against the code before building on it, and reports if it does not
+> hold.** A wrong precedent is worse than a wrong number: a number gets re-derived, and a
+> precedent gets INHERITED.
+
+**THE RULE ABOUT FIGURES DID NOT COVER THIS, AND THE GAP IS WHY IT IS WRITTEN DOWN.** The standing
+rules already say to derive a figure from the file rather than quote it — but a precedent is not a
+figure, and nothing told a batch to check one. **DOCUMENTS GET SWEPT AND BRIEFS DO NOT**, so a
+false precedent has no instrument standing between it and the next batch; it propagates by being
+read, which is the one channel this project has never gated.
+
+- **THE WORKED EXAMPLE IS THREE ERRORS IN ONE LINEAGE, ALL OF THEM IN BRIEFS.** CT asserted a rune
+  equip ladder that had been deleted at AN §9, and found that itself. **Eleven batches later EG's
+  brief asserted the same ladder.** EH's brief then diagnosed the source as `master.html` — and
+  **that document has never carried the claim**, so the correction was aimed at a file that was
+  right all along.
+- **THIS IS ALREADY WHAT HAPPENS, AND THAT IS THE ARGUMENT FOR WRITING IT DOWN RATHER THAN AGAINST
+  IT.** It is why EG caught CT's and why EH caught EG's. **A practice nobody has stated survives
+  only as long as every session thinks to do it.**
+- **IT IS FORWARD-LOOKING ONLY. DO NOT SWEEP PAST BRIEFS.** They are history, the changelog holds
+  them, and the reports already record every correction.
 
 **THE SHAPES THE ERRORS TAKE, so they can be recognised early:**
 - **A NAMED PRECEDENT THAT DOES NOT EXIST — AND THIS ONE HAS NOW BEEN NAMED BY TWO BRIEFS,
