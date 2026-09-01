@@ -26,8 +26,9 @@ describes what happened, it is not a rule and it does not belong here.
 **DO NOT ADD A BATCH BLOCK TO THIS FILE.** If a batch learns something that binds future
 work, add or amend a RULE here in the file's own voice — dateless, batch-agnostic, stated as
 an instruction. Cite the batch that set it in parentheses for provenance, and stop there.
-**Target: this file stays under 3% of the knowledge sync and roughly flat over time** — rules
-accumulate far more slowly than batches do.
+**Target: this file stays under a stated CEILING IN KiB — see the ceiling block below.** It is
+not measured as a share of anything, and it does not state its own live size: writing that number
+into this file changes it.
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
@@ -206,25 +207,65 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   reading the rest.
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
 
-## NEVER-QUOTED IS NOT DEAD, AND 3% IS BELOW THIS FILE'S GROWTH LAW (STANDING, RULED AT ED §1)
-> **Do not prune `CLAUDE.md` by a reference count.** EC measured a third of it as never asserted and
-> never quoted; ED read all 43 of those blocks and retired **NONE**. Every one is a live standing
-> rule or a live reference. **Never being cited is what a well-obeyed rule looks like.**
+## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 290 KiB (STANDING, RULED AT EE §1)
+> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 290 KiB.**
+> **When it is reached the answer is a SPLIT. It is never a prune.** The 3%-of-sync target this
+> replaces is retired: three readings killed it and all three are recorded below, so nobody derives
+> it again.
 
-- **THE MEASUREMENT WAS SOUND AND THE INFERENCE WAS NOT.** "Neither asserted nor quoted" is a fact
-  about citation, not about load. Tested a second way — is the SUBJECT still in the tree? — the 43
-  turned up **zero dead rules and two stale NAMES**, which is a repair, not a retirement.
-- **AND THE TARGET IS THE THING THAT DOES NOT HOLD.** Over eighteen prune-free batches `CLAUDE.md`
-  grows **+4.8 KiB** against a sync growing **+79.7 KiB**: a marginal rate of **6.1%**, which is
-  where the ratio converges. **3% is reachable only by pruning, roughly every eight batches,
-  forever.** DZ's cut bought eleven batches and cost one.
-- **SO: STOP RE-DERIVING THE PRUNE.** Either move the target to the growth law or split the file the
-  way CW split the changelog. Both are the designer's, and neither is a batch's to take silently.
-- **A CORPUS THAT CONTAINS `docs/state.md` DOES NOT MEASURE WHAT IT SAYS IT MEASURES.** That file is
-  rewritten every batch, so "is this rule quoted anywhere?" is partly a question about what the last
-  rewrite happened to say. **One block changed category between EC and ED for exactly that reason** —
-  its only quote lived in EB's `state.md` and EC's own rewrite dropped it. **Exclude the
-  every-batch files, or report the number as the range it is.**
+- **A TARGET YOU CAN MEET BY COMMITTING AN UNRELATED FILE IS NOT MEASURING DENSITY.** ED cleared 3%
+  **without removing a byte** — the file GREW that batch — because the denominator grew, and 296 KiB
+  of that growth was the pin manifest ED itself added. The numerator is inside the denominator, so
+  writing a rule moves both; **the share was never a property of this file.**
+- **AND THE PRUNE HAS NOW FAILED TWICE, MEASURED.** DZ cut **51.18 KiB** at the cost of a whole
+  batch and the ratio was back over target **two batches later**. ED then read every never-cited
+  block and retired **NONE** — zero dead rules, zero surviving narrative, two stale NAMES repaired.
+  **There is no dead weight to cut, and that has been tested rather than judged.**
+- **NEVER-QUOTED IS NOT DEAD.** "Neither asserted nor quoted" is a fact about citation, not about
+  load. **Nobody quotes the rule they are obeying**, so a well-obeyed rule and a dead one produce
+  identical evidence under a citation count. **Do not prune this file by a reference count.**
+- **THE 290 KiB IS DERIVED, NOT CHOSEN.** The FLOOR is measured: DZ's prune produced **210.59 KiB**
+  with the narrative gone, and everything added since has been tested live. The HEADROOM is measured:
+  the largest single-batch growth on record is **+8.09 KiB**, and **a ceiling within one batch's
+  reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten of
+  those. 210.59 + 80.90 = 291.49, **stated as 290 and rounded DOWN** — a ceiling above its own
+  derivation is one nobody trusts.
+- **THE PROCEDURE AT 290 KiB IS A SPLIT, AND THE SEAM IS ALREADY MEASURED.** A ceiling in KiB is a
+  ceiling on the READ, not on how many rules the project may hold — **splitting caps the read
+  without capping the rules, and pruning caps the rules, which is why it was always the wrong
+  instrument.** Roughly a third of this file is rules about the INSTRUMENTS rather than about the
+  game, and the seven `STANDING REFERENCE` blocks are a smaller, cleaner cut. **Take CW's split
+  discipline with it**: both halves name each other by full path, every suite whose pin moved is
+  re-pointed in the SAME batch, and the halves are asserted to re-concatenate.
+- **DO NOT STATE THIS FILE'S LIVE SIZE IN THIS FILE.** The live reading belongs in `docs/state.md`
+  and the batch report. **A file that records its own size changes it by recording it**, which is
+  the same shape as the corpus rule below.
+
+## AN INSTRUMENT'S CORPUS MUST NOT CONTAIN WHAT THE INSTRUMENT REWRITES (STANDING, SET AT EE §2)
+> **Before quoting a measurement, name the files in its corpus that the batch itself writes.** A
+> measurement whose evidence includes the batch's own output is partly measuring its own input, and
+> it reads exactly like a measurement that is not.
+
+- **`docs/state.md` IS OUT OF ANY CITATION CORPUS, ALWAYS.** It is rewritten from scratch every
+  batch, so *"is this rule quoted anywhere?"* is partly a question about what the last rewrite
+  happened to say — **a rule can change category with nobody touching it**, and one did between EC
+  and ED. `docs/reports/<CODE>.md` and `docs/changelog.html` gain the batch's own prose the same
+  way; **name them, or report the number as the range it is.**
+- **THE SHAPE HAS COST THIS PROJECT FOUR TIMES AND THREE OF THE FOUR WERE FOUND BY A DISAGREEMENT,
+  NOT BY A FAILURE.** EC's greedy capture window was live *inside the census EC used to measure that
+  very defect*. The sync ratio holds its own numerator, so a batch could meet the target by
+  committing an unrelated file. **An instrument folded into its own subject reports a clean tree in
+  the same words a clean tree does** — which is EA §1's rule arriving through the corpus instead of
+  through an empty match.
+- **THE FOUR PLACES THAT ALREADY CLOSE IT ARE THE PATTERN TO COPY**, so nobody re-derives them:
+  `check_de` and `check_ed` each name themselves in a `SELF` constant and drop out of their own
+  sweep; `check_ec` §3 deliberately binds **no** document holder, because a section building
+  synthetic assertion text would otherwise be extracted as if a suite had written it; `check_da` §3
+  keeps the same discipline for a gate whose source carries its own fingerprint.
+- **WHERE THE CORPUS CANNOT BE NARROWED, WEIGHT IT OUT AND SAY SO.** A gate that must read a file
+  the batch writes — `check_de` against `baselines.json` — is sound because the file is the CLAIM
+  being tested, not evidence about it. **That distinction is the test: is the churning file the
+  claim, or the evidence?**
 
 ## THE CHANGELOG IS ARCHIVED ON A SCHEDULE (STANDING, SET AT BATCH CW §4)
 
@@ -294,6 +335,12 @@ watch. Live sizes and percentages live in `docs/state.md`, not here** — they m
   file picker: the suites, `docs/build_docs.py`, the archived changelog, and any audit document
   whose findings have been ruled on and applied. **Deselecting is not deleting and does not touch
   the repo.**
+- **A DERIVED FILE IS THE BEST DESELECTION CANDIDATE THERE IS, AND `pin-manifest.json` IS ONE
+  (EE §3).** It is generated by `build_pin_manifest.py`, enforced by `check_ed` off disk every
+  battery, and **the design instance has never read it**. Nothing is lost by regenerating it, which
+  is the property the suites do not have. **It stays in the repo and the gate goes on reading it.**
+  **A generated artefact belongs in the repo and not in the sync**, and adding one to the sync used
+  to be a way to satisfy a ratio — which is half of why that ratio is retired.
 - **WHAT MUST STAY SELECTED:** `CLAUDE.md`, `docs/state.md`, `docs/changelog.html`,
   `docs/master.html`, `docs/design-notes.md`, `docs/text-standard.html`, `docs/reports/`, and the
   game scripts — `battle.gd`, `unit.gd`, `classes.gd`, `talents.gd`, `run_state.gd` and the
@@ -307,14 +354,10 @@ watch. Live sizes and percentages live in `docs/state.md`, not here** — they m
   becomes unworkable.**
 - `addendum.html` is RETIRED (frozen history; do not update it) and lives in the archive folder,
   not in `docs/`.
-- **THE 3% TARGET IS MEASURED AND IS RULED ON NOWHERE (EC §3).** Three batches in a row have moved
-  the ratio and **the file grows by construction** — every batch that earns a standing rule adds
-  one — so "under 3% and roughly flat" is a treadmill rather than a target. **Measured at EC:
-  33.8% of this file is neither asserted by any suite or gate nor quoted verbatim anywhere else in
-  the repo since its own batch wrote it; only 4.3 points of that were written in the last seven
-  batches.** **A rule nobody has quoted may still be load-bearing** — the number says whether the
-  file is dense or bloated, not what to cut. **The four options and the arithmetic are in
-  `docs/reports/EC.md`; the choice is the designer's and nothing here presumes it.**
+- **THE SHARE OF THE SYNC IS NOT A TARGET AND IS NOT TRACKED (RULED AT EE §1).** `CLAUDE.md` is
+  measured in KiB against a stated ceiling — see the ceiling block above. **The sync figure is still
+  worth WATCHING**, because it is what the connector ingests; it is simply not a budget any file is
+  held to. Live sizes stay in `docs/state.md`.
 
 ## The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM, CN AND CS)
 `docs/master.html` §4.2 documents all four cases: the normal check, the gated check, the
@@ -948,6 +991,17 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   checks passed while reading nothing at all**, and the comment above them already said the
   question was "asked of the whole branch". **A slice built from a `find()` is only as real as the
   anchor: assert the anchor resolved.**
+  - **TWO THINGS LOOK LIKE THAT ASSERTION AND ARE NOT (EE §4).** **A ternary is not a guard**:
+    `x.substr(i, n) if i >= 0 else ""` reads exactly like one and is the mechanism that makes the
+    vacuum SILENT — it converts a crash into a negative assertion that holds for every needle.
+    **And an ALTERNATION member does not prove its own slice**: `ok(slice.contains(A) or
+    whole.contains(A), …)` is satisfied by the sibling while the slice reads nothing, which is EC's
+    group boundary arriving one layer down. **Only an `ok()` on the OFFSET, or a positive read of
+    the slice that stands ALONE, is a guard.**
+  - **AND THE SWEEP FOR THIS SHAPE IS RE-RUN, NOT TRUSTED ONCE.** ED swept 87 slices and repaired
+    three; re-derived at EE over a wider population it found **three more**, two of them on a
+    COMMENT anchor — the fragile residency class — and one feeding a `for` loop rather than a
+    `contains`. **The vacuum wears whatever the call site wears.**
 
 ## A SCAN THAT CAPTURES A WINDOW IS BLIND TO WHAT THE WINDOW SWALLOWED (STANDING, SET AT ED §2)
 > **Capture the ARGUMENT, never a fixed span after it.** `finditer` resumes at the END of a match,

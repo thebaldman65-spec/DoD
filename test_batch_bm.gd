@@ -173,7 +173,15 @@ func _earning() -> void:
 	var bs := _src("res://scripts/battle.gd")
 	var idx := bs.find("func _resolve_boss")
 	var body := bs.substr(idx, 2400)
-	var end_half := body.substr(body.find("# The end boss."))
+	# GUARDED (BATCH EE §4). `# The end boss.` IS A COMMENT — ED's fragile
+	# residency class — and an unasserted -1 makes `end_half` EMPTY. The
+	# negative below then holds for every needle, and the alternation under it
+	# is satisfied by its `body` sibling, so BOTH checks stay green while
+	# neither reads anything. ED swept 87 slices for exactly this and this one
+	# sat inside the sweep.
+	var half_at := body.find("# The end boss.")
+	_check(half_at >= 0, "the end-boss comment anchor resolves, so the slice is real")
+	var end_half := body.substr(half_at)
 	_check(not end_half.contains("bank_zone_boss_points"),
 		"the end boss banks no talent points")
 	_check(end_half.contains("Relics.unlock_random") or body.contains("Relics.unlock_random"),
@@ -534,6 +542,10 @@ func _negative_controls() -> void:
 		"NEGATIVE 4: a party member carries no talent purse to award into")
 	var bs := _src("res://scripts/battle.gd")
 	var vi := bs.find('var node_type := String(Run.encounter.get("type", "fight"))')
+	# GUARDED (BATCH EE §4): a -1 here yields an EMPTY slice, no lines, and a
+	# negative that is true of nothing — the same vacuum as NEGATIVE 4 above,
+	# wearing a `for` loop instead of a `contains`.
+	_check(vi >= 0, "NEGATIVE 4: the victory-branch anchor resolves, so the slice is real")
 	var victory_code := PackedStringArray()
 	for line in bs.substr(vi, 1400).split("\n"):
 		var code := String(line).strip_edges()

@@ -14,6 +14,82 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch EE: THE RATIO IS RETIRED, AND THE INSTRUMENT STOPS MEASURING ITSELF</h2>
+<p><i>A target that could be met by committing an unrelated file, and a measurement whose evidence
+included the batch's own output. <b>The 3%-of-sync target is RETIRED and replaced by a stated
+ceiling of 290 KiB with a procedure that is a SPLIT and never a prune.</b> <b><code>docs/state.md</code>
+is out of the citation corpus, and the general rule is written down.</b> <b>NO GAME BEHAVIOUR
+CHANGED, NO ABILITY MOVED AND NO CARD WAS AUTHORED.</b> Full report:
+<code>docs/reports/EE.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE 3% TARGET IS RETIRED, ON THREE READINGS THAT ALL POINT THE SAME WAY.</b>
+<b>DZ pruned 51.18 KiB at the cost of a whole batch and the ratio was back over target two batches
+later.</b> <b>ED cleared 3% without removing a byte</b> &mdash; the file GREW that batch &mdash;
+because the denominator grew, and 296 KiB of that growth was the pin manifest ED itself added.
+And the file's growth sits above the target by construction. <b>The numerator is inside the
+denominator, so writing a rule moves both: the share was never a property of this file.</b></p>
+
+<p><b>THE REPLACEMENT IS A CEILING IN KiB AND IT IS DERIVED RATHER THAN CHOSEN.</b> The FLOOR is
+measured &mdash; <b>DZ's prune produced 210.59 KiB</b> with the narrative gone, and ED then read
+every never-cited block of what has been added since and retired NONE. The HEADROOM is measured
+&mdash; <b>the largest single-batch growth on record is +8.09 KiB</b>, and a ceiling within one
+batch's reach fires on whoever writes the big batch rather than on the file's condition, so it is
+ten of those. 210.59 + 80.90 = 291.49, <b>stated as 290 KiB and rounded DOWN</b>.</p>
+
+<p><b>AND THE PROCEDURE AT THE CEILING IS THE HALF THAT MATTERS, BECAUSE A CEILING WITH NO
+PROCEDURE IS THE TREADMILL IN A DIFFERENT UNIT.</b> <b>It is a SPLIT, and it is never a prune.</b>
+A ceiling in KiB is a ceiling on the READ, not on how many rules the project may hold &mdash;
+splitting caps the read without capping the rules, and pruning caps the rules, which is why it was
+always the wrong instrument. <b>The seam is already measured</b>: roughly a third of the file is
+rules about the INSTRUMENTS rather than about the game, and the seven <code>STANDING REFERENCE</code>
+blocks are a smaller, cleaner cut. CW's split discipline travels with it.</p>
+
+<p><b>&sect;2 &mdash; THE CITATION CHECK WAS PARTLY MEASURING ITS OWN INPUT, AND
+<code>docs/state.md</code> IS OUT OF THE CORPUS.</b> That file is rewritten from scratch every
+batch, so <i>"is this rule quoted anywhere?"</i> is partly a question about what the last rewrite
+happened to say. <b>Verified from git rather than recalled</b>: the one sentence that had ever
+quoted the protected-core block lived in <b>EB's</b> <code>state.md</code> alone, EC's rewrite
+dropped it, and nothing else in the repo at EC held it.</p>
+
+<p><b>THE EXCLUSION MOVES EXACTLY ONE BLOCK &mdash; AND IT IS THE RULING BLOCK ITSELF.</b> Re-derived
+at HEAD across a sweep of quotation lengths, the census barely moves; the single block whose only
+quoter is <code>state.md</code> is the one that says the corpus contains <code>state.md</code>.
+<b>The instrument-measuring-its-own-input shape in its purest form</b>, and the reason the general
+rule is now written down: <b>before quoting a measurement, name the files in its corpus that the
+batch itself writes.</b> <b>The shape has cost this project four times</b>, and the four places that
+already close it &mdash; <code>check_de</code> and <code>check_ed</code>'s <code>SELF</code>
+constants, <code>check_ec</code> &sect;3's deliberate lack of a document holder, and
+<code>check_da</code> &sect;3 &mdash; are named as the pattern to copy.</p>
+
+<p><b>&sect;3 &mdash; <code>pin-manifest.json</code> IS DESELECTED FROM THE SYNC. NOT A REPO
+CHANGE.</b> It stays in the repo and <code>check_ed</code> goes on reading it off disk. It is
+<b>296.0 KiB, the fifth-largest of the sync's 168 files</b>, fully re-derivable by
+<code>build_pin_manifest.py</code>, and the design instance has never read it. <b>A generated
+artefact belongs in the repo and not in the sync</b> &mdash; and adding one to the sync used to be
+a way to satisfy a ratio, which is half of why that ratio is retired.</p>
+
+<p><b>&sect;4 &mdash; THE SLICE SWEEP WAS RE-RUN AND FOUND THREE MORE.</b> ED swept 87
+<code>find</code>-then-<code>substr</code> slices and repaired three; all three are confirmed still
+guarded. <b>Re-derived over a wider population of 129, three more were live, resolving and
+unguarded</b> &mdash; <code>test_batch_bm</code> &sect;1 and <code>test_run_harness</code> gate 2
+both resolving <code>"# The end boss."</code>, <b>a COMMENT in <code>battle.gd</code> and therefore
+the fragile residency class</b>, and <code>test_batch_bm</code>'s NEGATIVE 4 victory-branch slice,
+<b>which feeds a <code>for</code> loop rather than a <code>contains</code> &mdash; the same vacuum
+wearing a loop.</b> All three assert their anchor now.</p>
+
+<p><b>AND TWO THINGS THAT LOOK LIKE A GUARD ARE NOT.</b> <b>A ternary is not a guard</b>:
+<code>x.substr(i, n) if i &gt;= 0 else ""</code> reads exactly like one and is the mechanism that
+makes the vacuum SILENT. <b>And an alternation member does not prove its own slice</b> &mdash;
+<code>ok(slice.contains(A) or whole.contains(A), &hellip;)</code> is satisfied by the sibling while
+the slice reads nothing, which is EC's group boundary arriving one layer down. <b>The first build of
+this batch's own classifier called both of them guarded</b>, and the two documented vacuous
+carriers in <code>at</code> and <code>aw</code> are what caught it.</p>
+
+<p><b>THE COUNTS.</b> <code>test_batch_bm</code> 1889 &rarr; <b>1891</b>, <code>test_run_harness</code>
+gate 2 165 &rarr; <b>166</b>. Nothing else moves: no gate was added, and every other edit is prose in
+a document. <b><code>pin-manifest.json</code> is regenerated and its pin SET is byte-identical</b>
+&mdash; 1313 pins, same residency table, only the line-number provenance field moved.</p>
+
 <h2>2026-08-31 &mdash; Batch ED: THE UNREAD THIRD WAS NOT UNREAD, AND THE PINS GET A MANIFEST</h2>
 <p><i>A prune that retired nothing, and the coverage EC reported and ruled on nowhere. <b>All 43
 never-cited blocks of <code>CLAUDE.md</code> were read and every one is live &mdash; zero

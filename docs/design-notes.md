@@ -4,6 +4,54 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A share is not a size (Batch EE) — 2026-08-31
+
+The 3%-of-sync target lasted from BY to EE, and what finally killed it was not that the file kept
+breaching it. It was that **the file cleared it, at ED, without a byte being removed** — the
+denominator grew instead, and 296 KiB of that growth was a derived instrument file that has nothing
+to do with `CLAUDE.md` at all.
+
+That is the whole argument. `CLAUDE.md` is *inside* the sync it was being measured against, so
+writing a rule moves the numerator and the denominator together, and committing anything large
+moves only the denominator. **A target you can meet by committing an unrelated file is not measuring
+the property it names.** The share was never a fact about this file.
+
+What the target was *for* was keeping the guide readable, and that is a size. So the replacement is
+a size: a stated ceiling in KiB. **The number is derived rather than picked** — DZ's prune is the
+only reading of this file with the narrative gone (210.59 KiB), and the largest single-batch growth
+on record is +8.09 KiB, because a ceiling a single batch can breach fires on whoever happens to
+write the big batch rather than on the file's condition.
+
+**The procedure is the half that makes it a rule rather than a number.** A ceiling in KiB is a
+ceiling on the READ, not on how many rules the project may hold. Splitting caps the read without
+capping the rules; pruning caps the rules. That is why the answer at the ceiling is a split, and it
+is why both of this file's prunes were the wrong instrument aimed at the right worry — DZ's cost a
+whole batch and bought two, and ED's read every candidate and found nothing to cut.
+
+## An instrument's corpus is evidence, and evidence the batch writes is not evidence (Batch EE) — 2026-08-31
+
+ED noticed that a `CLAUDE.md` block changed category between two batches with nobody touching it:
+its only quotation had lived in the previous batch's `docs/state.md`, and the next rewrite of that
+file dropped the sentence. `state.md` is rewritten from scratch every batch and sits inside the
+corpus, so *"is this rule quoted anywhere?"* was partly a question about what the last rewrite
+happened to say.
+
+Excluding it is the small half. The interesting half is what the exclusion *moved*: **exactly one
+block, and it is the block that states the ruling** — held in the "quoted" category by nothing but
+`state.md`'s own paragraph about it.
+
+The general shape is worth more than either. This project has now paid for it four times: EC's
+capture-window defect was live inside the census EC used to measure that defect; the sync ratio
+holds its own numerator; and two gates already carry `SELF` constants to drop themselves out of
+their own sweeps. What ties them together is that **an instrument folded into its own subject
+reports a clean tree in exactly the words a clean tree does** — there is no failure to notice,
+which is why all four were found by a disagreement rather than by a red.
+
+The test that separates the sound case from the unsound one is short: **is the churning file the
+CLAIM, or the EVIDENCE?** `check_de` reading `baselines.json` is fine — that file is the claim being
+tested. A census reading `state.md` is not — that file is being offered as evidence about a rule's
+life, and it reflects one batch's framing.
+
 ## A citation count is not a load-bearing test (Batch ED) — 2026-08-31
 
 EC measured a third of `CLAUDE.md` as never asserted and never quoted since its own batch wrote it,

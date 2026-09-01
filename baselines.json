@@ -286,8 +286,8 @@
   "harness_2": {
    "kind": "harness",
    "checks": [
-    165,
-    165
+    166,
+    166
    ],
    "checks_obs": 9,
    "fails": [
@@ -295,7 +295,7 @@
     0
    ],
    "fails_obs": 31,
-   "note": "**SEEDED AT DX §2, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND NOT A FINDING.** Gate 2 walks three randomly GENERATED maps by taking `reachable()[0]` at every step and asserts each of six node types was crossed at least once; `test_run_harness.gd` called `seed()` ZERO times, and DW's acceptance went red on `the walk crossed a event`. **THIRTY SEEDED RUNS, THIRTY BYTE-IDENTICAL WALKS, 165 / 0 EVERY TIME**, plus this batch's battery. **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.** Over 400 unseeded walks the length is 49 every time and `fight`, `elite` and `miniboss` never approach zero — but **`blacksmith` reached ZERO once and `merchant` and `event` each came within one of it**, so THREE of the six types were at risk rather than the one that happened to fail, and the rate is well under DW's estimated 3% (2 observed in ~474 readings, counting DW's own and 40 clean standalone re-runs at HEAD). **THE ASSERTION IS NOT WIDENED** — the six being present is the question, so relaxing it to five would delete the check rather than repair it (DD's rule). **THE SEED IS TAKEN AT EVERY BOARD GENERATION RATHER THAN ONCE**: seeding once leaves zones 1 and 2 drawing off whatever the loop consumed before them, so one added RNG draw inside the walk would silently re-roll two of three boards; per-generation is `bo`'s per-pair seed one layer out. The three boards stay DIFFERENT from one another because `_generate_map` reads `zone_idx`. **NEGATIVE CONTROL: `seed(101)` misses `event` and fails gate 2 on DW's own assertion, reproduced on demand.** **`test_batch_at` §1 IS NOW THE ONLY ROW IN THIS FILE CARRYING A FLAKE FIELD.**"
+   "note": "**SEEDED AT DX §2, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND NOT A FINDING.** Gate 2 walks three randomly GENERATED maps by taking `reachable()[0]` at every step and asserts each of six node types was crossed at least once; `test_run_harness.gd` called `seed()` ZERO times, and DW's acceptance went red on `the walk crossed a event`. **THIRTY SEEDED RUNS, THIRTY BYTE-IDENTICAL WALKS, 165 / 0 EVERY TIME**, plus this batch's battery. **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.** Over 400 unseeded walks the length is 49 every time and `fight`, `elite` and `miniboss` never approach zero — but **`blacksmith` reached ZERO once and `merchant` and `event` each came within one of it**, so THREE of the six types were at risk rather than the one that happened to fail, and the rate is well under DW's estimated 3% (2 observed in ~474 readings, counting DW's own and 40 clean standalone re-runs at HEAD). **THE ASSERTION IS NOT WIDENED** — the six being present is the question, so relaxing it to five would delete the check rather than repair it (DD's rule). **THE SEED IS TAKEN AT EVERY BOARD GENERATION RATHER THAN ONCE**: seeding once leaves zones 1 and 2 drawing off whatever the loop consumed before them, so one added RNG draw inside the walk would silently re-roll two of three boards; per-generation is `bo`'s per-pair seed one layer out. The three boards stay DIFFERENT from one another because `_generate_map` reads `zone_idx`. **NEGATIVE CONTROL: `seed(101)` misses `event` and fails gate 2 on DW's own assertion, reproduced on demand.** **`test_batch_at` §1 IS NOW THE ONLY ROW IN THIS FILE CARRYING A FLAKE FIELD.** **BATCH EE ADDED ONE CHECK, 165 -> 166**: gate 2's end-boss slice took `body.substr(body.find(\"# The end boss.\"))` with the locator unasserted, and the ONLY assertion on that slice is a NEGATIVE one — an empty slice satisfies it for every needle, in silence. The anchor is asserted now. It is a COMMENT in `battle.gd`, ED's fragile residency class, and `test_batch_bm` carried the same anchor with the same hole."
   },
   "harness_3": {
    "kind": "harness",
@@ -696,8 +696,8 @@
   "test_batch_bm": {
    "kind": "suite",
    "checks": [
-    1889,
-    1889
+    1891,
+    1891
    ],
    "checks_obs": 1,
    "fails": [

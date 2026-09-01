@@ -384,7 +384,12 @@ func _gate_talent_conservation() -> void:
 	# place a rule with no reachable gate can be checked at all (BM's idiom).
 	var bs := _src("res://scripts/battle.gd")
 	var body := bs.substr(bs.find("func _resolve_boss"), 2400)
-	var end_half := body.substr(body.find("# The end boss."))
+	# GUARDED (BATCH EE §4). The same comment anchor `test_batch_bm` reads, and
+	# here the ONLY assertion on the slice is a negative one — an empty
+	# `end_half` satisfies it for every needle, in silence.
+	var half_at := body.find("# The end boss.")
+	_check("the end-boss comment anchor resolves", half_at >= 0, true)
+	var end_half := body.substr(half_at)
 	_check("the end boss banks no talent points",
 		end_half.contains("bank_zone_boss_points"), false)
 	_check("the zone boss does", body.contains("Run.bank_zone_boss_points()"), true)
