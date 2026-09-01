@@ -617,9 +617,12 @@ document drifts from the code. **Three consecutive briefs (CR, CT, CV) each carr
 and five wrong claims, and every one was caught this way.**
 
 **THE SHAPES THE ERRORS TAKE, so they can be recognised early:**
-- **A NAMED PRECEDENT THAT DOES NOT EXIST.** "Follow the rune equip-slot ladder — it grows 2→3→4
-  by zone and announces each new slot": that ladder was DELETED batches earlier and the function
-  has returned a flat 3 ever since. There was nothing to copy.
+- **A NAMED PRECEDENT THAT DOES NOT EXIST — AND THIS ONE HAS NOW BEEN NAMED BY TWO BRIEFS,
+  ELEVEN BATCHES APART.** "Follow the rune equip-slot ladder — it grows 2→3→4 by zone and announces
+  each new slot": that ladder was DELETED at AN §9 and `rune_slots()` has returned a flat 3 ever
+  since. There was nothing to copy at CT and there was nothing to copy at EG. **A FALSE PRECEDENT
+  SURVIVES BEING CAUGHT**, because it is caught in a batch report and briefs are written from the
+  design document. **When one is found, correct the document it came from, not only the batch.**
 - **A LAYOUT CLAIM THAT WAS NEVER MEASURED.** "Six buttons fit the existing row" — at the shipped
   pitch, button six spanned x=1270–1452 on a 1280-wide viewport. **Measure it; do not eyeball it.**
 - **A NAME THAT COLLIDES WITH A LIVE ONE.** A requested status id already existed under a
@@ -1205,7 +1208,7 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v10, auto-saved after every slot), relic slots
+  save (user://run_save.bin v12, auto-saved after every slot), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
   and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
@@ -1250,8 +1253,11 @@ test_batch_bm's negative control 1 builds the collapse and proves it is rejected
   ONCE. Points are per spec; rows are not. A tier arrives FULLY unlocked, which is what an
   uncapped bank is for. A fresh save has NO rows, NO points and no talents at all.
 · **VERSIONS** — `Profile` is **v2** (tolerant load: a v1 profile arrives at tier 0 with zero
-  points, the correct state). The run save is **v10** and **a pre-v10 save is REFUSED and
+  points, the correct state). The run save is **v12** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
+  **v11 (CT) and v12 (EG) ARE BOTH TOLERANT AND NEITHER MOVED THE REFUSAL THRESHOLD** — the
+  threshold is a claim about a structure this build cannot walk, and a version bump for a field
+  with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.**
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
   `Run.award_spec_point`, `member["talent_points"]`, `member["talent_flex"]`,
   `Talents.can_learn`, `Talents.purse_for`, `Talents.points_spent`, `MAX_PER_ROW`, the events
@@ -1649,7 +1655,7 @@ status into the draft turned four tree-internal dependencies — which the chart
   whenever the card was drafted**, and the honest wording already exists on one of them.
 
 
-## STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
+## STANDING REFERENCE — THE ABILITY DRAFT, THE SLOT LADDER AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX, the cap and the loadout at EG)
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, on ONE SCREEN of four columns, each hero drawing
 from their OWN pools and keeping their OWN no-return ledger.**
 
@@ -1659,19 +1665,22 @@ from their OWN pools and keeping their OWN no-return ledger.**
 the game**, which is what "the existing pick, unchanged" forbids. **A drafted ability lands in
 `member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero sheet,
 `Talents.ability_names`, the rune filter and the upgrade pairing all pick it up with no new
-plumbing — **NO SAVE VERSION MOVES**; the member keys (`draft_candidates`, `draft_picks_owed`,
-`draft_refused`) ride the party dict, which is saved wholesale. **A drafted card removes itself
-from the boss offer and vice versa; that one shared list is what lets a boss pool empty below its
-own depth.**
-· **THE CAP IS SEVEN (`Run.ABILITY_SLOT_CAP`) AND IT BINDS EVERY SOURCE**, the boss pick included:
-  a cap one pool can walk past is not a cap. `Run.ability_slots_used` = `Classes.core_slots(spec)`
-  + earned.
-· **PROTECTED = THE OPENING KIT. EARNED = DROPPABLE.** `Run.drop_earned_ability` is THE ONE PLACE
-  a drop is written and it refuses anything not in `bm_abilities` — so "a protected ability can
-  never be dropped" is not a branch that could be got wrong, it is the absence of the name from
-  the list. Both pick paths call it.
-· **DECLINING REFUSES THE WHOLE OFFER; TAKING ONE REFUSES NOTHING.** `draft_refused` is the
-  no-return ledger, per hero per run. A DROP writes it too.
+plumbing — **NO SAVE VERSION MOVED FOR THE DRAFT ITSELF** (EG moved it for the slot ladder, which
+is run state rather than a member key); the member keys (`draft_candidates`, `draft_picks_owed`,
+`draft_refused`, and **`bm_equipped` since EG**) ride the party dict, which is saved wholesale.
+**A drafted card removes itself from the boss offer and vice versa; that one shared list is what
+lets a boss pool empty below its own depth.**
+· **THE CAP IS A LADDER AND IT BINDS EVERY SOURCE**, the boss pick included: a cap one pool can
+  walk past is not a cap. `Run.ability_slots_used` = `Classes.core_slots(spec)` + the LOADOUT, and
+  it is compared against **`Run.ability_slot_cap()`, never against a constant**.
+· **PROTECTED = THE OPENING KIT. EARNED = BENCHABLE, NEVER LOST.** `Run.unequip_earned_ability` is
+  THE ONE PLACE a card leaves the loadout and it refuses anything not in `bm_abilities` — so "a
+  protected ability can never be benched" is not a branch that could be got wrong, it is the
+  absence of the name from the list. `Run.hold_ability` is the ONE place a card enters the pool,
+  and both pick paths call both.
+· **DECLINING REFUSES THE WHOLE OFFER; TAKING ONE REFUSES NOTHING; BENCHING ONE REFUSES NOTHING.**
+  `draft_refused` is the no-return ledger, per hero per run, and **`decline_draft` is its only
+  writer since EG.**
 · **THE OFFER FILLS SHORT rather than padding with repeats**, and `Run.draft_card_is_class` is the
   one-in-four seam — **its own function precisely so a test can drive it 4000 times.** A check on
   the roller that could only ever measure zero is a check that can only pass, which is a gap.
@@ -1721,6 +1730,47 @@ they feed no passive, so at equal power they would be a safe default that dilute
 AGAINST THE FREE CORE ATTACK TOO** — a comparison against spec ABILITIES alone misses a card
 dominated by a basic.
 
+## STANDING RULE — THE SLOT LADDER, AND THE POOL IS NOT THE LOADOUT (Batch EG)
+> **ABILITY SLOTS GROW ON A ZONE BOSS: `Run.ABILITY_SLOTS_BY_BOSS` is `[7, 8, 9, 10]` and
+> `Run.ability_slot_cap()` is the only reader of it. AND A HERO'S POOL AND HIS LOADOUT ARE TWO
+> SETS: `bm_abilities` is everything he has earned and nothing ever leaves it; `bm_equipped` is
+> what he carries, and it is what the cap binds.**
+
+- **NEVER COMPARE AGAINST A CAP CONSTANT. ASK `Run.ability_slot_cap()`.** It is a function for the
+  same reason `Run.item_slots()` is: the number moves inside a run. A suite that fills a hero "to
+  the cap" writes `run.ability_slot_cap() - Classes.core_slots(spec)` and never a literal — BO's
+  own rule about writing a refusal setup relative to the live pool, one door along.
+- **THE LADDER IS INDEXED BY ZONE BOSSES CLEARED, NOT BY `zone_idx`, AND THE TWO PART COMPANY ON
+  THE THIRD BOSS.** BM §6 made the end boss a slot on the third zone's own board, so
+  `has_next_zone()` is already false when the third ZONE boss dies, `advance_zone()` never runs and
+  `zone_idx` stays 2. **A ladder read off `zone_idx` grants twice in a run that beats all three.**
+  `Run.zone_bosses_cleared` counts the event; `Run.note_zone_boss_cleared()` is its only writer.
+- **THE SLOT ARRIVES BEFORE THE AWARD, IN `battle._resolve_boss`, AND THAT ORDER IS LOAD-BEARING.**
+  It is granted by the boss dying rather than by the award being offered, so a hero whose pools are
+  both dry still gains it — and granting it first is what makes "a hero at cap can receive both"
+  true, because the pick is resolved later against a cap that has already moved.
+- **RESET IT WHERE `zone_idx` IS RESET.** A second run in one session would otherwise open every
+  hero at ten. This is CT's scar (the opening pouch sized off the previous run's zone) arriving at
+  a second ladder; it is written down rather than re-learned.
+- **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION, AND THERE ARE ONLY TWO QUESTIONS.**
+  *What can this hero CAST?* → the loadout (`Run.equipped_ability_names`) — the battle spawn and
+  the hero sheet, and nothing else. *What does this hero OWN, so he is not offered it again?* → the
+  pool (`bm_abilities`) — `Runes.kit_names` → `Talents.ability_names` → `Run.owned_ability_names`,
+  and through it the draft, the boss award and its fallback. **READING THE LOADOUT FOR THE SECOND
+  QUESTION RE-OFFERS A BENCHED CARD AS IF IT WERE NEW**, which is the exact defect
+  `owned_ability_names` exists to prevent.
+- **A BENCH IS NOT A DROP AND MUST NOT WRITE THE LEDGER.** A benched card is blocked from being
+  re-offered by OWNERSHIP, not by refusal. **`decline_draft` is the ledger's only writer**, and the
+  no-return rule is unchanged: a declined offer is gone for the run.
+- **A STEP THAT LISTS WHAT MAY BE BENCHED LISTS THE LOADOUT, NEVER THE POOL.** The pool holds
+  benched cards, which cannot be benched again — listing them puts a button on the screen that the
+  door correctly refuses and that therefore does nothing. **The bot has the same obligation**: a
+  policy that names a card off `earned_ability_names` gets a refusal string back and counts a
+  capped offer as an untaken one.
+- **`bm_equipped` DEFAULTS TO THE WHOLE POOL AND THAT DEFAULT IS WHY NO SAVE WAS WIPED.** A member
+  dict written before EG — a v11 save, and every suite fixture that stuffs `bm_abilities` — means
+  exactly what it always meant: everything earned is carried. **Do not "tidy" that default away.**
+
 ## STANDING DESIGN RULE — A ZONE-BOSS AWARD ALWAYS PAYS (Batch EA §1)
 > **When a hero's SPEC BOSS pool is exhausted, the award pays a card from that hero's SPEC DRAFT
 > pool that they do not already hold.** It is offered three at a time and **announced exactly like
@@ -1739,9 +1789,20 @@ dominated by a basic.
   that keeps a zone-boss award feeling like one. A rune returns `[]` in a runes-off run, which
   reintroduces the hole somewhere else; gold does not move the depth table at all. And it stays
   SPEC-LOCKED, so AN §4's ruling holds.
-- **THE FALLBACK POOL CANNOT ITSELF EMPTY, AND THAT IS ARITHMETIC.** A hero holds at most
-  `ABILITY_SLOT_CAP - core_slots(spec)` earned abilities against spec draft pools of ten to
-  thirteen. **The live floor is in `docs/state.md`; it is not restated here.**
+- **THE FALLBACK POOL CANNOT BE EMPTIED BY THE LOADOUT, AND EG §2 MADE THE LOADOUT THE WRONG
+  BOUND.** EA's arithmetic was that a hero holds at most `ABILITY_SLOT_CAP - core_slots(spec)`
+  earned abilities against spec draft pools of ten to thirteen. **Both terms moved at EG**: the cap
+  is a ladder to ten, and — decisively — **a benched card stays in the pool, so what a hero OWNS is
+  every card he has ever taken and is bounded by the POOL rather than by the cap.**
+  `owned_ability_names` is what the fallback filters on, so it is the pool that drains it.
+  **UNDER THE LOADOUT BOUND THE FALLBACK STILL CANNOT EMPTY; UNDER THE POOL BOUND IT CAN.**
+  `check_ea` §1 asserts the first and PRINTS the second, because closing the second is a design
+  decision (a class-wide third tier, priced at EA and not taken) and **a gate encodes a ruling.**
+  **The live floors are in `docs/state.md`; they are not restated here.**
+- **AND "AN AWARD ALWAYS PAYS" AND "AN AWARD OFFERS THREE" ARE TWO CLAIMS.** They were one
+  assertion until EG, because at a flat cap of seven the floor was six everywhere and both held.
+  **The rule is the first one** (`floor >= 1`); the second is stricter, and the specs that can fill
+  short are a NAMED SET in `check_ea` §1 rather than a loosened band.
 - **AND `owned_ability_names` CANNOT SEE AN ABILITY A RUNE GRANTS** — the grant lands on the battle
   `cfg`, never on the member dict. That is pre-existing and shared by every channel, but it is the
   one term that can push the floor below the slot arithmetic, so **derive it off `runes.json`

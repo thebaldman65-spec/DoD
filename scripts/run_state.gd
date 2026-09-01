@@ -209,6 +209,16 @@ const ZONE_DEFS := {
 const SLOT_POOLS := [["forest"], ["scarlands"], ["forest"]]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
+# BATCH EG §1 — HOW MANY ZONE BOSSES THIS RUN HAS PUT DOWN, AND WHY IT IS NOT
+# `zone_idx`. The ability slot ladder grants on a ZONE BOSS, and the third zone
+# boss is followed by the END BOSS on the same board (BM §6) — `has_next_zone()`
+# is already false when it dies, so `advance_zone()` never runs and `zone_idx`
+# stays 2. A ladder read off `zone_idx` would therefore grant TWICE in a run
+# that beats all three, which is the pouch ladder's shape and the wrong one
+# here: `ITEM_SLOTS_BY_ZONE` is indexed by the zone you are STANDING IN and
+# deliberately holds three values for three zones. This counts the EVENT the
+# brief names.
+var zone_bosses_cleared := 0
 var zone_name := "Forest of Old"
 var zone_draw: Array = []  # this run's drawn zone ids, one per slot
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
@@ -469,6 +479,12 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	# Nothing read the slot count before this batch, so the stale read was
 	# harmless until now. It is not harmless now.
 	zone_idx = 0
+	# BATCH EG §1 — AND THE ABILITY LADDER IS THE SAME TRAP, RESET IN THE SAME
+	# PLACE FOR THE SAME REASON. A second run in one session would otherwise
+	# open every hero at a cap of TEN off the previous run's three dead bosses.
+	# CT's scar above is the whole argument; this is it applied rather than
+	# re-learned.
+	zone_bosses_cleared = 0
 	# BATCH CT §1 — THE RESOLUTION, WRITTEN DOWN AS THE BRIEF REQUIRED.
 	# Five starting TYPES against four slots at zone 1 does not fit, and §1
 	# gave two ways out: drop the opening to four types, or make the player
@@ -1453,42 +1469,160 @@ func award_ability_pick(member: Dictionary) -> bool:
 	return true
 
 
-# ---------- THE ABILITY DRAFT (Batch BO §2/§3) ----------
+# ---------- THE ABILITY DRAFT (Batch BO §2/§3, rewired by BATCH EG) ----------
 #
-# ABILITY SLOTS CAP AT SEVEN, AND THE PROTECTED CORE COUNTS AGAINST IT — so
-# most specs carry 3 protected and 4 draftable (Holy carries 4 and 3; see
+# ABILITY SLOTS GROW ON A ZONE BOSS, AND THE PROTECTED CORE COUNTS AGAINST
+# THEM — so most specs open on 3 protected and 4 draftable and end a full run
+# on 3 and 7 (Holy opens on 4 and 3 and ends on 4 and 6; see
 # `Classes.PROTECTED_CORES` for the twelve-core table and why the Beastmaster's
 # five opening abilities are three slots).
 #
-# EVERY DROP DECISION IS AMONG EARNED ABILITIES. Protected ones can never be
-# dropped, which is what makes the cap unable to break a passive: the failure
-# mode this whole section exists to prevent is a spine that stops working
-# because its enabler was droppable, and that failure is SILENT.
-const ABILITY_SLOT_CAP := 7
+# **BATCH EG §1 — WHY THE LADDER, AND WHY IT IS THE POUCH'S SHAPE AND NOT THE
+# RUNES'.** Four draftable slots against roughly thirty offers a run made the
+# draft over after zone one: every offer after that was refuse-or-swap, and a
+# swap cost the card for the rest of the run. **AN §9 DELETED THE RUNE LADDER
+# FOR A REASON THAT LOOKS LIKE AN OBJECTION TO THIS ONE** — "a run that died in
+# zone 2 never owned a third slot" — and CT §1 kept the POUCH ladder against
+# the same objection, on the ground that a pouch slot is FILLED THE MOMENT YOU
+# REACH A MERCHANT, so growth loosens a tradeoff rather than diluting a reward.
+# **AN ABILITY SLOT IS THE POUCH CASE AND NOT THE RUNE CASE**: a draft offer
+# lands at every elite and a boss award at every zone boss, so a slot opened
+# here is filled almost immediately, and it is never dead weight. (The brief
+# named "the rune equip ladder" as a second precedent to follow. THERE IS NO
+# SUCH LADDER — `rune_slots()` has returned a flat 3 since AN §9, and CT §1's
+# own header records its brief making the identical claim.)
+#
+# THE ONE AUTHORED COPY OF THE LADDER. Indexed by ZONE BOSSES CLEARED, never
+# by `zone_idx` — see `zone_bosses_cleared` for why those two part company on
+# the third boss.
+const ABILITY_SLOTS_BY_BOSS := [7, 8, 9, 10]
 
 
-# What the hero has EARNED — boss picks and drafted cards alike, in the one
-# list `bm_abilities` they have always shared. This is the drop pool, and
-# nothing else in it can be dropped.
+# The cap RIGHT NOW. Clamped at both ends so a fourth zone boss (or a save
+# written by a build with a longer ladder) reads the last rung rather than off
+# the end — `item_slots()`'s idiom, one function per ladder.
+func ability_slot_cap() -> int:
+	return int(ABILITY_SLOTS_BY_BOSS[clampi(zone_bosses_cleared, 0,
+		ABILITY_SLOTS_BY_BOSS.size() - 1)])
+
+
+# BATCH EG §1 — THE GRANT, AND IT IS ITS OWN EVENT. Called from
+# `battle._resolve_boss` on a ZONE boss only (never the end boss: nothing
+# follows it), and called BEFORE `_award_ability_picks` so the hero the boss is
+# about to pay has the new slot to receive it into. The cap is derived from the
+# count rather than written, so this function cannot drift from the ladder.
+func note_zone_boss_cleared() -> void:
+	zone_bosses_cleared += 1
+
+
+# ---------- BATCH EG §2 — THE POOL AND THE LOADOUT ARE TWO SETS ----------
+#
+# `bm_abilities` IS THE POOL AND KEEPS ITS NAME. It is what the hero has
+# EARNED — boss picks and drafted cards alike, in the one list both channels
+# have always written — and **nothing ever leaves it during a run.** Every
+# question of the form "does this hero already own that card" reads it, through
+# `owned_ability_names` -> `Talents.ability_names` -> `Runes.kit_names`, and
+# that is why the pool and not the loadout is the set those readers want: a
+# card benched on the party screen is still owned, and re-offering it would be
+# a duplicate.
+#
+# `bm_equipped` IS THE LOADOUT AND IS NEW. It is the subset the hero actually
+# carries into a fight, and it is what the slot cap binds. **IT DEFAULTS TO THE
+# WHOLE POOL**, which is what makes every pre-EG member dict — a v11 save, and
+# the ninety-odd suite fixtures that stuff `bm_abilities` directly — mean
+# exactly what it meant before: everything earned is equipped until something
+# unequips it.
+#
+# EVERY UNEQUIP DECISION IS AMONG EARNED ABILITIES. Protected ones are not in
+# the pool at all, so there is no branch to get wrong — which is what makes the
+# cap unable to break a passive, the failure mode this whole section exists to
+# prevent.
 func earned_ability_names(member: Dictionary) -> Array:
 	return member.get("bm_abilities", []).duplicate()
+
+
+# What the hero fights with: the pool minus whatever is benched. A member that
+# has never benched anything carries no `bm_equipped` key and reads its pool.
+func equipped_ability_names(member: Dictionary) -> Array:
+	return member.get("bm_equipped", member.get("bm_abilities", [])).duplicate()
+
+
+# Benched: held, and not carried. The party screen's swap list.
+func benched_ability_names(member: Dictionary) -> Array:
+	var carried: Array = equipped_ability_names(member)
+	return earned_ability_names(member).filter(
+		func(n): return not carried.has(n))
 
 
 func ability_slots_used(member: Dictionary) -> int:
 	var spec := String(member.get("spec", ""))
 	if spec == "":
 		return 0
-	return Classes.core_slots(spec) + earned_ability_names(member).size()
+	return Classes.core_slots(spec) + equipped_ability_names(member).size()
 
 
 func ability_slots_full(member: Dictionary) -> bool:
-	return ability_slots_used(member) >= ABILITY_SLOT_CAP
+	return ability_slots_used(member) >= ability_slot_cap()
 
 
-# THE NO-RETURN LEDGER. A declined or dropped ability does not come back to
-# that run's pool — otherwise the offer keeps re-presenting exactly what was
-# just refused. Per hero, per run; it rides the member dict, so it is saved and
-# loaded with everything else and NO SAVE VERSION MOVES (still v10).
+# BATCH EG §2 — THE TWO DOORS A LOADOUT MOVES THROUGH, AND NEITHER TOUCHES THE
+# NO-RETURN LEDGER. `drop_earned_ability` stood here until EG and did two
+# things at once: it took the card out of the kit AND wrote `draft_refused`, so
+# a swap cost the card for the rest of the run. Benching is free and reversible
+# now, and the card cannot come back as an offer for the ordinary reason — it
+# is still in the pool, so `owned_ability_names` already blocks it. **THE
+# LEDGER IS UNCHANGED AND STILL BITES; ITS ONE WRITER IS `decline_draft`.**
+func unequip_earned_ability(member: Dictionary, name: String) -> bool:
+	var carried: Array = equipped_ability_names(member)
+	if not carried.has(name):
+		return false
+	# A protected ability is not in the POOL, so it can never be benched even
+	# though it is always carried — the absence is the rule.
+	if not earned_ability_names(member).has(name):
+		return false
+	carried.erase(name)
+	member["bm_equipped"] = carried
+	return true
+
+
+func equip_earned_ability(member: Dictionary, name: String) -> bool:
+	if not earned_ability_names(member).has(name):
+		return false
+	var carried: Array = equipped_ability_names(member)
+	if carried.has(name):
+		return false
+	if ability_slots_full(member):
+		return false
+	carried.append(name)
+	member["bm_equipped"] = carried
+	return true
+
+
+# THE ONE PLACE A CARD ENTERS THE POOL, FROM EITHER CHANNEL, so the pool and
+# the loadout can never be written half-way by one caller and not the other.
+# `take_draft_ability` calls it for the draft and `map_screen._pick_ability`
+# for the boss pick — the two channels that have always written `bm_abilities`,
+# through one writer now instead of two.
+func hold_ability(member: Dictionary, name: String, equip: bool) -> void:
+	var carried: Array = equipped_ability_names(member)
+	member["bm_abilities"] = member.get("bm_abilities", []) + [name]
+	if equip:
+		carried.append(name)
+	member["bm_equipped"] = carried
+
+
+# THE NO-RETURN LEDGER, AND IT STILL BITES. A DECLINED ability does not come
+# back to that run's pool — otherwise the offer keeps re-presenting exactly what
+# was just refused. Per hero, per run; it rides the member dict, so it is saved
+# and loaded with everything else.
+#
+# **BATCH EG §2 — IT HAS ONE WRITER NOW AND IT USED TO HAVE TWO.** A DROP wrote
+# it as well, because a drop was permanent. Benching is not a drop: the card
+# stays in the pool and is blocked from being re-offered by `owned_ability_names`
+# rather than by this list, which is the same guarantee reached through the set
+# that is actually true of it. **THE LEDGER IS WHAT KEEPS A LOADOUT A BUILD
+# RATHER THAN A SOLVED OPTIMISATION** — the pool is still exactly what the run
+# dealt you, and a refused card is refused for good.
 func draft_refused(member: Dictionary) -> Array:
 	return member.get("draft_refused", [])
 
@@ -1571,27 +1705,17 @@ func owed_draft_picks() -> int:
 	return n
 
 
-# THE ONE PLACE A DROP IS WRITTEN. Both pick paths — the boss pick and the
-# draft — call it, so the no-return rule cannot be applied in one and forgotten
-# in the other. It refuses anything that is not an EARNED ability, which is the
-# mechanical form of "protected abilities can never be dropped": a protected
-# name is simply not in this list, so there is no branch to get wrong.
-func drop_earned_ability(member: Dictionary, name: String) -> bool:
-	var kept := earned_ability_names(member)
-	if not kept.has(name):
-		return false
-	kept.erase(name)
-	member["bm_abilities"] = kept
-	_refuse_draft(member, name)
-	return true
-
-
-# TAKE ONE. At the cap this is take-one-AND-DROP-ONE: the caller names the
-# earned ability the incoming card replaces, and a drop that is not an EARNED
-# ability is refused outright — a protected ability can never be named here.
+# TAKE ONE. At the cap this is take-one-AND-BENCH-ONE: the caller names the
+# earned ability the incoming card displaces from the LOADOUT, and a name that
+# is not an EARNED ability is refused outright — a protected ability can never
+# be named here. **BATCH EG §2: THE BENCHED CARD IS KEPT.** It stays in the
+# pool, it is swappable back on the party screen, and it does not enter the
+# no-return ledger. The shape of the take is deliberately unchanged — at the
+# cap you still choose — because the complaint the batch answers is that the
+# choice was PERMANENT, not that it existed.
 # Returns "" on success, or the reason it was refused.
 func take_draft_ability(member: Dictionary, name: String,
-		drop_name := "") -> String:
+		bench_name := "") -> String:
 	if int(member.get("draft_picks_owed", 0)) < 1:
 		return "no pick is owed"
 	var queue: Array = member.get("draft_candidates", [])
@@ -1600,13 +1724,13 @@ func take_draft_ability(member: Dictionary, name: String,
 	if owned_ability_names(member).has(name):
 		return "already known"
 	if ability_slots_full(member):
-		if drop_name == "":
-			return "the kit is full — name an ability to drop"
-		if not drop_earned_ability(member, drop_name):
-			return "%s cannot be dropped" % drop_name
+		if bench_name == "":
+			return "the kit is full — name an ability to bench"
+		if not unequip_earned_ability(member, bench_name):
+			return "%s cannot be benched" % bench_name
 	queue.pop_front()
 	member["draft_candidates"] = queue
-	member["bm_abilities"] = member.get("bm_abilities", []) + [name]
+	hold_ability(member, name, true)
 	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) - 1
 	return ""
 
@@ -1745,8 +1869,26 @@ func save_run() -> void:
 	# renders honestly and the player can leave, so it beats wiping the run. The
 	# only genuinely new field is `pending_item_offers`, which a v10 save has
 	# none of and correctly loads empty.
+	# v12 (BATCH EG): the ability slot cap is a LADDER and the loadout is a
+	# subset of the pool. Two new pieces of state, and BOTH ARE TOLERANT — the
+	# refusal threshold below is untouched at 10 and this version needs none of
+	# its own.
+	#   * `zone_bosses_cleared` (here). A v11 save has none, and the default is
+	#     NOT zero: it is `zone_idx`, which is the correct count for every save
+	#     except one written in the window between the third ZONE boss and the
+	#     end boss. Defaulting to zero would silently take a resumed zone-3 run
+	#     back to a cap of seven; defaulting to `zone_idx` is right for both
+	#     earlier zones and one rung low for that last window, which loses a
+	#     slot rather than three. **THE CAP ONLY EVER RISES, SO NO TOLERATED
+	#     DEFAULT CAN PUT A HERO OVER IT** — seven is the ladder's floor and
+	#     every v11 kit was built against seven.
+	#   * `bm_equipped`, per member. It rides the member dict exactly as
+	#     `draft_refused` has since BO, so it is saved and loaded with the party
+	#     and needs no key here. A member without it reads its whole pool as its
+	#     loadout, which is what a v11 member meant.
 	file.store_var({
-		"version": 11, "party": party, "items": items, "gold": gold,
+		"version": 12, "party": party, "items": items, "gold": gold,
+		"zone_bosses_cleared": zone_bosses_cleared,
 		"pending_item_offers": pending_item_offers,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
@@ -1780,6 +1922,9 @@ func load_run() -> bool:
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]
+	# BATCH EG §1 — see the version block in `save_run` for why the default is
+	# `zone_idx` and not 0.
+	zone_bosses_cleared = int(data.get("zone_bosses_cleared", zone_idx))
 	zone_name = data["zone_name"]
 	zone_draw = data.get("zone_draw", [])
 	if zone_draw.is_empty():
@@ -2839,10 +2984,18 @@ func roll_spec_ability_offer(member: Dictionary) -> Array:
 # is spec-locked, so AN §4's ruling holds: nothing arrives here that a sibling
 # spec alone can reach.
 #
-# THE POOL CANNOT ITSELF EMPTY, AND THAT IS ARITHMETIC RATHER THAN A HOPE. A
-# hero holds at most `ABILITY_SLOT_CAP - Classes.core_slots(spec)` earned
-# abilities — FOUR, or three for Holy — against spec draft pools of 10 to 13.
-# **The floor is SIX cards**, which is twice the three an offer wants.
+# THE POOL CAN EMPTY NOW, AND BATCH EG IS WHAT CHANGED THAT — SAID HERE RATHER
+# THAN LEFT FOR THE GATE TO FIND. EA wrote this arithmetic against a flat cap
+# of seven: a hero held at most `ABILITY_SLOT_CAP - core_slots(spec)` earned
+# abilities, FOUR or three for Holy, against spec draft pools of 10 to 13, so
+# the floor was SIX cards — twice the three an offer wants. **EG BREAKS BOTH
+# TERMS.** The cap is a ladder to TEN, so the loadout alone reaches seven; and
+# the POOL is unbounded, because a benched card is kept, so what a hero owns is
+# every card he has ever taken rather than every card he currently carries.
+# `owned_ability_names` reads the pool, so the fallback's filter is what widens.
+# **`check_ea` §1 derives the live floor every battery run and asserts it clears
+# the award count** — the arithmetic is measured there and is not restated here,
+# because a second copy of a number is what goes stale.
 #
 # AND IT DELIBERATELY DOES NOT CONSULT `draft_refused`, which is the one
 # judgement call in this function. Three reasons, the last decisive:

@@ -383,7 +383,21 @@ func _gate_talent_conservation() -> void:
 	# does NOT call — so it is asserted against the source, which is the only
 	# place a rule with no reachable gate can be checked at all (BM's idiom).
 	var bs := _src("res://scripts/battle.gd")
-	var body := bs.substr(bs.find("func _resolve_boss"), 2400)
+	# **BATCH EG — THE WINDOW IS THE FUNCTION NOW, NOT 2400 CHARACTERS, AND THIS
+	# IS THE SECOND COPY OF IT.** `test_batch_bm` §6 carries the same slice and
+	# **both went red on the same EG comment block**, which is the copied-helper
+	# rule arriving in a scan: a window duplicated between two targets inherits
+	# its blind spot twice and diverges silently. ED §2's rule is the general
+	# form — a scan that captures a WINDOW is blind to what the window
+	# swallowed. The slice runs to the next top-level `func ` instead, which is
+	# the function itself and cannot be outgrown by anything written inside it.
+	#
+	# **EE §4's GUARD IS WHAT SAID SO HERE TOO**, and here it matters more: the
+	# ONLY assertion on this slice is a NEGATIVE one, so an empty `end_half`
+	# would have satisfied it for every needle, in silence.
+	var rb_at := bs.find("func _resolve_boss")
+	var rb_end := bs.find("\nfunc ", rb_at + 1)
+	var body := bs.substr(rb_at, (rb_end - rb_at) if rb_end > rb_at else 2400)
 	# GUARDED (BATCH EE §4). The same comment anchor `test_batch_bm` reads, and
 	# here the ONLY assertion on the slice is a negative one — an empty
 	# `end_half` satisfies it for every needle, in silence.

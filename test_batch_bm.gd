@@ -172,7 +172,25 @@ func _earning() -> void:
 	# rule about what _resolve_boss does NOT call.
 	var bs := _src("res://scripts/battle.gd")
 	var idx := bs.find("func _resolve_boss")
-	var body := bs.substr(idx, 2400)
+	# **BATCH EG — THE WINDOW IS THE FUNCTION NOW, NOT 2400 CHARACTERS, AND THIS
+	# IS ED §2's RULE MET IN THE WILD.** A scan that captures a WINDOW is blind
+	# to what the window swallowed: EG added a comment block inside
+	# `_resolve_boss` explaining why the slot is granted before the award, and
+	# that pushed `# The end boss.` from character 2130 to 2955 — past the
+	# window, so the anchor stopped resolving.
+	#
+	# **EE §4'S GUARD IS WHAT SAID SO, AND IT IS EXACTLY THE CASE IT WAS WRITTEN
+	# FOR.** Without the `half_at >= 0` check below, `end_half` would have been
+	# EMPTY, the negative assertion would have held for every needle, and the
+	# alternation under it would have been satisfied by its `body` sibling —
+	# **both checks green while neither read anything.**
+	#
+	# The slice runs to the NEXT top-level `func ` instead, which is the
+	# function itself and cannot be outgrown by anything written inside it. It
+	# falls back to the old window only if that search fails, so a malformed
+	# file degrades to the previous behaviour rather than to an empty slice.
+	var body_end := bs.find("\nfunc ", idx + 1)
+	var body := bs.substr(idx, (body_end - idx) if body_end > idx else 2400)
 	# GUARDED (BATCH EE §4). `# The end boss.` IS A COMMENT — ED's fragile
 	# residency class — and an unasserted -1 makes `end_half` EMPTY. The
 	# negative below then holds for every needle, and the alternation under it

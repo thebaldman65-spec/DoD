@@ -172,8 +172,22 @@ func _initialize() -> void:
 	var raw := FileAccess.open(save_path, FileAccess.READ)
 	var blob: Variant = raw.get_var(true)
 	raw = null
-	ok(blob is Dictionary and int(blob.get("version", 0)) == 11,
-		"...at v11")
+	# **RE-POINTED AT BATCH EG, ON CT'S OWN STANDING RULE — A SUITE MUST NOT PIN
+	# THE SAVE VERSION LITERAL (BK §6 / CT).** This gate pinned `== 11`, which
+	# is the exact shape that rule forbids, and it went red on EG's v12 the
+	# first time anybody bumped it. `test_batch_bm` already reads `>= 10` with
+	# the reason written beside it; this is the same repair.
+	#
+	# **AND THE INVARIANT IS NOT THE NUMBER.** CT's claim is that a save written
+	# by THIS build carries the slotted pouch, which needs v11 or later — the
+	# version at which `items` became the slot list. A later tolerant bump does
+	# not touch that claim, and the line below is what actually asserts it.
+	#
+	# **THE MANIFEST COULD NOT HAVE WARNED ANYONE**: `build_pin_manifest.py`
+	# indexes string literals, and a version pin written as an INTEGER
+	# comparison is invisible to it. Reported at EG rather than fixed there.
+	ok(blob is Dictionary and int(blob.get("version", 0)) >= 11,
+		"...at v11 or later (found %d)" % int((blob as Dictionary).get("version", 0)))
 	ok((blob as Dictionary).has("pending_item_offers"),
 		"...carrying the §3 offer queue")
 	# Now make it a v10 save: the old version, and none of CT's new field.

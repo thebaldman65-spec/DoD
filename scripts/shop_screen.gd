@@ -179,13 +179,13 @@ func _draw_screen() -> void:
 			# outright, so "nothing to sell you" is a state a player will
 			# meet — and it says so rather than taking the gold.
 			dbtn.text = "%s — nothing left to offer" % _hero_label(member)
-			dbtn.tooltip_text = "Every ability this run could offer %s has been\nlearned, declined or dropped." % \
+			dbtn.tooltip_text = "Every ability this run could offer %s has been\nlearned or declined." % \
 				_hero_label(member)
 			dbtn.disabled = true
 		else:
 			dbtn.tooltip_text = "Draw three abilities for %s (%d still in the pool).\nThe cards are drawn NOW and wait on their hero card.\nAbility slots %d of %d." % [
 				_hero_label(member), left, Run.ability_slots_used(member),
-				Run.ABILITY_SLOT_CAP]
+				Run.ability_slot_cap()]
 			dbtn.disabled = Run.gold < price
 			dbtn.pressed.connect(_buy_draft.bind(i))
 		add_child(dbtn)

@@ -153,7 +153,12 @@ func _draw_detail() -> void:
 		# battle spawn orders them, so a talent that modifies a pool-bought
 		# ability shows the same numbers here that it will in the fight.
 		# Six of a full kit's ten come from here; the sheet has to show them.
-		for bm_name in member.get("bm_abilities", []):
+		#
+		# BATCH EG §2 — THE LOADOUT, NOT THE POOL, and for the reason this
+		# whole page exists: the sheet's promise is that its numbers are the
+		# fight's numbers, so it must read exactly what `battle.gd`'s spawn
+		# reads. A benched card is listed below the runes instead.
+		for bm_name in Run.equipped_ability_names(member):
 			var bm_ab := Classes.spec_pool_ability(spec, String(bm_name))
 			if bm_ab != null and not cfg["abilities"].any(
 					func(a): return a.display_name == bm_ab.display_name):
@@ -280,17 +285,50 @@ func _draw_detail() -> void:
 	add_child(passive_label)
 
 	var ability_header := Label.new()
-	ability_header.text = "ABILITIES  (hover for details)"
+	# BATCH EG §1/§2 — THE HEADER CARRIES THE LADDER AND THE BENCH. The cap is
+	# not seven any more and it is not a constant, so a page that showed a kit
+	# without saying how many slots it fills would be the one screen the player
+	# compares builds on and the one that cannot answer "have I room for
+	# another". The bench clause only appears when something is benched.
+	var bench: Array = Run.benched_ability_names(member) if spec != "" else []
+	ability_header.text = "ABILITIES  (hover for details)" if spec == "" \
+		else "ABILITIES  %d of %d slots%s  (hover for details)" % [
+			Run.ability_slots_used(member), Run.ability_slot_cap(),
+			"  —  %d benched, swap them on the map" % bench.size() \
+				if not bench.is_empty() else ""]
 	ability_header.add_theme_font_size_override("font_size", 15)
 	ability_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	ability_header.position = Vector2(60, 296)
+	ability_header.size = Vector2(450, 20)
 	add_child(ability_header)
+
+	# **BATCH EG §1 — THE CHIPS LIVE IN A SCROLLER NOW, AND THE OVERFLOW IS
+	# OLDER THAN THIS BATCH.** They were laid out absolutely at
+	# `324 + (i / 2) * 46`, which puts a fifth row at y=508 — straight through
+	# the RUNES header at 520 and into its scroller at 544. **A BEASTMASTER
+	# ALREADY REACHED FIVE ROWS AT HEAD**: his protected core is SIX display
+	# names in three slots, so six plus four earned is ten chips at the old flat
+	# cap, before a rune or a talent grants an eleventh. EG makes it ordinary
+	# rather than creating it — every spec reaches eleven at cap 10. The fix is
+	# the runes' own, quoted from their block below: a list that can outgrow the
+	# page lives in a scroller, so every ability renders and none is silently
+	# cut. Four rows sit in the footprint the absolute layout used; the rest
+	# scroll.
+	var ab_scroll := ScrollContainer.new()
+	ab_scroll.position = Vector2(55, 318)
+	ab_scroll.size = Vector2(460, 196)
+	ab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(ab_scroll)
+	var ab_grid := GridContainer.new()
+	ab_grid.columns = 2
+	ab_grid.add_theme_constant_override("h_separation", 10)
+	ab_grid.add_theme_constant_override("v_separation", 8)
+	ab_scroll.add_child(ab_grid)
 
 	var abilities: Array = cfg["abilities"]
 	for i in abilities.size():
 		var ab: Ability = abilities[i]
 		var chip := PanelContainer.new()
-		chip.position = Vector2(60 + (i % 2) * 205, 324 + (i / 2) * 46)
 		chip.custom_minimum_size = Vector2(195, 38)
 		var chip_label := Label.new()
 		var cost_note := ""
@@ -336,7 +374,7 @@ func _draw_detail() -> void:
 		if not ups.is_empty():
 			tip += "\n%s" % " · ".join(PackedStringArray(ups))
 		chip.tooltip_text = tip
-		add_child(chip)
+		ab_grid.add_child(chip)
 
 	# Runes: THREE SLOTS FLAT from run start (Batch AN §9 — the 2/3/4 growth
 	# ladder is gone). READ-ONLY here: equipping happens on the map card, so

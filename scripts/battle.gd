@@ -1153,7 +1153,15 @@ func _spawn_units() -> void:
 				# Batch AJ's Battle Shout and Rampage) asks whether the copy
 				# was ALREADY in the kit — a question only this ordering can
 				# answer. apply_from_tree refuses to double-grant either way.
-				for bm_name in Run.party[i].get("bm_abilities", []):
+				#
+				# **BATCH EG §2 — THE LOADOUT, NOT THE POOL.** This is the one
+				# question in the project that wants `bm_equipped`: what the
+				# hero CARRIES into this fight. Every other reader of the two
+				# sets is asking what he OWNS, and owns is `bm_abilities`.
+				# `equipped_ability_names` reads the pool when nothing has ever
+				# been benched, so a member dict written before EG spawns
+				# exactly as it always did.
+				for bm_name in Run.equipped_ability_names(Run.party[i]):
 					var bm_ab := Classes.spec_pool_ability(spec, bm_name)
 					if bm_ab != null and not cfg["abilities"].any(
 							func(a): return a.display_name == bm_ab.display_name):
@@ -23062,6 +23070,29 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 				slots_next, slots_now]
 		if not relic.is_empty():
 			boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
+		# BATCH EG §1 — THE ABILITY SLOT, AND IT ARRIVES BEFORE THE AWARD.
+		#
+		# **THE ORDER IS THE WHOLE POINT AND IS WHY THIS IS TWO LINES ABOVE
+		# `_award_ability_picks` RATHER THAN INSIDE IT.** The brief asked
+		# whether the slot arrives WITH the award or separately, and the answer
+		# is separately: it is granted by the boss dying, not by the award being
+		# offered, so a hero whose spec pool AND fallback pool are both empty
+		# still gains the slot. Granting it FIRST is what makes "a hero at cap
+		# can still receive both" true — `award_ability_pick` queues a pick the
+		# map screen resolves through `Run.take_draft_ability`, which reads
+		# `ability_slots_full` off `ability_slot_cap()`, and that cap has
+		# already moved by the time the player clicks.
+		#
+		# It is announced from the LADDER rather than from a written number, so
+		# it cannot drift from `ABILITY_SLOTS_BY_BOSS` — the pouch line four
+		# lines up is the shape this copies, and CT wrote that one because the
+		# rune ladder the brief named did not exist to copy either.
+		var cap_before := Run.ability_slot_cap()
+		Run.note_zone_boss_cleared()
+		var cap_now := Run.ability_slot_cap()
+		if cap_now > cap_before:
+			boss_text += "\n\nTHE ROAD TEACHES: every hero carries %d abilities now, not %d." % [
+				cap_now, cap_before]
 		var picked: Array = _award_ability_picks()
 		if not picked.is_empty():
 			boss_text += "\n\nNEW ABILITY: %s may choose one of three\non their card." % \
@@ -24112,9 +24143,18 @@ func _member_summary(member: Dictionary) -> String:
 		rune_names.append(String(rune["name"]))
 	if not rune_names.is_empty():
 		text += "\n    Runes: %s" % ", ".join(rune_names)
+	# BATCH EG §2: the pool, with the benched half named. A summary that
+	# printed the pool alone would credit the run with a kit the hero never
+	# fought in, and one that printed the loadout alone would lose the cards
+	# he earned and set aside.
+	var run_node: Node = get_node_or_null("/root/Run")
 	var earned: Array = member.get("bm_abilities", [])
+	var benched: Array = run_node.benched_ability_names(member) \
+		if run_node != null else []
 	if not earned.is_empty():
 		text += "\n    Earned abilities: %s" % ", ".join(earned)
+		if not benched.is_empty():
+			text += "  (benched: %s)" % ", ".join(benched)
 	return text
 
 

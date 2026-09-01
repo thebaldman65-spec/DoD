@@ -416,7 +416,13 @@ func _cores() -> void:
 
 func _cap_and_slots() -> void:
 	var run := root.get_node("/root/Run")
-	ok(int(run.ABILITY_SLOT_CAP) == CAP, "§2: ability slots cap at 7")
+	# BATCH EG §1 — THE CAP IS A LADDER AND THIS SUITE ASKS IT AT RUN START.
+	# `ability_slot_cap()` reads `zone_bosses_cleared`, which is 0 on a fresh
+	# run node, so the number BO asserted is the ladder's FIRST rung and the
+	# rest of this section is unchanged by the ladder existing.
+	ok(int(run.ability_slot_cap()) == CAP, "§2: ability slots cap at 7 at run start")
+	ok(run.ABILITY_SLOTS_BY_BOSS == [7, 8, 9, 10],
+		"§2: ...and grow one a zone boss to ten (EG §1)")
 	var m := {"key": "mage", "spec": "pyromancer", "bm_abilities": []}
 	ok(int(run.ability_slots_used(m)) == 3,
 		"§2: a fresh Pyromancer uses 3 of 7 (the protected core counts against it)")
@@ -431,15 +437,31 @@ func _cap_and_slots() -> void:
 	# not in the drop list at all — there is no branch to get wrong.
 	ok(not run.earned_ability_names(m).has("Detonation"),
 		"§2: a protected ability is not in the drop list")
-	ok(not run.drop_earned_ability(m, "Detonation"),
-		"§2: ...and dropping one is REFUSED")
+	ok(not run.unequip_earned_ability(m, "Detonation"),
+		"§2: ...and benching one is REFUSED")
 	ok(int(run.ability_slots_used(m)) == CAP,
 		"§2: ...leaving the kit untouched")
-	ok(run.drop_earned_ability(m, "Firestorm"),
-		"§2: an EARNED ability drops")
+	ok(run.unequip_earned_ability(m, "Firestorm"),
+		"§2: an EARNED ability benches")
 	ok(int(run.ability_slots_used(m)) == 6, "§2: ...and frees its slot")
-	ok(run.draft_refused(m).has("Firestorm"),
-		"§2: a dropped ability does not return to this run's pool")
+	# **INVERTED BY BATCH EG §2, AND THE QUESTION IS KEPT.** BO asserted that a
+	# DROP wrote the no-return ledger, because a drop was permanent. Benching is
+	# not permanent — the card stays in the pool and can be carried again — so
+	# the ledger must NOT be written, and the property the old check was really
+	# protecting is asserted directly beside it: **the benched card still cannot
+	# be re-offered.** It is blocked by OWNERSHIP now rather than by refusal,
+	# which is the same guarantee reached through the set that is true of it.
+	ok(not run.draft_refused(m).has("Firestorm"),
+		"§2: benching does NOT write the no-return ledger (EG §2)")
+	ok(run.earned_ability_names(m).has("Firestorm"),
+		"§2: ...because the card is KEPT in the pool")
+	ok(not run.roll_draft_offer(m).has("Firestorm"),
+		"§2: ...and is still never re-offered, being owned")
+	ok(run.equip_earned_ability(m, "Firestorm"),
+		"§2: ...and it can be carried again, without cost")
+	ok(int(run.ability_slots_used(m)) == CAP, "§2: ...back at the cap")
+	ok(run.unequip_earned_ability(m, "Firestorm"),
+		"§2: ...left benched for what follows")
 
 
 # ---------- §3 THE OFFER ----------
@@ -605,21 +627,27 @@ func _take_decline_drop() -> void:
 	ok(run.ability_slots_full(m3), "§2: the Sharpshooter's kit is full at 7")
 	ok(run.award_draft_pick(m3), "§2: a full kit is still offered a draft")
 	var c3 := String(m3["draft_candidates"][0][0])
-	ok(run.take_draft_ability(m3, c3) == "the kit is full — name an ability to drop",
-		"§2: taking at the cap REQUIRES a drop before it resolves")
+	ok(run.take_draft_ability(m3, c3) == "the kit is full — name an ability to bench",
+		"§2: taking at the cap REQUIRES a bench before it resolves (EG §2)")
 	ok(not m3["bm_abilities"].has(c3), "§2: ...and nothing landed")
 	ok(int(m3["draft_picks_owed"]) == 1, "§2: ...and the pick is still owed")
 	ok(run.take_draft_ability(m3, c3, "Aimed Shot")
-			== "Aimed Shot cannot be dropped",
-		"§2: naming a PROTECTED ability as the drop is refused")
+			== "Aimed Shot cannot be benched",
+		"§2: naming a PROTECTED ability as the bench is refused")
 	ok(int(run.ability_slots_used(m3)) == CAP, "§2: ...leaving the kit at 7")
 	ok(run.take_draft_ability(m3, c3, "Pinning Shot") == "",
 		"§2: naming an EARNED ability resolves the offer")
-	ok(m3["bm_abilities"].has(c3) and not m3["bm_abilities"].has("Pinning Shot"),
-		"§2: ...one in, one out")
+	# **INVERTED BY BATCH EG §2.** One in, one out of the LOADOUT — and nothing
+	# out of the POOL, which is the whole of the change. The slot arithmetic is
+	# identical; what moved is that the displaced card is still held.
+	ok(run.equipped_ability_names(m3).has(c3)
+			and not run.equipped_ability_names(m3).has("Pinning Shot"),
+		"§2: ...one in, one out of the LOADOUT")
+	ok(m3["bm_abilities"].has(c3) and m3["bm_abilities"].has("Pinning Shot"),
+		"§2: ...and BOTH are in the pool (EG §2)")
 	ok(int(run.ability_slots_used(m3)) == CAP, "§2: ...and the cap still holds at 7")
-	ok(run.draft_refused(m3).has("Pinning Shot"),
-		"§2: the dropped ability does not come back this run")
+	ok(not run.draft_refused(m3).has("Pinning Shot"),
+		"§2: the benched ability does not enter the no-return ledger (EG §2)")
 	# A DECLINED OR DROPPED ABILITY IS GONE FOR THE RUN, NOT FOR THE HERO'S
 	# LIFE: the ledger rides the member dict, so a new run starts clean.
 	var fresh := {"key": "hunter", "spec": "sharpshooter", "bm_abilities": [],
@@ -688,15 +716,31 @@ func _sources() -> void:
 		"§3: ...through the function it always used")
 	# THE CAP BINDS THE BOSS PICK TOO — it is a rule about a KIT, not about one
 	# pool, and a boss pick that walked past it would not be a cap at all.
-	ok(map.contains("if drop_name == \"\" and Run.ability_slots_full(member):\n\t\t_open_drop_overlay(idx, \"ability\", pool_name)"),
+	ok(map.contains("if bench_name == \"\" and Run.ability_slots_full(member):\n\t\t_open_drop_overlay(idx, \"ability\", pool_name)"),
 		"§3: a boss pick at the cap opens the same drop step")
-	# ONE DROP DOOR, so the no-return rule cannot be applied in one path and
-	# forgotten in the other.
-	ok(map.count("Run.drop_earned_ability(") == 1,
-		"§2: the map screen writes a drop through exactly one door")
+	# ONE DOOR PER QUESTION, so a rule cannot be applied in one path and
+	# forgotten in the other. **RE-POINTED AT BATCH EG §2 AND THE COUNT MOVED
+	# FROM ONE TO TWO, WITH BOTH SITES NAMED** — the take-at-the-cap step and
+	# the loadout panel are two SCREENS calling one door, which is what BO's
+	# rule asks for; two different answers to what may be benched is what it
+	# forbids. The panel is named here so a third caller has to move this line.
+	ok(map.count("Run.unequip_earned_ability(") == 2,
+		"§2: the map screen benches through exactly one door, from its two screens (the cap step and the loadout panel)")
+	ok(map.count("func _toggle_loadout(") == 1
+			and map.contains("Run.equip_earned_ability(member, name)"),
+		"§2: ...and the panel carries no equip rule of its own")
 	var rs := _src("res://scripts/run_state.gd")
-	ok(rs.count("member[\"bm_abilities\"] = kept") == 1,
-		"§2: ...and that door is the only place a drop is written")
+	# **STRENGTHENED AT EG §2, NOT LOOSENED.** BO asserted the DROP was written
+	# once (`bm_abilities = kept`, the line that took a card out of the kit).
+	# Nothing takes a card out of the pool any more, so that needle has no
+	# referent — and the question it was asking has a better answer: the POOL
+	# has exactly ONE writer in the whole run state, `hold_ability`, which both
+	# channels call.
+	ok(rs.count("member[\"bm_abilities\"] = ") == 1,
+		"§2: ...and the POOL is written in exactly one place (EG §2: `hold_ability`)")
+	ok(map.count("member[\"bm_abilities\"] = ") == 0
+			and map.count("Run.hold_ability(") == 1,
+		"§2: ...which the map screen calls rather than writing the list itself")
 	# THE OVERLAY IS REUSED, NOT REBUILT (§1's instruction).
 	ok(map.count("func _open_pick_overlay(") == 1,
 		"§3: there is still exactly ONE pick overlay")
@@ -1354,7 +1398,10 @@ func _docs() -> void:
 	ok(glo.contains("ability_slots"), "§6: ...the slot cap")
 	ok(glo.contains("protected_core"), "§6: ...and protected abilities")
 	var claude := _src("res://CLAUDE.md")
-	ok(claude.contains("ABILITY_SLOT_CAP") or claude.contains("cap at 7")
+	# RE-POINTED BY BATCH EG §1: the const is `ABILITY_SLOTS_BY_BOSS` now. The
+	# needle follows its haystack; the question — does the guide carry the cap —
+	# is unchanged.
+	ok(claude.contains("ABILITY_SLOTS_BY_BOSS") or claude.contains("cap at 7")
 			or claude.contains("SEVEN"),
 		"§6: CLAUDE.md carries the cap")
 	# INVERTED BY BATCH BP. This proved the Warrior debt was RECORDED; the

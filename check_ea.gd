@@ -116,8 +116,15 @@ func _s0_premises() -> void:
 	var run_gd := load("res://scripts/run_state.gd")
 	ok(int(run_gd.SLOT_COUNT) == 3,
 		"§0: the zone-boss award count is %d, not 3 — §1's table is stale" % int(run_gd.SLOT_COUNT))
-	ok(int(run_gd.ABILITY_SLOT_CAP) == 7,
-		"§0: `ABILITY_SLOT_CAP` is %d, not 7 — §1's floor arithmetic is stale" % int(run_gd.ABILITY_SLOT_CAP))
+	# BATCH EG §1 — THE CAP IS A LADDER AND §1'S ARITHMETIC READS ITS TOP RUNG.
+	# EA asserted a flat 7 here so §1's floor could not go stale under it; the
+	# same premise, re-derived: the deepest the fallback pool can be drained is
+	# set by the LARGEST loadout a run can reach, which is the last rung.
+	ok(run_gd.ABILITY_SLOTS_BY_BOSS == [7, 8, 9, 10],
+		"§0: the slot ladder is %s, not [7, 8, 9, 10] — §1's floor arithmetic is stale" % [
+			run_gd.ABILITY_SLOTS_BY_BOSS])
+	ok(int(run_gd.ABILITY_SLOTS_BY_BOSS[0]) == 7,
+		"§0: the ladder no longer OPENS at 7")
 
 
 # ── §1 — EVERY SPEC'S DEPTH AGAINST THE AWARD COUNT, AFTER THE FALLBACK ─────
@@ -145,7 +152,10 @@ func _s1_depth() -> void:
 	print("\n§1 — every spec's depth against the award count, after the fallback")
 	var run_gd := load("res://scripts/run_state.gd")
 	var awards: int = int(run_gd.SLOT_COUNT)
-	var cap: int = int(run_gd.ABILITY_SLOT_CAP)
+	# The LAST rung, not the first: §1 asks how deep the pool can be drained, and
+	# the answer is set by the biggest loadout a run can hold.
+	var cap: int = int(run_gd.ABILITY_SLOTS_BY_BOSS[
+		run_gd.ABILITY_SLOTS_BY_BOSS.size() - 1])
 
 	# THE RUNE DRAIN, PER SPEC. A rune counts only against a spec that can
 	# actually WEAR it, which is what `scope` decides.
@@ -193,6 +203,8 @@ func _s1_depth() -> void:
 	var thinnest := 999
 	var thinnest_spec := ""
 	var emptiable := 0
+	# BATCH EG §1 — THE SPECS WHOSE FALLBACK CAN FILL SHORT, AS A NAMED SET.
+	var short_specs: Array = []
 	for cls2 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[cls2]:
 			var boss: Array = Classes.spec_pool(spec2)
@@ -216,9 +228,52 @@ func _s1_depth() -> void:
 			print("    %-13s boss=%d draft=%d safe=%d earnable=%d rune=%d  fallback floor=%d" % [
 				spec2, boss.size(), draft.size(), safe, earn,
 				int(rune_drain.get(spec2, 0)), floor_now])
-			ok(floor_now >= awards,
-				"§1: %s's fallback pool floors at %d, under the %d an award offers — it can be paid nothing" % [
-					spec2, floor_now, awards])
+			# **BATCH EG §1 — THIS WAS ONE ASSERTION AND IT WAS ASKING TWO
+			# QUESTIONS.** EA wrote `floor_now >= awards` and worded it "it can
+			# be paid nothing", and at a flat cap of seven the floor was six
+			# everywhere so both readings were true and nobody had to separate
+			# them. **THE RULE IN `CLAUDE.md` IS "AN AWARD ALWAYS PAYS", WHICH
+			# IS `floor >= 1`; `>= awards` IS THE STRICTER CLAIM THAT EVERY
+			# AWARD OFFERS A FULL THREE.** The slot ladder moves the floor to
+			# exactly 3 for seven specs and to 2 for the Occultist, so the two
+			# claims come apart here — and repairing the assertion TO ITS
+			# INTENT (DC's rule) means splitting it rather than loosening it.
+			ok(floor_now >= 1,
+				"§1: %s's fallback pool floors at %d — it can be drained EMPTY and an award can pay nothing" % [
+					spec2, floor_now])
+			if floor_now < awards:
+				short_specs.append(spec2)
+
+	# **AND THE STRICTER HALF IS A NAMED SET NOW, ON `emptiable`'s OWN SHAPE.**
+	# A pinned population rather than a pinned count: a THIRTEENTH spec whose
+	# fallback can fill short trips, and so does the Occultist's leaving the
+	# set, which is what a repair looks like from here.
+	ok(short_specs == ["occultist"],
+		"§1: the specs whose fallback can fill SHORT are %s, not the [occultist] on record — the slot ladder has moved under this table" % [
+			short_specs])
+
+	# **BATCH EG §1 — AND THE BOUND ABOVE IS NO LONGER THE ONLY ONE. REPORTED,
+	# NOT ASSERTED, BECAUSE CLOSING IT IS A RULING.** `earn` is the LOADOUT
+	# bound — the most a hero can CARRY — and EA could use it as the drain
+	# because carrying and holding were the same list. **EG §2 SPLIT THEM: a
+	# benched card stays in the pool and `owned_ability_names` reads the pool,
+	# so the fallback's filter is drained by everything a hero has EVER taken,
+	# which the slot cap does not bound at all.** The true worst case is a hero
+	# who drafts his entire spec pool, and that floors at ZERO. It is not
+	# asserted because the arithmetic that would make it safe is a design
+	# decision EA priced and did not take (a class-wide third tier), and a gate
+	# encodes a ruling.
+	var pool_bound_floor: int = 999
+	var pool_bound_spec := ""
+	for cls3 in Classes.SPEC_IDS:
+		for spec3 in Classes.SPEC_IDS[cls3]:
+			var d3: int = Classes.spec_draft_pool(spec3).size()
+			var f3: int = d3 - d3 - int(rune_drain.get(spec3, 0))
+			if f3 < pool_bound_floor:
+				pool_bound_floor = f3
+				pool_bound_spec = spec3
+	print("    EG §1 REPORTED, NOT ASSERTED — under the POOL bound (a hero who drafts his whole spec pool) the fallback floors at %d (%s). The loadout bound above is what is asserted." % [
+		pool_bound_floor, pool_bound_spec])
 
 	# THE ANSWER TO THE QUESTION §1 ASKS, STATED AS A PROPERTY.
 	ok(lost_after == 0,

@@ -5,93 +5,78 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-31 (Batch EF).*
+*Last rewritten: 2026-08-31 (Batch EG).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EF — THE CENSUS IS COMMITTED, AND THE GUIDE IS SPLIT AT THE INSTRUMENT SEAM.** Two
-  things EE recommended and did not take. **`claude_md_census.py` IS IN THE REPO AND READS 22
-  ASSERTED WHERE ED READ 24 — REPORTED, NOT RECONCILED; AND `CLAUDE.md` IS SPLIT, TWENTY-SIX BLOCKS
-  OF INSTRUMENT RULES MOVED TO `docs/instrument-rules.md`, WITH THE GUIDE STILL THE REQUIRED READ.**
-  **NO GAME BEHAVIOUR CHANGED, NO ABILITY MOVED, NO CARD WAS AUTHORED AND NOT ONE RULE WAS REWRITTEN
-  OR RETIRED.** `scripts/` is byte-unchanged. **Report: `docs/reports/EF.md`.**
-- **§1 — THE CITATION CENSUS IS A COMMITTED SCRIPT, AND IT DISAGREES WITH ED BY TWO BLOCKS.**
-  `claude_md_census.py` reads any commit through git (`--rev`) and reproduces ED's fixed points from
-  the repository alone: **164 files / 7.2277 MiB / 234,401 B / 94 blocks / 232,823 chars at EC**, and
-  **168 / 7.6027 MiB / 238,678 B / 96 blocks at ED.** The segmentation is asserted to be a PARTITION
-  on every run.
-  - **IT READS 22 ASSERTED WHERE ED REPORTED 24, AND IT IS NEITHER THE TREE NOR THE WINDOW** — 22 on
-    both trees at every quotation length from 8 to 30. **Exactly ONE pair of blocks in the whole 94
-    sums to the 5,415-character difference** between ED's 60,978 and this script's 55,563: the
-    `preload`/autoload trap and the ENEMY INTENT standing reference. **No needle reaches either at
-    any occurrence** — not in the manifest, not under the script's own extractor, not case-blind.
-    **Which instrument is right cannot be settled, because ED's is not in the repo.**
-  - **AND EE's "57 DISTINCT NEEDLES" IS NOT RE-DERIVABLE EITHER**: ED's manifest holds **54**
-    distinct positive `CLAUDE.md` needles, 65 counting both polarities, and **49 of the 54 locate**.
-    No filter gives 57. **The same defect, one layer up.**
-  - **THE DEFINITIONS ARE IN THE SCRIPT** — the sync set, the segmentation, ASSERTED, QUOTED, the
-    normalisation, and why `docs/state.md` is out of the corpus by default. **The quotation length
-    is the one free parameter and is SWEPT rather than chosen**: the same tree reads 2.4% at eight
-    words and 55.8% at thirty.
-  - **THE LIVE READING IS 44.3% AT WINDOW 22 AND IS NOT COMPARABLE WITH 33.3%** — a third of the
-    file left it this batch. **Compare against this figure, taken with this script.**
-- **§2 — `CLAUDE.md` IS SPLIT AT THE INSTRUMENT SEAM, AND THE SEAM IS WHAT A RULE BINDS.** A rule
-  that governs how a batch VERIFIES itself is in `docs/instrument-rules.md`; a rule that governs what
-  the game may contain stayed. **Where a rule does both it stayed, and NINE blocks that READ like
-  instrument rules were kept — SEVEN of them on that tiebreak** (the working agreement, the
-  brief-verification rule, the `preload` trap, `ability_corpus()`, the literal-digit rule, the
-  documented-exception trap and the shell/engine gotchas), **one because it is a game rule inside an
-  instrument-looking section** (the names-that-look-wrong list) **and one because it binds neither**
-  (the sync register). **The count is stated split because "nine on the tiebreak" would have been a
-  hand-tally.** **`THE TRAPS` split three children each
-  way**, with the heading in both files and each half saying so.
-  - **`CLAUDE.md` REMAINS THE FILE A BATCH IS REQUIRED TO READ.** It carries an INDEX of headings —
-    twenty-six blocks in twenty-four entries — and **no summary of any moved rule**, because a
-    summary is a second copy and a second copy is what let CW's split leave a file that contradicted
-    itself 1900 lines apart.
-  - **AND AN INDEX OF HEADINGS CAN SATISFY A PIN. THAT IS WRITTEN DOWN AT THE INDEX.** A
-    `contains()` on a moved heading passes off the index row while the rule could have been deleted.
-    **`check_ec`'s two needles are pinned against the new file for that reason, and a two-armed
-    control proves the index is not what they read**: reword the RULE and leave the index → RED;
-    reword the INDEX and leave the rule → GREEN at 23 / 0.
-  - **NOTHING WAS REWRITTEN AND THE PROOF IS BYTE-FOR-BYTE.** A second script sharing nothing with
-    the splitter re-derived every heading from an untouched backup, counted them two ways, required
-    each of the 96 exactly once across the halves, and **rejoined the two bodies BYTE-IDENTICAL to
-    the pre-split file. NO FILE SIZE WAS ASSERTED ANYWHERE** — and the control that proves it is a
-    BYTE-PRESERVING edit inside a moved block, which the sizes cannot see and the rejoin catches.
-  - **ALL 70 `CLAUDE.md` PINS WERE MAPPED TO THEIR BLOCK BEFORE ANYTHING MOVED. SIXTY-SIX SIT IN
-    BLOCKS THAT STAYED; FOUR MOVED AND ALL FOUR WERE RE-POINTED IN THE SAME BATCH** — `check_ec` §2
-    twice and `test_batch_ce` twice — **with the needle unchanged word for word. The haystack moved
-    and the needle did not.** HEAD's un-re-pointed `test_batch_ce` against the split tree reads
-    **1114 / 2**, which is what makes the re-point necessary rather than decorative.
-  - **THE NEW FILE IS INSIDE THE INSTRUMENTS' TERRITORY.** `build_pin_manifest.py`'s `DOCS` and
-    `check_ec.DOCS` both count it as a tracked document (**that +1 is `check_ec` 22 → 23**), and
-    `check_ea` §3's batch-code sweep binds a holder from EITHER rule file. **The manifest diff is
-    exactly the four re-pointed pins**: 1313 either side, every family and residency identical.
-  - **THE SIZES: 237.50 KiB became 175.46 KiB here and 69.84 KiB there, and headroom to the 290 KiB
-    ceiling went from 52.50 KiB (13 batches) to 114.54 KiB (26).** The split cost **7,984 B** of its
-    own — the index, the new header, two section headings and four dangling-pointer repairs.
-  - **THE INSTRUMENT HALF HAS GROWN FASTER — RECENTLY, AND ONLY RECENTLY.** Over the nineteen
-    prune-free steps DK→EE the MAIN half grew **+2,867 B/batch** against the instrument half's
-    **+1,630**; over the five post-prune batches DZ→EE it is **+1,890 against +3,623**. **Both are
-    real and they point opposite ways; the recent one is what five instrument batches in a row look
-    like.**
-  - **AND THE CEILING'S DERIVATION NOW COVERS TWO FILES.** EE's 290 = 210.59 floor + ten worst
-    batches, and that floor held both halves — **so 290 is now CONSERVATIVE for `CLAUDE.md` alone:
-    it fires later than its derivation would, never earlier.** Per-half by EE's own method:
-    **`CLAUDE.md` 160.71 + 63.0 = 223.71 → 220 KiB; the instrument file 49.88 + 50.0 = 99.88 →
-    95 KiB.** **The two sum to 315, not 290** — each half carries its own ten-worst-batch headroom,
-    so a split RAISES the total allowance under this formula. **A split buys a smaller REQUIRED
-    READ, not more rules.** **Taking those two numbers is a ruling and EF did not take it.**
-- **Next letter: EG.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EG — THE DRAFT STAYS LIVE ALL RUN.** The first behaviour change since DY. **A HERO
+  GAINS AN ABILITY SLOT AFTER EVERY ZONE BOSS (7 → 10 ACROSS A RUN), AND A DRAFTED CARD IS NEVER
+  LOST — BENCHING ONE IS FREE AND REVERSIBLE.** **NO ABILITY MAGNITUDE MOVED, NO CARD WAS AUTHORED,
+  `PROTECTED_CORES` IS BYTE-UNCHANGED, THE SPEC PASSIVE IS UNTOUCHED AND DO'S TALENT CHARTER HOLDS
+  UNCHANGED.** **Report: `docs/reports/EG.md`.**
+- **§1 — THE LADDER IS `ABILITY_SLOTS_BY_BOSS` AND IT IS INDEXED BY ZONE BOSSES CLEARED, NOT BY THE
+  ZONE.** `Run.ability_slot_cap()` is its only reader and the old `const ABILITY_SLOT_CAP := 7` is
+  GONE rather than kept beside it. **A LADDER READ OFF `zone_idx` GRANTS TWICE, NOT THREE TIMES** —
+  BM §6 put the end boss on the third zone's own board, so `has_next_zone()` is already false when
+  the third ZONE boss dies and `zone_idx` stays at 2. `Run.zone_bosses_cleared` counts the event and
+  is reset where `zone_idx` is reset (CT's pouch scar, at a second ladder).
+  - **THE SLOT ARRIVES SEPARATELY FROM THE AWARD AND BEFORE IT**, two lines above
+    `_award_ability_picks()` in `_resolve_boss`. It is granted by the boss dying rather than by the
+    award being offered, so a hero whose pools are both dry still gains it — and granting it first
+    is what makes *a hero at cap can receive both* true.
+  - **DRIVEN LIVE THROUGH THREE REAL ZONE BOSSES: the cap reads 7 → 8 → 9 → 10**, and the END boss
+    grants nothing. Identical on three standalone readings of `check_eg`. **NOTHING ELSE IN THE
+    PROJECT REACHES THE THIRD GRANT** — see the sim note below.
+  - **THE BRIEF NAMED A PRECEDENT THAT DOES NOT EXIST, FOR THE SECOND TIME IN ELEVEN BATCHES.** The
+    rune equip ladder was deleted at AN §9 and `rune_slots()` has been a flat 3 ever since; CT §1's
+    header records its own brief making the identical claim. **The ability ladder is the POUCH case
+    and not the rune case**, and the reason is in `run_state.gd` beside the constant: a slot opened
+    here is filled at the next elite, so it is never dead weight.
+- **§2 — THE POOL AND THE LOADOUT ARE TWO SETS, AND `bm_abilities` IS THE POOL.** It keeps its name
+  and nothing ever leaves it; **`bm_equipped` is new, is the LOADOUT, and DEFAULTS TO THE WHOLE
+  POOL** — which is why every v11 save and every one of the ninety-odd suite fixtures that stuff
+  `bm_abilities` means exactly what it meant before.
+  - **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION AND THERE ARE ONLY TWO.** *What can he
+    CAST* → the loadout: `battle.gd`'s spawn and the hero sheet, and nothing else. *What does he OWN,
+    so he is not offered it again* → the pool: `Runes.kit_names` → `Talents.ability_names` →
+    `Run.owned_ability_names`, and through it the draft, the boss award and its fallback.
+    **`owned_ability_names` IS CORRECT BY DOING NOTHING** — it reaches `bm_abilities` three layers
+    down. Reading the loadout there re-offers a benched card as new; that is control E, and it reds.
+  - **THE NO-RETURN LEDGER STILL BITES AND HAS ONE WRITER NOW INSTEAD OF TWO.** A DROP wrote it
+    because a drop was permanent; a BENCH does not, and the card is kept off every offer by
+    OWNERSHIP instead. **`decline_draft` is the only writer**, asserted at the site.
+  - **ALL SEVEN NAMED ENABLERS ARE IN `protected_names` FOR THEIR SPEC** — Quick Shot, Consecrated
+    Ground, Heal, the three summons, Guard Change. **No live brick.** Two of the brief's REASONS are
+    wrong and are corrected in the report (Heal is one of five Mercy outlets, four of them protected;
+    every single-target attack the Sharpshooter makes generates Focus).
+- **§3 — THE SAVE MOVES v11 → v12 AND IS TOLERANT; THE REFUSAL THRESHOLD IS DELIBERATELY UNMOVED AT
+  PRE-v10.** `zone_bosses_cleared` defaults to **`zone_idx`, not zero** — zero would take a resumed
+  zone-3 run back to seven slots — and `bm_equipped` rides the member dict like `draft_refused`.
+  **`check_eg` §3 drives the round trip rather than reading the version literal.**
+  **`docs/state.md` HAD RECORDED THE RUN SAVE AS v10 AND IT HAS BEEN v11 SINCE CT**; corrected in
+  `CLAUDE.md` in both places, with the rule that a tolerant bump does not move the threshold.
+- **§3 — AND THE HERO SHEET'S ABILITY CHIPS ARE IN A SCROLLER NOW, FOR AN OVERFLOW OLDER THAN THIS
+  BATCH.** The absolute layout put a fifth row through the RUNES header, and **a Beastmaster already
+  reached five rows at HEAD** — his protected core is SIX display names in three slots. EG makes it
+  ordinary rather than creating it.
+- **THE OFFER RATE IS RE-MEASURED AND IT IS THE WHOLE JUSTIFICATION FOR THE BATCH: 63% OF DRAFT
+  OFFERS ARRIVED AT A CAPPED HERO AT HEAD; 53% AND 55% ACROSS TWO SAMPLES AFTER.** Four `--run 25`
+  sims at rung 2. **THE SIM ONLY EVER REACHES A CAP OF NINE**, so that is the ladder's two-thirds
+  effect. **A COMPLETION-RATE SCARE WAS RAISED AND RESOLVED**: 21/25 at HEAD against 24/25 and 22/25
+  after — the second sample straddles it, so **nothing here establishes a completion change in
+  either direction** and this batch does not claim one.
+- **AND THE SIM CANNOT SEE THE THIRD ZONE-BOSS GRANT AT ALL — PRE-EXISTING, REPORTED, NOT FIXED.**
+  `run_sim`'s boss branch gates its award on `has_next_zone()`, so the THIRD zone boss sets
+  `run_over` instead of paying, the `endboss` node is never walked, and the bot plays 48 encounters
+  against the game's 49. Its `ceiling 2.00 (zone bosses only)` line was that assumption written as a
+  literal and now says which bosses it means. **Closing it moves every sim baseline in the project.**
+- **Next letter: EH.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** and all twelve talent trees are
-  purpose-authored and charter-clean. Recent batches are correction and consolidation: EB ruling on
-  EA's measurement, EC closing the group boundary, ED covering the half the instruments were never
-  watching, EE retiring the measurement that was partly measuring its own input, **and EF committing
-  the instrument that could not be re-derived and taking the split EE's ceiling procedure names.**
+  purpose-authored and charter-clean. EB through EF were correction and consolidation of the
+  instruments; **EG is the first batch since DY to change what a run plays.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -210,6 +195,23 @@ removes itself from the boss offer and vice versa.**
     reachable** — all of them are in their own spec's opening kit. `check_cz`'s set identity held
     through the deletion, measured: the CL walk still reaches **223 of 227** and still misses exactly
     the four kit overrides.
+- **AND EG §1/§2 MOVED THE ARITHMETIC UNDER ALL OF IT — THE ONE LIVE RULING THIS BATCH LEAVES.**
+  EA's guarantee rested on a hero holding at most `cap − core_slots` earned cards against pools of
+  ten to thirteen: a floor of SIX. **Both terms moved.** The cap is a ladder to ten, so the LOADOUT
+  bound alone takes the floor to **3 for seven specs and 2 for the Occultist** — measured, and
+  `check_ea` §1 went RED on it. **And the POOL is unbounded**, because a benched card is kept and
+  `owned_ability_names` reads the pool, so the true worst case floors at **zero**.
+  - **THE ASSERTION WAS SPLIT RATHER THAN LOOSENED, WHICH IS DC's REPAIR-TO-INTENT RULE.** EA's one
+    check was asking two questions: the RULE is *an award always pays* (`floor >= 1`, still green on
+    all twelve) and `>= awards` is the stricter *every award offers a full three*. At a flat cap of
+    seven the floor was six everywhere and both held. **`check_ea` §1 asserts the first per spec and
+    pins the specs that can fill SHORT as a NAMED SET (`[occultist]`)**, so a thirteenth trips and
+    the Occultist leaving trips too. **The POOL bound is PRINTED, not asserted.**
+  - **THE OPTION EA ALREADY PRICED IS A CLASS-WIDE THIRD TIER**, which EA recorded as closing the
+    table completely and as NOT the thing DY §3 forbade. **EG DID NOT TAKE IT** — EA chose the
+    spec-draft card deliberately, and the sim read `nothing left to offer` at **0.00 per run in both
+    samples**, so the hole is reachable in principle and was not reached in fifty runs.
+    **It is the designer's.**
 - **THE FALLBACK IS BUILT AT EA §1 AND THIS WHOLE BLOCK IS NOW HISTORY WITH ONE LIVE HALF.**
   **NO ZONE-BOSS AWARD CAN PAY NOTHING ANY MORE** — an exhausted boss pool falls back to the
   hero's own spec DRAFT pool, three offered and announced like any other award. **What is still
@@ -242,9 +244,9 @@ removes itself from the boss offer and vice versa.**
     moved); **EA built the spec-draft card.** The pricing is kept because it records why the other
     three were not taken:
     - **A spec-draft card or a class-wide card closes the table completely** — 8 emptiable specs →
-      **0**, 14 lost awards → **0** — and **neither fallback pool can itself empty**: a hero holds
-      at most `ABILITY_SLOT_CAP − core_slots` = **4** earned (3 for Holy) against spec pools of
-      10–13 and class pools of 6–7. **Floors: SIX cards and TWO cards.**
+      **0**, 14 lost awards → **0**. **THE FLOORS QUOTED HERE (SIX AND TWO) WERE DERIVED AT A FLAT
+      CAP OF SEVEN AND AGAINST A LOADOUT THAT WAS ALSO THE POOL. EG BROKE BOTH TERMS** — see the
+      live block above; they are kept as EA's working, not as current figures.
     - **A rune has the lowest build cost of the four and it is measured rather than asserted** —
       the grant is the same two fields the ability pick already uses (`rune_candidates` /
       `rune_picks_owed` against `bm_candidates` / `bm_picks_owed`) and the map's owed-pick overlay
@@ -508,6 +510,13 @@ re-derived from the source at DM; not one was moved.**
 
 ### Small, and still owed
 
+- **`master.html` SAYS GUARD CHANGE IS "the only stance swap in the game" AND BP CORRECTED THAT IN
+  THE CODE.** `PROTECTED_CORES`'s own `why` has read *the only UNCONDITIONAL stance swap* since BP —
+  Precision Strike and Feint both switch — and the document's protected-core table was never swept.
+  **One string, in a table two lines from what EG rewrote, and reported rather than fixed**: the
+  standing rule is that master.html is corrected TOWARD the code, so this is a correction the
+  designer should see rather than one a batch makes in passing.
+
 - **ONE PRE-EXISTING NAME NEAR-MISS IS REPORTED AND NOT FIXED.** The Beastmaster's draft card
   **Ghostpack** and his own row-8 talent node **Ghost Pack** differ by one space, on the same spec —
   a sixth member of the "five nodes named after live abilities" list below, which records only exact
@@ -639,6 +648,13 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried, and still awaiting a ruling
 
+- **WHETHER THE ZONE-BOSS FALLBACK NEEDS A THIRD TIER — RAISED BY EG, RULED ON NOWHERE.** EG §1's
+  ladder and §2's kept pool both drain the filter EA §1's guarantee rests on. **Under the LOADOUT
+  bound the fallback still cannot empty (thinnest floor 2, the Occultist); under the POOL bound it
+  can, and floors at zero.** The option EA priced and did not take is a class-wide third tier off
+  `CLASS_DRAFT_POOLS`, which EA recorded as closing the table completely and as NOT the thing DY §3
+  forbade. **Measured: `nothing left to offer` reads 0.00 a run in both post-EG samples**, so it is
+  reachable in principle and was not reached in fifty runs. Full working in `docs/reports/EG.md` §5.
 - **WHAT COVERS THE 915 SOURCE PINS — REPORTED AT EC §2, RULED ON NOWHERE.** Every document
   instrument watches the four tracked documents; **915 assertions across 52 suites pin a literal
   into a `.gd` file instead**, and **37 of them resolve only inside a COMMENT**, which is the
@@ -854,7 +870,13 @@ re-derived from the source at DM; not one was moved.**
   there because they catch a pool that EMPTIES rather than tracking the deepening.
   **The one authoritative tables are `test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`; every
   other suite asserts a FLOOR and the TOTAL.**
-- **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
+- **Ability slots are a LADDER: `ABILITY_SLOTS_BY_BOSS` = [7, 8, 9, 10]**, one rung per zone boss
+  cleared, read through `Run.ability_slot_cap()` and never off a constant. Twelve protected cores,
+  unchanged. **`core_slots` AND `protected_names().size()` DISAGREE ON ALL TWELVE SPECS AND THAT IS
+  BY CONSTRUCTION** — one is a SLOT count and the other a NAME count. `core_slots` is 3 for eleven
+  and 4 for Holy; `protected_names` returns 4 for ten, **5 for Holy and 6 for the Beastmaster**
+  (three summons are one bar entry). **The cap has always used `core_slots` and still does.**
+  Draftable goes 4 → 7 for eleven specs and **3 → 6 for Holy**.
 - **The pouch: 4 → 5 → 6 slots by zone** (`ITEM_SLOTS_BY_ZONE`), a slot holding one item TYPE and
   its whole stack. **Default per-type stack cap `ITEM_CAP` = 6**, with three exceptions
   (`ITEM_STACK_CAPS`): Cleansing Draught **4**, Cursed Visage **2**, Resonating Hourglass **2**.
@@ -862,7 +884,10 @@ re-derived from the source at DM; not one was moved.**
 - **The skill check's default profile** — `battle.SC_PROFILE_DEFAULT`: `perfect_half` **0.045**,
   `good_half` **0.16**, `centre` **0.5**, `sweep_time` **0.72**, `presses` **1**, `press_taper`
   **1.0**. **Every caller uses it except the Sharpshooter's basic attack.**
-- **Save versions: the run save is v10** (a pre-v10 save is REFUSED and cleared); **`Profile` is
+- **Save versions: the run save is v12** (a pre-**v10** save is REFUSED and cleared — the version
+  and the threshold are different numbers and this file conflated them until EG, recording v10 while
+  CT had taken it to v11). **v11 (CT) and v12 (EG) are both TOLERANT and neither moved the
+  threshold.** **`Profile` is
   v2** (tolerant load). Talent cells cost 1/2/3 by tier — **27 cells = 54 points a spec.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
@@ -875,7 +900,10 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty** —
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-one** —
+  **EG ADDED `check_eg` BECAUSE §1 AND §2 ARE BOTH RULINGS, AND BECAUSE §1 IS THE ONLY THING IN THE
+  PROJECT THAT DRIVES THE THIRD ZONE-BOSS GRANT.** A slot ladder that never grants would pass every
+  static check in the tree, which is DS's Heads Down arriving at a new mechanic.
   **EF AND EE EACH ADDED NONE, ED ADDED `check_ed`**, and before it EC added `check_ec`, EB `check_eb`, EA `check_ea`, DW
   `check_dw`, DV `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **ED ADDED ONE BECAUSE
   §2 IS A RULING** — the manifest is the answer to the coverage question EC priced and left open,
@@ -895,7 +923,7 @@ re-derived from the source at DM; not one was moved.**
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 37
+  move a line in another file and say why. **There are 38
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -926,8 +954,12 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 81 ROWS: 46 suites, 30 gates, 2 scene runs
-  and 3 harness gates.** **EF ADDED NO ROW AND MOVED EXACTLY ONE — `check_ec` 22 → 23, the fifth
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 82 ROWS: 46 suites, 31 gates, 2 scene runs
+  and 3 harness gates.** **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
+  BATTERY OFF STANDALONE READINGS** — `test_batch_bo` 1131 → 1140, `test_batch_bx` 157 → 161,
+  `check_ea` 60 → 62, `test_batch_bp` 275 → 276, and its own row off THREE identical readings of 68,
+  so `check_de` certified on pass one. **THE `bo` DELTA WAS COUNTED OFF THE DIFF RATHER THAN
+  GUESSED** — +20 `ok(` against −11, every one linear. **EF ADDED NO ROW AND MOVED EXACTLY ONE — `check_ec` 22 → 23, the fifth
   tracked document, written off three identical standalone readings BEFORE the battery so
   `check_de` certified on pass one.** **ED ADDED `check_ed` AND MOVED THREE ROWS, ALL THREE PREDICTED AND ALL
   THREE CONFIRMED STANDALONE BEFORE THE BATTERY** — `check_dr` 79 → 80, `test_batch_bm`
@@ -988,7 +1020,13 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 166 / 8** — EE's locator guard moved gate 2 from 165.
-- **master.html stamp: `Last updated: 2026-08-31 (Batch EF)`.** **EF MOVED THE STAMP AND NOTHING
+- **master.html stamp: `Last updated: 2026-08-31 (Batch EG)`.** **EG MOVED THE STAMP AND THREE
+  PROSE BLOCKS — the first behaviour change in that document since DY** — the draft column's cap
+  and ledger bullets, the seven-slot-cap paragraph (now the ladder, plus what a hero HOLDS against
+  what he CARRIES), and the take-one-and-bench-one paragraph. **The literal-flip sweep read 1 gained
+  / 0 LOST, and the retired-word counts are IDENTICAL to HEAD at 3 *party* and 28 *beast***, so
+  `test_batch_bx` §4 and §4b see exactly the population they saw.
+  **Before it, EF moved the stamp and nothing
   ELSE IN THAT DOCUMENT — a one-line diff, and the literal-flip sweep read 0 gained / 0 lost on it.
   Before it, EE moved the stamp and nothing else**, and the literal-flip sweep read **0 gained / 0 lost**
   on it. Before it, **ED MOVED THE STAMP AND NOTHING
@@ -1051,7 +1089,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **26 entries** (DG → EF). **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
+  **27 entries** (DG → EG). **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
@@ -1075,7 +1113,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   every live-changelog assertion in the tree is either the archive-path anchor or a **negative**
   `not contains("<h2>… Batch XX")`, which a cut can only make more true.
 
-### Knowledge sync, re-measured at EF
+### Knowledge sync, re-measured at EG
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **THE SET IS STATED RATHER THAN DESCRIBED**: it is every tracked file outside `assets/` with one of
 those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPTION** —
@@ -1083,18 +1121,22 @@ those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPT
 re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and all are measured on
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
-- **171 files, 7.6699 MiB.** **EF added TWO files** — `docs/instrument-rules.md` and
-  `claude_md_census.py` — and deleted none.
+- **174 files, 7.8114 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
+  `docs/reports/EG.md` INCLUDED, which is a change of convention from EF and is why the figure is
+  not directly comparable with its 171 / 7.6699. **EG added TWO files** — `check_eg.gd` and
+  `docs/reports/EG.md` — and deleted none. **Re-derive with `claude_md_census.py` rather than
+  quoting this.**
 - Heaviest: `scripts/battle.gd` **1226**, `docs/design-notes.md` **412**, `docs/master.html`
   **338**, `scripts/classes.gd` **322**, **`pin-manifest.json` 296**, `docs/changelog.html`
-  **224**, `scripts/talents.gd` **179**, `scripts/unit.gd` **177**, `CLAUDE.md` **175.46**,
+  **230**, `CLAUDE.md` **180.87**, `scripts/talents.gd` **179**, `scripts/unit.gd` **177**,
   `docs/talent-audit.html` **165**, **`docs/instrument-rules.md` 69.84**. **`CLAUDE.md` IS NO LONGER
   IN THE TOP FIVE**, which is what the split was for. The changelog grows about 8 KiB a batch, so
   CW's 400 KiB threshold is roughly twenty-two batches away.
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
   measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF took that
-  split.** **It reads 175.46 KiB, which is 114.54 KiB of headroom — about twenty-six batches at
-  +4,520 B/batch and about forty-one at the main half's own measured rate.**
+  split.** **It reads 180.87 KiB, which is 109.13 KiB of headroom — about
+  twenty-four batches at +4,520 B/batch.** **EG grew it by 5,533 B (5.40 KiB)**, which is one
+  standing rule, four rule amendments and one corrected precedent.
   **`docs/instrument-rules.md` reads 69.84 KiB and has no stated ceiling**; the arithmetic for one is
   in `docs/reports/EF.md` §2 and taking it is a ruling.
   - **THE SPLIT COST 7,984 B OF ITS OWN** — the index block, the new file's header, two section
@@ -1109,7 +1151,7 @@ the number.*
     worth re-deriving.** Its numerator is now spread over two files and its denominator gained both,
     which is the third way the same measurement can move without anything about density changing.
 - **THE DESELECTION LIST FOR THE FILE PICKER.** **Deselect `pin-manifest.json`** — it stays in the
-  repo and `check_ed` goes on reading it off disk. **After it: 170 files, 7.3808 MiB.** Already
+  repo and `check_ed` goes on reading it off disk. **After it: 173 files, 7.5189 MiB.** Already
   standing and unchanged: the 47 suite files, `docs/build_docs.py`, the archived changelog, and any
   audit document whose findings have been ruled on and applied. **`claude_md_census.py` IS A
   CANDIDATE TOO** by the same argument that deselects `build_pin_manifest.py` — it is a tool Claude
@@ -1118,8 +1160,8 @@ the number.*
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **37** — **EF AND EE ADDED NONE**; ED added `check_ed`, EC `check_ec`, EB `check_eb`, EA
-  `check_ea`, and DZ and DY each added none.
+  are **38** — **EG ADDED `check_eg`**; EF and EE added none, ED added `check_ed`, EC `check_ec`,
+  EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -1178,7 +1220,9 @@ reach `bp` §7 at all: it is a Warrior flow.**
   compared pair in the file, and every `_seeded()` call in it used to sit DOWNSTREAM of that check.
   Its check count is rock steady at **467** across every reading including both of DR's and all
   three of DY's.
-- **`test_batch_bo`'s FLAKY ASSERTION IS FIXED AT DT AND THE COUNT DID NOT MOVE — still 1106.**
+- **`test_batch_bo`'s FLAKY ASSERTION IS FIXED AT DT AND THAT FIX MOVED NO COUNT. THE NUMBER THIS
+  LINE USED TO RESTATE (1106) WAS STALE BY FOUR BATCHES; the live figure is in `baselines.json` and
+  is not repeated here.**
   §5's NULL FIELD check still requires `deep < shallow`; both blows are seeded per-pair now, so the
   pair reads 17 against 10 on every run. **`test_batch_bo.gd` called `seed()` zero times before DT
   and calls it twice now, both in `_nf_seeded()` at that one site.**
@@ -1211,93 +1255,45 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EF, AND IT FOUND NOTHING.** No suite failure, no throw, no notice, no timeout, and
-the only red is the one that is on purpose. **186 files were MD5-stamped before the acceptance run
-and re-compared after; EVERY ONE IS BYTE-IDENTICAL.** `CLAUDE.md`, `docs/instrument-rules.md`,
-`docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, `baselines.json`,
-`pin-manifest.json` and every `.gd` file are unchanged across the run, **so the battery certified
-what ships. EXACTLY TWO FILES DIFFER FROM THE CERTIFIED TREE NOW — this one and
-`docs/reports/EF.md` — and both are read by nothing**, checked rather than recalled.
-**THIS BLOCK WAS STILL EB's AT EE, WHICH IS WHY IT IS REPLACED WHOLE RATHER THAN AMENDED.**
+**TWO BATTERIES AT EG. BATTERY 1 FOUND FOUR INSTRUMENT DEFECTS AND BATTERY 2 FOUND NOTHING.**
+**188 files were MD5-stamped before the acceptance run and re-compared after; EVERY ONE IS
+BYTE-IDENTICAL**, so the battery certified what ships. **BATTERY 1 WAS FROZEN TOO, AND THAT IS WHAT
+MAKES ITS REDS ATTRIBUTABLE**: of the same 188, the only four differing from its pre-run stamp are
+the four repaired after it finished. **EXACTLY TWO FILES DIFFER FROM THE CERTIFIED TREE NOW — this
+one and `docs/reports/EG.md` — and both are read by nothing**, checked rather than recalled.
 
-| | EC's acceptance | ED's acceptance | EE's acceptance | **EF's acceptance** |
+| | EE's acceptance | EF's acceptance | **EG battery 1** | **EG's acceptance** |
 |---|---|---|---|---|
-| **suite failures** | 0 | 0 | 0 | **0** |
+| **suite failures** | 0 | 0 | **1** | **0** |
 | **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | 0 | **0** |
-| `check_de` | 333 / 0 / 0 | 337 / 0 / 0 | 337 / 0 / 0 | **337 / 0 / 0** |
-| targets in the manifest | 81 | 82 | 82 | **82** |
+| `check_de` | 337 / 0 / 0 | 337 / 0 / 0 | **341 / 3 / 0** | **341 / 0 / 0** |
+| run harness | 22 / 166 / 8 | 22 / 166 / 8 | **GATE 2 FAIL** | **22 / 166 / 8** |
+| targets in the manifest | 82 | 82 | 83 | **83** |
 
-**EIGHTY-TWO TARGETS RAN AND THE MANIFEST NAMES ALL EIGHTY-TWO**, compared both ways: no log on
-disk the manifest does not name, and none named that is not on disk. **0 `Parse Error` and 0
-`SCRIPT ERROR` in every one of the 82 logs** — grepped from the streams rather than read off a tally
-or an exit code, and **not one of the 82 logs contains either marker.**
-`check_map_screen: OK`; `check_ct_map` 83 / 0; the run harness reads **22 / 166 / 8**, all three
-PASS with no throws. **40,670 checks** across the suite and gate lines, plus 196 from the harness and
-83 from `check_ct_map`. **That total is a sum over drifting bands and is not a figure to compare
-across batches** — `an` alone read 6049 here against 6054 at EE, well inside its band.
+**EIGHTY-THREE TARGETS RAN AND THE MANIFEST NAMES ALL EIGHTY-THREE**, compared both ways.
+**0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 83 logs** — grepped from the streams
+rather than read off a tally or an exit code. `check_map_screen: OK`; `check_ct_map` 83 / 0.
 
-**AND THE PREDICTION HELD EXACTLY.** `check_de` reported **337 checks, 0 failures and ZERO
-NOTICES**, with **81 of 81 recorded targets swept and 0 off their recorded line**. **`check_ec` read
-23**, the one row written BEFORE the run off three identical standalone readings, and **no other row
-moved.** `check_de` itself did not move, because no target arrived or left.
+**AND THE PREDICTION HELD EXACTLY, ON BOTH RUNS.** `check_de` read **341 checks and ZERO NOTICES**,
+so not one unpredicted count moved: `check_eg` **68**, `test_batch_bo` **1140**, `test_batch_bx`
+**161**, `check_ea` **62**, `test_batch_bp` **276**, and every other row on its recorded line.
 
-**THE CODE CHANGE IS ONE NEW SCRIPT, ONE NEW DOCUMENT AND FOUR SMALL EDITS.** `scripts/` is
-byte-unchanged — `git diff --stat scripts/` is empty. `claude_md_census.py` and
-`docs/instrument-rules.md` are new; `check_ec.gd` gains a fifth tracked document and two re-pointed
-needles; `test_batch_ce.gd` gains a second holder and two re-pointed needles; `check_ea.gd`'s §3
-regex binds either rule file; `build_pin_manifest.py`'s `DOCS` gains the new file.
-`pin-manifest.json` is regenerated — **1313 pins either side, four changing haystack and nothing
-else**. `baselines.json` moves one row at `indent=1`, a three-line change with no churn.
-
-**THE NEGATIVE CONTROLS — AND FOUR OF THE SEVEN ARE TWO-ARMED.** Each armed on something a target
-demonstrably reads, disarmed state confirmed GREEN first, every file restored by `cp` from a
-scratchpad backup with the md5 compared.
-- **A / A2 — THE PAIR THAT MATTERS.** Reword `AN INSTRUMENT'S TERRITORY IS A CLAIM` in
-  `docs/instrument-rules.md` and leave `CLAUDE.md`'s index row intact: **`check_ec` 24 / 3**, naming
-  the file. Reword the **INDEX ROW ONLY** and leave the rule: **`check_ec` 23 / 0, GREEN.**
-  **Together they prove the pin reads the RULE and not the index** — which is the hazard the index
-  block writes down.
-- **B — THE GUIDE'S OWN READERS SURVIVED.** `DO NOT ADD A BATCH BLOCK TO THIS FILE` reworded in a
-  block that stayed: **`test_batch_bb` 177 / 1.**
-- **C — THE RE-POINT WAS NECESSARY, NOT DECORATIVE.** HEAD's un-re-pointed `test_batch_ce.gd` run
-  against the split tree reads **1114 / 2 FAILED**, naming both moved needles — **at its exact check
-  count, so only the failure moved.**
-- **F / F2 — THE SPLIT VERIFIER BITES.** Drop one block from the instrument half: **5 assertions
-  red**, naming the heading. Make a **BYTE-PRESERVING** edit inside a moved block (`400 KB` →
-  `004 KB`): **the file sizes are IDENTICAL and the rejoin still catches it.** That is why *do not
-  assert file sizes* is a rule.
-- **D — THE PARSE CONTROL, ARMED IN `check_parse`'s REAL SCOPE.** `func draft_pool_left(:` in
-  `run_state.gd` produced **22 `Parse Error` lines in stderr**, tally 7; the clean tree reads 0 and
-  0. **It is armed there rather than on an edited GATE on purpose** — `check_parse` does not cover
-  the gates, so a control armed on `check_ec.gd` reads clean for the wrong reason (EB §3). **The
-  three edited `.gd` files were each launched directly instead**, which is the only proof that bites
-  for a gate.
-
-**THE PRE-BATTERY INSTRUMENTS, ALL RUN BEFORE THE CERTIFICATION RUN.**
-- **THE SPLIT VERIFIER, A SECOND SCRIPT SHARING NOTHING WITH THE SPLITTER.** Headings counted two
-  independent ways on all three files; **71 + 28 = 96 + 3 authored**; no duplicate inside either
-  half; zero overlap; every original heading present exactly once and nothing invented; order
-  preserved inside each half; **the two bodies rejoin BYTE-IDENTICAL to the pre-split file**; and no
-  block body edited. **NO FILE SIZE WAS ASSERTED ANYWHERE.**
-- **THE PIN SWEEP, RUN BOTH WAYS.** Every document pin re-resolved against the split tree, and the
-  same sweep against `git show HEAD`'s documents and HEAD's manifest: **217 pins either side, the
-  same twelve unresolved, the same list.** Eight runtime format strings, the three documented
-  vacuous carriers, and two `master.html` needles asserted against a stripped copy. **The split
-  moved nothing into or out of that set.**
-- **THE LITERAL-FLIP SWEEP over the five tracked documents**, 11,205 distinct literals at a floor of
-  4, against `git show HEAD`: `CLAUDE.md` **1 gained / 71 lost**, `instrument-rules.md` **317 / 0**,
-  `changelog.html` **1 / 0**, `master.html` and `design-notes.md` **0 / 0**. **LOST LITERALS ARE
-  EXPECTED WHEN A THIRD OF A FILE MOVES — the proof is the assertions, not the count.** 0 gained
-  literals negatively pinned against the file they landed in; 0 lost literals positively pinned into
-  it. Against **HEAD's** manifest exactly **two** of the 71 lost were pinned, which is the re-point
-  showing up as arithmetic. **The one gained literal is `docs/instrument-rules.md` itself.**
-- **THE SOURCE-SIDE FLIP SWEEP over the four edited `.gd`/`.py` files: zero flips a pin cares
-  about**, checked against both manifests.
-- **THE RETIRED-WORD PRE-CHECK: 0 *party* and 0 *beast* in every line this batch added** to
-  `CLAUDE.md`, `docs/changelog.html` and `docs/design-notes.md`. The four in
-  `docs/instrument-rules.md` are inside moved blocks and no sweep reads that file — checked, not
-  assumed.
-- **A 17-SUITE SUBSET BATTERY plus all thirty gates**, over every reader of a tracked document:
-  **every suite exactly on its baseline, 0 throws.**
+**THE FOUR DEFECTS BATTERY 1 FOUND, BECAUSE THE SHAPES RECUR.**
+- **TWO ARE ONE DEFECT IN TWO COPIES.** `test_batch_bm` §6 and `test_run_harness` gate 2 each slice
+  `battle.gd` from `func _resolve_boss` for a fixed **2400 characters**; EG's §1 comment pushed the
+  `# The end boss.` anchor from 2130 to **2955** and both went red. **ED §2's rule met in the wild**
+  — a scan capturing a WINDOW is blind to what the window swallowed — arriving as a window COPIED
+  between two targets. Both run to the next top-level `func ` now. **EE §4's GUARD IS THE ONLY
+  REASON EITHER SURFACED**: without it the slice is EMPTY, the negative assertion holds for every
+  needle, and both go green reading nothing — and in the harness that negative is the ONLY
+  assertion on the slice.
+- **`check_ct` PINNED THE SAVE VERSION LITERAL, WHICH IS THE RULE CT ITSELF SET.** `== 11`, against
+  *a suite must not pin the save version literal*. **THE MANIFEST COULD NOT HAVE WARNED ANYONE** —
+  `build_pin_manifest.py` indexes STRING literals and a version pin written as an INTEGER comparison
+  is invisible to it, which is why a 762-pin source sweep with exactly four intended flips read
+  straight past it.
+- **SO THE POPULATION WAS SWEPT RATHER THAN THE INSTRUMENT TRUSTED, AND IT WAS TWO — THE SECOND WAS
+  `check_eg`, THE GATE THIS BATCH WAS WRITING.** A named list cannot audit itself. Both read `>=`
+  now. **No check count moved on any of the four.**

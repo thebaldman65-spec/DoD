@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-31 (Batch EF)</b></p>
+<p align="right"><b>Last updated: 2026-08-31 (Batch EG)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1220,11 +1220,12 @@ to show simply has no column.</p>
 <ul>
 <li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
 others, and a settled kit is a legitimate end state.</li>
-<li><b>A declined or dropped card does not come back that run</b>, for <i>that hero</i>. The
+<li><b>A declined card does not come back that run</b>, for <i>that hero</i>. The
 no-return ledger is <b>per hero</b>: refusing a card for the Pyromancer never hides it from
-anyone else.</li>
-<li><b>The seven-slot cap holds per column.</b> A hero already at the cap must name what the
-incoming card replaces before their column counts as decided.</li>
+anyone else. <b>Benching one is not declining it</b> — a benched card is kept.</li>
+<li><b>The slot cap holds per column.</b> A hero already at the cap must name what the
+incoming card replaces before their column counts as decided. The named ability is
+<b>benched, not lost</b>.</li>
 <li><b>The screen resolves as one action.</b> All four columns are chosen, then the whole
 screen is confirmed — so filling the Devout's last slot can still be reconsidered before the
 Warden's pick is locked. Leaving the screen commits nothing; the picks stay owed on the hero
@@ -1240,21 +1241,30 @@ damage in prose, so before this they drafted blind. <b>The offer / drop picker o
 screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
 no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
-<p>This is <b>four times as much drafting</b> as one hero per elite. A hero has five spec cards
-and six class cards against four draftable slots, so a hero at the cap will be dropping
-something at nearly every elite. That is the intended shape — constant, meaningful decisions —
-and it is deliberately untuned: neither the cap, nor the offer size, nor the seam is adjusted
-for it.</p>
+<p>This is <b>four times as much drafting</b> as one hero per elite. Every spec drafts from at
+least ten spec cards and six class-wide ones, and a run offers far more cards than a hero can
+carry — so the cap is what the draft is about. That is the intended shape: constant, meaningful
+decisions.</p>
 
-<p><b>The seven-slot cap, and the protected core.</b> Every spec keeps a <b>protected core</b>:
-its passive, its basic attack, and the minimum abilities its passive needs to function.
-Protected abilities <b>can never be dropped</b>, so every drop decision is among <i>earned</i>
-abilities — which keeps the choice clean and makes the cap unable to break a passive. The core
-counts against the cap, so most specs carry <b>3 protected and 4 draftable</b>.</p>
-<p><b>At the cap, an offer becomes take-one-and-drop-one:</b> pick the incoming ability, then
-name which of your earned abilities it replaces. <b>Declining is always allowed</b>, at any
+<p><b>The slot cap grows on every zone boss, and the protected core.</b> A hero carries
+<b>seven</b> abilities at the start of a run and <b>ten</b> by the end of it — one more slot
+after each of the three zone bosses, announced on the zone-victory screen beside the pouch. Every
+spec keeps a <b>protected core</b>: its passive, its basic attack, and the minimum abilities its
+passive needs to function. Protected abilities <b>can never be benched</b>, so every loadout
+decision is among <i>earned</i> abilities — which keeps the choice clean and makes the cap unable
+to break a passive. The core counts against the cap, so most specs carry <b>3 protected and 4
+draftable</b> at the start and <b>3 and 7</b> at the end; Holy carries 4 and 3, growing to 4 and
+6.</p>
+<p><b>What a hero HOLDS and what a hero CARRIES are two different things.</b> Every card a hero
+takes is kept for the rest of the run. What the cap limits is how many of them are
+<b>carried</b> into a fight — the rest sit on the bench, and <b>swapping between them costs
+nothing</b> and can be done at any time from the hero card on the map. A pick is a loadout
+decision, not a commitment.</p>
+<p><b>At the cap, an offer becomes take-one-and-bench-one:</b> pick the incoming ability, then
+name which of your carried abilities it replaces. The named one goes to the bench and can be
+brought back whenever you like. <b>Declining is always allowed</b>, at any
 point, full or not — a settled kit is a legitimate end state, and being forced to churn would
-make a good build worse as the run goes on. <b>A declined or dropped ability does not return
+make a good build worse as the run goes on. <b>A declined ability does not return
 to that run's pool</b>, so an offer can never re-present what was just refused.</p>
 
 <p><b>The twelve protected cores.</b> The "needs" column is the minimum the passive cannot

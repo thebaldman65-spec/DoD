@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A pick you cannot take back is not a decision (Batch EG) — 2026-08-31
+
+The draft shipped with four draftable slots and a no-return rule on both ends of it: decline a card
+and it never comes back, take a card at the cap and the one it replaced never comes back either.
+Measured, a run offers each hero roughly nine draft cards plus three boss picks, and **63% of those
+offers arrive at a hero who is already full**. So after zone one every offer was the same question —
+give up something permanently, or refuse — and the honest answer to that question is usually
+*refuse*. **A draft nobody takes cards from is not a draft.**
+
+The two changes answer different halves of it and neither would have been enough alone. **More
+slots** is the obvious half: 7 to 10 across a run, which is 4 draftable to 7. But a bigger cap
+reached later is still a cap you hit, and the last third of a run would have gone back to
+refuse-or-swap. **Free benching** is the half that changes what a pick IS. A card you take and set
+aside is still a card you own; you are choosing a loadout, not spending a life. Those are different
+decisions and only the second one is interesting to make repeatedly.
+
+**What is deliberately NOT free is the offer.** Declining still burns the cards for the run. That
+is what stops the loadout becoming a solved optimisation — the pool is still exactly what you were
+dealt, and the interesting question stays *which of these do I want to own*, not *how do I get
+everything*.
+
+**Why the ladder is the pouch's shape and not the runes'.** Batch AN deleted the rune slot ladder
+because a growth ladder means a run that dies in zone 2 never owns the last slot, and an empty rune
+slot is dead weight you cannot fill on demand. Batch CT kept the pouch ladder against the same
+objection, on the ground that a pouch slot is filled the moment you reach a merchant — growth
+loosens a tradeoff rather than diluting a reward. **An ability slot is the pouch case.** A draft
+offer lands at every elite and a boss award at every zone boss, so a slot opened here is filled
+almost immediately. It is never dead weight, which is the whole of the rune objection.
+
+**And the protected core stays fixed, which is not a detail.** The talent charter rests on it: *a
+talent modifying the spec's PROTECTED CORE is guaranteed and permitted*, and that sentence is worth
+83 nodes. If a core could be benched, every talent modifying one would become a bet on the player's
+own loadout — which is exactly the class of bet the charter exists to forbid. The core is not
+benchable and the rule is the absence of its names from the pool rather than a branch anyone has to
+remember.
+
 ## A share is not a size (Batch EE) — 2026-08-31
 
 The 3%-of-sync target lasted from BY to EE, and what finally killed it was not that the file kept

@@ -88,6 +88,11 @@ const PICKER_ID_BASE := 100
 # Which hero's pouch is open on the rune overlay, or -1.
 var _rune_panel_for := -1
 
+# BATCH EG §2 — the same, for the loadout panel. Its own flag rather than a
+# shared one: the two overlays are opened from two buttons on the same card and
+# a shared guard would make one refuse to open because the other had been.
+var _loadout_panel_for := -1
+
 # BATCH BX §2 — THE PARTY DRAFT'S STAGED CHOICES, and staging them rather than
 # committing them IS the section. The screen resolves as ONE action: every
 # column is decided, then the whole screen is confirmed, so a player who fills
@@ -188,6 +193,7 @@ func _draw_screen() -> void:
 	for child in get_children():
 		child.queue_free()
 	_rune_panel_for = -1
+	_loadout_panel_for = -1
 	# The draft overlay is a child too, so a redraw takes it with it. The
 	# STAGED CHOICES deliberately survive (`_draft_stage` is not cleared here):
 	# nothing was committed, so reopening from the card's CHOOSE button puts
@@ -648,6 +654,34 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		slot_btn.pressed.connect(_open_rune_panel.bind(idx))
 		add_child(slot_btn)
 
+	# BATCH EG §2 — THE SWAP NEEDS A PLACE TO HAPPEN, AND THIS IS IT.
+	# It is on the MAP CARD and not on the party sheet for the reason the runes
+	# are: one writer. `party_screen.gd`'s rune block says so in as many words —
+	# "equipping happens on the map card, so there is one place that writes
+	# `equipped`" — and a loadout with two writers is the same defect wearing a
+	# different field name. The sheet SHOWS the loadout and the bench count; this
+	# button is what moves them.
+	#
+	# The row it sits on is the rune slots'. It reads the ladder rather than a
+	# number, so it cannot drift from `ABILITY_SLOTS_BY_BOSS`.
+	if spec != "":
+		var load_btn := Button.new()
+		load_btn.position = at + Vector2(8 + Run.rune_slots() * 96, 62)
+		load_btn.custom_minimum_size = Vector2(CARD_W - 24 - Run.rune_slots() * 96, 26)
+		load_btn.add_theme_font_size_override("font_size", 10)
+		var held_n: int = Run.earned_ability_names(member).size()
+		var bench_n: int = Run.benched_ability_names(member).size()
+		load_btn.text = "Kit %d/%d" % [Run.ability_slots_used(member),
+			Run.ability_slot_cap()]
+		load_btn.tooltip_text = "%s carries %d of %d ability slots and holds %d earned card%s (%d benched).\nClick to swap them — benching costs nothing and a benched card is kept." % [
+			key.capitalize(), Run.ability_slots_used(member), Run.ability_slot_cap(),
+			held_n, "" if held_n == 1 else "s", bench_n]
+		load_btn.add_theme_color_override("font_color",
+			Color(0.95, 0.85, 0.4) if bench_n > 0 else Color(0.62, 0.6, 0.57))
+		load_btn.pressed.connect(Music.click)
+		load_btn.pressed.connect(_open_loadout_panel.bind(idx))
+		add_child(load_btn)
+
 	# Batch AQ §5C: the ability-upgrade count, sitting alongside the rune slots
 	# — runes already get exactly this treatment here and upgrades got nothing,
 	# which is the asymmetry worth closing. A full run awards three to every
@@ -824,12 +858,12 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	if kind == "ability":
 		var used := Run.ability_slots_used(member)
 		var slots := Label.new()
-		slots.text = "Ability slots %d of %d%s" % [used, Run.ABILITY_SLOT_CAP,
-			"  —  taking one means dropping one" if used >= Run.ABILITY_SLOT_CAP
+		slots.text = "Ability slots %d of %d%s" % [used, Run.ability_slot_cap(),
+			"  —  taking one means benching one" if used >= Run.ability_slot_cap()
 			else ""]
 		slots.add_theme_font_size_override("font_size", 13)
 		slots.add_theme_color_override("font_color",
-			Color(0.95, 0.6, 0.45) if used >= Run.ABILITY_SLOT_CAP
+			Color(0.95, 0.6, 0.45) if used >= Run.ability_slot_cap()
 			else Color(0.6, 0.58, 0.55))
 		slots.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(slots)
@@ -896,25 +930,33 @@ func _pick_button(box: VBoxContainer, label: String, desc: String,
 	box.add_child(text)
 
 
-# THE DROP STEP (Batch BO §2). At the cap an offer becomes take-one-and-drop-
-# one: the player picks the incoming ability and THEN names which one it
-# replaces. Only EARNED abilities are listed — a protected one can never appear
-# here, which is what makes the cap unable to break a passive.
+# THE BENCH STEP (Batch BO §2, renamed at EG §2). At the cap an offer becomes
+# take-one-and-bench-one: the player picks the incoming ability and THEN names
+# which one it replaces. Only EARNED abilities are listed — a protected one can
+# never appear here, which is what makes the cap unable to break a passive.
 #
-# BATCH BX §2 — ONE DROP STEP, TWO CONSUMERS. `on_drop` is what the party-wide
+# **BATCH EG §2 — IT LISTS THE LOADOUT, NOT THE POOL, AND THAT IS THE ONE LINE
+# THE SPLIT MOVED HERE.** `earned_ability_names` is the POOL now and it holds
+# benched cards, which are not carried and cannot be benched again — listing
+# them would put a button on the screen that `unequip_earned_ability` correctly
+# refuses and that therefore does nothing. `equipped_ability_names` is a subset
+# of the pool by construction (both doors check it), so this is still "only
+# earned abilities" and is now also "only ones he is actually carrying".
+#
+# BATCH BX §2 — ONE STEP, TWO CONSUMERS. `on_drop` is what the party-wide
 # draft screen passes: that screen resolves as one confirmation, so it STAGES
 # the replacement instead of committing it, and the difference between the two
 # consumers is exactly one Callable rather than a second list of what may be
-# dropped. `Run.earned_ability_names` is still the only answer to that.
+# benched.
 func _open_drop_overlay(idx: int, kind: String, incoming: String,
 		on_drop := Callable()) -> void:
 	var member: Dictionary = Run.party[idx]
-	var droppable := Run.earned_ability_names(member)
+	var droppable := Run.equipped_ability_names(member)
 	if droppable.is_empty():
-		# Nothing earned to drop and the kit still reads full — the protected
+		# Nothing carried to bench and the kit still reads full — the protected
 		# core alone cannot exceed the cap, so this is unreachable today. It
 		# refuses rather than silently exceeding the cap.
-		_toast("%s has nothing that can be dropped." % String(member["key"]).capitalize())
+		_toast("%s has nothing that can be benched." % String(member["key"]).capitalize())
 		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -943,7 +985,7 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String,
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var note := Label.new()
-	note.text = "The kit is full at %d slots. Protected abilities cannot be dropped,\nand a dropped one does not come back this run." % Run.ABILITY_SLOT_CAP
+	note.text = "The kit is full at %d slots. Protected abilities cannot be benched,\nand a benched one is KEPT — swap it back from the hero card." % Run.ability_slot_cap()
 	note.add_theme_font_size_override("font_size", 12)
 	note.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -952,7 +994,7 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String,
 	var spec := String(member.get("spec", ""))
 	for name in droppable:
 		var ab: Ability = Classes.spec_pool_ability(spec, String(name))
-		_pick_button(box, "Drop %s" % String(name),
+		_pick_button(box, "Bench %s" % String(name),
 			Classes.resolve_values(ab.description) if ab != null else "",
 			Color(0.9, 0.7, 0.6),
 			on_drop.bind(idx, String(name)) if on_drop.is_valid()
@@ -976,20 +1018,26 @@ func _finish_take(idx: int, kind: String, incoming: String, drop_name: String) -
 		_pick_ability(idx, incoming, drop_name)
 
 
-func _pick_ability(idx: int, pool_name: String, drop_name := "") -> void:
+func _pick_ability(idx: int, pool_name: String, bench_name := "") -> void:
 	var member: Dictionary = Run.party[idx]
 	if int(member.get("bm_picks_owed", 0)) < 1 \
 			or pool_name in member.get("bm_abilities", []):
 		return
 	# BATCH BO §2: THE CAP BINDS THE BOSS PICK TOO. §3 leaves the boss OFFER
 	# unchanged — same source, same timing, same SPEC_POOLS draw — but the
-	# seven-slot cap is a rule about a KIT, not about one pool, and a boss pick
-	# that could walk past it would not be a cap at all (a Beastmaster's five
-	# spec-pool entries alone reach eight).
-	if drop_name == "" and Run.ability_slots_full(member):
+	# cap is a rule about a KIT, not about one pool, and a boss pick that could
+	# walk past it would not be a cap at all (a Beastmaster's five spec-pool
+	# entries alone reach eight).
+	#
+	# BATCH EG §2: the step it opens BENCHES rather than drops. The named
+	# ability stays in the pool and is swappable back from the hero card, and
+	# the no-return ledger is not written — `Run.unequip_earned_ability` is the
+	# one door, and it refuses a protected name by the same absence
+	# `drop_earned_ability` refused it by.
+	if bench_name == "" and Run.ability_slots_full(member):
 		_open_drop_overlay(idx, "ability", pool_name)
 		return
-	if drop_name != "" and not Run.drop_earned_ability(member, drop_name):
+	if bench_name != "" and not Run.unequip_earned_ability(member, bench_name):
 		return
 	# Spend the triple this pick came from: the other two are gone, not
 	# banked for the next award.
@@ -997,13 +1045,13 @@ func _pick_ability(idx: int, pool_name: String, drop_name := "") -> void:
 	if not queue.is_empty():
 		queue.pop_front()
 		member["bm_candidates"] = queue
-	member["bm_abilities"] = member.get("bm_abilities", []) + [pool_name]
+	Run.hold_ability(member, pool_name, true)
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()
-	if drop_name != "":
-		_toast("%s trades %s for %s." % [String(member["key"]).capitalize(),
-			drop_name, pool_name])
+	if bench_name != "":
+		_toast("%s carries %s instead of %s." % [String(member["key"]).capitalize(),
+			pool_name, bench_name])
 	else:
 		_toast("%s learns %s." % [String(member["key"]).capitalize(), pool_name])
 
@@ -1061,9 +1109,10 @@ func _maybe_open_party_draft() -> void:
 
 
 # A column is DECIDED when the player has either declined it or chosen a card
-# AND, at the seven-slot cap, named what that card replaces. The confirm button
-# reads this for every column, so "the screen resolves as one action" is a
-# property of one predicate rather than of four buttons agreeing.
+# AND, at the cap, named what that card replaces. The confirm button reads this
+# for every column, so "the screen resolves as one action" is a property of one
+# predicate rather than of four buttons agreeing. (BATCH EG §1: the cap is a
+# ladder now and this predicate never named the number — it asks the run.)
 func _draft_decided(idx: int) -> bool:
 	var st: Dictionary = _draft_stage.get(idx, {})
 	if bool(st.get("declined", false)):
@@ -1179,8 +1228,8 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	# step instead of staging outright.
 	var used := Run.ability_slots_used(member)
 	var slots := Label.new()
-	slots.text = "Ability slots %d of %d%s" % [used, Run.ABILITY_SLOT_CAP,
-		"  —  taking one means dropping one" if full else ""]
+	slots.text = "Ability slots %d of %d%s" % [used, Run.ability_slot_cap(),
+		"  —  taking one means benching one" if full else ""]
 	slots.add_theme_font_size_override("font_size", 11)
 	slots.add_theme_color_override("font_color",
 		Color(0.95, 0.6, 0.45) if full else Color(0.6, 0.58, 0.55))
@@ -1276,7 +1325,7 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	# until the replacement is named, and the button says which state it is in.
 	if staged != "" and not declined and full:
 		var drop_btn := Button.new()
-		drop_btn.text = "replaces %s  (change)" % staged_drop if staged_drop != "" \
+		drop_btn.text = "benches %s  (change)" % staged_drop if staged_drop != "" \
 			else "Choose what %s replaces" % staged
 		drop_btn.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
 		drop_btn.add_theme_font_size_override("font_size", 12)
@@ -1315,7 +1364,7 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	elif full and staged_drop == "":
 		state.text = "name what it replaces"
 	elif staged_drop != "":
-		state.text = "takes %s for %s" % [staged, staged_drop]
+		state.text = "takes %s, benching %s" % [staged, staged_drop]
 	else:
 		state.text = "takes %s" % staged
 	state.add_theme_font_size_override("font_size", 12)
@@ -1364,7 +1413,7 @@ func _close_party_draft() -> void:
 
 # THE ONE COMMIT. Every column resolves here, through the same two doors the
 # single-hero overlay calls — `Run.take_draft_ability` and `Run.decline_draft`
-# — so the cap, the drop, the no-return ledger and the "already known" refusal
+# — so the cap, the bench, the no-return ledger and the "already known" refusal
 # are the run's rules and not this screen's. It saves ONCE afterwards.
 func _confirm_party_draft() -> void:
 	var took := PackedStringArray()
@@ -1535,6 +1584,155 @@ func _toggle_rune(idx: int, rune_idx: int, overlay: Control) -> void:
 	_rune_panel_for = -1
 	_draw_screen()
 	_open_rune_panel(idx)
+
+
+# ---------- BATCH EG §2: THE LOADOUT PANEL ----------
+#
+# THE RUNE POUCH'S SHAPE, DELIBERATELY. Same overlay, same row layout, same
+# toggle-and-redraw. What differs is what the cap counts (`ability_slots_used`
+# reads the PROTECTED CORE as well as the loadout, so the number on the title
+# is not the row count) and that the protected core is LISTED AND CANNOT BE
+# TOGGLED — a hero who could not see his own core would read the panel as
+# "three of ten used" with nothing to account for the missing seven.
+#
+# IT WRITES THROUGH `Run.equip_earned_ability` / `Run.unequip_earned_ability`
+# AND OWNS NEITHER RULE. The cap, the refusal of a protected name and the fact
+# that neither door touches the no-return ledger are all `run_state.gd`'s, on
+# the draft screen's own precedent.
+func _open_loadout_panel(idx: int) -> void:
+	if _loadout_panel_for == idx:
+		return
+	_loadout_panel_for = idx
+	var member: Dictionary = Run.party[idx]
+	var spec := String(member.get("spec", ""))
+	var earned: Array = Run.earned_ability_names(member)
+	var carried: Array = Run.equipped_ability_names(member)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 60
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.78)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(300, 110)
+	panel.custom_minimum_size = Vector2(680, 500)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+
+	var title := Label.new()
+	title.text = "%s — ABILITY SLOTS (%d of %d carried)" % [
+		String(member["key"]).capitalize(), Run.ability_slots_used(member),
+		Run.ability_slot_cap()]
+	title.add_theme_font_override("font", NAME_FONT)
+	title.add_theme_font_size_override("font_size", 26)
+	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+
+	var note := Label.new()
+	note.text = "Benching costs nothing and a benched card is KEPT for the rest of the run.\nThe protected core can never be benched. Slots grow on every zone boss."
+	note.add_theme_font_size_override("font_size", 12)
+	note.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(note)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(650, 380)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 5)
+	rows.custom_minimum_size = Vector2(630, 0)
+	scroll.add_child(rows)
+
+	# THE PROTECTED CORE FIRST, AS ROWS THAT CANNOT MOVE. Read off
+	# `Classes.protected_names` rather than counted off `core_slots`: those two
+	# are different units and disagree on every one of the twelve specs (a
+	# Beastmaster is SIX names in three slots), and a list wants the names.
+	for pname in Classes.protected_names(spec):
+		var prow := HBoxContainer.new()
+		prow.add_theme_constant_override("separation", 10)
+		rows.add_child(prow)
+		var plock := Label.new()
+		plock.text = "CORE"
+		plock.custom_minimum_size = Vector2(84, 26)
+		plock.add_theme_font_size_override("font_size", 11)
+		plock.add_theme_color_override("font_color", Color(0.55, 0.62, 0.85))
+		prow.add_child(plock)
+		var plbl := Label.new()
+		plbl.text = String(pname)
+		plbl.add_theme_font_size_override("font_size", 12)
+		plbl.add_theme_color_override("font_color", Color(0.72, 0.78, 0.9))
+		plbl.custom_minimum_size = Vector2(520, 20)
+		prow.add_child(plbl)
+
+	if earned.is_empty():
+		var none := Label.new()
+		none.text = "Nothing earned yet. The draft comes from elites and the Peddler,\nand a zone boss pays a pick of three."
+		none.add_theme_font_size_override("font_size", 13)
+		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
+		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rows.add_child(none)
+	for i in earned.size():
+		var aname := String(earned[i])
+		var is_on: bool = carried.has(aname)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		rows.add_child(row)
+		var toggle := Button.new()
+		toggle.text = "Bench" if is_on else "Carry"
+		toggle.custom_minimum_size = Vector2(84, 26)
+		toggle.add_theme_font_size_override("font_size", 11)
+		# A benched card cannot be carried while the slots are full. The
+		# refusal is the DISABLED button plus its reason, never a silent no-op.
+		toggle.disabled = not is_on and Run.ability_slots_full(member)
+		if toggle.disabled:
+			toggle.tooltip_text = "Every slot is carried. Bench one first."
+		toggle.pressed.connect(Music.click)
+		toggle.pressed.connect(_toggle_loadout.bind(idx, aname, overlay))
+		row.add_child(toggle)
+		var lbl := Label.new()
+		var ab: Ability = Classes.pool_ability(aname)
+		lbl.text = "%s%s%s" % ["✦ " if is_on else "", aname,
+			"" if ab == null or ab.description == ""
+			else " — %s" % Classes.resolve_values(ab.description)]
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.add_theme_color_override("font_color",
+			Color(0.45, 0.9, 0.5) if is_on else Color(0.62, 0.6, 0.57))
+		lbl.custom_minimum_size = Vector2(520, 20)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(lbl)
+
+	var close := Button.new()
+	close.text = "Close"
+	close.custom_minimum_size = Vector2(200, 38)
+	close.pressed.connect(Music.click)
+	close.pressed.connect(func():
+		_loadout_panel_for = -1
+		overlay.queue_free())
+	box.add_child(close)
+
+
+# The overlay defaults to null so the panel can be driven without one —
+# `check_map_screen` toggles both directions to prove the Callable binds, and a
+# hard `overlay.queue_free()` would make that a crash rather than a check. The
+# real caller always passes the live overlay.
+func _toggle_loadout(idx: int, name: String, overlay: Control = null) -> void:
+	var member: Dictionary = Run.party[idx]
+	if Run.equipped_ability_names(member).has(name):
+		Run.unequip_earned_ability(member, name)
+	elif not Run.equip_earned_ability(member, name):
+		return
+	Run.save_run()
+	if overlay != null and is_instance_valid(overlay):
+		overlay.queue_free()
+	_loadout_panel_for = -1
+	_draw_screen()
+	_open_loadout_panel(idx)
 
 
 # ---------- the footer: gold and the (now usable) potions ----------

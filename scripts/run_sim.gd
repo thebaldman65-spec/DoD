@@ -158,14 +158,15 @@ static var ability_taken := 0
 static var draft_attempts := 0    # elites that offered one (i.e. all of them)
 static var draft_offered := 0     # cards SHOWN (3 per offer at a full pool)
 static var draft_taken := 0       # offers resolved into an ability
-static var draft_dropped := 0     # ...of those, ones that cost a drop
+static var draft_dropped := 0     # ...of those, ones that cost a bench (EG)
 static var draft_short := 0       # offers that could not fill three cards
 static var draft_refused_pool := 0  # offers with nothing left to show at all
 # BATCH BX §2 — THE ONE NUMBER THE RATE CHANGE IS TO BE WATCHED BY, and it is
-# counted at the OFFER rather than at the take: a hero already at the
-# seven-slot cap when the cards were shown. `draft_dropped` counts drops the
-# bot actually made, which is the same figure only because the bot never
-# declines; this one stays true of a policy that does.
+# counted at the OFFER rather than at the take: a hero already at the cap when
+# the cards were shown. `draft_dropped` counts benches the bot actually made,
+# which is the same figure only because the bot never declines; this one stays
+# true of a policy that does. **BATCH EG WATCHES THIS NUMBER**: it is the
+# 63%-of-offers figure the slot ladder was authored against.
 static var draft_at_cap := 0
 static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
@@ -771,6 +772,21 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	if node_type == "boss":
 		# The END boss awards no ability pick (§4) — nothing follows it.
 		if run.has_next_zone():
+			# BATCH EG §1 — THE SLOT BEFORE THE AWARD, the same order
+			# `battle._resolve_boss` uses, so the bot's hero has the new slot
+			# to receive the pick into.
+			#
+			# **AND THIS BRANCH IS WHY THE SIM ONLY EVER SEES 7 -> 8 -> 9.**
+			# It gates the award on `has_next_zone()`, so the THIRD zone boss
+			# — which pays a pick in the real game (BM §6 made the end boss a
+			# separate slot) — ends the run here instead: `run_over` is set
+			# below and the `endboss` node is never walked. The report line
+			# that read `ceiling 2.00 (zone bosses only)` was that same
+			# assumption written as a literal. **PRE-EXISTING AND REPORTED,
+			# NOT FIXED HERE**: closing it moves every sim baseline in the
+			# project, which is its own batch. `check_eg` §3 drives all three
+			# grants on a real `_resolve_boss` instead.
+			run.note_zone_boss_cleared()
 			_award_trophies(run)  # never Relics.unlock_random — that persists
 			run.advance_zone()
 		else:
@@ -891,17 +907,24 @@ static func _award_trophies(run: Node) -> void:
 				break
 		if pick == "":
 			pick = String(offer[0])
-		m["bm_abilities"] = m.get("bm_abilities", []) + [pick]
+		run.hold_ability(m, pick, true)
 		ability_offered += offer.size()
 		ability_taken += 1
 
 
 # BATCH BO §3 — ONE DRAFT OFFER, resolved instantly by bot policy. THE POLICY
 # IS DUMB AND PRINTED: take the first card of the shuffled offer, and at the
-# seven-slot cap drop the OLDEST earned ability to make room. IT NEVER
-# DECLINES — declining is a real player choice and a legitimate end state, but
-# a bot that declined would measure the machinery less, not more, and the
-# take-one-drop-one path is exactly the one worth exercising at scale.
+# cap BENCH the oldest CARRIED ability to make room. IT NEVER DECLINES —
+# declining is a real player choice and a legitimate end state, but a bot that
+# declined would measure the machinery less, not more, and the
+# take-one-bench-one path is exactly the one worth exercising at scale.
+#
+# **BATCH EG §2 — IT NAMES A CARRIED ABILITY, NOT AN EARNED ONE.** Those were
+# the same list until this batch and are not now: `earned_ability_names` is the
+# POOL and holds benched cards, which `unequip_earned_ability` correctly
+# refuses — so a bot reading the pool would name a benched card, get a refusal
+# string back, and count every capped offer as an untaken one. The bot must
+# read the same set the bench step shows the player.
 static func _award_draft(run: Node, m: Dictionary) -> void:
 	draft_attempts += 1
 	if not run.award_draft_pick(m):
@@ -917,10 +940,10 @@ static func _award_draft(run: Node, m: Dictionary) -> void:
 	var drop := ""
 	if run.ability_slots_full(m):
 		draft_at_cap += 1
-		var earned: Array = run.earned_ability_names(m)
-		if earned.is_empty():
+		var carried: Array = run.equipped_ability_names(m)
+		if carried.is_empty():
 			return
-		drop = String(earned[0])
+		drop = String(carried[0])
 	# Through the SAME door the map screen calls, so a sim can never resolve a
 	# draft by a rule the real flow does not have.
 	if run.take_draft_ability(m, String(offer[0]), drop) != "":
@@ -1337,7 +1360,7 @@ static func _print_report(battle) -> void:
 	# choices each. "taken" below the ceiling means a hero ran its two pools
 	# dry, which is the only way an award can pass a hero by.
 	print("\nAbility economy (per run, per hero):")
-	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 2.00 (zone bosses only)" % [
+	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 2.00 (the zone bosses the SIM plays — see _award_trophies)" % [
 		ability_offered / runs / 4.0, ability_taken / runs / 4.0,
 		ability_taken / runs / 4.0])
 	print("  Upgrades %.2f/hero/run taken   ceiling 3.00 (one per mini-boss)" % [
@@ -1348,7 +1371,7 @@ static func _print_report(battle) -> void:
 	# together — pools are thin until tranche 3 and BOTH are expected to be
 	# large until then. They are printed rather than smoothed over precisely
 	# so "the pool is thin" never gets mistaken for "the roller is broken".
-	print("  Draft    %.2f offers/run   %.2f cards shown   taken %.2f   cost a drop %.2f" % [
+	print("  Draft    %.2f offers/run   %.2f cards shown   taken %.2f   cost a bench %.2f" % [
 		draft_attempts / runs, draft_offered / runs, draft_taken / runs,
 		draft_dropped / runs])
 	print("           short offers (pool under 3) %.2f/run   nothing left to offer %.2f/run" % [

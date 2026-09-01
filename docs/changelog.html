@@ -14,6 +14,96 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-31 &mdash; Batch EG: THE DRAFT STAYS LIVE ALL RUN</h2>
+<p><i>Four draftable slots against roughly thirty-seven draft offers a run, <b>63% of them arriving
+at a hero already at the cap</b> &mdash; so the draft was effectively over after zone one and every
+offer after it was refuse-or-swap, with a swap costing the card for the rest of the run. <b>Two
+changes: a hero gains an ability slot after every zone boss (7 &rarr; 10 across a run), and a
+drafted card is never lost &mdash; benching one is free and reversible.</b> The protected core does
+not change and does not become benchable. <b>No ability magnitude moved, no card was authored, the
+spec passive is untouched and the talent charter holds unchanged.</b> Full report:
+<code>docs/reports/EG.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; ABILITY SLOTS GROW ON A ZONE BOSS.</b> <code>ABILITY_SLOTS_BY_BOSS</code> is
+<code>[7, 8, 9, 10]</code> and <code>Run.ability_slot_cap()</code> is its only reader, following the
+pouch's <code>ITEM_SLOTS_BY_ZONE</code> and announced on the zone-victory screen beside it. <b>THE
+BRIEF NAMED A SECOND PRECEDENT THAT DOES NOT EXIST</b> &mdash; the rune equip ladder was deleted at
+AN &sect;9 and <code>rune_slots()</code> has returned a flat 3 ever since, which is the <i>identical</i>
+false claim Batch CT's brief made about the same ladder eleven batches ago. <b>AND THE LADDER IS NOT
+INDEXED BY THE ZONE.</b> BM &sect;6 put the end boss on the third zone's own board, so
+<code>has_next_zone()</code> is already false when the third ZONE boss dies and
+<code>zone_idx</code> stays at 2 &mdash; a ladder read off it would stop at nine. A run-level
+<code>zone_bosses_cleared</code> counts the event instead, and it is reset where
+<code>zone_idx</code> is reset, because a second run in one session would otherwise open every hero
+at ten (Batch CT's pouch scar, at a second ladder).</p>
+
+<p><b>THE SLOT ARRIVES BEFORE THE AWARD, AND SEPARATELY FROM IT.</b> It is granted by the boss
+dying rather than by the award being offered, so a hero whose pools are both dry still gains it
+&mdash; and granting it first is what makes a hero at the cap able to receive both, because the
+pick is resolved later against a cap that has already moved. <b>Driven live through three real zone
+bosses, the cap reads 7 &rarr; 8 &rarr; 9 &rarr; 10, and the end boss grants nothing.</b></p>
+
+<p><b>&sect;2 &mdash; A DRAFTED CARD IS NEVER LOST, AND THE POOL IS NOT THE LOADOUT.</b> Every card
+a hero takes is kept for the run; what the cap limits is how many are CARRIED.
+<code>bm_abilities</code> keeps its name and is the POOL; <code>bm_equipped</code> is new and is the
+LOADOUT, <b>and it defaults to the whole pool</b>, which is why every existing save and every test
+fixture means exactly what it meant before. Swapping happens on the hero card on the map, through
+the rune pouch's own shape &mdash; one writer, as
+<code>party_screen.gd</code> already says of <code>equipped</code>.</p>
+
+<p><b>THE NO-RETURN LEDGER STILL BITES AND IT HAS ONE WRITER NOW INSTEAD OF TWO.</b> A DROP used to
+write it, because a drop was permanent; a BENCH does not, because the card is still owned and
+<code>owned_ability_names</code> is what keeps it off the offer. <b>Declining still refuses the
+whole offer for the run.</b> The pool is still exactly what the run dealt you.</p>
+
+<p><b>ALL SEVEN NAMED ENABLERS ARE PROTECTED, CONFIRMED RATHER THAN ASSUMED</b> &mdash; Quick Shot,
+Consecrated Ground, Heal, the three summons and Guard Change are each in
+<code>Classes.protected_names</code> for their spec, so none is a live brick.</p>
+
+<p><b>&sect;3 &mdash; WHAT IT TOUCHED THAT IS NOT THE DRAFT.</b> <b>The save moves v11 &rarr; v12
+and is TOLERANT</b>, and the refusal threshold is deliberately unmoved at pre-v10: a v11 save loads
+with <code>zone_bosses_cleared</code> defaulting to <code>zone_idx</code> (not to zero, which would
+take a resumed zone-3 run back to seven slots) and every hero carrying his whole pool. <b>The hero
+sheet's ability chips are in a scroller now</b>, because the absolute layout put a fifth row through
+the RUNES header &mdash; an overflow a Beastmaster already reached before this batch, since his
+protected core is six display names in three slots. <code>test_batch_bp</code> &sect;7 is the one
+fixture in the tree that had to learn the split.</p>
+
+<p><b>MEASURED BEFORE AND AFTER, AND THE FIGURE IS THE WHOLE JUSTIFICATION FOR THE BATCH.</b> See
+the report for the re-measurement.</p>
+
+<p><b>&sect;4 &mdash; FOUR INSTRUMENT REPAIRS BATTERY 1 FOUND, AND TWO OF THEM ARE ONE DEFECT IN TWO
+COPIES.</b> <code>test_batch_bm</code> and <code>test_run_harness</code> gate 2 each slice
+<code>battle.gd</code> from <code>func _resolve_boss</code> for a fixed <b>2400 characters</b> and
+look for the <code># The end boss.</code> anchor inside it; &sect;1's comment block pushed that
+anchor from character 2130 to <b>2955</b> and both went red. <b>Both slices run to the next
+top-level <code>func</code> now</b>, which is the function itself and cannot be outgrown &mdash;
+Batch ED &sect;2's rule (a scan that captures a WINDOW is blind to what the window swallowed) met in
+the wild, in a window duplicated between two targets. <b>AND BATCH EE &sect;4's GUARD IS THE ONLY
+REASON EITHER SURFACED</b>: without its <code>half_at &gt;= 0</code> check the slice would have been
+EMPTY, the negative assertions would have held for every needle, and <b>both targets would have gone
+green while neither read anything</b> &mdash; which in the harness is the only assertion on that
+slice.</p>
+
+<p><b>AND <code>check_ct</code> PINNED THE SAVE VERSION LITERAL, WHICH IS THE RULE CT ITSELF SET.</b>
+<i>A suite must not pin the save version literal</i> (BK &sect;6 / CT) &mdash; and
+<code>check_ct</code> asserted <code>== 11</code>, so it went red the first time anybody bumped it.
+<b>The pin manifest could never have warned anyone</b>: <code>build_pin_manifest.py</code> indexes
+string literals, and a version pin written as an INTEGER comparison is invisible to it. <b>So the
+whole population was swept rather than the manifest trusted, and it was TWO &mdash; the other was
+<code>check_eg</code>, the gate this batch was writing.</b> A named list cannot audit itself. Both
+read <code>&gt;=</code> now, because what each section claims is that the fields survive a round trip
+and the older save still loads, and the number is incidental to both.
+<b>No check count moved on any of the four.</b></p>
+
+<p><b>WHAT IS REPORTED AND NOT RULED ON.</b> The slot ladder alone drops the zone-boss fallback's
+floor to 3 for seven specs and to <b>2 for the Occultist</b>, so <code>check_ea</code> &sect;1's one
+assertion &mdash; which was asking two questions at once &mdash; is split into the rule (an award
+always pays, <code>floor &gt;= 1</code>) and the stricter claim (every award offers three), the
+second as a NAMED SET. <b>And under the POOL bound it can empty outright</b>, because what a hero
+owns is no longer bounded by what he carries. Closing that is a design decision Batch EA priced and
+did not take, and it is the designer's.</p>
+
 <h2>2026-08-31 &mdash; Batch EF: THE CENSUS IS COMMITTED, AND THE GUIDE IS SPLIT AT THE INSTRUMENT SEAM</h2>
 <p><i>Two things EE recommended and did not take. <b>The `CLAUDE.md` citation census is a committed
 script now</b>, so the figure three batches have quoted can be re-derived by anyone. <b>And

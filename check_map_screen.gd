@@ -51,6 +51,34 @@ func _process(_d: float) -> void:
 			print("  pick overlay added %d nodes" % (int(_tally(map_scene)["all"]) - before))
 			map_scene._open_rune_panel(1)
 			print("  rune pouch opened without error")
+			# **BATCH EG §2 — THE LOADOUT PANEL, DRAWN NOWHERE ELSE.** It is the
+			# rune pouch's shape, so it inherits the rune pouch's hazard: a
+			# Callable that does not bind and a row that overflows both fail at
+			# DRAW time, where no source-level check can see them. Hero 1 is
+			# given a pool with a BENCHED card first, so the panel renders both
+			# row states and the CORE rows above them — a panel driven on an
+			# empty pool would draw the header and nothing else and read as
+			# passing.
+			var lm: Dictionary = Run.party[1]
+			var lpool: Array = Classes.spec_draft_pool(String(lm["spec"]))
+			for nm in lpool.slice(0, 3):
+				Run.hold_ability(lm, String(nm), true)
+			Run.unequip_earned_ability(lm, String(lpool[0]))
+			var lbefore: int = _tally(map_scene)["all"]
+			map_scene._open_loadout_panel(1)
+			print("  loadout panel added %d nodes (%d held, %d carried, cap %d)" % [
+				int(_tally(map_scene)["all"]) - lbefore,
+				Run.earned_ability_names(lm).size(),
+				Run.equipped_ability_names(lm).size(), Run.ability_slot_cap()])
+			# BOTH DIRECTIONS THROUGH THE REAL TOGGLE, which is what proves the
+			# bind rather than the layout.
+			map_scene._toggle_loadout(1, String(lpool[0]))
+			print("  ...carried again: %s" % str(
+				Run.equipped_ability_names(lm).has(String(lpool[0]))))
+			map_scene._toggle_loadout(1, String(lpool[0]))
+			print("  ...benched again: %s  (pool still %d)" % [str(
+				not Run.equipped_ability_names(lm).has(String(lpool[0]))),
+				Run.earned_ability_names(lm).size()])
 			_close()
 			# BATCH BX §2 — THE PARTY-WIDE DRAFT SCREEN, which like the lattice is
 			# only ever EXECUTED here. Four columns is four times the layout, and
@@ -62,7 +90,7 @@ func _process(_d: float) -> void:
 			var capped: Dictionary = Run.party[0]
 			var cap_pool: Array = Classes.spec_draft_pool(String(capped["spec"]))
 			capped["bm_abilities"] = cap_pool.slice(0,
-				Run.ABILITY_SLOT_CAP - Classes.core_slots(String(capped["spec"])))
+				Run.ability_slot_cap() - Classes.core_slots(String(capped["spec"])))
 			for m2 in Run.party:
 				Run.award_draft_pick(m2)
 			_open("four heroes owed a draft      ")

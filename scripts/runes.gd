@@ -179,6 +179,18 @@ static func config(id: String) -> Dictionary:
 # kit-override renames + EARNED abilities (Batch AH: six a run, from either
 # pool). Do NOT skip the earned list — several runes attach to abilities a
 # hero only has because it picked them.
+#
+# **BATCH EG §2 — THIS IS THE OWNERSHIP QUESTION AND IT READS THE POOL, WHICH
+# IS WHY `bm_abilities` IS THE RIGHT FIELD AND NOTHING CHANGED HERE.**
+# `Talents.ability_names` is this list, `Talents.owns_ability` is that list, and
+# `Run.owned_ability_names` is that — and the three callers that matter are the
+# draft's `draft_pool_left`, the boss award's `roll_spec_ability_offer` and its
+# fallback. Every one of them is asking "may this hero be OFFERED that card",
+# and the answer for a card he holds and has BENCHED is no. Reading the loadout
+# here would re-offer a benched card as if it were new, which is the defect
+# `owned_ability_names` exists to prevent, arriving through the new field.
+# The one reader that wants the LOADOUT is `battle.gd`'s spawn, and it names
+# `Run.equipped_ability_names` directly rather than going through here.
 static func kit_names(member: Dictionary) -> Array:
 	var cfg: Dictionary = Classes.hero_config(String(member["key"]))
 	var spec := String(member.get("spec", ""))

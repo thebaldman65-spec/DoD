@@ -348,6 +348,17 @@ func _warrior_draft_flow() -> void:
 	# alone, whom no draw here can reach. That is the durable fix rather than
 	# swapping one draftable name for another. **DR's own two new cards made the collision LESS likely (the
 	# pool went 10 -> 12), not more; the flake predates this batch entirely.**
+	# **BATCH EG §2 — A HAND-BUILT KIT MUST CLEAR THE LOADOUT IT REPLACES, AND
+	# THIS IS THE ONE FIXTURE IN THE TREE THAT HAD TO.** The pool and the
+	# loadout are two keys now; `bm_equipped` defaults to the whole pool ONLY
+	# while it is absent, and the `take_draft_ability` twenty lines above has
+	# already materialised it with one name. Re-stuffing the pool alone left
+	# this hero holding four and carrying one — `ability_slots_used` read 4 of
+	# 7 and §7's cap block went red on a kit it thought it had filled.
+	# **Erasing the key restores what the line means: everything held is
+	# carried.** Every other fixture in the tree stuffs `bm_abilities` on a
+	# member that has never taken a card, where the default already says that.
+	m.erase("bm_equipped")
 	m["bm_abilities"] = [cands[0], "Sweeping Strikes", "Shatterpoint",
 		"Rallying Shout"]
 	ok(run.ability_slots_used(m) == CAP,
@@ -359,19 +370,23 @@ func _warrior_draft_flow() -> void:
 	m["draft_picks_owed"] = 1
 	m["draft_candidates"] = [[cands[1]]]
 	ok(run.take_draft_ability(m, cands[1]) != "",
-		"§7: at the cap, taking without dropping is refused")
-	ok(not run.drop_earned_ability(m, "Guard Change"),
-		"§7: his protected enabler can never be dropped")
-	ok(not run.drop_earned_ability(m, "Overpower"),
+		"§7: at the cap, taking without benching is refused")
+	ok(not run.unequip_earned_ability(m, "Guard Change"),
+		"§7: his protected enabler can never be benched")
+	ok(not run.unequip_earned_ability(m, "Overpower"),
 		"§7: ...nor any other opening ability")
 	ok(run.take_draft_ability(m, cands[1], "Shatterpoint") == "",
-		"§7: naming an EARNED ability to drop works")
-	ok(not run.earned_ability_names(m).has("Shatterpoint"),
-		"§7: ...and the dropped one is gone")
-	ok(run.earned_ability_names(m).has(cands[1]),
+		"§7: naming an EARNED ability to bench works")
+	# **INVERTED BY BATCH EG §2**, with the question kept: the benched card is
+	# out of the LOADOUT and still in the POOL, and no ledger is written.
+	ok(not run.equipped_ability_names(m).has("Shatterpoint"),
+		"§7: ...and the benched one leaves the loadout")
+	ok(run.earned_ability_names(m).has("Shatterpoint"),
+		"§7: ...but is KEPT in the pool (EG §2)")
+	ok(run.equipped_ability_names(m).has(cands[1]),
 		"§7: ...replaced by the card taken")
-	ok(run.draft_refused(m).has("Shatterpoint"),
-		"§7: ...and a DROP writes the no-return ledger too")
+	ok(not run.draft_refused(m).has("Shatterpoint"),
+		"§7: ...and a BENCH does not write the no-return ledger (EG §2)")
 	ok(run.ability_slots_used(m) == CAP,
 		"§7: the cap still binds after the swap")
 	# DECLINING REFUSES THE WHOLE OFFER, for a Warrior as for anyone else.

@@ -355,42 +355,56 @@ func _cap_and_drop() -> void:
 	var m: Dictionary = run.party[0]
 	# Fill him to the cap out of his OWN draft pool, so every earned name is
 	# genuinely droppable and none of it is protected.
+	# BATCH EG §1 — THE CAP IS `run.ability_slot_cap()` AND IT MOVES WITH
+	# `zone_bosses_cleared`. The harness reads it live rather than a constant,
+	# so this section keeps measuring "filled to the cap" whatever rung the run
+	# node is on — which is the shape BO's own rule already demanded of a
+	# refusal setup (write it relative to the live pool, never to a count).
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
 	var core: int = Classes.core_slots("swordmaster")
-	var need: int = run.ABILITY_SLOT_CAP - core
+	var need: int = run.ability_slot_cap() - core
 	m["bm_abilities"] = pool.slice(0, need)
-	ok(run.ability_slots_used(m) == run.ABILITY_SLOT_CAP,
+	ok(run.ability_slots_used(m) == run.ability_slot_cap(),
 		"§2: the harness filled him to the cap (%d of %d)"
-			% [run.ability_slots_used(m), run.ABILITY_SLOT_CAP])
+			% [run.ability_slots_used(m), run.ability_slot_cap()])
 	ok(run.ability_slots_full(m), "§2: ...and the run agrees he is full")
 	ok(run.award_draft_pick(m), "§2: a full hero is still OFFERED a draft")
 	var offer: Array = (m["draft_candidates"] as Array)[0]
 	var card := String(offer[0])
 	# THE DOOR REFUSES THE TAKE WITHOUT A NAMED REPLACEMENT.
 	var why: String = run.take_draft_ability(m, card)
-	ok(why != "", "§2: taking at the cap without a drop is REFUSED (%s)" % why)
+	ok(why != "", "§2: taking at the cap without a bench is REFUSED (%s)" % why)
 	ok(int(m.get("draft_picks_owed", 0)) == 1,
 		"§2: ...and the pick is still owed")
 	ok(not (m["bm_abilities"] as Array).has(card),
 		"§2: ...and the card did not land anyway")
-	# A PROTECTED ABILITY CAN NEVER BE NAMED. `Run.drop_earned_ability` refuses
-	# anything not in `bm_abilities`, which is the mechanical form of the rule
-	# rather than a branch that could be got wrong.
+	# A PROTECTED ABILITY CAN NEVER BE NAMED. `Run.unequip_earned_ability` (EG
+	# §2, `drop_earned_ability` before it) refuses anything not in the POOL,
+	# which is the mechanical form of the rule rather than a branch that could
+	# be got wrong.
 	var protected: Array = Classes.PROTECTED_CORES.get("swordmaster",
 		{}).get("enablers", [])
 	var guard := "Guard Change"
 	ok(run.take_draft_ability(m, card, guard) != "" or protected.is_empty(),
-		"§2: a protected ability cannot be named as the drop")
-	# NAMED, IT RESOLVES — and the dropped one enters the ledger.
-	var dropped := String((m["bm_abilities"] as Array)[0])
-	ok(run.take_draft_ability(m, card, dropped) == "",
+		"§2: a protected ability cannot be named as the bench")
+	# NAMED, IT RESOLVES — and **INVERTED AT BATCH EG §2**: the named one leaves
+	# the LOADOUT and stays in the POOL, and the ledger is not written. The
+	# guarantee the old assertion protected is kept beside it, reached through
+	# ownership rather than through refusal.
+	var benched := String((m["bm_abilities"] as Array)[0])
+	ok(run.take_draft_ability(m, card, benched) == "",
 		"§2: named a real earned ability, the take resolves")
 	ok((m["bm_abilities"] as Array).has(card), "§2: the card landed")
-	ok(not (m["bm_abilities"] as Array).has(dropped), "§2: the named one is gone")
-	ok(run.draft_refused(m).has(dropped),
-		"§2: a DROP writes the no-return ledger too")
-	ok(run.ability_slots_used(m) == run.ABILITY_SLOT_CAP,
-		"§2: and the cap still binds at %d" % run.ABILITY_SLOT_CAP)
+	ok(not run.equipped_ability_names(m).has(benched),
+		"§2: the named one leaves the loadout")
+	ok((m["bm_abilities"] as Array).has(benched),
+		"§2: ...and is KEPT in the pool (EG §2)")
+	ok(not run.draft_refused(m).has(benched),
+		"§2: a BENCH does not write the no-return ledger (EG §2)")
+	ok(not run.roll_draft_offer(m).has(benched),
+		"§2: ...and it is still never re-offered, being owned")
+	ok(run.ability_slots_used(m) == run.ability_slot_cap(),
+		"§2: and the cap still binds at %d" % run.ability_slot_cap())
 
 
 # ---------- §2: a hero who FELL drafts like anyone else ----------
@@ -466,8 +480,14 @@ func _screen_source() -> void:
 		"§2: still exactly one drop step")
 	ok(map.contains("on_drop := Callable()"),
 		"§2: ...and the party screen stages through it rather than forking it")
-	ok(map.count("Run.drop_earned_ability(") == 1,
-		"§2: the map screen still writes a drop through exactly one door")
+	# **RE-POINTED AT BATCH EG §2, ONE TO TWO, WITH BOTH SITES NAMED.** BX's
+	# question is that the SCREEN owns no rule of its own; two screens calling
+	# one door is that property holding, and a third caller has to move this
+	# line. The rule is still `run_state.gd`'s.
+	ok(map.count("Run.unequip_earned_ability(") == 2,
+		"§2: the map screen still benches through exactly one door, from its two screens")
+	ok(map.count("func _toggle_loadout(") == 1,
+		"§2: ...the second being the loadout panel EG §2 added")
 	# THE RULES STAY IN run_state. The screen must not learn a second answer to
 	# the cap, the ledger or the decline.
 	ok(map.count("Run.take_draft_ability(") == 1
@@ -577,7 +597,7 @@ func _live_one_action() -> void:
 	var capped: Dictionary = run2.party[0]
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
 	capped["bm_abilities"] = pool.slice(0,
-		run2.ABILITY_SLOT_CAP - Classes.core_slots("swordmaster"))
+		run2.ability_slot_cap() - Classes.core_slots("swordmaster"))
 	ok(run2.ability_slots_full(capped), "§2: hero 0 is seated at the cap")
 	for m in run2.party:
 		run2.award_draft_pick(m)
@@ -600,9 +620,11 @@ func _live_one_action() -> void:
 	await process_frame
 	ok((capped["bm_abilities"] as Array).has(incoming),
 		"§2: the capped hero's card landed on confirm")
-	ok(not (capped["bm_abilities"] as Array).has(drop),
-		"§2: ...and the named replacement is gone")
-	ok(run2.ability_slots_used(capped) == run2.ABILITY_SLOT_CAP,
+	ok(not run2.equipped_ability_names(capped).has(drop),
+		"§2: ...and the named replacement left the loadout")
+	ok((capped["bm_abilities"] as Array).has(drop),
+		"§2: ...and is KEPT in the pool (EG §2)")
+	ok(run2.ability_slots_used(capped) == run2.ability_slot_cap(),
 		"§2: ...leaving the kit exactly at the cap (%d)"
 			% run2.ability_slots_used(capped))
 	ok(int(capped.get("draft_picks_owed", 0)) == 0,
