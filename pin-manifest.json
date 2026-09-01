@@ -1553,7 +1553,7 @@
   {
    "s": "check_ec.gd",
    "fn": "_s2_satisfaction",
-   "h": "CLAUDE.md",
+   "h": "docs/instrument-rules.md",
    "n": "A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT",
    "p": "+",
    "r": "code",
@@ -1564,7 +1564,7 @@
   {
    "s": "check_ec.gd",
    "fn": "_s2_satisfaction",
-   "h": "CLAUDE.md",
+   "h": "docs/instrument-rules.md",
    "n": "AN INSTRUMENT'S TERRITORY IS A CLAIM",
    "p": "+",
    "r": "code",
@@ -13835,7 +13835,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#248"
+   "g": "test_batch_ce.gd#249"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13846,7 +13846,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#250"
+   "g": "test_batch_ce.gd#251"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13857,7 +13857,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#254"
+   "g": "test_batch_ce.gd#255"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13868,18 +13868,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#237"
+   "g": "test_batch_ce.gd#238"
   },
   {
    "s": "test_batch_ce.gd",
    "fn": "_docs",
-   "h": "CLAUDE.md",
+   "h": "docs/instrument-rules.md",
    "n": "BINDING ON EVERY CONTENT BATCH FROM IT",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#236"
+   "g": "test_batch_ce.gd#237"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13890,7 +13890,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#239"
+   "g": "test_batch_ce.gd#240"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13901,7 +13901,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#243"
+   "g": "test_batch_ce.gd#244"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13923,7 +13923,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#244"
+   "g": "test_batch_ce.gd#245"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13945,7 +13945,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#242"
+   "g": "test_batch_ce.gd#243"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13956,18 +13956,18 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#242"
+   "g": "test_batch_ce.gd#243"
   },
   {
    "s": "test_batch_ce.gd",
    "fn": "_docs",
-   "h": "CLAUDE.md",
+   "h": "docs/instrument-rules.md",
    "n": "RE-POINTS IN PLACE, with the reason in the file",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#235"
+   "g": "test_batch_ce.gd#236"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13978,7 +13978,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#237"
+   "g": "test_batch_ce.gd#238"
   },
   {
    "s": "test_batch_ce.gd",
@@ -13989,7 +13989,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#241"
+   "g": "test_batch_ce.gd#242"
   },
   {
    "s": "test_batch_ce.gd",
@@ -14055,7 +14055,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#598"
+   "g": "test_batch_ce.gd#599"
   },
   {
    "s": "test_batch_ce.gd",
@@ -14066,7 +14066,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#599"
+   "g": "test_batch_ce.gd#600"
   },
   {
    "s": "test_batch_ce.gd",
@@ -14077,7 +14077,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#595"
+   "g": "test_batch_ce.gd#596"
   },
   {
    "s": "test_batch_ce.gd",

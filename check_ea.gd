@@ -315,10 +315,16 @@ func _label_text(n: Node, needle: String) -> String:
 # DZ §3's own lesson arriving as an instrument: a literal-presence pass cannot
 # see `to_lower().contains(...)`, and a pass that greps for `CLAUDE.md` on the
 # same line cannot see a needle three hundred lines below the read. What is
-# swept here is every identifier ASSIGNED from `res://CLAUDE.md`, then every
+# swept here is every identifier ASSIGNED from either rule file, then every
 # call on that identifier anywhere in the file.
+#
+# WIDENED AT BATCH EF §2 TO BOTH HALVES. The split sent a third of the rules to
+# `docs/instrument-rules.md`, and a sweep bound to `CLAUDE.md` alone would have
+# reported a clean tree with the whole instrument half outside its territory —
+# EC §2's rule, arriving as a hole this batch would otherwise have dug itself.
+# **Neither half narrates batches, so the question is the same on both.**
 func _s3_no_batch_code_pins() -> void:
-	print("\n§3 — no assertion pins a batch code against CLAUDE.md")
+	print("\n§3 — no assertion pins a batch code against either rule file")
 	var dir := DirAccess.open("res://")
 	var files: Array = []
 	if dir != null:
@@ -329,7 +335,8 @@ func _s3_no_batch_code_pins() -> void:
 	ok(files.size() > 60, "§3: the sweep read %d suites and gates — the population has moved" % files.size())
 
 	var assign := RegEx.new()
-	assign.compile("var\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*:?=[^\\n]*res://CLAUDE\\.md")
+	assign.compile("var\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*:?=[^\\n]*" \
+		+ "res://(?:CLAUDE\\.md|docs/instrument-rules\\.md)")
 	var code := RegEx.new()
 	code.compile("\\b(?:BATCH|Batch|batch)\\s+[A-Z]{1,3}\\b")
 	var accused: Array = []
@@ -357,12 +364,12 @@ func _s3_no_batch_code_pins() -> void:
 	for a in accused:
 		ok(false, "§3: %s pins a BATCH CODE in a document that no longer narrates batches" % a)
 	ok(accused.is_empty(),
-		"§3: no assertion pins a batch code against CLAUDE.md (%d literals across %d readers)" % [
+		"§3: no assertion pins a batch code against either rule file (%d literals across %d readers)" % [
 			scanned, readers])
 	# THE SWEEP IS PROVED NON-VACUOUS BY ITS OWN NUMBERS. A regex that matched
 	# no reader, or no literal, would report "no violations" just as loudly.
 	ok(readers >= 20,
-		"§3: only %d files were found reading CLAUDE.md — the sweep is matching nothing" % readers)
+		"§3: only %d files were found reading a rule file — the sweep is matching nothing" % readers)
 	ok(scanned >= 40,
 		"§3: only %d literals were swept — the call regex has stopped matching" % scanned)
 	print("  %d readers, %d asserted literals, %d batch-code pins" % [

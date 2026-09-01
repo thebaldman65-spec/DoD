@@ -43,7 +43,8 @@ import re, os, glob, json, sys
 CALLS = r'(?:contains|containsn|begins_with|ends_with|count|find|rfind|findn)'
 RES = re.compile(r'"(res://[^"]*)"')
 FMT = re.compile(r'%[-0-9.]*[dsfxv%]')
-DOCS = {"CLAUDE.md", "docs/master.html", "docs/changelog.html", "docs/design-notes.md"}
+DOCS = {"CLAUDE.md", "docs/instrument-rules.md", "docs/master.html",
+        "docs/changelog.html", "docs/design-notes.md"}   # EF §2 added the second
 
 # THE GATE IS NOT A SUBJECT OF ITS OWN SWEEP.  `check_ed` holds the manifest's
 # own vocabulary and every literal it names; leaving it in would have the

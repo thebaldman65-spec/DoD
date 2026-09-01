@@ -38,11 +38,16 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-# The four tracked documents, as a `const` rather than a `var`: `check_ea` §3
+# The tracked documents, as a `const` rather than a `var`: `check_ea` §3
 # sweeps every identifier ASSIGNED from `res://CLAUDE.md`, and a `var` here
 # would hand it a holder that reads a Dictionary key rather than a document.
+# FIVE SINCE BATCH EF §2. `docs/instrument-rules.md` is the instrument half of
+# CLAUDE.md and joined the moment it existed: an instrument's territory is a
+# CLAIM (EC §2), and a rules file the suites assert against, left outside the
+# sweep, is a population this gate would report clean without ever reading.
 const DOCS := {
 	"res://CLAUDE.md": "CLAUDE.md",
+	"res://docs/instrument-rules.md": "docs/instrument-rules.md",
 	"res://docs/master.html": "docs/master.html",
 	"res://docs/changelog.html": "docs/changelog.html",
 	"res://docs/design-notes.md": "docs/design-notes.md",
@@ -387,11 +392,17 @@ func _s2_satisfaction(rows: Array) -> void:
 	# finding either shape has stopped working rather than found a clean tree.
 	ok(conj >= 8, "§2: only %d multi-member conjunctions were found — the shape sweep has stopped matching" % conj)
 	ok(disj >= 6, "§2: only %d alternations were found — the shape sweep has stopped matching" % disj)
-	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
+	# RE-POINTED AT BATCH EF §2, WITH THE HAYSTACK AND NOT THE NEEDLE MOVED.
+	# Both rules are about how an INSTRUMENT is built, so both went to
+	# `docs/instrument-rules.md` when CLAUDE.md was split at the instrument
+	# seam. The needles are unchanged word for word: what moved is the file
+	# they are asserted against, which is CW's split discipline — every suite
+	# whose pin moved is re-pointed in the SAME batch.
+	var cm := FileAccess.get_file_as_string("res://docs/instrument-rules.md")
 	ok(cm.contains("A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT"),
-		"§2: CLAUDE.md does not carry the rule this gate enforces")
+		"§2: docs/instrument-rules.md does not carry the rule this gate enforces")
 	ok(cm.contains("AN INSTRUMENT'S TERRITORY IS A CLAIM"),
-		"§2: CLAUDE.md does not carry the rule the source-pin census earned")
+		"§2: docs/instrument-rules.md does not carry the rule the source-pin census earned")
 	print("  %d conjunctions, %d alternations, %d unsatisfied" % [conj, disj, bad.size()])
 
 

@@ -6161,3 +6161,53 @@ that no draw could reach becomes a name a draw can. That is how DR's one-in-eigh
 the first place. **So it is asserted rather than described**, through `draft_pool_left` itself
 rather than through the two pool accessors, which also keeps the gate clear of `check_da` §3's
 fingerprint.
+
+---
+
+## Batch EF — why the guide was split before the ceiling was reached, and why the census had to be committed
+
+**A number with no reproducible source was never a measurement.** DJ §3's rule says a number quoted
+from one document into another stops being one. EC's census script was never committed, so the
+33.3% that EC, ED and EE all quoted was already one step past that: nobody outside the batch that
+ran it could re-derive it at all. Committing the script is not tidiness — it is the difference
+between a figure and a rumour.
+
+**And the first thing the committed script did was disagree with the record.** It reads 22 blocks
+asserted where ED reported 24, on both trees, at every quotation length swept. The 5,415-character
+gap between the two is matched by exactly one pair of blocks in the whole file, and no pin in the
+manifest reaches either. **Which instrument is right cannot be settled, because ED's is not in the
+repo** — so the disagreement is reported beside the figure rather than resolved by picking the
+number that was published first. A census whose definitions live in the head of whoever ran it is
+the same defect as one with no script, which is why every definition this one uses is written into
+it: the sync set, the segmentation, what ASSERTED means, what QUOTED means, and why `docs/state.md`
+is out of the corpus.
+
+---
+
+**The split was taken with fifty-two kilobytes of headroom, and the timing is the decision.** EE
+ruled that the answer at the ceiling is a SPLIT and never a prune, and measured the seam. Waiting
+until 290 KiB would have meant taking the cut under pressure, on whatever the file looked like
+then. **A seam is cleaner measured than reached.** The prune was the wrong instrument for the same
+family of reason: it caps the rules rather than the read, and it fires on whoever happens to be
+writing when the number is hit.
+
+**The seam that works is what a rule BINDS, not what it is about.** "About the instruments" is a
+topic and topics blur — the save-version rule is about the save format and binds a suite; the
+comment-staleness rule is about `battle.gd` and binds a sweep. What a rule binds is answerable one
+block at a time: does this govern how a batch verifies itself, or what the game may contain? **Nine
+blocks did both, and every one of them stayed.** The tiebreak runs one way only, because a batch
+that reads only the guide must not be able to miss a rule about the game — and a batch that reads
+only the guide is the situation the split has to be safe under.
+
+**The one thing that must not be duplicated is the rules themselves.** CW's split left a `CLAUDE.md`
+that contradicted itself 1900 lines apart and DL found it still live four batches later. So the
+guide carries an INDEX of headings and no summary of any moved rule: a summary is a second copy,
+and a second copy is the thing that rots. The two dangling pointers the cut created — a rule
+pointing at "the standing rule above" and one at "the DEBUG SURFACES table below" — were repaired to
+name the file instead, and both are listed in the report rather than left to be found.
+
+**The cheapest test of a seam is the pins, and it was run before anything moved.** All 70
+assertions pinning a literal into `CLAUDE.md` were mapped to their block first. Sixty-six sit in
+blocks that stayed; four moved and were re-pointed in the same batch with their needles unchanged.
+**A suite breaking on a moved block would have been the seam telling you where that block belongs**,
+and none of the four was that: all four pin rules about instruments, written by instruments.

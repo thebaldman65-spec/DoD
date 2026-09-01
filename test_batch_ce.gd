@@ -594,9 +594,16 @@ func _docs() -> void:
 	# re-point-in-place discipline three batches closed (CE is one of them, and
 	# it is the rule THIS edit is obeying), and the content-batch convention CG
 	# set and made binding.
-	ok(cm.contains("RE-POINTS IN PLACE, with the reason in the file"),
-		"CLAUDE.md still binds a content batch to re-point in place rather than leave a false check")
-	ok(cm.contains("BINDING ON EVERY CONTENT BATCH FROM IT"),
+	# **RE-POINTED AGAIN AT BATCH EF §2, AND ONLY THE HAYSTACK MOVED.** Both
+	# needles are word for word what they were; `Verify before shipping` went to
+	# `docs/instrument-rules.md` when CLAUDE.md was split at the instrument
+	# seam, so the file asserted against is the file the rule now lives in. The
+	# two pins BELOW still read CLAUDE.md, because the standing draft reference
+	# stayed there — one function, two haystacks, deliberately.
+	var ir := _src("res://docs/instrument-rules.md")
+	ok(ir.contains("RE-POINTS IN PLACE, with the reason in the file"),
+		"docs/instrument-rules.md still binds a content batch to re-point in place rather than leave a false check")
+	ok(ir.contains("BINDING ON EVERY CONTENT BATCH FROM IT"),
 		"...and still carries the content-batch convention as BINDING, not as history")
 	# INVERTED BY BATCH DG §3, on the same idiom as test_batch_bo §6. This
 	# asserted that CLAUDE.md recorded the Cleric as the SECOND CLASS COMPLETE —
