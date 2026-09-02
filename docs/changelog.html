@@ -14,6 +14,77 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EK: ARCHETYPE TAGS</h2>
+<p><i>A shared vocabulary that names what a card is FOR, carried by every ability in the corpus
+and every authored rune, and <b>shown to the player on the draft card</b>. <b>MECHANICALLY INERT
+AS SHIPPED</b>: no clause reads a tag, no card's behaviour changes and no magnitude moves. <b>The
+vocabulary was MEASURED out of the corpus rather than proposed</b> &mdash; and the measurement
+overturned the brief's own example. Full working: <code>docs/reports/EK.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE SIX, AND WHY THEY ARE MECHANICS RATHER THAN STATUS NAMES.</b> The brief's
+example vocabulary was the status one (<i>"the Pyromancer's Fireball is a Burn card"</i>), and the
+corpus was measured before anything was authored. <b>IT DOES NOT SUPPORT SIX STATUS NAMES.</b>
+Grouped into families, the six biggest status systems in the game &mdash; Burn, Frost, Bleed,
+Poison, Ruin, Mark &mdash; reach <b>40 of the 154 draft cards, leaving 114 under no tag at all</b>,
+and the brief's own test says a vocabulary with a large remainder is the wrong vocabulary. <b>The
+reason is structural rather than accidental</b>: a status system belongs to ONE spec, so inside the
+pool a player is actually drafting from it does not vary &mdash; the Pyromancer's pool is 12 Burn
+cards of 13, and a tag on twelve of the thirteen cards on offer tells the player nothing. <b>The
+six shipped are AFFLICTION, SHELTER, BREAK, METER, AMP and CLOCK</b>, they cover <b>154 of
+154</b>, and they vary inside every pool &mdash; five to ten distinct tag combinations against ten
+to thirteen cards. <b>The status-family option is priced in the report so the designer can
+overturn this.</b></p>
+
+<p><b>&sect;1b &mdash; TWO OF THE SIX WERE RENAMED BEFORE SHIPPING, ON CJ's PRECEDENT.</b> The BR
+&sect;1 sweep ran against every ability, talent node, status label and rune name. <b>AFFLICTION,
+BREAK, METER and AMP collide with nothing.</b> <b>WARD became SHELTER</b> &mdash; <code>Ward</code>
+is a live status chip and the Rune of the Triage Ward carries the word &mdash; and <b>TEMPO became
+CLOCK</b>, because <code>Tempo</code> is a live chip AND three talent nodes. That is CJ's Iron Will
+collision exactly, and CJ's answer was to rename. <b>A new vocabulary is free to move today and
+costs 227 rows to move later.</b> <b>And the engine check the brief asked for is clean</b>: none of
+the six is one of DR's engine names, so an engine and a tag can never collapse into one word.</p>
+
+<p><b>&sect;2 &mdash; EVERY CARD TAGGED, DERIVED FROM THE READ SITE.</b> 227 abilities and 65
+runes, at most two tags each with the first the primary. <b>The fields are useless on this corpus
+and that is CN's rule biting hard</b>: <code>heal</code> is <b>0 on all 154 draft cards</b> and 123
+of them carry a <code>special</code>. A card's read site is its arm in
+<code>battle._resolve_special</code>, PLUS every block keyed on its <code>display_name</code> in the
+hero strike loop (<b>58 abilities carry one, and Blood Debt's whole payload is one of them</b>),
+PLUS the card-specific helpers those call, PLUS &mdash; for a setup card that resolves nothing at
+cast &mdash; <b>whatever reads the status it lays</b>. Aegis Wall applies <code>aegis_wall</code>
+and does nothing else; its healing lives in the BLOCK handler, and without that last hop it reads
+as untagged along with 39 others.</p>
+
+<p><b>&sect;3 &mdash; SHOWN ON THE DRAFT CARD, WHICH IS WHERE THE DECISION HAPPENS.</b> One line
+under the card's own button and above the description, in its own tint, built by
+<code>Classes.card_tag_line</code> &mdash; CK &sect;1's one-builder rule, one layer down. <b>The
+layout cost is measured and not papered over</b>: one 11px line a card, three cards a column,
+<b>+42px</b> on a column CK already measured at 557&ndash;671px against a 388px viewport. Nothing
+is clipped; the font was not shrunk and the computed block was not truncated. <b>Where else they
+should appear is REPORTED and not done</b> &mdash; the hero sheet, the battle tooltip, the rune
+offer and the blacksmith, each with its cost, in <code>docs/reports/EK.md</code> &sect;3.</p>
+
+<p><b>&sect;4 &mdash; INERT BY DECISION, AND THE DECISION IS ASSERTED.</b> <b>No clause reads a tag
+count. No card's behaviour changes. No magnitude moves.</b> Ship the vocabulary, let the designer
+see it on a card, then build on it &mdash; every alternative bets that the tag set is right before
+anyone has seen it in play, and 227 rows is an expensive bet to unwind. <b>Inertness is the one
+property nothing else in the tree would notice losing</b>, so <code>check_ek</code> &sect;3 sweeps
+every <code>.gd</code> in the repo comment-stripped and requires the set of files naming a tag to be
+EXACTLY five, with ZERO asserted separately in the six files a mechanic would have to live in.</p>
+
+<p><b>&sect;5 &mdash; THE GATE, AND THE LIVE HALF THAT IS NOT IN IT.</b> <code>check_ek</code> is
+new and joins <code>GATES</code>: coverage over
+<code>Classes.ability_corpus()</code>, the vocabulary pinned at six, inertness, the BR &sect;1 sweep
+re-run LIVE so a future collision trips, and CK's one-builder rule. <b>&sect;1's population is the
+corpus walk and that is DA &sect;3's rule applied rather than exempted</b> &mdash; the first draft
+read both draft-pool accessors, <code>check_da</code> called it correctly, and the exemption was
+NOT taken: the corpus is a superset of the draft, the boss pools and the cores, so one assertion
+answers four questions and <code>WALK_EXEMPT</code> stays at two. <b>A vocabulary that renders on
+nothing passes every static check in the tree</b> (DS's Heads Down shape), so the draft card's tag
+line is driven live in <code>check_map_screen</code>, which now <b>withholds its
+<code>check_map_screen: OK</code> verdict on a mismatch</b> &mdash; that target carries no failure
+counter, so taking the pinned line away is the only way to turn its report into an assertion.</p>
+
 <h2>2026-09-01 &mdash; Batch EJ: THE RUNES AGAINST A CHARTER THEY WERE NOT WRITTEN FOR</h2>
 <p><i>A REPORT. <b>No rune was re-keyed, re-authored, retuned or retired; no <code>lane</code>
 field was removed; no magnitude moved and no document was corrected.</b> The designer's new

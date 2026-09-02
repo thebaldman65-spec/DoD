@@ -1268,6 +1268,36 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 		b.pressed.connect(Music.click)
 		b.pressed.connect(_stage_draft.bind(idx, card_name))
 		cards.add_child(b)
+		# BATCH EK §3 — THE ARCHETYPE TAG, ON THE SCREEN WHERE THE DECISION
+		# HAPPENS. One line, directly under the card's own button and ABOVE the
+		# description, because a tag is what the card is FOR and the sentence is
+		# what it does — the reader wants the direction before the detail.
+		#
+		# **IT IS ITS OWN LABEL RATHER THAN A PREFIX ON THE DESCRIPTION**, for
+		# CK §1's reason one layer down: an authored sentence and a derived
+		# vocabulary are different kinds of writing, and only one of them is
+		# text the designer wrote. Its own tint keeps them apart at a glance.
+		#
+		# **`Classes.card_tag_line` IS THE ONE BUILDER** — the hero sheet, the
+		# battle tooltip and the rune offer all render a different surface, and
+		# when one of them takes tags on it must not draw them a second way.
+		#
+		# LAYOUT, MEASURED: one 11px line a card, three cards a column, so
+		# **+42px against a 388px viewport** on a column CK already measured at
+		# 557–671px. It is a `ScrollContainer` with autowrap on and nothing is
+		# clipped; the cost is that the column runs a little further past one
+		# viewport than it already did. **The font was NOT shrunk and the
+		# computed block was NOT truncated** — see `docs/reports/EK.md` §3.
+		var tag_line := Classes.card_tag_line(card_name)
+		if tag_line != "":
+			var tags_lbl := Label.new()
+			tags_lbl.text = tag_line
+			tags_lbl.add_theme_font_size_override("font_size", 11)
+			tags_lbl.add_theme_color_override("font_color",
+				Color(0.85, 0.72, 0.95) if chosen else Color(0.62, 0.55, 0.72))
+			tags_lbl.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+			tags_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			cards.add_child(tags_lbl)
 		if ab != null and ab.description != "":
 			var text := Label.new()
 			# BATCH CL §1 — NO CTX ON PURPOSE. The map screen has no live hero to

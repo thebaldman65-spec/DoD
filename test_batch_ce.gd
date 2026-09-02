@@ -665,8 +665,19 @@ func _docs() -> void:
 	# a Beastmaster's beast. That is this category's own test — one entry per
 	# thing a player cannot learn anywhere else — and it is the reason the
 	# vocabulary is worth having rather than a second word for the same set.
-	ok(gj != null and gj.size() == 97,
-		"the glossary holds 97 entries (96 + CV's hero/ally)")
+	# BATCH EK §3 — NINETY-EIGHT. **THE PIN IS BUMPED, NOT LOOSENED**, for the
+	# third time and for this category's own reason: the one entry is
+	# `archetype_tags`. EK gave every ability and every rune a shared vocabulary
+	# of six words and put it on the draft card, and a player meeting AFFLICTION
+	# on one card and CLOCK on the next has nowhere else to learn what the six
+	# mean or that they are inert. That is this category's test — one entry per
+	# thing a player cannot learn anywhere else. **AND IT IS DELIBERATELY STILL
+	# AN EQUALITY**: DX §1 forbids an equality against a collection that GROWS,
+	# and this one does not grow on its own — every entry is a decision, and the
+	# check exists so that adding one is a decision somebody made rather than a
+	# side effect. Loosening it to a floor would delete the question.
+	ok(gj != null and gj.size() == 98,
+		"the glossary holds 98 entries (97 + EK's archetype_tags)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

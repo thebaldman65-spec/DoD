@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-01 (Batch EI)</b></p>
+<p align="right"><b>Last updated: 2026-09-01 (Batch EK)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1579,6 +1579,34 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>The group buff the class lacks — the Berserker's Battle Shout is the only other Warrior card that improves anyone else's numbers, and it is spec-locked where this is class-wide.</td></tr>
 <tr><td><b>Ironclad</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 4 turns he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
 </table>
+
+<h3>6c. ARCHETYPE TAGS</h3>
+<p><b>Every ability in the game and every authored rune carries one or two ARCHETYPE TAGS, and
+the draft card shows them.</b> A tag names what a card is <i>for</i>, in a vocabulary shared
+across the whole roster, so a player choosing between three cards can see which direction each
+one points before reading a word of the description.</p>
+<p><b>The word ARCHETYPE is doing two jobs in this document and they are not related.</b> &sect;6
+above uses it for a <i>specialization's</i> role &mdash; Ramp, Rush, Nuker, Warder and the rest,
+one per spec, which decides base Attack. <b>A tag is a property of a CARD, not of a hero</b>, and
+nothing reads both.</p>
+<table>
+<tr><th>Tag</th><th>What it means</th></tr>
+<tr><td><b>AFFLICTION</b></td><td>Puts a harmful effect on the enemy, or spends one.</td></tr>
+<tr><td><b>SHELTER</b></td><td>Answers damage coming in: heals, absorbs or mitigates.</td></tr>
+<tr><td><b>BREAK</b></td><td>Moves a Break meter.</td></tr>
+<tr><td><b>METER</b></td><td>Moves a resource or a class meter.</td></tr>
+<tr><td><b>AMP</b></td><td>Raises what the holder deals.</td></tr>
+<tr><td><b>CLOCK</b></td><td>Moves the initiative timeline or a cooldown.</td></tr>
+</table>
+<p><b>At most two a card, and the first one is the primary</b> &mdash; what the card is for, with
+the second naming what it also touches. <b>A card with two tags of equal weight is a card whose
+primary has not been decided</b>, so every row states one.</p>
+<p><b>The protected cores carry them too, and that is what gives a build a seed.</b> The
+Pyromancer opens holding an AFFLICTION card whether or not he ever drafts one, so a hero starts
+the run pointing somewhere rather than needing three lucky picks to point anywhere.</p>
+<p><b>The tags are shown and read nothing.</b> No ability, talent, rune or relic changes its
+behaviour because of a tag, and no clause counts them; they are a vocabulary for the player and
+for the design, and the only surface that renders them today is the draft card.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>

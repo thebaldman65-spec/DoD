@@ -613,6 +613,385 @@ const PROTECTED_CORES := {
 }
 
 
+# ================== BATCH EK §1 — THE ARCHETYPE TAGS ==================
+#
+# **A SHARED VOCABULARY THAT NAMES WHAT A CARD IS FOR.** Six words, carried by
+# the protected cores, all 154 draft cards, the boss-pick pools and all 65
+# runes, and shown to the player on the draft card. **MECHANICALLY INERT AS
+# SHIPPED**: nothing in the game reads a tag for anything but display, and
+# `check_ek` asserts that every run.
+#
+# ── WHY SIX MECHANICS AND NOT SIX STATUS NAMES ──────────────────────────────
+# The brief's own example vocabulary was the status one — *"the Pyromancer's
+# Fireball is a Burn card"* — and the corpus was measured before anything was
+# authored. **IT DOES NOT SUPPORT SIX STATUS NAMES.** Grouped into families,
+# the six biggest status systems in the game (Burn, Frost, Bleed, Poison, Ruin,
+# Mark) reach **40 of the 154 draft cards — 114 under no tag at all**, and §1's
+# own test says that a vocabulary leaving a LARGE remainder is the wrong
+# vocabulary. The reason is structural rather than accidental: a status system
+# belongs to ONE spec, so inside the pool a player is actually drafting from it
+# does not vary — the Pyromancer's pool is 12 Burn cards out of 13, and a tag
+# carried by twelve of the thirteen cards on offer tells the player nothing.
+#
+# **THE MECHANIC VOCABULARY BELOW COVERS 154 OF 154**, and it varies inside
+# every pool: five to ten distinct tag combinations per pool against ten to
+# thirteen cards. That is the property the tags exist for — a player can see a
+# build forming — and it is why the distribution decided the set rather than
+# the brief's example doing it. **The status-family option is priced in
+# `docs/reports/EK.md` §1 so the designer can overturn this.**
+#
+# ── THE NAMES, SWEPT (BR §1) ────────────────────────────────────────────────
+# All six were swept against every ABILITY, TALENT NODE, STATUS LABEL and RUNE
+# name in the project. **AFFLICTION, BREAK, METER and AMP collide with
+# nothing.** Two were RENAMED before shipping rather than shipped and flagged,
+# because a brand-new vocabulary is free to move today and costs 227 rows to
+# move later:
+#   · **WARD → SHELTER.** `Ward` is a live status chip ("Takes 50% less Break
+#     damage") and the Rune of the Triage Ward carries the word. That is CJ's
+#     Iron Will collision exactly — a tag and a chip reading the same word on
+#     the same screen — and CJ's answer was to rename.
+#   · **TEMPO → CLOCK.** `Tempo` is a live status chip AND three talent nodes
+#     (Crusader's Tempo, Shattered Tempo, Tempo). CLOCK is the glossary's own
+#     word for what the tag names: *"Turn order is a clock, not a queue."*
+#
+# **AND THE ENGINE CHECK THE BRIEF ASKED FOR IS CLEAN.** None of the six is one
+# of DR's engine names (stance, Loyalty, Focus, Resonance, Ruin, Faith, Mercy,
+# Burn, Chilled, Frenzy, Block), so an engine and a tag can never collapse into
+# one word. **BREAK, METER and CLOCK ARE DR *AXIS* WORDS, WHICH IS REPORTED AND
+# IS NOT THE CHECK THE BRIEF SET** — see `docs/reports/EK.md` §1.
+#
+# ── HOW A TAG WAS DERIVED ───────────────────────────────────────────────────
+# **FROM THE READ SITE, NEVER FROM THE NAME OR THE DESCRIPTION** — CN's rule,
+# and it bites hard here: `heal` is **0 on all 154 draft cards** and 123 of
+# them carry a `special`, so a field-level reading of this corpus produces
+# almost nothing. The read site of a card is its arm in
+# `battle._resolve_special`, PLUS every block keyed on its `display_name` in
+# the hero strike loop (**58 abilities carry one, and Blood Debt's whole
+# payload is one of them**), PLUS the card-specific helpers those call, PLUS —
+# for a setup card that resolves nothing at cast — **whatever reads the status
+# it lays**. Aegis Wall applies `aegis_wall` and does nothing else; its healing
+# lives in the BLOCK handler, and without that last hop it reads as untagged.
+#
+# ── THE SIX ─────────────────────────────────────────────────────────────────
+# **AT MOST TWO PER CARD, THE FIRST IS THE PRIMARY.** A card with two tags of
+# equal weight is a card whose primary has not been decided, so the table
+# always states one.
+const CARD_TAGS := {
+	# --- boss:arcanist ---
+	"Ashes of Al'ar": ["SHELTER"],
+	"Stabilize": ["SHELTER", "METER"],
+	# --- boss:beastmaster ---
+	"Bestial Wrath": ["AMP"],
+	"Call of the Wild": ["BREAK", "AFFLICTION"],
+	"Mark of the Hunt": ["METER", "AMP"],
+	"Primal Surge": ["BREAK", "METER"],
+	"Spirit Bond": ["SHELTER", "METER"],
+	# --- boss:berserker ---
+	"Blood Price": ["METER", "AMP"],
+	# --- boss:holy ---
+	"Dawnbreak": ["SHELTER"],
+	"Sanctuary": ["SHELTER"],
+	# --- boss:mystic ---
+	"Deadfall": ["AFFLICTION", "BREAK"],
+	"Explosive Shot": ["AFFLICTION", "BREAK"],
+	"Hamstring": ["AFFLICTION"],
+	"Harvest": ["BREAK", "AFFLICTION"],
+	"Venom Coating": ["AFFLICTION"],
+	# --- boss:occultist ---
+	"Umbral Sigil": ["AFFLICTION"],
+	# --- boss:sharpshooter ---
+	"Called Shot": ["AFFLICTION", "BREAK"],
+	"Coup de Grâce": ["BREAK", "METER"],
+	"Pinning Shot": ["AFFLICTION", "BREAK"],
+	"Quick Draw": ["CLOCK"],
+	"Triple Shot": ["BREAK"],
+	# --- boss:swordmaster ---
+	"Shatterpoint": ["BREAK", "AFFLICTION"],
+	"Sweeping Strikes": ["AFFLICTION", "BREAK"],
+	# --- boss:warden ---
+	"Interpose": ["SHELTER"],
+	"Retaliation": ["SHELTER", "BREAK"],
+	"War Stomp": ["BREAK", "METER"],
+	# --- class:cleric ---
+	"Chastise": ["BREAK"],
+	"Consecration": ["SHELTER", "METER"],
+	"Exhortation": ["SHELTER", "AMP"],
+	"Ministration": ["SHELTER"],
+	"Unburden": ["SHELTER"],
+	"Undying Vigil": ["SHELTER"],
+	# --- class:hunter ---
+	"Aimed Volley": ["BREAK"],
+	"Arcane Arrows": ["AMP", "METER"],
+	"Bola": ["AFFLICTION"],
+	"Camouflage": ["SHELTER"],
+	"Field Dressing": ["SHELTER"],
+	"Hunter's Mark": ["AMP", "BREAK"],
+	# --- class:mage ---
+	"Blink": ["CLOCK"],
+	"Dispel": ["SHELTER", "AFFLICTION"],
+	"Magic Barrier": ["SHELTER"],
+	"Magic Missiles": ["BREAK"],
+	"Mana Shield": ["SHELTER", "METER"],
+	"Mana Well": ["METER"],
+	"Mirror Image": ["SHELTER"],
+	# --- class:warrior ---
+	"Battle Trance": ["SHELTER", "METER"],
+	"Charge": ["AFFLICTION", "BREAK"],
+	"Cleave": ["BREAK"],
+	"Ironclad": ["SHELTER"],
+	"Rally": ["CLOCK", "METER"],
+	"Warcry": ["AMP"],
+	# --- core:arcanist ---
+	"Arcane Barrage": ["BREAK", "METER"],
+	"Arcane Cannon": ["BREAK", "METER"],
+	"Arcane Explosion": ["BREAK", "METER"],
+	"Death Ray": ["BREAK", "METER"],
+	# --- core:beastmaster ---
+	"Hunter's Instinct": ["AMP"],
+	"Kill Command": ["BREAK", "AFFLICTION"],
+	"Quick Shot": ["BREAK", "METER"],
+	"Summon Aguila": ["BREAK"],
+	"Summon Canis": ["AFFLICTION", "BREAK"],
+	"Summon Ursus": ["BREAK", "SHELTER"],
+	# --- core:berserker ---
+	"Bloodlust": ["BREAK", "SHELTER"],
+	"Hack and Slash": ["AFFLICTION", "BREAK"],
+	"Strike": ["BREAK", "METER"],
+	"Wildstrikes": ["AFFLICTION", "BREAK"],
+	# --- core:cryomancer ---
+	"Blizzard": ["AFFLICTION", "BREAK"],
+	"Frostbolt": ["AFFLICTION", "BREAK"],
+	"Ice Lance": ["AFFLICTION", "BREAK"],
+	"Razor Ice": ["AFFLICTION", "BREAK"],
+	# --- core:holy ---
+	"Heal": ["SHELTER"],
+	"Hymn of Hope": ["SHELTER", "METER"],
+	"Renewal": ["SHELTER"],
+	"Resurrection": ["SHELTER"],
+	"Smite": ["BREAK"],
+	# --- core:inquisitor ---
+	"Blessing of Zeal": ["AMP", "CLOCK"],
+	"Consecrated Ground": ["SHELTER", "METER"],
+	"Divine Shield": ["SHELTER"],
+	# --- core:mystic ---
+	"Shrapnel Charge": ["BREAK", "AFFLICTION"],
+	"Snare Trap": ["AFFLICTION"],
+	"Tripwire": ["BREAK", "AFFLICTION"],
+	# --- core:occultist ---
+	"Bewitch": ["AFFLICTION"],
+	"Dark Pact": ["SHELTER", "METER"],
+	"Hex of Ruin": ["AFFLICTION", "BREAK"],
+	"Shadowrend": ["AFFLICTION", "BREAK"],
+	# --- core:pyromancer ---
+	"Detonation": ["AFFLICTION", "BREAK"],
+	"Fireball": ["AFFLICTION", "BREAK"],
+	"Flamewave": ["AFFLICTION", "BREAK"],
+	"Wildfire": ["AFFLICTION", "BREAK"],
+	# --- core:sharpshooter ---
+	"Aimed Shot": ["BREAK", "METER"],
+	"Hold Breath": ["METER", "AMP"],
+	"Powershot": ["BREAK"],
+	# --- core:swordmaster ---
+	"Guard Change": ["AMP", "SHELTER"],
+	"Overpower": ["BREAK", "METER"],
+	"Pommel Strike": ["AFFLICTION", "BREAK"],
+	# --- core:warden ---
+	"Crushing Blow": ["AFFLICTION", "BREAK"],
+	"Mocking Blow": ["AFFLICTION", "BREAK"],
+	"Shieldwall": ["SHELTER"],
+	# --- other ---
+	"Magic Bolt": ["BREAK", "METER"],
+	# --- spec:arcanist ---
+	"Arcane Bolt": ["BREAK", "METER"],
+	"Arcane Echo": ["BREAK", "AMP"],
+	"Arcane Surge": ["METER", "BREAK"],
+	"Inner Arcane": ["METER"],
+	"Kindled Mind": ["BREAK"],
+	"Magi's Wrath": ["BREAK", "METER"],
+	"Null Field": ["SHELTER", "METER"],
+	"Overcharge": ["METER"],
+	"Reality Fracture": ["CLOCK", "BREAK"],
+	"Resonant Field": ["AMP"],
+	"Threshold": ["METER"],
+	"Unmaking": ["AFFLICTION", "BREAK"],
+	# --- spec:beastmaster ---
+	"Bear the Brunt": ["SHELTER"],
+	"Bloodbond": ["SHELTER"],
+	"Bring It Down": ["AMP"],
+	"Call the Wilds": ["AFFLICTION", "BREAK"],
+	"Ghostpack": ["AMP"],
+	"Last Howl": ["AMP"],
+	"Savage Sweep": ["BREAK", "AFFLICTION"],
+	"Succession": ["CLOCK"],
+	"Twin Hunt": ["BREAK", "AFFLICTION"],
+	"Unleash": ["BREAK", "AFFLICTION"],
+	# --- spec:berserker ---
+	"Battle Shout": ["METER", "AMP"],
+	"Berserk": ["AMP"],
+	"Blood Debt": ["BREAK", "SHELTER"],
+	"Blood Offering": ["METER"],
+	"Boil Over": ["BREAK", "AMP"],
+	"Gut Rip": ["AFFLICTION", "BREAK"],
+	"Rampage": ["AFFLICTION", "BREAK"],
+	"Reckless Abandon": ["METER", "AMP"],
+	"Spite": ["SHELTER", "METER"],
+	"Unslaked": ["METER"],
+	# --- spec:cryomancer ---
+	"Cold Iron": ["AFFLICTION", "BREAK"],
+	"Cryoclasm": ["AFFLICTION", "BREAK"],
+	"Deep Winter": ["AFFLICTION"],
+	"Frostbind": ["AFFLICTION"],
+	"Glacial Prison": ["AFFLICTION"],
+	"Hoarfrost Armor": ["SHELTER", "AFFLICTION"],
+	"Killing Frost": ["AFFLICTION", "BREAK"],
+	"Rime": ["AFFLICTION"],
+	"Rimebinding": ["AFFLICTION"],
+	"Shatter": ["AFFLICTION", "BREAK"],
+	"Winter's Toll": ["BREAK"],
+	# --- spec:holy ---
+	"Alms": ["SHELTER", "METER"],
+	"Divine Plea": ["SHELTER", "METER"],
+	"Divine Presence": ["METER"],
+	"Intercession": ["SHELTER"],
+	"Recant": ["METER"],
+	"Reprisal": ["BREAK"],
+	"Rite of Return": ["SHELTER"],
+	"Second Wind": ["SHELTER"],
+	"Shared Grief": ["METER"],
+	"Vespers": ["SHELTER"],
+	# --- spec:inquisitor ---
+	"Aegis Reversal": ["AMP", "SHELTER"],
+	"Blessing of the Faithful": ["SHELTER", "METER"],
+	"Bulwark of Fortitude": ["SHELTER", "METER"],
+	"Divine Wrath": ["AMP"],
+	"Elevation": ["SHELTER", "METER"],
+	"Fortified Spirit": ["SHELTER"],
+	"Mantle": ["SHELTER"],
+	"Ordination": ["SHELTER", "METER"],
+	"Reliquary": ["SHELTER"],
+	"Sacred Resolve": ["SHELTER"],
+	"Vow of Suffering": ["SHELTER", "METER"],
+	# --- spec:mystic ---
+	"Choking Smoke": ["AFFLICTION", "METER"],
+	"Cull": ["BREAK"],
+	"Downwind": ["AFFLICTION"],
+	"Hunt": ["BREAK", "AMP"],
+	"Loaded Shot": ["AFFLICTION", "BREAK"],
+	"Preparation": ["CLOCK"],
+	"Salve": ["SHELTER", "AFFLICTION"],
+	"Snare Line": ["AFFLICTION"],
+	"Stalking Horse": ["SHELTER"],
+	"Thick Hide": ["SHELTER"],
+	# --- spec:occultist ---
+	"Anointing": ["AFFLICTION", "METER"],
+	"Blight the Well": ["AFFLICTION"],
+	"Breaking Darkness": ["AFFLICTION", "BREAK"],
+	"Covenant of Ash": ["AFFLICTION", "METER"],
+	"Mass Hysteria": ["AFFLICTION", "BREAK"],
+	"Mind Flay": ["AFFLICTION", "BREAK"],
+	"Penance": ["AFFLICTION"],
+	"Requiem": ["AFFLICTION", "BREAK"],
+	"Suffering": ["AFFLICTION", "SHELTER"],
+	"Transference": ["AFFLICTION"],
+	# --- spec:pyromancer ---
+	"Backdraft": ["AFFLICTION", "METER"],
+	"Cinderfall": ["AFFLICTION", "BREAK"],
+	"Ember Debt": ["AFFLICTION", "METER"],
+	"Emberkeep": ["AFFLICTION"],
+	"Firedraw": ["AFFLICTION", "BREAK"],
+	"Firestorm": ["AFFLICTION", "BREAK"],
+	"Funeral Pyre": ["AFFLICTION", "SHELTER"],
+	"Immolate": ["SHELTER", "AFFLICTION"],
+	"Phoenix Rebirth": ["METER"],
+	"Pyre Wake": ["AFFLICTION", "BREAK"],
+	"Pyroblast": ["AFFLICTION", "BREAK"],
+	"Slow Burn": ["AFFLICTION", "BREAK"],
+	"Stoke": ["AFFLICTION", "BREAK"],
+	# --- spec:sharpshooter ---
+	"Calibrating Shot": ["BREAK", "METER"],
+	"Called Volley": ["BREAK"],
+	"Crossfire": ["BREAK"],
+	"Drumfire": ["BREAK"],
+	"Dug In": ["SHELTER"],
+	"Fault Line": ["BREAK", "METER"],
+	"Heads Down": ["AFFLICTION", "BREAK"],
+	"Quarry's Mark": ["METER"],
+	"Reacquire": ["METER"],
+	"Trophy Shot": ["BREAK"],
+	# --- spec:swordmaster ---
+	"Answering Steel": ["CLOCK", "SHELTER"],
+	"Battle Poise": ["CLOCK"],
+	"Counter Time": ["AFFLICTION", "SHELTER"],
+	"Discipline": ["AMP", "SHELTER"],
+	"Execute": ["BREAK"],
+	"Feigned Guard": ["AMP"],
+	"Feint": ["BREAK"],
+	"Formless": ["AMP", "SHELTER"],
+	"Lunge": ["BREAK", "METER"],
+	"Precision Strike": ["BREAK"],
+	"Sever": ["BREAK", "CLOCK"],
+	"Wheeling Cut": ["BREAK", "AMP"],
+	# --- spec:warden ---
+	"Aegis Wall": ["SHELTER"],
+	"Anvil": ["METER"],
+	"Covering Guard": ["SHELTER"],
+	"Eye of the Storm": ["AFFLICTION"],
+	"Hold the Line": ["SHELTER", "METER"],
+	"Rallying Shout": ["BREAK", "METER"],
+	"Recompense": ["METER"],
+	"Shield Slam": ["BREAK"],
+	"Turn the Blade": ["BREAK"],
+	"Vendetta": ["AFFLICTION"],
+}
+
+
+# WHAT EACH TAG MEANS, IN ONE LINE, AND IT IS PLAYER-FACING TEXT.
+# The glossary carries the long form; this is what a tooltip shows.
+const TAG_INFO := {
+	"AFFLICTION": "Puts a harmful effect on the enemy, or spends one.",
+	"SHELTER": "Answers damage coming in: heals, absorbs or mitigates.",
+	"BREAK": "Moves a Break meter.",
+	"METER": "Moves a resource or a class meter.",
+	"AMP": "Raises what the holder deals.",
+	"CLOCK": "Moves the initiative timeline or a cooldown.",
+}
+
+# The six in display order. AUTHORED, so the draft card, the glossary and the
+# gate all read one list and a seventh tag cannot arrive in only some of them.
+const TAG_ORDER := ["AFFLICTION", "SHELTER", "BREAK", "METER", "AMP", "CLOCK"]
+
+
+# An ability's tags: `[primary]` or `[primary, secondary]`, and `[]` for a name
+# the table does not carry. **THE ONE READER OF `CARD_TAGS`**, so a later batch
+# that keys anything off a tag has exactly one door to come through.
+static func card_tags(display_name: String) -> Array:
+	return CARD_TAGS.get(display_name, [])
+
+
+# The primary alone, or "" — what the draft card leads with.
+static func card_tag_primary(display_name: String) -> String:
+	var t: Array = card_tags(display_name)
+	return String(t[0]) if not t.is_empty() else ""
+
+
+# The one line a tag shows, or "" for a name that is not a tag.
+static func tag_meaning(tag: String) -> String:
+	return String(TAG_INFO.get(tag, ""))
+
+
+# The tag line as the draft card renders it — "AFFLICTION · BREAK", or "" when
+# the card carries none. ONE BUILDER, so a second surface taking these on
+# cannot draw them a second way (CK §1's rule, one layer down).
+static func card_tag_line(display_name: String) -> String:
+	var t: Array = card_tags(display_name)
+	if t.is_empty():
+		return ""
+	var parts: Array = []
+	for x in t:
+		parts.append(String(x))
+	return " · ".join(parts)
+
+
 static func spec_draft_pool(spec: String) -> Array:
 	return SPEC_DRAFT_POOLS.get(spec, [])
 

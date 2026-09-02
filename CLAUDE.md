@@ -2084,6 +2084,53 @@ Chilled.** The difference is not size and it is not confidence:
   read would find nothing to apply. Fixing half of that would read as working while paying exactly
   what it pays now.
 
+## STANDING REFERENCE — AN ENGINE, AN AXIS, AND NOW A TAG (Batch EK §1)
+
+**THREE VOCABULARIES, AND THEY ARE NOT THE SAME ONE.** DR separated the first two; EK adds the
+third and it is the only one the player ever sees.
+
+> **An ENGINE is the spec's own currency.** Exclusive, one per spec. Identity.
+> **An AXIS is an effect type** — single-target damage, healing, control, tempo. Shared, internal
+> to the design audits, and **never shown to a player**.
+> **A TAG is what a card is FOR**, in six words the player reads on the draft card:
+> **AFFLICTION · SHELTER · BREAK · METER · AMP · CLOCK.** Carried by every ability in the corpus
+> and every authored rune, at most two a card, **the first is the primary**.
+
+- **THE TABLES ARE `Classes.CARD_TAGS` AND `Runes.RUNE_TAGS`, AND EACH HAS EXACTLY ONE ACCESSOR.**
+  `Classes.card_tags()` / `Runes.rune_tags()`, with `Classes.card_tag_line()` the ONE builder of
+  the displayed string (CK §1's rule one layer down). A batch keying anything off a tag comes
+  through those doors and nowhere else.
+- **THEY ARE MECHANICALLY INERT AND THAT IS A RULING, NOT AN OVERSIGHT.** No clause reads a tag
+  count, no card's behaviour changes, no magnitude moves. **`check_ek` §3 asserts it as a
+  POPULATION** — every `.gd` in the repo is swept comment-stripped and the set of files naming the
+  tag surface must be exactly five, with ZERO asserted separately in `battle.gd`, `unit.gd`,
+  `talents.gd`, `run_state.gd`, `run_sim.gd` and `ability.gd`. **A batch that makes a tag do
+  something has to move a line in that gate and say why.**
+- **THE VOCABULARY IS SIX MECHANICS BECAUSE THE CORPUS DOES NOT HOLD SIX STATUS NAMES, AND THAT IS
+  MEASURED RATHER THAN ASSERTED.** The six biggest status FAMILIES in the game (Burn, Frost, Bleed,
+  Poison, Ruin, Mark) reach **40 of the 154 draft cards and leave 114 with nothing**. The reason is
+  structural: **a status system belongs to one spec, so it does not vary inside the pool the player
+  is drafting from** — the Pyromancer's pool is 12 Burn cards of 13. The six shipped cover **154 of
+  154** and give five to ten distinct combinations per pool. Full working and the alternative set:
+  `docs/reports/EK.md` §1.
+- **A TAG NAME IS SWEPT LIKE AN ABILITY NAME, AND TWO OF THE SIX WERE RENAMED BEFORE SHIPPING.**
+  `Ward` and `Tempo` are both live STATUS CHIPS — and `Tempo` is three talent nodes as well — so
+  WARD became **SHELTER** and TEMPO became **CLOCK**, on CJ's Ironclad precedent. **`check_ek` §4
+  re-runs that sweep live**, so a card, node, status or rune authored later with one of these six
+  words trips. **None of the six is one of DR's ENGINE names**; BREAK, METER and CLOCK *are* DR
+  axis words, which is reported and is a different check.
+- **A TAG IS DERIVED FROM THE READ SITE, NEVER FROM THE NAME OR THE DESCRIPTION**, and on this
+  corpus a field-level reading produces almost nothing: **`heal` is 0 on all 154 draft cards** and
+  123 of them carry a `special`. The read site of a card is its arm in `_resolve_special`, **plus
+  every block keyed on its `display_name` in the hero strike loop** (58 abilities carry one, and
+  Blood Debt's whole payload is one of them), plus the card-specific helpers those call, **plus
+  whatever reads the status a setup card lays** — Aegis Wall applies `aegis_wall` and nothing else,
+  and its healing is in the BLOCK handler.
+- **A NEW ABILITY OR RUNE IS OWED A ROW IN THE SAME BATCH.** `check_ek` §1 walks
+  `Classes.ability_corpus()` and `Runes.ids()` and requires a tag on every one, **and requires the
+  tables not to outrun them either** — a row naming a card that does not exist is the shape
+  `CLASS_POOLS` spent eighteen batches in.
+
 ## STANDING RULE — THE THREE DOORS THAT BITE A NEW DRAFT CARD (Batch DS §2)
 
 **ALL THREE ARE MECHANICAL, ALL THREE WENT RED ON DS'S FIRST RUN, AND ALL THREE ARE CHEAPER TO

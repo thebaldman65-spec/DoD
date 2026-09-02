@@ -4,6 +4,37 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The vocabulary was in the corpus, and it was not the one anybody expected (Batch EK) — 2026-09-01
+
+The brief for the tags gave its own example in passing — *"the Pyromancer's Fireball is a Burn
+card"* — and then told the batch to derive the set by measuring rather than by proposing. Those two
+instructions disagree, and the measurement is what settled it.
+
+**Six status names reach a quarter of the draft.** Grouped generously into families — Burn, Frost,
+Bleed, Poison, Ruin, Mark — they cover 40 of the 154 cards. The brief's own test says a vocabulary
+leaving a large remainder is the wrong vocabulary, and 114 is large.
+
+**The reason is worth more than the number, because it is structural rather than a matter of
+picking better words.** A status system in this game belongs to ONE spec. That is by design: DR's
+rule is that an engine is exclusive and an axis is shared. So a status tag is constant inside the
+only pool a player is ever choosing from — the Pyromancer's pool is twelve Burn cards out of
+thirteen, and a label carried by twelve of the thirteen cards on offer is not a decision aid, it is
+wallpaper. **The tag has to vary where the choice happens, and a spec's own system never does.**
+
+What varies inside a pool is what a card does to the machinery every hero shares: the Break meter,
+the enemy's status bar, the hero's status bar, the resource, the clock. Six words for those cover
+154 of 154 and give five to ten distinct combinations per pool. That is the set that shipped.
+
+**Two of the six were renamed before shipping and the renaming is the cheap half of this batch.**
+WARD and TEMPO are both live status chips, and Tempo is three talent nodes as well. A tag reading
+the same word as a chip on the same screen is CJ's Iron Will collision, which cost a rename anyway
+— done a batch late, after the word was already on 227 rows. Doing it first cost one sweep.
+
+**And the tags do nothing, on purpose.** Every alternative bets that the set is right before anyone
+has seen it in play. Runes key onto them next; if the vocabulary turns out wrong, unwinding it
+today costs a table and a label, and unwinding it after the rune layer is re-keyed costs the rune
+layer.
+
 ## A floor with a hole is worse than no floor (Batch EI) — 2026-09-01
 
 Every implement-only batch since CG has run the same two-line acceptance test: *it parses — grep

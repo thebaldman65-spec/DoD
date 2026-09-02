@@ -273,6 +273,22 @@ renders <code>perfect_text</code> without wrapping is the battle tooltip, which 
 rather than clipping. <b>Recorded as measured, not filed as owed</b> — rewrapping 76 lines to a
 ceiling that does not bind them would be work with no reader.</p>
 
+<h3>4.8a AN ARCHETYPE TAG IS NOT PROSE, AND THE CEILING DOES NOT BIND IT (SET AT BATCH EK &sect;3)</h3>
+<p><b>A tag is a label, not a sentence, so &sect;4.8's 44-character ceiling does not apply to
+it</b> &mdash; and the decision is recorded here rather than left to be re-derived, because a
+later batch reading &sect;4.8 would otherwise have to guess.</p>
+<p><b>The reasoning is &sect;4.8's own.</b> The ceiling exists because an authored line is
+HAND-WRAPPED with a literal <code>\n</code> and a line that overruns is clipped where the author
+put the break. <b>A tag line carries no authored break at all</b>: it is composed at render time
+by <code>Classes.card_tag_line</code> from a table of six fixed words, and the label it renders
+into autowraps &mdash; the same reason &sect;4.8 above records that <code>perfect_text</code> has
+never been held to the ceiling.</p>
+<p><b>And the arithmetic says it could not bind anyway, which is measured rather than assumed.</b>
+The longest word is <code>AFFLICTION</code> at 10 characters, the separator is 3, and a card
+carries at most two tags &mdash; so <b>the widest tag line the table can produce is 20
+characters</b> (<code>AFFLICTION &middot; SHELTER</code>), under half the ceiling. <b>The words themselves are subject to &sect;4.4</b>: they are
+keywords, and they are capitalised everywhere they are shown.</p>
+
 <h2>4.9 HERO AND ALLY ARE THE ONLY TWO WORDS (BINDING, SET AT BATCH CV &sect;4, CLOSED AT DM)</h2>
 <blockquote><b>HERO</b> &mdash; one of the four. <b>ALLY</b> &mdash; heroes and
 companions together. <b>AND THERE IS NO THIRD WORD.</b></blockquote>

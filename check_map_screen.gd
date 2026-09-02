@@ -10,6 +10,8 @@ extends Node
 var stage := 0
 var frames := 0
 var map_scene: Node = null
+# BATCH EK §3 — set by the live tag drive in stage 3; gates the verdict line.
+var _ek_tags_ok := false
 
 
 func _ready() -> void:
@@ -100,6 +102,28 @@ func _process(_d: float) -> void:
 			print("  party draft added %d nodes, %d Buttons, %d columns owed" % [
 				int(d_after["all"]) - d_before, int(d_after["btn"]),
 				map_scene._draft_columns().size()])
+			# **BATCH EK §3 — THE TAG LINE, DRIVEN RATHER THAN ASSERTED.** A
+			# vocabulary that renders on NOTHING passes every static check in
+			# the tree — DS's Heads Down shape, where the code was right and the
+			# behaviour was inert. This walks the drawn tree for Labels whose
+			# text is a live tag line and requires one PER OFFERED CARD, so a
+			# renderer that stops being called says so here and nowhere else.
+			var ek_offered := 0
+			for i3 in map_scene._draft_columns():
+				var ekq: Array = Run.party[int(i3)].get("draft_candidates", [])
+				if not ekq.is_empty():
+					ek_offered += (ekq[0] as Array).size()
+			var ek_drawn: Array = _tag_labels(map_scene)
+			var ek_ok: bool = ek_drawn.size() == ek_offered and ek_offered > 0
+			print("  EK tag lines drawn: %d for %d offered cards (%s)" % [
+				ek_drawn.size(), ek_offered, "OK" if ek_ok else "MISMATCH"])
+			print("  EK first tag line: '%s'" % (
+				String(ek_drawn[0]) if not ek_drawn.is_empty() else ""))
+			# **AND IT IS AN ASSERTION, NOT A REPORT.** This target carries no
+			# failure counter — its whole verdict is the ONE line at the foot,
+			# pinned as `expect` in `baselines.json` — so a MISMATCH has to take
+			# that line away or `check_de` reads a mismatched run as a clean one.
+			_ek_tags_ok = ek_ok
 			# Stage a card on every column and confirm through the real door.
 			for i2 in Run.party.size():
 				var q: Array = Run.party[i2].get("draft_candidates", [])
@@ -118,8 +142,11 @@ func _process(_d: float) -> void:
 			map_scene._confirm_party_draft()
 			print("  confirmed; picks still owed: %d" % Run.owed_draft_picks())
 			_close()
-			print("check_map_screen: OK")
-			get_tree().quit(0)
+			if _ek_tags_ok:
+				print("check_map_screen: OK")
+			else:
+				print("check_map_screen: TAG MISMATCH — the draft card drew no tag line")
+			get_tree().quit(0 if _ek_tags_ok else 1)
 	stage += 1
 
 
@@ -135,6 +162,26 @@ func _close() -> void:
 	if map_scene != null and is_instance_valid(map_scene):
 		map_scene.free()
 	map_scene = null
+
+
+# BATCH EK §3 — every Label in the drawn tree whose whole text is a tag line
+# built out of `Classes.TAG_ORDER`. Derived from that constant rather than from
+# a literal list, so a seventh tag is covered by doing nothing here.
+func _tag_labels(n: Node) -> Array:
+	var out: Array = []
+	for c in n.get_children():
+		if c is Label:
+			var t := String((c as Label).text)
+			if t != "":
+				var ok := true
+				for part in t.split(" · "):
+					if not Classes.TAG_ORDER.has(String(part)):
+						ok = false
+						break
+				if ok:
+					out.append(t)
+		out.append_array(_tag_labels(c))
+	return out
 
 
 func _tally(n: Node) -> Dictionary:

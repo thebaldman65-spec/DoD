@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1335,
-  "source": 1034,
-  "other": 72,
+  "total": 1340,
+  "source": 1038,
+  "other": 73,
   "document": 229
  },
  "source_residency": {
-  "code": 616,
+  "code": 618,
   "absent": 287,
-  "runtime": 72,
+  "runtime": 74,
   "narrow": 18,
   "alt-sibling": 2,
   "comment": 39
@@ -1748,6 +1748,63 @@
    "k": "literal",
    "how": "read",
    "g": "check_eh.gd#152"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s3_inertness",
+   "h": "",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ek.gd#125",
+   "expr": "String"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s3_inertness",
+   "h": "scripts/map_screen.gd",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ek.gd#146",
+   "expr": "String"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s3_inertness",
+   "h": "scripts/map_screen.gd",
+   "n": "card_tag_line",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ek.gd#143"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s4_name_sweep",
+   "h": "scripts/battle.gd",
+   "n": "[\"%s\",",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ek.gd#184"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s5_one_builder",
+   "h": "scripts/classes.gd",
+   "n": "\" · \"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ek.gd#224"
   },
   {
    "s": "test_batch_ah.gd",
