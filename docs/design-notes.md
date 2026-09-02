@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A rename is cheap on the side nobody reads (Batch EL) — 2026-09-01
+
+EK had to choose between calling a tag what it is and calling it something free. It chose free:
+WARD became SHELTER and TEMPO became CLOCK because both words were already live status chips, and a
+tag reading the same word as a chip is CJ's Iron Will collision. That was the right call under the
+constraint. **It was the wrong constraint.**
+
+**The collision was never between two mechanics. It was between two labels**, and a label is one
+string. `Tempo` the chip is one entry in `STATUS_INFO`; the three nodes are three `"name"` fields.
+The tag was on 292 rows. **The expensive side was being protected from the cheap one**, and the
+answer was to move the six strings and take the word.
+
+**What made this batch bigger than six strings is the thing that always makes a rename bigger: the
+sweep did not know where the word lived.** `Tempo` was also the Sharpshooter's third talent LANE,
+in nine nodes and one rune, and the gate that swept for it reads `"name"` keys — a lane is a
+`"lane"` key, so it was invisible. **A sweep is only as wide as its population, and a population
+that was written down once is a population that stopped growing when the tree did.**
+
+**The instrument was wrong in a second, quieter way.** The status-label arm asked whether
+`battle.gd` contained `["Ward",` — an exact whole label equal to the tag. That catches `Ward` and
+`Tempo`, whose labels ARE the word, and it is blind to every label that merely contains it. The
+chip for Hunter's Mark is labelled "Hunter's Mark". **A check written against the two examples in
+front of it passes on both and answers no general question**, and it reported the MARK sweep clean
+while a chip rendered the word.
+
+**MARK's population was the other lesson, and it is CN's rule one turn further.** EK derived the
+candidate by reading card texts for the phrase *"one mark at a time"* and found six. The game had
+already written the list down — `DISPEL_NEVER`'s comment names *"the five MARKS the party
+applies"* by id, because Dispel had to be told not to strip them — and off that list the answer is
+ten. **Three cards lay a mark and say so nowhere a reader would look**: Covenant of Ash, Snare Line
+and Feint. A vocabulary derived from what cards SAY will always be the vocabulary of the cards that
+were written well.
+
+**Eight of the ten had a primary that was wrong rather than merely different**, and the pattern is
+one thing: each was tagged for what its mark PAYS. Quarry's Mark was RESOURCE because the mark
+doubles Focus; Hunter's Mark was OFFENSE because the mark grants damage; Blood Debt was BREAK
+because the strike carries pressure. **All three readings are of the payoff, and the payoff is not
+what the card is.** That is exactly the failure the tags exist to make visible, sitting inside the
+tag table itself.
+
+**Two kept their primaries and the reason is a shape rather than a preference.** Snare Line marks
+the whole field; Feint marks on one of its two stance branches. **A tag that means "one enemy is
+named" should not be led with by a card that names everyone or names sometimes.**
+
+**And two of the seven ship colliding, which is a line worth stating.** MARK meets three ability
+names; DEFENSE meets the Defense Potion. Neither was renamed, because **the collision that costs
+something is the one where two things wear one word and mean different things.** `Ward` meant
+*takes 50% less Break damage* — one narrow thing a SHELTER card might do, and a player reading both
+learns something false. Hunter's Mark IS a mark and CARRIES the tag. The word on the card and the
+word under it agree, and a reader who conflates them is right.
+
 ## The vocabulary was in the corpus, and it was not the one anybody expected (Batch EK) — 2026-09-01
 
 The brief for the tags gave its own example in passing — *"the Pyromancer's Fireball is a Burn

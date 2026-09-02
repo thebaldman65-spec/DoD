@@ -161,7 +161,7 @@ const IDS := ["ss_steady", "ss_perfect_form", "ss_deep_focus", "ss_exec_eye",
 func _tree_shape() -> void:
 	var tree := _tree()
 	ok(tree.size() == 27, "the Sharpshooter tree holds 24 nodes (got %d)" % tree.size())
-	var by_lane := {"Precision": 0, "Penetration": 0, "Tempo": 0}
+	var by_lane := {"Precision": 0, "Penetration": 0, "Pace": 0}
 	var caps := 0
 	var seen := {}
 	for t in tree:
@@ -203,8 +203,12 @@ func _tree_shape() -> void:
 	# Shatterpoint or AT's Control.
 	ok(String(_node("ss_steady")["lane"]) == "Precision"
 		and String(_node("ss_piercer")["lane"]) == "Penetration"
-		and String(_node("ss_fletcher")["lane"]) == "Tempo",
-		"the three lane names are unchanged: Precision / Penetration / Tempo")
+		and String(_node("ss_fletcher")["lane"]) == "Pace",
+		# BATCH EL §1 RE-POINTED: the third lane is PACE now. `Tempo` was a
+		# LANE as well as a chip and three nodes — the surface EK's own sweep
+		# missed, because it collected `"name"` keys and a lane lives under
+		# `"lane"`. The lane's THESIS did not move.
+		"the three lane names are Precision / Penetration / Pace")
 
 
 # ---------- §3 the magnitudes, final ----------
@@ -483,7 +487,7 @@ func _rune_audit() -> void:
 				"the class-wide rune %s does not write the Sharpshooter counter %s" % [id, f])
 	# No lane tag went stale: his lanes did not rename (the AS Honed Lance
 	# lesson, checked even though nothing moved).
-	var lanes := {"Precision": true, "Penetration": true, "Tempo": true}
+	var lanes := {"Precision": true, "Penetration": true, "Pace": true}
 	for id in ss_runes:
 		var lane := String(pool[id].get("lane", ""))
 		ok(lane == "" or lanes.has(lane),

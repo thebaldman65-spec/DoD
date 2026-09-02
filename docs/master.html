@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-01 (Batch EK)</b></p>
+<p align="right"><b>Last updated: 2026-09-01 (Batch EL &mdash; the tags get their real names, and MARK is the seventh)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1556,7 +1556,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td><td>The reliable filler. Multi-hit, so it plays with anything reading hits rather than casts, and cheap enough to cast while saving for something bigger.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
 <tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry. Until Batch CX the Crown&rsquo;s half could never fire, so in practice there was one source, not two.</td></tr>
-<tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Tempo, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
+<tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power and no baseline: none of the three can simply heal someone on turn one</i></td></tr>
 <tr><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td><td>The plain heal none of them has. Holy's healing is gated behind Mercy, the Devout's behind shields absorbing hits, the Occultist's behind marks on enemies.</td></tr>
 <tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td><td>Sustained rather than burst — the opposite read to Ministration.</td></tr>
@@ -1591,19 +1591,26 @@ one per spec, which decides base Attack. <b>A tag is a property of a CARD, not o
 nothing reads both.</p>
 <table>
 <tr><th>Tag</th><th>What it means</th></tr>
-<tr><td><b>AFFLICTION</b></td><td>Puts a harmful effect on the enemy, or spends one.</td></tr>
-<tr><td><b>SHELTER</b></td><td>Answers damage coming in: heals, absorbs or mitigates.</td></tr>
+<tr><td><b>DEBUFF</b></td><td>Lands a harmful effect on an enemy, or spends one.</td></tr>
+<tr><td><b>DEFENSE</b></td><td>Answers damage coming in: heals, absorbs or reduces it.</td></tr>
 <tr><td><b>BREAK</b></td><td>Moves a Break meter.</td></tr>
-<tr><td><b>METER</b></td><td>Moves a resource or a class meter.</td></tr>
-<tr><td><b>AMP</b></td><td>Raises what the holder deals.</td></tr>
-<tr><td><b>CLOCK</b></td><td>Moves the initiative timeline or a cooldown.</td></tr>
+<tr><td><b>RESOURCE</b></td><td>Moves Mana, Rage or a class meter.</td></tr>
+<tr><td><b>OFFENSE</b></td><td>Raises the damage the holder deals.</td></tr>
+<tr><td><b>TEMPO</b></td><td>Moves the initiative timeline or a cooldown.</td></tr>
+<tr><td><b>MARK</b></td><td>Lays a lasting mark on one enemy.</td></tr>
 </table>
 <p><b>At most two a card, and the first one is the primary</b> &mdash; what the card is for, with
 the second naming what it also touches. <b>A card with two tags of equal weight is a card whose
 primary has not been decided</b>, so every row states one.</p>
 <p><b>The protected cores carry them too, and that is what gives a build a seed.</b> The
-Pyromancer opens holding an AFFLICTION card whether or not he ever drafts one, so a hero starts
+Pyromancer opens holding a DEBUFF card whether or not he ever drafts one, so a hero starts
 the run pointing somewhere rather than needing three lucky picks to point anywhere.</p>
+<p><b>MARK is the seventh and seven is the ceiling.</b> A tag only means something if holding two
+is notable, so every word added divides the corpus finer &mdash; and seven is where the next one
+starts costing meaning. <b>An eighth needs an argument.</b> MARK names the cards that lay a
+lasting marker on ONE enemy that later hits read: Hunter&#x27;s Mark, Quarry&#x27;s Mark, Mark of
+the Hunt, Reacquire, Blood Debt, Vendetta, Covenant of Ash and Arcane Echo lead with it, and
+Snare Line and Feint carry it second.</p>
 <p><b>The tags are shown and read nothing.</b> No ability, talent, rune or relic changes its
 behaviour because of a tag, and no clause counts them; they are a vocabulary for the player and
 for the design, and the only surface that renders them today is the draft card.</p>
@@ -2075,7 +2082,7 @@ Pinning Shot — 20 Mana, 2.5, 3cd, 20% Atk: the target is Slowed AND Dazed for 
 Called Shot — 25 Mana, 3.0, 3cd, 25% Atk: pick the spot before loosing — Sunder (−35%
 armor, 2 turns), +30 Break damage, or Exposed (3 turns). A picker opens on cast (the bot
 picks armor against armored targets).<br>
-<b>Talent lanes:</b> see §7 — Precision / Penetration / Tempo.</li>
+<b>Talent lanes:</b> see §7 — Precision / Penetration / Pace.</li>
 <li><b>Survivalist (Pressure)</b> — <b>Stat block:</b> 170 HP / 18% armor / +25% nature
 resist, +10% shadow, −15% arcane (the toughest Hunter by design — his passive rewards being
 struck and Tripwire wants him in the fray; deep nature affinity from a life spent in it,
@@ -2214,7 +2221,7 @@ plainly that it cannot be changed.</p>
 <tr><td>4</td><td><b>Precision Strikes</b> — +20% critical strike chance against Stunned targets.</td><td><b>Swordsmanship</b> — A PERFECT Guard Change grants +25% parry chance for 2 turns, instead of the usual 10%.</td><td><b>Opportunist</b> — When an enemy attack MISSES the Swordmaster or is PARRIED, he counter attacks with Overpower (free).</td></tr>
 <tr><td>5</td><td><b>Seasoned Fighter</b> — Overpower gains +15% critical strike chance.</td><td><b>High Guard</b> — Take 40% less damage for 3 turns after parrying an attack.</td><td><b>No Quarter</b> — Breaking an enemy grants the Swordmaster 45 Rage.</td></tr>
 <tr><td>6</td><td><b>Overwhelm</b> — +8% damage for every debuff on the target. Broken is a Break-meter state rather than an affliction and is not one of them.</td><td><b>Riposte</b> — Counter Attack: immediately answer every parry with a free Overpower.</td><td><b>Punishment</b> — Overpower deals +60% damage against Broken targets.</td></tr>
-<tr><td>7</td><td><b>Tempo</b> — Switching stance grants +30% damage for 2 turns.</td><td><b>Deflection</b> — The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td><td><b>Off Balance</b> — All the Swordmaster&#x27;s damage is increased by 20% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.</td></tr>
+<tr><td>7</td><td><b>Pivot</b> — Switching stance grants +30% damage for 2 turns.</td><td><b>Deflection</b> — The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td><td><b>Off Balance</b> — All the Swordmaster&#x27;s damage is increased by 20% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.</td></tr>
 <tr><td>8</td><td><b>Whetstone</b> — Every critical strike permanently raises the Swordmaster&#x27;s Attack by 3 for the rest of the battle.</td><td><b>Waiting Guard</b> — Every turn the Swordmaster is not struck, he banks a Guard — the next attack against him is parried automatically. He may bank 3.</td><td><b>Overpressure</b> — Break damage the Swordmaster deals past a full meter is not wasted — it lands as damage instead, 100% of a point apiece.</td></tr>
 <tr><td>CAPSTONE</td><td><b>Finisher</b> — Pommel Strike deals +30% of Attack, and its cooldown falls to 1.</td><td><b>Untouchable</b> — While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.</td><td><b>Guard Breaker</b> — When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.</td></tr>
 </table>
@@ -2256,7 +2263,7 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>4</td><td><b>Snowblind</b> — Blizzard costs 10 less Mana, and its cooldown falls to 2.</td><td><b>Numbing Cold</b> — Ice Lance costs 10 less Mana, and its cooldown falls to 1.</td><td><b>Focused Lance</b> — Ice Lance deals +15% of Attack and 15 more Break damage.</td></tr>
 <tr><td>5</td><td><b>Icy Resolve</b> — Blizzard strikes for +10% of Attack.</td><td><b>Second Prison</b> — He can hold TWO enemies at once instead of one.</td><td><b>Piercing Ice</b> — Ice Lance gains 30% critical strike damage.</td></tr>
 <tr><td>6</td><td><b>Whiteout</b> — Blizzard applies 3 stacks of Chilled to every enemy instead of 1-2.</td><td><b>Cold Snap</b> — A held enemy&#x27;s Break meter fills 15 at the start of each of his turns.</td><td><b>Honed Shards</b> — A release applies 3 stacks of Chilled to the thawed enemy.</td></tr>
-<tr><td>7</td><td><b>Splintering Shards</b> — Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.</td><td><b>Glacial Economy</b> — Freezing an enemy restores 15% of his maximum Mana.</td><td><b>Shattered Tempo</b> — Releasing a hold pushes every OTHER enemy back 2 on the initiative timeline.</td></tr>
+<tr><td>7</td><td><b>Splintering Shards</b> — Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.</td><td><b>Glacial Economy</b> — Freezing an enemy restores 15% of his maximum Mana.</td><td><b>Shockwave</b> — Releasing a hold pushes every OTHER enemy back 2 on the initiative timeline.</td></tr>
 <tr><td>8</td><td><b>Winter&#x27;s Depth</b> — Every stack of Chilled lowers its bearer&#x27;s Constitution by 8%, by at most 75% and never below 10 Constitution — the colder they are, the easier they Break.</td><td><b>Cold Storage</b> — At the start of each of his turns every hero regains 5% of their maximum resource for each enemy he is holding.</td><td><b>Frostbound Hours</b> — Releasing a hold takes one turn off every hero&#x27;s cooldowns for every 3 turns the enemy spent held.</td></tr>
 <tr><td>CAPSTONE</td><td><b>Eternal Winter</b> — EVERY enemy gains 1 stack of Chilled at the start of each of his turns.</td><td><b>Absolute Zero</b> — No limit on how many enemies he can hold at once.</td><td><b>Shardfall</b> — Razor Ice strikes 3 additional times, and its cooldown falls to 1.</td></tr>
 </table>
@@ -2297,7 +2304,7 @@ build lands three distinct statuses.</p>
 <tr><td>2</td><td><b>Radient Aegis</b> — Casting Divine Shield has a 60% chance to cast it again on another hero.</td><td><b>Unwavering Faith</b> — Increases the Devout&#x27;s maximum health by 20%.</td><td><b>Righteous Fire</b> — Consecrated Ground reflects 35% of damage taken (up from the base 10%).</td></tr>
 <tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — Every hero takes 20% less Break damage.</td><td><b>Unshaken</b> — Blessing of Zeal costs 10 less Mana.</td></tr>
 <tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 3 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground holds, every hero heals 8% of the Devout&#x27;s max health each turn.</td></tr>
-<tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 55% of the Devout&#x27;s max health (up from the base 35%).</td><td><b>Sacred Covenant</b> — Should a shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
+<tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 55% of the Devout&#x27;s max health (up from the base 35%).</td><td><b>Sacred Covenant</b> — Should a shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusade</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
 <tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
 <tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — Whenever a hero&#x27;s Faith releases, the Devout gains 1 stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals every hero for 80% of the amount reflected.</td></tr>
 <tr><td>8</td><td><b>Layered Faith</b> — A Divine Shield cast on an ally who already holds one ADDS to it instead of replacing it, with no limit.</td><td><b>Creed</b> — Faith is held in common: every hero is paid for the HIGHEST peak any hero has reached this battle, not their own.</td><td><b>Eternal Ground</b> — Consecrated Ground never expires.</td></tr>
@@ -2331,7 +2338,7 @@ build lands three distinct statuses.</p>
 </table>
 <p><b>Cryomancer</b> — <b>WINTER</b> (buy more time) · <b>DEEP FREEZE</b> (spend it on denial) · <b>THAW</b> (spend it on the window)</p>
 <table border="1" cellpadding="4">
-<tr><th>Row</th><th>Precision</th><th>Penetration</th><th>Tempo</th></tr>
+<tr><th>Row</th><th>Precision</th><th>Penetration</th><th>Pace</th></tr>
 <tr><td>1</td><td><b>Steady Hands</b> — +15% critical chance.</td><td><b>Armor Piercer</b> — Your attacks ignore 30% of the target&#x27;s armor.</td><td><b>Fletcher&#x27;s Speed</b> — +18 Speed.</td></tr>
 <tr><td>2</td><td><b>Perfect Form</b> — Critical hits grant +40 Focus.</td><td><b>Sundering Shot</b> — Critical hits apply 45 Break damage.</td><td><b>Snap Shot</b> — The first 2 abilities you use each fight cost no Mana and do not start their cooldowns.</td></tr>
 <tr><td>3</td><td><b>Deep Focus</b> — Focus turns into force sooner: the conversion point falls from 100 Focus to 60.</td><td><b>Bonecracker</b> — +40% damage against Broken enemies.</td><td><b>Muscle Memory</b> — Focus gain per attack increases by 30.</td></tr>

@@ -668,9 +668,10 @@ func _docs() -> void:
 	# BATCH EK §3 — NINETY-EIGHT. **THE PIN IS BUMPED, NOT LOOSENED**, for the
 	# third time and for this category's own reason: the one entry is
 	# `archetype_tags`. EK gave every ability and every rune a shared vocabulary
-	# of six words and put it on the draft card, and a player meeting AFFLICTION
-	# on one card and CLOCK on the next has nowhere else to learn what the six
-	# mean or that they are inert. That is this category's test — one entry per
+	# and put it on the draft card, and a player meeting DEBUFF on one card and
+	# TEMPO on the next has nowhere else to learn what the words
+	# mean or that they are inert. **EL RENAMED SIX OF THE SEVEN AND ADDED MARK;
+	# THE ENTRY WAS REWRITTEN, NOT ADDED, SO THIS COUNT DID NOT MOVE.** That is this category's test — one entry per
 	# thing a player cannot learn anywhere else. **AND IT IS DELIBERATELY STILL
 	# AN EQUALITY**: DX §1 forbids an equality against a collection that GROWS,
 	# and this one does not grow on its own — every entry is a decision, and the

@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1340,
-  "source": 1038,
-  "other": 73,
-  "document": 229
+  "total": 1350,
+  "source": 1041,
+  "other": 75,
+  "document": 234
  },
  "source_residency": {
-  "code": 618,
+  "code": 620,
   "absent": 287,
   "runtime": 74,
-  "narrow": 18,
+  "narrow": 19,
   "alt-sibling": 2,
   "comment": 39
  },
@@ -1758,7 +1758,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ek.gd#125",
+   "g": "check_ek.gd#126",
    "expr": "String"
   },
   {
@@ -1770,7 +1770,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ek.gd#146",
+   "g": "check_ek.gd#157",
    "expr": "String"
   },
   {
@@ -1782,18 +1782,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ek.gd#143"
-  },
-  {
-   "s": "check_ek.gd",
-   "fn": "_s4_name_sweep",
-   "h": "scripts/battle.gd",
-   "n": "[\"%s\",",
-   "p": "+",
-   "r": "runtime",
-   "k": "format",
-   "how": "read",
-   "g": "check_ek.gd#184"
+   "g": "check_ek.gd#154"
   },
   {
    "s": "check_ek.gd",
@@ -1804,7 +1793,131 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ek.gd#224"
+   "g": "check_ek.gd#289"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_status_labels",
+   "h": "scripts/battle.gd",
+   "n": "\n}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_ek.gd#233"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_status_labels",
+   "h": "scripts/battle.gd",
+   "n": "const STATUS_INFO := {",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_ek.gd#230"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s1_mark_population",
+   "h": "scripts/battle.gd",
+   "n": "\"%s\"",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_el.gd#28",
+   "alt": true
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s1_mark_population",
+   "h": "scripts/battle.gd",
+   "n": "_apply_status(",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "read",
+   "g": "check_el.gd#28",
+   "alt": true
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s2_document_table",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_el.gd#129",
+   "expr": "String"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s2_document_table",
+   "h": "docs/master.html",
+   "n": "6c. ARCHETYPE TAGS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_el.gd#103"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s2_document_table",
+   "h": "docs/master.html",
+   "n": "</table>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_el.gd#111"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s2_document_table",
+   "h": "docs/master.html",
+   "n": "<h3>6.1",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_el.gd#127"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s2_document_table",
+   "h": "docs/master.html",
+   "n": "<tr><th>Tag</th><th>What it means</th></tr>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_el.gd#107"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s3_widest_line",
+   "h": "docs/text-standard.html",
+   "n": "<code>%s</code> at %d characters",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_el.gd#151"
+  },
+  {
+   "s": "check_el.gd",
+   "fn": "_s3_widest_line",
+   "h": "docs/text-standard.html",
+   "n": "can produce is %d characters</b>",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_el.gd#152"
   },
   {
    "s": "test_batch_ah.gd",

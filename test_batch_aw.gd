@@ -252,7 +252,10 @@ func _tree_shape() -> void:
 			# BATCH DO renamed both cells when their cards left for the draft — a
 			# node named after a live DRAFT CARD is the `wd_spiked`/Spite trap.
 			["dv_righteous", "Righteous Fire"], ["dv_resolve", "Unshaken"],
-			["dv_pulse", "Healing Pulse"], ["dv_crusade", "Crusader's Tempo"],
+			# BATCH EL §1 RE-POINTED: dv_crusade is CRUSADE now — the name its own
+			# `crusade_ranks` counter always carried (CK's Ironclad precedent), so
+			# freeing `Tempo` for the tag brought in no new word.
+			["dv_pulse", "Healing Pulse"], ["dv_crusade", "Crusade"],
 			["dv_purity", "Purity"], ["dv_lifewell", "Lifewell"],
 			["dv_bulwark", "Wardstone"], ["dv_apostle", "Apostle"],
 			["dv_judgement", "Judgement"]]:
@@ -352,7 +355,7 @@ func _additive_units() -> void:
 			["0.01 * zl_dv.waters_ranks", "Cleansing Waters"],
 			["0.01 * cg_dv.righteous_step", "Righteous Fire"],
 			["0.01 * zl_dv.pulse_ranks", "Healing Pulse"],
-			["1 + attacker.crusade_ranks", "Crusader's Tempo"],
+			["1 + attacker.crusade_ranks", "Crusade"],
 			["0.01 * attacker.purity_ranks", "Purity"],
 			["0.01 * cg_dv.lifewell_ranks", "Lifewell"],
 			["0.01 * cg_dv.judgement", "Judgement"]]:

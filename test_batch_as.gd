@@ -78,7 +78,9 @@ const NODES := {
 	"cr_lance_focus": [4, "Thaw", "Focused Lance"],
 	"cr_piercing": [5, "Thaw", "Piercing Ice"],
 	"cr_razor_hone": [6, "Thaw", "Honed Shards"],
-	"cr_icy_veins": [7, "Thaw", "Shattered Tempo"],
+	# BATCH EL §1 RE-POINTED: the node is SHOCKWAVE now — `Tempo` was freed for
+	# the archetype tag. The id and the `shattered_tempo` counter did NOT move.
+	"cr_icy_veins": [7, "Thaw", "Shockwave"],
 	"cr_eternal": [9, "Winter", "Eternal Winter"],
 	"cr_absolute": [9, "Deep Freeze", "Absolute Zero"],
 	"cr_shatter": [9, "Thaw", "Shardfall"],
@@ -264,7 +266,7 @@ func _magnitudes() -> void:
 	var st_cfg := {"abilities": []}
 	Talents.apply_payload(st_cfg, by_id["cr_icy_veins"]["payload"], 1, {})
 	ok(abs(float(st_cfg.get("shattered_tempo", 0.0)) - 2.0) < 0.001,
-		"Shattered Tempo writes 2.0 of initiative push")
+		"Shockwave writes 2.0 of initiative push")
 	var hs_cfg := {"abilities": []}
 	Talents.apply_payload(hs_cfg, by_id["cr_razor_hone"]["payload"], 1, {})
 	ok(int(hs_cfg.get("honed_shards_ranks", 0)) == 3,
@@ -891,7 +893,7 @@ func _live_releases() -> void:
 			"...and BN's guard stops those four re-freezing it on the spot")
 	hs.queue_free()
 	await process_frame
-	# Shattered Tempo pays the release out in TIME rather than damage.
+	# Shockwave (EL §1: was Shattered Tempo) pays the release out in TIME.
 	var st := await _spawn({"cr_icy_veins": 1}, ["raider", "raider", "raider"])
 	var c3 := _cryo(st)
 	if c3 != null:
@@ -900,7 +902,7 @@ func _live_releases() -> void:
 		var other_before: float = sfoes[1].next_time
 		st.call("_hold_release", sfoes[0], "the test")
 		ok(sfoes[1].next_time > other_before,
-			"Shattered Tempo: releasing pushes every OTHER enemy back")
+			"Shockwave: releasing pushes every OTHER enemy back")
 		var pushed: float = sfoes[1].next_time - other_before
 		var want: float = 2.0 * 100.0 / maxf(sfoes[1].effective_speed(), 0.1)
 		ok(abs(pushed - want) < 0.01,
@@ -926,7 +928,7 @@ func _live_releases() -> void:
 			ok(cc.call("_is_held", cfoes[1]), "...and the hold lands on the new target")
 			ok(cfoes[1].status_stacks("chilled") == 4, "...carrying its stacks with it")
 			ok(abs(cfoes[2].next_time - untouched) < 0.01,
-				"A MOVE IS NOT A RELEASE: Shattered Tempo does not fire")
+				"A MOVE IS NOT A RELEASE: Shockwave does not fire")
 	cc.queue_free()
 	await process_frame
 	# Shatter is the MASS release, paid on the pile each prison carried.

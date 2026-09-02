@@ -337,7 +337,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"overwhelm_ranks": 1}}},
 		# Re-spec (was Deep Thrust, +5 Pommel damage): pays for pressing
 		# the button the whole spec turns on.
-		{"id": "sm_deep_thrust", "name": "Tempo", "ranks": 1, "lane": "Blade", "row": 7,
+		{"id": "sm_deep_thrust", "name": "Pivot", "ranks": 1, "lane": "Blade", "row": 7,
 			"desc": "Switching stance grants +{v}% damage for 2 turns.",
 			"scale": {"step": 30},
 			"payload": {"stat": {"tempo_ranks": 1}}},
@@ -1057,7 +1057,7 @@ const LANE_TREES := {
 		# Re-spec (was Icy Veins, "an Ice Lance kill empowers the next lance" —
 		# the Lance's payoff paying forward, which is what this does too). The
 		# purest thing in the tree: the release is paid out in TIME.
-		{"id": "cr_icy_veins", "name": "Shattered Tempo", "ranks": 1, "lane": "Thaw", "row": 7,
+		{"id": "cr_icy_veins", "name": "Shockwave", "ranks": 1, "lane": "Thaw", "row": 7,
 			"desc": "Releasing a hold pushes every OTHER enemy back {v} on the initiative timeline.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"shattered_tempo": 2.0}}},
@@ -1706,7 +1706,7 @@ const LANE_TREES := {
 			"desc": "While Consecrated Ground holds, every hero heals {v}% of the Devout's max health each turn.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"pulse_ranks": 8}}},
-		{"id": "dv_crusade", "name": "Crusader's Tempo", "ranks": 1, "lane": "Zeal", "row": 5,
+		{"id": "dv_crusade", "name": "Crusade", "ranks": 1, "lane": "Zeal", "row": 5,
 			"desc": "Blessing of Zeal ticks its target's cooldowns down {v} additional turn(s) on cast.",
 			"scale": {"step": 3},
 			"payload": {"stat": {"crusade_ranks": 3}}},
@@ -1970,7 +1970,7 @@ const LANE_TREES := {
 		# away. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so saved picks migrate
 		# and no save version moves.
 		#
-		# THE LANE NAMES AND THESES ALL STAND — Precision, Penetration and Tempo
+		# THE LANE NAMES AND THESES ALL STAND — Precision, Penetration and Pace
 		# were never lying about their jobs, so unlike the Cryomancer's
 		# Shatterpoint or the Arcanist's Control nothing needed re-aiming.
 		#
@@ -2050,31 +2050,31 @@ const LANE_TREES := {
 		{"id": "ss_overkill", "name": "Overkill", "ranks": 1, "lane": "Penetration", "row": 7,
 			"desc": "Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.",
 			"payload": {"stat": {"overkill": 1}}},
-		# --- Lane C: Tempo — speed, cooldowns, Focus acceleration ---
-		{"id": "ss_fletcher", "name": "Fletcher's Speed", "ranks": 1, "lane": "Tempo", "row": 1,
+		# --- Lane C: Pace — speed, cooldowns, Focus acceleration ---
+		{"id": "ss_fletcher", "name": "Fletcher's Speed", "ranks": 1, "lane": "Pace", "row": 1,
 			"desc": "+{v} Speed.", "scale": {"step": 18},
 			"payload": {"stat": {"speed": 18.0}}},
-		{"id": "ss_snap", "name": "Snap Shot", "ranks": 1, "lane": "Tempo", "row": 2,
+		{"id": "ss_snap", "name": "Snap Shot", "ranks": 1, "lane": "Pace", "row": 2,
 			"desc": "The first {v} abilities you use each fight cost no Mana and do not start their cooldowns.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"snap_shot": 2}}},
-		{"id": "ss_muscle", "name": "Muscle Memory", "ranks": 1, "lane": "Tempo", "row": 3,
+		{"id": "ss_muscle", "name": "Muscle Memory", "ranks": 1, "lane": "Pace", "row": 3,
 			"desc": "Focus gain per attack increases by {v}.", "scale": {"step": 30},
 			"payload": {"stat": {"muscle_memory_ranks": 30}}},
-		# 150 OPENS HIM PAST THE CONVERSION POINT, which is the Tempo lane's whole
+		# 150 OPENS HIM PAST THE CONVERSION POINT, which is the Pace lane's whole
 		# argument in one node: he arrives already converting rather than earning
 		# his way there.
-		{"id": "ss_volley", "name": "Opening Volley", "ranks": 1, "lane": "Tempo", "row": 4,
+		{"id": "ss_volley", "name": "Opening Volley", "ranks": 1, "lane": "Pace", "row": 4,
 			"desc": "You begin every fight with {v} Focus.", "scale": {"step": 150},
 			"payload": {"stat": {"opening_volley": 150}}},
-		{"id": "ss_follow", "name": "Follow-Through", "ranks": 1, "lane": "Tempo", "row": 5,
+		{"id": "ss_follow", "name": "Follow-Through", "ranks": 1, "lane": "Pace", "row": 5,
 			"desc": "Critical hits reduce ALL your cooldowns by {v}.", "scale": {"step": 2},
 			"payload": {"stat": {"follow_through": 2}}},
-		{"id": "ss_second_nature", "name": "Second Nature", "ranks": 1, "lane": "Tempo", "row": 6,
+		{"id": "ss_second_nature", "name": "Second Nature", "ranks": 1, "lane": "Pace", "row": 6,
 			"desc": "Hold Breath's guaranteed critical applies to your next {v} attacks.",
 			"scale": {"step": 4},
 			"payload": {"stat": {"second_nature": 4}}},
-		{"id": "ss_spray", "name": "Spray of Arrows", "ranks": 1, "lane": "Tempo", "row": 7,
+		{"id": "ss_spray", "name": "Spray of Arrows", "ranks": 1, "lane": "Pace", "row": 7,
 			"desc": "Your single-target attacks strike {v} additional random enemies for 50% damage — but Focus can never exceed 50.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"spray": 2}}},
@@ -2097,7 +2097,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"sunder_shot": 100}}},
 		# THE METER SURVIVES WHAT CLEARS IT: the payout halves it rather than
 		# emptying it (Overkill covers the kill; this covers the conversion).
-		{"id": "ss_metronome", "name": "Metronome", "ranks": 1, "lane": "Tempo", "row": 8,
+		{"id": "ss_metronome", "name": "Metronome", "ranks": 1, "lane": "Pace", "row": 8,
 			"desc": "When Focus is spent it falls to {v}% of what it was rather than to zero.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"metronome": 50}}},
@@ -2113,7 +2113,7 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.",
 			"payload": {"stat": {"through_and_through": 1}}},
-		{"id": "ss_rapid", "name": "Rapid Fire", "ranks": 1, "lane": "Tempo", "row": 9,
+		{"id": "ss_rapid", "name": "Rapid Fire", "ranks": 1, "lane": "Pace", "row": 9,
 			"capstone": true,
 			"desc": "Each ability you use has a {v}% chance not to consume its cooldown.",
 			"scale": {"step": 50},

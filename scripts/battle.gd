@@ -218,7 +218,13 @@ const STATUS_INFO := {
 	# granting them — the block log names this as its source.
 	"shield_charges": ["Interpose", "IP", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
 	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 40% less damage."],
-	"tempo": ["Tempo", "T+", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor two turns (granted by switching\nstance)."],
+	# BATCH EL §1 — RENAMED Tempo -> PIVOT, to free the word for the archetype
+	# tag. The mechanic did not move and neither did the status id: `tempo`
+	# is internal and no player reads it, so this is the CHEAP side moving
+	# (CK's Ironclad precedent — the collision was the LABEL). PIVOT is the
+	# project's own word for it: this legend already said "the pivot's
+	# momentum" and two comments in the strike loop call it that.
+	"tempo": ["Pivot", "Pv", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor two turns (granted by switching\nstance)."],
 	"killing_edge": ["Killing Edge", "KE", Color(0.95, 0.5, 0.35), "The Aggressive guard hunts the\nopening: bonus critical chance while\nthe stance holds."],
 	"bracing": ["Bracing", "Br", Color(0.55, 0.80, 0.95), "The raised guard is harder to Break:\nbonus Constitution while the Defensive\nstance holds."],
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
@@ -4379,7 +4385,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			if u.passive_id == "seasoned":
 				var gchange := _find_ability(u, "Guard Change")
 				var sm_want := "defensive" if u.hp < u.max_hp * 0.45 else "aggressive"
-				# Tempo makes the swap itself profitable: a healthy Tempo
+				# Pivot makes the swap itself profitable: a healthy Pivot
 				# build pivots on cooldown for the buff and swaps right back.
 				# Sunder Guard does the same for a different reason — the
 				# pivot IS his party-wide Break blow, free and on a 1cd, so
@@ -5391,7 +5397,7 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 #   · BATTLE SHOUT hands the caster +5 Rage.
 #   · RECKLESS ABANDON spends the whole Rage bar (and CM already gates it below
 #     one full step).
-#   · BLESSING OF ZEAL ticks cooldowns down through Crusader's Tempo.
+#   · BLESSING OF ZEAL ticks cooldowns down through Crusade.
 # Only MAGIC BARRIER and VESPERS of the named cards qualify.
 #
 # **A KNOWN SHARP EDGE, RECORDED RATHER THAN WIDENED INTO:** Battle Shout,
@@ -8552,7 +8558,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					#
 					# **IT IS THE PIVOT AND NOT THE ABILITY** — `_swordmaster_switch`,
 					# the one implementation of "flip it, restamp the chip, pay
-					# Tempo". Guard Change's OWN payload (15 BD to the enemy
+					# Pivot". Guard Change's OWN payload (15 BD to the enemy
 					# nearest Breaking, SUNDER GUARD's 40 BD to EVERY enemy, NO
 					# QUARTER, the parry perfect) stays on that card, for the
 					# reason `_swordmaster_switch`'s own header gives: those are
@@ -9300,7 +9306,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.0 + 0.01 * ow_pct
 					_log("   → Talent: Overwhelm — +%d%% (%d debuffs)" % [
 						ow_pct, ow_n], "#b0a8e0")
-			# Tempo: the pivot's momentum rides the next cut.
+			# Pivot: the pivot's momentum rides the next cut.
 			if attacker.has_status("tempo"):
 				raw *= 1.0 + attacker.status_power("tempo") / 100.0
 			# Punishment: the narrow, big half of the Broken window — all of
@@ -11969,7 +11975,7 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	target.update_status("frozen", "HELD", _hold_tooltip(timed))
 	_hold_freeze_riders(target, cryo)
 	# Over the limit: the OLDEST prison gives out. This is a RELEASE, so it
-	# pays out through _hold_release like every other one — Shattered Tempo
+	# pays out through _hold_release like every other one — Shockwave
 	# and Honed Shards fire on it too.
 	# BATCH CB — IT COUNTS CELLS, NOT BODIES, AND A FROSTBOUND PAIR IS ONE
 	# CELL. Frostbind's own text promises that a pair reaching the threshold
@@ -12078,11 +12084,11 @@ func _hold_release_body(target: BattleUnit, reason: String) -> void:
 				_tick_cooldowns(h, refund)
 			_log("   → Talent: Frostbound Hours — %d turn%s off every cooldown" % [
 				refund, "" if refund == 1 else "s"], "#b0a8e0")
-	# Shattered Tempo: the release is paid out in TIME rather than damage —
+	# Shockwave: the release is paid out in TIME rather than damage —
 	# the purest thing in the tree. Same arithmetic as Ability.delay_push.
 	var st := _hero_shattered_tempo()
 	if st > 0.0:
-		_log("   → Talent: Shattered Tempo — the shockwave sets the field back",
+		_log("   → Talent: Shockwave — the release sets the field back",
 			"#b0a8e0")
 		for e in enemies:
 			if not e.dead and e != target and not _is_held(e):
@@ -12103,7 +12109,7 @@ func _hold_release_body(target: BattleUnit, reason: String) -> void:
 				_apply_status(target, "chilled", 3, 0, 0, hs_h)
 
 
-# Shattered Tempo is the tree's only FLOAT counter, so it needs its own
+# Shockwave is the tree's only FLOAT counter, so it needs its own
 # scanner: _max_hero_rank reads ints.
 func _hero_shattered_tempo() -> float:
 	var best := 0.0
@@ -12839,7 +12845,7 @@ func _mana_regen(u: BattleUnit) -> int:
 # THIS IS AN EXTRACTION, NOT A NEW HOOK, and §3 asked for exactly that ("the
 # cooldown-reduction hook already exists — reuse it"). What existed was FOUR
 # hand-written copies of the same six lines — Follow-Through, Practised Hands,
-# Frostbound Hours and Crusader's Tempo — and this project keeps re-learning
+# Frostbound Hours and Crusade — and this project keeps re-learning
 # what that costs (Batch BP's Eye of the Storm: a number written three times,
 # and the wrong copy silently won). All four call this now and BEHAVE
 # IDENTICALLY: cutting an entry already at zero was always a no-op, so folding
@@ -12893,7 +12899,7 @@ func _stamp_arrows_chip(u: BattleUnit, n: int) -> void:
 
 # BATCH BR — RALLY. THE ONE PLACE THE TURN IS HANDED OVER, and it is the
 # existing initiative machinery aimed the other way: `Ability.delay_push` and
-# Shattered Tempo both do `next_time += delay * 100 / effective_speed()` to push
+# Shockwave both do `next_time += delay * 100 / effective_speed()` to push
 # a unit BACK, so pulling one FORWARD is the same write with the ally landing
 # ahead of everything on the clock. There is no second turn-order manipulator.
 #
@@ -14069,9 +14075,9 @@ func _living_devout() -> BattleUnit:
 # THE STANCE PIVOT, ONE IMPLEMENTATION, THREE CALLERS (Guard Change, Precision
 # Strike, Feint). Batch AK's Guard Change was the only stance swap in the game
 # and could afford to own the pivot inline; two draft cards now switch it too,
-# and three copies of "flip it, restamp the chip, pay Tempo" would drift.
+# and three copies of "flip it, restamp the chip, pay Pivot" would drift.
 #
-# TEMPO IS PART OF THE PIVOT AND NOT PART OF GUARD CHANGE, and that is a
+# PIVOT IS PART OF THE SWAP AND NOT PART OF GUARD CHANGE, and that is a
 # decision rather than a convenience: the node's own text reads "Switching
 # stance grants +{v}% damage for 1 turn" and names no ability, so a swap that
 # skipped it would make a shipped tooltip false. Everything Guard Change pays
@@ -14205,14 +14211,14 @@ func _swordmaster_switch(u: BattleUnit) -> void:
 	_sfx("parry", -6.0, 0.8)
 	u.float_text("%s Stance" % sw_label, Color(0.4, 0.9, 1.0))
 	u.refresh_bars()  # restamps the stance chip
-	# Tempo: the pivot itself becomes an attack — momentum for a turn.
+	# Pivot: the pivot itself becomes an attack — momentum for a turn.
 	if u.tempo_ranks > 0:
 		var tp_pct := 30 * u.tempo_ranks
 		_apply_status(u, "tempo", 2, tp_pct)
 		u.update_status("tempo", "+%d%%" % tp_pct,
-			"Tempo: +%d%% damage for one turn\n(granted by switching stance)." % tp_pct,
+			"Pivot: +%d%% damage for one turn\n(granted by switching stance)." % tp_pct,
 			tp_pct)
-		_log("   → Talent: Tempo — +%d%% damage for a turn" % tp_pct, "#b0a8e0")
+		_log("   → Talent: Pivot — +%d%% damage for a turn" % tp_pct, "#b0a8e0")
 
 
 # Feint's banked charges, rendered. Its own function on Deadfall's
@@ -15677,7 +15683,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"zeal":
 			_sfx("heal", -6.0, 1.2)
 			_apply_status(target, "zeal", 4)
-			# Crusader's Tempo: the cast-time cooldown tick digs deeper.
+			# Crusade: the cast-time cooldown tick digs deeper.
 			var zeal_ticks := 1 + attacker.crusade_ranks
 			# BATCH BQ: one implementation (`_tick_cooldowns`). Its return is
 			# the count that moved, which is exactly what `zeal_ticked` asked.
@@ -15687,7 +15693,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, target.unit_name, 4,
 				("; cooldowns tick %d" % zeal_ticks) if zeal_ticked else ""], "#e8b860")
 			if zeal_ticked and attacker.crusade_ranks > 0:
-				_log("   → Talent: Crusader's Tempo — the blessing hastens %d turns of cooldown" % \
+				_log("   → Talent: Crusade — the blessing hastens %d turns of cooldown" % \
 					zeal_ticks, "#b0a8e0")
 			# Purity: the blessing carries a Divine Shield — doubled Faith
 			# gain finally travels WITH a Faith source.
@@ -17084,7 +17090,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"#70d878")
 			# IT IS A READER, SO IT FLIPS. `_swordmaster_switch` is the ONE
 			# pivot (Guard Change, Precision Strike, Feint — and now this), so
-			# Tempo pays, the chip restamps and DISCIPLINE'S ACCUMULATION dies
+			# Pivot pays, the chip restamps and DISCIPLINE'S ACCUMULATION dies
 			# here exactly as it does for the other three. A fourth copy of the
 			# flip is how the four would start to disagree.
 			_swordmaster_switch(attacker)
@@ -17230,7 +17236,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# AXIS: tempo, not damage. It goes through `_tick_cooldowns`, THE one
 			# implementation of "take N turns off this unit's cooldowns" — the
 			# same door Follow-Through, Practised Hands, Frostbound Hours and
-			# Crusader's Tempo use since this batch extracted it. That is what
+			# Crusade use since this batch extracted it. That is what
 			# makes "every cooldown, including abilities gained this run" true
 			# for free: the walk is over `u.cooldowns`, which is written by
 			# casting, so a drafted ability is in it the moment it is cast.
@@ -17481,7 +17487,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# AXIS: giving away tempo — the ONLY ability in the game that hands
 			# an ally a turn, and the only tempo tool a class with none can have.
 			#
-			# IT REUSES THE EXISTING INITIATIVE MACHINERY. Shattered Tempo and
+			# IT REUSES THE EXISTING INITIATIVE MACHINERY. Shockwave and
 			# `Ability.delay_push` both write `next_time` to move a unit along
 			# the timeline; this is that same hook aimed the other way, and
 			# `_rally_forward` is the ONE place the arithmetic lives. There is no
@@ -19023,7 +19029,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				"hero" if shout_n == 1 else "heroes"], "#70d878")
 		"guard_change":
 			# The swap itself (Rage and cooldown already handled generically).
-			# BATCH BP: the swap AND Tempo moved into `_swordmaster_switch`,
+			# BATCH BP: the swap AND Pivot moved into `_swordmaster_switch`,
 			# because Precision Strike and Feint switch the stance too and three
 			# copies of the pivot would drift. Everything BELOW this line is
 			# Guard Change's OWN payload and stays here — the pressure it lands,
@@ -19548,7 +19554,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"cryoclasm":
 			# Thaw row 4: CONTROL AS A VERB — the lockdown relocates without
 			# being spent. Deliberately NOT routed through _hold_release: a move
-			# is not a release, so Shattered Tempo and Honed Shards do not fire
+			# is not a release, so Shockwave and Honed Shards do not fire
 			# and the hold he is paying for is still the hold he has.
 			var cc_from: BattleUnit = null
 			for cc_h in _holds:
@@ -21471,7 +21477,7 @@ func _focus_mark(u: BattleUnit, fallback: BattleUnit) -> BattleUnit:
 	return fallback
 
 
-# BATCH BM §2 — METRONOME (Sharpshooter, Tempo row 8). THE METER SURVIVES
+# BATCH BM §2 — METRONOME (Sharpshooter, Pace row 8). THE METER SURVIVES
 # WHAT CURRENTLY CLEARS IT. Overkill already covers the kill; this covers the
 # PAYOUT — One Shot and Coup de Grâce both zero the meter that paid for them,
 # and the lane whose whole subject is keeping the rhythm going should not have

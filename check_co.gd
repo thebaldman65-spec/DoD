@@ -25,7 +25,7 @@ const MUST_NOT_GATE := {
 	"stabilize": "vents Resonance into Mana and heals 5% of maximum health",
 	"battle_shout": "hands the caster +5 Rage",
 	"reckless_abandon": "spends the whole Rage bar",
-	"zeal": "ticks cooldowns down through Crusader's Tempo",
+	"zeal": "ticks cooldowns down through Crusade",
 	"divine_plea": "heals and purges",
 	"jubilee": "spends Faith, heals and returns Mana",
 	"harvest": "damages and heals",

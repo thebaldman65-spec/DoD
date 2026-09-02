@@ -1146,7 +1146,7 @@ func _live_rally() -> void:
 	ok(bz.next_time >= 50.0,
 		"§6: a Rally aimed at himself does NOT pull him to the front (%.2f)" % bz.next_time)
 	# IT USES THE EXISTING INITIATIVE MACHINERY — the same `next_time` write
-	# Shattered Tempo and `Ability.delay_push` already make.
+	# Shockwave and `Ability.delay_push` already make.
 	ok(battle_src.contains("strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()"),
 		"§6: ...the hook Ability.delay_push already writes, aimed the other way")
 	await _drop(scene)

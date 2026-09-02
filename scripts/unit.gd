@@ -445,7 +445,7 @@ var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh 
 # talents.gd for the node text.
 var killing_edge_ranks := 0   # Killing Edge: +15% crit while Aggressive
 var overwhelm_ranks := 0      # Overwhelm: +8% damage per debuff on the target
-var tempo_ranks := 0          # Tempo: stance switch grants +30% damage 2 turns
+var tempo_ranks := 0          # PIVOT (EL: was named Tempo): stance switch grants +30% damage 2 turns
 var bracing_ranks := 0        # Bracing: +30 Constitution while Defensive
 var deflection := 0           # Deflection: parry works against ranged attacks
 var pressure_point_ranks := 0 # Pressure Point: Pommel Strike +30 BD
@@ -561,7 +561,7 @@ var honed_shards_ranks := 0   # Honed Shards: a release leaves N stacks of Chill
 var icy_resolve_ranks := 0    # Icy Resolve: Rime lasts N additional turns
 var grasp_ranks := 0          # Winter's Grasp: N random Chilled enemies gain a stack
 var second_prison := 0        # Second Prison: he can hold TWO enemies at once
-var shattered_tempo := 0.0    # Shattered Tempo: a release pushes every OTHER enemy back
+var shattered_tempo := 0.0    # SHOCKWAVE (EL: was Shattered Tempo): a release pushes every OTHER enemy back
 var absolute_zero := 0        # capstone: NO limit on how many enemies he holds
 var eternal_winter := 0       # capstone: every enemy gains a stack each of his turns
 # RUNE-ONLY (Batch AS §5). Numbing Veil's node became Glacial Prison; the
@@ -1018,7 +1018,7 @@ var warded_ranks := 0         # Warded Robes: +N% armor while the shield holds
 var stalwart_step := 0        # Stalwart: +N pts on Divine Shield's 30% absorb
 var unyielding_ranks := 0     # Unyielding Aegis: re-forms at N% of strength
 var righteous_step := 0       # Righteous Fire: +N pts on the ground's 10%
-var crusade_ranks := 0        # Crusader's Tempo: Zeal ticks N extra cooldown
+var crusade_ranks := 0        # CRUSADE (EL: was Crusader's Tempo): Zeal ticks N extra cooldown
 var purity_ranks := 0         # Purity: Zeal carries a shield of N% Devout max
 var lifewell_ranks := 0       # Lifewell: reflected damage heals N% of itself
 var apostle := 0              # capstone: each held Faith stack is worth

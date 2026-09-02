@@ -389,7 +389,7 @@ func _live_cryoclasm_unaffected() -> void:
 			"§1: THE GUARD DOES NOT TOUCH CRYOCLASM — the hold lands on the new target")
 		ok(foes[1].status_stacks("chilled") == 4, "...carrying its stacks with it")
 		ok(abs(foes[2].next_time - untouched) < 0.01,
-			"A MOVE IS STILL NOT A RELEASE: Shattered Tempo does not fire")
+			"A MOVE IS STILL NOT A RELEASE: Shockwave does not fire")
 		ok(foes[0].status_stacks("chilled") == 1,
 			"...and Honed Shards does not fire on a move either (got %d)" % \
 				foes[0].status_stacks("chilled"))

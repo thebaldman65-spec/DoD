@@ -370,7 +370,7 @@
 	},
 	"long_draw": {
 		"name": "Rune of the Long Draw", "rarity": "rare", "scope": "spec:sharpshooter",
-		"price": 75, "scarred": true, "lane": "Tempo",
+		"price": 75, "scarred": true, "lane": "Pace",
 		"desc": "He opens every fight holding 60 more Focus and gathers 10 more per attack — but the draw is slow: -10 Speed.",
 		"payload": {"stat": {"opening_volley": 60, "muscle_memory_ranks": 10, "speed": -10.0}}
 	},

@@ -5,139 +5,157 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-01 (Batch EK).*
+*Last rewritten: 2026-09-01 (Batch EL).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EK — ARCHETYPE TAGS.** A shared vocabulary that names what a card is FOR, carried
-  by **every ability in the corpus (227) and every authored rune (65)**, and **shown to the player
-  on the draft card**. **MECHANICALLY INERT AS SHIPPED**: no clause reads a tag, no card's
-  behaviour changes, no magnitude moves, and not one line of `battle.gd`, `unit.gd`, `talents.gd`,
-  `run_state.gd`, `run_sim.gd` or `ability.gd` was touched. Full working:
-  **`docs/reports/EK.md`**.
-- **§1 — THE VOCABULARY WAS MEASURED OUT OF THE CORPUS AND THE MEASUREMENT OVERTURNED THE BRIEF'S
-  OWN EXAMPLE.** The brief named a status vocabulary in passing — *"the Pyromancer's Fireball is a
-  Burn card"* — and then ruled that the distribution decides. **The distribution does not support
-  six status names.** Grouped generously into families, Burn / Frost / Bleed / Poison / Ruin / Mark
-  reach **40 of the 154 draft cards and leave 114 with nothing**, against the brief's own test that
-  a large remainder means the vocabulary is wrong.
-  - **AND THE REASON IS STRUCTURAL RATHER THAN A MATTER OF PICKING BETTER WORDS.** A status system
-    belongs to ONE spec by design (DR's rule: an engine is exclusive, an axis is shared), so a
-    status tag **does not vary inside the only pool a player is ever choosing from**. Measured:
-    under the status vocabulary **six of the sixteen pools give exactly ONE combination** — every
-    card in them reads the same. The Pyromancer's pool is twelve Burn cards of thirteen.
-  - **THE SIX SHIPPED ARE `AFFLICTION · SHELTER · BREAK · METER · AMP · CLOCK`**, they cover
-    **154 of 154**, and they give **4 to 9 distinct combinations per pool against 6 to 13 cards**.
-    **74 of the 154 carry a second tag.** The status-family option is priced in the report so the
-    ruling can be overturned on the numbers.
-  - **TWO OF THE SIX WERE RENAMED BEFORE SHIPPING, ON CJ's IRON WILL PRECEDENT.** The BR §1 sweep
-    ran against every ability, talent node, status LABEL and rune name. **AFFLICTION, BREAK, METER
-    and AMP collide with nothing. WARD → SHELTER** (`Ward` is a live chip, and the Rune of the
-    Triage Ward carries the word) and **TEMPO → CLOCK** (`Tempo` is a live chip AND three talent
-    nodes). **A tag and a status chip render on the same screens for the same reader**, so a label
-    collision is not the harmless kind BR §1 ships and flags. **Renaming today costs a sweep;
-    renaming after the runes are keyed onto them costs the rune layer.**
-  - **THE ENGINE CHECK THE BRIEF SET IS CLEAN AND IT IS NOT THE ONE THAT BOUND.** None of the six
-    is one of DR's ENGINE names. **THREE OF THEM — BREAK, METER, CLOCK — ARE DR *AXIS* WORDS**, and
-    that is reported rather than fixed: the alternative is the status set that covers a quarter of
-    the draft.
-  - **AND "ARCHETYPE" ALREADY MEANS SOMETHING ELSE IN THIS PROJECT.** `Classes.ARCHETYPE_ROLE`,
-    `ARCHETYPE_DESC` and `master.html` §6 use it for a SPEC's role — Ramp, Rush, Nuker, Warder —
-    which decides base Attack. **The code side is kept apart deliberately** (`CARD_TAGS` and
-    `RUNE_TAGS`, never `ARCHETYPE_TAGS`) and `master.html` §6c says outright that the two are
-    unrelated. **The document-side collision is reported and not resolved.**
-- **§2 — EVERY CARD TAGGED FROM ITS READ SITE, AND THE FIELDS ARE USELESS ON THIS CORPUS.** Over
-  the 154 draft cards **`heal` is 0 on all 154**, `bleed_build` is non-zero on ONE, and **123 carry
-  a `special`** — CN's rule biting harder than anywhere it has been applied. **A card's read site
-  is four things**: its arm in `_resolve_special`; **every block keyed on its `display_name` in the
-  hero strike loop** (58 abilities carry one, 133 sites, and **Blood Debt's whole payload is one of
-  them** — no `special`, no `applies_status`); the card-specific helpers those call; and **for a
-  setup card that resolves nothing at cast, whatever reads the status it lays** — Aegis Wall
-  applies `aegis_wall` and does nothing else, and its healing is in the BLOCK handler. **Without
-  that last hop 40 cards read as untagged.**
-  - **109 ROWS WERE HAND-READ AGAINST THE CODE AND 57 MOVED THE PRIMARY** — 37 of them in the
-    draft. **29 of the 57 are cards the derivation could not tag at all.** They are listed in the
-    report as the judgement calls, with the alternative beside each; **every one is one row of
-    `Classes.CARD_TAGS`** to change.
-  - **THE THREE STRONGEST CANDIDATES FOR A SEVENTH TAG ARE NAMED AND NOT TAKEN: MARK (9 cards),
-    PET (10) and STANCE (3).** Five or six was the ruling.
-- **§3 — SHOWN ON THE DRAFT CARD, AND DRIVEN LIVE.** One 11px line under the card's own button,
-  built by `Classes.card_tag_line` — CK §1's one-builder rule one layer down. **Layout cost
-  measured: +42px** on a column CK measured at 557–671px against a 388px viewport; nothing clipped,
-  no font shrunk, no block truncated. **`check_map_screen` walks the drawn tree and requires one
-  tag line per offered card — 12 for 12** — and **now WITHHOLDS its `check_map_screen: OK` verdict
-  on a mismatch**, because that target carries no failure counter and taking the pinned line away
-  is the only way to turn its report into something `check_de` reads.
-  - **WHERE ELSE THEY SHOULD GO IS PRICED AND NOT DONE.** **The hero sheet is the one to take** —
-    it already renders `computed_block`, it has the vertical room the draft column does not, and it
-    is the screen where a player reads the whole loadout at once. **The rune offer wants its own
-    surface** rather than `_pick_button`, which CK deliberately kept on the mid-combat tier. **The
-    battle tooltip and the blacksmith are NO** — the decision is over by then.
-  - **THE 44-CHARACTER CEILING DOES NOT BIND A TAG, AND `text-standard.html` §4.8a NOW SAYS SO.**
-    A tag carries no authored `\n` and renders into an autowrapping label, which is §4.8's own
-    reason for `perfect_text`. **The widest line the table can produce is 20 characters.**
-- **§4 — INERT BY DECISION, ASSERTED AS A POPULATION.** `check_ek` §3 sweeps every `.gd` in the
-  repo comment-stripped for the ten names in the tag surface and requires the set of files that
-  mention it to be **exactly five**, with **ZERO asserted separately in the six files a mechanic
-  would have to live in**. A rule forbidding `if tag ==` would be blind to every other way of
-  reading one.
-- **AND `check_da` §3 CAUGHT THE GATE ON ITS FIRST RUN. THE FIX WAS NOT AN EXEMPTION.** §1
-  originally read both draft-pool accessors, which is exactly the fingerprint. **The corpus is a
-  superset of the draft, the boss pools and the cores**, so one walk of `Classes.ability_corpus()`
-  answers all four questions — `WALK_EXEMPT` stays at two and `check_da` reads 41/0 over 40 gates.
-  `check_do`, `check_dp` and `check_dr` each record that needing no exemption beats having one;
-  **this is the fourth time.**
-- **ONE PIN WAS BUMPED AND IT WAS FOUND BY A SUBSET RUN, NOT BY A SWEEP.** The literal sweep read
-  **0 LOST / 23 GAINED** and the retired-word sweep read 0/0, and **`test_batch_ce` still went
-  red**: it pins the glossary at exactly 97 entries and `archetype_tags` made it 98. **BUMPED, NOT
-  LOOSENED** — CV's own idiom, and the comment says why: every glossary entry is a decision, so the
-  equality is what makes adding one a decision somebody made. `ce` reads 1114/0 either way.
-- **Next letter: EL.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EL — THE TAGS GET THEIR REAL NAMES, AND `Tempo` IS FREED.** EK shipped six tag
+  words chosen under a collision; EL freed the word that caused it, renamed six of the seven to
+  the plain words, and added **MARK** as the seventh. **STILL MECHANICALLY INERT**: no clause
+  reads a tag, no card's behaviour changes, no magnitude moves. Full working:
+  **`docs/reports/EL.md`**.
+- **§1 — `Tempo` WAS SIX SURFACES, NOT FOUR, AND THE TWO EK COULD NOT SEE WERE LANES.** The brief
+  named the chip and three talent nodes. **It was also the Sharpshooter's third talent LANE, in
+  nine nodes, and one rune's lane** — invisible to `check_ek` §4 because `_collect_names` walks
+  `"name"` keys and a lane lives under `"lane"`.
+  - **THE CHEAP SIDE MOVED, AS RULED.** chip `Tempo`/`T+` → **`Pivot`/`Pv`** (`P+` was taken by
+    `parry_up`); `sm_deep_thrust` → **Pivot**; `cr_icy_veins` → **Shockwave**; `dv_crusade` →
+    **Crusade**; the lane → **Pace**.
+  - **CK's PRECEDENT WAS CHECKED BEFORE ANY WORD WAS INVENTED AND IT PAID ONCE IN FOUR.** The ids
+    are `tempo`, `tempo_ranks`, `shattered_tempo` — the word itself, three times — and
+    **`crusade_ranks`**, which is CK's Ironclad shape exactly, so **Crusade brought in no new
+    vocabulary.** The other three words come from the project's own prose: the chip's legend
+    already read *"the pivot's momentum"* and `battle.gd`'s log line already read *"the shockwave
+    sets the field back"*.
+  - **THE STATUS IDS DID NOT MOVE.** The collision is a LABEL collision and no player reads an id.
+    **Each declaration in `unit.gd` now names its display word**, so the id is not orphaned.
+  - **`Tempo` NOW RESOLVES TO NOTHING** across ability, node, lane, status label, rune, rune lane,
+    item and relic — which is what §2 required before it could begin.
+- **§2 — THE SIX RENAMES, AND THE COST WAS 292 ROWS.** `AFFLICTION → DEBUFF`, `SHELTER → DEFENSE`,
+  `METER → RESOURCE`, `AMP → OFFENSE`, `CLOCK → TEMPO`; **BREAK unchanged**. **Every one-line
+  meaning was rewritten to fit the new word** — two were circular under the new names (a RESOURCE
+  tag reading *"moves a resource"*) and both now name the meters.
+  - **THE BRIEF'S PREMISE WAS FALSE AND IT ASKED TO BE TOLD.** `CARD_TAGS` and `RUNE_TAGS` hold the
+    words as LITERALS, not as references to `TAG_ORDER`: **227 + 65 = 292 rows, 459 tag slots**,
+    every one moved. **What DID hold is the half that mattered** — no reader outside those two
+    tables names a tag word, so the rename was two files and a `sed`, and **not one clause in the
+    game had to be read.**
+- **§2b — MARK, AND ITS POPULATION WAS ALREADY WRITTEN DOWN IN THE CODE.**
+  **`battle.DISPEL_NEVER`'s own comment names the marks by id**, because Dispel had to be told not
+  to strip them — *"the five MARKS the party applies — covenant, quarry, snare_line, feinted,
+  hunt_mark"*, plus `blood_debt`, `vendetta` and `reacquire` named the same way, plus `party_mark`
+  and `arcane_echo` whose card texts say *"one mark at a time"*. **TEN cards lay one, NINE of them
+  in the draft.**
+  - **EK'S TEN WAS A DIFFERENT TEN AND BOTH HALVES OF THE DIFFERENCE MATTER.** EK counted six that
+    SAY "one mark at a time" plus four bleedout cards (Call the Wilds, Gut Rip, Rampage, Savage
+    Sweep). **Those four cause bleedouts; Blood Debt's mark is what PAYS on one** — tagging them
+    MARK tags a card for another card's mark, which CN's rule forbids, and they keep their tags.
+    **And EK never reached Covenant of Ash, Snare Line or Feint**, none of which says "mark" in its
+    own text. **A vocabulary derived from what cards SAY is the vocabulary of the cards that were
+    written well.**
+  - **EIGHT PRIMARIES MOVED AND THE PATTERN IN ALL EIGHT IS ONE THING: each was tagged for what its
+    mark PAYS.** Quarry's Mark was METER because the mark doubles Focus; Hunter's Mark was AMP
+    because the mark grants party damage; Blood Debt was BREAK for the strike and SHELTER for the
+    heal. **All of those read the payoff, and the payoff is not what the card is** — the exact
+    failure the tags exist to make visible, sitting inside the tag table.
+  - **SNARE LINE AND FEINT KEEP THEIR PRIMARIES AND CARRY MARK SECOND.** Snare Line marks the whole
+    FIELD; Feint marks on one of its two stance branches. **Each is one row, and the alternative is
+    stated in the report.**
+  - **NO RUNE GAINS MARK, AND THAT IS MEASURED**: not one rune payload field reads a mark status.
+- **§2c — SEVEN IS THE CEILING AND THE ARGUMENT IS A MEASUREMENT.** A tag means something only if
+  **holding two is notable**. At seven words the sixteen draft pools give **4 to 10 distinct
+  combinations against 6 to 13 cards**, and **65 of the 154 cards — 42% — are already the ONLY card
+  in their pool with their combination**, with **one pool of sixteen fully unique** (the Warrior
+  class pool, 6 of 6). **An eighth word takes more pools there, and a vocabulary where everybody
+  holds a different pair has stopped grouping anything.** `check_ek` §2 pins the count as an
+  EQUALITY and prints the spread so the claim can be re-tested rather than taken.
+- **§3 — THE SWEEP RAN ON ALL SEVEN OVER 1,551 AUTHORED STRINGS, AND THE INSTRUMENT WAS THE THING
+  THAT WAS WRONG.** **DEBUFF, RESOURCE and OFFENSE collide with nothing.** BREAK is clean on every
+  NAME surface (one glossary term, *"Pressure & Break"*, which is the mechanic it is named for).
+  TEMPO is clean **because §1 freed it** — before §1 it read 14 hits.
+  - **TWO COLLIDE AND BOTH SHIP, NAMED.** **MARK** meets Hunter's Mark, Quarry's Mark, Mark of the
+    Hunt and the `party_mark` chip labelled *"Hunter's Mark"*; **DEFENSE** meets the Defense
+    Potion, whose pouch button renders `Defense` on the same screen the draft card is drawn on
+    (never in the same visible frame — the draft is an overlay dimming the map at 0.86 alpha).
+  - **THE LINE IS WHETHER THE TWO THINGS MEAN THE SAME THING.** `Ward` meant *takes 50% less Break
+    damage* — a different thing wearing one word, so a reader learns something false. **Hunter's
+    Mark IS a mark and CARRIES the tag.** A same-meaning collision ships and is named; a
+    different-meaning one is renamed. `check_ek` §4 compares each tag's clash set against a named
+    `CLASH_EXEMPT` **as an EQUALITY**, so a fifth collision still trips.
+  - **THREE HOLES IN THE SWEEP WERE FOUND AND CLOSED, AND THE THIRD IS THE ONE THAT MATTERS.**
+    Lanes were invisible; items and relics were absent; and **the status-LABEL arm asked whether
+    `battle.gd` contained `["Ward",` — an EXACT whole label — so it was blind to every label merely
+    CONTAINING the word.** Under it the MARK sweep reported the status half clean while a chip
+    rendered the word. **A check written against the two examples in front of it passes on both and
+    answers no general question.** Every label is extracted and word-boundary matched now, and both
+    new arms assert their own population.
+- **AND `check_ek` §3's FILE POPULATION MOVED, WHICH THE BRIEF FORBADE. THE FIX WAS NOT AN
+  EXEMPTION.** `check_el.gd` reads `CARD_TAGS`, so five became six. **The real fault is that one
+  number was answering two questions** — how many files in the SHIPPED GAME know what a tag is
+  (a claim about the game) and how many TARGETS check one (a claim about the instruments, which
+  grows with the tree). Rolled together, **writing a new gate was indistinguishable from breaking
+  the rule.** The section is two assertions now: **`TAG_DEFINERS` is pinned at THREE and did not
+  move**; `TAG_CHECKERS` went two to three.
+- **Next letter: EM.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **there is now a vocabulary the runes can be re-keyed
-  onto** — which is what EJ said the next batch needs and is the batch after this one.
+  purpose-authored and charter-clean, and **the vocabulary the runes will be re-keyed onto now has
+  its real names** — which is EJ's next batch and is the batch after this one.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE ARCHETYPE TAGS — SHIPPED AT EK, INERT, AND EVERY DESIGN QUESTION IN THEM IS OPEN
+### THE ARCHETYPE TAGS — NAMED AT EL, STILL INERT, AND EVERY DESIGN QUESTION IN THEM IS OPEN
 
-**Full evidence: `docs/reports/EK.md`.** The vocabulary is `AFFLICTION · SHELTER · BREAK · METER ·
-AMP · CLOCK`, it is on every ability in the corpus and every authored rune, the draft card shows
-it, and **nothing reads it.** `check_ek` asserts the inertness every battery run.
+**Full evidence: `docs/reports/EK.md` (the derivation) and `docs/reports/EL.md` (the names and the
+seventh).** The vocabulary is `DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK`, it is
+on every ability in the corpus and every authored rune, the draft card shows it, and **nothing
+reads it.** `check_ek` and `check_el` assert that every battery run.
 
-- **WHETHER THE SET IS RIGHT IS THE WHOLE QUESTION AND IT IS THE DESIGNER'S.** The alternative —
-  six STATUS names — is measured rather than described: **40 of 154 covered, 114 under no tag, and
-  six of the sixteen pools reading a single value.** The six shipped cover 154 of 154 at 4–9
-  combinations a pool. **Changing the set is one table; changing it after the runes are re-keyed is
-  the rune layer.**
-- **A SEVENTH TAG IS THE MOST LIKELY CHANGE AND THREE CANDIDATES ARE NAMED WITH THEIR MEASURED
-  SIZES.** **MARK** reaches **10 of the 154 draft cards and 16 of the 227** — Hunter's Mark,
-  Quarry's Mark, Vendetta, Reacquire, Arcane Echo and Blood Debt lay one outright, and four more
-  (Call the Wilds, Gut Rip, Rampage, Savage Sweep) reach one through the bleedout path rather than
-  by laying it. **It is the most defensible seventh word**: the marks are a real shared mechanic
-  and are currently split across four tags. **PET** would carry the Beastmaster's whole **10-card
-  pool** plus his three summons and Kill Command; **STANCE** would carry 3. All three are cards
-  tagged today for what their payoff does rather than for what they are.
-- **57 PRIMARIES ARE A JUDGEMENT AND ARE LISTED AS ONE.** 37 of them in the draft, each one row of
-  `Classes.CARD_TAGS`. The report gives the derived reading, the shipped one and DQ's axis beside
-  each. **Nine are flagged as genuinely arguable** — the stance cards, the companion cards, the
-  marks, Anointing, Immolate, Emberkeep, Divine Presence, Fault Line and the three consume-cards.
+- **WHETHER THE SET IS RIGHT IS STILL THE WHOLE QUESTION AND IT IS STILL THE DESIGNER'S.** The
+  alternative — six STATUS names — is measured rather than described: **40 of 154 covered, 114
+  under no tag, and six of the sixteen pools reading a single value.** The seven shipped cover 154
+  of 154 at **4–10 combinations a pool**. **EL proved the rename is cheap**: 292 rows, two files
+  and a `sed`, because no reader outside the tables names a tag word. **Changing the set after the
+  runes are re-keyed is the rune layer, and that is still true.**
+- **TWO WORDS SHIP COLLIDING AND EITHER CAN BE OVERTURNED FOR ONE ROW.** **MARK** meets Hunter's
+  Mark, Quarry's Mark, Mark of the Hunt and the `party_mark` chip; **DEFENSE** meets the Defense
+  Potion. Both were shipped on the rule that **a same-meaning collision ships and is named**.
+  **BRAND, PREY, TETHER, BOUNTY and TARGET are all swept clean** and would carry MARK's ten cards
+  without one. The cost is one row of `TAG_ORDER`, one of `TAG_INFO`, and a `sed` over two tables.
+- **SEVEN IS RECORDED AS THE CEILING AND AN EIGHTH NEEDS AN ARGUMENT.** The measurement is in
+  `Classes.TAG_ORDER`'s header and in the WHERE block above: 42% of the draft is already the only
+  card in its pool with its combination, and one pool of sixteen is fully unique.
+- **57 PRIMARIES WERE A JUDGEMENT AT EK AND EIGHT MORE MOVED AT EL.** EK's 57 are listed in its
+  report with the alternative beside each; **nine were flagged as genuinely arguable** — the stance
+  cards, the companion cards, the marks, Anointing, Immolate, Emberkeep, Divine Presence, Fault
+  Line and the three consume-cards. **EL's eight are the marks, and they are no longer arguable:
+  each had been tagged for what its mark PAYS.** **Two remain arguable and are named**: Snare Line
+  (MARK second because it marks the FIELD) and Feint (MARK second because it marks on one branch).
+- **PET AND STANCE ARE THE TWO CANDIDATES LEFT, AND SEVEN IS THE STATED CEILING.** **PET** would
+  carry the Beastmaster's whole **10-card pool** plus his three summons and Kill Command;
+  **STANCE** would carry 3. Both are cards tagged today for what their payoff does rather than for
+  what they are — **which is exactly the argument that MARK won on**, so the ceiling is what stands
+  between them and a row, not the strength of the reading.
 - **THE HERO SHEET IS RECOMMENDED AND NOT TAKEN.** It is the cheapest of the four remaining
   surfaces and the only screen where a player reads a whole loadout at once. **The rune offer wants
   its own surface** rather than `map_screen._pick_button`, which CK deliberately keeps on the
   mid-combat tier. **The battle tooltip and the blacksmith are recommended AGAINST.**
-- **THE WORD "ARCHETYPE" NAMES TWO UNRELATED THINGS AND ONLY THE CODE SIDE IS SEPARATED.**
+- **THE WORD "ARCHETYPE" STILL NAMES TWO UNRELATED THINGS AND ONLY THE CODE SIDE IS SEPARATED.**
   `ARCHETYPE_ROLE` / `ARCHETYPE_DESC` and `master.html` §6 use it for a SPEC's role, which decides
   base Attack. The constants are `CARD_TAGS` and `RUNE_TAGS` deliberately, and `master.html` §6c
   states the two are unrelated — **but the document still uses one word for both.** Renaming the
   nine spec archetypes is a design decision with a stat table under it.
-- **WHAT THE TAGGING DID NOT REACH, STATED SO IT IS NOT READ AS CLEAN.** No sim and no balance
-  judgement; not one magnitude was measured. **The tags were not compared against relics, items,
-  enemy abilities or events**, none of which carries one. **No rune was re-keyed** — EJ sized that
-  at 59 clauses in 32 runes and it is the next batch, not this one.
+- **WHAT THE TAGGING STILL HAS NOT REACHED, STATED SO IT IS NOT READ AS CLEAN.** No sim and no
+  balance judgement; not one magnitude was measured. **The tags were not compared against relics,
+  items, enemy abilities or events**, none of which carries one. **No rune was re-keyed** — EJ
+  sized that at 59 clauses in 32 runes and it is the next batch.
+- **AND TWO CLOSED AUDIT REPORTS STILL SAY `Tempo`.** `docs/talent-audit.html` and
+  `docs/rune-audit.html` were deliberately not edited: both are CLOSED (CV / DN) and kept *"as
+  written — it is the evidence of which way each disagreement pointed"*. **A reader searching
+  either file for the Sharpshooter's lanes finds the old name.** A header note on each is one line
+  and is the designer's call.
 
 ### THE DRAFT AUDIT — TWO FINDINGS RULED AT DR, THE REST STILL OPEN
 
@@ -1021,11 +1039,20 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-three** —
-  **EK ADDED `check_ek` BECAUSE THE BATCH CARRIES TWO RULINGS**: that the vocabulary is six
-  MECHANICS rather than six status names, and that the tags are MECHANICALLY INERT. **Inertness
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-four** —
+  **EL ADDED `check_el` BECAUSE THE BATCH CARRIES THREE RULINGS**: that MARK's population is
+  DERIVED from the marks the game itself names rather than listed, that `master.html` §6c's tag
+  table is the code's table, and that the widest tag line is MEASURED rather than transcribed
+  (DJ §3). **The first is the one that decays silently** — the day an eleventh mark is authored,
+  nothing else in the tree would notice its card going untagged — so §1 pins the STATUS half from
+  outside (`DISPEL_NEVER.size()`, DW's idiom) and DERIVES the CARD half live out of
+  `battle.gd`'s apply sites, through both anchors, agreeing in both directions.
+  **EK ADDED `check_ek` BECAUSE THAT BATCH CARRIED TWO RULINGS**: that the vocabulary is
+  MECHANICS rather than status names, and that the tags are MECHANICALLY INERT. **Inertness
   is the one property nothing else in the tree would notice losing**, so §3 asserts it as a
-  POPULATION — every `.gd` swept comment-stripped, the reader set pinned at five, and ZERO
+  POPULATION — every `.gd` swept comment-stripped, and **EL SPLIT THAT ASSERTION IN TWO** because
+  it was two claims: the files in the SHIPPED GAME naming a tag are pinned at THREE (and did not
+  move), the TARGETS that check one are listed separately (two → three), and ZERO is still
   asserted separately in the six files a mechanic would have to live in.
   **EH ADDED `check_eh` BECAUSE §1 IS A RULING AND BECAUSE THE THIRD TIER CAN ONLY BE PROVED
   LIVE.** A tier that resolves correctly and announces nothing passes every static check in the
@@ -1052,7 +1079,7 @@ re-derived from the source at DM; not one was moved.**
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 40
+  move a line in another file and say why. **There are 41
   `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -1086,10 +1113,13 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 84 ROWS: 46 suites, 33 gates, 2 scene runs
-  and 3 harness gates.** **EK ADDED `check_ek` AT [39, 39] AND MOVED EXACTLY ONE OTHER ROW —
-  `check_parse`, 158 → 159 — BOTH WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE
-  READINGS**, so `check_de` certified on pass one. **The `check_parse` move is that row working
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 85 ROWS: 46 suites, 34 gates, 2 scene runs
+  and 3 harness gates.** **EL ADDED `check_el` AT [23, 23] AND MOVED EXACTLY TWO OTHER ROWS —
+  `check_ek`, 39 → 43, and `check_parse`, 159 → 160 — ALL THREE WRITTEN BEFORE THE BATTERY OFF
+  STANDALONE READINGS**, so `check_de` certified on pass one. **`check_ek`'s move is itemised in
+  its own row**: §3 splits one assertion into two, §4 adds two population assertions and one more
+  tag to sweep. Before it, **EK ADDED `check_ek` AT [39, 39] AND MOVED EXACTLY ONE OTHER ROW —
+  `check_parse`, 158 → 159**. **The `check_parse` move is that row working
   as designed rather than drifting**: its count IS its coverage, so a target joining the battery
   raises it the same day. **EI ADDED NO ROW AND MOVED EXACTLY ONE — `check_parse`, `checks: null`
   → `[158, 158]`** — written before the battery off three identical standalone readings, so
@@ -1164,15 +1194,23 @@ re-derived from the source at DM; not one was moved.**
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 166 / 8** — EE's locator guard moved gate 2 from 165.
-- **master.html stamp: `Last updated: 2026-09-01 (Batch EK)`.** **EK MOVED THE STAMP AND ADDED ONE
-  SECTION — `§6c ARCHETYPE TAGS`, the first behaviour change in that document since EG.** It states
-  the six words, that at most two ride a card with the first the primary, that the protected cores
-  carry them too, and **that the tags are shown and read nothing.** It also states outright that
-  the word ARCHETYPE is doing two unrelated jobs in that document — §6's is a SPEC's role and
-  decides base Attack. **The retired-word sweep was run over the edited file before the battery**,
-  using `test_batch_bx` §4b's own `PARTY_IDENTS` strip and §4's `Beastmaster` strip: **0 *party*
-  and 0 *beast*.** **The literal-flip sweep read 0 LOST across all nine tracked documents**, and
-  `bx` reads 161 / 0.
+- **master.html stamp: `Last updated: 2026-09-01 (Batch EL — the tags get their real names, and
+  MARK is the seventh)`.** **EL MOVED THE STAMP AND EDITED SEVEN SITES IN THAT DOCUMENT**: §6c's
+  tag table (all seven rows rewritten and a new paragraph on MARK and the ceiling), §7's
+  Sharpshooter lane header and the lanes line (`Tempo` → `Pace`), the three node rows (`Tempo` →
+  `Pivot`, `Shattered Tempo` → `Shockwave`, `Crusader's Tempo` → `Crusade`), and **Blink's *"Tempo,
+  not damage"* → *"Timing, not damage"***, which is the ordinary English word colliding with a tag
+  rather than a mechanic naming itself.
+  - **§6c IS ASSERTED NOW AND IT WAS NOT BEFORE.** `check_el` §2 parses the tag table and requires
+    its words, their order and their meanings to be `TAG_ORDER` and `TAG_INFO` word for word, and
+    the five retired words to be absent from the section. **EH proved with a two-armed control that
+    this document's factual prose is asserted by nothing** — that is one table's worth of it closed.
+  - **THE LITERAL-FLIP SWEEP READ 18 LOST AND EVERY ONE WAS TRACED.** 11,010 gate-and-suite string
+    literals against thirteen tracked documents: **17 of the 18 are in `docs/state.md`, which
+    NOTHING READS** — six `.gd` files name that path and all six mentions are comments — and the
+    eighteenth is `spec_draft` leaving a `baselines.json` **`note` field**, which only `check_de`
+    opens and only as parsed JSON fields, never as prose. **0 LOST in `master.html`,
+    `text-standard.html`, `CLAUDE.md`, the glossary or the changelog.** `bx` reads 161 / 0.
   **Before it, EI, EF and EE each moved the stamp and nothing else in that document; EG moved it
   and three prose blocks** — the draft column's cap and ledger bullets, the seven-slot-cap
   paragraph and the take-one-and-bench-one paragraph. **EA moved the stamp and four prose sites; DZ
@@ -1227,7 +1265,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **31 entries** (DG → EK), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
+  **32 entries** (DG → EL), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
@@ -1301,7 +1339,7 @@ the number.*
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **40** — **EK ADDED `check_ek`**, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
+  are **41** — **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
   EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
 
@@ -1397,57 +1435,65 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EK, FROZEN, AND CLEAN ON THE FIRST RUN.** **313 files were MD5-stamped with
+**ONE BATTERY AT EL, FROZEN, AND CLEAN ON THE FIRST RUN.** **198 files were MD5-stamped with
 ABSOLUTE paths before it and re-compared after: it drifted ZERO** — the tree the battery read is
-byte-for-byte the tree that ships, this file and `docs/reports/EK.md` excepted, both written after
-the run and neither read by anything. **The reason one run was enough is that the reds were found
-BEFORE it**: `check_da` §3 caught the new gate standalone, `check_ed` caught an unrecorded pin
-against HEAD's own manifest, and **a thirty-target subset run caught `test_batch_ce`'s glossary pin
-while the literal sweep and the retired-word sweep were both green.**
+byte-for-byte the tree that ships. **The reds were found before it, by eight negative controls and
+two standalone gate runs**, and the one thing the battery itself said was a NOTICE rather than a
+failure (below).
 
-| | EG's acceptance | EH's acceptance | EI battery 1 | EI's acceptance | **EK's acceptance** |
+| | EH's acceptance | EI battery 1 | EI's acceptance | EK's acceptance | **EL's acceptance** |
 |---|---|---|---|---|---|
 | **suite failures** | 0 | 0 | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | 0 | 0 | **0** |
-| `check_de` | 341 / 0 / 0 | 345 / 0 / 0 | 346 / 0 / 0 | 346 / 0 / 0 | **350 / 0 / 0** |
+| `check_de` | 345 / 0 / 0 | 346 / 0 / 0 | 346 / 0 / 0 | 350 / 0 / 0 | **354 / 0 / 1 → 0** |
 | run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
-| targets in the manifest | 83 | 84 | 84 | 84 | **85** |
+| targets in the manifest | 84 | 84 | 84 | 85 | **86** |
 
-**EIGHTY-FIVE TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-FIVE, AND THERE ARE EIGHTY-FIVE LOGS** —
+**EIGHTY-SIX TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-SIX, AND THERE ARE EIGHTY-SIX LOGS** —
 compared both ways and checked for duplicate names, which is the fault a shared log directory
-produces. **0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 85 logs** — grepped from the
+produces. **0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 86 logs** — grepped from the
 streams rather than read off a tally or an exit code. **`check_map_screen: OK`, and its live tag
-drive read 12 tag lines for 12 offered cards**; `check_ct_map` 83 / 0.
+drive read 12 tag lines for 12 offered cards** with `DEBUFF · BREAK` as the first; `check_ct_map`
+83 / 0.
 
-**`check_de` READ 350 CHECKS AND ZERO NOTICES**, so not one unpredicted count moved anywhere in the
-tree. **The +4 over EI's 346 is exactly `check_ek` joining the battery** — that gate makes four
-assertions per target — and it is stated here because **`check_de` HAS NO BASELINE ROW OF ITS
-OWN**, so its own total moving is reported by nothing.
+**`check_de` READ 354 CHECKS, ZERO FAILURES AND EXACTLY ONE NOTICE, AND THE NOTICE WAS EL's OWN
+MISS.** `check_parse` rose 159 → 160 and the row was not moved before the run. **EL wrote
+`check_el`'s row and moved `check_ek`'s before the battery and did not write the third**, so the
+differ certified with a notice where it should have certified silent. **The row is moved now and
+`check_de` re-reads 354 / 0 / 0.** The +4 over EK's 350 is exactly `check_el` joining the
+battery — that gate makes four assertions per target.
+- **THE RULE THIS PAYS FOR THE SECOND TIME: `check_parse`'s COUNT IS ITS COVERAGE.** Its population
+  is derived from `run_battery.sh`'s own `GATES` array, so **any batch adding a target moves this
+  row**, and it moved at EK for the same reason. **A batch that adds a gate owes TWO baseline rows,
+  not one.**
 
-**NOTHING WAS FOUND BY EITHER BATTERY, AND THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THEM.** The
-seven targets most likely to move — `check_parse`, `check_da`, `check_dw`, `check_ec`, `check_ed`,
-`check_eh` and the pin manifest — were each run standalone against the edited tree before the first
-battery, and all seven read as predicted. **Two independent needle instruments cleared the document
-edits**: `check_ed` against HEAD's own manifest (**18 / 0**, manifest unchanged at 1335 pins) and a
-raw sweep of all 11,222 gate-and-suite literals, which found **two LOST needles, both traced to
-their pin sites and neither read by the document it left**.
+**THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THE BATTERY.** Two independent needle instruments
+cleared the document edits: **`check_ed` against HEAD's own manifest** (it caught eight unrecorded
+`check_el` pins on the first run, which is that gate working) and **a raw sweep of all 11,010
+gate-and-suite literals over thirteen tracked documents**, which read **18 LOST — every one traced
+to its site and none of them read by the document it left** (17 in `docs/state.md`, which nothing
+opens; one in a `baselines.json` `note` field, which only `check_de` reads and only as parsed JSON).
 
-**THE FOUR DEFECTS EG's BATTERY 1 FOUND, BECAUSE THE SHAPES RECUR.**
-- **TWO ARE ONE DEFECT IN TWO COPIES.** `test_batch_bm` §6 and `test_run_harness` gate 2 each slice
-  `battle.gd` from `func _resolve_boss` for a fixed **2400 characters**; EG's §1 comment pushed the
-  `# The end boss.` anchor from 2130 to **2955** and both went red. **ED §2's rule met in the wild**
-  — a scan capturing a WINDOW is blind to what the window swallowed — arriving as a window COPIED
-  between two targets. Both run to the next top-level `func ` now. **EE §4's GUARD IS THE ONLY
-  REASON EITHER SURFACED**: without it the slice is EMPTY, the negative assertion holds for every
-  needle, and both go green reading nothing — and in the harness that negative is the ONLY
-  assertion on the slice.
-- **`check_ct` PINNED THE SAVE VERSION LITERAL, WHICH IS THE RULE CT ITSELF SET.** `== 11`, against
-  *a suite must not pin the save version literal*. **THE MANIFEST COULD NOT HAVE WARNED ANYONE** —
-  `build_pin_manifest.py` indexes STRING literals and a version pin written as an INTEGER comparison
-  is invisible to it, which is why a 762-pin source sweep with exactly four intended flips read
-  straight past it.
-- **SO THE POPULATION WAS SWEPT RATHER THAN THE INSTRUMENT TRUSTED, AND IT WAS TWO — THE SECOND WAS
-  `check_eg`, THE GATE THIS BATCH WAS WRITING.** A named list cannot audit itself. Both read `>=`
-  now. **No check count moved on any of the four.**
+**EIGHT NEGATIVE CONTROLS WERE ARMED AND ALL EIGHT BIT, DISARMED GREEN BEFORE AND AFTER.** Four on
+`check_el` (a mark card losing MARK; a non-mark card gaining it; one word of `master.html` §6c
+drifting; `text-standard.html`'s figure drifting), one on `check_ek` §3 (a tag read added to
+`battle.gd` — **two reds, the game-half population AND the `battle.gd` zero**), one on
+`check_map_screen` (the draft card stops drawing its tag line: **`TAG MISMATCH`, and the `OK`
+verdict withheld** — DS's Heads Down shape), and **two TWO-ARMED controls on the sweep repair**:
+- **A STATUS LABEL TAKING A TAG WORD INSIDE A LONGER LABEL** (`High Guard` → `High Defense`).
+  **HEAD's `check_ek` never named it**; EL's caught `status label:High Defense`.
+- **A TALENT LANE TAKING A TAG WORD** (`Pace` → `Tempo` on one node). **HEAD's `check_ek` has no
+  lane arm at all and reported nothing**; EL's caught `lane:Tempo`.
+**A ONE-ARMED CONTROL WOULD HAVE PROVED ONLY THAT THE NEW CODE RUNS.** These two prove the old code
+was blind, which is the claim EL §3 actually makes.
+
+**AND A SUBSET BATTERY RAN AFTER THE POST-BATTERY EDITS.** Four files changed after the frozen run:
+three `.gd` COMMENTS still carrying retired tag words (`classes.gd`, `runes.gd`, `test_batch_ce`)
+and `baselines.json`'s `check_parse` row. **The comment edits were proved comment-only by a
+comment-stripped diff (0 code lines) and needle-free by a direct search** — no `.gd` holds any of
+the removed strings — and every target that reads an edited file was re-run standalone. **The subset
+that followed ran 15 suites and ALL 34 GATES** — a named-subset invocation replaces `SUITES` and
+leaves `GATES` whole — with **no failures and no throws** except `check_cm_live`'s standing four
+and `check_de`'s one, which is that gate refusing to certify a subset run and is it working.

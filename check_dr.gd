@@ -59,7 +59,7 @@ const TICK_SITES := {
 	"Blessing of Zeal": "Devout PROTECTED CORE — ticks the target's cooldowns on cast",
 	"Frostbound Hours": "cr_frostbound, Cryomancer Thaw r8 — EVERY hero's cooldowns",
 	"Practised Hands": "sv_practised, Survivalist Guerilla r8",
-	"Follow-Through": "ss_follow, Sharpshooter Tempo r5",
+	"Follow-Through": "ss_follow, Sharpshooter Pace r5",
 }
 
 # BATCH DR §4's three cards, and the axis each was authored to add.

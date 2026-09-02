@@ -28,7 +28,7 @@ const MUST_NOT_CAP := {
 	"hold_the_line": "hands the caster +5 Rage",
 	"stabilize": "vents Resonance into Mana and heals 5% of maximum health",
 	"reckless_abandon": "spends the whole Rage bar",
-	"zeal": "ticks cooldowns down through Crusader's Tempo",
+	"zeal": "ticks cooldowns down through Crusade",
 	"blink": "takes two turns off every cooldown he is holding",
 	"preparation": "buys an extra turn",
 	"elevation": "grants the party Faith",

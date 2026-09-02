@@ -613,52 +613,70 @@ const PROTECTED_CORES := {
 }
 
 
-# ================== BATCH EK §1 — THE ARCHETYPE TAGS ==================
+# ============ BATCH EK §1 / EL §2 — THE ARCHETYPE TAGS ============
 #
-# **A SHARED VOCABULARY THAT NAMES WHAT A CARD IS FOR.** Six words, carried by
-# the protected cores, all 154 draft cards, the boss-pick pools and all 65
+# **A SHARED VOCABULARY THAT NAMES WHAT A CARD IS FOR.** Seven words, carried
+# by the protected cores, all 154 draft cards, the boss-pick pools and all 65
 # runes, and shown to the player on the draft card. **MECHANICALLY INERT AS
 # SHIPPED**: nothing in the game reads a tag for anything but display, and
 # `check_ek` asserts that every run.
 #
-# ── WHY SIX MECHANICS AND NOT SIX STATUS NAMES ──────────────────────────────
-# The brief's own example vocabulary was the status one — *"the Pyromancer's
-# Fireball is a Burn card"* — and the corpus was measured before anything was
-# authored. **IT DOES NOT SUPPORT SIX STATUS NAMES.** Grouped into families,
-# the six biggest status systems in the game (Burn, Frost, Bleed, Poison, Ruin,
-# Mark) reach **40 of the 154 draft cards — 114 under no tag at all**, and §1's
-# own test says that a vocabulary leaving a LARGE remainder is the wrong
-# vocabulary. The reason is structural rather than accidental: a status system
-# belongs to ONE spec, so inside the pool a player is actually drafting from it
-# does not vary — the Pyromancer's pool is 12 Burn cards out of 13, and a tag
-# carried by twelve of the thirteen cards on offer tells the player nothing.
+# ── WHY MECHANICS AND NOT STATUS NAMES (EK §1, UNCHANGED) ───────────────────
+# EK's brief named a status vocabulary in passing — *"the Pyromancer's Fireball
+# is a Burn card"* — and the corpus was measured before anything was authored.
+# **IT DOES NOT SUPPORT SIX STATUS NAMES.** Grouped into families, the six
+# biggest status systems in the game (Burn, Frost, Bleed, Poison, Ruin, Mark)
+# reach **40 of the 154 draft cards — 114 under no tag at all**, against the
+# brief's own test that a large remainder means the vocabulary is wrong. The
+# reason is structural rather than accidental: a status system belongs to ONE
+# spec, so inside the pool a player is actually drafting from it does not vary
+# — the Pyromancer's pool is 12 Burn cards out of 13, and a tag carried by
+# twelve of the thirteen cards on offer tells the player nothing.
 #
-# **THE MECHANIC VOCABULARY BELOW COVERS 154 OF 154**, and it varies inside
-# every pool: five to ten distinct tag combinations per pool against ten to
-# thirteen cards. That is the property the tags exist for — a player can see a
-# build forming — and it is why the distribution decided the set rather than
-# the brief's example doing it. **The status-family option is priced in
+# **THE MECHANIC VOCABULARY BELOW COVERS 154 OF 154.** That is the property the
+# tags exist for — a player can see a build forming — and it is why the
+# distribution decided the set. **The status-family option is priced in
 # `docs/reports/EK.md` §1 so the designer can overturn this.**
 #
-# ── THE NAMES, SWEPT (BR §1) ────────────────────────────────────────────────
-# All six were swept against every ABILITY, TALENT NODE, STATUS LABEL and RUNE
-# name in the project. **AFFLICTION, BREAK, METER and AMP collide with
-# nothing.** Two were RENAMED before shipping rather than shipped and flagged,
-# because a brand-new vocabulary is free to move today and costs 227 rows to
-# move later:
-#   · **WARD → SHELTER.** `Ward` is a live status chip ("Takes 50% less Break
-#     damage") and the Rune of the Triage Ward carries the word. That is CJ's
-#     Iron Will collision exactly — a tag and a chip reading the same word on
-#     the same screen — and CJ's answer was to rename.
-#   · **TEMPO → CLOCK.** `Tempo` is a live status chip AND three talent nodes
-#     (Crusader's Tempo, Shattered Tempo, Tempo). CLOCK is the glossary's own
-#     word for what the tag names: *"Turn order is a clock, not a queue."*
+# ── THE NAMES, AND WHY THEY MOVED AT EL ─────────────────────────────────────
+# **EK SHIPPED SIX WORDS CHOSEN UNDER A COLLISION, AND EL GAVE THE SET ITS REAL
+# NAMES.** EK renamed WARD → SHELTER and TEMPO → CLOCK because `Ward` and
+# `Tempo` were live status chips; SHELTER and CLOCK were the substitutes, not
+# the words the mechanics are called. EL freed `Tempo` first (§1: the chip is
+# PIVOT, the three nodes are Pivot / Shockwave / Crusade, and the
+# Sharpshooter's lane is PACE) and then took the plain words:
 #
-# **AND THE ENGINE CHECK THE BRIEF ASKED FOR IS CLEAN.** None of the six is one
-# of DR's engine names (stance, Loyalty, Focus, Resonance, Ruin, Faith, Mercy,
-# Burn, Chilled, Frenzy, Block), so an engine and a tag can never collapse into
-# one word. **BREAK, METER and CLOCK ARE DR *AXIS* WORDS, WHICH IS REPORTED AND
-# IS NOT THE CHECK THE BRIEF SET** — see `docs/reports/EK.md` §1.
+#     AFFLICTION → DEBUFF      SHELTER → DEFENSE      METER → RESOURCE
+#     AMP        → OFFENSE     CLOCK   → TEMPO        BREAK → BREAK
+#
+# **AND THE RENAME COST 292 ROWS, WHICH IS A FINDING ABOUT THE DESIGN.** EL's
+# brief believed the rows referenced `TAG_ORDER`; they hold the words as
+# literals, so every row moved. **What DID hold is the one that mattered**: no
+# reader outside these two tables names a tag word, so the change was confined
+# to `classes.gd` and `runes.gd` and no clause in the game had to be read.
+#
+# ── MARK, THE SEVENTH (EL §2) ───────────────────────────────────────────────
+# **DERIVED FROM `battle.DISPEL_NEVER`, WHICH IS WHERE THIS PROJECT ALREADY
+# WROTE DOWN WHAT ITS MARKS ARE** — *"the five MARKS the party applies —
+# covenant, quarry, snare_line, feinted, hunt_mark"*, plus `blood_debt`,
+# `vendetta` and `reacquire` named the same way, plus `party_mark` and
+# `arcane_echo` whose own card text says *"one mark at a time"*. **Ten cards
+# lay one, nine of them in the draft.** EK named MARK as the strongest seventh
+# candidate off six of those ten and missed Covenant of Ash, Snare Line and
+# Feint, because it read the card texts rather than that list.
+#
+# **EIGHT OF THE TEN TAKE MARK AS THE PRIMARY, AND THAT IS A FINDING RATHER
+# THAN A RELABEL** — each was tagged for what its mark PAYS, which is a reading
+# of the payoff and not of the card. Snare Line and Feint keep their primaries:
+# the first marks the whole field rather than one enemy, the second marks on
+# one of its two stance branches. Both are argued in `docs/reports/EL.md` §2.
+#
+# **MARK COLLIDES WITH THREE LIVE ABILITY NAMES AND IS SHIPPED ANYWAY**, which
+# is not what happened to WARD and TEMPO. Those two named DIFFERENT things
+# wearing one word — `Ward` meant *takes 50% less Break damage*. Hunter's Mark,
+# Quarry's Mark and Mark of the Hunt ARE marks, and all three carry the tag, so
+# the word on the card and the word under it say the same thing. `check_ek` §4
+# holds those four as NAMED exemptions, so a fifth collision still trips.
 #
 # ── HOW A TAG WAS DERIVED ───────────────────────────────────────────────────
 # **FROM THE READ SITE, NEVER FROM THE NAME OR THE DESCRIPTION** — CN's rule,
@@ -672,293 +690,313 @@ const PROTECTED_CORES := {
 # it lays**. Aegis Wall applies `aegis_wall` and does nothing else; its healing
 # lives in the BLOCK handler, and without that last hop it reads as untagged.
 #
-# ── THE SIX ─────────────────────────────────────────────────────────────────
+# ── THE SEVEN ───────────────────────────────────────────────────────────────
 # **AT MOST TWO PER CARD, THE FIRST IS THE PRIMARY.** A card with two tags of
 # equal weight is a card whose primary has not been decided, so the table
 # always states one.
 const CARD_TAGS := {
 	# --- boss:arcanist ---
-	"Ashes of Al'ar": ["SHELTER"],
-	"Stabilize": ["SHELTER", "METER"],
+	"Ashes of Al'ar": ["DEFENSE"],
+	"Stabilize": ["DEFENSE", "RESOURCE"],
 	# --- boss:beastmaster ---
-	"Bestial Wrath": ["AMP"],
-	"Call of the Wild": ["BREAK", "AFFLICTION"],
-	"Mark of the Hunt": ["METER", "AMP"],
-	"Primal Surge": ["BREAK", "METER"],
-	"Spirit Bond": ["SHELTER", "METER"],
+	"Bestial Wrath": ["OFFENSE"],
+	"Call of the Wild": ["BREAK", "DEBUFF"],
+	"Mark of the Hunt": ["MARK", "OFFENSE"],
+	"Primal Surge": ["BREAK", "RESOURCE"],
+	"Spirit Bond": ["DEFENSE", "RESOURCE"],
 	# --- boss:berserker ---
-	"Blood Price": ["METER", "AMP"],
+	"Blood Price": ["RESOURCE", "OFFENSE"],
 	# --- boss:holy ---
-	"Dawnbreak": ["SHELTER"],
-	"Sanctuary": ["SHELTER"],
+	"Dawnbreak": ["DEFENSE"],
+	"Sanctuary": ["DEFENSE"],
 	# --- boss:mystic ---
-	"Deadfall": ["AFFLICTION", "BREAK"],
-	"Explosive Shot": ["AFFLICTION", "BREAK"],
-	"Hamstring": ["AFFLICTION"],
-	"Harvest": ["BREAK", "AFFLICTION"],
-	"Venom Coating": ["AFFLICTION"],
+	"Deadfall": ["DEBUFF", "BREAK"],
+	"Explosive Shot": ["DEBUFF", "BREAK"],
+	"Hamstring": ["DEBUFF"],
+	"Harvest": ["BREAK", "DEBUFF"],
+	"Venom Coating": ["DEBUFF"],
 	# --- boss:occultist ---
-	"Umbral Sigil": ["AFFLICTION"],
+	"Umbral Sigil": ["DEBUFF"],
 	# --- boss:sharpshooter ---
-	"Called Shot": ["AFFLICTION", "BREAK"],
-	"Coup de Grâce": ["BREAK", "METER"],
-	"Pinning Shot": ["AFFLICTION", "BREAK"],
-	"Quick Draw": ["CLOCK"],
+	"Called Shot": ["DEBUFF", "BREAK"],
+	"Coup de Grâce": ["BREAK", "RESOURCE"],
+	"Pinning Shot": ["DEBUFF", "BREAK"],
+	"Quick Draw": ["TEMPO"],
 	"Triple Shot": ["BREAK"],
 	# --- boss:swordmaster ---
-	"Shatterpoint": ["BREAK", "AFFLICTION"],
-	"Sweeping Strikes": ["AFFLICTION", "BREAK"],
+	"Shatterpoint": ["BREAK", "DEBUFF"],
+	"Sweeping Strikes": ["DEBUFF", "BREAK"],
 	# --- boss:warden ---
-	"Interpose": ["SHELTER"],
-	"Retaliation": ["SHELTER", "BREAK"],
-	"War Stomp": ["BREAK", "METER"],
+	"Interpose": ["DEFENSE"],
+	"Retaliation": ["DEFENSE", "BREAK"],
+	"War Stomp": ["BREAK", "RESOURCE"],
 	# --- class:cleric ---
 	"Chastise": ["BREAK"],
-	"Consecration": ["SHELTER", "METER"],
-	"Exhortation": ["SHELTER", "AMP"],
-	"Ministration": ["SHELTER"],
-	"Unburden": ["SHELTER"],
-	"Undying Vigil": ["SHELTER"],
+	"Consecration": ["DEFENSE", "RESOURCE"],
+	"Exhortation": ["DEFENSE", "OFFENSE"],
+	"Ministration": ["DEFENSE"],
+	"Unburden": ["DEFENSE"],
+	"Undying Vigil": ["DEFENSE"],
 	# --- class:hunter ---
 	"Aimed Volley": ["BREAK"],
-	"Arcane Arrows": ["AMP", "METER"],
-	"Bola": ["AFFLICTION"],
-	"Camouflage": ["SHELTER"],
-	"Field Dressing": ["SHELTER"],
-	"Hunter's Mark": ["AMP", "BREAK"],
+	"Arcane Arrows": ["OFFENSE", "RESOURCE"],
+	"Bola": ["DEBUFF"],
+	"Camouflage": ["DEFENSE"],
+	"Field Dressing": ["DEFENSE"],
+	"Hunter's Mark": ["MARK", "OFFENSE"],
 	# --- class:mage ---
-	"Blink": ["CLOCK"],
-	"Dispel": ["SHELTER", "AFFLICTION"],
-	"Magic Barrier": ["SHELTER"],
+	"Blink": ["TEMPO"],
+	"Dispel": ["DEFENSE", "DEBUFF"],
+	"Magic Barrier": ["DEFENSE"],
 	"Magic Missiles": ["BREAK"],
-	"Mana Shield": ["SHELTER", "METER"],
-	"Mana Well": ["METER"],
-	"Mirror Image": ["SHELTER"],
+	"Mana Shield": ["DEFENSE", "RESOURCE"],
+	"Mana Well": ["RESOURCE"],
+	"Mirror Image": ["DEFENSE"],
 	# --- class:warrior ---
-	"Battle Trance": ["SHELTER", "METER"],
-	"Charge": ["AFFLICTION", "BREAK"],
+	"Battle Trance": ["DEFENSE", "RESOURCE"],
+	"Charge": ["DEBUFF", "BREAK"],
 	"Cleave": ["BREAK"],
-	"Ironclad": ["SHELTER"],
-	"Rally": ["CLOCK", "METER"],
-	"Warcry": ["AMP"],
+	"Ironclad": ["DEFENSE"],
+	"Rally": ["TEMPO", "RESOURCE"],
+	"Warcry": ["OFFENSE"],
 	# --- core:arcanist ---
-	"Arcane Barrage": ["BREAK", "METER"],
-	"Arcane Cannon": ["BREAK", "METER"],
-	"Arcane Explosion": ["BREAK", "METER"],
-	"Death Ray": ["BREAK", "METER"],
+	"Arcane Barrage": ["BREAK", "RESOURCE"],
+	"Arcane Cannon": ["BREAK", "RESOURCE"],
+	"Arcane Explosion": ["BREAK", "RESOURCE"],
+	"Death Ray": ["BREAK", "RESOURCE"],
 	# --- core:beastmaster ---
-	"Hunter's Instinct": ["AMP"],
-	"Kill Command": ["BREAK", "AFFLICTION"],
-	"Quick Shot": ["BREAK", "METER"],
+	"Hunter's Instinct": ["OFFENSE"],
+	"Kill Command": ["BREAK", "DEBUFF"],
+	"Quick Shot": ["BREAK", "RESOURCE"],
 	"Summon Aguila": ["BREAK"],
-	"Summon Canis": ["AFFLICTION", "BREAK"],
-	"Summon Ursus": ["BREAK", "SHELTER"],
+	"Summon Canis": ["DEBUFF", "BREAK"],
+	"Summon Ursus": ["BREAK", "DEFENSE"],
 	# --- core:berserker ---
-	"Bloodlust": ["BREAK", "SHELTER"],
-	"Hack and Slash": ["AFFLICTION", "BREAK"],
-	"Strike": ["BREAK", "METER"],
-	"Wildstrikes": ["AFFLICTION", "BREAK"],
+	"Bloodlust": ["BREAK", "DEFENSE"],
+	"Hack and Slash": ["DEBUFF", "BREAK"],
+	"Strike": ["BREAK", "RESOURCE"],
+	"Wildstrikes": ["DEBUFF", "BREAK"],
 	# --- core:cryomancer ---
-	"Blizzard": ["AFFLICTION", "BREAK"],
-	"Frostbolt": ["AFFLICTION", "BREAK"],
-	"Ice Lance": ["AFFLICTION", "BREAK"],
-	"Razor Ice": ["AFFLICTION", "BREAK"],
+	"Blizzard": ["DEBUFF", "BREAK"],
+	"Frostbolt": ["DEBUFF", "BREAK"],
+	"Ice Lance": ["DEBUFF", "BREAK"],
+	"Razor Ice": ["DEBUFF", "BREAK"],
 	# --- core:holy ---
-	"Heal": ["SHELTER"],
-	"Hymn of Hope": ["SHELTER", "METER"],
-	"Renewal": ["SHELTER"],
-	"Resurrection": ["SHELTER"],
+	"Heal": ["DEFENSE"],
+	"Hymn of Hope": ["DEFENSE", "RESOURCE"],
+	"Renewal": ["DEFENSE"],
+	"Resurrection": ["DEFENSE"],
 	"Smite": ["BREAK"],
 	# --- core:inquisitor ---
-	"Blessing of Zeal": ["AMP", "CLOCK"],
-	"Consecrated Ground": ["SHELTER", "METER"],
-	"Divine Shield": ["SHELTER"],
+	"Blessing of Zeal": ["OFFENSE", "TEMPO"],
+	"Consecrated Ground": ["DEFENSE", "RESOURCE"],
+	"Divine Shield": ["DEFENSE"],
 	# --- core:mystic ---
-	"Shrapnel Charge": ["BREAK", "AFFLICTION"],
-	"Snare Trap": ["AFFLICTION"],
-	"Tripwire": ["BREAK", "AFFLICTION"],
+	"Shrapnel Charge": ["BREAK", "DEBUFF"],
+	"Snare Trap": ["DEBUFF"],
+	"Tripwire": ["BREAK", "DEBUFF"],
 	# --- core:occultist ---
-	"Bewitch": ["AFFLICTION"],
-	"Dark Pact": ["SHELTER", "METER"],
-	"Hex of Ruin": ["AFFLICTION", "BREAK"],
-	"Shadowrend": ["AFFLICTION", "BREAK"],
+	"Bewitch": ["DEBUFF"],
+	"Dark Pact": ["DEFENSE", "RESOURCE"],
+	"Hex of Ruin": ["DEBUFF", "BREAK"],
+	"Shadowrend": ["DEBUFF", "BREAK"],
 	# --- core:pyromancer ---
-	"Detonation": ["AFFLICTION", "BREAK"],
-	"Fireball": ["AFFLICTION", "BREAK"],
-	"Flamewave": ["AFFLICTION", "BREAK"],
-	"Wildfire": ["AFFLICTION", "BREAK"],
+	"Detonation": ["DEBUFF", "BREAK"],
+	"Fireball": ["DEBUFF", "BREAK"],
+	"Flamewave": ["DEBUFF", "BREAK"],
+	"Wildfire": ["DEBUFF", "BREAK"],
 	# --- core:sharpshooter ---
-	"Aimed Shot": ["BREAK", "METER"],
-	"Hold Breath": ["METER", "AMP"],
+	"Aimed Shot": ["BREAK", "RESOURCE"],
+	"Hold Breath": ["RESOURCE", "OFFENSE"],
 	"Powershot": ["BREAK"],
 	# --- core:swordmaster ---
-	"Guard Change": ["AMP", "SHELTER"],
-	"Overpower": ["BREAK", "METER"],
-	"Pommel Strike": ["AFFLICTION", "BREAK"],
+	"Guard Change": ["OFFENSE", "DEFENSE"],
+	"Overpower": ["BREAK", "RESOURCE"],
+	"Pommel Strike": ["DEBUFF", "BREAK"],
 	# --- core:warden ---
-	"Crushing Blow": ["AFFLICTION", "BREAK"],
-	"Mocking Blow": ["AFFLICTION", "BREAK"],
-	"Shieldwall": ["SHELTER"],
+	"Crushing Blow": ["DEBUFF", "BREAK"],
+	"Mocking Blow": ["DEBUFF", "BREAK"],
+	"Shieldwall": ["DEFENSE"],
 	# --- other ---
-	"Magic Bolt": ["BREAK", "METER"],
+	"Magic Bolt": ["BREAK", "RESOURCE"],
 	# --- spec:arcanist ---
-	"Arcane Bolt": ["BREAK", "METER"],
-	"Arcane Echo": ["BREAK", "AMP"],
-	"Arcane Surge": ["METER", "BREAK"],
-	"Inner Arcane": ["METER"],
+	"Arcane Bolt": ["BREAK", "RESOURCE"],
+	"Arcane Echo": ["MARK", "OFFENSE"],
+	"Arcane Surge": ["RESOURCE", "BREAK"],
+	"Inner Arcane": ["RESOURCE"],
 	"Kindled Mind": ["BREAK"],
-	"Magi's Wrath": ["BREAK", "METER"],
-	"Null Field": ["SHELTER", "METER"],
-	"Overcharge": ["METER"],
-	"Reality Fracture": ["CLOCK", "BREAK"],
-	"Resonant Field": ["AMP"],
-	"Threshold": ["METER"],
-	"Unmaking": ["AFFLICTION", "BREAK"],
+	"Magi's Wrath": ["BREAK", "RESOURCE"],
+	"Null Field": ["DEFENSE", "RESOURCE"],
+	"Overcharge": ["RESOURCE"],
+	"Reality Fracture": ["TEMPO", "BREAK"],
+	"Resonant Field": ["OFFENSE"],
+	"Threshold": ["RESOURCE"],
+	"Unmaking": ["DEBUFF", "BREAK"],
 	# --- spec:beastmaster ---
-	"Bear the Brunt": ["SHELTER"],
-	"Bloodbond": ["SHELTER"],
-	"Bring It Down": ["AMP"],
-	"Call the Wilds": ["AFFLICTION", "BREAK"],
-	"Ghostpack": ["AMP"],
-	"Last Howl": ["AMP"],
-	"Savage Sweep": ["BREAK", "AFFLICTION"],
-	"Succession": ["CLOCK"],
-	"Twin Hunt": ["BREAK", "AFFLICTION"],
-	"Unleash": ["BREAK", "AFFLICTION"],
+	"Bear the Brunt": ["DEFENSE"],
+	"Bloodbond": ["DEFENSE"],
+	"Bring It Down": ["OFFENSE"],
+	"Call the Wilds": ["DEBUFF", "BREAK"],
+	"Ghostpack": ["OFFENSE"],
+	"Last Howl": ["OFFENSE"],
+	"Savage Sweep": ["BREAK", "DEBUFF"],
+	"Succession": ["TEMPO"],
+	"Twin Hunt": ["BREAK", "DEBUFF"],
+	"Unleash": ["BREAK", "DEBUFF"],
 	# --- spec:berserker ---
-	"Battle Shout": ["METER", "AMP"],
-	"Berserk": ["AMP"],
-	"Blood Debt": ["BREAK", "SHELTER"],
-	"Blood Offering": ["METER"],
-	"Boil Over": ["BREAK", "AMP"],
-	"Gut Rip": ["AFFLICTION", "BREAK"],
-	"Rampage": ["AFFLICTION", "BREAK"],
-	"Reckless Abandon": ["METER", "AMP"],
-	"Spite": ["SHELTER", "METER"],
-	"Unslaked": ["METER"],
+	"Battle Shout": ["RESOURCE", "OFFENSE"],
+	"Berserk": ["OFFENSE"],
+	"Blood Debt": ["MARK", "DEFENSE"],
+	"Blood Offering": ["RESOURCE"],
+	"Boil Over": ["BREAK", "OFFENSE"],
+	"Gut Rip": ["DEBUFF", "BREAK"],
+	"Rampage": ["DEBUFF", "BREAK"],
+	"Reckless Abandon": ["RESOURCE", "OFFENSE"],
+	"Spite": ["DEFENSE", "RESOURCE"],
+	"Unslaked": ["RESOURCE"],
 	# --- spec:cryomancer ---
-	"Cold Iron": ["AFFLICTION", "BREAK"],
-	"Cryoclasm": ["AFFLICTION", "BREAK"],
-	"Deep Winter": ["AFFLICTION"],
-	"Frostbind": ["AFFLICTION"],
-	"Glacial Prison": ["AFFLICTION"],
-	"Hoarfrost Armor": ["SHELTER", "AFFLICTION"],
-	"Killing Frost": ["AFFLICTION", "BREAK"],
-	"Rime": ["AFFLICTION"],
-	"Rimebinding": ["AFFLICTION"],
-	"Shatter": ["AFFLICTION", "BREAK"],
+	"Cold Iron": ["DEBUFF", "BREAK"],
+	"Cryoclasm": ["DEBUFF", "BREAK"],
+	"Deep Winter": ["DEBUFF"],
+	"Frostbind": ["DEBUFF"],
+	"Glacial Prison": ["DEBUFF"],
+	"Hoarfrost Armor": ["DEFENSE", "DEBUFF"],
+	"Killing Frost": ["DEBUFF", "BREAK"],
+	"Rime": ["DEBUFF"],
+	"Rimebinding": ["DEBUFF"],
+	"Shatter": ["DEBUFF", "BREAK"],
 	"Winter's Toll": ["BREAK"],
 	# --- spec:holy ---
-	"Alms": ["SHELTER", "METER"],
-	"Divine Plea": ["SHELTER", "METER"],
-	"Divine Presence": ["METER"],
-	"Intercession": ["SHELTER"],
-	"Recant": ["METER"],
+	"Alms": ["DEFENSE", "RESOURCE"],
+	"Divine Plea": ["DEFENSE", "RESOURCE"],
+	"Divine Presence": ["RESOURCE"],
+	"Intercession": ["DEFENSE"],
+	"Recant": ["RESOURCE"],
 	"Reprisal": ["BREAK"],
-	"Rite of Return": ["SHELTER"],
-	"Second Wind": ["SHELTER"],
-	"Shared Grief": ["METER"],
-	"Vespers": ["SHELTER"],
+	"Rite of Return": ["DEFENSE"],
+	"Second Wind": ["DEFENSE"],
+	"Shared Grief": ["RESOURCE"],
+	"Vespers": ["DEFENSE"],
 	# --- spec:inquisitor ---
-	"Aegis Reversal": ["AMP", "SHELTER"],
-	"Blessing of the Faithful": ["SHELTER", "METER"],
-	"Bulwark of Fortitude": ["SHELTER", "METER"],
-	"Divine Wrath": ["AMP"],
-	"Elevation": ["SHELTER", "METER"],
-	"Fortified Spirit": ["SHELTER"],
-	"Mantle": ["SHELTER"],
-	"Ordination": ["SHELTER", "METER"],
-	"Reliquary": ["SHELTER"],
-	"Sacred Resolve": ["SHELTER"],
-	"Vow of Suffering": ["SHELTER", "METER"],
+	"Aegis Reversal": ["OFFENSE", "DEFENSE"],
+	"Blessing of the Faithful": ["DEFENSE", "RESOURCE"],
+	"Bulwark of Fortitude": ["DEFENSE", "RESOURCE"],
+	"Divine Wrath": ["OFFENSE"],
+	"Elevation": ["DEFENSE", "RESOURCE"],
+	"Fortified Spirit": ["DEFENSE"],
+	"Mantle": ["DEFENSE"],
+	"Ordination": ["DEFENSE", "RESOURCE"],
+	"Reliquary": ["DEFENSE"],
+	"Sacred Resolve": ["DEFENSE"],
+	"Vow of Suffering": ["DEFENSE", "RESOURCE"],
 	# --- spec:mystic ---
-	"Choking Smoke": ["AFFLICTION", "METER"],
+	"Choking Smoke": ["DEBUFF", "RESOURCE"],
 	"Cull": ["BREAK"],
-	"Downwind": ["AFFLICTION"],
-	"Hunt": ["BREAK", "AMP"],
-	"Loaded Shot": ["AFFLICTION", "BREAK"],
-	"Preparation": ["CLOCK"],
-	"Salve": ["SHELTER", "AFFLICTION"],
-	"Snare Line": ["AFFLICTION"],
-	"Stalking Horse": ["SHELTER"],
-	"Thick Hide": ["SHELTER"],
+	"Downwind": ["DEBUFF"],
+	"Hunt": ["BREAK", "OFFENSE"],
+	"Loaded Shot": ["DEBUFF", "BREAK"],
+	"Preparation": ["TEMPO"],
+	"Salve": ["DEFENSE", "DEBUFF"],
+	"Snare Line": ["DEBUFF", "MARK"],
+	"Stalking Horse": ["DEFENSE"],
+	"Thick Hide": ["DEFENSE"],
 	# --- spec:occultist ---
-	"Anointing": ["AFFLICTION", "METER"],
-	"Blight the Well": ["AFFLICTION"],
-	"Breaking Darkness": ["AFFLICTION", "BREAK"],
-	"Covenant of Ash": ["AFFLICTION", "METER"],
-	"Mass Hysteria": ["AFFLICTION", "BREAK"],
-	"Mind Flay": ["AFFLICTION", "BREAK"],
-	"Penance": ["AFFLICTION"],
-	"Requiem": ["AFFLICTION", "BREAK"],
-	"Suffering": ["AFFLICTION", "SHELTER"],
-	"Transference": ["AFFLICTION"],
+	"Anointing": ["DEBUFF", "RESOURCE"],
+	"Blight the Well": ["DEBUFF"],
+	"Breaking Darkness": ["DEBUFF", "BREAK"],
+	"Covenant of Ash": ["MARK", "DEBUFF"],
+	"Mass Hysteria": ["DEBUFF", "BREAK"],
+	"Mind Flay": ["DEBUFF", "BREAK"],
+	"Penance": ["DEBUFF"],
+	"Requiem": ["DEBUFF", "BREAK"],
+	"Suffering": ["DEBUFF", "DEFENSE"],
+	"Transference": ["DEBUFF"],
 	# --- spec:pyromancer ---
-	"Backdraft": ["AFFLICTION", "METER"],
-	"Cinderfall": ["AFFLICTION", "BREAK"],
-	"Ember Debt": ["AFFLICTION", "METER"],
-	"Emberkeep": ["AFFLICTION"],
-	"Firedraw": ["AFFLICTION", "BREAK"],
-	"Firestorm": ["AFFLICTION", "BREAK"],
-	"Funeral Pyre": ["AFFLICTION", "SHELTER"],
-	"Immolate": ["SHELTER", "AFFLICTION"],
-	"Phoenix Rebirth": ["METER"],
-	"Pyre Wake": ["AFFLICTION", "BREAK"],
-	"Pyroblast": ["AFFLICTION", "BREAK"],
-	"Slow Burn": ["AFFLICTION", "BREAK"],
-	"Stoke": ["AFFLICTION", "BREAK"],
+	"Backdraft": ["DEBUFF", "RESOURCE"],
+	"Cinderfall": ["DEBUFF", "BREAK"],
+	"Ember Debt": ["DEBUFF", "RESOURCE"],
+	"Emberkeep": ["DEBUFF"],
+	"Firedraw": ["DEBUFF", "BREAK"],
+	"Firestorm": ["DEBUFF", "BREAK"],
+	"Funeral Pyre": ["DEBUFF", "DEFENSE"],
+	"Immolate": ["DEFENSE", "DEBUFF"],
+	"Phoenix Rebirth": ["RESOURCE"],
+	"Pyre Wake": ["DEBUFF", "BREAK"],
+	"Pyroblast": ["DEBUFF", "BREAK"],
+	"Slow Burn": ["DEBUFF", "BREAK"],
+	"Stoke": ["DEBUFF", "BREAK"],
 	# --- spec:sharpshooter ---
-	"Calibrating Shot": ["BREAK", "METER"],
+	"Calibrating Shot": ["BREAK", "RESOURCE"],
 	"Called Volley": ["BREAK"],
 	"Crossfire": ["BREAK"],
 	"Drumfire": ["BREAK"],
-	"Dug In": ["SHELTER"],
-	"Fault Line": ["BREAK", "METER"],
-	"Heads Down": ["AFFLICTION", "BREAK"],
-	"Quarry's Mark": ["METER"],
-	"Reacquire": ["METER"],
+	"Dug In": ["DEFENSE"],
+	"Fault Line": ["BREAK", "RESOURCE"],
+	"Heads Down": ["DEBUFF", "BREAK"],
+	"Quarry's Mark": ["MARK", "RESOURCE"],
+	"Reacquire": ["MARK", "RESOURCE"],
 	"Trophy Shot": ["BREAK"],
 	# --- spec:swordmaster ---
-	"Answering Steel": ["CLOCK", "SHELTER"],
-	"Battle Poise": ["CLOCK"],
-	"Counter Time": ["AFFLICTION", "SHELTER"],
-	"Discipline": ["AMP", "SHELTER"],
+	"Answering Steel": ["TEMPO", "DEFENSE"],
+	"Battle Poise": ["TEMPO"],
+	"Counter Time": ["DEBUFF", "DEFENSE"],
+	"Discipline": ["OFFENSE", "DEFENSE"],
 	"Execute": ["BREAK"],
-	"Feigned Guard": ["AMP"],
-	"Feint": ["BREAK"],
-	"Formless": ["AMP", "SHELTER"],
-	"Lunge": ["BREAK", "METER"],
+	"Feigned Guard": ["OFFENSE"],
+	"Feint": ["BREAK", "MARK"],
+	"Formless": ["OFFENSE", "DEFENSE"],
+	"Lunge": ["BREAK", "RESOURCE"],
 	"Precision Strike": ["BREAK"],
-	"Sever": ["BREAK", "CLOCK"],
-	"Wheeling Cut": ["BREAK", "AMP"],
+	"Sever": ["BREAK", "TEMPO"],
+	"Wheeling Cut": ["BREAK", "OFFENSE"],
 	# --- spec:warden ---
-	"Aegis Wall": ["SHELTER"],
-	"Anvil": ["METER"],
-	"Covering Guard": ["SHELTER"],
-	"Eye of the Storm": ["AFFLICTION"],
-	"Hold the Line": ["SHELTER", "METER"],
-	"Rallying Shout": ["BREAK", "METER"],
-	"Recompense": ["METER"],
+	"Aegis Wall": ["DEFENSE"],
+	"Anvil": ["RESOURCE"],
+	"Covering Guard": ["DEFENSE"],
+	"Eye of the Storm": ["DEBUFF"],
+	"Hold the Line": ["DEFENSE", "RESOURCE"],
+	"Rallying Shout": ["BREAK", "RESOURCE"],
+	"Recompense": ["RESOURCE"],
 	"Shield Slam": ["BREAK"],
 	"Turn the Blade": ["BREAK"],
-	"Vendetta": ["AFFLICTION"],
+	"Vendetta": ["MARK", "DEBUFF"],
 }
 
 
 # WHAT EACH TAG MEANS, IN ONE LINE, AND IT IS PLAYER-FACING TEXT.
 # The glossary carries the long form; this is what a tooltip shows.
+#
+# **BATCH EL §2 REWROTE EVERY LINE TO FIT THE NEW WORD, NOT JUST THE WORDS.**
+# "Puts a harmful effect on the enemy, or spends one" was written for
+# AFFLICTION, a word that needed the sentence to explain it; DEBUFF does not,
+# so the line says what the card does and stops. Two of them were circular
+# under the new names — a RESOURCE tag reading "moves a resource" defines the
+# word with the word — and both now name the meters instead.
+# `docs/text-standard.html` governs these: state the effect, no rationale, no
+# second person, keywords capitalised.
 const TAG_INFO := {
-	"AFFLICTION": "Puts a harmful effect on the enemy, or spends one.",
-	"SHELTER": "Answers damage coming in: heals, absorbs or mitigates.",
+	"DEBUFF": "Lands a harmful effect on an enemy, or spends one.",
+	"DEFENSE": "Answers damage coming in: heals, absorbs or reduces it.",
 	"BREAK": "Moves a Break meter.",
-	"METER": "Moves a resource or a class meter.",
-	"AMP": "Raises what the holder deals.",
-	"CLOCK": "Moves the initiative timeline or a cooldown.",
+	"RESOURCE": "Moves Mana, Rage or a class meter.",
+	"OFFENSE": "Raises the damage the holder deals.",
+	"TEMPO": "Moves the initiative timeline or a cooldown.",
+	"MARK": "Lays a lasting mark on one enemy.",
 }
 
-# The six in display order. AUTHORED, so the draft card, the glossary and the
-# gate all read one list and a seventh tag cannot arrive in only some of them.
-const TAG_ORDER := ["AFFLICTION", "SHELTER", "BREAK", "METER", "AMP", "CLOCK"]
+# The seven in display order. AUTHORED, so the draft card, the glossary and the
+# gate all read one list and an eighth tag cannot arrive in only some of them.
+#
+# **SEVEN IS THE CEILING THE FIVE-OR-SIX REASONING ALREADY IMPLIED, AND EL
+# RECORDS IT SO AN EIGHTH NEEDS AN ARGUMENT.** A tag only means something if
+# HOLDING TWO IS NOTABLE. Every word added divides the corpus finer, and the
+# point at which a pool of ten to thirteen cards stops producing a repeated
+# combination is the point at which a second card on a tag stops being a
+# signal. **Seven is where the next one starts costing meaning** — the spread
+# `check_ek` §2 prints is how a later batch checks that claim rather than
+# taking it.
+const TAG_ORDER := ["DEBUFF", "DEFENSE", "BREAK", "RESOURCE", "OFFENSE", "TEMPO",
+	"MARK"]
 
 
 # An ability's tags: `[primary]` or `[primary, secondary]`, and `[]` for a name
@@ -979,7 +1017,7 @@ static func tag_meaning(tag: String) -> String:
 	return String(TAG_INFO.get(tag, ""))
 
 
-# The tag line as the draft card renders it — "AFFLICTION · BREAK", or "" when
+# The tag line as the draft card renders it — "DEBUFF · BREAK", or "" when
 # the card carries none. ONE BUILDER, so a second surface taking these on
 # cannot draw them a second way (CK §1's rule, one layer down).
 static func card_tag_line(display_name: String) -> String:
@@ -2752,9 +2790,9 @@ static func draft_ability(display_name: String) -> Ability:
 				"description": "Go somewhere the pain cannot follow:\nfor 4 turns, at the start of each of\nyour turns heal 3% of maximum health\nPLUS HALF of all damage taken since\nyour last turn."})
 		# AXIS: giving away tempo. THE ONLY ABILITY IN THE GAME THAT HANDS AN
 		# ALLY A TURN, and the only tempo tool a class with none can have. It
-		# reuses the EXISTING initiative machinery (the Cryomancer's Shattered
-		# Tempo pushes units along the timeline; this is that hook aimed the
-		# other way) — there is no second turn-order manipulator.
+		# reuses the EXISTING initiative machinery (the Cryomancer's Shockwave
+		# pushes units along the timeline; this is that hook aimed the other
+		# way) — there is no second turn-order manipulator.
 		#
 		# IT CANNOT TARGET HIM, which is what bounds it: handing away a turn
 		# costs him one, so no hero can be given consecutive turns off a single

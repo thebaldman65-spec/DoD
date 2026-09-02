@@ -14,6 +14,91 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EL: THE TAGS GET THEIR REAL NAMES, AND MARK IS THE SEVENTH</h2>
+<p><i>EK shipped six tag words chosen under a collision. EL freed the word that caused it, gave
+the vocabulary its plain names, and added the seventh &mdash; derived from a list the game had
+already written down. <b>Still mechanically inert: no clause reads a tag, no card's behaviour
+changes and no magnitude moves.</b> Full working: <code>docs/reports/EL.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; <code>Tempo</code> IS FREE, AND IT WAS SIX SURFACES RATHER THAN FOUR.</b>
+EK renamed TEMPO to CLOCK because <code>Tempo</code> was a live status chip and three talent
+nodes. <b>It was also the Sharpshooter's third talent LANE, in nine nodes, and one rune's lane</b>
+&mdash; a surface EK's own sweep could not see, because <code>_collect_names</code> walks
+<code>"name"</code> keys and a lane lives under <code>"lane"</code>. <b>The cheap side moved</b>,
+as the brief ruled: the chip is <b>PIVOT</b> (its legend already read <i>"the pivot's
+momentum"</i>), <code>sm_deep_thrust</code> is <b>Pivot</b>, <code>cr_icy_veins</code> is
+<b>Shockwave</b> (<code>battle.gd</code>'s own log line already said <i>"the shockwave sets the
+field back"</i>), <code>dv_crusade</code> is <b>Crusade</b> &mdash; <b>the name its own
+<code>crusade_ranks</code> counter always carried, which is CK's Ironclad precedent exactly, so no
+new word entered the game</b> &mdash; and the lane is <b>Pace</b>. <b>The status IDS did not
+move</b>: the collision was the LABEL, and each declaration in <code>unit.gd</code> now names its
+display word so the id stays traceable.</p>
+
+<p><b>&sect;2 &mdash; THE SIX RENAMES, AND THE COST WAS 292 ROWS.</b> AFFLICTION &rarr;
+<b>DEBUFF</b>, SHELTER &rarr; <b>DEFENSE</b>, METER &rarr; <b>RESOURCE</b>, AMP &rarr;
+<b>OFFENSE</b>, CLOCK &rarr; <b>TEMPO</b>; BREAK is unchanged. <b>Every one-line meaning was
+rewritten to fit the new word</b> rather than carried over &mdash; two were circular under the new
+names (a RESOURCE tag reading <i>"moves a resource"</i> defines the word with the word) and both
+now name the meters. <b>The brief believed the 292 rows referenced <code>TAG_ORDER</code>; they
+hold the words as literals, so every row moved</b>, and that is a finding about EK's design rather
+than about this batch. <b>What DID hold is the half that mattered</b>: no reader outside
+<code>CARD_TAGS</code> and <code>RUNE_TAGS</code> names a tag word, so the rename never left two
+files and not one clause in the game had to be read.</p>
+
+<p><b>&sect;2b &mdash; MARK, AND ITS POPULATION WAS ALREADY WRITTEN DOWN IN THE CODE.</b> EK
+sized MARK at six cards by reading the six card texts that say <i>"one mark at a time"</i>.
+<b><code>battle.DISPEL_NEVER</code>'s own comment names the marks</b> &mdash; <i>"the five MARKS
+the party applies &mdash; covenant, quarry, snare_line, feinted, hunt_mark"</i>, with
+<code>blood_debt</code>, <code>vendetta</code> and <code>reacquire</code> named the same way
+&mdash; and off that list the population is <b>TEN cards, nine of them in the draft</b>: EK missed
+<b>Covenant of Ash, Snare Line and Feint</b>, none of which says "mark" in its own text.
+<b>EIGHT TAKE MARK AS THEIR PRIMARY, AND THAT IS A FINDING RATHER THAN A RELABEL</b> &mdash; each
+was tagged for what its mark PAYS, which is a reading of the payoff and not of the card. Snare
+Line keeps DEBUFF (it marks the whole FIELD, not one enemy) and Feint keeps BREAK (it marks on one
+of its two stance branches); both carry MARK second. <b>No rune gains it</b>: not one rune payload
+field reads a mark, and that is measured rather than assumed.</p>
+
+<p><b>&sect;2c &mdash; SEVEN IS THE CEILING, AND IT IS RECORDED SO AN EIGHTH NEEDS AN
+ARGUMENT.</b> A tag only means something if <b>holding two is notable</b>. Every word added divides
+the corpus finer, and the point at which a pool of ten to thirteen cards stops producing a repeated
+combination is the point at which a second card on a tag stops being a signal. <b>Seven is where
+the next one starts costing meaning.</b></p>
+
+<p><b>&sect;3 &mdash; THE SWEEP RAN ON ALL SEVEN, AND THE INSTRUMENT WAS THE THING THAT WAS
+WRONG.</b> DEBUFF, RESOURCE and OFFENSE collide with <b>nothing</b> across 1,551 authored strings.
+BREAK is unchanged and still clean. TEMPO is clean <i>because</i> &sect;1 freed it. <b>Two collide
+and both ship, named:</b> MARK meets Hunter's Mark, Quarry's Mark, Mark of the Hunt and the
+<code>party_mark</code> chip labelled <i>"Hunter's Mark"</i> &mdash; <b>and all four MEAN what the
+tag means</b>, which is not what happened to WARD (a chip meaning <i>takes 50% less Break
+damage</i>); DEFENSE meets the <b>Defense Potion</b>, whose pouch button renders
+<code>Defense</code> on the same screen the draft card is drawn on, though never in the same
+visible frame. <b>A same-meaning collision ships and is named; a different-meaning one is
+renamed.</b> <code>check_ek</code> &sect;4 holds both as an EQUALITY against a named list, so a
+fifth collision still trips.</p>
+
+<p><b>&sect;3b &mdash; THREE HOLES IN THE SWEEP WERE FOUND AND CLOSED.</b> It could not see
+<b>talent or rune LANES</b>, it could not see <b>items</b>, and <b>its status-LABEL arm asked the
+wrong question</b>: it tested whether <code>battle.gd</code> contained <code>["Ward",</code>
+&mdash; an exact whole label &mdash; so it was blind to every label merely CONTAINING the word,
+which is precisely why the <code>party_mark</code> chip went unseen. Every label is word-boundary
+matched now, lanes, items and relics joined the population, and both new arms assert their own
+size.</p>
+
+<p><b>&sect;4 &mdash; WHAT DID NOT MOVE.</b> No clause reads a tag; no rune was re-keyed (EJ
+sized that at 59 clauses across 32 runes and it is the next batch); no card's behaviour changed and
+no magnitude moved. <b>The count of files in the SHIPPED GAME that name a tag is still THREE</b>
+&mdash; but <code>check_ek</code> &sect;3's population assertion rolled the game and the targets
+into one number, so writing a new gate was indistinguishable from breaking the rule. <b>The two
+halves fail separately now</b>, and only the targets' half moved.</p>
+
+<p><b>&sect;5 &mdash; VERIFIED.</b> <code>check_el</code> is new and carries three rulings: MARK's
+population is <b>derived live</b> out of <code>battle.gd</code>'s apply sites rather than listed;
+<code>master.html</code> &sect;6c's tag table is required to equal the code's word for word (EH
+proved that document's prose is asserted by nothing); and the widest tag line is <b>measured</b>
+here so <code>text-standard.html</code> &sect;4.8a quotes a live number rather than a transcribed
+one (DJ &sect;3). <b>The display was driven live</b> &mdash; <code>check_map_screen</code> renders
+12 tag lines for 12 offered cards in the new vocabulary.</p>
+
 <h2>2026-09-01 &mdash; Batch EK: ARCHETYPE TAGS</h2>
 <p><i>A shared vocabulary that names what a card is FOR, carried by every ability in the corpus
 and every authored rune, and <b>shown to the player on the draft card</b>. <b>MECHANICALLY INERT

@@ -66,7 +66,9 @@ const NODES := {
 	"sm_momentum_sm": [6, "Blade", "Overwhelm", "overwhelm_ranks", 1],
 	"sm_riposte": [6, "Poise", "Riposte", "counter_attacks", 1],
 	"sm_punish": [6, "Breaker", "Punishment", "punishment_ranks", 1],
-	"sm_deep_thrust": [7, "Blade", "Tempo", "tempo_ranks", 1],
+	# BATCH EL §1 RE-POINTED: the node is PIVOT now — `Tempo` was freed for the
+	# archetype tag. The id and the counter did NOT move.
+	"sm_deep_thrust": [7, "Blade", "Pivot", "tempo_ranks", 1],
 	"sm_composure": [7, "Poise", "Deflection", "deflection", 1],
 	"sm_guarded": [7, "Breaker", "Off Balance", "off_balance_ranks", 1],
 	"sm_execute": [9, "Blade", "Finisher", "", 0],

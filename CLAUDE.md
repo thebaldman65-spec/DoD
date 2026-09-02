@@ -498,7 +498,8 @@ corpus came to hold both at once.
 
 **NO CODE MOVED. FIVE NODE TEXTS DID**: `sm_deep_thrust` (1→2), `py_flame_shield` (3→4),
 `dv_resolve` (3/5→4/6), `cr_rime` (3→4) and — found by CV's own sweep of all 324, not named in the
-brief — `wd_hold_line` (the undying window, 1/2→2/3). The Tempo chip's legend said "one turn" and
+brief — `wd_hold_line` (the undying window, 1/2→2/3). The Pivot chip's legend (then named Tempo) said
+"one turn" and
 moved with them. **The one place the old reading was written down as a rule was
 `battle.gd`'s `hold_the_line` comment**; it now records the ruling instead.
 
@@ -1942,8 +1943,8 @@ BACKWARDS** — the intuitive authoring ("the Aggressive branch is the offensive
 exactly the inverted card, and it would still read fine on the tooltip.
 · **THE PIVOT IS ONE IMPLEMENTATION, THREE CALLERS — `_swordmaster_switch(u)`** (Guard Change,
   Precision Strike, Feint). Batch AK's Guard Change could afford to own the pivot inline while it
-  was the only swap in the game; three copies of "flip it, restamp the chip, pay Tempo" drift.
-· **TEMPO IS PART OF THE PIVOT AND NOT PART OF GUARD CHANGE**, and that is a decision: the node's
+  was the only swap in the game; three copies of "flip it, restamp the chip, pay Pivot" drift.
+· **PIVOT IS PART OF THE SWAP AND NOT PART OF GUARD CHANGE**, and that is a decision: the node's
   text reads "Switching stance grants +30% damage for 1 turn" and NAMES NO ABILITY, so a swap
   that skipped it would make a shipped tooltip false. Everything Guard Change pays BEYOND the
   pivot — its Break damage, Sunder Guard, No Quarter, the parry perfect — stays on Guard Change.
@@ -1996,7 +1997,7 @@ today; a property is the thing worth pinning.
   **BLINK — a MAGE CLASS-WIDE DRAFT CARD whose own comment names tempo as its axis**, **BLESSING OF
   ZEAL — the Devout's PROTECTED CORE**, and three talent nodes (Frostbound Hours, Cryomancer Thaw
   r8, which ticks EVERY hero's; Practised Hands, Survivalist Guerilla r8; Follow-Through,
-  Sharpshooter Tempo r5). Five more sites clear a cooldown outright through `cooldowns.erase` —
+  Sharpshooter Pace r5). Five more sites clear a cooldown outright through `cooldowns.erase` —
   Sever on a Broken target, Hex of Ruin's perfect, Apex Predator, Overkill, Mark of the Hunt —
   plus Terminal Velocity. **What IS one implementation is the FUNCTION** (BQ extracted four
   hand-written copies); what is shared is the axis.
@@ -2084,7 +2085,7 @@ Chilled.** The difference is not size and it is not confidence:
   read would find nothing to apply. Fixing half of that would read as working while paying exactly
   what it pays now.
 
-## STANDING REFERENCE — AN ENGINE, AN AXIS, AND NOW A TAG (Batch EK §1)
+## STANDING REFERENCE — AN ENGINE, AN AXIS, AND NOW A TAG (Batch EK §1, NAMED AT EL §2)
 
 **THREE VOCABULARIES, AND THEY ARE NOT THE SAME ONE.** DR separated the first two; EK adds the
 third and it is the only one the player ever sees.
@@ -2092,9 +2093,9 @@ third and it is the only one the player ever sees.
 > **An ENGINE is the spec's own currency.** Exclusive, one per spec. Identity.
 > **An AXIS is an effect type** — single-target damage, healing, control, tempo. Shared, internal
 > to the design audits, and **never shown to a player**.
-> **A TAG is what a card is FOR**, in six words the player reads on the draft card:
-> **AFFLICTION · SHELTER · BREAK · METER · AMP · CLOCK.** Carried by every ability in the corpus
-> and every authored rune, at most two a card, **the first is the primary**.
+> **A TAG is what a card is FOR**, in seven words the player reads on the draft card:
+> **DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK.** Carried by every ability in
+> the corpus and every authored rune, at most two a card, **the first is the primary**.
 
 - **THE TABLES ARE `Classes.CARD_TAGS` AND `Runes.RUNE_TAGS`, AND EACH HAS EXACTLY ONE ACCESSOR.**
   `Classes.card_tags()` / `Runes.rune_tags()`, with `Classes.card_tag_line()` the ONE builder of
@@ -2102,23 +2103,56 @@ third and it is the only one the player ever sees.
   through those doors and nowhere else.
 - **THEY ARE MECHANICALLY INERT AND THAT IS A RULING, NOT AN OVERSIGHT.** No clause reads a tag
   count, no card's behaviour changes, no magnitude moves. **`check_ek` §3 asserts it as a
-  POPULATION** — every `.gd` in the repo is swept comment-stripped and the set of files naming the
-  tag surface must be exactly five, with ZERO asserted separately in `battle.gd`, `unit.gd`,
-  `talents.gd`, `run_state.gd`, `run_sim.gd` and `ability.gd`. **A batch that makes a tag do
-  something has to move a line in that gate and say why.**
-- **THE VOCABULARY IS SIX MECHANICS BECAUSE THE CORPUS DOES NOT HOLD SIX STATUS NAMES, AND THAT IS
+  POPULATION** — every `.gd` in the repo is swept comment-stripped, and **EL §3 SPLIT THAT
+  POPULATION IN TWO BECAUSE IT WAS TWO CLAIMS**: the files in the SHIPPED GAME that name a tag are
+  pinned at **THREE** (`classes.gd` and `runes.gd` define, `map_screen.gd` displays) and the
+  TARGETS that check one are listed separately. **A fourth file in the game is the fault this
+  section exists for; a fourth gate is not**, and rolling them into one number made writing a new
+  gate indistinguishable from breaking the rule. ZERO is still asserted separately in `battle.gd`,
+  `unit.gd`, `talents.gd`, `run_state.gd`, `run_sim.gd` and `ability.gd`.
+- **THE VOCABULARY IS MECHANICS BECAUSE THE CORPUS DOES NOT HOLD SIX STATUS NAMES, AND THAT IS
   MEASURED RATHER THAN ASSERTED.** The six biggest status FAMILIES in the game (Burn, Frost, Bleed,
   Poison, Ruin, Mark) reach **40 of the 154 draft cards and leave 114 with nothing**. The reason is
   structural: **a status system belongs to one spec, so it does not vary inside the pool the player
-  is drafting from** — the Pyromancer's pool is 12 Burn cards of 13. The six shipped cover **154 of
-  154** and give five to ten distinct combinations per pool. Full working and the alternative set:
-  `docs/reports/EK.md` §1.
-- **A TAG NAME IS SWEPT LIKE AN ABILITY NAME, AND TWO OF THE SIX WERE RENAMED BEFORE SHIPPING.**
-  `Ward` and `Tempo` are both live STATUS CHIPS — and `Tempo` is three talent nodes as well — so
-  WARD became **SHELTER** and TEMPO became **CLOCK**, on CJ's Ironclad precedent. **`check_ek` §4
-  re-runs that sweep live**, so a card, node, status or rune authored later with one of these six
-  words trips. **None of the six is one of DR's ENGINE names**; BREAK, METER and CLOCK *are* DR
-  axis words, which is reported and is a different check.
+  is drafting from** — the Pyromancer's pool is 12 Burn cards of 13. The seven shipped cover **154
+  of 154**. Full working and the alternative set: `docs/reports/EK.md` §1.
+- **SEVEN IS THE CEILING AND AN EIGHTH NEEDS AN ARGUMENT (RULED AT EL §2).** A tag only means
+  something if **holding two is notable**. Every word added divides the corpus finer, and the point
+  at which a pool of ten to thirteen cards stops producing a repeated combination is the point at
+  which a second card on a tag stops being a signal. **Seven is where the next one starts costing
+  meaning.** `check_ek` §2 pins the count as an EQUALITY so an eighth is a decision somebody made,
+  and prints the spread so the claim can be re-tested rather than taken.
+- **A TAG NAME IS SWEPT LIKE AN ABILITY NAME, AND THE SWEEP'S POPULATION IS WIDER THAN "EVERY
+  ABILITY, NODE, STATUS AND RUNE".** EK swept those four and shipped two renames off them (WARD →
+  SHELTER, TEMPO → CLOCK). **EL found three surfaces that sweep could not see** and added all
+  three to `check_ek` §4: **talent and rune LANES** (`_collect_names` reads `"name"` keys, and a
+  lane lives under `"lane"` — `Tempo` was the Sharpshooter's third lane in nine nodes while the
+  sweep called the tag clean), **item ids and names** (`defense` is the Defense Potion, and the
+  pouch button renders `Defense` on the same screen as the draft card), and **relics**. **And the
+  status-LABEL arm was repaired**: it asked whether `battle.gd` contained `["Ward",` — an exact
+  whole label — so it was blind to every label merely CONTAINING the word, which is why the
+  `party_mark` chip reading *"Hunter's Mark"* went unseen. Every label is word-boundary matched now.
+- **TWO OF THE SEVEN SHIP WITH NAMED COLLISIONS, AND THE EXEMPTION IS A LIST RATHER THAN A SKIP.**
+  `check_ek` §4 compares each tag's clash set against `CLASH_EXEMPT` as an EQUALITY, so a fifth
+  collision still trips. **MARK meets Hunter's Mark, Quarry's Mark, Mark of the Hunt and the
+  `party_mark` chip — and all four MEAN what the tag means**, which is not what happened to WARD
+  (`Ward` meant *takes 50% less Break damage*). **DEFENSE meets the Defense Potion**, which carries
+  no tag and can never render beside one on a row. **A SAME-MEANING COLLISION SHIPS AND IS NAMED; A
+  DIFFERENT-MEANING ONE IS RENAMED.** That is the line EL drew, and it is the reason the two words
+  the brief flagged hardest are still the words.
+- **EL §1 FREED `Tempo` BY MOVING THE CHEAP SIDE, AND THE CHEAP SIDE WAS SIX STRINGS.** The chip is
+  **PIVOT** (its own legend already said *"the pivot's momentum"*), `sm_deep_thrust` is **Pivot**,
+  `cr_icy_veins` is **Shockwave** (`battle.gd`'s own log line already said *"the shockwave sets the
+  field back"*), `dv_crusade` is **Crusade** — **the name its `crusade_ranks` counter always
+  carried, so CK's Ironclad precedent brought in no new word** — and the Sharpshooter's third lane
+  is **Pace**. **THE STATUS IDS DID NOT MOVE** (`tempo`, `shattered_tempo`, `crusade_ranks`): the
+  collision was the LABEL, and each declaration in `unit.gd` now names its display word so the id
+  stays traceable.
+- **RENAMING THE VOCABULARY COST 292 ROWS, AND THAT IS A FINDING ABOUT THE DESIGN.** `CARD_TAGS`
+  and `RUNE_TAGS` hold the words as LITERALS, not as references to `TAG_ORDER` — so every row
+  moved. **What did hold is the property that mattered**: no reader outside those two tables names
+  a tag word, so the rename never left `classes.gd` and `runes.gd` and not one clause in the game
+  had to be read. **A future rename is the same shape: two files and a `sed`, plus the documents.**
 - **A TAG IS DERIVED FROM THE READ SITE, NEVER FROM THE NAME OR THE DESCRIPTION**, and on this
   corpus a field-level reading produces almost nothing: **`heal` is 0 on all 154 draft cards** and
   123 of them carry a `special`. The read site of a card is its arm in `_resolve_special`, **plus
@@ -2126,10 +2160,23 @@ third and it is the only one the player ever sees.
   Blood Debt's whole payload is one of them), plus the card-specific helpers those call, **plus
   whatever reads the status a setup card lays** — Aegis Wall applies `aegis_wall` and nothing else,
   and its healing is in the BLOCK handler.
+- **AND THE READ SITE FOR A WHOLE TAG CAN ALREADY BE WRITTEN DOWN IN THE GAME (EL §2).** MARK's
+  population is not a judgement about which cards feel like marks: **`battle.DISPEL_NEVER`'s own
+  comment names them** — *"the five MARKS the party applies — covenant, quarry, snare_line,
+  feinted, hunt_mark"*, with `blood_debt`, `vendetta` and `reacquire` named the same way, plus
+  `party_mark` and `arcane_echo` whose card texts say *"one mark at a time"*. **That list gives TEN
+  cards; EK's reading of the card texts gave six** and missed Covenant of Ash, Snare Line and Feint
+  entirely. **`check_el` §1 derives the cards LIVE** out of `battle.gd`'s apply sites and requires
+  the table to agree in both directions, so an eleventh mark cannot arrive with its card untagged.
 - **A NEW ABILITY OR RUNE IS OWED A ROW IN THE SAME BATCH.** `check_ek` §1 walks
   `Classes.ability_corpus()` and `Runes.ids()` and requires a tag on every one, **and requires the
   tables not to outrun them either** — a row naming a card that does not exist is the shape
   `CLASS_POOLS` spent eighteen batches in.
+- **`master.html` §6c IS A DERIVED TABLE NOW, NOT A TRANSCRIBED ONE (EL §2).** `check_el` §2 parses
+  the section and requires its words, their order and their meanings to be `TAG_ORDER` and
+  `TAG_INFO` word for word, and requires the five retired words to be absent from it. **EH proved
+  that document's factual prose is asserted by nothing**; this is the one part of it that is
+  machine-comparable, so it is compared.
 
 ## STANDING RULE — THE THREE DOORS THAT BITE A NEW DRAFT CARD (Batch DS §2)
 
@@ -2171,7 +2218,7 @@ both wrong versions read fine on a tooltip.
   requirement to reward. **The free pivot asks `_ability_usable` about the REAL Guard Change** —
   the same door — so Formless refuses it and Guard Change's own 1-turn cooldown is respected, in
   one place rather than two that could disagree. **It is the PIVOT and not the ability**: Guard
-  Change's own 15 BD, Sunder Guard's 40-to-every-enemy, No Quarter and Tempo stay on that card, or
+  Change's own 15 BD, Sunder Guard's 40-to-every-enemy, No Quarter and Pivot stay on that card, or
   a Defensive build parrying twice a turn lands 80 free Break across the field every turn.
 · **`_ability_usable` IS THE DOOR**, matching how Death Ray's Resonance gate and BV's nine are
   refused — so the greyed button, the bot's drafted-pick wrapper and the cast itself can never

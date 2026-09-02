@@ -160,89 +160,99 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 static var _data := {}
 
 
-# ================== BATCH EK §2 — THE RUNE'S ARCHETYPE TAGS ==================
+# ============ BATCH EK §2 / EL §2 — THE RUNE'S ARCHETYPE TAGS ============
 #
-# **THE SAME SIX WORDS THE CARDS CARRY**, keyed by rune id, so a rune and a
-# draft card can be read as pointing the same direction. The vocabulary, why it
-# is six MECHANICS rather than six status names, and the BR §1 name sweep are
-# all in `Classes.CARD_TAGS`'s header — **one authored explanation, not two.**
+# **THE SAME WORDS THE CARDS CARRY**, keyed by rune id, so a rune and a draft
+# card can be read as pointing the same direction. The vocabulary, why it is
+# MECHANICS rather than status names, why EL renamed six of the seven, and the
+# BR §1 name sweep are all in `Classes.CARD_TAGS`'s header — **one authored
+# explanation, not two.**
 #
 # **DERIVED FROM THE READ SITE OF EACH PAYLOAD FIELD**, never from the rune's
 # `desc` and never from its `lane`. A rune's payload is a set of FIELDS, so the
 # field's read site is where the rune does its work — the instrument EJ used
 # for the charter audit, one layer in. **A rune whose whole payload is an
 # `ability` edit carries the tag of the EDIT rather than of the ability**: the
-# Rune of Zealotry makes Smite hit harder, so it is AMP, not BREAK.
+# Rune of Zealotry makes Smite hit harder, so it is OFFENSE, not BREAK.
+#
+# **EL'S SEVENTH TAG REACHES NO RUNE, AND THAT IS MEASURED RATHER THAN
+# ASSUMED.** Every mark in the game is laid by a CARD; not one rune payload
+# field reads `covenant`, `quarry`, `snare_line`, `feinted`, `hunt_mark`,
+# `party_mark`, `blood_debt`, `vendetta`, `reacquire` or `arcane_echo`. The
+# Rune of the Whispering Dark says *"each mark of Ruin"* in its `desc`, which
+# is the ordinary English word for a stack and is exactly the reading this
+# header forbids taking. **MARK therefore appears in `Classes.TAG_ORDER` and
+# in no row below.**
 #
 # **MECHANICALLY INERT.** Nothing reads these for anything but display, and
 # `check_ek` asserts it. **EJ SIZED THE RE-KEY THAT WOULD USE THEM** — 59
-# clauses in 32 runes — and that is the batch after this one, not this one.
+# clauses in 32 runes — and that is the next batch, not this one.
 const RUNE_TAGS := {
-	"binding_souls": ["SHELTER"],  # Rune of Binding Souls
-	"martyr": ["SHELTER", "CLOCK"],  # Rune of the Martyr
-	"zealotry": ["AMP"],  # Rune of Zealotry
-	"hoarfrost_points": ["AFFLICTION", "AMP"],  # Rune of Hoarfrost Points
-	"true_flight": ["AMP"],  # Rune of True Flight
-	"wolfs_hunger": ["SHELTER", "AMP"],  # Rune of the Wolf's Hunger
+	"binding_souls": ["DEFENSE"],  # Rune of Binding Souls
+	"martyr": ["DEFENSE", "TEMPO"],  # Rune of the Martyr
+	"zealotry": ["OFFENSE"],  # Rune of Zealotry
+	"hoarfrost_points": ["DEBUFF", "OFFENSE"],  # Rune of Hoarfrost Points
+	"true_flight": ["OFFENSE"],  # Rune of True Flight
+	"wolfs_hunger": ["DEFENSE", "OFFENSE"],  # Rune of the Wolf's Hunger
 	"comet": ["BREAK"],  # Rune of the Comet
-	"reckless_channeling": ["SHELTER", "AMP"],  # Rune of Reckless Channeling
-	"wellspring": ["METER"],  # Rune of the Wellspring
-	"emberforged": ["AFFLICTION", "AMP"],  # Emberforged Rune
-	"old_wrath": ["METER"],  # Rune of Old Wrath
-	"warriors_edge": ["AMP", "METER"],  # Rune of the Whetted Edge
-	"resonant_core": ["AMP"],  # Rune of the Resonant Core
+	"reckless_channeling": ["DEFENSE", "OFFENSE"],  # Rune of Reckless Channeling
+	"wellspring": ["RESOURCE"],  # Rune of the Wellspring
+	"emberforged": ["DEBUFF", "OFFENSE"],  # Emberforged Rune
+	"old_wrath": ["RESOURCE"],  # Rune of Old Wrath
+	"warriors_edge": ["OFFENSE", "RESOURCE"],  # Rune of the Whetted Edge
+	"resonant_core": ["OFFENSE"],  # Rune of the Resonant Core
 	"seventh_bolt": ["BREAK"],  # Rune of the Seventh Bolt
-	"unquiet_mind": ["METER", "CLOCK"],  # Rune of the Unquiet Mind
-	"wide_current": ["METER", "AMP"],  # Rune of the Wide Current
-	"deep_bond": ["AFFLICTION", "SHELTER"],  # Rune of the Deep Bond
-	"loosened_straps": ["SHELTER"],  # Rune of the Loosened Straps
-	"shared_wild": ["AFFLICTION", "AMP"],  # Rune of the Shared Wild
-	"turning_pack": ["AFFLICTION", "AMP"],  # Rune of the Turning Pack
-	"boiling_blood": ["SHELTER", "AMP"],  # Rune of Boiling Blood
-	"broad_path": ["SHELTER", "AFFLICTION"],  # Rune of the Broad Path
-	"exsanguination": ["SHELTER", "AMP"],  # Rune of Exsanguination
-	"warpath": ["AFFLICTION", "METER"],  # Rune of the Warpath
-	"bitter_grip": ["AFFLICTION"],  # Rune of the Bitter Grip
-	"honed_lance": ["AMP", "METER"],  # Rune of the Honed Lance
-	"killing_cold": ["AFFLICTION", "SHELTER"],  # Rune of the Killing Cold
-	"long_winter": ["AFFLICTION"],  # Rune of the Long Winter
-	"last_rites": ["SHELTER", "CLOCK"],  # Rune of the Last Rites
-	"open_hand": ["AMP"],  # Rune of the Open Hand
-	"sleepless_vigil": ["SHELTER", "CLOCK"],  # Rune of the Sleepless Vigil
-	"triage_ward": ["METER", "AMP"],  # Rune of the Triage Ward
-	"binding_oath": ["METER", "SHELTER"],  # Rune of the Binding Oath
-	"burning_censer": ["SHELTER", "AFFLICTION"],  # Rune of the Burning Censer
-	"standing_vow": ["SHELTER", "METER"],  # Rune of the Standing Vow
-	"warded_robes": ["SHELTER"],  # Rune of the Warded Robes
-	"carrion_wake": ["SHELTER", "AFFLICTION"],  # Rune of the Carrion Wake
-	"long_hunt": ["AFFLICTION"],  # Rune of the Long Hunt
-	"quick_spring": ["AFFLICTION", "CLOCK"],  # Rune of the Quick Spring
-	"weeping_wound": ["AFFLICTION"],  # Rune of the Weeping Wound
-	"deepening_ruin": ["AFFLICTION", "SHELTER"],  # Rune of the Deepening Ruin
-	"flayed_mind": ["AFFLICTION", "BREAK"],  # Rune of the Flayed Mind
-	"hollow_chalice": ["SHELTER", "AFFLICTION"],  # Rune of the Hollow Chalice
-	"whispering_dark": ["METER", "AFFLICTION"],  # Rune of the Whispering Dark
-	"blast_radius": ["AFFLICTION"],  # Rune of the Blast Radius
-	"cinder_trail": ["AFFLICTION"],  # Rune of the Cinder Trail
-	"long_burn": ["AFFLICTION"],  # Rune of the Long Burn
-	"white_flame": ["SHELTER", "AFFLICTION"],  # Rune of the White Flame
-	"deep_sight": ["METER", "AMP"],  # Rune of the Deep Sight
-	"level_aim": ["METER", "AMP"],  # Rune of the Level Aim
-	"long_draw": ["CLOCK", "METER"],  # Rune of the Long Draw
-	"narrow_gap": ["AMP", "AFFLICTION"],  # Rune of the Narrow Gap
-	"bared_guard": ["SHELTER"],  # Rune of the Bared Guard
-	"duelist": ["SHELTER", "BREAK"],  # Rune of the Duelist
+	"unquiet_mind": ["RESOURCE", "TEMPO"],  # Rune of the Unquiet Mind
+	"wide_current": ["RESOURCE", "OFFENSE"],  # Rune of the Wide Current
+	"deep_bond": ["DEBUFF", "DEFENSE"],  # Rune of the Deep Bond
+	"loosened_straps": ["DEFENSE"],  # Rune of the Loosened Straps
+	"shared_wild": ["DEBUFF", "OFFENSE"],  # Rune of the Shared Wild
+	"turning_pack": ["DEBUFF", "OFFENSE"],  # Rune of the Turning Pack
+	"boiling_blood": ["DEFENSE", "OFFENSE"],  # Rune of Boiling Blood
+	"broad_path": ["DEFENSE", "DEBUFF"],  # Rune of the Broad Path
+	"exsanguination": ["DEFENSE", "OFFENSE"],  # Rune of Exsanguination
+	"warpath": ["DEBUFF", "RESOURCE"],  # Rune of the Warpath
+	"bitter_grip": ["DEBUFF"],  # Rune of the Bitter Grip
+	"honed_lance": ["OFFENSE", "RESOURCE"],  # Rune of the Honed Lance
+	"killing_cold": ["DEBUFF", "DEFENSE"],  # Rune of the Killing Cold
+	"long_winter": ["DEBUFF"],  # Rune of the Long Winter
+	"last_rites": ["DEFENSE", "TEMPO"],  # Rune of the Last Rites
+	"open_hand": ["OFFENSE"],  # Rune of the Open Hand
+	"sleepless_vigil": ["DEFENSE", "TEMPO"],  # Rune of the Sleepless Vigil
+	"triage_ward": ["RESOURCE", "OFFENSE"],  # Rune of the Triage Ward
+	"binding_oath": ["RESOURCE", "DEFENSE"],  # Rune of the Binding Oath
+	"burning_censer": ["DEFENSE", "DEBUFF"],  # Rune of the Burning Censer
+	"standing_vow": ["DEFENSE", "RESOURCE"],  # Rune of the Standing Vow
+	"warded_robes": ["DEFENSE"],  # Rune of the Warded Robes
+	"carrion_wake": ["DEFENSE", "DEBUFF"],  # Rune of the Carrion Wake
+	"long_hunt": ["DEBUFF"],  # Rune of the Long Hunt
+	"quick_spring": ["DEBUFF", "TEMPO"],  # Rune of the Quick Spring
+	"weeping_wound": ["DEBUFF"],  # Rune of the Weeping Wound
+	"deepening_ruin": ["DEBUFF", "DEFENSE"],  # Rune of the Deepening Ruin
+	"flayed_mind": ["DEBUFF", "BREAK"],  # Rune of the Flayed Mind
+	"hollow_chalice": ["DEFENSE", "DEBUFF"],  # Rune of the Hollow Chalice
+	"whispering_dark": ["RESOURCE", "DEBUFF"],  # Rune of the Whispering Dark
+	"blast_radius": ["DEBUFF"],  # Rune of the Blast Radius
+	"cinder_trail": ["DEBUFF"],  # Rune of the Cinder Trail
+	"long_burn": ["DEBUFF"],  # Rune of the Long Burn
+	"white_flame": ["DEFENSE", "DEBUFF"],  # Rune of the White Flame
+	"deep_sight": ["RESOURCE", "OFFENSE"],  # Rune of the Deep Sight
+	"level_aim": ["RESOURCE", "OFFENSE"],  # Rune of the Level Aim
+	"long_draw": ["TEMPO", "RESOURCE"],  # Rune of the Long Draw
+	"narrow_gap": ["OFFENSE", "DEBUFF"],  # Rune of the Narrow Gap
+	"bared_guard": ["DEFENSE"],  # Rune of the Bared Guard
+	"duelist": ["DEFENSE", "BREAK"],  # Rune of the Duelist
 	"shattered_guard": ["BREAK"],  # Rune of the Shattered Guard
-	"still_wrist": ["SHELTER", "METER"],  # Rune of the Still Wrist
-	"grudges": ["AMP"],  # Rune of Grudges
-	"iron_promise": ["SHELTER", "CLOCK"],  # Rune of the Iron Promise
-	"sentinel": ["SHELTER", "BREAK"],  # Rune of the Sentinel
-	"standard": ["SHELTER"],  # Rune of the Standard
-	"anchor": ["SHELTER", "CLOCK"],  # Anchor Rune
-	"colossus": ["SHELTER"],  # Rune of the Colossus
-	"glass": ["AMP", "SHELTER"],  # Glass Rune
-	"reaper": ["AMP"],  # Rune of the Reaper
-	"vampiric": ["SHELTER", "AMP"],  # Vampiric Rune
+	"still_wrist": ["DEFENSE", "RESOURCE"],  # Rune of the Still Wrist
+	"grudges": ["OFFENSE"],  # Rune of Grudges
+	"iron_promise": ["DEFENSE", "TEMPO"],  # Rune of the Iron Promise
+	"sentinel": ["DEFENSE", "BREAK"],  # Rune of the Sentinel
+	"standard": ["DEFENSE"],  # Rune of the Standard
+	"anchor": ["DEFENSE", "TEMPO"],  # Anchor Rune
+	"colossus": ["DEFENSE"],  # Rune of the Colossus
+	"glass": ["OFFENSE", "DEFENSE"],  # Glass Rune
+	"reaper": ["OFFENSE"],  # Rune of the Reaper
+	"vampiric": ["DEFENSE", "OFFENSE"],  # Vampiric Rune
 }
 
 
@@ -253,7 +263,7 @@ static func rune_tags(id: String) -> Array:
 	return RUNE_TAGS.get(id, [])
 
 
-# The tag line as a surface renders it — "SHELTER · METER", or "".
+# The tag line as a surface renders it — "DEFENSE · RESOURCE", or "".
 static func rune_tag_line(id: String) -> String:
 	var t: Array = rune_tags(id)
 	if t.is_empty():

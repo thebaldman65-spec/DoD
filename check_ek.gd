@@ -123,7 +123,11 @@ func _s1_coverage() -> void:
 # ── §2 — THE VOCABULARY ─────────────────────────────────────────────────────
 func _s2_vocabulary() -> void:
 	print("--- EK §2: the vocabulary ---")
-	ok(Classes.TAG_ORDER.size() == 6, "the vocabulary is six words (%d)"
+	# BATCH EL §2 — SEVEN. MARK joined and six of the six were renamed; the
+	# EQUALITY is what makes an eighth a decision somebody made, which is why
+	# it is BUMPED rather than loosened to a `>=` (CV's idiom). **Seven is the
+	# stated ceiling** — `Classes.TAG_ORDER`'s header carries the argument.
+	ok(Classes.TAG_ORDER.size() == 7, "the vocabulary is seven words (%d)"
 		% Classes.TAG_ORDER.size())
 	ok(Classes.TAG_INFO.size() == Classes.TAG_ORDER.size(),
 		"TAG_INFO and TAG_ORDER hold the same number of words (%d / %d)" % [
@@ -203,11 +207,28 @@ const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 	"card_tag_line", "TAG_INFO", "TAG_ORDER", "tag_meaning",
 	"RUNE_TAGS", "rune_tags", "rune_tag_line"]
 
-# The authored readers. `classes.gd` and `runes.gd` DEFINE the tables,
-# `map_screen.gd` is the one display surface, and the last two are the targets
-# that check them.
-const TAG_READERS := ["scripts/classes.gd", "scripts/runes.gd",
-	"scripts/map_screen.gd", "check_ek.gd", "check_map_screen.gd"]
+# The authored readers, SPLIT IN TWO AT BATCH EL §3 BECAUSE THEY ARE TWO
+# DIFFERENT CLAIMS AND ONLY ONE OF THEM IS ABOUT THE GAME.
+#
+# **EL's BRIEF RULED THAT THIS POPULATION MUST NOT MOVE, AND IT MOVED — BY ONE
+# GATE.** `check_el.gd` reads `CARD_TAGS` to derive MARK's population out of
+# `battle.DISPEL_NEVER`, so it names the tag surface and lands in the sweep.
+# **That is a sixth CHECKER, not a sixth reader**, and rolling the two counts
+# into one number is what made the brief's rule impossible to obey without
+# either weakening the gate or refusing to write one.
+#
+# **THE HALF THAT IS A CLAIM ABOUT THE GAME IS PINNED AT THREE AND HAS NOT
+# MOVED**: two files DEFINE the tables and one DISPLAYS them. A fourth arriving
+# here is a fourth place in the shipped game that knows what a tag is, and that
+# is the assertion EK wrote this section for.
+const TAG_DEFINERS := ["scripts/classes.gd", "scripts/runes.gd",
+	"scripts/map_screen.gd"]
+
+# The half that is a claim about the INSTRUMENTS. A gate reading a tag cannot
+# change how the game behaves, so this list grows with the tree — but it is
+# still AUTHORED rather than derived from a `check_*.gd` glob, because a
+# derived list would bless a gate that started doing something else.
+const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
@@ -234,11 +255,28 @@ func _s3_inertness() -> void:
 	ok(walked >= 80, "the inertness sweep read a real population (%d .gd files)" % walked)
 	var names: Array = found.keys()
 	names.sort()
-	var expected: Array = TAG_READERS.duplicate()
-	expected.sort()
-	ok(names == expected, "exactly the authored files name a tag — found [%s], expected [%s]"
-		% [", ".join(names), ", ".join(expected)])
-	print("    %d of %d .gd files name the tag surface" % [names.size(), walked])
+	# THE TWO HALVES FAIL SEPARATELY. A fourth file in the shipped game naming
+	# a tag is a different fault from a fourth gate checking one, and reporting
+	# them as one number is what stopped this section from being obeyable.
+	var in_game: Array = []
+	var in_gates: Array = []
+	for n in names:
+		if String(n).begins_with("check_") or String(n).begins_with("test_"):
+			in_gates.append(n)
+		else:
+			in_game.append(n)
+	var def_expected: Array = TAG_DEFINERS.duplicate()
+	def_expected.sort()
+	var chk_expected: Array = TAG_CHECKERS.duplicate()
+	chk_expected.sort()
+	ok(in_game == def_expected,
+		"exactly three files in the GAME name a tag — found [%s], expected [%s]"
+			% [", ".join(in_game), ", ".join(def_expected)])
+	ok(in_gates == chk_expected,
+		"exactly the authored TARGETS check a tag — found [%s], expected [%s]"
+			% [", ".join(in_gates), ", ".join(chk_expected)])
+	print("    %d of %d .gd files name the tag surface (%d in the game, %d in the targets)"
+		% [names.size(), walked, in_game.size(), in_gates.size()])
 
 	for f in NO_TAG_FILES:
 		var body := Gate.strip_comments(FileAccess.get_file_as_string("res://" + f))
@@ -279,14 +317,55 @@ func _all_gd() -> Array:
 
 
 # ── §4 — THE NAME SWEEP (BR §1) ─────────────────────────────────────────────
-# **ASSERTED LIVE, NOT RECORDED.** Two of the six were RENAMED before shipping
-# because they collided — WARD with the `Ward` chip, TEMPO with the `Tempo`
-# chip and three talent nodes — and the whole point of the rename is that the
-# collision must not come back. A card, node, status or rune authored later
-# with one of these words trips here.
+# **ASSERTED LIVE, NOT RECORDED.** EK renamed two of its six because they
+# collided — WARD with the `Ward` chip, TEMPO with the `Tempo` chip and three
+# talent nodes — and **EL took TEMPO back by moving the chip, the nodes and the
+# LANE instead** (§1). The whole point of either rename is that the collision
+# must not come back. A card, node, lane, item, status or rune authored later
+# with one of these seven words trips here.
+# **BATCH EL §3 — THE POPULATION GREW AND ONE TAG CARRIES NAMED EXEMPTIONS.**
+#
+# TWO SURFACES WERE ADDED, BOTH BECAUSE EK'S OWN SWEEP MISSED THEM. `_node_names`
+# collects `"name"` keys, so a talent LANE — which lives under `"lane"` — was
+# invisible: `Tempo` was the Sharpshooter's third lane as well as a chip and
+# three nodes, and EL had to free nine more strings than its brief listed. ITEM
+# names were absent too, and the pouch button on the map screen renders
+# `Defense` — the same screen the draft card's tag line is drawn on.
+#
+# **AND `MARK` SHIPS WITH FOUR NAMED COLLISIONS, WHICH IS NOT WHAT HAPPENED TO
+# WARD AND TEMPO.** Those two named DIFFERENT things wearing one word. Hunter's
+# Mark, Quarry's Mark and Mark of the Hunt ARE marks and all three CARRY the
+# tag, and the `party_mark` chip reads "Hunter's Mark" for the same reason. The
+# exemption is a LIST rather than a skip, so a fifth collision — a new card, a
+# node, a rune — still turns this section red.
+const CLASH_EXEMPT := {
+	"MARK": ["ability:Hunter's Mark", "ability:Mark of the Hunt",
+		"ability:Quarry's Mark", "status label:Hunter's Mark"],
+	# **DEFENSE MEETS THE DEFENSE POTION, AND THE POUCH BUTTON RENDERS IT ON
+	# THE SAME SCREEN.** `map_screen._draw_footer` prints
+	# `ITEM_INFO[id][0].replace(" Potion", "")`, so the button reads "Defense"
+	# — and `_draw_hero_cards`, twelve hundred lines up in the same file, draws
+	# the tag line. **They are never in one visible frame**: the draft is an
+	# overlay dimming the map at 0.86 alpha and the pouch is behind it. That is
+	# a NARROWER exposure than `Ward` had (a chip and a tag both inside the
+	# battle) and a WIDER one than a talent node's, and EL ships it rather than
+	# renaming a fourth thing. **An item carries no tag**, so nothing can ever
+	# render `DEFENSE` and `Defense` as two labels on one row.
+	"DEFENSE": ["item:Defense Potion", "item:defense"],
+}
+
 func _s4_name_sweep() -> void:
 	print("--- EK §4: the BR §1 name sweep ---")
 	var battle_src := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	var labels: Array = _status_labels(battle_src)
+	ok(labels.size() >= 150,
+		"the status-label arm read a real population (%d labels)" % labels.size())
+	var lanes_seen := {}
+	for sp0 in Talents.LANE_TREES:
+		for ln in _lane_names(String(sp0)):
+			lanes_seen[ln] = true
+	ok(lanes_seen.size() >= 30,
+		"the lane arm read a real population (%d distinct lanes)" % lanes_seen.size())
 	for tag in Classes.TAG_ORDER:
 		var word := String(tag).to_lower()
 		var clashes: Array = []
@@ -297,20 +376,99 @@ func _s4_name_sweep() -> void:
 			for node_name in _node_names(String(spec)):
 				if _has_word(node_name.to_lower(), word):
 					clashes.append("node:" + node_name)
+			# BATCH EL §3 — THE LANE, WHICH THIS SWEEP COULD NOT SEE.
+			for lane_name in _lane_names(String(spec)):
+				if _has_word(lane_name.to_lower(), word):
+					clashes.append("lane:" + lane_name)
+		# BATCH EL §3 — THE ITEMS. `defense` is an item id and the pouch button
+		# renders "Defense" on the very screen the tag line is drawn on.
+		for iid in Run.ITEM_IDS:
+			if _has_word(String(iid).to_lower(), word):
+				clashes.append("item:" + String(iid))
+			var iname := String((Run.ITEM_INFO[iid] as Array)[0])
+			if _has_word(iname.to_lower(), word):
+				clashes.append("item:" + iname)
 		for sid in BattleUnit.DEBUFF_IDS:
 			if _has_word(String(sid).to_lower(), word):
 				clashes.append("status:" + String(sid))
 		for rid in Runes.ids():
-			var rn := String(Runes.config(String(rid)).get("name", ""))
+			var cfg: Dictionary = Runes.config(String(rid))
+			var rn := String(cfg.get("name", ""))
 			if _has_word(rn.to_lower(), word):
 				clashes.append("rune:" + rn)
+			# BATCH EL §3 — A RUNE CARRIES A LANE TOO, and it is the same hole
+			# the talent lane was: the sweep read the NAME and nothing else.
+			if _has_word(String(cfg.get("lane", "")).to_lower(), word):
+				clashes.append("rune lane:" + String(cfg["lane"]))
+		# BATCH EL §3 — THE RELICS. Party-wide, named on their own screen, and
+		# `Ironbark Ward` is exactly the shape that made WARD untenable.
+		for relic_id in Relics.POOL:
+			if _has_word(String(relic_id).to_lower(), word):
+				clashes.append("relic:" + String(relic_id))
+			var reln := String((Relics.POOL[relic_id] as Dictionary).get("name", ""))
+			if _has_word(reln.to_lower(), word):
+				clashes.append("relic:" + reln)
 		# The STATUS LABEL is the surface a player reads, and it is the half
 		# that made WARD and TEMPO untenable. It lives in a const dictionary in
 		# `battle.gd`, so it is read out of the source rather than off a class.
-		if battle_src.contains("[\"%s\"," % String(tag).capitalize()):
-			clashes.append("status label:" + String(tag).capitalize())
-		ok(clashes.is_empty(), "the tag %s collides with nothing (%s)" % [
-			tag, ", ".join(clashes)])
+		#
+		# **BATCH EL §3 REPAIRED THIS ARM AND IT WAS THE WEAKEST ONE IN THE
+		# GATE.** It used to ask whether `battle.gd` contained `["Ward",` — an
+		# EXACT whole label equal to the capitalised tag. That catches `Ward`
+		# and `Tempo`, whose labels ARE the word, and is blind to every label
+		# that merely CONTAINS it. `party_mark`'s label is "Hunter's Mark", so
+		# under the old arm the MARK sweep reported the status half clean while
+		# a chip rendered the word. Every label is extracted now and matched on
+		# a word boundary like every other population.
+		for lbl in _status_labels(battle_src):
+			if _has_word(String(lbl).to_lower(), word):
+				clashes.append("status label:" + String(lbl))
+		# THE EXEMPTIONS ARE COMPARED AS A SET, NOT SUBTRACTED. A skip would
+		# hide a NEW collision behind an old one; an equality means the tag
+		# collides with exactly what EL wrote down and nothing else.
+		var allowed: Array = (CLASH_EXEMPT.get(String(tag), []) as Array).duplicate()
+		allowed.sort()
+		clashes.sort()
+		ok(clashes == allowed, "the tag %s collides with exactly what EL recorded — found [%s], expected [%s]" % [
+			tag, ", ".join(clashes), ", ".join(allowed)])
+
+
+# BATCH EL §3 — EVERY STATUS LABEL, out of `STATUS_INFO`'s own source block.
+# BOUNDED TO THE BLOCK rather than swept over the file, because `battle.gd`
+# holds other `"key": ["Label",` dictionaries and a clash reported out of one
+# of those would be a clash with something no player reads. The population is
+# asserted below (EA §5): a walk that read nothing reports a clean tree.
+func _status_labels(src: String) -> Array:
+	var out: Array = []
+	var start := src.find("const STATUS_INFO := {")
+	if start < 0:
+		return out
+	var body := src.substr(start, src.find("\n}", start) - start)
+	var re := RegEx.create_from_string("\n\t\"[a-z0-9_]+\": \\[\"([^\"]+)\",")
+	for m in re.search_all(body):
+		out.append(m.get_string(1))
+	return out
+
+
+# BATCH EL §3 — LANE NAMES. They live under a `"lane"` key on every node, so
+# `_collect_names`'s `"name"` walk never reached one, and `Tempo` sat in nine
+# of them while EK's sweep reported the tag clean.
+func _lane_names(spec: String) -> Array:
+	var seen := {}
+	var tree = Talents.LANE_TREES.get(spec, {})
+	_collect_lanes(tree, seen)
+	return seen.keys()
+
+
+func _collect_lanes(o, seen: Dictionary) -> void:
+	if o is Dictionary:
+		for k in o:
+			if String(k) == "lane" and o[k] is String:
+				seen[String(o[k])] = true
+			_collect_lanes(o[k], seen)
+	elif o is Array:
+		for x in o:
+			_collect_lanes(x, seen)
 
 
 func _node_names(spec: String) -> Array:
