@@ -2684,9 +2684,15 @@ func _run_battle() -> void:
 		# own — 5 Break damage per rank at the bearer's every turn.
 		if not u.is_hero and not u.broken and u.has_status("ruin"):
 			var ent_occ := _living_occultist()
-			if ent_occ != null and ent_occ.entropy_ranks > 0:
-				var ent_result: Dictionary = u.take_hit(0, ent_occ.entropy_ranks)
-				_stat_bd(ent_occ, ent_occ.entropy_ranks)
+			# BATCH EN — SUMMED INTO A LOCAL, DP's IDIOM. The guard is the half
+			# that goes silently dead: an Occultist holding the Rune of the
+			# Deepening Ruin and NOT the Entropy node reads 0 on the node's own
+			# counter, nothing throws, and the rune pays nothing forever.
+			var ent_rank := 0 if ent_occ == null \
+				else ent_occ.entropy_ranks + ent_occ.rune_entropy_ranks
+			if ent_occ != null and ent_rank > 0:
+				var ent_result: Dictionary = u.take_hit(0, ent_rank)
+				_stat_bd(ent_occ, ent_rank)
 				u.float_text("+%d BD" % ent_result.get("bd", 0), Color(0.62, 0.52, 0.35))
 				_log("   → Talent: Entropy — Ruin grinds %s (+%d Break damage)" % [
 					u.unit_name, ent_result.get("bd", 0)], "#b0a8e0")
@@ -3956,10 +3962,13 @@ func _player_turn(u: BattleUnit) -> void:
 				u.unit_name, toll, u.entropy_toll], "#b0a8e0")
 	# Pleasure from Pain (Occultist talent): every unique affliction on the
 	# enemy team feeds the party as the Occultist's turn ends.
-	if u.pleasure_pct > 0.0 and not u.dead and not battle_over:
+	# BATCH EN — the pair summed into a local before the guard reads it, so a
+	# rune-only Occultist is not refused at the door (DP's Whispering Dark case).
+	var pp_pct := u.pleasure_pct + u.rune_pleasure_pct
+	if pp_pct > 0.0 and not u.dead and not battle_over:
 		var pp_uniques := _unique_enemy_debuffs()
 		if pp_uniques > 0:
-			var pp_amt := maxi(int(round(u.max_hp * 0.01 * u.pleasure_pct
+			var pp_amt := maxi(int(round(u.max_hp * 0.01 * pp_pct
 				* pp_uniques)), 1)
 			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
@@ -3969,13 +3978,17 @@ func _player_turn(u: BattleUnit) -> void:
 				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
 	# as the Cleric's turn ends.
-	if u.divine_presence_pct > 0 and not u.dead and not battle_over:
+	# BATCH EN — the pair summed into a local, on the two above's pattern: the
+	# Rune of the Sleepless Vigil is a HOLY rune and its holder need not own the
+	# node, so the guard reading `divine_presence_pct` alone would refuse her.
+	var dp_pct := u.divine_presence_pct + u.rune_divine_presence_pct
+	if dp_pct > 0 and not u.dead and not battle_over:
 		var dp_pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
 		if not dp_pool.is_empty():
 			var dp_t := _lowest_hp(dp_pool)
 			if dp_t.hp < dp_t.max_hp:
 				var dp_amt := maxi(int(round(dp_t.max_hp * 0.01
-					* u.divine_presence_pct * _healing_done_mult(u))), 1)
+					* dp_pct * _healing_done_mult(u))), 1)
 				var dp_got: int = dp_t.heal_amount(dp_amt, dp_t != u)
 				dp_t.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
 				_stat_heal(u, dp_got, dp_t)

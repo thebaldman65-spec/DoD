@@ -470,8 +470,8 @@
   "test_batch_av": {
    "kind": "suite",
    "checks": [
-    350,
-    350
+    351,
+    351
    ],
    "checks_obs": 1,
    "fails": [
@@ -498,8 +498,8 @@
   "test_batch_ax": {
    "kind": "suite",
    "checks": [
-    350,
-    350
+    352,
+    352
    ],
    "checks_obs": 1,
    "fails": [
@@ -1165,8 +1165,8 @@
   "check_em": {
    "kind": "gate",
    "checks": [
-    210,
-    210
+    223,
+    223
    ],
    "checks_obs": 3,
    "fails": [

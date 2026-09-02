@@ -14,6 +14,81 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EN: THE LAST THREE CLAUSES, AND THE RUNG THAT IS A DOOR</h2>
+<p><i>The rune charter finishes at <b>59 of 59</b>. The lowest difficulty rung was ruled removed
+and <b>was not removed</b>, because it is the only thing that opens a player's first talent row
+&mdash; reported and stopped, as the brief instructed. Per-hero relics <b>never landed</b>, and
+<code>CLAUDE.md</code> now says what a relic is FOR as distinct from a talent. The sixteen runes
+the charter empties are split, derived and PRESENTED; nothing was authored. Full working:
+<code>docs/reports/EN.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE THREE HOMELESS CLAUSES GET RUNE-OWNED FIELDS, AND THE RUNE PAYS WHAT IT
+PAID.</b> <code>divine_presence_pct</code>, <code>entropy_ranks</code> and
+<code>pleasure_pct</code> now write <code>rune_</code> fields of their own, and each drip's
+EXISTING per-turn tick sums the pair. <b>There is no second tick and there must not be one</b>
+&mdash; a hero holding the rune AND the node would be paid twice, which is a magnitude moving.
+<b>All three are payouts and all three guards are presence tests</b>, read at their own sites
+rather than taken by analogy from EM's 56; AL's MAX rule has zero applications across all 59.</p>
+
+<p><b>AND IT WAS MEASURED LIVE, BEFORE AND AFTER, ON SEEDED BATTLES.</b> A drip that stops
+dripping passes every static check. On a hero holding the rune and no talents at all, across 24
+seeded autoplay battles an arm: Divine Presence <b>81 fires / 255 health</b>, Entropy <b>130 /
+694 Break</b>, Pleasure from Pain <b>76 / 166 health</b> &mdash; and <b>every one of the nine
+readings reproduced EXACTLY after the re-key</b>, not approximately. <b>The negative control bit
+in three directions at once:</b> with the read sites taking the node's half alone, all three
+rune-only arms went to <b>0</b>, the node-only arms did not move a single fire, and the hero
+holding both lost precisely the rune's share of the sum (17.18 &rarr; 13.39, 26.48 &rarr; 21.37,
+12.55 &rarr; 10.66).</p>
+
+<p><b>&sect;2 &mdash; THE SIXTEEN, DERIVED RATHER THAN TAKEN FROM THE BRIEF, AND PRESENTED AS
+OPTIONS.</b> The sixteen wholly talent-keyed runes were re-derived from <code>LANE_TREES</code>
+and <code>runes.json</code> and reproduce EM's list exactly. <b>Every spec has 4 spec-scoped runes
+and 12 drawable</b> (4 spec + 3 class-wide + 5 universal), so the retirement never blanks an offer
+&mdash; an exhausted rarity widens, then falls back to the generated Common family. <b>The
+threshold is stated and it is content, not a count: a spec is GUTTED when nothing surviving
+touches its own engine.</b> Exactly one spec fails it &mdash; the <b>Beastmaster</b>, who would
+keep one rune whose only upside is Quick Shot, leaving <b>no rune anywhere in the game that
+touches a companion.</b> <b>Nothing was authored.</b></p>
+
+<p><b>&sect;3 &mdash; THE RUNG STAYS, AND THIS IS THE STOP THE BRIEF ASKED FOR.</b>
+<code>Profile.note_end_boss(Run.difficulty_rung())</code> sets the talent tier to the rung
+cleared, and <code>Talents.TIER_ROWS</code> is <code>[0, 3, 6, 9]</code> &mdash; <b>tier 0 opens
+no rows at all</b>, so clearing rung 1 is the only thing in the game that opens rows 1&ndash;3 of
+all twelve trees, for every spec at once. <b>Re-measured on the live tree with BN's own instrument
+(untalented, n=30 a rung): 97% / 3% / 0%.</b> Removing the rung moves a new player's first talent
+row from a one-attempt clear to roughly a thirty-attempt one. <b>The 100% bot completion that
+motivated the removal is a FULLY TALENTED party</b> &mdash; already through the door the rung is.
+Relics would have survived it (<code>unlock_random</code> fires at every rung); talents would not.
+<b>Every site that reads a rung by index is listed in the report.</b></p>
+
+<p><b>&sect;4 &mdash; PER-HERO RELICS NEVER LANDED, AND THE DOCUMENT WAS NOT WRONG.</b>
+<code>Run.active_relics</code> is still a flat list of up to 3 ids with no hero key, and both
+accessors take a hook and nothing else &mdash; party-wide at all 25 read sites.
+<code>master.html</code>'s <i>"up to 3 equipped per run at the draft"</i> was ACCURATE; what was
+missing is that a ruling points the other way and is unbuilt, which it now says. <b>And
+<code>CLAUDE.md</code> gains the division of labour, derived from the read site:</b> every relic
+hook is read at run start, battle SPAWN, the victory screen, gold awards, rest nodes, shop prices
+or elite spoils &mdash; <b>not one while a turn resolves</b> &mdash; and the category
+<code>relics.gd</code> declares OUT is exactly the in-combat one. <b>A relic sets up the run; a
+talent changes what a spec does in a fight; a rune is this run's kit.</b></p>
+
+<p><b>&sect;5 &mdash; TWO ACCEPTANCES RECORDED, AND ONE STALE CAVEAT RETIRED.</b> Elites stay the
+shortest fight at every rung and that is accepted by design &mdash; but the figures to quote are
+EN's, not CY's: re-measured at <code>--run 30</code> a rung, <b>elite 3.4 / 3.7 / 4.0</b> against
+trash 3.9 / 4.3 / 4.4 and boss 3.8 / 4.4 / 5.4. <b>DA's "no longer holds at rung 3" caveat does
+not reproduce</b> and is retired; the elite is shortest at all three rungs again. <b>The tags stay
+mechanically inert</b> and <code>check_ek</code> &sect;3's game-side population stays at THREE.</p>
+
+<p><b>&sect;6 &mdash; ONE GATE SECTION INVERTED RATHER THAN DELETED.</b> <code>check_em</code>
+&sect;4 said <i>"the day one is answered this gate reds and the answer is to delete its row"</i>.
+All three were answered at once, and deleting the table outright would have left the section
+looping over nothing and <b>printing exactly like a clean run</b>. It asserts the CLOSURE now and
+walks EN's three in both directions over a live population, printing <code>CHECKED n of m</code>.
+<b>And a documentation error in that gate's own header was corrected</b>: it read <i>"crit_bonus,
+speed, armor and seven others"</i> and <i>"the TEN fields"</i>, where <code>UNIT_MATH</code> holds
+NINE and <code>armor</code> is not one of them &mdash; EJ's off-by-one arriving in the gate whose
+&sect;1 found it.</p>
+
 <h2>2026-09-01 &mdash; Batch EM: THE RUNES GET THEIR OWN FIELDS</h2>
 <p><i>The mechanical half of the designer's rune charter, and only the mechanical half.
 <b>56 of the 59 clauses that wrote a live talent node's own counter now write a rune-owned field,

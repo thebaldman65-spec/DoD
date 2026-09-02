@@ -4,6 +4,111 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The last three clauses, the rung that is a door, and what a relic is for (Batch EN) — 2026-09-01
+
+**Three things were decided here and one was refused, and the refusal is
+the one worth reading first.**
+
+### The charter finishes at 59 of 59
+
+EM left three clauses on their nodes because there was nothing beneath
+them to re-point onto: `divine_presence_pct`, `entropy_ranks` and
+`pleasure_pct` are per-turn drips that exist *only* as their node — no
+passive, no stat, no core ability, no draft card. Re-keying one meant
+inventing an effect, which AR §4 forbids, so EM priced four options and
+authored none.
+
+**EN took option A, and the shape of it is smaller than the option's own
+description.** EM described A as *"three new fields and three new
+per-turn read sites, each a small copy of the node's own tick"* — but a
+second tick is exactly wrong. A hero holding the rune AND the node would
+be paid twice, and a magnitude moving is the one thing a re-key forbids.
+So each clause got a field of its own and the drip's **existing** tick
+sums the pair, which is the same shape all 56 of EM's took. Owned by the
+rune, paid once.
+
+**All three are payouts and all three guards are presence tests, and
+that was read rather than assumed.** The brief said not to take it by
+analogy from EM's 56, and it was right to: `divine_presence_pct` is a
+percentage of max HP, `entropy_ranks` a flat Break figure, `pleasure_pct`
+a percentage per unique enemy debuff. Three magnitudes; three `> 0`
+tests that ask *does this hero have the effect at all*. AL's MAX rule
+has zero applications across all 59.
+
+**The measurement is the part that could not have been argued.** A drip
+that stops dripping passes every static check — the field exists, the
+type is right, the gate is green, and the rune quietly pays nothing.
+So the three were driven live on seeded autoplay battles, before and
+after, on a hero holding the rune and no talents at all: 81 fires for
+255 health, 130 fires for 694 Break, 76 fires for 166 health.
+**Every reading reproduced exactly after the re-key** — not
+approximately, exactly, which is the resolution at which a dropped
+clause hides. And then the control: with the read sites reading the
+node's half alone — the mistake a re-key makes — all three went to
+**zero** while the node-only arm did not move a single fire, and the
+hero holding both lost precisely the rune's share of the sum
+(17.18 → 13.39, 26.48 → 21.37, 12.55 → 10.66).
+
+### The starter rung was asked for and is a door
+
+The brief ruled the lowest difficulty rung removed, with a stop clause:
+report first if it gates meta-progression. **It does, and it is the only
+thing that gates the first of it.**
+
+`Profile.note_end_boss(Run.difficulty_rung())` sets `talent_tier` to the
+rung the end boss died on; `Talents.TIER_ROWS` is `[0, 3, 6, 9]`, so a
+fresh profile at tier 0 can buy **no talent cell in any tree**. Clearing
+rung 1 is the only thing in the game that opens rows 1–3, and it opens
+them for every spec at once.
+
+**The case for removal was made on a population that is not the one
+playing the rung.** The 100% bot completion is a sim party at
+`rows=9 of 9` — fully talented, which is to say already through the door
+the rung is. Re-measured at EN with BN's own instrument
+(`DOD_SIM_ROWS=0`, n=30 a rung, live tree): **untalented completion is
+97% at rung 1, 3% at rung 2, 0% at rung 3.** Removing the rung moves a
+new player's first talent row from a one-attempt clear to roughly a
+thirty-attempt one — which is the state BN §2 measured at ×0.70 (13%)
+and deliberately fixed by choosing ×0.50.
+
+**Relics would have survived it and talents would not**, which is worth
+recording because it is the half a reader would guess wrong:
+`Relics.unlock_random()` fires on every boss kill at every rung, so the
+relic ladder is difficulty-independent. Only the talent ladder reads the
+rung.
+
+### What a relic is for, which nothing said
+
+Both relics and talents are permanent meta-progression, and the only
+difference anyone had written down was in how they are acquired — earned
+and automatic versus chosen and paid for. That is a difference in
+acquisition, not in job, and the job is what a future author needs.
+
+**The code answers it cleanly, and the answer is the read site.** Every
+one of the 19 relic hooks is read at exactly one place, and the places
+are: run start, battle *spawn* (base stats, written before turn one),
+the victory screen, gold awards, rest nodes, shop prices, elite spoils.
+**Not one is read while a turn is resolving** — swept over all 25 read
+sites. And `relics.gd`'s own "needs plumbing, declared out for now" list
+— on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
+Break multipliers — is precisely the in-combat category. A talent
+counter is a `BattleUnit` field read inside the combat math, and the
+trees are the only meta layer that reaches a turn as it happens.
+
+**The second axis falls out of when each is chosen.** Relics are
+assigned at the draft, *before specs are chosen*, so a relic cannot be
+about a spec; it is party-wide by construction rather than by taste.
+Talents are copied off `Profile` the moment a spec is confirmed. So: **a
+relic sets up the run, a talent changes what a spec does in a fight**,
+and a rune — run-scoped, per-hero, bought — is the layer between them.
+
+That last point is also the honest answer to whether per-hero relics
+ever landed. They did not: `Run.active_relics` is still a flat list of
+ids with no hero key and both accessors still take a hook and nothing
+else. The ruling stands and is unbuilt, and it is worth noticing that
+the draft assigns relics at the one moment when "which hero" has the
+least information behind it.
+
 ## The runes come off the trees, and what that deletes (Batch EM) — 2026-09-01
 
 **The charter is the designer's and it is one sentence:** runes are

@@ -106,7 +106,11 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# "_ranks" any more. THE RULE FOR THE NEXT AUTHOR: a rune writing an int
 	# BattleUnit field whose name does not end "_ranks" must be listed here,
 	# or JSON's float slides straight into a typed int var and the hero fails
-	# to spawn. These three are what the four Holy runes write today.
+	# to spawn. **NO RUNE WRITES ANY OF THESE THREE ANY MORE** — EM re-keyed
+	# `triage_heal` and `last_hope_pct`, and EN re-keyed `divine_presence_pct`
+	# with the last three of the 59. All three stay listed for the durability
+	# AW and AX list their unwritten ones with; their `rune_` halves are in
+	# EM's block below.
 	"triage_heal", "divine_presence_pct", "last_hope_pct",
 	# Batch AW: the Devout's counters went additive too. Most kept their
 	# "_ranks" names (they are still int magnitudes, just in bigger units), but
@@ -160,19 +164,23 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# WEARING A PREFIX. `rune_X` inherits nothing from `X`: a `rune_` field
 	# whose name does not end "_ranks" needs a row here exactly as its partner
 	# did, or JSON's float slides into a typed int var and the hero fails to
-	# spawn. These are the THIRTEEN of the 47 re-keyed counters whose names do
-	# not end "_ranks" — the other 34 are `*_ranks` and the suffix arm covers
-	# them. **THE EIGHT FLOATS ARE DELIBERATELY ABSENT** and must stay absent:
+	# spawn. These are the FOURTEEN of the 50 re-keyed counters whose names do
+	# not end "_ranks" — the other 36 are `*_ranks` and the suffix arm covers
+	# them. **BATCH EN ADDED THE FOURTEENTH**, `rune_divine_presence_pct`, with
+	# the last three of the 59 (see `unit.gd`'s header block).
+	# **THE NINE FLOATS ARE DELIBERATELY ABSENT** and must stay absent:
 	# `rune_wild_communion_step`, `rune_absolute_step`, `rune_conduit_step`,
 	# `rune_companion_hp_pct`, `rune_bloodrage_step_bonus`,
 	# `rune_swordsmanship_parry`, `rune_seasoned_off_bonus` and
-	# `rune_seasoned_def_bonus` are floats, and coercing any of them would
-	# round the rune quietly under strength (AT's `conduit_step` precedent, and
-	# the Bared Guard's -0.15 would flatten to 0 outright).
+	# `rune_seasoned_def_bonus` are floats, and EN's `rune_pleasure_pct` is the
+	# NINTH. Coercing any of them would round the rune quietly under strength
+	# (AT's `conduit_step` precedent) — and the Bared Guard's -0.15 and the
+	# Whispering Dark's 0.5 would both flatten to 0 outright.
 	"rune_coated_blades", "rune_vulture", "rune_deep_focus", "rune_perfect_form",
 	"rune_opening_volley", "rune_triage_heal", "rune_last_hope_pct",
 	"rune_zealous_mercy", "rune_righteous_step", "rune_faithful_step",
-	"rune_soul_leech_step", "rune_deep_hex_step", "rune_spread_ruin"]
+	"rune_soul_leech_step", "rune_deep_hex_step", "rune_spread_ruin",
+	"rune_divine_presence_pct"]
 
 static var _data := {}
 

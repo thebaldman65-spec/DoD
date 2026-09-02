@@ -201,11 +201,16 @@ var vigor_hp_bonus := 0      # Spirit Bond perfect: +10% max health, reverted on
 # nothing throws — DP's Whispering Dark case, where two of a 100g rune's four
 # clauses would have gone silently dead. Every guard on a re-keyed field sums.
 #
-# **THREE CLAUSES ARE DELIBERATELY NOT HERE**: `divine_presence_pct`,
-# `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their
-# node, so there is nothing underneath them to re-point to. They still write the
-# node's counter, and EM §2 puts the options to the designer rather than
-# inventing an answer. See `docs/reports/EM.md`.
+# **THE LAST THREE LANDED AT BATCH EN AND THE SET IS CLOSED.**
+# `divine_presence_pct`, `entropy_ranks` and `pleasure_pct` are per-turn drips
+# that exist only as their node, so EM had nothing underneath them to re-point
+# onto and put four options to the designer instead. **EN took option A: each
+# gets a field of its own, and the drip's existing tick sums the pair** — there
+# is no second tick, because a hero holding the rune AND the node would then be
+# paid twice, which is a magnitude moving and the one thing the re-key forbids.
+# **All 59 are re-keyed now, so `check_em` §4 asserts the set is EMPTY rather
+# than naming three.** All three are PAYOUTS and all three guards are presence
+# tests, exactly as EM's 56 were — measured, not assumed by analogy.
 # ---- Beastmaster lane-tree talents (Batch 30; re-specced by BATCH AY) ----
 # EVERY COUNTER BELOW IS ADDITIVE (the AR/AS/AT/AV/AW/AX form): the payload
 # holds the MAGNITUDE in the units its read site sums, and the read site
@@ -865,6 +870,9 @@ var holy_light_pct := 0       # Holy Light: N% of max Mana back on a perfect cas
 var guardian_step := 0        # Guardian Angel: the INCREASE on the 50% Mercy window
 var mercy_threshold := 0.5    # party-wide stamp (Guardian Angel raises it)
 var divine_presence_pct := 0  # Divine Presence: end-of-turn drip heal, N% of max HP
+var rune_divine_presence_pct := 0 # rune-owned: the Sleepless Vigil +2. An INT whose
+                              # name does not end "_ranks", so it is in
+                              # Runes.STAT_INT_KEYS (the AA float-into-int trap)
 var last_hope_pct := 0        # Last Hope: the nearly-dead heal N% deeper
 var rune_last_hope_pct := 0   # rune-owned: the Open Hand +5
 var last_hope_bonus := 0      # party-wide stamp (receiver side of Last Hope)
@@ -1345,6 +1353,9 @@ var soul_leech_step := 0      # Soul Leech: +% per Ruin stack on the base 2%
 var rune_soul_leech_step := 0 # rune-owned: the Hollow Chalice +3
 var pleasure_pct := 0.0       # Pleasure from Pain: % max HP per unique debuff (FRACTIONAL
                               # — must NOT end in "_ranks" or STAT_INT_KEYS coerces it)
+var rune_pleasure_pct := 0.0  # rune-owned: the Whispering Dark +0.5. FRACTIONAL for the
+                              # same reason its partner is, and absent from
+                              # STAT_INT_KEYS for the same reason
 var channeling_ranks := 0     # Corrupted Channeling: crippled attackers feed
 var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
 var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
@@ -1359,6 +1370,7 @@ var deep_hex_step := 0        # Deeper Hex: +% damage per Ruin stack on the base
 var rune_deep_hex_step := 0   # rune-owned: the Deepening Ruin +1
 var grim_ranks := 0           # Grim Focus: +% detonation damage
 var entropy_ranks := 0        # Entropy: Break damage any Ruin grinds each turn
+var rune_entropy_ranks := 0   # rune-owned: the Deepening Ruin +5
 var unravel_ranks := 0        # Unraveling: Ruin a detonation seeds in others
 var whispers_step := 0        # Whispers: +Ruin per debuff on the passive's base 2
 var delirium_ranks := 0       # Delirium: Ruin an enemy-on-enemy strike marks

@@ -943,6 +943,23 @@ a later batch that writes `1.0` has replaced the rule with a coincidence.**
 **3.0 to 5.5 turns per hero** — trash 3.5/3.8/4.1 rounds at the three difficulty rungs, and
 **elite fights are the shortest of the three kinds at every rung**. A turn spent setting up is
 **20–33% of everything a hero will do**, so the ramp specs' engines never returned their cost.
+
+### THE ELITE BEING SHORTEST IS ACCEPTED, NOT A DEFECT (STANDING, RULED AT EN §5)
+> **Elites are burst checks by design. A ramp spec having least room exactly where the difficulty
+> spikes is the intended tension, not a finding.**
+
+**DO NOT RE-DISCOVER IT.** CY reported it as *"the finding nobody would have predicted"* and it has
+been re-derived once already; it is ruled and it stays.
+- **THE FIGURES TO QUOTE ARE EN's, NOT CY's.** Re-measured at EN over `--run 30` a rung on the live
+  tree: **elite 3.4 / 3.7 / 4.0** against trash 3.9 / 4.3 / 4.4 and boss 3.8 / 4.4 / 5.4. CY's
+  3.0 / 3.3 / 3.6 are superseded and DA's rung-3 row (all three kinds at 4.4) does not reproduce.
+- **THE "NO LONGER HOLDS AT RUNG 3" CAVEAT IS RETIRED.** DA measured rung 3 flat and the caveat
+  stood from DA to EN; **on the live tree the elite is shortest at all three rungs again**, by
+  0.4-0.5 rounds. The caveat was true when written and is not true now.
+- **THE CONFOUNDERS RIDE WITH THE NUMBER, AS THEY DID AT CY.** The sim party is FULLY TALENTED
+  (`rows=9 of 9`) and wears each tree's FIRST lane; companions are excluded from both halves of the
+  ratio; n=30 runs a rung. **A rounds figure is comparable only against another rounds figure taken
+  the same way.**
 Blood Frenzy reaches 31% of its band and Faith 1.6 of the 5 a release needs; **the average fight
 ends without a Faith release ever firing.**
 
@@ -1340,6 +1357,44 @@ test_batch_bm's negative control 1 builds the collapse and proves it is rejected
   nowhere at all** — a sim that read the player's ledger would make every baseline depend on
   whoever ran it.
 
+## STANDING RULE — A RELIC SETS UP THE RUN; A TALENT CHANGES WHAT A SPEC DOES IN A FIGHT (Batch EN §4)
+> **Both are permanent meta-progression, and nothing in the project said what each was FOR.
+> The read site is what separates them, and it separates them cleanly.**
+
+**THIS IS DERIVED FROM THE CODE, NOT ASSERTED.** `relics.gd`'s own header names every hook and the
+ONE site each is read at, and the sites are: `new_run` (the opening purse and pouch), **battle
+SPAWN** (base stats, written before turn one), the victory screen, `award_gold`, rest nodes, shop
+prices, elite spoils. **NOT ONE RELIC HOOK IS READ WHILE A TURN IS RESOLVING** — swept over all
+25 read sites of `relic_add` / `relic_dict`, which land in exactly `_spawn_units`, `_check_end`,
+`new_run`, `award_gold` and the three shop-price copies. And the header's own
+*"NEEDS PLUMBING (declared out for now)"* list — on-kill and per-turn procs, revive-on-death,
+enemy-side auras, DoT-tick and Break-damage multipliers — **is precisely the in-combat category.**
+A talent counter, by contrast, is a `BattleUnit` field read inside `battle.gd`'s combat math, and
+the talent trees are **the only meta layer that reaches a turn as it resolves.**
+
+**THE SECOND AXIS FOLLOWS FROM WHEN EACH IS CHOSEN.** Relics are assigned at the DRAFT, **before
+specs are chosen**, so a relic *cannot* be about a spec — it is party-wide by construction rather
+than by preference. Talents are copied off `Profile` the moment a spec is confirmed and locked for
+the run, so a talent can only be about that spec.
+
+**THE RULE FOR A FUTURE AUTHOR, AND THE TELL IS THE READ SITE:**
+- **If the effect must be read while a turn resolves, or must know which spec the hero is, it is a
+  TALENT.** It costs points, it is bought per spec, and it is gated behind a difficulty rung.
+- **If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory pays,
+  what an elite drops — it is a RELIC.** It is earned automatically, it is party-wide, and adding
+  one on an existing hook is **pure data**.
+- **If it is this run's kit rather than this account's — a stat, a resource, or the mechanics and
+  values of a core ability, draft ability or passive — it is a RUNE** (the charter, Batch EM).
+  Runes are the run-scoped, per-hero, bought layer between the two permanent ones.
+- **A NEW HOOK IS A BIGGER DECISION THAN A NEW RELIC.** Every hook is read at exactly one site by
+  construction; a second read site for one hook is how the vocabulary stops being auditable.
+
+**WHAT THIS RULE DOES NOT DECIDE.** It says what each layer is FOR; it does not say a relic must
+stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero at pickup) STANDS AND IS
+UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (`victory_heal_pct`,
+`victory_mana_pct`, `rest_heal_add`, `resource_floor_pct`) need a ruling before any of it, and that
+the draft assigns relics before there are specs to assign them to.
+
 ## STANDING RULE — WHAT MAKES A ROW-8 NODE (Batch BM §2), AND BH'S FIFTEEN POINTS
 **ROW 8 IS THE NODE THAT ONLY MATTERS ONCE THE REST OF THE LANE IS BOUGHT — a payoff that reads
 the build itself rather than adding to it.** Every future node authored into row 8, and any node
@@ -1390,6 +1445,36 @@ identically at every rung. It awards a relic ALWAYS, no ability pick, no talent 
 **`Profile.note_end_boss(rung)` is what opens the meta tree's row tiers.** ZONE BOSSES — the
 third included, which used to BE the end boss — now pay a point, a relic and an ability pick and
 open what follows them.
+
+### THE STARTER RUNG IS A META-PROGRESSION GATE AND MAY NOT BE REMOVED AS A BALANCE CHANGE (STANDING, EN §3)
+> **Rung 1 is not the easy difficulty. It is the only door into the talent trees, and a fresh
+> profile has to walk through it with nothing.**
+
+**EN WAS ASKED TO REMOVE IT AND STOPPED, WHICH IS WHAT ITS OWN BRIEF INSTRUCTED ON FINDING A GATE.**
+The chain is four links and every one of them is in the code:
+`battle._resolve_boss` → `Profile.note_end_boss(Run.difficulty_rung())` → `talent_tier = rung` →
+`Talents.rows_unlocked(tier)` off **`TIER_ROWS [0, 3, 6, 9]`**. **TIER 0 OPENS NO ROWS AT ALL**, and
+`Talents.can_buy` refuses every locked cell with *"Locked: beat the end boss on difficulty N"*. So
+**clearing rung 1 is the only thing in the game that opens rows 1-3 of all twelve trees**, and it
+opens them for every spec at once.
+- **THE MEASUREMENT THAT DECIDES IT, TAKEN AT EN ON THE LIVE TREE** (`DOD_SIM_ROWS=0`, `--run 30` a
+  rung — BN's own instrument, re-run): **untalented completion is 97% at rung 1, 3% at rung 2 and
+  0% at rung 3.** Removing rung 1 moves the first meta unlock from a one-attempt clear to roughly
+  a thirty-attempt one. **That is the exact state BN §2 measured at x0.70 (13%) and deliberately
+  fixed by choosing x0.50.**
+- **THE "IT IS BORING" CASE IS TRUE OF A POPULATION THAT IS NOT THE ONE PLAYING IT.** The 100%
+  bot completion at rung 1 comes from a sim party that is **FULLY TALENTED** (`rows=9 of 9`, CY's
+  own named confounder, re-confirmed at EN: 100 / 80 / 80% across the three rungs at n=20).
+  **A fully-talented bot has already been through the gate the rung exists to be.**
+- **RELICS ARE NOT BEHIND IT.** `Relics.unlock_random()` fires on every boss kill at every rung
+  (`battle.gd` `_resolve_boss`, both halves), so the relic ladder is difficulty-independent and
+  would survive a removal. **The talent ladder would not.**
+- **AND A REMOVAL RENUMBERS.** `def["rung"]` IS the talent tier index — `draft_screen` advertises
+  each rung's unlock as `rows_unlocked(rung - 1) + 1 .. rows_unlocked(rung)`, `enemies.json` tags
+  two end-boss abilities `"rung": 2` and `"rung": 3`, and `Enemies.config(kind, rung)` drops
+  anything above the rung played. **Re-homing an unlock is a design decision and it is not a
+  batch's to take.** `run_state.gd` already refuses a pre-v10 save; **do not invent a second
+  refusal path for a renumbered ladder.**
 
 ## STANDING REFERENCE — ENEMY INTENT: ONE DECLARED-ACTION STORE, THREE RE-VALIDATION BRANCHES (Batch BL §1)
 **DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted out
@@ -1764,10 +1849,23 @@ runes the charter empties, and whether the lane rule is replaced with anything.
   its own row there** — and a `rune_` FLOAT must be in neither, or the coercion rounds the rune
   quietly under strength (the AT `conduit_step` precedent; the Bared Guard's −0.15 would flatten to
   0 outright). `check_em` §3 derives both directions off the BattleUnit declaration.
-· **A CLAUSE WITH NOTHING UNDERNEATH IT IS NOT RE-KEYED, IT IS REPORTED.** `divine_presence_pct`,
-  `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their node; re-keying one
-  means inventing an effect, which is the guess AR §4 forbids. **`check_em.NO_HOME` names all three
-  as an EQUALITY** — the day one is answered the gate reds and the answer is to delete its row.
+· **THE THREE WITH NOTHING UNDERNEATH THEM WERE ANSWERED AT EN, AND THE SET IS CLOSED.**
+  `divine_presence_pct`, `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as
+  their node, so EM had nothing to re-point onto and priced four options rather than guessing (the
+  AR §4 rule). **EN took option A: a field of its own for each, summed at the drip's EXISTING
+  tick.** All 59 clauses are rune-owned now. **THERE IS NO SECOND TICK AND THERE MUST NOT BE ONE** —
+  a hero holding the rune AND the node would be paid twice, which is a magnitude moving, and a
+  magnitude moving is the one thing a re-key forbids.
+· **ALL THREE ARE PAYOUTS AND ALL THREE GUARDS ARE PRESENCE TESTS — MEASURED, NOT ASSUMED BY
+  ANALOGY.** EM's 56 had zero applications of AL's MAX rule and EN's three have zero as well, but
+  each was read at its own site before the arithmetic was chosen: `divine_presence_pct` is a % of
+  max HP, `entropy_ranks` a Break figure and `pleasure_pct` a % per unique debuff — three
+  magnitudes, and each `> 0` beside them asks *does this hero have the effect at all*.
+· **`check_em` §4 ASSERTS THE CLOSURE, NOT AN EMPTY TABLE.** EM's `NO_HOME` said "the day one is
+  answered this gate reds and the answer is to delete its row" — all three were answered at once,
+  and deleting the table outright would have left §4 looping over nothing and **printing exactly
+  like a clean run**. It walks EN's three as a live population in BOTH directions (the rune writes
+  `rune_X`; NOTHING writes the bare `X`) and prints `CHECKED n of m`.
 · **THE `lane` FIELDS ARE STILL AUTHORED AND STILL SHOWN, AND THEY NOW DESCRIBE HISTORY.** 36 lane
   runes and 12 splashes were built on *"worth more to a hero whose points went elsewhere"*; a rune
   with its own field is worth the same to every hero of its spec. **That was measured, not
@@ -2152,8 +2250,12 @@ third and it is the only one the player ever sees.
   `Classes.card_tags()` / `Runes.rune_tags()`, with `Classes.card_tag_line()` the ONE builder of
   the displayed string (CK §1's rule one layer down). A batch keying anything off a tag comes
   through those doors and nowhere else.
-- **THEY ARE MECHANICALLY INERT AND THAT IS A RULING, NOT AN OVERSIGHT.** No clause reads a tag
-  count, no card's behaviour changes, no magnitude moves. **`check_ek` §3 asserts it as a
+- **THEY ARE MECHANICALLY INERT AND THAT IS A RULING, NOT AN OVERSIGHT — RE-AFFIRMED AT EN §5.**
+  No clause reads a tag count, no card's behaviour changes, no magnitude moves. **WHETHER RUNES
+  EVER READ A TAG WAITS UNTIL THE DESIGNER HAS PLAYED WITH TAGS ON A REAL DRAFT SCREEN**, and EM
+  deliberately keyed nothing to a tag while re-keying 56 clauses past them. **The game-side
+  population stays at THREE** and a batch is not owed a differential mechanism for having touched
+  the rune layer. **`check_ek` §3 asserts it as a
   POPULATION** — every `.gd` in the repo is swept comment-stripped, and **EL §3 SPLIT THAT
   POPULATION IN TWO BECAUSE IT WAS TWO CLAIMS**: the files in the SHIPPED GAME that name a tag are
   pinned at **THREE** (`classes.gd` and `runes.gd` define, `map_screen.gd` displays) and the

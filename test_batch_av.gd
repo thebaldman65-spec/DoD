@@ -383,7 +383,14 @@ func _additive_units() -> void:
 			["0.01 * mend_pct", "On the Mend"],
 			["0.01 * caster.cascade_pct", "Radiant Cascade"],
 			["0.01 * _overflow_share(caster)", "Overflow"],
-			["* u.divine_presence_pct * _healing_done_mult(u)", "Divine Presence"],
+			# BATCH EN — the last of EM's 59. Divine Presence sums its two halves
+			# into a LOCAL, because the GUARD is what goes silently dead on a
+			# Holy Cleric holding the Rune of the Sleepless Vigil and not the
+			# node (DP's case, measured live at EN: 81 fires -> 0). Both the
+			# local and its use are pinned, exactly as AX pins Spread of Madness.
+			["var dp_pct := u.divine_presence_pct + u.rune_divine_presence_pct",
+				"Divine Presence (both halves)"],
+			["* dp_pct * _healing_done_mult(u)", "Divine Presence"],
 			["0.01 * hv_c.holy_vigil_pct", "Hour of Need"],
 			["0.01 * caster.vestments_pct", "Blessed Vestments"],
 			["0.01 * cleric.grace_pct", "Grace"],
@@ -487,8 +494,13 @@ func _rune_audit() -> void:
 		and int(oh.get("rune_zealous_mercy", 0)) == 1,
 		"the Open Hand pays 3%% healing, 1 opening Mercy and 5%% to the nearly-dead")
 	var sv: Dictionary = Runes.build("sleepless_vigil")["payload"]["stat"]
-	ok(int(sv.get("divine_presence_pct", 0)) == 2,
-		"the Sleepless Vigil pays its advertised 2%%")
+	# BATCH EN RE-KEYED THIS CLAUSE. The question is unchanged — does the rune
+	# pay its advertised 2%? — and it is asked of the field the rune now OWNS.
+	# The bare name is checked ABSENT as well: a payload writing both halves
+	# would pay a holder of the node twice.
+	ok(int(sv.get("rune_divine_presence_pct", 0)) == 2
+		and not sv.has("divine_presence_pct"),
+		"the Sleepless Vigil pays its advertised 2%% and pays it once")
 	# THE BY-NAME LANE REFERENCE, which is exactly the kind that breaks
 	# quietly: a dead lane name would leave the rune homeless in the bot's
 	# build policy and in the per-lane coverage test.

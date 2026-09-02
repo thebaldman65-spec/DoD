@@ -7,7 +7,14 @@
 #       reads `X` and not `rune_X` is a rune paying nothing, in silence
 #   §3  THE `rune_` FIELDS SURVIVE THE JSON LOAD AS THE TYPE THEY ARE — the AA
 #       float-into-int trap, which a `rune_` prefix inherits nothing from
-#   §4  THE THREE WITH NO HOME ARE NAMED, AS AN EQUALITY
+#   §4  THE SET WITH NO HOME IS EMPTY — BATCH EN ANSWERED THE LAST THREE.
+#       EM named three as an EQUALITY and said the day one was answered this
+#       gate would red and the answer would be to delete its row. All three
+#       were answered at once, so the row is gone and the section asserts the
+#       CLOSURE instead: no rune writes any live node counter, and each of
+#       EN's three is written by its rune under the `rune_` name and by
+#       nothing under the bare one. **IT IS NOT VACUOUS AND SAYS SO** — it
+#       prints CHECKED n of m over a live population of three
 #
 # **WHY THIS GATE EXISTS AND WHY IT COULD NOT HAVE BEEN WRITTEN AT EJ.** EJ's
 # own §5 says so: *"the property a future gate wants — that no rune writes a
@@ -18,13 +25,22 @@
 #
 # **§1 IS THE ONE THAT NEEDS A JUDGEMENT AND IT IS WRITTEN DOWN AS A TABLE.**
 # A talent node writing the same field does NOT by itself make a rune
-# talent-keyed. `crit_bonus`, `speed`, `armor` and seven others are the UNIT's
-# own math — read in the global damage, crit, parry and turn-order pipelines,
-# several of them written by relics too — and a node adding to one is a
-# coincidence of target rather than a coupling. That is EJ §1's test, and the
-# ten fields it clears are `UNIT_MATH` below, **asserted as an EQUALITY**: a
-# batch that wants an eleventh has to move a line here and say why, and a batch
-# that stops a node writing one of the ten trips this too.
+# talent-keyed. `crit_bonus`, `speed`, `max_hp_pct` and six others are the
+# UNIT's own math — read in the global damage, crit, parry and turn-order
+# pipelines, several of them written by relics too — and a node adding to one is
+# a coincidence of target rather than a coupling. That is EJ §1's test, and the
+# NINE fields it clears are `UNIT_MATH` below, **asserted as an EQUALITY**: a
+# batch that wants a tenth has to move a line here and say why, and a batch
+# that stops a node writing one of the nine trips this too.
+#
+# **BATCH EN CORRECTED THIS PARAGRAPH AND THE ERROR IS WORTH THE LINE.** It read
+# "`crit_bonus`, `speed`, `armor` and seven others" and "the TEN fields" — but
+# `UNIT_MATH` holds NINE and `armor` is NOT one of them. **That is EJ's own
+# off-by-one arriving in the gate whose §1 found it**: `armor` is the tenth name
+# in EJ's list precisely BECAUSE no live talent node writes it, so it needs no
+# exemption and was correctly left out of the table. The table was right and the
+# sentence describing it was wrong — which is the direction that survives a
+# battery, because nothing asserts on a comment.
 #
 # **§2 IS THE ONE THAT WOULD HAVE CAUGHT THE COST THIS BATCH NEARLY PAID.**
 # Splitting `X` into `X` and `rune_X` is not the dangerous half — the guard
@@ -74,16 +90,28 @@ const UNIT_MATH := {
 	"bleed_bonus": "the Bleed a bleed-building blow adds",
 }
 
-# THE THREE WITH NO HOME. Per-turn drips that exist ONLY as their node — there
-# is no passive, stat, core ability or draft card underneath them to re-point
-# to — so EM §2 put the options to the designer and authored nothing. They are
-# the three clauses still writing a live node's counter, they are an EQUALITY
-# rather than a floor, and **the day one of them is answered this gate reds and
-# the answer is to delete its row**, not to widen the set.
-const NO_HOME := {
-	"divine_presence_pct": "Rune of the Sleepless Vigil — Divine Presence's per-turn party heal",
-	"entropy_ranks": "Rune of the Deepening Ruin — Entropy's per-turn Break tick",
-	"pleasure_pct": "Rune of the Whispering Dark — Pleasure from Pain's per-turn heal",
+# THE THREE THAT HAD NO HOME, AND THE `rune_` FIELD EACH ONE LANDED ON.
+#
+# EM could not re-key these: each is a per-turn drip that exists ONLY as its
+# node, with no passive, stat, core ability or draft card underneath it to
+# re-point onto, so EM §2 priced four options and authored nothing. **BATCH EN
+# TOOK OPTION A** — each gets a field of its own and the drip's EXISTING tick
+# sums the pair. There is no second tick: a hero holding the rune and the node
+# would be paid twice, and a magnitude moving is the one thing the re-key
+# forbids.
+#
+# **THE TABLE INVERTED RATHER THAN EMPTIED, WHICH IS THE POINT.** EM's row said
+# "still on the node's counter"; deleting it outright would have left §4 looping
+# over nothing and printing like a clean run. Each row is now a LIVE pair the
+# section checks in both directions — the rune writes `rune_X`, and NOTHING
+# writes the bare `X` from `runes.json`.
+const RE_KEYED_AT_EN := {
+	"divine_presence_pct": ["sleepless_vigil",
+		"Divine Presence's per-turn heal to the most wounded"],
+	"entropy_ranks": ["deepening_ruin",
+		"Entropy's per-turn Break tick on anything bearing Ruin"],
+	"pleasure_pct": ["whispering_dark",
+		"Pleasure from Pain's per-turn heal, per unique enemy debuff"],
 }
 
 const SCRIPTS := ["battle.gd", "unit.gd", "party_screen.gd", "classes.gd",
@@ -145,7 +173,12 @@ func _s1_charter(node_fields: Dictionary, runes: Dictionary) -> void:
 				rune_owned += 1
 			if not node_fields.has(field):
 				continue
-			if UNIT_MATH.has(field) or NO_HOME.has(field):
+			# BATCH EN — `or NO_HOME.has(field)` IS GONE WITH THE SET. It
+			# exempted the three drips EM could not re-key; EN re-keyed all
+			# three, so leaving the arm standing would exempt a road nothing
+			# drives on and would silently re-admit any of the three if a later
+			# batch put one back on the node's counter.
+			if UNIT_MATH.has(field):
 				continue
 			offenders.append("%s/%s (node %s)" % [rid, field,
 				", ".join(node_fields[field] as Array)])
@@ -262,34 +295,56 @@ func _s3_types(runes: Dictionary) -> void:
 	print("  %d int clauses and %d float clauses, each loading as its declaration" % [ints, floats])
 
 
-# ── §4 — THE THREE WITH NO HOME ─────────────────────────────────────────────
+# ── §4 — THE SET IS CLOSED, AND THE CLOSURE IS CHECKED IN BOTH DIRECTIONS ───
+#
+# **A CHECK OVER AN EMPTY SET PRINTS EXACTLY LIKE A CLEAN ONE**, which is why
+# this does not simply assert that `NO_HOME` is empty and stop. It asserts the
+# closure (nothing writes a live node's counter) AND walks EN's three as a live
+# population of three, in both directions, and PRINTS `CHECKED n of m` so a
+# walk that silently reached nothing cannot read as a pass.
 func _s4_no_home(node_fields: Dictionary, runes: Dictionary) -> void:
-	print("\n§4 — the three drips with nothing underneath them, named")
+	print("\n§4 — the last three landed at EN; the un-re-keyed set is closed")
+	# ── the closure: NOT ONE clause anywhere still writes a node's counter,
+	# `UNIT_MATH` aside. §1 asserts the same property with its exemption table;
+	# this asserts it with NO exemption for a drip, which is the arm EN's three
+	# used to sit behind.
 	var still: Array = []
 	for rid in runes:
 		for f in ((runes[rid].get("payload", {}) as Dictionary).get("stat", {}) as Dictionary):
 			var field := String(f)
-			if NO_HOME.has(field) and node_fields.has(field):
-				still.append(field)
+			if node_fields.has(field) and not UNIT_MATH.has(field):
+				still.append("%s/%s" % [rid, field])
 	still.sort()
-	var want: Array = NO_HOME.keys()
-	want.sort()
-	ok(still == want,
-		"the un-re-keyed clauses are %s and `NO_HOME` names %s — EM §2 was answered or a fourth appeared" % [
-			str(still), str(want)])
-	# ...and each is still what it was said to be: a node writes it, and it has
-	# no `rune_` twin. A twin would mean the clause WAS re-keyed and the row is
-	# stale rather than live.
-	for f2 in NO_HOME:
-		ok(node_fields.has(String(f2)),
-			"`%s` is in NO_HOME and no live node writes it — the row is stale" % f2)
-		var twin := false
-		for rid2 in runes:
-			if ((runes[rid2].get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).has(
-					"rune_" + String(f2)):
-				twin = true
-		ok(not twin, "`%s` has a `rune_` twin — it was re-keyed and NO_HOME did not move" % f2)
-	print("  %d clause(s) still writing a node's counter, all three named with their reason" % still.size())
+	ok(still.is_empty(),
+		"%d clause(s) still write a live node's counter — %s" % [still.size(), str(still)])
+	# ── EN's three, checked BOTH WAYS over a live population.
+	var checked := 0
+	for bare in RE_KEYED_AT_EN:
+		var row: Array = RE_KEYED_AT_EN[bare]
+		var rid2 := String(row[0])
+		var what := String(row[1])
+		if not runes.has(rid2):
+			ok(false, "`%s` is named by RE_KEYED_AT_EN and is not a rune — the row is stale" % rid2)
+			continue
+		var stat: Dictionary = (runes[rid2].get("payload", {}) as Dictionary).get("stat", {})
+		checked += 1
+		# 1. the node still writes the bare name — otherwise the pair is not a
+		#    pair and the `rune_` half is a lone field wearing a prefix.
+		ok(node_fields.has(String(bare)),
+			"no live node writes `%s` any more — %s's pair is half a pair" % [bare, rid2])
+		# 2. the rune writes the `rune_` half...
+		ok(stat.has("rune_" + String(bare)),
+			"%s does not write `rune_%s` — %s is not paid" % [rid2, bare, what])
+		# 3. ...and NOT the bare one. Both at once would double-pay a holder of
+		#    the node, which is the magnitude EN was forbidden to move.
+		ok(not stat.has(String(bare)),
+			"%s writes BOTH `%s` and its rune half — a holder of the node is paid twice" % [
+				rid2, bare])
+	ok(checked == RE_KEYED_AT_EN.size(),
+		"CHECKED %d of %d — the walk reached fewer rows than the table holds" % [
+			checked, RE_KEYED_AT_EN.size()])
+	print("  0 clauses on a node's counter; CHECKED %d of %d EN pairs, both directions" % [
+		checked, RE_KEYED_AT_EN.size()])
 
 
 # ── THE INSTRUMENTS ─────────────────────────────────────────────────────────

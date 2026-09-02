@@ -343,7 +343,13 @@ func _additive_units() -> void:
 			["0.01 * chan_r", "Corrupted Channeling"],
 			["0.01 * (attacker.broken_will_ranks", "Broken Will"],
 			["0.01 * occ.grim_ranks", "Grim Focus"],
-			["u.take_hit(0, ent_occ.entropy_ranks)", "Entropy"],
+			# BATCH EN — Entropy sums its two halves into a LOCAL, Spread of
+			# Madness's shape below and for its reason: the guard is what goes
+			# dead on an Occultist holding the Rune of the Deepening Ruin and
+			# not the node. Measured live at EN: 130 fires -> 0.
+			["else ent_occ.entropy_ranks + ent_occ.rune_entropy_ranks",
+				"Entropy (both halves)"],
+			["u.take_hit(0, ent_rank)", "Entropy"],
 			["_gain_ruin(e, occ.unravel_ranks)", "Unraveling"],
 			# BATCH DP — THREE NEEDLES FOLLOWED THEIR NODES ONTO RUIN. Spread of
 			# Madness and Whispers both read PSYCHOSIS, which only Mind Flay applies
@@ -367,7 +373,10 @@ func _additive_units() -> void:
 			["var torment_turns := occ.torment_ranks", "Lingering Torment"],
 			["(2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step",
 				"Soul Leech / Gluttony"],
-			["0.01 * u.pleasure_pct", "Pleasure from Pain"],
+			# BATCH EN — and the same for Pleasure from Pain (76 fires -> 0).
+			["var pp_pct := u.pleasure_pct + u.rune_pleasure_pct",
+				"Pleasure from Pain (both halves)"],
+			["0.01 * pp_pct", "Pleasure from Pain"],
 			["0.01 * mi_ranks", "Murderous Intent"],
 			["0.20 - 0.01 * attacker.pact_flesh_ranks", "Pact of Flesh"],
 			["0.15 + 0.01 * attacker.barter_step", "Dark Barter"],
@@ -551,16 +560,21 @@ func _rune_audit() -> void:
 	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
 	# MOVED** — the question these checks ask is the same one, of the field
 	# the rune now owns.
-	# `entropy_ranks` IS DELIBERATELY NOT RE-KEYED: it is one of the three
-	# per-turn drips that exist only as their node, so there is nothing beneath
-	# it to re-point to and EM §2 puts the options rather than inventing one.
-	ok(int(dr.get("rune_deep_hex_step", 0)) == 1 and int(dr.get("entropy_ranks", 0)) == 5,
+	# BATCH EN RE-KEYED `entropy_ranks` — the last three of EM's 59, taking
+	# option A of the four EM priced: a field of its own, summed at the drip's
+	# EXISTING tick. **NOT ONE MAGNITUDE MOVED HERE EITHER**, so this asks the
+	# same question of the field the rune now owns, and asks the bare name to be
+	# ABSENT: writing both would pay a holder of the node twice.
+	ok(int(dr.get("rune_deep_hex_step", 0)) == 1
+		and int(dr.get("rune_entropy_ranks", 0)) == 5
+		and not dr.has("entropy_ranks"),
 		"the Deepening Ruin pays +1%/stack and 5 Break damage — exactly its old value")
 	var wd: Dictionary = data["whispering_dark"]["payload"]["stat"]
 	ok(int(wd.get("rune_broken_will_ranks", 0)) == 5
 		and int(wd.get("rune_spread_ranks", 0)) == 15
 		and int(wd.get("rune_spread_ruin", 0)) == 1
-		and is_equal_approx(float(wd.get("pleasure_pct", 0.0)), 0.5),
+		and is_equal_approx(float(wd.get("rune_pleasure_pct", 0.0)), 0.5)
+		and not wd.has("pleasure_pct"),
 		"the Whispering Dark pays +5% BD / +15% spread / 1 Ruin / 0.5% — its old values")
 	# THE ONE THAT COULD NOT PAY WHAT IT PAID, and it is reported rather than
 	# hidden: AX changed the lifesteal's UNIT from a flat rate to a per-stack

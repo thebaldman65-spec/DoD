@@ -5,60 +5,135 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-01 (Batch EM).*
+*Last rewritten: 2026-09-01 (Batch EN).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EM — THE RUNES GET THEIR OWN FIELDS.** The mechanical half of the designer's rune
-  charter, and only the mechanical half. **56 of the 59 clauses that wrote a live talent node's own
-  counter now write a rune-owned field, read beside the node's at the same site. Not one magnitude
-  moved.** Full working: **`docs/reports/EM.md`**.
-- **§0 — THE TAGS DID NOT MOVE AND THAT WAS DELIBERATE.** No rune keys to a tag; `check_ek` §3's
-  game-side population is still THREE. The differential mechanism waits for a real draft screen.
-- **§1 — 56 CLAUSES RE-KEYED, AND ALL 56 ARE PAYOUTS.** 47 new `BattleUnit` fields; **97 reading
-  statements across nineteen scripts**, derived by `check_em` §2 rather than counted. **AL's rule
-  was applied and its answer is uniform** — a THRESHOLD takes the MAX, a PAYOUT SUMS, and the `> 0`
-  tests beside these counters are PRESENCE tests rather than thresholds. On the Edge is still the
-  only threshold any rune shares and it is still AL's.
-  - **THE GUARD IS THE DANGEROUS HALF AND IT WAS MEASURED, NOT ARGUED.** `if occ.spread_ranks > 0`
-    is FALSE for an Occultist holding the Rune of the Whispering Dark and not the node. Driven live
-    on a rune-only hero with the guard reading the node's counter alone, that mark spread **0 times
-    in 400**; with the pair summed, **55–66**. **This is DP's dud arriving through the repair for
-    it**, which is why `check_em` §2 sweeps STATEMENTS rather than asserting the field exists.
-  - **FOUR CLAUSES ARE NAMED AS ARGUABLE** and none was decided quietly: the contagion CHANCE
-    (summed to 75%, where two independent rolls would be 66%), the Focus conversion-point DROP
-    (which reads like a threshold and whose own source comment authored it additive), the swap
-    cooldown (floored at 0, so the node can swallow the rune's turn), and the Bared Guard's
-    NEGATIVE scarred term.
-- **§2 — THREE CLAUSES HAVE NO HOME AND NOTHING WAS INVENTED.** `divine_presence_pct`,
-  `entropy_ranks` and `pleasure_pct` still write the node's counter. `check_em` §4 names all three
-  as an EQUALITY. **Options priced, none taken** — see the queue below.
-- **§3 — SIXTEEN RUNES ARE WHOLLY TALENT-KEYED**, every one mechanically whole after the re-key and
-  every one without its reason to exist. All sixteen are listed by name with what they do in
-  `docs/reports/EM.md` §3. **Exactly ONE is Scarred** (the Bared Guard, 75g).
-- **§4 — BOTH DOCUMENTS CORRECTED, AND THE LOSS IS RECORDED BESIDE THE CHANGE.** `master.html` and
-  `design-notes.md` stated the lane rule as CURRENT and both were accurate; they now say it is how
-  the sets were AUTHORED. **48 of the 65 runes were built on it and the 12 splashes lose most.**
-- **§5 — THE RUNE OF THE STANDING VOW IS ON THE RECORD.** Confirmed live and by the guard chain:
-  Healing Pulse's drip fires on **CONSECRATED GROUND alone** — DO's cut of the `unity` half is real
-  — and the rune's three clauses read 2 / 4 / 5 on an Inquisitor holding it and no talents. A quiet
-  weakening rather than a mis-sale: the desc named only holy ground before and after.
-- **§6 — A GATE THE BRIEF DID NOT ASK FOR, AND EJ NAMED THIS BATCH AS ITS HOME.** `check_em`, 210
-  checks, four sections, **five negative controls and all five bit.** `check_dp` §4's two Whispering
-  Dark rows were **repaired to intent rather than loosened** — they pinned the field the rune SHARED
-  with the node, which is exactly what the charter removes, and left standing they would have called
-  a live rune dead.
-- **AND EJ'S REPORT SAID NINE AND LISTED TEN.** Its §1 names the fields classed STAT despite having
-  a node; **`armor` is the tenth and no live talent node writes it at all.** `check_em` §1's
-  equality found that on its first run.
-- **Next letter: EN.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EN — THE LAST THREE CLAUSES, AND THE RUNG THAT IS A DOOR.** The rune charter is
+  **complete at 59 of 59**; the lowest difficulty rung was ruled removed and **was not removed**,
+  because it is the only thing that opens a player's first talent row; per-hero relics **never
+  landed**; and the sixteen runes the charter empties are split, derived and presented without
+  anything being authored. Full working: **`docs/reports/EN.md`**.
+- **§1 — THE THREE HOMELESS CLAUSES HAVE RUNE-OWNED FIELDS, AND THE MEASUREMENT IS THE PROOF.**
+  `divine_presence_pct`, `entropy_ranks` and `pleasure_pct` write `rune_` fields of their own, and
+  each drip's **EXISTING** per-turn tick sums the pair. **There is no second tick** — a hero
+  holding the rune AND the node would be paid twice, which is a magnitude moving, and that is the
+  one thing a re-key forbids. **This is EM §2's option A, taken smaller than option A described
+  itself.**
+  - **ALL THREE ARE PAYOUTS AND ALL THREE GUARDS ARE PRESENCE TESTS**, read at their own sites
+    rather than taken by analogy from EM's 56. **AL's MAX rule now has ZERO applications across
+    all 59** and On the Edge is still the only threshold any rune shares.
+  - **DRIVEN LIVE, SEEDED, BEFORE AND AFTER — AND EVERY READING REPRODUCED EXACTLY.** On a hero
+    holding the rune and no talents, 24 seeded autoplay battles an arm: Divine Presence **81 fires
+    / 255**, Entropy **130 / 694 Break**, Pleasure from Pain **76 / 166**. Not approximately —
+    exactly, which is the resolution at which a dropped clause hides.
+  - **THE NEGATIVE CONTROL BIT IN THREE DIRECTIONS AT ONCE.** With the read sites taking the
+    node's half alone — the exact mistake a re-key makes — all three rune-only arms went to **0**,
+    **the node-only arms did not move a single fire**, and the hero holding both lost precisely
+    the rune's share of the sum (17.18 → 13.39, 26.48 → 21.37, 12.55 → 10.66). The middle column
+    is what makes the outer two mean anything.
+- **§2 — THE SIXTEEN ARE DERIVED, SPLIT AND PRESENTED. NOTHING WAS AUTHORED.** The derivation off
+  `LANE_TREES` and `runes.json` reproduces EM's sixteen exactly — **but only with
+  `check_em.UNIT_MATH` excluded**; without that exemption it returns twenty-six and sweeps in the
+  Colossus and the Glass Rune, which touch no tree at all.
+  - **THE POOL ARITHMETIC IS FLAT AND THAT IS THE FIRST SURPRISE.** Every spec has **4 spec runes
+    and 12 drawable** (4 spec + 3 class-wide + 5 universal). The 5 universal and 12 class-wide
+    carry no talent clause, so the retirement is entirely a spec-scoped question. **It cannot
+    blank an offer**: an exhausted rarity widens to every rarity and then to the generated Common
+    family, and the rare shelf's floor after retirement is **6** against **3 rune slots**.
+  - **THE THRESHOLD IS STATED AND IT IS CONTENT, NOT A COUNT:** *a spec is GUTTED when nothing
+    surviving — spec, class-wide or universal — touches its own engine.* **A count cannot carry
+    the ruling** because no count-based line has a consequence behind it.
+  - **EXACTLY ONE SPEC FAILS IT: the BEASTMASTER.** He would keep `loosened_straps` alone, a
+    Scarred rune whose only upside is **Quick Shot** — and **no class-wide or universal rune
+    touches a companion either**, so after a blanket retirement there would not be one rune in the
+    game that touches a companion. **The companion IS the spec.** The line is movable and the
+    report shows both alternatives (a 2-survivor line catches the same one; a half-loss line
+    catches five).
+  - **EXACTLY ONE OF THE SIXTEEN IS SCARRED and it is flagged apart**: the Bared Guard, 75g,
+    Swordmaster, whose two clauses ARE the trade — retiring it removes the cost with the upside,
+    and would leave him **the only spec in the game with no Scarred rune.**
+  - **THE OVERLAP THAT CANNOT BE READ APART:** the Deepening Ruin and the Whispering Dark are both
+    Occultist and are the only two runes where §1 and §2 meet. Retiring them retires two of the
+    three fields EN authored.
+- **§3 — THE RUNG STAYS. THE STOP CLAUSE FIRED AND THE BRIEF'S OWN INSTRUCTION WAS FOLLOWED.**
+  `Profile.note_end_boss(Run.difficulty_rung())` sets the talent tier to the rung cleared, and
+  **`Talents.TIER_ROWS` is `[0, 3, 6, 9]` — tier 0 opens NO rows at all.** Clearing rung 1 is the
+  only thing in the game that opens rows 1–3 of all twelve trees, for every spec at once.
+  - **RE-MEASURED WITH BN's OWN INSTRUMENT ON THE LIVE TREE** (`DOD_SIM_ROWS=0`, `--run 30` a
+    rung): **untalented completion is 97% / 3% / 0%.** Removing the rung moves a new player's
+    first talent row from a one-attempt clear to roughly a thirty-attempt one — worse than the
+    13% BN §2 measured at ×0.70 and deliberately fixed by choosing ×0.50.
+  - **THE 100% BOT COMPLETION IS A FULLY TALENTED PARTY** (`rows=9 of 9`, CY's own named
+    confounder; re-confirmed at 100 / 80 / 80% across the three rungs, n=20). **A fully talented
+    party has already been through the door the rung is.**
+  - **RELICS WOULD HAVE SURVIVED IT AND TALENTS WOULD NOT.** `Relics.unlock_random()` runs above
+    the `is_end` branch, so every boss at every rung awards one. Only the talent ladder reads the
+    rung.
+  - **EVERY SITE THAT READS A RUNG BY INDEX IS LISTED IN THE REPORT.** The sharp one is
+    `draft_screen.gd:147-148`, which advertises each rung's unlock as
+    `rows_unlocked(rung - 1) + 1 .. rows_unlocked(rung)` — **`def["rung"]` IS the tier index**, so
+    a renumbering breaks the ANNOUNCEMENT rather than the ledger, which is the failure mode that
+    ships. `data/enemies.json` carries two `"rung"` tags (2 and 3, both end-boss).
+    **No second save-refusal path was invented, because nothing was removed.**
+- **§4 — PER-HERO RELICS NEVER LANDED, AND NEITHER DOCUMENT NOR CODE WAS WRONG.**
+  `Run.active_relics` is a flat list of up to 3 ids with **no hero key**, and `relic_add` /
+  `relic_dict` **both take a hook and nothing else** — party-wide at all 25 read sites, and the
+  save format never moved. `master.html`'s *"up to 3 equipped per run at the draft"* was
+  **accurate**; what was missing is that a ruling points the other way and is unbuilt, which it now
+  says. **The code was NOT moved toward the ruling** because four hooks are still unruled, and
+  choosing four designs by implementation is the guess AR §4 forbids.
+- **AND `CLAUDE.md` NOW SAYS WHAT A RELIC IS FOR, DERIVED FROM THE READ SITE.** Every one of the
+  19 relic hooks is read at exactly one place — run start, battle **spawn**, the victory screen,
+  gold awards, rest nodes, shop prices, elite spoils — and **not one is read while a turn is
+  resolving**, swept over all 25 sites. The category `relics.gd` declares OUT (on-kill and
+  per-turn procs, revive-on-death, enemy auras, DoT and Break multipliers) is exactly the
+  in-combat one. **A relic sets up the run; a talent changes what a spec does in a fight; a rune
+  is this run's kit.** And a relic is party-wide *by construction* — it is chosen at the draft,
+  before specs exist.
+- **§5 — TWO ACCEPTANCES RECORDED, AND ONE STALE CAVEAT RETIRED.** Elites stay the shortest fight
+  at every rung and that is **accepted by design**. **DA's "no longer holds at rung 3" caveat does
+  not reproduce**: re-measured at `--run 30` a rung, elite **3.4 / 3.7 / 4.0** against trash
+  3.9 / 4.3 / 4.4 and boss 3.8 / 4.4 / 5.4 — shortest at all three rungs again, by 0.4–0.5 rounds.
+  **The tags stay mechanically inert and `check_ek` §3's game-side population stays at THREE.**
+- **§6 — ONE GATE SECTION INVERTED RATHER THAN DELETED.** `check_em` §4 said *"the day one is
+  answered this gate reds and the answer is to delete its row"*. All three were answered at once,
+  and deleting the table would have left the section **looping over nothing and printing exactly
+  like a clean run**. It asserts the CLOSURE now and walks EN's three in both directions over a
+  live population, printing `CHECKED n of m`. §1's `NO_HOME` exemption arm went with the set.
+  - **AND THE GATE'S OWN HEADER CARRIED EJ'S OFF-BY-ONE.** It read *"`crit_bonus`, `speed`,
+    `armor` and seven others"* and *"the TEN fields"*; **`UNIT_MATH` holds NINE and `armor` is not
+    one of them** — it is the tenth name in EJ's list precisely BECAUSE no live node writes it.
+    The table was right and the sentence was wrong. `CLAUDE.md` had it right and is unchanged.
+  - **AND A `runes.gd` SENTENCE HAD BEEN STALE SINCE EM.** *"These three are what the four Holy
+    runes write today"* — no rune writes `triage_heal`, `divine_presence_pct` or `last_hope_pct`
+    any more. All three stay listed (the AW/AX durability rule) and the sentence now says so.
+- **THE BATTERY: 87 targets, 41,445 checks, 0 throws, 0 `Parse Error` in any of the 87 logs, and
+  `check_de` reads 358 / 0 / 0.** The tree was frozen and the freeze PROVED — 186 files md5'd by
+  absolute path before and after, identical, and `.ran` holds 87 names with no duplicate. Three
+  baseline rows moved and all three were predicted: `check_em` 210 → **223**, `test_batch_av`
+  350 → **351**, `test_batch_ax` 350 → **352**. The two standing reds (`test_rune_battle` 97/1
+  against a 0–1 band, `check_cm_live` 13/4) did not move.
+- **AND ONE REGRESSION, WHICH IS THE RETIRED-WORD RULE AND THE PRE-CHECK THAT MISSED IT.**
+  `test_batch_bx` §4b went red on new `master.html` prose reading **"PARTY-WIDE"** and **"the whole
+  party"** — DL §2's rule, where *party* means either *hero* or *ally* and is exactly the word
+  Rallying Shout's clause hid behind. **The pre-check ran ten document-reading GATES and all ten
+  were green; §4b lives in a SUITE.** The rule is not *pre-check the gates* — it is **pre-check
+  every target that reads the document you edited**, which for `master.html` is **25 targets, six
+  gates and nineteen suites.** Repaired to the project's vocabulary with no claim changed; a needle
+  sweep against the exact file the battery read flipped **1 LOST / 0 GAINED** (and that needle is
+  comment-only), **and the sweep is not the proof** — §4b tests `contains("party")` after stripping
+  five marked identifiers, which `master.html` legitimately still carries, so the needle never
+  flips. All 25 targets were re-run: bx reads **161 / 0**, its exact baseline, and `check_de` was
+  re-run over the updated logs at 358 / 0 / 0.
+- **Next letter: EO.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
-  and **the rune layer is now charter-clean on the mechanics.** What is left in the rune layer is
-  design: three clauses, sixteen runes, and whether the lane rule is replaced with anything.
+  and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
+  layer is design: sixteen runes, and whether the lane rule is replaced with anything.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -209,21 +284,27 @@ rune-owned fields; the property *no rune writes a live talent node's counter* is
 battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`master.html`,
 `design-notes.md` and `CLAUDE.md` all say so now.** What follows is what is NOT done.
 
-- **THE THREE CLAUSES WITH NO HOME. OPTIONS PRICED, NONE TAKEN.** `divine_presence_pct`,
-  `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their node — no passive,
-  stat, core ability or draft card underneath them — so re-keying one means INVENTING an effect,
-  which is the guess AR §4 forbids. All three still write the node's counter and `check_em` §4
-  names them as an EQUALITY, **so the day one is answered the gate reds and the answer is to delete
-  its row.** Full options and the before/after worth of each rune in `docs/reports/EM.md` §2.
-  - **Rune of the Sleepless Vigil** (75g, SCARRED, Vigil) — `divine_presence_pct` is **one of
-    three**; it keeps `beacon_ranks` (already rune-only) and its −10 Speed cost. Losing the clause
-    leaves a scarred rune paying ONE effect for a real cost.
-  - **Rune of the Deepening Ruin** (100g, Ruin) — `entropy_ranks` is **one of TWO**. Losing it
-    halves the rune.
-  - **Rune of the Whispering Dark** (100g) — `pleasure_pct` is **one of four**, and the other three
-    are re-keyed and live. It is the cheapest of the three to drop and the one whose desc would
-    need the most surgery.
-- **THE SIXTEEN THE CHARTER EMPTIES. LISTED, PRICED, AND UNRULED.** Every clause these sixteen own
+- **THE THREE CLAUSES WITH NO HOME ARE ANSWERED AT EN AND THIS QUESTION IS CLOSED.** EM priced
+  four options and authored none; **EN took option A** — `divine_presence_pct`, `entropy_ranks` and
+  `pleasure_pct` each have a `rune_` field of their own and each drip's EXISTING tick sums the
+  pair. **No second tick, because a hero holding both would be paid twice.** All three are payouts
+  with presence tests, read at their own sites; **AL's MAX rule has zero applications across all
+  59.** Driven live and seeded, before and after: **every reading reproduced exactly**, and the
+  control taking the node's half alone took all three to zero. `check_em` §4 asserts the CLOSURE
+  now, in both directions, over a live population of three. **Nothing else in the rune layer is
+  mechanically outstanding.**
+- **THE SIXTEEN THE CHARTER EMPTIES. DERIVED AND SPLIT AT EN, PRESENTED, AND STILL UNRULED —
+  NOTHING WAS AUTHORED.** EN re-derived the sixteen off `LANE_TREES` and `runes.json` (they
+  reproduce exactly, **but only with `check_em.UNIT_MATH` excluded** — without it the derivation
+  returns twenty-six and sweeps in two universal runes that touch no tree). **Every spec has 4 spec
+  runes and 12 drawable, and a retirement cannot blank an offer** — an exhausted rarity widens and
+  then falls back to the generated Common family, with a rare-shelf floor of 6 against 3 slots.
+  **EN's threshold, stated so it can be moved: a spec is GUTTED when nothing surviving touches its
+  own engine.** By that line **only the Beastmaster** is gutted — he would keep one Scarred rune
+  whose upside is Quick Shot, and **no class-wide or universal rune touches a companion either**,
+  so no rune in the game would. `docs/reports/EN.md` §2 carries the re-author axis for those three,
+  what each of the other thirteen loses, and the Bared Guard flagged apart. **The full list of the
+  sixteen with their clauses is still `docs/reports/EM.md` §3.** Every clause these sixteen own
   was talent-keyed, so after the re-key they are mechanically whole and have lost the argument for
   existing: each was *your lane, but more*. **`docs/reports/EM.md` §3 lists all sixteen by name with
   what each does, its price, its lane and its clauses.** **Exactly one is Scarred — the Rune of the
@@ -812,8 +893,11 @@ re-derived from the source at DM; not one was moved.**
 
 - **Enemy interference as a status.** Not yet specified.
 - **RELICS PER-HERO — RULED, SCOPED, AND NOT STARTED.** The ruling stands (a relic is assigned to
-  one hero at pickup); CX reported the scope and stopped. **It is a SAVE-FORMAT change: the run
-  save goes v10 → v11.** `Run.active_relics` is a flat `Array` read back as a hard key
+  one hero at pickup); CX reported the scope and stopped. **VERIFIED AT EN: NOT ONE LINE OF IT
+  LANDED**, and neither `master.html` nor the code was wrong about the other — they agree, and what
+  was missing is that the ruling points elsewhere and is unbuilt, which `master.html` now says.
+  **It is a SAVE-FORMAT change: the run save would go v12 → v13** (this block recorded v10 → v11,
+  written when the save was v10; CT took it to v11 and EG to v12).** `Run.active_relics` is a flat `Array` read back as a hard key
   (`data["active_relics"]`, no default), so every existing save breaks without a migration. It
   also touches **25 read sites** (`battle.gd` 12, `run_state.gd` 8, `run_sim.gd` 4,
   `shop_screen.gd` 1), the two aggregators (`Relics.hook_add` / `hook_dict`), the two accessors
@@ -1001,7 +1085,12 @@ re-derived from the source at DM; not one was moved.**
   threshold.** **`Profile` is
   v2** (tolerant load). Talent cells cost 1/2/3 by tier — **27 cells = 54 points a spec.**
   **`Talents.LANES` = 3**, so the twelve trees hold **36 lanes**.
-- **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide.
+- **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide —
+  **confirmed at EN as the code's behaviour, not just this file's memory of it.** The per-hero
+  ruling stands and is unbuilt. **`CLAUDE.md` now carries the division of labour:** every relic
+  hook is read at run start, battle SPAWN, the victory screen, gold awards, rest nodes, shop prices
+  or elite spoils — **not one while a turn resolves** — so a relic sets up the RUN and a talent
+  changes what a SPEC does in a fight.
 
 ### THE TEST TREE, AS OF EF
 
@@ -1093,7 +1182,7 @@ re-derived from the source at DM; not one was moved.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
 - **THE BASELINE TABLE IS `baselines.json` AND IT IS 86 ROWS: 46 suites, 35 gates, 2 scene runs
-  and 3 harness gates.** **EM ADDED `check_em` AT [210, 210] AND MOVED FIVE OTHER ROWS —
+  and 3 harness gates.** **EM ADDED `check_em` AT [210, 210]; EN MOVED IT TO [223, 223] AND MOVED `av` AND `ax` BY ONE AND TWO. EM MOVED FIVE OTHER ROWS —
   `check_dp` 43 → 48, `check_parse` 160 → 161, `test_batch_ak` 495 → 496, `test_batch_ax`
   348 → 350 and `test_runes` 3121 → 3125 — ALL SIX WRITTEN BEFORE THE BATTERY**, three of them
   off three identical standalone readings apiece. **`check_parse` read 163 first**, and the extra
@@ -1222,8 +1311,23 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
   **A fight is still three to six turns per hero** — the ROUNDS column is the half DK and DL do not
   move, because companions are excluded from both halves of that ratio. **The healing and Break
-  columns are the stale ones.** **"Elite fights are the shortest of the three
-  kinds at every rung" NO LONGER HOLDS AT RUNG 3**, where all three kinds read 4.4.
+  columns are the stale ones.**
+  - **RE-MEASURED AT EN, `--run 30` A RUNG ON THE LIVE TREE, AND THE ROUNDS TABLE ABOVE IS
+    SUPERSEDED BY THIS ONE:**
+
+    | party / rung | trash | elite | boss |
+    |---|---|---|---|
+    | 1 wanderer | 3.9 (n=206) | **3.4** (n=256) | 3.8 (n=60) |
+    | 2 warden | 4.3 (n=240) | **3.7** (n=246) | 4.4 (n=57) |
+    | 3 ruin | 4.4 (n=235) | **4.0** (n=225) | 5.4 (n=55) |
+
+  - **DA's "NO LONGER HOLDS AT RUNG 3" CAVEAT IS RETIRED — IT DOES NOT REPRODUCE.** DA read all
+    three kinds at 4.4; on the live tree the elite is **shortest at all three rungs again**, by
+    0.4–0.5 rounds. **And the finding is now ACCEPTED rather than open** (EN §5): elites are burst
+    checks by design and a ramp spec having least room where difficulty spikes is the intended
+    tension. It is recorded in `CLAUDE.md` beside CY's cap so it is not rediscovered a third time.
+    **The confounders are CY's, unchanged**: fully talented (`rows=9 of 9`), each tree's first
+    lane, companions excluded from both halves.
 - **THE SIM'S OWN `Avg rounds/battle` LINE DIVIDES BY THREE AND THE PARTY IS FOUR.** It has been
   reading a third high since the class draft. `cy_report_line` is the one to read instead.
 - **RAMP ARRIVAL, per-battle peak against what the spec is built around, AFTER DA:**
@@ -1250,7 +1354,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **32 entries** (DG → EL), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
+  **34 entries** (DG → EN), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever

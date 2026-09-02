@@ -272,7 +272,7 @@
 		"name": "Rune of the Sleepless Vigil", "rarity": "rare", "scope": "spec:holy",
 		"price": 75, "scarred": true, "lane": "Vigil",
 		"desc": "The most wounded ally heals 2% as her turn ends; allies under a quarter heal 5% as it starts — but -10 Speed.",
-		"payload": {"stat": {"divine_presence_pct": 2, "beacon_ranks": 1, "speed": -10.0}}
+		"payload": {"stat": {"rune_divine_presence_pct": 2, "beacon_ranks": 1, "speed": -10.0}}
 	},
 	"open_hand": {
 		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
@@ -310,7 +310,7 @@
 		"name": "Rune of the Deepening Ruin", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100, "lane": "Ruin",
 		"desc": "Every stack of Ruin makes its bearer take 1% more damage, and anything bearing Ruin takes 5 Break damage at the start of its turn.",
-		"payload": {"stat": {"rune_deep_hex_step": 1, "entropy_ranks": 5}}
+		"payload": {"stat": {"rune_deep_hex_step": 1, "rune_entropy_ranks": 5}}
 	},
 	"flayed_mind": {
 		"name": "Rune of the Flayed Mind", "rarity": "epic", "scope": "spec:occultist",
@@ -328,7 +328,7 @@
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
 		"desc": "A little of every rite: +5% Break damage, each mark of Ruin has a 15% chance to leap to another enemy, which catches 1 Ruin, enemy afflictions mend the heroes each turn.",
-		"payload": {"stat": {"rune_broken_will_ranks": 5, "rune_spread_ranks": 15, "rune_spread_ruin": 1, "pleasure_pct": 0.5}}
+		"payload": {"stat": {"rune_broken_will_ranks": 5, "rune_spread_ranks": 15, "rune_spread_ruin": 1, "rune_pleasure_pct": 0.5}}
 	},
 
 	"deep_bond": {
