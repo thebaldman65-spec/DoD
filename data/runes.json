@@ -113,7 +113,7 @@
 		"name": "Rune of Boiling Blood", "rarity": "rare", "scope": "spec:berserker",
 		"price": 100, "lane": "Fury",
 		"desc": "Blood Frenzy grants +0.5% more damage for every 5% of health missing.",
-		"payload": {"stat": {"bloodrage_step_bonus": 0.5}}
+		"payload": {"stat": {"rune_bloodrage_step_bonus": 0.5}}
 	},
 	"warpath": {
 		"name": "Rune of the Warpath", "rarity": "rare", "scope": "spec:berserker",
@@ -126,20 +126,20 @@
 		"name": "Rune of the Broad Path", "rarity": "rare", "scope": "spec:berserker",
 		"price": 100,
 		"desc": "A little of every road: +5 Bleed on bleed-building blows, Blood Frenzy +0.25%/step, +15 max health.",
-		"payload": {"stat": {"bleed_bonus": 5, "bloodrage_step_bonus": 0.25, "max_hp": 15}}
+		"payload": {"stat": {"bleed_bonus": 5, "rune_bloodrage_step_bonus": 0.25, "max_hp": 15}}
 	},
 
 	"bared_guard": {
 		"name": "Rune of the Bared Guard", "rarity": "rare", "scope": "spec:swordmaster",
 		"price": 75, "scarred": true, "lane": "Blade",
 		"desc": "Aggressive Stance deals +10% more — but Defensive Stance no longer reduces damage taken.",
-		"payload": {"stat": {"seasoned_off_bonus": 0.1, "seasoned_def_bonus": -0.15}}
+		"payload": {"stat": {"rune_seasoned_off_bonus": 0.1, "rune_seasoned_def_bonus": -0.15}}
 	},
 	"still_wrist": {
 		"name": "Rune of the Still Wrist", "rarity": "rare", "scope": "spec:swordmaster",
 		"price": 100, "lane": "Poise",
 		"desc": "+4% Parry; a perfect Guard Change's parry buff is 5% stronger.",
-		"payload": {"stat": {"parry_bonus": 0.04, "swordsmanship_parry": 0.05}}
+		"payload": {"stat": {"parry_bonus": 0.04, "rune_swordsmanship_parry": 0.05}}
 	},
 	"shattered_guard": {
 		"name": "Rune of the Shattered Guard", "rarity": "rare", "scope": "spec:swordmaster",
@@ -183,7 +183,7 @@
 		"name": "Rune of the Cinder Trail", "rarity": "rare", "scope": "spec:pyromancer",
 		"price": 100, "lane": "Kindling",
 		"desc": "Fireball also sets one other enemy Burning for 1 turn, and Flamewave burns 1 turn longer.",
-		"payload": {"stat": {"rune_cinder_ember": 1, "conflagration_ranks": 1}}
+		"payload": {"stat": {"rune_cinder_ember": 1, "rune_conflagration_ranks": 1}}
 	},
 	"white_flame": {
 		"name": "Rune of the White Flame", "rarity": "epic", "scope": "spec:pyromancer",
@@ -201,14 +201,14 @@
 		"name": "Rune of the Long Burn", "rarity": "rare", "scope": "spec:pyromancer",
 		"price": 100,
 		"desc": "A little of every fire: Burn ticks +1% of Attack, burning enemies hit him 2% softer, Detonation +3% crit.",
-		"payload": {"stat": {"accelerant_ranks": 1, "molten_ranks": 1, "supernova_ranks": 1}}
+		"payload": {"stat": {"rune_accelerant_ranks": 1, "molten_ranks": 1, "supernova_ranks": 1}}
 	},
 
 	"bitter_grip": {
 		"name": "Rune of the Bitter Grip", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100, "lane": "Deep Freeze",
 		"desc": "Every stack of Chilled slows 3% harder, and HELD enemies are 2% likelier to be struck critically — by anyone.",
-		"payload": {"stat": {"frigid_ranks": 3, "frostbite_ranks": 2}}
+		"payload": {"stat": {"rune_frigid_ranks": 3, "rune_frostbite_ranks": 2}}
 	},
 	"honed_lance": {
 		"name": "Rune of the Honed Lance", "rarity": "rare", "scope": "spec:cryomancer",
@@ -221,20 +221,20 @@
 		"name": "Rune of the Killing Cold", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 75, "scarred": true, "lane": "Winter",
 		"desc": "Enemies take 2% more damage per Chilled stack and Chilled enemies miss 5% more — but heals he receives are 25% weaker.",
-		"payload": {"stat": {"hypothermia_ranks": 2, "numbing_ranks": 5, "healing_received_mult": -0.25}}
+		"payload": {"stat": {"rune_hypothermia_ranks": 2, "numbing_ranks": 5, "healing_received_mult": -0.25}}
 	},
 	"long_winter": {
 		"name": "Rune of the Long Winter", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100,
 		"desc": "A little of every cold: Chilled slows 3% harder, Ice Lance +5% of Attack per stack, Chilled enemies hit 1% softer per stack.",
-		"payload": {"stat": {"frigid_ranks": 3, "crystal_edge_ranks": 5, "hungering_ranks": 1}}
+		"payload": {"stat": {"rune_frigid_ranks": 3, "rune_crystal_edge_ranks": 5, "rune_hungering_ranks": 1}}
 	},
 
 	"resonant_core": {
 		"name": "Rune of the Resonant Core", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 100, "lane": "Resonance",
 		"desc": "The first cast of each of his turns builds 1 extra Resonance, and the damage curve's step rises 0.5%.",
-		"payload": {"stat": {"resonant_core_ranks": 1, "conduit_step": 0.5}}
+		"payload": {"stat": {"rune_resonant_core_ranks": 1, "rune_conduit_step": 0.5}}
 	},
 	"seventh_bolt": {
 		"name": "Rune of the Seventh Bolt", "rarity": "rare", "scope": "spec:arcanist",
@@ -247,7 +247,7 @@
 		"name": "Rune of the Unquiet Mind", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 75, "scarred": true, "lane": "Entropy",
 		"desc": "Cooldowns tick an extra turn every sixth turn, and a fifth of Cannon's recoil is paid in Mana, not blood — but 8 less Mana a turn.",
-		"payload": {"stat": {"mindfulness_ranks": 1, "feedback_ranks": 20, "mana_regen_bonus": -8}}
+		"payload": {"stat": {"mindfulness_ranks": 1, "rune_feedback_ranks": 20, "mana_regen_bonus": -8}}
 	},
 	"wide_current": {
 		"name": "Rune of the Wide Current", "rarity": "rare", "scope": "spec:arcanist",
@@ -260,7 +260,7 @@
 		"name": "Rune of the Triage Ward", "rarity": "rare", "scope": "spec:holy",
 		"price": 100, "lane": "Radiance",
 		"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Heal.",
-		"payload": {"stat": {"triage_heal": 3, "capacitor_ranks": 1}}
+		"payload": {"stat": {"rune_triage_heal": 3, "capacitor_ranks": 1}}
 	},
 	"last_rites": {
 		"name": "Rune of the Last Rites", "rarity": "epic", "scope": "spec:holy",
@@ -278,39 +278,39 @@
 		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
 		"price": 100,
 		"desc": "A little of every grace: +3% healing and her instant heals can CRIT, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
-		"payload": {"stat": {"triage_heal": 3, "zealous_mercy": 1, "last_hope_pct": 5}}
+		"payload": {"stat": {"rune_triage_heal": 3, "rune_zealous_mercy": 1, "rune_last_hope_pct": 5}}
 	},
 
 	"warded_robes": {
 		"name": "Rune of the Warded Robes", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Bulwark",
 		"desc": "Divine Shield turns 4% of what it absorbs into healing, and its holder wears +10% armor while it stands.",
-		"payload": {"stat": {"blessed_barrier_ranks": 4, "warded_ranks": 10}}
+		"payload": {"stat": {"rune_blessed_barrier_ranks": 4, "rune_warded_ranks": 10}}
 	},
 	"binding_oath": {
 		"name": "Rune of the Binding Oath", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Faith",
 		"desc": "The oath is sworn before the fight: the Devout opens each battle holding 1 Faith of his own, and a Faith release heals 5% more of the bearer's max health.",
-		"payload": {"stat": {"oath_opening": 1, "faithful_step": 5}}
+		"payload": {"stat": {"oath_opening": 1, "rune_faithful_step": 5}}
 	},
 	"burning_censer": {
 		"name": "Rune of the Burning Censer", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 75, "scarred": true, "lane": "Zeal",
 		"desc": "Consecrated Ground reflects 10% more and the reflection mends every hero for a fifth of it — but -12% max health.",
-		"payload": {"stat": {"righteous_step": 10, "lifewell_ranks": 20, "max_hp_pct": -0.12}}
+		"payload": {"stat": {"rune_righteous_step": 10, "rune_lifewell_ranks": 20, "max_hp_pct": -0.12}}
 	},
 	"standing_vow": {
 		"name": "Rune of the Standing Vow", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100,
 		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% hero Break damage, holy ground mends 2% each turn.",
-		"payload": {"stat": {"blessed_barrier_ranks": 4, "devoutness_ranks": 5, "pulse_ranks": 2}}
+		"payload": {"stat": {"rune_blessed_barrier_ranks": 4, "rune_devoutness_ranks": 5, "rune_pulse_ranks": 2}}
 	},
 
 	"deepening_ruin": {
 		"name": "Rune of the Deepening Ruin", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100, "lane": "Ruin",
 		"desc": "Every stack of Ruin makes its bearer take 1% more damage, and anything bearing Ruin takes 5 Break damage at the start of its turn.",
-		"payload": {"stat": {"deep_hex_step": 1, "entropy_ranks": 5}}
+		"payload": {"stat": {"rune_deep_hex_step": 1, "entropy_ranks": 5}}
 	},
 	"flayed_mind": {
 		"name": "Rune of the Flayed Mind", "rarity": "epic", "scope": "spec:occultist",
@@ -322,70 +322,70 @@
 		"name": "Rune of the Hollow Chalice", "rarity": "rare", "scope": "spec:occultist",
 		"price": 75, "scarred": true, "lane": "Leech",
 		"desc": "The Ruin lifesteal drinks 6% more per stack — but heals HE receives are 30% weaker (capped at 40% of the damage dealt).",
-		"payload": {"stat": {"soul_leech_step": 3, "gluttony_ranks": 3, "healing_received_mult": -0.3}}
+		"payload": {"stat": {"rune_soul_leech_step": 3, "rune_gluttony_ranks": 3, "healing_received_mult": -0.3}}
 	},
 	"whispering_dark": {
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
 		"desc": "A little of every rite: +5% Break damage, each mark of Ruin has a 15% chance to leap to another enemy, which catches 1 Ruin, enemy afflictions mend the heroes each turn.",
-		"payload": {"stat": {"broken_will_ranks": 5, "spread_ranks": 15, "spread_ruin": 1, "pleasure_pct": 0.5}}
+		"payload": {"stat": {"rune_broken_will_ranks": 5, "rune_spread_ranks": 15, "rune_spread_ruin": 1, "pleasure_pct": 0.5}}
 	},
 
 	"deep_bond": {
 		"name": "Rune of the Deep Bond", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100, "lane": "devotion",
 		"desc": "Every Loyalty stack drives the companion 1.5% harder, and deepens the Pack Bond boon by a further 3%.",
-		"payload": {"stat": {"wild_communion_step": 1.5, "absolute_step": 3.0}}
+		"payload": {"stat": {"rune_wild_communion_step": 1.5, "rune_absolute_step": 3.0}}
 	},
 	"turning_pack": {
 		"name": "Rune of the Turning Pack", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100, "lane": "pack",
 		"desc": "Swap Companion returns a turn sooner, and each different companion fielded this fight adds +8% companion damage.",
-		"payload": {"stat": {"quick_whistle_ranks": 1, "momentum_ranks": 8}}
+		"payload": {"stat": {"rune_quick_whistle_ranks": 1, "rune_momentum_ranks": 8}}
 	},
 	"loosened_straps": {
 		"name": "Rune of the Loosened Straps", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 75, "scarred": true, "lane": "handler",
 		"desc": "Quick Shot flies 12% of Attack harder — but he sheds 8% armor, and every companion he calls wears his plate.",
-		"payload": {"stat": {"masters_aim_ranks": 12, "armor": -0.08}}
+		"payload": {"stat": {"rune_masters_aim_ranks": 12, "armor": -0.08}}
 	},
 	"shared_wild": {
 		"name": "Rune of the Shared Wild", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100,
 		"desc": "A little of every bond: +1.5% companion damage per Loyalty stack, +8% per different companion fielded, +5% companion health.",
-		"payload": {"stat": {"wild_communion_step": 1.5, "momentum_ranks": 8, "companion_hp_pct": 0.05}}
+		"payload": {"stat": {"rune_wild_communion_step": 1.5, "rune_momentum_ranks": 8, "rune_companion_hp_pct": 0.05}}
 	},
 
 	"deep_sight": {
 		"name": "Rune of the Deep Sight", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100, "lane": "Precision",
 		"desc": "His patience turns into force 8 Focus sooner, and critical hits pour 20 more into it.",
-		"payload": {"stat": {"deep_focus": 8, "perfect_form": 20}}
+		"payload": {"stat": {"rune_deep_focus": 8, "rune_perfect_form": 20}}
 	},
 	"narrow_gap": {
 		"name": "Rune of the Narrow Gap", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100, "lane": "Penetration",
 		"desc": "His arrows ignore 8% more armor and bite 12% deeper into Broken enemies.",
-		"payload": {"stat": {"pierce_bonus": 0.08, "bonecracker_ranks": 12}}
+		"payload": {"stat": {"pierce_bonus": 0.08, "rune_bonecracker_ranks": 12}}
 	},
 	"long_draw": {
 		"name": "Rune of the Long Draw", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 75, "scarred": true, "lane": "Pace",
 		"desc": "He opens every fight holding 60 more Focus and gathers 10 more per attack — but the draw is slow: -10 Speed.",
-		"payload": {"stat": {"opening_volley": 60, "muscle_memory_ranks": 10, "speed": -10.0}}
+		"payload": {"stat": {"rune_opening_volley": 60, "rune_muscle_memory_ranks": 10, "speed": -10.0}}
 	},
 	"level_aim": {
 		"name": "Rune of the Level Aim", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100,
 		"desc": "A little of every angle: 4% more armor ignored, +10 Focus per attack, +12% damage against Broken enemies.",
-		"payload": {"stat": {"pierce_bonus": 0.04, "muscle_memory_ranks": 10, "bonecracker_ranks": 12}}
+		"payload": {"stat": {"pierce_bonus": 0.04, "rune_muscle_memory_ranks": 10, "rune_bonecracker_ranks": 12}}
 	},
 
 	"weeping_wound": {
 		"name": "Rune of the Weeping Wound", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100, "lane": "Venom",
 		"desc": "His basic attack leaves Poison AND Cripple behind for 2 turns, and every stack bites 2 harder.",
-		"payload": {"stat": {"coated_blades": 1, "potent_ranks": 2}}
+		"payload": {"stat": {"rune_coated_blades": 1, "rune_potent_ranks": 2}}
 	},
 	"quick_spring": {
 		"name": "Rune of the Quick Spring", "rarity": "rare", "scope": "spec:mystic",
@@ -398,12 +398,12 @@
 		"name": "Rune of the Carrion Wake", "rarity": "rare", "scope": "spec:mystic",
 		"price": 75, "scarred": true, "lane": "Guerilla",
 		"desc": "He strikes 30% harder at anything wearing three afflictions and drinks 16% max Mana from every death — but -12% max health.",
-		"payload": {"stat": {"vulture": 30, "scavenger_ranks": 16, "max_hp_pct": -0.12}}
+		"payload": {"stat": {"rune_vulture": 30, "rune_scavenger_ranks": 16, "max_hp_pct": -0.12}}
 	},
 	"long_hunt": {
 		"name": "Rune of the Long Hunt", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100,
 		"desc": "A little of every trick: +1 Poison damage per stack, +15% trap damage, Tripwire answers with 10% more of his Attack.",
-		"payload": {"stat": {"potent_ranks": 1, "cruel_ranks": 15, "wire_ranks": 10}}
+		"payload": {"stat": {"rune_potent_ranks": 1, "rune_cruel_ranks": 15, "rune_wire_ranks": 10}}
 	}
 }

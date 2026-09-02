@@ -1706,7 +1706,9 @@ status into the draft turned four tree-internal dependencies — which the chart
 · **BEFORE RE-POINTING A NODE OFF A FIELD, CHECK WHETHER A RUNE WRITES IT.** A fresh field name
   leaves that rune's clauses paying nothing, in silence — the exact dud the rune schema exists to
   prevent. **Keep the field and re-point its MEANING.** `check_dp` §4 asserts the general property:
-  **every stat field any rune writes has a live read site in `scripts/`.**
+  **every stat field any rune writes has a live read site in `scripts/`.** **BATCH EM OPENED THE
+  SAME DOOR FROM THE OTHER SIDE** — a rune re-keyed off a node's field goes dead in the GUARD
+  rather than in the arithmetic — and the rule for that is its own standing section below.
 · **A CONSTANT QUOTED AT MORE THAN ONE SITE MOVES IN A FUNCTION, NEVER AT THE SITES**, and a gate
   asserts no caller quotes it directly, so a new site cannot be added that a node silently fails to
   reach.
@@ -1721,6 +1723,55 @@ status into the draft turned four tree-internal dependencies — which the chart
   `_collided` finds no authored `upgrade` arm, so the rune owes its generic and `Run.apply_upgrades`
   turns it into an upgrade on the very card it would have granted. **A "Grants …" desc is wrong
   whenever the card was drafted**, and the honest wording already exists on one of them.
+
+
+## STANDING RULE — A RUNE IS DISCONNECTED FROM THE TALENT TREES (Batch EM, the designer's charter)
+
+> **A rune modifies stats and resources, and the mechanics and values of core abilities, draft
+> abilities and passives. It does not write a talent node's own counter.**
+
+**THE CHARTER IS THE DESIGNER'S AND THIS IS ITS MECHANICAL HALF.** EJ audited the gap and sized it
+at **59 of 135 clauses in 32 of the 65 runes**; EM re-keyed **56** onto rune-owned fields. What
+remains open is design and is in `docs/state.md` — the three clauses with no home, the sixteen
+runes the charter empties, and whether the lane rule is replaced with anything.
+
+· **THE FIELD NAME IS THE RULE: `rune_X` BESIDE `X`, READ AT THE SAME SITE.** Batch AL shipped this
+  three times before the charter existed (`rune_grudge_bonus`, `rune_vigil_bonus`,
+  `rune_on_edge_ranks`) and the method is in the source comments at each site. **Do not invent a
+  second shape.**
+· **A THRESHOLD TAKES THE MAX; A PAYOUT SUMS — AND GETTING IT BACKWARDS IS SILENT.** A summed
+  threshold fires early (35 + 25 = 60% is not "both effects", it is a third effect neither asked
+  for) and a maxed payout underpays. Neither throws. **All 56 of EM's clauses were payouts**; On
+  the Edge is still the only threshold any rune shares and it is still AL's.
+· **THE GUARD IS THE DANGEROUS HALF, NOT THE ARITHMETIC.** `if u.spread_ranks > 0` is FALSE for a
+  hero holding the rune and not the node, so the clause pays nothing and nothing throws.
+  **EVERY PRESENCE TEST ON A RE-KEYED FIELD MUST SUM THE PAIR.** Measured: with the guard reading
+  the node's counter alone, a rune-only Occultist spread a mark **0 times in 400**; summed, 55–66.
+  This is DP's Whispering Dark dud arriving through the repair for it.
+· **`check_em` §2 IS THE INSTRUMENT AND IT WORKS ON STATEMENTS, NOT LINES.** A guard and its payout
+  are two statements and an expression is often three lines. **Its first version excluded a match
+  preceded by a word character OR A DOT** — and `attacker.vulture` has a dot in front of it, so it
+  was blind to 80 of its 85 sites while printing a clean zero. **A control for a sweep like this
+  must be armed on a DOTTED read.**
+· **A TALENT NODE WRITING THE SAME FIELD DOES NOT BY ITSELF MAKE A RUNE TALENT-KEYED.**
+  `crit_bonus`, `speed`, `max_hp_pct`, `block_chance`, `parry_bonus`, `dmg_bonus`,
+  `dmg_taken_bonus`, `pierce_bonus` and `bleed_bonus` are the unit's own math, read in global
+  pipelines that relics also write. **They are `check_em.UNIT_MATH`, asserted as an EQUALITY**, so
+  a tenth needs a line and a reason. (`armor` is NOT among them: EJ's report said nine and listed
+  ten, and no live node writes `armor` at all.)
+· **`rune_X` INHERITS NOTHING FROM `X`.** `Runes._typed_payload` restores an int for a field ending
+  `_ranks` or listed in `STAT_INT_KEYS`, so **a `rune_` int whose name does not end `_ranks` needs
+  its own row there** — and a `rune_` FLOAT must be in neither, or the coercion rounds the rune
+  quietly under strength (the AT `conduit_step` precedent; the Bared Guard's −0.15 would flatten to
+  0 outright). `check_em` §3 derives both directions off the BattleUnit declaration.
+· **A CLAUSE WITH NOTHING UNDERNEATH IT IS NOT RE-KEYED, IT IS REPORTED.** `divine_presence_pct`,
+  `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their node; re-keying one
+  means inventing an effect, which is the guess AR §4 forbids. **`check_em.NO_HOME` names all three
+  as an EQUALITY** — the day one is answered the gate reds and the answer is to delete its row.
+· **THE `lane` FIELDS ARE STILL AUTHORED AND STILL SHOWN, AND THEY NOW DESCRIBE HISTORY.** 36 lane
+  runes and 12 splashes were built on *"worth more to a hero whose points went elsewhere"*; a rune
+  with its own field is worth the same to every hero of its spec. **That was measured, not
+  overlooked** — see `docs/design-notes.md` and `docs/master.html`.
 
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SLOT LADDER AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX, the cap and the loadout at EG)

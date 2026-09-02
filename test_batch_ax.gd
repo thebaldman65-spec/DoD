@@ -334,9 +334,14 @@ func _magnitudes() -> void:
 func _additive_units() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	for pair in [
-			["0.01 * (2 + ruin_occ.deep_hex_step)", "Deeper Hex"],
+			# BATCH EM — the rune's half is summed at the site now, so these
+			# literals carry the pair. THE QUESTION IS UNCHANGED: the counter is
+			# read as a MAGNITUDE (a `0.01 *` on the counter itself), never as a
+			# rank multiplied by a step. The `dead_math` sweep below is what pins
+			# the coefficient, and it did not move.
+			["0.01 * (2 + ruin_occ.deep_hex_step", "Deeper Hex"],
 			["0.01 * chan_r", "Corrupted Channeling"],
-			["0.01 * attacker.broken_will_ranks", "Broken Will"],
+			["0.01 * (attacker.broken_will_ranks", "Broken Will"],
 			["0.01 * occ.grim_ranks", "Grim Focus"],
 			["u.take_hit(0, ent_occ.entropy_ranks)", "Entropy"],
 			["_gain_ruin(e, occ.unravel_ranks)", "Unraveling"],
@@ -345,15 +350,22 @@ func _additive_units() -> void:
 			# and DO moved that card into the draft; both are re-pointed onto the
 			# passive, which the Occultist owns in every run. THE COUNTERS ARE STILL
 			# ADDITIVE, which is what this section exists to prove.
-			["randf() < 0.01 * occ.spread_ranks", "Spread of Madness"],
-			["_gain_ruin(caught, occ.spread_ruin)",
+			# Spread of Madness sums its two halves into LOCALS, because the guard
+			# is what goes silently dead on a rune-only Occultist (DP's case).
+			# Both the local and its definition are pinned.
+			["var sp_chance := occ.spread_ranks + occ.rune_spread_ranks",
+				"Spread of Madness (both halves)"],
+			["randf() < 0.01 * sp_chance", "Spread of Madness"],
+			["var sp_ruin := occ.spread_ruin + occ.rune_spread_ruin",
+				"Spread of Madness (the Ruin it marks — both halves)"],
+			["_gain_ruin(caught, sp_ruin)",
 				"Spread of Madness (the Ruin it marks)"],
 			["return OLD_GODS_MARK + occ.whispers_step", "Whispers"],
 			["0.01 * mirror_r", "Umbral Mirror"],
 			["_gain_ruin(strike_target, mad_occ.delirium_ranks)", "Delirium"],
 			["0.01 * mad_occ.cackling_ranks", "Cackling Mirror"],
 			["var torment_turns := occ.torment_ranks", "Lingering Torment"],
-			["(2 + occ_leech.soul_leech_step + occ_leech.gluttony_ranks)",
+			["(2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step",
 				"Soul Leech / Gluttony"],
 			["0.01 * u.pleasure_pct", "Pleasure from Pain"],
 			["0.01 * mi_ranks", "Murderous Intent"],
@@ -534,12 +546,20 @@ func _rune_audit() -> void:
 	# RE-POINTED, and — except for the one that could not be — each still pays
 	# exactly what it paid before this batch. Only the units moved.
 	var dr: Dictionary = data["deepening_ruin"]["payload"]["stat"]
-	ok(int(dr.get("deep_hex_step", 0)) == 1 and int(dr.get("entropy_ranks", 0)) == 5,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	# `entropy_ranks` IS DELIBERATELY NOT RE-KEYED: it is one of the three
+	# per-turn drips that exist only as their node, so there is nothing beneath
+	# it to re-point to and EM §2 puts the options rather than inventing one.
+	ok(int(dr.get("rune_deep_hex_step", 0)) == 1 and int(dr.get("entropy_ranks", 0)) == 5,
 		"the Deepening Ruin pays +1%/stack and 5 Break damage — exactly its old value")
 	var wd: Dictionary = data["whispering_dark"]["payload"]["stat"]
-	ok(int(wd.get("broken_will_ranks", 0)) == 5
-		and int(wd.get("spread_ranks", 0)) == 15
-		and int(wd.get("spread_ruin", 0)) == 1
+	ok(int(wd.get("rune_broken_will_ranks", 0)) == 5
+		and int(wd.get("rune_spread_ranks", 0)) == 15
+		and int(wd.get("rune_spread_ruin", 0)) == 1
 		and is_equal_approx(float(wd.get("pleasure_pct", 0.0)), 0.5),
 		"the Whispering Dark pays +5% BD / +15% spread / 1 Ruin / 0.5% — its old values")
 	# THE ONE THAT COULD NOT PAY WHAT IT PAID, and it is reported rather than
@@ -547,8 +567,8 @@ func _rune_audit() -> void:
 	# one, so "5% more from Ruined targets" has no equivalent. It keeps the
 	# RELATIONSHIP it always had — exactly one node's worth of each dial.
 	var hc: Dictionary = data["hollow_chalice"]["payload"]["stat"]
-	ok(int(hc.get("soul_leech_step", 0)) == int(_stat_of("oc_soul_leech", "soul_leech_step"))
-		and int(hc.get("gluttony_ranks", 0)) == int(_stat_of("oc_gluttony", "gluttony_ranks")),
+	ok(int(hc.get("rune_soul_leech_step", 0)) == int(_stat_of("oc_soul_leech", "soul_leech_step"))
+		and int(hc.get("rune_gluttony_ranks", 0)) == int(_stat_of("oc_gluttony", "gluttony_ranks")),
 		"the Hollow Chalice still pays one node's worth of each dial")
 	ok(String(data["hollow_chalice"]["desc"]).contains("per stack"),
 		"...and its description was rewritten to the new units, not left lying")

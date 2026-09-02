@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-01 (Batch EL &mdash; the tags get their real names, and MARK is the seventh)</b></p>
+<p align="right"><b>Last updated: 2026-09-01 (Batch EM &mdash; the runes get their own fields)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2468,9 +2468,9 @@ in-run power source that scales with depth): an <b>authored pool</b> (data/runes
 <b>Rarity means kind, not magnitude:</b> Common = flat stat adds (the six generated
 "Cracked" templates remain the filler family: +10 max HP / +2% armor / +4 Speed / +12
 Constitution / +2% crit / +8 max Mana; 50g), Rare ("Polished", 100g) alters an existing
-ability's numbers or grants a talent-like effect (talent-counter runes STACK with the
-talent), Epic ("Radiant", 160g) grants an ability, changes a damage type, or inverts a
-rule. <b>Scarred</b> runes — a flag on Rare/Epic with their own prefix and colour — buy a
+ability's numbers or grants a talent-like effect (a rune's counter is <b>its own</b> since
+Batch EM and stacks with the node's where a hero holds both), Epic ("Radiant", 160g) grants
+an ability, changes a damage type, or inverts a rule. <b>Scarred</b> runes — a flag on Rare/Epic with their own prefix and colour — buy a
 larger upside with a real cost, and are priced below their clean peers so the trade shows
 in the shop. Rarity odds deepen with the zone slot: 60/30/10 → 40/40/20 → 25/45/30
 (Common/Rare/Epic). <b>Eligibility:</b> every rune declares a scope — universal,
@@ -2487,13 +2487,27 @@ drawn from a pool that already excludes the ones beside it, so a triple can neve
 same rune twice. A card whose hero owes a pick wears the rune-purple border until it is
 spent.
 <br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
-classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set is
-built to one rule:
+classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set was
+<i>authored</i> to one rule:
 <b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
 pays for reaching outside one. Exactly one rune per set is Scarred, and it sits on a lane;
-splashes are always clean. The per-lane rule is what makes a rune a build decision rather
-than a power increment — the same rune is worth more to a hero whose points went elsewhere
-than to one already deep in that lane.</li>
+splashes are always clean. <b>That rule no longer describes what the runes DO.</b>
+<br><b>THE CHARTER, TAKEN AT BATCH EM: a rune is disconnected from the talent trees.</b> It
+modifies stats and resources, and the mechanics and values of core abilities, draft
+abilities and passives — never a talent node's own counter. EJ measured the gap at <b>59 of
+135 clauses across 32 of the 65 runes</b>; EM re-keyed <b>56</b> of them onto rune-owned
+fields read beside the node's at the same site, so <b>a rune pays its advertised number to
+a hero who holds the node and to one who does not, and the two still stack.</b> Not one
+magnitude moved. The remaining <b>three</b> — Divine Presence, Entropy and Pleasure from
+Pain — are per-turn drips with nothing underneath them to re-point to, and are unruled.
+<br><b>WHAT THAT COST, RECORDED BECAUSE IT WAS MEASURED RATHER THAN OVERLOOKED.</b> The
+per-lane rule is what made a rune a build decision rather than a power increment — the same
+rune was worth more to a hero whose points went elsewhere than to one already deep in that
+lane. <b>A rune with its own field is worth the same to every hero of its spec</b>, so that
+asymmetry is gone: <b>48 of the 65 runes were built on it</b> and the <b>12 splashes lose
+most</b>, since with no lanes to reach across a splash is three unrelated numbers in a
+bundle. The <b>36 `lane` fields are still authored and still shown</b>; they describe where
+a rune came from, not what it now reaches.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every

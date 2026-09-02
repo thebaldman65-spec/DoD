@@ -4,6 +4,70 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The runes come off the trees, and what that deletes (Batch EM) — 2026-09-01
+
+**The charter is the designer's and it is one sentence:** runes are
+disconnected from talents and are run-specific items only — they modify
+stats and resources, and the mechanics and values of core abilities,
+draft abilities and passives. EJ measured what that removes: **59 of the
+135 clauses, in 32 of the 65 runes**, wrote a live talent node's own
+counter. This batch re-keyed **56** of them onto rune-owned fields.
+
+**Mechanically it was a re-key and not a rewrite, and that is the whole
+reason it fits in one batch.** Every one of the 56 already modified a
+passive, a stat, a core ability or a draft card *at its read site* — the
+node's counter was the address, not the effect — so each needed a field
+of its own and nothing else. Batch AL had shipped exactly this three
+times before anybody wrote the charter (`rune_grudge_bonus`,
+`rune_vigil_bonus`, `rune_on_edge_ranks`), and its rule travelled with
+it: **a threshold takes the MAX and a payout SUMS.** Getting that
+backwards is silent — a summed threshold fires early and a maxed payout
+underpays, and neither throws. **All 56 turned out to be payouts.** The
+only threshold any rune shares is still On the Edge's, and it is still
+AL's.
+
+**The half that is actually dangerous is not the arithmetic, it is the
+guard.** `if occ.spread_ranks > 0` is false for an Occultist holding the
+Rune of the Whispering Dark and not the node, so a 100g rune's clause
+pays nothing and nothing throws. Driven live before the guards were
+widened, that hero spread a mark **0 times in 400**; with the pair
+summed, 55–66. **DP found this exact dud arriving through a re-pointed
+NODE — the repair for it opens the same door from the other side**, and
+that is why `check_em` §2 asserts that every statement reading `X` also
+reads `rune_X` rather than merely asserting that `rune_X` exists.
+
+**What the charter deletes is not code, and it is worth naming because
+it was measured rather than overlooked.** 48 of the 65 runes — 36 lane
+runes and 12 splashes — were authored to *"one rune per talent lane,
+plus one splash"*, and the reason that rule existed is two sections
+below: **a rune was worth more to a hero whose points went elsewhere.**
+A rune with its own field is worth the same to every hero of its spec,
+which is the power increment the rule was written to prevent. **The
+splashes lose most**: a splash "carries a term from every lane and pays
+for reaching outside one", and with no lanes to reach across it is three
+unrelated numbers in a bundle — **six of the twelve are among the sixteen
+the charter empties, against ten of the thirty-six lane runes.** The `lane` fields are still authored and
+still shown; they now describe where a rune came from rather than what
+it reaches.
+
+**Three clauses had nowhere to go and were deliberately left alone.**
+`divine_presence_pct`, `entropy_ranks` and `pleasure_pct` are per-turn
+drips that exist *only* as their node — no passive, stat, core or draft
+card underneath them — so re-keying one means inventing an effect, which
+is the guess AR §4 forbids. They still write the node's counter,
+`check_em` §4 names all three as an EQUALITY, and the options are put to
+the designer in `docs/reports/EM.md` §2 rather than taken here.
+
+**And sixteen runes were WHOLLY talent-keyed**, so the charter does not
+trim them — it empties the reason they exist. Every one is mechanically
+whole after the re-key and every one has lost its argument, because each
+was nothing but *your lane, but more*. They are listed with what they
+do, what they cost and which is Scarred in `docs/reports/EM.md` §3.
+**The distribution is uneven and it matters to any retirement pass**:
+all 59 clauses sat in the 48 spec runes, the 5 universal and 12
+class-wide carried none, and the **Warden is 0-of-7 against the
+Beastmaster's 8-of-9**.
+
 ## A rename is cheap on the side nobody reads (Batch EL) — 2026-09-01
 
 EK had to choose between calling a tag what it is and calling it something free. It chose free:
@@ -2758,6 +2822,13 @@ a category. Five of the nine existing spec sets have no epic either.
 
 ## Mage and Cleric rune sets, and a forfeit (Batch AA) — 2026-08-03
 
+**SEVERED AT BATCH EM AND KEPT AS THE RECORD OF WHY IT WAS AUTHORED THIS
+WAY.** The charter disconnects runes from the talent trees, so a lane
+rune no longer writes that lane's counters and the asymmetry described
+below is gone. The paragraph stands because it is the argument the
+charter overrules, and a reader finding flat runes later needs to know
+the cost was measured. See the EM section at the top of this file.
+
 **Why one rune per lane is a mechanism and not a hope.** Batch X built
 the rune system and left the obvious question open: what stops an
 authored pool from becoming twelve slightly different damage stat
@@ -2786,6 +2857,20 @@ effects, and a rune is a way to buy one word of it out of order. The
 alternative — bespoke rune-only fields — would have meant twenty-four
 new read sites in battle.gd, twenty-four chances for a silent dud, and a
 second parallel effect vocabulary that drifts away from the first.
+
+**BATCH EM TOOK THE ALTERNATIVE, AND THE PRICE THIS PARAGRAPH QUOTED WAS
+THE RIGHT PRICE.** The charter left no choice, and the cost came in
+almost exactly where it was predicted: **47 new fields, and 97 statements
+across nineteen scripts that now read a pair** — `check_em` §2 derives
+both numbers every battery run — not twenty-four. **The "twenty-four chances for a silent dud"
+was the accurate half** — a re-key leaves the payout arithmetic obvious
+and the GUARD above it silent, and one such guard was measured paying a
+100g rune nothing 400 times out of 400 before it was widened. What the
+paragraph could not foresee is that the second vocabulary does not drift
+from the first, because `rune_X` is read *at the same site* as `X` and
+`check_em` §2 fails if any statement reads one without the other.
+`entropy_ranks` is, fittingly, one of the three clauses that could not
+be moved at all.
 
 **Why the mage sets trade in element and the cleric sets trade in
 direction.** The Pyromancer and Cryomancer are deliberate mirror images,

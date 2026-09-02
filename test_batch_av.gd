@@ -375,7 +375,9 @@ func _additive_units() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
 	for pair in [
-			["0.01 * caster.triage_heal", "Triage"],
+			# BATCH EM: the Triage Ward and the Open Hand write `rune_triage_heal`
+			# now, and the site sums the pair. Still a magnitude, still no rank.
+			["0.01 * (caster.triage_heal + caster.rune_triage_heal)", "Triage"],
 			["0.01 * (5 + caster.heavenly_step) * caster.second_resource", "Heavenly Aura"],
 			["0.01 * attacker.holy_light_pct", "Holy Light"],
 			["0.01 * mend_pct", "On the Mend"],
@@ -472,11 +474,17 @@ func _rune_audit() -> void:
 	probe.free()
 	# The re-points, by their advertised numbers.
 	var tw: Dictionary = Runes.build("triage_ward")["payload"]["stat"]
-	ok(int(tw.get("triage_heal", 0)) == 3,
-		"the Triage Ward pays its advertised 3%% (got %s)" % tw.get("triage_heal", 0))
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(int(tw.get("rune_triage_heal", 0)) == 3,
+		"the Triage Ward pays its advertised 3%% (got %s)" % tw.get("rune_triage_heal", 0))
 	var oh: Dictionary = Runes.build("open_hand")["payload"]["stat"]
-	ok(int(oh.get("triage_heal", 0)) == 3 and int(oh.get("last_hope_pct", 0)) == 5
-		and int(oh.get("zealous_mercy", 0)) == 1,
+	ok(int(oh.get("rune_triage_heal", 0)) == 3
+		and int(oh.get("rune_last_hope_pct", 0)) == 5
+		and int(oh.get("rune_zealous_mercy", 0)) == 1,
 		"the Open Hand pays 3%% healing, 1 opening Mercy and 5%% to the nearly-dead")
 	var sv: Dictionary = Runes.build("sleepless_vigil")["payload"]["stat"]
 	ok(int(sv.get("divine_presence_pct", 0)) == 2,

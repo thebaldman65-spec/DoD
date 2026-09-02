@@ -262,16 +262,16 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    160,
-    160
+    161,
+    161
    ],
-   "checks_obs": 1,
+   "checks_obs": 3,
    "fails": [
     0,
     0
    ],
    "fails_obs": 10,
-   "note": "**GAINED A CHECK COUNT AT EI, AND THE COUNT IS THE COVERAGE.** It read `checks=?` for its whole life, so the only number it printed was a failure total that reads zero whether the gate walks 158 files or 41 — which is why **this gate has been found short three times**: CP repaired the tally after it returned zero on genuinely broken files, DE found it does not cover the suites, and EH broke `gate_fixture.gd` and **the floor procedure's stderr grep came back CLEAN while 23 gates could not load.** The number is the file count now and THE FLOOR IS ASSERTED, so a walk that quietly stops covering something is a FALL and reds here, while a batch that adds a suite is a RISE and reads as a notice telling the next batch to record it. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF `158 checks / 0 failures`**, so `check_de` certifies on pass one. **THE POPULATION IS DERIVED FROM `run_battery.sh`, NEVER FROM A DIRECTORY LIST** — a directory list is the thing that went stale all three times. 82 targets the battery spawns, + 57 reached through their preload / ext_resource / change_scene_to_file edges and project.godot's autoloads (which is how both fixtures arrive, since nothing names them and 60 files depend on them), + 11 game-tree files reachable only by a class_name identifier, + 4 data JSON. The 4 residue files are NAMED in the output every run. Its verdict is still read off stderr and never off this tally: a --script target whose base class does not resolve prints a parse error, runs not one line, and EXITS 0. **EK MOVED IT 158 -> 159 AND THE +1 IS THE WHOLE OF IT: `check_ek` JOINED `GATES`.** That is this row working as designed rather than drifting — the count IS the coverage, so a target added to the battery raises it the same day, and a RISE is the notice telling the batch to record the number. Written off THREE identical standalone readings of 159 before the battery, so `check_de` certifies on pass one. **EL MOVED IT 159 -> 160**: `check_el` joined `run_battery.sh`'s GATES and this gate's population is DERIVED from that array, so its count IS its coverage and a target joining the battery raises it the same day. EK moved it 158 -> 159 for the same reason. **THE ROW MOVED AFTER THE BATTERY RATHER THAN BEFORE IT, AND THAT IS THE MISS**: EL wrote `check_el`'s and `check_ek`'s rows before the run and did not write this one, so `check_de` reported one NOTICE where it should have certified silent. The notice is the row working — a count that rose and was not predicted is exactly what it exists to say."
+   "note": "**GAINED A CHECK COUNT AT EI, AND THE COUNT IS THE COVERAGE.** It read `checks=?` for its whole life, so the only number it printed was a failure total that reads zero whether the gate walks 158 files or 41 — which is why **this gate has been found short three times**: CP repaired the tally after it returned zero on genuinely broken files, DE found it does not cover the suites, and EH broke `gate_fixture.gd` and **the floor procedure's stderr grep came back CLEAN while 23 gates could not load.** The number is the file count now and THE FLOOR IS ASSERTED, so a walk that quietly stops covering something is a FALL and reds here, while a batch that adds a suite is a RISE and reads as a notice telling the next batch to record it. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF `158 checks / 0 failures`**, so `check_de` certifies on pass one. **THE POPULATION IS DERIVED FROM `run_battery.sh`, NEVER FROM A DIRECTORY LIST** — a directory list is the thing that went stale all three times. 82 targets the battery spawns, + 57 reached through their preload / ext_resource / change_scene_to_file edges and project.godot's autoloads (which is how both fixtures arrive, since nothing names them and 60 files depend on them), + 11 game-tree files reachable only by a class_name identifier, + 4 data JSON. The 4 residue files are NAMED in the output every run. Its verdict is still read off stderr and never off this tally: a --script target whose base class does not resolve prints a parse error, runs not one line, and EXITS 0. **EK MOVED IT 158 -> 159 AND THE +1 IS THE WHOLE OF IT: `check_ek` JOINED `GATES`.** That is this row working as designed rather than drifting — the count IS the coverage, so a target added to the battery raises it the same day, and a RISE is the notice telling the batch to record the number. Written off THREE identical standalone readings of 159 before the battery, so `check_de` certifies on pass one. **EL MOVED IT 159 -> 160**: `check_el` joined `run_battery.sh`'s GATES and this gate's population is DERIVED from that array, so its count IS its coverage and a target joining the battery raises it the same day. EK moved it 158 -> 159 for the same reason. **THE ROW MOVED AFTER THE BATTERY RATHER THAN BEFORE IT, AND THAT IS THE MISS**: EL wrote `check_el`'s and `check_ek`'s rows before the run and did not write this one, so `check_de` reported one NOTICE where it should have certified silent. The notice is the row working — a count that rose and was not predicted is exactly what it exists to say. **EM MOVED IT 160 -> 161 AND THE +1 IS THE WHOLE OF IT: `check_em` JOINED `GATES`.** Same shape as EK's and EL's — the population is DERIVED from `run_battery.sh`, so a target joining the battery raises the count the same day and the count IS the coverage. **Written BEFORE the battery off three identical standalone readings of 161**, which is the half EL missed. It read 163 first: two scratch measurement probes were sitting in the repo root and this gate's RESIDUE walk found them, which is the walk working. They were moved out of the tree and the residue is 4 again."
   },
   "harness_1": {
    "kind": "harness",
@@ -372,8 +372,8 @@
   "test_batch_ak": {
    "kind": "suite",
    "checks": [
-    495,
-    495
+    496,
+    496
    ],
    "checks_obs": 1,
    "fails": [
@@ -381,7 +381,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [529, 529] -> 495. -34. §2's class-pool resolve loop moved from `CLASS_POOLS` (61 names) to `CLASS_DRAFT_POOLS` (25). The stance-exclusion claim is re-pointed at the class-wide DRAFT, which is the live class-wide offer. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [529, 529] -> 495. -34. §2's class-pool resolve loop moved from `CLASS_POOLS` (61 names) to `CLASS_DRAFT_POOLS` (25). The stance-exclusion claim is re-pointed at the class-wide DRAFT, which is the live class-wide offer. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone. **EM MOVED IT 495 -> 496.** The Still Wrist rune writes `rune_swordsmanship_parry` now, so §7's two rune checks were repaired in place — the rune must pay ON ITS OWN and the pair must still sum to 0.20 — and a THIRD was added asserting the rune no longer writes the node's counter at all. **The LIVE arm did not move and is the one that mattered**: a rune-only Swordmaster still reads a 15%% perfect Guard Change, which is what a missed read-site edit would have taken to 10."
   },
   "test_batch_al": {
    "kind": "suite",
@@ -498,8 +498,8 @@
   "test_batch_ax": {
    "kind": "suite",
    "checks": [
-    348,
-    348
+    350,
+    350
    ],
    "checks_obs": 1,
    "fails": [
@@ -507,7 +507,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DP: UNMOVED AT 348, AND THAT WAS PREDICTED. §3's `whispers_step` magnitude went 45 -> 2 and its tooltip needle followed the text; §5's three read-site needles followed their nodes onto Ruin. **§4's boss-rule block traded two checks for two**: `oc_spread` and `oc_whispers` were the last two nodes stating 'a boss resists until Broken' and they stated it because they modified PSYCHOSIS — re-pointed onto Ruin, which no boss resists, repeating it would be FALSE rather than redundant. What replaces it is stronger: the lane's row-8 cell is the EXCEPTION to the boss rule now, so it is the one node that must still name it, and naming a rule you are the exception to cannot be done vacuously."
+   "note": "BATCH DP: UNMOVED AT 348, AND THAT WAS PREDICTED. §3's `whispers_step` magnitude went 45 -> 2 and its tooltip needle followed the text; §5's three read-site needles followed their nodes onto Ruin. **§4's boss-rule block traded two checks for two**: `oc_spread` and `oc_whispers` were the last two nodes stating 'a boss resists until Broken' and they stated it because they modified PSYCHOSIS — re-pointed onto Ruin, which no boss resists, repeating it would be FALSE rather than redundant. What replaces it is stronger: the lane's row-8 cell is the EXCEPTION to the boss rule now, so it is the one node that must still name it, and naming a rule you are the exception to cannot be done vacuously. **EM MOVED IT 348 -> 350.** Spread of Madness sums its two halves into LOCALS at the read site, because the GUARD is what goes silently dead on an Occultist holding the Rune of the Whispering Dark and not the node. The two additive-units rows for it became four: the local AND the line that defines it, for each half. `entropy_ranks` is deliberately NOT re-keyed — it is one of the three drips with nothing underneath them — and its row is unchanged."
   },
   "test_batch_ay": {
    "kind": "suite",
@@ -941,15 +941,16 @@
   "test_runes": {
    "kind": "suite",
    "checks": [
-    3121,
-    3121
+    3125,
+    3125
    ],
-   "checks_obs": 9,
+   "checks_obs": 1,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": " **EM MOVED IT 3121 -> 3125.** The cfg-ordering probe loop gained the two RUNE-written ceiling fields (`rune_zealous_mercy`, `rune_opening_volley`), which are the names a derivation running before the rune block would now leave as duds; the node's two are still checked. Two checks apiece. **Two other repairs in this file added no checks and both would otherwise have gone VACUOUS rather than red**: the `ceiling_writers` floor counted the old field names and would have fallen 2 -> 0, and `BOOLEAN_READ_FIELDS`' payload lookup returned null on the bare name and `continue`d past its own assertion."
   },
   "check_do": {
    "kind": "gate",
@@ -968,16 +969,16 @@
   "check_dp": {
    "kind": "gate",
    "checks": [
-    43,
-    43
+    48,
+    48
    ],
-   "checks_obs": 1,
+   "checks_obs": 3,
    "fails": [
     0,
     0
    ],
    "fails_obs": 1,
-   "note": "BATCH DP's gate, and it extends `check_do` rather than repeating it: the ability rule and the STATUS rule are the same rule, and DO's ability-matching instrument could not see this class of bet at all (`sm_precision` named no ability and was still a bet). §1 sweeps every node's rendered text against every status form and ASSERTS THE PROPERTY, printing 324 / 6 / 6 / 0 beside it. **THE RATCHET IS ASYMMETRIC ON PURPOSE, which is this file's own rule one layer up**: a pair NOT in `KNOWN_PAIRS` is an ERROR (a new bet), a known pair that has GONE is a NOTICE (a repair) — a gate that reds on a repair teaches the next batch to leave the defect alone. **IT READS `check_do`'s `GUARANTEED_STATUS` AND `STATUS_FORMS` RATHER THAN COPYING THEM**, and asserts the load, because a second copy of a hand-authored table is this project's oldest recurring defect. §2 asserts the four re-pointed cells are in their ORIGINAL lane and row, name Ruin, and read FOUR DISTINCT quantities — an application, its magnitude, an event and a depth threshold — because four cells all reading 'stacks of Ruin' would flatten a lane authored as a theme; none reads a DETONATION, which Grim Focus, Unraveling and Avatar of Ruin already own. §3 asserts the six new read sites exist, the four old ones are GONE (a field read in two places under two meanings is a silent order-dependence), that `permanent_delusion` is absent from `scripts/` WITH COMMENT LINES STRIPPED FIRST (DO's scar — prose recording a removal necessarily names what was removed), and that no `_gain_ruin` call quotes `OLD_GODS_MARK` directly, so a sixth passive site cannot be added that Whispers silently fails to reach. §4 is the check that would have caught the cost this batch nearly paid: **every stat field any rune writes has a live read site in `scripts/`** (116 fields across 65 runes, 0 dead) — the Rune of the Whispering Dark writes `spread_ranks` AND `spread_ruin`, so a fresh field name would have left two of its four clauses paying nothing in silence. §5 asserts every rune grant still RESOLVES (a rune grant goes through `Classes.pending_talent_ability`, not the draft resolver, so DO moving card NAMES while DEFINITIONS stayed put is the only reason four granting runes still work) and REPORTS the two that now duplicate a draft card's grant. §6 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, and its header does not name the other call either. NINE NEGATIVE CONTROLS WERE RUN AND ALL NINE BEHAVED: the four cells' old texts restored (5, 5, 6, 6 failures), the Ruined Mind read site defeated (3), the Whispering Dark's `spread_ruin` renamed (5), a sixth `_gain_ruin` call made to quote the constant (3) — and **the comment-stripping trap controlled from BOTH sides**: `permanent_delusion` as a COMMENT left it GREEN, the same identifier as CODE turned it RED."
+   "note": "BATCH DP's gate, and it extends `check_do` rather than repeating it: the ability rule and the STATUS rule are the same rule, and DO's ability-matching instrument could not see this class of bet at all (`sm_precision` named no ability and was still a bet). §1 sweeps every node's rendered text against every status form and ASSERTS THE PROPERTY, printing 324 / 6 / 6 / 0 beside it. **THE RATCHET IS ASYMMETRIC ON PURPOSE, which is this file's own rule one layer up**: a pair NOT in `KNOWN_PAIRS` is an ERROR (a new bet), a known pair that has GONE is a NOTICE (a repair) — a gate that reds on a repair teaches the next batch to leave the defect alone. **IT READS `check_do`'s `GUARANTEED_STATUS` AND `STATUS_FORMS` RATHER THAN COPYING THEM**, and asserts the load, because a second copy of a hand-authored table is this project's oldest recurring defect. §2 asserts the four re-pointed cells are in their ORIGINAL lane and row, name Ruin, and read FOUR DISTINCT quantities — an application, its magnitude, an event and a depth threshold — because four cells all reading 'stacks of Ruin' would flatten a lane authored as a theme; none reads a DETONATION, which Grim Focus, Unraveling and Avatar of Ruin already own. §3 asserts the six new read sites exist, the four old ones are GONE (a field read in two places under two meanings is a silent order-dependence), that `permanent_delusion` is absent from `scripts/` WITH COMMENT LINES STRIPPED FIRST (DO's scar — prose recording a removal necessarily names what was removed), and that no `_gain_ruin` call quotes `OLD_GODS_MARK` directly, so a sixth passive site cannot be added that Whispers silently fails to reach. §4 is the check that would have caught the cost this batch nearly paid: **every stat field any rune writes has a live read site in `scripts/`** (116 fields across 65 runes, 0 dead) — the Rune of the Whispering Dark writes `spread_ranks` AND `spread_ruin`, so a fresh field name would have left two of its four clauses paying nothing in silence. §5 asserts every rune grant still RESOLVES (a rune grant goes through `Classes.pending_talent_ability`, not the draft resolver, so DO moving card NAMES while DEFINITIONS stayed put is the only reason four granting runes still work) and REPORTS the two that now duplicate a draft card's grant. §6 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, and its header does not name the other call either. NINE NEGATIVE CONTROLS WERE RUN AND ALL NINE BEHAVED: the four cells' old texts restored (5, 5, 6, 6 failures), the Ruined Mind read site defeated (3), the Whispering Dark's `spread_ruin` renamed (5), a sixth `_gain_ruin` call made to quote the constant (3) — and **the comment-stripping trap controlled from BOTH sides**: `permanent_delusion` as a COMMENT left it GREEN, the same identifier as CODE turned it RED. **EM MOVED IT 43 -> 48 AND THE +5 IS §4's TWO WHISPERING DARK ROWS REPAIRED TO INTENT PLUS THREE NEW ONES.** DP asked *does this rune still pay?* and asked it by pinning the two fields the rune SHARED with the node (`spread_ranks`, `spread_ruin`). **The charter is exactly that sharing**, so EM re-keyed the rune onto `rune_spread_ranks`/`rune_spread_ruin` and the old rows would have called a LIVE rune dead. The repair asserts the rune's own fields, ASSERTS THEIR VALUES (15 and 1 — a rename that dropped the number would pass a name check), and asserts the node's two fields are ABSENT from the rune. §3's two read-site rows moved with the code: the guard sums both halves into locals now, and the locals AND their definitions are pinned, because the guard is the half that goes silently dead. **The general §4 property did not move and could not have** — `code.contains(field)` is a SUBSTRING test and `rune_spread_ranks` contains `spread_ranks`, which is worth knowing about that instrument."
   },
   "check_dr": {
    "kind": "gate",
@@ -1160,6 +1161,20 @@
    ],
    "fails_obs": 1,
    "note": "**NEW AT EL. THREE RULINGS, AND THE FIRST IS THE ONE THAT DECAYS SILENTLY.** §1 — **MARK'S POPULATION IS DERIVED, NOT LISTED.** EK sized MARK at six cards by reading the six card texts that say \"one mark at a time\"; `battle.DISPEL_NEVER`'s own comment names the marks by id — \"the five MARKS the party applies — covenant, quarry, snare_line, feinted, hunt_mark\", plus blood_debt, vendetta and reacquire — and off that list the population is TEN cards, nine in the draft. **The day an eleventh mark is authored, nothing else in the tree would notice its card going untagged.** The STATUS half is pinned from outside (`DISPEL_NEVER.size() == 11`, DW's idiom, so an eleventh has to move a line in this gate); the CARD half is DERIVED LIVE out of `battle.gd`'s `_apply_status` sites, back-walked to the owning card through BOTH anchors — a `_resolve_special` arm and an `ab.display_name ==` block, because Blood Debt's whole payload is the second shape — and the table must agree in both directions. A named list cannot audit itself, so the card side is not one. §2 — **`master.html` §6c IS THE CODE'S TABLE.** EH proved with a two-armed control that that document's factual prose is asserted by NOTHING; the tag table is the one machine-comparable part of §6c, so its words, their order and their meanings are required to equal `TAG_ORDER` and `TAG_INFO` word for word, and the five retired words (AFFLICTION, SHELTER, METER, AMP, CLOCK) must be absent from the section. The scope is §6c alone and the words are matched capitalised — a sweep of the whole document would fire on ordinary prose and one over the changelog would fire on the entry recording the rename, which is that entry doing its job. §3 — **THE WIDEST TAG LINE IS MEASURED HERE** (DJ §3: a number quoted from one document into another stops being a measurement). `text-standard.html` §4.8a's arithmetic moved when the words did — longest word AFFLICTION (10) -> RESOURCE (8), widest possible 20 -> 18 — and the gate measures all three off the live table and fails if the paragraph disagrees. **23 CHECKS ON ONE STANDALONE READING BEFORE THE BATTERY**, so `check_de` certifies on pass one."
+  },
+  "check_em": {
+   "kind": "gate",
+   "checks": [
+    210,
+    210
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "BATCH EM's gate, and EJ §5 named this batch as its home: *the property a future gate wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.* **§1 DERIVES the property from `Talents.LANE_TREES` and `runes.json`** rather than from a list of field names, so a tree that stops existing takes its fields with it. The judgement it needs is `UNIT_MATH` — nine fields a node writes that are nevertheless the UNIT's own math (`crit_bonus`, `speed`, global damage, the crit/parry/turn-order pipelines relics also write) — **asserted as an EQUALITY**, and it found EJ's own miscount on its first run: that report says NINE and lists TEN, and the tenth (`armor`) is written by no live node at all. **§2 IS THE ONE THAT EARNS THE GATE.** Splitting `X` into `X` and `rune_X` is safe in the arithmetic and lethal in the GUARD: `if occ.spread_ranks > 0` is FALSE for a hero holding the rune and not the node, so the clause pays nothing and nothing throws. It sweeps STATEMENTS (a guard and its payout are two statements; an expression is often three lines) and fails if any statement reads one half without the other — 47 pairs, 97 readings, 0 holes. **ITS FIRST VERSION WAS WRONG AND ITS OWN HEADER SAYS HOW**: it excluded a match preceded by a word character OR A DOT, and `attacker.vulture` has a dot in front of it, so it was blind to 80 of its 85 sites while printing a clean zero. §3 asserts every `rune_` field survives `_typed_payload` as the type its BattleUnit partner is DECLARED — both directions, because an int loading as a float fails the spawn outright and a float coerced to int rounds the rune quietly under strength (the Bared Guard's -0.15 would flatten to 0). §4 pins the three clauses with no home as an EQUALITY, so the day one is answered this gate reds and the answer is to DELETE its row. **FIVE NEGATIVE CONTROLS, ALL FIVE BIT, EACH IN ITS OWN SECTION**: a clause re-keyed back onto the node (§1, 2 failures), one dotted read site disarmed (§2), a float field added to `STAT_INT_KEYS` (§3), one of the three re-keyed (§4 and §2 both), and an eleventh `UNIT_MATH` row (the equality). **Written BEFORE the battery off three identical standalone readings of 210 checks / 0 failures.** It needs no `check_da` WALK_EXEMPT entry: it reads ONE ability-source family (`LANE_TREES`) and returns no corpus."
   }
  }
 }

@@ -40,6 +40,17 @@ var _save_backup: PackedByteArray = PackedByteArray()
 var _had_save := false
 
 
+# BATCH EM — WHAT A RE-KEYED COUNTER READS AS NOW. The charter took the runes
+# off the talent trees, so 56 clauses write `rune_X` instead of the node's `X`
+# and every read site in the game sums the pair. **The question each check
+# below asks did not move** — did the rune's value reach this hero? — so they
+# ask it of the pair, which is the number the game itself reads. A check left
+# reading `X` alone on a rune-only hero reads ZERO and passes nothing, which is
+# the same silent dud DP's Whispering Dark case was.
+func _paid(u: Node, field: String) -> float:
+	return float(u.get(field)) + float(u.get("rune_" + field))
+
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -154,23 +165,25 @@ func _hunter_pass(spec: String) -> void:
 			# and `wild_communion_ranks` became the FLOAT `wild_communion_step`
 			# (the Deep Bond and the Shared Wild each pay 1.5, so they sum to
 			# 3.0). The question each check asks is unchanged.
-			ok(abs(float(hunter.wild_communion_step) - 3.0) < 0.001,
+			ok(abs(_paid(hunter, "wild_communion_step") - 3.0) < 0.001,
 				"beastmaster: two runes feeding wild_communion_step did not sum (%s)" % \
-					str(hunter.wild_communion_step))
+					str(_paid(hunter, "wild_communion_step")))
 			# The Devout's field is `communion_ranks`; writing that one would be
 			# a silent dud that also buffs another class.
 			ok(hunter.get("communion_ranks") == 0,
 				"beastmaster: a rune wrote communion_ranks — that is the DEVOUT's field")
-			ok(hunter.momentum_ranks >= 16,
-				"beastmaster: momentum_ranks read %d, expected 8+8" % hunter.momentum_ranks)
+			ok(_paid(hunter, "momentum_ranks") >= 16,
+				"beastmaster: momentum_ranks read %d, expected 8+8" % \
+					int(_paid(hunter, "momentum_ranks")))
 			# The Deep Bond's ceiling clause had no meaning left once Batch AY
 			# uncapped Loyalty, so it was RE-POINTED at the boon's own step
 			# rather than deleted. The rune must still pay something.
-			ok(abs(float(hunter.absolute_step) - 3.0) < 0.001,
+			ok(abs(_paid(hunter, "absolute_step") - 3.0) < 0.001,
 				"beastmaster: absolute_step read %s — the re-pointed Deep Bond is a dud" % \
-					str(hunter.absolute_step))
-			ok(hunter.masters_aim_ranks >= 12,
-				"beastmaster: masters_aim_ranks read %d, expected 12" % hunter.masters_aim_ranks)
+					str(_paid(hunter, "absolute_step")))
+			ok(_paid(hunter, "masters_aim_ranks") >= 12,
+				"beastmaster: masters_aim_ranks read %d, expected 12" % \
+					int(_paid(hunter, "masters_aim_ranks")))
 			# The scarred cost: it lands on HIM and, at summon, on every beast.
 			ok(hunter.armor < 0.10,
 				"beastmaster: the Loosened Straps armor cost never applied (%.2f)" % \
@@ -218,32 +231,32 @@ func _hunter_pass(spec: String) -> void:
 			# The counters went ADDITIVE in Batch AZ, so these read magnitudes
 			# rather than rank counts: the Deep Sight's +20 Focus a crit, and
 			# 12 apiece from the Narrow Gap and the Level Aim.
-			ok(hunter.perfect_form >= 20,
+			ok(_paid(hunter, "perfect_form") >= 20,
 				"sharpshooter: perfect_form read %d — the Deep Sight pays 20" % \
-					hunter.perfect_form)
+					int(_paid(hunter, "perfect_form")))
 			ok(hunter.pierce_bonus > 0.11,
 				"sharpshooter: two runes feeding pierce_bonus did not sum (%.2f)" % \
 					hunter.pierce_bonus)
-			ok(hunter.bonecracker_ranks >= 24,
+			ok(_paid(hunter, "bonecracker_ranks") >= 24,
 				"sharpshooter: bonecracker_ranks read %d — two runes pay 12 each" % \
-					hunter.bonecracker_ranks)
-			ok(hunter.muscle_memory_ranks >= 20,
+					int(_paid(hunter, "bonecracker_ranks")))
+			ok(_paid(hunter, "muscle_memory_ranks") >= 20,
 				"sharpshooter: muscle_memory_ranks read %d — two runes pay 10 each" % \
-					hunter.muscle_memory_ranks)
-			ok(hunter.deep_focus >= 8,
+					int(_paid(hunter, "muscle_memory_ranks")))
+			ok(_paid(hunter, "deep_focus") >= 8,
 				"sharpshooter: the Deep Sight's re-pointed clause never applied (%d)" % \
-					hunter.deep_focus)
+					int(_paid(hunter, "deep_focus")))
 			ok(hunter.speed < 100.0,
 				"sharpshooter: the Long Draw speed cost never applied (%.1f)" % hunter.speed)
 		"mystic":
-			ok(hunter.potent_ranks >= 3,
+			ok(_paid(hunter, "potent_ranks") >= 3,
 				"survivalist: two runes feeding potent_ranks did not sum (%d)" % \
-					hunter.potent_ranks)
-			ok(hunter.coated_blades >= 1, "survivalist: coated_blades never applied")
-			ok(hunter.vulture >= 1, "survivalist: vulture never applied")
-			ok(hunter.scavenger_ranks >= 2,
-				"survivalist: scavenger_ranks read %d" % hunter.scavenger_ranks)
-			ok(hunter.cruel_ranks >= 1 and hunter.wire_ranks >= 1,
+					int(_paid(hunter, "potent_ranks")))
+			ok(_paid(hunter, "coated_blades") >= 1, "survivalist: coated_blades never applied")
+			ok(_paid(hunter, "vulture") >= 1, "survivalist: vulture never applied")
+			ok(_paid(hunter, "scavenger_ranks") >= 2,
+				"survivalist: scavenger_ranks read %d" % int(_paid(hunter, "scavenger_ranks")))
+			ok(_paid(hunter, "cruel_ranks") >= 1 and _paid(hunter, "wire_ranks") >= 1,
 				"survivalist: the splash trap terms never applied")
 			# The ability-branch rune, and the only requires_ability in the set.
 			var snare: Ability = null
@@ -389,8 +402,8 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 			lit_foe.remove_status("burn")
 	if by_spec.has("permafrost"):
 		var cr: Node = by_spec["permafrost"]
-		ok(cr.hypothermia_ranks >= 2, "cryomancer: hypothermia_ranks never applied")
-		ok(cr.frigid_ranks >= 2, "cryomancer: two runes feeding frigid_ranks did not sum")
+		ok(_paid(cr, "hypothermia_ranks") >= 2, "cryomancer: hypothermia_ranks never applied")
+		ok(_paid(cr, "frigid_ranks") >= 2, "cryomancer: two runes feeding frigid_ranks did not sum")
 		# The ability-branch rune: Ice Lance actually got cheaper.
 		var lance: Ability = null
 		for ab in cr.abilities:
@@ -431,11 +444,13 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		# counters went ADDITIVE, so the Deepening Ruin writes a magnitude rather
 		# than a rank — 1 percentage point per Ruin stack and 5 Break damage a
 		# turn, which is EXACTLY what the rune paid before the batch.
-		ok(oc.deep_hex_step == 1, "occultist: the Deepening Ruin pays %d%% per stack, expected 1" % oc.deep_hex_step)
+		ok(_paid(oc, "deep_hex_step") == 1,
+			"occultist: the Deepening Ruin pays %d%% per stack, expected 1" % \
+				int(_paid(oc, "deep_hex_step")))
 		ok(oc.entropy_ranks == 5, "occultist: the Deepening Ruin grinds %d Break damage, expected 5" % oc.entropy_ranks)
-		ok(oc.soul_leech_step == 3 and oc.gluttony_ranks == 3,
+		ok(_paid(oc, "soul_leech_step") == 3 and _paid(oc, "gluttony_ranks") == 3,
 			"occultist: the Hollow Chalice pays %d/%d per stack, expected 3/3" % [
-				oc.soul_leech_step, oc.gluttony_ranks])
+				int(_paid(oc, "soul_leech_step")), int(_paid(oc, "gluttony_ranks"))])
 		ok(oc.healing_received_mult < 1.15,
 			"occultist: the Hollow Chalice healing cost never applied")
 		var has_flay := false
@@ -451,9 +466,9 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		# Righteous Fire's counter is `righteous_step` — the INCREASE on the
 		# ground's base 10%, which is what the Burning Censer's advertised
 		# "reflects 10% more" means. Same question, current units.
-		ok(dv.blessed_barrier_ranks >= 8,
+		ok(_paid(dv, "blessed_barrier_ranks") >= 8,
 			"devout: two runes feeding blessed_barrier_ranks did not sum")
-		ok(dv.righteous_step >= 10, "devout: righteous_step never applied")
+		ok(_paid(dv, "righteous_step") >= 10, "devout: righteous_step never applied")
 
 	# BATCH AH: the White Flame check below reads a LOG LINE, which made it a
 	# race against how long the fight lasts — and AH trimmed the Berserker's

@@ -222,8 +222,19 @@ func _s3_read_sites() -> void:
 			["func _old_gods_mark() -> int:",
 				"Whispers's new home — the helper the five passive sites call"],
 			["return OLD_GODS_MARK + occ.whispers_step", "Whispers (the magnitude)"],
-			["_gain_ruin(caught, occ.spread_ruin)", "Spread of Madness (the Ruin it marks)"],
-			["if not _ruin_spreading and occ.spread_ranks > 0", "Spread of Madness (the guard and the chance)"],
+			# BATCH EM RE-KEYED THE RUNE'S HALF, AND THE GUARD IS WHY THIS ROW
+			# MOVED RATHER THAN THE PAYOUT. The Whispering Dark writes
+			# `rune_spread_ranks`/`rune_spread_ruin` now, so the guard that used
+			# to read the node's counter alone would be FALSE on a hero holding
+			# the rune and not the node — the same dud DP found, arriving through
+			# the repair for it. Both halves are summed into locals at the site
+			# and the locals are what these rows now name.
+			["_gain_ruin(caught, sp_ruin)", "Spread of Madness (the Ruin it marks)"],
+			["var sp_ruin := occ.spread_ruin + occ.rune_spread_ruin",
+				"Spread of Madness (the Ruin it marks — both halves)"],
+			["if not _ruin_spreading and sp_chance > 0", "Spread of Madness (the guard and the chance)"],
+			["var sp_chance := occ.spread_ranks + occ.rune_spread_ranks",
+				"Spread of Madness (the guard reads the rune too)"],
 			["_gain_ruin(strike_target, mad_occ.delirium_ranks)", "Delirium (unmoved — its site never named a status)"],
 			['and target.status_stacks("ruin") >= src.broken_mind', "Ruined Mind (the depth gate)"]]:
 		ok(code.contains(String(pair[0])),
@@ -262,9 +273,24 @@ func _s4_rune_coupling() -> void:
 	var wd: Dictionary = runes.get("whispering_dark", {})
 	ok(not wd.is_empty(), "the Rune of the Whispering Dark is gone")
 	var wd_stat: Dictionary = wd.get("payload", {}).get("stat", {})
-	for f in ["spread_ranks", "spread_ruin"]:
+	# BATCH EM — REPAIRED TO INTENT, NOT LOOSENED. DP's question was *does this
+	# rune still pay?*, and it asked it by pinning the field the rune shared with
+	# the node. The charter says a rune may not write a node's counter, so the
+	# shared field is exactly what had to go: the rune owns `rune_spread_ranks`
+	# and `rune_spread_ruin` now and the read site sums the pair. **The row that
+	# would have gone quietly vacuous is the one below it** — a `has()` on the
+	# old name returns false and says the rune is dead, which is the opposite of
+	# what happened. The VALUES are pinned here too, because a re-key that
+	# renamed the key and dropped the number would pass a name check.
+	for f in ["rune_spread_ranks", "rune_spread_ruin"]:
 		ok(wd_stat.has(f),
-			"the Whispering Dark no longer writes `%s` — the field it shares with the node" % f)
+			"the Whispering Dark no longer writes `%s` — its own re-keyed field" % f)
+	ok(int(wd_stat.get("rune_spread_ranks", 0)) == 15
+			and int(wd_stat.get("rune_spread_ruin", 0)) == 1,
+		"the Whispering Dark's contagion clauses moved off 15%%/1 in the re-key")
+	for f in ["spread_ranks", "spread_ruin"]:
+		ok(not wd_stat.has(f),
+			"the Whispering Dark still writes the NODE's `%s` — the charter forbids it" % f)
 	ok(not String(wd.get("desc", "")).contains("Psychosis"),
 		"the Whispering Dark still sells Psychosis, which its node no longer touches")
 	# THE GENERAL PROPERTY, AND IT IS THE ONE THAT WOULD HAVE CAUGHT THE COST

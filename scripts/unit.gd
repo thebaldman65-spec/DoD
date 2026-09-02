@@ -179,6 +179,33 @@ var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunt
 var bestial_hp_bonus := 0    # Bestial Wrath (Ursus): doubled health, reverted on expiry
 var bestial_armor_bonus := 0.0
 var vigor_hp_bonus := 0      # Spirit Bond perfect: +10% max health, reverted on expiry
+# ---------- THE `rune_` COUNTERS (BATCH EM) ----------
+#
+# **THE CHARTER: A RUNE IS DISCONNECTED FROM THE TALENT TREES.** It modifies
+# stats and resources, and the mechanics and values of core abilities, draft
+# abilities and passives — never a talent node. EJ sized the gap at 59 clauses
+# in 32 runes writing a live node's own counter; EM re-keyed 56 of them onto
+# fields of their own. **A `rune_X` beside an `X` below is one of those 56**,
+# and the pattern is BATCH AL's, shipped three times before this batch existed
+# (`rune_grudge_bonus`, `rune_vigil_bonus`, `rune_on_edge_ranks`).
+#
+# **THE RULE THAT TRAVELS WITH IT, AND GETTING IT BACKWARDS IS SILENT:**
+# a THRESHOLD takes the MAX of the two sources and a PAYOUT SUMS them. A summed
+# threshold fires early and a maxed payout underpays, and neither throws.
+# **All 56 are payouts** — every one is a magnitude its read site sums, and the
+# `> 0` tests beside them are presence tests rather than thresholds. On the Edge
+# is still the only threshold any rune shares, and it is still AL's.
+#
+# **A PRESENCE TEST MUST READ BOTH HALVES OR THE RUNE PAYS NOTHING.** `if
+# u.spread_ranks > 0` on a hero holding the rune and NOT the node is false, and
+# nothing throws — DP's Whispering Dark case, where two of a 100g rune's four
+# clauses would have gone silently dead. Every guard on a re-keyed field sums.
+#
+# **THREE CLAUSES ARE DELIBERATELY NOT HERE**: `divine_presence_pct`,
+# `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their
+# node, so there is nothing underneath them to re-point to. They still write the
+# node's counter, and EM §2 puts the options to the designer rather than
+# inventing an answer. See `docs/reports/EM.md`.
 # ---- Beastmaster lane-tree talents (Batch 30; re-specced by BATCH AY) ----
 # EVERY COUNTER BELOW IS ADDITIVE (the AR/AS/AT/AV/AW/AX form): the payload
 # holds the MAGNITUDE in the units its read site sums, and the read site
@@ -189,9 +216,11 @@ var wild_communion_step := 0.0  # +% on the passive's own 5% strike step per
                              # Runes.STAT_INT_KEYS: the Rune of the Deep Bond
                              # pays 1.5 and an int coercion would round it to 1
                              # with nothing crashing (AT's `conduit_step`).
+var rune_wild_communion_step := 0.0 # rune-owned: the Deep Bond +1.5, the Shared Wild +1.5
 var unbroken_watch := 0      # Loyalty gained on a turn the beast took no damage
 var absolute_step := 0.0     # +% on the Pack Bond boon's own 20% step per
                              # stack. A FLOAT for the same reason.
+var rune_absolute_step := 0.0 # rune-owned: the Deep Bond +3.0
 var devoted_fury := 0        # Bestial Wrath: +N turns per Loyalty stack
 var steadfast_bond := 0      # % of a dead beast's Loyalty that endures
 var ancient_pact := 0        # the boon step DOUBLES; the beast is unhealable
@@ -199,7 +228,9 @@ var lone_bond := 0           # one beast per fight — AND the Loyalty it arrive
                              # at (the gate and the magnitude in one field,
                              # AW's `judgement` / AX's `avatar_ruin` precedent)
 var quick_whistle_ranks := 0 # turns shaved off the shared Swap cooldown
+var rune_quick_whistle_ranks := 0 # rune-owned: the Turning Pack +1
 var momentum_ranks := 0      # +% companion dmg per distinct beast fielded
+var rune_momentum_ranks := 0  # rune-owned: the Turning Pack +8, the Shared Wild +8
 var shared_devotion := 0     # Loyalty every OTHER beast gains on summon/swap
 var herald := 0              # ADDITIONAL targets an arrival effect strikes
 var menagerie := 0           # % of the boon an absent summoned beast keeps
@@ -208,7 +239,9 @@ var no_beast_left_loyalty := 0  # Loyalty a free-summoned beast arrives at
 var wild_rotation := 0       # swap has no cooldown — AND the Loyalty cap it
                              # imposes as its cost (gate and magnitude in one)
 var masters_aim_ranks := 0   # Quick Shot +% of Attack
+var rune_masters_aim_ranks := 0 # rune-owned: the Loosened Straps +12
 var companion_hp_pct := 0.0  # Beast Within: +% companion max health
+var rune_companion_hp_pct := 0.0 # rune-owned: the Shared Wild +0.05
 var deep_reserves_ranks := 0 # Spirit Bond +% max Mana
 var instinctive := 0         # Quick Shots Hunter's Instinct empowers (total)
 var symbiosis := 0           # % max Mana restored per companion strike
@@ -265,10 +298,13 @@ var same_target_turns := 0   # Unwavering: consecutive turns on that same enemy
 var lethal_eye_ranks := 0    # Executioner's Eye: percentage POINTS of crit mult
 var consistent_aim := 0      # Consistent Aim: percentage POINTS SUBTRACTED from it
 var deep_focus := 0          # Deep Focus: points the CONVERSION POINT drops
+var rune_deep_focus := 0      # rune-owned: the Deep Sight +8
 var unwavering := 0          # Unwavering: extra Focus per consecutive turn (ramp)
 var perfect_form := 0        # Perfect Form: Focus granted by a crit
+var rune_perfect_form := 0    # rune-owned: the Deep Sight +20
 var tunnel_vision := 0       # Tunnel Vision: percentage POINTS of crit chance, ±
 var bonecracker_ranks := 0   # Bonecracker: percentage points of damage vs Broken
+var rune_bonecracker_ranks := 0 # rune-owned: the Narrow Gap +12, the Level Aim +12
 var opp_aim_step := 0.0      # Opportunist's Aim: the INCREASE on Powershot's own
                              # 2% per full Break point (a `_step`, and a FLOAT —
                              # it must stay OUT of Runes.STAT_INT_KEYS)
@@ -278,7 +314,9 @@ var exposed_nerve := 0       # Exposed Nerve: gate AND magnitude — crits apply
 var no_cover := 0            # FLAG: attacks cannot be made to miss (a bypass)
 var overkill := 0            # FLAG: kill overflow carries, and keeps Focus whole
 var muscle_memory_ranks := 0 # Muscle Memory: Focus added to each attack's gain
+var rune_muscle_memory_ranks := 0 # rune-owned: the Long Draw +10, the Level Aim +10
 var opening_volley := 0      # Opening Volley: the Focus he opens a fight holding
+var rune_opening_volley := 0  # rune-owned: the Long Draw +60
 var follow_through := 0      # Follow-Through: cooldown turns a crit ticks off
 var second_nature := 0       # Second Nature: TOTAL held-breath shots (base 1)
 var snap_shot := 0           # Snap Shot: how many free abilities each fight
@@ -293,7 +331,9 @@ var rapid_fire := 0          # capstone: % chance an ability skips its cooldown
 # site sums, so a node and a rune each pay what they advertise, alone and
 # stacked. FLAGS (a bare 1) are RULES, not amounts — they are named as such.
 var potent_ranks := 0        # Potent Toxins: FLAT poison damage per stack (8)
+var rune_potent_ranks := 0    # rune-owned: the Weeping Wound +2, the Long Hunt +1
 var coated_blades := 0       # FLAG: basic attacks apply Poison 2t + Cripple 2t
+var rune_coated_blades := 0   # rune-owned: the Weeping Wound +1
 var virulence_ranks := 0     # Distillate: EXTRA poison stacks per application (2)
 var slow_acting := 0         # FLAG: half tick, double turns, sticky, +Slowed 3t
 var creeping_death := 0      # FLAG: any status on a Poisoned enemy refreshes it
@@ -302,16 +342,20 @@ var quartermaster := 0       # FLAG: allies' basic attacks apply HIS Poison
                              # (the id sv_plague carries it; PLAGUE BEARER, and
                              # the concept, are GONE — see the Batch BA block)
 var wire_ranks := 0          # Reinforced Wire: tripwire +N% of Attack (35)
+var rune_wire_ranks := 0      # rune-owned: the Long Hunt +10
 var quick_rigging := 0       # Snare Trap cooldown reduction (2) + snares Cripple
 var cruel_ranks := 0         # traps deal +N% damage (50)
+var rune_cruel_ranks := 0     # rune-owned: the Long Hunt +15
 var snap_shut := 0           # FLAG: tripwire also bites ranged attackers
 var caught_fast := 0         # trap victims cannot be healed for N turns (5)
 var bone_breaker := 0        # traps apply N Break damage (90)
 var deadfall_network := 0    # the trap CAP it installs (3) — gate AND magnitude
 var hit_and_run := 0         # applying a status grants Elusive for N turns (2)
 var scavenger_ranks := 0     # +N% max Mana on enemy death (25)
+var rune_scavenger_ranks := 0 # rune-owned: the Carrion Wake +16
 var field_medic := 0         # turn start: cleanse N debuffs from random allies (2)
 var vulture := 0             # +N% vs enemies with 3+ different statuses (60)
+var rune_vulture := 0         # rune-owned: the Carrion Wake +30
 var ghillie := 0             # N% less likely to be targeted while allies live (65)
 var improvised := 0          # how many opening abilities start no cooldown (2)
 var improvised_used := 0     # how many of them have been spent (AZ's `snap_used`)
@@ -336,6 +380,7 @@ var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
 var bleed_bonus := 0          # Savagery: extra Bleed on bleed-building abilities
 var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
+var rune_bloodrage_step_bonus := 0.0 # rune-owned: the Boiling Blood +0.5, the Broad Path +0.25
 var frenzy_floor := 0.0  # Blood Frenzy v2: half the peak bonus this battle
                          # (fraction; ratchets up, never resets mid-battle —
                          # units are built fresh each battle)
@@ -397,6 +442,7 @@ var precision_ranks := 0      # Precision Strikes: crit vs dazed/crippled/expose
 var opportunist := 0          # Opportunist: counter enemy misses AND parries with Overpower
 var blade_crit_ranks := 0     # Seasoned Fighter node: crit for Lunge/Overpower
 var swordsmanship_parry := 0.0 # Swordsmanship: the perfect Guard Change parry spike
+var rune_swordsmanship_parry := 0.0 # rune-owned: the Still Wrist +0.05
 var high_guard := 0           # High Guard: -40% damage 3 turns after parrying
 var dominant_ranks := 0       # Dominant Presence: armor per debuff applied
 var debuffs_applied := 0
@@ -438,7 +484,9 @@ var hold_line_upgraded := 0   # Hold the Line capstone landing on an earned copy
 var vengeful_guardian := 0    # Vengeful Guardian (capstone): first block each turn
 var vengeful_ready := true    # answers with Crushing Blow; re-arms at his turn
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
+var rune_seasoned_def_bonus := 0.0 # rune-owned: the Bared Guard -0.15
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
+var rune_seasoned_off_bonus := 0.0 # rune-owned: the Bared Guard +0.1
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
 # Swordmaster lanes (Batch F; magnitudes re-authored in Batch AK, where a
 # node became a whole exclusive row instead of one of three ranks). See
@@ -465,8 +513,10 @@ var guard_breaker := 0        # Guard Breaker: Broken recovery refills the meter
 # writes 4 into accelerant_ranks and the Rune of the Long Burn writes 1, and
 # the read site adds percentage points. See talents.gd for the node text.
 var accelerant_ranks := 0     # Accelerant: Burn ticks +N points of Attack
+var rune_accelerant_ranks := 0 # rune-owned: the Long Burn +1
 var cinder_trail_ranks := 0   # Cinder Trail: Fireball's Burn lasts +N turns
 var conflagration_ranks := 0  # Conflagration: Flamewave applies +N turns
+var rune_conflagration_ranks := 0 # rune-owned: the Cinder Trail +1
 var explosive_ranks := 0      # Explosive Force: a fire crit extends Burn +N turns
 var wildfire_spread := 0      # Wildfire Spread: Wildfire lights the unburnt first
 var ember_wind := 0           # Chain Ignition: a burning death splits its Burn
@@ -541,13 +591,17 @@ var avatar_flame := 0         # no node: Avatar of Flame
 # pays its advertised number alone AND stacked. Under the old `1 x step` form
 # a rune's value silently inherited the node's multiplier.
 var hungering_ranks := 0      # Hungering Cold: -N% damage per Chilled stack
+var rune_hungering_ranks := 0 # rune-owned: the Long Winter +1
 var hold_turns := 0           # Batch AT: turns this enemy has spent HELD. Written
                               # ONLY by battle._hold_sync (walking `_holds`) and
                               # zeroed at _hold_freeze; Shatter's damage reads it.
 var frostbite_ranks := 0      # Brittle Ice: +N% crit chance against a HELD enemy
+var rune_frostbite_ranks := 0 # rune-owned: the Bitter Grip +2
 var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance +N% critical damage
 var hypothermia_ranks := 0    # Hypothermia: +N% damage taken per Chilled stack
+var rune_hypothermia_ranks := 0 # rune-owned: the Killing Cold +2
 var frigid_ranks := 0         # Frigid Grip: every Chilled stack slows N% harder
+var rune_frigid_ranks := 0    # rune-owned: the Bitter Grip +3, the Long Winter +3
 var frigid_bonus := 0.0       # ...stamped on the VICTIM when Chilled lands
 var deep_chill_ranks := 0     # Deep Chill: Frostbolt applies +N stacks of Chilled
 var splinter_ranks := 0       # Splintering Shards: Razor Ice ALWAYS strikes a 4th time
@@ -557,6 +611,7 @@ var cold_snap_ranks := 0      # Cold Snap: a held enemy's Break fills N per turn
 var bitter_cold_ranks := 0    # Bitter Cold: a freeze chills every OTHER enemy N times
 var glacial_ranks := 0        # Glacial Economy: N% of max Mana back per freeze
 var crystal_edge_ranks := 0   # Crystal Edge: Ice Lance +N% of Attack per Chilled stack
+var rune_crystal_edge_ranks := 0 # rune-owned: the Long Winter +5
 var honed_shards_ranks := 0   # Honed Shards: a release leaves N stacks of Chilled
 var icy_resolve_ranks := 0    # Icy Resolve: Rime lasts N additional turns
 var grasp_ranks := 0          # Winter's Grasp: N random Chilled enemies gain a stack
@@ -593,10 +648,12 @@ var harmonics_ranks := 0      # Harmonics: extra Resonance from Arcane Explosion
 var attunement_crit := 0      # Attunement: extra Resonance from a crit
 var charged_bolts_ranks := 0  # Charged Bolts: % max Mana per cast, per 4 stacks
 var resonant_core_ranks := 0  # Resonant Core: extra Resonance, first cast of a turn
+var rune_resonant_core_ranks := 0 # rune-owned: the Resonant Core +1
 var critical_mass_stacks := 0 # Critical Mass: Resonance on every 3rd crit
 var cascade_stacks := 0       # Cascade: extra Resonance per cast at 10+ stacks
 var conduit_step := 0.0       # Conduit: POINTS on the damage curve's step (FLOAT —
                               # never name this "_ranks" or Runes coerces 0.5 to 0)
+var rune_conduit_step := 0.0  # rune-owned: the Resonant Core +0.5
 var volatility_ranks := 0     # Volatility: % damage on Arcane Cannon
 var volatility_recoil := 0    # Volatility: Cannon's recoil %, as a SET not an add
 var temporal_ranks := 0       # Temporal Rift: % of a crit echoed at a random enemy
@@ -607,6 +664,7 @@ var conversion_ranks := 0     # Conversion: % of damage taken paid as Mana
 var on_edge_threshold := 0.0  # On the Edge: health % below which surviving pays
 var on_edge_stacks := 0       # On the Edge: Resonance it pays
 var feedback_ranks := 0       # Feedback Loop: % of recoil paid as Mana
+var rune_feedback_ranks := 0  # rune-owned: the Unquiet Mind +20
 var stable_ranks := 0         # Stable Alignment: single-hit cap, % of max health
 var backlash_stacks := 0      # Backlash: Resonance per hit received
 var siphon_ranks := 0         # Siphon: % of damage dealt restored as Mana
@@ -724,7 +782,7 @@ func overcharge_ready() -> bool:
 # the payout where the step is only linear (AT's measured finding). A negative
 # control putting the doubling back on Singularity has to trip the test.
 func resonance_dmg_step() -> float:
-	var step := RESONANCE_DMG_STEP + conduit_step
+	var step := RESONANCE_DMG_STEP + conduit_step + rune_conduit_step
 	if wrath_step_double > 0:
 		step += RESONANCE_DMG_STEP
 	return step
@@ -771,7 +829,7 @@ const FOCUS_BAR_REF := 200.0    # what the second-resource bar fills toward when
 # holds the DROP, which is what makes it additive: the node pays 40 and the Rune
 # of the Deep Sight pays 8 on top.
 func focus_convert() -> int:
-	return maxi(FOCUS_CONVERT - deep_focus, 1)
+	return maxi(FOCUS_CONVERT - deep_focus - rune_deep_focus, 1)
 
 
 func focus_crit_chance() -> float:
@@ -801,12 +859,14 @@ func lethal_crit_mult() -> float:
 # its own magnitude in the units its read site sums (percentage POINTS unless
 # said otherwise), never a rank the read site multiplies. See talents.gd.
 var triage_heal := 0          # Triage: +N% healing, and heals may CRIT at all
+var rune_triage_heal := 0     # rune-owned: the Triage Ward +3, the Open Hand +3
 var heavenly_step := 0        # Heavenly Aura: the INCREASE on Mercy's base 5%/stack
 var holy_light_pct := 0       # Holy Light: N% of max Mana back on a perfect cast
 var guardian_step := 0        # Guardian Angel: the INCREASE on the 50% Mercy window
 var mercy_threshold := 0.5    # party-wide stamp (Guardian Angel raises it)
 var divine_presence_pct := 0  # Divine Presence: end-of-turn drip heal, N% of max HP
 var last_hope_pct := 0        # Last Hope: the nearly-dead heal N% deeper
+var rune_last_hope_pct := 0   # rune-owned: the Open Hand +5
 var last_hope_bonus := 0      # party-wide stamp (receiver side of Last Hope)
 var last_overheal := 0        # overheal of the most recent heal_amount call
 var on_mend_pct := 0          # On the Mend: N% chance a Renewal tick dispels
@@ -814,6 +874,7 @@ var sanctified_pct := 0       # Sanctified: N% chance a Mercy spend refunds
 var cascade_pct := 0          # Radiant Cascade: crit heals splash N% onward
 var overflow_pct := 0         # Overflow: N% of overhealing spills onward
 var zealous_mercy := 0        # Zealous Light: battle-opening Mercy (a COUNT)
+var rune_zealous_mercy := 0   # rune-owned: the Open Hand +1
 var grace_pct := 0            # Grace: a wasted stack heals the ally N% of her max HP
 var ardor_at := 0             # Ardor: hold this many Mercy and Empower is free
 var mercy_cap_bonus := 0      # Martyr's Vigor: the INCREASE on the base cap of 5
@@ -976,14 +1037,18 @@ func expire_fortified_spirit() -> void:
 
 var communion_ranks := 0      # Communion: (N x their own stacks)% to spread
 var faithful_step := 0        # Blessed are the Faithful: +N pts on the 15% heal
+var rune_faithful_step := 0   # rune-owned: the Binding Oath +5
 var devoutness_ranks := 0     # Devoutness: party-wide BD cut, percentage POINTS
+var rune_devoutness_ranks := 0 # rune-owned: the Standing Vow +5
 var afterglow_ranks := 0      # Afterglow: heal N% of Devout max on shield break
 var covenant_heal := 0        # Sacred Covenant: lethal-save heal, % of max
 var covenant_faith := 0       # Sacred Covenant: Faith granted by that save
 var aegis_ranks := 0          # Radient Aegis: N% chance Divine Shield echoes
 var blessed_barrier_ranks := 0 # Blessed Barrier: N% of absorbs become healing
+var rune_blessed_barrier_ranks := 0 # rune-owned: the Warded Robes +4, the Standing Vow +4
 var waters_ranks := 0         # Cleansing Waters: N% chance/turn to be cleansed
 var pulse_ranks := 0          # Healing Pulse: N% of Devout max healed per turn
+var rune_pulse_ranks := 0     # rune-owned: the Standing Vow +2
 # Devout Batch K lanes (07-30): the purpose-designed tree's new hooks.
 # BATCH BH §2 — TWO FIELDS WERE DELETED HERE RATHER THAN RE-POINTED IN PLACE,
 # BECAUSE BOTH NODES CHANGED WHAT THEY MEAN AND NOT ONLY WHAT THEY PAY. That is
@@ -1015,12 +1080,15 @@ var oath_opening := 0         # Rune-only (the Rune of the Binding Oath): N Fait
                               # because a rune writes it and it does not end
                               # "_ranks" (the AA float-into-int trap).
 var warded_ranks := 0         # Warded Robes: +N% armor while the shield holds
+var rune_warded_ranks := 0    # rune-owned: the Warded Robes +10
 var stalwart_step := 0        # Stalwart: +N pts on Divine Shield's 30% absorb
 var unyielding_ranks := 0     # Unyielding Aegis: re-forms at N% of strength
 var righteous_step := 0       # Righteous Fire: +N pts on the ground's 10%
+var rune_righteous_step := 0  # rune-owned: the Burning Censer +10
 var crusade_ranks := 0        # CRUSADE (EL: was Crusader's Tempo): Zeal ticks N extra cooldown
 var purity_ranks := 0         # Purity: Zeal carries a shield of N% Devout max
 var lifewell_ranks := 0       # Lifewell: reflected damage heals N% of itself
+var rune_lifewell_ranks := 0  # rune-owned: the Burning Censer +20
 var apostle := 0              # capstone: each held Faith stack is worth
                               # DOUBLE (Batch BG §2 — it no longer touches
                               # what a release consumes; see _faith_stack_mult)
@@ -1274,16 +1342,21 @@ var prep_pending := 0
 # changelog rather than silently generalised.
 var emp_hex_ranks := 0        # Empowered Hex: % chance Hex applies Decay (100 = always)
 var soul_leech_step := 0      # Soul Leech: +% per Ruin stack on the base 2%
+var rune_soul_leech_step := 0 # rune-owned: the Hollow Chalice +3
 var pleasure_pct := 0.0       # Pleasure from Pain: % max HP per unique debuff (FRACTIONAL
                               # — must NOT end in "_ranks" or STAT_INT_KEYS coerces it)
 var channeling_ranks := 0     # Corrupted Channeling: crippled attackers feed
 var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
 var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
 var spread_ranks := 0         # Spread of Madness: % chance a landing mark leaps
+var rune_spread_ranks := 0    # rune-owned: the Whispering Dark +15
 var spread_ruin := 0          # Spread of Madness: Ruin the enemy it leaps to catches
+var rune_spread_ruin := 0     # rune-owned: the Whispering Dark +1
 var mirror_ranks := 0         # Umbral Mirror: % chance enemy debuffs reflect
 var broken_will_ranks := 0    # Broken Will: +% Break damage dealt
+var rune_broken_will_ranks := 0 # rune-owned: the Whispering Dark +5
 var deep_hex_step := 0        # Deeper Hex: +% damage per Ruin stack on the base 2%
+var rune_deep_hex_step := 0   # rune-owned: the Deepening Ruin +1
 var grim_ranks := 0           # Grim Focus: +% detonation damage
 var entropy_ranks := 0        # Entropy: Break damage any Ruin grinds each turn
 var unravel_ranks := 0        # Unraveling: Ruin a detonation seeds in others
@@ -1292,6 +1365,7 @@ var delirium_ranks := 0       # Delirium: Ruin an enemy-on-enemy strike marks
 var cackling_ranks := 0       # Cackling Mirror: % of a fellow-strike healed
 var torment_ranks := 0        # Lingering Torment: Decay turns expired madness leaves
 var gluttony_ranks := 0       # Gluttony: +% per Ruin stack (its own dial)
+var rune_gluttony_ranks := 0  # rune-owned: the Hollow Chalice +3
 var pact_flesh_ranks := 0     # Pact of Flesh: percentage POINTS off Dark Pact's 20%
 var barter_step := 0          # Dark Barter: +% on Dark Pact's base 15% party heal
 var avatar_ruin := 0          # capstone: the Ruin threshold it installs (5), gate AND
@@ -1930,7 +2004,7 @@ func refresh_bars() -> void:
 	if passive_id == "bloodrage":
 		for s in statuses:
 			if s.id == "spec_passive":
-				var step := 2.0 + bloodrage_step_bonus
+				var step := 2.0 + bloodrage_step_bonus + rune_bloodrage_step_bonus
 				var live := frenzy_bonus() * 100.0
 				var floor_pct := frenzy_floor * 100.0
 				# Scar Tissue rewrites how much of the peak the floor keeps
@@ -1977,8 +2051,10 @@ func refresh_bars() -> void:
 		for s in statuses:
 			if s.id == "spec_passive":
 				var aggressive := stance == "aggressive"
-				var off_pct := int(round((0.15 + seasoned_off_bonus) * 100))
-				var def_pct := int(round((0.15 + seasoned_def_bonus) * 100))
+				var off_pct := int(round((0.15 + seasoned_off_bonus
+					+ rune_seasoned_off_bonus) * 100))
+				var def_pct := int(round((0.15 + seasoned_def_bonus
+					+ rune_seasoned_def_bonus) * 100))
 				s.short = "AGG" if aggressive else "DEF"
 				s.desc = "Seasoned Fighter — current stance: %s.\nAGGRESSIVE: +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE: %d%% less damage taken, -10%% damage dealt.\nGuard Change swaps (battles open Aggressive)." % [
 					"AGGRESSIVE" if aggressive else "DEFENSIVE", off_pct, def_pct]
@@ -2525,7 +2601,7 @@ func frenzy_rage_steps() -> int:
 # where damage is read AND after every hit taken, so a dive that gets
 # healed away before his next attack still banks its floor.
 func frenzy_bonus() -> float:
-	var step := (2.0 + bloodrage_step_bonus) / 100.0
+	var step := (2.0 + bloodrage_step_bonus + rune_bloodrage_step_bonus) / 100.0
 	# BATCH CZ §1 — TWO TERMS INTO ONE BAND, AND THE BAND DOES NOT GROW.
 	# The steps are SUMMED and then clamped at `FRENZY_MAX_STEPS`, which is the
 	# twentieth step the health term already tops out at, so the second term can

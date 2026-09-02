@@ -409,19 +409,24 @@ func _rune_audit() -> void:
 		if lane != "":
 			ok(lanes.has(lane), "the rune %s is tagged with a live lane (%s)" % [id, lane])
 	# The re-pointed magnitudes, in the units their read sites now sum.
-	ok(int(pool["bitter_grip"]["payload"]["stat"]["frigid_ranks"]) == 3,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(int(pool["bitter_grip"]["payload"]["stat"]["rune_frigid_ranks"]) == 3,
 		"the Bitter Grip pays its advertised 3 points of Frigid Grip")
-	ok(int(pool["bitter_grip"]["payload"]["stat"]["frostbite_ranks"]) == 2,
+	ok(int(pool["bitter_grip"]["payload"]["stat"]["rune_frostbite_ranks"]) == 2,
 		"...and its advertised 2 points of Brittle Ice")
-	ok(int(pool["long_winter"]["payload"]["stat"]["frigid_ranks"]) == 3,
+	ok(int(pool["long_winter"]["payload"]["stat"]["rune_frigid_ranks"]) == 3,
 		"the Long Winter pays 3 points of Frigid Grip")
-	ok(int(pool["long_winter"]["payload"]["stat"]["crystal_edge_ranks"]) == 5,
+	ok(int(pool["long_winter"]["payload"]["stat"]["rune_crystal_edge_ranks"]) == 5,
 		"...and 5 points of Crystal Edge")
-	ok(int(pool["long_winter"]["payload"]["stat"]["hungering_ranks"]) == 1,
+	ok(int(pool["long_winter"]["payload"]["stat"]["rune_hungering_ranks"]) == 1,
 		"...and 1 point of Hungering Cold, which did not move")
 	ok(int(pool["killing_cold"]["payload"]["stat"]["numbing_ranks"]) == 5,
 		"the Killing Cold pays its advertised 5 points of Numbing Veil")
-	ok(int(pool["killing_cold"]["payload"]["stat"]["hypothermia_ranks"]) == 2,
+	ok(int(pool["killing_cold"]["payload"]["stat"]["rune_hypothermia_ranks"]) == 2,
 		"...and 2 points of Hypothermia, which did not move")
 	# NUMBING VEIL HAS NO NODE AND THE READ SITE IS KEPT. That is §5's rule
 	# made a fact: a rune whose node is gone is flagged for re-authoring, not

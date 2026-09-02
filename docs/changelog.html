@@ -14,6 +14,87 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-01 &mdash; Batch EM: THE RUNES GET THEIR OWN FIELDS</h2>
+<p><i>The mechanical half of the designer's rune charter, and only the mechanical half.
+<b>56 of the 59 clauses that wrote a live talent node's own counter now write a rune-owned field,
+read beside the node's at the same site. Not one magnitude moved.</b> The three that had nowhere
+to go, the sixteen runes the charter empties, and what severing the lane rule deletes are
+REPORTED and unruled. Full working: <code>docs/reports/EM.md</code>.</i></p>
+
+<p><b>&sect;0 &mdash; THE TAGS STAY INERT AND THE POPULATION DID NOT MOVE.</b> No rune keys to a
+tag in this batch; <code>check_ek</code> &sect;3's game-side population is still THREE. The
+differential mechanism &mdash; a rune worth more to a hero pointed the same way &mdash; waits for
+a real draft screen. <b>This batch did the work that has to happen under any answer.</b></p>
+
+<p><b>&sect;1 &mdash; 56 CLAUSES RE-KEYED, AND EVERY ONE OF THEM IS A PAYOUT.</b> Each writes
+<code>rune_X</code> now instead of the node's <code>X</code>, and every read site sums the pair
+&mdash; <b>47 new <code>BattleUnit</code> fields and 97 reading statements across nineteen
+scripts</b>, derived by <code>check_em</code> &sect;2 rather than counted by hand. <b>AL's rule
+was applied and its answer is uniform: a THRESHOLD takes the MAX and a PAYOUT SUMS, and all 56 are
+payouts.</b> The <code>&gt; 0</code> tests beside them are presence tests, not thresholds; On the
+Edge is still the only threshold any rune shares and it is still AL's. <b>Four clauses are named
+in the report as arguable</b> &mdash; the contagion CHANCE, the Focus conversion-point DROP, a
+cooldown shave with a floor at zero, and the Bared Guard's NEGATIVE scarred term.</p>
+
+<p><b>AND THE GUARD IS THE DANGEROUS HALF, MEASURED RATHER THAN ARGUED.</b>
+<code>if occ.spread_ranks &gt; 0</code> is FALSE for an Occultist holding the Rune of the
+Whispering Dark and not the node, so a 100g rune's clause pays nothing and nothing throws. Driven
+live on a rune-only hero with the guard reading the node's counter alone, that mark spread
+<b>0 times in 400</b>; with the pair summed, <b>55&ndash;66</b>. <b>This is DP's Whispering Dark
+dud arriving through the repair for it</b>, and it is why <code>check_em</code> &sect;2 asserts
+that every STATEMENT reading <code>X</code> also reads <code>rune_X</code>.</p>
+
+<p><b>&sect;2 &mdash; THREE CLAUSES HAVE NO HOME AND NOTHING WAS INVENTED FOR THEM.</b>
+<code>divine_presence_pct</code> (the Sleepless Vigil), <code>entropy_ranks</code> (the Deepening
+Ruin) and <code>pleasure_pct</code> (the Whispering Dark) are per-turn drips that exist only as
+their node. <b>All three still write the node's counter</b>, <code>check_em</code> &sect;4 names
+them as an EQUALITY, and the options &mdash; a rune-owned implementation, a re-point onto
+something adjacent, or a deliberate retirement &mdash; are priced in the report with what each
+rune is worth before and after. <b>Each of the three loses one clause of three or four.</b></p>
+
+<p><b>&sect;3 &mdash; SIXTEEN RUNES ARE WHOLLY TALENT-KEYED AND THE CHARTER EMPTIES THEM.</b> All
+sixteen are mechanically whole after the re-key and all sixteen have lost the argument for
+existing, because each was nothing but <i>your lane, but more</i>. <b>Every one is listed by name
+in the report with what it does, what it costs and its lane.</b> <b>Exactly one is Scarred</b>
+&mdash; the Rune of the Bared Guard, 75g, whose two clauses are a trade &mdash; and retiring a
+Scarred rune removes both halves at once. <b>The distribution is uneven and it matters to the
+ruling</b>: all 59 clauses sat in the 48 spec runes, the 5 universal and 12 class-wide carried
+none, and the <b>Warden is 0-of-7 against the Beastmaster's 8-of-9</b>.</p>
+
+<p><b>&sect;4 &mdash; BOTH DOCUMENTS CORRECTED, AND WHAT IS LOST IS RECORDED BESIDE WHAT
+CHANGED.</b> <code>master.html</code> and <code>design-notes.md</code> both stated the lane rule
+as CURRENT and both were accurate descriptions of the authored pool. They now say the rule was how
+the sets were AUTHORED and no longer describes what the runes do. <b>The cost is stated because it
+was measured</b>: 48 of the 65 runes were built on <i>"worth more to a hero whose points went
+elsewhere"</i>, a rune with its own field is worth the same to every hero of its spec, and
+<b>the 12 splashes lose most</b> &mdash; with no lanes to reach across, a splash is three
+unrelated numbers in a bundle. The AA-era paragraphs in <code>design-notes.md</code> are kept in
+place and annotated, because they are the argument the charter overrules.</p>
+
+<p><b>&sect;5 &mdash; THE RUNE OF THE STANDING VOW IS ON THE RECORD.</b> DO cut the
+<code>unity</code> half of Healing Pulse's trigger and it appeared in no report, no changelog
+entry and no state file; EJ found it by grepping. <b>Confirmed live and by the guard chain: the
+drip fires on CONSECRATED GROUND alone</b> (<code>guard_cons_ground=true</code>,
+<code>guard_unity=false</code>), and the rune's three clauses read 2 / 4 / 5 on an Inquisitor
+holding it and no talents. <b>It is a quiet weakening rather than a mis-sale</b> &mdash; the desc
+named only holy ground before and after, so the code moved TOWARD the card &mdash; <b>but an
+undocumented change to a shipped item is what the report convention exists to prevent.</b></p>
+
+<p><b>&sect;6 &mdash; A GATE THE BRIEF DID NOT ASK FOR, BECAUSE EJ SAID THIS IS ITS BATCH.</b>
+EJ &sect;5 recorded that the property <i>no rune writes a live node's counter</i> "belongs in the
+batch that takes the charter". <b><code>check_em</code> is that gate: 210 checks, four sections,
+five negative controls all of which bit.</b> &sect;1 derives the charter property from
+<code>LANE_TREES</code> and <code>runes.json</code> and names the nine unit-math exemptions as an
+EQUALITY; &sect;2 is the statement sweep; &sect;3 asserts every <code>rune_</code> field survives
+the JSON load as the type its partner is declared; &sect;4 pins the three with no home.
+<b><code>check_dp</code> &sect;4's two Whispering Dark rows were repaired to intent rather than
+loosened</b> &mdash; they pinned the field the rune SHARED with the node, which is exactly what
+the charter removes, and left as they were they would have called a live rune dead.</p>
+
+<p><b>AND EJ'S REPORT SAID NINE AND LISTED TEN.</b> Its &sect;1 names the fields classed STAT
+despite having a node; <b><code>armor</code> is the tenth and no live talent node writes it at
+all</b>, so it needed no exemption. The gate's equality found that on its first run.</p>
+
 <h2>2026-09-01 &mdash; Batch EL: THE TAGS GET THEIR REAL NAMES, AND MARK IS THE SEVENTH</h2>
 <p><i>EK shipped six tag words chosen under a collision. EL freed the word that caused it, gave
 the vocabulary its plain names, and added the seventh &mdash; derived from a list the game had

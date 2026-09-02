@@ -279,13 +279,21 @@ func _additive_units() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var must := {
 		"0.01 * fn_h.force_of_nature * sv_n": "Force of Nature reads percentage points",
-		"0.01 * attacker.vulture": "Vulture reads percentage points",
+		# BATCH EM — the rune half is summed at each site now, so these literals
+		# carry the pair. THE QUESTION IS UNCHANGED: percentage POINTS read as a
+		# magnitude, never a rank times a step — and the `gone` sweep below still
+		# pins every retired coefficient.
+		"0.01 * (attacker.vulture + attacker.rune_vulture)":
+			"Vulture reads percentage points",
 		"0.01 * nec_h.necrosis": "Necrosis reads percentage points (hero strikes)",
 		"0.01 * nec_c.necrosis": "Necrosis reads percentage points (companion jaws)",
-		"0.01 * trapper.wire_ranks": "Reinforced Wire reads percentage points",
-		"0.01 * trapper.cruel_ranks": "Cruel Devices reads percentage points (tripwire)",
-		"0.01 * placer.cruel_ranks": "Cruel Devices reads percentage points (traps)",
-		"0.01 * sc_h.scavenger_ranks": "Scavenger reads percentage points",
+		"0.01 * (trapper.wire_ranks + trapper.rune_wire_ranks)":
+			"Reinforced Wire reads percentage points",
+		"0.01 * (trapper.cruel_ranks": "Cruel Devices reads percentage points (tripwire)",
+		"0.01 * (placer.cruel_ranks + placer.rune_cruel_ranks)":
+			"Cruel Devices reads percentage points (traps)",
+		"0.01 * (sc_h.scavenger_ranks + sc_h.rune_scavenger_ranks)":
+			"Scavenger reads percentage points",
 		# RE-POINTED IN PLACE BY BATCH BR, AND IT WAS A REAL CATCH — the AZ
 		# Follow-Through precedent exactly. The question is unchanged (does
 		# Ghillie read its own counter as the percentage CHANCE, additively,
@@ -420,18 +428,23 @@ func _rune_audit() -> void:
 	ok(mystic.size() == 4, "four spec:mystic runes (got %d)" % mystic.size())
 	# EACH STILL PAYS EXACTLY WHAT ITS TEXT ADVERTISES — only the units moved.
 	var lh: Dictionary = pool["long_hunt"]["payload"]["stat"]
-	ok(int(lh["cruel_ranks"]) == 15, "the Long Hunt still pays +15% trap damage")
-	ok(int(lh["wire_ranks"]) == 10, "the Long Hunt still pays 10% more of his Attack")
-	ok(int(lh["potent_ranks"]) == 1,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(int(lh["rune_cruel_ranks"]) == 15, "the Long Hunt still pays +15% trap damage")
+	ok(int(lh["rune_wire_ranks"]) == 10, "the Long Hunt still pays 10% more of his Attack")
+	ok(int(lh["rune_potent_ranks"]) == 1,
 		"the Long Hunt's +1 Poison damage per stack is UNTOUCHED — "
 		+ "Potent Toxins kept its units, so nothing about this clause moved")
 	var cw: Dictionary = pool["carrion_wake"]["payload"]["stat"]
-	ok(int(cw["vulture"]) == 30, "the Carrion Wake still strikes 30% harder")
-	ok(int(cw["scavenger_ranks"]) == 16, "the Carrion Wake still drinks 16% max Mana")
+	ok(int(cw["rune_vulture"]) == 30, "the Carrion Wake still strikes 30% harder")
+	ok(int(cw["rune_scavenger_ranks"]) == 16, "the Carrion Wake still drinks 16% max Mana")
 	ok(abs(float(cw["max_hp_pct"]) + 0.12) < 0.0001, "...and its scar is untouched")
 	var ww: Dictionary = pool["weeping_wound"]["payload"]["stat"]
-	ok(int(ww["potent_ranks"]) == 2, "the Weeping Wound still bites 2 harder per stack")
-	ok(int(ww["coated_blades"]) == 1,
+	ok(int(ww["rune_potent_ranks"]) == 2, "the Weeping Wound still bites 2 harder per stack")
+	ok(int(ww["rune_coated_blades"]) == 1,
 		"...and writes coated_blades as a FLAG, which is still what that field is")
 	ok(pool["quick_spring"]["payload"].has("ability"),
 		"the Quick Spring is an ability payload and needed no re-point")

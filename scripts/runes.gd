@@ -155,7 +155,24 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# had any (`fire_walker`, `invigorating_ranks`, `heat_haze_ranks`,
 	# `kiln_forged`, `ash_lung`, `cauterise`, and the old `forge_body`).
 	"ember_shroud", "ashen_skin", "ashen_skin_heal", "heat_haze", "backblast",
-	"kiln_forged_at", "ash_lung_pct", "forge_body_pct"]
+	"kiln_forged_at", "ash_lung_pct", "forge_body_pct",
+	# BATCH EM — THE RE-KEY'S HALF OF THIS LIST, AND IT IS THE SAME AA TRAP
+	# WEARING A PREFIX. `rune_X` inherits nothing from `X`: a `rune_` field
+	# whose name does not end "_ranks" needs a row here exactly as its partner
+	# did, or JSON's float slides into a typed int var and the hero fails to
+	# spawn. These are the THIRTEEN of the 47 re-keyed counters whose names do
+	# not end "_ranks" — the other 34 are `*_ranks` and the suffix arm covers
+	# them. **THE EIGHT FLOATS ARE DELIBERATELY ABSENT** and must stay absent:
+	# `rune_wild_communion_step`, `rune_absolute_step`, `rune_conduit_step`,
+	# `rune_companion_hp_pct`, `rune_bloodrage_step_bonus`,
+	# `rune_swordsmanship_parry`, `rune_seasoned_off_bonus` and
+	# `rune_seasoned_def_bonus` are floats, and coercing any of them would
+	# round the rune quietly under strength (AT's `conduit_step` precedent, and
+	# the Bared Guard's -0.15 would flatten to 0 outright).
+	"rune_coated_blades", "rune_vulture", "rune_deep_focus", "rune_perfect_form",
+	"rune_opening_volley", "rune_triage_heal", "rune_last_hope_pct",
+	"rune_zealous_mercy", "rune_righteous_step", "rune_faithful_step",
+	"rune_soul_leech_step", "rune_deep_hex_step", "rune_spread_ruin"]
 
 static var _data := {}
 

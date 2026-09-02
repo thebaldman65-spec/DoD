@@ -573,11 +573,19 @@ func _live_guard_change() -> void:
 		"the Still Wrist rune names the mechanic that still exists")
 	var rune_only := {"abilities": []}
 	Talents.apply_payload(rune_only, wrist["payload"], 1, {"learned": {}, "member": {}})
-	ok(abs(float(rune_only.get("swordsmanship_parry", 0.0)) - 0.05) < 0.0001,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE — it writes `rune_swordsmanship_parry`
+	# now, because the charter forbids a rune writing a node's counter. **The two
+	# questions are unchanged and are the two this batch could most easily have
+	# broken**: the rune must pay ON ITS OWN (the DP dud), and the pair must still
+	# sum to what they summed. The sum is taken here the way the read site takes it.
+	ok(abs(float(rune_only.get("rune_swordsmanship_parry", 0.0)) - 0.05) < 0.0001,
 		"the rune writes the live field")
+	ok(not rune_only.has("swordsmanship_parry"),
+		"the rune still writes the NODE's counter — the charter forbids it")
 	var stacked := _applied({"sm_swordsmanship": 1})
 	Talents.apply_payload(stacked, wrist["payload"], 1, {"learned": {}, "member": {}})
-	ok(abs(float(stacked["swordsmanship_parry"]) - 0.20) < 0.0001,
+	ok(abs(float(stacked["swordsmanship_parry"])
+			+ float(stacked["rune_swordsmanship_parry"]) - 0.20) < 0.0001,
 		"rune and node stack (0.20 = a 30%% grant)")
 	var rune_prep := func(run):
 		run.party[0]["runes"] = [{"id": "still_wrist", "equipped": true,

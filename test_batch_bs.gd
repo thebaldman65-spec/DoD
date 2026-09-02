@@ -338,8 +338,15 @@ func _rune_audit() -> void:
 	# ...and the ones that DO ride a Pyromancer counter still read a LIVE field.
 	# §4 names three by name because they are already known to be fragile.
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	# BATCH EM RE-KEYED TWO OF THESE SIX AND THE QUESTION IS UNCHANGED: does a
+	# rune still write this counter, and does battle.gd still read it? The Long
+	# Burn's `accelerant_ranks` and the Cinder Trail's `conflagration_ranks` are
+	# node counters, so the charter moved them onto the rune's own field; the
+	# other four ride a PASSIVE or a core and were never in the 59. The name is
+	# read off the rune rather than pinned twice, so a future re-key of one of
+	# the remaining four moves one line here instead of going quietly green.
 	for f in ["blast_radius_ranks", "supernova_ranks", "molten_ranks",
-			"accelerant_ranks", "rune_cinder_ember", "conflagration_ranks"]:
+			"rune_accelerant_ranks", "rune_cinder_ember", "rune_conflagration_ranks"]:
 		ok(written.has(f), "a rune still writes %s" % f)
 		ok(src.contains("." + f), "...and battle.gd still READS %s" % f)
 	# THE RUNE OF THE WHITE FLAME'S MIDDLE CLAUSE IS STILL INERT, AND THAT IS

@@ -1299,7 +1299,8 @@ func _spawn_units() -> void:
 		# Mercy: Martyr's Vigor moves the ceiling, Zealous Light the start.
 		if spec == "holy":
 			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
-			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0)),
+			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0))
+				+ int(cfg.get("rune_zealous_mercy", 0)),
 				int(cfg["second_max"]))
 		# Focus is the Sharpshooter's second resource, and BATCH AZ TOOK ITS
 		# CEILING AWAY. `second_max` carries the FOCUS_UNCAPPED sentinel for him
@@ -1310,7 +1311,8 @@ func _spawn_units() -> void:
 		if spec == "sharpshooter":
 			cfg["second_resource_name"] = "Focus"
 			cfg["second_max"] = 50 if cfg.get("spray", 0) > 0 else FOCUS_UNCAPPED
-			var ss_open := int(cfg.get("opening_volley", 0))
+			var ss_open := int(cfg.get("opening_volley", 0)) \
+				+ int(cfg.get("rune_opening_volley", 0))
 			if int(cfg["second_max"]) >= 0:
 				ss_open = mini(ss_open, int(cfg["second_max"]))
 			cfg["second_resource"] = ss_open
@@ -1431,8 +1433,8 @@ func _spawn_units() -> void:
 	var dvn_pct := 0
 	var dvn_src := ""
 	for h in heroes:
-		if h.devoutness_ranks > dvn_pct:
-			dvn_pct = h.devoutness_ranks
+		if h.devoutness_ranks + h.rune_devoutness_ranks > dvn_pct:
+			dvn_pct = h.devoutness_ranks + h.rune_devoutness_ranks
 			dvn_src = h.unit_name
 	if dvn_pct > 0:
 		for h in heroes:
@@ -1478,7 +1480,7 @@ func _spawn_units() -> void:
 	var lh_pct := 0
 	for h in heroes:
 		ga_step = maxi(ga_step, h.guardian_step)
-		lh_pct = maxi(lh_pct, h.last_hope_pct)
+		lh_pct = maxi(lh_pct, h.last_hope_pct + h.rune_last_hope_pct)
 	if ga_step > 0 or lh_pct > 0:
 		for h in heroes:
 			h.mercy_threshold = 0.5 + 0.01 * ga_step
@@ -2442,7 +2444,7 @@ func _run_battle() -> void:
 		if zl_h.mercy_cap_bonus > 0:
 			_log("Talent: Martyr's Vigor — %s's Mercy ceiling rises to %d" % [
 				zl_h.unit_name, zl_h.second_max], "#b0a8e0")
-		if zl_h.zealous_mercy > 0 and zl_h.second_resource > 0:
+		if zl_h.zealous_mercy + zl_h.rune_zealous_mercy > 0 and zl_h.second_resource > 0:
 			_log("Talent: Zealous Light — %s opens with %d Mercy" % [
 				zl_h.unit_name, zl_h.second_resource], "#b0a8e0")
 	# BATCH BI §1 — the Faith meters open at zero, COUNT AND PEAK TOGETHER. It
@@ -2755,9 +2757,9 @@ func _run_battle() -> void:
 		if u.has_status("cons_ground"):
 			var zl_dv := _living_devout()
 			if zl_dv != null:
-				if zl_dv.pulse_ranks > 0 and not u.is_companion:
-					var pulse_amt := maxi(int(round(
-						zl_dv.max_hp * 0.01 * zl_dv.pulse_ranks)), 1)
+				if zl_dv.pulse_ranks + zl_dv.rune_pulse_ranks > 0 and not u.is_companion:
+					var pulse_amt := maxi(int(round(zl_dv.max_hp
+						* 0.01 * (zl_dv.pulse_ranks + zl_dv.rune_pulse_ranks))), 1)
 					var pulse_got := u.heal_amount(pulse_amt, u != zl_dv)
 					u.float_text("+%d" % pulse_got, Color(0.4, 0.9, 0.45))
 					# BATCH BC §1: never credited to anybody until now, so the
@@ -5741,9 +5743,9 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 				base += int(held.get("power", 0))
 			var riders := {
 				"divine": 1.0,
-				"blessed_pct": 0.01 * u.blessed_barrier_ranks,
+				"blessed_pct": 0.01 * (u.blessed_barrier_ranks + u.rune_blessed_barrier_ranks),
 				"afterglow": float(int(round(u.max_hp * 0.01 * u.afterglow_ranks))),
-				"warded": 0.01 * u.warded_ranks,
+				"warded": 0.01 * (u.warded_ranks + u.rune_warded_ranks),
 				"unyielding_pct": 0.01 * u.unyielding_ranks,
 			}
 			if ab.special == "mantle":
@@ -7505,11 +7507,20 @@ func _living_hero_passive(pid: String) -> BattleUnit:
 
 # Highest rank of a talent stat among LIVING heroes (party-wide talents
 # like Hypothermia, Brittle Ice, Hungering Cold, Frigid Grip).
-func _max_hero_rank(field: String) -> int:
+# BATCH EM — THE SECOND FIELD IS THE RUNE'S HALF OF A RE-KEYED COUNTER, and it
+# is summed PER HERO before the party max is taken. The party aggregation is
+# unchanged: the best single hero still governs. What changes is what "best"
+# means for a hero holding the rune and not the node — under the old signature
+# he read 0 and the rune paid nothing, in silence, which is DP's Whispering
+# Dark case arriving through a string key.
+func _max_hero_rank(field: String, rune_field: String = "") -> int:
 	var best := 0
 	for h in heroes:
 		if not h.dead:
-			best = maxi(best, int(h.get(field)))
+			var v := int(h.get(field))
+			if rune_field != "":
+				v += int(h.get(rune_field))
+			best = maxi(best, v)
 	return best
 
 
@@ -8632,7 +8643,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Brittle Ice (talent): a HELD target is easier to strike true, and
 			# it is party-wide. ADDITIVE — percentage points.
 			if _is_held(strike_target):
-				crit_chance += 0.01 * _max_hero_rank("frostbite_ranks")
+				crit_chance += 0.01 * _max_hero_rank("frostbite_ranks",
+					"rune_frostbite_ranks")
 			# Sweeping Strikes perfect: the second swing cuts truer.
 			if is_perfect and ab.display_name == "Sweeping Strikes" and hit_i == 1:
 				crit_chance += 0.25
@@ -8779,8 +8791,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Quick Shot" and attacker.has_status("instinct"):
 				raw += 0.10 * attacker.attack
 			# Master's Aim: the basic shot is the craft.
-			if ab.display_name == "Quick Shot" and attacker.masters_aim_ranks > 0:
-				raw += 0.01 * attacker.masters_aim_ranks * attacker.attack
+			if ab.display_name == "Quick Shot" \
+					and attacker.masters_aim_ranks + attacker.rune_masters_aim_ranks > 0:
+				raw += 0.01 * (attacker.masters_aim_ranks
+					+ attacker.rune_masters_aim_ranks) * attacker.attack
 			# Empowered Frostbolt — NO NODE AND NO RUNE writes this (Batch AS):
 			# unreachable but kept, the AR vault pattern.
 			if ab.display_name == "Frostbolt" and attacker.emp_frostbolt_ranks > 0:
@@ -8800,7 +8814,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the counter is percentage POINTS on top of the base 5.
 			if ab.display_name == "Ice Lance" \
 					and strike_target.status_stacks("chilled") > 0:
-				raw += (0.05 + 0.01 * attacker.crystal_edge_ranks) \
+				raw += (0.05 + 0.01 * (attacker.crystal_edge_ranks
+					+ attacker.rune_crystal_edge_ranks)) \
 					* strike_target.status_stacks("chilled") * attacker.attack
 			# Icy Veins — NO NODE AND NO RUNE writes this (Batch AS): kept, gated
 			# and reported rather than deleted, the AR vault pattern.
@@ -8991,8 +9006,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Bonecracker: the broken are already lost. ADDITIVE — the counter is
 			# percentage POINTS, so the node's 40 and the two runes' 12 apiece
 			# each pay their advertised number alone and stacked.
-			if strike_target.broken and attacker.bonecracker_ranks > 0:
-				raw *= 1.0 + 0.01 * attacker.bonecracker_ranks
+			if strike_target.broken \
+					and attacker.bonecracker_ranks + attacker.rune_bonecracker_ranks > 0:
+				raw *= 1.0 + 0.01 * (attacker.bonecracker_ranks
+					+ attacker.rune_bonecracker_ranks)
 			# Exposed Nerve's SECOND clause: he finishes what he opened. The
 			# universal Exposed multiplier is target-side and applies to everyone;
 			# this is his alone, so it is attacker-side, and the one counter both
@@ -9033,8 +9050,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if sv_n >= 3:
 						_sig("trapper")
 				# Vulture: three open wounds is a feast. ADDITIVE (60).
-				if attacker.vulture > 0 and sv_n >= 3:
-					raw *= 1.0 + 0.01 * attacker.vulture
+				if attacker.vulture + attacker.rune_vulture > 0 and sv_n >= 3:
+					raw *= 1.0 + 0.01 * (attacker.vulture + attacker.rune_vulture)
 			# Necrosis: the poisoned rot for everyone's blades (enemies only).
 			# ADDITIVE — the counter is percentage POINTS (35).
 			if not strike_target.is_hero and strike_target.has_status("poison"):
@@ -9088,7 +9105,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if atk_chill >= 3:
 				raw *= 0.85
 			if atk_chill > 0:
-				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
+				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks",
+					"rune_hungering_ranks") * atk_chill
 			if not attacker.is_hero and strike_target.is_hero and pv_chill > raw:
 				_prev(_living_hero_passive("permafrost"), pv_chill - raw)
 			# Frost Ward — NO NODE AND NO RUNE writes this (Batch AS): kept and
@@ -9294,7 +9312,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				elif attacker.has_status("formless_recoil"):
 					raw *= FORMLESS_RECOIL_DEALT
 				elif attacker.stance == "aggressive":
-					raw *= 1.15 + attacker.seasoned_off_bonus + sf_disc
+					raw *= 1.15 + attacker.seasoned_off_bonus \
+						+ attacker.rune_seasoned_off_bonus + sf_disc
 				else:
 					raw *= 0.90
 			# Overwhelm: every wound on the target is leverage (+8%/rank per
@@ -9664,7 +9683,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if not strike_target.is_hero and strike_target.has_status("ruin"):
 				var ruin_occ := _living_occultist()
 				if ruin_occ != null:
-					raw *= 1.0 + 0.01 * (2 + ruin_occ.deep_hex_step) \
+					raw *= 1.0 + 0.01 * (2 + ruin_occ.deep_hex_step
+						+ ruin_occ.rune_deep_hex_step) \
 						* strike_target.status_stacks("ruin")
 			# Shielded: the Orc Shieldmaster's single-ally ward.
 			if strike_target.has_status("shielded"):
@@ -9766,7 +9786,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				elif strike_target.stance == "aggressive":
 					raw *= 1.10
 				else:
-					raw *= maxf(0.85 - strike_target.seasoned_def_bonus - sf_disc, 0.0)
+					raw *= maxf(0.85 - strike_target.seasoned_def_bonus
+						- strike_target.rune_seasoned_def_bonus - sf_disc, 0.0)
 				if raw < pv_was:
 					_prev(strike_target, pv_was - raw)
 			# BATCH CM §2 — THE BRACE, HALF ONE OF TWO. It sits among the DEFENDER's
@@ -9800,7 +9821,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Hypothermia (talent): the cold opens wounds wider. ADDITIVE — the
 			# counter is percentage POINTS per stack.
 			if not strike_target.is_hero and strike_target.has_status("chilled"):
-				raw *= 1.0 + 0.01 * _max_hero_rank("hypothermia_ranks") \
+				raw *= 1.0 + 0.01 * _max_hero_rank("hypothermia_ranks",
+					"rune_hypothermia_ranks") \
 					* strike_target.status_stacks("chilled")
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
@@ -9981,8 +10003,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Fault Line: %d Focus stands above the line — +%d BD" % [
 						attacker.second_resource, fl_add], "#e0a050")
 			# Broken Will: the Occultist grinds stability down harder.
-			if attacker.broken_will_ranks > 0:
-				pr = int(round(pr * (1.0 + 0.01 * attacker.broken_will_ranks)))
+			if attacker.broken_will_ranks + attacker.rune_broken_will_ranks > 0:
+				pr = int(round(pr * (1.0 + 0.01 * (attacker.broken_will_ranks
+					+ attacker.rune_broken_will_ranks))))
 			# Breaker runes (rune_bd_bonus, its only read site): every blow
 			# lands heavier on the meter.
 			if attacker.rune_bd_bonus > 0.0 and pr > 0:
@@ -10026,7 +10049,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var occ_leech := _living_occultist()
 				if occ_leech != null:
 					var leech_pct: float = minf(0.01
-						* (2 + occ_leech.soul_leech_step + occ_leech.gluttony_ranks)
+						* (2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step
+							+ occ_leech.gluttony_ranks + occ_leech.rune_gluttony_ranks)
 						* strike_target.status_stacks("ruin"), RUIN_LEECH_CAP)
 					var rl_heal := maxi(int(round(final * leech_pct)), 1)
 					var rl_got: int = attacker.heal_amount(rl_heal)
@@ -10034,7 +10058,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_stat_heal(occ_leech, rl_got, attacker)
 					# The base draught stays silent (float text only); the
 					# deepened one logs so the talent's work is auditable.
-					if occ_leech.gluttony_ranks > 0:
+					if occ_leech.gluttony_ranks + occ_leech.rune_gluttony_ranks > 0:
 						_log("   → Talent: Gluttony — %s drinks %d from the Ruined (%d%%)" % [
 							attacker.unit_name, rl_got, int(round(leech_pct * 100))], "#b0a8e0")
 					# Soul Glut (capstone): the siphon feeds every mouth at
@@ -10170,8 +10194,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# pays: Perfect Form's Focus, Sundering Shot's Break, Follow-Through's
 			# cooldown turns.
 			if is_crit and attacker.is_hero and not is_counter:
-				if attacker.perfect_form > 0:
-					_gain_focus(attacker, attacker.perfect_form)
+				if attacker.perfect_form + attacker.rune_perfect_form > 0:
+					_gain_focus(attacker, attacker.perfect_form + attacker.rune_perfect_form)
 				if attacker.sundering_shot > 0 and not strike_target.dead:
 					strike_target.take_hit(0, attacker.sundering_shot)
 					_stat_bd(attacker, attacker.sundering_shot)
@@ -10284,8 +10308,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and final > 0:
 				var cg_dv := _living_devout()
 				var cg_pct := 0.10
-				if cg_dv != null and cg_dv.righteous_step > 0:
-					cg_pct += 0.01 * cg_dv.righteous_step
+				if cg_dv != null and cg_dv.righteous_step + cg_dv.rune_righteous_step > 0:
+					cg_pct += 0.01 * (cg_dv.righteous_step + cg_dv.rune_righteous_step)
 				var reflect := maxi(int(round(final * cg_pct)), 1)
 				_log("   → Consecrated Ground reflects %d to %s%s" % [
 					reflect, attacker.unit_name,
@@ -10297,8 +10321,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 				# Lifewell: the reflected pain waters the party.
-				if cg_dv != null and cg_dv.lifewell_ranks > 0:
-					var well := maxi(int(round(reflect * 0.01 * cg_dv.lifewell_ranks)), 1)
+				if cg_dv != null and cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks > 0:
+					var well := maxi(int(round(reflect
+						* 0.01 * (cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks))), 1)
 					for wh in heroes:
 						if wh.dead or wh.is_companion:
 							continue
@@ -10784,7 +10809,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# extension. Conflagration adds its turns to either path, and
 				# the Rune of the Cinder Trail adds its own on top — the field
 				# is an ADDITIVE TURN COUNT, so each pays what it advertises.
-				var fw_turns := (3 if is_perfect else 2) + attacker.conflagration_ranks
+				var fw_turns := (3 if is_perfect else 2) + attacker.conflagration_ranks \
+					+ attacker.rune_conflagration_ranks
 				if strike_target.has_status("burn"):
 					var fw := strike_target.get_status("burn")
 					var binfo: Array = STATUS_INFO["burn"]
@@ -11233,7 +11259,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# being harm, which is the natural end of the Entropy lane. It is
 			# folded in here rather than given its own block so there is exactly
 			# ONE place the recoil-into-Mana rate is decided.
-			var fb_pct := 0.01 * attacker.feedback_ranks
+			var fb_pct := 0.01 * (attacker.feedback_ranks + attacker.rune_feedback_ranks)
 			if attacker.perfect_conversion > 0:
 				fb_pct = 1.0
 			if fb_pct > 0.0 and attacker.resource_name == "Mana":
@@ -11337,7 +11363,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(sv_t, "slow", sv_turns, 0, 0, attacker)
 					_apply_status(sv_t, "exposed", sv_turns, 0, 0, attacker)
 					_hit_and_run(attacker)
-				if attacker.coated_blades > 0 and ab.cost == 0:
+				if attacker.coated_blades + attacker.rune_coated_blades > 0 and ab.cost == 0:
 					_apply_poison(attacker, sv_t, 2)
 					# THE CARRIER (Batch BA): the blade is oiled, and what is on it
 					# does two things to the body it opens.
@@ -11605,8 +11631,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# ADDITIVE (Batch BA): wire_ranks and cruel_ranks are both
 				# percentage POINTS, so node and rune each pay what they say.
 				var ret := maxi(int(total_dealt * 0.75), 1) \
-					+ int(0.01 * trapper.wire_ranks * trapper.attack)
-				ret = int(round(ret * (1.0 + 0.01 * trapper.cruel_ranks)))
+					+ int(0.01 * (trapper.wire_ranks + trapper.rune_wire_ranks) * trapper.attack)
+				ret = int(round(ret * (1.0 + 0.01 * (trapper.cruel_ranks
+					+ trapper.rune_cruel_ranks))))
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
 				_stat("dmg_hero_" + trapper.unit_name, ret)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
@@ -11667,8 +11694,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				+ attacker.singularity_crit_build) if any_crit else 1
 			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
 				res_gain += attacker.harmonics_ranks
-			if attacker.resonant_core_ranks > 0 and not attacker.res_cast_this_turn:
-				res_gain += attacker.resonant_core_ranks
+			if attacker.resonant_core_ranks + attacker.rune_resonant_core_ranks > 0 \
+					and not attacker.res_cast_this_turn:
+				res_gain += attacker.resonant_core_ranks + attacker.rune_resonant_core_ranks
 			# CASCADE — the Resonance lane's thesis: the curve gets steeper the
 			# higher it already is.
 			if attacker.cascade_stacks > 0 and attacker.second_resource >= 10:
@@ -12385,7 +12413,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
 		# ADDITIVE units — the counter is percentage POINTS, so the node's 10
 		# and a rune's 3 each pay what they advertise, alone and stacked.
-		target.frigid_bonus = 0.01 * _max_hero_rank("frigid_ranks")
+		target.frigid_bonus = 0.01 * _max_hero_rank("frigid_ranks", "rune_frigid_ranks")
 		# Rime: the chill leaps to one other random enemy (never chains).
 		if target.has_status("rime") and not _rime_echoing:
 			var others := enemies.filter(func(e): return not e.dead and e != target)
@@ -12494,7 +12522,7 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 		return 0
 	var pct: int = DOT_STATUSES[id]
 	if id == "burn":
-		pct += applier.accelerant_ranks
+		pct += applier.accelerant_ranks + applier.rune_accelerant_ranks
 	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
 
 
@@ -13298,7 +13326,7 @@ const BOND_MITIGATION_MAX := 0.75
 # Absolute Devotion holds the INCREASE on the base 20%; Ancient Pact doubles
 # whatever that came to. Both taken, the step is +70% a stack.
 func _bond_step(hunter: BattleUnit) -> float:
-	var step := BOND_STEP + 0.01 * hunter.absolute_step
+	var step := BOND_STEP + 0.01 * (hunter.absolute_step + hunter.rune_absolute_step)
 	if hunter.ancient_pact > 0:
 		step *= 2.0
 	return step
@@ -13393,7 +13421,7 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 		"aguila":
 			gift = "%d%% of armor ignored" % mini(20 * stacks, 100)
 	var cap := _loyalty_cap(hunter)
-	var strike_step := 5.0 + hunter.wild_communion_step
+	var strike_step := 5.0 + hunter.wild_communion_step + hunter.rune_wild_communion_step
 	var l_desc := "Loyalty %s: +%d%% strike damage\nand %s." % [
 		str(stacks) if cap == LOYALTY_UNCAPPED else "%d/%d" % [stacks, cap],
 		int(round(strike_step * stacks)), gift]
@@ -13492,7 +13520,7 @@ func _healing_done_mult(caster: BattleUnit) -> float:
 	var m := 1.0
 	if caster.second_resource_name == "Mercy":
 		m += 0.01 * (5 + caster.heavenly_step) * caster.second_resource
-	m += 0.01 * caster.triage_heal
+	m += 0.01 * (caster.triage_heal + caster.rune_triage_heal)
 	if caster.sanctum > 0:
 		m += 0.60
 	return m
@@ -13502,7 +13530,8 @@ func _healing_done_mult(caster: BattleUnit) -> float:
 # non-zero Triage term is what unlocks the crit — one counter, one gate, so a
 # rune paying the healing half can never hand out crits the node did not.
 func _heal_crit_mult(caster: BattleUnit) -> float:
-	if caster.triage_heal > 0 and randf() < CRIT_CHANCE + caster.crit_bonus:
+	if caster.triage_heal + caster.rune_triage_heal > 0 \
+			and randf() < CRIT_CHANCE + caster.crit_bonus:
 		return 1.5
 	return 1.0
 
@@ -14049,16 +14078,17 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 		return
 	bstat["divine"] = true  # only Divine Shield absorbs build Faith
 	bstat["src"] = devout.unit_name  # Batch W: absorbs credit the caster
-	bstat["blessed_pct"] = 0.01 * devout.blessed_barrier_ranks
+	bstat["blessed_pct"] = 0.01 * (devout.blessed_barrier_ranks
+		+ devout.rune_blessed_barrier_ranks)
 	bstat["afterglow"] = int(round(devout.max_hp * 0.01 * devout.afterglow_ranks))
-	bstat["warded"] = 0.01 * devout.warded_ranks
+	bstat["warded"] = 0.01 * (devout.warded_ranks + devout.rune_warded_ranks)
 	# Re-applying merges to the bigger power (add_status maxes), so the
 	# re-form baseline is the pool as it stands, not this cast's power.
 	bstat["original"] = int(bstat.get("power", power))
 	bstat["unyielding_pct"] = 0.01 * devout.unyielding_ranks
-	if devout.warded_ranks > 0:
+	if devout.warded_ranks + devout.rune_warded_ranks > 0:
 		_log("   → Talent: Warded Robes — the shield hardens %s (+%d%% armor while it holds)" % [
-			target.unit_name, devout.warded_ranks], "#b0a8e0")
+			target.unit_name, devout.warded_ranks + devout.rune_warded_ranks], "#b0a8e0")
 
 
 # Conviction (Devout passive): the living Devout, or null. Faith stacks
@@ -14545,15 +14575,17 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	# Dark writes `spread_ranks` AND `spread_ruin`, so a new field name would
 	# have left two of that rune's four clauses paying nothing, in silence —
 	# which is the exact dud the rune schema exists to prevent.
-	if not _ruin_spreading and occ.spread_ranks > 0 and occ.spread_ruin > 0 \
-			and randf() < 0.01 * occ.spread_ranks:
+	var sp_chance := occ.spread_ranks + occ.rune_spread_ranks
+	var sp_ruin := occ.spread_ruin + occ.rune_spread_ruin
+	if not _ruin_spreading and sp_chance > 0 and sp_ruin > 0 \
+			and randf() < 0.01 * sp_chance:
 		var catchers := enemies.filter(func(e): return not e.dead and e != target)
 		if not catchers.is_empty():
 			var caught: BattleUnit = catchers.pick_random()
 			_log("   → Talent: Spread of Madness — the mark leaps to %s (+%d Ruin)" % [
-				caught.unit_name, occ.spread_ruin], "#b0a8e0")
+				caught.unit_name, sp_ruin], "#b0a8e0")
 			_ruin_spreading = true
-			_gain_ruin(caught, occ.spread_ruin)
+			_gain_ruin(caught, sp_ruin)
 			_ruin_spreading = false
 	# BATCH AX §0 — THE SECOND NEW NUMBER: how deep the mark actually gets now
 	# that it has no ceiling. Banked at the gain site rather than at battle end
@@ -14586,7 +14618,8 @@ func _cy_sample() -> void:
 				# half of the passive the batch did not change. `rage_spent`
 				# is a plain field read and `frenzy_rage_steps()` is pure, so
 				# the sampler stays read-only by construction.
-				var step: float = (2.0 + h.bloodrage_step_bonus) / 100.0
+				var step: float = (2.0 + h.bloodrage_step_bonus
+					+ h.rune_bloodrage_step_bonus) / 100.0
 				var steps: int = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) \
 					+ h.frenzy_rage_steps()
 				var cur: float = mini(steps, BattleUnit.FRENZY_MAX_STEPS) * step
@@ -14627,7 +14660,8 @@ func _stamp_ruin_chip(target: BattleUnit) -> void:
 	var step := _ruin_threshold()
 	target.update_status("ruin", "R%d" % stacks,
 		"Marked by the Old Gods: takes %d%% more\ndamage (%d%% per stack, never clears);\nheroes striking this unit heal. Ruin\ndetonates at %d stacks." % [
-			(2 + occ.deep_hex_step) * stacks, 2 + occ.deep_hex_step,
+			(2 + occ.deep_hex_step + occ.rune_deep_hex_step) * stacks,
+			2 + occ.deep_hex_step + occ.rune_deep_hex_step,
 			(int(stacks / step) + 1) * step])
 
 
@@ -14820,7 +14854,7 @@ func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
 	# three this batch and this chip is the one place a player is told what it
 	# is, so it quotes `FAITH_RELEASE` rather than a literal.
 	var f_tail := "At %d stacks: healed for %d%% max\nhealth and the count resets —\nthe PEAK keeps paying." % [
-		FAITH_RELEASE, 15 + devout.faithful_step]
+		FAITH_RELEASE, 15 + devout.faithful_step + devout.rune_faithful_step]
 	if u == devout:
 		f_tail = "His own Faith HOLDS — the\ncount never releases."
 	var f_desc := "Conviction: Faith x%d (peak %d) —\n%s%% damage mitigation and +%s%%\ndamage dealt, paid on the PEAK.\n%s" % [
@@ -14994,7 +15028,8 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# on the bar — see `_refresh_faith_chip`.
 	u.faith_stacks = 0
 	_refresh_faith_chip(u, devout)
-	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * devout.faithful_step))), 1)
+	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * (devout.faithful_step
+		+ devout.rune_faithful_step)))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
 	# BATCH BC §1 — THE TWO NUMBERS THE WHOLE DECOMPOSITION TURNS ON, banked
@@ -19084,9 +19119,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# rune, which pays into the same field) raises the GRANT itself
 			# rather than adding a second number at the roll, so the chip's
 			# live counter is exactly what _roll_parry reads.
-			var gc_parry := 10 + int(round(attacker.swordsmanship_parry * 100.0))
+			var gc_parry := 10 + int(round((attacker.swordsmanship_parry
+				+ attacker.rune_swordsmanship_parry) * 100.0))
 			if is_perfect:
-				if attacker.swordsmanship_parry > 0.0:
+				if attacker.swordsmanship_parry + attacker.rune_swordsmanship_parry > 0.0:
 					_log("   → Talent: Swordsmanship — the perfect pivot buys +%d%% parry for 2 turns" % \
 						gc_parry, "#b0a8e0")
 				_apply_status(attacker, "parry_up", 2, gc_parry)
@@ -20462,7 +20498,8 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		# Quick Whistle shaves the shared swap cooldown; the node shaves all
 		# of it (the floor is zero — "no cooldown" has to be reachable).
 		hunter.cooldowns["Swap Companion"] = maxi(
-			SWAP_COOLDOWN - hunter.quick_whistle_ranks, 0)
+			SWAP_COOLDOWN - hunter.quick_whistle_ranks
+				- hunter.rune_quick_whistle_ranks, 0)
 		if hunter.cooldowns["Swap Companion"] == 0:
 			hunter.cooldowns.erase("Swap Companion")
 	# No Beast Left: an armed free call is consumed by this summon.
@@ -20482,7 +20519,8 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	# Beast Within grows the base. (The flat `companion_hp_bonus` that used to
 	# ride on top lost its last writer in the AY re-author and was deleted in
 	# Batch BJ §1 — a field nothing can write goes, the BA rule.)
-	var base_hp: int = int(round(stats[0] * (1.0 + hunter.companion_hp_pct)))
+	var base_hp: int = int(round(stats[0] * (1.0 + hunter.companion_hp_pct
+		+ hunter.rune_companion_hp_pct)))
 	if kind == "ursus":
 		base_hp += int(round(stats[0] * 0.03)) * prior_l
 	var cfg := {"unit_name": kind.capitalize(), "is_hero": true, "sheet_dir": "sphere",
@@ -20668,10 +20706,13 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	if victim == null or victim.dead:
 		return
 	var l: int = int(hunter.loyalty.get(kind, 0))
-	var raw := dmg * (1.0 + (0.05 + 0.01 * hunter.wild_communion_step) * l) \
+	var raw := dmg * (1.0 + (0.05 + 0.01 * (hunter.wild_communion_step
+		+ hunter.rune_wild_communion_step)) * l) \
 		* randf_range(0.9, 1.1)
-	if hunter.momentum_ranks > 0 and hunter.kinds_summoned.size() > 0:
-		raw *= 1.0 + 0.01 * hunter.momentum_ranks * hunter.kinds_summoned.size()
+	if hunter.momentum_ranks + hunter.rune_momentum_ranks > 0 \
+			and hunter.kinds_summoned.size() > 0:
+		raw *= 1.0 + 0.01 * (hunter.momentum_ranks + hunter.rune_momentum_ranks) \
+			* hunter.kinds_summoned.size()
 	var is_crit := randf() < CRIT_CHANCE + hunter.crit_bonus \
 		+ (0.25 if victim.broken else 0.0)
 	if is_crit:
@@ -20806,7 +20847,8 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if comp_chill >= 3:
 		raw *= 0.85
 	if comp_chill > 0:
-		raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * comp_chill
+		raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks",
+			"rune_hungering_ranks") * comp_chill
 	# Mark of the Hunt: the pack tears at the marked prey.
 	var pm: BattleUnit = comp.pack_master
 	if pm != null and victim.has_status("hunt_mark") \
@@ -21011,7 +21053,8 @@ func _living_hero_with(field: String) -> BattleUnit:
 func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	if victim == null or victim.dead:
 		return
-	var tick := maxi(int(round(0.03 * src.attack)), 1) + src.potent_ranks
+	var tick := maxi(int(round(0.03 * src.attack)), 1) + src.potent_ranks \
+		+ src.rune_potent_ranks
 	var p_turns := turns
 	var sticky := false
 	if src.slow_acting > 0:
@@ -21116,8 +21159,9 @@ func _forest_bite(enemy: BattleUnit) -> void:
 				or not trapper.has_status("tripwire"):
 			continue
 		# ADDITIVE (Batch BA), same units as the retaliation block above.
-		var fb := maxi(int(trapper.attack * (0.25 + 0.01 * trapper.wire_ranks) \
-			* (1.0 + 0.01 * trapper.cruel_ranks)), 1)
+		var fb := maxi(int(trapper.attack
+			* (0.25 + 0.01 * (trapper.wire_ranks + trapper.rune_wire_ranks)) \
+			* (1.0 + 0.01 * (trapper.cruel_ranks + trapper.rune_cruel_ranks))), 1)
 		var fb_res: Dictionary = enemy.take_hit(fb, 0)
 		_stat("dmg_hero_" + trapper.unit_name, fb)
 		enemy.float_text("%d Tripwire" % fb, Color(0.8, 0.65, 0.35))
@@ -21312,7 +21356,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 		return
 	if dmg > 0.0:
 		# ADDITIVE (Batch BA): cruel_ranks is percentage POINTS of trap damage.
-		var tr_raw := dmg * (1.0 + 0.01 * placer.cruel_ranks) \
+		var tr_raw := dmg * (1.0 + 0.01 * (placer.cruel_ranks + placer.rune_cruel_ranks)) \
 			* randf_range(0.9, 1.1)
 		tr_raw *= 1.0 - float(victim.resists.get("nature", 0.0))
 		var tr_final := maxi(int(round(tr_raw * (1.0 - victim.effective_armor()))), 1)
@@ -21593,7 +21637,7 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 		return
 	if attacker.last_attack_target == victim:
 		attacker.same_target_turns += 1
-		var gain := 20 + attacker.muscle_memory_ranks
+		var gain := 20 + attacker.muscle_memory_ranks + attacker.rune_muscle_memory_ranks
 		# BATCH BO §5 — QUARRY'S MARK doubles the Focus gained from the marked
 		# enemy. It multiplies the WHOLE gain including Unwavering's ramp
 		# below, because the card says "Focus gained from attacking the marked
@@ -21771,8 +21815,9 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 	# Scavenger: the Survivalist strips the corpse for supplies. ADDITIVE — the
 	# counter is percentage POINTS of his maximum Mana (Batch BA: 25).
 	for sc_h in heroes:
-		if not sc_h.dead and sc_h.scavenger_ranks > 0:
-			var scv := int(sc_h.max_resource * 0.01 * sc_h.scavenger_ranks)
+		if not sc_h.dead and sc_h.scavenger_ranks + sc_h.rune_scavenger_ranks > 0:
+			var scv := int(sc_h.max_resource
+				* 0.01 * (sc_h.scavenger_ranks + sc_h.rune_scavenger_ranks))
 			sc_h.resource = mini(sc_h.resource + scv, sc_h.max_resource)
 			sc_h.float_text("+%d Mana" % scv, Color(0.45, 0.6, 0.95))
 			sc_h.refresh_bars()
@@ -21792,10 +21837,11 @@ func _comp_dmg_mult(comp: BattleUnit) -> float:
 	var pm: BattleUnit = comp.pack_master
 	if pm != null:
 		var l: int = int(pm.loyalty.get(comp.companion_kind, 0))
-		var step := 0.05 + 0.01 * pm.wild_communion_step
+		var step := 0.05 + 0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)
 		mult *= 1.0 + step * l
-		if pm.momentum_ranks > 0 and pm.kinds_summoned.size() > 0:
-			mult *= 1.0 + 0.01 * pm.momentum_ranks * pm.kinds_summoned.size()
+		if pm.momentum_ranks + pm.rune_momentum_ranks > 0 and pm.kinds_summoned.size() > 0:
+			mult *= 1.0 + 0.01 * (pm.momentum_ranks + pm.rune_momentum_ranks) \
+				* pm.kinds_summoned.size()
 	return mult
 
 

@@ -651,7 +651,9 @@ func _the_rune_is_repointed() -> void:
 		"§2: it no longer writes the deleted `oath_ranks`")
 	ok(int(stat.get("oath_opening", 0)) == 1,
 		"§2: RE-POINTED, NOT DELETED — it buys an opening stack of his own Faith")
-	ok(int(stat.get("faithful_step", 0)) == 5,
+	# BATCH EM: the Binding Oath writes `rune_faithful_step` now — the charter
+	# forbids a rune writing a node's counter. The number did not move.
+	ok(int(stat.get("rune_faithful_step", 0)) == 5,
 		"§2: ...and its second clause is byte-untouched, still paying 5")
 	ok(String(cfg.get("desc", "")).to_lower().contains("opens each battle"),
 		"§2: ...and its description was rewritten rather than left lying")

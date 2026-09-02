@@ -299,13 +299,16 @@ func _additive_units() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	# The magnitude lives in the payload; the read site applies no step.
 	var pairs := {
-		"0.01 * attacker.bonecracker_ranks": "Bonecracker",
+		# BATCH EM — the rune half is summed at the site. Still a magnitude, and
+		# the per-rank step below is still pinned absent.
+		"0.01 * (attacker.bonecracker_ranks": "Bonecracker",
 		"0.01 * attacker.exposed_nerve": "Exposed Nerve",
 		"0.01 * attacker.tunnel_vision": "Tunnel Vision",
 		"0.01 * attacker.rapid_fire": "Rapid Fire",
 		"2.0 + attacker.opp_aim_step": "Opportunist's Aim",
 		"20 + attacker.muscle_memory_ranks": "Muscle Memory",
-		"_gain_focus(attacker, attacker.perfect_form)": "Perfect Form",
+		"_gain_focus(attacker, attacker.perfect_form + attacker.rune_perfect_form)":
+			"Perfect Form",
 		"take_hit(0, attacker.sundering_shot)": "Sundering Shot",
 		# RE-POINTED IN PLACE BY BATCH BQ, and the question is unchanged: does
 		# Follow-Through's counter reach the read site as the MAGNITUDE, with
@@ -451,28 +454,33 @@ func _rune_audit() -> void:
 	# equivalent value once there is no ceiling. RE-POINTED, NOT DELETED — it
 	# keeps the RELATIONSHIP, at a fifth of the node, exactly AY's ratio.
 	var deep: Dictionary = pool["deep_sight"]["payload"]["stat"]
-	ok(int(deep["deep_focus"]) == 8,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(int(deep["rune_deep_focus"]) == 8,
 		"the Deep Sight drops the conversion point 8 — a fifth of Deep Focus's 40")
-	ok(int(deep["perfect_form"]) == 20,
+	ok(int(deep["rune_perfect_form"]) == 20,
 		"...and its second clause is untouched: crits still grant +20 Focus")
 	ok(not String(pool["deep_sight"]["desc"]).contains("150"),
 		"...and its desc was rewritten to the new units rather than left lying")
 	var narrow: Dictionary = pool["narrow_gap"]["payload"]["stat"]
 	ok(abs(float(narrow["pierce_bonus"]) - 0.08) < 0.001,
 		"the Narrow Gap still ignores 8% more armor")
-	ok(int(narrow["bonecracker_ranks"]) == 12,
+	ok(int(narrow["rune_bonecracker_ranks"]) == 12,
 		"...and still bites 12% deeper into Broken enemies (1 rank x 12 -> 12)")
 	var draw: Dictionary = pool["long_draw"]["payload"]["stat"]
-	ok(int(draw["opening_volley"]) == 60,
+	ok(int(draw["rune_opening_volley"]) == 60,
 		"the Long Draw still opens him on 60 Focus")
-	ok(int(draw["muscle_memory_ranks"]) == 10,
+	ok(int(draw["rune_muscle_memory_ranks"]) == 10,
 		"...and still gathers 10 more per attack (1 rank x 10 -> 10)")
 	ok(abs(float(draw["speed"]) + 10.0) < 0.001 and bool(pool["long_draw"].get("scarred", false)),
 		"...and it is still SCARRED — the -10 Speed survives")
 	var level: Dictionary = pool["level_aim"]["payload"]["stat"]
 	ok(abs(float(level["pierce_bonus"]) - 0.04) < 0.001
-		and int(level["muscle_memory_ranks"]) == 10
-		and int(level["bonecracker_ranks"]) == 12,
+		and int(level["rune_muscle_memory_ranks"]) == 10
+		and int(level["rune_bonecracker_ranks"]) == 12,
 		"the Level Aim still pays 4% armor, +10 Focus and +12% vs Broken")
 	# THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO SHARPSHOOTER COUNTER.
 	var ss_fields := {}

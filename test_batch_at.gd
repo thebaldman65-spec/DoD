@@ -486,12 +486,17 @@ func _rune_audit() -> void:
 				"...and %s is a real BattleUnit field (set() drops a typo silently)" % field)
 	# THE RE-POINTS, each one named so a silent revert trips here.
 	var core: Dictionary = Runes.config("resonant_core").get("payload", {}).get("stat", {})
-	ok(core.has("conduit_step") and not core.has("conduit_ranks"),
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(core.has("rune_conduit_step") and not core.has("conduit_ranks"),
 		"the Resonant Core rune was RE-POINTED conduit_ranks -> conduit_step")
-	ok(abs(float(core.get("conduit_step", 0.0)) - 0.5) < 0.001,
+	ok(abs(float(core.get("rune_conduit_step", 0.0)) - 0.5) < 0.001,
 		"...and pays the node's own 0.5 points of curve step")
 	var unquiet: Dictionary = Runes.config("unquiet_mind").get("payload", {}).get("stat", {})
-	ok(int(unquiet.get("feedback_ranks", 0)) == 20,
+	ok(int(unquiet.get("rune_feedback_ranks", 0)) == 20,
 		"the Unquiet Mind rune was RE-POINTED feedback_ranks 2 -> 20 (percentage POINTS)")
 	ok(String(Runes.config("unquiet_mind").get("lane", "")) == "Entropy",
 		"...and its lane tag followed Control -> Entropy (a dead lane name leaves it homeless)")

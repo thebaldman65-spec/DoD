@@ -339,25 +339,30 @@ func _magnitudes() -> void:
 func _additive_units() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	for pair in [
-			["0.01 * devout.blessed_barrier_ranks", "Blessed Barrier"],
+			# BATCH EM — the rune's half is summed at the site now, so these
+			# literals carry the pair. THE QUESTION IS UNCHANGED: the counter is
+			# read as a MAGNITUDE (a `0.01 *` on the counter itself), never as a
+			# rank multiplied by a step. The `dead_math` sweep below is what pins
+			# the coefficient, and it did not move.
+			["0.01 * (devout.blessed_barrier_ranks", "Blessed Barrier"],
 			["0.01 * attacker.aegis_ranks", "Radient Aegis"],
 			["0.01 * devout.afterglow_ranks", "Afterglow"],
-			["0.01 * devout.warded_ranks", "Warded Robes"],
+			["0.01 * (devout.warded_ranks + devout.rune_warded_ranks)", "Warded Robes"],
 			["0.01 * attacker.stalwart_step", "Stalwart"],
 			["0.01 * devout.unyielding_ranks", "Unyielding Aegis"],
 			["0.01 * devout.communion_ranks", "Communion"],
-			["0.01 * devout.faithful_step", "Blessed are the Faithful"],
+			["0.01 * (devout.faithful_step", "Blessed are the Faithful"],
 			["0.01 * devout.covenant_heal", "Sacred Covenant"],
 			# BATCH BH §2: Fervor is a gate on the multiplier now, not an
 			# addend on the drip. Its read site is `_faith_stack_mult`.
 			["devout.fervor > 0", "Fervor"],
 			["devout.oath_faith > 0", "Binding Oath"],
 			["0.01 * zl_dv.waters_ranks", "Cleansing Waters"],
-			["0.01 * cg_dv.righteous_step", "Righteous Fire"],
-			["0.01 * zl_dv.pulse_ranks", "Healing Pulse"],
+			["0.01 * (cg_dv.righteous_step + cg_dv.rune_righteous_step)", "Righteous Fire"],
+			["0.01 * (zl_dv.pulse_ranks + zl_dv.rune_pulse_ranks)", "Healing Pulse"],
 			["1 + attacker.crusade_ranks", "Crusade"],
 			["0.01 * attacker.purity_ranks", "Purity"],
-			["0.01 * cg_dv.lifewell_ranks", "Lifewell"],
+			["0.01 * (cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks)", "Lifewell"],
 			["0.01 * cg_dv.judgement", "Judgement"]]:
 		ok(bsrc.contains(String(pair[0])),
 			"%s reads its counter additively (%s)" % [pair[1], pair[0]])
@@ -533,8 +538,13 @@ func _rune_audit() -> void:
 	# exactly what it paid before AW and exactly what its text says — the units
 	# moved, not the magnitudes.
 	var wr: Dictionary = Runes.build("warded_robes")["payload"]["stat"]
-	ok(int(wr.get("blessed_barrier_ranks", 0)) == 4
-		and int(wr.get("warded_ranks", 0)) == 10,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(int(wr.get("rune_blessed_barrier_ranks", 0)) == 4
+		and int(wr.get("rune_warded_ranks", 0)) == 10,
 		"the Warded Robes pays its advertised 4%% absorb-heal and +10%% armor (got %s)" % str(wr))
 	var bo: Dictionary = Runes.build("binding_oath")["payload"]["stat"]
 	# BATCH BH §2 RE-POINTED THE FIRST CLAUSE IN PLACE. The node stopped
@@ -542,18 +552,18 @@ func _rune_audit() -> void:
 	# equivalent value; the rune keeps the RELATIONSHIP (Faith that persists)
 	# through the Devout's own meter instead. Its SECOND clause is byte-
 	# untouched, which is what this check is really guarding.
-	ok(int(bo.get("oath_opening", 0)) == 1 and int(bo.get("faithful_step", 0)) == 5,
+	ok(int(bo.get("oath_opening", 0)) == 1 and int(bo.get("rune_faithful_step", 0)) == 5,
 		"the Binding Oath opens with 1 Faith of his own and heals 5%% more (got %s)" % str(bo))
 	var bc: Dictionary = Runes.build("burning_censer")["payload"]["stat"]
-	ok(int(bc.get("righteous_step", 0)) == 10
-		and int(bc.get("lifewell_ranks", 0)) == 20,
+	ok(int(bc.get("rune_righteous_step", 0)) == 10
+		and int(bc.get("rune_lifewell_ranks", 0)) == 20,
 		"the Burning Censer reflects 10%% more and mends a fifth of it (got %s)" % str(bc))
 	ok(float(bc.get("max_hp_pct", 0.0)) < 0.0,
 		"...and the scarred rune still carries a real cost")
 	var sv: Dictionary = Runes.build("standing_vow")["payload"]["stat"]
-	ok(int(sv.get("blessed_barrier_ranks", 0)) == 4
-		and int(sv.get("devoutness_ranks", 0)) == 5
-		and int(sv.get("pulse_ranks", 0)) == 2,
+	ok(int(sv.get("rune_blessed_barrier_ranks", 0)) == 4
+		and int(sv.get("rune_devoutness_ranks", 0)) == 5
+		and int(sv.get("rune_pulse_ranks", 0)) == 2,
 		"the Standing Vow pays 4%% / -5%% BD / 2%% a turn (got %s)" % str(sv))
 	# A rune writing an int field whose name does not end "_ranks" MUST be in
 	# STAT_INT_KEYS or JSON's float slides into a typed int var and the hero

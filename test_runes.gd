@@ -338,7 +338,15 @@ func _ordering(battle_src: String) -> void:
 	# `spray` and `opening_volley` STILL derive from cfg and keep their probes —
 	# Spray of Arrows is the one node that still imposes a ceiling, and Opening
 	# Volley still sets what he walks in holding.
-	for probe in ["mercy_cap_bonus", "zealous_mercy", "spray", "opening_volley"]:
+	# BATCH EM RE-POINTED THE TWO RUNE-WRITTEN PROBES AND KEPT THE OTHER TWO.
+	# The charter took the runes off the talent counters, so the Open Hand writes
+	# `rune_zealous_mercy` and the Long Draw `rune_opening_volley` — and THOSE are
+	# the names a derivation running too early would now leave as duds. The node's
+	# `zealous_mercy` and `opening_volley` are still derived here and still
+	# checked; `spray` and `mercy_cap_bonus` are written by no rune either way and
+	# are unchanged. **The ordering question did not move; the field name did.**
+	for probe in ["mercy_cap_bonus", "zealous_mercy", "spray", "opening_volley",
+			"rune_zealous_mercy", "rune_opening_volley"]:
 		var derive_at := battle_src.find("cfg.get(\"%s\"" % probe)
 		ok(derive_at >= 0, "battle.gd: no derivation reads %s" % probe)
 		ok(derive_at > rune_at,
@@ -362,7 +370,11 @@ func _ordering(battle_src: String) -> void:
 	var ceiling_writers := 0
 	for id in Runes.ids():
 		for field in Runes.config(id).get("payload", {}).get("stat", {}):
-			if String(field) in ["opening_volley", "spray",
+			# BATCH EM: a rune's ceiling clause is `rune_X` now, so the name it
+			# is counted under moved. Both names are read, because the question
+			# is whether a rune drives this road at all — and if a node-keyed
+			# ceiling rune is ever authored again it must still be counted.
+			if String(field).trim_prefix("rune_") in ["opening_volley", "spray",
 					"mercy_cap_bonus", "zealous_mercy"]:
 				ceiling_writers += 1
 	# Batch AT lowered this floor 4 -> 3 and BATCH AZ LOWERS IT 3 -> 2, both for
@@ -647,13 +659,25 @@ func _boolean_fields(data: Dictionary, battle_src: String) -> void:
 		for line in battle_src.split("\n"):
 			if not line.contains(field) or line.strip_edges().begins_with("#"):
 				continue
-			if line.contains("* %s" % field) or line.contains("%s *" % field) \
-					or line.contains("+ %s" % field) or line.contains("%s +" % field):
+			# BATCH EM — THE PAIR IS NOT ARITHMETIC ON THE VALUE. A re-keyed flag
+			# is read `u.coated_blades + u.rune_coated_blades > 0`, so the `+`
+			# detector fires on the JOIN rather than on a magnitude. The join is
+			# masked out and everything else is still caught: an `x + coated_blades`
+			# anywhere else, or a `*` in any form, still trips this.
+			var probe_line := line.replace("%s + " % field, "")
+			probe_line = probe_line.replace("+ rune_%s" % field, "")
+			if probe_line.contains("* %s" % field) or probe_line.contains("%s *" % field) \
+					or probe_line.contains("+ %s" % field) or probe_line.contains("%s +" % field):
 				arith = true
 		ok(not arith,
 			"%s now has an arithmetic read site — it is no longer magnitude-free" % field)
+		# BATCH EM — READ BOTH NAMES OR THIS STOPS RUNNING SILENTLY. The Rune of
+		# the Weeping Wound writes `rune_coated_blades` now; a lookup on the bare
+		# name returns null, `continue` fires, and the check below reports nothing
+		# while looking exactly as green as a check that ran.
 		for id in data:
-			var v = data[id]["payload"].get("stat", {}).get(field, null)
+			var stat: Dictionary = data[id]["payload"].get("stat", {})
+			var v = stat.get(field, stat.get("rune_" + field, null))
 			if v == null:
 				continue
 			ok(int(v) == 1,

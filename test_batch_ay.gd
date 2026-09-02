@@ -326,12 +326,17 @@ func _additive_units() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	# The magnitude lives in the payload; the read site applies no step.
 	var pairs := {
-		"0.01 * hunter.wild_communion_step": "Wild Communion",
-		"0.01 * pm.wild_communion_step": "Wild Communion (companion strike)",
-		"0.01 * hunter.absolute_step": "Absolute Devotion",
-		"0.01 * hunter.momentum_ranks": "Feral Momentum (ghost)",
-		"0.01 * pm.momentum_ranks": "Feral Momentum",
-		"0.01 * attacker.masters_aim_ranks": "Master's Aim",
+		# BATCH EM — the rune half is summed at each site now. The question is
+	# unchanged: an ADDITIVE magnitude, never a rank times a step. The `dead`
+	# sweep below still pins every retired coefficient.
+	"0.01 * (hunter.wild_communion_step": "Wild Communion",
+		"0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)":
+		"Wild Communion (companion strike)",
+		"0.01 * (hunter.absolute_step + hunter.rune_absolute_step)": "Absolute Devotion",
+		"0.01 * (hunter.momentum_ranks + hunter.rune_momentum_ranks)":
+		"Feral Momentum (ghost)",
+		"0.01 * (pm.momentum_ranks + pm.rune_momentum_ranks)": "Feral Momentum",
+		"0.01 * (attacker.masters_aim_ranks": "Master's Aim",
 		"0.01 * attacker.deep_reserves_ranks": "Deep Reserves",
 		"0.01 * pm.symbiosis": "Symbiosis",
 		"0.01 * attacker.vengeance_dmg": "Vengeance",
@@ -450,30 +455,35 @@ func _rune_audit() -> void:
 				"the rune %s writes %s, which battle.gd still reads" % [id, f])
 	# EACH STILL PAYS EXACTLY WHAT IT ADVERTISES, in the NEW units.
 	var deep: Dictionary = pool["deep_bond"]["payload"]["stat"]
-	ok(abs(float(deep["wild_communion_step"]) - 1.5) < 0.001,
+	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
+	# from the talent trees, so each clause below writes `rune_X` instead of
+	# the node's `X` and the read site sums the pair. **NOT ONE MAGNITUDE
+	# MOVED** — the question these checks ask is the same one, of the field
+	# the rune now owns.
+	ok(abs(float(deep["rune_wild_communion_step"]) - 1.5) < 0.001,
 		"the Deep Bond still drives the beast 1.5%% harder a stack")
 	ok(not deep.has("loyalty_cap_bonus"),
 		"...and its dead ceiling clause was RE-POINTED, not left writing a dead field")
-	ok(deep.has("absolute_step"),
+	ok(deep.has("rune_absolute_step"),
 		"...it pays into the boon's step instead")
 	var turn: Dictionary = pool["turning_pack"]["payload"]["stat"]
-	ok(int(turn["quick_whistle_ranks"]) == 1,
+	ok(int(turn["rune_quick_whistle_ranks"]) == 1,
 		"the Turning Pack still returns the swap a turn sooner")
-	ok(int(turn["momentum_ranks"]) == 8,
+	ok(int(turn["rune_momentum_ranks"]) == 8,
 		"...and still pays +8%% per distinct beast (1 rank x 8 -> a flat 8)")
 	var straps: Dictionary = pool["loosened_straps"]["payload"]["stat"]
-	ok(int(straps["masters_aim_ranks"]) == 12,
+	ok(int(straps["rune_masters_aim_ranks"]) == 12,
 		"the Loosened Straps still flies 12%% of Attack harder (2 ranks x 6 -> 12)")
 	ok(float(straps["armor"]) < 0.0,
 		"...and it is still SCARRED — the armor cost survives")
 	ok(bool(pool["loosened_straps"].get("scarred", false)),
 		"...and still flagged scarred")
 	var wild: Dictionary = pool["shared_wild"]["payload"]["stat"]
-	ok(abs(float(wild["wild_communion_step"]) - 1.5) < 0.001,
+	ok(abs(float(wild["rune_wild_communion_step"]) - 1.5) < 0.001,
 		"the Shared Wild still pays +1.5%% a stack")
-	ok(int(wild["momentum_ranks"]) == 8,
+	ok(int(wild["rune_momentum_ranks"]) == 8,
 		"...and +8%% per distinct beast")
-	ok(abs(float(wild["companion_hp_pct"]) - 0.05) < 0.001,
+	ok(abs(float(wild["rune_companion_hp_pct"]) - 0.05) < 0.001,
 		"...and +5%% companion health, untouched")
 	# THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO BEASTMASTER COUNTER.
 	var bm_fields := {}

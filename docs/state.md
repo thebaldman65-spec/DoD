@@ -5,104 +5,60 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-01 (Batch EL).*
+*Last rewritten: 2026-09-01 (Batch EM).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EL — THE TAGS GET THEIR REAL NAMES, AND `Tempo` IS FREED.** EK shipped six tag
-  words chosen under a collision; EL freed the word that caused it, renamed six of the seven to
-  the plain words, and added **MARK** as the seventh. **STILL MECHANICALLY INERT**: no clause
-  reads a tag, no card's behaviour changes, no magnitude moves. Full working:
-  **`docs/reports/EL.md`**.
-- **§1 — `Tempo` WAS SIX SURFACES, NOT FOUR, AND THE TWO EK COULD NOT SEE WERE LANES.** The brief
-  named the chip and three talent nodes. **It was also the Sharpshooter's third talent LANE, in
-  nine nodes, and one rune's lane** — invisible to `check_ek` §4 because `_collect_names` walks
-  `"name"` keys and a lane lives under `"lane"`.
-  - **THE CHEAP SIDE MOVED, AS RULED.** chip `Tempo`/`T+` → **`Pivot`/`Pv`** (`P+` was taken by
-    `parry_up`); `sm_deep_thrust` → **Pivot**; `cr_icy_veins` → **Shockwave**; `dv_crusade` →
-    **Crusade**; the lane → **Pace**.
-  - **CK's PRECEDENT WAS CHECKED BEFORE ANY WORD WAS INVENTED AND IT PAID ONCE IN FOUR.** The ids
-    are `tempo`, `tempo_ranks`, `shattered_tempo` — the word itself, three times — and
-    **`crusade_ranks`**, which is CK's Ironclad shape exactly, so **Crusade brought in no new
-    vocabulary.** The other three words come from the project's own prose: the chip's legend
-    already read *"the pivot's momentum"* and `battle.gd`'s log line already read *"the shockwave
-    sets the field back"*.
-  - **THE STATUS IDS DID NOT MOVE.** The collision is a LABEL collision and no player reads an id.
-    **Each declaration in `unit.gd` now names its display word**, so the id is not orphaned.
-  - **`Tempo` NOW RESOLVES TO NOTHING** across ability, node, lane, status label, rune, rune lane,
-    item and relic — which is what §2 required before it could begin.
-- **§2 — THE SIX RENAMES, AND THE COST WAS 292 ROWS.** `AFFLICTION → DEBUFF`, `SHELTER → DEFENSE`,
-  `METER → RESOURCE`, `AMP → OFFENSE`, `CLOCK → TEMPO`; **BREAK unchanged**. **Every one-line
-  meaning was rewritten to fit the new word** — two were circular under the new names (a RESOURCE
-  tag reading *"moves a resource"*) and both now name the meters.
-  - **THE BRIEF'S PREMISE WAS FALSE AND IT ASKED TO BE TOLD.** `CARD_TAGS` and `RUNE_TAGS` hold the
-    words as LITERALS, not as references to `TAG_ORDER`: **227 + 65 = 292 rows, 459 tag slots**,
-    every one moved. **What DID hold is the half that mattered** — no reader outside those two
-    tables names a tag word, so the rename was two files and a `sed`, and **not one clause in the
-    game had to be read.**
-- **§2b — MARK, AND ITS POPULATION WAS ALREADY WRITTEN DOWN IN THE CODE.**
-  **`battle.DISPEL_NEVER`'s own comment names the marks by id**, because Dispel had to be told not
-  to strip them — *"the five MARKS the party applies — covenant, quarry, snare_line, feinted,
-  hunt_mark"*, plus `blood_debt`, `vendetta` and `reacquire` named the same way, plus `party_mark`
-  and `arcane_echo` whose card texts say *"one mark at a time"*. **TEN cards lay one, NINE of them
-  in the draft.**
-  - **EK'S TEN WAS A DIFFERENT TEN AND BOTH HALVES OF THE DIFFERENCE MATTER.** EK counted six that
-    SAY "one mark at a time" plus four bleedout cards (Call the Wilds, Gut Rip, Rampage, Savage
-    Sweep). **Those four cause bleedouts; Blood Debt's mark is what PAYS on one** — tagging them
-    MARK tags a card for another card's mark, which CN's rule forbids, and they keep their tags.
-    **And EK never reached Covenant of Ash, Snare Line or Feint**, none of which says "mark" in its
-    own text. **A vocabulary derived from what cards SAY is the vocabulary of the cards that were
-    written well.**
-  - **EIGHT PRIMARIES MOVED AND THE PATTERN IN ALL EIGHT IS ONE THING: each was tagged for what its
-    mark PAYS.** Quarry's Mark was METER because the mark doubles Focus; Hunter's Mark was AMP
-    because the mark grants party damage; Blood Debt was BREAK for the strike and SHELTER for the
-    heal. **All of those read the payoff, and the payoff is not what the card is** — the exact
-    failure the tags exist to make visible, sitting inside the tag table.
-  - **SNARE LINE AND FEINT KEEP THEIR PRIMARIES AND CARRY MARK SECOND.** Snare Line marks the whole
-    FIELD; Feint marks on one of its two stance branches. **Each is one row, and the alternative is
-    stated in the report.**
-  - **NO RUNE GAINS MARK, AND THAT IS MEASURED**: not one rune payload field reads a mark status.
-- **§2c — SEVEN IS THE CEILING AND THE ARGUMENT IS A MEASUREMENT.** A tag means something only if
-  **holding two is notable**. At seven words the sixteen draft pools give **4 to 10 distinct
-  combinations against 6 to 13 cards**, and **65 of the 154 cards — 42% — are already the ONLY card
-  in their pool with their combination**, with **one pool of sixteen fully unique** (the Warrior
-  class pool, 6 of 6). **An eighth word takes more pools there, and a vocabulary where everybody
-  holds a different pair has stopped grouping anything.** `check_ek` §2 pins the count as an
-  EQUALITY and prints the spread so the claim can be re-tested rather than taken.
-- **§3 — THE SWEEP RAN ON ALL SEVEN OVER 1,551 AUTHORED STRINGS, AND THE INSTRUMENT WAS THE THING
-  THAT WAS WRONG.** **DEBUFF, RESOURCE and OFFENSE collide with nothing.** BREAK is clean on every
-  NAME surface (one glossary term, *"Pressure & Break"*, which is the mechanic it is named for).
-  TEMPO is clean **because §1 freed it** — before §1 it read 14 hits.
-  - **TWO COLLIDE AND BOTH SHIP, NAMED.** **MARK** meets Hunter's Mark, Quarry's Mark, Mark of the
-    Hunt and the `party_mark` chip labelled *"Hunter's Mark"*; **DEFENSE** meets the Defense
-    Potion, whose pouch button renders `Defense` on the same screen the draft card is drawn on
-    (never in the same visible frame — the draft is an overlay dimming the map at 0.86 alpha).
-  - **THE LINE IS WHETHER THE TWO THINGS MEAN THE SAME THING.** `Ward` meant *takes 50% less Break
-    damage* — a different thing wearing one word, so a reader learns something false. **Hunter's
-    Mark IS a mark and CARRIES the tag.** A same-meaning collision ships and is named; a
-    different-meaning one is renamed. `check_ek` §4 compares each tag's clash set against a named
-    `CLASH_EXEMPT` **as an EQUALITY**, so a fifth collision still trips.
-  - **THREE HOLES IN THE SWEEP WERE FOUND AND CLOSED, AND THE THIRD IS THE ONE THAT MATTERS.**
-    Lanes were invisible; items and relics were absent; and **the status-LABEL arm asked whether
-    `battle.gd` contained `["Ward",` — an EXACT whole label — so it was blind to every label merely
-    CONTAINING the word.** Under it the MARK sweep reported the status half clean while a chip
-    rendered the word. **A check written against the two examples in front of it passes on both and
-    answers no general question.** Every label is extracted and word-boundary matched now, and both
-    new arms assert their own population.
-- **AND `check_ek` §3's FILE POPULATION MOVED, WHICH THE BRIEF FORBADE. THE FIX WAS NOT AN
-  EXEMPTION.** `check_el.gd` reads `CARD_TAGS`, so five became six. **The real fault is that one
-  number was answering two questions** — how many files in the SHIPPED GAME know what a tag is
-  (a claim about the game) and how many TARGETS check one (a claim about the instruments, which
-  grows with the tree). Rolled together, **writing a new gate was indistinguishable from breaking
-  the rule.** The section is two assertions now: **`TAG_DEFINERS` is pinned at THREE and did not
-  move**; `TAG_CHECKERS` went two to three.
-- **Next letter: EM.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EM — THE RUNES GET THEIR OWN FIELDS.** The mechanical half of the designer's rune
+  charter, and only the mechanical half. **56 of the 59 clauses that wrote a live talent node's own
+  counter now write a rune-owned field, read beside the node's at the same site. Not one magnitude
+  moved.** Full working: **`docs/reports/EM.md`**.
+- **§0 — THE TAGS DID NOT MOVE AND THAT WAS DELIBERATE.** No rune keys to a tag; `check_ek` §3's
+  game-side population is still THREE. The differential mechanism waits for a real draft screen.
+- **§1 — 56 CLAUSES RE-KEYED, AND ALL 56 ARE PAYOUTS.** 47 new `BattleUnit` fields; **97 reading
+  statements across nineteen scripts**, derived by `check_em` §2 rather than counted. **AL's rule
+  was applied and its answer is uniform** — a THRESHOLD takes the MAX, a PAYOUT SUMS, and the `> 0`
+  tests beside these counters are PRESENCE tests rather than thresholds. On the Edge is still the
+  only threshold any rune shares and it is still AL's.
+  - **THE GUARD IS THE DANGEROUS HALF AND IT WAS MEASURED, NOT ARGUED.** `if occ.spread_ranks > 0`
+    is FALSE for an Occultist holding the Rune of the Whispering Dark and not the node. Driven live
+    on a rune-only hero with the guard reading the node's counter alone, that mark spread **0 times
+    in 400**; with the pair summed, **55–66**. **This is DP's dud arriving through the repair for
+    it**, which is why `check_em` §2 sweeps STATEMENTS rather than asserting the field exists.
+  - **FOUR CLAUSES ARE NAMED AS ARGUABLE** and none was decided quietly: the contagion CHANCE
+    (summed to 75%, where two independent rolls would be 66%), the Focus conversion-point DROP
+    (which reads like a threshold and whose own source comment authored it additive), the swap
+    cooldown (floored at 0, so the node can swallow the rune's turn), and the Bared Guard's
+    NEGATIVE scarred term.
+- **§2 — THREE CLAUSES HAVE NO HOME AND NOTHING WAS INVENTED.** `divine_presence_pct`,
+  `entropy_ranks` and `pleasure_pct` still write the node's counter. `check_em` §4 names all three
+  as an EQUALITY. **Options priced, none taken** — see the queue below.
+- **§3 — SIXTEEN RUNES ARE WHOLLY TALENT-KEYED**, every one mechanically whole after the re-key and
+  every one without its reason to exist. All sixteen are listed by name with what they do in
+  `docs/reports/EM.md` §3. **Exactly ONE is Scarred** (the Bared Guard, 75g).
+- **§4 — BOTH DOCUMENTS CORRECTED, AND THE LOSS IS RECORDED BESIDE THE CHANGE.** `master.html` and
+  `design-notes.md` stated the lane rule as CURRENT and both were accurate; they now say it is how
+  the sets were AUTHORED. **48 of the 65 runes were built on it and the 12 splashes lose most.**
+- **§5 — THE RUNE OF THE STANDING VOW IS ON THE RECORD.** Confirmed live and by the guard chain:
+  Healing Pulse's drip fires on **CONSECRATED GROUND alone** — DO's cut of the `unity` half is real
+  — and the rune's three clauses read 2 / 4 / 5 on an Inquisitor holding it and no talents. A quiet
+  weakening rather than a mis-sale: the desc named only holy ground before and after.
+- **§6 — A GATE THE BRIEF DID NOT ASK FOR, AND EJ NAMED THIS BATCH AS ITS HOME.** `check_em`, 210
+  checks, four sections, **five negative controls and all five bit.** `check_dp` §4's two Whispering
+  Dark rows were **repaired to intent rather than loosened** — they pinned the field the rune SHARED
+  with the node, which is exactly what the charter removes, and left standing they would have called
+  a live rune dead.
+- **AND EJ'S REPORT SAID NINE AND LISTED TEN.** Its §1 names the fields classed STAT despite having
+  a node; **`armor` is the tenth and no live talent node writes it at all.** `check_em` §1's
+  equality found that on its first run.
+- **Next letter: EN.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **the vocabulary the runes will be re-keyed onto now has
-  its real names** — which is EJ's next batch and is the batch after this one.
+  purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
+  and **the rune layer is now charter-clean on the mechanics.** What is left in the rune layer is
+  design: three clauses, sixteen runes, and whether the lane rule is replaced with anything.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -149,8 +105,11 @@ reads it.** `check_ek` and `check_el` assert that every battery run.
   nine spec archetypes is a design decision with a stat table under it.
 - **WHAT THE TAGGING STILL HAS NOT REACHED, STATED SO IT IS NOT READ AS CLEAN.** No sim and no
   balance judgement; not one magnitude was measured. **The tags were not compared against relics,
-  items, enemy abilities or events**, none of which carries one. **No rune was re-keyed** — EJ
-  sized that at 59 clauses in 32 runes and it is the next batch.
+  items, enemy abilities or events**, none of which carries one. **AND NO RUNE IS KEYED TO A TAG.**
+  EM took the rune charter's MECHANICAL half — 56 clauses off the talent counters and onto fields of
+  their own — and deliberately keyed nothing to a tag, because the differential mechanism (a rune
+  worth more to a hero pointed the same way) is the design half and waits for a real draft screen.
+  **`check_ek` §3's game-side population is still THREE.**
 - **AND TWO CLOSED AUDIT REPORTS STILL SAY `Tempo`.** `docs/talent-audit.html` and
   `docs/rune-audit.html` were deliberately not edited: both are CLOSED (CV / DN) and kept *"as
   written — it is the evidence of which way each disagreement pointed"*. **A reader searching
@@ -237,53 +196,66 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
-### THE RUNE CHARTER — AUDITED AT EJ, RULED ON NOWHERE
+### THE RUNE CHARTER — MECHANICS TAKEN AT EM, EVERY DESIGN QUESTION IN IT STILL OPEN
 
-**Full evidence: `docs/rune-audit.html` (all 65 runes, all 135 clauses, generated from the data
-rather than typed) and `docs/reports/EJ.md`.** **The charter is the designer's and is not
-implemented:** *runes are disconnected from talents; they are run-specific items only, and their
-purpose is to modify stats and resources, and the mechanics and values of core abilities, draft
-abilities and passives.* **Nothing in the code or the documents is wrong against the rule the
-runes were actually written to** — `master.html`, `design-notes.md` and `runes.gd`'s own header all
-state the opposite rule as current and all three are accurate. **The gap is between the code and
-the NEW rule.**
+**Full evidence: `docs/rune-audit.html` (EJ's audit of all 65 runes and all 135 clauses, generated
+from the data), `docs/reports/EJ.md` (the sizing) and `docs/reports/EM.md` (what was done).**
+**The charter is the designer's:** *runes are disconnected from talents; they are run-specific items
+only, and their purpose is to modify stats and resources, and the mechanics and values of core
+abilities, draft abilities and passives.*
 
-- **THE SIZE: 59 of 135 clauses, in 32 of the 65 runes. 16 runes are WHOLLY talent-keyed.** All 59
-  sit in the 48 spec runes — **the 5 universal and 12 class-wide carry zero.** **Warden 0-of-7,
-  Beastmaster 8-of-9**; per class Warrior 5/27, Mage 11/33, Cleric 21/33, Hunter 22/34.
-- **IT IS A RE-KEY AND NOT A REWRITE — 56 of the 59 ride a passive, a stat, a core or a draft card
-  already**, and **AL shipped the same repair three times** (`rune_grudge_bonus`,
-  `rune_vigil_bonus`, `rune_on_edge_ranks`) with the method in the source comments. **AL's rule
-  travels with it: a THRESHOLD takes the MAX and a PAYOUT SUMS**, or the re-key ships a magnitude
-  nobody authored.
-- **THREE CLAUSES HAVE NO HOME AND NEED AN EFFECT INVENTED**: `divine_presence_pct`,
-  `entropy_ranks`, `pleasure_pct` — per-turn drips that exist only as their node.
-- **THE COST THE CODE CANNOT PRICE IS THE AUTHORING RULE.** 36 lane runes and 12 splashes are built
-  on *"worth more to a hero whose points went elsewhere"*; a rune with its own field is worth the
-  same to every hero of that spec. **The splashes lose most — with no lanes to reach across, a
-  splash is three unrelated numbers.**
-- **TWO RUNES WERE TOUCHED BY THE DO/DP REBUILD AND ONE IS ON NO RECORD.** The **Whispering Dark**
-  is DP's known case and its desc was rewritten with the node. **The RUNE OF THE STANDING VOW lost
-  the `unity` half of Healing Pulse's trigger at DO** and nothing anywhere records it — **not a
-  mis-sale (its desc named only holy ground before and after, so the code moved TOWARD the card),
-  but a silent weakening of a 100g rune's third clause.** Unruled: whether to restore it, re-key it
-  or leave it.
-- **THREE RUNE-ONLY EFFECTS ANNOUNCE THEMSELVES AS TALENTS** — `beacon_ranks`, `capacitor_ranks`,
-  `mindfulness_ranks`, none of which has a node of that name in any tree — **and three more share a
-  label with a node the holder may not own** (Grudge, Shared Vigil, On the Edge). The *"→ Rune:"*
-  convention already exists. **Reported, not fixed; player-facing text.**
-- **`pyromaniac_ranks` IS THE ONE CLAUSE THAT PAYS NOTHING TODAY.** The White Flame writes it and
-  nothing reads it — Inferno Master's per-turn step stopped existing at AR. `unit.gd:515` flags it
-  and AR §4 forbids inventing a read site. **A 120g scarred Epic with two live clauses of three.**
-- **NO GATE ENCODES ANY OF THIS**, because a gate encodes a ruling. The property a future gate
-  wants — *no rune writes a live node's counter* — is about twenty lines from `LANE_TREES` and
-  `runes.json` and belongs in the batch that takes the charter. **Writing it now would encode
-  today's 59 as an expectation.**
-- **WHAT THE AUDIT DID NOT REACH, STATED SO IT IS NOT READ AS CLEAN.** No sim, no balance
-  judgement; not one magnitude was measured in play. **Runes were not compared against each other,
-  nor against relics, items or enemy abilities.** Rune PRICING was not opened. The 12 `lane` fields
-  on the splash runes were not audited for accuracy.
+**THE MECHANICAL HALF IS DONE AND `check_em` HOLDS IT.** 56 of the 59 clauses were re-keyed onto
+rune-owned fields; the property *no rune writes a live talent node's counter* is asserted every
+battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`master.html`,
+`design-notes.md` and `CLAUDE.md` all say so now.** What follows is what is NOT done.
 
+- **THE THREE CLAUSES WITH NO HOME. OPTIONS PRICED, NONE TAKEN.** `divine_presence_pct`,
+  `entropy_ranks` and `pleasure_pct` are per-turn drips that exist only as their node — no passive,
+  stat, core ability or draft card underneath them — so re-keying one means INVENTING an effect,
+  which is the guess AR §4 forbids. All three still write the node's counter and `check_em` §4
+  names them as an EQUALITY, **so the day one is answered the gate reds and the answer is to delete
+  its row.** Full options and the before/after worth of each rune in `docs/reports/EM.md` §2.
+  - **Rune of the Sleepless Vigil** (75g, SCARRED, Vigil) — `divine_presence_pct` is **one of
+    three**; it keeps `beacon_ranks` (already rune-only) and its −10 Speed cost. Losing the clause
+    leaves a scarred rune paying ONE effect for a real cost.
+  - **Rune of the Deepening Ruin** (100g, Ruin) — `entropy_ranks` is **one of TWO**. Losing it
+    halves the rune.
+  - **Rune of the Whispering Dark** (100g) — `pleasure_pct` is **one of four**, and the other three
+    are re-keyed and live. It is the cheapest of the three to drop and the one whose desc would
+    need the most surgery.
+- **THE SIXTEEN THE CHARTER EMPTIES. LISTED, PRICED, AND UNRULED.** Every clause these sixteen own
+  was talent-keyed, so after the re-key they are mechanically whole and have lost the argument for
+  existing: each was *your lane, but more*. **`docs/reports/EM.md` §3 lists all sixteen by name with
+  what each does, its price, its lane and its clauses.** **Exactly one is Scarred — the Rune of the
+  Bared Guard (75g), whose two clauses ARE the trade** — so retiring it removes both halves at once,
+  and it is the only one of the sixteen where that is true.
+  - **THE DISTRIBUTION IS UNEVEN AND IT MATTERS TO THE RULING.** All 59 clauses sat in the 48 spec
+    runes; the 5 universal and 12 class-wide carried none. **The Warden is 0-of-7 and the
+    Beastmaster 8-of-9** — three of the Beastmaster's four runes are in the sixteen, against none of
+    the Warden's. A retirement pass would hit one spec's pool five times harder than another's.
+- **WHAT SEVERING THE LANE RULE DELETES, RECORDED BECAUSE IT WAS MEASURED.** 36 lane runes and 12
+  splashes — **48 of the 65** — were authored to *"one rune per talent lane, plus one splash"*, whose
+  point was that a rune is *"worth more to a hero whose points went elsewhere."* **A rune with its
+  own field is worth the same to every hero of its spec**, which is the power increment the rule
+  existed to prevent. **The splashes lose most**: with no lanes to reach across, a splash is three
+  unrelated numbers in a bundle. **The 36 `lane` fields are still authored and still shown** and now
+  describe where a rune came from rather than what it reaches. **Whether anything replaces the
+  variance mechanism is the open design question**, and the archetype tags are the candidate.
+- **THREE RUNE-ONLY EFFECTS STILL ANNOUNCE THEMSELVES AS TALENTS** — `beacon_ranks`,
+  `capacitor_ranks`, `mindfulness_ranks`, none of which has a node of that name in any tree — **and
+  three more share a label with a node the holder may not own** (Grudge, Shared Vigil, On the Edge).
+  The *"→ Rune:"* convention already exists. **Reported at EJ §2b, not fixed; player-facing text,
+  and the charter makes it worse rather than better.**
+- **`pyromaniac_ranks` IS STILL THE ONE CLAUSE THAT PAYS NOTHING.** The White Flame writes it and
+  nothing reads it — Inferno Master's per-turn step stopped existing at AR. `unit.gd` flags it and
+  AR §4 forbids inventing a read site. **A 120g scarred Epic with two live clauses of three.** It
+  was NOT in the 59 (nothing reads it, so no node counter is involved) and EM did not touch it.
+- **WHAT IS STILL NOT MEASURED, STATED SO THIS IS NOT READ AS CLEAN.** No sim and no balance
+  judgement; **not one magnitude was measured in play, before or after.** Runes were not compared
+  against each other, nor against relics, items or enemy abilities. Rune PRICING was not opened —
+  and it is now a live question, because a rune whose value no longer depends on the holder's build
+  is a different object to price. The 12 `lane` fields on the splash runes were never audited for
+  accuracy.
 ### THE BOSS-PICK POOLS — AUDITED AT DU §5, RULED ON NOWHERE
 
 **Full tables and working in `docs/reports/DU.md` §5.** DQ dumped them and did not audit them; this
@@ -1039,8 +1011,15 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-four** —
-  **EL ADDED `check_el` BECAUSE THE BATCH CARRIES THREE RULINGS**: that MARK's population is
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-five** —
+  **EM ADDED `check_em` BECAUSE EJ §5 NAMED THIS BATCH AS ITS HOME**: *the property a future gate
+  wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.*
+  §1 derives that property from `LANE_TREES` and `runes.json` rather than from a list of names, and
+  its nine unit-math exemptions are an EQUALITY. **§2 is the one that earns the gate**: splitting a
+  counter is safe in the arithmetic and lethal in the GUARD, so it sweeps STATEMENTS and fails if
+  any statement reads one half without the other. §3 holds the AA type trap on the `rune_` side; §4
+  pins the three clauses with no home as an EQUALITY. **Five negative controls, all five bit.**
+  **EL ADDED `check_el` BECAUSE THAT BATCH CARRIES THREE RULINGS**: that MARK's population is
   DERIVED from the marks the game itself names rather than listed, that `master.html` §6c's tag
   table is the code's table, and that the widest tag line is MEASURED rather than transcribed
   (DJ §3). **The first is the one that decays silently** — the day an eleventh mark is authored,
@@ -1113,8 +1092,14 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 85 ROWS: 46 suites, 34 gates, 2 scene runs
-  and 3 harness gates.** **EL ADDED `check_el` AT [23, 23] AND MOVED EXACTLY TWO OTHER ROWS —
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 86 ROWS: 46 suites, 35 gates, 2 scene runs
+  and 3 harness gates.** **EM ADDED `check_em` AT [210, 210] AND MOVED FIVE OTHER ROWS —
+  `check_dp` 43 → 48, `check_parse` 160 → 161, `test_batch_ak` 495 → 496, `test_batch_ax`
+  348 → 350 and `test_runes` 3121 → 3125 — ALL SIX WRITTEN BEFORE THE BATTERY**, three of them
+  off three identical standalone readings apiece. **`check_parse` read 163 first**, and the extra
+  two were scratch measurement probes sitting in the repo root that its RESIDUE walk found — the
+  walk working, and they were moved out of the tree. Before it, **EL ADDED `check_el` AT [23, 23]
+  AND MOVED EXACTLY TWO OTHER ROWS —
   `check_ek`, 39 → 43, and `check_parse`, 159 → 160 — ALL THREE WRITTEN BEFORE THE BATTERY OFF
   STANDALONE READINGS**, so `check_de` certified on pass one. **`check_ek`'s move is itemised in
   its own row**: §3 splits one assertion into two, §4 adds two population assertions and one more
@@ -1435,65 +1420,70 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EL, FROZEN, AND CLEAN ON THE FIRST RUN.** **198 files were MD5-stamped with
-ABSOLUTE paths before it and re-compared after: it drifted ZERO** — the tree the battery read is
-byte-for-byte the tree that ships. **The reds were found before it, by eight negative controls and
-two standalone gate runs**, and the one thing the battery itself said was a NOTICE rather than a
-failure (below).
+**ONE BATTERY AT EM, FROZEN, AND IT CERTIFIED ON PASS ONE.** **198 files were MD5-stamped with
+ABSOLUTE paths before it and re-compared after with the same absolute paths: it drifted ZERO** —
+the tree the battery read is byte-for-byte the tree that ships. **The reds were all found before
+it**, by nine negative controls, a two-arm literal sweep and standalone runs of every touched
+target.
 
-| | EH's acceptance | EI battery 1 | EI's acceptance | EK's acceptance | **EL's acceptance** |
-|---|---|---|---|---|---|
-| **suite failures** | 0 | 0 | 0 | 0 | **0** |
-| **throws, grepped from the stream** | 0 | 0 | 0 | 0 | **0** |
-| `check_cm_live` (deliberate) | 4 | 4 | 4 | 4 | **4** |
-| check counts outside their band | 0 | 0 | 0 | 0 | **0** |
-| `check_de` | 345 / 0 / 0 | 346 / 0 / 0 | 346 / 0 / 0 | 350 / 0 / 0 | **354 / 0 / 1 → 0** |
-| run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
-| targets in the manifest | 84 | 84 | 84 | 85 | **86** |
+| | EI's acceptance | EK's acceptance | EL's acceptance | **EM's acceptance** |
+|---|---|---|---|---|
+| **suite failures** | 0 | 0 | 0 | **0** |
+| **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
+| `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
+| check counts outside their band | 0 | 0 | 0 | **0** |
+| `check_de` | 346 / 0 / 0 | 350 / 0 / 0 | 354 / 0 / 1 → 0 | **358 / 0 / 0** |
+| run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
+| targets in the manifest | 84 | 85 | 86 | **87** |
 
-**EIGHTY-SIX TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-SIX, AND THERE ARE EIGHTY-SIX LOGS** —
-compared both ways and checked for duplicate names, which is the fault a shared log directory
-produces. **0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 86 logs** — grepped from the
-streams rather than read off a tally or an exit code. **`check_map_screen: OK`, and its live tag
-drive read 12 tag lines for 12 offered cards** with `DEBUFF · BREAK` as the first; `check_ct_map`
-83 / 0.
+**EIGHTY-SEVEN TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-SEVEN, AND THERE ARE EIGHTY-SEVEN LOGS**
+— compared both ways and checked for duplicate names, which is the fault a shared log directory
+produces. **0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 87 logs** — grepped from the
+log files rather than read off a tally or an exit code. **`check_map_screen: OK`, and its live tag
+drive read 12 tag lines for 12 offered cards**; `check_ct_map` 83 / 0.
 
-**`check_de` READ 354 CHECKS, ZERO FAILURES AND EXACTLY ONE NOTICE, AND THE NOTICE WAS EL's OWN
-MISS.** `check_parse` rose 159 → 160 and the row was not moved before the run. **EL wrote
-`check_el`'s row and moved `check_ek`'s before the battery and did not write the third**, so the
-differ certified with a notice where it should have certified silent. **The row is moved now and
-`check_de` re-reads 354 / 0 / 0.** The +4 over EK's 350 is exactly `check_el` joining the
-battery — that gate makes four assertions per target.
-- **THE RULE THIS PAYS FOR THE SECOND TIME: `check_parse`'s COUNT IS ITS COVERAGE.** Its population
-  is derived from `run_battery.sh`'s own `GATES` array, so **any batch adding a target moves this
-  row**, and it moved at EK for the same reason. **A batch that adds a gate owes TWO baseline rows,
-  not one.**
+**`check_de` READ 358 CHECKS, ZERO FAILURES AND ZERO NOTICES.** All six baseline rows this batch
+moved were written BEFORE the run, so the differ had nothing to report in either direction —
+**which is exactly the half EL's own record says it missed.** The +4 over EL's 354 is `check_em`
+joining the battery; that differ makes four assertions per target.
+- **THE RULE THIS HAS NOW PAID FOR THREE TIMES: `check_parse`'s COUNT IS ITS COVERAGE.** Its
+  population is derived from `run_battery.sh`'s own `GATES` array, so **any batch adding a target
+  moves this row**. **A batch that adds a gate owes TWO baseline rows, not one**, and EM wrote both
+  before the run.
+- **AND IT READ 163 BEFORE IT READ 161.** Two scratch measurement probes were sitting in the repo
+  root and `check_parse`'s RESIDUE walk found them. **That is the walk working**; they were moved
+  out of the tree and the residue is 4 again.
 
-**THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THE BATTERY.** Two independent needle instruments
-cleared the document edits: **`check_ed` against HEAD's own manifest** (it caught eight unrecorded
-`check_el` pins on the first run, which is that gate working) and **a raw sweep of all 11,010
-gate-and-suite literals over thirteen tracked documents**, which read **18 LOST — every one traced
-to its site and none of them read by the document it left** (17 in `docs/state.md`, which nothing
-opens; one in a `baselines.json` `note` field, which only `check_de` reads and only as parsed JSON).
+**THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THE BATTERY, AND THE PIN MANIFEST WAS NOT THE
+INSTRUMENT THIS TIME.** `check_ed` was run against HEAD's own manifest with every edit in place and
+read **18 / 0**; regenerating moved **three line-number references and nothing else — 0 pins lost,
+0 gained.** That is not this batch being small: **the 26 assertions it actually broke live in array
+literals read through a variable** (`for pair in [...]` → `contains(String(pair[0]))`), which the
+extractor classes as having no static needle — 93 of 1041 source pins are in that class. **The
+literal sweep is what found them**, 11,249 needles over 38 haystacks, and it agreed exactly with
+the set the suites reported when run: **26 LOST against HEAD's needles, 0 LOST against the current
+ones.** Separately, **all 346 negative pins were re-checked** (`CHECKED 346 of 346`) and none of the
+new prose put a retired string back.
 
-**EIGHT NEGATIVE CONTROLS WERE ARMED AND ALL EIGHT BIT, DISARMED GREEN BEFORE AND AFTER.** Four on
-`check_el` (a mark card losing MARK; a non-mark card gaining it; one word of `master.html` §6c
-drifting; `text-standard.html`'s figure drifting), one on `check_ek` §3 (a tag read added to
-`battle.gd` — **two reds, the game-half population AND the `battle.gd` zero**), one on
-`check_map_screen` (the draft card stops drawing its tag line: **`TAG MISMATCH`, and the `OK`
-verdict withheld** — DS's Heads Down shape), and **two TWO-ARMED controls on the sweep repair**:
-- **A STATUS LABEL TAKING A TAG WORD INSIDE A LONGER LABEL** (`High Guard` → `High Defense`).
-  **HEAD's `check_ek` never named it**; EL's caught `status label:High Defense`.
-- **A TALENT LANE TAKING A TAG WORD** (`Pace` → `Tempo` on one node). **HEAD's `check_ek` has no
-  lane arm at all and reported nothing**; EL's caught `lane:Tempo`.
-**A ONE-ARMED CONTROL WOULD HAVE PROVED ONLY THAT THE NEW CODE RUNS.** These two prove the old code
-was blind, which is the claim EL §3 actually makes.
+**NINE NEGATIVE CONTROLS WERE ARMED. ALL NINE BIT — AND THREE OF THEM DID NOT BITE THE FIRST
+TIME, WHICH IS THE PART WORTH KEEPING.** Five on `check_em`, one on the live game (the spread guard
+reading the node's counter alone: **0 marks spread in 400**, against 55–66 armed), two arms on the
+literal sweep, one on the negative-pin pre-check.
+- **THE UNPAIRED-READ SWEEP PRINTED A CLEAN ZERO WHILE BLIND TO 80 OF ITS 85 SITES.** Its regex
+  excluded a match preceded by a word character **or a dot**, and `attacker.vulture` has a dot in
+  front of it. **A control armed on the one `cfg.get("…")` site DID bite and proved nothing**; the
+  control that found the hole was armed on a DOTTED read.
+- **THE LITERAL SWEEP'S FIRST CONTROL WAS ARMED ON A NEEDLE THAT WAS ITSELF NEW**, so breaking it
+  moved the GAINED column and left LOST at zero. **Its second replaced the needle with a string
+  that CONTAINED it** (`aegis_ranks` → `aegis_ranks_X`), so `contains` stayed true. A differential
+  sweep can only be controlled on a needle BOTH trees carry, broken rather than extended.
+- **AND ONE INSTRUMENT WAS VACUOUS BEFORE IT WAS RIGHT.** The negative-pin pre-check read the
+  manifest's haystack field under the wrong key name, so every row was skipped and it reported
+  **0 violations over 0 pins checked** — indistinguishable from a clean reading. It prints
+  `CHECKED n of m` now.
 
-**AND A SUBSET BATTERY RAN AFTER THE POST-BATTERY EDITS.** Four files changed after the frozen run:
-three `.gd` COMMENTS still carrying retired tag words (`classes.gd`, `runes.gd`, `test_batch_ce`)
-and `baselines.json`'s `check_parse` row. **The comment edits were proved comment-only by a
-comment-stripped diff (0 code lines) and needle-free by a direct search** — no `.gd` holds any of
-the removed strings — and every target that reads an edited file was re-run standalone. **The subset
-that followed ran 15 suites and ALL 34 GATES** — a named-subset invocation replaces `SUITES` and
-leaves `GATES` whole — with **no failures and no throws** except `check_cm_live`'s standing four
-and `check_de`'s one, which is that gate refusing to certify a subset run and is it working.
+**AND ONE SUITE WAS READING A THROW AS A PASS.** `test_batch_as` printed *"375 checks / 0
+failures"* while a missing dictionary key raised at line 412 and nineteen assertions never ran; its
+baseline is 394 and the battery reads 394 now. **That is CD's lesson exactly** — a suite that throws
+is not a suite that passed — and it is why the throw count was read beside the check count on every
+target in this batch.

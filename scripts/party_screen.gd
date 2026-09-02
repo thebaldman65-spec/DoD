@@ -113,8 +113,10 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 	match Classes.SPEC_INFO[spec]["passive"]:
 		"seasoned":
 			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps." % [
-				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
-				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
+				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))
+					+ float(cfg.get("rune_seasoned_off_bonus", 0.0))) * 100)),
+				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))
+					+ float(cfg.get("rune_seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
 			# BATCH CV §6 — THE FLOOR IS INTERPOLATED, NOT HARDCODED AT HALF.
 			# Scar Tissue holds 85% of the peak and 100% with Unstoppable, and
@@ -127,7 +129,8 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 			var br_keep: int = [50, 85, 100][clampi(
 				int(cfg.get("scar_tissue_ranks", 0)), 0, 2)]
 			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing. %d%% of the highest bonus reached in a\nbattle is kept as a floor for the rest of it." % [
-				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1),
+				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0))
+					+ float(cfg.get("rune_bloodrage_step_bonus", 0.0)), 1),
 				br_keep]
 	return Classes.resolve_values(desc,
 		Classes.value_ctx_from_config(cfg)).replace("\n", " ")
