@@ -113,6 +113,7 @@
 		"name": "Rune of Boiling Blood", "rarity": "rare", "scope": "spec:berserker",
 		"price": 100, "lane": "Fury",
 		"desc": "Blood Frenzy grants +0.5% more damage for every 5% of health missing.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: one clause, and the thinnest loss of the twelve — `broad_path` already carries a Blood Frenzy term.",
 		"payload": {"stat": {"rune_bloodrage_step_bonus": 0.5}}
 	},
 	"warpath": {
@@ -208,6 +209,7 @@
 		"name": "Rune of the Bitter Grip", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100, "lane": "Deep Freeze",
 		"desc": "Every stack of Chilled slows 3% harder, and HELD enemies are 2% likelier to be struck critically — by anyone.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: the only item pairing Chilled's slow with a crit window on HELD enemies — the Deep Freeze lane's two halves in one object.",
 		"payload": {"stat": {"rune_frigid_ranks": 3, "rune_frostbite_ranks": 2}}
 	},
 	"honed_lance": {
@@ -227,6 +229,7 @@
 		"name": "Rune of the Long Winter", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100,
 		"desc": "A little of every cold: Chilled slows 3% harder, Ice Lance +5% of Attack per stack, Chilled enemies hit 1% softer per stack.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: a splash across three cold terms. `killing_cold` still covers Chilled, so the loss is breadth rather than the engine.",
 		"payload": {"stat": {"rune_frigid_ranks": 3, "rune_crystal_edge_ranks": 5, "rune_hungering_ranks": 1}}
 	},
 
@@ -234,6 +237,7 @@
 		"name": "Rune of the Resonant Core", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 100, "lane": "Resonance",
 		"desc": "The first cast of each of his turns builds 1 extra Resonance, and the damage curve's step rises 0.5%.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept: it stays here so a later batch can point something at it again, and it is never offered. LOST: the first-cast Resonance grant. `wide_current` pays crit and Mana and `seventh_bolt` a bolt; nothing else touches the BUILD RATE, which AT §3 measured as beating per-stack value quadratically.",
 		"payload": {"stat": {"rune_resonant_core_ranks": 1, "rune_conduit_step": 0.5}}
 	},
 	"seventh_bolt": {
@@ -278,6 +282,7 @@
 		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
 		"price": 100,
 		"desc": "A little of every grace: +3% healing and her instant heals can CRIT, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: a splash of three graces. `triage_ward` covers the healing term and `sleepless_vigil` the wounded-ally term; the opening Mercy is the piece with no other home.",
 		"payload": {"stat": {"rune_triage_heal": 3, "rune_zealous_mercy": 1, "rune_last_hope_pct": 5}}
 	},
 
@@ -285,6 +290,7 @@
 		"name": "Rune of the Warded Robes", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Bulwark",
 		"desc": "Divine Shield turns 4% of what it absorbs into healing, and its holder wears +10% armor while it stands.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: Divine Shield's absorb-to-healing conversion. `burning_censer` reflects and mends, but nothing else turns an absorb into a heal.",
 		"payload": {"stat": {"rune_blessed_barrier_ranks": 4, "rune_warded_ranks": 10}}
 	},
 	"binding_oath": {
@@ -303,6 +309,7 @@
 		"name": "Rune of the Standing Vow", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100,
 		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% hero Break damage, holy ground mends 2% each turn.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: a splash of three vows, and the one whose behaviour DO quietly narrowed (EM §5) — its holy-ground drip fires on Consecrated Ground alone. Retiring it closes that thread by removing it.",
 		"payload": {"stat": {"rune_blessed_barrier_ranks": 4, "rune_devoutness_ranks": 5, "rune_pulse_ranks": 2}}
 	},
 
@@ -310,6 +317,7 @@
 		"name": "Rune of the Deepening Ruin", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100, "lane": "Ruin",
 		"desc": "Every stack of Ruin makes its bearer take 1% more damage, and anything bearing Ruin takes 5 Break damage at the start of its turn.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: one of the two runes EN §1 re-keyed — its Entropy half is the per-turn Break tick EN gave a field to, so retiring it retires that field. It cannot be read apart from the Whispering Dark.",
 		"payload": {"stat": {"rune_deep_hex_step": 1, "rune_entropy_ranks": 5}}
 	},
 	"flayed_mind": {
@@ -328,6 +336,7 @@
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
 		"desc": "A little of every rite: +5% Break damage, each mark of Ruin has a 15% chance to leap to another enemy, which catches 1 Ruin, enemy afflictions mend the heroes each turn.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: the other of EN §1's two. Four clauses, the widest payload in the game, and the case EM and DP both used as the worked example of a rune going silently dead.",
 		"payload": {"stat": {"rune_broken_will_ranks": 5, "rune_spread_ranks": 15, "rune_spread_ruin": 1, "rune_pleasure_pct": 0.5}}
 	},
 
@@ -360,6 +369,7 @@
 		"name": "Rune of the Deep Sight", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100, "lane": "Precision",
 		"desc": "His patience turns into force 8 Focus sooner, and critical hits pour 20 more into it.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: the Focus conversion POINT moving — the one item that changes WHEN his patience converts rather than how much it pays. `level_aim` and `long_draw` both pay Focus; neither moves the point.",
 		"payload": {"stat": {"rune_deep_focus": 8, "rune_perfect_form": 20}}
 	},
 	"narrow_gap": {
@@ -385,6 +395,7 @@
 		"name": "Rune of the Weeping Wound", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100, "lane": "Venom",
 		"desc": "His basic attack leaves Poison AND Cripple behind for 2 turns, and every stack bites 2 harder.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: the only item that changes what his BASIC ATTACK leaves behind. Nothing else in his pool touches the basic.",
 		"payload": {"stat": {"rune_coated_blades": 1, "rune_potent_ranks": 2}}
 	},
 	"quick_spring": {
@@ -404,6 +415,7 @@
 		"name": "Rune of the Long Hunt", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100,
 		"desc": "A little of every trick: +1 Poison damage per stack, +15% trap damage, Tripwire answers with 10% more of his Attack.",
+		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: a splash across poison, traps and Tripwire. `carrion_wake` covers afflictions and `quick_spring` traps.",
 		"payload": {"stat": {"rune_potent_ranks": 1, "rune_cruel_ranks": 15, "rune_wire_ranks": 10}}
 	}
 }

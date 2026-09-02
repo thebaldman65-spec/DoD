@@ -221,10 +221,20 @@ func _eligibility(data: Dictionary) -> void:
 			ok(owner_key != "", "%s: scope names an unknown spec '%s'" % [id, spec])
 			if owner_key == "":
 				continue
-			# Rolls for its own spec...
+			# Rolls for its own spec — UNLESS IT IS RETIRED, and then it must
+			# roll for NOBODY.
+			#
+			# BATCH EO §3: twelve of the sixteen the charter emptied are retired
+			# the way Melted Armor is retired — the entry is kept in
+			# `runes.json` and simply never offered. **The property is asserted
+			# in BOTH directions rather than exempted**, because a one-armed
+			# version would go green on the day the whole file stopped rolling.
 			var mine := {"key": owner_key, "spec": spec, "runes": []}
-			ok(Runes.eligible_ids(mine, "", []).has(id),
-				"%s: does not roll for its own spec" % id)
+			var rolls: bool = Runes.eligible_ids(mine, "", []).has(id)
+			if Runes.is_retired(id):
+				ok(not rolls, "%s: is RETIRED and must not roll for its own spec" % id)
+			else:
+				ok(rolls, "%s: does not roll for its own spec" % id)
 			# ...and for nobody else's.
 			for key in Classes.SPEC_IDS:
 				for other in Classes.SPEC_IDS[key]:
@@ -787,9 +797,18 @@ func _healing_floor(data: Dictionary) -> void:
 
 # ---------- the rich arm's grant ----------
 #
-# The arm exists to put the FOUR runes written for a spec on that spec's
-# hero. If the grant handed out universals it would probe a different
-# question, and if it handed out duplicates the payload would double-apply.
+# The arm exists to put the runes written for a spec on that spec's hero. If
+# the grant handed out universals it would probe a different question, and if
+# it handed out duplicates the payload would double-apply.
+#
+# **BATCH EO §3 — THE COUNT IS DERIVED, NOT THE LITERAL 4.** Every spec was
+# authored four spec runes and this loop asked for exactly that many; the
+# retirement leaves some specs 2 or 3, and `grant_rune` then CORRECTLY falls
+# back to the ordinary roll, which read as nine failures. Asking for the number
+# that actually survives keeps the arm probing its own question — the spec's own
+# runes reach the spec's hero — and means a further retirement, or a
+# re-authoring that restores one, needs no edit here. The fifth-ask fallback
+# below is unchanged and is what covers the exhausted case.
 func _rich_grant(run: Node) -> void:
 	var had_sim: bool = run.sim_run
 	run.sim_run = true
@@ -797,7 +816,12 @@ func _rich_grant(run: Node) -> void:
 		for spec in Classes.SPEC_IDS[key]:
 			var member := {"key": key, "spec": spec, "runes": []}
 			var names := {}
-			for i in 4:
+			var own := 0
+			for rid in Runes.eligible_ids(member, "", []):
+				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec:
+					own += 1
+			ok(own > 0, "%s: the retirement left its own set empty" % spec)
+			for i in own:
 				var rune: Dictionary = run.grant_rune(member)
 				ok(not rune.is_empty(), "%s: grant %d came back empty" % [spec, i])
 				ok(String(rune.get("scope", "")) == "spec:%s" % spec,
@@ -808,7 +832,7 @@ func _rich_grant(run: Node) -> void:
 						spec, i, rune.get("name", "")])
 				names[String(rune["name"])] = true
 				member["runes"] = member["runes"] + [rune]
-			# A fifth ask exhausts the spec's four and must fall back to the
+			# One ask past the spec's surviving set must fall back to the
 			# ordinary roll rather than returning nothing.
 			var extra: Dictionary = run.grant_rune(member)
 			ok(not extra.is_empty(), "%s: the grant died once the spec set ran out" % spec)

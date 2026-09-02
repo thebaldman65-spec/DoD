@@ -1068,11 +1068,41 @@ func difficulty_mult() -> float:
 	return float(difficulty_def()["mult"])
 
 
-func zone_base_mult(slot: int) -> float:
+# The zone ladder ALONE — position, not identity, and no rung in it. Factored
+# out at BATCH EO §2 so the two spawn-time multipliers can disagree about the
+# rung while agreeing about the zone. Bit-identical to what the two callers
+# below used to compute inline: same operands, same association.
+func _zone_ladder(slot: int) -> float:
 	if slot <= ZONE_BASE_MULTS.size():
-		return ZONE_BASE_MULTS[maxi(slot, 1) - 1] * difficulty_mult()
+		return ZONE_BASE_MULTS[maxi(slot, 1) - 1]
 	return ZONE_BASE_MULTS[ZONE_BASE_MULTS.size() - 1] \
-		* pow(1.5, slot - ZONE_BASE_MULTS.size()) * difficulty_mult()
+		* pow(1.5, slot - ZONE_BASE_MULTS.size())
+
+
+# THE ATTACK PATH, and the rung's whole magnitude. Unchanged.
+func zone_base_mult(slot: int) -> float:
+	return _zone_ladder(slot) * difficulty_mult()
+
+
+# BATCH EO §2 — THE HEALTH PATH, AND THE RUNG IS FLOORED OUT OF IT.
+#
+# The ladder's multiplier used to discount enemy HEALTH as well as enemy
+# damage, and health is not forgiveness — it is the fight's LENGTH, and length
+# is the only thing that lets an enemy ask a question. Stability is a flat 100
+# at every rung and `ab.pressure` is flat too, so the Break gate needs the SAME
+# number of hero turns at rung 1 as at rung 3; halving the pool ended the fight
+# before the party could reach it. The same half took the 2.5-4.0 delay
+# telegraphs, the statuses worth cleansing and the turn of pressure an item is
+# for. Measured untalented at EO §1: 5.7 rounds a trash fight at rung 1 against
+# 7.8 at rung 2 — two rounds of questions the rung never got to pose.
+#
+# **THE FLOOR AT 1.0 IS WHAT KEEPS THIS RUNG 1'S CHANGE ALONE.** Rung 2
+# multiplies by 1.00 and rung 3 by 1.30; `maxf` returns both untouched, so the
+# product is bit-identical above rung 1 and no higher rung moves. The rung
+# still forgives — it forgives on DAMAGE, which is where a wrong answer is paid
+# for, rather than by never asking.
+func zone_base_mult_hp(slot: int) -> float:
+	return _zone_ladder(slot) * maxf(difficulty_mult(), 1.0)
 
 
 # The tier is the SLOT NUMBER (1-16). Batch T's ramp was fitted against slot

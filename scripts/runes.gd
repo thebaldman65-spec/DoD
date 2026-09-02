@@ -362,8 +362,29 @@ static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 	return false
 
 
+# BATCH EO §3 — A RETIRED RUNE IS RETIRED THE WAY MELTED ARMOR IS RETIRED:
+# KEPT, AND SAID TO BE KEPT.
+#
+# Twelve of the sixteen the charter emptied carry a `retired` string in
+# `runes.json` naming WHAT IS LOST. The entry is not deleted: `config`, `build`
+# and `display_name` all still resolve it, so a saved run holding one keeps
+# working and a later batch can point something at it again — the same contract
+# `data/glossary.json` gives Melted Armor, which `docs/text-audit.html` calls
+# the most honest string in the game.
+#
+# **THE FILTER LIVES HERE BECAUSE THIS IS THE ONLY DOOR.** Both offer paths —
+# `generate` above and `run_state.grant_rune` — reach the authored pool through
+# `eligible_ids` and nothing else, so one `continue` retires a rune everywhere
+# it could be offered without touching either caller. And neither can be blanked
+# by it: `generate` widens an exhausted rarity to every rarity and then falls
+# back to the generated Common family, and `grant_rune` falls back to
+# `generate_rune`.
+static func is_retired(id: String) -> bool:
+	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
+
+
 # Authored entries this member may roll at this rarity ("" = any rarity),
-# excluding names already in their pouch.
+# excluding names already in their pouch and every retired entry.
 static func eligible_ids(member: Dictionary, rarity_key: String,
 		owned_names: Array) -> Array:
 	var kit := kit_names(member)
@@ -371,6 +392,8 @@ static func eligible_ids(member: Dictionary, rarity_key: String,
 	var data := _load()
 	for id in data:
 		var e: Dictionary = data[id]
+		if String(e.get("retired", "")) != "":
+			continue
 		if rarity_key != "" and String(e["rarity"]) != rarity_key:
 			continue
 		if not _scope_ok(e, member):

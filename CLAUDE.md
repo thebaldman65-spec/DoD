@@ -1810,6 +1810,79 @@ status into the draft turned four tree-internal dependencies — which the chart
   whenever the card was drafted**, and the honest wording already exists on one of them.
 
 
+## STANDING RULE — A DIFFICULTY RUNG SCALES WHAT A MISTAKE COSTS, NEVER WHETHER THE QUESTION IS ASKED (Batch EO §2)
+
+> **The rung is allowed to change enemy DAMAGE. It is not allowed to change enemy HEALTH, ability
+> sets, intents, statuses, Break thresholds or encounter counts.**
+
+**HEALTH IS NOT FORGIVENESS — IT IS THE FIGHT'S LENGTH, AND LENGTH IS WHAT LETS AN ENEMY ASK ITS
+QUESTION.** The starter rung's ×0.50 used to apply to `max_hp` and `attack` together, and the
+half that hit health is what made the rung boring: enemy `stability` is a flat 100 at every rung
+and `ab.pressure` is flat too, so the Break gate needs the SAME number of hero turns at rung 1 as
+at rung 3 — and the enemy died before the heroes got there. The same half took the 2.5–4.0 delay
+telegraphs, the statuses worth cleansing and the turn of pressure an item is for. **Measured
+untalented, n=30 a rung: a rung-1 trash fight ran 5.7 rounds against rung 2's 7.8, and 9.2 after
+the fix; two-armed at n=100 it reads 5.7 → 9.1 over ~1,130 fights an arm, with completion
+92% → 73%.** **MEASURE THIS ON ROUNDS, NOT ON COMPLETION** — a completion figure at n=30 carries a
+±12-point band and the run harness prints that warning itself. A rung that forgives on damage still forgives a wrong answer; a rung that forgives on
+health never poses the question.
+
+· **THE TWO PATHS ARE `Run.zone_base_mult` (ATTACK) AND `Run.zone_base_mult_hp` (HEALTH), AND THE
+  ONLY THING THEY DISAGREE ABOUT IS THE RUNG.** Both multiply the same `_zone_ladder(slot)`; the
+  health path wraps the rung in `maxf(difficulty_mult(), 1.0)`. **The floor is what confines the
+  change to rung 1** — rung 2's ×1.00 and rung 3's ×1.30 come back untouched, proved bit-identical
+  rather than argued. A future rung BELOW 1.0 gets the same treatment for free; a rung above it is
+  unaffected by construction.
+· **THE LADDER CARRIES EXACTLY FOUR FIELDS WITH A CONSEQUENCE**, and a fifth added without a
+  reader is a field that lies: `rung` (the meta gate and the enemy-ability filter), `mult`,
+  `severity_floor` (the bargain floor) and `fixed_modifier` (rung 3's unduckable nodes).
+  **Nothing else in the game reads the difficulty** — encounter counts, elite and boss
+  composition, gold and the relic ladder are rung-independent, and `Run.difficulty` outside that
+  block is display and save only.
+· **THE ONE PLACE A RUNG MAY CHANGE MECHANICS IS AN ABILITY TAGGED `"rung": N` IN
+  `data/enemies.json`, AND IT IS AN ADDITION ABOVE RUNG 1 RATHER THAN A REMOVAL BELOW IT.**
+  `Enemies.config` defaults an untagged ability to rung 1, so the starter rung is the BASELINE
+  kit and higher rungs add to it. There are exactly two such tags in the game, both on the end
+  boss. **A tag that took an ability AWAY from rung 1 would break this rule**; one that gives a
+  higher rung a new mechanic is what the ladder is for.
+· **THE VERIFICATION IS A LIVE UNTALENTED MEASUREMENT AND NOTHING ELSE WILL DO.** `DOD_SIM_ROWS=0`
+  with `--run 30` a rung. **A rung that scales a number nothing reads passes every static check
+  there is** — that is exactly what a health-only change would have done to a completion sweep run
+  at `rows=9`, where all three rungs already read 80–100%.
+
+## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
+
+> **Retiring content means it stops being OFFERED. It does not mean the entry is deleted, and it
+> does not mean the suites stop driving it.**
+
+**THE PRECEDENT IS MELTED ARMOR**, whose `data/glossary.json` entry says outright that nothing in
+the game applies it and why — `docs/text-audit.html` calls that the most honest string in the
+game. EO §3 retired twelve runes on the same contract: each keeps its entry in `data/runes.json`
+with a `retired` string naming **what is lost**, `Runes.config` / `build` / `display_name` all
+still resolve it so a saved run holding one keeps working, and `Runes.eligible_ids` — the one
+door both offer paths use — skips it.
+
+· **THE FILTER GOES AT THE SINGLE DOOR, NOT AT THE CALLERS.** Both rune offer paths (`generate`
+  and `run_state.grant_rune`) reach the authored pool through `eligible_ids`; one `continue`
+  there retires a rune everywhere without touching either caller, and neither can be blanked by
+  it — `generate` widens an exhausted rarity and then falls back to the generated Common family,
+  and `grant_rune` falls back to `generate_rune`.
+· **ASSERT THE RETIREMENT IN BOTH DIRECTIONS.** `test_runes` now says a retired entry must roll
+  for NOBODY and a live one must still roll for its own spec. **An exemption arm instead would
+  read green on the day the whole file stopped rolling** — the same shape `check_em` §4 was
+  inverted to avoid at EN §6.
+· **A SUITE THAT TESTS WHETHER A CLAUSE PAYS MUST WALK `Runes.ids()`, NOT `eligible_ids`.**
+  `test_rune_battle` drives every authored spec rune through a live battle; walking the offer
+  pool stops driving all twelve on the day they are retired. **It does not fail silently — armed,
+  the control reads 17 failures, because the clause assertions name specific runes and values.**
+  **The hazard is the REPAIR:** the two ways to green are to walk the authored set, or to delete
+  those twelve runes' clause assertions, and the second is silent and is the tempting one.
+  **Kept content that nothing drives is content that rots**, and the whole point of keeping it is
+  that a later batch can point something at it again.
+· **A COUNT DERIVED FROM THE LIVE POOL SURVIVES THE NEXT RETIREMENT; A LITERAL DOES NOT.**
+  `test_runes`'s grant loop asked for the literal 4 every spec was authored and read nine
+  failures the moment some specs kept 2. It asks for the number that survives now.
+
 ## STANDING RULE — A RUNE IS DISCONNECTED FROM THE TALENT TREES (Batch EM, the designer's charter)
 
 > **A rune modifies stats and resources, and the mechanics and values of core abilities, draft

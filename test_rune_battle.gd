@@ -101,13 +101,32 @@ func _run() -> void:
 	quit(1 if fails.size() > 0 else 0)
 
 
-# Every authored rune this spec can roll, all equipped at once — the harshest
+# Every rune AUTHORED for this spec, all equipped at once — the harshest
 # version of "does it apply", and the one that would expose a payload branch
 # clobbering another.
+#
+# **BATCH EO §3 — THIS WALKS `Runes.ids()`, NOT `eligible_ids`, AND THE
+# DISTINCTION IS THE WHOLE POINT.** Twelve runes are retired: kept in
+# `runes.json`, still resolved by `config` / `build`, and simply never OFFERED.
+# Walking the offer pool stops testing all twelve on the day they are retired —
+# the Deepening Ruin's Break tick, the Deep Sight's Focus conversion and ten
+# more. **IT DOES NOT FAIL SILENTLY, AND EO's NEGATIVE CONTROL CORRECTED THIS
+# COMMENT'S FIRST DRAFT ON EXACTLY THAT POINT: armed, it reads 17 failures**,
+# because the assertions below name specific runes and specific values. **The
+# hazard is the REPAIR.** There are two ways to get the file green again — walk
+# the authored set, or delete those twelve runes' clause assertions — and the
+# second is the silent one, the smaller diff, and the same shape as the repair
+# EO made in `test_runes._rich_grant` one file over. **A retired rune is kept so
+# a later batch can point something at it again, and kept content that nothing
+# drives is content that rots.**
+# WHETHER a rune is offered is `test_runes`' question and it is asserted there
+# in both directions; whether its clauses PAY is this file's, and that question
+# is unchanged by the retirement.
 func _equip_all(member: Dictionary) -> Array:
 	var names: Array = []
-	for id in Runes.eligible_ids(member, "", []):
-		if not String(Runes.config(id).get("scope", "")).begins_with("spec:"):
+	var want := "spec:%s" % String(member.get("spec", ""))
+	for id in Runes.ids():
+		if String(Runes.config(id).get("scope", "")) != want:
 			continue
 		var rune := Runes.build(id)
 		rune["equipped"] = true

@@ -941,8 +941,8 @@
   "test_runes": {
    "kind": "suite",
    "checks": [
-    3125,
-    3125
+    3101,
+    3101
    ],
    "checks_obs": 1,
    "fails": [
@@ -950,7 +950,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": " **EM MOVED IT 3121 -> 3125.** The cfg-ordering probe loop gained the two RUNE-written ceiling fields (`rune_zealous_mercy`, `rune_opening_volley`), which are the names a derivation running before the rune block would now leave as duds; the node's two are still checked. Two checks apiece. **Two other repairs in this file added no checks and both would otherwise have gone VACUOUS rather than red**: the `ceiling_writers` floor counted the old field names and would have fallen 2 -> 0, and `BOOLEAN_READ_FIELDS`' payload lookup returned null on the bare name and `continue`d past its own assertion."
+   "note": " **EM MOVED IT 3121 -> 3125.** The cfg-ordering probe loop gained the two RUNE-written ceiling fields (`rune_zealous_mercy`, `rune_opening_volley`), which are the names a derivation running before the rune block would now leave as duds; the node's two are still checked. Two checks apiece. **Two other repairs in this file added no checks and both would otherwise have gone VACUOUS rather than red**: the `ceiling_writers` floor counted the old field names and would have fallen 2 -> 0, and `BOOLEAN_READ_FIELDS`' payload lookup returned null on the bare name and `continue`d past its own assertion. **EO MOVED IT 3125 -> 3101, AND THE ROW IS MOVED RATHER THAN THE SUITE REPAIRED.** `_rich_grant` asked every spec for the literal 4 spec runes it was authored; EO §3 retires twelve, some specs keep 2 or 3, and `grant_rune` then CORRECTLY falls back to the ordinary roll — which read as nine failures against an arm whose question is \u201cdo the spec\u2019s own runes reach the spec\u2019s hero\u201d. It asks for the number that SURVIVES now, derived from `eligible_ids`, so a further retirement or a restored re-author needs no edit there; the 24-check drop is that loop running 2-4 times a spec instead of 4 across twelve specs. The eligibility arm gained nothing net: it was one-armed (`rolls for its own spec`) and is two-armed now (`retired rolls for NOBODY` / `live still rolls`), which is the same count of checks over the same population and is deliberate — an EXEMPTION arm would read green on the day the whole file stopped rolling."
   },
   "check_do": {
    "kind": "gate",

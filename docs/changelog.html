@@ -14,6 +14,81 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-02 &mdash; Batch EO: THE STARTER RUNG TEACHES THE REAL GAME</h2>
+<p><i>The starter rung was ruled to keep the full game and soften only its blows. <b>The
+measurement that decides the batch came first, and it made the batch small:</b> rung 1 strips no
+abilities, no intents, no statuses and no Break gates &mdash; it only scales numbers. What it
+scaled was <b>health as well as damage</b>, and health is the fight's LENGTH, which is the only
+thing that lets an enemy ask a question. The rung now scales <b>damage alone</b>. Twelve of the
+sixteen runes the charter emptied are RETIRED &mdash; kept, and said to be kept. Full working:
+<code>docs/reports/EO.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; WHAT A RUNG ACTUALLY CHANGES, DERIVED FROM THE CODE RATHER THAN THE
+DOCUMENT.</b> The ladder carries exactly four fields with a consequence &mdash;
+<code>rung</code>, <code>mult</code>, <code>severity_floor</code>, <code>fixed_modifier</code>
+&mdash; and every reader of each was swept. <b>THE QUESTION THAT MATTERED: does rung 1 strip
+enemy ABILITIES, or only scale NUMBERS? It only scales numbers.</b> Config-diffed at rung 1
+against rung 3, <b>20 of the 21 enemy kinds are identical</b>, and <b>48 of the 50 authored
+abilities carry no rung tag at all</b>. The two that do are both on the end boss (Sundering
+Decree at 2, The Long Dark at 3) and are an authored ESCALATION added above rung 1, not a
+starter-rung gutting &mdash; <code>Enemies.config</code> defaults an untagged ability to rung 1.
+<b>Encounter counts, elite and boss composition, gold and the relic ladder read no rung at
+all.</b> Enemy <code>stability</code>, <code>armor</code>, <code>speed</code>, ability delays,
+statuses and <code>pressure</code> are flat at every rung.</p>
+
+<p><b>&sect;2 &mdash; THE RUNG SCALES DAMAGE, NOT HEALTH.</b> The multiplier reached the game
+through one door and applied to <code>max_hp</code> AND <code>attack</code> together. <b>Halving
+the health pool is not forgiveness &mdash; it ends the fight before the question is
+posed.</b> Stability is a flat 100 and <code>ab.pressure</code> is flat, so the Break gate needs
+the SAME number of hero turns at rung 1 as at rung 3; the same half took the 2.5&ndash;4.0
+telegraphs, the statuses worth cleansing and the turn of pressure an item is for.
+<code>Run.zone_base_mult_hp</code> floors the rung out of the health path.
+<b>Rungs 2 and 3 are untouched BY CONSTRUCTION</b> &mdash; <code>maxf(mult, 1.0)</code> returns
+&times;1.00 and &times;1.30 unchanged, proved bit-identical on 6 of 6 products, and the attack
+path is bit-identical on 9 of 9. <b>THE VERIFICATION IS A LIVE UNTALENTED MEASUREMENT</b>
+(<code>DOD_SIM_ROWS=0</code>, <code>--run 30</code> a rung): completion <b>97% &rarr; 77%</b> at
+rung 1, <b>0% &rarr; 0%</b> at rungs 2 and 3, and a rung-1 trash fight ran <b>5.7 &rarr; 9.2
+rounds</b>, elite 5.5 &rarr; 8.5, boss 7.8 &rarr; 12.3. <b>A two-armed re-run at n=100 &mdash;
+because a completion figure at n=30 carries a &plusmn;12-point band and cannot carry the claim
+&mdash; reads 92% &rarr; 73% and trash rounds 5.7 &rarr; 9.1 over ~1,130 fights an arm: 19 points
+at 3.7 standard errors.</b> <b>The &times;0.50 damage scale was NOT
+tuned and is flagged as the designer's.</b></p>
+
+<p><b>&sect;3 &mdash; TWELVE RUNES RETIRED; 65 AUTHORED, 53 OFFERABLE.</b> The sixteen were
+re-derived off <code>LANE_TREES</code> and <code>runes.json</code> and reproduce EM &sect;3 name
+for name &mdash; <b>but only once a <code>UNIT_MATH</code> clause counts as a rune SURVIVING</b>:
+excluding those nine from the denominator returns twenty-two and sweeps in six runes EN's own
+threshold table names as survivors. <b>Three are held back for re-authoring</b> (the
+Beastmaster's, whose retirement would leave no rune in the game touching a companion) and are
+PRESENTED AS OPTIONS with nothing authored; <b>the Bared Guard is reported apart and ruled on
+nowhere</b>, because its two clauses ARE the trade and retiring it removes the cost with the
+upside. <b>RETIRED MEANS KEPT</b> &mdash; the Melted Armor contract: the entry stays in
+<code>runes.json</code> with a <code>retired</code> string naming what is lost,
+<code>config</code> / <code>build</code> still resolve it, and one <code>continue</code> in
+<code>Runes.eligible_ids</code> &mdash; the only door both offer paths use &mdash; stops it being
+offered. <b>It cannot blank an offer:</b> measured floors are 9 drawable, 2 spec-scoped and 5 on
+the rare shelf against 3 slots.</p>
+
+<p><b>&sect;4 &mdash; RUNG 2's GAP DOES NOT CLOSE WHEN ROWS 1&ndash;3 OPEN, AND THAT IS
+REPORTED RATHER THAN FIXED.</b> Rung 1 unlocks rows 1&ndash;3; measured with exactly those rows
+equipped (<code>DOD_SIM_ROWS=3</code>, n=30), rung 2 reads <b>7%</b> against 0&ndash;3%
+untalented, and rung 3 stays at <b>0%</b>. <b>The second rung is the next problem</b>, and this
+batch deliberately did not touch it. Per-hero relics stay unbuilt and belong to the relic
+family's batch.</p>
+
+<p><b>THE SUITES THAT MOVED, AND WHY EACH MOVED THE WAY IT DID.</b> <code>test_runes</code>
+asserts the retirement in BOTH directions now &mdash; a retired rune must roll for nobody &mdash;
+rather than being exempted, because a one-armed version reads green on the day the whole file
+stops rolling; and its grant loop asks for the number of spec runes that SURVIVE rather than the
+literal 4, so a further retirement needs no edit there (3125 &rarr; 3101 checks).
+<code>test_rune_battle</code> now walks <code>Runes.ids()</code> instead of
+<code>eligible_ids</code>: it tests whether clauses PAY, not whether they are offered, and
+walking the offer pool stops driving all twelve on the day they are retired. <b>It does not fail
+silently &mdash; armed, the control reads 17 failures</b>, because the clause assertions name
+specific runes and values; <b>the hazard is the REPAIR</b>, since deleting those assertions is the
+other way to green and is the tempting one. <b>Kept content that nothing drives is content that
+rots.</b></p>
+
 <h2>2026-09-01 &mdash; Batch EN: THE LAST THREE CLAUSES, AND THE RUNG THAT IS A DOOR</h2>
 <p><i>The rune charter finishes at <b>59 of 59</b>. The lowest difficulty rung was ruled removed
 and <b>was not removed</b>, because it is the only thing that opens a player's first talent row

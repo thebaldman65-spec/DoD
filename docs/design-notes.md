@@ -6614,3 +6614,65 @@ assertions pinning a literal into `CLAUDE.md` were mapped to their block first. 
 blocks that stayed; four moved and were re-pointed in the same batch with their needles unchanged.
 **A suite breaking on a moved block would have been the seam telling you where that block belongs**,
 and none of the four was that: all four pin rules about instruments, written by instruments.
+
+## Batch EO — why the measurement had to come first, and why forgiveness on health is not forgiveness
+
+**The brief ruled that the starter rung should keep the full game and soften only its blows, and
+it made that ruling conditional on a measurement it insisted come first: does rung 1 strip enemy
+ABILITIES, or only scale NUMBERS?** The two branches led to completely different batches — the
+first a content restoration, the second a tuning pass — and the brief was explicit that the second
+must not be assumed. The designer's complaint, *too weak to punish carelessness*, is consistent
+with both.
+
+**It only scales numbers, and finding that out is what made the batch small enough to be right.**
+Config-diffed at rung 1 against rung 3, 20 of the 21 enemy kinds are identical; 48 of the 50
+authored enemy abilities carry no rung tag at all, and `Enemies.config` defaults an untagged
+ability to rung 1, so the starter rung is the BASELINE kit rather than a stripped one. The two
+tagged abilities are both on the end boss and are an authored escalation ADDED above rung 1 —
+the ladder doing exactly what a ladder is for. Encounter counts, elite and boss composition, gold
+and the relic ladder read no rung at all. A batch that had assumed the first branch would have
+spent itself restoring abilities that were never removed.
+
+**But the same measurement found the thing that actually made the rung boring, and it was not in
+the list the brief expected.** The rung's multiplier applied to enemy `max_hp` and `attack`
+together. **Halving the health pool is not forgiveness — it is the removal of the fight's
+LENGTH, and length is the only thing that lets an enemy ask a question at all.** Enemy
+`stability` is a flat 100 at every rung and ability `pressure` is flat too, so the Break gate
+needs the SAME number of hero turns at rung 1 as at rung 3 — and the enemy was dying before the
+heroes got there. The same half took the 2.5–4.0 delay telegraphs, the statuses worth cleansing
+and the turn of pressure an item is for. **Every one of the four questions the brief listed —
+read the intent, cleanse the debuff, open the Break gate, spend the item — was authored, present,
+and unreachable.**
+
+**The general lesson is worth more than the fix: a difficulty knob that scales the enemy's HEALTH
+is not scaling difficulty, it is scaling how much of the game the player meets.** Damage scales
+what a mistake costs. Health scales whether there is time to make one. They read as the same
+lever on a spreadsheet and they are opposite in play, and the reason this one survived so long is
+that the completion sweep it was tuned against could not tell them apart — a 97% clear looks the
+same whether the fights are easy or merely short. **The instrument that CAN tell them apart is
+rounds-to-resolution**, which is measured over a thousand-odd fights rather than thirty runs, and
+which moved 5.7 → 9.1 where completion moved 92% → 73%. **When a lever is suspected of changing
+how much game the player meets rather than how hard it is, the fight-length number is the
+measurement and the win-rate is the confounded one.**
+
+**Why the change is confined to rung 1 by construction rather than by care.** The health path
+wraps the rung in `maxf(difficulty_mult(), 1.0)`, so rung 2's ×1.00 and rung 3's ×1.30 come back
+untouched — proved bit-identical on 6 of 6 products rather than argued, and the attack path
+bit-identical on 9 of 9. A brief that says *do not touch rungs 2 and 3* deserves an implementation
+where touching them is impossible, not one where it merely did not happen.
+
+**And why §3's retirement keeps twelve runes it will never offer.** The Melted Armor contract —
+kept, and SAID to be kept — is usually justified as honesty toward a later reader. This batch
+found a second, harder reason: `test_rune_battle` drives every authored spec rune through a live
+battle, and it walked the OFFER pool. **The negative control corrected the first version of this
+paragraph, and the correction is the better lesson.** Retiring twelve runes does not make that
+suite go quietly under-covered — it makes it read **17 failures**, because the clause assertions
+name specific runes and specific values, and one of the twelve is the rune whose Break tick the
+previous batch had authored a field for eight hours earlier. **The silence is one repair away,
+not zero.** There are exactly two ways to get the file green again: walk the authored set, or
+delete the twelve runes' clause assertions — and the second is the tempting one, because it is
+the smaller diff and it is the same shape as a repair this very batch made one file over. **A
+coverage loss almost never arrives as silence; it arrives as a red that is cheaper to delete than
+to understand**, and the suite that tests whether a clause PAYS has to walk the authored set, not
+the offered one. Whether a rune is offered is a different question and it is
+asserted in both directions somewhere else.

@@ -1586,11 +1586,18 @@ func _spawn_units() -> void:
 	# tier rate compounds on the budget ramp WITHIN a zone, and at +4%/+5%
 	# those two multiplicative sources outran the party's one additive one.
 	# Health pools stay multiples of 10 (rounded UP). Standalone unscaled.
+	# BATCH EO §2: TWO multipliers now, and the only thing they disagree about
+	# is the rung. `slot_mult` carries it onto ATTACK, which is the rung's
+	# forgiveness; `hp_mult` floors it out of HEALTH, which is the fight's
+	# length and therefore whether the enemy gets to ask its question at all.
+	# Identical above rung 1 by construction — see Run.zone_base_mult_hp.
 	var zone_tier := 0
 	var slot_mult := 1.0
+	var hp_mult := 1.0
 	if Run.active:
 		zone_tier = clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE)
 		slot_mult = Run.zone_base_mult(Run.zone_idx + 1)
+		hp_mult = Run.zone_base_mult_hp(Run.zone_idx + 1)
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
@@ -1603,7 +1610,7 @@ func _spawn_units() -> void:
 		var mb_hp := MINIBOSS_HP_MULT \
 			if Run.active and Run.encounter.get("type", "") == "miniboss" else 1.0
 		if zone_tier > 0:
-			cfg["max_hp"] = int(ceil(cfg["max_hp"] * slot_mult * mb_hp
+			cfg["max_hp"] = int(ceil(cfg["max_hp"] * hp_mult * mb_hp
 				* (1.0 + 0.025 * zone_tier) / 10.0) * 10.0)
 			cfg["attack"] = int(round(cfg["attack"] * slot_mult
 				* (1.0 + 0.02 * zone_tier)))

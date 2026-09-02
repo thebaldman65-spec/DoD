@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-01 (Batch EN &mdash; the last three clauses, and the rung that is a door)</b></p>
+<p align="right"><b>Last updated: 2026-09-02 (Batch EO &mdash; the starter rung teaches the real game)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -57,7 +57,7 @@ twist</b> as well as scaling, because stat inflation alone is a wall and a named
 ladder. <b>Every scaling number below is provisional and is the designer's to set.</b>
 <table border="1" cellpadding="4">
 <tr><th>Rung</th><th>Enemies</th><th>Twist</th><th>Opens</th></tr>
-<tr><td><b>1 — Wanderer</b></td><td>×0.50</td><td>none</td><td>talent rows 1–3</td></tr>
+<tr><td><b>1 — Wanderer</b></td><td>×0.50 <b>damage only</b><br>(full health)</td><td>none</td><td>talent rows 1–3</td></tr>
 <tr><td><b>2 — Warden</b></td><td>×1.00</td><td>the severity floor rises: the guaranteed
 mild bargain option may be severity 3</td><td>talent rows 4–6</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td>the floor rises again (severity 4), and
@@ -71,13 +71,27 @@ completes <b>83%</b> of runs at it (n=100), against 13% / 28% / 95% at ×0.70 / 
 The aim is a first run won in one or two attempts; 70% would be 1.4 attempts and 83% is 1.2.
 The curve is a cliff between ×0.60 and ×0.50, so 70% sits in an unsampled gap and this is the
 nearest sampled value rather than a number defended to three figures.
+<br><b>THE RUNG SCALES DAMAGE AND NOT HEALTH (Batch EO §2).</b> The multiplier used to discount
+enemy <i>health</i> as well as enemy damage, and health is not forgiveness &mdash; it is the
+fight's LENGTH, and length is the only thing that lets an enemy ask a question. Enemy
+<code>stability</code> is a flat 100 at every rung and ability <code>pressure</code> is flat too,
+so the Break gate needs the SAME number of hero turns at rung 1 as at rung 3; halving the health
+pool ended the fight before the heroes could reach it, and took the 2.5&ndash;4.0 telegraphs, the
+statuses worth cleansing and the turn of pressure an item is for with it. <b>Measured untalented,
+n=30 a rung:</b> a rung-1 trash fight ran <b>5.7 rounds against rung 2's 7.8</b>, and now runs
+<b>9.2</b>. <b>Untalented completion at rung 1 moved 97% &rarr; 77%</b> at n=30, and a two-armed
+re-run at <b>n=100 reads 92% &rarr; 73%</b> with trash rounds <b>5.7 &rarr; 9.1</b> over ~1,130
+fights an arm &mdash; 19 points at 3.7 standard errors. Rungs 2 and 3 did not
+move, by construction &mdash; the health multiplier floors the rung at 1.0, so rung 2's ×1.00 and
+rung 3's ×1.30 are bit-identical to what they were. <b>The ×0.50 damage scale itself was NOT
+tuned and is the designer's.</b>
 <br><b>RUNG 1 IS A META-PROGRESSION GATE, NOT AN EASY MODE, AND REMOVING IT IS NOT A BALANCE
 CHANGE (Batch EN §3).</b> Beating the end boss on a rung sets <code>Profile.talent_tier</code> to
 that rung, and tier 0 — a fresh save — opens <b>no rows at all</b>: clearing rung 1 is the only
 thing in the game that opens rows 1&ndash;3 of all twelve trees. <b>Re-measured at EN on the live
-tree</b> (untalented, n=30 a rung): completion is <b>97% at rung 1, 3% at rung 2 and 0% at rung
-3</b>. Removing rung 1 would move a player's first talent row from a one-attempt clear to roughly
-a thirty-attempt one. The relic ladder would survive it — <code>Relics.unlock_random()</code>
+tree</b> (untalented, n=30 a rung): completion read <b>97% at rung 1, 3% at rung 2 and 0% at rung
+3</b> before Batch EO, and <b>77% / 0% / 0%</b> after it (rung 1 re-read at n=100: 92% &rarr; 73%). Removing rung 1 would move a player's
+first talent row from a one-attempt clear to roughly a thirty-attempt one. The relic ladder would survive it — <code>Relics.unlock_random()</code>
 fires on every boss kill at every rung — but the talent ladder would not.</li>
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
@@ -2522,7 +2536,26 @@ lane. <b>A rune with its own field is worth the same to every hero of its spec</
 asymmetry is gone: <b>48 of the 65 runes were built on it</b> and the <b>12 splashes lose
 most</b>, since with no lanes to reach across a splash is three unrelated numbers in a
 bundle. The <b>36 `lane` fields are still authored and still shown</b>; they describe where
-a rune came from, not what it now reaches.</li>
+a rune came from, not what it now reaches.
+<br><b>AND TWELVE OF THEM ARE RETIRED (Batch EO §3): 65 authored, 53 OFFERABLE.</b> The charter
+emptied <b>sixteen</b> runes whose every clause was talent-keyed &mdash; after the re-key each is
+mechanically whole and has lost the argument for existing, because each was <i>your lane, but
+more</i>. <b>Three are held back for re-authoring</b> (the Beastmaster's Deep Bond, Shared Wild
+and Turning Pack: retiring them would leave no rune in the game touching a companion, and the
+companion IS the spec), <b>one is flagged and untouched</b> (the Scarred Rune of the Bared Guard,
+whose two clauses ARE the trade, so retiring it would remove the cost with the upside), and
+<b>the other twelve are retired.</b>
+<br><b>RETIRED MEANS KEPT, AND SAID TO BE KEPT</b> &mdash; the contract
+<code>data/glossary.json</code> gives Melted Armor, which <code>docs/text-audit.html</code> calls
+the most honest string in the game. Each entry stays in <code>data/runes.json</code> carrying a
+<code>retired</code> string that names <b>what is lost</b>; <code>Runes.config</code>,
+<code>build</code> and <code>display_name</code> all still resolve it, so a saved run holding one
+keeps working and a later batch can point something at it again. <b>It is simply never
+offered</b>: both offer paths reach the authored pool through <code>Runes.eligible_ids</code> and
+nothing else. <b>The retirement cannot blank an offer</b> &mdash; measured floors across all
+twelve specs are <b>9 drawable, 2 spec-scoped and 5 on the rare shelf, against 3 rune
+slots</b>, and an exhausted rarity widens to every rarity and then to the generated Common
+family.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE

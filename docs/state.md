@@ -5,135 +5,111 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-01 (Batch EN).*
+*Last rewritten: 2026-09-02 (Batch EO).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EN — THE LAST THREE CLAUSES, AND THE RUNG THAT IS A DOOR.** The rune charter is
-  **complete at 59 of 59**; the lowest difficulty rung was ruled removed and **was not removed**,
-  because it is the only thing that opens a player's first talent row; per-hero relics **never
-  landed**; and the sixteen runes the charter empties are split, derived and presented without
-  anything being authored. Full working: **`docs/reports/EN.md`**.
-- **§1 — THE THREE HOMELESS CLAUSES HAVE RUNE-OWNED FIELDS, AND THE MEASUREMENT IS THE PROOF.**
-  `divine_presence_pct`, `entropy_ranks` and `pleasure_pct` write `rune_` fields of their own, and
-  each drip's **EXISTING** per-turn tick sums the pair. **There is no second tick** — a hero
-  holding the rune AND the node would be paid twice, which is a magnitude moving, and that is the
-  one thing a re-key forbids. **This is EM §2's option A, taken smaller than option A described
-  itself.**
-  - **ALL THREE ARE PAYOUTS AND ALL THREE GUARDS ARE PRESENCE TESTS**, read at their own sites
-    rather than taken by analogy from EM's 56. **AL's MAX rule now has ZERO applications across
-    all 59** and On the Edge is still the only threshold any rune shares.
-  - **DRIVEN LIVE, SEEDED, BEFORE AND AFTER — AND EVERY READING REPRODUCED EXACTLY.** On a hero
-    holding the rune and no talents, 24 seeded autoplay battles an arm: Divine Presence **81 fires
-    / 255**, Entropy **130 / 694 Break**, Pleasure from Pain **76 / 166**. Not approximately —
-    exactly, which is the resolution at which a dropped clause hides.
-  - **THE NEGATIVE CONTROL BIT IN THREE DIRECTIONS AT ONCE.** With the read sites taking the
-    node's half alone — the exact mistake a re-key makes — all three rune-only arms went to **0**,
-    **the node-only arms did not move a single fire**, and the hero holding both lost precisely
-    the rune's share of the sum (17.18 → 13.39, 26.48 → 21.37, 12.55 → 10.66). The middle column
-    is what makes the outer two mean anything.
-- **§2 — THE SIXTEEN ARE DERIVED, SPLIT AND PRESENTED. NOTHING WAS AUTHORED.** The derivation off
-  `LANE_TREES` and `runes.json` reproduces EM's sixteen exactly — **but only with
-  `check_em.UNIT_MATH` excluded**; without that exemption it returns twenty-six and sweeps in the
-  Colossus and the Glass Rune, which touch no tree at all.
-  - **THE POOL ARITHMETIC IS FLAT AND THAT IS THE FIRST SURPRISE.** Every spec has **4 spec runes
-    and 12 drawable** (4 spec + 3 class-wide + 5 universal). The 5 universal and 12 class-wide
-    carry no talent clause, so the retirement is entirely a spec-scoped question. **It cannot
-    blank an offer**: an exhausted rarity widens to every rarity and then to the generated Common
-    family, and the rare shelf's floor after retirement is **6** against **3 rune slots**.
-  - **THE THRESHOLD IS STATED AND IT IS CONTENT, NOT A COUNT:** *a spec is GUTTED when nothing
-    surviving — spec, class-wide or universal — touches its own engine.* **A count cannot carry
-    the ruling** because no count-based line has a consequence behind it.
-  - **EXACTLY ONE SPEC FAILS IT: the BEASTMASTER.** He would keep `loosened_straps` alone, a
-    Scarred rune whose only upside is **Quick Shot** — and **no class-wide or universal rune
-    touches a companion either**, so after a blanket retirement there would not be one rune in the
-    game that touches a companion. **The companion IS the spec.** The line is movable and the
-    report shows both alternatives (a 2-survivor line catches the same one; a half-loss line
-    catches five).
-  - **EXACTLY ONE OF THE SIXTEEN IS SCARRED and it is flagged apart**: the Bared Guard, 75g,
-    Swordmaster, whose two clauses ARE the trade — retiring it removes the cost with the upside,
-    and would leave him **the only spec in the game with no Scarred rune.**
-  - **THE OVERLAP THAT CANNOT BE READ APART:** the Deepening Ruin and the Whispering Dark are both
-    Occultist and are the only two runes where §1 and §2 meet. Retiring them retires two of the
-    three fields EN authored.
-- **§3 — THE RUNG STAYS. THE STOP CLAUSE FIRED AND THE BRIEF'S OWN INSTRUCTION WAS FOLLOWED.**
-  `Profile.note_end_boss(Run.difficulty_rung())` sets the talent tier to the rung cleared, and
-  **`Talents.TIER_ROWS` is `[0, 3, 6, 9]` — tier 0 opens NO rows at all.** Clearing rung 1 is the
-  only thing in the game that opens rows 1–3 of all twelve trees, for every spec at once.
-  - **RE-MEASURED WITH BN's OWN INSTRUMENT ON THE LIVE TREE** (`DOD_SIM_ROWS=0`, `--run 30` a
-    rung): **untalented completion is 97% / 3% / 0%.** Removing the rung moves a new player's
-    first talent row from a one-attempt clear to roughly a thirty-attempt one — worse than the
-    13% BN §2 measured at ×0.70 and deliberately fixed by choosing ×0.50.
-  - **THE 100% BOT COMPLETION IS A FULLY TALENTED PARTY** (`rows=9 of 9`, CY's own named
-    confounder; re-confirmed at 100 / 80 / 80% across the three rungs, n=20). **A fully talented
-    party has already been through the door the rung is.**
-  - **RELICS WOULD HAVE SURVIVED IT AND TALENTS WOULD NOT.** `Relics.unlock_random()` runs above
-    the `is_end` branch, so every boss at every rung awards one. Only the talent ladder reads the
-    rung.
-  - **EVERY SITE THAT READS A RUNG BY INDEX IS LISTED IN THE REPORT.** The sharp one is
-    `draft_screen.gd:147-148`, which advertises each rung's unlock as
-    `rows_unlocked(rung - 1) + 1 .. rows_unlocked(rung)` — **`def["rung"]` IS the tier index**, so
-    a renumbering breaks the ANNOUNCEMENT rather than the ledger, which is the failure mode that
-    ships. `data/enemies.json` carries two `"rung"` tags (2 and 3, both end-boss).
-    **No second save-refusal path was invented, because nothing was removed.**
-- **§4 — PER-HERO RELICS NEVER LANDED, AND NEITHER DOCUMENT NOR CODE WAS WRONG.**
-  `Run.active_relics` is a flat list of up to 3 ids with **no hero key**, and `relic_add` /
-  `relic_dict` **both take a hook and nothing else** — party-wide at all 25 read sites, and the
-  save format never moved. `master.html`'s *"up to 3 equipped per run at the draft"* was
-  **accurate**; what was missing is that a ruling points the other way and is unbuilt, which it now
-  says. **The code was NOT moved toward the ruling** because four hooks are still unruled, and
-  choosing four designs by implementation is the guess AR §4 forbids.
-- **AND `CLAUDE.md` NOW SAYS WHAT A RELIC IS FOR, DERIVED FROM THE READ SITE.** Every one of the
-  19 relic hooks is read at exactly one place — run start, battle **spawn**, the victory screen,
-  gold awards, rest nodes, shop prices, elite spoils — and **not one is read while a turn is
-  resolving**, swept over all 25 sites. The category `relics.gd` declares OUT (on-kill and
-  per-turn procs, revive-on-death, enemy auras, DoT and Break multipliers) is exactly the
-  in-combat one. **A relic sets up the run; a talent changes what a spec does in a fight; a rune
-  is this run's kit.** And a relic is party-wide *by construction* — it is chosen at the draft,
-  before specs exist.
-- **§5 — TWO ACCEPTANCES RECORDED, AND ONE STALE CAVEAT RETIRED.** Elites stay the shortest fight
-  at every rung and that is **accepted by design**. **DA's "no longer holds at rung 3" caveat does
-  not reproduce**: re-measured at `--run 30` a rung, elite **3.4 / 3.7 / 4.0** against trash
-  3.9 / 4.3 / 4.4 and boss 3.8 / 4.4 / 5.4 — shortest at all three rungs again, by 0.4–0.5 rounds.
-  **The tags stay mechanically inert and `check_ek` §3's game-side population stays at THREE.**
-- **§6 — ONE GATE SECTION INVERTED RATHER THAN DELETED.** `check_em` §4 said *"the day one is
-  answered this gate reds and the answer is to delete its row"*. All three were answered at once,
-  and deleting the table would have left the section **looping over nothing and printing exactly
-  like a clean run**. It asserts the CLOSURE now and walks EN's three in both directions over a
-  live population, printing `CHECKED n of m`. §1's `NO_HOME` exemption arm went with the set.
-  - **AND THE GATE'S OWN HEADER CARRIED EJ'S OFF-BY-ONE.** It read *"`crit_bonus`, `speed`,
-    `armor` and seven others"* and *"the TEN fields"*; **`UNIT_MATH` holds NINE and `armor` is not
-    one of them** — it is the tenth name in EJ's list precisely BECAUSE no live node writes it.
-    The table was right and the sentence was wrong. `CLAUDE.md` had it right and is unchanged.
-  - **AND A `runes.gd` SENTENCE HAD BEEN STALE SINCE EM.** *"These three are what the four Holy
-    runes write today"* — no rune writes `triage_heal`, `divine_presence_pct` or `last_hope_pct`
-    any more. All three stay listed (the AW/AX durability rule) and the sentence now says so.
-- **THE BATTERY: 87 targets, 41,445 checks, 0 throws, 0 `Parse Error` in any of the 87 logs, and
-  `check_de` reads 358 / 0 / 0.** The tree was frozen and the freeze PROVED — 186 files md5'd by
-  absolute path before and after, identical, and `.ran` holds 87 names with no duplicate. Three
-  baseline rows moved and all three were predicted: `check_em` 210 → **223**, `test_batch_av`
-  350 → **351**, `test_batch_ax` 350 → **352**. The two standing reds (`test_rune_battle` 97/1
-  against a 0–1 band, `check_cm_live` 13/4) did not move.
-- **AND ONE REGRESSION, WHICH IS THE RETIRED-WORD RULE AND THE PRE-CHECK THAT MISSED IT.**
-  `test_batch_bx` §4b went red on new `master.html` prose reading **"PARTY-WIDE"** and **"the whole
-  party"** — DL §2's rule, where *party* means either *hero* or *ally* and is exactly the word
-  Rallying Shout's clause hid behind. **The pre-check ran ten document-reading GATES and all ten
-  were green; §4b lives in a SUITE.** The rule is not *pre-check the gates* — it is **pre-check
-  every target that reads the document you edited**, which for `master.html` is **25 targets, six
-  gates and nineteen suites.** Repaired to the project's vocabulary with no claim changed; a needle
-  sweep against the exact file the battery read flipped **1 LOST / 0 GAINED** (and that needle is
-  comment-only), **and the sweep is not the proof** — §4b tests `contains("party")` after stripping
-  five marked identifiers, which `master.html` legitimately still carries, so the needle never
-  flips. All 25 targets were re-run: bx reads **161 / 0**, its exact baseline, and `check_de` was
-  re-run over the updated logs at 358 / 0 / 0.
-- **Next letter: EO.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EO — THE STARTER RUNG TEACHES THE REAL GAME.** The starter rung was ruled to keep
+  the full game and soften only its blows. **The measurement came first and made the batch small:
+  rung 1 strips nothing** — no abilities, no intents, no statuses, no Break gates. What it scaled
+  was **health as well as damage**, and health is the fight's LENGTH. The rung scales **damage
+  alone** now. Twelve of the sixteen runes the charter empties are **retired — kept, and said to
+  be kept.** Full working: **`docs/reports/EO.md`**.
+- **§1 — WHAT A RUNG CHANGES, DERIVED FROM THE CODE. THE LADDER CARRIES FOUR FIELDS AND EVERY
+  READER OF EACH IS SWEPT.** `rung` (the enemy-ability filter at `battle.gd:1078`, the meta gate at
+  `battle.gd:23186`, the run-report header at `run_sim.gd:240`), `mult` (read only by
+  `zone_base_mult`), `severity_floor` (`roll_offer`) and `fixed_modifier` (`arm_fixed_modifier`,
+  rung 3 only). **`Run.difficulty` outside that block is display and save only.**
+  - **RUNG 1 STRIPS NO ABILITIES AND THE CONFIG DIFF IS THE PROOF: 20 of the 21 enemy kinds are
+    IDENTICAL at rung 1 and rung 3.** `data/enemies.json` holds 50 authored abilities and **exactly
+    two rung tags**, both on the end boss (Sundering Decree at 2, The Long Dark at 3).
+    **`Enemies.config` defaults an untagged ability to rung 1**, so the starter rung is the
+    BASELINE kit and the higher rungs ADD to it — an escalation, not a gutting.
+  - **AND EVERYTHING ELSE IS FLAT AT EVERY RUNG:** ability delays, statuses and their chances,
+    `pressure`, `stability`, `armor`, `speed`, `constitution`, encounter counts (49), elite and
+    boss composition, gold, and the relic ladder.
+- **§2 — THE RUNG SCALES DAMAGE, NOT HEALTH, AND THAT IS THE WHOLE IMPLEMENTATION.** The
+  multiplier applied to `max_hp` AND `attack` together. **Stability is a flat 100 at every rung
+  and `ab.pressure` is flat too, so the Break gate needs the SAME number of hero turns at rung 1
+  as at rung 3** — and the enemy died before the heroes got there, taking the 2.5–4.0 telegraphs,
+  the statuses worth cleansing and the turn of pressure an item is for with it.
+  `Run.zone_base_mult_hp` floors the rung out of the health path.
+  - **RUNGS 2 AND 3 ARE UNTOUCHED BY CONSTRUCTION, PROVED RATHER THAN ARGUED.** `maxf(mult, 1.0)`
+    returns ×1.00 and ×1.30 unchanged: **6 of 6 health products bit-identical, and the attack path
+    9 of 9 at all three rungs.**
+  - **THE VERIFICATION IS THE LIVE UNTALENTED MEASUREMENT AND IT IS THE WHOLE BATCH**
+    (`DOD_SIM_ROWS=0`, `--run 30` a rung): **completion 97% → 77% at rung 1; 0% → 0% at rungs 2
+    and 3.** Rung-1 rounds to resolution: trash **5.7 → 9.2**, elite 5.5 → 8.5, boss 7.8 → 12.3.
+    **The fights are 60% longer, which is the texture.**
+  - **AND RE-RUN TWO-ARMED AT n=100, BECAUSE n=30 CANNOT CARRY IT.** A completion figure at n=30
+    has a ±12-point 95% band and the harness says so in its own report, so both arms were re-run
+    at n=100 against each other — the BEFORE arm being this tree with the floor removed, run in an
+    out-of-repo copy so the frozen tree was never armed. **92% → 73%, and trash rounds 5.7 → 9.1
+    over ~1,130 fights an arm: 19 points at 3.7 standard errors, p < 0.001.** **The ROUNDS figure
+    is what this batch rests on**, not the completion percentage.
+  - **FLAGGED, NOT TUNED: `DIFFICULTIES["wanderer"]["mult"]` IS STILL ×0.50 AND WAS NOT TOUCHED.**
+    77% is reported, not defended. Upward toward ×0.40 makes a first clear nearer one attempt;
+    downward makes the rung bite harder. **The lever is the designer's.**
+  - **ONE DISAGREEMENT REPORTED AND NOT DECIDED.** §2's wording — *rung 1 enemies keep their full
+    ability sets* — read to the letter would give the rung-1 end boss all five, **deleting the only
+    genuine mechanical escalation in the ladder.** Nothing was stripped, so nothing was restored;
+    giving the Crown its full five is one line in `data/enemies.json` and it is the designer's.
+- **§3 — TWELVE RUNES RETIRED. 65 AUTHORED, 53 OFFERABLE.** The sixteen were re-derived off
+  `LANE_TREES` and `runes.json` and reproduce EM §3 **name for name** — **but only once a
+  `UNIT_MATH` clause counts as a rune SURVIVING.** Excluding those nine from the denominator
+  returns **twenty-two** and sweeps in six runes EN's own threshold table names as survivors
+  (`still_wrist` carries `parry_bonus` beside its one talent-keyed clause, so it is still an item
+  that does something no node does). **Retiring on the first derivation would have retired six
+  runes that had an argument for existing.**
+  - **THE SPLIT: 3 held back for re-authoring, 1 flagged, 12 retired.** The Beastmaster's three
+    (Deep Bond, Shared Wild, Turning Pack) are **presented as options with nothing authored** —
+    retiring them would leave no rune in the game touching a companion, and the companion IS the
+    spec. **The Bared Guard is reported apart and ruled on nowhere**: §3's specific instruction
+    governs its general one, so it is live, offerable and untouched.
+  - **RETIRED MEANS KEPT — THE MELTED ARMOR CONTRACT.** Each of the twelve keeps its entry in
+    `data/runes.json` with a `retired` string naming **what is lost**; `Runes.config`, `build` and
+    `display_name` still resolve it, so a saved run holding one keeps working. **One `continue` in
+    `Runes.eligible_ids` — the only door both offer paths use — stops it being offered.**
+  - **AND THE CONTRACT PAID FOR ITSELF IMMEDIATELY.** `test_batch_bj` pins the Whispering Dark's
+    own description (`"which catches 1 Ruin"`) into `data/runes.json`. **A retirement that DELETED
+    the entry would have taken that pin red.** All 13 runes.json pins verified unmoved.
+  - **IT CANNOT BLANK AN OFFER:** measured floors across all twelve specs are **9 drawable, 2
+    spec-scoped, 5 on the rare shelf, against 3 rune slots.** The Occultist is thinnest.
+    **The Beastmaster is the only spec whose pool did not shrink at all** — 4 of 4 survive, because
+    his three went to the re-author half. EN's threshold did the job it was written for.
+  - **THE OVERLAP STANDS AND IS THE REASON THE TWO CANNOT BE REVERSED SEPARATELY.** The Deepening
+    Ruin and the Whispering Dark are both the Occultist's and are the only two runes where EN §1
+    and this §3 meet — **retiring them retires two of the three fields EN authored the day
+    before.**
+- **§4 — RUNG 2's GAP DOES NOT CLOSE WHEN ROWS 1–3 OPEN, AND THAT IS REPORTED AND STOPPED.**
+  Measured with exactly the rows rung 1 unlocks (`DOD_SIM_ROWS=3`, n=30): rung 2 reads **7%**
+  against 0–3% untalented, and rung 3 stays at **0%**. **A player who clears rung 1 and spends
+  everything it unlocked arrives at a rung they clear one time in fourteen.** The jump is
+  ×0.50 → ×1.00 in one step against a ladder that opens a third of itself at a time.
+  **The second rung is the next problem and it is not this ruling.** Per-hero relics stay unbuilt
+  and belong to the relic family's batch.
+- **THE TWO SUITES THAT MOVED, AND WHY EACH MOVED THE WAY IT DID.** **`test_runes` 3125 → 3101.**
+  Its eligibility arm is **two-armed now** — a retired entry must roll for NOBODY, a live one must
+  still roll for its spec — because an exemption arm would read green on the day the whole file
+  stopped rolling, the shape `check_em` §4 was inverted to avoid at EN §6. And `_rich_grant` asked
+  for the literal **4** spec runes every spec was authored; some specs keep 2, `grant_rune`
+  correctly falls back, and that read as nine failures. **It derives the surviving count now.**
+  **`test_rune_battle` unmoved at 97** (inside its recorded 0–1 fail band): `_equip_all` walked the
+  OFFER pool, which stops driving all twelve retired runes. **The negative control corrected the
+  first statement of this and the correction is the better lesson: it is NOT silent — armed it
+  reads 17 failures**, because the clause assertions name specific runes and values. **The hazard
+  is the REPAIR**, since deleting those assertions is the other way to green and is the tempting
+  one. It walks `Runes.ids()` now — **whether a rune is offered is `test_runes`' question; whether
+  its clauses PAY is this file's.**
+- **Next letter: EP.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
   and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
-  layer is design: sixteen runes, and whether the lane rule is replaced with anything.
+  layer is design: **the three Beastmaster re-authors, the Bared Guard, and whether the lane rule
+  is replaced with anything.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -293,27 +269,37 @@ battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`
   control taking the node's half alone took all three to zero. `check_em` §4 asserts the CLOSURE
   now, in both directions, over a live population of three. **Nothing else in the rune layer is
   mechanically outstanding.**
-- **THE SIXTEEN THE CHARTER EMPTIES. DERIVED AND SPLIT AT EN, PRESENTED, AND STILL UNRULED —
-  NOTHING WAS AUTHORED.** EN re-derived the sixteen off `LANE_TREES` and `runes.json` (they
-  reproduce exactly, **but only with `check_em.UNIT_MATH` excluded** — without it the derivation
-  returns twenty-six and sweeps in two universal runes that touch no tree). **Every spec has 4 spec
-  runes and 12 drawable, and a retirement cannot blank an offer** — an exhausted rarity widens and
-  then falls back to the generated Common family, with a rare-shelf floor of 6 against 3 slots.
-  **EN's threshold, stated so it can be moved: a spec is GUTTED when nothing surviving touches its
-  own engine.** By that line **only the Beastmaster** is gutted — he would keep one Scarred rune
-  whose upside is Quick Shot, and **no class-wide or universal rune touches a companion either**,
-  so no rune in the game would. `docs/reports/EN.md` §2 carries the re-author axis for those three,
-  what each of the other thirteen loses, and the Bared Guard flagged apart. **The full list of the
-  sixteen with their clauses is still `docs/reports/EM.md` §3.** Every clause these sixteen own
-  was talent-keyed, so after the re-key they are mechanically whole and have lost the argument for
-  existing: each was *your lane, but more*. **`docs/reports/EM.md` §3 lists all sixteen by name with
-  what each does, its price, its lane and its clauses.** **Exactly one is Scarred — the Rune of the
-  Bared Guard (75g), whose two clauses ARE the trade** — so retiring it removes both halves at once,
-  and it is the only one of the sixteen where that is true.
-  - **THE DISTRIBUTION IS UNEVEN AND IT MATTERS TO THE RULING.** All 59 clauses sat in the 48 spec
-    runes; the 5 universal and 12 class-wide carried none. **The Warden is 0-of-7 and the
-    Beastmaster 8-of-9** — three of the Beastmaster's four runes are in the sixteen, against none of
-    the Warden's. A retirement pass would hit one spec's pool five times harder than another's.
+- **THE SIXTEEN THE CHARTER EMPTIED ARE RULED AT EO. TWELVE ARE RETIRED; FOUR ARE STILL OPEN AND
+  ALL FOUR ARE DESIGN.** The sixteen reproduce EM §3 **name for name** off `LANE_TREES` and
+  `runes.json` — **but only once a `UNIT_MATH` clause counts as a rune SURVIVING.** (EN recorded
+  this as *"with `check_em.UNIT_MATH` excluded"*; EO's first re-derivation read that as
+  *excluded from the denominator*, returned **twenty-two**, and swept in six runes EN's own
+  threshold table names as survivors. `still_wrist` carries `parry_bonus` beside its one
+  talent-keyed clause and is therefore still an item that does something no node does.)
+  **65 authored, 12 retired, 53 OFFERABLE.**
+  - **WHAT IS STILL OPEN: the three Beastmaster re-authors and the Bared Guard.**
+    `docs/reports/EO.md` §3 carries all four — theme, axis, balance and synergy for each of the
+    three, and the Bared Guard's loss-and-gain reading — **and nothing is authored.** The Deep
+    Bond's axis is DEPTH and its risk is a Loyalty meter already over-arriving; the Turning Pack's
+    is BREADTH/TEMPO and its risk is a second non-damaging item in a pool with no boss damage; the
+    Shared Wild's is the companion's BODY and it is the only splash of the three, which is the half
+    the charter hurt most. **Retiring the three would leave no rune in the game touching a
+    companion, and the companion IS the spec.**
+  - **THE BARED GUARD IS LIVE, OFFERABLE AND RULED ON NOWHERE.** §3's brief ruled *retire the rest*
+    and then ruled this one *reported separately and ruled on nothing*; the specific instruction
+    governs. Its two clauses ARE the trade (+10% Aggressive Stance bought with −15% off Defensive
+    Stance), so **retiring it removes the cost with the upside** — it is the only item that lets a
+    Swordmaster buy commitment, and losing it would make him **the only spec in the game with no
+    Scarred rune.**
+  - **RETIRED MEANS KEPT — AND THE CONTRACT PAID FOR ITSELF IMMEDIATELY.** Each of the twelve keeps
+    its `runes.json` entry with a `retired` string naming what is lost; `config` / `build` /
+    `display_name` still resolve it. **`test_batch_bj` pins the Whispering Dark's own description
+    into that file, so a retirement that DELETED the entry would have taken a pin red.**
+  - **AND THE DISTRIBUTION EXPLAINS THE SHAPE OF THE RESULT.** All 59 clauses sat in the 48 spec
+    runes; the 5 universal and 12 class-wide carried none. Measured floors after the retirement are
+    **9 drawable, 2 spec-scoped, 5 on the rare shelf, against 3 rune slots** — the Occultist is
+    thinnest, and **the Beastmaster is the only spec whose pool did not shrink at all**, because his
+    three went to the re-author half.
 - **WHAT SEVERING THE LANE RULE DELETES, RECORDED BECAUSE IT WAS MEASURED.** 36 lane runes and 12
   splashes — **48 of the 65** — were authored to *"one rune per talent lane, plus one splash"*, whose
   point was that a rune is *"worth more to a hero whose points went elsewhere."* **A rune with its
@@ -1317,9 +1303,18 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
     | party / rung | trash | elite | boss |
     |---|---|---|---|
-    | 1 wanderer | 3.9 (n=206) | **3.4** (n=256) | 3.8 (n=60) |
+    | 1 wanderer | **4.4** (n=367) | **3.8** (n=358) | **4.1** (n=90) |
     | 2 warden | 4.3 (n=240) | **3.7** (n=246) | 4.4 (n=57) |
     | 3 ruin | 4.4 (n=235) | **4.0** (n=225) | 5.4 (n=55) |
+
+    **THE RUNG-1 ROW IS EO's AND THE OTHER TWO ARE EN's.** EO §2 stopped the rung discounting
+    enemy HEALTH, which lengthens a rung-1 fight and no other; re-measured at `--run 30`,
+    `DOD_SIM_ROWS=9`, it moves 3.9 / 3.4 / 3.8 → **4.4 / 3.8 / 4.1**. **Rungs 2 and 3 did not move
+    and were not re-measured** — the health multiplier floors the rung at 1.0, which is
+    bit-identical above rung 1 on 6 of 6 products. **The fully talented party still completes rung
+    1 at 100%** (30 of 30), which is the point EN made: a party that has already been through the
+    door the rung is finds it a formality either way. **The elite is still the shortest of the
+    three kinds at rung 1**, so EN §5's acceptance is unaffected.
 
   - **DA's "NO LONGER HOLDS AT RUNG 3" CAVEAT IS RETIRED — IT DOES NOT REPRODUCE.** DA read all
     three kinds at 4.4; on the live tree the elite is **shortest at all three rungs again**, by
