@@ -77,8 +77,9 @@ in `docs/master.html`.
   AND STILL UNPLAYED.** Tune the damage scale (one number, teaches nothing new); make the Break
   gate rung-aware (small, same shape as `zone_base_mult_hp` — **and the measured risk is that
   pressure is unevenly distributed: 76 of 227 abilities carry any, the Sharpshooter's draft pool
-  holds 6 pressure-bearing cards and the INQUISITOR'S HOLDS NONE**, so a Break gate becomes a spec
-  gate); rung-tagged abilities (**zero code** — `Enemies.config` already filters on `rung` and
+  holds 6 pressure-bearing cards and the DEVOUT'S HOLDS NONE** (`SPEC_INFO["inquisitor"]` displays
+  as **Devout**, and `mystic` as **Survivalist**; EP §2 printed both by id), so a Break gate
+  becomes a spec gate — **RULED AFTER EP: rejected**, and now a `CLAUDE.md` standing rule); rung-tagged abilities (**zero code** — `Enemies.config` already filters on `rung` and
   defaults untagged to 1 — and the only option that changes the QUESTION); a rung-aware encounter
   shape (respecting BK §5's boss-band collision and `compose`'s elite floor of 6); or making the
   severity twist that exists actually work. **The question in front of the designer is not how much
@@ -128,19 +129,35 @@ in `docs/master.html`.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE LADDER — WHAT RUNG 2 SHOULD ASK. **OPENED AT EP §2, RULED ON NOWHERE.**
+### THE LADDER — WHAT RUNG 2 SHOULD ASK. **RULED BY THE DESIGNER AFTER EP. UNBUILT.**
 
-**Full evidence: `docs/reports/EP.md`.** Rung 2 is the same fight as rung 1 in the same number of
-turns with the damage doubled — enemy health is bit-identical between the two rungs and every
-ability field is unchanged. **Five options are costed in EP §2 and none is taken:** tune the
-damage scale, make the Break gate rung-aware, add rung-tagged abilities, change the encounter
-shape, or make the severity twist work. **`DIFFICULTIES["wanderer"]["mult"]` is still ×0.50 and
-still unplayed**, so a rung-2 change on top of it compounds two unmeasured decisions.
+**Full evidence: `docs/reports/EP.md` §2.** Rung 2 is the same fight as rung 1 in the same number
+of turns with the damage doubled — enemy health is bit-identical between the two rungs and every
+ability field is unchanged. **Five options were costed and the designer has ruled on all five.**
 
-- **AND THE MEASURED CONSTRAINT ON THE BREAK OPTION:** pressure is unevenly distributed —
-  **76 of 227 abilities carry any**, and by draft pool the Sharpshooter holds 6 pressure-bearing
-  cards, the Arcanist 5, four specs hold 4, **the Holy Cleric holds 1 and the INQUISITOR HOLDS
-  NONE.** A rung-aware Break gate would quietly become a spec gate.
+- **TAKE C, OR C+D.**
+  - **C — RUNG-TAGGED ABILITIES.** *"The only option that gives rung 2 a question rung 1 doesn't
+    have, and it's the ladder's own stated principle: stat inflation alone is a wall, a named twist
+    is a ladder."* **Zero code** — `Enemies.config` already filters on `rung` and defaults an
+    untagged ability to 1, so a third tag is one field in `data/enemies.json`. **The cost is pure
+    authoring**, and every new ability owes `master.html`, `text-standard.html` and a card row in
+    the same batch. Today **2 of 50 authored abilities carry a rung tag and both are the end
+    boss's.**
+  - **D — THE ENCOUNTER SHAPE, AND IT IS THE ONE TO PAIR WITH C.** *"It moves the axis §1 proved
+    rung 2 doesn't touch at all."* A wider warband at the same per-enemy strength makes AoE, cleave
+    and Break-spreading real decisions rather than incidental ones. **THE BK §5 TRAP IS NAMED AND
+    AVOIDABLE**: the budget ramp was rescaled precisely because slot 15 would otherwise collide
+    with the boss's own 10–12 band, and `compose` floors elite and mini-boss rosters at 6 so an
+    elite cannot degrade to a plain mob. A rung-aware budget must respect both.
+- **B IS REJECTED, ON ITS OWN MEASUREMENT.** A rung-aware Break gate becomes a **spec** gate.
+  **This is now a `CLAUDE.md` standing rule** — a rung may only scale a system every spec can
+  participate in — because it settles with no implementation and would otherwise be lost when this
+  file is next rewritten.
+- **A IS THE ONE TO AVOID**, exactly as EP warns: not to be stacked on an unplayed ×0.50.
+- **E IS REAL BUT IT IS RUNG 3's.** *"Fix E separately whenever convenient."* See the item below.
+
+**WHAT IS STILL THE DESIGNER'S INSIDE C:** which abilities, on which enemies, at which rung.
+**Rune and ability content is content and this file does not invent it.**
 
 ### RUNG 3'S BARGAIN TWIST INVERTS — **MEASURED AT EP §1, AND IT IS NOT THIS BRIEF'S RUNG**
 
@@ -149,7 +166,8 @@ At rung 3's floor of 4 there is nothing above it, both gambles fall through the 
 all three options come from the whole twenty-modifier table. **Measured over 400 offers a rung,
 mean severity offered is 2.83 / 3.29 / 2.31 — the top rung's bargains are MILDER than the starter
 rung's.** The high pool holds **8 / 4 / 0**. **The stale comment that said otherwise is corrected;
-the behaviour is untouched and is the designer's.**
+the behaviour is untouched.** **RULED AFTER EP: it is a real defect and it is rung 3's — *"fix E
+separately whenever convenient."* It is not bundled into the rung-2 work above.**
 
 ### THE RUN REPORT'S WIPE TABLE IS BANDED FOR A TWELVE-SLOT ZONE — **NAMED AT EP §1c, NOT FIXED**
 
@@ -298,6 +316,34 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
+### THE FOUR RUNE ITEMS — **RULED BY THE DESIGNER AFTER EP. THREE RE-AUTHORS UNBUILT.**
+
+**Full evidence: `docs/reports/EP.md` §4.** The floors stand: **65 authored, 12 retired, 53
+offerable; drawable 9 (Occultist), spec-scoped 2 (Cryomancer), rare shelf 5 (Occultist), against 3
+rune slots.** **Nothing is authored here — rune content is content and it is the designer's.**
+
+- **RUNE OF THE DEEP BOND — RE-AUTHOR, BUT *NOT* ON DEPTH.** *"Its axis is the one thing
+  measurement says not to lean on: Loyalty already over-arrives at a 21.2 peak against a nominal 5.
+  Depth-scaling pushes the direction that's already too far."*
+  **AND THE REPLACEMENT AXIS IS NOT NAMED, WHICH IS THE OPEN HALF OF THIS RULING.** EP's argument
+  for authoring the pair at all was that **Deep Bond is the only one of the three that rewards NOT
+  swapping**, which makes it the exact opposite of the Turning Pack and gives the two a real
+  decision between them — and DEPTH was how it expressed that. **Dropping depth without replacing
+  the not-swapping identity collapses the pair into one idea**, so the axis that replaces it should
+  be chosen with the Turning Pack in view rather than on its own.
+- **RUNE OF THE TURNING PACK — RE-AUTHOR, AND IT IS THE STRONGEST CASE.** *"Tempo is his thinnest
+  axis, and his boss pool is the only one in the game with no damaging card — so a version paying
+  the swap in Break or a damage window answers a concentration finding instead of deepening it."*
+  **The number to price against is 0.35 swaps a trash fight** (measured n=1310 fights, rung 2
+  untalented).
+- **RUNE OF THE SHARED WILD — SAFEST, AND KEPT CLOSEST TO AS-IS.** *"Companion durability is the
+  one Beastmaster number nothing else touches, and 0.22 deaths a trash fight is a real event."*
+  **The honest cost is stated and accepted:** re-authoring a splash as one idea makes it a lane
+  rune wearing a splash's name.
+- **RUNE OF THE BARED GUARD — KEPT, AND THE 80% REFUND IS ACCEPTED.** This one settles with no
+  implementation, so **it is a `CLAUDE.md` standing rule** rather than a queue item: paying a point
+  and a lane to soften a Scarred rune is a decision, which is what a Scarred rune is for.
+
 ### THE RUNE CHARTER — MECHANICS TAKEN AT EM, EVERY DESIGN QUESTION IN IT STILL OPEN
 
 **Full evidence: `docs/rune-audit.html` (EJ's audit of all 65 runes and all 135 clauses, generated
@@ -1449,28 +1495,30 @@ those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPT
 re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and all are measured on
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
-- **188 files, 8.4772 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
+- **188 files, 8.4960 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
   `docs/reports/EP.md` INCLUDED, which is the convention since EG. **EP added ONE file**
   (`docs/reports/EP.md`) and deleted none. **Re-derive with `claude_md_census.py` rather than
   quoting this**; the census reads `git ls-files`, so a new file is outside the number until it is
   staged, and EP's figure is measured with it staged.
 - Heaviest, **re-measured at EP**: `scripts/battle.gd` **1233.25**, `docs/design-notes.md`
   **442.63**, `docs/master.html` **352.49**, `scripts/classes.gd` **339.15**,
-  **`pin-manifest.json` 303.89**, `docs/changelog.html` **294.71**, `CLAUDE.md` **213.73**,
+  **`pin-manifest.json` 303.89**, `docs/changelog.html` **294.71**, `CLAUDE.md` **217.17**,
   `scripts/unit.gd` **183.17**, `scripts/talents.gd` **178.66**, `docs/talent-audit.html`
   **165.03**, `scripts/run_state.gd` **139.90**, `docs/state.md` **136.09**.
   **`CLAUDE.md` IS NO LONGER IN THE TOP FIVE**, which is what the split was for.
   **AND THIS BLOCK'S FIGURES WERE FOUR BATCHES STALE WHEN EP ARRIVED** — it recorded `CLAUDE.md`
-  at 191.68 KiB against a live 213.73, and the changelog at 261.60 against 294.71. **CW's 400 KiB
+  at 191.68 KiB against a live 217.17, and the changelog at 261.60 against 294.71. **CW's 400 KiB
   changelog threshold is now about thirteen batches away, not seventeen.**
   **`scripts/classes.gd` GREW 14.6 KiB AT EK** and it is the tag table — 227 rows and their header.
   The changelog grows about 8 KiB a batch, so CW's 400 KiB threshold is roughly seventeen batches
   away.
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
   measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF took that
-  split.** **RE-MEASURED AT EP IT READS 213.73 KiB, which is 76.27 KiB of headroom — about
-  seventeen batches at +4,520 B/batch. THIS LINE HAD SAID 191.69 SINCE EK AND WAS 22 KiB STALE.
-  EP DID NOT TOUCH `CLAUDE.md` AND ADDED NO RULE.** **EK grew it by 3,713 B (3.63 KiB)**, which is one
+  split.** **RE-MEASURED AT EP IT READS 217.17 KiB, which is 72.83 KiB of headroom — about
+  sixteen batches at +4,520 B/batch. THIS LINE HAD SAID 191.69 SINCE EK AND WAS 22 KiB STALE.**
+  **EP's BATCH ADDED NO RULE; THE DESIGNER'S RULINGS AFTERWARDS ADDED TWO, +3,529 B (3.45 KiB)** —
+  the rung-lever rule and the Scarred-rune refund rule, both of which settle with no implementation
+  and would have been lost from this file's next rewrite. **EK grew it by 3,713 B (3.63 KiB)**, which is one
   standing reference: the three vocabularies, the tables and their one accessor each, the
   inertness ruling, and the rule that a new ability or rune is owed a row in the same batch.
   **`docs/instrument-rules.md` reads 70.08 KiB and has no stated ceiling**; the arithmetic for one is

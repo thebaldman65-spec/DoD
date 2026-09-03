@@ -1850,6 +1850,54 @@ health never poses the question.
   there is** — that is exactly what a health-only change would have done to a completion sweep run
   at `rows=9`, where all three rungs already read 80–100%.
 
+## STANDING RULE — A RUNG MAY ONLY SCALE A SYSTEM EVERY SPEC CAN PARTICIPATE IN (Batch EP §2, ruled by the designer)
+
+> **A rung-wide multiplier on a system whose participation is UNEVEN is not a difficulty lever.
+> It is a spec gate wearing one.**
+
+**RULED AT EP: making the Break gate rung-aware is REJECTED, on its own measurement.** Raising
+enemy `stability` with the rung is small, one-line, and shaped exactly like `zone_base_mult_hp` —
+which is precisely why it is tempting. **But pressure is not evenly distributed across the twelve
+specs**, measured over the draft pools: Sharpshooter **6** pressure-bearing cards, Arcanist 5,
+Berserker / Swordmaster / Pyromancer / Occultist 4, Beastmaster 2, **Holy 1 (mean 6.0) and the
+DEVOUT 0**. Only **76 of the 227-ability corpus** carry any pressure at all.
+
+· **THE SPEC THAT WOULD BE LOCKED OUT IS THE ONE LEAST ABLE TO ROUTE AROUND IT.** The Devout
+  (`SPEC_INFO["inquisitor"]`, archetype *Warder*) is the party's defensive anchor, built on Faith
+  and absorbs, and it holds **zero** pressure-bearing draft cards. A rung that costs more Break
+  would price a rung against a spec that cannot pay in that currency at all.
+· **THE ID IS `inquisitor` AND THE NAME IS `Devout`; `mystic` IS THE `Survivalist`.** Two of the
+  twelve display under a different word than their id, and a table printed by id reads as a
+  different spec to whoever reads names. **Print the display name beside the id in any
+  spec-by-spec figure a designer will rule on.**
+· **THE TEST GENERALISES BEYOND BREAK.** Before scaling any system with the rung, count how many
+  specs can participate in it. A lever every spec meets (damage taken) is a difficulty lever; a
+  lever six specs meet is a gate.
+
+## STANDING DESIGN RULE — A SCARRED RUNE'S COST MAY BE BOUGHT BACK, AND PAYING FOR THAT IS THE DECISION (Batch EP §4, ruled by the designer)
+
+> **A talent node that refunds a Scarred rune's downside is not a bug in the rune. The point,
+> the lane and the row it costs ARE the trade.**
+
+**RULED AT EP: the Rune of the Bared Guard is KEPT, and the 80% refund is ACCEPTED.** Its
+`rune_seasoned_def_bonus` −0.15 exactly cancels Defensive Stance's 0.85 mitigation
+(`maxf(0.85 - seasoned_def_bonus - rune_seasoned_def_bonus - discipline, 0.0)` resolves to 1.00 on
+the nose), and `sm_def_stance` — **Defensive Stance, lane Poise, row 1** — writes 0.12 back into
+the same subtraction, leaving 0.88 against a vanilla 0.85. **The node is inside the three rows a
+single rung-1 clear opens**, so the refund is available to the first player who ever sees the rune.
+**The designer's ruling: paying a point and a lane to soften a Scarred rune is a decision, which is
+what a Scarred rune is for.**
+
+· **THE TWO REPAIRS THAT WERE REFUSED, NAMED SO THEY ARE NOT RE-PROPOSED**: making the rune's term
+  un-refundable, and moving `sm_def_stance` deeper into the tree. Both were considered and both
+  were rejected in favour of accepting the interaction.
+· **AND THE SET-SHAPE FACT THAT KEPT IT.** There are **17 Scarred runes — 2 universal, 3
+  class-scoped (mage, cleric, hunter; there is NO `class:warrior` one) and exactly 1 per spec** —
+  so the three Warrior specs already draw 3 where the other nine draw 4. Retiring the Bared Guard
+  would leave the Swordmaster **2**, the thinnest Scarred shelf in the game and the only spec with
+  no spec-scoped one. **It is also the only item that lets a Swordmaster buy commitment**;
+  `still_wrist`, `shattered_guard` and `duelist` are all pure upside.
+
 ## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
 
 > **Retiring content means it stops being OFFERED. It does not mean the entry is deleted, and it
