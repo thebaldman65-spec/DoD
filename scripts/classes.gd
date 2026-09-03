@@ -4181,8 +4181,15 @@ static func draft_ability(display_name: String) -> Ability:
 		# AXIS: the meter as AMMUNITION. Loyalty pays continuously and has no
 		# ceiling, so a Beastmaster's only question about it is how deep it can
 		# get — never when to cash it. This is the answer, and it is deliberately
-		# a BAD trade most of the time: the curve he empties is what every other
+		# a BAD trade most of the time: the METER he empties is what every other
 		# card of his reads.
+		# AND IT READS THAT METER RAW — `0.20 x stacks x Attack`, never
+		# `_bond_mult` (Batch EQ §1, corrected here at ER §5). The Pack Bond
+		# CURVE is a DIFFERENT reader of the same meter, so a change to the
+		# curve does not reach this card at all and a change to the ACCRUAL
+		# reaches it in full. DO NOT RESTORE "the curve he empties" — that
+		# conflation is the premise EQ corrected, and it is also in
+		# `master.html`'s Unleash row, corrected in the same batch.
 		# IT IS NOT PRIMAL SURGE, AND THE DISTINCTION IS SHAPE RATHER THAN SIZE
 		# (BT's Stabilize/Arcane Bolt rule, through the Hunter door). Primal
 		# Surge is a boss-pool card that spends EVERY companion's meter for 15% a

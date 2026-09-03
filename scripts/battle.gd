@@ -5293,7 +5293,8 @@ func _show_actions(u: BattleUnit) -> void:
 		var entry: Dictionary = _menu_entries[e_idx]
 		if entry.has("summons"):
 			# Top of the list: opens the beast picker (Tab cycles, Space picks).
-			# With a beast already out it becomes the Swap (10 Mana, shared 2cd).
+			# With a beast already out it becomes the Swap (10 Mana, shared 3cd
+			# — `SWAP_COOLDOWN`; Quick Whistle shaves all three).
 			var swapping := _beasts(u).size() >= _beast_cap(u)
 			var group_btn := Button.new()
 			group_btn.text = "[%s] %s Companion ▸" % [_hotkey_name(e_idx),
@@ -5302,7 +5303,7 @@ func _show_actions(u: BattleUnit) -> void:
 			group_btn.add_theme_font_size_override("font_size", 13)
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			if swapping:
-				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
+				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 3-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
 				if u.the_pack > 0:
 					group_btn.tooltip_text += "\nThe newcomer replaces whichever companion\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
@@ -6394,7 +6395,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 			if a.special != "summon":
 				continue
 			var beast: String = a.display_name.get_slice(" ", 1)
-			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast
+			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 3 turns." % beast
 			if u.the_pack > 0:
 				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,

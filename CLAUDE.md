@@ -1652,9 +1652,12 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   BS removed | `_overburn_mult` (the ONE place the cap is decided), OVERBURN_STEP/CAP consts.
 · **Loyalty** (per beast, no ceiling) | the beast's DEATH breaks the meter (Steadfast Bond
   keeps a share); plus BOND_MITIGATION_MAX 0.75 clamps Savage Presence so an uncapped boon can
-  never heal the hunter off enemy hits | `_on_beast_death` battle.gd ~10790; the clamp const
-  beside BOND_STEP ~7370-7385; `_loyalty_cap` returns the LOYALTY_UNCAPPED sentinel (only Wild
-  Rotation hands it a number — the cap IS that node's cost).
+  never heal the hunter off enemy hits | `_on_beast_death` battle.gd ~21730; the clamp const
+  beside BOND_STEP ~13300-13345; `_loyalty_cap` returns the LOYALTY_UNCAPPED sentinel (only Wild
+  Rotation hands it a number — the cap IS that node's cost). **THE ADDRESSES WERE STALE BY TEN
+  THOUSAND LINES** (EQ found it, ER corrected it) — the table's CONTENT was right throughout, and
+  a citation is a claim that rots the same way a number does. **AND A CONVERSION IS RULED FOR
+  THIS METER AND IS NOT BUILT — see the ER block below; nothing here changes until it is.**
 · **Focus** (uncapped; Spray caps 50) | the FIXED-100 CONVERSION: the first 100 points buy
   crit CHANCE (saturates at +50%), everything past buys MULTIPLIER only; Deep Focus moves the
   split point down, floor 1 | FOCUS_CONVERT/FOCUS_STEP + focus_convert()/focus_crit_chance()/
@@ -1897,6 +1900,50 @@ what a Scarred rune is for.**
   would leave the Swordmaster **2**, the thinnest Scarred shelf in the game and the only spec with
   no spec-scoped one. **It is also the only item that lets a Swordmaster buy commitment**;
   `still_wrist`, `shattered_guard` and `duelist` are all pure upside.
+
+## STANDING RULE — LOYALTY IS GOVERNED BY A CONVERSION, NEVER BY A CEILING (Batch ER, ruled by the designer)
+> **The designer has ruled that Loyalty does NOT flatten. Above nominal the meter CONVERTS: each
+> stack stops adding to the term it was adding to and adds to something else, on the shape Focus
+> already uses. Below nominal nothing changes and the ACCRUAL is never touched.**
+
+**THE RULING IS TAKEN; THE CURRENCY IS NOT CHOSEN AND IS CONTENT.** Four are priced in
+`docs/reports/ER.md` §1 and none is authored. **The measurements this rests on are live in that
+file with their n and their standard error — do not quote a figure from here, there is none.**
+
+- **WHAT THIS RULES OUT, BY NAME.** The four shapes `docs/reports/EQ.md` §2 priced — diminishing
+  above nominal, a soft cap, a hard cap at twice nominal, a hard cap AT nominal — **are all off the
+  table as governors of this meter.** A later batch proposing one is proposing to overturn this.
+- **WHAT MAKES THE CONVERSION SAFE WHERE A CAP IS NOT, AND IT IS THE ACCRUAL.** A conversion writes
+  nothing into `_gain_loyalty` or `_loyalty_cap`, so **Kindred still fires at 8, Lone Bond still
+  seats at 6 and None Left Behind still seats at 5.** Every threshold reader and every raw-stack
+  reader — Unleash, Primal Surge, Last Howl, Bring It Down — is untouched **by construction**, not
+  by care. That is the whole reason the shape was ruled and it is the property to preserve.
+- **AND THE PORT OF FOCUS'S SHAPE IS NOT A PORT OF FOCUS'S SAFETY. THIS IS THE TRAP.** Focus's
+  conversion has a **zero loss column for two reasons Loyalty has neither of**: its first half
+  SATURATES (crit chance stops paying at +50%, so the converted stacks were buying nothing), and
+  its RATE is untouchable (`FOCUS_STEP` is a const no node modifies — **Deep Focus moves the SPLIT
+  POINT, not the rate**). **Loyalty's first half does not saturate and every one of its rates has a
+  node on it** — `_bond_step` is raised by Absolute Devotion, doubled by Ancient Pact and raised
+  again by a rune; the strike step is raised by Wild Communion and a rune. **So a conversion here
+  DOES cost the payout readers something, and what it costs is measured rather than assumed.**
+- **THE CONSEQUENCE FOR HOW IT IS BUILT: MOVE THE SPLIT POINT, NEVER THE RATE.** That is Deep
+  Focus's shape and it is the half of the precedent that transfers. **A node or rune that steepens
+  the converted half re-creates the over-arrival on the other side of the split**, which is what the
+  ruling exists to stop.
+- **NOMINAL IS NOT A LIVE NUMBER TODAY AND A CONVERSION MAKES IT ONE.** The 5 is a literal in
+  `battle.CY_METERS` — an instrument's reference point, and the only one of that table's four
+  denominators that is not a live constant. A conversion needs a `BOND_CONVERT` beside `BOND_STEP`,
+  which is `FOCUS_CONVERT`'s exact counterpart.
+- **THE TWO EXISTING CLAMPS ARE PART OF THE DECISION, NOT BYSTANDERS.** `BOND_MITIGATION_MAX` 0.75
+  and Savage Presence's taunt clamp of 1.0 both read `_bond_mult`. **A conversion that caps
+  `_bond_mult` at nominal puts both out of reach at every talent depth**, which by AR §4's rule
+  makes them dead constants rather than governors; a conversion that FEEDS `_bond_mult` makes both
+  bind harder. **Whichever half receives the converted stacks, one of those two things happens** —
+  say which, in the batch that builds it.
+- **AND THE CONVERSION MUST BE LEGIBLE WHERE FOCUS'S IS.** `unit.gd`'s nameplate prints both halves
+  of Focus side by side (`Focus %d (+%d%% crit / x%s)`), which is why a player can see the phase
+  change. `battle._stamp_loyalty_chip` already builds a two-line chip and is the counterpart
+  surface. **A silent second phase is a stat nobody knows they have.**
 
 ## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
 

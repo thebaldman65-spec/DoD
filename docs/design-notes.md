@@ -6676,3 +6676,46 @@ coverage loss almost never arrives as silence; it arrives as a red that is cheap
 to understand**, and the suite that tests whether a clause PAYS has to walk the authored set, not
 the offered one. Whether a rune is offered is a different question and it is
 asserted in both directions somewhere else.
+
+---
+
+## BATCH ER — why a conversion is not free, and why the shape had to be measured before it is built
+
+**Why the ruling's own argument needed testing rather than accepting.** The case for converting
+rather than flattening is that the loss column is zero, and Focus is the proof. But Focus's zero
+rests on two properties that were never stated as conditions: its first half **saturates**, so the
+points that convert were already buying nothing; and its **rate is untouchable**, because
+`FOCUS_STEP` is a constant no node modifies and Deep Focus moves the split POINT instead. Loyalty
+has neither. Its first half keeps paying at full rate for ever, and every rate in it — the boon
+step, the strike step — has a node and a rune on it. **A shape borrowed without its preconditions
+is a shape borrowed without its guarantee**, and the whole of §1 is the arithmetic of that
+difference: converting at nominal costs the companion strike step about a fifth, measured at the
+site the step is read.
+
+**Why the loss was measured at the read site rather than over the peak.** The peak is what the
+report has always printed, and it is the wrong weight for a payout that is applied at every blow:
+pricing every blow at the fight's deepest moment reads 17.9% where the blows themselves read
+20.4% and the meter's own time-average reads 6.0%. Three weightings, three answers, one mechanism.
+**The instrument that settles it is the one hooked into the function that does the multiplying**,
+because that is the only sample whose population is the thing being paid. It also caught EQ's
+table pricing the strike step at the base 0.05 while every arm it measured was wearing Wild
+Communion at 0.12 — an honest, stated assumption that happens not to describe the arm.
+
+**Why the currency is left unchosen, and why that is not a hedge.** Two of the four candidates run
+straight into decisions already written into this code. Paying the converted half in Break meets
+`UNLEASH_BREAK`'s own header, which refuses a per-stack Break term on this meter by name and cites
+three other cards that refused the same thing from their own side. Paying it in companion
+durability pays into **the meter's only governor**: the companion's death is what bounds Loyalty,
+and buying survival with depth is positive feedback on the one thing holding the meter down. Both
+are buildable and both are the designer's to take — but a batch that picked one would be
+overturning a standing decision inside an implementation, which is the shape of change this
+project has spent twenty batches learning to refuse.
+
+**And why the Deep Bond waits on the currency rather than on the curve.** A rune that moves the
+split point is the exact item the game retired at EO §3 — the Rune of the Deep Sight, whose
+retirement note names the loss as *the one item that changes WHEN his patience converts rather than
+how much it pays*. The shape is proven and the slot is empty. What cannot be decided yet is the
+**direction**: moving the point down is a buff only if the converted half is worth more than the
+half it takes from, and that is precisely §1's open question. **A depth rune authored against an
+unchosen currency would be authored twice, and this is the arithmetic that shows it rather than the
+assertion that claims it.**

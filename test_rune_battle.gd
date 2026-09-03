@@ -466,7 +466,18 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		ok(_paid(oc, "deep_hex_step") == 1,
 			"occultist: the Deepening Ruin pays %d%% per stack, expected 1" % \
 				int(_paid(oc, "deep_hex_step")))
-		ok(oc.entropy_ranks == 5, "occultist: the Deepening Ruin grinds %d Break damage, expected 5" % oc.entropy_ranks)
+		# RE-POINTED IN PLACE AT BATCH ER, with the reason here: EN §1 moved this
+		# clause onto a rune-owned field (`rune_entropy_ranks`) and the drip's
+		# EXISTING tick sums the pair — `battle.gd`'s Entropy read is
+		# `ent_occ.entropy_ranks + ent_occ.rune_entropy_ranks`. This line still
+		# read the NODE's counter alone, which the rune correctly stopped
+		# writing, so it had been RED on every run since EN and its failure was
+		# hiding inside this file's `fails: [0, 1]` flake band. The sibling
+		# clause one line above was re-pointed through `_paid()` and this one
+		# was not. Same question, asked against the field that now carries it.
+		ok(_paid(oc, "entropy_ranks") == 5,
+			"occultist: the Deepening Ruin grinds %d Break damage, expected 5" % \
+				int(_paid(oc, "entropy_ranks")))
 		ok(_paid(oc, "soul_leech_step") == 3 and _paid(oc, "gluttony_ranks") == 3,
 			"occultist: the Hollow Chalice pays %d/%d per stack, expected 3/3" % [
 				int(_paid(oc, "soul_leech_step")), int(_paid(oc, "gluttony_ranks"))])

@@ -5,141 +5,147 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-02 (Batch EQ).*
+*Last rewritten: 2026-09-03 (Batch ER).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EQ — THE LOYALTY METER, MEASURED BEFORE A CURVE IS CHOSEN.** A measurement batch:
-  **nothing was flattened, nothing was authored, nothing was retuned and no rune was changed.**
-  Full working: **`docs/reports/EQ.md`**. **Not one `.gd`, `.json` or `.sh` byte moved** — every
-  reading was taken on an out-of-repo instrumented copy of the tree.
-- **§1 — THE METER HAS 42 DIRECT SITES IN THE SHIPPED GAME AND THEY FALL INTO THREE CLASSES.**
-  Swept comment-stripped over all 119 `.gd` files: **42 `.loyalty` sites — 33 reads and 9 WRITES**
-  — plus **eleven derived readers with 37 call sites** between them.
-  - **A PAYOUT READER multiplies by the curve** (9 sites: `_bond_step`, `_bond_mult`,
-    `_comp_dmg_mult`'s strike step, `_ghost_hit`'s, Canis's wounded bonus, Ursus's mitigation,
-    Aguila's crit, the taunt pull, and the chip's own text, which is display).
-  - **A STACK-COUNT READER is linear in the raw meter and never touches the curve** — **Unleash,
-    Primal Surge, Last Howl, Bring It Down, Kill Command's Bleed, Aguila's armour pierce, Ursus's
-    health gift and Succession's half-carry.**
-  - **A THRESHOLD READER only asks whether the meter has passed a number** — Kindred at **8**, the
-    two spender doors at 1, the bot's Primal Surge gate at 4 — and **three sites WRITE a floor**:
-    Lone Bond 6, None Left Behind 5, Wild Rotation's cap of 3.
-  - **SO FLATTENING THE PAYOUT AND FLATTENING THE ACCRUAL ARE TWO DIFFERENT CHANGES WITH TWO
-    DIFFERENT BLAST RADII, AND THE BRIEF'S FOUR SHAPES ARE ALL ONE OF THE TWO.** A payout
-    flattening reaches 9 sites and no threshold; **Unleash, Primal Surge, Last Howl and Bring It
-    Down pay exactly what they pay today.** An accrual flattening reaches all three classes, and
-    **any cap below 8 makes Kindred — a row-8 talent node — unreachable.**
-- **§1b — THERE IS NO CLIFF AT FIVE. THE BRIEF'S PREMISE DOES NOT SURVIVE THE CODE.** Batch AY §2
-  deleted the doubling STEP and replaced it with a continuous curve: `_bond_mult` is
-  `1 + step × Loyalty` and reads ×2 at five only because `BOND_STEP` is 0.20. **The constant's own
-  header, `master.html` (*"a CURVE, not a threshold"*) and the glossary (*"it never plateaus"*) all
-  say so.** The only 5 in the system is **None Left Behind seating an arriving companion there**;
-  the nominal 5 the report prints is a literal in `battle.CY_METERS`, and it is the only one of
-  that table's four denominators that is not a live constant.
-- **§1c — THE CARRIED 21.2 IS A FULLY-TALENTED FIGURE AND THE FIRST-CLEAR PLAYER READS 10.1.**
-  Seven arms, `--run 100` (one at 60), `DOD_SIM_ROUTE=balanced`, the standard four specs, live.
-  Per-battle deepest single bond over every battle a Beastmaster stood in:
+- **Last batch: ER — LOYALTY CONVERTS, IT DOES NOT FLATTEN.** The designer ruled: **no flattening;
+  Loyalty gains a CONVERSION above nominal, on Focus's shape.** The ruling is recorded as a
+  `CLAUDE.md` standing rule. **The currency it converts into is NOT chosen and nothing was
+  authored** — no rune, node, constant or magnitude moved, and `data/runes.json` is byte-unchanged.
+  Full working: **`docs/reports/ER.md`**. **What shipped is §5: five corrections to the record**,
+  four of them copies of a claim an earlier sweep had already corrected somewhere else.
+- **§1 — THE PORT OF FOCUS'S SHAPE IS NOT A PORT OF FOCUS'S SAFETY, AND THAT IS THE BATCH'S MAIN
+  FINDING.** The ruling's case is that a conversion's loss column is zero. **On Focus that rests on
+  two preconditions Loyalty has neither of:** its first half **SATURATES** (crit chance stops paying
+  at +50%, so converted points bought nothing) and its **RATE IS UNTOUCHABLE** (`FOCUS_STEP` is a
+  const no node modifies — **Deep Focus moves the SPLIT POINT**). **Loyalty's first half never
+  saturates and every one of its rates carries a node**: `_bond_step` is raised by Absolute
+  Devotion, doubled by Ancient Pact and raised again by a rune; the strike step is raised by Wild
+  Communion and a rune. **So the rule for whoever builds it is: MOVE THE SPLIT POINT, NEVER THE
+  RATE.**
+- **§1b — WHAT THE CONVERSION COSTS, MEASURED AT THE SITE THE STEP IS READ.** A fourth arm
+  instrumented `_comp_dmg_mult` itself — one sample per companion blow — `--run 100`, rung 2, rows
+  1–3, **n = 2,030 battles and 6,283 blows.** Mean Loyalty at the blow **7.44**, of which **3.17 is
+  above nominal**; **42.6% of the meter a blow reads is above nominal.** Converting at nominal costs
+  the strike step **20.35% pooled** and **15.50 ±0.27% as a mean over battles**. **So each converted
+  stack must return about 6.4% of a companion blow for the loss column to be zero** — the price tag
+  every currency is quoted against.
+- **§1c — AND EQ'S LOSS TABLE IS PRICED AT A STEP THE MEASURED ARM DOES NOT WEAR.** EQ priced the
+  strike step as `1 + 0.05 L` — the BASE step — and **every arm at rows ≥ 1 holds Wild Communion,
+  devotion row 1**, which takes it to **0.12**. Re-priced live, the loss is **roughly double** what
+  that table prints (its 9.7% for the cap at nominal is **20.35%**). **EQ stated its own pricing, so
+  this corrects a figure and not a method** — the table's ORDERING between shapes stands, its
+  MAGNITUDES do not.
+- **§1d — THE METER RE-DERIVED ON THREE ARMS AND EQ REPRODUCES ON ALL OF THEM.** `--run 100`,
+  `DOD_SIM_ROUTE=balanced`, rung 2, standard four specs, live on an out-of-repo instrumented copy —
+  **not one executable byte of the shipped tree carries a probe.**
 
-  | arm | rung | rows | mean peak | median | >5 | >10 | >20 | deepest | n |
-  |---|---|---|---|---|---|---|---|---|---|
-  | C | 2 | 0 | **6.61 ±0.09** | 6 | 59.7% | 12.2% | 0.2% | 27 | 1298 |
-  | A | 2 | 1–3 | **10.13 ±0.11** | 10 | 82.3% | 43.8% | 3.4% | 34 | 1980 |
-  | D | 2 | 1–9 | **18.45 ±0.17** | 18 | 99.7% | 75.3% | 37.7% | **60** | 2600 |
-  | B | 1 | 1–3 | **11.26 ±0.10** | 11 | 86.7% | 53.1% | 5.4% | 34 | 2674 |
+  | arm | rows | mean peak | sd | median | >5 | >10 | >20 | deepest | n | EQ read |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | C | 0 | **6.64 ±0.09** | 3.23 | 6 | 61.2% | 11.2% | 0.1% | 22 | 1391 | 6.61 ±0.09 |
+  | A | 1–3 | **10.08 ±0.12** | 5.17 | 10 | 80.7% | 43.8% | 3.4% | 34 | 1947 | 10.13 ±0.11 |
+  | D | 1–9 | **18.98 ±0.17** | 8.86 | 18 | 99.6% | 77.6% | 40.8% | **90** | 2649 | 18.45 ±0.17 |
 
-  **DA's 21.2 was taken at `rows=9`; live at that loadout it is 18.45.** **AND THE RUNG MAKES THE
-  METER SHALLOWER, NOT DEEPER** — rung 1 reads 11.26 against rung 2's 10.13 on the same rows,
-  because the meter's governor is the companion's DEATH and rung 2 kills companions three times as
-  often (0.20 a trash fight against 0.06). **The governor is working; the talent tree is what
-  outruns it.**
-- **§1d — THE SHARE OF HIS DAMAGE ABOVE NOMINAL, DAMAGE-WEIGHTED AT THE SITE THE DAMAGE LANDS.**
-  Companion blows carrying the strike multiplier: **4.4% untalented, 18.5% with rows 1–3, 45.0%
-  fully talented.** Primal Surge, the linear spender that could be measured cleanly: **26.1% with
-  rows 1–3 and 74.3% fully talented.** **AND THE BRIEF HAS THE LARGEST PAYOUT THE WRONG WAY
-  ROUND** — Unleash pays **1.8×** what one Primal Surge blow pays, and Primal Surge pays
-  **2.4× Unleash's total** (4.3× fully talented) because it fires four times as often and spends
-  every companion's meter.
-- **§1e — THE GAME ALREADY FLATTENS THIS METER IN THREE PLACES AND THE MEASUREMENTS SAY WHERE.**
-  **Bring It Down's hard cap of 20 points binds on 41.5% ±3.6 of casts with rows 1–3 and 94.1%
-  fully talented** (paid 15.99 of a possible 19.32, and 20.00 of a possible 50.59).
-  `BOND_MITIGATION_MAX` 0.75 and Savage Presence's taunt-pull clamp of 1.0 **never bind below rows
-  9 (0.0–1.1%) and bind on 26.8% and 49.1% at rows 9** — at the top of the tree the bear's taunt is
-  a certainty on half its rolls. **Flattening above nominal is the third instance of an idea this
-  system already has.**
-- **§2 — SIX SHAPES PRICED AS COUNTERFACTUALS OVER THE MEASURED HISTOGRAM, NONE TAKEN.** With rows
-  1–3 at rung 2: **diminishing at half rate above 5** costs the strike step 4.9% and a linear
-  spender 19.5%; **a soft cap asymptotic at 10** costs 5.5% / 22.1%; **a hard cap at twice nominal**
-  2.8% / 11.3%; **a hard cap AT nominal** 9.7% / 39.0%. **Fully talented every one roughly triples**
-  (29.7% / 68.1% for the hard cap at nominal). **What Unleash pays after: 203% of Attack today →
-  149% / 137% / 162% / 95%** — **and all four stay at 203% if the flattening is applied to the
-  PAYOUT only.** **A FIFTH SHAPE IS NOT IN THE BRIEF AND IS THE GAME'S OWN ANSWER ON THE SIBLING
-  METER**: Focus is uncapped and over-arrives too, and its governor is a **CONVERSION** — the first
-  100 points buy crit CHANCE and everything past buys crit MULTIPLIER at the same rate, so nothing
-  is lost and the meter changes KIND at its nominal. **Its loss column is zero and its cost is
-  naming the second thing Loyalty buys, which is content.**
-- **§3 — HALF THE TURNING PACK IS ALREADY WORTH ZERO, AND THAT IS NEW.** `SWAP_COOLDOWN` is **3**,
-  Quick Whistle shaves **3**, and the read site is `maxi(3 − quick_whistle_ranks −
-  rune_quick_whistle_ranks, 0)` — **so a Beastmaster holding Quick Whistle is already at the floor
-  and the rune's +1 pays nothing.** Quick Whistle is **pack row 1**, inside the three rows a single
-  rung-1 clear opens; Wild Rotation skips the block outright. **And the verb it cheapens falls as
-  the build deepens: swaps go 0.38 a trash fight untalented → 0.21 with rows 1–3 → 0.02 fully
-  talented.** Its second clause is additive and always pays, but **Feral Momentum's own term reads
-  a mean of 1.235 different companions at a blow (79.1% at exactly one)**, so +8% a kind is worth
-  about **+9.9%**, not +24%. **Five options are priced in the report and none is authored.**
-- **§3b — THE CONCENTRATION FACT THE RE-AUTHOR IS AIMED AT IS WRONG IN BOTH READINGS.** *"His boss
-  pool is the only one in the game with no damaging card"*: on the FIELD reading **three pools carry
-  no `damage` field, not one** — Beastmaster 5, Holy 3 and the Devout 2, all `special`, all
-  `damage 0` and `pressure 0`. On the BEHAVIOUR reading **his pool does not qualify at all**, since
-  Primal Surge is his biggest damage payout and Call of the Wild strikes with every absent
-  companion. **And *"Tempo is the axis his kit is thinnest on"* holds only inside his own kit** — he
-  carries 1 TEMPO card of 10, **eight of the twelve specs carry zero**, and only the Swordmaster's
-  three beat him.
-- **§4 — THE SHARED WILD'S EVENT IS REAL AND ITS SIZE IS MEASURED.** Companion deaths a fight at
-  rung 2: **0.22 trash / 0.48 boss untalented, 0.20 / 0.35 with rows 1–3, 0.05 / 0.08 fully
-  talented** — and **0.06 / 0.13 at rung 1**, so the event is three times commoner at rung 2 and
-  nearly vanishes at the top of the tree. Its health clause is read once, at the summon, purely
-  additive, so **unlike the Turning Pack's it can never be worth nothing.** **Four options priced,
-  none authored, with the splash's loss priced beside them.**
-- **§5 — THE DEEP BOND IS NOT RE-AUTHORED**, as the brief directs. **What the measurement adds is
-  that DEPTH and the flattening are the same decision**: both its clauses are PAYOUT readers and
-  they sit on the two steepest terms in the system, one of which Ancient Pact then doubles.
-- **§6 — FOUR CORRECTIONS TO THE RECORD, THREE OF THEM IN INSTRUMENTS.**
-  - **`master.html` HAS CARRIED A RULE BATCH BB REVERTED, AND IT IS CORRECTED HERE.** BB corrected
-    both in-game swap tooltips and The Pack's talent text from *"replaces the OLDER of the two"* to
-    the Loyalty rule, and `test_batch_bb` pins that **over `battle.gd`** — the document was never
-    swept and **contradicted its own capstone row 330 lines below** ever since. Corrected toward the
-    code, together with the shared cooldown: the document said **2 turns**, `SWAP_COOLDOWN` is
-    **3**.
-  - **THE SAME WRONG 2 IS STILL IN THE GAME'S OWN TEXT AND IS REPORTED, NOT FIXED** —
-    `battle.gd:6397` (the swap card's own description, *"Shared cooldown: 2 turns."*) and
-    `battle.gd:5305` (the group-button tooltip). `battle.gd:16296` gets it right. **The card a
-    player reads says 2 and the constant says 3.**
-  - **THE RUN REPORT'S SHOP CONFOUNDER IS A VACUOUS READING THAT PRINTS LIKE A REAL ONE.**
-    `run_sim.gd:1136-1137` read `type_taken.get("shop")` where the node type is `"merchant"`, so
-    *"it takes 0.0 of 0.0 shops offered per run"* is **structurally zero** — while the same report
-    prints **4.57 merchants walked, 6.98 runes bought and 3.44 runes acquired per hero per run**
-    four blocks lower. **Its prose is reversed too**: it claims every route policy *"puts combat
-    first"* and `ROUTE_ORDER` puts `fight` **LAST in all three**. **`docs/reports/EP.md` §3 quoted
-    the false zero into its table of what the bot cannot do.**
-  - **ONE LOYALTY READ SITE CAN NEVER FIRE.** `devoted_fury` stretches Bestial Wrath by a turn per
-    stack and **nothing writes it** — DO re-authored its node onto Kill Command and
-    `test_batch_ay:258` asserts the counter absent. A read-only-zero field with a live read site,
-    in the family `icy_resolve_ranks` is already recorded in.
-- **WHAT MOVED: FOUR DOCUMENTS AND NOTHING ELSE.** `docs/master.html` (the two corrections and the
-  stamp), `docs/changelog.html`, this file, `docs/reports/EQ.md`. **No gate, no baseline row, no
-  `CLAUDE.md` rule** — a gate encodes a ruling and nothing here is ruled.
-- **Next letter: ER.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+  **The deepest single bond ever observed rose from 60 to 90.** **The number nobody had taken is how
+  much of the meter sits above nominal at all**, which is what a conversion spends: **15.7% of the
+  meter's own mass untalented, 32.7% with rows 1–3, 54.6% fully talented**, paying on **18.4% /
+  29.2% / 89.2%** of hunter turns. **The conversion is nearly inert at the bottom of the tree and
+  continuous at the top — the same six-to-one asymmetry EQ found for the shapes it replaces.**
+- **§1e — FOUR CURRENCIES PRICED, NONE AUTHORED, AND TWO OF THE FOUR MEET A DECISION ALREADY IN THE
+  CODE.** **BREAK** meets `UNLEASH_BREAK`'s own header, which refuses a per-stack Break term on this
+  meter by name; **but its build cost is ZERO and its real argument is better than the brief's** —
+  `_companion_hit` already takes a Break argument and **six of its eight call sites pass `pr = 0`**,
+  including every ordinary companion strike. **COMPANION DURABILITY pays into the meter's only
+  governor** (the companion's death), so it is positive feedback on the thing bounding the meter.
+  **THE PACK BOND BOON'S OWN GROWTH is the only one of the four needing no new field and no new read
+  site**, because both halves already exist and both are already payout readers — Focus's structure
+  exactly. **PARTY-WIDE is Bring It Down, which exists and is already hard-capped.**
+- **§1f — THE CONSTRAINT THAT KILLED FOUR OF EQ'S FIVE SHAPES IS SATISFIED FOR FREE.** A conversion
+  writes nothing into `_gain_loyalty` or `_loyalty_cap`, so **Kindred still fires at 8, Lone Bond
+  seats at 6, None Left Behind at 5, and Unleash / Primal Surge / Last Howl / Bring It Down pay
+  exactly what they pay today — by construction, not by care.** **But the two existing clamps go one
+  way or the other and the builder owes that sentence**: at the deepest live step (0.76 a stack) a
+  `_bond_mult` capped at nominal reaches ×4.80, so Ursus's mitigation reads 0.48 against a clamp of
+  **0.75** and the taunt pull 0.72 against **1.0** — **both dead at every talent depth**, which by
+  AR §4's rule makes them dead constants. **If `_bond_mult` is the RECEIVING half instead, both bind
+  harder.**
+- **§1g — AND THE TEXT COST IS SMALLER THAN ANY FLATTENING'S.** The meter really does stay uncapped,
+  so the nine surfaces EQ counted need the second phase NAMED rather than the *"no ceiling"* promise
+  retracted. `battle._stamp_loyalty_chip` already builds a two-line chip, so legibility costs one
+  format string — exactly what Focus's cost.
+- **§2 — THE DEEP BOND'S SHAPE IS ALREADY IN THIS GAME AND WAS RETIRED EIGHT BATCHES AGO.**
+  **`Rune of the Deep Sight`** carried `rune_deep_focus: 8` into `focus_convert()`, and its
+  `retired` string names the loss exactly: *"the one item that changes WHEN his patience converts
+  rather than how much it pays."* A Deep Bond that moves the Loyalty split point **keeps DEPTH as
+  its axis, keeps rewarding NOT swapping** (a held bond is what reaches the point) **and mirrors no
+  node**, because no Beastmaster node moves a point that does not exist yet. **Its DIRECTION is
+  undecidable until §1's currency is picked** — down is a buff only if the converted half is worth
+  more — **which proves the brief's hold by construction.** Today the rune buys **20–21% of a node
+  in rows 1–3**. Four shapes priced, none authored.
+- **§3 — HALF THE TURNING PACK IS STILL WORTH ZERO AND THE ARGUMENT FOR BREAK IS NOT.**
+  `SWAP_COOLDOWN` is 3, Quick Whistle shaves 3, the read site floors at 0 — **confirmed at the
+  line** — and Quick Whistle is pack row 1. Swaps re-measured per trash fight: **0.28 (rows 0) →
+  0.22 / 0.23 (rows 1–3) → 0.01 (rows 1–9)**. **The direction reproduces; the untalented magnitude
+  does not** (0.35 at EP, 0.38 at EQ, 0.28 here). **AND THE CONCENTRATION FACT IS WRONG FOR THE
+  THIRD TIME** — re-derived over all twelve boss pools, **THREE carry no damaging card (Beastmaster
+  5, Holy 3, Devout 2), not one**, and by TAG the Beastmaster holds **six BREAK cards**, mid-pack of
+  twelve against a range of 0–11. **The spec with no Break at all is the Devout**, who also has the
+  thinnest boss pool in the game at 2. Five options priced, none authored.
+- **§3b — AND EQ'S TEMPO COUNT IS OFF BY ONE, IN THE DIRECTION THAT FLATTERS THE ARGUMENT.** EQ
+  recorded *"eight of the twelve specs carry ZERO TEMPO cards"*; over EQ's own population it is
+  **SEVEN**, and over the pool a player can actually reach since EH §1 opened the class-wide tier it
+  is **THREE**, with **two** specs beating his one rather than one.
+- **§4 — THE SHARED WILD'S EVENT IS REAL AND HALF OF IT IS NOT A MEASUREMENT AT ITS n.** Companion
+  deaths a TRASH fight are rock steady across five independent readings: **0.22 / 0.22 / 0.23 /
+  0.22 / 0.22**. **The BOSS figure is not**: at the untalented arm it has read **0.39 (EP), 0.48
+  (EQ) and 0.26 (ER)** on **n ≈ 95 boss fights** each time — 2.5σ apart, so the per-fight
+  distribution is over-dispersed and **n ≈ 95 cannot resolve it to better than about ±0.1.** **The
+  brief quotes EP's 0.39, which EQ had already superseded with 0.48, and neither reproduces.**
+  **Price the rune against the trash figure and read the boss half as a band (0.26–0.48).** Four
+  options priced, none authored, with the splash's loss priced beside them.
+- **§5 — FIVE CORRECTIONS TO THE RECORD, AND FOUR WERE COPIES A SWEEP HAD MISSED.** The swap picker
+  card's own description and the group-button tooltip both said the shared cooldown is **2 turns**;
+  `SWAP_COOLDOWN` is **3**. Both corrected, with the source comment one screen above that said
+  `shared 2cd`. **`master.html` carried a THIRD copy of the same wrong 2**, 750 lines below the one
+  EQ corrected — **EH §2's sweep rule firing on the batch that invoked it.** **The Unleash claim —
+  *"the curve it empties"* — lived in BOTH `master.html` and a `classes.gd` comment**; Unleash reads
+  the raw stack count and never calls `_bond_mult`, and both are corrected with a do-not-restore
+  note naming the other copy. **`master.html` also quoted the meter's level with no loadout
+  attached** (*"measured near 20"*) and now names both. **The governor table's addresses for this
+  meter were stale by ten thousand lines and are corrected** (`_on_beast_death` 10790 → **21732**,
+  the clamp const 7370-7385 → **13300–13345**).
+- **§6c — A SECOND RED WAS HIDING AT A FLAKE BAND'S FLOOR SINCE EN, AND IT IS REPAIRED.**
+  `test_rune_battle` read 97 / 1, inside its `fails: [0, 1]` band — **but the failure was not the
+  flake that band exists for.** The row's note names the *pyromancer / White Flame* proc; the actual
+  line was **`occultist: the Deepening Ruin grinds 0 Break damage, expected 5`**. **A two-armed
+  control settled it: SIX OF SIX, on the working tree AND on a copy of unmodified HEAD** — so
+  **deterministic, not a flake, and not ER's.** **THE RED WAS THE ASSERTION, NOT THE RUNE**: EN §1
+  moved that clause onto `rune_entropy_ranks` and `battle.gd:2699` sums the pair, but the line still
+  read the NODE's `entropy_ranks` alone, while its sibling one line above had been re-pointed
+  through `_paid()`. **Re-pointed in place (DC's repair-to-intent rule); the suite now reads
+  97 / 0.** **NO NUMBER IN `baselines.json` MOVED** — the band stays `[0, 1]` and is now the
+  pyromancer flake's contribution alone; **the floor was deliberately NOT raised**, because a
+  failure floor above zero is a promise a red is known, named and *deliberate*. **The sweep is
+  CLOSED, over the population rather than the three names**: all **50** `unit.gd` fields with a
+  `rune_` twin, comment-stripped over `test_rune_battle.gd` — **zero remaining bare node reads.**
+  **This is `CLAUDE.md`'s own *A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE*, paid a second time.**
+- **WHAT MOVED: TWO SOURCE FILES, ONE SUITE AND SEVEN DOCUMENTS.** `scripts/battle.gd` (three copies of the
+  wrong 2), `scripts/classes.gd` (the Unleash comment, comment-only), `docs/master.html`,
+  `CLAUDE.md`, `docs/changelog.html`, `docs/design-notes.md`, this file, `docs/reports/ER.md`,
+  plus `test_rune_battle.gd` (one assertion re-pointed) and one line of PROSE in `baselines.json`.
+  **No rune, no node, no constant, no magnitude, no gate and NO BASELINE NUMBER.**
+- **Next letter: ES.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
   and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
   layer is design: **the three Beastmaster re-authors and whether the lane rule is replaced with
-  anything** — the Bared Guard is ruled and kept. **And the ladder has an open design question of
-  its own (what rung 2 should ASK), and the Loyalty meter now has one too (what shape the curve
-  takes, and whether it is the payout or the accrual that flattens).**
+  anything** — the Bared Guard is ruled and kept. **The Loyalty curve is RULED (a conversion) and
+  its CURRENCY is the open half.** **And the ladder still has an open design question of its own
+  (what rung 2 should ASK).**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -330,56 +336,66 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
-### THE LOYALTY CURVE — **MEASURED AT EQ, SIX SHAPES PRICED, NOTHING TAKEN**
+### THE LOYALTY CURVE — **RULED AT ER: IT CONVERTS. THE CURRENCY IS THE OPEN HALF.**
 
-**Full evidence: `docs/reports/EQ.md` §1 and §2.** The designer ruled that the payout should
-flatten above nominal. **EQ measured what that costs and what it reaches; the shape is unchosen and
-the batch authored nothing.**
+**Full evidence: `docs/reports/ER.md` §1 (the ruling priced and four currencies) and
+`docs/reports/EQ.md` §1/§2 (the read-site census and the six shapes).** The designer has ruled that
+Loyalty does **not** flatten: above nominal the meter **CONVERTS**, on Focus's shape. **The rule is
+in `CLAUDE.md`. Nothing is built and the currency is not chosen.**
 
-- **THE FIRST DECISION IS NOT THE SHAPE, IT IS WHERE THE FLATTENING GOES.** The meter's 42 sites
-  split three ways (see the WHERE block). **A PAYOUT flattening reaches 9 sites and no threshold**;
-  Unleash, Primal Surge, Last Howl and Bring It Down pay exactly what they pay today, and Kindred
-  still fires at 8. **An ACCRUAL flattening reaches all three classes at once.** **That choice is
-  worth more than the choice of curve.**
-- **THE LOSSES, WITH ROWS 1–3 AT RUNG 2** (strike step / linear spender): diminishing at half rate
-  **4.9% / 19.5%**; soft cap asymptotic at 10 **5.5% / 22.1%**; hard cap at 10 **2.8% / 11.3%**;
-  hard cap at nominal **9.7% / 39.0%**. **Fully talented each roughly triples** (29.7% / 68.1% for
-  the hard cap at nominal). **Untalented every one is under 4% on the strike step.** **The same
-  curve is a trim at the bottom of the tree and an amputation at the top, at about six to one.**
-- **WHAT UNLEASH PAYS AFTER**, on the same distribution at 20% of Attack a stack: **203% today →
-  149% (diminishing) / 137% (soft cap) / 162% (hard cap at 10) / 95% (hard cap at nominal)** — and
-  **all four stay at 203% under a payout-only flattening.**
-- **THE FIFTH SHAPE IS NOT IN THE BRIEF AND IT IS THIS GAME'S OWN ANSWER TO THIS PROBLEM.** Focus is
-  uncapped, over-arrives (128.2 against a nominal 100) and is governed by a **CONVERSION**:
-  `min(Focus, 100) × 0.005` buys crit CHANCE and `max(Focus − 100, 0) × 0.005` buys crit MULTIPLIER
-  — **the rate never changes, the KIND does.** Its loss column is **zero**. **Its cost is naming the
-  second thing Loyalty buys, and that is content this file does not invent.** Deep Focus shows how a
-  node interacts with it: it moves the SPLIT POINT rather than raising a ceiling.
-- **WHAT BREAKS, ENUMERATED FROM THE READ SITES.** **A hard cap below 8 makes Kindred — a row-8
-  node — unreachable**, and **Wild Rotation's cap of 3 already does, which nobody had recorded.** A
-  cap below 6 unseats Lone Bond and below 5 unseats None Left Behind. **At a cap of 10 both existing
-  clamps become unreachable at every talent depth** (Ursus's mitigation reaches 0.30 against 0.75,
-  the taunt pull 0.45 against 1.0), which by AR §4's rule makes them dead constants rather than
-  governors. **Bring It Down's own cap of 20 points = 10 stacks would be doubly bound.**
-- **THE TEXT COST IS NINE SURFACES.** The meter's uncappedness is a stated promise in
-  `battle.STATUS_INFO["loyalty"]`, the computed chip line, `Classes` `passive_desc`,
-  `master.html`'s Beastmaster block, its Loyalty-chip / Unleash / Bring It Down rows, and the
-  glossary's `res_loyalty` and `pack_bond` — **plus Absolute Devotion's and Ancient Pact's node text
-  and the three rune descriptions.** `test_batch_az` pins *"no ceiling"* and *"NO CEILING"* against
-  `master.html` today.
-- **AND THE STANDING DECISION FOUR OF THE SHAPES REVERSE IS WRITTEN DOWN.** `CLAUDE.md`'s
-  uncapped-meter governor table names **exactly one governor that is a CEILING rather than a
-  COST** — Overburn's — *"and that is deliberate: the cost was the fault BS removed."* **Loyalty's
-  governor is the companion's DEATH, and EQ measured it working**: rung 2 kills companions three
-  times as often as rung 1 and its meter runs a stack shallower. **It is the talent tree that
-  outruns the governor, not the ladder.** That is the designer's to take; it is recorded so it is
-  taken knowingly.
-- **THE GOVERNOR TABLE'S OWN LINE NUMBERS FOR THIS METER ARE STALE BY ABOUT TEN THOUSAND LINES.**
-  It cites `_on_beast_death` at *"battle.gd ~10790"* (it is 21730) and the clamp const *"beside
-  BOND_STEP ~7370-7385"* (13290–13345). **The table's content is right and only its addresses have
-  moved.**
+- **THE FOUR FLATTENING SHAPES ARE OFF THE TABLE BY NAME** — diminishing above nominal, a soft cap,
+  a hard cap at twice nominal, a hard cap AT nominal. A later batch proposing one is proposing to
+  overturn a ruling.
+- **THE RULING'S OWN ARGUMENT IS PRICED RATHER THAN ACCEPTED, AND ITS LOSS COLUMN IS NOT ZERO.**
+  See the WHERE block: Focus's zero rests on **saturation** and an **untouchable rate**, and Loyalty
+  has neither. Measured at the read site, converting at nominal costs the companion strike step
+  **20.35% pooled / 15.50 ±0.27% per battle** at rows 1–3, and **each converted stack must return
+  about 6.4% of a companion blow** for the loss to be zero.
+- **THE RULE FOR WHOEVER BUILDS IT: MOVE THE SPLIT POINT, NEVER THE RATE.** That is the half of
+  Deep Focus's precedent that transfers. A node or rune that steepens the converted half re-creates
+  the over-arrival on the far side of the split.
+- **NOMINAL IS NOT A LIVE NUMBER TODAY AND A CONVERSION MAKES IT ONE.** The 5 is a literal in
+  `battle.CY_METERS`, the only one of that table's four denominators that is not a live constant. A
+  conversion needs a **`BOND_CONVERT` beside `BOND_STEP`** — `FOCUS_CONVERT`'s exact counterpart.
+- **WHAT IT DOES NOT BREAK, AND THIS IS ITS BEST PROPERTY.** The accrual is untouched, so **Kindred
+  at 8, Lone Bond at 6 and None Left Behind at 5 all keep firing**, and **Unleash, Primal Surge,
+  Last Howl and Bring It Down pay exactly what they pay today** — all four read the raw stack count.
+  **Wild Rotation's cap of 3 remains the only ceiling in the system.**
+- **WHAT IT DOES CHANGE, AND THE BUILDER OWES THE SENTENCE.** `BOND_MITIGATION_MAX` 0.75 and the
+  taunt clamp of 1.0 both read `_bond_mult`. **Capping that half at nominal puts both out of reach
+  at every talent depth** (0.48 against 0.75, 0.72 against 1.0, at the deepest live step of 0.76 a
+  stack), which by AR §4's rule makes them dead constants. **Feeding that half instead makes both
+  bind harder.** One or the other happens; say which.
+- **THE FOUR CURRENCIES ARE IN `docs/reports/ER.md` §1e** with their read sites, build costs and
+  what each costs. **Two meet a decision already written into the code** — Break meets
+  `UNLEASH_BREAK`'s refusal of a per-stack Break term on this meter, and companion durability pays
+  into the meter's only governor. **The boon's own growth is the only one needing no new field and
+  no new read site.** **The report recommends it and authors nothing.**
+- **THE TEXT COST IS SMALLER THAN ANY FLATTENING'S**, because the meter stays uncapped: the nine
+  surfaces need the second phase NAMED, not the *"no ceiling"* promise retracted.
 
-### THE FOUR RUNE ITEMS — **RULED AFTER EP, MEASURED AT EQ. THREE RE-AUTHORS UNBUILT.**
+### THE FOUR RUNE ITEMS — **RULED AFTER EP, MEASURED AT EQ AND ER. THREE RE-AUTHORS UNBUILT.**
+
+**ER ADDED THE SHAPE THE DEEP BOND'S RE-AUTHOR FALLS OUT OF, AND BROKE TWO MORE OF THE PREMISES.**
+- **THE ITEM A RE-AUTHORED DEEP BOND WOULD BE IS ALREADY IN THIS GAME AND WAS RETIRED AT EO §3.**
+  **`Rune of the Deep Sight`** — 100g rare, same rarity and price — carried `rune_deep_focus: 8`
+  into `focus_convert()`, and its `retired` string names the loss exactly: *"the one item that
+  changes WHEN his patience converts rather than how much it pays."* **A Deep Bond that moves the
+  Loyalty split point keeps DEPTH as its axis, keeps rewarding NOT swapping, and mirrors no node.**
+  **Its DIRECTION cannot be chosen until the conversion's CURRENCY is** — down is a buff only if the
+  converted half is worth more — **which proves EQ's and ER's hold on this rune by construction.**
+  Four shapes are priced in `docs/reports/ER.md` §2d and none is authored.
+- **THE TURNING PACK'S CONCENTRATION PREMISE IS WRONG FOR THE THIRD TIME, RE-DERIVED.** Over all
+  twelve boss pools, **THREE carry no card with a `damage` field — Beastmaster 5, Holy 3, Devout 2
+  — and all three carry no `pressure` either.** By TAG the Beastmaster holds **six BREAK cards**,
+  mid-pack of twelve against a range of 0–11; **the spec with no Break at all is the Devout**, who
+  also holds the thinnest boss pool in the game at 2. **What survives is a better fact:
+  `_companion_hit` takes a Break argument and SIX OF ITS EIGHT CALL SITES PASS `pr = 0`**, including
+  every ordinary companion strike — so the companion's routine blow Breaks nothing, which is what a
+  Break re-author should be argued from.
+- **AND EQ'S TEMPO COUNT IS OFF BY ONE.** *"Eight of the twelve specs carry ZERO TEMPO cards"* is
+  **SEVEN** over EQ's own population, and **THREE** over the pool a player can reach since EH §1
+  opened the class-wide tier — with **two** specs beating the Beastmaster's one, not one.
 
 **Full evidence: `docs/reports/EP.md` §4 (the presentation) and `docs/reports/EQ.md` §3/§4
 (the measurements and the priced options).** The floors stand: **65 authored, 12 retired, 53
@@ -415,19 +431,25 @@ rune slots.** **Nothing is authored here — rune content is content and it is t
 - **RUNE OF THE TURNING PACK — RE-AUTHOR, AND EQ SHARPENED BOTH HALVES OF THE CASE AND BROKE
   ONE OF ITS PREMISES.** The ruling was *"tempo is his thinnest axis, and his boss pool is the only
   one in the game with no damaging card — so a version paying the swap in Break or a damage window
-  answers a concentration finding instead of deepening it."* **The swap figure reproduces (0.38 at
-  the arm it came from) and falls to 0.02 fully talented. The pool claim does not survive: three
-  pools carry no `damage` field and his holds the game's largest Loyalty payout by volume.** And
+  answers a concentration finding instead of deepening it."* **The swap figure's DIRECTION reproduces and its
+  MAGNITUDE does not** — per trash fight ER reads **0.28 (rows 0) → 0.22 / 0.23 (rows 1–3) → 0.01
+  (rows 1–9)**, against 0.35 at EP and 0.38 at EQ for the untalented arm. **The pool claim does not
+  survive: three pools carry no `damage` field and his holds the game's largest Loyalty payout by
+  volume.** And
   **Tempo is his thinnest axis only inside his own kit** — eight of the twelve specs carry ZERO
   TEMPO cards against his one. **Five options are priced in `docs/reports/EQ.md` §3 and none is
   authored**; three of the five keep the opposition to the Deep Bond explicit and **one (paying the
   swap in Loyalty) collapses the pair from the other direction.**
 - **RUNE OF THE SHARED WILD — SAFEST, KEPT CLOSEST TO AS-IS, AND EQ MEASURED THE EVENT.**
   *"Companion durability is the one Beastmaster number nothing else touches, and 0.22 deaths a trash
-  fight is a real event."* **0.22 reproduces exactly**; the boss half reads **0.48** where EP put
-  0.39, and the event is **three times commoner at rung 2 than at rung 1** (0.20/0.35 against
-  0.06/0.13 on the same rows) and nearly gone fully talented (0.05/0.08). **Four options are priced
-  in `docs/reports/EQ.md` §4 and none is authored. The honest cost is stated and accepted:**
+  fight is a real event."* **THE TRASH FIGURE IS ROCK STEADY ACROSS FIVE INDEPENDENT READINGS —
+  0.22 / 0.22 / 0.23 / 0.22 / 0.22.** **THE BOSS FIGURE IS NOT A MEASUREMENT AT ITS n AND THREE
+  BATCHES HAVE QUOTED IT AS IF IT WERE**: at the untalented arm it has read **0.39 (EP), 0.48 (EQ)
+  and 0.26 (ER)**, on **n ≈ 95 boss fights** each time, 2.5σ apart — the per-fight distribution is
+  over-dispersed and n ≈ 95 cannot resolve it to better than about ±0.1. **Read it as a band,
+  0.26–0.48, and price the rune against the trash figure.** The event nearly vanishes fully
+  talented (0.06/0.10 at ER). **Four options are priced in `docs/reports/ER.md` §4c and four more in
+  `docs/reports/EQ.md` §4; none is authored. The honest cost is stated and accepted:**
   re-authoring a splash as one idea makes it a lane rune wearing a splash's name — **and the sim's
   own rune policy makes that concrete, since `_pick_rune_candidate` prefers a candidate whose `lane`
   matches the build's target lane, so a splash is already the last thing the bot reaches for.**
@@ -1573,12 +1595,14 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   | Sharpshooter | Focus (of 100) | — | — | — | 128.2 |
 
   **Loyalty and Focus still over-arrive and have not been touched.**
-  - **THE LOYALTY ROW IS RE-MEASURED AT EQ AND THE 21.2 IS A `rows=9` FIGURE.** Live, per-battle
-    deepest single bond over every battle a Beastmaster stood in: **rung 2 untalented 6.61 ±0.09
-    (n=1298), rung 2 with rows 1–3 10.13 ±0.11 (n=1980), rung 2 fully talented 18.45 ±0.17
-    (n=2600), rung 1 with rows 1–3 11.26 ±0.10 (n=2674).** **The rung makes the meter SHALLOWER**,
-    because its governor is the companion's death and rung 2 kills companions three times as often.
-    **Do not quote 21.2 as the meter's level — quote the loadout with it.**
+  - **THE LOYALTY ROW WAS RE-MEASURED AT EQ AND AGAIN AT ER; THE 21.2 IS A `rows=9` FIGURE.**
+    Live at ER, per-battle deepest single bond over every battle a Beastmaster stood in, rung 2:
+    **untalented 6.64 ±0.09 (n=1391), rows 1–3 10.08 ±0.12 (n=1947), fully talented 18.98 ±0.17
+    (n=2649)** — **every arm reproducing EQ within its standard error**, and a fourth arm reading
+    the rows 1–3 meter at 10.2 (n=2030). EQ's rung-1 arm (11.26 ±0.10, n=2674) was not re-run.
+    **The rung makes the meter SHALLOWER**, because its governor is the companion's death and rung
+    2 kills companions three times as often. **Do not quote 21.2 as the meter's level — quote the
+    loadout with it.** **The deepest single bond ever observed is 90** (ER, rows 1–9).
 - **THE FAITH DECOMPOSITION AT RUNG 2, AFTER DA — AND STALE SINCE DK for the healing row:** absorbs **3.90**, ground drip **8.01**, total
   **12.27** a battle, of which **2.21** lands on the Devout's own held meter. **Faith per absorb
   ACTUALLY LANDED is 1.56 against the 2 the constant promises.** Ground up on **49% of hero turns**

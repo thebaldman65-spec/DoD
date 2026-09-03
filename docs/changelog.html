@@ -14,6 +14,148 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-03 &mdash; Batch ER: LOYALTY CONVERTS, IT DOES NOT FLATTEN</h2>
+<p><i>The designer has ruled: <b>no flattening &mdash; Loyalty gains a CONVERSION above nominal, on
+Focus's shape.</b> The ruling is recorded as a standing rule; <b>the currency it converts into is
+NOT chosen and nothing was authored.</b> Four currencies are priced in <code>docs/reports/ER.md</code>
+&sect;1, the three Beastmaster runes are priced in &sect;2&ndash;&sect;4, and <b>no rune, node,
+constant or magnitude moved.</b> What DID ship is &sect;5: <b>five corrections to the record</b>, four of
+them copies of a wrong claim that earlier sweeps missed. Full working: <code>docs/reports/ER.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE RULING IS TAKEN AND ITS PRICE IS MEASURED, BECAUSE IT IS NOT ZERO.</b>
+The case for a conversion is that its loss column is zero, and <b>on Focus that is true for two
+reasons Loyalty has neither of.</b> Focus's first half <b>SATURATES</b> &mdash; crit chance stops
+paying at +50%, so the converted points were buying nothing &mdash; and its <b>RATE is untouchable</b>
+(<code>FOCUS_STEP</code> is a const no node modifies; <b>Deep Focus moves the SPLIT POINT, not the
+rate</b>). <b>Loyalty's first half does not saturate, and every one of its rates has a node on it</b>:
+<code>_bond_step</code> is raised by Absolute Devotion, doubled by Ancient Pact and raised again by
+a rune; the strike step is raised by Wild Communion and a rune. <b>So a conversion at nominal DOES
+cost the nine payout readers something, and this batch measured what.</b></p>
+
+<p><b>&sect;1b &mdash; WHAT IT COSTS, BANKED AT THE SITE THE STRIKE STEP IS READ.</b> A fourth
+arm instrumented <code>_comp_dmg_mult</code> itself &mdash; one sample per companion blow, at the
+read site &mdash; <code>--run 100</code>, rung 2, rows 1&ndash;3, <b>n = 2,030 battles and 6,283
+companion blows</b>. Mean Loyalty at the blow <b>7.44</b>; <b>3.17 stacks of it above nominal</b>;
+<b>42.6% of the meter the blow reads is above nominal.</b> Converting at nominal costs the strike
+step <b>20.35% pooled</b>, and <b>15.50 &plusmn; 0.27% as a mean over battles</b>. <b>So each
+converted stack must return about 6.4% of a companion blow for the loss column to be zero</b>
+&mdash; that is the price tag every currency in &sect;1 is quoted against.</p>
+
+<p><b>&sect;1c &mdash; AND EQ'S OWN LOSS TABLE IS PRICED AT A STEP THE MEASURED ARM DOES NOT
+WEAR.</b> EQ priced the strike step as <code>1 + 0.05 L</code> &mdash; the BASE step &mdash; and
+every arm at rows&nbsp;&ge;&nbsp;1 holds <b>Wild Communion</b>, devotion row 1, which takes it to
+<b>0.12</b>. Re-priced at the live step the loss is <b>roughly double</b> what that table prints
+(9.7% &rarr; 20.35% for the cap at nominal). <b>EQ stated its own pricing, so this is a correction
+to a figure and not to a method</b> &mdash; but it is the figure the ruling is weighed against.</p>
+
+<p><b>&sect;1d &mdash; THE METER RE-DERIVED, AND EQ REPRODUCES.</b> Three arms, <code>--run 100</code>,
+<code>DOD_SIM_ROUTE=balanced</code>, rung 2, the standard four specs, live on an out-of-repo
+instrumented copy &mdash; <b>not one executable byte of the shipped tree carries a probe.</b></p>
+<table>
+<tr><th>arm</th><th>rows</th><th>mean peak</th><th>sd</th><th>median</th><th>&gt;5</th><th>&gt;10</th><th>&gt;20</th><th>deepest</th><th>n</th><th>EQ read</th></tr>
+<tr><td>C</td><td>0</td><td><b>6.64 &plusmn;0.09</b></td><td>3.23</td><td>6</td><td>61.2%</td><td>11.2%</td><td>0.1%</td><td>22</td><td>1391</td><td>6.61 &plusmn;0.09</td></tr>
+<tr><td>A</td><td>1&ndash;3</td><td><b>10.08 &plusmn;0.12</b></td><td>5.17</td><td>10</td><td>80.7%</td><td>43.8%</td><td>3.4%</td><td>34</td><td>1947</td><td>10.13 &plusmn;0.11</td></tr>
+<tr><td>D</td><td>1&ndash;9</td><td><b>18.98 &plusmn;0.17</b></td><td>8.86</td><td>18</td><td>99.6%</td><td>77.6%</td><td>40.8%</td><td><b>90</b></td><td>2649</td><td>18.45 &plusmn;0.17</td></tr>
+</table>
+<p><b>Every arm reproduces within its standard error</b>, and the deepest single bond ever seen
+rose from 60 to <b>90</b>. <b>The new number is how much of the meter sits above nominal at all</b>,
+which is what a conversion actually spends: <b>15.7% of the meter's own mass untalented, 32.7% with
+rows 1&ndash;3, 54.6% fully talented</b> &mdash; and it pays on <b>18.4% / 29.2% / 89.2%</b> of
+hunter turns. <b>The conversion is nearly inert at the bottom of the tree and continuous at the
+top, which is the same six-to-one asymmetry EQ found for the shapes it replaces.</b></p>
+
+<p><b>&sect;1e &mdash; FOUR CURRENCIES PRICED, NONE AUTHORED.</b> Break, companion durability, the
+Pack Bond boon's own growth, and a party-wide payout &mdash; each with its read site, its build
+cost and what it costs. <b>Two of the four run into a decision already written into the code.</b>
+<b>Break</b> meets <code>UNLEASH_BREAK</code>'s own header, which forbids a per-stack Break term on
+this meter as &ldquo;the squaring trap Arcane Bolt, Requiem and Pyre Wake each refused&rdquo;.
+<b>Companion durability</b> pays into <b>the meter's only governor</b> &mdash; the companion's death
+&mdash; so it is positive feedback on the thing that bounds the meter. <b>The boon's own growth is
+the only one of the four that needs no new field and no new read site</b>, because both halves
+already exist and both are already payout readers.</p>
+
+<p><b>&sect;2 &mdash; THE DEEP BOND'S RE-AUTHOR FALLS OUT OF THE SHAPE, AND THE GAME HAS ALREADY
+RETIRED THE ITEM IT WOULD BE.</b> <b>Rune of the Deep Sight</b> moved the Focus conversion POINT,
+and its retirement note at EO &sect;3 records exactly what was lost: <i>&ldquo;the one item that
+changes WHEN his patience converts rather than how much it pays&rdquo;</i>. A Deep Bond that moves
+the Loyalty split point keeps DEPTH as its axis, keeps <b>rewarding NOT swapping</b> (a held bond is
+what reaches the point), and <b>mirrors no node, because no Beastmaster node moves a point that does
+not exist yet</b>. <b>Its DIRECTION is undecidable until &sect;1's currency is picked</b> &mdash;
+down is a buff only if the converted half is worth more &mdash; which is the brief's own reason for
+holding it, confirmed by construction. Today the rune buys <b>20&ndash;21% of a node in rows 1&ndash;3</b>.</p>
+
+<p><b>&sect;3 &mdash; THE TURNING PACK: HALF OF IT IS STILL WORTH ZERO, AND THE ARGUMENT FOR
+BREAK IS NOT.</b> <code>SWAP_COOLDOWN</code> is 3, Quick Whistle shaves 3, the read site floors at
+0 &mdash; <b>confirmed at the line</b>, and Quick Whistle is pack row 1. Swaps fall as the build
+deepens, re-measured: <b>0.28 untalented &rarr; 0.22&ndash;0.23 at rows 1&ndash;3 &rarr; 0.01 fully
+talented</b> per trash fight. <b>But the concentration fact the Break re-author is aimed at is wrong
+for the third time</b>: re-derived through <code>Classes.pool_ability</code> over all twelve boss
+pools, <b>THREE carry no damaging card &mdash; Beastmaster 5, Holy 3, Devout 2 &mdash; not one</b>;
+and by TAG the Beastmaster already holds <b>six BREAK cards</b>, mid-pack of twelve. <b>The one
+spec with no Break at all is the Devout.</b> Five options are priced and none authored.</p>
+
+<p><b>&sect;3b &mdash; AND THE TEMPO COUNT IS OFF BY ONE, IN THE DIRECTION THAT FLATTERS THE
+ARGUMENT.</b> EQ recorded <i>&ldquo;eight of the twelve specs carry ZERO TEMPO cards&rdquo;</i>.
+Re-derived over EQ's own population (spec draft pool + boss pool) it is <b>SEVEN</b>; over the
+pool a player can actually reach since EH &sect;1 opened the class-wide tier it is <b>THREE</b>, and
+<b>two specs beat the Beastmaster's one rather than one</b>.</p>
+
+<p><b>&sect;4 &mdash; THE SHARED WILD, AND THE FIGURE IT IS PRICED AGAINST IS NOT A MEASUREMENT AT
+ITS n.</b> Companion deaths a TRASH fight are rock steady across four independent 100-run samples:
+<b>0.22 / 0.22 / 0.23 / 0.22</b>. <b>The BOSS figure is not</b>: at the untalented arm it has now
+read <b>0.39 (EP), 0.48 (EQ) and 0.26 (ER)</b>, on <b>n &asymp; 95 boss fights</b> each time.
+<b>The brief quotes EP's 0.39, which EQ had already superseded with 0.48, and neither reproduces.</b>
+Price the rune against the trash figure and read the boss half as a band. Four options priced, none
+authored, with the splash's loss priced beside them.</p>
+
+<p><b>&sect;5 &mdash; THE RECORD: FIVE CORRECTIONS, AND FOUR WERE COPIES A SWEEP HAD MISSED.</b>
+<b>(1)</b> the swap picker card's own description and <b>(2)</b> the group-button tooltip both said
+the shared swap cooldown is <b>2 turns</b>; <code>SWAP_COOLDOWN</code> is <b>3</b>. Both corrected,
+with <b>(3)</b> the source comment one screen above that said <code>shared 2cd</code>. <b>(4)</b>
+<b><code>master.html</code> carried a THIRD copy of the same wrong 2</b>, 750 lines below the one EQ
+corrected &mdash; EH &sect;2's sweep rule firing on the batch that wrote it. <b>(5)</b> the Unleash
+claim &mdash; <i>&ldquo;the curve it empties&rdquo;</i> &mdash; lived in <b>both</b>
+<code>master.html</code> and a <code>classes.gd</code> comment; Unleash reads the raw stack count and
+never touches the curve, and both are corrected with a do-not-restore note. <b>And
+<code>master.html</code> quoted the meter's level with no loadout attached</b> (&ldquo;measured near
+20&rdquo;); it now names both. <b>The Kindred/Succession confusion was never recorded outside the
+brief</b> &mdash; both documents describe both cards correctly &mdash; so there was nothing to sweep.
+<b>The governor table's addresses for this meter were stale by ten thousand lines and are
+corrected.</b></p>
+
+<p><b>&sect;6 &mdash; AND THE BATTERY FOUND A SECOND RED HIDING AT A FLAKE BAND'S FLOOR SINCE
+EN.</b> <code>test_rune_battle</code> read <b>97 / 1</b>, inside its <code>fails: [0, 1]</code> band
+&mdash; <b>but the failure was not the flake that band exists for.</b> The row's note names the
+<i>pyromancer / White Flame</i> proc; the line that fired was <b><i>occultist: the Deepening Ruin
+grinds 0 Break damage, expected 5</i></b>. <b>A two-armed control settled it: SIX OF SIX, on the
+working tree AND on a copy of unmodified HEAD</b> &mdash; so <b>deterministic, not a flake, and not
+this batch's</b>. <b>THE RED WAS THE ASSERTION, NOT THE RUNE</b>: Batch EN &sect;1 moved that clause
+onto <code>rune_entropy_ranks</code> and <code>battle.gd</code> sums the pair, but the suite line
+still read the NODE's <code>entropy_ranks</code> alone &mdash; while its sibling one line above had
+been re-pointed through the same file's <code>_paid()</code> helper. <b>Re-pointed in place with the
+reason in the file; the suite now reads 97 / 0.</b> <b>The sweep is CLOSED over the population
+rather than the three names</b> &mdash; all <b>50</b> <code>unit.gd</code> fields with a
+<code>rune_</code> twin, comment-stripped: <b>zero remaining.</b> <b>This is CLAUDE.md's own
+<i>a known flake is a place a second red can hide</i>, paid a second time.</b></p>
+
+<p><b>VERIFIED.</b> Full battery green apart from two banded rows, with <b>the predicted baseline
+table written before the run and NOT ONE ROW PREDICTED TO MOVE</b> &mdash; two-sided, so any
+movement is the alarm. <b>The prediction held</b>: <code>check_de</code>, the count differ, read
+<b>358 checks / 0 failures / 0 notices</b>; <code>check_parse</code> <b>161 / 0</b> against its
+[161,161] band (grepped from stderr for <code>Parse Error</code>, never a tally and never the exit
+code); <code>check_ed</code> <b>948 of 1041</b> source pins verified, 0 failures; harness gates
+<b>22 / 166 / 8</b>. <code>check_cm_live</code>'s 13 / 4 is its recorded on-purpose red and its
+FAIL lines are the defensive-bar assertions it names. <b>The only edit to
+<code>baselines.json</code> is ONE LINE OF PROSE</b> recording &sect;6 &mdash; <b>no number
+moved</b>, and the failure floor was deliberately <b>not</b> raised to 1, because a floor above zero
+is a promise that a red is known, named and <i>deliberate</i>. The <code>classes.gd</code> edit was
+proved comment-only by a comment-stripped diff that came back empty. <b>Four negative controls,
+every needle taken out of <code>pin-manifest.json</code> and broken by REPLACEMENT rather than
+extension</b>: <code>check_el</code> 23/0 &rarr; <b>14/1</b>, <code>check_dm</code> 93/0 &rarr;
+<b>93/1</b>, <code>test_batch_at</code> 467/0 &rarr; <b>467/1</b>, and &mdash; on the comment-only
+edit &mdash; <code>test_batch_bv</code> 864/0 &rarr; <b>837/1</b>. Every restore verified
+byte-identical, by <code>cp</code> from a scratchpad backup.</p>
+
 <h2>2026-09-02 &mdash; Batch EQ: THE LOYALTY METER, MEASURED BEFORE A CURVE IS CHOSEN</h2>
 <p><i>A measurement batch. <b>Nothing was flattened, nothing was authored, nothing was retuned and
 no rune was changed.</b> The designer ruled that Loyalty's payout should flatten above nominal and
