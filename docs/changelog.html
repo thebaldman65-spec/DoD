@@ -14,6 +14,152 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-02 &mdash; Batch EQ: THE LOYALTY METER, MEASURED BEFORE A CURVE IS CHOSEN</h2>
+<p><i>A measurement batch. <b>Nothing was flattened, nothing was authored, nothing was retuned and
+no rune was changed.</b> The designer ruled that Loyalty's payout should flatten above nominal and
+that the Rune of the Deep Bond keeps DEPTH as its axis; this batch does the measuring that ruling
+asked for, and presents the curve as priced options. <b>The brief's own framing needed three
+corrections and the meter's headline figure needed a fourth.</b> Full working:
+<code>docs/reports/EQ.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; EVERY SITE THAT READS THE METER, DERIVED FROM THE CODE.</b> Swept
+comment-stripped over all 119 <code>.gd</code> files: <b>42 direct <code>.loyalty</code> sites in
+the shipped game &mdash; 33 reads and 9 writes</b> &mdash; plus eleven derived readers with
+<b>37 call sites</b> between them. <b>They fall into three classes and a flattening moves them
+differently:</b> <b>a PAYOUT reader</b> multiplies by the curve (the companion strike step, the
+Pack Bond boon, the bodiless blow, Canis's wounded bonus, Ursus's mitigation, Aguila's crit, the
+taunt pull); <b>a STACK-COUNT reader</b> is linear in the raw meter and never touches the curve at
+all (<b>Unleash, Primal Surge, Last Howl, Bring It Down, Kill Command's Bleed, Aguila's armour
+pierce, Ursus's health gift, Succession's half-carry</b>); and <b>a THRESHOLD reader</b> only asks
+whether the meter has passed a number (<b>Kindred at 8</b>, the two spender doors at 1, the bot's
+Primal Surge gate at 4, and the three that WRITE a floor &mdash; Lone Bond 6, None Left Behind 5,
+Wild Rotation's cap of 3). <b>So flattening the PAYOUT and flattening the ACCRUAL are two different
+changes with two different blast radii, and the brief's four shapes are all one of the two.</b></p>
+
+<p><b>&sect;1b &mdash; THERE IS NO CLIFF AT FIVE TO SIT ON TOP OF.</b> The brief asks what breaks at
+&ldquo;the doubling threshold&rdquo;. <b>Batch AY &sect;2 deleted that threshold and replaced it
+with a continuous curve</b> &mdash; <code>_bond_mult</code> is <code>1 + step &times; Loyalty</code>
+and reads &times;2 at five stacks because <code>BOND_STEP</code> is 0.20, not because anything
+steps there. The code's own constant header, <code>master.html</code> (&ldquo;a CURVE, not a
+threshold&rdquo;) and the glossary all say so. <b>The only thing that happens AT 5 is None Left
+Behind seating an arriving companion there; the only threshold above nominal is Kindred at 8, and a
+hard cap at nominal would make a row-8 talent node unreachable.</b></p>
+
+<p><b>&sect;1c &mdash; THE 21.2 PEAK IS A FULLY-TALENTED FIGURE AND THE FIRST-CLEAR PLAYER READS
+10.1.</b> Seven arms, <code>--run 100</code> unless stated, <code>DOD_SIM_ROUTE=balanced</code>,
+the standard four specs, measured live on an out-of-repo instrumented copy so that <b>not one
+executable byte of the shipped tree moved</b>. Per-battle deepest single bond, every battle a
+Beastmaster stood in:</p>
+<table>
+<tr><th>arm</th><th>rung</th><th>rows</th><th>mean peak</th><th>median</th><th>&gt;5</th><th>&gt;10</th><th>&gt;20</th><th>deepest</th><th>n</th></tr>
+<tr><td>C</td><td>2</td><td>0</td><td><b>6.61 &plusmn;0.09</b></td><td>6</td><td>59.7%</td><td>12.2%</td><td>0.2%</td><td>27</td><td>1298</td></tr>
+<tr><td>A</td><td>2</td><td>1&ndash;3</td><td><b>10.13 &plusmn;0.11</b></td><td>10</td><td>82.3%</td><td>43.8%</td><td>3.4%</td><td>34</td><td>1980</td></tr>
+<tr><td>D</td><td>2</td><td>1&ndash;9</td><td><b>18.45 &plusmn;0.17</b></td><td>18</td><td>99.7%</td><td>75.3%</td><td>37.7%</td><td>60</td><td>2600</td></tr>
+<tr><td>B</td><td>1</td><td>1&ndash;3</td><td><b>11.26 &plusmn;0.10</b></td><td>11</td><td>86.7%</td><td>53.1%</td><td>5.4%</td><td>34</td><td>2674</td></tr>
+</table>
+<p>The carried <b>21.2</b> is Batch DA's, taken at <code>rows=9</code>; the live figure at that
+loadout is <b>18.5</b>. <b>At the loadout a single rung-1 clear actually buys it is 10.1, and
+untalented it is 6.6.</b> <b>And the rung makes the meter SHALLOWER, not deeper</b> &mdash; rung 1
+reads 11.26 against rung 2's 10.13 on the same three rows, because the meter's governor is the
+companion's death and rung 2 kills companions three times as often (0.20 a trash fight against
+0.06). <b>The governor is working; it is the talent tree that outruns it.</b></p>
+
+<p><b>&sect;1d &mdash; HOW MUCH OF HIS DAMAGE IS ABOVE NOMINAL, DAMAGE-WEIGHTED AT THE SITE THE
+DAMAGE LANDS.</b> Companion blows carrying the strike multiplier: <b>4.4% untalented, 18.5% with
+rows 1&ndash;3, 45.0% fully talented</b>. The linear spender that could be measured cleanly &mdash;
+<b>Primal Surge &mdash; reads 26.1% with rows 1&ndash;3 and 74.3% fully talented</b>. <b>And the
+brief has the largest payout the wrong way round:</b> Unleash pays <b>1.8&times;</b> what one Primal
+Surge blow pays, but Primal Surge fires four times as often and delivers <b>2.4&times; Unleash's
+total</b> (4.3&times; fully talented), because it spends every companion's meter and Unleash spends
+one.</p>
+
+<p><b>&sect;1e &mdash; THE GAME ALREADY FLATTENS THIS METER IN THREE PLACES, AND THE MEASUREMENTS
+SAY WHERE.</b> <b>Bring It Down's hard cap of 20 points binds on 41.5% &plusmn;3.6 of casts with
+rows 1&ndash;3 and 94.1% fully talented</b> (mean paid 15.99 of a possible 19.32, and 20.00 of a
+possible 50.59). <code>BOND_MITIGATION_MAX</code> 0.75 and Savage Presence's taunt-pull clamp of
+1.0 <b>never bind below rows 9 (0.0&ndash;1.1%) and bind on 26.8% and 49.1% of rolls at rows 9</b>
+&mdash; at the top of the tree the bear's taunt is a certainty on half its rolls. <b>Flattening
+above nominal is not a new idea in this system; it is the third instance of one.</b></p>
+
+<p><b>&sect;2 &mdash; SIX CURVES, PRICED, NONE TAKEN.</b> Every shape is evaluated as a
+counterfactual over the measured histogram, so the designer reads a loss rather than a proposal.
+With rows 1&ndash;3 at rung 2: <b>diminishing returns at half rate above 5</b> costs the strike
+step 4.9% and a linear spender 19.5%; <b>a soft cap asymptotic at 10</b> costs 5.5% / 22.1%;
+<b>a hard cap at twice nominal</b> costs 2.8% / 11.3%; <b>a hard cap at nominal</b> costs 9.7% /
+39.0%. Fully talented every one of those roughly triples. <b>What Unleash pays after</b>, priced on
+the same distribution: <b>203% of Attack today &rarr; 149% (diminishing), 137% (soft cap), 162%
+(hard cap at 10), 95% (hard cap at 5)</b>. <b>A FIFTH SHAPE IS NOT IN THE BRIEF AND IS THE GAME'S
+OWN ANSWER TO THIS EXACT PROBLEM ON THE SIBLING METER:</b> Focus is uncapped and over-arrives too,
+and its governor is neither a cap nor a taper &mdash; it is a <b>CONVERSION</b>, where the first
+100 points buy crit CHANCE and everything past buys crit MULTIPLIER at the same rate. <b>Nothing
+is lost and the meter changes KIND at its nominal.</b> Costed in the report beside the other
+four.</p>
+
+<p><b>&sect;3 &mdash; THE TURNING PACK: ITS FIRST CLAUSE IS WORTH NOTHING TO A
+Beastmaster WHO OWNS QUICK WHISTLE.</b> <code>SWAP_COOLDOWN</code> is 3, the node shaves 3, and the read site is
+<code>maxi(3 - quick_whistle_ranks - rune_quick_whistle_ranks, 0)</code> &mdash; so with the node
+held the floor is already reached and the rune's +1 pays <b>zero</b>. <b>Quick Whistle is pack row
+1, inside the three rows a single rung-1 clear opens.</b> Wild Rotation skips the block outright.
+Measured in the sim's devotion build (no Quick Whistle) the extra turn bites on 100% of swaps
+&mdash; and <b>swaps fall from 0.38 a trash fight untalented to 0.21 with rows 1&ndash;3 to 0.02
+fully talented</b>, because a deep bond is expensive to give up and Lone Bond forbids it. Its
+second clause is additive and always pays, but <b>Feral Momentum's own term reads a mean of 1.235
+different companions on the ledger at a blow &mdash; 79.1% of blows have exactly one</b> &mdash; so
++8% per kind is worth about <b>+9.9%</b>, not +24%.</p>
+
+<p><b>&sect;3b &mdash; AND THE CONCENTRATION FACT THE RE-AUTHOR IS AIMED AT IS WRONG IN BOTH
+READINGS.</b> &ldquo;His boss pool is the only one in the game with no damaging card&rdquo;: on the
+FIELD reading <b>three pools carry no <code>damage</code> field, not one</b> &mdash; Beastmaster 5,
+Holy 3 and the Devout 2, all <code>special</code>, all zero damage and zero pressure. On the
+BEHAVIOUR reading <b>his pool does not qualify at all</b>: Primal Surge is the game's biggest
+Loyalty payout by volume and Call of the Wild strikes with every absent companion. And <b>&ldquo;Tempo is
+the axis his kit is thinnest on&rdquo; holds only inside his own kit</b>: he carries 1 TEMPO card of
+10, which is <b>joint-best-but-one in the game</b> &mdash; eight of the twelve specs carry zero, and
+only the Swordmaster's three beat him.</p>
+
+<p><b>&sect;4 &mdash; THE SHARED WILD'S EVENT IS REAL AND ITS SIZE IS NOW MEASURED.</b> Companion
+deaths a fight, rung 2: <b>0.22 trash / 0.48 boss untalented, 0.20 / 0.35 with rows 1&ndash;3, 0.05
+/ 0.08 fully talented</b> &mdash; and <b>0.06 / 0.13 at rung 1</b>, so the event the rune acts on is
+three times commoner at rung 2 than at rung 1 and nearly vanishes at the top of the tree. Its
+health clause is read once, at the summon, and is purely additive, so unlike the Turning Pack's it
+can never be worth nothing. Options are presented and <b>nothing is authored</b>, with the cost EP
+named priced beside them: re-authoring the only splash of the three as one idea makes it a lane
+rune wearing a splash's name.</p>
+
+<p><b>&sect;5 &mdash; THE DEEP BOND IS NOT RE-AUTHORED</b>, as the brief directs: its axis is DEPTH
+and depth is measured against a curve nobody has chosen. <b>What the measurement adds to that
+ruling is that DEPTH and the flattening are the same decision</b> &mdash; both of its clauses are
+payout readers, so whatever &sect;2 does to the curve is done to this rune twice over.</p>
+
+<p><b>&sect;6 &mdash; FOUR CORRECTIONS TO THE RECORD, THREE OF THEM IN INSTRUMENTS.</b>
+(1) <b><code>master.html</code> has carried a rule Batch BB reverted.</b> BB corrected both in-game
+swap tooltips and The Pack's talent text from &ldquo;replaces the OLDER of the two&rdquo; to the
+Loyalty rule and <code>test_batch_bb</code> pins that over <code>battle.gd</code> &mdash; but the
+document was never swept and has said OLDER ever since, <b>contradicting its own capstone row 330
+lines below</b>. Corrected toward the code here, with the shared cooldown (the document said 2,
+<code>SWAP_COOLDOWN</code> is 3).
+(2) <b>The same wrong 2 is still in the game's own text</b>, at the swap card's description and the
+group-button tooltip. <b>Reported, not fixed</b> &mdash; it is a source edit this brief did not ask
+for.
+(3) <b>The run report's shop confounder is a vacuous reading printed like a real one.</b> It reads
+<code>type_taken.get(&quot;shop&quot;)</code> where the node type is <code>&quot;merchant&quot;</code>,
+so &ldquo;it takes 0.0 of 0.0 shops offered per run&rdquo; is structurally zero &mdash; while the
+same report prints <b>4.57 merchants walked, 6.98 runes bought and 3.44 runes acquired per hero per
+run</b> four blocks lower. <b>Its prose is reversed too:</b> it claims every route policy &ldquo;puts
+combat first&rdquo; and <code>ROUTE_ORDER</code> puts <code>fight</code> LAST in all three.
+<b><code>docs/reports/EP.md</code> quoted the false zero into its own table of what the bot cannot
+do.</b>
+(4) <b>One Loyalty read site can never fire.</b> <code>devoted_fury</code> stretches Bestial Wrath
+by a turn per stack and <b>nothing writes it</b> &mdash; Batch DO re-authored its node onto Kill
+Command and <code>test_batch_ay</code> asserts the counter absent. A read-only-zero field with a
+live read site, in the family <code>icy_resolve_ranks</code> is already recorded in.</p>
+
+<p><b>WHAT MOVED:</b> <code>docs/master.html</code> (the two corrections above and the stamp),
+<code>docs/changelog.html</code>, <code>docs/state.md</code> rewritten,
+<code>docs/reports/EQ.md</code>. <b>Not one <code>.gd</code>, <code>.json</code> or
+<code>.sh</code> byte, no gate, no baseline row and no <code>CLAUDE.md</code> rule</b> &mdash; a
+gate encodes a ruling and nothing here is ruled.</p>
+
 <h2>2026-09-02 &mdash; Batch EP: THE SECOND RUNG IS THE SAME FIGHT, TWICE AS HARD</h2>
 <p><i>A measurement batch. <b>Nothing was retuned, nothing was authored and nothing was ruled.</b>
 Rung 2 does not scale enemy HEALTH at all any more &mdash; Batch EO's floor made rung 1's health

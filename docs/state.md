@@ -5,127 +5,141 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-02 (Batch EP).*
+*Last rewritten: 2026-09-02 (Batch EQ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EP — THE SECOND RUNG IS THE SAME FIGHT, TWICE AS HARD.** A measurement batch:
-  **nothing was retuned, nothing was authored and nothing was ruled.** Full working:
-  **`docs/reports/EP.md`**.
-- **§1 — RUNG 2 IS CARRIED BY ATTACK AND ALMOST NOTHING ELSE, AND HEALTH IS NOT A LEVER BETWEEN
-  THESE TWO RUNGS AT ALL.** Both spawn multipliers, both rungs, all three zones: the **HEALTH row
-  is bit-identical on 3 of 3 products** and the **ATTACK row doubles on 3 of 3**. `maxf(mult, 1.0)`
-  returns rung 1's ×0.50 and rung 2's ×1.00 as the same 1.00 — **EO floored the rung out of the
-  health path to stop rung 1 being short, and the same floor makes rung 2's enemies exactly as
-  durable as rung 1's.**
-  - **THE FULL CONFIG DIFF: 1 of 21 enemy kinds differs** (the end boss gains Sundering Decree),
-    and **48 of 48 rung-1 abilities are field-for-field identical at rung 2** — delay, pressure,
-    `applies_status`, `status_chance`, cooldown, damage, heal, aoe, multi-hits. Enemy `stability`
-    reads a flat **100 on all 21 kinds**. **Encounter counts, elite and boss composition, gold and
-    loot read no rung at all**, re-derived by grepping every caller of `difficulty_*`.
-  - **SO THE FIGHTS ARE THE SAME LENGTH AND THE MEASUREMENT SAYS SO:** rounds to resolution
-    **7.8 at rung 1 against 7.4 at rung 2** on the same loadout. **The rung-2 fight is not longer,
-    not shorter and not different — the enemy just hits twice as hard while it happens.**
-  - **THE THIRD LEVER IS THE SEVERITY FLOOR (2 → 3) AND IT INVERTS AT RUNG 3.** Measured over
-    **400 offers a rung**, mean severity offered is **2.83 / 3.29 / 2.31**. At rung 3 the floor of
-    4 leaves the gamble pool EMPTY, both gambles fall through `roll_offer`'s guard clause and all
-    three options are drawn from the whole twenty — **rung 3's bargains come out MILDER than rung
-    1's.** The source comment said the high pool *"holds seven and needs to supply two, so this is
-    a guard, not a path"*; it holds **8 / 4 / 0**, and at rung 3 the guard IS the path. **The
-    comment is corrected. Nothing else was touched and rung 3 is ruled on nowhere** — see the open
-    queue below.
-- **§1b — THE BRIEF'S HEADLINE FIGURE WAS WRONG. RUNG 2 WITH ROWS 1–3 READS 22%, NOT 7%.** EO's 7%
-  was 2 of 30 and the harness prints a ±12-point band at that n in its own header. **Four arms at
-  `--run 100`, `DOD_SIM_ROUTE=balanced`, the standard four specs:**
+- **Last batch: EQ — THE LOYALTY METER, MEASURED BEFORE A CURVE IS CHOSEN.** A measurement batch:
+  **nothing was flattened, nothing was authored, nothing was retuned and no rune was changed.**
+  Full working: **`docs/reports/EQ.md`**. **Not one `.gd`, `.json` or `.sh` byte moved** — every
+  reading was taken on an out-of-repo instrumented copy of the tree.
+- **§1 — THE METER HAS 42 DIRECT SITES IN THE SHIPPED GAME AND THEY FALL INTO THREE CLASSES.**
+  Swept comment-stripped over all 119 `.gd` files: **42 `.loyalty` sites — 33 reads and 9 WRITES**
+  — plus **eleven derived readers with 37 call sites** between them.
+  - **A PAYOUT READER multiplies by the curve** (9 sites: `_bond_step`, `_bond_mult`,
+    `_comp_dmg_mult`'s strike step, `_ghost_hit`'s, Canis's wounded bonus, Ursus's mitigation,
+    Aguila's crit, the taunt pull, and the chip's own text, which is display).
+  - **A STACK-COUNT READER is linear in the raw meter and never touches the curve** — **Unleash,
+    Primal Surge, Last Howl, Bring It Down, Kill Command's Bleed, Aguila's armour pierce, Ursus's
+    health gift and Succession's half-carry.**
+  - **A THRESHOLD READER only asks whether the meter has passed a number** — Kindred at **8**, the
+    two spender doors at 1, the bot's Primal Surge gate at 4 — and **three sites WRITE a floor**:
+    Lone Bond 6, None Left Behind 5, Wild Rotation's cap of 3.
+  - **SO FLATTENING THE PAYOUT AND FLATTENING THE ACCRUAL ARE TWO DIFFERENT CHANGES WITH TWO
+    DIFFERENT BLAST RADII, AND THE BRIEF'S FOUR SHAPES ARE ALL ONE OF THE TWO.** A payout
+    flattening reaches 9 sites and no threshold; **Unleash, Primal Surge, Last Howl and Bring It
+    Down pay exactly what they pay today.** An accrual flattening reaches all three classes, and
+    **any cap below 8 makes Kindred — a row-8 talent node — unreachable.**
+- **§1b — THERE IS NO CLIFF AT FIVE. THE BRIEF'S PREMISE DOES NOT SURVIVE THE CODE.** Batch AY §2
+  deleted the doubling STEP and replaced it with a continuous curve: `_bond_mult` is
+  `1 + step × Loyalty` and reads ×2 at five only because `BOND_STEP` is 0.20. **The constant's own
+  header, `master.html` (*"a CURVE, not a threshold"*) and the glossary (*"it never plateaus"*) all
+  say so.** The only 5 in the system is **None Left Behind seating an arriving companion there**;
+  the nominal 5 the report prints is a literal in `battle.CY_METERS`, and it is the only one of
+  that table's four denominators that is not a live constant.
+- **§1c — THE CARRIED 21.2 IS A FULLY-TALENTED FIGURE AND THE FIRST-CLEAR PLAYER READS 10.1.**
+  Seven arms, `--run 100` (one at 60), `DOD_SIM_ROUTE=balanced`, the standard four specs, live.
+  Per-battle deepest single bond over every battle a Beastmaster stood in:
 
-  | arm | rung | rows | completion | 95% band | fights | wipes | loss per fight |
-  |---|---|---|---|---|---|---|---|
-  | B | 1 | 3 | **95%** | ±4.3 | 2681 | 5 | **0.19%** |
-  | A | 2 | 3 | **22%** | ±8.1 | 1994 | 78 | **3.91%** |
-  | C | 2 | 0 | **3%** | ±3.3 | 1412 | 97 | **6.87%** |
-  | D | 2 | 9 | **90%** | ±5.9 | 2693 | 10 | **0.37%** |
+  | arm | rung | rows | mean peak | median | >5 | >10 | >20 | deepest | n |
+  |---|---|---|---|---|---|---|---|---|---|
+  | C | 2 | 0 | **6.61 ±0.09** | 6 | 59.7% | 12.2% | 0.2% | 27 | 1298 |
+  | A | 2 | 1–3 | **10.13 ±0.11** | 10 | 82.3% | 43.8% | 3.4% | 34 | 1980 |
+  | D | 2 | 1–9 | **18.45 ±0.17** | 18 | 99.7% | 75.3% | 37.7% | **60** | 2600 |
+  | B | 1 | 1–3 | **11.26 ±0.10** | 11 | 86.7% | 53.1% | 5.4% | 34 | 2674 |
 
-  **The like-for-like pair is 95% → 22% — 73 points at 15.6 standard errors.** The brief's
-  73%-against-7% compared an untalented party at rung 1 with a talented one at rung 2.
-- **§1c — IT IS ATTRITION, NOT A WALL, AND NOT A BOSS.** Of arm A's 78 wipes, **only 14 (18%)
-  happen at a node the route cannot duck** (mini-boss slot 8, zone boss slot 16, end boss 17) and
-  **56 (72%) at ordinary fights in slots 10–15**, spread across six slots rather than piled on
-  one. **No single fight is a wall** — the worst printed per-fight win rate is 88% — and the run
-  ends because a party takes about twenty-six fights at a loss rate twenty-one times rung 1's.
-  Deaths per fight, same loadout: z2 t10 **0.10 → 1.03**, z3 t8 **0.38 → 1.56**.
-  - **AND THE HARNESS'S OWN WIPE TABLE WOULD HAVE GIVEN THE OPPOSITE ANSWER.** `run_sim.gd` bands
-    `tier >= 11` as **"boss"** and its per-tier table loops `for ft in range(1, 12)` labelling
-    `ft == 11` as the boss — but **a zone has held SIXTEEN slots since BATCH BK**. So the band is
-    six slots (reading **57** for arm A where the true zone-boss count is **7**) and the per-tier
-    table **silently drops slots 12–16**, which is where most wipes happen; its printed win rates
-    are optimistic by construction. `_finish_run`'s comment still says the ladder is *"(zone-1)\*11
-    + tier, so a full clear is 33"* while the code reads `SLOTS_PER_ZONE` and the header prints
-    **of 49**. **The true distribution came from the per-run progress line (`wiped z%d t%d`), which
-    carries the exact slot and needed no instrument change. NOTHING WAS FIXED** — it is named as
-    the next instrument, the way EO named the missing Break telemetry.
-- **§1d — ROWS 1–3 ARE WORTH NINETEEN POINTS AND A SEVENFOLD MULTIPLE** (3% → 22% at rung 2, 4.2
-  standard errors). The brief's own test was two points. **AND THE ARM IS EXACTLY THE FIRST-CLEAR
-  PLAYER RATHER THAN AN APPROXIMATION OF ONE:** `Profile.award_zone_boss_points` pays 1 point per
-  ZONE boss and the end boss pays none, so clearing rung 1 banks exactly **3 points**; rows 1–3
-  hold **9 cells at `TIER_COSTS[0]` = 1 point each**; `DOD_SIM_ROWS=3` equips exactly **3 nodes**.
-  **22% IS A FLOOR, NOT AN ESTIMATE** — a player who took three attempts banks nine points and can
-  fill all nine cells, and `DOD_SIM_ROWS` fills one lane's rows so a three-lane loadout cannot be
-  expressed by this harness.
-- **§2 — FIVE OPTIONS, COSTED, NONE TAKEN, AND `DIFFICULTIES["wanderer"]["mult"]` IS STILL ×0.50
-  AND STILL UNPLAYED.** Tune the damage scale (one number, teaches nothing new); make the Break
-  gate rung-aware (small, same shape as `zone_base_mult_hp` — **and the measured risk is that
-  pressure is unevenly distributed: 76 of 227 abilities carry any, the Sharpshooter's draft pool
-  holds 6 pressure-bearing cards and the DEVOUT'S HOLDS NONE** (`SPEC_INFO["inquisitor"]` displays
-  as **Devout**, and `mystic` as **Survivalist**; EP §2 printed both by id), so a Break gate
-  becomes a spec gate — **RULED AFTER EP: rejected**, and now a `CLAUDE.md` standing rule); rung-tagged abilities (**zero code** — `Enemies.config` already filters on `rung` and
-  defaults untagged to 1 — and the only option that changes the QUESTION); a rung-aware encounter
-  shape (respecting BK §5's boss-band collision and `compose`'s elite floor of 6); or making the
-  severity twist that exists actually work. **The question in front of the designer is not how much
-  harder rung 2 should be. It is what rung 2 should ASK that rung 1 does not.**
-- **§3 — THE 22% IS A BOT FLOOR.** Eleven decisions its policies exclude, each read off the code:
-  a fixed per-spec rotation identical on turn 1 and turn 30 (`battle.gd:4367`); drafted cards taken
-  as **the first usable one in slot order**, and only once the rotation has fallen through to the
-  basic attack (`:4042`); **one** in-battle item behaviour — a Health Potion below 35% HP, the
-  branch reads `items["health"]` and nothing else (`:3581`) — and no pre-emptive or offensive use;
-  routing one tier ahead (`run_sim.gd:376`); shop rune picks ignoring build synergy (`:507`);
-  severity-extreme bargains that never read what the modifier does (`:393`); first-in-pool ability
-  picks; first-valid events; one talent lane of the thirty-six (`:972`); and a timing bar rolled at
-  20% Perfect with **no mitigation taken at all** on defence.
-- **§4 — THE FOUR RUNE ITEMS ARE RE-PRESENTED IN `docs/reports/EP.md`, AND TWO FACTS ARE NEW.**
-  The floors are re-derived through `Runes.eligible_ids` rather than quoted and **reproduce EO
-  exactly: 65 authored, 12 retired, 53 offerable; drawable 9 (Occultist), spec-scoped 2
-  (Cryomancer), rare shelf 5 (Occultist), against 3 slots.**
-  - **EVERY TALENT NODE THE THREE BEASTMASTER RUNES MIRROR SITS IN ROWS 1–3** — Wild Communion
-    (devotion, row 1), Absolute Devotion (devotion, row 3), Quick Whistle (pack, row 1), Feral
-    Momentum (pack, row 2), The Wild Within (handler, row 2). **A 100g rare buys between an eighth
-    and a third of a node a single rung-1 clear already opens** (21% / 20% / 33% / 32% / 12.5%).
-  - **THE BARED GUARD'S COST IS 80% REFUNDABLE BY ONE ROW-1 TALENT NODE.** Its −0.15 exactly
-    cancels Defensive Stance's 0.85 mitigation (→ **1.00 on the nose**, so the card's wording is
-    literally true), and `sm_def_stance` — Poise, **row 1** — writes +0.12 back into the same
-    subtraction. **The refund is inside what a single rung-1 clear opens.**
-  - **AND ONE CORRECTION TO EO, MEASURED.** Retiring it would NOT leave the Swordmaster *"the only
-    spec in the game with no Scarred rune"*. There are **17 Scarred runes — 2 universal, 3
-    class-scoped (there is no `class:warrior` one) and exactly 1 per spec** — so the three WARRIOR
-    specs draw **3** where the other nine draw **4**, and retiring the Bared Guard leaves him **2**
-    (`glass` and `vampiric`). **He would be the only spec with no SPEC-SCOPED Scarred rune and
-    would hold the thinnest shelf in the game.** The set-shape argument stands and is sharper than
-    EO put it; the loss is smaller than EO priced it.
-- **WHAT MOVED: ONE COMMENT.** `scripts/run_state.gd`'s guard-clause comment. **A comment-stripped
-  diff of that file reads 1429 code lines before and after with ZERO differences**, and the
-  stripper was armed on a swallowed code line and bit. `docs/master.html` gains the rung-2 health
-  note and this batch's measurements; this file is rewritten; `docs/reports/EP.md` is the working.
-  **Batch EO's changelog entry is left exactly as it stands** — its 7% is the honest record of what
-  n=30 read, and superseding it rather than editing it is what a changelog is for.
-- **Next letter: EQ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+  **DA's 21.2 was taken at `rows=9`; live at that loadout it is 18.45.** **AND THE RUNG MAKES THE
+  METER SHALLOWER, NOT DEEPER** — rung 1 reads 11.26 against rung 2's 10.13 on the same rows,
+  because the meter's governor is the companion's DEATH and rung 2 kills companions three times as
+  often (0.20 a trash fight against 0.06). **The governor is working; the talent tree is what
+  outruns it.**
+- **§1d — THE SHARE OF HIS DAMAGE ABOVE NOMINAL, DAMAGE-WEIGHTED AT THE SITE THE DAMAGE LANDS.**
+  Companion blows carrying the strike multiplier: **4.4% untalented, 18.5% with rows 1–3, 45.0%
+  fully talented.** Primal Surge, the linear spender that could be measured cleanly: **26.1% with
+  rows 1–3 and 74.3% fully talented.** **AND THE BRIEF HAS THE LARGEST PAYOUT THE WRONG WAY
+  ROUND** — Unleash pays **1.8×** what one Primal Surge blow pays, and Primal Surge pays
+  **2.4× Unleash's total** (4.3× fully talented) because it fires four times as often and spends
+  every companion's meter.
+- **§1e — THE GAME ALREADY FLATTENS THIS METER IN THREE PLACES AND THE MEASUREMENTS SAY WHERE.**
+  **Bring It Down's hard cap of 20 points binds on 41.5% ±3.6 of casts with rows 1–3 and 94.1%
+  fully talented** (paid 15.99 of a possible 19.32, and 20.00 of a possible 50.59).
+  `BOND_MITIGATION_MAX` 0.75 and Savage Presence's taunt-pull clamp of 1.0 **never bind below rows
+  9 (0.0–1.1%) and bind on 26.8% and 49.1% at rows 9** — at the top of the tree the bear's taunt is
+  a certainty on half its rolls. **Flattening above nominal is the third instance of an idea this
+  system already has.**
+- **§2 — SIX SHAPES PRICED AS COUNTERFACTUALS OVER THE MEASURED HISTOGRAM, NONE TAKEN.** With rows
+  1–3 at rung 2: **diminishing at half rate above 5** costs the strike step 4.9% and a linear
+  spender 19.5%; **a soft cap asymptotic at 10** costs 5.5% / 22.1%; **a hard cap at twice nominal**
+  2.8% / 11.3%; **a hard cap AT nominal** 9.7% / 39.0%. **Fully talented every one roughly triples**
+  (29.7% / 68.1% for the hard cap at nominal). **What Unleash pays after: 203% of Attack today →
+  149% / 137% / 162% / 95%** — **and all four stay at 203% if the flattening is applied to the
+  PAYOUT only.** **A FIFTH SHAPE IS NOT IN THE BRIEF AND IS THE GAME'S OWN ANSWER ON THE SIBLING
+  METER**: Focus is uncapped and over-arrives too, and its governor is a **CONVERSION** — the first
+  100 points buy crit CHANCE and everything past buys crit MULTIPLIER at the same rate, so nothing
+  is lost and the meter changes KIND at its nominal. **Its loss column is zero and its cost is
+  naming the second thing Loyalty buys, which is content.**
+- **§3 — HALF THE TURNING PACK IS ALREADY WORTH ZERO, AND THAT IS NEW.** `SWAP_COOLDOWN` is **3**,
+  Quick Whistle shaves **3**, and the read site is `maxi(3 − quick_whistle_ranks −
+  rune_quick_whistle_ranks, 0)` — **so a Beastmaster holding Quick Whistle is already at the floor
+  and the rune's +1 pays nothing.** Quick Whistle is **pack row 1**, inside the three rows a single
+  rung-1 clear opens; Wild Rotation skips the block outright. **And the verb it cheapens falls as
+  the build deepens: swaps go 0.38 a trash fight untalented → 0.21 with rows 1–3 → 0.02 fully
+  talented.** Its second clause is additive and always pays, but **Feral Momentum's own term reads
+  a mean of 1.235 different companions at a blow (79.1% at exactly one)**, so +8% a kind is worth
+  about **+9.9%**, not +24%. **Five options are priced in the report and none is authored.**
+- **§3b — THE CONCENTRATION FACT THE RE-AUTHOR IS AIMED AT IS WRONG IN BOTH READINGS.** *"His boss
+  pool is the only one in the game with no damaging card"*: on the FIELD reading **three pools carry
+  no `damage` field, not one** — Beastmaster 5, Holy 3 and the Devout 2, all `special`, all
+  `damage 0` and `pressure 0`. On the BEHAVIOUR reading **his pool does not qualify at all**, since
+  Primal Surge is his biggest damage payout and Call of the Wild strikes with every absent
+  companion. **And *"Tempo is the axis his kit is thinnest on"* holds only inside his own kit** — he
+  carries 1 TEMPO card of 10, **eight of the twelve specs carry zero**, and only the Swordmaster's
+  three beat him.
+- **§4 — THE SHARED WILD'S EVENT IS REAL AND ITS SIZE IS MEASURED.** Companion deaths a fight at
+  rung 2: **0.22 trash / 0.48 boss untalented, 0.20 / 0.35 with rows 1–3, 0.05 / 0.08 fully
+  talented** — and **0.06 / 0.13 at rung 1**, so the event is three times commoner at rung 2 and
+  nearly vanishes at the top of the tree. Its health clause is read once, at the summon, purely
+  additive, so **unlike the Turning Pack's it can never be worth nothing.** **Four options priced,
+  none authored, with the splash's loss priced beside them.**
+- **§5 — THE DEEP BOND IS NOT RE-AUTHORED**, as the brief directs. **What the measurement adds is
+  that DEPTH and the flattening are the same decision**: both its clauses are PAYOUT readers and
+  they sit on the two steepest terms in the system, one of which Ancient Pact then doubles.
+- **§6 — FOUR CORRECTIONS TO THE RECORD, THREE OF THEM IN INSTRUMENTS.**
+  - **`master.html` HAS CARRIED A RULE BATCH BB REVERTED, AND IT IS CORRECTED HERE.** BB corrected
+    both in-game swap tooltips and The Pack's talent text from *"replaces the OLDER of the two"* to
+    the Loyalty rule, and `test_batch_bb` pins that **over `battle.gd`** — the document was never
+    swept and **contradicted its own capstone row 330 lines below** ever since. Corrected toward the
+    code, together with the shared cooldown: the document said **2 turns**, `SWAP_COOLDOWN` is
+    **3**.
+  - **THE SAME WRONG 2 IS STILL IN THE GAME'S OWN TEXT AND IS REPORTED, NOT FIXED** —
+    `battle.gd:6397` (the swap card's own description, *"Shared cooldown: 2 turns."*) and
+    `battle.gd:5305` (the group-button tooltip). `battle.gd:16296` gets it right. **The card a
+    player reads says 2 and the constant says 3.**
+  - **THE RUN REPORT'S SHOP CONFOUNDER IS A VACUOUS READING THAT PRINTS LIKE A REAL ONE.**
+    `run_sim.gd:1136-1137` read `type_taken.get("shop")` where the node type is `"merchant"`, so
+    *"it takes 0.0 of 0.0 shops offered per run"* is **structurally zero** — while the same report
+    prints **4.57 merchants walked, 6.98 runes bought and 3.44 runes acquired per hero per run**
+    four blocks lower. **Its prose is reversed too**: it claims every route policy *"puts combat
+    first"* and `ROUTE_ORDER` puts `fight` **LAST in all three**. **`docs/reports/EP.md` §3 quoted
+    the false zero into its table of what the bot cannot do.**
+  - **ONE LOYALTY READ SITE CAN NEVER FIRE.** `devoted_fury` stretches Bestial Wrath by a turn per
+    stack and **nothing writes it** — DO re-authored its node onto Kill Command and
+    `test_batch_ay:258` asserts the counter absent. A read-only-zero field with a live read site,
+    in the family `icy_resolve_ranks` is already recorded in.
+- **WHAT MOVED: FOUR DOCUMENTS AND NOTHING ELSE.** `docs/master.html` (the two corrections and the
+  stamp), `docs/changelog.html`, this file, `docs/reports/EQ.md`. **No gate, no baseline row, no
+  `CLAUDE.md` rule** — a gate encodes a ruling and nothing here is ruled.
+- **Next letter: ER.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
   and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
-  layer is design: **the three Beastmaster re-authors, the Bared Guard, and whether the lane rule
-  is replaced with anything.** **And the ladder now has an open design question of its own: what
-  rung 2 should ASK.**
+  layer is design: **the three Beastmaster re-authors and whether the lane rule is replaced with
+  anything** — the Bared Guard is ruled and kept. **And the ladder has an open design question of
+  its own (what rung 2 should ASK), and the Loyalty meter now has one too (what shape the curve
+  takes, and whether it is the payout or the accrual that flattens).**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -316,30 +330,107 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
-### THE FOUR RUNE ITEMS — **RULED BY THE DESIGNER AFTER EP. THREE RE-AUTHORS UNBUILT.**
+### THE LOYALTY CURVE — **MEASURED AT EQ, SIX SHAPES PRICED, NOTHING TAKEN**
 
-**Full evidence: `docs/reports/EP.md` §4.** The floors stand: **65 authored, 12 retired, 53
+**Full evidence: `docs/reports/EQ.md` §1 and §2.** The designer ruled that the payout should
+flatten above nominal. **EQ measured what that costs and what it reaches; the shape is unchosen and
+the batch authored nothing.**
+
+- **THE FIRST DECISION IS NOT THE SHAPE, IT IS WHERE THE FLATTENING GOES.** The meter's 42 sites
+  split three ways (see the WHERE block). **A PAYOUT flattening reaches 9 sites and no threshold**;
+  Unleash, Primal Surge, Last Howl and Bring It Down pay exactly what they pay today, and Kindred
+  still fires at 8. **An ACCRUAL flattening reaches all three classes at once.** **That choice is
+  worth more than the choice of curve.**
+- **THE LOSSES, WITH ROWS 1–3 AT RUNG 2** (strike step / linear spender): diminishing at half rate
+  **4.9% / 19.5%**; soft cap asymptotic at 10 **5.5% / 22.1%**; hard cap at 10 **2.8% / 11.3%**;
+  hard cap at nominal **9.7% / 39.0%**. **Fully talented each roughly triples** (29.7% / 68.1% for
+  the hard cap at nominal). **Untalented every one is under 4% on the strike step.** **The same
+  curve is a trim at the bottom of the tree and an amputation at the top, at about six to one.**
+- **WHAT UNLEASH PAYS AFTER**, on the same distribution at 20% of Attack a stack: **203% today →
+  149% (diminishing) / 137% (soft cap) / 162% (hard cap at 10) / 95% (hard cap at nominal)** — and
+  **all four stay at 203% under a payout-only flattening.**
+- **THE FIFTH SHAPE IS NOT IN THE BRIEF AND IT IS THIS GAME'S OWN ANSWER TO THIS PROBLEM.** Focus is
+  uncapped, over-arrives (128.2 against a nominal 100) and is governed by a **CONVERSION**:
+  `min(Focus, 100) × 0.005` buys crit CHANCE and `max(Focus − 100, 0) × 0.005` buys crit MULTIPLIER
+  — **the rate never changes, the KIND does.** Its loss column is **zero**. **Its cost is naming the
+  second thing Loyalty buys, and that is content this file does not invent.** Deep Focus shows how a
+  node interacts with it: it moves the SPLIT POINT rather than raising a ceiling.
+- **WHAT BREAKS, ENUMERATED FROM THE READ SITES.** **A hard cap below 8 makes Kindred — a row-8
+  node — unreachable**, and **Wild Rotation's cap of 3 already does, which nobody had recorded.** A
+  cap below 6 unseats Lone Bond and below 5 unseats None Left Behind. **At a cap of 10 both existing
+  clamps become unreachable at every talent depth** (Ursus's mitigation reaches 0.30 against 0.75,
+  the taunt pull 0.45 against 1.0), which by AR §4's rule makes them dead constants rather than
+  governors. **Bring It Down's own cap of 20 points = 10 stacks would be doubly bound.**
+- **THE TEXT COST IS NINE SURFACES.** The meter's uncappedness is a stated promise in
+  `battle.STATUS_INFO["loyalty"]`, the computed chip line, `Classes` `passive_desc`,
+  `master.html`'s Beastmaster block, its Loyalty-chip / Unleash / Bring It Down rows, and the
+  glossary's `res_loyalty` and `pack_bond` — **plus Absolute Devotion's and Ancient Pact's node text
+  and the three rune descriptions.** `test_batch_az` pins *"no ceiling"* and *"NO CEILING"* against
+  `master.html` today.
+- **AND THE STANDING DECISION FOUR OF THE SHAPES REVERSE IS WRITTEN DOWN.** `CLAUDE.md`'s
+  uncapped-meter governor table names **exactly one governor that is a CEILING rather than a
+  COST** — Overburn's — *"and that is deliberate: the cost was the fault BS removed."* **Loyalty's
+  governor is the companion's DEATH, and EQ measured it working**: rung 2 kills companions three
+  times as often as rung 1 and its meter runs a stack shallower. **It is the talent tree that
+  outruns the governor, not the ladder.** That is the designer's to take; it is recorded so it is
+  taken knowingly.
+- **THE GOVERNOR TABLE'S OWN LINE NUMBERS FOR THIS METER ARE STALE BY ABOUT TEN THOUSAND LINES.**
+  It cites `_on_beast_death` at *"battle.gd ~10790"* (it is 21730) and the clamp const *"beside
+  BOND_STEP ~7370-7385"* (13290–13345). **The table's content is right and only its addresses have
+  moved.**
+
+### THE FOUR RUNE ITEMS — **RULED AFTER EP, MEASURED AT EQ. THREE RE-AUTHORS UNBUILT.**
+
+**Full evidence: `docs/reports/EP.md` §4 (the presentation) and `docs/reports/EQ.md` §3/§4
+(the measurements and the priced options).** The floors stand: **65 authored, 12 retired, 53
 offerable; drawable 9 (Occultist), spec-scoped 2 (Cryomancer), rare shelf 5 (Occultist), against 3
 rune slots.** **Nothing is authored here — rune content is content and it is the designer's.**
 
-- **RUNE OF THE DEEP BOND — RE-AUTHOR, BUT *NOT* ON DEPTH.** *"Its axis is the one thing
-  measurement says not to lean on: Loyalty already over-arrives at a 21.2 peak against a nominal 5.
-  Depth-scaling pushes the direction that's already too far."*
+- **EQ ADDED THE NUMBERS ALL THREE ARE PRICED AGAINST, AND ONE OF THEM CHANGES A RUNE'S VALUE TO
+  ZERO.** **The Turning Pack's first clause pays nothing to any Beastmaster holding Quick Whistle**
+  — `SWAP_COOLDOWN` is 3, the node shaves 3, and the read site floors at 0 — **and Quick Whistle is
+  pack row 1.** Swaps fall **0.38 → 0.21 → 0.02** a trash fight as the build deepens. **Feral
+  Momentum's own term reads a mean of 1.235 different companions at a blow**, so the +8% clause both
+  the Turning Pack and the Shared Wild carry is worth about **+9.9%**, not +24%. **The Shared Wild's
+  event is real** — 0.20–0.22 companion deaths a trash fight and 0.35–0.48 at a boss with rows 1–3
+  — and **its health clause is the only one of the six that can never be worth nothing.**
+- **AND THE CONCENTRATION FACT THE TURNING PACK'S RE-AUTHOR WAS AIMED AT IS WRONG IN BOTH
+  READINGS** — see the WHERE block. **Three boss pools carry no `damage` field, not one**, and on
+  the behaviour reading his does not qualify at all.
+
+- **RUNE OF THE DEEP BOND — THE DESIGNER RULED AFTER EQ'S BRIEF THAT IT KEEPS DEPTH, AND EQ
+  DID NOT AUTHOR IT.** The earlier ruling was *"its axis is the one thing measurement says not to
+  lean on: Loyalty already over-arrives at a 21.2 peak against a nominal 5"*; **the reasoning that
+  overturned it is that DEPTH is the rune's identity — it is the only one of the three that rewards
+  NOT swapping, which is what makes it the Turning Pack's exact opposite.** **EQ's measurement
+  says the meter is fixed rather than avoided, and that the two are one decision**: both its clauses
+  are PAYOUT readers sitting on the two steepest terms in the system, one of which Ancient Pact then
+  doubles. **21.2 was `rows=9`; live at that loadout it is 18.45 and at rows 1–3 it is 10.13.**
   **AND THE REPLACEMENT AXIS IS NOT NAMED, WHICH IS THE OPEN HALF OF THIS RULING.** EP's argument
   for authoring the pair at all was that **Deep Bond is the only one of the three that rewards NOT
   swapping**, which makes it the exact opposite of the Turning Pack and gives the two a real
   decision between them — and DEPTH was how it expressed that. **Dropping depth without replacing
   the not-swapping identity collapses the pair into one idea**, so the axis that replaces it should
   be chosen with the Turning Pack in view rather than on its own.
-- **RUNE OF THE TURNING PACK — RE-AUTHOR, AND IT IS THE STRONGEST CASE.** *"Tempo is his thinnest
-  axis, and his boss pool is the only one in the game with no damaging card — so a version paying
-  the swap in Break or a damage window answers a concentration finding instead of deepening it."*
-  **The number to price against is 0.35 swaps a trash fight** (measured n=1310 fights, rung 2
-  untalented).
-- **RUNE OF THE SHARED WILD — SAFEST, AND KEPT CLOSEST TO AS-IS.** *"Companion durability is the
-  one Beastmaster number nothing else touches, and 0.22 deaths a trash fight is a real event."*
-  **The honest cost is stated and accepted:** re-authoring a splash as one idea makes it a lane
-  rune wearing a splash's name.
+- **RUNE OF THE TURNING PACK — RE-AUTHOR, AND EQ SHARPENED BOTH HALVES OF THE CASE AND BROKE
+  ONE OF ITS PREMISES.** The ruling was *"tempo is his thinnest axis, and his boss pool is the only
+  one in the game with no damaging card — so a version paying the swap in Break or a damage window
+  answers a concentration finding instead of deepening it."* **The swap figure reproduces (0.38 at
+  the arm it came from) and falls to 0.02 fully talented. The pool claim does not survive: three
+  pools carry no `damage` field and his holds the game's largest Loyalty payout by volume.** And
+  **Tempo is his thinnest axis only inside his own kit** — eight of the twelve specs carry ZERO
+  TEMPO cards against his one. **Five options are priced in `docs/reports/EQ.md` §3 and none is
+  authored**; three of the five keep the opposition to the Deep Bond explicit and **one (paying the
+  swap in Loyalty) collapses the pair from the other direction.**
+- **RUNE OF THE SHARED WILD — SAFEST, KEPT CLOSEST TO AS-IS, AND EQ MEASURED THE EVENT.**
+  *"Companion durability is the one Beastmaster number nothing else touches, and 0.22 deaths a trash
+  fight is a real event."* **0.22 reproduces exactly**; the boss half reads **0.48** where EP put
+  0.39, and the event is **three times commoner at rung 2 than at rung 1** (0.20/0.35 against
+  0.06/0.13 on the same rows) and nearly gone fully talented (0.05/0.08). **Four options are priced
+  in `docs/reports/EQ.md` §4 and none is authored. The honest cost is stated and accepted:**
+  re-authoring a splash as one idea makes it a lane rune wearing a splash's name — **and the sim's
+  own rune policy makes that concrete, since `_pick_rune_candidate` prefers a candidate whose `lane`
+  matches the build's target lane, so a splash is already the last thing the bot reaches for.**
 - **RUNE OF THE BARED GUARD — KEPT, AND THE 80% REFUND IS ACCEPTED.** This one settles with no
   implementation, so **it is a `CLAUDE.md` standing rule** rather than a queue item: paying a point
   and a lane to soften a Scarred rune is a decision, which is what a Scarred rune is for.
@@ -1003,6 +1094,40 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried from the code, reported and deliberately not fixed
 
+- **THE SWAP CARD A PLAYER READS SAYS THE COOLDOWN IS 2 AND `SWAP_COOLDOWN` IS 3 (EQ §6).** Two
+  authored strings: `battle.gd:6397`, the swap picker card's own `description` (*"Shared cooldown:
+  2 turns."*), and `battle.gd:5305`, the group-button tooltip (*"shared 2-turn cooldown"*). A source
+  comment at `:5296` repeats it and one at `:16296` gets it right. **`docs/master.html` carried the
+  same 2 and is corrected toward the code at EQ; the two in-game strings are not, because that is a
+  source edit EQ's brief did not ask for.** Both replacements are the same width, so the 44-character
+  ceiling is not in the way. **It lands on the mechanism the Rune of the Turning Pack is priced
+  against.**
+- **THE RUN REPORT'S SHOP CONFOUNDER IS A VACUOUS READING THAT PRINTS LIKE A REAL ONE (EQ §6).**
+  `run_sim.gd:1136-1137` read `type_taken.get("shop")` / `type_offered.get("shop")` where the node
+  type is `"merchant"` — the key is never written, so *"it takes 0.0 of 0.0 shops offered per run"*
+  is **structurally zero**. The same report prints **4.57 merchants walked, 6.98 runes bought and
+  3.44 runes acquired per hero per run** four blocks lower, off the correct key. **Its prose is
+  reversed as well**: it claims every route policy *"puts combat first"* and `ROUTE_ORDER` puts
+  `fight` **LAST in all three**, with `blacksmith` and `merchant` first and second in two of them —
+  which the comment twenty lines above says itself (*"balanced: trade nodes first"*). **This is the
+  wrong-key shape recorded below arriving through a REPORT rather than through a check, and
+  `docs/reports/EP.md` §3 quoted the false zero into its own table of what the bot cannot do.**
+  **Repairing it is a small instrument batch; EQ did not, because fixing an instrument mid-batch
+  describes an instrument that produced none of the batch's numbers.**
+- **`devoted_fury` IS A READ-ONLY-ZERO FIELD WITH A LIVE READ SITE (EQ §6).** It stretches Bestial
+  Wrath by a turn per Loyalty stack at `battle.gd:18858` and **nothing writes it** — Batch DO
+  re-authored `bm_devoted_fury` onto Kill Command's cost and cooldown, and `test_batch_ay:258`
+  asserts the counter absent. **Same family as `icy_resolve_ranks` below.** Deleting a read site is
+  a mechanic deletion and is not proposed.
+- **`STATUS_INFO["bloodbond"]`'s REGISTRY TEXT SAYS *HALF* WHERE THE CARD, THE DOCUMENT AND THE
+  CODE ALL SAY A QUARTER (EQ §6).** The cast at `battle.gd:20189` passes its own computed
+  description (`bb_pct = 25`), so the registry string has no live consumer today. **It is a trap
+  rather than a defect**: the next batch that adds a second `add_status("bloodbond", …)` without a
+  custom description ships the wrong number.
+- **`CLAUDE.md`'s UNCAPPED-METER GOVERNOR TABLE HAS STALE ADDRESSES FOR LOYALTY.** It cites
+  `_on_beast_death` at *"battle.gd ~10790"* (it is 21730) and the clamp const *"beside BOND_STEP
+  ~7370-7385"* (13290–13345). **Its content is right; only the line numbers moved.**
+
 - **`test_batch_bk`'s BASELINE ROW WAS WIDENED AT EJ, 129-130 -> 128-130, WHICH IS WHAT ITS OWN
   NOTE SAID TO DO.** EJ's battery read **128 checks / 0 failures** there. **It is not a regression
   and it is proved twice rather than argued:** EJ changed four files, all under `docs/`, and that
@@ -1444,10 +1569,16 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   | Berserker | Blood Frenzy (of 40) | 17.1 | **20.7** | 22.6 | 26.2 |
   | Devout | Faith (of 3) | 2.2 | **2.2** | 2.0 | 2.3 |
   | Devout | releases/battle | 1.93 | **2.60** | 2.48 | 3.62 |
-  | Beastmaster | Loyalty (of 5) | 19.3 | 21.2 | 19.9 | — |
+  | Beastmaster | Loyalty (of 5) | 19.3 | 21.2 | 19.9 | — |   *(DA's, and see EQ below)*
   | Sharpshooter | Focus (of 100) | — | — | — | 128.2 |
 
   **Loyalty and Focus still over-arrive and have not been touched.**
+  - **THE LOYALTY ROW IS RE-MEASURED AT EQ AND THE 21.2 IS A `rows=9` FIGURE.** Live, per-battle
+    deepest single bond over every battle a Beastmaster stood in: **rung 2 untalented 6.61 ±0.09
+    (n=1298), rung 2 with rows 1–3 10.13 ±0.11 (n=1980), rung 2 fully talented 18.45 ±0.17
+    (n=2600), rung 1 with rows 1–3 11.26 ±0.10 (n=2674).** **The rung makes the meter SHALLOWER**,
+    because its governor is the companion's death and rung 2 kills companions three times as often.
+    **Do not quote 21.2 as the meter's level — quote the loadout with it.**
 - **THE FAITH DECOMPOSITION AT RUNG 2, AFTER DA — AND STALE SINCE DK for the healing row:** absorbs **3.90**, ground drip **8.01**, total
   **12.27** a battle, of which **2.21** lands on the Devout's own held meter. **Faith per absorb
   ACTUALLY LANDED is 1.56 against the 2 the constant promises.** Ground up on **49% of hero turns**
@@ -1461,7 +1592,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **36 entries** (DG → EP), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
+  **37 entries** (DG → EQ), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
   STALE AGAIN AT EO, WHICH LEFT IT READING 34 WITH THE FILE AT 35** — the same fault the sentence
   below already records, for the third time. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
@@ -1496,8 +1627,8 @@ re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
 - **188 files, 8.4960 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
-  `docs/reports/EP.md` INCLUDED, which is the convention since EG. **EP added ONE file**
-  (`docs/reports/EP.md`) and deleted none. **Re-derive with `claude_md_census.py` rather than
+  `docs/reports/EQ.md` INCLUDED, which is the convention since EG. **EQ added ONE file**
+  (`docs/reports/EQ.md`) and deleted none; the 188/8.4960 figure is EP's and is one file stale. **Re-derive with `claude_md_census.py` rather than
   quoting this**; the census reads `git ls-files`, so a new file is outside the number until it is
   staged, and EP's figure is measured with it staged.
 - Heaviest, **re-measured at EP**: `scripts/battle.gd` **1233.25**, `docs/design-notes.md`
@@ -1641,106 +1772,76 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EP, FROZEN, AND IT CERTIFIED ON PASS ONE.** **204 files were MD5-stamped with
+**ONE BATTERY AT EQ, FROZEN, AND IT CERTIFIED ON PASS ONE.** **206 files were MD5-stamped with
 ABSOLUTE paths before it and re-compared after with the same absolute paths: it drifted ZERO** —
 the tree the battery read is byte-for-byte the tree that ships. **`.ran` holds 87 names with no
-duplicate**, every name has a log and every log a name.
+duplicate**, every name has a log and every log a name, compared both ways.
 
-| | EK's acceptance | EL's acceptance | EM's acceptance | **EP's acceptance** |
+| | EL's acceptance | EM's acceptance | EP's acceptance | **EQ's acceptance** |
 |---|---|---|---|---|
 | **suite failures** | 0 | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | 0 | **0** |
-| `check_de` | 350 / 0 / 0 | 354 / 0 / 1 → 0 | 358 / 0 / 0 | **358 / 0 / 0** |
+| `check_de` | 354 / 0 / 1 → 0 | 358 / 0 / 0 | 358 / 0 / 0 | **358 / 0 / 0** |
 | run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
-| targets in the manifest | 85 | 86 | 87 | **87** |
+| targets in the manifest | 86 | 87 | 87 | **87** |
 
-**EP MOVED NOT ONE BASELINE ROW AND SAID SO BEFORE THE RUN.** It changes no executable byte and
-adds no gate, so `check_parse` reads its recorded **161** (RESIDUE **4** — the five measurement
-probes were moved out of the tree before the run and the residue walk proves it) and no second row
-was owed. **`check_de` read 358 / 0 / 0 — zero NOTICES as well as zero errors, so nothing rose
-either.** Total **41,420 checks, 0 throws, 0 `Parse Error` across all 87 logs**, grepped from the
-log files rather than read off a tally or an exit code.
+**EQ MOVED NOT ONE BASELINE ROW AND SAID SO BEFORE THE RUN.** It changes no executable byte and
+adds no gate, so `check_parse` reads its recorded **161** (RESIDUE **4** — `check_ck_width`,
+`check_cu`, `check_cv`, `check_dn`, the four long-standing ones) and no second row was owed.
+Total **41,420 checks, 0 throws, 0 `Parse Error` and 0 `SCRIPT ERROR` across all 87 logs**, grepped
+from the log files rather than read off a tally or an exit code. **`check_de` read 358 / 0 / 0 —
+zero NOTICES as well as zero errors**, and its own §2 reports **7 recorded with no readable check
+count and 2 with no readable failure count, 0 lost and 0 gained on both.**
 
-**THE PRE-CHECK POPULATION WAS DERIVED BY GREPPING THE PATH:** `master.html` **25** readers,
-`changelog.html` **16**, `scripts/run_state.gd` **19** — **36 deduped, all run before the battery,
-0 red.** **`docs/state.md` and `docs/reports/` are read by ZERO targets**, which is what makes this
-file and the batch report safe to write after the run.
-- **AND "BLANK" HAD TO BE SEPARATED FROM "DID NOT RUN" AGAIN.** `check_map` and `check_flow` print
-  no check-count line, so the battery reads `?` for both. Confirmed by reading their logs.
-- **ONE PRE-CHECK RED WAS THE HARNESS'S OWN SCAR REPRODUCING ITSELF.** `test_batch_bl` read
-  **88 / 4** in a hand-rolled pre-check runner and **88 / 0** in the battery: the runner omitted
-  `EXTRA[test_batch_bl]="--fixed-fps 12"`, which `run_battery.sh` carries precisely because that
-  suite under-runs without it. **A PRE-CHECK THAT DOES NOT REPRODUCE THE BATTERY'S PER-TARGET
-  FLAGS MANUFACTURES ITS OWN REDS.**
-- **FOUR NEGATIVE CONTROLS, ALL FOUR BIT** — the comment-stripped diff (armed on a swallowed code
-  line: **10 diff lines** against 0), the retired-word strip (armed on `master.html`, the needle
-  `bx` §4b reads), the literal sweep (**LOST=1** against 0), and the wipe extractor two-armed.
-  **CONTROL 3 HAD TO BE RE-AIMED AND THAT IS THE LESSON:** its first needle was `&times;1.00`,
-  taken from `test_batch_bn`'s `doc.contains("&times;1.00") or doc.contains("×1.00")` — and
-  **`&times;1.00` is in `master.html` zero times at HEAD**, so the assertion has always passed
-  through the OR's second branch and a control armed on it proves nothing. **EC §1's rule arriving
-  through an extractor: a group is evaluated as the operator joins it.**
-- **THE LITERAL SWEEP READ 11,142 NEEDLES FROM 89 TARGETS:** `master.html` **0 LOST / 0 GAINED**,
-  `run_state.gd` **0 / 0**, `changelog.html` 0 / 17, `state.md` 9 / 27. **The sweep is not the
-  proof** — the changelog's 16 readers were ENUMERATED instead, and every one asserts exactly two
-  things: a positive `find("/changelog-archive.html</code>")` and a NEGATIVE `not contains` on its
-  own batch heading. None of the 17 is an `<h2>…Batch` heading.
-- **A THREE-HOUR-OLD ORPHANED SIM FROM EO's SESSION WAS FOUND SPINNING AT 98.8% CPU** during this
-  battery. Both its arms had printed complete reports and written their `.ran` markers three hours
-  earlier — the figures EO published — and the process never exited. **A completed `--run` sim does
-  not always quit, and a battery with a per-target watchdog is exactly what a spinning orphan can
-  cost.**
+**THE TWO STANDING REDS ARE STANDING AND NOTHING ELSE IS RED.** `test_rune_battle` reads
+**97 / 1** against its recorded band of 97 / 0–1, and `check_cm_live` reads **13 / 4** against a
+recorded 13 / 4. **Neither moved and no third appeared.** `check_map_screen: OK` with its live tag
+drive reading **12 tag lines for 12 offered cards**; `check_ct_map` **83 / 0**.
 
-**EIGHTY-SEVEN TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-SEVEN, AND THERE ARE EIGHTY-SEVEN LOGS**
-— compared both ways and checked for duplicate names, which is the fault a shared log directory
-produces. **0 `Parse Error` and 0 `SCRIPT ERROR` in every one of the 87 logs** — grepped from the
-log files rather than read off a tally or an exit code. **`check_map_screen: OK`, and its live tag
-drive read 12 tag lines for 12 offered cards**; `check_ct_map` 83 / 0.
+**THE PRE-CHECK POPULATION WAS DERIVED BY GREPPING THE PATH**, not reasoned about: **26 targets
+name `res://docs/master.html` or `res://docs/changelog.html`** and every one was run before the
+battery with the battery's own per-target flags — **26 green, 0 `Parse Error`, 0 `SCRIPT ERROR`, 0
+FAIL lines.** **`docs/state.md` and `docs/reports/` are read by ZERO targets**, which is what makes
+this file and the batch report safe to write after the run.
 
-**`check_de` READ 358 CHECKS, ZERO FAILURES AND ZERO NOTICES.** All six baseline rows this batch
-moved were written BEFORE the run, so the differ had nothing to report in either direction —
-**which is exactly the half EL's own record says it missed.** The +4 over EL's 354 is `check_em`
-joining the battery; that differ makes four assertions per target.
-- **THE RULE THIS HAS NOW PAID FOR THREE TIMES: `check_parse`'s COUNT IS ITS COVERAGE.** Its
-  population is derived from `run_battery.sh`'s own `GATES` array, so **any batch adding a target
-  moves this row**. **A batch that adds a gate owes TWO baseline rows, not one**, and EM wrote both
-  before the run.
-- **AND IT READ 163 BEFORE IT READ 161.** Two scratch measurement probes were sitting in the repo
-  root and `check_parse`'s RESIDUE walk found them. **That is the walk working**; they were moved
-  out of the tree and the residue is 4 again.
+**THREE NEGATIVE CONTROLS WERE ARMED. ALL THREE BIT.**
 
-**THE EVIDENCE THAT MATTERS WAS FOUND BEFORE THE BATTERY, AND THE PIN MANIFEST WAS NOT THE
-INSTRUMENT THIS TIME.** `check_ed` was run against HEAD's own manifest with every edit in place and
-read **18 / 0**; regenerating moved **three line-number references and nothing else — 0 pins lost,
-0 gained.** That is not this batch being small: **the 26 assertions it actually broke live in array
-literals read through a variable** (`for pair in [...]` → `contains(String(pair[0]))`), which the
-extractor classes as having no static needle — 93 of 1041 source pins are in that class. **The
-literal sweep is what found them**, 11,249 needles over 38 haystacks, and it agreed exactly with
-the set the suites reported when run: **26 LOST against HEAD's needles, 0 LOST against the current
-ones.** Separately, **all 346 negative pins were re-checked** (`CHECKED 346 of 346`) and none of the
-new prose put a retired string back.
+| control | armed on | armed | disarmed |
+|---|---|---|---|
+| **1 — the literal sweep, POSITIVE arm**, on a needle a suite demonstrably reads and BOTH copies carry | `"bounded by how many distinct debuffs exist"` broken in `master.html` (read by `test_batch_ba`) | **LOST 3**, naming the suite | **LOST 2** |
+| **2 — the literal sweep, DISCRIMINATION arm**, on prose no target names | `"Companions have HP, can be targeted by enemies"` broken | **LOST 2 — unmoved** | LOST 2 |
+| **3 — the same needle, against the LIVE SUITE** rather than the sweep | the same string broken in the shipped `master.html`, `test_batch_ba` run standalone | **690 checks / 1 failure**, naming the assertion | **690 / 0** |
 
-**NINE NEGATIVE CONTROLS WERE ARMED. ALL NINE BIT — AND THREE OF THEM DID NOT BITE THE FIRST
-TIME, WHICH IS THE PART WORTH KEEPING.** Five on `check_em`, one on the live game (the spread guard
-reading the node's counter alone: **0 marks spread in 400**, against 55–66 armed), two arms on the
-literal sweep, one on the negative-pin pre-check.
-- **THE UNPAIRED-READ SWEEP PRINTED A CLEAN ZERO WHILE BLIND TO 80 OF ITS 85 SITES.** Its regex
-  excluded a match preceded by a word character **or a dot**, and `attacker.vulture` has a dot in
-  front of it. **A control armed on the one `cfg.get("…")` site DID bite and proved nothing**; the
-  control that found the hole was armed on a DOTTED read.
-- **THE LITERAL SWEEP'S FIRST CONTROL WAS ARMED ON A NEEDLE THAT WAS ITSELF NEW**, so breaking it
-  moved the GAINED column and left LOST at zero. **Its second replaced the needle with a string
-  that CONTAINED it** (`aegis_ranks` → `aegis_ranks_X`), so `contains` stayed true. A differential
-  sweep can only be controlled on a needle BOTH trees carry, broken rather than extended.
-- **AND ONE INSTRUMENT WAS VACUOUS BEFORE IT WAS RIGHT.** The negative-pin pre-check read the
-  manifest's haystack field under the wrong key name, so every row was skipped and it reported
-  **0 violations over 0 pins checked** — indistinguishable from a clean reading. It prints
-  `CHECKED n of m` now.
+**CONTROL 3 IS THE ONE THAT MATTERS AND THE RESTORE IS PART OF IT**: the file was put back from a
+scratchpad copy and compared byte-for-byte, **never by `git checkout`**.
 
-**AND ONE SUITE WAS READING A THROW AS A PASS.** `test_batch_as` printed *"375 checks / 0
-failures"* while a missing dictionary key raised at line 412 and nineteen assertions never ran; its
-baseline is 394 and the battery reads 394 now. **That is CD's lesson exactly** — a suite that throws
-is not a suite that passed — and it is why the throw count was read beside the check count on every
-target in this batch.
+**THE LITERAL SWEEP READ 11,127 NEEDLES ≥4 CHARACTERS FROM 89 TARGETS:** `docs/master.html`
+**2 LOST / 0 GAINED**, `docs/changelog.html` **0 LOST / 22 GAINED**. **BOTH LOST NEEDLES ARE
+TRACED AND BOTH ARE NEGATIVE PINS THE EDIT MAKES MORE TRUE**: `"replaces the OLDER"` and
+`"the OLDER of the two"` are read by `test_batch_bb` §1 as `not src.contains(...)` — **and `src`
+there is `res://scripts/battle.gd`, not this document**, so neither assertion ever read the string
+this batch removed. **That is the finding, not an exception**: BB corrected the code and left the
+document, and the sweep is what surfaced it.
+
+**THE RETIRED-WORD PRE-CHECK WAS RUN BEFORE THE BATTERY**, reproducing `test_batch_bx` §4's and
+§4b's own strips exactly against the EDITED `master.html`: **`beast` absent after both casings of
+`beastmaster` are removed, `party` absent after the five `PARTY_IDENTS` are removed, and
+`Bestial Wrath` still present.** `bx` reads **161 / 0** in the battery. **One uppercase
+`BEASTMASTER` in the draft changelog entry was caught by the same strip and rewritten** — the
+changelog is not in either file list, so it was a latent trap rather than a red.
+
+**AND THE MEASUREMENT PROBES NEVER ENTERED THE TREE.** Every EQ figure was taken on an
+**out-of-repo instrumented copy** (`scripts/`, `scenes/`, `data/`, `assets/`, `project.godot` **and
+`.godot/`** — the cache is what stops every `class_name` reading as a Parse Error). **`check_parse`
+RESIDUE reads 4**, the four long-standing ones, which is that walk confirming the repo root is
+clean. The one probe that did run from the repo root — a boss-pool and tag census — was deleted
+immediately after it ran, before the battery.
+
+**THE INSTRUMENT'S OWN BLIND SPOT, NAMED RATHER THAN DISCOVERED LATER.** The probe banks at the
+site the damage LANDS, and **Unleash empties the meter BEFORE it calls `_companion_hit`** — so
+Unleash's Loyalty reads 0 by construction and its counterfactual is meaningless. **The printed
+"family B" share is an overstatement**; Primal Surge (which empties AFTER the blow) was recovered
+separately and its two independent estimates agree to within 1.5 points. **Unleash's own payout was
+measured directly instead, as damage a blow.**
