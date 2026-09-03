@@ -5,113 +5,164 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-02 (Batch EO).*
+*Last rewritten: 2026-09-02 (Batch EP).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EO — THE STARTER RUNG TEACHES THE REAL GAME.** The starter rung was ruled to keep
-  the full game and soften only its blows. **The measurement came first and made the batch small:
-  rung 1 strips nothing** — no abilities, no intents, no statuses, no Break gates. What it scaled
-  was **health as well as damage**, and health is the fight's LENGTH. The rung scales **damage
-  alone** now. Twelve of the sixteen runes the charter empties are **retired — kept, and said to
-  be kept.** Full working: **`docs/reports/EO.md`**.
-- **§1 — WHAT A RUNG CHANGES, DERIVED FROM THE CODE. THE LADDER CARRIES FOUR FIELDS AND EVERY
-  READER OF EACH IS SWEPT.** `rung` (the enemy-ability filter at `battle.gd:1078`, the meta gate at
-  `battle.gd:23186`, the run-report header at `run_sim.gd:240`), `mult` (read only by
-  `zone_base_mult`), `severity_floor` (`roll_offer`) and `fixed_modifier` (`arm_fixed_modifier`,
-  rung 3 only). **`Run.difficulty` outside that block is display and save only.**
-  - **RUNG 1 STRIPS NO ABILITIES AND THE CONFIG DIFF IS THE PROOF: 20 of the 21 enemy kinds are
-    IDENTICAL at rung 1 and rung 3.** `data/enemies.json` holds 50 authored abilities and **exactly
-    two rung tags**, both on the end boss (Sundering Decree at 2, The Long Dark at 3).
-    **`Enemies.config` defaults an untagged ability to rung 1**, so the starter rung is the
-    BASELINE kit and the higher rungs ADD to it — an escalation, not a gutting.
-  - **AND EVERYTHING ELSE IS FLAT AT EVERY RUNG:** ability delays, statuses and their chances,
-    `pressure`, `stability`, `armor`, `speed`, `constitution`, encounter counts (49), elite and
-    boss composition, gold, and the relic ladder.
-- **§2 — THE RUNG SCALES DAMAGE, NOT HEALTH, AND THAT IS THE WHOLE IMPLEMENTATION.** The
-  multiplier applied to `max_hp` AND `attack` together. **Stability is a flat 100 at every rung
-  and `ab.pressure` is flat too, so the Break gate needs the SAME number of hero turns at rung 1
-  as at rung 3** — and the enemy died before the heroes got there, taking the 2.5–4.0 telegraphs,
-  the statuses worth cleansing and the turn of pressure an item is for with it.
-  `Run.zone_base_mult_hp` floors the rung out of the health path.
-  - **RUNGS 2 AND 3 ARE UNTOUCHED BY CONSTRUCTION, PROVED RATHER THAN ARGUED.** `maxf(mult, 1.0)`
-    returns ×1.00 and ×1.30 unchanged: **6 of 6 health products bit-identical, and the attack path
-    9 of 9 at all three rungs.**
-  - **THE VERIFICATION IS THE LIVE UNTALENTED MEASUREMENT AND IT IS THE WHOLE BATCH**
-    (`DOD_SIM_ROWS=0`, `--run 30` a rung): **completion 97% → 77% at rung 1; 0% → 0% at rungs 2
-    and 3.** Rung-1 rounds to resolution: trash **5.7 → 9.2**, elite 5.5 → 8.5, boss 7.8 → 12.3.
-    **The fights are 60% longer, which is the texture.**
-  - **AND RE-RUN TWO-ARMED AT n=100, BECAUSE n=30 CANNOT CARRY IT.** A completion figure at n=30
-    has a ±12-point 95% band and the harness says so in its own report, so both arms were re-run
-    at n=100 against each other — the BEFORE arm being this tree with the floor removed, run in an
-    out-of-repo copy so the frozen tree was never armed. **92% → 73%, and trash rounds 5.7 → 9.1
-    over ~1,130 fights an arm: 19 points at 3.7 standard errors, p < 0.001.** **The ROUNDS figure
-    is what this batch rests on**, not the completion percentage.
-  - **FLAGGED, NOT TUNED: `DIFFICULTIES["wanderer"]["mult"]` IS STILL ×0.50 AND WAS NOT TOUCHED.**
-    77% is reported, not defended. Upward toward ×0.40 makes a first clear nearer one attempt;
-    downward makes the rung bite harder. **The lever is the designer's.**
-  - **ONE DISAGREEMENT REPORTED AND NOT DECIDED.** §2's wording — *rung 1 enemies keep their full
-    ability sets* — read to the letter would give the rung-1 end boss all five, **deleting the only
-    genuine mechanical escalation in the ladder.** Nothing was stripped, so nothing was restored;
-    giving the Crown its full five is one line in `data/enemies.json` and it is the designer's.
-- **§3 — TWELVE RUNES RETIRED. 65 AUTHORED, 53 OFFERABLE.** The sixteen were re-derived off
-  `LANE_TREES` and `runes.json` and reproduce EM §3 **name for name** — **but only once a
-  `UNIT_MATH` clause counts as a rune SURVIVING.** Excluding those nine from the denominator
-  returns **twenty-two** and sweeps in six runes EN's own threshold table names as survivors
-  (`still_wrist` carries `parry_bonus` beside its one talent-keyed clause, so it is still an item
-  that does something no node does). **Retiring on the first derivation would have retired six
-  runes that had an argument for existing.**
-  - **THE SPLIT: 3 held back for re-authoring, 1 flagged, 12 retired.** The Beastmaster's three
-    (Deep Bond, Shared Wild, Turning Pack) are **presented as options with nothing authored** —
-    retiring them would leave no rune in the game touching a companion, and the companion IS the
-    spec. **The Bared Guard is reported apart and ruled on nowhere**: §3's specific instruction
-    governs its general one, so it is live, offerable and untouched.
-  - **RETIRED MEANS KEPT — THE MELTED ARMOR CONTRACT.** Each of the twelve keeps its entry in
-    `data/runes.json` with a `retired` string naming **what is lost**; `Runes.config`, `build` and
-    `display_name` still resolve it, so a saved run holding one keeps working. **One `continue` in
-    `Runes.eligible_ids` — the only door both offer paths use — stops it being offered.**
-  - **AND THE CONTRACT PAID FOR ITSELF IMMEDIATELY.** `test_batch_bj` pins the Whispering Dark's
-    own description (`"which catches 1 Ruin"`) into `data/runes.json`. **A retirement that DELETED
-    the entry would have taken that pin red.** All 13 runes.json pins verified unmoved.
-  - **IT CANNOT BLANK AN OFFER:** measured floors across all twelve specs are **9 drawable, 2
-    spec-scoped, 5 on the rare shelf, against 3 rune slots.** The Occultist is thinnest.
-    **The Beastmaster is the only spec whose pool did not shrink at all** — 4 of 4 survive, because
-    his three went to the re-author half. EN's threshold did the job it was written for.
-  - **THE OVERLAP STANDS AND IS THE REASON THE TWO CANNOT BE REVERSED SEPARATELY.** The Deepening
-    Ruin and the Whispering Dark are both the Occultist's and are the only two runes where EN §1
-    and this §3 meet — **retiring them retires two of the three fields EN authored the day
-    before.**
-- **§4 — RUNG 2's GAP DOES NOT CLOSE WHEN ROWS 1–3 OPEN, AND THAT IS REPORTED AND STOPPED.**
-  Measured with exactly the rows rung 1 unlocks (`DOD_SIM_ROWS=3`, n=30): rung 2 reads **7%**
-  against 0–3% untalented, and rung 3 stays at **0%**. **A player who clears rung 1 and spends
-  everything it unlocked arrives at a rung they clear one time in fourteen.** The jump is
-  ×0.50 → ×1.00 in one step against a ladder that opens a third of itself at a time.
-  **The second rung is the next problem and it is not this ruling.** Per-hero relics stay unbuilt
-  and belong to the relic family's batch.
-- **THE TWO SUITES THAT MOVED, AND WHY EACH MOVED THE WAY IT DID.** **`test_runes` 3125 → 3101.**
-  Its eligibility arm is **two-armed now** — a retired entry must roll for NOBODY, a live one must
-  still roll for its spec — because an exemption arm would read green on the day the whole file
-  stopped rolling, the shape `check_em` §4 was inverted to avoid at EN §6. And `_rich_grant` asked
-  for the literal **4** spec runes every spec was authored; some specs keep 2, `grant_rune`
-  correctly falls back, and that read as nine failures. **It derives the surviving count now.**
-  **`test_rune_battle` unmoved at 97** (inside its recorded 0–1 fail band): `_equip_all` walked the
-  OFFER pool, which stops driving all twelve retired runes. **The negative control corrected the
-  first statement of this and the correction is the better lesson: it is NOT silent — armed it
-  reads 17 failures**, because the clause assertions name specific runes and values. **The hazard
-  is the REPAIR**, since deleting those assertions is the other way to green and is the tempting
-  one. It walks `Runes.ids()` now — **whether a rune is offered is `test_runes`' question; whether
-  its clauses PAY is this file's.**
-- **Next letter: EP.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EP — THE SECOND RUNG IS THE SAME FIGHT, TWICE AS HARD.** A measurement batch:
+  **nothing was retuned, nothing was authored and nothing was ruled.** Full working:
+  **`docs/reports/EP.md`**.
+- **§1 — RUNG 2 IS CARRIED BY ATTACK AND ALMOST NOTHING ELSE, AND HEALTH IS NOT A LEVER BETWEEN
+  THESE TWO RUNGS AT ALL.** Both spawn multipliers, both rungs, all three zones: the **HEALTH row
+  is bit-identical on 3 of 3 products** and the **ATTACK row doubles on 3 of 3**. `maxf(mult, 1.0)`
+  returns rung 1's ×0.50 and rung 2's ×1.00 as the same 1.00 — **EO floored the rung out of the
+  health path to stop rung 1 being short, and the same floor makes rung 2's enemies exactly as
+  durable as rung 1's.**
+  - **THE FULL CONFIG DIFF: 1 of 21 enemy kinds differs** (the end boss gains Sundering Decree),
+    and **48 of 48 rung-1 abilities are field-for-field identical at rung 2** — delay, pressure,
+    `applies_status`, `status_chance`, cooldown, damage, heal, aoe, multi-hits. Enemy `stability`
+    reads a flat **100 on all 21 kinds**. **Encounter counts, elite and boss composition, gold and
+    loot read no rung at all**, re-derived by grepping every caller of `difficulty_*`.
+  - **SO THE FIGHTS ARE THE SAME LENGTH AND THE MEASUREMENT SAYS SO:** rounds to resolution
+    **7.8 at rung 1 against 7.4 at rung 2** on the same loadout. **The rung-2 fight is not longer,
+    not shorter and not different — the enemy just hits twice as hard while it happens.**
+  - **THE THIRD LEVER IS THE SEVERITY FLOOR (2 → 3) AND IT INVERTS AT RUNG 3.** Measured over
+    **400 offers a rung**, mean severity offered is **2.83 / 3.29 / 2.31**. At rung 3 the floor of
+    4 leaves the gamble pool EMPTY, both gambles fall through `roll_offer`'s guard clause and all
+    three options are drawn from the whole twenty — **rung 3's bargains come out MILDER than rung
+    1's.** The source comment said the high pool *"holds seven and needs to supply two, so this is
+    a guard, not a path"*; it holds **8 / 4 / 0**, and at rung 3 the guard IS the path. **The
+    comment is corrected. Nothing else was touched and rung 3 is ruled on nowhere** — see the open
+    queue below.
+- **§1b — THE BRIEF'S HEADLINE FIGURE WAS WRONG. RUNG 2 WITH ROWS 1–3 READS 22%, NOT 7%.** EO's 7%
+  was 2 of 30 and the harness prints a ±12-point band at that n in its own header. **Four arms at
+  `--run 100`, `DOD_SIM_ROUTE=balanced`, the standard four specs:**
+
+  | arm | rung | rows | completion | 95% band | fights | wipes | loss per fight |
+  |---|---|---|---|---|---|---|---|
+  | B | 1 | 3 | **95%** | ±4.3 | 2681 | 5 | **0.19%** |
+  | A | 2 | 3 | **22%** | ±8.1 | 1994 | 78 | **3.91%** |
+  | C | 2 | 0 | **3%** | ±3.3 | 1412 | 97 | **6.87%** |
+  | D | 2 | 9 | **90%** | ±5.9 | 2693 | 10 | **0.37%** |
+
+  **The like-for-like pair is 95% → 22% — 73 points at 15.6 standard errors.** The brief's
+  73%-against-7% compared an untalented party at rung 1 with a talented one at rung 2.
+- **§1c — IT IS ATTRITION, NOT A WALL, AND NOT A BOSS.** Of arm A's 78 wipes, **only 14 (18%)
+  happen at a node the route cannot duck** (mini-boss slot 8, zone boss slot 16, end boss 17) and
+  **56 (72%) at ordinary fights in slots 10–15**, spread across six slots rather than piled on
+  one. **No single fight is a wall** — the worst printed per-fight win rate is 88% — and the run
+  ends because a party takes about twenty-six fights at a loss rate twenty-one times rung 1's.
+  Deaths per fight, same loadout: z2 t10 **0.10 → 1.03**, z3 t8 **0.38 → 1.56**.
+  - **AND THE HARNESS'S OWN WIPE TABLE WOULD HAVE GIVEN THE OPPOSITE ANSWER.** `run_sim.gd` bands
+    `tier >= 11` as **"boss"** and its per-tier table loops `for ft in range(1, 12)` labelling
+    `ft == 11` as the boss — but **a zone has held SIXTEEN slots since BATCH BK**. So the band is
+    six slots (reading **57** for arm A where the true zone-boss count is **7**) and the per-tier
+    table **silently drops slots 12–16**, which is where most wipes happen; its printed win rates
+    are optimistic by construction. `_finish_run`'s comment still says the ladder is *"(zone-1)\*11
+    + tier, so a full clear is 33"* while the code reads `SLOTS_PER_ZONE` and the header prints
+    **of 49**. **The true distribution came from the per-run progress line (`wiped z%d t%d`), which
+    carries the exact slot and needed no instrument change. NOTHING WAS FIXED** — it is named as
+    the next instrument, the way EO named the missing Break telemetry.
+- **§1d — ROWS 1–3 ARE WORTH NINETEEN POINTS AND A SEVENFOLD MULTIPLE** (3% → 22% at rung 2, 4.2
+  standard errors). The brief's own test was two points. **AND THE ARM IS EXACTLY THE FIRST-CLEAR
+  PLAYER RATHER THAN AN APPROXIMATION OF ONE:** `Profile.award_zone_boss_points` pays 1 point per
+  ZONE boss and the end boss pays none, so clearing rung 1 banks exactly **3 points**; rows 1–3
+  hold **9 cells at `TIER_COSTS[0]` = 1 point each**; `DOD_SIM_ROWS=3` equips exactly **3 nodes**.
+  **22% IS A FLOOR, NOT AN ESTIMATE** — a player who took three attempts banks nine points and can
+  fill all nine cells, and `DOD_SIM_ROWS` fills one lane's rows so a three-lane loadout cannot be
+  expressed by this harness.
+- **§2 — FIVE OPTIONS, COSTED, NONE TAKEN, AND `DIFFICULTIES["wanderer"]["mult"]` IS STILL ×0.50
+  AND STILL UNPLAYED.** Tune the damage scale (one number, teaches nothing new); make the Break
+  gate rung-aware (small, same shape as `zone_base_mult_hp` — **and the measured risk is that
+  pressure is unevenly distributed: 76 of 227 abilities carry any, the Sharpshooter's draft pool
+  holds 6 pressure-bearing cards and the INQUISITOR'S HOLDS NONE**, so a Break gate becomes a spec
+  gate); rung-tagged abilities (**zero code** — `Enemies.config` already filters on `rung` and
+  defaults untagged to 1 — and the only option that changes the QUESTION); a rung-aware encounter
+  shape (respecting BK §5's boss-band collision and `compose`'s elite floor of 6); or making the
+  severity twist that exists actually work. **The question in front of the designer is not how much
+  harder rung 2 should be. It is what rung 2 should ASK that rung 1 does not.**
+- **§3 — THE 22% IS A BOT FLOOR.** Eleven decisions its policies exclude, each read off the code:
+  a fixed per-spec rotation identical on turn 1 and turn 30 (`battle.gd:4367`); drafted cards taken
+  as **the first usable one in slot order**, and only once the rotation has fallen through to the
+  basic attack (`:4042`); **one** in-battle item behaviour — a Health Potion below 35% HP, the
+  branch reads `items["health"]` and nothing else (`:3581`) — and no pre-emptive or offensive use;
+  routing one tier ahead (`run_sim.gd:376`); shop rune picks ignoring build synergy (`:507`);
+  severity-extreme bargains that never read what the modifier does (`:393`); first-in-pool ability
+  picks; first-valid events; one talent lane of the thirty-six (`:972`); and a timing bar rolled at
+  20% Perfect with **no mitigation taken at all** on defence.
+- **§4 — THE FOUR RUNE ITEMS ARE RE-PRESENTED IN `docs/reports/EP.md`, AND TWO FACTS ARE NEW.**
+  The floors are re-derived through `Runes.eligible_ids` rather than quoted and **reproduce EO
+  exactly: 65 authored, 12 retired, 53 offerable; drawable 9 (Occultist), spec-scoped 2
+  (Cryomancer), rare shelf 5 (Occultist), against 3 slots.**
+  - **EVERY TALENT NODE THE THREE BEASTMASTER RUNES MIRROR SITS IN ROWS 1–3** — Wild Communion
+    (devotion, row 1), Absolute Devotion (devotion, row 3), Quick Whistle (pack, row 1), Feral
+    Momentum (pack, row 2), The Wild Within (handler, row 2). **A 100g rare buys between an eighth
+    and a third of a node a single rung-1 clear already opens** (21% / 20% / 33% / 32% / 12.5%).
+  - **THE BARED GUARD'S COST IS 80% REFUNDABLE BY ONE ROW-1 TALENT NODE.** Its −0.15 exactly
+    cancels Defensive Stance's 0.85 mitigation (→ **1.00 on the nose**, so the card's wording is
+    literally true), and `sm_def_stance` — Poise, **row 1** — writes +0.12 back into the same
+    subtraction. **The refund is inside what a single rung-1 clear opens.**
+  - **AND ONE CORRECTION TO EO, MEASURED.** Retiring it would NOT leave the Swordmaster *"the only
+    spec in the game with no Scarred rune"*. There are **17 Scarred runes — 2 universal, 3
+    class-scoped (there is no `class:warrior` one) and exactly 1 per spec** — so the three WARRIOR
+    specs draw **3** where the other nine draw **4**, and retiring the Bared Guard leaves him **2**
+    (`glass` and `vampiric`). **He would be the only spec with no SPEC-SCOPED Scarred rune and
+    would hold the thinnest shelf in the game.** The set-shape argument stands and is sharper than
+    EO put it; the loss is smaller than EO priced it.
+- **WHAT MOVED: ONE COMMENT.** `scripts/run_state.gd`'s guard-clause comment. **A comment-stripped
+  diff of that file reads 1429 code lines before and after with ZERO differences**, and the
+  stripper was armed on a swallowed code line and bit. `docs/master.html` gains the rung-2 health
+  note and this batch's measurements; this file is rewritten; `docs/reports/EP.md` is the working.
+  **Batch EO's changelog entry is left exactly as it stands** — its 7% is the honest record of what
+  n=30 read, and superseding it rather than editing it is what a changelog is for.
+- **Next letter: EQ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
   and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
   layer is design: **the three Beastmaster re-authors, the Bared Guard, and whether the lane rule
-  is replaced with anything.**
+  is replaced with anything.** **And the ladder now has an open design question of its own: what
+  rung 2 should ASK.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE LADDER — WHAT RUNG 2 SHOULD ASK. **OPENED AT EP §2, RULED ON NOWHERE.**
+
+**Full evidence: `docs/reports/EP.md`.** Rung 2 is the same fight as rung 1 in the same number of
+turns with the damage doubled — enemy health is bit-identical between the two rungs and every
+ability field is unchanged. **Five options are costed in EP §2 and none is taken:** tune the
+damage scale, make the Break gate rung-aware, add rung-tagged abilities, change the encounter
+shape, or make the severity twist work. **`DIFFICULTIES["wanderer"]["mult"]` is still ×0.50 and
+still unplayed**, so a rung-2 change on top of it compounds two unmeasured decisions.
+
+- **AND THE MEASURED CONSTRAINT ON THE BREAK OPTION:** pressure is unevenly distributed —
+  **76 of 227 abilities carry any**, and by draft pool the Sharpshooter holds 6 pressure-bearing
+  cards, the Arcanist 5, four specs hold 4, **the Holy Cleric holds 1 and the INQUISITOR HOLDS
+  NONE.** A rung-aware Break gate would quietly become a spec gate.
+
+### RUNG 3'S BARGAIN TWIST INVERTS — **MEASURED AT EP §1, AND IT IS NOT THIS BRIEF'S RUNG**
+
+`roll_offer` draws one option from the pool at or below `severity_floor` and two from above it.
+At rung 3's floor of 4 there is nothing above it, both gambles fall through the guard clause, and
+all three options come from the whole twenty-modifier table. **Measured over 400 offers a rung,
+mean severity offered is 2.83 / 3.29 / 2.31 — the top rung's bargains are MILDER than the starter
+rung's.** The high pool holds **8 / 4 / 0**. **The stale comment that said otherwise is corrected;
+the behaviour is untouched and is the designer's.**
+
+### THE RUN REPORT'S WIPE TABLE IS BANDED FOR A TWELVE-SLOT ZONE — **NAMED AT EP §1c, NOT FIXED**
+
+`run_sim.gd` bands `tier >= 11` as **"boss"** and its per-tier table loops `for ft in range(1, 12)`
+labelling `ft == 11` as the boss. **A zone has held SIXTEEN slots since BATCH BK; the zone boss is
+slot 16 and the mini-boss slot 8.** So the band is six slots and the per-tier table **silently
+drops slots 12–16**, which is where most wipes happen — its printed win rates are optimistic by
+construction. `_finish_run`'s comment still says the ladder is *"(zone-1)\*11 + tier, so a full
+clear is 33"* while the code reads `SLOTS_PER_ZONE`. **Reading the printed table literally reverses
+this batch's own answer** (it says 57 wipes at "boss" where 7 are at the zone boss). **The true
+distribution is available today from the per-run progress line, which carries the exact slot** —
+which is why EP measured rather than repaired, and why repairing it is a small, clearly-scoped
+instrument batch rather than an emergency.
 
 ### THE ARCHETYPE TAGS — NAMED AT EL, STILL INERT, AND EVERY DESIGN QUESTION IN THEM IS OPEN
 
@@ -1307,7 +1358,22 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
     | 2 warden | 4.3 (n=240) | **3.7** (n=246) | 4.4 (n=57) |
     | 3 ruin | 4.4 (n=235) | **4.0** (n=225) | 5.4 (n=55) |
 
-    **THE RUNG-1 ROW IS EO's AND THE OTHER TWO ARE EN's.** EO §2 stopped the rung discounting
+    **EP ADDED THE ROWS-3 PAIR AND IT IS THE ONE THAT ANSWERS "IS RUNG 2 A DIFFERENT FIGHT".**
+    Measured `DOD_SIM_ROWS=3`, `--run 100` a rung — the loadout a single rung-1 clear buys:
+
+    | party / rung, rows 1-3 | trash | elite | boss |
+    |---|---|---|---|
+    | 1 wanderer | **7.8** (n=1138) | **7.3** (n=1246) | **10.0** (n=297) |
+    | 2 warden | **7.4** (n=871) | **6.9** (n=946) | **10.1** (n=177) |
+
+    **The rung-2 fight is not longer, not shorter and not different.** Enemy health is
+    bit-identical between the two rungs, `stability` is a flat 100 on all 21 kinds and hero
+    `pressure` is untouched, so the Break gate costs the same hero turns and the fight runs the
+    same length — the enemy simply hits twice as hard while it happens. **Rung 2 untalented reads
+    7.5 / 7.4 / 10.9 and fully talented 4.4 / 3.7 / 4.8**, so talents SHORTEN the fight and the
+    rung does not.
+
+    **THE RUNG-1 ROW BELOW IS EO's AND THE OTHER TWO ARE EN's.** EO §2 stopped the rung discounting
     enemy HEALTH, which lengthens a rung-1 fight and no other; re-measured at `--run 30`,
     `DOD_SIM_ROWS=9`, it moves 3.9 / 3.4 / 3.8 → **4.4 / 3.8 / 4.1**. **Rungs 2 and 3 did not move
     and were not re-measured** — the health multiplier floors the rung at 1.0, which is
@@ -1349,7 +1415,9 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **34 entries** (DG → EN), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
+  **36 entries** (DG → EP), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
+  STALE AGAIN AT EO, WHICH LEFT IT READING 34 WITH THE FILE AT 35** — the same fault the sentence
+  below already records, for the third time. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
   PASS FOR ONE BATCH** — `check_dv` §4 read `live_span == 16` and **DW is the batch it broke on, on
   DW's own changelog entry.** **It asserts a FLOOR** (the cut left 16 and entries are only ever
@@ -1381,23 +1449,28 @@ those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPT
 re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and all are measured on
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
-- **181 files, 8.1401 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
-  `docs/reports/EK.md` INCLUDED, which is the convention since EG. **EK added TWO files** —
-  `check_ek.gd` and `docs/reports/EK.md` — and deleted none. **Re-derive with
-  `claude_md_census.py` rather than quoting this**; the census reads `git ls-files`, so a new file
-  is outside the number until it is staged.
-- Heaviest: `scripts/battle.gd` **1228.75**, `docs/design-notes.md` **423.48**, `docs/master.html`
-  **344.13**, `scripts/classes.gd` **336.87**, **`pin-manifest.json` 301.73**, `docs/changelog.html`
-  **261.60**, `CLAUDE.md` **191.68**, `scripts/talents.gd` **178.68**, `scripts/unit.gd` **177.14**,
-  `docs/talent-audit.html` **165.02**, `docs/state.md` **119.22**, **`docs/instrument-rules.md`
-  70.08**. **`CLAUDE.md` IS NO LONGER IN THE TOP FIVE**, which is what the split was for.
+- **188 files, 8.4772 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
+  `docs/reports/EP.md` INCLUDED, which is the convention since EG. **EP added ONE file**
+  (`docs/reports/EP.md`) and deleted none. **Re-derive with `claude_md_census.py` rather than
+  quoting this**; the census reads `git ls-files`, so a new file is outside the number until it is
+  staged, and EP's figure is measured with it staged.
+- Heaviest, **re-measured at EP**: `scripts/battle.gd` **1233.25**, `docs/design-notes.md`
+  **442.63**, `docs/master.html` **352.49**, `scripts/classes.gd` **339.15**,
+  **`pin-manifest.json` 303.89**, `docs/changelog.html` **294.71**, `CLAUDE.md` **213.73**,
+  `scripts/unit.gd` **183.17**, `scripts/talents.gd` **178.66**, `docs/talent-audit.html`
+  **165.03**, `scripts/run_state.gd` **139.90**, `docs/state.md` **136.09**.
+  **`CLAUDE.md` IS NO LONGER IN THE TOP FIVE**, which is what the split was for.
+  **AND THIS BLOCK'S FIGURES WERE FOUR BATCHES STALE WHEN EP ARRIVED** — it recorded `CLAUDE.md`
+  at 191.68 KiB against a live 213.73, and the changelog at 261.60 against 294.71. **CW's 400 KiB
+  changelog threshold is now about thirteen batches away, not seventeen.**
   **`scripts/classes.gd` GREW 14.6 KiB AT EK** and it is the tag table — 227 rows and their header.
   The changelog grows about 8 KiB a batch, so CW's 400 KiB threshold is roughly seventeen batches
   away.
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
   measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF took that
-  split.** **It reads 191.69 KiB, which is 98.31 KiB of headroom — about
-  twenty-one batches at +4,520 B/batch.** **EK grew it by 3,713 B (3.63 KiB)**, which is one
+  split.** **RE-MEASURED AT EP IT READS 213.73 KiB, which is 76.27 KiB of headroom — about
+  seventeen batches at +4,520 B/batch. THIS LINE HAD SAID 191.69 SINCE EK AND WAS 22 KiB STALE.
+  EP DID NOT TOUCH `CLAUDE.md` AND ADDED NO RULE.** **EK grew it by 3,713 B (3.63 KiB)**, which is one
   standing reference: the three vocabularies, the tables and their one accessor each, the
   inertness ruling, and the rule that a new ability or rune is owed a row in the same batch.
   **`docs/instrument-rules.md` reads 70.08 KiB and has no stated ceiling**; the arithmetic for one is
@@ -1423,7 +1496,8 @@ the number.*
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **41** — **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
+  are **42** — **EM ADDED `check_em` AND THIS LINE STILL READ 41 WHEN EP ARRIVED**; before it
+  **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
   EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
 
@@ -1519,21 +1593,57 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EM, FROZEN, AND IT CERTIFIED ON PASS ONE.** **198 files were MD5-stamped with
+**ONE BATTERY AT EP, FROZEN, AND IT CERTIFIED ON PASS ONE.** **204 files were MD5-stamped with
 ABSOLUTE paths before it and re-compared after with the same absolute paths: it drifted ZERO** —
-the tree the battery read is byte-for-byte the tree that ships. **The reds were all found before
-it**, by nine negative controls, a two-arm literal sweep and standalone runs of every touched
-target.
+the tree the battery read is byte-for-byte the tree that ships. **`.ran` holds 87 names with no
+duplicate**, every name has a log and every log a name.
 
-| | EI's acceptance | EK's acceptance | EL's acceptance | **EM's acceptance** |
+| | EK's acceptance | EL's acceptance | EM's acceptance | **EP's acceptance** |
 |---|---|---|---|---|
 | **suite failures** | 0 | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | 0 | **0** |
-| `check_de` | 346 / 0 / 0 | 350 / 0 / 0 | 354 / 0 / 1 → 0 | **358 / 0 / 0** |
+| `check_de` | 350 / 0 / 0 | 354 / 0 / 1 → 0 | 358 / 0 / 0 | **358 / 0 / 0** |
 | run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
-| targets in the manifest | 84 | 85 | 86 | **87** |
+| targets in the manifest | 85 | 86 | 87 | **87** |
+
+**EP MOVED NOT ONE BASELINE ROW AND SAID SO BEFORE THE RUN.** It changes no executable byte and
+adds no gate, so `check_parse` reads its recorded **161** (RESIDUE **4** — the five measurement
+probes were moved out of the tree before the run and the residue walk proves it) and no second row
+was owed. **`check_de` read 358 / 0 / 0 — zero NOTICES as well as zero errors, so nothing rose
+either.** Total **41,420 checks, 0 throws, 0 `Parse Error` across all 87 logs**, grepped from the
+log files rather than read off a tally or an exit code.
+
+**THE PRE-CHECK POPULATION WAS DERIVED BY GREPPING THE PATH:** `master.html` **25** readers,
+`changelog.html` **16**, `scripts/run_state.gd` **19** — **36 deduped, all run before the battery,
+0 red.** **`docs/state.md` and `docs/reports/` are read by ZERO targets**, which is what makes this
+file and the batch report safe to write after the run.
+- **AND "BLANK" HAD TO BE SEPARATED FROM "DID NOT RUN" AGAIN.** `check_map` and `check_flow` print
+  no check-count line, so the battery reads `?` for both. Confirmed by reading their logs.
+- **ONE PRE-CHECK RED WAS THE HARNESS'S OWN SCAR REPRODUCING ITSELF.** `test_batch_bl` read
+  **88 / 4** in a hand-rolled pre-check runner and **88 / 0** in the battery: the runner omitted
+  `EXTRA[test_batch_bl]="--fixed-fps 12"`, which `run_battery.sh` carries precisely because that
+  suite under-runs without it. **A PRE-CHECK THAT DOES NOT REPRODUCE THE BATTERY'S PER-TARGET
+  FLAGS MANUFACTURES ITS OWN REDS.**
+- **FOUR NEGATIVE CONTROLS, ALL FOUR BIT** — the comment-stripped diff (armed on a swallowed code
+  line: **10 diff lines** against 0), the retired-word strip (armed on `master.html`, the needle
+  `bx` §4b reads), the literal sweep (**LOST=1** against 0), and the wipe extractor two-armed.
+  **CONTROL 3 HAD TO BE RE-AIMED AND THAT IS THE LESSON:** its first needle was `&times;1.00`,
+  taken from `test_batch_bn`'s `doc.contains("&times;1.00") or doc.contains("×1.00")` — and
+  **`&times;1.00` is in `master.html` zero times at HEAD**, so the assertion has always passed
+  through the OR's second branch and a control armed on it proves nothing. **EC §1's rule arriving
+  through an extractor: a group is evaluated as the operator joins it.**
+- **THE LITERAL SWEEP READ 11,142 NEEDLES FROM 89 TARGETS:** `master.html` **0 LOST / 0 GAINED**,
+  `run_state.gd` **0 / 0**, `changelog.html` 0 / 17, `state.md` 9 / 27. **The sweep is not the
+  proof** — the changelog's 16 readers were ENUMERATED instead, and every one asserts exactly two
+  things: a positive `find("/changelog-archive.html</code>")` and a NEGATIVE `not contains` on its
+  own batch heading. None of the 17 is an `<h2>…Batch` heading.
+- **A THREE-HOUR-OLD ORPHANED SIM FROM EO's SESSION WAS FOUND SPINNING AT 98.8% CPU** during this
+  battery. Both its arms had printed complete reports and written their `.ran` markers three hours
+  earlier — the figures EO published — and the process never exited. **A completed `--run` sim does
+  not always quit, and a battery with a per-target watchdog is exactly what a spinning orphan can
+  cost.**
 
 **EIGHTY-SEVEN TARGETS RAN, THE MANIFEST NAMES ALL EIGHTY-SEVEN, AND THERE ARE EIGHTY-SEVEN LOGS**
 — compared both ways and checked for duplicate names, which is the fault a shared log directory

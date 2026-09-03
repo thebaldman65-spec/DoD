@@ -14,6 +14,106 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-02 &mdash; Batch EP: THE SECOND RUNG IS THE SAME FIGHT, TWICE AS HARD</h2>
+<p><i>A measurement batch. <b>Nothing was retuned, nothing was authored and nothing was ruled.</b>
+Rung 2 does not scale enemy HEALTH at all any more &mdash; Batch EO's floor made rung 1's health
+and rung 2's health bit-identical &mdash; so the two rungs run fights of the same LENGTH, asking
+the same questions, and rung 2 simply doubles what a wrong answer costs. <b>And the brief's
+headline figure was wrong:</b> rung 2 with the rows rung 1 unlocks reads <b>22%</b>, not the 7%
+Batch EO measured at n=30. Full working: <code>docs/reports/EP.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; WHAT RUNG 2 CHANGES, DERIVED FROM THE CODE. IT IS ATTACK, AND ALMOST NOTHING
+ELSE.</b> Both spawn multipliers at both rungs across all three zones: the HEALTH row is
+<b>bit-identical on 3 of 3 products</b> and the ATTACK row <b>doubles on 3 of 3</b>.
+<code>zone_base_mult_hp</code> is <code>_zone_ladder(slot) * maxf(difficulty_mult(), 1.0)</code>,
+and <code>maxf</code> returns rung 1's &times;0.50 and rung 2's &times;1.00 as the same 1.00.
+Config-diffed through <code>Enemies.config</code>, <b>1 of 21 enemy kinds differs between rung 1
+and rung 2</b> &mdash; the end boss gains Sundering Decree &mdash; and <b>48 of 48 rung-1
+abilities are field-for-field identical at rung 2</b> (delay, pressure, statuses, chances,
+cooldowns, damage). Enemy <code>stability</code> reads a flat <b>100 on all 21 kinds</b>.
+Encounter counts, elite and boss composition, gold and loot read no rung at all. <b>So the fights
+are the same length and the measurement says so: rounds to resolution 7.8 at rung 1 against 7.4 at
+rung 2 on the same loadout.</b></p>
+
+<p><b>&sect;1b &mdash; THE THIRD LEVER, AND IT INVERTS AT RUNG 3.</b> The severity floor rises
+2&rarr;3 between rungs 1 and 2, which does work: measured over <b>400 offers a rung</b>, mean
+severity offered goes <b>2.83 &rarr; 3.29</b>. But at rung 3 the floor of 4 leaves the
+<i>gamble</i> pool empty, both gambles fall through <code>roll_offer</code>'s guard clause, and
+all three options are drawn from the whole twenty-modifier table &mdash; <b>rung 3's bargains come
+out MILDER than rung 1's, at 2.31</b>. The source comment claimed the high pool &ldquo;holds seven
+and needs to supply two, so this is a guard, not a path&rdquo;; it holds <b>8 / 4 / 0</b> and at
+rung 3 the guard <i>is</i> the path. <b>The comment is corrected and nothing else is touched
+&mdash; rung 3 is not this brief's rung and no ruling is made on it.</b></p>
+
+<p><b>&sect;1c &mdash; WHERE THE RUNS ARE LOST: ATTRITION, NOT A WALL, AND NOT A BOSS.</b> Four
+arms at <code>--run 100</code> each, <code>DOD_SIM_ROUTE=balanced</code>: <b>rung 1 with rows 1&ndash;3
+completes 95% (&plusmn;4.3); rung 2 with the same three rows completes 22% (&plusmn;8.1); rung 2
+untalented 3% (&plusmn;3.3); rung 2 fully talented 90% (&plusmn;5.9)</b>. The like-for-like pair is
+<b>95% &rarr; 22%, 73 points at 15.6 standard errors</b>. Of the 78 wipes at rung 2 with rows
+1&ndash;3, <b>only 14 (18%) happen at a node the route cannot duck</b> and <b>56 (72%) happen at
+ordinary fights in slots 10&ndash;15</b>. No single fight is a wall &mdash; the worst printed
+per-fight win rate is 88% &mdash; and the run ends because a party takes about twenty-six fights
+and <b>the per-fight loss rate is 3.9% at rung 2 against 0.19% at rung 1 on the same loadout, a
+factor of twenty-one</b>. <b>THE HARNESS'S OWN WIPE TABLE WOULD HAVE GIVEN THE OPPOSITE ANSWER:</b>
+it bands <code>tier &gt;= 11</code> as &ldquo;boss&rdquo; and its per-tier table loops
+<code>range(1, 12)</code>, but a zone has held SIXTEEN slots since Batch BK &mdash; so the band is
+six slots (reading 57 where the true zone-boss count is 7) and the table silently drops slots
+12&ndash;16, which is where most wipes happen. The true distribution came from the per-run progress
+line, which carries the exact slot. <b>Named as the next instrument, not fixed.</b></p>
+
+<p><b>&sect;1d &mdash; WHAT ROWS 1&ndash;3 ARE WORTH: NINETEEN POINTS AND A SEVENFOLD MULTIPLE.</b>
+They move rung 2 from <b>3% to 22%</b>, at 4.2 standard errors. <b>And the arm is exactly the
+first-clear player rather than an approximation of one:</b>
+<code>Profile.award_zone_boss_points</code> pays 1 point per ZONE boss and the end boss pays none,
+so clearing rung 1 banks exactly <b>3 points</b>; rows 1&ndash;3 hold 9 cells at 1 point each; and
+<code>DOD_SIM_ROWS=3</code> equips exactly 3 nodes. <b>22% is a FLOOR</b> &mdash; a player who took
+three attempts banks nine points and can fill all nine cells, which this harness cannot express.</p>
+
+<p><b>&sect;2 &mdash; FIVE OPTIONS, COSTED, AND NONE TAKEN.</b> Tune the damage scale (one number,
+teaches nothing new); make the Break gate rung-aware (small, and the measured risk is that
+pressure is unevenly distributed &mdash; the Sharpshooter carries 6 pressure-bearing draft cards
+and <b>the Inquisitor carries none</b>, so a Break gate would quietly become a spec gate); add
+rung-tagged abilities (<b>zero code</b> &mdash; <code>Enemies.config</code> already filters on
+<code>rung</code> &mdash; and it is the only option that changes the QUESTION rather than the
+price); change the encounter shape rather than the enemies (respecting BK &sect;5's boss-band
+collision and <code>compose</code>'s elite floor of 6); or make the severity twist that exists
+actually work. <b>&times;0.50 is still untouched and still unplayed.</b></p>
+
+<p><b>&sect;3 &mdash; THE 22% IS A BOT FLOOR.</b> Eleven decisions the bot's policies exclude, each
+read off the code rather than the document: a fixed per-spec rotation identical on turn 1 and turn
+30; drafted cards taken as <b>the first usable one in slot order</b>, and only once the rotation has
+fallen through to the basic attack; <b>one</b> item behaviour in battle (a Health Potion below 35%
+HP &mdash; bomb, revive, defense and mana items are never used at all) and no pre-emptive or
+offensive use; routing one tier ahead; shop rune picks that ignore build synergy; severity-extreme
+bargains that never read what the modifier does; first-in-pool ability picks; first-valid events;
+one talent lane of the thirty-six; and a timing bar rolled at 20% Perfect with <b>no mitigation
+taken at all</b> on defence.</p>
+
+<p><b>&sect;4 &mdash; THE FOUR RUNE ITEMS, RE-PRESENTED, AND TWO NEW FACTS.</b> The floors are
+re-derived through <code>Runes.eligible_ids</code> rather than quoted and reproduce Batch EO:
+<b>65 authored, 12 retired, 53 offerable; drawable 9, spec-scoped 2, rare shelf 5, against 3
+slots</b>. <b>(1) Every talent node the three Beastmaster runes mirror sits in rows 1&ndash;3</b>
+&mdash; Wild Communion (row 1), Absolute Devotion (row 3), Quick Whistle (row 1), Feral Momentum
+(row 2), The Wild Within (row 2) &mdash; so a 100g rare buys between an <b>eighth and a third</b>
+of a node a single rung-1 clear already opens. <b>(2) The Bared Guard's cost is 80% refundable by
+one row-1 talent node:</b> its &minus;0.15 exactly cancels Defensive Stance's 0.85 mitigation
+(&rarr;1.00 on the nose), and <code>sm_def_stance</code> &mdash; Poise, row 1 &mdash; writes +0.12
+back into the same subtraction. <b>AND ONE CORRECTION TO BATCH EO:</b> retiring it would NOT leave
+the Swordmaster &ldquo;the only spec with no Scarred rune&rdquo;. There are 17 Scarred runes &mdash;
+2 universal, 3 class-scoped (there is no <code>class:warrior</code> one) and exactly 1 per spec
+&mdash; so the three Warrior specs draw 3 where the other nine draw 4, and retiring the Bared Guard
+leaves the Swordmaster <b>2</b>. He would be the only spec with no <i>spec-scoped</i> Scarred rune
+and would hold the thinnest shelf in the game. <b>Nothing authored, nothing retired, nothing
+ruled.</b></p>
+
+<p><b>WHAT MOVED.</b> One comment in <code>scripts/run_state.gd</code> &mdash; a
+comment-stripped diff of that file reads <b>1429 code lines before and after and zero differences</b>,
+and the instrument was armed on a swallowed code line and bit. <code>docs/master.html</code> gains
+the rung-2 health note and this batch's measurements; <code>docs/state.md</code> is rewritten;
+<code>docs/reports/EP.md</code> is the working. <b>Batch EO's entry above is left exactly as it
+stands</b> &mdash; its 7% is the honest record of what n=30 read, and superseding it here rather
+than editing it is what a changelog is for.</p>
+
 <h2>2026-09-02 &mdash; Batch EO: THE STARTER RUNG TEACHES THE REAL GAME</h2>
 <p><i>The starter rung was ruled to keep the full game and soften only its blows. <b>The
 measurement that decides the batch came first, and it made the batch small:</b> rung 1 strips no

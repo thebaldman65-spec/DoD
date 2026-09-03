@@ -2378,9 +2378,16 @@ func roll_offer() -> Array:
 		picked.append(low.pop_front())
 	while picked.size() < 3 and not rest.is_empty():
 		picked.append(rest.pop_front())
-	# Only if the high pool cannot fill the card — it holds seven and needs to
-	# supply two, so this is a guard, not a path. An offer short of three
-	# options would be worse than a second low one.
+	# BATCH EP §1 — THIS IS A PATH AT RUNG 3, AND THE SENTENCE THAT STOOD HERE
+	# SAID IT COULD NOT BE. It read "it holds seven and needs to supply two, so
+	# this is a guard, not a path." The high pool holds EIGHT at rung 1, FOUR at
+	# rung 2 and ZERO at rung 3 — the severity floor is what splits the table,
+	# so a floor of 4 leaves nothing above it and BOTH gambles fall through to
+	# here and are drawn from the whole twenty. Measured over 400 offers a rung,
+	# mean severity offered is 2.83 / 3.29 / 2.31: RUNG 3'S BARGAINS COME OUT
+	# MILDER THAN RUNG 1'S. Reported at EP §1 and ruled on nowhere — that brief
+	# is rung 2's. An offer short of three options would still be worse than a
+	# second low one, which is why the clause itself is correct and stays.
 	while picked.size() < 3 and not low.is_empty():
 		picked.append(low.pop_front())
 	var offer: Array = []
