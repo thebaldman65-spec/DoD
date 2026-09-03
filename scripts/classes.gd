@@ -1017,6 +1017,59 @@ static func tag_meaning(tag: String) -> String:
 	return String(TAG_INFO.get(tag, ""))
 
 
+# ── BATCH ES §4 — THE COUNTING PRIMITIVES ───────────────────────────────────
+#
+# **A RUNE READS ITS HOLDER'S EQUIPPED CARDS**, and these two are the arithmetic
+# half of that: they take a list of display names and say how much of each tag
+# is in it. They know nothing about heroes, loadouts or runes — the LIST is
+# assembled by `Run.loadout_ability_names` and handed here through
+# `Runes.loadout_tag_census`, which is the one door a rune comes through.
+# Keeping the arithmetic beside `CARD_TAGS` is what stops a second caller
+# counting a two-tag card twice or reading only the primary.
+#
+# **BOTH TAGS ON A CARD COUNT, and that is a decision rather than a detail.**
+# A card carries `[primary]` or `[primary, secondary]`, and the secondary is a
+# real reading of what the card does — a card that both Breaks and lands a
+# DEBUFF is a member of both populations. Counting the primary alone would make
+# 61 of the corpus's second tags decorative, which is the opposite of why the
+# secondary exists.
+static func tag_count(display_names: Array, tag: String) -> int:
+	var n := 0
+	for nm in display_names:
+		if card_tags(String(nm)).has(tag):
+			n += 1
+	return n
+
+
+# Every tag's count at once, keyed by tag, with a ZERO row for every word in
+# TAG_ORDER. **THE ZERO ROWS ARE THE POINT**: a surface showing "you hold two
+# of seven tags" has to know which five are absent, and a census that omitted
+# them would make an absent tag indistinguishable from a retired one.
+static func tag_census(display_names: Array) -> Dictionary:
+	var out := {}
+	for t in TAG_ORDER:
+		out[String(t)] = 0
+	for nm in display_names:
+		for t2 in card_tags(String(nm)):
+			var k := String(t2)
+			if out.has(k):
+				out[k] = int(out[k]) + 1
+	return out
+
+
+# **BATCH ES §5 — BREADTH: how many DIFFERENT tags this list touches at all.**
+# A normal rune pays for DEPTH in one tag; a splash pays for breadth across
+# tags, and this is the number it reads. Derived from the census rather than
+# counted separately, so the two can never disagree.
+static func tag_breadth(display_names: Array) -> int:
+	var census := tag_census(display_names)
+	var n := 0
+	for t in TAG_ORDER:
+		if int(census[String(t)]) > 0:
+			n += 1
+	return n
+
+
 # The tag line as the draft card renders it — "DEBUFF · BREAK", or "" when
 # the card carries none. ONE BUILDER, so a second surface taking these on
 # cannot draw them a second way (CK §1's rule, one layer down).

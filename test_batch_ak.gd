@@ -587,10 +587,14 @@ func _live_guard_change() -> void:
 	ok(abs(float(stacked["swordsmanship_parry"])
 			+ float(stacked["rune_swordsmanship_parry"]) - 0.20) < 0.0001,
 		"rune and node stack (0.20 = a 30%% grant)")
+	# BATCH ES §1 — `wrist` is the raw `runes.json` ENTRY (`Runes.config`), not a
+	# built instance, and it used to carry a `rarity` key that was copied into
+	# this hand-built rune dict and read by nothing. The key is retired; the
+	# field is dropped rather than replaced, because the spawn reads `id`,
+	# `equipped`, `payload` and `name` and has never read any other.
 	var rune_prep := func(run):
 		run.party[0]["runes"] = [{"id": "still_wrist", "equipped": true,
-			"payload": wrist["payload"], "name": String(wrist["name"]),
-			"rarity": String(wrist["rarity"])}]
+			"payload": wrist["payload"], "name": String(wrist["name"])}]
 	var runed := await _spawn(["swordmaster", "cryomancer", "holy", "mystic"],
 		["raider", "archer"], rune_prep)
 	var sm4 := _sm(runed)

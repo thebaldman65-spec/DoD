@@ -559,7 +559,7 @@ func _rune_audit() -> void:
 		and int(bc.get("rune_lifewell_ranks", 0)) == 20,
 		"the Burning Censer reflects 10%% more and mends a fifth of it (got %s)" % str(bc))
 	ok(float(bc.get("max_hp_pct", 0.0)) < 0.0,
-		"...and the scarred rune still carries a real cost")
+		"...and it still carries a real cost (ES §3: the label went, the clause stayed)")
 	var sv: Dictionary = Runes.build("standing_vow")["payload"]["stat"]
 	ok(int(sv.get("rune_blessed_barrier_ranks", 0)) == 4
 		and int(sv.get("rune_devoutness_ranks", 0)) == 5

@@ -468,7 +468,9 @@ static func _avg_hp(run: Node) -> float:
 
 # Prices come STRAIGHT OFF `Run` now (flat, no tier scaling; only the relic
 # discount moves them). Stock never runs out; runes are one per member per
-# visit, dupes re-rolled, price set by rarity (50/100/160).
+# visit, dupes re-rolled. (BATCH ES §1: the price used to be set by the rune's
+# rarity tier, 50/100/160. There are no tiers — an authored rune carries its own
+# price and a generated stat stick sits on `Runes.TEMPLATE_PRICE`.)
 #
 # BATCH CT: this used to be a hand-copied MIRROR of shop_screen.gd's table, and
 # the copy broke the moment §4 added three ids — the loop below walks
@@ -841,7 +843,7 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 			var scope := String(r.get("scope", "universal"))
 			var kind := "universal"
 			if String(r.get("id", "")).begins_with("tpl_"):
-				kind = "stick"  # the generated Common family, not authored
+				kind = "stick"  # the generated stat family, not authored
 			elif scope == spec_scope:
 				kind = "spec"
 			elif scope.begins_with("class:"):
@@ -1099,7 +1101,7 @@ static func _print_report(battle) -> void:
 	# no autoloads — the injection discipline).
 	var runes_env := OS.get_environment("DOD_SIM_RUNES")
 	var runes_mode := runes_env if runes_env in ["off", "stats"] else "full"
-	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=Common family, off=none)" % runes_mode)
+	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=generated stat family, off=none)" % runes_mode)
 	# BATCH BM: the RUNG this row was walked at, read off the live run rather
 	# than off the env — Batch Y's "standard" still resolves and maps to rung
 	# 2, so an old script's row would otherwise print a name the ladder does
@@ -1423,7 +1425,7 @@ static func _print_report(battle) -> void:
 	for kind in ["spec", "class", "universal", "stick"]:
 		kind_parts.append("%s %.2f" % [kind, float(worn_kind.get(kind, 0)) / runs / 4.0])
 	print("  Worn per hero at run end, by kind: %s" % "   ".join(kind_parts))
-	print("    (spec = one of the FOUR authored for that spec; stick = the generated Common family)")
+	print("    (spec = one of the FOUR authored for that spec; stick = the generated stat family)")
 
 	# ROUTE AGENCY — Batch BK's headline, and it is the SAME measurement Batch
 	# BG printed as 0% of 2,764 steps. 42 steps a run (an entry plus 13

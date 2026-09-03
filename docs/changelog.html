@@ -14,6 +14,127 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-03 &mdash; Batch ES: THE RUNE LAYER'S NEW SHAPE</h2>
+<p><i><b>Structure only. Not one rune is authored, re-authored or retuned</b> &mdash; every
+<code>payload</code>, <code>price</code> and <code>desc</code> in <code>data/runes.json</code> is
+byte-unchanged. <b>Rarity is removed entirely, "Scarred" is removed as a label while every cost
+clause stays, scope becomes the surviving axis, and runes gain the machinery to read ARCHETYPE TAGS
+on their holder's EQUIPPED cards.</b> Full working: <code>docs/reports/ES.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; RARITY IS GONE, AND THE HALF THAT MATTERED WAS THE OFFER ODDS.</b> Common,
+Rare and Epic are removed with their prefixes (Cracked / Polished / Radiant), their colours, the
+&times;1/&times;2/&times;3 magnitude ladder and the 50/100/160 tier price. <b>What rarity MEANT was
+an authoring convention rather than a behaviour</b> &mdash; the kind lived in the payload &mdash; so
+every rune goes on doing exactly what it did. <b>What it DID was drive the offer odds</b>, 60/30/10
+at zone 1 deepening to 25/45/30 by zone 3, <b>the only thing making a late offer differ from an early
+one.</b> Measured on the live pool before and after: <b>the generated stat family was 49.8% / 33.1%
+/ 21.1% of a Berserker's offers by zone, and is a flat 29.9% / 29.6% / 30.3% now.</b> The early game
+improves, the late game worsens, and that is what "no zone progression in rune quality" costs.
+<b>The zone slot stays in <code>Runes.generate</code>'s signature and is deliberately unread</b>
+(<code>_zone_slot</code>), which <code>check_es</code> &sect;1 asserts.</p>
+
+<p><b>&sect;1b &mdash; PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND, AND NO RULE WAS INVENTED
+FOR IT.</b> Authored runes have always carried their own <code>price</code> and none moved &mdash;
+but those prices were written against a tier table that no longer exists, and the 53 offerable still
+run <b>50 / 75 / 100 / 120 / 160</b>. <b>That is a design decision and it is the designer's.</b> The
+one magnitude this batch moves is the GENERATED family's, and only because the ladder was literally
+a rarity field: the six templates were eighteen runes across three grades and are six now, at their
+authored base and at the Common price they already sat on.</p>
+
+<p><b>&sect;1c &mdash; AND THE PREMISE THAT <code>is_cost</code> READS RARITY IS WRONG, IN THE
+REASSURING DIRECTION.</b> Three reports in a row called <code>DOD_SIM_RUNE_POWER</code> <i>"the sim's
+rarity lever"</i>. It is a POWER lever, and <code>Runes.is_cost</code> reads a field name and a sign
+&mdash; never a tier. <b>Removing rarity cannot make a cost clause start scaling</b>, which was the
+inverse defect the brief was right to ask about.</p>
+
+<p><b>&sect;2 &mdash; SCOPE IS THE SURVIVING AXIS, AND THE FIVE UNIVERSALS ARE RE-SCOPED RATHER THAN
+RETIRED.</b> It is what the shop row, the offer button and both pouch lists show where the rarity
+word used to be. <b>The class each of the five lands on is CONTENT and is the designer's, so they
+stay universal until it is made</b> &mdash; losing five authored, working runes to a scoping rule is
+waste, and <code>check_es</code> &sect;2 asserts they still roll for all twelve specs so a stealth
+retirement goes red. <b>THE SIZE OF THE MOVE IS MEASURED: the five are 5 of every spec's 9&ndash;12
+offerable runes</b>, 42% to 56% of the drawable pool, which makes this the largest single movement
+the pool has ever taken. <b>Two of the five charge for their upside</b> (the Glass and Vampiric
+Runes), and EP measured those as the Swordmaster's fallback if the Bared Guard is ever retired
+&mdash; re-scoping them removes that fallback for every spec outside the chosen class.</p>
+
+<p><b>&sect;3 &mdash; "SCARRED" IS GONE AS A LABEL AND EVERY COST CLAUSE STAYS &mdash; AND THE LABEL
+AND THE BEHAVIOUR HAD NEVER AGREED.</b> The flag, the crimson prefix and the crimson colour are
+removed; the negative terms are byte-unchanged. What recognises a cost now is
+<code>Runes.is_cost</code>, the same function that holds a cost at its authored value under the sim's
+power probe, so nothing became pure upside &mdash; <b>driven before and after on two shapes at the
+arm's own &times;3</b>, upside moving and cost held, plus the cost landing on a live hero config.
+<b>Both populations were 17 and they were different 17s.</b> <b>The Rune of Exsanguination carried
+the flag and has no payload cost term at all</b>: its whole payload is <code>blood_pact: -15</code>,
+and at its one read site that single field opens enemy veins early (its promise) <i>and</i> makes the
+bleedout tear 15% of max health instead of 20% (its price) &mdash; one field, two behaviours, nothing
+to sweep for. It is NAMED in <code>test_runes.COST_WITHOUT_A_TERM</code> and
+<code>check_es</code> &sect;3 rather than suppressed. <b>And the Anchor Rune carries a real
+&minus;10 Speed and never carried the flag</b>, because the old schema forbade a "scarred common" and
+it is the one common in the file &mdash; <b>a rarity rule was hiding a cost</b>, which is an argument
+for &sect;1 that &sect;1 did not have to make for itself. The standing rule about buying a cost back
+is relabelled, not weakened.</p>
+
+<p><b>&sect;4 &mdash; RUNES CAN READ TAGS NOW, AND NOT ONE RUNE DOES.</b> The reading machinery is
+built and no rune is authored: <b>a rune can ask how many EQUIPPED cards of tag X its holder
+carries.</b> The door is <code>Run.loadout_ability_names</code> &rarr; <code>Classes.tag_census</code>
+/ <code>tag_count</code> / <code>tag_breadth</code>, with <code>Runes.tag_threshold_met</code> and
+<code>Runes.breadth_met</code> as the two shapes a clause asks through. <b>EQUIPPED, NEVER OWNED:</b>
+a pool only grows, so a threshold read off it turns on once, late, and never off &mdash; the flat
+increment with a delay. A loadout is capped at 7&ndash;10 and freely swapped, so counting it makes
+the loadout a <b>lever</b>. <b>The protected core is in the count</b>, because it is carried and it
+is half to two thirds of the bar.</p>
+
+<p><b>&sect;4b &mdash; AND MEASURING THAT IMMEDIATELY FOUND THE TRAP A THRESHOLD HAS TO BE AUTHORED
+AGAINST.</b> Before a single card is drafted, the protected cores ALONE already meet a 2+ threshold
+on <b>BREAK for ten of the twelve specs</b> and on <b>DEBUFF for seven</b>; <b>MARK is zero for all
+twelve</b> and <b>TEMPO reaches 1 on exactly one</b>. A rune asking 2+ BREAK is on from the first
+fight for almost everyone and no swap turns it off &mdash; the flat increment again, arriving through
+the cores instead of through the pool. <b>The per-spec table is PRINTED by <code>check_es</code>
+&sect;4 on every battery run</b>, so the day a core kit moves the baseline is re-measured rather than
+re-assumed.</p>
+
+<p><b>&sect;4c &mdash; THE COUNT IS VISIBLE AND IT IS DRIVEN, BECAUSE THIS IS THE HEADS DOWN SHAPE.</b>
+A silent threshold is a stat nobody knows they have, and a count that never recomputes on a swap
+passes every static check in the tree. The census is drawn on the <b>loadout panel</b>, where the
+swap happens, and on the <b>hero sheet</b>, the one screen where a whole loadout is read at once.
+<b><code>check_es</code> &sect;4 drives the arithmetic through the real equip / unequip doors</b> and
+requires the census to move by exactly the swapped card's own tags and come back; <b>
+<code>check_map_screen</code> drives the SCREEN</b> and requires the drawn line to change across a
+real toggle. <b>That second drive nearly passed vacuously and the near-miss is worth recording:</b>
+<code>queue_free()</code> is deferred, so for the rest of the frame the OLD overlay is still a child
+and comes first &mdash; a walk taking the first match compared a panel against itself and reported a
+moving count as green. It skips a node queued for deletion now.</p>
+
+<p><b>&sect;5 &mdash; A SPLASH PAYS FOR BREADTH, AND SEVEN OF THE TWELVE ARE LIVE.</b> Redefined: a
+normal rune pays for DEPTH in one tag, a splash for BREADTH across tags. That gives the category an
+identity again now that the talent lanes it used to reach across are severed &mdash; <b>tags are the
+thing to reach across</b>, and a hero who is spread rather than deep is who it is for. The machinery
+is built and no splash is authored. <b>THE BRIEF'S COUNT WAS WRONG BY ONE: FIVE of the twelve were
+retired at EO, not six, and SEVEN remain</b> &mdash; and they fell unevenly. <b>All three Warriors
+keep theirs</b> (Berserker, Swordmaster, Warden), the Pyromancer, Arcanist, Beastmaster and
+Sharpshooter keep theirs, and <b>the whole CLERIC class has none</b> (Holy, Devout and Occultist all
+retired), along with the Cryomancer and the Survivalist.</p>
+
+<p><b>&sect;6 &mdash; THE GATE, AND THE ONE ASSERTION THAT HAD TO MOVE.</b> <code>check_es</code> is
+new at <b>42 checks</b> and carries the four rulings; <b>its first run accused itself</b>, because a
+gate whose source holds its own fingerprint does &mdash; the rarity marks are joined at runtime now,
+which is <code>check_da</code> &sect;3's own scar paid again. <code>check_ek</code> &sect;3's
+game-side tag population <b>moves from THREE to FOUR</b>: <code>party_screen.gd</code> joins as the
+hero sheet's census, and the rule that a display surface may not BRANCH on a tag is re-pointed rather
+than loosened &mdash; it is asserted over <code>TAG_ORDER</code> itself now, so an eighth tag is
+covered by doing nothing. <code>check_eh</code> &sect;3's named reader set for
+<code>protected_names</code> gains <code>run_state.gd</code> with its reason: the loadout list wants
+NAMES, not SLOTS, which is that section's own distinction applied rather than violated.</p>
+
+<p><b>WHAT MOVED.</b> <code>scripts/runes.gd</code>, <code>scripts/classes.gd</code>,
+<code>scripts/run_state.gd</code>, <code>scripts/map_screen.gd</code>,
+<code>scripts/party_screen.gd</code>, <code>scripts/shop_screen.gd</code>,
+<code>scripts/run_sim.gd</code> and <code>scripts/events.gd</code> (the last two comment-only);
+<code>data/runes.json</code> (two keys removed from 65 entries, nothing else);
+<code>data/glossary.json</code>; six suites and four gates; and the documents.
+<b>No rune, no node, no constant and no authored magnitude.</b></p>
+
 <h2>2026-09-03 &mdash; Batch ER: LOYALTY CONVERTS, IT DOES NOT FLATTEN</h2>
 <p><i>The designer has ruled: <b>no flattening &mdash; Loyalty gains a CONVERSION above nominal, on
 Focus's shape.</b> The ruling is recorded as a standing rule; <b>the currency it converts into is

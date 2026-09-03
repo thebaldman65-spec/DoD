@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1350,
-  "source": 1041,
-  "other": 75,
+  "total": 1353,
+  "source": 1042,
+  "other": 77,
   "document": 234
  },
  "source_residency": {
-  "code": 620,
-  "absent": 287,
+  "code": 621,
+  "absent": 286,
   "runtime": 74,
-  "narrow": 19,
+  "narrow": 20,
   "alt-sibling": 2,
   "comment": 39
  },
@@ -1733,7 +1733,7 @@
    "h": "scripts/run_state.gd",
    "n": "protected_names",
    "p": "-",
-   "r": "absent",
+   "r": "narrow",
    "k": "literal",
    "how": "derived",
    "g": "check_eh.gd#141"
@@ -1770,8 +1770,19 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ek.gd#157",
+   "g": "check_ek.gd#164",
    "expr": "String"
+  },
+  {
+   "s": "check_ek.gd",
+   "fn": "_s3_inertness",
+   "h": "",
+   "n": "\"%s\"",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_ek.gd#157"
   },
   {
    "s": "check_ek.gd",
@@ -1782,7 +1793,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ek.gd#154"
+   "g": "check_ek.gd#161"
   },
   {
    "s": "check_ek.gd",
@@ -1793,7 +1804,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ek.gd#289"
+   "g": "check_ek.gd#296"
   },
   {
    "s": "check_ek.gd",
@@ -1804,7 +1815,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_ek.gd#233"
+   "g": "check_ek.gd#240"
   },
   {
    "s": "check_ek.gd",
@@ -1815,7 +1826,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_ek.gd#230"
+   "g": "check_ek.gd#237"
   },
   {
    "s": "check_el.gd",
@@ -1918,6 +1929,29 @@
    "k": "format",
    "how": "read",
    "g": "check_el.gd#152"
+  },
+  {
+   "s": "check_es.gd",
+   "fn": "_s1_rarity_is_gone",
+   "h": "",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_es.gd#57",
+   "expr": "String"
+  },
+  {
+   "s": "check_es.gd",
+   "fn": "_s1_rarity_is_gone",
+   "h": "scripts/runes.gd",
+   "n": "static func generate(member: Dictionary, _zone_slot: int,",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_es.gd#94"
   },
   {
    "s": "test_batch_ah.gd",
@@ -14909,7 +14943,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "param",
-   "g": "test_runes.gd#327",
+   "g": "test_runes.gd#330",
    "expr": "BOOLEAN_READ_FIELDS"
   },
   {
@@ -14921,7 +14955,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#191"
+   "g": "test_runes.gd#194"
   },
   {
    "s": "test_runes.gd",
@@ -14932,7 +14966,7 @@
    "r": "runtime",
    "k": "format",
    "how": "param",
-   "g": "test_runes.gd#194"
+   "g": "test_runes.gd#197"
   },
   {
    "s": "test_runes.gd",
@@ -14943,7 +14977,7 @@
    "r": "absent",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#197"
+   "g": "test_runes.gd#200"
   },
   {
    "s": "test_runes.gd",
@@ -14954,7 +14988,7 @@
    "r": "absent",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#199"
+   "g": "test_runes.gd#202"
   },
   {
    "s": "test_runes.gd",
@@ -14965,7 +14999,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#200"
+   "g": "test_runes.gd#203"
   },
   {
    "s": "test_runes.gd",
@@ -14976,7 +15010,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#198"
+   "g": "test_runes.gd#201"
   }
  ]
 }

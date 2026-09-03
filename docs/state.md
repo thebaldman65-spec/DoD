@@ -5,147 +5,165 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-03 (Batch ER).*
+*Last rewritten: 2026-09-03 (Batch ES).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: ER — LOYALTY CONVERTS, IT DOES NOT FLATTEN.** The designer ruled: **no flattening;
-  Loyalty gains a CONVERSION above nominal, on Focus's shape.** The ruling is recorded as a
-  `CLAUDE.md` standing rule. **The currency it converts into is NOT chosen and nothing was
-  authored** — no rune, node, constant or magnitude moved, and `data/runes.json` is byte-unchanged.
-  Full working: **`docs/reports/ER.md`**. **What shipped is §5: five corrections to the record**,
-  four of them copies of a claim an earlier sweep had already corrected somewhere else.
-- **§1 — THE PORT OF FOCUS'S SHAPE IS NOT A PORT OF FOCUS'S SAFETY, AND THAT IS THE BATCH'S MAIN
-  FINDING.** The ruling's case is that a conversion's loss column is zero. **On Focus that rests on
-  two preconditions Loyalty has neither of:** its first half **SATURATES** (crit chance stops paying
-  at +50%, so converted points bought nothing) and its **RATE IS UNTOUCHABLE** (`FOCUS_STEP` is a
-  const no node modifies — **Deep Focus moves the SPLIT POINT**). **Loyalty's first half never
-  saturates and every one of its rates carries a node**: `_bond_step` is raised by Absolute
-  Devotion, doubled by Ancient Pact and raised again by a rune; the strike step is raised by Wild
-  Communion and a rune. **So the rule for whoever builds it is: MOVE THE SPLIT POINT, NEVER THE
-  RATE.**
-- **§1b — WHAT THE CONVERSION COSTS, MEASURED AT THE SITE THE STEP IS READ.** A fourth arm
-  instrumented `_comp_dmg_mult` itself — one sample per companion blow — `--run 100`, rung 2, rows
-  1–3, **n = 2,030 battles and 6,283 blows.** Mean Loyalty at the blow **7.44**, of which **3.17 is
-  above nominal**; **42.6% of the meter a blow reads is above nominal.** Converting at nominal costs
-  the strike step **20.35% pooled** and **15.50 ±0.27% as a mean over battles**. **So each converted
-  stack must return about 6.4% of a companion blow for the loss column to be zero** — the price tag
-  every currency is quoted against.
-- **§1c — AND EQ'S LOSS TABLE IS PRICED AT A STEP THE MEASURED ARM DOES NOT WEAR.** EQ priced the
-  strike step as `1 + 0.05 L` — the BASE step — and **every arm at rows ≥ 1 holds Wild Communion,
-  devotion row 1**, which takes it to **0.12**. Re-priced live, the loss is **roughly double** what
-  that table prints (its 9.7% for the cap at nominal is **20.35%**). **EQ stated its own pricing, so
-  this corrects a figure and not a method** — the table's ORDERING between shapes stands, its
-  MAGNITUDES do not.
-- **§1d — THE METER RE-DERIVED ON THREE ARMS AND EQ REPRODUCES ON ALL OF THEM.** `--run 100`,
-  `DOD_SIM_ROUTE=balanced`, rung 2, standard four specs, live on an out-of-repo instrumented copy —
-  **not one executable byte of the shipped tree carries a probe.**
-
-  | arm | rows | mean peak | sd | median | >5 | >10 | >20 | deepest | n | EQ read |
-  |---|---|---|---|---|---|---|---|---|---|---|
-  | C | 0 | **6.64 ±0.09** | 3.23 | 6 | 61.2% | 11.2% | 0.1% | 22 | 1391 | 6.61 ±0.09 |
-  | A | 1–3 | **10.08 ±0.12** | 5.17 | 10 | 80.7% | 43.8% | 3.4% | 34 | 1947 | 10.13 ±0.11 |
-  | D | 1–9 | **18.98 ±0.17** | 8.86 | 18 | 99.6% | 77.6% | 40.8% | **90** | 2649 | 18.45 ±0.17 |
-
-  **The deepest single bond ever observed rose from 60 to 90.** **The number nobody had taken is how
-  much of the meter sits above nominal at all**, which is what a conversion spends: **15.7% of the
-  meter's own mass untalented, 32.7% with rows 1–3, 54.6% fully talented**, paying on **18.4% /
-  29.2% / 89.2%** of hunter turns. **The conversion is nearly inert at the bottom of the tree and
-  continuous at the top — the same six-to-one asymmetry EQ found for the shapes it replaces.**
-- **§1e — FOUR CURRENCIES PRICED, NONE AUTHORED, AND TWO OF THE FOUR MEET A DECISION ALREADY IN THE
-  CODE.** **BREAK** meets `UNLEASH_BREAK`'s own header, which refuses a per-stack Break term on this
-  meter by name; **but its build cost is ZERO and its real argument is better than the brief's** —
-  `_companion_hit` already takes a Break argument and **six of its eight call sites pass `pr = 0`**,
-  including every ordinary companion strike. **COMPANION DURABILITY pays into the meter's only
-  governor** (the companion's death), so it is positive feedback on the thing bounding the meter.
-  **THE PACK BOND BOON'S OWN GROWTH is the only one of the four needing no new field and no new read
-  site**, because both halves already exist and both are already payout readers — Focus's structure
-  exactly. **PARTY-WIDE is Bring It Down, which exists and is already hard-capped.**
-- **§1f — THE CONSTRAINT THAT KILLED FOUR OF EQ'S FIVE SHAPES IS SATISFIED FOR FREE.** A conversion
-  writes nothing into `_gain_loyalty` or `_loyalty_cap`, so **Kindred still fires at 8, Lone Bond
-  seats at 6, None Left Behind at 5, and Unleash / Primal Surge / Last Howl / Bring It Down pay
-  exactly what they pay today — by construction, not by care.** **But the two existing clamps go one
-  way or the other and the builder owes that sentence**: at the deepest live step (0.76 a stack) a
-  `_bond_mult` capped at nominal reaches ×4.80, so Ursus's mitigation reads 0.48 against a clamp of
-  **0.75** and the taunt pull 0.72 against **1.0** — **both dead at every talent depth**, which by
-  AR §4's rule makes them dead constants. **If `_bond_mult` is the RECEIVING half instead, both bind
-  harder.**
-- **§1g — AND THE TEXT COST IS SMALLER THAN ANY FLATTENING'S.** The meter really does stay uncapped,
-  so the nine surfaces EQ counted need the second phase NAMED rather than the *"no ceiling"* promise
-  retracted. `battle._stamp_loyalty_chip` already builds a two-line chip, so legibility costs one
-  format string — exactly what Focus's cost.
-- **§2 — THE DEEP BOND'S SHAPE IS ALREADY IN THIS GAME AND WAS RETIRED EIGHT BATCHES AGO.**
-  **`Rune of the Deep Sight`** carried `rune_deep_focus: 8` into `focus_convert()`, and its
-  `retired` string names the loss exactly: *"the one item that changes WHEN his patience converts
-  rather than how much it pays."* A Deep Bond that moves the Loyalty split point **keeps DEPTH as
-  its axis, keeps rewarding NOT swapping** (a held bond is what reaches the point) **and mirrors no
-  node**, because no Beastmaster node moves a point that does not exist yet. **Its DIRECTION is
-  undecidable until §1's currency is picked** — down is a buff only if the converted half is worth
-  more — **which proves the brief's hold by construction.** Today the rune buys **20–21% of a node
-  in rows 1–3**. Four shapes priced, none authored.
-- **§3 — HALF THE TURNING PACK IS STILL WORTH ZERO AND THE ARGUMENT FOR BREAK IS NOT.**
-  `SWAP_COOLDOWN` is 3, Quick Whistle shaves 3, the read site floors at 0 — **confirmed at the
-  line** — and Quick Whistle is pack row 1. Swaps re-measured per trash fight: **0.28 (rows 0) →
-  0.22 / 0.23 (rows 1–3) → 0.01 (rows 1–9)**. **The direction reproduces; the untalented magnitude
-  does not** (0.35 at EP, 0.38 at EQ, 0.28 here). **AND THE CONCENTRATION FACT IS WRONG FOR THE
-  THIRD TIME** — re-derived over all twelve boss pools, **THREE carry no damaging card (Beastmaster
-  5, Holy 3, Devout 2), not one**, and by TAG the Beastmaster holds **six BREAK cards**, mid-pack of
-  twelve against a range of 0–11. **The spec with no Break at all is the Devout**, who also has the
-  thinnest boss pool in the game at 2. Five options priced, none authored.
-- **§3b — AND EQ'S TEMPO COUNT IS OFF BY ONE, IN THE DIRECTION THAT FLATTERS THE ARGUMENT.** EQ
-  recorded *"eight of the twelve specs carry ZERO TEMPO cards"*; over EQ's own population it is
-  **SEVEN**, and over the pool a player can actually reach since EH §1 opened the class-wide tier it
-  is **THREE**, with **two** specs beating his one rather than one.
-- **§4 — THE SHARED WILD'S EVENT IS REAL AND HALF OF IT IS NOT A MEASUREMENT AT ITS n.** Companion
-  deaths a TRASH fight are rock steady across five independent readings: **0.22 / 0.22 / 0.23 /
-  0.22 / 0.22**. **The BOSS figure is not**: at the untalented arm it has read **0.39 (EP), 0.48
-  (EQ) and 0.26 (ER)** on **n ≈ 95 boss fights** each time — 2.5σ apart, so the per-fight
-  distribution is over-dispersed and **n ≈ 95 cannot resolve it to better than about ±0.1.** **The
-  brief quotes EP's 0.39, which EQ had already superseded with 0.48, and neither reproduces.**
-  **Price the rune against the trash figure and read the boss half as a band (0.26–0.48).** Four
-  options priced, none authored, with the splash's loss priced beside them.
-- **§5 — FIVE CORRECTIONS TO THE RECORD, AND FOUR WERE COPIES A SWEEP HAD MISSED.** The swap picker
-  card's own description and the group-button tooltip both said the shared cooldown is **2 turns**;
-  `SWAP_COOLDOWN` is **3**. Both corrected, with the source comment one screen above that said
-  `shared 2cd`. **`master.html` carried a THIRD copy of the same wrong 2**, 750 lines below the one
-  EQ corrected — **EH §2's sweep rule firing on the batch that invoked it.** **The Unleash claim —
-  *"the curve it empties"* — lived in BOTH `master.html` and a `classes.gd` comment**; Unleash reads
-  the raw stack count and never calls `_bond_mult`, and both are corrected with a do-not-restore
-  note naming the other copy. **`master.html` also quoted the meter's level with no loadout
-  attached** (*"measured near 20"*) and now names both. **The governor table's addresses for this
-  meter were stale by ten thousand lines and are corrected** (`_on_beast_death` 10790 → **21732**,
-  the clamp const 7370-7385 → **13300–13345**).
-- **§6c — A SECOND RED WAS HIDING AT A FLAKE BAND'S FLOOR SINCE EN, AND IT IS REPAIRED.**
-  `test_rune_battle` read 97 / 1, inside its `fails: [0, 1]` band — **but the failure was not the
-  flake that band exists for.** The row's note names the *pyromancer / White Flame* proc; the actual
-  line was **`occultist: the Deepening Ruin grinds 0 Break damage, expected 5`**. **A two-armed
-  control settled it: SIX OF SIX, on the working tree AND on a copy of unmodified HEAD** — so
-  **deterministic, not a flake, and not ER's.** **THE RED WAS THE ASSERTION, NOT THE RUNE**: EN §1
-  moved that clause onto `rune_entropy_ranks` and `battle.gd:2699` sums the pair, but the line still
-  read the NODE's `entropy_ranks` alone, while its sibling one line above had been re-pointed
-  through `_paid()`. **Re-pointed in place (DC's repair-to-intent rule); the suite now reads
-  97 / 0.** **NO NUMBER IN `baselines.json` MOVED** — the band stays `[0, 1]` and is now the
-  pyromancer flake's contribution alone; **the floor was deliberately NOT raised**, because a
-  failure floor above zero is a promise a red is known, named and *deliberate*. **The sweep is
-  CLOSED, over the population rather than the three names**: all **50** `unit.gd` fields with a
-  `rune_` twin, comment-stripped over `test_rune_battle.gd` — **zero remaining bare node reads.**
-  **This is `CLAUDE.md`'s own *A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE*, paid a second time.**
-- **WHAT MOVED: TWO SOURCE FILES, ONE SUITE AND SEVEN DOCUMENTS.** `scripts/battle.gd` (three copies of the
-  wrong 2), `scripts/classes.gd` (the Unleash comment, comment-only), `docs/master.html`,
-  `CLAUDE.md`, `docs/changelog.html`, `docs/design-notes.md`, this file, `docs/reports/ER.md`,
-  plus `test_rune_battle.gd` (one assertion re-pointed) and one line of PROSE in `baselines.json`.
-  **No rune, no node, no constant, no magnitude, no gate and NO BASELINE NUMBER.**
-- **Next letter: ES.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: ES — THE RUNE LAYER'S NEW SHAPE.** **STRUCTURE ONLY: not one rune is authored,
+  re-authored or retuned.** Every `payload`, `price`, `desc`, `lane` and `scope` in
+  `data/runes.json` is byte-unchanged; the two keys removed (`rarity`, `scarred`) are the whole
+  data diff. **Rarity is removed ENTIRELY, "Scarred" is removed as a LABEL while every cost clause
+  stays, SCOPE becomes the surviving axis, and runes gain the machinery to read ARCHETYPE TAGS on
+  their holder's EQUIPPED cards.** Full working: **`docs/reports/ES.md`**. **Three of the brief's
+  premises were wrong and all three are corrected there**, one in the reassuring direction.
+- **§1 — RARITY IS GONE, AND THE HALF THAT MATTERED WAS THE OFFER ODDS.** The tiers, the prefixes
+  (Cracked / Polished / Radiant), the colours, the ×1/×2/×3 magnitude ladder and the 50/100/160
+  tier price are all removed. **What rarity MEANT was an authoring convention, never a behaviour** —
+  the kind lives in the payload — so every rune goes on doing exactly what it did (`test_rune_battle`
+  drives all 65 and reads 97 / 0). **What it DID was drive the offer odds**, 60/30/10 at zone 1
+  deepening to 25/45/30 by zone 3. **Measured live before and after, 4,000 draws a cell: the
+  generated stat family was 49.8% / 33.1% / 21.1% of a Berserker's offers by zone slot and is a flat
+  29.9% / 29.6% / 30.3% now.** **The early game improves and the late game worsens; that is the
+  ruling's price and it is paid on purpose.** The zone slot stays in `Runes.generate`'s signature as
+  `_zone_slot` and is deliberately unread, which `check_es` §1 asserts.
+- **§1b — PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND AND NO RULE WAS INVENTED FOR IT.**
+  Authored runes have always carried their own `price` and `build()` has always read it, so **not
+  one price moved** — but they were written against a tier table that no longer exists, and the 53
+  offerable still run **50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5**. **The 75 and 120 rows exist
+  specifically to undercut a clean peer price that is gone.** The generated family sits on
+  `Runes.TEMPLATE_PRICE` = 50, the Common floor it already had — the absence of a rule, not a new
+  one. **This is a design decision and it is the designer's.**
+- **§1c — AND THE BRIEF'S PREMISE THAT `is_cost` READS RARITY IS FALSE, IN THE REASSURING
+  DIRECTION.** It reads a **field name and a sign** and never read a tier. **`DOD_SIM_RUNE_POWER` is
+  a POWER lever, not "the sim's rarity lever"** — that phrase has been copied through EO §3, EP §4
+  and this brief. **Removing rarity cannot make a cost clause start scaling**, which was the inverse
+  defect the brief was right to ask about.
+- **§2 — SCOPE IS THE SURVIVING AXIS AND THE FIVE UNIVERSALS ARE RE-SCOPED, NOT RETIRED — AND THE
+  CLASS EACH LANDS ON IS UNMADE.** Scope replaces rarity on the shop row, the offer button and the
+  three pouch lists (`scope_label` / `scope_color`). **The class is CONTENT and the standing rule
+  forbids a batch presenting rune content as options**, so the five keep `scope: "universal"` and
+  `check_es` §2 asserts they still roll for all twelve specs — a stealth retirement through an
+  eligibility rule goes red rather than quiet. **THE SIZE OF THE MOVE IS MEASURED AND IT IS LARGER
+  THAN THE BRIEF SAYS: the five are 5 of every spec's 9–12 offerable runes, 42% to 56% of the
+  drawable pool**, which makes this the largest single movement the pool has ever taken. If all five
+  landed on one class the other nine specs would fall to **4–7 offerable against 3 rune slots**, and
+  the Occultist — already thinnest at 9 — would fall to **4**. **Flipping them is one string each in
+  the data on the day the designer rules.**
+- **§2b — AND THE FIELD-NEIGHBOURHOOD EVIDENCE DOES NOT DECIDE IT, WHICH IS THE POINT.** `reaper`'s
+  `rune_execute_bonus`, `glass`'s `dmg_taken_bonus` and `vampiric`'s `rune_lifesteal` are written by
+  **no other rune in the file**, so nothing places them; the three that can be placed point in
+  different directions. **Two of the five charge for their upside** (Glass, Vampiric) and EP measured
+  those as the Swordmaster's fallback if the Bared Guard is ever retired — **re-scoping either to a
+  non-Warrior class removes that fallback outright.** Table in `docs/reports/ES.md` §2a.
+- **§3 — THE LABEL WENT, EVERY COST CLAUSE STAYED, AND THE LABEL AND THE BEHAVIOUR HAD NEVER
+  AGREED.** The flag, the crimson prefix and the crimson colour are removed; the negative terms are
+  byte-unchanged. **`Runes.is_cost` is what recognises a cost now** — the same function that holds a
+  cost at its authored value under the power probe — **measured before and after on two shapes at
+  the arm's own ×3**, upside moving and cost held, plus the cost landing on a live hero config.
+  **BOTH POPULATIONS ARE 17 AND THEY ARE DIFFERENT 17s.**
+  - **`exsanguination` CARRIED THE FLAG AND HAS NO PAYLOAD COST TERM AT ALL.** Its whole payload is
+    `blood_pact: -15`, which `INVERTED_STAT_FIELDS` reads as the rune's PROMISE (veins pop at 85).
+    Its price — the bleedout tearing **15% of max health instead of 20%** — is a second behaviour of
+    the SAME field at the SAME read site (`battle._add_bleed_with_burst`, `battle.gd:21876`). **One
+    field, two behaviours, nothing for any sweep to find.** The flag was the only machine-readable
+    record that it charges anything. **Named in `test_runes.COST_WITHOUT_A_TERM` and `check_es` §3
+    with its reason, never suppressed.**
+  - **`anchor` CARRIES A REAL −10 SPEED AND NEVER CARRIED THE FLAG**, because the old schema asserted
+    *"scarred commons are not a thing"* and it is the one common in the file. **The schema forbade
+    the label on grounds of TIER, not of behaviour — a rarity rule was hiding a cost**, which is an
+    argument for §1 that §1 did not have to make for itself.
+  - **The `check_es` §3 population is pinned as a NAMED SET, not a count** — a count would let one
+    entry lose its term while another gained one and read green. **`test_runes._coverage`'s property
+    survived the instrument change**: derived through `is_cost`, it is still exactly one costed lane
+    rune per spec and zero costed splashes, on all twelve.
+- **§4 — RUNES CAN READ TAGS NOW AND NOT ONE RUNE DOES.** The door is
+  `Run.loadout_ability_names(member)` → `Classes.tag_census` / `tag_count` / `tag_breadth`, with
+  **`Runes.tag_threshold_met(names, tag, need)`** and **`Runes.breadth_met(names, need)`** as the two
+  shapes a clause asks through. **EQUIPPED, NEVER OWNED:** a pool only grows, so a threshold read off
+  it turns on once, late, and never off — the flat increment with a delay. A loadout is capped and
+  freely swapped, so counting it makes the loadout a **lever**.
+  - **THE BRIEF'S "7–10 equipped and freely swappable" IS TWO DIFFERENT SETS AND THE CORRECTION
+    DECIDES A DESIGN QUESTION.** The 7–10 is `ability_slot_cap()`, and `ability_slots_used` is
+    `core_slots(spec) + equipped_ability_names().size()` — **the protected core is inside the brief's
+    own number** while only the earned half is swappable. **The census counts the whole bar**, for
+    three reasons: the cores are what the spawn puts on the bar (`check_es` §4 re-derives the spawn's
+    own kit against `protected_names` and they are **identical on all twelve**); a hero with no
+    earned cards would otherwise census to ZERO on every tag, so the mechanic would be dead for the
+    first third of a run; and **`protected_names` and `core_slots` are different units** — a
+    Beastmaster is 3 slots holding SIX names — so a census wants NAMES.
+  - **THE `Runes` HELPERS TAKE THE NAME LIST AND NOT THE MEMBER, AND THAT IS A CONSTRAINT.** They are
+    static on a `class_name` script and **a static function cannot see an autoload**: `Run` from
+    there is `Compile Error: Identifier not found: Run`, found by running it. The split is also what
+    keeps `run_state.gd` free of every tag word, which `check_ek` §3 asserts at zero for that file by
+    name.
+- **§4b — THE CORE-KIT BASELINE IS THE FINDING, AND IT IS PRINTED EVERY BATTERY RUN.** Before a card
+  is drafted, the protected cores ALONE already meet a **2+ threshold on BREAK for TEN of the twelve
+  specs** and on **DEBUFF for SEVEN**; **MARK is zero for all twelve** and **TEMPO reaches 1 on
+  exactly one** (the Devout). **A "hold 2+ BREAK" rune would be on from the first fight for ten specs
+  and no swap could turn it off** — the flat increment again, arriving through the cores instead of
+  through the pool. **A threshold's magnitude has to be chosen against that table**; `check_es` §4
+  prints it per spec so the day a core kit moves nobody has to remember this. **The full table is in
+  `docs/reports/ES.md` §4b.**
+- **§4c — THE COUNT IS COMPUTED ON DEMAND, UNCACHED, AND THAT IS THE RIGHT SHAPE TODAY.** One
+  dictionary lookup per carried card (7–10 of them), **two callers and both are screen draws** — the
+  loadout panel and the hero sheet — so there is nothing to invalidate and no cache to go stale.
+  **WHEN A RUNE FINALLY READS IT IN A FIGHT THE PLACE IS THE SPAWN, NOT THE STRIKE LOOP**: the
+  loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
+  Recorded in `CLAUDE.md` so the batch authoring the first threshold rune does not re-derive it.
+- **§4d — THE COUNT IS VISIBLE AND DRIVEN IN TWO PLACES, AND THE SCREEN DRIVE NEARLY PASSED
+  VACUOUSLY.** A silent threshold is a stat nobody knows they have. `check_es` §4 drives the
+  arithmetic through the real equip/unequip doors and requires the census to move by **exactly the
+  swapped card's own tags** and come back; `check_map_screen` drives the SCREEN. **`queue_free()` is
+  DEFERRED, so for the rest of the frame the old overlay is still a child and comes FIRST** — a
+  finder taking the first match compared a panel against itself and printed *"ES census moved on the
+  swap: false"* while the count was in fact moving. It skips a node queued for deletion now. **The
+  reading that caught it was the two printed lines being byte-identical, not a failing assertion**,
+  which is why the verdict prints both.
+- **§4e — `check_ek` §3's GAME-SIDE TAG POPULATION MOVES FROM THREE TO FOUR, AND THE FOURTH IS
+  `party_screen.gd`.** Two files define the tables and **two** display them now: `map_screen.gd` (the
+  draft card's line and the panel's census) and the hero sheet, which `docs/state.md` has recommended
+  as the tags' surface since EK. **EK's claim is unchanged — nothing reads a tag for anything but
+  display.** The rule that a display surface may not BRANCH on a tag is **re-pointed rather than
+  loosened**: it used to forbid `map_screen.gd` naming anything but the line builder, a proxy that a
+  census makes wrong without making the property wrong, and it is asserted directly now over
+  `TAG_ORDER` itself — **a display surface may not name a tag WORD** — so an eighth tag is covered by
+  doing nothing. `TAG_SURFACE` grows by the five new names.
+- **§5 — A SPLASH PAYS FOR BREADTH, AND THE BRIEF'S COUNT IS OFF BY ONE.** Redefined: a normal rune
+  pays for DEPTH in one tag, a splash for BREADTH across tags — the inverse shape, and what gives the
+  category an identity again now that the lanes it reached across are severed. **FIVE of the twelve
+  were retired at EO, not six, and SEVEN remain** — and they fell along class lines. **All three
+  WARRIORS keep theirs** (Broad Path, Duelist, Sentinel), the Pyromancer, Arcanist, Beastmaster and
+  Sharpshooter keep theirs, and **the whole CLERIC class has none** (Open Hand, Standing Vow and
+  Whispering Dark all retired), with the Cryomancer and Survivalist. **So the class with no splash at
+  all is the one that would gain most from the category being given an identity.** Machinery built,
+  nothing authored.
+- **§6 — THE GATE, AND THE TWO ASSERTIONS THAT HAD TO MOVE.** `check_es` is new at **42 checks** and
+  carries four rulings; **§2 deliberately encodes none**, because the five universals' classes are
+  unmade and a gate that asserted one would be encoding a ruling nobody made. **Its first run accused
+  itself** — a gate whose source holds its own fingerprint does — so the rarity marks are joined at
+  runtime, which is `check_da` §3's own scar paid again. **`check_eh` §3's named reader set for
+  `protected_names` gains `run_state.gd` with its reason**: the loadout list wants NAMES, not SLOTS,
+  which is that section's own distinction applied rather than violated.
+- **WHAT MOVED: EIGHT SOURCE FILES, TWO DATA FILES, SIX SUITES, FOUR GATES AND EIGHT DOCUMENTS.**
+  `scripts/runes.gd`, `scripts/classes.gd`, `scripts/run_state.gd`, `scripts/map_screen.gd`,
+  `scripts/party_screen.gd`, `scripts/shop_screen.gd`, and `scripts/run_sim.gd` +
+  `scripts/events.gd` (comment-only); `data/runes.json` (two keys removed from 65 entries, nothing
+  else) and `data/glossary.json`; `test_runes`, `test_batch_ak`, `test_batch_ay`, `test_batch_az`,
+  `test_batch_aw`; `check_ek`, `check_eh`, `check_map_screen` and the new `check_es`;
+  `docs/master.html`, `docs/changelog.html`, `docs/text-standard.html`, `docs/design-notes.md`,
+  `CLAUDE.md`, `baselines.json`, this file and `docs/reports/ES.md`. **No rune, no node, no constant
+  and no authored magnitude.**
+- **Next letter: ET.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, the archetype tags have their real names and are still inert,
-  and **the rune layer is charter-clean on the mechanics at 59 of 59.** What is left in the rune
-  layer is design: **the three Beastmaster re-authors and whether the lane rule is replaced with
-  anything** — the Bared Guard is ruled and kept. **The Loyalty curve is RULED (a conversion) and
-  its CURRENCY is the open half.** **And the ladder still has an open design question of its own
-  (what rung 2 should ASK).**
+  purpose-authored and charter-clean, and **the rune layer is charter-clean on the mechanics at 59 of
+  59.** **The archetype tags are no longer inert: a rune can read them, and nothing does yet.** What
+  is left in the rune layer is design: **the three Beastmaster re-authors, the five universals'
+  classes, rune PRICING now that the tier table is gone, and the first rune to actually key off a
+  tag.** **The Loyalty curve is RULED (a conversion) and its CURRENCY is the open half. And the
+  ladder still has an open design question of its own (what rung 2 should ASK).**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -202,12 +220,62 @@ distribution is available today from the per-run progress line, which carries th
 which is why EP measured rather than repaired, and why repairing it is a small, clearly-scoped
 instrument batch rather than an emergency.
 
-### THE ARCHETYPE TAGS — NAMED AT EL, STILL INERT, AND EVERY DESIGN QUESTION IN THEM IS OPEN
+### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ALL THREE ARE RUNE CONTENT AND ALL THREE ARE THE DESIGNER'S**
 
-**Full evidence: `docs/reports/EK.md` (the derivation) and `docs/reports/EL.md` (the names and the
-seventh).** The vocabulary is `DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK`, it is
-on every ability in the corpus and every authored rune, the draft card shows it, and **nothing
-reads it.** `check_ek` and `check_el` assert that every battery run.
+**Full evidence: `docs/reports/ES.md`.** ES built machinery and authored nothing, and the standing
+rule it recorded is why: *a batch may build machinery, re-scope, retire or repair; it never authors a
+rune and never presents rune content as options.* **These three are what the machinery is waiting
+for.** Each has its measurement attached and none has an option list, deliberately.
+
+- **(1) RUNE PRICING, WHICH RARITY LEFT BEHIND — NEW AT ES §1 AND THE SHARPEST OF THE THREE.** The
+  53 offerable runes carry **50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5**, every one written against
+  a tier table that no longer exists. **The 75 and 120 rows exist SPECIFICALLY to undercut a clean
+  peer price that is gone** (the old schema asserted a costed rune must be cheaper than its clean
+  rarity peer; there is no peer). **Not one price moved and no rule was invented.** The generated stat
+  family sits on `Runes.TEMPLATE_PRICE` = 50 — the Common floor it already had, which is the absence
+  of a rule rather than a new one. **This joins the three pricing questions below rather than
+  replacing them**; it is about the rune layer's own prices, where EB §1's ruling was about cores
+  against draft cards.
+- **(2) WHICH CLASS EACH OF THE FIVE UNIVERSALS LANDS ON — RULED TO MOVE AT ES §2, UNMADE.** Scope is
+  spec-and-class only; the five are **re-scoped, not retired**, and until the classes are named they
+  keep `scope: "universal"` with `check_es` §2 asserting they still roll for all twelve. **They are 5
+  of every spec's 9–12 offerable runes — 42% to 56% of the drawable pool — so this is the largest
+  single movement the pool has ever taken.** If all five landed on one class the other nine specs
+  would fall to **4–7 offerable against 3 rune slots**, and the Occultist (thinnest at 9) to **4**.
+  **The field-neighbourhood evidence does not decide it**: `reaper`, `glass`'s cost term and
+  `vampiric`'s upside term are written by no other rune in the file, and the three that CAN be placed
+  point in different directions. Table in `docs/reports/ES.md` §2a. **And re-scoping `glass` or
+  `vampiric` outside Warrior removes the Swordmaster's fallback EP measured.**
+- **(3) THE FIRST RUNE THAT ACTUALLY KEYS OFF A TAG — MACHINERY BUILT AT ES §4/§5, NOTHING
+  AUTHORED.** A rune can ask **how many equipped cards of tag X its holder carries**
+  (`Runes.tag_threshold_met`) or **how many different tags it spans** (`Runes.breadth_met`).
+  **Thresholds are the default shape and a splash pays for breadth**, both ruled. **The one hard
+  constraint on whoever authors the first is measured and printed every battery run**: the protected
+  cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on **DEBUFF for
+  seven**, so those two magnitudes are already spent; **MARK is zero for all twelve and TEMPO reaches
+  1 on exactly one**, so those two are the ones a draft can actually move. **And the place a rune
+  reads it in a fight is the SPAWN, not the strike loop** — the loadout cannot change during a
+  battle. `CLAUDE.md` carries all of that as a standing rule.
+
+### THE ARCHETYPE TAGS — READABLE AT ES, KEYED TO NOTHING, AND EVERY DESIGN QUESTION STILL OPEN
+
+**Full evidence: `docs/reports/EK.md` (the derivation), `docs/reports/EL.md` (the names and the
+seventh) and `docs/reports/ES.md` §4 (the reading machinery).** The vocabulary is
+`DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK`, it is on every ability in the corpus
+and every authored rune, and the draft card shows it.
+
+- **THE INERTNESS ENDED AT ES §4 AND WHAT REPLACED IT IS NARROW: a rune CAN ask how many equipped
+  cards of a tag its holder carries, and NO RUNE ASKS.** The door is
+  `Run.loadout_ability_names` → `Classes.tag_census` / `tag_count` / `tag_breadth`, with
+  `Runes.tag_threshold_met` and `Runes.breadth_met` as the two shapes a clause comes through.
+  **`check_ek` §3's game-side population is FOUR now** — two files defining, two displaying — and
+  its claim is unchanged: **nothing reads a tag for anything but display.** The rule that a display
+  surface may not BRANCH on one is asserted directly over `TAG_ORDER` rather than by proxy.
+- **AND THE FIRST THING THE MACHINERY MEASURED IS THE CONSTRAINT ON EVERY FUTURE THRESHOLD RUNE.**
+  The protected cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on
+  **DEBUFF for seven**, while **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly one**.
+  See the WHERE block; `check_es` §4 prints the per-spec table every battery run rather than this
+  file carrying a second copy of it.
 
 - **WHETHER THE SET IS RIGHT IS STILL THE WHOLE QUESTION AND IT IS STILL THE DESIGNER'S.** The
   alternative — six STATUS names — is measured rather than described: **40 of 154 covered, 114
@@ -245,11 +313,12 @@ reads it.** `check_ek` and `check_el` assert that every battery run.
   nine spec archetypes is a design decision with a stat table under it.
 - **WHAT THE TAGGING STILL HAS NOT REACHED, STATED SO IT IS NOT READ AS CLEAN.** No sim and no
   balance judgement; not one magnitude was measured. **The tags were not compared against relics,
-  items, enemy abilities or events**, none of which carries one. **AND NO RUNE IS KEYED TO A TAG.**
-  EM took the rune charter's MECHANICAL half — 56 clauses off the talent counters and onto fields of
-  their own — and deliberately keyed nothing to a tag, because the differential mechanism (a rune
-  worth more to a hero pointed the same way) is the design half and waits for a real draft screen.
-  **`check_ek` §3's game-side population is still THREE.**
+  items, enemy abilities or events**, none of which carries one. **AND NO RUNE IS KEYED TO A TAG —
+  ES BUILT THE MACHINERY AND AUTHORED NOTHING.** EM took the rune charter's MECHANICAL half (56
+  clauses off the talent counters onto fields of their own) and keyed nothing to a tag; ES gave a
+  rune the QUESTION to ask and no rune asks it. **The differential mechanism — a rune worth more to
+  a hero pointed the same way — is now buildable and is still unbuilt**, and the first rune that
+  keys off a tag is content and is the designer's.
 - **AND TWO CLOSED AUDIT REPORTS STILL SAY `Tempo`.** `docs/talent-audit.html` and
   `docs/rune-audit.html` were deliberately not edited: both are CLOSED (CV / DN) and kept *"as
   written — it is the evidence of which way each disagreement pointed"*. **A reader searching
@@ -378,7 +447,8 @@ in `CLAUDE.md`. Nothing is built and the currency is not chosen.**
 
 **ER ADDED THE SHAPE THE DEEP BOND'S RE-AUTHOR FALLS OUT OF, AND BROKE TWO MORE OF THE PREMISES.**
 - **THE ITEM A RE-AUTHORED DEEP BOND WOULD BE IS ALREADY IN THIS GAME AND WAS RETIRED AT EO §3.**
-  **`Rune of the Deep Sight`** — 100g rare, same rarity and price — carried `rune_deep_focus: 8`
+  **`Rune of the Deep Sight`** — 100g, and it was the same price and the same tier as the Deep Bond
+  when both had one (**ES §1 removed the tiers; both prices are unmoved**) — carried `rune_deep_focus: 8`
   into `focus_convert()`, and its `retired` string names the loss exactly: *"the one item that
   changes WHEN his patience converts rather than how much it pays."* **A Deep Bond that moves the
   Loyalty split point keeps DEPTH as its axis, keeps rewarding NOT swapping, and mirrors no node.**
@@ -455,7 +525,9 @@ rune slots.** **Nothing is authored here — rune content is content and it is t
   matches the build's target lane, so a splash is already the last thing the bot reaches for.**
 - **RUNE OF THE BARED GUARD — KEPT, AND THE 80% REFUND IS ACCEPTED.** This one settles with no
   implementation, so **it is a `CLAUDE.md` standing rule** rather than a queue item: paying a point
-  and a lane to soften a Scarred rune is a decision, which is what a Scarred rune is for.
+  and a lane to soften a COSTED rune is a decision, which is what the cost is for. (**ES §3
+  relabelled that rule and did not weaken it** — there is no Scarred label; `Runes.is_cost` is what
+  recognises a cost, and the Bared Guard's −0.15 is byte-unchanged and still one of the 17.)
 
 ### THE RUNE CHARTER — MECHANICS TAKEN AT EM, EVERY DESIGN QUESTION IN IT STILL OPEN
 
@@ -500,7 +572,9 @@ battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`
     governs. Its two clauses ARE the trade (+10% Aggressive Stance bought with −15% off Defensive
     Stance), so **retiring it removes the cost with the upside** — it is the only item that lets a
     Swordmaster buy commitment, and losing it would make him **the only spec in the game with no
-    Scarred rune.**
+    rune that charges for its upside.** (**ES §3 re-derived that population and it is a different 17
+    from the flag's** — see the WHERE block — but the Warrior arithmetic is unaffected:
+    `exsanguination` is the Berserker's and `anchor` is universal.)
   - **RETIRED MEANS KEPT — AND THE CONTRACT PAID FOR ITSELF IMMEDIATELY.** Each of the twelve keeps
     its `runes.json` entry with a `retired` string naming what is lost; `config` / `build` /
     `display_name` still resolve it. **`test_batch_bj` pins the Whispering Dark's own description
@@ -510,14 +584,22 @@ battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`
     **9 drawable, 2 spec-scoped, 5 on the rare shelf, against 3 rune slots** — the Occultist is
     thinnest, and **the Beastmaster is the only spec whose pool did not shrink at all**, because his
     three went to the re-author half.
-- **WHAT SEVERING THE LANE RULE DELETES, RECORDED BECAUSE IT WAS MEASURED.** 36 lane runes and 12
-  splashes — **48 of the 65** — were authored to *"one rune per talent lane, plus one splash"*, whose
-  point was that a rune is *"worth more to a hero whose points went elsewhere."* **A rune with its
-  own field is worth the same to every hero of its spec**, which is the power increment the rule
-  existed to prevent. **The splashes lose most**: with no lanes to reach across, a splash is three
-  unrelated numbers in a bundle. **The 36 `lane` fields are still authored and still shown** and now
-  describe where a rune came from rather than what it reaches. **Whether anything replaces the
-  variance mechanism is the open design question**, and the archetype tags are the candidate.
+- **WHAT SEVERING THE LANE RULE DELETES, RECORDED BECAUSE IT WAS MEASURED — AND ES §5 ANSWERED THE
+  SPLASH HALF OF IT.** 36 lane runes and 12 splashes — **48 of the 65** — were authored to *"one rune
+  per talent lane, plus one splash"*, whose point was that a rune is *"worth more to a hero whose
+  points went elsewhere."* **A rune with its own field is worth the same to every hero of its spec**,
+  which is the power increment the rule existed to prevent. **The 36 `lane` fields are still authored
+  and still shown** and now describe where a rune came from rather than what it reaches.
+  - **THE SPLASH HALF IS RULED AT ES §5: A SPLASH PAYS FOR BREADTH ACROSS TAGS.** EJ's finding was
+    that with the lanes severed *"a little of every bond"* had nothing left to reach across; **tags
+    are the thing to reach across.** The machinery is `Runes.breadth_met`, **no splash is authored**,
+    and the live census is **SEVEN of the twelve alive, not six retired as the brief said — FIVE were
+    retired at EO.** They fell along class lines: **all three Warriors keep theirs and the whole
+    CLERIC class has none.**
+  - **THE LANE-RUNE HALF IS STILL THE OPEN DESIGN QUESTION.** What replaces the variance mechanism
+    for the 36 is unruled; **the archetype tags are now not merely the candidate but a BUILT one** —
+    a threshold rune is worth more to a hero whose loadout points the same way, which is exactly the
+    asymmetry the lane rule provided. **Nothing is authored.**
 - **THREE RUNE-ONLY EFFECTS STILL ANNOUNCE THEMSELVES AS TALENTS** — `beacon_ranks`,
   `capacitor_ranks`, `mindfulness_ranks`, none of which has a node of that name in any tree — **and
   three more share a label with a node the holder may not own** (Grudge, Shared Vigil, On the Edge).
@@ -1116,6 +1198,20 @@ re-derived from the source at DM; not one was moved.**
 
 ### Carried from the code, reported and deliberately not fixed
 
+- **`events.gd`'s RELIC-TIER COMMENT LOOKS LIKE A SITE ES §1 MISSED AND IS NOT ONE.** It reads
+  *"(Batch 39 tiering exists exactly so events can promise rarity)"* at `events.gd:356` and it is
+  about **RELIC** tiers — 17 common and 8 rare — which ES does not touch. **Named here because a
+  grep for `rarity` finds it and the next reader will assume it was overlooked.**
+- **THE "a held rune for two of lower rarity" EVENT NEEDS RE-SPECIFYING NOW, NOT JUST BUILDING
+  (ES §1).** It was already blocked on a surrender path that has never existed (`equipped` has one
+  writer and the pouch only grows). **With no tiers there is no "lower rarity" to trade down to**, so
+  the idea needs a new statement before it can be costed. `master.html` and `events.gd` both say so.
+- **THE `scarred_runes` GLOSSARY ENTRY KEEPS ITS `id` AND NO LONGER MATCHES IT (ES §3).** It is
+  rewritten as *"Runes That Charge"* and teaches the mechanic rather than the retired name; the `id`
+  is kept so the runes entry's `see_also` edge still resolves. **Nothing outside `glossary.json`
+  names that id** — checked. Renaming the id is a one-line change in two places and is cosmetic.
+
+
 - **THE SWAP CARD A PLAYER READS SAYS THE COOLDOWN IS 2 AND `SWAP_COOLDOWN` IS 3 (EQ §6).** Two
   authored strings: `battle.gd:6397`, the swap picker card's own `description` (*"Shared cooldown:
   2 turns."*), and `battle.gd:5305`, the group-button tooltip (*"shared 2-turn cooldown"*). A source
@@ -1330,7 +1426,18 @@ re-derived from the source at DM; not one was moved.**
 - **`_spawn` IS AUTHORED ONCE, IN `suite_fixture.gd`, AND 37 SUITES GO THROUGH IT.** `_kill` too, in
   14. Each suite keeps its OWN `_spawn` SIGNATURE and delegates, so **all 389 call sites are
   untouched.**
-- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-five** —
+- **`run_battery.sh` RUNS 46 SUITES AND MISSES NONE.** The `GATES` array is **thirty-six** —
+  **ES ADDED `check_es` BECAUSE THAT BATCH CARRIES FOUR RULINGS AND THREE OF THEM DECAY SILENTLY.**
+  §1 is the one a source sweep cannot reach: a re-invented tier is a new table and a new roll, and
+  the OFFER DISTRIBUTION is the only place it shows, so it is MEASURED at three zone slots against a
+  4.5-point band where the old weights spread it by 29. §3 is the dangerous one: with the `scarred`
+  flag gone, `Runes.is_cost` is the only thing that knows a rune charges anything and it is what the
+  power arm holds a cost by, so the costed population is derived and pinned as a NAMED SET with
+  `exsanguination` named as the one whose cost is a behaviour rather than a term. §4 is DS's Heads
+  Down shape outright and is DRIVEN through the real equip/unequip doors. **§2 DELIBERATELY ENCODES
+  NO RULING** — the five universals' classes are unmade, so it asserts nothing was stealth-retired
+  and PRINTS the depth table the decision needs, because a gate that named a class would be encoding
+  a ruling nobody made. Before it,
   **EM ADDED `check_em` BECAUSE EJ §5 NAMED THIS BATCH AS ITS HOME**: *the property a future gate
   wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.*
   §1 derives that property from `LANE_TREES` and `runes.json` rather than from a list of names, and
@@ -1377,8 +1484,8 @@ re-derived from the source at DM; not one was moved.**
   populations LIVE and require the suite's table to equal them, because a named population is only
   useful while it is still the real one — which is what stopped being true between CN and DW. **It
   also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **There are 41
-  `check_*.gd` files**, so **seven are not in `GATES`** — `check_ck_width`,
+  move a line in another file and say why. **There are 42
+  `check_*.gd` files** (ES added `check_es`), so **seven are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
   AFTER them**, so the four that run nowhere are `check_ck_width`, `check_cu`, `check_cv` and `check_dn`.
@@ -1411,8 +1518,14 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 86 ROWS: 46 suites, 35 gates, 2 scene runs
-  and 3 harness gates.** **EM ADDED `check_em` AT [210, 210]; EN MOVED IT TO [223, 223] AND MOVED `av` AND `ax` BY ONE AND TWO. EM MOVED FIVE OTHER ROWS —
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 87 ROWS: 46 suites, 36 gates, 2 scene runs
+  and 3 harness gates.** **ES ADDED `check_es` AT [42, 42] AND MOVED EXACTLY THREE OTHER ROWS —
+  `test_runes` 3101 → 3118, `check_ek` 43 → 45 and `check_parse` 161 → 162 — ALL FOUR WRITTEN BEFORE
+  THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS EACH.** **The `test_runes` +17 was COUNTED OFF
+  THE DIFF rather than guessed**: `_schema` goes 472 → 585 (two absence pins and a no-prefix pin
+  replace one tier check and one conditional price check, over 65 entries) and `_scarred` → `_costs`
+  goes 102 → 6, called twice as before; +113 − 96 = +17. **`check_parse`'s move is that row working
+  as designed** — its count IS its coverage, so a target joining the battery raises it the same day. **EM ADDED `check_em` AT [210, 210]; EN MOVED IT TO [223, 223] AND MOVED `av` AND `ax` BY ONE AND TWO. EM MOVED FIVE OTHER ROWS —
   `check_dp` 43 → 48, `check_parse` 160 → 161, `test_batch_ak` 495 → 496, `test_batch_ax`
   348 → 350 and `test_runes` 3121 → 3125 — ALL SIX WRITTEN BEFORE THE BATTERY**, three of them
   off three identical standalone readings apiece. **`check_parse` read 163 first**, and the extra
@@ -1616,7 +1729,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **37 entries** (DG → EQ), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
+  **39 entries** (DG → ES), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
   STALE AGAIN AT EO, WHICH LEFT IT READING 34 WITH THE FILE AT 35** — the same fault the sentence
   below already records, for the third time. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
@@ -1650,11 +1763,13 @@ those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPT
 re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and all are measured on
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
-- **188 files, 8.4960 MiB, MEASURED ON THE TREE AS IT SHIPS** — this file and
-  `docs/reports/EQ.md` INCLUDED, which is the convention since EG. **EQ added ONE file**
-  (`docs/reports/EQ.md`) and deleted none; the 188/8.4960 figure is EP's and is one file stale. **Re-derive with `claude_md_census.py` rather than
-  quoting this**; the census reads `git ls-files`, so a new file is outside the number until it is
-  staged, and EP's figure is measured with it staged.
+- **THE FIGURE IS NOT RESTATED HERE ANY MORE, AND THAT IS THE POINT.** This line has carried a
+  file count and a byte total since EG and **it has been stale on arrival for three batches running**
+  (EP found it four batches out, EQ recorded its own as one file stale). **`claude_md_census.py`
+  prints both for any commit and reads `git ls-files`**, so a new file is outside the number until it
+  is staged — which is exactly why a copy written into this file is wrong the moment the batch that
+  wrote it adds its own report. **Run the census; do not quote a number from here.** ES adds two
+  files (`check_es.gd`, `docs/reports/ES.md`) and deletes none.
 - Heaviest, **re-measured at EP**: `scripts/battle.gd` **1233.25**, `docs/design-notes.md`
   **442.63**, `docs/master.html` **352.49**, `scripts/classes.gd` **339.15**,
   **`pin-manifest.json` 303.89**, `docs/changelog.html` **294.71**, `CLAUDE.md` **217.17**,
@@ -1796,76 +1911,110 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**ONE BATTERY AT EQ, FROZEN, AND IT CERTIFIED ON PASS ONE.** **206 files were MD5-stamped with
+**ONE BATTERY AT ES, FROZEN, AND IT CERTIFIED ON PASS ONE.** **325 files were MD5-stamped with
 ABSOLUTE paths before it and re-compared after with the same absolute paths: it drifted ZERO** —
-the tree the battery read is byte-for-byte the tree that ships. **`.ran` holds 87 names with no
+the tree the battery read is byte-for-byte the tree that ships. **`.ran` holds 88 names with no
 duplicate**, every name has a log and every log a name, compared both ways.
 
-| | EL's acceptance | EM's acceptance | EP's acceptance | **EQ's acceptance** |
+**AND THE `.ran` DUPLICATE CHECK EARNED ITS KEEP THIS BATCH, WHICH IT HAD NEVER DONE BEFORE.** A
+first battery was killed part-way (a stale tier name was found in two PRINTED sim-report strings and
+editing behind a running battery is what discards a run); **the kill cleared the lock through the
+script's own `trap`, one of its shells survived, and the restart ran ALONGSIDE it.** `.ran` showed it
+immediately — **two ascending sequences interleaved in one file** (`ah…at` and `bs…bw`) and a
+`No such file` on a log the second run's `rm -rf` had taken — and the run was discarded rather than
+read. **`CLAUDE.md`'s own line is the lesson: no lock does not mean no battery.** The certified run
+below is a third, started only after `pgrep` read zero of both.
+
+| | EM's acceptance | EP's acceptance | EQ's acceptance | **ES's acceptance** |
 |---|---|---|---|---|
 | **suite failures** | 0 | 0 | 0 | **0** |
 | **throws, grepped from the stream** | 0 | 0 | 0 | **0** |
 | `check_cm_live` (deliberate) | 4 | 4 | 4 | **4** |
 | check counts outside their band | 0 | 0 | 0 | **0** |
-| `check_de` | 354 / 0 / 1 → 0 | 358 / 0 / 0 | 358 / 0 / 0 | **358 / 0 / 0** |
+| `check_de` | 358 / 0 / 0 | 358 / 0 / 0 | 358 / 0 / 0 | **362 / 0 / 0** |
 | run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 | **22 / 166 / 8** |
-| targets in the manifest | 86 | 87 | 87 | **87** |
+| targets in the manifest | 87 | 87 | 87 | **88** |
 
-**EQ MOVED NOT ONE BASELINE ROW AND SAID SO BEFORE THE RUN.** It changes no executable byte and
-adds no gate, so `check_parse` reads its recorded **161** (RESIDUE **4** — `check_ck_width`,
-`check_cu`, `check_cv`, `check_dn`, the four long-standing ones) and no second row was owed.
-Total **41,420 checks, 0 throws, 0 `Parse Error` and 0 `SCRIPT ERROR` across all 87 logs**, grepped
-from the log files rather than read off a tally or an exit code. **`check_de` read 358 / 0 / 0 —
-zero NOTICES as well as zero errors**, and its own §2 reports **7 recorded with no readable check
-count and 2 with no readable failure count, 0 lost and 0 gained on both.**
+Total **41,687 checks, 0 throws, 0 `Parse Error` and 0 `SCRIPT ERROR` across all 88 logs**, grepped
+from the log FILES rather than read off a tally or an exit code. **The only `FAIL:` lines anywhere
+in the run are `check_cm_live`'s four**, which are the recorded deliberate red. **`check_de` read
+362 / 0 / 0 — zero NOTICES as well as zero errors** — and its §1 says **87 of 87 recorded targets
+swept, 0 off their recorded line**; its §2 reports **7 recorded with no readable check count and 2
+with no readable failure count, 0 lost and 0 gained on both.**
 
-**THE TWO STANDING REDS ARE STANDING AND NOTHING ELSE IS RED.** `test_rune_battle` reads
-**97 / 1** against its recorded band of 97 / 0–1, and `check_cm_live` reads **13 / 4** against a
-recorded 13 / 4. **Neither moved and no third appeared.** `check_map_screen: OK` with its live tag
-drive reading **12 tag lines for 12 offered cards**; `check_ct_map` **83 / 0**.
+**`check_de`'s OWN +4 WAS PREDICTED AND IT LANDED**: it has no row of its own, so a new gate moves
+it by four assertions and nothing reports that but the prediction. 358 → **362**.
 
-**THE PRE-CHECK POPULATION WAS DERIVED BY GREPPING THE PATH**, not reasoned about: **26 targets
-name `res://docs/master.html` or `res://docs/changelog.html`** and every one was run before the
-battery with the battery's own per-target flags — **26 green, 0 `Parse Error`, 0 `SCRIPT ERROR`, 0
-FAIL lines.** **`docs/state.md` and `docs/reports/` are read by ZERO targets**, which is what makes
-this file and the batch report safe to write after the run.
+**THE FOUR BASELINE ROWS WERE WRITTEN BEFORE THE RUN, EACH OFF THREE IDENTICAL STANDALONE
+READINGS** — `check_es` [42, 42] new, `test_runes` 3101 → 3118, `check_ek` 43 → 45,
+`check_parse` 161 → 162 — so `check_de` certified on pass one instead of reporting an unwatched
+target. **`test_runes`'s +17 was COUNTED OFF THE DIFF rather than guessed** and the arithmetic is in
+its own row. **`check_parse` reads 162 with RESIDUE 4** (`check_ck_width`, `check_cu`, `check_cv`,
+`check_dn` — the four long-standing ones), which is that walk confirming the repo root is clean.
 
-**THREE NEGATIVE CONTROLS WERE ARMED. ALL THREE BIT.**
+**THE TWO STANDING REDS ARE STANDING AND NOTHING ELSE IS RED.** `test_rune_battle` reads **97 / 0**
+against its recorded band of 97 / 0–1 — **at the floor, which is where ER's repair left it** — and
+`check_cm_live` reads **13 / 4** against a recorded 13 / 4. **Neither moved and no third appeared.**
+`check_map_screen: OK`, with its live tag drive reading **12 tag lines for 12 offered cards** and
+**ES's census line moving on a real swap** (`BREAK 5` → `BREAK 6`, printed both ways in the log);
+`check_ct_map` **83 / 0**.
+
+**SIX NEGATIVE CONTROLS WERE ARMED. ALL SIX BIT.** Full table in `docs/reports/ES.md` §7.
 
 | control | armed on | armed | disarmed |
 |---|---|---|---|
-| **1 — the literal sweep, POSITIVE arm**, on a needle a suite demonstrably reads and BOTH copies carry | `"bounded by how many distinct debuffs exist"` broken in `master.html` (read by `test_batch_ba`) | **LOST 3**, naming the suite | **LOST 2** |
-| **2 — the literal sweep, DISCRIMINATION arm**, on prose no target names | `"Companions have HP, can be targeted by enemies"` broken | **LOST 2 — unmoved** | LOST 2 |
-| **3 — the same needle, against the LIVE SUITE** rather than the sweep | the same string broken in the shipped `master.html`, `test_batch_ba` run standalone | **690 checks / 1 failure**, naming the assertion | **690 / 0** |
+| **1 — the literal sweep, POSITIVE arm**, on a needle a suite demonstrably reads | `"bounded by how many distinct debuffs exist"` broken in `master.html` (read by `test_batch_ba`) | **LOST 1**, naming the suite | LOST 0 |
+| **2 — the literal sweep, DISCRIMINATION arm**, on prose no target names | `"Companions have HP, can be targeted by enemies"` broken | **LOST 0 — unmoved** | LOST 0 |
+| **3 — the same needle against the LIVE SUITE** | `test_batch_ba` standalone | **690 / 1**, naming the assertion | **690 / 0** |
+| **4 — §4's swap drive**, the loadout made to read the POOL | `Run.loadout_ability_names` | `check_es` **42 / 2**; `check_map_screen` **TAG MISMATCH** | 42 / 0; `OK` |
+| **5 — §1's flatness**, a zone quality ladder re-invented | `Runes.generate` reading the zone slot | `check_es` **42 / 2**, share **57.6 / 49.3 / 31.1** (26.4-point spread) | 42 / 0, share **29.9 / 29.6 / 30.3** |
+| **6 — §3's cost recognition**, `is_cost` made blind to a negative `speed` | `Runes.is_cost` | `check_es` **42 / 2** — *"anchor's COST (speed) was scaled — it became pure upside"* — and `test_runes` **3118 / 6** | 42 / 0; 3118 / 0 |
 
-**CONTROL 3 IS THE ONE THAT MATTERS AND THE RESTORE IS PART OF IT**: the file was put back from a
-scratchpad copy and compared byte-for-byte, **never by `git checkout`**.
+**CONTROL 6 IS THE ONE THAT MATTERS AND IT PRINTS THE DEFECT IN §3'S OWN WORDS.** With the flag
+gone, `Runes.is_cost` is the only thing in the project that knows a rune charges anything; the
+control makes it forget one field and both instruments say so, one of them naming the rune that
+became pure upside. **CONTROL 4 IS THE SECOND**: it is DS's Heads Down shape armed directly, and it
+reds the gate AND the screen.
 
-**THE LITERAL SWEEP READ 11,127 NEEDLES ≥4 CHARACTERS FROM 89 TARGETS:** `docs/master.html`
-**2 LOST / 0 GAINED**, `docs/changelog.html` **0 LOST / 22 GAINED**. **BOTH LOST NEEDLES ARE
-TRACED AND BOTH ARE NEGATIVE PINS THE EDIT MAKES MORE TRUE**: `"replaces the OLDER"` and
-`"the OLDER of the two"` are read by `test_batch_bb` §1 as `not src.contains(...)` — **and `src`
-there is `res://scripts/battle.gd`, not this document**, so neither assertion ever read the string
-this batch removed. **That is the finding, not an exception**: BB corrected the code and left the
-document, and the sweep is what surfaced it.
+**EVERY RESTORE WAS FROM A SCRATCHPAD COPY AND COMPARED BYTE-FOR-BYTE, NEVER BY `git checkout`** —
+`scripts/runes.gd`, `scripts/run_state.gd` and `docs/master.html` all restored byte-identical.
+
+**THE LITERAL SWEEP READ 11,356 NEEDLES ≥ 4 CHARACTERS FROM 92 TARGETS against every tracked
+document at `HEAD` and in the working tree: SIX LOST, and every one is traced to its assertion
+rather than waved through.** Three are `data/runes.json`'s `rarity` / `scarred` / `rarit`, **which
+`check_es` §1 and `test_runes._schema` pin ABSENT — the removal IS the assertion.** The other three
+are asserted by nothing where they left: `SCARR` in `CLAUDE.md` is `check_es`'s own fingerprint half
+(swept over `.gd` files, never against that document); `scope` and `stats` in `data/glossary.json`
+carry fourteen and one reader respectively and **not one of the fifteen asserts against the
+glossary** — `check_dn`, the only holder of `stats`, does not read that file at all.
+**0 LOST in `master.html`, `changelog.html`, `text-standard.html`, `design-notes.md` and
+`baselines.json`.** **12 LOST in `docs/state.md` and that file is READ BY NOTHING** — re-verified
+rather than inherited: ten `.gd`/`.py`/`.sh` files name the path, every `.gd` mention is a comment,
+and the four non-comment lines are all `claude_md_census.py`'s own *exclusion default*, which names
+the path and never opens it.
 
 **THE RETIRED-WORD PRE-CHECK WAS RUN BEFORE THE BATTERY**, reproducing `test_batch_bx` §4's and
-§4b's own strips exactly against the EDITED `master.html`: **`beast` absent after both casings of
-`beastmaster` are removed, `party` absent after the five `PARTY_IDENTS` are removed, and
-`Bestial Wrath` still present.** `bx` reads **161 / 0** in the battery. **One uppercase
-`BEASTMASTER` in the draft changelog entry was caught by the same strip and rewritten** — the
-changelog is not in either file list, so it was a latent trap rather than a red.
+§4b's own strips against the EDITED files: **`beast` absent from `master.html` after both casings of
+`beastmaster` are removed; `party` absent from `master.html`, `glossary.json` and `runes.json` after
+the five `PARTY_IDENTS`; zero stray `party` string literals across the thirteen `.gd` files §4b
+sweeps.** `bx` reads **161 / 0** in the battery.
 
-**AND THE MEASUREMENT PROBES NEVER ENTERED THE TREE.** Every EQ figure was taken on an
-**out-of-repo instrumented copy** (`scripts/`, `scenes/`, `data/`, `assets/`, `project.godot` **and
-`.godot/`** — the cache is what stops every `class_name` reading as a Parse Error). **`check_parse`
-RESIDUE reads 4**, the four long-standing ones, which is that walk confirming the repo root is
-clean. The one probe that did run from the repo root — a boss-pool and tag census — was deleted
-immediately after it ran, before the battery.
+**AND A SWEEP FOR THE RETIRED WORD'S SIBLINGS IS WHAT A `rarity` GREP CANNOT SEE — IT FOUND TWO
+LIVE STRINGS AND IT IS WHY THE FIRST BATTERY WAS DISCARDED.** Grepping the tier NAMES
+(`Common` / `Rare` / `Epic` / `Cracked` / `Polished` / `Radiant`) inside string literals only, over
+every `scripts/*.gd`, found `run_sim.gd` printing **`stats=Common family`** and **`stick = the
+generated Common family`** — an instrument's report naming a tier that no longer exists. Both say
+*generated stat family* now. **`Radiant Cascade` (a talent) and `Cracked Hourglass` (a relic) are
+NOT this batch's and were correctly left alone.**
 
-**THE INSTRUMENT'S OWN BLIND SPOT, NAMED RATHER THAN DISCOVERED LATER.** The probe banks at the
-site the damage LANDS, and **Unleash empties the meter BEFORE it calls `_companion_hit`** — so
-Unleash's Loyalty reads 0 by construction and its counterfactual is meaningless. **The printed
-"family B" share is an overstatement**; Primal Surge (which empties AFTER the blow) was recovered
-separately and its two independent estimates agree to within 1.5 points. **Unleash's own payout was
-measured directly instead, as damage a blow.**
+**THE PIN MANIFEST WAS RUN AGAINST `HEAD`'S COPY BEFORE BEING REGENERATED**, which is what surfaced
+both of its findings rather than burying them: a **negative pin NOW PRESENT**
+(`check_eh.gd → scripts/run_state.gd: protected_names`, a real assertion that had to move and did,
+with its reason) and an **unrecorded pin** (`check_ek.gd: "%s"`). Regenerated **1350 → 1353 pins,
+3 GAINED and 0 LOST**; `check_ed` reads **18 / 0**.
+
+**AND THE GAME RUNS, WHICH IS THE BRIEF'S OWN FLOOR AND IS SEPARATE FROM THE BATTERY.** `./sim.sh
+--run 6` completed six full runs with **0 `Parse Error` and 0 `SCRIPT ERROR`**, exit 0, the rune
+economy resolving normally through the flat pool: worn per hero at run end **spec 1.04 / class 0.38
+/ universal 0.71 / stick 0.88**, which is the generated family at **29% of a filled pouch** — the
+flat ~30% offer share of §1 arriving at the other end of a run.

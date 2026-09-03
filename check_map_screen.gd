@@ -12,6 +12,8 @@ var frames := 0
 var map_scene: Node = null
 # BATCH EK §3 — set by the live tag drive in stage 3; gates the verdict line.
 var _ek_tags_ok := false
+# BATCH ES §4 — set by the live census drive in stage 3; gates the verdict line.
+var _es_census_ok := false
 
 
 func _ready() -> void:
@@ -81,6 +83,25 @@ func _process(_d: float) -> void:
 			print("  ...benched again: %s  (pool still %d)" % [str(
 				not Run.equipped_ability_names(lm).has(String(lpool[0]))),
 				Run.earned_ability_names(lm).size()])
+			# **BATCH ES §4 — THE TAG CENSUS, DRAWN AND MOVED.** A count that is
+			# right in the source and never reaches a Label is DS's Heads Down
+			# shape, and a Label that is drawn once and never redrawn on a swap
+			# is the same defect one step later — both pass every static check in
+			# the tree. `check_es` §4 drives the ARITHMETIC through the real
+			# doors; this drives the SCREEN, which is the half only a scene run
+			# can reach. The panel is re-opened by `_toggle_loadout` itself, so
+			# the text below is whatever the live loadout produced.
+			var es_line := _census_label(map_scene)
+			print("  ES census line (card benched): '%s'" % es_line)
+			map_scene._toggle_loadout(1, String(lpool[0]))
+			var es_line2 := _census_label(map_scene)
+			print("  ES census line (card carried): '%s'" % es_line2)
+			var swapped: bool = Classes.card_tags(String(lpool[0])).is_empty()
+			_es_census_ok = es_line != "" and es_line2 != "" \
+				and (es_line != es_line2 or swapped)
+			print("  ES census moved on the swap: %s%s" % [str(_es_census_ok),
+				"  (the swapped card carries no tag)" if swapped else ""])
+			map_scene._toggle_loadout(1, String(lpool[0]))
 			_close()
 			# BATCH BX §2 — THE PARTY-WIDE DRAFT SCREEN, which like the lattice is
 			# only ever EXECUTED here. Four columns is four times the layout, and
@@ -123,7 +144,7 @@ func _process(_d: float) -> void:
 			# failure counter — its whole verdict is the ONE line at the foot,
 			# pinned as `expect` in `baselines.json` — so a MISMATCH has to take
 			# that line away or `check_de` reads a mismatched run as a clean one.
-			_ek_tags_ok = ek_ok
+			_ek_tags_ok = ek_ok and _es_census_ok
 			# Stage a card on every column and confirm through the real door.
 			for i2 in Run.party.size():
 				var q: Array = Run.party[i2].get("draft_candidates", [])
@@ -144,6 +165,8 @@ func _process(_d: float) -> void:
 			_close()
 			if _ek_tags_ok:
 				print("check_map_screen: OK")
+			elif not _es_census_ok:
+				print("check_map_screen: TAG MISMATCH — the loadout panel's ES census did not draw or did not move on a swap")
 			else:
 				print("check_map_screen: TAG MISMATCH — the draft card drew no tag line")
 			get_tree().quit(0 if _ek_tags_ok else 1)
@@ -182,6 +205,29 @@ func _tag_labels(n: Node) -> Array:
 					out.append(t)
 		out.append_array(_tag_labels(c))
 	return out
+
+
+# BATCH ES §4 — the loadout panel's census line, found by its own prefix rather
+# than by position, so a re-laid panel does not silently stop being measured.
+# Returns "" when nothing drew one, which is the reading that fails the verdict.
+#
+# **IT SKIPS A NODE QUEUED FOR DELETION, AND THAT IS THE WHOLE TRICK — WITHOUT
+# IT THIS CHECK READS THE OLD PANEL AND PASSES ON A CENSUS THAT NEVER MOVED.**
+# `_toggle_loadout` frees the overlay and opens a fresh one in the same call,
+# and `queue_free()` is DEFERRED: until the frame ends both overlays are
+# children of the map and the doomed one comes FIRST. A walk that took the
+# first match would compare a panel against itself and report a moving count as
+# green, which is the exact defect this drive exists to catch.
+func _census_label(n: Node) -> String:
+	for c in n.get_children():
+		if c.is_queued_for_deletion():
+			continue
+		if c is Label and String((c as Label).text).begins_with("CARRIED BY TAG"):
+			return String((c as Label).text)
+		var deeper := _census_label(c)
+		if deeper != "":
+			return deeper
+	return ""
 
 
 func _tally(n: Node) -> Dictionary:

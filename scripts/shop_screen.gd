@@ -210,9 +210,9 @@ func _draw_screen() -> void:
 		panel.add_child(vbox)
 		var label := Label.new()
 		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
-			rune["rarity"], member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]
+			rune["scope_label"], member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]
 		label.add_theme_font_size_override("font_size", 14)
-		label.add_theme_color_override("font_color", rune["rarity_color"])
+		label.add_theme_color_override("font_color", rune["scope_color"])
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()

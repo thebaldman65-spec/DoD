@@ -267,9 +267,19 @@ func _s3_the_record() -> void:
 	var cbody := rs.substr(capf, 200)
 	ok(not cbody.contains("core_slots") and not cbody.contains("protected_names"),
 		"§3: the LADDER reads a core count — it is indexed by zone bosses cleared and nothing else")
-	# AND NOTHING ELSE IN `scripts/` READS THE OTHER. One live reader, and it is
-	# the loadout panel's CORE rows — the list that cannot be benched, which is
-	# what a NAME count is for.
+	# AND THE READERS OF THE OTHER ARE A NAMED SET. It was TWO live readers from
+	# EH to ER — the definition and the loadout panel's CORE rows, the list that
+	# cannot be benched, which is what a NAME count is for.
+	#
+	# **BATCH ES §4 ADDED THE THIRD AND IT IS THE SAME KIND OF USE.**
+	# `Run.loadout_ability_names` is the hero's whole bar — the protected core
+	# plus the equipped earned cards — which is what `battle.gd`'s spawn
+	# assembles and what a tag census is taken over. **It wants NAMES, not
+	# SLOTS**, which is this section's own distinction applied rather than
+	# violated: `core_slots` is 3 for a Beastmaster holding SIX protected names,
+	# and a census off the slot count would miss three of his cards.
+	# The list is asserted rather than the count for the reason it always was —
+	# a fourth reader has to come here and say what it is doing.
 	var readers: Array = []
 	var dir := DirAccess.open("res://scripts")
 	if dir != null:
@@ -281,8 +291,8 @@ func _s3_the_record() -> void:
 			if src.contains("protected_names("):
 				readers.append(f)
 	readers.sort()
-	ok(readers == ["classes.gd", "map_screen.gd"],
-		"§3: `protected_names` is read by %s, not by its definition and the loadout panel alone" % [readers])
+	ok(readers == ["classes.gd", "map_screen.gd", "run_state.gd"],
+		"§3: `protected_names` is read by %s, not by its definition, the loadout panel and the loadout list alone" % [readers])
 
 	# (2) ALL SEVEN ENABLERS ARE PROTECTED — AND THE TWO CORRECTED REASONS ARE
 	# ASSERTED AS FACTS, NOT LEFT IN PROSE. A right conclusion resting on a

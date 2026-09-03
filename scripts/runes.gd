@@ -1,47 +1,76 @@
-# Runes (Batch X): every authored rune lives in data/runes.json — name,
-# rarity, scope, price, desc, and a payload in the Talents.apply_payload
-# vocabulary (stat / ability / grant_ability / new_ability). Adding a rune
-# is a JSON edit; there is NO new payload machinery here.
+# Runes (Batch X, re-shaped at BATCH ES): every authored rune lives in
+# data/runes.json — name, scope, price, desc, and a payload in the
+# Talents.apply_payload vocabulary (stat / ability / grant_ability /
+# new_ability). Adding a rune is a JSON edit; there is NO new payload
+# machinery here.
 #
-# RARITY MEANS KIND, not magnitude:
-#   common — flat stat adds. The six generated TEMPLATES survive as the
-#            filler family and the exhaustion floor.
-#   rare   — alters an existing ability's numbers, or grants a talent-like
-#            effect (talent counter fields STACK with the talent — intended).
-#   epic   — grants an ability, changes a damage type, or inverts a rule.
-# "scarred" is a BOOLEAN FLAG, not a rarity: a larger upside bought with a
-# real cost (every scarred payload carries a negative term), priced BELOW
-# its clean rarity peer so the trade shows in the shop as well as the
-# tooltip. Scarred runes wear their own prefix and colour.
+# ── BATCH ES §1 — RARITY IS GONE, ENTIRELY ─────────────────────────────────
+# There are no tiers, no rarity odds and no zone progression in rune quality.
+# What rarity used to do, and where each half went:
 #
-# ELIGIBILITY (the load-bearing part): "scope" is universal | class:<key>
-# | spec:<id> — spec runes only roll for a matching hero, so the awakening
-# shapes the loot table. Ability-payload runes MUST carry
-# "requires_ability": Talents.apply_payload matches on display_name and a
-# rune naming an ability the hero does not own applies silently and does
-# NOTHING. The derivable kit checked here: core kit + spec abilities +
-# apply_kit_overrides renames + the member's bm_abilities (boss trophies).
+#   IT MEANT KIND — common was flat stat adds, rare altered an ability's
+#     numbers, epic granted an ability or inverted a rule. **THAT WAS AN
+#     AUTHORING CONVENTION AND NOT A BEHAVIOUR**, and every rune goes on doing
+#     exactly what it did: the kind lived in the payload, never in the label.
+#     The one place it was mechanical is the generated TEMPLATE family below.
+#   IT DROVE THE OFFER ODDS — 60/30/10 at zone 1 deepening to 25/45/30 by
+#     zone 3, which was the only thing making a late offer differ from an early
+#     one. **GONE. `generate` draws FLAT** from the eligible authored pool plus
+#     the template family.
+#   IT SET THE PRICE for the generated family (50/100/160 by tier). Authored
+#     runes have always carried their own `price` and are untouched; the
+#     template family sits on TEMPLATE_PRICE, the Common floor it already had.
+#     **NO PRICING RULE IS INVENTED HERE — that is the designer's.**
+#
+# ── BATCH ES §3 — "SCARRED" IS GONE AS A LABEL; EVERY COST CLAUSE STAYS ─────
+# There is no `scarred` flag, no Scarred prefix and no Scarred colour. A rune
+# that gives and takes is simply what that rune does, and its negative terms
+# are byte-unchanged. **`is_cost()` BELOW IS A DIFFERENT THING AND SURVIVES**:
+# it reads a field name and a sign, never a label, and it is what holds a cost
+# at its authored value under the sim's power probe.
+#
+# ── ELIGIBILITY (the load-bearing part) ────────────────────────────────────
+# "scope" is universal | class:<key> | spec:<id> — spec runes only roll for a
+# matching hero, so the awakening shapes the loot table. **ES §2 RULED THAT
+# SCOPE IS SPEC AND CLASS ONLY and the five universals are RE-SCOPED, not
+# retired — the class each lands on is the designer's and is unmade, so
+# `universal` still resolves here.** The day the five are re-homed it can go.
+# Ability-payload runes MUST carry "requires_ability": Talents.apply_payload
+# matches on display_name and a rune naming an ability the hero does not own
+# applies silently and does NOTHING. The derivable kit checked here: core kit
+# + spec abilities + apply_kit_overrides renames + the member's bm_abilities
+# (boss trophies).
 class_name Runes
 
 const DATA_PATH := "res://data/runes.json"
 
-const RARITIES := {
-	"common": {"label": "Common", "prefix": "Cracked", "price": 50, "mult": 1,
-		"color": Color(0.8, 0.8, 0.8)},
-	"rare": {"label": "Rare", "prefix": "Polished", "price": 100, "mult": 2,
-		"color": Color(0.45, 0.65, 1.0)},
-	"epic": {"label": "Epic", "prefix": "Radiant", "price": 160, "mult": 3,
-		"color": Color(0.75, 0.45, 1.0)},
+# BATCH ES §1 — WHAT REPLACED THE RARITY LABEL AND COLOUR ON A RUNE INSTANCE.
+# The shop row, the offer button and both pouch lists showed a rarity word and
+# a rarity tint. **SCOPE IS THE SURVIVING AXIS** (§2 makes it the only one), so
+# it is what those surfaces show now: how narrowly a rune is written, which is
+# the one thing about a rune that is not in its description. The palette is
+# carried over UNCHANGED from the three tiers so nothing about the screens
+# moves except what the words mean — broader reads greyer, narrower reads rarer
+# to the eye. **THIS IS NOT RARITY UNDER A NEW NAME**: it drives no odds, no
+# price and no magnitude, and it is derived from a field that decides
+# eligibility rather than from a tier nobody can see.
+const SCOPE_INFO := {
+	"universal": {"label": "Universal", "color": Color(0.8, 0.8, 0.8)},
+	"class": {"label": "Class", "color": Color(0.45, 0.65, 1.0)},
+	"spec": {"label": "Spec", "color": Color(0.75, 0.45, 1.0)},
 }
-const SCARRED_PREFIX := "Scarred"
-const SCARRED_COLOR := Color(0.9, 0.35, 0.3)
 
-# Rarity weights (common/rare/epic) keyed by zone SLOT; past the authored
-# slots the pull keeps drifting epic-ward formulaically, like
-# ZONE_BASE_MULTS — a 4th zone is data work, never formula work.
-const RARITY_WEIGHTS := {1: [60, 30, 10], 2: [40, 40, 20], 3: [25, 45, 30]}
+# The generated family's price. It is the Common floor these six already sat
+# on, carried over so nothing moves — NOT a new pricing rule.
+const TEMPLATE_PRICE := 50
 
-# The pre-Batch-X generated family: flat stat sticks, the Common floor.
+# The pre-Batch-X generated family: flat stat sticks, and the exhaustion floor.
+#
+# **BATCH ES §1 — THE ONE PLACE RARITY WAS MECHANICAL, AND THE ONE MAGNITUDE
+# THIS BATCH MOVES.** `base` used to be multiplied by the tier's ×1/×2/×3 and
+# the tier's prefix went into the name, so these six were EIGHTEEN runes across
+# three grades. With the tiers gone they are six, at `base`, at TEMPLATE_PRICE
+# — the Common grade they were authored at, unscaled. Nothing authored moved.
 const TEMPLATES := [
 	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
 	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
@@ -288,6 +317,72 @@ static func rune_tags(id: String) -> Array:
 	return RUNE_TAGS.get(id, [])
 
 
+# ══ BATCH ES §4/§5 — WHAT A RUNE ASKS ABOUT ITS HOLDER ══════════════════════
+#
+# **THE READING MACHINERY, AND NOT ONE RUNE READS IT YET.** Rune CONTENT is
+# written with the designer one rune at a time; these are the two SHAPES a
+# clause comes through when one is, and they are here rather than in
+# `Classes` because the vocabulary is the rune layer's: a threshold and a
+# breadth test are what a rune asks, where a census is what a screen shows.
+# The arithmetic underneath is `Classes.tag_count` / `Classes.tag_breadth`, so
+# a clause and the surface that displays its state can never be two numbers.
+#
+# ── THEY TAKE THE NAME LIST, NOT THE MEMBER ────────────────────────────────
+# `Run.loadout_ability_names(member)` is what a caller passes. **THAT IS A
+# CONSTRAINT AND NOT A PREFERENCE**: this file is a `class_name` script and
+# these are STATIC, and a static function cannot see an autoload — reaching
+# `Run` from here is a compile error, found by running it rather than reasoned
+# about. Splitting it this way is what keeps `run_state.gd` free of every tag
+# word, which `check_ek` §3 asserts at ZERO for that file by name.
+#
+# ── WHAT THE LIST IS, AND WHY THAT SET ─────────────────────────────────────
+# **EQUIPPED, NEVER OWNED.** A hero's POOL is everything he has drafted and
+# nothing ever leaves it, so a threshold read off the pool turns on once, late,
+# and never off again — a flat increment with a delay. His LOADOUT is what he
+# carries, it is capped at 7-to-10, and he can bench and carry freely between
+# fights. Counting it is what makes the loadout a lever: a player can swap to
+# switch a rune on or off, which is the decision the whole shape exists for.
+#
+# **THE PROTECTED CORE IS IN THE COUNT**, because it is equipped — it is half
+# to two thirds of the bar, `Run.ability_slots_used` counts it, and a census
+# that skipped it would answer a question about the hero's cards with a number
+# about only the swappable ones. **THE CONSEQUENCE IS MEASURED RATHER THAN LEFT
+# TO BE DISCOVERED: the core kit ALONE already meets a 2+ threshold on BREAK for
+# TEN of the twelve specs and on DEBUFF for SEVEN, while MARK is zero for all
+# twelve and TEMPO reaches 1 on exactly one.** So a threshold's magnitude has to
+# be chosen against the per-spec core baseline or it is on from the first fight
+# and no swap can turn it off. `check_es` §4 PRINTS that table every battery
+# run, so the day a core kit moves the baseline is re-measured, not re-assumed.
+#
+# ── WHERE THE COUNT IS COMPUTED, AND HOW OFTEN ─────────────────────────────
+# **ON DEMAND, UNCACHED, AND THAT IS THE RIGHT SHAPE TODAY.** The census is one
+# dictionary lookup per carried card — 7 to 10 of them — and its two callers are
+# both SCREEN DRAWS (the loadout panel and the hero sheet), which run once per
+# open and once per swap. There is nothing to invalidate, so there is no cache
+# to go stale, which is the failure mode a cached count would add.
+# **WHEN A RUNE FINALLY READS IT IN A FIGHT, THE PLACE IS THE SPAWN AND NOT THE
+# STRIKE LOOP** — the loadout cannot change during a battle (benching is a map
+# screen), so the count is a per-hero constant for the whole fight and belongs
+# on the unit beside every other rune field. A per-hit recount would be 84
+# multiplier terms' worth of work for a number that cannot move.
+
+
+# **THE DEFAULT SHAPE: hold `need` or more equipped cards of a tag, get the
+# effect.** Other shapes stay available per rune — this is the one a rune
+# reaches for unless it wants otherwise.
+static func tag_threshold_met(loadout_names: Array, tag: String, need: int) -> bool:
+	return Classes.tag_count(loadout_names, tag) >= need
+
+
+# **BATCH ES §5 — A SPLASH PAYS FOR BREADTH.** A normal rune pays for DEPTH in
+# one tag; a splash pays for cards spanning `need` or more DIFFERENT tags. That
+# is the inverse shape, and it is what gives the category an identity again now
+# that the lanes it used to reach across are severed: TAGS are the thing to
+# reach across, and a hero who is spread rather than deep is who it is for.
+static func breadth_met(loadout_names: Array, need: int) -> bool:
+	return Classes.tag_breadth(loadout_names) >= need
+
+
 # The tag line as a surface renders it — "DEFENSE · RESOURCE", or "".
 static func rune_tag_line(id: String) -> String:
 	var t: Array = rune_tags(id)
@@ -344,11 +439,24 @@ static func kit_names(member: Dictionary) -> Array:
 	return names
 
 
-# The final shop/pouch name: scarred runes wear their own prefix.
+# The final shop/pouch name. **BATCH ES §1/§3 — IT IS THE AUTHORED NAME NOW.**
+# It used to wear a tier prefix (Cracked / Polished / Radiant) or the Scarred
+# one, and both of those vocabularies are retired. The function is KEPT rather
+# than inlined at its eleven call sites because it is still the one place a
+# rune's display name is built, which is what stops a second surface drawing it
+# a different way (CK §1's rule).
 static func display_name(entry: Dictionary) -> String:
-	var prefix: String = SCARRED_PREFIX if entry.get("scarred", false) \
-		else RARITIES[String(entry["rarity"])]["prefix"]
-	return "%s %s" % [prefix, entry["name"]]
+	return String(entry["name"])
+
+
+# BATCH ES §1 — THE SCOPE BAND A SURFACE SHOWS, taking rarity's old slot.
+# "universal" | "class" | "spec", off the same string `_scope_ok` reads.
+static func scope_band(scope: String) -> String:
+	if scope.begins_with("class:"):
+		return "class"
+	if scope.begins_with("spec:"):
+		return "spec"
+	return "universal"
 
 
 static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
@@ -376,25 +484,30 @@ static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 # `generate` above and `run_state.grant_rune` — reach the authored pool through
 # `eligible_ids` and nothing else, so one `continue` retires a rune everywhere
 # it could be offered without touching either caller. And neither can be blanked
-# by it: `generate` widens an exhausted rarity to every rarity and then falls
-# back to the generated Common family, and `grant_rune` falls back to
-# `generate_rune`.
+# by it: `generate` falls back to the generated stat family (BATCH ES §1: it
+# used to widen an exhausted RARITY first, and there is no rarity to widen now),
+# and `grant_rune` falls back to `generate_rune`.
 static func is_retired(id: String) -> bool:
 	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
 
 
-# Authored entries this member may roll at this rarity ("" = any rarity),
-# excluding names already in their pouch and every retired entry.
-static func eligible_ids(member: Dictionary, rarity_key: String,
-		owned_names: Array) -> Array:
+# Authored entries this member may roll, excluding names already in their pouch
+# and every retired entry.
+#
+# **BATCH ES §1 — THE `rarity_key` PARAMETER IS GONE AND SO IS THE FILTER IT
+# FED.** Every caller passed either a tier or "" (any), and with the tiers
+# retired only the second reading survives; the signature drops the argument
+# rather than keeping a parameter that can only be given one value, because a
+# vestigial parameter is a place a later batch re-invents a tier. Its four
+# callers — `generate`, `grant_rune`, `_start_rune_pool` and this file's own
+# fallback — all passed "".
+static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 	var kit := kit_names(member)
 	var out: Array = []
 	var data := _load()
 	for id in data:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
-			continue
-		if rarity_key != "" and String(e["rarity"]) != rarity_key:
 			continue
 		if not _scope_ok(e, member):
 			continue
@@ -407,57 +520,43 @@ static func eligible_ids(member: Dictionary, rarity_key: String,
 	return out
 
 
-static func rarity_weights(zone_slot: int) -> Array:
-	if RARITY_WEIGHTS.has(zone_slot):
-		return RARITY_WEIGHTS[zone_slot]
-	var over: int = zone_slot - 3
-	var c: int = maxi(25 - 10 * over, 5)
-	var e: int = mini(30 + 10 * over, 70)
-	return [c, 100 - c - e, e]
-
-
-static func _roll_rarity(zone_slot: int) -> String:
-	var w := rarity_weights(zone_slot)
-	var roll := randi_range(1, int(w[0]) + int(w[1]) + int(w[2]))
-	if roll <= int(w[0]):
-		return "common"
-	if roll <= int(w[0]) + int(w[1]):
-		return "rare"
-	return "epic"
-
-
-# One rune for this member at this zone slot. Rarity rolls by slot weight;
-# the eligible pool of that rarity is drawn from (commons include the
-# generated family); an exhausted pool widens to every rarity, then falls
-# back to the Common stat family — an empty offer list is a silent
-# regression, not a design statement. Dedupe against the pouch is by
-# final display name (call-site retry loops keep working on top).
-# exclude_names (Batch AI fix): names that are unavailable for this draw
-# even though the hero does not own them — in practice, the candidates
-# already sitting in the triple being rolled. It rides the SAME channel as
-# the owned pouch because it is the same question: a rune already in the
-# offer is exactly as unavailable as one already worn. Threading it here
-# makes a multi-draw roll a draw WITHOUT REPLACEMENT, which is what the
-# callers always wanted; the alternative — roll and retry on a collision —
-# is only probabilistically right and fails outright on a small pool.
-static func generate(member: Dictionary, zone_slot: int,
+# One rune for this member. **BATCH ES §1 — THE DRAW IS FLAT AND THE ZONE SLOT
+# NO LONGER CHANGES IT.** Every eligible authored entry and every unspent
+# template marker go into one pool and one is picked; there is no tier to roll,
+# no pool-of-that-tier to be exhausted, and therefore no widening step. The
+# exhaustion floor is unchanged and is still the thing that stops an empty
+# offer: with every authored entry owned, the template markers are what is
+# left, and with those spent too `template_rune` still returns one.
+#
+# `zone_slot` IS KEPT IN THE SIGNATURE AND IS DELIBERATELY UNREAD. Its four
+# call sites pass `Run.zone_idx + 1` and it is the one hook a later batch would
+# want if a zone is ever allowed to change an offer again — removing it costs
+# four callers and a save-shaped question, and keeping it costs a comment. The
+# ruling is that quality is FLAT across the run, and a parameter nothing reads
+# cannot break that.
+#
+# Dedupe against the pouch is by final display name (call-site retry loops keep
+# working on top). exclude_names (Batch AI fix): names that are unavailable for
+# this draw even though the hero does not own them — in practice, the candidates
+# already sitting in the triple being rolled. It rides the SAME channel as the
+# owned pouch because it is the same question: a rune already in the offer is
+# exactly as unavailable as one already worn. Threading it here makes a
+# multi-draw roll a draw WITHOUT REPLACEMENT, which is what the callers always
+# wanted; the alternative — roll and retry on a collision — is only
+# probabilistically right and fails outright on a small pool.
+static func generate(member: Dictionary, _zone_slot: int,
 		exclude_names: Array = []) -> Dictionary:
 	var owned: Array = []
 	for r in member.get("runes", []):
 		owned.append(String(r["name"]))
 	owned.append_array(exclude_names)
-	var rarity := _roll_rarity(zone_slot)
-	var pool := eligible_ids(member, rarity, owned)
-	if rarity == "common":
-		pool.append_array(_template_markers(member, owned))
+	var pool := eligible_ids(member, owned)
+	pool.append_array(_template_markers(member, owned))
 	if pool.is_empty():
-		pool = eligible_ids(member, "", owned)
-		pool.append_array(_template_markers(member, owned))
-	if pool.is_empty():
-		return template_rune(String(member["key"]), "common")
+		return template_rune(String(member["key"]))
 	var pick: String = pool.pick_random()
 	if pick.begins_with("tpl:"):
-		return template_rune(String(member["key"]), "common", pick.trim_prefix("tpl:"))
+		return template_rune(String(member["key"]), pick.trim_prefix("tpl:"))
 	return build(pick)
 
 
@@ -476,60 +575,54 @@ static func _template_markers(member: Dictionary, owned_names: Array) -> Array:
 	for t in TEMPLATES:
 		if t["stat"] == "max_resource" and String(member["key"]) == "warrior":
 			continue
-		if owned_names.has("Cracked Rune of %s" % t["noun"]):
+		if owned_names.has("Rune of %s" % t["noun"]):
 			continue
 		out.append("tpl:%s" % t["noun"])
 	return out
 
 
-# The generated stat family. rarity_key "" = the pre-Batch-X roll
-# (60/30/10 with magnitude scaling ×1/2/3) — DOD_SIM_RUNES=stats runs on
-# exactly this. A named rarity pins magnitude AND price (the Common floor
-# inside full mode); noun pins the template (pool draws).
-static func template_rune(class_key: String, rarity_key := "", noun := "",
+# The generated stat family — DOD_SIM_RUNES=stats runs on exactly this, and it
+# is `generate`'s exhaustion floor. `noun` pins the template (pool draws).
+#
+# **BATCH ES §1 — THE `rarity_key` PARAMETER IS GONE WITH THE TIERS, AND SO IS
+# THE ×1/×2/×3 MAGNITUDE LADDER AND THE 60/30/10 ROLL THAT PICKED AMONG THEM.**
+# These six were eighteen runes across three grades wearing three prefixes;
+# they are six now, at their authored `base` and at TEMPLATE_PRICE — the Common
+# grade, unscaled. **THIS IS THE ONLY MAGNITUDE THIS BATCH MOVES AND IT MOVES
+# NOTHING AUTHORED**: the ladder was `RARITIES[rk]["mult"]`, so it went with the
+# table that held it.
+#
+# The two-branch shape survives because the exclusion branch is still needed:
+# `exclude_names` makes a multi-draw roll a draw WITHOUT REPLACEMENT, and a
+# stat stick's name is now its noun alone, so the filter reads the noun
+# directly instead of having to roll a tier first to know what the name will be.
+static func template_rune(class_key: String, noun := "",
 		exclude_names: Array = []) -> Dictionary:
 	var pool := TEMPLATES.filter(
 		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
 	var template: Dictionary
-	var rk := rarity_key
 	if exclude_names.is_empty():
-		# The original order — pool pick, then the rarity roll — kept byte
-		# for byte, because every caller but the triple roller lands here
-		# and RNG ordering is what a sim baseline is made of.
 		template = pool.pick_random()
-		if rk == "":
-			var roll := randf()
-			rk = "common" if roll < 0.6 else ("rare" if roll < 0.9 else "epic")
 	else:
-		# Drawing without replacement: a stat stick's NAME is its rarity and
-		# its noun together, so the rarity has to be rolled before the noun
-		# pool can be filtered. A noun already spent at this rarity is out;
-		# the same noun at another rarity is a different rune and stays in.
-		if rk == "":
-			var roll2 := randf()
-			rk = "common" if roll2 < 0.6 else ("rare" if roll2 < 0.9 else "epic")
-		var prefix: String = RARITIES[rk]["prefix"]
 		var open_pool := pool.filter(func(t): return not exclude_names.has(
-			"%s Rune of %s" % [prefix, t["noun"]]))
-		# Every noun spent at this rarity is the exhausted case; six nouns
-		# against at most two exclusions means it cannot happen today.
+			"Rune of %s" % t["noun"]))
+		# Every noun spent is the exhausted case; six nouns against at most two
+		# exclusions means it cannot happen today.
 		template = (open_pool if not open_pool.is_empty() else pool).pick_random()
 	if noun != "":
 		for t in TEMPLATES:
 			if t["noun"] == noun:
 				template = t
-	var rar: Dictionary = RARITIES[rk]
-	var value = template["base"] * rar["mult"]
+	var value = template["base"]
 	var shown: int = int(value * 100) if template["base"] is float else int(value)
 	return {
 		"id": "tpl_%s" % String(template["noun"]).to_lower(),
-		"name": "%s Rune of %s" % [rar["prefix"], template["noun"]],
-		"rarity": rar["label"],
-		"rarity_color": rar["color"],
-		"price": rar["price"],
+		"name": "Rune of %s" % template["noun"],
+		"scope_label": SCOPE_INFO["universal"]["label"],
+		"scope_color": SCOPE_INFO["universal"]["color"],
+		"price": TEMPLATE_PRICE,
 		"desc": template["fmt"] % shown,
 		"payload": {"stat": {template["stat"]: value}},
-		"scarred": false,
 		"scope": "universal",
 		"lane": "",
 		"equipped": false,
@@ -537,20 +630,24 @@ static func template_rune(class_key: String, rarity_key := "", noun := "",
 
 
 # An authored entry as a pouch-ready rune instance (payload int-restored).
+#
+# **BATCH ES §1/§3 — `rarity`, `rarity_color` AND `scarred` ARE GONE FROM THE
+# INSTANCE.** `scope_label` / `scope_color` take the two display slots; the
+# payload, the price and the desc are byte-unchanged, so what the rune DOES and
+# what it COSTS are exactly what they were.
 static func build(id: String) -> Dictionary:
 	var e: Dictionary = _load()[id]
-	var rar: Dictionary = RARITIES[String(e["rarity"])]
-	var scarred := bool(e.get("scarred", false))
+	var scope := String(e.get("scope", "universal"))
+	var band: Dictionary = SCOPE_INFO[scope_band(scope)]
 	return {
 		"id": id,
 		"name": display_name(e),
-		"rarity": rar["label"],
-		"rarity_color": SCARRED_COLOR if scarred else rar["color"],
+		"scope_label": String(band["label"]),
+		"scope_color": band["color"],
 		"price": int(e["price"]),
 		"desc": String(e["desc"]),
 		"payload": _typed_payload(e["payload"]),
-		"scarred": scarred,
-		"scope": String(e.get("scope", "universal")),
+		"scope": scope,
 		"lane": String(e.get("lane", "")),
 		"requires_ability": String(e.get("requires_ability", "")),
 		"equipped": false,
@@ -564,8 +661,11 @@ static func build(id: String) -> Dictionary:
 # nothing here reads the environment). It scales the UPSIDE and holds every
 # COST at its authored value, deliberately: the arm asks "are the entries
 # too weak", and a multiplier that grew the drawbacks in step would answer
-# a different question. That makes the arm strictly generous to scarred
-# runes, which is why it is a probe and not a design.
+# a different question. That makes the arm strictly generous to a rune that
+# CHARGES for its upside, which is why it is a probe and not a design.
+# (BATCH ES §3: the word for those used to be "scarred". The label is retired
+# and this machinery is not — `is_cost` below reads a field and a sign, never a
+# label, so every cost is held at its authored value exactly as before.)
 #
 # A cost is found two ways. Usually it is a NEGATIVE value on an ordinary
 # field (-10 Speed, -0.3 healing received, -8% armor). Sometimes it is a

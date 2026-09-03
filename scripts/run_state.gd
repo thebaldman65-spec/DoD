@@ -1347,8 +1347,10 @@ func rune_slots() -> int:
 	return 3
 
 # Runes mode (sim matrix flag, Batch X): full = the authored pool
-# (default), stats = the generated Common family only (approximately the
+# (default), stats = the generated stat family only (approximately the
 # pre-Batch-X behaviour), off = no runes generated, offered, or dropped.
+# (BATCH ES §1: that family used to be called the "Common family" after the
+# rarity tier it sat on. There are no tiers; the family is unchanged.)
 func runes_mode() -> String:
 	var m := OS.get_environment("DOD_SIM_RUNES")
 	return m if m in ["off", "stats"] else "full"
@@ -1366,7 +1368,7 @@ func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 		"off":
 			return {}
 		"stats":
-			return Runes.template_rune(String(member["key"]), "", "", exclude_names)
+			return Runes.template_rune(String(member["key"]), "", exclude_names)
 	return _apply_rune_power(Runes.generate(member, zone_idx + 1, exclude_names))
 
 
@@ -1400,7 +1402,7 @@ func grant_rune(member: Dictionary) -> Dictionary:
 		owned.append(String(r["name"]))
 	var spec_scope := "spec:%s" % String(member.get("spec", ""))
 	var spec_ids: Array = []
-	for id in Runes.eligible_ids(member, "", owned):
+	for id in Runes.eligible_ids(member, owned):
 		if String(Runes.config(id).get("scope", "")) == spec_scope:
 			spec_ids.append(id)
 	if spec_ids.is_empty():
@@ -1593,6 +1595,33 @@ func earned_ability_names(member: Dictionary) -> Array:
 # has never benched anything carries no `bm_equipped` key and reads its pool.
 func equipped_ability_names(member: Dictionary) -> Array:
 	return member.get("bm_equipped", member.get("bm_abilities", [])).duplicate()
+
+
+# ── BATCH ES §4 — THE WHOLE BAR: what this hero actually carries into a fight.
+#
+# **THE PROTECTED CORE PLUS THE EQUIPPED EARNED CARDS, IN THAT ORDER**, which
+# is exactly what `battle.gd`'s spawn assembles and exactly the 7-to-10 the slot
+# cap counts (`ability_slots_used` is `core_slots` + this function's second
+# half). `equipped_ability_names` alone is NOT the loadout — it is the earned
+# subset, and a hero who has drafted nothing carries a full bar through it that
+# reads EMPTY.
+#
+# **IT READS NO TAG AND MUST NOT.** This is the list; what the list MEANS is
+# `Classes.tag_census`'s question, asked through `Runes.loadout_tag_census`.
+# Keeping the two apart is what keeps `run_state.gd` out of `check_ek` §3's
+# tag population, which is asserted at zero for this file by name.
+#
+# **AND THE TWO HALVES ARE VERIFIED EQUAL TO THE SPAWN'S, NOT ASSUMED**:
+# `check_es` §4 re-derives the spawn's own non-earned kit for all twelve specs
+# and requires it to be `protected_names` name for name, because a census taken
+# over a list the fight does not use is a number about nothing.
+func loadout_ability_names(member: Dictionary) -> Array:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return []
+	var out: Array = Classes.protected_names(spec).duplicate()
+	out.append_array(equipped_ability_names(member))
+	return out
 
 
 # Benched: held, and not carried. The party screen's swap list.

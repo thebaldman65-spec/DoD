@@ -4,6 +4,110 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The rune layer's new shape, and what a label was hiding (Batch ES) — 2026-09-03
+
+**Newest first, so read this before the Batch X entries below** — two of
+them ("Why rarity means kind rather than magnitude" and "Why scarred is
+a flag, not a rarity") record decisions this batch reverses. They are
+left standing because they are why the shape was chosen, and a design
+journal that edits its own history stops being evidence.
+
+### Why rarity went entirely rather than being simplified
+
+Rarity was three things wearing one word, and only one of them was
+load-bearing. It **meant kind** — an authoring convention that lived in
+the payload, so removing the label removed nothing. It **set the price**
+of the generated stat family — 50/100/160 by tier — where every authored
+rune has always carried its own price. And it **drove the offer odds**,
+which is the half that mattered: 60/30/10 at zone 1 deepening to
+25/45/30 by zone 3.
+
+**That third one is the reason the ruling is "entirely" and not "mostly".**
+The zone-slot weight shift was the *only* thing making a late rune differ
+from an early one — the Batch X entry below says so in as many words —
+and once it is gone the tiers are a vocabulary with nothing under it.
+Keeping the label without the odds would have been a grade the player
+could read and the game could not act on.
+
+**And the cost of removing it is measurable rather than notional.** Half
+of every zone-1 offer used to be a generated stat stick and only a fifth
+of every zone-3 offer. It is a flat ~30% at every slot now: **the early
+game gets better and the late game gets worse**, which is what "no zone
+progression in rune quality" buys. That is the ruling's price and it is
+paid on purpose.
+
+### Why the Scarred label went and every cost stayed
+
+A cost clause is a *number*. The label was a second, hand-maintained
+record of the same fact, and the moment there are two records of one
+fact they disagree — which is exactly what had happened, unnoticed, for
+the whole life of the flag.
+
+**Both sets were 17 and they were different 17s.** The Rune of
+Exsanguination carried the flag and has no payload cost term at all: its
+whole payload is `blood_pact: -15`, and at its one read site that single
+field opens enemy veins early (its promise) *and* makes the bleedout tear
+15% of max health instead of 20% (its price). One field, two behaviours,
+nothing for a sweep to find. Going the other way, the Anchor Rune carries
+a real −10 Speed and never carried the flag — because the schema forbade
+a "scarred common" and it is the one common in the file. **A rarity rule
+was hiding a cost**, which is a small argument for §1 that §1 did not
+have to make for itself.
+
+**What recognises a cost now is `Runes.is_cost`**, which reads a field
+name and a sign and is the same function that holds a cost at its
+authored value under the sim's power probe. There was never a second
+mechanism; there was a second *record*, and it is gone.
+
+### Why a rune reads EQUIPPED cards and not owned ones
+
+This is the whole design and it is one sentence: **a pool only grows.**
+Nothing ever leaves a hero's drafted pool, so a threshold read off it
+turns on once, late, and never off — a flat increment with a delay, which
+is the shape the rune charter spent three batches getting away from. A
+loadout is capped and freely swapped, so counting it makes the loadout a
+**lever**: you can bench a card to switch a rune off, and that is a
+decision a player makes with information in front of them.
+
+**Which is why the count is on the screen.** A silent threshold is a stat
+nobody knows they have. It is drawn where the swap happens and on the
+sheet where a whole loadout is read at once, and both are driven by a
+gate, because a count that never recomputes passes every static check
+there is.
+
+**The protected core is in the count, and measuring that immediately
+found the trap.** The cores alone already meet a 2+ threshold on BREAK
+for ten of the twelve specs and on DEBUFF for seven, while MARK is zero
+for all twelve. So a rune asking for 2+ BREAK would be on from the first
+fight for almost everyone and no swap could turn it off — the flat
+increment again, arriving through the cores instead of through the pool.
+**The per-spec table is printed on every battery run** rather than
+written down, so the day a core kit moves nobody has to remember this.
+
+### Why a splash pays for breadth
+
+EJ's finding was that with the talent lanes severed, *"a little of every
+bond"* had nothing left to reach across. **Tags are the thing to reach
+across.** A normal rune pays for depth in one tag; a splash pays for a
+loadout spanning several — the inverse shape, and the pick for a hero who
+is spread rather than deep. It gives the category an identity again
+instead of leaving it as three unrelated numbers in a bundle.
+
+**Seven of the twelve splashes are live and five were retired at EO**,
+and the retirements fell unevenly: **the whole Cleric class has none**,
+while all three Warriors keep theirs. Nothing is authored here.
+
+### What was deliberately not done, and why the list is short
+
+No rune was authored, re-authored or retuned; no pool was expanded; no
+pricing rule was invented. **Price is the open question rarity leaves
+behind** — the 53 offerable runes carry 50 / 75 / 100 / 120 / 160,
+written against a tier table that no longer exists — and it is a design
+decision. And **the five universals are re-scoped rather than retired**,
+with the class each lands on left to the designer: they are 5 of every
+spec's 9–12 offerable runes, so whichever way it goes it is the largest
+single movement the pool has taken.
+
 ## The last three clauses, the rung that is a door, and what a relic is for (Batch EN) — 2026-09-01
 
 **Three things were decided here and one was refused, and the refusal is

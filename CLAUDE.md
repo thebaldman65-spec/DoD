@@ -1877,10 +1877,15 @@ DEVOUT 0**. Only **76 of the 227-ability corpus** carry any pressure at all.
   specs can participate in it. A lever every spec meets (damage taken) is a difficulty lever; a
   lever six specs meet is a gate.
 
-## STANDING DESIGN RULE — A SCARRED RUNE'S COST MAY BE BOUGHT BACK, AND PAYING FOR THAT IS THE DECISION (Batch EP §4, ruled by the designer)
+## STANDING DESIGN RULE — A RUNE'S COST MAY BE BOUGHT BACK, AND PAYING FOR THAT IS THE DECISION (Batch EP §4, ruled by the designer; relabelled at ES §3)
 
-> **A talent node that refunds a Scarred rune's downside is not a bug in the rune. The point,
+> **A talent node that refunds a costed rune's downside is not a bug in the rune. The point,
 > the lane and the row it costs ARE the trade.**
+
+**BATCH ES §3 RETIRED THE WORD, NOT THE RULE.** This rule was written about "a Scarred rune", and
+there is no Scarred label any more — the flag, the prefix and the colour are gone and every cost
+clause is byte-unchanged. **The rule is about a rune that CHARGES for its upside**, which is what
+`Runes.is_cost` recognises, and it reads exactly as it did.
 
 **RULED AT EP: the Rune of the Bared Guard is KEPT, and the 80% refund is ACCEPTED.** Its
 `rune_seasoned_def_bonus` −0.15 exactly cancels Defensive Stance's 0.85 mitigation
@@ -1888,18 +1893,109 @@ DEVOUT 0**. Only **76 of the 227-ability corpus** carry any pressure at all.
 the nose), and `sm_def_stance` — **Defensive Stance, lane Poise, row 1** — writes 0.12 back into
 the same subtraction, leaving 0.88 against a vanilla 0.85. **The node is inside the three rows a
 single rung-1 clear opens**, so the refund is available to the first player who ever sees the rune.
-**The designer's ruling: paying a point and a lane to soften a Scarred rune is a decision, which is
-what a Scarred rune is for.**
+**The designer's ruling: paying a point and a lane to soften a costed rune is a decision, which is
+what the cost is for.**
 
 · **THE TWO REPAIRS THAT WERE REFUSED, NAMED SO THEY ARE NOT RE-PROPOSED**: making the rune's term
   un-refundable, and moving `sm_def_stance` deeper into the tree. Both were considered and both
   were rejected in favour of accepting the interaction.
-· **AND THE SET-SHAPE FACT THAT KEPT IT.** There are **17 Scarred runes — 2 universal, 3
+· **AND THE SET-SHAPE FACT THAT KEPT IT.** There are **17 costed runes — 2 universal, 3
   class-scoped (mage, cleric, hunter; there is NO `class:warrior` one) and exactly 1 per spec** —
   so the three Warrior specs already draw 3 where the other nine draw 4. Retiring the Bared Guard
-  would leave the Swordmaster **2**, the thinnest Scarred shelf in the game and the only spec with
+  would leave the Swordmaster **2**, the thinnest costed shelf in the game and the only spec with
   no spec-scoped one. **It is also the only item that lets a Swordmaster buy commitment**;
   `still_wrist`, `shattered_guard` and `duelist` are all pure upside.
+· **ES §3 RE-DERIVED THAT 17 AND IT IS A DIFFERENT 17 FROM THE FLAG'S.** The count is the same and
+  the SET is not. **`exsanguination` carried the flag and has no payload cost term at all** — its
+  promise (veins open at 85) and its price (the bleedout tears 15% of max health instead of 20%)
+  are two behaviours of ONE field at ONE read site, so nothing can sweep for it; it is named in
+  `test_runes.COST_WITHOUT_A_TERM` and in `check_es` §3 rather than suppressed. **And `anchor`
+  carries a real −10 Speed and never carried the flag**, because the old schema forbade a "scarred
+  common" and it is the one common in the file — **a rarity rule was hiding a cost.** The Warrior
+  arithmetic above is unaffected: `exsanguination` is the Berserker's and `anchor` is universal.
+
+## STANDING RULE — RUNE CONTENT IS WRITTEN WITH THE DESIGNER, ONE RUNE AT A TIME (Batch ES, ruled by the designer)
+
+> **A batch may build machinery, re-scope, retire or repair. It never authors a rune, never
+> re-authors one, never retunes one, and never presents rune content as options.**
+
+Rune content is written in conversation, one rune at a time. **A batch that finds itself listing
+three candidate clauses for the designer to pick from has already broken this rule** — the
+listing is the authoring. What a batch owes instead is the measurement the decision needs and the
+machinery the decision will land on.
+
+· **THE TEST IS WHETHER A MAGNITUDE MOVED.** ES removed rarity, the Scarred label and the offer
+  odds and moved **not one authored magnitude**: every `payload`, `price` and `desc` in
+  `data/runes.json` is byte-unchanged. The one number it moved is the GENERATED stat family's,
+  and only because the ×1/×2/×3 ladder was literally a rarity field.
+
+## STANDING RULE — THERE ARE NO RUNE RARITY TIERS, AND AN OFFER IS FLAT ACROSS THE RUN (Batch ES §1, ruled by the designer)
+
+> **Rarity is removed entirely. No tiers, no rarity odds, no zone progression in rune quality.
+> A batch proposing a quality grade is proposing to overturn a ruling.**
+
+**WHAT RARITY DID, AND WHERE EACH HALF WENT.** It *meant kind* — an authoring convention, never a
+behaviour, and every rune goes on doing exactly what it did. It *drove the offer odds* — 60/30/10
+at zone 1 deepening to 25/45/30 by zone 3, **the only thing that made a late offer differ from an
+early one**, and measured on the live pool that put **half of every zone-1 offer** into the
+generated stat family against a fifth of every zone-3 offer; it is a flat **~30% at every slot**
+now. It *set the price* for the generated family; authored runes have always carried their own.
+
+· **PRICE IS THE OPEN QUESTION AND NO RULE WAS INVENTED FOR IT.** The 53 offerable runes carry
+  prices of 50 / 75 / 100 / 120 / 160 written against a tier table that no longer exists. **That
+  is a design decision and it is the designer's.**
+· **`Runes.is_cost` NEVER READ RARITY AND IS UNAFFECTED**, which is worth writing down because
+  three reports in a row called `DOD_SIM_RUNE_POWER` "the sim's rarity lever". It is a POWER
+  lever; `is_cost` reads a field name and a sign.
+· **THE ZONE SLOT IS STILL IN `Runes.generate`'s SIGNATURE AND IS DELIBERATELY UNREAD** —
+  `_zone_slot`, asserted by `check_es` §1. It is the hook a later batch would want if a zone is
+  ever allowed to change an offer again, and a parameter nothing reads cannot break the ruling.
+
+## STANDING RULE — A RUNE'S SCOPE IS SPEC AND CLASS; THE FIVE UNIVERSALS ARE RE-SCOPED, NOT RETIRED (Batch ES §2, ruled by the designer)
+
+> **Losing five authored, working runes to a scoping rule is waste. The class each of the five
+> lands on is CONTENT and is the designer's, and until it is made they stay universal.**
+
+**THE SIZE OF THE MOVE IS MEASURED: the five are 5 of every spec's 9–12 offerable runes** — 42% to
+56% of the drawable pool — so this is the largest single movement the rune pool has ever taken.
+Whichever class each lands on, the other three specs' pools lose it. **The Occultist is thinnest
+at 9 today.** `check_es` §2 asserts the five still roll for all twelve specs, so a stealth
+retirement through an eligibility rule goes red; it PRINTS the depth table and asserts no class.
+
+· **TWO OF THE FIVE CHARGE FOR THEIR UPSIDE** (the Glass and Vampiric Runes), and EP measured that
+  those two are what a Swordmaster falls back on if the Bared Guard is ever retired. **Re-scoping
+  them removes that fallback for every spec outside the chosen class.**
+
+## STANDING RULE — A RUNE READS ITS HOLDER'S EQUIPPED CARDS, NEVER HIS POOL (Batch ES §4, ruled by the designer)
+
+> **A rune that keys off archetype tags counts the cards the hero is CARRYING. Thresholds are the
+> default shape — hold 2+ of a tag, get the effect — mixed per rune where a rune wants otherwise.
+> A SPLASH pays for BREADTH across tags where a normal rune pays for depth in one.**
+
+**THE EQUIPPED/OWNED DISTINCTION IS LOAD-BEARING AND EG CREATED IT.** A hero's pool is everything
+drafted and nothing ever leaves it, so **counting owned cards means a threshold turns on once,
+late, and never off — the flat increment with a delay.** Counting the loadout keeps it a live
+decision: **you can swap to switch a rune on or off, so the loadout becomes a lever.**
+
+· **THE DOOR IS `Run.loadout_ability_names(member)` → `Classes.tag_census` / `tag_count` /
+  `tag_breadth`, with `Runes.tag_threshold_met` and `Runes.breadth_met` as the two shapes a rune
+  asks through.** The list is the PROTECTED CORE plus the equipped earned cards, which is what
+  `battle.gd`'s spawn assembles and what the 7-to-10 slot cap counts.
+· **THE `Runes` HELPERS TAKE THE NAME LIST AND NOT THE MEMBER, AND THAT IS A CONSTRAINT.** They
+  are static on a `class_name` script, and **a static function cannot see an autoload** — reaching
+  `Run` from there is a compile error. The split is also what keeps `run_state.gd` free of every
+  tag word, which `check_ek` §3 asserts at zero for that file by name.
+· **A THRESHOLD'S MAGNITUDE MUST BE CHOSEN AGAINST THE CORE-KIT BASELINE.** Before a card is
+  drafted, the cores alone already meet a 2+ threshold on **BREAK for ten of the twelve specs**
+  and on **DEBUFF for seven**; **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly
+  one**. A rune asking 2+ BREAK is on from the first fight for almost everyone and no swap turns
+  it off. `check_es` §4 prints the per-spec table every battery run.
+· **THE COUNT MUST BE VISIBLE AND MUST MOVE ON A SWAP.** A silent threshold is a stat nobody knows
+  they have. It is drawn on the loadout panel (where the swap happens) and on the hero sheet, and
+  **both are driven** — `check_es` §4 through the real equip/unequip doors, `check_map_screen`
+  through the real screen.
+· **WHEN A RUNE FINALLY READS IT IN A FIGHT, THE PLACE IS THE SPAWN AND NOT THE STRIKE LOOP.** The
+  loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
 
 ## STANDING RULE — LOYALTY IS GOVERNED BY A CONVERSION, NEVER BY A CEILING (Batch ER, ruled by the designer)
 > **The designer has ruled that Loyalty does NOT flatten. Above nominal the meter CONVERTS: each
@@ -1960,8 +2056,9 @@ door both offer paths use — skips it.
 · **THE FILTER GOES AT THE SINGLE DOOR, NOT AT THE CALLERS.** Both rune offer paths (`generate`
   and `run_state.grant_rune`) reach the authored pool through `eligible_ids`; one `continue`
   there retires a rune everywhere without touching either caller, and neither can be blanked by
-  it — `generate` widens an exhausted rarity and then falls back to the generated Common family,
-  and `grant_rune` falls back to `generate_rune`.
+  it — `generate` falls back to the generated stat family (**ES §1: it widened an exhausted RARITY
+  first, and there is no rarity to widen out of now, so that fall is the whole floor**), and
+  `grant_rune` falls back to `generate_rune`.
 · **ASSERT THE RETIREMENT IN BOTH DIRECTIONS.** `test_runes` now says a retired entry must roll
   for NOBODY and a live one must still roll for its own spec. **An exemption arm instead would
   read green on the day the whole file stopped rolling** — the same shape `check_em` §4 was

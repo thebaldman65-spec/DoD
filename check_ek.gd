@@ -203,9 +203,17 @@ func _s2_vocabulary() -> void:
 # comment-stripped, for any mention of the tag surface, and the set of files
 # that name it must be EXACTLY this list. A batch that keys a clause off a tag
 # has to move a line here and say why.
+# **BATCH ES §4 ADDED FIVE NAMES AND THAT IS THE POINT OF KEEPING THIS LIST
+# AUTHORED.** ES built the reading machinery — a census, a count, a breadth and
+# the two predicates a rune asks through — and every one of them is a new way to
+# read a tag. A sweep that did not grow with them would go on reporting the
+# population it was written for while the real one moved underneath it, which is
+# the exact failure `check_dw` exists to catch one layer up.
 const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 	"card_tag_line", "TAG_INFO", "TAG_ORDER", "tag_meaning",
-	"RUNE_TAGS", "rune_tags", "rune_tag_line"]
+	"RUNE_TAGS", "rune_tags", "rune_tag_line",
+	"tag_count", "tag_census", "tag_breadth", "tag_threshold_met",
+	"breadth_met"]
 
 # The authored readers, SPLIT IN TWO AT BATCH EL §3 BECAUSE THEY ARE TWO
 # DIFFERENT CLAIMS AND ONLY ONE OF THEM IS ABOUT THE GAME.
@@ -217,18 +225,29 @@ const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 # into one number is what made the brief's rule impossible to obey without
 # either weakening the gate or refusing to write one.
 #
-# **THE HALF THAT IS A CLAIM ABOUT THE GAME IS PINNED AT THREE AND HAS NOT
-# MOVED**: two files DEFINE the tables and one DISPLAYS them. A fourth arriving
-# here is a fourth place in the shipped game that knows what a tag is, and that
-# is the assertion EK wrote this section for.
-const TAG_DEFINERS := ["scripts/classes.gd", "scripts/runes.gd",
-	"scripts/map_screen.gd"]
+# **THE HALF THAT IS A CLAIM ABOUT THE GAME. IT WAS THREE FROM EK TO ER AND IT
+# IS FOUR AT BATCH ES §4, WHICH IS THE BATCH THAT ENDED THE TAGS' INERTNESS.**
+# Two files DEFINE the tables (`classes.gd` the cards' and the counting
+# primitives, `runes.gd` the runes' and the two predicates a rune asks through)
+# and TWO DISPLAY them: `map_screen.gd` draws the draft card's tag line and now
+# the loadout panel's census, and **`party_screen.gd` IS THE FOURTH** — the hero
+# sheet, which `docs/state.md` has recommended as the tags' surface since EK and
+# which is the only screen where a player reads a whole loadout at once.
+#
+# **WHY A FOURTH IS ALLOWED HERE WHEN A FOURTH WAS THE THING EK ASSERTED
+# AGAINST.** EK's claim was that nothing reads a tag for anything but DISPLAY,
+# and that is still exactly the claim: both new readers draw a line and neither
+# branches on a tag — asserted below, over `TAG_ORDER` itself. What moved is the
+# number of places that display one, not what displaying one is allowed to do.
+const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd",
+	"scripts/party_screen.gd", "scripts/runes.gd"]
 
 # The half that is a claim about the INSTRUMENTS. A gate reading a tag cannot
 # change how the game behaves, so this list grows with the tree — but it is
 # still AUTHORED rather than derived from a `check_*.gd` glob, because a
 # derived list would bless a gate that started doing something else.
-const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_map_screen.gd"]
+const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
+	"check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
@@ -270,7 +289,7 @@ func _s3_inertness() -> void:
 	var chk_expected: Array = TAG_CHECKERS.duplicate()
 	chk_expected.sort()
 	ok(in_game == def_expected,
-		"exactly three files in the GAME name a tag — found [%s], expected [%s]"
+		"exactly the authored FILES in the GAME name a tag — found [%s], expected [%s]"
 			% [", ".join(in_game), ", ".join(def_expected)])
 	ok(in_gates == chk_expected,
 		"exactly the authored TARGETS check a tag — found [%s], expected [%s]"
@@ -286,12 +305,33 @@ func _s3_inertness() -> void:
 				hits.append(w2)
 		ok(hits.is_empty(), "%s reads no tag (%s)" % [f, ", ".join(hits)])
 
-	# **AND THE DISPLAY SURFACE ONLY DISPLAYS.** `map_screen.gd` may name the
-	# builder; it may not branch on a tag or count one.
+	# **AND THE DISPLAY SURFACES ONLY DISPLAY. BATCH ES §4 RE-POINTED THIS RULE
+	# RATHER THAN LOOSENING IT, AND THE NEW SHAPE IS STRICTER.** It used to
+	# forbid `map_screen.gd` from naming anything but the line builder, which was
+	# a proxy for "does not branch on a tag" — and ES made the proxy wrong
+	# without making the property wrong: a census IS a display, and both screens
+	# take one now.
+	#
+	# **THE PROPERTY ITSELF IS ASSERTABLE AND IS ASSERTED: A SURFACE MAY NOT NAME
+	# A TAG WORD.** You cannot branch on a tag without naming it, and iterating
+	# `TAG_ORDER` — which is what a census display does — never does. The
+	# population is `TAG_ORDER` itself rather than a list, so an eighth tag is
+	# covered by doing nothing.
+	for f2 in ["scripts/map_screen.gd", "scripts/party_screen.gd"]:
+		var disp := Gate.strip_comments(FileAccess.get_file_as_string("res://" + f2))
+		var named: Array = []
+		for tw in Classes.TAG_ORDER:
+			if disp.contains('"%s"' % String(tw)):
+				named.append(String(tw))
+		ok(named.is_empty(),
+			"%s names a tag word (%s) — a display surface iterates TAG_ORDER, it does not branch on a tag"
+				% [f2, ", ".join(named)])
+	# The builder is still called exactly once, which is what stops a second
+	# copy of the draft card's line.
 	var ms := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/map_screen.gd"))
 	var reads: int = ms.count("card_tag_line")
-	ok(reads == 1, "map_screen builds the line once and reads nothing else (%d)" % reads)
+	ok(reads == 1, "map_screen builds the draft line once (%d)" % reads)
 	for w3 in ["CARD_TAGS", "card_tags(", "TAG_INFO", "card_tag_primary"]:
 		ok(not ms.contains(String(w3)),
 			"map_screen does not reach past the builder for %s" % w3)

@@ -47,7 +47,7 @@ func _run() -> void:
 	_schema(data)
 	_payloads(data, unit_props, unit_src, battle_src)
 	_requires_ability(data)
-	_scarred(data)
+	_costs(data)
 	_eligibility(data)
 	_coverage(data)
 	_exclusives(data)
@@ -73,7 +73,10 @@ func _run() -> void:
 
 # ---------- schema ----------
 
-const RARITY_KEYS := ["common", "rare", "epic"]
+# BATCH ES §1 — `RARITY_KEYS` WENT WITH THE TIERS. The schema used to require
+# every entry to name one of three; there is no tier to name, and the price
+# assertion that hung off it (a costed entry must undercut its clean rarity
+# peer) had no peer left to undercut — see `_costs` below for what replaced it.
 const PAYLOAD_BRANCHES := ["stat", "ability", "grant_ability", "new_ability"]
 
 
@@ -82,8 +85,11 @@ func _schema(data: Dictionary) -> void:
 	for id in data:
 		var e: Dictionary = data[id]
 		ok(e.has("name") and String(e["name"]) != "", "%s: no name" % id)
-		ok(e.has("rarity") and RARITY_KEYS.has(String(e["rarity"])),
-			"%s: bad rarity" % id)
+		# BATCH ES §1 — RARITY IS GONE FROM THE DATA AND IS PINNED ABSENT, not
+		# merely unread. A key nothing reads is a key a later batch re-keys
+		# something to, and this file is the schema.
+		ok(not e.has("rarity"), "%s: still carries a `rarity` key (ES §1)" % id)
+		ok(not e.has("scarred"), "%s: still carries a `scarred` flag (ES §3)" % id)
 		ok(e.has("price") and int(e["price"]) > 0, "%s: bad price" % id)
 		ok(e.has("desc") and String(e["desc"]) != "", "%s: no desc" % id)
 		ok(e.has("payload") and e["payload"] is Dictionary, "%s: no payload" % id)
@@ -97,13 +103,13 @@ func _schema(data: Dictionary) -> void:
 		var disp := Runes.display_name(e)
 		ok(not seen_names.has(disp), "%s: duplicate display name %s" % [id, disp])
 		seen_names[disp] = true
-		# Scarred entries must undercut their clean rarity peer, or the trade
-		# only shows in the tooltip and never in the shop.
-		var base_price: int = int(Runes.RARITIES[String(e["rarity"])]["price"])
-		if bool(e.get("scarred", false)):
-			ok(int(e["price"]) < base_price,
-				"%s: scarred but priced >= its clean peer (%d vs %d)" % [
-					id, int(e["price"]), base_price])
+		# **BATCH ES §1 — AND THE NAME IS NOW THE ONLY THING KEEPING THEM
+		# APART.** `display_name` used to prepend a tier or the Scarred prefix,
+		# so two entries could share a `name` and still be distinct runes; they
+		# cannot now, which makes this uniqueness check load-bearing where it
+		# used to be belt-and-braces.
+		ok(disp == String(e["name"]),
+			"%s: display_name no longer adds a prefix (ES §1)" % id)
 
 
 # ---------- the silent-dud alarms ----------
@@ -160,7 +166,7 @@ func _reachable(entry: Dictionary, ability_name: String) -> bool:
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			var member := {"key": key, "spec": spec, "runes": []}
-			if not Runes.eligible_ids(member, "", []).has(_id_of(entry)):
+			if not Runes.eligible_ids(member, []).has(_id_of(entry)):
 				continue
 			if Runes.kit_names(member).has(ability_name):
 				return true
@@ -174,36 +180,77 @@ func _id_of(entry: Dictionary) -> String:
 	return ""
 
 
-# ---------- scarred ----------
-
-# A scarred payload MUST carry a real cost. Negative numbers are the cost in
-# every branch: a stat term below zero, or an ability field reduced.
-# Fields whose PENALTY reads as a positive number — "+15% damage taken" is a
-# cost even though the term is +0.15. Batch X's Glass Rune is the precedent;
-# without this list the check would reject an already-shipped rune.
+# ---------- the cost clauses (was: scarred) ----------
+#
+# ── BATCH ES §3 — THE LABEL WENT, THE COSTS STAYED, AND THE POPULATION IS
+# DERIVED NOW INSTEAD OF DECLARED ──────────────────────────────────────────
+#
+# This section used to read the `scarred` boolean and check that a flagged
+# entry carried a negative term. **THERE IS NO FLAG**, so the question inverts
+# into the one that was always the real one: **which runes actually charge for
+# their upside, and does `Runes.is_cost` — the function the power probe uses to
+# hold a cost at its authored value — agree that they do?** A cost clause that
+# stopped being RECOGNISED as a cost would be scaled by the arm and the rune
+# would quietly become pure upside, which is the defect §3 names.
+#
+# **AND DERIVING IT IMMEDIATELY FOUND THAT THE FLAG AND THE BEHAVIOUR HAD NEVER
+# AGREED.** Both sets are 17 and they are not the same 17:
+#
+#   `exsanguination` WAS FLAGGED AND HAS NO PAYLOAD COST TO FIND. Its whole
+#     payload is `blood_pact: -15`, which is in `INVERTED_STAT_FIELDS` because a
+#     negative there is the rune's PROMISE (veins open at 85). Its price — the
+#     bleedout tearing 15% of max health instead of 20% — is a second behaviour
+#     of the SAME field at the SAME read site (`battle._add_bleed_with_burst`),
+#     so there is no term for any sweep to see. The flag was the only
+#     machine-readable record that this rune charges anything, and it is gone.
+#     **IT IS NAMED HERE RATHER THAN SUPPRESSED**, which is what an exemption is
+#     for in this project.
+#   `anchor` CARRIES A REAL COST (-10 Speed) AND WAS NEVER FLAGGED, because the
+#     old rule forbade a "scarred common" and it is the one common in the file.
+#     **That was a RARITY rule hiding a cost**, and ES §1 removing rarity is
+#     what surfaces it.
 const PENALTY_FIELDS := ["dmg_taken_bonus"]
 
+# The one entry whose cost is a behaviour rather than a term. See above.
+const COST_WITHOUT_A_TERM := {
+	"exsanguination": "its cost and its promise are two behaviours of one field (blood_pact) at one read site, so no payload term expresses it",
+}
 
-func _scarred(data: Dictionary) -> void:
+
+# Every payload term `Runes.is_cost` calls a cost, for one entry.
+func _cost_terms(e: Dictionary) -> Array:
+	var out: Array = []
+	var pay: Dictionary = e.get("payload", {})
+	for field in pay.get("stat", {}):
+		var v = pay["stat"][field]
+		if (v is float or v is int) and Runes.is_cost(String(field), float(v)):
+			out.append("stat.%s" % field)
+	for field2 in pay.get("add", {}):
+		var v2 = pay["add"][field2]
+		if (v2 is float or v2 is int) and float(v2) < 0.0 \
+				and not Runes.INVERTED_AB_FIELDS.has(String(field2)):
+			out.append("add.%s" % field2)
+	return out
+
+
+func _costs(data: Dictionary) -> void:
+	var costed: Array = []
 	for id in data:
-		var e: Dictionary = data[id]
-		if not bool(e.get("scarred", false)):
-			continue
-		var pay: Dictionary = e["payload"]
-		var negative := false
-		for field in pay.get("stat", {}):
-			if float(pay["stat"][field]) < 0.0:
-				negative = true
-			elif PENALTY_FIELDS.has(String(field)) and float(pay["stat"][field]) > 0.0:
-				negative = true
-		for part in ["add"]:
-			for field in pay.get(part, {}):
-				if float(pay[part][field]) < 0.0:
-					negative = true
-		ok(negative, "%s: scarred but its payload carries no negative term" % id)
-		ok(String(e["rarity"]) != "common", "%s: scarred commons are not a thing" % id)
-		ok(Runes.display_name(e).begins_with(Runes.SCARRED_PREFIX),
-			"%s: scarred rune does not wear the Scarred prefix" % id)
+		if not _cost_terms(data[id]).is_empty():
+			costed.append(String(id))
+	costed.sort()
+	# **THE SWEEP ASSERTS ITS OWN POPULATION** (EA §5): a walk that recognised
+	# nothing would report a file with no costs in it and read green.
+	ok(costed.size() >= 15,
+		"the cost sweep read a real population (%d entries charge for their upside)" % costed.size())
+	# The named exception must still be in the file and must still be the ONLY
+	# one that needs naming — a second entry losing its term is what this catches.
+	for id2 in COST_WITHOUT_A_TERM:
+		ok(data.has(id2), "COST_WITHOUT_A_TERM names '%s', which is not in the pool" % id2)
+		ok(not costed.has(id2),
+			"%s now carries a payload cost term — it is no longer the exception, update the list" % id2)
+	print("  (ES §3: %d entries carry a cost term `is_cost` recognises; %d named exception)" % [
+		costed.size(), COST_WITHOUT_A_TERM.size()])
 
 
 # ---------- eligibility ----------
@@ -230,7 +277,7 @@ func _eligibility(data: Dictionary) -> void:
 			# in BOTH directions rather than exempted**, because a one-armed
 			# version would go green on the day the whole file stopped rolling.
 			var mine := {"key": owner_key, "spec": spec, "runes": []}
-			var rolls: bool = Runes.eligible_ids(mine, "", []).has(id)
+			var rolls: bool = Runes.eligible_ids(mine, []).has(id)
 			if Runes.is_retired(id):
 				ok(not rolls, "%s: is RETIRED and must not roll for its own spec" % id)
 			else:
@@ -241,7 +288,7 @@ func _eligibility(data: Dictionary) -> void:
 					if other == spec:
 						continue
 					var theirs := {"key": key, "spec": other, "runes": []}
-					ok(not Runes.eligible_ids(theirs, "", []).has(id),
+					ok(not Runes.eligible_ids(theirs, []).has(id),
 						"%s: leaks into spec %s" % [id, other])
 		elif scope.begins_with("class:"):
 			var ckey := scope.trim_prefix("class:")
@@ -271,18 +318,23 @@ func _coverage(data: Dictionary) -> void:
 					tree_lanes[String(node["lane"])] = true
 			var covered := {}
 			var splash := 0
-			var scarred_on_lane := 0
-			var scarred_splash := 0
+			# **BATCH ES §3 — DERIVED THROUGH `is_cost`, NOT OFF A FLAG.** The
+			# property is unchanged and only its instrument moved: exactly one
+			# rune in each spec's set of four CHARGES for its upside, and it is
+			# never the splash — the splash is the clean, always-fine pick.
+			var costed_on_lane := 0
+			var costed_splash := 0
 			for id in mine:
 				var lane := String(data[id].get("lane", ""))
-				var is_scarred := bool(data[id].get("scarred", false))
+				var charges: bool = not _cost_terms(data[id]).is_empty() \
+					or COST_WITHOUT_A_TERM.has(String(id))
 				if lane == "":
 					splash += 1
-					if is_scarred:
-						scarred_splash += 1
+					if charges:
+						costed_splash += 1
 					continue
-				if is_scarred:
-					scarred_on_lane += 1
+				if charges:
+					costed_on_lane += 1
 				ok(tree_lanes.has(lane),
 					"%s: rune %s names lane '%s', which is not in its LANE_TREES entry" % [
 						spec, id, lane])
@@ -291,11 +343,10 @@ func _coverage(data: Dictionary) -> void:
 			ok(splash == 1, "%s: %d splash runes, expected exactly 1" % [spec, splash])
 			ok(covered.size() == tree_lanes.size(),
 				"%s: covers %d of %d lanes" % [spec, covered.size(), tree_lanes.size()])
-			# Exactly one scarred per set, and it sits ON a lane — the splash
-			# is the clean, always-fine pick.
-			ok(scarred_on_lane == 1,
-				"%s: %d scarred lane runes, expected exactly 1" % [spec, scarred_on_lane])
-			ok(scarred_splash == 0, "%s: the splash rune is scarred" % spec)
+			ok(costed_on_lane == 1,
+				"%s: %d lane runes charge for their upside, expected exactly 1" % [
+					spec, costed_on_lane])
+			ok(costed_splash == 0, "%s: the splash rune charges a cost" % spec)
 	ok(specs_seen == 12, "expected 12 specs, walked %d" % specs_seen)
 
 
@@ -422,16 +473,18 @@ func _int_restore(data: Dictionary) -> void:
 # ---------- exhaustion ----------
 
 # An offer list can never come back empty: a hero holding every rune they can
-# roll still gets something (the pool widens, then falls to the Common family).
+# roll still gets something. **BATCH ES §1: the pool no longer WIDENS first —
+# there is no tier to widen out of — so the fall to the generated stat family is
+# the whole floor now and this check is the only thing standing on it.**
 func _exhaustion() -> void:
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			var member := {"key": key, "spec": spec, "runes": []}
 			var owned: Array = []
-			for id in Runes.eligible_ids(member, "", []):
+			for id in Runes.eligible_ids(member, []):
 				owned.append({"name": Runes.display_name(Runes.config(id))})
 			for t in Runes.TEMPLATES:
-				owned.append({"name": "Cracked Rune of %s" % t["noun"]})
+				owned.append({"name": "Rune of %s" % t["noun"]})
 			member["runes"] = owned
 			for _i in 5:
 				var offer := Runes.generate(member, 3)
@@ -499,7 +552,7 @@ func _arm_purity(run: Node) -> void:
 	ok(is_equal_approx(float(sim_rune["payload"]["stat"]["crit_bonus"]), 0.24),
 		"sim_run + env: the power arm did not scale an authored payload")
 	# Generated stat sticks are not authored content and stay put.
-	var stick: Dictionary = run._apply_rune_power(Runes.template_rune("warrior", "common", "Vitality"))
+	var stick: Dictionary = run._apply_rune_power(Runes.template_rune("warrior", "Vitality"))
 	ok(int(stick["payload"]["stat"]["max_hp"]) == 10,
 		"the power arm scaled a generated stat stick; only authored entries should move")
 
@@ -612,7 +665,7 @@ func _power_arm(data: Dictionary, unit_props: Dictionary, unit_src: String,
 	# one-branch rule, same int discipline. Stage 2 raises magnitudes for
 	# real, so the schema has to hold at the numbers the arm produced too.
 	_payloads(scaled_data, unit_props, unit_src, battle_src)
-	_scarred(scaled_data)
+	_costs(scaled_data)
 
 
 # ---------- Batch AE: fields with a NUMBER but no MAGNITUDE ----------
@@ -714,10 +767,16 @@ func _boolean_fields(data: Dictionary, battle_src: String) -> void:
 # Batch AE's deliverable was one pick of three at spec confirmation, rolled
 # through the ORDINARY roller at zone slot 1. The report-back the designer
 # asked for is how often that triple contains a spec-scoped rune, and the sim
-# measured 36-42% across ten rows. That number is a property of the POOL and
-# the slot-1 rarity weights, so it belongs in a test: if a future batch adds
-# spec entries or moves RARITY_WEIGHTS, this is the check that tells the
-# designer the hit rate moved with it.
+# measured 36-42% across ten rows. That number is a property of the POOL, so it
+# belongs in a test: if a future batch adds or retires spec entries, this is the
+# check that tells the designer the hit rate moved with it.
+#
+# **BATCH ES §1 MOVED THE OTHER HALF OF WHAT SETS IT, AND MOVED THE FIGURE.**
+# The rate used to be a property of the pool AND the slot-1 tier weights
+# (60/30/10, which put 60% of every zone-1 draw into a bucket holding one
+# authored rune and the six stat sticks). **The draw is FLAT now**, so a
+# spec-scoped rune's share of the triple is simply its share of the eligible
+# pool, and the band below is re-derived rather than carried.
 #
 # RE-POINTED IN PLACE BY BATCH CD, AND THE FIRST LINE IS AN INVERSION. BATCH
 # AN DELETED THE OPENING PICK — `start_rune_enabled`, `spec_opening_enabled`,
@@ -761,7 +820,7 @@ func _start_rune_pool(run: Node) -> void:
 	# Deliberately a WIDE band: this is a drift alarm on the pool, not a
 	# balance assertion. The measured sim figure sits near the middle of it.
 	ok(rate > 20.0 and rate < 70.0,
-		"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band Batch AE measured (36-42%%); the pool or RARITY_WEIGHTS moved" % rate)
+		"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
 	print("  (Batch AE report-back, re-pointed at the elite cache by CD: a spec-scoped rune is among the three %.0f%% of the time)" % rate)
 	run.sim_run = had_sim
 
@@ -817,7 +876,7 @@ func _rich_grant(run: Node) -> void:
 			var member := {"key": key, "spec": spec, "runes": []}
 			var names := {}
 			var own := 0
-			for rid in Runes.eligible_ids(member, "", []):
+			for rid in Runes.eligible_ids(member, []):
 				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec:
 					own += 1
 			ok(own > 0, "%s: the retirement left its own set empty" % spec)

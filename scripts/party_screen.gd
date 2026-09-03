@@ -379,6 +379,35 @@ func _draw_detail() -> void:
 		chip.tooltip_text = tip
 		ab_grid.add_child(chip)
 
+	# ── BATCH ES §4 — THE TAG CENSUS ON THE HERO SHEET ─────────────────────
+	#
+	# **THIS IS THE ONE SCREEN WHERE A PLAYER READS A WHOLE LOADOUT AT ONCE**,
+	# which is why `docs/state.md` has recommended it as the tags' surface since
+	# EK. The panel where the swap HAPPENS carries the same line
+	# (`map_screen._open_loadout_panel`), so the count is visible both where it
+	# is changed and where it is studied.
+	#
+	# **IT READS THE SAME DOOR EVERYTHING ELSE DOES** —
+	# `Run.loadout_ability_names` through `Classes.tag_census` — so the sheet's
+	# promise holds here as it does for every other number on this page: what it
+	# shows is what a clause would read. Drawn on every `_draw_detail`, so a
+	# bench on the map card is reflected the next time this page opens; there is
+	# no cached count to go stale.
+	var lo_names: Array = Run.loadout_ability_names(member)
+	var lo_census: Dictionary = Classes.tag_census(lo_names)
+	var lo_parts: Array = []
+	for tag in Classes.TAG_ORDER:
+		lo_parts.append("%s %d" % [String(tag), int(lo_census[String(tag)])])
+	var tag_header := Label.new()
+	tag_header.text = "CARRIED BY TAG  (%d cards)   %s   breadth %d of %d" % [
+		lo_names.size(), "  ".join(lo_parts), Classes.tag_breadth(lo_names),
+		Classes.TAG_ORDER.size()]
+	tag_header.add_theme_font_size_override("font_size", 12)
+	tag_header.add_theme_color_override("font_color", Color(0.72, 0.68, 0.85))
+	tag_header.position = Vector2(60, 498)
+	tag_header.size = Vector2(452, 18)
+	add_child(tag_header)
+
 	# Runes: THREE SLOTS FLAT from run start (Batch AN §9 — the 2/3/4 growth
 	# ladder is gone). READ-ONLY here: equipping happens on the map card, so
 	# there is one place that writes `equipped` and this page can be what it
@@ -433,7 +462,7 @@ func _draw_detail() -> void:
 		rune_label.add_theme_font_size_override("font_size", 12)
 		rune_label.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on
-			else rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
 		rune_label.custom_minimum_size = Vector2(354, 20)
 		rune_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(rune_label)

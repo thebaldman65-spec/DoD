@@ -475,9 +475,11 @@ func _rune_audit() -> void:
 	ok(int(straps["rune_masters_aim_ranks"]) == 12,
 		"the Loosened Straps still flies 12%% of Attack harder (2 ranks x 6 -> 12)")
 	ok(float(straps["armor"]) < 0.0,
-		"...and it is still SCARRED — the armor cost survives")
-	ok(bool(pool["loosened_straps"].get("scarred", false)),
-		"...and still flagged scarred")
+		"...and it still CHARGES — the armor cost survives")
+	# BATCH ES §3 — the `scarred` flag is retired; `Runes.is_cost` is what says a
+	# rune charges anything now, and it is the function the power arm reads.
+	ok(Runes.is_cost("armor", float(straps["armor"])),
+		"...and the cost is still RECOGNISED as one (the power arm must not scale it)")
 	var wild: Dictionary = pool["shared_wild"]["payload"]["stat"]
 	ok(abs(float(wild["rune_wild_communion_step"]) - 1.5) < 0.001,
 		"the Shared Wild still pays +1.5%% a stack")

@@ -649,7 +649,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			slot_btn.tooltip_text = "%s\n%s\n\nClick to manage %s's runes." % [
 				rune["name"], rune["desc"], key.capitalize()]
 			slot_btn.add_theme_color_override("font_color",
-				rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+				rune.get("scope_color", Color(0.8, 0.8, 0.8)))
 		slot_btn.pressed.connect(Music.click)
 		slot_btn.pressed.connect(_open_rune_panel.bind(idx))
 		add_child(slot_btn)
@@ -892,9 +892,9 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			var triple: Array = queue3[0] if not queue3.is_empty() else []
 			for i in triple.size():
 				var rune: Dictionary = triple[i]
-				_pick_button(box, "%s  [%s]" % [rune["name"], rune["rarity"]],
+				_pick_button(box, "%s  [%s]" % [rune["name"], rune["scope_label"]],
 					String(rune["desc"]),
-					rune.get("rarity_color", Color(0.8, 0.8, 0.8)),
+					rune.get("scope_color", Color(0.8, 0.8, 0.8)),
 					_pick_rune.bind(idx, i), overlay)
 
 	var close := Button.new()
@@ -1580,7 +1580,7 @@ func _open_rune_panel(idx: int) -> void:
 		lbl.text = "%s%s — %s" % ["✦ " if is_on else "", rune["name"], rune["desc"]]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
-			else rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
 		lbl.custom_minimum_size = Vector2(520, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(lbl)
@@ -1669,6 +1669,35 @@ func _open_loadout_panel(idx: int) -> void:
 	note.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(note)
+
+	# ── BATCH ES §4 — THE TAG CENSUS, ON THE SCREEN WHERE THE SWAP HAPPENS ──
+	#
+	# **A SILENT THRESHOLD IS A STAT NOBODY KNOWS THEY HAVE.** A rune reading
+	# "hold 2+ of a tag" is only a decision if the player can see the count, see
+	# it move, and see which card moved it — so the census sits on THIS panel and
+	# not only on the sheet, because this is the one screen where the number is
+	# under the player's hand. `_toggle_loadout` re-opens the panel after every
+	# bench and carry, so the line is redrawn from the live loadout each time and
+	# cannot go stale: there is no cached count here to invalidate.
+	#
+	# It reads `Run.loadout_ability_names` through `Classes.tag_census` — the
+	# same door a rune asks through (`Runes.loadout_tag_census`) — so the number
+	# on the screen and the number a clause reads can never be two numbers.
+	# **THE CORE IS IN IT**, because the core is carried; that is why the row
+	# already reads non-zero before anything is drafted, and it is the baseline
+	# a threshold has to be authored against.
+	var census: Dictionary = Classes.tag_census(Run.loadout_ability_names(member))
+	var held: Array = []
+	for tag in Classes.TAG_ORDER:
+		held.append("%s %d" % [String(tag), int(census[String(tag)])])
+	var tag_line := Label.new()
+	tag_line.text = "CARRIED BY TAG   %s        breadth %d of %d" % [
+		"   ".join(held), Classes.tag_breadth(Run.loadout_ability_names(member)),
+		Classes.TAG_ORDER.size()]
+	tag_line.add_theme_font_size_override("font_size", 12)
+	tag_line.add_theme_color_override("font_color", Color(0.72, 0.68, 0.85))
+	tag_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(tag_line)
 
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(650, 380)

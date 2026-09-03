@@ -762,7 +762,7 @@
   "term": "Runes",
   "category": "gear",
   "short": "This run's gear: three slots per hero, from the first step.",
-  "long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. A rune's scope limits who can wear it - universal, one class, or one spec - and its rarity tells you its KIND, not just its size: common runes are flat stats, rares alter an ability you own or act like an extra talent, epics grant whole abilities or break a rule. Runes vanish with the run.",
+  "long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. A rune's SCOPE is the thing to read - universal, one class, or one spec - and it is what the shop row names beside the price. There are no rarity tiers and no quality ladder: a rune found in the first zone is drawn from the same pool as one found in the last, and what a rune does is in its own text rather than in a grade. Some runes charge for their upside, and the cost is always written in the text. Runes vanish with the run.",
   "see_also": [
    "scarred_runes",
    "relics_vs_runes"
@@ -770,10 +770,10 @@
  },
  {
   "id": "scarred_runes",
-  "term": "Scarred Runes",
+  "term": "Runes That Charge",
   "category": "gear",
-  "short": "Crimson bargains: real power with a cost carved in.",
-  "long": "A Scarred rune (crimson name) is a rare or epic with a drawback baked into it - more power than its clean cousin would dare, priced cheaper, and the cost is always written in the text. Read them twice; some scars are worth wearing.",
+  "short": "Real power with a cost carved in - and the cost is in the text.",
+  "long": "Some runes buy a larger upside with a real drawback - less armor, less speed, weaker healing, more damage taken. They wear no special name and no special colour: a rune that gives and takes is simply what that rune does, and the cost is always written in its own text. Read them twice; some are worth wearing anyway.",
   "see_also": [
    "runes"
   ]

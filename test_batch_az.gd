@@ -475,8 +475,15 @@ func _rune_audit() -> void:
 		"the Long Draw still opens him on 60 Focus")
 	ok(int(draw["rune_muscle_memory_ranks"]) == 10,
 		"...and still gathers 10 more per attack (1 rank x 10 -> 10)")
-	ok(abs(float(draw["speed"]) + 10.0) < 0.001 and bool(pool["long_draw"].get("scarred", false)),
-		"...and it is still SCARRED — the -10 Speed survives")
+	# BATCH ES §3 — THE LABEL WENT AND THE COST STAYED, so the flag half of this
+	# assertion is replaced by the thing the flag was standing in for:
+	# `Runes.is_cost` is what recognises a cost now, and it is what the sim's
+	# power arm holds a negative term by. Reading it here is STRICTER than the
+	# boolean was — a rune keeping its term but losing recognition would have
+	# passed the old check and fails this one.
+	ok(abs(float(draw["speed"]) + 10.0) < 0.001
+			and Runes.is_cost("speed", float(draw["speed"])),
+		"...and it still CHARGES — the -10 Speed survives and reads as a cost")
 	var level: Dictionary = pool["level_aim"]["payload"]["stat"]
 	ok(abs(float(level["pierce_bonus"]) - 0.04) < 0.001
 		and int(level["rune_muscle_memory_ranks"]) == 10

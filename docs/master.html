@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-03 (Batch ER &mdash; Loyalty converts, it does not flatten)</b></p>
+<p align="right"><b>Last updated: 2026-09-03 (Batch ES &mdash; the rune layer's new shape)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -330,7 +330,9 @@ exhausts.</p>
 rarity" conversion needs a rune to be <i>surrendered</i>, and nothing in the project has ever
 removed a rune from a hero — <code>equipped</code> has exactly one writer and the pouch only
 grows. Building a removal path for one event would put a second, untested writer beside the
-one careful one.</p>
+one careful one. <b>Batch ES §1 removed the other half of it too: with no tiers, "of lower
+rarity" names nothing</b>, so the event would have to be re-specified before it could be
+built, on top of the surrender path it always needed.</p>
 
 <h3>3c. Attrition, the pouch and its slots</h3>
 <p><b>There is no resting.</b> Clearing any encounter heals every hero <b>15% of max HP</b>
@@ -1642,9 +1644,37 @@ starts costing meaning. <b>An eighth needs an argument.</b> MARK names the cards
 lasting marker on ONE enemy that later hits read: Hunter&#x27;s Mark, Quarry&#x27;s Mark, Mark of
 the Hunt, Reacquire, Blood Debt, Vendetta, Covenant of Ash and Arcane Echo lead with it, and
 Snare Line and Feint carry it second.</p>
-<p><b>The tags are shown and read nothing.</b> No ability, talent, rune or relic changes its
-behaviour because of a tag, and no clause counts them; they are a vocabulary for the player and
-for the design, and the only surface that renders them today is the draft card.</p>
+<p><b>NO CLAUSE READS A TAG YET, AND BATCH ES BUILT THE MACHINERY FOR THE ONES THAT WILL.</b>
+No ability, talent, rune or relic changes its behaviour because of a tag today. What ES §4 added
+is the <i>question a rune can ask</i>: <b>how many EQUIPPED cards of tag X does this hero
+have.</b> Nothing asks it yet &mdash; rune content is written one rune at a time with the
+designer &mdash; and the count is shown to the player on two screens.</p>
+<p><b>EQUIPPED, NEVER OWNED, AND THAT IS THE WHOLE DESIGN.</b> A hero&#x27;s <b>pool</b> is
+everything he has drafted and nothing ever leaves it, so a threshold read off the pool would turn
+on once, late, and never off again &mdash; a flat increment with a delay. His <b>loadout</b> is
+what he carries: 7 to 10 cards, capped, and freely benched and carried between fights. Counting
+the loadout is what makes it a <b>lever</b> &mdash; you can swap to switch a rune on or off.
+<b>The protected core is in the count</b>, because it is carried: it is half to two thirds of the
+bar, and a census that skipped it would answer a question about a hero&#x27;s cards with a number
+about only the swappable ones.</p>
+<p><b>THE DEFAULT SHAPE IS A THRESHOLD</b> &mdash; hold 2+ of a tag, get the effect &mdash; with
+other shapes available per rune. <b>A SPLASH PAYS FOR BREADTH INSTEAD (&sect;5):</b> where a
+normal rune pays for DEPTH in one tag, a splash pays for cards spanning several different tags.
+That is the inverse shape, and it gives the category an identity again now that the talent lanes
+it used to reach across are severed &mdash; <b>tags are the thing to reach across</b>, and a hero
+who is spread rather than deep is who it is for.</p>
+<p><b>THE COUNT IS VISIBLE, WHICH IS HALF OF WHY IT IS WORTH HAVING.</b> A silent threshold is a
+stat nobody knows they have. The census is drawn on the <b>loadout panel</b>, where the swap
+happens, and on the <b>hero sheet</b>, the one screen where a whole loadout is read at once; it is
+recomputed from the live loadout on every draw, so it moves the instant a card is benched.</p>
+<p><b>AND A THRESHOLD&#x27;S MAGNITUDE HAS TO BE CHOSEN AGAINST THE CORE KIT, WHICH IS MEASURED
+RATHER THAN LEFT TO BE DISCOVERED.</b> Before a single card is drafted, the protected cores alone
+already meet a 2+ threshold on <b>BREAK for ten of the twelve specs</b> and on <b>DEBUFF for
+seven</b>; <b>MARK is zero for all twelve</b> and <b>TEMPO reaches 1 on exactly one</b>. A rune
+asking for 2+ BREAK would be on from the first fight for almost everyone and no swap could turn
+it off &mdash; the flat increment this shape exists to avoid, arriving through the cores instead
+of through the pool. The per-spec table is printed by <code>check_es</code> on every battery run,
+so the day a core kit moves the baseline is re-measured rather than re-assumed.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
@@ -2499,21 +2529,36 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
-<b>Rarity means kind, not magnitude:</b> Common = flat stat adds (the six generated
-"Cracked" templates remain the filler family: +10 max HP / +2% armor / +4 Speed / +12
-Constitution / +2% crit / +8 max Mana; 50g), Rare ("Polished", 100g) alters an existing
-ability's numbers or grants a talent-like effect (a rune's counter is <b>its own</b> since
-Batch EM and stacks with the node's where a hero holds both), Epic ("Radiant", 160g) grants
-an ability, changes a damage type, or inverts a rule. <b>Scarred</b> runes — a flag on Rare/Epic with their own prefix and colour — buy a
-larger upside with a real cost, and are priced below their clean peers so the trade shows
-in the shop. Rarity odds deepen with the zone slot: 60/30/10 → 40/40/20 → 25/45/30
-(Common/Rare/Epic). <b>Eligibility:</b> every rune declares a scope — universal,
-class-wide, or spec-only, so the awakening shapes the loot table — and ability-modifying
-runes only roll for heroes who actually own the named ability (boss trophies included).
+<b>THERE ARE NO RARITY TIERS (Batch ES §1).</b> Common, Rare and Epic are gone, and with
+them the prefixes (Cracked / Polished / Radiant), the tier colours, the &times;1/&times;2/&times;3
+magnitude ladder and the 50/100/160 tier price. <b>A rune wears its authored name.</b> What
+each tier used to <i>mean</i> — flat stats, an ability's numbers altered, an ability granted
+or a rule inverted — was an authoring convention rather than a behaviour, and every rune goes
+on doing exactly what it did: the kind lived in the payload, never in the label.
+<br><b>OFFERS ARE FLAT ACROSS THE RUN.</b> The odds used to deepen with the zone slot —
+60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
+differ from an early one</i>. Measured on the live pool, that put <b>half of every zone-1
+offer</b> into the generated stat family and only a fifth of every zone-3 offer;
+<b>it is a flat ~30% at every slot now</b>. <b>The generated family survives as the filler
+and as the exhaustion floor</b>, at its authored magnitudes and one price: +10 max HP / +2%
+armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g.
+<br><b>Eligibility:</b> every rune declares a scope — universal, class-wide, or spec-only, so
+the awakening shapes the loot table — and ability-modifying runes only roll for heroes who
+actually own the named ability (boss trophies included). <b>SCOPE IS THE AXIS THAT SURVIVES,
+and it is what the shop row and the offer button show where the rarity word used to be.</b>
 <b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
-map card). Shop offers avoid duplicates per hero, and
-an exhausted pool falls back to the Common family — the offer list never comes back
-empty.
+map card). Shop offers avoid duplicates per hero, and an exhausted pool falls back to the
+generated family — the offer list never comes back empty.
+<br><b>SCOPE IS RULED TO BE SPEC AND CLASS ONLY (Batch ES §2), AND THE FIVE UNIVERSALS ARE
+RE-SCOPED RATHER THAN RETIRED — the class each lands on is unmade.</b> They are authored and
+working, and losing five runes to a scoping rule is waste. <b>They are 5 of every spec's
+9&ndash;12 offerable runes</b>, so the re-scope is the largest single movement the pool has
+ever taken: whichever class each lands on, the other three lose it.
+<br><b>PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND.</b> Every authored rune has always
+carried its own <code>price</code> and none moved — but those prices were written against a
+tier table that no longer exists, and they still run 50 / 75 / 100 / 120 / 160 across the 53
+offerable. <b>No pricing rule was invented; that is a design decision and it is the
+designer's.</b>
 <br><b>Heroes begin the run with no runes and three empty slots.</b> The first rune comes
 from the Peddler, an elite cache, or a severity-3-or-4 bargain. Every pick-of-three is
 resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
@@ -2524,8 +2569,21 @@ spent.
 classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set was
 <i>authored</i> to one rule:
 <b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
-pays for reaching outside one. Exactly one rune per set is Scarred, and it sits on a lane;
-splashes are always clean. <b>That rule no longer describes what the runes DO.</b>
+pays for reaching outside one. Exactly one rune per set <b>charges for its upside</b>, and it
+sits on a lane; splashes are always clean. <b>That rule no longer describes what the runes
+DO.</b>
+<br><b>AND "SCARRED" IS GONE AS A LABEL WHILE EVERY COST CLAUSE STAYS (Batch ES §3).</b>
+There is no flag, no crimson prefix and no crimson colour: <b>a rune that gives and takes is
+simply what that rune does</b>, and its negative terms are byte-unchanged. What recognises a
+cost now is <code>Runes.is_cost</code> — a field name and a sign — which is the same function
+that holds a cost at its authored value under the sim's power probe, so no clause quietly
+became pure upside. <b>The flag and the behaviour had never agreed, and removing the flag is
+what showed it:</b> both were 17 and they were different 17s. The Rune of Exsanguination was
+flagged and has <i>no payload term to find</i> — its promise (veins open at 85) and its price
+(the bleedout tears 15% instead of 20%) are two behaviours of one field at one read site. And
+the Anchor Rune carries a real &minus;10 Speed and was never flagged, because the old schema
+forbade a "scarred common" and it is the one common in the file — <b>a rarity rule was hiding
+a cost.</b>
 <br><b>THE CHARTER, TAKEN AT BATCH EM: a rune is disconnected from the talent trees.</b> It
 modifies stats and resources, and the mechanics and values of core abilities, draft
 abilities and passives — never a talent node's own counter. EJ measured the gap at <b>59 of
@@ -2554,7 +2612,7 @@ emptied <b>sixteen</b> runes whose every clause was talent-keyed &mdash; after t
 mechanically whole and has lost the argument for existing, because each was <i>your lane, but
 more</i>. <b>Three are held back for re-authoring</b> (the Beastmaster's Deep Bond, Shared Wild
 and Turning Pack: retiring them would leave no rune in the game touching a companion, and the
-companion IS the spec), <b>one is flagged and untouched</b> (the Scarred Rune of the Bared Guard,
+companion IS the spec), <b>one is flagged and untouched</b> (the Rune of the Bared Guard,
 whose two clauses ARE the trade, so retiring it would remove the cost with the upside), and
 <b>the other twelve are retired.</b>
 <br><b>RETIRED MEANS KEPT, AND SAID TO BE KEPT</b> &mdash; the contract
@@ -2566,8 +2624,9 @@ keeps working and a later batch can point something at it again. <b>It is simply
 offered</b>: both offer paths reach the authored pool through <code>Runes.eligible_ids</code> and
 nothing else. <b>The retirement cannot blank an offer</b> &mdash; measured floors across all
 twelve specs are <b>9 drawable, 2 spec-scoped and 5 on the rare shelf, against 3 rune
-slots</b>, and an exhausted rarity widens to every rarity and then to the generated Common
-family.</li>
+slots</b>, and an exhausted pool falls back to the generated stat family. (Before Batch ES it
+widened to every tier first; there is no tier to widen out of, so that fall is the whole floor
+now.)</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE
@@ -2878,7 +2937,7 @@ at 20%), <b>Statuses</b> (every debuff the battle code can apply, plus Quick Dra
 Focus, Loyalty, Ruin), <b>Progression</b> (the seven exclusive rows and the capstone row,
 the flat 1-point price, talent point income, boss trophies, <b>ability upgrades</b>, node
 scaling),
-<b>Items &amp; gear</b> (runes, scarred runes, consumables, and <b>relics versus runes</b>
+<b>Items &amp; gear</b> (runes, consumables, and <b>relics versus runes</b>
 as its own entry — permanent-across-runs versus run-scoped is the single most confusable
 distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, <b>the
 bargain, modifiers and severity</b>, events, what a wipe costs, the difficulty choice). The
@@ -3195,6 +3254,8 @@ run against 6.00).</li>
 <li><b>A rune has never been removed from a hero.</b> The equipped flag has one writer and
 the pouch only grows, which is why Batch BK's event vocabulary can grant a rune but not take
 one &mdash; and why the "trade a held rune for two of lower rarity" conversion is unwritten.
-Whenever a design wants that, the removal path is the piece to build carefully and once.</li>
+Whenever a design wants that, the removal path is the piece to build carefully and once.
+<b>Since Batch ES that conversion needs re-specifying as well as building: there are no
+tiers, so there is no "lower rarity" to trade down to.</b></li>
 </ul>
 </body></html>
