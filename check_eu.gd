@@ -308,7 +308,11 @@ func _s2_raw_stack_readers(scene: Node, bm: BattleUnit) -> void:
 	var stripped := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	var ghost: String = stripped.split("func _ghost_hit(")[1].split("\nfunc ")[0]
-	ok(ghost.contains("var paid: int = _bond_paid(hunter, l)"),
+	# BATCH EV §1 gave `_bond_paid` the KIND, because saturation is a property
+	# of which boon the stack would feed. The assertion is unchanged in what it
+	# asks — the strike step reads the paid half and Aguila's pierce beside it
+	# does not — and the literal moved with the signature.
+	ok(ghost.contains("var paid: int = _bond_paid(hunter, kind, l)"),
 		"§2: `_ghost_hit`'s strike step reads the PAID half")
 	ok(ghost.contains("(0.20 * l) if kind == \"aguila\""),
 		"§2: ...and Aguila's pierce beside it still reads the WHOLE meter")

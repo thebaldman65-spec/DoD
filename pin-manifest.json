@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1357,
-  "source": 1046,
+  "total": 1360,
+  "source": 1049,
   "other": 77,
   "document": 234
  },
  "source_residency": {
-  "code": 625,
+  "code": 628,
   "absent": 286,
   "runtime": 74,
   "narrow": 20,
@@ -4837,7 +4837,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#471"
+   "g": "test_batch_ay.gd#475"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4848,7 +4848,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#414"
+   "g": "test_batch_ay.gd#418"
+  },
+  {
+   "s": "test_batch_ay.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
+   "n": "_bond_converted(hunter, kind, l)) * reach",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_ay.gd#271"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4859,7 +4870,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#271"
+   "g": "test_batch_ay.gd#275"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4870,7 +4881,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#271"
+   "g": "test_batch_ay.gd#275"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4881,7 +4892,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#275"
+   "g": "test_batch_ay.gd#279"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4892,7 +4903,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#274",
+   "g": "test_batch_ay.gd#278",
    "alt": true
   },
   {
@@ -4904,7 +4915,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#274",
+   "g": "test_batch_ay.gd#278",
    "alt": true
   },
   {
@@ -4916,7 +4927,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#268"
+   "g": "test_batch_ay.gd#272"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4927,7 +4938,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#273"
+   "g": "test_batch_ay.gd#277"
+  },
+  {
+   "s": "test_batch_ay.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
+   "n": "const SAVAGE_MITIGATION_STEP := 0.10",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_ay.gd#274"
+  },
+  {
+   "s": "test_batch_ay.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
+   "n": "func _bond_curve(hunter: BattleUnit, n: int) -> float:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_ay.gd#270"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4938,7 +4971,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#269"
+   "g": "test_batch_ay.gd#273"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4955,12 +4988,12 @@
    "s": "test_batch_ay.gd",
    "fn": "_negative_control_source",
    "h": "scripts/battle.gd",
-   "n": "minf(0.10 * sp_ursus, BOND_MITIGATION_MAX)",
+   "n": "minf(SAVAGE_MITIGATION_STEP * sp_ursus,",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#270"
+   "g": "test_batch_ay.gd#274"
   },
   {
    "s": "test_batch_ay.gd",
@@ -4971,29 +5004,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#272"
+   "g": "test_batch_ay.gd#276"
   },
   {
    "s": "test_batch_ay.gd",
    "fn": "_negative_control_source",
    "h": "scripts/battle.gd",
-   "n": "return curve * 0.01 * hunter.menagerie",
+   "n": "return 0.01 * hunter.menagerie",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#267"
+   "g": "test_batch_ay.gd#271"
   },
   {
    "s": "test_batch_ay.gd",
    "fn": "_negative_control_source",
    "h": "scripts/battle.gd",
-   "n": "var curve := 1.0 + _bond_step(hunter) *",
+   "n": "return 1.0 + _bond_step(hunter) * n",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ay.gd#266"
+   "g": "test_batch_ay.gd#270"
   },
   {
    "s": "test_batch_ay.gd",

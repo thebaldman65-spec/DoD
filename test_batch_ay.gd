@@ -569,10 +569,29 @@ func _negative_control_source() -> void:
 	# (1) A boon that still STEPS at 5 rather than curving.
 	ok(not bsrc.contains("if int(hunter.loyalty.get(kind, 0)) >= 5:"),
 		"NEGATIVE CONTROL: no path steps the boon at 5 — it is a curve")
-	ok(bsrc.contains("var curve := 1.0 + _bond_step(hunter) *"),
-		"NEGATIVE CONTROL: the boon IS the curve, in one place")
+	# RE-POINTED IN PLACE (Batch EV §1) AND THE QUESTION IS UNCHANGED. EV needed
+	# the curve at a count it SUPPLIES rather than derives — `_bond_fallback`
+	# cannot ask `_bond_mult` for it without asking itself — so the arithmetic
+	# moved into `_bond_curve` and the three readers share it. "IN ONE PLACE"
+	# is now assertable more strongly than a grep for the expression: the
+	# function is named, and exactly one line in the file computes it.
+	var curve_lines := 0
+	for cl in bsrc.split("\n"):
+		if cl.contains("1.0 + _bond_step(") and not cl.begins_with("#"):
+			curve_lines += 1
+	ok(bsrc.contains("func _bond_curve(hunter: BattleUnit, n: int) -> float:")
+		and bsrc.contains("return 1.0 + _bond_step(hunter) * n")
+		and curve_lines == 1,
+		"NEGATIVE CONTROL: the boon IS the curve, in one place (%d lines compute it)" % curve_lines)
 	# (2) Menagerie paying FULL instead of half.
-	ok(bsrc.contains("return curve * 0.01 * hunter.menagerie"),
+	# RE-POINTED IN PLACE (Batch EV §1), SAME QUESTION. The share is a REACH
+	# factor now — `_bond_reach` answers "how much of this boon does the hunter
+	# actually receive" and `_bond_mult` multiplies the curve by it — because
+	# the fallback has to know a Menagerie half-boon is half as close to its
+	# clamp as a live one. Both halves are pinned, so a reach that started
+	# returning 1.0 for a remembered kind still reds here.
+	ok(bsrc.contains("return 0.01 * hunter.menagerie")
+		and bsrc.contains("_bond_converted(hunter, kind, l)) * reach"),
 		"NEGATIVE CONTROL: Menagerie pays its SHARE of the curve, never the whole")
 	# (3) The ceiling must be a sentinel, not a big number a batch can reach.
 	ok(bsrc.contains("const LOYALTY_UNCAPPED := -1"),
@@ -580,7 +599,13 @@ func _negative_control_source() -> void:
 	ok(bsrc.contains("if hunter.wild_rotation > 0:\n\t\treturn hunter.wild_rotation"),
 		"NEGATIVE CONTROL: exactly one node still hands _loyalty_cap a number")
 	# (4) The mitigation clamp — without it an uncapped boon HEALS him.
-	ok(bsrc.contains("minf(0.10 * sp_ursus, BOND_MITIGATION_MAX)"),
+	# RE-POINTED IN PLACE (Batch EV §1), SAME QUESTION AND A STRONGER FACT. The
+	# 0.10 is a NAMED CONSTANT now, because EV derives the bear's saturation
+	# point from it — the clamp and the step the fallback reads have to be the
+	# clamp and the step the game spends, or the fallback hands back stacks a
+	# read site was still paying with.
+	ok(bsrc.contains("minf(SAVAGE_MITIGATION_STEP * sp_ursus,")
+		and bsrc.contains("const SAVAGE_MITIGATION_STEP := 0.10"),
 		"NEGATIVE CONTROL: Savage Presence cannot cross zero into healing")
 	# (5) §9: a release that DID consume stacks must still pay full growth.
 	# RE-POINTED IN PLACE (Batch BH §2), and the question is now asked of a

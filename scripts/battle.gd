@@ -7246,7 +7246,8 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 			if not sp_c.dead and sp_c.companion_kind == "ursus" \
 					and sp_c.pack_master != null and not sp_c.pack_master.dead \
 					and target != sp_c:
-				var sp_pull := minf(0.15 * _bond_mult(sp_c.pack_master, "ursus"), 1.0)
+				var sp_pull := minf(SAVAGE_TAUNT_STEP \
+					* _bond_mult(sp_c.pack_master, "ursus"), 1.0)
 				if randf() < sp_pull:
 					target = sp_c
 					logs.append(["   → Savage Presence: %s draws %s's attack" % [
@@ -9438,7 +9439,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var sp_ursus := _bond_mult(strike_target, "ursus")
 				if sp_ursus > 0.0:
 					var pv_was := raw
-					raw *= 1.0 - minf(0.10 * sp_ursus, BOND_MITIGATION_MAX)
+					raw *= 1.0 - minf(SAVAGE_MITIGATION_STEP * sp_ursus,
+						BOND_MITIGATION_MAX)
 					_prev(strike_target, pv_was - raw)
 			# BATCH BP — EYE OF THE STORM. He took the whole field onto himself,
 			# and the more of it he took the better he weathers it: 8% off per
@@ -13370,6 +13372,22 @@ const STALKING_HORSE_STATUSES := ["poison", "cripple", "slow", "exposed",
 # bounded here rather than the curve being bounded, because the curve is the
 # identity and a negative damage multiplier is an absurdity.
 const BOND_MITIGATION_MAX := 0.75
+# BATCH EV §1 — SAVAGE PRESENCE'S TWO COEFFICIENTS, NAMED, AND THE NAMES ARE
+# LOAD-BEARING RATHER THAN TIDINESS. `_bond_saturation` DERIVES the point at
+# which the bear's boon stops buying anything from exactly these three numbers
+# (`BOND_MITIGATION_MAX / SAVAGE_MITIGATION_STEP` against
+# `1.0 / SAVAGE_TAUNT_STEP`), so a designer who moves a clamp moves the
+# fallback with it. Left inline at the two read sites, the saturation point
+# would have been a fourth copy of a magnitude nobody compares — which is the
+# drift `_bot_boon_worth` already cost this project once (EU §2).
+#
+# THE TAUNT'S OWN CEILING IS NOT A CONSTANT AND DELIBERATELY IS NOT ONE: it is
+# `minf(..., 1.0)` on a PROBABILITY, so the 1.0 is arithmetic rather than a
+# choice a designer could revisit. `BOND_MITIGATION_MAX`'s 0.75 is the
+# opposite — the guard forces SOME value below 1.0 and nothing forces 0.75.
+# `docs/reports/EV.md` §2 prices that distinction; this batch moves neither.
+const SAVAGE_MITIGATION_STEP := 0.10
+const SAVAGE_TAUNT_STEP := 0.15
 
 
 # BATCH EU §1 — THE ONE PLACE THE SPLIT IS DECIDED, and it is `focus_convert()`
@@ -13388,23 +13406,166 @@ func _bond_convert(_hunter: BattleUnit) -> int:
 	return BOND_CONVERT
 
 
+# BATCH EV §1 — THE BOON'S OWN CURVE, AT A COUNT GIVEN RATHER THAN DERIVED.
+# `_bond_mult`, `_bot_boon_worth` and `_bond_fallback` all need `1 + step x n`
+# and the third of them CANNOT get it by asking `_bond_mult`, because
+# `_bond_mult` asks `_bond_converted` which asks the fallback. Taking `n` as an
+# argument is what breaks that cycle, and it collapses what would otherwise
+# have been a THIRD copy of this arithmetic into the one EU already warned
+# about: "nothing compares the two functions".
+func _bond_curve(hunter: BattleUnit, n: int) -> float:
+	return 1.0 + _bond_step(hunter) * n
+
+
+# BATCH EV §1 — HOW MUCH OF THE BOON THIS HUNTER ACTUALLY RECEIVES FOR A KIND,
+# lifted out of `_bond_mult` unchanged: 1.0 for a beast that stands (or whose
+# Vengeance carries it), Menagerie's share for one it only remembers, and 0.0
+# for a kind it has no claim on at all. **THE FALLBACK NEEDS THIS AND NOT JUST
+# THE CURVE**: a Menagerie half-boon is half as close to its clamp as a live
+# one, so a saturation test on the curve alone would hand back stacks a
+# remembered bond was still spending.
+func _bond_reach(hunter: BattleUnit, kind: String) -> float:
+	if hunter == null or hunter.dead or hunter.passive_id != "pack":
+		return 0.0
+	# The Pack: each active beast grants its own boon — this check simply
+	# matches any of them.
+	if _beasts(hunter).any(func(b): return b.companion_kind == kind):
+		return 1.0
+	if hunter.vengeance_kind == kind and hunter.has_status("vengeance"):
+		return 1.0
+	if hunter.menagerie > 0 and hunter.kinds_summoned.has(kind):
+		return 0.01 * hunter.menagerie
+	return 0.0
+
+
+# BATCH EV §1 — WHERE A KIND'S BOON STOPS BUYING ANYTHING, DERIVED FROM THE
+# CLAMPS THEMSELVES. A boon at or above this value pays every consumer of that
+# kind exactly what the next stack down would have paid, because every one of
+# them is already at its ceiling.
+#
+# ONLY URSUS HAS ONE AND THAT IS A MEASUREMENT, NOT AN OVERSIGHT. The bear's
+# boon is spent in exactly two places and BOTH are clamped — Savage Presence's
+# taunt pull (`minf(step x boon, 1.0)`) and its mitigation
+# (`minf(step x boon, BOND_MITIGATION_MAX)`). Canis's wounded-prey bonus and
+# Aguila's party crit are spent UNCLAMPED, so no stack of theirs can ever pay
+# nothing and `INF` is the honest answer rather than a placeholder. EU §3
+# measured the consequence: at rows=9 the bear's two terms gained +0.00% from
+# the conversion while the wolf's gained +62.6% and the eagle's +49.0%.
+#
+# THE LATER-BINDING CLAMP GOVERNS, and it is the mitigation. The taunt
+# saturates at a boon of 1/0.15 = 6.67 and the mitigation at 0.75/0.10 = 7.50,
+# so between the two there is a band where a converted stack is worthless to
+# the pull and still worth something to the cover. **A stack is only handed
+# back when it is worthless to BOTH**, which is why this is a `maxf` and not a
+# `minf` — the cheaper reading would have paid the strike step with a stack the
+# mitigation was still spending.
+func _bond_saturation(kind: String) -> float:
+	if kind == "ursus":
+		return maxf(1.0 / SAVAGE_TAUNT_STEP,
+			BOND_MITIGATION_MAX / SAVAGE_MITIGATION_STEP)
+	return INF
+
+
+# ── BATCH EV §1 — THE FALLBACK: A CONVERTED STACK NEVER PAYS NOTHING ────────
+#
+# **A stack above the split point pays the boon. If the boon it would feed is
+# already at its clamp, that stack pays the STRIKE STEP instead** — exactly
+# what it would have paid below the split. This returns HOW MANY of the
+# converted stacks fall back, and it is the only place that decision is made.
+#
+# WHY IT LIVES HERE AND NOT AT THE FIVE READ SITES. `_bond_convert` is the one
+# place the split is decided so that a later rune moving the point moves ONE
+# line (EU §1, `focus_convert()`'s discipline). A fallback scattered through
+# the payout sites would undo exactly that, and worse: `_bond_paid` and
+# `_bond_converted` would each be deciding separately, and the failure that
+# invites is a stack paying the boon AND the strike step. **BOTH HALVES CALL
+# THIS ONE FUNCTION**, so they stay disjoint and still sum to the whole meter
+# by construction rather than by care — which is the property that makes this a
+# conversion rather than a windfall.
+#
+# IT IS PER STACK AND NOT PER HERO, AND EU PROVED WHY. The clamp saturates
+# partway up a meter, so within a single battle the early stacks past the point
+# convert and the later ones fall back. EU §4's histogram of live mitigation
+# samples at rows=9 is `{6: 13, 10: 3, 14: 1}` and the window in which a
+# converted stack is worth anything at all is ONE STACK WIDE (Loyalty 9, where
+# 0.73 clamps to 0.75). A hero-level test would be right occasionally and wrong
+# most of the time, which is the worst kind of wrong.
+#
+# AND IT IS SCOPED TO A SATURATED CLAMP, NOT TO "PAYS NOTHING". A kind the
+# hunter cannot reach at all (`_bond_reach` 0.0 — no beast, no Vengeance, no
+# Menagerie) also pays nothing, and Call of the Wild's bodiless blow can read
+# the meter in exactly that state. **THOSE STACKS DO NOT FALL BACK.** That is
+# a different question from a clamp — it is a boon that is absent rather than
+# full — and `docs/reports/EV.md` §2 reports it for the designer rather than
+# ruling on it here.
+func _bond_fallback(hunter: BattleUnit, kind: String, l: int) -> int:
+	var converted: int = maxi(l - _bond_convert(hunter), 0)
+	if converted <= 0:
+		return 0
+	var sat := _bond_saturation(kind)
+	if is_inf(sat):
+		return 0
+	var reach := _bond_reach(hunter, kind)
+	if reach <= 0.0:
+		return 0
+	var step := _bond_step(hunter)
+	if step <= 0.0:
+		return 0
+	var total: int = l + converted
+	# The smallest total count at which the DELIVERED boon is still saturated.
+	# The closed form can land a stack either side of the boundary in floating
+	# point, so it is a starting guess that is then CONFIRMED against the curve
+	# — both walks are bounded by `total`, and a one-stack error here is the
+	# whole defect this function exists to avoid.
+	# THE NAME IS NOT A STYLE CHOICE. `test_batch_bg` §2 pins the local that
+	# Batch BH deleted out of the Conviction release branch ABSENT from this
+	# file, and the obvious name for the count below is that same word. Its own
+	# pin is slice-scoped to `_gain_faith` so it would not have gone red, but
+	# `check_ed`'s file-level scan of the same needle does, and it is right to.
+	# A local variable is free to move; a suite's record of a deletion is not.
+	#
+	# AND THE FIRST DRAFT OF THIS COMMENT TRIPPED IT AGAIN by NAMING the word
+	# while explaining the rename — prose recording a removal reads exactly
+	# like the removal not happening, which is why the word is not written
+	# anywhere above.
+	var sat_floor := clampi(int(ceil((sat / reach - 1.0) / step)), 0, total)
+	while sat_floor > 0 and reach * _bond_curve(hunter, sat_floor - 1) >= sat:
+		sat_floor -= 1
+	while sat_floor < total and reach * _bond_curve(hunter, sat_floor) < sat:
+		sat_floor += 1
+	if reach * _bond_curve(hunter, sat_floor) < sat:
+		return 0
+	return clampi(total - sat_floor, 0, converted)
+
+
 # The two halves of the meter, named, and every payout site reads one of them.
 # `_bond_paid` is `focus_crit_chance`'s `mini`; `_bond_converted` is
 # `focus_crit_mult`'s `maxi(..., 0)`. THEY ARE DISJOINT AND THEY SUM TO THE
 # WHOLE METER: a stack is paid once, into one half or the other, which is what
 # makes this a conversion rather than a flattening.
 #
+# BATCH EV §1 — AND THE FALLBACK MOVES A STACK BETWEEN THEM WITHOUT BREAKING
+# THAT. The SAME count is added to one half and subtracted from the other, from
+# the SAME call, so `_bond_paid + _bond_converted == l` still holds identically
+# — a stack that falls back stops feeding the boon in the same breath as it
+# starts feeding the strike. `check_ev` §0 asserts the sum over the whole
+# reachable meter rather than trusting the arithmetic here.
+#
+# THE KIND IS A PARAMETER NOW AND IT HAS TO BE: saturation is a property of
+# WHICH BOON the stack would feed, and the bear's is clamped where the wolf's
+# and the eagle's are not. All six call sites already had a kind in hand.
+#
 # A RAW-STACK READER CALLS NEITHER, AND THAT IS HOW THE TWO CLASSES ARE TOLD
 # APART. Unleash, Primal Surge, Last Howl, Bring It Down, Kindred's gate,
 # Aguila's armor pierce, Canis's Bleed, Ursus's health gift, Succession,
 # Devoted Fury and every threshold read the meter itself and are untouched by
-# this batch (ER §1d's table, side by side).
-func _bond_paid(hunter: BattleUnit, l: int) -> int:
-	return mini(l, _bond_convert(hunter))
+# this batch and by EV (ER §1d's table, side by side).
+func _bond_paid(hunter: BattleUnit, kind: String, l: int) -> int:
+	return mini(l, _bond_convert(hunter)) + _bond_fallback(hunter, kind, l)
 
 
-func _bond_converted(hunter: BattleUnit, l: int) -> int:
-	return maxi(l - _bond_convert(hunter), 0)
+func _bond_converted(hunter: BattleUnit, kind: String, l: int) -> int:
+	return maxi(l - _bond_convert(hunter), 0) - _bond_fallback(hunter, kind, l)
 
 
 # The boon's step per Loyalty stack for this hunter, all talents applied.
@@ -13437,19 +13598,11 @@ func _bond_step(hunter: BattleUnit) -> float:
 # this half at nominal would have done, and it is the branch ER §1f named as
 # "the clamps do more work rather than less".
 func _bond_mult(hunter: BattleUnit, kind: String) -> float:
-	if hunter == null or hunter.dead or hunter.passive_id != "pack":
+	var reach := _bond_reach(hunter, kind)
+	if reach <= 0.0:
 		return 0.0
 	var l: int = int(hunter.loyalty.get(kind, 0))
-	var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))
-	# The Pack: each active beast grants its own boon — this check simply
-	# matches any of them.
-	if _beasts(hunter).any(func(b): return b.companion_kind == kind):
-		return curve
-	if hunter.vengeance_kind == kind and hunter.has_status("vengeance"):
-		return curve
-	if hunter.menagerie > 0 and hunter.kinds_summoned.has(kind):
-		return curve * 0.01 * hunter.menagerie
-	return 0.0
+	return _bond_curve(hunter, l + _bond_converted(hunter, kind, l)) * reach
 
 
 # The hunter's Loyalty ceiling. IT RETURNS "NO CAP" BY DEFAULT and a number
@@ -13526,7 +13679,7 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 	# still multiplying by `stacks` here would have printed a strike bonus the
 	# companion does not have, which is a worse fault than the silent phase: a
 	# number on the chip that the blow disagrees with.
-	var paid: int = _bond_paid(hunter, stacks)
+	var paid: int = _bond_paid(hunter, comp.companion_kind, stacks)
 	var l_desc := "Loyalty %s: +%d%% strike damage\nand %s." % [
 		str(stacks) if cap == LOYALTY_UNCAPPED else "%d/%d" % [stacks, cap],
 		int(round(strike_step * paid)), gift]
@@ -13548,10 +13701,31 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 	# count, against a chip whose existing widest line is 37 (the Pack Bond
 	# boon line at a three-digit multiplier). SIX CHARACTERS WIDER THAN WHAT
 	# THE CHIP ALREADY CARRIES, and the count is the only part that grows.
-	var converted: int = _bond_converted(hunter, stacks)
+	var converted: int = _bond_converted(hunter, comp.companion_kind, stacks)
 	l_desc += "\nCONVERTS at %d: stacks past it feed the\nboon instead of the strike%s." % [
 		_bond_convert(hunter),
 		"" if converted <= 0 else " (%d converted)" % converted]
+	# BATCH EV §1 — AND THE FALLBACK IS NAMED FOR THE SAME REASON THE SPLIT IS.
+	# `CLAUDE.md`: "a silent second phase is a stat nobody knows they have" —
+	# a silent THIRD phase is worse, because the two numbers above it move
+	# without explanation. At a saturated bear the converted count FALLS as the
+	# meter climbs and the strike figure RISES, and a player reading only the
+	# line above would conclude the chip was broken. This says why.
+	#
+	# MEASURED RATHER THAN EYEBALLED, at its widest substitution: 37 characters
+	# at a three-digit count ("Boon at its limit: 100 stacks pay the"), against
+	# the chip's existing widest of 43 — EU's own converted-count line. IT ADDS
+	# NO WIDTH TO THE CHIP AT ALL, which the count growing cannot change: three
+	# digits is already the measurement.
+	#
+	# IT PRINTS ONLY WHEN IT FIRES, unlike the CONVERTS line above it. That
+	# line names a rule the player lives under at every depth; this one reports
+	# a state the boon is IN, and a chip that announced "no stacks fell back"
+	# at every depth would be noise rather than legibility.
+	var fell: int = _bond_fallback(hunter, comp.companion_kind, stacks)
+	if fell > 0:
+		l_desc += "\nBoon at its limit: %d stack%s pay%s the\nstrike step instead." % [
+			fell, "" if fell == 1 else "s", "s" if fell == 1 else ""]
 	var info: Array = STATUS_INFO["loyalty"]
 	if not comp.update_status("loyalty", "L%d" % stacks, l_desc, stacks):
 		comp.add_status("loyalty", info[0], "L%d" % stacks, info[2], -1, l_desc, stacks)
@@ -20483,7 +20657,7 @@ const SWAP_COOLDOWN := 3
 # have drifted silently because nothing compares the two functions.
 func _bot_boon_worth(hunter: BattleUnit, kind: String) -> float:
 	var l: int = int(hunter.loyalty.get(kind, 0))
-	var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))
+	var curve := _bond_curve(hunter, l + _bond_converted(hunter, kind, l))
 	match kind:
 		"canis":
 			# +15% damage per enemy under 35% health — worth what the field is.
@@ -20842,7 +21016,7 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	# the bodiless blow is the same blow); AGUILA'S ARMOR PIERCE IS A RAW-STACK
 	# READER and keeps the whole meter (ER §1d). One `l` serving both would
 	# have silently converted the pierce, which nothing ruled.
-	var paid: int = _bond_paid(hunter, l)
+	var paid: int = _bond_paid(hunter, kind, l)
 	var raw := dmg * (1.0 + (0.05 + 0.01 * (hunter.wild_communion_step
 		+ hunter.rune_wild_communion_step)) * paid) \
 		* randf_range(0.9, 1.1)
@@ -21981,7 +22155,8 @@ func _comp_dmg_mult(comp: BattleUnit) -> float:
 	var mult := _bestial_dmg_mult(comp)
 	var pm: BattleUnit = comp.pack_master
 	if pm != null:
-		var l: int = _bond_paid(pm, int(pm.loyalty.get(comp.companion_kind, 0)))
+		var l: int = _bond_paid(pm, comp.companion_kind,
+			int(pm.loyalty.get(comp.companion_kind, 0)))
 		var step := 0.05 + 0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)
 		mult *= 1.0 + step * l
 		if pm.momentum_ranks + pm.rune_momentum_ranks > 0 and pm.kinds_summoned.size() > 0:

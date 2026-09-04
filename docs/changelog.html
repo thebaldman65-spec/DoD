@@ -14,6 +14,95 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-04 &mdash; Batch EV: A CONVERTED STACK NEVER PAYS NOTHING</h2>
+<p><i><b>When a converted Loyalty stack would pay into a boon that is already at its clamp, it pays
+the strike step instead.</b> EU measured the defect and did not fix it: <b>at rows=9 a Beastmaster
+fielding Ursus lost 40.2% of his companion&#x27;s strike step and gained exactly zero</b>, because
+both consumers of the bear&#x27;s boon were already saturated. That arm now reads <b>0.00% lost</b>,
+and <b>the boon pays exactly what it paid before</b>. Full working:
+<code>docs/reports/EV.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE FALLBACK, AND IT LIVES BESIDE THE SPLIT.</b>
+<code>_bond_fallback()</code> sits with <code>_bond_convert()</code> and returns how many converted
+stacks fall back. <b>Both halves read it from ONE call</b> &mdash; <code>_bond_paid</code> adds the
+count and <code>_bond_converted</code> subtracts it &mdash; so the two stay disjoint and still sum
+to the whole meter <b>by construction rather than by care</b>. That is the failure the brief named:
+a stack paying the boon <i>and</i> the strike step because the saturation test and the payment
+happen in different places. <b>IT IS PER STACK, NOT PER HERO</b>, because the clamp saturates
+partway up a meter: at the untalented boon step Loyalty 21 hands back one stack of thirteen and
+converts the other twelve. <b>And it declines on the one-stack window EU found</b> &mdash; at the
+deep step the mitigation clamps at a count of ten, so Loyalty 9 is the only depth where a converted
+stack still buys something (0.73 against a clamp of 0.75) and it is not handed back.</p>
+
+<p><b>&sect;1a &mdash; THE SATURATION POINT IS DERIVED FROM THE CLAMPS, NEVER WRITTEN DOWN.</b>
+Savage Presence&#x27;s two coefficients are named constants now
+(<code>SAVAGE_MITIGATION_STEP</code> 0.10, <code>SAVAGE_TAUNT_STEP</code> 0.15) and both read sites
+spend them, so <code>_bond_saturation()</code> derives the point from
+<code>BOND_MITIGATION_MAX / SAVAGE_MITIGATION_STEP</code> against
+<code>1.0 / SAVAGE_TAUNT_STEP</code> and <b>a designer who moves a clamp moves the fallback with
+it</b>. <b>THE LATER-BINDING CLAMP GOVERNS</b>: the taunt saturates at a boon of 6.67 and the
+mitigation at 7.50, so between them there is a band where a stack is worthless to the draw and
+still worth something to the cover. A stack comes back only when it is worthless to <b>both</b>.</p>
+
+<p><b>&sect;2 &mdash; MEASURED, AND THE BRIEF&#x27;S OWN FIGURE WAS THE POOLED ONE.</b> The rows=9
+arm reproduces (4,093 companion blows against EU&#x27;s 4,074, pooled loss 36.37% against
+EU&#x27;s 36.70%). <b>The bear&#x27;s own slice is worse than the number EU quoted: 40.17%, not
+36.7%</b> &mdash; 36.7% was pooled across all three beasts. <b>It now reads 0.00%.</b> Over the
+228 ursus blows the boon itself was LOWER on 183 of them and <b>the mitigation and the taunt
+differed on none</b>. The wolf and the eagle are untouched at 35.77% and 50.52% on both sides,
+which is correct: nothing clamps their boons, so no stack of theirs ever pays nothing.</p>
+
+<p><b>&sect;3 &mdash; THE BOT MIRROR TAKES THE BRANCH, STRUCTURALLY.</b>
+<code>_bot_boon_worth</code> recomputes the boon&#x27;s curve so the bot can price a swap it has
+not made; ER&#x27;s payout table omitted it and EU caught it. It reads the same
+<code>_bond_converted</code> the game pays, so it takes the fallback without a second copy of the
+rule &mdash; and <code>check_ev</code> &sect;5 asserts the consequence, which is the half that
+could drift.</p>
+
+<p><b>&sect;4 &mdash; WHAT IS REPORTED AND NOT FIXED, AND IT IS THE LARGER FINDING.</b>
+<b>Aguila&#x27;s boon has no clamp and it is wasted far harder than the bear&#x27;s.</b> The
+party crit it feeds is spent as <code>randf() &lt; crit_chance</code> with no ceiling written
+anywhere, so everything past a certainty buys nothing &mdash; and at rows 1&ndash;9 <b>58.7% of the
+rolls where its boon is live are already at or over total crit 1.0</b> (0.23% at rows 0, 6.4% at
+rows 1&ndash;3), with mean total crit at <b>1.93</b> and <b>60.3% of every point the eagle delivers
+there landing above the ceiling</b>. <b>The fallback deliberately does not reach
+it.</b> The ruling is scoped to a saturated clamp, and the eagle&#x27;s ceiling is not a property
+of its boon: it is shared with every other crit source, so whether a stack is wasted depends on the
+attacker, the ability and whether the target is Broken. <b>That is a design decision and it is
+now priced.</b> Canis genuinely never saturates &mdash; its term reached &times;30.16 at rows
+1&ndash;9 and was still climbing. <b>No clamp was raised and no rate, cap or accrual moved.</b></p>
+
+<p><b>&sect;5 &mdash; IT IS VISIBLE.</b> The companion chip gains a line where the fallback fires
+&mdash; <i>&quot;Boon at its limit: N stacks pay the strike step instead&quot;</i> &mdash; and only
+where it fires. Without it the two numbers above it move without explanation: at a saturated bear
+the converted count FALLS as the meter climbs while the strike figure RISES, and a player reading
+only EU&#x27;s line would conclude the chip was broken. <b>Measured rather than eyeballed at its
+widest substitution: 37 characters against the chip&#x27;s existing widest of 43</b>, so it adds no
+width at all.</p>
+
+<p><b>&sect;6 &mdash; A NEW GATE, SEVEN CONTROLS, AND ALL SEVEN BIT.</b> <code>check_ev</code>
+(54 checks) drives every section live, because a fallback that never fires and one that fires for
+every stack <b>would both pass a static check</b>. Controls: HEAD&#x27;s own <code>battle.gd</code>
+verbatim (&sect;3 reading a ratio of 1.0000 at 131 vs 131, which is EU&#x27;s shipped behaviour),
+the fallback never firing (14 failures), firing for every converted stack (8), one stack greedy
+(7), the stack paying BOTH halves (8, with the live invariant reading 49 violations),
+<code>_bot_boon_worth</code> left behind (1) and a read site back to a literal (1). Every restore
+was by <code>cp</code> from a scratchpad backup, md5 verified identical all seven times, never
+<code>git checkout</code>. <b>The gate&#x27;s own instrument was wrong once and it is recorded in
+the file</b>: &sect;2b read 86 against 90 and looked exactly like a clamp that was not holding, and
+running the arms in the other order read 86 against 90 <i>again</i> &mdash; it is the first pass
+through <code>_resolve</code> against a fresh board, not the meter. A discarded warm-up arm is the
+whole fix.</p>
+
+<p><b>&sect;6a &mdash; TWO INSTRUMENTS CAUGHT WHAT A DIFF COULD NOT.</b> The literal sweep found
+<b>three needles in <code>test_batch_ay</code></b> that the refactor broke and that a
+comment-stripped diff reads as clean; all three were <b>re-pointed to intent, not deleted</b>, and
+that suite&#x27;s count is unmoved at 486. And <code>check_ed</code>, run against HEAD&#x27;s
+manifest <i>before</i> it was regenerated, found a new local variable colliding with a needle
+<code>test_batch_bg</code> pins ABSENT. <b>The variable was renamed rather than the pin weakened</b>
+&mdash; and the comment explaining the rename tripped the same needle a second time by naming the
+word, which is prose recording a removal reading exactly like the removal not happening.</p>
+
 <h2>2026-09-04 &mdash; Batch EU: LOYALTY CONVERTS AT 8</h2>
 <p><i><b>The conversion ER ruled is built, and the split point is 8.</b> Below it nothing moved.
 Above it a Loyalty stack <b>stops adding to the companion&#x27;s strike step and feeds the Pack

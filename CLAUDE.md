@@ -2112,7 +2112,38 @@ and their standard error — do not quote a figure from here, there is none.**
   HARDER AND NEITHER BECOMES A DEAD CONSTANT.** That is the branch ER §1f called "the clamps do
   more work rather than less", and it is the opposite of what the four flattening shapes would have
   done. **How much harder is measured, not asserted** — `docs/reports/EU.md` §4 carries the binding
-  rate of each of the three limits before and after, at all three loadouts.
+  rate of each of the three limits before and after, at all three loadouts. **AND "BIND HARDER" HAS
+  A FAR SIDE THE SENTENCE DID NOT CARRY: a clamp that binds on every stack has stopped governing
+  and started confiscating.** Both of Ursus's are saturated at every reachable rows=9 loadout, which
+  is what EV §1 exists to answer.
+- **AND A CONVERTED STACK NEVER PAYS NOTHING (BATCH EV). THIS IS THE CLAUSE THE CLAMP SENTENCE
+  ABOVE MADE NECESSARY.** The clamps binding harder is the good half of feeding `_bond_mult`; the
+  other half is that a clamp which is already FULL takes a stack and returns nothing for it.
+  **EU measured it: at rows=9 a Beastmaster fielding Ursus lost 40.2% of his companion's strike
+  step and gained exactly zero.** So **when a converted stack would pay into a saturated clamp, it
+  pays the strike step instead** — exactly as it would have below the split.
+  · **IT LIVES BESIDE `_bond_convert`, AND THE REASON IS THE SAME ONE.** `_bond_fallback()` is the
+    one place the decision is made, and **BOTH HALVES READ IT FROM ONE CALL** — the count is added
+    to `_bond_paid` and subtracted from `_bond_converted` — so they stay disjoint and still sum to
+    the whole meter **by construction rather than by care**. A saturation test in one half and a
+    payment in the other is how a stack comes to pay both.
+  · **IT IS PER STACK, NEVER PER HERO.** The clamp saturates partway up a meter, so within one
+    battle the early converted stacks stay and the later ones fall back. **And the window in which
+    a converted stack is worth anything is ONE STACK WIDE** at the deep boon step — a fallback one
+    stack greedy takes a stack the cover was still spending, and one stack shy leaves the whole
+    loss on the floor. Both look identical in the source.
+  · **THE SATURATION POINT IS DERIVED FROM THE CLAMPS, NEVER WRITTEN DOWN**, and the LATER-BINDING
+    clamp governs: a stack comes back only when it is worthless to EVERY consumer of that kind's
+    boon, not to the first one that filled. **Only Ursus has a saturation point at all** — the
+    wolf's and the eagle's boons are spent unclamped, so nothing of theirs ever falls back, and
+    that is a measurement rather than an omission.
+  · **AND THE SCOPE IS A SATURATED CLAMP, NOT "PAYS NOTHING".** A kind the hunter cannot reach pays
+    nothing too, and **Aguila's party crit overshoots a probability ceiling harder than either of
+    the bear's clamps binds** — 58.7% of live-boon rolls at rows 1–9 are already at total crit 1.0,
+    and **60.3% of every point the eagle delivers there lands above the ceiling**.
+    **Neither falls back**, because neither is a clamp on the boon: the eagle's ceiling is shared
+    with every other crit source, so whether a stack is wasted depends on the attacker, the ability
+    and the target. **Both are reported in `docs/reports/EV.md` §2 and ruled on nowhere.**
 - **AND THE CONVERSION MUST BE LEGIBLE WHERE FOCUS'S IS.** `unit.gd`'s nameplate prints both halves
   of Focus side by side (`Focus %d (+%d%% crit / x%s)`), which is why a player can see the phase
   change. **EU'S COUNTERPART IS `_stamp_loyalty_chip`'S FOURTH LINE**, which names the point at
@@ -2121,6 +2152,36 @@ and their standard error — do not quote a figure from here, there is none.**
   nameplate shows its second half at zero Focus. **The chip's strike figure reads the PAID half**:
   a chip still multiplying by the whole meter would print a bonus the blow does not have, which is
   worse than the silent phase. **A silent second phase is a stat nobody knows they have.**
+
+## STANDING RULE — THE READ SITE IS THE LINE, NOT THE FUNCTION (Batch EU, recorded at EV §4)
+
+> **`_ghost_hit` holds a converting read and a raw read of the same meter in one variable, and so
+> does `_companion_strike`. A POPULATION DERIVED BY WALKING FUNCTIONS WILL MERGE THE TWO AND BE
+> WRONG IN BOTH DIRECTIONS** — it converts a gift nobody ruled, and it reports a function as
+> "already handled" when only one of its two reads is.
+
+**EVERY POPULATION THIS PROJECT HAS DERIVED BY WALKING FUNCTIONS HAS THAT SHAPE AVAILABLE TO IT** —
+CN's 137, CO's refusal set, CY's delay cap, EM's 56. The rule is not about Loyalty; it is about how
+a census is taken.
+
+- **AND THE SWEEP HAS TO FOLLOW THE CALL, NOT THE FUNCTION, OR IT FINDS ONLY HALF.** EV §4 swept
+  for it and a DIRECT sweep — one that looks for a converting read and a raw read in the same body
+  — finds **six** Loyalty functions and **misses `_companion_strike`, which is the one EU named**,
+  because its converting read is inside `_comp_dmg_mult`. A ONE-HOP sweep finds four more.
+  **The population is eight, and five of them are the real shape**: `_ghost_hit` (the strike step
+  against Aguila's pierce), `_companion_strike` (against Canis's Bleed), `_stamp_loyalty_chip`
+  (the paid half against all three gifts), `_resolve_special`'s Kill Command (`_comp_dmg_mult`
+  against `kc_l`, which feeds the Bleed and the pierce) and `_autoplay_pick_kit` (the bot's
+  `_bot_boon_worth` against Primal Surge's raw `>= 4` gate). **ALL FIVE ARE CORRECT TODAY**, which
+  is the point: the shape is not a defect, it is a place a defect hides.
+- **A THIRD CATEGORY EXISTS AND IT IS NOT THE SHAPE**: `_gain_loyalty` and `_do_summon` hold a raw
+  accrual beside a call to `_stamp_loyalty_chip`, whose converting read is a DISPLAY. A sweep that
+  does not separate a display call from a payout reports both as mixed reads.
+- **AND THE FOCUS HALF CANNOT BE READ THE SAME WAY, WHICH IS WORTH KNOWING BEFORE SOMEONE TRIES.**
+  `second_resource` is FIVE specs' currencies in one field, so a raw read of it inside a Resonance
+  or a Faith branch is not a raw read of Focus at all; and `refresh_bars()` is a universal display
+  call, so a one-hop sweep on Focus returns eleven functions and **not one of them is the shape**.
+  **The Loyalty sweep is sharp because `loyalty` is Loyalty's alone.**
 
 ## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
 

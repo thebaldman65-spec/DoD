@@ -7036,3 +7036,46 @@ how much it pays*. The shape is proven and the slot is empty. What cannot be dec
 half it takes from, and that is precisely §1's open question. **A depth rune authored against an
 unchosen currency would be authored twice, and this is the arithmetic that shows it rather than the
 assertion that claims it.**
+
+---
+
+## Batch EV — a converted stack never pays nothing
+
+**Why a fallback rather than a raised clamp.** EU's finding had two possible repairs and only one
+of them is an implementation. Raising `BOND_MITIGATION_MAX` is the shorter fix and it is the
+designer's, not a builder's: the clamp's existence is forced (an uncapped bear mitigation crosses
+zero and starts *healing* the hunter off enemy attacks) but its value is not — anything under 1.0
+satisfies the guard, and 0.75 is a choice nobody has revisited. **A batch that raised it would be
+taking a balance decision inside a bug fix.** The fallback takes no such decision: it changes
+nothing about what the boon pays, at any depth, which is the property that made it shippable
+without a ruling. The measurement is that plain — over 228 companion blows at rows=9 the boon was
+genuinely lower on 183 of them and the two terms it feeds differed on none.
+
+**Why it is per stack, and why that mattered more than it looked.** The tempting shape is a hero
+test — *is this hunter's bear boon saturated?* — and it would be right most of the time. But the
+clamp fills partway up a meter, so at the untalented boon step Loyalty 21 is a hunter with twelve
+stacks still buying cover and one stack buying nothing, in the same battle, on the same blow. A
+hero test has no way to express that. **The window in which a converted stack is worth anything is
+one stack wide at the deep step**, so the difference between correct, one-stack-greedy and
+one-stack-shy is invisible in the source and decisive in play — which is why the gate pins Loyalty
+9 by name rather than asserting a range.
+
+**Why the later-binding clamp governs.** Savage Presence spends the bear's boon twice, on a draw
+and on cover, and they fill at different depths — the draw at a boon of 6.67, the cover at 7.50.
+Between them sits a band where a converted stack is worthless to one and still worth something to
+the other. Taking the *first* clamp to fill would have been the cheaper reading and it would have
+paid the strike step with a stack the cover was still spending. **A stack comes back only when it
+is worthless to everything.**
+
+**What the batch found and deliberately left alone, which is the larger number.** The bear's boon
+is the one with clamps and it is *not* the one that is most wasted. Aguila's party crit is spent as
+a bare probability with no ceiling written anywhere, and at rows 1–9 **58.7% of the rolls where its
+boon is live are already at or past a certainty** — mean total crit 1.93, against a maximum useful
+1.0. **60.3% of every point of crit the eagle delivers at that depth lands above the ceiling**, and
+the conversion pours stacks into it. It is not a
+clamp, though, and that distinction is load-bearing rather than pedantic: the eagle's ceiling is
+**shared with every other crit source**, so whether a given stack is wasted depends on who is
+attacking, with what, and whether the target is Broken. A saturation test for the bear can be
+answered from the hunter alone; one for the eagle cannot. **That is a design question with a real
+cost attached, and it is now priced rather than guessed at.** Canis, for contrast, genuinely never
+saturates — its term reached ×30.16 at rows 1–9 and was still climbing.
