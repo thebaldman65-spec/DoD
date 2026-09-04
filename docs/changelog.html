@@ -14,6 +14,63 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-04 &mdash; Batch EU: LOYALTY CONVERTS AT 8</h2>
+<p><i><b>The conversion ER ruled is built, and the split point is 8.</b> Below it nothing moved.
+Above it a Loyalty stack <b>stops adding to the companion&#x27;s strike step and feeds the Pack
+Bond boon instead</b> &mdash; the companion stops hitting harder and its presence changes the
+fight. <b>Nothing is capped, nothing is slowed and the accrual is not touched:</b> a converted
+stack is paid in full, into the other half. Full working: <code>docs/reports/EU.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE SPLIT, AND THE ONE MAGNITUDE THIS BATCH CHOSE.</b>
+<code>BOND_CONVERT := 8</code> sits beside <code>BOND_STEP</code>; <code>_bond_convert()</code> is
+the one place the split is decided (<code>focus_convert()</code>&#x27;s counterpart, taking the
+hunter so a later rune moves one line rather than five call sites) and <code>_bond_paid</code> /
+<code>_bond_converted</code> are its two halves. <b>Why 8 and not the nominal 5:</b> ER measured
+Loyalty arriving at 10.08 &plusmn;0.12 at a first-clear loadout against a nominal of 5, so a split
+at 5 converts most of a typical meter and <b>a split at 8 bites only the tail that over-arrives</b>.
+<b>And 8 is Kindred&#x27;s own threshold</b>, so no lower point could put a row-8 node on the far
+side of a phase change the player never chose. <b>THE RATE NEVER MOVED</b> &mdash;
+<code>BOND_STEP</code> is still 0.20, the strike step still 0.05, and every node and rune on either
+is untouched. That is <code>CLAUDE.md</code>&#x27;s standing rule: move the point, never the rate.</p>
+
+<p><b>&sect;2 &mdash; FIVE PAYOUT SITES CONVERT; THE RAW-STACK READERS DO NOT, AND ONE OF THEM WAS
+MISSING FROM THE BRIEF&#x27;S OWN TABLE.</b> <code>_comp_dmg_mult</code> and
+<code>_ghost_hit</code>&#x27;s strike step read the paid half; <code>_bond_mult</code> receives, and
+carries Ursus&#x27;s mitigation, Canis&#x27;s wounded bonus, Savage Presence&#x27;s taunt and
+Aguila&#x27;s party crit with it. <b><code>_bot_boon_worth</code> is the fifth and ER &sect;1d does
+not list it</b> &mdash; it recomputes the same curve so the bot can price a swap, and leaving it
+behind would have made the bot under-value exactly the deep bonds the conversion pays most for.
+<b>Unleash, Primal Surge, Last Howl and Bring It Down keep the whole meter</b>, and so do all three
+companion gifts, every threshold and the accrual. <b>Two functions hold both halves</b>:
+<code>_ghost_hit</code> pays its strike step off 8 stacks while Aguila&#x27;s armor pierce beside it
+still reads the whole meter, and <code>_companion_strike</code> likewise for Canis&#x27;s Bleed.</p>
+
+<p><b>&sect;3 &mdash; IT IS VISIBLE, WHICH IS THE HALF THE CODE CANNOT DO FOR ITSELF.</b> The
+Loyalty chip gains a line naming the point <b>at every depth</b> &mdash; below it as well as above
+&mdash; and counting the converted stacks once there are any; a phase you only learn about by
+crossing it is still a surprise. <b>The chip&#x27;s strike figure now reads the paid half</b>,
+because a chip multiplying by the whole meter would print a bonus the blow does not have. The status
+tooltip, the Pack Bond passive text, the master document&#x27;s Beastmaster block and chip row, and
+both glossary entries all name the second phase. <b>No promise was retracted</b> &mdash; the meter
+really does stay uncapped, which is why this cost less text than any flattening would have.</p>
+
+<p><b>&sect;4 &mdash; THE CLAMPS BIND HARDER, AND THAT SENTENCE WAS OWED.</b>
+<code>CLAUDE.md</code> required the batch that built this to say which way
+<code>BOND_MITIGATION_MAX</code> 0.75 and the taunt clamp of 1.0 went. <b>They bind harder</b>:
+both read <code>_bond_mult</code>, and this feeds it. Neither becomes a dead constant, which is what
+capping that half at nominal would have done. Binding rates before and after, at three loadouts, are
+in the report.</p>
+
+<p><b>&sect;5 &mdash; A NEW GATE, AND FIVE CONTROLS THAT ALL BIT.</b> <code>check_eu.gd</code>
+drives the split through a real battle: the strike step goes flat at the point and the boon doubles
+past it, <b>measured on real companion blows and not on the multiplier that feeds them</b>, and all
+four raw-stack readers are <b>cast</b> rather than read. Controls: the strike step un-converted (2
+red), the boon not receiving (1), Unleash re-pointed at the paid half (1), the chip silenced (2),
+and the point moved 8&nbsp;&rarr;&nbsp;9 (3). <b>Every restore was by <code>cp</code> from a
+scratchpad backup and verified md5-identical</b>, never by <code>git checkout</code>.
+<code>test_batch_ay</code>&#x27;s boon-curve assertions were <b>re-pointed in place</b> and its count
+did not move.</p>
+
 <h2>2026-09-03 &mdash; Batch ET: THE RUNE POOL IS RETIRED</h2>
 <p><i><b>All 53 offerable runes are retired. The generated stat family survives. Nothing is
 authored.</b> Retired the way the twelve already are &mdash; <b>kept, and said to be kept</b>:

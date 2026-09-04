@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1353,
-  "source": 1042,
+  "total": 1357,
+  "source": 1046,
   "other": 77,
   "document": 234
  },
  "source_residency": {
-  "code": 621,
+  "code": 625,
   "absent": 286,
   "runtime": 74,
   "narrow": 20,
@@ -1952,6 +1952,50 @@
    "k": "literal",
    "how": "read",
    "g": "check_es.gd#96"
+  },
+  {
+   "s": "check_eu.gd",
+   "fn": "_s0_one_place",
+   "h": "scripts/battle.gd",
+   "n": "const BOND_CONVERT := 8",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_eu.gd#29"
+  },
+  {
+   "s": "check_eu.gd",
+   "fn": "_s0_one_place",
+   "h": "scripts/battle.gd",
+   "n": "func _bond_convert(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_eu.gd#30"
+  },
+  {
+   "s": "check_eu.gd",
+   "fn": "_s0_one_place",
+   "h": "scripts/battle.gd",
+   "n": "func _bond_converted(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_eu.gd#30"
+  },
+  {
+   "s": "check_eu.gd",
+   "fn": "_s0_one_place",
+   "h": "scripts/battle.gd",
+   "n": "func _bond_paid(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_eu.gd#30"
   },
   {
    "s": "test_batch_ah.gd",

@@ -15,8 +15,13 @@
 #      splitting across THREE bodies; Ursus's 100+idx taunt encoding decoding
 #      to the right body with two beasts; Call of the Wild against a two-beast
 #      field; AND that Lone Bond makes The Pack unreachable.
-#   §2 LOYALTY HAS NO CEILING and the boon is a CURVE: past 5, 10 and 20 with
-#      the multiplier reading x2, x3 and x5.
+#   §2 LOYALTY HAS NO CEILING and the boon is a CURVE, read at 5, 10 and 20.
+#      BATCH EU SPLIT THE METER AT `BOND_CONVERT` (8) and this section's three
+#      depths straddle it: 5 is BELOW the point and is unchanged at x2, which
+#      is the arm proving the conversion left the ordinary case alone; 10 and
+#      20 are above it and read x3.4 and x7.4, because the stacks past 8 stop
+#      buying the companion's strike step and feed THIS curve a second time.
+#      The rate never moved — `BOND_STEP` is still 0.20 — only the count.
 #   §3 THE TREE: 24 ids, 7/7/7 + 3 capstones, every final magnitude on the node
 #      that owes it, and every counter ADDITIVE at its read site.
 #   §5 THE TROPHY-POOL COLLISION CANNOT ARISE: no Beastmaster node grants an
@@ -611,7 +616,18 @@ func _live_curve() -> void:
 	ok(h != null and h.passive_id == "pack", "the Beastmaster spawned")
 	await _summon(scene, h, "canis")
 	# Base step 20%: x2 at 5, x3 at 10, x5 at 20 — the three §11 names.
-	for pair in [[5, 2.0], [10, 3.0], [20, 5.0]]:
+	#
+	# BATCH EU §1 — RE-POINTED IN PLACE (DC's repair-to-intent rule), AND THE
+	# QUESTION IS THE SAME ONE. AY's assertion is that the boon is a CURVE
+	# rather than a step, read at three depths; EU splits the meter at
+	# `BOND_CONVERT` (8) and the stacks past it feed THIS half a second time,
+	# so the curve above 8 climbs at double the step. The three depths are
+	# kept exactly because they now straddle the split: **5 IS UNCHANGED AT
+	# x2.0 AND THAT IS THE POINT** — below the point nothing moved — while 10
+	# reads 1 + 0.20 x (10 + 2) = x3.4 and 20 reads 1 + 0.20 x (20 + 12) = x7.4.
+	# The rate is untouched; the COUNT converted. Not one check was added or
+	# removed here, so `baselines.json`'s [486, 486] does not move for it.
+	for pair in [[5, 2.0], [10, 3.4], [20, 7.4]]:
 		h.loyalty["canis"] = pair[0]
 		var m: float = scene.call("_bond_mult", h, "canis")
 		ok(abs(m - pair[1]) < 0.001,
@@ -619,20 +635,23 @@ func _live_curve() -> void:
 	# Absolute Devotion: 35% a stack.
 	h.absolute_step = 15.0
 	h.loyalty["canis"] = 10
-	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 4.5) < 0.001,
-		"Absolute Devotion at 10 Loyalty reads x4.5 (1 + 0.35 x 10)")
+	# EU §1: the STEP is still 0.35 and Absolute Devotion still holds the whole
+	# of that increase — what moved is the count, 10 -> 12 (two stacks past
+	# `BOND_CONVERT`, paid into this half a second time).
+	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 5.2) < 0.001,
+		"Absolute Devotion at 10 Loyalty reads x5.2 (1 + 0.35 x 12)")
 	# Ancient Pact doubles WHATEVER the step came to: 70% a stack.
 	h.ancient_pact = 1
 	ok(abs(float(scene.call("_bond_step", h)) - 0.70) < 0.001,
 		"Absolute Devotion + Ancient Pact = a 70%% step")
-	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 8.0) < 0.001,
-		"...so 10 Loyalty reads x8.0")
+	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 9.4) < 0.001,
+		"...so 10 Loyalty reads x9.4 (1 + 0.70 x 12)")
 	h.ancient_pact = 0
 	h.absolute_step = 0.0
 	# THE CLAMP: Savage Presence must never cross zero.
 	ok(scene.get("BOND_MITIGATION_MAX") < 1.0,
 		"the Savage Presence clamp is under 1.0 — damage can never go negative")
-	_report.append("BOON CURVE: 1 + 0.20 x L (x2 at 5, x3 at 10, x5 at 20); with Absolute Devotion + Ancient Pact the step is 70%%")
+	_report.append("BOON CURVE: 1 + 0.20 x (L + converted) — x2 at 5, x3.4 at 10, x7.4 at 20 since EU split the meter at 8; with Absolute Devotion + Ancient Pact the step is 70%%")
 	await _kill(scene)
 
 
@@ -698,8 +717,12 @@ func _live_two_beasts() -> void:
 	# BOTH boons at FULL strength — never half. This is §1's first decision.
 	ok(abs(float(scene.call("_bond_mult", h, "ursus")) - 2.0) < 0.001,
 		"the bear's boon reads x2.0 at 5 Loyalty — FULL, not half")
-	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 3.0) < 0.001,
-		"the wolf's boon reads x3.0 at 10 Loyalty — FULL, not half")
+	# EU §1: 10 Loyalty is two stacks past `BOND_CONVERT`, so the wolf's boon
+	# reads 1 + 0.20 x 12. THE ASSERTION IS STILL "FULL, NOT HALF" — the bear
+	# at 5 above is the arm that proves the conversion did not move the
+	# unconverted case, and this one that both beasts pay their whole meter.
+	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 3.4) < 0.001,
+		"the wolf's boon reads x3.4 at 10 Loyalty — FULL, not half")
 	# The §0 instrument samples the field, not the capstone.
 	ok(scene.get("sim_stats").has("pack_turns")
 		or true, "the pack-turn instrument exists")
@@ -938,8 +961,10 @@ func _live_vengeance_and_steadfast() -> void:
 	# And it carries the boon at FULL strength on the surviving Loyalty.
 	beast.dead = true
 	scene.call("_free_beast", h, beast)
-	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 3.4) < 0.001,
-		"the inherited boon reads the surviving 12 Loyalty at full (x3.4, got x%.2f)" % \
+	# EU §1: the surviving meter is still 12 and Steadfast Bond still returns it
+	# in FULL — what the inherited boon pays on it is 1 + 0.20 x (12 + 4).
+	ok(abs(float(scene.call("_bond_mult", h, "canis")) - 4.2) < 0.001,
+		"the inherited boon reads the surviving 12 Loyalty at full (x4.2, got x%.2f)" % \
 			float(scene.call("_bond_mult", h, "canis")))
 	_report.append("STEADFAST + VENGEANCE compose: full Loyalty survives, and the inherited boon reads it")
 	await _kill(scene)

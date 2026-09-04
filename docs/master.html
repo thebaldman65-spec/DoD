@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-03 (Batch ET &mdash; the rune pool is retired)</b></p>
+<p align="right"><b>Last updated: 2026-09-04 (Batch EU &mdash; Loyalty converts at 8)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -862,7 +862,9 @@ attack's damage.</td></tr>
 (on summon/swap, 2 turns).</td></tr>
 <tr><td>Loyalty</td><td>Beastmaster companion chip (UNCAPPED, battle-long): +5% strike
 damage per stack plus the companion's gift, and the Pack Bond boon grows 20% a stack with no
-ceiling. Lost when the companion dies (kept in full under Steadfast Bond).</td></tr>
+ceiling. <b>Past 8 the meter CONVERTS</b> — further stacks stop adding to the strike step and feed
+the boon instead, and the chip says so at every depth. Lost when the companion dies (kept in full
+under Steadfast Bond).</td></tr>
 <tr><td>Marked</td><td>Mark of the Hunt: the Beastmaster and their companion deal +25% damage
 to this enemy and their strikes on it restore the hunter's Mana (5 turns; kill resets the
 mark's cooldown).</td></tr>
@@ -1558,9 +1560,13 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Ghostpack</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For 4 turns, <b>every companion he has summoned this battle</b> strikes alongside his attacks for <b>40%</b> — <b>including the ones no longer standing</b>. A hunter who has cycled all three gets three ghosts an attack; one who never swaps gets one.</td><td>What rotating actually buys. It is the Pack build's payoff and deliberately near-worthless to a Lone Bond build.<br><b>Builds with:</b> <b>Wild Rotation</b>, <b>None Left Behind</b>, <b>Shared Devotion</b> and <b>Instinctive Rotation</b> all make cycling cheap — this is what cycling <i>pays</i>. It stacks with the <b>Ghost Pack</b> node rather than replacing it.</td></tr>
 <tr><td><b>Last Howl</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For the <b>rest of the battle</b>, every companion that falls pays the hunter <b>+3% strike damage per stack of Loyalty it had earned</b>. The meter breaks exactly as it always did — this is paid out of what it held, not instead of it. Under <b>The Pack</b> it reads the <b>dying companion's own</b> meter, so two companions falling pay twice.</td><td>The meter outliving the body. It is the only card of his that pays <i>because</i> the bond broke.<br><b>Builds with:</b> <b>Steadfast Bond</b> above all (a share of the meter survives, so the same companion can pay again), plus <b>None Left Behind</b> and <b>Wild Rotation</b>. It is <b>not Vengeance</b> and stacks with it: Vengeance inherits the <i>boon</i>, this carries the <i>meter</i> to the man.</td></tr>
 <tr><td><b>Succession</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>6 turns</b> a swap hands the bond on: the arriving companion starts holding <b>half the Loyalty of the one it replaces</b>. It <b>raises, never lowers</b> — rotating into a deeper bond costs nothing.</td><td>Rotation stops costing the bond. BJ measured 0.05 swaps a trash battle; Instinctive Rotation removed the <i>turn</i> cost, this removes the <i>depth</i> cost.<br><b>Builds with:</b> <b>Wild Rotation</b> and <b>Quick Whistle</b> (the two nodes that make him swap often) and <b>Menagerie</b>. Under <b>The Pack</b> the swap evicts the <i>shallower</i> bond, so what it carries forward is the smaller meter.</td></tr>
-<tr><td><b>Unleash</b></td><td>25 Mana, 2.5, 4cd, one enemy, 12 BD</td><td>His <b>deepest companion</b> strikes immediately for <b>20% of Attack per stack</b> of its Loyalty (Perfect: 25%), and <b>that meter resets to zero</b>. Requires a companion with Loyalty. Under <b>The Pack</b> it reads the <b>deeper bond alone</b> — an ordered action goes to one companion.</td><td>The meter as ammunition, and deliberately a bad trade most of the time: the <b>meter</b> it empties is what every other card of his reads &mdash; and it reads that meter <b>raw</b>, 20% of Attack a stack, never through the Pack Bond curve.<br><b>Builds with:</b> <b>Absolute Devotion</b> and <b>Ancient Pact</b> (steeper per-stack curve), <b>Unbroken Watch</b> and <b>Shared Devotion</b> (a faster fill), and <b>Last Howl</b>. It is <i>not</i> Primal Surge: that one spends every companion's meter and leaves a lasting buff; this is one companion, harder, with Break behind it.</td></tr>
+<tr><td><b>Unleash</b></td><td>25 Mana, 2.5, 4cd, one enemy, 12 BD</td><td>His <b>deepest companion</b> strikes immediately for <b>20% of Attack per stack</b> of its Loyalty (Perfect: 25%), and <b>that meter resets to zero</b>. Requires a companion with Loyalty. Under <b>The Pack</b> it reads the <b>deeper bond alone</b> — an ordered action goes to one companion.</td><td>The meter as ammunition, and deliberately a bad trade most of the time: the <b>meter</b> it empties is what every other card of his reads &mdash; and it reads that meter <b>raw</b>, 20% of Attack a stack, never through the Pack Bond curve.
+<b>That is why Batch EU's conversion does not reach it</b>: the split changes what a stack PAYS,
+and this card counts stacks.<br><b>Builds with:</b> <b>Absolute Devotion</b> and <b>Ancient Pact</b> (steeper per-stack curve), <b>Unbroken Watch</b> and <b>Shared Devotion</b> (a faster fill), and <b>Last Howl</b>. It is <i>not</i> Primal Surge: that one spends every companion's meter and leaves a lasting buff; this is one companion, harder, with Break behind it.</td></tr>
 <tr><td><b>Bear the Brunt</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next blow that would <b>fell HIM is REFUSED</b>, and his <b>deepest bond takes all of it</b> instead. It has <b>no duration and waits until it fires</b>. <b>What it takes can kill the companion.</b></td><td><b>Bloodbond, exactly inverted</b>, and the pair is meant to be read together: that card moves a killing blow off the companion and onto him, this moves one off him and onto the companion. His pool had <b>no mitigation of any kind</b> before it.<br><b>Builds with:</b> <b>The Pack</b> (a second body to spend), <b>Steadfast Bond</b> (which softens the meter when the companion pays), and <b>Call the Wilds</b>, which puts a fresh animal back under the guard the same turn.</td></tr>
-<tr><td><b>Bring It Down</b></td><td>25 Mana, 2.0, 5cd, every hero</td><td>For <b>4 turns EVERY hero</b> deals <b>2% more damage per stack of Loyalty</b> on his deepest bond, <b>up to +20%</b>. The bond is <b>not spent</b> — the number is read as the horn sounds.</td><td>The answer to a pool that was <b>8 of 8 on one engine</b>: it makes the other three heroes care what the Loyalty meter reads. Loyalty is uncapped and over-arrives, and by how far depends on the loadout: a deepest bond of <b>10.1 stacks</b> with the three talent rows a first rung-1 clear opens, and <b>19.0</b> fully talented (measured at ER). The cap is 10 stacks, so it binds about where the meter sits early and far below it later.<br><b>Builds with:</b> <b>Steadfast Bond</b>, <b>Absolute Devotion</b> and <b>Wild Rotation</b> — every Loyalty builder, because the number is snapshot at cast. It is <b>Unleash&#x27;s opposite</b>: that one spends the meter for one blow, this rents it to every hero and spends nothing.</td></tr>
+<tr><td><b>Bring It Down</b></td><td>25 Mana, 2.0, 5cd, every hero</td><td>For <b>4 turns EVERY hero</b> deals <b>2% more damage per stack of Loyalty</b> on his deepest bond, <b>up to +20%</b>. The bond is <b>not spent</b> — the number is read as the horn sounds.</td><td>The answer to a pool that was <b>8 of 8 on one engine</b>: it makes the other three heroes care what the Loyalty meter reads. Loyalty is uncapped and over-arrives, and by how far depends on the loadout: a deepest bond of <b>10.1 stacks</b> with the three talent rows a first rung-1 clear opens, and <b>19.0</b> fully talented (measured at ER). The cap is 10 stacks, so it binds about where the meter sits early and far below it later.
+<b>Batch EU's split at 8 does not move this</b> — the card reads the raw stack count, so its cap
+binds exactly as often as it did before the conversion.<br><b>Builds with:</b> <b>Steadfast Bond</b>, <b>Absolute Devotion</b> and <b>Wild Rotation</b> — every Loyalty builder, because the number is snapshot at cast. It is <b>Unleash&#x27;s opposite</b>: that one spends the meter for one blow, this rents it to every hero and spends nothing.</td></tr>
 <tr><td colspan="4"><b>Sharpshooter</b> — <i>what breaks the patience, and what pays for it</i></td></tr>
 <tr><td><b>Called Volley</b></td><td>30 Mana, 3.0, 4cd, all enemies</td><td>20% of Attack across the line (Perfect: 26%), and his Focus and his mark survive it untouched.</td><td>Hitting the field without breaking the bond.</td></tr>
 <tr><td><b>Quarry's Mark</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Marks it for the battle: Focus gained from attacking it is doubled. One mark at a time.</td><td>Patience that accelerates. It deliberately does <b>not</b> protect Focus on the marked enemy's death — Overkill already does that.</td></tr>
@@ -2052,9 +2058,18 @@ health; <b>Aguila:</b> the hunter and every hero gain +10% crit chance.<br>
 hunter turn that begins with it active, and 1 more each time it is summoned or swapped in.
 Each stack: +5% companion strike damage, plus that companion's gift — Ursus +3% max health, Canis
 +2 Bleed on its strikes, Aguila ignores 20% of the target's armor. <b>The Pack Bond boon
-itself is a CURVE, not a threshold: ×(1 + 0.20 × Loyalty)</b> — ×2 at five stacks, ×3 at ten,
-×5 at twenty, and it never stops climbing. Each companion keeps its own meter for the whole
-battle; it dies with that companion. (Talents steepen the curve — Absolute Devotion raises the
+itself is a CURVE, not a threshold: ×(1 + 0.20 × Loyalty)</b> — ×2 at five stacks, and it never
+stops climbing. Each companion keeps its own meter for the whole
+battle; it dies with that companion.<br>
+<b>PAST 8 THE METER CONVERTS (Batch EU, `BOND_CONVERT`).</b> The first 8 stacks buy the
+companion's strike step; <b>every stack past 8 stops adding to the strike and feeds the Pack Bond
+boon instead</b> — the companion stops hitting harder and its presence changes the fight. So the
+boon climbs at DOUBLE its step above the point: ×3.4 at ten, ×7.4 at twenty. <b>Nothing is capped
+and nothing is slowed</b>: a converted stack is paid in full, into the other half, and this is
+Focus's shape (`FOCUS_CONVERT`) on a second meter. <b>The four cards that read the RAW stack count
+— Unleash, Primal Surge, Last Howl and Bring It Down — pay exactly what they always did</b>, and so
+do the three companion gifts and every threshold: the conversion touches the PAYOUT only and never
+the accrual, so Kindred still fires at 8, Lone Bond still seats at 6 and None Left Behind at 5. (Talents steepen the curve — Absolute Devotion raises the
 step to 35% a stack and Ancient Pact doubles whatever that came to; Lone Bond seats its one
 companion at 6 Loyalty and doubles every gain after. <b>Exactly one node still imposes a ceiling:
 Wild Rotation caps Loyalty at 3, and that cap is its cost.</b>)<br>

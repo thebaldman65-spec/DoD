@@ -322,7 +322,7 @@ const STATUS_INFO := {
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
-	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs 20% a stack, with NO CEILING.\nLost when the companion dies."],
+	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs 20% a stack, with NO CEILING.\nPast 8 the meter CONVERTS: further stacks\nfeed the boon instead of the strike.\nLost when the companion dies."],
 	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are 50% more likely\nto miss."],
 	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
@@ -13302,6 +13302,35 @@ const LOYALTY_UNCAPPED := -1
 # curve reads x2 — EXACTLY today's doubling, so nothing a player learned
 # became wrong — and it keeps climbing past it.
 const BOND_STEP := 0.20
+# BATCH EU §1 — WHERE THE METER CHANGES KIND. `FOCUS_CONVERT`'s exact
+# counterpart, and the constant `docs/reports/ER.md` §1a said a conversion
+# would need. THE FIRST `BOND_CONVERT` STACKS BUY THE COMPANION'S STRIKE STEP
+# (the hunter's damage); EVERY STACK PAST IT FEEDS THE PACK BOND BOON INSTEAD
+# (the beast's presence — Ursus's mitigation, Canis's wounded bonus, Aguila's
+# party crit). The meter is not capped, not flattened and not slowed: a
+# converted stack is still paid in full, into the other half.
+#
+# WHY 8 AND NOT THE NOMINAL 5. The 5 in `CY_METERS` is where the boon reads x2
+# and is an INSTRUMENT'S reference point, not a live constant — ER §1a. Against
+# it Loyalty arrives at 10.08 +/-0.12 with the rows a single rung-1 clear opens
+# and 6.64 +/-0.09 untalented (ER §6), so a split at 5 converts most of a
+# typical meter and a split at 8 bites the tail that over-arrives and leaves
+# the ordinary case alone. IT IS ALSO THE ONE NUMBER THAT CANNOT MAKE A NODE
+# UNREACHABLE: Kindred seats at 8, so any point BELOW it would put a row-8
+# node on the far side of a phase change the player never chose.
+#
+# THE ACCRUAL IS NOT TOUCHED AND THAT IS THE WHOLE SAFETY OF THE SHAPE.
+# Nothing here reaches `_gain_loyalty` or `_loyalty_cap`, so Kindred still
+# fires at 8, Lone Bond still seats at 6, None Left Behind still seats at 5,
+# Wild Rotation's cap of 3 is still the only ceiling in the system, and the
+# four RAW-STACK readers — Unleash, Primal Surge, Last Howl, Bring It Down —
+# pay exactly what they paid before this batch. By construction, not by care.
+#
+# AND THE RULE THIS OBEYS IS `CLAUDE.md`'s: MOVE THE SPLIT POINT, NEVER THE
+# RATE. `BOND_STEP`, the strike step's 0.05 and every node and rune that raises
+# either are untouched. A later rune moves THIS number through `_bond_convert`,
+# which is the one place the split is decided — Deep Focus's shape exactly.
+const BOND_CONVERT := 8
 # ---------- BATCH CH: the Hunter nine's five numbers, together ----------
 #
 # THREE OF THESE ARE FLAGGED AS UNTRUSTED AND SHIPPED TO BE WATCHED IN PLAY
@@ -13343,6 +13372,41 @@ const STALKING_HORSE_STATUSES := ["poison", "cripple", "slow", "exposed",
 const BOND_MITIGATION_MAX := 0.75
 
 
+# BATCH EU §1 — THE ONE PLACE THE SPLIT IS DECIDED, and it is `focus_convert()`
+# word for word. Every payout site below reads the point through this function
+# and never through the constant, so a later rune that moves the point cannot
+# leave one of them behind — the AT Resonance discipline, which `unit.gd`'s
+# Focus block states as its own reason for existing.
+#
+# `hunter` IS DELIBERATELY UNREAD AND THE SIGNATURE IS THE POINT OF THE
+# FUNCTION. `focus_convert()` is `maxi(FOCUS_CONVERT - deep_focus -
+# rune_deep_focus, 1)` — the point is PER HUNTER because a node and a rune move
+# it. Nothing moves Loyalty's yet (EU authors no rune and no node, ER §2), so
+# this returns the constant today; the parameter is here so that authoring one
+# is a change to THIS LINE and not to five call sites and their suites.
+func _bond_convert(_hunter: BattleUnit) -> int:
+	return BOND_CONVERT
+
+
+# The two halves of the meter, named, and every payout site reads one of them.
+# `_bond_paid` is `focus_crit_chance`'s `mini`; `_bond_converted` is
+# `focus_crit_mult`'s `maxi(..., 0)`. THEY ARE DISJOINT AND THEY SUM TO THE
+# WHOLE METER: a stack is paid once, into one half or the other, which is what
+# makes this a conversion rather than a flattening.
+#
+# A RAW-STACK READER CALLS NEITHER, AND THAT IS HOW THE TWO CLASSES ARE TOLD
+# APART. Unleash, Primal Surge, Last Howl, Bring It Down, Kindred's gate,
+# Aguila's armor pierce, Canis's Bleed, Ursus's health gift, Succession,
+# Devoted Fury and every threshold read the meter itself and are untouched by
+# this batch (ER §1d's table, side by side).
+func _bond_paid(hunter: BattleUnit, l: int) -> int:
+	return mini(l, _bond_convert(hunter))
+
+
+func _bond_converted(hunter: BattleUnit, l: int) -> int:
+	return maxi(l - _bond_convert(hunter), 0)
+
+
 # The boon's step per Loyalty stack for this hunter, all talents applied.
 # Absolute Devotion holds the INCREASE on the base 20%; Ancient Pact doubles
 # whatever that came to. Both taken, the step is +70% a stack.
@@ -13358,10 +13422,25 @@ func _bond_step(hunter: BattleUnit) -> float:
 # absent one Menagerie remembers pays that share of it; Vengeance carries a
 # dead beast's bond at FULL strength for the rest of the battle (on whatever
 # Loyalty survived the death, which is why Steadfast Bond makes it larger).
+#
+# BATCH EU §1 — THIS IS THE HALF THAT RECEIVES. Below `_bond_convert` the curve
+# is byte-for-byte what it always was; above it each converted stack pays the
+# boon a SECOND time, which is what the stack stopped paying the strike step.
+# The boon's RATE is untouched — `_bond_step` is not read differently — and it
+# is the COUNT that moves, which is `CLAUDE.md`'s "move the point, never the
+# rate" from the receiving side.
+#
+# AND THE SENTENCE `CLAUDE.md` SAYS THE BUILDER OWES: THE TWO CLAMPS BIND
+# HARDER, THEY DO NOT DIE. `BOND_MITIGATION_MAX` 0.75 and Savage Presence's
+# taunt clamp of 1.0 both read this function, so feeding it moves both TOWARD
+# their limits rather than out of reach — which is the opposite of what capping
+# this half at nominal would have done, and it is the branch ER §1f named as
+# "the clamps do more work rather than less".
 func _bond_mult(hunter: BattleUnit, kind: String) -> float:
 	if hunter == null or hunter.dead or hunter.passive_id != "pack":
 		return 0.0
-	var curve := 1.0 + _bond_step(hunter) * int(hunter.loyalty.get(kind, 0))
+	var l: int = int(hunter.loyalty.get(kind, 0))
+	var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))
 	# The Pack: each active beast grants its own boon — this check simply
 	# matches any of them.
 	if _beasts(hunter).any(func(b): return b.companion_kind == kind):
@@ -13443,12 +13522,36 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 			gift = "%d%% of armor ignored" % mini(20 * stacks, 100)
 	var cap := _loyalty_cap(hunter)
 	var strike_step := 5.0 + hunter.wild_communion_step + hunter.rune_wild_communion_step
+	# BATCH EU §4 — THE STRIKE FIGURE READS THE PAID HALF, NOT THE METER. A chip
+	# still multiplying by `stacks` here would have printed a strike bonus the
+	# companion does not have, which is a worse fault than the silent phase: a
+	# number on the chip that the blow disagrees with.
+	var paid: int = _bond_paid(hunter, stacks)
 	var l_desc := "Loyalty %s: +%d%% strike damage\nand %s." % [
 		str(stacks) if cap == LOYALTY_UNCAPPED else "%d/%d" % [stacks, cap],
-		int(round(strike_step * stacks)), gift]
+		int(round(strike_step * paid)), gift]
 	l_desc += "\nPack Bond boon x%.1f (+%d%% a stack)." % [
 		_bond_mult(hunter, comp.companion_kind),
 		int(round(_bond_step(hunter) * 100.0))]
+	# BATCH EU §4 — AND THE PHASE CHANGE IS NAMED, WHICH IS THE HALF THE CODE
+	# CANNOT DO FOR ITSELF. `unit.gd`'s Focus nameplate prints both halves side
+	# by side (`Focus %d (+%d%% crit / x%s)`) and that is the only reason a
+	# player can see Focus convert; `CLAUDE.md` calls a silent second phase "a
+	# stat nobody knows they have". THE LINE IS PRINTED BELOW THE POINT AS WELL
+	# AS ABOVE IT — a phase you only learn about by crossing it is still a
+	# surprise, and Focus's nameplate shows its second half at zero Focus too.
+	#
+	# THE LIVE COUNT IS A PARENTHETICAL RATHER THAN THE SENTENCE'S SUBJECT, so
+	# the number and the verb can never disagree at one stack. MEASURED RATHER
+	# THAN EYEBALLED, over every line either block can produce at its widest
+	# substitution: this block reaches 43 characters at a three-digit converted
+	# count, against a chip whose existing widest line is 37 (the Pack Bond
+	# boon line at a three-digit multiplier). SIX CHARACTERS WIDER THAN WHAT
+	# THE CHIP ALREADY CARRIES, and the count is the only part that grows.
+	var converted: int = _bond_converted(hunter, stacks)
+	l_desc += "\nCONVERTS at %d: stacks past it feed the\nboon instead of the strike%s." % [
+		_bond_convert(hunter),
+		"" if converted <= 0 else " (%d converted)" % converted]
 	var info: Array = STATUS_INFO["loyalty"]
 	if not comp.update_status("loyalty", "L%d" % stacks, l_desc, stacks):
 		comp.add_status("loyalty", info[0], "L%d" % stacks, info[2], -1, l_desc, stacks)
@@ -20372,9 +20475,15 @@ const SWAP_COOLDOWN := 3
 # Loyalty curve, which is what makes an established beast expensive to give
 # up. An ABSENT kind is valued at the curve it would arrive on — it keeps its
 # meter, so a beast rotated out and back is not starting from nothing.
+#
+# BATCH EU §1 — IT MIRRORS `_bond_mult` AND MUST MIRROR THE CONVERSION WITH IT.
+# This is the boon's curve computed a second time so the bot can price a swap
+# it has not made yet; leaving the old shape here would have made the bot
+# UNDER-value exactly the deep bonds the conversion pays most for, and it would
+# have drifted silently because nothing compares the two functions.
 func _bot_boon_worth(hunter: BattleUnit, kind: String) -> float:
 	var l: int = int(hunter.loyalty.get(kind, 0))
-	var curve := 1.0 + _bond_step(hunter) * l
+	var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))
 	match kind:
 		"canis":
 			# +15% damage per enemy under 35% health — worth what the field is.
@@ -20727,8 +20836,15 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	if victim == null or victim.dead:
 		return
 	var l: int = int(hunter.loyalty.get(kind, 0))
+	# BATCH EU §1 — THE TWO READS OF THIS METER IN THIS FUNCTION FALL ON
+	# OPPOSITE SIDES OF THE SPLIT AND THAT IS WHY THEY ARE TWO NAMES NOW. The
+	# strike step is a PAYOUT (it converts, exactly as `_comp_dmg_mult` does —
+	# the bodiless blow is the same blow); AGUILA'S ARMOR PIERCE IS A RAW-STACK
+	# READER and keeps the whole meter (ER §1d). One `l` serving both would
+	# have silently converted the pierce, which nothing ruled.
+	var paid: int = _bond_paid(hunter, l)
 	var raw := dmg * (1.0 + (0.05 + 0.01 * (hunter.wild_communion_step
-		+ hunter.rune_wild_communion_step)) * l) \
+		+ hunter.rune_wild_communion_step)) * paid) \
 		* randf_range(0.9, 1.1)
 	if hunter.momentum_ranks + hunter.rune_momentum_ranks > 0 \
 			and hunter.kinds_summoned.size() > 0:
@@ -21853,11 +21969,19 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 # Every talent that feeds a companion's blows, in one place: Loyalty
 # (Wild Communion deepens the per-stack step), Bestial Wrath, and Feral
 # Momentum's count of distinct beasts fielded.
+#
+# BATCH EU §1 — THIS IS THE HALF THAT PAYS, AND IT IS THE ONE THE CONVERSION
+# COSTS. It reads `_bond_paid` rather than the meter: past `_bond_convert` a
+# stack stops adding here and adds to `_bond_mult` instead. THE STEP ITSELF IS
+# UNTOUCHED — 0.05 and both of the nodes on it are exactly as they were, and it
+# is the count that stops climbing, never the rate. ER §1b measured what this
+# costs at a split of 5 (20.35% of the step, pooled over 6,283 companion
+# blows); EU re-measured it at 8 and the figure is in `docs/reports/EU.md` §2.
 func _comp_dmg_mult(comp: BattleUnit) -> float:
 	var mult := _bestial_dmg_mult(comp)
 	var pm: BattleUnit = comp.pack_master
 	if pm != null:
-		var l: int = int(pm.loyalty.get(comp.companion_kind, 0))
+		var l: int = _bond_paid(pm, int(pm.loyalty.get(comp.companion_kind, 0)))
 		var step := 0.05 + 0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)
 		mult *= 1.0 + step * l
 		if pm.momentum_ranks + pm.rune_momentum_ranks > 0 and pm.kinds_summoned.size() > 0:
@@ -23475,6 +23599,13 @@ static func signature_report_block(stats: Dictionary) -> String:
 #   Blood Frenzy  40 points — 2% a step (`bloodrage_step_bonus` aside) x 20
 #                 steps, the band at zero health.
 #   Loyalty        5 stacks — where the Pack Bond curve reads x2 (`BOND_STEP`).
+#                 **THIS IS NOT `BOND_CONVERT`, AND EU DELIBERATELY LEFT IT
+#                 ALONE.** The split point is 8; this 5 means "where the boon
+#                 doubles", which is still true and is the denominator every
+#                 arrival figure from EQ, ER and EU is quoted against.
+#                 Repointing it at the split would have silently broken
+#                 comparability with every prior reading of this meter, and
+#                 the two numbers answer different questions.
 #   Focus        100 points — `BattleUnit.FOCUS_CONVERT`, where chance stops
 #                 and the critical multiplier starts.
 #   Faith          5 stacks — the release threshold.

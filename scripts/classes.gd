@@ -5362,7 +5362,7 @@ const SPEC_INFO := {
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
 		"max_hp": 160, "armor": 0.15,
 		"resists": {"nature": 0.20, "physical": 0.05},
-		"passive_desc": "Pack Bond — the active companion grants its boon. Ursus,\nSavage Presence: enemies are drawn to the bear and the\nBeastmaster takes 10% less damage. Canis: +15% damage per\nenemy under 35% health. Aguila: every hero gains\n+10% crit. LOYALTY (per companion, NO MAXIMUM): +1 each\nturn the companion stands, and on summon or swap; +5%\nstrike damage per stack plus a companion-specific gift,\nand the boon itself grows 20% a stack — x2 at five. A\nmeter dies with its companion.",
+		"passive_desc": "Pack Bond — the active companion grants its boon. Ursus,\nSavage Presence: enemies are drawn to the bear and the\nBeastmaster takes 10% less damage. Canis: +15% damage per\nenemy under 35% health. Aguila: every hero gains\n+10% crit. LOYALTY (per companion, NO MAXIMUM): +1 each\nturn the companion stands, and on summon or swap; +5%\nstrike damage per stack plus a companion-specific gift,\nand the boon itself grows 20% a stack — x2 at five. PAST\n8 THE METER CONVERTS: further stacks stop adding to the\nstrike and feed the boon instead. A meter dies with its\ncompanion.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
 	# The lightest Hunter: a marksman who wants to be at range and pays for
 	# being reached.

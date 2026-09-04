@@ -4,6 +4,116 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Loyalty converts at 8, and why the point is not the nominal (Batch EU) — 2026-09-04
+
+### Why a split point is a design object and a cap is not
+
+ER ruled that Loyalty converts rather than flattens, and the reason is
+worth restating because it is easy to read as a technicality. A cap
+says *this meter stops mattering here*. A conversion says *this meter
+starts mattering differently here*. The first one takes a decision away
+from the player — past the ceiling, depth is not a choice any more. The
+second one keeps depth a choice and changes what the choice buys.
+
+The practical difference is what happens to everything else in the
+tree. A cap on the accrual reaches every reader at once, including the
+four cards that count stacks and the six nodes that seat or gate on a
+threshold; Kindred at 8, Lone Bond at 6, None Left Behind at 5 all sit
+inside the range a cap would have to bite. **A conversion writes
+nothing into the accrual**, so none of them move — not because the
+batch was careful, but because there is nowhere for the change to
+reach them from. That is the property the ruling was chosen for and it
+is the one to protect.
+
+### Why 8, when everything for four batches has said 5
+
+The 5 was never a live number. It is a literal in `CY_METERS` meaning
+*where the boon reads x2*, and the whole "over-arrives against a
+nominal of 5" conversation has been quoting an instrument's reference
+point as if it were a game constant.
+
+Measured against it, the meter arrives at **10.08 ±0.12** with the
+three talent rows a single rung-1 clear opens, and **6.64 ±0.09**
+untalented. So a split at 5 would convert most of an ordinary meter:
+the median first-clear Beastmaster would spend most of his bond in the
+converted phase, and the phase change would stop being a thing that
+happens to deep bonds and become the default. **A split at 8 bites the
+tail.** At the untalented loadout it is nearly inert; at first-clear it
+takes a stack or two off a typical blow; at rows=9 it is continuous.
+That six-to-one asymmetry is the same one EQ found for the shapes this
+replaces, and it is the honest shape for a mechanic that is supposed
+to reward depth rather than punish it.
+
+There is a second reason and it is structural rather than numeric.
+**Kindred is a row-8 node keyed to 8 Loyalty.** Any split below 8 puts
+a node the player deliberately bought on the far side of a phase change
+they did not choose — they would reach Kindred's threshold already
+inside the converted phase, having stopped buying strike damage before
+the node that rewards the depth fires. At exactly 8 the two coincide:
+the stack that arms Kindred is the last stack that pays the strike.
+
+### The half that receives, and the sentence the rule made us write
+
+`CLAUDE.md` required whoever built this to say which way the two
+existing clamps went, because the two available answers are opposites.
+Capping `_bond_mult` at nominal would have put `BOND_MITIGATION_MAX`
+(0.75) and Savage Presence's taunt clamp (1.0) permanently out of
+reach at every talent depth, which by AR §4's rule turns a governor
+into a dead constant. **Feeding it makes both bind harder.**
+
+That is the branch we took, and it should be read as a cost rather
+than a bonus. The receiving half is the steepest term in the system —
+`_bond_step` is raised by Absolute Devotion and doubled by Ancient
+Pact — and Canis's wounded bonus multiplies it by the number of
+wounded enemies with no clamp at all. ER named this as option 3's
+price and it is still the price. What makes it the right trade is that
+the two halves already existed as live payout readers, which is the
+property that makes Focus's conversion cheap and un-drifting, and the
+alternatives each needed a new field, a new read site, or a decision
+already refused in the code.
+
+### What a raw-stack reader is, and why the distinction had to be built rather than documented
+
+The split changes what a stack **pays**. Four cards **count** stacks —
+Unleash, Primal Surge, Last Howl and Bring It Down — and three
+companion gifts do too. Those are not exceptions carved out of the
+conversion; they are a different question, and the conversion never
+had an answer to give them.
+
+The reason this needed a gate rather than a comment is that getting it
+wrong is silent. An Unleash re-pointed at the paid half still fires,
+still logs, still empties the meter, and simply pays less — nothing in
+the tree goes red, and the game's largest single Loyalty payout would
+have been changed with nobody ruling it. `check_eu` §2 casts all four
+on a live board at two depths that straddle the point, because that is
+the only assertion the broken version cannot also pass.
+
+Two functions turned out to hold **both** kinds of read in one
+variable. `_ghost_hit` used a single `l` for its strike step and for
+Aguila's armor pierce; `_companion_strike` for the strike and Canis's
+Bleed. A single conversion at the top of either would have converted
+the gift as a side effect. That is the shape to look for the next time
+this meter is touched: the read site is not the function, it is the
+line.
+
+### An instrument that measured the wrong term, twice
+
+The gate's damage measurement was wrong in its first two drafts and
+both are recorded in the file because both are general.
+
+The first drove Canis and read a ratio of 1.5000 where the strike step
+was provably flat — Canis's blow also lays Bleed at +2 per **raw**
+stack, and against a body with 1e8 max health the bleedout (a
+percentage of max HP) dwarfed the strike. **The instrument was
+measuring the one term the section exists to keep raw.** The second
+switched to Ursus and still read 1.0315, because the bear also mauls
+adjacent enemies and an adjacent raider that dies in one arm and
+survives in the other consumes a different number of draws from the
+seeded stream. Narrowing the field to one standing body fixed it, and
+the arms are now exactly equal as integers rather than equal within a
+tolerance — a tolerance is where a real one-stack slip in the split
+would hide.
+
 ## Retiring a pool whole rather than patching it entry by entry (Batch ET) — 2026-09-03
 
 **Newest first, so read this before the Batch ES entry below** — that

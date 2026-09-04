@@ -1656,8 +1656,10 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   beside BOND_STEP ~13300-13345; `_loyalty_cap` returns the LOYALTY_UNCAPPED sentinel (only Wild
   Rotation hands it a number — the cap IS that node's cost). **THE ADDRESSES WERE STALE BY TEN
   THOUSAND LINES** (EQ found it, ER corrected it) — the table's CONTENT was right throughout, and
-  a citation is a claim that rots the same way a number does. **AND A CONVERSION IS RULED FOR
-  THIS METER AND IS NOT BUILT — see the ER block below; nothing here changes until it is.**
+  a citation is a claim that rots the same way a number does. **THE CONVERSION IS BUILT AT EU AND
+  THIS ROW DOES NOT MOVE FOR IT** — `BOND_CONVERT` 8 changes what a stack PAYS, never how many
+  there are, so the governor is still the beast's death and Wild Rotation is still the only
+  ceiling. `_bond_convert` beside `BOND_STEP` is the one place the split is decided.
 · **Focus** (uncapped; Spray caps 50) | the FIXED-100 CONVERSION: the first 100 points buy
   crit CHANCE (saturates at +50%), everything past buys MULTIPLIER only; Deep Focus moves the
   split point down, floor 1 | FOCUS_CONVERT/FOCUS_STEP + focus_convert()/focus_crit_chance()/
@@ -2052,9 +2054,29 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
 > stack stops adding to the term it was adding to and adds to something else, on the shape Focus
 > already uses. Below nominal nothing changes and the ACCRUAL is never touched.**
 
-**THE RULING IS TAKEN; THE CURRENCY IS NOT CHOSEN AND IS CONTENT.** Four are priced in
-`docs/reports/ER.md` §1 and none is authored. **The measurements this rests on are live in that
-file with their n and their standard error — do not quote a figure from here, there is none.**
+**BUILT AT BATCH EU. THE CURRENCY IS THE PACK BOND BOON'S OWN GROWTH AND THE POINT IS 8.**
+`BOND_CONVERT := 8` beside `BOND_STEP`; `_bond_convert()` is the one place the split is decided
+(`focus_convert()`'s counterpart) and `_bond_paid` / `_bond_converted` are its two halves. **Below
+the point NOTHING MOVED**; above it a stack stops adding to `_comp_dmg_mult`'s strike step and
+feeds `_bond_mult` a second time. **The measurements are live in `docs/reports/EU.md` with their n
+and their standard error — do not quote a figure from here, there is none.**
+
+- **WHY 8 AND NOT THE NOMINAL 5, WHICH IS THE ONLY MAGNITUDE THIS BATCH CHOSE.** Loyalty arrives
+  at 10.08 ±0.12 with the rows a single rung-1 clear opens and 6.64 ±0.09 untalented (ER §6), so a
+  split at 5 converts most of a typical meter and a split at 8 bites only the tail that
+  over-arrives. **AND 8 IS KINDRED'S OWN THRESHOLD**, so no point below it can put a row-8 node on
+  the far side of a phase change the player never chose.
+- **THE FOUR RAW-STACK READERS AND THE THREE GIFTS DO NOT CONVERT, AND THIS IS THE THING MOST
+  LIKELY TO BE GOT WRONG.** Unleash, Primal Surge, Last Howl and Bring It Down COUNT stacks; the
+  split changes what a stack PAYS. A batch that re-points one of them at `_bond_paid` changes the
+  game's largest single Loyalty payout silently — `check_eu` §2 casts all four to stop it.
+- **A FUNCTION CAN HOLD BOTH HALVES AND TWO OF THEM DO.** `_ghost_hit` reads the paid half for its
+  strike step and the WHOLE meter for Aguila's armor pierce; `_companion_strike` likewise for
+  Canis's Bleed. One variable serving both silently converts the gift.
+- **AND THE MIRROR IS A READ SITE TOO.** `_bot_boon_worth` recomputes `_bond_mult`'s curve so the
+  bot can price a swap it has not made; ER §1d's payout table omitted it and EQ §1's census caught
+  it. Leaving it behind would have made the bot under-value exactly the deep bonds the conversion
+  pays most for, and nothing compares the two functions.
 
 - **WHAT THIS RULES OUT, BY NAME.** The four shapes `docs/reports/EQ.md` §2 priced — diminishing
   above nominal, a soft cap, a hard cap at twice nominal, a hard cap AT nominal — **are all off the
@@ -2076,20 +2098,29 @@ file with their n and their standard error — do not quote a figure from here, 
   Focus's shape and it is the half of the precedent that transfers. **A node or rune that steepens
   the converted half re-creates the over-arrival on the other side of the split**, which is what the
   ruling exists to stop.
-- **NOMINAL IS NOT A LIVE NUMBER TODAY AND A CONVERSION MAKES IT ONE.** The 5 is a literal in
-  `battle.CY_METERS` — an instrument's reference point, and the only one of that table's four
-  denominators that is not a live constant. A conversion needs a `BOND_CONVERT` beside `BOND_STEP`,
-  which is `FOCUS_CONVERT`'s exact counterpart.
+- **NOMINAL WAS NOT A LIVE NUMBER AND `BOND_CONVERT` IS — BUT THEY ARE DIFFERENT NUMBERS AND THE
+  INSTRUMENT KEPT ITS OWN.** The 5 in `battle.CY_METERS` means *where the boon reads x2*, which is
+  still true and is still what every arrival figure from EQ, ER and EU is quoted against.
+  **`CY_METERS` WAS DELIBERATELY NOT REPOINTED AT `BOND_CONVERT`**: re-denominating it would have
+  silently broken comparability with every prior measurement of this meter, and the two numbers
+  answer different questions. The header there names both so a later reader cannot conflate them.
 - **THE TWO EXISTING CLAMPS ARE PART OF THE DECISION, NOT BYSTANDERS.** `BOND_MITIGATION_MAX` 0.75
   and Savage Presence's taunt clamp of 1.0 both read `_bond_mult`. **A conversion that caps
   `_bond_mult` at nominal puts both out of reach at every talent depth**, which by AR §4's rule
   makes them dead constants rather than governors; a conversion that FEEDS `_bond_mult` makes both
-  bind harder. **Whichever half receives the converted stacks, one of those two things happens** —
-  say which, in the batch that builds it.
+  bind harder. **THE SENTENCE IS OWED AND HERE IT IS: EU FEEDS `_bond_mult`, SO BOTH CLAMPS BIND
+  HARDER AND NEITHER BECOMES A DEAD CONSTANT.** That is the branch ER §1f called "the clamps do
+  more work rather than less", and it is the opposite of what the four flattening shapes would have
+  done. **How much harder is measured, not asserted** — `docs/reports/EU.md` §4 carries the binding
+  rate of each of the three limits before and after, at all three loadouts.
 - **AND THE CONVERSION MUST BE LEGIBLE WHERE FOCUS'S IS.** `unit.gd`'s nameplate prints both halves
   of Focus side by side (`Focus %d (+%d%% crit / x%s)`), which is why a player can see the phase
-  change. `battle._stamp_loyalty_chip` already builds a two-line chip and is the counterpart
-  surface. **A silent second phase is a stat nobody knows they have.**
+  change. **EU'S COUNTERPART IS `_stamp_loyalty_chip`'S FOURTH LINE**, which names the point at
+  EVERY depth and counts the converted stacks once there are any — printed BELOW the point as well
+  as above it, because a phase you only learn about by crossing it is still a surprise and Focus's
+  nameplate shows its second half at zero Focus. **The chip's strike figure reads the PAID half**:
+  a chip still multiplying by the whole meter would print a bonus the blow does not have, which is
+  worse than the silent phase. **A silent second phase is a stat nobody knows they have.**
 
 ## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
 

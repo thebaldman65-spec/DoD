@@ -5,111 +5,69 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-03 (Batch ET).*
+*Last rewritten: 2026-09-04 (Batch EU).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: ET — THE RUNE POOL IS RETIRED.** **All 53 offerable runes are retired. The
-  generated stat family survives. Nothing is authored.** Retired the way the twelve already are —
-  **kept, and said to be kept**: every entry keeps its `name`, `price`, `payload`, `desc`, `lane`
-  and `scope`, still resolves through `config` / `build` / `display_name`, and gains a string naming
-  what is lost. **The whole data diff is 53 ADDED LINES — zero deletions, and not one payload,
-  price, desc, lane or scope moved.** Full working: **`docs/reports/ET.md`**.
-- **THE REASONING, RECORDED WITH THE RULING SO IT IS NEVER RECONSTRUCTED WRONGLY.** The pool was
-  authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent counters, which
-  were rebuilt at DO and DP; and re-keyed onto rune-owned fields at EM. **What survived all of that
-  was the magnitudes, and the magnitudes were never the interesting part.** A pool authored to the
-  real charter — threshold-gated, reading archetype tags on the holder's DRAFTED cards — will be
-  better than 53 patched ones. **EO's twelve keep their existing strings unrewritten**, and the pool
-  is uniformly retired in TWO PASSES rather than by two decisions.
-- **§1 — THE RETIREMENT IS DECLARATIVE, AND THAT IS THE WHOLE POINT.** `eligible_ids` reads the
-  `retired` key and nothing else, so a bare `"retired": "yes"` would empty the pool exactly as
-  effectively and record nothing. **The string is the only place the loss lives.** `check_et` §1
-  asserts every entry carries one naming its batch and its loss — **12 at EO §3, 53 at ET §1, 0
-  undeclared** — and that nothing is offerable through the live door for any of the twelve specs.
-- **§1b — THE FOUR LOSSES THAT ARE NOT CLAUSES, AND THE BRIEF'S GROUPING WAS WRONG IN BOTH
-  DIRECTIONS.** Derived live through `Run.draft_pool_left` and `Classes.protected_names`:
-  - **THE RUNE OF THE COMET IS THE LARGEST SINGLE LOSS IN THE BATCH AND THE BRIEF DOES NOT NAME
-    IT.** COMET is defined *inline* in the entry's `new_ability` payload and exists in no draft
-    pool, no boss pool, no talent tree and no protected core. **It is the only ability in the game
-    reachable ONLY through a rune**, so this retirement removes an ability outright — and the entry
-    holds the only copy of its definition. `check_et` §4 pins that population at exactly one.
-  - **BINDING SOULS IS THE ONLY GENUINE OUT-OF-POOL GRANT**, and only for two of its three buyers:
-    Sacred Resolve is the Devout's own draft and boss card, so for him it collides and pays
-    Quickened. For the Holy Cleric and the Occultist it was the only route to it.
-  - **FLAYED MIND WAS NOT AN OUT-OF-POOL GRANT AT ALL.** Mind Flay is in the Occultist's *own* spec
-    draft pool and his own boss pool since DO, and he is the only hero who can buy the rune — so it
-    was a 160g shortcut past the draft, and collided to Honed once he had drafted the card.
-  - **LAST RITES COULD NEVER GRANT.** Resurrection is the Holy Cleric's PROTECTED CORE, so the
-    payload *always* collided and always paid Quickened, which is why its `desc` is the one honest
-    "she already knows it" wording in the pool.
-- **§2 — THE GENERATED STAT FAMILY SURVIVES UNCHANGED AND IS NOW THE WHOLE POOL.** +10 max HP / +2%
-  armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g — **no magnitude moved and no
-  price was chosen.** Every fallback in the rune layer is now load-bearing on the first Peddler of
-  every run, so it is **DRIVEN rather than read**: `check_et` §2 takes **540 draws across all twelve
-  specs through five doors** — the Peddler, the elite cache's single draw, its pick-of-three WITHOUT
-  REPLACEMENT, the grant door, and the exhaustion floor at a pouch holding every template. **None
-  came back empty, none nameless, none payloadless, and not one retired entry reached a live
-  offer.**
-- **§2b — THE EXHAUSTION FLOOR MOVED AND IT IS THE ONE BEHAVIOUR CHANGE A PLAYER COULD SEE.** A hero
-  now draws **5 distinct runes (6 outside the Warrior class, where `max_resource` is excluded)**
-  before the pool starts repeating, where the same hero reached **15–18** before ET. The floor is
-  the same code; it used to sit behind 9–12 authored entries and is the ordinary path now.
-- **§3 — RETIRED IS NOT DELETED, AND THAT IS THE LOAD-BEARING FACT.** `test_rune_battle` walks
-  `Runes.ids()` rather than the offer pool and **still reads 97 / 0** with every entry retired —
-  every rune still does exactly what it did. **The pool is unofferable, not broken.** `check_et` §3
-  covers the 17 universal and class entries that suite's spec-scoped walk does not reach.
-- **§4 — THE TRAP ET SETS FOR THE NEXT BATCH.** **72 of the 84 stat fields the retired pool writes
-  have `data/runes.json` as their only writer in the project**, so their branches in `battle.gd` can
-  no longer fire — and a branch that cannot fire is indistinguishable from dead code to every
-  instrument here. **Deleting one is deleting a mechanic the pool is meant to come back to.**
-  `check_dp` §4 asserts the forward direction and **would go on passing while the fields were
-  deleted from `runes.json` alongside their branches**, so `check_et` §5 pins the population as an
-  ASYMMETRIC RATCHET: it may grow, and it may not shrink without a line changing there.
-- **§5 — THREE ASSERTIONS THAT THE POOL IS NON-EMPTY BECAME STATEMENTS OF THIS RULING, AND ALL THREE
-  WERE MADE TWO-ARMED RATHER THAN DELETED.** `test_runes._rich_grant` asserted *"the retirement left
-  its own set empty"* on all twelve specs; `test_runes._start_rune_pool` asserted a 20–70% band on
-  spec runes in a cache triple; `check_es` §2 asserted the five universals still roll for all twelve.
-  **Each derives its arm from the pool now and comes back on its own the day a rune is authored.**
-  **`check_es` §2 came back WIDER than it was**: every entry a spec cannot draw must be undrawable
-  BECAUSE IT IS RETIRED, across all 65 rather than the five — so a retirement wearing an eligibility
-  rule still goes red. And **`test_runes._reachable` was re-pointed from offerability onto SCOPE**,
-  because "does this rune name an ability its hero can hold" is a question about the AUTHORED entry.
-  **Skipping retired entries was the other repair and it is the silent one** — all three sections
-  would have looped over nothing and printed like a clean run.
-- **§6 — ONE MEASUREMENT WENT DORMANT RATHER THAN WRONG, AND IT SAYS SO.** `check_es` §1 measures
-  that the offer is flat across zone slots; with the pool empty it reads **100% / 100% / 100%** and
-  is flat BY CONSTRUCTION, so the arm passes and *cannot fail*. **A vacuous check prints exactly
-  like a clean one**, so it prints DORMANT beside the reading and wakes with the first authored rune.
-- **§7 — THE GATE.** `check_et` is new at **23 checks** and carries one ruling that can decay in
-  three directions, two of them silently. It reads only `Runes`, the data and `Run`'s own doors, so
-  it trips neither `check_da` §3 fingerprint and needs **no exemption** — confirmed live before the
-  battery at **`check_da` 41 / 0, 0 hand-rolled walks, 1 exempt**.
-- **WHAT A RUN IS LIKE MEANWHILE: SPARSE, NOT BROKEN, AND THE DISTINCTION IS MEASURED.** 30 complete
-  sim runs on the retired pool: **30 of 30 completed, 0 wipes, depth 48.00 of 49**, `ratio@z1t8`
-  1.228. The Peddler still offers **16.03 runes a run** and the bot still buys **8.23**; the elite
-  cache still awards. **Every one is a generated stat stick.** The visible consequences are that a
-  rune-shaped clause reads zero where it used to read something — the run report's Faith-by-source
-  line now shows *"Binding Oath 0.00 | opening rune 0.00"* — and that the three slots fill with stat
-  sticks. **Nothing reads as broken.**
-- **WHAT MOVED: ONE DATA FILE, TWO SUITES, ONE GATE, ONE NEW GATE, THE BATTERY AND SEVEN
-  DOCUMENTS.** `data/runes.json` (53 added lines, nothing else); `test_runes`; the new `check_et` and
-  a re-pointed `check_es`; `run_battery.sh`; `docs/master.html`, `docs/changelog.html`,
-  `docs/design-notes.md`, `CLAUDE.md`, `baselines.json`, `pin-manifest.json`, this file and
-  `docs/reports/ET.md`. **NO SOURCE FILE IN `scripts/` WAS TOUCHED AT ALL** — the retirement needed
-  no code, because `is_retired` and its single door were already the shape EO built at §3.
-- **Next letter: EU.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EU — LOYALTY CONVERTS AT 8.** **The conversion ER ruled is built and the split
+  point is 8.** Below it nothing moved; above it a Loyalty stack **stops adding to the companion's
+  strike step and feeds the Pack Bond boon instead** — the companion stops hitting harder and its
+  presence changes the fight. **Nothing is capped, nothing is slowed, and the accrual is not
+  touched:** a converted stack is paid in full, into the other half. Full working:
+  **`docs/reports/EU.md`**. The mechanic's own summary is in **THE LOYALTY CURVE** below; what
+  follows here is only what the batch MOVED.
+- **§1 — `BOND_CONVERT := 8`, and it is the only magnitude the batch chose.** It sits beside
+  `BOND_STEP`; `_bond_convert()` is the one place the split is decided and takes the hunter so a
+  later rune moves ONE line rather than five call sites and their suites — `focus_convert()`'s
+  shape exactly. `_bond_paid` / `_bond_converted` are the two halves. **`check_eu` §0 asserts that
+  exactly ONE line in the file reads the constant**, which is the property that keeps a later
+  split-point move from leaving a payout site behind.
+- **§2 — FIVE PAYOUT SITES CONVERT AND FOUR RAW-STACK READERS DO NOT, AND THE BRIEF'S OWN SOURCE
+  TABLE WAS ONE SHORT.** ER §1d lists the payout readers and **omits `_bot_boon_worth`**, which
+  recomputes `_bond_mult`'s curve so the bot can price a swap it has not made. EQ §1's census has
+  it. Left behind it would have made the bot under-value exactly the deep bonds the conversion pays
+  most for — **and it would have drifted silently, because nothing compares the two functions.**
+- **§3 — IT IS VISIBLE, AND THE CHIP'S OWN NUMBER MOVED WITH IT.** The Loyalty chip names the point
+  **at every depth** (below as well as above) and counts the converted stacks once there are any.
+  **Its strike figure now reads the paid half** — a chip still multiplying by the whole meter would
+  have printed a bonus the blow does not have, which is worse than a silent phase because it is a
+  visible number the game disagrees with.
+- **§4 — A NEW GATE, LIVE THROUGHOUT, AND FIVE CONTROLS THAT ALL BIT.** `check_eu` drives the split
+  through a real battle and **measures real companion blows** rather than the multiplier that feeds
+  them. Controls: the strike step un-converted (2 red), the boon not receiving (1), Unleash
+  re-pointed at `_bond_paid` (1), the chip silenced (2), the point moved 8 → 9 (3). Every restore
+  was by `cp` from a scratchpad backup, md5 verified identical, never `git checkout`.
+  **`check_eu`'s own damage instrument was wrong twice and both are recorded in the file** — see
+  the report §6b; the second read 1.0315 with the strike step provably flat.
+- **THE BATTERY: `check_de` read 370 checks / 0 failures / 0 NOTICES**, the `Parse Error` grep is
+  clean across all 90 streams, and **the only red in the run is `check_cm_live` at 13 / 4 — its four
+  FAIL lines read and confirmed to be the defensive-bar assertions its row names.** `check_parse`
+  164, `check_eu` 38, `test_batch_ay` 486, harness 22 / 166 / 8. **TWO BASELINE ROWS MOVED AND BOTH
+  WERE WRITTEN BEFORE THE RUN.**
+- **AND THE FIRST BATTERY WAS DISCARDED: TWO RAN AT ONCE.** `pkill -f run_battery.sh` matched the
+  backgrounded WRAPPER and reported an exit code, so the kill looked successful while the real
+  script survived on PPID 1; Godot was re-checked and the script was not. **`sort .ran | uniq -d`
+  held 17 duplicate names.** Report §6d. The rule now is to confirm BOTH `pgrep -f run_battery.sh`
+  at 0 and `ps aux | grep '[G]odot'` at 0 before relaunching, and never to remove the lock by hand.
+- **WHAT MOVED: TWO SOURCE FILES, ONE SUITE, ONE NEW GATE, THE BATTERY AND SEVEN DOCUMENTS.**
+  `scripts/battle.gd` (the constant, three helpers, five read sites, the chip and two comments) and
+  `scripts/classes.gd` (the Pack Bond passive text); `test_batch_ay` **re-pointed in place with its
+  count unmoved**; the new `check_eu`; `run_battery.sh`; `docs/master.html`, `docs/changelog.html`,
+  `docs/design-notes.md`, `data/glossary.json`, `CLAUDE.md`, `baselines.json`, `pin-manifest.json`,
+  this file and `docs/reports/EU.md`. **NO RUNE, NO NODE, NO CAP AND NO RATE MOVED.**
+- **Next letter: EV.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
   when the pool was retired. **The rune layer is now MACHINERY WITH NO CONTENT**: scope, cost
   recognition, the power arm, the collision rule and ES's tag-reading helpers all stand and are all
   asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
-  is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED (a
-  conversion) and its CURRENCY is the open half. And the ladder still has an open design question of
-  its own (what rung 2 should ASK).**
+  is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED AND BUILT
+  (it converts at 8, EU), and what is left of it is the RUNE that moves the point — which is
+  authoring and waits on the pool. And the ladder still has an open design question of its own
+  (what rung 2 should ASK).**
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
@@ -369,43 +327,63 @@ refresh that also moves the definitions cannot be compared with what it replaced
   two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
   what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
   problem at all is still unruled**, and DR's framework says it is not by itself.
-### THE LOYALTY CURVE — **RULED AT ER: IT CONVERTS. THE CURRENCY IS THE OPEN HALF.**
+### THE LOYALTY CURVE — **BUILT AT EU. IT CONVERTS AT 8. THE OPEN HALF IS THE RUNE.**
 
-**Full evidence: `docs/reports/ER.md` §1 (the ruling priced and four currencies) and
-`docs/reports/EQ.md` §1/§2 (the read-site census and the six shapes).** The designer has ruled that
-Loyalty does **not** flatten: above nominal the meter **CONVERTS**, on Focus's shape. **The rule is
-in `CLAUDE.md`. Nothing is built and the currency is not chosen.**
+**Full evidence: `docs/reports/EU.md` (the build, the measurements and the census), with
+`docs/reports/ER.md` §1 (the ruling priced) and `docs/reports/EQ.md` §1/§2 (the read-site census
+and the six shapes) behind it.** **The rule is in `CLAUDE.md`, `check_eu` is the gate, and the
+figures live in the EU report — do not quote a number from this file.**
 
-- **THE FOUR FLATTENING SHAPES ARE OFF THE TABLE BY NAME** — diminishing above nominal, a soft cap,
-  a hard cap at twice nominal, a hard cap AT nominal. A later batch proposing one is proposing to
-  overturn a ruling.
-- **THE RULING'S OWN ARGUMENT IS PRICED RATHER THAN ACCEPTED, AND ITS LOSS COLUMN IS NOT ZERO.**
-  See the WHERE block: Focus's zero rests on **saturation** and an **untouchable rate**, and Loyalty
-  has neither. Measured at the read site, converting at nominal costs the companion strike step
-  **20.35% pooled / 15.50 ±0.27% per battle** at rows 1–3, and **each converted stack must return
-  about 6.4% of a companion blow** for the loss to be zero.
-- **THE RULE FOR WHOEVER BUILDS IT: MOVE THE SPLIT POINT, NEVER THE RATE.** That is the half of
-  Deep Focus's precedent that transfers. A node or rune that steepens the converted half re-creates
-  the over-arrival on the far side of the split.
-- **NOMINAL IS NOT A LIVE NUMBER TODAY AND A CONVERSION MAKES IT ONE.** The 5 is a literal in
-  `battle.CY_METERS`, the only one of that table's four denominators that is not a live constant. A
-  conversion needs a **`BOND_CONVERT` beside `BOND_STEP`** — `FOCUS_CONVERT`'s exact counterpart.
-- **WHAT IT DOES NOT BREAK, AND THIS IS ITS BEST PROPERTY.** The accrual is untouched, so **Kindred
-  at 8, Lone Bond at 6 and None Left Behind at 5 all keep firing**, and **Unleash, Primal Surge,
-  Last Howl and Bring It Down pay exactly what they pay today** — all four read the raw stack count.
-  **Wild Rotation's cap of 3 remains the only ceiling in the system.**
-- **WHAT IT DOES CHANGE, AND THE BUILDER OWES THE SENTENCE.** `BOND_MITIGATION_MAX` 0.75 and the
-  taunt clamp of 1.0 both read `_bond_mult`. **Capping that half at nominal puts both out of reach
-  at every talent depth** (0.48 against 0.75, 0.72 against 1.0, at the deepest live step of 0.76 a
-  stack), which by AR §4's rule makes them dead constants. **Feeding that half instead makes both
-  bind harder.** One or the other happens; say which.
-- **THE FOUR CURRENCIES ARE IN `docs/reports/ER.md` §1e** with their read sites, build costs and
-  what each costs. **Two meet a decision already written into the code** — Break meets
-  `UNLEASH_BREAK`'s refusal of a per-stack Break term on this meter, and companion durability pays
-  into the meter's only governor. **The boon's own growth is the only one needing no new field and
-  no new read site.** **The report recommends it and authors nothing.**
-- **THE TEXT COST IS SMALLER THAN ANY FLATTENING'S**, because the meter stays uncapped: the nine
-  surfaces need the second phase NAMED, not the *"no ceiling"* promise retracted.
+- **THE SHAPE, IN ONE LINE.** `BOND_CONVERT := 8` beside `BOND_STEP`. **The first 8 stacks buy the
+  companion's strike step; every stack past 8 stops adding to it and feeds the Pack Bond boon
+  instead**, so the boon climbs at double its step above the point. `_bond_convert()` is the one
+  place the split is decided (`focus_convert()`'s counterpart, taking the hunter so a later rune
+  moves one line); `_bond_paid` and `_bond_converted` are its two halves, and they are disjoint and
+  sum to the whole meter.
+- **BELOW THE POINT NOTHING MOVED, AND THAT IS ASSERTED RATHER THAN CLAIMED.** `test_batch_ay`'s
+  x2.0-at-five arm is unchanged and is the arm that proves it.
+- **WHY 8 AND NOT THE NOMINAL 5 — THE ONE MAGNITUDE THIS BATCH CHOSE.** Loyalty arrives at
+  10.08 ±0.12 at a first-clear loadout and 6.64 ±0.09 untalented (ER §6). A split at 5 converts
+  most of a typical meter; **a split at 8 bites only the tail that over-arrives.** **And 8 is
+  Kindred's own threshold**, so no lower point could put a row-8 node on the far side of a phase
+  change the player never chose.
+- **THE RATE NEVER MOVED.** `BOND_STEP` 0.20, the strike step 0.05, Wild Communion, Absolute
+  Devotion and Ancient Pact are all untouched. That is `CLAUDE.md`'s standing rule — move the
+  point, never the rate — and `check_eu` §0 asserts both rates at their source.
+- **THE ACCRUAL IS UNTOUCHED, WHICH IS THE PROPERTY THE SHAPE WAS RULED FOR.** Nothing is written
+  into `_gain_loyalty` or `_loyalty_cap`, so **Kindred still fires at 8, Lone Bond still seats at 6,
+  None Left Behind still seats at 5, Wild Rotation's cap of 3 is still the only ceiling** — and
+  **Unleash, Primal Surge, Last Howl and Bring It Down pay exactly what they paid before EU**,
+  because all four COUNT stacks and the split changes what a stack PAYS. `check_eu` §2 CASTS all
+  four on a live board rather than reading them, because a converted Unleash still fires, still
+  logs, still empties the meter and simply pays less.
+- **FIVE PAYOUT SITES CONVERT, AND ER'S OWN TABLE LISTED FOUR.** `_comp_dmg_mult` and
+  `_ghost_hit`'s strike step read the paid half; `_bond_mult` receives, carrying Ursus's
+  mitigation, Canis's wounded bonus, Savage Presence's taunt and Aguila's party crit with it.
+  **`_bot_boon_worth` is the fifth** — it recomputes the same curve so the bot can price a swap —
+  **and ER §1d omits it** (EQ §1's census has it). Left behind, it would have made the bot
+  under-value exactly the deep bonds the conversion pays most for.
+- **TWO FUNCTIONS HOLD BOTH KINDS OF READ IN ONE VARIABLE, AND THAT IS THE SHAPE TO LOOK FOR NEXT
+  TIME.** `_ghost_hit` pays its strike step off the paid half while Aguila's armor pierce beside it
+  reads the whole meter; `_companion_strike` likewise for Canis's Bleed. **The read site is the
+  line, not the function.**
+- **THE CLAMPS BIND HARDER, AND THAT SENTENCE WAS OWED.** `BOND_MITIGATION_MAX` 0.75 and Savage
+  Presence's taunt clamp of 1.0 both read `_bond_mult`, and EU feeds it. **Neither becomes a dead
+  constant**, which is what capping that half at nominal would have done. Binding rates before and
+  after, at three loadouts, are in the EU report.
+- **THE TEXT COST WAS SMALLER THAN ANY FLATTENING'S, EXACTLY AS ER PREDICTED**, because the meter
+  stays uncapped: the surfaces needed the second phase NAMED, not the *"no ceiling"* promise
+  retracted. Chip, status tooltip, Pack Bond passive text, `master.html`'s Beastmaster block and
+  chip row, and both glossary entries.
+- **`CY_METERS`' 5 WAS DELIBERATELY NOT REPOINTED AT `BOND_CONVERT`.** It means *where the boon
+  reads x2*, which is still true and is the denominator every arrival figure from EQ, ER and EU is
+  quoted against. The two numbers answer different questions and the header there now says so.
+- **WHAT IS STILL OPEN: THE RUNE THAT MOVES THE POINT.** ER §2 established that the item a
+  re-authored Deep Bond would be is `Rune of the Deep Sight`'s exact shape and that its direction
+  was undecidable until the currency was chosen. **The currency is chosen now**, so the table in
+  ER §2c resolves: the converted half is worth MORE than the strike step at depth, so a Deep Bond
+  moves the point DOWN — Deep Focus's exact shape. **EU authors no rune** (ET §1 retired the pool
+  and rune content is written with the designer), and `_bond_convert`'s signature is the slot.
 
 ### THE FOUR RUNE ITEMS — **THE THREE RE-AUTHORS ARE MOOT AT ET §1. THE MEASUREMENTS ARE KEPT.**
 
@@ -1755,13 +1733,19 @@ the number.*
   (EP found it four batches out, EQ recorded its own as one file stale). **`claude_md_census.py`
   prints both for any commit and reads `git ls-files`**, so a new file is outside the number until it
   is staged — which is exactly why a copy written into this file is wrong the moment the batch that
-  wrote it adds its own report. **Run the census; do not quote a number from here.** ES adds two
-  files (`check_es.gd`, `docs/reports/ES.md`) and deletes none.
-- Heaviest, **re-measured at EP**: `scripts/battle.gd` **1233.25**, `docs/design-notes.md`
-  **442.63**, `docs/master.html` **352.49**, `scripts/classes.gd` **339.15**,
-  **`pin-manifest.json` 303.89**, `docs/changelog.html` **294.71**, `CLAUDE.md` **217.17**,
-  `scripts/unit.gd` **183.17**, `scripts/talents.gd` **178.66**, `docs/talent-audit.html`
-  **165.03**, `scripts/run_state.gd` **139.90**, `docs/state.md` **136.09**.
+  wrote it adds its own report. **Run the census; do not quote a number from here.** **EU adds
+  two files (`check_eu.gd`, `docs/reports/EU.md`) and deletes none**, and the working tree reads
+  **194 files / 8.8757 MiB** with both of them in it.
+- Heaviest, **re-measured at EU with this batch's own two files in the tree**:
+  `scripts/battle.gd` **1241.20**, `docs/design-notes.md` **462.52**, `docs/master.html`
+  **362.05**, `scripts/classes.gd` **341.94**, `docs/changelog.html` **340.17**,
+  **`pin-manifest.json` 305.35**, `CLAUDE.md` **235.11**, `scripts/unit.gd` **183.17**,
+  `scripts/talents.gd` **178.66**, `docs/talent-audit.html` **165.03**, `docs/state.md`
+  **163.18**, `scripts/run_state.gd` **141.35**.
+  **THE CHANGELOG HAS PASSED `pin-manifest.json` AND IS NOW FIFTH**, one place behind
+  `scripts/classes.gd` (341.94) rather than ahead of it. At 340.17 KiB **CW's 400 KiB threshold is
+  roughly eight batches away, not thirteen** — EP estimated thirteen against a 294.71 reading, and
+  the file has grown about 7.6 KiB a batch over the four batches since.
   **`CLAUDE.md` IS NO LONGER IN THE TOP FIVE**, which is what the split was for.
   **AND THIS BLOCK'S FIGURES WERE FOUR BATCHES STALE WHEN EP ARRIVED** — it recorded `CLAUDE.md`
   at 191.68 KiB against a live 217.17, and the changelog at 261.60 against 294.71. **CW's 400 KiB
@@ -1771,8 +1755,9 @@ the number.*
   away.
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
   measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF took that
-  split.** **RE-MEASURED AT EP IT READS 217.17 KiB, which is 72.83 KiB of headroom — about
-  sixteen batches at +4,520 B/batch. THIS LINE HAD SAID 191.69 SINCE EK AND WAS 22 KiB STALE.**
+  split.** **RE-MEASURED AT EU IT READS 235.11 KiB, which is 54.89 KiB of headroom — about
+  twelve batches at the +4,520 B/batch EP measured. EP read 217.17 and the four batches since have
+  added ~17.9 KiB, which is close to that rate rather than an excursion.**
   **EP's BATCH ADDED NO RULE; THE DESIGNER'S RULINGS AFTERWARDS ADDED TWO, +3,529 B (3.45 KiB)** —
   the rung-lever rule and the Scarred-rune refund rule, both of which settle with no implementation
   and would have been lost from this file's next rewrite. **EK grew it by 3,713 B (3.63 KiB)**, which is one
