@@ -14,6 +14,97 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-03 &mdash; Batch ET: THE RUNE POOL IS RETIRED</h2>
+<p><i><b>All 53 offerable runes are retired. The generated stat family survives. Nothing is
+authored.</b> Retired the way the twelve already are &mdash; <b>kept, and said to be kept</b>:
+every entry keeps its name, price, payload, desc, lane and scope, still resolves, and gains a
+string naming what is lost. <b>The whole data diff is 53 added lines &mdash; zero deletions, and
+not one payload, price, desc, lane or scope moved.</b> Full working:
+<code>docs/reports/ET.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; WHY, RECORDED WITH THE RULING SO IT IS NEVER RECONSTRUCTED WRONGLY.</b> The
+pool was authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent
+counters, which were rebuilt at DO and DP; and re-keyed onto rune-owned fields at EM. <b>What
+survived all of that was the magnitudes, and the magnitudes were never the interesting part.</b> A
+pool authored to the real charter &mdash; threshold-gated, reading archetype tags on the holder's
+drafted cards &mdash; will be better than 53 patched ones. <b>EO's twelve keep their existing
+strings unrewritten</b>, and the pool is now uniformly retired in two passes rather than by two
+decisions.</p>
+
+<p><b>&sect;1b &mdash; THE FOUR LOSSES THAT ARE NOT CLAUSES, AND THE BRIEF'S GROUPING OF THEM WAS
+WRONG IN BOTH DIRECTIONS.</b> Derived live through <code>Run.draft_pool_left</code> and
+<code>Classes.protected_names</code> rather than read:</p>
+<ul>
+<li><b>Rune of the Comet is the largest single loss in the batch and the brief does not name
+it.</b> COMET is defined <i>inline</i> in the entry's <code>new_ability</code> payload and exists
+in no draft pool, no boss pool, no talent tree and no protected core. <b>It is the only ability in
+the game reachable ONLY through a rune</b>, so this retirement removes an ability outright &mdash;
+and the entry is the only copy of its definition, which is why it is kept rather than deleted.
+<code>check_et</code> &sect;4 pins that population at exactly one.</li>
+<li><b>Rune of Binding Souls is the only genuine out-of-pool grant</b>, and only for two of its
+three buyers: Sacred Resolve is the Devout's own draft and boss card, so for him it collides and
+pays Quickened. For the Holy Cleric and the Occultist it was the only route to it.</li>
+<li><b>Rune of the Flayed Mind was NOT an out-of-pool grant at all.</b> Mind Flay sits in the
+Occultist's <i>own</i> spec draft pool and his own boss pool since DO, and he is the only hero who
+can buy the rune &mdash; so it was a 160g shortcut past the draft, and when he had drafted the card
+it collided and paid Honed. What is lost is the shortcut.</li>
+<li><b>Rune of the Last Rites could never grant.</b> Resurrection is the Holy Cleric's PROTECTED
+CORE, so the payload <i>always</i> collided and always paid Quickened &mdash; which is why its
+<code>desc</code> is the one honest "she already knows it" wording in the pool.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; THE GENERATED STAT FAMILY SURVIVES, UNCHANGED, AND IS NOW THE WHOLE
+POOL.</b> +10 max HP / +2% armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g
+&mdash; no magnitude moved and no price was chosen. <b>Every fallback in the rune layer is now
+load-bearing on the first Peddler of every run</b>, so it is DRIVEN rather than read: 540 draws
+through five doors (the Peddler, the elite cache's single draw, its pick-of-three without
+replacement, the grant door, and the exhaustion floor at a full pouch) across all twelve specs.
+<b>None came back empty, none nameless, none with an empty payload, and not one retired entry
+reached a live offer.</b> <b>The exhaustion floor is reached far earlier than it ever was</b>: a
+hero draws <b>5 distinct runes (6 outside the Warrior class)</b> before the pool repeats, where the
+same hero reached <b>15&ndash;18</b> before ET.</p>
+
+<p><b>&sect;3 &mdash; RETIRED IS NOT DELETED, AND THAT IS THE LOAD-BEARING FACT.</b>
+<code>test_rune_battle</code> walks <code>Runes.ids()</code> rather than the offer pool and still
+reads <b>97 / 0</b> with every entry retired &mdash; every rune still does exactly what it did.
+<b>The pool is unofferable, not broken.</b> <code>check_et</code> &sect;3 drives all 65 through
+<code>config</code>, <code>build</code> and <code>display_name</code>, applies a payload to a live
+config, and resolves every ability grant.</p>
+
+<p><b>&sect;4 &mdash; THE TRAP THIS SETS FOR THE NEXT BATCH, PINNED AS A RATCHET.</b> <b>72 of the
+84 stat fields the retired pool writes have <code>data/runes.json</code> as their only writer in
+the project</b>, so their branches in <code>battle.gd</code> can no longer fire &mdash; and a
+branch that cannot fire is indistinguishable from dead code to every instrument here. <b>Deleting
+one is deleting a mechanic the pool is meant to come back to.</b> <code>check_et</code> &sect;5
+pins the population asymmetrically: it may grow, and it may not shrink without a line changing
+there.</p>
+
+<p><b>&sect;5 &mdash; THREE ASSERTIONS THAT THE POOL IS NON-EMPTY BECAME STATEMENTS OF THIS RULING,
+AND ALL THREE WERE MADE TWO-ARMED RATHER THAN DELETED.</b> <code>test_runes._rich_grant</code>
+asserted <i>"the retirement left its own set empty"</i> on all twelve specs;
+<code>test_runes._start_rune_pool</code> asserted a 20&ndash;70% band on spec runes in a cache
+triple; <code>check_es</code> &sect;2 asserted the five universals still roll for all twelve.
+<b>Each now derives its arm from the pool and comes back on its own the day a rune is
+authored.</b> <code>check_es</code> &sect;2 came back <i>wider</i> than it was: every entry a spec
+cannot draw must be undrawable BECAUSE IT IS RETIRED, across all 65 rather than the five &mdash; so
+a retirement wearing an eligibility rule still goes red. <b>And
+<code>test_runes._reachable</code> was re-pointed from offerability onto SCOPE</b>, because
+"does this rune name an ability its hero can hold" is a question about the authored entry; skipping
+retired entries would have left it looping over nothing and printing like a clean run.</p>
+
+<p><b>&sect;6 &mdash; ONE MEASUREMENT WENT DORMANT RATHER THAN WRONG, AND IT SAYS SO.</b>
+<code>check_es</code> &sect;1 measures that the offer is flat across zone slots; with the pool empty
+it is 100% at every slot BY CONSTRUCTION, so the arm passes and <i>cannot fail</i>. <b>A vacuous
+check prints exactly like a clean one</b>, so it prints DORMANT beside the reading and wakes on its
+own with the first authored rune.</p>
+
+<p><b>&sect;7 &mdash; WHAT IS DELIBERATELY NOT DONE.</b> <b>Not one rune is authored, sketched or
+reserved</b> &mdash; rune content is written with the designer, one rune at a time. <b>No price is
+chosen</b>: flat pricing is ruled, the number is not, and with the pool empty there is nothing to
+price. <b>ES's tag-reading machinery is untouched and still reads nothing.</b> <b>And ER's three
+Beastmaster re-authors are MOOT</b> &mdash; the Deep Bond, the Turning Pack and the Shared Wild are
+retired here, so the queue no longer carries them as owed.</p>
+
 <h2>2026-09-03 &mdash; Batch ES: THE RUNE LAYER'S NEW SHAPE</h2>
 <p><i><b>Structure only. Not one rune is authored, re-authored or retuned</b> &mdash; every
 <code>payload</code>, <code>price</code> and <code>desc</code> in <code>data/runes.json</code> is

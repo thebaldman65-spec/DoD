@@ -180,6 +180,17 @@ func _s1_rarity_is_gone() -> void:
 	# lever rather than noise; the OLD weights spread these by 29 points.
 	ok(hi - lo < 4.5,
 		"§1: the offer is not flat — the stat-stick share spans %.1f points across three zone slots" % (hi - lo))
+	# **BATCH ET §2 — AND THE ARM SAYS SO WHEN IT CANNOT FAIL.** With ET §1
+	# retiring every authored entry, the generated family is the whole pool and
+	# the share is 100% at every slot BY CONSTRUCTION — so the flatness above is
+	# arithmetic rather than evidence, and a re-invented tier could not show in
+	# it. **A vacuous check prints exactly like a clean one**, so this one
+	# prints which of the two it is. It wakes on its own the day a rune is
+	# authored; nothing here has to be remembered or re-edited.
+	if is_equal_approx(float(shares[0]), 100.0) and is_equal_approx(hi - lo, 0.0):
+		print("    ^ DORMANT: the authored pool is empty (ET §1), so this is 100%"
+			+ " by construction and the flatness arm cannot fail. It wakes with"
+			+ " the first authored rune.")
 	# AND THE ZONE ARGUMENT IS INERT RATHER THAN ABSENT, which is the claim the
 	# signature makes. A parameter that had quietly started being read again
 	# would show as a spread above and as a non-empty body here.
@@ -235,6 +246,26 @@ func _s2_scope_is_the_axis() -> void:
 	universals.sort()
 	ok(universals.size() == int(bands["universal"]),
 		"§2: the universal count disagrees with itself")
+	# **BATCH ET §1 SUPERSEDED THE RULING THIS ARM WAS WRITTEN FOR, AND THE
+	# ALARM IT WAS REALLY MAKING IS KEPT RATHER THAN DELETED.**
+	#
+	# ES §2 ruled the five universals were RE-SCOPED and NOT retired, so this
+	# required all five to roll for all twelve specs. **ET §1 retires all 53
+	# offerable entries, the five included**, and against that ruling the old
+	# form fired sixty times and would have had to be deleted to get green.
+	#
+	# **WHAT ES §2 WAS ACTUALLY GUARDING WAS NARROWER THAN THE FORM IT TOOK: a
+	# STEALTH retirement through an ELIGIBILITY RULE.** A rune made undrawable
+	# by a scope that stops resolving, a class key that names nothing, or a
+	# filter that quietly excludes it is a retirement nobody wrote down and
+	# nobody can find. **A DECLARED retirement is the opposite of that** — it is
+	# a string in the entry saying what is lost, which is the whole of ET.
+	#
+	# So the arm asks the question that survives both rulings: **every entry a
+	# spec cannot draw must be undrawable BECAUSE IT IS RETIRED.** One that
+	# falls out of `eligible_ids` for any other reason still fires, on the five
+	# and on all sixty-five — which is a WIDER population than ES §2 watched,
+	# not a narrower one. The day a rune is authored it is covered on arrival.
 	var unreachable: Array = []
 	var specs_walked := 0
 	for ckey in Classes.SPEC_IDS:
@@ -244,11 +275,33 @@ func _s2_scope_is_the_axis() -> void:
 				"bm_abilities": []}
 			var ids: Array = Runes.eligible_ids(mine, [])
 			for u in universals:
-				if not ids.has(u):
+				if not ids.has(u) and not Runes.is_retired(u):
 					unreachable.append("%s/%s" % [spec, u])
 	ok(specs_walked == 12, "§2: walked %d specs, expected 12" % specs_walked)
 	ok(unreachable.is_empty(),
-		"§2: ES §2 rules the five are RE-SCOPED and NOT retired — %s cannot be drawn" % [unreachable])
+		"§2: %s are undrawable and carry no `retired` string — a retirement wearing an eligibility rule" % [unreachable])
+
+	# AND THE SAME QUESTION OVER THE WHOLE FILE, WHICH IS THE HALF ES §2 COULD
+	# NOT ASK WHILE ONLY TWELVE ENTRIES WERE RETIRED. Every entry in scope for a
+	# spec is either drawable or carries its own retirement string; nothing is
+	# silently absent from the pool.
+	var silent: Array = []
+	for ckey3 in Classes.SPEC_IDS:
+		for spec3 in Classes.SPEC_IDS[ckey3]:
+			var mine3 := {"key": String(ckey3), "spec": String(spec3), "runes": [],
+				"bm_abilities": []}
+			var ids3: Array = Runes.eligible_ids(mine3, [])
+			for id4 in data:
+				var e4: Dictionary = data[id4]
+				if not _in_scope(String(e4.get("scope", "universal")),
+						String(ckey3), String(spec3)):
+					continue
+				if String(e4.get("requires_ability", "")) != "":
+					continue
+				if not ids3.has(String(id4)) and not Runes.is_retired(String(id4)):
+					silent.append("%s/%s" % [spec3, id4])
+	ok(silent.is_empty(),
+		"§2: %s are in scope for a spec, are not offered, and say nothing about why" % [silent])
 
 	# THE DEPTH TABLE THE DECISION NEEDS, PRINTED. It is a report and not an
 	# assertion, because how thin a pool may get is a ruling nobody has made.
@@ -272,6 +325,15 @@ func _s2_scope_is_the_axis() -> void:
 					s2 += 1
 			print("      %-15s %-6d %-10d %-6d %d" % [spec2, ids2.size(), u2, c2, s2])
 
+
+# Does this scope string admit this class/spec pair? The same three cases
+# `Runes._scope_ok` reads, without needing a member dict to ask.
+func _in_scope(scope: String, class_key: String, spec: String) -> bool:
+	if scope.begins_with("class:"):
+		return scope.trim_prefix("class:") == class_key
+	if scope.begins_with("spec:"):
+		return scope.trim_prefix("spec:") == spec
+	return scope == "universal"
 
 # ── §3 — THE LABEL WENT AND THE COSTS STAYED ────────────────────────────────
 #

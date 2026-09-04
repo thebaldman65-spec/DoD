@@ -157,17 +157,39 @@ func _requires_ability(data: Dictionary) -> void:
 		ok(req == String(pay["ability"]),
 			"%s: requires_ability '%s' != the ability it alters '%s'" % [
 				id, req, pay["ability"]])
-		# And SOME hero this rune can roll for must actually own it.
+		# And SOME hero this rune is WRITTEN FOR must actually own it.
 		ok(_reachable(e, req),
-			"%s: requires_ability '%s' is in no eligible hero's derivable kit" % [id, req])
+			"%s: requires_ability '%s' is in no in-scope hero's derivable kit" % [id, req])
 
 
+# **BATCH ET §2 — THIS ASKS ABOUT SCOPE NOW, NOT ABOUT OFFERABILITY, AND THE
+# DISTINCTION IS THE SAME ONE `test_rune_battle` MAKES.**
+#
+# It used to skip any hero who could not currently ROLL the rune, so with the
+# whole pool retired at ET every `requires_ability` entry read as unreachable
+# and nine of them failed — not because the authoring is wrong but because
+# nothing is offered. **The question this section asks is about the AUTHORED
+# ENTRY**: a rune whose payload names an ability no hero it is written for can
+# ever hold applies silently and does nothing, and that is a defect whether or
+# not the rune is currently in the offer pool. WHETHER it is offered is
+# `_eligibility`'s question and is asserted there in BOTH directions.
+#
+# **THE REPAIR IS DELIBERATELY NOT AN EXEMPTION.** Skipping retired entries
+# would have been the smaller diff and the silent one: it would have left this
+# section looping over nothing and printing like a clean run, which is the
+# shape EO's own comment in `test_rune_battle` warns about one file over.
+# Scope is read off the entry the same way `_scope_ok` reads it, so the check
+# survives a retirement, survives a re-scope, and still fires the day a rune
+# names an ability its class cannot reach.
 func _reachable(entry: Dictionary, ability_name: String) -> bool:
+	var scope := String(entry.get("scope", "universal"))
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
-			var member := {"key": key, "spec": spec, "runes": []}
-			if not Runes.eligible_ids(member, []).has(_id_of(entry)):
+			if scope.begins_with("class:") and scope.trim_prefix("class:") != String(key):
 				continue
+			if scope.begins_with("spec:") and scope.trim_prefix("spec:") != String(spec):
+				continue
+			var member := {"key": key, "spec": spec, "runes": []}
 			if Runes.kit_names(member).has(ability_name):
 				return true
 	return false
@@ -817,10 +839,26 @@ func _start_rune_pool(run: Node) -> void:
 						with_spec += 1
 						break
 	var rate := 100.0 * with_spec / maxf(float(trials), 1.0)
-	# Deliberately a WIDE band: this is a drift alarm on the pool, not a
-	# balance assertion. The measured sim figure sits near the middle of it.
-	ok(rate > 20.0 and rate < 70.0,
-		"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
+	# **BATCH ET §2 — TWO-ARMED, AND THE ARM IS CHOSEN BY THE POOL RATHER THAN
+	# BY THIS FILE'S MEMORY.** The 20-70 band is a drift alarm on the eligible
+	# pool and it is the right alarm whenever there IS one; with every entry
+	# retired at ET the rate is 0 by ruling, and a band that cannot be met is
+	# not an alarm. So the arm is derived: if no spec rune is eligible for any
+	# spec the rate MUST be exactly zero — which is a real assertion, because a
+	# retired rune leaking into a cache triple is precisely what it would catch
+	# — and the day one is authored the band comes back with no edit here.
+	var any_spec_eligible := false
+	for key2 in Classes.SPEC_IDS:
+		for spec2 in Classes.SPEC_IDS[key2]:
+			for rid in Runes.eligible_ids({"key": key2, "spec": spec2, "runes": []}, []):
+				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec2:
+					any_spec_eligible = true
+	if any_spec_eligible:
+		ok(rate > 20.0 and rate < 70.0,
+			"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
+	else:
+		ok(is_zero_approx(rate),
+			"no spec rune is eligible for any spec (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)
 	print("  (Batch AE report-back, re-pointed at the elite cache by CD: a spec-scoped rune is among the three %.0f%% of the time)" % rate)
 	run.sim_run = had_sim
 
@@ -879,7 +917,24 @@ func _rich_grant(run: Node) -> void:
 			for rid in Runes.eligible_ids(member, []):
 				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec:
 					own += 1
-			ok(own > 0, "%s: the retirement left its own set empty" % spec)
+			# **BATCH ET §2 — TWO-ARMED, BECAUSE THE POOL BEING EMPTY IS NOW A
+			# RULING RATHER THAN A DEFECT.** This asserted `own > 0` — "the
+			# retirement left its own set empty" — which was the right alarm
+			# while EO's twelve were the only retirement and is a statement of
+			# ET's ruling now, so at ET it fired on all twelve specs. Deleting
+			# it would leave the loop below running zero times and the section
+			# printing like a clean run, which is the silent repair EO's own
+			# comment in `test_rune_battle` names. **The property is asserted in
+			# BOTH directions instead**: where a spec HAS surviving spec runes
+			# they must reach its hero without repeating, and where it has none
+			# the FALLBACK must be what answers — and the day a rune is authored
+			# for that spec, the first arm comes back on its own.
+			if own == 0:
+				var only: Dictionary = run.grant_rune(member)
+				ok(not only.is_empty(),
+					"%s: with no spec rune surviving, the grant returned nothing" % spec)
+				ok(String(only.get("scope", "")) != "spec:%s" % spec,
+					"%s: no spec rune is eligible, yet the grant returned one" % spec)
 			for i in own:
 				var rune: Dictionary = run.grant_rune(member)
 				ok(not rune.is_empty(), "%s: grant %d came back empty" % [spec, i])

@@ -1914,6 +1914,47 @@ what the cost is for.**
   common" and it is the one common in the file — **a rarity rule was hiding a cost.** The Warrior
   arithmetic above is unaffected: `exsanguination` is the Berserker's and `anchor` is universal.
 
+## STANDING RULE — THE OFFERABLE RUNE POOL IS RETIRED, AND A RETIREMENT IS DECLARED PER ENTRY (Batch ET §1, ruled by the designer)
+
+> **All 65 authored entries are retired. Nothing is offerable but the generated stat family.
+> A retired entry is KEPT and SAID to be kept: it keeps its name, price, payload and desc, it
+> still resolves, and it carries a string naming WHAT IS LOST.**
+
+**THE REASONING, RECORDED WITH THE RULING SO IT IS NEVER RECONSTRUCTED WRONGLY.** The pool was
+authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent counters, which
+were rebuilt at DO and DP; and re-keyed onto rune-owned fields at EM. **What survived all of that
+was the magnitudes, and the magnitudes were never the interesting part.** A pool authored to the
+real charter — threshold-gated, reading archetype tags on the holder's DRAFTED cards — will be
+better than 53 patched ones.
+
+· **A RETIREMENT WITH NO STRING IS A DELETION NOBODY WROTE DOWN.** `eligible_ids` reads the
+  `retired` key and nothing else, so a bare `"retired": "yes"` would empty the pool exactly as
+  effectively and record nothing. **The string is the only place the loss lives**, and it is what a
+  future author reads before re-covering that ground. `check_et` §1 asserts every entry carries one
+  naming its batch and its loss.
+· **THE TWO VINTAGES ARE ONE DECISION.** EO §3 retired twelve, ET §1 the other fifty-three, and
+  EO's twelve keep their existing strings unrewritten. A reader meeting a uniformly empty pool must
+  not mistake the two passes for two decisions.
+· **RETIRED IS NOT DELETED, AND KEPT CONTENT THAT NOTHING DRIVES IS CONTENT THAT ROTS.**
+  `test_rune_battle` walks `Runes.ids()` rather than the offer pool and still reads **97 / 0** with
+  every entry retired — the pool is unofferable, not broken. **Do not "simplify" a suite onto
+  `eligible_ids` to get a green file**; that is the silent repair, it is the smaller diff, and EO's
+  own comment in that suite names it.
+· **THE READ SITES ARE THE TRAP THIS SETS FOR THE NEXT BATCH.** **72 of the 84 stat fields the
+  retired pool writes have `data/runes.json` as their only writer in the project**, so their
+  branches in `battle.gd` can no longer fire — and a branch that cannot fire is indistinguishable
+  from dead code to every instrument here. **Deleting one is deleting a mechanic the pool is meant
+  to come back to.** `check_et` §5 pins the population as an asymmetric ratchet: it may grow, and it
+  may not shrink without a line changing there.
+· **AN ASSERTION THAT THE POOL IS NON-EMPTY IS NOW A STATEMENT OF THIS RULING, NOT AN ALARM.**
+  Three of them existed and all three were made TWO-ARMED rather than deleted — `test_runes`
+  `_rich_grant` and `_start_rune_pool`, and `check_es` §2. **Each comes back on its own the day a
+  rune is authored.** A one-armed repair reads green on the day the whole file stops rolling.
+· **AND ONE MEASUREMENT WENT DORMANT RATHER THAN WRONG.** `check_es` §1 measures that the offer is
+  flat across zone slots; with the pool empty it is 100% at every slot BY CONSTRUCTION and the arm
+  cannot fail. **It prints DORMANT rather than passing quietly** — a vacuous check prints exactly
+  like a clean one.
+
 ## STANDING RULE — RUNE CONTENT IS WRITTEN WITH THE DESIGNER, ONE RUNE AT A TIME (Batch ES, ruled by the designer)
 
 > **A batch may build machinery, re-scope, retire or repair. It never authors a rune, never
@@ -1939,7 +1980,8 @@ behaviour, and every rune goes on doing exactly what it did. It *drove the offer
 at zone 1 deepening to 25/45/30 by zone 3, **the only thing that made a late offer differ from an
 early one**, and measured on the live pool that put **half of every zone-1 offer** into the
 generated stat family against a fifth of every zone-3 offer; it is a flat **~30% at every slot**
-now. It *set the price* for the generated family; authored runes have always carried their own.
+now — and **100% at every slot since ET §1 retired the authored pool**. It *set the price* for the
+generated family; authored runes have always carried their own.
 
 · **PRICE IS THE OPEN QUESTION AND NO RULE WAS INVENTED FOR IT.** The 53 offerable runes carry
   prices of 50 / 75 / 100 / 120 / 160 written against a tier table that no longer exists. **That
@@ -1951,16 +1993,24 @@ now. It *set the price* for the generated family; authored runes have always car
   `_zone_slot`, asserted by `check_es` §1. It is the hook a later batch would want if a zone is
   ever allowed to change an offer again, and a parameter nothing reads cannot break the ruling.
 
-## STANDING RULE — A RUNE'S SCOPE IS SPEC AND CLASS; THE FIVE UNIVERSALS ARE RE-SCOPED, NOT RETIRED (Batch ES §2, ruled by the designer)
+## STANDING RULE — A RUNE'S SCOPE IS SPEC AND CLASS (Batch ES §2; the five universals' half SUPERSEDED at ET §1)
 
 > **Losing five authored, working runes to a scoping rule is waste. The class each of the five
 > lands on is CONTENT and is the designer's, and until it is made they stay universal.**
 
+**BATCH ET §1 SUPERSEDED THE SECOND SENTENCE AND LEFT THE FIRST STANDING.** The five are retired
+with the other forty-eight, so there is no class left to choose and the question leaves the queue.
+**The scope AXIS is untouched**: every entry still declares one, `_scope_ok` still resolves all
+three bands, and the shop row still shows the band — the next pool is authored against this rule.
+**`check_es` §2 was re-pointed rather than deleted**, and onto a wider population than it watched
+before: every entry a spec cannot draw must be undrawable BECAUSE IT IS RETIRED, so a retirement
+wearing an eligibility rule still goes red across all 65.
+
 **THE SIZE OF THE MOVE IS MEASURED: the five are 5 of every spec's 9–12 offerable runes** — 42% to
 56% of the drawable pool — so this is the largest single movement the rune pool has ever taken.
 Whichever class each lands on, the other three specs' pools lose it. **The Occultist is thinnest
-at 9 today.** `check_es` §2 asserts the five still roll for all twelve specs, so a stealth
-retirement through an eligibility rule goes red; it PRINTS the depth table and asserts no class.
+at 9 today.** **Those figures are ET's BEFORE reading and are kept as the record of what the pool
+was**; the depth table `check_es` §2 prints now reads zero across all twelve.
 
 · **TWO OF THE FIVE CHARGE FOR THEIR UPSIDE** (the Glass and Vampiric Runes), and EP measured that
   those two are what a Swordmaster falls back on if the Bared Guard is ever retired. **Re-scoping

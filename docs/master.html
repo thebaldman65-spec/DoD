@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-03 (Batch ES &mdash; the rune layer's new shape)</b></p>
+<p align="right"><b>Last updated: 2026-09-03 (Batch ET &mdash; the rune pool is retired)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2529,6 +2529,22 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
+<br><b>THE WHOLE OFFERABLE POOL IS RETIRED (Batch ET §1). ALL 65 AUTHORED ENTRIES NOW CARRY A
+RETIREMENT STRING, AND THE GENERATED STAT FAMILY IS THE ONLY THING AN OFFER CAN CONTAIN.</b>
+EO §3 retired twelve; ET §1 retires the other fifty-three. <b>Retired the way the twelve
+already are &mdash; kept, and said to be kept</b>: every entry keeps its name, its price, its
+payload and its <code>desc</code>, still resolves through <code>config</code> /
+<code>build</code> / <code>display_name</code> so a saved run holding one keeps working, and
+each carries a string naming what is lost. <b>Nothing is authored, nothing is deleted, and no
+payload, price, desc, lane or scope moved &mdash; the whole data diff is 53 added lines.</b>
+<br><b>WHY:</b> the pool was authored to the one-rune-per-talent-lane rule, which was replaced;
+keyed to talent counters, which were rebuilt at DO and DP; and re-keyed onto rune-owned fields
+at EM. What survived all of that was the magnitudes, and the magnitudes were never the
+interesting part. <b>A pool authored to the real charter &mdash; threshold-gated, reading
+archetype tags on the holder's drafted cards &mdash; will be better than 53 patched ones.</b>
+<br><b>WHAT A RUN IS LIKE MEANWHILE: sparse, not broken.</b> Every rune offer is a generated
+stat stick, the three slots fill with them, and nothing else in the run changes. <b>That is
+accepted</b> &mdash; the designer will playtest against the first authored batch, not this one.
 <b>THERE ARE NO RARITY TIERS (Batch ES §1).</b> Common, Rare and Epic are gone, and with
 them the prefixes (Cracked / Polished / Radiant), the tier colours, the &times;1/&times;2/&times;3
 magnitude ladder and the 50/100/160 tier price. <b>A rune wears its authored name.</b> What
@@ -2539,9 +2555,14 @@ on doing exactly what it did: the kind lived in the payload, never in the label.
 60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
 differ from an early one</i>. Measured on the live pool, that put <b>half of every zone-1
 offer</b> into the generated stat family and only a fifth of every zone-3 offer;
-<b>it is a flat ~30% at every slot now</b>. <b>The generated family survives as the filler
+<b>it is a flat ~30% at every slot now</b> &mdash; and <b>100% at every slot since ET §1
+retired the authored pool</b>. <b>The generated family survives as the filler
 and as the exhaustion floor</b>, at its authored magnitudes and one price: +10 max HP / +2%
-armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g.
+armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g. <b>It is kept exactly as it
+was: ET moves no magnitude and chooses no price.</b> Because it is now the whole pool, the
+<b>exhaustion floor</b> is reached far earlier than it ever was: a hero can draw <b>5 distinct
+runes (6 outside the Warrior class)</b> before the pool starts repeating, where the same hero
+reached <b>15&ndash;18</b> before ET.
 <br><b>Eligibility:</b> every rune declares a scope — universal, class-wide, or spec-only, so
 the awakening shapes the loot table — and ability-modifying runes only roll for heroes who
 actually own the named ability (boss trophies included). <b>SCOPE IS THE AXIS THAT SURVIVES,
@@ -2549,16 +2570,19 @@ and it is what the shop row and the offer button show where the rarity word used
 <b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
 map card). Shop offers avoid duplicates per hero, and an exhausted pool falls back to the
 generated family — the offer list never comes back empty.
-<br><b>SCOPE IS RULED TO BE SPEC AND CLASS ONLY (Batch ES §2), AND THE FIVE UNIVERSALS ARE
-RE-SCOPED RATHER THAN RETIRED — the class each lands on is unmade.</b> They are authored and
-working, and losing five runes to a scoping rule is waste. <b>They are 5 of every spec's
-9&ndash;12 offerable runes</b>, so the re-scope is the largest single movement the pool has
-ever taken: whichever class each lands on, the other three lose it.
-<br><b>PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND.</b> Every authored rune has always
-carried its own <code>price</code> and none moved — but those prices were written against a
-tier table that no longer exists, and they still run 50 / 75 / 100 / 120 / 160 across the 53
-offerable. <b>No pricing rule was invented; that is a design decision and it is the
-designer's.</b>
+<br><b>SCOPE WAS RULED TO BE SPEC AND CLASS ONLY (Batch ES §2), AND THE FIVE UNIVERSALS WERE
+RE-SCOPED RATHER THAN RETIRED — the class each lands on was unmade.</b> They were 5 of every
+spec's 9&ndash;12 offerable runes, so the re-scope would have been the largest single movement
+the pool had ever taken. <b>BATCH ET §1 SUPERSEDES THAT: the five are retired with the other
+forty-eight, and the class question goes with them.</b> <b>The scope AXIS is untouched</b>
+&mdash; every entry still declares one, <code>_scope_ok</code> still resolves all three bands,
+and the shop row and offer button still show the band. What is gone is anything to draw.
+<br><b>PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND, AND ET DOES NOT ANSWER IT EITHER.</b>
+Every authored rune has always carried its own <code>price</code> and none moved — but those
+prices were written against a tier table that no longer exists, and they still run 50 / 75 /
+100 / 120 / 160 across the 53 ET retires. <b>Flat pricing is ruled; the number is not, and with
+the pool empty there is nothing left to price.</b> <b>No pricing rule was invented; that is a
+design decision and it is the designer's.</b>
 <br><b>Heroes begin the run with no runes and three empty slots.</b> The first rune comes
 from the Peddler, an elite cache, or a severity-3-or-4 bargain. Every pick-of-three is
 resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
@@ -2571,7 +2595,10 @@ classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set was
 <b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
 pays for reaching outside one. Exactly one rune per set <b>charges for its upside</b>, and it
 sits on a lane; splashes are always clean. <b>That rule no longer describes what the runes
-DO.</b>
+DO, and ET §1 is the consequence taken to its end: the pool authored to it is retired whole
+rather than patched entry by entry.</b> <b>The 65 entries and their authoring structure are
+still here</b> &mdash; the count, the scopes, the lanes and the one-costed-rune-per-set shape
+are all unchanged, which is what makes them readable by the batch that writes the next pool.
 <br><b>AND "SCARRED" IS GONE AS A LABEL WHILE EVERY COST CLAUSE STAYS (Batch ES §3).</b>
 There is no flag, no crimson prefix and no crimson colour: <b>a rune that gives and takes is
 simply what that rune does</b>, and its negative terms are byte-unchanged. What recognises a

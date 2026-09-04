@@ -4,6 +4,109 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Retiring a pool whole rather than patching it entry by entry (Batch ET) — 2026-09-03
+
+**Newest first, so read this before the Batch ES entry below** — that
+entry records the decisions this batch supersedes. It is left standing
+because it is why the shape was chosen, and a design journal that edits
+its own history stops being evidence.
+
+### Why the pool went whole rather than one rune at a time
+
+The 53 offerable runes had been patched four times without being
+re-authored once. They were written to a one-rune-per-talent-lane rule
+that was replaced. They were keyed to talent counters that DO and DP
+rebuilt underneath them. EM re-keyed 56 of their clauses onto
+rune-owned fields, and EN took the last three. ES stripped rarity, the
+Scarred label and the offer odds off them.
+
+**Every one of those passes preserved the magnitudes, and the
+magnitudes were the part nobody was defending.** Read as a roster the
+survivors are stat sticks with a spec's name on them — *"+4% Block, +4%
+max health, +10% Break damage"* is three numbers sharing a card, and
+five of the twelve splashes read exactly like that by construction.
+Patching a fifth time would have preserved the same thing again.
+
+The argument for retiring whole is that **the next pool is authored
+against a charter that now exists and did not when these were written**
+— threshold-gated clauses reading archetype tags on cards the hero
+actually drafted, which is a question the machinery can ask since ES §4
+and no rune asks. Fifty-three entries written against the old rule are
+not a head start on that; they are fifty-three things to argue with.
+
+### Why they are kept rather than deleted, and why the string matters more than the flag
+
+`eligible_ids` reads one key. A bare `"retired": true` would have emptied
+the pool exactly as effectively as a paragraph does — **so the paragraph
+is the entire point of the retirement, and the mechanism is incidental.**
+
+EO set the standard at §3 and it is the right one: *"LOST: the only item
+pairing Chilled's slow with a crit window on HELD enemies."* That
+sentence is what a future author reads before re-covering the ground, and
+a string saying "flat stats" for a rune that did something specific
+throws away the one thing worth keeping. Writing 53 of them was most of
+the work in this batch and it is the half that will still be worth
+something in a year.
+
+**What that forced was a derivation rather than an impression.** Asked
+what each rune "really did", the honest answer for a third of them was
+*nothing another rune did not also do* — and the only way to know which
+third was to derive field ownership across the whole file rather than
+read the descs. That derivation is what found the four sharpest losses,
+three of which the brief either missed or had backwards.
+
+### Why a branch that cannot fire is the dangerous residue
+
+**72 of the 84 stat fields the retired pool writes have
+`data/runes.json` as their only writer in the project.** Their read
+sites in `battle.gd` still stand and can never fire.
+
+This is a worse hazard than dead code, because it is *indistinguishable*
+from dead code by every instrument here. A later batch sweeping for
+unreachable branches finds 72 of them, all genuinely unreachable, all
+correct to delete on the evidence available — and deleting any one of
+them deletes a mechanic the pool is explicitly meant to come back to.
+`check_dp` §4 asserts the forward direction (every field a rune writes
+has a live read site) and **would go on passing while the fields were
+deleted from `runes.json` alongside their branches**, which is why ET
+owes an assertion on the population itself.
+
+The ratchet is asymmetric on purpose: it may grow and it may not shrink.
+A rune authored onto a new field raises the floor by doing nothing; a
+batch that wants to delete a branch has to come and say so.
+
+### Why three green assertions were more dangerous than three red ones
+
+Three checks asserted the pool was non-empty. All three went red at ET,
+and **red was the easy case** — the hazard was the shape of the repair.
+
+Each had a one-line fix that produced a green file: skip retired
+entries. `test_runes._reachable` would then have looped over nothing;
+`_rich_grant`'s grant loop would have run zero times; `check_es` §2
+would have watched an empty set. All three would print exactly like a
+clean run, and the coverage would be gone with no diff to point at.
+This is EO's own lesson from `test_rune_battle`, arriving one file over
+and three times at once.
+
+**The two-armed form is what keeps them:** derive whether the pool is
+empty, assert one thing if it is and the original thing if it is not.
+The day a rune is authored, all three original arms come back with no
+edit and nobody has to remember. And one of them came back *wider* —
+`check_es` §2 now asks its question of all 65 entries rather than the
+five it was written for.
+
+### And the one that went green and stopped meaning anything
+
+`check_es` §1 measures that the offer is flat across zone slots, which
+was ES's own ruling. With the pool empty it reads 100% / 100% / 100%:
+**flat, passing, and unfalsifiable.** Nothing about it is wrong and
+nothing about it is evidence.
+
+A check that cannot fail prints exactly like a check that passed, so it
+prints DORMANT beside its reading and names the condition that wakes it.
+That is cheaper than deleting it and honest in a way that leaving it
+silent would not be.
+
 ## The rune layer's new shape, and what a label was hiding (Batch ES) — 2026-09-03
 
 **Newest first, so read this before the Batch X entries below** — two of

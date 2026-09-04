@@ -5,165 +5,112 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-03 (Batch ES).*
+*Last rewritten: 2026-09-03 (Batch ET).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: ES — THE RUNE LAYER'S NEW SHAPE.** **STRUCTURE ONLY: not one rune is authored,
-  re-authored or retuned.** Every `payload`, `price`, `desc`, `lane` and `scope` in
-  `data/runes.json` is byte-unchanged; the two keys removed (`rarity`, `scarred`) are the whole
-  data diff. **Rarity is removed ENTIRELY, "Scarred" is removed as a LABEL while every cost clause
-  stays, SCOPE becomes the surviving axis, and runes gain the machinery to read ARCHETYPE TAGS on
-  their holder's EQUIPPED cards.** Full working: **`docs/reports/ES.md`**. **Three of the brief's
-  premises were wrong and all three are corrected there**, one in the reassuring direction.
-- **§1 — RARITY IS GONE, AND THE HALF THAT MATTERED WAS THE OFFER ODDS.** The tiers, the prefixes
-  (Cracked / Polished / Radiant), the colours, the ×1/×2/×3 magnitude ladder and the 50/100/160
-  tier price are all removed. **What rarity MEANT was an authoring convention, never a behaviour** —
-  the kind lives in the payload — so every rune goes on doing exactly what it did (`test_rune_battle`
-  drives all 65 and reads 97 / 0). **What it DID was drive the offer odds**, 60/30/10 at zone 1
-  deepening to 25/45/30 by zone 3. **Measured live before and after, 4,000 draws a cell: the
-  generated stat family was 49.8% / 33.1% / 21.1% of a Berserker's offers by zone slot and is a flat
-  29.9% / 29.6% / 30.3% now.** **The early game improves and the late game worsens; that is the
-  ruling's price and it is paid on purpose.** The zone slot stays in `Runes.generate`'s signature as
-  `_zone_slot` and is deliberately unread, which `check_es` §1 asserts.
-- **§1b — PRICE IS THE OPEN QUESTION RARITY LEAVES BEHIND AND NO RULE WAS INVENTED FOR IT.**
-  Authored runes have always carried their own `price` and `build()` has always read it, so **not
-  one price moved** — but they were written against a tier table that no longer exists, and the 53
-  offerable still run **50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5**. **The 75 and 120 rows exist
-  specifically to undercut a clean peer price that is gone.** The generated family sits on
-  `Runes.TEMPLATE_PRICE` = 50, the Common floor it already had — the absence of a rule, not a new
-  one. **This is a design decision and it is the designer's.**
-- **§1c — AND THE BRIEF'S PREMISE THAT `is_cost` READS RARITY IS FALSE, IN THE REASSURING
-  DIRECTION.** It reads a **field name and a sign** and never read a tier. **`DOD_SIM_RUNE_POWER` is
-  a POWER lever, not "the sim's rarity lever"** — that phrase has been copied through EO §3, EP §4
-  and this brief. **Removing rarity cannot make a cost clause start scaling**, which was the inverse
-  defect the brief was right to ask about.
-- **§2 — SCOPE IS THE SURVIVING AXIS AND THE FIVE UNIVERSALS ARE RE-SCOPED, NOT RETIRED — AND THE
-  CLASS EACH LANDS ON IS UNMADE.** Scope replaces rarity on the shop row, the offer button and the
-  three pouch lists (`scope_label` / `scope_color`). **The class is CONTENT and the standing rule
-  forbids a batch presenting rune content as options**, so the five keep `scope: "universal"` and
-  `check_es` §2 asserts they still roll for all twelve specs — a stealth retirement through an
-  eligibility rule goes red rather than quiet. **THE SIZE OF THE MOVE IS MEASURED AND IT IS LARGER
-  THAN THE BRIEF SAYS: the five are 5 of every spec's 9–12 offerable runes, 42% to 56% of the
-  drawable pool**, which makes this the largest single movement the pool has ever taken. If all five
-  landed on one class the other nine specs would fall to **4–7 offerable against 3 rune slots**, and
-  the Occultist — already thinnest at 9 — would fall to **4**. **Flipping them is one string each in
-  the data on the day the designer rules.**
-- **§2b — AND THE FIELD-NEIGHBOURHOOD EVIDENCE DOES NOT DECIDE IT, WHICH IS THE POINT.** `reaper`'s
-  `rune_execute_bonus`, `glass`'s `dmg_taken_bonus` and `vampiric`'s `rune_lifesteal` are written by
-  **no other rune in the file**, so nothing places them; the three that can be placed point in
-  different directions. **Two of the five charge for their upside** (Glass, Vampiric) and EP measured
-  those as the Swordmaster's fallback if the Bared Guard is ever retired — **re-scoping either to a
-  non-Warrior class removes that fallback outright.** Table in `docs/reports/ES.md` §2a.
-- **§3 — THE LABEL WENT, EVERY COST CLAUSE STAYED, AND THE LABEL AND THE BEHAVIOUR HAD NEVER
-  AGREED.** The flag, the crimson prefix and the crimson colour are removed; the negative terms are
-  byte-unchanged. **`Runes.is_cost` is what recognises a cost now** — the same function that holds a
-  cost at its authored value under the power probe — **measured before and after on two shapes at
-  the arm's own ×3**, upside moving and cost held, plus the cost landing on a live hero config.
-  **BOTH POPULATIONS ARE 17 AND THEY ARE DIFFERENT 17s.**
-  - **`exsanguination` CARRIED THE FLAG AND HAS NO PAYLOAD COST TERM AT ALL.** Its whole payload is
-    `blood_pact: -15`, which `INVERTED_STAT_FIELDS` reads as the rune's PROMISE (veins pop at 85).
-    Its price — the bleedout tearing **15% of max health instead of 20%** — is a second behaviour of
-    the SAME field at the SAME read site (`battle._add_bleed_with_burst`, `battle.gd:21876`). **One
-    field, two behaviours, nothing for any sweep to find.** The flag was the only machine-readable
-    record that it charges anything. **Named in `test_runes.COST_WITHOUT_A_TERM` and `check_es` §3
-    with its reason, never suppressed.**
-  - **`anchor` CARRIES A REAL −10 SPEED AND NEVER CARRIED THE FLAG**, because the old schema asserted
-    *"scarred commons are not a thing"* and it is the one common in the file. **The schema forbade
-    the label on grounds of TIER, not of behaviour — a rarity rule was hiding a cost**, which is an
-    argument for §1 that §1 did not have to make for itself.
-  - **The `check_es` §3 population is pinned as a NAMED SET, not a count** — a count would let one
-    entry lose its term while another gained one and read green. **`test_runes._coverage`'s property
-    survived the instrument change**: derived through `is_cost`, it is still exactly one costed lane
-    rune per spec and zero costed splashes, on all twelve.
-- **§4 — RUNES CAN READ TAGS NOW AND NOT ONE RUNE DOES.** The door is
-  `Run.loadout_ability_names(member)` → `Classes.tag_census` / `tag_count` / `tag_breadth`, with
-  **`Runes.tag_threshold_met(names, tag, need)`** and **`Runes.breadth_met(names, need)`** as the two
-  shapes a clause asks through. **EQUIPPED, NEVER OWNED:** a pool only grows, so a threshold read off
-  it turns on once, late, and never off — the flat increment with a delay. A loadout is capped and
-  freely swapped, so counting it makes the loadout a **lever**.
-  - **THE BRIEF'S "7–10 equipped and freely swappable" IS TWO DIFFERENT SETS AND THE CORRECTION
-    DECIDES A DESIGN QUESTION.** The 7–10 is `ability_slot_cap()`, and `ability_slots_used` is
-    `core_slots(spec) + equipped_ability_names().size()` — **the protected core is inside the brief's
-    own number** while only the earned half is swappable. **The census counts the whole bar**, for
-    three reasons: the cores are what the spawn puts on the bar (`check_es` §4 re-derives the spawn's
-    own kit against `protected_names` and they are **identical on all twelve**); a hero with no
-    earned cards would otherwise census to ZERO on every tag, so the mechanic would be dead for the
-    first third of a run; and **`protected_names` and `core_slots` are different units** — a
-    Beastmaster is 3 slots holding SIX names — so a census wants NAMES.
-  - **THE `Runes` HELPERS TAKE THE NAME LIST AND NOT THE MEMBER, AND THAT IS A CONSTRAINT.** They are
-    static on a `class_name` script and **a static function cannot see an autoload**: `Run` from
-    there is `Compile Error: Identifier not found: Run`, found by running it. The split is also what
-    keeps `run_state.gd` free of every tag word, which `check_ek` §3 asserts at zero for that file by
-    name.
-- **§4b — THE CORE-KIT BASELINE IS THE FINDING, AND IT IS PRINTED EVERY BATTERY RUN.** Before a card
-  is drafted, the protected cores ALONE already meet a **2+ threshold on BREAK for TEN of the twelve
-  specs** and on **DEBUFF for SEVEN**; **MARK is zero for all twelve** and **TEMPO reaches 1 on
-  exactly one** (the Devout). **A "hold 2+ BREAK" rune would be on from the first fight for ten specs
-  and no swap could turn it off** — the flat increment again, arriving through the cores instead of
-  through the pool. **A threshold's magnitude has to be chosen against that table**; `check_es` §4
-  prints it per spec so the day a core kit moves nobody has to remember this. **The full table is in
-  `docs/reports/ES.md` §4b.**
-- **§4c — THE COUNT IS COMPUTED ON DEMAND, UNCACHED, AND THAT IS THE RIGHT SHAPE TODAY.** One
-  dictionary lookup per carried card (7–10 of them), **two callers and both are screen draws** — the
-  loadout panel and the hero sheet — so there is nothing to invalidate and no cache to go stale.
-  **WHEN A RUNE FINALLY READS IT IN A FIGHT THE PLACE IS THE SPAWN, NOT THE STRIKE LOOP**: the
-  loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
-  Recorded in `CLAUDE.md` so the batch authoring the first threshold rune does not re-derive it.
-- **§4d — THE COUNT IS VISIBLE AND DRIVEN IN TWO PLACES, AND THE SCREEN DRIVE NEARLY PASSED
-  VACUOUSLY.** A silent threshold is a stat nobody knows they have. `check_es` §4 drives the
-  arithmetic through the real equip/unequip doors and requires the census to move by **exactly the
-  swapped card's own tags** and come back; `check_map_screen` drives the SCREEN. **`queue_free()` is
-  DEFERRED, so for the rest of the frame the old overlay is still a child and comes FIRST** — a
-  finder taking the first match compared a panel against itself and printed *"ES census moved on the
-  swap: false"* while the count was in fact moving. It skips a node queued for deletion now. **The
-  reading that caught it was the two printed lines being byte-identical, not a failing assertion**,
-  which is why the verdict prints both.
-- **§4e — `check_ek` §3's GAME-SIDE TAG POPULATION MOVES FROM THREE TO FOUR, AND THE FOURTH IS
-  `party_screen.gd`.** Two files define the tables and **two** display them now: `map_screen.gd` (the
-  draft card's line and the panel's census) and the hero sheet, which `docs/state.md` has recommended
-  as the tags' surface since EK. **EK's claim is unchanged — nothing reads a tag for anything but
-  display.** The rule that a display surface may not BRANCH on a tag is **re-pointed rather than
-  loosened**: it used to forbid `map_screen.gd` naming anything but the line builder, a proxy that a
-  census makes wrong without making the property wrong, and it is asserted directly now over
-  `TAG_ORDER` itself — **a display surface may not name a tag WORD** — so an eighth tag is covered by
-  doing nothing. `TAG_SURFACE` grows by the five new names.
-- **§5 — A SPLASH PAYS FOR BREADTH, AND THE BRIEF'S COUNT IS OFF BY ONE.** Redefined: a normal rune
-  pays for DEPTH in one tag, a splash for BREADTH across tags — the inverse shape, and what gives the
-  category an identity again now that the lanes it reached across are severed. **FIVE of the twelve
-  were retired at EO, not six, and SEVEN remain** — and they fell along class lines. **All three
-  WARRIORS keep theirs** (Broad Path, Duelist, Sentinel), the Pyromancer, Arcanist, Beastmaster and
-  Sharpshooter keep theirs, and **the whole CLERIC class has none** (Open Hand, Standing Vow and
-  Whispering Dark all retired), with the Cryomancer and Survivalist. **So the class with no splash at
-  all is the one that would gain most from the category being given an identity.** Machinery built,
-  nothing authored.
-- **§6 — THE GATE, AND THE TWO ASSERTIONS THAT HAD TO MOVE.** `check_es` is new at **42 checks** and
-  carries four rulings; **§2 deliberately encodes none**, because the five universals' classes are
-  unmade and a gate that asserted one would be encoding a ruling nobody made. **Its first run accused
-  itself** — a gate whose source holds its own fingerprint does — so the rarity marks are joined at
-  runtime, which is `check_da` §3's own scar paid again. **`check_eh` §3's named reader set for
-  `protected_names` gains `run_state.gd` with its reason**: the loadout list wants NAMES, not SLOTS,
-  which is that section's own distinction applied rather than violated.
-- **WHAT MOVED: EIGHT SOURCE FILES, TWO DATA FILES, SIX SUITES, FOUR GATES AND EIGHT DOCUMENTS.**
-  `scripts/runes.gd`, `scripts/classes.gd`, `scripts/run_state.gd`, `scripts/map_screen.gd`,
-  `scripts/party_screen.gd`, `scripts/shop_screen.gd`, and `scripts/run_sim.gd` +
-  `scripts/events.gd` (comment-only); `data/runes.json` (two keys removed from 65 entries, nothing
-  else) and `data/glossary.json`; `test_runes`, `test_batch_ak`, `test_batch_ay`, `test_batch_az`,
-  `test_batch_aw`; `check_ek`, `check_eh`, `check_map_screen` and the new `check_es`;
-  `docs/master.html`, `docs/changelog.html`, `docs/text-standard.html`, `docs/design-notes.md`,
-  `CLAUDE.md`, `baselines.json`, this file and `docs/reports/ES.md`. **No rune, no node, no constant
-  and no authored magnitude.**
-- **Next letter: ET.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: ET — THE RUNE POOL IS RETIRED.** **All 53 offerable runes are retired. The
+  generated stat family survives. Nothing is authored.** Retired the way the twelve already are —
+  **kept, and said to be kept**: every entry keeps its `name`, `price`, `payload`, `desc`, `lane`
+  and `scope`, still resolves through `config` / `build` / `display_name`, and gains a string naming
+  what is lost. **The whole data diff is 53 ADDED LINES — zero deletions, and not one payload,
+  price, desc, lane or scope moved.** Full working: **`docs/reports/ET.md`**.
+- **THE REASONING, RECORDED WITH THE RULING SO IT IS NEVER RECONSTRUCTED WRONGLY.** The pool was
+  authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent counters, which
+  were rebuilt at DO and DP; and re-keyed onto rune-owned fields at EM. **What survived all of that
+  was the magnitudes, and the magnitudes were never the interesting part.** A pool authored to the
+  real charter — threshold-gated, reading archetype tags on the holder's DRAFTED cards — will be
+  better than 53 patched ones. **EO's twelve keep their existing strings unrewritten**, and the pool
+  is uniformly retired in TWO PASSES rather than by two decisions.
+- **§1 — THE RETIREMENT IS DECLARATIVE, AND THAT IS THE WHOLE POINT.** `eligible_ids` reads the
+  `retired` key and nothing else, so a bare `"retired": "yes"` would empty the pool exactly as
+  effectively and record nothing. **The string is the only place the loss lives.** `check_et` §1
+  asserts every entry carries one naming its batch and its loss — **12 at EO §3, 53 at ET §1, 0
+  undeclared** — and that nothing is offerable through the live door for any of the twelve specs.
+- **§1b — THE FOUR LOSSES THAT ARE NOT CLAUSES, AND THE BRIEF'S GROUPING WAS WRONG IN BOTH
+  DIRECTIONS.** Derived live through `Run.draft_pool_left` and `Classes.protected_names`:
+  - **THE RUNE OF THE COMET IS THE LARGEST SINGLE LOSS IN THE BATCH AND THE BRIEF DOES NOT NAME
+    IT.** COMET is defined *inline* in the entry's `new_ability` payload and exists in no draft
+    pool, no boss pool, no talent tree and no protected core. **It is the only ability in the game
+    reachable ONLY through a rune**, so this retirement removes an ability outright — and the entry
+    holds the only copy of its definition. `check_et` §4 pins that population at exactly one.
+  - **BINDING SOULS IS THE ONLY GENUINE OUT-OF-POOL GRANT**, and only for two of its three buyers:
+    Sacred Resolve is the Devout's own draft and boss card, so for him it collides and pays
+    Quickened. For the Holy Cleric and the Occultist it was the only route to it.
+  - **FLAYED MIND WAS NOT AN OUT-OF-POOL GRANT AT ALL.** Mind Flay is in the Occultist's *own* spec
+    draft pool and his own boss pool since DO, and he is the only hero who can buy the rune — so it
+    was a 160g shortcut past the draft, and collided to Honed once he had drafted the card.
+  - **LAST RITES COULD NEVER GRANT.** Resurrection is the Holy Cleric's PROTECTED CORE, so the
+    payload *always* collided and always paid Quickened, which is why its `desc` is the one honest
+    "she already knows it" wording in the pool.
+- **§2 — THE GENERATED STAT FAMILY SURVIVES UNCHANGED AND IS NOW THE WHOLE POOL.** +10 max HP / +2%
+  armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g — **no magnitude moved and no
+  price was chosen.** Every fallback in the rune layer is now load-bearing on the first Peddler of
+  every run, so it is **DRIVEN rather than read**: `check_et` §2 takes **540 draws across all twelve
+  specs through five doors** — the Peddler, the elite cache's single draw, its pick-of-three WITHOUT
+  REPLACEMENT, the grant door, and the exhaustion floor at a pouch holding every template. **None
+  came back empty, none nameless, none payloadless, and not one retired entry reached a live
+  offer.**
+- **§2b — THE EXHAUSTION FLOOR MOVED AND IT IS THE ONE BEHAVIOUR CHANGE A PLAYER COULD SEE.** A hero
+  now draws **5 distinct runes (6 outside the Warrior class, where `max_resource` is excluded)**
+  before the pool starts repeating, where the same hero reached **15–18** before ET. The floor is
+  the same code; it used to sit behind 9–12 authored entries and is the ordinary path now.
+- **§3 — RETIRED IS NOT DELETED, AND THAT IS THE LOAD-BEARING FACT.** `test_rune_battle` walks
+  `Runes.ids()` rather than the offer pool and **still reads 97 / 0** with every entry retired —
+  every rune still does exactly what it did. **The pool is unofferable, not broken.** `check_et` §3
+  covers the 17 universal and class entries that suite's spec-scoped walk does not reach.
+- **§4 — THE TRAP ET SETS FOR THE NEXT BATCH.** **72 of the 84 stat fields the retired pool writes
+  have `data/runes.json` as their only writer in the project**, so their branches in `battle.gd` can
+  no longer fire — and a branch that cannot fire is indistinguishable from dead code to every
+  instrument here. **Deleting one is deleting a mechanic the pool is meant to come back to.**
+  `check_dp` §4 asserts the forward direction and **would go on passing while the fields were
+  deleted from `runes.json` alongside their branches**, so `check_et` §5 pins the population as an
+  ASYMMETRIC RATCHET: it may grow, and it may not shrink without a line changing there.
+- **§5 — THREE ASSERTIONS THAT THE POOL IS NON-EMPTY BECAME STATEMENTS OF THIS RULING, AND ALL THREE
+  WERE MADE TWO-ARMED RATHER THAN DELETED.** `test_runes._rich_grant` asserted *"the retirement left
+  its own set empty"* on all twelve specs; `test_runes._start_rune_pool` asserted a 20–70% band on
+  spec runes in a cache triple; `check_es` §2 asserted the five universals still roll for all twelve.
+  **Each derives its arm from the pool now and comes back on its own the day a rune is authored.**
+  **`check_es` §2 came back WIDER than it was**: every entry a spec cannot draw must be undrawable
+  BECAUSE IT IS RETIRED, across all 65 rather than the five — so a retirement wearing an eligibility
+  rule still goes red. And **`test_runes._reachable` was re-pointed from offerability onto SCOPE**,
+  because "does this rune name an ability its hero can hold" is a question about the AUTHORED entry.
+  **Skipping retired entries was the other repair and it is the silent one** — all three sections
+  would have looped over nothing and printed like a clean run.
+- **§6 — ONE MEASUREMENT WENT DORMANT RATHER THAN WRONG, AND IT SAYS SO.** `check_es` §1 measures
+  that the offer is flat across zone slots; with the pool empty it reads **100% / 100% / 100%** and
+  is flat BY CONSTRUCTION, so the arm passes and *cannot fail*. **A vacuous check prints exactly
+  like a clean one**, so it prints DORMANT beside the reading and wakes with the first authored rune.
+- **§7 — THE GATE.** `check_et` is new at **23 checks** and carries one ruling that can decay in
+  three directions, two of them silently. It reads only `Runes`, the data and `Run`'s own doors, so
+  it trips neither `check_da` §3 fingerprint and needs **no exemption** — confirmed live before the
+  battery at **`check_da` 41 / 0, 0 hand-rolled walks, 1 exempt**.
+- **WHAT A RUN IS LIKE MEANWHILE: SPARSE, NOT BROKEN, AND THE DISTINCTION IS MEASURED.** 30 complete
+  sim runs on the retired pool: **30 of 30 completed, 0 wipes, depth 48.00 of 49**, `ratio@z1t8`
+  1.228. The Peddler still offers **16.03 runes a run** and the bot still buys **8.23**; the elite
+  cache still awards. **Every one is a generated stat stick.** The visible consequences are that a
+  rune-shaped clause reads zero where it used to read something — the run report's Faith-by-source
+  line now shows *"Binding Oath 0.00 | opening rune 0.00"* — and that the three slots fill with stat
+  sticks. **Nothing reads as broken.**
+- **WHAT MOVED: ONE DATA FILE, TWO SUITES, ONE GATE, ONE NEW GATE, THE BATTERY AND SEVEN
+  DOCUMENTS.** `data/runes.json` (53 added lines, nothing else); `test_runes`; the new `check_et` and
+  a re-pointed `check_es`; `run_battery.sh`; `docs/master.html`, `docs/changelog.html`,
+  `docs/design-notes.md`, `CLAUDE.md`, `baselines.json`, `pin-manifest.json`, this file and
+  `docs/reports/ET.md`. **NO SOURCE FILE IN `scripts/` WAS TOUCHED AT ALL** — the retirement needed
+  no code, because `is_retired` and its single door were already the shape EO built at §3.
+- **Next letter: EU.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **the rune layer is charter-clean on the mechanics at 59 of
-  59.** **The archetype tags are no longer inert: a rune can read them, and nothing does yet.** What
-  is left in the rune layer is design: **the three Beastmaster re-authors, the five universals'
-  classes, rune PRICING now that the tier table is gone, and the first rune to actually key off a
-  tag.** **The Loyalty curve is RULED (a conversion) and its CURRENCY is the open half. And the
-  ladder still has an open design question of its own (what rung 2 should ASK).**
+  purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
+  when the pool was retired. **The rune layer is now MACHINERY WITH NO CONTENT**: scope, cost
+  recognition, the power arm, the collision rule and ES's tag-reading helpers all stand and are all
+  asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
+  is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED (a
+  conversion) and its CURRENCY is the open half. And the ladder still has an open design question of
+  its own (what rung 2 should ASK).**
+
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -220,12 +167,29 @@ distribution is available today from the per-run progress line, which carries th
 which is why EP measured rather than repaired, and why repairing it is a small, clearly-scoped
 instrument batch rather than an emergency.
 
-### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ALL THREE ARE RUNE CONTENT AND ALL THREE ARE THE DESIGNER'S**
+### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ONE IS CLOSED BY ET, TWO ARE DEFERRED WITH THE POOL**
 
-**Full evidence: `docs/reports/ES.md`.** ES built machinery and authored nothing, and the standing
-rule it recorded is why: *a batch may build machinery, re-scope, retire or repair; it never authors a
-rune and never presents rune content as options.* **These three are what the machinery is waiting
-for.** Each has its measurement attached and none has an option list, deliberately.
+**BATCH ET §1 RETIRED ALL 53 OFFERABLE RUNES, AND THAT MOVES ALL THREE OF THESE.** They are kept in
+full below because they are the measurements the NEXT pool is authored against, and because two of
+the three are not answered — only postponed:
+
+- **(1) RUNE PRICING is DEFERRED, not answered.** Flat pricing is ruled; the number is not, and
+  **with the pool empty there is nothing left to price.** The 53 still carry their authored prices in
+  the data, unmoved, so the distribution below is still readable — but it is a record of what the
+  retired pool charged rather than a question anyone owes an answer to today. **It comes back with
+  the first authored rune.**
+- **(2) THE FIVE UNIVERSALS' CLASSES IS CLOSED.** ET retires the five with the other forty-eight, so
+  there is no class left to choose. **The scope AXIS survives and the next pool is authored against
+  it**; `check_es` §2 was re-pointed rather than deleted and now watches all 65 entries.
+- **(3) THE FIRST RUNE TO KEY OFF A TAG is unchanged and is now the whole of the rune queue.** The
+  machinery is untouched and still reads nothing; the core-kit baseline it must be authored against
+  is printed by `check_es` §4 every battery run.
+
+**Full evidence: `docs/reports/ES.md` and `docs/reports/ET.md`.** ES built machinery and authored
+nothing, and the standing rule it recorded is why: *a batch may build machinery, re-scope, retire or
+repair; it never authors a rune and never presents rune content as options.* **ET is that rule taken
+to its end.** Each question below has its measurement attached and none has an option list,
+deliberately.
 
 - **(1) RUNE PRICING, WHICH RARITY LEFT BEHIND — NEW AT ES §1 AND THE SHARPEST OF THE THREE.** The
   53 offerable runes carry **50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5**, every one written against
@@ -443,7 +407,22 @@ in `CLAUDE.md`. Nothing is built and the currency is not chosen.**
 - **THE TEXT COST IS SMALLER THAN ANY FLATTENING'S**, because the meter stays uncapped: the nine
   surfaces need the second phase NAMED, not the *"no ceiling"* promise retracted.
 
-### THE FOUR RUNE ITEMS — **RULED AFTER EP, MEASURED AT EQ AND ER. THREE RE-AUTHORS UNBUILT.**
+### THE FOUR RUNE ITEMS — **THE THREE RE-AUTHORS ARE MOOT AT ET §1. THE MEASUREMENTS ARE KEPT.**
+
+**BATCH ET §1 RETIRED ALL 53 OFFERABLE RUNES, AND THE DEEP BOND, THE TURNING PACK AND THE SHARED
+WILD ARE ALL `spec:beastmaster`. ALL THREE RE-AUTHORS ARE MOOT AND THE QUEUE NO LONGER CARRIES THEM
+AS OWED.** The Bared Guard is retired with them and its standing rule in `CLAUDE.md` survives it —
+that rule is about **a rune that CHARGES**, which is what `Runes.is_cost` recognises, and `check_es`
+§3 still asserts the costed population over all 65 entries.
+
+**EVERYTHING BELOW IS KEPT AND NONE OF IT IS STALE**, because every figure in it is a fact about a
+SYSTEM rather than about a rune: the Turning Pack's first clause being worth zero to any Beastmaster
+holding Quick Whistle is a fact about `SWAP_COOLDOWN` and a floor at 0; Feral Momentum's +8% being
+worth about +9.9% is a fact about how many different companions are fielded at a blow; the
+companion-death event at 0.22 a trash fight is a fact about companion durability. **The next pool is
+authored against the same systems, so these are the numbers it starts from.**
+
+*The original block follows, unedited.*
 
 **ER ADDED THE SHAPE THE DEEP BOND'S RE-AUTHOR FALLS OUT OF, AND BROKE TWO MORE OF THE PREMISES.**
 - **THE ITEM A RE-AUTHORED DEEP BOND WOULD BE IS ALREADY IN THIS GAME AND WAS RETIRED AT EO §3.**
@@ -468,9 +447,11 @@ in `CLAUDE.md`. Nothing is built and the currency is not chosen.**
   opened the class-wide tier — with **two** specs beating the Beastmaster's one, not one.
 
 **Full evidence: `docs/reports/EP.md` §4 (the presentation) and `docs/reports/EQ.md` §3/§4
-(the measurements and the priced options).** The floors stand: **65 authored, 12 retired, 53
-offerable; drawable 9 (Occultist), spec-scoped 2 (Cryomancer), rare shelf 5 (Occultist), against 3
-rune slots.** **Nothing is authored here — rune content is content and it is the designer's.**
+(the measurements and the priced options).** The floors those batches measured were **65 authored,
+12 retired, 53 offerable; drawable 9 (Occultist), spec-scoped 2 (Cryomancer), against 3 rune slots**
+— **and ET §1 took every one of them to zero: 65 authored, 65 retired, 0 offerable.** They are kept
+as the record of what the pool was. **Nothing is authored here — rune content is content and it is
+the designer's.**
 
 - **EQ ADDED THE NUMBERS ALL THREE ARE PRICED AGAINST, AND ONE OF THEM CHANGES A RUNE'S VALUE TO
   ZERO.** **The Turning Pack's first clause pays nothing to any Beastmaster holding Quick Whistle**
@@ -558,8 +539,13 @@ battery, derived from `LANE_TREES` and `runes.json` rather than from a list. **`
   *excluded from the denominator*, returned **twenty-two**, and swept in six runes EN's own
   threshold table names as survivors. `still_wrist` carries `parry_bonus` beside its one
   talent-keyed clause and is therefore still an item that does something no node does.)
-  **65 authored, 12 retired, 53 OFFERABLE.**
-  - **WHAT IS STILL OPEN: the three Beastmaster re-authors and the Bared Guard.**
+  **65 authored, 65 RETIRED, 0 OFFERABLE since ET §1** (it was 12 retired and 53 offerable when the
+  reading below was taken, and the reading is kept because it is about the CLAUSES rather than about
+  what is drawable).
+  - **CLOSED AT ET §1: the three Beastmaster re-authors and the Bared Guard are all retired**, so
+    none is owed. The reasoning below is kept because the next pool is argued against the same
+    systems.
+  - **WHAT WAS OPEN, AND IS NOW THE NEXT POOL'S TO ANSWER:**
     `docs/reports/EO.md` §3 carries all four — theme, axis, balance and synergy for each of the
     three, and the Bared Guard's loss-and-gain reading — **and nothing is authored.** The Deep
     Bond's axis is DEPTH and its risk is a Loyalty meter already over-arriving; the Turning Pack's
@@ -1434,10 +1420,11 @@ re-derived from the source at DM; not one was moved.**
   flag gone, `Runes.is_cost` is the only thing that knows a rune charges anything and it is what the
   power arm holds a cost by, so the costed population is derived and pinned as a NAMED SET with
   `exsanguination` named as the one whose cost is a behaviour rather than a term. §4 is DS's Heads
-  Down shape outright and is DRIVEN through the real equip/unequip doors. **§2 DELIBERATELY ENCODES
-  NO RULING** — the five universals' classes are unmade, so it asserts nothing was stealth-retired
-  and PRINTS the depth table the decision needs, because a gate that named a class would be encoding
-  a ruling nobody made. Before it,
+  Down shape outright and is DRIVEN through the real equip/unequip doors. **§2 DELIBERATELY ENCODED
+  NO RULING** while the five universals' classes were unmade; **ET §1 retired the five and
+  RE-POINTED §2 onto a wider question** — every entry a spec cannot draw must be undrawable BECAUSE
+  IT IS RETIRED, over all 65 rather than the five — so a retirement wearing an eligibility rule
+  still goes red, and the depth table it prints now reads zero across all twelve. Before it,
   **EM ADDED `check_em` BECAUSE EJ §5 NAMED THIS BATCH AS ITS HOME**: *the property a future gate
   wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.*
   §1 derives that property from `LANE_TREES` and `runes.json` rather than from a list of names, and
