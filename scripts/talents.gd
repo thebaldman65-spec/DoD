@@ -2698,10 +2698,23 @@ static func owns_ability(member: Dictionary, display_name: String) -> bool:
 	return ability_names(member).has(display_name)
 
 
-# A payload's optional "condition": {"has_node": id} / {"owns_ability": name},
-# or both (ALL must hold). ctx carries {learned, member} — an empty ctx makes
-# a conditional payload inert rather than silently unconditional, which is the
-# safe direction: an effect that fails to appear is a bug you can see.
+# A payload's optional "condition": {"has_node": id} / {"owns_ability": name} /
+# {"tag_threshold": TAG} / {"tag_breadth": true}, or several (ALL must hold).
+# ctx carries {learned, member} — an empty ctx makes a conditional payload
+# inert rather than silently unconditional, which is the safe direction: an
+# effect that fails to appear is a bug you can see.
+#
+# ── BATCH EZ §0 — THE TWO RUNE CONDITIONS COME THROUGH HERE AND NOWHERE ELSE ─
+# **THIS IS THE SPAWN, WHICH IS THE PLACE ES §4 NAMED FOR THEM.** Both rune
+# application sites — `battle.gd`'s spawn and `party_screen.gd`'s sheet — call
+# `apply_payload` with the same `{learned, member}` ctx, so a rune gated on a
+# loadout is decided ONCE per fight and the sheet shows exactly what the fight
+# will use. A per-hit recount would be work for a number that cannot move: the
+# loadout cannot change during a battle.
+#
+# **THE ARITHMETIC IS `Runes`', NOT THIS FILE'S**, so the condition and the
+# surface that prints its state are one number — see `Runes.threshold_met` /
+# `Runes.breadth_met_fraction` for the fractions and for which cards they count.
 static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 	if cond.is_empty():
 		return true
@@ -2710,6 +2723,15 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 		return false
 	if cond.has("owns_ability") \
 			and not owns_ability(ctx.get("member", {}), String(cond["owns_ability"])):
+		return false
+	# **THE WHOLE DICT IS HANDED OVER AND THIS FILE NAMES NO TAG WORD**, which
+	# is a constraint rather than a style: `check_ek` §3 sweeps every `.gd` in
+	# the repo for the tag surface and asserts the set of files that name it is
+	# EXACTLY four — two that define the tables and two that display them. The
+	# rune layer's own vocabulary belongs in `runes.gd` for ES §4's stated
+	# reason ("the vocabulary is the rune layer's"), and passing the condition
+	# through untouched is what keeps that true with a rune finally reading one.
+	if not Runes.loadout_condition_met(cond, ctx.get("member", {})):
 		return false
 	return true
 

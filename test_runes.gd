@@ -300,10 +300,33 @@ func _eligibility(data: Dictionary) -> void:
 			# version would go green on the day the whole file stopped rolling.
 			var mine := {"key": owner_key, "spec": spec, "runes": []}
 			var rolls: bool = Runes.eligible_ids(mine, []).has(id)
+			# BATCH EZ — THE THIRD ARM, AND IT IS `requires_ability` DOING ITS
+			# JOB RATHER THAN AN EXEMPTION. This member has drafted nothing, so
+			# a rune naming an ability outside the DERIVABLE kit — core kit plus
+			# spec abilities plus the overrides — correctly does not roll for
+			# him. **Ambush requires Called Volley, which is a DRAFT card**, and
+			# the alternative to this arm is a rune that applies silently and
+			# does NOTHING for a hero who was offered it.
+			#
+			# **THE ARM IS TWO-WAY, WHICH IS WHAT KEEPS IT FROM BEING A SKIP.**
+			# A rune whose requirement the bare member DOES satisfy must still
+			# roll (Split Tongue, Open Wound and the Split Shield all name core
+			# kit and are asserted to roll), and one whose requirement it does
+			# not must not — so a `requires_ability` pointing at a name nothing
+			# resolves still turns this red.
+			var needs := String(Runes.config(id).get("requires_ability", ""))
+			# **THE SAME DOOR `eligible_ids` ITSELF USES.** A second reading of
+			# "does he own it" would be a second answer to the question the
+			# filter is asking, and the two would eventually disagree.
+			var owns: bool = needs == "" or Runes.kit_names(mine).has(needs)
 			if Runes.is_retired(id):
 				ok(not rolls, "%s: is RETIRED and must not roll for its own spec" % id)
-			else:
+			elif owns:
 				ok(rolls, "%s: does not roll for its own spec" % id)
+			else:
+				ok(not rolls,
+					"%s: requires '%s', which this member does not own, and rolled anyway"
+						% [id, needs])
 			# ...and for nobody else's.
 			for key in Classes.SPEC_IDS:
 				for other in Classes.SPEC_IDS[key]:
@@ -327,11 +350,43 @@ func _coverage(data: Dictionary) -> void:
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			specs_seen += 1
+			# ── BATCH EZ SPLIT THIS WALK IN TWO, AND NEITHER HALF IS WEAKER ──
+			# **EVERYTHING BELOW IS THE OLD AUTHORING RULE — one rune per talent
+			# lane plus one splash, exactly one of the four charging for its
+			# upside — AND THAT RULE GOVERNS THE 65 ET RETIRED AND NOTHING
+			# ELSE.** ES §5 severed the lane rule; EZ's twenty-one carry no
+			# `lane` at all, so under the unsplit walk every one of them read as
+			# a splash and the per-spec count went 4 -> 9 (10 for the
+			# Beastmaster). **Re-deriving the retired entries under a rule they
+			# were never authored to would be inventing history**, and dropping
+			# the rule would lose the only thing pinning the lane coverage those
+			# 65 were built on. So the population is narrowed and the assertions
+			# are untouched.
 			var mine: Array = []
+			var live_here: Array = []
 			for id in data:
-				if String(data[id].get("scope", "")) == "spec:%s" % spec:
+				if String(data[id].get("scope", "")) != "spec:%s" % spec:
+					continue
+				if Runes.is_retired(String(id)):
 					mine.append(id)
-			ok(mine.size() == 4, "%s: has %d spec runes, expected 4" % [spec, mine.size()])
+				else:
+					live_here.append(id)
+			ok(mine.size() == 4,
+				"%s: has %d RETIRED spec runes, expected the 4 authored to the lane rule"
+					% [spec, mine.size()])
+			# **AND THE LIVE HALF IS FLOORED AND PRINTED RATHER THAN PINNED**,
+			# because which specs are authored next is CONTENT and is the
+			# designer's: an equality here would go red on the next authoring
+			# batch for doing exactly the right thing. What is asserted is the
+			# thing that cannot be intentional — a live rune carrying a `lane`,
+			# which would mean the severed rule had quietly come back.
+			var live_with_lane: Array = []
+			for lid in live_here:
+				if String(data[lid].get("lane", "")) != "":
+					live_with_lane.append(lid)
+			ok(live_with_lane.is_empty(),
+				"%s: %s are live and still carry a `lane` — the severed rule is back"
+					% [spec, live_with_lane])
 			# Lanes come out of LANE_TREES, never a written list (Batch Y's
 			# 70%-vs-53% drift is the precedent for not trusting prose).
 			var tree_lanes := {}
@@ -623,8 +678,23 @@ func _penalty_list_agrees() -> void:
 # grant an ability, one adds one, and Quick Spring's whole payload is
 # inverted (cost/cooldown reductions), which the arm deliberately leaves
 # alone rather than making an ability free.
+# **BATCH EZ ADDED `split_tongue`, AND IT IS A REAL MEMBER RATHER THAN AN
+# EXEMPTION.** The arm scales every `stat` BENEFIT and every ability `add` by
+# three and requires the payload to MOVE, so an entry that does not respond is
+# an entry the power probe cannot measure. Split Tongue's whole payload is
+# `{"ability": "Hex of Ruin", "set": {"aoe": true}}` plus an `also` carrying a
+# FLAG (`rune_split_tongue: 1`): a `set` is an absolute assignment the arm
+# correctly refuses to scale, and **a flag has no magnitude — three is not more
+# `aoe` than one.** It belongs here for `comet`'s reason and not for a new one.
+#
+# **AND THE ARM HAS A HOLE THIS ENTRY SITS BESIDE, WHICH IS WORTH THE LINE:
+# the walk reads `base["stat"]` and `base["add"]` at the TOP LEVEL and does not
+# descend into `also`.** No rune's `also` carries a magnitude today, so nothing
+# is unmeasured — but the day one does, the probe will report it as a dud
+# rather than scaling it, and the entry will be added here instead of the hole
+# being closed. Recorded so that is a decision somebody makes on purpose.
 const UNSCALABLE := ["comet", "binding_souls", "last_rites", "flayed_mind",
-	"quick_spring"]
+	"quick_spring", "split_tongue"]
 
 
 func _power_arm(data: Dictionary, unit_props: Dictionary, unit_src: String,

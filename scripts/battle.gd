@@ -687,6 +687,15 @@ const ASHES_RETURN_PERFECT := 40
 # percent. It rides the Heavy Plating slice of the block roll on purpose —
 # see the "shield_block" special and the roll itself.
 const SHIELDWALL_BLOCK := 25
+# BATCH EZ §2 — THE LEVEL BRACING LINE READS, IN PERCENTAGE POINTS OF THE
+# PLATING CLIMB. **RULED BY THE DESIGNER AT 32 AND IT IS NOT A ROUNDING
+# CHOICE**: the climb is +8% a miss to a +40% cap, so the meter can only ever
+# read 0, 8, 16, 24, 32 or 40 — 32 is FOUR consecutive unblocked attacks, and
+# 24 (three) would be on in most fights and would read as a flat party buff
+# rather than as a reward for a Warden genuinely failing to block. Named here
+# rather than at the read site for the BW rule one block down: it is read at a
+# mitigation site the rune's own card never touches.
+const BRACING_LINE_LEVEL := 32
 # ---- BATCH BP: the Warrior draft's magnitudes, in ONE place ----
 # Two of the six branch on stance, so their numbers cannot live on the Ability
 # the way Winter's Toll's per-turn step does — an Ability field holds one value
@@ -1528,8 +1537,15 @@ func _spawn_units() -> void:
 	# spend the other hunter's beast. `pack_master` is the relationship the
 	# callback walks back down, so the arming has to agree with it.
 	for h in heroes:
-		if _find_ability(h, "Bear the Brunt") != null:
+		# BATCH EZ §4 — THE ANSWERING PACK ARMS THE SAME HOOK, on the same
+		# caster-alone rule and for the same reason: the guard moves the blow
+		# onto THIS hunter's own companion. **The spend is reset here rather
+		# than at the guard**, so "once a fight" means once per spawn — a
+		# battle, not a run — and a rune that fired last fight is armed again.
+		if _find_ability(h, "Bear the Brunt") != null \
+				or h.rune_answering_pack > 0:
 			h.brunt_cb = _on_brunt_guard
+			h.answering_pack_spent = false
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -2716,6 +2732,35 @@ func _run_battle() -> void:
 					_sfx("break", -4.0)
 					_message("%s BREAKS!" % u.unit_name)
 					_log("!! %s BREAKS (Entropy)" % u.unit_name, "#c070e0")
+		# BATCH EZ §1 — OPEN WOUND'S COST, AND IT IS THE HALF THAT MAKES THE
+		# RUNE A TRADE. Ruin has never decayed and never cleared (AX §1); while
+		# this rune is held it loses ONE STACK a turn on every bearer.
+		#
+		# **IT IS WORTH ALMOST NOTHING AGAINST A DEEP PILE AND MOST OF A
+		# SHALLOW ONE**, which is the designer's own reading and is what makes
+		# it fight Deepening Hex: detonation is a MULTIPLE, so a decay of 1
+		# against 30 stacks delays the next threshold by half a turn and against
+		# 3 it takes a third of the mark. That tension is intended.
+		#
+		# **IT RUNS ABOVE THE DETONATION CHECK, BESIDE SUFFERING'S DRIP AND FOR
+		# THE OPPOSITE REASON.** A decay below the check would let a mark
+		# detonate on stacks the rune had already taken; above it, the bearer's
+		# turn resolves against the meter the rune leaves behind. **The primer
+		# is a STATUS and is not disarmed by this** — a mark that reached a
+		# threshold has already been noticed, and un-arming it here would make
+		# the rune silently delete detonations rather than delay them.
+		if not u.is_hero and u.has_status("ruin"):
+			var ow_occ := _living_occultist()
+			if ow_occ != null and ow_occ.rune_open_wound > 0:
+				var ow_was := u.status_stacks("ruin")
+				if ow_was > 0:
+					# `set_ruin_stacks` removes the status outright at zero, so
+					# the last stack leaving takes the chip with it and the
+					# stamp below correctly finds nothing to re-draw.
+					u.set_ruin_stacks(ow_was - 1)
+					_stamp_ruin_chip(u)
+					_log("   → Open Wound: %s's Ruin bleeds away (%d left)" % [
+						u.unit_name, maxi(ow_was - 1, 0)], "#a070b0")
 		# BATCH BU — SUFFERING's drip, and it pays ON THE ENEMY'S CLOCK, which
 		# is the axis of the card: one turn of his buys four of theirs.
 		#
@@ -5654,6 +5699,28 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 				"power": maxi(int(round(u.max_hp * 0.20)), 1)}]
 		"shield_block":
 			var sw_turns := 3 + 2 * u.shield_mastery_ranks
+			# BATCH EZ §2 — THE SPLIT SHIELD, AND ITS BRIEF'S PREMISE DID NOT
+			# SURVIVE THE CODE. It was written as "Shieldwall covers a second
+			# ally"; Shieldwall covers NO ally — Batch AB made it a SELF stance
+			# ("he guarantees the line and gambles for himself"), and the thing
+			# that reaches an ally is the Bulwark Line node. So the rune is
+			# built as what its NAME says instead: the wall is SPLIT — half of
+			# it stays on him and half goes to whoever he set it in front of.
+			#
+			# **HALF IS FORCED RATHER THAN CHOSEN.** "At reduced Block for each"
+			# names no magnitude, and a wall split in two is `SHIELDWALL_BLOCK`
+			# divided by two — derived from the constant the card already
+			# advertises, so it cannot drift from it if that number moves.
+			#
+			# **IT DOES NOT DELETE BULWARK LINE.** A Warden holding the node and
+			# the rune keeps the larger of the two on the ally, so the rune
+			# cannot make a talent he has already bought worse.
+			if u.rune_split_shield > 0:
+				if t == u:
+					return [{"id": "shieldwall", "turns": sw_turns,
+						"power": SHIELDWALL_BLOCK / 2}]
+				return [{"id": "bulwark_line", "turns": sw_turns,
+					"power": maxi(u.bulwark_ally_block, SHIELDWALL_BLOCK / 2)}]
 			if t == u:
 				return [{"id": "shieldwall", "turns": sw_turns,
 					"power": SHIELDWALL_BLOCK}]
@@ -8225,11 +8292,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if cg_warden != null:
 						cover = _live_block_chance(cg_warden)
 					var block_roll := randf()
-					if block_roll < strike_target.block_chance:
+					# BATCH EZ §2 — BARED PLATE. He can no longer Block, and it
+					# is written as a REFUSAL OF THE ROLL rather than as a zeroed
+					# `block_chance`, because the slice is assembled from four
+					# sources (base, the passive's 15%, its climb, and both
+					# stances) and zeroing one of them would leave Shieldwall
+					# still buying blocks off a Warden whose card says he has
+					# none. **THE COVERING GUARD SLICE IS DELIBERATELY LEFT
+					# STANDING**: that third slice is another Warden's Block
+					# chance doing its job on this body, and it is not his.
+					var bared: bool = strike_target.rune_no_block > 0
+					if bared:
+						plating = 0.0
+					if not bared and block_roll < strike_target.block_chance:
 						block_source = "base Block"
-					elif block_roll < strike_target.block_chance + plating:
+					elif not bared and block_roll < strike_target.block_chance + plating:
 						block_source = plate_label
-					elif block_roll < strike_target.block_chance + plating + cover:
+					elif block_roll < (0.0 if bared else strike_target.block_chance) \
+							+ plating + cover:
 						block_source = "Covering Guard"
 				if block_source != "":
 					_stat("attacks")
@@ -8289,9 +8369,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							# After the write it would always be zero, which is the class
 							# of mistake that reads exactly like the card doing nothing.
 							var rc_points := int(round(strike_target.plating_bonus * 100.0))
-							strike_target.plating_bonus = 0.0
+							# BATCH EZ §2 — THE STANDING WALL HALVES INSTEAD OF
+							# CLEARING. It sits INSIDE the Anvil `else`, not
+							# beside it, and that is the whole ordering: Anvil
+							# already refuses the reset entirely, so a Warden
+							# holding both is not paid twice — the stronger
+							# effect simply wins and the rune quietly does
+							# nothing while the status stands. That is the Anvil
+							# / Recompense shape this file already accepts.
+							#
+							# **RECOMPENSE IS PAID ON WHAT WAS ACTUALLY LOST**,
+							# which is why `rc_points` is recomputed below rather
+							# than left reading the pre-reset meter: a half reset
+							# from +32% pays 16 Rage, not 32. Paying the full
+							# meter for half a loss is the reading that makes the
+							# pair strictly better than either.
+							if strike_target.rune_standing_wall > 0:
+								strike_target.plating_bonus *= 0.5
+								rc_points -= int(round(
+									strike_target.plating_bonus * 100.0))
+							else:
+								strike_target.plating_bonus = 0.0
 							strike_target.refresh_bars()
-							_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
+							if strike_target.rune_standing_wall > 0:
+								_log("   → Standing Wall: the climb HALVES to +%d%% rather than resetting" % \
+									int(round(strike_target.plating_bonus * 100.0)),
+									"#8c9cc8")
+							else:
+								_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
 							if strike_target.has_status("recompense") and rc_points > 0 \
 									and strike_target.max_resource > 0:
 								var rc_before := strike_target.resource
@@ -8814,6 +8919,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# it. See BattleUnit.resonance_curve for the arithmetic.
 			if attacker.second_resource_name == "Resonance":
 				raw *= _resonance_dmg_mult(attacker)
+			# BATCH EZ §3 — AMBUSH. Called Volley's damage scales with the Focus
+			# he is HOLDING, at the meter's own rate: `FOCUS_STEP` per point, so
+			# a full conversion point of Focus is +50% on the volley and the
+			# rune invents no rate of its own. **THE RATE IS BORROWED RATHER
+			# THAN CHOSEN**, which is what keeps it honest if the meter is ever
+			# re-priced.
+			#
+			# **THE CARD'S SECOND CLAUSE WAS ALREADY TRUE AND IS NOT BUILT
+			# TWICE.** "and does not clear it" is `_focus_safe`'s existing
+			# guarantee — Called Volley is named in it by hand, and every AoE
+			# has been Focus-safe since AZ. See `docs/reports/EZ.md` §3d.
+			if attacker.rune_ambush > 0 \
+					and ab.display_name == "Called Volley":
+				raw *= 1.0 + BattleUnit.FOCUS_STEP \
+					* float(maxi(attacker.second_resource, 0))
 			if attacker.has_status("surge"):
 				raw *= 1.2
 			if attacker.has_status("wrath"):
@@ -9715,6 +9835,39 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
 						int(round(sv_cut * 100.0))], "#b0a8e0")
+			# BATCH EZ §2 — BRACING LINE. The party is paid off the Warden's
+			# PITY METER, and the level is 32 — four consecutive unblocked
+			# attacks. The meter climbs 8% a miss to a +40% cap so it sits on
+			# exactly one of 0, 8, 16, 24, 32 or 40, and 32 is chosen so the
+			# pity meter pays out when the pity is real: a level of 24 would be
+			# on in most fights and would read as a flat party buff rather than
+			# as a reward for a Warden genuinely failing to block.
+			#
+			# **IT SCANS RATHER THAN CALLING `_living_hero_with`**, for the
+			# Standard's exact reason one block up: that helper reads its field
+			# as an int off a NAMED counter, and this rune's holder is found by
+			# a rune field plus a live meter, which no single counter carries.
+			#
+			# **IT PAIRS WITH THE STANDING WALL AND THAT IS THE BUILD.** With
+			# the wall held a block HALVES the climb instead of clearing it, so
+			# a meter that has reached 32 rarely falls back below it — the pair
+			# compounds, deliberately, and `docs/reports/EZ.md` §2b measures how
+			# often the level holds with and without.
+			if strike_target.is_hero and not strike_target.is_companion:
+				var bl_w: BattleUnit = null
+				for bl_h in heroes:
+					if not bl_h.dead and not bl_h.is_companion \
+							and bl_h.rune_bracing_line > 0 \
+							and bl_h.passive_id == "heavy_plating" \
+							and int(round(bl_h.plating_bonus * 100.0)) >= BRACING_LINE_LEVEL:
+						bl_w = bl_h
+						break
+				if bl_w != null and bl_w != strike_target:
+					var pv_was := raw
+					raw *= 1.0 - 0.01 * bl_w.rune_bracing_line
+					_prev(bl_w, pv_was - raw)
+					_log("   → Bracing Line: %s braces behind the wall (-%d%%)" % [
+						strike_target.unit_name, bl_w.rune_bracing_line], "#8c9cc8")
 			# HOUR OF NEED (HOLY, Vigil row 5, Batch AV; RENAMED FROM SHARED
 			# VIGIL BY BATCH AW §9 — the Warden above had the name first and
 			# his trigger fits it, so hers moved. Label only: the counter
@@ -10121,10 +10274,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and strike_target.has_status("ruin") and not attacker.dead:
 				var occ_leech := _living_occultist()
 				if occ_leech != null:
+					# BATCH EZ §1 — THE STANDING MARK RAISES THE CAP, 40% -> 60%,
+					# and it raises the CAP rather than the per-stack rate on
+					# ER's standing rule: the rune moves where the runaway guard
+					# bites and leaves what a stack is worth alone. The guard is
+					# still a guard — 0.60 is not 1.0 — so the party still
+					# cannot out-heal its own damage on a long boss.
+					var leech_cap: float = RUIN_LEECH_CAP \
+						+ occ_leech.rune_ruin_leech_cap
 					var leech_pct: float = minf(0.01
 						* (2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step
 							+ occ_leech.gluttony_ranks + occ_leech.rune_gluttony_ranks)
-						* strike_target.status_stacks("ruin"), RUIN_LEECH_CAP)
+						* strike_target.status_stacks("ruin"), leech_cap)
 					var rl_heal := maxi(int(round(final * leech_pct)), 1)
 					var rl_got: int = attacker.heal_amount(rl_heal)
 					attacker.float_text("+%d" % rl_got, Color(0.7, 0.4, 0.9))
@@ -10229,6 +10390,35 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.sunder_shot = int(round(
 						attacker.sunder_shot * attacker.pierce_bonus))
 			var result: Dictionary = strike_target.take_hit(final, pr)
+			# BATCH EZ §2 — THE LONG WATCH. His Break damage carries to a
+			# SECOND enemy, and it carries as `take_hit(0, bd)` — the house
+			# idiom for Break with no damage (Guard Change's 15 and Sunder
+			# Guard's 40 both land this way), so Overpressure's overflow and the
+			# Break announcement behave exactly as they do everywhere else.
+			#
+			# **ONE ENEMY, NOT THE LINE**, which is the rune's own word: the
+			# lowest-health living foe other than the one struck, so the carry
+			# is aimed rather than random and two Wardens cannot disagree about
+			# where it lands. **AND IT DOES NOT RE-ENTER THIS BRANCH** — it is a
+			# `take_hit` on another body, not a second strike, so it cannot
+			# chain.
+			if attacker.rune_long_watch > 0 and attacker.is_hero \
+					and not strike_target.is_hero and pr > 0:
+				var lw_pool := enemies.filter(
+					func(e): return not e.dead and e != strike_target)
+				if not lw_pool.is_empty():
+					var lw_t: BattleUnit = _lowest_hp(lw_pool)
+					var lw_res: Dictionary = lw_t.take_hit(0, pr)
+					_stat_bd(attacker, pr)
+					lw_t.float_text("+%d BD" % int(lw_res["bd"]),
+						Color(0.8, 0.35, 1.0))
+					_log("   → Long Watch: the guard reaches %s too (+%d Break damage)" % [
+						lw_t.unit_name, int(lw_res["bd"])], "#8c9cc8")
+					if lw_res["broke"]:
+						_stat("breaks_on_enemies")
+						_sfx("break", -3.0)
+						_message("%s BREAKS!" % lw_t.unit_name)
+						_log("!! %s BREAKS (Long Watch)" % lw_t.unit_name, "#c070e0")
 			if attacker.is_hero and not strike_target.is_hero and pr > 0:
 				_stat_bd(attacker, pr)
 				# BLOOD COMMUNION (Occultist, Leech row 8): THE PARTY DRINKS
@@ -10506,7 +10696,30 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
 					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
 							and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]):
-						_gain_ruin(strike_target, _old_gods_mark())
+						# BATCH EZ §1 — SPLIT TONGUE. The curse is spoken to the
+						# whole line now (`aoe`, set on the Ability by the rune's
+						# own payload), so this branch runs once PER ENEMY — and
+						# the mark each one takes is REDUCED, which is the half
+						# the rune's own text names. **ONE IS FORCED RATHER THAN
+						# CHOSEN**: the base mark is `_old_gods_mark()`'s 2, and
+						# the only integer below 2 that is not "nothing" is 1.
+						if attacker.rune_split_tongue > 0 \
+								and ab.display_name == "Hex of Ruin":
+							_gain_ruin(strike_target, 1)
+						else:
+							_gain_ruin(strike_target, _old_gods_mark())
+					# BATCH EZ §1 — OPEN WOUND. Shadowrend marks EVERY enemy,
+					# not the one it struck. **It runs beside the Wrath branch
+					# rather than inside it** because the mark it lays on the
+					# OTHER enemies is not a debuff any of them was dealt —
+					# nothing struck them — so it cannot ride a condition
+					# testing what this blow applied to this body.
+					if attacker.rune_open_wound > 0 and attacker.is_hero \
+							and ab.display_name == "Shadowrend":
+						for ow_e in enemies:
+							if ow_e.dead or ow_e == strike_target:
+								continue
+							_gain_ruin(ow_e, _old_gods_mark())
 				# Empowered Hex: the curse can set the rot in.
 				if ab.display_name == "Hex of Ruin" and attacker.emp_hex_ranks > 0 \
 						and not strike_target.dead \
@@ -13452,8 +13665,22 @@ const SAVAGE_TAUNT_STEP := 0.15
 # it. Nothing moves Loyalty's yet (EU authors no rune and no node, ER §2), so
 # this returns the constant today; the parameter is here so that authoring one
 # is a change to THIS LINE and not to five call sites and their suites.
-func _bond_convert(_hunter: BattleUnit) -> int:
-	return BOND_CONVERT
+func _bond_convert(hunter: BattleUnit) -> int:
+	# BATCH EZ §4 — THE LONG LEASH MOVES THE POINT 8 -> 11, AND THIS SIGNATURE
+	# IS THE SLOT EU BUILT FOR IT. `_bond_convert` takes the hunter for exactly
+	# this reason — "built that way so a rune moves one line" — and this is the
+	# line. `BOND_STEP`, the strike step, Wild Communion, Absolute Devotion and
+	# Ancient Pact are all untouched: **move the point, never the rate.**
+	#
+	# **UP, NOT DOWN, AND THAT IS THE DESIGNER'S DIRECTION.** ER §2c resolved
+	# that the converted half is worth MORE than the strike step at depth, so a
+	# point moved DOWN is the buff and this one is moved UP — the Long Leash
+	# buys a Beastmaster three more stacks of the companion's own strike step
+	# before his patience starts feeding the boon instead.
+	# **ONE LINE READS THE CONSTANT, AND `check_eu` §0 ASSERTS IT.** A two-armed
+	# body naming `BOND_CONVERT` twice takes that gate red — and the gate is
+	# right: the point is decided in one place, and one place means one line.
+	return BOND_CONVERT + (0 if hunter == null else hunter.rune_long_leash)
 
 
 # BATCH EV §1 — THE BOON'S OWN CURVE, AT A COUNT GIVEN RATHER THAN DERIVED.
@@ -14291,8 +14518,26 @@ func _on_bloodbond_guard(comp: BattleUnit, amount: int) -> bool:
 func _on_brunt_guard(hunter: BattleUnit, amount: int) -> bool:
 	if hunter == null or amount <= 0:
 		return false
+	# BATCH EZ §4 — THE ANSWERING PACK RIDES THIS EXACT GUARD, and it is placed
+	# here rather than given a second one because `brunt_cb` is already wired on
+	# every hero at spawn and `take_hit` already asks it at the one moment that
+	# matters. A second callback would be a second set of rules for "the blow
+	# that would fell the hunter", and the two would eventually disagree about
+	# whether a beast that dies paying still counts as having covered him.
+	#
+	# **BEAR THE BRUNT WINS WHERE BOTH STAND**, and it must: the card is a cast
+	# with a cost and the rune is passive, so a rune that consumed the guard
+	# first would spend a status the player paid Mana for. The rune is the
+	# fallback, and a Beastmaster holding both is covered twice in a fight.
+	#
+	# **ONCE A FIGHT IS THE SPEND, NOT THE HOLDING.** `answering_pack_spent` is
+	# reset at spawn beside the field; the rune itself is never removed, which
+	# is what keeps it a held item rather than a consumable.
+	var by_rune := false
 	if not hunter.has_status("bear_brunt"):
-		return false
+		if hunter.rune_answering_pack <= 0 or hunter.answering_pack_spent:
+			return false
+		by_rune = true
 	var comp: BattleUnit = _deepest_bond(hunter)
 	if comp == null or comp.dead:
 		# NOTHING STANDS TO TAKE IT, SO THE GUARD IS NOT SPENT. A refusal that
@@ -14300,17 +14545,28 @@ func _on_brunt_guard(hunter: BattleUnit, amount: int) -> bool:
 		# a missing hunter), and it must not silently burn the card either —
 		# this is the one branch where the beast is the thing that is absent.
 		return false
-	var share_pct: int = hunter.status_power("bear_brunt")
+	# THE RUNE TAKES THE WHOLE BLOW, which is what "takes the blow that would
+	# fell the hunter" says and is the same 100 the card's own share would be at
+	# full strength. It is written as `100` rather than as `BRUNT_SHARE` because
+	# the two are different quantities that happen to be near each other, and
+	# pointing the rune at the card's constant would silently re-tune the rune
+	# the day the card is re-tuned.
+	var share_pct: int = 100 if by_rune else hunter.status_power("bear_brunt")
 	if share_pct <= 0:
 		share_pct = BRUNT_SHARE
 	var share := maxi(int(round(amount * share_pct / 100.0)), 1)
-	hunter.remove_status("bear_brunt")
+	if by_rune:
+		hunter.answering_pack_spent = true
+	else:
+		hunter.remove_status("bear_brunt")
 	_sfx("crit", -6.0, 0.8)
+	var brunt_name := "Answering Pack" if by_rune else "Bear the Brunt"
 	_message("%s takes the blow meant for %s!" % [comp.unit_name,
 		hunter.unit_name])
-	_log("%s: Bear the Brunt — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
-		hunter.unit_name, hunter.unit_name, comp.unit_name, share], "#e0a050")
-	_dmg_frame(comp, "Bear the Brunt")
+	_log("%s: %s — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
+		hunter.unit_name, brunt_name, hunter.unit_name, comp.unit_name, share],
+		"#e0a050")
+	_dmg_frame(comp, brunt_name)
 	comp.take_tick_damage(share, "-%d" % share, Color(0.80, 0.55, 0.30))
 	if comp.dead:
 		# A COMPANION KILLED BY A TICK IS ANNOUNCED AND BOOKED BY ITS CALLER,
@@ -14670,6 +14926,13 @@ func _stamp_berserk_chip(u: BattleUnit) -> void:
 # have read exactly like the ability working while being quietly worse than the
 # card, which is the failure §7 named.
 func _live_block_chance(u: BattleUnit) -> float:
+	# BATCH EZ §2 — A BARED-PLATE WARDEN COVERS NOBODY, and this is the second
+	# of the rune's two sites for the reason the roll's own comment gives: the
+	# ward Covering Guard lays reads THIS number, so a rune that only refused
+	# his own roll would leave him blocking blows on an ally's body while
+	# blocking none on his own.
+	if u.rune_no_block > 0:
+		return 0.0
 	var bc := u.block_chance + _plating_slice(u)
 	return clampf(bc, 0.0, 1.0)
 
@@ -14846,18 +15109,33 @@ const RUIN_LEECH_CAP := 0.40
 # silently inflated all three off one node.
 func _old_gods_mark() -> int:
 	var occ := _living_occultist()
-	if occ != null and occ.whispers_step > 0:
-		return OLD_GODS_MARK + occ.whispers_step
-	return OLD_GODS_MARK
+	if occ == null:
+		return OLD_GODS_MARK
+	# BATCH EZ §1 — THE WIDE RITE ADDS ONE, AND IT IS `whispers_step`'s EXACT
+	# SHAPE beside it: the rune moves the number in the ONE function all five
+	# quoting sites call, so it cannot land at four of them and not the fifth.
+	# **THE PASSIVE ALREADY MARKS TWO**, so the rune reads +1 rather than
+	# turning something on — see `docs/reports/EZ.md` §1c, where the premise it
+	# was written against is checked.
+	return OLD_GODS_MARK + occ.whispers_step + occ.rune_wide_rite
 
 
 func _ruin_threshold() -> int:
 	var occ := _living_occultist()
 	# `avatar_ruin` is the GATE AND THE MAGNITUDE in one field (AW's `judgement`
 	# precedent): it holds the threshold the capstone installs.
+	var step := RUIN_THRESHOLD
 	if occ != null and occ.avatar_ruin > 0:
-		return occ.avatar_ruin
-	return RUIN_THRESHOLD
+		step = occ.avatar_ruin
+	# BATCH EZ §1 — DEEPENING HEX installs 8, in the same field shape the
+	# capstone uses. **IT IS A `mini`, NOT AN ASSIGNMENT, AND THAT MATTERS:**
+	# Avatar of Ruin already installs 5, so an Occultist holding both would
+	# otherwise have the rune UNDO his capstone and push detonation back from
+	# every 5th stack to every 8th. A rune sold as deepening the hex making it
+	# shallower is the class of fault that reads exactly like the rune working.
+	if occ != null and occ.rune_hex_threshold > 0:
+		step = mini(step, occ.rune_hex_threshold)
+	return step
 
 
 # BATCH AY §8 — WRATH OF THE OLD GODS MARKS WITH TWO, NOT ONE. AX measured
@@ -20894,6 +21172,32 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	# Lone Bond: the one beast of the fight arrives deep in the bond.
 	if hunter.lone_bond > 0 and int(hunter.loyalty.get(kind, 0)) < hunter.lone_bond:
 		hunter.loyalty[kind] = hunter.lone_bond
+	# BATCH EZ §4 — THE SECOND WHISTLE. Every summon fields its beast with 3
+	# Loyalty already earned. **IT RAISES RATHER THAN ASSIGNS**, which is
+	# Succession's own discipline four blocks up and is load-bearing for the
+	# same reason: a returning beast already keeps what it earned, so an
+	# assignment would let a re-call into a deep bond LOWER it — a rune sold on
+	# arriving devoted quietly costing depth.
+	#
+	# **IT NAMES THREE ABILITIES IN THE PROTECTED CORE**, so every Beastmaster
+	# can roll it — `Summon Ursus`, `Summon Canis` and `Summon Aguila` are his
+	# passive's own enablers and no draft can take them away.
+	if hunter.rune_second_whistle > int(hunter.loyalty.get(kind, 0)):
+		hunter.loyalty[kind] = hunter.rune_second_whistle
+	# BATCH EZ §4 — THE SHARED SCENT. Loyalty carries to the NEXT companion when
+	# one dies: `_on_beast_death` banks the fallen meter on the hunter and this
+	# is where it is spent. **IT IS SPENT, NOT COPIED** — the bank is cleared
+	# here, so one death pays one arrival and a Beastmaster cannot ride a single
+	# fallen bond through a whole rotation.
+	#
+	# **AND IT RAISES, FOR SUCCESSION'S REASON.** A beast returning to a deeper
+	# bond than the one that fell keeps its own.
+	if hunter.rune_shared_scent > 0 and hunter.shared_scent_bank > 0:
+		if hunter.shared_scent_bank > int(hunter.loyalty.get(kind, 0)):
+			hunter.loyalty[kind] = hunter.shared_scent_bank
+			_log("   → Shared Scent: the pack remembers — %s arrives holding %d Loyalty" % [
+				kind.capitalize(), hunter.shared_scent_bank], "#e0a050")
+		hunter.shared_scent_bank = 0
 	# Returning beasts keep their Loyalty; Ursus carries its HP gift too.
 	var prior_l: int = int(hunter.loyalty.get(kind, 0))
 	# Beast Within grows the base. (The flat `companion_hp_bonus` that used to
@@ -20962,6 +21266,13 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	hunter.beast_committed = true
 	# Ancient Pact: the beast is beyond all mending.
 	if hunter.ancient_pact > 0:
+		comp.no_heals = true
+	# BATCH EZ §4 — THE BARED FANG'S COST, AND IT IS ANCIENT PACT'S OWN FIELD
+	# RATHER THAN A SECOND ONE. `no_heals` sits at the top of `heal_amount`
+	# with the absolute refusals, so "the companion cannot be healed" is a RULE
+	# and not an amount — which is the same reading Unmaking and Weight of Ruin
+	# already ship. A second field would be a second answer to one question.
+	if hunter.rune_bared_fang > 0.0:
 		comp.no_heals = true
 	# One Soul: the hunter and EVERY beast he fields share every wound.
 	_sync_soul_bond(hunter)
@@ -21185,6 +21496,75 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 
 # All beasts deal physical damage using the hunter's inherited crit chance.
 # `pen` ignores that share of the victim's armor (Aguila's Loyalty gift).
+# ══ BATCH EZ §4 — THE SHARED HIDE, AND WHAT IT COULD AND COULD NOT BE ══════
+#
+# **THE RULING WAS "THE COMPANION INHERITS EVERYTHING — THE FULL HERO
+# MULTIPLIER BLOCK, NOT A SHARE AND NOT A NAMED LIST", AND WHAT SHIPPED IS A
+# NAMED LIST. THAT IS THE BATCH'S SHARPEST DIVERGENCE AND IT IS SAID HERE
+# RATHER THAN LEFT TO BE FOUND.** The reason is structural: the hero block is
+# ~84 terms written INLINE inside `_resolve_ability`'s strike loop, interleaved
+# with reads of `ab` (the Ability), of `strike_target`, of `grade` and of local
+# state built forty lines earlier. There is no function to call and no
+# expression to reuse — extracting one is a refactor of the largest function in
+# the project, and this batch's own charter forbids moving an ability, a
+# magnitude or a constant. **`docs/reports/EZ.md` §4b carries the term-by-term
+# reading the brief asked for, and names the gap in both directions.**
+#
+# ── WHAT THIS LIST IS, AND WHY IT IS THE RIGHT LIST TO HAVE ────────────────
+# **EVERY TERM HERE IS A BUFF THE COMPANION ALREADY WEARS AND HAS NEVER READ.**
+# That is DK's measurement made actionable: Empower attached to a beast
+# perfectly — chip, tooltip and all — and paid exactly 1.0000, because
+# `_companion_hit` reads none of them. So the population is not "the hero's
+# terms handed to the beast"; it is "the terms the beast is ALREADY CARRYING
+# and was silently ignoring", which is a set this function can be complete
+# over. **It is read off the COMPANION**, not off the hunter, so a party buff
+# that missed the beast is honestly worth nothing and one that landed pays.
+#
+# **AND THE HUNTER'S OWN TWO ARE HERE TOO** — Last Howl and Vengeance's
+# `vengeance_dmg` are fields rather than statuses and live on him, and both are
+# by construction about a companion that died, which is exactly the thing a
+# rune called the Shared Hide should carry across.
+#
+# ── WHAT IT CANNOT REACH, REGARDLESS OF THIS RUNE ──────────────────────────
+# **A TERM THE BEAST CANNOT BE GIVEN IS NOT TURNED ON BY THIS RUNE.** DU §2
+# enumerated the block and found 76 of its 78 absent terms unreachable BY
+# SHAPE, and the shape is in `_companion_hit`'s signature: it takes a float and
+# not an `Ability`, so 26 ability-keyed terms cannot apply; a companion's
+# `passive_id` is always the empty string (10 more); and a companion is never
+# allocated a tree, so every talent-rank field on one is zero (20 more). **This
+# rune does not change any of that and does not pretend to.**
+func _shared_hide_mult(comp: BattleUnit) -> float:
+	if comp == null or comp.rune_shared_hide <= 0:
+		return 1.0
+	var m := 1.0
+	# The five party/self buff statuses that read as a flat multiplier —
+	# `has_status` and a literal, exactly as the strike loop writes them.
+	if comp.has_status("surge"):
+		m *= 1.2
+	if comp.has_status("empower"):
+		m *= 1.25
+	if comp.has_status("blood_price"):
+		m *= 1.25
+	if comp.has_status("hexed"):
+		m *= 0.85
+	# ...and the five that carry their number ON the status, which is the one
+	# implementation of "this unit deals N% more damage" the file already has.
+	for sid in ["battle_shout", "warcry", "bring_it_down", "reckless_abandon",
+			"tempo"]:
+		if comp.has_status(sid):
+			m *= 1.0 + comp.status_power(sid) / 100.0
+	# The hunter's own two. Both are about a bond that ALREADY BROKE, which is
+	# why a rune sharing the hide is the item that carries them onto the animal
+	# standing in the fallen one's place.
+	var pm: BattleUnit = comp.pack_master
+	if pm != null and not pm.dead:
+		if pm.last_howl_dmg > 0:
+			m *= 1.0 + pm.last_howl_dmg / 100.0
+		if pm.has_status("vengeance") and pm.vengeance_dmg > 0:
+			m *= 1.0 + 0.01 * pm.vengeance_dmg
+	return m
+
+
 func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 		pen := 0.0) -> void:
 	if victim == null or victim.dead:
@@ -21237,6 +21617,14 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	# companion's blow carries no damage type at all — see the flat physical
 	# resist read below — so the term would find nothing to apply to. Fixing
 	# half of that would read as working while paying exactly what it pays now.
+	# BATCH EZ §4 — THE SHARED HIDE and THE BARED FANG, the two runes that move
+	# this line. The hide is the whole block above; the fang is a flat +30% and
+	# is paid for with `no_heals` at the summon. **THEY COMPOSE**: a Beastmaster
+	# holding both gets both, and neither reads the other.
+	raw *= _shared_hide_mult(comp)
+	var bf_pm: BattleUnit = comp.pack_master
+	if bf_pm != null and bf_pm.rune_bared_fang > 0.0:
+		raw *= 1.0 + bf_pm.rune_bared_fang
 	if comp.has_status("cripple"):
 		raw *= 0.75
 	var comp_chill := comp.status_stacks("chilled")
@@ -21827,7 +22215,14 @@ func _is_sharpshooter_basic(u: BattleUnit, ab: Ability) -> bool:
 func _sequence_presses(u: BattleUnit) -> int:
 	if u == null or u.second_resource_name != "Focus":
 		return 1
-	return clampi(1 + int(u.second_resource / SS_SEQ_STEP), 1, SS_SEQ_MAX_PRESSES)
+	# BATCH EZ §3 — THE LONG DRAW ADDS ONE PRESS AT EVERY STAGE, AND THE
+	# STAGES DO NOT MOVE. `SS_SEQ_STEP` is untouched, so the ladder is still one
+	# press below 50 Focus and then 50 / 100 / 150 — the rune raises the CAP by
+	# the same one it adds, or the addition would be swallowed at the top of the
+	# ladder and the card would pay nothing to the deep-Focus build it is for.
+	return clampi(1 + u.rune_long_draw_presses
+		+ int(u.second_resource / SS_SEQ_STEP), 1,
+		SS_SEQ_MAX_PRESSES + u.rune_long_draw_presses)
 
 
 # §1/§4 — THE PROFILE HIS BASIC HANDS THE BAR.
@@ -21854,7 +22249,21 @@ func _sharpshooter_basic_profile(u: BattleUnit) -> Dictionary:
 	var presses := _sequence_presses(u)
 	var scale: float = float(SC_PROFILE_DEFAULT["sweep_time"]) \
 		* SS_SEQ_OFFSET / SS_SEQ_SWEEP
-	var open_widen: float = float(SS_SEQ_OPEN[presses - 1])
+	# BATCH EZ §3 — AND THIS CLAMP IS THE LONG DRAW'S ENTIRE COST, WHICH IS
+	# WHY IT IS NOT A DEFENSIVE BOUND. `SS_SEQ_OPEN` is a four-entry table
+	# SOLVED so that a one-, two-, three- or four-press sequence lands with the
+	# same probability — CS §4's demand that a deeper sequence must not be
+	# likelier to break. **The rune adds a fifth press and the table is NOT
+	# extended**, deliberately: the extra press opens at the four-press widening
+	# and then takes another `SS_SEQ_TAPER` step, so the sequence really does
+	# get harder to hold together. That is the "but the windows are narrower"
+	# half of the card, and it is the only place it lives.
+	#
+	# **THE 15% PER-PRESS TAPER THE BRIEF NAMES IS ALREADY SHIPPED** —
+	# `SS_SEQ_TAPER` is 0.85 and has been since CS — so the rune does not move
+	# it and could not narrow anything by doing so. See `docs/reports/EZ.md`
+	# §3c, where that premise is checked.
+	var open_widen: float = float(SS_SEQ_OPEN[mini(presses, SS_SEQ_OPEN.size()) - 1])
 	return {
 		"perfect_half": float(SC_PROFILE_DEFAULT["perfect_half"]) * scale,
 		"good_half": float(SC_PROFILE_DEFAULT["good_half"]) * scale * open_widen,
@@ -22022,6 +22431,16 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 		if trophy:
 			_log("   → Trophy Shot: the kill costs him NOTHING — all %d Focus carries to the next mark" % \
 				attacker.second_resource, "#e0a050")
+		elif attacker.rune_wide_watch > 0:
+			# BATCH EZ §3 — THE WIDE WATCH. The kill costs him nothing: the
+			# meter carries in FULL rather than the 50 the base rule retains.
+			# It is written as its own arm above the Overkill one rather than
+			# beside it because the two are the SAME outcome by different
+			# routes, and a rune quietly reading as a talent's proc line is what
+			# the roll-call rule exists to stop.
+			if attacker.second_resource > 50:
+				_log("   → Wide Watch: the whole watch holds — all %d Focus survives the kill" % \
+					attacker.second_resource, "#e0a050")
 		elif attacker.overkill <= 0:
 			attacker.second_resource = mini(attacker.second_resource, 50)
 		elif attacker.second_resource > 50:
@@ -22080,7 +22499,18 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 					attacker.last_attack_target.unit_name], "#e0a050")
 		elif attacker.second_resource > 0:
 			attacker.float_text("Focus broken", Color(0.65, 0.65, 0.65))
-		attacker.second_resource = 0
+		# BATCH EZ §3 — KEEN FOCUS. A switch HALVES the meter instead of
+		# clearing it. **IT SITS BELOW REACQUIRE AND ABOVE THE ZERO**, which is
+		# the whole ordering: Reacquire banks the WHOLE meter on a marked body
+		# and pays it back on the return, so a rune that halved first would
+		# quietly halve what the node banks. A hero holding both banks the full
+		# meter and keeps half of it in hand — the two compose rather than
+		# competing, which is the shape this file already gives Steadfast Bond
+		# and Vengeance.
+		if attacker.rune_keen_focus > 0:
+			attacker.second_resource = attacker.second_resource / 2
+		else:
+			attacker.second_resource = 0
 		attacker.same_target_turns = 0
 		attacker.refresh_bars()
 	# THE RETURN. It sits below BOTH branches deliberately: coming back to the
@@ -22145,6 +22575,20 @@ func _on_beast_death(comp: BattleUnit) -> void:
 	elif had > 0:
 		pm.loyalty[kind] = 0
 		_log("   → %s's Loyalty is broken" % comp.unit_name, "#c08850")
+	# BATCH EZ §4 — THE SHARED SCENT BANKS IT, AND IT READS `had`. Last Howl's
+	# own reasoning applies exactly: Steadfast Bond rewrites this meter three
+	# lines up, so a read taken afterwards would carry only the share that
+	# SURVIVED rather than what the companion actually earned — and the whole
+	# card is that the bond outlives the body it was sworn to.
+	#
+	# **IT STACKS WITH STEADFAST BOND RATHER THAN REPLACING IT**: that node
+	# holds a share of the DEAD kind's meter, this carries the full meter to the
+	# NEXT kind, and the two are different meters. A Beastmaster holding both
+	# gets both, which is what the pair's shapes already say.
+	if pm.rune_shared_scent > 0 and had > 0:
+		pm.shared_scent_bank = maxi(pm.shared_scent_bank, had)
+		_log("   → Shared Scent: %d Loyalty waits for the next of the pack" % \
+			had, "#e0a050")
 	if pm.vengeance > 0 and not pm.dead:
 		# BATCH AY §3: for the REST OF THE BATTLE, not a status's duration.
 		_apply_status(pm, "vengeance", -1)

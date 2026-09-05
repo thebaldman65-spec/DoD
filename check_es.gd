@@ -139,7 +139,11 @@ func _s1_rarity_is_gone() -> void:
 			with_rarity.append(String(id))
 		if (data[id] as Dictionary).has("scarred"):
 			with_scarred.append(String(id))
-	ok(data.size() == 65, "§1: the authored pool is %d entries, expected 65" % data.size())
+	# **BATCH EZ: 65 -> 86.** ET §1 retired all 65 and left the pool empty; EZ
+	# authors the first twenty-one under the new charter. The pin is MOVED, not
+	# loosened to a `>=` — the count is what says a rune arrived or left without
+	# anybody writing it down (CV's idiom, EY's `WANT_PROFILE` precedent).
+	ok(data.size() == 86, "§1: the authored pool is %d entries, expected 86" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 
@@ -592,24 +596,46 @@ func _s5_breadth() -> void:
 	print("\n§5 — a splash pays for breadth")
 	var data: Dictionary = JSON.parse_string(
 		FileAccess.get_file_as_string("res://data/runes.json"))
-	# A SPLASH IS A SPEC RUNE WITH NO LANE, derived rather than listed — the
-	# `lane` field is what the old authoring rule wrote and it is still there.
+	# ── BATCH EZ RE-POINTED THIS DERIVATION AND THE OLD ONE WAS STALE, NOT
+	# BROKEN ────────────────────────────────────────────────────────────────
+	# **A SPLASH USED TO BE "A SPEC RUNE WITH NO `lane`"**, which was exact
+	# while every authored rune carried a lane: the old rule was one rune per
+	# talent lane PLUS ONE SPLASH, so the empty field WAS the splash. ES §5
+	# severed the lane rule, and **EZ's twenty-one carry no `lane` at all** —
+	# under the old derivation all twenty-one read as splashes and the count
+	# went 12 -> 33. The gate was reporting the absence of a retired field.
+	#
+	# **THE NEW DERIVATION IS ES §5's OWN DEFINITION: A SPLASH PAYS FOR
+	# BREADTH.** It reads `RUNE_SHAPES`' secondary, which is the axis EZ §0
+	# authors, so the two halves of "what a splash is" can never disagree again.
+	# The RETIRED population keeps the `lane` reading, because that is the rule
+	# those entries were authored under and re-deriving them under a rule they
+	# never saw would be inventing history.
 	var live: Array = []
 	var retired: Array = []
 	for id in data:
 		var e: Dictionary = data[id]
 		if not String(e.get("scope", "")).begins_with("spec:"):
 			continue
-		if String(e.get("lane", "")) != "":
-			continue
 		if String(e.get("retired", "")) != "":
+			if String(e.get("lane", "")) != "":
+				continue
 			retired.append(String(e["scope"]).trim_prefix("spec:"))
 		else:
+			if not (Runes.rune_shape(String(id)) as Array).has("BREADTH"):
+				continue
 			live.append(String(e["scope"]).trim_prefix("spec:"))
 	live.sort()
 	retired.sort()
-	ok(live.size() + retired.size() == 12,
-		"§5: %d splashes, expected one per spec" % (live.size() + retired.size()))
+	ok(retired.size() == 12,
+		"§5: %d retired splashes, expected one per spec" % retired.size())
+	# **THE LIVE COUNT IS PRINTED AND FLOORED, NOT PINNED.** Which specs get a
+	# splash is CONTENT and is the designer's; four specs are authored and eight
+	# are not, so an equality here would go red on the next authoring batch for
+	# doing exactly the right thing. The floor is what stops the shape going
+	# quietly extinct.
+	ok(live.size() >= 4,
+		"§5: %d live splashes — the BREADTH shape has gone extinct" % live.size())
 	print("    splashes: %d live (%s)" % [live.size(), ", ".join(live)])
 	print("    splashes: %d retired (%s)" % [retired.size(), ", ".join(retired)])
 

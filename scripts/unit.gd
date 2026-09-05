@@ -834,7 +834,13 @@ const FOCUS_BAR_REF := 200.0    # what the second-resource bar fills toward when
 # holds the DROP, which is what makes it additive: the node pays 40 and the Rune
 # of the Deep Sight pays 8 on top.
 func focus_convert() -> int:
-	return maxi(FOCUS_CONVERT - deep_focus - rune_deep_focus, 1)
+	# BATCH EZ §3 — HEAVY BOLTS DROPS THE POINT 100 -> 80, and it comes through
+	# THIS function beside Deep Focus rather than as a second rule. ER's
+	# standing rule is the reason it is written as a subtraction from the point
+	# and not as a change to `FOCUS_STEP`: **a rune moves WHERE the meter
+	# changes kind, never what a point of it pays.**
+	return maxi(FOCUS_CONVERT - deep_focus - rune_deep_focus
+		- rune_heavy_bolts, 1)
 
 
 func focus_crit_chance() -> float:
@@ -1378,6 +1384,59 @@ var cackling_ranks := 0       # Cackling Mirror: % of a fellow-strike healed
 var torment_ranks := 0        # Lingering Torment: Decay turns expired madness leaves
 var gluttony_ranks := 0       # Gluttony: +% per Ruin stack (its own dial)
 var rune_gluttony_ranks := 0  # rune-owned: the Hollow Chalice +3
+
+# ══ BATCH EZ — THE FIRST TWENTY-ONE RUNES' OWN FIELDS ═══════════════════════
+#
+# **EVERY ONE OF THESE IS RUNE-OWNED AND HAS `data/runes.json` AS ITS ONLY
+# WRITER**, which is the shape ET §4 measured across the retired pool (72 of
+# its 84 fields) and the shape EM's charter rules for: no rune writes a live
+# talent node's counter. **A rune reading one of these is dead the day nobody
+# writes it, and that is the intended failure** — a field with no writer is
+# visible; a shared counter quietly inflated by two owners is not.
+#
+# **THEY DO NOT CARRY THE `condition`.** A payload gated on EZ §0's THRESHOLD
+# or BREADTH is refused whole at `Talents.condition_met`, at the spawn, so a
+# field below is either written at its authored value or is zero — there is no
+# third state and no read site needs to ask a second question.
+#
+# Occultist —
+var rune_hex_threshold := 0   # rune-owned: Deepening Hex installs 8
+var rune_ruin_leech_cap := 0.0 # rune-owned: the Standing Mark +0.20
+var rune_split_tongue := 0    # rune-owned: Split Tongue 1 (a FLAG)
+var rune_wide_rite := 0       # rune-owned: the Wide Rite +1 to the mark
+var rune_open_wound := 0      # rune-owned: Open Wound 1 (a FLAG)
+# Warden —
+var rune_standing_wall := 0   # rune-owned: the Standing Wall 1 (a FLAG)
+var rune_bracing_line := 0    # rune-owned: Bracing Line 5 (percentage POINTS)
+var rune_split_shield := 0    # rune-owned: the Split Shield 1 (a FLAG)
+var rune_long_watch := 0      # rune-owned: the Long Watch 1 (a FLAG)
+var rune_no_block := 0        # rune-owned: Bared Plate 1 (a FLAG) — he cannot Block
+# Sharpshooter —
+var rune_keen_focus := 0      # rune-owned: Keen Focus 1 (a FLAG)
+var rune_heavy_bolts := 0     # rune-owned: Heavy Bolts 20 (points off the split)
+var rune_ambush := 0          # rune-owned: Ambush 1 (a FLAG)
+var rune_wide_watch := 0      # rune-owned: the Wide Watch 1 (a FLAG)
+var rune_long_draw_presses := 0 # rune-owned: the Long Draw +1 press at every stage
+# Beastmaster —
+var rune_long_leash := 0      # rune-owned: the Long Leash +3 to the split point
+var rune_shared_hide := 0     # rune-owned: the Shared Hide 1 (a FLAG)
+var rune_answering_pack := 0  # rune-owned: the Answering Pack 1 (a FLAG)
+var rune_second_whistle := 0  # rune-owned: the Second Whistle 3 (Loyalty on arrival)
+var rune_shared_scent := 0    # rune-owned: the Shared Scent 1 (a FLAG)
+var rune_bared_fang := 0.0    # rune-owned: the Bared Fang +0.30 companion damage
+
+# **NOT A RUNE FIELD AND DELIBERATELY NOT ONE: the Answering Pack's spend.**
+# The rune says "once a fight", so what is per-BATTLE is the SPEND and not the
+# holding — `battle.gd`'s spawn writes the field above once and never again,
+# and this is reset beside it. A rune field doubling as its own spent-flag
+# would be a rune that stops being held.
+var answering_pack_spent := false
+
+# **AND NOT A RUNE FIELD EITHER: the Shared Scent's carry.** The rune field is
+# the HOLDING; this is the meter a fallen companion left behind, written at
+# `_on_beast_death` and spent at the next `_do_summon`. It is per-battle state
+# in the same sense `loyalty` itself is.
+var shared_scent_bank := 0
 var pact_flesh_ranks := 0     # Pact of Flesh: percentage POINTS off Dark Pact's 20%
 var barter_step := 0          # Dark Barter: +% on Dark Pact's base 15% party heal
 var avatar_ruin := 0          # capstone: the Ruin threshold it installs (5), gate AND

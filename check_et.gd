@@ -64,6 +64,18 @@ func _data() -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 
 
+# **BATCH EZ — "IS THIS ID RETIRED", ASKED OF THE DATA RATHER THAN OF THE ID's
+# SHAPE.** §2 used to test `not id.begins_with("tpl_")`, which was exact while
+# the generated family was the ONLY thing that could be offered: it read "this
+# is not a stat stick, so it must be a retired entry". With twenty-one live
+# runes that inference is false and the test would have called every one of them
+# a leak. The question it was always asking is asked directly now.
+func _is_retired(id: String) -> bool:
+	if id == "" or id.begins_with("tpl_"):
+		return false
+	return String(Runes.config(id).get("retired", "")) != ""
+
+
 func _member(class_key: String, spec: String) -> Dictionary:
 	return {"key": class_key, "spec": spec, "runes": [], "abilities": [],
 		"earned_abilities": [], "bm_abilities": []}
@@ -84,10 +96,29 @@ func _member(class_key: String, spec: String) -> Dictionary:
 const EO_MARK := "BATCH EO"
 const ET_MARK := "BATCH ET"
 
+# ── BATCH EZ RE-POINTED THIS SECTION AND DID NOT WEAKEN IT ─────────────────
+#
+# **ET's SUBJECT WAS "THE POOL IS EMPTY". EZ ENDS THAT STATE AND THE SUBJECT
+# SURVIVES IT INTACT: the SIXTY-FIVE ET retired are still retired, still carry
+# their record, and are still unreachable through every door.** What is no
+# longer true is that the WHOLE FILE is retired, and that was never the ruling —
+# ET §1 ruled on the sixty-five it emptied, and those sixty-five are pinned
+# below by their own count rather than by the file's.
+#
+# **THE RETIRED POPULATION IS DERIVED, NOT SUBTRACTED FROM A TOTAL.** An entry
+# is retired iff it carries the key, so a twenty-second rune authored tomorrow
+# needs no line here — and a retired entry that quietly lost its string still
+# turns this red, which is the property the section was written for.
+const RETIRED_AT_ET := 65
+
 func _s1_all_retired() -> void:
-	print("\n§1 — every entry is retired, and every one says why")
+	print("\n§1 — the retired sixty-five are retired, and every one says why")
 	var data := _data()
-	ok(data.size() == 65, "§1: the authored pool is %d entries, expected 65" % data.size())
+	# THE TOTAL IS PRINTED AND NOT PINNED HERE: `check_es` §1 owns the authored
+	# count (86 today), and two gates pinning one growing number is the
+	# second-copy defect this project has a standing rule about. What THIS gate
+	# owes is that the sixty-five did not shrink.
+	print("    the authored pool is %d entries" % data.size())
 
 	var bare: Array = []
 	var eo := 0
@@ -95,7 +126,8 @@ func _s1_all_retired() -> void:
 	for id in data:
 		var s := String((data[id] as Dictionary).get("retired", ""))
 		if s == "":
-			bare.append(String(id))
+			# BATCH EZ — AN ENTRY WITH NO RETIREMENT RECORD IS A LIVE RUNE NOW.
+			# It was a defect only while the whole pool was retired.
 			continue
 		# A string that names no batch and no loss is a filter, not a record.
 		if not (s.contains(EO_MARK) or s.contains(ET_MARK)) or not s.contains("LOST:"):
@@ -106,9 +138,12 @@ func _s1_all_retired() -> void:
 		else:
 			et += 1
 	ok(bare.is_empty(),
-		"§1: %s carry no retirement record — the pool must be retired DECLARATIVELY" % [bare])
+		"§1: %s carry a retirement string naming no batch or no loss — a retirement must be DECLARATIVE" % [bare])
 	ok(eo == 12, "§1: %d entries carry EO's retirement, expected 12" % eo)
 	ok(et == 53, "§1: %d entries carry ET's retirement, expected 53" % et)
+	ok(eo + et == RETIRED_AT_ET,
+		"§1: %d entries are retired, expected the %d ET emptied — a retirement was UNDONE"
+			% [eo + et, RETIRED_AT_ET])
 	# **EO's TWELVE ARE NOT REWRITTEN.** ET §1 rules they keep their existing
 	# strings; a batch that re-worded them would erase EO's own record of what
 	# each of those twelve lost.
@@ -119,21 +154,48 @@ func _s1_all_retired() -> void:
 	# `eligible_ids` is the ONLY door to the authored pool — `generate` and
 	# `grant_rune` both reach it through here and nothing else — so an entry that
 	# is offerable despite its string would show only here.
+	# **BATCH EZ: THE QUESTION IS NO LONGER "IS ANYTHING OFFERABLE" — IT IS "IS
+	# ANYTHING *RETIRED* OFFERABLE", WHICH IS THE ONE ET ACTUALLY RULED.** A
+	# blanket emptiness check would have to be DELETED the day a rune is
+	# authored; this one gets sharper instead, because a live pool standing
+	# beside the retired one is what makes a leak possible at all.
 	var offerable: Array = []
+	var live_seen := {}
 	var specs := 0
 	for ckey in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[ckey]:
 			specs += 1
 			for id2 in Runes.eligible_ids(_member(String(ckey), String(spec)), []):
-				offerable.append("%s/%s" % [spec, id2])
+				if String(Runes.config(String(id2)).get("retired", "")) != "":
+					offerable.append("%s/%s" % [spec, id2])
+				else:
+					live_seen[String(id2)] = true
 	ok(specs == 12, "§1: walked %d specs, expected 12" % specs)
 	ok(offerable.is_empty(),
-		"§1: %s are still offerable against a fully retired pool" % [offerable])
+		"§1: %s are RETIRED and still offerable" % [offerable])
 	# THE SWEEP ASSERTS ITS OWN POPULATION (EA §5): a walk that read nothing
 	# would report a clean tree, and "nothing is offerable" is exactly what a
-	# broken walk prints.
-	ok(Runes.ids().size() == 65,
-		"§1: `Runes.ids()` reads %d entries — the walk lost its population" % Runes.ids().size())
+	# broken walk prints. **WITH THE RETIRED HALF UNREACHABLE BY CONSTRUCTION,
+	# THE LIVE HALF IS THE ONLY THING THAT CAN PROVE THE WALK RAN AT ALL** —
+	# which is why the floor moved onto it rather than staying on `ids()`.
+	# **TWENTY, NOT TWENTY-ONE, AND THE ONE THAT IS ABSENT IS ABSENT
+	# CORRECTLY.** `_member` carries no `bm_abilities`, and `Ambush` requires
+	# Called Volley — a Sharpshooter DRAFT card, not a protected core — so a
+	# hero who has drafted nothing cannot roll it. That is `requires_ability`
+	# doing precisely its job (an ability-payload rune naming an ability the
+	# hero does not own would apply silently and do NOTHING), and the floor
+	# records it rather than papering over it. The other three ability runes —
+	# Split Tongue, Open Wound and the Split Shield — all name core kit and are
+	# reached. **A FLOOR RATHER THAN AN EQUALITY**: which specs get authored
+	# next is content, and the number only ever goes up.
+	ok(live_seen.size() >= 20,
+		"§1: the eligibility walk reached %d live runes — it lost its population"
+			% live_seen.size())
+	print("    %d of %d live runes are reachable by a hero who has drafted nothing"
+		% [live_seen.size(), Runes.ids().size() - RETIRED_AT_ET])
+	ok(Runes.ids().size() == data.size(),
+		"§1: `Runes.ids()` reads %d entries against the file's %d" % [
+			Runes.ids().size(), data.size()])
 
 
 # ── §2 — THE OFFER NEVER COMES BACK EMPTY ──────────────────────────────────
@@ -176,7 +238,7 @@ func _s2_the_offer_is_never_empty() -> void:
 				if not (one.get("payload", {}) is Dictionary) \
 						or (one["payload"] as Dictionary).is_empty():
 					payloadless.append("%s/shop" % spec)
-				if not String(one.get("id", "")).begins_with("tpl_"):
+				if _is_retired(String(one.get("id", ""))):
 					non_template.append("%s/shop -> %s" % [spec, one.get("id", "")])
 			# (3) THE ELITE CACHE's pick-of-three, WITHOUT REPLACEMENT. A Warrior
 			# has FIVE markers (max_resource is excluded for the class) against
@@ -190,7 +252,7 @@ func _s2_the_offer_is_never_empty() -> void:
 				var seen := {}
 				for c in triple:
 					seen[String(c["name"])] = true
-					if not String(c.get("id", "")).begins_with("tpl_"):
+					if _is_retired(String(c.get("id", ""))):
 						non_template.append("%s/cache -> %s" % [spec, c.get("id", "")])
 				if seen.size() != 3:
 					empties.append("%s/cache repeated a name" % spec)
@@ -221,7 +283,7 @@ func _s2_the_offer_is_never_empty() -> void:
 	# way this batch could be wrong in the player's favour and still be wrong.
 	ok(non_template.is_empty(),
 		"§2: a RETIRED authored entry reached a live offer — %s" % [non_template])
-	print("    %d draws through five doors; every one a generated stat stick, none empty" % drawn)
+	print("    %d draws through five doors; none empty, none retired" % drawn)
 	run.sim_run = had_sim
 
 

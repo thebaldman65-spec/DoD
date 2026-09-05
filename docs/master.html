@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-05 (Batch EY &mdash; the base sweep goes to 1.00s)</b></p>
+<p align="right"><b>Last updated: 2026-09-05 (Batch EZ &mdash; the first twenty-one runes)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2569,8 +2569,50 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
-<br><b>THE WHOLE OFFERABLE POOL IS RETIRED (Batch ET §1). ALL 65 AUTHORED ENTRIES NOW CARRY A
-RETIREMENT STRING, AND THE GENERATED STAT FAMILY IS THE ONLY THING AN OFFER CAN CONTAIN.</b>
+<br><b>THE FIRST TWENTY-ONE RUNES ARE AUTHORED (Batch EZ). 86 ENTRIES: THE 65 ET RETIRED, AND
+21 LIVE ONES ACROSS FOUR SPECS.</b> The Occultist, the Warden and the Sharpshooter have five
+each and the Beastmaster six. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
+price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
+SPEC ONLY for all twenty-one</b>; eight specs are still unauthored, and a hero of one of those
+eight still draws nothing but the generated stat family.
+<br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY (Batch EZ §0).</b> The
+primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
+it, if anything &mdash; <b>THRESHOLD, BREADTH or TRADEOFF</b>. A rune may carry more than one, or
+none. They live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in
+<code>RUNE_TAGS</code>, and the two are <b>different axes</b>: one says what a rune is FOR in the
+seven-word card vocabulary, the other says what it does and what turns it on. <code>check_ez</code>
+&sect;0 asserts the label and the payload's condition agree in both directions, because a rune
+advertising a gate it does not have and one carrying a gate the player is never told about are
+different faults and neither is visible from one side.
+<br><b>THE TWO CONDITIONS ARE FRACTIONS OF THE HERO'S DRAFTED CARDS, NOT COUNTS.</b>
+<b>THRESHOLD: at least HALF his DRAFTED cards carry the named tag. BREADTH: NO tag exceeds a
+THIRD of them.</b> Both count the <b>PRIMARY tag only</b>, so a card contributes exactly one tag
+and the two read the same denominator. <b>The fraction is the point</b>: a hero drafts 4 earned
+slots at zone 1 and 7 by the end, so a fixed COUNT would mean two different commitments at those
+two moments &mdash; a fraction is the same commitment all run, <b>and it can be tipped by benching
+one card</b>, which is what makes the loadout lever reach the rune layer.
+<br><b>THE COUNTED SET IS THE DRAFTED HALF THAT IS EQUIPPED &mdash; never the pool, and NEVER
+the protected core.</b> Batch EG split pool from loadout and made only the earned half swappable,
+so the counted set and the swap lever are the same set. The core is out for a measured reason:
+<b>the Occultist's core alone carries the DEBUFF threshold</b>, so counting the whole bar would
+turn Deepening Hex on from the first fight with no bench able to turn it off. <b>ES &sect;4's
+census counts BOTH tags on a card and these count only the PRIMARY, and neither is the other's
+repair</b> &mdash; a census is right for a screen, and a condition needs a PARTITION or the
+per-tag numbers sum past the card count and &ldquo;a third of them&rdquo; means nothing.
+<br><b>THE STATE IS VISIBLE ON BOTH SCREENS AND UPDATES ON A SWAP, IMMEDIATELY.</b> The hero
+sheet and the loadout panel each carry a <code>RUNE CONDITIONS</code> line &mdash; <i>&ldquo;4 of
+7 &mdash; DEBUFF&rdquo;</i>, with a tick where the condition is met &mdash; beside the existing
+census, rebuilt from the live member on every draw. <b>A player who cannot see he is one card
+away cannot use the lever.</b>
+<br><b>AN EMPTY DRAFTED LIST MEETS BOTH CONDITIONS, VACUOUSLY, AND THAT IS REPORTED RATHER THAN
+GUARDED.</b> Nothing carries the tag, so nothing fails to be half of it; no tag exists, so none
+exceeds a third. It is the literal reading of the two rules, it is implemented literally, and it
+is reachable by benching everything.
+<br><b>THE CONDITION IS READ AT THE SPAWN AND NEVER IN THE STRIKE LOOP.</b> A loadout cannot
+change during a battle, so a gated payload is decided once, where <code>Talents.apply_payload</code>
+already reads its <code>condition</code> &mdash; and <code>Runes.loadout_condition_met</code> is
+the one door it comes through, which is what keeps the tag vocabulary inside the rune layer.
+<br><b>THE 65 ET RETIRED ARE STILL RETIRED (Batch ET §1) AND STILL UNREACHABLE.</b>
 EO §3 retired twelve; ET §1 retires the other fifty-three. <b>Retired the way the twelve
 already are &mdash; kept, and said to be kept</b>: every entry keeps its name, its price, its
 payload and its <code>desc</code>, still resolves through <code>config</code> /
@@ -2595,14 +2637,16 @@ on doing exactly what it did: the kind lived in the payload, never in the label.
 60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
 differ from an early one</i>. Measured on the live pool, that put <b>half of every zone-1
 offer</b> into the generated stat family and only a fifth of every zone-3 offer;
-<b>it is a flat ~30% at every slot now</b> &mdash; and <b>100% at every slot since ET §1
-retired the authored pool</b>. <b>The generated family survives as the filler
+<b>it is a flat ~30% at every slot now</b> &mdash; it was <b>100% at every slot</b> between
+ET §1 and EZ, while the authored pool stood empty, and it is back to a flat draw against the
+21 live entries for the four specs EZ authors and still 100% for the other eight. <b>The generated family survives as the filler
 and as the exhaustion floor</b>, at its authored magnitudes and one price: +10 max HP / +2%
 armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g. <b>It is kept exactly as it
-was: ET moves no magnitude and chooses no price.</b> Because it is now the whole pool, the
-<b>exhaustion floor</b> is reached far earlier than it ever was: a hero can draw <b>5 distinct
-runes (6 outside the Warrior class)</b> before the pool starts repeating, where the same hero
-reached <b>15&ndash;18</b> before ET.
+was: ET moves no magnitude and chooses no price.</b> While it was the whole pool the
+<b>exhaustion floor</b> was reached far earlier than it ever had been: a hero could draw <b>5
+distinct runes (6 outside the Warrior class)</b> before the pool started repeating, where the
+same hero reached <b>15&ndash;18</b> before ET. <b>Batch EZ lifts it back for four specs</b> and
+leaves the other eight exactly there.
 <br><b>Eligibility:</b> every rune declares a scope — universal, class-wide, or spec-only, so
 the awakening shapes the loot table — and ability-modifying runes only roll for heroes who
 actually own the named ability (boss trophies included). <b>SCOPE IS THE AXIS THAT SURVIVES,
@@ -2674,7 +2718,10 @@ asymmetry is gone: <b>48 of the 65 runes were built on it</b> and the <b>12 spla
 most</b>, since with no lanes to reach across a splash is three unrelated numbers in a
 bundle. The <b>36 `lane` fields are still authored and still shown</b>; they describe where
 a rune came from, not what it now reaches.
-<br><b>AND TWELVE OF THEM ARE RETIRED (Batch EO §3): 65 authored, 53 OFFERABLE.</b> The charter
+<br><b>AND TWELVE OF THEM ARE RETIRED (Batch EO §3): 65 authored, 53 OFFERABLE.</b>
+<b>(SUPERSEDED TWICE: ET §1 took it to 65 retired and 0 offerable, and EZ to 86 authored with
+21 offerable &mdash; the paragraph below is EO's reading of ITS OWN twelve and is kept because
+it is the reasoning the next retirement is argued against.)</b> The charter
 emptied <b>sixteen</b> runes whose every clause was talent-keyed &mdash; after the re-key each is
 mechanically whole and has lost the argument for existing, because each was <i>your lane, but
 more</i>. <b>Three are held back for re-authoring</b> (the Beastmaster's Deep Bond, Shared Wild

@@ -209,7 +209,22 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_opening_volley", "rune_triage_heal", "rune_last_hope_pct",
 	"rune_zealous_mercy", "rune_righteous_step", "rune_faithful_step",
 	"rune_soul_leech_step", "rune_deep_hex_step", "rune_spread_ruin",
-	"rune_divine_presence_pct"]
+	"rune_divine_presence_pct",
+	# BATCH EZ — THE FIRST TWENTY-ONE'S OWN INT FIELDS. Nineteen of the
+	# twenty-one write an int and NONE of the nineteen ends in "_ranks", so
+	# every one needs this list for exactly the AA reason: JSON parses `1` as a
+	# float and a float into a typed int var is a runtime error at spawn, not a
+	# rounding. **THE TWO FLOATS ARE DELIBERATELY ABSENT AND NAMED HERE SO THE
+	# ABSENCE READS AS A DECISION**: `rune_ruin_leech_cap` (the Standing Mark's
+	# 0.20) and `rune_bared_fang` (0.30) would both flatten to 0 outright, which
+	# is the failure that reads exactly like the rune working — the Bared
+	# Guard's -0.15 precedent, one line up.
+	"rune_hex_threshold", "rune_split_tongue", "rune_wide_rite",
+	"rune_open_wound", "rune_standing_wall", "rune_bracing_line",
+	"rune_split_shield", "rune_long_watch", "rune_no_block",
+	"rune_keen_focus", "rune_heavy_bolts", "rune_ambush", "rune_wide_watch",
+	"rune_long_draw_presses", "rune_long_leash", "rune_shared_hide",
+	"rune_answering_pack", "rune_second_whistle", "rune_shared_scent"]
 
 static var _data := {}
 
@@ -307,7 +322,97 @@ const RUNE_TAGS := {
 	"glass": ["OFFENSE", "DEFENSE"],  # Glass Rune
 	"reaper": ["OFFENSE"],  # Rune of the Reaper
 	"vampiric": ["DEFENSE", "OFFENSE"],  # Vampiric Rune
+	# ── BATCH EZ — THE FIRST TWENTY-ONE, ON THE SAME VOCABULARY ─────────────
+	# **THESE ARE THE ARCHETYPE TAGS AND THEY ARE NOT §0's PRIMARY TYPE.** EZ
+	# §0 gives every rune a TYPE (ABILITY / PASSIVE / STAT) and an optional
+	# SECONDARY (THRESHOLD / BREADTH / TRADEOFF); those live in `RUNE_SHAPES`
+	# below and are a different axis entirely — one says what a rune touches,
+	# this says what it is FOR, in the same seven words every card carries.
+	# Both are wanted and neither derives the other: `standing_wall` is a
+	# PASSIVE with no secondary, and it is a DEFENSE rune.
+	"deepening_hex": ["DEBUFF", "BREAK"],      # Deepening Hex
+	"standing_mark": ["DEBUFF", "DEFENSE"],    # Standing Mark — the draught heals
+	"split_tongue": ["DEBUFF"],                # Split Tongue
+	"wide_rite": ["DEBUFF"],                   # Wide Rite
+	"open_wound": ["DEBUFF"],                  # Open Wound
+	"standing_wall": ["DEFENSE"],              # Standing Wall
+	"bracing_line": ["DEFENSE"],               # Bracing Line
+	"split_shield": ["DEFENSE"],               # Split Shield
+	"long_watch": ["BREAK"],                   # Long Watch
+	"bared_plate": ["BREAK", "DEFENSE"],       # Bared Plate — it SPENDS defense
+	"keen_focus": ["RESOURCE"],                # Keen Focus
+	"heavy_bolts": ["RESOURCE", "OFFENSE"],    # Heavy Bolts
+	"ambush": ["OFFENSE", "RESOURCE"],         # Ambush
+	"wide_watch": ["RESOURCE"],                # Wide Watch
+	"long_draw_press": ["RESOURCE"],           # Long Draw — the sequence pays Focus
+	"long_leash": ["OFFENSE", "RESOURCE"],     # Long Leash
+	"shared_hide": ["OFFENSE"],                # Shared Hide
+	"answering_pack": ["DEFENSE"],             # Answering Pack
+	"second_whistle": ["RESOURCE"],            # Second Whistle
+	"shared_scent": ["RESOURCE"],              # Shared Scent
+	"bared_fang": ["OFFENSE", "DEFENSE"],      # Bared Fang — it SPENDS the mending
 }
+
+
+# ══ BATCH EZ §0 — WHAT A RUNE IS AND WHAT GATES IT ═════════════════════════
+#
+# **THE PRIMARY TYPE — WHAT IT TOUCHES: ABILITY, PASSIVE or STAT. THE
+# SECONDARY — WHAT GATES IT, IF ANYTHING: THRESHOLD, BREADTH or TRADEOFF.** A
+# rune may carry more than one secondary, or none. Authored beside the entry it
+# describes rather than derived from the payload, because the two answer
+# different questions: `bared_plate` writes two `stat` fields and is a STAT rune
+# with a TRADEOFF, while `standing_wall` also writes one `stat` field and is a
+# PASSIVE with none — the payload's SHAPE cannot tell them apart.
+#
+# **THE SECONDARY IS NOT THE CONDITION AND MUST NOT BE READ AS ONE.** The
+# condition is in the payload, where `Talents.condition_met` reads it; this is
+# the word a surface shows. They are asserted equal to each other by the gate
+# rather than by one deriving the other, so a rune labelled THRESHOLD whose
+# payload carries no `tag_threshold` is a defect that can be caught.
+const RUNE_SHAPES := {
+	"deepening_hex": ["PASSIVE", "THRESHOLD"],
+	"standing_mark": ["PASSIVE"],
+	"split_tongue": ["ABILITY"],
+	"wide_rite": ["PASSIVE", "BREADTH"],
+	"open_wound": ["ABILITY", "TRADEOFF"],
+	"standing_wall": ["PASSIVE"],
+	"bracing_line": ["PASSIVE", "THRESHOLD"],
+	"split_shield": ["ABILITY"],
+	"long_watch": ["PASSIVE", "BREADTH"],
+	"bared_plate": ["STAT", "TRADEOFF"],
+	"keen_focus": ["PASSIVE"],
+	"heavy_bolts": ["PASSIVE", "THRESHOLD"],
+	"ambush": ["ABILITY"],
+	"wide_watch": ["PASSIVE", "BREADTH"],
+	"long_draw_press": ["ABILITY", "TRADEOFF"],
+	"long_leash": ["PASSIVE"],
+	"shared_hide": ["PASSIVE"],
+	"answering_pack": ["PASSIVE", "THRESHOLD"],
+	"second_whistle": ["ABILITY"],
+	"shared_scent": ["PASSIVE", "BREADTH"],
+	"bared_fang": ["STAT", "TRADEOFF"],
+}
+
+const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
+const RUNE_SECONDARIES := ["THRESHOLD", "BREADTH", "TRADEOFF"]
+
+
+# A rune's shape: `[type]` or `[type, secondary...]`, `[]` for an id the table
+# does not carry — the retired sixty-five and the generated TEMPLATE family.
+# **THE ONE READER**, `rune_tags`'s own shape one table up.
+static func rune_shape(id: String) -> Array:
+	return RUNE_SHAPES.get(id, [])
+
+
+# "PASSIVE · THRESHOLD", or "" — what a surface prints beside the tag line.
+static func rune_shape_line(id: String) -> String:
+	var t: Array = rune_shape(id)
+	if t.is_empty():
+		return ""
+	var parts: Array = []
+	for x in t:
+		parts.append(String(x))
+	return " · ".join(parts)
 
 
 # A rune's tags: `[primary]` or `[primary, secondary]`, `[]` for an id the
@@ -381,6 +486,122 @@ static func tag_threshold_met(loadout_names: Array, tag: String, need: int) -> b
 # reach across, and a hero who is spread rather than deep is who it is for.
 static func breadth_met(loadout_names: Array, need: int) -> bool:
 	return Classes.tag_breadth(loadout_names) >= need
+
+
+# ══ BATCH EZ §0 — THE TWO CONDITIONS THE FIRST TWENTY-ONE RUNES OBEY ═══════
+#
+# **THEY ARE FRACTIONS, NOT COUNTS, AND THAT IS THE DESIGNER'S REASON RATHER
+# THAN AN IMPLEMENTATION CHOICE.** A hero drafts 4 earned slots at zone 1 and 7
+# by the end (`ABILITY_SLOTS_BY_BOSS` 7→10 against a 3-slot core), so a FIXED
+# count means two different commitments at those two moments — "3 DEBUFF cards"
+# is three quarters of an opening loadout and under half of a finished one. A
+# fraction is the same commitment all run, **and it can be tipped by benching
+# one card**, which is what makes the loadout lever reach the rune layer.
+#
+# ── THE COUNTED SET IS THE DRAFTED HALF, AND IT IS THE SWAP LEVER'S OWN SET ──
+# **`Run.equipped_ability_names(member)` — DRAFTED AND CARRIED. Not the pool,
+# and NOT the protected core.** ES §4's helpers count the whole bar including
+# the core, deliberately, because a screen showing a loadout must show all of
+# it; **these do not, and the difference is load-bearing.** The core kit alone
+# already meets a 2+ threshold on BREAK for ten of the twelve specs and on
+# DEBUFF for seven (`check_es` §4 prints that table every run) — counting it
+# would put those two magnitudes on from the first fight with no swap able to
+# turn them off. **And `equip_earned_ability` / `unequip_earned_ability` write
+# exactly this list**, so the counted set and the lever are the same set:
+# EG §2 split pool from loadout and made only the earned half swappable.
+#
+# **THE COUNT IS PRIMARY-ONLY** (`Classes.primary_tag_*`) so the per-tag numbers
+# partition the list and both conditions read one denominator — see that block
+# for why the both-tags census is right for a screen and wrong for these.
+#
+# **READ AT THE SPAWN, NEVER IN THE STRIKE LOOP.** The loadout cannot change
+# during a battle (benching is a map screen), so a payload gated on one of
+# these is decided once, where `Talents.apply_payload` already reads its
+# `condition` — see `Talents.condition_met`.
+
+# **THRESHOLD: at least HALF the hero's drafted cards carry the named tag.**
+# Written as `x 2 >=` rather than as a float ratio because half of an odd count
+# has to round the same way every time it is read, and integer arithmetic is
+# the only form of that which cannot drift between a condition and the surface
+# printing it. **AN EMPTY DRAFTED LIST MEETS IT VACUOUSLY** (0 >= 0) — that is
+# the literal reading of the rule and it is REPORTED rather than guarded, see
+# `docs/reports/EZ.md` §0b.
+static func threshold_met(drafted: Array, tag: String) -> bool:
+	return Classes.primary_tag_count(drafted, tag) * 2 >= drafted.size()
+
+
+# **BREADTH: NO tag exceeds a THIRD of the hero's drafted cards.** The inverse
+# shape — a threshold rewards depth in one tag, this rewards a hero who is
+# spread — and it is a BOUND on the peak rather than a count of how many tags
+# are touched. **`ES §5`'s `breadth_met` IS A DIFFERENT QUESTION AND BOTH
+# STAND**: that one asks how many different tags a list touches at all, this
+# asks whether any one of them dominates.
+#
+# "Exceeds" is strict, so a tag sitting exactly ON a third passes: at 6 drafted
+# cards a peak of 2 is fine and 3 is not. Same integer discipline as above.
+static func breadth_met_fraction(drafted: Array) -> bool:
+	return Classes.primary_tag_peak(drafted) * 3 <= drafted.size()
+
+
+# **THE DRAFTED-AND-CARRIED LIST, off the member dict alone.** This file is a
+# `class_name` script and these are STATIC, so it cannot see the `Run` autoload
+# (EQ's compile-error lesson, recorded in the block above) — it reads the same
+# two keys `Run.equipped_ability_names` reads, in the same order, so a member
+# that has never benched anything reads its pool exactly as the fight does.
+static func drafted_names(member: Dictionary) -> Array:
+	if member.is_empty():
+		return []
+	return member.get("bm_equipped", member.get("bm_abilities", [])).duplicate()
+
+
+# **THE ONE DOOR A PAYLOAD'S CONDITION COMES THROUGH, AND THE ONLY PLACE THE
+# TWO KEY NAMES ARE WRITTEN.** `Talents.condition_met` hands the whole `cond`
+# dict here rather than reading `tag_threshold` / `tag_breadth` itself, because
+# `check_ek` §3 asserts that the set of `.gd` files naming the tag surface is
+# EXACTLY four — the two that define the tables and the two that display them —
+# and `talents.gd` is not one of them. **That is not a formality**: the day a
+# fifth file names a tag, that gate is what says so, and a rune layer that had
+# quietly leaked its vocabulary into the talent file would have spent the
+# warning on itself.
+#
+# **AN EMPTY MEMBER MAKES A GATED PAYLOAD INERT** rather than silently
+# unconditional — `condition_met`'s own stated direction, carried through here:
+# a hero with no member dict has no drafted cards, and `threshold_met` over an
+# empty list is the one place that reading is generous, which is why the
+# EMPTINESS is checked here and not left to the arithmetic.
+static func loadout_condition_met(cond: Dictionary, member: Dictionary) -> bool:
+	if cond.is_empty():
+		return true
+	var wants_tag: bool = cond.has("tag_threshold") \
+		or bool(cond.get("tag_breadth", false))
+	if not wants_tag:
+		return true
+	if member.is_empty():
+		return false
+	var drafted := drafted_names(member)
+	if cond.has("tag_threshold") \
+			and not threshold_met(drafted, String(cond["tag_threshold"])):
+		return false
+	if bool(cond.get("tag_breadth", false)) \
+			and not breadth_met_fraction(drafted):
+		return false
+	return true
+
+
+# **THE ONE LINE A SURFACE PRINTS FOR A THRESHOLD** — *"4 of 7 — DEBUFF"*, or
+# with the tag absent, *"0 of 7 — DEBUFF"*. ES requires the state be visible and
+# EZ §0 is where that earns out: a player who cannot see he is one card away
+# cannot use the lever. **ONE BUILDER**, so the hero sheet and the loadout panel
+# cannot render the same fact two ways.
+static func threshold_line(drafted: Array, tag: String) -> String:
+	return "%d of %d — %s" % [Classes.primary_tag_count(drafted, tag),
+		drafted.size(), tag]
+
+
+# ...and the breadth half: *"peak 2 of 7 — BREADTH"*.
+static func breadth_line(drafted: Array) -> String:
+	return "peak %d of %d — BREADTH" % [Classes.primary_tag_peak(drafted),
+		drafted.size()]
 
 
 # The tag line as a surface renders it — "DEFENSE · RESOURCE", or "".

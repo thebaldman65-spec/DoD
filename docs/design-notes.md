@@ -7265,3 +7265,88 @@ attacking, with what, and whether the target is Broken. A saturation test for th
 answered from the hunter alone; one for the eagle cannot. **That is a design question with a real
 cost attached, and it is now priced rather than guessed at.** Canis, for contrast, genuinely never
 saturates — its term reached ×30.16 at rows 1–9 and was still climbing.
+
+## Batch EZ — why a condition needs a partition, and why a ruling shipped as a list
+
+**The two conditions the designer wrote are fractions, and the reason is the ladder rather than
+elegance.** A hero drafts four earned slots at zone 1 and seven by the end — `ABILITY_SLOTS_BY_BOSS`
+runs 7→10 against a three-slot core — so a fixed count means two different commitments at those two
+moments. "Hold three DEBUFF cards" is three quarters of an opening loadout and under half of a
+finished one; it is one rule that quietly gets easier as the run goes on. A fraction is the same
+commitment throughout, and — this is the half that makes it a design rather than a tidy-up — **it
+can be tipped by benching one card**. That is what makes the loadout lever reach the rune layer at
+all. EG split the pool from the loadout two dozen batches ago and made only the earned half
+swappable; nothing had yet had a reason to read that split, and this is the reason.
+
+**The counted set is where a static check goes blind, so it is the thing worth writing down.** Three
+sets are candidates and all three produce a sensible number: the hero's POOL (everything drafted,
+nothing ever leaves), his BAR (the protected core plus what he carries) and the DRAFTED HALF he is
+carrying. The pool answers "what has he collected", which turns a threshold on once, late, and never
+off — a flat increment with a delay wearing a decision's clothes. The bar answers "what does he
+fight with", which sounds right and is worse: **the Occultist's protected core alone carries the
+DEBUFF threshold**, so Deepening Hex would be on from the first fight and no bench could turn it off.
+ES §4 printed that table every battery run for exactly this moment and it is the first time anything
+has been authored against it. Only the third set is both the thing the player chose and the thing he
+can change, and it is the set the two swap doors already write.
+
+**Why the count is primary-only when the census counts both tags, and why neither is the other's
+repair.** `Classes.tag_count` counts both tags on a card, deliberately: a card that Breaks and
+DEBUFFs is a member of both populations, and a screen showing a player his loadout must say so — 61
+of the corpus's second tags would otherwise be decorative. **A condition needs something a census
+does not: a partition.** Under the both-tags count the per-tag numbers sum past the card count, so a
+tag could exceed a third while every tag did, and "at least half carry the tag" could be met by two
+different tags at once on the same three cards. The two conditions are written as fractions of one
+denominator, and they can only be read against a denominator the parts add up to. So the primary-only
+counterparts sit beside the originals rather than replacing them, and the gate proves they are
+different numbers on a card where they disagree rather than asserting it.
+
+**And the vacuous reading was found, implemented literally, and reported rather than patched.** An
+empty drafted list meets both conditions: nothing carries the tag, so nothing fails to be half of it;
+no tag exists, so none exceeds a third. It is 0 ≥ 0 and 0 ≤ 0, it is the literal reading of both
+rules, **and it is reachable** — a player can bench everything and switch on a THRESHOLD rune and a
+BREADTH rune at the same time, which is the one state the two shapes were designed never to share.
+A batch does not alter an authored condition, so it ships as written and is named. It is the sharpest
+thing in the batch and the cheapest to change if the designer wants it changed: one clause.
+
+**The Shared Hide is the batch's real divergence and the interesting part is why it was not
+avoidable.** The ruling was explicit and its reasoning was good: the companion inherits *everything*,
+not a share and not a named list, because a named list is the stale-list trap this project has now
+hit six times — it goes wrong the day a thirteenth term is added and nothing announces it. What
+shipped is a named list. The obstacle is not judgement, it is shape: **the hero multiplier block is
+about eighty-four terms written inline inside the strike loop**, interleaved with reads of the
+Ability, the target, the grade and local state built forty lines earlier. There is no function to
+call and no expression to reuse, and extracting one is a refactor of the largest function in the
+project — which this batch's own charter forbids twice over.
+
+**What made the list defensible is that a different population is available and it is one a function
+can be complete over.** DK measured Empower attaching to a beast perfectly — chip, tooltip and all —
+and paying exactly 1.0000. That is not a story about the hero's terms failing to reach the companion;
+it is a story about **terms the companion is already wearing and has never read**. That set is
+finite, it is visible, and a rune can turn all of it on. Eleven terms off the beast, plus the
+hunter's two that are by construction about a bond which already broke. And the thing the rune
+cannot do is stated rather than implied: DU §2 enumerated the block and found 76 of its 78 absent
+terms unreachable *by shape* — 26 ability-keyed against a function that takes a float, 10 gated on a
+`passive_id` a companion never has, 20 talent ranks a companion is never allocated. A term the beast
+cannot be given is not turned on by any rune, and a rune that claimed otherwise would be the exact
+failure DK's 1.0000 is a record of.
+
+**Two of the twenty-one were written against premises the code does not support, and both were
+built rather than refused.** Hex of Ruin already strikes three enemies — `choose_three`, since the
+Old Gods rework — so "strikes two instead of one" is a nerf as transcribed; and Wrath of the Old
+Gods already marks two Ruin on every debuff the Occultist applies, so "also marks 1 Ruin" reads as
++1 rather than as turning something on. The useful discipline here is narrow: **implement the
+direction the words point, never the magnitude they imply**, and report the gap. Split Tongue
+widens (the line, not two of three) and the reduction it names is applied to the Ruin, where 1 is
+the only integer below 2 that is not nothing. Neither magnitude was chosen by the batch, and both
+premises are on the record where the designer will meet them.
+
+**Long Draw's cost lives in a table that was deliberately not extended, which is worth naming
+because it looks like an omission.** `SS_SEQ_OPEN` is four entries solved so a one-, two-, three- or
+four-press sequence lands with the same probability — CS §4's demand that a deeper sequence must not
+be likelier to break. The rune adds a fifth press; the table stays at four. The fifth press opens at
+the four-press widening and takes another taper step, so the sequence genuinely is harder to hold
+together, and that *is* the "but the windows are narrower" half of the card. A later batch reading
+four entries against five presses as a bug and adding a fifth would delete the rune's entire cost
+and turn it into a pure upside — with nothing else in the tree noticing. The brief's own phrasing is
+the trap: "each press is 15% narrower than the one before it" is `SS_SEQ_TAPER` = 0.85 and has been
+shipped since CS, so read literally it describes the status quo and buys nothing.

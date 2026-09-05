@@ -408,6 +408,39 @@ func _draw_detail() -> void:
 	tag_header.size = Vector2(452, 18)
 	add_child(tag_header)
 
+	# ── BATCH EZ §0 — WHERE THE HERO STANDS AGAINST THE TWO RUNE CONDITIONS ──
+	#
+	# **ES REQUIRED THE STATE BE VISIBLE AND THIS IS WHERE IT EARNS OUT.** The
+	# line above is the CENSUS — what he carries, all of it, both tags counted.
+	# This one is the CONDITION — the drafted half only, primary tag only, as a
+	# fraction — and the two are deliberately different numbers rather than one
+	# number drawn twice. **A player who cannot see he is one card away cannot
+	# use the lever**, and the lever is the whole design: benching one card
+	# tips a threshold.
+	#
+	# **IT UPDATES ON A SWAP IMMEDIATELY** for the same reason the census does:
+	# it is rebuilt on every `_draw_detail` off the live member dict, so there
+	# is no cached count to go stale. The panel where the bench actually happens
+	# carries the same two lines (`map_screen._open_loadout_panel`).
+	var ez_drafted: Array = Runes.drafted_names(member)
+	var ez_parts: Array = []
+	for tag in Classes.TAG_ORDER:
+		var ez_n: int = Classes.primary_tag_count(ez_drafted, String(tag))
+		if ez_n > 0:
+			ez_parts.append("%s %d%s" % [String(tag), ez_n,
+				" ✓" if Runes.threshold_met(ez_drafted, String(tag)) else ""])
+	var ez_header := Label.new()
+	ez_header.text = "RUNE CONDITIONS  (%d drafted)   %s   %s%s" % [
+		ez_drafted.size(),
+		"  ".join(ez_parts) if not ez_parts.is_empty() else "—",
+		Runes.breadth_line(ez_drafted),
+		" ✓" if Runes.breadth_met_fraction(ez_drafted) else ""]
+	ez_header.add_theme_font_size_override("font_size", 12)
+	ez_header.add_theme_color_override("font_color", Color(0.85, 0.72, 0.55))
+	ez_header.position = Vector2(60, 514)
+	ez_header.size = Vector2(452, 18)
+	add_child(ez_header)
+
 	# Runes: THREE SLOTS FLAT from run start (Batch AN §9 — the 2/3/4 growth
 	# ladder is gone). READ-ONLY here: equipping happens on the map card, so
 	# there is one place that writes `equipped` and this page can be what it

@@ -280,9 +280,17 @@ func _anvil_recompense_source() -> void:
 	ok(at >= 0, "the Anvil branch exists at the plating reset")
 	if at < 0:
 		return
-	var region := src.substr(at, 1400)
-	var else_at := region.find("else:")
-	var rc_at := region.find("has_status(\"recompense\")")
+	# BATCH EZ — THE FIXED WINDOW IS GONE AND THE PROPERTY IS UNCHANGED. This
+	# read a FIXED 1,400-byte `substr` from the Anvil branch, and the Rune of
+	# the Standing Wall's comment pushed `has_status("recompense")` off the far
+	# end of it: the section went red while the ordering it asserts was
+	# untouched. **A fixed window over a source file is a pin on how much
+	# COMMENT sits inside it**, which is not what any of these three checks is
+	# about. Both offsets are found FROM the anchor instead, unbounded —
+	# `find(x, at)` returns the first occurrence at or after `at`, which is the
+	# one this section means, and the comparison below is unchanged.
+	var else_at := src.find("else:", at)
+	var rc_at := src.find("has_status(\"recompense\")", at)
 	ok(else_at >= 0, "...and it carries an else branch")
 	ok(rc_at >= 0, "...and Recompense is decided in the same region")
 	# THE PROPERTY: the Recompense payment sits BELOW the else, i.e. it is

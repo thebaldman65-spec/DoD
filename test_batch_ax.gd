@@ -404,9 +404,24 @@ func _additive_units() -> void:
 	# second cap could disagree with the first and nothing would crash.
 	ok(bsrc.count("func _ruin_threshold") == 1,
 		"the detonation threshold has exactly one implementation")
-	ok(bsrc.count("const RUIN_LEECH_CAP") == 1
-		and bsrc.count("RUIN_LEECH_CAP)") == 1,
-		"the lifesteal cap has one definition and one read site")
+	# BATCH EZ RE-POINTED THE FINGERPRINT AND NOT THE PROPERTY. The read site
+	# used to be `minf(..., RUIN_LEECH_CAP)` and the closing paren was the
+	# match; the Rune of the Standing Mark raises the CAP (40% -> 60%), so the
+	# site now sums the constant with a rune-owned field into a local exactly
+	# as `soul_leech_step + rune_soul_leech_step` does two lines above it.
+	# **ONE DEFINITION AND ONE READ SITE IS STILL THE CLAIM AND IT IS ASSERTED
+	# MORE TIGHTLY THAN BEFORE**: the whole comment-stripped source may name
+	# the constant exactly TWICE — the `const` and the one read. The old form
+	# allowed it to appear anywhere else as long as one occurrence closed a
+	# paren.
+	var bsrc_code := ""
+	for bs_ln in bsrc.split("\n"):
+		if not bs_ln.strip_edges().begins_with("#"):
+			bsrc_code += bs_ln + "\n"
+	ok(bsrc_code.count("const RUIN_LEECH_CAP") == 1
+		and bsrc_code.count("RUIN_LEECH_CAP") == 2,
+		"the lifesteal cap has one definition and one read site (%d mentions)"
+			% bsrc_code.count("RUIN_LEECH_CAP"))
 	ok(bsrc.contains("const RUIN_THRESHOLD := 10"),
 		"the base threshold is 10")
 	ok(bsrc.contains("const RUIN_LEECH_CAP := 0.40"),
@@ -725,7 +740,16 @@ func _negative_control_source() -> void:
 		"...only the PRIMER is consumed")
 	# (2) THE LIFESTEAL UNCAPPED. Per-stack against uncapped stacks would let
 	# the party heal more than it deals — with no error anywhere.
-	ok(bsrc.contains("RUIN_LEECH_CAP)"),
+	# BATCH EZ: the cap is a LOCAL now (`leech_cap`), because the Standing Mark
+	# raises it — so the control matches the `minf` the local is passed to
+	# rather than the constant's own closing paren. **The question is unchanged
+	# and is the one that matters**: an uncapped per-stack lifesteal against
+	# uncapped stacks lets the party heal more than it deals, with no error
+	# anywhere. Both halves are asserted, so neither the cap's assembly nor its
+	# use can go missing on its own.
+	ok(bsrc.contains("RUIN_LEECH_CAP \\") or bsrc.contains("RUIN_LEECH_CAP)"),
+		"NEGATIVE CONTROL: the cap is still assembled from the constant")
+	ok(bsrc.contains(", leech_cap)") or bsrc.contains("RUIN_LEECH_CAP)"),
 		"NEGATIVE CONTROL: the lifesteal passes through minf() with the cap")
 	ok(not bsrc.contains("var leech_pct := 0.10 +"),
 		"...and the old flat 10%-while-any-Ruin rate is gone")

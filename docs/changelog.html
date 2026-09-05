@@ -14,6 +14,168 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-05 &mdash; Batch EZ: THE FIRST TWENTY-ONE RUNES</h2>
+
+<p><i><b>Twenty-one runes across four specs, authored with the designer. The pool has been empty
+since Batch ET retired all 53; these are the first under the new charter.</b> Price is
+<b>100g, flat, every rune</b> &mdash; rarity is gone and price no longer signals power, so the
+player pays for fit rather than magnitude. Scope is <b>spec only</b> for all twenty-one. Full
+working: <code>docs/reports/EZ.md</code>.</i></p>
+
+<p><b>&sect;0 &mdash; THE TWO CONDITIONS, AND THEY ARE FRACTIONS.</b> A rune carries a PRIMARY TYPE
+(ABILITY, PASSIVE or STAT) and an optional SECONDARY that gates it (THRESHOLD, BREADTH or
+TRADEOFF). <b>THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag. BREADTH: NO
+tag exceeds a THIRD of them.</b> Both count the PRIMARY tag only, so a card contributes exactly one
+tag and the two conditions read the same denominator. <b>The fraction is deliberate</b>: a hero
+drafts 4 earned slots at zone 1 and 7 by the end, so a fixed COUNT means two different commitments
+at those two moments &mdash; a fraction is the same commitment all run, <b>and it can be tipped by
+benching one card</b>, which is what makes the loadout lever reach the rune layer.</p>
+
+<p><b>&sect;0a &mdash; THE COUNTED SET IS THE DRAFTED HALF, NOT THE BAR, AND THAT IS THE HALF A
+STATIC CHECK CANNOT SEE.</b> Batch EG split pool from loadout and made only the earned half
+swappable, so the counted set and the swap lever are the same set. <b>The protected core is
+deliberately OUT</b>, and the reason is measured rather than asserted: the Occultist's core alone
+carries the DEBUFF threshold, so counting the whole bar would turn Deepening Hex on from the first
+fight with no bench able to turn it off &mdash; exactly the constraint Batch ES &sect;4 printed and
+nothing had yet been authored against. <b>ES &sect;4's own census counts BOTH tags on a card and
+these count only the PRIMARY, and neither is the other's repair</b>: a census is right for a screen,
+where a card that Breaks and Debuffs is a member of both populations; a condition needs a PARTITION,
+or the per-tag numbers sum past the card count and &ldquo;a third of them&rdquo; means nothing.</p>
+
+<p><b>&sect;0b &mdash; THE STATE IS VISIBLE ON BOTH SCREENS AND UPDATES ON A SWAP.</b> Batch ES
+required it and this is where it earns out: the hero sheet and the loadout panel each carry a
+<code>RUNE CONDITIONS</code> line reading <i>&ldquo;4 of 7 &mdash; DEBUFF&rdquo;</i> beside the
+existing census, rebuilt from the live member on every draw, so there is no cached count to go
+stale. <b>A player who cannot see he is one card away cannot use the lever.</b></p>
+
+<p><b>&sect;0c &mdash; AND AN EMPTY DRAFTED LIST MEETS BOTH CONDITIONS, VACUOUSLY. REPORTED, NOT
+GUARDED.</b> Nothing carries the tag, so nothing fails to be half of it; no tag exists, so none
+exceeds a third. That is the literal reading of the designer's two rules and it is implemented
+literally &mdash; <b>it is also reachable</b>, by benching everything. It is named here rather than
+patched because a batch does not alter an authored condition.</p>
+
+<p><b>&sect;1 &mdash; THE OCCULTIST'S FIVE.</b> <b>Deepening Hex</b> (PASSIVE + THRESHOLD/DEBUFF)
+detonates Ruin every 8th stack instead of every 10th &mdash; through <code>_ruin_threshold()</code>,
+the one function the arming site and the chip both read, and as a <code>mini</code> so it can never
+undo Avatar of Ruin's 5. <b>Standing Mark</b> (PASSIVE) raises Ruin's lifesteal cap 40% &rarr; 60%,
+the CAP and not the per-stack rate. <b>Split Tongue</b> (ABILITY) makes Hex of Ruin curse the whole
+line at 1 Ruin a target instead of 2. <b>Wide Rite</b> (PASSIVE + BREADTH) adds 1 to the mark, in
+the one function all five quoting sites call. <b>Open Wound</b> (ABILITY + TRADEOFF) marks Ruin on
+EVERY enemy from Shadowrend &mdash; but Ruin now decays by 1 a turn, which is nothing against a deep
+pile and most of a shallow one, and which fights Deepening Hex on purpose.</p>
+
+<p><b>&sect;1a &mdash; AND TWO OF THE FIVE WERE WRITTEN AGAINST PREMISES THE CODE DOES NOT
+SUPPORT.</b> <b>Hex of Ruin already strikes THREE enemies</b> (<code>choose_three</code>, since the
+Old Gods rework), so &ldquo;strikes two instead of one&rdquo; is a NERF as transcribed; Split Tongue
+ships as the widening its name and its direction call for &mdash; the whole line &mdash; with the
+reduction the card names applied to the Ruin. <b>And Wrath of the Old Gods already marks 2 Ruin on
+every debuff he applies</b>, so Wide Rite reads +1 rather than turning something on. Both are
+built, both are reported, and neither magnitude was invented: 1 is the only integer below 2 that is
+not nothing.</p>
+
+<p><b>&sect;2 &mdash; THE WARDEN'S FIVE, AND THREE OF THEM READ HEAVY PLATING.</b> <b>Standing
+Wall</b> (PASSIVE) makes a block HALVE the plating climb instead of clearing it &mdash; inside the
+Anvil branch, so a Warden holding both gets the stronger one rather than being paid twice, and
+<b>Recompense is paid on what was actually lost</b>. <b>Bracing Line</b> (PASSIVE +
+THRESHOLD/DEFENSE) pays the party 5% less damage taken while his climb stands at <b>+32%</b> or
+higher &mdash; four consecutive unblocked attacks, ruled by the designer, and chosen so the pity
+meter pays out when the pity is real (24 would be on in most fights and would read as a flat party
+buff). <b>Split Shield</b> (ABILITY) splits Shieldwall in two. <b>Long Watch</b> (PASSIVE +
+BREADTH) carries his Break damage to a second enemy. <b>Bared Plate</b> (STAT + TRADEOFF) is +25%
+Break damage and he can no longer Block. <b>Standing Wall plus Bracing Line is a visible build and
+Bared Plate is the opposite run</b>; a Warden holding Bared Plate and either of the others wastes
+one, and that is intended.</p>
+
+<p><b>&sect;2a &mdash; SHIELDWALL COVERS NO ALLY, SO THE SPLIT SHIELD IS BUILT AS ITS NAME RATHER
+THAN AS ITS BRIEF.</b> Batch AB made Shieldwall a SELF stance &mdash; <i>&ldquo;he guarantees the
+line and gambles for himself&rdquo;</i> &mdash; and the thing that reaches an ally is the Bulwark
+Line node. The rune splits the wall instead: half its Block for him and that same half for the ally
+he sets it in front of. <b>Half is forced rather than chosen</b> (it is
+<code>SHIELDWALL_BLOCK / 2</code>, derived from the constant the card advertises), and a Warden
+holding Bulwark Line keeps the larger of the two on the ally, so the rune cannot make a talent he
+has already bought worse.</p>
+
+<p><b>&sect;3 &mdash; THE SHARPSHOOTER'S FIVE.</b> <b>Keen Focus</b> (PASSIVE) halves Focus on a
+target switch instead of clearing it &mdash; placed BELOW Reacquire, so a hero holding both banks
+the whole meter and keeps half in hand. <b>Heavy Bolts</b> (PASSIVE + THRESHOLD/MARK) drops the
+conversion point 100 &rarr; 80, through <code>focus_convert()</code> beside Deep Focus: <b>the point
+moves, the rate never does</b>. <b>Ambush</b> (ABILITY) makes Called Volley scale with the Focus he
+holds, at the meter's own <code>FOCUS_STEP</code> rather than a rate of its own. <b>Wide Watch</b>
+(PASSIVE + BREADTH) carries Focus in full through a kill rather than the 50 retained. <b>Long
+Draw</b> (ABILITY + TRADEOFF) runs one EXTRA press at every stage of the existing ladder &mdash; the
+stages do not move.</p>
+
+<p><b>&sect;3a &mdash; LONG DRAW IS THE ONLY RUNE IN THE GAME THAT TOUCHES A SKILL CHECK, AND ITS
+COST IS THE TABLE IT IS NOT PAID OUT OF.</b> <code>SS_SEQ_OPEN</code> is a FOUR-entry table solved
+so a one-, two-, three- or four-press sequence lands with the same probability (Batch CS &sect;4).
+<b>The rune adds a fifth press and the table is deliberately NOT extended</b>: the extra press opens
+at the four-press widening and then takes another <code>SS_SEQ_TAPER</code> step, so the sequence
+really is harder to hold together. <b>That is the whole of &ldquo;but the windows are
+narrower&rdquo;</b> &mdash; the brief's <i>&ldquo;each press is 15% narrower than the one before
+it&rdquo;</i> is <code>SS_SEQ_TAPER</code> = 0.85 and has been shipped since CS, so it describes the
+status quo and buys nothing. It is priced against EY's base sweep of 1.00s, which was confirmed in
+place before anything was authored.</p>
+
+<p><b>&sect;4 &mdash; THE BEASTMASTER'S SIX.</b> <b>Long Leash</b> (PASSIVE) moves the Loyalty split
+point 8 &rarr; 11, through <code>_bond_convert()</code> &mdash; the slot Batch EU built for exactly
+this, taking the hunter so a rune moves one line. <b>Shared Hide</b> (PASSIVE) makes the companion's
+blows read the damage buffs it is already wearing. <b>Answering Pack</b> (PASSIVE +
+THRESHOLD/DEFENSE) gives the deepest bond the blow that would fell the hunter, once a fight, riding
+Bear the Brunt's existing guard &mdash; and the CARD wins where both stand, because it was paid for.
+<b>Second Whistle</b> (ABILITY) fields every beast with 3 Loyalty already earned, raising rather
+than assigning. <b>Shared Scent</b> (PASSIVE + BREADTH) carries a fallen companion's Loyalty to the
+next one called. <b>Bared Fang</b> (STAT + TRADEOFF) is +30% companion damage and the companion can
+no longer be healed &mdash; written into Ancient Pact's own <code>no_heals</code>, because
+&ldquo;cannot be healed&rdquo; is a RULE and not an amount.</p>
+
+<p><b>&sect;4a &mdash; THE SHARED HIDE SHIPPED AS A NAMED LIST AND THE RULING SAID NOT TO. SAID
+HERE RATHER THAN LEFT TO BE FOUND.</b> The ruling was <i>&ldquo;the companion inherits EVERYTHING
+&mdash; the full hero multiplier block, not a share and not a named list&rdquo;</i>, because a list
+goes stale the day a thirteenth term is added. <b>The hero block is ~84 terms written INLINE inside
+the strike loop</b>, interleaved with reads of the Ability, the target, the grade and local state
+built forty lines earlier &mdash; there is no function to call and no expression to reuse, and
+extracting one is a refactor this batch's own charter forbids. What shipped instead is the
+population that CAN be complete: <b>the buffs the companion is already wearing and has never
+read</b>, which is Batch DK's Empower measurement made actionable &mdash; it attached perfectly,
+chip and tooltip included, and paid exactly <b>1.0000</b>. Eleven terms, read off the beast, plus
+the hunter's two that are about a bond which already broke. <b>And 76 of the block's 78 absent terms
+are unreachable BY SHAPE and this rune does not pretend otherwise</b>: <code>_companion_hit</code>
+takes a float and not an Ability (26 ability-keyed terms), a companion's <code>passive_id</code> is
+always empty (10 more), and a companion is never allocated a tree (20 more).</p>
+
+<p><b>&sect;5 &mdash; THE GATE, AND THREE CONTROLS THAT ALL BIT.</b> <code>check_ez.gd</code> is
+<b>96 checks / 0 failures</b> and drives every claim above rather than reading it: the two fractions
+at 4, 5 and 7 drafted cards; a member where the pool, the equipped half and the whole bar give
+THREE different answers, with the condition asserted to read the right one; the lever pulled through
+the live bench and carry doors; all 21 payloads applied to a real cfg with the 8 gated ones REFUSED
+on a failing arm; and the read sites driven on a live board. <b>Armed against a Second Whistle that
+ASSIGNED &rarr; 1 failure; a threshold rounding the other way &rarr; 6; the protected core counted
+into the drafted half &rarr; 12.</b> Disarmed it reads 96 / 0.</p>
+
+<p><b>&sect;6 &mdash; FOUR GATES MOVED AND EVERY MOVE IS A RE-POINT.</b> <code>check_es</code>
+43 &rarr; 44 (the pool pin 65 &rarr; 86, and &sect;5's splash derivation was stale &mdash; a splash
+was &ldquo;a spec rune with no <code>lane</code>&rdquo;, and EZ's twenty-one carry none at all, so
+all twenty-one read as splashes; it reads the BREADTH secondary now, which is ES &sect;5's own
+definition). <code>check_et</code> 23 &rarr; 24 (its subject survives intact &mdash; the sixty-five
+ET retired are still retired and still unreachable &mdash; and its leak test asks
+<code>_is_retired</code> directly instead of inferring it from an id prefix, which would have called
+all twenty-one live runes a leak). <code>check_ek</code> 45 &rarr; 46 &mdash; <b>this is the batch
+its &sect;3 was kept authored for: EK's claim that nothing reads a tag for anything but DISPLAY ends
+here, deliberately.</b> <code>check_parse</code> 166 &rarr; 167, because <code>check_ez</code>
+joined the battery and that gate's count IS its coverage. <b>The name sweep ran on all twenty-one
+against a 661-name roster: 0 exact collisions and 3 near-misses</b>, all shipped and named &mdash;
+<i>Bracing</i> is a Swordmaster node and a status, <i>Focus</i> is the meter Keen Focus is about,
+and the retired <i>Rune of the Long Draw</i> keeps its id while the new Long Draw takes
+<code>long_draw_press</code>.</p>
+
+<p><b>WHAT DID NOT MOVE.</b> No class or universal runes &mdash; eight specs are unauthored and the
+five re-scoped universals still await a class. <b>No rune reads a tag other than through &sect;0's
+two conditions.</b> No ability, talent, magnitude or constant moved except where a rune's own
+payload required it. <code>SC_PROFILE_DEFAULT.sweep_time</code> is EY's and is untouched;
+<code>CRIT_EXCESS_STEP</code> stays 0.50, the Loyalty split stays 8 and
+<code>BOND_MITIGATION_MAX</code> 0.75; <code>PERFECT_HALF</code> and <code>GOOD_HALF</code> stay
+0.045 and 0.16; and the Sharpshooter's press ladder is untouched.</p>
+
 <h2>2026-09-05 &mdash; Batch EY: THE BASE SWEEP GOES 0.72s &rarr; 1.00s</h2>
 <p><i><b>Ruled by the designer: the checks feel too hard.</b>
 <code>SC_PROFILE_DEFAULT.sweep_time</code> moves <b>0.72 &rarr; 1.00</b>.

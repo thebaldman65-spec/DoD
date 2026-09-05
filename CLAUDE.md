@@ -1945,11 +1945,17 @@ what the cost is for.**
   common" and it is the one common in the file — **a rarity rule was hiding a cost.** The Warrior
   arithmetic above is unaffected: `exsanguination` is the Berserker's and `anchor` is universal.
 
-## STANDING RULE — THE OFFERABLE RUNE POOL IS RETIRED, AND A RETIREMENT IS DECLARED PER ENTRY (Batch ET §1, ruled by the designer)
+## STANDING RULE — THE OFFERABLE RUNE POOL IS RETIRED, AND A RETIREMENT IS DECLARED PER ENTRY (Batch ET §1, ruled by the designer; the pool is REFILLED at EZ and the retirement stands)
 
-> **All 65 authored entries are retired. Nothing is offerable but the generated stat family.
-> A retired entry is KEPT and SAID to be kept: it keeps its name, price, payload and desc, it
-> still resolves, and it carries a string naming WHAT IS LOST.**
+> **The 65 entries ET retired are still retired and are still unreachable. A retired entry is
+> KEPT and SAID to be kept: it keeps its name, price, payload and desc, it still resolves, and it
+> carries a string naming WHAT IS LOST.**
+>
+> **BATCH EZ ENDED THE EMPTINESS AND NOT THE RULING.** 21 runes are authored across four specs,
+> so the file is 86 entries: 65 retired and 21 live. **Everything below is about the 65 and is
+> unchanged.** What is no longer true is only that the WHOLE FILE is retired — which was never
+> the ruling, and `check_et` §1 asserts the sixty-five by their own count now rather than by the
+> file's, so a twenty-second rune needs no line there and an UNDONE retirement still turns it red.
 
 **THE REASONING, RECORDED WITH THE RULING SO IT IS NEVER RECONSTRUCTED WRONGLY.** The pool was
 authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent counters, which
@@ -2077,6 +2083,106 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   through the real screen.
 · **WHEN A RUNE FINALLY READS IT IN A FIGHT, THE PLACE IS THE SPAWN AND NOT THE STRIKE LOOP.** The
   loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
+  **BUILT AT EZ AND IT IS `Talents.condition_met`**, which both rune-application sites already
+  reach with the same `{learned, member}` ctx — so a gated payload is decided once and the hero
+  sheet shows exactly what the fight will use.
+
+## STANDING RULE — THE TWO RUNE CONDITIONS ARE FRACTIONS OF THE DRAFTED CARDS (Batch EZ §0, ruled by the designer)
+
+> **THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag.**
+> **BREADTH: NO tag exceeds a THIRD of the hero's DRAFTED cards.**
+> **Both count the PRIMARY tag only, and both count the DRAFTED half that is EQUIPPED — never the
+> pool, and NEVER the protected core.**
+
+**THIS IS THE RULE ES §4 ABOVE WAS BUILDING TOWARD, AND IT CHANGES TWO OF ITS ANSWERS.** ES built
+the machinery and authored nothing; EZ authors twenty-one runes and eight of them are gated. Where
+the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN**, and both stand.
+
+- **A FRACTION, NEVER A COUNT, AND THE REASON IS THE LADDER.** A hero drafts **4 earned slots at
+  zone 1 and 7 by the end** (`ABILITY_SLOTS_BY_BOSS` 7→10 against a 3-slot core), so "3 DEBUFF
+  cards" is three quarters of an opening loadout and under half of a finished one — **one rule
+  meaning two different commitments.** A fraction is the same commitment all run, **and it can be
+  tipped by benching ONE card**, which is the whole reason the shape exists: it is what makes the
+  loadout lever reach the rune layer.
+- **PRIMARY ONLY, AND THAT IS NOT ES §4's CENSUS WEAKENED.** `Classes.tag_count` counts BOTH tags
+  on a card, deliberately, because a card that Breaks and DEBUFFs is a member of both populations
+  and a SCREEN must say so. **A CONDITION NEEDS A PARTITION**: under the both-tags count the
+  per-tag numbers sum past the card count, so a tag could exceed a third while every tag did, and
+  "half" could be met by two tags at once on the same three cards. `Classes.primary_tag_*` are the
+  partitioning counterparts and they sit beside the originals rather than replacing them.
+- **THE COUNTED SET IS `Run.equipped_ability_names` — THE DRAFTED HALF THAT IS CARRIED.** EG §2
+  split pool from loadout and made only the earned half swappable, **so the counted set and the
+  swap lever are the same set.** ES §4's `loadout_ability_names` includes the core and is right for
+  the screens; **including it here would be a defect, and the reason is measured**: the Occultist's
+  core alone carries the DEBUFF threshold, so Deepening Hex would be on from the first fight with
+  no bench able to turn it off.
+- **THE ARITHMETIC IS INTEGER, IN ONE PLACE.** `count * 2 >= n` and `peak * 3 <= n`, because half
+  of an odd count has to round the same way every time it is read and integer arithmetic is the
+  only form of that which cannot drift between a condition and the surface printing it.
+  **"Exceeds" is strict**: at 6 drafted cards a peak of 2 passes and 3 does not.
+- **AN EMPTY DRAFTED LIST MEETS BOTH, VACUOUSLY, AND IT IS REPORTED RATHER THAN GUARDED.** 0 ≥ 0
+  and 0 ≤ 0. It is the literal reading of both rules, it is implemented literally, **and it is
+  reachable by benching everything** — a batch does not alter an authored condition, so this is
+  named in `docs/reports/EZ.md` §0b and left for the designer.
+- **THE ONE DOOR IS `Runes.loadout_condition_met`, AND `talents.gd` NAMES NO TAG WORD.**
+  `condition_met` hands the whole `cond` dict over rather than reading the two keys itself, because
+  `check_ek` §3 asserts the set of `.gd` files naming the tag surface is exactly four. **The rune
+  layer's vocabulary stays in the rune layer** — that is ES §4's own rule, and the day a fifth file
+  names a tag, that gate is what says so.
+
+## STANDING RULE — A RUNE READS A TAG NOW, AND EK'S INERTNESS CLAIM IS OVER (Batch EZ, deliberately)
+
+> **`check_ek` §3's claim was "nothing reads a tag for anything but DISPLAY". That ended at EZ,
+> on purpose. It did not decay — it was spent.**
+
+- **THE GATE GREW A THIRD CATEGORY RATHER THAN LOSING A CLAIM.** `TAG_DEFINERS` is still the four
+  files that define or display the tables; `TAG_CHECKERS` is the gates; and **`TAG_CONSUMERS` is
+  new** — a file that reaches the machinery through the one door without holding any of it.
+  `talents.gd` is the only member, and it is asserted to name **EXACTLY the door** and no other
+  word of the surface, and no tag WORD at all. **That is a tighter bound than "none", not a looser
+  one**, and moving it out of `NO_TAG_FILES` did not weaken that list.
+- **`battle.gd` STILL HOLDS ZERO AND THAT IS THE ONE THAT MATTERS.** It is what says ES §4's "read
+  at the SPAWN, never in the strike loop" is still obeyed. A per-hit recount would be 84 multiplier
+  terms' worth of work for a number that cannot move.
+
+## STANDING RULE — THE COMPANION'S BLOW READS ELEVEN TERMS, NOT EIGHTY-FOUR, AND THE RULING SAID "EVERYTHING" (Batch EZ §4 — a DIVERGENCE, recorded)
+
+> **The ruling on the Shared Hide was "the companion inherits EVERYTHING — the full hero
+> multiplier block, not a share and NOT A NAMED LIST", because a list goes stale the day a
+> thirteenth term is added. WHAT SHIPPED IS A NAMED LIST. This is that fact, written where the
+> next batch will meet it.**
+
+**WHY, STRUCTURALLY, AND IT IS NOT A JUDGEMENT CALL.** The hero multiplier block is **~84 terms
+written INLINE inside `_resolve_ability`'s strike loop**, interleaved with reads of `ab` (the
+Ability), of `strike_target`, of `grade` and of local state built forty lines earlier. **There is
+no function to call and no expression to reuse.** Extracting one is a refactor of the largest
+function in the project, and EZ's own charter forbids moving an ability, a magnitude or a constant.
+
+- **THE POPULATION THAT SHIPPED IS ONE THIS FUNCTION CAN BE COMPLETE OVER: the buffs the companion
+  is ALREADY WEARING and has never read.** That is DK's measurement made actionable — Empower
+  attached to a beast perfectly, chip and tooltip included, and paid exactly **1.0000**. Eleven
+  terms, read off the COMPANION so a party buff that missed the beast is honestly worth nothing,
+  plus the hunter's two that are about a bond which already broke (Last Howl and Vengeance).
+- **AND 76 OF THE BLOCK'S 78 ABSENT TERMS ARE UNREACHABLE BY SHAPE, WHICH IS WHY "EVERYTHING" WAS
+  NEVER GOING TO MEAN 84.** DU §2 enumerated it: `_companion_hit` takes a float and not an
+  `Ability` (26 ability-keyed terms cannot apply), a companion's `passive_id` is always the empty
+  string (10 more), and a companion is never allocated a tree (20 more). **A term the beast cannot
+  be given is not turned on by any rune.**
+- **THE STALE-LIST TRAP IS REAL AND IS NOT AVOIDED HERE — IT IS NAMED.** `_shared_hide_mult` is
+  ONE function and the list is in one place, which is the most that can be done short of the
+  refactor. **A batch that extracts the hero block into a callable is the one that can honour the
+  ruling**, and it should re-point this rune at it rather than growing the list.
+
+## STANDING RULE — A RUNE IS 100g, FLAT (Batch EZ §0, ruled by the designer)
+
+> **Every authored rune costs 100 gold. Rarity is gone and price no longer signals power — a
+> rune's worth is contextual, so the player pays for FIT rather than for magnitude.**
+
+**THIS CLOSES THE PRICING QUESTION ES §1 OPENED AND `docs/state.md` HAS CARRIED SINCE.** The
+retired 65 keep their authored prices (50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5) unmoved, as the
+record of what the old pool charged; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
+Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
+the absence of a rule. `check_ez` §0 asserts the flat 100 as an EQUALITY over the live pool.
 
 ## STANDING RULE — LOYALTY IS GOVERNED BY A CONVERSION, NEVER BY A CEILING (Batch ER, ruled by the designer)
 > **The designer has ruled that Loyalty does NOT flatten. Above nominal the meter CONVERTS: each

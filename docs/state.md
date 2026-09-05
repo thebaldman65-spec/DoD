@@ -5,88 +5,122 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-05 (Batch EY).*
+*Last rewritten: 2026-09-05 (Batch EZ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EY — THE BASE SWEEP GOES 0.72s → 1.00s.** The designer ruled that the checks feel
-  too hard. `SC_PROFILE_DEFAULT.sweep_time` moves **0.72 → 1.00**; **`perfect_half` 0.045 and
-  `good_half` 0.16 are untouched** — the bar slows, the target does not grow. **The executable diff
-  is ONE LINE in `battle.gd`**, proved by a comment-stripped diff with identical line counts either
-  side (14,251 both). **One gate moved with it and had to**: `check_cn.gd`'s `WANT_PROFILE` pins the
-  profile by number. **Nothing else moved: no other profile field, none of the four `SS_SEQ_*`
-  constants, no grade, multiplier, gate rule or defensive rule, and no rune was authored.** Full
-  working: **`docs/reports/EY.md`**.
-- **§1 — THE ARITHMETIC, MEASURED OFF A LIVE BAR RATHER THAN COMPUTED.** Perfect **64.80 ms →
-  90.00 ms**, Good **230.40 ms → 320.00 ms**. The zone rects do not move — the drawn Good band is
-  2 × 0.16 of the track before and after, and the graded half is the same 0.16. **The alternative —
-  widening the half-widths instead of slowing the bar — was priced and NOT TAKEN**, because a
-  half-width is a fraction of the TRACK and widening it redraws what the player aims at. **That is
-  now a standing rule in `CLAUDE.md`** so it is not re-proposed as a discovery.
-- **§1a — THE SHARPSHOOTER RESTATES `sweep_time` AND INHERITS THE TOLERANCE, AND THE BRIEF'S
-  CONDITIONAL WAS THE WRONG READING.** The brief asked whether his profile inherits or restates, and
-  said that if it restates *the change misses him*. **It does both.** His `sweep_time` is the literal
-  `SS_SEQ_SWEEP` and stays **0.52 s** — measured at all four press counts — but both half-widths are
-  computed through `SC_PROFILE_DEFAULT["sweep_time"]`, so **his tolerance moves by exactly the factor
-  everyone else's does**: Perfect **55.08 → 76.50 ms**, still ×0.85 of the default's, still flat
-  across one to four presses. **He is the only caster who takes all of the difficulty and none of the
-  wall-clock.** Opening Good windows **272.0 / 355.5 / 428.1 / 506.2 ms**.
-- **§1b — AND HIS FOUR-PRESS OPENING WINDOW IS NOW 97.3% OF THE TRACK. NAMED, NOT CHANGED.** At 150+
-  Focus his first Good half is **0.487** of a track whose half is 0.5, leaving a miss band of
-  **6.9 ms at each end of his 520 ms pass** against yesterday's 77.8 ms. `SS_SEQ_OPEN` and
-  `SS_SEQ_TAPER` are unmoved and `check_cs` still passes — **this is the figure a later batch must
-  look at before spending any more tolerance on him.**
-- **§2 — THE PACING COST, MEASURED, AND CM'S FIGURES DO NOT REPRODUCE.** A Warden party runs
-  **6.6 defensive bars and 10.9 ordinary casts a battle** (n=200, rung 2). The brief quoted CM's
-  *9.4 a battle against 27.3 hero actions*; **neither reproduces** — hero turns read 29.7 and only
-  10.9 of them open a bar at all. **CM's own comment that the Warden's bar "roughly doubles the
-  presses" reads ×1.61 today.** A centred press costs half a sweep, so a bar costs **+0.14 s** and
-  17.5 bars cost **about +2.4 s a battle**, roughly two minutes across a 49-encounter clear.
-  **AND "every incoming attack" IS TWO NARROWINGS SHORT**: a counter raises no bar and neither does
-  an attack carrying a `special`.
-- **§3 — NO SIM CAN MEASURE THE CHANGE ITSELF, AND NONE WAS RUN.** The bot rolls grades off fixed
-  probabilities and never touches the bar, so every completion figure this project owns is blind to
-  it. `check_cs` printing *the bot lands 2.69 of four* identically before and after is that fact on
-  the record. **The bar COUNT is a different quantity** — a structural count the sim does keep — and
-  is what §2 measures.
-- **§4 — THE GATE THE BRIEF DID NOT NAME WOULD HAVE SHIPPED RED, AND IT WAS ARMED BOTH WAYS.**
-  The old pin against the new constant reads `FAIL: default profile sweep_time = 1.0, want 0.72` —
-  **1 failure against a `fails: [0, 0]` row**; the moved pin reads **0 failures**. **The pin was
-  moved to the new value, never loosened.**
-- **§5 — DRIVEN LIVE, BECAUSE A VALUE READ ONCE AT UI SETUP WOULD PASS EVERY STATIC CHECK.** An
-  out-of-repo probe opened real bars and integrated `_process` by hand: the marker moves at
-  **1.000000 s** per pass, read at two frame lengths, and **reads 0.720000 back when a stale value is
-  planted** — so the reading could have said otherwise. Four consecutive casts alternating
-  Sharpshooter and ordinary read **0.52 / 1.00 / 0.52 / 1.00**. **39 checks, 0 failures.**
-- **§6 — THE INSTRUMENTS, AND ONE OF THEM HAD A HOLE THAT WAS FOUND BEFORE IT WAS TRUSTED.** The
-  scan-window census extracts `find()` anchors, and the first pass matched only **double**-quoted
-  literals — **48 of the 198 anchors are single-quoted**, including the one holding the tree's widest
-  window (3,000 bytes). Re-run over both forms: **no specific anchor lands within ±3,400 bytes of any
-  of the four edits.** The literal sweep — **18,790 needles from 124 `.gd` files** — was armed both
-  ways first (delete a once-only needle → LOST 1, inject an absent one → GAINED 3, unchanged copy →
-  0/0). **And a `grep -rn -- "$n" --include=…` silently searched every file type again**, the same
-  fault EX recorded; redone without the `--`.
-- **§7 — THE BATTERY.** **92 targets, `sort .ran | uniq -d` ZERO duplicates, 0 `Parse Error`, 0 `SCRIPT ERROR` and 0 timeouts across every log.** **`check_de` 378 / 0 / 0 NOTICES** — no baseline row moved and none rose. `check_cn` **0 failures**, `check_cs` **104 / 0**, `check_parse` **166 / 0**, `check_ew` **38 / 0**, `check_ev` **54 / 0**, `check_eu` **38 / 0**, `check_ed` **18 / 0**; run harness GATE 1 **22** / GATE 2 **166** / GATE 3 **8**, all PASS, throws 0. **The only red is `check_cm_live` 13 / 4**, whose four FAIL lines were READ and — because that gate is the only thing in the tree that presses the defensive bar — **re-run on a copy with `battle.gd` restored to HEAD, where it reads the same 13 / 4 with the same four lines.** **The freeze held EXACTLY**: an md5 stamp of **334 files with absolute paths, tracked AND untracked**, before and after, **zero differ**, with nothing appearing outside the list — which closes the gap EX named in its own `git ls-files` population.
-- **WHAT MOVED: TWO SOURCE FILES AND EIGHT DOCUMENTS.** `scripts/battle.gd` (one constant and three
-  comments); `check_cn.gd` (the pin); `docs/changelog.html`; `CLAUDE.md`; `docs/master.html` and its
-  stamp; `data/glossary.json`; `docs/design-notes.md`; `baselines.json`; this file; and
-  `docs/reports/EY.md`. **NO SUITE, NO OTHER GATE, NO `run_battery.sh`, NO BASELINE COUNT, NO RUNE,
-  NO NODE, NO CLAMP AND NO OTHER CONSTANT MOVED.**
-- **Next letter: EZ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
-  what breaks it — **and EZ is the last two-letter code before FA**, which still sorts above every
-  suite's own code and is therefore still fine.
+- **Last batch: EZ — THE FIRST TWENTY-ONE RUNES.** The pool has been empty since ET §1 retired all
+  53; these are the first under the new charter, authored with the designer and **transcribed
+  rather than proposed**. **21 runes across FOUR specs** — Occultist, Warden and Sharpshooter five
+  each, Beastmaster six — at **100g flat**, **spec scope only**, taking `runes.json` from 65
+  entries to **86: 65 retired and 21 live**. **The machinery ES §4 built and nothing read is
+  finally read: EIGHT of the twenty-one are gated on §0's two loadout conditions.** Full working:
+  **`docs/reports/EZ.md`**.
+- **§0 — THE TWO CONDITIONS ARE FRACTIONS OF THE DRAFTED CARDS, AND THE FRACTION IS THE DESIGN.**
+  **THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag. BREADTH: NO tag exceeds
+  a THIRD of them.** A hero drafts 4 earned slots at zone 1 and 7 by the end, so a fixed COUNT
+  means two different commitments at those two moments; **a fraction is the same commitment all
+  run, and it can be tipped by benching ONE card** — which is what makes the loadout lever reach
+  the rune layer. Read at the SPAWN through `Runes.loadout_condition_met`, the one door.
+- **§0a — THE COUNTED SET IS THE DRAFTED HALF THAT IS EQUIPPED, AND THE CORE IS OUT FOR A MEASURED
+  REASON.** `Run.equipped_ability_names`, which is exactly the set the two swap doors write —
+  EG §2's split, finally load-bearing. **The Occultist's protected core ALONE carries the DEBUFF
+  threshold**, so counting the whole bar would turn Deepening Hex on from the first fight with no
+  bench able to turn it off. That is the constraint `check_es` §4 has printed every run since ES
+  and the first time anything has been authored against it.
+- **§0b — THE COUNT IS PRIMARY-ONLY, WHICH CONTRADICTS ES §4, AND BOTH RULINGS STAND.** A census
+  counts BOTH tags because a card that Breaks and DEBUFFs is in both populations and a SCREEN must
+  say so; **a condition needs a PARTITION** or the per-tag numbers sum past the card count and "a
+  third of them" means nothing. `Classes.primary_tag_*` were added BESIDE the originals.
+- **§0c — AN EMPTY DRAFTED LIST MEETS BOTH CONDITIONS, VACUOUSLY, AND IT IS REACHABLE.** 0 ≥ 0 and
+  0 ≤ 0. It is the literal reading of both rules, it is implemented literally, and a player can
+  bench everything to switch a THRESHOLD rune and a BREADTH rune on at once — the one state the two
+  shapes were designed never to share. **A batch does not alter an authored condition**, so it is
+  built as written and is the sharpest thing owed back to the designer. One clause closes it.
+- **§1 — FOUR OF THE BRIEF'S PREMISES DID NOT SURVIVE THE CODE, AND EVERY RUNE SHIPPED ANYWAY.**
+  **Hex of Ruin already strikes THREE** (`choose_three`), so Split Tongue as transcribed was a
+  NERF — it ships as the widening its name calls for, the whole line, at 1 Ruin a target instead of
+  2. **Wrath of the Old Gods already marks TWO** on every debuff he applies, so Wide Rite reads +1.
+  **Shieldwall covers NO ally** (AB made it a self stance), so the Split Shield splits the wall
+  instead — half for him, that same half for the ally, and `SHIELDWALL_BLOCK / 2` is derived rather
+  than chosen. **And "each press 15% narrower" is `SS_SEQ_TAPER` = 0.85 and has shipped since CS.**
+  **No magnitude was invented for any of the four.**
+- **§2 — LONG DRAW'S COST IS A TABLE THAT WAS DELIBERATELY NOT EXTENDED, AND IT WILL READ AS A BUG.**
+  `SS_SEQ_OPEN` is FOUR entries solved so a one-to-four-press sequence lands with the same
+  probability. The rune adds a fifth press and **the table stays at four**: the fifth press opens at
+  the four-press widening and takes another taper step, so the sequence really is harder to hold.
+  **Extending it would delete the rune's entire cost with nothing else noticing**, which is why
+  `check_ez` §5 asserts it as an INEQUALITY rather than a value.
+- **§3 — THE SHARED HIDE IS THE BATCH'S ONE DIVERGENCE FROM A RULING AND IT IS RECORDED IN
+  `CLAUDE.md`.** The ruling was *"the companion inherits EVERYTHING — not a named list"*; **what
+  shipped is a named list**, because the hero block is ~84 terms written INLINE in the strike loop
+  with no function to call and extracting one is a refactor this batch's charter forbids. What
+  shipped instead is a population a function CAN be complete over: **the eleven buff terms the
+  companion is already WEARING and has never read** — DK's Empower 1.0000 made actionable — plus the
+  hunter's two that are about a bond which already broke. **Measured at three loadouts: +25.0%,
+  +56.2%, +133.6%**, and the "without" column is **1.0000 at every one of them**, which is the
+  finding rather than the baseline. **76 of the block's 78 absent terms are unreachable BY SHAPE**
+  and the rune does not claim otherwise — re-derived here at 26 ability-keyed, 42 attacker-keyed,
+  16 passive-keyed, and DU §2's own 26 is reproduced exactly.
+- **§4 — BRACING LINE'S LEVEL IS 32 AND WHAT 32 COSTS IS NOW MEASURED.** Over 200,000 incoming hits
+  an arm, with the block roll taken at the Warden's own LIVE chance so the feedback loop is in the
+  reading: **the level holds on 8.98% of incoming hits alone and 11.91% with the Standing Wall** —
+  a third more often — and his own mean block chance rises 0.357 → 0.430, which is the mechanism
+  that makes the pair a build. **The figure to argue with is the 8.98%, not the ratio.**
+- **§5 — FOUR GATES WERE RE-POINTED FOR A GROWING POOL AND FOUR MORE FOR WHAT THE RUN FOUND.**
+  `check_es` 43 → 44 (the pool pin 65 → 86, and §5's splash derivation was STALE: a splash was "a
+  spec rune with no `lane`", and EZ's twenty-one carry none at all, so all 21 read as splashes and
+  the count went 12 → 33; it reads the BREADTH secondary now). `check_et` 23 → 24 (its subject
+  survives — the 65 ET retired are still retired and still unreachable — and its leak test asks
+  `_is_retired` directly instead of inferring it from an id prefix). `check_ek` 45 → 46 — **this is
+  the batch its §3 was kept authored for.** `check_parse` 166 → 167. Then `test_batch_ax` 352 → 353,
+  `test_batch_cp`, `test_runes` 3022 → 3803 and `test_rune_battle`, all found by the run.
+- **§6 — THE FIRST BATTERY IS REPORTED AS RECONNAISSANCE BECAUSE THE FREEZE BROKE.** A red was
+  read and repaired at target 25 while the run was still going — the fault DL discarded two runs
+  for. **The run was allowed to FINISH rather than killed**, because it found eight red targets and
+  fixing them one run at a time would have cost eight batteries; then the tree was re-frozen and the
+  battery was run once, clean. **One of the eight was MY CODE and not a fingerprint**: `check_eu`
+  §0 asserts exactly one line reads `BOND_CONVERT` and my two-armed `_bond_convert` named it twice.
+  The gate was right; the code is one expression now.
+- **§7 — THE BATTERY.** **93 targets** (one more than EY's 92 — `check_ez` joined), **`sort .ran |
+  uniq -d` ZERO duplicates, 0 `Parse Error`, 0 `SCRIPT ERROR` and 0 timeouts across every log.**
+  `check_ez` **96 / 0**, `check_es` **44 / 0**, `check_et` **24 / 0**, `check_ek` **46 / 0**,
+  `check_parse` **167 / 0**, `check_ed` **18 / 0**, `check_eu` **38 / 0**, `test_runes`
+  **3803 / 0**, `test_batch_ax` **353 / 0**. **The only red is `check_cm_live` 13 / 4**, whose four
+  FAIL lines are the four its baseline row names and which carries `fails: [4, 4]` for that reason.
+  **The freeze held EXACTLY**: an md5 stamp of 336 files with absolute paths, tracked AND untracked,
+  before and after, **zero differ.**
+- **§8 — THE INSTRUMENTS, AND THE SCAN-WINDOW CENSUS HAD A HOLE THE BATTERY FOUND.** It read a
+  clean zero for the anchor that turned `test_batch_cp` red, **because a GDScript literal carries
+  ESCAPED quotes and searching the source for the escaped text never matches** — and its first pass
+  also took the first and last divergence as ONE range, which read the whole of `battle.gd` (36
+  separate hunks). Repaired both ways and re-derived a second way: **every fixed-size `substr`
+  window in the corpus enumerated with its anchor, 59 of them, the widest 3,000 bytes.** The
+  literal sweep — **15,458 needles from 125 `.gd` files** — reads **LOST 0 in all eight documents**
+  and was armed both ways first. **44 GAINED needles, and exactly one negative `contains` assertion
+  anywhere touches one — against an Ability, not a document.**
+- **WHAT MOVED: SEVEN GAME SCRIPTS, EIGHT TARGETS AND NINE DOCUMENTS.** `battle.gd`, `unit.gd`,
+  `runes.gd`, `classes.gd`, `talents.gd`, `map_screen.gd`, `party_screen.gd`; `check_ez.gd` (new),
+  `check_ek`, `check_es`, `check_et`, `test_batch_ax`, `test_batch_cp`, `test_runes`,
+  `test_rune_battle`, `run_battery.sh` and `pin-manifest.json`; `data/runes.json` (**+130 lines, a
+  pure append — no existing entry moved a byte**), `data/glossary.json`, `docs/changelog.html`,
+  `CLAUDE.md`, `docs/master.html` and its stamp, `docs/text-standard.html`, `docs/design-notes.md`,
+  `baselines.json`, this file and `docs/reports/EZ.md`. **NO ABILITY, TALENT, MAGNITUDE OR CONSTANT
+  MOVED except where a rune's own payload required it**, and every item on the brief's own
+  not-done list was read out of the tree after the batch and confirmed unmoved.
+- **Next letter: FA.** **EZ was the last two-letter code before it**, and FA still sorts above every
+  suite's own code, so the stamp compare — which reads exactly TWO characters — is still fine.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
-  when the pool was retired. **The rune layer is now MACHINERY WITH NO CONTENT**: scope, cost
-  recognition, the power arm, the collision rule and ES's tag-reading helpers all stand and are all
-  asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
-  is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED, BUILT
-  AND REPAIRED, the crit surplus is ruled end to end, and the skill check's difficulty is now RULED
-  AND BUILT.** **The twenty-one authored runes are EZ, and EY shipped alone precisely so the two
-  verdicts stay readable.** **The ladder still has an open design question of its own (what rung 2
-  should ASK), and it is the largest unbuilt item on this list.**
+  purpose-authored and charter-clean, and **the rune layer has CONTENT again for the first time
+  since ET**: 21 authored against four specs, with **eight specs still unauthored** and the five
+  re-scoped universals still awaiting a class. **The machinery is no longer inert** — a rune reads a
+  tag, the loadout is a lever, and the state is on two screens. **What is left in the rune layer is
+  still authoring and it is still the designer's, one rune at a time.** The Loyalty curve is ruled,
+  built and repaired; the crit surplus is ruled end to end; the skill check's difficulty is ruled
+  and built. **The ladder still has an open design question of its own (what rung 2 should ASK),
+  and it is the largest unbuilt item on this list.**
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
@@ -196,7 +230,15 @@ distribution is available today from the per-run progress line, which carries th
 which is why EP measured rather than repaired, and why repairing it is a small, clearly-scoped
 instrument batch rather than an emergency.
 
-### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ONE IS CLOSED BY ET, TWO ARE DEFERRED WITH THE POOL**
+### THE THREE DESIGN QUESTIONS ES HANDS OVER — **TWO ARE CLOSED NOW (ET, EZ), ONE IS PARTLY ANSWERED**
+
+**BATCH EZ §0 ANSWERS PRICING AND OPENS THE POOL, AND THE READING BELOW IS KEPT AS THE RECORD OF
+WHAT THE OLD POOL CHARGED.** (1) **PRICING IS RULED: 100g, FLAT, EVERY AUTHORED RUNE** — rarity is
+gone and price no longer signals power, so the player pays for FIT rather than magnitude; the
+retired 65 keep their authored prices unmoved as history and the generated family keeps
+`TEMPLATE_PRICE` = 50, and **neither is a second pricing rule.** `check_ez` §0 asserts the flat 100
+as an equality over the live pool. (3) **THE FIRST RUNE TO KEY OFF A TAG IS BUILT — eight of them
+are** — and what is left of that item is the eight unauthored specs. **(2) is still closed.**
 
 **BATCH ET §1 RETIRED ALL 53 OFFERABLE RUNES, AND THAT MOVES ALL THREE OF THESE.** They are kept in
 full below because they are the measurements the NEXT pool is authored against, and because two of
@@ -257,6 +299,17 @@ seventh) and `docs/reports/ES.md` §4 (the reading machinery).** The vocabulary 
 `DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK`, it is on every ability in the corpus
 and every authored rune, and the draft card shows it.
 
+- **THE INERTNESS IS OVER AT BATCH EZ AND THE CLAIM BELOW IS SUPERSEDED. EIGHT RUNES ASK.**
+  Deepening Hex, Bracing Line, Heavy Bolts and the Answering Pack read a THRESHOLD; the Wide Rite,
+  the Long Watch, the Wide Watch and the Shared Scent read BREADTH. **They ask through a DIFFERENT
+  shape from the one ES built and both stand**: EZ §0's conditions are FRACTIONS of the hero's
+  DRAFTED cards counting the PRIMARY tag only (`Runes.threshold_met` / `breadth_met_fraction` over
+  `Classes.primary_tag_*`), where ES's are absolute counts over the whole bar counting both tags.
+  **The ES shape is right for a screen and the EZ shape is right for a condition** — see
+  `CLAUDE.md`'s standing rule for why a condition needs a partition. **`check_ek` §3's file
+  population grew a THIRD CATEGORY rather than losing a claim**: `talents.gd` is a CONSUMER, asserted
+  to name exactly the one door and no tag word at all, and `battle.gd` still holds zero.
+  *The original bullet follows, unedited, because its door and its measurement are unchanged.*
 - **THE INERTNESS ENDED AT ES §4 AND WHAT REPLACED IT IS NARROW: a rune CAN ask how many equipped
   cards of a tag its holder carries, and NO RUNE ASKS.** The door is
   `Run.loadout_ability_names` → `Classes.tag_census` / `tag_count` / `tag_breadth`, with
@@ -306,8 +359,9 @@ and every authored rune, and the draft card shows it.
   nine spec archetypes is a design decision with a stat table under it.
 - **WHAT THE TAGGING STILL HAS NOT REACHED, STATED SO IT IS NOT READ AS CLEAN.** No sim and no
   balance judgement; not one magnitude was measured. **The tags were not compared against relics,
-  items, enemy abilities or events**, none of which carries one. **AND NO RUNE IS KEYED TO A TAG —
-  ES BUILT THE MACHINERY AND AUTHORED NOTHING.** EM took the rune charter's MECHANICAL half (56
+  items, enemy abilities or events**, none of which carries one. **AND EIGHT RUNES ARE KEYED TO A TAG SINCE BATCH EZ** (the sentence that stood here — *no rune is
+  keyed to a tag; ES built the machinery and authored nothing* — is superseded and is kept only in
+  the shape of this correction).** EM took the rune charter's MECHANICAL half (56
   clauses off the talent counters onto fields of their own) and keyed nothing to a tag; ES gave a
   rune the QUESTION to ask and no rune asks it. **The differential mechanism — a rune worth more to
   a hero pointed the same way — is now buildable and is still unbuilt**, and the first rune that

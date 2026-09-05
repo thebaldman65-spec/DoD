@@ -1699,6 +1699,36 @@ func _open_loadout_panel(idx: int) -> void:
 	tag_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(tag_line)
 
+	# ── BATCH EZ §0 — AND THE LINE THE RUNES ACTUALLY READ, UNDER IT ─────────
+	#
+	# **THE CENSUS ABOVE IS NOT THE CONDITION AND THIS PANEL IS WHERE THAT
+	# MATTERS MOST.** It counts the whole bar and both tags; the two rune
+	# conditions count the DRAFTED half and the PRIMARY tag only, as fractions
+	# of that half. Showing only the census here would tell a player he holds
+	# five DEBUFF cards while the rune he is trying to switch on reads two.
+	#
+	# **THIS IS THE SCREEN WHERE THE LEVER IS UNDER HIS HAND**, and
+	# `_toggle_loadout` re-opens the panel after every bench and every carry —
+	# so this line is rebuilt from the live member on each swap and the change
+	# is immediate. There is no cached count here to invalidate.
+	var ez_dr: Array = Runes.drafted_names(member)
+	var ez_held: Array = []
+	for tag in Classes.TAG_ORDER:
+		var ez_c: int = Classes.primary_tag_count(ez_dr, String(tag))
+		if ez_c > 0:
+			ez_held.append("%s %d%s" % [String(tag), ez_c,
+				"✓" if Runes.threshold_met(ez_dr, String(tag)) else ""])
+	var rune_line := Label.new()
+	rune_line.text = "RUNE CONDITIONS   %d drafted   %s        %s%s" % [
+		ez_dr.size(),
+		"   ".join(ez_held) if not ez_held.is_empty() else "—",
+		Runes.breadth_line(ez_dr),
+		"✓" if Runes.breadth_met_fraction(ez_dr) else ""]
+	rune_line.add_theme_font_size_override("font_size", 12)
+	rune_line.add_theme_color_override("font_color", Color(0.85, 0.72, 0.55))
+	rune_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(rune_line)
+
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(650, 380)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

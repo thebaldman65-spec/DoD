@@ -209,11 +209,24 @@ func _s2_vocabulary() -> void:
 # read a tag. A sweep that did not grow with them would go on reporting the
 # population it was written for while the real one moved underneath it, which is
 # the exact failure `check_dw` exists to catch one layer up.
+#
+# **BATCH EZ ADDED EIGHT MORE, AND THIS IS THE BATCH THE LIST WAS KEPT AUTHORED
+# FOR.** ES built the machinery and nothing read it; EZ is where twenty-one
+# runes finally do. Six are the PRIMARY-ONLY arithmetic and the two fraction
+# conditions §0 rules (`primary_tag_count` / `primary_tag_census` /
+# `primary_tag_peak`, `threshold_met` / `breadth_met_fraction`,
+# `loadout_condition_met`) and two are the surfaces that print the state ES
+# requires be visible (`threshold_line`, `breadth_line`). **Every one is a new
+# way to read a tag**, and a sweep that did not grow with them would go on
+# reporting the population it was written for.
 const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 	"card_tag_line", "TAG_INFO", "TAG_ORDER", "tag_meaning",
 	"RUNE_TAGS", "rune_tags", "rune_tag_line",
 	"tag_count", "tag_census", "tag_breadth", "tag_threshold_met",
-	"breadth_met"]
+	"breadth_met",
+	"primary_tag_count", "primary_tag_census", "primary_tag_peak",
+	"threshold_met", "breadth_met_fraction", "loadout_condition_met",
+	"threshold_line", "breadth_line"]
 
 # The authored readers, SPLIT IN TWO AT BATCH EL §3 BECAUSE THEY ARE TWO
 # DIFFERENT CLAIMS AND ONLY ONE OF THEM IS ABOUT THE GAME.
@@ -242,18 +255,55 @@ const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd",
 	"scripts/party_screen.gd", "scripts/runes.gd"]
 
+# ── BATCH EZ — A THIRD CATEGORY, BECAUSE §3's CLAIM CHANGED AND SAYING SO IS
+# THE WHOLE JOB OF THIS SECTION ────────────────────────────────────────────
+#
+# **EK's CLAIM WAS "NOTHING READS A TAG FOR ANYTHING BUT DISPLAY". THAT ENDED
+# AT BATCH EZ AND IT ENDED DELIBERATELY**: twenty-one runes are authored and
+# eight of them are gated on §0's two loadout conditions, so a payload is now
+# refused or applied on the strength of a tag count. **This list is that fact,
+# written down.**
+#
+# A CONSUMER IS A FILE THAT REACHES THE MACHINERY WITHOUT HOLDING ANY OF IT.
+# `talents.gd` calls `Runes.loadout_condition_met` and hands the whole
+# `condition` dict through; it names no tag WORD, no table, no census and no
+# predicate — asserted below, and that is a stricter claim than the one it
+# replaces. The rune layer's vocabulary stays in the rune layer (ES §4's rule),
+# and the one door is the only thing that crosses the line.
+#
+# **A SECOND CONSUMER IS A DECISION SOMEBODY HAS TO MAKE.** The list is
+# authored, so the day `battle.gd` or `run_state.gd` starts asking a loadout
+# question — recounting per hit, say, which ES §4 explicitly rules against —
+# this section is what says so.
+const TAG_CONSUMERS := ["scripts/talents.gd"]
+
+# The one word a consumer is allowed to name: the door itself.
+const TAG_DOOR := "loadout_condition_met"
+
 # The half that is a claim about the INSTRUMENTS. A gate reading a tag cannot
 # change how the game behaves, so this list grows with the tree — but it is
 # still AUTHORED rather than derived from a `check_*.gd` glob, because a
 # derived list would bless a gate that started doing something else.
+# **BATCH EZ ADDED THE FIFTH.** `check_ez.gd` is the gate for the twenty-one
+# runes and it drives both fraction conditions, so it names the surface for the
+# ordinary reason a checker does. It is a CHECKER and not a reader: nothing it
+# does changes how the game behaves, which is the whole reason this half of the
+# population is allowed to grow with the tree while the other half is not.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
-	"check_map_screen.gd"]
+	"check_ez.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
 # none" fail in different ways and the second is the one that matters.
+# **BATCH EZ MOVED `talents.gd` OUT OF THIS LIST AND INTO `TAG_CONSUMERS`, AND
+# THE LIST DID NOT GET WEAKER FOR IT** — that file is asserted to name exactly
+# ONE word of the surface (the door) and nothing else, which is a tighter bound
+# than "none", not a looser one. **The five that remain are the ones where a
+# MECHANIC would have to live**, and `battle.gd` is still the one that matters:
+# ES §4 rules the count is read at the SPAWN and never in the strike loop, and
+# `battle.gd` holding zero is what says that rule is still obeyed.
 const NO_TAG_FILES := ["scripts/battle.gd", "scripts/unit.gd",
-	"scripts/talents.gd", "scripts/run_state.gd", "scripts/run_sim.gd",
+	"scripts/run_state.gd", "scripts/run_sim.gd",
 	"scripts/ability.gd"]
 
 func _s3_inertness() -> void:
@@ -285,6 +335,7 @@ func _s3_inertness() -> void:
 		else:
 			in_game.append(n)
 	var def_expected: Array = TAG_DEFINERS.duplicate()
+	def_expected.append_array(TAG_CONSUMERS)
 	def_expected.sort()
 	var chk_expected: Array = TAG_CHECKERS.duplicate()
 	chk_expected.sort()
@@ -296,6 +347,28 @@ func _s3_inertness() -> void:
 			% [", ".join(in_gates), ", ".join(chk_expected)])
 	print("    %d of %d .gd files name the tag surface (%d in the game, %d in the targets)"
 		% [names.size(), walked, in_game.size(), in_gates.size()])
+
+	# **THE CONSUMERS NAME THE DOOR AND NOTHING ELSE.** Asserted as an equality
+	# rather than as "contains the door", so a consumer that started reading a
+	# census, a count or a predicate directly turns this red — which is the
+	# failure the third category exists to catch and the one a bare membership
+	# test would bless.
+	for fc in TAG_CONSUMERS:
+		var cbody := Gate.strip_comments(FileAccess.get_file_as_string("res://" + fc))
+		var cnamed: Array = []
+		for cw in TAG_SURFACE:
+			if cbody.contains(String(cw)):
+				cnamed.append(String(cw))
+		ok(cnamed == [TAG_DOOR],
+			"%s reaches the machinery through the one door and nothing else — names [%s]"
+				% [fc, ", ".join(cnamed)])
+		var ctagged: Array = []
+		for ctw in Classes.TAG_ORDER:
+			if cbody.contains('"%s"' % String(ctw)):
+				ctagged.append(String(ctw))
+		ok(ctagged.is_empty(),
+			"%s names no tag WORD (%s) — the vocabulary stays in the rune layer"
+				% [fc, ", ".join(ctagged)])
 
 	for f in NO_TAG_FILES:
 		var body := Gate.strip_comments(FileAccess.get_file_as_string("res://" + f))
@@ -379,8 +452,17 @@ func _all_gd() -> Array:
 # exemption is a LIST rather than a skip, so a fifth collision — a new card, a
 # node, a rune — still turns this section red.
 const CLASH_EXEMPT := {
+	# **BATCH EZ ADDED THE FIFTH, AND IT IS THE FIRST THAT IS A RUNE.** The
+	# Standing Mark is the Occultist's, and the mark it names is RUIN — which
+	# is a mark, carries the tag, and is the same-meaning collision EL's rule
+	# ships and names. **The rune's own tag row is `["DEBUFF", "DEFENSE"]` and
+	# not MARK**, because MARK means "lays a lasting mark on ONE enemy" and Ruin
+	# is the Occultist's whole board; the word in the name is doing different
+	# work from the word in the vocabulary, which is exactly the case the
+	# exemption list exists to record rather than to hide.
 	"MARK": ["ability:Hunter's Mark", "ability:Mark of the Hunt",
-		"ability:Quarry's Mark", "status label:Hunter's Mark"],
+		"ability:Quarry's Mark", "rune:Standing Mark",
+		"status label:Hunter's Mark"],
 	# **DEFENSE MEETS THE DEFENSE POTION, AND THE POUCH BUTTON RENDERS IT ON
 	# THE SAME SCREEN.** `map_screen._draw_footer` prints
 	# `ITEM_INFO[id][0].replace(" Potion", "")`, so the button reads "Defense"

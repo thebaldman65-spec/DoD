@@ -122,6 +122,20 @@ func _run() -> void:
 # WHETHER a rune is offered is `test_runes`' question and it is asserted there
 # in both directions; whether its clauses PAY is this file's, and that question
 # is unchanged by the retirement.
+# **HOW MANY ENTRIES `runes.json` SCOPES TO THIS SPEC, RETIRED INCLUDED.**
+# `_equip_all` walks `Runes.ids()` and equips every one of them by scope — it
+# does NOT go through `eligible_ids`, deliberately, because EO's rule is that
+# kept content nothing drives is content that rots and this suite is what
+# drives the retired half. So the expected count is the FILE's population and
+# not the offerable one.
+func _spec_scoped(spec: String) -> int:
+	var n := 0
+	for id in Runes.ids():
+		if String(Runes.config(String(id)).get("scope", "")) == "spec:%s" % spec:
+			n += 1
+	return n
+
+
 func _equip_all(member: Dictionary) -> Array:
 	var names: Array = []
 	var want := "spec:%s" % String(member.get("spec", ""))
@@ -172,8 +186,15 @@ func _hunter_pass(spec: String) -> void:
 		if not h.is_companion and String(h.hero_key) == "hunter":
 			hunter = h
 	ok(hunter != null, "%s: never spawned" % spec)
-	ok(equipped.size() == 4, "%s: equipped %d spec runes, expected 4" % [
-		spec, equipped.size()])
+	# BATCH EZ — DERIVED, NOT PINNED. The `4` was the OLD pool's per-spec size
+	# (one rune per talent lane plus one splash); EZ authors 5 or 6 more for
+	# four specs and the number is content from here on. **The claim was never
+	# the count** — it is that `_equip_all` reached EVERY entry scoped to this
+	# spec and the fight then saw them — so it is asserted against the file's
+	# own population instead, which cannot rot when the pool grows again.
+	ok(equipped.size() == _spec_scoped(spec),
+		"%s: equipped %d spec runes, expected the %d in runes.json" % [
+			spec, equipped.size(), _spec_scoped(spec)])
 	if hunter == null:
 		scene.queue_free()
 		return
@@ -361,8 +382,9 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 	# ---- the runes reached the spawned hero ----
 	for spec in specs:
 		ok(not equipped[spec].is_empty(), "%s: nothing eligible to equip" % spec)
-		ok(equipped[spec].size() == 4, "%s: equipped %d spec runes, expected 4" % [
-			spec, equipped[spec].size()])
+		ok(equipped[spec].size() == _spec_scoped(spec),
+			"%s: equipped %d spec runes, expected the %d in runes.json" % [
+				spec, equipped[spec].size(), _spec_scoped(spec)])
 
 	# RE-POINTED IN BATCH AR, and this is the standing 91/1 defect closing.
 	# The old block asserted the INFERNO MASTER chip against a string Batch AG

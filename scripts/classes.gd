@@ -1070,6 +1070,61 @@ static func tag_breadth(display_names: Array) -> int:
 	return n
 
 
+# ══ BATCH EZ §0 — THE PRIMARY-ONLY ARITHMETIC, AND WHY IT IS A SECOND SET ══
+#
+# **THE THREE ABOVE COUNT BOTH TAGS ON A CARD AND THESE THREE COUNT ONLY THE
+# PRIMARY. NEITHER IS THE OTHER'S REPAIR — they answer different questions and
+# both answers are wanted.** ES §4 ruled that a census counts both, because a
+# card that Breaks and DEBUFFs is a member of both populations and the
+# secondary would otherwise be decorative; that is the right rule for the two
+# SCREENS, which show a player what his loadout contains.
+#
+# **A RUNE CONDITION NEEDS A PARTITION AND A CENSUS IS NOT ONE.** BATCH EZ's
+# two conditions are FRACTIONS of the same denominator — "at least HALF the
+# drafted cards carry the tag" and "NO tag exceeds a THIRD of them" — and under
+# the both-tags count the per-tag numbers sum to more than the card count, so a
+# tag could exceed a third while every tag did, and "half" could be met by two
+# tags at once on the same three cards. **A card contributes exactly one tag
+# here, so the counts partition the list and the two conditions read the same
+# denominator**, which is the designer's stated reason and is the whole of it.
+#
+# They sit beside their both-tags counterparts rather than in `Runes` for the
+# same reason those do: the arithmetic belongs next to `CARD_TAGS`, and a
+# second copy anywhere else is how the two would eventually disagree.
+static func primary_tag_count(display_names: Array, tag: String) -> int:
+	var n := 0
+	for nm in display_names:
+		if card_tag_primary(String(nm)) == tag:
+			n += 1
+	return n
+
+
+# Every tag's PRIMARY count at once, with a ZERO row for every word in
+# TAG_ORDER — the zero rows for `tag_census`'s own reason. **The values sum to
+# at most the list's size** (a card whose name carries no row contributes to
+# nothing), which is the property the fractions are read against.
+static func primary_tag_census(display_names: Array) -> Dictionary:
+	var out := {}
+	for t in TAG_ORDER:
+		out[String(t)] = 0
+	for nm in display_names:
+		var k := card_tag_primary(String(nm))
+		if out.has(k):
+			out[k] = int(out[k]) + 1
+	return out
+
+
+# The largest PRIMARY count in the list — the number BREADTH is a bound on.
+# Derived from the census rather than counted separately, so the two can never
+# disagree (`tag_breadth`'s own discipline).
+static func primary_tag_peak(display_names: Array) -> int:
+	var census := primary_tag_census(display_names)
+	var top := 0
+	for t in TAG_ORDER:
+		top = maxi(top, int(census[String(t)]))
+	return top
+
+
 # The tag line as the draft card renders it — "DEBUFF · BREAK", or "" when
 # the card carries none. ONE BUILDER, so a second surface taking these on
 # cannot draw them a second way (CK §1's rule, one layer down).

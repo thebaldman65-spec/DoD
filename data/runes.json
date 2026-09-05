@@ -465,5 +465,135 @@
 		"desc": "A little of every trick: +1 Poison damage per stack, +15% trap damage, Tripwire answers with 10% more of his Attack.",
 		"retired": "RETIRED at BATCH EO §3 — kept, and said to be kept. LOST: a splash across poison, traps and Tripwire. `carrion_wake` covers afflictions and `quick_spring` traps.",
 		"payload": {"stat": {"rune_potent_ranks": 1, "rune_cruel_ranks": 15, "rune_wire_ranks": 10}}
+	},
+	"deepening_hex": {
+		"name": "Deepening Hex", "scope": "spec:occultist",
+		"price": 100,
+		"desc": "Ruin detonates every 8th stack instead of every 10th — while at least HALF his drafted cards are DEBUFF.",
+		"payload": {"condition": {"tag_threshold": "DEBUFF"}, "stat": {"rune_hex_threshold": 8}}
+	},
+	"standing_mark": {
+		"name": "Standing Mark", "scope": "spec:occultist",
+		"price": 100,
+		"desc": "Ruin's lifesteal cap rises from 40% to 60%.",
+		"payload": {"stat": {"rune_ruin_leech_cap": 0.20}}
+	},
+	"split_tongue": {
+		"name": "Split Tongue", "scope": "spec:occultist",
+		"price": 100,
+		"requires_ability": "Hex of Ruin",
+		"desc": "Hex of Ruin curses the WHOLE line rather than three chosen enemies — at 1 Ruin a target instead of 2.",
+		"payload": {"ability": "Hex of Ruin", "set": {"aoe": true}, "also": [{"stat": {"rune_split_tongue": 1}}]}
+	},
+	"wide_rite": {
+		"name": "Wide Rite", "scope": "spec:occultist",
+		"price": 100,
+		"desc": "Every debuff he applies marks 1 MORE Ruin — while NO tag holds more than a THIRD of his drafted cards.",
+		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_wide_rite": 1}}
+	},
+	"open_wound": {
+		"name": "Open Wound", "scope": "spec:occultist",
+		"price": 100,
+		"requires_ability": "Shadowrend",
+		"desc": "Shadowrend marks Ruin on EVERY enemy, not one — but Ruin now decays by 1 each turn.",
+		"payload": {"stat": {"rune_open_wound": 1}}
+	},
+	"standing_wall": {
+		"name": "Standing Wall", "scope": "spec:warden",
+		"price": 100,
+		"desc": "A block HALVES the Heavy Plating bonus instead of clearing it.",
+		"payload": {"stat": {"rune_standing_wall": 1}}
+	},
+	"bracing_line": {
+		"name": "Bracing Line", "scope": "spec:warden",
+		"price": 100,
+		"desc": "Allies take 5% less damage while his Heavy Plating bonus stands at +32% or higher — and while at least HALF his drafted cards are DEFENSE.",
+		"payload": {"condition": {"tag_threshold": "DEFENSE"}, "stat": {"rune_bracing_line": 5}}
+	},
+	"split_shield": {
+		"name": "Split Shield", "scope": "spec:warden",
+		"price": 100,
+		"requires_ability": "Shieldwall",
+		"desc": "Shieldwall is split in two: half its Block for him, and that same half for the ally he sets it in front of.",
+		"payload": {"stat": {"rune_split_shield": 1}}
+	},
+	"long_watch": {
+		"name": "Long Watch", "scope": "spec:warden",
+		"price": 100,
+		"desc": "His Break damage carries to a second enemy — while NO tag holds more than a THIRD of his drafted cards.",
+		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_long_watch": 1}}
+	},
+	"bared_plate": {
+		"name": "Bared Plate", "scope": "spec:warden",
+		"price": 100,
+		"desc": "+25% Break damage — but he can no longer Block.",
+		"payload": {"stat": {"rune_bd_bonus": 0.25, "rune_no_block": 1}}
+	},
+	"keen_focus": {
+		"name": "Keen Focus", "scope": "spec:sharpshooter",
+		"price": 100,
+		"desc": "A target switch HALVES his Focus instead of clearing it.",
+		"payload": {"stat": {"rune_keen_focus": 1}}
+	},
+	"heavy_bolts": {
+		"name": "Heavy Bolts", "scope": "spec:sharpshooter",
+		"price": 100,
+		"desc": "His patience turns into force at 80 Focus rather than 100 — while at least HALF his drafted cards are MARK.",
+		"payload": {"condition": {"tag_threshold": "MARK"}, "stat": {"rune_heavy_bolts": 20}}
+	},
+	"ambush": {
+		"name": "Ambush", "scope": "spec:sharpshooter",
+		"price": 100,
+		"requires_ability": "Called Volley",
+		"desc": "Called Volley strikes 0.5% harder for every point of Focus he is holding, and still does not clear it.",
+		"payload": {"stat": {"rune_ambush": 1}}
+	},
+	"wide_watch": {
+		"name": "Wide Watch", "scope": "spec:sharpshooter",
+		"price": 100,
+		"desc": "Focus carries in FULL through a kill rather than the 50 retained — while NO tag holds more than a THIRD of his drafted cards.",
+		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_wide_watch": 1}}
+	},
+	"long_draw_press": {
+		"name": "Long Draw", "scope": "spec:sharpshooter",
+		"price": 100,
+		"desc": "His basic attack runs one EXTRA press at every stage — but the added press buys no widening, so the sequence is harder to hold.",
+		"payload": {"stat": {"rune_long_draw_presses": 1}}
+	},
+	"long_leash": {
+		"name": "Long Leash", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "The Loyalty split point moves from 8 to 11 — three more stacks buy the companion's strike step before the boon takes over.",
+		"payload": {"stat": {"rune_long_leash": 3}}
+	},
+	"shared_hide": {
+		"name": "Shared Hide", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "The companion's blows finally read the damage buffs it is already wearing — and the two the hunter carries for a bond that broke.",
+		"payload": {"stat": {"rune_shared_hide": 1}}
+	},
+	"answering_pack": {
+		"name": "Answering Pack", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "Once a fight, the deepest bond takes the blow that would fell the hunter — while at least HALF his drafted cards are DEFENSE.",
+		"payload": {"condition": {"tag_threshold": "DEFENSE"}, "stat": {"rune_answering_pack": 1}}
+	},
+	"second_whistle": {
+		"name": "Second Whistle", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "Summon Ursus, Canis and Aguila each field the companion with 3 Loyalty already earned.",
+		"payload": {"stat": {"rune_second_whistle": 3}}
+	},
+	"shared_scent": {
+		"name": "Shared Scent", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "A fallen companion's Loyalty carries to the next one called — while NO tag holds more than a THIRD of his drafted cards.",
+		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_shared_scent": 1}}
+	},
+	"bared_fang": {
+		"name": "Bared Fang", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "+30% companion damage — but the companion can no longer be healed.",
+		"payload": {"stat": {"rune_bared_fang": 0.30}}
 	}
 }
