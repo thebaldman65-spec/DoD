@@ -5,103 +5,108 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-04 (Batch EX).*
+*Last rewritten: 2026-09-05 (Batch EY).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EX — THE SURPLUS RATE GOES TO 0.50.** The designer ruled the one number EW left
-  open. `CRIT_EXCESS_STEP` moves **1.0 → 0.50**: crit chance above a certainty still becomes crit
-  MULTIPLIER, from every source, game-wide, but at **half** Focus's exchange rate rather than all of
-  it. **The executable diff is ONE LINE**, proved by a comment-stripped diff with identical line
-  counts either side. **Nothing else moved: Focus's conversion point and rate, the four roll sites,
-  the one body, the unclamped roll, `BOND_MITIGATION_MAX`, `BOND_CONVERT` and `_bond_fallback` are
-  all untouched, no gate was edited and no rune was authored.** Full working, with every figure's n
-  and standard error: **`docs/reports/EX.md`**.
-- **§1 — WHY 0.50, RECORDED WITH THE RULING.** 1.0 is a rate tuned for **one meter, that one spec
-  builds, on one target**. This constant prices a total assembled over **twelve statements carrying
-  thirteen terms**, fed by the whole party and pushed past a certainty mostly by a boon belonging to
-  a different hero. **Nothing has ever tested that those two answers should be the same number**, and
-  shipping 1.0 was a default rather than a test. **0.25 was priced and rejected as too timid.** The
-  constant is still deliberately NOT derived from `FOCUS_STEP`.
-- **§1a — MEASURED LIVE OVER NINE ARMS RUN AS A LATIN SQUARE**, three rates × three row bands, three
-  at a time, so each rate appears once per batch and once per row band — a two-armed reading can
-  otherwise follow the POSITION rather than the meter. Conversion off against 0.50, independent runs:
-  **rows 0 −0.112% ±0.115, rows 1–3 +0.269% ±0.104, rows 1–9 +1.235% ±0.158.** **EW's counterfactual
-  predicted +1.351% at rows 1–9 and the live arm agrees inside one standard error.** The same arms
-  at 1.00 read +2.180% ±0.189, so **what EX costs the deep game is about one percent of crit output**
-  (−0.925% ±0.201) and nothing measurable anywhere else.
-- **§1b — THE FLOOR IS ±0.11% AND IT IS WHAT MAKES ROWS 1–3 READABLE, BY SAYING IT IS NOT.** The
-  exact counterfactual prices the conversion at **+0.037%** at rows 1–3 — thirty times smaller than
-  that arm's own noise — so the +0.269% measured there is run-to-run variance at either rate.
-  **Only rows 1–9 is above the floor.**
-- **§1c — AND THE FIGURE THE RATE WAS ARGUED ON DOES NOT HOLD STILL. THIS IS THE BATCH'S SHARPEST
-  FINDING.** The brief chose 0.50 partly on EW's worst measured blow (×12.74 at 1.00, ×7.12 at
-  0.50). Across four independent rows-1–9 arms the worst total crit reads **7.20 / 11.12 / 12.24 /
-  18.09** — a 2.5× spread. **A sample maximum of an unbounded term grows with sampling instead of
-  converging**, so that figure is a fact about a hundred runs and not about the game. **It makes the
-  ruling better founded rather than worse** — the reason to halve the rate was that the tail has no
-  ceiling, and this is that same fact said again. **The stable figures are the RATIO (0.50 buys
-  exactly half of 1.00, at every arm) and the aggregate band**, and both are now standing rules.
-- **§2 — ROWS 0 IS A RARE EVENT, NOT A STRUCTURAL ZERO, AND EW'S REPORT SAYS OTHERWISE.** EW recorded
-  that the conversion *provably cannot fire* untalented. **It can** — measured **2 crossings in
-  40,437 hero strikes**, totals reaching **1.09**, with 208 strikes at or past 0.50.
-  **`_party_crit_bonus()` is gated on `passive_id == "pack"` and NOTHING ELSE** — no talent, no row —
-  so Aguila's boon on an uncapped Loyalty meter reaches a certainty there. **The requirement still
-  held**: the shipped arm converted exactly nothing, 0 of 40,766, and two crossings would move that
-  mean by +0.0002% against a ±0.11% floor. **But a negative control asserted as structural, and
-  really only rare, stops being a control on the day it is not rare.**
-- **§3 — THE CONSTANT'S OWN COMMENT NAMED THE WRONG NUMBER.** `battle.gd` said the total is assembled
-  *from eight sources*; every document says twelve. Counted mechanically off the strike loop it is
-  **TWELVE statements carrying THIRTEEN terms** — the first is the base and a Broken target's 25% in
-  one line. So "twelve" is right about the places and wrong about the terms and "eight" is wrong
-  about both. **Corrected in the comment this batch was rewriting anyway, and in the standing rule.**
-  **`docs/reports/EW.md` is left alone — it is EW's record, and this is not a defect in what EW
-  built.**
-- **§4 — THE GATE HELD AT 38 AND GOT SHARPER.** `check_ew` reads **38 / 0** off three identical
-  standalone readings at 0.50, exactly as the brief predicted — nothing in it was pinning the VALUE
-  rather than the property. Driven on an instrumented copy, **§2's measured ratio is 1.4977 against
-  a predicted 1.5000 at 0.50, an error of 0.0023 — half what it was at 1.00**, against a 0.02 bound.
-  **ONE OF THE 38 IS VACUOUS AND IS NAMED RATHER THAN TOUCHED:** §6's last assertion is
-  `ok(step == step, …)`, which cannot fail. **Owed**, because a gate edit would move the count this
-  batch predicted unmoved.
-- **§5 — THE INSTRUMENTS, AND ONE OF THEM WAS SILENTLY DISABLED.** A `--` placed before
-  `--include="*.gd"` turned the filter into a file operand, so a sweep searched every file type while
-  reporting as though it had filtered. **Caught by arming it with a needle in each direction.** The
-  literal sweep — **15,256 needles from 124 `.gd` files** — was armed both ways before it was
-  trusted: deleting a needle that appears exactly once in `master.html` reads LOST 1, injecting one
-  the file does not carry reads GAINED 3.
-- **§6 — THE BATTERY, AND EVERY PREDICTION HELD.** **`check_de` 378 / 0 / 0 NOTICES** — no baseline
-  row moved and none rose. **92 targets, `sort .ran | uniq -d` holds ZERO duplicates, 0 `Parse
-  Error` and 0 `SCRIPT ERROR` across every log.** `check_ew` **38 / 0**, `check_parse` **166 / 0**,
-  `check_ev` **54 / 0**, `check_eu` **38 / 0**, run harness GATE 1 **22** / GATE 2 **166** / GATE 3
-  **8**, all PASS, throws 0. **The only red is `check_cm_live` 13 / 4**, whose four FAIL lines were
-  READ and are the four its baseline row names. **The freeze held EXACTLY**: an md5 stamp of all
-  **333 tracked files with absolute paths**, before and after, **zero differ**. The list is
-  `git ls-files`, so the new report was untracked and outside it — **named rather than implied**,
-  and covered instead by the fact that nothing in the tree loads `docs/reports/`.
-- **WHAT MOVED: ONE SOURCE FILE AND SEVEN DOCUMENTS.** `scripts/battle.gd` (one constant and the
-  comment above it); `docs/changelog.html`; `CLAUDE.md`; `docs/master.html` and its stamp;
-  `data/glossary.json`; `docs/design-notes.md`; `baselines.json`; this file; and
-  `docs/reports/EX.md`. **NO GATE, NO SUITE, NO `run_battery.sh`, NO BASELINE COUNT, NO RUNE, NO
-  NODE, NO CLAMP AND NO OTHER RATE MOVED.**
-- **Next letter: EY.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
-  what breaks it — still a long way off.
+- **Last batch: EY — THE BASE SWEEP GOES 0.72s → 1.00s.** The designer ruled that the checks feel
+  too hard. `SC_PROFILE_DEFAULT.sweep_time` moves **0.72 → 1.00**; **`perfect_half` 0.045 and
+  `good_half` 0.16 are untouched** — the bar slows, the target does not grow. **The executable diff
+  is ONE LINE in `battle.gd`**, proved by a comment-stripped diff with identical line counts either
+  side (14,251 both). **One gate moved with it and had to**: `check_cn.gd`'s `WANT_PROFILE` pins the
+  profile by number. **Nothing else moved: no other profile field, none of the four `SS_SEQ_*`
+  constants, no grade, multiplier, gate rule or defensive rule, and no rune was authored.** Full
+  working: **`docs/reports/EY.md`**.
+- **§1 — THE ARITHMETIC, MEASURED OFF A LIVE BAR RATHER THAN COMPUTED.** Perfect **64.80 ms →
+  90.00 ms**, Good **230.40 ms → 320.00 ms**. The zone rects do not move — the drawn Good band is
+  2 × 0.16 of the track before and after, and the graded half is the same 0.16. **The alternative —
+  widening the half-widths instead of slowing the bar — was priced and NOT TAKEN**, because a
+  half-width is a fraction of the TRACK and widening it redraws what the player aims at. **That is
+  now a standing rule in `CLAUDE.md`** so it is not re-proposed as a discovery.
+- **§1a — THE SHARPSHOOTER RESTATES `sweep_time` AND INHERITS THE TOLERANCE, AND THE BRIEF'S
+  CONDITIONAL WAS THE WRONG READING.** The brief asked whether his profile inherits or restates, and
+  said that if it restates *the change misses him*. **It does both.** His `sweep_time` is the literal
+  `SS_SEQ_SWEEP` and stays **0.52 s** — measured at all four press counts — but both half-widths are
+  computed through `SC_PROFILE_DEFAULT["sweep_time"]`, so **his tolerance moves by exactly the factor
+  everyone else's does**: Perfect **55.08 → 76.50 ms**, still ×0.85 of the default's, still flat
+  across one to four presses. **He is the only caster who takes all of the difficulty and none of the
+  wall-clock.** Opening Good windows **272.0 / 355.5 / 428.1 / 506.2 ms**.
+- **§1b — AND HIS FOUR-PRESS OPENING WINDOW IS NOW 97.3% OF THE TRACK. NAMED, NOT CHANGED.** At 150+
+  Focus his first Good half is **0.487** of a track whose half is 0.5, leaving a miss band of
+  **6.9 ms at each end of his 520 ms pass** against yesterday's 77.8 ms. `SS_SEQ_OPEN` and
+  `SS_SEQ_TAPER` are unmoved and `check_cs` still passes — **this is the figure a later batch must
+  look at before spending any more tolerance on him.**
+- **§2 — THE PACING COST, MEASURED, AND CM'S FIGURES DO NOT REPRODUCE.** A Warden party runs
+  **6.6 defensive bars and 10.9 ordinary casts a battle** (n=200, rung 2). The brief quoted CM's
+  *9.4 a battle against 27.3 hero actions*; **neither reproduces** — hero turns read 29.7 and only
+  10.9 of them open a bar at all. **CM's own comment that the Warden's bar "roughly doubles the
+  presses" reads ×1.61 today.** A centred press costs half a sweep, so a bar costs **+0.14 s** and
+  17.5 bars cost **about +2.4 s a battle**, roughly two minutes across a 49-encounter clear.
+  **AND "every incoming attack" IS TWO NARROWINGS SHORT**: a counter raises no bar and neither does
+  an attack carrying a `special`.
+- **§3 — NO SIM CAN MEASURE THE CHANGE ITSELF, AND NONE WAS RUN.** The bot rolls grades off fixed
+  probabilities and never touches the bar, so every completion figure this project owns is blind to
+  it. `check_cs` printing *the bot lands 2.69 of four* identically before and after is that fact on
+  the record. **The bar COUNT is a different quantity** — a structural count the sim does keep — and
+  is what §2 measures.
+- **§4 — THE GATE THE BRIEF DID NOT NAME WOULD HAVE SHIPPED RED, AND IT WAS ARMED BOTH WAYS.**
+  The old pin against the new constant reads `FAIL: default profile sweep_time = 1.0, want 0.72` —
+  **1 failure against a `fails: [0, 0]` row**; the moved pin reads **0 failures**. **The pin was
+  moved to the new value, never loosened.**
+- **§5 — DRIVEN LIVE, BECAUSE A VALUE READ ONCE AT UI SETUP WOULD PASS EVERY STATIC CHECK.** An
+  out-of-repo probe opened real bars and integrated `_process` by hand: the marker moves at
+  **1.000000 s** per pass, read at two frame lengths, and **reads 0.720000 back when a stale value is
+  planted** — so the reading could have said otherwise. Four consecutive casts alternating
+  Sharpshooter and ordinary read **0.52 / 1.00 / 0.52 / 1.00**. **39 checks, 0 failures.**
+- **§6 — THE INSTRUMENTS, AND ONE OF THEM HAD A HOLE THAT WAS FOUND BEFORE IT WAS TRUSTED.** The
+  scan-window census extracts `find()` anchors, and the first pass matched only **double**-quoted
+  literals — **48 of the 198 anchors are single-quoted**, including the one holding the tree's widest
+  window (3,000 bytes). Re-run over both forms: **no specific anchor lands within ±3,400 bytes of any
+  of the four edits.** The literal sweep — **18,790 needles from 124 `.gd` files** — was armed both
+  ways first (delete a once-only needle → LOST 1, inject an absent one → GAINED 3, unchanged copy →
+  0/0). **And a `grep -rn -- "$n" --include=…` silently searched every file type again**, the same
+  fault EX recorded; redone without the `--`.
+- **§7 — THE BATTERY.** **92 targets, `sort .ran | uniq -d` ZERO duplicates, 0 `Parse Error`, 0 `SCRIPT ERROR` and 0 timeouts across every log.** **`check_de` 378 / 0 / 0 NOTICES** — no baseline row moved and none rose. `check_cn` **0 failures**, `check_cs` **104 / 0**, `check_parse` **166 / 0**, `check_ew` **38 / 0**, `check_ev` **54 / 0**, `check_eu` **38 / 0**, `check_ed` **18 / 0**; run harness GATE 1 **22** / GATE 2 **166** / GATE 3 **8**, all PASS, throws 0. **The only red is `check_cm_live` 13 / 4**, whose four FAIL lines were READ and — because that gate is the only thing in the tree that presses the defensive bar — **re-run on a copy with `battle.gd` restored to HEAD, where it reads the same 13 / 4 with the same four lines.** **The freeze held EXACTLY**: an md5 stamp of **334 files with absolute paths, tracked AND untracked**, before and after, **zero differ**, with nothing appearing outside the list — which closes the gap EX named in its own `git ls-files` population.
+- **WHAT MOVED: TWO SOURCE FILES AND EIGHT DOCUMENTS.** `scripts/battle.gd` (one constant and three
+  comments); `check_cn.gd` (the pin); `docs/changelog.html`; `CLAUDE.md`; `docs/master.html` and its
+  stamp; `data/glossary.json`; `docs/design-notes.md`; `baselines.json`; this file; and
+  `docs/reports/EY.md`. **NO SUITE, NO OTHER GATE, NO `run_battery.sh`, NO BASELINE COUNT, NO RUNE,
+  NO NODE, NO CLAMP AND NO OTHER CONSTANT MOVED.**
+- **Next letter: EZ.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+  what breaks it — **and EZ is the last two-letter code before FA**, which still sorts above every
+  suite's own code and is therefore still fine.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
   when the pool was retired. **The rune layer is now MACHINERY WITH NO CONTENT**: scope, cost
   recognition, the power arm, the collision rule and ES's tag-reading helpers all stand and are all
   asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
   is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED, BUILT
-  AND REPAIRED (it converts at 8, EU; a converted stack never pays nothing, EV), and what is left of
-  it is the RUNE that moves the point — which is authoring and waits on the pool. EV's two clamp
-  questions are CLOSED, and EW's one open number is CLOSED by EX. The crit surplus is now ruled end
-  to end: mechanism, scope, enemy question and rate.** **The ladder still has an open design question
-  of its own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
+  AND REPAIRED, the crit surplus is ruled end to end, and the skill check's difficulty is now RULED
+  AND BUILT.** **The twenty-one authored runes are EZ, and EY shipped alone precisely so the two
+  verdicts stay readable.** **The ladder still has an open design question of its own (what rung 2
+  should ASK), and it is the largest unbuilt item on this list.**
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE SKILL CHECK'S DIFFICULTY IS RULED AND BUILT — **ONE OBSERVATION IS OWED FORWARD (EY)**
+
+**Full evidence: `docs/reports/EY.md`.** The designer ruled the checks too hard, `sweep_time` moved
+0.72 → 1.00 and the half-widths were deliberately left alone. **Nothing about the ruling is open.**
+This item carries the two things a later batch must not re-derive from scratch:
+
+- **THE SHARPSHOOTER'S FOUR-PRESS OPENING GOOD WINDOW IS 97.3% OF THE TRACK** — a miss band of
+  6.9 ms at each end of his 520 ms pass. It is the arithmetic working as designed (`SS_SEQ_OPEN`
+  holds his SEQUENCE risk flat, and a flatter sequence at an easier base is a wider opening), and
+  nothing in EY touched it. **But there is no tolerance left to spend on him**, and `check_cs` §4's
+  flat-difficulty assertion now passes at **0.011 against its 0.02 bound** where it used to pass at
+  0.003. **The next batch to widen a window is the one that finds out.**
+- **DIFFICULTY IS BOUGHT WITH `sweep_time`, NOT WITH THE HALF-WIDTHS**, and the reason is a standing
+  rule in `CLAUDE.md` now: a half-width is a fraction of the TRACK, so widening it redraws what the
+  player is aiming at, while the sweep buys the same seconds and leaves every zone where it was.
+  **The alternative was priced and rejected — it is not a discovery.**
 
 ### THE CRIT SURPLUS IS RULED END TO END — **NOTHING IS OPEN. EX CLOSED THE LAST NUMBER.**
 
@@ -1448,8 +1453,12 @@ re-derived from the source at DM; not one was moved.**
   (`ITEM_STACK_CAPS`): Cleansing Draught **4**, Cursed Visage **2**, Resonating Hourglass **2**.
   Sale returns `SELL_FRACTION` = **0.4** of listed price.
 - **The skill check's default profile** — `battle.SC_PROFILE_DEFAULT`: `perfect_half` **0.045**,
-  `good_half` **0.16**, `centre` **0.5**, `sweep_time` **0.72**, `presses` **1**, `press_taper`
-  **1.0**. **Every caller uses it except the Sharpshooter's basic attack.**
+  `good_half` **0.16**, `centre` **0.5**, `sweep_time` **1.00** (EY; it was 0.72), `presses` **1**,
+  `press_taper` **1.0**. Perfect window **90.0 ms**, Good window **320.0 ms**. **Every caller uses
+  it except the Sharpshooter's basic attack — which RESTATES `sweep_time` (a flat 0.52 s) and
+  INHERITS both half-widths through it**, so a change to the base sweep reaches him as tolerance
+  and not as pace: his Perfect window is **76.5 ms**, still ×0.85 of the default's.
+  **`check_cn.gd`'s `WANT_PROFILE` pins all six by number — moving one here is two edits.**
 - **Save versions: the run save is v12** (a pre-**v10** save is REFUSED and cleared — the version
   and the threshold are different numbers and this file conflated them until EG, recording v10 while
   CT had taken it to v11). **v11 (CT) and v12 (EG) are both TOLERANT and neither moved the

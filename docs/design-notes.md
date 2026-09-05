@@ -4,6 +4,65 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The bar slows and the target does not grow (Batch EY) — 2026-09-05
+
+### Why `sweep_time` and not the half-widths
+
+The designer's ruling was that the checks feel too hard. Difficulty in this
+system is `half * sweep_time` seconds — CN's own standing rule read as an
+equation — so there were two ways to buy the same tolerance, and on paper
+they are interchangeable. `SC_PROFILE_DEFAULT.sweep_time` moves 0.72 → 1.00
+and `PERFECT_HALF` and `GOOD_HALF` are untouched at 0.045 and 0.16.
+
+They are not interchangeable in what else they move, and the zone rects are
+why. The half-widths are **fractions of the track**: widening them redraws
+the thing the player is aiming at, so an easier bar becomes a visibly
+easier bar. Slowing the sweep leaves every zone the width it has always
+been drawn at and pays the tolerance out in seconds instead. The Perfect
+window goes 64.8 ms → 90.0 ms and the Good window 230.4 ms → 320.0 ms with
+the gold band on screen exactly where it was.
+
+The second reason is the Sharpshooter. His opening Good half at four
+presses is already 0.350 of the track; the same tolerance bought by
+widening the base half would have taken it past 0.5 and made his four-press
+opening window the whole bar with nothing outside it. Slowing the base
+takes it to 0.487 — which is 97.3% of the track and is quite far enough,
+and is the number a later batch should look at before spending any more
+tolerance on him. **The alternative was priced and not taken; it is written
+down here so it is not re-proposed later as a discovery.**
+
+### What one constant reaches, and why it is a difficulty change rather than a pacing one
+
+It is one constant and it is under every skill check in the game. The five
+gated abilities — Death Ray, Requiem, Reckless Abandon, Boil Over, Unleash
+— lose the whole cast on a Sloppy, so a slower bar is a direct difficulty
+reduction on the five most decisive cards in the game and not a cosmetic
+one. The Warden's defensive check runs on qualifying incoming attacks and
+is the highest-volume bar in the game: 6.6 a battle against 10.9 ordinary
+casts, measured. And every ordinary cast in the game is the rest of it.
+
+The pacing cost is real and it is small: a player aiming at the centre
+presses at half a sweep, so a bar costs +0.14 s and a Warden party's
+17.5 bars a battle cost about **+2.4 s a battle**, roughly two minutes
+across a 49-encounter clear. That is the price of the ruling and it was
+known before it shipped.
+
+### The one hero the change reaches without slowing him down
+
+The Sharpshooter's basic carries its own profile, and reading which fields
+it restates is the whole question. It restates `sweep_time` — his bar is
+`SS_SEQ_SWEEP`, a flat 0.52 s, and it does not move. But both of his
+half-widths are derived through `SC_PROFILE_DEFAULT["sweep_time"]`, so his
+tolerance in seconds moves by exactly the same factor everyone else's does:
+his Perfect window goes 55.1 ms → 76.5 ms, still exactly 0.85 of the
+default's, still flat across all four press counts.
+
+So he is the only caster in the game who takes all of this change's
+difficulty and none of its wall-clock. **"His profile restates the field,
+so the change misses him" is the wrong reading**, and it is the reading a
+key-by-key look at the dictionary gives you. The derivation is where the
+inheritance lives.
+
 ## The surplus rate is 0.50, not Focus's 1.00 (Batch EX) — 2026-09-04
 
 ### Why the two rates were never obliged to agree

@@ -17,7 +17,7 @@ const BASIC_DELAY := Ability.BASIC_DELAY
 #
 # `PERFECT_HALF` and `GOOD_HALF` were bare constants read at exactly two places
 # — `_grade_skill_check()`, which takes no arguments, and a ColorRect built once
-# during UI setup — and the 0.72s sweep was a literal in `_process`. THAT IS WHY
+# during UI setup — and the sweep was a 0.72s literal in `_process`. THAT IS WHY
 # `up_sure` WAS NEVER WRITTEN: the window was not a parameter, so an upgrade
 # meant to widen it had nothing to widen. A profile is handed to the check per
 # cast instead, and every one of the five fields is read from it.
@@ -32,7 +32,16 @@ const BASIC_DELAY := Ability.BASIC_DELAY
 #                              WIRED AND UNUSED: nothing in this batch moves it,
 #                              which is deliberate — CO is where an off-centre
 #                              bar becomes a spec's identity.
-#   sweep_time               — seconds for one end-to-end pass of the marker
+#   sweep_time               — seconds for one end-to-end pass of the marker.
+#                              BATCH EY MOVED IT 0.72 -> 1.00 on the designer's
+#                              ruling that the checks feel too hard, and the
+#                              half-widths were deliberately LEFT ALONE: the
+#                              alternative of widening them was priced and not
+#                              taken, because a half-width is a fraction of the
+#                              TRACK and widening it redraws what the player is
+#                              aiming at. See CLAUDE.md. **AND `check_cn.gd`
+#                              PINS THESE VALUES BY NUMBER — moving one here
+#                              without moving `WANT_PROFILE` ships a red gate.**
 #   presses                  — how many windows the sequence asks for (see
 #                              `_run_skill_check`; BATCH CS replaced CN's
 #                              worst-grade combine with partial credit)
@@ -45,7 +54,7 @@ const SC_PROFILE_DEFAULT := {
 	"perfect_half": 0.045,
 	"good_half": 0.16,
 	"centre": 0.5,
-	"sweep_time": 0.72,
+	"sweep_time": 1.00,
 	"presses": 1,
 	"press_taper": 1.0,
 }
@@ -22848,7 +22857,7 @@ func _show_defensive_check_hint() -> void:
 func _process(delta: float) -> void:
 	if sc_active:
 		# BATCH CN §1 — the sweep is the profile's, not a literal. `sweep_time`
-		# is seconds for ONE end-to-end pass, which is what the 0.72 always
+		# is seconds for ONE end-to-end pass, which is what CN's 0.72 literal
 		# meant; the marker still turns round at both ends rather than wrapping.
 		sc_pos += sc_dir * delta / float(sc_profile["sweep_time"])
 		if sc_pos >= 1.0:

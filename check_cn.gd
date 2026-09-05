@@ -18,7 +18,7 @@ const CEILING := 44
 # to add in silence, so it stays.
 const WANT_PROFILE := {
 	"perfect_half": 0.045, "good_half": 0.16, "centre": 0.5,
-	"sweep_time": 0.72, "presses": 1, "press_taper": 1.0,
+	"sweep_time": 1.00, "presses": 1, "press_taper": 1.0,
 }
 
 

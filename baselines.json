@@ -62,7 +62,8 @@
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 10,
+   "note": "**BATCH EY: THE PIN MOVED AND THE ROW DID NOT.** `WANT_PROFILE` carries a literal copy of `SC_PROFILE_DEFAULT`, so EY's `sweep_time` 0.72 -> 1.00 had to be TWO edits. Armed both ways before the row was trusted: the old pin against the new constant reads `FAIL: default profile sweep_time = 1.0, want 0.72` \u2014 **1 failure against this row's [0, 0]** \u2014 and the moved pin reads 0 failures. The pin was moved to the new value, never loosened. This gate reports no readable check count, so the failure count is the whole row."
   },
   "check_co": {
    "kind": "gate",
@@ -84,12 +85,13 @@
     104,
     104
    ],
-   "checks_obs": 9,
+   "checks_obs": 10,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 10,
+   "note": "**BATCH EY: 104 / 0 PREDICTED UNMOVED AND MEASURED UNMOVED, WITH LESS MARGIN THAN BEFORE.** \u00a74 asserts the Sharpshooter's sequence lands within 2 points of a one-press cast; every figure inside it is taken RELATIVE to `SC_PROFILE_DEFAULT`, so the base sweep moving does not move an assertion. The absolute level does: the printed model goes 89.7 / 90.0 / 90.0 / 90.0 to **97.7 / 98.5 / 98.7 / 98.8**, so the widest spread against press one goes 0.003 to **0.011 against the 0.02 bound**. Still passing, at a quarter of the slack \u2014 recorded because the next batch to widen a window is the one that finds out."
   },
   "check_ct": {
    "kind": "gate",

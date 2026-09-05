@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-04 (Batch EX &mdash; the surplus rate goes to 0.50)</b></p>
+<p align="right"><b>Last updated: 2026-09-05 (Batch EY &mdash; the base sweep goes to 1.00s)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -424,12 +424,12 @@ ability is chosen and persists through targeting and the skill check.</p>
 <p><b>There are four cases: the normal check, the gated check, the defensive check, and the
 Sharpshooter's SEQUENCE. All four use the same bar and the same kind of zones</b> &mdash; a
 cursor sweeps 0→1→0, stopped with <b>Spacebar or Left Click</b>. The first three run one
-0.72s sweep; the sequence runs up to four faster ones.</p>
+1.00s sweep; the sequence runs up to four faster ones.</p>
 <p><b>THE BAR IS PARAMETERIC.</b> The window half-widths, where the Perfect window sits, the
 sweep time, how many presses the check asks for, and how much each press narrows are a
 <b>profile</b> handed to the check per cast, rather than constants. <b>One default profile is in
 force everywhere but one ability</b> &mdash; ±0.045 Perfect, ±0.16 Good, centred at 0.5,
-0.72s, one press, no narrowing &mdash; and it is the numbers in the table below. <b>The
+1.00s, one press, no narrowing &mdash; and it is the numbers in the table below. <b>The
 Sharpshooter's basic attack is the only thing in the game that overrides it.</b></p>
 <p><b>THE NORMAL CHECK.</b> Every hero action runs one <b>except</b> the two classes of action
 below, which resolve at a fixed <b>Good</b>.</p>
@@ -542,7 +542,7 @@ for the thing the spec is built to do.</p>
 constant&rdquo;: it is meant to be harder and to pay more. That exception is a FIXED OFFSET, not
 a slope</b> &mdash; <b>15% less timing tolerance than everybody else's, the same 15% at one
 press and at four.</b> Harder than everyone else's, not harder the better you play. His bar also
-sweeps faster (0.52s against 0.72s), which is what makes it feel like a different instrument;
+sweeps faster (0.52s against 1.00s), which is what makes it feel like a different instrument;
 because difficulty is measured as time inside the window, the quicker sweep is paid for with
 proportionally wider zones and does not move the difficulty.</p>
 <p><b>The bar shows how many presses are coming before the first one, and names the live press

@@ -396,6 +396,20 @@ those are a PROFILE rather than constants.**
   THERE CHANGES EVERY CHECK IN THE GAME AT ONCE.** `check_cn.gd` asserts the values AND THE FIELD
   COUNT, and asserts that the zone rects and grade boundaries the profile produces are the ones
   the pre-CN formulas drew. **The live values are in `docs/state.md`.**
+- **`check_cn.gd` PINS THOSE VALUES BY NUMBER, SO MOVING ONE IS TWO EDITS, NOT ONE (BATCH EY).**
+  `WANT_PROFILE` carries a literal copy of the default. A batch that moves the constant and not
+  the pin ships a gate reading **1 failure against a `fails: [0, 0]` row** — measured, not
+  predicted. **That is the gate working**, and the pin is moved to the new value rather than
+  loosened.
+- **STANDING, SET AT EY: DIFFICULTY IS BOUGHT WITH `sweep_time`, NOT WITH THE HALF-WIDTHS.**
+  The two are interchangeable on paper — difficulty is `half * sweep_time` — and the alternative
+  of **widening `PERFECT_HALF` / `GOOD_HALF` instead of slowing the bar was priced at EY and NOT
+  TAKEN.** Recorded so it is not re-proposed later as a discovery. They are NOT equivalent in
+  what else they move: the half-widths are **fractions of the track**, so widening them changes
+  the picture the player aims at and pushes the Sharpshooter's opening Good zone toward the whole
+  bar, while `sweep_time` leaves every zone the width it has always been drawn at and buys the
+  same tolerance in seconds. **The zone rects are the reason**: a wider zone is a visibly easier
+  bar, a slower one is the same bar with more time in it.
 - **`centre` IS WIRED AND UNUSED; `presses` > 1 IS THE SHARPSHOOTER'S BASIC AND NOTHING ELSE.**
 - **THE ZONE RECTS ARE RESIZED PER CAST** (`_apply_sc_profile`), not built once at UI setup.
   Grading and drawing come off the same dictionary on the same line of execution — split them and
@@ -420,6 +434,15 @@ those are a PROFILE rather than constants.**
 > everyone else's, not harder the better you play. **It is taken against `SC_PROFILE_DEFAULT` in
 > `_sharpshooter_basic_profile` rather than written as a literal**, so it survives a change to the
 > default as an offset.
+>
+> **HIS PROFILE RESTATES `sweep_time` AND INHERITS THE TOLERANCE, AND THOSE ARE DIFFERENT
+> ANSWERS TO "does a change to the default reach him" (MEASURED AT EY).** `sweep_time` is the
+> literal `SS_SEQ_SWEEP` — his bar keeps its 0.52 s pass whatever the default does — but both
+> half-widths are computed through `scale = SC_PROFILE_DEFAULT["sweep_time"] * SS_SEQ_OFFSET /
+> SS_SEQ_SWEEP`, so **a change to the base sweep reaches him in full, as tolerance rather than as
+> pace.** He is therefore the ONE caster who takes all of such a change's difficulty and none of
+> its wall-clock. **"It restates the field, so the change misses him" is the wrong reading and a
+> batch must not act on it** — read the derivation, not the key.
 
 ### WHERE THE CHECK COMES OFF (STANDING, SET AT BATCH CN §2)
 **`Ability.runs_skill_check()` is the ONE answer**, asked by the cast path and by the draft card

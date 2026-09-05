@@ -14,6 +14,88 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-05 &mdash; Batch EY: THE BASE SWEEP GOES 0.72s &rarr; 1.00s</h2>
+<p><i><b>Ruled by the designer: the checks feel too hard.</b>
+<code>SC_PROFILE_DEFAULT.sweep_time</code> moves <b>0.72 &rarr; 1.00</b>.
+<b><code>PERFECT_HALF</code> and <code>GOOD_HALF</code> are untouched</b> at 0.045 and 0.16 &mdash;
+the bar slows, the target does not grow. <b>One constant, and it is under every skill check in the
+game.</b> Full working: <code>docs/reports/EY.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; THE ARITHMETIC, REPORTED RATHER THAN A VERDICT.</b> The <b>Perfect</b> window
+goes <b>64.80 ms &rarr; 90.00 ms</b> and the <b>Good</b> window <b>230.40 ms &rarr; 320.00 ms</b>,
+both measured off a live bar rather than computed. The zone rects do not move: the drawn Good band
+is 2 &times; 0.16 of the track before and after, and the graded half is the same 0.16. <b>The
+alternative &mdash; widening the half-widths instead of slowing the bar &mdash; was priced and NOT
+TAKEN</b>, and the reason is recorded in <code>CLAUDE.md</code> and
+<code>docs/design-notes.md</code> so it is not re-proposed later as a discovery.</p>
+
+<p><b>&sect;1a &mdash; THE SHARPSHOOTER RESTATES <code>sweep_time</code> AND INHERITS THE
+TOLERANCE, AND THE BRIEF'S CONDITIONAL WAS THE WRONG READING.</b> The brief asked whether his
+profile inherits the base or restates it, and said that if it restates it <i>the change misses
+him</i>. <b>It does both.</b> His <code>sweep_time</code> is the literal
+<code>SS_SEQ_SWEEP</code> and stays at <b>0.52 s</b> &mdash; measured at all four press counts
+&mdash; but both his half-widths are computed through
+<code>SC_PROFILE_DEFAULT["sweep_time"]</code>, so <b>his tolerance moves by exactly the factor
+everyone else's does</b>: his Perfect window goes <b>55.08 ms &rarr; 76.50 ms</b>, still exactly
+&times;0.85 of the default's and still flat across one to four presses. <b>He is the only caster
+who takes all of this change's difficulty and none of its wall-clock.</b> His four opening Good
+windows read <b>272.0 / 355.5 / 428.1 / 506.2 ms</b> against yesterday's 195.8 / 256.0 / 308.3 /
+364.5.</p>
+
+<p><b>&sect;1b &mdash; AND HIS FOUR-PRESS OPENING WINDOW IS NOW 97.3% OF THE TRACK, WHICH IS
+NAMED RATHER THAN CHANGED.</b> At 150+ Focus his first Good half is <b>0.487</b> of a track whose
+half is 0.5, leaving a miss band of <b>6.9 ms at each end of his 520 ms pass</b> against
+yesterday's 77.8 ms. Nothing in the batch touches it &mdash; <code>SS_SEQ_OPEN</code> and
+<code>SS_SEQ_TAPER</code> are unmoved, and <code>check_cs</code>'s flat-difficulty assertion still
+passes &mdash; but it is the figure a later batch must look at before spending any more tolerance
+on him.</p>
+
+<p><b>&sect;2 &mdash; WHAT ONE CONSTANT REACHES, NAMED IN THE RECORD RATHER THAN INFERRED.</b>
+<b>The five gated abilities</b> &mdash; <b>Death Ray</b>, <b>Requiem</b>, <b>Reckless Abandon</b>,
+<b>Boil Over</b>, <b>Unleash</b> &mdash; where a Sloppy loses the whole cast, so this is a direct
+difficulty reduction on the five most decisive cards in the game. <b>The defensive check</b>, the
+highest-volume bar there is. <b>The Sharpshooter's press ladder.</b> <b>Every ordinary cast.</b></p>
+
+<p><b>&sect;2a &mdash; THE PACING COST, MEASURED, AND CM'S OWN FIGURES RE-DERIVED BECAUSE THEY
+HAVE MOVED.</b> A Warden party runs <b>6.6 defensive bars and 10.9 ordinary casts a battle</b>
+(n=200, rung 2). The brief quoted CM's <i>9.4 a battle against 27.3 hero actions</i>; <b>neither
+reproduces today</b> &mdash; the defensive count reads 6.6 and hero turns read 29.7, of which only
+10.9 open a bar at all. <b>CM's comment that the Warden's bar "roughly doubles the presses in a
+fight he is holding" reads &times;1.61 today</b>, not &times;2. A centred press costs half a sweep,
+so a bar costs <b>+0.14 s</b> and a Warden party's 17.5 bars cost <b>about +2.4 s a battle</b>
+&mdash; roughly two minutes across a 49-encounter clear.</p>
+
+<p><b>&sect;3 &mdash; NO SIM CAN MEASURE THIS, AND THE RECORD SAYS SO RATHER THAN QUOTING ONE.</b>
+The bot never runs the bar: it rolls grades off fixed probabilities (20% perfect, 15% sloppy) and
+enemies resolve at a flat Good. <b>Every completion figure this project has produced is blind to
+this change</b>, and <code>check_cs</code> printing <i>the bot lands 2.69 of four</i> identically
+before and after is that fact on the record. <b>No completion arm was run and none is quoted.</b>
+The bar COUNT is a different quantity and is a structural count the sim does keep, which is why
+&sect;2a exists.</p>
+
+<p><b>&sect;4 &mdash; THE GATE THE BRIEF DID NOT NAME, AND IT WOULD HAVE SHIPPED RED.</b>
+<code>check_cn.gd</code>'s <code>WANT_PROFILE</code> carries a literal copy of the default
+profile, <code>sweep_time</code> included. <b>Moving the constant without moving the pin reads
+<code>FAIL: default profile sweep_time = 1.0, want 0.72</code> &mdash; 1 failure against a
+<code>fails: [0, 0]</code> row.</b> Armed both ways: the old pin against the new constant is red,
+the new pin against it is <b>0 failures</b>. <b>The pin was moved to the new value, never
+loosened</b>, and <code>CLAUDE.md</code> now records that moving a profile value is two edits.</p>
+
+<p><b>&sect;5 &mdash; DRIVEN LIVE, BECAUSE A VALUE READ ONCE AT UI SETUP WOULD PASS EVERY STATIC
+CHECK.</b> A probe outside the repo opened real bars and integrated <code>_process</code> by hand:
+the marker moves at <b>1.000000 s</b> per end-to-end pass, read at two different frame lengths, and
+the probe <b>reads 0.720000 back when a stale value is planted in the live profile</b> &mdash; so
+the reading could have said otherwise. Four consecutive casts alternating Sharpshooter and ordinary
+read <b>0.52 / 1.00 / 0.52 / 1.00</b>, which is CN &sect;1's per-cast rebuild proved by driving it
+rather than by reading it. <b>39 checks, 0 failures.</b></p>
+
+<p><b>&sect;6 &mdash; WHAT DELIBERATELY DID NOT MOVE.</b> <code>PERFECT_HALF</code> 0.045 and
+<code>GOOD_HALF</code> 0.16; <code>centre</code>, <code>presses</code> and <code>press_taper</code>;
+<code>SS_SEQ_SWEEP</code>, <code>SS_SEQ_OFFSET</code>, <code>SS_SEQ_OPEN</code> and
+<code>SS_SEQ_TAPER</code>; the grades, the multipliers, CM's gating, the mitigate-only defensive
+rule and the press ladder; <code>CRIT_EXCESS_STEP</code> at 0.50, the Loyalty split at 8 and
+<code>BOND_MITIGATION_MAX</code> at 0.75. <b>No rune is authored.</b></p>
+
 <h2>2026-09-04 &mdash; Batch EX: THE SURPLUS RATE GOES TO 0.50</h2>
 <p><i><b>The designer ruled the one number EW left open. <code>CRIT_EXCESS_STEP</code> moves
 1.0 &rarr; 0.50 &mdash; crit chance above a certainty still becomes crit multiplier, from every
