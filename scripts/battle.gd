@@ -7585,16 +7585,29 @@ const CRIT_CHANCE := 0.10
 # existed every point past it evaporated — measured at EV §3 on Aguila's party
 # crit, and shared with every other source rather than owned by the eagle.
 #
-# **1.0 IS FOCUS'S OWN EXCHANGE RATE AND IT IS NOT DERIVED FROM IT.**
-# `FOCUS_STEP` buys 0.005 of chance below the conversion point and 0.005 of
-# multiplier above it, so Focus already trades one for one; this constant ships
-# at the rate the game had rather than at an invented one. It is deliberately
-# NOT written as `FOCUS_STEP / FOCUS_STEP`, because that would assert the two
-# must stay equal — and the open question EW leaves is exactly whether a rate
-# tuned for ONE meter is right for a total assembled from eight sources.
-# **FLAGGED, NOT TUNED: this is the designer's number.** `docs/reports/EW.md`
-# §1 prices 0.25, 0.50 and 1.00 at all three arms.
-const CRIT_EXCESS_STEP := 1.0
+# **BATCH EX RULED THE RATE AND MOVED IT 1.0 -> 0.50.** EW shipped it at
+# Focus's own rate and flagged it as the designer's; this is that ruling, and
+# the reasoning is recorded with it so the priced alternative is not
+# re-proposed later as a discovery.
+#
+# **1.0 IS FOCUS'S EXCHANGE RATE, AND FOCUS IS ONE METER, ONE SPEC, ONE
+# TARGET.** `FOCUS_STEP` buys 0.005 of chance below the conversion point and
+# 0.005 of multiplier above it, so Focus trades one for one — but this
+# constant prices a total assembled over TWELVE statements (thirteen terms;
+# the first carries the base and a Broken target's 25%) and fed by the whole
+# party, and nothing has ever tested that those two answers should be the
+# same number. It is still deliberately NOT written as
+# `FOCUS_STEP / FOCUS_STEP`: a derivation would assert they must stay equal,
+# and one line is what makes this constant movable.
+#
+# **THE TAIL IS THE REASON, NOT THE MEAN.** The term feeding the deep end has
+# no ceiling anywhere — Aguila's boon rides an uncapped Loyalty meter — so the
+# certainty ceiling was acting as a de facto clamp on an unbounded term, and
+# this rate decides how much of that clamp is given back. EW measured the
+# worst single blow going x1.5 -> x12.74 at 1.0 and -> x7.12 at 0.50.
+# **0.25 was rejected as too timid**: its aggregate swing at rows 1-9 barely
+# clears the live comparison's own noise floor. `docs/reports/EX.md` §1.
+const CRIT_EXCESS_STEP := 0.50
 # Death Ray's gate — THE one place the line is decided, read by
 # `_ability_usable`, its tooltip affordance and the bot's rotation.
 # BATCH AU RAISED IT 5 -> 8. At twelve stacks the ability lands 325% of Attack

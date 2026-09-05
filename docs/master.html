@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-04 (Batch EW &mdash; crit chance above certainty becomes crit multiplier)</b></p>
+<p align="right"><b>Last updated: 2026-09-04 (Batch EX &mdash; the surplus rate goes to 0.50)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -637,14 +637,14 @@ a perfect Execute. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Crit chance above a certainty becomes crit MULTIPLIER, from every source.</b> A total crit
 chance over 100% cannot make a hit any more certain, so the surplus is paid as critical damage
-instead at <b>+1.0 of multiplier per 1.0 of surplus chance</b> — a hero assembling 250% crit
-chance lands every blow as a critical at ×2.5 rather than ×1.5. It is the whole assembled total
+instead at <b>+0.5 of multiplier per 1.0 of surplus chance</b> — a hero assembling 250% crit
+chance lands every blow as a critical at ×2.25 rather than ×1.5. It is the whole assembled total
 that converts, not any one source: the base rate, a Broken target's 25%, Resonance, Aguila's shared
 boon, Precision Strikes, Killing Edge, Brittle Ice, the Sweeping Strikes rider and Lethal Aim's own
 sub-split Focus all feed one number and the surplus belongs to none of them. <b>This is not the Sharpshooter's Focus conversion and the two
 are independent</b> — a hero below his Focus split point still converts the total's surplus, and
 both fire on the same blow. In practice only the deep game reaches it: the heroes' crit output
-rises about <b>1.7%</b> at a fully-talented loadout and not measurably at all untalented, but the
+rises about <b>1.2%</b> at a fully-talented loadout and not measurably at all untalented, but the
 individual blow that does land past a certainty is much larger.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;

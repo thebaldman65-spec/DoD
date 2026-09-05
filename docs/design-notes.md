@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The surplus rate is 0.50, not Focus's 1.00 (Batch EX) — 2026-09-04
+
+### Why the two rates were never obliged to agree
+
+EW shipped `CRIT_EXCESS_STEP` at 1.0 because that is what Focus already
+trades at, and because a rate the game already uses is the one value that
+is not an invention. That was the right thing to ship and the wrong thing
+to keep. Focus is one meter, that one spec builds, on one target, by
+staying on it — the rate was tuned against a resource a player has to earn
+and can lose in a single target switch. The surplus rate prices something
+else entirely: a total assembled over twelve statements in the strike
+loop, carrying thirteen terms, fed by the whole party, and pushed past a
+certainty mostly by a boon that belongs to a different hero. Writing the
+derivation would have asserted that those two answers must always be the
+same number. Nothing has ever tested it, and shipping 1.0 was not a test —
+it was a default.
+
+### Why the tail is what the rate is actually for
+
+The honest description of this change is not "a buff of about a percent".
+It is: **a ceiling nobody wrote down was acting as a clamp on the one term
+in the game that has no ceiling of its own**, and the rate decides how much
+of that clamp is handed back. Aguila's boon rides an uncapped Loyalty
+meter. The surplus is linear in it. So the question is not what the mean
+does — it is how much of an unbounded quantity is allowed through.
+
+Half is a defensible answer to that question in a way that "all of it,
+because Focus does" is not. It keeps the mechanism, keeps the deep build
+rewarded, and keeps the certainty ceiling doing half the work it was
+silently doing before anyone noticed it was there. 0.25 was priced and
+rejected as too timid: at rows 1–3 and rows 0 the conversion is already
+under the noise floor, and a quarter rate puts the deep arm close enough
+to it that the mechanism stops being worth its own machinery.
+
+### Why the number the choice was argued on could not be quoted back
+
+The brief chose 0.50 partly on the worst blow EW measured: ×12.74 at 1.00
+against ×7.12 at 0.50. Re-measured over three more independent hundred-run
+sets, the worst total crit reads 18.09, 11.12 and 7.20 against EW's 12.24.
+That is a 2.5× spread, and it is not a defect in either measurement — **a
+sample maximum of an unbounded term grows with sampling instead of
+converging.** The figure is a fact about a hundred runs, not about the
+game.
+
+This makes the ruling better founded rather than worse. The reason to
+halve the rate was that the tail has no ceiling; the evidence that the
+worst blow will not hold still is the same fact, said again. What should
+be quoted instead is the ratio — 0.50 buys exactly half of 1.00, at every
+arm, because the conversion is linear in the rate — and the aggregate
+band, about +1.2% live at a fully-talented loadout against a ±0.11% floor.
+
 ## Crit chance above a certainty becomes crit multiplier (Batch EW) — 2026-09-04
 
 ### Why a ceiling nobody wrote down was still a ceiling
@@ -44,13 +95,14 @@ share of the ceiling belongs to it.
 
 ### Why the rate is a named constant that is not derived from Focus's
 
-`CRIT_EXCESS_STEP` ships at 1.0, which is Focus's own exchange rate —
-0.005 of chance below the split for 0.005 of multiplier above it. It
+`CRIT_EXCESS_STEP` shipped at 1.0, which is Focus's own exchange rate —
+0.005 of chance below the split for 0.005 of multiplier above it.
+(**Batch EX ruled it to 0.50**; the section above is why.) It
 would have been tidier to write it as a derivation. It is deliberately
 not, and the reason is the open question rather than the arithmetic: the
 Focus rate was tuned against one meter that one spec builds on one
-target, and this one prices a total assembled from twelve terms across
-the whole party. Writing the derivation would assert that those two
+target, and this one prices a total assembled over twelve statements —
+thirteen terms — across the whole party. Writing the derivation would assert that those two
 answers must always be the same number. They may well be; nothing has
 tested it. A constant with a comment can be moved in one line, and a
 derivation cannot be moved at all without also making a claim.
@@ -58,9 +110,13 @@ derivation cannot be moved at all without also making a claim.
 ### Why the mean is the wrong statistic to price this on
 
 The party-level swing is small and it is worth being plain about that:
-about +1.7% of crit output at a fully-talented loadout, about +0.3% at
-rows 1–3, and nothing at all untalented, where no roll ever passes a
-certainty. Read as a balance change that is nearly nothing, and a first
+at EW's rate of 1.0, about +1.7% of crit output at a fully-talented
+loadout, about +0.3% at rows 1–3, and nothing measurable untalented.
+(EX re-measured all three: at 1.0 the deep arm reads +2.2% on fresh
+seeds, and rows 1–3 turns out to be below the noise floor at either
+rate. Rows 0 is a near-zero rather than the structural zero this
+paragraph assumed — the conversion fires there about twice in forty
+thousand strikes, because Aguila's boon needs no talent.) Read as a balance change that is nearly nothing, and a first
 reading of the finding — a party at "nearly double a certainty" — makes
 it sound enormous. Both are true of different populations: the 1.93 is
 the mean over the rolls where the eagle's boon is live, and those are

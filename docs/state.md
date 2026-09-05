@@ -5,94 +5,88 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-04 (Batch EW).*
+*Last rewritten: 2026-09-04 (Batch EX).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EW — CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER.** **EV's §3 finding is
-  built.** A total crit chance over 100% cannot make a hit more certain, so the surplus is paid as
-  critical DAMAGE instead, **from every source, game-wide**, at `CRIT_EXCESS_STEP`. **Nothing else
-  moved: no clamp was raised, Focus's own conversion point and rate are untouched, the Loyalty split
-  stays at 8 and no rune was authored.** Full working, with every figure's n and standard error:
-  **`docs/reports/EW.md`**.
-- **§0 — THE BRIEF ASKED FOR ONE PLACE AND THE TREE HAS FOUR. THIS IS THE BATCH'S FIRST FINDING AND
-  IT WAS REPORTED BEFORE ANYTHING WAS BUILT.** The crit roll happens at **four** sites in
-  `battle.gd` — `_resolve`'s strike loop (a twelve-term assembly), `_heal_crit_mult`, `_ghost_hit`
-  and `_companion_hit`. **Only the strike loop assembles more than three terms and only it can pass
-  a certainty today**: over 202,000 crit rolls at three loadouts the deepest total the other three
-  ever reached was **0.37**. So the RULE has ONE body — `_crit_excess_mult` — and **all four rolls
-  spend it**; the three thin sites are paid exactly zero and change nothing. **A fifth roll that
-  forgets the call is what `check_ew` §0 is built to catch**, and its census is DERIVED (a crit roll
-  is a `randf() <` against a NAMED variable whose declaration carries `CRIT_CHANCE`) rather than
-  listed, because a gate naming the four would pass on the day a fifth arrives.
-- **§1 — THE RATE IS A NAMED CONSTANT, IT SHIPS AT FOCUS'S OWN, AND IT IS FLAGGED RATHER THAN
-  TUNED.** `CRIT_EXCESS_STEP` = **1.0** — one point of surplus chance for one point of multiplier,
-  which is exactly what `FOCUS_STEP` has always traded at. **It is deliberately NOT derived from
-  `FOCUS_STEP`**, because that would assert a rate tuned for one meter is right for a total
-  assembled from twelve terms, which is the open question. **0.25 and 0.50 are priced beside it at
-  all three arms in the report.**
-- **§1a — AND THE BRIEF'S HEADLINE WAS OVER A DIFFERENT POPULATION THAN THE ONE IT NAMED.** *"At
-  rows 1–9 the party's mean total crit is 1.93"* is **EV's figure over the rolls where Aguila's boon
-  is LIVE**, and those are **2.6% of the heroes' rolls**. Re-derived on its own population it
-  reproduces (mean 2.170, 55.8% at or over a certainty, 65.6% of the boon above the ceiling).
-  **Over EVERY hero roll the mean total crit at that arm is 0.172 and only 1.5% are at or past
-  1.0.** So the swing is **small at the party and large on the blow**, and both halves are in the
-  report.
-- **§2 — IT CANNOT REACH AN ENEMY, AND THE QUESTION IS CLOSED RATHER THAN HANDED OVER.** Over
-  **69,932 enemy crit rolls** across all three arms the deepest total any enemy assembled was
-  **0.3500** — the base 10% plus a Broken target's 25% — and **none reached a certainty**. It is
-  structural, not lucky: `_party_crit_bonus()` is hero-gated at its read site, `crit_bonus` is
-  written on the HERO spawn path and inherited only by companions (its one other writer, `dulledge`,
-  SUBTRACTS), and every remaining term is a talent counter an enemy has no tree to hold. **No
-  difficulty change and nothing for the designer to rule on.**
-- **§3 — `BOND_MITIGATION_MAX` STAYS AT 0.75, RULED, WITH ITS REASONING RECORDED.** The guard forces
-  some value below 1.0 and does not force 0.75 — **but that constant is a 75% damage reduction and
-  0.90 would make it 90%**, which is a large survivability change wearing a saturation fix's
-  clothes. EV's fallback already answers the waste. **Recorded so the priced alternative is not
-  re-proposed as a discovery.**
-- **§4 — TWO CORRECTIONS TO SHIPPED DOCUMENTATION, FOUND ON THE WAY AND NEITHER IN SCOPE.**
-  `master.html` §4.3 said Aguila grants **+15%** crit; the code grants **+10% scaled by the bond
-  tier**, which is what the same document already says in two other places. And **`CLAUDE.md`'s
-  claim that every `data/*.json` is TAB-indented is false for half of them** — `glossary.json` and
-  `enemies.json` are single-space indented with no trailing newline, and `events.json` and
-  `runes.json` match no simple `json.dumps` form at all. **The rule's own procedure is what found
-  it** (round-trip the unmodified parse and assert byte equality before writing), and that is the
-  half that now carries the rule.
-- **§5 — THE GATE, AND EIGHT NEGATIVE CONTROLS THAT ALL BIT.** `check_ew` (**38 checks**) drives §2
-  and §3 live, because the brief names the failure family exactly: *a conversion computed after the
-  roll, or on a per-source total rather than the assembled one, would pass every static check.*
-  Controls: HEAD's own `battle.gd` verbatim (9 failures), converting `crit_bonus` instead of the
-  assembled total (3 — the live arm reading **1.9335 against a predicted 2.0000**), the missing
-  `maxf` floor (3), a fifth roll site added without the call (3), `_companion_hit` dropping the call
-  (3), the rate at 0.0 (3 — the live arm reading **436 against 436**), the conversion stubbed to
-  zero (4) and the conversion applied before the roll instead of after (4). Every restore was by
-  `cp` from a scratchpad backup, md5 verified, never `git checkout`.
-- **§6 — AND THE GATE'S OWN FIRST TWO INSTRUMENTS WERE WRONG, BOTH IN THE DIRECTION THAT PASSES.**
-  The census fingerprint took every `randf() <` line containing the word *"crit"* and read
-  **THREE** — `_heal_crit_mult`'s roll line is `if randf() < hc_chance:` and carries the word
-  nowhere. And §3's live arms ran without resetting the Sharpshooter's Focus between them, so the
-  second arm started where the first finished, deep past his own split point: **with the conversion
-  stubbed to zero that section still read 1325 against 538 and passed**, measuring Focus accrual and
-  calling it the surplus. **Both are recorded in the gate at the site**, and §3's own §3-shaped
-  retreat is recorded there too — the sharper section that recovers the base multiplier from two
-  arms reads ×1.16 against a true ×2.00 on this fixture, because armor and the `maxi(..., 1)` floor
-  sit below the crit block and a subtractive term inflates a two-point ratio.
-- **§7 — AND THE LITERAL SWEEP CAUGHT A RULE VIOLATION THE DOCUMENTATION WOULD OTHERWISE HAVE
-  SHIPPED.** The glossary's rewritten crit entry said *"the whole party"*, which `test_batch_bx` §4b
-  pins absent from `data/glossary.json`. **And the same sweep was structurally blind to the same
-  word in `master.html`**, because that file already carried `party` inside code identifiers, so the
-  needle was not GAINED — it was already present. **A sweep reports on needles that MOVE; a word
-  already in the file cannot move.** Both were corrected and `test_batch_bx` was driven (161 / 0).
-- **WHAT MOVED: ONE SOURCE FILE, ONE NEW GATE, THE BATTERY AND SEVEN DOCUMENTS.**
-  `scripts/battle.gd` (one constant, one new helper, four roll sites, three chances named);
-  the new `check_ew.gd`; `run_battery.sh`; `baselines.json`; `docs/master.html` and its stamp;
-  `docs/changelog.html`; `CLAUDE.md`; `docs/design-notes.md`; `data/glossary.json`; this file;
-  and `docs/reports/EW.md`. **The two `.docx` exports were rebuilt and are OUTSIDE this repo**
-  (one directory up, not under version control). **NO RUNE, NO NODE, NO CLAMP, NO CAP AND NO OTHER
-  RATE MOVED.**
-- **Next letter: EX.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EX — THE SURPLUS RATE GOES TO 0.50.** The designer ruled the one number EW left
+  open. `CRIT_EXCESS_STEP` moves **1.0 → 0.50**: crit chance above a certainty still becomes crit
+  MULTIPLIER, from every source, game-wide, but at **half** Focus's exchange rate rather than all of
+  it. **The executable diff is ONE LINE**, proved by a comment-stripped diff with identical line
+  counts either side. **Nothing else moved: Focus's conversion point and rate, the four roll sites,
+  the one body, the unclamped roll, `BOND_MITIGATION_MAX`, `BOND_CONVERT` and `_bond_fallback` are
+  all untouched, no gate was edited and no rune was authored.** Full working, with every figure's n
+  and standard error: **`docs/reports/EX.md`**.
+- **§1 — WHY 0.50, RECORDED WITH THE RULING.** 1.0 is a rate tuned for **one meter, that one spec
+  builds, on one target**. This constant prices a total assembled over **twelve statements carrying
+  thirteen terms**, fed by the whole party and pushed past a certainty mostly by a boon belonging to
+  a different hero. **Nothing has ever tested that those two answers should be the same number**, and
+  shipping 1.0 was a default rather than a test. **0.25 was priced and rejected as too timid.** The
+  constant is still deliberately NOT derived from `FOCUS_STEP`.
+- **§1a — MEASURED LIVE OVER NINE ARMS RUN AS A LATIN SQUARE**, three rates × three row bands, three
+  at a time, so each rate appears once per batch and once per row band — a two-armed reading can
+  otherwise follow the POSITION rather than the meter. Conversion off against 0.50, independent runs:
+  **rows 0 −0.112% ±0.115, rows 1–3 +0.269% ±0.104, rows 1–9 +1.235% ±0.158.** **EW's counterfactual
+  predicted +1.351% at rows 1–9 and the live arm agrees inside one standard error.** The same arms
+  at 1.00 read +2.180% ±0.189, so **what EX costs the deep game is about one percent of crit output**
+  (−0.925% ±0.201) and nothing measurable anywhere else.
+- **§1b — THE FLOOR IS ±0.11% AND IT IS WHAT MAKES ROWS 1–3 READABLE, BY SAYING IT IS NOT.** The
+  exact counterfactual prices the conversion at **+0.037%** at rows 1–3 — thirty times smaller than
+  that arm's own noise — so the +0.269% measured there is run-to-run variance at either rate.
+  **Only rows 1–9 is above the floor.**
+- **§1c — AND THE FIGURE THE RATE WAS ARGUED ON DOES NOT HOLD STILL. THIS IS THE BATCH'S SHARPEST
+  FINDING.** The brief chose 0.50 partly on EW's worst measured blow (×12.74 at 1.00, ×7.12 at
+  0.50). Across four independent rows-1–9 arms the worst total crit reads **7.20 / 11.12 / 12.24 /
+  18.09** — a 2.5× spread. **A sample maximum of an unbounded term grows with sampling instead of
+  converging**, so that figure is a fact about a hundred runs and not about the game. **It makes the
+  ruling better founded rather than worse** — the reason to halve the rate was that the tail has no
+  ceiling, and this is that same fact said again. **The stable figures are the RATIO (0.50 buys
+  exactly half of 1.00, at every arm) and the aggregate band**, and both are now standing rules.
+- **§2 — ROWS 0 IS A RARE EVENT, NOT A STRUCTURAL ZERO, AND EW'S REPORT SAYS OTHERWISE.** EW recorded
+  that the conversion *provably cannot fire* untalented. **It can** — measured **2 crossings in
+  40,437 hero strikes**, totals reaching **1.09**, with 208 strikes at or past 0.50.
+  **`_party_crit_bonus()` is gated on `passive_id == "pack"` and NOTHING ELSE** — no talent, no row —
+  so Aguila's boon on an uncapped Loyalty meter reaches a certainty there. **The requirement still
+  held**: the shipped arm converted exactly nothing, 0 of 40,766, and two crossings would move that
+  mean by +0.0002% against a ±0.11% floor. **But a negative control asserted as structural, and
+  really only rare, stops being a control on the day it is not rare.**
+- **§3 — THE CONSTANT'S OWN COMMENT NAMED THE WRONG NUMBER.** `battle.gd` said the total is assembled
+  *from eight sources*; every document says twelve. Counted mechanically off the strike loop it is
+  **TWELVE statements carrying THIRTEEN terms** — the first is the base and a Broken target's 25% in
+  one line. So "twelve" is right about the places and wrong about the terms and "eight" is wrong
+  about both. **Corrected in the comment this batch was rewriting anyway, and in the standing rule.**
+  **`docs/reports/EW.md` is left alone — it is EW's record, and this is not a defect in what EW
+  built.**
+- **§4 — THE GATE HELD AT 38 AND GOT SHARPER.** `check_ew` reads **38 / 0** off three identical
+  standalone readings at 0.50, exactly as the brief predicted — nothing in it was pinning the VALUE
+  rather than the property. Driven on an instrumented copy, **§2's measured ratio is 1.4977 against
+  a predicted 1.5000 at 0.50, an error of 0.0023 — half what it was at 1.00**, against a 0.02 bound.
+  **ONE OF THE 38 IS VACUOUS AND IS NAMED RATHER THAN TOUCHED:** §6's last assertion is
+  `ok(step == step, …)`, which cannot fail. **Owed**, because a gate edit would move the count this
+  batch predicted unmoved.
+- **§5 — THE INSTRUMENTS, AND ONE OF THEM WAS SILENTLY DISABLED.** A `--` placed before
+  `--include="*.gd"` turned the filter into a file operand, so a sweep searched every file type while
+  reporting as though it had filtered. **Caught by arming it with a needle in each direction.** The
+  literal sweep — **15,256 needles from 124 `.gd` files** — was armed both ways before it was
+  trusted: deleting a needle that appears exactly once in `master.html` reads LOST 1, injecting one
+  the file does not carry reads GAINED 3.
+- **§6 — THE BATTERY, AND EVERY PREDICTION HELD.** **`check_de` 378 / 0 / 0 NOTICES** — no baseline
+  row moved and none rose. **92 targets, `sort .ran | uniq -d` holds ZERO duplicates, 0 `Parse
+  Error` and 0 `SCRIPT ERROR` across every log.** `check_ew` **38 / 0**, `check_parse` **166 / 0**,
+  `check_ev` **54 / 0**, `check_eu` **38 / 0**, run harness GATE 1 **22** / GATE 2 **166** / GATE 3
+  **8**, all PASS, throws 0. **The only red is `check_cm_live` 13 / 4**, whose four FAIL lines were
+  READ and are the four its baseline row names. **The freeze held EXACTLY**: an md5 stamp of all
+  **333 tracked files with absolute paths**, before and after, **zero differ**. The list is
+  `git ls-files`, so the new report was untracked and outside it — **named rather than implied**,
+  and covered instead by the fact that nothing in the tree loads `docs/reports/`.
+- **WHAT MOVED: ONE SOURCE FILE AND SEVEN DOCUMENTS.** `scripts/battle.gd` (one constant and the
+  comment above it); `docs/changelog.html`; `CLAUDE.md`; `docs/master.html` and its stamp;
+  `data/glossary.json`; `docs/design-notes.md`; `baselines.json`; this file; and
+  `docs/reports/EX.md`. **NO GATE, NO SUITE, NO `run_battery.sh`, NO BASELINE COUNT, NO RUNE, NO
+  NODE, NO CLAMP AND NO OTHER RATE MOVED.**
+- **Next letter: EY.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
@@ -101,41 +95,27 @@ in `docs/master.html`.
   asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
   is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED, BUILT
   AND REPAIRED (it converts at 8, EU; a converted stack never pays nothing, EV), and what is left of
-  it is the RUNE that moves the point — which is authoring and waits on the pool. Both of EV's clamp
-  questions are now CLOSED — one ruled (§3), one built (the whole of EW). What EW leaves is a single
-  number, the RATE, and the ladder still has an open design question of its own (what rung 2 should
-  ASK).**
+  it is the RUNE that moves the point — which is authoring and waits on the pool. EV's two clamp
+  questions are CLOSED, and EW's one open number is CLOSED by EX. The crit surplus is now ruled end
+  to end: mechanism, scope, enemy question and rate.** **The ladder still has an open design question
+  of its own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE ONE NUMBER EW HANDS OVER — **THE RATE, PRICED AT THREE VALUES, AUTHORED AT ONE**
+### THE CRIT SURPLUS IS RULED END TO END — **NOTHING IS OPEN. EX CLOSED THE LAST NUMBER.**
 
-**Full evidence: `docs/reports/EW.md` §1.** The mechanism is ruled and built; **the rate is the
-designer's and it is the only thing EW leaves open.** `battle.CRIT_EXCESS_STEP` ships at **1.0**,
-which is Focus's own exchange rate and therefore the one value that is not an invention — and it is
-a named constant precisely so this is one line to move.
+**Full evidence: `docs/reports/EW.md` (mechanism) and `docs/reports/EX.md` (rate).** EW built the
+conversion and flagged the rate; **the designer ruled 0.50 and EX built it.** The mechanism, the
+scope (assembled total, never a source), the enemy question (§2 of EW, structurally moot) and the
+rate are all settled. **This item is here to record that it is closed, and to carry the two things a
+later batch must not re-derive from scratch:**
 
-- **THE SWING IS SMALL AT THE PARTY AND LARGE ON THE BLOW, AND THE SECOND HALF IS THE ONE TO CHOOSE
-  AGAINST.** Measured as an exact counterfactual over the same rolls (the conversion consumes no
-  randomness, so the arithmetic is exact rather than an A/B), the heroes' mean damage multiplier per
-  strike moves **+0.000% / +0.055% / +2.703%** at rows 0 / 1–3 / 1–9 at a rate of 1.00, and
-  proportionally less at 0.50 and 0.25. **Driven live as two independent arms it reads
-  +0.14% ± 0.10 / +0.27% ± 0.09 / +1.72% ± 0.16 — and the rows-0 arm is that comparison's own noise
-  floor**, because the conversion provably cannot fire there.
-- **THE TAIL IS WHERE THE RATE ACTUALLY LIVES.** At rows 1–9, **1.15% of hero strikes land with the
-  total already past a certainty**, at a mean total crit of **2.515**. Those blows go
-  ×1.5 → **×2.10 / ×2.70 / ×3.90** at 0.25 / 0.50 / 1.00, and the **worst single blow measured**
-  goes ×1.5 → **×4.31 / ×7.12 / ×12.74**. **The term feeding that tail has no ceiling anywhere** —
-  Aguila's boon rides an uncapped Loyalty meter — so before EW the certainty ceiling was acting as
-  a de facto clamp on it, and the rate is what decides how much of that clamp is given back.
-- **WHAT WOULD MAKE 1.00 THE WRONG NUMBER:** it is Focus's rate, and Focus is one meter one spec
-  builds on one target. This prices a total assembled from twelve terms across four heroes. **The
-  rate is not derived from `FOCUS_STEP` for exactly that reason**, and a designer taking 0.50 or
-  0.25 is moving one constant with no other consequence — the fallback, the gate and every figure
-  in the report are all expressed against the live value.
-- **AND NOTHING ELSE IN EW IS OPEN.** §2 closed the enemy question on a structural answer, §3 ruled
-  the clamp stays at 0.75, and the mechanism itself is ruled.
+- **THE WORST-BLOW FIGURE IS NOT A BOUND** and must never be quoted as one — four arms, 7.20 to
+  18.09. Quote the ratio and the band instead.
+- **`check_ew` §6's last assertion is vacuous** (`ok(step == step, …)`) and is owed a repair by
+  whichever batch next has reason to touch that gate. It is one of the 38, so repairing it in place
+  keeps the count.
 
 ### `BOND_MITIGATION_MAX` STAYS AT 0.75 — **RULED AT EW §3. NOT A QUESTION ANY MORE.**
 

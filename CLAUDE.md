@@ -2159,7 +2159,7 @@ and their standard error — do not quote a figure from here, there is none.**
   a chip still multiplying by the whole meter would print a bonus the blow does not have, which is
   worse than the silent phase. **A silent second phase is a stat nobody knows they have.**
 
-## STANDING RULE — CRIT CHANCE ABOVE A CERTAINTY BECOMES CRIT MULTIPLIER (Batch EW, ruled by the designer)
+## STANDING RULE — CRIT CHANCE ABOVE A CERTAINTY BECOMES CRIT MULTIPLIER (Batch EW; rate ruled at EX)
 
 > **A total crit chance over 100% cannot make a hit more certain, so the surplus is paid as
 > critical DAMAGE instead — from every source, game-wide, at `battle.CRIT_EXCESS_STEP`.**
@@ -2167,8 +2167,8 @@ and their standard error — do not quote a figure from here, there is none.**
 > one term.
 
 **THIS IS NOT FOCUS'S CONVERSION AND MUST NOT BE FOLDED INTO IT.** Focus converts at a DEPTH IN ONE
-METER (`unit.focus_convert`, still 100, still `FOCUS_STEP`); this converts a TOTAL assembled from
-twelve terms. **A hero at 80 Focus is below his own split point, is still contributing +40% crit
+METER (`unit.focus_convert`, still 100, still `FOCUS_STEP`); this converts a TOTAL assembled over
+twelve statements, carrying thirteen terms. **A hero at 80 Focus is below his own split point, is still contributing +40% crit
 chance, and can be past 100% TOTAL once a Broken target and a talent are added — both conversions
 fire on that blow and nothing is counted twice**, because the sub-split Focus is inside
 `crit_chance` and was never paid as multiplier.
@@ -2185,18 +2185,32 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   roll comparing against an inline expression cannot hand the SAME value to the conversion — it
   would have to recompute it, which is a second copy of the assembly, which is the drift
   `_bot_boon_worth` already cost this project once.
-- **THE RATE IS `CRIT_EXCESS_STEP` AND IT IS FLAGGED, NOT TUNED.** It ships at **1.0**, which is
-  Focus's own exchange rate (0.005 of chance below the split for 0.005 of multiplier above it, so
-  one for one). **It is deliberately NOT written as a derivation from `FOCUS_STEP`**: that would
-  assert the two must stay equal, and whether a rate tuned for ONE meter is right for a total
-  assembled from every source is exactly the open question. `docs/reports/EW.md` §1 prices 0.25 and
-  0.50 beside it at all three arms.
-- **THE MEAN IS NOT WHERE THIS LIVES — PRICE IT ON THE TAIL.** At a fully-talented loadout the
-  party's crit output rises about **+1.7%**, at rows 1–3 about **+0.3%**, and at rows 0 **not at
-  all** because nothing ever passes a certainty there. **But the blows that do land past one go
-  from ×1.5 to a mean ×3.0, with the worst single blow measured at ×8.28** — and the term feeding
-  that tail (Aguila's boon on an uncapped Loyalty meter) has no ceiling anywhere. **A rate chosen
-  off the party mean is a rate chosen at the wrong statistic.**
+- **THE RATE IS `CRIT_EXCESS_STEP` AND IT WAS RULED AT EX: 1.0 → 0.50.** EW shipped it at Focus's
+  own exchange rate (0.005 of chance below the split for 0.005 of multiplier above it, so one for
+  one) and flagged it rather than tuning it. **The designer ruled 0.50, and the reasoning is
+  recorded so the priced alternative is not re-proposed later as a discovery:** 1.0 is a rate tuned
+  for ONE meter that one spec builds on one target, and this constant prices a total assembled over
+  **twelve statements — thirteen terms** — and fed by the whole party. Nothing has ever tested that
+  those two answers should be the same number. **It is still deliberately NOT written as a
+  derivation from `FOCUS_STEP`**: a derivation would assert they must stay equal, and one line is
+  what makes this constant movable. `docs/reports/EX.md` §1.
+- **THE MEAN IS NOT WHERE THIS LIVES — PRICE IT ON THE TAIL.** At 0.50 and a fully-talented loadout
+  the party's crit output rises about **+1.2%** live (±0.11 floor); at rows 1–3 and rows 0 the
+  conversion is **below the noise floor and the arms cannot see it**. **But the blows that do land
+  past a certainty go from ×1.5 to a mean ×2.5** — and the term feeding that tail (Aguila's boon on
+  an uncapped Loyalty meter) has no ceiling anywhere. **A rate chosen off the party mean is a rate
+  chosen at the wrong statistic.**
+- **AND THE WORST-BLOW FIGURE IS A SAMPLE MAXIMUM, SO IT DOES NOT CONVERGE — DO NOT QUOTE ONE AS A
+  BOUND.** Four independent rows-1–9 arms read worst totals of **7.20 / 11.12 / 12.24 / 18.09**,
+  a 2.5× spread, because the term feeding them is unbounded. **The stable figures are the RATIO
+  (0.50 buys exactly half of 1.00, at every arm) and the aggregate band.** EX §1c.
+- **ROWS 0 IS A NEAR-ZERO, NOT A STRUCTURAL ZERO, AND EW's REPORT SAYS OTHERWISE.** The conversion
+  **can** fire with no talents equipped: measured **2 crossings in 40,437 hero strikes**, totals to
+  **1.09**, with 208 strikes at or past 0.50. **`_party_crit_bonus()` is gated on
+  `passive_id == "pack"` and NOTHING ELSE** — no talent, no row — so Aguila's boon on an uncapped
+  meter reaches a certainty at rows 0. It is still a sound noise floor (the crossings move that
+  arm's mean by +0.0002% against a ±0.11% floor), **but it is a rare event and must not be asserted
+  as impossible.** EX §2.
 - **IT CANNOT REACH AN ENEMY, AND THAT IS STRUCTURAL.** `_party_crit_bonus()` is hero-gated at its
   read site; `crit_bonus` is written on the HERO spawn path and inherited only by a companion (its
   one other writer, `dulledge`, SUBTRACTS); every remaining term is a talent counter and an enemy is
@@ -2210,6 +2224,28 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   spend that same sum as a BURN MAGNITUDE rather than as a chance. **None can know the assembled
   total** — it depends on the ability, the target and the board — so none was changed, and a sweep
   for "places that read `CRIT_CHANCE`" must not mistake any of the six for a roll site.
+
+## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
+
+> **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does
+> not remove the sampling error in the rolls it is priced over.**
+
+EW priced the surplus rate over one run set and read +1.351% at rows 1–9; EX priced it the same way
+over three more and read **2.048% / 1.211% / 1.031%** — a full percentage point of spread on a
+figure whose per-arm standard error is a tenth of that. **Nothing was wrong with either arithmetic.**
+The quantity is dominated by a rare heavy tail, so the estimate inherits the tail's variance no
+matter how exact the pairing is.
+
+- **QUOTE THE PAIRED DELTA AS EXACT AND THE LEVEL AS A SAMPLE.** "0.50 buys exactly half of 1.00"
+  is a property of the arithmetic and holds at every arm. "0.50 is worth +1.35%" is a reading of
+  one run set.
+- **A SAMPLE MAXIMUM OF AN UNBOUNDED TERM NEVER CONVERGES — never quote one as a bound.** Four arms
+  gave worst totals of 7.20 / 11.12 / 12.24 / 18.09.
+- **AND THE COUNTERFACTUAL RUNS HIGH AGAINST THE LIVE ARM, REPRODUCIBLY.** EW: 2.703 priced against
+  1.717 live. EX: 2.048 priced against 1.235 live. **Bigger blows kill faster, so the meter feeding
+  the tail has less time to build** — visible directly in EX's own arms, where the same counter-
+  factual priced over arms that RAN at 0 / 0.50 / 1.00 falls monotonically. Treat a counterfactual
+  as an upper reading and drive the live arm before quoting a swing.
 
 ## STANDING RULE — AN ARM IS NOT READ UNTIL ITS PROCESS HAS EXITED (Batch EV §6g, recorded at EW §4)
 

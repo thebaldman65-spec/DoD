@@ -14,6 +14,81 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-04 &mdash; Batch EX: THE SURPLUS RATE GOES TO 0.50</h2>
+<p><i><b>The designer ruled the one number EW left open. <code>CRIT_EXCESS_STEP</code> moves
+1.0 &rarr; 0.50 &mdash; crit chance above a certainty still becomes crit multiplier, from every
+source, but at half of Focus&#x27;s exchange rate rather than all of it.</b> One constant, one line,
+and the executable diff is exactly that line. Full working, with every figure&#x27;s n and standard
+error: <code>docs/reports/EX.md</code>.</i></p>
+
+<p><b>&sect;1 &mdash; WHY 0.50 AND NOT FOCUS&#x27;S 1.00, RECORDED SO IT IS NOT RE-PROPOSED LATER AS
+A DISCOVERY.</b> 1.0 is a rate tuned for <b>one meter, that one spec builds, on one target</b>.
+This constant prices a total assembled over <b>twelve statements in the strike loop, carrying
+thirteen terms</b>, fed by the whole party and pushed past a certainty mostly by a boon belonging to
+a different hero. <b>Nothing has ever tested that those two answers should be the same number</b>,
+and shipping 1.0 was a default rather than a test. The constant is still deliberately NOT written as
+a derivation from <code>FOCUS_STEP</code>: a derivation would assert they must stay equal, and one
+line is what makes this movable. <b>0.25 was priced and rejected as too timid.</b></p>
+
+<p><b>&sect;1a &mdash; MEASURED LIVE, NINE ARMS RUN AS A LATIN SQUARE.</b> Three rates &times; three
+row bands, three at a time, so each rate appears once per batch and once per row band &mdash; a
+two-armed reading can otherwise follow the POSITION rather than the meter. Independent runs, the
+conversion off against the conversion at 0.50: <b>rows 0 &minus;0.112% &plusmn;0.115</b> (n=40,437
+against 40,766), <b>rows 1&ndash;3 +0.269% &plusmn;0.104</b>, <b>rows 1&ndash;9 +1.235%
+&plusmn;0.158</b>. <b>EW&#x27;s counterfactual predicted +1.351% at rows 1&ndash;9 and the live arm
+agrees inside one standard error.</b> The same arms at 1.00 read +2.180% &plusmn;0.189, so
+<b>what this batch actually costs the deep game is about one percent of crit output</b>
+(&minus;0.925% &plusmn;0.201, 1.00 against 0.50) and nothing measurable anywhere else.</p>
+
+<p><b>&sect;1b &mdash; THE ROWS-0 ARM IS THE NOISE FLOOR AND IT IS WHAT MAKES ROWS 1&ndash;3
+READABLE, BY SAYING IT IS NOT.</b> The floor is <b>&plusmn;0.11%</b>. The exact counterfactual says
+the conversion is worth <b>+0.037%</b> at rows 1&ndash;3 &mdash; thirty times smaller than that
+arm&#x27;s own noise &mdash; so the +0.269% measured there is run-to-run variance and not the
+mechanism, at either rate. <b>Only rows 1&ndash;9 is above the floor.</b></p>
+
+<p><b>&sect;1c &mdash; AND THE FIGURE THE RATE WAS ARGUED ON DOES NOT HOLD STILL.</b> The brief
+chose 0.50 partly on the worst blow EW measured (&times;12.74 at 1.00 against &times;7.12 at 0.50).
+Across four independent rows-1&ndash;9 arms the worst total crit reads <b>7.20 / 11.12 / 12.24 /
+18.09</b> &mdash; a 2.5&times; spread. <b>A sample maximum of an unbounded term grows with sampling
+instead of converging</b>, so that figure is a fact about a hundred runs rather than about the game.
+<b>It makes the ruling better founded rather than worse</b>: the reason to halve the rate was that
+the tail has no ceiling, and this is that same fact said again. <b>The stable figures are the RATIO
+&mdash; 0.50 buys exactly half of 1.00, at every arm, because the conversion is linear in the rate
+&mdash; and the aggregate band.</b> Both are now standing rules.</p>
+
+<p><b>&sect;2 &mdash; ROWS 0 IS A RARE EVENT, NOT A STRUCTURAL ZERO, AND EW&#x27;S REPORT SAID
+OTHERWISE.</b> EW recorded that the conversion <i>provably cannot fire</i> with no talents equipped.
+<b>It can.</b> The rate-0 arm crossed a certainty <b>twice in 40,437 hero strikes</b>, with totals
+reaching <b>1.09</b> and 208 strikes at or past 0.50. <b><code>_party_crit_bonus()</code> is gated
+on <code>passive_id == &quot;pack&quot;</code> and nothing else</b> &mdash; no talent, no row &mdash;
+so Aguila&#x27;s boon on an uncapped Loyalty meter reaches a certainty at rows 0. <b>The requirement
+still held</b> (the shipped arm converted exactly nothing, 0 of 40,766, and two crossings would move
+that mean by +0.0002% against a &plusmn;0.11% floor) &mdash; <b>but a negative control asserted as
+structural, and really only rare, stops being a control on the day it is not rare.</b></p>
+
+<p><b>&sect;3 &mdash; THE CONSTANT&#x27;S OWN COMMENT NAMED THE WRONG NUMBER.</b>
+<code>battle.gd</code> said the total is assembled <i>from eight sources</i>; every document says
+twelve. <b>Counted mechanically off the strike loop it is TWELVE statements carrying THIRTEEN
+terms</b> &mdash; the first statement is the base and a Broken target&#x27;s 25% in one line. So
+&quot;twelve&quot; is right about the places and wrong about the terms, and &quot;eight&quot; is
+wrong about both. <b>Corrected in the comment this batch was rewriting anyway, and in the standing
+rule.</b> <code>docs/reports/EW.md</code> is left alone: it is EW&#x27;s record.</p>
+
+<p><b>&sect;4 &mdash; THE GATE HELD AT 38 AND GOT SHARPER.</b> <code>check_ew</code> reads
+<b>38 / 0</b> off three identical standalone readings at 0.50, exactly as predicted &mdash; nothing
+in it was pinning the VALUE rather than the property. Driven on an instrumented copy, <b>&sect;2&#x27;s
+measured ratio against its own live prediction is 1.4977 against 1.5000 at 0.50, an error of
+0.0023 &mdash; half what it was at 1.00</b>, against a 0.02 bound. <b>One of the 38 is vacuous and
+is named rather than touched</b>: <code>&sect;6</code>&#x27;s last assertion is
+<code>ok(step == step, &hellip;)</code>, which cannot fail. Recorded as owed, because a gate edit
+would move the count this batch predicted unmoved.</p>
+
+<p><b>WHAT DID NOT MOVE:</b> Focus&#x27;s conversion point and rate (<code>FOCUS_CONVERT</code> 100,
+<code>FOCUS_STEP</code> 0.005); the four roll sites, the one body and the unclamped roll;
+<code>BOND_MITIGATION_MAX</code> at 0.75; <code>BOND_CONVERT</code> at 8;
+<code>_bond_fallback</code>; <code>check_ew</code> itself; <code>run_battery.sh</code>; and
+<b>no rune was authored</b>. <b>No baseline row moves.</b></p>
+
 <h2>2026-09-04 &mdash; Batch EW: CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER</h2>
 <p><i><b>Crit chance past 100% is no longer thrown away. The surplus is paid as critical damage
 instead, at +1.0 of multiplier per 1.0 of surplus chance, from every source, game-wide.</b>
