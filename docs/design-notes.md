@@ -7300,13 +7300,39 @@ denominator, and they can only be read against a denominator the parts add up to
 counterparts sit beside the originals rather than replacing them, and the gate proves they are
 different numbers on a card where they disagree rather than asserting it.
 
-**And the vacuous reading was found, implemented literally, and reported rather than patched.** An
-empty drafted list meets both conditions: nothing carries the tag, so nothing fails to be half of it;
-no tag exists, so none exceeds a third. It is 0 ≥ 0 and 0 ≤ 0, it is the literal reading of both
-rules, **and it is reachable** — a player can bench everything and switch on a THRESHOLD rune and a
-BREADTH rune at the same time, which is the one state the two shapes were designed never to share.
-A batch does not alter an authored condition, so it ships as written and is named. It is the sharpest
-thing in the batch and the cheapest to change if the designer wants it changed: one clause.
+**And the vacuous reading was found, implemented literally, and reported rather than patched —
+and Batch FA is the designer closing it.** An empty drafted list met both conditions: nothing
+carries the tag, so nothing fails to be half of it; no tag exists, so none exceeds a third. It was
+0 ≥ 0 and 0 ≤ 0, the literal reading of both rules, **and it was reachable** — a player can bench
+everything and switch on a THRESHOLD rune and a BREADTH rune at the same time, which is the one
+state the two shapes were designed never to share. A batch does not alter an authored condition, so
+EZ shipped it as written and named it; **FA is the ruling, and both conditions now require at least
+one drafted card.**
+
+**Three things about that closure are worth keeping, and none of them is the clause itself.**
+
+*The reachability was wider than the report claimed, and the second route is the ordinary one.* EZ
+named benching as the way in. But `equipped_ability_names` is the EARNED subset, and its own comment
+says so: *"a hero who has drafted nothing carries a full bar through it that reads EMPTY."* **A hero
+who has simply not drafted yet reads the same empty list as a hero who benched his whole bar.** The
+degenerate state was not an exotic thing a player had to construct; for a THRESHOLD rune it was the
+opening state of every run.
+
+*The guard's PLACE was the decision, not the guard.* One clause in `loadout_condition_met` would
+have been cheaper than two in the predicates, and wrong. The hero sheet and the loadout panel call
+`threshold_met` and `breadth_met_fraction` directly for the tick they draw beside the
+`RUNE CONDITIONS` line — so a guard at the door alone would have refused the rune while both screens
+went on showing a ✓ on an empty bar. **A guard a display surface cannot see is half a guard**, and
+the file's own ONE BUILDER rule (one function builds the printed line, so two screens cannot render
+one fact two ways) had already argued the point one layer down.
+
+*And the assertion that made this cheap was the one written in the direction it was then true.*
+`check_ez` §1 asserted the vacuity deliberately, *"so the day it is changed the gate says so."* Run
+unmodified against FA's code, that gate goes three red — and **the third red is the one nobody
+predicted**: §4's *condition MET* arm was an empty drafted list for all twenty-one payloads, and it
+worked only because an empty list met both shapes vacuously. Eight gated runes stop landing. Nothing
+in the diff points at it and nothing in §4 mentions emptiness. **A gate asserting today's behaviour
+is not a tautology; it is the instrument the batch that changes that behaviour reads first.**
 
 **The Shared Hide is the batch's real divergence and the interesting part is why it was not
 avoidable.** The ruling was explicit and its reasoning was good: the companion inherits *everything*,
@@ -7339,6 +7365,24 @@ direction the words point, never the magnitude they imply**, and report the gap.
 widens (the line, not two of three) and the reduction it names is applied to the Ruin, where 1 is
 the only integer below 2 that is not nothing. Neither magnitude was chosen by the batch, and both
 premises are on the record where the designer will meet them.
+
+**Batch FA prices the widening EZ flagged and the same discipline applies to the ruling itself.**
+The designer ruled Split Tongue's damage 20% → 12% of Attack on the rune's version, and the stated
+reason for 12% rather than 10% was that halving *"risks making it a downgrade against the
+four-enemy warbands a player meets most."* **Measured, 12% is already that downgrade.** Damage per
+cast, twenty casts an arm on isolated boards: ×0.61 at three enemies, ×0.79 at four, ×1.02 at five,
+×1.18 at six. The break-even is arithmetic — N × 12 = 3 × 20 at N = 5 — and it sits above the board
+the ruling was reasoning about. **The ruling was built as ruled and the number was put beside it**,
+because a magnitude is the designer's and a measurement is the batch's; what a batch owes is the
+number, not a second opinion wearing one.
+
+**And the board the nerf was priced for is not the board the game fields.** The premise was that
+`compose` floors elite and mini-boss rosters at six or more. It floors the *budget* at 6, which is a
+different quantity: a budget of 6 buys three power-2 enemies, and over 200 compositions a tier it
+buys exactly that — **three enemies at every draw at tiers 1 and 4**, 3.12 at tier 8, a mean of 4.87
+only at tier 16. The board caps at six slots regardless. **So the large board the rune was nerfed
+for is mostly the small board where the nerf costs the most**, and ×1.18 is the best it can ever do.
+That is a design question and it is left as one.
 
 **Long Draw's cost lives in a table that was deliberately not extended, which is worth naming
 because it looks like an omission.** `SS_SEQ_OPEN` is four entries solved so a one-, two-, three- or

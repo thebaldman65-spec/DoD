@@ -14,6 +14,97 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-05 &mdash; Batch FA: TWO RULINGS EZ LEFT OPEN</h2>
+
+<p><i><b>Both are the designer's rulings on things Batch EZ built literally and reported rather
+than patching.</b> An empty drafted loadout met BOTH rune conditions and now meets neither; Split
+Tongue's damage goes 20% &rarr; 12% of Attack on the rune's version of Hex of Ruin. No other rune,
+magnitude, constant or ability moves, and no new rune is authored.</i></p>
+
+<p><b>&sect;1 &mdash; AN EMPTY DRAFTED LOADOUT MEETS NEITHER CONDITION.</b> EZ built the two
+loadout rules literally and the literal reading was vacuous: nothing carries the tag, so nothing
+fails to be half of it (<code>0 * 2 &gt;= 0</code>); no tag exists, so none exceeds a third
+(<code>0 * 3 &lt;= 0</code>). <b>A player who benched everything switched on a THRESHOLD rune and
+a BREADTH rune at the same time</b> &mdash; the one state the two shapes were designed never to
+share. <b>It is reachable and it was reachable two ways</b>: <code>Run.unequip_earned_ability</code>
+has no floor, so a hero's whole drafted half can be benched &mdash; and a hero who has not drafted
+yet reads the same empty list, because <code>equipped_ability_names</code> is the EARNED subset and
+<i>&ldquo;a hero who has drafted nothing carries a full bar through it that reads EMPTY&rdquo;</i>
+is that function's own comment. <b>BOTH conditions are closed, not just threshold.</b>
+Breadth-of-nothing is arguably harmless on its own and it is the same degenerate state, and
+<b>two conditions with different emptiness rules is a second thing to remember for no gain.</b></p>
+
+<p><b>&sect;1a &mdash; THE GUARD IS IN THE TWO PREDICATES AND NOT AT THE DOOR, AND THE PLACE IS
+PART OF THE RULING.</b> <code>Runes.threshold_met</code> and
+<code>Runes.breadth_met_fraction</code> each refuse an empty list themselves. A guard one layer up
+in <code>loadout_condition_met</code> would have been one clause instead of two and would have been
+wrong: <b>the hero sheet and the loadout panel call the two predicates DIRECTLY</b> for the tick
+they draw beside the <code>RUNE CONDITIONS</code> line
+(<code>party_screen._draw_detail</code>, <code>map_screen._open_loadout_panel</code>), so the rune
+would have been refused while both screens still drew a &check; on an empty bar &mdash; one fact
+rendered two ways, which is what the ONE BUILDER rule above <code>threshold_line</code> exists to
+prevent. <b>The now-redundant <code>member.is_empty()</code> line at the door is kept and labelled
+rather than deleted</b>: a caller with no member is a different fault from a hero who benched his
+bar.</p>
+
+<p><b>&sect;1b &mdash; THE GATE ASSERTION INVERTS, IT IS NOT DELETED, AND HEAD'S OWN GATE FOUND
+THE DEPENDENCY.</b> <code>check_ez</code> &sect;1 asserted the vacuity in the direction it was then
+true, deliberately, <i>&ldquo;so the day it is changed the gate says so.&rdquo;</i> That day is
+today. <b>Run unmodified against the new code, HEAD's 96-check <code>check_ez</code> goes THREE
+red</b> &mdash; the vacuity assertion, <code>13 of 21 landed</code>, and all EIGHT gated runes
+named as not landing. <b>That third red is a dependency the brief did not name and the gate
+did</b>: &sect;4's <i>condition MET</i> arm was the EMPTY LIST for all twenty-one, and it only
+worked because an empty list met both shapes vacuously. It is a real per-rune loadout now
+(<code>_met_drafted</code>: four-of-four on the named tag for a threshold, a 2/2/2 six for breadth,
+<b>which no single list can both be</b>), and <b>the arm is checked before it is used</b> so a
+wrong arm reads as one broken arm rather than as twenty-one broken payloads.</p>
+
+<p><b>&sect;2 &mdash; SPLIT TONGUE'S DAMAGE GOES 20% &rarr; 12% OF ATTACK, ON THE RUNE'S VERSION
+ONLY.</b> Hex of Ruin is authored at 20% of Attack against three chosen enemies
+(<code>choose_three</code>); the rune makes it <code>aoe</code>, so the target count rises and the
+damage had never been priced for it. <b>The reduction rides the same <code>set</code> the widening
+does</b> &mdash; <code>{"aoe": true, "damage": 12}</code> &mdash; which is what makes it the rune's
+version rather than the card's: an Occultist without the rune keeps 20% against three, and
+<code>check_ez</code> &sect;5 asserts that base FIRST and on the live Ability. <b>12% and not 10%
+because the rune already pays 1 Ruin a target instead of 2.</b></p>
+
+<p><b>&sect;2a &mdash; AND THE MEASUREMENT DOES NOT SUPPORT THE REASON GIVEN FOR 12% OVER 10%.
+THE RULING IS BUILT AS RULED AND THE GAP IS REPORTED.</b> The ruling's stated argument was that
+halving the damage <i>&ldquo;risks making it a downgrade against the four-enemy warbands a player
+meets most&rdquo;</i>. Measured on a live board at Attack 100, twenty casts an arm, each arm on its
+own board with hp, statuses, Break and Broken reset before every cast: <b>at four enemies the rune
+is &times;0.79 damage per cast &mdash; already a downgrade at 12%</b>. Three enemies &times;0.61,
+four &times;0.79, five &times;1.02, six &times;1.18. <b>The break-even is FIVE enemies</b>, which is
+arithmetic rather than noise: N &times; 12 = 3 &times; 20 at N = 5. <b>Break pressure moves the
+other way and is the half that is not priced at all</b> &mdash; &times;1.00, &times;1.33,
+&times;1.67, &times;2.00 &mdash; because 15 Break and an Exposed reach every enemy instead of
+three. <b>No magnitude was changed on this finding</b>: 12% is the designer's ruling, it is built,
+and the number is put beside it.</p>
+
+<p><b>&sect;2b &mdash; AND THE BRIEF'S PREMISE ABOUT ELITE ROSTERS IS FALSE, WHICH MOVES THE
+&sect;2a NUMBERS ONTO A DIFFERENT BOARD.</b> The brief reads <i>&ldquo;six or more on the elite and
+mini-boss rosters <code>compose</code> floors&rdquo;</i>. <code>compose</code> floors the
+<b>BUDGET</b> at 6 (<code>budget = maxi(budget, 6)</code>), not the enemy count, and a budget of 6
+buys three power-2 enemies. Measured over 200 compositions at each of six tiers: <b>elite and
+mini-boss rosters are THREE enemies at tiers 1 through 4 (mean 3.00, every single draw), 3.12 at
+tier 8, and reach a mean of 4.87 only at tier 16.</b> <b>So the board the rune was nerfed for is
+mostly the board where it is worst</b> &mdash; &times;0.61 at three. <b>And the board itself caps
+at SIX</b>: <code>ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]</code>, so &times;1.18 is the
+ceiling the rune can ever reach.</p>
+
+<p><b>&sect;3 &mdash; WHAT IS DELIBERATELY NOT DONE.</b> <b>Bracing Line stays at 32</b>
+(<code>BRACING_LINE_LEVEL</code>), measured and ruled at EZ. <b>The Shared Hide's named list
+stands</b> &mdash; the batch that extracts the ~84-term hero block into a callable is the one that
+re-points that rune. <b>No other rune, magnitude, constant or ability moves</b>:
+<code>SC_PROFILE_DEFAULT</code>, <code>CRIT_EXCESS_STEP</code>, <code>BOND_CONVERT</code>,
+<code>BOND_MITIGATION_MAX</code> and every <code>SS_SEQ_*</code> are untouched, read out of the
+tree after the batch. <b>No new rune is authored</b> &mdash; eight specs and the class runes are
+still unwritten. <b>And one thing is pinned rather than repaired</b>: <code>choose_three</code>
+survives on the rune's Ability and is DEAD, because <code>_resolve</code> reads
+<code>if ab.aoe: &hellip; elif ab.choose_two or ab.choose_three</code>. It is asserted as
+surviving-and-dead so a later batch reading the field does not conclude the card still picks
+three.</p>
+
 <h2>2026-09-05 &mdash; Batch EZ: THE FIRST TWENTY-ONE RUNES</h2>
 
 <p><i><b>Twenty-one runes across four specs, authored with the designer. The pool has been empty

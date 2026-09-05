@@ -66,6 +66,42 @@ func _member(class_key: String, spec: String, drafted: Array = []) -> Dictionary
 		"earned_abilities": [], "bm_abilities": drafted.duplicate()}
 
 
+# Every corpus card whose PRIMARY tag is `tag`, in `CARD_TAGS` order. The
+# counts are 68 DEBUFF / 56 DEFENSE / 54 BREAK / 17 RESOURCE / 16 OFFENSE /
+# 8 MARK / 8 TEMPO, so every tag can supply the six an arm below needs.
+func _cards_of(tag: String) -> Array:
+	var out: Array = []
+	for nm in Classes.CARD_TAGS:
+		if Classes.card_tag_primary(String(nm)) == tag:
+			out.append(String(nm))
+	return out
+
+
+# **A DRAFTED LIST THAT MEETS THE GIVEN CONDITION — BATCH FA §1's REPLACEMENT
+# FOR THE EMPTY ONE.** §4's MET arm used to be `[]` for every rune, which
+# worked only because an empty list met both shapes vacuously; FA closed that
+# and the arm has to be real. The two shapes cannot share a list — "at least
+# half carry the tag" and "no tag holds more than a third" are opposite
+# statements about the same peak — so this returns one per shape.
+func _met_drafted(cond: Dictionary) -> Array:
+	if cond.has("tag_threshold"):
+		# 4 of 4 on the named tag: past half at every loadout size. The arm is
+		# about the PAYLOAD landing; §1 owns the boundary, on both sides, at 4,
+		# 5 and 7 drafted cards.
+		return _cards_of(String(cond["tag_threshold"])).slice(0, 4)
+	if bool(cond.get("tag_breadth", false)):
+		# 2/2/2 across three tags — a peak of EXACTLY a third, which §1 asserts
+		# passes, so the arm sits on the boundary the rule is written at rather
+		# than comfortably inside it.
+		var six: Array = []
+		for t in ["DEBUFF", "DEFENSE", "BREAK"]:
+			six.append_array(_cards_of(t).slice(0, 2))
+		return six
+	# UNGATED. Left empty on purpose: a payload with no `condition` must land
+	# for a hero with no drafted cards at all, and that is the arm that says so.
+	return []
+
+
 # ── §0 — THE POOL ───────────────────────────────────────────────────────────
 func _s0_the_pool() -> void:
 	print("\n§0 — the pool: twenty-one authored, sixty-five retired")
@@ -244,11 +280,33 @@ func _s1_the_arithmetic() -> void:
 		"§1: the primary counts sum to the card count (%d/%d) — they PARTITION"
 			% [total, seven.size()])
 
-	# THE VACUOUS READING, NAMED RATHER THAN GUARDED. An empty drafted list
-	# meets BOTH conditions — 0 >= 0 and 0 <= 0 — which is the literal reading
-	# of §0's two rules and is reported in `docs/reports/EZ.md` §0b.
-	ok(Runes.threshold_met([], "DEBUFF") and Runes.breadth_met_fraction([]),
-		"§1: an EMPTY drafted list meets both, vacuously — the literal reading, on the record")
+	# **THE VACUOUS READING IS CLOSED AT BATCH FA §1, AND THIS ASSERTION IS
+	# INVERTED RATHER THAN DELETED.** EZ asserted it in the direction it was
+	# then true — 0 >= 0 and 0 <= 0, the literal reading of §0's two rules —
+	# deliberately, *"so the day it is changed the gate says so."* That day is
+	# today. **A gate that stops asking is the failure this project has spent
+	# thirty batches removing**, so the question stays and its answer moves.
+	ok(not Runes.threshold_met([], "DEBUFF"),
+		"§1: an EMPTY drafted list does NOT meet the threshold (FA §1)")
+	ok(not Runes.breadth_met_fraction([]),
+		"§1: ...nor breadth — BOTH are closed, not just threshold")
+	# **AND THE DEGENERATE STATE IS ASSERTED AT THE DOOR, NOT ONLY AT THE
+	# ARITHMETIC**, because the door is what a rune is actually gated on: a
+	# hero who benched everything used to switch a THRESHOLD rune and a BREADTH
+	# rune on at once, which is the one state the two shapes were designed
+	# never to share.
+	var benched := _member("mage", "occultist", [])
+	benched["bm_equipped"] = []
+	ok(Runes.drafted_names(benched).is_empty(),
+		"§1: ...a hero who has benched his whole drafted half reads zero drafted cards")
+	ok(not Runes.loadout_condition_met({"tag_threshold": "DEBUFF"}, benched)
+			and not Runes.loadout_condition_met({"tag_breadth": true}, benched),
+		"§1: ...and the live door refuses BOTH shapes for him — the state is closed")
+	# **THE ONE NON-EMPTY CASE ON THE OTHER SIDE OF THE NEW CLAUSE**, so the
+	# guard is proved to be a guard on EMPTINESS and not a guard on the rule:
+	# a single card of the named tag is 1 of 1, which is still at least half.
+	ok(Runes.threshold_met([deb[0]], "DEBUFF"),
+		"§1: ...while ONE drafted card of the tag still meets it — the clause tests emptiness only")
 
 
 # ── §2 — THE COUNTED SET ────────────────────────────────────────────────────
@@ -385,9 +443,20 @@ func _s4_the_payloads() -> void:
 			missed.append("%s: no stat field at all" % id)
 			continue
 		var cond: Dictionary = payload.get("condition", {})
-		# THE ARM THAT MEETS THE CONDITION. An empty drafted list meets both
-		# vacuously (§1), which is exactly what makes it the right MET arm here.
-		var met := _member("mage", "occultist", [])
+		# **THE ARM THAT MEETS THE CONDITION — A REAL LOADOUT SINCE BATCH FA
+		# §1.** It was one empty list for all twenty-one until FA, because an
+		# empty drafted list met BOTH shapes vacuously. FA closed that, so the
+		# arm has to be built per rune, and the two shapes need DIFFERENT
+		# loadouts: a threshold wants its tag at half or more, breadth wants no
+		# tag past a third, and **no single list can satisfy both.**
+		var met := _member("mage", "occultist", _met_drafted(cond))
+		met["bm_equipped"] = _met_drafted(cond)
+		# **THE ARM IS CHECKED BEFORE IT IS USED.** If `_met_drafted` were
+		# wrong, all eight gated payloads would be refused and this section
+		# would report twenty-one broken payloads rather than one broken arm.
+		if not cond.is_empty():
+			ok(Runes.loadout_condition_met(cond, met),
+				"§4: the MET arm for %s really does meet %s" % [id, cond])
 		var cfg_on := {"abilities": []}
 		Talents.apply_payload(cfg_on, payload, 1, {"learned": {}, "member": met})
 		var all_on := true
@@ -477,6 +546,38 @@ func _s5_the_read_sites() -> void:
 		"§5: ...and with Avatar of Ruin held it stays 5 — the rune never makes it SHALLOWER")
 	occ.avatar_ruin = 0
 	occ.rune_hex_threshold = 0
+
+	# ---- Occultist: SPLIT TONGUE'S DAMAGE, AND THE BASE IT MUST NOT MOVE ----
+	# **BATCH FA §2 — 20% OF ATTACK BECOMES 12%, ON THE RUNE'S VERSION ONLY.**
+	# Hex of Ruin is authored at 20% against THREE chosen enemies
+	# (`choose_three`); the rune makes it `aoe`, so the target count rises and
+	# the damage had never been priced for it. **The reduction rides the same
+	# `set` the widening does**, which is what makes it the rune's version
+	# rather than the card's — an Occultist without the rune keeps 20 and
+	# `choose_three`, and that is asserted FIRST and on the live Ability.
+	var hex: Ability = scene._find_ability(occ, "Hex of Ruin")
+	ok(hex != null, "§5: the Occultist holds Hex of Ruin")
+	ok(hex != null and hex.damage == 20 and not hex.aoe and hex.choose_three,
+		"§5: ...authored at 20%% of Attack against three chosen enemies — the BASE, untouched")
+	var st_cfg := {"abilities": [hex]}
+	Talents.apply_payload(st_cfg, Runes.build("split_tongue")["payload"], 1,
+		{"learned": {}, "member": {}})
+	ok(hex != null and hex.damage == 12,
+		"§5: Split Tongue takes it to 12%% of Attack (reads %d)"
+			% (hex.damage if hex != null else -1))
+	ok(hex != null and hex.aoe,
+		"§5: ...and the curse is spoken to the whole line")
+	# **AND THE WIDENING IS WHAT DECIDES THE TARGETS, NOT THE FLAG BESIDE IT.**
+	# `_resolve`'s branch is `if ab.aoe: ... elif ab.choose_two or ab.choose_three`,
+	# so `choose_three` is still TRUE on the rune's version and is dead — which
+	# is worth pinning, because a later batch reading the field would conclude
+	# the card still picks three.
+	ok(hex != null and hex.choose_three,
+		"§5: ...while `choose_three` survives on the Ability and is DEAD — `aoe` wins the branch")
+	# Restore, so the sections below read the board they were written against.
+	if hex != null:
+		hex.damage = 20
+		hex.aoe = false
 
 	# ---- Occultist: the Wide Rite adds to the ONE function five sites call ----
 	var mark_base: int = scene._old_gods_mark()

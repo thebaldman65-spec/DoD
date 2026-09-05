@@ -482,8 +482,8 @@
 		"name": "Split Tongue", "scope": "spec:occultist",
 		"price": 100,
 		"requires_ability": "Hex of Ruin",
-		"desc": "Hex of Ruin curses the WHOLE line rather than three chosen enemies — at 1 Ruin a target instead of 2.",
-		"payload": {"ability": "Hex of Ruin", "set": {"aoe": true}, "also": [{"stat": {"rune_split_tongue": 1}}]}
+		"desc": "Hex of Ruin curses the WHOLE line rather than three chosen enemies — at 12% of Attack a target instead of 20%, and 1 Ruin instead of 2.",
+		"payload": {"ability": "Hex of Ruin", "set": {"aoe": true, "damage": 12}, "also": [{"stat": {"rune_split_tongue": 1}}]}
 	},
 	"wide_rite": {
 		"name": "Wide Rite", "scope": "spec:occultist",

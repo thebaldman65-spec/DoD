@@ -5,123 +5,115 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-05 (Batch EZ).*
+*Last rewritten: 2026-09-05 (Batch FA).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EZ — THE FIRST TWENTY-ONE RUNES.** The pool has been empty since ET §1 retired all
-  53; these are the first under the new charter, authored with the designer and **transcribed
-  rather than proposed**. **21 runes across FOUR specs** — Occultist, Warden and Sharpshooter five
-  each, Beastmaster six — at **100g flat**, **spec scope only**, taking `runes.json` from 65
-  entries to **86: 65 retired and 21 live**. **The machinery ES §4 built and nothing read is
-  finally read: EIGHT of the twenty-one are gated on §0's two loadout conditions.** Full working:
-  **`docs/reports/EZ.md`**.
-- **§0 — THE TWO CONDITIONS ARE FRACTIONS OF THE DRAFTED CARDS, AND THE FRACTION IS THE DESIGN.**
-  **THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag. BREADTH: NO tag exceeds
-  a THIRD of them.** A hero drafts 4 earned slots at zone 1 and 7 by the end, so a fixed COUNT
-  means two different commitments at those two moments; **a fraction is the same commitment all
-  run, and it can be tipped by benching ONE card** — which is what makes the loadout lever reach
-  the rune layer. Read at the SPAWN through `Runes.loadout_condition_met`, the one door.
-- **§0a — THE COUNTED SET IS THE DRAFTED HALF THAT IS EQUIPPED, AND THE CORE IS OUT FOR A MEASURED
-  REASON.** `Run.equipped_ability_names`, which is exactly the set the two swap doors write —
-  EG §2's split, finally load-bearing. **The Occultist's protected core ALONE carries the DEBUFF
-  threshold**, so counting the whole bar would turn Deepening Hex on from the first fight with no
-  bench able to turn it off. That is the constraint `check_es` §4 has printed every run since ES
-  and the first time anything has been authored against it.
-- **§0b — THE COUNT IS PRIMARY-ONLY, WHICH CONTRADICTS ES §4, AND BOTH RULINGS STAND.** A census
-  counts BOTH tags because a card that Breaks and DEBUFFs is in both populations and a SCREEN must
-  say so; **a condition needs a PARTITION** or the per-tag numbers sum past the card count and "a
-  third of them" means nothing. `Classes.primary_tag_*` were added BESIDE the originals.
-- **§0c — AN EMPTY DRAFTED LIST MEETS BOTH CONDITIONS, VACUOUSLY, AND IT IS REACHABLE.** 0 ≥ 0 and
-  0 ≤ 0. It is the literal reading of both rules, it is implemented literally, and a player can
-  bench everything to switch a THRESHOLD rune and a BREADTH rune on at once — the one state the two
-  shapes were designed never to share. **A batch does not alter an authored condition**, so it is
-  built as written and is the sharpest thing owed back to the designer. One clause closes it.
-- **§1 — FOUR OF THE BRIEF'S PREMISES DID NOT SURVIVE THE CODE, AND EVERY RUNE SHIPPED ANYWAY.**
-  **Hex of Ruin already strikes THREE** (`choose_three`), so Split Tongue as transcribed was a
-  NERF — it ships as the widening its name calls for, the whole line, at 1 Ruin a target instead of
-  2. **Wrath of the Old Gods already marks TWO** on every debuff he applies, so Wide Rite reads +1.
-  **Shieldwall covers NO ally** (AB made it a self stance), so the Split Shield splits the wall
-  instead — half for him, that same half for the ally, and `SHIELDWALL_BLOCK / 2` is derived rather
-  than chosen. **And "each press 15% narrower" is `SS_SEQ_TAPER` = 0.85 and has shipped since CS.**
-  **No magnitude was invented for any of the four.**
-- **§2 — LONG DRAW'S COST IS A TABLE THAT WAS DELIBERATELY NOT EXTENDED, AND IT WILL READ AS A BUG.**
-  `SS_SEQ_OPEN` is FOUR entries solved so a one-to-four-press sequence lands with the same
-  probability. The rune adds a fifth press and **the table stays at four**: the fifth press opens at
-  the four-press widening and takes another taper step, so the sequence really is harder to hold.
-  **Extending it would delete the rune's entire cost with nothing else noticing**, which is why
-  `check_ez` §5 asserts it as an INEQUALITY rather than a value.
-- **§3 — THE SHARED HIDE IS THE BATCH'S ONE DIVERGENCE FROM A RULING AND IT IS RECORDED IN
-  `CLAUDE.md`.** The ruling was *"the companion inherits EVERYTHING — not a named list"*; **what
-  shipped is a named list**, because the hero block is ~84 terms written INLINE in the strike loop
-  with no function to call and extracting one is a refactor this batch's charter forbids. What
-  shipped instead is a population a function CAN be complete over: **the eleven buff terms the
-  companion is already WEARING and has never read** — DK's Empower 1.0000 made actionable — plus the
-  hunter's two that are about a bond which already broke. **Measured at three loadouts: +25.0%,
-  +56.2%, +133.6%**, and the "without" column is **1.0000 at every one of them**, which is the
-  finding rather than the baseline. **76 of the block's 78 absent terms are unreachable BY SHAPE**
-  and the rune does not claim otherwise — re-derived here at 26 ability-keyed, 42 attacker-keyed,
-  16 passive-keyed, and DU §2's own 26 is reproduced exactly.
-- **§4 — BRACING LINE'S LEVEL IS 32 AND WHAT 32 COSTS IS NOW MEASURED.** Over 200,000 incoming hits
-  an arm, with the block roll taken at the Warden's own LIVE chance so the feedback loop is in the
-  reading: **the level holds on 8.98% of incoming hits alone and 11.91% with the Standing Wall** —
-  a third more often — and his own mean block chance rises 0.357 → 0.430, which is the mechanism
-  that makes the pair a build. **The figure to argue with is the 8.98%, not the ratio.**
-- **§5 — FOUR GATES WERE RE-POINTED FOR A GROWING POOL AND FOUR MORE FOR WHAT THE RUN FOUND.**
-  `check_es` 43 → 44 (the pool pin 65 → 86, and §5's splash derivation was STALE: a splash was "a
-  spec rune with no `lane`", and EZ's twenty-one carry none at all, so all 21 read as splashes and
-  the count went 12 → 33; it reads the BREADTH secondary now). `check_et` 23 → 24 (its subject
-  survives — the 65 ET retired are still retired and still unreachable — and its leak test asks
-  `_is_retired` directly instead of inferring it from an id prefix). `check_ek` 45 → 46 — **this is
-  the batch its §3 was kept authored for.** `check_parse` 166 → 167. Then `test_batch_ax` 352 → 353,
-  `test_batch_cp`, `test_runes` 3022 → 3803 and `test_rune_battle`, all found by the run.
-- **§6 — THE FIRST BATTERY IS REPORTED AS RECONNAISSANCE BECAUSE THE FREEZE BROKE.** A red was
-  read and repaired at target 25 while the run was still going — the fault DL discarded two runs
-  for. **The run was allowed to FINISH rather than killed**, because it found eight red targets and
-  fixing them one run at a time would have cost eight batteries; then the tree was re-frozen and the
-  battery was run once, clean. **One of the eight was MY CODE and not a fingerprint**: `check_eu`
-  §0 asserts exactly one line reads `BOND_CONVERT` and my two-armed `_bond_convert` named it twice.
-  The gate was right; the code is one expression now.
-- **§7 — THE BATTERY.** **93 targets** (one more than EY's 92 — `check_ez` joined), **`sort .ran |
-  uniq -d` ZERO duplicates, 0 `Parse Error`, 0 `SCRIPT ERROR` and 0 timeouts across every log.**
-  `check_ez` **96 / 0**, `check_es` **44 / 0**, `check_et` **24 / 0**, `check_ek` **46 / 0**,
-  `check_parse` **167 / 0**, `check_ed` **18 / 0**, `check_eu` **38 / 0**, `test_runes`
-  **3803 / 0**, `test_batch_ax` **353 / 0**. **The only red is `check_cm_live` 13 / 4**, whose four
-  FAIL lines are the four its baseline row names and which carries `fails: [4, 4]` for that reason.
-  **The freeze held EXACTLY**: an md5 stamp of 336 files with absolute paths, tracked AND untracked,
-  before and after, **zero differ.**
-- **§8 — THE INSTRUMENTS, AND THE SCAN-WINDOW CENSUS HAD A HOLE THE BATTERY FOUND.** It read a
-  clean zero for the anchor that turned `test_batch_cp` red, **because a GDScript literal carries
-  ESCAPED quotes and searching the source for the escaped text never matches** — and its first pass
-  also took the first and last divergence as ONE range, which read the whole of `battle.gd` (36
-  separate hunks). Repaired both ways and re-derived a second way: **every fixed-size `substr`
-  window in the corpus enumerated with its anchor, 59 of them, the widest 3,000 bytes.** The
-  literal sweep — **15,458 needles from 125 `.gd` files** — reads **LOST 0 in all eight documents**
-  and was armed both ways first. **44 GAINED needles, and exactly one negative `contains` assertion
-  anywhere touches one — against an Ability, not a document.**
-- **WHAT MOVED: SEVEN GAME SCRIPTS, EIGHT TARGETS AND NINE DOCUMENTS.** `battle.gd`, `unit.gd`,
-  `runes.gd`, `classes.gd`, `talents.gd`, `map_screen.gd`, `party_screen.gd`; `check_ez.gd` (new),
-  `check_ek`, `check_es`, `check_et`, `test_batch_ax`, `test_batch_cp`, `test_runes`,
-  `test_rune_battle`, `run_battery.sh` and `pin-manifest.json`; `data/runes.json` (**+130 lines, a
-  pure append — no existing entry moved a byte**), `data/glossary.json`, `docs/changelog.html`,
-  `CLAUDE.md`, `docs/master.html` and its stamp, `docs/text-standard.html`, `docs/design-notes.md`,
-  `baselines.json`, this file and `docs/reports/EZ.md`. **NO ABILITY, TALENT, MAGNITUDE OR CONSTANT
-  MOVED except where a rune's own payload required it**, and every item on the brief's own
-  not-done list was read out of the tree after the batch and confirmed unmoved.
-- **Next letter: FA.** **EZ was the last two-letter code before it**, and FA still sorts above every
-  suite's own code, so the stamp compare — which reads exactly TWO characters — is still fine.
-- **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **the rune layer has CONTENT again for the first time
-  since ET**: 21 authored against four specs, with **eight specs still unauthored** and the five
-  re-scoped universals still awaiting a class. **The machinery is no longer inert** — a rune reads a
-  tag, the loadout is a lever, and the state is on two screens. **What is left in the rune layer is
-  still authoring and it is still the designer's, one rune at a time.** The Loyalty curve is ruled,
-  built and repaired; the crit surplus is ruled end to end; the skill check's difficulty is ruled
-  and built. **The ladder still has an open design question of its own (what rung 2 should ASK),
-  and it is the largest unbuilt item on this list.**
-
+- **Last batch: FA — TWO RULINGS EZ LEFT OPEN.** Both are the designer's rulings on things EZ
+  built literally and reported rather than patching. **An empty drafted loadout met BOTH rune
+  conditions and now meets neither**; **Split Tongue's damage goes 20% → 12% of Attack on the
+  rune's version of Hex of Ruin.** No other rune, magnitude, constant or ability moved and no new
+  rune was authored. Full working: **`docs/reports/FA.md`**.
+- **§1 — AN EMPTY DRAFTED LIST MEETS NEITHER CONDITION, AND IT WAS REACHABLE TWO WAYS.** EZ built
+  both rules literally and the literal reading was vacuous (`0 * 2 >= 0`, `0 * 3 <= 0`), so **a
+  hero with no drafted cards switched on a THRESHOLD rune and a BREADTH rune at once** — the one
+  state the two shapes were designed never to share. EZ named benching as the route in;
+  **the second route is the ordinary one and is new here**: `equipped_ability_names` is the EARNED
+  subset, so **a hero who has not drafted yet reads the same empty list**, which for a THRESHOLD
+  rune was the opening state of every run. **BOTH are closed, not just threshold** — two
+  conditions with different emptiness rules is a second thing to remember for no gain.
+- **§1a — THE GUARD'S PLACE WAS THE DECISION, NOT THE GUARD.** It sits in `Runes.threshold_met`
+  and `Runes.breadth_met_fraction` themselves, not in `loadout_condition_met`. One clause at the
+  door would have been cheaper and wrong: **the hero sheet and the loadout panel call the two
+  predicates DIRECTLY** for the tick beside the `RUNE CONDITIONS` line, so the rune would have been
+  refused while both screens still drew a ✓ on an empty bar. **A guard a display surface cannot see
+  is half a guard.** The now-redundant `member.is_empty()` line at the door is **kept and
+  labelled** rather than deleted.
+- **§1b — HEAD'S OWN GATE FOUND A DEPENDENCY THE BRIEF DID NOT NAME, AND THIS IS THE BATCH'S
+  MOST TRANSFERABLE FINDING.** `check_ez` §1 asserted the vacuity in the direction it was then
+  true, deliberately, *"so the day it is changed the gate says so."* **Run unmodified against FA's
+  code, HEAD's 96-check `check_ez` goes THREE red**: the vacuity assertion (predicted),
+  `13 of 21 landed`, and **all EIGHT gated runes named as not landing** (not predicted). §4's
+  *condition MET* arm was the EMPTY LIST for all twenty-one and worked only because an empty list
+  met both shapes vacuously. It is a real per-rune loadout now (`_met_drafted` — four-of-four on
+  the named tag for a threshold, a 2/2/2 six for breadth, **which no single list can both be**),
+  and **the arm is checked before it is used** so a wrong arm reads as one broken arm rather than
+  as twenty-one broken payloads. **Nothing in the diff points at it**; the first thing that would
+  otherwise have found it is a forty-five-minute battery, after the freeze. It is a standing rule
+  in `CLAUDE.md` now.
+- **§2 — SPLIT TONGUE IS 12% OF ATTACK ON THE RUNE'S VERSION, AND THE REDUCTION RIDES THE SAME
+  `set` THE WIDENING DOES.** `{"aoe": true, "damage": 12}` — which is what makes it the rune's
+  version rather than the card's. **An Occultist without the rune keeps 20% against three chosen
+  enemies** (`choose_three`), and `check_ez` §5 asserts that base FIRST, on the live Ability,
+  before applying the payload. **`choose_three` survives on the rune's Ability and is DEAD** —
+  `_resolve` reads `if ab.aoe: … elif ab.choose_two or ab.choose_three` — and it is pinned as
+  surviving-and-dead so a later batch does not conclude the card still picks three.
+- **§2a — THE MEASUREMENT DOES NOT SUPPORT THE REASON GIVEN FOR 12% OVER 10%, AND THE RULING WAS
+  BUILT AS RULED ANYWAY.** The stated argument was that halving *"risks making it a downgrade
+  against the four-enemy warbands a player meets most."* **At 12% it is already that downgrade.**
+  Damage per cast at Attack 100, twenty casts an arm, each arm on its own board with hp, statuses,
+  Break and Broken reset before every cast: **×0.61 at three enemies, ×0.79 at four, ×1.02 at
+  five, ×1.18 at six.** The break-even is arithmetic — N × 12 = 3 × 20 at N = 5. **Break pressure
+  moves the other way and is the half that is not priced at all**: ×1.00 / ×1.33 / ×1.67 / ×2.00,
+  because 15 Break and an Exposed reach every enemy instead of three. **A magnitude is the
+  designer's and a measurement is the batch's.**
+- **§2b — AND THE BRIEF'S PREMISE ABOUT ELITE ROSTERS IS FALSE, WHICH PUTS §2a's NUMBERS ON A
+  DIFFERENT BOARD.** `compose` floors the **BUDGET** at 6 (`budget = maxi(budget, 6)`), not the
+  enemy count, and a budget of 6 buys three power-2 enemies. Measured over 200 compositions at each
+  of six tiers: **elite and mini-boss rosters are THREE enemies at tiers 1 and 4 — every single
+  draw** — 3.12 at tier 8, 3.40 / 3.37 at tier 11, and a mean of only **4.87 / 4.79 at tier 16**.
+  **So the large board the rune was nerfed for is mostly the small board where the nerf costs
+  most.** **And the board caps at SIX**: `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]`, so
+  ×1.18 is the ceiling the rune can ever reach. Both are standing rules in `CLAUDE.md` now.
+- **§3 — WHAT DELIBERATELY DID NOT MOVE, READ OUT OF THE TREE AFTER THE BATCH.** **Bracing Line
+  stays at 32** (`BRACING_LINE_LEVEL`). **The Shared Hide's named list stands** — the batch that
+  extracts the ~84-term hero block into a callable is the one that re-points that rune.
+  `SC_PROFILE_DEFAULT`, `CRIT_EXCESS_STEP`, `BOND_CONVERT` (8), `BOND_MITIGATION_MAX` (0.75),
+  `SHIELDWALL_BLOCK` (25), `SS_SEQ_OPEN` and `SS_SEQ_TAPER` (0.85) are **untouched**. **No new
+  rune is authored** — eight specs and the class runes are still unwritten.
+- **§4 — THE CONTROLS, AND ALL THREE BIT.** (A) The §1 guard removed → `check_ez` **113 / 3**,
+  the three §1 assertions by name. (B) HEAD's `data/runes.json` — which IS the disarmed payload —
+  against FA's gate → **113 / 1**, `§5: Split Tongue takes it to 12% of Attack (reads 20)`.
+  (C) HEAD's whole gate against FA's code → **96 / 3**, above. **Every file was restored and the
+  restore was md5-verified**, not assumed.
+- **§5 — THE INSTRUMENTS.** The literal sweep reads **16,218 needles from 125 `.gd` files** and
+  **LOST 0 in every document**; **25 GAINED across four documents, and no negative `contains`
+  assertion anywhere touches one** — 303 negative assertions swept, the single containment hit is
+  `test_batch_bd`'s `perfect_text` against an **Ability**, not a document. **The sweep was armed
+  both ways first**: removing `THE ABILITY DRAFT` from `master.html` reads LOST 1 *and* turns
+  `test_batch_bo` §6 red, so the needle is one a suite demonstrably reads. **AND THE SWEEP HAD A
+  GAP THAT IS WORTH THE LINE**: `state.md` was rewritten AFTER the second snapshot, so its rewrite
+  sat outside the before/after pair and the zero would have covered a file it never compared.
+  Re-run before-all-edits against final it reads **LOST 10** — all ten EZ's WHERE block, in the one
+  document nothing opens (every mention of the path in the corpus is a comment) and the one the
+  battery ran green on. **Take the FIRST snapshot before the first doc edit and the LAST after the
+  last one; a snapshot in the middle measures whatever happened to be done at the time.**
+- **§6 — THE BATTERY.** **93 targets**, `sort .ran | uniq -d` **ZERO duplicates**, **0
+  `Parse Error`, 0 `SCRIPT ERROR`, 0 timeouts** across every log. `check_ez` **113 / 0**,
+  `test_runes` **3804 / 0**, `check_es` **44 / 0**, `check_et` **24 / 0**, `check_ek` **46 / 0**,
+  `check_parse` **167 / 0**, `check_ed` **18 / 0**. **The only red is `check_cm_live` 13 / 4**,
+  whose four FAIL lines are the four its baseline row names. **The freeze held EXACTLY**: an md5
+  stamp with absolute paths, tracked AND untracked, before and after, **zero differ**.
+- **WHAT MOVED: TWO GAME FILES, ONE TARGET AND SIX DOCUMENTS.** `scripts/runes.gd` (two guards and
+  three comment blocks, one of them a stale rationale corrected — the door's `member.is_empty()`
+  was load-bearing only while the arithmetic read generously); `data/runes.json` (**one payload and
+  one desc; no other entry moved a byte**); `check_ez.gd` (96 → 113); `baselines.json` (two rows,
+  **zero line churn** — the file is `indent=1`); `docs/changelog.html`, `CLAUDE.md` (one rule
+  inverted, two added), `docs/master.html` and its stamp, `docs/design-notes.md`, this file and
+  `docs/reports/FA.md`.
+- **Next letter: FB.** FA still sorts above every suite's own stamp compare — the highest is
+  `"CE"`, and all fourteen read exactly TWO characters.
+- **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
+  talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
+  against four specs** with **eight specs still unauthored**. **What EZ left open is now closed**:
+  the loadout conditions are ruled at their boundary and Split Tongue is priced. **What is left in
+  the rune layer is still authoring and it is still the designer's, one rune at a time.** **The
+  ladder still has an open design question of its own (what rung 2 should ASK), and it is the
+  largest unbuilt item on this list.** **And §2a leaves the first genuinely open NUMBER the rune
+  layer has had since EZ**: 12% is built, and whether it should be 15% or 20%-with-a-smaller-Ruin
+  is a design question with a measurement under it.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 

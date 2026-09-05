@@ -523,10 +523,27 @@ static func breadth_met(loadout_names: Array, need: int) -> bool:
 # Written as `x 2 >=` rather than as a float ratio because half of an odd count
 # has to round the same way every time it is read, and integer arithmetic is
 # the only form of that which cannot drift between a condition and the surface
-# printing it. **AN EMPTY DRAFTED LIST MEETS IT VACUOUSLY** (0 >= 0) — that is
-# the literal reading of the rule and it is REPORTED rather than guarded, see
-# `docs/reports/EZ.md` §0b.
+# printing it.
+#
+# **BATCH FA §1 — AN EMPTY DRAFTED LIST NOW MEETS NEITHER CONDITION.** EZ built
+# both rules literally and the literal reading is vacuous: nothing carries the
+# tag, so nothing fails to be half of it (`0 * 2 >= 0`). It is REACHABLE —
+# `Run.unequip_earned_ability` has no floor, so a player can bench every earned
+# card — and a hero who benched everything switched on a THRESHOLD rune and a
+# BREADTH rune at the same time, **the one state the two shapes were designed
+# never to share.** The designer has ruled BOTH closed: a condition about a
+# hero's drafted cards is not met by a hero who has drafted none.
+#
+# **THE GUARD IS HERE AND NOT IN `loadout_condition_met`, AND THE PLACE IS THE
+# RULING.** The hero sheet and the loadout panel call THIS function for the
+# tick they draw beside `threshold_line` (`party_screen._draw_detail`,
+# `map_screen._open_loadout_panel`). A guard one layer up would refuse the rune
+# while both screens still drew a ✓ on an empty bar — one fact rendered two
+# ways, which is exactly what the ONE BUILDER rule above `threshold_line`
+# exists to prevent.
 static func threshold_met(drafted: Array, tag: String) -> bool:
+	if drafted.is_empty():
+		return false
 	return Classes.primary_tag_count(drafted, tag) * 2 >= drafted.size()
 
 
@@ -539,7 +556,15 @@ static func threshold_met(drafted: Array, tag: String) -> bool:
 #
 # "Exceeds" is strict, so a tag sitting exactly ON a third passes: at 6 drafted
 # cards a peak of 2 is fine and 3 is not. Same integer discipline as above.
+#
+# **AND THE EMPTY LIST IS CLOSED HERE TOO (FA §1), FOR THE REASON IT IS CLOSED
+# ABOVE AND NOT FOR A WEAKER ONE.** Breadth-of-nothing is arguably harmless on
+# its own — no tag dominates a list with no tags in it — but it is the same
+# degenerate state, and **two conditions with different emptiness rules is a
+# second thing to remember for no gain.** Ruled closed together, deliberately.
 static func breadth_met_fraction(drafted: Array) -> bool:
+	if drafted.is_empty():
+		return false
 	return Classes.primary_tag_peak(drafted) * 3 <= drafted.size()
 
 
@@ -565,10 +590,15 @@ static func drafted_names(member: Dictionary) -> Array:
 # warning on itself.
 #
 # **AN EMPTY MEMBER MAKES A GATED PAYLOAD INERT** rather than silently
-# unconditional — `condition_met`'s own stated direction, carried through here:
-# a hero with no member dict has no drafted cards, and `threshold_met` over an
-# empty list is the one place that reading is generous, which is why the
-# EMPTINESS is checked here and not left to the arithmetic.
+# unconditional — `condition_met`'s own stated direction, carried through here.
+# **FA §1 MADE THIS LINE REDUNDANT AND IT IS KEPT DELIBERATELY.** It was load-
+# bearing while an empty drafted list read GENEROUSLY: it was the only thing
+# standing between a member-less caller and an unconditional payload. Both
+# predicates now refuse an empty list themselves, so a member with no dict
+# would be refused by the arithmetic one line down — but this states the
+# intent at the door rather than leaving it to a property of two other
+# functions, and a caller with no member is a different fault from a hero who
+# benched his bar.
 static func loadout_condition_met(cond: Dictionary, member: Dictionary) -> bool:
 	if cond.is_empty():
 		return true

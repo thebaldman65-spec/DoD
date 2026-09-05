@@ -2120,15 +2120,61 @@ the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN*
   of an odd count has to round the same way every time it is read and integer arithmetic is the
   only form of that which cannot drift between a condition and the surface printing it.
   **"Exceeds" is strict**: at 6 drafted cards a peak of 2 passes and 3 does not.
-- **AN EMPTY DRAFTED LIST MEETS BOTH, VACUOUSLY, AND IT IS REPORTED RATHER THAN GUARDED.** 0 ≥ 0
-  and 0 ≤ 0. It is the literal reading of both rules, it is implemented literally, **and it is
-  reachable by benching everything** — a batch does not alter an authored condition, so this is
-  named in `docs/reports/EZ.md` §0b and left for the designer.
+- **AN EMPTY DRAFTED LIST MEETS NEITHER CONDITION — RULED AT FA §1, AND BOTH ARE CLOSED.** EZ
+  built the two rules literally and the literal reading was vacuous (`0 * 2 >= 0` and
+  `0 * 3 <= 0`), so **a hero with no drafted cards switched on a THRESHOLD rune and a BREADTH rune
+  at the same time** — the one state the two shapes were designed never to share. **It was
+  reachable two ways**: `Run.unequip_earned_ability` has no floor, so a whole drafted half can be
+  benched — and a hero who has not drafted yet reads the same empty list, which is
+  `equipped_ability_names`' own stated behaviour. **BREADTH IS CLOSED WITH THRESHOLD EVEN THOUGH
+  BREADTH-OF-NOTHING IS ARGUABLY HARMLESS**, because it is the same degenerate state and **two
+  conditions with different emptiness rules is a second thing to remember for no gain.**
+- **AND THE GUARD BELONGS IN THE TWO PREDICATES, NOT AT THE DOOR — THE PLACE IS PART OF THE RULE.**
+  `threshold_met` and `breadth_met_fraction` each refuse an empty list themselves. One clause in
+  `loadout_condition_met` would have been cheaper and wrong: **the hero sheet and the loadout panel
+  call the two predicates DIRECTLY** for the tick beside the `RUNE CONDITIONS` line, so the rune
+  would have been refused while both screens still drew a ✓ on an empty bar — one fact rendered two
+  ways, which is what the ONE BUILDER rule above `threshold_line` exists to prevent. **A guard that
+  a display surface cannot see is half a guard.**
 - **THE ONE DOOR IS `Runes.loadout_condition_met`, AND `talents.gd` NAMES NO TAG WORD.**
   `condition_met` hands the whole `cond` dict over rather than reading the two keys itself, because
   `check_ek` §3 asserts the set of `.gd` files naming the tag surface is exactly four. **The rune
   layer's vocabulary stays in the rune layer** — that is ES §4's own rule, and the day a fifth file
   names a tag, that gate is what says so.
+
+## STANDING RULE — RUN HEAD'S OWN GATE AGAINST THE NEW CODE BEFORE RE-POINTING IT (Batch FA §1b)
+
+> **A gate that asserts a behaviour IN THE DIRECTION IT IS CURRENTLY TRUE is an instrument for the
+> batch that changes that behaviour. Run it unmodified against the new tree FIRST — before you edit
+> a single assertion — and read every red. The reds you did not predict are the dependencies.**
+
+- **FA IS THE WORKED EXAMPLE AND IT FOUND ONE THE BRIEF DID NOT NAME.** `check_ez` §1 asserted the
+  loadout vacuity deliberately, *"so the day it is changed the gate says so."* FA is that day. Run
+  unmodified against FA's code, HEAD's 96-check `check_ez` goes THREE red: the vacuity assertion
+  (predicted), `13 of 21 landed`, and **all EIGHT gated runes named as not landing** (not
+  predicted). §4's *condition MET* arm was the EMPTY LIST for all twenty-one and worked only
+  because an empty list met both shapes vacuously.
+- **THE COST OF SKIPPING IT IS A BATTERY.** That red is invisible from the diff — nothing in §4
+  mentions emptiness, and the arm reads as an ordinary `_member(...)` call — so the first thing
+  that would have found it is a forty-five-minute battery run, after the freeze.
+- **AND A RE-POINTED ARM IS CHECKED BEFORE IT IS USED.** §4's replacement asserts that the loadout
+  it just built really does meet the condition, **so a wrong arm reads as one broken arm rather
+  than as twenty-one broken payloads.** A rebuilt arm is new code in the gate and gets no more
+  trust than the code it is testing.
+
+## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
+
+> **`compose` floors elite and mini-boss encounters with `budget = maxi(budget, 6)`. That is SIX
+> POINTS OF BUDGET, not six enemies. A budget of 6 buys three power-2 enemies, and it usually
+> does.**
+
+- **MEASURED, 200 COMPOSITIONS AT EACH OF SIX TIERS.** Elite and mini-boss rosters are **THREE
+  enemies at tiers 1 and 4 — every single draw** — 3.12 at tier 8, 3.40 / 3.37 at tier 11, and
+  they reach a mean of only **4.87 / 4.79 at tier 16.** Anything reasoning about "the big board"
+  from that floor is reasoning about a board the player mostly does not meet.
+- **AND THE BOARD ITSELF CAPS AT SIX.** `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]`, so a
+  seventh enemy would index past the layout array. **Six is the ceiling any AoE magnitude can ever
+  be priced against**, and `_theme_combos` is what actually decides the count.
 
 ## STANDING RULE — A RUNE READS A TAG NOW, AND EK'S INERTNESS CLAIM IS OVER (Batch EZ, deliberately)
 

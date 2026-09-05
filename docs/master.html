@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-05 (Batch EZ &mdash; the first twenty-one runes)</b></p>
+<p align="right"><b>Last updated: 2026-09-05 (Batch FA &mdash; two rulings EZ left open)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2040,6 +2040,7 @@ by construction: a trash enemy will not live long enough for the stacks to run a
 and a boss will. The stacks only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
 Smite — 25% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
 Hex of Ruin — 20 Mana, 2.5, 2cd; curse THREE chosen enemies for 20% Atk shadow / 15 BD
+  (the Split Tongue rune makes it hit the WHOLE line at 12% Atk a target instead — Batch FA §2)
 each, leaving them Exposed 3 turns (Perfect: no cooldown).<br>
 Bewitch — 25 Mana, 3.5, 4cd; the target basic-attacks its OWN allies for 3 turns,
 Dazing them with every strike — charms and Dazes feed Ruin. <b>A boss REFUSES it until
@@ -2604,10 +2605,19 @@ sheet and the loadout panel each carry a <code>RUNE CONDITIONS</code> line &mdas
 7 &mdash; DEBUFF&rdquo;</i>, with a tick where the condition is met &mdash; beside the existing
 census, rebuilt from the live member on every draw. <b>A player who cannot see he is one card
 away cannot use the lever.</b>
-<br><b>AN EMPTY DRAFTED LIST MEETS BOTH CONDITIONS, VACUOUSLY, AND THAT IS REPORTED RATHER THAN
-GUARDED.</b> Nothing carries the tag, so nothing fails to be half of it; no tag exists, so none
-exceeds a third. It is the literal reading of the two rules, it is implemented literally, and it
-is reachable by benching everything.
+<br><b>AN EMPTY DRAFTED LIST MEETS NEITHER CONDITION (Batch FA &sect;1, ruled by the
+designer).</b> EZ built the two rules literally and the literal reading was vacuous &mdash; nothing
+carries the tag, so nothing fails to be half of it; no tag exists, so none exceeds a third &mdash;
+which meant <b>a hero with no drafted cards switched on a THRESHOLD rune and a BREADTH rune at the
+same time</b>, the one state the two shapes were designed never to share. <b>It was reachable two
+ways</b>: <code>Run.unequip_earned_ability</code> has no floor, so a hero's whole drafted half can
+be benched, and a hero who has not drafted yet reads the same empty list. <b>BOTH are closed, not
+just threshold</b> &mdash; breadth-of-nothing is arguably harmless on its own and it is the same
+degenerate state, and two conditions with different emptiness rules is a second thing to remember
+for no gain. <b>The guard sits in <code>threshold_met</code> and
+<code>breadth_met_fraction</code> themselves rather than at the door</b>, because the hero sheet
+and the loadout panel call those two DIRECTLY for the tick they draw: a guard one layer up would
+refuse the rune while both screens still showed a &check; on an empty bar.
 <br><b>THE CONDITION IS READ AT THE SPAWN AND NEVER IN THE STRIKE LOOP.</b> A loadout cannot
 change during a battle, so a gated payload is decided once, where <code>Talents.apply_payload</code>
 already reads its <code>condition</code> &mdash; and <code>Runes.loadout_condition_met</code> is
