@@ -5,94 +5,94 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-04 (Batch EV).*
+*Last rewritten: 2026-09-04 (Batch EW).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: EV — A CONVERTED STACK NEVER PAYS NOTHING.** **EU's finding is repaired.** When a
-  converted Loyalty stack would pay into a boon that is already at its clamp, **it pays the strike
-  step instead** — exactly as it would have below the split. **Nothing else moved: no clamp was
-  raised, no rate, cap or accrual moved, the split stays at 8 and no rune was authored.** Full
-  working: **`docs/reports/EV.md`**. The mechanic's own summary is in **THE LOYALTY CURVE** below;
-  what follows here is only what the batch MOVED.
-- **§1 — `_bond_fallback()` SITS BESIDE `_bond_convert()` AND BOTH HALVES READ IT FROM ONE CALL.**
-  The count is added to `_bond_paid` and subtracted from `_bond_converted`, so the two stay disjoint
-  and still sum to the whole meter **by construction rather than by care** — which is the failure
-  the brief named: a stack paying the boon *and* the strike step because the saturation test and the
-  payment happen in different places. **`_bond_paid` / `_bond_converted` take a `kind` now**, because
-  saturation is a property of WHICH boon the stack would feed; all six call sites already had one.
-- **§1a — THE SATURATION POINT IS DERIVED FROM THE CLAMPS, NEVER WRITTEN DOWN**, and **the
-  LATER-BINDING clamp governs**. Savage Presence's two coefficients are named constants and both
-  read sites spend them. The draw saturates at a boon of 6.67 and the cover at 7.50, so between them
-  is a band where a stack is worthless to one and not the other — **a stack comes back only when it
-  is worthless to both.**
-- **§1b — IT IS PER STACK AND IT DECLINES THE ONE-STACK WINDOW.** At the untalented step Loyalty 21
-  hands back one stack of thirteen and converts the other twelve, in the same battle on the same
-  blow. At the deep step **Loyalty 9 is the only depth where a converted stack still buys the clamp
-  (0.73 against 0.75) and it is not handed back** — a fallback one stack greedy fails exactly there
-  and nowhere else in the tree.
-- **§2 — MEASURED, AND THE BRIEF'S OWN FIGURE WAS THE POOLED ONE.** The rows=9 arm reproduces
-  (4,093 blows against EU's 4,074; pooled loss 36.37% against EU's 36.70%). **The bear's own slice
-  was worse than the 36.7% the brief quoted — 40.17% — and it now reads 0.00%.** Over its 228 blows
-  **the boon itself was LOWER on 183 and the mitigation and taunt differed on none.** Canis and
-  Aguila are bit-identical on both sides, which is correct: nothing clamps their boons.
-- **§3 — AND THE LARGER FINDING IS REPORTED, NOT FIXED: AGUILA IS WASTED HARDER THAN THE BEAR.**
-  Its party crit has **no clamp** but an implicit ceiling — `randf() < crit_chance` — and at
-  rows 1–9 **58.7% of the rolls where its boon is live are already at or over total crit 1.0**
-  (0.23% at rows 0, 6.4% at rows 1–3), mean total crit **1.93**, and **60.3% of every point the
-  eagle delivers there lands above the ceiling**. **The fallback deliberately does
-  not reach it**: the ceiling is shared with every other crit source, so whether a stack is wasted
-  depends on the attacker, the ability and the target — a question `_bond_fallback` cannot answer
-  from the hunter alone. Canis genuinely never saturates (×30.16 at rows 1–9, still climbing).
-  **Both are in the OPEN QUEUE below and ruled on nowhere.**
-- **§4 — A NEW GATE, LIVE THROUGHOUT, AND SEVEN CONTROLS THAT ALL BIT.** `check_ev` (54 checks)
-  drives every section, because a fallback that never fires and one that fires for every stack
-  **would both pass a static check**. Controls: **HEAD's own `battle.gd` verbatim** (7 failures, §3
-  reading ratio 1.0000 at 131 vs 131 — EU's shipped behaviour), never firing (14), firing for every
-  converted stack (8), one stack greedy (7), the stack paying BOTH halves (8, with the live
-  invariant reading 49 violations of 240), `_bot_boon_worth` left behind (1) and a read site back to
-  a literal (1). Every restore was by `cp` from a scratchpad backup, md5 verified identical all
-  seven times, never `git checkout`. **The gate's own instrument was wrong once and it is recorded
-  in the file** — §2b read 86 against 90 and running the arms in the OTHER ORDER read 86 against 90
-  again, so it is the first pass through `_resolve`, not the meter.
-- **§5 — TWO INSTRUMENTS CAUGHT WHAT A DIFF COULD NOT, AND THIS IS THE BATCH'S PROCESS FINDING.**
-  The **literal sweep** found **three needles in `test_batch_ay`** the refactor broke, all three of
-  which a comment-stripped diff reads as ordinary code movement; all three were **re-pointed to
-  intent, not deleted**, and that suite's count is unmoved at 486. And **`check_ed`, run against
-  HEAD's manifest BEFORE it was regenerated**, found a new local variable colliding with a needle
-  `test_batch_bg` pins ABSENT — **the variable was renamed rather than the pin weakened**, and the
-  comment explaining the rename tripped the same needle a second time by naming the word.
-- **THE BATTERY: `check_de` READ 374 CHECKS / 0 FAILURES / 0 NOTICES**, the `Parse Error` grep is
-  clean across all 91 logs, `SCRIPT ERROR` is 0, and **the only red in the run is `check_cm_live`
-  at 13 / 4 — its four FAIL lines read and confirmed to be the defensive-bar assertions its row
-  names.** `check_parse` **165**, `check_ev` **54**, `check_eu` **38 (unmoved)**, `test_batch_ay`
-  **486 (unmoved)**, harness 22 / 166 / 8. **`sort .ran | uniq -d` holds ZERO duplicates**, so one
-  battery wrote these logs. **The tree was frozen and the freeze was CHECKED**: an md5 stamp of all
-  212 files before and after the run differs in exactly two — this file and `docs/reports/EV.md`,
-  the two nothing loads — and the post-run figure corrections were needle-swept against the copy the
-  battery itself read, at **0 LOST and 0 GAINED** in all four asserted documents — **and then all
-  36 targets that load one of those documents were RE-RUN against the edited copies (derived by
-  grepping the `res://` paths, not listed): all clean, and all reporting the IDENTICAL counts the
-  battery read.**
-- **AND §2's FIGURES WERE MEASURED TWICE, BECAUSE THE FIRST READING WAS OVER LOGS STILL BEING
-  WRITTEN.** Three arms ran in parallel and two were analysed mid-flight, so the analysis read a
-  prefix and reported it as the whole run — same shape, same conclusion, wrong counts (rows 1–9 read
-  28,156 crit rolls against a true 34,785). **The control is `rows 0`, which had already finished:
-  it is bit-identical between the two readings**, which is what proves the difference is the
-  truncation and not the analysis. Report §6g.
-- **TWO BASELINE ROWS MOVED AND BOTH
-  WERE WRITTEN BEFORE THE RUN** — the new `check_ev` at 54 / 0 and `check_parse` 164 → 165, whose
-  count IS its coverage. Every other row is predicted unmoved, `check_eu` at 38 and `test_batch_ay`
-  at 486 included; both were re-pointed in place.
-- **WHAT MOVED: ONE SOURCE FILE, TWO SUITES RE-POINTED IN PLACE, ONE NEW GATE, THE BATTERY AND
-  SEVEN DOCUMENTS.** `scripts/battle.gd` (two constants, four helpers, two signatures, six call
-  sites, two read sites and the chip's fifth line); `check_eu.gd` and `test_batch_ay.gd` **both with
-  their counts unmoved**; the new `check_ev`; `run_battery.sh`; `docs/master.html`,
-  `docs/changelog.html`, `CLAUDE.md`, `docs/design-notes.md`, `baselines.json`, `pin-manifest.json`,
-  this file and `docs/reports/EV.md`. **NO RUNE, NO NODE, NO CLAMP, NO CAP AND NO RATE MOVED.**
-- **Next letter: EW.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
+- **Last batch: EW — CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER.** **EV's §3 finding is
+  built.** A total crit chance over 100% cannot make a hit more certain, so the surplus is paid as
+  critical DAMAGE instead, **from every source, game-wide**, at `CRIT_EXCESS_STEP`. **Nothing else
+  moved: no clamp was raised, Focus's own conversion point and rate are untouched, the Loyalty split
+  stays at 8 and no rune was authored.** Full working, with every figure's n and standard error:
+  **`docs/reports/EW.md`**.
+- **§0 — THE BRIEF ASKED FOR ONE PLACE AND THE TREE HAS FOUR. THIS IS THE BATCH'S FIRST FINDING AND
+  IT WAS REPORTED BEFORE ANYTHING WAS BUILT.** The crit roll happens at **four** sites in
+  `battle.gd` — `_resolve`'s strike loop (a twelve-term assembly), `_heal_crit_mult`, `_ghost_hit`
+  and `_companion_hit`. **Only the strike loop assembles more than three terms and only it can pass
+  a certainty today**: over 202,000 crit rolls at three loadouts the deepest total the other three
+  ever reached was **0.37**. So the RULE has ONE body — `_crit_excess_mult` — and **all four rolls
+  spend it**; the three thin sites are paid exactly zero and change nothing. **A fifth roll that
+  forgets the call is what `check_ew` §0 is built to catch**, and its census is DERIVED (a crit roll
+  is a `randf() <` against a NAMED variable whose declaration carries `CRIT_CHANCE`) rather than
+  listed, because a gate naming the four would pass on the day a fifth arrives.
+- **§1 — THE RATE IS A NAMED CONSTANT, IT SHIPS AT FOCUS'S OWN, AND IT IS FLAGGED RATHER THAN
+  TUNED.** `CRIT_EXCESS_STEP` = **1.0** — one point of surplus chance for one point of multiplier,
+  which is exactly what `FOCUS_STEP` has always traded at. **It is deliberately NOT derived from
+  `FOCUS_STEP`**, because that would assert a rate tuned for one meter is right for a total
+  assembled from twelve terms, which is the open question. **0.25 and 0.50 are priced beside it at
+  all three arms in the report.**
+- **§1a — AND THE BRIEF'S HEADLINE WAS OVER A DIFFERENT POPULATION THAN THE ONE IT NAMED.** *"At
+  rows 1–9 the party's mean total crit is 1.93"* is **EV's figure over the rolls where Aguila's boon
+  is LIVE**, and those are **2.6% of the heroes' rolls**. Re-derived on its own population it
+  reproduces (mean 2.170, 55.8% at or over a certainty, 65.6% of the boon above the ceiling).
+  **Over EVERY hero roll the mean total crit at that arm is 0.172 and only 1.5% are at or past
+  1.0.** So the swing is **small at the party and large on the blow**, and both halves are in the
+  report.
+- **§2 — IT CANNOT REACH AN ENEMY, AND THE QUESTION IS CLOSED RATHER THAN HANDED OVER.** Over
+  **69,932 enemy crit rolls** across all three arms the deepest total any enemy assembled was
+  **0.3500** — the base 10% plus a Broken target's 25% — and **none reached a certainty**. It is
+  structural, not lucky: `_party_crit_bonus()` is hero-gated at its read site, `crit_bonus` is
+  written on the HERO spawn path and inherited only by companions (its one other writer, `dulledge`,
+  SUBTRACTS), and every remaining term is a talent counter an enemy has no tree to hold. **No
+  difficulty change and nothing for the designer to rule on.**
+- **§3 — `BOND_MITIGATION_MAX` STAYS AT 0.75, RULED, WITH ITS REASONING RECORDED.** The guard forces
+  some value below 1.0 and does not force 0.75 — **but that constant is a 75% damage reduction and
+  0.90 would make it 90%**, which is a large survivability change wearing a saturation fix's
+  clothes. EV's fallback already answers the waste. **Recorded so the priced alternative is not
+  re-proposed as a discovery.**
+- **§4 — TWO CORRECTIONS TO SHIPPED DOCUMENTATION, FOUND ON THE WAY AND NEITHER IN SCOPE.**
+  `master.html` §4.3 said Aguila grants **+15%** crit; the code grants **+10% scaled by the bond
+  tier**, which is what the same document already says in two other places. And **`CLAUDE.md`'s
+  claim that every `data/*.json` is TAB-indented is false for half of them** — `glossary.json` and
+  `enemies.json` are single-space indented with no trailing newline, and `events.json` and
+  `runes.json` match no simple `json.dumps` form at all. **The rule's own procedure is what found
+  it** (round-trip the unmodified parse and assert byte equality before writing), and that is the
+  half that now carries the rule.
+- **§5 — THE GATE, AND EIGHT NEGATIVE CONTROLS THAT ALL BIT.** `check_ew` (**38 checks**) drives §2
+  and §3 live, because the brief names the failure family exactly: *a conversion computed after the
+  roll, or on a per-source total rather than the assembled one, would pass every static check.*
+  Controls: HEAD's own `battle.gd` verbatim (9 failures), converting `crit_bonus` instead of the
+  assembled total (3 — the live arm reading **1.9335 against a predicted 2.0000**), the missing
+  `maxf` floor (3), a fifth roll site added without the call (3), `_companion_hit` dropping the call
+  (3), the rate at 0.0 (3 — the live arm reading **436 against 436**), the conversion stubbed to
+  zero (4) and the conversion applied before the roll instead of after (4). Every restore was by
+  `cp` from a scratchpad backup, md5 verified, never `git checkout`.
+- **§6 — AND THE GATE'S OWN FIRST TWO INSTRUMENTS WERE WRONG, BOTH IN THE DIRECTION THAT PASSES.**
+  The census fingerprint took every `randf() <` line containing the word *"crit"* and read
+  **THREE** — `_heal_crit_mult`'s roll line is `if randf() < hc_chance:` and carries the word
+  nowhere. And §3's live arms ran without resetting the Sharpshooter's Focus between them, so the
+  second arm started where the first finished, deep past his own split point: **with the conversion
+  stubbed to zero that section still read 1325 against 538 and passed**, measuring Focus accrual and
+  calling it the surplus. **Both are recorded in the gate at the site**, and §3's own §3-shaped
+  retreat is recorded there too — the sharper section that recovers the base multiplier from two
+  arms reads ×1.16 against a true ×2.00 on this fixture, because armor and the `maxi(..., 1)` floor
+  sit below the crit block and a subtractive term inflates a two-point ratio.
+- **§7 — AND THE LITERAL SWEEP CAUGHT A RULE VIOLATION THE DOCUMENTATION WOULD OTHERWISE HAVE
+  SHIPPED.** The glossary's rewritten crit entry said *"the whole party"*, which `test_batch_bx` §4b
+  pins absent from `data/glossary.json`. **And the same sweep was structurally blind to the same
+  word in `master.html`**, because that file already carried `party` inside code identifiers, so the
+  needle was not GAINED — it was already present. **A sweep reports on needles that MOVE; a word
+  already in the file cannot move.** Both were corrected and `test_batch_bx` was driven (161 / 0).
+- **WHAT MOVED: ONE SOURCE FILE, ONE NEW GATE, THE BATTERY AND SEVEN DOCUMENTS.**
+  `scripts/battle.gd` (one constant, one new helper, four roll sites, three chances named);
+  the new `check_ew.gd`; `run_battery.sh`; `baselines.json`; `docs/master.html` and its stamp;
+  `docs/changelog.html`; `CLAUDE.md`; `docs/design-notes.md`; `data/glossary.json`; this file;
+  and `docs/reports/EW.md`. **The two `.docx` exports were rebuilt and are OUTSIDE this repo**
+  (one directory up, not under version control). **NO RUNE, NO NODE, NO CLAMP, NO CAP AND NO OTHER
+  RATE MOVED.**
+- **Next letter: EX.** The stamp compare reads exactly TWO characters, so a THREE-letter code is
   what breaks it — still a long way off.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and the rune layer's mechanics were charter-clean at 59 of 59
@@ -100,47 +100,63 @@ in `docs/master.html`.
   recognition, the power arm, the collision rule and ES's tag-reading helpers all stand and are all
   asserted; nothing is offerable but the six generated stat sticks. **What is left in the rune layer
   is authoring, and it is the designer's, one rune at a time.** **The Loyalty curve is RULED, BUILT
-  AND NOW REPAIRED (it converts at 8, EU; a converted stack never pays nothing, EV), and what is
-  left of it is the RUNE that moves the point — which is authoring and waits on the pool. Two
-  clamp questions are now the designer's and both are priced (below). And the ladder still has an
-  open design question of its own (what rung 2 should ASK).**
+  AND REPAIRED (it converts at 8, EU; a converted stack never pays nothing, EV), and what is left of
+  it is the RUNE that moves the point — which is authoring and waits on the pool. Both of EV's clamp
+  questions are now CLOSED — one ruled (§3), one built (the whole of EW). What EW leaves is a single
+  number, the RATE, and the ladder still has an open design question of its own (what rung 2 should
+  ASK).**
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE TWO CLAMP QUESTIONS EV HANDS OVER — **MEASURED AT EV §2, RULED ON NOWHERE**
+### THE ONE NUMBER EW HANDS OVER — **THE RATE, PRICED AT THREE VALUES, AUTHORED AT ONE**
 
-**Full evidence: `docs/reports/EV.md` §2.** EV repaired the *consequence* of a saturated clamp — a
-converted stack that pays nothing now pays the strike step — and **deliberately moved no clamp**.
-Two decisions are left, and they are independent of each other and of the fallback.
+**Full evidence: `docs/reports/EW.md` §1.** The mechanism is ruled and built; **the rate is the
+designer's and it is the only thing EW leaves open.** `battle.CRIT_EXCESS_STEP` ships at **1.0**,
+which is Focus's own exchange rate and therefore the one value that is not an invention — and it is
+a named constant precisely so this is one line to move.
 
-- **(1) `BOND_MITIGATION_MAX` 0.75 IS A CHOICE INSIDE A FORCED BAND, AND IT IS THE SHARPER OF THE
-  TWO.** Its own header says why the clamp exists: an uncapped bear mitigation crosses zero and
-  starts *healing* the hunter off enemy attacks. **That guard forces some value below 1.0. It does
-  not force 0.75.** 0.85 or 0.90 satisfy it identically and would push the bear's saturation point
-  from a boon of 7.50 to 8.50 or 9.00 — **one to two more stacks of real cover at the deep step and
-  five to seven at the untalented one** before the fallback starts. **The fallback is correct at
-  any value it takes**, because it derives its point from the constant; raising the clamp and
-  keeping the fallback are independent choices and the designer can take either, both or neither.
-  **Savage Presence's taunt ceiling of 1.0 is NOT in this question**: it is `minf(..., 1.0)` on a
-  probability, so it is arithmetic and there is no version of the game in which it is 1.2.
-- **(2) AGUILA'S BOON HAS NO CLAMP AND IS WASTED HARDER THAN THE BEAR'S EVER WAS.** The party crit
-  it feeds is spent as `randf() < crit_chance` with no ceiling written anywhere, so everything past
-  a certainty buys nothing. **At rows 1–9, 58.7% of the rolls where its boon is live are already at
-  or over total crit 1.0** — 0.23% at rows 0, 6.4% at rows 1–3 — with mean total crit **1.93**
-  against a maximum useful 1.00, and **60.3% of every point the eagle delivers there above it**. **EU's `+48.96%` party-crit gain at that arm is therefore a
-  multiplier that is substantially unspendable**, which is not an error in EU's measurement but is
-  the sentence that was missing beside it.
-  · **WHY THE FALLBACK DOES NOT REACH IT, AND THIS IS THE PART THAT MAKES IT A DESIGN QUESTION.**
-    The eagle's ceiling is **not a property of its boon**: it is shared with the base rate,
-    `crit_bonus`, Precision Strikes, Killing Edge, Supernova, Focus's own converted half and a
-    Broken target's +25%. **On 0 of the rolls measured at any arm was the total already at 1.0
-    WITHOUT the eagle's contribution** — so the boon is never wholly wasted, it is the thing pushing
-    the total over, and only the part above 1.0 is lost. Whether a given stack is wasted depends on
-    **who is attacking, with what, and whether the target is Broken**, which `_bond_fallback` cannot
-    answer from the hunter alone. A repair here is a different mechanism, not a wider `if`.
-- **CANIS IS NOT A QUESTION.** Its term is genuinely unbounded — measured at ×30.16 at rows 1–9 and
-  still climbing — so no stack of the wolf's ever pays nothing.
+- **THE SWING IS SMALL AT THE PARTY AND LARGE ON THE BLOW, AND THE SECOND HALF IS THE ONE TO CHOOSE
+  AGAINST.** Measured as an exact counterfactual over the same rolls (the conversion consumes no
+  randomness, so the arithmetic is exact rather than an A/B), the heroes' mean damage multiplier per
+  strike moves **+0.000% / +0.055% / +2.703%** at rows 0 / 1–3 / 1–9 at a rate of 1.00, and
+  proportionally less at 0.50 and 0.25. **Driven live as two independent arms it reads
+  +0.14% ± 0.10 / +0.27% ± 0.09 / +1.72% ± 0.16 — and the rows-0 arm is that comparison's own noise
+  floor**, because the conversion provably cannot fire there.
+- **THE TAIL IS WHERE THE RATE ACTUALLY LIVES.** At rows 1–9, **1.15% of hero strikes land with the
+  total already past a certainty**, at a mean total crit of **2.515**. Those blows go
+  ×1.5 → **×2.10 / ×2.70 / ×3.90** at 0.25 / 0.50 / 1.00, and the **worst single blow measured**
+  goes ×1.5 → **×4.31 / ×7.12 / ×12.74**. **The term feeding that tail has no ceiling anywhere** —
+  Aguila's boon rides an uncapped Loyalty meter — so before EW the certainty ceiling was acting as
+  a de facto clamp on it, and the rate is what decides how much of that clamp is given back.
+- **WHAT WOULD MAKE 1.00 THE WRONG NUMBER:** it is Focus's rate, and Focus is one meter one spec
+  builds on one target. This prices a total assembled from twelve terms across four heroes. **The
+  rate is not derived from `FOCUS_STEP` for exactly that reason**, and a designer taking 0.50 or
+  0.25 is moving one constant with no other consequence — the fallback, the gate and every figure
+  in the report are all expressed against the live value.
+- **AND NOTHING ELSE IN EW IS OPEN.** §2 closed the enemy question on a structural answer, §3 ruled
+  the clamp stays at 0.75, and the mechanism itself is ruled.
+
+### `BOND_MITIGATION_MAX` STAYS AT 0.75 — **RULED AT EW §3. NOT A QUESTION ANY MORE.**
+
+**EV measured and priced it; the designer has ruled it stays.** The guard forces some value below
+1.0 and does not force 0.75 — 0.85 or 0.90 would satisfy it identically and would push the bear's
+saturation point from a boon of 7.50 to 8.50 or 9.00, which is one to two more stacks of real cover
+at the deep step and five to seven at the untalented one. **But that constant is a 75% damage
+reduction and 0.90 would make it 90%**, which is a large survivability change wearing a saturation
+fix's clothes, and **EV's fallback already answers the waste**. **Recorded with its reasoning so the
+priced alternative is not re-proposed as a discovery.** (Savage Presence's taunt ceiling of 1.0 was
+never in this question: it is `minf(..., 1.0)` on a probability, so it is arithmetic.)
+
+### AGUILA'S BOON IS NO LONGER WASTED — **BUILT AT EW. THIS ITEM IS CLOSED.**
+
+EV reported that the eagle's party crit overshoots an implicit ceiling harder than either of the
+bear's clamps binds, and that `_bond_fallback` deliberately could not reach it because **the ceiling
+is shared with every other crit source** — so whether a stack is wasted depends on the attacker, the
+ability and the target. **EW answers it at the ceiling instead of at the boon**: the assembled total
+converts its own surplus into crit multiplier, so no source has to be told what share of the ceiling
+belongs to it. **The eagle needed no special case and got none.** **CANIS WAS NEVER A QUESTION** —
+its term is genuinely unbounded, measured at ×30.16 at rows 1–9 and still climbing.
 
 ### THE LADDER — WHAT RUNG 2 SHOULD ASK. **RULED BY THE DESIGNER AFTER EP. UNBUILT.**
 
@@ -450,9 +466,11 @@ figures live in the EU report — do not quote a number from this file.**
   blows the boon itself fell on 183 and the two terms it feeds differed on none. `check_ev` is the
   gate; the figures are in `docs/reports/EV.md`.
 - **ONLY URSUS HAS A SATURATION POINT AND THAT IS A MEASUREMENT, NOT AN OMISSION.** Canis's
-  wounded-prey bonus and Aguila's party crit are spent UNCLAMPED, so no stack of theirs can ever pay
-  nothing and nothing of theirs falls back. **But Aguila's boon is wasted harder than the bear's is
-  clamped** — see the OPEN QUEUE item above.
+  wounded-prey bonus and Aguila's shared crit are spent UNCLAMPED, so no stack of theirs can ever
+  pay nothing and nothing of theirs falls back. **Aguila's boon WAS wasted harder than the bear's is
+  clamped, and BATCH EW ANSWERED IT AT THE CEILING RATHER THAN AT THE BOON** — the assembled crit
+  total converts its own surplus into crit multiplier, so the eagle needed no special case and got
+  none. `_bond_fallback` is byte-unchanged.
 - **THE TEXT COST WAS SMALLER THAN ANY FLATTENING'S, EXACTLY AS ER PREDICTED**, because the meter
   stays uncapped: the surfaces needed the second phase NAMED, not the *"no ceiling"* promise
   retracted. Chip, status tooltip, Pack Bond passive text, `master.html`'s Beastmaster block and

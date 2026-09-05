@@ -14,6 +14,95 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-04 &mdash; Batch EW: CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER</h2>
+<p><i><b>Crit chance past 100% is no longer thrown away. The surplus is paid as critical damage
+instead, at +1.0 of multiplier per 1.0 of surplus chance, from every source, game-wide.</b>
+EV &sect;3 measured the waste on Aguila&#x27;s party crit and reported rather than fixed it. Full
+working, and every figure with its n and its standard error: <code>docs/reports/EW.md</code>.</i></p>
+
+<p><b>&sect;0 &mdash; THE BRIEF ASKED FOR ONE PLACE AND THE TREE HAS FOUR. THIS IS THE BATCH&#x27;S
+FIRST FINDING AND IT WAS REPORTED BEFORE ANYTHING WAS BUILT.</b> The brief required the conversion
+to sit between assembly and the roll, at exactly one site. <b>The crit roll happens at FOUR sites in
+<code>battle.gd</code></b>: the hero strike loop (a twelve-term assembly), <code>_heal_crit_mult</code>,
+<code>_ghost_hit</code> and <code>_companion_hit</code>. <b>Only the strike loop assembles more than
+three terms, and only it can pass a certainty today</b> &mdash; measured over 202,000 crit rolls at
+three loadouts, the highest total the other three ever reached was <b>0.37</b>. So the RULE lives in
+one helper, <code>_crit_excess_mult</code>, and <b>all four rolls spend it</b>: the three thin sites
+are paid exactly zero and cost nothing, and a fifth roll added later that forgets the call is what
+the gate is built to catch.</p>
+
+<p><b>&sect;1 &mdash; THE RATE IS A NAMED CONSTANT AND IT SHIPS AT FOCUS&#x27;S OWN.</b>
+<code>CRIT_EXCESS_STEP</code> = <b>1.0</b>: one point of surplus chance buys one point of
+multiplier, which is exactly the rate <code>FOCUS_STEP</code> has always traded at (0.005 of chance
+below the split, 0.005 of multiplier above it). <b>It is deliberately NOT derived from
+<code>FOCUS_STEP</code></b> &mdash; writing it as a derivation would assert that a rate tuned for
+one meter is right for a total assembled from eight sources, which is precisely the open question.
+<b>FLAGGED, NOT TUNED: it is the designer&#x27;s number, and 0.25 and 0.50 are priced beside it in
+the report.</b></p>
+
+<p><b>&sect;1a &mdash; THE SWING IS SMALL AT THE PARTY AND LARGE ON THE BLOW, AND THE BRIEF&#x27;S
+HEADLINE WAS OVER A DIFFERENT POPULATION.</b> The brief read <i>&quot;the party&#x27;s mean total
+crit is 1.93&quot;</i>. <b>That figure is EV&#x27;s, and EV measured it over the rolls where
+Aguila&#x27;s boon is LIVE &mdash; 2.6% of the party&#x27;s rolls.</b> Re-derived on its own
+population it reproduces (mean 2.170, 55.8% at or over a certainty). <b>Over every hero roll the
+party&#x27;s mean total crit at that arm is 0.172</b>, and only <b>1.5%</b> of rolls are at or past
+1.0. So the party&#x27;s crit output rises <b>+1.72% &plusmn; 0.16</b> at rows 1&ndash;9,
+<b>+0.27% &plusmn; 0.09</b> at rows 1&ndash;3 and <b>not measurably at all</b> at rows 0 &mdash;
+where the conversion provably cannot fire, which makes that arm the live comparison&#x27;s own noise
+floor. <b>The blow that does land past a certainty is a different matter</b>: at rows 1&ndash;9
+those blows go from &times;1.5 to a mean <b>&times;3.02</b>, with the worst single blow measured at
+<b>&times;8.28</b>. <b>The tail is the thing to watch, not the mean</b> &mdash; the term feeding it
+has no ceiling anywhere.</p>
+
+<p><b>&sect;2 &mdash; IT DOES NOT REACH ENEMIES, AND THE QUESTION IS CLOSED RATHER THAN RULED.</b>
+<b>Over 69,932 enemy crit rolls across all three arms the deepest total any enemy assembled was
+0.3500</b> &mdash; the base 10% plus a Broken target&#x27;s 25% &mdash; and <b>not one reached a
+certainty</b>. It is structural rather than lucky: the party boon is hero-gated at its read site,
+<code>crit_bonus</code> is written on the hero spawn path and inherited only by companions (its one
+other writer, Dull Edge, SUBTRACTS), and every remaining term is a talent counter an enemy has no
+tree to hold. <b>No difficulty change, and nothing for the designer to rule on.</b></p>
+
+<p><b>&sect;3 &mdash; <code>BOND_MITIGATION_MAX</code> STAYS AT 0.75, RULED, WITH ITS REASONING.</b>
+The guard forces some value below 1.0 and does not force 0.75 &mdash; but <b>that constant is a 75%
+damage reduction and 0.90 would make it 90%</b>, which is a large survivability change wearing a
+saturation fix&#x27;s clothes. EV&#x27;s fallback already answers the waste. <b>Recorded so the
+priced alternative is not re-proposed as a discovery.</b></p>
+
+<p><b>&sect;4 &mdash; TWO CORRECTIONS TO SHIPPED DOCUMENTATION, FOUND ON THE WAY.</b>
+<code>master.html</code> &sect;4.3 said Aguila grants <b>+15%</b> crit; the code grants <b>+10%
+scaled by the bond tier</b>, which is what the same document says in two other places. And
+<code>CLAUDE.md</code>&#x27;s claim that <b>every <code>data/*.json</code> is tab-indented</b> is
+false for two of the four &mdash; <code>glossary.json</code> and <code>enemies.json</code> are
+single-space indented. <b>The rule that found it is the rule&#x27;s own procedure</b>: round-trip
+the unmodified parse and assert it equals the file byte for byte before writing.</p>
+
+<p><b>&sect;5 &mdash; THE GATE, AND EIGHT NEGATIVE CONTROLS THAT ALL BIT.</b> <code>check_ew</code>
+(38 checks) derives the roll-site census through <code>CRIT_CHANCE</code> rather than by naming the
+four, and drives &sect;2 and &sect;3 live &mdash; because the brief names the failure family
+exactly: <i>a conversion computed after the roll, or on a per-source total rather than the assembled
+one, would pass every static check.</i> Controls: HEAD&#x27;s own <code>battle.gd</code> verbatim
+(9 failures), converting <code>crit_bonus</code> instead of the assembled total (3, the live arm
+reading 1.9335 against a predicted 2.0000), the missing <code>maxf</code> floor (3), a fifth roll
+site added without the call (3), <code>_companion_hit</code> dropping the call (3), the rate at 0.0
+(3, the live arm reading 436 against 436), the conversion stubbed to zero (4) and the conversion
+applied before the roll instead of after (4).</p>
+
+<p><b>&sect;6 &mdash; AND THE GATE&#x27;S OWN FIRST TWO INSTRUMENTS WERE WRONG, BOTH IN THE
+DIRECTION THAT PASSES.</b> The census fingerprint took every <code>randf() &lt;</code> line
+containing the word &quot;crit&quot; and read <b>THREE</b> &mdash; <code>_heal_crit_mult</code>&#x27;s
+roll line carries the word nowhere. And &sect;3&#x27;s live arms ran without resetting the
+Sharpshooter&#x27;s Focus between them, so the second arm started where the first finished, deep
+past his own split point: <b>with the conversion stubbed to zero that section still read 1325
+against 538 and passed</b>, measuring Focus accrual and calling it the surplus. Both are recorded in
+the gate at the site.</p>
+
+<p><b>WHAT DELIBERATELY DID NOT MOVE.</b> <b>No clamp was raised</b> (&sect;3).
+<b>Focus&#x27;s conversion point and rate are untouched</b> &mdash; still 100, still 0.5% a point,
+still in <code>unit.gd</code>. <b>The Loyalty split stays at 8</b> and <code>_bond_fallback</code>
+is byte-unchanged. <b>No rune is authored.</b> <b>The roll itself is not clamped</b>: <code>randf()</code>
+returns [0,1), so a <code>minf</code> on the roll line would change no behaviour and would only add a
+second place the ceiling is written down.</p>
+
 <h2>2026-09-04 &mdash; Batch EV: A CONVERTED STACK NEVER PAYS NOTHING</h2>
 <p><i><b>When a converted Loyalty stack would pay into a boon that is already at its clamp, it pays
 the strike step instead.</b> EU measured the defect and did not fix it: <b>at rows=9 a Beastmaster

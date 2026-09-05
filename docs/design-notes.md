@@ -4,6 +4,77 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Crit chance above a certainty becomes crit multiplier (Batch EW) — 2026-09-04
+
+### Why a ceiling nobody wrote down was still a ceiling
+
+`randf() < crit_chance` has no `minf` anywhere near it, so nothing in the
+project ever *clamped* crit chance — and yet everything past 1.0 bought
+exactly nothing, because a certainty cannot be improved. That is the
+quietest kind of ceiling there is: it does not appear in a constant, it
+does not appear in a diff, and every instrument that looks for clamps
+walks straight past it. EV found it by measuring the boon rather than
+by reading the code.
+
+The conversion is the same answer the project already gave for Focus,
+one door along. Focus stops buying chance at 100 and starts buying
+force, and the reason it works is that chance saturates and force does
+not. The surplus rule generalises that from one meter to the total: the
+moment the assembled number stops being able to buy certainty, it buys
+force instead. Nothing new is invented — the shape was already in the
+game and it was applied to one spec's resource.
+
+### Why it converts the total and not the source
+
+The obvious cheaper build converts each source as it is added: the
+eagle's boon knows how much of itself landed above 1.0, and so on. It is
+wrong, and the reason is that **the ceiling is not a property of any
+source**. Whether Aguila's +180% is wasted depends on the base rate, on
+`crit_bonus`, on whether the target is Broken, on which talents the
+attacker holds and on which ability is being cast. Measured across every
+arm, **on zero rolls was the total already at 1.0 without the eagle's
+contribution** — so the eagle is never the wasted term, it is the term
+that pushes the total over, and only the part above 1.0 is lost. Any
+per-source accounting has to pick a source to blame, and there is no
+principled way to pick.
+
+Converting the assembled total sidesteps the question entirely: one
+number goes in, one number comes out, and no source has to be told what
+share of the ceiling belongs to it.
+
+### Why the rate is a named constant that is not derived from Focus's
+
+`CRIT_EXCESS_STEP` ships at 1.0, which is Focus's own exchange rate —
+0.005 of chance below the split for 0.005 of multiplier above it. It
+would have been tidier to write it as a derivation. It is deliberately
+not, and the reason is the open question rather than the arithmetic: the
+Focus rate was tuned against one meter that one spec builds on one
+target, and this one prices a total assembled from twelve terms across
+the whole party. Writing the derivation would assert that those two
+answers must always be the same number. They may well be; nothing has
+tested it. A constant with a comment can be moved in one line, and a
+derivation cannot be moved at all without also making a claim.
+
+### Why the mean is the wrong statistic to price this on
+
+The party-level swing is small and it is worth being plain about that:
+about +1.7% of crit output at a fully-talented loadout, about +0.3% at
+rows 1–3, and nothing at all untalented, where no roll ever passes a
+certainty. Read as a balance change that is nearly nothing, and a first
+reading of the finding — a party at "nearly double a certainty" — makes
+it sound enormous. Both are true of different populations: the 1.93 is
+the mean over the rolls where the eagle's boon is live, and those are
+2.6% of the party's rolls.
+
+What the mean hides is the shape. The blows that do land past a
+certainty go from ×1.5 to a mean of ×3.0, and the worst single blow
+measured went to ×8.28. The surplus is linear in a term with no ceiling
+on it — Aguila's boon rides an uncapped Loyalty meter — so the tail is
+not bounded by anything, and before this batch the certainty ceiling was
+acting as a de facto clamp on it. **Removing a clamp that nobody knew
+was there is what this change actually does**, and that is the sentence
+a rate should be chosen against.
+
 ## Loyalty converts at 8, and why the point is not the nominal (Batch EU) — 2026-09-04
 
 ### Why a split point is a design object and a cap is not

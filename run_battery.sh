@@ -68,7 +68,7 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_cz check_da check_di check_dj check_dk check_dl check_dm check_do
        check_dp check_dr check_ds check_du check_dv check_dw check_ea check_eb
        check_ec check_ed check_eg check_eh check_ek check_el check_em
-       check_es check_et check_eu check_ev)
+       check_es check_et check_eu check_ev check_ew)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -151,7 +151,7 @@ echo "=== SUITES ==="
 for s in $SUITES; do run_one $s; done
 echo "=== GATES ==="
 for g in $GATES; do run_one $g; done
-echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/165/8) ==="
+echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/166/8) ==="
 for n in 1 2 3; do
   echo "harness_$n" >> "$RAN"
   DOD_GATE=$n "$GODOT" --headless --path . --script test_run_harness.gd \

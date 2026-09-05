@@ -576,7 +576,7 @@ copy with `const ITEM_PRICES := preload("res://scripts/shop_screen.gd").ITEM_PRI
   `GATE 3 PASS`. The only tells were `throws=3` beside them and **GATE 2 reporting 57 checks against
   its documented 165** — it ran barely a third of itself and said PASS. **This is exactly why the
   battery reports the throw count beside the check count** (CD's rule), and exactly why the live
-  counts 22/165/8 are written into `run_battery.sh`'s own header. **Read both. A gate that passes
+  counts 22/166/8 are written into `run_battery.sh`'s own header. **Read both. A gate that passes
   with throws is not a gate that passed.**
 - **THE FIX IS RUNTIME, NOT COMPILE TIME:** `ITEM_PRICES` and `SELL_FRACTION` now live in
   `run_state.gd` beside `ITEM_INFO` and the stack caps — §6's "single place these numbers are
@@ -1272,10 +1272,16 @@ as a live decision.
   descriptions that matter most. **Mask escapes to a non-word sentinel first, and add an ALL-CAPS
   rule.** Found by re-running the survey afterwards, not by the pass reporting anything:
   **a rename script that silently does 90% of the job looks identical to one that worked.**
-- **EVERY `data/*.json` FILE IS TAB-INDENTED, so `json.dumps(..., indent=2)` REWRITES THE WHOLE
-  FILE** — a one-entry glossary edit came out as a 1,966-line diff that buried the change. Use
-  `indent="\t"` and `ensure_ascii=False`, and **ROUND-TRIP FIRST**: dump the unmodified parse and
-  assert it equals the file byte for byte before writing. Nothing asserts a data file's whitespace.
+- **A `data/*.json` FILE HAS ITS OWN WHITESPACE AND `json.dumps(..., indent=2)` REWRITES THE WHOLE
+  FILE** — a one-entry glossary edit came out as a 1,966-line diff that buried the change.
+  **ROUND-TRIP FIRST**: dump the unmodified parse and assert it equals the file byte for byte
+  before writing, and only then edit. Nothing asserts a data file's whitespace.
+  · **DO NOT ASSUME THE STYLE. THIS BULLET SAID "EVERY `data/*.json` FILE IS TAB-INDENTED" AND
+    THAT WAS FALSE FOR HALF OF THEM** — `glossary.json` and `enemies.json` are indented with a
+    SINGLE SPACE and carry no trailing newline; `events.json` and `runes.json` match no simple
+    `json.dumps` form at all. **The round-trip is what makes the specific value irrelevant**, which
+    is why it is the half of this rule that binds: it found the error the other half asserted.
+    Use `ensure_ascii=False` throughout.
 - **A REFERENCE COUNT OF ZERO IS NOT EVIDENCE A FILE IS DEAD**, and it was wrong four ways in one
   audit, every one of which would have broken the build. (1) **Sprite paths are BUILT at runtime**
   (`"%s/%s_%s.png" % [...]`), so sixteen of twenty sprite files are named nowhere in source **and
@@ -2152,6 +2158,101 @@ and their standard error — do not quote a figure from here, there is none.**
   nameplate shows its second half at zero Focus. **The chip's strike figure reads the PAID half**:
   a chip still multiplying by the whole meter would print a bonus the blow does not have, which is
   worse than the silent phase. **A silent second phase is a stat nobody knows they have.**
+
+## STANDING RULE — CRIT CHANCE ABOVE A CERTAINTY BECOMES CRIT MULTIPLIER (Batch EW, ruled by the designer)
+
+> **A total crit chance over 100% cannot make a hit more certain, so the surplus is paid as
+> critical DAMAGE instead — from every source, game-wide, at `battle.CRIT_EXCESS_STEP`.**
+> **It converts the ASSEMBLED TOTAL and never a single source**, because the ceiling belongs to no
+> one term.
+
+**THIS IS NOT FOCUS'S CONVERSION AND MUST NOT BE FOLDED INTO IT.** Focus converts at a DEPTH IN ONE
+METER (`unit.focus_convert`, still 100, still `FOCUS_STEP`); this converts a TOTAL assembled from
+twelve terms. **A hero at 80 Focus is below his own split point, is still contributing +40% crit
+chance, and can be past 100% TOTAL once a Broken target and a talent are added — both conversions
+fire on that blow and nothing is counted twice**, because the sub-split Focus is inside
+`crit_chance` and was never paid as multiplier.
+
+- **THE ROLL HAPPENS AT FOUR SITES AND THE BRIEF ASSUMED ONE. THIS IS THE THING TO KNOW BEFORE
+  TOUCHING CRIT.** `_resolve`'s strike loop is the only one that assembles more than three terms;
+  `_heal_crit_mult`, `_ghost_hit` and `_companion_hit` each assemble the base rate, `crit_bonus`
+  and a Broken target's 25% and **wear none of the strike loop's other terms** — measured over
+  202,000 crit rolls at three loadouts, the deepest any of the three reached was **0.37**. **So the
+  RULE has one body and the four rolls spend it.** A fifth roll that forgets the call is the defect
+  `check_ew` §0 exists for, and it is derived rather than listed: a crit roll is a `randf() <`
+  against a NAMED variable whose declaration carries `CRIT_CHANCE`.
+- **THE CHANCE MUST BE NAMED AT EVERY ROLL SITE, AND THAT IS A PROPERTY RATHER THAN A STYLE.** A
+  roll comparing against an inline expression cannot hand the SAME value to the conversion — it
+  would have to recompute it, which is a second copy of the assembly, which is the drift
+  `_bot_boon_worth` already cost this project once.
+- **THE RATE IS `CRIT_EXCESS_STEP` AND IT IS FLAGGED, NOT TUNED.** It ships at **1.0**, which is
+  Focus's own exchange rate (0.005 of chance below the split for 0.005 of multiplier above it, so
+  one for one). **It is deliberately NOT written as a derivation from `FOCUS_STEP`**: that would
+  assert the two must stay equal, and whether a rate tuned for ONE meter is right for a total
+  assembled from every source is exactly the open question. `docs/reports/EW.md` §1 prices 0.25 and
+  0.50 beside it at all three arms.
+- **THE MEAN IS NOT WHERE THIS LIVES — PRICE IT ON THE TAIL.** At a fully-talented loadout the
+  party's crit output rises about **+1.7%**, at rows 1–3 about **+0.3%**, and at rows 0 **not at
+  all** because nothing ever passes a certainty there. **But the blows that do land past one go
+  from ×1.5 to a mean ×3.0, with the worst single blow measured at ×8.28** — and the term feeding
+  that tail (Aguila's boon on an uncapped Loyalty meter) has no ceiling anywhere. **A rate chosen
+  off the party mean is a rate chosen at the wrong statistic.**
+- **IT CANNOT REACH AN ENEMY, AND THAT IS STRUCTURAL.** `_party_crit_bonus()` is hero-gated at its
+  read site; `crit_bonus` is written on the HERO spawn path and inherited only by a companion (its
+  one other writer, `dulledge`, SUBTRACTS); every remaining term is a talent counter and an enemy is
+  allocated no tree. **Measured: 69,932 enemy crit rolls, deepest total 0.3500, none at a
+  certainty.** A future enemy ability that raised one would need this checked again.
+- **THE ROLL IS DELIBERATELY NOT CLAMPED.** `randf()` returns [0,1), so `randf() < 1.93` and
+  `randf() < minf(1.93, 1.0)` are the same blow. A `minf` there would change no behaviour and would
+  add a SECOND place the ceiling is written down, which is the drift this rule exists to avoid.
+- **THREE DISPLAY SURFACES SHOW A PARTIAL CRIT TOTAL AND NONE OF THEM IS A ROLL.**
+  `party_screen`'s hero card and two `battle.gd` sites print `CRIT_CHANCE + crit_bonus`; three more
+  spend that same sum as a BURN MAGNITUDE rather than as a chance. **None can know the assembled
+  total** — it depends on the ability, the target and the board — so none was changed, and a sweep
+  for "places that read `CRIT_CHANCE`" must not mistake any of the six for a roll site.
+
+## STANDING RULE — AN ARM IS NOT READ UNTIL ITS PROCESS HAS EXITED (Batch EV §6g, recorded at EW §4)
+
+> **An analysis over a log that is still being written reads a PREFIX and reports it as the run.
+> Before reading an arm, confirm the process that writes it has exited — and confirm it by a marker
+> the process itself writes, never by looking at the file.**
+
+**THE SHAPE AND THE CONCLUSION SURVIVE THE TRUNCATION, WHICH IS WHY IT IS NOT CAUGHT BY READING
+THE RESULT.** EV launched three arms in parallel and analysed two of them mid-flight: same shape,
+same conclusion, **every count wrong** (rows 1–9 read 28,156 crit rolls against a true 34,785). It
+was found only because the ONE arm that had already finished was bit-identical across both
+readings — an accidental control.
+
+- **THE PROCEDURE: EACH ARM WRITES ITS OWN DONE MARKER AND THE READER POLLS FOR THE MARKER.**
+  `( ... ; echo "EXIT=$?" > arm.done ) &`, then a FOREGROUND `until [ -f arm.done ]` loop. **Not a
+  `pgrep -f` wait loop** (it matches itself and never exits) and **not a backgrounded `sleep`**
+  (a backgrounded call returns instantly and waits for nothing).
+- **A DELIBERATE CONTROL IS AVAILABLE FOR FREE AND COSTS ONE ARM: run one arm that finishes early
+  and read it twice.** If the two readings differ, something was still being written.
+- **AND IT GENERALISES BEYOND SIM ARMS**: a battery log, a probe dump, any file a detached process
+  is appending to. **The size of the file is not the signal** — a log that has stopped growing for
+  a minute may simply be in a slow fight.
+
+## STANDING RULE — PROSE RECORDING A REMOVAL READS EXACTLY LIKE THE REMOVAL NOT HAPPENING (Batch EV §5, recorded at EW §4)
+
+> **A comment that explains why a word is gone NAMES that word, and an instrument pinning the word
+> absent matches the comment. Before writing a comment that names a banned string, ask whether
+> anything greps for it.**
+
+**EV RENAMED A LOCAL VARIABLE TO CLEAR A PIN `test_batch_bg` HOLDS ABSENT, AND THE COMMENT
+EXPLAINING THE RENAME TRIPPED THE SAME PIN BY NAMING THE WORD.** The rename was correct; the
+record of it was what went red.
+
+- **THE FIX IS NEVER THE EXEMPTION.** An exemption granted to a sentence blinds the rule to a real
+  violation arriving in that file later — this project has paid for that once already (`check_ds`
+  in `check_da` §3). **Either the instrument strips comments first, or the prose does not spell the
+  word.**
+- **A COMMENT CANNOT CONCATENATE, WHICH IS WHY THE TWO HALVES ARE NOT SYMMETRIC.** A gate can split
+  a literal at runtime so its own source does not carry the needle; prose has no such move. **So
+  the burden falls on the prose**: say what the word was FOR without spelling it, and say in the
+  paragraph why it is absent.
+- **THIS IS THE SAME FAMILY AS DR §4's ABSENCE CHECK** — an instrument asserting a name is gone
+  must strip comments before it looks — and the two rules are the two directions of one seam.
 
 ## STANDING RULE — THE READ SITE IS THE LINE, NOT THE FUNCTION (Batch EU, recorded at EV §4)
 

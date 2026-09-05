@@ -7579,6 +7579,22 @@ const MISS_CHANCE := 0.05
 const PARRY_CHANCE := 0.05        # hero baseline
 const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
 const CRIT_CHANCE := 0.10
+# BATCH EW — CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER. What one
+# point of surplus crit CHANCE buys in crit MULTIPLIER once the assembled total
+# has passed 1.0. A certainty cannot be improved, so before this constant
+# existed every point past it evaporated — measured at EV §3 on Aguila's party
+# crit, and shared with every other source rather than owned by the eagle.
+#
+# **1.0 IS FOCUS'S OWN EXCHANGE RATE AND IT IS NOT DERIVED FROM IT.**
+# `FOCUS_STEP` buys 0.005 of chance below the conversion point and 0.005 of
+# multiplier above it, so Focus already trades one for one; this constant ships
+# at the rate the game had rather than at an invented one. It is deliberately
+# NOT written as `FOCUS_STEP / FOCUS_STEP`, because that would assert the two
+# must stay equal — and the open question EW leaves is exactly whether a rate
+# tuned for ONE meter is right for a total assembled from eight sources.
+# **FLAGGED, NOT TUNED: this is the designer's number.** `docs/reports/EW.md`
+# §1 prices 0.25, 0.50 and 1.00 at all three arms.
+const CRIT_EXCESS_STEP := 1.0
 # Death Ray's gate — THE one place the line is decided, read by
 # `_ability_usable`, its tooltip affordance and the bot's rotation.
 # BATCH AU RAISED IT 5 -> 8. At twelve stacks the ability lands 325% of Attack
@@ -8735,6 +8751,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# the counter is percentage POINTS of critical damage.
 				if ab.display_name == "Ice Lance":
 					crit_mult += 0.01 * attacker.piercing_ice_ranks
+				# BATCH EW — EVERYTHING THE ASSEMBLY BOUGHT PAST A CERTAINTY, PAID
+				# AS FORCE. `crit_chance` is the whole total: the base, Resonance,
+				# `crit_bonus`, Aguila's party boon, Precision Strikes, Seasoned
+				# Fighter, Killing Edge, Super Nova, Brittle Ice, the Sweeping
+				# Strikes rider, a Broken target's 25% and Lethal Aim's own
+				# sub-split Focus. **IT IS READ AFTER ASSEMBLY AND IT IS THE SAME
+				# VALUE THE ROLL SPENT** — one variable, so the two can never
+				# disagree. The five forced-crit riders above (Ice Lance into
+				# Frozen, White Heat, Execute, Triple Shot, Held Breath) collect it
+				# too, deliberately: the surplus is a property of what the attacker
+				# assembled, not of how this particular crit was won.
+				crit_mult += _crit_excess_mult(crit_chance)
 				raw *= crit_mult
 				# CRITICAL MASS — TWO CLAUSES, ONE STREAK. The NODE builds
 				# Resonance on every third crit (critical_mass_stacks, Batch
@@ -13824,13 +13852,39 @@ func _healing_done_mult(caster: BattleUnit) -> float:
 	return m
 
 
+# BATCH EW §0 — THE ONE PLACE THE SURPLUS IS PRICED, AND IT IS A HELPER BECAUSE
+# THE ROLL IS NOT IN ONE PLACE. The brief asked for the conversion to sit
+# between assembly and the roll, at exactly one site. **THE ROLL HAPPENS AT
+# FOUR** — the strike loop, this heal crit, `_ghost_hit` and `_companion_hit` —
+# and only the strike loop assembles a total from more than three terms. So the
+# RULE lives here, once, and the four sites spend it; a fifth roll added later
+# that forgets this call is a bug this comment exists to name in advance.
+#
+# It is deliberately total-agnostic: it takes the assembled chance and knows
+# nothing about which source pushed it over, because the ceiling belongs to no
+# single source. Below a certainty it returns exactly 0.0, so the three sites
+# that cannot reach 1.0 today pay nothing and change nothing — measured, EW §0.
+#
+# THIS IS NOT FOCUS'S CONVERSION AND MUST NOT BE FOLDED INTO IT. Focus converts
+# at a DEPTH IN ONE METER (`unit.focus_convert`); this converts a TOTAL. A
+# Sharpshooter below his Focus split point is still feeding this one, and both
+# fire on the same roll — his sub-split Focus is inside `crit_chance` and was
+# never paid as multiplier, so nothing is counted twice.
+func _crit_excess_mult(chance: float) -> float:
+	return maxf(chance - 1.0, 0.0) * CRIT_EXCESS_STEP
+
+
 # Triage: instant heals can CRIT (x1.5) off the Cleric's crit chance. A
 # non-zero Triage term is what unlocks the crit — one counter, one gate, so a
 # rune paying the healing half can never hand out crits the node did not.
+# BATCH EW: the chance is named so the roll and the surplus read ONE value.
+# The `and` short-circuited before and the `if` nests now, so `randf()` is still
+# reached only when the Triage term is non-zero — the stream is unchanged.
 func _heal_crit_mult(caster: BattleUnit) -> float:
-	if caster.triage_heal + caster.rune_triage_heal > 0 \
-			and randf() < CRIT_CHANCE + caster.crit_bonus:
-		return 1.5
+	if caster.triage_heal + caster.rune_triage_heal > 0:
+		var hc_chance := CRIT_CHANCE + caster.crit_bonus
+		if randf() < hc_chance:
+			return 1.5 + _crit_excess_mult(hc_chance)
 	return 1.0
 
 
@@ -21024,10 +21078,15 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 			and hunter.kinds_summoned.size() > 0:
 		raw *= 1.0 + 0.01 * (hunter.momentum_ranks + hunter.rune_momentum_ranks) \
 			* hunter.kinds_summoned.size()
-	var is_crit := randf() < CRIT_CHANCE + hunter.crit_bonus \
+	# BATCH EW: named so the roll and the surplus read ONE value. A bodiless
+	# blow carries the hunter's own crit chance and NOT the party boon, so this
+	# total is three terms and reaches 1.0 nowhere in the live tree (EW §0) —
+	# the call is here so the rule holds if a later term changes that.
+	var gh_chance := CRIT_CHANCE + hunter.crit_bonus \
 		+ (0.25 if victim.broken else 0.0)
+	var is_crit := randf() < gh_chance
 	if is_crit:
-		raw *= 1.5
+		raw *= 1.5 + _crit_excess_mult(gh_chance)
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
 	var pen := clampf(((0.20 * l) if kind == "aguila" else 0.0), 0.0, 1.0)
 	var gh_armor := victim.effective_armor() * (1.0 - pen)
@@ -21109,9 +21168,13 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if victim == null or victim.dead:
 		return
 	var raw := (dmg + comp.companion_power) * randf_range(0.9, 1.1)
-	var is_crit := randf() < CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
+	# BATCH EW: named so the roll and the surplus read ONE value. The companion
+	# inherits `crit_bonus` from its hunter (`_spawn_companion`) and wears none of
+	# the strike loop's other terms, so this total is three terms as well.
+	var ch_chance := CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
+	var is_crit := randf() < ch_chance
 	if is_crit:
-		raw *= 1.5
+		raw *= 1.5 + _crit_excess_mult(ch_chance)
 	# BATCH DU §2/§3 — THE TWO TERMS OF THE HERO STRIKE LOOP'S EIGHTY-FOUR THAT
 	# A COMPANION CAN ACTUALLY WEAR. DT enumerated that block and found 78
 	# genuinely absent from this function; SEVENTY-SIX ARE UNREACHABLE BY SHAPE

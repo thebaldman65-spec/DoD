@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-04 (Batch EV &mdash; a converted stack never pays nothing)</b></p>
+<p align="right"><b>Last updated: 2026-09-04 (Batch EW &mdash; crit chance above certainty becomes crit multiplier)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -632,9 +632,20 @@ all</b> — their kits are gated by resources and AI conditions instead.</li>
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
 classification.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
-bonuses (+15% with Aguila summoned). Guaranteed: Ice Lance vs Frozen; a perfect Execute.
-Resonance builds
+bonuses (+10% with Aguila summoned, scaled by its Loyalty tier). Guaranteed: Ice Lance vs Frozen;
+a perfect Execute. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
+<li><b>Crit chance above a certainty becomes crit MULTIPLIER, from every source.</b> A total crit
+chance over 100% cannot make a hit any more certain, so the surplus is paid as critical damage
+instead at <b>+1.0 of multiplier per 1.0 of surplus chance</b> — a hero assembling 250% crit
+chance lands every blow as a critical at ×2.5 rather than ×1.5. It is the whole assembled total
+that converts, not any one source: the base rate, a Broken target's 25%, Resonance, Aguila's shared
+boon, Precision Strikes, Killing Edge, Brittle Ice, the Sweeping Strikes rider and Lethal Aim's own
+sub-split Focus all feed one number and the surplus belongs to none of them. <b>This is not the Sharpshooter's Focus conversion and the two
+are independent</b> — a hero below his Focus split point still converts the total's surplus, and
+both fire on the same blow. In practice only the deep game reaches it: the heroes' crit output
+rises about <b>1.7%</b> at a fully-talented loadout and not measurably at all untalented, but the
+individual blow that does land past a certainty is much larger.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
 Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +15% above half HP; relic bonuses
@@ -1018,7 +1029,9 @@ switching targets, up to 50 retained on a kill — all of it under Overkill. THE
 CONVERTS: the first 100 points each grant +0.5% critical chance, and every point past 100
 grants +0.5% of critical MULTIPLIER instead, so ×2 becomes ×2.5 at 200 Focus and ×3 at
 300. Deep Focus moves that conversion point down to 60; Spray of Arrows is the one talent
-that still imposes a ceiling, at 50. Spent by Coup de Grâce (which reads at most 200) and
+that still imposes a ceiling, at 50. <b>The game-wide surplus rule in &sect;4.3 is a separate
+conversion and does not touch this one</b> — this one converts a DEPTH in one meter, that one
+converts an assembled TOTAL, and both can fire on one blow. Spent by Coup de Grâce (which reads at most 200) and
 One Shot (which fires at 200).</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 hero falls below 50% health (any damage source; crossings count each time). Each
@@ -2147,7 +2160,11 @@ first 100 points of Focus each grant <b>+0.5% critical chance</b> — a hundred 
 patience is +50% crit. Every point beyond 100 grants <b>+0.5% of critical MULTIPLIER</b>
 instead, so Lethal Aim's ×2 becomes ×2.5 at 200 Focus, ×3 at 300, and it never stops
 paying: patience buys certainty first, then force. The decision the spec is built around:
-the enemy you've been working is rarely the enemy that most needs to die right now.<br>
+the enemy you've been working is rarely the enemy that most needs to die right now.
+<b>A SECOND CONVERSION SITS BESIDE IT AND THE TWO ARE INDEPENDENT</b> (&sect;4.3): crit chance
+above a certainty becomes crit multiplier for everybody, from every source. A Sharpshooter still
+short of 100 Focus is below his own split point and can already be past 100% TOTAL crit once a
+Broken target and a talent are added &mdash; and both conversions pay him on the same blow.<br>
 <b>HIS BASIC ATTACK IS A SEQUENCE</b> (&sect;4.2): Quick Shot runs one press plus one for every
 50 Focus he holds, capped at four, resolved with partial credit and paid in Focus &mdash; 8 a
 landed press, plus 20 more for a full sequence. <b>His basic attack only; no other ability of
