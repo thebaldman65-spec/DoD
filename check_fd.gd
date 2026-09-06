@@ -528,18 +528,26 @@ func _s2_break_is_secondary_only() -> void:
 	print("    breadth over %d real loadouts: met %d after, %d before; the peak rose on %d"
 		% [seen, met_now, met_before, peak_rose])
 
-	# **`RUNE_TAGS` IS NOT TOUCHED AND THE POPULATION IS PINNED SO THE DAY IT
-	# IS RULED ON, THIS LINE MOVES.** The ruling named CARDS.
+	# **`RUNE_TAGS` WAS PINNED AT FIVE SO THE DAY IT WAS RULED ON THIS LINE WOULD
+	# MOVE, AND AT BATCH FE IT DID.** The designer ruled that no RUNE carries
+	# BREAK as its primary either, and all five rows FD reported now read
+	# `["OFFENSE", "BREAK"]`. **RE-POINTED IN PLACE, WITH ITS REASON, RATHER
+	# THAN DELETED** — FD's ruling named CARDS and this line is what recorded
+	# that the runes had not followed; it records that they have now, and it is
+	# still the thing that goes red if a sixth row is ever authored BREAK-first.
+	# **`check_fe` §1 owns the population and the retention** (that all five
+	# kept BREAK second); this arm stays deliberately narrow, on the one claim
+	# FD's own section made.
 	var rune_break: Array = []
 	for rid in Runes.RUNE_TAGS:
 		var rt: Array = Runes.RUNE_TAGS[rid]
 		if not rt.is_empty() and String(rt[0]) == "BREAK":
 			rune_break.append(String(rid))
 	rune_break.sort()
-	ok(rune_break.size() == 5,
-		"§2: %d rune rows carry BREAK first, not the 5 FD reported — %s" % [
+	ok(rune_break.is_empty(),
+		"§2: %d rune rows carry BREAK first — FE §1 ruled that none may (%s)" % [
 			rune_break.size(), rune_break])
-	print("    RUNE_TAGS rows still primary-BREAK (reported, NOT ruled on): %s" % [rune_break])
+	print("    RUNE_TAGS rows primary-BREAK: %d (ruled to zero at FE §1)" % rune_break.size())
 
 
 # The peak this loadout WOULD have had before FD §2, reconstructed row by row:

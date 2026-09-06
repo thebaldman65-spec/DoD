@@ -870,17 +870,24 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 
 	match kind:
 		"ability":
-			var queue: Array = member.get("bm_candidates", [])
+			# BATCH FE §2 — THROUGH `Run.ability_choice`, NOT OFF THE MEMBER.
+			# The triple was rolled at the ZONE BOSS and rides the save; this
+			# re-asks what the hero owns NOW and writes the repair back, so a
+			# name he has taken since is not drawn as a button that refuses
+			# itself. Same door FD §1 put in front of the rune cache.
 			var spec := String(member.get("spec", ""))
-			for pool_name in (queue[0] if not queue.is_empty() else []):
+			for pool_name in Run.ability_choice(member):
 				var ab: Ability = Classes.spec_pool_ability(spec, String(pool_name))
 				_pick_button(box, String(pool_name),
 					Classes.resolve_values(ab.description) if ab != null else "",
 					Color(0.85, 0.82, 0.75),
 					_pick_ability.bind(idx, String(pool_name)), overlay)
 		"upgrade":
-			var queue2: Array = member.get("up_candidates", [])
-			var offer: Array = queue2[0] if not queue2.is_empty() else []
+			# BATCH FE §2 — THROUGH `Run.upgrade_choice`, same reason, and this
+			# one is indexed rather than named: `_pick_upgrade` takes an INDEX,
+			# so the array the buttons are built from MUST be the array the
+			# handler reads. It is, because the repair is written back.
+			var offer: Array = Run.upgrade_choice(member)
 			for i in offer.size():
 				var up: Dictionary = offer[i]
 				_pick_button(box, "%s: %s" % [String(up["ability"]),
@@ -1023,8 +1030,21 @@ func _finish_take(idx: int, kind: String, incoming: String, drop_name: String) -
 
 func _pick_ability(idx: int, pool_name: String, bench_name := "") -> void:
 	var member: Dictionary = Run.party[idx]
-	if int(member.get("bm_picks_owed", 0)) < 1 \
-			or pool_name in member.get("bm_abilities", []):
+	# BATCH FE §2 — RE-ASKED HERE TOO, AND THE OLD GUARD IS WHY.
+	# This used to refuse `pool_name in member["bm_abilities"]` and return,
+	# which popped nothing and decremented nothing — so a name the hero had
+	# taken since the triple was rolled stayed on screen as a button that did
+	# NOTHING when pressed (604 of them over 240 driven runs), and where the
+	# boss pool was smaller than the number of deferred picks EVERY button was
+	# dead and the pick could never be answered at all (the Inquisitor's pool
+	# is two: 20 of 20 driven runs stranded the third pick for good).
+	# `ability_choice` is idempotent — it writes its repair back — so calling it
+	# here re-reads the array the buttons were built from rather than repairing
+	# a second time, and a triple that repaired to NOTHING is refused here
+	# rather than being taken.
+	var live: Array = Run.ability_choice(member)
+	if int(member.get("bm_picks_owed", 0)) < 1 or live.is_empty() \
+			or not live.has(pool_name):
 		return
 	# BATCH BO §2: THE CAP BINDS THE BOSS PICK TOO. §3 leaves the boss OFFER
 	# unchanged — same source, same timing, same SPEC_POOLS draw — but the
@@ -1481,10 +1501,21 @@ func _confirm_party_draft() -> void:
 
 func _pick_upgrade(idx: int, choice: int) -> void:
 	var member: Dictionary = Run.party[idx]
+	# BATCH FE §2 — THE SAME DOOR THE OVERLAY DREW FROM, CALLED AGAIN.
+	# This path had NO guard of any kind: it indexed the stored offer and
+	# appended it, so a hero could take one upgrade twice — AP's once-per-run
+	# rule is enforced only by the ROLL's `has_upgrade` filter, and six of the
+	# eight upgrades stamp a field that is not idempotent (Honed 25 -> 38 ->
+	# 57, Weighted's pressure x2 -> x4, Quickened -2 -> -4 turns). Two queued
+	# triples shared an id in 376 of 400 trials and the same (ability, id) pair
+	# in 247 of 400.
+	var live: Array = Run.upgrade_choice(member)
 	var queue: Array = member.get("up_candidates", [])
-	if int(member.get("up_picks_owed", 0)) < 1 or queue.is_empty():
+	if int(member.get("up_picks_owed", 0)) < 1 or queue.is_empty() \
+			or live.is_empty():
 		return
-	var offer: Array = queue.pop_front()
+	queue.pop_front()
+	var offer: Array = live
 	member["up_candidates"] = queue
 	var up: Dictionary = offer[clampi(choice, 0, offer.size() - 1)]
 	member["upgrades"] = member.get("upgrades", []) + [up.duplicate()]

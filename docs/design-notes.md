@@ -7540,3 +7540,48 @@ five are pinned at five and reported: the day the designer rules on them, the ga
 quietly become the marker of a withdrawn pool, and the newest rune was the only live entry wearing
 it. The generated stat family keeps the long form and that is now written down as deliberate rather
 than left as an inconsistency somebody will "fix" later.
+
+## Batch FE — why a refusal is not a repair, and why "nothing reads it" had to be measured
+
+**The two items in this batch look unrelated and share one shape: a claim that had gone unchecked
+because checking it was nobody's job.**
+
+**§1 is a consistency change and the honest thing to say about it is that it does nothing.** FD
+demoted BREAK on 54 cards and left the five rune rows, asking whether they should follow. They
+should, and the argument is the one the project has already paid for three times: a vocabulary with
+two rules is the defect, and `inquisitor` reading as Devout has misled two briefs on exactly that.
+But the brief's stated reason — that EZ established the conditions count PRIMARIES, so a rune's
+primary is not merely descriptive — **is not true of RUNE tags.** Both conditions count CARD
+primaries over the hero's drafted cards. A rune's own primary feeds nothing.
+
+**And it is worse than "display-only", which is what four documents call it.** `rune_tag_line` has
+zero callers. The table does not reach a screen either; the rune-offer surface EK deferred was
+never built. **That is the more interesting fact, and nobody had it because nobody had asked the
+question in that direction** — "is it read as a condition?" gets you to "no, it's display-only",
+and only "what displays it?" gets you to "nothing does". The gate asserts both now, because a
+consistency change whose justification is *it changes nothing* is exactly the change that becomes
+wrong silently.
+
+**§2 is where the batch earned its keep, and it is a lesson about the SHAPE of a guard rather than
+about its presence.** `_pick_ability` had the right test — it refused a name the hero already held
+— and the wrong response: it **returned**. The illegal option stayed in the offer and stayed on
+screen, so the button was drawn, pressed, and did nothing. **A guard that declines without removing
+is not a repair; it is a dead end with a correct opinion.** Where every option was illegal the pick
+could not be answered at all, and the badge sat on the hero card for the rest of the run.
+
+**FD's table said that queue was unguarded and the other was too, and both rows were wrong in
+opposite directions.** One had a guard that was sufficient for the fault it named and useless for
+the fault it had; the other had no guard and a worse fault than the one implied, because six of the
+eight upgrade stamps compound and the once-per-run rule was being held up by the roll alone.
+**Reading a table of resolution doors tells you whether a check exists. It does not tell you what
+happens when the check fires, and that was the whole of it.**
+
+**The population was five and FD had four**, and the fifth — the item swap — was already guarded,
+with a comment explaining why. So the project had solved this problem before and had not noticed it
+was the same problem. That is the argument for writing the idiom down as a rule rather than as
+three repairs.
+
+**One number is worth keeping for its own sake: the collision rate was 400 of 400, and that is a
+property of the POOL, not of the queue.** Boss pools hold two to five entries and an offer takes
+three, so below four entries two offers are the same set — certainty, not chance. A rate quoted
+without its denominator's size reads as a probability when it is arithmetic.

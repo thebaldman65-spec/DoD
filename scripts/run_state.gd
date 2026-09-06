@@ -1509,6 +1509,160 @@ func rune_choice(member: Dictionary) -> Array:
 	return kept
 
 
+# ══ BATCH FE §2 — THE OTHER TWO FROZEN QUEUES ARE RE-ASKED TOO ═══════════════
+#
+# FD §1 repaired `rune_candidates` and REPORTED two more queues wearing the same
+# roll-store-answer idiom, explicitly without driving their reachability. **BOTH
+# ARE REACHABLE, AND THE POPULATION IS FIVE RATHER THAN FOUR.** Derived off what
+# a rolled offer is STORED on, not off a list of screens:
+#
+#   `rune_candidates`     elite cache / bargain -> `_pick_rune`      RE-ASKED (FD)
+#   `draft_candidates`    elite victory        -> `take_draft_ability`  RE-ASKED
+#   `pending_item_offers` loot / relic / event -> `_check_item_offers`  RE-ASKED
+#   `bm_candidates`       ZONE BOSS            -> `_pick_ability`       **NOT**
+#   `up_candidates`       MINI-BOSS            -> `_pick_upgrade`       **NOT**
+#
+# `pending_item_offers` is the fifth and FD did not have it; it re-asks the
+# POUCH at resolution (`if not Run.needs_slot(id)`) and says so in as many
+# words. The shop and the blacksmith are NOT in this population: both roll into
+# a screen-local `offers` in `_ready` and neither is saved.
+#
+# **REACHABILITY IS STRUCTURAL, NOT INCIDENTAL.** `MINI_SLOT` and `BOSS_SLOT`
+# are FIXED slots — one mini-boss and one zone boss per zone, three zones, and
+# the mini-boss is where the first half of the map converges, so no route
+# avoids either. Both award to EVERY member, and **nothing forces the answer**:
+# the pick waits on the hero card behind a badge. Three of each per run can be
+# queued before one is answered.
+#
+# **THE TWO FAULTS ARE NOT THE SAME FAULT, AND ONE OF FD'S TWO CLAIMS IS
+# WRONG.** Measured before either was touched:
+#
+#   * **`bm_candidates` CANNOT PRODUCE A DUPLICATE ABILITY.** `_pick_ability`
+#     already refuses `pool_name in member["bm_abilities"]`, and `bm_abilities`
+#     is the ONLY term of `owned_ability_names` that moves during a run — the
+#     kit is fixed, kit overrides are fixed, and BM's ruling locks `talents`
+#     for the run. **But it refuses by RETURNING**, which pops nothing and
+#     decrements nothing, so the stale name is still drawn as a button that
+#     silently does nothing: **604 dead buttons over 240 driven runs.** And
+#     where the boss pool is smaller than the number of deferred picks the pick
+#     becomes UNANSWERABLE — the Inquisitor's pool is TWO, so three deferred
+#     picks strand the third **in 20 of 20 driven runs**, with `bm_picks_owed`
+#     stuck at 1 and every button dead for the rest of the run.
+#   * **`up_candidates` HAS NO GUARD AT ALL AND IT IS A BALANCE FAULT.**
+#     `_pick_upgrade` indexes the raw stored offer and appends it. Two queued
+#     triples share an upgrade id in **376 of 400** trials — that is AP's
+#     ONCE-PER-RUN rule, whose only enforcement is the roll's `has_upgrade`
+#     filter — and share the SAME (ability, upgrade) PAIR in **247 of 400**.
+#     **`_stamp_upgrade` IS NOT IDEMPOTENT FOR SIX OF THE EIGHT**: Honed 25 ->
+#     38 -> 57, Weighted's pressure x2 -> x4, Quickened -2 -> -4 turns, Widened
+#     +1 -> +2 hits, Piercing 0.5 -> a full 1.0, Swift x0.75 -> x0.5625. Only
+#     Effortless and Certain set a constant and survive being taken twice.
+#
+# **THE REPAIR IS FD's REPAIR, TWICE, AND IT IS NOT A REROLL.** Each drops only
+# what is no longer legal, tops back up through the SAME door the roll uses, and
+# **writes the repair back** — so a triple with nothing wrong with it is returned
+# untouched (BATCH X's no-reroll rule) and a repaired one is repaired once, which
+# is what keeps the button's index and the handler's index the same offer.
+
+
+# The zone-boss triple, re-asked. Drops any candidate the hero has since
+# ACQUIRED — which is what turns a dead button into a live one — and tops back
+# up through the same three-tier cascade `award_ability_pick` rolls through.
+#
+# **THE TIERING IS PRESERVED EXACTLY RATHER THAN FLATTENED.** `award_ability_pick`
+# reads the spec draft pool only when the BOSS pool comes back empty, and the
+# class pool only when both do. A top-up that walked all three would hand a hero
+# a draft-pool card while his boss pool still had one in it, which is a different
+# offer from the one the roll would make today. **So a repaired triple can be
+# SHORTER than three, and that is the correct outcome**, on
+# `roll_upgrade_offer`'s own stated principle: the picker shows what exists
+# rather than padding.
+func ability_choice(member: Dictionary) -> Array:
+	var queue: Array = member.get("bm_candidates", [])
+	if queue.is_empty():
+		return []
+	var triple: Array = queue[0]
+	var owned: Array = owned_ability_names(member)
+	var kept: Array = []
+	for c in triple:
+		var nm := String(c)
+		if owned.has(nm) or kept.has(nm):
+			continue
+		kept.append(nm)
+	if kept.size() == triple.size():
+		return triple
+	while kept.size() < 3:
+		var fresh := _ability_topup(member, kept)
+		if fresh == "":
+			break
+		kept.append(fresh)
+	queue[0] = kept
+	member["bm_candidates"] = queue
+	return kept
+
+
+# The first name the tier `award_ability_pick` would read TODAY offers that is
+# not already in this triple. Each tier already filters `owned_ability_names`,
+# so the only thing left to exclude is the triple's own survivors.
+func _ability_topup(member: Dictionary, taken: Array) -> String:
+	var tier: Array = roll_spec_ability_offer(member)
+	if tier.is_empty():
+		tier = roll_spec_fallback_offer(member)
+	if tier.is_empty():
+		tier = roll_class_fallback_offer(member)
+	for n in tier:
+		if not taken.has(String(n)):
+			return String(n)
+	return ""
+
+
+# The mini-boss triple, re-asked against AP's once-per-run rule — the same
+# `has_upgrade` filter `roll_upgrade_offer` applies at the roll, applied again
+# at the answer, which is the whole of FD §1's rule.
+#
+# **THE PAIRED ABILITY IS DELIBERATELY NOT RE-ASKED.** An entry names an
+# `ability` as well as an `id`, and a hero can BENCH that ability between the
+# roll and the answer (EG §2 benches rather than drops). `apply_upgrades` skips
+# an entry whose ability is not in the resolved list *in silence*, and its own
+# header says that is not an error — the card stays in the pool and the upgrade
+# returns with it. Dropping the candidate would DESTROY a pick over a reversible
+# state, so the pairing stands and only the once-per-run rule is enforced.
+func upgrade_choice(member: Dictionary) -> Array:
+	var queue: Array = member.get("up_candidates", [])
+	if queue.is_empty():
+		return []
+	var offer: Array = queue[0]
+	var kept: Array = []
+	var taken: Array = []
+	for c in offer:
+		var uid := String((c as Dictionary).get("id", ""))
+		if uid == "" or has_upgrade(member, uid) or taken.has(uid):
+			continue
+		kept.append(c)
+		taken.append(uid)
+	if kept.size() == offer.size():
+		return offer
+	while kept.size() < 3:
+		var fresh := _upgrade_topup(member, taken)
+		if fresh.is_empty():
+			break
+		kept.append(fresh)
+		taken.append(String(fresh.get("id", "")))
+	queue[0] = kept
+	member["up_candidates"] = queue
+	return kept
+
+
+# One {id, ability} the hero has not taken and that is not already in this
+# triple. `roll_upgrade_offer` applies `has_upgrade` and the AP §3 pairing
+# filter, so this adds only the triple's own survivors to the exclusion.
+func _upgrade_topup(member: Dictionary, taken: Array) -> Dictionary:
+	for c in roll_upgrade_offer(member):
+		if not taken.has(String((c as Dictionary).get("id", ""))):
+			return c
+	return {}
+
+
 # Ability picks (zone bosses) waiting to be chosen, across the party.
 func owed_ability_picks() -> int:
 	var n := 0

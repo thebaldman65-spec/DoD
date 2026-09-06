@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-05 (Batch FC &mdash; Split Tongue is replaced by the Rune of the Shared Ruin)</b></p>
+<p align="right"><b>Last updated: 2026-09-06 (Batch FE &mdash; the rune rows follow the cards, and the two frozen queues are re-asked)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1670,10 +1670,17 @@ OFFENSE&nbsp;&middot;&nbsp;MARK, and it is <b>the one card of the 54 where the d
 removal</b>. <b>Thirty rows lost a secondary to make room</b> (18 RESOURCE, 9 DEBUFF, 2 DEFENSE,
 1 TEMPO; 20 had none to lose and 3 already read OFFENSE second), and that is cheap because <b>a secondary feeds no condition</b>: the two rune conditions
 count the PRIMARY only, so a displaced secondary moves a screen and nothing a rune asks.
-<b><code>Runes.RUNE_TAGS</code> is not touched</b> &mdash; the ruling named cards, and five rune
-rows still carry BREAK first (<code>long_watch</code> and <code>bared_plate</code> live,
-<code>comet</code>, <code>seventh_bolt</code> and <code>shattered_guard</code> retired). They are
-reported, not moved.</p>
+<b><code>Runes.RUNE_TAGS</code> follows the cards</b> &mdash; the five rune rows that led with
+BREAK (<code>long_watch</code> and <code>bared_plate</code> live, <code>comet</code>,
+<code>seventh_bolt</code> and <code>shattered_guard</code> retired) all read
+OFFENSE&nbsp;&middot;&nbsp;BREAK, so the primary vocabulary is uniform across cards and runes.
+Four of the five carried BREAK as their ONLY tag and cost nothing to move;
+<code>bared_plate</code> displaced a DEFENSE that <code>RUNE_SHAPES</code> already records as its
+TRADEOFF. <b>Nothing behaves differently, and that is measured rather than assumed</b>: the
+chain <code>RUNE_TAGS</code>&nbsp;&rarr;&nbsp;<code>rune_tags()</code>&nbsp;&rarr;&nbsp;<code>rune_tag_line()</code>
+ends in <b>no caller at all</b> &mdash; the rune-offer surface is still unbuilt &mdash; and
+neither rune condition reads the table, because both count CARD primaries over the hero's
+drafted cards.</p>
 <p><b>The protected cores carry them too, and that is what gives a build a seed.</b> The
 Pyromancer opens holding a DEBUFF card whether or not he ever drafts one, so a hero starts
 the run pointing somewhere rather than needing three lucky picks to point anywhere.</p>
@@ -2735,6 +2742,25 @@ is <b>not a reroll</b> — a triple with nothing wrong with it is returned untou
 Batch X's rule and it still stands. <b>Measured before it was built:</b> two triples queued
 before either was answered shared a name in <b>265 of 400</b> trials, and a queued candidate was
 also the shop's offer in <b>127 of 400</b>.
+<br><b>AND EVERY OTHER OFFER THAT IS ROLLED EARLY AND ANSWERED LATE IS RE-ASKED THE SAME WAY
+(Batch FE &sect;2).</b> Five offers in the game are rolled at one moment and answered at another,
+riding the save in between: the <b>rune cache</b>, the <b>ability draft</b>, the <b>item swap</b>,
+the <b>zone-boss ability pick</b> and the <b>mini-boss upgrade pick</b>. All five re-ask at the
+answer now. <b>The two that did not are the zone-boss and mini-boss picks</b>, and a run holds
+<b>three of each at fixed map slots</b>, awarded to every hero, with nothing forcing the answer
+&mdash; so three can be queued before one is spent.
+<br>The <b>zone-boss pick</b> comes through <code>Run.ability_choice</code>: a name the hero has
+taken since the triple was rolled is <b>removed from the offer</b> rather than merely refused when
+pressed, and the triple is topped back up out of the same pool the award would draw from today.
+It used to be drawn as a button that did nothing &mdash; and where a hero's boss pool is smaller
+than the number of picks he has saved up, <b>every</b> button was dead and the pick could never be
+spent at all. The Devout's boss pool is two, which is the sharp case.
+<br>The <b>mini-boss upgrade pick</b> comes through <code>Run.upgrade_choice</code>, which
+enforces the <b>once-per-run</b> rule at the answer as well as at the roll. Taking one upgrade
+twice used to be possible and it <b>stacked</b>: Honed is +50% damage applied twice, Weighted
+doubles Break damage twice, Quickened takes four turns off a cooldown rather than two. Both
+repairs are <b>written back</b> and neither is a reroll &mdash; a clean offer is returned
+untouched.
 <br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
 classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set was
 <i>authored</i> to one rule:

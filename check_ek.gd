@@ -289,13 +289,19 @@ const TAG_DOOR := "loadout_condition_met"
 # ordinary reason a checker does. It is a CHECKER and not a reader: nothing it
 # does changes how the game behaves, which is the whole reason this half of the
 # population is allowed to grow with the tree while the other half is not.
+# **BATCH FE ADDED THE SEVENTH, AND FOR THE SAME REASON AGAIN.** `check_fe.gd`
+# is the gate for the ruling that carried FD's demotion into `RUNE_TAGS`, so it
+# reads that table and `CARD_TAGS` both — the second as its positive arm, because
+# a batch that "fixed" the runes by re-breaking the cards is the failure this
+# list exists to make visible. **Listed, not exempted.**
+#
 # **BATCH FD ADDED THE SIXTH, AND FOR THE SAME REASON.** `check_fd.gd` is the
 # gate for FD §2's ruling that no card carries BREAK as its PRIMARY, so it reads
 # `CARD_TAGS`, `TAG_ORDER`, `RUNE_TAGS` and `primary_tag_peak`. **It changes no
 # behaviour and it is not exempted** — it is listed, which is what this half of
 # the population is for.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
-	"check_ez.gd", "check_fd.gd", "check_map_screen.gd"]
+	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

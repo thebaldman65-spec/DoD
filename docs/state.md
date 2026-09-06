@@ -5,176 +5,130 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-06 (Batch FD).*
+*Last rewritten: 2026-09-06 (Batch FE).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FD — THE CACHE RE-ASKS, BREAK BECOMES SECONDARY-ONLY, AND THE SHARED RUIN IS
-  RENAMED.** Three items. **§1 was reported as two bugs and is one hole plus one ruling**: every
-  site that ROLLS a rune offer reads the retirement correctly, and the hole is that the elite cache
-  **does not roll at the offer** — it rolls at the DROP and stores its triple in the save, where
-  nothing re-asks it. `Run.rune_choice` is the resolution door now. **The Peddler's ability draft
-  was never a bug** (BATCH BO §3, deliberate, same door as every other source) and is withdrawn
-  because the designer ruled it. **§2 demotes BREAK to a secondary tag on all 54 cards that led
-  with it. §3 renames the rune to `Shared Ruin`.** Full working: **`docs/reports/FD.md`**.
-- **§0 — FOUR OF THE BRIEF'S PREMISES WERE FALSE AND THREE OF THEM DECIDED WORK.** *"The retirement
-  flag is not read at every offer site"* — it is, at all four. ***"Firestorm and Pyrewake … both
-  should read OFFENSE primary"* — NEITHER IS IN THE POPULATION**: both are `["DEBUFF", "BREAK"]`,
-  BREAK is already their secondary, and there is no card called *Pyrewake* (it is **Pyre Wake**).
-  *"61 of the 66 retired use the `Rune of the…` form"* — **52** do; 61 use `Rune of …`. The brief
-  itself said to derive the population rather than take the two names, and taking them would have
-  moved two cards that did not need moving and missed all 54 that did.
-- **§1 — THE OFFER-SITE POPULATION IS DERIVED FROM THE WRITE, AND IT IS FOUR.** A rune reaches a
-  hero exactly where something appends to `member["runes"]`: **the Peddler** (`Run.generate_rune`),
-  **the elite cache** and **the bargain** (`Run.roll_rune_candidates`), and **the event verb**
-  (`Run.grant_rune`). All four reach the pool through `Runes.eligible_ids` and nothing else, and in
-  `scripts/` only `run_state.gd` names any `Runes.*` pool accessor at all. **Three absences are
-  asserted rather than assumed**: the spec-choice screen offers no rune (AN deleted the opening
-  pick), boss trophies award ABILITIES, no relic grants one. **Driven on the designer's own saved
-  party** — berserker / pyromancer / holy / sharpshooter — **300 Peddler draws a hero, zero retired
-  entries**; and three of those four heroes can be offered **nothing but the generated stat family**,
-  because eight of the twelve specs are still unauthored.
-- **§1a — THE HOLE IS THAT A CACHE DOES NOT ROLL AT THE OFFER, AND IT IS THIS BATCH'S MOST
-  TRANSFERABLE FINDING.** `roll_rune_candidates` runs at the DROP; its triple rides
-  `member["rune_candidates"]` into the save and is answered whenever the player opens the card. In
-  between, a rune can be **retired** or **acquired**. **`Runes.is_retired` had ZERO callers in the
-  game** — `eligible_ids` re-implements the test inline and the stored triple never returns through
-  it. **Two symptoms of one hole, measured:** two queued triples share a name in **265 of 400**
-  trials and a queued candidate is also the Peddler's offer in **127 of 400**; and **the designer's
-  live save carries the second one** — one hero wearing **Heavy Bolts twice, both equipped**, under
-  a shop header promising *"one of each"*. **`check_et` §2 reads clean and is correct: it drives the
-  producer, and the player uses the consumer.** Recorded as a standing rule in `CLAUDE.md`.
-- **§1b — THE REPAIR IS ONE DOOR AND IT IS NOT A REROLL.** `Run.rune_choice(member)` drops any
-  candidate now retired or now owned, tops the triple back to three through the same `eligible_ids`
-  every roll uses, and **writes the repair back** — so it happens once, the overlay and
-  `map_screen._pick_rune` read the same array, and **a triple with nothing wrong with it is returned
-  untouched**, which is BATCH X's no-reroll rule and is asserted. Without that last arm the section
-  passes on a function that simply rerolls.
-- **§1c — THE SAME FROZEN-QUEUE IDIOM IS IN THREE MORE PLACES AND ONLY ONE IS GUARDED. REPORTED,
-  NOT FIXED, AND ITS REACHABILITY WAS NOT DRIVEN.** `draft_candidates` IS re-asked
-  (`take_draft_ability` refuses a card the hero already knows); **`bm_candidates` (the zone-boss
-  pick) and `up_candidates` (the upgrade pick) reach `hold_ability` / `member["upgrades"]` with no
-  such check.** Both need two picks queued before either is answered. **This is owed forward.**
-- **§1d — THE MERCHANT SELLS NO DRAFT PICK, AND THAT IS A REVERSAL RATHER THAN A REPAIR.** BO §3
-  built it as the third of four sources and it asked the same door every other source asks. **A
-  draft pick is earned and never bought.** The other three sources are asserted still present in the
-  same breath as the removal. `Run.draft_price()` keeps its 120 / 180 / 240 ladder with **no
-  game-side caller** (the Melted Armor contract); **`run_sim` never bought one, so no economy figure
-  moves**; the shop's left column is empty from y=452 to the Leave button and the 36-row pitch is
-  deliberately **not** widened back (a ninth item type lands at 450 under it and 610 under the old
-  one).
-- **§2 — BREAK IS A SECONDARY TAG ONLY. 54 OF 227 ROWS MOVED; THE PRIMARY SPREAD WENT BREAK 54 → 0
-  AND OFFENSE 16 → 70**, and the cards carrying BREAK at all went 46 → 99. **30 rows lost a
-  secondary** (18 RESOURCE, 9 DEBUFF, 2 DEFENSE, 1 TEMPO; 20 had none to lose, 3 already read
-  OFFENSE second). **That is cheap for exactly one reason — a SECONDARY FEEDS NO CONDITION** (EZ
-  §0c counts the primary only), and had EZ counted both tags it would have been a balance change
-  wearing a vocabulary fix's clothes.
-- **§2a — FEINT IS THE ONE PER-CARD JUDGEMENT, AND A STANDING RULING KEPT THE SLOT.** EL §2 ruled
-  that Feint carries MARK second. FD's binding half is *no BREAK primary*; its retained-secondary
-  half is why it is a demotion rather than a removal, and on this one card the two cannot both be
-  had. **`Feint` reads `["OFFENSE", "MARK"]` and is the one card of the 54 where the demotion became
-  a removal.** `check_el`'s pin was re-pointed in place from `["Feint", "BREAK"]` to
-  `["Feint", "OFFENSE"]`, with its reason, and still asserts the MARK half from its own side.
-  **It was found by running that gate unmodified against the new code before anything was
-  re-pointed.**
-- **§2b — THRESHOLD IS UNTOUCHED AND BREADTH ONLY GETS HARDER, AND BOTH ARE DERIVATIONS.** The
-  transform moved cards between exactly two columns, so a threshold's count can only have moved if
-  it names one of them — and none of the four live thresholds does (DEBUFF, DEFENSE twice, MARK).
-  `check_fd` §2 asserts no live rune gates on BREAK **or** OFFENSE, in both directions. **A BREAK
-  threshold is now UNMEETABLE and must not be authored**, which INVERTS the warning `master.html`
-  carried (*"would be on from the first fight for almost everyone"*). **Breadth, over 36 real
-  drafted loadouts at 4 / 5 / 7 cards, against an EXACT reconstruction of the old table: met on 4
-  before and 2 after; the peak rose on 5 and fell on 0.** The bill falls on Wide Rite, Long Watch,
-  Wide Watch and Shared Scent. **Not ruled on.**
-- **§2c — `Runes.RUNE_TAGS` IS DELIBERATELY NOT TOUCHED AND THIS NEEDS A RULING.** The ruling names
-  CARDS, four times, so **five rune rows still carry BREAK first** — `long_watch` and `bared_plate`
-  **live**, `comet`, `seventh_bolt` and `shattered_guard` retired. Pinned at five. The table is
-  display-only, so nothing behaves differently either way. **Widening a ruling is not implementing
-  it. The question for the designer: do the two live rune rows follow the cards?**
-- **§3 — THE RENAME IS ONE STRING PLUS ITS ONE POINTER.** `data/runes.json`'s `name`, and the
-  sentence inside Split Tongue's own retirement string that pointed at the old name — a retirement
-  record naming a rune that no longer exists is worse than one that follows its subject. **The BR §1
-  sweep ran on the SHORTENED form** against the 227-name ability corpus, the whole 87-entry rune
-  pool including the retired half, the six templates and every talent node: **no collision**.
-  Neighbours are `Hex of Ruin`, `Weight of Ruin` and `Avatar of Ruin`. The rule is now
-  `text-standard.html` §4.11, with the generated stat family named as its one deliberate exception.
-- **§4 — TWO FALSE CLAIMS ABOUT THE TAG MECHANISM WERE REPAIRED BECAUSE §2 IS WRITTEN IN THAT
-  SECTION.** `master.html` §6c said *"NO CLAUSE READS A TAG YET"* and the glossary's
-  `archetype_tags` said *"THE TAGS ARE SHOWN AND READ NOTHING"* — **both false since EZ gated eight
-  runes**, and the second is contradicted by the glossary's own `runes` entry two screens away.
-  **NOT repaired and named so the next batch can find them:** `master.html`'s rune section still
-  says *"with the pool empty there is nothing left to price"*, *"the 53 ET retires"* and *"Spec
-  coverage: 65 authored runes"* (all superseded at EZ, a different section and a paragraph rather
-  than a sentence); and the `merchant` glossary entry says the Peddler offers a rune *"to each hero
-  who has a free slot"* when `_roll_offers` checks no slot.
-- **§5 — FIVE NEGATIVE CONTROLS, EACH DISCRIMINATING, AND ONE THAT READ GREEN ON ITS FIRST ARMING.**
-  `rune_choice` neutered to HEAD's behaviour → **6 reds**, and §1e **reproduced the designer's exact
-  symptom through the real screen** (`["Heavy Bolts", "Heavy Bolts"]` in the pouch). One BREAK
-  primary restored → 3. The old rune name restored → 2. The merchant's three draft needles restored
-  → 4. **`rune_choice` turned into a REROLL → exactly 2**, the idempotence arm and the no-reroll
-  arm and nothing else, which is what earns those two. **THE REROLL CONTROL DID NOT BITE ON ITS
-  FIRST ARMING** — dropping the early return left the rebuilt array identical to the stored one, so
-  it read 87 / 0; re-armed by discarding the survivors it bit. Every control file was restored from
-  a pre-control copy and **md5-verified identical**.
-- **§6 — HEAD'S UNMODIFIED GATES WERE RUN AGAINST THE NEW CODE FIRST, AND IT RETURNED TWO REDS
-  NOBODY PREDICTED PLUS ONE THAT READ GREEN AND SHOULD NOT HAVE.** Predicted: `check_ek` (a sixth
-  TAG_CHECKER), `check_ed` (the new gate's pins unrecorded). **NOT predicted: `check_el`** — Feint,
-  §2a above. **NOT predicted: `check_ez` — 118 / 6 WITH A THROW**, down from 132: §1 and §4 each
-  **hard-coded BREAK as a tag with primaries to draw from**, so §1 threw at `mk[0]` and deleted 14
-  checks of §5, and §4's 2/2/2 breadth arm came back four cards long and stopped meeting the
-  condition it exists to test. **§4's self-check caught its own arm and named all four breadth
-  runes** — exactly what FA §4 built that assertion for. **Both are repaired by DERIVING the tag
-  rather than naming a different one**, because naming a second word buys the identical failure the
-  next time the vocabulary moves. **AND `test_batch_bo` WENT ONLY 2 RED OF 3**: its third needle,
-  `Run.draft_price()`, went on matching **the paragraph in `shop_screen.gd` that explains why the
-  column is gone** — CLAUDE.md's EV §5 rule arriving from the other side. It reads the
-  comment-stripped source now, through the authored `Gate.strip_comments` rather than a copy.
-- **WHAT MOVED: four game scripts, one data file, five gates and suites, the manifest and eight
-  documents.** `scripts/run_state.gd` (`rune_choice`), `scripts/map_screen.gd` (the render and the
-  pick both through it), `scripts/shop_screen.gd` (the draft column removed), `scripts/classes.gd`
-  (54 `CARD_TAGS` rows + a header block); `data/runes.json` (the name and its pointer);
-  `data/glossary.json` (three entries); **`check_fd.gd` is NEW at 87 checks**, `check_ez` 132 → 133,
-  `check_ek` / `check_el` / `test_batch_bo` re-pointed with no count change, `check_parse` 167 →
-  168; `pin-manifest.json` (1371 → 1380 pins), `baselines.json` (three rows), `CLAUDE.md` (two new
-  standing rules and two extended blocks), `docs/master.html`, `docs/changelog.html`,
-  `docs/design-notes.md`, `docs/text-standard.html` (§4.11 is new), this file and
-  `docs/reports/FD.md`. **`scripts/battle.gd`, `scripts/unit.gd`, `scripts/talents.gd`,
-  `scripts/runes.gd`, `scripts/events.gd` and `scripts/run_sim.gd` are byte-unchanged.**
-- **Next letter: FE.** FD sorts above every suite's own stamp compare — the highest is `"CE"`, and
+- **Last batch: FE — THE RUNE ROWS FOLLOW THE CARDS, AND THE OTHER TWO QUEUES ARE DRIVEN.** Two
+  items, both handed forward by FD, and **both of FD's open questions are now answered.** §1 moves
+  the five `RUNE_TAGS` rows that led with BREAK to `["OFFENSE", "BREAK"]`; §2 drove the two
+  unguarded frozen queues, found **both reachable and both of FD's descriptions wrong**, and
+  repaired them through `Run.ability_choice` and `Run.upgrade_choice`. Full working:
+  **`docs/reports/FE.md`**.
+- **§0 — THREE OF THE BRIEF'S PREMISES WERE FALSE AND ONE DECIDED HOW §2 WAS WRITTEN.** *"EZ §0c
+  established that the two conditions count PRIMARIES, so a rune's primary is not merely
+  descriptive"* — **the conditions count CARD primaries over the DRAFTED half; neither reads
+  `RUNE_TAGS` at all.** *"`bm_candidates` … unguarded"* — **`_pick_ability` already had a guard**,
+  and repairing the fault the brief describes would have left the fault that exists. *"`inquisitor`
+  displaying as Devout misled a brief at CE, CF and again in FD's own pressure table"* — it misled
+  **EQ §3 and ER §1**; FD's table is correct. And the brief's file list names `data/runes.json`,
+  which carries no tag field: §1 is entirely in `scripts/runes.gd`.
+- **§1 — `RUNE_TAGS` FOLLOWS THE CARDS, AND THE POPULATION IS FIVE.** Derived off the table, not
+  taken from the brief. `long_watch` and `bared_plate` live, `comet`, `seventh_bolt` and
+  `shattered_guard` retired — **all five read `["OFFENSE", "BREAK"]`.** The retired three move with
+  the live two, because the reason for the ruling is that one vocabulary with two rules is the
+  defect and a retired entry is kept precisely so it can be read. **Primary spread: BREAK 5 → 0,
+  OFFENSE 14 → 19; rows carrying BREAK at all stayed at 9**, which is what says this was a demotion
+  and not a removal.
+- **§1a — FOUR OF THE FIVE CARRIED BREAK AS THEIR ONLY TAG. `bared_plate` IS THE ONE PER-RUNE
+  JUDGEMENT AND IT IS NOT A FEINT.** The four cost nothing — one tag becomes two and nothing is
+  displaced. `bared_plate` read `["BREAK", "DEFENSE"]` and two tags is the ceiling, so retaining
+  BREAK displaces DEFENSE — **but that DEFENSE was recording a DRAWBACK, and `RUNE_SHAPES` already
+  records it as `TRADEOFF`.** Nothing is lost that is written nowhere else. **No standing ruling
+  owned any of the five second slots**, so BREAK is retained on all five.
+- **§1b — NOTHING READS A RUNE'S PRIMARY, AND THAT IS STRONGER THAN "DISPLAY-ONLY".** Four
+  documents called the table display-only. **It reaches no surface at all**: the chain is
+  `RUNE_TAGS` → `rune_tags()` → `rune_tag_line()` → **nothing**, because that builder has **zero
+  callers** in `scripts/` and `scenes/` and the rune-offer surface EK deferred was never built.
+  `rune_shape_line` is in the same position. **And neither rune CONDITION reads it** —
+  `threshold_met` counts `Classes.primary_tag_count`, `breadth_met_fraction` counts
+  `primary_tag_peak`, both over the DRAFTED cards. **So §1 is purely for consistency and has no
+  mechanical effect at all**, and `check_fe` §1b asserts the inertness in both directions.
+- **§2 — THE IDIOM'S POPULATION IS FIVE AND THREE WERE ALREADY GUARDED.** Derived off what a rolled
+  offer is STORED on. The fifth is **`pending_item_offers`** — rolled at loot, saved, answered on
+  the map, and it re-asks the POUCH with a comment saying why. **The shop and the blacksmith are
+  NOT in the population** and that is asserted: both roll into a screen-local `offers` in `_ready`
+  and neither is saved. **Reachability is structural** — `MINI_SLOT` and `BOSS_SLOT` are FIXED
+  slots, three mini-boss and three zone-boss awards a run, both awarding to every hero, and
+  **nothing forces the answer**: travel is not gated on either `picks_owed`.
+- **§2a — `bm_candidates` COULD NOT PRODUCE THE DUPLICATE FD IMPLIES, AND ITS REAL FAULT IS WORSE.**
+  `_pick_ability` already refused `pool_name in member["bm_abilities"]`, and **`bm_abilities` is the
+  only term of `owned_ability_names` that moves during a run** (the kit and its overrides are fixed,
+  BM locks `talents` for the run, and a drafted card also lands there). **But it refused by
+  RETURNING**, which removed nothing — so the stale name was still drawn as a button that did
+  nothing: **604 dead buttons over 240 driven runs**, and where the boss pool is smaller than the
+  number of deferred picks **every** button was dead. **The Devout's pool is TWO: three deferred
+  picks stranded the third in 20 of 20 of his runs**, badge stuck for the rest of the run. **The
+  collision is certain, not likely** — boss pools run 2–5 against an offer of three, and drafting in
+  between does not help because a draft comes out of `spec_draft_pool` (10–13), a different pool.
+- **§2b — `up_candidates` HAD NO GUARD AT ALL AND IT IS A BALANCE FAULT.** AP's ONCE-PER-RUN rule
+  has exactly one enforcement point and it is the ROLL's `has_upgrade` filter. **Two queued triples
+  share an upgrade id in 376 of 400 and the same (ability, upgrade) pair in 247 of 400** — and
+  **`_stamp_upgrade` is not idempotent for six of the eight**: Honed 25 → 38 → **57**, Weighted's
+  pressure ×2 → **×4**, Quickened −2 → **−4** turns, Widened +1 → **+2** hits, Piercing to a full
+  1.0, Swift compounding. Only Effortless and Certain set a constant.
+- **§2c — THE REPAIR IS FD'S REPAIR TWICE, AND NEITHER IS A REROLL.** Both drop only what is no
+  longer legal, top up through the same door the roll uses, and **write the repair back** — so the
+  overlay's buttons and the handler read one array, which matters because `_pick_upgrade` takes an
+  INDEX. **A clean queue is returned untouched** (BATCH X) and that is asserted on both.
+  `ability_choice` **preserves the award's three-tier cascade** rather than flattening it, so a
+  repaired triple can come back shorter than three — `roll_upgrade_offer`'s own principle, *the
+  picker shows what exists rather than padding*. The stranded Devout pick becomes answerable out of
+  his spec draft pool. **`_pick_ability`'s old refuse-and-return is removed rather than left
+  beside the new door**, and its absence is asserted.
+- **§3 — TWO THINGS DELIBERATELY NOT DONE.** `_stamp_upgrade` is **not** made idempotent — that is a
+  second way to reach the same guarantee, and the guard belongs at the answer with the rest of the
+  idiom; `check_fe` §2c asserts the stack IS still real so the day that changes the gate says the
+  guard has become belt-and-braces. And **the upgrade's paired ABILITY is not re-asked**: a benched
+  card is kept and `apply_upgrades` skips its entry in silence by design, so dropping the candidate
+  would destroy a pick over a reversible state.
+- **§4 — HEAD'S UNMODIFIED GATES WERE RUN AGAINST THE NEW CODE FIRST AND RETURNED EXACTLY ONE RED,
+  PREDICTED.** `check_fd` §2's `rune_break.size() == 5` reading 0 — the pin FD placed for the day
+  this was ruled on, doing its job. Nothing unpredicted, which is the first time in three batches;
+  FD's own run returned two. Zero throws and zero `Parse Error` across all 94 logs.
+- **WHAT MOVED: three game scripts, one gate re-pointed, one new gate and eight documents.**
+  `scripts/runes.gd` (5 `RUNE_TAGS` rows + the header), `scripts/run_state.gd` (`ability_choice`,
+  `upgrade_choice` and two top-up helpers), `scripts/map_screen.gd` (four call sites);
+  **`check_fe.gd` is NEW**, `check_fd` §2's pin re-pointed 5 → 0 in place with its reason,
+  `check_ek`'s `TAG_CHECKERS` gained a seventh, `check_parse` 168 → 169; `pin-manifest.json`,
+  `baselines.json`, `run_battery.sh`, `CLAUDE.md` (two blocks extended), `docs/master.html` (the
+  stamp is bumped to FE — **FD left it reading FC**), `docs/changelog.html`,
+  `docs/design-notes.md`, this file and `docs/reports/FE.md`. **`scripts/battle.gd`,
+  `scripts/classes.gd`, `scripts/talents.gd`, `scripts/unit.gd`, `scripts/shop_screen.gd`,
+  `scripts/run_sim.gd`, `scripts/events.gd` and `data/runes.json` are byte-unchanged.**
+- **Next letter: FF.** FE sorts above every suite's own stamp compare — the highest is `"CE"`, and
   all fourteen read exactly TWO characters.
+- **`CLAUDE.md` IS AT 284 KiB AGAINST A 290 KiB CEILING.** EE §1's rule. **The next batch to add a
+  block is the one that has to cut**, and there is roughly one batch of headroom left.
 - **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
   talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
   against four specs** with **eight specs still unauthored**. **What is left in the rune layer is
   still authoring and it is still the designer's, one rune at a time.** **The ladder still has an
   open design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on
-  this list.** **Two questions this batch opens and does not answer:** whether the two live
-  primary-BREAK rune rows follow the cards (§2c), and whether the two unguarded frozen queues are
-  reachable (§1c).
+  this list.** **This batch opens no new question.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### FD OPENS TWO QUESTIONS AND ANSWERS NEITHER — **BOTH ARE THE DESIGNER'S OR THE NEXT BATCH'S**
+### FD'S TWO QUESTIONS ARE BOTH ANSWERED — **NOTHING IS OWED FROM THEM**
 
-**Full evidence: `docs/reports/FD.md` §1f and §2.**
+**Full evidence: `docs/reports/FE.md`.** FD asked whether the two live primary-BREAK rune rows
+should follow the cards, and whether the two unguarded frozen queues were reachable. **The designer
+ruled the first and FE drove the second.** This item records that both are closed, and carries the
+two things a later batch must not re-derive from scratch:
 
-- **DO THE TWO LIVE PRIMARY-BREAK RUNE ROWS FOLLOW THE CARDS?** FD §2 ruled that no CARD carries
-  BREAK first, and the word "card" is in the ruling four times. `Runes.RUNE_TAGS` still has
-  **`long_watch` (`["BREAK"]`) and `bared_plate` (`["BREAK", "DEFENSE"]`) live**, plus three retired
-  rows. **The vocabulary is shared, so the primary vocabulary is now uniform on cards and not on
-  runes.** The table is display-only (`rune_tag_line`), so nothing behaves differently either way —
-  this is a consistency decision, not a mechanical one. `check_fd` §2 pins the population at five so
-  the day it is ruled on, the gate says so. **Widening a ruling is not implementing it, and that is
-  why this is here rather than done.**
-- **ARE THE TWO UNGUARDED FROZEN QUEUES REACHABLE?** FD §1 repaired `rune_candidates`, which is
-  rolled at a drop and answered later with nothing re-asking it. **The same idiom is in three more
-  places and only one is guarded**: `draft_candidates` IS re-asked (`Run.take_draft_ability` refuses
-  a card the hero already knows), while **`bm_candidates` (the zone-boss pick, → `Run.hold_ability`)
-  and `up_candidates` (the upgrade pick, → `member["upgrades"]`) have no such check.** Both need two
-  picks queued before either is answered. **Their reachability was NOT driven and FD does not claim
-  it** — the source-level fact is what is recorded. Repairing them on a hunch was out of FD's scope;
-  measuring them is one probe.
+- **`RUNE_TAGS` IS NOT A MECHANISM AND MEASURING THAT WAS THE USEFUL HALF.** `rune_tag_line` has
+  ZERO callers and neither rune condition reads the table, so *any* future change to those rows is
+  a consistency change until the rune-offer surface EK deferred is actually built. **`check_fe` §1b
+  asserts it in both directions**, so the day that surface arrives the gate says so rather than four
+  documents quietly becoming false.
+- **A GUARD THAT REFUSES BY RETURNING IS NOT A REPAIR, AND THAT IS THE TRANSFERABLE FINDING.**
+  `_pick_ability` had the right test and the wrong response: it declined the illegal pick without
+  removing it from the offer, so the button stayed on screen doing nothing and — where every option
+  was illegal — the pick could never be answered at all. **Reading a table of resolution doors tells
+  you whether a check exists; it does not tell you what happens when the check fires.** Recorded as a
+  standing rule in `CLAUDE.md`, inside FD's own block.
 
 ### THE SKILL CHECK'S DIFFICULTY IS RULED AND BUILT — **ONE OBSERVATION IS OWED FORWARD (EY)**
 

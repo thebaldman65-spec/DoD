@@ -14,6 +14,80 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-06 &mdash; Batch FE: THE RUNE ROWS FOLLOW THE CARDS, AND THE OTHER TWO QUEUES ARE DRIVEN</h2>
+
+<p><i><b>Two items, both handed forward by Batch FD.</b> FD demoted BREAK on all 54 cards that led
+with it and deliberately left the five RUNE rows alone, asking the designer whether they should
+follow. They do. And FD reported two more offers wearing the &ldquo;rolled early, answered late&rdquo;
+shape without driving whether the state was reachable &mdash; <b>it is, on both, and driving them
+moved both of FD&rsquo;s findings.</b></i></p>
+
+<p><b>&sect;1 &mdash; <code>RUNE_TAGS</code> FOLLOWS THE CARDS.</b> The population was derived off
+the table rather than taken from the brief: <b>five rows</b>, and all five now read
+OFFENSE&nbsp;&middot;&nbsp;BREAK &mdash; <code>long_watch</code> and <code>bared_plate</code> live,
+<code>comet</code>, <code>seventh_bolt</code> and <code>shattered_guard</code> retired. <b>The
+retired three move with the live two</b>, because the reason for the ruling is that one vocabulary
+with two rules is the defect and a retired entry is kept precisely so it can be read. <b>Four of
+the five carried BREAK as their ONLY tag</b> and cost nothing &mdash; one tag becomes two and
+nothing is displaced. <b><code>bared_plate</code> is the one per-rune judgement</b>: it read
+BREAK&nbsp;&middot;&nbsp;DEFENSE, two tags is the ceiling, and the DEFENSE it displaces was
+recording a DRAWBACK that <code>RUNE_SHAPES</code> already records as its TRADEOFF. It is not a
+Feint &mdash; no standing ruling owned any of the five second slots, so <b>BREAK is retained on all
+five</b> and the demotion never became a removal. The primary spread went BREAK
+5&nbsp;&rarr;&nbsp;0 and OFFENSE 14&nbsp;&rarr;&nbsp;19; rows carrying BREAK at all stayed at 9.</p>
+
+<p><b>&sect;1a &mdash; AND IT CHANGES NOTHING MECHANICALLY, WHICH IS STRONGER THAN &ldquo;DISPLAY-ONLY&rdquo;.</b>
+Four documents called <code>RUNE_TAGS</code> display-only. <b>It reaches no surface at all</b>: the
+chain is <code>RUNE_TAGS</code>&nbsp;&rarr;&nbsp;<code>rune_tags()</code>&nbsp;&rarr;&nbsp;<code>rune_tag_line()</code>&nbsp;&rarr;&nbsp;<b>nothing</b>,
+because that builder has <b>zero callers</b> and the rune-offer surface EK deferred was never
+built. <b>And neither rune CONDITION reads it</b> &mdash; THRESHOLD and BREADTH both count CARD
+primaries over the hero&rsquo;s drafted cards. So the change is purely for consistency, and
+<code>check_fe</code> &sect;1b asserts the inertness in both directions so the day a condition does
+read the table, the gate says so.</p>
+
+<p><b>&sect;2 &mdash; THE TWO FROZEN QUEUES ARE DRIVEN, AND BOTH OF FD&rsquo;S ROWS WERE WRONG.</b>
+The idiom&rsquo;s population is <b>five, not four</b>: the fifth is the <b>item swap offer</b>,
+which was already guarded and says so in its own comment. <b>Three of five were guarded, not one of
+three.</b> Reachability is structural &mdash; the mini-boss and the zone boss sit at <b>fixed map
+slots</b>, one of each per zone across three zones, both awarding to every hero, and nothing forces
+the answer.</p>
+
+<p><b>&sect;2a &mdash; THE ZONE-BOSS PICK COULD NOT PRODUCE A DUPLICATE, AND THE REAL FAULT IS
+WORSE THAN ONE.</b> <code>_pick_ability</code> already refused a name the hero held &mdash; and
+that field is the only part of what a hero owns that moves during a run. <b>But it refused by
+RETURNING</b>, which removed nothing, so the stale name was still drawn as a button that did
+nothing when pressed: <b>604 dead buttons over 240 driven runs</b>. And where a hero&rsquo;s boss
+pool is smaller than the number of picks he has saved up, <b>every button is dead and the pick can
+never be spent</b> &mdash; the Devout&rsquo;s pool is two, and three deferred picks stranded the
+third in <b>20 of 20</b> of his runs, with the badge stuck on for the rest of the run. The
+collision is certain rather than likely: boss pools run 2&ndash;5 entries against an offer of
+three, and drafting in between does not help because a draft comes out of a different pool.</p>
+
+<p><b>&sect;2b &mdash; THE MINI-BOSS UPGRADE PICK HAD NO GUARD AT ALL, AND IT STACKED.</b> The
+once-per-run rule on upgrades was enforced only by the roll. Two queued offers shared an upgrade in
+<b>376 of 400</b> trials and the same upgrade on the same ability in <b>247 of 400</b> &mdash; and
+<b>six of the eight upgrades compound when applied twice</b>: Honed 25&nbsp;&rarr;&nbsp;38&nbsp;&rarr;&nbsp;<b>57</b>,
+Weighted&rsquo;s Break damage &times;2&nbsp;&rarr;&nbsp;<b>&times;4</b>, Quickened
+&minus;2&nbsp;&rarr;&nbsp;<b>&minus;4</b> turns, Widened +1&nbsp;&rarr;&nbsp;<b>+2</b> hits,
+Piercing to a <b>full</b> 1.0, Swift compounding. Only Effortless and Certain set a constant and
+survive it.</p>
+
+<p><b>&sect;2c &mdash; THE REPAIR IS FD&rsquo;S REPAIR, TWICE.</b> <code>Run.ability_choice</code>
+and <code>Run.upgrade_choice</code> each drop only what is no longer legal, top back up through the
+same door the roll uses, and <b>write the repair back</b> &mdash; so the overlay&rsquo;s buttons and
+the handler read one array, which matters because the upgrade handler takes an INDEX. <b>Neither is
+a reroll</b>: a clean queue is returned untouched, which is Batch X&rsquo;s rule. The ability top-up
+<b>preserves the award&rsquo;s three-tier cascade</b> rather than flattening it, so a repaired
+triple can come back shorter than three &mdash; the picker shows what exists rather than padding.
+The stranded Devout pick becomes answerable out of his spec draft pool.</p>
+
+<p><b>&sect;3 &mdash; WHAT WAS DELIBERATELY LEFT.</b> <code>_stamp_upgrade</code> is <b>not</b> made
+idempotent: that would be a second way to reach the same guarantee, and the guard belongs at the
+answer with the rest of the idiom &mdash; <code>check_fe</code> asserts the stack is still real so
+the day that changes the gate says the guard has become belt-and-braces. The upgrade&rsquo;s paired
+ABILITY is deliberately not re-asked either: a benched card is kept and its upgrade returns with
+it, so dropping the candidate would destroy a pick over a reversible state.</p>
+
 <h2>2026-09-06 &mdash; Batch FD: THE CACHE RE-ASKS, BREAK BECOMES SECONDARY-ONLY, AND THE SHARED RUIN IS RENAMED</h2>
 
 <p><i><b>Three items, and the first one was reported as two bugs and is one hole.</b> The designer
@@ -89,7 +163,7 @@ threshold is now UNMEETABLE and must not be authored</b>, which inverts the warn
 fight. <b><code>Runes.RUNE_TAGS</code> is deliberately not touched</b>: the ruling named CARDS, and
 five rune rows still carry BREAK first (<code>long_watch</code>, <code>bared_plate</code> live;
 <code>comet</code>, <code>seventh_bolt</code>, <code>shattered_guard</code> retired). Pinned at five
-and reported, not moved.</p>
+and reported, not moved. <b>(Ruled and moved one batch later &mdash; see Batch FE below.)</b></p>
 
 <p><b>&sect;3 &mdash; <code>Rune of the Shared Ruin</code> &rarr; <code>Shared Ruin</code>.</b> 20 of
 the 21 live runes carry one- or two-word names and <b>61 of the 66 retired ones are

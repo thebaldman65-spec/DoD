@@ -258,9 +258,42 @@ static var _data := {}
 # header forbids taking. **MARK therefore appears in `Classes.TAG_ORDER` and
 # in no row below.**
 #
-# **MECHANICALLY INERT.** Nothing reads these for anything but display, and
-# `check_ek` asserts it. **EJ SIZED THE RE-KEY THAT WOULD USE THEM** — 59
-# clauses in 32 runes — and that is the next batch, not this one.
+# **MECHANICALLY INERT, AND FE §1 MEASURED HOW INERT.** `check_ek` asserts
+# nothing reads these for anything but display — and the display does not exist
+# yet either. The whole chain is `RUNE_TAGS` → `rune_tags()` →
+# `rune_tag_line()` → **nothing**: that builder has ZERO callers in `scripts/`
+# and in `scenes/`. `docs/reports/EK.md` is where it was deferred -- the rune
+# offer *"wants its own rune-offer surface, which is the rune batch's work"*.
+# **NEITHER RUNE CONDITION READS THIS TABLE**: `threshold_met` and
+# `breadth_met_fraction` both count
+# `Classes.card_tag_primary` over the hero's DRAFTED CARDS (EZ §0c), so a rune's
+# own primary feeds nothing at all. **EJ SIZED THE RE-KEY THAT WOULD USE THEM**
+# — 59 clauses in 32 runes — and that is still a later batch.
+#
+# ══ BATCH FE §1 — THE RUNE ROWS FOLLOW THE CARDS ══════════════════════
+#
+# **NO RUNE CARRIES BREAK AS ITS PRIMARY EITHER**, ruled by the designer, and
+# the population was DERIVED off this table rather than taken from a list:
+# **five rows**, `long_watch` and `bared_plate` live, `comet`, `seventh_bolt`
+# and `shattered_guard` retired. All five now read `["OFFENSE", "BREAK"]`.
+#
+# **FOUR OF THE FIVE CARRIED BREAK AS THEIR *ONLY* TAG** and cost nothing to
+# move — one tag becomes two and nothing is displaced, exactly as the 20
+# single-tag cards of FD's 54 did. **`bared_plate` IS THE ONE PER-RUNE
+# JUDGEMENT**: it read `["BREAK", "DEFENSE"]`, and two tags is the ceiling
+# (`check_ek` §2), so retaining BREAK displaces DEFENSE. **That DEFENSE was
+# recording a DRAWBACK** — the rune spends the hero's Block for +25% Break
+# damage — **and the drawback is already recorded one table down**, where
+# `RUNE_SHAPES["bared_plate"]` reads `["STAT", "TRADEOFF"]`. Nothing is lost
+# that is not written elsewhere, which is why this is a displacement rather
+# than a collision. **NO ROW WAS A FEINT**: no standing ruling pins any of the
+# five rows' second slot, so BREAK is retained on all five and the demotion
+# never became a removal.
+#
+# **THE RETIRED THREE MOVE WITH THE LIVE TWO, DELIBERATELY.** The reason for
+# the ruling is that one vocabulary with two rules is the defect — `inquisitor`
+# displaying as Devout has misled three briefs — and a retired entry is kept
+# precisely so it can be read. A row left behind is the second rule.
 const RUNE_TAGS := {
 	"binding_souls": ["DEFENSE"],  # Rune of Binding Souls
 	"martyr": ["DEFENSE", "TEMPO"],  # Rune of the Martyr
@@ -268,14 +301,14 @@ const RUNE_TAGS := {
 	"hoarfrost_points": ["DEBUFF", "OFFENSE"],  # Rune of Hoarfrost Points
 	"true_flight": ["OFFENSE"],  # Rune of True Flight
 	"wolfs_hunger": ["DEFENSE", "OFFENSE"],  # Rune of the Wolf's Hunger
-	"comet": ["BREAK"],  # Rune of the Comet
+	"comet": ["OFFENSE", "BREAK"],  # Rune of the Comet
 	"reckless_channeling": ["DEFENSE", "OFFENSE"],  # Rune of Reckless Channeling
 	"wellspring": ["RESOURCE"],  # Rune of the Wellspring
 	"emberforged": ["DEBUFF", "OFFENSE"],  # Emberforged Rune
 	"old_wrath": ["RESOURCE"],  # Rune of Old Wrath
 	"warriors_edge": ["OFFENSE", "RESOURCE"],  # Rune of the Whetted Edge
 	"resonant_core": ["OFFENSE"],  # Rune of the Resonant Core
-	"seventh_bolt": ["BREAK"],  # Rune of the Seventh Bolt
+	"seventh_bolt": ["OFFENSE", "BREAK"],  # Rune of the Seventh Bolt
 	"unquiet_mind": ["RESOURCE", "TEMPO"],  # Rune of the Unquiet Mind
 	"wide_current": ["RESOURCE", "OFFENSE"],  # Rune of the Wide Current
 	"deep_bond": ["DEBUFF", "DEFENSE"],  # Rune of the Deep Bond
@@ -316,7 +349,7 @@ const RUNE_TAGS := {
 	"narrow_gap": ["OFFENSE", "DEBUFF"],  # Rune of the Narrow Gap
 	"bared_guard": ["DEFENSE"],  # Rune of the Bared Guard
 	"duelist": ["DEFENSE", "BREAK"],  # Rune of the Duelist
-	"shattered_guard": ["BREAK"],  # Rune of the Shattered Guard
+	"shattered_guard": ["OFFENSE", "BREAK"],  # Rune of the Shattered Guard
 	"still_wrist": ["DEFENSE", "RESOURCE"],  # Rune of the Still Wrist
 	"grudges": ["OFFENSE"],  # Rune of Grudges
 	"iron_promise": ["DEFENSE", "TEMPO"],  # Rune of the Iron Promise
@@ -344,8 +377,8 @@ const RUNE_TAGS := {
 	"standing_wall": ["DEFENSE"],              # Standing Wall
 	"bracing_line": ["DEFENSE"],               # Bracing Line
 	"split_shield": ["DEFENSE"],               # Split Shield
-	"long_watch": ["BREAK"],                   # Long Watch
-	"bared_plate": ["BREAK", "DEFENSE"],       # Bared Plate — it SPENDS defense
+	"long_watch": ["OFFENSE", "BREAK"],        # Long Watch
+	"bared_plate": ["OFFENSE", "BREAK"],       # Bared Plate — DEFENSE displaced (FE §1)
 	"keen_focus": ["RESOURCE"],                # Keen Focus
 	"heavy_bolts": ["RESOURCE", "OFFENSE"],    # Heavy Bolts
 	"ambush": ["OFFENSE", "RESOURCE"],         # Ambush

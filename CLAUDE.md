@@ -2250,14 +2250,53 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   path the player uses replays. **A drive that exercises the producer is not a drive of the
   consumer.** THE IDIOM IS IN THREE MORE PLACES AND ONLY ONE OF THEM IS GUARDED, which is the
   useful half of this: `draft_candidates` IS re-asked (`take_draft_ability` refuses a card the
-  hero already knows), while **`bm_candidates` (the zone-boss pick) and `up_candidates` (the
-  upgrade pick) reach `hold_ability` / `member["upgrades"]` with no such check**. Both are
-  **reported, not repaired, at FD §1** — see `docs/reports/FD.md`, which is explicit that their
-  reachability was NOT driven.
+  hero already knows), while `bm_candidates` and `up_candidates` did not. **BATCH FE DROVE BOTH,
+  FOUND THE POPULATION IS FIVE RATHER THAN FOUR, AND REPAIRED THEM** — see below.
 - **THE REPAIR IS NOT A REROLL AND THE DIFFERENCE IS ASSERTED.** BATCH X's rule is that a cache
   does not reroll when a screen opens. `check_fd` §1c hands it a triple with nothing wrong with it
   and requires it back unchanged — without that arm the section passes on a function that simply
   rerolls, which satisfies every other arm and breaks the rule the cache is built on.
+
+### THE POPULATION IS FIVE, BOTH REMAINING HOLES WERE REACHABLE, AND A REFUSAL IS NOT A REPAIR (FE §2)
+
+> **A GUARD THAT REFUSES BY *RETURNING* IS NOT A REPAIR. It declines the illegal choice and
+> LEAVES IT ON SCREEN — so the offer is still drawn, the button does nothing when pressed, and
+> where every option is illegal the choice can never be answered at all. Remove the stale option
+> from the offer; do not merely decline it.**
+
+**FE DROVE THE TWO QUEUES FD REPORTED AND BOTH OF FD'S ROWS WERE WRONG, IN OPPOSITE DIRECTIONS.**
+
+- **THE IDIOM'S POPULATION IS FIVE AND THREE WERE ALREADY GUARDED.** Derived off what a rolled
+  offer is STORED on. The fifth is **`pending_item_offers`** — rolled at loot, saved, answered on
+  the map, and it re-asks the POUCH (`if not Run.needs_slot(id)`) with a comment saying why. **The
+  shop and the blacksmith are NOT in the population**: both roll into a screen-local `offers` in
+  `_ready` and neither is saved, so neither can go stale.
+- **REACHABILITY IS STRUCTURAL.** `MINI_SLOT` and `BOSS_SLOT` are FIXED slots — three mini-boss
+  and three zone-boss awards a run, both awarding to every member, and **nothing forces the
+  answer**; travel is not gated on `bm_picks_owed` or `up_picks_owed`.
+- **`bm_candidates` COULD NOT PRODUCE THE DUPLICATE FD IMPLIES.** `_pick_ability` already refused
+  `pool_name in member["bm_abilities"]`, and **`bm_abilities` is the only term of
+  `owned_ability_names` that moves during a run** — the kit and its overrides are fixed, BM locks
+  `talents` for the run, and a drafted card also lands in `bm_abilities`. **The fault was the
+  refusal's SHAPE**: 604 dead buttons over 240 driven runs, and where the boss pool is smaller than
+  the number of deferred picks EVERY button is dead — **the Inquisitor's pool is TWO, and three
+  deferred picks stranded the third in 20 of 20 of his runs**, `bm_picks_owed` stuck at 1 for the
+  rest of the run.
+- **`up_candidates` HAD NO GUARD AND IT IS A BALANCE FAULT.** AP's ONCE-PER-RUN rule has exactly
+  one enforcement point and it is the ROLL's `has_upgrade` filter. Two queued triples share an
+  upgrade id in **376 of 400** and the same (ability, upgrade) pair in **247 of 400** — and
+  **`_stamp_upgrade` is not idempotent for six of the eight**: Honed 25 → 38 → **57**, Weighted's
+  pressure ×2 → **×4**, Quickened −2 → **−4**, Widened +1 → **+2**, Piercing to a full 1.0, Swift
+  compounding. Only Effortless and Certain set a constant.
+- **A COLLISION RATE CAN BE A PROPERTY OF THE POOL RATHER THAN OF THE QUEUE.** `bm` read
+  **400 / 400** because the boss pool is 2–5 entries and an offer is `slice(0, 3)`: at three or
+  fewer, two triples are **the same set**. It stayed 240 / 240 with a whole zone of drafting in
+  between, because a draft comes out of `spec_draft_pool` (10–13) — **a different pool**. Quote the
+  pool size beside the rate or the rate reads as chance.
+- **A TOP-UP MUST PRESERVE THE ROLL'S TIERING, AND MAY THEREFORE COME BACK SHORT.**
+  `ability_choice` reads the tier `award_ability_pick` would read today and no further, so a
+  repaired triple can hold fewer than three — which is `roll_upgrade_offer`'s own stated
+  principle, *the picker shows what exists rather than padding*.
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 
@@ -2291,10 +2330,22 @@ removal would have destroyed the one thing the word is on the card for.
 - **BREADTH ONLY EVER GETS HARDER.** `primary_tag_peak` folds what was a hero's BREAK column into
   his OFFENSE one, so the peak rises or holds and never falls, and the four BREADTH runes (Wide
   Rite, Long Watch, Wide Watch, Shared Scent) are what pays for it.
-- **`Runes.RUNE_TAGS` IS NOT TOUCHED AND THAT IS A DECISION, NOT AN OVERSIGHT.** The ruling names
-  CARDS. Five rune rows still carry BREAK first — `long_watch` and `bared_plate` live, `comet`,
-  `seventh_bolt` and `shattered_guard` retired — pinned at five so the day it is ruled on, the
-  gate says so. **Widening a ruling is not implementing it.**
+- **`Runes.RUNE_TAGS` FOLLOWS THE CARDS, RULED BY THE DESIGNER AT FE §1.** FD left it and pinned
+  the population at five; **all five now read `["OFFENSE", "BREAK"]`** — `long_watch` and
+  `bared_plate` live, `comet`, `seventh_bolt` and `shattered_guard` retired. **The retired three
+  move with the live two**, because the reason for the ruling is that one vocabulary with two
+  rules is the defect and a retired entry is kept precisely so it can be read.
+  - **FOUR OF THE FIVE CARRIED BREAK AS THEIR ONLY TAG** and cost nothing — one tag becomes two.
+    **`bared_plate` is the one per-rune judgement**: it read `["BREAK", "DEFENSE"]`, and its
+    DEFENSE was recording a DRAWBACK that `RUNE_SHAPES` already records as `TRADEOFF`, so the
+    displacement loses nothing written nowhere else. **It is not a Feint** — no standing ruling
+    owned any of the five second slots, so BREAK is retained on all five.
+  - **AND THE CHANGE IS PURELY FOR CONSISTENCY, WHICH IS STRONGER THAN "DISPLAY-ONLY".** Four
+    documents called the table display-only. **`rune_tag_line` has ZERO callers** in `scripts/`
+    and `scenes/` — the chain is `RUNE_TAGS` → `rune_tags()` → `rune_tag_line()` → nothing — and
+    **neither rune CONDITION reads it**: `threshold_met` and `breadth_met_fraction` both count
+    `Classes.card_tag_primary` over the hero's DRAFTED CARDS. `check_fe` §1b asserts the inertness
+    in both directions, so the day a condition reads `RUNE_TAGS` the gate says so.
 
 ## STANDING RULE — A RUNE READS A TAG NOW, AND EK'S INERTNESS CLAIM IS OVER (Batch EZ, deliberately)
 
