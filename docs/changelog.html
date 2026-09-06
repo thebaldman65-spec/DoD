@@ -14,6 +14,81 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-05 &mdash; Batch FB: SPLIT TONGUE GOES BACK TO 20%</h2>
+
+<p><i><b>The designer reverted Batch FA's nerf, and the ruling followed FA's measurement rather
+than the argument that set the number.</b> Split Tongue's damage clause is REMOVED &mdash; the
+payload is <code>{"aoe": true}</code> and nothing else &mdash; so a rune-holding Occultist reads the
+same 20% of Attack as one without it. No other rune, magnitude, constant or ability moves, and no
+new rune is authored.</i></p>
+
+<p><b>&sect;1 &mdash; THE CLAUSE IS REMOVED, NOT SET BACK TO 20.</b> FA priced the damage down
+because the rune makes Hex of Ruin <code>aoe</code> and the target count would rise;
+<b>FA then measured that both halves of that reasoning were wrong</b>. <code>compose</code> floors
+the elite and mini-boss <i>budget</i> at 6, not the enemy count &mdash; a budget of 6 buys three
+power-2 enemies, and elite rosters are <b>three enemies at tiers 1 and 4 on every draw</b> &mdash;
+and at 12% the rune was already a downgrade at the common board (&times;0.61 at three,
+&times;0.79 at four), which is the thing 12% was chosen over 10% to avoid.
+<b>Writing <code>{"aoe": true, "damage": 20}</code> was refused</b>: a payload restating the card's
+own authored value is a second copy of a magnitude and goes stale silently the day Hex of Ruin is
+re-tuned. The rune widens the target set and says nothing about damage &mdash; which is the form
+<b>Pandemonium's payload already ships in</b> one file over.
+<code>data/runes.json</code> is now byte-identical to its Batch EZ state.</p>
+
+<p><b>&sect;1a &mdash; THE OBVIOUS ASSERTION IS VACUOUS AGAINST THE THING THE RULING FORBIDS, AND A
+CONTROL PROVED IT RATHER THAN AN ARGUMENT.</b> The brief asked for one new check &mdash;
+<i>&ldquo;the rune-applied Ability must now read 20 too&rdquo;</i> &mdash; and that check
+<b>PASSES</b> on <code>{"aoe": true, "damage": 20}</code>, the exact payload &sect;1 refuses. So
+<code>check_ez</code> &sect;5 gains two arms instead of one: the <b>shape</b> (no <code>damage</code>
+key in <code>set</code> or <code>add</code>) and the <b>re-tune arm</b> &mdash; move Hex of Ruin's
+authored number to 33, apply the payload, and the rune must carry 33 rather than restore 20. Armed
+with the forbidden payload the gate reads <b>115 / 2</b> and names both; the arm the brief asked for
+is not among them.</p>
+
+<p><b>&sect;2 &mdash; WHAT THE RUNE IS NOW WORTH, MEASURED, AND IT IS NOT STRICTLY BETTER.</b>
+Attack 100, twenty casts an arm, each arm on its own board, hp / statuses / Break / Broken reset
+before every cast, and every size run in <b>both orders</b> as a control (the two agree to within
+0.05). Damage and Break now move together, because with the damage clause gone both are simply the
+target count: <b>&times;1.00 / &times;1.33 / &times;1.67 / &times;2.00</b> across three to six
+enemies, on both meters. <b>At three enemies the rune is STRICTLY WORSE than not holding it</b>
+&mdash; <code>aoe</code> and <code>choose_three</code> strike the same three bodies for the same
+damage and the same Break, and the rune's only remaining effect is halving the Ruin: 3 stacks a cast
+instead of 6, and over twenty casts <b>six primings instead of twelve</b>. Ruin breaks even only at
+six, the board cap. <b>And a second strictly-worse case is a talent rather than a board size</b>:
+<b>Pandemonium</b>, the Occultist's own row-9 Madness capstone, already sets <code>aoe</code> on Hex
+of Ruin, so for a hero holding it the rune is &times;1.00 damage, &times;1.00 Break and
+<b>&times;0.50 Ruin at every board size from three to six</b>. Built as ruled; the numbers are put
+beside it.</p>
+
+<p><b>&sect;3 &mdash; HEAD'S UNMODIFIED GATES WERE RUN AGAINST THE NEW CODE FIRST, AND THIS TIME
+THEY WERE CLEAN.</b> FA's own standing rule, paid: eighteen targets that read
+<code>data/runes.json</code>, run unmodified against the reverted payload before a single assertion
+was edited. <b>Exactly one red</b> &mdash; <code>&sect;5: Split Tongue takes it to 12% of Attack
+(reads 20)</code>, the predicted one &mdash; and no unnamed dependency. <b>That the pass finds
+nothing is the result, not a reason to skip it</b>; FA's cost three unpredicted reds.
+<code>test_runes</code> fell 3804 &rarr; 3803 in the same pass, which located the whole delta in
+one <code>_int_restore</code> assertion before the baseline row moved.</p>
+
+<p><b>&sect;4 &mdash; ONE OF THE BRIEF'S TWO STANDING RULES WAS ALREADY WRITTEN, AND IT IS NOT
+WRITTEN TWICE.</b> The brief asked for both of FA's findings to be recorded in
+<code>CLAUDE.md</code>. <b>&ldquo;Run the unmodified gates against new code before editing
+them&rdquo; is already there</b>, authored by FA itself as <i>RUN HEAD'S OWN GATE AGAINST THE NEW
+CODE BEFORE RE-POINTING IT (Batch FA &sect;1b)</i>, worked example and all. Recording it again would
+be the second copy this file's own preamble names as what let it contradict itself 1900 lines apart.
+FB's run is added to the existing block as a second data point instead. <b>The snapshot rule is
+genuinely new</b> and is written beside the EV log rule it generalises:
+<i>A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME</i>.</p>
+
+<p><b>WHAT MOVED.</b> <code>data/runes.json</code> (one payload, one desc &mdash; back to its EZ
+bytes); <code>check_ez.gd</code> 113 &rarr; 115; <code>baselines.json</code> two rows
+(<code>check_ez</code> 113 &rarr; 115, <code>test_runes</code> 3804 &rarr; 3803, twelve lines
+changed, the file is <code>indent=1</code>); <code>CLAUDE.md</code> (one rule added, one extended);
+<code>docs/master.html</code> and its stamp; <code>docs/design-notes.md</code>;
+<code>docs/state.md</code>; and <code>docs/reports/FB.md</code>. <b>No game script moved a byte</b>
+&mdash; <code>scripts/runes.gd</code>, <code>scripts/battle.gd</code> and
+<code>scripts/classes.gd</code> are all unchanged, and &sect;1's empty-loadout guards stand exactly
+as FA built them.</p>
+
 <h2>2026-09-05 &mdash; Batch FA: TWO RULINGS EZ LEFT OPEN</h2>
 
 <p><i><b>Both are the designer's rulings on things Batch EZ built literally and reported rather

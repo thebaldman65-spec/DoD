@@ -547,26 +547,46 @@ func _s5_the_read_sites() -> void:
 	occ.avatar_ruin = 0
 	occ.rune_hex_threshold = 0
 
-	# ---- Occultist: SPLIT TONGUE'S DAMAGE, AND THE BASE IT MUST NOT MOVE ----
-	# **BATCH FA §2 — 20% OF ATTACK BECOMES 12%, ON THE RUNE'S VERSION ONLY.**
-	# Hex of Ruin is authored at 20% against THREE chosen enemies
-	# (`choose_three`); the rune makes it `aoe`, so the target count rises and
-	# the damage had never been priced for it. **The reduction rides the same
-	# `set` the widening does**, which is what makes it the rune's version
-	# rather than the card's — an Occultist without the rune keeps 20 and
-	# `choose_three`, and that is asserted FIRST and on the live Ability.
+	# ---- Occultist: SPLIT TONGUE WIDENS AND SAYS NOTHING ABOUT DAMAGE ----
+	# **BATCH FB §1 — FA's 12% IS REVERTED AND THE CLAUSE IS REMOVED, NOT SET
+	# BACK TO 20.** The payload is `{"aoe": true}` and nothing else. Writing
+	# `{"aoe": true, "damage": 20}` would read identically TODAY and is the
+	# thing this block refuses: a payload restating the card's own authored
+	# value is a second copy of a magnitude, and it goes stale silently the day
+	# Hex of Ruin is re-tuned.
+	#
+	# **SO THE SHAPE IS ASSERTED AS WELL AS THE VALUE, AND THE THIRD ARM IS THE
+	# ONE THAT MATTERS.** "The rune-applied Ability reads 20" passes either way.
+	# Moving the AUTHORED number and re-applying the payload is what separates
+	# "the rune is silent about damage" from "the rune happens to assign the
+	# same number" — and only the first survives a re-tune.
 	var hex: Ability = scene._find_ability(occ, "Hex of Ruin")
 	ok(hex != null, "§5: the Occultist holds Hex of Ruin")
 	ok(hex != null and hex.damage == 20 and not hex.aoe and hex.choose_three,
 		"§5: ...authored at 20%% of Attack against three chosen enemies — the BASE, untouched")
+	# THE SHAPE: no `damage` key anywhere in the payload, in either half.
+	var st_payload: Dictionary = Runes.build("split_tongue")["payload"]
+	var st_set: Dictionary = st_payload.get("set", {})
+	var st_add: Dictionary = st_payload.get("add", {})
+	ok(not st_set.has("damage") and not st_add.has("damage"),
+		"§5: ...and Split Tongue's payload names no damage at all (set: %s)" % [st_set])
 	var st_cfg := {"abilities": [hex]}
-	Talents.apply_payload(st_cfg, Runes.build("split_tongue")["payload"], 1,
-		{"learned": {}, "member": {}})
-	ok(hex != null and hex.damage == 12,
-		"§5: Split Tongue takes it to 12%% of Attack (reads %d)"
+	Talents.apply_payload(st_cfg, st_payload, 1, {"learned": {}, "member": {}})
+	ok(hex != null and hex.damage == 20,
+		"§5: ...so a rune-holding Occultist reads the SAME 20%% as one without it (reads %d)"
 			% (hex.damage if hex != null else -1))
 	ok(hex != null and hex.aoe,
 		"§5: ...and the curse is spoken to the whole line")
+	# THE RE-TUNE ARM. Move the authored number and apply the payload again:
+	# the rune must carry the new value, not restore the old one.
+	if hex != null:
+		hex.damage = 33
+		hex.aoe = false
+		Talents.apply_payload({"abilities": [hex]}, st_payload, 1,
+			{"learned": {}, "member": {}})
+	ok(hex != null and hex.damage == 33 and hex.aoe,
+		"§5: ...and a RE-TUNED Hex of Ruin keeps its new number through the rune (reads %d)"
+			% (hex.damage if hex != null else -1))
 	# **AND THE WIDENING IS WHAT DECIDES THE TARGETS, NOT THE FLAG BESIDE IT.**
 	# `_resolve`'s branch is `if ab.aoe: ... elif ab.choose_two or ab.choose_three`,
 	# so `choose_three` is still TRUE on the rune's version and is dead — which

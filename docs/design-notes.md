@@ -7384,6 +7384,39 @@ only at tier 16. The board caps at six slots regardless. **So the large board th
 for is mostly the small board where the nerf costs the most**, and ×1.18 is the best it can ever do.
 That is a design question and it is left as one.
 
+**Batch FB reverts that nerf, and the interesting half is that the ruling followed the measurement
+rather than the argument.** FA built 12% as ruled and reported that the reason given for it did not
+survive contact with the code — the board it was priced against is three enemies, not six, and at
+three a 12% field is a 39% loss for nothing. The designer read the measurement and removed the
+clause. **A batch that had patched the number instead of reporting it would have left the ruling
+standing on a premise nobody could see.**
+
+**The clause is REMOVED rather than set back to 20, and the difference is the whole discipline.**
+`{"aoe": true, "damage": 20}` behaves identically today and is a second copy of a magnitude the card
+already authors: the day Hex of Ruin is re-tuned, the rune quietly keeps the old number and nothing
+announces it. This project has now found that shape in a comment, a header, a document and a
+manifest, and the rune layer already ships the correct form one file over — **Pandemonium's payload
+is `{"aoe": true}` with an `add` for its Break and says nothing about damage at all.** The rune
+widens the target set; the card owns its own magnitude.
+
+**And the measurement the revert owes says the rune is not strictly better — it is strictly WORSE on
+the board the game fields most.** With the damage clause gone, damage and Break both scale purely
+with the target count: ×1.00 / ×1.33 / ×1.67 / ×2.00 across three to six enemies, the two columns
+now identical because they are the same ratio. **At three enemies `aoe` and `choose_three` strike
+the same three bodies for the same damage and the same Break** — the rune changes nothing except
+halving the Ruin, 6 stacks a cast to 3, and over twenty casts that is six primings instead of
+twelve. **Three enemies is every elite and mini-boss draw at tiers 1 and 4**, which is FA's own
+roster measurement. The rune breaks even on Ruin only at six, the board cap, where it is finally
+strictly better.
+
+**There is a second strictly-worse case and it is a talent, not a board size.** Pandemonium — the
+Occultist's own row-9 Madness capstone — already sets `aoe` on Hex of Ruin. A hero holding it has
+the whole line cursed before the rune is bought, so Split Tongue's only surviving clause is the Ruin
+halving: measured at ×1.00 damage and ×1.00 Break against ×0.50 Ruin **at every board size from
+three to six**. That is not a defect a batch corrects — the rune is built exactly as ruled — but a
+100g purchase that is a pure downgrade for anyone down that lane is a design question, and it is
+the same shape the batch was called to fix one layer up.
+
 **Long Draw's cost lives in a table that was deliberately not extended, which is worth naming
 because it looks like an omission.** `SS_SEQ_OPEN` is four entries solved so a one-, two-, three- or
 four-press sequence lands with the same probability — CS §4's demand that a deeper sequence must not

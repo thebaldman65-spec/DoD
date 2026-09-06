@@ -2161,6 +2161,17 @@ the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN*
   it just built really does meet the condition, **so a wrong arm reads as one broken arm rather
   than as twenty-one broken payloads.** A rebuilt arm is new code in the gate and gets no more
   trust than the code it is testing.
+- **FB RAN IT AND FOUND NOTHING, AND THAT IS THE ENTRY WORTH HAVING.** Eighteen targets that read
+  `data/runes.json`, unmodified, against FB's reverted payload before one assertion was edited:
+  **exactly one red, the predicted one.** A rule that has only ever been recorded on the run that
+  justified it reads as a rule about a near-miss. **The pass is cheap and its answer is information
+  either way** — FB's clean result is what licensed re-pointing `check_ez` in one pass instead of
+  two, and it cost about two minutes.
+- **AND A COUNT THAT MOVES IS PART OF THE READING, NOT JUST A FAILURE.** `test_runes` came back
+  **3803 against a recorded 3804** in that same pass — no failure, no red, nothing in the diff
+  pointing at it. It located the whole delta in one `_int_restore` assertion **before**
+  `baselines.json` moved, which is the difference between a baseline written off the arithmetic and
+  one written off whatever the code happened to do.
 
 ## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
 
@@ -2443,6 +2454,38 @@ readings — an accidental control.
 - **AND IT GENERALISES BEYOND SIM ARMS**: a battery log, a probe dump, any file a detached process
   is appending to. **The size of the file is not the signal** — a log that has stopped growing for
   a minute may simply be in a slow fight.
+
+## STANDING RULE — A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME (Batch FA §5, recorded at FB §3)
+
+> **A before/after instrument is only as wide as its two endpoints. Take the FIRST snapshot before
+> the first byte moves and the LAST after the last one — a snapshot taken partway through reports a
+> clean zero for every file that moved outside the pair, and a clean zero is what it looks like when
+> the instrument is working.**
+
+**IT IS THE SAME SHAPE AS READING A LOG THAT IS STILL BEING WRITTEN**, the rule directly above, and
+it belongs beside it: both read a PREFIX of the thing they are measuring and report it as the whole.
+The difference is only which end is short — the log rule is about a process that has not finished
+writing, this one about an instrument that started reading too late.
+
+- **FA IS THE WORKED EXAMPLE AND IT CAUGHT ITSELF.** FA's literal sweep took its second snapshot
+  partway through the batch, so **`docs/state.md`'s rewrite fell outside the pair.** The sweep
+  reported `LOST 0` across every document — for a file it had never compared. Re-run
+  before-all-edits against final, `state.md` read **LOST 10**.
+- **THE FAILURE IS INVISIBLE FROM THE RESULT, WHICH IS WHY THE RULE IS ABOUT PROCEDURE.** A sweep
+  that skipped a file and a sweep that cleared it print the same line. This is the vacuous-check
+  fault arriving through the instrument's WINDOW rather than through its predicate — the same
+  family as a check whose key is wrong and skips every row while printing "0 violations".
+- **THE PROCEDURE: COPY THE WHOLE TREE BEFORE THE FIRST EDIT, AND DIFF AGAINST THAT.** Not a needle
+  list captured at some point during the work — the needle POPULATION may legitimately grow as the
+  batch writes new assertions, so it is taken as the union of both corpora, but the DOCUMENTS must
+  be compared against a copy that predates every edit. **FB took a 390-file `rsync` of the tree as
+  its first action** and the endpoints could not drift after that.
+- **AND THE SNAPSHOT INSTRUMENT IS ARMED LIKE ANY OTHER.** A green sweep over prose nothing reads is
+  indistinguishable from a green sweep over prose everything reads. FB armed its own on
+  `"PARTY" IS RETIRED FROM PLAYER-FACING TEXT` — a needle **written with escaped quotes** in
+  `test_batch_bx.gd`, so a plain grep for the resolved text finds nothing and only an
+  escape-resolving extractor sees it — and confirmed both arms: the sweep read `LOST 1` naming it,
+  and `test_batch_bx` §4b went red. Restored and md5-verified.
 
 ## STANDING RULE — PROSE RECORDING A REMOVAL READS EXACTLY LIKE THE REMOVAL NOT HAPPENING (Batch EV §5, recorded at EW §4)
 
