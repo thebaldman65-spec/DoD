@@ -143,7 +143,13 @@ func _s1_rarity_is_gone() -> void:
 	# authors the first twenty-one under the new charter. The pin is MOVED, not
 	# loosened to a `>=` — the count is what says a rune arrived or left without
 	# anybody writing it down (CV's idiom, EY's `WANT_PROFILE` precedent).
-	ok(data.size() == 86, "§1: the authored pool is %d entries, expected 86" % data.size())
+	# **BATCH FC: 86 -> 87.** §3 retires Split Tongue and authors the Rune of the
+	# Shared Ruin in its place; the ENTRY is kept (the Melted Armor contract), so
+	# a one-out-one-in replacement grows the file by one and leaves the LIVE
+	# count at twenty-one. **THIS GATE OWNS THE TOTAL AND `check_et` §1 PRINTS
+	# IT** — two gates pinning one growing number is the second-copy defect, and
+	# `check_ez` §0 pins it too, which is why both were moved in one pass.
+	ok(data.size() == 87, "§1: the authored pool is %d entries, expected 87" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 
@@ -618,6 +624,18 @@ func _s5_breadth() -> void:
 		if not String(e.get("scope", "")).begins_with("spec:"):
 			continue
 		if String(e.get("retired", "")) != "":
+			# **BATCH FC — A RETIREMENT AFTER EZ IS NOT ONE OF THE TWELVE.** The
+			# retired half keeps the `lane` reading because that is the rule
+			# those entries were authored under — and FC §3 retires Split
+			# Tongue, which was authored under the SHAPES charter instead and
+			# carries no lane, so it read as a thirteenth splash for a
+			# retirement doing exactly the right thing. **`RUNE_SHAPES`
+			# MEMBERSHIP IS THE VINTAGE**: the 65 predate EZ §0's vocabulary and
+			# carry no row, everything authored at EZ or since carries one, and
+			# retiring a rune does not take its row away. Same repair as
+			# `test_runes`' coverage walk, same reason, no vintage list.
+			if not (Runes.rune_shape(String(id)) as Array).is_empty():
+				continue
 			if String(e.get("lane", "")) != "":
 				continue
 			retired.append(String(e["scope"]).trim_prefix("spec:"))

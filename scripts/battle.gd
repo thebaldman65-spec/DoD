@@ -15330,6 +15330,11 @@ func _stamp_ruin_chip(target: BattleUnit) -> void:
 func _detonate_ruin(target: BattleUnit) -> void:
 	var occ := _living_occultist()
 	target.remove_status("ruin_primed")
+	# BATCH FC §2 — THE CHAIN BOUND IS READ AND CONSUMED HERE, ABOVE EVERY
+	# EARLY RETURN, so a detonation that resolves into nothing still clears the
+	# flag rather than leaving the next one silently unable to jump.
+	var sr_fed := target.ruin_shared_in
+	target.ruin_shared_in = false
 	if occ == null or target.dead:
 		return
 	var det_raw := 0.90 * occ.attack * randf_range(0.9, 1.1)
@@ -15373,8 +15378,87 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	# next multiple of the threshold, which is what _gain_ruin's modulo decides.
 	if not target.dead:
 		_stamp_ruin_chip(target)
+		var sr_left := target.status_stacks("ruin")
 		_log("   → the mark endures — %s still bears %d Ruin" % [target.unit_name,
-			target.status_stacks("ruin")], "#b070d0")
+			sr_left], "#b070d0")
+		# BATCH FC §2 — THE RUNE OF THE SHARED RUIN, AND IT SITS HERE BECAUSE
+		# THIS IS THE ONE PLACE THE SURVIVORS ARE KNOWN. `sr_left` is the same
+		# number the line above prints; a second site computing "what survived"
+		# would be a second answer to one question, and the two would drift.
+		#
+		# **"THE STACKS THAT SURVIVE THE BLAST" IS THE PROJECT'S OWN IDIOM AND
+		# IS NOT A CLAIM ABOUT DEATH.** AX §1's rule is that the mark is not
+		# consumed by its own detonation, so on a living bearer the survivors ARE
+		# the whole pile. A bearer the blast KILLS carries nothing at all —
+		# `BattleUnit._die` clears every status — so this block is inside the
+		# `not target.dead` arm by construction rather than by a second guard,
+		# and a killing detonation moves nothing. That is reported, not assumed.
+		#
+		# **HALF, ROUNDED DOWN, AND THE MOVE IS A MOVE.** Integer division on a
+		# meter that only holds integers; a rune rounding up would take the one
+		# stack out of a mark of one. The bearer LOSES what the receiver gains,
+		# which is the rune's cost — and it costs him no cadence: detonation
+		# arms on a MULTIPLE of the threshold, so a pile halved from 20 to 10 is
+		# still exactly one threshold away from its next blast.
+		#
+		# **THE TARGET IS THE ENEMY CARRYING THE MOST RUIN AND `_ruin_focus` IS
+		# DELIBERATELY NOT REUSED.** That helper answers the BOT's question —
+		# it returns an unbroken boss ahead of any mark at all — which is a
+		# different question wearing the same words. Ties go to the first body in
+		# field order, and an all-zero board still receives: feeding the
+		# next-deepest mark is what makes a single deep mark cascade, and with
+		# nothing else marked the deepest mark is the one this seeds.
+		#
+		# **IT CANNOT CHAIN INSIDE ITSELF, BY CONSTRUCTION AND NOT BY A CAP.**
+		# The jump goes through `_gain_ruin`, so it arms the receiver's own
+		# threshold, deepens its chip and books the AX depth reading exactly as a
+		# directly-applied stack does — Unraveling's reason, ten lines up. But
+		# `_gain_ruin` only ARMS: a primed mark detonates at its bearer's turn
+		# start and never inside another detonation, so the cascade is one
+		# detonation per bearer per turn and there is no loop to bound.
+		# **AND A FED DETONATION DOES NOT FEED ONWARD, WHICH IS THE BOUND THE
+		# BRIEF'S OWN QUESTION NAMES.** Measured before it was written: with the
+		# jump unbounded, two marks seeded once and NEVER touched again produced
+		# **80 detonations over 40 rounds** — the stacks slosh between two bodies,
+		# every crossing re-arms the one it left, and the Occultist supplies
+		# nothing at all. That is not a payoff, it is perpetual motion on a meter
+		# with no ceiling. **THE BOUND IS A RULE AND NOT AN AMOUNT**: a mark the
+		# Occultist primed HIMSELF jumps; a mark a jump primed detonates in full
+		# and stops. **Chain length is exactly two, by construction** — the same
+		# shape as Unraveling's one-propagation-per-detonation, and there is no
+		# number in it to re-tune.
+		if occ.rune_shared_ruin > 0 and sr_left > 0 and not sr_fed:
+			var sr_share: int = sr_left / 2
+			var sr_to: BattleUnit = null
+			var sr_best := -1
+			for sr_e in enemies:
+				if sr_e.dead or sr_e == target:
+					continue
+				var sr_r: int = sr_e.status_stacks("ruin")
+				if sr_r > sr_best:
+					sr_best = sr_r
+					sr_to = sr_e
+			if sr_to == null:
+				_log("   → the Shared Ruin finds no other body — %s keeps all %d" % [
+					target.unit_name, sr_left], "#a070b0")
+			elif sr_share <= 0:
+				_log("   → the Shared Ruin has nothing to halve — %s keeps its %d" % [
+					target.unit_name, sr_left], "#a070b0")
+			else:
+				target.set_ruin_stacks(sr_left - sr_share)
+				_stamp_ruin_chip(target)
+				_log("   → the Shared Ruin: %d of %s's %d stacks leap to %s (deepest at %d)" % [
+					sr_share, target.unit_name, sr_left, sr_to.unit_name, sr_best],
+					"#c060d0")
+				# **THE FLAG IS SET ONLY IF THE JUMP ITSELF DID THE ARMING**, and
+				# that is read across the call rather than assumed. A receiver
+				# the jump merely DEEPENED keeps its own next detonation whole —
+				# flagging it would quietly withhold the rune from a mark the
+				# player went on to build by hand.
+				var sr_armed := sr_to.has_status("ruin_primed")
+				_gain_ruin(sr_to, sr_share)
+				if not sr_armed and sr_to.has_status("ruin_primed"):
+					sr_to.ruin_shared_in = true
 	if det_died:
 		_stat("enemy_deaths")
 		_sfx("death", -4.0)

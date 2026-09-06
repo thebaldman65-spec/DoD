@@ -14,6 +14,100 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-05 &mdash; Batch FC: SPLIT TONGUE IS REPLACED BY THE RUNE OF THE SHARED RUIN</h2>
+
+<p><i><b>Split Tongue is retired and replaced. Its premise was false from the moment it was
+transcribed</b> &mdash; <i>&ldquo;Hex of Ruin strikes two enemies instead of one&rdquo;</i> when the
+card already strikes THREE &mdash; <b>and two batches of repricing could not rescue a card built on
+a misreading.</b> FA priced it at 12% against a roster premise that was also false; FB reverted it
+to the card&rsquo;s own 20% and measured it <b>strictly worse than not holding it</b> at three
+enemies, the modal board. The replacement needs no target-count assumption at all. <b>No constant,
+ability, talent or magnitude moves, and the Occultist&rsquo;s other four stand untouched.</b></i></p>
+
+<p><b>&sect;1 &mdash; THE REPLACEMENT, AND IT READS THE ONE THING THE OTHER FOUR DO NOT.</b>
+<b>RUNE OF THE SHARED RUIN</b> &middot; 100g &middot; <code>spec:occultist</code> &middot; PASSIVE:
+<i>when Ruin detonates, HALF the stacks that survive the blast leap to the enemy carrying the most
+Ruin.</i> Deepening Hex moves the detonation <i>cadence</i>, Standing Mark the lifesteal <i>cap</i>,
+Wide Rite the mark <i>rate</i>, Open Wound trades <i>permanence</i> for reach &mdash; <b>all four
+move how much or how often, and nothing changed what a detonation DOES</b>. Verified out of
+<code>_detonate_ruin</code>: it reads the Occultist&rsquo;s Attack, Grim Focus and Unraveling, and
+no rune writes either of those.</p>
+
+<p><b>&sect;2 &mdash; WHAT HAD TO BE DECIDED, EACH REPORTED RATHER THAN CHOSEN.</b> <b>WHERE:</b> in
+<code>_detonate_ruin</code>&rsquo;s <code>not target.dead</code> arm, reading the same
+<code>sr_left</code> the &ldquo;the mark endures&rdquo; line already prints &mdash; one place, one
+answer. <b>HALF:</b> integer division, <b>rounds DOWN</b> (21 keeps 11, sends 10), and it is a MOVE
+&mdash; the bearer loses what the receiver gains. <b>AND IT COSTS HIM NO CADENCE:</b> detonation
+arms on a MULTIPLE, so a pile halved from 20 to 10 is still exactly one threshold from its next
+blast &mdash; measured, both arms 10 of 10. <b>NO TARGET:</b> with one enemy alive the stacks
+<b>STAY</b> (21 &rarr; 21); they are never lost. <b>THE TARGET IS THE DEEPEST OTHER, NOT THE
+BOARD</b> &mdash; on 20/6/3 the six receives ten and the three receives nothing. <b>A KILLING BLAST
+MOVES NOTHING</b>, because <code>_die</code> clears every status and no stack survives a corpse.
+<b>AND REQUIEM FIRES NO DETONATION</b>, so the pile it spends never jumps &mdash; confirmed, not
+assumed.</p>
+
+<p><b>&sect;2a &mdash; IT CHAINED, AND UNBOUNDED IT WAS PERPETUAL MOTION. MEASURED BEFORE IT WAS
+CAPPED.</b> The jump goes through <code>_gain_ruin</code>, so it ARMS the receiver &mdash; which is
+the cascade the rune is for. But because the jump MOVES stacks rather than granting them, the pile
+is conserved and the same stacks cross the threshold over and over: <b>two enemies seeded once and
+then never marked again produced 80 detonations over 40 rounds</b>, against 2 without the rune, at
+90% of Attack plus a full-party heal apiece, with the Occultist doing nothing at all. <b>It is not a
+hang</b> &mdash; the turn-start check fires once per bearer per turn &mdash; which is exactly why no
+watchdog could have seen it. <b>THE BOUND IS A RULE AND NOT AN AMOUNT:</b> a mark the Occultist
+primed HIMSELF jumps; a mark a JUMP primed detonates in full and stops. Chain length is exactly two,
+by construction. <b>80 &rarr; 3</b>, and the real payoff survives: over 60 marks the rune still turns
+<b>6 detonations into 16</b>, identical in both orders.</p>
+
+<p><b>&sect;3 &mdash; SPLIT TONGUE IS RETIRED THE WAY MELTED ARMOR IS: KEPT, AND SAID TO BE KEPT.</b>
+Its retirement string records what was lost and <i>why</i>, and the why is the useful part &mdash;
+<b>not that it was weak, but that the card it modified already did the thing</b>. Both repricings go
+with it, so a later reader meets a retired rune with two numbers behind it and can see that neither
+number was the problem. The entry, its payload and its <code>rune_split_tongue</code> read site are
+all kept and reachable by nothing, the <code>rune_entropy_ranks</code> contract.
+<b><code>data/runes.json</code> now modifies Hex of Ruin not at all.</b></p>
+
+<p><b>&sect;3a &mdash; AND &ldquo;RETIRED&rdquo; STOPPED MEANING &ldquo;AUTHORED UNDER THE OLD LANE
+RULE&rdquo;, IN THREE PLACES AT ONCE.</b> Running HEAD&rsquo;s unmodified gates against the new code
+first &mdash; FA&rsquo;s own standing rule &mdash; found <b>six reds, four predicted and two
+not</b>. The two were <code>check_es</code> &sect;5 and <code>test_runes</code>&rsquo; coverage walk
+counting a fifth Occultist &ldquo;lane-rule&rdquo; rune and a second splash, <b>for a retirement
+doing exactly the right thing</b>. <b>The populations are narrowed, never the assertions
+loosened</b>, and the discriminator is <code>RUNE_SHAPES</code> membership &mdash; which IS the
+vintage: the 65 predate EZ &sect;0&rsquo;s vocabulary and carry no row, everything authored since
+carries one, and a retirement does not take the row away. <b>No vintage list and no per-batch
+exemption</b>; the next EZ-era retirement classifies itself. <code>check_et</code> &sect;1&rsquo;s
+declarative test was widened the same way &mdash; it asked whether a string named one of TWO
+batches, and reported FC&rsquo;s as &ldquo;names no batch&rdquo; while naming FC in its first five
+characters.</p>
+
+<p><b>&sect;4 &mdash; TWO INSTRUMENT DEFECTS FOUND, AND BOTH RULES WERE ALREADY WRITTEN.</b>
+<code>test_batch_ax</code>&rsquo;s detonation negative control read <code>substr(det_at, 2600)</code>
+against a function that was <b>2624 characters long at HEAD</b> &mdash; 24 characters outside the
+control before this batch touched anything, and shrinking with every line the function gains. It
+derives the body from the declaration separator now and asserts both ends. And <code>check_ed</code>
+&sect;2 still carries the line-bounded holder binding its own standing rule names: a haystack whose
+<code>res://</code> path wraps to a continuation line binds nothing, so <b><code>check_ed</code> read
+18 / 0 against a manifest missing five entries</b>. The holder is written flat so both instruments
+cover it; <b>the scan was NOT widened</b> &mdash; that is a change to a gate&rsquo;s population and
+is handed forward.</p>
+
+<p><b>&sect;5 &mdash; A VACUOUS ARM, CAUGHT BY ITS OWN POSITIVE PAIR.</b> The Requiem confirmation
+anchored on <code>"requiem":</code> and got the BOT&rsquo;s <code>ab.special == "requiem"</code>
+fifteen thousand lines earlier. <i>&ldquo;Requiem fires no detonation&rdquo;</i> went <b>green over
+targeting code</b>. The paired arm &mdash; <i>&ldquo;and it SPENDS the pile, which is the whole
+card&rdquo;</i> &mdash; is the only reason it was caught. The anchor carries its indent now and its
+count is asserted at 1.</p>
+
+<p><b>&sect;6 &mdash; WHAT MOVED.</b> <code>data/runes.json</code> (one retirement string, one new
+entry); <code>scripts/battle.gd</code> (<code>_detonate_ruin</code> gains the jump and its bound),
+<code>scripts/unit.gd</code> (two fields), <code>scripts/runes.gd</code> (the coercion list and the
+two tag tables); <code>check_ez</code> <b>115 &rarr; 132</b>, <code>check_et</code> 24 &rarr; 25,
+<code>test_batch_ax</code> 353 &rarr; 356, <code>test_runes</code> and the two pool pins;
+<code>pin-manifest.json</code>, <code>baselines.json</code>, this file, <code>CLAUDE.md</code> (one
+new design rule), <code>docs/instrument-rules.md</code> (ED &sect;2 extended),
+<code>docs/master.html</code> and its stamp, <code>docs/design-notes.md</code>,
+<code>docs/state.md</code> and <code>docs/reports/FC.md</code>.</p>
+
 <h2>2026-09-05 &mdash; Batch FB: SPLIT TONGUE GOES BACK TO 20%</h2>
 
 <p><i><b>The designer reverted Batch FA's nerf, and the ruling followed FA's measurement rather

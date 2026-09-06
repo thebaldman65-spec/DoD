@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1362,
-  "source": 1049,
+  "total": 1371,
+  "source": 1058,
   "other": 79,
   "document": 234
  },
  "source_residency": {
-  "code": 627,
+  "code": 632,
   "absent": 286,
-  "runtime": 74,
-  "narrow": 20,
+  "runtime": 76,
+  "narrow": 22,
   "alt-sibling": 3,
   "comment": 39
  },
@@ -2006,7 +2006,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#248",
+   "g": "check_ez.gd#272",
    "alt": true
   },
   {
@@ -2018,8 +2018,76 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#248",
+   "g": "check_ez.gd#272",
    "alt": true
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ez.gd#388",
+   "expr": "rq_key"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ez.gd#389",
+   "expr": "rq_key"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": "\n\t\t\"penance\":",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#390"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": "_detonate_ruin",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ez.gd#394"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": "remove_status(\"ruin\")",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ez.gd#393"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
+   "n": "rune_shared_ruin",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#386"
   },
   {
    "s": "test_batch_ah.gd",
@@ -4541,7 +4609,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#265"
+   "g": "test_batch_ax.gd#269"
+  },
+  {
+   "s": "test_batch_ax.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
+   "n": "\n\n\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_ax.gd#262"
+  },
+  {
+   "s": "test_batch_ax.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "test_batch_ax.gd#266"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4552,7 +4642,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#268",
+   "g": "test_batch_ax.gd#272",
    "alt": true
   },
   {
@@ -4564,7 +4654,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#267",
+   "g": "test_batch_ax.gd#271",
    "alt": true
   },
   {
@@ -4576,7 +4666,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#267",
+   "g": "test_batch_ax.gd#271",
    "alt": true
   },
   {
@@ -4588,7 +4678,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#274"
+   "g": "test_batch_ax.gd#278"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4605,12 +4695,23 @@
    "s": "test_batch_ax.gd",
    "fn": "_negative_control_source",
    "h": "scripts/battle.gd",
+   "n": "func _detonate_ruin(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "test_batch_ax.gd#266"
+  },
+  {
+   "s": "test_batch_ax.gd",
+   "fn": "_negative_control_source",
+   "h": "scripts/battle.gd",
    "n": "if st > 0 and st % step == 0",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#272"
+   "g": "test_batch_ax.gd#276"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4621,7 +4722,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#273"
+   "g": "test_batch_ax.gd#277"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4632,7 +4733,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#270"
+   "g": "test_batch_ax.gd#274"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4643,7 +4744,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ax.gd#263"
+   "g": "test_batch_ax.gd#267"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4654,7 +4755,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ax.gd#264"
+   "g": "test_batch_ax.gd#268"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4665,7 +4766,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#271"
+   "g": "test_batch_ax.gd#275"
   },
   {
    "s": "test_batch_ax.gd",
@@ -4676,7 +4777,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ax.gd#269"
+   "g": "test_batch_ax.gd#273"
   },
   {
    "s": "test_batch_ax.gd",
@@ -15047,7 +15148,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "param",
-   "g": "test_runes.gd#347",
+   "g": "test_runes.gd#355",
    "expr": "BOOLEAN_READ_FIELDS"
   },
   {
@@ -15059,7 +15160,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#211"
+   "g": "test_runes.gd#219"
   },
   {
    "s": "test_runes.gd",
@@ -15070,7 +15171,7 @@
    "r": "runtime",
    "k": "format",
    "how": "param",
-   "g": "test_runes.gd#214"
+   "g": "test_runes.gd#222"
   },
   {
    "s": "test_runes.gd",
@@ -15081,7 +15182,7 @@
    "r": "absent",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#217"
+   "g": "test_runes.gd#225"
   },
   {
    "s": "test_runes.gd",
@@ -15092,7 +15193,7 @@
    "r": "absent",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#219"
+   "g": "test_runes.gd#227"
   },
   {
    "s": "test_runes.gd",
@@ -15103,7 +15204,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#220"
+   "g": "test_runes.gd#228"
   },
   {
    "s": "test_runes.gd",
@@ -15114,7 +15215,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "test_runes.gd#218"
+   "g": "test_runes.gd#226"
   }
  ]
 }

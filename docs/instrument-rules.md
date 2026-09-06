@@ -423,6 +423,26 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   join into one statement. **GDScript has both quote styles; a masker that knows one is a
   statement-merger.** Strip comments first, or an apostrophe in prose opens a string that never
   closes — that one ate a third of the tree's declarations in ED's first build.
+- **A FOURTH, ADDED AT FC §6: AN ANCHOR THAT MATCHES TWO SITES POINTS THE WINDOW AT THE WRONG ONE,
+  AND THE NEGATIVE ARM THEN PASSES ABOUT NOTHING.** FC anchored a Requiem check on `"requiem":` and
+  got the BOT's `ab.special == "requiem"` fifteen thousand lines earlier; the body it measured was
+  never the handler, and *"Requiem fires no detonation"* went green over targeting code. **The
+  PAIRED POSITIVE ARM is the only reason it was caught** — *"…and it SPENDS the pile, which is the
+  whole card"* failed, which is a body-identity assertion wearing a behaviour assertion's clothes.
+  **Anchor with the INDENT, assert the anchor's count is 1, and pair every "X is absent from this
+  window" with an "…and this really is the window" that would fail on the wrong body.**
+- **FC ALSO PAID THE HEADLINE RULE AND THE SECOND FORM, IN ONE BATCH, AND BOTH WERE ALREADY
+  WRITTEN.** `test_batch_ax`'s detonation control read `substr(det_at, 2600)` against a function
+  that was **2624 characters long at HEAD** — 24 characters outside the control before FC touched
+  anything, and shrinking further with every line the function gains. It derives the body from the
+  declaration separator now and asserts both ends. **And `check_ed` §2's own holder regex still
+  carries the line-bounded binding this rule names two bullets up**: a haystack written as
+  `var b_src := Gate.strip_comments(\n\tFileAccess.get_file_as_string("res://…"))` binds nothing,
+  so five of FC's pins were invisible to the completeness scan while the manifest BUILDER saw them
+  all — `check_ed` read **18 / 0 against a manifest missing five entries.** FC wrote its holder flat
+  so both instruments cover it and **did not widen the scan**, which is a change to that gate's
+  population. **A RULE THE INSTRUMENT ITSELF HAS NOT BEEN REPAIRED TO IS A RULE THAT WILL BE PAID
+  AGAIN.**
 
 ## A COMMENT NAMING CODE IS A CLAIM, AND IT GOES STALE SILENTLY (STANDING, SET AT EB §2)
 > **A comment naming a function, constant, ability or field is a claim that can go stale silently.
@@ -476,6 +496,14 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   Picking the string first and hoping it is asserted is the step that fails. Restore **by `cp` from
   a scratchpad backup, never by `git checkout`** — that has cost this project a batch's uncommitted
   work once already.
+- **AND "BREAK IT" MEANS THE NEEDLE MUST BE ABSENT AFTERWARDS, WHICH IS NOT THE SAME AS EDITING IT
+  (added at FC §6).** Every instrument here asks `contains`, so an injection that EXTENDS the needle
+  leaves it matching: FC armed `THE ABILITY DRAFT` → `THE ABILITY DRAFTT` in `master.html` and **both
+  arms read green** — the sweep `LOST 0`, `test_batch_bo` 1140 / 0 — which is exactly the reading a
+  control that bites nothing gives. Re-armed as `THE ABILITY DRAFX`, the sweep read `LOST 1` naming
+  it and the suite went 1140 / 1 on `§6: ...and carries the draft's own section`. **ASSERT THE
+  ABSENCE IN THE INJECTION ITSELF** (`assert needle not in text`) and **replace EVERY occurrence** —
+  a single-occurrence replace on a needle written twice is the same false green.
 
 ## WRITE THE PREDICTED BASELINES BEFORE THE VERIFICATION RUN (STANDING, EARNED AT DF)
 > **In a repair batch, write the predicted baselines BEFORE the verification run.** A baseline

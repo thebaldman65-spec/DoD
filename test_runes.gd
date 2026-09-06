@@ -362,15 +362,43 @@ func _coverage(data: Dictionary) -> void:
 			# the rule would lose the only thing pinning the lane coverage those
 			# 65 were built on. So the population is narrowed and the assertions
 			# are untouched.
+			# **BATCH FC — "RETIRED" IS NO LONGER THE SAME SET AS "AUTHORED TO
+			# THE LANE RULE", AND THE POPULATION IS NARROWED RATHER THAN THE
+			# ASSERTION LOOSENED.** FC §3 retires Split Tongue — an EZ rune,
+			# authored under the SHAPES charter and never under the lane rule —
+			# and it walked straight into this population as a fifth Occultist
+			# entry and a second splash, turning two assertions red for a
+			# retirement doing exactly the right thing. **THE DISCRIMINATOR IS
+			# `RUNE_SHAPES` MEMBERSHIP, WHICH IS THE VINTAGE ITSELF**: the 65 ET
+			# retired predate EZ §0's vocabulary and carry no row, every rune
+			# authored at EZ or after carries one, and a retirement does not take
+			# the row away (a retired rune is still an ABILITY rune). So this
+			# needs no vintage list and no per-batch exemption — the next EZ-era
+			# retirement is classified correctly with no edit here.
 			var mine: Array = []
 			var live_here: Array = []
+			var later_retired: Array = []
 			for id in data:
 				if String(data[id].get("scope", "")) != "spec:%s" % spec:
 					continue
 				if Runes.is_retired(String(id)):
+					if not (Runes.rune_shape(String(id)) as Array).is_empty():
+						later_retired.append(id)
+						continue
 					mine.append(id)
 				else:
 					live_here.append(id)
+			# **AND THE NARROWING IS ASSERTED RATHER THAN TRUSTED.** A skipped
+			# entry must be one this walk genuinely does not govern: no `lane`
+			# (the field the rule is made of) and a retirement string that names
+			# neither of the two batches that emptied the pool.
+			for lr in later_retired:
+				ok(String(data[lr].get("lane", "")) == "",
+					"%s: %s was retired after EZ and still carries a `lane`" % [spec, lr])
+				var lr_s := String(data[lr].get("retired", ""))
+				ok(not lr_s.contains("BATCH EO") and not lr_s.contains("BATCH ET"),
+					"%s: %s carries a SHAPES row and an EO/ET retirement — the two vintages have crossed"
+						% [spec, lr])
 			ok(mine.size() == 4,
 				"%s: has %d RETIRED spec runes, expected the 4 authored to the lane rule"
 					% [spec, mine.size()])

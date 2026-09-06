@@ -95,6 +95,16 @@ func _member(class_key: String, spec: String) -> Dictionary:
 # only place the loss lives.
 const EO_MARK := "BATCH EO"
 const ET_MARK := "BATCH ET"
+# **BATCH FC — A RETIREMENT AFTER ET IS A THIRD VINTAGE, AND THE DECLARATIVE
+# TEST WAS NARROWER THAN THE RULE IT ENFORCES.** The rule is that a retirement
+# string names a BATCH and names a LOSS; the test asked whether it named one of
+# TWO batches, which is the same thing only while those two are the only ones
+# that have ever retired anything. FC §3 retires Split Tongue and the string
+# went into `bare` — reported as "names no batch" while naming FC in its first
+# five characters. **THE FINGERPRINT IS WIDENED, THE TABLE IS NOT EXTENDED**:
+# any `BATCH XX` mark satisfies it, so the next retirement needs no line here,
+# and the EO/ET counts below are unchanged and still pin ET's own sixty-five.
+const BATCH_MARK := "BATCH "
 
 # ── BATCH EZ RE-POINTED THIS SECTION AND DID NOT WEAKEN IT ─────────────────
 #
@@ -112,7 +122,7 @@ const ET_MARK := "BATCH ET"
 const RETIRED_AT_ET := 65
 
 func _s1_all_retired() -> void:
-	print("\n§1 — the retired sixty-five are retired, and every one says why")
+	print("\n§1 — ET's sixty-five are still retired, and every retirement says why")
 	var data := _data()
 	# THE TOTAL IS PRINTED AND NOT PINNED HERE: `check_es` §1 owns the authored
 	# count (86 today), and two gates pinning one growing number is the
@@ -121,6 +131,7 @@ func _s1_all_retired() -> void:
 	print("    the authored pool is %d entries" % data.size())
 
 	var bare: Array = []
+	var later: Array = []
 	var eo := 0
 	var et := 0
 	for id in data:
@@ -130,13 +141,15 @@ func _s1_all_retired() -> void:
 			# It was a defect only while the whole pool was retired.
 			continue
 		# A string that names no batch and no loss is a filter, not a record.
-		if not (s.contains(EO_MARK) or s.contains(ET_MARK)) or not s.contains("LOST:"):
+		if not s.contains(BATCH_MARK) or not s.contains("LOST:"):
 			bare.append("%s (string names no batch or no loss)" % id)
 			continue
 		if s.contains(EO_MARK):
 			eo += 1
-		else:
+		elif s.contains(ET_MARK):
 			et += 1
+		else:
+			later.append(String(id))
 	ok(bare.is_empty(),
 		"§1: %s carry a retirement string naming no batch or no loss — a retirement must be DECLARATIVE" % [bare])
 	ok(eo == 12, "§1: %d entries carry EO's retirement, expected 12" % eo)
@@ -144,10 +157,28 @@ func _s1_all_retired() -> void:
 	ok(eo + et == RETIRED_AT_ET,
 		"§1: %d entries are retired, expected the %d ET emptied — a retirement was UNDONE"
 			% [eo + et, RETIRED_AT_ET])
+	# **THE LATER VINTAGES ARE COUNTED AND PRINTED, NEVER PINNED.** How many
+	# runes get retired after ET is content and is the designer's; what this
+	# gate owes is that ET's sixty-five did not shrink, which the equality above
+	# says. **BUT A LATER RETIREMENT IS NOT ONE OF THE 65 AND MUST NOT LOOK LIKE
+	# ONE**: every entry here is asserted to carry the EZ-era `RUNE_SHAPES` row
+	# the 65 predate, which is the same discriminator `check_es` §5 and
+	# `test_runes`' coverage walk narrow their populations with. A later
+	# retirement that lost its row would silently rejoin the lane-rule
+	# population in all three places at once, and this is the one that says so.
+	var crossed: Array = []
+	for lid in later:
+		if (Runes.rune_shape(lid) as Array).is_empty():
+			crossed.append(lid)
+	ok(crossed.is_empty(),
+		"§1: %s are retired AFTER ET and carry no `RUNE_SHAPES` row — they read as lane-rule entries"
+			% [crossed])
+	print("    retired after ET: %d (%s)" % [later.size(), ", ".join(later)])
 	# **EO's TWELVE ARE NOT REWRITTEN.** ET §1 rules they keep their existing
 	# strings; a batch that re-worded them would erase EO's own record of what
 	# each of those twelve lost.
-	print("    retirement vintages: %d at EO §3, %d at ET §1, 0 undeclared" % [eo, et])
+	print("    retirement vintages: %d at EO §3, %d at ET §1, %d later, 0 undeclared"
+		% [eo, et, later.size()])
 
 	# ── AND NOTHING IS OFFERABLE, THROUGH THE LIVE DOOR ──────────────────────
 	# The data half above is what a sweep can see. This is the half that matters:
@@ -299,7 +330,7 @@ func _s2_the_offer_is_never_empty() -> void:
 # 48 SPEC-scoped entries, so the five universals and the twelve class runes are
 # reached by nothing else — plus the resolver every ability grant depends on.
 func _s3_retired_is_not_deleted() -> void:
-	print("\n§3 — retired is not deleted: all 65 still resolve")
+	print("\n§3 — retired is not deleted: every entry in the file still resolves")
 	var data := _data()
 	var unresolved: Array = []
 	var misnamed: Array = []

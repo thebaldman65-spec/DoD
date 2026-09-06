@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-05 (Batch FB &mdash; Split Tongue goes back to 20%)</b></p>
+<p align="right"><b>Last updated: 2026-09-05 (Batch FC &mdash; Split Tongue is replaced by the Rune of the Shared Ruin)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2035,14 +2035,20 @@ stacks and whatever the talents. <b>Every TENTH stack</b> the mark is primed and
 DETONATES when its bearer next acts: <b>90% of the Occultist's Attack</b> as shadow
 damage, and every ally heals <b>25% of the Occultist's max health</b>. <b>The stacks
 SURVIVE the blast</b>, so the next detonation waits for the next multiple of ten (the
-Avatar of Ruin capstone moves that to every fifth). This makes him the boss specialist
+Avatar of Ruin capstone moves that to every fifth). <b>The RUNE OF THE SHARED RUIN (Batch FC)
+sends HALF the surviving stacks, rounded down, to the enemy carrying the most Ruin</b> &mdash;
+a MOVE, so the bearer loses what the receiver gains, and it costs him no cadence because
+detonation arms on a MULTIPLE (a pile halved from 20 to 10 is still exactly one threshold from
+its next blast). <b>The jump ARMS the receiver, and a mark a jump primed does not itself jump</b>
+&mdash; chain length is exactly two, by construction. With no other body alive the stacks STAY,
+and a blast that KILLS its bearer moves nothing (death clears every status, so no stack survives
+to jump). This makes him the boss specialist
 by construction: a trash enemy will not live long enough for the stacks to run away
 and a boss will. The stacks only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
 Smite — 25% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
 Hex of Ruin — 20 Mana, 2.5, 2cd; curse THREE chosen enemies for 20% Atk shadow / 15 BD
-  (the Split Tongue rune makes it hit the WHOLE line at the SAME 20% Atk a target, for
-  1 Ruin a target instead of 2 — Batch FB §1)
-each, leaving them Exposed 3 turns (Perfect: no cooldown).<br>
+each, leaving them Exposed 3 turns (Perfect: no cooldown). <b>NO RUNE MODIFIES THIS CARD</b>
+&mdash; Split Tongue did and is retired at Batch FC &sect;3.<br>
 Bewitch — 25 Mana, 3.5, 4cd; the target basic-attacks its OWN allies for 3 turns,
 Dazing them with every strike — charms and Dazes feed Ruin. <b>A boss REFUSES it until
 Broken — the Break meter is the key</b>, and
@@ -2571,9 +2577,14 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
-<br><b>THE FIRST TWENTY-ONE RUNES ARE AUTHORED (Batch EZ). 86 ENTRIES: THE 65 ET RETIRED, AND
+<br><b>THE FIRST TWENTY-ONE RUNES ARE AUTHORED (Batch EZ). 87 ENTRIES: 66 RETIRED, AND
 21 LIVE ONES ACROSS FOUR SPECS.</b> The Occultist, the Warden and the Sharpshooter have five
-each and the Beastmaster six. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
+each and the Beastmaster six. <b>Batch FC retired the twenty-second &mdash; Split Tongue &mdash;
+and authored the Rune of the Shared Ruin in its place</b>, so the file grew by one entry (a
+retirement is KEPT and said to be kept) while the live count stayed at twenty-one. <b>65 of the 66
+retirements are ET's and EO's; FC's is the first of a later vintage</b>, and the three walks that
+read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
+their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
 price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
 SPEC ONLY for all twenty-one</b>; eight specs are still unauthored, and a hero of one of those
 eight still draws nothing but the generated stat family.

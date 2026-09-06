@@ -729,7 +729,35 @@ func _negative_control_source() -> void:
 	# confused for each other.
 	var det_at := bsrc.find("func _detonate_ruin(")
 	ok(det_at > 0, "the detonation is findable")
-	var det_body := bsrc.substr(det_at, 2600) if det_at > 0 else ""
+	# **BATCH FC — THE WINDOW WAS A MAGIC NUMBER AND IT HAD ALREADY OUTGROWN
+	# THE FUNCTION.** `substr(det_at, 2600)` read 2600 characters where
+	# `_detonate_ruin` was 2624 long at HEAD, so the last 24 characters of the
+	# function — the tail of its death bookkeeping — were outside the negative
+	# control BEFORE this batch touched anything. A fixed window silently shrinks
+	# its own coverage every time the code inside it grows, and it prints exactly
+	# as green when it covers half the function as when it covers all of it.
+	#
+	# **THE BODY IS DERIVED FROM THE NEXT DECLARATION INSTEAD, AND THE
+	# DERIVATION IS ASSERTED**: a body that failed to find its end would read as
+	# the whole rest of the file, which would make the control fire on Requiem's
+	# site three thousand lines down and look like a real regression. Both ends
+	# are checked, so the window cannot silently become too NARROW or too WIDE.
+	# The bound is the file's own two-blank-line separator between top-level
+	# declarations, NOT the next `func` — `_detonate_ruin` is followed by nine
+	# thousand characters of block comment before the next declaration, and a
+	# window that swallowed those would be looser than the 2600 it replaces.
+	var det_end := bsrc.find("\n\n\n", det_at + 1)
+	ok(det_end > det_at, "...and its end is findable — the body is bounded at both ends")
+	var det_body := bsrc.substr(det_at, det_end - det_at) if det_end > det_at else ""
+	# The floor is the 2600 the fixed window used to read, so coverage can never
+	# go BACKWARDS; the ceiling is two orders of magnitude under the file's own
+	# length, so a derivation that failed and returned the rest of `battle.gd`
+	# cannot pass as a control.
+	ok(det_body.length() > 2600 and det_body.length() < 20000,
+		"...and the derived body is %d chars — a window that reads the whole file is not a control"
+			% det_body.length())
+	ok(det_body.contains("func _detonate_ruin(") and det_body.count("\nfunc ") == 0,
+		"...and it holds exactly one function")
 	ok(not det_body.contains('target.remove_status("ruin")\n'),
 		"NEGATIVE CONTROL: nothing removes the Ruin status on detonation")
 	ok(det_body.contains('target.remove_status("ruin_primed")'),

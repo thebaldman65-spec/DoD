@@ -5,116 +5,145 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-05 (Batch FB).*
+*Last rewritten: 2026-09-05 (Batch FC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FB — SPLIT TONGUE GOES BACK TO 20%.** The designer reverted FA's nerf, and
-  **the ruling followed FA's measurement rather than the argument that set the number.** The damage
-  clause is **removed entirely** — the payload is `{"aoe": true}` and nothing else — so a
-  rune-holding Occultist reads the same 20% of Attack as one without it. **No game script moved a
-  byte**, no other rune, magnitude, constant or ability moved, and no new rune was authored. Full
-  working: **`docs/reports/FB.md`**.
-- **§1 — THE CLAUSE IS REMOVED, NOT SET BACK TO 20, AND THE DIFFERENCE IS THE WHOLE DISCIPLINE.**
-  `{"aoe": true, "damage": 20}` behaves identically today and is a **second copy of a magnitude the
-  card already authors** — it goes stale silently the day Hex of Ruin is re-tuned. **The correct
-  form already ships one file over**: Pandemonium's payload is `{"aoe": true}` with an `add` for
-  its Break and says nothing about damage at all. **`data/runes.json` is now byte-identical to its
-  Batch EZ state** — FA moved one payload and one desc, and both are back.
-- **§1a — THE ASSERTION THE BRIEF ASKED FOR IS VACUOUS AGAINST THE THING THE RULING FORBIDS, AND A
-  CONTROL PROVED IT RATHER THAN AN ARGUMENT. THIS IS THE BATCH'S MOST TRANSFERABLE FINDING.** The
-  brief asked for one new check — *"the rune-applied Ability must now read 20 too"* — and that check
-  **PASSES on `{"aoe": true, "damage": 20}`**, the exact payload §1 refuses. So `check_ez` §5 gains
-  **two** arms: the **shape** (no `damage` key in `set` or `add`) and the **re-tune arm** — move Hex
-  of Ruin's authored number to 33, apply the payload, and the rune must carry **33** rather than
-  restore 20. Armed with the forbidden payload the gate reads **115 / 2** and names both; **the arm
-  the brief asked for is not among them.** A value assertion pins a value; only a re-tune arm pins
-  SILENCE.
-- **§2 — THE RUNE IS NOT STRICTLY BETTER. IT IS STRICTLY WORSE ON THE BOARD THE GAME FIELDS MOST,
-  AND THE BRIEF PREDICTED THE OPPOSITE.** Attack 100, twenty casts an arm, each arm on its own
-  board, hp / statuses / Break / Broken reset before every cast, every size run in **both orders**
-  (the two agree to within 0.05). With the damage clause gone **damage and Break are the same
-  ratio** — they are both just the target count: **×1.00 / ×1.33 / ×1.67 / ×2.00** across three to
-  six enemies, on both meters. **At three enemies `aoe` and `choose_three` strike the same three
-  bodies for the same damage and the same Break**, so the rune's only remaining effect is halving
-  the Ruin: **3 stacks a cast instead of 6, and six primings instead of twelve over twenty casts.**
-  Ruin breaks even only at **six**, the board cap. **Three enemies is every elite and mini-boss draw
-  at tiers 1 and 4** (FA's roster measurement), so the modal board is the strictly-worse one.
-- **§2a — AND THERE IS A SECOND STRICTLY-WORSE CASE THAT IS A TALENT RATHER THAN A BOARD SIZE.**
-  **Pandemonium** (`oc_hysteria`, the Occultist's own row-9 Madness capstone) **already sets `aoe`
-  on Hex of Ruin.** A hero holding it has the whole line cursed before the rune is bought, so Split
-  Tongue's only surviving clause is the Ruin halving — measured at **×1.00 damage, ×1.00 Break and
-  ×0.50 Ruin at EVERY board size from three to six.** Built exactly as ruled; **a 100g purchase
-  that is a pure downgrade for anyone down that lane is the designer's question, not a defect for a
-  batch to correct**, and it is on the record where the designer will meet it.
-- **§3 — HEAD'S UNMODIFIED GATES WERE RUN AGAINST THE NEW CODE FIRST, AND THIS TIME THEY WERE
-  CLEAN.** FA's own standing rule, paid: **eighteen targets that read `data/runes.json`**, run
-  unmodified against the reverted payload before one assertion was edited. **Exactly one red**
-  — `§5: Split Tongue takes it to 12% of Attack (reads 20)`, the predicted one — and **no unnamed
-  dependency**. **That the pass finds nothing is the result, not a reason to skip it.** It also
-  caught `test_runes` at **3803 against a recorded 3804** — no failure, nothing in the diff pointing
-  at it — which located the whole delta in one `_int_restore` assertion **before** `baselines.json`
-  moved.
-- **§4 — ONE OF THE BRIEF'S TWO STANDING RULES WAS ALREADY WRITTEN, AND IT IS NOT WRITTEN TWICE.**
-  *"Run the unmodified gates against new code before editing them"* is **already in `CLAUDE.md`**,
-  authored by FA itself (*RUN HEAD'S OWN GATE AGAINST THE NEW CODE BEFORE RE-POINTING IT*), worked
-  example and all. Writing it again is the second copy this file's own preamble names as what let
-  it contradict itself 1900 lines apart. **FB's clean run is added to the existing block as a second
-  data point instead.** The snapshot rule **is** genuinely new and is written beside the EV log rule
-  it generalises: *A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME.*
-- **§5 — THE CONTROLS, AND ALL THREE BIT.** **(A)** HEAD's `data/runes.json` — which IS the FA
-  payload — against FB's gate → **115 / 3**, all three new/moved arms by name. **(B)** the
-  `{"aoe": true, "damage": 20}` trap → **115 / 2**, and **the brief's own assertion passed**, which
-  is what earned the other two. **(C)** HEAD's whole unmodified `check_ez` against FB's code →
-  **113 / 1**, the predicted line. **Every file was restored from a pre-control copy and the restore
-  was md5-verified**, not assumed.
-- **§6 — THE INSTRUMENTS.** The literal sweep reads its needles from **both** corpora as a union
-  (the population legitimately grows when a batch writes assertions) and compares each document
-  against **a 390-file `rsync` copy of the tree taken before the first byte moved** — FA's snapshot
-  gap, closed by procedure rather than by care. **It was armed both ways before it was believed**:
-  `"PARTY" IS RETIRED FROM PLAYER-FACING TEXT` — a needle **written with escaped quotes** in
-  `test_batch_bx.gd`, so a plain grep for the resolved text finds nothing and only an
-  escape-resolving extractor sees it — was broken in `CLAUDE.md`, the sweep read **LOST 1** naming
-  it **and** `test_batch_bx` §4b went red. Restored, md5-verified, and `test_batch_bx` back to
-  161 / 0.
+- **Last batch: FC — SPLIT TONGUE IS REPLACED BY THE RUNE OF THE SHARED RUIN.** Split Tongue is
+  **retired** (kept, and said to be kept) and the **Rune of the Shared Ruin** is authored in its
+  place: *when Ruin detonates, HALF the stacks that survive the blast leap to the enemy carrying the
+  most Ruin.* 100g, `spec:occultist`, PASSIVE. **The pool stays at 21 live runes and the file grows
+  to 87 entries.** No constant, ability, talent or magnitude moved; the Occultist's other four
+  stand; Hex of Ruin is untouched and **no rune modifies that card at all now**. Full working:
+  **`docs/reports/FC.md`**.
+- **§1 — WHY THIS ONE, AND IT IS THE AXIS THE SPEC HAD NEVER TOUCHED.** Deepening Hex moves the
+  detonation *cadence*, Standing Mark the lifesteal *cap*, Wide Rite the mark *rate*, Open Wound
+  trades *permanence* for reach — **all four move how much or how often, and nothing changed what a
+  detonation DOES**. Verified out of `_detonate_ruin`, which reads the Occultist's Attack, Grim
+  Focus and Unraveling, and **no rune writes either of those**. It also needs no target-count
+  assumption, which is what broke Split Tongue twice.
+- **§2 — EVERY DECISION REPORTED AND EVERY ONE DRIVEN LIVE.** **WHERE:** in `_detonate_ruin`'s
+  `not target.dead` arm, reading the same `sr_left` the *"the mark endures"* line already prints —
+  one place, one answer. **HALF:** integer division, **rounds DOWN** (21 keeps 11, sends 10), and it
+  is a **MOVE** — the bearer loses what the receiver gains. **AND IT COSTS HIM NO CADENCE:**
+  detonation arms on a MULTIPLE, so a pile halved from 20 to 10 is still exactly one threshold from
+  its next blast — measured, both arms 10 of 10. **NO OTHER BODY:** the stacks **STAY** (21 → 21),
+  never lost. **THE TARGET IS THE DEEPEST OTHER, NOT THE BOARD** — on 20/6/3 the six receives ten
+  and the three receives nothing. **A KILLING BLAST MOVES NOTHING**, because `_die` clears every
+  status and no stack survives a corpse. **AND REQUIEM FIRES NO DETONATION**, so the pile it spends
+  never jumps — confirmed with a driven read site count and a bounded handler read, not assumed.
+- **§2a — IT WAS PERPETUAL MOTION BEFORE IT WAS BOUNDED, AND THE MEASUREMENT IS THE ARGUMENT. THIS
+  IS THE BATCH'S MOST TRANSFERABLE FINDING.** The jump arms the receiver — that is the cascade the
+  rune is for — but it **MOVES** stacks rather than granting them, so the pile is conserved and the
+  same stacks cross the threshold forever. **Two enemies seeded once and then never marked again:
+  80 detonations over 40 rounds, against 2 without the rune**, at 90% of Attack plus a full-party
+  heal apiece, with the Occultist doing nothing at all. **It is not a hang** — the turn-start check
+  fires once per bearer per turn — which is exactly why no watchdog and no parse gate could have
+  seen it. **THE BOUND IS A RULE AND NOT AN AMOUNT:** a mark the Occultist primed HIMSELF jumps; a
+  mark a JUMP primed detonates in full and stops. **Chain length is exactly two, by construction.**
+  80 → **3**, and the payoff survives: over 60 marks the rune still turns **6 detonations into 16**,
+  identical in both orders. Recorded as a **standing design rule** in `CLAUDE.md`.
+- **§3 — SPLIT TONGUE IS RETIRED THE MELTED ARMOR WAY, AND ITS STRING RECORDS THE PREMISE RATHER
+  THAN THE WEAKNESS.** *It was authored against a base that did not exist*: the brief that
+  transcribed it said Hex of Ruin *"strikes two enemies instead of one"* when `choose_three` already
+  made it three. **Both repricings go with it** — FA's 12% against a false roster premise, FB's
+  revert to 20% measured strictly worse than not holding it — so a later reader can see that
+  **neither number was the problem**. The entry, its payload and its `rune_split_tongue` read site
+  are kept and reachable by nothing, the `rune_entropy_ranks` contract.
+- **§3a — "RETIRED" STOPPED MEANING "AUTHORED UNDER THE OLD LANE RULE", IN THREE PLACES AT ONCE.**
+  HEAD's unmodified gates were run against the new code first (FA's standing rule): **six reds, four
+  predicted and two not.** The two were `check_es` §5 and `test_runes`' coverage walk counting a
+  fifth Occultist lane-rule rune and a second splash, **for a retirement doing exactly the right
+  thing**. **The populations are narrowed, never the assertions loosened**, and the discriminator is
+  **`RUNE_SHAPES` membership — which IS the vintage**: the 65 predate EZ §0's vocabulary and carry
+  no row, everything authored since carries one, and retiring a rune does not take its row away.
+  **No vintage list and no per-batch exemption.** `check_et` §1's declarative test was widened the
+  same way — it asked whether a string named one of TWO batches and reported FC's as *"names no
+  batch"* while naming FC in its first five characters.
+- **§4 — FIVE NEGATIVE CONTROLS, EACH ARMED ON SOMETHING THE GATE DEMONSTRABLY READS, AND EACH
+  DISCRIMINATING.** The jump removed → **6 reds**. **A COPY instead of a MOVE → 3 reds, and the
+  RECEIVER arm PASSED** — which is what earns the bearer arm, and is FB §1a's shape again: a check
+  that bites on the wrong thing. **Half rounding UP → exactly 1 red, the odd-pile arm, its
+  neighbours all green** — the even arms read the same under both roundings and cannot carry the
+  ruling. **The chain bound removed → exactly 1 red.** **The receiver picked LOWEST instead of
+  highest → 3 reds**, including the untouched-third-body arm, which is what distinguishes §1's
+  highest-Ruin ruling from the alternative it weighed. `scripts/battle.gd` restored from a
+  pre-control copy and **md5-verified**.
+- **§5 — A VACUOUS ARM, CAUGHT BY ITS OWN POSITIVE PAIR; AND A CONTROL WHOSE INJECTION DID NOT
+  BREAK.** The Requiem confirmation anchored on `"requiem":` and got the BOT's
+  `ab.special == "requiem"` fifteen thousand lines earlier — *"Requiem fires no detonation"* went
+  **green over targeting code**, and only the paired *"…and it SPENDS the pile"* arm exposed it. The
+  anchor carries its indent now and its count is asserted at 1. **And the literal sweep's own
+  control read green on its first arming**: `THE ABILITY DRAFT` → `THE ABILITY DRAFTT` leaves the
+  needle matching, so the sweep read `LOST 0` and `test_batch_bo` 1140 / 0. Re-armed as
+  `THE ABILITY DRAFX` it read `LOST 1` naming it and the suite went **1140 / 1**. Both recorded in
+  `docs/instrument-rules.md`.
+- **§6 — TWO INSTRUMENT DEFECTS, AND BOTH RULES WERE ALREADY WRITTEN.** `test_batch_ax`'s detonation
+  negative control read `substr(det_at, 2600)` against a function **2624 characters long at HEAD** —
+  24 characters outside the control before FC touched anything. It derives the body from the
+  declaration separator now and asserts both ends. And **`check_ed` §2 still carries the
+  line-bounded holder binding its own standing rule names**: a haystack whose `res://` path wraps to
+  a continuation line binds nothing, so `check_ed` read **18 / 0 against a manifest missing five
+  entries**. FC wrote its holder flat so both instruments cover it and **did not widen the scan** —
+  that is a change to a gate's population, and it is owed forward.
 - **§7 — THE BATTERY.** **93 targets**, `sort .ran | uniq -d` **ZERO duplicates**, 93 names and 93
   logs compared both ways, and **0 `Parse Error`, 0 `SCRIPT ERROR`, 0 timeouts** across every log —
-  grepped from the log FILES, never from a target's own tally. `check_ez` **115 / 0**, `test_runes`
-  **3803 / 0**, `check_parse` **167 / 0**, `check_de` **382 / 0 / 0 notices**, `test_rune_battle`
-  97 / 0, `check_es` 44 / 0, `check_et` 24 / 0, `check_ek` 46 / 0, `check_ed` 18 / 0, `check_dv`
-  83 / 0, `check_ec` 23 / 0. **The ONLY four `FAIL:` lines in the whole run are `check_cm_live`'s**,
-  which is `13 / 4` against a recorded `fails: [4, 4]` — and they are compared **line for line**
-  rather than by count: the bar on the enemy's attack, its top line naming the incoming blow, and
-  the brace's two magnitudes. **This batch moved no game script**, so nothing in that area could
-  have changed. `check_cl_width` reads `checks=? fails=?` by design; its row carries
-  `checks: null, fails: null`. **`check_de` names both moved rows on their recorded line** —
-  `check_ez 115 / 0 (recorded 115 / 0)`, `test_runes 3803 / 0 (recorded 3803 / 0)`, **92 of 92
-  swept, 0 off**. **THE FREEZE HELD EXACTLY**: an md5 stamp of **390 files, absolute paths, tracked
-  AND untracked**, before and after over the same path list — **zero differ, and no path added or
-  removed**. **The measurement probe was written, run and DELETED before the stamp was taken**, so
-  it is not in the tree and does not appear as `check_parse` residue. **The only things added after
-  the run are this bullet and `docs/reports/FB.md`**, and neither file is opened by any target.
-- **WHAT MOVED: NO GAME SCRIPT, ONE TABLE, ONE TARGET AND FIVE DOCUMENTS.** `data/runes.json` (one
-  payload and one desc, back to their EZ bytes); `check_ez.gd` (**113 → 115**); `baselines.json`
-  (two rows — `check_ez` 113 → 115 and `test_runes` 3804 → 3803 — **twelve lines changed**, the file
-  is `indent=1`); `docs/changelog.html`, `CLAUDE.md` (**one rule added, one extended**),
-  `docs/master.html` and its stamp, `docs/design-notes.md`, this file and `docs/reports/FB.md`.
-  **`scripts/runes.gd`, `scripts/battle.gd` and `scripts/classes.gd` are byte-unchanged**, and
-  FA §1's empty-loadout guards stand exactly as built.
-- **Next letter: FC.** FB still sorts above every suite's own stamp compare — the highest is `"CE"`,
+  grepped from the log FILES, never from a target's own tally. `check_ez` **132 / 0**, `test_runes`
+  **3839 / 0**, `check_et` **25 / 0**, `test_batch_ax` **356 / 0**, `check_es` 44 / 0, `check_parse`
+  167 / 0, `check_ed` 18 / 0, `test_rune_battle` 97 / 0, `check_ek` 46 / 0, `check_ec` 23 / 0,
+  harness gates 22 / 166 / 8 PASS, `check_ct_map` 83 / 0. **The ONLY four `FAIL:` lines in the whole
+  run are `check_cm_live`'s** — 13 / 4 against a recorded `fails: [4, 4]`, compared **line for
+  line**: the bar on the enemy's attack, its top line naming the incoming blow, and the brace's two
+  magnitudes. This batch moved no UI code. `check_cl_width` and `check_map_screen` report no
+  readable count **by design**, which is what their rows record (`check_map_screen`'s `expect`
+  string is present in the log). **THE FREEZE HELD EXACTLY**: an md5 stamp of **391 files, absolute
+  paths, tracked AND untracked**, before and after over the same path list — **zero differ, and no
+  path added or removed**. The measurement probe was written, run and **deleted before the stamp was
+  taken**, so `check_parse` shows no residue.
+- **§7a — THE COUNT DIFFER RETURNED FOUR NOTICES THAT WERE NOT PREDICTED, AND ALL FOUR ARE ONE POOL
+  ENTRY.** `check_em` 286→289, `test_batch_al` 582→583, `test_batch_bh` 254→255 and `test_batch_cb`
+  1361→1370 — per-entry loops over a `data/runes.json` that went 86 → 87. **Not one assertion in any
+  of them changed.** `test_batch_bh`'s own row already named those three suites as pool-walkers, so
+  this was predictable and was not predicted. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**:
+  with HEAD's 86-entry file and every other FC change in place all four read their OLD numbers
+  exactly (286 / 582 / 254 / 1361); with FC's 87, their new ones. Three identical standalone
+  readings each, the rows moved, and **`check_de` re-run over the SAME battery logs reads 382 / 0 /
+  0 notices, 92 of 92 swept, 0 off their recorded line.** The four rows were moved AFTER the run and
+  say so.
+- **§7b — THE LITERAL SWEEP: LOST 0 IN EVERY DOCUMENT.** 10,365 needles (union of the before and
+  after `.gd` corpora, escapes resolved, format-bearing literals separated), against a **391-file
+  `rsync` copy of the tree taken before the first byte moved**. `CLAUDE.md`, `master.html`,
+  `changelog.html`, `design-notes.md`, `instrument-rules.md`, `baselines.json`, `data/runes.json`,
+  `pin-manifest.json`, `glossary.json`, the three audit pages, `README.md` and `project.godot` all
+  read **LOST 0**. **Nothing opens `docs/state.md` or `docs/reports/`** — re-derived here, not
+  inherited: every mention of `state.md` in the `.gd` corpus is inside a comment, and no
+  `FileAccess`, `_src`, `load(` or `open(` call names either path.
+- **WHAT MOVED: `data/runes.json` (one retirement string, one new entry), three game scripts, four
+  targets, the manifest and seven documents.** `scripts/battle.gd` (`_detonate_ruin` gains the jump
+  and its bound), `scripts/unit.gd` (`rune_shared_ruin`, `ruin_shared_in`), `scripts/runes.gd` (the
+  coercion list, `RUNE_TAGS`, `RUNE_SHAPES`); `check_ez` **115 → 132**, `check_et` 24 → 25,
+  `test_batch_ax` 353 → 356, `test_runes` 3803 → 3839, `check_es` (two population repairs, no count
+  change); `pin-manifest.json` (1362 → 1371 pins), `baselines.json` (eight rows), `CLAUDE.md` (one
+  new design rule), `docs/instrument-rules.md` (ED §2 and the negative-control rule each extended),
+  `docs/changelog.html`, `docs/master.html` and its stamp, `docs/design-notes.md`, this file and
+  `docs/reports/FC.md`. **`scripts/classes.gd`, `scripts/talents.gd` and `scripts/run_state.gd` are
+  byte-unchanged.**
+- **Next letter: FD.** FC still sorts above every suite's own stamp compare — the highest is `"CE"`,
   and all fourteen read exactly TWO characters.
 - **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
   talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
-  against four specs** with **eight specs still unauthored**. **The number EZ opened and FA priced
-  is now closed** — Split Tongue is back at the card's own 20% and the rune's only cost is the Ruin
-  halving. **What is left in the rune layer is still authoring and it is still the designer's, one
-  rune at a time.** **The ladder still has an open design question of its own (what rung 2 should
-  ASK), and it is the largest unbuilt item on this list.** **And §2/§2a hand the designer a new
-  one**: Split Tongue is a strict downgrade at three enemies and a strict downgrade at every board
-  size for a hero holding Pandemonium, which is a question about what the rune should COST rather
-  than about what it should do.
+  against four specs** with **eight specs still unauthored**. **The Split Tongue question EZ opened,
+  FA priced and FB measured is CLOSED by retirement rather than by a third number.** **What is left
+  in the rune layer is still authoring and it is still the designer's, one rune at a time.** **The
+  ladder still has an open design question of its own (what rung 2 should ASK), and it is the
+  largest unbuilt item on this list.** **And §5 of the brief is answered as a report**: the specific
+  Wide Rite / Split Tongue anti-synergy is gone with the retirement, and what replaces it is the
+  opposite sign — the Shared Ruin **compounds** with Deepening Hex and Wide Rite and makes **Open
+  Wound's cost strictly worse** (that rune bleeds 1 Ruin a turn off every bearer, and this one puts
+  the mark on more bearers: one body without it, two with it, over the 60-mark measurement).
+  Standing Mark is reported as arithmetic rather than as a measurement. **Nothing is ruled on.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 

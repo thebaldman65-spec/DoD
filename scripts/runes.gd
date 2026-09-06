@@ -220,7 +220,12 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# is the failure that reads exactly like the rune working — the Bared
 	# Guard's -0.15 precedent, one line up.
 	"rune_hex_threshold", "rune_split_tongue", "rune_wide_rite",
-	"rune_open_wound", "rune_standing_wall", "rune_bracing_line",
+	"rune_open_wound",
+	# BATCH FC — the Shared Ruin's flag, on the list for the same AA reason
+	# as the four above it: JSON parses `1` as a float and a float into a
+	# typed int var is a runtime error at spawn, not a rounding.
+	"rune_shared_ruin",
+	"rune_standing_wall", "rune_bracing_line",
 	"rune_split_shield", "rune_long_watch", "rune_no_block",
 	"rune_keen_focus", "rune_heavy_bolts", "rune_ambush", "rune_wide_watch",
 	"rune_long_draw_presses", "rune_long_leash", "rune_shared_hide",
@@ -332,7 +337,8 @@ const RUNE_TAGS := {
 	# PASSIVE with no secondary, and it is a DEFENSE rune.
 	"deepening_hex": ["DEBUFF", "BREAK"],      # Deepening Hex
 	"standing_mark": ["DEBUFF", "DEFENSE"],    # Standing Mark — the draught heals
-	"split_tongue": ["DEBUFF"],                # Split Tongue
+	"split_tongue": ["DEBUFF"],                # Split Tongue (RETIRED at FC)
+	"shared_ruin": ["DEBUFF"],                 # the Shared Ruin — it MOVES the mark
 	"wide_rite": ["DEBUFF"],                   # Wide Rite
 	"open_wound": ["DEBUFF"],                  # Open Wound
 	"standing_wall": ["DEFENSE"],              # Standing Wall
@@ -373,6 +379,7 @@ const RUNE_SHAPES := {
 	"deepening_hex": ["PASSIVE", "THRESHOLD"],
 	"standing_mark": ["PASSIVE"],
 	"split_tongue": ["ABILITY"],
+	"shared_ruin": ["PASSIVE"],
 	"wide_rite": ["PASSIVE", "BREADTH"],
 	"open_wound": ["ABILITY", "TRADEOFF"],
 	"standing_wall": ["PASSIVE"],

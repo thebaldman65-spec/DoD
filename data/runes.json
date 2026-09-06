@@ -483,7 +483,14 @@
 		"price": 100,
 		"requires_ability": "Hex of Ruin",
 		"desc": "Hex of Ruin curses the WHOLE line rather than three chosen enemies — at 1 Ruin a target instead of 2.",
+		"retired": "RETIRED at BATCH FC \u00a73 \u2014 kept, and said to be kept. LOST: nothing the card it modified was not already doing, and THAT is the record. **IT WAS AUTHORED AGAINST A BASE THAT DID NOT EXIST** \u2014 not \"it was weak\": the brief that transcribed it said Hex of Ruin \"strikes two enemies instead of one\" when the card already strikes THREE (`choose_three`), so `aoe` at a three-enemy board widens onto the same three bodies for the same damage, the same Break and the same Exposed, and the halved mark is then the only clause left. **TWO REPRICINGS ARE BEHIND IT AND NEITHER NUMBER WAS THE PROBLEM.** FA cut the rune's damage 20%% \u2192 12%% against a roster premise that was also false and measured \u00d70.61 at three enemies; FB reverted it to the card's own 20%% and measured \u00d71.00 damage, \u00d71.00 Break and \u00d70.50 Ruin at three \u2014 STRICTLY WORSE than not holding it, on the modal board \u2014 and the same \u00d71.00 / \u00d71.00 / \u00d70.50 at EVERY board size for a hero holding Pandemonium, whose capstone already sets `aoe`. **A RUNE WHOSE PREMISE IS WRONG CANNOT BE REPRICED INTO RIGHTNESS.** Its `rune_split_tongue` read site in `_resolve` is KEPT and is now reachable by nothing, the `rune_entropy_ranks` contract. Replaced by the Rune of the Shared Ruin, which needs no target-count assumption at all.",
 		"payload": {"ability": "Hex of Ruin", "set": {"aoe": true}, "also": [{"stat": {"rune_split_tongue": 1}}]}
+	},
+	"shared_ruin": {
+		"name": "Rune of the Shared Ruin", "scope": "spec:occultist",
+		"price": 100,
+		"desc": "When Ruin detonates, HALF the stacks that survive the blast leap to the enemy carrying the most Ruin.",
+		"payload": {"stat": {"rune_shared_ruin": 1}}
 	},
 	"wide_rite": {
 		"name": "Wide Rite", "scope": "spec:occultist",

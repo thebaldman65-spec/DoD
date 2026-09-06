@@ -1844,6 +1844,39 @@ status into the draft turned four tree-internal dependencies — which the chart
   whenever the card was drafted**, and the honest wording already exists on one of them.
 
 
+## STANDING DESIGN RULE — A SPREAD THAT **MOVES** A THRESHOLD METER IS PERPETUAL MOTION; ONE THAT **ADDS** TO IT IS NOT (Batch FC §2)
+
+> **An effect that takes stacks off one bearer and puts them on another CONSERVES the pile, so the
+> same stacks cross the threshold again and again and the board feeds itself with no further input.
+> An effect that GRANTS new stacks is paid for by whatever granted them. Before shipping a spread,
+> ask which of the two it is — and if it moves, bound the CHAIN, not the amount.**
+
+**IT IS WRITTEN BESIDE THE RE-ENTRY-GUARD BULLET ABOVE BECAUSE IT IS THE CASE THAT BULLET DOES NOT
+COVER, AND EVERY GUARD THAT BULLET NAMES WOULD HAVE READ CLEAN.** The Rune of the Shared Ruin sends
+half a detonating mark to the enemy carrying the most Ruin. There is no recursion — the jump goes
+through `_gain_ruin`, which only ARMS a primer, and a primed mark detonates at its bearer's own turn
+start — so nothing re-enters, an identity guard has nothing to break, and the target is
+DETERMINISTIC rather than random. **The loop is not inside a call. It is across turns, and it comes
+from conservation.**
+
+- **MEASURED BEFORE IT WAS BOUNDED, AND THE FIGURE IS THE ARGUMENT.** Two enemies seeded once and
+  then *never marked again*: **80 detonations over 40 rounds** with the rune, against **2** without.
+  The pair reached a steady state — one body permanently primed, the other holding the remainder —
+  and paid 90% of the Occultist's Attack plus a full-party heal, twice a round, forever, while the
+  Occultist did nothing at all. **It is not a hang** (the turn-start check fires once per bearer per
+  turn), which is precisely why no watchdog and no parse gate could ever have seen it.
+- **THE TELL IS A CONSERVED TOTAL WITH A RISING EVENT COUNT.** Total Ruin was 40 before and 40
+  after, in both arms. A meter that is neither growing nor shrinking while its payoff fires eighty
+  times is the signature, and an instrument watching the METER reads flat.
+- **THE BOUND IS A RULE, NEVER AN AMOUNT.** A mark the Occultist primed HIMSELF jumps; a mark a
+  JUMP primed detonates in full and stops. Chain length is exactly two, by construction, and there
+  is no number in it for a later batch to re-tune. Measured after: 80 → **3**. The rune's real
+  payoff survives — over 60 marks it still turns 6 detonations into **16**.
+- **AND THE FLAG IS SET ONLY WHERE THE JUMP DID THE ARMING.** A receiver the jump merely DEEPENED
+  keeps its own next detonation whole. Flagging every receiver would silently withhold the rune
+  from a mark the player went on to build by hand — a cost that is invisible from the code and
+  from every static check.
+
 ## STANDING RULE — A DIFFICULTY RUNG SCALES WHAT A MISTAKE COSTS, NEVER WHETHER THE QUESTION IS ASKED (Batch EO §2)
 
 > **The rung is allowed to change enemy DAMAGE. It is not allowed to change enemy HEALTH, ability

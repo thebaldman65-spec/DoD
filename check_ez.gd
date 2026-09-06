@@ -49,9 +49,17 @@ func _data() -> Dictionary:
 		FileAccess.get_file_as_string("res://data/runes.json"))
 
 
-# Every id authored at EZ — DERIVED as "not retired", never listed, so a
-# twenty-second needs no line here and a retirement applied to one of these
-# turns the section red rather than shrinking its population silently.
+# Every LIVE id — DERIVED as "not retired", never listed, so a twenty-second
+# needs no line here.
+#
+# **BATCH FC — THE NAME OUTLIVED ITS POPULATION AND IS CORRECTED RATHER THAN
+# LEFT TO READ TRUE.** This was "every id authored at EZ", which was the same
+# set only while nothing EZ authored had been retired and nothing later had been
+# authored. FC §3 makes both false at once: Split Tongue is an EZ author and is
+# retired, the Rune of the Shared Ruin is live and is not an EZ author, and the
+# count is still 21 — so the OLD comment would have gone on reading correct
+# while describing the wrong set. The DERIVATION never moved and the section's
+# question never moved; only the sentence naming the population did.
 func _ez_ids() -> Array:
 	var out: Array = []
 	for id in _data():
@@ -104,12 +112,12 @@ func _met_drafted(cond: Dictionary) -> Array:
 
 # ── §0 — THE POOL ───────────────────────────────────────────────────────────
 func _s0_the_pool() -> void:
-	print("\n§0 — the pool: twenty-one authored, sixty-five retired")
+	print("\n§0 — the pool: twenty-one live, sixty-six retired")
 	var data := _data()
 	var ez := _ez_ids()
-	ok(ez.size() == 21, "§0: %d entries carry no retirement, expected the 21 EZ authors"
+	ok(ez.size() == 21, "§0: %d entries carry no retirement, expected 21 live runes"
 		% ez.size())
-	ok(data.size() == 86, "§0: the authored pool is %d entries, expected 86" % data.size())
+	ok(data.size() == 87, "§0: the authored pool is %d entries, expected 87" % data.size())
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the
@@ -518,6 +526,20 @@ func _s4_the_payloads() -> void:
 	await process_frame
 
 
+# BATCH FC §2 — SEED A MARK AT AN EXACT DEPTH, PRIMER OFF. `_gain_ruin` arms on
+# every multiple, so a seeded board would arrive already primed and the arms
+# below would be reading a detonation nobody drove. The primer is stripped
+# after, never instead: the stacks must go through the real door so the chip,
+# the depth stat and Covenant of Ash all see them exactly as the game does.
+func _sr_seed(scene: Node, e: BattleUnit, n: int) -> void:
+	e.remove_status("ruin")
+	e.remove_status("ruin_primed")
+	e.ruin_shared_in = false
+	if n > 0:
+		scene._gain_ruin(e, n)
+	e.remove_status("ruin_primed")
+
+
 # ── §5 — THE READ SITES ─────────────────────────────────────────────────────
 #
 # **A FIELD THAT LANDS AND IS NEVER READ IS A RUNE THAT READS AS WORKING.**
@@ -605,6 +627,163 @@ func _s5_the_read_sites() -> void:
 	ok(scene._old_gods_mark() == mark_base + 1,
 		"§5: the Wide Rite marks one more (%d -> %d)" % [mark_base, scene._old_gods_mark()])
 	occ.rune_wide_rite = 0
+
+	# ---- Occultist: THE RUNE OF THE SHARED RUIN (Batch FC §2) ----
+	#
+	# **A RUNE THAT COMPUTES A SURVIVOR COUNT AND NEVER MOVES A STACK WOULD PASS
+	# EVERY STATIC CHECK.** So every arm below drives `_detonate_ruin` on a live
+	# board and reads the stacks on BOTH bodies afterwards.
+	var foes: Array = scene.get("enemies")
+	ok(foes.size() == 3, "§5: the fixture board is three enemies (%d)" % foes.size())
+	var sr_a: BattleUnit = foes[0]
+	var sr_b: BattleUnit = foes[1]
+	var sr_c: BattleUnit = foes[2]
+	for sr_u in foes:
+		sr_u.max_hp = 9999999
+		sr_u.hp = 9999999
+
+	# THE CONTROL ARM FIRST, AND IT IS NOT OPTIONAL: without the rune a
+	# detonation must move nothing at all, or every reading below is measuring
+	# the detonation rather than the rune.
+	_sr_seed(scene, sr_a, 20)
+	_sr_seed(scene, sr_b, 6)
+	_sr_seed(scene, sr_c, 3)
+	occ.rune_shared_ruin = 0
+	scene._detonate_ruin(sr_a)
+	ok(sr_a.status_stacks("ruin") == 20 and sr_b.status_stacks("ruin") == 6
+			and sr_c.status_stacks("ruin") == 3,
+		"§5: WITHOUT the rune a detonation moves no stack anywhere (%d/%d/%d)" % [
+			sr_a.status_stacks("ruin"), sr_b.status_stacks("ruin"),
+			sr_c.status_stacks("ruin")])
+
+	# HALF, TO THE DEEPEST OTHER, AND THE THIRD BODY UNTOUCHED. The last clause
+	# is what separates "the most Ruin" from "the board": a rune that spread the
+	# share evenly would pass an assertion naming only the receiver.
+	occ.rune_shared_ruin = 1
+	_sr_seed(scene, sr_a, 20)
+	_sr_seed(scene, sr_b, 6)
+	_sr_seed(scene, sr_c, 3)
+	scene._detonate_ruin(sr_a)
+	ok(sr_a.status_stacks("ruin") == 10,
+		"§5: the Shared Ruin takes HALF off the bearer (20 -> %d)"
+			% sr_a.status_stacks("ruin"))
+	ok(sr_b.status_stacks("ruin") == 16,
+		"§5: ...and the enemy carrying the MOST Ruin receives them (6 -> %d)"
+			% sr_b.status_stacks("ruin"))
+	ok(sr_c.status_stacks("ruin") == 3,
+		"§5: ...and the shallower body gets NOTHING — it is the deepest, not the board (%d)"
+			% sr_c.status_stacks("ruin"))
+
+	# **ROUNDING IS DOWN, AND IT IS ASSERTED ON AN ODD PILE**, which is the only
+	# place the two roundings differ: 21 gives 10 away and keeps 11.
+	_sr_seed(scene, sr_a, 21)
+	_sr_seed(scene, sr_b, 4)
+	_sr_seed(scene, sr_c, 0)
+	scene._detonate_ruin(sr_a)
+	ok(sr_a.status_stacks("ruin") == 11 and sr_b.status_stacks("ruin") == 14,
+		"§5: ...half ROUNDS DOWN — 21 keeps 11 and sends 10 (%d / %d)" % [
+			sr_a.status_stacks("ruin"), sr_b.status_stacks("ruin")])
+
+	# **AND IT COSTS THE BEARER NO CADENCE**, which is a property of the
+	# threshold rather than a coincidence: detonation arms on a MULTIPLE, so a
+	# pile halved from a multiple is still exactly one threshold from its next.
+	var sr_step: int = scene._ruin_threshold()
+	_sr_seed(scene, sr_a, 2 * sr_step)
+	_sr_seed(scene, sr_b, 0)
+	_sr_seed(scene, sr_c, 0)
+	scene._detonate_ruin(sr_a)
+	var sr_climb := 0
+	while not sr_a.has_status("ruin_primed") and sr_climb < 4 * sr_step:
+		scene._gain_ruin(sr_a, 1)
+		sr_climb += 1
+	ok(sr_climb == sr_step,
+		"§5: ...and the bearer is still exactly one threshold from its next blast (%d of %d)"
+			% [sr_climb, sr_step])
+
+	# **THE JUMP ARMS THE RECEIVER — THAT IS THE CASCADE THE RUNE IS FOR.**
+	_sr_seed(scene, sr_a, 2 * sr_step)
+	_sr_seed(scene, sr_b, 0)
+	_sr_seed(scene, sr_c, 0)
+	scene._detonate_ruin(sr_a)
+	ok(sr_b.has_status("ruin_primed"),
+		"§5: ...and the stacks it lands ARM the receiver — a fed mark detonates sooner")
+
+	# **THE CHAIN IS BOUNDED AT TWO, BY CONSTRUCTION.** A fed detonation does
+	# not feed onward. Unbounded, this rune was measured at **80 detonations
+	# over 40 rounds from two marks and no further input** — the stacks slosh
+	# between two bodies and every crossing re-arms the one they left. THE ARM
+	# IS DRIVEN IN BOTH DIRECTIONS: the fed mark refuses, and the flag CLEARS,
+	# so the very next detonation that body earns for itself jumps normally.
+	ok(sr_b.ruin_shared_in,
+		"§5: ...and the receiver is flagged as fed — the bound is armed")
+	var sr_b_was: int = sr_b.status_stacks("ruin")
+	scene._detonate_ruin(sr_b)
+	ok(sr_b.status_stacks("ruin") == sr_b_was and not sr_b.ruin_shared_in,
+		"§5: ...a FED detonation moves nothing onward and consumes the flag (%d -> %d)"
+			% [sr_b_was, sr_b.status_stacks("ruin")])
+	_sr_seed(scene, sr_b, 2 * sr_step)
+	_sr_seed(scene, sr_a, 0)
+	_sr_seed(scene, sr_c, 0)
+	scene._detonate_ruin(sr_b)
+	ok(sr_b.status_stacks("ruin") == sr_step and sr_a.status_stacks("ruin") == sr_step,
+		"§5: ...and the SAME body jumps again the moment it primes itself (%d -> %d)"
+			% [sr_b.status_stacks("ruin"), sr_a.status_stacks("ruin")])
+
+	# **WITH NO OTHER BODY THE STACKS STAY.** A rune that DELETED Ruin on a
+	# single-enemy board would read as working everywhere else.
+	_sr_seed(scene, sr_a, 21)
+	sr_b.dead = true
+	sr_c.dead = true
+	scene._detonate_ruin(sr_a)
+	sr_b.dead = false
+	sr_c.dead = false
+	ok(sr_a.status_stacks("ruin") == 21,
+		"§5: ...and with no other body alive the stacks STAY, never lost (%d)"
+			% sr_a.status_stacks("ruin"))
+	occ.rune_shared_ruin = 0
+	for sr_u2 in foes:
+		sr_u2.remove_status("ruin")
+		sr_u2.remove_status("ruin_primed")
+		sr_u2.ruin_shared_in = false
+
+	# **AND IT DOES NOT FIRE ON REQUIEM, CONFIRMED RATHER THAN ASSUMED.**
+	# Requiem consumes the whole pile and the primer with it and fires NO
+	# detonation, so there is nothing to jump — but "there is nothing to jump"
+	# is only true while the jump has ONE home. Both halves are asserted: the
+	# rune's field is read at exactly one site in the comment-stripped source,
+	# and Requiem's own handler does not reach that site.
+	# **THE `res://` PATH IS ON THIS LINE ON PURPOSE, AND THE REASON IS ALREADY
+	# A STANDING RULE.** `instrument-rules.md`'s ED §2 block names it as that
+	# bug's SECOND FORM — *bind holders from STATEMENTS, which join
+	# continuations, never from lines* — and `check_ed` §2 has not been repaired
+	# to it: its holder regex is still `[^\n]*`, so a haystack whose path wraps
+	# to a continuation line binds nothing and every pin read off it is invisible
+	# to the completeness scan. Verified on this batch's own pins: written
+	# wrapped, `check_ed` read **18 / 0 against a manifest missing five
+	# entries**; written flat, it named all five. **The gate is not widened here**
+	# — that is a change to its population — and the finding is in FC's report.
+	var b_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
+	ok(b_src.count("rune_shared_ruin") == 1,
+		"§5: the Shared Ruin has exactly ONE read site in battle.gd (%d)"
+			% b_src.count("rune_shared_ruin"))
+	# **THE ANCHOR CARRIES ITS INDENT AND ITS UNIQUENESS IS ASSERTED, BECAUSE
+	# THE FIRST FORM OF THIS CHECK ANCHORED ON THE WRONG SITE.** Bare
+	# `"requiem":` occurs TWICE — the bot's `ab.special == "requiem"` fifteen
+	# thousand lines earlier, and the handler — so `find` landed on the targeting
+	# code and the "no detonation" arm read a body that was never the handler:
+	# green, and about nothing. **The paired POSITIVE arm is what exposed it**,
+	# which is the only reason it is not still passing.
+	var rq_key := "\n\t\t\"requiem\":"
+	ok(b_src.count(rq_key) == 1,
+		"§5: ...the handler's anchor names exactly one site (%d)" % b_src.count(rq_key))
+	var rq_at := b_src.find(rq_key)
+	var rq_end := b_src.find("\n\t\t\"penance\":", rq_at + 1)
+	ok(rq_at > 0 and rq_end > rq_at, "§5: ...Requiem's handler is findable and bounded")
+	var rq_body := b_src.substr(rq_at, rq_end - rq_at) if rq_end > rq_at else ""
+	ok(rq_body.contains("remove_status(\"ruin\")"),
+		"§5: ...it SPENDS the pile, which is the whole card — and is the arm that says the body is REALLY the handler")
+	ok(not rq_body.contains("_detonate_ruin"),
+		"§5: ...and Requiem fires no detonation, so the pile it spends never jumps")
 
 	# ---- Warden: he can no longer Block ----
 	wd.block_chance = 0.5

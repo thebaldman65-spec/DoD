@@ -7427,3 +7427,45 @@ four entries against five presses as a bug and adding a fifth would delete the r
 and turn it into a pure upside — with nothing else in the tree noticing. The brief's own phrasing is
 the trap: "each press is 15% narrower than the one before it" is `SS_SEQ_TAPER` = 0.85 and has been
 shipped since CS, so read literally it describes the status quo and buys nothing.
+
+**Batch FC retires Split Tongue rather than repricing it a third time, and the note worth keeping is
+about repricing, not about the rune.** Two batches moved that number — FA down to 12%, FB back to
+the card's own 20% — and both were built exactly as ruled and both were measured. Neither number was
+the problem. **The card was authored against a base that did not exist**: the brief that transcribed
+it said Hex of Ruin *"strikes two enemies instead of one"* when `choose_three` had already made it
+three, so `aoe` at a three-enemy board widens onto the same three bodies and the halved mark is the
+only clause left standing. **A magnitude is the only lever a reprice has, and no magnitude reaches a
+false premise.** The retirement string carries the whole history — both numbers and the premise —
+precisely so a later reader does not conclude that the pricing was the fault.
+
+**The replacement was chosen so that it has no target-count premise to be wrong about.** The Rune of
+the Shared Ruin moves half a detonating mark onto the enemy carrying the most Ruin; there is no board
+size at which that does nothing, and there is no talent that already does it — `_detonate_ruin` reads
+the Occultist's Attack, Grim Focus and Unraveling, and no rune writes either of those. **All four of
+the Occultist's other runes move how much or how often; none of them changes what a detonation
+DOES**, which is why this was the axis available.
+
+**And it was perpetual motion before it was bounded, which is the transferable half.** The jump goes
+through `_gain_ruin`, so it arms the receiver — that is the cascade the rune exists for. But the
+jump MOVES stacks rather than granting them, so the pile is conserved, and a conserved pile crosses
+its threshold forever: **two enemies seeded once and then never marked again produced 80 detonations
+over 40 rounds**, against 2 without the rune. Every existing guard in this area would have read
+clean — there is no recursion to break by identity, the target is deterministic rather than random,
+and nothing re-enters, because a primed mark waits for its bearer's own turn. **The loop is across
+turns and it comes from conservation.** The bound is a rule and not an amount: a mark the Occultist
+primed himself jumps, a mark a jump primed detonates in full and stops. 80 → 3, and over 60 marks
+the rune still turns 6 detonations into 16.
+
+**FB's Wide Rite collision outlives Split Tongue in general shape but not in particular.** The
+specific anti-synergy is gone with the retirement — nothing pays a hard `1` against
+`_old_gods_mark()` any more. Read across the surviving five, the shape that replaces it is the
+opposite sign: **the Shared Ruin compounds with Deepening Hex and Wide Rite** (both raise detonation
+frequency, and every detonation is a jump), and **it makes Open Wound's cost strictly worse** — that
+rune bleeds 1 Ruin a turn off *every* bearer, and the Shared Ruin's whole purpose is to put the mark
+on more bearers. Over the 60-mark measurement the mark sat on one body without the rune and on two
+with it, so the decay bill doubles. **Standing Mark is the one where the reading is not obvious and
+is therefore reported as arithmetic rather than as a measurement**: the draught is
+`min(0.02 × stacks, cap)`, so halving a pile halves the draught on that body wherever the pile is
+under the cap — and the Standing Mark's raised 60% cap puts *more* of the pile inside that linear
+region. The stacks are not destroyed, they move, so whether it nets out depends on which body the
+party strikes. **Nothing is ruled on any of this.**

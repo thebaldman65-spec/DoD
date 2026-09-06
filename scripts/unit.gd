@@ -1405,6 +1405,17 @@ var rune_ruin_leech_cap := 0.0 # rune-owned: the Standing Mark +0.20
 var rune_split_tongue := 0    # rune-owned: Split Tongue 1 (a FLAG)
 var rune_wide_rite := 0       # rune-owned: the Wide Rite +1 to the mark
 var rune_open_wound := 0      # rune-owned: Open Wound 1 (a FLAG)
+# BATCH FC — THE RUNE OF THE SHARED RUIN replaces Split Tongue in the
+# Occultist's five. It is a FLAG: the SHARE is authored in the read site
+# (half, rounded down), not carried here, so there is one copy of it.
+var rune_shared_ruin := 0     # rune-owned: the Shared Ruin 1 (a FLAG)
+# BATCH FC §2 — THE CHAIN BOUND, AND IT IS ENGINE STATE RATHER THAN A RUNE
+# FIELD (`weight_of_ruin`'s precedent one screen up: stamped by the battle,
+# read by the battle, written by no payload). TRUE while THIS unit's pending
+# detonation is one a Shared Ruin jump ARMED. A detonation carrying it does
+# not jump onward, and it clears the moment that detonation resolves — so a
+# mark the Occultist primed HIMSELF always jumps, and a fed one never chains.
+var ruin_shared_in := false
 # Warden —
 var rune_standing_wall := 0   # rune-owned: the Standing Wall 1 (a FLAG)
 var rune_bracing_line := 0    # rune-owned: Bracing Line 5 (percentage POINTS)
