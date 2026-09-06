@@ -14,6 +14,99 @@ any time. <b>A file outside the repo is not in version control and is not backed
 GitHub</b> &mdash; see the <b>Batch DV</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-09-06 &mdash; Batch FD: THE CACHE RE-ASKS, BREAK BECOMES SECONDARY-ONLY, AND THE SHARED RUIN IS RENAMED</h2>
+
+<p><i><b>Three items, and the first one was reported as two bugs and is one hole.</b> The designer
+saw retired runes still being offered and the Peddler selling an ability draft. <b>Neither is what
+the brief predicted.</b> Every site that ROLLS a rune offer reads the retirement correctly &mdash;
+driven 1,200 times through three doors on the designer&rsquo;s own saved party, zero leaks. The
+hole is that <b>the elite cache does not roll at the offer</b>: it rolls at the DROP and stores its
+triple on the member, where it rides the save, and nothing re-asked. And the Peddler&rsquo;s draft
+column was never a bug &mdash; it is BATCH BO &sect;3, deliberate, asking the same door every other
+draft source asks. <b>It is withdrawn because the designer has ruled it, not because it was
+broken.</b></i></p>
+
+<p><b>&sect;1 &mdash; THE OFFER SITES, ENUMERATED FROM THE WRITE RATHER THAN FROM A LIST.</b> A rune
+reaches a hero exactly where something appends to <code>member["runes"]</code>, and there are FOUR
+such sites in the shipped game: the Peddler (<code>Run.generate_rune</code>), the elite cache and
+the bargain (<code>Run.roll_rune_candidates</code>) and the event verb
+(<code>Run.grant_rune</code>). <b>All four reach the pool through
+<code>Runes.eligible_ids</code> and nothing else</b>, which is what the file already claimed. The
+spec-choice screen offers no rune (AN deleted the opening pick), boss trophies award ABILITIES, and
+no relic grants one. <b>So the retirement flag is read at every offer site, and the designer was
+still right.</b></p>
+
+<p><b>&sect;1a &mdash; THE RESOLUTION DOOR IS NOT A ROLL, AND THAT IS THE WHOLE FINDING.</b> A cache
+triple is rolled at the drop and answered later &mdash; possibly whole batches later, across a
+retirement. Between those two moments a rune can be retired, bought at the Peddler, or won from a
+second cache, and <b><code>Runes.is_retired</code> had ZERO callers in the game</b>. Two symptoms,
+one hole: <b>two triples queued before either is answered share a name in 265 of 400 trials</b>,
+and a queued candidate is also the shop&rsquo;s offer in <b>127 of 400</b>. <b>The
+designer&rsquo;s own live save carried the second symptom</b> &mdash; one hero wearing Heavy Bolts
+TWICE, both equipped, under a shop header that promises <i>&ldquo;one of each&rdquo;</i>.</p>
+
+<p><b>&sect;1b &mdash; ONE DOOR, AND IT IS NOT A REROLL.</b> <code>Run.rune_choice(member)</code>
+takes the head of the queue, drops any candidate now retired or now owned, tops it back to three
+through the same <code>eligible_ids</code> every roll uses, and <b>writes the repair back</b> so it
+happens once rather than on every screen open. Both the overlay and
+<code>map_screen._pick_rune</code> come through it, so the button the player presses and the rune
+they get are the same array. <b>A triple with nothing wrong with it is returned untouched</b>
+&mdash; BATCH X&rsquo;s no-reroll rule stands, and <code>check_fd</code> &sect;1c asserts it,
+because without that arm the section would pass on a function that simply rerolls.</p>
+
+<p><b>&sect;1c &mdash; THE MERCHANT SELLS NO DRAFT PICK (ruled by the designer).</b> BO &sect;3 built
+four sources and this was the third: <i>&ldquo;an elite always gives one, an event may trade one,
+and this is the one you can simply BUY.&rdquo;</i> <b>A draft pick is earned and never bought
+now.</b> The other three are untouched and are asserted still present in the same breath, because a
+ruling that took a source it did not name is the failure worth catching.
+<code>Run.draft_price()</code> keeps its 120 / 180 / 240 ladder with <b>no game-side caller</b>, on
+the same contract a retired rune is kept on. <b><code>run_sim</code> never bought one</b>, so no
+figure in the economy report moves. The left column of the shop is empty below y=452 and the 36-row
+pitch is deliberately NOT widened back.</p>
+
+<p><b>&sect;2 &mdash; BREAK BECOMES A SECONDARY TAG ONLY.</b> <b>No card carries BREAK as its
+PRIMARY.</b> BREAK was the only one of the seven naming a <i>mechanic</i> where the other six name
+a <i>role</i>; demoting it makes the primary vocabulary uniform, and it is DEMOTED rather than
+removed so a Break build stays visible on the draft card. <b>54 of 227 rows moved and 53
+became <code>["OFFENSE", "BREAK"]</code></b> &mdash; the primary spread went BREAK
+54&nbsp;&rarr;&nbsp;0 and OFFENSE 16&nbsp;&rarr;&nbsp;70, and 99 cards carry BREAK where 46 did.
+<b>The 54th is FEINT</b>: EL &sect;2 had already ruled its second slot to MARK, so it reads
+<code>["OFFENSE", "MARK"]</code> and is <b>the one card where the demotion became a removal</b>.
+<code>check_el</code>&rsquo;s pin moved from <code>["Feint", "BREAK"]</code> to
+<code>["Feint", "OFFENSE"]</code> in place, with its reason. <b>The population was DERIVED and the brief&rsquo;s two named cases were both false
+premises</b>: <i>Firestorm</i> and <i>Pyre Wake</i> (written &ldquo;Pyrewake&rdquo;, which is in no
+file) read <code>["DEBUFF", "BREAK"]</code> and were never in it.</p>
+
+<p><b>&sect;2a &mdash; WHAT IT COSTS, AND WHAT IT DOES TO THE TWO CONDITIONS.</b> Two tags is the
+ceiling and BREAK takes the second slot, so <b>30 rows lost a secondary</b>: 18 RESOURCE, 9 DEBUFF,
+2 DEFENSE, 1 TEMPO (20 had none to lose, 3 already read OFFENSE second). <b>That is cheap because a secondary feeds no condition</b> &mdash; EZ
+&sect;0c counts the PRIMARY only. <b>THRESHOLD is untouched and it is proved rather than asserted</b>:
+the transform moved cards between exactly two columns, and no live rune names either of them (the
+four thresholds name DEBUFF, DEFENSE twice and MARK). <b>BREADTH only ever gets harder</b>, because
+<code>primary_tag_peak</code> folds a hero&rsquo;s BREAK column into his OFFENSE one. <b>A BREAK
+threshold is now UNMEETABLE and must not be authored</b>, which inverts the warning
+<code>master.html</code> carried &mdash; it used to say such a rune would be on from the first
+fight. <b><code>Runes.RUNE_TAGS</code> is deliberately not touched</b>: the ruling named CARDS, and
+five rune rows still carry BREAK first (<code>long_watch</code>, <code>bared_plate</code> live;
+<code>comet</code>, <code>seventh_bolt</code>, <code>shattered_guard</code> retired). Pinned at five
+and reported, not moved.</p>
+
+<p><b>&sect;3 &mdash; <code>Rune of the Shared Ruin</code> &rarr; <code>Shared Ruin</code>.</b> 20 of
+the 21 live runes carry one- or two-word names and <b>61 of the 66 retired ones are
+&ldquo;Rune of&nbsp;&hellip;&rdquo;</b> (52 of those &ldquo;Rune of the&nbsp;&hellip;&rdquo;), so the
+new rune was the only live entry wearing the withdrawn pool&rsquo;s shape. The BR &sect;1 sweep was
+run on the SHORTENED form against abilities, talent nodes, statuses and the whole rune pool
+including the retired half: <b>no collision</b>, and the nearest neighbours are <i>Hex of Ruin</i>,
+<i>Weight of Ruin</i> and <i>Avatar of Ruin</i>. The rule is written into
+<code>text-standard.html</code> &sect;4.11, with the generated stat family named as its one
+deliberate exception.</p>
+
+<p><b>ALSO CORRECTED, BECAUSE &sect;2 IS WRITTEN IN THAT SECTION.</b> <code>master.html</code>
+&sect;6c and the glossary both still said <i>&ldquo;no clause reads a tag yet&rdquo;</i> and
+<i>&ldquo;the tags are shown and read nothing&rdquo;</i> &mdash; false since BATCH EZ gated eight
+runes, and contradicted by the glossary&rsquo;s own <code>runes</code> entry two screens away. Both
+are repaired.</p>
+
 <h2>2026-09-05 &mdash; Batch FC: SPLIT TONGUE IS REPLACED BY THE RUNE OF THE SHARED RUIN</h2>
 
 <p><i><b>Split Tongue is retired and replaced. Its premise was false from the moment it was

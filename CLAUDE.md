@@ -1852,7 +1852,7 @@ status into the draft turned four tree-internal dependencies — which the chart
 > ask which of the two it is — and if it moves, bound the CHAIN, not the amount.**
 
 **IT IS WRITTEN BESIDE THE RE-ENTRY-GUARD BULLET ABOVE BECAUSE IT IS THE CASE THAT BULLET DOES NOT
-COVER, AND EVERY GUARD THAT BULLET NAMES WOULD HAVE READ CLEAN.** The Rune of the Shared Ruin sends
+COVER, AND EVERY GUARD THAT BULLET NAMES WOULD HAVE READ CLEAN.** The Shared Ruin sends
 half a detonating mark to the enemy carrying the most Ruin. There is no recursion — the jump goes
 through `_gain_ruin`, which only ARMS a primer, and a primed mark detonates at its bearer's own turn
 start — so nothing re-enters, an identity guard has nothing to break, and the target is
@@ -1997,6 +1997,13 @@ was the magnitudes, and the magnitudes were never the interesting part.** A pool
 real charter — threshold-gated, reading archetype tags on the holder's DRAFTED cards — will be
 better than 53 patched ones.
 
+· **AND `eligible_ids` IS NOT REACHED BY EVERY OFFER — ONLY BY EVERY *ROLL* (Batch FD §1).**
+  The elite cache and the bargain roll at the DROP and store the triple on the member, so the
+  offer the player answers is a REPLAY of a roll that may predate a retirement by whole batches.
+  ET §2's five-door drive read clean the whole time and the designer was looking at the opposite.
+  **`Run.rune_choice` is the resolution door and it re-asks**; `Runes.is_retired` had ZERO callers
+  in the game before FD. **When a rule is enforced at one door, check whether every offer goes
+  through it or only every roll.**
 · **A RETIREMENT WITH NO STRING IS A DELETION NOBODY WROTE DOWN.** `eligible_ids` reads the
   `retired` key and nothing else, so a bare `"retired": "yes"` would empty the pool exactly as
   effectively and record nothing. **The string is the only place the loss lives**, and it is what a
@@ -2219,6 +2226,75 @@ the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN*
 - **AND THE BOARD ITSELF CAPS AT SIX.** `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]`, so a
   seventh enemy would index past the layout array. **Six is the ceiling any AoE magnitude can ever
   be priced against**, and `_theme_combos` is what actually decides the count.
+
+## STANDING RULE — AN OFFER FROZEN AT DROP TIME IS RE-ASKED AT RESOLUTION (Batch FD §1)
+
+> **A choice that is ROLLED at one moment and ANSWERED at another is two events, and everything
+> the roll asked can have changed by the time it is answered. The door that enforces a rule at
+> the roll does not enforce it at the answer. Re-ask at the answer, repair in place, and WRITE
+> THE REPAIR BACK — a repair recomputed on every screen open is a reroll, which is a different
+> feature.**
+
+**IT IS WRITTEN AS A RULE BECAUSE THE PROJECT HAD ALREADY WRITTEN THE OPPOSITE DOWN AND BELIEVED
+IT.** `runes.gd` said, in as many words, *"THE FILTER LIVES HERE BECAUSE THIS IS THE ONLY DOOR …
+one `continue` retires a rune everywhere it could be offered"*. That was true of every roll and
+false of the cache, whose triple rides `member["rune_candidates"]` into the save.
+
+- **TWO SYMPTOMS, ONE HOLE, AND THE SECOND ONE IS MEASURABLE.** A retired rune goes on being
+  offered for the life of a run; and a rune the hero already owns is offered again. **Two triples
+  queued before either is answered share a name in 265 of 400 trials**, and a queued candidate is
+  also the Peddler's offer in **127 of 400** — the designer's own save carried one hero wearing
+  **Heavy Bolts twice, both equipped**, under a shop header that promises *"one of each"*.
+- **THE INSTRUMENT THAT COULD NOT SEE IT WAS LOOKING AT THE RIGHT THING.** `check_et` §2 drives
+  five doors across twelve specs and asserts no retired entry reaches an offer. **It rolls.** The
+  path the player uses replays. **A drive that exercises the producer is not a drive of the
+  consumer.** THE IDIOM IS IN THREE MORE PLACES AND ONLY ONE OF THEM IS GUARDED, which is the
+  useful half of this: `draft_candidates` IS re-asked (`take_draft_ability` refuses a card the
+  hero already knows), while **`bm_candidates` (the zone-boss pick) and `up_candidates` (the
+  upgrade pick) reach `hold_ability` / `member["upgrades"]` with no such check**. Both are
+  **reported, not repaired, at FD §1** — see `docs/reports/FD.md`, which is explicit that their
+  reachability was NOT driven.
+- **THE REPAIR IS NOT A REROLL AND THE DIFFERENCE IS ASSERTED.** BATCH X's rule is that a cache
+  does not reroll when a screen opens. `check_fd` §1c hands it a triple with nothing wrong with it
+  and requires it back unchanged — without that arm the section passes on a function that simply
+  rerolls, which satisfies every other arm and breaks the rule the cache is built on.
+
+## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
+
+> **No card carries BREAK as its PRIMARY. Every one that did reads `["OFFENSE", "BREAK"]`. BREAK
+> is DEMOTED, never removed — a Break build stays visible on the draft card.**
+
+**THE REASONING, RECORDED WITH THE RULING.** BREAK was the only one of the seven naming a
+*mechanic* where the other six name a *role* — DEBUFF, DEFENSE, RESOURCE, OFFENSE, TEMPO and MARK
+are all what a card is FOR. Demoting it makes the primary vocabulary uniform, and a straight
+removal would have destroyed the one thing the word is on the card for.
+
+- **54 OF 227 ROWS MOVED, AND THE POPULATION WAS DERIVED RATHER THAN TAKEN.** The brief named two
+  cards and **both were false premises**: `Firestorm` and `Pyre Wake` (spelled *Pyrewake*, which
+  is in no file) are `["DEBUFF", "BREAK"]` and were never in the population.
+- **30 ROWS LOST A SECONDARY AND THAT IS THE COST.** Two tags is the ceiling and BREAK takes the
+  second slot, so 18 RESOURCE, 9 DEBUFF, 2 DEFENSE and 1 TEMPO are displaced (20 rows had no
+  secondary to lose, 3 already read OFFENSE second). **It is cheap because a SECONDARY FEEDS NO
+  CONDITION** — EZ §0c counts the primary only, so a displaced secondary moves a screen and
+  nothing a rune asks.
+- **FEINT IS THE ONE PER-CARD JUDGEMENT AND THE RULE LOSES TO A STANDING RULING THERE.** EL §2
+  ruled that Feint carries MARK second, so the slot was already owned. FD's binding half is *no
+  BREAK primary*; the retained-secondary half yields, and Feint reads `["OFFENSE", "MARK"]` —
+  **the one card of the 54 where the demotion became a removal.** `check_el`'s pin was re-pointed
+  from `["Feint", "BREAK"]` to `["Feint", "OFFENSE"]` in place, with its reason, and it still
+  asserts the MARK half from its own side. **Where this rule meets an older ruling on the same
+  slot, the older ruling keeps the slot and the card is named.**
+- **A BREAK THRESHOLD IS NOW UNMEETABLE AND MUST NOT BE AUTHORED.** No card can contribute one.
+  Nothing depends on it today (the four live thresholds name DEBUFF, DEFENSE twice and MARK), and
+  `check_fd` §2 asserts no live rune gates on BREAK **or** on OFFENSE — the two columns the
+  demotion moved, which are the only two whose counts could have changed.
+- **BREADTH ONLY EVER GETS HARDER.** `primary_tag_peak` folds what was a hero's BREAK column into
+  his OFFENSE one, so the peak rises or holds and never falls, and the four BREADTH runes (Wide
+  Rite, Long Watch, Wide Watch, Shared Scent) are what pays for it.
+- **`Runes.RUNE_TAGS` IS NOT TOUCHED AND THAT IS A DECISION, NOT AN OVERSIGHT.** The ruling names
+  CARDS. Five rune rows still carry BREAK first — `long_watch` and `bared_plate` live, `comet`,
+  `seventh_bolt` and `shattered_guard` retired — pinned at five so the day it is ruled on, the
+  gate says so. **Widening a ruling is not implementing it.**
 
 ## STANDING RULE — A RUNE READS A TAG NOW, AND EK'S INERTNESS CLAIM IS OVER (Batch EZ, deliberately)
 
@@ -2671,8 +2747,15 @@ runes the charter empties, and whether the lane rule is replaced with anything.
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, on ONE SCREEN of four columns, each hero drawing
 from their OWN pools and keeping their OWN no-return ledger.**
 
+**BATCH FD §1 — THE MERCHANT IS NO LONGER ONE OF THE SOURCES, RULED BY THE DESIGNER.** BO §3
+built four (elite, merchant, event, zone boss) and the merchant's is withdrawn: **a draft pick is
+earned and never bought.** `Run.draft_price()` is KEPT with no game-side caller, on the Melted
+Armor contract, and **the other three are untouched** — a ruling that took a source it did not
+name would be the failure worth catching, so `check_fd` §1f asserts the three still stand in the
+same breath as the removal. `run_sim` never bought one, so no measured figure moves.
+
 **A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
-`Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites, merchants and events offer;
+`Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites and events offer;
 `SPEC_POOLS` is what a ZONE BOSS offers. **Sharing one pool would re-weight every boss offer in
 the game**, which is what "the existing pick, unchanged" forbids. **A drafted ability lands in
 `member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero sheet,

@@ -888,8 +888,11 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 					Run.upgrade_desc(String(up["id"])),
 					Color(1.0, 0.9, 0.5), _pick_upgrade.bind(idx, i), overlay)
 		"rune":
-			var queue3: Array = member.get("rune_candidates", [])
-			var triple: Array = queue3[0] if not queue3.is_empty() else []
+			# BATCH FD §1 — THROUGH `Run.rune_choice`, NOT OFF THE MEMBER.
+			# The stored triple was rolled at DROP time; this re-asks the pool
+			# and the pouch and writes the repair back, so the button at index
+			# `i` here and the one `_pick_rune` indexes are the same rune.
+			var triple: Array = Run.rune_choice(member)
 			for i in triple.size():
 				var rune: Dictionary = triple[i]
 				_pick_button(box, "%s  [%s]" % [rune["name"], rune["scope_label"]],
@@ -1494,8 +1497,16 @@ func _pick_upgrade(idx: int, choice: int) -> void:
 
 func _pick_rune(idx: int, choice: int) -> void:
 	var member: Dictionary = Run.party[idx]
+	# BATCH FD §1 — THE SAME DOOR THE OVERLAY DREW FROM, CALLED AGAIN.
+	# `rune_choice` is idempotent (it writes its repair back), so calling it
+	# here re-reads the array the buttons were built from rather than repairing
+	# a second time — and a triple that repaired to NOTHING is refused here
+	# rather than indexing an empty array. That state needs runes to have been
+	# switched off mid-run and is unreachable in play; it is guarded anyway.
+	var live: Array = Run.rune_choice(member)
 	var queue: Array = member.get("rune_candidates", [])
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() \
+			or live.is_empty():
 		return
 	var triple: Array = queue.pop_front()
 	member["rune_candidates"] = queue

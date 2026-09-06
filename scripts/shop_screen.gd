@@ -86,6 +86,14 @@ func _draw_screen() -> void:
 	# tall run 162..446, which clears 452 with six pixels to spare and moves
 	# nothing else on the screen.
 	#
+	# **BATCH FD §1 — THE THING IT WAS CLEARING IS GONE AND THE PITCH STAYS.**
+	# The draft column below y=452 is removed, so nothing now bounds this column
+	# from underneath. **THE 36 PITCH IS NOT WIDENED BACK**: the ninth item type
+	# is the next thing to arrive here and it lands at 450 under this pitch and
+	# at 610 under the old one, so the measured layout is the one that survives
+	# growth. **The left column is empty from 452 to the Leave button at 640
+	# now** — a cosmetic consequence of the ruling, reported and not redesigned.
+	#
 	# EVERY TYPE IS LISTED, HELD OR NOT. The shop is where a type you do not own
 	# is acquired, so a slot-less pouch greys the button and says which wall it
 	# hit — a missing row would read as "the merchant is out", which is a
@@ -152,43 +160,24 @@ func _draw_screen() -> void:
 			add_child(sell)
 		row += 1
 
-	# BATCH BO §3 — THE MERCHANT SELLS A DRAFT PICK. The third of the four
-	# sources: an elite always gives one, an event may trade one, and this is
-	# the one you can simply BUY. It sells the OFFER, not a named ability —
-	# three cards are drawn at purchase and wait on the hero's card, resolved
-	# by the same overlay every other owed pick uses.
-	var draft_header := Label.new()
-	draft_header.text = "THE DRAFT  (%dg each — a choice of three, on the hero's card)" % \
-		Run.draft_price()
-	draft_header.add_theme_font_size_override("font_size", 15)
-	draft_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
-	draft_header.position = Vector2(140, 452)
-	add_child(draft_header)
-	for i in Run.party.size():
-		var member: Dictionary = Run.party[i]
-		var pools: Dictionary = Run.draft_pool_left(member)
-		var left: int = pools["spec"].size() + pools["class"].size()
-		var price := Run.draft_price()
-		var dbtn := Button.new()
-		dbtn.text = "%s — %dg" % [_hero_label(member), price]
-		dbtn.custom_minimum_size = Vector2(360, 40)
-		dbtn.position = Vector2(140, 482 + i * 44)
-		dbtn.add_theme_font_size_override("font_size", 13)
-		if left < 1:
-			# THE POOL IS THIN UNTIL TRANCHE 3 and a Warrior's is empty
-			# outright, so "nothing to sell you" is a state a player will
-			# meet — and it says so rather than taking the gold.
-			dbtn.text = "%s — nothing left to offer" % _hero_label(member)
-			dbtn.tooltip_text = "Every ability this run could offer %s has been\nlearned or declined." % \
-				_hero_label(member)
-			dbtn.disabled = true
-		else:
-			dbtn.tooltip_text = "Draw three abilities for %s (%d still in the pool).\nThe cards are drawn NOW and wait on their hero card.\nAbility slots %d of %d." % [
-				_hero_label(member), left, Run.ability_slots_used(member),
-				Run.ability_slot_cap()]
-			dbtn.disabled = Run.gold < price
-			dbtn.pressed.connect(_buy_draft.bind(i))
-		add_child(dbtn)
+	# ── BATCH FD §1 — THE MERCHANT NO LONGER SELLS A DRAFT PICK ──────────────
+	#
+	# **RULED BY THE DESIGNER. IT WAS NOT A BUG AND THE RECORD SAYS SO** —
+	# BATCH BO §3 built this deliberately, as the third of four draft sources:
+	# *"an elite always gives one, an event may trade one, and this is the one
+	# you can simply BUY."* It asked the same door every other source asks
+	# (`Run.draft_pool_left` for what is left, `Run.award_draft_pick` to roll
+	# the offer onto the hero's card), so it shares NO cause with FD §1's rune
+	# hole; the two arrived on one screen and were reported as one symptom.
+	#
+	# **WHAT GOES WITH IT, STATED RATHER THAN DISCOVERED LATER.** The other
+	# three sources stand untouched, so a draft pick is now earned and never
+	# bought. `Run.draft_price()` keeps its 120g-per-zone ladder and is KEPT
+	# with no game-side caller — the Melted Armor contract this project already
+	# uses for a retired rune, so a later batch that wants a paid draft back
+	# does not have to re-derive the price. **`run_sim` never bought one**
+	# (its shop policy buys items and runes only), so no measured figure in the
+	# economy report moves.
 
 	# Rune offers column.
 	var rune_header := Label.new()
@@ -291,27 +280,6 @@ func _sell_item(id: String) -> void:
 		return
 	Run.gold += value
 	Run.tally_add("gold_earned", value)
-	_draw_screen()
-
-
-func _hero_label(member: Dictionary) -> String:
-	var spec := String(member.get("spec", ""))
-	if Classes.SPEC_INFO.has(spec):
-		return String(Classes.SPEC_INFO[spec]["name"])
-	return String(member["key"]).capitalize()
-
-
-func _buy_draft(member_idx: int) -> void:
-	var member: Dictionary = Run.party[member_idx]
-	var price := Run.draft_price()
-	# The offer is rolled BEFORE the gold moves, so a purchase that cannot
-	# land never costs anything — the item cap's rule, applied to the draft.
-	if Run.gold < price:
-		return
-	if not Run.award_draft_pick(member):
-		return
-	Run.gold -= price
-	Run.tally_add("gold_spent", price)
 	_draw_screen()
 
 

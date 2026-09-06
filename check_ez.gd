@@ -56,7 +56,7 @@ func _data() -> Dictionary:
 # LEFT TO READ TRUE.** This was "every id authored at EZ", which was the same
 # set only while nothing EZ authored had been retired and nothing later had been
 # authored. FC §3 makes both false at once: Split Tongue is an EZ author and is
-# retired, the Rune of the Shared Ruin is live and is not an EZ author, and the
+# retired, the Shared Ruin is live and is not an EZ author, and the
 # count is still 21 — so the OLD comment would have gone on reading correct
 # while describing the wrong set. The DERIVATION never moved and the section's
 # question never moved; only the sentence naming the population did.
@@ -101,9 +101,24 @@ func _met_drafted(cond: Dictionary) -> Array:
 		# 2/2/2 across three tags — a peak of EXACTLY a third, which §1 asserts
 		# passes, so the arm sits on the boundary the rule is written at rather
 		# than comfortably inside it.
+		#
+		# **BATCH FD §2 — THE THREE TAGS ARE DERIVED FOR §1's REASON.** This
+		# named DEBUFF, DEFENSE and BREAK; BREAK's primary population went to
+		# zero, so the arm came back FOUR cards long with a peak of 2 and
+		# stopped meeting breadth — and §4's self-check caught it and named all
+		# four breadth runes, which is exactly what FA §4 built that arm for.
+		# **A wrong arm reads as a broken arm rather than as four broken
+		# payloads**, and it did.
 		var six: Array = []
-		for t in ["DEBUFF", "DEFENSE", "BREAK"]:
-			six.append_array(_cards_of(t).slice(0, 2))
+		var used := 0
+		for t in Classes.TAG_ORDER:
+			var pool: Array = _cards_of(String(t))
+			if pool.size() < 2:
+				continue
+			six.append_array(pool.slice(0, 2))
+			used += 1
+			if used == 3:
+				break
 		return six
 	# UNGATED. Left empty on purpose: a payload with no `condition` must land
 	# for a hero with no drafted cards at all, and that is the arm that says so.
@@ -236,11 +251,31 @@ func _s1_the_arithmetic() -> void:
 
 	# **A THIRD, THE SAME WAY.** "Exceeds" is strict, so a tag sitting exactly
 	# ON a third passes: at 6 cards a peak of 2 is fine and 3 is not.
+	# **BATCH FD §2 — THE THIRD TAG IS DERIVED, NOT NAMED, AND THAT IS THE
+	# REPAIR RATHER THAN A SUBSTITUTION.** This asked for BREAK by name; FD §2
+	# demoted BREAK to a secondary and the primary population went to ZERO, so
+	# `mk[0]` threw and took FOURTEEN checks of §5 with it. **Naming a second
+	# tag would buy exactly the same failure the next time a word is retired**
+	# — and this gate exists because the vocabulary is content that moves. The
+	# third tag is the first in `TAG_ORDER` that is neither of the two already
+	# used AND still has two primaries, and it is ASSERTED FOUND, so an empty
+	# vocabulary reads as one failing assertion rather than as a throw.
 	var six: Array = [deb[0], deb[1], non[0], non[1]]
 	var mk: Array = []
-	for nm2 in Classes.CARD_TAGS:
-		if Classes.card_tag_primary(String(nm2)) == "BREAK":
-			mk.append(String(nm2))
+	for t0 in Classes.TAG_ORDER:
+		if String(t0) == "DEBUFF" or String(t0) == "DEFENSE":
+			continue
+		var pool: Array = []
+		for nm2 in Classes.CARD_TAGS:
+			if Classes.card_tag_primary(String(nm2)) == String(t0):
+				pool.append(String(nm2))
+		if pool.size() >= 2:
+			mk = pool
+			break
+	ok(mk.size() >= 2,
+		"§1: no THIRD tag in `TAG_ORDER` carries two primaries — the 2/2/2 arm cannot be built")
+	if mk.size() < 2:
+		return
 	six.append(mk[0])
 	six.append(mk[1])
 	ok(Classes.primary_tag_peak(six) == 2, "§1: the peak of a 2/2/2 six reads 2")

@@ -35,6 +35,12 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+# **BATCH FD §1 — THE AUTHORED COMMENT STRIPPER, PRELOADED RATHER THAN COPIED.**
+# §3's merchant needles read the shop's source with the comments taken out (see
+# the block there for why), and `gate_fixture.strip_comments` is where that
+# helper lives. A second copy of it in this file is exactly the defect DA and DB
+# were about, so it is reached by path — the same way every gate reaches it.
+const Gate = preload("res://gate_fixture.gd")
 
 const CAP := 7
 const CLASS_SHARE := 0.25
@@ -685,12 +691,31 @@ func _sources() -> void:
 		"§3: ...and the sim's elite branch offers it to every living hero too")
 	ok(sim.contains("run.take_draft_ability(m, String(offer[0]), drop)"),
 		"§3: ...resolved through the SAME door the map screen calls")
-	# MERCHANT — purchasable, gold.
-	ok(shop.contains("Run.draft_price()"), "§3: the merchant prices a draft")
-	ok(shop.contains("Run.award_draft_pick(member)"),
-		"§3: ...and sells the OFFER, resolved on the hero card")
-	ok(shop.contains("if Run.gold < price:\n\t\treturn"),
-		"§3: ...refusing before the gold moves")
+	# ── MERCHANT — RE-POINTED AT BATCH FD §1, IN THE OPPOSITE DIRECTION ──────
+	#
+	# **THE DESIGNER HAS RULED THAT THE MERCHANT SELLS NO DRAFT PICK.** These
+	# three needles pinned BO §3's third source; a batch that DELETED them would
+	# leave the reversal unrecorded and let a later batch put the column back
+	# without anything going red, which is the whole reason this project
+	# re-points a pin in place rather than removing it. **The other three
+	# sources are asserted below and are untouched** — a ruling that took a
+	# source it did not name is the failure worth catching.
+	#
+	# **READ OFF THE COMMENT-STRIPPED SOURCE, AND THAT IS NOT A DETAIL.**
+	# `shop_screen.gd` now carries a paragraph explaining WHY the column is
+	# gone, and that paragraph names `Run.draft_price()`. Against the raw text
+	# the first needle below went on matching and **read GREEN on the run that
+	# found this** — two of the three fired and the third did not. That is
+	# CLAUDE.md's EV §5 rule arriving from the other side: prose recording a
+	# removal reads exactly like the removal not happening, and the fix here is
+	# the instrument half, because the paragraph is the record.
+	var shop_code := Gate.strip_comments(shop)
+	ok(not shop_code.contains("Run.draft_price()"),
+		"§3: the merchant no longer prices a draft (FD §1)")
+	ok(not shop_code.contains("Run.award_draft_pick("),
+		"§3: ...and no longer sells the OFFER")
+	ok(not shop_code.contains("draft_pool_left"),
+		"§3: ...and no longer reads what is left of the pool")
 	var run := root.get_node("/root/Run")
 	run.zone_idx = 0
 	var p1 := int(run.draft_price())

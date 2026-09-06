@@ -7469,3 +7469,74 @@ is therefore reported as arithmetic rather than as a measurement**: the draught 
 under the cap — and the Standing Mark's raised 60% cap puts *more* of the pile inside that linear
 region. The stacks are not destroyed, they move, so whether it nets out depends on which body the
 party strikes. **Nothing is ruled on any of this.**
+
+## Batch FD — why one hole produced two bug reports, and why a ruling was not widened
+
+**The brief offered two explanations and the answer was neither.** Either the retirement flag was
+not read at every offer site — a bug, one line — or ET's live drive had missed a whole offer path.
+The population was derived from the WRITE rather than from a list: a rune reaches a hero exactly
+where something appends to `member["runes"]`, and there are four such sites. All four reach the
+pool through `eligible_ids`, driven 1,200 times on the designer's own saved party with zero leaks.
+**The flag is read at every offer site. The designer was still right.**
+
+**The distinction the project had not drawn is between a ROLL and an OFFER.** `runes.gd` says, in
+as many words, *"THE FILTER LIVES HERE BECAUSE THIS IS THE ONLY DOOR … one `continue` retires a
+rune everywhere it could be offered"*. That is true of every roll. The elite cache does not roll at
+the offer: it rolls at the DROP, stores its triple on the member, and the triple rides the save
+until the player answers it — possibly whole batches later, across a retirement. **A rule enforced
+at the producer is not enforced at the consumer, and `check_et` §2 drives the producer.** Both
+reports were true simultaneously and neither instrument could see the other's.
+
+**The second symptom is what makes it a hole rather than a stale-save story.** Two triples queued
+before either is answered are rolled against the same pouch and share a name in 265 of 400 trials;
+a queued candidate is also the Peddler's offer in 127 of 400. The designer's live save carried it:
+one hero wearing Heavy Bolts twice, both equipped, under a shop header promising *"one of each"*.
+**Two symptoms of one hole is a better finding than two patches**, and the brief said so before the
+evidence did.
+
+**The repair is a re-ask, not a reroll, and the difference is the whole design.** BATCH X ruled
+that a cache does not reroll when a screen opens — an offer that changed under the player would be
+a different feature and a worse one. So `Run.rune_choice` drops only what is no longer legal, tops
+the triple back through the same door, and **writes the repair back**, which makes it idempotent:
+repaired once, stable across every later open, and the array the buttons were built from is the
+array the handler indexes. The arm that earns this is the one that hands it a clean triple and
+requires it back unchanged — without it the section passes on a function that simply rerolls.
+
+**The Peddler's draft column was not a bug and saying so is part of the work.** BO §3 built it
+deliberately as the third of four sources, and it asked the same door every other source asks. It
+is withdrawn because the designer ruled it, and the record now says which of those two things
+happened — a reader who finds the removal later must not conclude that a defect was fixed.
+
+**BREAK's demotion is a vocabulary decision and the reasoning is what makes it stick.** BREAK was
+the only one of the seven naming a *mechanic* where the other six name a *role*. A straight removal
+would have been simpler and would have destroyed the thing the word is on the card for, so it is
+demoted and kept. **The cost is stated rather than discovered later**: two tags is the ceiling and
+BREAK takes the second slot, so 30 rows lose a secondary. That is cheap for one specific reason —
+**a secondary feeds no condition** — and if EZ §0c had counted both tags it would not have been.
+
+**And one card is where a rule met an older ruling on the same slot.** EL §2 had already ruled that
+Feint carries MARK second. FD's binding half is *no BREAK primary*; its retained-secondary half is
+the reason it is a demotion rather than a removal, and on Feint the two cannot both be had. **The
+older ruling keeps the slot**: Feint reads `["OFFENSE", "MARK"]` and is the one card of the 54
+where the demotion became a removal. It was found by running `check_el` unmodified against the new
+code before anything was re-pointed — which is the whole point of that ordering, and it is the
+second time in three batches that it has paid.
+
+**THRESHOLD is untouched and BREADTH only gets harder, and both are derivations rather than
+measurements.** The transform moved cards between exactly two columns, so a threshold's count can
+only have moved if it names one of them; none of the four does. And `primary_tag_peak` folds a
+hero's BREAK column into his OFFENSE one, so the peak rises or holds and never falls. **The
+warning `master.html` carried is now inverted**: it said a rune asking for 2+ BREAK would be on from
+the first fight for almost everyone. It can now never be met by anyone. That is the kind of claim
+that does not decay — it simply becomes false and waits.
+
+**`RUNE_TAGS` was left alone on purpose, and that is the harder call in this batch.** Five rune rows
+still carry BREAK first and the vocabulary is shared, so the primary vocabulary is not uniform
+after all. The ruling names CARDS four times. **Widening a ruling is not implementing it**, so the
+five are pinned at five and reported: the day the designer rules on them, the gate says so.
+
+**And the rename is one string that was worth a rule.** 61 of 66 retired entries are
+"Rune of …" and every one of the 21 live entries is one or two words — so the naming shape had
+quietly become the marker of a withdrawn pool, and the newest rune was the only live entry wearing
+it. The generated stat family keeps the long form and that is now written down as deliberate rather
+than left as an inconsistency somebody will "fix" later.

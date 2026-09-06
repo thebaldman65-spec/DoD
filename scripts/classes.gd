@@ -694,15 +694,59 @@ const PROTECTED_CORES := {
 # **AT MOST TWO PER CARD, THE FIRST IS THE PRIMARY.** A card with two tags of
 # equal weight is a card whose primary has not been decided, so the table
 # always states one.
+#
+# ── BATCH FD §2 — BREAK IS A SECONDARY TAG ONLY, AND NO CARD CARRIES IT FIRST ─
+# **THE REASON IS THE VOCABULARY, NOT THE MECHANIC.** BREAK was the only one of
+# the seven naming a MECHANIC where the other six name a ROLE — DEBUFF,
+# DEFENSE, RESOURCE, OFFENSE, TEMPO and MARK are all what a card is FOR.
+# Demoting it makes the primary vocabulary uniform. **A STRAIGHT REMOVAL WAS
+# REJECTED**: BREAK stays as the secondary so a Break build is still visible on
+# the draft card, which is the whole reason the word is on the card at all.
+#
+# **FIFTY-FOUR ROWS MOVED AND FIFTY-THREE BECAME `["OFFENSE", "BREAK"]`.** The
+# population was DERIVED off the table rather than taken from a list: 54 of 227
+# rows carried BREAK first, 20 of them as their ONLY tag. The primary spread
+# went BREAK 54 → 0 and OFFENSE 16 → 70; the corpus is 227 both sides, and the
+# cards carrying BREAK at all went 46 → 99.
+#
+# **THE FIFTY-FOURTH IS FEINT, AND IT IS THE ONE PER-CARD JUDGEMENT IN HERE.**
+# EL §2 ruled that Feint carries MARK second — it marks on one of its two
+# stance branches — so a ruling already owned the second slot. FD §2's binding
+# half is that no card carries BREAK FIRST; the retained-secondary half loses
+# to EL, and Feint reads `["OFFENSE", "MARK"]`. **It is the one card of the 54
+# where the demotion became a removal**, and `check_el` asserts the MARK half
+# from its own side so the two rulings cannot drift apart.
+#
+# **THIRTY ROWS LOST A SECONDARY AND THAT IS THE COST, STATED.** Two tags
+# is the ceiling and BREAK takes the second slot, so `["BREAK", "RESOURCE"]`
+# reads `["OFFENSE", "BREAK"]` — 18 RESOURCE, 9 DEBUFF, 2 DEFENSE and 1 TEMPO
+# are displaced (20 rows had no secondary to lose and 3 already read OFFENSE
+# second). **IT IS CHEAP BECAUSE A SECONDARY FEEDS NO CONDITION**:
+# EZ §0c counts the PRIMARY only (`primary_tag_*` → `Runes.threshold_met` /
+# `breadth_met_fraction`), so a displaced secondary moves `tag_census` — a
+# SCREEN — and nothing a rune asks.
+#
+# **AND WHAT IT DOES TO THE TWO CONDITIONS IS ASYMMETRIC.** No live rune gates
+# on BREAK (the four thresholds name DEBUFF, DEFENSE twice and MARK), so
+# THRESHOLD is untouched — the three counted tags gained and lost nothing.
+# **BREADTH ONLY EVER GETS HARDER**: `primary_tag_peak` folds a hero's BREAK
+# column into his OFFENSE one, so the peak rises or holds and never falls, and
+# the four BREADTH runes (Wide Rite, Long Watch, Wide Watch, Shared Scent) are
+# what pays for it. Measured in `docs/reports/FD.md` §2.
+#
+# **`Runes.RUNE_TAGS` IS DELIBERATELY NOT TOUCHED.** The ruling names CARDS;
+# five rune rows still carry BREAK first (`long_watch` and `bared_plate` live,
+# `comet`, `seventh_bolt` and `shattered_guard` retired) and they are reported
+# rather than moved, because widening a ruling is not implementing it.
 const CARD_TAGS := {
 	# --- boss:arcanist ---
 	"Ashes of Al'ar": ["DEFENSE"],
 	"Stabilize": ["DEFENSE", "RESOURCE"],
 	# --- boss:beastmaster ---
 	"Bestial Wrath": ["OFFENSE"],
-	"Call of the Wild": ["BREAK", "DEBUFF"],
+	"Call of the Wild": ["OFFENSE", "BREAK"],
 	"Mark of the Hunt": ["MARK", "OFFENSE"],
-	"Primal Surge": ["BREAK", "RESOURCE"],
+	"Primal Surge": ["OFFENSE", "BREAK"],
 	"Spirit Bond": ["DEFENSE", "RESOURCE"],
 	# --- boss:berserker ---
 	"Blood Price": ["RESOURCE", "OFFENSE"],
@@ -713,32 +757,32 @@ const CARD_TAGS := {
 	"Deadfall": ["DEBUFF", "BREAK"],
 	"Explosive Shot": ["DEBUFF", "BREAK"],
 	"Hamstring": ["DEBUFF"],
-	"Harvest": ["BREAK", "DEBUFF"],
+	"Harvest": ["OFFENSE", "BREAK"],
 	"Venom Coating": ["DEBUFF"],
 	# --- boss:occultist ---
 	"Umbral Sigil": ["DEBUFF"],
 	# --- boss:sharpshooter ---
 	"Called Shot": ["DEBUFF", "BREAK"],
-	"Coup de Grâce": ["BREAK", "RESOURCE"],
+	"Coup de Grâce": ["OFFENSE", "BREAK"],
 	"Pinning Shot": ["DEBUFF", "BREAK"],
 	"Quick Draw": ["TEMPO"],
-	"Triple Shot": ["BREAK"],
+	"Triple Shot": ["OFFENSE", "BREAK"],
 	# --- boss:swordmaster ---
-	"Shatterpoint": ["BREAK", "DEBUFF"],
+	"Shatterpoint": ["OFFENSE", "BREAK"],
 	"Sweeping Strikes": ["DEBUFF", "BREAK"],
 	# --- boss:warden ---
 	"Interpose": ["DEFENSE"],
 	"Retaliation": ["DEFENSE", "BREAK"],
-	"War Stomp": ["BREAK", "RESOURCE"],
+	"War Stomp": ["OFFENSE", "BREAK"],
 	# --- class:cleric ---
-	"Chastise": ["BREAK"],
+	"Chastise": ["OFFENSE", "BREAK"],
 	"Consecration": ["DEFENSE", "RESOURCE"],
 	"Exhortation": ["DEFENSE", "OFFENSE"],
 	"Ministration": ["DEFENSE"],
 	"Unburden": ["DEFENSE"],
 	"Undying Vigil": ["DEFENSE"],
 	# --- class:hunter ---
-	"Aimed Volley": ["BREAK"],
+	"Aimed Volley": ["OFFENSE", "BREAK"],
 	"Arcane Arrows": ["OFFENSE", "RESOURCE"],
 	"Bola": ["DEBUFF"],
 	"Camouflage": ["DEFENSE"],
@@ -748,33 +792,33 @@ const CARD_TAGS := {
 	"Blink": ["TEMPO"],
 	"Dispel": ["DEFENSE", "DEBUFF"],
 	"Magic Barrier": ["DEFENSE"],
-	"Magic Missiles": ["BREAK"],
+	"Magic Missiles": ["OFFENSE", "BREAK"],
 	"Mana Shield": ["DEFENSE", "RESOURCE"],
 	"Mana Well": ["RESOURCE"],
 	"Mirror Image": ["DEFENSE"],
 	# --- class:warrior ---
 	"Battle Trance": ["DEFENSE", "RESOURCE"],
 	"Charge": ["DEBUFF", "BREAK"],
-	"Cleave": ["BREAK"],
+	"Cleave": ["OFFENSE", "BREAK"],
 	"Ironclad": ["DEFENSE"],
 	"Rally": ["TEMPO", "RESOURCE"],
 	"Warcry": ["OFFENSE"],
 	# --- core:arcanist ---
-	"Arcane Barrage": ["BREAK", "RESOURCE"],
-	"Arcane Cannon": ["BREAK", "RESOURCE"],
-	"Arcane Explosion": ["BREAK", "RESOURCE"],
-	"Death Ray": ["BREAK", "RESOURCE"],
+	"Arcane Barrage": ["OFFENSE", "BREAK"],
+	"Arcane Cannon": ["OFFENSE", "BREAK"],
+	"Arcane Explosion": ["OFFENSE", "BREAK"],
+	"Death Ray": ["OFFENSE", "BREAK"],
 	# --- core:beastmaster ---
 	"Hunter's Instinct": ["OFFENSE"],
-	"Kill Command": ["BREAK", "DEBUFF"],
-	"Quick Shot": ["BREAK", "RESOURCE"],
-	"Summon Aguila": ["BREAK"],
+	"Kill Command": ["OFFENSE", "BREAK"],
+	"Quick Shot": ["OFFENSE", "BREAK"],
+	"Summon Aguila": ["OFFENSE", "BREAK"],
 	"Summon Canis": ["DEBUFF", "BREAK"],
-	"Summon Ursus": ["BREAK", "DEFENSE"],
+	"Summon Ursus": ["OFFENSE", "BREAK"],
 	# --- core:berserker ---
-	"Bloodlust": ["BREAK", "DEFENSE"],
+	"Bloodlust": ["OFFENSE", "BREAK"],
 	"Hack and Slash": ["DEBUFF", "BREAK"],
-	"Strike": ["BREAK", "RESOURCE"],
+	"Strike": ["OFFENSE", "BREAK"],
 	"Wildstrikes": ["DEBUFF", "BREAK"],
 	# --- core:cryomancer ---
 	"Blizzard": ["DEBUFF", "BREAK"],
@@ -786,15 +830,15 @@ const CARD_TAGS := {
 	"Hymn of Hope": ["DEFENSE", "RESOURCE"],
 	"Renewal": ["DEFENSE"],
 	"Resurrection": ["DEFENSE"],
-	"Smite": ["BREAK"],
+	"Smite": ["OFFENSE", "BREAK"],
 	# --- core:inquisitor ---
 	"Blessing of Zeal": ["OFFENSE", "TEMPO"],
 	"Consecrated Ground": ["DEFENSE", "RESOURCE"],
 	"Divine Shield": ["DEFENSE"],
 	# --- core:mystic ---
-	"Shrapnel Charge": ["BREAK", "DEBUFF"],
+	"Shrapnel Charge": ["OFFENSE", "BREAK"],
 	"Snare Trap": ["DEBUFF"],
-	"Tripwire": ["BREAK", "DEBUFF"],
+	"Tripwire": ["OFFENSE", "BREAK"],
 	# --- core:occultist ---
 	"Bewitch": ["DEBUFF"],
 	"Dark Pact": ["DEFENSE", "RESOURCE"],
@@ -806,26 +850,26 @@ const CARD_TAGS := {
 	"Flamewave": ["DEBUFF", "BREAK"],
 	"Wildfire": ["DEBUFF", "BREAK"],
 	# --- core:sharpshooter ---
-	"Aimed Shot": ["BREAK", "RESOURCE"],
+	"Aimed Shot": ["OFFENSE", "BREAK"],
 	"Hold Breath": ["RESOURCE", "OFFENSE"],
-	"Powershot": ["BREAK"],
+	"Powershot": ["OFFENSE", "BREAK"],
 	# --- core:swordmaster ---
 	"Guard Change": ["OFFENSE", "DEFENSE"],
-	"Overpower": ["BREAK", "RESOURCE"],
+	"Overpower": ["OFFENSE", "BREAK"],
 	"Pommel Strike": ["DEBUFF", "BREAK"],
 	# --- core:warden ---
 	"Crushing Blow": ["DEBUFF", "BREAK"],
 	"Mocking Blow": ["DEBUFF", "BREAK"],
 	"Shieldwall": ["DEFENSE"],
 	# --- other ---
-	"Magic Bolt": ["BREAK", "RESOURCE"],
+	"Magic Bolt": ["OFFENSE", "BREAK"],
 	# --- spec:arcanist ---
-	"Arcane Bolt": ["BREAK", "RESOURCE"],
+	"Arcane Bolt": ["OFFENSE", "BREAK"],
 	"Arcane Echo": ["MARK", "OFFENSE"],
 	"Arcane Surge": ["RESOURCE", "BREAK"],
 	"Inner Arcane": ["RESOURCE"],
-	"Kindled Mind": ["BREAK"],
-	"Magi's Wrath": ["BREAK", "RESOURCE"],
+	"Kindled Mind": ["OFFENSE", "BREAK"],
+	"Magi's Wrath": ["OFFENSE", "BREAK"],
 	"Null Field": ["DEFENSE", "RESOURCE"],
 	"Overcharge": ["RESOURCE"],
 	"Reality Fracture": ["TEMPO", "BREAK"],
@@ -839,16 +883,16 @@ const CARD_TAGS := {
 	"Call the Wilds": ["DEBUFF", "BREAK"],
 	"Ghostpack": ["OFFENSE"],
 	"Last Howl": ["OFFENSE"],
-	"Savage Sweep": ["BREAK", "DEBUFF"],
+	"Savage Sweep": ["OFFENSE", "BREAK"],
 	"Succession": ["TEMPO"],
-	"Twin Hunt": ["BREAK", "DEBUFF"],
-	"Unleash": ["BREAK", "DEBUFF"],
+	"Twin Hunt": ["OFFENSE", "BREAK"],
+	"Unleash": ["OFFENSE", "BREAK"],
 	# --- spec:berserker ---
 	"Battle Shout": ["RESOURCE", "OFFENSE"],
 	"Berserk": ["OFFENSE"],
 	"Blood Debt": ["MARK", "DEFENSE"],
 	"Blood Offering": ["RESOURCE"],
-	"Boil Over": ["BREAK", "OFFENSE"],
+	"Boil Over": ["OFFENSE", "BREAK"],
 	"Gut Rip": ["DEBUFF", "BREAK"],
 	"Rampage": ["DEBUFF", "BREAK"],
 	"Reckless Abandon": ["RESOURCE", "OFFENSE"],
@@ -865,14 +909,14 @@ const CARD_TAGS := {
 	"Rime": ["DEBUFF"],
 	"Rimebinding": ["DEBUFF"],
 	"Shatter": ["DEBUFF", "BREAK"],
-	"Winter's Toll": ["BREAK"],
+	"Winter's Toll": ["OFFENSE", "BREAK"],
 	# --- spec:holy ---
 	"Alms": ["DEFENSE", "RESOURCE"],
 	"Divine Plea": ["DEFENSE", "RESOURCE"],
 	"Divine Presence": ["RESOURCE"],
 	"Intercession": ["DEFENSE"],
 	"Recant": ["RESOURCE"],
-	"Reprisal": ["BREAK"],
+	"Reprisal": ["OFFENSE", "BREAK"],
 	"Rite of Return": ["DEFENSE"],
 	"Second Wind": ["DEFENSE"],
 	"Shared Grief": ["RESOURCE"],
@@ -891,9 +935,9 @@ const CARD_TAGS := {
 	"Vow of Suffering": ["DEFENSE", "RESOURCE"],
 	# --- spec:mystic ---
 	"Choking Smoke": ["DEBUFF", "RESOURCE"],
-	"Cull": ["BREAK"],
+	"Cull": ["OFFENSE", "BREAK"],
 	"Downwind": ["DEBUFF"],
-	"Hunt": ["BREAK", "OFFENSE"],
+	"Hunt": ["OFFENSE", "BREAK"],
 	"Loaded Shot": ["DEBUFF", "BREAK"],
 	"Preparation": ["TEMPO"],
 	"Salve": ["DEFENSE", "DEBUFF"],
@@ -926,39 +970,39 @@ const CARD_TAGS := {
 	"Slow Burn": ["DEBUFF", "BREAK"],
 	"Stoke": ["DEBUFF", "BREAK"],
 	# --- spec:sharpshooter ---
-	"Calibrating Shot": ["BREAK", "RESOURCE"],
-	"Called Volley": ["BREAK"],
-	"Crossfire": ["BREAK"],
-	"Drumfire": ["BREAK"],
+	"Calibrating Shot": ["OFFENSE", "BREAK"],
+	"Called Volley": ["OFFENSE", "BREAK"],
+	"Crossfire": ["OFFENSE", "BREAK"],
+	"Drumfire": ["OFFENSE", "BREAK"],
 	"Dug In": ["DEFENSE"],
-	"Fault Line": ["BREAK", "RESOURCE"],
+	"Fault Line": ["OFFENSE", "BREAK"],
 	"Heads Down": ["DEBUFF", "BREAK"],
 	"Quarry's Mark": ["MARK", "RESOURCE"],
 	"Reacquire": ["MARK", "RESOURCE"],
-	"Trophy Shot": ["BREAK"],
+	"Trophy Shot": ["OFFENSE", "BREAK"],
 	# --- spec:swordmaster ---
 	"Answering Steel": ["TEMPO", "DEFENSE"],
 	"Battle Poise": ["TEMPO"],
 	"Counter Time": ["DEBUFF", "DEFENSE"],
 	"Discipline": ["OFFENSE", "DEFENSE"],
-	"Execute": ["BREAK"],
+	"Execute": ["OFFENSE", "BREAK"],
 	"Feigned Guard": ["OFFENSE"],
-	"Feint": ["BREAK", "MARK"],
+	"Feint": ["OFFENSE", "MARK"],
 	"Formless": ["OFFENSE", "DEFENSE"],
-	"Lunge": ["BREAK", "RESOURCE"],
-	"Precision Strike": ["BREAK"],
-	"Sever": ["BREAK", "TEMPO"],
-	"Wheeling Cut": ["BREAK", "OFFENSE"],
+	"Lunge": ["OFFENSE", "BREAK"],
+	"Precision Strike": ["OFFENSE", "BREAK"],
+	"Sever": ["OFFENSE", "BREAK"],
+	"Wheeling Cut": ["OFFENSE", "BREAK"],
 	# --- spec:warden ---
 	"Aegis Wall": ["DEFENSE"],
 	"Anvil": ["RESOURCE"],
 	"Covering Guard": ["DEFENSE"],
 	"Eye of the Storm": ["DEBUFF"],
 	"Hold the Line": ["DEFENSE", "RESOURCE"],
-	"Rallying Shout": ["BREAK", "RESOURCE"],
+	"Rallying Shout": ["OFFENSE", "BREAK"],
 	"Recompense": ["RESOURCE"],
-	"Shield Slam": ["BREAK"],
-	"Turn the Blade": ["BREAK"],
+	"Shield Slam": ["OFFENSE", "BREAK"],
+	"Turn the Blade": ["OFFENSE", "BREAK"],
 	"Vendetta": ["MARK", "DEBUFF"],
 }
 

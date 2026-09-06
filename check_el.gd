@@ -140,7 +140,18 @@ func _s1_mark_population() -> void:
 	# two stance branches, so both keep the primary they were given — see
 	# `docs/reports/EL.md` §2. Asserted as a PROPERTY of those two by name,
 	# because "eight" is a count that moves the moment an eleventh mark lands.
-	for pair in [["Snare Line", "DEBUFF"], ["Feint", "BREAK"]]:
+	#
+	# **BATCH FD §2 — FEINT'S PRIMARY IS `OFFENSE` NOW, AND THE RULING THIS PIN
+	# CARRIES IS UNCHANGED.** FD ruled that no card carries BREAK as its
+	# PRIMARY; Feint's was BREAK, so it moved with the other 53. **THE MARK HALF
+	# IS WHAT THIS PIN IS FOR AND IT IS NOT LOOSENED** — Feint still carries
+	# MARK second, and it is the ONE card of the 54 where FD's demotion became a
+	# removal, precisely because EL §2 already owned that slot. **This pin is
+	# what made that collision visible**: it was found by running this gate
+	# unmodified against the new code before anything was re-pointed (FA §1b),
+	# and a batch that had re-pointed first would have dropped MARK from a card
+	# EL ruled must carry it and nothing would have said so.
+	for pair in [["Snare Line", "DEBUFF"], ["Feint", "OFFENSE"]]:
 		var t: Array = Classes.card_tags(String(pair[0]))
 		ok(t.size() == 2 and String(t[0]) == String(pair[1]) and String(t[1]) == "MARK",
 			"%s keeps its primary and carries MARK second (%s)" % [pair[0], str(t)])

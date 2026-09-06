@@ -1274,8 +1274,6 @@ the ladder are set out in full further down this section.
 <tr><td><b>Elite</b></td><td><b>Always</b>, on victory — <b>to every living hero</b>, each
 from their own pool, on <b>one screen of four columns</b>. Elites run 0–3 per zone, so drafts
 are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.</td></tr>
-<tr><td><b>Merchant</b></td><td>Purchasable with gold, one hero at a time: <b>120 / 180 / 240
-by zone</b>. The three cards are drawn at purchase and wait on that hero's card.</td></tr>
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
 new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
 <tr><td><b>Zone bosses</b></td><td>The §6a pick: same timing and same overlay. Its draw is
@@ -1284,6 +1282,12 @@ the last two are the pools on this page.</td></tr>
 </table>
 <p><b>Every offer is 3 cards</b>, and if the pool cannot fill three it <b>fills short rather
 than padding with repeats</b> — the same rule ability upgrades already follow.</p>
+<p><b>THE MERCHANT NO LONGER SELLS ONE (Batch FD &sect;1, ruled by the designer).</b> BO §3 built
+a fourth source — a draft pick purchasable for 120 / 180 / 240 by zone — and it is
+withdrawn. <b>A draft pick is earned and never bought.</b> The three sources above are untouched;
+<code>Run.draft_price()</code> is KEPT with no caller, on the same contract a retired rune is kept
+on, so a later batch that wants a paid draft back does not re-derive the ladder. The sim never
+bought one, so no measured figure in the economy report moves.</p>
 
 <p><b>The elite draft screen.</b> An elite victory offers a draft to <b>every living hero at
 once</b>, on <b>one screen with four columns</b> rather than four screens in sequence. Each
@@ -1654,6 +1658,22 @@ nothing reads both.</p>
 <p><b>At most two a card, and the first one is the primary</b> &mdash; what the card is for, with
 the second naming what it also touches. <b>A card with two tags of equal weight is a card whose
 primary has not been decided</b>, so every row states one.</p>
+<p><b>BREAK IS A SECONDARY TAG ONLY, AND NO CARD CARRIES IT FIRST (Batch FD &sect;2).</b> BREAK was
+the only one of the seven naming a <i>mechanic</i> where the other six name a <i>role</i>, so
+demoting it makes the primary vocabulary uniform. <b>It was demoted rather than removed</b>: it
+stays as the secondary, so a Break build is still visible on the draft card. <b>Fifty-four rows
+moved and fifty-three became OFFENSE&nbsp;&middot;&nbsp;BREAK</b> &mdash; the primary spread went
+BREAK 54&nbsp;&rarr;&nbsp;0 and OFFENSE 16&nbsp;&rarr;&nbsp;70 over a corpus of 227 both sides, and
+the cards carrying BREAK at all went 46&nbsp;&rarr;&nbsp;99. <b>The fifty-fourth is FEINT</b>,
+where EL &sect;2 had already ruled the second slot to MARK: it reads
+OFFENSE&nbsp;&middot;&nbsp;MARK, and it is <b>the one card of the 54 where the demotion became a
+removal</b>. <b>Thirty rows lost a secondary to make room</b> (18 RESOURCE, 9 DEBUFF, 2 DEFENSE,
+1 TEMPO; 20 had none to lose and 3 already read OFFENSE second), and that is cheap because <b>a secondary feeds no condition</b>: the two rune conditions
+count the PRIMARY only, so a displaced secondary moves a screen and nothing a rune asks.
+<b><code>Runes.RUNE_TAGS</code> is not touched</b> &mdash; the ruling named cards, and five rune
+rows still carry BREAK first (<code>long_watch</code> and <code>bared_plate</code> live,
+<code>comet</code>, <code>seventh_bolt</code> and <code>shattered_guard</code> retired). They are
+reported, not moved.</p>
 <p><b>The protected cores carry them too, and that is what gives a build a seed.</b> The
 Pyromancer opens holding a DEBUFF card whether or not he ever drafts one, so a hero starts
 the run pointing somewhere rather than needing three lucky picks to point anywhere.</p>
@@ -1663,11 +1683,13 @@ starts costing meaning. <b>An eighth needs an argument.</b> MARK names the cards
 lasting marker on ONE enemy that later hits read: Hunter&#x27;s Mark, Quarry&#x27;s Mark, Mark of
 the Hunt, Reacquire, Blood Debt, Vendetta, Covenant of Ash and Arcane Echo lead with it, and
 Snare Line and Feint carry it second.</p>
-<p><b>NO CLAUSE READS A TAG YET, AND BATCH ES BUILT THE MACHINERY FOR THE ONES THAT WILL.</b>
-No ability, talent, rune or relic changes its behaviour because of a tag today. What ES §4 added
-is the <i>question a rune can ask</i>: <b>how many EQUIPPED cards of tag X does this hero
-have.</b> Nothing asks it yet &mdash; rune content is written one rune at a time with the
-designer &mdash; and the count is shown to the player on two screens.</p>
+<p><b>EIGHT RUNES READ A TAG, AND THE SENTENCE THAT STOOD HERE &mdash; <i>&ldquo;no clause reads
+a tag yet&rdquo;</i> &mdash; HAS BEEN FALSE SINCE BATCH EZ.</b> ES §4 built the machinery and
+authored nothing; EZ authored twenty-one runes and gated eight of them. <b>Deepening Hex, Bracing
+Line, Heavy Bolts and the Answering Pack read a THRESHOLD</b> (on DEBUFF, DEFENSE, MARK and
+DEFENSE respectively) and <b>the Wide Rite, the Long Watch, the Wide Watch and the Shared Scent
+read BREADTH</b>. No ability, talent or relic reads one, and no rune branches on a tag for
+anything but its own gate. The count is shown to the player on two screens.</p>
 <p><b>EQUIPPED, NEVER OWNED, AND THAT IS THE WHOLE DESIGN.</b> A hero&#x27;s <b>pool</b> is
 everything he has drafted and nothing ever leaves it, so a threshold read off the pool would turn
 on once, late, and never off again &mdash; a flat increment with a delay. His <b>loadout</b> is
@@ -1694,6 +1716,13 @@ asking for 2+ BREAK would be on from the first fight for almost everyone and no 
 it off &mdash; the flat increment this shape exists to avoid, arriving through the cores instead
 of through the pool. The per-spec table is printed by <code>check_es</code> on every battery run,
 so the day a core kit moves the baseline is re-measured rather than re-assumed.</p>
+<p><b>AND SINCE BATCH FD &sect;2 THAT WARNING HAS BECOME A PROHIBITION, IN THE OTHER DIRECTION.</b>
+The table above is <code>check_es</code>&#x27;s BOTH-TAGS census, which is right for a screen; the
+two rune conditions count the PRIMARY only, and <b>no card has a BREAK primary any more</b>.
+So a rune asking for a BREAK threshold is not <i>always on</i> &mdash; it can <b>never</b> be met,
+by any hero, ever. <b>Do not author one.</b> The four live thresholds name DEBUFF, DEFENSE (twice)
+and MARK, so nothing today depends on it; <code>check_fd</code> §2 asserts that no live rune gates
+on BREAK <i>or</i> on OFFENSE, the two columns the demotion moved.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
@@ -2580,7 +2609,7 @@ in-run power source that scales with depth): an <b>authored pool</b> (data/runes
 <br><b>THE FIRST TWENTY-ONE RUNES ARE AUTHORED (Batch EZ). 87 ENTRIES: 66 RETIRED, AND
 21 LIVE ONES ACROSS FOUR SPECS.</b> The Occultist, the Warden and the Sharpshooter have five
 each and the Beastmaster six. <b>Batch FC retired the twenty-second &mdash; Split Tongue &mdash;
-and authored the Rune of the Shared Ruin in its place</b>, so the file grew by one entry (a
+and authored the Shared Ruin in its place</b>, so the file grew by one entry (a
 retirement is KEPT and said to be kept) while the live count stayed at twenty-one. <b>65 of the 66
 retirements are ET's and EO's; FC's is the first of a later vintage</b>, and the three walks that
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
@@ -2695,6 +2724,17 @@ resolved on that hero's map card, and <b>the three are always distinct</b>: each
 drawn from a pool that already excludes the ones beside it, so a triple can never offer the
 same rune twice. A card whose hero owes a pick wears the rune-purple border until it is
 spent.
+<br><b>AND THE TRIPLE IS RE-ASKED WHEN IT IS ANSWERED, NOT ONLY WHEN IT IS ROLLED (Batch FD
+&sect;1).</b> A cache rolls at the DROP and stores its three on the member, where they ride the
+save until the player answers them — so <b>a rune can be retired, or bought at the Peddler,
+or won from a second cache, in the window between</b>. <code>Run.rune_choice</code> is the one
+door the overlay and the pick both come through: it drops any candidate that is now retired or
+now owned, tops the triple back to three through the same <code>eligible_ids</code> every roll
+uses, and <b>writes the repair back</b> so it happens once rather than on every screen open. It
+is <b>not a reroll</b> — a triple with nothing wrong with it is returned untouched, which is
+Batch X's rule and it still stands. <b>Measured before it was built:</b> two triples queued
+before either was answered shared a name in <b>265 of 400</b> trials, and a queued candidate was
+also the shop's offer in <b>127 of 400</b>.
 <br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
 classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set was
 <i>authored</i> to one rule:
@@ -3041,7 +3081,9 @@ along on every path the class can take) and each ability's damage with its "% At
 The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
-6 greys its own button rather than taking the gold.</li>
+6 greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
+§1) — the column BO §3 put below the supplies is gone and the left side of the screen is
+empty from y=452 down.</li>
 <li><b>Offer screen:</b> three bargain cards before every elite and mini-boss (§3a) — severity
 number, a four-pip severity bar, the modifier's name and effect, and what it pays on victory.
 The heroes' HP and the warband being faced are both on screen, because choosing a

@@ -1439,6 +1439,76 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 	return out
 
 
+# ══ BATCH FD §1 — THE CACHE'S OFFER IS RE-ASKED AT PICK TIME, NOT ONLY ROLLED
+#    AT DROP TIME ═══════════════════════════════════════════════════════════
+#
+# **`eligible_ids` IS THE ONE DOOR AND EVERY SITE THAT *ROLLS* AN OFFER GOES
+# THROUGH IT — THE HOLE WAS THAT THE CACHE DOES NOT ROLL AT THE OFFER.**
+# `roll_rune_candidates` runs at DROP time and stores its triple on the member,
+# where it rides the save until the player answers it. The screen that shows it
+# and `map_screen._pick_rune` both read that stored array straight, so between
+# the drop and the pick NOTHING re-asks the pool anything — and two facts can
+# move in that window:
+#
+#   * **A RUNE CAN BE RETIRED.** `Runes.is_retired` had ZERO callers in the
+#     game (only `eligible_ids`' own inline read), so a triple queued before a
+#     retirement batch goes on offering the retired entry for the life of the
+#     run. That is why ET §2's live drive read clean while the designer was
+#     looking at the opposite: that drive rolls, and this path replays.
+#   * **THE HERO CAN ALREADY OWN IT.** Two caches queued before either is
+#     answered roll against the SAME pouch, and the Peddler's offer is rolled
+#     against a pouch the queued triple is not in. Measured at FD §1: two
+#     queued triples share a name in **265 of 400** trials and a queued
+#     candidate is also the shop's offer in **127 of 400**. The designer's own
+#     save carried the symptom — one hero wearing Heavy Bolts TWICE, both
+#     equipped — against a shop header that promises *"one of each"*.
+#
+# **THE REPAIR IS ONE DOOR AND IT IS NOT A REROLL.** BATCH X's rule is that a
+# cache does not reroll when a screen opens, and that rule stands: this drops
+# only candidates that are no longer legal, tops the triple back to three
+# through `generate_rune` (which reaches `eligible_ids`, so the top-up cannot
+# reintroduce either fault), and WRITES THE REPAIR BACK. A repaired triple is
+# repaired once and is stable across every later open — the render and the pick
+# read the same array, so the index a button carries still names the rune the
+# button showed.
+#
+# **THE TOP-UP CANNOT COME BACK EMPTY IN A REAL RUN.** `generate_rune` returns
+# `{}` only under `DOD_SIM_RUNES=off`, and under that flag `roll_rune_candidates`
+# returns `[]` and nothing is ever queued — so a non-empty queue means runes
+# were on when it was written. The loop still breaks rather than spinning, and
+# `_pick_rune` refuses an empty triple, because "cannot happen" is not the same
+# as "is not guarded".
+func rune_choice(member: Dictionary) -> Array:
+	var queue: Array = member.get("rune_candidates", [])
+	if queue.is_empty():
+		return []
+	var triple: Array = queue[0]
+	var owned: Array = []
+	for r in member.get("runes", []):
+		owned.append(String(r["name"]))
+	var kept: Array = []
+	var taken: Array = []
+	for c in triple:
+		if Runes.is_retired(String((c as Dictionary).get("id", ""))):
+			continue
+		var nm := String((c as Dictionary).get("name", ""))
+		if owned.has(nm) or taken.has(nm):
+			continue
+		kept.append(c)
+		taken.append(nm)
+	if kept.size() == triple.size():
+		return triple
+	while kept.size() < 3:
+		var fresh := generate_rune(member, taken)
+		if fresh.is_empty():
+			break
+		kept.append(fresh)
+		taken.append(String(fresh.get("name", "")))
+	queue[0] = kept
+	member["rune_candidates"] = queue
+	return kept
+
+
 # Ability picks (zone bosses) waiting to be chosen, across the party.
 func owed_ability_picks() -> int:
 	var n := 0
