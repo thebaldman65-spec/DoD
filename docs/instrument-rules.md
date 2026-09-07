@@ -1264,3 +1264,46 @@ a census is taken.
   call, so a one-hop sweep on Focus returns eleven functions and **not one of them is the shape**.
   **The Loyalty sweep is sharp because `loyalty` is Loyalty's alone.**
 
+
+## STANDING RULE — A GATE THAT DRIVES A LIVE RUN OWNS THE PLAYER'S SAVE (Batch FH §2)
+> **A GATE THAT SETS `Run.sim_run = false` IS WRITING `user://run_save.bin`, AND TWO OF THEM
+> DELETE IT TODAY.** `gate_fixture.spawn` sets `sim_run = false` and `active = true` — it has to,
+> because a `sim_run` battle is not the battle a player fights — and `battle._check_end` then
+> reaches `Run.clear_save()` on a wipe and `Run.save_run()` on a victory. **MEASURED BY
+> BISECTION, ONE GATE AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B RUN SAVE: `check_da`
+> and `check_cs` DELETE IT; `check_ea`, `check_ec`, `check_ed`, `check_es`, `check_fg` and
+> `check_parse` leave it byte-identical.** Only `check_ct` and `check_fh` protect it.
+
+- **`Run.SAVE_PATH` IS A `const`, SO IT CANNOT BE REDIRECTED THE WAY `Profile.save_path` CAN.**
+  Every suite points `Profile.save_path` at a scratch file and none of them can do the same for
+  the run save. The protection is therefore a BACKUP, not a redirect.
+- **AND THE BACKUP MUST BE A FILE ON DISK, NOT A MEMBER.** `check_fh`'s first draft held the bytes
+  in a member and restored them at the end of `_initialize`. Three `SCRIPT ERROR`s while the file
+  was being written aborted the coroutine, so the restore never ran — and by then the drive's own
+  end boss had already called `Run.clear_save()`. **The run save was destroyed and every
+  subsequent run printed `none — nothing to protect`, which is a clean-looking line for a file
+  that is gone.** A backup written before the first byte moves survives the abort; the gate then
+  RECOVERS from it at the top of the next run and deletes it only after a successful restore, so
+  it can never resurrect a save the player deleted themselves between two clean runs.
+- **THE CONTROL IS TWO-ARMED AND THE SECOND ARM IS A KILL.** Arm one is HEAD's shape, which is
+  what lost the save. Arm two: `kill -9` the gate the moment the save disappears, then run it
+  again — **62,360 B recovered, byte-identical.**
+- **AND A GUARDED RESTORE ARM MAKES THE CHECK COUNT DEPEND ON THE MACHINE.** Writing the
+  byte-equality arm as `if _had_save: ok(...)` read **160 on a machine with no run in progress and
+  161 on one with a save** — a baseline row that reds for a reason that has nothing to do with the
+  tree. Both arms run unconditionally; the emptiness is inside the predicate.
+
+## STANDING RULE — THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` (Batch FH §2)
+> **`build_pin_manifest.py` binds a holder from `var\s+(\w+)\s*:?=`.** An explicitly typed
+> declaration — `var src: String = FileAccess.get_file_as_string("res://scripts/battle.gd")` —
+> does not match, so **every literal a gate pins into that file is invisible to the manifest and
+> therefore to `check_ed`.** Measured: `check_fh` contributed **zero** pins with typed holders and
+> **five** with inferred ones, and the manifest went 1412 → 1417.
+
+- **THIS IS NOT A STYLE PREFERENCE AND IT BITES THE NEW GATES HARDEST.** A drive gate reads screens
+  through `Node.get()` and `Node.call()`, whose returns are Variant, so its author reaches for
+  explicit types everywhere — and then writes the one declaration that matters in the same style.
+  **The holder declaration is the exception: it is always a `String`, so `:=` always infers.**
+- **THE TELL IS `--check` SAYING `current`.** A manifest that cannot see a gate's pins is a
+  manifest with nothing to add, so the regeneration is a no-op and reports success. **Grep the
+  regenerated manifest for the gate's own filename before believing it.**

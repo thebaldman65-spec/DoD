@@ -52,11 +52,11 @@ Turn-based, party-based roguelike RPG. Phase 1: combat prototype.
 - `docs/design-notes.md` — the "why" behind each batch, rationale only
 - `docs/build_docs.py` — builds the Word exports of master + changelog into `DoD/*.docx`
 
-**The archive folder is `DoD-archive/`**, one level up beside the `.docx` exports and
-**outside this repo**. It holds the older half of the changelog (`changelog-archive.html`,
-Batch BO back to Batch 1) and the retired `addendum.html`. It is kept out of the repo so
-the knowledge-base sync does not carry it — but that means **it is not in version control
-and is not backed up by GitHub**, so the folder needs to sit somewhere the machine itself
-backs up (iCloud Drive, a Time Machine target, or a second private repo).
+**The archive folder is `DoD-archive/`, at the repo root** (Batch FH brought it in; it
+lived two levels up, outside the repo, until then). It holds the older half of the changelog
+(`changelog-archive.html`, Batch EP back to Batch 1) and the retired `addendum.html`. **It is
+in version control and backed up by GitHub now.** It is kept out of the knowledge-base sync by
+DESELECTING it in the connector's file picker — the same thing the test suites do — which is a
+different act from keeping it out of the repo, and the one that was doing both jobs before.
 
 Design docs live one folder up in `DoD/*.docx`.

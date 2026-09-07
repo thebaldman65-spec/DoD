@@ -7,12 +7,152 @@ when.</i></p>
 <p><b>THIS IS THE RECENT HALF OF THE CHANGELOG. IT STARTS AT BATCH EQ (2026-09-02) &mdash; the
 oldest entry below &mdash; AND RUNS FORWARD.</b> Everything older, from <b>Batch EP</b>
 (2026-09-02) back to the first entry of the project, is in <b><code>changelog-archive.html</code>,
-which lives OUTSIDE THE REPO</b> at <code>/Users/zipples/Documents/DoD-archive/changelog-archive.html</code>,
+which lives INSIDE THE REPO</b> at <code>res://DoD-archive/changelog-archive.html</code>,
 alongside the retired <code>addendum.html</code>. Batch BZ split them at BO/BP, <b>Batch CX</b>
 cut again at CN/CO, <b>Batch DV</b> at DF/DG and <b>Batch FG</b> at EP/EQ, each to reduce what the knowledge-base sync carries; <b>nothing was deleted</b>
-any time. <b>A file outside the repo is not in version control and is not backed up by
-GitHub</b> &mdash; see the <b>Batch FG</b> entry below for what that costs and what to do about
-it.</p>
+any time. <b>Batch FH BROUGHT THE ARCHIVE FOLDER INTO THE REPO</b>, so it is in version control
+and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELECTION in the
+connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
+<b>Batch FH</b> entry below.</p>
+
+<h2>2026-09-06 &mdash; Batch FH: THE ARCHIVE COMES INTO THE REPO, AND A WHOLE RUN IS DRIVEN THROUGH THE REAL SCREENS</h2>
+
+<p><i><b>Two halves, and the second is the batch.</b> &sect;1 brings <code>DoD-archive/</code> into
+version control, which costs nothing because the file picker &mdash; not the repo boundary &mdash;
+is the tool for the knowledge-sync problem. &sect;2 is <b>the first thing in this project that
+plays the game</b>: a real, non-sim run walked end to end through the shipped screens, pressing
+real buttons. <b>No rune, card, ability, talent, constant or magnitude moved, and no file under
+<code>scenes/</code> was touched.</b></i></p>
+
+<p><b>&sect;0 &mdash; THE BRIEF&rsquo;S PREMISES, CHECKED FIRST.</b> <b>&ldquo;A boss trophy&rdquo;
+is not a rune source</b> &mdash; <code>_resolve_boss</code> awards a relic, a pouch/ability slot
+rung, an ability pick and a meta talent point, and reaches no rune door at all; the live doors are
+the Peddler, the elite cache, the bargain&rsquo;s <code>rune</code> reward and the event verb
+<code>rune_grant</code>. <b>&ldquo;1,646,681 B&rdquo; is the archived changelog alone</b>; the
+folder is 1,680,660 B with the retired <code>addendum.html</code> beside it. <b>&ldquo;44 test
+suites&rdquo; is the <code>test_batch_*</code> count</b>; the tree holds 47 <code>test_*.gd</code>
+files and the battery runs 46 of them. And <b>the archive was TWO levels above the repo, not one,
+and not beside the <code>.docx</code> exports</b> &mdash; <code>README.md</code> said one level up
+beside them and was wrong on both halves.</p>
+
+<p><b>&sect;1 &mdash; <code>DoD-archive/</code> IS IN THE REPO.</b> Two files, 1,680,660 B, moved
+in and proved byte-identical by md5. <b>THE ONE THING THAT RESOLVES THE ARCHIVE IS THE LIVE
+CHANGELOG&rsquo;S OWN HEADER</b> &mdash; CD&rsquo;s pattern &mdash; and <b>fifteen readers follow
+it</b>: fourteen suites plus <code>check_dv</code> &sect;4, each finding
+<code>/changelog-archive.html&lt;/code&gt;</code> and reading back to the opening
+<code>&lt;code&gt;</code>. <b>No <code>.gd</code> file in the tree names the archive by path.</b>
+So the move is one header edit: the absolute
+<code>/Users/zipples/Documents/DoD-archive/&hellip;</code> becomes
+<code>res://DoD-archive/changelog-archive.html</code>, which is machine-independent as the old one
+was not. <b>All fifteen ran green against the moved tree before a single assertion was edited</b>,
+and the pointer was armed against a directory that does not exist to prove they follow it rather
+than pass regardless: <code>check_dv</code> 83&nbsp;/&nbsp;4 and <code>test_batch_bb</code>
+177&nbsp;&rarr;&nbsp;173 with 2 failures and a throw.</p>
+
+<p><b>&sect;1a &mdash; WHAT TO DESELECT, MEASURED.</b> <b><code>DoD-archive/</code> &mdash; both
+files.</b> It is <b>14.4% of the knowledge sync</b>, larger than every <code>check_*.gd</code> in
+the tree put together; the sync reads <b>11.3106 MiB</b> with it and <b>9.7078 MiB</b> without
+it, which is exactly where it stood before this batch. Nothing else needs to move: the 47 suites
+(1.9008 MiB), <code>pin-manifest.json</code>, <code>docs/build_docs.py</code> and the four ruled-on
+audits are already on the standing list, and applying the whole of it lands at <b>162 files /
+7.1336 MiB</b>. <b><code>docs/reports/</code> is now the second-largest block at 1.6558 MiB and
+grows by one file every batch</b> &mdash; reported, not recommended, because
+<code>CLAUDE.md</code> lists it as MUST STAY SELECTED and moving it is a ruling.</p>
+
+<p><b>&sect;2 &mdash; <code>check_fh.gd</code> DRIVES A WHOLE RUN, AND IT IS THE BATCH.</b> 161
+checks. <b>The reason it can exist at all is that <code>map_screen._on_node_pressed</code> opens
+with <code>if Run.sim_run: return</code></b> &mdash; so <code>run_sim</code> and a player are two
+different programs, and the last four player-visible defects were all found by a person and none
+by a battery. This drive is not a sim: <code>sim_run</code> is false, the scenes are the shipped
+scenes, and every step is an <code>emit_signal(&quot;pressed&quot;)</code> on a real button.
+<b>&sect;1 walked all 49 encounters &mdash; 30 battles, 8 elites, 3 zone bosses, 7 draft screens
+with 28 cards pressed and 12 benches, 7 rune picks, 12 upgrade picks, 5 shops, 30 purchases and 11
+bargains &mdash; and asserts the DRIVE, never the balance.</b> Where the autoplay bot dies is
+printed, not asserted: it reached slot 47 of 49 on rung 1 before wiping, and that is a bot datum
+&mdash; the bot rolls a flat <i>good</i> on every skill check and never drinks in a fight.</p>
+
+<p><b>&sect;2a &mdash; WHAT EACH PATH THE BRIEF NAMED DID.</b> <b>Driven:</b> a draft offer at each
+of the four slot counts (7/8/9/10, the ladder asserted), a swap, a bench off the two-press drop
+step, and the archetype tag line read off the card itself; the Peddler&rsquo;s rune bought on the
+shop screen; an elite cache <b>answered a node later</b>, which is where FD&rsquo;s hole was; a
+rune&rsquo;s tag threshold broken by benching and put back, with the loadout panel and the hero
+sheet both following; the pouch&rsquo;s four outcomes &mdash; a purchase, the [4,&nbsp;5,&nbsp;6]
+slot ladder, a full-stack refusal that takes no gold, a sell that takes the whole stack and frees
+its slot, and a no-slot arrival queued as a CHOICE rather than refused; all four skill-check cases
+on the real bar; a zone-boss award at an exhausted pool paying EA/EH&rsquo;s third tier and
+answerable on the card; and the end boss, reached by pressing the last node on the final
+zone&rsquo;s map. <b>Not driven:</b> the defensive brace&rsquo;s PLAYER branch, which
+<code>--headless</code> cannot reach &mdash; see &sect;3.</p>
+
+<p><b>&sect;2b &mdash; TWO MORE CENSUSES, BECAUSE THE DEFECTS THE BRIEF NAMES ARE VISUAL.</b>
+<b>&sect;9 asks every visible enabled Button on 13 screens whether anything is connected to
+<code>pressed</code></b> &mdash; the 604-dead-buttons defect class, checked without pressing
+anything, so it is safe on Sell, Discard and Confirm. <b>120 buttons, 0 dead</b>, with 28 exempted
+by SIGNATURE rather than by name: 27 hover surfaces (the hero sheet&rsquo;s talent tree, which
+<code>party_screen.gd</code> documents as deliberate) and 1 menu button. <b>&sect;9b reads the
+RENDERED strings against the run&rsquo;s own numbers</b> &mdash; gold, pouch slots, hero HP, the
+hero sheet&rsquo;s rune line &mdash; and buys something to prove the shop REFRESHES rather than
+drawing a correct first frame.</p>
+
+<p><b>&sect;3 &mdash; SIX THINGS FOUND AND DELIBERATELY NOT FIXED.</b> <b>(1) Two gates in the
+battery DELETE the player&rsquo;s run save.</b> <code>gate_fixture.spawn</code> sets
+<code>sim_run = false</code>, so <code>battle._check_end</code> reaches
+<code>Run.clear_save()</code> on a wipe; measured by bisection against a fresh copy of a real
+62,360 B save, <b><code>check_da</code> and <code>check_cs</code> destroy it</b> and six other
+battle-spawning gates leave it byte-identical. Only <code>check_ct</code> and
+<code>check_fh</code> protect it. <b>(2) The defensive brace&rsquo;s player branch is unreachable
+under <code>--headless</code> by construction</b> &mdash; <code>_nobody_can_press()</code> is
+<code>sim or autoplay or headless</code> &mdash; and <b><code>check_cm_live</code>&rsquo;s four
+standing failures are that one fact, not four defects.</b> <b>(3)</b>
+<code>battle._break_impact()</code> restores <code>Engine.time_scale</code> to the literal
+<code>1.0</code> rather than to what it was; invisible in play, and it cost this gate 546 seconds a
+run before it was found. <b>(4)</b> The hero sheet draws 27 enabled Buttons that do nothing when
+pressed &mdash; deliberate, and the same silhouette as a real defect. <b>(5)</b>
+<code>Run.grant_rune</code> returns a rune it does not FIT; its callers append to
+<code>member[&quot;runes&quot;]</code> themselves. <b>(6)</b> No boss awards a rune (&sect;0).</p>
+
+<p><b>&sect;4 &mdash; THE VERIFICATION.</b> Documentation written BEFORE the run. HEAD&rsquo;s
+unmodified gates run against the moved tree before any of them was edited, and <b>run again once
+the new gate was in the tree</b> &mdash; which is the pass that found <code>check_da</code>
+41&nbsp;&rarr;&nbsp;43&nbsp;/&nbsp;4: a new gate reading both draft pools trips &sect;3&rsquo;s
+enumeration fingerprint, and <b>a COMMENT naming the battle scene&rsquo;s path trips the fixture
+fingerprint exactly as the path does</b>, because the match is on raw source. Both fixed toward
+the rule &mdash; the pools are asked through <code>Run.draft_pool_left</code> and the scene is
+reached by pressing the node &mdash; and never by an exemption. <b>Two baseline rows written before
+the battery off three identical standalone readings</b>: <code>check_fh</code> new at
+<b>161&nbsp;/&nbsp;0</b> and <code>check_parse</code> <b>172</b>, because a new battery target
+raises the gate whose count IS its coverage. <b>Eight controls, eight bites</b> &mdash; and one of
+them did not bite until the arm it aimed at was repaired for standing on a zero meter, which is
+the whole reason a control is armed at all. <code>pin-manifest.json</code> <b>1412
+&rarr; 1417</b>.</p>
+
+<p><b>&sect;4a &mdash; BATTERY 1 FOUND ONE UNPREDICTED RED, AND IT IS THE SAME LESSON A THIRD
+TIME.</b> <b>98 targets, zero <code>Parse Error</code> and zero <code>SCRIPT ERROR</code> across
+all 98 logs</b>, the tree <b>md5-frozen with 301 files byte-identical before and after</b>,
+<code>check_fh</code> <b>161&nbsp;/&nbsp;0</b> and <code>check_parse</code>
+<b>172&nbsp;/&nbsp;0</b> matching the rows written before the run, all 46 suites green.
+<b>The one unpredicted red was <code>check_ek</code> 46&nbsp;/&nbsp;1</b> &mdash; &sect;3's
+authored <code>TAG_CHECKERS</code> census, which a new gate joins BY EXISTING, because
+<code>check_fh</code> reads <code>Classes.card_tag_line</code> off the draft card and
+<code>TAG_ORDER</code> for a rune condition. <b>LISTED, NOT EXEMPTED</b>, which is what EZ, FD and
+FE each did before it. <b>The pre-pass should have caught it and did not, because it ran a CHOSEN
+SUBSET of the gates rather than all of them.</b> <b>AND BATTERY 1 DESTROYED THE PLAYER&rsquo;S RUN
+SAVE IN THE WILD, exactly as &sect;3 predicts</b> &mdash; <code>check_fh</code> runs after
+<code>check_da</code> and <code>check_cs</code> and its own first line read <i>none &mdash; nothing
+to protect</i>. Backed up before, restored after, byte-identical.</p>
+
+<p><b>&sect;4b &mdash; BATTERY 2 IS THE ACCEPTANCE RUN AND IT IS CLEAN.</b> After the one repair
+&mdash; <code>check_ek.gd</code>&rsquo;s authored list, one name added with its reason &mdash; and
+a fresh md5 freeze: <b>98 targets</b>, <code>check_de</code> <b>402 checks / 0 failures / 0
+NOTICES</b>, so every count in the tree matches its baseline exactly. <b><code>check_fh</code>
+161&nbsp;/&nbsp;0</b>, <b><code>check_parse</code> 172&nbsp;/&nbsp;0</b> and
+<b><code>check_ek</code> 46&nbsp;/&nbsp;0</b>; all 46 suites green with 0 throws; the harness
+<b>22&nbsp;/&nbsp;166&nbsp;/&nbsp;8</b>. <b>The only red is <code>check_cm_live</code> at
+13&nbsp;/&nbsp;4, its recorded baseline and the one red that is on purpose.</b> <b>Zero
+<code>Parse Error</code> and zero <code>SCRIPT ERROR</code> across all 98 logs</b>, grepped from
+stderr rather than from a tally or an exit code, and <b>the tree was md5-frozen across both runs
+&mdash; 301 files byte-identical before and after each, with no file appearing or vanishing.</b>
+<b>No red was repaired while a battery ran.</b></p>
 
 <h2>2026-09-06 &mdash; Batch FG: THE CHANGELOG CUT, AND SOMETHING WATCHES THE THRESHOLD NOW</h2>
 

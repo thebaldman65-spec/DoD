@@ -7713,3 +7713,79 @@ three repairs.
 property of the POOL, not of the queue.** Boss pools hold two to five entries and an offer takes
 three, so below four entries two offers are the same set — certainty, not chance. A rate quoted
 without its denominator's size reads as a probability when it is arithmetic.
+
+---
+
+## BATCH FH — THE ARCHIVE COMES IN, AND THE FIRST THING THAT PLAYS THE GAME
+
+**§1 is small because the problem was never the one it looked like.** The archive sat outside the
+repo for four cuts and three batches wrote down what that cost — not in version control, not backed
+up by GitHub, recoverable only from one old commit — and every one of them ended with *it is still
+the designer's call*. The reason it was ever outside was knowledge-sync capacity, and **the file
+picker had solved the capacity problem the whole time**: tracked and deselected is exactly what the
+44 test suites already are. Two tools, two problems, and one of them was doing both jobs badly. The
+move cost one header edit, because CD's pattern means the fifteen readers resolve the archive
+through the live changelog's own header rather than by naming it — **the value of that pattern is
+only visible on the day the file moves, which is four cuts after it was written.**
+
+**And the new pointer is `res://` rather than a new absolute path, which is a second thing the move
+bought.** The old one was `/Users/zipples/Documents/DoD-archive/...` — correct on exactly one
+machine. The suites open whatever the header says, so making it a project-relative path made
+fifteen assertions portable without touching one of them.
+
+**§2 is the batch, and the argument for it is one line of `map_screen.gd`:**
+`if Run.sim_run: return`. That line is the reason `run_sim` and a player are two different
+programs. RunSim walks `Run` directly and never loads a screen, so every defect that lives in a
+screen — a button with nothing connected, an offer that cannot be answered, a label drawn once and
+never redrawn — is invisible to a battery that is otherwise very good indeed. The last four
+player-visible defects were all found by a person playing and none by 46 suites and 45 gates. **A
+battery that cannot fail the way the player fails is not covering the player.**
+
+**What the drive is, precisely: a real run with `sim_run` false, walked by pressing buttons.** Not
+`_pick_ability(idx, name)` but `emit_signal("pressed")` on the Button the card drew — because a
+button whose signal was never connected is exactly the defect being hunted, and calling the handler
+hides it. Everything the run put in front of it was answered the way a player answers it, and the
+three things that made it possible are each worth keeping:
+
+- **`Engine.time_scale` has to be re-asserted every frame.** `_break_impact` restores it to a
+  literal `1.0` rather than to what it was, so the first Break of the run silently cancels any
+  scale a driver set. **561 seconds for ten battles set once; 15 for the same ten re-asserted.**
+  It is invisible in play, where the scale is always 1.0 — which is why it survived.
+- **The player's run save is a file the gate must own.** `Run.SAVE_PATH` is a `const`, so it
+  cannot be redirected the way `Profile.save_path` is by every suite in the tree. An in-memory
+  backup is not enough: three `SCRIPT ERROR`s while this file was being written aborted the
+  coroutine before the restore, and a real 62,360 B run was destroyed. The backup is a file now
+  and the gate recovers from it at the top of the next run.
+- **The drive owns no scene.** A `--script` SceneTree has no `current_scene` of its own, so
+  `change_scene_to_file` — which is what every real button calls — behaves the way a button makes
+  it behave, with nothing of the gate's in the way.
+
+**THE MOST USEFUL THING §1 PRODUCED IS A NUMBER NOBODY SHOULD ASSERT.** The autoplay bot reached
+slot 47 of 49 on rung 1 and wiped at the third zone. That is not a balance verdict — the bot rolls
+a flat `good` on every skill check, never drinks a potion in a fight, and takes the first reachable
+node every time — and asserting it would make the gate red on ordinary tuning work. **What is
+asserted is that every screen the run opened could be answered.** A stall, a screen with no way
+off, or a button that does nothing is this batch's business; where a bot dies is the designer's.
+
+**THE TWO CENSUSES ARE THE PART THAT GENERALISES.** Asking whether a Button has anything connected
+to `pressed` needs no press, so it is safe on Sell, Discard and Confirm — 120 buttons across 13
+screens, none dead. And reading the RENDERED string against the run's own number catches the one
+defect class every instrument in the tree is blind to by construction: every gate reads `Run`, and
+so does the label, so the two can only disagree on a screen. **Buying something and asserting the
+gold line MOVED is the half that catches a screen which draws a correct first frame and never
+again.**
+
+**THE EXEMPTIONS ARE MECHANICAL, AND THAT IS THE difference between a census and a list.** The
+hero sheet draws 27 enabled Buttons that do nothing when pressed — deliberately, as hover surfaces,
+documented in `party_screen.gd`. Exempting them by name would go stale the day the sheet is redrawn.
+Exempting them by SIGNATURE — `focus_mode` NONE, an arrow cursor, and something connected to
+`mouse_entered` — means a control that lost its handler still fails, because it would match none
+of the three.
+
+**AND THE BATTERY'S OWN GATES DELETE THE PLAYER'S RUN.** `check_da` and `check_cs`, measured by
+bisection against a fresh copy of a real save. Neither is doing anything wrong on its own terms:
+`gate_fixture.spawn` sets `sim_run = false` because a `sim_run` battle is not the battle a player
+fights, and a battle that ends calls `Run.clear_save()`. **The cost is invisible because the
+symptom is silence** — the next run of anything simply reports there was no save to protect. It is
+reported rather than repaired here, because it is not a crash and the brief's rule is that the
+designer rules on what matters before he plays.

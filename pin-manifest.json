@@ -2,16 +2,17 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1412,
-  "source": 1081,
+  "total": 1417,
+  "source": 1086,
   "other": 85,
   "document": 246
  },
  "source_residency": {
-  "code": 647,
+  "code": 651,
   "absent": 289,
   "runtime": 78,
   "narrow": 25,
+  "unresolved": 1,
   "alt-sibling": 3,
   "comment": 39
  },
@@ -2578,6 +2579,61 @@
    "k": "literal",
    "how": "read",
    "g": "check_fg.gd#109"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s10_the_observations",
+   "h": "scripts/battle.gd",
+   "n": "Engine.time_scale = 1.0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fh.gd#1338"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s3_the_rune_offer",
+   "h": "scripts/battle.gd",
+   "n": "func _resolve_boss",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fh.gd#722"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s3_the_rune_offer",
+   "h": "scripts/battle.gd",
+   "n": "grant_rune",
+   "p": "+",
+   "r": "unresolved",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_fh.gd#725"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s3_the_rune_offer",
+   "h": "scripts/battle.gd",
+   "n": "roll_rune_candidates",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_fh.gd#725"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s3_the_rune_offer",
+   "h": "scripts/battle.gd",
+   "n": "rune_picks_owed",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_fh.gd#725"
   },
   {
    "s": "test_batch_ah.gd",

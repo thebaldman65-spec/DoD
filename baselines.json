@@ -264,8 +264,8 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    171,
-    171
+    172,
+    172
    ],
    "checks_obs": 3,
    "fails": [
@@ -1304,6 +1304,20 @@
    ],
    "fails_obs": 3,
    "note": "NEW AT FG. **THE FIRST INSTRUMENT THIS PROJECT HAS EVER HAD FOR A STATED CEILING.** CW §4 wrote the changelog's 400 KB threshold and a whole cut procedure and nothing was ever built to notice the threshold being crossed: it was crossed at FB/FC and four batches went past with a green tree, because `check_dv` §4 printed the live file's ENTRY COUNT every battery and nothing printed its SIZE. EE's 290 KiB ceiling on `CLAUDE.md` had the same hole from EE to FG. **§1 reads `docs/changelog.html` against the threshold and §2 reads `CLAUDE.md` against the ceiling; §3 pins the standing rule that generalises them and asserts both files name this gate.** **THE GATE HOLDS NO COPY OF EITHER NUMBER** — both bars are parsed out of the rule that states them and every statement of a bar within its own file must AGREE, so a half-edited rule reds rather than leaving a gate measuring against the copy nobody updated. **IT MEASURES BYTES, NEVER CHARACTERS**: `String.length()` is a character count and `CLAUDE.md` carries 1,996 bytes of multi-byte punctuation. **THE TWO ARMS: over the bar is a printed WARNING, over the bar for a SECOND BATCH RUNNING is a FAILURE** — §1's second arm measures the file WITHOUT its newest entry, which is the file as the previous batch left it, so it fires on exactly the batch the rule blames and never on one that had no warning. `CLAUDE.md`'s deadline is the ceiling plus the largest single-batch growth on record, the same figure the ceiling itself was derived from. No magnitude is invented in either arm. **A DISARMED GATE SHOWS TWICE**: the bar-parse arms `return` early, so a reworded rule drops the check count as well as failing (22 -> 17 measured), and a falling count is its own error here. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 22 / 0**, with seven controls run and every one biting where it was aimed."
+  },
+  "check_fh": {
+   "kind": "gate",
+   "checks": [
+    161,
+    161
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "NEW AT FH. **THE FIRST THING IN THIS PROJECT THAT PLAYS THE GAME.** Every other target reads `Run` or drives one screen; this one starts a real non-sim run and walks it through the SHIPPED screens, pressing real buttons with `emit_signal(\"pressed\")` — the map, the draft, the pick overlays, the Peddler, the Blacksmith, the event, the bargain, the hero sheet, the battle and its end card. **THE REASON IT EXISTS IS THAT `map_screen._on_node_pressed` OPENS WITH `if Run.sim_run: return`**, so `run_sim` and a player are two different programs and the last four player-visible defects were all found by a person. **§1 walks a whole run and asserts the DRIVE, never the balance** — a stall, a screen with no way off or a button that does nothing is a red; where the autoplay bot dies is printed, not asserted, because that moves with every magnitude the designer touches. §2 drafts at each of the four slot counts and drives a swap and a bench; §3 buys a rune at the Peddler and answers an elite cache A NODE LATER; §4 breaks a rune's loadout condition by benching and reads both surfaces; §5 drives the pouch's four outcomes; §6 empties two award pools and sees EA/EH's third tier pay; §7 drives all four skill-check cases on the real bar; §8 presses the last node and fights the end boss; **§9 censuses every Button on 13 screens for a `pressed` connection** — the 604-dead-buttons defect class, checked without pressing anything — and §9b reads the RENDERED numbers against the run's. **THREE THINGS MAKE IT POSSIBLE AND ARE WRITTEN IN THE FILE**: `Engine.time_scale` must be re-asserted EVERY FRAME (`_break_impact` restores it to a literal 1.0, which cost 546 s a run before it was found); the player's `user://run_save.bin` is backed up TO A FILE and the gate is self-healing, because an in-memory backup died with three SCRIPT ERRORs while this file was being written and took a real run save with it; and the drive owns no scene, so `change_scene_to_file` behaves the way a button makes it behave. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 161 / 0 at ~70 s**, READ BOTH WITH AND WITHOUT A PLAYER RUN SAVE ON THE MACHINE (the first draft read 160 without one and 161 with one, because a restore arm was guarded rather than written to run either way), with eight controls run and every one biting where it was aimed — including one that did NOT bite until the arm it aimed at was repaired for standing on a zero meter."
   },
   "check_ez": {
    "kind": "gate",

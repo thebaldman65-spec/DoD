@@ -5,126 +5,126 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-06 (Batch FG).*
+*Last rewritten: 2026-09-06 (Batch FH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FG — THE CHANGELOG CUT, AND SOMETHING WATCHES THE THRESHOLD NOW.** The cut CW §4
-  wrote a procedure for and nothing ever announced was owed. **No rune, card, ability, constant or
-  magnitude moved, and no rule was rewritten.** Full working: **`docs/reports/FG.md`**.
-- **§0 — THREE OF THE BRIEF'S PREMISES NEEDED CORRECTING.** The rule says **400 KB, not 400 KiB**,
-  and the two readings are 9,600 B apart — enough to put the crossing a whole batch apart (FB at
-  402,070 B on the decimal reading, FC at 409,793 B on the binary one), which is why "three to four
-  batches overdue" was right either way. **CX is not the only prior cut — DV cut too**, at DF/DG,
-  and DV's figures are the ones the tree carried. And **CX left 162.1 KB, not "~150"**; DV left
-  **149.97 KiB**, which is the reading showing the target has always been taken in KiB.
-- **§1 — THE CUT IS AT EP/EQ. 36 ENTRIES MOVED** (Batch EP back to Batch DG) out of the repo, so
-  the archive goes **149 → 185**. The live file keeps **FF back to EQ** and reads **17 entries and
-  147,929 B = 147.93 KB = 144.46 KiB** with FG's own entry in it — **under 150 on BOTH readings**,
-  which is the same tiebreak the new gate takes on the threshold. At the measured **7,827 B a
-  batch** since DV, the next cut is **about 32 batches away**.
-- **§1a — THE VERIFICATION IS THE PART WORTH REPEATING, AND IT IS THE PROCEDURE ALREADY WRITTEN.** A
-  **second script sharing nothing with the splitter** read untouched frozen copies of both
-  originals: headings extracted **two independent ways** agreeing on all four files (52 / 149 /
-  16 / 185), counts summing with **zero overlap** and order preserved, every heading **exactly
-  once** with none invented and none dropped, **the two bodies re-concatenating byte for byte** and
-  again by sha256, and all 201 entries surviving **verbatim**. **NO FILE SIZE WAS ASSERTED
-  ANYWHERE.** 24 checks, 0 failures.
-- **§1b — AND THE PROOF WAS PROVED, THREE ARMS, AND THE THIRD IS WHY THE SIZE RULE EXISTS.** An
-  entry **dropped** → 10 failures; an entry in **both** halves → 11; **one word misspelt inside a
-  kept entry** → 3. The first two move the file sizes and a size check would have caught them; the
-  third **changes the size by exactly zero bytes** and is invisible to every heading count.
-- **§1c — THE READER POPULATION IS 18, DERIVED: 15 READ THE CONTENT AND 3 DECLARE TERRITORY.**
-  `check_ec`'s `DOCS`, `build_pin_manifest.py`'s and `docs/build_docs.py` are the three (the last is
-  why the live file never moves). **Fourteen of the fifteen needed nothing** — every one is a
-  NEGATIVE pin on the live file plus a positive one on the archive, reached by following the path
-  out of the live header, so a cut can only make them more true. **All fourteen ran green against
-  the cut tree before one assertion was edited.**
-- **§1d — A BOUNDARY LITERAL HAS TWO READERS, NOT ONE.** `check_dv` §4 was the one gate the cut
-  broke, and its four stale literals came back **a second time under `check_ec` §2's name**, which
-  verifies that every document pin in the tree resolves. **Re-point the gate, then re-run the gate
-  that reads the gates.**
-- **§1e — AND ONE ARM OF `check_dv` §4 COULD NOT HAVE FAILED.** It read
-  `contains("Batch DV</b> at DF/DG") or contains("Batch DV")`, and the header names every cut in
-  its own history — so the second member held no matter what the first said and **the arm would
-  have passed with the first deleted.** `check_ec` §1 counted it among nine live alternations and
-  correctly reported it satisfied: **reading a group by its operator is not the same as the group
-  asking anything.** The `or` is gone and the pin names FG's own boundary.
-- **§2 — `check_fg.gd` IS NEW (22 CHECKS) AND IT IS THE BATCH'S REAL CONTENT.** CW wrote a
-  threshold and a cut procedure and **nothing was ever built to notice the threshold being
-  crossed**: `check_dv` §4 printed the live file's ENTRY COUNT every battery from DV onward and
-  nothing printed its SIZE. **The same hole was open on `CLAUDE.md`'s 290 KiB from EE to now.**
-- **§2a — THE WARNING IS THE LINE AND THE FAILURE IS THE DEADLINE, AND THE SPLIT IS THE RULE'S OWN
-  WORDS.** A gate that reds on the crossing batch reds on a batch whose only crime is writing its
-  changelog entry, and asks for a whole batch of work the rules say must not share a diff — so it
-  **trains everyone to ignore it**. A gate that only warns is ignorable, which is what four batches
-  of silence look like. **So: over the bar is a WARNING; over the bar for a SECOND BATCH RUNNING is
-  a FAILURE.** §1 measures the file **without its newest entry** — the file as the previous batch
-  left it — so it needs no memory and fires on exactly the batch the rule blames. `CLAUDE.md`'s
-  deadline is the ceiling **plus the largest single-batch growth on record**, the figure its own
-  ceiling was derived from. **No magnitude is invented in either arm.**
-- **§2b — THE GATE HOLDS NO COPY OF EITHER NUMBER, AND IT MEASURES BYTES.** Both bars are parsed
-  out of the rule that states them and **every statement of a bar within its own file must AGREE**,
-  so a half-edited rule reds. `String.length()` is a CHARACTER count and `CLAUDE.md` carries
-  **1,996 bytes of multi-byte punctuation** — a gate reading `.length()` reports the file nearly
-  2 KiB small and says nothing. **Seven controls, all seven bit**: over the bar by the newest entry
-  alone (warning, 0 fails), over it without that entry (warning + fail), `CLAUDE.md` over the
-  ceiling (warning, 0 fails), past the deadline (fail), the threshold sentence reworded (the gate
-  says it cannot find its bar), a second disagreeing ceiling (fail), the rule's body reworded
-  (fail). **A DISARMED GATE SHOWS TWICE**: the parse arms `return` early, so the check count falls
-  as well (22 → 17 measured), and a falling count is its own error here.
-- **§3 — SIX FALSE CLAIMS CORRECTED: ONE INSTRUMENT AND FIVE CLAIMS.** FF reported four and two
-  more were found by sweeping the mechanism rather than the section.
-- **§3a — THE INSTRUMENT: `check_es` §1 HAD NEVER ONCE FIRED.** ET emptied the pool, the arm printed
-  `DORMANT` and promised to wake with the first authored rune, and **EZ authored twenty-one four
-  batches ago.** Its sample member was a **Berserker**, one of the eight specs with no authored
-  rune, so `eligible_ids` returned nothing and the reading stayed 100% **for a second reason nobody
-  had written down**. **The gate was not wrong and its sample was — a sample is part of an
-  assertion's territory.** The member is a Warden now (same class key) and it reads **51.4% at every
-  zone slot**. **The vacuity is an ASSERTION now rather than a print** — a battery cannot go red on
-  a `print`, which is why it went four batches. **The band came off and the triple is SEEDED, and
-  that is not a loosening**: awake, p ≈ 0.50 gives 900 draws a slot an SE of 1.67 points and the
-  range of three exceeds the old 4.5-point band **13.6% of the time**, so the arm would have become
-  a coin flip. `check_es` goes **44 → 46**, and **the control is HEAD's own code**: the berserker
-  sample reads 44 / 0 at HEAD and 46 / 2 here.
-- **§3b — THE FIVE CLAIMS.** (1) `CLAUDE.md` stated that dormancy as present-tense fact. (2)
-  *"PRICE IS THE OPEN QUESTION AND NO RULE WAS INVENTED FOR IT"* stood **seven batches after EZ §0
-  closed it**, 330 lines above `A RUNE IS 100g, FLAT` in the same file. (3) The `merchant` glossary
-  said a rune goes *"to each hero who has a free slot"*; `shop_screen._roll_offers` walks **every**
-  member and never calls `Run.rune_slots()` — **and neither does `_buy_rune`**, so there is no
-  refusal at the purchase either: a rune bought with three worn goes into the pouch **unequipped**.
-  **The same sentence was in a second player-facing surface**, the map node's scout tooltip; both
-  are corrected, and `master.html`'s two mentions describe the SIM BOT's policy and are accurate.
-  **(4) and (5) were not named**: the same rarity block still read *"100% at every slot since ET §1
-  retired the authored pool"*, false since EZ; and `A RUNE IS 100g, FLAT` gave the retired prices as
-  `100g ×27, 120g ×6, 160g ×5` where the file held **×41, ×3 and ×6 the day it was written** —
-  **the total was measured and the breakdown was not.**
-- **§4 — THE VERIFICATION RUN IS CLEAN.** **97 targets**, `check_de` **398 checks / 0 failures / 0
-  notices** — every count in the tree matches its baseline exactly. **`check_fg` 22 / 0,
-  `check_parse` 171 / 0 and `check_es` 46 / 0**, all three matching rows written before the run;
-  all 46 suites green with 0 throws. **The only red is `check_cm_live` at 13 / 4, its recorded
-  baseline and the one red that is on purpose. Zero `Parse Error` and zero `SCRIPT ERROR` across
-  all 97 logs**, and the tree was md5-frozen across the run with **231 files byte-identical**, the
-  archive included and the stamp taken with absolute paths.
-- **WHAT MOVED: one document cut, one NEW gate, two gates edited, and the documents.**
-  `docs/changelog.html` (36 entries out, header rewritten, FG's entry in),
-  `DoD-archive/changelog-archive.html` (149 → 185, header rewritten); **`check_fg.gd` is NEW**;
-  `check_dv.gd` (§4 re-pointed, one inert `or` removed) and `check_es.gd` (§1's sample, its two
-  vacuity arms and the seeded triple); `CLAUDE.md` (the index row, the ceiling block's instrument
-  pointer, four claim corrections), `docs/instrument-rules.md` (the new standing rule and three
-  additions to CW §4's block), `docs/master.html` (the stamp and one stale changelog pointer),
-  `data/glossary.json` and `scripts/map_screen.gd` (the merchant claim), `run_battery.sh`,
-  `baselines.json` (three rows), `pin-manifest.json` (1406 → 1412), `docs/design-notes.md`, this
-  file and `docs/reports/FG.md`. **No file under `scenes/` was touched and no magnitude moved.**
-- **Next letter: FH.** FG sorts above every suite's own stamp compare — the highest is `"CE"`, and
+- **Last batch: FH — THE ARCHIVE COMES INTO THE REPO, AND A WHOLE RUN IS DRIVEN THROUGH THE REAL
+  SCREENS.** **No rune, card, ability, talent, constant or magnitude moved, no rule about the game
+  was written, and no file under `scenes/` was touched.** Full working: **`docs/reports/FH.md`**.
+- **§0 — FOUR OF THE BRIEF'S PREMISES NEEDED CORRECTING.** **"A boss trophy" is not a rune
+  source** — `_resolve_boss` awards a relic, a slot rung, an ability pick and a meta talent point
+  and reaches no rune door; the live doors are the Peddler, the elite cache, the bargain's `rune`
+  reward and the event verb `rune_grant`. **1,646,681 B is the archived changelog alone**; the
+  folder is **1,680,660 B** with `addendum.html`. **"44 test suites" is the `test_batch_*`
+  count** — the tree holds 47 `test_*.gd` and the battery runs 46. And **the archive sat TWO
+  levels above the repo, not one, and not beside the `.docx` exports**, which is what `README.md`
+  said and it was wrong on both halves.
+- **§1 — `DoD-archive/` IS IN THE REPO. TWO FILES, 1,680,660 B, PROVED BYTE-IDENTICAL BY md5.**
+  **THE ONLY THING THAT RESOLVES THE ARCHIVE IS THE LIVE CHANGELOG'S OWN HEADER** — CD's pattern —
+  and **fifteen readers follow it**: fourteen suites plus `check_dv` §4, each finding
+  `/changelog-archive.html</code>` and reading back to the opening `<code>`. **No `.gd` file in
+  the tree names the archive by path**, so the move was ONE header edit. The new pointer is
+  **`res://DoD-archive/changelog-archive.html`**, which is machine-independent as the absolute one
+  was not. **All fifteen ran green against the moved tree before an assertion was edited**, and
+  the pointer was armed at a directory that does not exist to prove they follow it: `check_dv`
+  **83 / 4** and `test_batch_bb` **177 → 173 with 2 failures and a throw**.
+- **§1a — WHAT TO DESELECT: `DoD-archive/`, BOTH FILES, AND NOTHING ELSE NEEDS TO MOVE.** It is
+  **14.2% of the sync** — larger than every `check_*.gd` put together. The sync reads **11.3106
+  MiB** with it and **9.7078 MiB** without it, which is exactly where it stood before this batch.
+  Applying the whole standing list (the 47 suites, `pin-manifest.json`, `docs/build_docs.py`, the
+  four ruled-on audits, the archive) lands at **164 files / 7.1336 MiB**. **`docs/reports/` is the
+  second-largest block at 1.6558 MiB and grows by one file every batch** — reported, not
+  recommended: `CLAUDE.md` lists it as MUST STAY SELECTED and moving it is a ruling.
+- **§2 — `check_fh.gd` IS NEW (161 CHECKS) AND IT IS THE FIRST THING IN THIS PROJECT THAT PLAYS
+  THE GAME.** The reason it can exist is one line: `map_screen._on_node_pressed` opens with
+  `if Run.sim_run: return`, so **`run_sim` and a player are two different programs** — RunSim walks
+  `Run` directly and never loads a screen. **The last four player-visible defects were all found by
+  a person playing and none by 46 suites and 46 gates.** This drive is not a sim: `sim_run` is
+  false, the scenes are the shipped scenes, and every step is an `emit_signal("pressed")` on a
+  real button rather than a call to its handler — because a button whose signal was never
+  connected is the defect being hunted and calling the handler hides it.
+- **§2a — THE RUN, WALKED.** **All 49 encounters**: 30 battles, 8 elites, 3 zone bosses, 3
+  mini-bosses, 7 draft screens with **28 cards pressed and 12 benches**, 7 rune picks, 12 upgrade
+  picks, 5 shops, 30 purchases, 11 bargains and 4 events. **IT ASSERTS THE DRIVE, NEVER THE
+  BALANCE.** Where the autoplay bot dies is PRINTED, not asserted: **slot 47 of 49 on rung 1**,
+  and that is a bot datum — it rolls a flat `good` on every skill check, never drinks in a fight,
+  and takes the first reachable node every time. **A stall, a screen with no way off, or a button
+  that does nothing is this batch's business; where a bot dies is the designer's.**
+- **§2b — EVERY PATH THE BRIEF NAMED, AND WHETHER IT WAS DRIVEN.** **DRIVEN:** a draft offer at
+  each of the four slot counts (7/8/9/10, the ladder asserted), a swap, a bench off the **two-press**
+  drop step, and the tag line read off the card; the Peddler's rune bought on the shop screen; an
+  elite cache **answered a node later**, which is where FD's hole was; a rune's tag threshold
+  broken by benching and put back, with the loadout panel and the hero sheet both following; the
+  pouch's four outcomes — a purchase, the **[4, 5, 6]** slot ladder (indexed by `zone_idx`, NOT by
+  bosses cleared), a full-stack refusal that takes no gold, a sell that takes the WHOLE stack and
+  frees its slot, and a no-slot arrival queued as a CHOICE; all four skill-check cases on the real
+  bar; a zone-boss award at an exhausted pool paying EA/EH's third tier and answerable on the card;
+  and the end boss, reached by **pressing the last node** on the final zone's map. **NOT DRIVEN:**
+  the defensive brace's PLAYER branch — see the known-broken block.
+- **§2c — TWO CENSUSES, BECAUSE THE DEFECTS THE BRIEF NAMES ARE VISUAL.** **§9 asks every visible
+  enabled Button on 13 screens whether anything is connected to `pressed`** — the
+  604-dead-buttons class, checked without pressing anything, so it is safe on Sell, Discard and
+  Confirm. **120 buttons, 0 dead**, with 28 exempt **BY SIGNATURE RATHER THAN BY NAME**: 27 hover
+  surfaces and 1 menu button. **§9b reads the RENDERED strings against the run's own numbers** and
+  buys something to prove the shop REFRESHES rather than drawing a correct first frame — which is
+  the one defect class every other instrument is blind to by construction, because every gate reads
+  `Run` and so does the label.
+- **§3 — SIX THINGS FOUND AND DELIBERATELY NOT FIXED.** They are in the known-broken block below.
+  The largest is that **`check_da` and `check_cs` DELETE the player's run save**, measured by
+  bisection against a fresh copy of a real 62,360 B save.
+- **§4 — THE VERIFICATION RUN.** Documentation written BEFORE it. HEAD's unmodified gates run
+  against the moved tree before any of them was edited, **and again once the new gate was in the
+  tree** — which is the pass that found `check_da` **41 → 43 / 4**: a new gate reading both draft
+  pools trips §3's enumeration fingerprint, and **a COMMENT naming the battle scene's path trips
+  the fixture fingerprint exactly as the path does**, because the match is on raw source. Both
+  fixed toward the rule and never by an exemption. **Two baseline rows written before the battery
+  off three identical standalone readings** — `check_fh` new at **161 / 0** and `check_parse`
+  **171 → 172**, because a new battery target raises the gate whose count IS its coverage.
+  **Eight controls, eight bites**, one of them only after the arm it aimed at was repaired for
+  standing on a zero meter. `pin-manifest.json` **1412 → 1417**.
+- **§4a — BATTERY 1 FOUND ONE UNPREDICTED RED AND IT IS THE SAME LESSON A THIRD TIME.**
+  **98 targets, ZERO `Parse Error` and ZERO `SCRIPT ERROR` across all 98 logs**, the tree
+  **md5-frozen with 301 files byte-identical before and after** (absolute paths, so a moved
+  working directory could not read as drift), `check_fh` **161 / 0** and `check_parse` **172 / 0**
+  matching the rows written before the run, all 46 suites green, and the harness 22 / 166 / 8.
+  **The one unpredicted red was `check_ek` 46 / 1**: §3's authored `TAG_CHECKERS` census, which
+  a new gate joins BY EXISTING — `check_fh` §2 reads `Classes.card_tag_line` off the draft card
+  and §4 reads `TAG_ORDER` for a rune condition. **LISTED, NOT EXEMPTED**, which is what EZ, FD
+  and FE each did before it. **THE PRE-PASS SHOULD HAVE CAUGHT IT AND DID NOT, BECAUSE IT RAN A
+  CHOSEN SUBSET OF THE GATES RATHER THAN ALL OF THEM** — that is the transferable half.
+- **§4c — BATTERY 2 IS THE ACCEPTANCE RUN AND IT IS CLEAN.** After the one repair —
+  `check_ek.gd`'s authored list, one name added with its reason — and a fresh md5 freeze:
+  **98 targets**, `check_de` **402 checks / 0 failures / 0 NOTICES** (every count in the tree
+  matches its baseline exactly), **`check_fh` 161 / 0**, **`check_parse` 172 / 0** and
+  **`check_ek` 46 / 0**, all 46 suites green with 0 throws, the harness **22 / 166 / 8**,
+  `check_ct_map` **83 / 0**. **THE ONLY RED IS `check_cm_live` AT 13 / 4, WHICH IS ITS RECORDED
+  BASELINE AND THE ONE RED THAT IS ON PURPOSE.** **Zero `Parse Error` and zero `SCRIPT ERROR`
+  across all 98 logs** — grepped from stderr, never a tally and never the exit code. **The tree
+  was md5-frozen across the run: 301 files byte-identical before and after, with no file appearing
+  or vanishing**, stamped with absolute paths. **No red was repaired while a battery ran.**
+- **§4b — AND THE BATTERY DESTROYED THE PLAYER'S RUN SAVE, IN THE WILD, EXACTLY AS PREDICTED.**
+  `check_fh` runs after `check_da` and `check_cs` in the GATES order, and its own first line read
+  `none — nothing to protect` **on BOTH battery runs**. The save was backed up before each battery
+  and restored after it, byte-identical. **This is no longer an inference from a bisection; it is a measurement of a
+  whole battery run.**
+- **WHAT MOVED: one directory into the repo, one NEW gate, and the documents.**
+  `DoD-archive/` (2 files, tracked for the first time, both headers rewritten);
+  **`check_fh.gd` is NEW**; `check_ek.gd` (§3's authored `TAG_CHECKERS`, one name added with its
+  reason); `run_battery.sh` (one gate name), `baselines.json` (two rows),
+  `pin-manifest.json` (1412 → 1417); `docs/changelog.html` (the header pointer and FH's entry),
+  `CLAUDE.md` (two index rows, the addendum path, the sync block), `docs/instrument-rules.md`
+  (two new rules), `README.md` (the archive folder), `docs/master.html` (the stamp),
+  `docs/design-notes.md`, this file and `docs/reports/FH.md`. **No file under `scenes/` or
+  `scripts/` was touched and no magnitude moved.**
+- **Next letter: FI.** FH sorts above every suite's own stamp compare — the highest is `"CE"`, and
   all fourteen read exactly TWO characters.
-- **`CLAUDE.md` IS AT 263.95 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT 101.20
-  KiB AND HAS NO STATED CEILING.** Headroom is **26.05 KiB — 6.2 batches at the measured mean of
-  +4,315 B, 3.2 at the worst batch on record.** **This batch spent 2.92 KiB of it** on the index
-  row, the ceiling block's instrument pointer and the four claim corrections. **Something measures
-  this every battery now and this file no longer has to remember to.**
+- **`CLAUDE.md` IS AT 264.88 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT
+  104.70 KiB AND HAS NO STATED CEILING.** Headroom is **25.12 KiB**. **This batch spent 0.93 KiB**
+  of it on two index rows, the addendum path and the sync block. **`check_fg` measures both every
+  battery and this file does not have to remember to.**
 - **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
   talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
   against four specs** with **eight specs still unauthored**. **What is left in the rune layer is
@@ -1925,9 +1925,12 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   past with a green tree** because nothing read the file against the number. `check_fg.gd` §1 does,
   every battery, and FAILS if a second batch passes without the cut.
 - **`DoD-archive/changelog-archive.html` holds 185 entries** (Batch 1 → **EP**) and is
-  **1608.1 KiB**. **IT IS OUTSIDE THE REPO, SO IT IS NOT IN VERSION CONTROL AND NOT BACKED UP BY
-  GITHUB, AND THIS CUT MADE THAT EXPOSURE LARGER AGAIN.** The entries it moved — **DG through
-  EP** — are recoverable only from the commit of Batch FF. It is still the designer's call.
+  **1608.1 KiB**. **IT IS IN THE REPO AS OF BATCH FH, SO IT IS IN VERSION CONTROL AND BACKED UP BY
+  GITHUB, AND THAT EXPOSURE IS CLOSED.** It is kept out of the knowledge sync by **DESELECTION in
+  the file picker**, which is a different act from keeping it out of the repo — and the two were
+  being done with the same lever for four cuts. **The header pointer is
+  `res://DoD-archive/changelog-archive.html` now**, not an absolute path, so the fifteen readers
+  that follow it work on any machine.
 - **THE VERIFICATION IS THE THING TO REPEAT, NOT THE CUT.** A SECOND script reading untouched
   frozen copies, sharing nothing with the splitter: headings counted two independent ways on all
   four files (52 / 149 / 16 / 185), counts summing with zero overlap, order preserved on both
@@ -1936,11 +1939,15 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   ASSERTED ANYWHERE** — sizes agreeing is consistent with a duplicated entry and a dropped one.
   **AND THE PROOF WAS PROVED**: an entry dropped → 10 failures, an entry in both halves → 11, **one
   word misspelt inside a kept entry → 3**, and the third moves the file size by zero bytes.
-- **FOURTEEN SUITES DEPEND ON A FILE THAT IS NOT IN VERSION CONTROL** — bb, bn, bo, bp, bq, br, bs,
-  bt, bu, bv, bw, bx, cb, ce. On a machine without `DoD-archive/` they FAIL LOUDLY, which is
-  correct. **NONE OF THE FOURTEEN NEEDED RE-POINTING AT DV OR AT FG, AND THAT IS CX's WORK**: every
+- **FIFTEEN READERS RESOLVE THE ARCHIVE THROUGH THE LIVE FILE'S OWN HEADER** — the fourteen
+  suites bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx, cb, ce, **plus `check_dv` §4**. **NO
+  `.gd` FILE IN THE TREE NAMES THE ARCHIVE BY PATH**, which is why FH's move was one header edit
+  and none of the fifteen was touched. They no longer depend on a file outside version control.
+  **NONE OF THEM NEEDED RE-POINTING AT DV, AT FG OR AT FH, AND THAT IS CX's WORK**: every
   live-changelog assertion in the tree is either the archive-path anchor or a **negative**
-  `not contains("<h2>… Batch XX")`, which a cut can only make more true.
+  `not contains("<h2>… Batch XX")`, which a cut can only make more true. **The anchor was armed at
+  a directory that does not exist to prove they follow it rather than pass regardless: `check_dv`
+  83 / 4, `test_batch_bb` 177 → 173 with 2 failures and a throw.**
 - **THE TWO GATES THAT DID NEED RE-POINTING ARE `check_dv` §4 AND — SECOND-HAND — `check_ec` §2**,
   which verifies that every document pin in the tree resolves. **A boundary literal has two
   readers**, so a cut is not done until the gate that reads the gates has been re-run.
@@ -1967,23 +1974,22 @@ the number.*
   at 194 files and the census reads **196 at that very commit** (`--rev HEAD`), so the recorded
   figure was two files short before EV touched anything. **196 + EV's own two = 198**, which is the
   whole of the delta and is the only way to read this row that stays true.
-- Heaviest, **re-measured at FG off the files on disk**:
-  `scripts/battle.gd` **1285.86**, `docs/design-notes.md` **510.77**, `docs/master.html` **377.92**,
-  `scripts/classes.gd` **347.39**, **`pin-manifest.json` 317.70**, `CLAUDE.md` **263.95**,
-  `scripts/unit.gd` **187.41**, `docs/state.md` **184.82**, `scripts/talents.gd` **180.06**,
-  `docs/talent-audit.html` **165.03**, `baselines.json` **159.00**, `scripts/run_state.gd`
-  **151.97**, **`docs/changelog.html` 144.46**, **`docs/instrument-rules.md` 101.20**.
-  (`docs/state.md`'s own figure is the one this edit moves; run the census rather than trusting it.)
-  **THE CHANGELOG FELL 280.67 KiB AND LEFT THE TOP FIVE ALTOGETHER** — it was fourth at FF and is
-  thirteenth now; FG moved 36 entries out of it. **AND TWO ROWS IN THE FF READING WERE CARRIED
-  RATHER THAN MEASURED, WHICH IS WHAT THIS BLOCK KEEPS DOING**: `scripts/talents.gd` was recorded
-  at 178.66 and `scripts/run_state.gd` at 145.34, and **both read 180.06 and 151.97 at the very
-  commit that wrote those figures.** Neither file was touched by FF or by FG.
-  **THE THRESHOLD ESTIMATE IS NOT IN THIS BLOCK ANY MORE AND THAT IS DELIBERATE.** It read
-  seventeen → thirteen → eight → seven batches away as it was re-measured, **each re-measurement
-  shortening it — the direction a carried-forward number never moves on its own** — and then the
-  threshold was crossed four batches before anyone noticed, with two contradictory estimates
-  ("about seven" and "roughly seventeen") standing in this one bullet at the time. **`check_fg` §1
+- Heaviest, **re-measured at FH off the files on disk**, and **the archive is now in the tree and
+  is the heaviest file in it**:
+  **`DoD-archive/changelog-archive.html` 1608.35**, `scripts/battle.gd` **1285.86**,
+  `docs/design-notes.md` **516.41**, `docs/master.html` **377.93**, `scripts/classes.gd`
+  **347.39**, **`pin-manifest.json` 318.79**, `CLAUDE.md` **264.88**, `docs/state.md` **189.66**,
+  `scripts/unit.gd` **187.41**, `scripts/talents.gd` **180.06**, `docs/talent-audit.html`
+  **165.03**, `baselines.json` **161.58**, **`docs/changelog.html` 153.52**,
+  `scripts/run_state.gd` **151.97**, `scripts/map_screen.gd` **107.22**,
+  **`docs/instrument-rules.md` 104.70**, `check_fh.gd` **90.58**.
+  (`docs/state.md`'s own figure is the one this edit moves; run the census rather than trusting
+  it.) **THE ARCHIVE ENTERING THE TREE MOVES NO OTHER ROW AND IT IS DESELECTED FROM THE SYNC**, so
+  the number that matters — what the connector ingests — is unchanged at **9.7078 MiB** while the
+  tracked tree grows by 1.6 MiB. **THE THRESHOLD ESTIMATE IS NOT IN THIS BLOCK AND THAT IS
+  DELIBERATE**: it read seventeen → thirteen → eight → seven batches away as it was re-measured,
+  **each re-measurement shortening it — the direction a carried-forward number never moves on its
+  own** — and then the threshold was crossed four batches before anyone noticed. **`check_fg` §1
   prints the live figure and the headroom against the bar every battery. Read that.**
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
   measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF and FF both
@@ -2012,17 +2018,27 @@ the number.*
   - **FOR THE RECORD, AND NOT AS A TARGET: the retired ratio has not been re-derived at EF and is not
     worth re-deriving.** Its numerator is now spread over two files and its denominator gained both,
     which is the third way the same measurement can move without anything about density changing.
-- **THE DESELECTION LIST FOR THE FILE PICKER.** **Deselect `pin-manifest.json`** — it stays in the
-  repo and `check_ed` goes on reading it off disk. **After it: 173 files, 7.5189 MiB.** Already
-  standing and unchanged: the 47 suite files, `docs/build_docs.py`, the archived changelog, and any
-  audit document whose findings have been ruled on and applied. **`claude_md_census.py` IS A
+- **THE DESELECTION LIST FOR THE FILE PICKER. THE ONE FH ADDS IS `DoD-archive/`, BOTH FILES.**
+  It is **1,680,660 B = 14.2% of the sync** — larger than every `check_*.gd` in the tree put
+  together — and the sync reads **11.3106 MiB** with it and **9.7078 MiB** without it, which is
+  exactly where it stood before FH. **Deselect `pin-manifest.json`** too — it stays in the repo and
+  `check_ed` goes on reading it off disk. **Applying the whole list lands at 164 files / 7.1336
+  MiB**, from 219 files / 11.3106 MiB. Already standing and unchanged: the 47 suite files,
+  `docs/build_docs.py`, the archived changelog, and any audit document whose findings have been
+  ruled on and applied. **`docs/reports/` is the second-largest block at 64 files / 1.6558 MiB and
+  grows by one every batch** — NOT recommended, because `CLAUDE.md` lists it as MUST STAY SELECTED
+  and moving it is a ruling. **`claude_md_census.py` IS A
   CANDIDATE TOO** by the same argument that deselects `build_pin_manifest.py` — it is a tool Claude
   Code runs off disk — **but it is 11.34 KiB and the saving is not worth a second entry to remember.**
   **WHAT MUST STAY SELECTED NOW INCLUDES `docs/instrument-rules.md`** and is listed in `CLAUDE.md`:
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files are unchanged in number and still the single largest block. They cannot be
-  archived (they must be in the repo to run) but they CAN be deselected from the sync.** The gates
-  are **42** — **EM ADDED `check_em` AND THIS LINE STILL READ 41 WHEN EP ARRIVED**; before it
+  archived (they must be in the repo to run) but they CAN be deselected from the sync.**
+  **MEASURED AT FH RATHER THAN CARRIED: 53 `check_*.gd` files exist, 46 of them are in the
+  battery's GATES list, and the battery runs 46 suites out of 47 `test_*.gd` (44 of those are
+  `test_batch_*`).** The seven outside the battery are `check_ck_width`, `check_ct_map`,
+  `check_cu`, `check_cv`, `check_de`, `check_dn` and `check_map_screen`. The line below is the
+  history of that count and **it read 42 when FH arrived** — **EM ADDED `check_em` AND THIS LINE STILL READ 41 WHEN EP ARRIVED**; before it
   **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
   EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
@@ -2074,6 +2090,52 @@ reach `bp` §7 at all: it is a Warrior flow.**
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
   before and after the gate consolidation; DC through DR confirm them again.** It is the only thing
   that presses the defensive bar.
+  **AND FH NAMED THE CAUSE: THE FOUR ARE ONE FACT, NOT FOUR DEFECTS.** `_defensive_brace` chooses
+  between the bar and a bot roll on `_nobody_can_press()`, which is
+  `sim or autoplay or DisplayServer.get_name() == "headless"` — so under **every** gate in this
+  project the bot branch is taken and **the bar can never open through an attack**. CQ §1 made it
+  that way deliberately, to stop four suites deadlocking on a modal nobody could press. The four
+  reds are `the bar appeared`, `the bar's top line names the incoming blow`, `the brace lands near
+  x0.85` and `the brace's Break half lands near x0.75` — the first two are the bar not opening and
+  the last two are two bot rolls being compared. **The only way to press that bar is a run with a
+  display server**, and `check_fh` §7 drives the bar itself instead (`_run_skill_check(false,
+  "defensive")` grades, says INCOMING and carries no Cancel) while asserting `_nobody_can_press()`
+  is TRUE, so the day that stops being true the gate says so and these four are re-derived.
+
+### `check_da` AND `check_cs` DELETE THE PLAYER'S RUN SAVE (FOUND AT FH, NOT REPAIRED)
+
+**`gate_fixture.spawn` sets `run.sim_run = false` and `run.active = true`** — it has to, because a
+`sim_run` battle is not the battle a player fights — **and `battle._check_end` then reaches
+`Run.clear_save()` on a wipe and `Run.save_run()` on a victory.** **MEASURED BY BISECTION, ONE
+GATE AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B RUN SAVE: `check_da` and `check_cs`
+DELETE IT; `check_ea`, `check_ec`, `check_ed`, `check_es`, `check_fg` and `check_parse` leave it
+byte-identical.** Only `check_ct` and `check_fh` protect it.
+- **`Run.SAVE_PATH` IS A `const`**, so it cannot be redirected the way every suite redirects
+  `Profile.save_path`. The protection is a BACKUP, not a redirect.
+- **THE SYMPTOM IS SILENCE**, which is why it survived: the next run of anything simply reports
+  there was no save to protect, and that is a clean-looking line for a file that is gone.
+- **DO NOT RUN THE BATTERY OVER A RUN THE DESIGNER CARES ABOUT** until this is ruled on. FH backed
+  the save up before its own battery and restored it after, byte-identical.
+
+### FIVE MORE THINGS FH FOUND AND DID NOT FIX
+
+- **`battle._break_impact()` RESTORES `Engine.time_scale` TO THE LITERAL `1.0`** rather than to
+  what it was. Invisible in play, where the scale is always 1.0; it cost `check_fh` **546 seconds a
+  run** (561 s for ten battles set once, 15 s for the same ten re-asserted every frame) before it
+  was found.
+- **THE HERO SHEET DRAWS 27 ENABLED BUTTONS THAT DO NOTHING WHEN PRESSED.** Deliberate —
+  `party_screen._make_tree_node` says they are the cheapest hover surface and `disabled` must stay
+  false or the tooltip stops firing — and the same silhouette as the 604 dead buttons that shipped
+  once. `check_fh` §9 exempts them **by SIGNATURE, never by name**.
+- **`Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT.** Its callers append to `member["runes"]`
+  themselves. Not a defect today; exactly the shape that goes wrong on the next caller.
+- **NO BOSS AWARDS A RUNE.** The live doors are the Peddler, the elite cache, the bargain's `rune`
+  reward and the event verb `rune_grant`. `check_fh` §3 asserts `_resolve_boss` reaches none of
+  them, so the day one is added the claim is re-derived rather than left standing.
+- **`build_pin_manifest.py` BINDS A HOLDER OFF `var x :=` AND NEVER OFF `var x: String =`**, so a
+  gate written with explicit types pins nothing the manifest can see and `--check` reports
+  `current`. `check_fh` contributed **0 pins typed and 5 inferred**; the manifest went 1412 → 1417
+  once two declarations were rewritten. Now a rule in `docs/instrument-rules.md`.
 - **AND CHECKS THAT PASS BY ACCIDENT ARE STILL WORSE THAN A RED.** `bs`'s bare `CLAUDE.md` pin was
   the one on record; **EA §2 repaired it and found five siblings**, all of them passing off a
   standing rule that named the batch in passing rather than off the block their message claimed.

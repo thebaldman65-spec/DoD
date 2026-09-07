@@ -300,8 +300,21 @@ const TAG_DOOR := "loadout_condition_met"
 # `CARD_TAGS`, `TAG_ORDER`, `RUNE_TAGS` and `primary_tag_peak`. **It changes no
 # behaviour and it is not exempted** — it is listed, which is what this half of
 # the population is for.
+#
+# **BATCH FH ADDED THE EIGHTH, AND FOR THE SAME REASON A THIRD TIME.**
+# `check_fh.gd` drives a whole run through the real screens, and two of the
+# things it drives are tag surfaces: §2 reads `Classes.card_tag_line` OFF THE
+# DRAFT CARD — EK §3's own feature, checked on the screen where the decision
+# happens rather than off the table — and §4 breaks and restores a rune's tag
+# threshold by benching, which needs `TAG_ORDER` and `primary_tag_count`. **It
+# changes no behaviour and it is not exempted; it is listed**, which is what
+# this half of the population is for. **AND IT IS THE THIRD BATCH RUNNING TO
+# LEARN THAT A NEW GATE JOINS THIS LIST BY EXISTING**: FH's second pre-pass
+# ran a chosen subset rather than every gate, so this red arrived from the
+# battery instead of from the pre-pass that was written to catch it.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
-	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_map_screen.gd"]
+	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
+	"check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
