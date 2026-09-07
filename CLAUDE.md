@@ -60,10 +60,11 @@ into this file changes it.
   through prose. **`check_ec` §2's own two needles are pinned against `docs/instrument-rules.md`
   for exactly that reason**, and every document instrument scopes a pin to the file it names.
 
-**WHAT IS OVER THERE** — thirty-three blocks and one four-bullet run, in thirty-two entries, in
+**WHAT IS OVER THERE** — thirty-four blocks and one four-bullet run, in thirty-three entries, in
 the order they stood here; the two `###` children of the equality rule travel with their parent.
 **The last eight rows are FF §2's**, and they are the residue: rules written into this file AFTER
-the seam was taken, which the seam's own test puts on the other side of it:
+the seam was taken, which the seam's own test puts on the other side of it. **The last row is
+FG's** and it was written straight into the reference rather than moved there:
 
 | | |
 |---|---|
@@ -99,6 +100,7 @@ the seam was taken, which the seam's own test puts on the other side of it:
 | A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME | FA §5 |
 | PROSE RECORDING A REMOVAL READS EXACTLY LIKE THE REMOVAL NOT HAPPENING | EV §5 |
 | THE READ SITE IS THE LINE, NOT THE FUNCTION | EU |
+| A CEILING NOBODY MEASURES IS A CEILING THAT GETS CROSSED SILENTLY | FG §2 |
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
@@ -285,6 +287,17 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   and the batch report. **A file that records its own size changes it by recording it**, which is
   the same shape as *an instrument's corpus must not contain what the instrument rewrites*, in
   `docs/instrument-rules.md`.
+- **AND SOMETHING MEASURES IT NOW: `check_fg.gd` §2, EVERY BATTERY (Batch FG).** From EE to FG this
+  ceiling had no instrument at all — the number was stated here and nothing ever read the file
+  against it, which is how the changelog's own threshold came to be crossed four batches running
+  with a green tree. **The gate parses the bar out of the two sentences above rather than holding a
+  copy**, and asserts they agree; over the ceiling is a printed WARNING, and over it by more than
+  the largest single-batch growth on record is a FAILURE. **The reasoning for the two arms is the
+  LAST standing rule in the index above**, in `docs/instrument-rules.md`, written beside the
+  changelog's own threshold — its title is not repeated here, because a title repeated in this file
+  is a second place a pin can resolve, which is the hazard the index bullet above names. **Reword
+  either sentence and the gate says it cannot find its bar** — which is deliberate, and is why the
+  wording is load-bearing.
 
 ## Repo weight and the knowledge-base sync (STANDING — BY, ACTED ON AT BZ AND CW)
 **The number that matters is not the repo, it is the TEXT.** Most of the repo is `assets/` —
@@ -1932,10 +1945,18 @@ better than 53 patched ones.
   Three of them existed and all three were made TWO-ARMED rather than deleted — `test_runes`
   `_rich_grant` and `_start_rune_pool`, and `check_es` §2. **Each comes back on its own the day a
   rune is authored.** A one-armed repair reads green on the day the whole file stops rolling.
-· **AND ONE MEASUREMENT WENT DORMANT RATHER THAN WRONG.** `check_es` §1 measures that the offer is
-  flat across zone slots; with the pool empty it is 100% at every slot BY CONSTRUCTION and the arm
-  cannot fail. **It prints DORMANT rather than passing quietly** — a vacuous check prints exactly
-  like a clean one.
+· **AND ONE MEASUREMENT WENT DORMANT, SAID SO, AND THEN DID NOT WAKE — WHICH IS THE HALF WORTH
+  KEEPING (repaired at Batch FG §3).** `check_es` §1 measures that the offer is flat across zone
+  slots; with the pool empty it was 100% at every slot BY CONSTRUCTION, the arm could not fail, and
+  it printed DORMANT rather than passing quietly, on the rule that **a vacuous check prints exactly
+  like a clean one**. **IT PROMISED TO WAKE WITH THE FIRST AUTHORED RUNE AND EZ AUTHORED
+  TWENTY-ONE, AND IT WENT ON PRINTING DORMANT FOR FOUR MORE BATCHES** — because its sample member
+  was a **Berserker**, one of the eight specs with no authored rune, so `eligible_ids` returned
+  nothing and the reading was 100% for a second reason nobody had written down. **THE GATE WAS NOT
+  WRONG AND ITS SAMPLE WAS.** Two things came out of the repair and both generalise: **a sample is
+  part of an assertion's territory**, and **a vacuity that is only PRINTED is a vacuity nothing can
+  go red on** — the arm asserts its own non-vacuity now (the sample spec must have an authored
+  rune, and the offer must not be all one family) instead of announcing it in a `print`.
 
 ## STANDING RULE — RUNE CONTENT IS WRITTEN WITH THE DESIGNER, ONE RUNE AT A TIME (Batch ES, ruled by the designer)
 
@@ -1961,13 +1982,20 @@ machinery the decision will land on.
 behaviour, and every rune goes on doing exactly what it did. It *drove the offer odds* — 60/30/10
 at zone 1 deepening to 25/45/30 by zone 3, **the only thing that made a late offer differ from an
 early one**, and measured on the live pool that put **half of every zone-1 offer** into the
-generated stat family against a fifth of every zone-3 offer; it is a flat **~30% at every slot**
-now — and **100% at every slot since ET §1 retired the authored pool**. It *set the price* for the
-generated family; authored runes have always carried their own.
+generated stat family against a fifth of every zone-3 offer; **it is FLAT at every slot now, and
+the LEVEL is the drawing spec's own pool depth** — 100% for the eight specs with no authored rune,
+and 50% / 55% / 50% / 60% for the Warden, Occultist, Beastmaster and Sharpshooter, whose runes EZ
+authored (corrected at Batch FG §3; it read *"100% at every slot since ET §1 retired the authored
+pool"*, which stopped being true at EZ). It *set the price* for the generated family; authored
+runes have always carried their own.
 
-· **PRICE IS THE OPEN QUESTION AND NO RULE WAS INVENTED FOR IT.** The 53 offerable runes carry
-  prices of 50 / 75 / 100 / 120 / 160 written against a tier table that no longer exists. **That
-  is a design decision and it is the designer's.**
+· **PRICE WAS THE OPEN QUESTION THIS RULING LEFT BEHIND, AND EZ §0 ANSWERED IT: 100g, FLAT**
+  (corrected at Batch FG §3 — this bullet went on stating the question as open for seven batches
+  after it was closed, and *A RUNE IS 100g, FLAT* is 330 lines further down this same file). The
+  53 offerable runes it named are retired; **all 21 live runes read 100g and `check_ez` §0 asserts
+  it as an equality.** The 66 retired keep their authored prices — 100 ×42, 75 ×14, 160 ×6,
+  120 ×3, 50 ×1 — as the record of what the old pool charged, and the generated stat family keeps
+  `TEMPLATE_PRICE` = 50. **Neither is a second pricing rule.**
 · **`Runes.is_cost` NEVER READ RARITY AND IS UNAFFECTED**, which is worth writing down because
   three reports in a row called `DOD_SIM_RUNE_POWER` "the sim's rarity lever". It is a POWER
   lever; `is_cost` reads a field name and a sign.
@@ -2270,8 +2298,11 @@ function in the project, and EZ's own charter forbids moving an ability, a magni
 > rune's worth is contextual, so the player pays for FIT rather than for magnitude.**
 
 **THIS CLOSES THE PRICING QUESTION ES §1 OPENED AND `docs/state.md` HAS CARRIED SINCE.** The
-retired 65 keep their authored prices (50g ×1, 75g ×14, 100g ×27, 120g ×6, 160g ×5) unmoved, as the
-record of what the old pool charged; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
+retired 66 keep their authored prices (50g ×1, 75g ×14, 100g ×42, 120g ×3, 160g ×6) unmoved, as the
+record of what the old pool charged — **the breakdown was WRONG ON ARRIVAL and is corrected at
+Batch FG §3**: EZ wrote `100g ×27, 120g ×6, 160g ×5`, and the file said `×41`, `×3` and `×6` on the
+day it was written, so the TOTAL was measured and the split was not. FC's retirement has since
+taken the total to 66; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
 Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
 the absence of a rule. `check_ez` §0 asserts the flat 100 as an EQUALITY over the live pool.
 

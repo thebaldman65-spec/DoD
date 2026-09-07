@@ -72,6 +72,15 @@ below.
   boundary and move the OLDEST entries into `changelog-archive.html`, leaving the live file the
   most recent ones. Aim to leave the live file around 150 KB — the size BZ's own cut produced —
   so the next cut is many batches away rather than immediate.
+  · **`KB` IS DECIMAL AND THE BAR IS 400,000 BYTES, WHICH IS THE STRICTER OF THE TWO READINGS.**
+    Everything else in this project is measured in KiB, so this line has always had two readings
+    9,600 bytes apart — and they are not academic: they put the last crossing a whole batch apart
+    (FB on the decimal reading, FC on the binary one). **The literal reading is also the one that
+    fires earlier**, which is the safe direction for a bar whose only job is to be noticed.
+    `check_fg.gd` §1 prints both figures beside the bar so nobody has to guess which is meant.
+  · **AND THE UNIT IS BYTES, NEVER CHARACTERS.** `String.length()` in a Godot gate is a CHARACTER
+    count; these documents hold thousands of bytes of multi-byte punctuation, so a gate reading
+    `.length()` reports a file smaller than the census does and says nothing about it.
 - **CUT AT A BATCH BOUNDARY AND EDIT NO ENTRY.** The live file starts at a batch; the archive
   ends at the one before it.
 - **ARCHIVE MEANS MOVE OUT OF THE REPO, NEVER DELETE** — to `/Users/zipples/Documents/DoD-archive/`,
@@ -99,6 +108,10 @@ below.
   that batch in its own prose, so it **passes without its subject being in the file at all** —
   a check that has stopped asking its question, with no throw to announce it. Two suites have
   done exactly this.
+- **THE CUT IS OWED AT THE NEXT BATCH BOUNDARY, AND `check_fg.gd` §1 IS WHAT SAYS SO.** Over the
+  bar is a printed WARNING and not a failure; over the bar *without this batch's own newest entry*
+  — the file as the previous batch left it — is a FAILURE, because that is the next boundary and
+  the cut was not taken. See the standing rule below for why it is split that way.
 - **THE CUT IS NOT DONE UNTIL EVERY SUITE WHOSE ENTRY MOVED IS RE-POINTED, IN THE SAME BATCH.**
   CX moved 23 entries and re-pointed **eleven suites** (bp, bq, br, bs, bt, bu, bv, bw, bx, cb,
   ce). **Eight of them would have gone on PASSING** — a bare `contains("Batch XX")` is satisfied
@@ -106,10 +119,67 @@ below.
   BO two batches later; **it is cheaper by far to repair it in the batch that causes it.**
   Fourteen suites now read the archive, so a cut that forgets this breaks a suite the batch never
   touched.
+  · **AND A BOUNDARY LITERAL HAS TWO READERS, NOT ONE.** FG re-pointed `check_dv` §4 and expected
+    that to be the whole debt; `check_ec` §2 verifies that every document pin in the tree
+    RESOLVES, so the same four stale literals came back a second time under another gate's name.
+    **Re-point the gate, then re-run the gate that reads the gates.**
+  · **AN ALTERNATION WHOSE WEAKER MEMBER IS ALWAYS TRUE IS NOT A CHECK.** `check_dv` §4 asked that
+    the live header record which batch made the cut, as
+    `contains("Batch DV</b> at DF/DG") or contains("Batch DV")` — and the header names every cut
+    in its own history, so the second member held no matter what the first said. It would have
+    passed with the first deleted. **A cut writes its own batch into that header, so pin THAT**,
+    and note that `check_ec` §1 counted this among nine live alternations and correctly reported
+    it satisfied: reading a group by its operator is not the same as the group asking anything.
 - **A FILE IN THE ARCHIVE IS NOT IN VERSION CONTROL AND IS NOT BACKED UP BY GITHUB.** If the
   machine is lost, it is lost with it. The archive folder must live somewhere the machine backs
   up — iCloud-synced Documents, a Time Machine target, or a second private repo. **At BZ none of
   the three was in place, and it is the designer's call to fix.**
+
+## A CEILING NOBODY MEASURES IS A CEILING THAT GETS CROSSED SILENTLY (STANDING, Batch FG §2)
+> **A THRESHOLD WITH NO INSTRUMENT IS A NOTE, NOT A GATE.** A number written into a rule is a
+> number nobody reads again. If a bar is worth stating, something in the battery owes a reading
+> of the file against it — every run, in print, whether or not it is close.
+
+**TWO INSTANCES, AND BOTH WENT UNMEASURED FOR THEIR WHOLE LIVES.**
+
+| the bar | where it is stated | what watched it | what happened |
+|---|---|---|---|
+| `docs/changelog.html` at 400 KB | CW §4, the block above | nothing, from CW to FG | crossed at FB/FC and **four batches went past in silence** |
+| `CLAUDE.md` at 290 KiB | EE §1, `CLAUDE.md`'s ceiling block | nothing, from EE to FG | not yet crossed — **found out by measuring rather than by arriving** |
+
+- **THE FAILURE MODE IS NOT THAT THE BAR IS WRONG. IT IS THAT NOTHING LOOKS.** `check_dv` §4
+  printed the live changelog's ENTRY COUNT every single battery from DV onward and nothing
+  anywhere printed its SIZE, so the tree was green the whole way across. The last recorded reading
+  was *"about seven batches away"* and seven batches came and went; every re-measurement of that
+  estimate had shortened it — seventeen, thirteen, eight, seven — **which is the direction a
+  carried-forward number never moves on its own**, and was the only warning anyone got.
+- **THE WARNING IS THE LINE AND THE FAILURE IS THE DEADLINE.** This is the choice a watcher has to
+  make and it is not "warn or fail". A gate that reds the moment a bar is crossed reds on a batch
+  whose only crime is writing its own changelog entry, and the answer to either bar is a whole
+  batch of work that this file says elsewhere must not share a diff with anything — **so a red on
+  the crossing batch asks for the one thing the rules forbid, and trains everyone to ignore it.**
+  A gate that only warns is ignorable, which is precisely what four batches of silence look like.
+  **So: over the bar is a WARNING, and over the bar for a SECOND BATCH RUNNING is a FAILURE.** It
+  cannot be ignored twice, and the red never lands on a batch that had no warning in front of it.
+- **DERIVE THE SECOND ARM FROM THE RULE'S OWN WORDS, NEVER FROM A MARGIN SOMEBODY CHOSE.** The
+  changelog rule says *cut at the NEXT batch boundary*, so the second arm measures the file
+  **without its newest entry** — which is the file as the previous batch left it, needs no memory,
+  no stored number and no git, and fires on exactly the batch the rule blames. Where a file has no
+  per-entry structure to lean on (`CLAUDE.md`), the deadline is the ceiling plus **the largest
+  single-batch growth on record** — the same figure that file's own ceiling was derived from.
+  **No new magnitude is authored in either arm.**
+- **THE GATE HOLDS NO COPY OF EITHER NUMBER.** Both bars are parsed out of the rule that states
+  them, because a second copy of a number is this project's oldest recurring defect. It asserts
+  that EVERY statement of a bar within its own file AGREES, so a half-edited rule goes red instead
+  of leaving a gate measuring against the copy nobody updated. **A gate that falls back to a
+  hardcoded bar when it cannot find the rule is worse than one that fails**: the rule is the
+  authority, and a gate that cannot find it must say so.
+- **THE COST OF THE MISS IS THE MEASURE OF THE RULE.** Four batches of drift cost one whole batch
+  to repair, and the repair moved 36 entries and re-pointed two gates. That is cheap because the
+  changelog is append-only prose. **The same silence on a bar with a harder procedure behind it is
+  not cheap**, and `CLAUDE.md`'s is the harder one: FF measured that there is no third seam of its
+  kind, so the next batch to reach 290 KiB has two moves and both are the designer's. **Finding
+  that out early is the whole value.**
 
 ## ON A SPLIT-CLAUSE CARD, EVERY PIN NAMES THE CLAUSE IT PINS (STANDING, Batch DM §2)
 > **A pin that matches the CARD rather than the CLAUSE can go red for the wrong reason, or stay

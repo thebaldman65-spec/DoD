@@ -4,6 +4,95 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The cut was the easy half; the finding was that nobody was looking (Batch FG) — 2026-09-06
+
+The brief said the changelog cut was mechanical and its procedure already written, and that the
+finding was that nothing watched the threshold. **Both halves turned out to be true, and the second
+one is worth more than it first reads.**
+
+The cut is genuinely mechanical. CW §4 wrote the procedure, CX and DV had both executed it, and the
+verification — headings two ways, counts summing with zero overlap, bodies rejoining byte for byte,
+never a size — is written down well enough that following it takes an afternoon. What made it worth
+doing carefully was the third control arm. Dropping an entry and duplicating one both change the
+file's size, and a batch tempted to "just check the sizes agree" would have caught both. **Misspelling
+one word inside a kept entry changes the size by zero bytes and is invisible to every heading count
+in the procedure** — only the byte-for-byte rejoin sees it. The rule's own warning is that two sizes
+agreeing is consistent with a duplicated entry and a dropped one; the sharper version is that a
+size check cannot see an EDIT at all, and an edit is the failure a cut is most likely to produce by
+accident.
+
+**The real question this batch had to answer was warn or fail, and I do not think it is a choice
+between them.** The brief put it precisely: a check that reds on an unrelated batch trains people to
+ignore it, and a check that only warns can be ignored anyway. Both are true, and both were true here
+in the concrete. Every batch writes a changelog entry, so every batch contributes to the crossing —
+but the *answer* to a crossing is a whole batch of work, and this project's own rule says two
+byte-for-byte splits do not share a diff. **A gate that reds on the crossing batch is therefore
+asking for the exact thing the rules forbid.** That is not a hard call to make; it is a call that
+looks like a compromise and is not.
+
+What resolved it was reading CW's own words again: *cut at the NEXT batch boundary*. The rule
+already contains the deadline. So the gate does not need a margin anybody chose — it measures the
+file **without its newest entry**, which is the file as the previous batch left it. Over the bar with
+that entry is a warning; over the bar without it is a failure, because you are the next boundary and
+the cut was not taken. **It fires on exactly the batch the rule blames, it cannot be ignored twice,
+and it invents no magnitude.** I would not have found that shape by arguing about margins; it came
+from re-reading the sentence the bar was written in.
+
+**The other thing I would not have predicted is how much of the gate's design went into refusing to
+hold a number.** The obvious gate is six lines: read the file, compare to 400,000, fail. It would
+also be a second copy of a number — the defect this project names as its oldest — and the copy that
+goes stale is always the one nobody is looking at. Parsing the bar out of the rule that states it
+costs about twenty lines and buys two things: the rule stays the authority, and **a half-edited rule
+goes red** rather than leaving an instrument quietly measuring against the wrong bar. The gate
+asserts that every statement of a bar within its own file agrees, which is a check the project has
+never had and which one control armed in about a minute.
+
+**And the smallest thing here is the one I will remember.** `String.length()` in Godot is a character
+count. `CLAUDE.md` carries nearly two kilobytes of multi-byte punctuation against a ceiling whose
+entire remaining headroom is twenty-six. A gate written the obvious way would have reported the file
+two KiB under its true size, every battery, with nothing to announce it — **an instrument off by
+almost a batch's worth of growth, in the direction of never firing.**
+
+### The four false claims, and why two more were sitting beside them
+
+FF reported four and left them. Correcting them took an hour; **finding the other two took a sweep,
+and the sweep is the transferable half.** Both extras were in the same blocks as the named ones —
+one two sentences above a claim I was already fixing, the other in the very rule that overturned the
+claim I was fixing. That is EH §2's lesson arriving for the third or fourth time: **a batch sweeps
+the section it is writing in, and the mechanism does not respect section boundaries.** If a document
+was wrong about the rune pool in one place, it is worth reading every sentence in that document that
+mentions the rune pool, not the paragraph the brief pointed at.
+
+The sixth one is a different species and worth naming separately. `A RUNE IS 100g, FLAT` gives the
+retired pool's price breakdown as `100g ×27, 120g ×6, 160g ×5`. The file held `×41`, `×3` and `×6`
+**on the day that sentence was written**. The total beside it was right, and has since gone stale by
+one in the ordinary way. **So the total was measured and the breakdown was not** — someone counted
+the entries and then wrote a plausible split of them, in the same sentence, in the same voice. A
+reader has no way to tell those two halves apart, which is exactly why a document that carries a
+derived figure should say what derived it.
+
+### `check_es` §1 is the one I would have missed
+
+It printed `DORMANT` and said it would wake with the first authored rune. Twenty-one were authored
+and it did not wake, because its sample member was a Berserker and the Berserker has no runes. **The
+gate was not wrong. Its sample was.** A sample is not scaffolding around an assertion; it is part of
+what the assertion is about, and this one silently changed what the check measured without a single
+line of the check changing.
+
+But the reason it went four batches is smaller and more general: **`DORMANT` was a `print`, and a
+battery cannot go red on a print.** ET wrote that print for exactly the right reason — a vacuous
+check prints like a clean one — and then stopped one step short. The condition that made the check
+vacuous was known, stated, and expressible as an assertion, and writing it as prose instead meant
+the tree stayed green through the whole period the check was asleep. **If you can say why a check
+cannot fail, you can assert that it can.**
+
+The repair also had to answer a question the old arm never faced. Awake, the flatness band would
+have flaked one run in seven — the old 4.5-point tolerance was sized for a distribution that never
+existed, and the moment the arm started measuring anything it would have become a coin flip. The
+project's rule covers it: if the noise is wider than the band the question needs, the band is not
+available, so seed the pair and assert exactly. **Widening it to 8 points would have been the
+tempting move and would have deleted the check.**
+
 ## The seam was measured, and the measurement said there is no next one (Batch FF) — 2026-09-06
 
 The brief asked for the next seam and told me not to take one from it. That instruction is what the

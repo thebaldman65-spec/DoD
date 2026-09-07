@@ -489,9 +489,16 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 			return ("%s — THE BLACKSMITH\nThree ability upgrades on the counter, " +
 				"gold only.\nOne purchase and the visit is over. %d gold here.%s") % [
 					head, Run.blacksmith_price(), closed]
+		# BATCH FG §3 — IT READ "to each hero who has a free slot" AND THE SHOP
+		# HAS NEVER ASKED. `shop_screen._roll_offers` walks EVERY party member
+		# and calls `Run.rune_slots()` nowhere; `_buy_rune` does not either, so
+		# a rune bought with three worn goes into the pouch unequipped. The cap
+		# is enforced where a rune is WORN (this file's own toggle, and the
+		# elite pick's auto-equip), and the sim's "13.6 refusals a run for no
+		# free slot" is the BOT's buying policy rather than the shop's.
 		"merchant":
-			return ("%s — THE PEDDLER\nPotions, and one rune offered to each hero " +
-				"who has\na free slot.%s") % [head, closed]
+			return ("%s — THE PEDDLER\nPotions, and one rune offered to every hero. The\n" +
+				"three slots cap what is WORN, not what is owned.%s") % [head, closed]
 		"event":
 			return ("%s — ???\nSomething stands on the road. It may want to trade, " +
 				"it\nmay be a gift, and it may simply cost you.%s") % [head, closed]

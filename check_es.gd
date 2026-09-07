@@ -81,6 +81,9 @@ func _rarity_marks() -> Array:
 # authored for exactly these and the formula drifted epic-ward past them.
 const ZONE_SLOTS := [1, 2, 3]
 const OFFER_DRAWS := 900
+# §1's flatness triple is SEEDED rather than banded — see the block at the
+# arm. The value is arbitrary and only has to be the same for all three loops.
+const FLAT_SEED := 20260906
 
 
 func _all_gd() -> Array:
@@ -169,38 +172,68 @@ func _s1_rarity_is_gone() -> void:
 	# each of the three zone slots the old weights were authored for; the share
 	# of draws that are generated stat sticks must be the SAME at all three,
 	# where it used to run 50% / 33% / 21%.
-	var member := {"key": "warrior", "spec": "berserker", "runes": [],
+	# **BATCH FG §3 — THE SAMPLE WAS A BERSERKER AND THIS ARM HAD NEVER ONCE
+	# FIRED.** ET §1 emptied the pool, the block below printed DORMANT and
+	# promised to wake with the first authored rune, and **EZ authored
+	# twenty-one four batches ago.** It did not wake: the sample member was a
+	# Berserker, one of the EIGHT specs with no authored rune, so `eligible_ids`
+	# returned nothing and the share stayed 100% for a second reason nobody had
+	# written down. **THE GATE WAS NOT WRONG AND ITS SAMPLE WAS** — and a check
+	# that has stopped asking its question while printing that it knows it has
+	# is the worst of both. **A SAMPLE IS PART OF AN ASSERTION'S TERRITORY.**
+	#
+	# The member is a WARDEN now: the same class key, so `_template_markers`'
+	# warrior exclusion is untouched and the generated family is the same five,
+	# against the five runes EZ authored for the spec. The other three authored
+	# specs read 55% / 50% / 60% and any of them would do; the Warden is chosen
+	# because it needs no other field in this dictionary to move.
+	var member := {"key": "warrior", "spec": "warden", "runes": [],
 		"bm_abilities": []}
+	# **AND THE VACUITY IS AN ASSERTION NOW RATHER THAN A PRINT.** The reason
+	# this went four batches is that DORMANT was a `print`, and **a battery
+	# cannot go red on a print.** These two arms fail the day the sample spec
+	# has no authored rune again, and the day the offer is all one family — so
+	# the condition that made this arithmetic instead of evidence is a check.
+	var elig: Array = Runes.eligible_ids(member, [])
+	ok(not elig.is_empty(),
+		"§1: the sample spec has NO authored rune, so the flatness arm below is arithmetic rather than evidence")
+	# **THE BAND IS GONE AND THE TRIPLE IS SEEDED, WHICH IS THE PROJECT'S OWN
+	# RULE FOR THIS AND NOT A LOOSENING.** Awake, the share is p ≈ 0.50, so one
+	# slot's 900 draws carry a standard error of 1.67 points and the RANGE of
+	# three lands outside the old 4.5-point band **13.6% of the time** — the
+	# arm would have become a coin flip the moment it started measuring
+	# anything. *A margin only works if it is WIDER than the noise it sits on*,
+	# and *if the propagated noise is wider than the band the question needs,
+	# THE BAND IS NOT AVAILABLE: seed the pair and assert exactly.* **DO NOT
+	# WIDEN THE BAND TO SWALLOW THIS — that deletes the check.**
+	#
+	# The zone slot is an UNREAD parameter, so three identically-seeded loops
+	# must draw the identical SEQUENCE. The comparison is the whole sequence
+	# rather than the stat-stick share, so a zone that changed WHICH authored
+	# rune came up fails here even if the share happened to coincide.
 	var shares: Array = []
+	var seqs: Array = []
 	for z in ZONE_SLOTS:
+		seed(FLAT_SEED)
 		var tpl := 0
+		var drawn := PackedStringArray()
 		for i in OFFER_DRAWS:
-			if String(Runes.generate(member, int(z)).get("id", "")).begins_with("tpl_"):
+			var id := String(Runes.generate(member, int(z)).get("id", ""))
+			drawn.append(id)
+			if id.begins_with("tpl_"):
 				tpl += 1
 		shares.append(100.0 * tpl / OFFER_DRAWS)
-	var lo: float = shares[0]
-	var hi: float = shares[0]
-	for sh in shares:
-		lo = minf(lo, float(sh))
-		hi = maxf(hi, float(sh))
+		seqs.append(",".join(drawn))
+	# The global RNG is left where the rest of this gate found it.
+	randomize()
 	print("    stat-stick share of the offer by zone slot: %.1f%% / %.1f%% / %.1f%%" % [
 		shares[0], shares[1], shares[2]])
-	# A 4.5-point band over 900 draws a cell. Three EQUAL binomials at p≈0.35
-	# have a standard error near 1.6 points each, so a spread past this is a
-	# lever rather than noise; the OLD weights spread these by 29 points.
-	ok(hi - lo < 4.5,
-		"§1: the offer is not flat — the stat-stick share spans %.1f points across three zone slots" % (hi - lo))
-	# **BATCH ET §2 — AND THE ARM SAYS SO WHEN IT CANNOT FAIL.** With ET §1
-	# retiring every authored entry, the generated family is the whole pool and
-	# the share is 100% at every slot BY CONSTRUCTION — so the flatness above is
-	# arithmetic rather than evidence, and a re-invented tier could not show in
-	# it. **A vacuous check prints exactly like a clean one**, so this one
-	# prints which of the two it is. It wakes on its own the day a rune is
-	# authored; nothing here has to be remembered or re-edited.
-	if is_equal_approx(float(shares[0]), 100.0) and is_equal_approx(hi - lo, 0.0):
-		print("    ^ DORMANT: the authored pool is empty (ET §1), so this is 100%"
-			+ " by construction and the flatness arm cannot fail. It wakes with"
-			+ " the first authored rune.")
+	print("    sample: %s, %d authored runes eligible against %d stat-stick templates" % [
+		member["spec"], elig.size(), Runes.TEMPLATES.size() - 1])
+	ok(shares[0] > 0.0 and shares[0] < 100.0,
+		"§1: the offer is %.1f%% one family — a tier cannot show in a pool with only one kind in it" % shares[0])
+	ok(seqs[0] == seqs[1] and seqs[1] == seqs[2],
+		"§1: the zone slot CHANGES the offer — three identically-seeded runs of %d draws gave different sequences" % OFFER_DRAWS)
 	# AND THE ZONE ARGUMENT IS INERT RATHER THAN ABSENT, which is the claim the
 	# signature makes. A parameter that had quietly started being read again
 	# would show as a spread above and as a non-empty body here.

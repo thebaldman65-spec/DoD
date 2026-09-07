@@ -389,28 +389,41 @@ func _s4_the_cut() -> void:
 	# repaired version of the same lesson.
 	#
 	# THE FLOOR IS THE DURABLE HALF AND IT IS THE HALF THE CUT WAS ABOUT: the
-	# cut left 16 and entries are only ever ADDED, so an entry VANISHING from
+	# cut left 17 and entries are only ever ADDED, so an entry VANISHING from
 	# the live file still fails here, which is what this check is for. The
 	# ceiling is not asserted because it is not a claim — it is the batch
 	# number. THE ARCHIVE KEEPS ITS EQUALITY, because that file only moves when
-	# a cut moves it, so 149 is a real invariant rather than a growing count.
-	ok(live_span >= 16,
-		"§4: the live file holds %d entries, FEWER than the 16 the cut left — an entry has been dropped" % live_span)
-	ok(arch_span == 149, "§4: the archive holds %d entries, not the 149 the cut made" % arch_span)
-	print("  live %d entries (floor 16, +1 a batch since the cut), archive %d" % [
+	# a cut moves it, so 185 is a real invariant rather than a growing count.
+	#
+	# **BATCH FG CUT AGAIN, AT EP/EQ, AND THIS IS THAT RE-POINT.** DV's figures
+	# were 16 and 149; FG moved 36 entries out, leaving 16 plus its own = 17
+	# live and taking the archive to 185. Both numbers move ONLY in the batch
+	# that moves them, which is why the archive's is an equality and the live
+	# file's is not.
+	ok(live_span >= 17,
+		"§4: the live file holds %d entries, FEWER than the 17 the cut left — an entry has been dropped" % live_span)
+	ok(arch_span == 185, "§4: the archive holds %d entries, not the 185 the cut made" % arch_span)
+	print("  live %d entries (floor 17, +1 a batch since the cut), archive %d" % [
 		live_span, arch_span])
 
 	# THE BOUNDARY IS A BATCH BOUNDARY AND IT IS THE ONE INTENDED.
-	ok(live.contains("<h2>2026-08-22 &mdash; Batch DG"),
-		"§4: the live file's oldest entry, Batch DG, is missing")
-	ok(not live.contains("<h2>2026-08-22 &mdash; Batch DF"),
-		"§4: Batch DF is still in the live file — the cut did not move it")
-	ok(arch.contains("<h2>2026-08-22 &mdash; Batch DF"),
-		"§4: Batch DF is not in the archive — an entry was DROPPED by the cut")
-	ok(not arch.contains("<h2>2026-08-22 &mdash; Batch DG"),
-		"§4: Batch DG is in BOTH halves — the cut duplicated an entry")
-	ok(live.contains("<h2>2026-08-29 &mdash; Batch DV"),
-		"§4: this batch's own entry is not in the live changelog")
+	# **RE-POINTED AT BATCH FG FROM DF/DG TO EP/EQ.** All four literals below
+	# named DV's boundary and all four were correct until FG cut again; the
+	# cut is not done until every reader whose entry moved is re-pointed IN THE
+	# SAME BATCH, and this gate is one of exactly two readers that needed it.
+	# **THE OTHER IS `check_ec` §2**, which verifies these very pins resolve —
+	# so a boundary literal has TWO readers and re-pointing one leaves the
+	# other red.
+	ok(live.contains("<h2>2026-09-02 &mdash; Batch EQ"),
+		"§4: the live file's oldest entry, Batch EQ, is missing")
+	ok(not live.contains("<h2>2026-09-02 &mdash; Batch EP"),
+		"§4: Batch EP is still in the live file — the cut did not move it")
+	ok(arch.contains("<h2>2026-09-02 &mdash; Batch EP"),
+		"§4: Batch EP is not in the archive — an entry was DROPPED by the cut")
+	ok(not arch.contains("<h2>2026-09-02 &mdash; Batch EQ"),
+		"§4: Batch EQ is in BOTH halves — the cut duplicated an entry")
+	ok(live.contains("<h2>2026-09-06 &mdash; Batch FG"),
+		"§4: the cutting batch's own entry is not in the live changelog")
 
 	# ZERO OVERLAP, ASSERTED OVER THE WHOLE OF BOTH HALVES rather than at the
 	# boundary alone. A duplicated entry anywhere fails here.
@@ -425,9 +438,17 @@ func _s4_the_cut() -> void:
 	# BOTH HALVES NAME THE OTHER, with the counterpart's full path.
 	ok(arch.contains("docs/changelog.html"),
 		"§4: the archive header no longer names the live file")
-	ok(live.contains("Batch DV</b> at DF/DG") or live.contains("Batch DV") ,
+	# **BATCH FG — THE `or` CAME OFF, AND IT IS THE REASON THIS ARM COULD NOT
+	# FAIL.** It read `contains("Batch DV</b> at DF/DG") or contains("Batch
+	# DV")`, and the header names every cut in its own history — so the second
+	# branch is satisfied by the RECORD of a cut rather than by this cut, and
+	# the arm would have passed with the first branch deleted. An alternation
+	# whose weaker member is always true is a check that has stopped asking its
+	# question, which is exactly what `check_ec` §1 exists to read: it counted
+	# this among nine live alternations and reported it SATISFIED.
+	ok(live.contains("Batch FG</b> at EP/EQ"),
 		"§4: the live header does not record which batch made this cut")
-	print("  live %d entries (DV..DG), archive %d entries (DF..Batch 1), 0 overlapping headings" % [
+	print("  live %d entries (FG..EQ), archive %d entries (EP..Batch 1), 0 overlapping headings" % [
 		live_span, arch_span])
 
 

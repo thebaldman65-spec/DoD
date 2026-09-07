@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1406,
+  "total": 1412,
   "source": 1081,
   "other": 85,
-  "document": 240
+  "document": 246
  },
  "source_residency": {
   "code": 647,
@@ -1341,7 +1341,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-08-22 &mdash; Batch DF",
+   "n": "<h2>2026-09-02 &mdash; Batch EP",
    "p": "-",
    "r": "absent",
    "k": "literal",
@@ -1352,7 +1352,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-08-22 &mdash; Batch DG",
+   "n": "<h2>2026-09-02 &mdash; Batch EQ",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -1363,7 +1363,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-08-29 &mdash; Batch DV",
+   "n": "<h2>2026-09-06 &mdash; Batch FG",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -1374,25 +1374,12 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "Batch DV",
+   "n": "Batch FG</b> at EP/EQ",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#216",
-   "alt": true
-  },
-  {
-   "s": "check_dv.gd",
-   "fn": "_s4_the_cut",
-   "h": "docs/changelog.html",
-   "n": "Batch DV</b> at DF/DG",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_dv.gd#216",
-   "alt": true
+   "g": "check_dv.gd#216"
   },
   {
    "s": "check_dv.gd",
@@ -1939,7 +1926,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_es.gd#57",
+   "g": "check_es.gd#58",
    "expr": "String"
   },
   {
@@ -1951,7 +1938,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_es.gd#96"
+   "g": "check_es.gd#101"
   },
   {
    "s": "check_eu.gd",
@@ -2512,6 +2499,85 @@
    "k": "literal",
    "how": "read",
    "g": "check_ff.gd#70"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s1_the_changelog",
+   "h": "docs/changelog.html",
+   "n": "<h2",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fg.gd#41"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s1_the_changelog",
+   "h": "docs/instrument-rules.md",
+   "n": "THE THRESHOLD IS 400 KB",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fg.gd#30"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s2_the_required_read",
+   "h": "CLAUDE.md",
+   "n": "THE CEILING IS 290 KiB",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fg.gd#62"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s3_the_rule_and_the_gate",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_fg.gd#108",
+   "expr": "RULE_BODY"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s3_the_rule_and_the_gate",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_fg.gd#107",
+   "expr": "RULE_BODY"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s3_the_rule_and_the_gate",
+   "h": "CLAUDE.md",
+   "n": "check_fg.gd",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fg.gd#110"
+  },
+  {
+   "s": "check_fg.gd",
+   "fn": "_s3_the_rule_and_the_gate",
+   "h": "docs/instrument-rules.md",
+   "n": "check_fg.gd",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fg.gd#109"
   },
   {
    "s": "test_batch_ah.gd",

@@ -856,7 +856,7 @@
   "term": "The Peddler (Trade)",
   "category": "run",
   "short": "A shop you can see coming, and plan to arrive at with gold.",
-  "long": "The Peddler used to turn up after a won fight, about two fights in five. Now they stand on the map as a TRADE node - five a zone, about two on a route - so a shop is something you route toward with gold in hand rather than something that happens to you. The stock is unchanged: potions, and one rune offered to each hero who has a free slot. The only merchant that still follows a fight is the one a severity-4 BARGAIN pays out, and that one was bought with a modifier.",
+  "long": "The Peddler used to turn up after a won fight, about two fights in five. Now they stand on the map as a TRADE node - five a zone, about two on a route - so a shop is something you route toward with gold in hand rather than something that happens to you. The stock is unchanged: potions, and one rune offered to every hero. The three slots cap what a hero WEARS rather than what they own: buy a fourth and it rides in the pouch until you free a slot for it. The only merchant that still follows a fight is the one a severity-4 BARGAIN pays out, and that one was bought with a modifier.",
   "see_also": [
    "node_types",
    "blacksmith",
