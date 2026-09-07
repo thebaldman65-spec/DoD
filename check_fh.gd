@@ -2099,23 +2099,35 @@ func _s10_the_observations() -> void:
 			callers.append("%s x%d" % [String(f).get_file(), n2])
 	print("    (4) `Run.grant_rune` returns a rune and does not FIT it — every")
 	print("        caller appends to `member[\"runes\"]` itself: %s" % [callers])
-	# (5) TWO GATES IN THE BATTERY DESTROY THE PLAYER'S RUN SAVE.
+	# (5) TWENTY-FOUR BATTERY TARGETS DESTROY THE PLAYER'S RUN SAVE.
 	# `gate_fixture.spawn` sets `run.sim_run = false` and `run.active = true`
 	# — it has to, because a `sim_run` battle is not the battle a player
 	# fights — and `battle._check_end` then reaches `Run.clear_save()` on a
-	# wipe and `Run.save_run()` on a victory. **MEASURED BY BISECTION, ONE
-	# GATE AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B SAVE:
-	# `check_da` and `check_cs` DELETE IT; check_ea, check_ec, check_ed,
-	# check_es, check_fg and check_parse leave it byte-identical.** Only
-	# `check_ct` protects it, and this gate now does. **IT IS NOT REPAIRED
-	# HERE** — the brief's rule is that a defect that is not a crash or a
-	# softlock is reported and ruled on — but it is why a battery must not be
-	# run over a run the designer cares about, and it is how this gate's own
-	# author lost one.
-	print("    (5) `check_da` and `check_cs` DELETE `user://run_save.bin`.")
-	print("        Measured by bisection against a fresh copy of a real save;")
-	print("        six other battle-spawning gates leave it byte-identical.")
-	print("        Only check_ct and this gate protect it. NOT repaired here.")
+	# wipe and `Run.save_run()` on a victory. **CENSUSED BEHAVIOURALLY RATHER
+	# THAN SAMPLED: every one of the 80 battery targets that reaches a spawn or
+	# sets `sim_run` was run ALONE against a fresh copy of a real 62,360 B run
+	# save, and the save checked after each. 24 DELETE IT, 56 leave it
+	# byte-identical, none overwrites it in place.**
+	#
+	# **ONLY THIS GATE PROTECTS IT END TO END, AND `check_ct` IS THE
+	# CAUTIONARY CASE**: its §2 backs the save up and puts it back, with an arm
+	# asserting exactly that which PASSES, and then its §3 spawns a battle that
+	# destroys it after the restore. A protection scoped to a section is not a
+	# protection, and its own passing arm is what makes that invisible.
+	#
+	# **AND THE FIRST MEASUREMENT OF THIS REPORTED TWO.** It bisected eight
+	# gates, drew mostly document gates, and the number reached five documents
+	# before the save went missing again after a seven-target re-run that the
+	# "two" did not include. **A SAMPLE IS NOT A POPULATION.**
+	#
+	# **IT IS NOT REPAIRED HERE** — the brief's rule is that a defect that is
+	# not a crash or a softlock is reported and ruled on — but it is why a
+	# battery must not be run over a run the designer cares about.
+	print("    (5) TWENTY-FOUR of the battery's 80 spawning targets DELETE")
+	print("        `user://run_save.bin`. Censused one at a time against a fresh")
+	print("        copy of a real save: 24 delete, 56 leave it byte-identical.")
+	print("        Only this gate protects it END TO END — check_ct restores it")
+	print("        in §2 and its own §3 destroys it again. NOT repaired here.")
 	# (6) A BOSS AWARDS NO RUNE — see §3.
 	print("    (6) no boss awards a rune. The live rune doors are the Peddler,")
 	print("        the elite cache, the bargain's `rune` reward and the event")

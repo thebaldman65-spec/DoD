@@ -51,11 +51,11 @@ than pass regardless: <code>check_dv</code> 83&nbsp;/&nbsp;4 and <code>test_batc
 
 <p><b>&sect;1a &mdash; WHAT TO DESELECT, MEASURED.</b> <b><code>DoD-archive/</code> &mdash; both
 files.</b> It is <b>14.4% of the knowledge sync</b>, larger than every <code>check_*.gd</code> in
-the tree put together; the sync reads <b>11.3106 MiB</b> with it and <b>9.7078 MiB</b> without
+the tree put together; the sync reads <b>11.3174 MiB</b> with it and <b>9.7146 MiB</b> without
 it, which is exactly where it stood before this batch. Nothing else needs to move: the 47 suites
 (1.9008 MiB), <code>pin-manifest.json</code>, <code>docs/build_docs.py</code> and the four ruled-on
 audits are already on the standing list, and applying the whole of it lands at <b>162 files /
-7.1336 MiB</b>. <b><code>docs/reports/</code> is now the second-largest block at 1.6558 MiB and
+7.1405 MiB</b>. <b><code>docs/reports/</code> is now the second-largest block at 1.6577 MiB and
 grows by one file every batch</b> &mdash; reported, not recommended, because
 <code>CLAUDE.md</code> lists it as MUST STAY SELECTED and moving it is a ruling.</p>
 
@@ -94,13 +94,20 @@ RENDERED strings against the run&rsquo;s own numbers</b> &mdash; gold, pouch slo
 hero sheet&rsquo;s rune line &mdash; and buys something to prove the shop REFRESHES rather than
 drawing a correct first frame.</p>
 
-<p><b>&sect;3 &mdash; SIX THINGS FOUND AND DELIBERATELY NOT FIXED.</b> <b>(1) Two gates in the
-battery DELETE the player&rsquo;s run save.</b> <code>gate_fixture.spawn</code> sets
+<p><b>&sect;3 &mdash; SIX THINGS FOUND AND DELIBERATELY NOT FIXED.</b> <b>(1) TWENTY-FOUR battery targets DELETE
+the player&rsquo;s run save.</b> <code>gate_fixture.spawn</code> sets
 <code>sim_run = false</code>, so <code>battle._check_end</code> reaches
-<code>Run.clear_save()</code> on a wipe; measured by bisection against a fresh copy of a real
-62,360 B save, <b><code>check_da</code> and <code>check_cs</code> destroy it</b> and six other
-battle-spawning gates leave it byte-identical. Only <code>check_ct</code> and
-<code>check_fh</code> protect it. <b>(2) The defensive brace&rsquo;s player branch is unreachable
+<code>Run.clear_save()</code> on a wipe. <b>Censused behaviourally rather than sampled: every one
+of the 80 targets that reaches a spawn or sets <code>sim_run</code> was run ALONE against a fresh
+copy of a real 62,360 B save &mdash; 24 delete it, 56 leave it byte-identical, none overwrites it
+in place.</b> They are <code>test_batch_an</code>, <code>check_flow</code>, <code>check_cm_live</code>, <code>check_co</code>, <code>check_cs</code>, <code>check_ct</code>, <code>check_cy</code>, <code>check_cz</code>, <code>check_da</code>, <code>check_di</code>, <code>check_dj</code>, <code>check_dk</code>, <code>check_dl</code>, <code>check_dm</code>, <code>check_dr</code>, <code>check_ds</code>, <code>check_du</code>, <code>check_dv</code>, <code>check_et</code>, <code>check_eu</code>, <code>check_ev</code>, <code>check_ew</code>, <code>check_ez</code> and <code>check_fd</code>. <b>Only <code>check_fh</code> protects it end to end, and
+<code>check_ct</code> is the cautionary case</b>: its &sect;2 backs the save up and puts it back,
+with an arm asserting exactly that which PASSES, and then its &sect;3 spawns a battle that
+destroys it after the restore. <b>A protection scoped to a section is not a protection, and its
+own passing arm is what makes that invisible.</b> <b>And the first measurement of this got the
+number WRONG</b> &mdash; it bisected eight gates, drew mostly document gates, and reported TWO;
+it was corrected only because the save went missing again after seven targets the &ldquo;two&rdquo;
+did not include. <b>A sample is not a population.</b> <b>(2) The defensive brace&rsquo;s player branch is unreachable
 under <code>--headless</code> by construction</b> &mdash; <code>_nobody_can_press()</code> is
 <code>sim or autoplay or headless</code> &mdash; and <b><code>check_cm_live</code>&rsquo;s four
 standing failures are that one fact, not four defects.</b> <b>(3)</b>
@@ -141,7 +148,7 @@ SAVE IN THE WILD, exactly as &sect;3 predicts</b> &mdash; <code>check_fh</code> 
 <code>check_da</code> and <code>check_cs</code> and its own first line read <i>none &mdash; nothing
 to protect</i>. Backed up before, restored after, byte-identical.</p>
 
-<p><b>&sect;4b &mdash; BATTERY 2 IS THE ACCEPTANCE RUN AND IT IS CLEAN.</b> After the one repair
+<p><b>&sect;4b &mdash; BATTERIES 2 AND 3 ARE BOTH CLEAN, AND 3 IS THE ACCEPTANCE RUN.</b> After the one repair
 &mdash; <code>check_ek.gd</code>&rsquo;s authored list, one name added with its reason &mdash; and
 a fresh md5 freeze: <b>98 targets</b>, <code>check_de</code> <b>402 checks / 0 failures / 0
 NOTICES</b>, so every count in the tree matches its baseline exactly. <b><code>check_fh</code>
@@ -152,7 +159,11 @@ NOTICES</b>, so every count in the tree matches its baseline exactly. <b><code>c
 <code>Parse Error</code> and zero <code>SCRIPT ERROR</code> across all 98 logs</b>, grepped from
 stderr rather than from a tally or an exit code, and <b>the tree was md5-frozen across both runs
 &mdash; 301 files byte-identical before and after each, with no file appearing or vanishing.</b>
-<b>No red was repaired while a battery ran.</b></p>
+<b>No red was repaired while a battery ran.</b> <b>Battery 3 reads identically</b> and exists
+because the save census corrected a claim standing in five documents and one gate&rsquo;s
+<code>print</code> lines after battery 2 &mdash; a documentation correction that reaches a gate is
+still a tree change. The edit to <code>check_fh.gd</code> was proved comments-and-prints only by a
+comment-stripped diff against HEAD.</p>
 
 <h2>2026-09-06 &mdash; Batch FG: THE CHANGELOG CUT, AND SOMETHING WATCHES THE THRESHOLD NOW</h2>
 

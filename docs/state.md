@@ -32,11 +32,11 @@ in `docs/master.html`.
   the pointer was armed at a directory that does not exist to prove they follow it: `check_dv`
   **83 / 4** and `test_batch_bb` **177 → 173 with 2 failures and a throw**.
 - **§1a — WHAT TO DESELECT: `DoD-archive/`, BOTH FILES, AND NOTHING ELSE NEEDS TO MOVE.** It is
-  **14.2% of the sync** — larger than every `check_*.gd` put together. The sync reads **11.3106
-  MiB** with it and **9.7078 MiB** without it, which is exactly where it stood before this batch.
+  **14.2% of the sync** — larger than every `check_*.gd` put together. The sync reads **11.3174
+  MiB** with it and **9.7146 MiB** without it, which is exactly where it stood before this batch.
   Applying the whole standing list (the 47 suites, `pin-manifest.json`, `docs/build_docs.py`, the
-  four ruled-on audits, the archive) lands at **164 files / 7.1336 MiB**. **`docs/reports/` is the
-  second-largest block at 1.6558 MiB and grows by one file every batch** — reported, not
+  four ruled-on audits, the archive) lands at **164 files / 7.1405 MiB**. **`docs/reports/` is the
+  second-largest block at 1.6577 MiB and grows by one file every batch** — reported, not
   recommended: `CLAUDE.md` lists it as MUST STAY SELECTED and moving it is a ruling.
 - **§2 — `check_fh.gd` IS NEW (161 CHECKS) AND IT IS THE FIRST THING IN THIS PROJECT THAT PLAYS
   THE GAME.** The reason it can exist is one line: `map_screen._on_node_pressed` opens with
@@ -73,8 +73,8 @@ in `docs/master.html`.
   the one defect class every other instrument is blind to by construction, because every gate reads
   `Run` and so does the label.
 - **§3 — SIX THINGS FOUND AND DELIBERATELY NOT FIXED.** They are in the known-broken block below.
-  The largest is that **`check_da` and `check_cs` DELETE the player's run save**, measured by
-  bisection against a fresh copy of a real 62,360 B save.
+  The largest is that **TWENTY-FOUR of the battery's 80 spawning targets DELETE the player's run
+  save**, censused one at a time against a fresh copy of a real 62,360 B save.
 - **§4 — THE VERIFICATION RUN.** Documentation written BEFORE it. HEAD's unmodified gates run
   against the moved tree before any of them was edited, **and again once the new gate was in the
   tree** — which is the pass that found `check_da` **41 → 43 / 4**: a new gate reading both draft
@@ -95,7 +95,7 @@ in `docs/master.html`.
   and §4 reads `TAG_ORDER` for a rune condition. **LISTED, NOT EXEMPTED**, which is what EZ, FD
   and FE each did before it. **THE PRE-PASS SHOULD HAVE CAUGHT IT AND DID NOT, BECAUSE IT RAN A
   CHOSEN SUBSET OF THE GATES RATHER THAN ALL OF THEM** — that is the transferable half.
-- **§4c — BATTERY 2 IS THE ACCEPTANCE RUN AND IT IS CLEAN.** After the one repair —
+- **§4c — BATTERIES 2 AND 3 ARE BOTH CLEAN, AND 3 IS THE ACCEPTANCE RUN.** After the one repair —
   `check_ek.gd`'s authored list, one name added with its reason — and a fresh md5 freeze:
   **98 targets**, `check_de` **402 checks / 0 failures / 0 NOTICES** (every count in the tree
   matches its baseline exactly), **`check_fh` 161 / 0**, **`check_parse` 172 / 0** and
@@ -104,9 +104,14 @@ in `docs/master.html`.
   BASELINE AND THE ONE RED THAT IS ON PURPOSE.** **Zero `Parse Error` and zero `SCRIPT ERROR`
   across all 98 logs** — grepped from stderr, never a tally and never the exit code. **The tree
   was md5-frozen across the run: 301 files byte-identical before and after, with no file appearing
-  or vanishing**, stamped with absolute paths. **No red was repaired while a battery ran.**
+  or vanishing**, stamped with absolute paths. **No red was repaired while a battery ran.** **BATTERY 3 IS THE ACCEPTANCE RUN AND READS
+  IDENTICALLY** — 98 targets, `check_de` **402 / 0 / 0**, `check_fh` **161 / 0**, `check_parse`
+  **172 / 0**, `check_ek` **46 / 0**, the only red `check_cm_live` **13 / 4**, zero `Parse Error`
+  and zero `SCRIPT ERROR` across all 98 logs, **301 files byte-identical** across it. It exists
+  because the save census corrected a claim in five documents and one gate's prints after battery
+  2, and a documentation correction that reaches a gate is still a tree change.
 - **§4b — AND THE BATTERY DESTROYED THE PLAYER'S RUN SAVE, IN THE WILD, EXACTLY AS PREDICTED.**
-  `check_fh` runs after `check_da` and `check_cs` in the GATES order, and its own first line read
+  `check_fh` runs after twenty-three of the twenty-four in the GATES order, and its own first line read
   `none — nothing to protect` **on BOTH battery runs**. The save was backed up before each battery
   and restored after it, byte-identical. **This is no longer an inference from a bisection; it is a measurement of a
   whole battery run.**
@@ -1978,14 +1983,14 @@ the number.*
   is the heaviest file in it**:
   **`DoD-archive/changelog-archive.html` 1608.35**, `scripts/battle.gd` **1285.86**,
   `docs/design-notes.md` **516.41**, `docs/master.html` **377.93**, `scripts/classes.gd`
-  **347.39**, **`pin-manifest.json` 318.79**, `CLAUDE.md` **264.88**, `docs/state.md` **189.66**,
+  **347.39**, **`pin-manifest.json` 318.79**, `CLAUDE.md` **264.88**, `docs/state.md` **191.28**,
   `scripts/unit.gd` **187.41**, `scripts/talents.gd` **180.06**, `docs/talent-audit.html`
   **165.03**, `baselines.json` **161.58**, **`docs/changelog.html` 153.52**,
   `scripts/run_state.gd` **151.97**, `scripts/map_screen.gd` **107.22**,
   **`docs/instrument-rules.md` 104.70**, `check_fh.gd` **90.58**.
   (`docs/state.md`'s own figure is the one this edit moves; run the census rather than trusting
   it.) **THE ARCHIVE ENTERING THE TREE MOVES NO OTHER ROW AND IT IS DESELECTED FROM THE SYNC**, so
-  the number that matters — what the connector ingests — is unchanged at **9.7078 MiB** while the
+  the number that matters — what the connector ingests — is unchanged at **9.7146 MiB** while the
   tracked tree grows by 1.6 MiB. **THE THRESHOLD ESTIMATE IS NOT IN THIS BLOCK AND THAT IS
   DELIBERATE**: it read seventeen → thirteen → eight → seven batches away as it was re-measured,
   **each re-measurement shortening it — the direction a carried-forward number never moves on its
@@ -2020,12 +2025,12 @@ the number.*
     which is the third way the same measurement can move without anything about density changing.
 - **THE DESELECTION LIST FOR THE FILE PICKER. THE ONE FH ADDS IS `DoD-archive/`, BOTH FILES.**
   It is **1,680,660 B = 14.2% of the sync** — larger than every `check_*.gd` in the tree put
-  together — and the sync reads **11.3106 MiB** with it and **9.7078 MiB** without it, which is
+  together — and the sync reads **11.3174 MiB** with it and **9.7146 MiB** without it, which is
   exactly where it stood before FH. **Deselect `pin-manifest.json`** too — it stays in the repo and
-  `check_ed` goes on reading it off disk. **Applying the whole list lands at 164 files / 7.1336
-  MiB**, from 219 files / 11.3106 MiB. Already standing and unchanged: the 47 suite files,
+  `check_ed` goes on reading it off disk. **Applying the whole list lands at 164 files / 7.1405
+  MiB**, from 219 files / 11.3174 MiB. Already standing and unchanged: the 47 suite files,
   `docs/build_docs.py`, the archived changelog, and any audit document whose findings have been
-  ruled on and applied. **`docs/reports/` is the second-largest block at 64 files / 1.6558 MiB and
+  ruled on and applied. **`docs/reports/` is the second-largest block at 64 files / 1.6577 MiB and
   grows by one every batch** — NOT recommended, because `CLAUDE.md` lists it as MUST STAY SELECTED
   and moving it is a ruling. **`claude_md_census.py` IS A
   CANDIDATE TOO** by the same argument that deselects `build_pin_manifest.py` — it is a tool Claude
@@ -2102,20 +2107,31 @@ reach `bp` §7 at all: it is a Warrior flow.**
   "defensive")` grades, says INCOMING and carries no Cancel) while asserting `_nobody_can_press()`
   is TRUE, so the day that stops being true the gate says so and these four are re-derived.
 
-### `check_da` AND `check_cs` DELETE THE PLAYER'S RUN SAVE (FOUND AT FH, NOT REPAIRED)
+### TWENTY-FOUR BATTERY TARGETS DELETE THE PLAYER'S RUN SAVE (FOUND AT FH, NOT REPAIRED)
 
 **`gate_fixture.spawn` sets `run.sim_run = false` and `run.active = true`** — it has to, because a
 `sim_run` battle is not the battle a player fights — **and `battle._check_end` then reaches
-`Run.clear_save()` on a wipe and `Run.save_run()` on a victory.** **MEASURED BY BISECTION, ONE
-GATE AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B RUN SAVE: `check_da` and `check_cs`
-DELETE IT; `check_ea`, `check_ec`, `check_ed`, `check_es`, `check_fg` and `check_parse` leave it
-byte-identical.** Only `check_ct` and `check_fh` protect it.
+`Run.clear_save()` on a wipe and `Run.save_run()` on a victory.**
+
+**CENSUSED BEHAVIOURALLY RATHER THAN SAMPLED. Every one of the 80 battery targets that reaches a
+spawn or sets `sim_run` was run ALONE against a fresh copy of a real 62,360 B run save, and the
+save checked after each: 24 DELETE IT, 56 leave it byte-identical, none overwrites it in place.**
+The 24 are `test_batch_an`, `check_flow`, `check_cm_live`, `check_co`, `check_cs`, `check_ct`, `check_cy`, `check_cz`, `check_da`, `check_di`, `check_dj`, `check_dk`, `check_dl`, `check_dm`, `check_dr`, `check_ds`, `check_du`, `check_dv`, `check_et`, `check_eu`, `check_ev`, `check_ew`, `check_ez` and `check_fd`.
+- **ONLY `check_fh` PROTECTS IT END TO END, AND `check_ct` IS THE CAUTIONARY CASE.** `check_ct` §2
+  backs the save up and puts it back — with an arm asserting exactly that, which PASSES — and then
+  its §3 spawns a battle that destroys it after the restore. **A PROTECTION SCOPED TO A SECTION IS
+  NOT A PROTECTION, AND ITS OWN PASSING ARM IS WHAT MAKES THAT INVISIBLE.**
 - **`Run.SAVE_PATH` IS A `const`**, so it cannot be redirected the way every suite redirects
   `Profile.save_path`. The protection is a BACKUP, not a redirect.
 - **THE SYMPTOM IS SILENCE**, which is why it survived: the next run of anything simply reports
   there was no save to protect, and that is a clean-looking line for a file that is gone.
+- **AND A SAMPLE IS NOT A POPULATION — THIS BATCH GOT THE NUMBER WRONG FIRST.** The first
+  measurement bisected EIGHT gates, drew mostly document gates, and reported the population as
+  TWO. It was only corrected because the save went missing again after a re-run of seven targets
+  the "two" did not include. **Derive the candidate population from the source, then measure every
+  member of it.**
 - **DO NOT RUN THE BATTERY OVER A RUN THE DESIGNER CARES ABOUT** until this is ruled on. FH backed
-  the save up before its own battery and restored it after, byte-identical.
+  the save up before every battery and restored it after, byte-identical.
 
 ### FIVE MORE THINGS FH FOUND AND DID NOT FIX
 

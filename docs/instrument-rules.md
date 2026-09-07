@@ -1266,14 +1266,26 @@ a census is taken.
 
 
 ## STANDING RULE — A GATE THAT DRIVES A LIVE RUN OWNS THE PLAYER'S SAVE (Batch FH §2)
-> **A GATE THAT SETS `Run.sim_run = false` IS WRITING `user://run_save.bin`, AND TWO OF THEM
-> DELETE IT TODAY.** `gate_fixture.spawn` sets `sim_run = false` and `active = true` — it has to,
-> because a `sim_run` battle is not the battle a player fights — and `battle._check_end` then
-> reaches `Run.clear_save()` on a wipe and `Run.save_run()` on a victory. **MEASURED BY
-> BISECTION, ONE GATE AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B RUN SAVE: `check_da`
-> and `check_cs` DELETE IT; `check_ea`, `check_ec`, `check_ed`, `check_es`, `check_fg` and
-> `check_parse` leave it byte-identical.** Only `check_ct` and `check_fh` protect it.
+> **A TARGET THAT SETS `Run.sim_run = false` IS WRITING `user://run_save.bin`, AND TWENTY-FOUR
+> OF THEM DELETE IT.** `gate_fixture.spawn` sets `sim_run = false` and `active = true` — it has
+> to, because a `sim_run` battle is not the battle a player fights — and `battle._check_end` then
+> reaches `Run.clear_save()` on a wipe and `Run.save_run()` on a victory.
+>
+> **CENSUSED BEHAVIOURALLY, NOT SAMPLED: every one of the 80 battery targets that reaches a spawn
+> or sets `sim_run` was run ALONE against a fresh copy of a real 62,360 B run save, and the save
+> checked after each. 24 DELETE IT, 56 leave it byte-identical, none overwrites it in place:**
+> `test_batch_an`, `check_flow`, `check_cm_live`, `check_co`, `check_cs`, `check_ct`, `check_cy`, `check_cz`, `check_da`, `check_di`, `check_dj`, `check_dk`, `check_dl`, `check_dm`, `check_dr`, `check_ds`, `check_du`, `check_dv`, `check_et`, `check_eu`, `check_ev`, `check_ew`, `check_ez` and `check_fd`.
+>
+> **ONLY `check_fh` PROTECTS IT END TO END, AND `check_ct` IS THE CAUTIONARY CASE.** `check_ct`
+> §2 backs the save up and puts it back — with an arm asserting exactly that, which PASSES — and
+> then its §3 spawns a battle that destroys it after the restore. **A PROTECTION SCOPED TO A
+> SECTION IS NOT A PROTECTION, AND ITS OWN PASSING ARM IS WHAT MAKES THAT INVISIBLE.**
 
+- **AND A SAMPLE IS NOT A POPULATION. THIS BATCH GOT IT WRONG ONCE AND SHIPPED THE WRONG
+  NUMBER.** The first measurement bisected EIGHT gates, happened to draw mostly document gates,
+  and reported the population as TWO. The number is 24, and it was only found because the save
+  went missing a second time after a re-run of seven targets that the "two" did not include.
+  **Derive the candidate population from the source, then measure every member of it.**
 - **`Run.SAVE_PATH` IS A `const`, SO IT CANNOT BE REDIRECTED THE WAY `Profile.save_path` CAN.**
   Every suite points `Profile.save_path` at a scratch file and none of them can do the same for
   the run save. The protection is therefore a BACKUP, not a redirect.

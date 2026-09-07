@@ -77,19 +77,19 @@ the pointer was armed at a directory that does not exist:
 | block | files | B | MiB | share |
 |---|---|---|---|---|
 | **`DoD-archive/` (new at FH)** | **2** | **1,680,660** | **1.6028** | **14.2%** |
-| `docs/reports/` | 64 | 1,736,240 | 1.6558 | 14.6% |
+| `docs/reports/` | 64 | 1,738,244 | 1.6577 | 14.6% |
 | `test_*.gd` suites | 47 | 1,993,161 | 1.9008 | 16.8% |
-| `check_*.gd` + fixtures | 55 | 1,050,745 | 1.0021 | 8.9% |
+| `check_*.gd` + fixtures | 55 | 1,051,466 | 1.0028 | 8.9% |
 | `pin-manifest.json` | 1 | 326,436 | 0.3113 | 2.8% |
 | audits (`docs/*-audit.html`) | 4 | 377,803 | 0.3603 | 3.2% |
 
 **The archive alone is larger than every `check_*.gd` in the tree put together.** The sync reads
-**11.3106 MiB** with it and **9.7078 MiB** without it — *exactly where it stood before this batch*.
+**11.3174 MiB** with it and **9.7146 MiB** without it — *exactly where it stood before this batch*.
 
-The ladder, applying the standing list in order: everything **219 files / 11.3106 MiB** → less the
-archive **217 / 9.7078** → less the suites **170 / 7.8069** → less `pin-manifest.json` **169 /
-7.4956** → less `docs/build_docs.py` **168 / 7.4939** → less the four ruled-on audits **164 /
-7.1336 MiB**.
+The ladder, applying the standing list in order: everything **219 files / 11.3174 MiB** → less the
+archive **217 / 9.7146** → less the suites **170 / 7.8138** → less `pin-manifest.json` **169 /
+7.5025** → less `docs/build_docs.py` **168 / 7.5008** → less the four ruled-on audits **164 /
+7.1405 MiB**.
 
 **`docs/reports/` IS NOW THE SECOND-LARGEST BLOCK AND GROWS BY ONE FILE EVERY BATCH.** Reported,
 **not recommended**: `CLAUDE.md` lists it as MUST STAY SELECTED and moving it is a ruling.
@@ -222,20 +222,38 @@ screen.**
 **None is a crash and none is a softlock**, so under the brief's rule they are listed and the
 designer rules on what matters.
 
-**(1) `check_da` AND `check_cs` DELETE THE PLAYER'S RUN SAVE. This is the largest of the six.**
+**(1) TWENTY-FOUR BATTERY TARGETS DELETE THE PLAYER'S RUN SAVE. This is the largest of the six.**
 `gate_fixture.spawn` sets `run.sim_run = false` and `run.active = true` — it has to, because a
 `sim_run` battle is not the battle a player fights — and `battle._check_end` then reaches
-`Run.clear_save()` on a wipe and `Run.save_run()` on a victory. **MEASURED BY BISECTION, ONE GATE
-AT A TIME AGAINST A FRESH COPY OF A REAL 62,360 B RUN SAVE:**
+`Run.clear_save()` on a wipe and `Run.save_run()` on a victory.
 
-| gate | the save after |
+**CENSUSED BEHAVIOURALLY, NOT SAMPLED.** Every one of the 80 battery targets that reaches a spawn
+or sets `sim_run` was run **alone**, against a fresh copy of a real 62,360 B run save, with the
+save checked after each:
+
+| | |
 |---|---|
-| `check_da` | **GONE** |
-| `check_cs` | **GONE** |
-| `check_ea`, `check_ec`, `check_ed`, `check_es`, `check_fg`, `check_parse` | byte-identical |
+| **DELETE it** | **24** — `test_batch_an`, `check_flow`, `check_cm_live`, `check_co`, `check_cs`, `check_ct`, `check_cy`, `check_cz`, `check_da`, `check_di`, `check_dj`, `check_dk`, `check_dl`, `check_dm`, `check_dr`, `check_ds`, `check_du`, `check_dv`, `check_et`, `check_eu`, `check_ev`, `check_ew`, `check_ez`, `check_fd` |
+| leave it byte-identical | 56 |
+| overwrite it in place | 0 |
+| structurally cannot touch it (no spawn, no `sim_run`) | 15 more targets, not run |
 
-Only `check_ct` and now `check_fh` protect it. **THE SYMPTOM IS SILENCE**, which is why it
-survived: the next run of anything simply reports there was no save to protect.
+**ONLY `check_fh` PROTECTS IT END TO END, AND `check_ct` IS THE CAUTIONARY CASE.** `check_ct` §2
+backs the save up and puts it back, with an arm — *"the gate leaves the player's save exactly as
+it found it"* — asserting exactly that, and **that arm passes**. Its §3 then spawns a battle which
+destroys the save after the restore. **A protection scoped to a section is not a protection, and
+its own passing arm is what makes that invisible.**
+
+**AND THIS BATCH GOT THE NUMBER WRONG THE FIRST TIME, WHICH IS THE TRANSFERABLE HALF.** The first
+measurement bisected **eight** gates — `check_da`, `check_cs`, `check_ea`, `check_ec`, `check_ed`,
+`check_es`, `check_fg`, `check_parse` — happened to draw mostly document gates, and reported the
+population as **two**. That number reached five documents and a commit. It was corrected only
+because the save went missing **again** after a seven-target re-run that the "two" did not
+include. **A SAMPLE IS NOT A POPULATION: derive the candidates from the source, then measure every
+member.**
+
+**THE SYMPTOM IS SILENCE**, which is why it survived: the next run of anything simply reports there
+was no save to protect.
 
 **(2) The defensive brace's player branch is unreachable headless** — §2d.
 
@@ -337,7 +355,7 @@ goes wrong on the next caller, and it read an empty pouch in this gate's own fir
   `none — nothing to protect`. The save was backed up before the battery and restored after,
   byte-identical. **That finding is no longer an inference from a bisection; it is a measurement
   of a whole battery run.**
-- **BATTERY 2 — THE ACCEPTANCE RUN, AND IT IS CLEAN.** After the one repair —
+- **BATTERY 2 — CLEAN. After the one repair —
   `check_ek.gd`'s authored `TAG_CHECKERS`, one name added with its reason — and a fresh md5
   freeze: **98 targets**, `check_de` **402 checks / 0 failures / 0 NOTICES**, so every count in
   the tree matches its baseline exactly. **`check_fh` 161 / 0** and **`check_parse` 172 / 0**,
@@ -346,8 +364,15 @@ goes wrong on the next caller, and it read an empty pouch in this gate's own fir
   `check_ec` 23 / 0, `check_ed` 18 / 0, `check_da` 41 / 0, `check_ea` 86 / 0, `check_ff` 55 / 0,
   `check_fg` 22 / 0. **THE ONLY RED IS `check_cm_live` AT 13 / 4** — its recorded baseline and the
   one red that is on purpose.
-- **Floor: `grep` stderr for `Parse Error` across all 98 logs — ZERO, and zero `SCRIPT ERROR`.**
-- **THE TREE WAS md5-FROZEN ACROSS BOTH RUNS: 301 files byte-identical before and after each**,
+- **BATTERY 3 — THE ACCEPTANCE RUN, AND IT READS IDENTICALLY.** It exists because the save census
+  (§3) corrected a claim standing in five documents and one gate's `print` lines *after* battery 2,
+  and a documentation correction that reaches a gate is still a tree change. **98 targets,
+  `check_de` 402 / 0 / 0, `check_fh` 161 / 0, `check_parse` 172 / 0, `check_ek` 46 / 0, the only
+  red `check_cm_live` 13 / 4.** The edit to `check_fh.gd` was proved comments-and-prints only by a
+  **comment-stripped diff against HEAD**, which showed the five `print` lines and no live code.
+- **Floor: `grep` stderr for `Parse Error` across all 98 logs of BOTH runs — ZERO, and zero
+  `SCRIPT ERROR`.**
+- **THE TREE WAS md5-FROZEN ACROSS ALL THREE RUNS: 301 files byte-identical before and after each**,
   the archive included, stamped with absolute paths so a moved working directory could not read as
   drift, and **no file appeared or vanished**. **No red was repaired while a battery ran.**
 - **THE PLAYER'S RUN SAVE WAS BACKED UP BEFORE THE BATTERY AND RESTORED AFTER IT**, byte-identical,
