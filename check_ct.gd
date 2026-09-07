@@ -156,15 +156,17 @@ func _initialize() -> void:
 	# being wiped — and a claim about a migration is worth exactly as much as the
 	# round trip that proves it. This writes a real v10 save and loads it.
 	#
-	# **IT BACKS UP ANY REAL SAVE FIRST AND PUTS IT BACK.** SAVE_PATH is the
-	# player's actual `user://run_save.bin`; a gate that eats an in-progress run
-	# to prove a point about migrations is a worse bug than the one it is
-	# testing. There is no save on this machine today — there will be one day.
-	var save_path: String = run.SAVE_PATH
-	var backup: PackedByteArray = PackedByteArray()
-	var had_save := FileAccess.file_exists(save_path)
-	if had_save:
-		backup = FileAccess.get_file_as_bytes(save_path)
+	# **BATCH FI — THIS GATE NO LONGER BACKS THE PLAYER'S SAVE UP, BECAUSE IT NO
+	# LONGER GOES NEAR IT.** It used to, and it is the case that proved discipline
+	# cannot solve this: the backup and restore lived in THIS section, the arm
+	# below asserted the save came back untouched and PASSED, and then the battle
+	# spawned further down destroyed it after the restore. A protection scoped to
+	# a section is not a protection, and its own passing arm is what made that
+	# invisible. `Run.save_path` is redirected for the whole process now, so both
+	# halves of this gate write the harness path and neither can reach the player.
+	var player_path: String = run.SAVE_PATH
+	var had_save := FileAccess.file_exists(player_path)
+	var save_path: String = run.save_path
 	run.sim_run = false
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	run.save_run()
@@ -203,15 +205,16 @@ func _initialize() -> void:
 	ok(run.slots_used() > 0, "...with its pouch intact")
 	ok(run.pending_item_offers.is_empty(),
 		"...and no offers, which is right: a v10 build could not create one")
-	# Put the machine back exactly as it was found.
-	if had_save:
-		var rw := FileAccess.open(save_path, FileAccess.WRITE)
-		rw.store_buffer(backup)
-		rw = null
-	else:
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
-	ok(FileAccess.file_exists(save_path) == had_save,
+	# **THE ARM STAYS AND ITS SUBJECT CHANGES.** It used to assert that a restore
+	# this section performed had worked, which is a claim about six lines of this
+	# file; it now asserts that the player's file was never opened at all, which
+	# is a claim about the whole gate — including the §3 battle below that used to
+	# eat it. Unguarded on purpose: it reads the same on a machine with a run in
+	# progress and on one without.
+	ok(FileAccess.file_exists(player_path) == had_save,
 		"the gate leaves the player's save exactly as it found it")
+	ok(save_path != player_path,
+		"...and never resolved the player's path in the first place")
 
 	# ---------- the battle half: each new item, on live units ----------
 	# A HELD, EMPTY SLOT goes in deliberately: "the pouch renders full and

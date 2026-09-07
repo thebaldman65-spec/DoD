@@ -60,11 +60,11 @@ into this file changes it.
   through prose. **`check_ec` §2's own two needles are pinned against `docs/instrument-rules.md`
   for exactly that reason**, and every document instrument scopes a pin to the file it names.
 
-**WHAT IS OVER THERE** — thirty-four blocks and one four-bullet run, in thirty-three entries, in
+**WHAT IS OVER THERE** — thirty-five blocks and one four-bullet run, in thirty-four entries, in
 the order they stood here; the two `###` children of the equality rule travel with their parent.
 **The last eight rows are FF §2's**, and they are the residue: rules written into this file AFTER
-the seam was taken, which the seam's own test puts on the other side of it. **The last three rows are
-FG's and FH's**, written straight into the reference rather than moved there:
+the seam was taken, which the seam's own test puts on the other side of it. **The last four rows are
+FG's, FH's and FI's**, written straight into the reference rather than moved there:
 
 | | |
 |---|---|
@@ -103,6 +103,7 @@ FG's and FH's**, written straight into the reference rather than moved there:
 | A CEILING NOBODY MEASURES IS A CEILING THAT GETS CROSSED SILENTLY | FG §2 |
 | A GATE THAT DRIVES A LIVE RUN OWNS THE PLAYER'S SAVE | FH §2 |
 | THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` | FH §2 |
+| AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is

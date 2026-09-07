@@ -33,7 +33,6 @@ extends SceneTree
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
 
-const REAL_SAVE := "user://run_save.bin"
 
 # §2's design numbers, in one place.
 # BATCH BI §1 RE-POINTED THE TWO MAGNITUDES AND EVERY CHECK BELOW THAT READS
@@ -80,8 +79,6 @@ var fails: Array = []
 # live function bumps this on its LAST line, and the count is asserted.
 var _live_ran := 0
 const LIVE_CHECKS := 6
-var _save_backup: PackedByteArray = PackedByteArray()
-var _had_save := false
 var _report: Array = []
 
 
@@ -99,9 +96,6 @@ func ok(cond: bool, msg: String) -> void:
 
 func _run() -> void:
 	await process_frame
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = "user://profile_batch_bg_test.json"
 	Profile.loaded = false
 	Profile.data = {}
@@ -127,10 +121,6 @@ func _run() -> void:
 	Profile.save_path = "user://profile.json"
 	Profile.loaded = false
 	Profile.data = {}
-	if _had_save:
-		FileAccess.open(REAL_SAVE, FileAccess.WRITE).store_buffer(_save_backup)
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 
 	for line in _report:
 		print("  REPORT: %s" % line)

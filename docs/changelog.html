@@ -15,6 +15,114 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-07 &mdash; Batch FI: NO TEST WRITES THE PLAYER&rsquo;S SAVE</h2>
+
+<p><i><b>The ruling is taken and it is taken structurally.</b> A harness process cannot reach
+<code>user://run_save.bin</code> any more &mdash; not because every target remembers to swap a
+path, but because there is no way to obtain a <code>Run</code> that has not already decided which
+file it writes. <b>No rune, card, ability, talent, constant or magnitude moved, no new rune was
+authored, and no file under <code>scenes/</code> was touched.</b></i></p>
+
+<p><b>&sect;0 &mdash; THE BRIEF&rsquo;S PREMISES, CHECKED FIRST. TWO NEEDED CORRECTING.</b>
+<b>&ldquo;<code>Profile.save_path</code> is already swapped by 37 of 39 suites&rdquo; is 39 of
+39</b> &mdash; every suite that has a <code>_run()</code> body swaps it, and one more file does
+too (<code>test_run_harness.gd</code>), so the population is 40 files and the &ldquo;2 that do
+not&rdquo; do not exist; <code>docs/state.md</code> said 38 and was one low. <b>And the 24 is
+right for what it measured and wrong for what it was used for</b> &mdash; see &sect;1. The rest of
+the brief held: <code>check_ct</code> really does restore the save in &sect;2 with a passing arm
+and destroy it in &sect;3, the guidance really has been &ldquo;back it up first&rdquo; since BN
+(<code>docs/instrument-rules.md</code>), and a wrapper really would be bypassed by running one
+gate alone.</p>
+
+<p><b>&sect;1 &mdash; THE POPULATION RE-DERIVED BY OBSERVATION: 67 OF 98, NOT 24 OF 80.</b> Every
+battery target &mdash; all 98, with no candidate predicate in front of them &mdash; was run
+<b>alone</b> against a fresh copy of the designer&rsquo;s real 62,360 B run save, with
+<code>Run</code>&rsquo;s four save functions instrumented to print, so the CALLS were counted
+rather than the residue. <b>67 targets destroy the player&rsquo;s save at least once; 43 of them
+put it back before exiting, so an end-state census sees 24 and the other 42 read as harmless.</b>
+The two readings reconcile exactly: <b>24 that never restore + 1 that restores and then destroys it
+again (<code>check_ct</code>) = the 25 that end with the file gone</b>, and the 43 restorers were
+derived independently from the source. <b>FH&rsquo;s 24 is reproduced name for name</b>; the one
+addition is <b><code>test_batch_ah</code></b>, which FH&rsquo;s candidate predicate &mdash;
+<i>&ldquo;reaches a spawn or sets <code>sim_run</code>&rdquo;</i> &mdash; structurally excluded,
+because it does neither: it calls <code>run.new_run()</code>, and that calls
+<code>clear_save()</code>. <b>The derivation is the step that fails silently, which is one turn
+further than FH&rsquo;s own lesson reached.</b> <b>67 targets also READ it</b>, three of them its
+contents through <code>load_run()</code>; <b>21 never touch the save machinery at all.</b></p>
+
+<p><b>&sect;2 &mdash; ONE PATH, AND NOTHING HAS TO REMEMBER IT.</b>
+<code>Run.SAVE_PATH</code> stays a <code>const</code> and stays the player&rsquo;s file, because
+three gates read it to mean exactly that. The four file operations moved onto
+<b><code>Run.save_path</code></b>, a var &mdash; the shape <code>Profile.save_path</code> has had
+since Batch 40, followed rather than reinvented &mdash; and <b><code>Run._init()</code> points it
+at <code>Run.TEST_SAVE_PATH</code> for any process launched with <code>--script</code>, with a
+scene that is not the project&rsquo;s main scene, or headless.</b> A gate run BY HAND is covered on
+the same terms as one run by the battery, which is the whole reason the redirect is a property of
+the process rather than of a wrapper script.</p>
+
+<p><b>&sect;2a &mdash; <code>_init()</code> AND NOT <code>_ready()</code>, AND THAT WAS MEASURED
+RATHER THAN REASONED.</b> The first draft did it in <code>_ready()</code> and a full battery run
+destroyed the save anyway. <b>Twenty-four targets never use the autoload</b>: they
+<code>load(&quot;res://scripts/run_state.gd&quot;).new()</code> and drive the instance directly,
+which is never added to a tree, so <code>_ready()</code> never fires and the instance kept the
+player&rsquo;s path. <code>_init()</code> runs on <code>.new()</code> and on the autoload alike.
+<b>The control is two-armed on the target that escaped:</b> <code>test_batch_ah</code> against
+HEAD&rsquo;s <code>run_state.gd</code> leaves the save ABSENT, against FI&rsquo;s it leaves it
+byte-identical, and putting the redirect back in <code>_ready()</code> destroys it again.</p>
+
+<p><b>&sect;2b &mdash; AND THE COPIED BACKUP PREAMBLE IS GONE FROM ALL 41 FILES.</b> It is not
+merely redundant now. The restore is
+<code>FileAccess.open(REAL_SAVE, WRITE)</code> followed by <code>store_buffer</code>, and
+<b>the open TRUNCATES</b> &mdash; so a process that died between those two calls left the
+player&rsquo;s save at zero bytes. <b>A backup that can destroy what it protects is worse than no
+backup</b>, and 38 suites and 3 gates carried that pair. <code>check_ct</code>&rsquo;s &sect;2 and
+<code>check_fh</code>&rsquo;s file-based backup go with them: both keep their assertions, re-pointed
+from <i>&ldquo;the restore this section performed worked&rdquo;</i> to <i>&ldquo;the player&rsquo;s
+file was never opened at all&rdquo;</i>, which is a claim about the whole gate rather than about six
+lines of it. <b>This half-closes DZ&rsquo;s copied-helper item</b>: the save-backup half of the
+<code>_run</code> preamble no longer exists anywhere, and the <code>Profile.save_path</code> swap
+in 39 suites is untouched and still owed &mdash; the same mechanism would close it and that is a
+separate batch, because seven suites do not swap it and would newly get a scratch profile.</p>
+
+<p><b>&sect;2c &mdash; <code>check_fi.gd</code> IS NEW (27 CHECKS) AND IT IS THE INSTRUMENT THE RULE
+NEVER HAD.</b> &sect;1 asserts the redirect fired and that the const still names the player&rsquo;s
+file; &sect;2 that the four file operations go through the var; <b>&sect;3 drives the resolver in
+BOTH directions</b> &mdash; two harness argvs TRUE and two player argvs FALSE, calling
+<code>argv_is_harness</code> rather than re-implementing it, because every process that could run
+the assertion is headless and the real entry point short-circuits before it reads an argument;
+<b>&sect;4 is a two-armed control on the destruction path itself</b>, driven on a battle spawned by
+<code>gate_fixture</code> &mdash; arm one points the writes at a surrogate and
+<code>clear_save()</code> destroys it, arm two runs the same two calls on the same battle and the
+surrogate comes back byte-identical while the harness path moves instead; <b>&sect;5 sweeps every
+<code>.gd</code> in the tree</b> for the player&rsquo;s path with <code>CHECKED n of m</code>
+printed, <b>one file exempt by name</b> and the needle read off <code>Run.SAVE_PATH</code> rather
+than written down, so the gate cannot be the first thing its own sweep finds; &sect;6 hashes the
+player&rsquo;s own file before and after, both arms unguarded so the count cannot depend on whether
+the machine has a run in progress. <b>Its own first draft broke FH &sect;2&rsquo;s standing rule</b>
+&mdash; the four needles arrived through a loop variable, the manifest went 1417 &rarr; 1417 and
+only <code>--check</code> noticed. Written out, they are six pins and the manifest is 1423.</p>
+
+<p><b>&sect;3 &mdash; WHAT WAS DELIBERATELY NOT DONE.</b> The other five FH findings stay open and
+the hero sheet&rsquo;s 27 do-nothing buttons is still the one flagged next. <b>No rune, card,
+ability, talent, constant or magnitude moved and no new rune was authored.</b> One stale figure was
+corrected in passing: <code>docs/design-notes.md</code> still carried FH&rsquo;s first,
+superseded measurement (<i>&ldquo;<code>check_da</code> and <code>check_cs</code>, measured by
+bisection&rdquo;</i>) &mdash; FH corrected that number in five documents and missed this one, which
+is its own small lesson: <b>a superseded number survives wherever the sweep was a sweep for the NEW
+figure rather than for the old.</b></p>
+
+<p><b>&sect;4 &mdash; VERIFICATION.</b> <b>The designer&rsquo;s save was copied aside and verified
+by hash before anything else</b>, and re-verified after every battery and every control; it is
+byte-identical at 62,360 B. Documentation was written before the verification run. <b>Baselines
+written before the battery off three identical standalone readings each</b>: <code>check_fi</code>
+new at <b>27 / 0</b>, <code>check_parse</code> <b>172 &rarr; 173</b> (a new battery target raises
+the gate whose count IS its coverage), <code>check_ct</code> <b>113 &rarr; 114</b>.
+<code>pin-manifest.json</code> <b>1417 &rarr; 1423</b>. <b>HEAD&rsquo;s unmodified instruments were
+run against the new code before any gate was edited</b>, and the two reds it found were the two
+predicted in writing beforehand &mdash; <code>check_ct</code> and <code>check_eg</code>, both
+holding <code>run.SAVE_PATH</code> in a local across a <code>save_run()</code> &mdash; with all 46
+suites green. <b>Six controls, six bites</b>, each confirmed to break the needle it aims at.</p>
+
 <h2>2026-09-06 &mdash; Batch FH: THE ARCHIVE COMES INTO THE REPO, AND A WHOLE RUN IS DRIVEN THROUGH THE REAL SCREENS</h2>
 
 <p><i><b>Two halves, and the second is the batch.</b> &sect;1 brings <code>DoD-archive/</code> into

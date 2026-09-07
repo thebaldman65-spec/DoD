@@ -26,15 +26,14 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-# The run save this gate's battles overwrite, and the scratch Profile it writes
-# instead of the player's. Both restored at the end — a gate that eats a save
-# is a gate nobody runs twice.
-const REAL_SAVE := "user://run_save.bin"
+# The scratch Profile this gate writes instead of the player's, removed at the
+# end. **THE RUN SAVE IS NO LONGER THIS FILE'S PROBLEM (Batch FI):** the path
+# is redirected for the whole process by `Run._ready()`, so the backup this
+# gate used to copy in and out — a `FileAccess.open(..., WRITE)` that truncates
+# before it restores — is gone along with the forty others like it.
 const SCRATCH_PROFILE := "user://profile_check_ea.json"
 
 var _g := Gate.new()
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
 
 # §4's table, built once inside a `-> void` section. It is NOT returned from
 # anything: `check_da` §3b's rule is that a function RETURNING a collection
@@ -50,9 +49,6 @@ func ok(cond: bool, what: String) -> void:
 func _initialize() -> void:
 	await process_frame
 	seed(20260831)
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = SCRATCH_PROFILE
 	Profile.loaded = false
 	Profile.data = {}
@@ -64,13 +60,6 @@ func _initialize() -> void:
 	_s3_no_batch_code_pins()
 	_s4_pricing()
 
-	if _had_save:
-		var f := FileAccess.open(REAL_SAVE, FileAccess.WRITE)
-		if f != null:
-			f.store_buffer(_save_backup)
-			f.close()
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 	if FileAccess.file_exists(SCRATCH_PROFILE):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SCRATCH_PROFILE))
 	_g.report(self)

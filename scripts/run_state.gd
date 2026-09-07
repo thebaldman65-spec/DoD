@@ -184,6 +184,75 @@ var combat_wins := 0
 
 const SAVE_PATH := "user://run_save.bin"
 
+# BATCH FI — THE PLAYER'S PATH IS OPT-IN, AND ONLY THE SHIPPED GAME OPTS IN.
+#
+# `SAVE_PATH` above is still a `const` and still the player's file, because
+# three gates read it to MEAN exactly that. What moved is which path the four
+# file operations below actually use: `save_path`, a var, the shape
+# `Profile.save_path` has had since Batch 40.
+#
+# **AND NOTHING HAS TO REMEMBER TO SWAP IT.** A target that must remember is a
+# target that will forget — that is how twenty-four battery targets came to
+# delete a real run in progress, and why a wrapper script was the wrong answer:
+# a wrapper is bypassed by running one gate alone, which is exactly how the
+# save went missing. The redirect is a property of the PROCESS instead, decided
+# once in `_ready()` from how the process was launched, so a gate run by hand
+# gets the harness path on the same terms as a gate run by the battery.
+const TEST_SAVE_PATH := "user://run_save_harness.bin"
+
+var save_path := SAVE_PATH
+
+
+# **`_init`, NOT `_ready`, AND THAT DISTINCTION WAS MEASURED RATHER THAN
+# REASONED.** The first draft did this in `_ready()` and `test_batch_ah` deleted
+# a real save straight through it: **twenty-four targets do not use the autoload
+# at all** — they `load("res://scripts/run_state.gd").new()` and drive the
+# instance directly, which is never added to a tree, so `_ready()` never fires
+# and the instance kept the player's path. `_init()` runs on `.new()` and on the
+# autoload alike, so there is no way to obtain a `Run` that has not decided.
+func _init() -> void:
+	if save_path_is_harness(OS.get_cmdline_args(),
+			String(ProjectSettings.get_setting("application/run/main_scene", ""))):
+		save_path = TEST_SAVE_PATH
+
+
+# **THE ARGUMENTS ARE PASSED IN SO BOTH DIRECTIONS CAN BE ASSERTED.** A
+# resolver that reads `OS.get_cmdline_args()` itself can only ever be tested in
+# the one process the test happens to run in — which is a harness process, so
+# the player's arm would never execute. `check_fi` §4 drives four argvs through
+# this and pins two TRUE and two FALSE.
+#
+# THE THREE SHAPES A NON-PLAYER PROCESS HAS, ALL MEASURED RATHER THAN ASSUMED
+# (the engine strips `--headless`, `--path` and `--quit-after` from
+# `get_cmdline_args()`; it does not strip these):
+#   `--script X.gd`      every suite and every gate the battery runs
+#   `res://X.tscn`       the two scene targets, where the scene is NOT the
+#                        project's main scene — an explicit launch of the main
+#                        scene is a player and is excluded by name
+#   a headless display   no player runs headless; a gate run by hand without
+#                        `--script` still cannot reach the player's file
+# **THE FALSE POSITIVE IS CHEAP AND THE FALSE NEGATIVE IS NOT.** Running a
+# single non-main scene from the editor resolves to the harness path, so the
+# designer's in-progress run is not offered on that screen; that is visible,
+# recoverable and deliberate. The other direction destroys the run.
+func save_path_is_harness(args: PackedStringArray, main_scene: String) -> bool:
+	return DisplayServer.get_name() == "headless" or argv_is_harness(args, main_scene)
+
+
+# **SPLIT OUT SO IT CAN BE ASSERTED IN BOTH DIRECTIONS, AND NOT COPIED TO DO
+# IT.** Every process that could run the assertion is headless, so the clause
+# above short-circuits and the argv reading below would never execute under
+# test. The alternative was for the gate to re-implement these four lines
+# beside its own assertions, which is the second copy of a helper that this
+# project has paid for more than once. `check_fi` §3 calls THIS.
+func argv_is_harness(args: PackedStringArray, main_scene: String) -> bool:
+	for a in args:
+		if a == "--script":
+			return true
+		if (a.ends_with(".tscn") or a.ends_with(".scn")) and a != main_scene:
+			return true
+	return false
+
 # Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
 # slot draws ONE zone from its authored candidate pool — zones are
 # designed FOR a position (openers are not finales), so pools are
@@ -2131,7 +2200,7 @@ func advance_zone() -> void:
 func save_run() -> void:
 	if not active or sim_run:
 		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
 	# v4 (Batch Z): + tally (the run ledger). v5 (Batch AC): + debug_used
 	# (the honesty flag). v6 (Batch AI): the ROW tree — members carry
@@ -2202,13 +2271,13 @@ func save_run() -> void:
 
 
 func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
+	return FileAccess.file_exists(save_path)
 
 
 func load_run() -> bool:
 	if not has_save():
 		return false
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(save_path, FileAccess.READ)
 	var data: Variant = file.get_var(true)
 	if not (data is Dictionary):
 		return false
@@ -2304,7 +2373,7 @@ func clear_save() -> void:
 	if sim_run:
 		return
 	if has_save():
-		DirAccess.remove_absolute(SAVE_PATH)
+		DirAccess.remove_absolute(save_path)
 
 
 func award_gold(node_type: String) -> int:

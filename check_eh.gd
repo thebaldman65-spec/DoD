@@ -27,12 +27,9 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-const REAL_SAVE := "user://run_save.bin"
 const SCRATCH_PROFILE := "user://profile_check_eh.json"
 
 var _g := Gate.new()
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func ok(cond: bool, what: String) -> void:
@@ -42,9 +39,6 @@ func ok(cond: bool, what: String) -> void:
 func _initialize() -> void:
 	await process_frame
 	seed(20260831)
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = SCRATCH_PROFILE
 	Profile.loaded = false
 	Profile.data = {}
@@ -55,13 +49,6 @@ func _initialize() -> void:
 	_s4_sweep_instrument()
 	await _s1_chain_live()
 
-	if _had_save:
-		var f := FileAccess.open(REAL_SAVE, FileAccess.WRITE)
-		if f != null:
-			f.store_buffer(_save_backup)
-			f.close()
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 	if FileAccess.file_exists(SCRATCH_PROFILE):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SCRATCH_PROFILE))
 	_g.report(self)

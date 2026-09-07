@@ -36,10 +36,6 @@ const RUNG3_MULT := 1.30
 
 var checks := 0
 var fails: Array = []
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
-
-const REAL_SAVE := "user://run_save.bin"
 
 
 func _initialize() -> void:
@@ -61,9 +57,6 @@ func _src(path: String) -> String:
 
 func _run() -> void:
 	await process_frame
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = "user://profile_batch_bn_test.json"
 	Profile.loaded = false
 	Profile.data = {}
@@ -79,13 +72,6 @@ func _run() -> void:
 	_docs()
 
 	# Restore the player's save byte-for-byte — the live half calls new_run.
-	if _had_save:
-		var f := FileAccess.open(REAL_SAVE, FileAccess.WRITE)
-		if f != null:
-			f.store_buffer(_save_backup)
-			f.close()
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 	var scratch := "user://profile_batch_bn_test.json"
 	if FileAccess.file_exists(scratch):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(scratch))

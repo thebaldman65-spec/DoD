@@ -65,7 +65,6 @@ extends SceneTree
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
 
-const REAL_SAVE := "user://run_save.bin"
 
 # Mirrored from battle.gd so each check states what it depends on rather than
 # hiding it inside a magic number.
@@ -75,8 +74,6 @@ const EMBERKEEP_MULT_TEST := 2
 
 var checks := 0
 var fails: Array = []
-var _save_backup: PackedByteArray = PackedByteArray()
-var _had_save := false
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # This table is the machine-checkable half of "the batch shipped what it said".
@@ -122,9 +119,6 @@ func ok(cond: bool, msg: String) -> void:
 
 func _run() -> void:
 	await process_frame
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = "user://profile_batch_cb_test.json"
 	Profile.loaded = false
 	Profile.data = {}
@@ -155,10 +149,6 @@ func _run() -> void:
 	Profile.save_path = "user://profile.json"
 	Profile.loaded = false
 	Profile.data = {}
-	if _had_save:
-		FileAccess.open(REAL_SAVE, FileAccess.WRITE).store_buffer(_save_backup)
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 
 	print("BATCH CB: %d checks, %d FAILED" % [checks, fails.size()])
 	for f in fails:

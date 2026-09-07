@@ -27,13 +27,9 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-const REAL_SAVE := "user://run_save.bin"
 const SCRATCH_PROFILE := "user://profile_check_eg.json"
-const SCRATCH_SAVE := "user://run_save_check_eg.bin"
 
 var _g := Gate.new()
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func ok(cond: bool, what: String) -> void:
@@ -43,9 +39,6 @@ func ok(cond: bool, what: String) -> void:
 func _initialize() -> void:
 	await process_frame
 	seed(20260831)
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = SCRATCH_PROFILE
 	Profile.loaded = false
 	Profile.data = {}
@@ -56,11 +49,6 @@ func _initialize() -> void:
 	_s3_save_round_trip()
 	await _s1_ladder_live()
 
-	if _had_save:
-		var f := FileAccess.open(REAL_SAVE, FileAccess.WRITE)
-		f.store_buffer(_save_backup)
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 	_g.report(self)
 
 
@@ -291,7 +279,12 @@ func _s2_pool_and_loadout() -> void:
 func _s3_save_round_trip() -> void:
 	print("\n§3 — the save is v12 and TOLERANT")
 	var run: Node = root.get_node("/root/Run")
-	var real := String(run.SAVE_PATH)
+	# **BATCH FI — `save_path`, NOT `SAVE_PATH`.** `SAVE_PATH` is the player's
+	# file and this gate never touches it; `save_path` is where THIS process
+	# saves, which is the harness path, and it is where `save_run()` below
+	# actually writes. Reading the const here would have read the player's
+	# in-progress run and asserted on it.
+	var real := String(run.save_path)
 	var sim_was: bool = run.sim_run
 	run.sim_run = false
 	run.new_run(["warrior", "mage", "cleric", "hunter"])

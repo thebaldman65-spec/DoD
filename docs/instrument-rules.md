@@ -928,13 +928,24 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
 - **A SUITE MUST NOT PIN THE SAVE VERSION LITERAL** — it turns a save bump into a suite failure
   that reads like a regression.
 - **NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD.** It resolves at parse time, before the
-  autoload exists, and it cost a gate. **Autoloads (`Run`) do not resolve in a `--script`
-  SceneTree at all** — a test that needs one must be a SCENE run.
-- **RUNNING THE FULL BATTERY DESTROYS THE PLAYER'S IN-PROGRESS RUN.** Many suites spawn a live
-  battle, which means `Run.new_run` and `clear_save`, and `user://run_save.bin` is simply gone
-  afterwards. Individual suites that back it up buy nothing, because a LATER suite wipes it again.
-  **Copy `run_save.bin` aside before a battery run if the designer has a run going, and say so
-  afterwards either way.** The META layer (`profile.json`, `relics.json`) is safe.
+  autoload exists, and it cost a gate. **THE AUTOLOAD IDENTIFIER does not resolve in a `--script`
+  SceneTree** — naming `Run` in a file compiled under `--script` is a parse error, which is the
+  rule every gate obeys by fetching the node instead.
+- **BUT THE AUTOLOAD NODE ITSELF EXISTS UNDER `--script`, AND BATCH FI LEANS ON IT.** This bullet
+  used to end *"a test that needs one must be a SCENE run"*, and that is not what was measured.
+  `/root/Run` is ABSENT during `_initialize()` and PRESENT after the first `process_frame`, with
+  `_ready()` already run — which is why every gate's `root.get_node("/root/Run")` works, and why a
+  redirect decided in `Run._ready()` fires in all 98 battery targets and not just the two scene
+  ones. **The identifier and the node are two different facts and only one of them is unavailable.**
+- **A HARNESS PROCESS CANNOT REACH THE PLAYER'S RUN SAVE, AND NOTHING HAS TO REMEMBER THAT
+  (Batch FI).** It could until FI, and this bullet used to read *"copy `run_save.bin` aside before
+  a battery run"* — which is DISCIPLINE, and thirty batches of it did not stop the file being
+  destroyed. `Run.save_path` is a var now and `Run._ready()` points it at `Run.TEST_SAVE_PATH` for
+  any process launched with `--script`, with a scene that is not the project's main scene, or
+  headless. **A gate run BY HAND gets the harness path on the same terms as one run by the
+  battery**, which is why the redirect is a property of the process and not of a wrapper script.
+  `check_fi` is the instrument. **THE META LAYER IS NOT UNDER THIS**: `Profile.save_path` is still
+  swapped by hand in each suite's own `_run` preamble, and `relics.json` by nobody.
 - **"IS THERE ANYBODY THERE TO PRESS?" IS ONE QUESTION, ASKED IN ONE PLACE** —
   `battle._nobody_can_press()` is `sim or autoplay or DisplayServer.get_name() == "headless"`.
   **`sim or autoplay` names the two BOTS, not the absence of a player**: a hand-driven suite is
@@ -1286,9 +1297,14 @@ a census is taken.
   and reported the population as TWO. The number is 24, and it was only found because the save
   went missing a second time after a re-run of seven targets that the "two" did not include.
   **Derive the candidate population from the source, then measure every member of it.**
-- **`Run.SAVE_PATH` IS A `const`, SO IT CANNOT BE REDIRECTED THE WAY `Profile.save_path` CAN.**
-  Every suite points `Profile.save_path` at a scratch file and none of them can do the same for
-  the run save. The protection is therefore a BACKUP, not a redirect.
+- **THAT WAS TAKEN AT BATCH FI AND THE RULE ABOVE IS DISCHARGED: A GATE NO LONGER OWNS THE
+  PLAYER'S SAVE, BECAUSE IT CANNOT REACH IT.** `Run.SAVE_PATH` stays a `const` and stays the
+  player's file; the four file operations moved onto `Run.save_path`, a var, which `_ready()`
+  points at the harness path for any non-player process. **THE BACKUP WAS THE WRONG SHAPE EVEN
+  WHERE IT WORKED**, and not only because it has to be remembered: the restore is
+  `FileAccess.open(REAL_SAVE, WRITE)` followed by `store_buffer`, and the open TRUNCATES — so a
+  process that died between those two calls left the player's save at zero bytes. Forty-one files
+  carried that pair and none of them survives.
 - **AND THE BACKUP MUST BE A FILE ON DISK, NOT A MEMBER.** `check_fh`'s first draft held the bytes
   in a member and restored them at the end of `_initialize`. Three `SCRIPT ERROR`s while the file
   was being written aborted the coroutine, so the restore never ran — and by then the drive's own
@@ -1304,6 +1320,28 @@ a census is taken.
   byte-equality arm as `if _had_save: ok(...)` read **160 on a machine with no run in progress and
   161 on one with a save** — a baseline row that reds for a reason that has nothing to do with the
   tree. Both arms run unconditionally; the emptiness is inside the predicate.
+
+## STANDING RULE — AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK (Batch FI §1)
+> **FH RAN EVERY CANDIDATE ALONE AGAINST A FRESH SAVE AND CHECKED THE FILE AFTERWARDS. THAT IS A
+> SOUND METHOD AND IT UNDER-REPORTED THE POPULATION BY 42.** 24 targets ended with the save gone;
+> **67 destroyed it during the run**, and 43 of those put it back before exiting, so the file the
+> census looked at was byte-identical and the target read as harmless. A target that damages and
+> repairs is still a target that damages — it just needs the repair to run.
+
+- **MEASURE THE ACT, NOT THE RESIDUE.** FI re-derived the same population by printing from inside
+  `Run`'s four save functions and reading the calls, which sees the 42 an end-state check cannot.
+  The two readings agree exactly where they can: 24 never-restore + 1 restore-then-destroy-again
+  = the 25 that end absent, and the 43 restorers were derived independently from the source.
+- **AND THE CANDIDATE PREDICATE IS PART OF THE POPULATION.** FH derived its candidates as *"reaches
+  a spawn or sets `sim_run`"* — 80 of 98 — which is where `test_batch_ah` escaped: it calls
+  `run.new_run()`, that calls `clear_save()`, and it neither spawns nor sets `sim_run`. It destroys
+  the save, restores nothing, and was never in the 80. **FH's own lesson was "derive the candidates
+  from the source, then measure every member"; the correction is that the DERIVATION is the step
+  that fails silently.** FI censused all 98 and derived nothing.
+- **A PROTECTION SCOPED TO A SECTION IS NOT A PROTECTION**, and `check_ct` is the case: its §2
+  restored the save and asserted the restore had worked — an arm that PASSED — while its §3 spawned
+  a battle that destroyed it afterwards. It is the only file in the tree that both restores and
+  ends absent, and its passing arm is what made that invisible for the whole time it was true.
 
 ## STANDING RULE — THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` (Batch FH §2)
 > **`build_pin_manifest.py` binds a holder from `var\s+(\w+)\s*:?=`.** An explicitly typed

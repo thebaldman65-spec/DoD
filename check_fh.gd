@@ -123,69 +123,42 @@ func _initialize() -> void:
 
 # ── THE PLAYER'S SAVE ────────────────────────────────────────────────────────
 #
-# `check_ct` §2's pattern, and it is not optional here: this gate drives a real
-# non-sim run, so `Run.save_run()` writes `user://run_save.bin` on every single
-# step and `_resolve_boss` CLEARS it when the end boss dies. A gate that ate the
-# designer's run in progress would be a worse defect than anything it could find.
+# **BATCH FI — THIS IS A WATCH NOW, NOT A BACKUP, AND THAT IS THE WHOLE POINT.**
+# This gate drives a real non-sim run, so every step reaches `Run.save_run()`
+# and the end boss reaches `Run.clear_save()`. Under FH those calls landed on
+# the player's own file and this gate copied it aside and put it back — which
+# worked, and which was still the wrong shape, because a gate that repairs the
+# damage it does is a gate that hides how many others do the same damage and do
+# not repair it. There were twenty-four of those.
 #
-# **AN IN-MEMORY BACKUP IS NOT ENOUGH AND THIS GATE PROVED IT ON ITS AUTHOR.**
-# The first draft held the bytes in a member and put them back at the end of
-# `_initialize`. A `SCRIPT ERROR` in a later section — three of them while this
-# file was being written — aborts the coroutine, so the restore never ran, and
-# by then §8's end boss had already called `Run.clear_save()`. **The run save
-# was destroyed and every subsequent run reported `none — nothing to protect`,
-# which is a clean-looking line for a file that is gone.**
-#
-# So the backup is a FILE, written before the first byte moves, and the gate is
-# SELF-HEALING: a backup on disk with no live save means a previous run died
-# holding it, and it is put back at the top of this one. The backup is removed
-# only after a successful restore, so it can never resurrect a save the player
-# themselves deleted between two clean runs.
-const SAVE_BACKUP := "user://fh_run_save_backup.bin"
+# `Run.save_path` is redirected for the whole process now, so the drive below
+# writes the harness path and the player's file is never opened. What is left
+# here is the ASSERTION that this is true — taken before the first step and
+# checked after the last one, on the file the drive is no longer allowed to
+# touch. **BOTH ARMS RUN WHETHER OR NOT THERE IS A SAVE**: guarding the second
+# behind `if _had_save` made this gate's check count depend on whether the
+# machine happened to have a run in progress — 160 on one without and 161 on
+# one with — which is a baseline row that reds for a reason that has nothing to
+# do with the tree. Measured at FH, not predicted.
 
 
 func _take_the_save() -> void:
 	var p: String = _run.SAVE_PATH
-	if not FileAccess.file_exists(p) and FileAccess.file_exists(SAVE_BACKUP):
-		# A previous run of this gate died holding it.
-		var rescued := FileAccess.get_file_as_bytes(SAVE_BACKUP)
-		var wf := FileAccess.open(p, FileAccess.WRITE)
-		wf.store_buffer(rescued)
-		wf = null
-		print("  RECOVERED the player's run save (%d B) from a previous run of this gate"
-			% rescued.size())
 	_had_save = FileAccess.file_exists(p)
 	if _had_save:
 		_save_backup = FileAccess.get_file_as_bytes(p)
-		var bf := FileAccess.open(SAVE_BACKUP, FileAccess.WRITE)
-		bf.store_buffer(_save_backup)
-		bf = null
 	print("  the player's run save: %s" % (
-		"present, %d B — backed up to %s" % [_save_backup.size(), SAVE_BACKUP]
-		if _had_save else "none — nothing to protect"))
+		"present, %d B — this gate writes %s and will not open it"
+			% [_save_backup.size(), _run.save_path]
+		if _had_save else "none on this machine — the arms below still both run"))
 
 
 func _give_the_save_back() -> void:
 	var p: String = _run.SAVE_PATH
-	if _had_save:
-		var f := FileAccess.open(p, FileAccess.WRITE)
-		f.store_buffer(_save_backup)
-		f = null
-	elif FileAccess.file_exists(p):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
-	# **BOTH ARMS RUN WHETHER OR NOT THERE WAS A SAVE.** Guarding the second
-	# one behind `if _had_save` made this gate's CHECK COUNT depend on whether
-	# the machine happened to have a run in progress — 160 on a machine with
-	# none and 161 on one with a save — which is a baseline row that reds for a
-	# reason that has nothing to do with the tree. Measured, not predicted.
 	ok(FileAccess.file_exists(p) == _had_save,
 		"the player's run save is NOT as this gate found it")
 	ok(not _had_save or FileAccess.get_file_as_bytes(p) == _save_backup,
 		"the player's run save came back changed")
-	# Only now — the on-disk backup exists precisely to survive the path above
-	# not being reached.
-	if FileAccess.file_exists(SAVE_BACKUP):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_BACKUP))
 
 
 # ── THE DRIVE'S PRIMITIVES ───────────────────────────────────────────────────
@@ -2123,11 +2096,10 @@ func _s10_the_observations() -> void:
 	# **IT IS NOT REPAIRED HERE** — the brief's rule is that a defect that is
 	# not a crash or a softlock is reported and ruled on — but it is why a
 	# battery must not be run over a run the designer cares about.
-	print("    (5) TWENTY-FOUR of the battery's 80 spawning targets DELETE")
-	print("        `user://run_save.bin`. Censused one at a time against a fresh")
-	print("        copy of a real save: 24 delete, 56 leave it byte-identical.")
-	print("        Only this gate protects it END TO END — check_ct restores it")
-	print("        in §2 and its own §3 destroys it again. NOT repaired here.")
+	print("    (5) REPAIRED AT BATCH FI — the player's run save is no longer")
+	print("        reachable from a harness process at all. `Run.save_path` is")
+	print("        redirected in `_ready()` from how the process was launched,")
+	print("        so no target has to remember, and `check_fi` holds it.")
 	# (6) A BOSS AWARDS NO RUNE — see §3.
 	print("    (6) no boss awards a rune. The live rune doors are the Peddler,")
 	print("        the elite cache, the bargain's `rune` reward and the event")

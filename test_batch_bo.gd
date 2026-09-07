@@ -44,7 +44,6 @@ const Gate = preload("res://gate_fixture.gd")
 
 const CAP := 7
 const CLASS_SHARE := 0.25
-const REAL_SAVE := "user://run_save.bin"
 
 # The eighteen, by pool. WARRIOR IS DELIBERATELY EMPTY — §5 ships eighteen, not
 # twenty-four, and the empty arrays are the visible shape of that debt.
@@ -62,8 +61,6 @@ const TRANCHE_1 := {
 
 var checks := 0
 var fails: Array = []
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
 
 
 func _initialize() -> void:
@@ -92,9 +89,6 @@ func _src(path: String) -> String:
 
 func _run() -> void:
 	await process_frame
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = "user://profile_batch_bo_test.json"
 	Profile.loaded = false
 	Profile.data = {}
@@ -116,13 +110,6 @@ func _run() -> void:
 	await _live_survivalist()
 	_docs()
 
-	if _had_save:
-		var f := FileAccess.open(REAL_SAVE, FileAccess.WRITE)
-		if f != null:
-			f.store_buffer(_save_backup)
-			f.close()
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 	var scratch := "user://profile_batch_bo_test.json"
 	if FileAccess.file_exists(scratch):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(scratch))
@@ -958,7 +945,6 @@ func _live_cryomancer() -> void:
 # would have been the wrong one.
 func _nf_seeded() -> void:
 	seed(20260829)
-
 
 
 func _live_arcanist() -> void:

@@ -7782,10 +7782,37 @@ Exempting them by SIGNATURE — `focus_mode` NONE, an arrow cursor, and somethin
 `mouse_entered` — means a control that lost its handler still fails, because it would match none
 of the three.
 
-**AND THE BATTERY'S OWN GATES DELETE THE PLAYER'S RUN.** `check_da` and `check_cs`, measured by
-bisection against a fresh copy of a real save. Neither is doing anything wrong on its own terms:
-`gate_fixture.spawn` sets `sim_run = false` because a `sim_run` battle is not the battle a player
-fights, and a battle that ends calls `Run.clear_save()`. **The cost is invisible because the
-symptom is silence** — the next run of anything simply reports there was no save to protect. It is
-reported rather than repaired here, because it is not a crash and the brief's rule is that the
+**AND THE BATTERY'S OWN GATES DELETE THE PLAYER'S RUN.** Neither is doing anything wrong on its
+own terms: `gate_fixture.spawn` sets `sim_run = false` because a `sim_run` battle is not the battle
+a player fights, and a battle that ends calls `Run.clear_save()`. **The cost is invisible because
+the symptom is silence** — the next run of anything simply reports there was no save to protect. It
+is reported rather than repaired here, because it is not a crash and the brief's rule is that the
 designer rules on what matters before he plays.
+
+**THE FIGURE IN THIS PARAGRAPH WAS WRONG AND IS CORRECTED AT BATCH FI.** It read *"`check_da` and
+`check_cs`, measured by bisection"* — the first measurement, which sampled eight gates, drew mostly
+document gates and reported the population as two. FH corrected it to 24 in five documents and
+missed this one, which is its own small lesson: a superseded number survives wherever the sweep for
+it was a sweep for the NEW figure rather than for the old.
+
+
+## BATCH FI — NO TEST WRITES THE PLAYER'S SAVE
+
+**THE POINT IS THAT NO DISCIPLINE IS REQUIRED.** Everything before this batch asked somebody to
+remember: back the save up before a battery, restore it afterwards, scope the backup to the gate
+that needs it. Thirty batches of that guidance did not stop the designer losing a run, and the
+reason is structural rather than careless — a rule you have to remember is a rule you will forget
+on the day you are thinking about something else, and the census says a quarter of the battery
+destroyed the save individually, so it did not even take a battery.
+
+**THE REJECTED ALTERNATIVE IS WORTH RECORDING BECAUSE IT IS THE OBVIOUS ONE.** A wrapper script
+that copies the save aside, runs the battery and puts it back would work — until somebody runs one
+gate by hand, which is exactly how the save went missing. The redirect is a property of the
+PROCESS instead: `Run._ready()` decides once, from how the process was launched, so a gate run by
+hand is protected on the same terms as the battery.
+
+**WHY THE PLAYER'S PATH IS OPT-IN RATHER THAN THE TEST PATH BEING OPT-OUT.** The two are not
+symmetrical. A test that forgets to opt out destroys a real run and says nothing — the symptom is
+silence, and the next run of anything reports there was no save to protect. A player's build that
+somehow failed to opt in would show an empty Continue button on the main menu, which is visible in
+one second and destroys nothing. **The cheap failure is the one the default should produce.**

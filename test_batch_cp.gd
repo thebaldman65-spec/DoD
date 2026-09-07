@@ -22,9 +22,6 @@ const Fixture = preload("res://suite_fixture.gd")
 var checks := 0
 var fails: Array = []
 
-const REAL_SAVE := "user://run_save.bin"
-var _had_save := false
-var _save_backup: PackedByteArray = PackedByteArray()
 
 # The twenty-seven, transcribed once. Nine per class, the LAST THREE of each
 # spec's eight-deep draft pool — which is what "tranche 3" means structurally.
@@ -136,9 +133,6 @@ func ok(cond: bool, msg: String) -> void:
 
 func _run() -> void:
 	await process_frame
-	_had_save = FileAccess.file_exists(REAL_SAVE)
-	if _had_save:
-		_save_backup = FileAccess.get_file_as_bytes(REAL_SAVE)
 	Profile.save_path = "user://profile_batch_cp_test.json"
 	Profile.loaded = false
 	Profile.data = {}
@@ -163,10 +157,6 @@ func _run() -> void:
 	Profile.save_path = "user://profile.json"
 	Profile.loaded = false
 	Profile.data = {}
-	if _had_save:
-		FileAccess.open(REAL_SAVE, FileAccess.WRITE).store_buffer(_save_backup)
-	elif FileAccess.file_exists(REAL_SAVE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(REAL_SAVE))
 
 	print("\n%d checks, %d failures" % [checks, fails.size()])
 	for f in fails:
