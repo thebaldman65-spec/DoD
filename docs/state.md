@@ -5,111 +5,182 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-06 (Batch FE).*
+*Last rewritten: 2026-09-06 (Batch FF).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FE — THE RUNE ROWS FOLLOW THE CARDS, AND THE OTHER TWO QUEUES ARE DRIVEN.** Two
-  items, both handed forward by FD, and **both of FD's open questions are now answered.** §1 moves
-  the five `RUNE_TAGS` rows that led with BREAK to `["OFFENSE", "BREAK"]`; §2 drove the two
-  unguarded frozen queues, found **both reachable and both of FD's descriptions wrong**, and
-  repaired them through `Run.ability_choice` and `Run.upgrade_choice`. Full working:
-  **`docs/reports/FE.md`**.
-- **§0 — THREE OF THE BRIEF'S PREMISES WERE FALSE AND ONE DECIDED HOW §2 WAS WRITTEN.** *"EZ §0c
-  established that the two conditions count PRIMARIES, so a rune's primary is not merely
-  descriptive"* — **the conditions count CARD primaries over the DRAFTED half; neither reads
-  `RUNE_TAGS` at all.** *"`bm_candidates` … unguarded"* — **`_pick_ability` already had a guard**,
-  and repairing the fault the brief describes would have left the fault that exists. *"`inquisitor`
-  displaying as Devout misled a brief at CE, CF and again in FD's own pressure table"* — it misled
-  **EQ §3 and ER §1**; FD's table is correct. And the brief's file list names `data/runes.json`,
-  which carries no tag field: §1 is entirely in `scripts/runes.gd`.
-- **§1 — `RUNE_TAGS` FOLLOWS THE CARDS, AND THE POPULATION IS FIVE.** Derived off the table, not
-  taken from the brief. `long_watch` and `bared_plate` live, `comet`, `seventh_bolt` and
-  `shattered_guard` retired — **all five read `["OFFENSE", "BREAK"]`.** The retired three move with
-  the live two, because the reason for the ruling is that one vocabulary with two rules is the
-  defect and a retired entry is kept precisely so it can be read. **Primary spread: BREAK 5 → 0,
-  OFFENSE 14 → 19; rows carrying BREAK at all stayed at 9**, which is what says this was a demotion
-  and not a removal.
-- **§1a — FOUR OF THE FIVE CARRIED BREAK AS THEIR ONLY TAG. `bared_plate` IS THE ONE PER-RUNE
-  JUDGEMENT AND IT IS NOT A FEINT.** The four cost nothing — one tag becomes two and nothing is
-  displaced. `bared_plate` read `["BREAK", "DEFENSE"]` and two tags is the ceiling, so retaining
-  BREAK displaces DEFENSE — **but that DEFENSE was recording a DRAWBACK, and `RUNE_SHAPES` already
-  records it as `TRADEOFF`.** Nothing is lost that is written nowhere else. **No standing ruling
-  owned any of the five second slots**, so BREAK is retained on all five.
-- **§1b — NOTHING READS A RUNE'S PRIMARY, AND THAT IS STRONGER THAN "DISPLAY-ONLY".** Four
-  documents called the table display-only. **It reaches no surface at all**: the chain is
-  `RUNE_TAGS` → `rune_tags()` → `rune_tag_line()` → **nothing**, because that builder has **zero
-  callers** in `scripts/` and `scenes/` and the rune-offer surface EK deferred was never built.
-  `rune_shape_line` is in the same position. **And neither rune CONDITION reads it** —
-  `threshold_met` counts `Classes.primary_tag_count`, `breadth_met_fraction` counts
-  `primary_tag_peak`, both over the DRAFTED cards. **So §1 is purely for consistency and has no
-  mechanical effect at all**, and `check_fe` §1b asserts the inertness in both directions.
-- **§2 — THE IDIOM'S POPULATION IS FIVE AND THREE WERE ALREADY GUARDED.** Derived off what a rolled
-  offer is STORED on. The fifth is **`pending_item_offers`** — rolled at loot, saved, answered on
-  the map, and it re-asks the POUCH with a comment saying why. **The shop and the blacksmith are
-  NOT in the population** and that is asserted: both roll into a screen-local `offers` in `_ready`
-  and neither is saved. **Reachability is structural** — `MINI_SLOT` and `BOSS_SLOT` are FIXED
-  slots, three mini-boss and three zone-boss awards a run, both awarding to every hero, and
-  **nothing forces the answer**: travel is not gated on either `picks_owed`.
-- **§2a — `bm_candidates` COULD NOT PRODUCE THE DUPLICATE FD IMPLIES, AND ITS REAL FAULT IS WORSE.**
-  `_pick_ability` already refused `pool_name in member["bm_abilities"]`, and **`bm_abilities` is the
-  only term of `owned_ability_names` that moves during a run** (the kit and its overrides are fixed,
-  BM locks `talents` for the run, and a drafted card also lands there). **But it refused by
-  RETURNING**, which removed nothing — so the stale name was still drawn as a button that did
-  nothing: **604 dead buttons over 240 driven runs**, and where the boss pool is smaller than the
-  number of deferred picks **every** button was dead. **The Devout's pool is TWO: three deferred
-  picks stranded the third in 20 of 20 of his runs**, badge stuck for the rest of the run. **The
-  collision is certain, not likely** — boss pools run 2–5 against an offer of three, and drafting in
-  between does not help because a draft comes out of `spec_draft_pool` (10–13), a different pool.
-- **§2b — `up_candidates` HAD NO GUARD AT ALL AND IT IS A BALANCE FAULT.** AP's ONCE-PER-RUN rule
-  has exactly one enforcement point and it is the ROLL's `has_upgrade` filter. **Two queued triples
-  share an upgrade id in 376 of 400 and the same (ability, upgrade) pair in 247 of 400** — and
-  **`_stamp_upgrade` is not idempotent for six of the eight**: Honed 25 → 38 → **57**, Weighted's
-  pressure ×2 → **×4**, Quickened −2 → **−4** turns, Widened +1 → **+2** hits, Piercing to a full
-  1.0, Swift compounding. Only Effortless and Certain set a constant.
-- **§2c — THE REPAIR IS FD'S REPAIR TWICE, AND NEITHER IS A REROLL.** Both drop only what is no
-  longer legal, top up through the same door the roll uses, and **write the repair back** — so the
-  overlay's buttons and the handler read one array, which matters because `_pick_upgrade` takes an
-  INDEX. **A clean queue is returned untouched** (BATCH X) and that is asserted on both.
-  `ability_choice` **preserves the award's three-tier cascade** rather than flattening it, so a
-  repaired triple can come back shorter than three — `roll_upgrade_offer`'s own principle, *the
-  picker shows what exists rather than padding*. The stranded Devout pick becomes answerable out of
-  his spec draft pool. **`_pick_ability`'s old refuse-and-return is removed rather than left
-  beside the new door**, and its absence is asserted.
-- **§3 — TWO THINGS DELIBERATELY NOT DONE.** `_stamp_upgrade` is **not** made idempotent — that is a
-  second way to reach the same guarantee, and the guard belongs at the answer with the rest of the
-  idiom; `check_fe` §2c asserts the stack IS still real so the day that changes the gate says the
-  guard has become belt-and-braces. And **the upgrade's paired ABILITY is not re-asked**: a benched
-  card is kept and `apply_upgrades` skips its entry in silence by design, so dropping the candidate
-  would destroy a pick over a reversible state.
-- **§4 — HEAD'S UNMODIFIED GATES WERE RUN AGAINST THE NEW CODE FIRST AND RETURNED EXACTLY ONE RED,
-  PREDICTED.** `check_fd` §2's `rune_break.size() == 5` reading 0 — the pin FD placed for the day
-  this was ruled on, doing its job. Nothing unpredicted, which is the first time in three batches;
-  FD's own run returned two. Zero throws and zero `Parse Error` across all 94 logs.
-- **WHAT MOVED: three game scripts, one gate re-pointed, one new gate and eight documents.**
-  `scripts/runes.gd` (5 `RUNE_TAGS` rows + the header), `scripts/run_state.gd` (`ability_choice`,
-  `upgrade_choice` and two top-up helpers), `scripts/map_screen.gd` (four call sites);
-  **`check_fe.gd` is NEW**, `check_fd` §2's pin re-pointed 5 → 0 in place with its reason,
-  `check_ek`'s `TAG_CHECKERS` gained a seventh, `check_parse` 168 → 169; `pin-manifest.json`,
-  `baselines.json`, `run_battery.sh`, `CLAUDE.md` (two blocks extended), `docs/master.html` (the
-  stamp is bumped to FE — **FD left it reading FC**), `docs/changelog.html`,
-  `docs/design-notes.md`, this file and `docs/reports/FE.md`. **`scripts/battle.gd`,
-  `scripts/classes.gd`, `scripts/talents.gd`, `scripts/unit.gd`, `scripts/shop_screen.gd`,
-  `scripts/run_sim.gd`, `scripts/events.gd` and `data/runes.json` are byte-unchanged.**
-- **Next letter: FF.** FE sorts above every suite's own stamp compare — the highest is `"CE"`, and
+- **Last batch: FF — THE INSTRUMENT RESIDUE FOLLOWS EF'S SEAM, AND THERE IS NO THIRD ONE.** A split
+  batch taken with headroom left rather than at the ceiling. **Nothing was pruned, no rule was
+  rewritten, and not one game script was touched.** Full working: **`docs/reports/FF.md`**.
+- **§0 — THE BRIEF SAID 284 KiB AND THE FILE READ 280.80.** The figure came from FE's report and
+  **this file carried it forward** — a number quoted from one document into another (DJ §3). Real
+  headroom was **9.20 KiB**, not 6. The brief's conclusion survives its arithmetic only because the
+  worst single-batch growth on record is 8.09 KiB: **1.1 worst-case batches, 2.2 at the mean.**
+- **§1 — THE SEAM WAS MEASURED, AND THE MEASUREMENT IS WORTH MORE THAN THE BYTES.** All **105
+  blocks** classified by what each BINDS, which is EF's own test. **Three quarters of `CLAUDE.md`
+  is rule about what the game may contain** — the combat law 66.74 KiB, the card and ability law
+  59.12, the rune law 25.39, the talent law 17.96, the difficulty law 17.38, plus items, misc and
+  the text standard: **207.78 KiB, 74.0%** — and EF's tiebreak (*where a rule does both, it STAYS*)
+  is a one-way valve holding all of it here. **The full per-group table is in `docs/reports/FF.md`
+  §1a and this file does not restate it.**
+- **§1a — SO WHAT MOVED IS THE RESIDUE: 21.36 KiB IN EIGHT ITEMS, ALL WRITTEN AFTER EF TOOK THE
+  SEAM.** Seven whole blocks — the shell/engine/files traps, `RUN HEAD'S OWN GATE…`, the exact
+  counterfactual, an arm is not read until its process has exited, a snapshot taken mid-way, prose
+  recording a removal, and the read site is the line — plus **the four-bullet run inside the
+  *Working agreement*** that binds `baselines.json`, the battery's count grep and the parse floor.
+  **Four more candidates were read per-block and KEPT** because each ends in a rule about the game;
+  **`VERIFY THE BRIEF AGAINST THE REPO` and `A PRECEDENT IS A CLAIM` stay** because they bind the
+  batch's reading, and moving the rule that catches a false premise out of the required read is the
+  one move that could cost more than it saves.
+- **§1b — IT WENT INTO THE FILE THAT ALREADY EXISTS, NOT A THIRD ONE, AND THAT WAS MEASURED.**
+  **Three instruments name the two halves by path** — `check_ea` §3's regex, `check_ec`'s `DOCS`
+  and `build_pin_manifest.py`'s — so a third file digs EC §2's territory hole in three places at
+  once, and costs a second pointer block in the required read.
+- **§1c — EF'S GROWTH-RATE READING IS SETTLED AGAINST ITS OWN RECENT NUMBER.** EF measured the
+  instrument half growing nearly twice as fast over five batches and said it was *composition, not
+  a law*. **Over the twenty-five batches EF→FE, `CLAUDE.md` grew +4,315 B a batch and
+  `docs/instrument-rules.md` grew +116 — the required read grew 37× faster.** The reference is
+  very nearly static: **2.83 KiB in twenty-five batches.**
+- **§1d — THERE IS NO THIRD SEAM OF THIS KIND, AND THAT IS NOW IN THE CEILING BLOCK.** The eight
+  `STANDING REFERENCE` blocks the ceiling block named as the remaining cut are **not available**:
+  there are eight, not the seven it said, and the two largest are the protected cores and the
+  engine/axis/tag vocabulary, which every new card is authored against. **A later batch at 290 KiB
+  is not looking for a seam — it needs a RULING**, and both candidates are the designer's. See the
+  open-queue item below.
+- **§2 — EVERY PIN WAS MAPPED BEFORE A BYTE MOVED AND NONE NEEDED RE-POINTING, MEASURED BOTH
+  WAYS.** Two unioned needle sources gave **65 needles across 27 readers and ZERO inside the
+  payload**; then **40 unmodified suites and gates were run against the split tree before one
+  assertion was edited — 0 failures, 0 throws.** **Two controls confirm the readers still bite**,
+  one per half (`check_dr` 80/1, `test_batch_ce` 1114/1). **The first arming of the first control
+  did NOT bite** — the needle occurs twice in the file and only one copy was broken, so the pin was
+  satisfied by the survivor and the run read identical to clean.
+- **§2a — THE READER POPULATION IS 27, NOT THE MANIFEST'S 25.** `check_dj` and `check_ec` reach
+  `CLAUDE.md` through a **dictionary of paths** rather than a `var` assignment, so neither the
+  manifest's extractor nor `check_ea` §3's regex sees them. **Recorded, not repaired** — both are
+  correct today, and it is where a future document pin can hide.
+- **§2b — THE REJOIN IS PROVED FOUR WAYS AND NEVER BY SIZE.** Against the pre-split commit: the
+  main half plus the payload re-concatenates byte for byte; each payload range appears verbatim
+  **exactly once** in the reference and not at all in `CLAUDE.md`; the reference is HEAD's file plus
+  exactly three insertions; and the headings partition **104 = 97 + 7**, zero overlap, order
+  preserved. **Two sizes agreeing is consistent with a duplicated block and a dropped one**, which
+  is now a rule in the reference's header.
+- **§2c — `check_ff.gd` IS NEW (55 CHECKS) AND ITS §4 IS THE HALF THAT KEEPS WORKING.** EF proved
+  by control that an index of headings can satisfy a pin; **FF added eight index rows, so it added
+  eight more places a pin can pass without reading a rule.** §4 walks every suite and gate, locates
+  every literal each asserts into `CLAUDE.md`, and **fails on any whose only occurrence is inside
+  the index table** — 63 literals across 26 readers, both floors asserted. **Three controls, all
+  three bit**, and the third is the fault in one line: **the armed pin PASSED while §4 named it.**
+- **§2d — AND THE NEW GATE'S OWN TERRITORY WAS A CLAIM IT FAILED FIRST.** Its first draft read the
+  documents into member vars, which breaks `build_pin_manifest.py`'s holder propagation — **all six
+  of its document pins were invisible to the manifest and unenforceable by `check_ed`**, and
+  `--check` reported the manifest *current*. Caught by running the builder, not by reading the gate.
+- **§3 — THREE STALE `master.html` CLAIMS CORRECTED, AND A FOURTH FOUND BY THE SWEEP.** *"the 53 ET
+  retires"* (**87 entries, 66 retired**), *"with the pool empty there is nothing left to price"*
+  (**both halves false — 21 live runes, and the number was ruled at EZ: 100g flat, all 21 read
+  100**), and *"Spec coverage: 65 authored runes — 5 universal, 3 class-wide"* (**that is the
+  RETIRED pool's structure; the live pool is 21, every one spec-scoped, across four specs**). **All
+  three sat roughly a hundred lines BELOW a passage stating the current truth** — the document
+  contradicted itself inside one section. **The fourth was the headline one line above the sentence
+  being fixed**, found by sweeping for the mechanism rather than the section.
+- **§4 — THE VERIFICATION RUN IS CLEAN.** 96 targets, `check_de` **394 checks / 0 failures / 0
+  notices** — every count in the tree matches its baseline exactly; `check_ff` 55 / 0 and
+  `check_parse` 170 / 0, both matching rows written before the run. **The only red is
+  `check_cm_live` at 13 / 4, its recorded baseline and the one red that is on purpose. Zero
+  `Parse Error` and zero `SCRIPT ERROR` across all 96 logs**, and the tree was md5-frozen across
+  the run with 229 files byte-identical.
+- **§3b — THE BATTERY'S ONE UNPREDICTED RED WAS A HOLE IN THIS BATCH'S OWN PRE-PASS, AND IT IS THE
+  finding worth carrying.** `check_ea` read **87 / 2** against a recorded 86 / 0: its §3 forbids a
+  literal matching `BATCH <1–3 capitals>` pinned into either rule file, and **the accused literal
+  was `check_ff`'s own** — *"THE FILE A BATCH IS REQUIRED TO READ IS `CLAUDE.md`"*, whose **"BATCH
+  IS"** the regex reads as the batch code `IS`. **The gate is right and the needle moved**;
+  `check_ea` returns to **86 / 0 exactly** and no baseline moved. **Two-armed control: 87 / 2 with
+  the fault restored, 86 / 0 repaired.** **FA §1b's pass was run and could not have caught it,
+  because `check_ff.gd` did not exist yet** — so **a batch that writes a NEW INSTRUMENT owes that
+  pass twice**: once against the changed tree, and again once its own instrument is in the tree.
+  **The red was not repaired while the battery ran**; it finished, every count was read, and
+  `check_ea` was the only movement across 91 targets with the tree md5-frozen and 229 files
+  byte-identical across the run.
+- **WHAT MOVED: two rule files, one document, one NEW gate and five documents.** `CLAUDE.md` (the
+  payload out, the index rewritten, the ceiling block corrected), `docs/instrument-rules.md` (the
+  payload in, header corrected), `docs/master.html` (§3 and the stamp); **`check_ff.gd` is NEW**,
+  `run_battery.sh`, `baselines.json` (two rows — `check_ff` at 55/0 and `check_parse` 169 → 170),
+  `pin-manifest.json` (1400 → 1406), `docs/changelog.html`, `docs/design-notes.md`, this file and
+  `docs/reports/FF.md`. **NO EXISTING SUITE OR GATE WAS EDITED and no file under `scripts/`,
+  `scenes/` or `data/` was touched.**
+- **Next letter: FG.** FF sorts above every suite's own stamp compare — the highest is `"CE"`, and
   all fourteen read exactly TWO characters.
-- **`CLAUDE.md` IS AT 284 KiB AGAINST A 290 KiB CEILING.** EE §1's rule. **The next batch to add a
-  block is the one that has to cut**, and there is roughly one batch of headroom left.
+- **`CLAUDE.md` IS AT 261.03 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT 95.23
+  KiB AND HAS NO STATED CEILING.** Headroom is **28.97 KiB — 6.9 batches at the measured mean of
+  +4,315 B, 3.6 at the worst batch on record.** Before FF it was 9.20 KiB and 1.1 worst-case
+  batches. **The split's own cost was +2.78 KiB across the two files.**
 - **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
   talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
   against four specs** with **eight specs still unauthored**. **What is left in the rune layer is
   still authoring and it is still the designer's, one rune at a time.** **The ladder still has an
   open design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on
-  this list.** **This batch opens no new question.**
+  this list.** **This batch opens one question and it is recorded below.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE CHANGELOG ARCHIVE CUT IS OVERDUE BY THREE OR FOUR BATCHES — **OWED, AND NOT TAKEN AT FF**
+
+**CW §4's rule (now in `docs/instrument-rules.md`) reads: THE THRESHOLD IS 400 KB. When
+`docs/changelog.html` exceeds it, cut at the next batch boundary.** It was measured across every
+commit at FF:
+
+| batch | `docs/changelog.html` | |
+|---|---|---|
+| FA | 396,126 B = 396.12 KB / 386.84 KiB | under both readings |
+| **FB** | **402,070 B = 402.07 KB** / 392.64 KiB | **over on the KB reading** |
+| **FC** | 409,793 B / **400.18 KiB** | **over on both** |
+| FD | 417,348 B / 407.56 KiB | over |
+| FE | 423,502 B / 413.57 KiB | over |
+| **FF** | **435,335 B = 435.33 KB / 425.13 KiB** | over, and FF's own entry is 11.6 KiB of it |
+
+**So the cut was owed at FC at the latest, and FC, FD, FE and FF have all passed the boundary
+without taking it.** Nothing is red — **no instrument watches this threshold**, which is why it went
+four batches unnoticed: the last recorded reading is EV's *"about seven batches away"*, and seven
+batches came and went.
+
+**FF DELIBERATELY DID NOT TAKE IT, AND THE REASON IS FF's OWN §4.** An archive cut is a second
+byte-for-byte split with its own rejoin proof, its own second-script verification from backups, and
+its own literal sweep — **doing two of those in one diff is two changes wearing one diff**, which is
+the rule this batch was told to work under. **It is well-scoped, it is overdue, and it should be its
+own batch.** Target from the rule: cut at a batch boundary, leave the live file around 150 KB, move
+the oldest entries to `/Users/zipples/Documents/DoD-archive/changelog-archive.html`, edit no entry,
+and **assert the halves re-concatenate byte for byte — never by size.**
+
+**AND THE TRANSFERABLE HALF: A THRESHOLD WITH NO INSTRUMENT IS A NOTE, NOT A GATE.** `check_dv` §4
+prints the changelog's live ENTRY COUNT every battery and nothing prints its SIZE against the 400.
+A batch taking the cut should leave a print behind.
+
+### FOUR FALSE CLAIMS FF FOUND, REPORTED AND DELIBERATELY NOT FIXED — **THE FIRST IS A LIVE VACUITY**
+
+**Full evidence: `docs/reports/FF.md` §3a.** A split batch that also repairs the rune layer is two
+changes wearing one diff, so all four were left. **The first is the one that matters.**
+
+- **`check_es` §1 STILL PRINTS `DORMANT: the authored pool is empty (ET §1) … It wakes with the
+  first authored rune`. TWENTY-ONE RUNES HAVE BEEN AUTHORED AND IT DID NOT WAKE.** The gate is
+  green and the arm is not broken; **its stated reason is false.** Its sample member is
+  `{"key": "warrior", "spec": "berserker"}` and the Berserker is one of the **eight specs with no
+  authored rune**, so `Runes.generate` returns only `tpl_` stat sticks and the flatness reads
+  100% / 100% / 100% exactly as it did when the pool was empty. **This is a check that has stopped
+  asking its question while printing that it knows it has.** The fix is one word — a spec that has
+  authored runes — and it **changes what the flatness arm measures**, so it needs its own arming
+  and its own controls. **Whichever batch next touches the rune offer owes this.**
+- **`CLAUDE.md` STATES THAT DORMANCY AS PRESENT-TENSE FACT** inside `THE OFFERABLE RUNE POOL IS
+  RETIRED`. It is one bullet, and it goes with the gate's repair.
+- **AND TWO BLOCKS OF `CLAUDE.md` GIVE OPPOSITE ANSWERS, 330 LINES APART.** `THERE ARE NO RUNE
+  RARITY TIERS` still reads *"The 53 offerable runes carry prices of 50 / 75 / 100 / 120 / 160 …
+  That is a design decision and it is the designer's"*, which `A RUNE IS 100g, FLAT` (EZ §0)
+  overturned. **The same shape DL found four batches after CW's split.**
+- **THE `merchant` GLOSSARY ENTRY IS FALSE ABOUT THE OFFER.** It says the Peddler offers a rune
+  *"to each hero who has a free slot"*; `shop_screen._roll_offers` loops **every** party member and
+  **never calls `Run.rune_slots()`**. The slot refusal happens at the **purchase**, which is where
+  `master.html`'s own *"13.6 shop-rune refusals a run for no free slot"* comes from. **Player-facing
+  text — it goes through `docs/text-standard.html`.**
 
 ### FD'S TWO QUESTIONS ARE BOTH ANSWERED — **NOTHING IS OWED FROM THEM**
 
@@ -1235,11 +1306,25 @@ re-derived from the source at DM; not one was moved.**
   arithmetic behind the other three is still in `docs/reports/EC.md` §3 and a later batch reading
   that page needs to know which one was taken. **The live ceiling, the live sizes and the per-half
   growth rates are in the WHERE block and the knowledge-sync section; do not re-derive the ratio.**
-- **WHAT A CEILING SHOULD BE FOR EACH HALF — MEASURED AT EF §2, RULED ON NOWHERE.** EE's 290 KiB
-  was derived for one file and its FLOOR term held both halves, so **290 is now conservative for
-  `CLAUDE.md` alone.** Per-half by EE's own method: **`CLAUDE.md` 220 KiB, `docs/instrument-rules.md`
-  95 KiB**, and **the two sum to 315 rather than 290** because each half carries its own
-  ten-worst-batch headroom. **Taking those numbers is the designer's; the 290 stands until then.**
+- **WHAT A CEILING SHOULD BE FOR EACH HALF — MEASURED AT EF §2, RULED ON NOWHERE, AND FF MAKES IT
+  THE LIVE QUESTION.** EE's 290 KiB was derived for one file and its FLOOR term held both halves, so
+  **290 is conservative for `CLAUDE.md` alone.** Per-half by EE's own method: **`CLAUDE.md` 220 KiB,
+  `docs/instrument-rules.md` 95 KiB**, and **the two sum to 315 rather than 290** because each half
+  carries its own ten-worst-batch headroom. **Taking those numbers is the designer's; the 290
+  stands until then.**
+  - **BOTH OF EF'S NUMBERS ARE NOW STALE IN OPPOSITE DIRECTIONS, WHICH IS WHY THIS ITEM MATTERS
+    MORE THAN IT DID.** EF's **220 KiB for `CLAUDE.md` is BELOW the live file** (261.03) and always
+    would have been within four batches at the measured rate — it was derived off a +6.30 KiB worst
+    batch when the file was 175 KiB. EF's **95 KiB for the reference is now 0.23 KiB below it**
+    (95.23), and it was derived off a +5.00 KiB worst batch (DX) that was itself building that
+    file, against a file that has since grown **116 B a batch**. **Neither number should be adopted
+    as written; the METHOD is what survives.**
+  - **AND FF MEASURED THAT THE ALTERNATIVE — ANOTHER SPLIT — IS GONE.** Three quarters of
+    `CLAUDE.md` is rule about what the game may contain, held here by EF's one-way tiebreak, and
+    the residue is spent. **So the next batch to reach 290 KiB has exactly two moves and both are
+    rulings: derive a ceiling per half, or overturn the tiebreak** and accept that a batch may have
+    to open two files to find a rule about the game. **It is not looking for a seam.** Working:
+    `docs/reports/FF.md` §1, and the ceiling block in `CLAUDE.md` now says so.
 
 - **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
   `STACKS := 4` is a **direct-write probe depth**, not a carry ceiling — those checks write
@@ -1642,8 +1727,13 @@ re-derived from the source at DM; not one was moved.**
   **the differ reports the rest as DID NOT RUN instead of certifying a clean tree.**
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
-- **THE BASELINE TABLE IS `baselines.json` AND IT IS 87 ROWS: 46 suites, 36 gates, 2 scene runs
-  and 3 harness gates.** **ES ADDED `check_es` AT [42, 42] AND MOVED EXACTLY THREE OTHER ROWS —
+- **THE BASELINE TABLE IS `baselines.json` AND IT IS 95 ROWS: 46 suites, 44 gates, 2 scene runs
+  and 3 harness gates**, against a battery of **90 targets** (46 suites + 44 gates). **FF ADDED
+  `check_ff` AT [55, 55] AND MOVED EXACTLY ONE OTHER ROW — `check_parse` 169 → 170 — BOTH WRITTEN
+  BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS.** **A new gate owes TWO rows**, its
+  own and `check_parse`'s, because that gate's count IS its coverage and a target joining the
+  battery raises it the same day. **The row count below is the historical reading and is kept for
+  the reasoning attached to each move.** **ES ADDED `check_es` AT [42, 42] AND MOVED EXACTLY THREE OTHER ROWS —
   `test_runes` 3101 → 3118, `check_ek` 43 → 45 and `check_parse` 161 → 162 — ALL FOUR WRITTEN BEFORE
   THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS EACH.** **The `test_runes` +17 was COUNTED OFF
   THE DIFF rather than guessed**: `_schema` goes 472 → 585 (two absence pins and a no-prefix pin
@@ -1853,7 +1943,7 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
 
 ### The changelog
 - **THE LIVE FILE WAS CUT AT DV, AT THE DF/DG BOUNDARY.** It starts at **Batch DG** and holds
-  **39 entries** (DG → ES), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
+  **52 entries** (DG → FF, counted off the `<h2>` heads and confirmed by `check_dv` §4), read off `check_dv` §4 rather than counted by hand. **THIS LINE WAS
   STALE AGAIN AT EO, WHICH LEFT IT READING 34 WITH THE FILE AT 35** — the same fault the sentence
   below already records, for the third time. **THIS LINE WAS STALE AT EE, WHICH READ 24 WITH THE FILE AT 25** —
   `check_dv` §4 prints the live figure every battery and is the thing to read. **DV ASSERTED THAT COUNT AS AN EQUALITY AND IT COULD ONLY
@@ -1901,13 +1991,15 @@ the number.*
   at 194 files and the census reads **196 at that very commit** (`--rev HEAD`), so the recorded
   figure was two files short before EV touched anything. **196 + EV's own two = 198**, which is the
   whole of the delta and is the only way to read this row that stays true.
-- Heaviest, **re-measured at EV with this batch's own two files staged**:
-  `scripts/battle.gd` **1251.09**, `docs/design-notes.md` **465.71**, `docs/master.html`
-  **362.77**, `docs/changelog.html` **347.22**, `scripts/classes.gd` **341.94**,
-  **`pin-manifest.json` 306.08**, `CLAUDE.md` **240.18**, `scripts/unit.gd` **183.17**,
-  `scripts/talents.gd` **178.66**, `docs/state.md` **172.63**, `docs/talent-audit.html`
-  **165.03**, `scripts/run_state.gd` **141.35**. (`docs/state.md`'s own figure is the one this
-  edit moves; run the census rather than trusting it.)
+- Heaviest, **re-measured at FF with this batch's own files staged**:
+  `scripts/battle.gd` **1285.86**, `docs/design-notes.md` **504.14**, **`docs/changelog.html`
+  425.13**, `docs/master.html` **377.81**, `scripts/classes.gd` **347.39**,
+  **`pin-manifest.json` 316.45**, `CLAUDE.md` **261.03**, `scripts/unit.gd` **187.41**,
+  `docs/state.md` **186.02**, `scripts/talents.gd` **178.66**, `docs/talent-audit.html`
+  **165.03**, `scripts/run_state.gd` **145.34**, **`docs/instrument-rules.md` 95.23**.
+  (`docs/state.md`'s own figure is the one this edit moves; run the census rather than trusting it.)
+  **`CLAUDE.md` FELL 19.77 KiB THIS BATCH AND IS THE ONLY ROW THAT FELL** — FF §1 moved 21.36 KiB
+  of it into `docs/instrument-rules.md`, which enters this list for the first time.
   **THE CHANGELOG HAS PASSED `scripts/classes.gd` AND IS NOW FOURTH** (347.22 against 341.94),
   where at EU it was fifth. **CW's 400 KiB threshold is about seven batches away**: it grew
   **7.05 KiB this batch** (340.17 → 347.22), which is almost exactly the ~7.6 KiB a batch EU

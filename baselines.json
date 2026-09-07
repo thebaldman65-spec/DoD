@@ -264,8 +264,8 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    169,
-    169
+    170,
+    170
    ],
    "checks_obs": 3,
    "fails": [
@@ -273,7 +273,7 @@
     0
    ],
    "fails_obs": 10,
-   "note": "**BATCH FE MOVED IT 168 -> 169.** `check_fe` joined the battery, and **this gate's count IS its coverage** — a target joining the battery raises it the same day. **THE ROW IS WRITTEN BEFORE THE BATTERY**, off a standalone reading of 169 taken with `check_fe.gd` in the tree and every probe out of it. The RESIDUE is unchanged at 4 (`check_ck_width`, `check_cu`, `check_cv`, `check_dn` — in the tree, spawned by nothing). **A NEW GATE OWES TWO ROWS, ITS OWN AND THIS ONE**, and EL forgot the second: a gate whose count is its coverage reads a missing row as a regression rather than as an addition. **BATCH FD MOVED IT 167 -> 168** for `check_fd`, on the same rule."
+   "note": "**BATCH FF MOVED IT 169 -> 170.** `check_ff` joined the battery, and **this gate's count IS its coverage** — a target joining the battery raises it the same day. **THE ROW IS WRITTEN BEFORE THE BATTERY**, off three identical standalone readings of 170 taken with `check_ff.gd` in the tree and every control out of it. The RESIDUE is unchanged at 4 (`check_ck_width`, `check_cu`, `check_cv`, `check_dn` — in the tree, spawned by nothing). **A NEW GATE OWES TWO ROWS, ITS OWN AND THIS ONE**, and EL forgot the second: a gate whose count is its coverage reads a missing row as a regression rather than as an addition. **BATCH FE MOVED IT 168 -> 169** for `check_fe` and **FD 167 -> 168** for `check_fd`, on the same rule."
   },
   "harness_1": {
    "kind": "harness",
@@ -1276,6 +1276,20 @@
    ],
    "fails_obs": 3,
    "note": "NEW AT FE. THE GATE FOR THE RUNE ROWS FOLLOWING THE CARDS AND FOR THE OTHER TWO FROZEN QUEUES. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 79 / 0.** **§1 IS A CONSISTENCY CHANGE AND THE GATE SAYS SO OUT LOUD.** The five `RUNE_TAGS` rows that led with BREAK now read `[\"OFFENSE\", \"BREAK\"]`; §1 asserts the population, that BREAK is RETAINED on all five (a straight removal is what the ruling rejects), the two-tag ceiling, **and every primary column the transform does not touch** — a gate that counted only BREAK would pass on a table somebody had rewritten wholesale. The CARD table is its positive arm, because a batch that fixed the runes by re-breaking the cards is the failure worth catching. **§1b IS THE HALF THAT DECAYS SILENTLY**: it sweeps eleven scripts comment-stripped and asserts `rune_tag_line` has ZERO callers, and reads the two condition predicates' own source to assert THRESHOLD counts `primary_tag_count` and BREADTH `primary_tag_peak` and that neither names `rune_tags` — so the day a rune condition reads the table, the gate says so rather than four documents quietly becoming false. **§2 DERIVES THE ROLL-STORE-ANSWER POPULATION AT FIVE**, names `pending_item_offers` as the fifth (already guarded), and asserts the shop and the blacksmith are NOT in it — a census that quietly grew to include a screen that never had the fault would report a population it had not measured. **§2b AND §2c DRIVE THE TWO REPAIRS AND EACH LEADS WITH ITS NO-REROLL ARM**, because without it both sections pass on a function that simply rerolls (BATCH X). §2b answers three deferred Inquisitor picks — his boss pool is TWO, and on HEAD the third was STRANDED with every button dead. **§2d INSTANTIATES THE REAL MAP SCREEN**, reads the pick overlay's own buttons (scoped to the `z_index = 60` Control — a walk of the whole screen reads map-node buttons as offers, which is how this section first read red), and presses both picks through the real handlers. **SIX NEGATIVE CONTROLS, EACH DISCRIMINATING:** `ability_choice` neutered to HEAD → **6 reds**; `upgrade_choice` neutered → 3; **`ability_choice` turned into a REROLL → exactly 3**, the three no-reroll arms and nothing else; one rune row restored to BREAK-first → 3 here and 1 in `check_fd`; **`_pick_ability`'s old refuse-and-return restored → 6, reproducing the STRANDED pick through the real screen** (\"1 picks are still owed after three were answered\"); and a caller added for `rune_tag_line` → exactly 1. **§2c's THIRD ARM READ GREEN ON ITS FIRST ARMING** — two real queued offers share an (ability, upgrade) pair in only 247 of 400 trials, so on a fixed seed the arm was a coin flip; re-armed by CONSTRUCTING the collision it bit. Every control file was restored from a pre-control copy and **md5-verified identical**."
+  },
+  "check_ff": {
+   "kind": "gate",
+   "checks": [
+    55,
+    55
+   ],
+   "checks_obs": 3,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 3,
+   "note": "NEW AT FF. THE GATE FOR EF'S SEAM TAKEN A SECOND TIME, AND FOR THE INDEX HAZARD EF PROVED BY CONTROL. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 55 / 0.** FF moved eight instrument rules out of `CLAUDE.md` into `docs/instrument-rules.md` — seven whole blocks plus the four-bullet run inside the *Working agreement* that binds `baselines.json`, the battery's count grep and the parse floor. **§1 asserts each of the eight is a heading in the reference, is NO heading in `CLAUDE.md`, and survives there as exactly ONE index row and nothing else** — a prose restatement would be a second copy of a rule, which is what let that file contradict itself 1900 lines apart after CW's split. **§2 IS THE SHARP HALF: a BODY sentence out of each moved rule**, present once in the reference and absent from `CLAUDE.md`. A heading can be an index row; a sentence out of the middle of a rule cannot, so §2 is what separates *the rule moved* from *the title moved and the rule was dropped*. §3 asserts both halves still declare which file is the required read and that the tiebreak still runs one way. **§4 IS THE HALF THAT KEEPS WORKING**: it walks every suite and gate, matches the VARIABLE assigned from `res://CLAUDE.md` rather than the literal (a needle can sit three hundred lines below its read), locates every literal each asserts, and fails on any whose ONLY occurrence is inside the index table — EF's hazard swept live rather than checked once. It prints CHECKED 60 literals across 26 readers and asserts both floors, because a regex matching no reader reports a clean tree exactly as loudly as a clean tree. **THREE NEGATIVE CONTROLS, ALL THREE BIT:** a moved rule put back into `CLAUDE.md` as a heading → **2 reds in §1**; a body sentence deleted from the reference → **1 red in §2**; and a pin armed on a moved heading, whose only occurrence in `CLAUDE.md` is now an index row → **§4 accused it by name while the pin itself PASSED**, which is the whole fault in one line. **NOTHING HERE COMPARES A FILE SIZE** — two sizes agreeing is consistent with a duplicated block and a dropped one; the byte-exact reconstruction of both halves against the pre-split commit is a batch-time proof and is in `docs/reports/FF.md` §2. Every control file was restored from a pre-control copy and verified byte-identical with `cmp`. **AND ITS FIRST BATTERY RUN TOOK `check_ea` RED, 87 / 2 — the one unpredicted red of the batch.** `check_ea` §3 forbids a literal matching `BATCH <1-3 capitals>` pinned into either rule file, and §3's needle here opened *\"THE FILE A BATCH IS REQUIRED TO READ…\"*, whose **\"BATCH IS\"** it reads as the batch code `IS`. **The needle moved, not the gate**, and `check_ea` returns to 86 / 0 exactly. **FA §1b's pre-pass could not have caught it because this gate did not exist when that pass ran** — a batch writing a new instrument owes the pass twice."
   },
   "check_ez": {
    "kind": "gate",

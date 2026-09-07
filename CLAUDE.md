@@ -60,8 +60,10 @@ into this file changes it.
   through prose. **`check_ec` §2's own two needles are pinned against `docs/instrument-rules.md`
   for exactly that reason**, and every document instrument scopes a pin to the file it names.
 
-**WHAT IS OVER THERE** — twenty-six blocks in twenty-four entries, in the order they stood
-here; the two `###` children of the equality rule travel with their parent:
+**WHAT IS OVER THERE** — thirty-three blocks and one four-bullet run, in thirty-two entries, in
+the order they stood here; the two `###` children of the equality rule travel with their parent.
+**The last eight rows are FF §2's**, and they are the residue: rules written into this file AFTER
+the seam was taken, which the seam's own test puts on the other side of it:
 
 | | |
 |---|---|
@@ -89,6 +91,14 @@ here; the two `###` children of the equality rule travel with their parent:
 | SUITES AND THE HARNESS | CW §1 |
 | Verify before shipping *(the battery, the gates, the sim, the run harness)* | CG onward |
 | A NUMBER QUOTED FROM ONE DOCUMENT INTO ANOTHER STOPS BEING A MEASUREMENT | DJ §3 |
+| COUNTS, BANDS, FLAKES AND THE PARSE FLOOR *(four bullets out of the Working agreement)* | DE / DF / EI |
+| THE SHELL, THE ENGINE AND THE FILES *(a fourth `###` under THE TRAPS)* | CW §1 onward |
+| RUN HEAD'S OWN GATE AGAINST THE NEW CODE BEFORE RE-POINTING IT | FA §1b |
+| AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE | EX §1b |
+| AN ARM IS NOT READ UNTIL ITS PROCESS HAS EXITED | EV §6g |
+| A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME | FA §5 |
+| PROSE RECORDING A REMOVAL READS EXACTLY LIKE THE REMOVAL NOT HAPPENING | EV §5 |
+| THE READ SITE IS THE LINE, NOT THE FUNCTION | EU |
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
@@ -103,84 +113,6 @@ here; the two `###` children of the equality rule travel with their parent:
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
-- **A SUITE'S CHECK COUNT CAN DRIFT, AND A DRIFTING SUITE IS RECORDED AS A BAND, NOT A NUMBER.**
-  A suite that walks generated content has a count that is a function of what it rolled, and
-  **a count-diffing rule reads a drift as a regression.** **The live counts and bands live in
-  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; neither
-  this file nor `docs/state.md` restates it, they point at it.**
-  - **A BAND ALSO CARRIES THE NUMBER OF OBSERVATIONS BEHIND IT (STANDING, DE §1).** A band is a
-    claim about a distribution nobody has characterised, and **the number of readings behind it is
-    part of the claim.** **A band written to a sample's exact extremes is exceeded by roughly two
-    runs in eleven**, so: **floor = the lowest observation; ceiling = the highest PLUS the observed
-    spread.** It is asymmetric because **the floor is the half that catches a real fault** — a
-    section that stopped running costs hundreds of checks, not five. **Widen where a reading
-    demands it and nowhere else**, so every number stays traceable to a run.
-- **A FLAKY ASSERTION IS A THIRD KIND OF INSTABILITY AND IS NOT A DRIFT.** A suite whose COUNT is
-  rock steady can still fail by chance when an assertion compares two damage rolls that can land
-  on the same integer. **A bare `<` or `>` between two blows is not a check, it is a coin flip
-  with good odds.**
-  - **A RATIO WITH A MARGIN IS NOT THE ANSWER ON ITS OWN, AND COMPUTING THE PROPAGATED NOISE
-    FIRST IS (STANDING, DE §4).** The first line of the strike block is `randf_range(0.9, 1.1)`,
-    so **one blow carries ±10% and a RATIO of two carries up to 22%.** **A margin only works if it
-    is WIDER than the noise it sits on. Do that arithmetic before choosing the band, not after
-    the flake.** If the propagated noise is wider than the band the question needs, **THE BAND IS
-    NOT AVAILABLE**: seed the pair and assert exactly.
-  - **SEED THE PAIR, NOT THE SUITE.** `seed()` the same value immediately before EACH blow of a
-    compared pair, so both draw the same variance and the only thing left between them is what is
-    under test. **Where the check averages a LOOP of pairs, vary the seed per iteration**
-    (`seed(base + i)`) or the averaging that makes its band meaningful collapses into the same
-    measurement N times. **Where a GENERATED WALK is the subject, seed at every generation** —
-    the guarantee is per-BOARD.
-  - **THE BAND IS THE QUESTION. DO NOT WIDEN IT TO SWALLOW A FLAKE** — that deletes the check
-    rather than repairing it.
-  - **A SOURCE SWEEP CANNOT FIND A FLAKE, IN EITHER DIRECTION (STANDING, MEASURED AT DX §2).**
-    **`seed()`-count is not evidence**: twenty suites and gates make unseeded draws and are
-    perfectly stable, and a suite can call no RNG function at all while flaking on
-    `battle.gd`'s own roll, which no sweep of the suite tree can see. **ONLY READINGS FIND A
-    FLAKE, AND THE READINGS ARE IN `baselines.json`** — the rows carrying a `flake` field are the
-    answer to "how many are there", and nothing else is.
-  - **CHARACTERISE A FAILURE BEFORE NAMING IT.** A flake recorded as one thing at one rate has
-    twice turned out to be a different thing at a different rate once it was measured at scale.
-  - **A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE (STANDING, FOUND AT DE §6).** A row banded
-    `0–1` "for the known flake" hid a DETERMINISTIC failure at its floor for batches, because the
-    band happened to admit the observed value and nothing ever contradicted the label. **WHEN A
-    SUITE IS EXCUSED BY A KNOWN CAUSE, CHECK THAT THE RED IN FRONT OF YOU IS THAT CAUSE.**
-  - **A BAND WIDE ENOUGH TO COVER A GENUINE FAILURE CANNOT REPORT ONE (STANDING, SET AT DF §0).**
-    **A band is for a count that legitimately varies. It is never a place to admit a red.** The
-    moment a floor is set above zero to stop a known failure from shouting, the row has stopped
-    being a measurement and become an excuse — and **the one thing it can no longer do is tell you
-    the failure is still there**, nor that a second has arrived beneath it. **A FAILURE COUNT'S
-    FLOOR AND A CHECK COUNT'S FLOOR ARE NOT THE SAME KIND OF NUMBER**: a failure floor is a promise
-    that exactly that many reds are known, named and deliberate, so it belongs in `baselines.json`
-    **with the reason written beside it**, and a band around it is only ever a FLAKE's
-    contribution, never a deterministic red's.
-- **THE BATTERY'S COUNT GREP MUST MATCH EVERY SHAPE A SUITE PRINTS.** Three are in use:
-  `checks: N   failures: N`, `BATCH XX: N passed, N FAILED`, and `N checks`. A count-diffing rule
-  cannot see a regression in a suite whose count reads `?`, so a too-narrow grep is a blind spot
-  that looks like coverage. This was found and fixed three separate times.
-- **THE PARSE FLOOR COVERS EVERYTHING THE BATTERY SPAWNS, AND ITS POPULATION IS DERIVED FROM
-  `run_battery.sh` RATHER THAN FROM A LIST OF DIRECTORIES (STANDING, WIDENED AT EI §1).**
-  `check_parse` walks the battery's own `SUITES` and `GATES` arrays, every literal `--script`
-  target, every `run_one`, every scene run, the transitive `preload` / `ext_resource` /
-  `change_scene_to_file` closure of all of them, `project.godot`'s autoloads and main scene, what
-  is left of `scripts/` and `scenes/`, and `res://data/*.json`. **A target added to the battery is
-  covered the same day, without editing that gate.**
-  · **A DIRECTORY LIST IS WHAT WENT STALE, THREE SEPARATE TIMES**, and the third one is the reason
-    this rule is here: `gate_fixture.gd` was briefly broken and **the floor procedure every
-    implement-only batch runs — grep stderr for `Parse Error` — came back CLEAN while 23 gates
-    could not load**, because the repo ROOT was outside the walk. **DO NOT NARROW IT BACK TO A
-    DIRECTORY**, and do not add a population by naming its folder.
-  · **THE GATE MUST NOT `preload` ANYTHING.** A floor that preloads `gate_fixture.gd` cannot report
-    that `gate_fixture.gd` is broken — it fails to load itself, prints a Parse Error, runs not one
-    line and **exits 0**. The gate that checks the fixtures must not be one of the files that
-    depends on them.
-  · **ITS CHECK COUNT IS ITS COVERAGE AND THE FLOOR IS ASSERTED.** A failure total reads zero
-    whether the walk covers 158 files or 41, which is exactly how it was short three times without
-    anything going red. A FALL in that count is an error; a RISE is a notice telling the next batch
-    to record the number in `baselines.json`.
-  · **AND STILL GREP THE STREAM.** The tally is a ratchet on coverage, not the verdict. A data-file
-    JSON error is the one population the engine says nothing about, so the gate prints that one to
-    stderr naming itself a `Parse Error` — the floor procedure is one procedure.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -322,13 +254,23 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten of
   those. 210.59 + 80.90 = 291.49, **stated as 290 and rounded DOWN** — a ceiling above its own
   derivation is one nobody trusts.
-- **THE PROCEDURE AT 290 KiB IS A SPLIT, AND IT HAS BEEN TAKEN ONCE (EF §2).** A ceiling in KiB is a
-  ceiling on the READ, not on how many rules the project may hold — **splitting caps the read
-  without capping the rules, and pruning caps the rules, which is why it was always the wrong
-  instrument.** The instrument seam was the cut taken; the seven `STANDING REFERENCE` blocks are
-  the one still available. **Take CW's split discipline with it**: both halves name each other by
+- **THE PROCEDURE AT 290 KiB IS A SPLIT, AND IT HAS BEEN TAKEN TWICE (EF §2, FF §1).** A ceiling
+  in KiB is a ceiling on the READ, not on how many rules the project may hold — **splitting caps
+  the read without capping the rules, and pruning caps the rules, which is why it was always the
+  wrong instrument.** **Take CW's split discipline with it**: both halves name each other by
   path, every suite whose pin moved is re-pointed in the SAME batch, and the halves are asserted to
   re-concatenate byte for byte.
+  · **AND FF MEASURED THAT THERE IS NO THIRD SEAM OF THIS KIND. A LATER BATCH AT THE CEILING IS
+    NOT LOOKING FOR ONE.** FF classified all 105 blocks by what each BINDS and the residue is
+    spent: **roughly three quarters of this file is now rule about what the game may contain**,
+    which the tiebreak above keeps here by construction, and FF took what was left of the
+    instrument half. **The `STANDING REFERENCE` blocks are NOT the seam this block used to name
+    them as** — there are eight of them now, not seven, and the two largest (the protected cores,
+    and engine/axis/tag) are the vocabulary every new card is authored against, so the tiebreak
+    keeps both. **The next batch to reach 290 KiB has two moves and both are the designer's:
+    re-derive the ceiling per half (EF costed it and deliberately did not take it), or overturn
+    the one-way tiebreak.** The classification and its per-group sizes are in `docs/reports/FF.md`
+    §1 — do not re-derive them from a proposal.
   · **TAKE A SPLIT AT A MEASURED SEAM, NOT AT A REACHED CEILING (STANDING, EF §2).** EF split at
     52.50 KiB of headroom rather than at zero. **A seam is cleaner measured than reached**, and a
     split taken under a ceiling is a split taken in a hurry — which is the same argument that made
@@ -1283,43 +1225,6 @@ as a live decision.
   that names the caster twice ("X shields X!") is the same tell that a branch never expected a
   self-cast.
 
-### THE SHELL, THE ENGINE AND THE FILES
-- **ZSH DOES NOT WORD-SPLIT UNQUOTED EXPANSIONS: A BATTERY SCRIPT MUST HOLD FLAGS IN AN ARRAY,
-  NOT A STRING.** `fps="--fixed-fps 12"` passed as bare `$fps` reaches Godot as ONE token, the
-  flag is rejected, and the suite silently runs at the default step — reporting failures that read
-  as real. Use `fps=(--fixed-fps 12)`. **The bash habit silently under-runs the one suite that
-  most needs the flag.**
-- **`\n` IN A GDSCRIPT STRING IS TWO CHARACTERS, SO A `\bword\b` REGEX SILENTLY FAILS ON EVERY
-  HAND-WRAPPED TOOLTIP.** The `n` of the escape is a WORD character, so `"this\nbeast's own gift"`
-  has no word boundary before the word — and a rename pass skips exactly the multi-line
-  descriptions that matter most. **Mask escapes to a non-word sentinel first, and add an ALL-CAPS
-  rule.** Found by re-running the survey afterwards, not by the pass reporting anything:
-  **a rename script that silently does 90% of the job looks identical to one that worked.**
-- **A `data/*.json` FILE HAS ITS OWN WHITESPACE AND `json.dumps(..., indent=2)` REWRITES THE WHOLE
-  FILE** — a one-entry glossary edit came out as a 1,966-line diff that buried the change.
-  **ROUND-TRIP FIRST**: dump the unmodified parse and assert it equals the file byte for byte
-  before writing, and only then edit. Nothing asserts a data file's whitespace.
-  · **DO NOT ASSUME THE STYLE. THIS BULLET SAID "EVERY `data/*.json` FILE IS TAB-INDENTED" AND
-    THAT WAS FALSE FOR HALF OF THEM** — `glossary.json` and `enemies.json` are indented with a
-    SINGLE SPACE and carry no trailing newline; `events.json` and `runes.json` match no simple
-    `json.dumps` form at all. **The round-trip is what makes the specific value irrelevant**, which
-    is why it is the half of this rule that binds: it found the error the other half asserted.
-    Use `ensure_ascii=False` throughout.
-- **A REFERENCE COUNT OF ZERO IS NOT EVIDENCE A FILE IS DEAD**, and it was wrong four ways in one
-  audit, every one of which would have broken the build. (1) **Sprite paths are BUILT at runtime**
-  (`"%s/%s_%s.png" % [...]`), so sixteen of twenty sprite files are named nowhere in source **and
-  the parse gate still passes** after deleting them. (2) **A `class_name` global is reached by
-  NAME and has no `preload` to find** (`Profile`, `Enemies`, `Glossary`, `GlossaryPanel`).
-  (3) Two files can reference only each other, a closed loop with nothing pointing in, and both be
-  live. (4) A font's `OFL.txt` is its LICENCE and may not be removed at any reference count.
-- **NEW `class_name` FILES NEED `--headless --import` BEFORE THEY RESOLVE.**
-- **GDScript gotchas that bit us:** multiline lambdas in call args (use named methods); ternaries
-  need parens for type inference; `:=` can't infer from untyped funcs; edits via python heredocs
-  (apostrophes! — use `chr(39)`); `min()`/`max()` are numeric-only, and **String args are a
-  runtime error mid-`_init` that leaves a headless `--script` run idling forever** — compare with
-  `<` instead. Children added in a SceneTree script's `_initialize` never fire `_ready` (root not
-  ready) — park scene-spawning tests on the first `process_frame`.
-
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
   save (user://run_save.bin v12, auto-saved after every slot), relic slots
@@ -2182,37 +2087,6 @@ the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN*
   layer's vocabulary stays in the rune layer** — that is ES §4's own rule, and the day a fifth file
   names a tag, that gate is what says so.
 
-## STANDING RULE — RUN HEAD'S OWN GATE AGAINST THE NEW CODE BEFORE RE-POINTING IT (Batch FA §1b)
-
-> **A gate that asserts a behaviour IN THE DIRECTION IT IS CURRENTLY TRUE is an instrument for the
-> batch that changes that behaviour. Run it unmodified against the new tree FIRST — before you edit
-> a single assertion — and read every red. The reds you did not predict are the dependencies.**
-
-- **FA IS THE WORKED EXAMPLE AND IT FOUND ONE THE BRIEF DID NOT NAME.** `check_ez` §1 asserted the
-  loadout vacuity deliberately, *"so the day it is changed the gate says so."* FA is that day. Run
-  unmodified against FA's code, HEAD's 96-check `check_ez` goes THREE red: the vacuity assertion
-  (predicted), `13 of 21 landed`, and **all EIGHT gated runes named as not landing** (not
-  predicted). §4's *condition MET* arm was the EMPTY LIST for all twenty-one and worked only
-  because an empty list met both shapes vacuously.
-- **THE COST OF SKIPPING IT IS A BATTERY.** That red is invisible from the diff — nothing in §4
-  mentions emptiness, and the arm reads as an ordinary `_member(...)` call — so the first thing
-  that would have found it is a forty-five-minute battery run, after the freeze.
-- **AND A RE-POINTED ARM IS CHECKED BEFORE IT IS USED.** §4's replacement asserts that the loadout
-  it just built really does meet the condition, **so a wrong arm reads as one broken arm rather
-  than as twenty-one broken payloads.** A rebuilt arm is new code in the gate and gets no more
-  trust than the code it is testing.
-- **FB RAN IT AND FOUND NOTHING, AND THAT IS THE ENTRY WORTH HAVING.** Eighteen targets that read
-  `data/runes.json`, unmodified, against FB's reverted payload before one assertion was edited:
-  **exactly one red, the predicted one.** A rule that has only ever been recorded on the run that
-  justified it reads as a rule about a near-miss. **The pass is cheap and its answer is information
-  either way** — FB's clean result is what licensed re-pointing `check_ez` in one pass instead of
-  two, and it cost about two minutes.
-- **AND A COUNT THAT MOVES IS PART OF THE READING, NOT JUST A FAILURE.** `test_runes` came back
-  **3803 against a recorded 3804** in that same pass — no failure, no red, nothing in the diff
-  pointing at it. It located the whole delta in one `_int_restore` assertion **before**
-  `baselines.json` moved, which is the difference between a baseline written off the arithmetic and
-  one written off whatever the code happened to do.
-
 ## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
 
 > **`compose` floors elite and mini-boss encounters with `budget = maxi(budget, 6)`. That is SIX
@@ -2570,133 +2444,6 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   spend that same sum as a BURN MAGNITUDE rather than as a chance. **None can know the assembled
   total** — it depends on the ability, the target and the board — so none was changed, and a sweep
   for "places that read `CRIT_CHANCE`" must not mistake any of the six for a roll site.
-
-## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
-
-> **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does
-> not remove the sampling error in the rolls it is priced over.**
-
-EW priced the surplus rate over one run set and read +1.351% at rows 1–9; EX priced it the same way
-over three more and read **2.048% / 1.211% / 1.031%** — a full percentage point of spread on a
-figure whose per-arm standard error is a tenth of that. **Nothing was wrong with either arithmetic.**
-The quantity is dominated by a rare heavy tail, so the estimate inherits the tail's variance no
-matter how exact the pairing is.
-
-- **QUOTE THE PAIRED DELTA AS EXACT AND THE LEVEL AS A SAMPLE.** "0.50 buys exactly half of 1.00"
-  is a property of the arithmetic and holds at every arm. "0.50 is worth +1.35%" is a reading of
-  one run set.
-- **A SAMPLE MAXIMUM OF AN UNBOUNDED TERM NEVER CONVERGES — never quote one as a bound.** Four arms
-  gave worst totals of 7.20 / 11.12 / 12.24 / 18.09.
-- **AND THE COUNTERFACTUAL RUNS HIGH AGAINST THE LIVE ARM, REPRODUCIBLY.** EW: 2.703 priced against
-  1.717 live. EX: 2.048 priced against 1.235 live. **Bigger blows kill faster, so the meter feeding
-  the tail has less time to build** — visible directly in EX's own arms, where the same counter-
-  factual priced over arms that RAN at 0 / 0.50 / 1.00 falls monotonically. Treat a counterfactual
-  as an upper reading and drive the live arm before quoting a swing.
-
-## STANDING RULE — AN ARM IS NOT READ UNTIL ITS PROCESS HAS EXITED (Batch EV §6g, recorded at EW §4)
-
-> **An analysis over a log that is still being written reads a PREFIX and reports it as the run.
-> Before reading an arm, confirm the process that writes it has exited — and confirm it by a marker
-> the process itself writes, never by looking at the file.**
-
-**THE SHAPE AND THE CONCLUSION SURVIVE THE TRUNCATION, WHICH IS WHY IT IS NOT CAUGHT BY READING
-THE RESULT.** EV launched three arms in parallel and analysed two of them mid-flight: same shape,
-same conclusion, **every count wrong** (rows 1–9 read 28,156 crit rolls against a true 34,785). It
-was found only because the ONE arm that had already finished was bit-identical across both
-readings — an accidental control.
-
-- **THE PROCEDURE: EACH ARM WRITES ITS OWN DONE MARKER AND THE READER POLLS FOR THE MARKER.**
-  `( ... ; echo "EXIT=$?" > arm.done ) &`, then a FOREGROUND `until [ -f arm.done ]` loop. **Not a
-  `pgrep -f` wait loop** (it matches itself and never exits) and **not a backgrounded `sleep`**
-  (a backgrounded call returns instantly and waits for nothing).
-- **A DELIBERATE CONTROL IS AVAILABLE FOR FREE AND COSTS ONE ARM: run one arm that finishes early
-  and read it twice.** If the two readings differ, something was still being written.
-- **AND IT GENERALISES BEYOND SIM ARMS**: a battery log, a probe dump, any file a detached process
-  is appending to. **The size of the file is not the signal** — a log that has stopped growing for
-  a minute may simply be in a slow fight.
-
-## STANDING RULE — A SNAPSHOT TAKEN MID-WAY MEASURES WHATEVER HAPPENED TO BE DONE AT THE TIME (Batch FA §5, recorded at FB §3)
-
-> **A before/after instrument is only as wide as its two endpoints. Take the FIRST snapshot before
-> the first byte moves and the LAST after the last one — a snapshot taken partway through reports a
-> clean zero for every file that moved outside the pair, and a clean zero is what it looks like when
-> the instrument is working.**
-
-**IT IS THE SAME SHAPE AS READING A LOG THAT IS STILL BEING WRITTEN**, the rule directly above, and
-it belongs beside it: both read a PREFIX of the thing they are measuring and report it as the whole.
-The difference is only which end is short — the log rule is about a process that has not finished
-writing, this one about an instrument that started reading too late.
-
-- **FA IS THE WORKED EXAMPLE AND IT CAUGHT ITSELF.** FA's literal sweep took its second snapshot
-  partway through the batch, so **`docs/state.md`'s rewrite fell outside the pair.** The sweep
-  reported `LOST 0` across every document — for a file it had never compared. Re-run
-  before-all-edits against final, `state.md` read **LOST 10**.
-- **THE FAILURE IS INVISIBLE FROM THE RESULT, WHICH IS WHY THE RULE IS ABOUT PROCEDURE.** A sweep
-  that skipped a file and a sweep that cleared it print the same line. This is the vacuous-check
-  fault arriving through the instrument's WINDOW rather than through its predicate — the same
-  family as a check whose key is wrong and skips every row while printing "0 violations".
-- **THE PROCEDURE: COPY THE WHOLE TREE BEFORE THE FIRST EDIT, AND DIFF AGAINST THAT.** Not a needle
-  list captured at some point during the work — the needle POPULATION may legitimately grow as the
-  batch writes new assertions, so it is taken as the union of both corpora, but the DOCUMENTS must
-  be compared against a copy that predates every edit. **FB took a 390-file `rsync` of the tree as
-  its first action** and the endpoints could not drift after that.
-- **AND THE SNAPSHOT INSTRUMENT IS ARMED LIKE ANY OTHER.** A green sweep over prose nothing reads is
-  indistinguishable from a green sweep over prose everything reads. FB armed its own on
-  `"PARTY" IS RETIRED FROM PLAYER-FACING TEXT` — a needle **written with escaped quotes** in
-  `test_batch_bx.gd`, so a plain grep for the resolved text finds nothing and only an
-  escape-resolving extractor sees it — and confirmed both arms: the sweep read `LOST 1` naming it,
-  and `test_batch_bx` §4b went red. Restored and md5-verified.
-
-## STANDING RULE — PROSE RECORDING A REMOVAL READS EXACTLY LIKE THE REMOVAL NOT HAPPENING (Batch EV §5, recorded at EW §4)
-
-> **A comment that explains why a word is gone NAMES that word, and an instrument pinning the word
-> absent matches the comment. Before writing a comment that names a banned string, ask whether
-> anything greps for it.**
-
-**EV RENAMED A LOCAL VARIABLE TO CLEAR A PIN `test_batch_bg` HOLDS ABSENT, AND THE COMMENT
-EXPLAINING THE RENAME TRIPPED THE SAME PIN BY NAMING THE WORD.** The rename was correct; the
-record of it was what went red.
-
-- **THE FIX IS NEVER THE EXEMPTION.** An exemption granted to a sentence blinds the rule to a real
-  violation arriving in that file later — this project has paid for that once already (`check_ds`
-  in `check_da` §3). **Either the instrument strips comments first, or the prose does not spell the
-  word.**
-- **A COMMENT CANNOT CONCATENATE, WHICH IS WHY THE TWO HALVES ARE NOT SYMMETRIC.** A gate can split
-  a literal at runtime so its own source does not carry the needle; prose has no such move. **So
-  the burden falls on the prose**: say what the word was FOR without spelling it, and say in the
-  paragraph why it is absent.
-- **THIS IS THE SAME FAMILY AS DR §4's ABSENCE CHECK** — an instrument asserting a name is gone
-  must strip comments before it looks — and the two rules are the two directions of one seam.
-
-## STANDING RULE — THE READ SITE IS THE LINE, NOT THE FUNCTION (Batch EU, recorded at EV §4)
-
-> **`_ghost_hit` holds a converting read and a raw read of the same meter in one variable, and so
-> does `_companion_strike`. A POPULATION DERIVED BY WALKING FUNCTIONS WILL MERGE THE TWO AND BE
-> WRONG IN BOTH DIRECTIONS** — it converts a gift nobody ruled, and it reports a function as
-> "already handled" when only one of its two reads is.
-
-**EVERY POPULATION THIS PROJECT HAS DERIVED BY WALKING FUNCTIONS HAS THAT SHAPE AVAILABLE TO IT** —
-CN's 137, CO's refusal set, CY's delay cap, EM's 56. The rule is not about Loyalty; it is about how
-a census is taken.
-
-- **AND THE SWEEP HAS TO FOLLOW THE CALL, NOT THE FUNCTION, OR IT FINDS ONLY HALF.** EV §4 swept
-  for it and a DIRECT sweep — one that looks for a converting read and a raw read in the same body
-  — finds **six** Loyalty functions and **misses `_companion_strike`, which is the one EU named**,
-  because its converting read is inside `_comp_dmg_mult`. A ONE-HOP sweep finds four more.
-  **The population is eight, and five of them are the real shape**: `_ghost_hit` (the strike step
-  against Aguila's pierce), `_companion_strike` (against Canis's Bleed), `_stamp_loyalty_chip`
-  (the paid half against all three gifts), `_resolve_special`'s Kill Command (`_comp_dmg_mult`
-  against `kc_l`, which feeds the Bleed and the pierce) and `_autoplay_pick_kit` (the bot's
-  `_bot_boon_worth` against Primal Surge's raw `>= 4` gate). **ALL FIVE ARE CORRECT TODAY**, which
-  is the point: the shape is not a defect, it is a place a defect hides.
-- **A THIRD CATEGORY EXISTS AND IT IS NOT THE SHAPE**: `_gain_loyalty` and `_do_summon` hold a raw
-  accrual beside a call to `_stamp_loyalty_chip`, whose converting read is a DISPLAY. A sweep that
-  does not separate a display call from a payout reports both as mixed reads.
-- **AND THE FOCUS HALF CANNOT BE READ THE SAME WAY, WHICH IS WORTH KNOWING BEFORE SOMEONE TRIES.**
-  `second_resource` is FIVE specs' currencies in one field, so a raw read of it inside a Resonance
-  or a Faith branch is not a raw read of Focus at all; and `refresh_bars()` is a universal display
-  call, so a one-hop sweep on Focus returns eleven functions and **not one of them is the shape**.
-  **The Loyalty sweep is sharp because `loyalty` is Loyalty's alone.**
 
 ## STANDING RULE — A RETIRED PIECE OF CONTENT IS KEPT, AND SAID TO BE KEPT (Batch EO §3, the Melted Armor contract)
 

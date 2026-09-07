@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1400,
+  "total": 1406,
   "source": 1081,
   "other": 85,
-  "document": 234
+  "document": 240
  },
  "source_residency": {
   "code": 647,
@@ -2446,6 +2446,72 @@
    "k": "literal",
    "how": "read",
    "g": "check_fe.gd#118"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "docs/instrument-rules.md",
+   "n": "It holds no rule about what the game may",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#73"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "docs/instrument-rules.md",
+   "n": "NEVER PROVE A SPLIT BY COMPARING SIZES",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#74"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "docs/instrument-rules.md",
+   "n": "REQUIRED TO READ IS `CLAUDE.md`",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#72"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "CLAUDE.md",
+   "n": "THIS FILE IS THE REQUIRED READ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#69"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "CLAUDE.md",
+   "n": "WHERE A RULE DOES BOTH, IT STAYS HERE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#71"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s3_the_tiebreak",
+   "h": "CLAUDE.md",
+   "n": "docs/instrument-rules.md",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#70"
   },
   {
    "s": "test_batch_ah.gd",

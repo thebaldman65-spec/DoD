@@ -4,6 +4,45 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The seam was measured, and the measurement said there is no next one (Batch FF) — 2026-09-06
+
+The brief asked for the next seam and told me not to take one from it. That instruction is what the
+batch turned on. **Every seam I could propose was one I had already ruled out by EF's own test**,
+and the useful output was not the 21 KiB that moved — it was the classification that says nothing
+else can.
+
+**EF's rule is that the seam is what a rule BINDS, and that where a rule does both, it stays.** That
+tiebreak is a one-way valve, and twenty-five batches of writing rules about the game have pushed
+about three quarters of `CLAUDE.md` behind it. Classifying all 105 blocks made that visible for the
+first time: the card law and the combat law are 126 KiB between them and neither is movable by any
+argument the project has. **What was left was the residue — six blocks written into the required
+read after EF split it, plus one four-bullet run — and it is the residue precisely because the seam
+had already been taken.** A second cut of the same kind is a cut of what has leaked back, and that
+refills at about a block a batch.
+
+**So the honest answer to "where is the next seam" is that the question changes at the ceiling.** A
+later batch does not need a cleverer classification; it needs a ruling — a ceiling derived per half,
+or a tiebreak that runs both ways. Both are the designer's, both were costed by EF, and neither was
+taken. Writing that into the ceiling block is worth more than the bytes, because the failure mode
+here is a batch at 289 KiB spending itself looking for a seam that measurement already says is not
+there.
+
+**The other thing worth keeping is a negative result about a prediction.** EF measured the
+instrument half growing nearly twice as fast as the main one over five batches, and said in terms
+that it was composition rather than a law. It was composition: over the twenty-five batches since,
+the required read grew thirty-seven times faster than the reference. **EF was right to distrust its
+own most recent number, and the cheapest thing a later batch can do with a five-point trend is wait
+for twenty-five.** That is also why the residue went into the file that already exists instead of a
+third one — a file that has grown 2.83 KiB in twenty-five batches is not a file with a capacity
+problem, and three instruments name the two halves by path, so a third file digs the same hole in
+three places.
+
+**And §3's three stale claims all sat a hundred lines below a passage stating the current truth.**
+Not in a forgotten corner — in the same section, under a different heading, in a document a batch
+had edited two batches earlier. **The section a batch writes in is the section it sweeps**, and the
+mechanism does not respect section boundaries. Sweeping for the mechanism found a fourth the brief
+had not named, one line above the sentence I was already fixing.
+
 ## The bar slows and the target does not grow (Batch EY) — 2026-09-05
 
 ### Why `sweep_time` and not the half-widths
