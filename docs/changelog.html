@@ -15,6 +15,114 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-07 &mdash; Batch FJ: RECONNAISSANCE ON THE EIGHT UNAUTHORED SPECS</h2>
+
+<p><i><b>A report, and nothing else.</b> No rune was authored, proposed, sketched, named or
+reserved; no card, ability, talent, constant or magnitude moved; no file under
+<code>scenes/</code> was touched. The deliverable is <b><code>docs/spec-recon.html</code></b>, a
+standing document the designer and the assistant author forty runes against &mdash; eight sections,
+one per unauthored spec, each written to be read alone.</i></p>
+
+<p><b>&sect;0 &mdash; THE BRIEF&rsquo;S TWO NAMES ARE NOT CODE KEYS, AND A RUNE SCOPED TO THEM
+WOULD ROLL FOR NOBODY.</b> The eight are Berserker, Pyromancer, Cryomancer, Holy, <b>Devout</b>,
+Arcanist, Swordmaster and <b>Survivalist</b> &mdash; and the last two are DISPLAY names. The code
+keys are <code>inquisitor</code> and <code>mystic</code>; <code>classes.gd</code> records that the
+disagreement is deliberate and that a <code>&quot;devout&quot;:</code> entry would resolve nothing.
+<b>The scope strings are <code>spec:inquisitor</code> and <code>spec:mystic</code>.</b> Every other
+premise held: <code>core_slots</code> and <code>protected_names</code> really do disagree for all
+twelve specs, and the twenty-one live runes really are four sets across the Warden, Occultist,
+Sharpshooter and Beastmaster.</p>
+
+<p><b>&sect;1 &mdash; THE EIGHT ENGINES, DERIVED FROM THE CODE AND NOT FROM
+<code>master.html</code>.</b> For each: the passive&rsquo;s mechanic, its constants by name and
+value, what accrues, spends, caps and clears it, and <b>every read site as a LINE</b> (EV&rsquo;s
+rule), labelled the raw meter, a payout or a threshold. The protected core with both
+<code>core_slots</code> and <code>protected_names</code> reported and <b>which one the game
+reads</b> &mdash; the CAP reads <code>core_slots</code>, three files read
+<code>protected_names</code>, and the gap is the class basic attack, which occupies no slot. All
+157 cards across the three channels, each with its primary and secondary tag and <b>what it does at
+the read site</b>. The talent lanes, so a rune does not duplicate a node.</p>
+
+<p><b>&sect;1a &mdash; THE POPULATION IS THREE CHANNELS, NOT ONE, AND A DRAFT-POOL-ONLY READING IS
+WRONG BY UP TO FIVE CARDS.</b> <code>hold_ability()</code> is the one writer, so a zone-boss pick
+and an elite draft both land in <code>bm_abilities</code> and <b>both count toward a rune
+condition</b>. The reachable population per spec is boss pool + spec draft + class draft &mdash; 17
+to 21 cards, not the 10-to-13 draft pool alone.</p>
+
+<p><b>&sect;2 &mdash; WHAT A RUNE COULD NOT DO, WHICH IS THE HALF THAT WOULD HAVE SAVED EZ.</b>
+Per spec, what is already true and what is structurally unavailable. Four findings are worth naming
+here. <b>(1) A BREADTH rune can NEVER be satisfied by a Devout</b> &mdash; his whole earnable pool
+carries exactly TWO distinct primary tags, and the rule needs three at six cards and four at seven,
+so it is impossible at every bar size. <b>(2) A DEFENSE THRESHOLD is AUTOMATIC for him from six
+drafted cards on</b>, because only three off-tag cards exist. <b>(3) The Holy Cleric&rsquo;s
+BREADTH is satisfiable at EXACTLY ONE bar size</b> (six) and the Swordmaster&rsquo;s fails at
+exactly five &mdash; a condition can be live at one rung of the ladder and dead at the next.
+<b>(4) <code>BREAK</code> cannot carry a THRESHOLD anywhere in the game</b>: FD made it
+secondary-only, so <b>zero of the 227 tagged cards carry a BREAK primary</b> and
+<code>primary_tag_count(drafted, &quot;BREAK&quot;)</code> is always zero, for every hero in every
+build.</p>
+
+<p><b>&sect;2a &mdash; AND THE BARE LITERALS, WHICH ARE WHERE THE NEXT EZ WOULD HAPPEN.</b> The
+<b>Swordmaster&rsquo;s two stance DOWNSIDES</b> (<code>raw *= 1.10</code> taken in Aggressive,
+<code>raw *= 0.90</code> dealt in Defensive) carry no bonus field at all, where both UPSIDES carry
+two each &mdash; so <i>&ldquo;your Defensive guard no longer blunts your blade&rdquo;</i> is
+natural, obvious, and unimplementable from data. <b>Both halves of Trapper</b> are bare literals
+too (the +8% step and the 25% barb), and <b>Force of Nature REPLACES the passive&rsquo;s term
+rather than adding to it</b>, so a rune written against the 8% is worth nothing to a Survivalist
+holding that capstone.</p>
+
+<p><b>&sect;2b &mdash; 58 IDLE <code>rune_*</code> FIELDS, AND EVERY ONE IS STILL WIRED.</b> Of the
+80 declared on <code>BattleUnit</code>, 22 are written by a live rune and <b>58 belong to the 66
+retired ones</b> &mdash; declared, read in <code>battle.gd</code>/<code>unit.gd</code>, and written
+by nothing. That is what an author can reach with no new code, and it is <b>wildly uneven</b>: the
+Devout has 7 and the Occultist 8, <b>the Berserker has ONE</b>. The Cryomancer&rsquo;s four are the
+only rune plumbing in the game read PARTY-WIDE with a MAX
+(<code>_max_hero_rank(field, rune_field)</code>), so a rune written against one <b>competes with
+the talent node on another hero rather than stacking with it</b>.</p>
+
+<p><b>&sect;3 &mdash; THE TWENTY-ONE LIVE RUNES CARRY AN INVARIANT NOBODY HAD WRITTEN DOWN.</b>
+14 PASSIVE, 5 ABILITY, 2 STAT; 4 THRESHOLD, 4 BREADTH, 4 TRADEOFF, 9 bare. <b>Each of the four
+authored specs got EXACTLY ONE THRESHOLD, EXACTLY ONE BREADTH and EXACTLY ONE TRADEOFF</b>, with
+the rest bare &mdash; 4&nbsp;&times;&nbsp;3 gated plus 9 bare is the 21. THRESHOLD and BREADTH are
+always on a PASSIVE; the TRADEOFF is on a STAT twice and an ABILITY twice. <b>Tags gated more than
+once:</b> DEFENSE (&times;2). <b>Gated once:</b> DEBUFF, MARK. <b>Gated by no live rune:</b> BREAK,
+RESOURCE, OFFENSE, TEMPO &mdash; and BREAK can never be. All 21 are priced at 100g and none carries
+a <code>lane</code>.</p>
+
+<p><b>&sect;4 &mdash; TWO FALSE CLAIMS FOUND IN <code>master.html</code> AND CORRECTED TOWARD THE
+CODE, WHICH IS THE ONLY EDIT THIS BATCH MADE TO IT.</b> Both sat in the rune-condition section,
+<b>four lines below a paragraph that states the rule correctly</b> &mdash; EI&rsquo;s hazard
+exactly. <b>(1)</b> <i>&ldquo;The protected core is in the count, because it is carried: it is half
+to two thirds of the bar&rdquo;</i> is <b>false</b>: <code>Runes.drafted_names()</code> reads
+<code>bm_equipped</code>/<code>bm_abilities</code>, the EARNED cards, and both surfaces that draw
+the tick call it. The denominator is 4&ndash;7 (3&ndash;6 for the Holy), not the 7-to-10 bar.
+<b>(2)</b> <i>&ldquo;hold 2+ of a tag&rdquo;</i> is the charter&rsquo;s opening shape; the live rule
+has been <code>primary_tag_count(drafted, tag) * 2 &gt;= drafted.size()</code> since ES &sect;4.
+<b>The edit was proved by needle sweep: every string literal of 4+ characters in each of the 34
+files that read <code>master.html</code>, before and against now &mdash; 12,371 needles, ZERO
+LOST.</b> 18 GAINED, each checked against the pin manifest and against whether any target uses it
+negatively: none is. <b>And the sweep was armed first</b>, because a sweep that reads 0/0 on an
+unchanged file has proved nothing &mdash; a same-length one-character edit to a real needle moved
+it to 1 LOST.</p>
+
+<p><b>&sect;5 &mdash; ONE INSTRUMENT FAULT, FOUND BEFORE IT BECAME A HEADLINE.</b> The read-site
+sweep masked string literals before matching, which is the ordinary way to stop a sweep matching
+its own name inside a comment. <b>Half this codebase&rsquo;s field reads are string-keyed</b>
+&mdash; <code>_max_hero_rank(&quot;frigid_ranks&quot;, &quot;rune_frigid_ranks&quot;)</code>,
+<code>cfg.get(&quot;rune_opening_volley&quot;, 0)</code> &mdash; so the masked sweep reported
+<b>five idle <code>rune_*</code> fields as having ZERO read sites, four of them the
+Cryomancer&rsquo;s</b>. That reads as <i>a rune written against these would install and do
+nothing</i>, and it is false. The stripper now cuts only the comment, tracking quotes so a
+<code>#</code> inside <code>&quot;#e05050&quot;</code> does not truncate the line; the two versions
+were run against the same population as each other&rsquo;s control, <b>5 dead against 0 dead</b>.
+<b>The correct number of dead rune fields is zero.</b></p>
+
+<p><b>WHAT MOVED: three documents and one new one.</b> <code>docs/spec-recon.html</code> is NEW;
+<code>docs/master.html</code> (the two corrections above), <code>docs/changelog.html</code>,
+<code>docs/state.md</code> and <code>docs/reports/FJ.md</code>. <b>No <code>.gd</code> file, no
+<code>.json</code> data file, no gate and no <code>CLAUDE.md</code> rule</b> &mdash; the pin
+manifest reads current at 1,423 unchanged.</p>
+
 <h2>2026-09-07 &mdash; Batch FI: NO TEST WRITES THE PLAYER&rsquo;S SAVE</h2>
 
 <p><i><b>The ruling is taken and it is taken structurally.</b> A harness process cannot reach

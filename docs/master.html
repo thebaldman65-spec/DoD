@@ -1699,14 +1699,29 @@ read BREADTH</b>. No ability, talent or relic reads one, and no rune branches on
 anything but its own gate. The count is shown to the player on two screens.</p>
 <p><b>EQUIPPED, NEVER OWNED, AND THAT IS THE WHOLE DESIGN.</b> A hero&#x27;s <b>pool</b> is
 everything he has drafted and nothing ever leaves it, so a threshold read off the pool would turn
-on once, late, and never off again &mdash; a flat increment with a delay. His <b>loadout</b> is
-what he carries: 7 to 10 cards, capped, and freely benched and carried between fights. Counting
-the loadout is what makes it a <b>lever</b> &mdash; you can swap to switch a rune on or off.
-<b>The protected core is in the count</b>, because it is carried: it is half to two thirds of the
-bar, and a census that skipped it would answer a question about a hero&#x27;s cards with a number
-about only the swappable ones.</p>
-<p><b>THE DEFAULT SHAPE IS A THRESHOLD</b> &mdash; hold 2+ of a tag, get the effect &mdash; with
-other shapes available per rune. <b>A SPLASH PAYS FOR BREADTH INSTEAD (&sect;5):</b> where a
+on once, late, and never off again &mdash; a flat increment with a delay. What the conditions
+count is what he <b>carries and earned</b>: <code>Runes.drafted_names()</code> reads
+<code>bm_equipped</code>, falling back to <code>bm_abilities</code>. Counting that is what makes
+it a <b>lever</b> &mdash; you can swap to switch a rune on or off.</p>
+<p><b>AND THE PROTECTED CORE IS <i>NOT</i> IN THAT COUNT. THIS PARAGRAPH SAID IT WAS, AND BATCH FJ
+CORRECTED IT TOWARD THE CODE.</b> The claim &mdash; <i>&ldquo;the protected core is in the count,
+because it is carried: it is half to two thirds of the bar&rdquo;</i> &mdash; described the
+pre-ES&nbsp;&sect;4 charter and contradicted the paragraph four above it, which has said
+correctly since EZ that both conditions <i>&ldquo;count CARD primaries over the hero&#x27;s
+drafted cards&rdquo;</i>. <b>ES &sect;4 is why:</b> it measured that a protected core ALONE met a
+2+ threshold on BREAK for ten of twelve specs, so the conditions moved to drafted-only counting.
+<b>The denominator is therefore the EARNED cards, not the 7-to-10 bar</b> &mdash;
+<code>ability_slot_cap()</code> minus <code>core_slots(spec)</code>, so <b>4 to 7</b> for the ten
+3-slot specs and <b>3 to 6</b> for the Holy Cleric at 4. The whole-bar figure is a different
+number for a different question: <code>Run.loadout_ability_names()</code> is core plus earned, and
+that is what the on-screen tag census walks.</p>
+<p><b>THE DEFAULT SHAPE IS A THRESHOLD</b> &mdash; <b>at least HALF his drafted cards carry the
+tag as their PRIMARY</b>, get the effect &mdash; with other shapes available per rune.
+(<b>&ldquo;hold 2+ of a tag&rdquo; stood here and was corrected at Batch FJ:</b> that was the
+charter's opening shape, and the live rule has been
+<code>primary_tag_count(drafted, tag) * 2 &gt;= drafted.size()</code> since ES &sect;4 &mdash;
+written as integer arithmetic so half of an odd count rounds the same way in the condition and on
+the surface that prints it.) <b>A SPLASH PAYS FOR BREADTH INSTEAD (&sect;5):</b> where a
 normal rune pays for DEPTH in one tag, a splash pays for cards spanning several different tags.
 That is the inverse shape, and it gives the category an identity again now that the talent lanes
 it used to reach across are severed &mdash; <b>tags are the thing to reach across</b>, and a hero

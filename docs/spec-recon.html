@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Spec Reconnaissance (Batch FJ)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-09-07 (Batch FJ &mdash; first pass)</b></p>
+<h1>DAWN OF DECAY — THE SPEC RECONNAISSANCE</h1>
+<p><i>The eight specs that hold <b>no authored rune</b>, derived from the code so that forty
+runes can be written against what the game actually does. <b>This is a REPORT. Nothing here was
+authored, changed, retired or retuned</b> &mdash; no rune was proposed, sketched, named or
+reserved; no card, ability, talent, constant or magnitude moved. Every section is written to be
+read ALONE, while that spec's five are being drafted, so the shared arithmetic is repeated rather
+than cross-referenced.</i></p>
+<p style="border:2px solid #a00; padding:8px"><b>WHY THIS DOCUMENT EXISTS.</b> Batch EZ
+authored five Occultist runes from recollection and <b>four of its premises described bases that
+do not exist</b> &mdash; Hex of Ruin already struck three, Wrath of the Old Gods already marked
+two, Shieldwall covers no ally, and &ldquo;15% narrower a press&rdquo; had been
+<code>SS_SEQ_TAPER</code> since CS. <b>Every one was &ldquo;the card already does that.&rdquo;</b>
+Batch FD then found the two cards named in a tag ruling were not in the population at all.
+<b>Authoring from recollection cost four batches of repair on one spec's five runes.</b> So the
+&sect;2 half of every section below &mdash; <i>what a rune must NOT be written to do, because it
+is already true</i> &mdash; is the half this page is for.</p>
+<h2>COVERAGE, STATED BEFORE ANY FINDING</h2>
+<p><b>An audit that overstates its reach is worse than a narrow one that admits its edges.</b>
+Batch CJ reported 120 of 120 clean and was later found to have had no check for the failure mode
+it missed. So: this is what was derived, how, and what was not.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>How it was derived</th><th>Reached?</th></tr>
+<tr><td><b>All 12 specs</b>, of which these <b>8</b> are unauthored</td>
+<td>Dumped from a running headless engine through the game's own accessors
+(<code>Classes.protected_names</code>, <code>core_slots</code>, <code>core_enablers</code>,
+<code>spec_draft_pool</code>, <code>spec_pool</code>, <code>class_draft_pool</code>,
+<code>SPEC_INFO</code>, <code>Talents.LANE_TREES</code>), not parsed out of source text.</td>
+<td><b>12 / 12</b></td></tr>
+<tr><td><b>227 corpus abilities</b> (154 draft cards + 44 boss-pool entries + the cores)</td>
+<td>Every ability built live and every field read off the object.</td><td><b>227 / 227</b></td></tr>
+<tr><td><b>160 of 227 carry a <code>special</code></b> &mdash; <b>70% of the corpus</b></td>
+<td>The handler body was lifted out of <code>battle._resolve_special</code>'s match block (168 arms,
+battle.gd:16190&ndash;21032), comments and cosmetic calls stripped, and read. <b>A field-level read
+describes less than a third of this corpus</b>, which is CN's finding restated over a different
+population.</td><td><b>160 / 160</b>; every <code>special</code> named by a card resolves to an arm</td></tr>
+<tr><td><b>15 self-flag cards</b> across the eight, whose whole handler is
+<code>_apply_status(attacker, &hellip;)</code></td>
+<td>The flag's READ SITES were followed, because the payload is not in the handler. Listed per spec below.</td>
+<td><b>15 / 15</b></td></tr>
+<tr><td><b>80 <code>rune_*</code> fields</b> on <code>BattleUnit</code></td>
+<td>Each mapped to the rune that writes it and to its read sites in <code>battle.gd</code>/<code>unit.gd</code>.
+<b>22 are written by a live rune; 58 are idle</b> &mdash; and
+<b>all 58 are still wired</b>.</td><td><b>80 / 80</b></td></tr>
+<tr><td><b>The engines</b> &mdash; 8 passives</td>
+<td>Constants, accrual, spend, cap, clear and <b>every read site as a LINE, not a function</b> (EV's
+rule). Read sites are labelled: the raw meter, a payout, or a threshold.</td><td><b>8 / 8</b></td></tr>
+<tr style="background:#fee"><td><b>NOT REACHED: balance.</b></td>
+<td>Nothing here says whether a magnitude is right, whether a spec is strong, or whether a pool is
+well-priced. <code>check_ea</code>/<code>check_eb</code> hold the pricing invariants and
+<code>docs/draft-audit.html</code> holds the offer-space comparison; neither was re-run here.</td>
+<td><b>0 / 0</b> &mdash; out of scope</td></tr>
+<tr style="background:#fee"><td><b>NOT REACHED: the enemy side.</b></td>
+<td>No enemy ability, boss script or encounter table was read. A rune's real value depends on what
+it is pointed at, and that is not measured here.</td><td><b>none</b></td></tr>
+<tr style="background:#ffe"><td><b>PARTIAL: talent nodes.</b></td>
+<td>All 27 nodes per spec were dumped with their lane, row, <code>desc</code> and payload, and lane
+themes are reported. <b>Node read sites in <code>battle.gd</code> were NOT followed individually</b>
+&mdash; only where a node collides with something this page names. A rune that duplicates a node's
+<i>payload field</i> would be caught; one that duplicates a node's <i>effect through a different
+field</i> might not.</td><td><b>324 / 324 dumped</b>, read sites partial</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:8px"><b>ONE INSTRUMENT FAULT, FOUND AND FIXED WHILE
+THIS WAS BEING WRITTEN, AND RECORDED BECAUSE IT NEARLY BECAME A HEADLINE.</b> The read-site sweep
+masked string literals before matching, the ordinary way to stop a sweep matching its own name
+inside a comment. <b>Half this codebase's field reads are string-keyed</b> &mdash;
+<code>_max_hero_rank("frigid_ranks", "rune_frigid_ranks")</code>,
+<code>cfg.get("rune_opening_volley", 0)</code> &mdash; so the masked sweep reported <b>five idle
+<code>rune_*</code> fields as having ZERO read sites, four of them the Cryomancer's</b>. That reads
+as <i>a rune written against these would install and do nothing</i>, and it is false: all five are
+read. The stripper now cuts only the comment, tracking quotes so a <code>#</code> inside
+<code>"#e05050"</code> does not truncate the line, and the two versions were run against the same
+population as each other's control &mdash; <b>5 dead against 0 dead</b>. <b>The correct number of
+dead rune fields is zero.</b></p>
+<h2>THE TWO CONDITION SHAPES, AND THE ARITHMETIC EVERY SECTION REPEATS</h2>
+<p>A rune's optional clause comes through one of two predicates, and both read the hero's
+<b>drafted-and-equipped</b> cards only &mdash; <code>Runes.drafted_names(member)</code> reads
+<code>bm_equipped</code>, falling back to <code>bm_abilities</code>. <b>The protected core is NOT
+counted</b>, which is the ES &sect;4 ruling: a core kit alone met a 2+ BREAK threshold for ten of
+twelve specs, so the conditions moved to drafted-only counting.</p>
+<ul>
+<li><b>THRESHOLD</b> &mdash; <code>Classes.primary_tag_count(drafted, tag) * 2 &gt;= drafted.size()</code>.
+At least HALF the drafted cards carry the tag <b>as their PRIMARY</b>. A secondary tag counts for nothing.</li>
+<li><b>BREADTH</b> &mdash; <code>Classes.primary_tag_peak(drafted) * 3 &lt;= drafted.size()</code>.
+No single primary tag exceeds a third of the bar. This is a BOUND ON THE PEAK, not a count of tags touched.</li>
+<li><b>Both refuse an empty list</b> (FA &sect;1), and the guard is in the predicates themselves so
+the hero sheet and the loadout panel cannot draw a tick on an empty bar.</li>
+</ul>
+<p><b>The bar size <i>n</i> is the number of EARNED cards carried</b>, and it moves with the
+ladder: <code>ABILITY_SLOTS_BY_BOSS</code> is <code>[7, 8, 9, 10]</code> and
+<code>ability_slots_used = core_slots(spec) + equipped</code>, so a 3-slot spec carries <b>4 to 7</b>
+and the Holy Cleric, at <code>core_slots</code> 4, carries <b>3 to 6</b>. <b>A condition can
+therefore be satisfiable at one rung of the ladder and not another</b>, and two of the eight below
+have exactly that shape.</p>
+<p style="border:2px solid #a00; padding:8px"><b>AND ONE FACT THAT APPLIES TO ALL TWELVE
+SPECS: <code>BREAK</code> CANNOT CARRY A THRESHOLD, ANYWHERE.</b> Of the 227 tagged cards in
+the game, <b>0 carry BREAK as their PRIMARY tag</b> and
+<b>99 carry it as a secondary</b>. FD made BREAK secondary-only deliberately; the
+consequence nobody has written down is that <code>primary_tag_count(drafted, "BREAK")</code> is
+<b>always zero</b>, so a THRESHOLD rune gated on BREAK is inert for every hero in every build.
+The same is true of any tag with too few primaries in a given spec's pool, and each section below
+states which.</p>
+<h2>WHAT THE FOUR AUTHORED SPECS DID, AS A PATTERN</h2>
+<p><b>21 live runes across four specs</b> &mdash; the Warden, the Occultist, the
+Sharpshooter and the Beastmaster &mdash; against <b>66 retired</b>. Reported by shape so the
+eight new sets can be authored against a known distribution rather than by feel. <b>The designer's
+standing rule is that the combination follows the spec</b>, so this is a baseline, not a template.</p>
+<h3>Every live rune, by shape</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Spec</th><th>Rune</th><th>Primary</th><th>Secondary</th><th>Archetype tags</th><th>Gates on</th></tr>
+<tr><td rowspan="6"><b>beastmaster</b> (6)</td><td>Answering Pack</td><td>PASSIVE</td><td>THRESHOLD</td><td>DEFENSE</td><td>THRESHOLD on <b>DEFENSE</b></td></tr>
+<tr><td>Bared Fang</td><td>STAT</td><td>TRADEOFF</td><td>OFFENSE &middot; DEFENSE</td><td>&mdash;</td></tr>
+<tr><td>Long Leash</td><td>PASSIVE</td><td>&mdash;</td><td>OFFENSE &middot; RESOURCE</td><td>&mdash;</td></tr>
+<tr><td>Second Whistle</td><td>ABILITY</td><td>&mdash;</td><td>RESOURCE</td><td>&mdash;</td></tr>
+<tr><td>Shared Hide</td><td>PASSIVE</td><td>&mdash;</td><td>OFFENSE</td><td>&mdash;</td></tr>
+<tr><td>Shared Scent</td><td>PASSIVE</td><td>BREADTH</td><td>RESOURCE</td><td>BREADTH</td></tr>
+<tr><td rowspan="5"><b>occultist</b> (5)</td><td>Deepening Hex</td><td>PASSIVE</td><td>THRESHOLD</td><td>DEBUFF &middot; BREAK</td><td>THRESHOLD on <b>DEBUFF</b></td></tr>
+<tr><td>Open Wound</td><td>ABILITY</td><td>TRADEOFF</td><td>DEBUFF</td><td>&mdash;</td></tr>
+<tr><td>Shared Ruin</td><td>PASSIVE</td><td>&mdash;</td><td>DEBUFF</td><td>&mdash;</td></tr>
+<tr><td>Standing Mark</td><td>PASSIVE</td><td>&mdash;</td><td>DEBUFF &middot; DEFENSE</td><td>&mdash;</td></tr>
+<tr><td>Wide Rite</td><td>PASSIVE</td><td>BREADTH</td><td>DEBUFF</td><td>BREADTH</td></tr>
+<tr><td rowspan="5"><b>sharpshooter</b> (5)</td><td>Ambush</td><td>ABILITY</td><td>&mdash;</td><td>OFFENSE &middot; RESOURCE</td><td>&mdash;</td></tr>
+<tr><td>Heavy Bolts</td><td>PASSIVE</td><td>THRESHOLD</td><td>RESOURCE &middot; OFFENSE</td><td>THRESHOLD on <b>MARK</b></td></tr>
+<tr><td>Keen Focus</td><td>PASSIVE</td><td>&mdash;</td><td>RESOURCE</td><td>&mdash;</td></tr>
+<tr><td>Long Draw</td><td>ABILITY</td><td>TRADEOFF</td><td>RESOURCE</td><td>&mdash;</td></tr>
+<tr><td>Wide Watch</td><td>PASSIVE</td><td>BREADTH</td><td>RESOURCE</td><td>BREADTH</td></tr>
+<tr><td rowspan="5"><b>warden</b> (5)</td><td>Bared Plate</td><td>STAT</td><td>TRADEOFF</td><td>OFFENSE &middot; BREAK</td><td>&mdash;</td></tr>
+<tr><td>Bracing Line</td><td>PASSIVE</td><td>THRESHOLD</td><td>DEFENSE</td><td>THRESHOLD on <b>DEFENSE</b></td></tr>
+<tr><td>Long Watch</td><td>PASSIVE</td><td>BREADTH</td><td>OFFENSE &middot; BREAK</td><td>BREADTH</td></tr>
+<tr><td>Split Shield</td><td>ABILITY</td><td>&mdash;</td><td>DEFENSE</td><td>&mdash;</td></tr>
+<tr><td>Standing Wall</td><td>PASSIVE</td><td>&mdash;</td><td>DEFENSE</td><td>&mdash;</td></tr>
+</table>
+<h3>The distribution, and the invariant inside it</h3>
+<p><b>Primary type:</b> <b>14</b> PASSIVE, <b>5</b> ABILITY, <b>2</b> STAT.<br>
+<b>Secondary:</b> <b>9</b> (none), <b>4</b> THRESHOLD, <b>4</b> BREADTH, <b>4</b> TRADEOFF.<br>
+<b>Combinations:</b> PASSIVE &times;<b>6</b>, PASSIVE &middot; THRESHOLD &times;<b>4</b>, PASSIVE &middot; BREADTH &times;<b>4</b>, ABILITY &times;<b>3</b>, ABILITY &middot; TRADEOFF &times;<b>2</b>, STAT &middot; TRADEOFF &times;<b>2</b>.</p>
+<p style="border:2px solid #060; padding:8px"><b>THE INVARIANT, AND IT HOLDS FOR ALL FOUR
+SETS: each authored spec got EXACTLY ONE <code>THRESHOLD</code>, EXACTLY ONE <code>BREADTH</code>
+and EXACTLY ONE <code>TRADEOFF</code>, with the rest bare.</b> Verified across all four sets.
+That is 4 &times; 3 = 12 runes carrying a secondary and 9 bare, which is exactly the
+21. The THRESHOLD and BREADTH are always on a <code>PASSIVE</code>; the TRADEOFF is on a
+<code>STAT</code> twice (Warden, Beastmaster) and on an <code>ABILITY</code> twice (Occultist,
+Sharpshooter). <b>The Beastmaster is the only set of six</b>; the extra rune is a bare
+<code>PASSIVE</code>. <b>This is a description of what was done, not a rule that binds the eight.</b></p>
+<p><b>Which tags a live rune gates on.</b> Only THRESHOLD names a tag; BREADTH is tag-agnostic
+and four runes carry it. <b>Gated more than once:</b> <code>DEFENSE</code> (&times;2).
+<b>Gated once:</b> <code>DEBUFF</code>, <code>MARK</code>.
+<b>Gated by NO live rune:</b> <code>BREAK</code>, <code>RESOURCE</code>, <code>OFFENSE</code>, <code>TEMPO</code> &mdash; and of those,
+<code>BREAK</code> can never be gated at all, for the reason given above.</p>
+<p><b>Prices and requirements.</b> All 21 live runes are priced at
+<b>100g</b> &mdash; the price is not yet a lever.
+<b>3 of 21</b> carry
+<code>requires_ability</code>: Open Wound &rarr; <i>Shadowrend</i>, Split Shield &rarr; <i>Shieldwall</i>, Ambush &rarr; <i>Called Volley</i>.
+<b>None carries a <code>lane</code></b> &mdash; ES &sect;5 severed the lane rule, and
+<code>check_ez</code> asserts a live rune carrying one is the severed rule coming back.</p>
+<p><b>The retired 66 are not gone.</b> Their payload fields are still declared on
+<code>BattleUnit</code> and still read in <code>battle.gd</code> &mdash; <b>58 idle
+<code>rune_*</code> fields, every one of them wired</b>. Each section below lists the ones that
+belong to that spec, because they are what an author can reach <b>with no new code</b>.</p>
+<hr><h1>THE EIGHT</h1>
+<p><i>Each section is self-contained. Read one.</i></p>
+<hr><h2 id="berserker">BERSERKER <span style="font-weight:normal">(<code>berserker</code>, warrior)</span></h2>
+<h3>The engine &mdash; Blood Frenzy (<code>passive_id = "bloodrage"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Blood Frenzy: +2% damage for every 5% of health
+missing. Half the highest bonus reached in a battle
+is kept as a floor for the rest of it.</i></p>
+<p><b>What the meter is:</b> Not a stored meter. Two terms summed into one band on every read: <code>int((1 - hp/max_hp) * 100 / 5)</code> health steps plus <code>rage_spent / FRENZY_RAGE_PER_STEP</code>.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>FRENZY_MAX_STEPS</code></td><td><code>20</code></td><td><code>unit.gd:741</code></td><td>the band; +40% at the default step</td></tr>
+<tr><td><code>FRENZY_RAGE_PER_STEP</code></td><td><code>5</code></td><td><code>unit.gd:742</code></td><td>Rage that must LEAVE the bar to buy one step</td></tr>
+<tr><td><code>step</code></td><td><code>2.0 + bloodrage_step_bonus + rune_bloodrage_step_bonus</code></td><td><code>unit.gd:2686</code></td><td>% per step</td></tr>
+<tr><td><code>keep</code></td><td><code>[0.5, 0.85, 1.0][scar_tissue_ranks]</code></td><td><code>unit.gd:2701</code></td><td>the floor's share of the peak</td></tr>
+</table>
+<p><b>What accrues it:</b> Losing health, and <code>note_resource_spent()</code> (unit.gd:2666) — Rage that leaves the bar, however it leaves.<br><b>What spends it:</b> Nothing spends it. It is a live read of two counters.<br><b>What caps it:</b> <code>mini(steps, FRENZY_MAX_STEPS)</code> clamps the SUM, so the second term fills the band sooner and never deeper (unit.gd:2696).<br><b>What clears it:</b> Nothing. <code>frenzy_floor</code> ratchets up inside <code>frenzy_bonus()</code> itself (unit.gd:2710-2711) and never falls; units are rebuilt each battle, so it resets between fights.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:9315</code></td><td><b>the payout, and the only one</b></td><td><code>raw *= 1.0 + attacker.frenzy_bonus()</code></td></tr>
+<tr><td><code>unit.gd:3199</code></td><td>ratchet only</td><td><code>frenzy_bonus()</code> called for its side effect in <code>take_hit</code></td></tr>
+<tr><td><code>unit.gd:3298</code></td><td>ratchet only</td><td>the same, in <code>take_tick_damage</code></td></tr>
+<tr><td><code>battle.gd:19725</code></td><td>ratchet only</td><td>Blood Offering's self-cut banks the floor immediately</td></tr>
+<tr><td><code>unit.gd:2090</code></td><td>the UI chip</td><td>the nameplate's live/floor line</td></tr>
+<tr><td><code>battle.gd:15273-15278</code></td><td>instrument</td><td><code>_cy_sample</code>, a read-only sampler that must not ratchet</td></tr>
+<tr><td><code>battle.gd:23775</code></td><td>instrument</td><td><code>cz_rage_spent</code> banked at battle end</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <b>empty</b> &mdash; a real answer, not an omission. These abilities are protected because they shipped in the kit, not because the passive needs them.<br>
+<i>Authored reason:</i> Blood Frenzy reads his own health bar and nothing else.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Strike</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=23 pressure=18 perfect_id=rage resource_gain=20</code></td><td>The Warrior basic. Free, no cooldown, <b>+20 Rage</b>; <code>perfect_id = rage</code> pays extra Rage on a Perfect.</td></tr>
+<tr><td><b>Bloodlust</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.0 damage=26 pressure=18 heal_missing=0.3 resource_gain=10</code></td><td>Straight hit that <b>self-heals 30% of the damage against MISSING health</b> (<code>heal_missing</code>), which pulls him back UP out of the frenzy band.</td></tr>
+<tr><td><b>Wildstrikes</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=35 cooldown=3 delay=4.5 damage=16 pressure=14 aoe=True bleed_build=35 bleed_chance=0.5 resource_gain=10</code></td><td>AoE, <b>35 Bleed buildup at 50% chance</b> per enemy. The kit's only AoE.</td></tr>
+<tr><td><b>Hack and Slash</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=2 delay=3.0 damage=10 pressure=10 multi_hits=3 bleed_build=25 bleed_chance=0.5 resource_gain=10 perfect_extra_hit=False</code></td><td>Three hits on one target, 25 Bleed each at 50%. <code>perfect_extra_hit = false</code> &mdash; a Perfect adds no fourth swing.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>3 boss-pool + 10 spec-draft + 6 class-draft =
+    17 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Battle Shout</b>, <b>Rampage</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 10 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Blood Offering</b></td><td>RESOURCE</td><td><code>cooldown=3 delay=1.5 special=blood_offering</code></td><td><code>special = blood_offering</code> &mdash; <b>Pays 20% of CURRENT health for 60 Rage.</b> Health clamped at 1, so it cannot kill him. Free, 3-turn cooldown.</td></tr>
+<tr><td><b>Gut Rip</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=2.5 damage=6 pressure=20 special=gut_rip</code></td><td><code>special = gut_rip</code> &mdash; <b>Fills the target's bleed meter to 100 and bursts it</b>, then hits for <code>0.01 &times; damage &times; (bloodloss / 10) &times; Attack</code> &mdash; the damage is a function of the bloodloss that was there BEFORE the fill.</td></tr>
+<tr><td><b>Reckless Abandon</b></td><td>RESOURCE &middot; OFFENSE</td><td><code>cooldown=4 delay=1.5 special=reckless_abandon gated=True</code></td><td><code>special = reckless_abandon</code> &mdash; <b>Empties the Rage bar</b> and converts it to a 3-turn damage buff at <code>RECKLESS_PCT_PER_10</code> per 10 spent. Calls <code>note_resource_spent()</code>, so <b>the whole bar becomes Frenzy steps too</b>. <code>gated</code>.</td></tr>
+<tr><td><b>Berserk</b></td><td>OFFENSE</td><td><code>cost=25 cooldown=5 delay=1.0 special=berserk</code></td><td><code>special = berserk</code> &mdash; Grants <code>berserk_strikes</code> charges and <b>a 3-turn self-debuff taking <code>BERSERK_RISK_PCT</code> MORE damage</b> (read at battle.gd:9958-9959) &mdash; the authored way into his own power band.</td></tr>
+<tr><td><b>Blood Debt</b></td><td>MARK &middot; DEFENSE</td><td><code>cost=20 cooldown=4 damage=30 pressure=10</code></td><td>Fields only: 30% damage, 10 Pressure, 4-turn cooldown. Tagged <code>MARK</code>, and it is the Berserker's only MARK card.</td></tr>
+<tr><td><b>Unslaked</b></td><td>RESOURCE</td><td><code>cost=30 cooldown=5 delay=1.0 special=unslaked</code></td><td><code>special = unslaked</code> &mdash; Self-flag. For 4 turns <code>frenzy_bonus()</code>'s <code>keep</code> becomes <code>maxf(keep, 1.0)</code> (unit.gd:2708) &mdash; <b>the floor banks the FULL peak instead of half</b>, and it can never lower a Scar Tissue Berserker.</td></tr>
+<tr><td><b>Spite</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=20 cooldown=4 delay=1.0 special=spite</code></td><td><code>special = spite</code> &mdash; Self-flag, 6 turns. Read at battle.gd:9990-9993: <b><code>SPITE_PER_5_MISSING</code>% less damage taken per 5% of max health missing</b>, capped. <b>Mitigation, never healing</b> &mdash; it keeps him inside the frenzy band rather than lifting him out.</td></tr>
+<tr><td><b>Boil Over</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=40 cooldown=5 delay=2.5 damage=30 pressure=15 gated=True</code></td><td>Fields only, plus a status read in <code>frenzy_bonus()</code> (unit.gd:2723): for 2 turns after the strike he <b>receives only the floor</b>. The ratchet still runs, which is what makes it pair with Unslaked. <code>gated</code>.</td></tr>
+<tr><td><b>Battle Shout</b></td><td>RESOURCE &middot; OFFENSE</td><td><code>cost=15 cooldown=2 delay=1.5 special=battle_shout</code></td><td><code>special = battle_shout</code> &mdash; Party-wide damage buff whose size reads <b>the total bleed buildup on the whole enemy team</b>: <code>base + bloodloss/20</code> percent. Base and duration scale with <code>battle_shout_node</code>.</td></tr>
+<tr><td><b>Rampage</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=40 cooldown=4 delay=4.0 damage=20 pressure=10 multi_hits=3 bleed_build=10 perfect_extra_hit=False</code></td><td>Fields only: 3 hits, 10 Bleed each, no Perfect extra hit.</td></tr>
+</table>
+<p><b>The 3 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Blood Price</b></td><td>RESOURCE &middot; OFFENSE</td><td><code>cooldown=3 delay=1.5 special=blood_price</code></td><td><code>special = blood_price</code> &mdash; The smaller sibling: <b>7.5% of current health for 30 Rage</b>, and it <b>calls <code>frenzy_bonus()</code> to bank the floor immediately</b> (battle.gd:19725).</td></tr>
+<tr><td><b>Battle Shout</b></td><td>RESOURCE &middot; OFFENSE</td><td><code>cost=15 cooldown=2 delay=1.5 special=battle_shout</code></td><td><code>special = battle_shout</code> &mdash; Party-wide damage buff whose size reads <b>the total bleed buildup on the whole enemy team</b>: <code>base + bloodloss/20</code> percent. Base and duration scale with <code>battle_shout_node</code>.</td></tr>
+<tr><td><b>Rampage</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=40 cooldown=4 delay=4.0 damage=20 pressure=10 multi_hits=3 bleed_build=10 perfect_extra_hit=False</code></td><td>Fields only: 3 hits, 10 Bleed each, no Perfect extra hit.</td></tr>
+</table>
+<p><b>The 6 class-wide draft cards (warrior, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Battle Trance</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=15 cooldown=4 delay=1.0 special=battle_trance</code></td><td><code>special = battle_trance</code> &mdash; Self-flag, 4 turns; resets <code>trance_taken</code>. The payload is at the flag's read site.</td></tr>
+<tr><td><b>Rally</b></td><td>TEMPO &middot; RESOURCE</td><td><code>cost=15 cooldown=4 delay=1.5 target=ALLY special=rally_ally</code></td><td><code>special = rally_ally</code> &mdash; Moves an ally forward in the initiative order and grants <b>15% of their max resource</b>.</td></tr>
+<tr><td><b>Charge</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 delay=1.0 damage=25 pressure=20 applies_status={&#x27;id&#x27;: &#x27;dazed&#x27;, &#x27;turns&#x27;: 1} resource_gain=30</code></td><td>Fields only: 25% damage, 20 Pressure, 1 turn Dazed, <b>+30 Rage</b>.</td></tr>
+<tr><td><b>Cleave</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=2.5 damage=15 pressure=15 choose_three=True perfect_extra_hit=False</code></td><td>Fields only: <code>choose_three</code> at 15%.</td></tr>
+<tr><td><b>Warcry</b></td><td>OFFENSE</td><td><code>cost=20 cooldown=5 delay=1.0 special=warcry</code></td><td><code>special = warcry</code> &mdash; <b><code>WARCRY_PCT</code> damage buff on the WHOLE party</b> for 4 turns.</td></tr>
+<tr><td><b>Ironclad</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 special=ironclad</code></td><td><code>special = ironclad</code> &mdash; Self-flag, 4 turns: <code>IRONCLAD_CUT_PCT</code> mitigation.</td></tr>
+</table>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>17 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>3</b></td><td>17%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>3</b></td><td>17%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>5</b></td><td>29%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>4</b></td><td>23%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>1</b></td><td>5%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>1</b></td><td>5%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>6 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Six distinct primary tags in the pool &mdash; the widest of the eight. BREADTH is reachable at every bar size, and a THRESHOLD is a real choice on RESOURCE and OFFENSE at every size, and on DEBUFF and DEFENSE up to six. <b>He is the spec where both shapes work.</b></i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Bloodletting</b></td><td>Bleed as an engine: <code>bleed_bonus</code>, <code>hemorrhage_ranks</code>, <code>crushing_blows_ranks</code>, <code>arterial_ranks</code>, <code>scent_ranks</code>, <code>bloodcraze</code>. Reads the enemy team's bloodloss.</td><td>Savagery, Hemorrhage, Crushing Blows, Arterial Spray, Scent of Blood, Bloodcraze, Blood Tithe, Slaughterhouse, Exsanguination</td></tr>
+<tr><td><b>Fury</b></td><td>Rage and the frenzy band: <b><code>bloodrage_step_bonus</code> lives here (Unstoppable)</b>, and <code>scar_tissue_ranks</code> sets the floor's keep. <b>A rune touching the step or the floor is in this lane.</b></td><td>Unstoppable, Reckless Fury, Battle Roar, Deathwish, Scar Tissue, Measured Rage, Enraged, Last Rites, Undying Rage</td></tr>
+<tr><td><b>Warpath</b></td><td>Opening and momentum: First Blood grants 40 Rage at the bell, then flurry/relentless/overkill terms.</td><td>First Blood, Flurry, Bloodied Momentum, Relentless, Second Wind, Unrelenting Assault, Overkill, Bloodwake, Bloodstorm</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>The floor already survives a heal.</b> <code>frenzy_bonus()</code> is called from <code>take_hit</code> and <code>take_tick_damage</code> for the side effect alone, so a dive that is healed away before his next swing has already banked half of it. A rune that &ldquo;keeps what he reached&rdquo; is Scar Tissue and Unslaked.</li>
+<li><b>Spending Rage already feeds the passive.</b> CZ's second term means every Rage cost in his kit is already a Frenzy step. A rune paying Frenzy for spending Rage pays twice for one act.</li>
+<li><b>Unslaked already raises the ratchet rate</b> to 100% for four turns (unit.gd:2708), and it uses <code>maxf</code> so it can never lower a Scar Tissue Berserker.</li>
+<li><b>Boil Over already returns only the floor</b> for two turns (unit.gd:2723), written as a RETURN rather than a write, so nothing can permanently lower the floor.</li>
+<li><b>Four of his seventeen earnable cards already cost no resource</b> and three of those (Blood Offering, Blood Price, Reckless Abandon) convert health or Rage into the passive directly.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>He has exactly ONE idle rune field</b> — <code>rune_bloodrage_step_bonus</code>, the step-size term — against the Devout's seven and the Occultist's eight. Anything else a Berserker rune wants to do needs new code in <code>battle.gd</code>.</li>
+<li><b>The band cannot be deepened from data.</b> <code>FRENZY_MAX_STEPS</code> is a <code>const</code> with no bonus term beside it, so a rune can only make him reach +40% sooner, never further. That was CZ's explicit design decision, not an oversight.</li>
+<li><b>The payout is one line.</b> Everything Blood Frenzy pays goes through battle.gd:9315; there is no per-ability hook, so a rune cannot make one card read the meter differently.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>1 idle <code>rune_*</code> field</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_bloodrage_step_bonus</code></td><td>Rune of Boiling Blood (<code>boiling_blood</code>, retired)</td></tr>
+</table>
+<hr><h2 id="pyromancer">PYROMANCER <span style="font-weight:normal">(<code>pyromancer</code>, mage)</span></h2>
+<h3>The engine &mdash; Overburn (<code>passive_id = "overburn"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Overburn: +2% damage for every turn of Burn standing
+on the enemy team, up to +40%. Every turn of Burn
+CONSUMED refunds 1 Mana.</i></p>
+<p><b>What the meter is:</b> <b>Not stored anywhere.</b> <code>_total_burn_turns()</code> (battle.gd:12818) sums the <code>turns</code> of the Burn status across every living enemy, every time it is asked.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>OVERBURN_STEP</code></td><td><code>2.0</code></td><td><code>battle.gd:12869</code></td><td>% damage per burn turn standing</td></tr>
+<tr><td><code>OVERBURN_CAP</code></td><td><code>40.0</code></td><td><code>battle.gd:12870</code></td><td>the ceiling, in percentage points</td></tr>
+<tr><td><code>rate</code></td><td><code>2 if crucible > 0 else 1</code></td><td><code>battle.gd:13550</code></td><td>Mana per burn turn consumed</td></tr>
+</table>
+<p><b>What accrues it:</b> Nothing accrues. Applying Burn to any enemy raises it; a burn ticking down lowers it; an enemy dying removes its whole contribution.<br><b>What spends it:</b> <code>_overburn_refund()</code> (battle.gd:13546) pays 1 Mana per turn of Burn CONSUMED, capped at the missing Mana. It is a property of the PASSIVE — five cards inherit it from one implementation.<br><b>What caps it:</b> <code>minf(burn_turns * OVERBURN_STEP, OVERBURN_CAP)</code> — battle.gd:13474.<br><b>What clears it:</b> Enemy death. There is no other clear, because there is nothing to clear.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:9265</code></td><td><b>the payout</b></td><td><code>raw *= _overburn_mult(attacker, inferno_turns)</code></td></tr>
+<tr><td><code>battle.gd:16718</code></td><td>the payout, re-read</td><td>Cinderfall measures the field BEFORE its own consumption</td></tr>
+<tr><td><code>battle.gd:18589</code></td><td>the payout, re-read</td><td>Pyre Wake, the same</td></tr>
+<tr><td><code>battle.gd:20195</code></td><td>the payout, re-read</td><td>Wildfire, the same</td></tr>
+<tr><td><code>battle.gd:11079</code></td><td>refund</td><td>Detonation</td></tr>
+<tr><td><code>battle.gd:16766, 16790, 18405, 18646, 20265</code></td><td>refund</td><td>Cinderfall, Ember Debt, Funeral Pyre, Pyre Wake, Wildfire</td></tr>
+<tr><td><code>battle.gd:3372-3377</code></td><td>the UI chip</td><td>the passive's tooltip</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Fireball</code>, <code>Detonation</code><br>
+<i>Authored reason:</i> Overburn needs a Burn applier to build the field and a spender to empty it.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Fireball</b></td><td>DEBUFF &middot; BREAK</td><td><code>damage=20 pressure=15 dmg_type=fire applies_status={&#x27;id&#x27;: &#x27;burn&#x27;, &#x27;turns&#x27;: 3}</code></td><td>The overridden Mage basic. Free, no cooldown, applies <b>3 turns of Burn</b> &mdash; the passive's engine, on the free action.</td></tr>
+<tr><td><b>Detonation</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.0 damage=25 pressure=20 dmg_type=fire</code></td><td>Fields only for damage, but it calls <code>_overburn_refund()</code> (battle.gd:11079) &mdash; <b>the spender the protected core exists to guarantee</b>.</td></tr>
+<tr><td><b>Wildfire</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 delay=2.5 pressure=10 dmg_type=fire special=wildfire</code></td><td><code>special = wildfire</code> &mdash; Consumes 1 turn of Burn (2 on a Perfect) from EVERY burning enemy and converts it to damage; with the Wildfire Spread node it first lights every unburned enemy. <b>Samples <code>_total_burn_turns()</code> BEFORE its own consumption</b>, then refunds.</td></tr>
+<tr><td><b>Flamewave</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.0 damage=15 pressure=5 aoe=True dmg_type=fire</code></td><td>Fields only: AoE, 15% damage. No burn application.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>3 boss-pool + 13 spec-draft + 7 class-draft =
+    21 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Firestorm</b>, <b>Immolate</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 13 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Cinderfall</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=3 delay=3.0 damage=20 pressure=8 aoe=True dmg_type=fire special=cinderfall</code></td><td><code>special = cinderfall</code> &mdash; AoE that consumes <b>2 turns of Burn per enemy (3 on a Perfect)</b> and <b>DOUBLES its damage on each enemy it took burn from</b>. Refunds.</td></tr>
+<tr><td><b>Ember Debt</b></td><td>DEBUFF &middot; RESOURCE</td><td><code>cost=20 cooldown=4 dmg_type=fire special=ember_debt</code></td><td><code>special = ember_debt</code> &mdash; <b>Applies 12 turns of Burn to one target and refunds all 12 Mana at once</b> &mdash; the single largest meter swing in the kit.</td></tr>
+<tr><td><b>Slow Burn</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=15 cooldown=4 delay=1.5 dmg_type=fire special=slow_burn</code></td><td><code>special = slow_burn</code> &mdash; Applies the <code>slow_burn</code> status to every enemy for <code>SLOW_BURN_TURNS + 1</code>. A separate affliction from Burn, and it is in <code>DEBUFF_IDS</code>.</td></tr>
+<tr><td><b>Stoke</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 damage=25 pressure=8 dmg_type=fire</code></td><td>Fields only: 25% fire damage, 8 Pressure, 3-turn cooldown.</td></tr>
+<tr><td><b>Funeral Pyre</b></td><td>DEBUFF &middot; DEFENSE</td><td><code>cost=25 cooldown=4 delay=2.5 dmg_type=fire special=funeral_pyre</code></td><td><code>special = funeral_pyre</code> &mdash; <b>Strips ALL Burn from one target and converts what it WOULD have ticked into a barrier on himself</b> at <code>PYRE_SHARE</code>. Refunds the turns it removed.</td></tr>
+<tr><td><b>Firedraw</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=2.5 dmg_type=fire special=firedraw</code></td><td><code>special = firedraw</code> &mdash; <b>Moves Burn from every OTHER enemy onto the target</b>, <code>FIREDRAW_TAKE</code> turns each, <b>plus <code>FIREDRAW_DEEP_BONUS</code> from any enemy carrying another spec's debuff</b>.</td></tr>
+<tr><td><b>Pyre Wake</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=2.5 damage=8 dmg_type=fire special=pyre_wake</code></td><td><code>special = pyre_wake</code> &mdash; <b>Strips the target's Burn and throws one hit at a random living enemy per turn stripped.</b> Samples the multiplier before stripping.</td></tr>
+<tr><td><b>Emberkeep</b></td><td>DEBUFF</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=fire special=emberkeep</code></td><td><code>special = emberkeep</code> &mdash; Self-flag. Read only by <code>_emberkeep_holder()</code> (battle.gd:21897) &mdash; the payload is entirely at that read site.</td></tr>
+<tr><td><b>Backdraft</b></td><td>DEBUFF &middot; RESOURCE</td><td><code>cost=20 cooldown=3 special=backdraft</code></td><td><code>special = backdraft</code> &mdash; <b>Adds 2 turns (3 on a Perfect) to every standing Burn.</b> The most direct meter-raiser in the game.</td></tr>
+<tr><td><b>Immolate</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=15 cooldown=2 delay=1.0 special=immolate</code></td><td><code>special = immolate</code> &mdash; Self-flag, 4 turns. Read at battle.gd:9659: <b><code>raw *= 1.0 - IMMOLATE_CUT</code> (20%)</b> on damage he takes, and at battle.gd:11001 for the enemy-attacker branch.</td></tr>
+<tr><td><b>Pyroblast</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=45 delay=6.0 damage=55 pressure=25 dmg_type=fire</code></td><td>Fields only, and the kit's nuke: <b>55% damage at initiative 6.0 with NO cooldown</b>.</td></tr>
+<tr><td><b>Firestorm</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=3.5 damage=12 pressure=8 random_hits=6 dmg_type=fire applies_status={&#x27;id&#x27;: &#x27;burn&#x27;, &#x27;turns&#x27;: 2} perfect_extra_hit=False</code></td><td>Fields only: <b>6 random hits</b>, each applying 2 turns of Burn &mdash; up to 12 turns of meter from one cast.</td></tr>
+<tr><td><b>Phoenix Rebirth</b></td><td>RESOURCE</td><td><code>cooldown=4 special=phoenix</code></td><td><code>special = phoenix</code> &mdash; <b>Pays 15% of current health to refill the Mana bar completely.</b> Free, 4-turn cooldown.</td></tr>
+</table>
+<p><b>The 3 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Immolate</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=15 cooldown=2 delay=1.0 special=immolate</code></td><td><code>special = immolate</code> &mdash; Self-flag, 4 turns. Read at battle.gd:9659: <b><code>raw *= 1.0 - IMMOLATE_CUT</code> (20%)</b> on damage he takes, and at battle.gd:11001 for the enemy-attacker branch.</td></tr>
+<tr><td><b>Firestorm</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=3.5 damage=12 pressure=8 random_hits=6 dmg_type=fire applies_status={&#x27;id&#x27;: &#x27;burn&#x27;, &#x27;turns&#x27;: 2} perfect_extra_hit=False</code></td><td>Fields only: <b>6 random hits</b>, each applying 2 turns of Burn &mdash; up to 12 turns of meter from one cast.</td></tr>
+<tr><td><b>Ashes of Al&#x27;ar</b></td><td>DEFENSE</td><td><code>cost=30 delay=1.0 special=ashes</code></td><td><code>special = ashes</code> &mdash; Sets <code>ashes_return</code>. Shared by all three Mage specs' boss pools.</td></tr>
+</table>
+<p><b>The 7 class-wide draft cards (mage, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Magic Barrier</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=arcane special=magic_barrier</code></td><td><code>special = magic_barrier</code> &mdash; A barrier worth <b>20% of his own max HP</b> for 3 turns.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=arcane special=mirror_image</code></td><td><code>special = mirror_image</code> &mdash; <b>4 mirror charges</b>; each incoming attack strikes an image instead (battle.gd:13460-13468).</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 damage=12 pressure=3 multi_hits=3 dmg_type=arcane</code></td><td>Fields only: 3 hits at 12%.</td></tr>
+<tr><td><b>Mana Well</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.0 dmg_type=arcane special=mana_well</code></td><td><code>special = mana_well</code> &mdash; Self-flag, 4 turns: raises <code>_mana_regen</code>.</td></tr>
+<tr><td><b>Dispel</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=15 cooldown=3 delay=1.5 dmg_type=arcane special=dispel</code></td><td><code>special = dispel</code> &mdash; <b>Removes up to 3 debuffs</b> from a hero, or 3 buffs from an enemy &mdash; the branch depends on the target's side.</td></tr>
+<tr><td><b>Blink</b></td><td>TEMPO</td><td><code>cost=10 cooldown=3 delay=1.0 dmg_type=arcane special=blink</code></td><td><code>special = blink</code> &mdash; <b>Takes 2 turns off ALL his cooldowns.</b> 10 Mana. Tagged <code>TEMPO</code>.</td></tr>
+<tr><td><b>Mana Shield</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=15 cooldown=3 delay=1.0 special=mana_shield</code></td><td><code>special = mana_shield</code> &mdash; Self-flag, 3 turns: <b>damage taken becomes Mana</b>. DY &sect;1 put it here because it is the only ability in the game that does so, so it feeds no passive and dilutes none.</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:6px"><b>3 SELF-FLAG CARDS
+        &mdash; THE PAYLOAD IS NOT IN THE HANDLER.</b> The whole arm is
+        <code>_apply_status(attacker, &hellip;)</code>; what the card DOES lives at the flag's read
+        sites. <b>Emberkeep</b> &rarr; <code>emberkeep</code>; <b>Immolate</b> &rarr; <code>immolate</code>; <b>Immolate</b> &rarr; <code>immolate</code>.
+        <b>Reading these cards by their handler alone will misjudge every one of them.</b></p>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>21 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>11</b></td><td>52%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>6</b></td><td>28%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>2</b></td><td>9%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>5 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Five tags, and BREADTH is reachable throughout &mdash; but DEBUFF is 11 of 21, so a breadth build means deliberately refusing his own theme. DEBUFF and DEFENSE carry a threshold at every size; nothing else survives past four.</i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Kindling</b></td><td>Burn application and spread: <b><code>rune_accelerant_ranks</code> and <code>rune_conflagration_ranks</code> answer to Accelerant and Conflagration here</b>, and Wildfire Spread is the node Wildfire's handler reads.</td><td>Cinder Trail, Accelerant, Conflagration, Melt, Wildfire Spread, Explosive Force, Chain Ignition, Sea of Flame, Sky Ablaze</td></tr>
+<tr><td><b>Inferno</b></td><td>Standing in the fire: <code>IMMOLATE_CUT</code>'s neighbours, Ashen Skin, Backblast, Forge Body. Defensive conversion.</td><td>Ember Shroud, Ashen Skin, Heat Haze, Emberwall, Backblast, Kiln-Forged, Ash Lung, Forge Body, Rekindled</td></tr>
+<tr><td><b>Detonation</b></td><td>The spender: <b>Crucible doubles the Overburn refund rate</b>, Twin Detonation and Cataclysm sit at the top.</td><td>Focused Flame, Pressure Cooker, Aftershock, Concussion, Crucible, Twin Detonation, Total Commitment, Powder Keg, Cataclysm</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>Every consuming card is already refunded.</b> The refund lives on the passive, not on the card, so Detonation, Wildfire, Cinderfall, Ember Debt, Funeral Pyre and Pyre Wake all pay it already. A rune that &ldquo;returns Mana when you spend the fire&rdquo; is the passive.</li>
+<li><b>A consuming cast is already paid for the field it empties.</b> All four consumers sample <code>_total_burn_turns()</code> BEFORE their own consumption — the shape is authored in and commented at battle.gd:12866.</li>
+<li><b>Backdraft already extends every standing Burn</b> by 2 turns (3 on a Perfect), which is the most direct way to raise the meter that exists.</li>
+<li><b>Ember Debt already lays a 12-turn Burn and refunds all 12 Mana at once</b> — the single largest meter swing in the kit, on a 4-turn cooldown.</li>
+<li><b>Crucible already doubles the refund rate.</b> It is a talent, and the rate term has no second writer.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>There is no meter to carry.</b> Overburn is a live read of the enemy board, so a rune that &ldquo;keeps your heat through a kill&rdquo; or &ldquo;banks Overburn between fights&rdquo; has nothing to bank — killing the burning enemy is what takes the bonus away, by construction.</li>
+<li><b><code>OVERBURN_CAP</code> and <code>OVERBURN_STEP</code> are bare <code>const</code>s</b> with no bonus term beside them (unlike Blood Frenzy's step). Raising either from a rune needs code.</li>
+<li><b>The cap-raise was deliberately DELETED, not rehomed.</b> The comment above the constants (battle.gd:12855-12867) records that a later batch wanting one must author it deliberately.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>4 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_resist_pierce</code></td><td>Rune of the White Flame (<code>white_flame</code>, retired)</td></tr>
+<tr><td><code>rune_accelerant_ranks</code></td><td>Rune of the Long Burn (<code>long_burn</code>, retired)</td></tr>
+<tr><td><code>rune_conflagration_ranks</code></td><td>Rune of the Cinder Trail (<code>cinder_trail</code>, retired)</td></tr>
+<tr><td><code>rune_cinder_ember</code></td><td>Rune of the Cinder Trail (<code>cinder_trail</code>, retired)</td></tr>
+</table>
+<hr><h2 id="cryomancer">CRYOMANCER <span style="font-weight:normal">(<code>cryomancer</code>, mage)</span></h2>
+<h3>The engine &mdash; Glacial Hold (<code>passive_id = "permafrost"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Glacial Hold: Chilled stacks the Cryomancer applies
+never expire, and a Frozen enemy stays Frozen
+INDEFINITELY — it leaves the turn order until Ice Lance
+or Shatter releases it, or a new freeze passes the limit
+of ONE held enemy (which frees the oldest). Nothing else
+thaws it: not ally damage, not Blizzard, not time. A held
+enemy takes +15% damage from all sources and comes back
+on 1 stack of Chilled. Bosses resist the freeze until
+Broken and shrug a hold after one turn.</i></p>
+<p><b>What the meter is:</b> <b>Not a number.</b> A LIST — <code>_holds</code>, the enemies currently held — plus each held enemy's <code>hold_turns</code> counter and its Chilled stack count.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>HOLD_RELEASE_STACKS</code></td><td><code>(see battle.gd)</code></td><td><code>battle.gd</code></td><td>what a released enemy comes back on</td></tr>
+<tr><td><code>frozen turns</code></td><td><code><code>1 if (is_boss or not _freeze_holds(t)) else -1</code></code></td><td><code>battle.gd:12205</code></td><td>-1 is indefinite</td></tr>
+<tr><td><code>hold limit</code></td><td><code>ONE held enemy</code></td><td><code>battle.gd (_hold_freeze)</code></td><td>a new freeze frees the oldest</td></tr>
+</table>
+<p><b>What accrues it:</b> Chilled reaching 4 stacks, and two cards that skip straight to the hold (Glacial Prison, Cryoclasm). Chilled stacks the Cryomancer applies never expire.<br><b>What spends it:</b> Ice Lance or Shatter release it; a second freeze evicts the first.<br><b>What caps it:</b> ONE held enemy at a time. Bosses resist until Broken and shrug a hold after one turn.<br><b>What clears it:</b> Release, eviction, or death. <b>Nothing else thaws it</b> — not ally damage, not Blizzard, not time.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:12195</code></td><td>the gate</td><td><code>_freeze_holds()</code> — a living Cryomancer, and never on a hero</td></tr>
+<tr><td><code>battle.gd:12205</code></td><td>the duration</td><td><code>_freeze_turns()</code>, the ONE authored copy</td></tr>
+<tr><td><code>battle.gd:12241</code></td><td>the write</td><td><code>_hold_freeze()</code>, three callers</td></tr>
+<tr><td><code>battle.gd:12443, 12469</code></td><td>release</td><td>the release path and its signature</td></tr>
+<tr><td><code>battle.gd:12555</code></td><td>source check</td><td>a chill's source must be the Cryomancer</td></tr>
+<tr><td><code>battle.gd:4754</code></td><td>turn order</td><td>a held enemy sits at <code>next_time = INF</code></td></tr>
+<tr><td><code>battle.gd:9303</code></td><td>damage</td><td>the +15% a held enemy takes</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Frostbolt</code>, <code>Ice Lance</code><br>
+<i>Authored reason:</i> Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Frostbolt</b></td><td>DEBUFF &middot; BREAK</td><td><code>damage=20 pressure=15 dmg_type=frost applies_status={&#x27;id&#x27;: &#x27;chilled&#x27;, &#x27;turns&#x27;: 3}</code></td><td>The overridden Mage basic. Free, no cooldown, <b>3 turns of Chilled</b> &mdash; and Chilled he applies never expires.</td></tr>
+<tr><td><b>Razor Ice</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=2.5 damage=15 pressure=10 multi_hits=3 dmg_type=frost applies_status={&#x27;id&#x27;: &#x27;chilled&#x27;, &#x27;turns&#x27;: 3} perfect_extra_hit=False</code></td><td>3 hits, each applying Chilled. <b>The fastest route to the 4 stacks that trigger a hold.</b></td></tr>
+<tr><td><b>Blizzard</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=3.5 damage=15 pressure=10 aoe=True dmg_type=frost</code></td><td>Fields only: AoE, 15% frost.</td></tr>
+<tr><td><b>Ice Lance</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.0 damage=35 pressure=15 dmg_type=frost</code></td><td>Fields only for damage (35%), but it is <b>one of the two releases</b> the passive names. The release path is battle.gd:12443.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>3 boss-pool + 11 spec-draft + 7 class-draft =
+    19 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Rime</b>, <b>Shatter</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 11 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Winter&#x27;s Toll</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=2.5 damage=8 dmg_type=frost special=winters_toll</code></td><td><code>special = winters_toll</code> &mdash; <b>Hits every HELD enemy for <code>damage &times; hold_turns</code></b> &mdash; it reads the hold's DEPTH, and pays nothing when nothing is held.</td></tr>
+<tr><td><b>Rimebinding</b></td><td>DEBUFF</td><td><code>cost=20 cooldown=3 dmg_type=frost special=rimebinding</code></td><td><code>special = rimebinding</code> &mdash; <b>Copies the deepest held enemy's Chilled stack count +1 onto a new target.</b> Pays nothing with no hold standing.</td></tr>
+<tr><td><b>Killing Frost</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 damage=20 pressure=6 aoe=True dmg_type=frost special=killing_frost</code></td><td><code>special = killing_frost</code> &mdash; AoE that <b>only strikes enemies already Chilled</b>, and applies <code>KILLING_FROST_STACKS</code> more.</td></tr>
+<tr><td><b>Hoarfrost Armor</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=frost special=hoarfrost_armor</code></td><td><code>special = hoarfrost_armor</code> &mdash; Self-flag (<code>rimeguard</code>). Read at battle.gd:9723: <b><code>raw *= 1.0 - HOARFROST_CUT</code></b> on damage taken.</td></tr>
+<tr><td><b>Deep Winter</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=4 delay=2.5 dmg_type=frost special=deep_winter</code></td><td><code>special = deep_winter</code> &mdash; <b>Applies <code>ceil(deepest_hold_stacks / 2)</code> stacks of Chilled to EVERY enemy.</b> Reads the hold, pays the board.</td></tr>
+<tr><td><b>Cold Iron</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 damage=25 pressure=6 dmg_type=frost</code></td><td>Fields only: 25% frost, 6 Pressure.</td></tr>
+<tr><td><b>Frostbind</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=4 delay=2.5 choose_two=True dmg_type=frost special=frostbind</code></td><td><code>special = frostbind</code> &mdash; <code>choose_two</code>. Binds two enemies with <code>frostbind</code>; auto-picks the deepest-chilled second target if none is named.</td></tr>
+<tr><td><b>Rime</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=3 delay=3.0 special=rime</code></td><td><code>special = rime</code> &mdash; Applies <code>rime</code> for <code>4 + icy_resolve_ranks</code> turns <b>and 2 turns of Frostbite</b> &mdash; the status is applied on CAST, not on hit.</td></tr>
+<tr><td><b>Glacial Prison</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=4 delay=2.5 special=glacial_prison</code></td><td><code>special = glacial_prison</code> &mdash; <b>Skips the 4-stack requirement and calls <code>_hold_freeze()</code> directly</b>, chilling first if needed. One of three callers.</td></tr>
+<tr><td><b>Cryoclasm</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 special=cryoclasm</code></td><td><code>special = cryoclasm</code> &mdash; <b>Moves the prison: releases the currently held enemy and freezes the target instead</b>, carrying the stack count across. The released enemy returns on <code>HOLD_RELEASE_STACKS</code> and re-enters the timeline.</td></tr>
+<tr><td><b>Shatter</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=5 delay=4.0 damage=10 pressure=10 aoe=True dmg_type=frost</code></td><td>Fields only: AoE, 10% frost &mdash; and <b>the second of the two releases</b> the passive names.</td></tr>
+</table>
+<p><b>The 3 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Rime</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=3 delay=3.0 special=rime</code></td><td><code>special = rime</code> &mdash; Applies <code>rime</code> for <code>4 + icy_resolve_ranks</code> turns <b>and 2 turns of Frostbite</b> &mdash; the status is applied on CAST, not on hit.</td></tr>
+<tr><td><b>Shatter</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=5 delay=4.0 damage=10 pressure=10 aoe=True dmg_type=frost</code></td><td>Fields only: AoE, 10% frost &mdash; and <b>the second of the two releases</b> the passive names.</td></tr>
+<tr><td><b>Ashes of Al&#x27;ar</b></td><td>DEFENSE</td><td><code>cost=30 delay=1.0 special=ashes</code></td><td><code>special = ashes</code> &mdash; Sets <code>ashes_return</code>. Shared by all three Mage specs' boss pools.</td></tr>
+</table>
+<p><b>The 7 class-wide draft cards (mage, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Magic Barrier</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=arcane special=magic_barrier</code></td><td><code>special = magic_barrier</code> &mdash; A barrier worth <b>20% of his own max HP</b> for 3 turns.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=arcane special=mirror_image</code></td><td><code>special = mirror_image</code> &mdash; <b>4 mirror charges</b>; each incoming attack strikes an image instead (battle.gd:13460-13468).</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 damage=12 pressure=3 multi_hits=3 dmg_type=arcane</code></td><td>Fields only: 3 hits at 12%.</td></tr>
+<tr><td><b>Mana Well</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.0 dmg_type=arcane special=mana_well</code></td><td><code>special = mana_well</code> &mdash; Self-flag, 4 turns: raises <code>_mana_regen</code>.</td></tr>
+<tr><td><b>Dispel</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=15 cooldown=3 delay=1.5 dmg_type=arcane special=dispel</code></td><td><code>special = dispel</code> &mdash; <b>Removes up to 3 debuffs</b> from a hero, or 3 buffs from an enemy &mdash; the branch depends on the target's side.</td></tr>
+<tr><td><b>Blink</b></td><td>TEMPO</td><td><code>cost=10 cooldown=3 delay=1.0 dmg_type=arcane special=blink</code></td><td><code>special = blink</code> &mdash; <b>Takes 2 turns off ALL his cooldowns.</b> 10 Mana. Tagged <code>TEMPO</code>.</td></tr>
+<tr><td><b>Mana Shield</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=15 cooldown=3 delay=1.0 special=mana_shield</code></td><td><code>special = mana_shield</code> &mdash; Self-flag, 3 turns: <b>damage taken becomes Mana</b>. DY &sect;1 put it here because it is the only ability in the game that does so, so it feeds no passive and dilutes none.</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:6px"><b>1 SELF-FLAG CARD
+        &mdash; THE PAYLOAD IS NOT IN THE HANDLER.</b> The whole arm is
+        <code>_apply_status(attacker, &hellip;)</code>; what the card DOES lives at the flag's read
+        sites. <b>Hoarfrost Armor</b> &rarr; <code>rimeguard</code>.
+        <b>Reading these cards by their handler alone will misjudge every one of them.</b></p>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>19 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>9</b></td><td>47%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>6</b></td><td>31%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>1</b></td><td>5%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>2</b></td><td>10%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>1</b></td><td>5%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>5 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Five tags, BREADTH reachable throughout. DEBUFF (9) and DEFENSE (6) carry a threshold at every size; RESOURCE, OFFENSE, TEMPO and MARK cannot past four.</i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Winter</b></td><td>Chill depth and breadth: <b><code>hungering_ranks</code> is row 1</b> and its rune twin is read party-wide.</td><td>Hungering Cold, Deep Chill, Winter&#x27;s Grasp, Snowblind, Icy Resolve, Whiteout, Splintering Shards, Winter&#x27;s Depth, Eternal Winter</td></tr>
+<tr><td><b>Deep Freeze</b></td><td>The prison: <b><code>frostbite_ranks</code> (Brittle Ice) and <code>frigid_ranks</code> (Frigid Grip)</b>, Second Prison, Absolute Zero.</td><td>Brittle Ice, Bitter Cold, Frigid Grip, Numbing Cold, Second Prison, Cold Snap, Glacial Economy, Cold Storage, Absolute Zero</td></tr>
+<tr><td><b>Thaw</b></td><td>The release: <b><code>hypothermia_ranks</code> is row 1</b>, Killing Frost feeds <code>_hold_window_mult()</code>, and <code>crystal_edge_ranks</code> sits at row 3.</td><td>Hypothermia, Killing Frost, Crystal Edge, Focused Lance, Piercing Ice, Honed Shards, Shockwave, Frostbound Hours, Shardfall</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>Chilled the Cryomancer applies already never expires.</b> A rune that &ldquo;makes your Chill last longer&rdquo; is the passive's first clause verbatim.</li>
+<li><b>The hold is already indefinite</b> (<code>frozen</code> at -1 turns, off the timeline at <code>next_time = INF</code>). There is no duration to extend.</li>
+<li><b>A held enemy already takes +15% damage from all sources.</b></li>
+<li><b>Four of his eighteen earnable cards are already AoE</b> (Blizzard, Killing Frost, Shatter, and Shatter again through the boss pool) and Razor Ice already multi-hits.</li>
+<li><b>Rimebinding, Deep Winter and Cryoclasm already copy or move the prison's depth</b> onto other enemies — the spread lever exists three times.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>His four idle rune fields are the only rune plumbing in the game read PARTY-WIDE with a MAX.</b> <code>rune_frigid_ranks</code>, <code>rune_frostbite_ranks</code>, <code>rune_hungering_ranks</code> and <code>rune_hypothermia_ranks</code> all arrive through <code>_max_hero_rank(field, rune_field)</code> (battle.gd:7614), which takes the highest <code>node + rune</code> across LIVING HEROES. So a Cryomancer rune written against one of these <b>does not stack with the talent node on a different hero — it competes with it</b>, and it pays for the whole party's cold rather than the wearer's.</li>
+<li><b>The hold limit of ONE is structural, not a constant.</b> It is enforced by the eviction branch in <code>_hold_freeze</code>, so &ldquo;hold two&rdquo; is code, not data.</li>
+<li><b><code>permafrost</code> is the only passive in the game looked up party-wide</b> through <code>_living_hero_passive()</code> (4 call sites). His engine already fires for chills he did not cast, as long as he is alive.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>5 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_hungering_ranks</code></td><td>Rune of the Long Winter (<code>long_winter</code>, retired)</td></tr>
+<tr><td><code>rune_frostbite_ranks</code></td><td>Rune of the Bitter Grip (<code>bitter_grip</code>, retired)</td></tr>
+<tr><td><code>rune_hypothermia_ranks</code></td><td>Rune of the Killing Cold (<code>killing_cold</code>, retired)</td></tr>
+<tr><td><code>rune_frigid_ranks</code></td><td>Rune of the Bitter Grip (<code>bitter_grip</code>, retired)</td></tr>
+<tr><td><code>rune_crystal_edge_ranks</code></td><td>Rune of the Long Winter (<code>long_winter</code>, retired)</td></tr>
+</table>
+<hr><h2 id="holy">HOLY <span style="font-weight:normal">(<code>holy</code>, cleric)</span></h2>
+<h3>The engine &mdash; Mercy (<code>passive_id = "mercy"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Mercy: a stack is gained when an ally falls below 50%
+health (max 5). Each stack: +5% healing done. Stacks pay
+for Hymn of Hope and talent abilities, or one Empowers a
+heal — Empowered casts forgo their Perfect bonus.</i></p>
+<p><b>What the meter is:</b> <code>second_resource</code>, the second-resource bar, named &ldquo;Mercy&rdquo; at spawn (battle.gd:1161). <b>Shared plumbing</b>: the same field is the Arcanist's Resonance and the Sharpshooter's Focus.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>second_max</code></td><td><code>5 + mercy_cap_bonus</code></td><td><code>battle.gd:1319</code></td><td>Martyr's Vigor moves the ceiling</td></tr>
+<tr><td><code>opening</code></td><td><code>mini(zealous_mercy + rune_zealous_mercy, second_max)</code></td><td><code>battle.gd:1320</code></td><td>Zealous Light moves the start</td></tr>
+<tr><td><code>mercy_threshold</code></td><td><code>0.5 (+0.01 per Guardian Angel step)</code></td><td><code>unit.gd:877 / battle.gd:1504</code></td><td>the ally-health line that grants a stack</td></tr>
+</table>
+<p><b>What accrues it:</b> An ally falling below <code>mercy_threshold</code> of maximum health (<code>_on_hero_below_half</code>, battle.gd:16071).<br><b>What spends it:</b> <code>faith_cost</code> on Hymn of Hope and Resurrection (battle.gd:7996); one stack to Empower a heal (battle.gd:16114); Divine Plea at 2.<br><b>What caps it:</b> <code>second_max</code>, default 5.<br><b>What clears it:</b> Spending. Nothing decays it.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:16092</code></td><td>the gate</td><td>Empower needs a stack, or <code>avatar_of_mercy</code></td></tr>
+<tr><td><code>battle.gd:5389, 5391</code></td><td>the UI</td><td>the Empower button's enabled state</td></tr>
+<tr><td><code>battle.gd:14368, 14402</code></td><td><code>_mercy_holder()</code></td><td>the party-wide lookup</td></tr>
+<tr><td><code>battle.gd:20618</code></td><td>Shared Grief</td><td>counts allies under the threshold, not the meter</td></tr>
+<tr><td><code>battle.gd:2476-2479</code></td><td>spawn</td><td>Zealous Light's opening stacks</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 4; <code>protected_names</code> returns 5.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 5 names are protected; 4 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Heal</code>, <code>Hymn of Hope</code><br>
+<i>Authored reason:</i> Mercy is earned passively and must be SPENDABLE — Hymn pays stacks outright, and Empower needs a heal to empower.</p>
+<p><b>The 5 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Smite</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=44 pressure=16 dmg_type=holy perfect_id=self_heal</code></td><td>The Cleric basic, and <b>the hardest basic in the game at 44% damage</b> (the Warrior's is 23). <code>perfect_id = self_heal</code>.</td></tr>
+<tr><td><b>Heal</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=1 delay=3.0 target=ALLY special=holy_heal</code></td><td><code>special = holy_heal</code> &mdash; <b>40% of the CASTER's max HP</b>, multiplied by <code>_healing_done_mult</code> and a heal-crit roll. Banks overheal, spills overflow, wards through Vestments. Empowerable.</td></tr>
+<tr><td><b>Renewal</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=3 delay=3.0 target=ALLY special=renewal</code></td><td><code>special = renewal</code> &mdash; 5 turns of a regen ticking <b>15% of the caster's max HP</b>. Empowered, it also lands on the caster.</td></tr>
+<tr><td><b>Hymn of Hope</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>faith_cost=1 cooldown=2 delay=3.5 special=hymn</code></td><td><code>special = hymn</code> &mdash; <b>Costs 1 Mercy.</b> Heals the whole party 20% of EACH hero's max (25% Perfect, <b>35% Empowered</b>). The passive's outright spender.</td></tr>
+<tr><td><b>Resurrection</b></td><td>DEFENSE</td><td><code>faith_cost=1 cooldown=3 delay=4.0 target=ALLY special=resurrection</code></td><td><code>special = resurrection</code> &mdash; <b>Costs 1 Mercy.</b> Revives at 25% &mdash; <b>at 100% with a Renewal attached when Empowered</b>.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>3 boss-pool + 10 spec-draft + 6 class-draft =
+    18 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>1 card appears in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Divine Plea</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 10 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Second Wind</b></td><td>DEFENSE</td><td><code>cost=30 cooldown=4 delay=2.5 target=ALLY special=second_wind_holy</code></td><td><code>special = second_wind_holy</code> &mdash; <b>Heals back what the target actually took in the last two turns</b> (<code>damage_taken_recent()</code>), capped at 40% of their max (55% Perfect).</td></tr>
+<tr><td><b>Rite of Return</b></td><td>DEFENSE</td><td><code>cost=35 cooldown=5 delay=1.0 target=ALLY special=rite_of_return</code></td><td><code>special = rite_of_return</code> &mdash; Self-flag on the ally (<code>rite_return</code>, 4 turns). The payload is at the flag's read site, not here.</td></tr>
+<tr><td><b>Recant</b></td><td>RESOURCE</td><td><code>cost=25 cooldown=4 target=ALLY dmg_type=holy special=recant</code></td><td><code>special = recant</code> &mdash; <b>Restores 40% of the target ally's max RESOURCE</b> &mdash; Rage or Mana. Refuses on a target with no resource bar.</td></tr>
+<tr><td><b>Shared Grief</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=4 dmg_type=holy special=shared_grief</code></td><td><code>special = shared_grief</code> &mdash; <b>Pays 25% of his own max HP for <code>4 + SHARED_GRIEF_PER_WOUNDED &times; (allies under the Mercy threshold)</code> Mercy.</b> Guards on <code>second_resource_name != "Mercy"</code>.</td></tr>
+<tr><td><b>Reprisal</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=2.5 pressure=6 dmg_type=holy special=reprisal</code></td><td><code>special = reprisal</code> &mdash; <b>Damage equal to 50% of what he has healed recently</b> (75% on a Perfect). Pays nothing if he has healed nothing.</td></tr>
+<tr><td><b>Divine Presence</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=holy special=divine_presence</code></td><td><code>special = divine_presence</code> &mdash; Self-flag, 4 turns. Read by <code>_divine_presence_tick()</code> (battle.gd:14314): Mercy on a timer. Reads <code>rune_divine_presence_pct</code>. Guards on the Mercy name.</td></tr>
+<tr><td><b>Alms</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=holy special=alms</code></td><td><code>special = alms</code> &mdash; Self-flag, 4 turns. Read by <code>_alms_spill()</code> (battle.gd:14275): <b>overheal spills to the lowest ally</b> at <code>ALMS_WARD_PCT</code>. Guards on the Mercy name.</td></tr>
+<tr><td><b>Vespers</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 target=ALLY dmg_type=holy special=vespers</code></td><td><code>special = vespers</code> &mdash; Ally flag, 4 turns, power = <code>VESPERS_PCT</code> of the caster's max HP. <b>Read inside <code>unit.take_hit()</code> (unit.gd:2961-2964)</b> &mdash; it catches damage, not a heal.</td></tr>
+<tr><td><b>Divine Plea</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>faith_cost=2 cooldown=2 delay=3.0 target=ALLY special=divine_plea</code></td><td><code>special = divine_plea</code> &mdash; <b>Costs 2 Mercy and heals the target to FULL.</b> <code>check_eb</code> names it the pool's ONE crossover that is both cheaper and shorter than a comparable protected core.</td></tr>
+<tr><td><b>Intercession</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 special=intercession</code></td><td><code>special = intercession</code> &mdash; Self-flag/party effect on a 4-turn cooldown; one of the two moments <code>_sig("mercy_b")</code> marks.</td></tr>
+</table>
+<p><b>The 3 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Divine Plea</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>faith_cost=2 cooldown=2 delay=3.0 target=ALLY special=divine_plea</code></td><td><code>special = divine_plea</code> &mdash; <b>Costs 2 Mercy and heals the target to FULL.</b> <code>check_eb</code> names it the pool's ONE crossover that is both cheaper and shorter than a comparable protected core.</td></tr>
+<tr><td><b>Dawnbreak</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=2 delay=3.0 target=ALLY special=dawnbreak</code></td><td><code>special = dawnbreak</code> &mdash; Boss-pool heal, 2-turn cooldown. Added at DY &sect;2 to take his boss pool from ONE card to three.</td></tr>
+<tr><td><b>Sanctuary</b></td><td>DEFENSE</td><td><code>cost=30 cooldown=4 delay=3.5 special=sanctuary</code></td><td><code>special = sanctuary</code> &mdash; Boss-pool party defence, 4-turn cooldown. Added at DY &sect;2 alongside Dawnbreak.</td></tr>
+</table>
+<p><b>The 6 class-wide draft cards (cleric, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Ministration</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=2 target=ALLY dmg_type=holy special=ministration</code></td><td><code>special = ministration</code> &mdash; Heals the target <b>20% of THEIR max HP</b> (26% Perfect).</td></tr>
+<tr><td><b>Consecration</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=5 delay=1.0 dmg_type=holy special=consecration</code></td><td><code>special = consecration</code> &mdash; <code>consecration</code> on every non-companion hero for 4 turns, stamped with the caster's name.</td></tr>
+<tr><td><b>Chastise</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 damage=25 pressure=20 dmg_type=holy</code></td><td>Fields only: 25% holy, 20 Pressure.</td></tr>
+<tr><td><b>Unburden</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.5 target=ALLY dmg_type=holy special=unburden</code></td><td><code>special = unburden</code> &mdash; <b>Purges every debuff from one ally</b> and grants <code>unburdened</code> for 3 turns.</td></tr>
+<tr><td><b>Exhortation</b></td><td>DEFENSE &middot; OFFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=holy special=exhortation</code></td><td><code>special = exhortation</code> &mdash; <b><code>exhorted</code> at 35 on every non-companion hero, INDEFINITELY</b> (-1 turns), using <code>maxi</code> so a re-cast never lowers it.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 target=ALLY dmg_type=holy special=undying_vigil</code></td><td><code>special = undying_vigil</code> &mdash; <code>vigil</code> on one ally for 4 turns, stamped with the caster's name.</td></tr>
+</table>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>18 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>13</b></td><td>72%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>3</b></td><td>16%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>2</b></td><td>11%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>3 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td></tr>
+</table>
+<p><i><b>Three tags, and this is the sharpest scheduling problem of the eight.</b> BREADTH needs <code>peak &times; 3 &le; n</code>: at n=6 that is no tag over 2, and three tags &times; 2 = 6 exactly &mdash; reachable, and only just. At n=4, 5 and 7 it needs four or more distinct tags, which do not exist. <b>A BREADTH rune on the Holy Cleric is live at exactly one rung of the ladder and dead at the others.</b></i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Radiance</b></td><td>Raw healing throughput: Triage (<code>rune_triage_heal</code>), On the Mend, Overflow, Font of Light.</td><td>Triage, Soothing Touch, On the Mend, Benediction, Swift Mending, Radiant Cascade, Overflow, Font of Light, Sanctum</td></tr>
+<tr><td><b>Mercy</b></td><td>The meter itself: <b>Zealous Light writes the opening stacks (<code>rune_zealous_mercy</code>), Martyr's Vigor moves <code>second_max</code></b>, Avatar of Mercy is the capstone the Empower gate reads.</td><td>Heavenly Aura, Holy Light, Zealous Light, Sanctified, Grace, Ardor, Martyr&#x27;s Vigor, Communion of Mercy, Avatar of Mercy</td></tr>
+<tr><td><b>Vigil</b></td><td>Watching the wounded: <b>Guardian Angel moves <code>mercy_threshold</code></b>, Divine Presence and Last Hope carry rune twins.</td><td>Guardian Angel, Divine Presence, Last Hope, Inner Faith, Hour of Need, Blessed Vestments, Serenity, Watchtower, Martyrdom</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>Each stack already gives +5% healing done</b> as well as being spendable — the meter already pays twice.</li>
+<li><b>Empowered casts already forgo their Perfect bonus</b>, which is the authored cost of the Empower lever.</li>
+<li><b>Zealous Light already grants opening Mercy and already reads a rune field</b> — <code>rune_zealous_mercy</code> (battle.gd:1321), idle since the Rune of the Open Hand was retired.</li>
+<li><b>Divine Plea already heals to FULL</b> (battle.gd, <code>divine_plea</code>) for 2 Mercy on a 2-turn cooldown, and <code>check_eb</code> names it as the pool's ONE known cheaper-and-shorter crossover against a protected core. A rune deepening a Holy heal lands beside that.</li>
+<li><b>Not one of his eighteen earnable cards is AoE, multi-hit or choose-N.</b> Hymn of Hope reaches the party through its handler, not through the <code>aoe</code> flag.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>His BREADTH condition is satisfiable at exactly ONE bar size.</b> His earnable pool holds three distinct primary tags; the rule needs <code>peak * 3 &le; n</code>, which at n=6 wants no tag over 2 (three tags &times; 2 = 6, exactly reachable) and at n=4, 5 and 7 wants four or more tags, which do not exist. <b>A BREADTH rune for the Holy is met at six drafted cards and at no other count</b>, including the seven a fully-laddered hero carries.</li>
+<li><b>The Mercy bar is shared machinery.</b> <code>second_resource</code> is also Resonance and Focus, so a rune written against the FIELD rather than against <code>second_resource_name == "Mercy"</code> reaches two other specs.</li>
+<li><b>Three of his cards already refuse to fire when the caster is not Holy</b> &mdash; Shared Grief, Divine Presence and Alms each open with <code>if attacker.second_resource_name != "Mercy"</code>. The guard is authored per card, not centrally, so a rune assuming a central one is assuming something that does not exist.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>4 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_triage_heal</code></td><td>Rune of the Triage Ward (<code>triage_ward</code>, retired)</td></tr>
+<tr><td><code>rune_divine_presence_pct</code></td><td>Rune of the Sleepless Vigil (<code>sleepless_vigil</code>, retired)</td></tr>
+<tr><td><code>rune_last_hope_pct</code></td><td>Rune of the Open Hand (<code>open_hand</code>, retired)</td></tr>
+<tr><td><code>rune_zealous_mercy</code></td><td>Rune of the Open Hand (<code>open_hand</code>, retired)</td></tr>
+</table>
+<hr><h2 id="inquisitor">DEVOUT <span style="font-weight:normal">(<code>inquisitor</code>, cleric)</span></h2>
+<p style="border:2px solid #a00; padding:6px"><b>THE DISPLAY NAME AND THE CODE KEY
+        DIFFER, BY DESIGN.</b> Everything the player sees says <b>Devout</b>; every table,
+        accessor and pool in the code says <code>"inquisitor"</code>. <code>classes.gd</code> records
+        that the disagreement is deliberate and that a <code>"devout":</code> entry would
+        resolve nothing. <b>A rune scoped <code>spec:devout</code> would roll for
+        nobody.</b> The scope string is <code>spec:inquisitor</code>.</p>
+<h3>The engine &mdash; Conviction (<code>passive_id = "conviction"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Conviction: allies build Faith whenever Divine Shield
+absorbs damage for them — 2 a hit, max 3 stacks, doubled
+under Blessing of Zeal. Each stack: 2% damage mitigation
+and +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD
+THIS BATTLE. Apostle adds another 1x and Fervor another
+on Consecrated Ground, so both together are triple, not
+quadruple. At 3 the ally is healed for {mhp:15|ally}, and
+the COUNT resets while the peak does not. The Devout
+recovers {res:3}, carries Faith as well, and that count
+never releases.</i> <b>Tokens like <code>{mhp:15|ally}</code> are CL &sect;1 value-resolver placeholders, filled by <code>Classes.resolve_values()</code> at the surface &mdash; they are not raw text the player sees.</b></p>
+<p><b>What the meter is:</b> <b>A status, not a bar.</b> <code>faith_stacks</code> (0&ndash;3) and <code>faith_peak</code> on EVERY hero, rendered as the <code>faith</code> status chip. The Devout carries his own count as well, and it never releases.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>FAITH_RELEASE</code></td><td><code>3</code></td><td><code>battle.gd:15535</code></td><td>the count at which an ally is healed and reset</td></tr>
+<tr><td><code>FAITH_MITIGATION_PCT</code></td><td><code>2.0</code></td><td><code>battle.gd:15536</code></td><td>% mitigation per PEAK stack</td></tr>
+<tr><td><code>FAITH_DAMAGE_PCT</code></td><td><code>1.5</code></td><td><code>battle.gd:15537</code></td><td>% damage dealt per PEAK stack</td></tr>
+<tr><td><code>heal</code></td><td><code>15 + faithful_step + rune_faithful_step</code></td><td><code>battle.gd:15593</code></td><td>% of max HP at the release</td></tr>
+</table>
+<p><b>What accrues it:</b> Divine Shield absorbing damage for an ally — 2 a hit, doubled under Blessing of Zeal (<code>_gain_faith</code>, battle.gd:15734).<br><b>What spends it:</b> Nothing spends the PEAK. The COUNT resets at 3; Blessing of the Faithful zeroes both deliberately (battle.gd, <code>jubilee</code>).<br><b>What caps it:</b> <code>mini(faith_stacks + n, FAITH_RELEASE)</code> — the count caps at 3. <b>The peak has no cap</b> but cannot exceed 3 either, because the count is what feeds it.<br><b>What clears it:</b> Battle end (battle.gd:15638-15639) and Blessing of the Faithful.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:8956</code></td><td><b>the damage payout</b></td><td><code>raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT * peak * mult</code></td></tr>
+<tr><td><code>battle.gd:9793</code></td><td><b>the mitigation payout</b></td><td><code>raw *= 1.0 - 0.01 * FAITH_MITIGATION_PCT * peak * mult</code></td></tr>
+<tr><td><code>battle.gd:14682-14689</code></td><td>the multiplier</td><td>Apostle and Fervor, read as the best across the party</td></tr>
+<tr><td><code>battle.gd:15739</code></td><td>the ratchet</td><td><code>faith_peak = maxi(faith_peak, faith_stacks)</code></td></tr>
+<tr><td><code>battle.gd:6145, 6376</code></td><td>a gate</td><td>Blessing of the Faithful needs <code>JUBILEE_MIN_FAITH</code></td></tr>
+<tr><td><code>battle.gd:15290</code></td><td>instrument</td><td>the CY sampler reads <code>maxi(stacks, peak)</code></td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Divine Shield</code>, <code>Consecrated Ground</code><br>
+<i>Authored reason:</i> Conviction builds ONLY on Divine Shield absorbs, and Batch BI measured the ground&#x27;s drip at 66% of all Faith.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Smite</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=44 pressure=16 dmg_type=holy perfect_id=self_heal</code></td><td>The Cleric basic, and <b>the hardest basic in the game at 44% damage</b> (the Warrior's is 23). <code>perfect_id = self_heal</code>.</td></tr>
+<tr><td><b>Divine Shield</b></td><td>DEFENSE</td><td><code>cost=15 cooldown=2 delay=1.0 target=ALLY special=divine_shield</code></td><td><code>special = divine_shield</code> &mdash; <b>A barrier worth <code>35% + stalwart_step</code> of the DEVOUT's max HP</b> on one ally, through <code>_grant_divine_shield()</code>. <b>Absorbing from it is the ONLY thing that builds Faith.</b> Aegis can duplicate it onto a second ally.</td></tr>
+<tr><td><b>Consecrated Ground</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=3 delay=1.0 special=cons_ground</code></td><td><code>special = cons_ground</code> &mdash; 3 turns of <code>cons_ground</code> on the whole party. <b>BI measured this at 66% of all Faith generated.</b></td></tr>
+<tr><td><b>Blessing of Zeal</b></td><td>OFFENSE &middot; TEMPO</td><td><code>cost=20 cooldown=2 target=ALLY special=zeal</code></td><td><code>special = zeal</code> &mdash; 4 turns of <code>zeal</code> on one ally: <b>doubles their Faith accrual</b>, ticks their cooldowns by <code>1 + crusade_ranks</code>, and with Purity also shields them.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>2 boss-pool + 11 spec-draft + 6 class-draft =
+    17 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Bulwark of Fortitude</b>, <b>Sacred Resolve</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 11 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Vow of Suffering</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=20 cooldown=3 delay=1.0 target=ALLY special=vow_suffering</code></td><td><code>special = vow_suffering</code> &mdash; 4 turns: <b>HALF the damage that ally takes is redirected to the Devout, and every share he eats kindles that ally 1 Faith.</b></td></tr>
+<tr><td><b>Aegis Reversal</b></td><td>OFFENSE &middot; DEFENSE</td><td><code>cost=30 cooldown=4 delay=2.5 target=ALLY special=aegis_reversal</code></td><td><code>special = aegis_reversal</code> &mdash; <b>Consumes an ally's remaining Divine Shield and converts 150% of it into <code>aegis_bonus</code></b> &mdash; defence turned into offence. Refuses on a non-divine barrier.</td></tr>
+<tr><td><b>Ordination</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=4 dmg_type=holy special=ordination</code></td><td><code>special = ordination</code> &mdash; <b>Grants 4 Faith to the ally holding the LEAST.</b> Requires a living Devout.</td></tr>
+<tr><td><b>Fortified Spirit</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 target=ALLY dmg_type=holy special=fortified_spirit</code></td><td><code>special = fortified_spirit</code> &mdash; <b>Lends the ally <code>3 &times; 10%</code> of the Devout's max HP as real max HP</b> (4 steps on a Perfect) and heals it in; it sheds a tenth per turn.</td></tr>
+<tr><td><b>Reliquary</b></td><td>DEFENSE</td><td><code>cost=30 cooldown=5 delay=2.5 dmg_type=holy special=reliquary</code></td><td><code>special = reliquary</code> &mdash; <b>Heals every hero <code>2.5% &times; their faith_peak</code> of the Devout's max HP</b> (3.5% Perfect) &mdash; it reads the PEAK, which never falls.</td></tr>
+<tr><td><b>Elevation</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=35 cooldown=5 delay=2.5 dmg_type=holy special=elevation</code></td><td><code>special = elevation</code> &mdash; <b>Grants <code>ELEVATION_STACKS</code> Faith to the entire party at once.</b> Requires a living Devout.</td></tr>
+<tr><td><b>Blessing of the Faithful</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=20 cooldown=4 dmg_type=holy special=jubilee</code></td><td><code>special = jubilee</code> &mdash; <b>Zeroes BOTH his stacks and his peak</b> and heals for <code>6% &times; stacks</code> of max HP (8% Perfect). Gated on <code>JUBILEE_MIN_FAITH</code> and on <code>passive_id == "conviction"</code>. <b>The only card that destroys the peak.</b></td></tr>
+<tr><td><b>Mantle</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 target=ALLY dmg_type=holy special=mantle</code></td><td><code>special = mantle</code> &mdash; A Divine Shield worth <code>MANTLE_PCT</code> of his max HP that <b>HOPS to a new ally <code>MANTLE_HOPS + 1</code> times</b> as it is consumed.</td></tr>
+<tr><td><b>Sacred Resolve</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=5 delay=1.0 special=unity</code></td><td><code>special = unity</code> &mdash; <code>unity</code> on every hero for <code>4 + resolve_extra_turns</code>.</td></tr>
+<tr><td><b>Bulwark of Fortitude</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=30 cooldown=3 delay=3.0 special=bulwark</code></td><td><code>special = bulwark</code> &mdash; <code>bulwark</code> on every non-companion hero for <code>3 + bulwark_extra_turns</code>, <b>plus a 5%-of-max heal each</b>.</td></tr>
+<tr><td><b>Divine Wrath</b></td><td>OFFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 special=divine_wrath</code></td><td><code>special = divine_wrath</code> &mdash; Boss-pool offence, 4-turn cooldown &mdash; the Devout's one OFFENSE-primary boss card.</td></tr>
+</table>
+<p><b>The 2 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Sacred Resolve</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=5 delay=1.0 special=unity</code></td><td><code>special = unity</code> &mdash; <code>unity</code> on every hero for <code>4 + resolve_extra_turns</code>.</td></tr>
+<tr><td><b>Bulwark of Fortitude</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=30 cooldown=3 delay=3.0 special=bulwark</code></td><td><code>special = bulwark</code> &mdash; <code>bulwark</code> on every non-companion hero for <code>3 + bulwark_extra_turns</code>, <b>plus a 5%-of-max heal each</b>.</td></tr>
+</table>
+<p><b>The 6 class-wide draft cards (cleric, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Ministration</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=2 target=ALLY dmg_type=holy special=ministration</code></td><td><code>special = ministration</code> &mdash; Heals the target <b>20% of THEIR max HP</b> (26% Perfect).</td></tr>
+<tr><td><b>Consecration</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=5 delay=1.0 dmg_type=holy special=consecration</code></td><td><code>special = consecration</code> &mdash; <code>consecration</code> on every non-companion hero for 4 turns, stamped with the caster's name.</td></tr>
+<tr><td><b>Chastise</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 damage=25 pressure=20 dmg_type=holy</code></td><td>Fields only: 25% holy, 20 Pressure.</td></tr>
+<tr><td><b>Unburden</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.5 target=ALLY dmg_type=holy special=unburden</code></td><td><code>special = unburden</code> &mdash; <b>Purges every debuff from one ally</b> and grants <code>unburdened</code> for 3 turns.</td></tr>
+<tr><td><b>Exhortation</b></td><td>DEFENSE &middot; OFFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=holy special=exhortation</code></td><td><code>special = exhortation</code> &mdash; <b><code>exhorted</code> at 35 on every non-companion hero, INDEFINITELY</b> (-1 turns), using <code>maxi</code> so a re-cast never lowers it.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 target=ALLY dmg_type=holy special=undying_vigil</code></td><td><code>special = undying_vigil</code> &mdash; <code>vigil</code> on one ally for 4 turns, stamped with the caster's name.</td></tr>
+</table>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>17 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>14</b></td><td>82%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#fdd">automatic</td><td style="background:#fdd">automatic</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>3</b></td><td>17%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>2 distinct primary tags in the pool</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td></tr>
+</table>
+<p><i><b>TWO tags. BREADTH is impossible at every bar size and always will be until his pool gains a third primary.</b> And DEFENSE is 14 of 17, so a DEFENSE threshold stops being a choice at six drafted cards and becomes a free clause. <b>Only OFFENSE, at three cards, is a real threshold &mdash; and it dies at seven.</b></i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Bulwark</b></td><td>Divine Shield's size and reach: <b><code>blessed_barrier_ranks</code>, <code>warded_ranks</code></b>, Stalwart writes <code>stalwart_step</code> which the shield reads directly.</td><td>Blessed Barrier, Radient Aegis, Afterglow, Warded Robes, Stalwart, Bastion, Unyielding Aegis, Layered Faith, Wardstone</td></tr>
+<tr><td><b>Faith</b></td><td>The meter: <b><code>devoutness_ranks</code>, <code>faithful_step</code></b> (the release heal), Apostle and Fervor multiply the payout.</td><td>Communion, Unwavering Faith, Devoutness, Blessed are the Faithful, Sacred Covenant, Fervor, Binding Oath, Creed, Apostle</td></tr>
+<tr><td><b>Zeal</b></td><td>Conversion outward: <b><code>righteous_step</code>, <code>lifewell_ranks</code>, <code>pulse_ranks</code></b>, Crusade ticks cooldowns through Blessing of Zeal.</td><td>Cleansing Waters, Righteous Fire, Unshaken, Healing Pulse, Crusade, Purity, Lifewell, Eternal Ground, Judgement</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>The peak already never falls.</b> &ldquo;Paid on the highest count held this battle&rdquo; is the passive; a rune that &ldquo;keeps your Faith through the release&rdquo; is Conviction.</li>
+<li><b>The release already heals</b> 15% of max HP, and that figure already reads <code>rune_faithful_step</code> (battle.gd:15593) — idle since the Rune of the Binding Oath.</li>
+<li><b>Blessing of Zeal already doubles the accrual rate.</b></li>
+<li><b>Apostle and Fervor already multiply the payout</b> and are explicitly additive, not multiplicative, with each other — &ldquo;both together are triple, not quadruple&rdquo; is in the passive text and in the code.</li>
+<li><b>Fourteen of his seventeen earnable cards carry primary DEFENSE.</b> A rune asking for a defensive build is asking for what he cannot avoid being.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>A BREADTH rune can NEVER be satisfied by a Devout.</b> His whole earnable pool &mdash; boss pool, spec draft and class draft together &mdash; carries exactly TWO distinct primary tags (DEFENSE and OFFENSE). <code>breadth_met_fraction</code> needs the peak at or under a third of the bar, which needs three tags at six cards and four at seven. <b>At every bar size from 3 to 7 it is impossible.</b> This is the single most important fact on this page.</li>
+<li><b>And a DEFENSE THRESHOLD rune is AUTOMATIC from six drafted cards on.</b> Only three non-DEFENSE cards exist in his reachable pool, so at n&ge;6 he cannot hold enough off-tag cards to fail the condition. At n=3&ndash;5 it is a real choice; from 6 it is a free clause.</li>
+<li><b>Faith is party-wide status plumbing, not the Devout's resource.</b> Every hero carries <code>faith_stacks</code>. A rune written against the field affects whoever wears it, not the Devout.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>7 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_faithful_step</code></td><td>Rune of the Binding Oath (<code>binding_oath</code>, retired)</td></tr>
+<tr><td><code>rune_devoutness_ranks</code></td><td>Rune of the Standing Vow (<code>standing_vow</code>, retired)</td></tr>
+<tr><td><code>rune_blessed_barrier_ranks</code></td><td>Rune of the Warded Robes (<code>warded_robes</code>, retired)</td></tr>
+<tr><td><code>rune_pulse_ranks</code></td><td>Rune of the Standing Vow (<code>standing_vow</code>, retired)</td></tr>
+<tr><td><code>rune_warded_ranks</code></td><td>Rune of the Warded Robes (<code>warded_robes</code>, retired)</td></tr>
+<tr><td><code>rune_righteous_step</code></td><td>Rune of the Burning Censer (<code>burning_censer</code>, retired)</td></tr>
+<tr><td><code>rune_lifewell_ranks</code></td><td>Rune of the Burning Censer (<code>burning_censer</code>, retired)</td></tr>
+</table>
+<hr><h2 id="arcanist">ARCANIST <span style="font-weight:normal">(<code>arcanist</code>, mage)</span></h2>
+<h3>The engine &mdash; Runaway Resonance (<code>passive_id = "resonance"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Runaway Resonance: damaging casts build stacks (2 on a
+crit), with NO MAXIMUM, and nothing removes them. Each
+stack deepens the one before it — damage dealt and
+damage taken both climb faster the more are held — and
+each stack adds +1% critical chance.</i></p>
+<p><b>What the meter is:</b> <code>second_resource</code>, named &ldquo;Resonance&rdquo; at spawn (battle.gd:1156), <code>second_max</code> set to 99 as &ldquo;never reached in practice&rdquo; (battle.gd:1316). <b>Shared plumbing</b> with Mercy and Focus.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>RESONANCE_BAR_REF</code></td><td><code>15.0</code></td><td><code>unit.gd:762</code></td><td>what the nameplate bar fills toward</td></tr>
+<tr><td><code>RESONANCE_DMG_STEP</code></td><td><code>1.5</code></td><td><code>unit.gd:765</code></td><td>% damage per point of curve</td></tr>
+<tr><td><code>RESONANCE_TAKEN_STEP</code></td><td><code>0.75</code></td><td><code>unit.gd:766</code></td><td>% taken per point — <b>nothing modifies this</b></td></tr>
+<tr><td><code>curve</code></td><td><code>n * (n + 1) / 2</code></td><td><code>unit.gd:771-773</code></td><td>triangular, so the payout is quadratic in stacks</td></tr>
+</table>
+<p><b>What accrues it:</b> Damaging casts (2 on a crit), through <code>_gain_resonance</code> (battle.gd:14060).<br><b>What spends it:</b> Two cards, and only two: <b>Stabilize</b> floors it at <code>2 + still_mind_ranks</code> and pays for every stack above (battle.gd, <code>stabilize</code>), and <b>Arcane Bolt</b> halves it after the blow (<code>ARCANE_BOLT_KEEP</code>, battle.gd:11423).<br><b>What caps it:</b> None that is reached. 99 is a sentinel.<br><b>What clears it:</b> Nothing decays it, no cleanse takes it, no enemy touches it.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:8921</code></td><td><b>the damage payout</b></td><td><code>raw *= _resonance_dmg_mult(attacker)</code></td></tr>
+<tr><td><code>battle.gd:9588</code></td><td><b>the taken payout</b></td><td><code>raw *= _resonance_taken_mult(strike_target)</code></td></tr>
+<tr><td><code>battle.gd:6656</code></td><td>buffs</td><td><code>buff_mult *= _resonance_dmg_mult(u)</code></td></tr>
+<tr><td><code>battle.gd:9429</code></td><td>Resonant Field</td><td>allies get <code>RESONANT_FIELD_SHARE</code> of his bonus</td></tr>
+<tr><td><code>battle.gd:9598</code></td><td>Null Field</td><td>the mitigation reads the RAW stack count, not the curve</td></tr>
+<tr><td><code>battle.gd:4017, 10159</code></td><td>gates</td><td>cards that check <code>second_resource_name == "Resonance"</code></td></tr>
+<tr><td><code>unit.gd:2157-2158</code></td><td>the UI chip</td><td>dealt and taken, both rendered</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Arcane Explosion</code><br>
+<i>Authored reason:</i> Runaway Resonance builds on damaging casts; the free core attack is what guarantees one every turn.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Arcane Explosion</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=10 pressure=10 random_hits=2 dmg_type=arcane perfect_extra_hit=False</code></td><td>The overridden Mage basic. Free, no cooldown, <b>2 random hits</b> &mdash; and <b>two damaging casts is two Resonance</b>, which is why it is the enabler.</td></tr>
+<tr><td><b>Arcane Cannon</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.5 damage=40 dmg_type=arcane recoil_base=0.15</code></td><td>Fields only: 40% arcane with <b>15% recoil</b>.</td></tr>
+<tr><td><b>Arcane Barrage</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=20 cooldown=2 delay=2.5 damage=8 pressure=3 random_hits=6 dmg_type=arcane perfect_extra_hit=False</code></td><td>Fields only: <b>6 random hits</b> at 8% &mdash; six chances to build Resonance in one cast.</td></tr>
+<tr><td><b>Death Ray</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=55 cooldown=3 delay=5.0 damage=150 dmg_type=arcane gated=True</code></td><td>Fields only: <b>150% damage, 55 Mana, initiative 5.0</b>, and <code>gated</code>. The most expensive card in the corpus.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>4 boss-pool + 12 spec-draft + 7 class-draft =
+    21 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Magi&#x27;s Wrath</b>, <b>Overcharge</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 12 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Null Field</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=arcane special=null_field</code></td><td><code>special = null_field</code> &mdash; Self-flag, 4 turns. Read at battle.gd:9598: <b><code>minf(0.05 &times; second_resource, 0.95)</code> of incoming damage removed</b> &mdash; it reads the RAW STACK COUNT, not the triangular curve, so it is the one linear read of the meter.</td></tr>
+<tr><td><b>Kindled Mind</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 delay=1.5 damage=15 pressure=6 dmg_type=arcane</code></td><td>Fields only: 15% at 15 Mana, initiative 1.5 &mdash; the cheap cantrip that keeps the meter climbing.</td></tr>
+<tr><td><b>Arcane Bolt</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=2.5 damage=15 pressure=8 dmg_type=arcane</code></td><td>Fields only for damage, but <b>it HALVES the meter afterwards</b> (<code>ARCANE_BOLT_KEEP</code>, battle.gd:11423). One of only two cards that remove Resonance.</td></tr>
+<tr><td><b>Inner Arcane</b></td><td>RESOURCE</td><td><code>cost=15 cooldown=3 delay=1.0 dmg_type=arcane special=inner_arcane</code></td><td><code>special = inner_arcane</code> &mdash; <b>Gains <code>living_enemies &times; (2 if below half health else 1) + 1</code> Resonance</b> &mdash; no damage, pure ramp.</td></tr>
+<tr><td><b>Arcane Echo</b></td><td>MARK &middot; OFFENSE</td><td><code>cost=25 cooldown=4 damage=20 pressure=6 dmg_type=arcane</code></td><td>Fields only, tagged <code>MARK</code>. The Arcanist's only MARK card.</td></tr>
+<tr><td><b>Resonant Field</b></td><td>OFFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=arcane special=resonant_field</code></td><td><code>special = resonant_field</code> &mdash; <b>Shares <code>RESONANT_FIELD_SHARE</code> of HIS damage bonus with every other hero</b> for the duration (read at battle.gd:9429). Guards on the Resonance name.</td></tr>
+<tr><td><b>Threshold</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.5 dmg_type=arcane special=threshold</code></td><td><code>special = threshold</code> &mdash; <b>SETS the meter to <code>THRESHOLD_STACKS</code></b> &mdash; a floor AND a ceiling &mdash; and locks it for <code>THRESHOLD_LOCK_TURNS</code> so <code>_gain_resonance</code> refuses (battle.gd:14049).</td></tr>
+<tr><td><b>Unmaking</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=30 cooldown=5 delay=3.0 damage=10 pressure=8 dmg_type=arcane</code></td><td>Fields only, applies the <code>unmade</code> affliction. The Arcanist's only DEBUFF-primary card.</td></tr>
+<tr><td><b>Overcharge</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.5 special=overcharge</code></td><td><code>special = overcharge</code> &mdash; <b>Gains <code>floor(second_resource &times; overcharge_mult)</code> &mdash; it DOUBLES the meter.</b> Limited to <code>1 + overcharge_extra</code> uses a battle.</td></tr>
+<tr><td><b>Magi&#x27;s Wrath</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=4.0 damage=15 aoe=True dmg_type=arcane recoil_base=0.15</code></td><td>Fields only: AoE with 15% recoil. The node of the same name doubles the Resonance damage step.</td></tr>
+<tr><td><b>Arcane Surge</b></td><td>RESOURCE &middot; BREAK</td><td><code>cost=15 cooldown=3 delay=3.0 special=surge</code></td><td><code>special = surge</code> &mdash; Self-flag (<code>surge</code>, 2 turns) plus <b>2 Resonance</b>. Read at battle.gd:8937: <b><code>raw *= 1.2</code></b>, a flat 20%.</td></tr>
+<tr><td><b>Reality Fracture</b></td><td>TEMPO &middot; BREAK</td><td><code>cost=20 cooldown=3 damage=15 pressure=14 dmg_type=arcane delay_push=6.0</code></td><td>Fields only: <b><code>delay_push = 6.0</code></b>, the kit's tempo card. Tagged <code>TEMPO</code>.</td></tr>
+</table>
+<p><b>The 4 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Overcharge</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.5 special=overcharge</code></td><td><code>special = overcharge</code> &mdash; <b>Gains <code>floor(second_resource &times; overcharge_mult)</code> &mdash; it DOUBLES the meter.</b> Limited to <code>1 + overcharge_extra</code> uses a battle.</td></tr>
+<tr><td><b>Magi&#x27;s Wrath</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=4.0 damage=15 aoe=True dmg_type=arcane recoil_base=0.15</code></td><td>Fields only: AoE with 15% recoil. The node of the same name doubles the Resonance damage step.</td></tr>
+<tr><td><b>Stabilize</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cooldown=3 delay=1.5 special=stabilize</code></td><td><code>special = stabilize</code> &mdash; <b>Floors the meter at <code>2 + still_mind_ranks</code> and pays for every stack above it</b>: 5 Mana and 10% damage reduction per stack consumed, plus a 5% heal. Free. The other of the two removers.</td></tr>
+<tr><td><b>Ashes of Al&#x27;ar</b></td><td>DEFENSE</td><td><code>cost=30 delay=1.0 special=ashes</code></td><td><code>special = ashes</code> &mdash; Sets <code>ashes_return</code>. Shared by all three Mage specs' boss pools.</td></tr>
+</table>
+<p><b>The 7 class-wide draft cards (mage, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Magic Barrier</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 dmg_type=arcane special=magic_barrier</code></td><td><code>special = magic_barrier</code> &mdash; A barrier worth <b>20% of his own max HP</b> for 3 turns.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 dmg_type=arcane special=mirror_image</code></td><td><code>special = mirror_image</code> &mdash; <b>4 mirror charges</b>; each incoming attack strikes an image instead (battle.gd:13460-13468).</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=15 cooldown=2 damage=12 pressure=3 multi_hits=3 dmg_type=arcane</code></td><td>Fields only: 3 hits at 12%.</td></tr>
+<tr><td><b>Mana Well</b></td><td>RESOURCE</td><td><code>cost=20 cooldown=5 delay=1.0 dmg_type=arcane special=mana_well</code></td><td><code>special = mana_well</code> &mdash; Self-flag, 4 turns: raises <code>_mana_regen</code>.</td></tr>
+<tr><td><b>Dispel</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=15 cooldown=3 delay=1.5 dmg_type=arcane special=dispel</code></td><td><code>special = dispel</code> &mdash; <b>Removes up to 3 debuffs</b> from a hero, or 3 buffs from an enemy &mdash; the branch depends on the target's side.</td></tr>
+<tr><td><b>Blink</b></td><td>TEMPO</td><td><code>cost=10 cooldown=3 delay=1.0 dmg_type=arcane special=blink</code></td><td><code>special = blink</code> &mdash; <b>Takes 2 turns off ALL his cooldowns.</b> 10 Mana. Tagged <code>TEMPO</code>.</td></tr>
+<tr><td><b>Mana Shield</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=15 cooldown=3 delay=1.0 special=mana_shield</code></td><td><code>special = mana_shield</code> &mdash; Self-flag, 3 turns: <b>damage taken becomes Mana</b>. DY &sect;1 put it here because it is the only ability in the game that does so, so it feeds no passive and dilutes none.</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:6px"><b>2 SELF-FLAG CARDS
+        &mdash; THE PAYLOAD IS NOT IN THE HANDLER.</b> The whole arm is
+        <code>_apply_status(attacker, &hellip;)</code>; what the card DOES lives at the flag's read
+        sites. <b>Null Field</b> &rarr; <code>null_field</code>; <b>Arcane Surge</b> &rarr; <code>surge</code>.
+        <b>Reading these cards by their handler alone will misjudge every one of them.</b></p>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>21 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>7</b></td><td>33%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>5</b></td><td>23%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>5</b></td><td>23%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>2</b></td><td>9%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>6 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Six tags, evenly spread &mdash; DEFENSE 7, RESOURCE 5, OFFENSE 5. <b>The most balanced pool of the eight.</b> BREADTH is reachable everywhere and three separate tags carry a threshold at every size, so both shapes are genuine choices.</i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Resonance</b></td><td>Build rate and the curve: <b><code>resonant_core_ranks</code></b> buys an extra stack on the first cast each turn; Singularity pays build rate, not step, and AU moved that deliberately.</td><td>Harmonics, Attunement, Charged Bolts, Overdraw, Resonant Core, Critical Mass, Cascade, Harmonic Convergence, Singularity</td></tr>
+<tr><td><b>Overload</b></td><td>Spending and throughput: <b><code>conduit_step</code> is row 1</b> and is one of only two writers of the damage step.</td><td>Conduit, Volatility, Temporal Rift, Suppressing Fire, Cannoneer, Barrage Master, Terminal Velocity, Blowback, Unchained</td></tr>
+<tr><td><b>Entropy</b></td><td>The downside as a resource: <b><code>on_edge_ranks</code>, <code>feedback_ranks</code></b>, Event Horizon and Entropy's Toll read the meter's depth.</td><td>Conversion, On the Edge, Feedback Loop, Stable Alignment, Backlash, Siphon, Event Horizon, Entropy&#x27;s Toll, Perfect Conversion</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>The meter already has no maximum and nothing removes it</b> but the two cards named above. A rune that &ldquo;keeps your Resonance&rdquo; is the passive.</li>
+<li><b>Each stack already adds +1% critical chance</b> on top of the curve.</li>
+<li><b>Threshold already SETS the meter to a fixed value</b> and locks it — a hard floor and a hard ceiling in one card, on a 5-turn cooldown.</li>
+<li><b>Overcharge already doubles the meter</b> (it gains <code>floor(second_resource * mult)</code>), once or twice a battle.</li>
+<li><b>Inner Arcane already scales with the enemy count and doubles below half health.</b></li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b><code>RESONANCE_TAKEN_STEP</code> has no bonus term and that is deliberate</b> — the comment at unit.gd:766 records that Conduit and Singularity name the DAMAGE curve only. A rune that softens the downside has no field, and adding one reverses an authored decision.</li>
+<li><b>The curve is quadratic and the ceiling is a sentinel</b>, so any rune raising build RATE is worth far more than one raising the step. AU already moved a doubling off Singularity for exactly this reason, and the comment at unit.gd:781-786 says a control must trip if it is put back.</li>
+<li><b>The bar is shared machinery</b> with Mercy and Focus; write the rune against <code>second_resource_name</code>, not against the field.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>4 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_resonant_core_ranks</code></td><td>Rune of the Resonant Core (<code>resonant_core</code>, retired)</td></tr>
+<tr><td><code>rune_conduit_step</code></td><td>Rune of the Resonant Core (<code>resonant_core</code>, retired)</td></tr>
+<tr><td><code>rune_feedback_ranks</code></td><td>Rune of the Unquiet Mind (<code>unquiet_mind</code>, retired)</td></tr>
+<tr><td><code>rune_on_edge_ranks</code></td><td>Rune of the Wide Current (<code>wide_current</code>, retired)</td></tr>
+</table>
+<hr><h2 id="swordmaster">SWORDMASTER <span style="font-weight:normal">(<code>swordmaster</code>, warrior)</span></h2>
+<h3>The engine &mdash; Seasoned Fighter (<code>passive_id = "seasoned"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Seasoned Fighter: fights in one of two stances.
+AGGRESSIVE — +15% damage dealt, +10% damage taken.
+DEFENSIVE — 15% less damage taken, -10% damage dealt.
+Starts each battle Aggressive; Guard Change swaps.</i></p>
+<p><b>What the meter is:</b> <b>No meter.</b> A single string, <code>stance</code>, holding <code>"aggressive"</code> or <code>"defensive"</code> (unit.gd:495), fresh each battle.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>aggressive dealt</code></td><td><code>1.15 + seasoned_off_bonus + rune_seasoned_off_bonus + discipline</code></td><td><code>battle.gd:9507</code></td><td>the ONE upside a rune can reach</td></tr>
+<tr><td><code>aggressive taken</code></td><td><code>1.10</code></td><td><code>battle.gd:10013</code></td><td><b>a bare literal, no bonus term</b></td></tr>
+<tr><td><code>defensive dealt</code></td><td><code>0.90</code></td><td><code>battle.gd:9510</code></td><td><b>a bare literal, no bonus term</b></td></tr>
+<tr><td><code>defensive taken</code></td><td><code>maxf(0.85 - seasoned_def_bonus - rune_seasoned_def_bonus - discipline, 0.0)</code></td><td><code>battle.gd:10015</code></td><td>the other reachable upside</td></tr>
+</table>
+<p><b>What accrues it:</b> Nothing. The stance is set, not built.<br><b>What spends it:</b> Nothing.<br><b>What caps it:</b> The <code>maxf(..., 0.0)</code> floor on the defensive-taken term, added at CI so a deeply built Swordmaster cannot drive the multiplier through zero and turn damage into healing.<br><b>What clears it:</b> Battle start — he opens Aggressive, always.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:9492-9509</code></td><td><b>the offence payout</b></td><td>four branches: formless, formless_recoil, aggressive, defensive</td></tr>
+<tr><td><code>battle.gd:9999-10016</code></td><td><b>the defence payout</b></td><td>the same four, mirrored</td></tr>
+<tr><td><code>battle.gd:14766</code></td><td><code>_eff_stance()</code></td><td>Feigned Guard makes abilities read the OTHER stance</td></tr>
+<tr><td><code>battle.gd:14818</code></td><td>the gate</td><td>what counts as a Swordmaster for stance purposes</td></tr>
+<tr><td><code>battle.gd:14865</code></td><td>Discipline</td><td>the switch resets the Discipline counter</td></tr>
+<tr><td><code>battle.gd:4461</code></td><td>the AI</td><td>autoplay's stance choice</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <code>Guard Change</code><br>
+<i>Authored reason:</i> Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — the two drafted ones are neither guaranteed nor free.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Strike</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=23 pressure=18 perfect_id=rage resource_gain=20</code></td><td>The Warrior basic. Free, no cooldown, <b>+20 Rage</b>; <code>perfect_id = rage</code> pays extra Rage on a Perfect.</td></tr>
+<tr><td><b>Overpower</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=1 delay=2.5 damage=15 pressure=20 perfect_id=rage5 resource_gain=10</code></td><td>Fields only: 15% at 20 Pressure on a 1-turn cooldown; <code>perfect_id = rage5</code>. Holds the Broken window open longer via <code>broken_extra_turns</code>.</td></tr>
+<tr><td><b>Pommel Strike</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 damage=25 pressure=30 applies_status={&#x27;id&#x27;: &#x27;stunned&#x27;, &#x27;turns&#x27;: 1} resource_gain=10</code></td><td>Fields only: <b>30 Pressure and a 1-turn Stun</b> &mdash; the core's only status application.</td></tr>
+<tr><td><b>Guard Change</b></td><td>OFFENSE &middot; DEFENSE</td><td><code>cooldown=1 delay=1.5 special=guard_change resource_gain=15</code></td><td><code>special = guard_change</code> &mdash; <b>Switches stance AND deals 15 Break damage</b> to the highest-pressure unbroken enemy &mdash; <b>to ALL enemies once <code>guard_change_bd</code> is learned</b>. On a Perfect it also grants <b>2 turns of <code>10 + swordsmanship_parry + rune_swordsmanship_parry</code>% parry</b>. Free, 1-turn cooldown. <b>The only UNCONDITIONAL stance swap.</b></td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>4 boss-pool + 12 spec-draft + 6 class-draft =
+    20 distinct cards</b> (two names appear in two of the three).</p>
+<p><b>2 cards appear in BOTH the boss pool
+        and the spec draft pool</b> &mdash; <b>Execute</b>, <b>Lunge</b>. Taking one
+        through either channel removes it from the other.</p>
+<p><b>The 12 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Precision Strike</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=20 cooldown=3 special=precision_strike</code></td><td><code>special = precision_strike</code> &mdash; <b>Reads <code>_eff_stance()</code> and forks</b>: Aggressive gives 2 hits and grants <code>parry_up</code>; Defensive gives 1 hit and grants <code>open_guard</code>. <b>It also switches stance.</b></td></tr>
+<tr><td><b>Feint</b></td><td>OFFENSE &middot; MARK</td><td><code>cost=25 cooldown=4 special=feint</code></td><td><code>special = feint</code> &mdash; <b>Forks on stance</b>: Aggressive strikes for <code>FEINT_STRIKE_PCT</code>; Defensive takes the other branch. <b>It also switches stance.</b> Tagged <code>MARK</code>.</td></tr>
+<tr><td><b>Sever</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=2.5 damage=40 pressure=15</code></td><td>Fields only: 40% at 15 Pressure.</td></tr>
+<tr><td><b>Battle Poise</b></td><td>TEMPO</td><td><code>cost=25 cooldown=4 delay=1.0 special=battle_poise</code></td><td><code>special = battle_poise</code> &mdash; Self-flag, 4 turns. Read at battle.gd:8721: <b>every PARRY takes <code>BATTLE_POISE_TICK</code> turns off all his cooldowns.</b></td></tr>
+<tr><td><b>Feigned Guard</b></td><td>OFFENSE</td><td><code>cost=20 cooldown=3 delay=1.0 special=feigned_guard</code></td><td><code>special = feigned_guard</code> &mdash; Self-flag, 3 turns. Read inside <code>_eff_stance()</code> (battle.gd:14766): <b>his abilities resolve as though cast from the OTHER stance and satisfy that stance's requirement &mdash; his ACTUAL guard, and everything the passive reads, does not move.</b></td></tr>
+<tr><td><b>Discipline</b></td><td>OFFENSE &middot; DEFENSE</td><td><code>cost=25 cooldown=5 delay=1.0 special=discipline</code></td><td><code>special = discipline</code> &mdash; Self-flag, 7 turns. Read by <code>_discipline_bonus()</code> (battle.gd:14832-14834): <b>deepens whichever UPSIDE he is currently receiving, never a downside</b>, additively with the talent on the same term, capped at <code>DISCIPLINE_CAP</code>. The stance switch resets its counter.</td></tr>
+<tr><td><b>Answering Steel</b></td><td>TEMPO &middot; DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 special=answering_steel</code></td><td><code>special = answering_steel</code> &mdash; Self-flag, 6 turns: <b>+<code>ANSWERING_PERFECT_PARRY</code>% parry, and every parry grants <code>ANSWERING_RAGE</code> and takes a turn off all cooldowns.</b> Pays tempo, not damage.</td></tr>
+<tr><td><b>Formless</b></td><td>OFFENSE &middot; DEFENSE</td><td><code>cost=35 cooldown=6 delay=1.0 special=formless</code></td><td><code>special = formless</code> &mdash; 4 turns holding <b>BOTH stances' upsides and NEITHER downside</b>, counting as both stances, unable to Guard Change &mdash; then <code>FORMLESS_RECOIL_TURNS</code> paying both downsides. <b>It REPLACES the passive's branch at battle.gd:9502 rather than stacking with it.</b></td></tr>
+<tr><td><b>Lunge</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=3.5 damage=30 pressure=20 resource_gain=10</code></td><td>Fields only: 30% at 20 Pressure. The Lunge node upgrades an earned copy to apply both debuffs in any stance.</td></tr>
+<tr><td><b>Execute</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=3 damage=55 pressure=50</code></td><td>Fields only, and the kit's finisher: <b>55% damage and 50 Pressure</b>.</td></tr>
+<tr><td><b>Wheeling Cut</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=2.5 damage=20 pressure=12 aoe=True special=wheeling_cut</code></td><td><code>special = wheeling_cut</code> &mdash; AoE that <b>forks on stance</b>: Aggressive grants <code>wheeling_guard</code> (mitigation), Defensive grants <code>wheeling_edge</code> (damage). <b>A Perfect grants BOTH.</b></td></tr>
+<tr><td><b>Counter Time</b></td><td>DEBUFF &middot; DEFENSE</td><td><code>cost=25 cooldown=5 special=counter_time</code></td><td><code>special = counter_time</code> &mdash; <b>Stuns the target for <code>COUNTER_TIME_TURNS</code></b> outright.</td></tr>
+</table>
+<p><b>The 4 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Sweeping Strikes</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 delay=3.0 damage=15 pressure=12 multi_hits=2 applies_status={&#x27;id&#x27;: &#x27;dazed&#x27;, &#x27;turns&#x27;: 3} resource_gain=10 perfect_extra_hit=False</code></td><td>Fields only: 2 hits, 3 turns of Dazed, <b>no cooldown</b>.</td></tr>
+<tr><td><b>Shatterpoint</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=4 delay=3.0 damage=20 pressure=40</code></td><td>Fields only: <b>40 Pressure</b> at 20% damage &mdash; a pure Break card.</td></tr>
+<tr><td><b>Lunge</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=3.5 damage=30 pressure=20 resource_gain=10</code></td><td>Fields only: 30% at 20 Pressure. The Lunge node upgrades an earned copy to apply both debuffs in any stance.</td></tr>
+<tr><td><b>Execute</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=3 damage=55 pressure=50</code></td><td>Fields only, and the kit's finisher: <b>55% damage and 50 Pressure</b>.</td></tr>
+</table>
+<p><b>The 6 class-wide draft cards (warrior, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Battle Trance</b></td><td>DEFENSE &middot; RESOURCE</td><td><code>cost=15 cooldown=4 delay=1.0 special=battle_trance</code></td><td><code>special = battle_trance</code> &mdash; Self-flag, 4 turns; resets <code>trance_taken</code>. The payload is at the flag's read site.</td></tr>
+<tr><td><b>Rally</b></td><td>TEMPO &middot; RESOURCE</td><td><code>cost=15 cooldown=4 delay=1.5 target=ALLY special=rally_ally</code></td><td><code>special = rally_ally</code> &mdash; Moves an ally forward in the initiative order and grants <b>15% of their max resource</b>.</td></tr>
+<tr><td><b>Charge</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=3 delay=1.0 damage=25 pressure=20 applies_status={&#x27;id&#x27;: &#x27;dazed&#x27;, &#x27;turns&#x27;: 1} resource_gain=30</code></td><td>Fields only: 25% damage, 20 Pressure, 1 turn Dazed, <b>+30 Rage</b>.</td></tr>
+<tr><td><b>Cleave</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=3 delay=2.5 damage=15 pressure=15 choose_three=True perfect_extra_hit=False</code></td><td>Fields only: <code>choose_three</code> at 15%.</td></tr>
+<tr><td><b>Warcry</b></td><td>OFFENSE</td><td><code>cost=20 cooldown=5 delay=1.0 special=warcry</code></td><td><code>special = warcry</code> &mdash; <b><code>WARCRY_PCT</code> damage buff on the WHOLE party</b> for 4 turns.</td></tr>
+<tr><td><b>Ironclad</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 special=ironclad</code></td><td><code>special = ironclad</code> &mdash; Self-flag, 4 turns: <code>IRONCLAD_CUT_PCT</code> mitigation.</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:6px"><b>3 SELF-FLAG CARDS
+        &mdash; THE PAYLOAD IS NOT IN THE HANDLER.</b> The whole arm is
+        <code>_apply_status(attacker, &hellip;)</code>; what the card DOES lives at the flag's read
+        sites. <b>Battle Poise</b> &rarr; <code>battle_poise</code>; <b>Feigned Guard</b> &rarr; <code>feigned_guard</code>; <b>Discipline</b> &rarr; <code>discipline</code>.
+        <b>Reading these cards by their handler alone will misjudge every one of them.</b></p>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>20 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>3</b></td><td>15%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>2</b></td><td>10%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>12</b></td><td>60%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>3</b></td><td>15%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>4 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#fdd"><b>IMPOSSIBLE</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Four tags. <b>BREADTH holds at 4, 6 and 7 and fails at 5</b> &mdash; at five cards the rule wants no tag over one, which needs five distinct tags and only four exist. <b>A BREADTH rune on him blinks off for one rung.</b> OFFENSE is 12 of 20 and carries a threshold everywhere; TEMPO and DEBUFF die at seven.</i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Blade</b></td><td>The Aggressive half: <b>Aggressive Stance writes <code>seasoned_off_bonus</code></b> and Overwhelm reads the target's affliction count.</td><td>Aggressive Stance, Committed Thrust, Killing Edge, Precision Strikes, Seasoned Fighter, Overwhelm, Pivot, Whetstone, Finisher</td></tr>
+<tr><td><b>Poise</b></td><td>The Defensive half: <b>Defensive Stance writes <code>seasoned_def_bonus</code>, Swordsmanship writes <code>swordsmanship_parry</code></b> which Guard Change reads on a Perfect.</td><td>Defensive Stance, Sword Mastery, Bracing, Swordsmanship, High Guard, Riposte, Deflection, Waiting Guard, Untouchable</td></tr>
+<tr><td><b>Breaker</b></td><td>Pressure: Sunder Guard, Dominant Presence, No Quarter (Rage on a Break through Guard Change), <b><code>guard_change_bd</code> widens Guard Change to the whole enemy team</b>.</td><td>Pressure Point, Sunder Guard, Dominant Presence, Opportunist, No Quarter, Punishment, Off Balance, Overpressure, Guard Breaker</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>Guard Change already deals Break damage.</b> 15 BD to the highest-pressure unbroken enemy, or to ALL enemies once <code>guard_change_bd</code> is learned &mdash; on a free, cooldown-1 ability. A rune that &ldquo;makes the switch chip their guard&rdquo; is Guard Change.</li>
+<li><b>Guard Change already grants parry on a Perfect</b> &mdash; 2 turns of <code>10 + swordsmanship_parry + rune_swordsmanship_parry</code> percent, and that rune field is idle and wired.</li>
+<li><b>Three abilities already switch stance</b>, not one: Guard Change unconditionally, plus Precision Strike and Feint. <code>PROTECTED_CORES</code>' own comment records the correction &mdash; Guard Change is the only UNCONDITIONAL one.</li>
+<li><b>Formless already holds both upsides and neither downside</b> for four turns, and pays both downsides afterwards. Discipline already deepens whichever upside he is receiving, additively with the talent that deepens the same term.</li>
+<li><b>Feigned Guard already makes his abilities resolve as though cast from the other stance</b> while his actual guard, and everything the passive reads, does not move.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>Both DOWNSIDES are bare literals.</b> <code>raw *= 1.10</code> (aggressive, taken) and <code>raw *= 0.90</code> (defensive, dealt) carry no bonus field of any kind, where both UPSIDES carry two each. <b>A rune that reduces what a stance costs him has nowhere to write.</b> This is the likeliest EZ-shaped trap on this page: the sentence &ldquo;your Defensive guard no longer blunts your blade&rdquo; is natural, obvious, and unimplementable from data.</li>
+<li><b>He has three idle rune fields</b> &mdash; <code>rune_seasoned_off_bonus</code>, <code>rune_seasoned_def_bonus</code> and <code>rune_swordsmanship_parry</code> &mdash; and all three deepen an upside.</li>
+<li><b>His BREADTH condition fails at exactly five drafted cards</b> and holds at 4, 6 and 7. Four distinct primary tags exist in his pool; n=5 needs five. A BREADTH rune on him blinks off for one rung of the ladder.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>3 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_swordsmanship_parry</code></td><td>Rune of the Still Wrist (<code>still_wrist</code>, retired)</td></tr>
+<tr><td><code>rune_seasoned_def_bonus</code></td><td>Rune of the Bared Guard (<code>bared_guard</code>, retired)</td></tr>
+<tr><td><code>rune_seasoned_off_bonus</code></td><td>Rune of the Bared Guard (<code>bared_guard</code>, retired)</td></tr>
+</table>
+<hr><h2 id="mystic">SURVIVALIST <span style="font-weight:normal">(<code>mystic</code>, hunter)</span></h2>
+<p style="border:2px solid #a00; padding:6px"><b>THE DISPLAY NAME AND THE CODE KEY
+        DIFFER, BY DESIGN.</b> Everything the player sees says <b>Survivalist</b>; every table,
+        accessor and pool in the code says <code>"mystic"</code>. <code>classes.gd</code> records
+        that the disagreement is deliberate and that a <code>"survivalist":</code> entry would
+        resolve nothing. <b>A rune scoped <code>spec:survivalist</code> would roll for
+        nobody.</b> The scope string is <code>spec:mystic</code>.</p>
+<h3>The engine &mdash; Trapper (<code>passive_id = "trapper"</code>)</h3>
+<p><b>The mechanic as the code states it:</b> <i>Trapper: enemies that strike the Hunter have a 25%
+chance to be Poisoned for 5 turns, and the Survivalist&#x27;s
+abilities deal +8% damage per DIFFERENT status effect
+afflicting the target.</i></p>
+<p><b>What the meter is:</b> <b>No stored meter.</b> <code>_status_count(target)</code> (battle.gd:21799) counts how many of <code>BattleUnit.DEBUFF_IDS</code> stand on the target, excluding <code>broken</code> &mdash; recomputed at every strike.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Constant / term</th><th>Value</th><th>Where</th><th>What it is</th></tr>
+<tr><td><code>step</code></td><td><code>0.08</code></td><td><code>battle.gd:9227</code></td><td><b>a bare literal</b>: +8% per distinct status</td></tr>
+<tr><td><code>barb chance</code></td><td><code>0.25</code></td><td><code>battle.gd:10964</code></td><td><b>a bare literal</b>: poison on being struck</td></tr>
+<tr><td><code>barb duration</code></td><td><code>5 turns</code></td><td><code>battle.gd:10965</code></td><td>the Poison applied</td></tr>
+<tr><td><code>DEBUFF_IDS</code></td><td><code>the vocabulary</code></td><td><code>unit.gd:19</code></td><td>the breadth ceiling, minus <code>broken</code></td></tr>
+</table>
+<p><b>What accrues it:</b> Any hero applying any listed affliction to the target &mdash; the count reads statuses from ANY source, including allies'.<br><b>What spends it:</b> Nothing. A cleanse or an expiry lowers it.<br><b>What caps it:</b> <b>Bounded by how many distinct afflictions EXIST.</b> The comment at battle.gd:9215-9219 states this is the one ceiling in the game that is correct and stays &mdash; Overburn, Loyalty, Focus, Resonance and Ruin all had theirs removed.<br><b>What clears it:</b> Cleanse, expiry, enemy death.</p>
+<p><b>Every read site, as a LINE.</b> EV's rule: the read site is the line, not the function.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Line</th><th>Reads</th><th>What</th></tr>
+<tr><td><code>battle.gd:9226-9227</code></td><td><b>the payout</b></td><td><code>raw *= 1.0 + 0.08 * sv_n</code>, and Force of Nature <b>REPLACES</b> it via <code>elif</code></td></tr>
+<tr><td><code>battle.gd:9245</code></td><td>Vulture</td><td>a second, additive term at 3+ statuses, reading <code>rune_vulture</code></td></tr>
+<tr><td><code>battle.gd:10963</code></td><td>the barb</td><td>the 25% poison on being struck</td></tr>
+<tr><td><code>battle.gd:9759-9761</code></td><td>Thick Hide</td><td>reads <code>_status_count(attacker)</code> &mdash; the enemy's afflictions</td></tr>
+<tr><td><code>battle.gd:9233-9243</code></td><td>instrument</td><td>BA's breadth sampler and the signature moment</td></tr>
+<tr><td><code>battle.gd:11638</code></td><td>the package</td><td>the Survivalist-only on-hit block</td></tr>
+</table>
+<h3>The protected core</h3>
+<p><b><code>core_slots</code> is 3; <code>protected_names</code> returns 4.
+    They disagree, and they disagree for all twelve specs</b> &mdash; <code>check_eh</code> &sect;3
+    asserts the count is 12. <b>Both are live and they answer different questions.</b>
+    <code>core_slots</code> is a SLOT count and the CAP reads it
+    (<code>run_state.ability_slots_used</code>, and <code>map_screen</code> for the earned-slot
+    arithmetic). <code>protected_names</code> is a NAME count, read by exactly three files
+    (<code>classes.gd</code>, <code>map_screen.gd</code>, <code>run_state.gd</code>), and it is
+    what the drop step refuses and what a tag census walks. <b>The gap is the class basic attack,
+    which occupies no slot</b>.
+    <b>For authoring: 4 names are protected; 3 of the cap's seven-to-ten are spent.</b></p>
+<p><b><code>core_enablers</code>:</b> <b>empty</b> &mdash; a real answer, not an omission. These abilities are protected because they shipped in the kit, not because the passive needs them.<br>
+<i>Authored reason:</i> Trapper&#x27;s poison rides being struck, and its breadth term counts statuses from ANY source — including his allies&#x27;.</p>
+<p><b>The 4 protected abilities, at the read site:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Quick Shot</b></td><td>OFFENSE &middot; BREAK</td><td><code>damage=20 pressure=14 perfect_id=mana</code></td><td>The Hunter basic. Free, no cooldown; <code>perfect_id = mana</code> pays Mana on a Perfect. Read by Lethal Aim as a consecutive single-target attack.</td></tr>
+<tr><td><b>Tripwire</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=20 cooldown=4 delay=1.0 special=tripwire</code></td><td><code>special = tripwire</code> &mdash; Self-flag, 6 turns &mdash; <b>indefinite with The Whole Forest</b>. Read at battle.gd:11912: any enemy that acts is ripped for <code>attack &times; wire_ranks</code>, scaled by <code>cruel_ranks</code>, and both terms read their <code>rune_</code> twins.</td></tr>
+<tr><td><b>Shrapnel Charge</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=2 delay=3.0 damage=20 pressure=25 choose_two=True dmg_type=nature applies_status={&#x27;id&#x27;: &#x27;cripple&#x27;, &#x27;turns&#x27;: 3} perfect_id=status_plus</code></td><td><code>choose_two</code>: 20% nature and <b>3 turns of Cripple</b> on two chosen enemies. <code>perfect_id = status_plus</code>.</td></tr>
+<tr><td><b>Snare Trap</b></td><td>DEBUFF</td><td><code>cost=20 cooldown=3 special=snare_trap</code></td><td><code>special = snare_trap</code> &mdash; Applies <code>snared</code> at <b>-1 turns (indefinite)</b>, keyed to the caster's party index. <b>Deadfall duplicates it and has since BD</b> &mdash; on the open queue.</td></tr>
+</table>
+<h3>The draft pool</h3>
+<p><b>Three channels write the same list.</b> <code>hold_ability()</code> is the one
+    writer, so a boss pick and a draft pick both land in <code>bm_abilities</code> and both count
+    toward a THRESHOLD or BREADTH condition. The reachable population is therefore
+    <b>5 boss-pool + 10 spec-draft + 6 class-draft =
+    21 distinct cards</b>.</p>
+<p><b>The 10 spec draft cards:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Choking Smoke</b></td><td>DEBUFF &middot; RESOURCE</td><td><code>cost=25 cooldown=4 delay=2.5 aoe=True dmg_type=nature special=choking_smoke</code></td><td><code>special = choking_smoke</code> &mdash; AoE applying <b>TWO different afflictions to every enemy</b> &mdash; 3 turns of Blind and 2 of Burn. <b>The most direct breadth-builder in the kit.</b></td></tr>
+<tr><td><b>Snare Line</b></td><td>DEBUFF &middot; MARK</td><td><code>cost=25 cooldown=4 delay=2.5 dmg_type=nature special=snare_line</code></td><td><code>special = snare_line</code> &mdash; Applies <code>snare_line</code> to <b>every</b> enemy for 2 turns, keyed to the caster's index. Tagged <code>MARK</code>.</td></tr>
+<tr><td><b>Loaded Shot</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=20 cooldown=4 damage=20 pressure=8 dmg_type=nature</code></td><td>Fields only for damage; its real body is outside the Survivalist package (battle.gd:11733) and <b>puts every harmful effect on the body back to FULL duration</b>.</td></tr>
+<tr><td><b>Hunt</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=2.5 damage=15 pressure=10 dmg_type=nature</code></td><td>Fields only: 15% nature at 10 Pressure.</td></tr>
+<tr><td><b>Preparation</b></td><td>TEMPO</td><td><code>cost=25 cooldown=5 special=preparation</code></td><td><code>special = preparation</code> &mdash; Sets <code>prep_pending = 2</code> and grants 15 Mana. Tagged <code>TEMPO</code>.</td></tr>
+<tr><td><b>Stalking Horse</b></td><td>DEFENSE</td><td><code>cost=25 cooldown=4 delay=1.0 special=stalking_horse</code></td><td><code>special = stalking_horse</code> &mdash; Self-flag, 4 turns. Read at battle.gd:7345-7346 <b>inside enemy target selection</b>: enemies re-roll onto him at <code>STALKING_PULL</code>%. Also read at battle.gd:10988 when a blow lands.</td></tr>
+<tr><td><b>Downwind</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=5 delay=1.0 special=downwind</code></td><td><code>special = downwind</code> &mdash; Self-flag, 4 turns. Read <b>inside <code>_apply_status()</code> itself</b> (battle.gd:12675): an affliction landing on one enemy spreads to the others.</td></tr>
+<tr><td><b>Cull</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=30 cooldown=5 delay=3.0 dmg_type=nature special=cull</code></td><td><code>special = cull</code> &mdash; <b>Purges every debuff from the target and converts the count into damage across the board.</b> Refuses when <code>_harvest_yield()</code> is zero.</td></tr>
+<tr><td><b>Thick Hide</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 special=thick_hide</code></td><td><code>special = thick_hide</code> &mdash; Self-flag, 4 turns. Read at battle.gd:9759-9761: <b>mitigation equal to <code>_status_count(ATTACKER) &times; THICK_HIDE_PER</code></b>, capped &mdash; it reads the afflictions on whoever is hitting him.</td></tr>
+<tr><td><b>Salve</b></td><td>DEFENSE &middot; DEBUFF</td><td><code>cost=25 cooldown=5 special=salve</code></td><td><code>special = salve</code> &mdash; Self-flag. Read in <code>_run_battle</code> (battle.gd:2976-2985): <b>healing scaled by the number of afflictions</b>, capped at <code>SALVE_CAP</code>.</td></tr>
+</table>
+<p><b>The 5 boss-pool cards (<code>SPEC_POOLS</code>, the zone-boss pick):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Explosive Shot</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=35 cooldown=3 delay=3.0 damage=10 pressure=20 aoe=True dmg_type=nature applies_status={&#x27;id&#x27;: &#x27;poison&#x27;, &#x27;turns&#x27;: 5}</code></td><td>Fields only: <b>AoE with 5 turns of Poison</b> on every enemy.</td></tr>
+<tr><td><b>Venom Coating</b></td><td>DEBUFF</td><td><code>cost=20 cooldown=5 delay=1.0 special=venom_coat</code></td><td><code>special = venom_coat</code> &mdash; Self-flag, 4 turns. Read at battle.gd:11657: <b><code>_apply_poison()</code> on every strike.</b></td></tr>
+<tr><td><b>Hamstring</b></td><td>DEBUFF</td><td><code>cost=25 cooldown=3 delay=2.5 damage=20 pressure=10 applies_status={&#x27;id&#x27;: &#x27;cripple&#x27;, &#x27;turns&#x27;: 3} perfect_id=status_plus</code></td><td>Fields only: 20% and 3 turns of Cripple. <code>perfect_id = status_plus</code>.</td></tr>
+<tr><td><b>Deadfall</b></td><td>DEBUFF &middot; BREAK</td><td><code>cost=25 cooldown=5 delay=1.0 special=deadfall</code></td><td><code>special = deadfall</code> &mdash; Arms <code>DEADFALL_CHARGES + 1</code> charges. <b>BD found it duplicating Snare Trap and it has stood for fourteen batches</b> &mdash; still open.</td></tr>
+<tr><td><b>Harvest</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=25 cooldown=4 delay=3.0 special=harvest</code></td><td><code>special = harvest</code> &mdash; <b>Redistributes the target's afflictions across the enemy team</b> rather than removing them. Reads <code>_status_count</code> and <code>_harvest_yield</code>.</td></tr>
+</table>
+<p><b>The 6 class-wide draft cards (hunter, ~25% of offers):</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>Tags</th><th>Fields</th><th>What it does at the read site</th></tr>
+<tr><td><b>Field Dressing</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=3 special=field_dressing</code></td><td><code>special = field_dressing</code> &mdash; Self-heal <b>18% of max (24% Perfect) and sheds ONE debuff</b>.</td></tr>
+<tr><td><b>Camouflage</b></td><td>DEFENSE</td><td><code>cost=20 cooldown=4 delay=1.0 special=camouflage</code></td><td><code>special = camouflage</code> &mdash; Self-flag, 3 turns: <code>CAMOUFLAGE_PCT</code> less likely to be targeted.</td></tr>
+<tr><td><b>Aimed Volley</b></td><td>OFFENSE &middot; BREAK</td><td><code>cost=20 cooldown=3 delay=2.5 damage=12 pressure=8 multi_hits=3</code></td><td>Fields only: 3 hits at 12%.</td></tr>
+<tr><td><b>Bola</b></td><td>DEBUFF</td><td><code>cost=15 cooldown=3 delay=1.5 special=bola</code></td><td><code>special = bola</code> &mdash; <b>Applies BOTH Slow and Cripple</b> for 4 turns &mdash; two afflictions from one card, which is why it reads well for a Survivalist.</td></tr>
+<tr><td><b>Hunter&#x27;s Mark</b></td><td>MARK &middot; OFFENSE</td><td><code>cost=15 cooldown=4 delay=1.5 special=hunters_mark</code></td><td><code>special = hunters_mark</code> &mdash; <b><code>party_mark</code> at <code>PARTY_MARK_PCT</code> for 6 turns, and it is EXCLUSIVE</b> &mdash; marking a new enemy strips the mark from the old one.</td></tr>
+<tr><td><b>Arcane Arrows</b></td><td>OFFENSE &middot; RESOURCE</td><td><code>cost=25 cooldown=5 delay=1.0 dmg_type=arcane special=arcane_arrows</code></td><td><code>special = arcane_arrows</code> &mdash; Grants at least 6 charges of arcane-converted shots.</td></tr>
+</table>
+<p style="border:2px solid #a60; padding:6px"><b>6 SELF-FLAG CARDS
+        &mdash; THE PAYLOAD IS NOT IN THE HANDLER.</b> The whole arm is
+        <code>_apply_status(attacker, &hellip;)</code>; what the card DOES lives at the flag's read
+        sites. <b>Tripwire</b> &rarr; <code>tripwire</code>; <b>Stalking Horse</b> &rarr; <code>stalking_horse</code>; <b>Downwind</b> &rarr; <code>downwind</code>; <b>Thick Hide</b> &rarr; <code>thick_hide</code>; <b>Salve</b> &rarr; <code>salve</code>; <b>Venom Coating</b> &rarr; <code>venom_coat</code>.
+        <b>Reading these cards by their handler alone will misjudge every one of them.</b></p>
+<h3>The tag spread &mdash; and what it makes possible</h3>
+<p>Counted over the <b>21 earnable cards</b> above, by <b>PRIMARY</b> tag, because that
+    is what both predicates read.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Primary tag</th><th>Cards</th><th>Share</th><th>THRESHOLD at n=3</th><th>THRESHOLD at n=4</th><th>THRESHOLD at n=5</th><th>THRESHOLD at n=6</th><th>THRESHOLD at n=7</th></tr>
+<tr><td><code>DEBUFF</code></td><td><b>9</b></td><td>42%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>DEFENSE</code></td><td><b>5</b></td><td>23%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>BREAK</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>RESOURCE</code></td><td><b>0</b></td><td>0%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>OFFENSE</code></td><td><b>5</b></td><td>23%</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td><td style="background:#dfd">a choice</td></tr>
+<tr><td><code>TEMPO</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+<tr><td><code>MARK</code></td><td><b>1</b></td><td>4%</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td><td style="background:#eee">impossible</td></tr>
+</table>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>BREADTH</th><th>n=3</th><th>n=4</th><th>n=5</th><th>n=6</th><th>n=7</th></tr>
+<tr><td><b>5 distinct primary tags in the pool</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td><td style="background:#dfd"><b>reachable</b></td></tr>
+</table>
+<p><i>Five tags, well spread &mdash; DEBUFF 9, OFFENSE 5, DEFENSE 5. BREADTH is reachable at every size, and three tags carry a threshold at every size. <b>Like the Arcanist, both shapes work on him.</b></i></p>
+<h3>The talent lanes</h3>
+<p>27 nodes, 3 lanes, 9 rows. Listed in row order so a rune can be checked against the node it would duplicate.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Lane</th><th>What it reads</th><th>Nodes, rows 1&ndash;9</th></tr>
+<tr><td><b>Venom</b></td><td>Poison: <b><code>potent_ranks</code>, <code>coated_blades</code></b>, Necrosis makes the poisoned rot for the whole party.</td><td>Potent Toxins, Coated Blades, Distillate, Slow Acting, Creeping Death, Necrosis, Quartermaster, Cocktail, Perfected Toxin</td></tr>
+<tr><td><b>Snares</b></td><td>Traps: <b><code>wire_ranks</code>, <code>cruel_ranks</code></b> (both read inside Tripwire's arm), Snap Shut, Bone Breaker, The Whole Forest makes Tripwire indefinite.</td><td>Reinforced Wire, Quick Rigging, Cruel Devices, Snap Shut, Caught Fast, Bone Breaker, Deadfall Network, Set and Forget, The Whole Forest</td></tr>
+<tr><td><b>Guerilla</b></td><td>Field craft: <b><code>scavenger_ranks</code>, <code>vulture</code></b> &mdash; and <b>Force of Nature, the capstone that REPLACES the passive's own 8% term</b> rather than adding to it.</td><td>Woodcraft, Hit and Run, Scavenger, Field Medic, Vulture, Ghillie Suit, Improvised, Practised Hands, Force of Nature</td></tr>
+</table>
+<h3 style="color:#a00">What a rune must NOT be authored to do</h3>
+<p><b>Because it is already true:</b></p><ul>
+<li><b>The breadth term already counts statuses from ANY source</b>, including his allies'. <code>PROTECTED_CORES</code>' own <code>why</code> for this spec says so. A rune that &ldquo;lets your allies' debuffs count&rdquo; is the passive.</li>
+<li><b>Choking Smoke already applies TWO different afflictions to every enemy</b> (blind and burn), which is the most direct breadth-builder in the kit.</li>
+<li><b>Venom Coating already adds poison to every strike</b> for four turns; Snare Line already lands a line on the whole enemy team; Explosive Shot is already AoE poison.</li>
+<li><b>Harvest and Cull already read the affliction count</b> &mdash; Cull purges and converts, Harvest redistributes. The &ldquo;spend the board&rdquo; lever exists twice.</li>
+<li><b>Deadfall already duplicates Snare Trap</b> and has since BD; the talent audit found it and it is on the open queue. A rune in that space lands on a known collision.</li>
+</ul>
+<p><b>Because it is structurally unavailable:</b></p><ul>
+<li><b>Both halves of Trapper are bare literals.</b> The +8% step (battle.gd:9227) and the 25% barb chance (battle.gd:10964) carry no bonus field, no talent term, nothing. <b>A rune deepening either needs code.</b> Compare Blood Frenzy, whose step has two.</li>
+<li><b>Force of Nature REPLACES the passive rather than adding to it.</b> The branch is <code>if force_of_nature != null: ... elif passive_id == "trapper": ...</code>, so a Survivalist holding that capstone <b>stops reading his own passive's term entirely</b>. Any rune written against the 8% is silently worth nothing to him.</li>
+<li><b>The ceiling is a design constant, not a dial.</b> Breadth is bounded by the size of <code>DEBUFF_IDS</code>; there is no cap term to raise.</li>
+<li><b>His six idle rune fields all belong to the Venom, Snares and Guerilla node terms</b> (<code>rune_potent_ranks</code>, <code>rune_coated_blades</code>, <code>rune_wire_ranks</code>, <code>rune_cruel_ranks</code>, <code>rune_scavenger_ranks</code>, <code>rune_vulture</code>) &mdash; every one deepens a NODE, none touches the passive.</li>
+</ul>
+<h3>The rune plumbing this spec already has</h3>
+<p><b>6 idle <code>rune_*</code> fields</b> &mdash;
+        declared on <code>BattleUnit</code>, read in <code>battle.gd</code>/<code>unit.gd</code>,
+        and written by <b>no live rune</b>. These are what a data-only rune can reach <b>with no new
+        code</b>. Every one was verified to still have a read site.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Retired rune that wrote it</th></tr>
+<tr><td><code>rune_potent_ranks</code></td><td>Rune of the Weeping Wound (<code>weeping_wound</code>, retired)</td></tr>
+<tr><td><code>rune_coated_blades</code></td><td>Rune of the Weeping Wound (<code>weeping_wound</code>, retired)</td></tr>
+<tr><td><code>rune_wire_ranks</code></td><td>Rune of the Long Hunt (<code>long_hunt</code>, retired)</td></tr>
+<tr><td><code>rune_cruel_ranks</code></td><td>Rune of the Long Hunt (<code>long_hunt</code>, retired)</td></tr>
+<tr><td><code>rune_scavenger_ranks</code></td><td>Rune of the Carrion Wake (<code>carrion_wake</code>, retired)</td></tr>
+<tr><td><code>rune_vulture</code></td><td>Rune of the Carrion Wake (<code>carrion_wake</code>, retired)</td></tr>
+</table>
+<hr><h2>WHAT THIS PAGE DELIBERATELY DOES NOT SAY</h2>
+<ul>
+<li><b>It proposes no rune.</b> Not a name, not a sketch, not a reservation. Rune content is
+written with the designer, one rune at a time.</li>
+<li><b>It moves nothing.</b> No card, ability, talent, constant or magnitude changed, and no file
+under <code>scenes/</code> was touched.</li>
+<li><b>It does not rule on the generated stat family.</b> That comes out once the eight specs are
+authored; the order is the designer's and it is deliberate, because removing the floor before the
+pool exists leaves most parties with nothing.</li>
+<li><b>It does not price anything.</b> All 21 live runes sit at 100g and this page does not argue
+they should not.</li>
+</ul>
+<p><i>Generated from the code at Batch FJ. Regenerate rather than hand-edit.</i></p>
+</body></html>

@@ -5,104 +5,96 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-07 (Batch FI).*
+*Last rewritten: 2026-09-07 (Batch FJ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FI — NO TEST WRITES THE PLAYER'S SAVE.** **No rune, card, ability, talent, constant
-  or magnitude moved, no new rune was authored, and no file under `scenes/` was touched.** Full
-  working: **`docs/reports/FI.md`**.
-- **§0 — TWO OF THE BRIEF'S PREMISES NEEDED CORRECTING.** **"`Profile.save_path` is already swapped
-  by 37 of 39 suites" is 39 of 39** — every suite with a `_run()` body swaps it, plus
-  `test_run_harness.gd`, so the population is 40 files and the "2 that do not" do not exist; **this
-  file said 38 and was one low.** 33 of the 39 swap it back and 38 carried the `_had_save` block.
-  Everything else in the brief held, `check_ct`'s §2/§3 behaviour included.
-- **§1 — THE POPULATION IS 67 OF 98, NOT 24 OF 80, AND BOTH READINGS ARE RIGHT.** Every battery
-  target — **all 98, with no candidate predicate in front of them** — was run ALONE against a fresh
-  copy of the designer's real 62,360 B save, with `Run`'s four save functions instrumented to PRINT
-  so the CALLS were counted rather than the residue. **67 destroy the player's save at least once;
-  43 carry a restore, so 42 end byte-identical and read as harmless to an end-state census.** The
-  arithmetic closes exactly: **24 that never restore + 1 that restores and then destroys it again
-  (`check_ct`) = the 25 that end absent.** **FH's 24 is reproduced NAME FOR NAME**; the one addition
-  is **`test_batch_ah`**, which FH's candidate predicate — *"reaches a spawn or sets `sim_run`"* —
-  structurally excluded, because it does neither: it calls `run.new_run()` and that calls
-  `clear_save()`. **THE DERIVATION IS THE STEP THAT FAILS SILENTLY**, which is one turn further than
-  FH's own lesson reached. **67 targets READ it too**, three of them its contents; 21 never touch
-  the save machinery at all.
-- **§2 — `Run.save_path` IS A VAR AND `Run._init()` DECIDES IT. NOTHING HAS TO REMEMBER.**
-  `Run.SAVE_PATH` stays a `const` and stays the player's file, because three gates read it to mean
-  that; the four file operations moved onto `save_path`, the shape `Profile.save_path` has had since
-  Batch 40. The redirect fires for any process launched with `--script`, with a scene that is not the
-  project's main scene, or headless — **so a gate run BY HAND is covered on the same terms as one run
-  by the battery**, which is why a wrapper was the wrong answer. **The player's path is OPT-IN and
-  only the shipped game opts in**, because a test that forgets to opt out destroys a real run in
-  silence while a build that fails to opt in shows an empty Continue button. **The known cost:
-  running a single NON-MAIN scene from the editor (F6) resolves to the harness path. F5 does not.**
-- **§2a — `_init()` AND NOT `_ready()`, AND A BATTERY FOUND THAT, NOT A READING.** The first draft
-  used `_ready()`, was verified by probe, worked, and a full battery destroyed the save anyway:
-  **twenty-four targets never use the autoload** — they `load("res://scripts/run_state.gd").new()`
-  and drive an instance that is never added to a tree, so `_ready()` never fires. `test_batch_ah` and
-  `test_batch_an`, the two suites that end with the file gone, are both of them. **This also
-  corrected a standing rule**: `/root/Run` is ABSENT during `_initialize()` and PRESENT after the
-  first `process_frame` with `_ready()` already run — **the IDENTIFIER does not resolve under
-  `--script`; the NODE exists**, and every gate's `get_node("/root/Run")` depends on the second fact.
-- **§2b — THE COPIED BACKUP PREAMBLE IS GONE FROM ALL 41 FILES**, and not only because it is
-  redundant. The restore is `FileAccess.open(REAL_SAVE, WRITE)` then `store_buffer`, and **the open
-  TRUNCATES** — a process dying between them left the save at ZERO BYTES. **A backup that can
-  destroy what it protects is worse than no backup.** `check_ct` and `check_fh` keep their assertions
-  and change their subject, from *"the restore worked"* to *"the file was never opened"*; `check_ct`
-  gains a paired arm (113 → 114) and `check_fh` is unchanged at 161.
-- **§2c — `check_fi.gd` IS NEW (27 CHECKS) AND IT IS THE INSTRUMENT THE RULE NEVER HAD.** §1 the
-  redirect fired; §2 the four operations go through the var; **§3 the resolver in BOTH directions**,
-  calling `argv_is_harness` rather than copying it, because every process that could run the
-  assertion is headless and the real entry point short-circuits first; **§4 the destruction path
-  DRIVEN on a `gate_fixture` battle, two-armed on a SURROGATE** — a control that proves a repair by
-  damaging the thing the repair protects has understood neither; §5 every `.gd` swept with
-  **`CHECKED 130 of 131`** printed, one file exempt by name and **the needle read off
-  `Run.SAVE_PATH` rather than written down**; §6 the player's file hashed before and after, both arms
-  unguarded. **Its own first draft broke FH §2's rule** — the needles came through a loop variable,
-  the manifest read 1417 → 1417 and only `--check` noticed. Written out they are six pins: **1423**.
-- **§4 — THE ACCEPTANCE RUN, AND THE ASSERTION NOBODY HAD.** **99 targets, ZERO `Parse Error` and
-  ZERO `SCRIPT ERROR` across all 99 logs**, the tree **md5-frozen with 403 files byte-identical
-  before and after** (absolute paths, tracked AND untracked, so the new gate was inside the freeze),
-  `check_de` **406 / 0 / 0**, `check_fi` **27 / 0**, `check_parse` **173 / 0**, `check_ct` **114 /
-  0**, `check_fh` **161 / 0**, `check_ek` **46 / 0**, all 46 suites green, the harness **22 / 166 /
-  8**, `check_ct_map` **83 / 0**. **The only red is `check_cm_live` at 13 / 4, its recorded
-  baseline.** **AND THE PLAYER'S 62,360 B RUN SAVE IS BYTE-IDENTICAL AFTER THE WHOLE BATTERY** —
-  which is the only assertion that mattered here and is exactly what nobody had.
-- **§4a — HEAD'S UNMODIFIED INSTRUMENTS WERE RUN AGAINST THE NEW CODE BEFORE ANY GATE WAS EDITED,
-  AND THE TWO REDS WERE THE TWO PREDICTED IN WRITING.** `check_ct` and `check_eg`, both holding
-  `run.SAVE_PATH` in a local across a `save_run()` that now writes elsewhere; all 46 suites green.
-  **That run also destroyed the save, which the prediction file named as the hazard to watch** — and
-  chasing it is what found §2a's 24 `.new()` targets. **SIX CONTROLS, SIX BITES**, including a
-  two-armed one on `test_batch_ah` (HEAD ABSENT / FI byte-identical) and one that put the redirect
-  back in `_ready()` and lost the save again. **Control D destroyed the save and `check_fi` §6 SAID
-  SO**, which is the instrument reporting its own damage.
-- **§4b — THE DOC EDITS WERE PROVED BY NEEDLE SWEEP.** Every string literal of 4+ characters in each
-  of the **59 doc-reading targets** against six documents, at HEAD and now: **88,368 pairs, ZERO
-  LOST**. 29 GAINED, each checked against the pin manifest and against whether its target opens that
-  document: **none pinned, none used negatively.**
-- **WHAT MOVED: one autoload, 45 instruments and the documents.** `scripts/run_state.gd` (the var,
-  `_init`, the two-part resolver, four operations re-pointed); **`check_fi.gd` is NEW**; the backup
-  preamble out of 41 files; `check_ct`, `check_eg`, `check_fh` re-pointed; `run_battery.sh` (one gate
-  name), `baselines.json` (three rows), `pin-manifest.json` (1417 → 1423); `docs/changelog.html`,
-  `CLAUDE.md` (one index row), `docs/instrument-rules.md` (four edits, one of them a correction),
-  `docs/master.html` (the stamp), `docs/design-notes.md` (a stale figure corrected and FI's note),
-  this file and `docs/reports/FI.md`. **No file under `scenes/` was touched and no magnitude moved.**
-- **Next letter: FJ.**
+- **Last batch: FJ — RECONNAISSANCE ON THE EIGHT UNAUTHORED SPECS.** **A REPORT.** No rune was
+  authored, proposed, sketched, named or reserved; **no card, ability, talent, constant or
+  magnitude moved; no `.gd` file, no `.json` data file and no gate was touched**, and no
+  `CLAUDE.md` rule was added. The deliverable is **`docs/spec-recon.html`** (179.0 KiB, NEW) —
+  eight sections, one per unauthored spec, each written to be read ALONE while that spec's five are
+  drafted. Full working: **`docs/reports/FJ.md`**.
+- **§0 — TWO OF THE BRIEF'S EIGHT NAMES ARE NOT CODE KEYS.** **Devout is `inquisitor` and
+  Survivalist is `mystic`**; `classes.gd` records the disagreement as deliberate and that a
+  `"devout":` entry would resolve nothing. **A rune scoped `spec:devout` or `spec:survivalist`
+  would roll for nobody.** Everything else in the brief held — `core_slots` and `protected_names`
+  really do disagree for all twelve specs (`check_eh` §3 asserts the count is 12), and the 21 live
+  runes really are four sets across the Warden, Occultist, Sharpshooter and Beastmaster.
+- **§1 — THE POPULATION IS THREE CHANNELS, AND A DRAFT-POOL-ONLY READING IS SHORT BY UP TO FIVE
+  CARDS PER SPEC.** `hold_ability()` is the ONE writer, so a zone-boss pick and an elite draft both
+  land in `bm_abilities` and **both count toward a rune condition**. The reachable population is
+  boss pool + spec draft + class draft: **17 to 21 cards a spec**, not the 10-to-13 draft pool.
+  All **157** cards were dumped live and **160 of the 227-card corpus (70%) carry a `special`**,
+  so a field-level read describes under a third of it.
+- **§2 — FOUR CONDITION FACTS THAT DECIDE WHETHER A GATED RUNE IS A CHOICE AT ALL.**
+  **(1) A BREADTH rune can NEVER be satisfied by a Devout** — his earnable pool carries exactly TWO
+  distinct primary tags, and `breadth_met_fraction` needs three at six cards and four at seven, so
+  it is impossible at every bar size from 3 to 7. **(2) A DEFENSE THRESHOLD is AUTOMATIC for him
+  from six drafted cards on**, because only three off-tag cards exist in his reach. **(3) The Holy
+  Cleric's BREADTH is satisfiable at EXACTLY ONE bar size (six)** and the **Swordmaster's fails at
+  exactly five** — a condition can be live at one rung of the ladder and dead at the next.
+  **(4) `BREAK` cannot carry a THRESHOLD anywhere in the game**: FD made it secondary-only, so
+  **zero of the 227 tagged cards carry a BREAK primary** and `primary_tag_count(drafted, "BREAK")`
+  is always zero, for every hero in every build.
+- **§2a — THE BARE LITERALS, WHICH IS WHERE THE NEXT EZ WOULD HAPPEN.** The **Swordmaster's two
+  stance DOWNSIDES** — `raw *= 1.10` (aggressive, taken, battle.gd:10013) and `raw *= 0.90`
+  (defensive, dealt, battle.gd:9510) — **carry no bonus term at all**, where both UPSIDES carry
+  two each. *"Your Defensive guard no longer blunts your blade"* is natural, obvious and
+  unimplementable from data. **Both halves of Trapper** are bare literals too (the +8% step at
+  battle.gd:9227 and the 25% barb at battle.gd:10964), and **Force of Nature REPLACES the passive's
+  term via `elif` rather than adding to it**, so a rune written against the 8% is worth nothing to
+  a Survivalist holding that capstone.
+- **§2b — 58 IDLE `rune_*` FIELDS, AND EVERY ONE IS STILL WIRED.** Of the **80** declared on
+  `BattleUnit`, 22 are written by a live rune and **58 belong to the 66 retired ones** — declared,
+  read, and written by nothing. That is what an author reaches **with no new code**, and it is
+  **wildly uneven**: the Devout has 7 and the Occultist 8, **the Berserker has ONE**. The
+  Cryomancer's four are the only rune plumbing in the game read PARTY-WIDE with a MAX
+  (`_max_hero_rank(field, rune_field)`), so a rune against one **competes with the talent node on
+  another hero rather than stacking with it**.
+- **§3 — THE 21 LIVE RUNES CARRY AN INVARIANT NOBODY HAD WRITTEN DOWN.** 14 PASSIVE / 5 ABILITY /
+  2 STAT; 4 THRESHOLD / 4 BREADTH / 4 TRADEOFF / 9 bare. **Each of the four authored specs got
+  EXACTLY ONE THRESHOLD, EXACTLY ONE BREADTH and EXACTLY ONE TRADEOFF**, the rest bare — 4 × 3
+  gated plus 9 bare is the 21. THRESHOLD and BREADTH always sit on a PASSIVE; the TRADEOFF is on a
+  STAT twice and an ABILITY twice. **Gated more than once:** DEFENSE (×2). **Gated once:** DEBUFF,
+  MARK. **Gated by no live rune:** BREAK, RESOURCE, OFFENSE, TEMPO. All 21 are at 100g and none
+  carries a `lane`. **This is a description of what was done, not a rule that binds the eight.**
+- **§4 — TWO FALSE CLAIMS IN `master.html`, CORRECTED TOWARD THE CODE.** Both sat in the
+  rune-condition section **four lines below a paragraph that states the rule correctly** — EI's
+  hazard exactly. *"The protected core is in the count, because it is carried"* is **false**:
+  `Runes.drafted_names()` reads `bm_equipped`/`bm_abilities`, the EARNED cards, and both surfaces
+  that draw the tick call it — so the denominator is **4–7 (3–6 for the Holy)**, not the 7-to-10
+  bar. And *"hold 2+ of a tag"* is the charter's opening shape; the live rule has been
+  `primary_tag_count(drafted, tag) * 2 >= drafted.size()` since ES §4. **Proved by needle sweep:
+  12,371 needles over the 34 files that read `master.html`, ZERO LOST**; 18 GAINED, none pinned and
+  none used negatively. **The changelog edit was swept the same way: 4,854 needles, ZERO LOST.**
+  **Both sweeps were ARMED FIRST** — a same-length one-character edit to a real needle moved the
+  count to 1 LOST, because a sweep reading 0/0 on an unchanged file has proved nothing.
+- **§5 — ONE INSTRUMENT FAULT, CAUGHT BEFORE IT SHIPPED AS A FINDING.** The read-site sweep masked
+  string literals before matching. **Half this codebase's field reads are string-keyed** —
+  `_max_hero_rank("frigid_ranks", "rune_frigid_ranks")`, `cfg.get("rune_opening_volley", 0)` — so
+  it reported **five idle `rune_*` fields as having ZERO read sites, four of them the
+  Cryomancer's**, which reads as *a rune against these would install and do nothing*. It is false.
+  Strip only the comment, tracking quotes so a `#` inside `"#e05050"` does not truncate the line.
+  Two-armed against the same population: **5 dead against 0 dead. The correct number is zero.**
+- **WHAT MOVED: four documents and nothing else.** `docs/spec-recon.html` is **NEW**;
+  `docs/master.html` (the two §4 corrections), `docs/changelog.html`, this file and
+  `docs/reports/FJ.md`. **`pin-manifest.json` reads current at 1,423, unchanged**, because no `.gd`
+  file was touched.
+- **Next letter: FK.**
 - **`CLAUDE.md` IS AT 264.95 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT
-  109.15 KiB AND HAS NO STATED CEILING.** Headroom is **25.05 KiB**. **This batch spent 0.07 KiB**
-  of it, on one index row and one count. `docs/changelog.html` is at **166.29 KiB** against CW §4's
-  400 KB threshold. **`check_fg` measures both every battery and this file does not have to
-  remember to.**
+  109.15 KiB AND HAS NO STATED CEILING.** Headroom is **25.05 KiB**. **This batch spent
+  NONE of it** — no `CLAUDE.md` rule was added. `docs/changelog.html` is at **174.64 KiB**
+  against CW §4's 400 KB threshold. **`check_fg` measures both every battery and this file does not
+  have to remember to.**
 - **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
   talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
   against four specs** with **eight specs still unauthored**. **What is left in the rune layer is
-  still authoring and it is still the designer's, one rune at a time.** **The ladder still has an
-  open design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on
-  this list.**
+  still authoring and it is still the designer's, one rune at a time** — and `docs/spec-recon.html`
+  is now the document that authoring reads. **The ladder still has an open design question of its
+  own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
