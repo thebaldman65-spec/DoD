@@ -768,8 +768,20 @@ const RESONANCE_TAKEN_STEP := 0.75  # % damage TAKEN per point — nothing modif
                                     # name the damage curve only
 
 
+# **BATCH FK — THE RUNE OF THE DISSONANCE READS THE METER TWICE, HERE.** That
+# placement is the whole rune and it is not a convenience: `RESONANCE_TAKEN_STEP`
+# has NO bonus term and that is an authored decision recorded six lines up
+# (Conduit and Singularity name the DAMAGE curve only), so a rune reaching the
+# taken curve by ADDING a field would reverse it. Doubling the INPUT reaches
+# both curves through the one function they already share, adds no term to
+# either step, and the nameplate chip follows for free because it reads the
+# same two bonuses.
+#
+# **IT IS QUADRATIC IN THE DOUBLING, NOT LINEAR** — n(n+1)/2 at 2n is a little
+# over FOUR times the curve, not twice it — which is why it carries a TRADEOFF
+# and why the taken half is the price rather than a footnote.
 func resonance_curve() -> float:
-	var n := float(second_resource)
+	var n := float(second_resource * (2 if rune_dissonance > 0 else 1))
 	return n * (n + 1.0) * 0.5
 
 
@@ -1030,6 +1042,26 @@ func sync_victory_state(member: Dictionary) -> void:
 	member["max_hp"] = save_max
 	if resource_name == "Mana":
 		member["mana"] = resource
+	# BATCH FK — THE RUNE OF THE RESONANT CORE BANKS ITS SHARE HERE, at the one
+	# site a battle's end writes anything back onto the party member. It is
+	# written beside `mana` because it is the same kind of fact — a meter that
+	# survives the fight — and it obeys the same discipline the three signs
+	# above exist to enforce: what is banked is a SHARE of what stood, computed
+	# once, so nothing compounds across fights by being re-read.
+	#
+	# **`second_resource` IS SHARED MACHINERY** (Mercy, Resonance, Focus), so
+	# the name is what is tested and not the field. A Holy Cleric's Mercy and a
+	# Sharpshooter's Focus are untouched by this line, and the Rune of the Long
+	# Watch below writes its own key for exactly that reason: one field, three
+	# meters, three separate carries.
+	if rune_resonant_carry > 0 and second_resource_name == "Resonance":
+		member["fk_resonance_carry"] = int(floor(second_resource
+			* 0.01 * rune_resonant_carry))
+	# ...and the Rune of the Long Watch (Holy), which carries the WHOLE bar
+	# rather than a share of it — "Mercy no longer clears between battles" is
+	# the rune, and a share would be a different card.
+	if rune_long_watch_mercy > 0 and second_resource_name == "Mercy":
+		member["fk_mercy_carry"] = second_resource
 
 
 # BATCH BU — FORTIFIED SPIRIT: hand the lent health back and clamp under it.
@@ -1436,6 +1468,129 @@ var rune_second_whistle := 0  # rune-owned: the Second Whistle 3 (Loyalty on arr
 var rune_shared_scent := 0    # rune-owned: the Shared Scent 1 (a FLAG)
 var rune_bared_fang := 0.0    # rune-owned: the Bared Fang +0.30 companion damage
 
+# ══ BATCH FK — THE EIGHT UNAUTHORED SPECS, THIRTY-NINE FIELDS ══════════════
+#
+# **SAME CONTRACT AS THE TWENTY-ONE ABOVE**: rune-owned, written by a payload
+# and by nothing else, and no live talent node's counter is among them. Every
+# INT here is in `Runes.STAT_INT_KEYS` for the AA reason (JSON parses `1` as a
+# float and a float into a typed int var is a runtime error at SPAWN, not a
+# rounding) — and the FLOATS are deliberately absent from that list, named in
+# its own block so the absence reads as a decision rather than an omission.
+#
+# **NONE OF THE FORTY CARRIES A THRESHOLD OR A BREADTH.** The designer retired
+# both secondaries going forward (a gated rune at a flat price is strictly
+# worse than a bare one), so no field below is ever refused at the spawn and
+# every read site reads a written value or a zero. TRADEOFF survives and eight
+# of these carry one — a cost paired with a bigger upside, priced in the same
+# payload rather than in a condition.
+#
+# **THE SEVEN FIELDS THAT ARE STAMPED ON A UNIT THAT DOES NOT WEAR THE RUNE**
+# are marked STAMPED below. `rune_long_fuse` is the clearest: the Burn it holds
+# open stands on an ENEMY, and `tick_statuses` is unit-side and cannot see the
+# party (`_add_bleed_with_burst`'s own note, one file over). They ride
+# `mercy_threshold`'s idiom — a party-wide stamp written at the spawn — rather
+# than a per-tick party walk.
+#
+# Berserker — one idle field existed (`rune_bloodrage_step_bonus`) and none of
+# these five reaches it: the Last Word and the Slaughterhouse are turn-order,
+# Blood Debt re-points a cost, the Butcher's Bill adds a strike, and the Open
+# Vein doubles CZ's SECOND term rather than the step the idle field holds.
+var rune_last_word := 0       # rune-owned: the Last Word 1 (a FLAG)
+var rune_blood_debt := 0      # rune-owned: Blood Debt 1 (a FLAG)
+var rune_butchers_bill := 0   # rune-owned: the Butcher's Bill 50 (percent, the roll)
+var rune_open_vein := 0       # rune-owned: the Open Vein 1 (a FLAG)
+var rune_bleedout_action := 0  # rune-owned: the Slaughterhouse 1 (a FLAG)
+# **NOT RUNE FIELDS, and deliberately not**: the Last Word's re-arm latch and
+# the Slaughterhouse's per-turn bound are ENGINE STATE — battle-scoped, written
+# by the battle, read by the battle, written by no payload (`ruin_shared_in`'s
+# precedent directly above). A per-battle SPEND is not a per-rune MAGNITUDE.
+var last_word_armed := true   # re-arms on healing back above the quarter
+var free_action_taken := false # one granted turn a turn, however many bleed out
+# Pyromancer —
+var rune_long_fuse := 0       # rune-owned: the Long Fuse 1 (a FLAG)
+var rune_ashfall := 0         # rune-owned: the Ashfall 1 (a FLAG)
+var rune_chain_fire := 0      # rune-owned: the Chain Fire 1 (a FLAG)
+var rune_ember_leap := 0      # rune-owned: the Ember Leap 1 (a FLAG)
+var rune_pyre_debt := 0       # rune-owned: the Pyre Debt 10 (percent of the refund, as recoil)
+# Cryomancer — NONE of these five writes `rune_frigid_ranks`,
+# `rune_frostbite_ranks`, `rune_hungering_ranks` or `rune_hypothermia_ranks`.
+# Those four arrive through `_max_hero_rank(field, rune_field)`, which takes the
+# highest node+rune across LIVING HEROES, so a rune written against one COMPETES
+# with a talent node on another hero rather than stacking with it.
+var rune_second_winter := 0   # rune-owned: the Second Winter 1 (a FLAG)
+var rune_killing_cold := 0    # rune-owned: the Killing Cold 5 (percent of max HP per stack)
+var rune_glass_prison := 0    # rune-owned: the Glass Prison 1 (a FLAG)
+var rune_cold_snap := 0       # rune-owned: the Cold Snap 1 (a FLAG)
+var rune_deep_cold := 0       # rune-owned: the Deep Cold 1 (a FLAG)
+# Arcanist — `rune_resonant_core_ranks` is IDLE and is NOT what the Rune of the
+# Resonant Core writes. That field means "the first cast of each turn builds
+# more" (battle.gd's build block, beside the node of the same name); this rune
+# carries the METER between battles, which is a different thing entirely and
+# needs its own field or the two meanings would share one name.
+var rune_resonant_carry := 0  # rune-owned: the Resonant Core 10 (percent carried)
+var rune_half_note := 0       # rune-owned: the Half Note 25 (points added to KEEP)
+var rune_overtone := 0        # rune-owned: the Overtone 3 (every Nth cast builds double)
+var rune_dissonance := 0      # rune-owned: the Dissonance 1 (a FLAG)
+var rune_overflow := 0        # rune-owned: the Overflow +1 stack on a crit
+# **ENGINE STATE, not a rune field**: the Overtone's cast counter is per-battle
+# and the carried meter is per-RUN, so the carry lives on the run's member dict
+# (`run_state`) and only the counter is here.
+var overtone_casts := 0
+# Swordmaster — the Whetstone writes `rune_seasoned_off_bonus`, the idle field
+# the Rune of the Bared Guard used to write, AND its own flag. The flag is what
+# advances the counter, so the read site reads exactly `rune_seasoned_off_bonus`
+# when the counter is zero and a flat writer is unchanged by this batch.
+var rune_growing_edge := 0       # rune-owned: the Whetstone 1 (a FLAG — it arms the growth)
+var rune_mirror_guard := 0    # rune-owned: the Mirror Guard 50 (percent returned)
+var rune_open_line := 0       # rune-owned: the Open Line 1 (a FLAG)
+var rune_long_blade := 0      # rune-owned: the Long Blade 1 (a FLAG)
+var rune_naked_blade := 0     # rune-owned: the Naked Blade 1 (a FLAG)
+var whetstone_turns := 0      # engine state: turns held in Aggressive, reset on a switch
+# Holy — written against `second_resource_name == "Mercy"` at every read site,
+# never against the FIELD: `second_resource` is also Resonance and Focus, so a
+# rune written against the field reaches two other specs.
+var rune_vigil := 0           # rune-owned: the Vigil 1 (a FLAG)
+var rune_open_hand := 0       # rune-owned: the Open Hand 1 (a FLAG)
+var rune_long_watch_mercy := 0 # rune-owned: the Long Watch (Holy) 1 (a FLAG)
+var rune_grace := 0           # rune-owned: the Grace 50 (percent of the echo)
+var rune_martyr := 0          # rune-owned: the Martyr 1 (a FLAG)
+# Devout —
+var rune_layered_aegis := 0   # rune-owned: the Layered Aegis 1 (a FLAG)
+var rune_deep_absorb := 0     # rune-owned: the Deep Absorb +1 Faith an absorb
+var rune_fourth_stack := 0    # rune-owned: the Fourth Stack +1 to the release
+var rune_bare_altar := 0      # rune-owned: the Bare Altar 1 (a FLAG)
+# Survivalist — none of these five is written against Trapper's +8% step.
+# FORCE OF NATURE REPLACES that term via `elif` rather than adding to it, so a
+# rune written against the 8% is silently worth nothing to a Survivalist holding
+# that capstone. All five are written elsewhere on purpose.
+var rune_long_poison := 0     # rune-owned: the Long Poison 1 (a FLAG). STAMPED on enemies.
+var rune_second_barb := 0     # rune-owned: the Second Barb 1 (a FLAG)
+var rune_full_board := 0      # rune-owned: the Full Board 1 (a FLAG)
+var rune_carrion := 0         # rune-owned: the Carrion 1 (a FLAG)
+var rune_thin_blood := 0      # rune-owned: Thin Blood 1 (a FLAG)
+var second_barb_next := 0     # engine state: where the barb's cycle stands
+# **ENGINE STATE AND NOT A RUNE FIELD**: the Glass Prison stamps this on the
+# BODIES it seals, not on the Cryomancer, so a prison laid while the rune was
+# worn stays glass even if the wearer falls — and an ordinary hold laid by the
+# same hero on another turn is not retroactively made fragile. `ruin_shared_in`'s
+# precedent: stamped by the battle, read by the battle, written by no payload.
+var glass_hold := false
+# **THE TWO ENEMY-SIDE STAMPS, AND THEY ARE DELIBERATELY NOT NAMED `rune_*`.**
+# `check_ez` §4 asserts that a `rune_*` field is written by `runes.json` and by
+# NOTHING ELSE, and the rule is right: a rune field whose value can arrive from
+# a script is a field whose value is not the rune's. **An enemy never wears a
+# rune**, so what is stamped onto one is a BATTLE FACT about that body and not a
+# rune's payload — the Long Fuse holds THIS enemy's burn clock, the Deep Cold
+# lifts THIS enemy's chill cap. The rune's own field stays on the hero where the
+# payload wrote it. (`mercy_threshold`'s idiom, and `ruin_shared_in`'s naming.)
+var burn_clock_held := false  # stamped: a Long Fuse Pyromancer stands, so Burn does not tick down
+var chill_uncapped := false   # stamped: a Deep Cold Cryomancer stands, so Chilled does not cap
+# **ENGINE STATE**: the Rune of the Grace's owed echo, as a PERCENTAGE of each
+# hero's own maximum rather than a healed total — the hymn is a fraction of each
+# body and a banked total would pay the smallest hero the largest one's number.
+# Banked at the cast, spent at the turn's end, zeroed as it is read.
+var grace_echo_pct := 0.0
+
 # **NOT A RUNE FIELD AND DELIBERATELY NOT ONE: the Answering Pack's spend.**
 # The rune says "once a fight", so what is per-BATTLE is the SPEND and not the
 # holding — `battle.gd`'s spawn writes the field above once and never again,
@@ -1547,6 +1702,18 @@ var status_expired_cb := Callable()
 # Mercy hook (set by the battle scene on heroes): fires when this unit
 # crosses below 50% health, from any damage source.
 var below_half_cb := Callable()
+# BATCH FK — the Rune of the Last Word's hook, beside the Mercy one because it
+# is the same kind of thing at a different line: the battle scene owns what
+# happens (a turn granted is turn-order state and the unit cannot see the
+# timeline), the unit owns WHEN.
+var last_word_cb := Callable()
+# ...and the Rune of the Vigil's, which is the Mercy line crossed UPWARD. Same
+# split as `below_half_cb`: the unit owns when, the battle owns who pays.
+var heal_above_half_cb := Callable()
+# ...and the Rune of the Glass Prison's. A glass cell shatters on the first
+# point of damage from ANY source, and a release is turn-order work the unit
+# cannot do — same split again.
+var glass_cb := Callable()
 # The two Holy reversal hooks (Batch AV) are declared with the rest of her
 # state above: `intercession_cb` (asked whether the refusal can be PAID, so it
 # returns a bool) and `martyrdom_cb` (reports a spent latch).
@@ -1554,10 +1721,30 @@ var below_half_cb := Callable()
 
 # The threshold is 50% by default; Guardian Angel stamps a higher one on
 # the whole party at spawn.
+#
+# **BATCH FK — THE LAST WORD'S QUARTER IS CHECKED HERE AND NOT AT A SITE OF ITS
+# OWN.** Both crossings the game can make — `take_hit` and `take_tick_damage` —
+# already funnel through this one function with `was_above` computed against the
+# health BEFORE the subtraction, so a second threshold is two lines here rather
+# than a third and fourth call site that could drift out of step with these two.
+# The quarter is a LITERAL and the half is a party-wide stamp, deliberately:
+# Guardian Angel moves the Mercy line and nothing moves this one.
+const LAST_WORD_AT := 0.25
 func _check_below_half(was_above: bool) -> void:
 	if is_hero and not is_companion and was_above \
 			and hp <= max_hp * mercy_threshold and below_half_cb.is_valid():
 		below_half_cb.call(self)
+	# **THE LATCH IS WHAT MAKES IT REPEATABLE RATHER THAN CONTINUOUS.** Without
+	# it every subsequent hit taken below the quarter is another crossing as far
+	# as `was_above` is concerned only on the first one — but a heal back over
+	# the line and a second dive must pay again, and that re-arm is in
+	# `heal_amount` where the line is crossed upward. Disarming here is what
+	# stops one dive paying twice through two different damage doors in the
+	# same turn.
+	if rune_last_word > 0 and is_hero and not is_companion and last_word_armed \
+			and hp > 0 and hp <= max_hp * LAST_WORD_AT and last_word_cb.is_valid():
+		last_word_armed = false
+		last_word_cb.call(self)
 
 
 # The health Martyrdom hands back — named so the test can read the number the
@@ -2207,7 +2394,18 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
 				# Permafrost applications arrive with turns -1: the pile stops
 				# thawing the moment the Cryomancer touches it.
-				s.stacks = mini(int(s.get("stacks", 1)) + 1, 4)
+				# BATCH FK — THE RUNE OF THE DEEP COLD lifts the cap and
+				# NOTHING ELSE. Four stacks still flash-freezes (battle.gd's
+				# branch is on the count, not on the cap), so the rune is worth
+				# nothing on an enemy that can be held and everything on one
+				# that cannot — a boss before the Break, and every enemy after
+				# the hold limit of ONE is already spent. `rune_deep_cold` is
+				# STAMPED on the enemy at the spawn for `rune_long_fuse`'s
+				# reason: the pile stands on a body this file cannot ask the
+				# party about.
+				s.stacks = int(s.get("stacks", 1)) + 1
+				if not chill_uncapped:
+					s.stacks = mini(int(s.stacks), 4)
 				s.turns = turns
 				s.short = "C%d" % s.stacks
 				s.desc = _chilled_desc(int(s.stacks), turns < 0)
@@ -2293,7 +2491,7 @@ func remove_status(id: String) -> void:
 func set_chilled_stacks(n: int) -> void:
 	for s in statuses:
 		if s.id == "chilled":
-			s.stacks = clampi(n, 1, 4)
+			s.stacks = clampi(n, 1, 4) if not chill_uncapped else maxi(n, 1)
 			s.short = "C%d" % s.stacks
 			s.desc = _chilled_desc(int(s.stacks), int(s.turns) < 0)
 			_refresh_chips()
@@ -2424,7 +2622,19 @@ func tick_statuses() -> void:
 	# the marker's own clock and the Burn it is holding cannot disagree about
 	# this turn: `slow_burn` decrements normally on the same pass, which is
 	# what makes three turns of marker exactly three turns of held fire.
-	var burn_held := has_status("slow_burn")
+	# **BATCH FK — THE RUNE OF THE LONG FUSE RIDES SLOW BURN'S OWN SENTENCE.**
+	# Same clause, same position, same consequence: the DAMAGE tick is a
+	# separate pass that never touches this clock, so holding the countdown
+	# leaves every tick of damage intact. `rune_long_fuse` is STAMPED on the
+	# enemy at the spawn (`mercy_threshold`'s idiom) because the Burn stands on
+	# a body this file cannot ask the party about — the same reason
+	# `_add_bleed_with_burst` had to move Slaughterhouse battle-side.
+	#
+	# **ONLY CONSUMPTION ENDS IT, WHICH IS THE RUNE'S SECOND HALF AND IS FREE**:
+	# every consumer already calls `remove_status`/`update_status` directly
+	# rather than waiting on the clock, so nothing had to be taught the
+	# difference.
+	var burn_held := has_status("slow_burn") or burn_clock_held
 	for s in statuses:
 		if s.id == "burn" and burn_held:
 			continue
@@ -2671,8 +2881,18 @@ func note_resource_spent(amount: int) -> void:
 # ratchet inside `frenzy_bonus()`, which is the property CY's instrument turns
 # on. Returns STEPS, not a fraction — the caller owns what a step is worth,
 # because Unstoppable moves that and this term rides the same step it does.
+# **BATCH FK — THE RUNE OF THE OPEN VEIN DOUBLES THIS TERM AND ONLY THIS ONE.**
+# It is written here rather than at the sum in `frenzy_bonus()` because this
+# function IS CZ's second term, and the sampler (`_cy_sample`) calls it directly
+# — a doubling written at the sum would be invisible to the instrument that
+# exists to read this term apart from the health one.
+#
+# **THE BAND DOES NOT GROW AND THAT IS THE WHOLE SHAPE.** `frenzy_bonus()`
+# clamps the SUM at `FRENZY_MAX_STEPS`, so the rune makes him reach +40%
+# SOONER and never deeper — CZ §1's explicit design decision, unchanged. A
+# Berserker already at the ceiling gets nothing from it, which is correct.
 func frenzy_rage_steps() -> int:
-	return rage_spent / FRENZY_RAGE_PER_STEP
+	return (rage_spent * (2 if rune_open_vein > 0 else 1)) / FRENZY_RAGE_PER_STEP
 
 
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
@@ -2977,6 +3197,14 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	var hp_before := hp
 	hp = maxi(hp - amount, 0)
 	_check_below_half(was_above_mercy)
+	# BATCH FK — THE GLASS CELL SHATTERS HERE, beside the Mercy line and for the
+	# same reason it is here: this is where damage has LANDED, and the rune's
+	# promise is "breaks on any damage" — an ally's cleave, a stray AoE and a
+	# DoT tick all have to spend it, or the TRADEOFF is not one. The battle
+	# owns the release (a hold is turn-order state); this only says when.
+	if glass_hold and amount > 0 and glass_cb.is_valid():
+		glass_hold = false
+		glass_cb.call(self)
 	# Hold the Line: the party cannot die while the blessing holds.
 	if hp == 0 and has_status("undying"):
 		hp = 1
@@ -3281,6 +3509,9 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	var tick_hp_before := hp
 	hp = maxi(hp - amount, 0)
 	_check_below_half(tick_was_above)
+	if glass_hold and amount > 0 and glass_cb.is_valid():
+		glass_hold = false
+		glass_cb.call(self)
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
@@ -3419,6 +3650,21 @@ func heal_amount(amount: int, external := false) -> int:
 		float_text("BLIGHTED", Color(0.55, 0.25, 0.45))
 		blight_cb.call(self, amount)
 		return 0
+	# BATCH FK — THE RUNE OF THE MARTYR's cost, and it joins the ABSOLUTE
+	# refusals rather than the multiplier block for Weight of Ruin's stated
+	# reason: "can no longer be healed by anyone but himself" is a RULE, not an
+	# amount, and a large enough heal must not answer it.
+	#
+	# **IT READS `external`, WHICH IS ALREADY EXACTLY THE QUESTION.** Every
+	# caller passes `target != attacker`, so his own casts, his own lifesteal
+	# and his own barrier conversion all land and every ally's heal is refused
+	# — no second predicate, and nothing to keep in step with the rest of the
+	# heal pipeline. A self-heal that arrived with `external` true would be a
+	# bug at the CALLER and is caught there, not softened here.
+	if rune_martyr > 0 and external:
+		if amount > 0:
+			float_text("MARTYR", Color(0.95, 0.8, 0.3))
+		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
 		mult *= 1.30
@@ -3436,6 +3682,12 @@ func heal_amount(amount: int, external := false) -> int:
 	# today — this is here so a future rune cannot open the hole silently.
 	mult = maxf(mult, 0.0)
 	var final := int(round(amount * mult))
+	# BATCH FK — the two UPWARD crossings, captured before the bar moves for the
+	# same reason `take_hit` captures `was_above_mercy` before the subtraction:
+	# after the write there is no way to know which side of either line he was
+	# on. Both are read at the bottom of this function, below the clamp.
+	var heal_was_below_mercy := hp <= max_hp * mercy_threshold
+	var heal_was_below_quarter := hp <= max_hp * LAST_WORD_AT
 	last_overheal = maxi(final - (max_hp - hp), 0)
 	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
 	# lane's waste product and seven rows make more of it; here it becomes the
@@ -3456,6 +3708,25 @@ func heal_amount(amount: int, external := false) -> int:
 	# battle.gd's (unit.gd cannot see the board) — this hands over the number.
 	if final > 0 and has_status("vigil") and vigil_cb.is_valid():
 		vigil_cb.call(self, final)
+	# BATCH FK — THE RUNE OF THE LAST WORD RE-ARMS HERE, at the one line every
+	# heal in the game passes through (Undying Vigil's own position argument,
+	# one clause up). The rune is repeatable — "healing back up and diving again
+	# re-arms it" — and this is the only place the quarter can be crossed
+	# UPWARD, so a latch re-armed anywhere else would be a list of heal sources
+	# that goes stale silently. **IT RE-ARMS ON THE UNIT THAT WAS HEALED**, not
+	# on the healer, which is why it is here rather than at the cast.
+	if rune_last_word > 0 and heal_was_below_quarter \
+			and hp > max_hp * LAST_WORD_AT:
+		last_word_armed = true
+	# ...and the RUNE OF THE VIGIL's accrual, which is the Mercy line crossed
+	# the other way. The unit that crossed is an ALLY and the Mercy is the
+	# CLERIC'S, so this hands the crossing over rather than paying it: unit.gd
+	# cannot see the party, and `_on_hero_below_half` is battle-side for exactly
+	# the same reason. Guarded on `final > 0` so a heal into a full bar forks
+	# nothing, exactly as it books nothing.
+	if final > 0 and heal_was_below_mercy \
+			and hp > max_hp * mercy_threshold and heal_above_half_cb.is_valid():
+		heal_above_half_cb.call(self)
 	return final
 
 

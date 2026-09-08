@@ -127,12 +127,18 @@ func _met_drafted(cond: Dictionary) -> Array:
 
 # ── §0 — THE POOL ───────────────────────────────────────────────────────────
 func _s0_the_pool() -> void:
-	print("\n§0 — the pool: twenty-one live, sixty-six retired")
+	# **BATCH FK MOVED THREE COUNTS AND NOT ONE RULE.** The pool went 21 -> 60
+	# live and 87 -> 126 entries when FK authored the eight unauthored specs, so
+	# every census in this section is a count of a population that grew. Each was
+	# checked for a RULE hiding inside it before it was moved, and the two that
+	# hold one — SCOPE IS SPEC ONLY, and price is flat 100g — are equalities over
+	# the whole live pool and did not have to move at all.
+	print("\n§0 — the pool: sixty live, sixty-six retired")
 	var data := _data()
 	var ez := _ez_ids()
-	ok(ez.size() == 21, "§0: %d entries carry no retirement, expected 21 live runes"
+	ok(ez.size() == 60, "§0: %d entries carry no retirement, expected 60 live runes"
 		% ez.size())
-	ok(data.size() == 87, "§0: the authored pool is %d entries, expected 87" % data.size())
+	ok(data.size() == 126, "§0: the authored pool is %d entries, expected 126" % data.size())
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the
@@ -153,20 +159,41 @@ func _s0_the_pool() -> void:
 		if (Runes.rune_shape(id) as Array).is_empty():
 			unshaped.append(id)
 	ok(mispriced.is_empty(), "§0: every rune is 100g flat (%s)" % [mispriced])
-	ok(unscoped.is_empty(), "§0: SCOPE IS SPEC ONLY for all twenty-one (%s)" % [unscoped])
+	ok(unscoped.is_empty(), "§0: SCOPE IS SPEC ONLY for all sixty (%s)" % [unscoped])
 	ok(untagged.is_empty(), "§0: every one carries an archetype tag (%s)" % [untagged])
 	ok(unshaped.is_empty(), "§0: every one carries a §0 shape (%s)" % [unshaped])
 
-	# FOUR SPECS, AND THE COUNTS THE BRIEF NAMES. Six for the Beastmaster.
+	# **ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND THE SHAPE OF THE
+	# ASSERTION CHANGED WITH THE POPULATION.** It used to name four specs and
+	# their four counts; naming twelve would be twelve lines that move again the
+	# next time a set is re-sized. **The claim that is actually load-bearing is
+	# that NO spec is empty** — a spec with an authored set of zero draws nothing
+	# but the generated stat family, which is the state the whole rune layer
+	# exists to leave — so that is what is asserted, with the two counts that ARE
+	# rulings (the Beastmaster's extra, and the Devout's owed fifth) named beside
+	# it.
 	var per_spec := {}
 	for id2 in ez:
 		var sp := String((data[id2] as Dictionary)["scope"]).trim_prefix("spec:")
 		per_spec[sp] = int(per_spec.get(sp, 0)) + 1
-	ok(per_spec.size() == 4, "§0: four specs are authored (%s)" % [per_spec.keys()])
-	ok(int(per_spec.get("occultist", 0)) == 5, "§0: the Occultist has 5")
-	ok(int(per_spec.get("warden", 0)) == 5, "§0: the Warden has 5")
-	ok(int(per_spec.get("sharpshooter", 0)) == 5, "§0: the Sharpshooter has 5")
-	ok(int(per_spec.get("beastmaster", 0)) == 6, "§0: the Beastmaster has 6, not 5")
+	ok(per_spec.size() == 12, "§0: %d specs are authored, not all 12 (%s)" % [
+		per_spec.size(), per_spec.keys()])
+	var empty_spec: Array = []
+	for sp2 in Classes.all_specs():
+		if int(per_spec.get(String(sp2), 0)) <= 0:
+			empty_spec.append(sp2)
+	ok(empty_spec.is_empty(),
+		"§0: a spec has no authored rune and draws only the stat family — %s" % [empty_spec])
+	ok(int(per_spec.get("beastmaster", 0)) == 6,
+		"§0: the Beastmaster has 6, not 5 — his extra is a bare PASSIVE")
+	# **THE DEVOUT HAS FOUR AND THE FIFTH IS OWED, NOT MISSING.** FK authored a
+	# Rune of the Standing Ground whose clause is the base kit (Consecrated
+	# Ground already kindles every hero standing in it, since AW §2), so it would
+	# have shipped inert and was reported instead. `check_fk` §6 holds the
+	# reason; this row holds the count, so the day the fifth arrives BOTH move.
+	ok(int(per_spec.get("inquisitor", 0)) == 4,
+		"§0: the Devout has %d, not the 4 FK shipped — his fifth is owed" % \
+			int(per_spec.get("inquisitor", 0)))
 
 	# **THE SHAPE AND THE CONDITION AGREE, IN BOTH DIRECTIONS.** A rune labelled
 	# THRESHOLD whose payload carries no `tag_threshold` advertises a gate it
@@ -533,11 +560,11 @@ func _s4_the_payloads() -> void:
 			if cfg_off.has(f3):
 				not_refused.append("%s: %s landed with the condition FAILING" % [id, f3])
 	ok(missed.is_empty(), "§4: every payload lands its field (%s)" % [missed])
-	ok(landed == 21, "§4: %d of 21 landed" % landed)
+	ok(landed == 60, "§4: %d of 60 landed" % landed)
 	ok(gated == 8, "§4: %d runes carry a condition, expected 8" % gated)
 	ok(not_refused.is_empty(),
 		"§4: a gated payload landed anyway (%s)" % [not_refused])
-	print("    21 payloads, %d of them gated, all refused when the condition fails" % gated)
+	print("    60 payloads, %d of them gated, all refused when the condition fails" % gated)
 
 	# **AND THE FIELDS ARE RUNE-OWNED**, which is EM's charter asserted rather
 	# than claimed: every `rune_` field these twenty-one write has

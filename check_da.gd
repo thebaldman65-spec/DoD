@@ -77,6 +77,19 @@ const WALK_EXEMPT := {
 	# shape is honest rather than merely declared).
 	"check_ea.gd": "measures the AWARD CHAIN's depth per spec — it reads both draft pools because the chain does",
 	"check_eh.gd": "drives the AWARD CHAIN's three tiers live — it reads both draft pools because the chain does",
+	# **BATCH FK — THE FOURTH TIME THE MARK OVER-FIRES, AND IT IS EH §1's REASON
+	# EXACTLY.** `check_fk` §5 asks whether a rune's `requires_ability` names an
+	# ability the SCOPED SPEC CAN ACTUALLY EARN — a rune naming one its hero
+	# cannot own applies silently and does nothing, which is the whole point of
+	# that section. **`ability_corpus()` cannot answer it**: it returns a flat
+	# list with no membership, so "can a Berserker earn Blood Price?" has no
+	# other source than the pools the award chain itself reads (boss pool, spec
+	# draft, class draft — FJ §1's three channels, all writing `bm_abilities`
+	# through one `hold_ability()`). **And the gate calls `ability_corpus()`
+	# OUTRIGHT for the walk itself**, which is `check_dn.gd`'s exemption verbatim:
+	# canonical walk for the enumeration, pools for the membership question the
+	# enumeration cannot answer.
+	"check_fk.gd": "asks whether a rune's `requires_ability` is EARNABLE by its scoped spec — it reads both draft pools because the award chain does, and calls `Classes.ability_corpus()` for the walk itself",
 }
 
 

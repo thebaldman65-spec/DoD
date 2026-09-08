@@ -312,9 +312,16 @@ const TAG_DOOR := "loadout_condition_met"
 # LEARN THAT A NEW GATE JOINS THIS LIST BY EXISTING**: FH's second pre-pass
 # ran a chosen subset rather than every gate, so this red arrived from the
 # battery instead of from the pre-pass that was written to catch it.
+# **BATCH FK ADDED THE NINTH, AND IT IS THE FOURTH BATCH RUNNING TO LEARN THAT
+# A NEW GATE JOINS THIS LIST BY EXISTING.** `check_fk.gd` §2 asserts that not
+# one of FK's thirty-nine runes carries a THRESHOLD or a BREADTH — the two gated
+# secondaries the designer retired going forward — and that the six already
+# shipped ARE still gated, so it reads `tag_threshold` and `tag_breadth` off the
+# payloads. **It changes no behaviour and it is not exempted; it is listed**,
+# which is what this half of the population is for.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
-	"check_map_screen.gd"]
+	"check_fk.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

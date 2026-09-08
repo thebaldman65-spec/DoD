@@ -335,8 +335,15 @@ func _sweep_ratchet(src: String) -> void:
 			filtered += 1
 	print("  `heroes` walks: %d, of which %d carry a no-op `is_companion` filter" % [
 		walks, filtered])
-	ok(filtered == 23,
-		"the `is_companion`-over-`heroes` population is %d, not the 23 CV measured and DJ re-derived" % filtered)
+	# **BATCH FK MOVED IT 23 -> 25.** Two of the thirty-nine walk `heroes` with
+	# the filter: the Rune of the Vigil's accrual (`_on_hero_healed_above_half`)
+	# and the Rune of the Open Hand's party heal. **Both filters are the
+	# CORRECT no-op** in DK's sense — a companion is not a hero the Mercy bar or
+	# a Divine Plea can reach — and both are written the way every other walk in
+	# the file is, which is the property this count exists to hold: the number is
+	# a census of a consistent idiom, not a budget.
+	ok(filtered == 25,
+		"the `is_companion`-over-`heroes` population is %d, not the 25 after FK" % filtered)
 	# **AND DK ASKED THE QUESTION THIS COUNT EXISTS FOR, AND THE ANSWER WAS
 	# NONE.** DK widened four ally-worded read sites to `_hero_side()`, which
 	# genuinely does hold companions — so a filter sitting on one of them would

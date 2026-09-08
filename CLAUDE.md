@@ -3312,3 +3312,89 @@ call and one string).
   Worse than BP's Precision Strike (same spec, but a node against a SPEC card). Nothing breaks, and
   **the ability's status is `ironclad` with its own chip** precisely so a Warden holding both never
   sees two chips reading the same word.
+· **BATCH FK SWEPT FORTY RUNE NAMES AGAINST 708 AND FOUND TEN EXACT HITS WHERE THE BRIEF NAMED
+  FIVE — and the three it missed were all SAME-SPEC.** `Cold Snap` is a Cryomancer Deep Freeze
+  node, `Grace` is a Holy Mercy node, and `Vigil` is the Holy's own LANE. **Sweep the LANE NAMES
+  too**; they were not in this rule's list until FK and a lane is a word the player reads.
+· **RENAMED THERE: the Pyromancer rune authored as BACKDRAFT is the RUNE OF THE EMBER LEAP.** The
+  brief called `Backdraft` a talent node in his Inferno lane; **it is a live DRAFT CARD**, which is
+  a closer collision than the one named — and the rename went ahead on the order rather than on the
+  reason. **A brief's account of WHAT a name collides with is a premise like any other.**
+· **REPORTED, NOT RESOLVED — BLOOD DEBT is the worst of FK's nine.** A rune and a Berserker draft
+  card share one name in one spec's reachable pool, and the rune attaches to a DIFFERENT card
+  (`Blood Price`). **Nothing resolves a rune by name**: `config` and `build` key on the id, and the
+  only name-keyed lookup is `eligible_ids`'s PER-MEMBER pouch dedupe. **That was checked rather
+  than assumed, and it is what makes the two `Long Watch` runes safe as well** — the Warden's and
+  the Holy's have disjoint spec scopes and `_scope_ok` runs before the dedupe, so no hero can ever
+  hold both and the dedupe can never mis-fire.
+
+## STANDING RULE — A RUNE'S CLAUSE MUST BE CHECKED AGAINST THE BASE KIT, NOT ONLY AGAINST THE
+## TALENT TREES AND THE CARDS (Batch FK §7)
+
+**The Rune of the Standing Ground was authored as *"Consecrated Ground grants Faith to allies
+standing in it, not only to its caster"* and that has been the BASE KIT since Batch AW §2.** The
+`cons_ground` handler stamps every living non-companion hero and `_ground_faith_tick` pays whichever
+hero holds it — so the rune would have installed, logged nothing and changed nothing. **BR §1's
+sweep would not have caught it**: the NAME is clean, and what collided was the CLAUSE.
+· **THE SECOND PREMISE WAS FALSE IN THE OPPOSITE DIRECTION AND THAT IS THE OTHER HALF OF THE
+  LESSON.** The brief also said *"Fervor is the node that already extends the ground to allies"*,
+  and Fervor's own `desc` says **"It grants no extra Faith at all."** So one claim said a mechanic
+  exists that does not, and the other said a mechanic does not exist when it does. **Both were
+  found by reading the handler, and neither was visible from the card text or the node list.**
+· **WHAT TO DO ABOUT ONE, RULED HERE: DO NOT SHIP IT AND DO NOT RE-AIM IT.** A batch may not alter
+  an authored rune, and a rune that ships inert is worse than one that does not ship — the two
+  rules resolve to "report it, price the nearest alternatives, and let the designer choose". **The
+  Devout shipped four.**
+· **AND THE REASON GOES IN A GATE, NOT A REPORT.** `check_fk` §6 asserts the absence AND the two
+  code facts that make the rune inert, so the day a batch narrows the ground to its caster the
+  gate says the rune is authorable. **A reason recorded only in prose is a reason nobody re-reads.**
+
+## STANDING RULE — `for i in n` EVALUATES ITS RANGE ONCE, SO A CLAUSE THAT ADDS AN ITERATION FROM
+## INSIDE THE BODY NEEDS A `while` (Batch FK §6)
+
+**The Rune of the Butcher's Bill adds a strike when a Bleed lands, and a Bleed lands INSIDE the hit
+loop.** Raising `total_hits` from in there raised a number nothing read: GDScript's `for hit_i in
+total_hits` builds the range at entry. **Berserk expands the same variable and needs none of this,
+because it expands it BEFORE the loop** — whether a bleed landed is not knowable until the roll
+inside, and that is the whole difference.
+· **THE CONVERSION IS MECHANICAL AND MUST BE CHECKED FOR EXACTLY THREE THINGS**: the increment goes
+  at the TOP (so a `continue` still advances — there are none at that level today), every `break`
+  is unchanged, and any `hit_i == total_hits - 1` now means *"the last hit including an added
+  one"*, which for a crit-on-the-last-blow clause is the correct reading and not a side effect.
+· **`test_batch_br` §1 SLICES THAT LOOP BY FINDING ITS HEADER** and its own
+  `ok(loop_start > 0, "the hit loop is locatable")` is what caught the change. **A suite that
+  locates code by a string is a pin on that string** — re-point it, never delete it.
+
+## STANDING RULE — A SHARED SECOND-RESOURCE CARRY NEEDS ITS OWN KEY (Batch FK §4)
+
+`second_resource` is **Mercy, Resonance and Focus**, one field wearing three names. FK authored two
+runes that carry a meter between battles — the Arcanist's Resonant Core (a tenth of it) and the
+Holy's Long Watch (all of it) — and **they bank to two SEPARATE keys on the party member**
+(`fk_resonance_carry`, `fk_mercy_carry`), tested by `second_resource_name` and never by the field.
+· **ONE KEY WOULD HAVE PAID THE WRONG METER.** A Cleric and an Arcanist in one party both write
+  `second_resource` at `sync_victory_state`; a shared key means whichever synced last decides what
+  the other opens the next fight holding.
+· **THE BANK IS WRITTEN ON VICTORY AND ERASED AS IT IS READ**, so a wipe carries nothing and a
+  stale key cannot survive into a fight that did not earn it.
+
+## STANDING RULE — A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE
+## (Batch FK §2a)
+
+**Two naming rules bind the rune pool that BR §1's roster sweep cannot see**, because they are
+about the POOL'S OWN CONVENTIONS rather than about whether a name exists. FK's brief got both
+wrong, and both were caught by gates that already existed.
+· **A RETIRED ENTRY STILL OWNS ITS NAME.** `test_runes`' schema walk asserts no two entries share a
+  `display_name`, **retired included**, and ES §1 is why it is load-bearing: `display_name` used to
+  prepend a tier or the Scarred word, so two entries could share a `name` and still be distinct
+  runes — **they cannot now**. A retired entry is KEPT and still resolves through `config` /
+  `build` / `display_name` (EO §3), so two entries sharing a name is two resolvable runes wearing
+  one word.
+· **THE LIVE POOL DOES NOT WEAR `Rune of the …`.** All 21 EZ/FC runes are bare — `Deepening Hex`,
+  `Standing Wall`, `Keen Focus` — and `check_fd` §3 pins the long shape as the RETIRED pool's, with
+  a floor on the retired side proving the shape is really theirs.
+· **THE TWO INTERACT, AND FK'S FIX WAS ONE EDIT.** Bare-naming thirty-nine runes authored as
+  *"Rune of the X"* turned §3 green AND removed four duplicate names at a stroke — under the pool's
+  own convention the brief's *"a retired name is free"* becomes TRUE. **It forced exactly one
+  rename**: bare, a second `Long Watch` is byte-identical to the Warden's live one, so the Holy's
+  is `Carried Mercy`. **Nothing RESOLVES a rune by name — and that does not make a duplicate safe**,
+  because the schema refuses it regardless and the schema is what the next batch meets.

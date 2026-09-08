@@ -229,7 +229,35 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_split_shield", "rune_long_watch", "rune_no_block",
 	"rune_keen_focus", "rune_heavy_bolts", "rune_ambush", "rune_wide_watch",
 	"rune_long_draw_presses", "rune_long_leash", "rune_shared_hide",
-	"rune_answering_pack", "rune_second_whistle", "rune_shared_scent"]
+	"rune_answering_pack", "rune_second_whistle", "rune_shared_scent",
+	# BATCH FK — THE EIGHT UNAUTHORED SPECS' OWN INT FIELDS. Thirty-eight of
+	# the thirty-nine write an int and NONE of the thirty-eight ends in
+	# "_ranks", so every one needs this list for exactly the AA reason: JSON
+	# parses `1` as a float and a float into a typed int var is a runtime error
+	# at spawn, not a rounding.
+	#
+	# **THE ONE FLOAT IS DELIBERATELY ABSENT AND NAMED HERE SO THE ABSENCE
+	# READS AS A DECISION**: `rune_seasoned_off_bonus` (the Whetstone's 0.03
+	# per-turn step) is a FRACTION and coercing it would flatten it to 0
+	# outright — the failure that reads exactly like the rune working, which is
+	# the Bared Guard's -0.15 precedent two blocks up. It is already in the
+	# nine named there and stays out for the same reason.
+	"rune_last_word", "rune_blood_debt", "rune_butchers_bill", "rune_open_vein",
+	"rune_bleedout_action",
+	"rune_long_fuse", "rune_ashfall", "rune_chain_fire", "rune_ember_leap",
+	"rune_pyre_debt",
+	"rune_second_winter", "rune_killing_cold", "rune_glass_prison",
+	"rune_cold_snap", "rune_deep_cold",
+	"rune_resonant_carry", "rune_half_note", "rune_overtone", "rune_dissonance",
+	"rune_overflow",
+	"rune_growing_edge", "rune_mirror_guard", "rune_open_line", "rune_long_blade",
+	"rune_naked_blade",
+	"rune_vigil", "rune_open_hand", "rune_long_watch_mercy", "rune_grace",
+	"rune_martyr",
+	"rune_layered_aegis", "rune_deep_absorb", "rune_fourth_stack",
+	"rune_bare_altar",
+	"rune_long_poison", "rune_second_barb", "rune_full_board", "rune_carrion",
+	"rune_thin_blood"]
 
 static var _data := {}
 
@@ -390,6 +418,70 @@ const RUNE_TAGS := {
 	"second_whistle": ["RESOURCE"],            # Second Whistle
 	"shared_scent": ["RESOURCE"],              # Shared Scent
 	"bared_fang": ["OFFENSE", "DEFENSE"],      # Bared Fang — it SPENDS the mending
+	# ── BATCH FK — THE EIGHT UNAUTHORED SPECS, ON THE SAME VOCABULARY ───────
+	# **DERIVED FROM THE READ SITE OF EACH PAYLOAD FIELD**, never from the
+	# rune's `desc` — this table's own rule, one header up. Where a rune's whole
+	# payload is an ABILITY edit it carries the tag of the EDIT rather than of
+	# the ability, which is why the Cold Snap is OFFENSE and not DEBUFF: what it
+	# changes is how many bodies the lance strikes.
+	#
+	# **MARK STILL REACHES NO RUNE**, and it is measured rather than assumed for
+	# the second time: not one of these thirty-nine payload fields is read
+	# anywhere near `covenant`, `quarry`, `snare_line`, `feinted`, `hunt_mark`,
+	# `party_mark`, `blood_debt`, `vendetta`, `reacquire` or `arcane_echo`. The
+	# Rune of Blood Debt is the near-miss and it is a real one — it shares a NAME
+	# with the card that lays the `blood_debt` mark — but its payload re-points
+	# Blood PRICE's cost and touches no mark at all.
+	#
+	# **AND NO RUNE CARRIES BREAK AS ITS PRIMARY**, which is FE §1's ruling
+	# holding: three of these read BREAK as a SECOND tag and none as a first.
+	# Berserker —
+	"last_word": ["TEMPO", "DEFENSE"],         # the Last Word — a turn, taken at the line
+	"blood_debt_rune": ["RESOURCE", "OFFENSE"],# Blood Debt — the bill moves, the meter fills
+	"butchers_bill": ["OFFENSE", "DEBUFF"],    # the Butcher's Bill — a strike, bought with a wound
+	"open_vein": ["RESOURCE", "OFFENSE"],      # the Open Vein — spend feeds the band
+	"slaughterhouse_rune": ["TEMPO"],          # the Slaughterhouse — a bleedout IS a turn
+	# Pyromancer —
+	"long_fuse": ["DEBUFF"],                   # the Long Fuse — the clock stops
+	"ashfall": ["DEFENSE", "DEBUFF"],          # the Ashfall — a shield that costs no fire
+	"chain_fire": ["DEBUFF"],                  # the Chain Fire — the field consolidated
+	"ember_leap": ["DEBUFF"],                  # the Ember Leap — the field widened
+	"pyre_debt": ["RESOURCE", "DEFENSE"],      # the Pyre Debt — Mana bought with health
+	# Cryomancer —
+	"second_winter": ["DEBUFF"],               # the Second Winter — the release leaves the cold
+	"killing_cold_fk": ["OFFENSE", "DEBUFF"],  # the Killing Cold — the pile bites
+	"glass_prison": ["DEBUFF", "DEFENSE"],     # the Glass Prison — two held, both fragile
+	"cold_snap_fk": ["OFFENSE", "BREAK"],      # the Cold Snap — the lance finds every body
+	"deep_cold": ["DEBUFF"],                   # the Deep Cold — the cap comes off
+	# Arcanist —
+	"resonant_core_fk": ["RESOURCE"],          # the Resonant Core — the meter survives the fight
+	"half_note": ["RESOURCE"],                 # the Half Note — the bolt takes less
+	"overtone": ["RESOURCE"],                  # the Overtone — build rate, on a cadence
+	"dissonance": ["OFFENSE", "DEFENSE"],      # the Dissonance — both curves, doubled
+	"overflow": ["RESOURCE", "OFFENSE"],       # the Overflow — a crit banks deeper
+	# Swordmaster —
+	"whetstone": ["OFFENSE"],                  # the Whetstone — the guard held sharpens
+	"mirror_guard": ["DEFENSE", "OFFENSE"],    # the Mirror Guard — the refusal answers
+	"open_line": ["TEMPO", "OFFENSE"],         # the Open Line — the pivot without the pivot
+	"long_blade": ["TEMPO", "BREAK"],          # the Long Blade — the cooldown, not the Break
+	"naked_blade": ["OFFENSE", "DEFENSE"],     # the Naked Blade — both guards, doubled
+	# Holy —
+	"vigil": ["RESOURCE"],                     # the Vigil — the bar reads the rescue too
+	"open_hand_fk": ["DEFENSE"],               # the Open Hand — the plea reaches the party
+	"long_watch_holy": ["RESOURCE"],           # the Long Watch — the bar survives the fight
+	"grace": ["DEFENSE", "TEMPO"],             # the Grace — the hymn, sung twice
+	"martyr_fk": ["RESOURCE", "DEFENSE"],      # the Martyr — the wound is the offering
+	# Devout —
+	"layered_aegis": ["DEFENSE"],              # the Layered Aegis — two bodies warded
+	"deep_absorb": ["RESOURCE", "DEFENSE"],    # the Deep Absorb — the absorb pays more
+	"fourth_stack": ["DEFENSE", "OFFENSE"],    # the Fourth Stack — the peak goes one higher
+	"bare_altar": ["RESOURCE", "DEFENSE"],     # the Bare Altar — rate bought with size
+	# Survivalist —
+	"long_poison": ["DEBUFF"],                 # the Long Poison — the clock stops
+	"second_barb": ["DEBUFF"],                 # the Second Barb — breadth off the counter-hit
+	"full_board": ["DEBUFF", "OFFENSE"],       # the Full Board — billed, and left standing
+	"carrion": ["DEBUFF"],                     # the Carrion — every body, not one
+	"thin_blood": ["DEBUFF", "OFFENSE"],       # Thin Blood — certainty bought with the tick
 }
 
 
@@ -431,6 +523,57 @@ const RUNE_SHAPES := {
 	"second_whistle": ["ABILITY"],
 	"shared_scent": ["PASSIVE", "BREADTH"],
 	"bared_fang": ["STAT", "TRADEOFF"],
+	# ── BATCH FK — THE EIGHT UNAUTHORED SPECS ──────────────────────────────
+	# **NOT ONE THRESHOLD AND NOT ONE BREADTH, AND THAT IS A RULING RATHER THAN
+	# A GAP.** The designer has retired both secondaries going forward: a gated
+	# rune at a flat price is strictly worse than a bare one, and FJ measured
+	# the constraints as unworkable besides (BREAK can never carry a threshold,
+	# the Devout can never satisfy breadth, and a condition can be live at one
+	# rung of the ladder and dead at the next). **TRADEOFF survives** — a cost
+	# paired with a bigger upside is self-balancing and reads on the card — and
+	# EIGHT of these carry one, against the four the first twenty-one had.
+	#
+	# **THE SIX ALREADY-SHIPPED GATED RUNES ARE NOT REPAIRED HERE.** Their rows
+	# above are unchanged and they are owed to a later batch.
+	"last_word": ["PASSIVE"],
+	"blood_debt_rune": ["ABILITY", "TRADEOFF"],
+	"butchers_bill": ["ABILITY"],
+	"open_vein": ["PASSIVE"],
+	"slaughterhouse_rune": ["PASSIVE"],
+	"long_fuse": ["PASSIVE"],
+	"ashfall": ["ABILITY"],
+	"chain_fire": ["ABILITY"],
+	"ember_leap": ["PASSIVE"],
+	"pyre_debt": ["PASSIVE", "TRADEOFF"],
+	"second_winter": ["PASSIVE"],
+	"killing_cold_fk": ["PASSIVE"],
+	"glass_prison": ["ABILITY", "TRADEOFF"],
+	"cold_snap_fk": ["ABILITY"],
+	"deep_cold": ["PASSIVE"],
+	"resonant_core_fk": ["PASSIVE"],
+	"half_note": ["ABILITY"],
+	"overtone": ["PASSIVE"],
+	"dissonance": ["PASSIVE", "TRADEOFF"],
+	"overflow": ["PASSIVE"],
+	"whetstone": ["PASSIVE"],
+	"mirror_guard": ["PASSIVE"],
+	"open_line": ["ABILITY"],
+	"long_blade": ["ABILITY"],
+	"naked_blade": ["PASSIVE", "TRADEOFF"],
+	"vigil": ["PASSIVE"],
+	"open_hand_fk": ["ABILITY"],
+	"long_watch_holy": ["PASSIVE"],
+	"grace": ["ABILITY"],
+	"martyr_fk": ["PASSIVE", "TRADEOFF"],
+	"layered_aegis": ["ABILITY"],
+	"deep_absorb": ["PASSIVE"],
+	"fourth_stack": ["PASSIVE"],
+	"bare_altar": ["PASSIVE", "TRADEOFF"],
+	"long_poison": ["PASSIVE"],
+	"second_barb": ["PASSIVE"],
+	"full_board": ["ABILITY"],
+	"carrion": ["ABILITY"],
+	"thin_blood": ["PASSIVE", "TRADEOFF"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]

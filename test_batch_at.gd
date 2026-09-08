@@ -453,8 +453,11 @@ func _rune_audit() -> void:
 	for id in Runes.ids():
 		if String(Runes.config(id).get("scope", "")) == "spec:arcanist":
 			arcanist_runes.append(id)
-	ok(arcanist_runes.size() == 4,
-		"the Arcanist has 4 spec runes (got %d)" % arcanist_runes.size())
+	ok(arcanist_runes.size() == 9,
+		# **BATCH FK MOVED IT 4 -> 9** — ET's four retired plus FK's five. The
+		# walk reads the FILE, retired included, so this is the file's own
+		# population; the assertions below it are the ones about fields.
+		"the Arcanist has 9 spec runes (got %d)" % arcanist_runes.size())
 	# Every counter a rune writes must be written by a node OR still have a live
 	# read site. This is the assertion that caught real breakage in AR and AS.
 	var node_fields := {}

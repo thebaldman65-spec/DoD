@@ -152,7 +152,11 @@ func _s1_rarity_is_gone() -> void:
 	# count at twenty-one. **THIS GATE OWNS THE TOTAL AND `check_et` §1 PRINTS
 	# IT** — two gates pinning one growing number is the second-copy defect, and
 	# `check_ez` §0 pins it too, which is why both were moved in one pass.
-	ok(data.size() == 87, "§1: the authored pool is %d entries, expected 87" % data.size())
+	# **BATCH FK MOVED IT 87 -> 126**: thirty-nine entries authored across the
+	# eight specs that held none. A count of a growing population, and the rules
+	# this section actually holds — every entry resolves, nothing is deleted —
+	# are asserted over the whole file rather than against this number.
+	ok(data.size() == 126, "§1: the authored pool is %d entries, expected 126" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 

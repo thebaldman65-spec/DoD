@@ -7816,3 +7816,36 @@ symmetrical. A test that forgets to opt out destroys a real run and says nothing
 silence, and the next run of anything reports there was no save to protect. A player's build that
 somehow failed to opt in would show an empty Continue button on the main menu, which is visible in
 one second and destroys nothing. **The cheap failure is the one the default should produce.**
+
+---
+
+# BATCH FK — WHY THE DEVOUT SHIPPED FOUR
+
+**The rune authored for his fifth slot said *"Consecrated Ground grants Faith to allies standing in
+it, not only to its caster."* That has been the base kit since Batch AW §2.** The `cons_ground`
+handler stamps every living non-companion hero and `_ground_faith_tick` pays whichever hero holds
+it — the comment above the call literally reads *"the holy ground is a Faith engine in the BASE KIT
+now."* The rune would have installed and changed nothing.
+
+**THE INTERESTING PART IS THE SECOND PREMISE, WHICH FAILED IN THE OPPOSITE DIRECTION.** The brief
+also warned that *"Fervor is the node that already extends the ground to allies"* and asked how the
+two would interact. **Fervor extends nothing**: its own text says *"It grants no extra Faith at
+all."* It is a payout multiplier. So one claim said a mechanic exists that does not, and the other
+said one does not exist when it does — **and both were about the same three lines of code.**
+
+**WHAT THAT SAYS ABOUT WHERE TO LOOK.** BR §1 sweeps NAMES and `docs/spec-recon.html` catalogues
+FIELDS and CARDS. Neither catches this: the name is clean and the field is real. **What collided
+was the CLAUSE, and the only place a clause lives is the handler.** The recon's own coverage
+statement names this edge — *"a rune that duplicates a node's payload FIELD would be caught; one
+that duplicates a node's EFFECT through a different field might not"* — and this is that edge
+arriving at the BASE KIT rather than at a node.
+
+**WHY IT WAS NOT RE-AIMED.** A batch may not alter an authored rune, and a rune that ships inert is
+worse than one that does not ship. Those two rules have exactly one intersection and it is
+"report it". **Two alternatives are priced in `docs/reports/FK.md` §7 — deepening the ground's
+kindle, or kindling the Devout's own count at a second rate — and neither is recommended over the
+other, because rune content is written with the designer one rune at a time.**
+
+**AND THE REASON IS IN A GATE.** `check_fk` §6 asserts the rune's absence AND the two code facts
+that cause it, so the day a batch narrows the ground to its caster the battery says the rune is
+authorable. A reason recorded only in a report is a reason nobody re-reads.

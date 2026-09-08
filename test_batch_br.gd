@@ -1336,7 +1336,13 @@ func _live_hits_not_casts() -> void:
 	# THE OTHER CHARGE BANKS ALREADY COUNTED HITS — verified at their sites
 	# rather than assumed, and reported as needing no change.
 	var battle_src := _src("res://scripts/battle.gd")
-	var loop_start := battle_src.find("for hit_i in total_hits:")
+	# BATCH FK: the loop is a `while` now, because the Rune of the Butcher's Bill
+	# adds a strike from INSIDE the body and `for hit_i in total_hits` evaluates
+	# its range once. **The locator moves and the claim does not** — this section
+	# slices the loop to check WHERE charges are spent, and
+	# `ok(loop_start > 0, "the hit loop is locatable")` below is what caught the
+	# change, which is a pin doing its job.
+	var loop_start := battle_src.find("\t\tvar hit_i := -1\n\t\twhile true:")
 	var loop_end := battle_src.find('if ab.display_name == "Ice Lance" and attacker.is_hero')
 	ok(loop_start > 0 and loop_end > loop_start, "§1: the hit loop is locatable")
 	var loop := battle_src.substr(loop_start, loop_end - loop_start)

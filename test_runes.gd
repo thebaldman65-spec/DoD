@@ -951,9 +951,23 @@ func _start_rune_pool(run: Node) -> void:
 			for rid in Runes.eligible_ids({"key": key2, "spec": spec2, "runes": []}, []):
 				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec2:
 					any_spec_eligible = true
+	# **BATCH FK MOVED THE BAND 20-70 -> 70-95, AND THE MESSAGE ABOVE PREDICTED
+	# THE MOVE**: *"the eligible pool moved… this is the pool's own shape."* It
+	# is. Before FK, EIGHT of the twelve specs had no spec rune at all, so their
+	# triples were drawn from the six template markers alone and the average
+	# across the twelve sat inside 20-70. **Every spec is authored now**, so a
+	# hero draws from 4-6 spec runes against 6 templates and the chance that at
+	# least one of three is spec-scoped is what the arithmetic says it is:
+	# 1 - C(6,3)/C(11,3) = 88% for a five-rune spec, ~80% for the Devout's four
+	# and ~90% for the Beastmaster's six. **Measured across the mix: 83%.**
+	#
+	# **THE BAND IS STILL A REAL ALARM AT ITS NEW WIDTH.** A spec's set going
+	# missing drops the rate toward the old floor; the template family being
+	# removed (which is owed, once the pool is proven) drives it to 100. Both
+	# are movements this catches, and both are things a later batch will do.
 	if any_spec_eligible:
-		ok(rate > 20.0 and rate < 70.0,
-			"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
+		ok(rate > 70.0 and rate < 95.0,
+			"a spec rune is in the cache triple %.0f%% of the time — outside the 70-95%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
 	else:
 		ok(is_zero_approx(rate),
 			"no spec rune is eligible for any spec (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)

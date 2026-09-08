@@ -15,6 +15,83 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-08 &mdash; Batch FK: FORTY RUNES, EIGHT SPECS &mdash; THIRTY-NINE SHIP AND ONE IS OWED</h2>
+<p><b>THE RUNE POOL GOES FROM 21 LIVE TO 60, AND ALL TWELVE SPECS NOW HAVE AN AUTHORED SET.</b>
+Five apiece, six for the Beastmaster, four for the Devout. <b>Price is 100g flat and scope is spec
+only</b>, both unchanged. <b>Not one THRESHOLD and not one BREADTH is authored</b> — the designer
+retired both gated secondaries going forward, because a gated rune at a flat price is strictly
+worse than a bare one and FJ measured the constraints as unworkable besides. <b>TRADEOFF survives
+and eight of the thirty-nine carry one</b>, against the four the first twenty-one had.</p>
+<p><b>THE RUNE OF THE STANDING GROUND IS NOT SHIPPED, AND IT IS THE BATCH'S SHARPEST FINDING.</b>
+Its clause — <i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its
+caster&rdquo;</i> — <b>is the base kit and has been since Batch AW &sect;2</b>: the
+<code>cons_ground</code> handler stamps <b>every living non-companion hero</b> and
+<code>_ground_faith_tick</code> pays whichever hero holds it. The rune would have installed, logged
+nothing and changed nothing. <b>And the brief's stated reason to worry about it is false in the
+other direction</b>: <i>&ldquo;Fervor is the node that already extends the ground to allies&rdquo;</i>
+&mdash; Fervor's own text reads <b>&ldquo;It grants no extra Faith at all.&rdquo;</b> It is a payout
+multiplier and has never touched the drip. <b>The brief's own ruling settles what to do:</b> a rune
+that ships inert is worse than one that does not ship, and nothing authored may be altered by a
+batch. <b><code>check_fk</code> &sect;6 asserts the absence AND the reason</b>, so the day a batch
+narrows the ground to its caster the gate says the rune is authorable.
+<b>Two alternatives are priced in <code>docs/reports/FK.md</code> &sect;7 and neither is
+recommended over the other &mdash; it is the designer's.</b></p>
+<p><b>A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE.</b> The brief said
+three times that a retired name is free and wrote all forty as <i>&ldquo;Rune of the X&rdquo;</i>.
+<b><code>test_runes</code> pins display-name uniqueness across the WHOLE file, retired included</b>
+&mdash; ES &sect;1 made that load-bearing when <code>display_name</code> stopped adding a prefix,
+and a retired entry still resolves through <code>config</code>/<code>build</code>/
+<code>display_name</code> &mdash; and <b><code>check_fd</code> &sect;3 pins that
+<code>Rune of the&nbsp;…</code> is the RETIRED pool's shape</b>, which all 21 live runes already
+avoid. <b>Bare-naming the thirty-nine closed both at a stroke</b> and forced exactly one rename:
+bare, the Holy's <code>Long Watch</code> is byte-identical to the Warden's live one, so it is
+<b><code>Carried Mercy</code></b>. <b>Neither premise was reachable by the name sweep</b> &mdash;
+both are about the pool's own conventions rather than about the roster.</p>
+<p><b>SIX OF THE BRIEF'S SIXTEEN CHECKABLE PREMISES WERE FALSE.</b> Besides the two above:
+<code>Backdraft</code> was named as a live talent NODE in the Pyromancer's Inferno lane and is a
+live <b>draft card</b> &mdash; a closer collision than the one named, and the rename went ahead;
+and the Arcanist's <code>Resonant Core</code> was called free because it is a retired rune's name,
+when it is <b>also a live talent node in his own Resonance lane</b>.</p>
+<p><b>THE BR &sect;1 NAME SWEEP RAN ON ALL FORTY AGAINST 708 NAMES</b> &mdash; 227 abilities, 324
+talent nodes, 87 rune entries, the statuses and the lane names, dumped from a running headless
+engine, with a near-miss treated as a hit. <b>TEN EXACT COLLISIONS; the brief named five.</b> The
+three it did not name are <b><code>Cold Snap</code>, <code>Grace</code> and <code>Vigil</code>, and
+all three are SAME-SPEC</b> (a Deep Freeze node, a Mercy node, and the Holy's own lane). <b>One
+rename and nine ship</b>, which is BR &sect;1's own rule &mdash; only an ability-vs-ability
+duplicate breaks a resolver, and <code>Classes.pool_ability</code> is the thing keyed on a display
+name. <b>Rune of the Backdraft &rarr; RUNE OF THE EMBER LEAP</b>, swept clean.
+<b><code>Rune of Blood Debt</code> is the worst of the nine and it ships</b>: a rune and a card
+sharing one name in one spec's reachable pool, with the rune attached to a different card. Nothing
+resolves a rune by name &mdash; the only name-keyed lookup is a per-member pouch dedupe, and the
+two <code>Long Watch</code> runes have disjoint scopes so no hero can hold both.</p>
+<p><b>EVERY ONE OF THE FORTY NEEDED CODE.</b> The eight specs hold 34 idle <code>rune_*</code>
+fields between them and <b>exactly one of the thirty-nine reaches one</b> (the Whetstone, onto
+<code>rune_seasoned_off_bonus</code>) &mdash; and even that needed a second field and a turn
+counter to mean <i>&ldquo;grows&rdquo;</i>. <b>Thirty-nine new fields, forty payload terms</b>, all
+declared, all read, all on <code>Runes.STAT_INT_KEYS</code> except the one deliberate float.</p>
+<p><b>ONE LOOP CHANGED SHAPE.</b> <code>for hit_i in total_hits:</code> evaluates its range once, so
+the Rune of the Butcher's Bill &mdash; which adds a strike when a Bleed lands, from <i>inside</i>
+the body &mdash; would have raised a number nothing read. It is a <code>while</code> with the
+increment at the top now, and <code>test_batch_br</code> &sect;1's own
+<i>&ldquo;the hit loop is locatable&rdquo;</i> is what said so.</p>
+<p><b>THREE RUNES OVERLAP SOMETHING ALREADY SHIPPED; ALL THREE SHIP AND ALL THREE ARE NAMED.</b>
+<b>The Rune of the Long Poison is one clause of the <code>Perfected Toxin</code> capstone</b>
+(<i>&ldquo;cannot be cleansed, never expires, and its tick rises&rdquo;</i>) and <b>goes fully
+inert under it</b> &mdash; which answers the brief's <i>&ldquo;which of the five go inert under the
+capstone&rdquo;</i> for a capstone it did not ask about. Under <b>Force of Nature</b>, the one it
+did ask about, the answer is <b>none</b>: not one of the five is written against Trapper's +8%
+step. The Layered Aegis sits beside Radient Aegis and is unconditional where the node is a roll;
+the Open Line reuses <code>formless</code> and pays no recoil.</p>
+<p><b>WHAT DID NOT MOVE:</b> the six already-shipped gated runes are <b>not repaired</b> and are
+owed to the next batch (<code>check_fk</code> &sect;2 asserts they are still gated, so
+&ldquo;none is authored&rdquo; cannot be satisfied by ungating them); the generated stat family
+stays; and <code>RESONANCE_TAKEN_STEP</code>, <code>ARCANE_BOLT_KEEP</code>,
+<code>FAITH_RELEASE</code>, <code>FAITH_PER_ABSORB</code>, <code>HOLD_RELEASE_STACKS</code>,
+<code>FRENZY_RAGE_PER_STEP</code> and the four bare stance literals are all <b>byte-unchanged</b>
+&mdash; every rune reads beside them. <b>The Dissonance reaches the taken curve by doubling the
+meter inside <code>resonance_curve()</code></b>, the one function both curves share, rather than by
+adding a term to a step the code says must not have one.</p>
+
 <h2>2026-09-07 &mdash; Batch FJ: RECONNAISSANCE ON THE EIGHT UNAUTHORED SPECS</h2>
 
 <p><i><b>A report, and nothing else.</b> No rune was authored, proposed, sketched, named or

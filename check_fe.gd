@@ -92,8 +92,14 @@ func _s1_rune_tags_follow_the_cards() -> void:
 			lost.append("%s=%s" % [id, t])
 	ok(lost.is_empty(),
 		"§1: a moved row does not read [OFFENSE, BREAK] — %s" % [lost])
-	ok(brk_any.size() == 9,
-		"§1: %d rune rows carry BREAK at all, not the 9 FE measured — %s" % [
+	# **BATCH FK MOVED THIS COUNT 9 -> 11 AND NOT THE RULE ABOVE IT.** Two of
+	# FK's thirty-nine carry BREAK as a SECOND tag (the Cold Snap and the Long
+	# Blade); NEITHER carries it first, which is the arm three lines up and is
+	# the ruling. **The count is kept rather than deleted** because it is what
+	# catches a batch satisfying the primary rule by scattering BREAK into every
+	# second slot — a table where the word is everywhere says nothing.
+	ok(brk_any.size() == 11,
+		"§1: %d rune rows carry BREAK at all, not the 11 after FK — %s" % [
 			brk_any.size(), brk_any])
 	ok(bad_size.is_empty(),
 		"§1: the two-tag ceiling is broken on a rune row — %s" % [bad_size])
@@ -108,16 +114,23 @@ func _s1_rune_tags_follow_the_cards() -> void:
 		if rt2.is_empty():
 			continue
 		spread[String(rt2[0])] = int(spread[String(rt2[0])]) + 1
-	var want := {"DEBUFF": 23, "DEFENSE": 29, "BREAK": 0, "RESOURCE": 15,
-		"OFFENSE": 19, "TEMPO": 1, "MARK": 0}
+	# **BATCH FK GREW EVERY COLUMN BUT TWO, AND THE TWO THAT DID NOT MOVE ARE
+	# THE RULES.** BREAK stays at ZERO — FE §1's whole ruling — and MARK stays at
+	# zero, which EK measured rather than assumed: every mark in the game is laid
+	# by a CARD, and not one rune payload field reads one. The other five moved
+	# because thirty-nine rows were added, and the column table is kept (rather
+	# than reduced to the two zeroes) for the reason it was written: a gate that
+	# only counted BREAK would pass on a table somebody had rewritten wholesale.
+	var want := {"DEBUFF": 34, "DEFENSE": 35, "BREAK": 0, "RESOURCE": 27,
+		"OFFENSE": 25, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
 		if int(spread[String(k)]) != int(want[k]):
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 87,
-		"§1: the table is %d rows, not 87" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 126,
+		"§1: the table is %d rows, not the 126 after FK" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

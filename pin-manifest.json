@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1423,
-  "source": 1092,
+  "total": 1432,
+  "source": 1101,
   "other": 85,
   "document": 246
  },
  "source_residency": {
-  "code": 655,
+  "code": 661,
   "absent": 291,
-  "runtime": 78,
+  "runtime": 81,
   "narrow": 25,
   "unresolved": 1,
   "alt-sibling": 3,
@@ -1994,7 +1994,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#289",
+   "g": "check_ez.gd#292",
    "alt": true
   },
   {
@@ -2006,7 +2006,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#289",
+   "g": "check_ez.gd#292",
    "alt": true
   },
   {
@@ -2018,7 +2018,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#405",
+   "g": "check_ez.gd#408",
    "expr": "rq_key"
   },
   {
@@ -2030,7 +2030,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#406",
+   "g": "check_ez.gd#409",
    "expr": "rq_key"
   },
   {
@@ -2042,7 +2042,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#407"
+   "g": "check_ez.gd#410"
   },
   {
    "s": "check_ez.gd",
@@ -2053,7 +2053,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#411"
+   "g": "check_ez.gd#414"
   },
   {
    "s": "check_ez.gd",
@@ -2064,7 +2064,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#410"
+   "g": "check_ez.gd#413"
   },
   {
    "s": "check_ez.gd",
@@ -2075,7 +2075,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#403"
+   "g": "check_ez.gd#406"
   },
   {
    "s": "check_fd.gd",
@@ -2700,6 +2700,72 @@
    "k": "literal",
    "how": "read",
    "g": "check_fi.gd#37"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s3_every_field_declared_and_read",
+   "h": "scripts/unit.gd",
+   "n": "var %s\t",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_fk.gd#105"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s3_every_field_declared_and_read",
+   "h": "scripts/unit.gd",
+   "n": "var %s ",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_fk.gd#105"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s3_every_field_declared_and_read",
+   "h": "scripts/unit.gd",
+   "n": "var %s:",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_fk.gd#105"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s6_the_standing_ground_is_absent",
+   "h": "scripts/talents.gd",
+   "n": "It grants no extra Faith at all.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fk.gd#173"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s6_the_standing_ground_is_absent",
+   "h": "scripts/battle.gd",
+   "n": "_apply_status(h, \"cons_ground\", 3, 0, 0, attacker)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "stripped",
+   "g": "check_fk.gd#170"
+  },
+  {
+   "s": "check_fk.gd",
+   "fn": "_s6_the_standing_ground_is_absent",
+   "h": "scripts/battle.gd",
+   "n": "_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "stripped",
+   "g": "check_fk.gd#171"
   },
   {
    "s": "test_batch_ah.gd",
@@ -8079,7 +8145,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bf.gd#147"
+   "g": "test_batch_bf.gd#148"
   },
   {
    "s": "test_batch_bf.gd",
@@ -8090,18 +8156,40 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bf.gd#148"
+   "g": "test_batch_bf.gd#149"
   },
   {
    "s": "test_batch_bf.gd",
    "fn": "_the_condition_is_at_the_gate",
    "h": "scripts/battle.gd",
-   "n": "or h.faith_stacks >= FAITH_RELEASE:",
+   "n": "or h.faith_stacks >= f_release:",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bf.gd#146"
+  },
+  {
+   "s": "test_batch_bf.gd",
+   "fn": "_the_condition_is_at_the_gate",
+   "h": "scripts/battle.gd",
+   "n": "or u.faith_stacks < f_release:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bf.gd#146"
+  },
+  {
+   "s": "test_batch_bf.gd",
+   "fn": "_the_condition_is_at_the_gate",
+   "h": "scripts/battle.gd",
+   "n": "var f_release := FAITH_RELEASE + devout.rune_fourth_stack",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bf.gd#147"
   },
   {
    "s": "test_batch_bf.gd",
@@ -8740,7 +8828,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_bi.gd#171"
+   "g": "test_batch_bi.gd#172"
   },
   {
    "s": "test_batch_bi.gd",
@@ -8763,6 +8851,17 @@
    "k": "literal",
    "how": "read",
    "g": "test_batch_bi.gd#164"
+  },
+  {
+   "s": "test_batch_bi.gd",
+   "fn": "_every_gain_names_its_source",
+   "h": "scripts/battle.gd",
+   "n": "var da_n := FAITH_PER_ABSORB",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bi.gd#171"
   },
   {
    "s": "test_batch_bi.gd",
@@ -8993,7 +9092,7 @@
    "r": "comment",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bi.gd#176"
+   "g": "test_batch_bi.gd#177"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9004,7 +9103,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "test_batch_bi.gd#178"
+   "g": "test_batch_bi.gd#179"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9015,7 +9114,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bi.gd#179"
+   "g": "test_batch_bi.gd#180"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9026,7 +9125,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bi.gd#180"
+   "g": "test_batch_bi.gd#181"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9037,7 +9136,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bi.gd#179"
+   "g": "test_batch_bi.gd#180"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9048,7 +9147,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bi.gd#179"
+   "g": "test_batch_bi.gd#180"
   },
   {
    "s": "test_batch_bi.gd",
@@ -9059,7 +9158,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bi.gd#174"
+   "g": "test_batch_bi.gd#175"
   },
   {
    "s": "test_batch_bi.gd",
@@ -12276,23 +12375,23 @@
    "s": "test_batch_br.gd",
    "fn": "_live_hits_not_casts",
    "h": "scripts/battle.gd",
+   "n": "\t\tvar hit_i := -1\n\t\twhile true:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_br.gd#635"
+  },
+  {
+   "s": "test_batch_br.gd",
+   "fn": "_live_hits_not_casts",
+   "h": "scripts/battle.gd",
    "n": "_roll_parry(strike_target)",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "derived",
    "g": "test_batch_br.gd#640"
-  },
-  {
-   "s": "test_batch_br.gd",
-   "fn": "_live_hits_not_casts",
-   "h": "scripts/battle.gd",
-   "n": "for hit_i in total_hits:",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_br.gd#635"
   },
   {
    "s": "test_batch_br.gd",

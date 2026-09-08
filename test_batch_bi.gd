@@ -363,7 +363,12 @@ func _every_gain_names_its_source() -> void:
 		"§2: `_gain_faith` takes a source and does not default it")
 	# BATCH DC: the drip's rate is `FAITH_PER_GROUND_TURN` now, not a literal 1.
 	for pair in [["_gain_faith(u, FAITH_PER_GROUND_TURN, \"ground\")", "the ground's drip"],
-			["_gain_faith(holder, FAITH_PER_ABSORB, \"absorb\")", "Conviction's absorbs"],
+			# BATCH FK: the Rune of the Deep Absorb adds to the rate and the Rune
+			# of the Bare Altar doubles it, so the call passes a LOCAL now. **The
+			# claim this section makes is that every caller NAMES ITS SOURCE**
+			# and that is unmoved; the rate's derivation from the named constant
+			# is asserted separately below, so neither claim rests on the other.
+			["_gain_faith(holder, da_n, \"absorb\")", "Conviction's absorbs"],
 			["_gain_faith(h, 1, \"communion\")", "Communion"],
 			["_gain_faith(saved, maxi(devout.covenant_faith, 1), \"covenant\")", "Sacred Covenant"],
 			["_gain_faith(devout, devout.oath_faith, \"oath\")", "Binding Oath"],
@@ -377,6 +382,8 @@ func _every_gain_names_its_source() -> void:
 	ok(body.contains("_stat(\"faith_gained_total\"") \
 			and body.contains("_stat(\"faith_gained_\" + source"),
 		"§2: ...which writes the total and the named term together")
+	ok(src.contains("var da_n := FAITH_PER_ABSORB"),
+		"§2: ...and the absorb rate is still DERIVED from FAITH_PER_ABSORB")
 	ok(src.contains("const FAITH_PER_ABSORB := %d" % PER_ABSORB),
 		"§2: an absorbed hit pays %d Faith" % PER_ABSORB)
 

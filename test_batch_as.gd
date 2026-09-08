@@ -386,7 +386,14 @@ func _rune_audit() -> void:
 			cryo.append(id)
 		elif String(r.get("scope", "")) == "class:mage":
 			mage.append(id)
-	ok(cryo.size() == 4, "four Cryomancer spec runes (got %d)" % cryo.size())
+	# **BATCH FK MOVED IT 4 -> 9.** The four are ET's retired ones and FK
+	# authored five more; this walks `runes.json`, retired included, so the count
+	# is the FILE's population and not the offerable one. **The claim was never
+	# the number** — it is that every Cryomancer-scoped rune writes a field that
+	# is LIVE on `BattleUnit`, which the loop below asserts one by one — so the
+	# count is here to catch a set going MISSING, and it is re-pointed rather
+	# than deleted for that reason.
+	ok(cryo.size() == 9, "nine Cryomancer spec runes (got %d)" % cryo.size())
 	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
 	# Every lane tag must name a lane that EXISTS — the Honed Lance was tagged
 	# Shatterpoint, which stopped being a lane.

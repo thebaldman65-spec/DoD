@@ -5,96 +5,94 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-07 (Batch FJ).*
+*Last rewritten: 2026-09-08 (Batch FK).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FJ — RECONNAISSANCE ON THE EIGHT UNAUTHORED SPECS.** **A REPORT.** No rune was
-  authored, proposed, sketched, named or reserved; **no card, ability, talent, constant or
-  magnitude moved; no `.gd` file, no `.json` data file and no gate was touched**, and no
-  `CLAUDE.md` rule was added. The deliverable is **`docs/spec-recon.html`** (179.0 KiB, NEW) —
-  eight sections, one per unauthored spec, each written to be read ALONE while that spec's five are
-  drafted. Full working: **`docs/reports/FJ.md`**.
-- **§0 — TWO OF THE BRIEF'S EIGHT NAMES ARE NOT CODE KEYS.** **Devout is `inquisitor` and
-  Survivalist is `mystic`**; `classes.gd` records the disagreement as deliberate and that a
-  `"devout":` entry would resolve nothing. **A rune scoped `spec:devout` or `spec:survivalist`
-  would roll for nobody.** Everything else in the brief held — `core_slots` and `protected_names`
-  really do disagree for all twelve specs (`check_eh` §3 asserts the count is 12), and the 21 live
-  runes really are four sets across the Warden, Occultist, Sharpshooter and Beastmaster.
-- **§1 — THE POPULATION IS THREE CHANNELS, AND A DRAFT-POOL-ONLY READING IS SHORT BY UP TO FIVE
-  CARDS PER SPEC.** `hold_ability()` is the ONE writer, so a zone-boss pick and an elite draft both
-  land in `bm_abilities` and **both count toward a rune condition**. The reachable population is
-  boss pool + spec draft + class draft: **17 to 21 cards a spec**, not the 10-to-13 draft pool.
-  All **157** cards were dumped live and **160 of the 227-card corpus (70%) carry a `special`**,
-  so a field-level read describes under a third of it.
-- **§2 — FOUR CONDITION FACTS THAT DECIDE WHETHER A GATED RUNE IS A CHOICE AT ALL.**
-  **(1) A BREADTH rune can NEVER be satisfied by a Devout** — his earnable pool carries exactly TWO
-  distinct primary tags, and `breadth_met_fraction` needs three at six cards and four at seven, so
-  it is impossible at every bar size from 3 to 7. **(2) A DEFENSE THRESHOLD is AUTOMATIC for him
-  from six drafted cards on**, because only three off-tag cards exist in his reach. **(3) The Holy
-  Cleric's BREADTH is satisfiable at EXACTLY ONE bar size (six)** and the **Swordmaster's fails at
-  exactly five** — a condition can be live at one rung of the ladder and dead at the next.
-  **(4) `BREAK` cannot carry a THRESHOLD anywhere in the game**: FD made it secondary-only, so
-  **zero of the 227 tagged cards carry a BREAK primary** and `primary_tag_count(drafted, "BREAK")`
-  is always zero, for every hero in every build.
-- **§2a — THE BARE LITERALS, WHICH IS WHERE THE NEXT EZ WOULD HAPPEN.** The **Swordmaster's two
-  stance DOWNSIDES** — `raw *= 1.10` (aggressive, taken, battle.gd:10013) and `raw *= 0.90`
-  (defensive, dealt, battle.gd:9510) — **carry no bonus term at all**, where both UPSIDES carry
-  two each. *"Your Defensive guard no longer blunts your blade"* is natural, obvious and
-  unimplementable from data. **Both halves of Trapper** are bare literals too (the +8% step at
-  battle.gd:9227 and the 25% barb at battle.gd:10964), and **Force of Nature REPLACES the passive's
-  term via `elif` rather than adding to it**, so a rune written against the 8% is worth nothing to
-  a Survivalist holding that capstone.
-- **§2b — 58 IDLE `rune_*` FIELDS, AND EVERY ONE IS STILL WIRED.** Of the **80** declared on
-  `BattleUnit`, 22 are written by a live rune and **58 belong to the 66 retired ones** — declared,
-  read, and written by nothing. That is what an author reaches **with no new code**, and it is
-  **wildly uneven**: the Devout has 7 and the Occultist 8, **the Berserker has ONE**. The
-  Cryomancer's four are the only rune plumbing in the game read PARTY-WIDE with a MAX
-  (`_max_hero_rank(field, rune_field)`), so a rune against one **competes with the talent node on
-  another hero rather than stacking with it**.
-- **§3 — THE 21 LIVE RUNES CARRY AN INVARIANT NOBODY HAD WRITTEN DOWN.** 14 PASSIVE / 5 ABILITY /
-  2 STAT; 4 THRESHOLD / 4 BREADTH / 4 TRADEOFF / 9 bare. **Each of the four authored specs got
-  EXACTLY ONE THRESHOLD, EXACTLY ONE BREADTH and EXACTLY ONE TRADEOFF**, the rest bare — 4 × 3
-  gated plus 9 bare is the 21. THRESHOLD and BREADTH always sit on a PASSIVE; the TRADEOFF is on a
-  STAT twice and an ABILITY twice. **Gated more than once:** DEFENSE (×2). **Gated once:** DEBUFF,
-  MARK. **Gated by no live rune:** BREAK, RESOURCE, OFFENSE, TEMPO. All 21 are at 100g and none
-  carries a `lane`. **This is a description of what was done, not a rule that binds the eight.**
-- **§4 — TWO FALSE CLAIMS IN `master.html`, CORRECTED TOWARD THE CODE.** Both sat in the
-  rune-condition section **four lines below a paragraph that states the rule correctly** — EI's
-  hazard exactly. *"The protected core is in the count, because it is carried"* is **false**:
-  `Runes.drafted_names()` reads `bm_equipped`/`bm_abilities`, the EARNED cards, and both surfaces
-  that draw the tick call it — so the denominator is **4–7 (3–6 for the Holy)**, not the 7-to-10
-  bar. And *"hold 2+ of a tag"* is the charter's opening shape; the live rule has been
-  `primary_tag_count(drafted, tag) * 2 >= drafted.size()` since ES §4. **Proved by needle sweep:
-  12,371 needles over the 34 files that read `master.html`, ZERO LOST**; 18 GAINED, none pinned and
-  none used negatively. **The changelog edit was swept the same way: 4,854 needles, ZERO LOST.**
-  **Both sweeps were ARMED FIRST** — a same-length one-character edit to a real needle moved the
-  count to 1 LOST, because a sweep reading 0/0 on an unchanged file has proved nothing.
-- **§5 — ONE INSTRUMENT FAULT, CAUGHT BEFORE IT SHIPPED AS A FINDING.** The read-site sweep masked
-  string literals before matching. **Half this codebase's field reads are string-keyed** —
-  `_max_hero_rank("frigid_ranks", "rune_frigid_ranks")`, `cfg.get("rune_opening_volley", 0)` — so
-  it reported **five idle `rune_*` fields as having ZERO read sites, four of them the
-  Cryomancer's**, which reads as *a rune against these would install and do nothing*. It is false.
-  Strip only the comment, tracking quotes so a `#` inside `"#e05050"` does not truncate the line.
-  Two-armed against the same population: **5 dead against 0 dead. The correct number is zero.**
-- **WHAT MOVED: four documents and nothing else.** `docs/spec-recon.html` is **NEW**;
-  `docs/master.html` (the two §4 corrections), `docs/changelog.html`, this file and
-  `docs/reports/FJ.md`. **`pin-manifest.json` reads current at 1,423, unchanged**, because no `.gd`
-  file was touched.
-- **Next letter: FK.**
-- **`CLAUDE.md` IS AT 264.95 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT
-  109.15 KiB AND HAS NO STATED CEILING.** Headroom is **25.05 KiB**. **This batch spent
-  NONE of it** — no `CLAUDE.md` rule was added. `docs/changelog.html` is at **174.64 KiB**
-  against CW §4's 400 KB threshold. **`check_fg` measures both every battery and this file does not
-  have to remember to.**
-- **Phase.** Unchanged by this batch: the ability draft is **COMPLETE at 154 of 154**, all twelve
-  talent trees are purpose-authored and charter-clean, and the rune layer holds **21 authored
-  against four specs** with **eight specs still unauthored**. **What is left in the rune layer is
-  still authoring and it is still the designer's, one rune at a time** — and `docs/spec-recon.html`
-  is now the document that authoring reads. **The ladder still has an open design question of its
-  own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
+- **Last batch: FK — FORTY RUNES, EIGHT SPECS. THIRTY-NINE SHIPPED AND ONE IS OWED.** The pool
+  goes from **21 live to 60**, and **every one of the twelve specs now has an authored set** —
+  five apiece, six for the Beastmaster, four for the Devout. **Price is 100g flat and scope is
+  spec only**, unchanged. Full working: **`docs/reports/FK.md`**.
+- **§0 — SIX OF THE BRIEF'S SIXTEEN CHECKABLE PREMISES WERE FALSE, AND ONE OF THEM COST A
+  RUNE.** The brief said `Backdraft` is a live talent NODE in the Pyromancer's Inferno lane; it is
+  a live **draft card**, which is a closer collision than the one it named. It said the Arcanist's
+  `Resonant Core` is a retired rune's name and therefore **free**; it is also a **live talent node
+  in his own Resonance lane**. And two claims about the Devout were false together — see below.
+- **§0a — A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE.** The brief said
+  three times that a retired name is free (`Killing Cold`, `Resonant Core`, `Open Hand`,
+  `Long Watch`, `Martyr`) and wrote all forty as *"Rune of the X"*. **`test_runes` pins
+  display-name uniqueness across the WHOLE file, retired included** — ES §1 made that load-bearing
+  when `display_name` stopped adding a prefix, and a retired entry still resolves through
+  `config`/`build`/`display_name` — and **`check_fd` §3 pins that `Rune of the …` is the RETIRED
+  pool's shape**, which every one of the 21 live runes already avoids. **Bare-naming the
+  thirty-nine closed both at a stroke**, and forced exactly one rename: bare, the Holy's
+  `Long Watch` is byte-identical to the Warden's, so it is **`Carried Mercy`**. **Neither premise
+  was reachable by a name sweep** — both are about the pool's own conventions rather than the
+  roster.
+- **§1 — THE RUNE OF THE STANDING GROUND IS NOT SHIPPED, AND THAT IS THE BATCH'S SHARPEST
+  FINDING.** Its clause — *"Consecrated Ground grants Faith to allies standing in it, not only to
+  its caster"* — **is the base kit and has been since Batch AW §2**: the `cons_ground` handler
+  stamps **every living non-companion hero**, and `_ground_faith_tick` pays whichever hero holds
+  it. The rune would have installed and changed nothing. **And the brief's stated reason to worry
+  about it is false too**: *"Fervor is the node that already extends the ground to allies"* —
+  Fervor's own text says **"It grants no extra Faith at all."** It is a payout multiplier. The
+  brief's own ruling settles it: *a rune that ships inert is worse than one that does not ship*,
+  and *nothing here may be altered by a batch*. **`check_fk` §6 asserts BOTH the absence and the
+  REASON**, so the day a batch narrows the ground to its caster the gate says the rune is
+  authorable rather than a report nobody re-reads saying so. **Two alternatives are priced in
+  `docs/reports/FK.md` §7 and neither is recommended over the other — it is the designer's.**
+- **§2 — THE NAME SWEEP FOUND TEN EXACT COLLISIONS AND THE BRIEF NAMED FIVE.** All 40 were swept
+  against **708 live and retired names** dumped from a running engine — 227 abilities, 324 talent
+  nodes, 87 rune entries, the statuses and the lane names — with a near-miss treated as a hit.
+  **The three the brief did not name are `Cold Snap`, `Grace` and `Vigil`, and all three are
+  SAME-SPEC** (a Deep Freeze node, a Mercy node, and the Holy's own lane). **One rename, nine
+  ship**, which is BR §1's own rule: only an ability-vs-ability duplicate breaks a resolver.
+  **`Rune of the Backdraft` → `RUNE OF THE EMBER LEAP`**, swept clean —
+  **and `test_batch_cb` has been asserting since batch CB that the node `py_melt`
+  *"no longer collides with the card name"* and that *"Backdraft is a DRAFT card now"*, so the
+  brief's premise describes a state the project deliberately repaired several batches ago.**
+- **§3 — EVERY ONE OF THE FORTY NEEDED CODE, AND THAT IS THE ANSWER TO THE BRIEF'S QUESTION.**
+  The eight specs hold **34 idle `rune_*` fields** between them and **exactly one of the
+  thirty-nine reaches one** — the Whetstone, onto `rune_seasoned_off_bonus` — and even that
+  needed a second field and a turn counter to mean *"grows"*. **Thirty-nine new fields, forty
+  payload terms**, all declared, all read, all in `Runes.STAT_INT_KEYS` except the one deliberate
+  float.
+- **§4 — NO THRESHOLD AND NO BREADTH IS AUTHORED. EIGHT TRADEOFFS ARE.** The designer retired both
+  gated secondaries going forward. **The six already-shipped gated runes are NOT repaired** and are
+  owed to the next batch — `check_fk` §2 asserts they are **still gated**, because "none is
+  authored" must not be satisfiable by quietly ungating the six that are owed a fix.
+- **§5 — THREE RUNES OVERLAP SOMETHING ALREADY SHIPPED, ALL THREE SHIP, AND ALL THREE ARE NAMED.**
+  **The Rune of the Long Poison is one clause of the `Perfected Toxin` capstone** (*"cannot be
+  cleansed, never expires, and its tick rises"*) and **goes fully inert under it** — the answer to
+  the brief's *"which of the five go inert under the capstone"*, for a capstone the brief did not
+  ask about. (Under **Force of Nature**, the one it did ask about, the answer is **none**: not one
+  of the five is written against Trapper's +8% step.) The Layered Aegis sits beside Radient Aegis
+  and is unconditional where the node is a roll; the Open Line reuses `formless` and pays no
+  recoil.
+- **§6 — ONE LOOP CHANGED SHAPE AND ONE PIN CAUGHT IT.** `for hit_i in total_hits:` evaluates its
+  range once, so the Butcher's Bill — which adds a strike from *inside* the body — would have
+  raised a number nothing read. It is a `while` with the increment at the top now.
+  **`test_batch_br` §1 slices the loop body by finding that header** and its own
+  `ok(loop_start > 0, "the hit loop is locatable")` is what said so.
+- **WHAT MOVED:** `scripts/battle.gd`, `scripts/unit.gd`, `scripts/runes.gd`, `data/runes.json`
+  (**+256 lines, zero deletions** — appended in the file's own hand-written style, not re-dumped),
+  **`check_fk.gd` is NEW**, and the gates and suites named in the report's §10.
+- **Next letter: FL.**
+- **`CLAUDE.md` IS AT 271.74 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT
+  109.15 KiB AND HAS NO STATED CEILING.** Headroom is **18.26 KiB**. `docs/changelog.html` is at
+  **181.52 KiB** against CW §4's 400 KB threshold. **`check_fg` measures both every battery and this
+  file does not have to remember to.**
+- **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
+  purpose-authored and charter-clean, and **the rune layer is now authored for all twelve specs**
+  — 60 live against 66 retired. **What is left in the rune layer is the DEVOUT'S FIFTH (owed, with
+  two alternatives priced), the six shipped gated runes (owed), and the generated stat family
+  (comes out once the pool is proven).** `docs/spec-recon.html` is still the document authoring
+  reads, and **§7 of `docs/reports/FK.md` is the correction to it**: the recon named the Devout's
+  ground as a Faith engine and did not say it already reaches every hero. **The ladder still has an
+  open design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on
+  this list.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 

@@ -74,7 +74,22 @@ const SRC_FLOOR := 107
 # nothing `_note_debuff_applied` counts, so they are correctly unstamped, exactly
 # as DR's two Wheeling Cut grants were. **SRC_FLOOR therefore moves 106 -> 107**
 # and the unstamped remainder goes 99 -> 103.
-const CALL_SITES := 210
+# **BATCH FK MOVED IT 210 -> 214, AND SAYS WHY. Net +4, all arrivals and no
+# departures.** The thirty-nine runes add four `_apply_status` call sites:
+# the Rune of the Second Barb's cycled affliction and the Rune of Thin Blood's
+# certain barb share the Trapper site's ELSE branch (one site becomes two), the
+# Rune of the Ember Leap lands the jumped Burn, the Rune of the Cold Snap's
+# second body takes its Chilled through the Glacial Prison handler, and the Rune
+# of the Open Line applies `formless`.
+#
+# **THE SOURCE-STAMPED HALF MOVES WITH THEM WHERE THE RULE SAYS IT SHOULD.**
+# DI's rule is that a status applied to an ENEMY carries its source, and the
+# three that land on an enemy (the Second Barb's affliction, the Ember Leap's
+# Burn, the Glass Prison's Chilled) all pass their caster; the Open Line's
+# `formless` is a self-buff on the Swordmaster and is correctly unstamped,
+# exactly as DS's four hero-side grants were. `SRC_FLOOR` is a RATCHET
+# (`with_src >= SRC_FLOOR`), so it does not have to move for the count to.
+const CALL_SITES := 214
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

@@ -1402,6 +1402,11 @@ func _spawn_units() -> void:
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
 		u.parry_chance = cfg.get("parry_chance", -1.0)
 		u.below_half_cb = _on_hero_below_half
+		# BATCH FK — the two FK crossings, wired beside the Mercy one because
+		# they are the same split: the unit owns WHEN a line is crossed, the
+		# battle owns what happens.
+		u.last_word_cb = _on_last_word
+		u.heal_above_half_cb = _on_hero_healed_above_half
 		if spec != "":
 			# BATCH CL §1 — resolved against the unit that was just spawned. Four
 			# specs overwrite this chip live in `refresh_bars` (bloodrage, heavy
@@ -1427,6 +1432,26 @@ func _spawn_units() -> void:
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
 				u.resource = clampi(Run.party[i].get("mana", u.resource), 0, u.max_resource)
+			# BATCH FK — the two SECOND-resource carries, read back at the one
+			# site the member's banked state reaches the unit. Both are cleared
+			# as they are read, so a bank never pays twice: the write is at
+			# `sync_victory_state` and happens only on a VICTORY, so a wipe or a
+			# retreat carries nothing and a stale key cannot survive into a
+			# fight that did not earn it.
+			#
+			# THE NAME IS TESTED, NEVER THE FIELD — `second_resource` is Mercy,
+			# Resonance and Focus, and two separate keys is what keeps the three
+			# meters from reading each other's bank.
+			if u.second_resource_name == "Resonance" \
+					and Run.party[i].has("fk_resonance_carry"):
+				u.second_resource = mini(u.second_resource
+					+ int(Run.party[i]["fk_resonance_carry"]), u.second_max)
+				Run.party[i].erase("fk_resonance_carry")
+			if u.second_resource_name == "Mercy" \
+					and Run.party[i].has("fk_mercy_carry"):
+				u.second_resource = mini(u.second_resource
+					+ int(Run.party[i]["fk_mercy_carry"]), u.second_max)
+				Run.party[i].erase("fk_mercy_carry")
 			u.refresh_bars()
 		# Bottled Storm: battles open with a floor under the resource tank
 		# (Rage included — the warrior walks in already angry). After the
@@ -1644,10 +1669,17 @@ func _spawn_units() -> void:
 		if Run.active and Run.zone_idx > 0:
 			# Deeper zones keep their scorched warpaint.
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
-		enemies.append(_make_unit(cfg, layout[i], tint,
-			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP)))
+		var eu := _make_unit(cfg, layout[i], tint,
+			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP))
+		# BATCH FK — the Glass Prison's shatter hook. Wired on every enemy at
+		# the spawn rather than at the seal, because a body that is never sealed
+		# never sets `glass_hold` and so never calls it — one wiring site beats
+		# a conditional one that a later seal path could forget.
+		eu.glass_cb = _on_glass_shatter
+		enemies.append(eu)
 
 	_apply_battle_modifier()
+	_stamp_fk_enemy_runes()
 	# Batch AS §0: the opening roll seeds off EFFECTIVE speed, not the raw
 	# stat. Every reschedule site in this file has always divided by
 	# effective_speed() — so Chilled, Slowed and Quick Draw have always bent
@@ -1663,6 +1695,42 @@ func _spawn_units() -> void:
 	for u in heroes:
 		if u.hero_key == "hunter":
 			u.next_time = -0.01
+
+
+# ══ BATCH FK — THE THREE STAMPED RUNES, WRITTEN ONTO THE ENEMY SIDE ════════
+#
+# **THEY ARE `mercy_threshold`'s IDIOM AND NOT A NEW ONE**: a party-wide fact
+# written once at the spawn onto the units that have to read it, because the
+# read site cannot ask the party. Guardian Angel stamps the Mercy line the same
+# way and for the same reason.
+#
+# **THE THREE, AND WHY EACH HAS TO BE STAMPED RATHER THAN LOOKED UP:**
+#   · `rune_long_fuse` and `rune_deep_cold` are read in `BattleUnit.tick_statuses`
+#     and `BattleUnit.add_status` — unit-side functions with no view of the
+#     party. `_add_bleed_with_burst`'s own note records the same constraint
+#     from the other side (Slaughterhouse had to move battle-side because
+#     `add_bleed` could not see the party); here the code that must change is
+#     unit-side, so the fact moves instead.
+#   · `rune_second_barb` is on the HERO and is not stamped — it is listed here
+#     only so the absence is deliberate rather than forgotten.
+#
+# **STAMPED ONCE, AT THE SPAWN, AND NEVER RE-READ.** A Pyromancer who falls
+# mid-battle leaves the fires he lit standing, which is the same contract
+# `slow_burn` gives (the marker is on the body, not on the caster) and the same
+# one Guardian Angel's stamp gives. **NOTHING JOINS THE ENEMY SIDE AFTER THIS
+# PASS** — every summon in the game is hero-side (`companions`), and
+# `_next_unit()` walks `heroes + enemies` — so a single stamp at the spawn is
+# the whole population rather than a first instalment of it.
+func _stamp_fk_enemy_runes() -> void:
+	var lf := _living_hero_with("rune_long_fuse")
+	var dc := _living_hero_with("rune_deep_cold")
+	if lf == null and dc == null:
+		return
+	for e in enemies:
+		if lf != null:
+			e.burn_clock_held = true
+		if dc != null:
+			e.chill_uncapped = true
 
 
 # ---------- Batch AN §3 / Batch AQ §3: the battle modifier ----------
@@ -2840,6 +2908,19 @@ func _run_battle() -> void:
 						u.float_text("Cleansed: %s" % washed, Color(0.5, 0.95, 0.6))
 						_log("   → Talent: Cleansing Waters — the %s washes off %s" % [
 							washed, u.unit_name], "#b0a8e0")
+		# BATCH FK — THE TWO PER-TURN COUNTERS, cleared and advanced at the one
+		# turn-start block rather than at their own read sites, so neither can
+		# be missed by a turn that ends early (a stun, a freeze, a death).
+		#   · `free_action_taken` is the Slaughterhouse's bound: one granted turn
+		#     per turn of his, however many enemies bleed out inside it.
+		#   · `whetstone_turns` is the Rune of the Whetstone's growth. It counts
+		#     turns HELD in Aggressive and the reset lives at the SWITCH
+		#     (`_swordmaster_switch`), not here — a stance he never leaves must
+		#     keep counting, and a stance he changes must start over even if the
+		#     change happens mid-turn.
+		u.free_action_taken = false
+		if u.rune_growing_edge > 0 and u.stance == "aggressive":
+			u.whetstone_turns += 1
 		# Batch AW §2: the holy ground is a Faith engine in the BASE KIT now.
 		_ground_faith_tick(u)
 		# BATCH CE — DIVINE PRESENCE (Matins, renamed at CG §1) pays here, ABOVE
@@ -3272,9 +3353,50 @@ func _run_battle() -> void:
 			# board guards) and a declaration owed on every one of them is a
 			# declaration owed by the CALLER.
 			_declare_intent(u)
+		# BATCH FK — THE RUNE OF THE GRACE PAYS HERE, at the end of the acting
+		# unit's turn, which is the position the rune's own sentence names.
+		# `_run_battle` cannot be driven headlessly, so the body is its own
+		# function (the AR / `_ground_faith_tick` / `_perfected_toxin_tick`
+		# precedent) and this is one call.
+		await _grace_echo(u)
 		_check_end()
 	if active_unit != null and is_instance_valid(active_unit):
 		active_unit.set_plate_active(false)
+
+
+# **BATCH FK — THE RUNE OF THE GRACE'S SECOND SINGING.** Its own function for
+# the standing reason (`_run_battle` cannot be driven headlessly, so a clause
+# inside its loop has no reachable negative control), and it is deliberately
+# NOT a status: the echo is owed for exactly one turn-end and a status would
+# have to be applied, ticked and removed to say that.
+#
+# **IT PAYS EVERY HERO, NOT THE CASTER'S TARGET**, because the Hymn does — and
+# it goes through `heal_amount` like the first pass, so Bloodless, Unmade,
+# Caught Fast and the Rune of the Martyr all refuse it exactly as they refuse
+# the original. The crit is rolled fresh: the echo is a second singing, not a
+# copy of the first one's dice.
+func _grace_echo(u: BattleUnit) -> void:
+	if u == null or u.grace_echo_pct <= 0.0:
+		return
+	var ge_pct := u.grace_echo_pct
+	u.grace_echo_pct = 0.0
+	if u.dead or battle_over:
+		return
+	_sfx("heal", -6.0, 1.2)
+	for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+		var ge_crit := _heal_crit_mult(u)
+		var ge_amt := int(h.max_hp * ge_pct * ge_crit)
+		var ge_got: int = h.heal_amount(ge_amt, h != u)
+		if ge_got <= 0:
+			continue
+		h.float_text("+%d%s" % [ge_got, "!" if ge_crit > 1.0 else ""],
+			Color(0.4, 0.9, 0.45), ge_crit > 1.0)
+		_stat_heal(u, ge_got, h)
+		_bank_overheal(u, h)
+		_overflow_spill(u, h)
+		_vestments_ward(u, h, ge_got)
+	_log("   → Rune: the Grace — the hymn is sung again as the turn closes (%d%%)" % \
+		int(round(ge_pct * 100.0)), "#70d878")
 
 
 # WATCHTOWER's own function (the `_run_battle`-cannot-be-driven-headlessly
@@ -7892,6 +8014,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		+ ab.resource_gain, 0, attacker.max_resource)
 	attacker.note_resource_spent(cz_res_before - attacker.resource)
 	attacker.refresh_bars()
+	# BATCH FK — THE RUNE OF THE KILLING COLD, AND THE OVERTONE'S CAST COUNTER.
+	# Both are "whenever he casts", and this is the one line every ability in
+	# the game passes through — the same property CZ §1 books its second term
+	# off, one clause up, and for the same reason: measuring HERE catches the
+	# waivers, the discounts and the free copies without knowing any of their
+	# names. `is_counter` is excluded so a retaliation is not a cast.
+	if not is_counter:
+		_killing_cold_cast(attacker)
+		if attacker.rune_overtone > 0 \
+				and attacker.second_resource_name == "Resonance":
+			attacker.overtone_casts += 1
 	if was_free_ability:
 		attacker.free_ability -= 1
 		_log("   → Twin Hunt: the companion's kill pays for this one (%d left)" % \
@@ -8049,6 +8182,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_dmg_frame(attacker, ab.display_name)
 	else:
 		var strike_targets: Array = [target]
+		# BATCH FK — THE RUNE OF THE COLD SNAP widens Ice Lance to every Chilled
+		# enemy. It is written HERE, in the target list, rather than by giving
+		# the card `aoe` — the `aoe` flag also suppresses the miss roll and the
+		# Mirror Image charge one branch up, and a rune that quietly made his
+		# release unmissable would be a second effect nobody asked for.
+		#
+		# **THE STRUCK TARGET IS ALWAYS FIRST**, so the named release below still
+		# names the enemy the player aimed at and Ice Lance's own always-crit
+		# against Frozen reads the same body it always did. A held enemy carries
+		# four Chilled by construction, so the aimed target is in the set anyway
+		# — the `has_status` filter is for the OTHERS.
+		if ab.display_name == "Ice Lance" and attacker.rune_cold_snap > 0 \
+				and attacker.is_hero:
+			for cs_e in enemies:
+				if cs_e.dead or cs_e == target or not cs_e.has_status("chilled"):
+					continue
+				strike_targets.append(cs_e)
+			if strike_targets.size() > 1:
+				_log("Rune: the Cold Snap — the lance finds every chilled body (%d)" % \
+					strike_targets.size(), "#7cc8f0")
 		if ab.aoe:
 			strike_targets = enemies.filter(func(t): return not t.dead) \
 				if attacker.is_hero else _hero_side()
@@ -8158,7 +8311,27 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Exhortation: %s's attack lands %d%% harder (spent)" % [
 				attacker.unit_name, attacker.status_power("exhorted")], "#e8c860")
 			_stamp_exhort_chip(attacker, 0)
-		for hit_i in total_hits:
+		# **BATCH FK — THE BOUND IS LIVE NOW, AND THE RUNE OF THE BUTCHER'S BILL
+		# IS THE ONLY THING THAT MOVES IT MID-CAST.** `for hit_i in total_hits`
+		# evaluates the range ONCE, so a strike added from inside the body — the
+		# Butcher's Bill adds one when a Bleed lands — would have been counted
+		# and never run. Berserk expands `total_hits` BEFORE the loop and needs
+		# none of this; the Butcher's Bill cannot, because whether a bleed landed
+		# is not known until the roll inside.
+		#
+		# **IT IS THE SAME LOOP.** `hit_i` runs 0..total_hits-1 exactly as it
+		# did, the increment is at the TOP so a `continue` would still advance
+		# (there are none at this level today), every `break` in the body means
+		# what it meant, and `hit_i == total_hits - 1` at the crit site now reads
+		# "the last hit INCLUDING an added one", which is the correct reading of
+		# a strike that really is last.
+		# The Butcher's Bill's per-cast latch (see its clause at the bleed site).
+		var butchers_paid := false
+		var hit_i := -1
+		while true:
+			hit_i += 1
+			if hit_i >= total_hits:
+				break
 			var strike_target: BattleUnit
 			if ab.random_hits > 0:
 				# Each shard picks a fresh living target at launch time.
@@ -8348,6 +8521,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
 						attacker.unit_name, ab.display_name, block_source], "#8c9cc8")
+					_mirror_guard_return(strike_target, attacker, ab, "block")
 					# Any Block resets the Heavy Plating climb (the chip follows).
 					#
 					# BATCH CI — ANVIL AND RECOMPENSE ARE BOTH DECIDED HERE, AND THEY
@@ -8644,6 +8818,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# riders cannot be known for a hit that was never rolled). ONE
 				# place, so it can never drift into reading a damage figure that
 				# the parry itself deleted.
+				_mirror_guard_return(strike_target, attacker, ab, "parry")
 				if parry_source == "Feint" and ab.damage > 0 and not attacker.dead:
 					var fr_dmg := maxi(int(round(ab.damage * 0.01 * attacker.attack
 						* (1.0 - strike_target.effective_armor()))), 1)
@@ -9504,10 +9679,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				elif attacker.has_status("formless_recoil"):
 					raw *= FORMLESS_RECOIL_DEALT
 				elif attacker.stance == "aggressive":
-					raw *= 1.15 + attacker.seasoned_off_bonus \
-						+ attacker.rune_seasoned_off_bonus + sf_disc
+					# BATCH FK — TWO RUNES LAND ON THIS LINE AND NEITHER ADDS A
+					# SITE. **THE WHETSTONE** multiplies the idle
+					# `rune_seasoned_off_bonus` by the turns he has held the
+					# guard: at zero turns the term reads EXACTLY what a flat
+					# writer would give, so re-pointing that field costs nothing
+					# to anything that ever wrote it flat. **THE NAKED BLADE**
+					# doubles the STANCE's own 0.15 and leaves the talent terms
+					# alone — it is written as a delta from 1.0 rather than as a
+					# second literal so the doubling and the base cannot drift.
+					var sf_off := 0.15 * (2.0 if attacker.rune_naked_blade > 0 else 1.0)
+					raw *= 1.0 + sf_off + attacker.seasoned_off_bonus \
+						+ attacker.rune_seasoned_off_bonus \
+							* (1 + attacker.whetstone_turns) + sf_disc
 				else:
-					raw *= 0.90
+					# The defensive DOWNSIDE, a bare literal with no bonus term
+					# — and the Naked Blade doubles it anyway, which is the
+					# whole TRADEOFF. Written as a delta for the reason above.
+					raw *= 1.0 - 0.10 * (2.0 if attacker.rune_naked_blade > 0 else 1.0)
 			# Overwhelm: every wound on the target is leverage (+8%/rank per
 			# debuff — the curated DEBUFF_IDS count, Broken excluded).
 			if attacker.overwhelm_ranks > 0:
@@ -10010,9 +10199,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				elif strike_target.has_status("formless_recoil"):
 					raw *= FORMLESS_RECOIL_TAKEN
 				elif strike_target.stance == "aggressive":
-					raw *= 1.10
+					# The aggressive DOWNSIDE, the second of the two bare
+					# literals, doubled by the Naked Blade for its TRADEOFF.
+					raw *= 1.0 + 0.10 * (2.0 if strike_target.rune_naked_blade > 0 else 1.0)
 				else:
-					raw *= maxf(0.85 - strike_target.seasoned_def_bonus
+					# ...and the other UPSIDE doubled with them. The `maxf`
+					# floor is CI's and it matters more now, not less: the
+					# doubled 0.15 is 0.30 before a single talent term is added.
+					var sf_def := 0.15 * (2.0 if strike_target.rune_naked_blade > 0 else 1.0)
+					raw *= maxf(1.0 - sf_def - strike_target.seasoned_def_bonus
 						- strike_target.rune_seasoned_def_bonus - sf_disc, 0.0)
 				if raw < pv_was:
 					_prev(strike_target, pv_was - raw)
@@ -10804,10 +10999,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the window and then swings through it. The check is on `broken`
 			# alone — Exposed, Crippled and the rest are not the Break window and
 			# widening it here would make the Breaker lane's own clause generic.
+			# BATCH FK — THE RUNE OF THE LONG BLADE widens the window from the
+			# body he struck to the BOARD. The card's own clause is unchanged
+			# and is still checked first; the rune only adds the second reading,
+			# so a Swordmaster who breaks the thing he hits pays nothing extra
+			# for holding it. The check stays on `broken` ALONE for the card's
+			# stated reason — Exposed and Crippled are not the Break window.
 			if ab.display_name == "Sever" and strike_target.broken:
 				attacker.cooldowns.erase(ab.display_name)
 				_log("   → Sever: %s is BROKEN, so the cut costs him no cooldown" % \
 					strike_target.unit_name, "#7cc8f0")
+			elif ab.display_name == "Sever" and attacker.rune_long_blade > 0:
+				var lb_broken: BattleUnit = null
+				for lb_e in enemies:
+					if not lb_e.dead and lb_e.broken:
+						lb_broken = lb_e
+						break
+				if lb_broken != null:
+					attacker.cooldowns.erase(ab.display_name)
+					_log("   → Rune: the Long Blade — %s is BROKEN somewhere on the field, so the cut costs him no cooldown" % \
+						lb_broken.unit_name, "#7cc8f0")
 			# BATCH BW — BLOOD DEBT lays its mark here rather than through a
 			# `special`, for the BT Arcane Bolt reason: it is an ORDINARY 30%
 			# strike and sending it down `_resolve_special` would hand-roll the
@@ -10902,6 +11113,25 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					bleed_amount += attacker.mod_bleed_add
 				if bleed_amount > 0:
 					_add_bleed_with_burst(strike_target, bleed_amount)
+					# BATCH FK — THE RUNE OF THE BUTCHER'S BILL. The wound buys
+					# the next swing: a Bleed landed by Hack and Slash rolls the
+					# rune's own chance for an EXTRA strike, and the strike is
+					# an ordinary one because it is an extra turn of THIS loop
+					# rather than a hand-rolled blow — it takes its own crit,
+					# its own miss, its own parry and its own bleed roll, which
+					# is Berserk's stated rule arriving through the live bound.
+					#
+					# **IT CANNOT RUN AWAY**, and the bound is one added strike
+					# a CAST rather than a fresh roll per added strike: without
+					# the latch a bleeding strike that bleeds again would roll
+					# again, and Hack and Slash at a 50% bleed roll would have a
+					# real tail. One is the card.
+					if attacker.rune_butchers_bill > 0 and not butchers_paid \
+							and ab.display_name == "Hack and Slash" \
+							and randf() <= 0.01 * attacker.rune_butchers_bill:
+						butchers_paid = true
+						total_hits += 1
+						_log("   → Rune: the Butcher's Bill — the wound buys another swing", "#e05050")
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
@@ -10960,10 +11190,43 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# (Permafrost's old on-hit Frostbite clause left in Batch O — the
 			# status lives on where it is CHOSEN: Rime applies it on cast.)
 			# Trapper: striking the Survivalist risks a poisoned barb.
+			# BATCH FK — TWO RUNES LAND ON THIS LINE. **THIN BLOOD** replaces the
+			# quarter chance with certainty (and pays for it in `_apply_poison`,
+			# where his Poison stops dealing damage); **THE SECOND BARB** cycles
+			# the affliction instead of always Poisoning.
+			#
+			# **THE CYCLE IS STALKING HORSE'S OWN TABLE AND ITS OWN RULE**, which
+			# is what the rune's text promises — `STALKING_HORSE_STATUSES`, so
+			# EVERY id it can hand out is in `DEBUFF_IDS` by construction and
+			# feeds Trapper's breadth term. A second hand-rolled list here would
+			# drift from that one and the drift would be silent: an affliction
+			# outside the curated list applies, logs, reads as working and pays
+			# the multiplier nothing.
+			#
+			# **THE INDEX LIVES ON THE HUNTER**, for the reason the node's own
+			# index does: a per-attacker counter would hand the same body the
+			# same affliction twice, which is the opposite of what a breadth
+			# passive wants. Its OWN counter and not `stalking_next`, so a
+			# Survivalist holding both the card and the rune advances two cycles
+			# rather than sharing one — the two are different sources and
+			# sharing an index would make the pair narrower than either alone.
 			if strike_target.passive_id == "trapper" and not attacker.is_hero \
-					and not attacker.dead and randf() < 0.25:
-				_apply_status(attacker, "poison", 5, 0,
-					_dot_tick("poison", strike_target), strike_target)
+					and not attacker.dead \
+					and (strike_target.rune_thin_blood > 0 or randf() < 0.25):
+				if strike_target.rune_second_barb > 0:
+					var sb_list: Array = STALKING_HORSE_STATUSES
+					var sb_id := String(sb_list[strike_target.second_barb_next
+						% sb_list.size()])
+					strike_target.second_barb_next += 1
+					if sb_id == "poison":
+						_apply_poison(strike_target, attacker, 5)
+					else:
+						_apply_status(attacker, sb_id, 3, 0, 0, strike_target)
+					_log("   → Rune: the Second Barb — %s takes %s" % [
+						attacker.unit_name, String(STATUS_INFO[sb_id][0])], "#70d878")
+				else:
+					_apply_status(attacker, "poison", 5, 0,
+						_dot_tick("poison", strike_target), strike_target)
 			# BATCH CH — STALKING HORSE PAYS OUT HERE, BESIDE TRAPPER'S OWN BARB,
 			# and the position IS the card: it fires when an attack actually LANDS
 			# on him, not when one was declared at him. BL §1 declares an enemy's
@@ -10996,6 +11259,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(attacker, sh_id, 3, 0, 0, strike_target)
 				_log("   → Stalking Horse: %s took the bait — %s" % [
 					attacker.unit_name, String(STATUS_INFO[sh_id][0])], "#70d878")
+			# BATCH FK — THE RUNE OF THE MARTYR'S ACCRUAL FIRES HERE, beside
+			# Trapper's barb and Immolate's ignition, because it is the same
+			# kind of clause: something that happens to whoever struck him, read
+			# at the site where a blow has actually LANDED.
+			#
+			# **A LANDED ATTACK, NOT ANY DAMAGE, AND THE NARROWING IS DELIBERATE.**
+			# The rune's sentence is "he gains Mercy when he takes damage"; read
+			# at `take_hit` it would also pay on every DoT tick, every recoil and
+			# every bleedout, which on a five-affliction board is several stacks
+			# a turn on a five-stack bar. Bounding it to a blow somebody threw
+			# keeps the meter's rate comparable to the passive's own (an ally
+			# falling below half) rather than an order of magnitude above it.
+			if strike_target.rune_martyr > 0 and not attacker.is_hero \
+					and not strike_target.dead:
+				_on_martyr_struck(strike_target)
 			# Immolate: whoever strikes the burning Pyromancer ignites — and
 			# that fresh Burn feeds his own engine, drain and all.
 			if strike_target.has_status("immolate") and not attacker.is_hero \
@@ -11420,7 +11698,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Arcane Bolt" and attacker.is_hero \
 				and attacker.second_resource_name == "Resonance":
 			var bo_before := attacker.second_resource
-			attacker.second_resource = int(floor(bo_before * ARCANE_BOLT_KEEP))
+			# BATCH FK — THE RUNE OF THE HALF NOTE moves what the bolt LEAVES
+			# BEHIND, not what it is paid. The payout above already read the
+			# meter as it stood, so the rune is exactly this one term: three
+			# quarters kept instead of a half, written as points added to the
+			# constant so `ARCANE_BOLT_KEEP` stays the one authored figure.
+			attacker.second_resource = int(floor(bo_before * (ARCANE_BOLT_KEEP
+				+ 0.01 * attacker.rune_half_note)))
 			attacker.refresh_bars()
 			attacker.float_text("Resonance %d" % attacker.second_resource,
 				Color(0.8, 0.5, 1.0))
@@ -11976,7 +12260,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# CRIT BUILDING IS ADDITIVE AND THIS IS ITS ONLY READ SITE (Batch
 			# AU §4): base 2, Attunement +1 = 3, Singularity +2 = 5 with both.
 			# NOT the higher of the two, and never summed at a second site.
-			var res_gain := (2 + attacker.attunement_crit
+			# BATCH FK — THE RUNE OF THE OVERFLOW joins the crit term ADDITIVELY,
+			# which is this block's general rule (base 2, Attunement +1,
+			# Singularity +2) rather than an exception it would have to carve
+			# out. A crit builds three instead of two; with both nodes it builds
+			# six, and the card says "instead of two" because that is the base
+			# it moves.
+			var res_gain := (2 + attacker.rune_overflow + attacker.attunement_crit
 				+ attacker.singularity_crit_build) if any_crit else 1
 			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
 				res_gain += attacker.harmonics_ranks
@@ -12000,6 +12290,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				res_gain += 3 if is_perfect else 2
 			if attacker.second_resource_name == "Resonance":
 				attacker.res_cast_this_turn = true
+			# BATCH FK — THE RUNE OF THE OVERTONE, and it is a DOUBLING of the
+			# whole term rather than a flat add: "every third cast builds
+			# double" has to compose with the crit that lands on it, or the
+			# rune would be worth less on the casts it is most likely to matter
+			# on. The counter is advanced at `_resolve`'s cost line — the one
+			# place every cast in the game passes — and is read here, so a cast
+			# that builds nothing still advances the count. That is the honest
+			# reading of "every third CAST" and it is what makes the rune
+			# predictable enough to play around.
+			if attacker.rune_overtone > 0 \
+					and attacker.second_resource_name == "Resonance" \
+					and attacker.overtone_casts % attacker.rune_overtone == 0:
+				res_gain *= 2
+				_log("   → Rune: the Overtone — every %d%s cast rings double (%d)" % [
+					attacker.rune_overtone, "rd" if attacker.rune_overtone == 3 \
+						else "th", res_gain], "#b0a8e0")
 			_gain_resonance(attacker, res_gain)
 		# Rampage: a kill lets it surge onward — an immediate free recast on
 		# another enemy. Batch AJ put a CAP on it: once per turn, or twice if
@@ -12176,10 +12482,21 @@ func _hold_cells() -> int:
 	return n
 
 
+# **BATCH FK — THE RUNE OF THE GLASS PRISON RAISES THE LIMIT HERE, AT THE ONE
+# PLACE IT IS DECIDED.** Additive with Second Prison rather than a second table:
+# +1 either way, so a Cryomancer holding both seals three, and Absolute Zero's
+# sentinel still supersedes both. Writing the rune's second body without moving
+# this number would have the eviction loop at the bottom of `_hold_freeze`
+# release the first one instantly — the exact Frostbind defect BATCH CB found.
 func _hold_limit() -> int:
 	if _living_hero_with("absolute_zero") != null:
 		return 99
-	return 2 if _living_hero_with("second_prison") != null else 1
+	var hl := 1
+	if _living_hero_with("second_prison") != null:
+		hl += 1
+	if _living_hero_with("rune_glass_prison") != null:
+		hl += 1
+	return hl
 
 
 # Clause 3, and the ONE place the window's size is decided.
@@ -12308,6 +12625,46 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 		_hold_release(_holds[0], "the oldest prison gives out")
 
 
+# **BATCH FK — THE RUNE OF THE KILLING COLD.** An enemy at maximum Chill takes a
+# share of its own pile whenever he casts. The share is `rune_killing_cold`
+# percent of the victim's MAXIMUM health per stack, so a deep pile on a large
+# body is worth what a deep pile on a large body should be — a flat number per
+# stack would be a rounding error on a boss and a execute on a mob.
+#
+# **"MAXIMUM CHILL" IS FOUR, THE FREEZE THRESHOLD**, and it is written `>= 4`
+# rather than `== 4` deliberately: the Rune of the Deep Cold lifts the cap, and
+# an equality here would make the two runes silently exclusive — the deepest
+# piles in the game would be the ones this rune stopped reading.
+#
+# **IT GOES THROUGH `take_tick_damage`, NOT `take_hit`.** This is the cold
+# working, not a blow he threw: it must not roll a crit, must not be parried,
+# must not feed a counter, and must not carry Break. A kill still routes through
+# `_on_enemy_death` because that is where the function's own lethal path ends.
+func _killing_cold_cast(caster: BattleUnit) -> void:
+	if caster.rune_killing_cold <= 0 or not caster.is_hero or caster.is_companion:
+		return
+	for e in enemies:
+		if e.dead or not e.has_status("chilled"):
+			continue
+		var kc_stacks: int = e.status_stacks("chilled")
+		if kc_stacks < 4:
+			continue
+		var kc_dmg: int = maxi(int(round(e.max_hp * 0.01
+			* caster.rune_killing_cold * kc_stacks)), 1)
+		_dmg_frame(caster, "Rune: the Killing Cold", caster.unit_name)
+		var kc_died: bool = e.take_tick_damage(kc_dmg, "-%d" % kc_dmg,
+			Color(0.65, 0.88, 1.0))
+		_stat("dmg_hero_" + _contrib_name(caster), kc_dmg)
+		_log("   → Rune: the Killing Cold — %s's own ice bites for %d (x%d)" % [
+			e.unit_name, kc_dmg, kc_stacks], "#7cc8f0")
+		if kc_died:
+			_stat("kills")
+			_sfx("death", -4.0)
+			_message("%s falls!" % e.unit_name)
+			_log("† %s dies" % e.unit_name, "#e05050")
+			_on_enemy_death(e)
+
+
 # What rides a freeze: the Mana it pays back and the cold it rolls outward.
 func _hold_freeze_riders(target: BattleUnit, cryo: BattleUnit) -> void:
 	# Glacial Economy: every freeze pays its caster back in Mana.
@@ -12366,6 +12723,16 @@ func _hold_release(target: BattleUnit, reason: String) -> void:
 	_releasing = false
 
 
+# BATCH FK — the Glass Prison's cell giving out. It goes through `_hold_release`
+# like every other release, so Shockwave, Honed Shards and Frostbound Hours all
+# fire on it — the same argument `_hold_freeze`'s eviction makes for routing the
+# limit's own eviction through the named door rather than erasing a hold.
+func _on_glass_shatter(victim: BattleUnit) -> void:
+	if not _is_held(victim):
+		return
+	_hold_release(victim, "the glass cell shatters (Rune: the Glass Prison)")
+
+
 func _hold_release_body(target: BattleUnit, reason: String) -> void:
 	_holds.erase(target)
 	target.remove_status("frozen")
@@ -12376,7 +12743,24 @@ func _hold_release_body(target: BattleUnit, reason: String) -> void:
 	# BATCH BL §1: back on the timeline means back to declaring — the player
 	# should see what the thawed enemy means to do before it does it.
 	_declare_intent(target)
-	target.set_chilled_stacks(HOLD_RELEASE_STACKS)
+	# BATCH FK — THE RUNE OF THE SECOND WINTER. A released enemy comes back on
+	# `HOLD_RELEASE_STACKS` (one) by the standing rule; the rune returns it on
+	# the depth the hold was WORTH instead — `hold_turns`, the same counter
+	# Shatter is paid on and Frostbound Hours reads two clauses down, so the
+	# rune and those two can never disagree about how long a prison stood.
+	#
+	# **READ BEFORE HONED SHARDS**, for the reason that clause is written last:
+	# a re-freeze zeroes the counter. And it is a FLOOR rather than a
+	# replacement — `maxi` against the standing one — so the rune can only ever
+	# leave more cold behind, never less, which is what makes it safe beside a
+	# later batch lowering `HOLD_RELEASE_STACKS`.
+	var sw_stacks := HOLD_RELEASE_STACKS
+	var sw_h := _living_hero_with("rune_second_winter")
+	if sw_h != null and target.hold_turns > 0:
+		sw_stacks = maxi(HOLD_RELEASE_STACKS, target.hold_turns)
+		_log("   → Rune: the Second Winter — the ice does not let go (%d Chilled, the prison's own depth)" % \
+			sw_stacks, "#7cc8f0")
+	target.set_chilled_stacks(sw_stacks)
 	if is_inf(target.next_time):
 		# Back onto the timeline a full basic action from NOW — never
 		# instantly, and never at the stale clock it was frozen on.
@@ -12682,13 +13066,33 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				func(e): return not e.has_status(id))
 			var dw_pool: Array = dw_fresh if not dw_fresh.is_empty() else dw_others
 			if not dw_pool.is_empty():
-				var dw_to: BattleUnit = dw_pool.pick_random()
+				# BATCH FK — THE RUNE OF THE CARRION. The scent carries to EVERY
+				# other body rather than to one, which turns the card from a
+				# breadth-doubler into a breadth-multiplier.
+				#
+				# **IT SPREADS OVER `dw_others`, NOT `dw_pool`.** The pool is
+				# already filtered to bodies that do NOT carry the status, which
+				# is right when one is being chosen and wrong when all are: the
+				# rune's sentence is "every other enemy", and a body that already
+				# holds the affliction still wants the refreshed clock the card
+				# would have given it. The unruned pick is untouched and still
+				# prefers a clean body.
+				#
+				# **`_downwind_spreading` STILL GUARDS THE WHOLE LOOP**, so a
+				# copy never re-enters and spreads again — the re-entrancy bound
+				# is the card's and the rune inherits it rather than needing one
+				# of its own.
+				var dw_carrion: bool = dw_src.rune_carrion > 0
+				var dw_targets: Array = dw_others if dw_carrion \
+					else [dw_pool.pick_random()]
 				_downwind_spreading = true
-				_apply_status(dw_to, id, turns, power, tick, src, force)
+				for dw_to in dw_targets:
+					_apply_status(dw_to, id, turns, power, tick, src, force)
+					_log("   → Downwind: %s carries from %s to %s%s" % [
+						String(STATUS_INFO[id][0]) if STATUS_INFO.has(id) else id,
+						target.unit_name, dw_to.unit_name,
+						" (Rune: the Carrion)" if dw_carrion else ""], "#70d878")
 				_downwind_spreading = false
-				_log("   → Downwind: %s carries from %s to %s" % [
-					String(STATUS_INFO[id][0]) if STATUS_INFO.has(id) else id,
-					target.unit_name, dw_to.unit_name], "#70d878")
 	# CREEPING DEATH sits HERE, above every per-status branch, because three of
 	# those branches (chilled, burn, poison) return early and a hook below them
 	# would silently miss the statuses a Cryomancer or a Pyromancer lands. It is
@@ -13543,18 +13947,64 @@ func _forge_body_throw(hero: BattleUnit, prevented: float) -> void:
 # property of the PASSIVE, not of any ability, so Detonation, Wildfire,
 # Cataclysm and anything the tree adds later inherit it from this single
 # implementation. Crucible doubles the rate.
+# **BATCH FK — TWO RUNES LAND INSIDE THIS FUNCTION AND NEITHER ADDS A CALL
+# SITE.** That is the point of the passive owning the refund: this is the ONE
+# door every Burn consumer already shares, so a rune that wants to fire "when a
+# stack is consumed" fires for all six of them by being written here — and
+# `test_batch_ar`'s pinned call-site count does not move.
+#
+# **THE EMBER LEAP IS ABOVE THE `back <= 0` RETURN AND THAT IS LOAD-BEARING.**
+# A Pyromancer at full Mana refunds nothing and returns early; a jump written
+# below that line would silently stop firing exactly when he is playing well,
+# which is the failure mode that reads as the rune working.
 func _overburn_refund(u: BattleUnit, turns_consumed: int) -> void:
 	if u == null or u.passive_id != "overburn" or turns_consumed <= 0:
 		return
+	# BATCH FK — THE RUNE OF THE EMBER LEAP. The consumed fire does not go out:
+	# it lands on the SHALLOWEST burning body at half the turns, which is the
+	# clause pointed the opposite way to Firedraw's consolidation — this one
+	# spreads the field wide where the draw pulls it deep, and the two are
+	# deliberately opposed rather than stacked. An enemy carrying no Burn at all
+	# is preferred over a burning one for the same reason Downwind prefers a
+	# clean body: the point is BREADTH, and OVERBURN counts turns standing on the
+	# whole team.
+	if u.rune_ember_leap > 0:
+		var el_half: int = turns_consumed / 2
+		if el_half > 0:
+			var el_pool: Array = enemies.filter(func(e): return not e.dead)
+			var el_to: BattleUnit = null
+			for el_e in el_pool:
+				var el_have: int = maxi(int(el_e.get_status("burn").get("turns", 0)), 0)
+				if el_to == null \
+						or el_have < maxi(int(el_to.get_status("burn").get("turns", 0)), 0):
+					el_to = el_e
+			if el_to != null:
+				_apply_status(el_to, "burn", el_half, 0, _dot_tick("burn", u), u)
+				_log("   → Rune: the Ember Leap — %d turn%s of the consumed fire jumps to %s" % [
+					el_half, "" if el_half == 1 else "s", el_to.unit_name], "#e08850")
 	var rate := 2 if u.crucible > 0 else 1
+	# BATCH FK — THE RUNE OF THE PYRE DEBT doubles the refund and bills him a
+	# tenth of it back as fire. It is MULTIPLICATIVE with Crucible rather than
+	# additive, deliberately: Crucible is "the refund rate doubles" and so is
+	# this, and two doublings of one rate compose. The recoil is priced off the
+	# refund actually PAID (below the `mini` against his missing Mana), so a
+	# Pyromancer at a full bar pays no debt for a refund he never received.
+	if u.rune_pyre_debt > 0:
+		rate *= 2
 	var back: int = mini(turns_consumed * rate, u.max_resource - u.resource)
 	if back <= 0:
 		return
 	u.resource += back
 	u.refresh_bars()
 	u.float_text("+%d Mana" % back, Color(0.5, 0.7, 1.0))
-	_log("   → Overburn: %d turn%s of Burn consumed refunds %d Mana" % [
-		turns_consumed, "" if turns_consumed == 1 else "s", back], "#70a0e0")
+	_log("   → Overburn: %d turn%s of Burn consumed refunds %d Mana%s" % [
+		turns_consumed, "" if turns_consumed == 1 else "s", back,
+		" (Rune: the Pyre Debt doubles it)" if u.rune_pyre_debt > 0 else ""], "#70a0e0")
+	if u.rune_pyre_debt > 0:
+		var pd_burn: int = maxi(int(round(back * 0.01 * u.rune_pyre_debt)), 1)
+		u.take_tick_damage(pd_burn, "PYRE DEBT", Color(1.0, 0.45, 0.2))
+		_log("   → Rune: the Pyre Debt — the fire he took back burns him for %d" % \
+			pd_burn, "#e05050")
 
 
 # BATCH AY §2 — LOYALTY HAS NO CEILING AND THE BOON IS A CURVE, NOT A STEP.
@@ -14622,6 +15072,39 @@ func _preparation_tick(u: BattleUnit) -> void:
 		u.unit_name, "#a0d060")
 
 
+# ══ BATCH FK — THE FREE ACTION, ONE IMPLEMENTATION FOR TWO RUNES ═══════════
+#
+# **THE SAME THREE LINES `_preparation_tick` USES**, lifted into a helper the
+# moment a second thing wanted them, so "acts immediately" cannot come to mean
+# two different positions in the turn order. The unit is moved to the front of
+# the queue and re-enters the ORDINARY initiative loop: his DoTs bite, his buffs
+# shorten, his cooldowns tick. That is Preparation's stated design and it is
+# what keeps the grant honest rather than free.
+#
+# **WHY IT CANNOT PRODUCE UNBOUNDED CONSECUTIVE TURNS**, which is the whole risk
+# of an extra-turn mechanic and the one the brief names for the Slaughterhouse:
+# every caller carries its own latch. THE LAST WORD's is `last_word_armed`,
+# cleared at the crossing and re-armed only by a heal back over the quarter, so
+# one dive pays once however many blows land inside it. THE SLAUGHTERHOUSE's is
+# `free_action_taken`, cleared at the start of each of his turns, so a Wildstrikes
+# that bleeds out four enemies at once grants ONE turn and not four — and the
+# bleedout → free action → Gut Rip → bleedout loop the brief asks about is
+# bounded at one extra turn per turn, not by the number of open wounds.
+func _grant_free_action(u: BattleUnit, label: String, why: String) -> void:
+	if u == null or u.dead or battle_over:
+		return
+	var soonest := u.next_time
+	for other in heroes + enemies + companions:
+		if other.dead or other == u:
+			continue
+		soonest = minf(soonest, other.next_time)
+	u.next_time = soonest - 0.01
+	u.float_text(label, Color(0.9, 0.25, 0.3))
+	_sfx("crit", -8.0, 1.1)
+	_message("%s acts at once!" % u.unit_name)
+	_log("%s: %s — he takes ANOTHER turn at once" % [u.unit_name, why], "#e05050")
+
+
 # BLIGHT THE WELL (Occultist). Healing became damage; unit.gd returned 0 and
 # handed the number here so the DEATH it can cause routes through
 # `_on_enemy_death` like every other one — the whole reason this is a callback
@@ -14850,6 +15333,43 @@ func _stamp_discipline_chip(u: BattleUnit) -> void:
 		"Discipline: %d consecutive turn(s) held in\nthe %s guard, so that stance's own effect\nis %d%% stronger (ceiling %d%%). A GUARD\nCHANGE resets this to nothing." % [
 			u.discipline_turns, d_guard, d_pct, DISCIPLINE_CAP])
 
+# ══ BATCH FK — THE RUNE OF THE MIRROR GUARD, ONE IMPLEMENTATION ════════════
+#
+# **THE NUMBER COMES FROM THE NOMINAL HIT THROUGH HIS ARMOR AND NOT FROM
+# `final`.** That is Batch W's idiom and Feint's own reason, and it is forced
+# here rather than chosen: a blow that was blocked or parried was never rolled,
+# so its variance, its crit and its riders do not exist to read. One helper for
+# both doors, so the two can never come to return different halves.
+#
+# **DEFENSIVE ONLY**, which is the rune's whole shape: the guard that gives up
+# ten percent of his blade is what turns the refusal into an answer. A Formless
+# Swordmaster is in NEITHER stance and gets nothing — `stance` still holds the
+# guard he will land back in, and reading it here would pay him for a stance he
+# is not currently in.
+func _mirror_guard_return(defender: BattleUnit, attacker: BattleUnit,
+		ab: Ability, how: String) -> void:
+	if defender.rune_mirror_guard <= 0 or defender.stance != "defensive" \
+			or defender.has_status("formless") or attacker == null \
+			or attacker.dead or ab.damage <= 0:
+		return
+	var mg_dmg := maxi(int(round(ab.damage * 0.01 * attacker.attack
+		* (1.0 - defender.effective_armor())
+		* 0.01 * defender.rune_mirror_guard)), 1)
+	var mg_res: Dictionary = attacker.take_hit(mg_dmg, 0)
+	attacker.float_text("-%d Mirror" % mg_dmg, Color(0.55, 0.85, 1.0))
+	if defender.is_hero and not attacker.is_hero:
+		_stat("dmg_hero_" + _contrib_name(defender), mg_dmg)
+	_log("   → Rune: the Mirror Guard — the %s comes back on %s for %d" % [
+		how, attacker.unit_name, mg_dmg], "#7cc8f0")
+	if mg_res["died"]:
+		_stat("hero_deaths" if attacker.is_hero else "enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % attacker.unit_name)
+		_log("† %s dies" % attacker.unit_name, "#e05050")
+		if not attacker.is_hero:
+			_on_enemy_death(attacker)
+
+
 func _swordmaster_switch(u: BattleUnit) -> void:
 	# BATCH CI — DISCIPLINE'S ACCUMULATION DIES HERE, AT THE ONE PIVOT WITH
 	# THREE CALLERS, so Guard Change, Precision Strike and Feint all throw it
@@ -14866,6 +15386,18 @@ func _swordmaster_switch(u: BattleUnit) -> void:
 			_log("   → Discipline: the guard changes and the accumulation is lost",
 				"#7cc8f0")
 		_stamp_discipline_chip(u)
+	# BATCH FK — THE RUNE OF THE WHETSTONE'S EDGE DIES AT THE SAME PIVOT, and
+	# it is written HERE rather than at the read site for Discipline's own
+	# stated reason: three abilities switch the stance and a list of them at the
+	# rune's site would go stale the first time a fourth was authored. The two
+	# accumulations are deliberately NOT merged — Discipline deepens whichever
+	# upside he is receiving and this one only ever deepens the Aggressive
+	# term, so a hero in Defensive keeps his Discipline and holds no edge.
+	if u.whetstone_turns > 0:
+		u.whetstone_turns = 0
+		if u.rune_growing_edge > 0:
+			_log("   → Rune: the Whetstone — the guard changes and the edge is lost",
+				"#7cc8f0")
 	u.stance = "defensive" if u.stance == "aggressive" else "aggressive"
 	var sw_label := "Aggressive" if u.stance == "aggressive" else "Defensive"
 	_sfx("parry", -6.0, 0.8)
@@ -15732,7 +16264,19 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# ONE BRANCH, so there is one answer to "can this unit release".
 	var own := u == devout
 	var f_was := u.faith_stacks
-	u.faith_stacks = mini(u.faith_stacks + n, FAITH_RELEASE)
+	# BATCH FK — THE RUNE OF THE FOURTH STACK moves the release THRESHOLD, and
+	# `FAITH_RELEASE` is both the cap and the threshold, so it moves both — an
+	# ally who cannot hold a fourth stack cannot release on one. It is read off
+	# the DEVOUT, never off the ally: the release is his engine, and reading it
+	# off the wearer's own field would mean the rune worked only when the Devout
+	# happened to be the ally being kindled.
+	#
+	# **THE PEAK IS WHAT PAYS, AND THE PEAK NEVER FALLS**, so a fourth stack is
+	# permanently more mitigation and more damage on that ally for the rest of
+	# the battle — not merely a later release. That is the rune's real weight
+	# and it is why the heal arrives less often rather than more.
+	var f_release := FAITH_RELEASE + devout.rune_fourth_stack
+	u.faith_stacks = mini(u.faith_stacks + n, f_release)
 	# BATCH BI §1 — THE PEAK RATCHETS HERE AND NOWHERE ELSE. It is raised from
 	# the count immediately after the count moves, so there is exactly one line
 	# in the file where the two can disagree and it is this one.
@@ -15744,7 +16288,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# call, the `_devout_heal` pattern, so the parts can never disagree with the
 	# sum — which is the property §5 asserts.
 	_faith_gained(u, u.faith_stacks - f_was, source)
-	if own or u.faith_stacks < FAITH_RELEASE:
+	if own or u.faith_stacks < f_release:
 		_refresh_faith_chip(u, devout)
 		return
 	# The threshold stack: an ALLY releases, always to zero.
@@ -15831,7 +16375,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 		_communion_chain = true
 		for h in heroes:
 			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0 \
-					or h.faith_stacks >= FAITH_RELEASE:
+					or h.faith_stacks >= f_release:
 				continue
 			if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
@@ -16028,7 +16572,19 @@ func _on_shield_absorbed(holder: BattleUnit) -> void:
 	# per-source table cannot say whether a small number means a weak source or
 	# a rare one.
 	_stat("faith_absorb_hits")
-	_gain_faith(holder, FAITH_PER_ABSORB, "absorb")
+	# BATCH FK — TWO RUNES MEET AT THIS LINE AND THEY PULL OPPOSITE WAYS, which
+	# is the point. THE DEEP ABSORB adds to what an absorb is worth; THE BARE
+	# ALTAR doubles the whole rate and pays for it at the shield's own size.
+	# Both are read off the DEVOUT rather than off the holder — the shield is
+	# his work and the ally is only where it landed, which is the same reading
+	# `_gain_faith`'s own `_living_devout()` lookup already takes.
+	var da_devout := _living_devout()
+	var da_n := FAITH_PER_ABSORB
+	if da_devout != null:
+		da_n += da_devout.rune_deep_absorb
+		if da_devout.rune_bare_altar > 0:
+			da_n *= 2
+	_gain_faith(holder, da_n, "absorb")
 
 
 # Sacred Covenant: a Divine Shield that saved a life rewards its holder.
@@ -16050,6 +16606,26 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 # (Guardian Angel widens the window to 65%). THE GENERATOR ITSELF IS
 # UNTOUCHED BY BATCH AV — only the dead end at the ceiling is closed: Grace
 # turns the stack she cannot hold into healing for the ally who earned it.
+# BATCH FK — THE RUNE OF THE MARTYR'S ACCRUAL. Its cost (nobody but himself may
+# heal him) is in `heal_amount`, at the top of the heal pipeline with the other
+# absolute refusals; this is the upside, and the two are deliberately in
+# different files because they are different mechanisms — one is a rule about
+# healing and one is a resource event.
+#
+# **THE STACK IS HIS OWN, not the party's**, which is what separates it from
+# Mercy's ordinary accrual: the passive pays when an ALLY falls, and this pays
+# when HE is struck. A Holy Cleric holding the rune has two feeders for one bar.
+func _on_martyr_struck(h: BattleUnit) -> void:
+	if h.rune_martyr <= 0 or h.dead or h.is_companion or not h.is_hero:
+		return
+	if h.second_resource_name != "Mercy" or h.second_resource >= h.second_max:
+		return
+	h.second_resource += 1
+	h.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
+	h.refresh_bars()
+	_log("   → Rune: the Martyr — the wound is its own offering (+1 Mercy)", "#e8c860")
+
+
 func _on_hero_below_half(low_ally: BattleUnit) -> void:
 	for h in heroes:
 		if h.dead or h.second_resource_name != "Mercy":
@@ -16076,6 +16652,37 @@ func _on_hero_below_half(low_ally: BattleUnit) -> void:
 		else:
 			_grace_spill(h, low_ally)
 			_alms_spill(h, low_ally)
+
+
+# BATCH FK — THE RUNE OF THE LAST WORD. The latch is the unit's (it is a
+# property of HIS bar, and re-arming it is a property of HIS heal), so this
+# handler owns only the turn order.
+func _on_last_word(u: BattleUnit) -> void:
+	if u.rune_last_word <= 0:
+		return
+	_grant_free_action(u, "LAST WORD", "Rune: the Last Word — cornered, he swings first")
+
+
+# BATCH FK — THE RUNE OF THE VIGIL. The Mercy line crossed UPWARD, which is
+# `_on_hero_below_half`'s exact mirror and is written beside it for that reason.
+# **THE STACK IS THE CLERIC'S AND THE CROSSING IS THE ALLY'S**, so this walks
+# the party for a holder rather than paying the unit that crossed — the same
+# shape the downward handler already has, and the reason the rune reads
+# `second_resource_name == "Mercy"` rather than the shared `second_resource`
+# field: that field is also Resonance and Focus.
+func _on_hero_healed_above_half(risen: BattleUnit) -> void:
+	for h in heroes:
+		if h.dead or h.is_companion or h.rune_vigil <= 0:
+			continue
+		if h.second_resource_name != "Mercy":
+			continue
+		if h.second_resource >= h.second_max:
+			continue
+		h.second_resource += 1
+		h.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
+		h.refresh_bars()
+		_log("   → Rune: the Vigil — %s is pulled back over the line, and %s takes heart" % [
+			risen.unit_name, h.unit_name], "#e8c860")
 
 
 # Mercy: arms and pays the Empower surcharge (+1 stack) for a supporting
@@ -16285,10 +16892,35 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# there is no perfect half left to name — carrying
 			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
 			# through the lethal-save hook). Stalwart deepens the absorb.
+			# BATCH FK — THE RUNE OF THE BARE ALTAR'S PRICE, and the Rune of
+			# the Layered Aegis's second body, both land on this cast.
+			# The Altar halves the absorb AFTER Stalwart rather than before, so
+			# the node keeps paying what it says and the rune halves the total —
+			# the reading that keeps a talent's own text true.
 			var ds_pct := 0.35 + 0.01 * attacker.stalwart_step
+			if attacker.rune_bare_altar > 0:
+				ds_pct *= 0.5
 			var shield := int(round(attacker.max_hp * ds_pct))
 			_sfx("parry", -6.0, 0.6)
 			_grant_divine_shield(attacker, target, shield)
+			# BATCH FK — THE RUNE OF THE LAYERED AEGIS. A SECOND ally is shielded
+			# at the same size, unconditionally — which is what separates it from
+			# RADIENT AEGIS directly below, a node that echoes the shield on a
+			# ROLL. The two compose and are not a duplicate: a Devout holding
+			# both shields two by rule and may shield a third by luck. The rune
+			# picks the ally lowest on health rather than at random, because a
+			# guaranteed second shield that lands on the healthiest body is the
+			# clause reading as working while doing nothing.
+			if attacker.rune_layered_aegis > 0:
+				var la_pool := heroes.filter(
+					func(h): return not h.dead and h != target and not h.is_companion)
+				if not la_pool.is_empty():
+					la_pool.sort_custom(func(a, b): return a.hp < b.hp)
+					var la_t: BattleUnit = la_pool[0]
+					_grant_divine_shield(attacker, la_t, shield)
+					la_t.float_text("Layered Aegis", Color(0.95, 0.9, 0.6))
+					_log("   → Rune: the Layered Aegis — the ward holds on %s as well (%d)" % [
+						la_t.unit_name, shield], "#70d878")
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, shield])
 			_log("%s: Divine Shield on %s — absorbs %d (%d%% of the Devout's health%s)" % [
 				attacker.unit_name, target.unit_name, shield,
@@ -16381,6 +17013,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
 			_log("%s: Hymn of Hope — heroes heal %d%%%s" % [attacker.unit_name,
 				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
+			# BATCH FK — THE RUNE OF THE GRACE banks the SHARE here and pays it
+			# at the end of the turn (`_grace_echo`). It banks the PERCENTAGE,
+			# not the healed total: the hymn's amount is a fraction of each
+			# hero's OWN maximum and every voice rolls its own crit, so a banked
+			# total would pay the smallest hero the largest hero's number. Half
+			# the pct, echoed the same way, is the only reading that keeps the
+			# card's shape.
+			#
+			# **AN OVERHEALED FIRST PASS DOES NOT CANCEL THE ECHO**, deliberately:
+			# the party takes damage between the hymn and the end of the turn far
+			# more often than not, and that window is what the rune buys.
+			if attacker.rune_grace > 0:
+				attacker.grace_echo_pct = pct * 0.01 * attacker.rune_grace
 		"sanctuary":
 			# VAULTED ability's machinery (kept): Mercy-scaled like all heals.
 			# Batch AB: it used to hand out a Shieldwall v1 ward as well; that
@@ -18371,7 +19016,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var fp_would := fp_turns * fp_tick
 				var fp_share := PYRE_SHARE_PERFECT
 				var fp_power := int(round(fp_would * fp_share))
-				target.remove_status("burn")
+				# BATCH FK — THE RUNE OF THE ASHFALL LEAVES THE FIRE STANDING.
+				# The shield is already computed from what the Burn WOULD have
+				# dealt — read before the consume, because the consume is what
+				# makes it stop being true — so the rune is exactly this one
+				# refusal and no arithmetic of its own.
+				#
+				# **THE REFUND GOES WITH THE CONSUMPTION AND THAT IS THE PRICE.**
+				# `_overburn_refund` is paid per turn CONSUMED; nothing is
+				# consumed, so `fp_turns` is passed as zero below rather than
+				# the call being removed — the passive's ONE door keeps its
+				# five call sites and its rule ("a consuming cast is refunded")
+				# stays true rather than acquiring an exception. What he buys
+				# with the Mana is a board that still feeds Overburn.
+				var fp_kept: bool = attacker.rune_ashfall > 0
+				if not fp_kept:
+					target.remove_status("burn")
 				if fp_power > 0:
 					# `add_status` already MAXES power and turns on
 					# re-application, so a fresh pyre can never be worth less
@@ -18393,16 +19053,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("%s: Funeral Pyre finds no Burn on %s" % [
 						attacker.unit_name, target.unit_name], "#909090")
 				else:
-					_message("%s smothers the fire and wears it" % attacker.unit_name)
-					_log("%s: Funeral Pyre — %d turn%s of Burn consumed from %s (worth %d), a shield of %d" % [
+					_message("%s wears the fire without smothering it" % attacker.unit_name \
+						if fp_kept else "%s smothers the fire and wears it" % attacker.unit_name)
+					_log("%s: Funeral Pyre — %d turn%s of Burn %s on %s (worth %d), a shield of %d" % [
 						attacker.unit_name, fp_turns,
-						"" if fp_turns == 1 else "s", target.unit_name, fp_would,
+						"" if fp_turns == 1 else "s",
+						"LEFT STANDING (Rune: the Ashfall)" if fp_kept else "consumed from",
+						target.unit_name, fp_would,
 						fp_power], "#70d878")
 				# The refund is the PASSIVE's, through the ONE door every other
 				# Burn consumer already shares (AR's rule; Crucible doubles it).
 				# A FIFTH consumer arriving and inheriting it is that rule
 				# working — test_batch_ar's pinned call-site count goes 4 -> 5.
-				_overburn_refund(attacker, fp_turns)
+				_overburn_refund(attacker, 0 if fp_kept else fp_turns)
 		"killing_frost":
 			# AXIS: the accumulation pays on its own. His stacks have only ever
 			# counted toward a freeze, so a fight where the freeze never lands
@@ -18546,7 +19209,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					if _other_spec_debuff(foe):
 						fd_this += FIREDRAW_DEEP_BONUS
 						fd_deep += 1
-					var fd_spent: int = mini(fd_this, fd_left)
+					# BATCH FK — THE RUNE OF THE CHAIN FIRE takes the body's
+					# whole fire instead of a fixed draught. It is written as
+					# the `mini` falling away rather than as a large `fd_this`,
+					# so the DEEP bonus above stays a real clause on an unruned
+					# draw and becomes moot on a runed one rather than
+					# double-counting into a cap that no longer binds.
+					var fd_spent: int = fd_left if attacker.rune_chain_fire > 0 \
+						else mini(fd_this, fd_left)
 					if fd_left - fd_spent <= 0:
 						foe.remove_status("burn")
 					else:
@@ -19273,8 +19943,30 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.unit_name], "#909090")
 			else:
 				var cu_before := _status_count(target)
-				target.purge_debuffs()
-				var cu_n: int = maxi(cu_before - _status_count(target), 0)
+				# BATCH FK — THE RUNE OF THE FULL BOARD. The bill is drawn and
+				# the purge is refused: he is paid for the whole board and the
+				# board is still standing, which is what makes the rune worth a
+				# slot to a Trapper — every affliction Cull would have taken
+				# keeps paying his +8% breadth term on the very next strike.
+				#
+				# **THE BILL MUST BE COUNTED, NOT MEASURED, AND THIS IS THE HALF
+				# THAT WOULD HAVE SHIPPED INERT.** The unruned cast reads
+				# before-minus-after, which is zero when nothing was removed —
+				# so refusing the purge and leaving that arithmetic alone gives
+				# `cu_n = 0` and a rune that logs, reads as working and deals
+				# nothing. `_harvest_yield` is the count a purge WOULD take
+				# (non-sticky, non-broken `DEBUFF_IDS`) and it is already the
+				# gate three lines up, so the runed branch bills exactly what the
+				# unruned one bills and not one status more: sticky poison and
+				# the marks survive a purge and are excluded from both readings.
+				var cu_n: int = 0
+				if attacker.rune_full_board > 0:
+					cu_n = _harvest_yield(target)
+					_log("   → Rune: the Full Board — the bill is drawn and the board is left standing",
+						"#70d878")
+				else:
+					target.purge_debuffs()
+					cu_n = maxi(cu_before - _status_count(target), 0)
 				var cu_pct := 0.12 if is_perfect else 0.10
 				_message("%s culls the field!" % attacker.unit_name)
 				_log("%s: Cull — %d afflictions consumed from %s, and every enemy pays for them%s" % [
@@ -19717,8 +20409,48 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Berserker CHOOSES when Blood Frenzy wakes instead of waiting
 			# for the enemy to decide it.
 			var bp_cost := maxi(int(round(attacker.hp * 0.075)), 1)
-			attacker.hp = maxi(attacker.hp - bp_cost, 1)
-			attacker.float_text("-%d" % bp_cost, Color(1.0, 0.4, 0.5))
+			# BATCH FK — THE RUNE OF BLOOD DEBT SENDS THE BILL THE OTHER WAY.
+			# The card's whole safety argument is that the price is a share of
+			# his CURRENT health and cannot reach zero; the rune keeps the shape
+			# and changes the payer, so the cost is a share of the TARGET's
+			# current health, clamped the same way and by the same line.
+			#
+			# **AND THEIR MISSING HEALTH BECOMES HIS FRENZY STEPS, WHICH IS THE
+			# HALF THAT NEEDS SAYING.** The health term of Blood Frenzy reads HIS
+			# bar and the rune does not touch it — a Berserker who never bleeds
+			# never enters his own band. So the payment is made into CZ's SECOND
+			# term (`note_resource_spent`, in Rage-equivalent units) rather than
+			# into a third term of its own: one band, two feeders, and the
+			# `FRENZY_MAX_STEPS` clamp still holds the ceiling at +40%.
+			#
+			# `frenzy_bonus()` is still called for its ratchet, exactly as the
+			# unruned cast calls it — the floor is banked at the moment of
+			# payment either way (Batch A's rule).
+			var bp_debt: bool = attacker.rune_blood_debt > 0 and target != null \
+				and not target.dead and not target.is_hero
+			if bp_debt:
+				var bd_cost := maxi(int(round(target.hp * 0.075)), 1)
+				var bd_res: Dictionary = target.take_hit(bd_cost, 0)
+				target.float_text("-%d Blood Debt" % bd_cost, Color(0.9, 0.15, 0.2))
+				_stat("dmg_hero_" + attacker.unit_name, bd_cost)
+				# Rage-equivalent: their MISSING health as a share of their
+				# maximum, priced at the same 5 Rage a step the passive uses, so
+				# a target at half health is worth ten steps' worth of spend.
+				var bd_missing: float = 1.0 - target.hp / float(maxi(target.max_hp, 1))
+				var bd_steps := int(bd_missing * 100.0 / 5.0)
+				attacker.note_resource_spent(bd_steps * BattleUnit.FRENZY_RAGE_PER_STEP)
+				_log("   → Rune: Blood Debt — %s pays %d, and %d%% missing is %d Frenzy step%s" % [
+					target.unit_name, bd_cost, int(round(bd_missing * 100.0)),
+					bd_steps, "" if bd_steps == 1 else "s"], "#e05050")
+				if bd_res["died"]:
+					_stat("kills")
+					_sfx("death", -4.0)
+					_message("%s falls!" % target.unit_name)
+					_log("† %s dies" % target.unit_name, "#e05050")
+					_on_enemy_death(target)
+			else:
+				attacker.hp = maxi(attacker.hp - bp_cost, 1)
+				attacker.float_text("-%d" % bp_cost, Color(1.0, 0.4, 0.5))
 			# The self-cut banks its Frenzy floor immediately, like any hit
 			# taken (Batch A rule: dives count even if healed away).
 			if attacker.passive_id == "bloodrage":
@@ -19806,7 +20538,35 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Guard Change's OWN payload and stays here — the pressure it lands,
 			# Sunder Guard, No Quarter and the parry perfect are on its card and
 			# on no other.
-			_swordmaster_switch(attacker)
+			#
+			# BATCH FK — THE RUNE OF THE OPEN LINE REFUSES THE SWITCH ITSELF and
+			# buys the thing the switch is for: one turn holding BOTH stances'
+			# upsides and neither downside, which is the `formless` status the
+			# Formless card already carries. It reuses that status rather than
+			# authoring a fifth branch in the two stance blocks — the four there
+			# are `formless / formless_recoil / aggressive / defensive` and a
+			# fifth would be a second copy of the first.
+			#
+			# **AND IT PAYS NO RECOIL, WHICH IS THE DIFFERENCE FROM THE CARD.**
+			# `formless_pending` is what arms `formless_recoil` when the window
+			# lapses (the turn-start block); the rune never sets it, so the
+			# window simply ends. That is the exchange: two ticks instead of the
+			# card's four, and a guard he no longer gets to change.
+			#
+			# **THE DISCIPLINE ACCUMULATION SURVIVES**, because
+			# `_swordmaster_switch` is what throws it away and this does not call
+			# it. A Swordmaster holding this rune keeps building Discipline
+			# through his Guard Changes, which is the clearest statement of what
+			# the rune traded — and `_stance_satisfies` reads `formless` as BOTH
+			# (a single string cannot, which is why that helper exists), so
+			# Sever's aggressive gate still opens while the window holds.
+			if attacker.rune_open_line > 0:
+				_apply_status(attacker, "formless", 2)
+				attacker.float_text("OPEN LINE", Color(0.65, 0.95, 1.0))
+				_log("%s: Rune: the Open Line — no guard changes; he holds BOTH guards for a turn" % \
+					attacker.unit_name, "#7cc8f0")
+			else:
+				_swordmaster_switch(attacker)
 			# The pivot presses the opening he already made: 15 BD to the
 			# un-Broken enemy nearest to Breaking (auto-picked — the ability
 			# takes no target, keeping autoplay await-free). SUNDER GUARD
@@ -20323,6 +21083,37 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_apply_status(target, "chilled", 3, 0, 0, attacker)
 				_note_debuff_applied(attacker, "chilled")
 			_hold_freeze(target, attacker)
+			# BATCH FK — THE RUNE OF THE GLASS PRISON. A SECOND body is sealed,
+			# and both cells are glass: any damage shatters them.
+			#
+			# **IT RAISES `_hold_limit`, WHICH IS THE ONLY HONEST WAY TO DO IT.**
+			# The limit is enforced by an eviction loop at the bottom of
+			# `_hold_freeze` — seal a second enemy without moving the limit and
+			# the first is evicted on the spot, which is exactly the Frostbind
+			# defect BATCH CB found by driving the card rather than reading it.
+			# `rune_glass_prison` is read by `_hold_limit` itself, so Second
+			# Prison and Absolute Zero compose with it rather than colliding.
+			#
+			# **AND THE TRADEOFF IS REAL RATHER THAN COSMETIC**: `glass_hold` is
+			# stamped on both bodies, and `take_hit` releasing on the first point
+			# of damage is what a hold normally refuses — an ally's cleave, a
+			# DoT tick or a stray AoE now spends the prison the Cryomancer paid
+			# for. Half the depth is the `hold_turns` seed below.
+			if attacker.rune_glass_prison > 0:
+				target.glass_hold = true
+				var gp_pool: Array = enemies.filter(
+					func(e): return not e.dead and e != target and not _is_held(e))
+				if gp_pool.is_empty():
+					_log("   → Rune: the Glass Prison finds no second body to seal", "#909090")
+				else:
+					var gp_second: BattleUnit = gp_pool.pick_random()
+					if not gp_second.has_status("chilled"):
+						_apply_status(gp_second, "chilled", 3, 0, 0, attacker)
+						_note_debuff_applied(attacker, "chilled")
+					_hold_freeze(gp_second, attacker)
+					gp_second.glass_hold = true
+					_log("   → Rune: the Glass Prison — %s is sealed as well, and BOTH cells are glass" % \
+						gp_second.unit_name, "#7cc8f0")
 		"cryoclasm":
 			# Thaw row 4: CONTROL AS A VERB — the lockdown relocates without
 			# being spent. Deliberately NOT routed through _hold_release: a move
@@ -20478,6 +21269,33 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
 			_stat_heal(attacker, dp_got, target)
 			_vestments_ward(attacker, target, dp_got)
+			# BATCH FK — THE RUNE OF THE OPEN HAND. The named ally is healed by
+			# the card exactly as it always was; the rune adds every OTHER ally
+			# already under the Mercy line, at the same full heal.
+			#
+			# **IT READS `mercy_threshold` RATHER THAN A LITERAL HALF**, which is
+			# Shared Grief's own rule at this same engine: Guardian Angel moves
+			# that line party-wide, and a card that read 0.5 while the passive
+			# read 0.51 would grant Mercy for a fall it then refused to answer.
+			#
+			# **THE EMPOWERED CLEANSE AND WARD ARE NOT WIDENED**, deliberately.
+			# The rune's sentence is "heals every ally below half to full", and
+			# spreading the Hallowed as well would be a second card riding in on
+			# the first — the same displacement FE §1 refused for `bared_plate`.
+			if attacker.rune_open_hand > 0:
+				for oh_h in heroes:
+					if oh_h.dead or oh_h.is_companion or oh_h == target:
+						continue
+					if oh_h.hp > oh_h.max_hp * oh_h.mercy_threshold:
+						continue
+					var oh_got: int = oh_h.heal_amount(oh_h.max_hp, oh_h != attacker)
+					if oh_got <= 0:
+						continue
+					oh_h.float_text("+%d" % oh_got, Color(0.4, 0.9, 0.45))
+					_stat_heal(attacker, oh_got, oh_h)
+					_vestments_ward(attacker, oh_h, oh_got)
+					_log("   → Rune: the Open Hand — %s is raised as well (+%d)" % [
+						oh_h.unit_name, oh_got], "#70d878")
 			var dp_note := ""
 			if empowered:
 				var dp_purged := target.purge_debuffs()
@@ -21923,6 +22741,19 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 		return
 	var tick := maxi(int(round(0.03 * src.attack)), 1) + src.potent_ranks \
 		+ src.rune_potent_ranks
+	# BATCH FK — THE RUNE OF THIN BLOOD'S PRICE. His Poison deals NO damage: the
+	# affliction still lands, still counts toward Trapper's breadth, still feeds
+	# Cull, Harvest, Vulture and every carrier — it simply stops biting. That is
+	# the trade the rune names, and it is written as the TICK going to zero
+	# rather than as the status not being applied, because the whole upside
+	# (a barb on EVERY strike) is worthless if the barbs are not really there.
+	#
+	# **ZERO, NOT ONE.** The `maxi(..., 1)` floor above is what keeps an ordinary
+	# poison from rounding away to nothing on a small Attack; overriding it after
+	# the fact is the only way to say "no damage" without teaching that floor an
+	# exception it would carry for every other caster.
+	if src.rune_thin_blood > 0:
+		tick = 0
 	var p_turns := turns
 	var sticky := false
 	if src.slow_acting > 0:
@@ -21930,9 +22761,21 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 		if p_turns > 0:
 			p_turns *= 2
 		sticky = true
+	# BATCH FK — THE RUNE OF THE LONG POISON, written BESIDE Perfected Toxin
+	# rather than folded into it. **THE CAPSTONE ALREADY MAKES HIS POISON
+	# PERMANENT** ("cannot be cleansed, never expires, and its tick rises") —
+	# see `docs/reports/FK.md` §8, where this overlap is reported rather than
+	# quietly resolved. The rune buys the FIRST of those three clauses and
+	# neither of the other two, so a Survivalist holding the capstone gains
+	# nothing from it and one who has not taken the Venom lane gains the whole
+	# permanence. `sticky` is deliberately NOT set here: that flag is what makes
+	# a poison uncleansable, and taking cleansing off the table is the
+	# capstone's, not this rune's.
 	if src.perfected_toxin > 0:
 		p_turns = -1
 		sticky = true
+	elif src.rune_long_poison > 0:
+		p_turns = -1
 	for _i in 1 + src.virulence_ranks:
 		_apply_status(victim, "poison", p_turns, 0, tick, src)
 	var ps: Dictionary = victim.get_status("poison")
@@ -22845,6 +23688,25 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# BJ §3a: an enemy BLEEDING OUT is the Berserker's signature
 			# moment (banked only when one stands — the _sig slice rule).
 			_sig("bloodrage")
+			# BATCH FK — THE RUNE OF THE SLAUGHTERHOUSE, at the ONE bleedout
+			# path in the game. It is here rather than at Gut Rip or at the
+			# strike loop for the reason the node three screens up is here: this
+			# is where a bleedout IS, so every route to one pays — a meter that
+			# filled on its own, Gut Rip's forced burst, the Exsanguination
+			# capstone's deeper bite and Arterial Spray's chain alike.
+			#
+			# **IT CHAINS WITH EXSANGUINATION AND IS BOUNDED ANYWAY.** Both hang
+			# off this same event, so a capstone Berserker's bleedouts are worth
+			# more AND arrive more often — but `free_action_taken` is cleared at
+			# his turn start, so the loop is one extra turn per turn regardless
+			# of how many wounds open. The rune reads the WEARER through
+			# `_living_hero_with`, exactly as the node's own clause does, because
+			# `_add_bleed_with_burst` is called from sites that do not carry him.
+			var butcher_rune := _living_hero_with("rune_bleedout_action")
+			if butcher_rune != null and not butcher_rune.free_action_taken:
+				butcher_rune.free_action_taken = true
+				_grant_free_action(butcher_rune, "SLAUGHTERHOUSE",
+					"Rune: the Slaughterhouse — the kill is an opening")
 			# BATCH BW — BLOOD DEBT COLLECTS, and it sits beside Bloodcraze
 			# because it is the marked version of the same idea at much larger
 			# scale (holding both is a real sustain build).

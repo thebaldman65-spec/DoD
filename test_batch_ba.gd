@@ -415,7 +415,10 @@ func _rune_audit() -> void:
 		if String(pool[id].get("scope", "")) == "spec:mystic":
 			mystic.append(id)
 	mystic.sort()
-	ok(mystic.size() == 4, "four spec:mystic runes (got %d)" % mystic.size())
+	# **BATCH FK MOVED IT 4 -> 9** — BA's four retired plus FK's five. The walk
+	# reads the FILE, retired included; the per-field assertions below are the
+	# claim, and this count is what catches a set going missing.
+	ok(mystic.size() == 9, "nine spec:mystic runes (got %d)" % mystic.size())
 	# EACH STILL PAYS EXACTLY WHAT ITS TEXT ADVERTISES — only the units moved.
 	var lh: Dictionary = pool["long_hunt"]["payload"]["stat"]
 	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes

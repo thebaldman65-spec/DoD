@@ -2628,17 +2628,37 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
-<br><b>THE FIRST TWENTY-ONE RUNES ARE AUTHORED (Batch EZ). 87 ENTRIES: 66 RETIRED, AND
-21 LIVE ONES ACROSS FOUR SPECS.</b> The Occultist, the Warden and the Sharpshooter have five
-each and the Beastmaster six. <b>Batch FC retired the twenty-second &mdash; Split Tongue &mdash;
+<br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK. 126 ENTRIES: 66 RETIRED, AND
+60 LIVE ONES ACROSS ALL TWELVE.</b> Nine specs have five, the Beastmaster six, and the
+Devout four &mdash; <b>his fifth is OWED, not missing</b>, and the reason is in
+<code>docs/reports/FK.md</code> &sect;7: the rune authored for that slot said
+<i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its caster&rdquo;</i>
+and that has been <b>the base kit since Batch AW &sect;2</b>, so it would have shipped 100% inert.
+<b><code>check_fk</code> &sect;6 asserts the absence AND the two code facts that cause it</b>, so
+the day a batch narrows the ground to its caster the gate says the rune is authorable.
+<b>Batch FC retired the twenty-second &mdash; Split Tongue &mdash;
 and authored the Shared Ruin in its place</b>, so the file grew by one entry (a
 retirement is KEPT and said to be kept) while the live count stayed at twenty-one. <b>65 of the 66
 retirements are ET's and EO's; FC's is the first of a later vintage</b>, and the three walks that
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
 their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
 price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
-SPEC ONLY for all twenty-one</b>; eight specs are still unauthored, and a hero of one of those
-eight still draws nothing but the generated stat family.
+SPEC ONLY for all sixty</b>, and every hero in the game now draws an authored pool rather than the
+generated stat family alone.
+<br><b>THE TWO GATED SECONDARIES ARE RETIRED GOING FORWARD (Batch FK, ruled by the designer).</b>
+<b>THRESHOLD and BREADTH are not authored again.</b> A gated rune at a flat price is strictly worse
+than a bare one &mdash; the price does not fall to pay for the condition &mdash; and FJ measured
+the constraints as unworkable besides: <b>BREAK can never carry a threshold anywhere in the game</b>
+(zero of the 227 tagged cards carry it as a PRIMARY), <b>the Devout can never satisfy a breadth</b>
+(his whole earnable pool holds two distinct primary tags), and <b>a condition can be live at one
+rung of the ladder and dead at the next</b> (the Holy's breadth is satisfiable at exactly six
+drafted cards; the Swordmaster's fails at exactly five). <b>TRADEOFF SURVIVES</b> &mdash; a cost
+paired with a bigger upside is self-balancing and reads on the card &mdash; and <b>eight of FK's
+thirty-nine carry one</b>, against the four the first twenty-one had.
+<b>THE SIX ALREADY-SHIPPED GATED RUNES ARE NOT REPAIRED AND ARE OWED</b>; the machinery below is
+unchanged and still reads exactly as it did, because six live runes still come through it.
+<code>check_fk</code> &sect;2 asserts those six are <b>still gated</b>, so &ldquo;none is
+authored&rdquo; cannot be satisfied by quietly ungating the ones that are owed a fix.
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY (Batch EZ §0).</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
 it, if anything &mdash; <b>THRESHOLD, BREADTH or TRADEOFF</b>. A rune may carry more than one, or

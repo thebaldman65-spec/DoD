@@ -602,5 +602,261 @@
 		"price": 100,
 		"desc": "+30% companion damage — but the companion can no longer be healed.",
 		"payload": {"stat": {"rune_bared_fang": 0.30}}
+	},
+
+	"last_word": {
+		"name": "Last Word", "scope": "spec:berserker",
+		"price": 100,
+		"desc": "Every time he is brought below a quarter health, he acts immediately. Healing back up and diving again re-arms it.",
+		"payload": {"stat": {"rune_last_word": 1}}
+	},
+	"blood_debt_rune": {
+		"name": "Blood Debt", "scope": "spec:berserker",
+		"price": 100,
+		"requires_ability": "Blood Price",
+		"desc": "Blood Price costs the ENEMY's health instead of his — and their missing health becomes his Frenzy steps.",
+		"payload": {"stat": {"rune_blood_debt": 1}}
+	},
+	"butchers_bill": {
+		"name": "Butcher's Bill", "scope": "spec:berserker",
+		"price": 100,
+		"requires_ability": "Hack and Slash",
+		"desc": "Landing a Bleed with Hack and Slash has a 50% chance to add another strike — once a cast.",
+		"payload": {"stat": {"rune_butchers_bill": 50}}
+	},
+	"open_vein": {
+		"name": "Open Vein", "scope": "spec:berserker",
+		"price": 100,
+		"desc": "Rage he spends counts DOUBLE toward Blood Frenzy. The band still caps at 20 steps — it fills sooner, never deeper.",
+		"payload": {"stat": {"rune_open_vein": 1}}
+	},
+	"slaughterhouse_rune": {
+		"name": "Slaughterhouse", "scope": "spec:berserker",
+		"price": 100,
+		"desc": "An enemy that bleeds out grants him a free action — one a turn, however many wounds open.",
+		"payload": {"stat": {"rune_bleedout_action": 1}}
+	},
+
+	"long_fuse": {
+		"name": "Long Fuse", "scope": "spec:pyromancer",
+		"price": 100,
+		"desc": "Burn no longer counts down. Only consumption ends it.",
+		"payload": {"stat": {"rune_long_fuse": 1}}
+	},
+	"ashfall": {
+		"name": "Ashfall", "scope": "spec:pyromancer",
+		"price": 100,
+		"requires_ability": "Funeral Pyre",
+		"desc": "Funeral Pyre shields for what the Burn would still deal WITHOUT consuming it — and so refunds no Mana.",
+		"payload": {"stat": {"rune_ashfall": 1}}
+	},
+	"chain_fire": {
+		"name": "Chain Fire", "scope": "spec:pyromancer",
+		"price": 100,
+		"requires_ability": "Firedraw",
+		"desc": "Firedraw pulls ALL the Burn from every other enemy onto the target instead of a fixed amount from each.",
+		"payload": {"stat": {"rune_chain_fire": 1}}
+	},
+	"ember_leap": {
+		"name": "Ember Leap", "scope": "spec:pyromancer",
+		"price": 100,
+		"desc": "When Burn is consumed, the fire jumps to the enemy carrying the LEAST Burn, at half the turns.",
+		"payload": {"stat": {"rune_ember_leap": 1}}
+	},
+	"pyre_debt": {
+		"name": "Pyre Debt", "scope": "spec:pyromancer",
+		"price": 100,
+		"desc": "Overburn refunds DOUBLE — but the fire he takes back burns him for a tenth of it.",
+		"payload": {"stat": {"rune_pyre_debt": 10}}
+	},
+
+	"second_winter": {
+		"name": "Second Winter", "scope": "spec:cryomancer",
+		"price": 100,
+		"desc": "Breaking a hold leaves the enemy Chilled to the depth the hold was worth, instead of on one stack.",
+		"payload": {"stat": {"rune_second_winter": 1}}
+	},
+	"killing_cold_fk": {
+		"name": "Killing Cold", "scope": "spec:cryomancer",
+		"price": 100,
+		"desc": "An enemy at maximum Chill takes 5% of its maximum health per Chilled stack whenever he casts.",
+		"payload": {"stat": {"rune_killing_cold": 5}}
+	},
+	"glass_prison": {
+		"name": "Glass Prison", "scope": "spec:cryomancer",
+		"price": 100,
+		"requires_ability": "Glacial Prison",
+		"desc": "Glacial Prison holds TWO enemies — and both cells are glass: any damage shatters them.",
+		"payload": {"stat": {"rune_glass_prison": 1}}
+	},
+	"cold_snap_fk": {
+		"name": "Cold Snap", "scope": "spec:cryomancer",
+		"price": 100,
+		"requires_ability": "Ice Lance",
+		"desc": "Ice Lance strikes EVERY Chilled enemy instead of one.",
+		"payload": {"stat": {"rune_cold_snap": 1}}
+	},
+	"deep_cold": {
+		"name": "Deep Cold", "scope": "spec:cryomancer",
+		"price": 100,
+		"desc": "Chilled stacks he applies no longer cap at four.",
+		"payload": {"stat": {"rune_deep_cold": 1}}
+	},
+
+	"resonant_core_fk": {
+		"name": "Resonant Core", "scope": "spec:arcanist",
+		"price": 100,
+		"desc": "A tenth of his Resonance carries into the next battle.",
+		"payload": {"stat": {"rune_resonant_carry": 10}}
+	},
+	"half_note": {
+		"name": "Half Note", "scope": "spec:arcanist",
+		"price": 100,
+		"requires_ability": "Arcane Bolt",
+		"desc": "Arcane Bolt keeps THREE QUARTERS of the meter instead of half.",
+		"payload": {"stat": {"rune_half_note": 25}}
+	},
+	"overtone": {
+		"name": "Overtone", "scope": "spec:arcanist",
+		"price": 100,
+		"desc": "Every third cast builds DOUBLE Resonance.",
+		"payload": {"stat": {"rune_overtone": 3}}
+	},
+	"dissonance": {
+		"name": "Dissonance", "scope": "spec:arcanist",
+		"price": 100,
+		"desc": "The damage curve reads TWICE his Resonance — and so does the taken curve.",
+		"payload": {"stat": {"rune_dissonance": 1}}
+	},
+	"overflow": {
+		"name": "Overflow", "scope": "spec:arcanist",
+		"price": 100,
+		"desc": "A crit builds THREE stacks instead of two.",
+		"payload": {"stat": {"rune_overflow": 1}}
+	},
+
+	"whetstone": {
+		"name": "Whetstone", "scope": "spec:swordmaster",
+		"price": 100,
+		"desc": "The Aggressive bonus grows 3% for each turn he stays in it, and resets on a switch.",
+		"payload": {"stat": {"rune_growing_edge": 1, "rune_seasoned_off_bonus": 0.03}}
+	},
+	"mirror_guard": {
+		"name": "Mirror Guard", "scope": "spec:swordmaster",
+		"price": 100,
+		"desc": "While Defensive, damage he blocks or parries is dealt back at HALF.",
+		"payload": {"stat": {"rune_mirror_guard": 50}}
+	},
+	"open_line": {
+		"name": "Open Line", "scope": "spec:swordmaster",
+		"price": 100,
+		"requires_ability": "Guard Change",
+		"desc": "Guard Change no longer switches stance — it grants BOTH stances' upsides for a turn, and no recoil.",
+		"payload": {"stat": {"rune_open_line": 1}}
+	},
+	"long_blade": {
+		"name": "Long Blade", "scope": "spec:swordmaster",
+		"price": 100,
+		"requires_ability": "Sever",
+		"desc": "Sever's cooldown clears on ANY Broken enemy, not only the one it struck.",
+		"payload": {"stat": {"rune_long_blade": 1}}
+	},
+	"naked_blade": {
+		"name": "Naked Blade", "scope": "spec:swordmaster",
+		"price": 100,
+		"desc": "Both stances' upsides are DOUBLED — and both downsides with them.",
+		"payload": {"stat": {"rune_naked_blade": 1}}
+	},
+
+	"vigil": {
+		"name": "Vigil", "scope": "spec:holy",
+		"price": 100,
+		"desc": "Mercy also accrues when an ally is healed from below half back above it.",
+		"payload": {"stat": {"rune_vigil": 1}}
+	},
+	"open_hand_fk": {
+		"name": "Open Hand", "scope": "spec:holy",
+		"price": 100,
+		"requires_ability": "Divine Plea",
+		"desc": "Divine Plea heals EVERY ally below half to full, not only one.",
+		"payload": {"stat": {"rune_open_hand": 1}}
+	},
+	"long_watch_holy": {
+		"name": "Carried Mercy", "scope": "spec:holy",
+		"price": 100,
+		"desc": "Mercy no longer clears between battles.",
+		"payload": {"stat": {"rune_long_watch_mercy": 1}}
+	},
+	"grace": {
+		"name": "Grace", "scope": "spec:holy",
+		"price": 100,
+		"requires_ability": "Hymn of Hope",
+		"desc": "Hymn of Hope's healing is dealt again at the end of the turn, at half.",
+		"payload": {"stat": {"rune_grace": 50}}
+	},
+	"martyr_fk": {
+		"name": "Martyr", "scope": "spec:holy",
+		"price": 100,
+		"desc": "He gains Mercy when an enemy strikes him — but he can no longer be healed by anyone but himself.",
+		"payload": {"stat": {"rune_martyr": 1}}
+	},
+
+	"layered_aegis": {
+		"name": "Layered Aegis", "scope": "spec:inquisitor",
+		"price": 100,
+		"requires_ability": "Divine Shield",
+		"desc": "Divine Shield holds on TWO allies instead of one — the second is whoever is lowest.",
+		"payload": {"stat": {"rune_layered_aegis": 1}}
+	},
+	"deep_absorb": {
+		"name": "Deep Absorb", "scope": "spec:inquisitor",
+		"price": 100,
+		"desc": "An absorb grants 3 Faith instead of 2.",
+		"payload": {"stat": {"rune_deep_absorb": 1}}
+	},
+	"fourth_stack": {
+		"name": "Fourth Stack", "scope": "spec:inquisitor",
+		"price": 100,
+		"desc": "Allies hold FOUR stacks of Faith before releasing instead of three.",
+		"payload": {"stat": {"rune_fourth_stack": 1}}
+	},
+	"bare_altar": {
+		"name": "Bare Altar", "scope": "spec:inquisitor",
+		"price": 100,
+		"desc": "Faith builds TWICE as fast — and Divine Shield absorbs half as much.",
+		"payload": {"stat": {"rune_bare_altar": 1}}
+	},
+
+	"long_poison": {
+		"name": "Long Poison", "scope": "spec:mystic",
+		"price": 100,
+		"desc": "His Poison never expires. It can still be cleansed.",
+		"payload": {"stat": {"rune_long_poison": 1}}
+	},
+	"second_barb": {
+		"name": "Second Barb", "scope": "spec:mystic",
+		"price": 100,
+		"desc": "An enemy that strikes him takes a DIFFERENT affliction each time, cycling as Stalking Horse does.",
+		"payload": {"stat": {"rune_second_barb": 1}}
+	},
+	"full_board": {
+		"name": "Full Board", "scope": "spec:mystic",
+		"price": 100,
+		"requires_ability": "Cull",
+		"desc": "Cull bills for the whole board and no longer consumes it.",
+		"payload": {"stat": {"rune_full_board": 1}}
+	},
+	"carrion": {
+		"name": "Carrion", "scope": "spec:mystic",
+		"price": 100,
+		"requires_ability": "Downwind",
+		"desc": "Downwind copies onto EVERY other enemy, not one.",
+		"payload": {"stat": {"rune_carrion": 1}}
+	},
+	"thin_blood": {
+		"name": "Thin Blood", "scope": "spec:mystic",
+		"price": 100,
+		"desc": "The barb fires on EVERY strike instead of a quarter — and his Poison deals no damage.",
+		"payload": {"stat": {"rune_thin_blood": 1}}
 	}
 }

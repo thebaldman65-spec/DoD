@@ -316,8 +316,17 @@ func _the_condition_is_at_the_gate() -> void:
 	# BATCH DC: CZ §2 replaced the literal 5 with the named threshold — the walk
 	# gates on `FAITH_RELEASE` now, so the assertion names it too. A suite that
 	# pinned the digit would have to be repaired again on the next ruling.
-	ok(src.contains("or h.faith_stacks >= FAITH_RELEASE:"),
+	# BATCH FK: the Rune of the Fourth Stack moves the release threshold, so the
+	# walk gates on a LOCAL now — and the local is asserted to be derived from
+	# the named constant rather than from a digit, which is CZ §2's rule taken
+	# one layer further. **BOTH ARMS, because either alone is weak**: the first
+	# alone would pass on `>= 4`, and the second alone would pass on a walk that
+	# had stopped reading the threshold at all.
+	ok(src.contains("or u.faith_stacks < f_release:") \
+			and src.contains("or h.faith_stacks >= f_release:"),
 		"§2: an ally AT THE THRESHOLD is skipped by the Communion walk")
+	ok(src.contains("var f_release := FAITH_RELEASE + devout.rune_fourth_stack"),
+		"§2: ...and the threshold is still DERIVED from FAITH_RELEASE, not a digit")
 	# It sits on the EXISTING gate rather than beside it, so there is still one
 	# place the walk decides who is eligible.
 	ok(src.contains("if h == u or h.dead or h.is_companion or h.faith_stacks <= 0 \\"),
