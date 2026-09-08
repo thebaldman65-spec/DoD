@@ -5,96 +5,163 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-09-08 (Batch FK).*
+**AND HOW A BATCH COMES TO EXIST BELONGS IN `docs/ways-of-working.md` (FL §1)** — design settled
+before a brief is written, a recon read before content is authored, findings routed to the queue
+below rather than to the designer, and implementation calls made by the batch. **It binds the
+conversation UPSTREAM of a brief, which neither `CLAUDE.md` nor `docs/instrument-rules.md` has ever
+covered. Read it before writing a brief, not after.** *This pointer is in the preamble rather than
+in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
+last exactly one.*
+
+*Last rewritten: 2026-09-08 (Batch FL).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FK — FORTY RUNES, EIGHT SPECS. THIRTY-NINE SHIPPED AND ONE IS OWED.** The pool
-  goes from **21 live to 60**, and **every one of the twelve specs now has an authored set** —
-  five apiece, six for the Beastmaster, four for the Devout. **Price is 100g flat and scope is
-  spec only**, unchanged. Full working: **`docs/reports/FK.md`**.
-- **§0 — SIX OF THE BRIEF'S SIXTEEN CHECKABLE PREMISES WERE FALSE, AND ONE OF THEM COST A
-  RUNE.** The brief said `Backdraft` is a live talent NODE in the Pyromancer's Inferno lane; it is
-  a live **draft card**, which is a closer collision than the one it named. It said the Arcanist's
-  `Resonant Core` is a retired rune's name and therefore **free**; it is also a **live talent node
-  in his own Resonance lane**. And two claims about the Devout were false together — see below.
-- **§0a — A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE.** The brief said
-  three times that a retired name is free (`Killing Cold`, `Resonant Core`, `Open Hand`,
-  `Long Watch`, `Martyr`) and wrote all forty as *"Rune of the X"*. **`test_runes` pins
-  display-name uniqueness across the WHOLE file, retired included** — ES §1 made that load-bearing
-  when `display_name` stopped adding a prefix, and a retired entry still resolves through
-  `config`/`build`/`display_name` — and **`check_fd` §3 pins that `Rune of the …` is the RETIRED
-  pool's shape**, which every one of the 21 live runes already avoids. **Bare-naming the
-  thirty-nine closed both at a stroke**, and forced exactly one rename: bare, the Holy's
-  `Long Watch` is byte-identical to the Warden's, so it is **`Carried Mercy`**. **Neither premise
-  was reachable by a name sweep** — both are about the pool's own conventions rather than the
-  roster.
-- **§1 — THE RUNE OF THE STANDING GROUND IS NOT SHIPPED, AND THAT IS THE BATCH'S SHARPEST
-  FINDING.** Its clause — *"Consecrated Ground grants Faith to allies standing in it, not only to
-  its caster"* — **is the base kit and has been since Batch AW §2**: the `cons_ground` handler
-  stamps **every living non-companion hero**, and `_ground_faith_tick` pays whichever hero holds
-  it. The rune would have installed and changed nothing. **And the brief's stated reason to worry
-  about it is false too**: *"Fervor is the node that already extends the ground to allies"* —
-  Fervor's own text says **"It grants no extra Faith at all."** It is a payout multiplier. The
-  brief's own ruling settles it: *a rune that ships inert is worse than one that does not ship*,
-  and *nothing here may be altered by a batch*. **`check_fk` §6 asserts BOTH the absence and the
-  REASON**, so the day a batch narrows the ground to its caster the gate says the rune is
-  authorable rather than a report nobody re-reads saying so. **Two alternatives are priced in
-  `docs/reports/FK.md` §7 and neither is recommended over the other — it is the designer's.**
-- **§2 — THE NAME SWEEP FOUND TEN EXACT COLLISIONS AND THE BRIEF NAMED FIVE.** All 40 were swept
-  against **708 live and retired names** dumped from a running engine — 227 abilities, 324 talent
-  nodes, 87 rune entries, the statuses and the lane names — with a near-miss treated as a hit.
-  **The three the brief did not name are `Cold Snap`, `Grace` and `Vigil`, and all three are
-  SAME-SPEC** (a Deep Freeze node, a Mercy node, and the Holy's own lane). **One rename, nine
-  ship**, which is BR §1's own rule: only an ability-vs-ability duplicate breaks a resolver.
-  **`Rune of the Backdraft` → `RUNE OF THE EMBER LEAP`**, swept clean —
-  **and `test_batch_cb` has been asserting since batch CB that the node `py_melt`
-  *"no longer collides with the card name"* and that *"Backdraft is a DRAFT card now"*, so the
-  brief's premise describes a state the project deliberately repaired several batches ago.**
-- **§3 — EVERY ONE OF THE FORTY NEEDED CODE, AND THAT IS THE ANSWER TO THE BRIEF'S QUESTION.**
-  The eight specs hold **34 idle `rune_*` fields** between them and **exactly one of the
-  thirty-nine reaches one** — the Whetstone, onto `rune_seasoned_off_bonus` — and even that
-  needed a second field and a turn counter to mean *"grows"*. **Thirty-nine new fields, forty
-  payload terms**, all declared, all read, all in `Runes.STAT_INT_KEYS` except the one deliberate
-  float.
-- **§4 — NO THRESHOLD AND NO BREADTH IS AUTHORED. EIGHT TRADEOFFS ARE.** The designer retired both
-  gated secondaries going forward. **The six already-shipped gated runes are NOT repaired** and are
-  owed to the next batch — `check_fk` §2 asserts they are **still gated**, because "none is
-  authored" must not be satisfiable by quietly ungating the six that are owed a fix.
-- **§5 — THREE RUNES OVERLAP SOMETHING ALREADY SHIPPED, ALL THREE SHIP, AND ALL THREE ARE NAMED.**
-  **The Rune of the Long Poison is one clause of the `Perfected Toxin` capstone** (*"cannot be
-  cleansed, never expires, and its tick rises"*) and **goes fully inert under it** — the answer to
-  the brief's *"which of the five go inert under the capstone"*, for a capstone the brief did not
-  ask about. (Under **Force of Nature**, the one it did ask about, the answer is **none**: not one
-  of the five is written against Trapper's +8% step.) The Layered Aegis sits beside Radient Aegis
-  and is unconditional where the node is a roll; the Open Line reuses `formless` and pays no
-  recoil.
-- **§6 — ONE LOOP CHANGED SHAPE AND ONE PIN CAUGHT IT.** `for hit_i in total_hits:` evaluates its
-  range once, so the Butcher's Bill — which adds a strike from *inside* the body — would have
-  raised a number nothing read. It is a `while` with the increment at the top now.
-  **`test_batch_br` §1 slices the loop body by finding that header** and its own
-  `ok(loop_start > 0, "the hit loop is locatable")` is what said so.
-- **WHAT MOVED:** `scripts/battle.gd`, `scripts/unit.gd`, `scripts/runes.gd`, `data/runes.json`
-  (**+256 lines, zero deletions** — appended in the file's own hand-written style, not re-dumped),
-  **`check_fk.gd` is NEW**, and the gates and suites named in the report's §10.
-- **Next letter: FL.**
-- **`CLAUDE.md` IS AT 271.74 KiB AGAINST A 290 KiB CEILING; `docs/instrument-rules.md` IS AT
-  109.15 KiB AND HAS NO STATED CEILING.** Headroom is **18.26 KiB**. `docs/changelog.html` is at
-  **181.52 KiB** against CW §4's 400 KB threshold. **`check_fg` measures both every battery and this
-  file does not have to remember to.**
+- **Last batch: FL — THE WAYS OF WORKING, AND AN AUDIT OF WHAT IS ALREADY RECORDED.**
+  **Documentation only: no code, no data, no rune, no magnitude, no gate.** Two halves — a new
+  file recording rules that had never been written down anywhere, and an audit of what already
+  had been. Full working: **`docs/reports/FL.md`**.
+- **`docs/ways-of-working.md` IS NEW, AND IT IS NOT A THIRD SEAM OF THE RULE TREE.** `CLAUDE.md`
+  binds what the game may contain; `docs/instrument-rules.md` binds how a batch verifies itself.
+  **Both bind a batch that already HAS a brief. The new file binds the conversation upstream of
+  one** — how design is settled before a brief is written, what is read before content is
+  authored, and which decisions are the batch's rather than the designer's. **Six rules, none of
+  them recorded anywhere before.** `CLAUDE.md` gains a POINTER and not a summary, in its own
+  routing list; this file's pointer is at the foot of this block.
+- **§2 — EVERY ONE OF THE RUNE CHARTER'S SIX BULLETS WAS ALREADY RECORDED, SO THIS BATCH WROTE
+  NONE OF THEM AGAIN.** Where each lives is tabulated in `docs/reports/FL.md` §2 and is not
+  copied here. **The one worth knowing is that the PRIMARY / SECONDARY vocabulary is not in
+  `CLAUDE.md` at all** — it is in `docs/master.html` and in a source comment on
+  `Runes.RUNE_SHAPES` — **which is the seam working as written rather than a gap**, because a
+  vocabulary for describing content is not a rule about what the game may contain.
+- **§2a — THERE ARE EIGHT SHIPPED GATED RUNES, NOT SIX, AND THAT IS THE BATCH'S SHARPEST
+  FINDING.** Four THRESHOLD — **Deepening Hex, Bracing Line, Heavy Bolts, Answering Pack** — and
+  four BREADTH — **Wide Rite, Long Watch, Wide Watch, Shared Scent**. All eight are live, all
+  eight carry both their condition and their label, and **all eight are owed a re-read now that
+  the secondaries are retired**. **`check_fk.STILL_GATED` holds all eight and is right; ELEVEN
+  LINES ACROSS FIVE FILES SAY SIX** — five comments in `check_fk.gd`, one in `scripts/runes.gd`,
+  three lines of `docs/master.html`, `docs/changelog.html`'s FK entry and `docs/reports/FK.md` §9.
+  **The number is right in the one place that is asserted and wrong in every place that is read.**
+  **The count is taken from a census, not a hand-tally** — the first pass through this said nine,
+  and `check_fk.gd` alone holds five. Only this file is corrected; **the eleven are listed in
+  `docs/reports/FL.md` §2a and are owed as one scoped repair**, because fixing some of eleven
+  makes the disagreement worse rather than better.
+- **§2b — THE 8.98% IS NOT THE FIGURE IT IS QUOTED AS, AND THIS ONE CHANGES WHAT THE REPAIR
+  BATCH HAS TO DO.** **Bracing Line carries TWO gates, not one**: the retired `tag_threshold` at
+  the SPAWN (`Talents.condition_met`, which returns before `apply_payload` writes the field) and
+  **Heavy Plating standing at +32% in the FIGHT** (`battle.gd`'s read site, which never sees the
+  threshold). **`docs/reports/EZ.md` §2b(i) measured the second, with the first assumed met** —
+  8.98% of incoming hits alone, 11.91% paired with the Standing Wall. **So 8.98% is the rate the
+  rune would pay at with the secondary REMOVED, not the rate it pays at today**; today's rate is
+  that figure times the chance the DEFENSE threshold holds, and is strictly lower. **Ungating it
+  does not invalidate what 32 was ruled against — it makes that figure true.** The level and the
+  condition were priced separately and only one of them is being retired.
+- **§2c — TWO THINGS ARE RECORDED IN ONLY ONE PLACE EACH, AND BOTH PLACES ARE CLOSED REPORTS.**
+  **(1) The `.docx` exports staying stale is recorded ONLY at `docs/reports/FH.md` §4**, and it
+  **contradicts `CLAUDE.md`'s *Working agreement* step (3)**, which requires rebuilding both on
+  every design change. A standing rule and a designer's ruling disagree, and the ruling is in the
+  one file class nothing sweeps. **Reported and NOT reconciled — reconciling them rewrites a
+  rule, which this batch was forbidden.** It is in the queue below. **(2) The generated stat
+  family's ORDER is recorded at `docs/spec-recon.html`, and its stated trigger has FIRED**: that
+  page says it comes out *"once the eight specs are authored"* and FK authored all eight. **This
+  file has carried a different trigger — *"once the pool is proven"* — which has not fired.** Two
+  triggers, one met and one not, and neither document knew about the other.
+- **§3 — THE `master.html` STAMP WAS TWO BATCHES STALE AND NOTHING COULD SEE IT.** It read
+  *Batch FI* while both FJ's and FK's edits were in the document. **The fourteen stamp readers
+  assert only that the stamp is no older than their own suite's batch code** — the durable shape
+  CN gave them on purpose, so that no bump is ever owed — **and the newest of the fourteen is
+  `ce`, so the stamp can sit roughly forty batches stale and pass every one of them.** Bumped to
+  FL, and the slack is recorded here rather than left to be rediscovered.
+- **WHAT MOVED:** `docs/ways-of-working.md` (**NEW**), `CLAUDE.md` (one pointer bullet, no rule
+  written or moved), `docs/master.html` (**the stamp line only**), `docs/changelog.html`, this
+  file, and `docs/reports/FL.md`. **No `.gd` file, no `.json` data file and no gate was touched**,
+  so `pin-manifest.json` and every baseline row are unmoved.
+- **Next letter: FM.**
+- **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
+  THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER
+  THE FIGURES** — read them off that gate's output rather than from here, which is why the live
+  numbers are no longer copied into this line. `docs/instrument-rules.md` still has no stated
+  ceiling. **`docs/ways-of-working.md` is new and small and is under neither**; a ceiling is
+  DERIVED and deriving one is a ruling.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **the rune layer is now authored for all twelve specs**
-  — 60 live against 66 retired. **What is left in the rune layer is the DEVOUT'S FIFTH (owed, with
-  two alternatives priced), the six shipped gated runes (owed), and the generated stat family
-  (comes out once the pool is proven).** `docs/spec-recon.html` is still the document authoring
-  reads, and **§7 of `docs/reports/FK.md` is the correction to it**: the recon named the Devout's
-  ground as a Faith engine and did not say it already reaches every hero. **The ladder still has an
-  open design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on
-  this list.**
+  purpose-authored and charter-clean, and **the rune layer is authored for all twelve specs** —
+  60 live against 66 retired. **What is left in the rune layer is the DEVOUT'S FIFTH (owed, with
+  two alternatives priced in `docs/reports/FK.md` §7), the EIGHT shipped gated runes (owed — see
+  §2a above for the count and §2b for what re-reading one actually costs), and the generated stat
+  family (whose two recorded triggers disagree — see §2c).** `docs/spec-recon.html` is still the
+  document authoring reads, and **§7 of `docs/reports/FK.md` is the correction to it**: the recon
+  named the Devout's ground as a Faith engine and did not say it already reaches every hero.
+  **The ladder still has an open design question of its own (what rung 2 should ASK), and it is
+  the largest unbuilt item on this list.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE RUNE LAYER'S FOUR OWED ITEMS — **CARRIED HERE AT FL BECAUSE THE WHERE BLOCK CANNOT HOLD THEM**
+
+**All four were recorded only in the WHERE block above, which is REPLACED every batch** — so each
+survived by whichever batch happened to re-copy it, which is not a mechanism. **They are queue
+items and they live here now.** None is a decision this file may take.
+
+- **THE EIGHT SHIPPED GATED RUNES NEED RE-READING, AND THE COUNT IS EIGHT.** Four THRESHOLD —
+  **Deepening Hex, Bracing Line, Heavy Bolts, Answering Pack** — and four BREADTH — **Wide Rite,
+  Long Watch, Wide Watch, Shared Scent**. The designer retired both secondaries going forward
+  (`docs/master.html` and the `Runes.RUNE_SHAPES` source comment carry the three reasons, which
+  are **FJ's**); these eight predate the ruling and still carry both their condition and their
+  label. **`check_fk` §2 asserts they are still gated, deliberately** — *"none is authored"* must
+  not be satisfiable by quietly ungating the ones that are owed a fix.
+  - **ELEVEN LINES ACROSS FIVE FILES SAY SIX AND ONLY THE ASSERTED LIST IS RIGHT.**
+    `check_fk.STILL_GATED` holds eight. The eleven, from a census rather than a hand-tally:
+    **`check_fk.gd` ×5** (lines 6, 8, 53, 134, 153), **`scripts/runes.gd` ×1** (536),
+    **`docs/master.html` ×3** (2658–2660, including *"because six live runes still come through
+    it"*), **`docs/changelog.html` ×1** (the FK entry) and **`docs/reports/FK.md` ×1** (§9).
+    **FL corrected this file only** — fixing some of eleven makes the disagreement worse.
+    **It is ONE scoped repair for whichever batch next touches that gate**,
+    and `check_fk.gd`'s own comments are inside it. **A `.gd` comment is an asserted surface, so
+    that repair owes a literal sweep and a subset battery even though it moves no code.**
+  - **AND RE-READING ONE IS NOT RE-PRICING IT.** See the Bracing Line entry below: at least one
+    of the eight has its magnitude priced against a DIFFERENT gate from the one being retired.
+- **BRACING LINE'S 8.98% PRICES THE LEVEL, NOT THE CONDITION — DO NOT QUOTE IT AS THE PAY RATE.**
+  The rune carries **two gates**: the retired `tag_threshold: DEFENSE` at the SPAWN
+  (`Talents.condition_met` returns before `apply_payload` writes `rune_bracing_line`) and **Heavy
+  Plating standing at +32% in the FIGHT** (`battle.gd`'s read site, which never sees the
+  threshold). **`docs/reports/EZ.md` §2b(i) measured the second with the first assumed met** —
+  8.98% of incoming hits alone, 11.91% paired with the Standing Wall, n = 200,000 an arm.
+  **So 8.98% is the rate the rune would pay at with the secondary REMOVED**; today's rate is that
+  figure times the chance the DEFENSE threshold holds, and is strictly lower. **Ungating it does
+  not invalidate what 32 was ruled against — it makes that figure true.** `BRACING_LINE_LEVEL` is
+  the constant and it is untouched.
+- **THE GENERATED STAT FAMILY HAS TWO RECORDED TRIGGERS AND THEY DISAGREE. ONE HAS FIRED.**
+  **`docs/spec-recon.html` says it comes out *"once the eight specs are authored"* — and FK
+  authored all eight, so by that wording it comes out now.** This file has carried *"once the pool
+  is proven"*, which has not fired and has no stated test. **The ORDER is the designer's ruling and
+  the reason is unchanged and good**: removing the floor before the pool exists leaves most parties
+  with nothing. **What is owed is which trigger was meant**, not whether the order stands. Until
+  it is answered the family stays and `Runes.TEMPLATE_PRICE` = 50 stays with it.
+- **THE `.docx` EXPORTS: A DESIGNER'S RULING AND A STANDING RULE DISAGREE, AND ONLY ONE OF THEM IS
+  SWEPT.** `CLAUDE.md`'s *Working agreement* step (3) requires rebuilding both via
+  `python3 docs/build_docs.py` on **every design change**. **The ruling that they stay stale is
+  recorded in exactly one place — `docs/reports/FH.md` §4 — a closed report**, which is the one
+  file class no instrument reads and no sweep covers. The exports are stale by construction and
+  nothing in the tree says so. **The reconciliation is a RULE EDIT and belongs to a batch that is
+  allowed to make one**: either the *Working agreement* gains the exception, or the exports come
+  back into the loop. **FL was forbidden to rewrite a rule, so it reported this rather than
+  taking it.**
+
+### THE `master.html` STAMP CAN SIT ~40 BATCHES STALE AND PASS — **NAMED AT FL §3, NOT FIXED**
+
+**Fourteen suites read the stamp and every one asks the same durable question**: that
+`docs/master.html` carries a `Last updated:` line, and that its batch code sorts **no older than
+the reading suite's own**. That shape is CN's and it is deliberate — the alternative was a literal
+that had to be hand-bumped every batch, which *"will be red most batches"* and stops carrying
+information. **The cost is that the newest of the fourteen is `ce`**, so any stamp from CE forward
+passes all fourteen. **FI's stamp survived FJ's and FK's edits to the document untouched**, and
+nothing went red. **Repairing it is not a matter of bumping the pin** — a suite that asserts the
+CURRENT batch code is the shape CN removed on purpose. **The question a fix has to ask is whether
+the stamp moved when the FILE moved**, which is a different instrument from the fourteen and needs
+git or an mtime, neither of which a `--script` gate has today. **Recorded with its reasoning so
+the priced alternative is not re-proposed as a discovery.**
 
 ### THE CHANGELOG CUT AND THE FOUR FALSE CLAIMS ARE BOTH TAKEN — **NOTHING IS OWED FROM EITHER**
 

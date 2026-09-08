@@ -25,6 +25,12 @@ describes what happened, it is not a rule and it does not belong here.
 - **How a batch VERIFIES itself** — the suites, the gates, the battery, `baselines.json`, the
   negative controls and the sweeps → **`docs/instrument-rules.md`**, split out of this file at
   EF §2. **This file stays the required read**; that one is the reference it points at.
+- **How a batch COMES TO EXIST** — how design is settled before a brief is written, what is read
+  before content is authored, and which decisions are the batch's rather than the designer's →
+  **`docs/ways-of-working.md`** (FL §1). **It is not a third seam of the rule tree**: every rule
+  about what the game may contain is still here, and every rule about how a batch verifies itself
+  is still in `docs/instrument-rules.md`. That file binds the conversation UPSTREAM of a brief,
+  which neither of these two has ever covered. **Nothing in it is summarised here.**
 
 **DO NOT ADD A BATCH BLOCK TO THIS FILE.** If a batch learns something that binds future
 work, add or amend a RULE here in the file's own voice — dateless, batch-agnostic, stated as
