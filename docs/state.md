@@ -13,102 +13,146 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-08 (Batch FO).*
+*Last rewritten: 2026-09-09 (Batch FP).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FO — TWO RUNES FN FLAGGED, RULED.** Deepening Hex subtracts 2 from the Ruin
-  threshold instead of setting it to 8, under a floor of 3; the Wide Watch is retired and the
-  Shared Mark replaces it; the `Overkill` collision is confirmed and ruled on by nothing. Full
-  working: **`docs/reports/FO.md`**.
-- **BOTH RUNES WERE WORTH EXACTLY ZERO TO A HERO HOLDING ONE TALENT NODE, AND IN BOTH CASES THE
-  CODE WAS CORRECT.** `mini(step, 8)` against a capstone installing 5 is 5 — and the `mini` was
-  written on purpose, to stop a rune sold as *deepening* the hex pushing detonation BACK. The Wide
-  Watch sat one `elif` above the arm Overkill reaches. **There was nothing to repair in either
-  handler; there were two decisions to take.**
-- **THE FLOOR IS THE PART THAT NEEDED DECIDING, AND IT IS A RULING RATHER THAN ARITHMETIC.**
-  `_gain_ruin` arms on `st % step == 0` and the chip prints `int(stacks / step)`, so ZERO throws —
-  **and any floor answers that; a floor chosen only to answer it is 1.** At a threshold of 1 every
-  stack detonates, which is a different mechanic wearing the same name. **`RUIN_FLOOR := 3` is the
-  exact bottom of the live tree** (Avatar of Ruin's 5 minus the rune's 2), so it changes nothing
-  today and forces the next batch that wants a shallower period to rule on it.
-- **AND A SUBTRACTION IS OPEN AT THE BOTTOM WHERE AN ASSIGNMENT IS NOT — WHICH RE-OPENS FN'S HOLE
-  BY A NEW ROUTE.** Nothing could compose with `mini(step, 8)` below 5; everything composes with a
-  subtraction, and **at the floor the rune is worth zero again.** `check_ez` §5's two assertions
-  are RE-POINTED, not deleted — 10 / 8 / **3**, plus a fourth arm for the floor — and `check_fo`
-  §1e adds the arm a property could never carry: **a STRICT inequality on both builds**, because
-  *never shallower* is satisfied by `mini` itself. **That is the arm that goes red the day
-  something else lowers the threshold.**
-- **THE BRIEF'S *"word for word"* WAS TRUE IN SUBSTANCE AND WRONG AS WORDED, AND THE WORDING IS THE
-  HALF THAT MATTERS.** Measured: the longest phrase the Overkill node's text and the Wide Watch's
-  `desc` share is **`rather than`**, and the node's clause appears verbatim in **zero** rune
-  descriptions. **What made the rune worth nothing was the CODE**, visible only from the handler —
-  the FK §7 Standing Ground shape. The retirement string says *authored against a base a node
-  already provided* and names the node, rather than repeating a claim a sweep refutes.
-- **THE SHARED MARK: 100g, `spec:sharpshooter`, PASSIVE — *"An ally attacking the enemy he last
-  attacked builds him 5 Focus."*** It reads `last_attack_target` (one definition of *the enemy he
-  is working*, shared with `_focus_mark`) and pays through `_gain_focus`, **proved behaviourally**
-  by parking the meter on Spray of Arrows' 50-point ceiling, which lives inside that function and
-  nowhere else. **The name is BARE**: all 60 live entries are, all 61 `Rune of the…` names are
-  retired, and a live long name would red `check_fd` §3.
-- **A COMPANION COUNTS AS AN ALLY, AND THE ARM IS UNREACHABLE IN A LEGAL RUN BY TWO INDEPENDENT
-  STRUCTURES.** A party is one of each class, the Sharpshooter IS the Hunter, and summoning is the
-  Beastmaster's exclusive axis (DR §1) — **so no beast can stand beside him.** The word stays ALLY
-  and `_companion_hit` calls the same function, because **the five recorded reasons a companion
-  cannot receive something are all about a RECIPIENT and here the companion is the ATTACKER**;
-  narrowing would need a sixth reason that is really a fact about the party. **DK §1 is met with a
-  MEASUREMENT**: `check_fo` §2g seats both Hunter specs through the fixture — an illegal party, and
-  it says so — summons a real Canis and reads the Focus arriving.
-- **THE NAME SWEEP FOUND NINETEEN NEAR-MISSES WHERE THE BRIEF NAMED FOUR, AND THE SHARPEST IS ONE
-  IT DID NOT NAME.** 1,363 labels, 0 exact and 0 containment for `Shared Mark`. **`Quarry's Mark`
-  is a live SHARPSHOOTER card in his own reachable pool, read by the very function the new rune
-  sits beside** — same spec, same mechanic, same meter. **It ships and is FLAGGED** (its status id
-  is `quarry`, not `mark`), which is BR §1's disposition for a label collision.
-- **§3 — THE `Overkill` COLLISION IS CONFIRMED AND NOTHING IS RENAMED.** `bz_warcry`
-  (berserker / Warpath / row 7) and `ss_overkill` (sharpshooter / **Penetration** / row 7).
-  **Its only home was a comment beside one of the two nodes, and that comment had the lane wrong** —
-  *Precision* for *Penetration*. The word is corrected; `check_fo` §3 asserts the pair off the trees
-  so the finding cannot evaporate into a closed report.
-- **TWO OF THE BRIEF'S PREMISES CREDITED FN WITH WORK THAT IS CX's AND FK's.** The Crushing Blow
-  ruling is **CX's** (it renamed the enemy ability) and the *"ten exact collisions where a brief
-  named five"* sweep is **FK's**; FN ran no name sweep. Neither cost anything — both METHODS are
-  right and both were run — but a batch taking either on trust would have cited the wrong report in
-  four documents. **`docs/reports/FO.md` §0 carries all 22 premises.**
-- **WHAT MOVED:** `data/runes.json` (Deepening Hex's `desc` and payload, the Wide Watch's `retired`
-  string, **one new entry — 126 → 127**); `scripts/battle.gd` (`RUIN_FLOOR`, `_ruin_threshold`,
-  `SHARED_MARK_FOCUS`, `_shared_mark_focus` and its two call sites), `scripts/unit.gd`
-  (`rune_hex_threshold` → **`rune_hex_deepen`**, and `rune_shared_mark`), `scripts/runes.gd`
-  (`STAT_INT_KEYS`, `RUNE_TAGS`, `RUNE_SHAPES`), `scripts/talents.gd` (**one comment word**:
-  Precision → Penetration); `check_ez.gd`, `check_es.gd`, `check_fe.gd`, `check_fn.gd`,
-  **`check_fo.gd` (NEW)**, `run_battery.sh`, `baselines.json`, `pin-manifest.json`; `CLAUDE.md`,
-  `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, `docs/spec-recon.html`, this
-  file and `docs/reports/FO.md`. **No card, ability, talent or constant moved** beyond §1's
-  threshold arithmetic — `BRACING_LINE_LEVEL` is still 32, `RUIN_THRESHOLD` still 10,
-  `FOCUS_CONVERT` still 100, and `avatar_ruin` still installs 5.
-- **Next letter: FP.**
+- **Last batch: FP — RECONNAISSANCE FOR THE CLASS MERGE. REPORT ONLY.** Nothing was authored,
+  merged, changed, retired or retuned; **no code moved, no gate was written, no `CLAUDE.md` rule
+  was added and no data file was touched.** The deliverable is **`docs/merge-recon.html`**, on
+  `spec-recon.html`'s pattern with self-contained sections, because it will be read many times
+  across many batches and never once from the top. Full working: **`docs/reports/FP.md`**.
+- **THE THREE NUMBERS THAT DECIDE IT.** Talent nodes that survive *"no node may depend on an
+  engine"*: **50 of 324**, and **four specs contribute ZERO** (Pyromancer, Cryomancer, Holy,
+  Beastmaster). Live runes that read the engine they sit beside: **43 of 60**. Battery targets
+  that read a spec concept: **87 of 97**, of which **52 are engine-bound and carry 32,393 of the
+  battery's 45,248 asserted checks — 71.6%**.
+- **AND THE SENTENCE THE BATCH EXISTS TO WRITE: DN PRICED ITS RESTRUCTURE AT 97 NEW TALENT NODES
+  AND THE DESIGNER DID NOT TAKE IT. THIS ONE IS 274.** DN found 318 of 324 clean because
+  *guaranteed* meant the spec's own passive and core kit — **exactly what this merge makes drawn**,
+  so DN's finding inverts and 6 becomes 274. With the runes and cards, **400 authored things stop
+  meaning what they mean today**, to move a choice the player already makes on the spec-select
+  screen into the draft.
+- **THE FINDING THE BRIEF DID NOT ANTICIPATE: `SPEC_INFO` IS A STAT BLOCK, AND ONE OF ITS STATS IS
+  LOAD-BEARING FOR A LANE.** `parry_chance` has a universal baseline (`PARRY_CHANCE := 0.05`, with
+  −1.0 as a *use-the-baseline* sentinel), so the Swordmaster's 0.12 is an override and parry
+  survives for everyone. **`block_chance` has NO baseline** — it defaults to 0.0, the Warden alone
+  declares it at 0.10, and the only other unconditional source is `_plating_slice`, which opens
+  `if u.passive_id == "heavy_plating"`. **So an engine rune carrying Heavy Plating to a Berserker
+  installs a climb on a base of zero, and `PROTECTED_CORES` cannot see it, because the enabler
+  table names ABILITIES and this is a STAT.** Three "surviving" Warden nodes were cut by hand for
+  this reason — Unkillable, Ricochet and Bruising Guard all fire on a BLOCK and never name the
+  engine, which is **FK §7's Standing Ground shape arriving from the opposite direction**.
+- **`Profile` IS THE MIGRATION RISK AND THE FAILURE MODE IS SILENCE — DRIVEN, NOT INFERRED.**
+  `Profile._load()` has **no version branch at all**: it merges every key it finds over the
+  defaults and writes `data["version"] = VERSION` unconditionally, reading the old value nowhere.
+  A constructed scratch profile (tier 3, six points, three cells bought, one equipped) asked
+  against a tree that no longer holds those ids returned **`cells_spent` 0, `equipped_learned`
+  empty, and `owns_cell` still TRUE for all three** — the points come back, the loadout empties,
+  and the ledger keeps cells that now cost nothing. **`Talents.has_tree("warrior")` is false and
+  `generate_tree("warrior")` returns 0 nodes today.** And it is **written once**: `_save()`
+  overwrites the file on the next point earned, so a wrong first load destroys the original purses
+  the first time the player beats a zone boss. **The run save is not the risk** — v12, refusing
+  below v10, and four versions of precedent say a merge has no honest default, so v13 REFUSED
+  costs one evening.
+- **FIVE OF THE BRIEF'S TWENTY-FOUR PREMISES DID NOT HOLD.** Three FALSE: **`second_resource` is
+  three currencies, not four** (Resonance / Mercy / Focus — Faith is `faith_stacks`, and
+  `Ability.faith_cost` is a misnamed MERCY cost, which `classes.gd` says outright); **the battery
+  has 97 targets, not 103** (105 `check_`/`test_` files exist, eight of which it does not run);
+  **the class draft pools are 6/7/6/6 = 25 at a 0.25 per-card share**, so nothing guarantees a hero
+  any class-wide card. One STALE: the summons are **10 of 10** Beastmaster cards, not 8 of 8. One
+  right in substance, wrong in mechanism: **Trapper READS a target's status LIST where Sanctity
+  counts application EVENTS.** Full table: `docs/merge-recon.html` §0.
+- **AND PREMISE 6 BEING FALSE MAKES THE TWO-METER QUESTION EASIER, NOT HARDER.** Two meters at
+  once is **not** a state that does not exist — the Devout is it, and Conviction, Pack Bond and
+  Wrath of the Old Gods all carry their count outside `second_resource` and display through
+  **chips**. **Three of the twelve engines already solved "a meter that is not the bar" and none of
+  them needed the bar widened.**
+- **OF THE THREE NEW SPINES, CHANNEL IS CHEAPEST BY A WIDE MARGIN AND SANCTITY IS DEAREST.**
+  `note_resource_spent(amount)` is already generic in shape and already books the **NET** off the
+  bar at the one line every ability pays through; its payout, `dmg_bonus`, is **read at exactly one
+  site** and is element-blind. Momentum is half-built — damage TAKEN per turn exists twice over
+  (`dmg_by_turn`, `trance_taken`) and damage DEALT per turn does not exist at all. **Sanctity's
+  READING half is the cheapest of the three** (`add_status` is a single funnel: 214
+  `_apply_status` calls route through it plus 35 direct callers, so all 249 sites pass one
+  function) **and its PAYOUT does not exist anywhere**: `STATUS_INFO` holds 156 ids and carries
+  label, short code, colour and description — **not one magnitude** — so every status magnitude in
+  this game is authored per site.
+- **WHAT MOVED:** `docs/merge-recon.html` (**NEW**), `docs/changelog.html`,
+  `docs/reports/FP.md` (**NEW**) and this file. **NOTHING ELSE.** No `.gd` file, no `.json`, no
+  `CLAUDE.md`, no `master.html`, no gate, no baseline row and no manifest entry.
+- **THE FLOOR WAS MET AND THE DOC EDITS WERE PROVED RATHER THAN ASSUMED.** No code moved, so parse
+  is trivially clean; the risk was a suite literal. **193 needles were snapshotted off the 18
+  readers of `docs/changelog.html` BEFORE the edit and swept after: 0 LOST**, with a **two-armed
+  control** (the same needle removed from the shipped copy and from HEAD's) reading 1 on both arms,
+  so the zero is not vacuous. **All four changelog gates were run and match their baselines
+  exactly** — `check_dv` 83/0, `check_ec` 23/0, `check_el` 23/0, `check_fg` 22/0. The changelog is
+  at **236,260 B against CW §4's 400 KB bar** with 163 KB of headroom; `CLAUDE.md` is untouched at
+  289,255 B.
+- **Next letter: FQ.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FN left about 12 KiB of headroom and FO spent
-  some of it**, which is why FO's own three additions to `CLAUDE.md` are BULLETS ON EXISTING
-  BLOCKS rather than new top-level rules — only the floor rule is new, and it is short. **The next
-  batch to write a long standing rule is still the one that finds out**; the gate WARNS before it
-  FAILS. `docs/instrument-rules.md` and `docs/ways-of-working.md` still have no stated ceiling; a
-  ceiling is DERIVED and deriving one is a ruling.
-- **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean, and **the rune layer is authored for all twelve specs** — 60
-  live against **67** retired, every one of the 60 spec-scoped, and not one of the 60 is
-  conditional. **What is left in the rune layer is the DEVOUT'S FIFTH** (owed, two alternatives
-  priced in `docs/reports/FK.md` §7), **the pricing question FN handed over on the Wide Rite and
-  Heavy Bolts, and the Shared Mark's own magnitude — see the queue.**
-  `docs/spec-recon.html` is still the document authoring reads; §7 of `docs/reports/FK.md` is the
-  correction to it, **and FO added a dated note at its rune table** because that table still shows
-  eight conditions FN retired and a rune FO put out of the offer. **The ladder still has an open
-  design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on this
-  list.**
+  FIGURES** — read them off that gate's output. **FP spent none of `CLAUDE.md`'s headroom**,
+  because the brief forbade a rule and this batch added none; the roughly 7 KiB FO left is still
+  there. **The next batch to write a long standing rule is still the one that finds out**; the gate
+  WARNS before it FAILS. `docs/instrument-rules.md` and `docs/ways-of-working.md` still have no
+  stated ceiling; a ceiling is DERIVED and deriving one is a ruling.
+- **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide — measured
+  at FP), all twelve talent trees are purpose-authored and charter-clean at **324 nodes**, and
+  **the rune layer is authored for all twelve specs** — 60 live against 67 retired, every one of
+  the 60 spec-scoped, and not one of the 60 conditional. **What is left in the rune layer is the
+  DEVOUT'S FIFTH** (owed, two alternatives priced in `docs/reports/FK.md` §7), **the pricing
+  question FN handed over on the Wide Rite and Heavy Bolts, and the Shared Mark's own magnitude —
+  see the queue.** `docs/spec-recon.html` is still the document authoring reads; §7 of
+  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
+  its own (what rung 2 should ASK), and the class merge is now the largest unbuilt item on this
+  list and the one awaiting a ruling.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
+
+**Full evidence: `docs/merge-recon.html`, written to be read section by section across many
+batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
+nothing: it measured what dissolving the twelve specs into their four classes would cost, and the
+ruling is the designer's. **Nothing below is a recommendation about whether to do it.** These are
+the things a later batch must not re-derive from scratch:
+
+- **THE SIZE, IN BATCHES: TWELVE TO FOURTEEN, AND THE GAME IS BROKEN THROUGH ROUGHLY EIGHT OF
+  THEM.** Not degraded — broken. From the moment the engines move, **52 battery targets carrying
+  71.6% of the project's asserted checks are red** for as long as it takes. **This project has
+  never worked in that condition**: every red it has carried has been the one sanctioned
+  `check_cm_live` red with a note in `baselines.json`, and **a tree with fifty reds has no
+  differ.**
+- **THE ENGINE MOVE CANNOT BE STAGED PER SPEC, AND THIS IS THE STRUCTURAL ANSWER.** The unit of
+  the merge is a **class** — three specs collapse into one pool, one tree and one stat line
+  simultaneously, because there is no state in which the Berserker has merged and the Warden has
+  not: they would need one tree and two. **So "merge one class as a pilot" is not a pilot** — it
+  is four batches, eight to thirteen nodes salvaged out of 81, and a battery whose engine-bound
+  targets do not care that only a quarter of the game moved.
+- **THE PROFILE MIGRATION IS WRITTEN ONCE AND CANNOT BE ITERATED ON LIVE**, and the one part that
+  is a ruling rather than a programming step is **how twelve purses fold into four**: a player with
+  3 points on each of three Warrior specs has 9, and **sum rewards breadth while max rewards
+  mastery** — with the merged trees three times shallower, summing may hand a full tree on day one.
+  FP does not choose. See the WHERE block for what the driven probe returned.
+- **THE ONE PART WORTH BUILDING WHETHER OR NOT THE MERGE HAPPENS IS THE THREE SPINES AS MACHINERY
+  ON NOBODY.** Channel is two lines and one ruling; Momentum is one per-turn ledger in a shape the
+  file already uses twice, plus a decision about where initiative is written; **and Sanctity's
+  status-potency layer is the single largest unbuilt system the recon found — the one a merged
+  tree needs independently, and the one any future batch wanting a status to be worth more to one
+  hero than to another also needs.** Building all three touches none of the 400 authored things.
+- **AND THE ONE OPEN QUESTION INSIDE CHANNEL IS A RULING, NOT MACHINERY: there is no `is_spell`
+  flag on `Ability`.** The available partition is `dmg_type` — *arcane / nature / shadow / holy /
+  physical / fire / frost* — so *spell damage* has to mean *not physical*, or Channel pays into
+  `dmg_bonus` and buys the basic attack with it.
+- **WHAT THE RECON DID NOT REACH, SO IT IS NOT READ AS CLEAN:** **no balance judgement and not one
+  magnitude** — *survives* means *still does what its text says*, never *is still correctly
+  priced*; the **enemy, event and relic layers** were swept for spec literals only (2 sites, both
+  in `relics.gd`); and the **card classification in §4c is coarse, with both of its instrument
+  faults reported in place** — a card that FEEDS an engine without READING it counts as
+  engine-free there, which under-states the Pyromancer and the Survivalist most.
 
 ### THE RUNE LAYER'S OWED ITEMS — **NONE. FN CLOSED THE LAST THREE.**
 

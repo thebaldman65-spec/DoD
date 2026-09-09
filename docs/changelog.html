@@ -15,6 +15,238 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-09 &mdash; Batch FP: RECONNAISSANCE FOR THE CLASS MERGE</h2>
+<p><b>REPORT ONLY. NOTHING WAS AUTHORED, MERGED, CHANGED, RETIRED OR RETUNED</b> &mdash; no spec
+was collapsed, no engine moved, no node cut, no rune re-scoped, no card changed pool, and not one
+constant or magnitude moved. The deliverable is <b><code>docs/merge-recon.html</code></b>, written
+on <code>spec-recon.html</code>'s pattern with self-contained sections, because it will be read
+many times across many batches and never once from the top.</p>
+
+<p><b>THE THREE NUMBERS THAT DECIDE IT.</b> Talent nodes that survive <i>&ldquo;no node may depend
+on an engine&rdquo;</i>: <b>50 of 324</b>, and <b>four specs contribute ZERO</b> (Pyromancer,
+Cryomancer, Holy, Beastmaster). Live runes that read the engine they sit beside: <b>43 of 60</b>.
+Battery targets that read a spec concept: <b>87 of 97</b>, of which <b>52 are engine-bound and
+carry 32,393 of the battery's 45,248 asserted checks &mdash; 71.6%.</b></p>
+
+<p><b>AND THE SENTENCE THE BATCH EXISTS TO WRITE, WHICH IS NOT SOFTENED: DN PRICED ITS
+RESTRUCTURE AT 97 NEW TALENT NODES AND THE DESIGNER DID NOT TAKE IT. THIS ONE IS 274.</b> DN found
+318 of 324 clean because <i>guaranteed</i> meant the spec's own passive and core kit &mdash; and
+those are exactly what this merge makes drawn, so <b>DN's finding inverts: 6 nodes dependent on a
+draw becomes 274.</b> Counting the runes and the cards with it, <b>400 authored things stop meaning
+what they mean today</b>, to move a choice the player already makes on the spec-select screen into
+the draft.</p>
+
+<p><b>&sect;1 &mdash; 368 GAME-SIDE SITES READ A SPEC CONCEPT, AND THE GAME CODE IS THE SMALL
+HALF.</b> 1,554 spec-id literals exist in the tree and <b>1,419 of them are in instruments</b>
+&mdash; the suites and gates carry <b>91%</b> of the project's spec vocabulary. The largest single
+mechanical population is <b>79 <code>passive_id</code> reads</b>, and those <i>re-point</i> rather
+than being rewritten: every one becomes a question about a held rune instead of about a spec, and
+it is the same question.</p>
+
+<p><b>THE FINDING THE BRIEF DID NOT ANTICIPATE: <code>SPEC_INFO</code> IS A STAT BLOCK, AND ONE OF
+ITS STATS IS LOAD-BEARING FOR A LANE.</b> Every spec declares <code>max_hp</code>,
+<code>armor</code> and <code>constitution</code> &mdash; the Warrior class spans <b>165 to 200
+health and 0.15 to 0.32 armor</b> &mdash; and two declare a defensive stat nothing else has.
+<b><code>parry_chance</code> has a universal baseline</b> (<code>PARRY_CHANCE := 0.05</code>, with
+&minus;1.0 as a &ldquo;use the baseline&rdquo; sentinel), so the Swordmaster's 0.12 is an override
+and parry survives for everyone. <b><code>block_chance</code> has NO baseline</b>: it defaults to
+0.0 and the Warden alone declares it (0.10), while the only other unconditional source is
+<code>_plating_slice</code>, which opens
+<code>if u.passive_id == "heavy_plating"</code>. <b>So an engine rune carrying Heavy Plating to a
+Berserker would install a climb on a base of zero &mdash; and <code>PROTECTED_CORES</code> cannot
+see it, because the enabler table names ABILITIES and this is a STAT. The Warden's empty
+<code>enablers</code> list is the most misleading empty list in the merge.</b></p>
+
+<p><b>&sect;1d &mdash; THE SAVE: THE RUN IS NOT THE RISK, <code>Profile</code> IS, AND THE FAILURE
+MODE IS SILENCE.</b> The run save is at v12 and refuses below v10; four versions of precedent say a
+merge has no honest default, so <b>v13 REFUSED costs one evening</b> and BK and BM both already
+judged that acceptable. <b><code>Profile</code> is the meta progression and it has NO VERSION
+BRANCH AT ALL</b> &mdash; <code>_load()</code> merges every key it finds over the defaults and then
+writes <code>data["version"] = VERSION</code> unconditionally, reading the old value nowhere.
+<b>Seven buckets are spec-keyed</b>, three of them the talent ledger.</p>
+
+<p><b>CONSTRUCTED AND DRIVEN RATHER THAN INFERRED.</b> A scratch profile was built &mdash; tier 3,
+six points to the Berserker, three cells bought and one equipped &mdash; and then asked against a
+tree that no longer holds those ids. <b><code>cells_spent</code> returned 0,
+<code>equipped_learned</code> returned empty, and <code>owns_cell</code> stayed TRUE for all
+three.</b> The points come back, the loadout empties, and the ledger still claims cells that now
+cost nothing. Nothing errors and nothing logs. <b><code>Talents.has_tree("warrior")</code> is
+false and <code>generate_tree("warrior")</code> returns 0 nodes today</b>, so a merge that keys the
+new trees by class and leaves the profile alone shows four classes at zero points while twelve spec
+purses sit un-migrated in the file, indistinguishable from a profile that has never finished a run.
+<b>AND IT IS WRITTEN ONCE: <code>_save()</code> overwrites the file on the next point earned, so a
+wrong first load destroys the original purses the first time the player beats a zone boss.</b></p>
+
+<p><b>&sect;1f &mdash; THE BOT SURVIVES, AND IT IS THE ONE PIECE OF GOOD NEWS.</b>
+<code>_autoplay_pick_kit</code> is 645 lines with <b>ZERO spec-id literals</b> and <b>four</b>
+<code>passive_id</code> branches; everything else it does is name-keyed &mdash; fetch the ability,
+test <code>ab != null</code> and a resource, pick. <b>That is already the question the merge asks.</b>
+The bot needs four branches re-pointed and nothing else.</p>
+
+<p><b>&sect;2 &mdash; THE ENABLER BILL, AND ONLY ONE ENGINE NEEDS MORE THAN TWO THINGS.</b>
+<code>PROTECTED_CORES</code> names <b>16 enablers across 9 specs</b> (the brief's premise, held).
+Three specs move free, three with one card, five with two, and <b>the Beastmaster with three</b>
+&mdash; the one engine that is a body on the board rather than a number on a bar, and whose
+<b>10 of 10</b> draft cards all read the companion. <b>The brief's choice of Focus as the Hunter
+core is right and it is measurable</b>: every other engine names a status, a stance, a defensive
+roll, an ally's health, one ability's absorb, or a summoned body. Focus alone names a targeting
+DISCIPLINE and pays a UNIVERSAL stat.</p>
+
+<p><b>THE THREE NEW SPINES, RANKED. CHANNEL IS CHEAPEST AND IT IS NOT CLOSE.</b>
+<code>note_resource_spent(amount)</code> is already generic in shape and already books the
+<b>NET</b> off the bar at <code>battle.gd:8015</code> &mdash; <i>&ldquo;this one line is where
+every ability in the game pays&rdquo;</i> &mdash; so it catches waivers, discounts, refunds and the
+clamp at zero for free. It needs its <code>resource_name != "Rage"</code> guard widened and a
+second field (EM's charter forces a second rather than a shared one). <b>And the payout already
+exists as ONE line</b>: <code>dmg_bonus</code> is read at exactly one site and is element-blind by
+construction. The only open question is a ruling &mdash; <b>there is no <code>is_spell</code>
+flag</b>, so <i>spell damage</i> must mean <i>not physical</i> or Channel buys the basic attack
+too.</p>
+
+<p><b>MOMENTUM IS MIDDLING AND HALF-BUILT.</b> Damage TAKEN per turn exists twice over with its
+semantics already argued out &mdash; <code>dmg_by_turn</code> (global turn index, bounded to two
+keys) and <code>trance_taken</code> (the span between one hero's turns, which is the shape Momentum
+wants). <b>Damage DEALT per turn does not exist</b>: <code>total_dealt</code> is a local alive for
+one cast and <code>_run_dealt</code> is a run-long recap ledger. The shape to copy is unambiguous
+&mdash; <code>heal_by_turn</code> calls itself <i>&ldquo;the exact mirror of
+<code>dmg_by_turn</code>&rdquo;</i>. <b>The payout is the decision:</b>
+<code>effective_speed()</code> has a closed list of six terms and five are statuses or a run
+modifier, so Momentum needs either a seventh term in the function all <b>23</b>
+<code>next_time</code> writes divide by, or a discrete <code>next_time</code> write on
+<code>delay_push</code>'s pattern. <b>Initiative IS writable; what does not exist is a place to
+write it that belongs to a passive.</b></p>
+
+<p><b>SANCTITY IS DEAREST, AND THE PAYOUT IS WHY.</b> Its reading half is the <i>cheapest</i> of
+the three: <code>add_status</code> is a single funnel &mdash; <code>_apply_status</code> is called
+<b>214</b> times and calls it exactly once, plus <b>35</b> direct callers, so all <b>249</b>
+application sites pass through one function, and removal is <b>64</b> more. <b>But the payout does
+not exist.</b> <code>STATUS_INFO</code> holds <b>156 status ids and carries label, short code,
+colour and description &mdash; not one magnitude.</b> Strength arrives as per-call
+<code>power</code> and <code>tick</code> arguments (67 of 214 pass a power) and everything else
+lives in whichever handler reads the status. <b>Every status magnitude in this game is authored per
+site.</b> Duration has exactly one general term, <code>mod_status_turns</code> &mdash; additive,
+read at one site, <b>off the VICTIM rather than the applier</b>, belonging to the Fleeting run
+modifier and only ever set to &minus;1. <b>So Sanctity's payout is not a constant to add; it is a
+layer to invent across 156 statuses.</b></p>
+
+<p><b>AND THE BRIEF'S PREMISE THAT <code>second_resource</code> IS &ldquo;ONE FIELD, FOUR
+CURRENCIES&rdquo; IS FALSE &mdash; IT IS THREE, AND THAT MAKES THE TWO-METER QUESTION
+EASIER.</b> <code>second_resource_name</code> is written in exactly three places: Resonance, Mercy
+and Focus. <b>Faith is <code>faith_stacks</code>, a separate int carried by every ally</b>; the
+confusion is genuine and is in the code, because <code>Ability.faith_cost</code> reads
+<code>second_resource</code> and <code>classes.gd</code> states flatly that
+<i>&ldquo;<code>faith_cost</code> IS MERCY EVERYWHERE IT APPEARS&rdquo;</i>. <b>So two meters at
+once is NOT a state that does not exist &mdash; the Devout is it</b>, and Conviction, Pack Bond and
+Wrath of the Old Gods all already carry their count outside that field and display through
+<b>chips</b>. Three of the twelve engines solved &ldquo;a meter that is not the bar&rdquo; and none
+of them needed the bar widened.</p>
+
+<p><b>&sect;3 &mdash; THE SURVIVORS ARE NAMED, AND FIVE WERE REMOVED BY HAND BECAUSE A LIST NOBODY
+CHECKED IS WORTH NOTHING.</b> The mechanical sort returned 55; hand-verification cut it to <b>50</b>,
+two of which are conditional. <b>Unkillable, Ricochet and Bruising Guard all fire on a BLOCK</b>
+&mdash; they never name Heavy Plating, so no sweep for the engine can see them, and they are worth
+exactly zero to a hero holding neither the Warden's stat block nor his passive. <b>That is FK
+&sect;7's Standing Ground shape arriving from the opposite direction: there the clause was already
+the base kit, here the base the clause needs is not there at all.</b> <b>Brittle Ice</b> reads
+<code>_is_held(strike_target)</code> and Held IS Glacial Hold &mdash; it looked universal only
+because the node is party-wide. <b>Set and Forget</b> re-arms a trap, and traps are the
+Survivalist's alone.</p>
+
+<p><b>AND THE DISTRIBUTION IS THE FINDING, NOT THE TOTAL. THE SHARPSHOOTER ALONE SUPPLIES 12 OF THE
+50</b> &mdash; 24% of the whole salvage from one spec of twelve, every one of them crit, armor
+penetration, Break or cooldowns &mdash; <b>for exactly the reason the brief picks Focus as the
+Hunter core: his engine is build-blind, so his tree could be written against universal systems and
+it was.</b> The salvage is concentrated in the specs whose engines were already neutral
+(Sharpshooter 12, Warden 9, Swordmaster 9, Arcanist 6, Survivalist 6) and <b>absent from the four
+whose engines are their identity</b>.</p>
+
+<p><b>WHAT THE MERGED TREE COULD BE MADE OF INSTEAD, CHECKED FOR EXISTS / PARAMETRIC / REACHABLE.</b>
+<b>Skill checks are the best candidate</b>: <code>SC_PROFILE_DEFAULT</code> has six independent
+dials, CN's own comment sanctions a partial profile, and <b>exactly one non-default profile exists
+in the game</b> (<code>_sharpshooter_basic_profile</code>) &mdash; proven and almost entirely
+unspent, with EY's warning that his opening window is already 97.3% of the track. <b>The pouch and
+the loadout ladder are clean and completely untouched</b> &mdash; not one of the 324 nodes reaches
+either. <b>Break and crit are proven and partly spent</b>, which the survivor list itself
+demonstrates. <b>Status potency is the one that would have to be built &mdash; and it is the same
+thing Sanctity needs, which is the only place in the whole recon where two costs collapse into
+one.</b></p>
+
+<p><b>&sect;4 &mdash; 43 OF 60 RUNES READ THE ENGINE THEY SIT BESIDE, AND ONLY SEVEN READ NEITHER
+AN ENGINE NOR AN ENABLER.</b> Hand-read from every field's read site. Four specs are 100%
+engine-bound (Occultist, Beastmaster, Sharpshooter, Arcanist). <b>A merged class rune pool would
+be roughly five-sixths conditional, and the three engines in it are mutually exclusive in practice
+&mdash; so a hero can only ever make one third of it live.</b> Eight more read a
+<b>spec-exclusive STATUS rather than the engine</b> (Bleed, Burn, Chilled, his Poison), which is a
+dependency <code>PROTECTED_CORES</code> does not track at all.</p>
+
+<p><b>AND THE BRIEF'S &ldquo;FM'S <code>requires_ability</code> PROBLEM AT TEN TIMES THE
+SCALE&rdquo; IS THE ONE PLACE THE MERGE IS CHEAPER THAN FEARED.</b> FM's count re-derives exactly
+&mdash; <b>7 of 17 in the spawn kit, 10 reachable only by drawing, 0 unreachable</b> &mdash; but
+<b>the ten already-conditional entries do not get worse</b>, and <b>five of the seven in-kit ones
+name an ENABLER the proposal explicitly makes travel with its engine.</b> <b>Exactly TWO degrade:
+Split Shield and Butcher's Bill</b>, whose named abilities are in the kit and are not enablers.
+The reason it is cheap is worth keeping: <code>requires_ability</code> is an <b>explicit, declared</b>
+dependency the offer filter reads. <b>The 43 engine-reading runes declare nothing &mdash; their
+dependency is in the handler, invisible to the filter, and it is the 43 that are the problem.</b></p>
+
+<p><b>THE CARD PASS FOUND TWO FAULTS IN ITS OWN INSTRUMENT AND BOTH ARE REPORTED RATHER THAN
+SMOOTHED.</b> A fixed 40-line window read <b>13 of 25 class-wide cards as engine-bound</b> by
+running past its own match arm into the next one and into <code>STATUS_INFO</code>; a window
+bounded at the next arm cut that to three, and hand-checking cleared all three (they matched
+<code>/companion/</code> inside an <b>ally loop</b>, which is not the Pack Bond engine).
+<b>The corrected figure is ZERO of 25</b>, which is what the class-card authoring rule promises and
+is now measured rather than quoted. <b>The remaining hole is named and not closed: a card that FEEDS
+an engine without READING it counts as engine-free here</b>, so the spec-card figure of <b>83 of
+129</b> under-states the dependency, and under-states it worst where the engine is a status.</p>
+
+<p><b>&sect;5 &mdash; TWELVE TO FOURTEEN BATCHES, AND THE GAME IS BROKEN THROUGH ROUGHLY EIGHT OF
+THEM.</b> Not degraded &mdash; broken: from the moment the engines move, the trees reference
+engines nobody is guaranteed, the pools offer cards for engines nobody holds, and <b>52 battery
+targets carrying 71.6% of the project's assertions are red for as long as it takes.</b> This
+project has never worked in that condition &mdash; every red it has carried has been the ONE
+sanctioned <code>check_cm_live</code> red, with a note in <code>baselines.json</code> explaining
+it, and <b>a tree with fifty reds has no differ.</b></p>
+
+<p><b>WHAT CANNOT BE STAGED, AND IT IS THE STRUCTURAL ANSWER: THE ENGINE MOVE CANNOT BE STAGED PER
+SPEC.</b> The unit of the merge is a CLASS &mdash; three specs collapse into one pool, one tree and
+one stat line simultaneously, because there is no state in which the Berserker has merged and the
+Warden has not: they would need one tree and two. <b>The smallest shippable step is a whole class,
+and a whole class is four batches for a quarter of the game.</b> <b>So &ldquo;merge one class as a
+pilot&rdquo; is not a pilot</b> &mdash; it is four batches, eight to thirteen nodes salvaged out of
+81, and a battery whose engine-bound targets do not care that only a quarter of the game moved.</p>
+
+<p style="border:2px solid #a00; padding:8px"><b>WHAT TO THROW AWAY, AND IT IS THE POINT OF THE
+BATCH. DN'S SENTENCE WAS &ldquo;THE COST IS NOT IN THE 324. IT IS IN THE 97&rdquo; AND THE
+DESIGNER DID NOT TAKE IT. THE EQUIVALENT SENTENCE IS: THE MERGE THROWS AWAY 274 TALENT NODES, 43
+RUNES AND 83 DRAFT CARDS &mdash; 400 AUTHORED THINGS &mdash; TO MOVE A CHOICE THE PLAYER ALREADY
+MAKES.</b> And the part that no amount of work recovers: <b>four specs contribute ZERO surviving
+nodes.</b> Pyromancer, Cryomancer, Holy and Beastmaster are 108 nodes and not one of them says
+anything to a hero who did not draw their engine. <b>Those four trees are not re-pointed. They are
+deleted and replaced.</b><br><br>
+<b>IF ANY PART OF IT IS TAKEN, TAKE THE PART THAT COSTS NOTHING TO REVERSE.</b> Build Momentum,
+Channel and Sanctity as machinery on nobody. Channel is two lines and one ruling; Momentum is one
+ledger in a shape the file already uses twice; <b>and Sanctity's potency layer is the single
+largest unbuilt system this recon found &mdash; the one &sect;3 wants independently, for the
+merged tree and for any future batch that wants a status to be worth more to one hero than to
+another.</b> Build those three and the merge stays possible without one of the 400 being
+touched.</p>
+
+<p><b>WHAT MOVED:</b> <b><code>docs/merge-recon.html</code> (NEW)</b>, <code>docs/state.md</code>
+(rewritten), <code>docs/reports/FP.md</code> (new) and this file. <b>NO CODE MOVED, NO GATE WAS
+WRITTEN, NO <code>CLAUDE.md</code> RULE WAS ADDED, AND NO DATA FILE WAS TOUCHED</b> &mdash; the
+brief forbade all four, and nothing is settled until the document is read.</p>
+
+<p><b>FIVE OF THE BRIEF'S TWENTY-FOUR CHECKABLE PREMISES DID NOT HOLD, AND THE FULL TABLE IS
+<code>docs/merge-recon.html</code> &sect;0.</b> Three are FALSE &mdash;
+<b><code>second_resource</code> is three currencies, not four</b>; <b>the battery has 97 targets,
+not 103</b> (105 <code>check_</code>/<code>test_</code> files exist, eight of which it does not
+run); <b>the class draft pools hold 6/7/6/6 = 25 cards at a 0.25 per-card share, not &ldquo;three
+class-wide draft cards&rdquo;</b>, so nothing guarantees a hero any of them. One is STALE &mdash;
+the summons are <b>10 of 10</b> Beastmaster cards, not 8 of 8, which
+<code>docs/state.md</code> already recorded. And one is true in substance but names the wrong
+mechanism: <b>Trapper READS a target's status LIST, where Sanctity counts application
+EVENTS.</b></p>
+
 <h2>2026-09-08 &mdash; Batch FO: TWO RUNES FN FLAGGED, RULED</h2>
 <p><b>DEEPENING HEX SUBTRACTS 2 FROM THE RUIN THRESHOLD INSTEAD OF SETTING IT TO 8 (ruled by the
 designer).</b> FN measured the rune at <b>exactly ZERO</b> for an Occultist holding Avatar of Ruin:
