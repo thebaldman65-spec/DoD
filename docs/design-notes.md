@@ -7902,3 +7902,35 @@ was never exhausted — it filled the pouch with the six TEMPLATE names, which w
 family WAS the whole pool and matches nothing the authored pool returns. **A sample is part of an
 assertion's territory**, which is `check_es` §1's own lesson arriving four batches later in a
 different file.
+
+
+## Batch FN — the eight gated runes come off their conditions
+
+**A gated rune at a flat price is strictly worse than a bare one, and that is the whole ruling.**
+Every rune costs 100g. A condition does not lower the price, so it is pure cost: the player is
+offered the same item, at the same money, that sometimes does nothing. FK retired THRESHOLD and
+BREADTH going forward; FN took them off the eight that still wore them.
+
+**The measurement is the part worth keeping.** Nothing had ever priced what the eight conditions
+were costing, and the spread is enormous — Deepening Hex held on 69–86% of an Occultist's reachable
+loadouts, which is near enough a free clause, while Heavy Bolts held on 0–8% and the Wide Rite on
+0–4%. **Two of the eight were unreachable at a full bar**: a Sharpshooter carrying seven drafted
+cards cannot meet a MARK threshold at all (his whole pool holds three MARK primaries against the
+four the fraction needs), and an Occultist cannot meet a breadth at five or at seven. A rune that
+is dead at the top of the ladder is not a design that needs re-tuning; it is a shape that does not
+work, which is what FJ said and what this measures.
+
+**And three of the eight turn out to carry a second gate that was never the secondary.** Bracing
+Line's Heavy Plating +32% was already on the record. The two that were not: Deepening Hex is worth
+exactly zero to an Occultist who has taken Avatar of Ruin, because the capstone already pushes
+detonation to every fifth stack and the rune's `mini` cannot make it shallower; and the Wide Watch
+is worth exactly zero to a Sharpshooter holding Overkill, whose node text carries the rune's own
+clause word for word. **Both are flagged and neither is retuned** — a rune that is now redundant is
+a design question, and design questions are the designer's.
+
+**The machinery came out rather than being left at zero callers.** Nine functions, one door and two
+screen lines, all of which existed to evaluate or display a condition that no longer exists. What
+stayed, stayed for a stated reason: the both-tags census is older than the conditions, it answers
+what a SCREEN shows rather than what a rune asks, and the core-kit baseline it prints every battery
+is what the next tag-reading rune will have to be authored against. **The tags are player-facing on
+the draft card and are not conditions** — that distinction is the whole of what survives.

@@ -721,18 +721,16 @@ const PROTECTED_CORES := {
 # is the ceiling and BREAK takes the second slot, so `["BREAK", "RESOURCE"]`
 # reads `["OFFENSE", "BREAK"]` — 18 RESOURCE, 9 DEBUFF, 2 DEFENSE and 1 TEMPO
 # are displaced (20 rows had no secondary to lose and 3 already read OFFENSE
-# second). **IT IS CHEAP BECAUSE A SECONDARY FEEDS NO CONDITION**:
-# EZ §0c counts the PRIMARY only (`primary_tag_*` → `Runes.threshold_met` /
-# `breadth_met_fraction`), so a displaced secondary moves `tag_census` — a
-# SCREEN — and nothing a rune asks.
+# second). **IT WAS CHEAP BECAUSE A SECONDARY FED NO CONDITION**: EZ §0c
+# counted the PRIMARY only, so a displaced secondary moved `tag_census` — a
+# SCREEN — and nothing a rune asked.
 #
-# **AND WHAT IT DOES TO THE TWO CONDITIONS IS ASYMMETRIC.** No live rune gates
-# on BREAK (the four thresholds name DEBUFF, DEFENSE twice and MARK), so
-# THRESHOLD is untouched — the three counted tags gained and lost nothing.
-# **BREADTH ONLY EVER GETS HARDER**: `primary_tag_peak` folds a hero's BREAK
-# column into his OFFENSE one, so the peak rises or holds and never falls, and
-# the four BREADTH runes (Wide Rite, Long Watch, Wide Watch, Shared Scent) are
-# what pays for it. Measured in `docs/reports/FD.md` §2.
+# **AND AT BATCH FN THERE IS NO CONDITION AT ALL.** FD's asymmetry is recorded
+# here as history rather than as a live constraint: THRESHOLD was untouched by
+# the fold (no live rune gated on BREAK), and BREADTH only ever got HARDER
+# because the peak folded a hero's BREAK column into his OFFENSE one — measured
+# in `docs/reports/FD.md` §2. **FN retired both shapes and removed the
+# arithmetic that read them**, so the fold now moves a screen and nothing else.
 #
 # **`Runes.RUNE_TAGS` IS DELIBERATELY NOT TOUCHED.** The ruling names CARDS;
 # five rune rows still carry BREAK first (`long_watch` and `bared_plate` live,
@@ -1114,59 +1112,31 @@ static func tag_breadth(display_names: Array) -> int:
 	return n
 
 
-# ══ BATCH EZ §0 — THE PRIMARY-ONLY ARITHMETIC, AND WHY IT IS A SECOND SET ══
+# ══ BATCH FN — THE PRIMARY-ONLY ARITHMETIC STOOD HERE AND IT IS GONE ══════
 #
-# **THE THREE ABOVE COUNT BOTH TAGS ON A CARD AND THESE THREE COUNT ONLY THE
-# PRIMARY. NEITHER IS THE OTHER'S REPAIR — they answer different questions and
-# both answers are wanted.** ES §4 ruled that a census counts both, because a
-# card that Breaks and DEBUFFs is a member of both populations and the
-# secondary would otherwise be decorative; that is the right rule for the two
-# SCREENS, which show a player what his loadout contains.
+# **EZ §0 added `primary_tag_count`, `primary_tag_census` and `primary_tag_peak`
+# BESIDE the three above, for one reason: a rune CONDITION needs a partition and
+# a census is not one.** The both-tags counts above sum to more than the card
+# count, so under them a tag could exceed a third while every tag did, and
+# "at least half" could be met by two tags at once on the same three cards.
+# Counting the PRIMARY alone made the per-tag numbers partition the list, so
+# EZ's two fractions read one denominator.
 #
-# **A RUNE CONDITION NEEDS A PARTITION AND A CENSUS IS NOT ONE.** BATCH EZ's
-# two conditions are FRACTIONS of the same denominator — "at least HALF the
-# drafted cards carry the tag" and "NO tag exceeds a THIRD of them" — and under
-# the both-tags count the per-tag numbers sum to more than the card count, so a
-# tag could exceed a third while every tag did, and "half" could be met by two
-# tags at once on the same three cards. **A card contributes exactly one tag
-# here, so the counts partition the list and the two conditions read the same
-# denominator**, which is the designer's stated reason and is the whole of it.
+# **THERE ARE NO FRACTIONS LEFT TO READ.** FK retired THRESHOLD and BREADTH
+# going forward and FN took them off the eight runes that still carried one, so
+# the two predicates went, the two `RUNE CONDITIONS` lines went with them, and
+# these three lost every caller they ever had. **They came in with the
+# conditions and they go out with them.**
 #
-# They sit beside their both-tags counterparts rather than in `Runes` for the
-# same reason those do: the arithmetic belongs next to `CARD_TAGS`, and a
-# second copy anywhere else is how the two would eventually disagree.
-static func primary_tag_count(display_names: Array, tag: String) -> int:
-	var n := 0
-	for nm in display_names:
-		if card_tag_primary(String(nm)) == tag:
-			n += 1
-	return n
-
-
-# Every tag's PRIMARY count at once, with a ZERO row for every word in
-# TAG_ORDER — the zero rows for `tag_census`'s own reason. **The values sum to
-# at most the list's size** (a card whose name carries no row contributes to
-# nothing), which is the property the fractions are read against.
-static func primary_tag_census(display_names: Array) -> Dictionary:
-	var out := {}
-	for t in TAG_ORDER:
-		out[String(t)] = 0
-	for nm in display_names:
-		var k := card_tag_primary(String(nm))
-		if out.has(k):
-			out[k] = int(out[k]) + 1
-	return out
-
-
-# The largest PRIMARY count in the list — the number BREADTH is a bound on.
-# Derived from the census rather than counted separately, so the two can never
-# disagree (`tag_breadth`'s own discipline).
-static func primary_tag_peak(display_names: Array) -> int:
-	var census := primary_tag_census(display_names)
-	var top := 0
-	for t in TAG_ORDER:
-		top = maxi(top, int(census[String(t)]))
-	return top
+# **THE THREE ABOVE ARE OLDER AND STAY**, and the difference is not taste:
+# `tag_count`, `tag_census` and `tag_breadth` are ES §4's, they answer what a
+# SCREEN shows rather than what a rune asks, `check_es` §4 reads them for the
+# per-spec core-kit table it prints every battery run, and both screens still
+# draw their `CARRIED BY TAG` line off them. **`card_tag_primary` also stays**:
+# it arrived at EK with the vocabulary itself, it is the accessor for the
+# primary-first ordering `check_ek` §2 pins on `CARD_TAGS`, and it is the same
+# shape as `rune_tag_line` — a tag-layer reader the deferred rune-offer surface
+# will want, kept and asserted rather than deleted and re-derived.
 
 
 # The tag line as the draft card renders it — "DEBUFF · BREAK", or "" when

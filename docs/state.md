@@ -13,154 +13,139 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-08 (Batch FM).*
+*Last rewritten: 2026-09-08 (Batch FN).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FM — THE FILLER COMES OUT.** The generated stat family is removed from every
-  offer path, by the designer's ruling; **the authored pool is the whole pool.** Full working:
-  **`docs/reports/FM.md`**.
-- **THE REMOVAL IS FOUR LINES AND THE BATCH WAS NOT.** What the removal REACHED was **five places
-  that had never once executed in a real run** — three of which paid the player nothing and said
-  nothing, and one of which **stranded an owed rune pick for the rest of the run.**
-  `Runes.generate` fell back to a stat stick on an exhausted pool, so `generate_rune` returned
-  `{}` only under `DOD_SIM_RUNES=off` and every site's `if rune.is_empty()` was a runes-off guard
-  wearing an ordinary `if`. **`check_et` §2 is the proof rather than the suspicion**: at HEAD it
-  drives 540+ draws through five doors and asserts not one comes back empty, and it passes.
-- **THE POPULATION IS ONE SITE, NOT FOUR, AND IT WAS DERIVED.** `scripts/` holds exactly one
-  `Runes.generate(` and one `Runes.template_rune(` in the whole directory, both inside
-  `run_state.generate_rune` — so the Peddler, the elite cache, the bargain, the event verb and
-  `rune_choice`'s top-up (which FD's list of four does not carry) all reach the pool through one
-  function, and **a fifth offer site is closed by construction rather than by a list somebody keeps
-  current.** `check_fm` §1a asserts the census, not the names. **The generator and its six entries
-  are KEPT and said to be kept** (ET's Melted Armor contract): `_template_markers` has zero callers
-  on purpose, so restoring a floor is one line. **The one place the family is still reachable is
-  `DOD_SIM_RUNES=stats`** — a sim arm whose whole purpose is to measure it, so closing it would
-  delete a measurement rather than an offer.
-- **§2 — "FIVE PER HERO" IS WRONG IN BOTH DIRECTIONS AND THE CORRECTION CHANGED THE BUILD.**
-  Authored depth is **four to six** (the Devout 4, the Beastmaster 6); **reachable-at-spawn depth
-  is three to six**, because seventeen live entries name a `requires_ability` and **ten of those
-  name something outside the spawn kit**. **The Pyromancer and the Mystic open a run able to roll
-  THREE of five.** So an empty offer is not a late-run event — it is one purchase away, and it
-  landed on a code path that discarded a reward without a word. **A rune pool DEEPENS as a hero
-  earns abilities** (`kit_names` reads `bm_abilities`), which is why the empty-offer message forks:
-  telling a Pyromancer at three-of-five that he carries them all is a lie. The clause is derived in
-  ONE place, `Runes.empty_offer_reason`, because four sites print it. Per-spec table:
-  `docs/reports/FM.md` §2a.
-- **§3 — THE STRANDED PICK IS THE WORST THING THE BATCH FOUND.** A cache triple that repairs to
-  nothing drew *"Warden 2 — RUNE, choose one"* over a single *Not yet* button, and
-  `rune_picks_owed` never came down — the card kept its purple border and its CHOOSE button **for
-  the rest of the run.** **FE's dead-button defect with the button removed instead of left behind**,
-  and reachable by playing normally. The overlay carries the sentence and one button, **`Let it
-  go`**, which SPENDS the pick; holding it is what strands the run, because a hero's pool only ever
-  shrinks except through what he earns. Travel was never gated on `rune_picks_owed`, so it was a
-  permanently-lit card rather than a softlock.
-- **§5 — THREE IMPLEMENTATION CALLS ARE THE BATCH'S OWN AND ARE FLAGGED AS SUCH.** (1)
-  `roll_rune_candidates` held `return []` on the first empty draw and **threw away partial
-  offers**: a Pyromancer owning ONE of his three drew a triple of **zero**, so the next elite paid
-  nothing, printed nothing and owed nothing. It offers what is left now (3 / 2 / 1 / 0 where it
-  read 3 / 0 / 0 / 0). (2) *"may choose one of three"* was unconditional in two reward lines and is
-  read off the offer. (3) The bargain's recipient is drawn from heroes it can actually pay — the
-  idiom `events.gd`'s rune verb already used — and the event verb gained the same filter ahead of
-  its free-slot preference. **None is a card, ability, talent, constant or magnitude; the designer
-  may overturn any of the three.**
-- **§6 — `check_et` §2 WAS GREEN AND VACUOUS, AND THAT IS THE SHARPEST FINDING OF THE
-  VERIFICATION.** It read 25 / 0 against the new tree while `test_runes` went red **fifteen times
-  over the same property** — because its "exhausted" member was never exhausted: it filled the
-  pouch with the six TEMPLATE names, exact while that family WAS the pool at ET and matching
-  nothing `eligible_ids` returns against FK's authored one. **A sample is part of an assertion's
-  territory**, which is `check_es` §1's own lesson four batches later and one file over. **And it
-  was sitting on a boundary**: its cache arm asserted a literal 3, and the Pyromancer and Mystic
-  reach exactly three at spawn.
-- **§6b — `check_da` CAUGHT THE NEW GATE TWICE AND WAS RIGHT BOTH TIMES.** The verification
-  battery's only unsanctioned reds were its two. **`check_fm`'s first elite arm named the battle
-  scene by path** and drove the autoplay bot through a whelp — **a SECOND battle fixture**, which is
-  what DB §1 consolidated seven divergent copies of. **The fix is the fixture, not an exemption**:
-  it goes through `gate_fixture.spawn` and short-circuits at `_check_end`'s own
-  `victory := enemies.all(…dead)`, so the whole spoils path is real and only the COMBAT is skipped —
-  which is not an offer site, and which makes the arm deterministic rather than dependent on a bot
-  winning. **It then tripped a SECOND time on the COMMENT explaining the first**, because
-  `check_da` §3 reads the RAW source: prose recording a removal reads exactly like the removal not
-  happening. **`check_cm_live`'s four remain the one sanctioned red, identical on unmodified HEAD.**
-- **WHAT MOVED:** `scripts/runes.gd`, `scripts/run_state.gd`, `scripts/shop_screen.gd`,
-  `scripts/battle.gd`, `scripts/events.gd`, `scripts/map_screen.gd`; `test_runes.gd`,
-  `check_es.gd`, `check_et.gd`, `check_fh.gd`, **`check_fm.gd` (NEW)**, `run_battery.sh`,
-  `baselines.json`, `pin-manifest.json` (1432 → 1437); `CLAUDE.md`, `docs/master.html`,
-  `docs/text-standard.html` (**new §4.12**), `docs/changelog.html`, `docs/design-notes.md`, this
-  file and `docs/reports/FM.md`. **No `data/` file moved** — not one rune, price, payload or
-  magnitude.
-- **Next letter: FN.**
+- **Last batch: FN — THE EIGHT GATED RUNES COME OFF THEIR CONDITIONS.** THRESHOLD and BREADTH are
+  retired and the eight runes that still carried them are unconditional — payload, label and the
+  clause on the card, all three. Full working: **`docs/reports/FN.md`**.
+- **THE MEASUREMENT IS THE HALF NOBODY HAD DONE, AND TWO OF THE EIGHT WERE UNREACHABLE AT A FULL
+  BAR.** Read as the exact share of a spec's reachable loadouts satisfying the clause at each rung:
+  **Deepening Hex 69–86%** (near enough a free clause) down to **Heavy Bolts 0–8%** and **the Wide
+  Rite 0–4%**. **Heavy Bolts' MARK threshold cannot be met by a Sharpshooter carrying seven drafted
+  cards** — his whole pool holds three MARK primaries against the four the fraction needs — and
+  **the Wide Rite's breadth cannot be met by an Occultist at five or at seven.** Both readings,
+  with boss trophies and without, agree. The spread across the eight is **55× wide** and every one
+  of them was sold at the same 100g. Per-rune table: `docs/reports/FN.md` §1.
+- **THREE OF THE EIGHT CARRY A SECOND GATE THAT WAS NEVER THE SECONDARY, AND TWO OF THE THREE WERE
+  ON NOBODY'S RECORD.** FL named the shape off Bracing Line's Heavy Plating +32%; reading all eight
+  read sites found two more, both worse, because both make the rune worth **exactly zero**:
+  **Deepening Hex pays nothing to an Occultist holding Avatar of Ruin** (`mini(5, 8)` is 5 — the
+  capstone already detonates every 5th stack), and **the Wide Watch pays nothing to a Sharpshooter
+  holding Overkill**, whose node text carries the rune's own clause word for word. **Flagged, not
+  retuned — see the queue.**
+- **THE MACHINERY CAME OUT BECAUSE NOTHING ELSE USED IT, AND WHAT STAYS IS SAID TO STAY.** Nine
+  functions, one door call and two screen lines: `Runes.threshold_met`, `breadth_met_fraction`,
+  `drafted_names`, `loadout_condition_met`, `threshold_line`, `breadth_line`,
+  `Classes.primary_tag_count` / `primary_tag_census` / `primary_tag_peak`, the
+  `Runes.loadout_condition_met` call inside `Talents.condition_met`, and the `RUNE CONDITIONS` line
+  on the hero sheet and the loadout panel. **`git log -S` put all three `primary_tag_*` helpers in
+  BATCH EZ and EZ's own report says why** — a condition needs a partition and a census is not one —
+  **so they came in with the conditions and went out with them.** KEPT, each for a stated reason:
+  `Classes.tag_count` / `tag_census` / `tag_breadth` (older, ES §4's, and `check_es` §4 prints the
+  per-spec core-kit table off them every battery), `card_tag_primary` (older still — EK's, zero
+  callers, kept and asserted the way `rune_tag_line` is), `Runes.tag_threshold_met` and
+  `breadth_met` (ES §4/§5's ABSOLUTE-count shapes over the whole bar — **a different question, and
+  the door a future tag-reading rune comes back through**), and the `CARRIED BY TAG` census on both
+  screens, **because the tags are player-facing on the draft card and are not conditions.**
+- **THE COUNT WAS EIGHT AND ELEVEN LINES SAID SIX; ALL ELEVEN ARE CORRECTED.** `check_fk.gd` ×5,
+  `scripts/runes.gd` ×1, `docs/master.html` ×3, `docs/changelog.html` ×1 and `docs/reports/FK.md`
+  §9 — the last **struck rather than rewritten**, because the report is closed. The three *"six
+  live runes"* strings still in the tree are FL's own **quotations of the wrong line** and they
+  stay.
+- **`check_fk` §2's ARM INVERTED RATHER THAN BEING DELETED.** It asserted the eight were STILL
+  GATED so *"none is authored"* could not be satisfied by quietly ungating them; it now asserts
+  none carries a condition or a label — the same guard against a silent re-gating. The count does
+  not move.
+- **THE RECONNAISSANCE BATTERY FOUND TWO REDS NOBODY PREDICTED AND ONE OF THEM IS THE SHARPEST
+  THING IN THE BATCH.** `check_es` §5 asserted a FLOOR of four live BREADTH runes, with its own
+  comment saying the floor *"stops the shape going quietly extinct"* — and FN made it extinct
+  **loudly, by ruling**, which is the one case a floor was never guarding against. **It inverts to
+  an equality at ZERO**, which asks a live question where a floor asked a dead one. The other was
+  `check_ed`: four pins anchored on the removed predicates, found because **the manifest was read
+  BEFORE it was regenerated.**
+- **§3 — THE `.docx` CONTRADICTION IS CLOSED AND THE REASON IS MECHANICAL.** `CLAUDE.md`'s
+  *Working agreement* step (3) required rebuilding both exports on every design change while the
+  designer's ruling that they stay stale lived only in `docs/reports/FH.md` §4. **Step (3) now
+  carries the ruling AND its reason**: `build_docs.py` reads the LIVE changelog, which is the
+  recent half only, so a rebuild would overwrite `DoD Changelog.docx` with a fraction of itself.
+  **That is not a stale export becoming fresh; it is an archive being destroyed.** The script is
+  kept.
+- **WHAT MOVED:** `data/runes.json` (eight `desc` strings, eight `condition` objects, and nothing
+  else — no price, scope, lane or `requires_ability`); `scripts/runes.gd`, `scripts/classes.gd`,
+  `scripts/talents.gd`, `scripts/party_screen.gd`, `scripts/map_screen.gd`; `gate_fixture.gd` (a
+  fourth `opts` key, `party`); `check_ez.gd`, `check_fd.gd`, `check_fe.gd`, `check_fh.gd`,
+  `check_ek.gd`, `check_es.gd`, `check_fk.gd`, **`check_fn.gd` (NEW)**, `run_battery.sh`,
+  `baselines.json`, `pin-manifest.json` (1437 → 1440); `CLAUDE.md`, `docs/master.html`,
+  `docs/text-standard.html`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FK.md`,
+  this file and `docs/reports/FN.md`. **No card, ability, talent, constant or magnitude moved** —
+  `BRACING_LINE_LEVEL` is still 32, `RUIN_THRESHOLD` still 10, `FOCUS_CONVERT` still 100.
+- **Next letter: FO.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. `docs/instrument-rules.md` and
+  FIGURES** — read them off that gate's output. **FN's own edits cost `CLAUDE.md` about 5 KiB and
+  the headroom is the tightest it has been**, so the next batch to write a long standing rule is
+  the one that finds out; the gate WARNS before it FAILS. `docs/instrument-rules.md` and
   `docs/ways-of-working.md` still have no stated ceiling; a ceiling is DERIVED and deriving one is
   a ruling.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and **the rune layer is authored for all twelve specs** — 60
-  live against 66 retired, every one of the 60 spec-scoped. **What is left in the rune layer is the
-  DEVOUT'S FIFTH (owed, two alternatives priced in `docs/reports/FK.md` §7) and the EIGHT shipped
-  gated runes (owed — see the queue below for the count and for what re-reading one actually
-  costs).** **The generated stat family is no longer on that list: FM took it out.**
-  `docs/spec-recon.html` is still the document authoring reads, and §7 of `docs/reports/FK.md` is
-  the correction to it. **The ladder still has an open design question of its own (what rung 2
-  should ASK), and it is the largest unbuilt item on this list.**
+  live against 66 retired, every one of the 60 spec-scoped, **and after FN not one of the 60 is
+  conditional.** **What is left in the rune layer is the DEVOUT'S FIFTH** (owed, two alternatives
+  priced in `docs/reports/FK.md` §7) **and the three design questions FN's measurement hands over
+  — see the queue.** `docs/spec-recon.html` is still the document authoring reads, and §7 of
+  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
+  its own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE RUNE LAYER'S OWED ITEMS — **THREE NOW: FM CLOSED THE FOURTH**
+### THE RUNE LAYER'S OWED ITEMS — **NONE. FN CLOSED THE LAST THREE.**
 
-**All four were recorded only in the WHERE block above, which is REPLACED every batch** — so each
-survived by whichever batch happened to re-copy it, which is not a mechanism. **They are queue
-items and they live here.** None of the three that remain is a decision this file may take;
-**the fourth — the generated stat family's two disagreeing triggers — was answered by the designer
-at FM and is struck through below rather than deleted**, so the reasoning is not re-derived.
+**All four items in this section were recorded only in the WHERE block above until FL moved them
+here, which is the mechanism that let them survive a rewrite.** FM answered the generated stat
+family; **FN answered the other three**, and they are struck through rather than deleted so the
+reasoning is not re-derived.
 
-- **THE EIGHT SHIPPED GATED RUNES NEED RE-READING, AND THE COUNT IS EIGHT.** Four THRESHOLD —
-  **Deepening Hex, Bracing Line, Heavy Bolts, Answering Pack** — and four BREADTH — **Wide Rite,
-  Long Watch, Wide Watch, Shared Scent**. The designer retired both secondaries going forward
-  (`docs/master.html` and the `Runes.RUNE_SHAPES` source comment carry the three reasons, which
-  are **FJ's**); these eight predate the ruling and still carry both their condition and their
-  label. **`check_fk` §2 asserts they are still gated, deliberately** — *"none is authored"* must
-  not be satisfiable by quietly ungating the ones that are owed a fix.
-  - **ELEVEN LINES ACROSS FIVE FILES SAY SIX AND ONLY THE ASSERTED LIST IS RIGHT.**
-    `check_fk.STILL_GATED` holds eight. The eleven, from a census rather than a hand-tally:
-    **`check_fk.gd` ×5** (lines 6, 8, 53, 134, 153), **`scripts/runes.gd` ×1** (536),
-    **`docs/master.html` ×3** (2658–2660, including *"because six live runes still come through
-    it"*), **`docs/changelog.html` ×1** (the FK entry) and **`docs/reports/FK.md` ×1** (§9).
-    **FL corrected this file only** — fixing some of eleven makes the disagreement worse.
-    **It is ONE scoped repair for whichever batch next touches that gate**,
-    and `check_fk.gd`'s own comments are inside it. **A `.gd` comment is an asserted surface, so
-    that repair owes a literal sweep and a subset battery even though it moves no code.**
-  - **AND RE-READING ONE IS NOT RE-PRICING IT.** See the Bracing Line entry below: at least one
-    of the eight has its magnitude priced against a DIFFERENT gate from the one being retired.
-- **BRACING LINE'S 8.98% PRICES THE LEVEL, NOT THE CONDITION — DO NOT QUOTE IT AS THE PAY RATE.**
-  The rune carries **two gates**: the retired `tag_threshold: DEFENSE` at the SPAWN
-  (`Talents.condition_met` returns before `apply_payload` writes `rune_bracing_line`) and **Heavy
-  Plating standing at +32% in the FIGHT** (`battle.gd`'s read site, which never sees the
-  threshold). **`docs/reports/EZ.md` §2b(i) measured the second with the first assumed met** —
-  8.98% of incoming hits alone, 11.91% paired with the Standing Wall, n = 200,000 an arm.
-  **So 8.98% is the rate the rune would pay at with the secondary REMOVED**; today's rate is that
-  figure times the chance the DEFENSE threshold holds, and is strictly lower. **Ungating it does
-  not invalidate what 32 was ruled against — it makes that figure true.** `BRACING_LINE_LEVEL` is
-  the constant and it is untouched.
-- **~~THE GENERATED STAT FAMILY'S TWO TRIGGERS~~ — CLOSED AT FM. THE DESIGNER RULED AND IT IS OUT.**
-  The disagreement FL reported (`docs/spec-recon.html`'s *"once the eight specs are authored"*
-  against this file's *"once the pool is proven"*) never needed resolving: the designer ruled
-  directly. **The family is removed from every offer path and the entries are KEPT**, so
-  `Runes.TEMPLATE_PRICE` = 50 and all six templates stand unmoved in the code and reach nothing but
-  `DOD_SIM_RUNES=stats`. **Nothing is owed from this item.** What FM found on the way is in the
-  WHERE block above and in `docs/reports/FM.md`.
-- **THE `.docx` EXPORTS: A DESIGNER'S RULING AND A STANDING RULE DISAGREE, AND ONLY ONE OF THEM IS
-  SWEPT.** `CLAUDE.md`'s *Working agreement* step (3) requires rebuilding both via
-  `python3 docs/build_docs.py` on **every design change**. **The ruling that they stay stale is
-  recorded in exactly one place — `docs/reports/FH.md` §4 — a closed report**, which is the one
-  file class no instrument reads and no sweep covers. The exports are stale by construction and
-  nothing in the tree says so. **The reconciliation is a RULE EDIT and belongs to a batch that is
-  allowed to make one**: either the *Working agreement* gains the exception, or the exports come
-  back into the loop. **FL was forbidden to rewrite a rule, so it reported this rather than
-  taking it.**
+- **~~THE EIGHT SHIPPED GATED RUNES NEED RE-READING~~ — CLOSED AT FN. THE DESIGNER RULED AND THE
+  CONDITIONS CAME OFF.** The count was **EIGHT** (four THRESHOLD — Deepening Hex, Bracing Line,
+  Heavy Bolts, Answering Pack; four BREADTH — Wide Rite, Long Watch, Wide Watch, Shared Scent), the
+  eleven lines that said six are corrected, and `check_fk` §2's assertion inverted rather than
+  being deleted. **Nothing is owed from this item.** What FN measured on the way is in the WHERE
+  block and in `docs/reports/FN.md` §1.
+- **~~BRACING LINE'S 8.98% PRICES THE LEVEL, NOT THE CONDITION~~ — STILL TRUE AND NO LONGER A
+  WARNING.** It priced Heavy Plating's +32% level **with the tag threshold assumed met**; the
+  threshold is gone, so **8.98% of incoming hits (11.91% with the Standing Wall) is simply the
+  rate now.** `BRACING_LINE_LEVEL` is untouched at 32 and the plating clause is still on the card —
+  it was always a SECOND gate and never the retired secondary.
+- **~~THE `.docx` EXPORTS: A DESIGNER'S RULING AND A STANDING RULE DISAGREE~~ — CLOSED AT FN §3.**
+  `CLAUDE.md`'s *Working agreement* step (3) carries the ruling and its reason now. **The
+  transferable half, which is why this item is kept:** a rule contradicted by a ruling that lives
+  only in a closed batch report is a rule a future batch follows, because `docs/reports/` is the
+  one file class no instrument reads and no sweep covers.
+
+### FN HANDS OVER THREE DESIGN QUESTIONS AND TAKES NONE OF THEM
+
+**All three are magnitudes or content and all three are the designer's. FN flagged and did not
+retune, which is what its brief required.**
+
+- **DEEPENING HEX IS WORTH EXACTLY ZERO TO AN OCCULTIST HOLDING AVATAR OF RUIN.** `_ruin_threshold`
+  is `mini(step, 8)` and the capstone installs 5. **The behaviour is correct and deliberate** —
+  `check_ez` §5 asserts it, and it was written to stop a rune that ASSIGNED pushing detonation
+  BACK. **What nobody had written down is that the correct behaviour makes the rune inert for a
+  capstone holder**, and ungating did not change that: it was true before and it is true now.
+- **THE WIDE WATCH IS WORTH EXACTLY ZERO TO A SHARPSHOOTER HOLDING OVERKILL.** The node's own text
+  is *"the carry keeps your Focus in FULL rather than dropping it to the usual 50"* — the rune's
+  clause, word for word — and the rune sits one `elif` above the arm that clamps. **There is a
+  cosmetic tell**: with the rune held the Overkill log line can never print, so the player is told
+  the rune did what his talent did.
+- **AND TWO OF THE EIGHT JUST GOT MUCH STRONGER, WHICH IS THE OTHER SIDE OF THE SAME
+  MEASUREMENT.** The Wide Rite went from **1.4%** of an Occultist's build space to 100%, and Heavy
+  Bolts from **2.6%** to 100%. **Neither magnitude was retuned and neither should be re-read as a
+  bug**; they are the two the ruling changed most, and whether they are now correctly priced at
+  100g is a design question.
 
 ### TEN OF FK'S RUNES HAVE NO SUITE COVERAGE — **REPORTED AT FK §3, RECORDED HERE AT FM §5, OWED**
 
@@ -203,6 +188,25 @@ recommended over the other, because rune content is written with the designer on
   caught). **The source-level pins were never the loose ones** and are untouched: `check_fd` §1f and
   `test_batch_bo` §3 hold three needles each. Repaired at FM; recorded because the SHAPE recurs —
   a screen-level proxy for a source-level rule goes stale when the screen's content grows.
+  **AND AT FN THE REPAIR WENT DORMANT WITHOUT BEING WRONG.** The eight *"his drafted cards"*
+  clauses FM scoped around were the eight retired conditions, so **zero live runes name a draft
+  now** and the excusal has nothing to excuse. **It is not reverted**: the BUTTON arm is
+  unaffected, and the day a rune's text names a draft again the scoping is what stops a false red.
+  **A repair whose occasion disappears is not a repair that was wrong.**
+
+### AN OUT-OF-REPO HEAD REBUILD NEEDS THE IGNORED FILES — **FOUND AT FN, RECORDED, NOT A RULE EDIT**
+
+**`git archive HEAD | tar -x` IS TRACKED FILES ONLY, AND `.godot/` AND `*.import` ARE BOTH
+GITIGNORED.** A copy built that way cannot resolve `res://scenes/battle.tscn`, so **every
+fixture-driven gate throws `Cannot call method 'get' on a null value` inside `gate_fixture.spawn`
+and then sits at ~1% CPU instead of exiting** — which reads as a hang, not as a broken copy.
+**THE METHOD THAT WORKS:** `rsync` the whole working tree (ignored files included), then
+`git --work-tree=<copy> checkout HEAD -- .`, which puts HEAD's tracked content into a tree that
+still has its import cache. **Verified both ways at FN**: the archive copy hung on
+`check_cm_live`; the rsync copy ran it in 70 seconds and reproduced the sanctioned red's four FAIL
+lines byte-for-byte. **Recorded here rather than in `docs/instrument-rules.md` because writing a
+rule is a rule edit** — but a batch that needs a HEAD control needs this before it needs anything
+else.
 
 ### THE `master.html` STAMP CAN SIT ~40 BATCHES STALE AND PASS — **NAMED AT FL §3, NOT FIXED**
 

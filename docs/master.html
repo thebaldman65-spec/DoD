@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-08 (Batch FM &mdash; the filler comes out)</b></p>
+<p align="right"><b>Last updated: 2026-09-08 (Batch FN &mdash; the eight gated runes come off their conditions)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1668,8 +1668,8 @@ the cards carrying BREAK at all went 46&nbsp;&rarr;&nbsp;99. <b>The fifty-fourth
 where EL &sect;2 had already ruled the second slot to MARK: it reads
 OFFENSE&nbsp;&middot;&nbsp;MARK, and it is <b>the one card of the 54 where the demotion became a
 removal</b>. <b>Thirty rows lost a secondary to make room</b> (18 RESOURCE, 9 DEBUFF, 2 DEFENSE,
-1 TEMPO; 20 had none to lose and 3 already read OFFENSE second), and that is cheap because <b>a secondary feeds no condition</b>: the two rune conditions
-count the PRIMARY only, so a displaced secondary moves a screen and nothing a rune asks.
+1 TEMPO; 20 had none to lose and 3 already read OFFENSE second), and that is cheap because <b>a secondary feeds no condition</b> &mdash; and since Batch FN
+<b>nothing does</b>: no rune reads a tag at all, so a displaced secondary moves a screen and nothing else.
 <b><code>Runes.RUNE_TAGS</code> follows the cards</b> &mdash; the five rune rows that led with
 BREAK (<code>long_watch</code> and <code>bared_plate</code> live, <code>comet</code>,
 <code>seventh_bolt</code> and <code>shattered_guard</code> retired) all read
@@ -1679,8 +1679,7 @@ Four of the five carried BREAK as their ONLY tag and cost nothing to move;
 TRADEOFF. <b>Nothing behaves differently, and that is measured rather than assumed</b>: the
 chain <code>RUNE_TAGS</code>&nbsp;&rarr;&nbsp;<code>rune_tags()</code>&nbsp;&rarr;&nbsp;<code>rune_tag_line()</code>
 ends in <b>no caller at all</b> &mdash; the rune-offer surface is still unbuilt &mdash; and
-neither rune condition reads the table, because both count CARD primaries over the hero's
-drafted cards.</p>
+<b>no rune condition exists to read the table</b> (Batch FN retired both).</p>
 <p><b>The protected cores carry them too, and that is what gives a build a seed.</b> The
 Pyromancer opens holding a DEBUFF card whether or not he ever drafts one, so a hero starts
 the run pointing somewhere rather than needing three lucky picks to point anywhere.</p>
@@ -1690,61 +1689,31 @@ starts costing meaning. <b>An eighth needs an argument.</b> MARK names the cards
 lasting marker on ONE enemy that later hits read: Hunter&#x27;s Mark, Quarry&#x27;s Mark, Mark of
 the Hunt, Reacquire, Blood Debt, Vendetta, Covenant of Ash and Arcane Echo lead with it, and
 Snare Line and Feint carry it second.</p>
-<p><b>EIGHT RUNES READ A TAG, AND THE SENTENCE THAT STOOD HERE &mdash; <i>&ldquo;no clause reads
-a tag yet&rdquo;</i> &mdash; HAS BEEN FALSE SINCE BATCH EZ.</b> ES §4 built the machinery and
-authored nothing; EZ authored twenty-one runes and gated eight of them. <b>Deepening Hex, Bracing
-Line, Heavy Bolts and the Answering Pack read a THRESHOLD</b> (on DEBUFF, DEFENSE, MARK and
-DEFENSE respectively) and <b>the Wide Rite, the Long Watch, the Wide Watch and the Shared Scent
-read BREADTH</b>. No ability, talent or relic reads one, and no rune branches on a tag for
-anything but its own gate. The count is shown to the player on two screens.</p>
-<p><b>EQUIPPED, NEVER OWNED, AND THAT IS THE WHOLE DESIGN.</b> A hero&#x27;s <b>pool</b> is
-everything he has drafted and nothing ever leaves it, so a threshold read off the pool would turn
-on once, late, and never off again &mdash; a flat increment with a delay. What the conditions
-count is what he <b>carries and earned</b>: <code>Runes.drafted_names()</code> reads
-<code>bm_equipped</code>, falling back to <code>bm_abilities</code>. Counting that is what makes
-it a <b>lever</b> &mdash; you can swap to switch a rune on or off.</p>
-<p><b>AND THE PROTECTED CORE IS <i>NOT</i> IN THAT COUNT. THIS PARAGRAPH SAID IT WAS, AND BATCH FJ
-CORRECTED IT TOWARD THE CODE.</b> The claim &mdash; <i>&ldquo;the protected core is in the count,
-because it is carried: it is half to two thirds of the bar&rdquo;</i> &mdash; described the
-pre-ES&nbsp;&sect;4 charter and contradicted the paragraph four above it, which has said
-correctly since EZ that both conditions <i>&ldquo;count CARD primaries over the hero&#x27;s
-drafted cards&rdquo;</i>. <b>ES &sect;4 is why:</b> it measured that a protected core ALONE met a
-2+ threshold on BREAK for ten of twelve specs, so the conditions moved to drafted-only counting.
-<b>The denominator is therefore the EARNED cards, not the 7-to-10 bar</b> &mdash;
-<code>ability_slot_cap()</code> minus <code>core_slots(spec)</code>, so <b>4 to 7</b> for the ten
-3-slot specs and <b>3 to 6</b> for the Holy Cleric at 4. The whole-bar figure is a different
-number for a different question: <code>Run.loadout_ability_names()</code> is core plus earned, and
-that is what the on-screen tag census walks.</p>
-<p><b>THE DEFAULT SHAPE IS A THRESHOLD</b> &mdash; <b>at least HALF his drafted cards carry the
-tag as their PRIMARY</b>, get the effect &mdash; with other shapes available per rune.
-(<b>&ldquo;hold 2+ of a tag&rdquo; stood here and was corrected at Batch FJ:</b> that was the
-charter's opening shape, and the live rule has been
-<code>primary_tag_count(drafted, tag) * 2 &gt;= drafted.size()</code> since ES &sect;4 &mdash;
-written as integer arithmetic so half of an odd count rounds the same way in the condition and on
-the surface that prints it.) <b>A SPLASH PAYS FOR BREADTH INSTEAD (&sect;5):</b> where a
-normal rune pays for DEPTH in one tag, a splash pays for cards spanning several different tags.
-That is the inverse shape, and it gives the category an identity again now that the talent lanes
-it used to reach across are severed &mdash; <b>tags are the thing to reach across</b>, and a hero
-who is spread rather than deep is who it is for.</p>
-<p><b>THE COUNT IS VISIBLE, WHICH IS HALF OF WHY IT IS WORTH HAVING.</b> A silent threshold is a
-stat nobody knows they have. The census is drawn on the <b>loadout panel</b>, where the swap
-happens, and on the <b>hero sheet</b>, the one screen where a whole loadout is read at once; it is
-recomputed from the live loadout on every draw, so it moves the instant a card is benched.</p>
-<p><b>AND A THRESHOLD&#x27;S MAGNITUDE HAS TO BE CHOSEN AGAINST THE CORE KIT, WHICH IS MEASURED
-RATHER THAN LEFT TO BE DISCOVERED.</b> Before a single card is drafted, the protected cores alone
-already meet a 2+ threshold on <b>BREAK for ten of the twelve specs</b> and on <b>DEBUFF for
-seven</b>; <b>MARK is zero for all twelve</b> and <b>TEMPO reaches 1 on exactly one</b>. A rune
-asking for 2+ BREAK would be on from the first fight for almost everyone and no swap could turn
-it off &mdash; the flat increment this shape exists to avoid, arriving through the cores instead
-of through the pool. The per-spec table is printed by <code>check_es</code> on every battery run,
-so the day a core kit moves the baseline is re-measured rather than re-assumed.</p>
-<p><b>AND SINCE BATCH FD &sect;2 THAT WARNING HAS BECOME A PROHIBITION, IN THE OTHER DIRECTION.</b>
-The table above is <code>check_es</code>&#x27;s BOTH-TAGS census, which is right for a screen; the
-two rune conditions count the PRIMARY only, and <b>no card has a BREAK primary any more</b>.
-So a rune asking for a BREAK threshold is not <i>always on</i> &mdash; it can <b>never</b> be met,
-by any hero, ever. <b>Do not author one.</b> The four live thresholds name DEBUFF, DEFENSE (twice)
-and MARK, so nothing today depends on it; <code>check_fd</code> §2 asserts that no live rune gates
-on BREAK <i>or</i> on OFFENSE, the two columns the demotion moved.</p>
+<p><b>NO RUNE READS A TAG. THE TAGS ARE A VOCABULARY THE PLAYER READS, AND NOTHING BRANCHES ON
+ONE.</b> No ability, talent, relic or rune reads a tag count; the draft card shows the words and
+the two loadout screens count them, and that is the whole of it. <b>The count is shown to the
+player on two screens</b> &mdash; the <b>loadout panel</b>, where the swap happens, and the
+<b>hero sheet</b>, the one screen where a whole loadout is read at once. Each is recomputed from
+the live loadout on every draw, so it moves the instant a card is benched.
+<code>check_ek</code> &sect;3 sweeps every script in the repo and asserts the set of files naming
+a tag is exactly four &mdash; two that define the tables and two that display them.</p>
+<p><b>THE READING MACHINERY IS STILL THERE AND STILL READS NOTHING.</b> A rune CAN ask how many
+equipped cards of a tag its holder carries (<code>Runes.tag_threshold_met</code>) or how many
+different tags his bar spans (<code>Runes.breadth_met</code>), both over
+<code>Run.loadout_ability_names</code> &mdash; the whole bar, both tags on a card counted. <b>No
+rune asks.</b> These are ES &sect;4/&sect;5's absolute-count shapes and they are the door the
+first tag-reading rune would come back through.</p>
+<p><b>AND ITS ONE HARD CONSTRAINT IS MEASURED RATHER THAN LEFT TO BE DISCOVERED.</b> Before a
+single card is drafted, the protected cores alone already meet a 2+ threshold on <b>BREAK for ten
+of the twelve specs</b> and on <b>DEBUFF for seven</b>; <b>MARK is zero for all twelve</b> and
+<b>TEMPO reaches 1 on exactly one</b>. A rune asking for 2+ BREAK would be on from the first
+fight for almost everyone and no swap could turn it off &mdash; a flat increment arriving through
+the cores instead of through the pool. The per-spec table is printed by <code>check_es</code> on
+every battery run, so the day a core kit moves the baseline is re-measured rather than re-assumed.
+<b>And BREAK cannot carry one at all</b>: no card has a BREAK primary since Batch FD &sect;2, so a
+threshold counting primaries on BREAK could never be met by any hero, ever. <b>Do not author
+one.</b> <code>check_fd</code> &sect;2 asserts that no live rune carries a condition of any kind,
+and names BREAK and OFFENSE &mdash; the two columns the demotion moved &mdash; separately.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
@@ -2655,56 +2624,43 @@ rung of the ladder and dead at the next</b> (the Holy's breadth is satisfiable a
 drafted cards; the Swordmaster's fails at exactly five). <b>TRADEOFF SURVIVES</b> &mdash; a cost
 paired with a bigger upside is self-balancing and reads on the card &mdash; and <b>eight of FK's
 thirty-nine carry one</b>, against the four the first twenty-one had.
-<b>THE SIX ALREADY-SHIPPED GATED RUNES ARE NOT REPAIRED AND ARE OWED</b>; the machinery below is
-unchanged and still reads exactly as it did, because six live runes still come through it.
-<code>check_fk</code> &sect;2 asserts those six are <b>still gated</b>, so &ldquo;none is
-authored&rdquo; cannot be satisfied by quietly ungating the ones that are owed a fix.
+<b>AND THE EIGHT ALREADY-SHIPPED GATED RUNES CAME OFF THEIR CONDITIONS AT BATCH FN (ruled by the
+designer).</b> They were <b>EIGHT, not six</b> &mdash; four THRESHOLD (Deepening Hex, Bracing Line,
+Heavy Bolts, the Answering Pack) and four BREADTH (the Wide Rite, the Long Watch, the Wide Watch,
+the Shared Scent) &mdash; and every one of them is unconditional now: the payload condition and the
+label came off together, and the clause came off the card. <b>No entry in the file carries a
+condition of any kind</b>, so the reading machinery below had no reader left and went with them.
+<code>check_fk</code> &sect;2 asserted those eight were <b>still gated</b>, so &ldquo;none is
+authored&rdquo; could not be satisfied by quietly ungating the ones that were owed a fix; that arm
+is <b>inverted</b> now and asserts none of the eight carries a condition, which keeps the same
+question alive pointed the other way.
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY (Batch EZ §0).</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
-it, if anything &mdash; <b>THRESHOLD, BREADTH or TRADEOFF</b>. A rune may carry more than one, or
-none. They live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in
-<code>RUNE_TAGS</code>, and the two are <b>different axes</b>: one says what a rune is FOR in the
-seven-word card vocabulary, the other says what it does and what turns it on. <code>check_ez</code>
-&sect;0 asserts the label and the payload's condition agree in both directions, because a rune
-advertising a gate it does not have and one carrying a gate the player is never told about are
-different faults and neither is visible from one side.
-<br><b>THE TWO CONDITIONS ARE FRACTIONS OF THE HERO'S DRAFTED CARDS, NOT COUNTS.</b>
-<b>THRESHOLD: at least HALF his DRAFTED cards carry the named tag. BREADTH: NO tag exceeds a
-THIRD of them.</b> Both count the <b>PRIMARY tag only</b>, so a card contributes exactly one tag
-and the two read the same denominator. <b>The fraction is the point</b>: a hero drafts 4 earned
-slots at zone 1 and 7 by the end, so a fixed COUNT would mean two different commitments at those
-two moments &mdash; a fraction is the same commitment all run, <b>and it can be tipped by benching
-one card</b>, which is what makes the loadout lever reach the rune layer.
-<br><b>THE COUNTED SET IS THE DRAFTED HALF THAT IS EQUIPPED &mdash; never the pool, and NEVER
-the protected core.</b> Batch EG split pool from loadout and made only the earned half swappable,
-so the counted set and the swap lever are the same set. The core is out for a measured reason:
-<b>the Occultist's core alone carries the DEBUFF threshold</b>, so counting the whole bar would
-turn Deepening Hex on from the first fight with no bench able to turn it off. <b>ES &sect;4's
-census counts BOTH tags on a card and these count only the PRIMARY, and neither is the other's
-repair</b> &mdash; a census is right for a screen, and a condition needs a PARTITION or the
-per-tag numbers sum past the card count and &ldquo;a third of them&rdquo; means nothing.
-<br><b>THE STATE IS VISIBLE ON BOTH SCREENS AND UPDATES ON A SWAP, IMMEDIATELY.</b> The hero
-sheet and the loadout panel each carry a <code>RUNE CONDITIONS</code> line &mdash; <i>&ldquo;4 of
-7 &mdash; DEBUFF&rdquo;</i>, with a tick where the condition is met &mdash; beside the existing
-census, rebuilt from the live member on every draw. <b>A player who cannot see he is one card
-away cannot use the lever.</b>
-<br><b>AN EMPTY DRAFTED LIST MEETS NEITHER CONDITION (Batch FA &sect;1, ruled by the
-designer).</b> EZ built the two rules literally and the literal reading was vacuous &mdash; nothing
-carries the tag, so nothing fails to be half of it; no tag exists, so none exceeds a third &mdash;
-which meant <b>a hero with no drafted cards switched on a THRESHOLD rune and a BREADTH rune at the
-same time</b>, the one state the two shapes were designed never to share. <b>It was reachable two
-ways</b>: <code>Run.unequip_earned_ability</code> has no floor, so a hero's whole drafted half can
-be benched, and a hero who has not drafted yet reads the same empty list. <b>BOTH are closed, not
-just threshold</b> &mdash; breadth-of-nothing is arguably harmless on its own and it is the same
-degenerate state, and two conditions with different emptiness rules is a second thing to remember
-for no gain. <b>The guard sits in <code>threshold_met</code> and
-<code>breadth_met_fraction</code> themselves rather than at the door</b>, because the hero sheet
-and the loadout panel call those two DIRECTLY for the tick they draw: a guard one layer up would
-refuse the rune while both screens still showed a &check; on an empty bar.
-<br><b>THE CONDITION IS READ AT THE SPAWN AND NEVER IN THE STRIKE LOOP.</b> A loadout cannot
-change during a battle, so a gated payload is decided once, where <code>Talents.apply_payload</code>
-already reads its <code>condition</code> &mdash; and <code>Runes.loadout_condition_met</code> is
-the one door it comes through, which is what keeps the tag vocabulary inside the rune layer.
+it, if anything. <b>TRADEOFF is the only secondary any entry carries</b> &mdash; a cost paired
+with a bigger upside, self-balancing and readable on the card &mdash; and <b>twelve of the sixty
+carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
+live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the
+two are <b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the
+other says what it does and what turns it on. <code>check_ez</code> &sect;0 asserts the label and
+the payload's condition agree in both directions, because a rune advertising a gate it does not
+have and one carrying a gate the player is never told about are different faults and neither is
+visible from one side.
+<br><b>NO RUNE IS CONDITIONAL. A RUNE INSTALLS AND IT IS ON.</b> A payload may still carry a
+<code>condition</code> in principle &mdash; <code>Talents.condition_met</code> answers
+<code>has_node</code> and <code>owns_ability</code> for the talent trees &mdash; but <b>no rune
+uses one</b>, and the two tag conditions it used to answer are gone from the file, from the code
+and from the screens. <b>A gated rune at a flat 100g is strictly WORSE than a bare one</b>: the
+price does not fall to pay for the clause, so the condition is pure cost with nothing bought by
+it. <code>check_fn</code> &sect;1 asserts the census across all 126 entries, live and retired, so
+a re-gating is caught where it would appear rather than where somebody happened to look.
+<br><b>AND WHAT THE CONDITIONS WERE ACTUALLY COSTING WAS MEASURED BEFORE THEY WENT.</b> Read as
+the share of a spec's reachable loadouts that satisfied the clause at each rung of the slot
+ladder, the eight ranged from <b>Deepening Hex at 69&ndash;86%</b> &mdash; near enough a free
+clause &mdash; down to <b>Heavy Bolts at 0&ndash;8%</b> and <b>the Wide Rite at 0&ndash;4%</b>.
+<b>Two of them were unreachable at a full bar</b>: Heavy Bolts' MARK threshold cannot be met by a
+Sharpshooter carrying seven drafted cards (his whole pool holds three MARK primaries against the
+four the fraction needs), and the Wide Rite's breadth cannot be met by an Occultist at five or at
+seven. Full per-rune table in <code>docs/reports/FN.md</code> &sect;1.
 <br><b>THE 65 ET RETIRED ARE STILL RETIRED (Batch ET §1) AND STILL UNREACHABLE.</b>
 EO §3 retired twelve; ET §1 retires the other fifty-three. <b>Retired the way the twelve
 already are &mdash; kept, and said to be kept</b>: every entry keeps its name, its price, its

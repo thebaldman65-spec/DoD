@@ -1147,18 +1147,29 @@ func _s3_the_rune_offer() -> void:
 	print("    a boss awards a relic, a slot rung, an ability pick and a talent point — NO rune")
 
 
-# ── §4 — A RUNE'S CONDITION, TURNED OFF BY BENCHING ─────────────────────────
+# ── §4 — THE BENCH LEVER, AND THE LINE THAT WENT WITH THE CONDITIONS ────────
 #
-# EZ–FC authored twenty-one runes that read the LOADOUT, so a bench is a lever
-# on a rune. **THE LEVER AND ITS READOUT ARE THE SAME PRESS**: `_toggle_loadout`
-# re-opens the panel it just acted on, so the RUNE CONDITIONS line is rebuilt
-# from the live member and there is no cached count to go stale — which is the
-# claim this section is here to test rather than to repeat.
+# **THIS SECTION DROVE A RUNE'S CONDITION ON AND OFF BY BENCHING, AND BATCH FN
+# RETIRED THE CONDITIONS.** EZ–FC authored twenty-one runes and gated eight on
+# the loadout; FK retired both gated secondaries going forward; FN took them off
+# the eight and removed the predicates, the two line builders and the
+# `RUNE CONDITIONS` line both screens drew.
+#
+# **THE LEVER ITSELF IS NOT WHAT WENT, SO THE DRIVE IS NOT WHAT GOES.** The
+# claim underneath was never really about runes: `_toggle_loadout` re-opens the
+# panel it just acted on, so the tag line is rebuilt from the live member and
+# there is no cached count to go stale. **That is now asserted against the
+# `CARRIED BY TAG` census** — ES §4's line, which stays because the tags are
+# player-facing on the draft card and are not conditions (EK) — with the
+# retired line asserted ABSENT on both surfaces beside it. A negative anchor
+# with a positive arm through the same press, which is what stops "no
+# RUNE CONDITIONS line" being what an unopened panel prints.
 func _s4_bench_a_condition() -> void:
-	print("\n§4 — a rune's condition, turned off by benching")
+	print("\n§4 — the bench lever, and the retired condition line")
 	var s: Node = await _fresh_map(3)
 	var hero: Dictionary = _run.party[0]
-	# Give him cards until one tag threshold is MET, through the run's door.
+	# Give him cards through the run's own door, until the drafted half carries
+	# something a bench can actually move.
 	var tag := ""
 	for _i in 14:
 		if not bool(_run.award_draft_pick(hero)):
@@ -1175,42 +1186,43 @@ func _s4_bench_a_condition() -> void:
 			if String(_run.take_draft_ability(hero, name0,
 					String(carried[carried.size() - 1]))) != "":
 				break
-		var dr: Array = Runes.drafted_names(hero)
+		# The tag to pull on: one the DRAFTED half carries, so a bench moves it.
+		var drafted_now: Array = _run.equipped_ability_names(hero)
 		for t in Classes.TAG_ORDER:
-			if bool(Runes.threshold_met(dr, String(t))):
+			if int(Classes.tag_count(drafted_now, String(t))) >= 2:
 				tag = String(t)
 				break
 		if tag != "":
 			break
-	ok(tag != "", "§4: no tag threshold could be met on a full Berserker kit")
+	ok(tag != "", "§4: no tag reached two drafted cards on a full Berserker kit")
 	if tag == "":
 		return
-	var drafted: Array = Runes.drafted_names(hero)
-	var cond := {"tag_threshold": tag}
-	ok(bool(Runes.loadout_condition_met(cond, hero)),
-		"§4: the %s threshold reads MET on the table and NOT through the door" % tag)
-	# THE PANEL, AND ITS LINE.
+	# THE PANEL, AND ITS LINE. The needle is the WHOLE joined census exactly as
+	# `map_screen` builds it, not one `TAG n` pair: at ten carried cards a count
+	# of 1 is a substring of a count of 13, and a needle that can match a
+	# neighbour is a needle that passes for the wrong reason.
 	s.call("_open_loadout_panel", 0)
 	await process_frame
 	var ov: Node = _overlay(s, 60)
 	ok(ov != null, "§4: the loadout panel did not open")
 	if ov == null:
 		return
-	var met_line: String = "%s %d✓" % [tag, int(Classes.primary_tag_count(drafted, tag))]
-	ok(_has_text(ov, met_line),
-		"§4: the loadout panel does not show `%s` while the condition IS met" % met_line)
-	# BENCH UNTIL IT FALLS. Every bench is a real press on the panel's own row.
+	var before := _census_needle(hero)
+	ok(_has_text(ov, before),
+		"§4: the loadout panel does not show its own census `%s`" % before)
+	ok(not _has_text(ov, "RUNE CONDITIONS"),
+		"§4: the loadout panel still draws a `RUNE CONDITIONS` line — FN retired both conditions")
+	# BENCH UNTIL THE CENSUS MOVES. Every bench is a real press on the panel's
+	# own row.
 	var benched: Array = []
 	for _i in 8:
-		if not bool(Runes.loadout_condition_met(cond, hero)):
-			break
 		var live_ov: Node = _overlay(s, 60)
 		if live_ov == null:
 			break
 		var carried2: Array = _run.equipped_ability_names(hero)
 		var hit := ""
 		for c in carried2:
-			if int(Classes.primary_tag_count([String(c)], tag)) > 0:
+			if Classes.card_tags(String(c)).has(tag):
 				hit = String(c)
 				break
 		if hit == "":
@@ -1225,18 +1237,23 @@ func _s4_bench_a_condition() -> void:
 		benched.append(hit)
 		await process_frame
 		await process_frame
-	ok(not benched.is_empty(), "§4: nothing could be benched to break the condition")
-	ok(not bool(Runes.loadout_condition_met(cond, hero)),
-		"§4: %d %s cards were benched and the condition is STILL met" % [
-			benched.size(), tag])
-	# AND THE SCREEN SAYS SO. The ✓ is gone from the same line.
+		if _census_needle(hero) != before:
+			break
+	ok(not benched.is_empty(), "§4: nothing could be benched to move the census")
+	var after := _census_needle(hero)
+	ok(after != before,
+		"§4: %d %s cards were benched and the census did not move (`%s`)" % [
+			benched.size(), tag, after])
+	# AND THE SCREEN SAYS SO, on the panel the press landed on.
 	var ov2: Node = _overlay(s, 60)
 	if ov2 == null:
 		s.call("_open_loadout_panel", 0)
 		await process_frame
 		ov2 = _overlay(s, 60)
-	ok(ov2 != null and not _has_text(ov2, met_line),
-		"§4: the panel still shows `%s` after the condition was broken" % met_line)
+	ok(ov2 != null and _has_text(ov2, after),
+		"§4: the panel does not show the census `%s` after the bench" % after)
+	ok(ov2 != null and not _has_text(ov2, before),
+		"§4: the panel still shows the census it had BEFORE the bench — there is a cached count")
 	# AND BACK ON. The lever works in both directions or it is not a lever.
 	for b in benched:
 		var back_ov: Node = _overlay(s, 60)
@@ -1244,23 +1261,34 @@ func _s4_bench_a_condition() -> void:
 			_run.equip_earned_ability(hero, String(b))
 		await process_frame
 		await process_frame
-	ok(bool(Runes.loadout_condition_met(cond, hero)),
-		"§4: the benched cards were carried again and the condition did NOT come back")
-	# THE HERO SHEET CARRIES THE SAME LINE — one builder, two surfaces.
+	ok(_census_needle(hero) == before,
+		"§4: the benched cards were carried again and the census did NOT come back")
+	# THE HERO SHEET CARRIES THE CENSUS TOO — one vocabulary, two surfaces — and
+	# it carries no condition line either.
 	_run.hero_screen_idx = 0
 	change_scene_to_file("res://scenes/party.tscn")
 	for _i in 5:
 		await process_frame
 	var sheet: Node = current_scene
 	ok(_scene_name() == "Party", "§4: the hero sheet did not open (got %s)" % _scene_name())
-	var dr2: Array = Runes.drafted_names(hero)
-	var sheet_line: String = "%s %d ✓" % [tag, int(Classes.primary_tag_count(dr2, tag))]
-	ok(_has_text(sheet, "RUNE CONDITIONS"),
-		"§4: the hero sheet does not carry a RUNE CONDITIONS line at all")
-	ok(_has_text(sheet, sheet_line),
-		"§4: the hero sheet does not show `%s` while the condition is met" % sheet_line)
-	print("    %s met, %d cards benched to break it, and both surfaces followed" % [
+	ok(_has_text(sheet, "CARRIED BY TAG"),
+		"§4: the hero sheet lost its `CARRIED BY TAG` census")
+	ok(not _has_text(sheet, "RUNE CONDITIONS"),
+		"§4: the hero sheet still draws a `RUNE CONDITIONS` line")
+	print("    %s pulled, %d cards benched and carried back, and the census followed both ways" % [
 		tag, benched.size()])
+
+
+# The `CARRIED BY TAG` line's own middle, built exactly as `map_screen` builds
+# it — `Classes.tag_census` over the WHOLE bar, every tag including the zeroes,
+# joined with three spaces. One builder, so this needle cannot drift from the
+# screen's without the screen changing.
+func _census_needle(member: Dictionary) -> String:
+	var census: Dictionary = Classes.tag_census(_run.loadout_ability_names(member))
+	var held: Array = []
+	for t in Classes.TAG_ORDER:
+		held.append("%s %d" % [String(t), int(census[String(t)])])
+	return "   ".join(PackedStringArray(held))
 
 
 # ── §5 — THE POUCH ──────────────────────────────────────────────────────────

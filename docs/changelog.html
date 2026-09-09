@@ -15,6 +15,74 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-08 &mdash; Batch FN: THE EIGHT GATED RUNES COME OFF THEIR CONDITIONS</h2>
+<p><b>THRESHOLD AND BREADTH ARE RETIRED AND THE EIGHT RUNES THAT STILL CARRIED THEM ARE
+UNCONDITIONAL (ruled by the designer).</b> FK retired both secondaries going forward; these eight
+predate that ruling. <b>The payload condition, the label and the clause on the card all came off
+together</b> &mdash; Deepening Hex, Bracing Line, Heavy Bolts and the Answering Pack (THRESHOLD),
+the Wide Rite, the Long Watch, the Wide Watch and the Shared Scent (BREADTH). <b>It is EIGHT and
+not six</b>: <code>check_fk.STILL_GATED</code> held the right list while eleven lines across five
+files said six, and all eleven are corrected here. <b>No magnitude moved.</b></p>
+<p><b>THE REASON, RECORDED SO THE ALTERNATIVE IS NOT RE-PROPOSED.</b> At a flat 100g a gated rune
+is <b>strictly worse than a bare one</b> &mdash; the price does not fall to pay for the clause, so
+the condition is pure cost with nothing bought by it. FJ measured the shapes as unworkable
+besides: BREAK can never carry a threshold, the Devout can never satisfy a breadth, and a condition
+can be live at one rung of the ladder and dead at the next.</p>
+<p><b>AND WHAT THE EIGHT WERE ACTUALLY COSTING WAS MEASURED, WHICH NOTHING HAD DONE.</b> Read as
+the exact share of a spec&rsquo;s reachable loadouts that satisfied the clause at each rung of the
+slot ladder: <b>Deepening Hex 69&ndash;86%</b> (near enough a free clause), <b>Bracing Line
+18&ndash;48%</b>, <b>the Long Watch 5&ndash;39%</b>, <b>the Wide Watch 2&ndash;30%</b>, <b>the
+Shared Scent 1&ndash;18%</b>, <b>the Answering Pack 3&ndash;23%</b>, <b>Heavy Bolts 0&ndash;8%</b>
+and <b>the Wide Rite 0&ndash;4%</b>. <b>TWO WERE UNREACHABLE AT A FULL BAR</b>: Heavy Bolts&rsquo;
+MARK threshold cannot be met by a Sharpshooter carrying seven drafted cards (three MARK primaries
+exist in his whole pool against the four the fraction needs), and the Wide Rite&rsquo;s breadth
+cannot be met by an Occultist at five or at seven. <b>Both readings &mdash; with boss trophies and
+without &mdash; agree.</b></p>
+<p><b>THREE OF THE EIGHT CARRY A SECOND GATE THAT WAS NEVER THE SECONDARY, AND ONLY ONE OF THE
+THREE WAS ON THE RECORD.</b> Bracing Line&rsquo;s Heavy Plating +32% is FL&rsquo;s finding and is
+untouched &mdash; its 8.98% priced that LEVEL with the threshold assumed met, so ungating does not
+invalidate what 32 was ruled against, <b>it makes that figure true</b>. The two nobody had written
+down: <b>Deepening Hex is worth exactly ZERO to an Occultist holding Avatar of Ruin</b>
+(<code>mini(5, 8)</code> is 5), and <b>the Wide Watch is worth exactly ZERO to a Sharpshooter
+holding Overkill</b>, whose node text carries the rune&rsquo;s own clause word for word.
+<b>Reported, not retuned</b> &mdash; a rune that is now too strong or now redundant is a design
+question and it is the designer&rsquo;s.</p>
+<p><b>THE MACHINERY CAME OUT BECAUSE NOTHING ELSE USED IT, AND WHAT STAYS IS SAID TO STAY.</b>
+Removed: <code>Runes.threshold_met</code>, <code>breadth_met_fraction</code>,
+<code>drafted_names</code>, <code>loadout_condition_met</code>, <code>threshold_line</code>,
+<code>breadth_line</code>, <code>Classes.primary_tag_count</code> / <code>primary_tag_census</code>
+/ <code>primary_tag_peak</code>, the <code>Runes.loadout_condition_met</code> call in
+<code>Talents.condition_met</code>, and the <code>RUNE CONDITIONS</code> line on the hero sheet and
+the loadout panel. <b>The three <code>primary_tag_*</code> helpers arrived at EZ to serve exactly
+these conditions and went out with them.</b> Kept: <code>Classes.tag_count</code>,
+<code>tag_census</code> and <code>tag_breadth</code> (older, ES &sect;4&rsquo;s, and
+<code>check_es</code> &sect;4 prints the per-spec core-kit table off them every battery),
+<code>card_tag_primary</code> (EK&rsquo;s, the accessor for the primary-first ordering),
+<code>Runes.tag_threshold_met</code> and <code>breadth_met</code> (ES&rsquo;s absolute-count shapes
+&mdash; the door a future tag-reading rune comes back through), and the
+<code>CARRIED BY TAG</code> census on both screens, <b>because the tags are player-facing on the
+draft card and are not conditions</b>.</p>
+<p><b><code>check_fk</code> &sect;2's ARM INVERTED RATHER THAN BEING DELETED.</b> It asserted the
+eight were STILL GATED so that &ldquo;none is authored&rdquo; could not be satisfied by quietly
+ungating them; it now asserts none of the eight carries a condition or a label, which keeps the
+same question alive pointed the other way. <b><code>check_fn</code> is new</b> &mdash; 80 checks
+across the ungating, the machinery census, both screens driven, and each of the eight driven on a
+loadout that would have FAILED its old condition, with the retired predicate re-implemented in the
+gate as that arm&rsquo;s own control.</p>
+<p><b>AND THE <code>.docx</code> CONTRADICTION IS CLOSED.</b> <code>CLAUDE.md</code>&rsquo;s
+<i>Working agreement</i> step (3) required rebuilding both exports on every design change while the
+designer&rsquo;s ruling that they stay stale lived <b>only in a closed batch report</b>
+(<code>docs/reports/FH.md</code> &sect;4) &mdash; the one file class no instrument reads and no
+sweep covers. <b>Step (3) now carries the ruling and its reason</b>: <code>build_docs.py</code>
+reads the LIVE changelog, which is the recent half only, so a rebuild would overwrite the Word
+export with a fraction of itself and destroy the archive. <b>The script is kept</b>.</p>
+<p><b>WHAT DID NOT MOVE:</b> no rune magnitude, price, scope or <code>requires_ability</code>; no
+card, ability, talent or constant; <code>BRACING_LINE_LEVEL</code> is still 32 and Bracing
+Line&rsquo;s Heavy Plating clause is still on its card; THRESHOLD and BREADTH stay in
+<code>Runes.RUNE_SECONDARIES</code> as words (the ruling lives in the assertion, not in the
+spelling); the generated stat family stays out of the offer path and stays in the data, per FM; and
+no class or universal rune is authored.</p>
+
 <h2>2026-09-08 &mdash; Batch FM: THE FILLER COMES OUT</h2>
 <p><b>THE GENERATED STAT FAMILY IS REMOVED FROM EVERY OFFER PATH (ruled by the designer). The
 authored pool is the whole pool.</b> The removal itself is four lines. <b>What it REACHED was five
@@ -260,9 +328,11 @@ capstone&rdquo;</i> for a capstone it did not ask about. Under <b>Force of Natur
 did ask about, the answer is <b>none</b>: not one of the five is written against Trapper's +8%
 step. The Layered Aegis sits beside Radient Aegis and is unconditional where the node is a roll;
 the Open Line reuses <code>formless</code> and pays no recoil.</p>
-<p><b>WHAT DID NOT MOVE:</b> the six already-shipped gated runes are <b>not repaired</b> and are
-owed to the next batch (<code>check_fk</code> &sect;2 asserts they are still gated, so
-&ldquo;none is authored&rdquo; cannot be satisfied by ungating them); the generated stat family
+<p><b>WHAT DID NOT MOVE:</b> the <b>eight</b> already-shipped gated runes are <b>not repaired</b>
+and are owed to a later batch (<code>check_fk</code> &sect;2 asserts they are still gated, so
+&ldquo;none is authored&rdquo; cannot be satisfied by ungating them) &mdash; <i>this entry said
+SIX and was one of the eleven lines FL &sect;2a found; the count is EIGHT and Batch FN paid the
+repair</i>; the generated stat family
 stays; and <code>RESONANCE_TAKEN_STEP</code>, <code>ARCANE_BOLT_KEEP</code>,
 <code>FAITH_RELEASE</code>, <code>FAITH_PER_ABSORB</code>, <code>HOLD_RELEASE_STACKS</code>,
 <code>FRENZY_RAGE_PER_STEP</code> and the four bare stance literals are all <b>byte-unchanged</b>

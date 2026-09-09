@@ -210,23 +210,28 @@ func _s2_vocabulary() -> void:
 # population it was written for while the real one moved underneath it, which is
 # the exact failure `check_dw` exists to catch one layer up.
 #
-# **BATCH EZ ADDED EIGHT MORE, AND THIS IS THE BATCH THE LIST WAS KEPT AUTHORED
-# FOR.** ES built the machinery and nothing read it; EZ is where twenty-one
-# runes finally do. Six are the PRIMARY-ONLY arithmetic and the two fraction
-# conditions §0 rules (`primary_tag_count` / `primary_tag_census` /
-# `primary_tag_peak`, `threshold_met` / `breadth_met_fraction`,
-# `loadout_condition_met`) and two are the surfaces that print the state ES
-# requires be visible (`threshold_line`, `breadth_line`). **Every one is a new
-# way to read a tag**, and a sweep that did not grow with them would go on
-# reporting the population it was written for.
+# **BATCH EZ ADDED EIGHT MORE, AND BATCH FN TOOK THE SAME EIGHT BACK OUT.** ES
+# built the machinery and nothing read it; EZ is where twenty-one runes finally
+# did, through the PRIMARY-ONLY arithmetic and the two fraction conditions §0
+# ruled (`primary_tag_count` / `primary_tag_census` / `primary_tag_peak`,
+# `threshold_met` / `breadth_met_fraction`, `loadout_condition_met`) and the two
+# surfaces that printed the state ES required be visible (`threshold_line`,
+# `breadth_line`). **FK retired THRESHOLD and BREADTH going forward and FN took
+# them off the eight runes that still carried one, so all eight names are gone
+# from the tree** — `check_fn` §2 asserts each is absent AND uncalled.
+#
+# **THEY COME OFF THIS LIST RATHER THAN STAYING ON IT AT ZERO**, and the reason
+# is this section's own: a word here is a WAY TO READ A TAG, and a way that
+# does not exist cannot be one. Leaving them would make `TAG_DEFINERS` pass for
+# a reason that is no longer true — `classes.gd` would still be sweeping clean
+# on nine words instead of on the six it actually holds. The removal is recorded
+# in the comment rather than in a zero, which is EA §5's rule about a population
+# that shrinks.
 const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 	"card_tag_line", "TAG_INFO", "TAG_ORDER", "tag_meaning",
 	"RUNE_TAGS", "rune_tags", "rune_tag_line",
 	"tag_count", "tag_census", "tag_breadth", "tag_threshold_met",
-	"breadth_met",
-	"primary_tag_count", "primary_tag_census", "primary_tag_peak",
-	"threshold_met", "breadth_met_fraction", "loadout_condition_met",
-	"threshold_line", "breadth_line"]
+	"breadth_met"]
 
 # The authored readers, SPLIT IN TWO AT BATCH EL §3 BECAUSE THEY ARE TWO
 # DIFFERENT CLAIMS AND ONLY ONE OF THEM IS ABOUT THE GAME.
@@ -252,6 +257,13 @@ const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 # and that is still exactly the claim: both new readers draw a line and neither
 # branches on a tag — asserted below, over `TAG_ORDER` itself. What moved is the
 # number of places that display one, not what displaying one is allowed to do.
+#
+# **BATCH FN LEFT THIS LIST AT FOUR AND CHANGED WHAT TWO OF THEM DRAW.** The
+# `RUNE CONDITIONS` line came off the loadout panel and the hero sheet with the
+# conditions it displayed; both screens keep their `CARRIED BY TAG` census, so
+# both are still DISPLAYS and both are still here. **The tags are player-facing
+# and are not conditions** — that is EK's whole point and it survives the
+# retirement untouched.
 const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd",
 	"scripts/party_screen.gd", "scripts/runes.gd"]
 
@@ -275,9 +287,22 @@ const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd",
 # authored, so the day `battle.gd` or `run_state.gd` starts asking a loadout
 # question — recounting per hit, say, which ES §4 explicitly rules against —
 # this section is what says so.
-const TAG_CONSUMERS := ["scripts/talents.gd"]
+#
+# ── BATCH FN — THE LIST IS EMPTY AGAIN, AND THAT IS A TIGHTER BOUND ─────────
+# **`talents.gd` WAS THE ONE CONSUMER AND IT IS BACK IN `NO_TAG_FILES`.** EZ
+# moved it here because `condition_met` handed the whole `cond` dict to
+# `Runes.loadout_condition_met`; FN retired both tag conditions, so that call is
+# gone and the file names no word of the surface at all. **A file asserted to
+# name NOTHING is a stronger claim than one asserted to name exactly the door**,
+# which is the direction EZ's own comment said this category could move back in.
+# The category is KEPT at zero rather than deleted: the day a rune asks a
+# loadout question again, the door comes back and it comes back here.
+const TAG_CONSUMERS: Array = []
 
-# The one word a consumer is allowed to name: the door itself.
+# The one word a consumer is allowed to name: the door itself. **The door does
+# not exist today** (FN removed it), so this is the NAME the next one would
+# have to take rather than a live spelling — kept for the same reason the
+# category above is.
 const TAG_DOOR := "loadout_condition_met"
 
 # The half that is a claim about the INSTRUMENTS. A gate reading a tag cannot
@@ -319,9 +344,16 @@ const TAG_DOOR := "loadout_condition_met"
 # shipped ARE still gated, so it reads `tag_threshold` and `tag_breadth` off the
 # payloads. **It changes no behaviour and it is not exempted; it is listed**,
 # which is what this half of the population is for.
+# **BATCH FN ADDED THE TENTH, AND IT IS THE FIFTH BATCH RUNNING TO LEARN THAT
+# A NEW GATE JOINS THIS LIST BY EXISTING.** `check_fn.gd` is the gate for the
+# ungating: §1 reads the payloads and `RUNE_SHAPES` for a retired secondary, §2
+# sweeps `classes.gd` and `runes.gd` for the nine names that came out and the
+# seven that stayed, and §4 builds its failing loadouts off `TAG_ORDER` and
+# `card_tag_primary`. **It changes no behaviour and it is not exempted; it is
+# listed.**
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
-	"check_fk.gd", "check_map_screen.gd"]
+	"check_fk.gd", "check_fn.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
@@ -333,9 +365,11 @@ const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 # MECHANIC would have to live**, and `battle.gd` is still the one that matters:
 # ES §4 rules the count is read at the SPAWN and never in the strike loop, and
 # `battle.gd` holding zero is what says that rule is still obeyed.
+# **BATCH FN PUT `talents.gd` BACK, WHICH IS THE SIXTH.** It left this list at
+# EZ because it named the one door; the door is gone, so it names nothing again.
 const NO_TAG_FILES := ["scripts/battle.gd", "scripts/unit.gd",
 	"scripts/run_state.gd", "scripts/run_sim.gd",
-	"scripts/ability.gd"]
+	"scripts/ability.gd", "scripts/talents.gd"]
 
 func _s3_inertness() -> void:
 	print("--- EK §3: inertness ---")

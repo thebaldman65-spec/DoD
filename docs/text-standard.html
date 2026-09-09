@@ -403,9 +403,19 @@ plainly receivable, and widening them is a magnitude change on beast survivabili
 widening. <b>Bulwark is the sharpest case: widening its loop would ship three quarters of a card</b>,
 because the 10%-a-turn regen &mdash; the sustain the card is named for &mdash; can never arrive.</p>
 
-<h2>4.10 A RUNE THAT ASKS SOMETHING OF THE LOADOUT SAYS SO, ON THE CARD (BINDING, SET AT BATCH EZ &sect;0)</h2>
+<h2>4.10 A RUNE THAT ASKS SOMETHING OF THE LOADOUT SAYS SO, ON THE CARD (BINDING, SET AT BATCH EZ &sect;0 &mdash; <span style="color:#a60">DORMANT SINCE BATCH FN</span>)</h2>
+<p style="border:2px solid #a60; padding:8px"><b>DORMANT, NOT REPEALED. NO RUNE ASKS ANYTHING OF
+THE LOADOUT.</b> Batch FK retired THRESHOLD and BREADTH going forward and <b>Batch FN took them off
+the eight runes that still carried one</b>, so there is no gated rune for this rule to bind: the
+clauses below came off all eight <code>desc</code> strings, and the
+<code>RUNE CONDITIONS</code> line came off both screens with the conditions it displayed.
+<b>The rule is kept in full and stays binding on its own terms</b> &mdash; the day a rune asks
+something of the loadout again, this is what it must say and how it must say it, and none of the
+reasoning below was what was ruled against. <b>What was ruled against is the PRICE</b>: at a flat
+100g a gated rune is strictly worse than a bare one. <b>One clause below is NOT dormant and is
+live text today</b> &mdash; see the last bullet.</p>
 <p><b>A gated rune must state its gate in its own <code>desc</code>, in the fraction the code
-reads.</b> Eight of the twenty-one runes authored at EZ are conditional, and a condition the
+reads.</b> Eight of the twenty-one runes authored at EZ were conditional, and a condition the
 player cannot see is a stat nobody knows they have &mdash; the same fault &sect;1 names about a
 value left off a line, one layer up.</p>
 <ul>
@@ -421,9 +431,19 @@ player cannot change, which is precisely the lever the whole shape exists to giv
 the same seven words <code>Classes.TAG_ORDER</code> holds and the draft card already shows, so a
 player reading a rune and a card is reading one vocabulary.</li>
 <li><b>AND THE STATE IS ON THE SCREEN, NOT ONLY ON THE CARD.</b> The hero sheet and the loadout
-panel each carry a <code>RUNE CONDITIONS</code> line &mdash; <i>&ldquo;4 of 7 &mdash;
-DEBUFF&rdquo;</i> &mdash; that moves the moment a card is benched. The card says what the rune
-asks; the screen says where you stand.</li>
+panel each carried a <code>RUNE CONDITIONS</code> line &mdash; <i>&ldquo;4 of 7 &mdash;
+DEBUFF&rdquo;</i> &mdash; that moved the moment a card was benched. The card said what the rune
+asked; the screen said where you stood. <b>Both lines were removed at FN with the conditions they
+displayed.</b> The <code>CARRIED BY TAG</code> census beside them is untouched and is live text:
+the tags are player-facing on the draft card and are not conditions.</li>
+<li><b>THE ONE CLAUSE THAT IS STILL LIVE TEXT, AND IT IS THE ONE A TRIM WOULD HAVE EATEN.</b>
+Bracing Line reads <i>&ldquo;Allies take 5% less damage while his Heavy Plating bonus stands at
++32% or higher&rdquo;</i>. <b>That is a SECOND gate and it was never the retired secondary</b> &mdash;
+it is read in the fight by <code>battle.gd</code> against <code>BRACING_LINE_LEVEL</code>, not at
+the spawn against a tag count. It stays on the card, in the wording this section requires, and
+<code>check_fn</code> &sect;1d asserts it is still there for exactly this reason: removing a
+condition clause and trimming a description are different edits, and only one of them was
+ruled.</li>
 </ul>
 
 <h2>4.11 A RUNE'S NAME IS ONE OR TWO WORDS (BINDING, SET AT BATCH FD &sect;3)</h2>

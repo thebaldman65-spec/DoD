@@ -111,16 +111,36 @@ FG's, FH's and FI's**, written straight into the reference rather than moved the
 | THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` | FH §2 |
 | AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
 | A FALLBACK IS WHAT MAKES ITS CONSUMERS LOOK FINE — REMOVING ONE IS NEVER A LOCAL CHANGE | FM §1 |
+| A GATED RUNE AT A FLAT PRICE IS STRICTLY WORSE THAN A BARE ONE | FN §1 |
+| THE `.docx` EXPORTS STAY STALE — the Working agreement carries the exception | FN §3 |
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
   the designer + playtester. Iterate on their feedback each session.
 - EVERY design change: (1) update `docs/master.html` (current truth) and bump
   its "Last updated" timestamp; (2) add an entry to `docs/changelog.html`
-  (newest first); (3) rebuild both docx via `python3 docs/build_docs.py`
-  (unwraps paragraphs — plain textutil makes Word spacing weird; exports are
-  Arial size 14 by user preference); (4) append a short "why" entry to
-  docs/design-notes.md — rationale only, not instructions.
+  (newest first); (3) **the `.docx` exports STAY STALE — do NOT rebuild them
+  (ruled by the designer at FG, recorded at FH §4, written here at FN §3)**;
+  (4) append a short "why" entry to docs/design-notes.md — rationale only, not
+  instructions.
+  - **THE REASON, RECORDED WITH THE RULE SO THE REBUILD IS NOT RE-PROPOSED AS A
+    FIX.** `docs/build_docs.py` reads `docs/changelog.html` by relative name,
+    and that file is **the RECENT HALF only** — the changelog has been cut four
+    times (BZ at BO/BP, CX at CN/CO, DV at DF/DG, FG at EP/EQ) and everything
+    older lives in `DoD-archive/changelog-archive.html`. **Rebuilding would
+    overwrite `DoD Changelog.docx` with the recent half and drop the rest**,
+    which is not a stale export becoming fresh; it is an archive being
+    destroyed. **The archive is the archive.** The `.docx` files are dated
+    2026-09-06 and are expected to stay behind the HTML.
+  - **THE SCRIPT IS KEPT AND IS NOT DELETED.** `docs/build_docs.py` still
+    resolves and still works; the day the changelog stops being cut, or the day
+    the exporter learns to concatenate the archive first, the rebuild comes
+    back. **A tool that is not run is not a tool that is wrong.**
+  - **AND THE RULING LIVED IN A CLOSED REPORT UNTIL FN.** `docs/reports/FH.md`
+    §4 carried it and nothing else in the tree did, while this step said the
+    opposite — **a closed batch report is the one file class no instrument
+    reads and no sweep covers**, so a rule contradicted only there is a rule a
+    future batch follows. FL §2c found it; FN wrote it here.
 - master.html shows ONLY what is currently in the game (user rule 07-20):
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
@@ -2075,64 +2095,66 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   through the real screen.
 · **WHEN A RUNE FINALLY READS IT IN A FIGHT, THE PLACE IS THE SPAWN AND NOT THE STRIKE LOOP.** The
   loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
-  **BUILT AT EZ AND IT IS `Talents.condition_met`**, which both rune-application sites already
-  reach with the same `{learned, member}` ctx — so a gated payload is decided once and the hero
-  sheet shows exactly what the fight will use.
+  **BUILT AT EZ AND REMOVED AT FN**: `Talents.condition_met` answered two tag keys through
+  `Runes.loadout_condition_met`, and with the conditions retired the door came out with them. Both
+  rune-application sites still reach `apply_payload` with the same `{learned, member}` ctx, so the
+  place is unchanged and only the reader is gone. **The rule above still binds the day a rune asks
+  again** — this is where it would ask, and `check_ek` §3's `TAG_CONSUMERS` is where the file that
+  asks would be listed.
 
-## STANDING RULE — THE TWO RUNE CONDITIONS ARE FRACTIONS OF THE DRAFTED CARDS (Batch EZ §0, ruled by the designer)
+## STANDING RULE — A GATED RUNE AT A FLAT PRICE IS STRICTLY WORSE THAN A BARE ONE (Batch FN, ruled by the designer)
 
-> **THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag.**
-> **BREADTH: NO tag exceeds a THIRD of the hero's DRAFTED cards.**
-> **Both count the PRIMARY tag only, and both count the DRAFTED half that is EQUIPPED — never the
-> pool, and NEVER the protected core.**
+> **THRESHOLD and BREADTH are RETIRED. No rune carries a condition on a tag, and none may be
+> authored. The two predicates, the one door, the primary-only arithmetic and the
+> `RUNE CONDITIONS` line on both screens are removed — not zeroed.**
 
-**THIS IS THE RULE ES §4 ABOVE WAS BUILDING TOWARD, AND IT CHANGES TWO OF ITS ANSWERS.** ES built
-the machinery and authored nothing; EZ authors twenty-one runes and eight of them are gated. Where
-the two differ, **EZ's shape governs a rune CONDITION and ES's governs a SCREEN**, and both stand.
+**THE REASON IS THE PRICE AND IT IS ONE SENTENCE.** Every rune is 100g, flat (the rule below), so
+**a condition is pure cost with nothing bought by it** — the price does not fall to pay for the
+clause, and the player is offered a strictly worse item at the same money. FK retired both
+secondaries going forward; **FN took them off the eight that already carried one.**
 
-- **A FRACTION, NEVER A COUNT, AND THE REASON IS THE LADDER.** A hero drafts **4 earned slots at
-  zone 1 and 7 by the end** (`ABILITY_SLOTS_BY_BOSS` 7→10 against a 3-slot core), so "3 DEBUFF
-  cards" is three quarters of an opening loadout and under half of a finished one — **one rule
-  meaning two different commitments.** A fraction is the same commitment all run, **and it can be
-  tipped by benching ONE card**, which is the whole reason the shape exists: it is what makes the
-  loadout lever reach the rune layer.
-- **PRIMARY ONLY, AND THAT IS NOT ES §4's CENSUS WEAKENED.** `Classes.tag_count` counts BOTH tags
-  on a card, deliberately, because a card that Breaks and DEBUFFs is a member of both populations
-  and a SCREEN must say so. **A CONDITION NEEDS A PARTITION**: under the both-tags count the
-  per-tag numbers sum past the card count, so a tag could exceed a third while every tag did, and
-  "half" could be met by two tags at once on the same three cards. `Classes.primary_tag_*` are the
-  partitioning counterparts and they sit beside the originals rather than replacing them.
-- **THE COUNTED SET IS `Run.equipped_ability_names` — THE DRAFTED HALF THAT IS CARRIED.** EG §2
-  split pool from loadout and made only the earned half swappable, **so the counted set and the
-  swap lever are the same set.** ES §4's `loadout_ability_names` includes the core and is right for
-  the screens; **including it here would be a defect, and the reason is measured**: the Occultist's
-  core alone carries the DEBUFF threshold, so Deepening Hex would be on from the first fight with
-  no bench able to turn it off.
-- **THE ARITHMETIC IS INTEGER, IN ONE PLACE.** `count * 2 >= n` and `peak * 3 <= n`, because half
-  of an odd count has to round the same way every time it is read and integer arithmetic is the
-  only form of that which cannot drift between a condition and the surface printing it.
-  **"Exceeds" is strict**: at 6 drafted cards a peak of 2 passes and 3 does not.
-- **AN EMPTY DRAFTED LIST MEETS NEITHER CONDITION — RULED AT FA §1, AND BOTH ARE CLOSED.** EZ
-  built the two rules literally and the literal reading was vacuous (`0 * 2 >= 0` and
-  `0 * 3 <= 0`), so **a hero with no drafted cards switched on a THRESHOLD rune and a BREADTH rune
-  at the same time** — the one state the two shapes were designed never to share. **It was
-  reachable two ways**: `Run.unequip_earned_ability` has no floor, so a whole drafted half can be
-  benched — and a hero who has not drafted yet reads the same empty list, which is
-  `equipped_ability_names`' own stated behaviour. **BREADTH IS CLOSED WITH THRESHOLD EVEN THOUGH
-  BREADTH-OF-NOTHING IS ARGUABLY HARMLESS**, because it is the same degenerate state and **two
-  conditions with different emptiness rules is a second thing to remember for no gain.**
-- **AND THE GUARD BELONGS IN THE TWO PREDICATES, NOT AT THE DOOR — THE PLACE IS PART OF THE RULE.**
-  `threshold_met` and `breadth_met_fraction` each refuse an empty list themselves. One clause in
-  `loadout_condition_met` would have been cheaper and wrong: **the hero sheet and the loadout panel
-  call the two predicates DIRECTLY** for the tick beside the `RUNE CONDITIONS` line, so the rune
-  would have been refused while both screens still drew a ✓ on an empty bar — one fact rendered two
-  ways, which is what the ONE BUILDER rule above `threshold_line` exists to prevent. **A guard that
-  a display surface cannot see is half a guard.**
-- **THE ONE DOOR IS `Runes.loadout_condition_met`, AND `talents.gd` NAMES NO TAG WORD.**
-  `condition_met` hands the whole `cond` dict over rather than reading the two keys itself, because
-  `check_ek` §3 asserts the set of `.gd` files naming the tag surface is exactly four. **The rune
-  layer's vocabulary stays in the rune layer** — that is ES §4's own rule, and the day a fifth file
-  names a tag, that gate is what says so.
+**AND THE SHAPES WERE UNWORKABLE BESIDES, WHICH FJ MEASURED AND FN CONFIRMED PER RUNE.**
+**BREAK can never carry a threshold** (zero of 227 cards hold it as a PRIMARY, FD §2);
+**the Devout can never satisfy a breadth** (his whole reachable pool holds two distinct primaries
+against a rule needing three); and **a condition can be live at one rung of the ladder and dead at
+the next**, because the denominator moves with the slot ladder. **FN priced the eight over the
+share of each spec's reachable loadouts that satisfied them: 69–86% for Deepening Hex, 0–8% for
+Heavy Bolts, 0–4% for the Wide Rite — and two were UNREACHABLE at a full seven-card bar.**
+
+- **THE TRANSFERABLE HALF: A CONDITION NEEDS A PARTITION AND A CENSUS IS NOT ONE.** `tag_count`
+  counts BOTH tags on a card, deliberately, because a card that Breaks and DEBUFFs is a member of
+  both populations and a SCREEN must say so. Under that count the per-tag numbers sum past the card
+  count, so "a third of them" means nothing and "half" can be met by two tags at once on the same
+  three cards. **EZ added `Classes.primary_tag_*` beside the originals for exactly that**, and FN
+  removed them with the conditions they served. **Whoever writes the next condition of any kind
+  owes the same question: does my denominator partition the thing I am counting?**
+- **AND THE SECOND TRANSFERABLE HALF: A GATED RUNE CAN HAVE A SECOND GATE THAT IS NOT THE
+  SECONDARY.** Bracing Line carried the retired `tag_threshold: DEFENSE` at the SPAWN **and** Heavy
+  Plating standing at +32% in the FIGHT — a different file, a different moment, its own constant
+  and its own measurement (EZ §2b(i): 8.98% of incoming hits). **Retiring the labelled one leaves
+  the other standing**, and FN found two more of the same shape: **Deepening Hex is worth exactly
+  zero to an Occultist holding Avatar of Ruin** (`mini(5, 8)` is 5), and **the Wide Watch is worth
+  exactly zero to a Sharpshooter holding Overkill**, whose node text carries the rune's own clause.
+  **Read every read site before assuming the label is the whole condition.**
+- **WHAT THE TAGS STILL ARE.** Player-facing on the draft card, counted on the loadout panel and
+  the hero sheet, and read by nothing else — EK's inertness claim, restored by the retirement
+  rather than re-asserted. **ES §4's absolute-count shapes (`tag_threshold_met`, `breadth_met`)
+  are KEPT and are the door a future tag-reading rune comes back through.**
+- **THE RULE THAT STOOD HERE IS KEPT BELOW AS THE RECORD OF WHAT WAS RETIRED**, so a later batch
+  meeting a tag and a rune in the same sentence does not re-derive EZ's arithmetic from scratch and
+  re-propose it as a discovery.
+
+### WHERE THE RETIRED RULE ITSELF IS KEPT, AND WHY IT IS NOT KEPT HERE
+
+**EZ §0's two fractions — *THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag*
+and *BREADTH: NO tag exceeds a THIRD of them*, both counting the PRIMARY only over the drafted half
+that is EQUIPPED — stood in this place for six batches with a page of reasoning under it.** It is
+**not** reproduced here. This file holds what binds a batch, and that rule binds nothing: the two
+transferable halves are the bullets above, and the rest is a mechanism that no longer exists.
+**Its full text and its reasoning are in `docs/reports/EZ.md` §0 and in `docs/reports/FN.md` §2**,
+and the ungating itself is in `docs/changelog.html`'s FN entry. **A retired rule kept at length in
+the rules file is a rule a future batch reads as live** — the same fault as a ruling kept only in a
+closed report (the *Working agreement*'s step (3), which FN also closed), pointed the other way.
 
 ## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
 
@@ -2274,8 +2296,8 @@ removal would have destroyed the one thing the word is on the card for.
 - **30 ROWS LOST A SECONDARY AND THAT IS THE COST.** Two tags is the ceiling and BREAK takes the
   second slot, so 18 RESOURCE, 9 DEBUFF, 2 DEFENSE and 1 TEMPO are displaced (20 rows had no
   secondary to lose, 3 already read OFFENSE second). **It is cheap because a SECONDARY FEEDS NO
-  CONDITION** — EZ §0c counts the primary only, so a displaced secondary moves a screen and
-  nothing a rune asks.
+  CONDITION** — EZ §0c counted the primary only, so a displaced secondary moved a screen and
+  nothing a rune asked. **Since FN nothing does**: no rune carries a condition at all.
 - **FEINT IS THE ONE PER-CARD JUDGEMENT AND THE RULE LOSES TO A STANDING RULING THERE.** EL §2
   ruled that Feint carries MARK second, so the slot was already owned. FD's binding half is *no
   BREAK primary*; the retained-secondary half yields, and Feint reads `["OFFENSE", "MARK"]` —
@@ -2283,13 +2305,17 @@ removal would have destroyed the one thing the word is on the card for.
   from `["Feint", "BREAK"]` to `["Feint", "OFFENSE"]` in place, with its reason, and it still
   asserts the MARK half from its own side. **Where this rule meets an older ruling on the same
   slot, the older ruling keeps the slot and the card is named.**
-- **A BREAK THRESHOLD IS NOW UNMEETABLE AND MUST NOT BE AUTHORED.** No card can contribute one.
-  Nothing depends on it today (the four live thresholds name DEBUFF, DEFENSE twice and MARK), and
-  `check_fd` §2 asserts no live rune gates on BREAK **or** on OFFENSE — the two columns the
-  demotion moved, which are the only two whose counts could have changed.
-- **BREADTH ONLY EVER GETS HARDER.** `primary_tag_peak` folds what was a hero's BREAK column into
-  his OFFENSE one, so the peak rises or holds and never falls, and the four BREADTH runes (Wide
-  Rite, Long Watch, Wide Watch, Shared Scent) are what pays for it.
+- **A BREAK THRESHOLD IS UNMEETABLE AND MUST NOT BE AUTHORED.** No card can contribute one, and
+  **no rune carries a threshold of any kind since FN.** `check_fd` §2 asserts the live pool holds
+  ZERO conditions, and names BREAK and OFFENSE separately — the two columns the demotion moved,
+  which are the only two whose counts could have changed. **The prohibition outlives the shape**:
+  it binds the day a threshold comes back, which is why it is still written here.
+- **BREADTH ONLY EVER GOT HARDER, AND THAT IS HISTORY NOW.** `primary_tag_peak` folded what was a
+  hero's BREAK column into his OFFENSE one, so the peak rose or held and never fell, and the four
+  BREADTH runes (Wide Rite, Long Watch, Wide Watch, Shared Scent) were what paid for it. **FN
+  retired BREADTH and deleted the peak**, so the fold now moves a screen and nothing else; the
+  measurement is kept in `docs/reports/FD.md` §2 and the drive that made it is retired with its
+  subject.
 - **`Runes.RUNE_TAGS` FOLLOWS THE CARDS, RULED BY THE DESIGNER AT FE §1.** FD left it and pinned
   the population at five; **all five now read `["OFFENSE", "BREAK"]`** — `long_watch` and
   `bared_plate` live, `comet`, `seventh_bolt` and `shattered_guard` retired. **The retired three
@@ -2303,21 +2329,25 @@ removal would have destroyed the one thing the word is on the card for.
   - **AND THE CHANGE IS PURELY FOR CONSISTENCY, WHICH IS STRONGER THAN "DISPLAY-ONLY".** Four
     documents called the table display-only. **`rune_tag_line` has ZERO callers** in `scripts/`
     and `scenes/` — the chain is `RUNE_TAGS` → `rune_tags()` → `rune_tag_line()` → nothing — and
-    **neither rune CONDITION reads it**: `threshold_met` and `breadth_met_fraction` both count
-    `Classes.card_tag_primary` over the hero's DRAFTED CARDS. `check_fe` §1b asserts the inertness
-    in both directions, so the day a condition reads `RUNE_TAGS` the gate says so.
+    **no rune CONDITION reads it, because since FN there is none**: the two that existed counted
+    `Classes.card_tag_primary` over the hero's DRAFTED CARDS and never touched this table.
+    `check_fe` §1b asserts the inertness in both directions — the table populated, the condition
+    census at zero — so the day a condition reads `RUNE_TAGS` the gate says so.
 
-## STANDING RULE — A RUNE READS A TAG NOW, AND EK'S INERTNESS CLAIM IS OVER (Batch EZ, deliberately)
+## STANDING RULE — EK'S INERTNESS CLAIM ENDED AT EZ AND CAME BACK AT FN (Batch EZ, deliberately; Batch FN, by ruling)
 
-> **`check_ek` §3's claim was "nothing reads a tag for anything but DISPLAY". That ended at EZ,
-> on purpose. It did not decay — it was spent.**
+> **`check_ek` §3's claim was "nothing reads a tag for anything but DISPLAY". That ended at EZ, on
+> purpose — it did not decay, it was spent. FN retired both rune conditions and it is TRUE AGAIN,
+> for a different reason: not that nothing has been built, but that what was built was ruled out.**
 
-- **THE GATE GREW A THIRD CATEGORY RATHER THAN LOSING A CLAIM.** `TAG_DEFINERS` is still the four
-  files that define or display the tables; `TAG_CHECKERS` is the gates; and **`TAG_CONSUMERS` is
-  new** — a file that reaches the machinery through the one door without holding any of it.
-  `talents.gd` is the only member, and it is asserted to name **EXACTLY the door** and no other
-  word of the surface, and no tag WORD at all. **That is a tighter bound than "none", not a looser
-  one**, and moving it out of `NO_TAG_FILES` did not weaken that list.
+- **THE GATE GREW A THIRD CATEGORY RATHER THAN LOSING A CLAIM, AND THE CATEGORY IS KEPT AT ZERO.**
+  `TAG_DEFINERS` is still the four files that define or display the tables; `TAG_CHECKERS` is the
+  gates; and **`TAG_CONSUMERS` is a file that reaches the machinery through the one door without
+  holding any of it.** `talents.gd` was its only member, asserted to name **EXACTLY the door** and
+  no other word of the surface and no tag WORD at all — a tighter bound than "none", not a looser
+  one. **FN removed the door, so that file names nothing again and moves back into
+  `NO_TAG_FILES`**, which is tighter still. **The empty category stays**: the day a rune asks a
+  loadout question, the file that asks is listed there rather than the list being invented again.
 - **`battle.gd` STILL HOLDS ZERO AND THAT IS THE ONE THAT MATTERS.** It is what says ES §4's "read
   at the SPAWN, never in the strike loop" is still obeyed. A per-hit recount would be 84 multiplier
   terms' worth of work for a number that cannot move.

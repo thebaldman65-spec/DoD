@@ -184,31 +184,43 @@ func _s1b_nothing_reads_a_rune_primary() -> void:
 			read, files.size()])
 	ok(callers.is_empty(),
 		"§1b: `rune_tag_line` has a caller now (%s) — the table reaches a SURFACE, and every document calling it unread is false" % [callers])
-	# **AND THE TWO CONDITIONS READ THE CARD TABLE, WHICH IS THE HALF THAT
-	# MATTERS.** Asserted off the SOURCE of the two predicates rather than by
-	# perturbing an input, because "it did not budge" is what a condition that
-	# reads nothing at all also prints.
+	# ── BATCH FN — THE TWO CONDITIONS ARE GONE, AND THE CLAIM GOT STRONGER ──
+	#
+	# **THIS ARM READ THE SOURCE OF `threshold_met` AND `breadth_met_fraction`
+	# AND ASSERTED THAT NEITHER NAMED `rune_tags`** — FE's whole finding being
+	# that a rune's own primary is merely DESCRIPTIVE, because neither condition
+	# read the table it sits in. **FN retired both conditions and deleted both
+	# predicates**, so the claim is no longer "the two do not read it" but "there
+	# is nothing that could": asserted at the payload, which is where a
+	# condition would have to appear, over EVERY entry rather than over two
+	# functions.
+	#
+	# **THE POSITIVE ARM IS `RUNE_TAGS` ITSELF, AND IT IS THE HALF THAT KEEPS
+	# THIS SECTION HONEST.** The table is still there, still populated, and
+	# still reaches nothing — a gate that only asserted "no condition reads it"
+	# would pass just as well on a table somebody had deleted.
 	var rsrc := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/runes.gd"))
 	ok(rsrc != "", "§1b: runes.gd read back empty — the sweep read nothing")
-	var t_at := rsrc.find("func threshold_met(")
-	var b_at := rsrc.find("func breadth_met_fraction(")
-	ok(t_at >= 0 and b_at >= 0,
-		"§1b: one of the two condition predicates has been renamed — this arm is describing a mechanism that moved")
-	var t_body := rsrc.substr(t_at, rsrc.find("func ", t_at + 8) - t_at) if t_at >= 0 else ""
-	var b_body := rsrc.substr(b_at, rsrc.find("func ", b_at + 8) - b_at) if b_at >= 0 else ""
-	ok(t_body.contains("Classes.primary_tag_count"),
-		"§1: THRESHOLD no longer counts CARD primaries")
-	ok(b_body.contains("Classes.primary_tag_peak"),
-		"§1: BREADTH no longer counts CARD primaries")
-	ok(not t_body.contains("rune_tags") and not b_body.contains("rune_tags"),
-		"§1b: a rune CONDITION now reads RUNE_TAGS — the primary is no longer descriptive and every document saying it is has become false")
-	# And the arithmetic itself, driven, so the source read above is not the
-	# only thing standing between this claim and a rewritten predicate.
-	var names := ["Cleave", "Rend", "Bloodlust"]
-	var peak := Classes.primary_tag_peak(names)
-	ok(peak >= 1 and peak <= names.size(),
-		"§1b: primary_tag_peak read %d over %d cards" % [peak, names.size()])
-	print("    rune_tag_line callers: 0; THRESHOLD reads primary_tag_count, BREADTH reads primary_tag_peak")
+	ok(not rsrc.contains("func threshold_met(")
+			and not rsrc.contains("func breadth_met_fraction("),
+		"§1b: a retired rune condition predicate is defined again — FN removed both")
+	var gated_now: Array = []
+	for rid in Runes.ids():
+		if ((Runes.config(String(rid)).get("payload", {}) as Dictionary)
+				.get("condition", {}) as Dictionary).has("tag_threshold") \
+				or ((Runes.config(String(rid)).get("payload", {}) as Dictionary)
+					.get("condition", {}) as Dictionary).has("tag_breadth"):
+			gated_now.append(String(rid))
+	ok(gated_now.is_empty(),
+		"§1b: a rune carries a tag CONDITION again (%s) — a rune's primary stops being descriptive the moment one does"
+			% [gated_now])
+	ok(Runes.RUNE_TAGS.size() >= 100,
+		"§1b: `RUNE_TAGS` holds %d rows — the zero above is the table's, not the claim's"
+			% Runes.RUNE_TAGS.size())
+	ok(rsrc.contains("func rune_tags(") and rsrc.contains("func rune_tag_line("),
+		"§1b: the table lost an accessor — it is KEPT for the rune-offer surface EK deferred")
+	print("    rune_tag_line callers: 0; 0 of %d runes carry a tag condition; RUNE_TAGS %d rows"
+		% [Runes.ids().size(), Runes.RUNE_TAGS.size()])
 
 
 # ── §2 — THE ROLL-STORE-ANSWER IDIOM, AND ITS WHOLE POPULATION ──────────────

@@ -297,11 +297,12 @@ static var _data := {}
 # `rune_tag_line()` → **nothing**: that builder has ZERO callers in `scripts/`
 # and in `scenes/`. `docs/reports/EK.md` is where it was deferred -- the rune
 # offer *"wants its own rune-offer surface, which is the rune batch's work"*.
-# **NEITHER RUNE CONDITION READS THIS TABLE**: `threshold_met` and
-# `breadth_met_fraction` both count
-# `Classes.card_tag_primary` over the hero's DRAFTED CARDS (EZ §0c), so a rune's
-# own primary feeds nothing at all. **EJ SIZED THE RE-KEY THAT WOULD USE THEM**
-# — 59 clauses in 32 runes — and that is still a later batch.
+# **AND THERE IS NO LONGER A RUNE CONDITION TO READ IT (BATCH FN).** The two
+# that existed counted `Classes.card_tag_primary` over the hero's DRAFTED CARDS
+# (EZ §0c) and never touched this table; FN retired both, so a rune's own primary
+# still feeds nothing at all — for a second reason now rather than for none.
+# **EJ SIZED THE RE-KEY THAT WOULD USE THEM** — 59 clauses in 32 runes — and
+# that is still a later batch.
 #
 # ══ BATCH FE §1 — THE RUNE ROWS FOLLOW THE CARDS ══════════════════════
 #
@@ -493,40 +494,50 @@ const RUNE_TAGS := {
 # ══ BATCH EZ §0 — WHAT A RUNE IS AND WHAT GATES IT ═════════════════════════
 #
 # **THE PRIMARY TYPE — WHAT IT TOUCHES: ABILITY, PASSIVE or STAT. THE
-# SECONDARY — WHAT GATES IT, IF ANYTHING: THRESHOLD, BREADTH or TRADEOFF.** A
-# rune may carry more than one secondary, or none. Authored beside the entry it
-# describes rather than derived from the payload, because the two answer
-# different questions: `bared_plate` writes two `stat` fields and is a STAT rune
-# with a TRADEOFF, while `standing_wall` also writes one `stat` field and is a
-# PASSIVE with none — the payload's SHAPE cannot tell them apart.
+# SECONDARY — WHAT GATES IT, IF ANYTHING.** A rune may carry more than one
+# secondary, or none. Authored beside the entry it describes rather than derived
+# from the payload, because the two answer different questions: `bared_plate`
+# writes two `stat` fields and is a STAT rune with a TRADEOFF, while
+# `standing_wall` also writes one `stat` field and is a PASSIVE with none — the
+# payload's SHAPE cannot tell them apart.
+#
+# ── BATCH FN — TRADEOFF IS THE ONLY SECONDARY ANY ENTRY CARRIES ────────────
+# **THRESHOLD and BREADTH were retired at FK going forward, and FN took them off
+# the eight that still wore them** — the condition and the label together, so
+# there is no longer a row in this table carrying either word. **The two words
+# stay in `RUNE_SECONDARIES` deliberately**: the vocabulary is how the entries
+# are DESCRIBED, and `check_fn` §2 asserts nothing uses them rather than the
+# spelling being what makes it impossible. `check_ez` §0 and `check_fk` §2 hold
+# the label half; `check_fn` §1 holds the payload half.
 #
 # **THE SECONDARY IS NOT THE CONDITION AND MUST NOT BE READ AS ONE.** The
-# condition is in the payload, where `Talents.condition_met` reads it; this is
-# the word a surface shows. They are asserted equal to each other by the gate
-# rather than by one deriving the other, so a rune labelled THRESHOLD whose
-# payload carries no `tag_threshold` is a defect that can be caught.
+# condition lives in the payload, where `Talents.condition_met` reads it; this
+# is the word a surface shows. They are asserted equal to each other by the gate
+# rather than by one deriving the other, so a rune labelled with a gate whose
+# payload carries no condition is a defect that can be caught — and with the two
+# tag conditions gone that equality now reads zero on both sides.
 const RUNE_SHAPES := {
-	"deepening_hex": ["PASSIVE", "THRESHOLD"],
+	"deepening_hex": ["PASSIVE"],
 	"standing_mark": ["PASSIVE"],
 	"split_tongue": ["ABILITY"],
 	"shared_ruin": ["PASSIVE"],
-	"wide_rite": ["PASSIVE", "BREADTH"],
+	"wide_rite": ["PASSIVE"],
 	"open_wound": ["ABILITY", "TRADEOFF"],
 	"standing_wall": ["PASSIVE"],
-	"bracing_line": ["PASSIVE", "THRESHOLD"],
+	"bracing_line": ["PASSIVE"],
 	"split_shield": ["ABILITY"],
-	"long_watch": ["PASSIVE", "BREADTH"],
+	"long_watch": ["PASSIVE"],
 	"bared_plate": ["STAT", "TRADEOFF"],
 	"keen_focus": ["PASSIVE"],
-	"heavy_bolts": ["PASSIVE", "THRESHOLD"],
+	"heavy_bolts": ["PASSIVE"],
 	"ambush": ["ABILITY"],
-	"wide_watch": ["PASSIVE", "BREADTH"],
+	"wide_watch": ["PASSIVE"],
 	"long_draw_press": ["ABILITY", "TRADEOFF"],
 	"long_leash": ["PASSIVE"],
 	"shared_hide": ["PASSIVE"],
-	"answering_pack": ["PASSIVE", "THRESHOLD"],
+	"answering_pack": ["PASSIVE"],
 	"second_whistle": ["ABILITY"],
-	"shared_scent": ["PASSIVE", "BREADTH"],
+	"shared_scent": ["PASSIVE"],
 	"bared_fang": ["STAT", "TRADEOFF"],
 	# ── BATCH FK — THE EIGHT UNAUTHORED SPECS ──────────────────────────────
 	# **NOT ONE THRESHOLD AND NOT ONE BREADTH, AND THAT IS A RULING RATHER THAN
@@ -538,8 +549,11 @@ const RUNE_SHAPES := {
 	# paired with a bigger upside is self-balancing and reads on the card — and
 	# EIGHT of these carry one, against the four the first twenty-one had.
 	#
-	# **THE SIX ALREADY-SHIPPED GATED RUNES ARE NOT REPAIRED HERE.** Their rows
-	# above are unchanged and they are owed to a later batch.
+	# **THE EIGHT ALREADY-SHIPPED GATED RUNES WERE NOT REPAIRED HERE — BATCH FN
+	# TOOK THEM.** They were EIGHT and not six (four THRESHOLD, four BREADTH);
+	# `check_fk.STILL_GATED` held the right list all along while eleven lines
+	# across five files said six, and this was one of the eleven. Their rows
+	# above now read `["PASSIVE"]` and carry no condition.
 	"last_word": ["PASSIVE"],
 	"blood_debt_rune": ["ABILITY", "TRADEOFF"],
 	"butchers_bill": ["ABILITY"],
@@ -676,150 +690,44 @@ static func breadth_met(loadout_names: Array, need: int) -> bool:
 	return Classes.tag_breadth(loadout_names) >= need
 
 
-# ══ BATCH EZ §0 — THE TWO CONDITIONS THE FIRST TWENTY-ONE RUNES OBEY ═══════
+# ══ BATCH FN — THE TWO CONDITIONS STOOD HERE AND THEY ARE GONE ═════════════
 #
-# **THEY ARE FRACTIONS, NOT COUNTS, AND THAT IS THE DESIGNER'S REASON RATHER
-# THAN AN IMPLEMENTATION CHOICE.** A hero drafts 4 earned slots at zone 1 and 7
-# by the end (`ABILITY_SLOTS_BY_BOSS` 7→10 against a 3-slot core), so a FIXED
-# count means two different commitments at those two moments — "3 DEBUFF cards"
-# is three quarters of an opening loadout and under half of a finished one. A
-# fraction is the same commitment all run, **and it can be tipped by benching
-# one card**, which is what makes the loadout lever reach the rune layer.
+# **EZ §0 built two loadout conditions — a THRESHOLD (at least half his drafted
+# cards carry tag X) and a BREADTH (no tag holds more than a third) — and eight
+# runes were authored against them. FK retired both secondaries going forward;
+# FN took them off the eight that still wore them, and with the last payload
+# gone the machinery had no reader left.** Removed here rather than left
+# standing at zero callers: `threshold_met`, `breadth_met_fraction`,
+# `drafted_names`, `loadout_condition_met`, `threshold_line`, `breadth_line`.
+# `Classes.primary_tag_count` / `primary_tag_census` / `primary_tag_peak` were
+# added at EZ to serve exactly these and went with them; `Classes.tag_count`,
+# `tag_census` and `tag_breadth` are OLDER and stay, because `check_es` §4 reads
+# them for the per-spec core-kit table it prints every battery.
 #
-# ── THE COUNTED SET IS THE DRAFTED HALF, AND IT IS THE SWAP LEVER'S OWN SET ──
-# **`Run.equipped_ability_names(member)` — DRAFTED AND CARRIED. Not the pool,
-# and NOT the protected core.** ES §4's helpers count the whole bar including
-# the core, deliberately, because a screen showing a loadout must show all of
-# it; **these do not, and the difference is load-bearing.** The core kit alone
-# already meets a 2+ threshold on BREAK for ten of the twelve specs and on
-# DEBUFF for seven (`check_es` §4 prints that table every run) — counting it
-# would put those two magnitudes on from the first fight with no swap able to
-# turn them off. **And `equip_earned_ability` / `unequip_earned_ability` write
-# exactly this list**, so the counted set and the lever are the same set:
-# EG §2 split pool from loadout and made only the earned half swappable.
+# **THE REASON THE CONDITIONS WENT, RECORDED WHERE THEY LIVED.** At a flat 100g
+# a gated rune is strictly WORSE than a bare one — the price does not fall to
+# pay for the clause — and FJ measured the shapes as unworkable besides: BREAK
+# can never carry a threshold (zero of 227 cards hold it as a PRIMARY), the
+# Devout can never satisfy a breadth (his reachable pool holds two distinct
+# primaries against a rule needing three), and a condition can be live at one
+# rung of the ladder and dead at the next, because the denominator moves with
+# the slot ladder. **FN measured what the eight were actually costing and two of
+# them were nearly dead**: Heavy Bolts' MARK threshold is UNREACHABLE at a full
+# seven-card bar, and the Wide Rite's breadth is unreachable at five and at
+# seven. `docs/reports/FN.md` §1 carries the per-rune table.
 #
-# **THE COUNT IS PRIMARY-ONLY** (`Classes.primary_tag_*`) so the per-tag numbers
-# partition the list and both conditions read one denominator — see that block
-# for why the both-tags census is right for a screen and wrong for these.
+# **WHAT IS STILL HERE AND WHY.** `tag_threshold_met` and `breadth_met` above
+# are ES §4/§5's ABSOLUTE-count shapes over the whole bar, not EZ's fractions
+# over the drafted half — a different question, never read by a rune, and read
+# by `check_es` §4. **They are the door a future rune would come back through**,
+# so the vocabulary the designer kept is the one that survived.
 #
-# **READ AT THE SPAWN, NEVER IN THE STRIKE LOOP.** The loadout cannot change
-# during a battle (benching is a map screen), so a payload gated on one of
-# these is decided once, where `Talents.apply_payload` already reads its
-# `condition` — see `Talents.condition_met`.
-
-# **THRESHOLD: at least HALF the hero's drafted cards carry the named tag.**
-# Written as `x 2 >=` rather than as a float ratio because half of an odd count
-# has to round the same way every time it is read, and integer arithmetic is
-# the only form of that which cannot drift between a condition and the surface
-# printing it.
-#
-# **BATCH FA §1 — AN EMPTY DRAFTED LIST NOW MEETS NEITHER CONDITION.** EZ built
-# both rules literally and the literal reading is vacuous: nothing carries the
-# tag, so nothing fails to be half of it (`0 * 2 >= 0`). It is REACHABLE —
-# `Run.unequip_earned_ability` has no floor, so a player can bench every earned
-# card — and a hero who benched everything switched on a THRESHOLD rune and a
-# BREADTH rune at the same time, **the one state the two shapes were designed
-# never to share.** The designer has ruled BOTH closed: a condition about a
-# hero's drafted cards is not met by a hero who has drafted none.
-#
-# **THE GUARD IS HERE AND NOT IN `loadout_condition_met`, AND THE PLACE IS THE
-# RULING.** The hero sheet and the loadout panel call THIS function for the
-# tick they draw beside `threshold_line` (`party_screen._draw_detail`,
-# `map_screen._open_loadout_panel`). A guard one layer up would refuse the rune
-# while both screens still drew a ✓ on an empty bar — one fact rendered two
-# ways, which is exactly what the ONE BUILDER rule above `threshold_line`
-# exists to prevent.
-static func threshold_met(drafted: Array, tag: String) -> bool:
-	if drafted.is_empty():
-		return false
-	return Classes.primary_tag_count(drafted, tag) * 2 >= drafted.size()
-
-
-# **BREADTH: NO tag exceeds a THIRD of the hero's drafted cards.** The inverse
-# shape — a threshold rewards depth in one tag, this rewards a hero who is
-# spread — and it is a BOUND on the peak rather than a count of how many tags
-# are touched. **`ES §5`'s `breadth_met` IS A DIFFERENT QUESTION AND BOTH
-# STAND**: that one asks how many different tags a list touches at all, this
-# asks whether any one of them dominates.
-#
-# "Exceeds" is strict, so a tag sitting exactly ON a third passes: at 6 drafted
-# cards a peak of 2 is fine and 3 is not. Same integer discipline as above.
-#
-# **AND THE EMPTY LIST IS CLOSED HERE TOO (FA §1), FOR THE REASON IT IS CLOSED
-# ABOVE AND NOT FOR A WEAKER ONE.** Breadth-of-nothing is arguably harmless on
-# its own — no tag dominates a list with no tags in it — but it is the same
-# degenerate state, and **two conditions with different emptiness rules is a
-# second thing to remember for no gain.** Ruled closed together, deliberately.
-static func breadth_met_fraction(drafted: Array) -> bool:
-	if drafted.is_empty():
-		return false
-	return Classes.primary_tag_peak(drafted) * 3 <= drafted.size()
-
-
-# **THE DRAFTED-AND-CARRIED LIST, off the member dict alone.** This file is a
-# `class_name` script and these are STATIC, so it cannot see the `Run` autoload
-# (EQ's compile-error lesson, recorded in the block above) — it reads the same
-# two keys `Run.equipped_ability_names` reads, in the same order, so a member
-# that has never benched anything reads its pool exactly as the fight does.
-static func drafted_names(member: Dictionary) -> Array:
-	if member.is_empty():
-		return []
-	return member.get("bm_equipped", member.get("bm_abilities", [])).duplicate()
-
-
-# **THE ONE DOOR A PAYLOAD'S CONDITION COMES THROUGH, AND THE ONLY PLACE THE
-# TWO KEY NAMES ARE WRITTEN.** `Talents.condition_met` hands the whole `cond`
-# dict here rather than reading `tag_threshold` / `tag_breadth` itself, because
-# `check_ek` §3 asserts that the set of `.gd` files naming the tag surface is
-# EXACTLY four — the two that define the tables and the two that display them —
-# and `talents.gd` is not one of them. **That is not a formality**: the day a
-# fifth file names a tag, that gate is what says so, and a rune layer that had
-# quietly leaked its vocabulary into the talent file would have spent the
-# warning on itself.
-#
-# **AN EMPTY MEMBER MAKES A GATED PAYLOAD INERT** rather than silently
-# unconditional — `condition_met`'s own stated direction, carried through here.
-# **FA §1 MADE THIS LINE REDUNDANT AND IT IS KEPT DELIBERATELY.** It was load-
-# bearing while an empty drafted list read GENEROUSLY: it was the only thing
-# standing between a member-less caller and an unconditional payload. Both
-# predicates now refuse an empty list themselves, so a member with no dict
-# would be refused by the arithmetic one line down — but this states the
-# intent at the door rather than leaving it to a property of two other
-# functions, and a caller with no member is a different fault from a hero who
-# benched his bar.
-static func loadout_condition_met(cond: Dictionary, member: Dictionary) -> bool:
-	if cond.is_empty():
-		return true
-	var wants_tag: bool = cond.has("tag_threshold") \
-		or bool(cond.get("tag_breadth", false))
-	if not wants_tag:
-		return true
-	if member.is_empty():
-		return false
-	var drafted := drafted_names(member)
-	if cond.has("tag_threshold") \
-			and not threshold_met(drafted, String(cond["tag_threshold"])):
-		return false
-	if bool(cond.get("tag_breadth", false)) \
-			and not breadth_met_fraction(drafted):
-		return false
-	return true
-
-
-# **THE ONE LINE A SURFACE PRINTS FOR A THRESHOLD** — *"4 of 7 — DEBUFF"*, or
-# with the tag absent, *"0 of 7 — DEBUFF"*. ES requires the state be visible and
-# EZ §0 is where that earns out: a player who cannot see he is one card away
-# cannot use the lever. **ONE BUILDER**, so the hero sheet and the loadout panel
-# cannot render the same fact two ways.
-static func threshold_line(drafted: Array, tag: String) -> String:
-	return "%d of %d — %s" % [Classes.primary_tag_count(drafted, tag),
-		drafted.size(), tag]
-
-
-# ...and the breadth half: *"peak 2 of 7 — BREADTH"*.
-static func breadth_line(drafted: Array) -> String:
-	return "peak %d of %d — BREADTH" % [Classes.primary_tag_peak(drafted),
-		drafted.size()]
+# **AND THE STATE THAT WAS ON THE SCREEN WENT WITH IT.** The hero sheet and the
+# loadout panel each carried a `RUNE CONDITIONS` line showing where a hero stood
+# against the fractions. With nothing reading them the line was a number that
+# decided nothing, so both are gone; the `CARRIED BY TAG` census line above each
+# of them is untouched, because the tags themselves are player-facing (EK) and
+# are not conditions. `check_fn` §3 drives both screens for exactly that pair.
 
 
 # The tag line as a surface renders it — "DEFENSE · RESOURCE", or "".

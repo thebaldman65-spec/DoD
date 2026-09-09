@@ -469,8 +469,8 @@
 	"deepening_hex": {
 		"name": "Deepening Hex", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "Ruin detonates every 8th stack instead of every 10th — while at least HALF his drafted cards are DEBUFF.",
-		"payload": {"condition": {"tag_threshold": "DEBUFF"}, "stat": {"rune_hex_threshold": 8}}
+		"desc": "Ruin detonates every 8th stack instead of every 10th.",
+		"payload": {"stat": {"rune_hex_threshold": 8}}
 	},
 	"standing_mark": {
 		"name": "Standing Mark", "scope": "spec:occultist",
@@ -495,8 +495,8 @@
 	"wide_rite": {
 		"name": "Wide Rite", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "Every debuff he applies marks 1 MORE Ruin — while NO tag holds more than a THIRD of his drafted cards.",
-		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_wide_rite": 1}}
+		"desc": "Every debuff he applies marks 1 MORE Ruin.",
+		"payload": {"stat": {"rune_wide_rite": 1}}
 	},
 	"open_wound": {
 		"name": "Open Wound", "scope": "spec:occultist",
@@ -514,8 +514,8 @@
 	"bracing_line": {
 		"name": "Bracing Line", "scope": "spec:warden",
 		"price": 100,
-		"desc": "Allies take 5% less damage while his Heavy Plating bonus stands at +32% or higher — and while at least HALF his drafted cards are DEFENSE.",
-		"payload": {"condition": {"tag_threshold": "DEFENSE"}, "stat": {"rune_bracing_line": 5}}
+		"desc": "Allies take 5% less damage while his Heavy Plating bonus stands at +32% or higher.",
+		"payload": {"stat": {"rune_bracing_line": 5}}
 	},
 	"split_shield": {
 		"name": "Split Shield", "scope": "spec:warden",
@@ -527,8 +527,8 @@
 	"long_watch": {
 		"name": "Long Watch", "scope": "spec:warden",
 		"price": 100,
-		"desc": "His Break damage carries to a second enemy — while NO tag holds more than a THIRD of his drafted cards.",
-		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_long_watch": 1}}
+		"desc": "His Break damage carries to a second enemy.",
+		"payload": {"stat": {"rune_long_watch": 1}}
 	},
 	"bared_plate": {
 		"name": "Bared Plate", "scope": "spec:warden",
@@ -545,8 +545,8 @@
 	"heavy_bolts": {
 		"name": "Heavy Bolts", "scope": "spec:sharpshooter",
 		"price": 100,
-		"desc": "His patience turns into force at 80 Focus rather than 100 — while at least HALF his drafted cards are MARK.",
-		"payload": {"condition": {"tag_threshold": "MARK"}, "stat": {"rune_heavy_bolts": 20}}
+		"desc": "His patience turns into force at 80 Focus rather than 100.",
+		"payload": {"stat": {"rune_heavy_bolts": 20}}
 	},
 	"ambush": {
 		"name": "Ambush", "scope": "spec:sharpshooter",
@@ -558,8 +558,8 @@
 	"wide_watch": {
 		"name": "Wide Watch", "scope": "spec:sharpshooter",
 		"price": 100,
-		"desc": "Focus carries in FULL through a kill rather than the 50 retained — while NO tag holds more than a THIRD of his drafted cards.",
-		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_wide_watch": 1}}
+		"desc": "Focus carries in FULL through a kill rather than the 50 retained.",
+		"payload": {"stat": {"rune_wide_watch": 1}}
 	},
 	"long_draw_press": {
 		"name": "Long Draw", "scope": "spec:sharpshooter",
@@ -582,8 +582,8 @@
 	"answering_pack": {
 		"name": "Answering Pack", "scope": "spec:beastmaster",
 		"price": 100,
-		"desc": "Once a fight, the deepest bond takes the blow that would fell the hunter — while at least HALF his drafted cards are DEFENSE.",
-		"payload": {"condition": {"tag_threshold": "DEFENSE"}, "stat": {"rune_answering_pack": 1}}
+		"desc": "Once a fight, the deepest bond takes the blow that would fell the hunter.",
+		"payload": {"stat": {"rune_answering_pack": 1}}
 	},
 	"second_whistle": {
 		"name": "Second Whistle", "scope": "spec:beastmaster",
@@ -594,8 +594,8 @@
 	"shared_scent": {
 		"name": "Shared Scent", "scope": "spec:beastmaster",
 		"price": 100,
-		"desc": "A fallen companion's Loyalty carries to the next one called — while NO tag holds more than a THIRD of his drafted cards.",
-		"payload": {"condition": {"tag_breadth": true}, "stat": {"rune_shared_scent": 1}}
+		"desc": "A fallen companion's Loyalty carries to the next one called.",
+		"payload": {"stat": {"rune_shared_scent": 1}}
 	},
 	"bared_fang": {
 		"name": "Bared Fang", "scope": "spec:beastmaster",

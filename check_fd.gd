@@ -434,6 +434,14 @@ func _s2_break_is_secondary_only() -> void:
 	# words. No live rune names either — asserted here, both ways, so the day a
 	# rune is authored against a BREAK threshold this section says the condition
 	# can never be met rather than shipping a dead rune.
+	# ── BATCH FN — THE CENSUS INVERTED, AND THE REASON IS NOT THAT IT PASSES ─
+	# It read "at least eight live runes carry a condition" as its population
+	# assertion — the walk's own EA §5 guard — and then asserted none of them
+	# names BREAK or OFFENSE. **FN retired THRESHOLD and BREADTH and ungated the
+	# eight**, so the population is ZERO by ruling and the two negatives below
+	# are true for a stronger reason than the one they were written for. The
+	# population arm is inverted rather than dropped: a rune re-gated on
+	# anything at all turns it red here as well as in `check_fn` §1b.
 	var gated: Array = []
 	var on_break: Array = []
 	var on_offense: Array = []
@@ -450,33 +458,36 @@ func _s2_break_is_secondary_only() -> void:
 			on_break.append(String(id))
 		elif tag == "OFFENSE":
 			on_offense.append(String(id))
-	ok(gated.size() >= 8,
-		"§2: only %d live runes carry a condition — the walk lost its population"
-			% gated.size())
+	ok(gated.is_empty(),
+		"§2: %d live runes carry a condition — FN retired both gated secondaries (%s)"
+			% [gated.size(), gated])
 	ok(on_break.is_empty(),
 		"§2: %s gate on a BREAK threshold, which NO CARD can now contribute to" % [on_break])
 	ok(on_offense.is_empty(),
 		"§2: %s gate on an OFFENSE threshold — the 54 that moved changed its count" % [on_offense])
 	print("    %d live runes are gated; %d name BREAK, %d name OFFENSE"
 		% [gated.size(), on_break.size(), on_offense.size()])
+	# **AND THE WALK ITSELF STILL READS A REAL POOL**, which is what stops the
+	# three zeroes above being what an empty `Runes.ids()` prints.
+	var live_seen := 0
+	for id_l in Runes.ids():
+		if not Runes.is_retired(String(id_l)):
+			live_seen += 1
+	ok(live_seen >= 55,
+		"§2: the condition walk read %d live runes — the zeroes above are the walk's, not the pool's"
+			% live_seen)
 
-	# **BREADTH ONLY EVER GETS HARDER, AND IT IS DRIVEN AGAINST AN EXACT
-	# RECONSTRUCTION OF THE TABLE BEFORE THE TRANSFORM.** `primary_tag_peak`
-	# folds what was the BREAK column into the OFFENSE one, so a hero holding
-	# both kinds peaks higher and `breadth_met_fraction` refuses where it used
-	# to allow.
+	# **THE TRANSFORM IS STILL RECONSTRUCTED EXACTLY, AND THAT IS WHAT SURVIVES
+	# BATCH FN.** Before FD **no row read `["OFFENSE", "BREAK"]`** — the three
+	# cards that carried both had them the other way round — so every row
+	# reading exactly that pair today is one of the 53 that moved. The count is
+	# the reconstruction's own population check: a table somebody rewrote
+	# wholesale reads a different number here before any claim below is made.
 	#
-	# **THE RECONSTRUCTION IS EXACT AND THAT IS CHECKED, NOT ASSUMED.** Before
-	# FD **no row read `["OFFENSE", "BREAK"]`** — the three cards that carried
-	# both had them the other way round — so every row reading exactly that
-	# pair today is one of the 54 that moved, and reading its primary back as
-	# BREAK inverts the transform row for row. `_pre_fd_peak` asserts its own
-	# population against the 54 rather than trusting the shape.
-	#
-	# The loadouts are REAL, taken through `Run.draft_pool_left` — the live
-	# door, so this gate reads no ability pool of its own — at the three sizes
-	# the ladder actually produces (EZ §1: 4, 5 and 7 drafted cards).
-	var run2: Node = root.get_node("/root/Run")
+	# **WHAT WENT AT FN IS THE CONSUMER, NOT THE RECONSTRUCTION.** The drive
+	# under this used it to show that the fold can only ever make BREADTH
+	# harder; BREADTH is retired and its predicate is deleted, so there is
+	# nothing left to be harder. See the block below.
 	var moved := 0
 	for nm3 in Classes.CARD_TAGS:
 		var t4: Array = Classes.CARD_TAGS[nm3]
@@ -495,38 +506,21 @@ func _s2_break_is_secondary_only() -> void:
 	ok(str(Classes.card_tags("Feint")) == str(["OFFENSE", "MARK"] as Array),
 		"§2: Feint reads %s — it is the one card where EL §2 owns the second slot"
 			% [Classes.card_tags("Feint")])
-	var seen := 0
-	var met_now := 0
-	var met_before := 0
-	var peak_rose := 0
-	for ckey in Classes.SPEC_IDS:
-		for spec in Classes.SPEC_IDS[ckey]:
-			var m := _member(String(ckey), String(spec))
-			var pool: Array = (run2.draft_pool_left(m) as Dictionary)["spec"]
-			for n in [4, 5, 7]:
-				if pool.size() < n:
-					continue
-				var drafted: Array = pool.slice(0, n)
-				m["bm_abilities"] = drafted
-				m["bm_equipped"] = drafted
-				seen += 1
-				var now: int = Classes.primary_tag_peak(drafted)
-				var was: int = _pre_fd_peak(drafted)
-				if now > was:
-					peak_rose += 1
-				ok(now >= was,
-					"§2: %s/%d — the peak FELL, %d against %d; the fold cannot lower it"
-						% [spec, n, now, was])
-				if Runes.breadth_met_fraction(Runes.drafted_names(m)):
-					met_now += 1
-				if was * 3 <= n:
-					met_before += 1
-	ok(seen >= 30, "§2: the breadth drive read %d loadouts, not the roster" % seen)
-	ok(met_now <= met_before,
-		"§2: breadth is met on MORE loadouts after the fold (%d against %d)"
-			% [met_now, met_before])
-	print("    breadth over %d real loadouts: met %d after, %d before; the peak rose on %d"
-		% [seen, met_now, met_before, peak_rose])
+	# ── BATCH FN — THE BREADTH DRIVE STOOD HERE AND ITS SUBJECT IS GONE ─────
+	#
+	# **IT DROVE `breadth_met_fraction` OVER EVERY SPEC'S REAL LOADOUT AT 4, 5
+	# AND 7 DRAFTED CARDS** and asserted that the fold never LOWERS the primary
+	# peak, so BREADTH could only ever get harder — FD's own asymmetry, measured
+	# rather than argued. **FN retired BREADTH and removed both
+	# `Runes.breadth_met_fraction` and `Classes.primary_tag_peak`**, so the arm
+	# has no predicate left to drive and its claim has no consumer.
+	#
+	# **IT IS REMOVED RATHER THAN RE-IMPLEMENTED IN THE GATE.** A gate carrying
+	# its own copy of a retired predicate, asserting a property of a fold that
+	# now moves nothing but a screen, is a check that can only pass — and the
+	# measurement itself is kept where measurements belong, in
+	# `docs/reports/FD.md` §2. The half of §2 that is about the CARDS is
+	# untouched above, and it is the half FD's ruling actually binds.
 
 	# **`RUNE_TAGS` WAS PINNED AT FIVE SO THE DAY IT WAS RULED ON THIS LINE WOULD
 	# MOVE, AND AT BATCH FE IT DID.** The designer ruled that no RUNE carries
@@ -548,30 +542,6 @@ func _s2_break_is_secondary_only() -> void:
 		"§2: %d rune rows carry BREAK first — FE §1 ruled that none may (%s)" % [
 			rune_break.size(), rune_break])
 	print("    RUNE_TAGS rows primary-BREAK: %d (ruled to zero at FE §1)" % rune_break.size())
-
-
-# The peak this loadout WOULD have had before FD §2, reconstructed row by row:
-# a card reading `["OFFENSE", "BREAK"]` today read BREAK first yesterday, and
-# every other row is untouched. **VOID-SAFE BY BEING A COUNT, NOT A WALK** — it
-# reads one table and enumerates nothing.
-func _pre_fd_peak(names: Array) -> int:
-	var census := {}
-	for t in Classes.TAG_ORDER:
-		census[String(t)] = 0
-	for nm in names:
-		var tags: Array = Classes.card_tags(String(nm))
-		if tags.is_empty():
-			continue
-		var p := String(tags[0])
-		if tags.size() == 2 and p == "OFFENSE" and String(tags[1]) == "BREAK":
-			p = "BREAK"
-		elif String(nm) == "Feint":
-			p = "BREAK"   # the 54th: `["BREAK", "MARK"]` before FD §2
-		census[p] = int(census[p]) + 1
-	var top := 0
-	for t2 in Classes.TAG_ORDER:
-		top = maxi(top, int(census[String(t2)]))
-	return top
 
 
 # ── §3 — THE SHARED RUIN'S NAME ─────────────────────────────────────────────

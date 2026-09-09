@@ -713,13 +713,22 @@ func _s5_breadth() -> void:
 	retired.sort()
 	ok(retired.size() == 12,
 		"§5: %d retired splashes, expected one per spec" % retired.size())
-	# **THE LIVE COUNT IS PRINTED AND FLOORED, NOT PINNED.** Which specs get a
-	# splash is CONTENT and is the designer's; four specs are authored and eight
-	# are not, so an equality here would go red on the next authoring batch for
-	# doing exactly the right thing. The floor is what stops the shape going
-	# quietly extinct.
-	ok(live.size() >= 4,
-		"§5: %d live splashes — the BREADTH shape has gone extinct" % live.size())
+	# **THE FLOOR WAS THERE TO STOP THE SHAPE GOING QUIETLY EXTINCT, AND AT
+	# BATCH FN IT WENT EXTINCT LOUDLY.** FK retired BREADTH going forward and FN
+	# took it off the four runes that still carried it, so the live count is ZERO
+	# by ruling rather than by neglect — which is the one case the floor was
+	# never guarding against.
+	#
+	# **IT INVERTS RATHER THAN BEING DELETED, AND THE INVERSION IS THE STRONGER
+	# CHECK.** A floor at four asked "has somebody let this rot?"; an equality at
+	# zero asks "has somebody authored one against the ruling?", and that is a
+	# question with a live answer. **ES §5's machinery is untouched below** —
+	# `Runes.breadth_met` is kept and is still driven, because what was retired
+	# is EZ §0's FRACTION over the drafted half, not ES §5's absolute count over
+	# the bar, and the two were never the same question.
+	ok(live.is_empty(),
+		"§5: %d live runes carry a BREADTH label — FK retired the shape and FN took it off the last four (%s)"
+			% [live.size(), live])
 	print("    splashes: %d live (%s)" % [live.size(), ", ".join(live)])
 	print("    splashes: %d retired (%s)" % [retired.size(), ", ".join(retired)])
 

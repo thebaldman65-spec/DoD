@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1437,
-  "source": 1104,
+  "total": 1440,
+  "source": 1107,
   "other": 87,
   "document": 246
  },
  "source_residency": {
   "code": 664,
-  "absent": 291,
+  "absent": 295,
   "runtime": 81,
-  "narrow": 25,
+  "narrow": 24,
   "unresolved": 1,
   "alt-sibling": 3,
   "comment": 39
@@ -1987,6 +1987,50 @@
   },
   {
    "s": "check_ez.gd",
+   "fn": "_s1_the_conditions_are_retired",
+   "h": "scripts/runes.gd",
+   "n": "func breadth_met(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#109"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s1_the_conditions_are_retired",
+   "h": "scripts/runes.gd",
+   "n": "func breadth_met_fraction(",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#108"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s1_the_conditions_are_retired",
+   "h": "scripts/runes.gd",
+   "n": "func tag_threshold_met(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#109"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s1_the_conditions_are_retired",
+   "h": "scripts/runes.gd",
+   "n": "func threshold_met(",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ez.gd#108"
+  },
+  {
+   "s": "check_ez.gd",
    "fn": "_s4_the_payloads",
    "h": "",
    "n": "%s += ",
@@ -1994,7 +2038,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#292",
+   "g": "check_ez.gd#185",
    "alt": true
   },
   {
@@ -2006,7 +2050,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#292",
+   "g": "check_ez.gd#185",
    "alt": true
   },
   {
@@ -2018,7 +2062,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#408",
+   "g": "check_ez.gd#301",
    "expr": "rq_key"
   },
   {
@@ -2030,7 +2074,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#409",
+   "g": "check_ez.gd#302",
    "expr": "rq_key"
   },
   {
@@ -2042,7 +2086,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#410"
+   "g": "check_ez.gd#303"
   },
   {
    "s": "check_ez.gd",
@@ -2053,7 +2097,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#414"
+   "g": "check_ez.gd#307"
   },
   {
    "s": "check_ez.gd",
@@ -2064,7 +2108,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#413"
+   "g": "check_ez.gd#306"
   },
   {
    "s": "check_ez.gd",
@@ -2075,7 +2119,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#406"
+   "g": "check_ez.gd#299"
   },
   {
    "s": "check_fd.gd",
@@ -2217,53 +2261,9 @@
    "s": "check_fe.gd",
    "fn": "_s1b_nothing_reads_a_rune_primary",
    "h": "scripts/runes.gd",
-   "n": "Classes.primary_tag_count",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_fe.gd#94"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s1b_nothing_reads_a_rune_primary",
-   "h": "scripts/runes.gd",
-   "n": "Classes.primary_tag_peak",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "check_fe.gd#95"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s1b_nothing_reads_a_rune_primary",
-   "h": "scripts/runes.gd",
-   "n": "func ",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fe.gd#92"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s1b_nothing_reads_a_rune_primary",
-   "h": "scripts/runes.gd",
    "n": "func breadth_met_fraction(",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fe.gd#90"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s1b_nothing_reads_a_rune_primary",
-   "h": "scripts/runes.gd",
-   "n": "func threshold_met(",
-   "p": "+",
-   "r": "code",
+   "p": "-",
+   "r": "absent",
    "k": "literal",
    "how": "read",
    "g": "check_fe.gd#89"
@@ -2272,12 +2272,34 @@
    "s": "check_fe.gd",
    "fn": "_s1b_nothing_reads_a_rune_primary",
    "h": "scripts/runes.gd",
-   "n": "rune_tags",
-   "p": "-",
-   "r": "narrow",
+   "n": "func rune_tag_line(",
+   "p": "+",
+   "r": "code",
    "k": "literal",
-   "how": "derived",
+   "how": "read",
    "g": "check_fe.gd#96"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s1b_nothing_reads_a_rune_primary",
+   "h": "scripts/runes.gd",
+   "n": "func rune_tags(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fe.gd#96"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s1b_nothing_reads_a_rune_primary",
+   "h": "scripts/runes.gd",
+   "n": "func threshold_met(",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fe.gd#89"
   },
   {
    "s": "check_fe.gd",
@@ -2288,7 +2310,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_fe.gd#109",
+   "g": "check_fe.gd#106",
    "alt": true
   },
   {
@@ -2300,7 +2322,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_fe.gd#109",
+   "g": "check_fe.gd#106",
    "alt": true
   },
   {
@@ -2312,7 +2334,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#112"
+   "g": "check_fe.gd#109"
   },
   {
    "s": "check_fe.gd",
@@ -2323,7 +2345,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#124"
+   "g": "check_fe.gd#121"
   },
   {
    "s": "check_fe.gd",
@@ -2334,7 +2356,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#125"
+   "g": "check_fe.gd#122"
   },
   {
    "s": "check_fe.gd",
@@ -2345,7 +2367,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#124"
+   "g": "check_fe.gd#121"
   },
   {
    "s": "check_fe.gd",
@@ -2356,7 +2378,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#119"
+   "g": "check_fe.gd#116"
   },
   {
    "s": "check_fe.gd",
@@ -2367,7 +2389,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#113"
+   "g": "check_fe.gd#110"
   },
   {
    "s": "check_fe.gd",
@@ -2378,7 +2400,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#114"
+   "g": "check_fe.gd#111"
   },
   {
    "s": "check_fe.gd",
@@ -2389,7 +2411,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#120"
+   "g": "check_fe.gd#117"
   },
   {
    "s": "check_fe.gd",
@@ -2400,7 +2422,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#116"
+   "g": "check_fe.gd#113"
   },
   {
    "s": "check_fe.gd",
@@ -2411,7 +2433,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#115"
+   "g": "check_fe.gd#112"
   },
   {
    "s": "check_fe.gd",
@@ -2422,7 +2444,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#117"
+   "g": "check_fe.gd#114"
   },
   {
    "s": "check_fe.gd",
@@ -2433,7 +2455,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#118"
+   "g": "check_fe.gd#115"
   },
   {
    "s": "check_ff.gd",
@@ -2589,7 +2611,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1343"
+   "g": "check_fh.gd#1347"
   },
   {
    "s": "check_fh.gd",
@@ -2821,6 +2843,17 @@
    "k": "literal",
    "how": "read",
    "g": "check_fm.gd#97"
+  },
+  {
+   "s": "check_fn.gd",
+   "fn": "_s1_the_eight_are_ungated",
+   "h": "scripts/battle.gd",
+   "n": "BRACING_LINE_LEVEL := 32",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fn.gd#91"
   },
   {
    "s": "test_batch_ah.gd",

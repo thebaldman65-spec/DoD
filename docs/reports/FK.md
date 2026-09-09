@@ -399,7 +399,11 @@ rune does not call it — the clearest statement of what the rune traded.
 
 ## §9 — WHAT WAS DELIBERATELY NOT DONE
 
-- **The six shipped gated runes are not repaired.** Owed, next batch, exactly as the brief says.
+- **The ~~six~~ EIGHT shipped gated runes are not repaired.** Owed, next batch, exactly as the
+  brief says. *(Corrected at FN: this report is closed and the line is struck rather than rewritten.
+  There are EIGHT — four THRESHOLD and four BREADTH — and this was one of eleven lines across five
+  files that said six. `check_fk.STILL_GATED` held the right list the whole time; FL §2a derived the
+  count off it and FN paid the repair.)*
 - **The generated stat family stays.** It comes out once the pool is proven; that was the
   designer's ruling on order.
 - **No THRESHOLD and no BREADTH is authored.** All thirty-nine carry a bare shape or a TRADEOFF.

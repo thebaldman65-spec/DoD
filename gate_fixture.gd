@@ -52,6 +52,14 @@ extends RefCounted
 #                           keeps its slot.
 #   run           : Node  — supply the run node instead of fetching it
 #                           (check_ct already holds it).
+#   party         : Dict  — {seat: {key: value}} stamped onto `run.party[seat]`
+#                           AFTER the spec/tree/runes reset and BEFORE the scene
+#                           instantiates (check_fn). **THE WINDOW IS THE POINT**:
+#                           `battle.gd`'s spawn reads `party[i]["runes"]` and the
+#                           member dict as it builds each hero, so a rune or a
+#                           loadout set afterwards is a rune the fight never saw.
+#                           The reset above clears `runes` unconditionally, which
+#                           is why a caller cannot simply set it first.
 #
 # THE `Profile.set_flag` LINES ARE GONE AND THEY ARE NOT COMING BACK — see
 # `flags_are_inert()` below for the proof, which is asserted rather than argued.
@@ -70,6 +78,11 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 		run.sync_spec_hp(i)
 	run.specs_chosen = true
 	run.active = true
+	var party_over: Dictionary = opts.get("party", {})
+	for seat in party_over:
+		var over: Dictionary = party_over[seat]
+		for k2 in over:
+			run.party[int(seat)][k2] = over[k2]
 	var items: Dictionary = opts.get("items", {})
 	for k in items:
 		run.items[k] = items[k]

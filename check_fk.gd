@@ -3,9 +3,12 @@
 #   §1  the pool census: 60 live across all twelve specs, flat 100g, and the
 #       TWO SCOPE STRINGS THAT WOULD ROLL FOR NOBODY are absent by assertion
 #   §2  NO THRESHOLD AND NO BREADTH among the thirty-nine — the secondaries the
-#       designer retired going forward — with the six already-shipped gated
-#       runes asserted STILL GATED, because "none is authored" must not be
-#       satisfiable by quietly ungating the six that are owed a repair
+#       designer retired going forward. **THE EIGHT ALREADY-SHIPPED GATED RUNES
+#       WERE ASSERTED STILL GATED HERE AND THAT ARM INVERTED AT BATCH FN**: it
+#       existed so "none is authored" could not be satisfied by quietly ungating
+#       the eight that were owed a repair, and FN paid the repair, so it now
+#       asserts none of the eight carries a condition. Same question, pointed
+#       the other way — and EIGHT, not the six five lines of this file said
 #   §3  THE ANTI-INERT WALK, and it is this gate's reason to exist: every field
 #       every FK payload writes is DECLARED on `BattleUnit` and READ somewhere
 #       in `scripts/`. A payload that applies and pays nothing is this project's
@@ -50,9 +53,14 @@ const FK_IDS := [
 	"long_poison", "second_barb", "full_board", "carrion", "thin_blood",
 ]
 
-# The six gated runes EZ and FC shipped, which FK does NOT repair. They are
-# owed to a later batch and §2 asserts they are STILL GATED — see that section.
-const STILL_GATED := ["deepening_hex", "wide_rite", "bracing_line",
+# **THE EIGHT GATED RUNES EZ AND FC SHIPPED — EIGHT, AND THIS LIST WAS ALWAYS
+# RIGHT.** Eleven lines across five files called them six, five of them in this
+# file; FL §2a derived the count off this constant and FN corrected the eleven.
+# FK did not repair them and §2 asserted they were STILL GATED; **FN ungated all
+# eight and the arm inverted.** The list is kept under its own name because it
+# is the POPULATION — a walk deriving "the gated ones" from a property is empty
+# now and would pass on a tree where all eight had been deleted.
+const WAS_GATED := ["deepening_hex", "wide_rite", "bracing_line",
 	"long_watch", "heavy_bolts", "wide_watch", "answering_pack", "shared_scent"]
 
 # The ONE float among the thirty-nine's payload fields. Coercing it would
@@ -129,12 +137,14 @@ func _s1_the_pool() -> void:
 
 
 # ── §2 ──────────────────────────────────────────────────────────────────────
-# **"NONE OF THE FORTY CARRIES A THRESHOLD OR A BREADTH" IS TWO CLAIMS, NOT
-# ONE**, and a gate asserting only the first is one a batch could satisfy by
-# ungating the six that ARE gated. The second arm is why the negative here is
-# safe to assert.
+# **"NONE OF THE FORTY CARRIES A THRESHOLD OR A BREADTH" WAS TWO CLAIMS, NOT
+# ONE**, and a gate asserting only the first was one a batch could satisfy by
+# ungating the eight that WERE gated. **BATCH FN UNGATED THEM ON PURPOSE**, so
+# the second arm is inverted rather than deleted: it now asserts the eight carry
+# NEITHER a condition NOR a label, which is the same guard against a silent
+# re-gating that the original was against a silent ungating.
 func _s2_no_threshold_no_breadth() -> void:
-	print("\n§2 — no THRESHOLD and no BREADTH among the thirty-nine")
+	print("\n§2 — no THRESHOLD and no BREADTH: the 39, and the 8 FN ungated")
 	var gated_payload: Array = []
 	var gated_label: Array = []
 	for id in FK_IDS:
@@ -150,21 +160,25 @@ func _s2_no_threshold_no_breadth() -> void:
 		"§2: an FK payload carries a retired secondary's condition — %s" % [gated_payload])
 	ok(gated_label.is_empty(),
 		"§2: an FK shape row is labelled THRESHOLD or BREADTH — %s" % [gated_label])
-	# THE POSITIVE ARM: the six shipped gated runes are NOT repaired here, so
-	# every one of them still carries its condition AND its label.
-	var ungated: Array = []
-	for id2 in STILL_GATED:
+	# **THE ARM THAT INVERTED AT FN.** It read "these eight still carry their
+	# condition AND their label" and its job was to stop a batch satisfying the
+	# negative above by ungating them quietly. FN ungated them LOUDLY, so the
+	# same eight are now asserted to carry neither — and a re-gating is what
+	# turns this red.
+	var regated: Array = []
+	for id2 in WAS_GATED:
 		var p2: Dictionary = Runes.config(String(id2)).get("payload", {})
 		var c2: Dictionary = p2.get("condition", {})
 		var s2: Array = Runes.rune_shape(String(id2))
-		if not (c2.has("tag_threshold") or c2.has("tag_breadth")):
-			ungated.append("%s payload" % id2)
-		if not (s2.has("THRESHOLD") or s2.has("BREADTH")):
-			ungated.append("%s label" % id2)
-	ok(ungated.is_empty(),
-		"§2: a gated rune FK does not repair has been quietly ungated — %s" % [ungated])
-	# ...and every FK shape is a real one. A TRADEOFF is the ONE secondary that
-	# survives, so its presence is the positive arm of the negative above.
+		if c2.has("tag_threshold") or c2.has("tag_breadth"):
+			regated.append("%s payload" % id2)
+		if s2.has("THRESHOLD") or s2.has("BREADTH"):
+			regated.append("%s label" % id2)
+	ok(regated.is_empty(),
+		"§2: one of the eight FN ungated carries a retired secondary again — %s" % [regated])
+	# ...and every FK shape is a real one. A TRADEOFF is the ONE secondary any
+	# entry carries after FN, so its presence is the positive arm of the
+	# negative above: a table somebody had emptied reads zero THRESHOLD too.
 	var bad_shape: Array = []
 	var tradeoffs := 0
 	for id3 in FK_IDS:
