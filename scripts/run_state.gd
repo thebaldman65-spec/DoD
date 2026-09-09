@@ -1426,8 +1426,25 @@ func runes_mode() -> String:
 
 
 # Takes the MEMBER dict (Batch X) so eligibility can read the spec, the
-# trophies, and the owned pouch. Returns {} when runes are off — every
-# call site skips empties. The pool lives in data/runes.json (Runes).
+# trophies, and the owned pouch. The pool lives in data/runes.json (Runes).
+#
+# ══ BATCH FM §1 — `{}` IS NO LONGER ONLY "RUNES ARE OFF" ════════════════════
+#
+# It used to read *"returns {} when runes are off — every call site skips
+# empties"*, and both halves have changed. **`Runes.generate` returns `{}` on an
+# EXHAUSTED POOL now**, which a real run reaches: every rune is spec-scoped and
+# five per hero, so a hero who has seen his five draws nothing. Skipping an
+# empty is what made the failure invisible, so the four offer sites ANNOUNCE it
+# instead (FM §2) — an empty panel that says nothing reads as a bug, and the
+# designer will hit this inside a run.
+#
+# **AND THIS IS THE ONE PLACE THE GENERATED STAT FAMILY IS STILL REACHABLE**,
+# reported rather than left to be found: the `"stats"` branch below hands back a
+# `Runes.template_rune` directly. It is behind `DOD_SIM_RUNES`, an environment
+# variable no player sets and one `test_runes._arm_purity` asserts cannot arm a
+# real game, and the flag's whole documented purpose is to run the sim on
+# exactly that family. **Closing it would delete a measurement arm rather than
+# an offer**, so it stands and is named here.
 # exclude_names: names this draw may not return even though the hero does
 # not own them — the candidates already in the triple being rolled. Empty
 # for every ordinary single-rune caller (shop, elite cache), so their
@@ -1502,8 +1519,23 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 		for c in out:
 			taken.append(String(c["name"]))
 		var rune := generate_rune(member, taken)
+		# ── BATCH FM §2 — A SHORT TRIPLE, NOT A DISCARDED ONE ────────────────
+		#
+		# **THIS WAS `return []` AND THAT LINE WOULD HAVE SHIPPED A REWARD THAT
+		# SILENTLY PAYS NOTHING.** It was correct while the generated family
+		# floored every draw — the loop could not fail to reach three, so the
+		# early return was unreachable. FM §1 makes it the ordinary case, and it
+		# fires on a pool that is NOT empty: measured at FM §2, a Pyromancer
+		# reaches three of his five at spawn, so **one rune bought from the
+		# first Peddler leaves two — and `return []` threw both away**, printed
+		# no spoils line, incremented no owed pick, and read exactly like an
+		# elite that never carried a cache.
+		#
+		# A `break` offers what there is. The fully-empty case is unchanged and
+		# still returns `[]` on the first draw — including under
+		# `DOD_SIM_RUNES=off`, where nothing is ever queued.
 		if rune.is_empty():
-			return []
+			break
 		out.append(rune)
 	return out
 
@@ -2786,14 +2818,46 @@ func claim_reward() -> Dictionary:
 					% [ITEM_INFO[id][0], item_stack_cap(id)], "shop": false}
 			return {"text": "+1 %s (the bargain)" % ITEM_INFO[id][0], "shop": false}
 		"rune":
-			var looter: Dictionary = party.pick_random()
+			# ══ BATCH FM §2 — THE BARGAIN IS PAID FOR, SO IT MAY NOT PAY
+			#    NOTHING IN SILENCE ═══════════════════════════════════════════
+			#
+			# **THE MODIFIER IS THE PRICE** (see this function's own header:
+			# *"the reward is what clearing it under that price bought"*), so a
+			# player reaches this line having already fought the harder fight.
+			# It used to `return {"text": ""}` on an empty triple with the
+			# comment `# runes off`, and that was exhaustive while the generated
+			# family floored every draw. FM §1 gives the empty a second cause a
+			# real run reaches, and paying a bought reward with a blank line is
+			# the worst of the four sites — the player has no way to tell it
+			# from a reward that never fired.
+			#
+			# **THE PICK PREFERS SOMEONE IT CAN ACTUALLY PAY**, which is the
+			# idiom `events.gd`'s own rune verb already uses one function over
+			# (it prefers a hero with a free slot and falls back to the party).
+			# `party.pick_random()` was exhaustive when every hero could always
+			# take one; now a random pick can land on the one exhausted hero in
+			# a party of four and throw the reward away. The fallback keeps the
+			# random pick so the empty case still names a hero.
+			var takers: Array = []
+			for m in party:
+				if not Runes.pool_empty_for(m):
+					takers.append(m)
+			var looter: Dictionary = (takers if not takers.is_empty()
+				else party).pick_random()
 			var candidates: Array = roll_rune_candidates(looter)
 			if candidates.is_empty():
-				return {"text": "", "shop": false}  # runes off
+				if runes_mode() == "off":
+					return {"text": "", "shop": false}
+				return {"text": "RUNE (the bargain): nothing left to hand over — %s."
+					% Runes.empty_offer_reason(looter), "shop": false}
 			looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
 			looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
-			return {"text": "RUNE (the bargain): the %s may choose one of three."
-				% String(looter["key"]).capitalize(), "shop": false}
+			# **AND THE COUNT IS READ OFF THE TRIPLE**, for the elite cache's
+			# reason: a short triple is ordinary now and "one of three" would be
+			# the screen lying about a reward.
+			return {"text": "RUNE (the bargain): the %s may choose one of %d."
+				% [String(looter["key"]).capitalize(), candidates.size()],
+				"shop": false}
 		"shop":
 			pending_shop = true
 			return {"text": "A merchant follows the fight.", "shop": true}

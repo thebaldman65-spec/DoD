@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1432,
-  "source": 1101,
-  "other": 85,
+  "total": 1437,
+  "source": 1104,
+  "other": 87,
   "document": 246
  },
  "source_residency": {
-  "code": 661,
+  "code": 664,
   "absent": 291,
   "runtime": 81,
   "narrow": 25,
@@ -1939,7 +1939,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_es.gd#101"
+   "g": "check_es.gd#105"
   },
   {
    "s": "check_eu.gd",
@@ -2589,7 +2589,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1320"
+   "g": "check_fh.gd#1343"
   },
   {
    "s": "check_fh.gd",
@@ -2600,7 +2600,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#704"
+   "g": "check_fh.gd#727"
   },
   {
    "s": "check_fh.gd",
@@ -2611,7 +2611,7 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#707"
+   "g": "check_fh.gd#730"
   },
   {
    "s": "check_fh.gd",
@@ -2622,7 +2622,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#707"
+   "g": "check_fh.gd#730"
   },
   {
    "s": "check_fh.gd",
@@ -2633,7 +2633,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#707"
+   "g": "check_fh.gd#730"
   },
   {
    "s": "check_fi.gd",
@@ -2766,6 +2766,61 @@
    "k": "literal",
    "how": "stripped",
    "g": "check_fk.gd#171"
+  },
+  {
+   "s": "check_fm.gd",
+   "fn": "_s1_out_of_the_offer",
+   "h": "scripts/run_state.gd",
+   "n": "\t\t\"stats\":\n\t\t\treturn Runes.template_rune(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fm.gd#67"
+  },
+  {
+   "s": "check_fm.gd",
+   "fn": "_s1_out_of_the_offer",
+   "h": "scripts/",
+   "n": "Runes.generate(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fm.gd#58"
+  },
+  {
+   "s": "check_fm.gd",
+   "fn": "_s1_out_of_the_offer",
+   "h": "scripts/",
+   "n": "Runes.template_rune(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fm.gd#60"
+  },
+  {
+   "s": "check_fm.gd",
+   "fn": "_s1_out_of_the_offer",
+   "h": "scripts/runes.gd",
+   "n": "_template_markers(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fm.gd#98"
+  },
+  {
+   "s": "check_fm.gd",
+   "fn": "_s1_out_of_the_offer",
+   "h": "scripts/runes.gd",
+   "n": "static func _template_markers(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fm.gd#97"
   },
   {
    "s": "test_batch_ah.gd",
@@ -15826,7 +15881,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "param",
-   "g": "test_runes.gd#355",
+   "g": "test_runes.gd#361",
    "expr": "BOOLEAN_READ_FIELDS"
   },
   {

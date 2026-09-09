@@ -13,6 +13,11 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 # Rune generation lives in Run (shared with elite drops); runes are run-scoped
 # and only offered for classes present in the current party.
 var offers: Array = []  # [{member_idx, rune}]
+# BATCH FM §2 — WHICH HEROES THE PEDDLER HAD NOTHING FOR, kept beside the
+# offers rather than derived at draw time from `Run.party.size() - offers.size()`
+# — a hero can also be absent because the roll came back a duplicate, and the
+# two are different sentences.
+var _spent: Array = []  # member indices whose authored pool is exhausted
 # BATCH CT §2: which Sell button is armed, if any. Session state on the screen
 # rather than on the run — leaving the shop with a button armed and coming back
 # must not find it still armed.
@@ -28,14 +33,28 @@ func _ready() -> void:
 	_draw_screen()
 
 
+# ══ BATCH FM §2 — AN EMPTY COLUMN IS RECORDED, NOT JUST SKIPPED ═════════════
+#
+# `Run.generate_rune` returning `{}` used to mean one thing — runes are off —
+# and `continue` was the whole handling. FM §1 gives it a second meaning that a
+# real run reaches: **the hero has seen every rune written for his spec.** Five
+# a hero, spec-scoped, nothing universal left to fall back on. Skipping that
+# silently leaves the merchant's rune column holding a header and white space,
+# which is FE's finding wearing a different coat — a correct refusal that leaves
+# the screen lying.
+#
+# So the indices are KEPT and `_draw_screen` says the sentence.
 func _roll_offers() -> void:
 	offers = []
+	_spent = []
 	for i in Run.party.size():
 		var member: Dictionary = Run.party[i]
 		# The member dict (Batch X): eligibility reads spec, trophies, and
-		# the owned pouch. Empty = runes off (DOD_SIM_RUNES) — no offer.
+		# the owned pouch. Empty = runes off (DOD_SIM_RUNES), or — since FM §1
+		# — the hero's authored pool is spent.
 		var rune: Dictionary = Run.generate_rune(member)
 		if rune.is_empty():
+			_spent.append(i)
 			continue
 		var owned_names: Array = []
 		for owned in member.get("runes", []):
@@ -44,7 +63,16 @@ func _roll_offers() -> void:
 			if not owned_names.has(rune["name"]):
 				break
 			rune = Run.generate_rune(member)
-		if not owned_names.has(rune["name"]):
+			# **AND THE RE-ROLL CAN COME BACK EMPTY NOW.** It could not before
+			# FM §1 — the family always had one more stick — and reading
+			# `rune["name"]` off `{}` on the next pass is a hard error, not a
+			# missing offer. Unreachable today (the pouch cannot change inside
+			# this loop, so a non-empty first draw means a non-empty pool), and
+			# guarded anyway: "cannot happen" is not "is not guarded".
+			if rune.is_empty():
+				_spent.append(i)
+				break
+		if not rune.is_empty() and not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
 
 
@@ -211,6 +239,39 @@ func _draw_screen() -> void:
 		buy.pressed.connect(_buy_rune.bind(i))
 		vbox.add_child(buy)
 
+	# ── BATCH FM §2 — THE COLUMN SAYS WHY IT IS SHORT ────────────────────────
+	#
+	# **A HEADER OVER WHITE SPACE READS AS A BUG AND THE DESIGNER WILL HIT
+	# THIS.** With the generated stat family out of the offer (FM §1) the pool
+	# is authored-only and spec-scoped — **four to six a hero, of which three to
+	# six are reachable at spawn** (FM §2's census; the brief's "five per hero"
+	# is right about the shape and wrong about the number in both directions) —
+	# so a hero draws nothing inside an ordinary run with no fault anywhere.
+	# CO §3's rule is that a refusal with no reason reads as a bug, and this is
+	# that rule applied to an offer that is simply absent rather than darkened.
+	#
+	# **RUNES-OFF IS NOT THIS SENTENCE.** Under `DOD_SIM_RUNES=off` the rune
+	# layer does not exist and there is nothing to explain, so `_spent` is
+	# announced only in `full` and `stats` — CO §3's own "two genuinely
+	# different causes get two sentences", where the second sentence is
+	# deliberately silence.
+	# **ONE LINE PER HERO, NOT ONE LINE FOR THE COLUMN**, because the reason is
+	# per-hero: a Warden who has bought all five and a Pyromancer whose last two
+	# wait on Funeral Pyre and Firedraw are in different positions, and only one
+	# of them can do anything about it.
+	if Run.runes_mode() != "off":
+		for si in _spent.size():
+			var mi: int = int(_spent[si])
+			var spent_label := Label.new()
+			spent_label.text = "The Peddler has nothing for %s — %s." % [
+				_hero_label(mi), Runes.empty_offer_reason(Run.party[mi])]
+			spent_label.add_theme_font_size_override("font_size", 14)
+			spent_label.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
+			spent_label.position = Vector2(620, 168 + offers.size() * 130 + si * 44)
+			spent_label.size = Vector2(520, 42)
+			spent_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			add_child(spent_label)
+
 	var leave := Button.new()
 	leave.text = "Leave the Shop"
 	leave.custom_minimum_size = Vector2(220, 48)
@@ -223,6 +284,17 @@ func _draw_screen() -> void:
 		Run.save_run()
 		get_tree().change_scene_to_file(next))
 	add_child(leave)
+
+
+# BATCH FM §2 — the hero as the player reads them on the map: the awakening's
+# own name where the spec is chosen, the class otherwise, and always the party
+# slot, because two Hunters in one party is an ordinary opening.
+func _hero_label(idx: int) -> String:
+	var member: Dictionary = Run.party[idx]
+	var spec := String(member.get("spec", ""))
+	var shown: String = String(Classes.SPEC_INFO.get(spec, {}).get(
+		"name", String(member["key"]).capitalize()))
+	return "%s %d" % [shown, idx + 1]
 
 
 # Peddler's Lodestone and kin: every listed price honors the discount.

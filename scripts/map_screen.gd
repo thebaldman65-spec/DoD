@@ -913,6 +913,46 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 					String(rune["desc"]),
 					rune.get("scope_color", Color(0.8, 0.8, 0.8)),
 					_pick_rune.bind(idx, i), overlay)
+			# ══ BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING STRANDS THE
+			#    PICK, AND THIS IS WHERE IT SHOWED ═══════════════════════════
+			#
+			# **THIS IS FE's DEAD-BUTTON FAILURE WITH THE BUTTON REMOVED
+			# INSTEAD OF LEFT BEHIND, AND IT IS WORSE.** `_pick_ability`
+			# refused illegally and left 604 buttons on screen; this drew a
+			# heading — *"Warden 2 — RUNE, choose one"* — over nothing at all,
+			# and `rune_picks_owed` never came down, so the card kept its
+			# purple border and its CHOOSE button **for the rest of the run**.
+			#
+			# **IT IS REACHABLE AND IT IS NOT RARE.** FD's own repair drops a
+			# queued candidate the hero has since acquired, and tops the triple
+			# back up through `generate_rune` — which returned a stat stick
+			# forever and returns `{}` on an exhausted pool since FM §1. So:
+			# roll a cache, buy the same runes from the Peddler, open the card.
+			# Measured live at FM §3.
+			#
+			# **THE PICK IS SPENT RATHER THAN HELD**, because holding it is what
+			# strands the run: there is nothing that can arrive to fill it — the
+			# pool only ever shrinks for a hero, except through a DRAFT, which
+			# is why the reason line says which of the two it is. The button
+			# says what it does and does not pretend to be a choice.
+			if triple.is_empty():
+				var none := Label.new()
+				none.text = "The cache holds nothing this hero can take — %s.\nThe pick is spent rather than held: nothing can arrive to fill it." % \
+					Runes.empty_offer_reason(member)
+				none.add_theme_font_size_override("font_size", 14)
+				none.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+				none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				none.custom_minimum_size = Vector2(600, 0)
+				box.add_child(none)
+				var drop := Button.new()
+				drop.text = "Let it go"
+				drop.custom_minimum_size = Vector2(200, 34)
+				drop.pressed.connect(Music.click)
+				drop.pressed.connect(func():
+					overlay.queue_free()
+					_dismiss_rune_pick(idx))
+				box.add_child(drop)
 
 	var close := Button.new()
 	close.text = "Not yet"
@@ -1531,6 +1571,30 @@ func _pick_upgrade(idx: int, choice: int) -> void:
 	_draw_screen()
 	_toast("%s: %s is now %s." % [String(member["key"]).capitalize(),
 		String(up["ability"]), Run.upgrade_name(String(up["id"]))])
+
+
+# ══ BATCH FM §3 — SPENDING A PICK THAT HAS NOTHING TO SPEND ON ══════════════
+#
+# The counterpart to `_pick_rune`, and it asks the SAME door first for the same
+# reason: `rune_choice` is what decides whether this triple has anything left,
+# so a dismiss that did not ask it could eat a live pick if it were ever
+# reached from anywhere but the empty overlay. It cannot be today — the button
+# is only built when the triple came back empty — and the guard is here for the
+# rule this project already has about that.
+func _dismiss_rune_pick(idx: int) -> void:
+	var member: Dictionary = Run.party[idx]
+	var queue: Array = member.get("rune_candidates", [])
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+		return
+	if not (Run.rune_choice(member) as Array).is_empty():
+		return
+	queue.pop_front()
+	member["rune_candidates"] = queue
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	Run.save_run()
+	_draw_screen()
+	_toast("%s: the cache had nothing left to offer. The pick is spent." % [
+		String(member["key"]).capitalize()])
 
 
 func _pick_rune(idx: int, choice: int) -> void:

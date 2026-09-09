@@ -229,22 +229,45 @@ func _s1_all_retired() -> void:
 			Runes.ids().size(), data.size()])
 
 
-# ── §2 — THE OFFER NEVER COMES BACK EMPTY ──────────────────────────────────
+# ── §2 — THE OFFER IS EMPTY EXACTLY WHEN THE POOL IS ───────────────────────
 #
 # **THIS IS THE VERIFICATION THAT MATTERS AND IT IS THE ONLY ONE THAT CANNOT BE
-# FAKED BY A SOURCE READ.** `docs/master.html` says an exhausted pool falls back
-# to the generated family and the offer list never comes back empty. That was a
-# sentence about an edge case while 53 runes stood in front of it; it is the
-# ordinary path now, on the first Peddler of every run.
+# FAKED BY A SOURCE READ.** It read: *"THE OFFER NEVER COMES BACK EMPTY —
+# `docs/master.html` says an exhausted pool falls back to the generated family
+# and the offer list never comes back empty."*
 #
-# Every door is driven on a REAL member, including the two the pool's emptiness
-# reaches in different ways: `roll_rune_candidates` draws THREE without
-# replacement (a five-marker pool for a Warrior, against three draws), and the
-# exhaustion floor is reached by a pouch holding every template there is.
+# ══ BATCH FM §1 REVERSES THE SENTENCE AND §6 FOUND THE ARM ALREADY VACUOUS ══
+#
+# **THE RULING MOVED.** The generated family is out of every offer path, so an
+# exhausted pool returns `{}` and the four offer sites announce it. "Never
+# empty" is not merely false now — it is the opposite of what the designer
+# ruled, so repairing it to the code would mean deleting the section.
+#
+# **AND THE ARM THAT WOULD HAVE CAUGHT THE MOVE HAD STOPPED ASKING.** The
+# exhaustion arm filled the pouch with the six TEMPLATE names — exact while the
+# generated family was the whole pool at ET — and **against FK's authored pool
+# those six names match nothing `eligible_ids` returns**, so the "exhausted"
+# member was drawing from a full spec set. That is why this gate read 25 / 0
+# against the FM tree in the pre-edit run while `test_runes` went red fifteen
+# times over the same property: **a sample is part of an assertion's territory**
+# — `check_es` §1's own lesson, four batches later and one file over. The pouch
+# is built from `eligible_ids` now, which is the only list that can exhaust
+# anything.
+#
+# **THE QUESTION IS TWO-ARMED AND SHARPER FOR IT:** at a pool with something in
+# it, every door must pay something whole and never retired; at an exhausted
+# one, every door must come back EMPTY. The second arm is what a restored floor
+# turns red.
+#
+# **AND THE CACHE'S THREE ARE DERIVED, NOT LITERAL.** `roll_rune_candidates`
+# draws without replacement, so a spec with fewer than three eligible entries
+# gets a SHORT triple (FM §5) rather than a discarded one — the Pyromancer and
+# the Mystic reach exactly three at spawn today, which is the boundary this arm
+# happens to be sitting on.
 const TRIPLE_TRIALS := 40
 
 func _s2_the_offer_is_never_empty() -> void:
-	print("\n§2 — the offer never comes back empty, driven through every door")
+	print("\n§2 — the offer is empty exactly when the pool is, driven through every door")
 	var run: Node = root.get_node("/root/Run")
 	var had_sim: bool = run.sim_run
 	run.sim_run = false
@@ -254,6 +277,8 @@ func _s2_the_offer_is_never_empty() -> void:
 	var nameless: Array = []
 	var payloadless: Array = []
 	var non_template: Array = []
+	# BATCH FM §1 — offers that arrived where the ruling says none should.
+	var floored: Array = []
 	var drawn := 0
 	for ckey in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[ckey]:
@@ -275,10 +300,12 @@ func _s2_the_offer_is_never_empty() -> void:
 			# has FIVE markers (max_resource is excluded for the class) against
 			# three draws, which is the tightest this gets.
 			for _t in TRIPLE_TRIALS:
-				var triple: Array = run.roll_rune_candidates(_member(String(ckey), String(spec)))
+				var fresh_m := _member(String(ckey), String(spec))
+				var want: int = mini(Runes.eligible_ids(fresh_m, []).size(), 3)
+				var triple: Array = run.roll_rune_candidates(fresh_m)
 				drawn += 1
-				if triple.size() != 3:
-					empties.append("%s/cache(%d)" % [spec, triple.size()])
+				if triple.size() != want:
+					empties.append("%s/cache(%d of %d)" % [spec, triple.size(), want])
 					continue
 				var seen := {}
 				for c in triple:
@@ -292,29 +319,45 @@ func _s2_the_offer_is_never_empty() -> void:
 			drawn += 1
 			if granted.is_empty():
 				empties.append("%s/grant" % spec)
-			# (5) THE EXHAUSTION FLOOR: a pouch holding every template there is.
-			# This is the case `master.html` promises and the one the retirement
-			# makes reachable — it used to sit behind 9-12 authored runes.
+			# (5) THE EXHAUSTED POOL — **BATCH FM §1's RULING, AND THE ARM
+			# THAT HAD STOPPED ASKING.** The pouch was the six TEMPLATE names,
+			# which exhausted the pool exactly while the family WAS the pool;
+			# against an authored one it exhausts nothing. It is built from
+			# `eligible_ids` now, so every door here must come back EMPTY —
+			# which is the assertion a restored floor fails.
 			var full := _member(String(ckey), String(spec))
-			for t in Runes.TEMPLATES:
-				full["runes"].append({"name": "Rune of %s" % t["noun"]})
+			for id3 in Runes.eligible_ids(full, []):
+				full["runes"].append(Runes.build(String(id3)))
 			for _e in 3:
 				var last: Dictionary = run.generate_rune(full)
 				drawn += 1
-				if last.is_empty():
-					empties.append("%s/exhausted" % spec)
-				elif String(last.get("name", "")) == "":
-					nameless.append("%s/exhausted" % spec)
+				if not last.is_empty():
+					floored.append("%s/exhausted -> %s" % [spec, last.get("id", "")])
+			# AND THE TWO MULTI-DRAW DOORS AT THE SAME POUCH. A cache that still
+			# rolled here, or a grant that still paid, would mean the family had
+			# come back through a path `generate` alone does not cover.
+			if not run.roll_rune_candidates(full).is_empty():
+				floored.append("%s/exhausted cache" % spec)
+			if not (run.grant_rune(full) as Dictionary).is_empty():
+				floored.append("%s/exhausted grant" % spec)
+			drawn += 2
 	ok(drawn > 500, "§2: only %d draws were taken — the drive read nothing" % drawn)
 	ok(empties.is_empty(), "§2: an offer came back EMPTY — %s" % [empties])
 	ok(nameless.is_empty(), "§2: an offer came back with no name — %s" % [nameless])
 	ok(payloadless.is_empty(), "§2: an offer came back with an empty payload — %s" % [payloadless])
-	# AND EVERY ONE OF THEM IS A GENERATED STAT STICK, WHICH IS ET's RULING
-	# STATED AS A MEASUREMENT. A retired entry reaching a live offer is the one
-	# way this batch could be wrong in the player's favour and still be wrong.
+	# A RETIRED ENTRY REACHING A LIVE OFFER is the one way ET could be wrong in
+	# the player's favour and still be wrong. **The claim above this used to be
+	# "and every one of them is a generated stat stick", which was ET's own
+	# ruling stated as a measurement and has not been true since EZ.**
 	ok(non_template.is_empty(),
 		"§2: a RETIRED authored entry reached a live offer — %s" % [non_template])
-	print("    %d draws through five doors; none empty, none retired" % drawn)
+	# **BATCH FM §1's RULING, AS THE OTHER ARM.** Everything above says a pool
+	# with something in it pays; this says an exhausted one does not. Without it
+	# the section is one-armed and a restored floor passes every check here.
+	ok(floored.is_empty(),
+		"§2: an EXHAUSTED pool still produced an offer — the generated floor is back: %s" % [floored])
+	print("    %d draws through five doors; nothing empty while the pool held something," % drawn)
+	print("    nothing retired, and every door empty once it did not")
 	run.sim_run = had_sim
 
 

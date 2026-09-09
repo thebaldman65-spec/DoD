@@ -64,7 +64,12 @@ const SCOPE_INFO := {
 # on, carried over so nothing moves — NOT a new pricing rule.
 const TEMPLATE_PRICE := 50
 
-# The pre-Batch-X generated family: flat stat sticks, and the exhaustion floor.
+# The pre-Batch-X generated family: flat stat sticks.
+#
+# **BATCH FM §1 — THIS IS NO LONGER `generate`'S EXHAUSTION FLOOR, AND IT IS NO
+# LONGER IN ANY OFFER.** The six entries are KEPT, unmoved and still resolving,
+# under ET's retirement contract — removed from the offer, not from the code.
+# `DOD_SIM_RUNES=stats` is the one thing that still reaches them.
 #
 # **BATCH ES §1 — THE ONE PLACE RARITY WAS MECHANICAL, AND THE ONE MAGNITUDE
 # THIS BATCH MOVES.** `base` used to be multiplied by the tier's ×1/×2/×3 and
@@ -917,10 +922,16 @@ static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 # **THE FILTER LIVES HERE BECAUSE THIS IS THE ONLY DOOR.** Both offer paths —
 # `generate` above and `run_state.grant_rune` — reach the authored pool through
 # `eligible_ids` and nothing else, so one `continue` retires a rune everywhere
-# it could be offered without touching either caller. And neither can be blanked
-# by it: `generate` falls back to the generated stat family (BATCH ES §1: it
-# used to widen an exhausted RARITY first, and there is no rarity to widen now),
-# and `grant_rune` falls back to `generate_rune`.
+# it could be offered without touching either caller.
+#
+# **BATCH FM §1 — AND BOTH CAN BE BLANKED BY IT NOW, DELIBERATELY.** This block
+# used to end *"neither can be blanked: `generate` falls back to the generated
+# stat family, and `grant_rune` falls back to `generate_rune`"*. The second half
+# still holds and the first is what FM removed: with the family out of the offer
+# `generate` returns `{}` on an exhausted pool, so `grant_rune`'s fallback lands
+# on an empty too. **An empty offer is a ruled outcome, not a fault** — every
+# authored rune is spec-scoped and five per hero, so a hero who has seen his
+# five has seen the pool. The four offer sites each say so (FM §2).
 static func is_retired(id: String) -> bool:
 	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
 
@@ -954,13 +965,114 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 	return out
 
 
+# ══ BATCH FM §2 — WHY AN OFFER CAME BACK EMPTY, ASKED IN ONE PLACE ══════════
+#
+# **FOUR SITES HAVE TO SAY THE SENTENCE AND THERE IS ONE SENTENCE.** With the
+# generated family out of the offer an empty draw is a ruled outcome, and CO
+# §3's rule binds it: a refusal with no reason reads as a bug. The reason is
+# derived here rather than written four times, so the Peddler, the elite cache,
+# the bargain and the event verb cannot drift into telling the player three
+# different things about one state.
+#
+# **AND THERE ARE GENUINELY TWO CAUSES, WHICH IS WHY THIS IS NOT A CONSTANT.**
+# Measured at FM §2 over all twelve specs: a hero who has drafted nothing
+# reaches **3 to 6** of his spec's authored runes, not all of them — SEVENTEEN
+# live entries carry `requires_ability`, and eight of those name a DRAFT card
+# rather than core kit. The Pyromancer's Ashfall waits on Funeral Pyre and his
+# Chain Fire on Firedraw, so he opens a run able to roll THREE of five. **His
+# pool deepens as he EARNS abilities** (`kit_names` reads `bm_abilities`, which
+# is where a drafted card AND a boss trophy both land), so "he has seen them
+# all" would be a LIE told to a hero with two runes still waiting behind cards.
+# The two states get two sentences, and the second one is actionable.
+#
+# **THE WORD IS "EARNED" AND NOT "DRAFTED", FOR TWO REASONS.** `bm_abilities`
+# holds boss trophies as well as drafted cards, so "earned" is the more accurate
+# of the two — and `check_fh` §3 asserts the Peddler's screen carries no
+# `"draft"`, FD's defect, on a bare SUBSTRING that "drafted" satisfies. The
+# needle is coarser than the defect it guards and that is recorded at FM §6
+# rather than loosened; the wording here was wrong on its own terms anyway.
+#
+# The filter chain below is `eligible_ids`' own with the `requires_ability`
+# clause INVERTED — the exact complement, so a rune cannot be missing from both
+# lists or present in both.
+# The member's pouch by display name — the array `eligible_ids` takes as its
+# second argument. Four sites built it inline; one is enough.
+static func owned_names(member: Dictionary) -> Array:
+	var out: Array = []
+	for r in member.get("runes", []):
+		out.append(String(r["name"]))
+	return out
+
+
+# **THE ONE QUESTION ALL FOUR OFFER SITES ASK BEFORE THEY DRAW.** "Is there a
+# rune left for this hero" — the pouch and the kit both read, so it is the same
+# test `generate` itself applies rather than a second opinion about it.
+static func pool_empty_for(member: Dictionary) -> bool:
+	return eligible_ids(member, owned_names(member)).is_empty()
+
+
+static func locked_by_kit(member: Dictionary) -> Array:
+	var kit := kit_names(member)
+	var owned := owned_names(member)
+	var out: Array = []
+	var data := _load()
+	for id in data:
+		var e: Dictionary = data[id]
+		if String(e.get("retired", "")) != "":
+			continue
+		if not _scope_ok(e, member):
+			continue
+		if owned.has(display_name(e)):
+			continue
+		var req := String(e.get("requires_ability", ""))
+		if req != "" and not kit.has(req):
+			out.append(id)
+	return out
+
+
+# The clause every empty offer site prints after its own em-dash. Kept as a
+# CLAUSE rather than a whole sentence because each site frames it differently —
+# a merchant has nothing to sell, a cache has nothing to drop — and only the
+# reason is shared.
+static func empty_offer_reason(member: Dictionary) -> String:
+	if not locked_by_kit(member).is_empty():
+		return "the runes left for that awakening wait on abilities they have not earned"
+	return "they already carry every rune written for that awakening"
+
+
 # One rune for this member. **BATCH ES §1 — THE DRAW IS FLAT AND THE ZONE SLOT
-# NO LONGER CHANGES IT.** Every eligible authored entry and every unspent
-# template marker go into one pool and one is picked; there is no tier to roll,
-# no pool-of-that-tier to be exhausted, and therefore no widening step. The
-# exhaustion floor is unchanged and is still the thing that stops an empty
-# offer: with every authored entry owned, the template markers are what is
-# left, and with those spent too `template_rune` still returns one.
+# NO LONGER CHANGES IT.** Every eligible authored entry goes into one pool and
+# one is picked; there is no tier to roll, no pool-of-that-tier to be
+# exhausted, and therefore no widening step.
+#
+# ══ BATCH FM §1 — THE GENERATED FAMILY IS OUT OF THE OFFER, AND `{}` IS WHAT
+#    AN EXHAUSTED POOL RETURNS NOW ═══════════════════════════════════════════
+#
+# **TWO LINES READ THE FAMILY HERE AND BOTH ARE GONE**: the `tpl:` markers that
+# were appended into the pool beside the authored ids, and the exhaustion floor
+# that returned a stat stick when the pool came back empty. **THIS FUNCTION IS
+# THE WHOLE REMOVAL.** The population was DERIVED rather than taken from FD's
+# four: `scripts/` holds exactly one `Runes.generate(` and one
+# `Runes.template_rune(` in the entire directory, both inside
+# `run_state.generate_rune`, which is the single choke point every offer site
+# reaches the pool through — so one function closes the Peddler, the elite
+# cache, the bargain and the event verb at once, and a fifth site added later
+# is closed by construction rather than by a list being kept up to date.
+#
+# **THE GENERATOR AND ITS ENTRIES ARE KEPT, AND SAID TO BE KEPT** — ET's own
+# retirement contract, the one `data/glossary.json` gives Melted Armor.
+# `TEMPLATES`, `template_rune` and `_template_markers` all still stand and all
+# still resolve. **`_template_markers` HAS NO CALLER TODAY AND THAT IS THE
+# POINT**: restoring a floor is these two lines coming back, not a family being
+# re-authored. **The one place the family is still reachable is
+# `DOD_SIM_RUNES=stats`** — an environment flag no player sets, whose whole
+# purpose is to run on exactly this family; see `run_state.generate_rune`.
+#
+# **AN EMPTY RETURN IS A CONTRACT THAT ALREADY EXISTED.** `generate_rune` has
+# returned `{}` under `DOD_SIM_RUNES=off` since Batch X and every call site
+# already skips an empty. What FM changes is that the state is REACHABLE IN A
+# REAL RUN — a hero who has seen his five draws nothing — so "skips it" stopped
+# being good enough and all four sites now SAY so instead (FM §2).
 #
 # `zone_slot` IS KEPT IN THE SIGNATURE AND IS DELIBERATELY UNREAD. Its four
 # call sites pass `Run.zone_idx + 1` and it is the one hook a later batch would
@@ -985,13 +1097,9 @@ static func generate(member: Dictionary, _zone_slot: int,
 		owned.append(String(r["name"]))
 	owned.append_array(exclude_names)
 	var pool := eligible_ids(member, owned)
-	pool.append_array(_template_markers(member, owned))
 	if pool.is_empty():
-		return template_rune(String(member["key"]))
-	var pick: String = pool.pick_random()
-	if pick.begins_with("tpl:"):
-		return template_rune(String(member["key"]), pick.trim_prefix("tpl:"))
-	return build(pick)
+		return {}
+	return build(String(pool.pick_random()))
 
 
 # eligible_ids returns authored ids only (never a "tpl:" marker), so this
@@ -1004,6 +1112,11 @@ static func _scoped_ids(ids: Array, scope: String) -> Array:
 	return out
 
 
+# **BATCH FM §1 — ZERO CALLERS, KEPT ON PURPOSE.** `generate` appended these
+# markers into the offer pool and no longer does. It is left standing so that
+# restoring a floor is one `append_array` coming back rather than a family being
+# re-authored — the same "kept, and said to be kept" contract the retired
+# entries in `runes.json` carry.
 static func _template_markers(member: Dictionary, owned_names: Array) -> Array:
 	var out: Array = []
 	for t in TEMPLATES:
@@ -1015,8 +1128,14 @@ static func _template_markers(member: Dictionary, owned_names: Array) -> Array:
 	return out
 
 
-# The generated stat family — DOD_SIM_RUNES=stats runs on exactly this, and it
-# is `generate`'s exhaustion floor. `noun` pins the template (pool draws).
+# The generated stat family — DOD_SIM_RUNES=stats runs on exactly this.
+# `noun` pins the template (pool draws).
+#
+# **BATCH FM §1 — `generate` NO LONGER CALLS THIS AND NOTHING IN A REAL RUN
+# DOES.** Its one surviving caller is `run_state.generate_rune`'s `"stats"`
+# branch, which is an environment-flag sim arm; the `noun` and `exclude_names`
+# parameters are unreached from there and are kept for the same reason the
+# family is.
 #
 # **BATCH ES §1 — THE `rarity_key` PARAMETER IS GONE WITH THE TIERS, AND SO IS
 # THE ×1/×2/×3 MAGNITUDE LADDER AND THE 60/30/10 ROLL THAT PICKED AMONG THEM.**

@@ -1020,8 +1020,55 @@ func _s3_the_rune_offer() -> void:
 	ok(bought > 0, "§3: the Peddler's rune Buy button spent nothing")
 	# **A PEDDLER OFFERS NO ABILITY DRAFT.** FD's defect, and the one thing on
 	# this screen a player already found.
-	ok(not _has_text(shop, "draft"),
-		"§3: the Peddler's screen names a DRAFT — FD's defect is back")
+	#
+	# ══ BATCH FM §6 — THE NEEDLE IS SCOPED, NOT WEAKENED ════════════════════
+	#
+	# This was `_has_text(shop, "draft")`: a bare substring over every Label,
+	# Button and RichTextLabel on the screen. **EIGHT of the sixty live runes
+	# carry the words "his drafted cards" in their own `desc`** — the gated pair
+	# FK left owed — so a counter that happened to hold one turned this red for
+	# a reason with nothing to do with FD's defect. **It fired on FM's pre-edit
+	# run**: with the generated stat family out of the offer (FM §1) the counter
+	# is authored-only, which raised the chance of one landing there, and the
+	# seeded draw put Deepening Hex on it.
+	#
+	# **THE CLAIM IS THAT THE SCREEN TALKS ABOUT A DRAFT ON ITS OWN ACCOUNT.**
+	# Text a rune brought with it is the rune's, so the offers' own `desc`
+	# strings are subtracted and everything else is still swept — a header, a
+	# price line or a Buy button naming one all still fail. **The source-level
+	# pins are untouched and are the real fence** (`check_fd` §1f and
+	# `test_batch_bo` §3 hold three needles each on `Run.draft_price()`,
+	# `Run.award_draft_pick(` and `draft_pool_left`); this arm is the screen's
+	# own reading and had been the loose one.
+	var own_words: Array = []
+	var live_offers: Array = shop.get("offers")
+	for o in live_offers:
+		own_words.append(String(((o as Dictionary)["rune"] as Dictionary).get("desc", "")))
+	var screen_says: Array = []
+	var shop_texts: Array = []
+	_texts(shop, shop_texts)
+	for t in shop_texts:
+		if not String(t).contains("draft"):
+			continue
+		var brought := false
+		for d in own_words:
+			if String(d) != "" and String(t).contains(String(d)):
+				brought = true
+		if not brought:
+			screen_says.append(String(t))
+	ok(screen_says.is_empty(),
+		"§3: the Peddler's screen names a DRAFT on its own account — FD's defect is back: %s" % [screen_says])
+	# **AND THE SUBTRACTION IS NOT A HOLE.** A rune desc is only ever a Label in
+	# the offer column; a BUTTON naming a draft is the defect itself and can
+	# never be excused by a rune's text.
+	var draft_buttons: Array = []
+	var shop_btns: Array = []
+	_buttons(shop, shop_btns)
+	for b in shop_btns:
+		if String((b as Button).text).to_lower().contains("draft"):
+			draft_buttons.append(String((b as Button).text))
+	ok(draft_buttons.is_empty(),
+		"§3: the Peddler drew a BUTTON naming a draft — %s" % [draft_buttons])
 
 	# (b) THE ELITE CACHE, ANSWERED A NODE LATER. FD's hole was in the ANSWER,
 	# not the offer, so the cache is rolled, the party WALKS ON, and only then

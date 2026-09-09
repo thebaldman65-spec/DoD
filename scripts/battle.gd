@@ -24831,14 +24831,31 @@ func _check_end() -> void:
 				spoils += "\nTHE DRAFT: %s may each choose a new ability." % \
 					" and ".join(d_names)
 			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on the
-			# member (never rerolled), chosen on the hero card. Empty = runes
-			# off — the spoils keep the item.
+			# member (never rerolled), chosen on the hero card.
+			#
+			# ── BATCH FM §2 — THE CACHE SAYS WHAT IT FOUND, INCLUDING NOTHING ─
+			#
+			# **THE COUNT IS READ OFF THE TRIPLE INSTEAD OF WRITTEN INTO THE
+			# SENTENCE.** It said *"one of three"* unconditionally, which was
+			# true while the generated family floored every draw; FM §1 makes a
+			# SHORT triple ordinary (`roll_rune_candidates` offers what is left
+			# rather than discarding it), and a spoils line promising three
+			# where two arrive is the screen lying about a reward.
+			#
+			# **AND AN EMPTY CACHE IS ANNOUNCED RATHER THAN OMITTED.** With no
+			# line at all the elite simply appears not to have carried one, and
+			# the player has no way to tell a pool he has exhausted from a drop
+			# that failed. Runes-off keeps the silence — there is no rune layer
+			# to explain — which is the same split the Peddler draws.
 			var candidates: Array = Run.roll_rune_candidates(looter)
 			if not candidates.is_empty():
 				looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
 				looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
-				spoils += "\nRUNE CACHE: the %s may choose one of three\non their card." % \
-					String(looter["key"]).capitalize()
+				spoils += "\nRUNE CACHE: the %s may choose one of %d\non their card." % [
+					String(looter["key"]).capitalize(), candidates.size()]
+			elif Run.runes_mode() != "off":
+				spoils += "\nRUNE CACHE: nothing in it for the %s —\n%s." % [
+					_hero_label(looter), Runes.empty_offer_reason(looter)]
 			# Gravelight Lantern: the spoils pile runs deeper.
 			for extra_i in int(Run.relic_add("loot_extra")):
 				spoils += "%s (Gravelight Lantern)" % _drop_item_line(Run.random_loot())

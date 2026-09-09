@@ -437,15 +437,50 @@ entries are &ldquo;Rune of&nbsp;&hellip;&rdquo; (52 of them &ldquo;Rune of the&n
 and <b>every one of the 21 live ones is one or two words</b>. A live rune wearing the long form is
 wearing the shape of the pool that was withdrawn, which is the opposite of what a name should
 signal. <code>check_fd</code> &sect;3 asserts no LIVE entry begins &ldquo;Rune of&rdquo;.</li>
-<li><b>THE GENERATED STAT FAMILY IS THE ONE EXCEPTION AND IT IS DELIBERATE.</b> Rune of Vitality,
-Rune of Warding, Rune of Swiftness, Rune of Poise, Rune of Precision, Rune of Springs are
-<i>filler</i> &mdash; six templates, not authored content &mdash; and the long form is what marks
-them as such on a shop row beside an authored rune.</li>
+<li><b>THE GENERATED STAT FAMILY KEPT THE LONG FORM AND NO LONGER APPEARS BESIDE ANYTHING.</b>
+Rune of Vitality, Rune of Warding, Rune of Swiftness, Rune of Poise, Rune of Precision and Rune of
+Springs are <i>filler</i> &mdash; six templates, not authored content &mdash; and the long form
+marked them as such on a shop row. <b>Batch FM &sect;1 removed them from every offer path</b>, so
+the exception is now dormant rather than exercised: the names are kept with the entries, and the
+only thing that still renders one is the simulator's <code>DOD_SIM_RUNES=stats</code> arm.</li>
 <li><b>&sect;3's RENAME WAS TAKEN FOR THIS RULE AND NOT THE OTHER WAY ROUND.</b>
 <i>Rune of the Shared Ruin</i> became <b>Shared Ruin</b>: five words to two, the only live entry
 that was out of shape. <b>The BR &sect;1 sweep runs on the SHORTENED form</b>, because that is the
 name that ships &mdash; and it must be swept against abilities, talent nodes, statuses and the
 whole rune pool including the retired half.</li>
+</ul>
+
+<h2>4.12 AN EMPTY OFFER NAMES THE HERO AND THE REASON (BINDING, SET AT BATCH FM &sect;2)</h2>
+<p><b>A panel that renders nothing reads as a bug.</b> With the generated stat family out of every
+offer path, a hero whose authored pool is spent draws nothing &mdash; and that is a ruled outcome,
+not a fault. <b>CO &sect;3's rule binds it: a refusal with no reason reads as a bug.</b> So every
+site that can offer a rune says, in the player's own words, that it has nothing and why.</p>
+<ul>
+<li><b>THERE ARE TWO CAUSES AND THEY GET TWO SENTENCES.</b> A hero has taken everything written
+for his awakening &mdash; <i>&ldquo;they already carry every rune written for that
+awakening&rdquo;</i> &mdash; or what is left is gated behind an ability he has not earned &mdash;
+<i>&ldquo;the runes left for that awakening wait on abilities they have not earned&rdquo;</i>.
+<b>The second is actionable and the first is not</b>, which is why the fork exists: ten of the
+sixty live runes are unreachable at spawn and open up as the hero earns cards. The clause is
+derived in ONE place (<code>Runes.empty_offer_reason</code>) because four sites print it.</li>
+<li><b>THE FOUR SENTENCES, EACH IN ITS OWN FRAME.</b> The Peddler names the hero, one line each:
+<i>&ldquo;The Peddler has nothing for Pyromancer 2 &mdash; &hellip;&rdquo;</i>. The elite card
+reads <i>&ldquo;RUNE CACHE: nothing in it for the Pyromancer &mdash; &hellip;&rdquo;</i>. The
+bargain, which was paid for with a modifier, reads <i>&ldquo;RUNE (the bargain): nothing left to
+hand over &mdash; &hellip;&rdquo;</i>. The event verb reads <i>&ldquo;RUNE: nothing answers &mdash;
+every hero already carries every rune written for them.&rdquo;</i></li>
+<li><b>A COUNT IS READ OFF THE OFFER, NEVER WRITTEN INTO THE SENTENCE.</b> A cache with two runes
+left offers two, so <i>&ldquo;may choose one of three&rdquo;</i> became <i>&ldquo;may choose one of
+2&rdquo;</i>. A number in a reward line is a promise.</li>
+<li><b>AND AN OWED PICK THAT CANNOT BE ANSWERED SAYS SO AND CAN BE SPENT.</b> The hero card's rune
+overlay carries <i>&ldquo;The cache holds nothing this hero can take &mdash; &hellip; The pick is
+spent rather than held: nothing can arrive to fill it.&rdquo;</i> and one button,
+<b>&ldquo;Let it go&rdquo;</b>. A heading over an empty panel is FE's dead button with the button
+removed, and it strands the run.</li>
+<li><b>RUNES-OFF SAYS NOTHING, DELIBERATELY.</b> Under <code>DOD_SIM_RUNES=off</code> there is no
+rune layer to explain, so every one of these lines is suppressed. That is CO &sect;3's own
+&ldquo;two genuinely different causes get two sentences&rdquo;, where the second sentence is
+silence.</li>
 </ul>
 
 <h2>5. HOW TO APPLY THIS</h2>

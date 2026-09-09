@@ -311,10 +311,35 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			# Onto a hero with a free slot first — a rune that arrives worn is
 			# a rune that does something. Everyone full: it goes in the pouch,
 			# where the map screen's slot buttons can still reach it.
+			#
+			# ══ BATCH FM §2 — THE POOL IS FILTERED TO HEROES WHO CAN BE PAID,
+			#    AND AN EVENT THAT PAYS NOTHING SAYS SO ═══════════════════════
+			#
+			# **THE SLOT PREFERENCE WAS THE ONLY AXIS AND IT IS NOT THE ONE
+			# THAT CAN NOW COME BACK EMPTY.** A free slot says where a rune can
+			# be WORN; FM §1 makes "is there a rune left for this hero at all" a
+			# separate question a real run answers no to. Picking at random and
+			# then discovering the taker is spent threw the grant away — and
+			# with `amount > 1` the `break` threw away every LATER grant too,
+			# including ones another hero could have taken. The eligibility
+			# filter runs FIRST and the slot preference runs inside it, so the
+			# two orderings compose rather than fight.
+			#
+			# **`break` STAYS AS THE RUNES-OFF GUARD** and is exact again: with
+			# the pool filtered, `grant_rune` can only return `{}` when the rune
+			# layer is switched off entirely.
 			var granted := PackedStringArray()
+			var any_payable := false
 			for i in int(fx.get("amount", 1)):
-				var open_slot: Array = []
+				var payable: Array = []
 				for m in run.get("party"):
+					if not Runes.pool_empty_for(m):
+						payable.append(m)
+				if payable.is_empty():
+					break
+				any_payable = true
+				var open_slot: Array = []
+				for m in payable:
 					var worn := 0
 					for r in m.get("runes", []):
 						if r.get("equipped", false):
@@ -322,7 +347,7 @@ static func apply(run: Node, fx: Dictionary) -> String:
 					if worn < run.rune_slots():
 						open_slot.append(m)
 				var pool: Array = open_slot if not open_slot.is_empty() \
-					else run.get("party")
+					else payable
 				if pool.is_empty():
 					break
 				var taker: Dictionary = pool.pick_random()
@@ -333,7 +358,13 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				taker["runes"] = taker.get("runes", []) + [rune]
 				granted.append("%s (%s)" % [String(rune["name"]), _who(taker)])
 			if granted.is_empty():
-				return ""
+				# **AN EVENT IS A TRADE AND THE PLAYER HAS USUALLY PAID ALREADY**
+				# (§4's own worked example is "health for a rune"), so a blank
+				# line here is the same failure the bargain's was. Runes-off
+				# keeps the silence: there is no rune layer to explain.
+				if run.runes_mode() == "off" or any_payable:
+					return ""
+				return "RUNE: nothing answers — every hero already carries every rune written for them."
 			return "RUNE: %s" % ", ".join(granted)
 		"ability_draft":
 			# BATCH BO §3 — SOME EVENTS OFFER A DRAFT AS A TRADE, the fourth

@@ -7849,3 +7849,56 @@ other, because rune content is written with the designer one rune at a time.**
 **AND THE REASON IS IN A GATE.** `check_fk` §6 asserts the rune's absence AND the two code facts
 that cause it, so the day a batch narrows the ground to its caster the battery says the rune is
 authorable. A reason recorded only in a report is a reason nobody re-reads.
+
+---
+
+## BATCH FM — WHY REMOVING A FALLBACK IS NEVER A LOCAL CHANGE
+
+**The generated stat family came out of every offer path, and the removal itself is four lines in
+one function.** The batch was not four lines. **The floor is what had been making five consumers
+look correct**, and every one of them had a branch for the empty case that had never once executed
+in a real run.
+
+`Runes.generate` returned a stat stick when the authored pool came back empty, so
+`generate_rune` could only return `{}` under `DOD_SIM_RUNES=off` — and each site's
+`if rune.is_empty()` was a runes-off guard wearing an ordinary `if`. Reading any one of them, it
+looks handled. **`check_et` §2 is the proof rather than the suspicion**: at HEAD it drives 540+
+draws through five doors and asserts not one comes back empty, and it passes.
+
+**So the question a removal has to ask is not "what calls this" — it is "what does its absence now
+reach".** The answers, in order of how bad they were:
+
+1. **The cache's re-ask could return NOTHING, and the owed pick could then never be answered.** The
+   overlay drew *"Warden 2 — RUNE, choose one"* over a single *Not yet* button, `rune_picks_owed`
+   never came down, and the hero's card kept its purple border for the rest of the run. **That is
+   FE's dead-button defect with the button removed instead of left behind**, which is worse: FE's
+   at least looked wrong.
+2. **`roll_rune_candidates` was discarding partial offers.** It drew three without replacement and
+   `return []`'d on the first empty draw — correct while the floor guaranteed three, and firing on
+   a pool that is not empty now. **A Pyromancer who owns one of his three drew a triple of zero**,
+   so the next elite paid nothing and said nothing.
+3. **The bargain paid a blank line for a reward the player had fought a modifier to earn.**
+4. **The Peddler drew a header over white space, and the elite cache omitted its line entirely.**
+
+**AND THE BRIEF'S ARITHMETIC WAS WRONG IN A WAY THAT CHANGED THE BUILD.** It said *"five per hero,
+so a hero who has seen his five gets an empty offer"*. Authored depth is four to six; **reachable
+depth at spawn is three to six**, because seventeen live runes name a `requires_ability` and ten of
+those name something outside the spawn kit. **A rune pool DEEPENS as a hero earns abilities.** So
+the empty offer arrives one purchase into a run rather than at the end of one — and the message had
+to fork, because telling a Pyromancer holding three of five that *"he carries every rune written for
+that awakening"* is a lie, while *"the rest wait on abilities he has not earned"* is both true and
+actionable.
+
+**THE ONE THING THAT MADE ALL OF THIS FINDABLE WAS DRIVING IT.** None of the five is visible to a
+source read: an empty panel is a draw-time fact, and a spoils line that is simply absent looks
+exactly like an elite that never carried a cache. `check_fm` presses the real buttons on the real
+screens and wins two real elite fights to read what the card actually says — which is the same
+reason `check_fh` exists, and the same reason the last several player-visible defects were all
+found by a person playing.
+
+**AND A GATE THAT PASSES IS NOT A GATE THAT ASKED.** `check_et` §2 read 25 / 0 against the new tree
+while `test_runes` went red fifteen times over the same property, because its "exhausted" member
+was never exhausted — it filled the pouch with the six TEMPLATE names, which was exact while that
+family WAS the whole pool and matches nothing the authored pool returns. **A sample is part of an
+assertion's territory**, which is `check_es` §1's own lesson arriving four batches later in a
+different file.

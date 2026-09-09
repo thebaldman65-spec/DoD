@@ -175,7 +175,9 @@ func _s1_rarity_is_gone() -> void:
 	# the only place it shows is the distribution. The same member is drawn at
 	# each of the three zone slots the old weights were authored for; the share
 	# of draws that are generated stat sticks must be the SAME at all three,
-	# where it used to run 50% / 33% / 21%.
+	# where it used to run 50% / 33% / 21%. **BATCH FM §1 TOOK THAT FAMILY OUT
+	# OF THE OFFER ENTIRELY, so the share is a flat ZERO** — the distribution
+	# is still the instrument and the figure it reports has changed.
 	# **BATCH FG §3 — THE SAMPLE WAS A BERSERKER AND THIS ARM HAD NEVER ONCE
 	# FIRED.** ET §1 emptied the pool, the block below printed DORMANT and
 	# promised to wake with the first authored rune, and **EZ authored
@@ -234,8 +236,35 @@ func _s1_rarity_is_gone() -> void:
 		shares[0], shares[1], shares[2]])
 	print("    sample: %s, %d authored runes eligible against %d stat-stick templates" % [
 		member["spec"], elig.size(), Runes.TEMPLATES.size() - 1])
-	ok(shares[0] > 0.0 and shares[0] < 100.0,
-		"§1: the offer is %.1f%% one family — a tier cannot show in a pool with only one kind in it" % shares[0])
+	# ══ BATCH FM §1 — THE STAT-STICK SHARE IS ZERO NOW, AND THE ARM THAT
+	#    MEASURED IT SPLITS IN TWO RATHER THAN WIDENING ══════════════════════
+	#
+	# This asserted `shares[0] > 0.0 and shares[0] < 100.0` — *"the offer is
+	# 100% one family; a tier cannot show in a pool with only one kind in it"*.
+	# **FM §1 removes the generated family from every offer, so the share is
+	# EXACTLY ZERO and the offer IS one family again — the other one.** The
+	# assertion is false and repairing it to the code would mean deleting it.
+	#
+	# **IT WAS DOING TWO JOBS AND ONLY ONE OF THEM WAS ABOUT THE FAMILY.** The
+	# real job is a VACUITY GUARD for the flatness arm below: three identically
+	# seeded sequences can only be evidence about the zone slot if the pool they
+	# are drawn from holds more than one thing. That job survives FM untouched
+	# and is asserted directly now, on DISTINCT ids drawn rather than on the
+	# presence of a second family. The other job — the family's share — is FM's
+	# ruling and is asserted as the equality it now is.
+	#
+	# **THE SHARE ARM IS NOT REDUNDANT WITH `check_fm` §1b.** That one drives
+	# `Runes.generate` at every pouch depth; this one measures the share ES
+	# itself measured, at the same three zone slots, on the same seeded draw —
+	# so the figure this gate has printed since ES is still comparable, and the
+	# line that reported "a flat ~30%" now reports a flat 0%.
+	ok(is_zero_approx(shares[0]),
+		"§1: the generated stat family is %.1f%% of the offer — FM §1 removed it from every offer path" % shares[0])
+	var distinct := {}
+	for id2 in String(seqs[0]).split(","):
+		distinct[String(id2)] = true
+	ok(distinct.size() > 1,
+		"§1: the sample drew %d distinct rune(s) — the flatness arm below is arithmetic rather than evidence" % distinct.size())
 	ok(seqs[0] == seqs[1] and seqs[1] == seqs[2],
 		"§1: the zone slot CHANGES the offer — three identically-seeded runs of %d draws gave different sequences" % OFFER_DRAWS)
 	# AND THE ZONE ARGUMENT IS INERT RATHER THAN ABSENT, which is the claim the

@@ -15,6 +15,115 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-08 &mdash; Batch FM: THE FILLER COMES OUT</h2>
+<p><b>THE GENERATED STAT FAMILY IS REMOVED FROM EVERY OFFER PATH (ruled by the designer). The
+authored pool is the whole pool.</b> The removal itself is four lines. <b>What it REACHED was five
+places that had never once executed in a real run</b>, three of which paid the player nothing and
+said nothing &mdash; and one of which stranded an owed rune pick for the rest of the run.</p>
+<p><b>THE POPULATION WAS DERIVED RATHER THAN TAKEN, AND IT IS ONE SITE, NOT FOUR.</b> FD derived
+its four from the WRITE to <code>member["runes"]</code>; what governs a REMOVAL is where a rune is
+produced, and a census over <code>scripts/</code> finds <b>exactly one <code>Runes.generate(</code>
+and one <code>Runes.template_rune(</code> in the whole directory</b>, both inside
+<code>run_state.generate_rune</code>. The Peddler, the elite cache, the bargain's rune reward, the
+event verb <code>rune_grant</code> and the cache's own re-ask &mdash; which FD's list does not
+carry &mdash; all reach the pool through that one function. <b>So a fifth offer site is closed by
+construction rather than by a list somebody has to keep current</b>, and <code>check_fm</code>
+&sect;1a asserts the census instead of the four names. <b>The generator and its six entries are
+KEPT and said to be kept</b> (ET's Melted Armor contract): <code>_template_markers</code> has zero
+callers on purpose, so restoring a floor is one line rather than a family being re-authored.
+<b>The one place the family is still reachable is <code>DOD_SIM_RUNES=stats</code></b>, a sim arm
+whose whole purpose is to measure it &mdash; closing that would delete a measurement rather than an
+offer, so it stands and is asserted in both directions.</p>
+<p><b>THE BRIEF'S &ldquo;FIVE PER HERO&rdquo; IS WRONG IN BOTH DIRECTIONS, AND THE CORRECTION
+CHANGED WHAT HAD TO BE BUILT.</b> Authored depth is <b>four to six</b> (the Devout 4, the
+Beastmaster 6) and <b>reachable-at-spawn depth is three to six</b>: seventeen live entries carry a
+<code>requires_ability</code> and <b>ten of those name something outside the spawn kit</b>, so a
+hero's rune pool DEEPENS as he earns abilities. <b>The Pyromancer and the Mystic open a run able to
+roll THREE of their five.</b> An empty offer is therefore not a late-run event &mdash; it is one
+purchase away.</p>
+<p><b>AT HEAD, EVERY EMPTY BRANCH IN ALL FOUR SITES WAS UNREACHABLE IN A REAL RUN.</b>
+<code>Runes.generate</code> fell back to the stat family, so <code>generate_rune</code> returned
+<code>{}</code> only under <code>DOD_SIM_RUNES=off</code> and each site's
+<code>if rune.is_empty()</code> was a runes-off guard wearing an ordinary <code>if</code>.
+<b><code>check_et</code> &sect;2 is the empirical proof of that</b> &mdash; it drives 540+ draws
+through five doors at HEAD and asserts not one comes back empty. <b>Removing the floor made all
+five reachable at once</b>, and what each one did with an empty offer was: the Peddler drew a
+header over white space; the elite cache omitted its spoils line entirely and owed no pick; the
+bargain paid <code>{"text": ""}</code> for a reward the player had fought a modifier to earn; the
+event verb returned an empty string; and the cache's re-ask drew a heading over nothing.</p>
+<p><b>EVERY SITE NOW SAYS SO, IN THE PLAYER'S OWN WORDS, AND EACH ONE IS DRIVEN LIVE AT BOTH A FULL
+POOL AND AN EXHAUSTED ONE.</b> The Peddler names the hero, one line each. The elite card reads
+<i>&ldquo;RUNE CACHE: nothing in it for the Pyromancer &mdash; &hellip;&rdquo;</i>. The bargain
+reads <i>&ldquo;nothing left to hand over&rdquo;</i>. The event verb reads <i>&ldquo;RUNE: nothing
+answers&rdquo;</i>. <b>The reason has TWO cases and is derived in ONE place</b>
+(<code>Runes.empty_offer_reason</code>): a hero has taken everything written for his awakening, or
+what is left waits on abilities he has not earned &mdash; and the second is actionable, which is
+why telling a Pyromancer at three-of-five that he carries them all would have been a lie.
+<b>Runes-off keeps its silence</b>, because there is no rune layer to explain. <b>The full-pool arm
+is not decoration</b>: a message printed unconditionally passes every &ldquo;the screen says
+so&rdquo; check ever written and replaces a silent panel with a permanent lie.</p>
+<p><b>THE WORST THING THE BATCH FOUND IS A STRANDED PICK, AND IT IS FE'S DEFECT WITH THE BUTTON
+REMOVED INSTEAD OF LEFT BEHIND.</b> FD's repair drops queued candidates the hero has since
+acquired and tops the triple back up through <code>generate_rune</code> &mdash; which used to
+return a stat stick forever. <b>So a triple can repair to NOTHING, and the overlay drew
+<i>&ldquo;Warden 2 &mdash; RUNE, choose one&rdquo;</i> above a single <i>Not yet</i> button while
+<code>rune_picks_owed</code> never came down</b>: the card kept its purple border and its CHOOSE
+button for the rest of the run. <b>Reachable by playing normally</b> &mdash; roll a cache, buy
+those runes from the next Peddler, open the card. The overlay now carries the sentence and one
+button, <b>&ldquo;Let it go&rdquo;</b>, which spends the pick; holding it is what strands the run,
+because a hero's pool only ever shrinks except through what he earns.</p>
+<p><b>AND THE ELITE CACHE WAS THROWING AWAY TWO RUNES IN SILENCE.</b>
+<code>roll_rune_candidates</code> drew three without replacement and held <code>return []</code> on
+the first empty draw &mdash; unreachable while the floor guaranteed three, and ordinary now.
+<b>It fires on a pool that is NOT empty</b>: a Pyromancer who owns ONE of his three drew a triple
+of <b>zero</b>, so the next elite paid nothing, printed nothing and owed nothing, indistinguishable
+from an elite that never carried a cache. <b>It offers what is left now</b> (3 / 2 / 1 / 0 where it
+read 3 / 0 / 0 / 0), the fully-empty case is unchanged, and <b>the spoils line reads the count off
+the offer</b> instead of promising three. <b>The bargain's recipient is drawn from heroes it can
+actually pay</b> &mdash; the idiom the event verb had used since it was written &mdash; and the
+event verb's taker pool gained the same filter ahead of its free-slot preference.</p>
+<p><b>THE GATES: FOUR REPAIRED TO INTENT, ONE NEW, AND ONE WAS FOUND VACUOUS.</b> The unmodified
+gates were run against the new tree first. <b><code>check_et</code> &sect;2 passed 25/0 while
+<code>test_runes</code> went red fifteen times over the same property &mdash; because its
+&ldquo;exhausted&rdquo; member was never exhausted</b>: it filled the pouch with the six TEMPLATE
+names, exact while the family WAS the pool at ET and matching nothing <code>eligible_ids</code>
+returns against FK's authored one. <b>A sample is part of an assertion's territory</b> &mdash;
+<code>check_es</code> &sect;1's own lesson, four batches later and one file over. <b>Repaired to
+intent, all four:</b> <code>test_runes</code>' exhaustion arm asks its question at both ends (one
+short of exhausted, something whole must arrive; exhausted, nothing may) and its rich-grant arm
+asserts the FALLBACK IS TAKEN rather than that it pays; <code>check_es</code> &sect;1 splits into
+the family's share (now an equality at zero) and the vacuity guard it was really doing;
+<code>check_et</code> &sect;2 becomes <i>empty exactly when the pool is</i>; and the cache-triple
+band moves 70&ndash;95 to an equality at <b>100</b>, which the gate's own failure message had
+predicted in writing. <b><code>check_fh</code> &sect;3's <code>&ldquo;draft&rdquo;</code> needle was
+a bare substring over every label on the shop screen, and EIGHT live runes carry
+<i>&ldquo;his drafted cards&rdquo;</i> in their own description</b> &mdash; it is SCOPED to text
+the screen owns rather than weakened, with the source-level pins in <code>check_fd</code> &sect;1f
+and <code>test_batch_bo</code> &sect;3 untouched, and both arms of the repair were driven.
+<b><code>check_fm</code> is new (81 checks)</b>: it derives the population by census, drives the removal at
+every pouch depth, asserts the generator is kept AND uncalled, wins two real elite fights to read
+the victory card at a full pool and an exhausted one, opens the real shop scene at both, and drives
+the stranded pick to its <i>Let it go</i> button with a control hero who must NOT be offered one.</p>
+<p><b>AND <code>check_da</code> CAUGHT THE NEW GATE TWICE, BOTH TIMES RIGHTLY.</b> The verification
+battery came back with two reds &mdash; <code>check_cm_live</code>'s four, which are the sanctioned
+baseline and identical on unmodified HEAD, and <code>check_da</code>'s two, which were this batch's.
+<b><code>check_fm</code>'s first elite arm named the battle scene by path and drove the autoplay bot
+through a whelp: a SECOND battle fixture</b>, which is exactly what DB &sect;1 consolidated seven
+divergent copies of. <b>The fix is the fixture, not an exemption</b> &mdash; it goes through
+<code>gate_fixture.spawn</code> and short-circuits at <code>_check_end</code>'s own
+<code>victory := enemies.all(&hellip;dead)</code>, so the real <code>claim_reward</code>, the real
+<code>roll_rune_candidates</code>, the real spoils assembly and the real <code>_show_end</code> all
+run and only the COMBAT is skipped, which is not an offer site. <b>It then tripped a SECOND time on
+the comment explaining the first</b>: <code>check_da</code> reads the RAW source, so prose recording
+a removal reads exactly like the removal not happening &mdash; CLAUDE.md's EV &sect;5 rule, twice in
+one batch in one file. <b><code>test_batch_cb</code>'s single failure in the reconnaissance run was a
+FLAKE</b> (three standalone re-runs at 1721 / 0, and clean again in the verification battery);
+recorded rather than repaired, because a flake diagnosed from one observation is a guess.</p>
+<p><b>WHAT WAS DELIBERATELY NOT DONE:</b> the eight shipped gated runes are not repaired; no class
+or universal rune is authored; no authored rune moved and the 39 + 21 stand as FK and EZ&ndash;FC
+left them; the generated entries are not deleted, only removed from the offer; and no card,
+ability, talent, constant or magnitude moved.</p>
+
 <h2>2026-09-08 &mdash; Batch FL: THE WAYS OF WORKING, AND AN AUDIT OF WHAT IS ALREADY RECORDED</h2>
 <p><b>DOCUMENTATION ONLY. NO CODE, NO DATA, NO RUNE, NO MAGNITUDE.</b> Two halves: a new file
 recording rules that had never been written down anywhere, and an audit of what already has been,

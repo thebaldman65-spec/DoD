@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-08 (Batch FL &mdash; the ways of working, and an audit of what is already recorded)</b></p>
+<p align="right"><b>Last updated: 2026-09-08 (Batch FM &mdash; the filler comes out)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2728,25 +2728,35 @@ or a rule inverted — was an authoring convention rather than a behaviour, and 
 on doing exactly what it did: the kind lived in the payload, never in the label.
 <br><b>OFFERS ARE FLAT ACROSS THE RUN.</b> The odds used to deepen with the zone slot —
 60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
-differ from an early one</i>. Measured on the live pool, that put <b>half of every zone-1
-offer</b> into the generated stat family and only a fifth of every zone-3 offer;
-<b>it is a flat ~30% at every slot now</b> &mdash; it was <b>100% at every slot</b> between
-ET §1 and EZ, while the authored pool stood empty, and it is back to a flat draw against the
-21 live entries for the four specs EZ authors and still 100% for the other eight. <b>The generated family survives as the filler
-and as the exhaustion floor</b>, at its authored magnitudes and one price: +10 max HP / +2%
-armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g. <b>It is kept exactly as it
-was: ET moves no magnitude and chooses no price.</b> While it was the whole pool the
-<b>exhaustion floor</b> was reached far earlier than it ever had been: a hero could draw <b>5
-distinct runes (6 outside the Warrior class)</b> before the pool started repeating, where the
-same hero reached <b>15&ndash;18</b> before ET. <b>Batch EZ lifts it back for four specs</b> and
-leaves the other eight exactly there.
+differ from an early one</i>. <b>They do not, and there is nothing left for a zone to weight:
+every rune in an offer is an authored, spec-scoped entry.</b> <code>check_es</code> §1 measures
+the distribution at all three zone slots every battery run and prints it.
+<br><b>THE GENERATED STAT FAMILY IS OUT OF EVERY OFFER PATH (Batch FM §1, ruled by the
+designer).</b> There is no filler and no exhaustion floor: the Peddler, the elite cache, the
+bargain's rune reward, the event verb <code>rune_grant</code> and the cache's own re-ask all
+reach the pool through one function, and it hands back <b>nothing</b> when a hero's pool is
+spent. <b>THE SIX ENTRIES ARE KEPT</b> &mdash; <code>Runes.TEMPLATES</code>,
+<code>template_rune</code> and <code>_template_markers</code> all still stand and still
+resolve, at their authored magnitudes and one price (+10 max HP / +2% armor / +4 Speed / +12
+Constitution / +2% crit / +8 max Mana, 50g), so restoring a floor is one line rather than a
+family being re-authored. <b>The one thing that still reaches them is the simulator's
+<code>DOD_SIM_RUNES=stats</code> arm</b>, whose whole purpose is to measure that family.
 <br><b>Eligibility:</b> every rune declares a scope — universal, class-wide, or spec-only, so
 the awakening shapes the loot table — and ability-modifying runes only roll for heroes who
 actually own the named ability (boss trophies included). <b>SCOPE IS THE AXIS THAT SURVIVES,
 and it is what the shop row and the offer button show where the rarity word used to be.</b>
 <b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
-map card). Shop offers avoid duplicates per hero, and an exhausted pool falls back to the
-generated family — the offer list never comes back empty.
+map card). Shop offers avoid duplicates per hero.
+<br><b>AN EXHAUSTED POOL RETURNS AN EMPTY OFFER, AND EVERY SITE SAYS SO IN AS MANY WORDS
+(Batch FM §2).</b> Each spec has <b>four to six</b> authored runes and a hero who has drafted
+nothing can reach <b>three to six</b> of them &mdash; seventeen live entries name a
+<code>requires_ability</code> and ten of those name something outside the spawn kit, so
+<b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
+Peddler names the hero and the reason, the elite cache and the bargain print a line instead of
+paying in silence, and the event verb says nothing answers. <b>A cache with one or two runes
+left offers one or two</b> rather than discarding them, and the spoils line reads the count off
+the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPENT</b> from the
+hero's card &mdash; it cannot be filled, so holding it would strand the run.
 <br><b>SCOPE WAS RULED TO BE SPEC AND CLASS ONLY (Batch ES §2), AND THE FIVE UNIVERSALS WERE
 RE-SCOPED RATHER THAN RETIRED — the class each lands on was unmade.</b> They were 5 of every
 spec's 9&ndash;12 offerable runes, so the re-scope would have been the largest single movement
@@ -2871,11 +2881,9 @@ the most honest string in the game. Each entry stays in <code>data/runes.json</c
 <code>build</code> and <code>display_name</code> all still resolve it, so a saved run holding one
 keeps working and a later batch can point something at it again. <b>It is simply never
 offered</b>: both offer paths reach the authored pool through <code>Runes.eligible_ids</code> and
-nothing else. <b>The retirement cannot blank an offer</b> &mdash; measured floors across all
-twelve specs are <b>9 drawable, 2 spec-scoped and 5 on the rare shelf, against 3 rune
-slots</b>, and an exhausted pool falls back to the generated stat family. (Before Batch ES it
-widened to every tier first; there is no tier to widen out of, so that fall is the whole floor
-now.)</li>
+nothing else. <b>An exhausted pool blanks the offer, and that is the ruling rather than a
+defect (Batch FM §1)</b> &mdash; there is no fall to the generated stat family and no tier to
+widen out of. Every offer site announces the empty rather than skipping it.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE

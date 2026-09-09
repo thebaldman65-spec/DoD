@@ -110,6 +110,7 @@ FG's, FH's and FI's**, written straight into the reference rather than moved the
 | A GATE THAT DRIVES A LIVE RUN OWNS THE PLAYER'S SAVE | FH §2 |
 | THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` | FH §2 |
 | AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
+| A FALLBACK IS WHAT MAKES ITS CONSUMERS LOOK FINE — REMOVING ONE IS NEVER A LOCAL CHANGE | FM §1 |
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
@@ -2217,6 +2218,45 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   `ability_choice` reads the tier `award_ability_pick` would read today and no further, so a
   repaired triple can hold fewer than three — which is `roll_upgrade_offer`'s own stated
   principle, *the picker shows what exists rather than padding*.
+
+### AND A RE-ASK CAN COME BACK EMPTY ONCE THE FLOOR UNDER IT IS REMOVED (FM §3/§5)
+
+> **A GUARD THAT REFUSES BY *RETURNING* IS STILL NOT A REPAIR WHEN THE OFFER IS EMPTY RATHER THAN
+> ILLEGAL. FE removed the stale option; FM found what happens when removing them leaves NONE — the
+> overlay draws its heading over nothing, the handler correctly refuses, and the owed pick can
+> never be answered. AN OFFER THAT CAN COME BACK EMPTY OWES A WAY TO SPEND THE PICK, AND A
+> SENTENCE SAYING WHY.**
+
+**EVERY EMPTY BRANCH IN ALL FOUR RUNE OFFER SITES WAS UNREACHABLE IN A REAL RUN UNTIL FM, AND EACH
+ONE READ AS ORDINARY CODE.** `Runes.generate` fell back to the generated stat family on an
+exhausted pool, so `generate_rune` returned `{}` only under `DOD_SIM_RUNES=off` — and each site's
+`if rune.is_empty()` was a runes-off guard wearing an ordinary `if`. Removing the floor made all
+five reachable at once.
+
+- **THE FLOOR IS WHAT MAKES THE BRANCHES LOOK FINE, SO REMOVING ONE IS NEVER A LOCAL CHANGE.**
+  Before deleting a fallback, enumerate what its absence now reaches — not what calls it. FM's
+  removal was four lines in one function; the work was five consumers, three of which paid the
+  player nothing and said nothing.
+- **`return []` ON THE FIRST EMPTY DRAW DISCARDS A PARTIAL OFFER.** `roll_rune_candidates` drew
+  three without replacement and abandoned the whole triple on the first empty. Correct while the
+  floor guaranteed three; with the floor gone it fires on a pool that is NOT empty — **a
+  Pyromancer reaches three of his five at spawn, so ONE purchase left two and the next elite cache
+  paid nothing, printed nothing and owed nothing.** Offer what is left. *(This is FE's own last
+  bullet — "a top-up must preserve the roll's tiering, and may therefore come back short" —
+  arriving at the roll instead of at the top-up.)*
+- **A COUNT WRITTEN INTO A SENTENCE BECOMES A LIE THE DAY THE OFFER CAN BE SHORT.** *"may choose
+  one of three"* was unconditional in two places. Read the count off the offer.
+- **A RANDOM RECIPIENT MUST BE DRAWN FROM THOSE WHO CAN RECEIVE.** `party.pick_random()` was
+  exhaustive while every hero could always take a rune; it can now land on the one exhausted hero
+  in a party of four and throw a bought reward away. Filter first, then apply whatever preference
+  the site already had — `events.gd`'s rune verb had used that shape since it was written.
+- **AND THE REASON HAS TWO CASES, SO IT IS DERIVED RATHER THAN WRITTEN.** A hero's pool is empty
+  because he has taken everything, **or** because what is left is gated behind an ability he has
+  not drafted — `Runes.kit_names` reads `bm_abilities`, so **a rune pool DEEPENS during a run.**
+  Ten of the sixty live runes are unreachable at spawn for that reason. Telling the Pyromancer he
+  "carries every rune written for that awakening" at three-of-five is a lie; CO §3's rule that a
+  refusal names its cause is what forces the fork. **One door — `Runes.empty_offer_reason` — because
+  four sites print it.**
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 

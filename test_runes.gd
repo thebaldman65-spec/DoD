@@ -577,26 +577,59 @@ func _int_restore(data: Dictionary) -> void:
 
 # ---------- exhaustion ----------
 
-# An offer list can never come back empty: a hero holding every rune they can
-# roll still gets something. **BATCH ES §1: the pool no longer WIDENS first —
-# there is no tier to widen out of — so the fall to the generated stat family is
-# the whole floor now and this check is the only thing standing on it.**
+# ══ BATCH FM §1 — THE SUBJECT INVERTS, AND THE SECTION GETS SHARPER RATHER
+#    THAN SMALLER ═════════════════════════════════════════════════════════════
+#
+# It read: *"An offer list can never come back empty: a hero holding every rune
+# they can roll still gets something… the fall to the generated stat family is
+# the whole floor now and this check is the only thing standing on it."* **FM §1
+# removes that floor by the designer's ruling**, so the first assertion is not
+# merely false, it is the OPPOSITE of the ruling — an exhausted pool returns
+# `{}` and the four offer sites say so.
+#
+# **THE QUESTION THIS SECTION WAS ALWAYS ASKING SURVIVES INTACT: is the offer
+# WELL FORMED at every depth?** It is asked at both ends now rather than at one:
+#
+#   * with the pouch **one short** of exhausted, an offer must arrive and must
+#     be named and payloaded — the arm that proves the walk is really drawing,
+#     and the one a floor coming back could not fake;
+#   * with the pouch **exhausted**, it must be EMPTY — which is FM's ruling
+#     asserted rather than assumed, and is what goes red the day a floor is
+#     restored under it.
+#
+# **AND THE OLD BODY WAS ALREADY HALF VACUOUS.** It filled the pouch with the
+# six TEMPLATE names beside the authored ones; against FK's authored pool those
+# six names match nothing `eligible_ids` returns, so they contributed nothing to
+# the exhaustion they were there to create. The pouch is built from the
+# eligible ids alone now, which is the only list that can exhaust anything.
 func _exhaustion() -> void:
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			var member := {"key": key, "spec": spec, "runes": []}
-			var owned: Array = []
-			for id in Runes.eligible_ids(member, []):
-				owned.append({"name": Runes.display_name(Runes.config(id))})
-			for t in Runes.TEMPLATES:
-				owned.append({"name": "Rune of %s" % t["noun"]})
-			member["runes"] = owned
+			var elig: Array = Runes.eligible_ids(member, [])
+			ok(not elig.is_empty(),
+				"%s: no rune is eligible at all — the arms below are arithmetic rather than evidence" % spec)
+			# ONE SHORT. The positive arm: something arrives, and it is whole.
+			var short: Array = []
+			for i in range(maxi(elig.size() - 1, 0)):
+				short.append({"name": Runes.display_name(Runes.config(elig[i]))})
+			member["runes"] = short
 			for _i in 5:
 				var offer := Runes.generate(member, 3)
-				ok(not offer.is_empty(), "%s: exhausted pool returned an empty offer" % spec)
+				ok(not offer.is_empty(),
+					"%s: a pool with one rune left returned an empty offer" % spec)
 				ok(String(offer.get("name", "")) != "", "%s: offer with no name" % spec)
-				ok(offer.get("payload", {}) is Dictionary and not offer["payload"].is_empty(),
+				ok((offer.get("payload", {}) as Dictionary) is Dictionary
+						and not (offer.get("payload", {}) as Dictionary).is_empty(),
 					"%s: offer with an empty payload" % spec)
+			# EXHAUSTED. The ruling, asserted.
+			var all_of_them: Array = []
+			for id in elig:
+				all_of_them.append({"name": Runes.display_name(Runes.config(id))})
+			member["runes"] = all_of_them
+			for _j in 5:
+				ok(Runes.generate(member, 3).is_empty(),
+					"%s: an EXHAUSTED pool still produced an offer — the generated floor is back (FM §1)" % spec)
 
 
 # ================= Batch AD: the two experiment arms =================
@@ -951,6 +984,8 @@ func _start_rune_pool(run: Node) -> void:
 			for rid in Runes.eligible_ids({"key": key2, "spec": spec2, "runes": []}, []):
 				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec2:
 					any_spec_eligible = true
+	# *(FK moved this band 20-70 -> 70-95 and FM replaces it outright; FK's
+	# reasoning is kept below because it is what the 100 is measured against.)*
 	# **BATCH FK MOVED THE BAND 20-70 -> 70-95, AND THE MESSAGE ABOVE PREDICTED
 	# THE MOVE**: *"the eligible pool moved… this is the pool's own shape."* It
 	# is. Before FK, EIGHT of the twelve specs had no spec rune at all, so their
@@ -961,13 +996,20 @@ func _start_rune_pool(run: Node) -> void:
 	# 1 - C(6,3)/C(11,3) = 88% for a five-rune spec, ~80% for the Devout's four
 	# and ~90% for the Beastmaster's six. **Measured across the mix: 83%.**
 	#
-	# **THE BAND IS STILL A REAL ALARM AT ITS NEW WIDTH.** A spec's set going
-	# missing drops the rate toward the old floor; the template family being
-	# removed (which is owed, once the pool is proven) drives it to 100. Both
-	# are movements this catches, and both are things a later batch will do.
+	# **BATCH FM MOVED IT 70-95 -> AN EQUALITY AT 100, AND THE MESSAGE ABOVE
+	# PREDICTED THAT TOO**: *"the template family being removed… drives it to
+	# 100. Both are movements this catches, and both are things a later batch
+	# will do."* FM is that batch. **THE BAND IS NOT WIDENED TO SWALLOW THE
+	# MOVE — IT IS REPLACED BY THE THING THAT IS NOW TRUE**, which is stricter
+	# than the band it replaces: every one of the 60 live entries is
+	# `spec:`-scoped and the generated family is out of the pool, so a candidate
+	# that is NOT the holder's own spec rune cannot exist. **It is still a real
+	# alarm and it is a sharper one**: a class-scoped or universal rune reaching
+	# a cache — which is what ES §2's re-scope would do — turns it red on the
+	# first triple rather than after a twenty-five-point drift.
 	if any_spec_eligible:
-		ok(rate > 70.0 and rate < 95.0,
-			"a spec rune is in the cache triple %.0f%% of the time — outside the 70-95%% band; the eligible pool moved (ES §1: the draw is flat, so this is the pool's own shape)" % rate)
+		ok(is_equal_approx(rate, 100.0),
+			"a spec rune is in the cache triple %.1f%% of the time, not 100%% — with the generated family out of the offer (FM §1) and all sixty live entries spec-scoped, a candidate that is not the holder's own is a scope leak" % rate)
 	else:
 		ok(is_zero_approx(rate),
 			"no spec rune is eligible for any spec (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)
@@ -1060,6 +1102,26 @@ func _rich_grant(run: Node) -> void:
 				member["runes"] = member["runes"] + [rune]
 			# One ask past the spec's surviving set must fall back to the
 			# ordinary roll rather than returning nothing.
+			# ── BATCH FM §1 — THE FALLBACK IS STILL TAKEN; WHAT IT LANDS ON
+			#    MOVED ────────────────────────────────────────────────────────
+			#
+			# This asserted `not extra.is_empty()` — *"the grant died once the
+			# spec set ran out"* — which was the right alarm while the ordinary
+			# roll could not come back empty. **FM §1 removes the generated
+			# family from that roll**, so the fallback now lands on `{}` for
+			# every spec, and the literal would have to be deleted rather than
+			# repaired.
+			#
+			# **THE PROPERTY IT WAS GUARDING IS THAT THE FALLBACK IS TAKEN AT
+			# ALL**, and that is asserted directly: past its own set,
+			# `grant_rune` must hand back exactly what `generate_rune` would —
+			# empty precisely when the whole pool is empty, and a rune whenever
+			# anything at all is left. **Two-armed by construction**: the day a
+			# class-scoped or universal rune is authored the pool is not empty
+			# past the spec set, and this arm requires a rune without an edit.
 			var extra: Dictionary = run.grant_rune(member)
-			ok(not extra.is_empty(), "%s: the grant died once the spec set ran out" % spec)
+			ok(extra.is_empty() == Runes.pool_empty_for(member),
+				"%s: past its own set the grant %s while the pool %s — the ordinary roll is not being reached" % [
+					spec, "died" if extra.is_empty() else "paid",
+					"is empty" if Runes.pool_empty_for(member) else "still holds something"])
 	run.sim_run = had_sim
