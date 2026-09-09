@@ -147,6 +147,9 @@ controls above are for, and why they keep the API and break only the behaviour.
 
 ## §2 — THE MERGE GETS ITS OWN BRANCH
 
+**The branch is `class-merge`, cut from FQ's own commit** rather than from before it — a branch
+cut earlier would start the merge without the one thing built to survive it.
+
 **Recorded in `docs/ways-of-working.md`**, which is where the brief put it and where it belongs:
 that file binds what happens before and around a brief, not what a batch does with one.
 

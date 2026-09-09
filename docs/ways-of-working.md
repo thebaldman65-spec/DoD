@@ -90,8 +90,9 @@ each.** Make the call, state it in the report, and move on.
 
 ## THE MERGE IS DEVELOPED ON ITS OWN BRANCH
 
-> **The merge is developed on its own branch. `main` stays playable. A merge batch commits and
-> pushes to the branch, and the push check reports the branch's remote rather than `main`'s.**
+> **The merge is developed on its own branch — `class-merge`. `main` stays playable. A merge batch
+> commits and pushes to `class-merge`, and the push check reports THAT branch's remote against
+> local HEAD rather than `main`'s.**
 
 **The recon priced the merge at twelve to fourteen batches with the game BROKEN — not degraded —
 through roughly eight of them**, because the engine move cannot be staged per spec: the unit is a

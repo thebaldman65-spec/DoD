@@ -63,8 +63,8 @@ last exactly one.*
   §4c in both directions. **HEAD's `profile.gd` under the new gate is a PARSE ERROR, not a
   failure** — informative (the gate is genuinely new-code-bound) but it proves nothing about
   catching a subtly broken guard, which is what the six surgical controls are for.
-- **THE MERGE HAS A BRANCH, AND THE CONFLICT CONVENTION IS DECIDED RATHER THAN RESOLVED FOURTEEN
-  TIMES.** Recorded in `docs/ways-of-working.md`. **The brief predicted THREE files would conflict
+- **THE MERGE HAS A BRANCH — `class-merge`, cut from FQ's own commit so it carries the version
+  guard — AND THE CONFLICT CONVENTION IS DECIDED RATHER THAN RESOLVED FOURTEEN TIMES.** Recorded in `docs/ways-of-working.md`. **The brief predicted THREE files would conflict
   every batch; the measurement over the last fourteen says EIGHT** — `changelog.html` and
   `state.md` at 14/14, `CLAUDE.md` and `master.html` at 12/14, and `baselines.json`,
   `design-notes.md`, `pin-manifest.json` and `run_battery.sh` at 10/14.
