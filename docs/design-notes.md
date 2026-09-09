@@ -8010,3 +8010,37 @@ shot — and the rune would stop supplementing his patience and start replacing 
 single meter cannot afford. A quarter pays 15 against his own 20 and keeps his own shot the largest
 single source under every composition. **That is a derivation, not a preference**, and it is what a
 re-tune should argue with.
+
+---
+
+## FQ — WHY THE PROFILE'S REFUSAL DOES NOT DELETE, AND WHY IT REFUSES UPWARD
+
+**`run_state.load_run()` refuses a save it cannot read and then CLEARS it, and copying that shape
+into the profile would have been the obvious thing to do.** The difference is what the file is. A
+refused run save is one run in flight, and the player's alternative is starting a new one — which
+is the thing they were going to do anyway. A refused profile is *every run they have ever
+finished*: twelve purses, a tier, a bought-cell ledger and a loadout. **Deleting it to resolve the
+refusal would BE the destruction the guard exists to prevent**, so the profile refuses, writes
+nothing, and leaves the file byte-for-byte alone. The file on disk is the only backup that exists,
+which is also why the on-screen message names its path.
+
+**The refusal is deliberately not a quiet zero, and that is a design position rather than a
+nicety.** A profile that fails to load and reads as a fresh start invites exactly one action: play
+on. The next zone boss then writes the fresh start over the real one. **The banner and the disabled
+Talents button are both there to make the safe action — copy that file somewhere — the obvious
+one**, and to stop the screen whose whole content is the refused ledger from offering to spend
+points that are not actually gone.
+
+**IT REFUSES UPWARD AS WELL AS DOWNWARD, AND THE UPWARD HALF IS THE ONE THAT WAS ALREADY LIVE.**
+A version-99 profile loaded clean under the old code, was stamped back down and re-saved. That was
+harmless while there was one branch. **FQ §2 creates a second one that the designer will be
+switching between for twelve to fourteen batches**, and the moment the merge bumps the version, a
+single afternoon spent on `main` would silently downgrade and overwrite the branch's profile. The
+ceiling is not defensive programming against a hypothetical; it is the direct consequence of the
+other half of this same batch.
+
+**And the floor refuses nothing today on purpose.** `MIN_VERSION` is 1 and there is nothing below
+it, so no existing profile changes behaviour. **It is a line the merge moves, not a line this batch
+uses**: the batch that renames a talent id raises it, and every older profile is refused rather
+than half-read — which is the honest answer, because FP measured what the tolerant read returns and
+it is a silent lie in three fields at once.

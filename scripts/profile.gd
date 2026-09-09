@@ -23,12 +23,74 @@ static var loaded := false
 # 0 — which is exactly the right state for a save that has never completed
 # a run under this system. Nothing migrates because nothing could: in-run
 # talent points were per-RUN and are deleted.
+#
+# BATCH FQ §1 — AND UNTIL FQ THE SENTENCE ABOVE WAS THE WHOLE STORY, BECAUSE
+# `_load()` HAD NO VERSION BRANCH AT ALL. It merged every key it found over
+# the defaults and wrote `data["version"] = VERSION` unconditionally, reading
+# the old value NOWHERE. FP built the collision rather than reasoning about
+# it: a profile carrying six points and three bought cells, asked against a
+# tree that no longer holds those ids, returns `cells_spent` 0,
+# `equipped_learned` empty and `owns_cell` STILL TRUE. The points come back,
+# the loadout empties, and the ledger keeps cells that now cost nothing.
+#
+# THE READ IS NOT THE DANGEROUS HALF. `_save()` writes the merged dictionary
+# back over the file on the next point earned, so a wrong first load is not a
+# bad read — it is a bad WRITE, and the twelve purses are gone the first time
+# the player beats a zone boss. **Every merge batch touches talent ids**, and
+# that is why this guard exists before the merge starts rather than during it.
+#
+# THE SHAPE IS `run_state.gd`'s AND IS DELIBERATELY NOT A SECOND PATTERN: a
+# version, a refusal path for what it will not load, and no silent coercion.
+# **THE ONE DIFFERENCE IS THAT THIS REFUSAL DOES NOT DELETE.** `load_run()`
+# calls `clear_save()` because a refused run save is one run in flight; a
+# refused profile is every run the player has ever finished, so deleting it
+# would BE the destruction the guard exists to prevent. It refuses, it keeps
+# its hands off the file, and it says so.
 const VERSION := 2
+
+# BATCH FQ §1 — THE FLOOR. The oldest profile this build will read.
+# v1 predates the meta talent ledger and loads TOLERANTLY on purpose, for the
+# reason BM's comment above gives: it arrives at zero points, zero cells and
+# tier 0, which is the correct state for a save that never completed a run
+# under that system. There is nothing below v1, so the floor refuses nothing
+# today — **it is the line the merge moves.** The batch that renames a talent
+# id raises this to its own VERSION and every older profile is refused, which
+# is the honest answer, because FP measured what the tolerant read returns
+# and it is a silent lie in three fields at once.
+#
+# A PROFILE WITH NO VERSION KEY READS 0 AND IS REFUSED. `run_state.load_run()`
+# treats a missing version exactly the same way (`int(data.get("version", 0))`
+# against a floor), and a JSON dictionary this build never wrote is not a
+# profile just because it parses.
+const MIN_VERSION := 1
+
+# BATCH FQ §1 — THE CEILING, WHICH IS THE HALF THAT IS LIVE TODAY.
+# A profile written at version 99 loads CLEAN under the code this replaces, is
+# stamped back down to 2, and is re-saved at 2 — measured in a driven probe,
+# not reasoned about. **FQ §2 puts the merge on its own branch with `main`
+# staying playable**, so the designer will be switching between a build that
+# writes vN and a build that writes vN+1 against ONE `user://profile.json`.
+# The forward case stops being hypothetical the day the merge bumps VERSION,
+# and it is the branch itself that makes it routine.
+#
+# Set when `_load()` REFUSED the file on disk. Two things follow and both
+# matter: **`_save()` becomes a NO-OP**, so the refused file is never
+# overwritten; and **the main menu says so**, because a profile that reads as
+# a fresh start is exactly the silent zero this guard exists to prevent.
+static var refused := false
+static var refused_reason := ""
+static var refused_version := 0
 
 
 static func _load() -> Dictionary:
 	if not loaded:
 		loaded = true
+		# Re-evaluated on every fresh load, because the harness redirects
+		# `save_path` and resets `loaded`/`data` between sections, and a
+		# refusal that outlived its file would refuse the next one too.
+		refused = false
+		refused_reason = ""
+		refused_version = 0
 		data = {"version": VERSION, "runs_started": {}, "runs_completed": {},
 			"wipes": {}, "forfeits": {}, "bosses_killed": {}, "events_seen": {},
 			"zones_cleared": 0, "flags": {},
@@ -40,16 +102,69 @@ static func _load() -> Dictionary:
 		if FileAccess.file_exists(save_path):
 			var file := FileAccess.open(save_path, FileAccess.READ)
 			var read: Variant = JSON.parse_string(file.get_as_text())
-			if read is Dictionary:
-				for key in read:
-					data[key] = read[key]
-		data["version"] = VERSION
+			# BATCH FQ §1 — three refusals, and NOT ONE of them writes.
+			# A file that does not parse as a dictionary used to fall
+			# straight through to the defaults and then get overwritten by
+			# the next `_save()`, which is a corrupt profile becoming a
+			# DELETED one with no message in between.
+			if not (read is Dictionary):
+				_refuse(0, "it is not readable as a profile")
+				return data
+			var found := int((read as Dictionary).get("version", 0))
+			if found < MIN_VERSION:
+				_refuse(found, "it was written by a build older than this one")
+				return data
+			if found > VERSION:
+				_refuse(found, "it was written by a NEWER build than this one")
+				return data
+			for key in read:
+				data[key] = read[key]
+			# Only reached on an ACCEPTED load, and it is an upgrade rather
+			# than a coercion: a v1 profile merged over v2 defaults genuinely
+			# IS a v2 profile. A refused version never gets here, which is
+			# the whole of "no silent coercion".
+			data["version"] = VERSION
 	return data
 
 
 static func _save() -> void:
+	# BATCH FQ §1 — THE REFUSAL'S TEETH. Everything else this guard does is a
+	# message; this is the line that keeps the file on disk.
+	#
+	# **THE ORDER IS LOAD-BEARING AND THE OBVIOUS SPELLING IS WRONG.** Reading
+	# `refused` before `_load()` has run tests a flag that is still false, so
+	# the very first write of a session — the one that destroys the file —
+	# would sail past a guard that looks correct. `_load()` is called FIRST,
+	# and its refusal is read afterwards.
+	var out := _load()
+	if refused:
+		return
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
-	file.store_string(JSON.stringify(_load()))
+	file.store_string(JSON.stringify(out))
+
+
+# BATCH FQ §1 — the refusal, recorded rather than swallowed. `push_warning`
+# reaches the editor and the headless log; `refusal_message()` is what the
+# PLAYER reads, and the main menu shows it.
+static func _refuse(found: int, why: String) -> void:
+	refused = true
+	refused_version = found
+	refused_reason = why
+	push_warning("Profile: REFUSED %s (version %d) — %s. Nothing will be written to it."
+		% [save_path, found, why])
+
+
+# What the player is told, in their words rather than in the format's.
+# It names the FILE, because the file is the backup: the refusal exists so
+# that copying it somewhere safe is still possible.
+static func refusal_message() -> String:
+	if not refused:
+		return ""
+	var stamp := "version %d" % refused_version if refused_version > 0 else "no version"
+	return ("Your saved progress could not be read — %s (%s), and this build reads %d to %d.\n"
+		+ "NOTHING HAS BEEN CHANGED OR DELETED. The file is left exactly as it was, and this "
+		+ "session will not write to it.\nThe file is: %s") \
+		% [refused_reason, stamp, MIN_VERSION, VERSION, save_path]
 
 
 static func _bump(bucket: String, key: String) -> void:

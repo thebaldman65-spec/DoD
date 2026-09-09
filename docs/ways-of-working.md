@@ -88,6 +88,53 @@ each.** Make the call, state it in the report, and move on.
   requires pricing options rather than guessing when a clause has no home — which is a question
   about what the game contains, on the content side of this seam.
 
+## THE MERGE IS DEVELOPED ON ITS OWN BRANCH
+
+> **The merge is developed on its own branch. `main` stays playable. A merge batch commits and
+> pushes to the branch, and the push check reports the branch's remote rather than `main`'s.**
+
+**The recon priced the merge at twelve to fourteen batches with the game BROKEN — not degraded —
+through roughly eight of them**, because the engine move cannot be staged per spec: the unit is a
+CLASS, and there is no state in which one spec of a class has merged and its siblings have not.
+**A tree carrying fifty red targets has no differ**, so `main` is where the designer keeps playing
+and the branch is where the game is taken apart.
+
+· **`CLAUDE.md`'s push step POINTS HERE and is not restated there.** It reads `origin/main` because
+  until now there was only one branch; a merge batch confirms the BRANCH's remote against local
+  HEAD, by the same rule and with the same evidence.
+· **THE BRANCH IS CUT FROM THE COMMIT THAT CARRIES THE PROFILE VERSION GUARD, NOT FROM BEFORE IT.**
+  A branch cut earlier starts the merge without the one thing built to survive it.
+
+### THE FILES EVERY BATCH WRITES, AND WHAT HAPPENS WHEN BOTH SIDES WRITE THEM
+
+**Decided once, here, rather than resolved by hand at every merge point.** The list is longer than
+the three anyone predicts, and the two hardest entries are not documents at all.
+
+| File | Convention |
+|---|---|
+| `docs/state.md` | **Take the branch's wholesale.** It is rewritten every batch and has no reader. |
+| `docs/changelog.html` | **Append-only at the top; BOTH sides' entries survive, ordered by batch code.** Neither side's history is a draft. |
+| `docs/design-notes.md` | Append-only. Both sides survive. |
+| `docs/reports/XX.md` | One new file per batch. Cannot conflict. |
+| `run_battery.sh` | Both sides' `GATES` / `SUITES` entries survive — it is one array and a target is a name. |
+| `pin-manifest.json` | **NEVER hand-merged. It is DERIVED.** Take either side and re-run `build_pin_manifest.py`; `check_ed` is what says the result is right. |
+| `baselines.json` | Both sides' ROWS survive, but **a count is not a fact about a file, it is a fact about a GAME** — every engine-bound row measured on the branch is wrong for `main` and the reverse. Rows merge; numbers are re-measured. |
+| `CLAUDE.md` | See below. |
+| `docs/master.html` | **The hardest one, and it is not `CLAUDE.md`.** See below. |
+
+· **`CLAUDE.md` RECONCILES BY WHAT A RULE IS ABOUT, NOT BY WHO WROTE IT.** A rule that names no
+  spec, engine or node **is true on both sides** — instrument rules, working agreements, the
+  verification floor — and **both sides' additions are kept**. A rule that NAMES one is a claim
+  about a game only one side has, and at the merge point the branch's reading wins, because the
+  branch's game is the one that ships. **THIS IS A TRIAGE AND NOT A DECISION PROCEDURE**: it says
+  which rules need a human read, and roughly half of them do.
+· **`master.html` IS HARDER BECAUSE IT IS THE ONE DOCUMENT THAT IS NOT ALLOWED TO HOLD HISTORY.**
+  It shows only what is currently in the game (the designer's 07-20 rule), and during the merge the
+  two sides describe **different games** — so their edits are not two versions of one sentence and
+  no line-level convention can reconcile them. **The branch's `master.html` is RE-DERIVED at the
+  merge point, not merged**, and `main`'s edits to it are read as a list of things to check rather
+  than as text to keep.
+
 ## A BATCH IS MOSTLY TRANSCRIPTION
 
 > **What is genuinely the batch's own work is finding read sites, deriving payload fields, sweeping

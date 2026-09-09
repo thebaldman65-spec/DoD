@@ -13,102 +13,103 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-09 (Batch FP).*
+*Last rewritten: 2026-09-09 (Batch FQ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FP — RECONNAISSANCE FOR THE CLASS MERGE. REPORT ONLY.** Nothing was authored,
-  merged, changed, retired or retuned; **no code moved, no gate was written, no `CLAUDE.md` rule
-  was added and no data file was touched.** The deliverable is **`docs/merge-recon.html`**, on
-  `spec-recon.html`'s pattern with self-contained sections, because it will be read many times
-  across many batches and never once from the top. Full working: **`docs/reports/FP.md`**.
-- **THE THREE NUMBERS THAT DECIDE IT.** Talent nodes that survive *"no node may depend on an
-  engine"*: **50 of 324**, and **four specs contribute ZERO** (Pyromancer, Cryomancer, Holy,
-  Beastmaster). Live runes that read the engine they sit beside: **43 of 60**. Battery targets
-  that read a spec concept: **87 of 97**, of which **52 are engine-bound and carry 32,393 of the
-  battery's 45,248 asserted checks — 71.6%**.
-- **AND THE SENTENCE THE BATCH EXISTS TO WRITE: DN PRICED ITS RESTRUCTURE AT 97 NEW TALENT NODES
-  AND THE DESIGNER DID NOT TAKE IT. THIS ONE IS 274.** DN found 318 of 324 clean because
-  *guaranteed* meant the spec's own passive and core kit — **exactly what this merge makes drawn**,
-  so DN's finding inverts and 6 becomes 274. With the runes and cards, **400 authored things stop
-  meaning what they mean today**, to move a choice the player already makes on the spec-select
-  screen into the draft.
-- **THE FINDING THE BRIEF DID NOT ANTICIPATE: `SPEC_INFO` IS A STAT BLOCK, AND ONE OF ITS STATS IS
-  LOAD-BEARING FOR A LANE.** `parry_chance` has a universal baseline (`PARRY_CHANCE := 0.05`, with
-  −1.0 as a *use-the-baseline* sentinel), so the Swordmaster's 0.12 is an override and parry
-  survives for everyone. **`block_chance` has NO baseline** — it defaults to 0.0, the Warden alone
-  declares it at 0.10, and the only other unconditional source is `_plating_slice`, which opens
-  `if u.passive_id == "heavy_plating"`. **So an engine rune carrying Heavy Plating to a Berserker
-  installs a climb on a base of zero, and `PROTECTED_CORES` cannot see it, because the enabler
-  table names ABILITIES and this is a STAT.** Three "surviving" Warden nodes were cut by hand for
-  this reason — Unkillable, Ricochet and Bruising Guard all fire on a BLOCK and never name the
-  engine, which is **FK §7's Standing Ground shape arriving from the opposite direction**.
-- **`Profile` IS THE MIGRATION RISK AND THE FAILURE MODE IS SILENCE — DRIVEN, NOT INFERRED.**
-  `Profile._load()` has **no version branch at all**: it merges every key it finds over the
-  defaults and writes `data["version"] = VERSION` unconditionally, reading the old value nowhere.
-  A constructed scratch profile (tier 3, six points, three cells bought, one equipped) asked
-  against a tree that no longer holds those ids returned **`cells_spent` 0, `equipped_learned`
-  empty, and `owns_cell` still TRUE for all three** — the points come back, the loadout empties,
-  and the ledger keeps cells that now cost nothing. **`Talents.has_tree("warrior")` is false and
-  `generate_tree("warrior")` returns 0 nodes today.** And it is **written once**: `_save()`
-  overwrites the file on the next point earned, so a wrong first load destroys the original purses
-  the first time the player beats a zone boss. **The run save is not the risk** — v12, refusing
-  below v10, and four versions of precedent say a merge has no honest default, so v13 REFUSED
-  costs one evening.
-- **FIVE OF THE BRIEF'S TWENTY-FOUR PREMISES DID NOT HOLD.** Three FALSE: **`second_resource` is
-  three currencies, not four** (Resonance / Mercy / Focus — Faith is `faith_stacks`, and
-  `Ability.faith_cost` is a misnamed MERCY cost, which `classes.gd` says outright); **the battery
-  has 97 targets, not 103** (105 `check_`/`test_` files exist, eight of which it does not run);
-  **the class draft pools are 6/7/6/6 = 25 at a 0.25 per-card share**, so nothing guarantees a hero
-  any class-wide card. One STALE: the summons are **10 of 10** Beastmaster cards, not 8 of 8. One
-  right in substance, wrong in mechanism: **Trapper READS a target's status LIST where Sanctity
-  counts application EVENTS.** Full table: `docs/merge-recon.html` §0.
-- **AND PREMISE 6 BEING FALSE MAKES THE TWO-METER QUESTION EASIER, NOT HARDER.** Two meters at
-  once is **not** a state that does not exist — the Devout is it, and Conviction, Pack Bond and
-  Wrath of the Old Gods all carry their count outside `second_resource` and display through
-  **chips**. **Three of the twelve engines already solved "a meter that is not the bar" and none of
-  them needed the bar widened.**
-- **OF THE THREE NEW SPINES, CHANNEL IS CHEAPEST BY A WIDE MARGIN AND SANCTITY IS DEAREST.**
-  `note_resource_spent(amount)` is already generic in shape and already books the **NET** off the
-  bar at the one line every ability pays through; its payout, `dmg_bonus`, is **read at exactly one
-  site** and is element-blind. Momentum is half-built — damage TAKEN per turn exists twice over
-  (`dmg_by_turn`, `trance_taken`) and damage DEALT per turn does not exist at all. **Sanctity's
-  READING half is the cheapest of the three** (`add_status` is a single funnel: 214
-  `_apply_status` calls route through it plus 35 direct callers, so all 249 sites pass one
-  function) **and its PAYOUT does not exist anywhere**: `STATUS_INFO` holds 156 ids and carries
-  label, short code, colour and description — **not one magnitude** — so every status magnitude in
-  this game is authored per site.
-- **WHAT MOVED:** `docs/merge-recon.html` (**NEW**), `docs/changelog.html`,
-  `docs/reports/FP.md` (**NEW**) and this file. **NOTHING ELSE.** No `.gd` file, no `.json`, no
-  `CLAUDE.md`, no `master.html`, no gate, no baseline row and no manifest entry.
-- **THE FLOOR WAS MET AND THE DOC EDITS WERE PROVED RATHER THAN ASSUMED.** No code moved, so parse
-  is trivially clean; the risk was a suite literal. **193 needles were snapshotted off the 18
-  readers of `docs/changelog.html` BEFORE the edit and swept after: 0 LOST**, with a **two-armed
-  control** (the same needle removed from the shipped copy and from HEAD's) reading 1 on both arms,
-  so the zero is not vacuous. **All four changelog gates were run and match their baselines
-  exactly** — `check_dv` 83/0, `check_ec` 23/0, `check_el` 23/0, `check_fg` 22/0. The changelog is
-  at **236,260 B against CW §4's 400 KB bar** with 163 KB of headroom; `CLAUDE.md` is untouched at
-  289,255 B.
-- **Next letter: FQ.**
+- **Last batch: FQ — THE VERSION GUARD, AND THE BRANCH. NO MERGE WORK.** No spec dissolved, no
+  pool merged, no engine became a rune, no node moved, and **not one rune, card, ability, talent,
+  constant or magnitude moved.** The batch built the two things that had to exist before the merge
+  starts. Full working: **`docs/reports/FQ.md`**.
+- **`Profile._load()` HAS A VERSION BRANCH NOW. IT HAD NONE.** It merged every key it found over
+  the defaults and stamped `data["version"] = VERSION` unconditionally, reading the old value
+  nowhere. **The shape is `run_state.gd`'s with ONE deliberate difference: this refusal does not
+  DELETE.** `load_run()` calls `clear_save()` because a refused run save is one run in flight; a
+  refused profile is every run the player has ever finished, so deleting it would BE the
+  destruction the guard exists to prevent. It refuses, writes nothing, and leaves the file
+  byte-for-byte alone.
+- **AND IT REFUSES UPWARD AS WELL AS DOWNWARD, WHICH IS THE HALF THAT WAS ALREADY LIVE.** A
+  version-99 profile loaded clean under HEAD, was stamped back to 2 and re-saved at 2 — **driven
+  in a probe, not reasoned about.** Five shapes now refuse: no version key, one above, far above,
+  a JSON file that is not a dictionary, and a file that is not JSON. **`MIN_VERSION := 1` refuses
+  nothing today on purpose** — there is nothing below it, so no existing profile changes behaviour.
+  **It is the line the merge moves**, and the batch that renames a talent id raises it.
+- **THE REFUSAL IS NOT A QUIET ZERO.** The main menu banners the version found, the range this
+  build reads, **that the file has not been changed or deleted**, and its path — the file is the
+  only backup that exists, so finding it is the point. **Talents is disabled while a profile is
+  refused**, because a board offering cells to buy with points that are not actually gone is the
+  same lie one screen later.
+- **THE FIELD CENSUS, DERIVED RATHER THAN QUOTED FROM FP. The profile holds 13 keys.** **SEVEN are
+  SPEC-KEYED** and read 0 or empty the moment a spec id changes — `runs_started`,
+  `runs_completed`, `wipes`, `forfeits`, `talent_points`, `talent_cells`, `talent_equipped`. **Two
+  of those seven are keyed a SECOND time on NODE ids** (`talent_cells`, `talent_equipped`), and
+  that is where FP's three silent defaults live: `cells_spent` reads 0, `equipped_learned` empties,
+  and `owns_cell` never consults the tree at all so it stays TRUE. **FIVE are safe** —
+  `bosses_killed`, `events_seen`, `zones_cleared`, `flags`, `talent_tier` — because nothing the
+  merge renames is their key. The thirteenth is `version`.
+- **§1 GOT AN INSTRUMENT AND NOT A PARAGRAPH — `check_fq.gd`, 46 checks.** BN's warning about the
+  run save sat in documentation for thirty batches doing nothing. §1 drives the branch in **both**
+  directions, because a guard that never refuses and one that refuses everything pass the same
+  static check; **§2 is the arm the batch exists for** and md5-hashes the file across **five write
+  paths**; §3 is the lossless round trip; **§4b drives `_save()` as the FIRST call of a session**,
+  the only state that tells `if refused` placed before `_load()` apart from after it — a one-line
+  reordering that looks correct either way and leaves the guard inert on exactly the write that
+  destroys the file. **No version literal is pinned anywhere in it.**
+- **SIX CONTROLS, EACH ON THE NEEDLE IT AIMS AT.** Ceiling removed → 11 reds; floor removed → 2,
+  and only §1b; the `_save()` reordering → **1 red and it is §4b alone**; the refusal guard deleted
+  → 7; a guard that refuses everything → 5, caught by the positive arm; a refusal that deletes →
+  §4c in both directions. **HEAD's `profile.gd` under the new gate is a PARSE ERROR, not a
+  failure** — informative (the gate is genuinely new-code-bound) but it proves nothing about
+  catching a subtly broken guard, which is what the six surgical controls are for.
+- **THE MERGE HAS A BRANCH, AND THE CONFLICT CONVENTION IS DECIDED RATHER THAN RESOLVED FOURTEEN
+  TIMES.** Recorded in `docs/ways-of-working.md`. **The brief predicted THREE files would conflict
+  every batch; the measurement over the last fourteen says EIGHT** — `changelog.html` and
+  `state.md` at 14/14, `CLAUDE.md` and `master.html` at 12/14, and `baselines.json`,
+  `design-notes.md`, `pin-manifest.json` and `run_battery.sh` at 10/14.
+- **TWO OF THE FIVE UNPREDICTED ONES ARE NOT DOCUMENTS, AND `master.html` IS HARDER THAN
+  `CLAUDE.md`.** `pin-manifest.json` is **DERIVED** and must never be hand-merged — take either
+  side, re-run the builder, and `check_ed` says whether the result is right. `baselines.json`
+  merges its ROWS cleanly while **every number in an engine-bound row is a fact about a GAME**, not
+  about a file. And `master.html` is the one document forbidden to hold history, so the two sides
+  describe **different games** and their edits are not two versions of one sentence: it is
+  **re-derived at the merge point, not merged.** `CLAUDE.md` reconciles by what a rule is ABOUT —
+  **measured at 54 of 108 blocks naming a spec or an engine and 54 naming neither**, which is a
+  triage that halves the reading rather than a procedure that removes it.
+- **NO GATE READS THE BRANCH NAME, AND THE BRIEF'S CLAIM THAT `run_battery.sh` CARRIES A SCAR OF
+  ONE IS FALSE.** That script contains no `git` call at all, and the four gate files matching
+  `git ` match it inside the word *digit*. **The only live assumption in the tree was `CLAUDE.md`'s
+  push step**, which now points at `docs/ways-of-working.md` rather than restating it.
+- **WHAT MOVED:** `scripts/profile.gd`, `scripts/main_menu.gd`, `check_fq.gd` (**NEW**),
+  `run_battery.sh`, `baselines.json` (two rows — its own, and `check_parse` 177→178),
+  `pin-manifest.json`, `docs/ways-of-working.md`, `CLAUDE.md`, `docs/master.html`,
+  `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FQ.md` (**NEW**) and this file.
+  **The designer's four save files were copied to `save-backups/FQ-20260909-134621/` and
+  md5-verified against the originals before anything else happened.**
+- **THE BATTERY: 102 TARGETS, AND THE ONLY RED IS THE SANCTIONED ONE.** `check_fq` **48 / 0**,
+  `check_de` (the count differ) **426 checks / 0 failures / 0 notices** — every baseline matched,
+  including the two rows this batch wrote. **ZERO TARGETS THREW.** `check_cm_live`'s four failures
+  are the one red that is on purpose, and they were compared **line for line against a HEAD
+  rebuild** rather than by count: identical. **The tree was frozen across the whole run — 369
+  files, tracked and untracked, hashed with absolute paths before and after: ZERO differ.** The
+  designer's four save files are byte-identical to the FQ backup after all 102 targets.
+- **Next letter: FR.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FP spent none of `CLAUDE.md`'s headroom**,
-  because the brief forbade a rule and this batch added none; the roughly 7 KiB FO left is still
-  there. **The next batch to write a long standing rule is still the one that finds out**; the gate
-  WARNS before it FAILS. `docs/instrument-rules.md` and `docs/ways-of-working.md` still have no
-  stated ceiling; a ceiling is DERIVED and deriving one is a ruling.
-- **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide — measured
-  at FP), all twelve talent trees are purpose-authored and charter-clean at **324 nodes**, and
-  **the rune layer is authored for all twelve specs** — 60 live against 67 retired, every one of
-  the 60 spec-scoped, and not one of the 60 conditional. **What is left in the rune layer is the
-  DEVOUT'S FIFTH** (owed, two alternatives priced in `docs/reports/FK.md` §7), **the pricing
-  question FN handed over on the Wide Rite and Heavy Bolts, and the Shared Mark's own magnitude —
-  see the queue.** `docs/spec-recon.html` is still the document authoring reads; §7 of
-  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
-  its own (what rung 2 should ASK), and the class merge is now the largest unbuilt item on this
-  list and the one awaiting a ruling.**
+  FIGURES** — read them off that gate's output. **FQ spent 234 bytes of `CLAUDE.md`'s
+  headroom** on the push step's pointer, and deliberately wrote **no standing rule**: the index
+  table lists rules that LIVE in `docs/instrument-rules.md`, and a row pointing at a rule that was
+  never written there is the exact defect that table's own preamble names. **The changelog gained a
+  27th heading**, which `check_dv` §4 carries as a floor rather than an equality.
+- **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide), all twelve
+  talent trees are purpose-authored and charter-clean at **324 nodes**, and **the rune layer is
+  authored for all twelve specs** — 60 live against 67 retired. **The class merge is ruled as a
+  PROJECT rather than a batch and its running order is in the queue below.** What is still open in
+  the rune layer is the **Devout's fifth**, FN's pricing question on the Wide Rite and Heavy Bolts,
+  and the Shared Mark's own magnitude. `docs/spec-recon.html` is still the document authoring
+  reads; §7 of `docs/reports/FK.md` is the correction to it. **The ladder still has an open design
+  question of its own (what rung 2 should ASK).**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -153,6 +154,67 @@ the things a later batch must not re-derive from scratch:
   in `relics.gd`); and the **card classification in §4c is coarse, with both of its instrument
   faults reported in place** — a card that FEEDS an engine without READING it counts as
   engine-free there, which under-states the Pyromancer and the Survivalist most.
+
+### `master.html`'s RUN-SAVE FIGURES ARE STALE — **FOUND AT FQ, MEASURED, DELIBERATELY NOT FIXED**
+
+**`docs/master.html` says the run save is *format v8* and that a save *older than v8* is refused
+and cleared.** `scripts/run_state.gd` writes **v12** (`save_run`) and refuses below **v10**
+(`load_run`). **Both figures are wrong in the one document whose whole job is current truth**, and
+they have been since BM took the version to 10.
+
+- **Found while editing the adjacent profile block at FQ §1**, not by a sweep — nothing sweeps
+  `master.html` for agreement with the code, which is the general form of this item.
+- **NOT FIXED AT FQ**, because correcting it is outside a brief that forbade moving anything and
+  the paragraph is not one §1 or §2 required. **It is a two-number edit** and the numbers are
+  measured above, so the batch that takes it does not need to re-derive them.
+- **THE PROSE AROUND THEM IS STILL RIGHT** — the *refused and cleared rather than half-loaded*
+  reasoning, and the AN/AI precedents, all still describe what `load_run()` does. It is the two
+  version numbers alone that moved.
+
+### THE MERGE'S RUNNING ORDER — **RECORDED AT FQ §3 SO THE SEQUENCE SURVIVES A COMPACTION**
+
+**Ruled: the merge is a PROJECT, not a batch — twelve to fourteen batches — and it is developed on
+its own branch with `main` staying playable** (`docs/ways-of-working.md`). **None of the below was
+done at FQ.** The order is recorded so it is not re-litigated batch by batch:
+
+1. **THE THREE SPINES, ON NOBODY.** Momentum, Channel and Sanctity built and tested **before a
+   single spec dissolves**. FP measured that this touches **none of the 400 authored things**.
+   Channel is nearly free (`note_resource_spent` is already generic and books the NET at the one
+   line every ability pays through; its payout `dmg_bonus` is read at **one** site and is
+   element-blind). Momentum needs an initiative write — damage TAKEN per turn exists twice over
+   and damage DEALT per turn does not exist at all. **Sanctity's potency layer is the largest
+   unbuilt system in the game and is wanted independently of the merge**: its reading half is the
+   cheapest of the three (`add_status` is a single funnel), and its PAYOUT does not exist anywhere,
+   because `STATUS_INFO` holds 156 ids and carries **no magnitude at all**.
+2. **THE TALENT LAYER — 274 new nodes**, authored by the designer and the assistant together.
+   **The long pole.**
+3. **ENGINES TO RUNES, each with its enabler.**
+4. **POOL MERGING.**
+5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
+6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks.
+
+### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD**
+
+**`block_chance` has NO universal baseline.** It defaults to **0.0** (`unit.gd:142`) with no
+sentinel, the **Warden alone** declares it at **0.10** (`classes.gd:5380`), and the only other
+unconditional source is `_plating_slice`, which opens `if u.passive_id == "heavy_plating"`
+(`battle.gd:15488`). **The contrast is `parry_chance`**, which defaults to **−1.0** — a
+*use-the-role-baseline* sentinel — against `PARRY_CHANCE := 0.05` for every hero
+(`battle.gd:7777`). **So `sm_sword_mastery` (+parry%) genuinely survives a merge and
+`wd_unkillable` (on a Block) genuinely does not, and the two are indistinguishable from the
+payload.** Three surviving Warden nodes died to this at FP.
+
+- **AN ENGINE RUNE CARRYING HEAVY PLATING INSTALLS A CLIMB ON A BASE OF ZERO**, and
+  `PROTECTED_CORES` cannot see it **because the enabler table names ABILITIES and this is a STAT**.
+- **THE TABLE SAYS SO ITSELF, WHICH IS THE PART TO KEEP.** `PROTECTED_CORES["warden"]` carries
+  `"enablers": []` with the `why` *"Heavy Plating is a Block-chance rule; it reads no ability."*
+  **The gap is not an oversight the merge discovers — it is documented in the table that has the
+  hole.** **The enabler concept has to cover STATS, not only abilities**, and that is a change to
+  `PROTECTED_CORES`' shape rather than to its contents.
+- **AND ONE NODE ALREADY INSTALLS THE STAT.** `wd_mountain` (Immovable, the Plate capstone) grants
+  `block_chance: 0.20` in its own payload, so a merged Warden node can partially self-enable —
+  which makes the survivor question *"does it reach a non-zero base"* rather than
+  *"does it name the engine"*.
 
 ### THE RUNE LAYER'S OWED ITEMS — **NONE. FN CLOSED THE LAST THREE.**
 

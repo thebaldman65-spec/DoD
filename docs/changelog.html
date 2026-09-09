@@ -15,6 +15,100 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-09 &mdash; Batch FQ: THE VERSION GUARD, AND THE BRANCH</h2>
+<p><b>NO MERGE WORK.</b> No spec dissolved, no pool merged, no engine became a rune, no node
+moved, and <b>not one rune, card, ability, talent, constant or magnitude moved.</b> This batch is
+the two things that had to exist before any of the merge starts.</p>
+
+<p><b>&sect;1 &mdash; <code>Profile._load()</code> HAS A VERSION BRANCH. IT HAD NONE.</b> It
+merged every key it found over the defaults and stamped <code>data["version"] = VERSION</code>
+unconditionally, <b>reading the old value nowhere</b>. FP built the collision rather than
+reasoning about it: a profile carrying six points and three bought cells, asked against a tree
+that no longer holds those ids, returns <code>cells_spent</code> <b>0</b>,
+<code>equipped_learned</code> <b>empty</b> and <code>owns_cell</code> <b>still TRUE</b> &mdash;
+the points come back, the loadout empties, and the ledger keeps cells that now cost nothing.
+<b>The read is not the dangerous half:</b> <code>_save()</code> writes the merged dictionary back
+on the next point earned, so a wrong first load is a bad WRITE, and the designer's live profile
+carries twelve purses at 60&ndash;68 points each.</p>
+
+<p><b>THE SHAPE IS <code>run_state.gd</code>'s, WITH ONE DELIBERATE DIFFERENCE: THIS REFUSAL DOES
+NOT DELETE.</b> <code>load_run()</code> calls <code>clear_save()</code> because a refused run save
+is one run in flight; a refused profile is every run the player has ever finished, so deleting it
+would BE the destruction the guard exists to prevent. It refuses, it leaves the file byte-for-byte
+alone, and it says so.</p>
+
+<p><b>IT REFUSES IN BOTH DIRECTIONS, AND THE CEILING IS THE HALF THAT WAS ALREADY LIVE.</b> A
+version-99 profile loaded clean under the old code, was stamped back down to 2 and re-saved at 2
+&mdash; measured in a driven probe, not reasoned about. <b>FQ &sect;2's branch is what makes that
+routine</b>, because the designer will be switching between a build that writes vN and a build
+that writes vN+1 against one <code>user://profile.json</code>. Five shapes are refused: no version
+key, one above, far above, a JSON file that is not a dictionary, and a file that is not JSON.</p>
+
+<p><b>AND THE REFUSAL IS NOT A QUIET ZERO.</b> The main menu banners what happened, names the
+version it found, names the version range this build reads, <b>says the file has not been changed
+or deleted</b>, and gives its path &mdash; the file is the backup, so finding it is the point.
+<b>Talents is disabled while a profile is refused</b>: a board offering cells to buy with points
+that are not actually gone is the same lie as the silent zero, arriving one screen later.</p>
+
+<p><b>THE FIELD CENSUS, DERIVED RATHER THAN QUOTED.</b> The profile holds <b>13 keys</b>.
+<b>Seven are SPEC-KEYED</b> and read 0 or empty the moment a spec id changes &mdash;
+<code>runs_started</code>, <code>runs_completed</code>, <code>wipes</code>,
+<code>forfeits</code>, <code>talent_points</code>, <code>talent_cells</code>,
+<code>talent_equipped</code>. <b>Two of those seven are keyed a SECOND time on node ids</b>
+(<code>talent_cells</code>, <code>talent_equipped</code>), which is where FP's three silent
+defaults live. <b>Five are safe</b> because they are keyed on nothing the merge renames &mdash;
+<code>bosses_killed</code>, <code>events_seen</code>, <code>zones_cleared</code>,
+<code>flags</code>, <code>talent_tier</code>. The thirteenth is <code>version</code> itself.</p>
+
+<p><b>&sect;1 GETS AN INSTRUMENT AND NOT A PARAGRAPH</b> &mdash; BN's warning about the run save
+sat in documentation for thirty batches doing nothing. <b><code>check_fq.gd</code>: 46 checks.</b>
+&sect;1 drives the branch in both directions, because a guard that never refuses and a guard that
+refuses everything pass the same static check. <b>&sect;2 is the arm the batch exists for</b>: the
+file md5-hashed across <b>five separate write paths</b>. &sect;3 is the lossless round trip, key
+by key and accessor by accessor. <b>&sect;4b drives <code>_save()</code> as the FIRST call of a
+session</b>, which is the only state that distinguishes <code>if refused</code> placed before
+<code>_load()</code> from after it &mdash; a one-line reordering that looks correct either way and
+would leave the guard inert on exactly the write that destroys the file. <b>No version literal is
+pinned anywhere in the gate</b>, per the standing rule learned three times off the run save.</p>
+
+<p><b>SIX CONTROLS, EACH ON THE NEEDLE IT AIMS AT.</b> Ceiling removed &rarr; 11 reds; floor
+removed &rarr; 2, and only &sect;1b; the <code>_save()</code> reordering &rarr; <b>1 red, and it
+is &sect;4b alone</b>; the refusal guard deleted &rarr; 7; a guard that refuses everything &rarr;
+5, caught by the positive arm; a refusal that deletes &rarr; &sect;4c both ways.</p>
+
+<p><b>&sect;2 &mdash; THE MERGE GETS ITS OWN BRANCH, AND THE CONFLICT CONVENTION IS DECIDED NOW.</b>
+Recorded in <code>docs/ways-of-working.md</code>: the merge is developed on its own branch,
+<code>main</code> stays playable, and a merge batch pushes to the branch. <b>The brief predicted
+three files would conflict every batch; the measurement over the last fourteen batches says
+EIGHT.</b> <code>changelog.html</code> and <code>state.md</code> at 14/14;
+<code>CLAUDE.md</code> and <code>master.html</code> at 12/14; <code>baselines.json</code>,
+<code>design-notes.md</code>, <code>pin-manifest.json</code> and <code>run_battery.sh</code> at
+10/14. <b>Two of the five unpredicted ones are not documents:</b> <code>pin-manifest.json</code>
+is DERIVED and must never be hand-merged (take either side, re-run the builder,
+<code>check_ed</code> says whether it is right), and <code>baselines.json</code> merges its ROWS
+cleanly while every number in an engine-bound row is a fact about a GAME rather than about a file.</p>
+
+<p><b>AND <code>master.html</code> IS HARDER THAN <code>CLAUDE.md</code>, WHICH THE BRIEF DID NOT
+EXPECT.</b> It is the one document forbidden to hold history, so during the merge the two sides
+describe <b>different games</b> and their edits are not two versions of one sentence &mdash; it is
+<b>re-derived at the merge point, not merged</b>. <code>CLAUDE.md</code> reconciles by what a rule
+is ABOUT: a rule naming no spec or engine is true on both sides and both survive, a rule naming one
+belongs to the side whose game has it. <b>Measured: 54 of its 108 blocks name a spec or an engine
+and 54 name neither</b> &mdash; a triage that halves the reading, not a procedure that removes it.</p>
+
+<p><b>NO GATE READS THE BRANCH NAME.</b> Swept: <code>run_battery.sh</code> contains no
+<code>git</code> call at all, and the four gate files matching <code>git&nbsp;</code> match it
+inside the word <i>digit</i>. The only live assumption in the tree was <code>CLAUDE.md</code>'s
+push step, which now points at <code>docs/ways-of-working.md</code> rather than restating it.</p>
+
+<p><b>MOVED:</b> <code>scripts/profile.gd</code>, <code>scripts/main_menu.gd</code>,
+<code>check_fq.gd</code> (NEW), <code>run_battery.sh</code>, <code>baselines.json</code> (two rows
+&mdash; its own and <code>check_parse</code> 177&rarr;178), <code>pin-manifest.json</code>,
+<code>docs/ways-of-working.md</code>, <code>CLAUDE.md</code>, <code>docs/master.html</code>,
+this file, <code>docs/state.md</code>, <code>docs/design-notes.md</code> and
+<code>docs/reports/FQ.md</code>. The designer's four save files were copied to
+<code>save-backups/</code> and md5-verified before anything was touched.</p>
+
 <h2>2026-09-09 &mdash; Batch FP: RECONNAISSANCE FOR THE CLASS MERGE</h2>
 <p><b>REPORT ONLY. NOTHING WAS AUTHORED, MERGED, CHANGED, RETIRED OR RETUNED</b> &mdash; no spec
 was collapsed, no engine moved, no node cut, no rune re-scoped, no card changed pool, and not one

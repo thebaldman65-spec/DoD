@@ -244,7 +244,10 @@ FG's, FH's and FI's**, written straight into the reference rather than moved the
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
   `Name_Idle/Walk/Attack01-03/Hurt/Death.png`.
-- Commit AND PUSH (origin/main) after each change batch. Launch the game for playtesting via
+- Commit AND PUSH (origin/main) after each change batch. **A MERGE BATCH PUSHES TO THE MERGE
+  BRANCH INSTEAD, AND CONFIRMS THAT BRANCH'S REMOTE AGAINST LOCAL HEAD — the rule and the
+  per-file conflict conventions live in `docs/ways-of-working.md` and are not restated here
+  (FQ §2).** Launch the game for playtesting via
   `/Applications/Godot.app/Contents/MacOS/Godot --path <this dir>` (background,
   watch stderr for errors).
 

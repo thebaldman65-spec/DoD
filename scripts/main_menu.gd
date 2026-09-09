@@ -47,13 +47,41 @@ func _draw_screen() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
+	# BATCH FQ §1 — THE REFUSAL IS NOT A QUIET ZERO.
+	# `Profile._load()` refuses a profile it cannot read and writes nothing to
+	# it. Without this banner that refusal is INDISTINGUISHABLE FROM A FRESH
+	# START: the tally reads zero, the talent board is empty, and the file the
+	# player wants copied somewhere safe is one they do not know is at risk.
+	# Reading `Profile.refused` requires the load to have happened, which the
+	# call below both does and is the cheapest read on the class.
+	var refusal := Profile.refusal_message()
+	if refusal != "":
+		var warn := Label.new()
+		warn.text = refusal
+		warn.add_theme_font_size_override("font_size", 17)
+		warn.add_theme_color_override("font_color", Color(1.0, 0.76, 0.38))
+		warn.add_theme_constant_override("outline_size", 6)
+		warn.add_theme_color_override("font_outline_color", Color(0.09, 0.02, 0.02))
+		warn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		warn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		warn.position = Vector2(140, 600)
+		warn.size = Vector2(1000, 110)
+		add_child(warn)
+
 	var entries: Array = [
 		["New Game", _on_new_game, true],
 		["Continue", _on_continue, Run.has_save()],
 		# BATCH BM §4: talents are chosen BETWEEN runs, so the tree needs a
 		# home outside one. Always available — a fresh save opens it to a
 		# board with no rows, which is the honest first thing to show.
-		["Talents", _on_talents, true],
+		#
+		# BATCH FQ §1 — WITH ONE EXCEPTION, AND IT IS THE SAME RULE. A board
+		# with no rows is honest when the profile IS empty. On a REFUSED
+		# profile it is a lie: the screen would offer cells to buy with points
+		# that are not gone, spend them against a ledger that will never be
+		# written, and show a loadout the player did not choose. The button is
+		# disabled and the banner above says why.
+		["Talents", _on_talents, not Profile.refused],
 		["Relics", _on_relics, true],
 		["Settings", _on_settings, true],
 		["Exit", _on_exit, true],
