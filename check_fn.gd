@@ -83,8 +83,18 @@ const OLD_CONDITION := {
 # The field each of the eight writes, and the value it writes. Held here so §4
 # asserts the VALUE landed rather than merely that a key appeared — a payload
 # that landed a zero would satisfy `cfg.has(field)` and pay nothing.
+# **BATCH FO — THE ONE OF THE EIGHT THAT MAY CARRY A RETIREMENT, AND WHY.**
+# The Wide Watch was authored against a base the Sharpshooter's OVERKILL node
+# already provided and was worth exactly zero to a holder of both; FO retired it
+# on the Melted Armor contract and replaced it with the Shared Mark. **The list
+# is the population, so an eighth quietly retired rune still reds §1a.**
+const RETIRED_BY_RULING := ["wide_watch"]
+
 const FIELD := {
-	"deepening_hex": ["rune_hex_threshold", 8],
+	# BATCH FO §1 — DEEPENING HEX SUBTRACTS 2 rather than installing 8, and the
+	# field is RENAMED with it: `rune_hex_threshold` holding a decrement would be
+	# a name that lies, and EM's charter says the field name is the rule.
+	"deepening_hex": ["rune_hex_deepen", 2],
 	"wide_rite": ["rune_wide_rite", 1],
 	"bracing_line": ["rune_bracing_line", 5],
 	"long_watch": ["rune_long_watch", 1],
@@ -188,7 +198,18 @@ func _s1_the_eight_are_ungated() -> void:
 		if not scopes.has(sc):
 			scopes.append(sc)
 	ok(missing.is_empty(), "§1a: an id of the eight is not in the file (%s)" % [missing])
-	ok(retired.is_empty(), "§1a: one of the eight was RETIRED rather than ungated (%s)" % [retired])
+	# **BATCH FO RETIRED ONE OF THE EIGHT, BY RULING, AND THIS ARM IS RE-POINTED
+	# RATHER THAN WEAKENED.** It asserted that no one of the eight was quietly
+	# RETIRED instead of ungated — a real guard, because a retirement removes a
+	# rune from the offer and would satisfy "it is not gated" by making it
+	# unreachable. **FO retired the Wide Watch for a different reason entirely**:
+	# it duplicated Overkill's effect and was worth exactly zero to a holder of
+	# that node. So the arm now names the ONE that may be retired and still
+	# refuses the other seven, which is the same guard with the ruling written
+	# into it (the `check_fk` §2 inversion, and for the same reason).
+	ok(retired == RETIRED_BY_RULING,
+		"§1a: the retired set among the eight is %s, not %s — a retirement is a RULING and this is the list of them"
+			% [retired, RETIRED_BY_RULING])
 	ok(priced.is_empty(), "§1a: one of the eight left the flat 100g (%s)" % [priced])
 	ok(still_gated.is_empty(), "§1a: one of the eight STILL carries a condition (%s)" % [still_gated])
 	scopes.sort()

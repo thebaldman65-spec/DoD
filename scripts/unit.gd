@@ -1432,7 +1432,7 @@ var rune_gluttony_ranks := 0  # rune-owned: the Hollow Chalice +3
 # third state and no read site needs to ask a second question.
 #
 # Occultist —
-var rune_hex_threshold := 0   # rune-owned: Deepening Hex installs 8
+var rune_hex_deepen := 0      # rune-owned: Deepening Hex SUBTRACTS 2 (FO §1)
 var rune_ruin_leech_cap := 0.0 # rune-owned: the Standing Mark +0.20
 var rune_split_tongue := 0    # rune-owned: Split Tongue 1 (a FLAG)
 var rune_wide_rite := 0       # rune-owned: the Wide Rite +1 to the mark
@@ -1458,7 +1458,11 @@ var rune_no_block := 0        # rune-owned: Bared Plate 1 (a FLAG) — he cannot
 var rune_keen_focus := 0      # rune-owned: Keen Focus 1 (a FLAG)
 var rune_heavy_bolts := 0     # rune-owned: Heavy Bolts 20 (points off the split)
 var rune_ambush := 0          # rune-owned: Ambush 1 (a FLAG)
-var rune_wide_watch := 0      # rune-owned: the Wide Watch 1 (a FLAG)
+var rune_wide_watch := 0      # rune-owned: the Wide Watch 1 (a FLAG) — RETIRED at
+                              # FO §2, and the field and its read site are KEPT:
+                              # a saved run holding the rune keeps working, the
+                              # `rune_split_tongue` contract
+var rune_shared_mark := 0     # rune-owned: the Shared Mark 1 (a FLAG)
 var rune_long_draw_presses := 0 # rune-owned: the Long Draw +1 press at every stage
 # Beastmaster —
 var rune_long_leash := 0      # rune-owned: the Long Leash +3 to the split point

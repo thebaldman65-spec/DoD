@@ -351,9 +351,18 @@ const TAG_DOOR := "loadout_condition_met"
 # seven that stayed, and §4 builds its failing loadouts off `TAG_ORDER` and
 # `card_tag_primary`. **It changes no behaviour and it is not exempted; it is
 # listed.**
+# **BATCH FO ADDED THE ELEVENTH, AND IT IS THE SIXTH BATCH RUNNING TO LEARN
+# THAT A NEW GATE JOINS THIS LIST BY EXISTING.** `check_fo.gd` §2c asserts the
+# Shared Mark carries a `RUNE_TAGS` row — the new rune replaces the Wide Watch,
+# whose row is KEPT because a retired entry still resolves, so the table grows
+# where the live pool does not and `check_fe` §1's RESOURCE column moves with
+# it. **It changes no behaviour and it is not exempted; it is listed.**
+# **AND THIS ARM CAUGHT IT RATHER THAN THE BATCH PREDICTING IT**, which is the
+# same sentence the five notes above carry: the pre-pass that would have found
+# it has to run EVERY gate, and a chosen subset is what keeps missing this one.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
-	"check_fk.gd", "check_fn.gd", "check_map_screen.gd"]
+	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds
@@ -525,8 +534,26 @@ const CLASH_EXEMPT := {
 	# is the Occultist's whole board; the word in the name is doing different
 	# work from the word in the vocabulary, which is exactly the case the
 	# exemption list exists to record rather than to hide.
+	# **BATCH FO ADDED THE SIXTH, AND IT IS THE SECOND RUNE — CAUGHT BY THIS
+	# GATE RATHER THAN BY THE BATCH.** FO's own BR §1 sweep over 1,363 labels
+	# read the Shared Mark clean on both hard tests (0 exact, 0 containment) and
+	# flagged nineteen shared-word near-misses; **this equality is what turned
+	# one of them into a decision.** It is the EZ case again: the mark the rune
+	# names is the Sharpshooter's `last_attack_target` — a lasting mark on ONE
+	# enemy, so it really is a mark and the word is doing the same work — while
+	# **the rune's own tag row is `["RESOURCE"]` and not MARK**, because what
+	# the rune DOES is build a meter. The word in the name and the word in the
+	# vocabulary are different work, which is precisely what this list records
+	# rather than hides.
+	#
+	# **AND THE SET COMPARISON IS WHY IT ARRIVED AT ALL.** A subtraction would
+	# have let a sixth collision hide behind five older ones; the equality made
+	# a new name a red the day it landed. `Quarry's Mark` is in this list and is
+	# the sharpest neighbour the new rune has — a live SHARPSHOOTER card in his
+	# own pool, read by the same function — and it SHIPS, which is BR §1's
+	# disposition for a label collision: nothing resolves a rune by name.
 	"MARK": ["ability:Hunter's Mark", "ability:Mark of the Hunt",
-		"ability:Quarry's Mark", "rune:Standing Mark",
+		"ability:Quarry's Mark", "rune:Shared Mark", "rune:Standing Mark",
 		"status label:Hunter's Mark"],
 	# **DEFENSE MEETS THE DEFENSE POTION, AND THE POUCH BUTTON RENDERS IT ON
 	# THE SAME SCREEN.** `map_screen._draw_footer` prints

@@ -12024,6 +12024,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_poison(qm_h, qm_t, 2)
 					_log("   → Quartermaster: %s's blade carries %s's poison" % [
 						attacker.unit_name, qm_h.unit_name], "#70d878")
+		# BATCH FO §2 — THE SHARED MARK, AND IT SITS BESIDE THE ENGINE RATHER
+		# THAN INSIDE IT. `_sharpshooter_focus` is the HOLDER's own engine and
+		# does the streak bookkeeping (`same_target_turns`, Reacquire, the
+		# switch rules); an ally's blow moves none of that and must not be able
+		# to. It reads the same gate the block below reads — a damaging,
+		# non-counter cast at a live enemy — so **his own shot and an ally's are
+		# counted by ONE rule**: neither asks whether the blow landed, both fire
+		# once per CAST (the AZ rule), and the two can therefore never disagree
+		# about what "attacked the mark" means.
+		if attacker.is_hero and ab.damage > 0 and not is_counter \
+				and target != null and not target.is_hero:
+			_shared_mark_focus(attacker, target)
 		# Sharpshooter: the Focus engine, the promised shot's spending, the
 		# pin, the called spot, and the spray's echo.
 		#
@@ -15622,6 +15634,40 @@ func _unique_enemy_debuffs() -> int:
 # chip text read.
 const RUIN_THRESHOLD := 10
 
+
+# BATCH FO §1 — THE FLOOR UNDER THE RUIN THRESHOLD, AND THE NUMBER IS A RULING
+# RATHER THAN AN ARITHMETIC CONSEQUENCE.
+#
+# **THREE IS THE DEEPEST THE LIVE TREE CAN REACH**: Avatar of Ruin installs 5
+# and Deepening Hex subtracts 2, so `maxi(5 - 2, 3)` is 3 and this floor changes
+# nothing today. **IT IS NOT CHOSEN TO CHANGE NOTHING** — it is chosen because a
+# subtraction is open at the bottom where the `mini` it replaced was not, and the
+# next thing that lowers this number composes with the rune rather than
+# competing with it.
+#
+# **WHY NOT 1, WHICH IS ALL THE ARITHMETIC NEEDS.** `_gain_ruin` arms on
+# `st % step == 0` and `_stamp_ruin_chip` prints `int(stacks / step)`, so ZERO is
+# a division-by-zero and any floor at all answers that. **1 answers it and rules
+# on something nobody asked to rule on**: at a threshold of 1 every single stack
+# detonates, which is not a deeper hex — it is a different mechanic wearing the
+# same name, and the detonation stops being a payoff the mark is *earned* toward.
+# 2 is the same objection one step along.
+#
+# **THREE KEEPS THE SHAPE AX BUILT AND BF PRICED.** The detonation is periodic
+# and the period is what the Occultist's whole Ruin lane accumulates against;
+# the chip says *"Ruin detonates at N stacks"* and N has to be a cadence for
+# that sentence to mean anything. **A floor is not a balance number here — it is
+# the boundary at which the mechanic stops being itself**, and moving it is a
+# design decision that has to be taken on purpose.
+#
+# **AND THE HAZARD THE FLOOR CREATES IS NAMED RATHER THAN LEFT TO BE FOUND:**
+# the day anything else lowers the threshold to 3 or below, Deepening Hex is
+# worth EXACTLY ZERO again — the same shape FN flagged on the `mini`, arriving
+# through the floor instead. `check_fo` §1 asserts the floor bites AND asserts
+# that at today's numbers the rune is still worth its full 2, so a future
+# threshold change cannot quietly re-open the hole this batch closed.
+const RUIN_FLOOR := 3
+
 # §1's runaway guard. The per-stack lifesteal reads uncapped stacks, so without
 # this the party would out-heal its own damage on a long boss. Soul Leech,
 # Gluttony and Soul Glut all sit UNDER it.
@@ -15659,14 +15705,32 @@ func _ruin_threshold() -> int:
 	var step := RUIN_THRESHOLD
 	if occ != null and occ.avatar_ruin > 0:
 		step = occ.avatar_ruin
-	# BATCH EZ §1 — DEEPENING HEX installs 8, in the same field shape the
-	# capstone uses. **IT IS A `mini`, NOT AN ASSIGNMENT, AND THAT MATTERS:**
-	# Avatar of Ruin already installs 5, so an Occultist holding both would
-	# otherwise have the rune UNDO his capstone and push detonation back from
-	# every 5th stack to every 8th. A rune sold as deepening the hex making it
-	# shallower is the class of fault that reads exactly like the rune working.
-	if occ != null and occ.rune_hex_threshold > 0:
-		step = mini(step, occ.rune_hex_threshold)
+	# BATCH FO §1 — DEEPENING HEX SUBTRACTS 2; IT NO LONGER INSTALLS 8.
+	#
+	# **THE `mini` IT REPLACES WAS CORRECT AND WAS WRITTEN FOR A REAL REASON.**
+	# EZ chose it so a rune sold as *deepening* the hex could never make a
+	# capstone holder's detonation SHALLOWER: Avatar of Ruin installs 5, and an
+	# ASSIGNMENT of 8 would have pushed him back from every 5th stack to every
+	# 8th, which is the class of fault that reads exactly like the rune working.
+	# **THAT PROPERTY STILL HOLDS HERE** — a subtraction can only ever lower the
+	# number — and `check_ez` §5 still asserts it in both directions rather than
+	# being deleted for having had its subject changed.
+	#
+	# **WHAT THE `mini` COST WAS THE CAPSTONE HOLDER, AND FN MEASURED IT AT
+	# ZERO.** `mini(5, 8)` is 5, so an Occultist holding Avatar of Ruin bought
+	# the rune and got nothing at all. The subtraction pays every build the same
+	# TWO stacks: **10 → 8 without the capstone, 5 → 3 with it.**
+	#
+	# **THE FLOOR IS `RUIN_FLOOR` AND IT IS DELIBERATE, NOT A GUARD AGAINST
+	# ZERO.** A subtraction is open at the bottom in a way an assignment never
+	# was: anything else that lowers the threshold composes with this rune and
+	# walks the number down. `st % step` and `int(stacks / step)` both divide, so
+	# 0 is a runtime error rather than a balance question — but a floor placed at
+	# 1 to answer only that would let a future effect turn Ruin into a
+	# **per-stack** detonation, which is a different mechanic and a ruling
+	# nobody would have made. See the constant for the number and the reasoning.
+	if occ != null and occ.rune_hex_deepen > 0:
+		step = maxi(step - occ.rune_hex_deepen, RUIN_FLOOR)
 	return step
 
 
@@ -22567,6 +22631,14 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 		victim.hit_react((victim.position - comp.position).normalized())
 	_log("%s: strikes %s for %d%s" % [comp.unit_name, victim.unit_name, final,
 		" CRIT" if is_crit else ""], "#d8b880")
+	# BATCH FO §2 — THE SHARED MARK'S COMPANION ARM. *Ally* is heroes AND
+	# companions (CV §4), and a beast's blows never enter the hero strike loop —
+	# so without this line the card would say the wide word and the code would
+	# implement the narrow one, which is DJ §1's failure and it reports nothing.
+	# **The unit here is the BLOW rather than the cast**, which is what this
+	# function is: Ursus's adjacent sweep lands on other bodies, so only a blow
+	# that strikes the mark itself can reach the branch inside.
+	_shared_mark_focus(comp, victim)
 	# Symbiosis and the Mark: the beast's blows feed the hunter's Mana.
 	if pm != null and not pm.dead:
 		var fed := 0
@@ -23112,6 +23184,30 @@ const FOCUS_UNCAPPED := -1
 const COUP_FOCUS_CAP := 200
 
 
+# BATCH FO §2 — WHAT AN ALLY'S BLOW ON THE MARK IS WORTH, AND IT IS A QUARTER
+# OF HIS OWN.
+#
+# **THE NUMBER IT IS PRICED AGAINST IS 20** — `_sharpshooter_focus`'s base for a
+# consecutive attack on the same mark (`20 + muscle_memory_ranks +
+# rune_muscle_memory_ranks`, and both those terms are zero on an untalented
+# hero). An ally's blow should plainly be worth less than his own, and the
+# question a ratio has to answer is *how much less*.
+#
+# **A QUARTER IS THE LARGEST SHARE THAT KEEPS HIS OWN SHOT THE BIGGEST SINGLE
+# SOURCE UNDER EVERY PARTY.** The ally population in a legal run is the THREE
+# other heroes (a companion cannot stand beside him — see `_shared_mark_focus`),
+# so a full round of party fire on his mark pays 3 x 5 = **15 against his own
+# 20**. At a half it would pay 30, and the rune would stop supplementing his
+# patience and start replacing it — which is the thing HELD VALUE AND SPEND
+# FREQUENCY (BI §1) says a meter cannot afford.
+#
+# **IT IS A CONSTANT AND NOT A LITERAL BECAUSE THE MAGNITUDE IS THE DESIGNER'S**
+# and this batch proposes it rather than ruling it: one number, one place, and
+# `docs/reports/FO.md` §2 carries the derivation so a re-tune is a decision
+# rather than a rediscovery.
+const SHARED_MARK_FOCUS := 5
+
+
 func _focus_cap(u: BattleUnit) -> int:
 	if u.spray > 0:
 		return 50
@@ -23457,6 +23553,56 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 				victim.unit_name, attacker.second_resource], "#e0a050")
 			attacker.refresh_bars()
 	attacker.last_attack_target = victim
+
+
+# ══ BATCH FO §2 — THE RUNE OF THE SHARED MARK ══════════════════════════════
+#
+# **THE MARK IS `last_attack_target` AND THERE IS NO SECOND DEFINITION.**
+# `_focus_mark` already reads that field for the bot's own targeting — *"a
+# Sharpshooter aims everything he casts at the enemy he is already working"* —
+# so *the enemy he is working* is one concept with one owner, and this rune
+# reads the same field rather than deriving its own idea of a mark.
+#
+# **IT PAYS THROUGH `_gain_focus`, WHICH IS THE ONLY WAY IN.** Spray of Arrows'
+# 50-point ceiling, the conversion-point signature and the deepest-Focus ledger
+# all read the meter through that function, and a second write site would be a
+# second set of rules for one meter. This function computes WHO and HOW MUCH and
+# hands the number to the engine, exactly as `_pay_sequence_focus` does.
+#
+# **IT IS "ALLY", WHICH IS HEROES AND COMPANIONS (CV §4 / DM §3), AND THE
+# COMPANION HALF IS WHY THIS IS A FUNCTION RATHER THAN A LINE.** A companion's
+# blows go through `_companion_hit`, a separate damage path that never enters
+# the hero strike loop — so a hook written only at the ability site would have
+# implemented the narrow word while the card said the wide one, which is DJ §1's
+# exact failure and it reports nothing when it happens. ONE function, BOTH
+# paths, so they cannot disagree (`_metronome_left`'s precedent).
+#
+# **AND THE COMPANION ARM IS UNREACHABLE IN A LEGAL PARTY, WHICH IS RECORDED
+# HERE RATHER THAN LEFT TO BE FOUND.** A run's party is one of each class
+# (`draft_screen.ROSTER`), the Sharpshooter IS the Hunter, and companion
+# summoning is the Beastmaster's exclusive axis (DR §1; `check_dr` reds a
+# `special: "summon"` ability authored onto the Sharpshooter) — so no beast can
+# stand beside a Sharpshooter today. **The arm is written and DRIVEN anyway**:
+# `check_fo` §2 seats both Hunter specs through the fixture and measures the
+# Focus arriving off a live companion's blow, which is DK §1's rule met with a
+# real measurement rather than with an argument that it cannot be measured.
+#
+# **THE ATTACKER IS NEVER THE HOLDER.** His own blow on his own mark is already
+# paid by `_sharpshooter_focus` at 20 + Muscle Memory; paying it here as well
+# would be a second write site for the same event wearing a rune's name.
+func _shared_mark_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
+	if attacker == null or victim == null or victim.is_hero:
+		return
+	for h in heroes:
+		if h == attacker or h.dead or h.rune_shared_mark <= 0:
+			continue
+		if h.second_resource_name != "Focus":
+			continue
+		if h.last_attack_target != victim:
+			continue
+		_gain_focus(h, SHARED_MARK_FOCUS)
+		_log("   → Shared Mark: %s works %s's mark — +%d Focus" % [
+			attacker.unit_name, h.unit_name, SHARED_MARK_FOCUS], "#a0d060")
 
 
 # A beast has died: Loyalty breaks (or endures at half under Steadfast

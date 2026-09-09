@@ -121,7 +121,14 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# because thirty-nine rows were added, and the column table is kept (rather
 	# than reduced to the two zeroes) for the reason it was written: a gate that
 	# only counted BREAK would pass on a table somebody had rewritten wholesale.
-	var want := {"DEBUFF": 34, "DEFENSE": 35, "BREAK": 0, "RESOURCE": 27,
+	# **BATCH FO MOVED RESOURCE 27 -> 28 AND NOTHING ELSE.** §2 authors the
+	# Shared Mark, whose primary is RESOURCE — it builds a meter — and retires
+	# the Wide Watch, whose row is KEPT (a retired entry still resolves and this
+	# table is keyed by id). **A one-out-one-in replacement therefore grows a
+	# column here where it leaves the LIVE pool at sixty**, which is the one
+	# place those two counts disagree, and it is why the column table is asserted
+	# rather than derived.
+	var want := {"DEBUFF": 34, "DEFENSE": 35, "BREAK": 0, "RESOURCE": 28,
 		"OFFENSE": 25, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
@@ -129,8 +136,8 @@ func _s1_rune_tags_follow_the_cards() -> void:
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 126,
-		"§1: the table is %d rows, not the 126 after FK" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 127,
+		"§1: the table is %d rows, not the 127 after FO" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

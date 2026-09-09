@@ -93,12 +93,17 @@ func _s0_the_pool() -> void:
 	# checked for a RULE hiding inside it before it was moved, and the two that
 	# hold one — SCOPE IS SPEC ONLY, and price is flat 100g — are equalities over
 	# the whole live pool and did not have to move at all.
-	print("\n§0 — the pool: sixty live, sixty-six retired")
+	# **BATCH FO MOVED IT 126 -> 127 AND LEFT THE LIVE COUNT AT SIXTY.** §2
+	# retires the Wide Watch and authors the Shared Mark in its place; the ENTRY
+	# is kept (the Melted Armor contract), so a one-out-one-in replacement grows
+	# the file by one — the FC Split Tongue / Shared Ruin shape exactly, and
+	# `check_es` §1's own comment already records it.
+	print("\n§0 — the pool: sixty live, sixty-seven retired")
 	var data := _data()
 	var ez := _ez_ids()
 	ok(ez.size() == 60, "§0: %d entries carry no retirement, expected 60 live runes"
 		% ez.size())
-	ok(data.size() == 126, "§0: the authored pool is %d entries, expected 126" % data.size())
+	ok(data.size() == 127, "§0: the authored pool is %d entries, expected 127" % data.size())
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the
@@ -433,16 +438,39 @@ func _s5_the_read_sites() -> void:
 	var bm: BattleUnit = heroes[3]
 
 	# ---- Occultist: the threshold IS the function, both ways ----
+	#
+	# **BATCH FO §1 — DEEPENING HEX SUBTRACTS 2 NOW, AND THESE ARMS ARE
+	# RE-POINTED RATHER THAN DELETED.** They asked whether the rune deepens the
+	# hex and whether it can ever make a CAPSTONE holder's detonation shallower;
+	# both questions survive the change and both are still asked here, against
+	# the new arithmetic. **A gate that stops asking because its subject moved is
+	# the failure this project has spent forty batches removing.**
+	#
+	# **AND THE `mini` THIS REPLACES WAS CORRECT.** It stopped a rune that
+	# ASSIGNED 8 pushing an Avatar of Ruin holder BACK from every 5th stack to
+	# every 8th. What it cost was that holder: `mini(5, 8)` is 5, so the rune paid
+	# him nothing — FN measured it and FO took it. A subtraction keeps the
+	# property and pays every build the same two stacks.
 	ok(scene._ruin_threshold() == 10, "§5: Ruin detonates every 10th by default")
-	occ.rune_hex_threshold = 8
-	ok(scene._ruin_threshold() == 8, "§5: Deepening Hex moves it to 8")
-	# **AND IT CANNOT UNDO THE CAPSTONE.** Avatar of Ruin installs 5; a rune
-	# that ASSIGNED would push detonation back to 8 and read as working.
+	occ.rune_hex_deepen = 2
+	ok(scene._ruin_threshold() == 8, "§5: Deepening Hex takes two off it — 10 to 8")
+	# **AND IT STILL CANNOT UNDO THE CAPSTONE.** Avatar of Ruin installs 5; a
+	# rune that ASSIGNED would push detonation back to 8 and read as working.
 	occ.avatar_ruin = 5
-	ok(scene._ruin_threshold() == 5,
-		"§5: ...and with Avatar of Ruin held it stays 5 — the rune never makes it SHALLOWER")
+	ok(scene._ruin_threshold() == 3,
+		"§5: ...and with Avatar of Ruin held it reads 3 — the rune never makes it SHALLOWER")
+	ok(scene._ruin_threshold() < 5,
+		"§5: ...and it is worth SOMETHING to that holder, which the `mini` never was")
+	# **THE FLOOR, WHICH THE `mini` NEVER NEEDED.** A subtraction is open at the
+	# bottom where an assignment is not: anything else that lowers the threshold
+	# composes with this rune. `RUIN_FLOOR` is 3 — the exact bottom of the live
+	# tree — and it is driven here at an edge the live tree cannot reach, because
+	# what it guards is a composition that does not exist yet.
+	occ.avatar_ruin = 4
+	ok(scene._ruin_threshold() == 3,
+		"§5: ...and the floor holds a 4-threshold at 3 rather than letting the subtraction reach 2")
 	occ.avatar_ruin = 0
-	occ.rune_hex_threshold = 0
+	occ.rune_hex_deepen = 0
 
 	# ---- Occultist: SPLIT TONGUE WIDENS AND SAYS NOTHING ABOUT DAMAGE ----
 	# **BATCH FB §1 — FA's 12% IS REVERTED AND THE CLAUSE IS REMOVED, NOT SET

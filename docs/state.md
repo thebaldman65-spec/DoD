@@ -13,92 +13,100 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-08 (Batch FN).*
+*Last rewritten: 2026-09-08 (Batch FO).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FN — THE EIGHT GATED RUNES COME OFF THEIR CONDITIONS.** THRESHOLD and BREADTH are
-  retired and the eight runes that still carried them are unconditional — payload, label and the
-  clause on the card, all three. Full working: **`docs/reports/FN.md`**.
-- **THE MEASUREMENT IS THE HALF NOBODY HAD DONE, AND TWO OF THE EIGHT WERE UNREACHABLE AT A FULL
-  BAR.** Read as the exact share of a spec's reachable loadouts satisfying the clause at each rung:
-  **Deepening Hex 69–86%** (near enough a free clause) down to **Heavy Bolts 0–8%** and **the Wide
-  Rite 0–4%**. **Heavy Bolts' MARK threshold cannot be met by a Sharpshooter carrying seven drafted
-  cards** — his whole pool holds three MARK primaries against the four the fraction needs — and
-  **the Wide Rite's breadth cannot be met by an Occultist at five or at seven.** Both readings,
-  with boss trophies and without, agree. The spread across the eight is **55× wide** and every one
-  of them was sold at the same 100g. Per-rune table: `docs/reports/FN.md` §1.
-- **THREE OF THE EIGHT CARRY A SECOND GATE THAT WAS NEVER THE SECONDARY, AND TWO OF THE THREE WERE
-  ON NOBODY'S RECORD.** FL named the shape off Bracing Line's Heavy Plating +32%; reading all eight
-  read sites found two more, both worse, because both make the rune worth **exactly zero**:
-  **Deepening Hex pays nothing to an Occultist holding Avatar of Ruin** (`mini(5, 8)` is 5 — the
-  capstone already detonates every 5th stack), and **the Wide Watch pays nothing to a Sharpshooter
-  holding Overkill**, whose node text carries the rune's own clause word for word. **Flagged, not
-  retuned — see the queue.**
-- **THE MACHINERY CAME OUT BECAUSE NOTHING ELSE USED IT, AND WHAT STAYS IS SAID TO STAY.** Nine
-  functions, one door call and two screen lines: `Runes.threshold_met`, `breadth_met_fraction`,
-  `drafted_names`, `loadout_condition_met`, `threshold_line`, `breadth_line`,
-  `Classes.primary_tag_count` / `primary_tag_census` / `primary_tag_peak`, the
-  `Runes.loadout_condition_met` call inside `Talents.condition_met`, and the `RUNE CONDITIONS` line
-  on the hero sheet and the loadout panel. **`git log -S` put all three `primary_tag_*` helpers in
-  BATCH EZ and EZ's own report says why** — a condition needs a partition and a census is not one —
-  **so they came in with the conditions and went out with them.** KEPT, each for a stated reason:
-  `Classes.tag_count` / `tag_census` / `tag_breadth` (older, ES §4's, and `check_es` §4 prints the
-  per-spec core-kit table off them every battery), `card_tag_primary` (older still — EK's, zero
-  callers, kept and asserted the way `rune_tag_line` is), `Runes.tag_threshold_met` and
-  `breadth_met` (ES §4/§5's ABSOLUTE-count shapes over the whole bar — **a different question, and
-  the door a future tag-reading rune comes back through**), and the `CARRIED BY TAG` census on both
-  screens, **because the tags are player-facing on the draft card and are not conditions.**
-- **THE COUNT WAS EIGHT AND ELEVEN LINES SAID SIX; ALL ELEVEN ARE CORRECTED.** `check_fk.gd` ×5,
-  `scripts/runes.gd` ×1, `docs/master.html` ×3, `docs/changelog.html` ×1 and `docs/reports/FK.md`
-  §9 — the last **struck rather than rewritten**, because the report is closed. The three *"six
-  live runes"* strings still in the tree are FL's own **quotations of the wrong line** and they
-  stay.
-- **`check_fk` §2's ARM INVERTED RATHER THAN BEING DELETED.** It asserted the eight were STILL
-  GATED so *"none is authored"* could not be satisfied by quietly ungating them; it now asserts
-  none carries a condition or a label — the same guard against a silent re-gating. The count does
-  not move.
-- **THE RECONNAISSANCE BATTERY FOUND TWO REDS NOBODY PREDICTED AND ONE OF THEM IS THE SHARPEST
-  THING IN THE BATCH.** `check_es` §5 asserted a FLOOR of four live BREADTH runes, with its own
-  comment saying the floor *"stops the shape going quietly extinct"* — and FN made it extinct
-  **loudly, by ruling**, which is the one case a floor was never guarding against. **It inverts to
-  an equality at ZERO**, which asks a live question where a floor asked a dead one. The other was
-  `check_ed`: four pins anchored on the removed predicates, found because **the manifest was read
-  BEFORE it was regenerated.**
-- **§3 — THE `.docx` CONTRADICTION IS CLOSED AND THE REASON IS MECHANICAL.** `CLAUDE.md`'s
-  *Working agreement* step (3) required rebuilding both exports on every design change while the
-  designer's ruling that they stay stale lived only in `docs/reports/FH.md` §4. **Step (3) now
-  carries the ruling AND its reason**: `build_docs.py` reads the LIVE changelog, which is the
-  recent half only, so a rebuild would overwrite `DoD Changelog.docx` with a fraction of itself.
-  **That is not a stale export becoming fresh; it is an archive being destroyed.** The script is
-  kept.
-- **WHAT MOVED:** `data/runes.json` (eight `desc` strings, eight `condition` objects, and nothing
-  else — no price, scope, lane or `requires_ability`); `scripts/runes.gd`, `scripts/classes.gd`,
-  `scripts/talents.gd`, `scripts/party_screen.gd`, `scripts/map_screen.gd`; `gate_fixture.gd` (a
-  fourth `opts` key, `party`); `check_ez.gd`, `check_fd.gd`, `check_fe.gd`, `check_fh.gd`,
-  `check_ek.gd`, `check_es.gd`, `check_fk.gd`, **`check_fn.gd` (NEW)**, `run_battery.sh`,
-  `baselines.json`, `pin-manifest.json` (1437 → 1440); `CLAUDE.md`, `docs/master.html`,
-  `docs/text-standard.html`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FK.md`,
-  this file and `docs/reports/FN.md`. **No card, ability, talent, constant or magnitude moved** —
-  `BRACING_LINE_LEVEL` is still 32, `RUIN_THRESHOLD` still 10, `FOCUS_CONVERT` still 100.
-- **Next letter: FO.**
+- **Last batch: FO — TWO RUNES FN FLAGGED, RULED.** Deepening Hex subtracts 2 from the Ruin
+  threshold instead of setting it to 8, under a floor of 3; the Wide Watch is retired and the
+  Shared Mark replaces it; the `Overkill` collision is confirmed and ruled on by nothing. Full
+  working: **`docs/reports/FO.md`**.
+- **BOTH RUNES WERE WORTH EXACTLY ZERO TO A HERO HOLDING ONE TALENT NODE, AND IN BOTH CASES THE
+  CODE WAS CORRECT.** `mini(step, 8)` against a capstone installing 5 is 5 — and the `mini` was
+  written on purpose, to stop a rune sold as *deepening* the hex pushing detonation BACK. The Wide
+  Watch sat one `elif` above the arm Overkill reaches. **There was nothing to repair in either
+  handler; there were two decisions to take.**
+- **THE FLOOR IS THE PART THAT NEEDED DECIDING, AND IT IS A RULING RATHER THAN ARITHMETIC.**
+  `_gain_ruin` arms on `st % step == 0` and the chip prints `int(stacks / step)`, so ZERO throws —
+  **and any floor answers that; a floor chosen only to answer it is 1.** At a threshold of 1 every
+  stack detonates, which is a different mechanic wearing the same name. **`RUIN_FLOOR := 3` is the
+  exact bottom of the live tree** (Avatar of Ruin's 5 minus the rune's 2), so it changes nothing
+  today and forces the next batch that wants a shallower period to rule on it.
+- **AND A SUBTRACTION IS OPEN AT THE BOTTOM WHERE AN ASSIGNMENT IS NOT — WHICH RE-OPENS FN'S HOLE
+  BY A NEW ROUTE.** Nothing could compose with `mini(step, 8)` below 5; everything composes with a
+  subtraction, and **at the floor the rune is worth zero again.** `check_ez` §5's two assertions
+  are RE-POINTED, not deleted — 10 / 8 / **3**, plus a fourth arm for the floor — and `check_fo`
+  §1e adds the arm a property could never carry: **a STRICT inequality on both builds**, because
+  *never shallower* is satisfied by `mini` itself. **That is the arm that goes red the day
+  something else lowers the threshold.**
+- **THE BRIEF'S *"word for word"* WAS TRUE IN SUBSTANCE AND WRONG AS WORDED, AND THE WORDING IS THE
+  HALF THAT MATTERS.** Measured: the longest phrase the Overkill node's text and the Wide Watch's
+  `desc` share is **`rather than`**, and the node's clause appears verbatim in **zero** rune
+  descriptions. **What made the rune worth nothing was the CODE**, visible only from the handler —
+  the FK §7 Standing Ground shape. The retirement string says *authored against a base a node
+  already provided* and names the node, rather than repeating a claim a sweep refutes.
+- **THE SHARED MARK: 100g, `spec:sharpshooter`, PASSIVE — *"An ally attacking the enemy he last
+  attacked builds him 5 Focus."*** It reads `last_attack_target` (one definition of *the enemy he
+  is working*, shared with `_focus_mark`) and pays through `_gain_focus`, **proved behaviourally**
+  by parking the meter on Spray of Arrows' 50-point ceiling, which lives inside that function and
+  nowhere else. **The name is BARE**: all 60 live entries are, all 61 `Rune of the…` names are
+  retired, and a live long name would red `check_fd` §3.
+- **A COMPANION COUNTS AS AN ALLY, AND THE ARM IS UNREACHABLE IN A LEGAL RUN BY TWO INDEPENDENT
+  STRUCTURES.** A party is one of each class, the Sharpshooter IS the Hunter, and summoning is the
+  Beastmaster's exclusive axis (DR §1) — **so no beast can stand beside him.** The word stays ALLY
+  and `_companion_hit` calls the same function, because **the five recorded reasons a companion
+  cannot receive something are all about a RECIPIENT and here the companion is the ATTACKER**;
+  narrowing would need a sixth reason that is really a fact about the party. **DK §1 is met with a
+  MEASUREMENT**: `check_fo` §2g seats both Hunter specs through the fixture — an illegal party, and
+  it says so — summons a real Canis and reads the Focus arriving.
+- **THE NAME SWEEP FOUND NINETEEN NEAR-MISSES WHERE THE BRIEF NAMED FOUR, AND THE SHARPEST IS ONE
+  IT DID NOT NAME.** 1,363 labels, 0 exact and 0 containment for `Shared Mark`. **`Quarry's Mark`
+  is a live SHARPSHOOTER card in his own reachable pool, read by the very function the new rune
+  sits beside** — same spec, same mechanic, same meter. **It ships and is FLAGGED** (its status id
+  is `quarry`, not `mark`), which is BR §1's disposition for a label collision.
+- **§3 — THE `Overkill` COLLISION IS CONFIRMED AND NOTHING IS RENAMED.** `bz_warcry`
+  (berserker / Warpath / row 7) and `ss_overkill` (sharpshooter / **Penetration** / row 7).
+  **Its only home was a comment beside one of the two nodes, and that comment had the lane wrong** —
+  *Precision* for *Penetration*. The word is corrected; `check_fo` §3 asserts the pair off the trees
+  so the finding cannot evaporate into a closed report.
+- **TWO OF THE BRIEF'S PREMISES CREDITED FN WITH WORK THAT IS CX's AND FK's.** The Crushing Blow
+  ruling is **CX's** (it renamed the enemy ability) and the *"ten exact collisions where a brief
+  named five"* sweep is **FK's**; FN ran no name sweep. Neither cost anything — both METHODS are
+  right and both were run — but a batch taking either on trust would have cited the wrong report in
+  four documents. **`docs/reports/FO.md` §0 carries all 22 premises.**
+- **WHAT MOVED:** `data/runes.json` (Deepening Hex's `desc` and payload, the Wide Watch's `retired`
+  string, **one new entry — 126 → 127**); `scripts/battle.gd` (`RUIN_FLOOR`, `_ruin_threshold`,
+  `SHARED_MARK_FOCUS`, `_shared_mark_focus` and its two call sites), `scripts/unit.gd`
+  (`rune_hex_threshold` → **`rune_hex_deepen`**, and `rune_shared_mark`), `scripts/runes.gd`
+  (`STAT_INT_KEYS`, `RUNE_TAGS`, `RUNE_SHAPES`), `scripts/talents.gd` (**one comment word**:
+  Precision → Penetration); `check_ez.gd`, `check_es.gd`, `check_fe.gd`, `check_fn.gd`,
+  **`check_fo.gd` (NEW)**, `run_battery.sh`, `baselines.json`, `pin-manifest.json`; `CLAUDE.md`,
+  `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, `docs/spec-recon.html`, this
+  file and `docs/reports/FO.md`. **No card, ability, talent or constant moved** beyond §1's
+  threshold arithmetic — `BRACING_LINE_LEVEL` is still 32, `RUIN_THRESHOLD` still 10,
+  `FOCUS_CONVERT` still 100, and `avatar_ruin` still installs 5.
+- **Next letter: FP.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FN's own edits cost `CLAUDE.md` about 5 KiB and
-  the headroom is the tightest it has been**, so the next batch to write a long standing rule is
-  the one that finds out; the gate WARNS before it FAILS. `docs/instrument-rules.md` and
-  `docs/ways-of-working.md` still have no stated ceiling; a ceiling is DERIVED and deriving one is
-  a ruling.
+  FIGURES** — read them off that gate's output. **FN left about 12 KiB of headroom and FO spent
+  some of it**, which is why FO's own three additions to `CLAUDE.md` are BULLETS ON EXISTING
+  BLOCKS rather than new top-level rules — only the floor rule is new, and it is short. **The next
+  batch to write a long standing rule is still the one that finds out**; the gate WARNS before it
+  FAILS. `docs/instrument-rules.md` and `docs/ways-of-working.md` still have no stated ceiling; a
+  ceiling is DERIVED and deriving one is a ruling.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
   purpose-authored and charter-clean, and **the rune layer is authored for all twelve specs** — 60
-  live against 66 retired, every one of the 60 spec-scoped, **and after FN not one of the 60 is
-  conditional.** **What is left in the rune layer is the DEVOUT'S FIFTH** (owed, two alternatives
-  priced in `docs/reports/FK.md` §7) **and the three design questions FN's measurement hands over
-  — see the queue.** `docs/spec-recon.html` is still the document authoring reads, and §7 of
-  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
-  its own (what rung 2 should ASK), and it is the largest unbuilt item on this list.**
+  live against **67** retired, every one of the 60 spec-scoped, and not one of the 60 is
+  conditional. **What is left in the rune layer is the DEVOUT'S FIFTH** (owed, two alternatives
+  priced in `docs/reports/FK.md` §7), **the pricing question FN handed over on the Wide Rite and
+  Heavy Bolts, and the Shared Mark's own magnitude — see the queue.**
+  `docs/spec-recon.html` is still the document authoring reads; §7 of `docs/reports/FK.md` is the
+  correction to it, **and FO added a dated note at its rune table** because that table still shows
+  eight conditions FN retired and a rune FO put out of the offer. **The ladder still has an open
+  design question of its own (what rung 2 should ASK), and it is the largest unbuilt item on this
+  list.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -126,26 +134,41 @@ reasoning is not re-derived.
   only in a closed batch report is a rule a future batch follows, because `docs/reports/` is the
   one file class no instrument reads and no sweep covers.
 
-### FN HANDS OVER THREE DESIGN QUESTIONS AND TAKES NONE OF THEM
+### FN HANDED OVER THREE DESIGN QUESTIONS — **FO TOOK TWO. ONE IS STILL OPEN.**
 
-**All three are magnitudes or content and all three are the designer's. FN flagged and did not
-retune, which is what its brief required.**
+**FN flagged and did not retune, which is what its brief required. FO ruled on the two that were
+worth EXACTLY ZERO and left the pricing question alone.**
 
-- **DEEPENING HEX IS WORTH EXACTLY ZERO TO AN OCCULTIST HOLDING AVATAR OF RUIN.** `_ruin_threshold`
-  is `mini(step, 8)` and the capstone installs 5. **The behaviour is correct and deliberate** —
-  `check_ez` §5 asserts it, and it was written to stop a rune that ASSIGNED pushing detonation
-  BACK. **What nobody had written down is that the correct behaviour makes the rune inert for a
-  capstone holder**, and ungating did not change that: it was true before and it is true now.
-- **THE WIDE WATCH IS WORTH EXACTLY ZERO TO A SHARPSHOOTER HOLDING OVERKILL.** The node's own text
-  is *"the carry keeps your Focus in FULL rather than dropping it to the usual 50"* — the rune's
-  clause, word for word — and the rune sits one `elif` above the arm that clamps. **There is a
-  cosmetic tell**: with the rune held the Overkill log line can never print, so the player is told
-  the rune did what his talent did.
-- **AND TWO OF THE EIGHT JUST GOT MUCH STRONGER, WHICH IS THE OTHER SIDE OF THE SAME
-  MEASUREMENT.** The Wide Rite went from **1.4%** of an Occultist's build space to 100%, and Heavy
-  Bolts from **2.6%** to 100%. **Neither magnitude was retuned and neither should be re-read as a
-  bug**; they are the two the ruling changed most, and whether they are now correctly priced at
-  100g is a design question.
+- **~~DEEPENING HEX IS WORTH EXACTLY ZERO TO AN OCCULTIST HOLDING AVATAR OF RUIN~~ — CLOSED AT
+  FO §1. IT SUBTRACTS 2 NOW, UNDER A FLOOR OF 3.** **The transferable half, which is why this item
+  is kept:** the `mini` was CORRECT and was written for a real reason, and **the correct behaviour
+  was what made the rune inert** — there was nothing to repair in the handler, only a decision to
+  take. **And the fix's own shape is the new hazard**: a subtraction is OPEN at the bottom where an
+  assignment is not, so at the floor the rune is worth zero again. `check_fo` §1e is a STRICT
+  inequality on both builds rather than a property arm, because *never shallower* is satisfied by
+  `mini` itself.
+- **~~THE WIDE WATCH IS WORTH EXACTLY ZERO TO A SHARPSHOOTER HOLDING OVERKILL~~ — CLOSED AT FO §2.
+  RETIRED, KEPT, AND REPLACED BY THE SHARED MARK.** **The transferable half:** the brief said the
+  two texts match *word for word* and they do not — **the longest shared phrase is `rather than`**
+  and the node's clause appears in zero rune `desc` strings. **The duplication was in the CODE and
+  is invisible to a text sweep**, which is FK §7's Standing Ground shape. Its read site, field,
+  payload and entry are all KEPT: a saved run holding it is still paid.
+- **AND TWO OF THE EIGHT JUST GOT MUCH STRONGER, WHICH IS THE OTHER SIDE OF THE SAME MEASUREMENT —
+  STILL OPEN, AND FO DID NOT TOUCH IT.** The Wide Rite went from **1.4%** of an Occultist's build
+  space to 100%, and Heavy Bolts from **2.6%** to 100%. **Neither magnitude was retuned and neither
+  should be re-read as a bug**; whether they are now correctly priced at 100g is a design question
+  and it is the designer's.
+
+### THE SHARED MARK'S MAGNITUDE IS PROPOSED, NOT RULED — **OWED A DECISION (FO §2)**
+
+**`SHARED_MARK_FOCUS := 5`, and the batch claims the DERIVATION rather than the number.** It is
+priced against the **20** a consecutive attack on his own mark pays him (`20 + muscle_memory_ranks`,
+both terms zero untalented). **The ally population in a legal run is the three other heroes**, so a
+quarter pays **15 against his own 20** and keeps his own shot the largest single source under every
+composition; a half would pay 30 and the rune would stop supplementing his patience and start
+replacing it, which BI §1 says a single meter cannot afford. **One authored copy in `battle.gd` and
+one string on the card**, so a re-tune is two lines — and `check_fo` §2c asserts the two agree, so
+they cannot part.
 
 ### TEN OF FK'S RUNES HAVE NO SUITE COVERAGE — **REPORTED AT FK §3, RECORDED HERE AT FM §5, OWED**
 

@@ -224,7 +224,7 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# 0.20) and `rune_bared_fang` (0.30) would both flatten to 0 outright, which
 	# is the failure that reads exactly like the rune working — the Bared
 	# Guard's -0.15 precedent, one line up.
-	"rune_hex_threshold", "rune_split_tongue", "rune_wide_rite",
+	"rune_hex_deepen", "rune_split_tongue", "rune_wide_rite",
 	"rune_open_wound",
 	# BATCH FC — the Shared Ruin's flag, on the list for the same AA reason
 	# as the four above it: JSON parses `1` as a float and a float into a
@@ -233,6 +233,10 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_standing_wall", "rune_bracing_line",
 	"rune_split_shield", "rune_long_watch", "rune_no_block",
 	"rune_keen_focus", "rune_heavy_bolts", "rune_ambush", "rune_wide_watch",
+	# BATCH FO — the Shared Mark's flag, on the list for the same AA reason as
+	# every int above it: JSON parses `1` as a float and a float into a typed
+	# int var is a runtime error at spawn, not a rounding.
+	"rune_shared_mark",
 	"rune_long_draw_presses", "rune_long_leash", "rune_shared_hide",
 	"rune_answering_pack", "rune_second_whistle", "rune_shared_scent",
 	# BATCH FK — THE EIGHT UNAUTHORED SPECS' OWN INT FIELDS. Thirty-eight of
@@ -416,7 +420,8 @@ const RUNE_TAGS := {
 	"keen_focus": ["RESOURCE"],                # Keen Focus
 	"heavy_bolts": ["RESOURCE", "OFFENSE"],    # Heavy Bolts
 	"ambush": ["OFFENSE", "RESOURCE"],         # Ambush
-	"wide_watch": ["RESOURCE"],                # Wide Watch
+	"wide_watch": ["RESOURCE"],                # Wide Watch — RETIRED at FO §2
+	"shared_mark": ["RESOURCE"],               # Shared Mark
 	"long_draw_press": ["RESOURCE"],           # Long Draw — the sequence pays Focus
 	"long_leash": ["OFFENSE", "RESOURCE"],     # Long Leash
 	"shared_hide": ["OFFENSE"],                # Shared Hide
@@ -532,6 +537,11 @@ const RUNE_SHAPES := {
 	"heavy_bolts": ["PASSIVE"],
 	"ambush": ["ABILITY"],
 	"wide_watch": ["PASSIVE"],
+	# BATCH FO §2 — THE SHARED MARK replaces the Wide Watch, which is RETIRED
+	# rather than deleted (the Melted Armor contract) and keeps its row here:
+	# `RUNE_SHAPES` is keyed by id and a retired entry is still `config`- and
+	# `build`-resolvable, so a saved run holding one still reads its shape.
+	"shared_mark": ["PASSIVE"],
 	"long_draw_press": ["ABILITY", "TRADEOFF"],
 	"long_leash": ["PASSIVE"],
 	"shared_hide": ["PASSIVE"],

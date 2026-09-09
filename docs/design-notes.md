@@ -7934,3 +7934,79 @@ stayed, stayed for a stated reason: the both-tags census is older than the condi
 what a SCREEN shows rather than what a rune asks, and the core-kit baseline it prints every battery
 is what the next tag-reading rune will have to be authored against. **The tags are player-facing on
 the draft card and are not conditions** — that distinction is the whole of what survives.
+
+## Batch FO — why a floor is a ruling, and why "word for word" was the wrong reason
+
+FN flagged two runes as worth exactly zero to a hero holding one talent node and retuned neither,
+which is what its brief required. This batch took both. Neither fix is complicated; **what took the
+work was that in each case the obvious repair was slightly wrong, and slightly wrong in a way the
+repair itself could not see.**
+
+**Deepening Hex first.** The rune installed 8 through a `mini`, and Avatar of Ruin installs 5, so a
+capstone holder bought the rune and got nothing — `mini(5, 8)` is 5. The `mini` was not a mistake.
+EZ wrote it so a rune sold as *deepening* the hex could never push a capstone holder's detonation
+back from every 5th stack to every 8th, and `check_ez` §5 asserts that in both directions. **The
+correct behaviour was what made the rune inert**, and that is the whole shape of the finding: there
+was nothing to fix in the code, only a decision to take about what the rune should be.
+
+Subtracting 2 instead of assigning 8 pays every build the same two stacks and keeps the property
+the `mini` was protecting — a subtraction can only ever lower the number. **But it changes the
+shape of the arithmetic in a way that is easy to miss: the `mini` was CLOSED at the bottom and a
+subtraction is OPEN.** Nothing in the game could compose with `mini(step, 8)` to produce a number
+below 5. Everything composes with a subtraction. Two more effects like this one and the threshold
+is on the floor, and at the floor the rune is worth exactly zero again — **the same hole FN
+measured, arriving by a different route.**
+
+So the floor had to be chosen rather than defaulted, and this is the part worth writing down.
+`_gain_ruin` arms on `st % step == 0` and the chip prints `int(stacks / step)`; both are divisions,
+so a threshold of 0 is a runtime error. **Any floor answers that, and a floor chosen only to answer
+it is 1.** But at a threshold of 1 every single stack detonates. That is not a deeper hex — it is a
+different mechanic wearing the same name, and the entire Ruin lane accumulates against a period
+that would no longer exist. **The number to pick is the one at which the mechanic stops being
+itself, not the one at which the code stops working.** Three is the exact bottom of the live tree
+(5 minus 2), so it changes nothing today, refuses everything below, and forces the next batch that
+wants a shallower period to take that decision deliberately.
+
+**And the assertion had to be sharpened, not just re-pointed.** EZ's property — *the rune never
+makes it shallower* — is still true and is kept. But a property arm cannot catch the hazard the
+floor creates, because `mini` satisfies *never shallower* perfectly and pays a capstone holder
+nothing. The arm that actually guards this is a STRICT inequality on every build, asserting the
+rune is worth something rather than merely not worth less than nothing.
+
+**The Wide Watch is the other half, and its brief was wrong about why.** The brief said the rune
+duplicates the Sharpshooter's Overkill *word for word*. It does not. Measured, the longest phrase
+the two texts share is `rather than` — two words — and the node's clause appears verbatim in zero
+rune descriptions. **What made the rune worth nothing was the code**: it sits one `elif` above the
+arm Overkill would otherwise reach, so a holder of both gets the rune's log line and the talent's
+effect, and the talent's own line can never print.
+
+That distinction is not pedantry. *"Word for word"* sends a future author looking for a literal
+duplicate, and a text sweep returns nothing. **A duplication invisible to a string search is
+exactly the class FK §7 named on the Standing Ground**, where the name was clean and the CLAUSE was
+the base kit — found by reading the handler and by nothing else. So the retirement string records
+*authored against a base a node already provided* and names the node, rather than repeating a
+claim about wording that does not survive being checked.
+
+**The replacement raised the one genuinely open question, and it is about a word.** *ALLY* means
+heroes and companions; *HERO* means the four. The new rune pays when an ally strikes the
+Sharpshooter's mark, so the word decides whether a beast's blow counts. None of the five recorded
+reasons a companion cannot receive something applies here — **the companion is the attacker, not
+the receiver**, and the Focus goes to a hero with a bar.
+
+But a companion cannot stand beside a Sharpshooter at all. A party is one of each class, he is the
+Hunter, and the Beastmaster is the other Hunter spec; summoning is the Beastmaster's exclusive axis
+besides. **The tempting move is to write `hero` and record that as the reason**, and it is wrong
+twice: it would be a sixth kind of reason where CLAUDE.md says there are five, and it is a fact
+about the party rather than about the beast — it evaporates the day any other class fields one.
+**Writing ALLY costs one call in `_companion_hit`, promises a player nothing his party cannot
+deliver, and needs no exception.** DK §1 still demands a measurement rather than an argument, so
+the gate seats both Hunter specs through the fixture — an illegal party, and it says so — summons a
+real wolf and reads the Focus arriving off its blow.
+
+**The magnitude is proposed rather than ruled, and the useful part is what it is proposed against.**
+A consecutive attack on his own mark pays him 20. The allies who can reach that mark in a legal run
+are the three other heroes, so at a half a full round of party fire would pay 30 — more than his own
+shot — and the rune would stop supplementing his patience and start replacing it, which BI §1 says a
+single meter cannot afford. A quarter pays 15 against his own 20 and keeps his own shot the largest
+single source under every composition. **That is a derivation, not a preference**, and it is what a
+re-tune should argue with.

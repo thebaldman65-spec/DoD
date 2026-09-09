@@ -558,6 +558,16 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
   `party` event target, `spec_in_party` (an event condition), and `party.tscn`. Nothing else.
 - **PROSE ABOUT THE GAME IS NOT PLAYER-FACING.** This file, `docs/changelog.html`,
   `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
+· **UNREACHABLE IS NOT EXCLUDED, AND IT IS NOT A SIXTH REASON (Batch FO §2).** The Shared Mark
+  pays a Sharpshooter when an ALLY strikes his mark, and **no companion can stand beside a
+  Sharpshooter**: a party is one of each class, he IS the Hunter, and summoning is the
+  Beastmaster's exclusive axis (DR §1). **That is a fact about the PARTY, not about the beast** —
+  the five recorded reasons are all about a companion RECEIVING, and here the companion is the
+  ATTACKER. **So the word stays ALLY and the call is made from `_companion_hit` too**, because
+  narrowing would need an exception that evaporates the day any other class fields one.
+  **AND DK §1 IS STILL MET WITH A MEASUREMENT**: the fixture seats both Hunter specs, summons a
+  real Canis and reads the Focus arriving off its blow. **A clause unreachable in PLAY is still
+  drivable in a FIXTURE, and driving it is what stops "it would work" being an argument.**
 - **THE RULE IS KEPT BY A CHECK.** `test_batch_bx` §4 forbids "beast" in player-facing prose and
   §4b keeps **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT** over the same file set. **Each was
   shown to bite before it was trusted.**
@@ -2170,6 +2180,33 @@ closed report (the *Working agreement*'s step (3), which FN also closed), pointe
   seventh enemy would index past the layout array. **Six is the ceiling any AoE magnitude can ever
   be priced against**, and `_theme_combos` is what actually decides the count.
 
+## STANDING RULE — A SUBTRACTION IS OPEN AT THE BOTTOM WHERE AN ASSIGNMENT IS NOT (Batch FO §1)
+
+> **A rune that ASSIGNS a threshold cannot be composed past its own number. A rune that SUBTRACTS
+> composes with everything that lowers the same number, so it needs a FLOOR — and the floor is a
+> RULING about what the mechanic still is, never a guard against a division by zero.**
+
+**DEEPENING HEX IS THE CASE.** `mini(step, 8)` paid a capstone holder exactly nothing (Avatar of
+Ruin installs 5) and was CLOSED at the bottom: nothing could push the result under 5.
+`maxi(step - 2, RUIN_FLOOR)` pays every build the same two stacks and is OPEN — two more effects
+like it and the threshold sits on the floor.
+
+· **THE ARITHMETIC AND THE RULING ARE DIFFERENT QUESTIONS AND THE ARITHMETIC IS THE SMALL ONE.**
+  `_gain_ruin` arms on `st % step == 0` and the chip prints `int(stacks / step)`, so ZERO throws —
+  **and any floor at all answers that.** A floor chosen to answer only that is 1, and **at a
+  threshold of 1 every stack detonates, which is a different mechanic wearing the same name.**
+  Pick the number at which the mechanic stops being itself, not the number at which the code stops
+  working.
+· **THE FLOOR'S REASON IS A RELATION, SO ASSERT THE TERMS TOGETHER.** 3 is chosen because `5 - 2`
+  reaches it exactly — the deepest the live tree can go — so it changes nothing today and refuses
+  everything below. `check_fo` §1c pins **10, 5 and 2 as well as the 3**, because a floor of 3
+  under a capstone that had moved to 4 is answering a question nobody is asking any more.
+· **AND A FLOOR RE-OPENS THE HOLE IT WAS BUILT BESIDE.** At the floor the rune is worth EXACTLY
+  ZERO again — the fault FN measured, arriving by a new route. **A PROPERTY ARM CANNOT CATCH
+  THAT**: *never shallower* is satisfied by `mini` itself, which pays a capstone holder nothing.
+  **The arm has to be a STRICT inequality on every build**, and that is the one that goes red the
+  day something else lowers the number.
+
 ## STANDING RULE — AN OFFER FROZEN AT DROP TIME IS RE-ASKED AT RESOLUTION (Batch FD §1)
 
 > **A choice that is ROLLED at one moment and ANSWERED at another is two events, and everything
@@ -2597,6 +2634,14 @@ door both offer paths use — skips it.
 · **A COUNT DERIVED FROM THE LIVE POOL SURVIVES THE NEXT RETIREMENT; A LITERAL DOES NOT.**
   `test_runes`'s grant loop asked for the literal 4 every spec was authored and read nine
   failures the moment some specs kept 2. It asks for the number that survives now.
+· **AND A REPLACEMENT KEEPS THE RETIRED RUNE'S READ SITE (Batch FO §2, the Split Tongue
+  precedent).** The Wide Watch is retired because **Overkill already keeps his Focus whole through
+  a kill** — the rune sat one `elif` ABOVE the arm that clamps, so a holder of both got exactly
+  nothing and the node's own log line could never print. **The entry, the payload, the
+  `rune_wide_watch` field AND the arm in `_sharpshooter_focus` all stay**: a saved run holding it
+  is still paid, and deleting any of the four is the tempting green on the day something reds.
+  `check_fo` §2a pins all four PRESENT and pins `eligible_ids` refusing it — **the kept half is
+  asserted as hard as the retired half.**
 
 ## STANDING RULE — A RUNE IS DISCONNECTED FROM THE TALENT TREES (Batch EM, the designer's charter)
 
@@ -3474,3 +3519,16 @@ wrong, and both were caught by gates that already existed.
   rename**: bare, a second `Long Watch` is byte-identical to the Warden's live one, so the Holy's
   is `Carried Mercy`. **Nothing RESOLVES a rune by name — and that does not make a duplicate safe**,
   because the schema refuses it regardless and the schema is what the next batch meets.
+· **BATCH FO SWEPT `Shared Mark` AGAINST 1,363 LABELS — 0 EXACT, 0 CONTAINMENT, AND NINETEEN
+  SHARED-WORD NEAR-MISSES WHERE THE BRIEF NAMED FOUR.** The sharpest is one the brief did not
+  name: **`Quarry's Mark` is a live SHARPSHOOTER card in his own reachable pool, read by the very
+  function the new rune sits beside** (`_sharpshooter_focus` doubles Focus off an enemy wearing
+  `quarry`) — **same spec, same mechanic, same meter.** It SHIPS and is FLAGGED: the status id is
+  `quarry` and not `mark`, so no chip reads one word twice. **SWEEP THE STATUS IDS AND THE LANE
+  NAMES AS WELL AS THE LABELS** — three of these nineteen are ids no card prints.
+· **REPORTED, NOT RESOLVED — `Overkill` IS TWO LIVE TALENT NODES AT ROW 7 IN TWO TREES**:
+  `bz_warcry` (berserker / Warpath) and `ss_overkill` (sharpshooter / **Penetration**). A label
+  collision, so it ships. **ITS ONLY HOME WAS A COMMENT BESIDE ONE OF THE TWO NODES AND THAT
+  COMMENT HAD THE LANE WRONG** — *Precision* for *Penetration* — which is why `check_fo` §3
+  asserts the pair off the trees instead. **A collision recorded only where one half lives is a
+  collision the other half's author never meets.**

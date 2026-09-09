@@ -215,10 +215,17 @@ const LANE_TREES := {
 		# Re-spec (was Deafening Cry, -1 turn on Battle Shout's cooldown;
 		# same id, so saved picks carry). See the header note: a node whose
 		# only job was to modify a node in its own exclusive row.
-		# NOTE for the designer: the Sharpshooter's Precision lane already has
+		# NOTE for the designer: the Sharpshooter's Penetration lane already has
 		# a talent called Overkill (a kill's overflow damage carries to
 		# another enemy). Different trees, different ids, so nothing breaks —
 		# but two nodes share a name in the glossary and the tooltips now.
+		# BATCH FO §3 — CONFIRMED, AND THE LANE WORD IS CORRECTED: this note
+		# said `Precision` and his Overkill is `ss_overkill`, Penetration row 7,
+		# the same row as this one. **Nothing is renamed** — a node's name
+		# resolves nothing, so BR §1 calls this a LABEL collision and its
+		# disposition is *ships and is flagged*. `check_fo` §3 asserts the pair
+		# off the trees, because a collision recorded only beside one of its two
+		# halves is one the other half's author never meets.
 		{"id": "bz_warcry", "name": "Overkill", "ranks": 1, "lane": "Warpath", "row": 7,
 			"desc": "Killing an enemy clears the cooldowns of Hack and Slash and Wildstrikes.",
 			"payload": {"stat": {"overkill_reset": 1}}},
