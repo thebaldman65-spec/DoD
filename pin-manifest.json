@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1442,
-  "source": 1109,
-  "other": 87,
+  "total": 1446,
+  "source": 1111,
+  "other": 89,
   "document": 246
  },
  "source_residency": {
-  "code": 665,
+  "code": 667,
   "absent": 296,
   "runtime": 81,
   "narrow": 24,
@@ -2876,6 +2876,52 @@
    "k": "literal",
    "how": "read",
    "g": "check_fq.gd#134"
+  },
+  {
+   "s": "check_fr.gd",
+   "fn": "_ref_exists",
+   "h": ".git/packed-refs",
+   "n": "refs/heads/%s",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_fr.gd#35",
+   "alt": true
+  },
+  {
+   "s": "check_fr.gd",
+   "fn": "_ref_exists",
+   "h": ".git/packed-refs",
+   "n": "refs/remotes/origin/%s",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_fr.gd#35",
+   "alt": true
+  },
+  {
+   "s": "check_fr.gd",
+   "fn": "_s1_the_branch",
+   "h": "scripts/profile.gd",
+   "n": "MIN_VERSION",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fr.gd#49"
+  },
+  {
+   "s": "check_fr.gd",
+   "fn": "_s1_the_branch",
+   "h": "scripts/profile.gd",
+   "n": "refusal_message",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fr.gd#50"
   },
   {
    "s": "test_batch_ah.gd",
@@ -14879,7 +14925,7 @@
    "s": "test_batch_cb.gd",
    "fn": "_docs",
    "h": "docs/master.html",
-   "n": "All twelve specs draft from at least eight",
+   "n": "All twelve specs draft from at least ten",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -14923,7 +14969,7 @@
    "s": "test_batch_cb.gd",
    "fn": "_docs",
    "h": "docs/master.html",
-   "n": "hundred and forty-two",
+   "n": "hundred and fifty-four",
    "p": "+",
    "r": "code",
    "k": "literal",

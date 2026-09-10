@@ -13,103 +13,93 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-09 (Batch FQ).*
+*Last rewritten: 2026-09-09 (Batch FR).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FQ — THE VERSION GUARD, AND THE BRANCH. NO MERGE WORK.** No spec dissolved, no
-  pool merged, no engine became a rune, no node moved, and **not one rune, card, ability, talent,
-  constant or magnitude moved.** The batch built the two things that had to exist before the merge
-  starts. Full working: **`docs/reports/FQ.md`**.
-- **`Profile._load()` HAS A VERSION BRANCH NOW. IT HAD NONE.** It merged every key it found over
-  the defaults and stamped `data["version"] = VERSION` unconditionally, reading the old value
-  nowhere. **The shape is `run_state.gd`'s with ONE deliberate difference: this refusal does not
-  DELETE.** `load_run()` calls `clear_save()` because a refused run save is one run in flight; a
-  refused profile is every run the player has ever finished, so deleting it would BE the
-  destruction the guard exists to prevent. It refuses, writes nothing, and leaves the file
-  byte-for-byte alone.
-- **AND IT REFUSES UPWARD AS WELL AS DOWNWARD, WHICH IS THE HALF THAT WAS ALREADY LIVE.** A
-  version-99 profile loaded clean under HEAD, was stamped back to 2 and re-saved at 2 — **driven
-  in a probe, not reasoned about.** Five shapes now refuse: no version key, one above, far above,
-  a JSON file that is not a dictionary, and a file that is not JSON. **`MIN_VERSION := 1` refuses
-  nothing today on purpose** — there is nothing below it, so no existing profile changes behaviour.
-  **It is the line the merge moves**, and the batch that renames a talent id raises it.
-- **THE REFUSAL IS NOT A QUIET ZERO.** The main menu banners the version found, the range this
-  build reads, **that the file has not been changed or deleted**, and its path — the file is the
-  only backup that exists, so finding it is the point. **Talents is disabled while a profile is
-  refused**, because a board offering cells to buy with points that are not actually gone is the
-  same lie one screen later.
-- **THE FIELD CENSUS, DERIVED RATHER THAN QUOTED FROM FP. The profile holds 13 keys.** **SEVEN are
-  SPEC-KEYED** and read 0 or empty the moment a spec id changes — `runs_started`,
-  `runs_completed`, `wipes`, `forfeits`, `talent_points`, `talent_cells`, `talent_equipped`. **Two
-  of those seven are keyed a SECOND time on NODE ids** (`talent_cells`, `talent_equipped`), and
-  that is where FP's three silent defaults live: `cells_spent` reads 0, `equipped_learned` empties,
-  and `owns_cell` never consults the tree at all so it stays TRUE. **FIVE are safe** —
-  `bosses_killed`, `events_seen`, `zones_cleared`, `flags`, `talent_tier` — because nothing the
-  merge renames is their key. The thirteenth is `version`.
-- **§1 GOT AN INSTRUMENT AND NOT A PARAGRAPH — `check_fq.gd`, 46 checks.** BN's warning about the
-  run save sat in documentation for thirty batches doing nothing. §1 drives the branch in **both**
-  directions, because a guard that never refuses and one that refuses everything pass the same
-  static check; **§2 is the arm the batch exists for** and md5-hashes the file across **five write
-  paths**; §3 is the lossless round trip; **§4b drives `_save()` as the FIRST call of a session**,
-  the only state that tells `if refused` placed before `_load()` apart from after it — a one-line
-  reordering that looks correct either way and leaves the guard inert on exactly the write that
-  destroys the file. **No version literal is pinned anywhere in it.**
-- **SIX CONTROLS, EACH ON THE NEEDLE IT AIMS AT.** Ceiling removed → 11 reds; floor removed → 2,
-  and only §1b; the `_save()` reordering → **1 red and it is §4b alone**; the refusal guard deleted
-  → 7; a guard that refuses everything → 5, caught by the positive arm; a refusal that deletes →
-  §4c in both directions. **HEAD's `profile.gd` under the new gate is a PARSE ERROR, not a
-  failure** — informative (the gate is genuinely new-code-bound) but it proves nothing about
-  catching a subtly broken guard, which is what the six surgical controls are for.
-- **THE MERGE HAS A BRANCH — `class-merge`, cut from FQ's own commit so it carries the version
-  guard — AND THE CONFLICT CONVENTION IS DECIDED RATHER THAN RESOLVED FOURTEEN TIMES.** Recorded in `docs/ways-of-working.md`. **The brief predicted THREE files would conflict
-  every batch; the measurement over the last fourteen says EIGHT** — `changelog.html` and
-  `state.md` at 14/14, `CLAUDE.md` and `master.html` at 12/14, and `baselines.json`,
-  `design-notes.md`, `pin-manifest.json` and `run_battery.sh` at 10/14.
-- **TWO OF THE FIVE UNPREDICTED ONES ARE NOT DOCUMENTS, AND `master.html` IS HARDER THAN
-  `CLAUDE.md`.** `pin-manifest.json` is **DERIVED** and must never be hand-merged — take either
-  side, re-run the builder, and `check_ed` says whether the result is right. `baselines.json`
-  merges its ROWS cleanly while **every number in an engine-bound row is a fact about a GAME**, not
-  about a file. And `master.html` is the one document forbidden to hold history, so the two sides
-  describe **different games** and their edits are not two versions of one sentence: it is
-  **re-derived at the merge point, not merged.** `CLAUDE.md` reconciles by what a rule is ABOUT —
-  **measured at 54 of 108 blocks naming a spec or an engine and 54 naming neither**, which is a
-  triage that halves the reading rather than a procedure that removes it.
-- **NO GATE READS THE BRANCH NAME, AND THE BRIEF'S CLAIM THAT `run_battery.sh` CARRIES A SCAR OF
-  ONE IS FALSE.** That script contains no `git` call at all, and the four gate files matching
-  `git ` match it inside the word *digit*. **The only live assumption in the tree was `CLAUDE.md`'s
-  push step**, which now points at `docs/ways-of-working.md` rather than restating it.
-- **WHAT MOVED:** `scripts/profile.gd`, `scripts/main_menu.gd`, `check_fq.gd` (**NEW**),
-  `run_battery.sh`, `baselines.json` (two rows — its own, and `check_parse` 177→178),
-  `pin-manifest.json`, `docs/ways-of-working.md`, `CLAUDE.md`, `docs/master.html`,
-  `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FQ.md` (**NEW**) and this file.
-  **The designer's four save files were copied to `save-backups/FQ-20260909-134621/` and
+- **Last batch: FR — THE NUMBERS `master.html` STATES, SWEPT AGAINST THE CODE, AND A READER FOR
+  THE BRANCH RULE. NO MERGE WORK.** Nothing touched `class-merge`, and **not one rune, card,
+  ability, talent, constant or magnitude moved** — no `.gd` under `scripts/` and no file under
+  `data/` was edited at all. Full working: **`docs/reports/FR.md`**.
+- **THE SWEEP FOUND FOURTEEN DEFECTS, AND FIVE OF THEM ARE THE DOCUMENT CONTRADICTING ITSELF.**
+  Every numeric claim in `master.html` was read against the code. The run save (v8 → **v12**,
+  refusing below **v10**); the enemy tier ladder (**1–11 → 1–16**, two sites); the power-budget
+  ramp (the slope is **5/14**, not a half, and all five worked bands were wrong); the event verb
+  vocabulary (it listed **`talent_points`**, which exists nowhere, and omitted **`ability_draft`**,
+  which is live); the drafted-abilities heading (**142/118/24** against a table of 127/103/24 and
+  pools of 154/129/25); a whole **"the floor is eight"** stratum sixty lines under the line that
+  says TEN; **"fifteen at the cheapest spec"** (sixteen, driven); **"DEBUFF for seven"** (five —
+  and 7 is the OFFENSE column); the capstone shelf (**difficulty 3**, not 2); the Sharpshooter's
+  third lane (**Pace**, not TEMPO); and the rune file (**127 entries / 67 retired**, against a
+  whole FF-era stratum still saying 21 live across four specs in an 87-entry file).
+- **AND EIGHT OF THE TWELVE TALENT-TREE HEADINGS SAT ABOVE THE WRONG TREE'S TABLE.** The Holy
+  heading introduced the Pyromancer's tree, the Devout's the Cryomancer's, and so on — **only
+  Berserker, Swordmaster, Warden and, by coincidence, Occultist lined up.** **Not one number in §7
+  is wrong**: all 324 cells match the trees name for name and figure for figure. **A document can
+  be correct line by line and still tell a reader something false**, and no doc-vs-code check can
+  see it. The repair is a **pure permutation of the file's own lines**, asserted as one.
+- **THE STALE STRATA CLUSTER BY ERA, WHICH IS THE PATTERN WORTH KEEPING.** The run-save reason,
+  the tier range and the budget ramp are all **pre-lattice** — from when a zone held twelve slots —
+  and all three survived the batch that changed it. Two more are FF-era rune figures superseded by
+  FK. **The document rots where a batch changed a mechanism and swept the section it was writing
+  in**, which is CLAUDE.md's own EH observation at a larger scale than it was found at.
+- **THE QUEUE'S "IT IS A TWO-NUMBER EDIT" WAS FALSE, AND THAT IS THE SHARPEST FINDING.** FQ routed
+  the run-save figures here saying *the prose around them is still right*. **It was not.** The
+  reason attached to the threshold (*"a flat 12-slot line … no honest place on a lattice"*) is
+  **BK's v8** reason; the live threshold is **BM's v10**, whose reason is the final zone's
+  **seventeenth slot**. **A v9 save HAS the lattice**, so changing only the digits would have
+  manufactured a new false claim that read as freshly checked. `CLAUDE.md` carried the correct
+  reason the whole time.
+- **`docs/ways-of-working.md` HAS A READER NOW — `check_fr.gd`, 25 checks, and it says in its own
+  header what it CANNOT assert.** FQ measured that file at zero readers. Six of its eight rule
+  blocks are about how a batch comes to EXIST and leave no artefact in the tree; **a check claiming
+  to assert those would always pass, which is worse than none.** It asserts the branch rule (the
+  name read OUT of the rule, the ref present in `.git`, the guard present in `profile.gd`,
+  `CLAUDE.md` pointing here and NOT restating the branch name), the file's own no-second-copy rule
+  as a 60-character line comparison, that every path it names resolves, the conflict table, and
+  that it stays the smallest of the three rule files. **§1 is TWO FACTS AND NOT THEIR
+  CONJUNCTION** — a gate reads refs and cannot walk ancestry, so a branch cut from BEFORE the guard
+  satisfies both arms, and that hole is named rather than papered over. **EIGHT CONTROLS, each on
+  the arm it aims at**, both touched files restored by md5.
+- **THE TABLES ARE CLEAN AND THAT IS MEASURED, NOT ASSUMED.** 1,265 mechanical comparisons: all
+  **324** talent cells (names AND full number sequences, two-armed control), **296** ability stat
+  fields, **156** bestiary fields (five-armed control), **198** pool names. **3 raw flags, 0 true
+  defects** — all three are figures dealt inside a handler, which `battle.gd`'s own comment names.
+- **SO §3'S ANSWER IS MOSTLY NO, AND IT IS ON THE RECORD.** A gate checking that every number the
+  document states matches the constant it names **would have caught ZERO of the fourteen**, because
+  the part that names constants is already right. **EB declined the header sweep at 118 rows for 16
+  defects; this is ~1,265 rows for 0.** What IS worth building is **doc-vs-doc**: a heading/table
+  pairing check reaches D10 (8 sites), D11 and D5 for a handful of lines, and `check_es` §4's
+  core-kit census — which the battery already computes and asserts nothing about — needs one arm.
+- **TWO SUITE NEEDLES MOVED, WHICH IS DO'S OWN PRECEDENT.** `test_batch_cb` pinned the two stale
+  figures. **The unmodified suite was run against the new tree FIRST and read 1730 / 2** — exactly
+  the two predicted — and reads **1730 / 0** re-pointed, at the same check count.
+- **WHAT MOVED:** `docs/master.html` (throughout), `CLAUDE.md` (three second copies of the same
+  figures — a literal sweep over all 63 of its readers reads **0 LOST / 0 GAINED**),
+  `check_fr.gd` (**NEW**), `test_batch_cb.gd`, `run_battery.sh`, `baselines.json` (two rows — its
+  own, and `check_parse` 178→179), `pin-manifest.json`, `docs/ways-of-working.md`,
+  `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FR.md` (**NEW**) and this file.
+  **The designer's four save files were copied to `save-backups/FR-20260909-155944/` and
   md5-verified against the originals before anything else happened.**
-- **THE BATTERY: 102 TARGETS, AND THE ONLY RED IS THE SANCTIONED ONE.** `check_fq` **48 / 0**,
-  `check_de` (the count differ) **426 checks / 0 failures / 0 notices** — every baseline matched,
-  including the two rows this batch wrote. **ZERO TARGETS THREW.** `check_cm_live`'s four failures
-  are the one red that is on purpose, and they were compared **line for line against a HEAD
-  rebuild** rather than by count: identical. **The tree was frozen across the whole run — 369
-  files, tracked and untracked, hashed with absolute paths before and after: ZERO differ.** The
-  designer's four save files are byte-identical to the FQ backup after all 102 targets.
-- **Next letter: FR.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FQ spent 234 bytes of `CLAUDE.md`'s
-  headroom** on the push step's pointer, and deliberately wrote **no standing rule**: the index
-  table lists rules that LIVE in `docs/instrument-rules.md`, and a row pointing at a rule that was
-  never written there is the exact defect that table's own preamble names. **The changelog gained a
-  27th heading**, which `check_dv` §4 carries as a floor rather than an equality.
+  FIGURES** — read them off that gate's output. **FR spent 11 bytes of `CLAUDE.md`'s headroom**
+  (three figure corrections, near size-neutral) and wrote **no standing rule**: the rules it would
+  have written are already there — *the code's field is authoritative and master.html is corrected
+  toward it*, *sweep for every copy of a corrected claim* (EH §2), and *a section being current is
+  not evidence that the section above it is*. What is new is a RECOMMENDATION, and §3 of the brief
+  says to recommend and rule on nothing.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide), all twelve
   talent trees are purpose-authored and charter-clean at **324 nodes**, and **the rune layer is
-  authored for all twelve specs** — 60 live against 67 retired. **The class merge is ruled as a
-  PROJECT rather than a batch and its running order is in the queue below.** What is still open in
-  the rune layer is the **Devout's fifth**, FN's pricing question on the Wide Rite and Heavy Bolts,
-  and the Shared Mark's own magnitude. `docs/spec-recon.html` is still the document authoring
-  reads; §7 of `docs/reports/FK.md` is the correction to it. **The ladder still has an open design
-  question of its own (what rung 2 should ASK).**
+  authored for all twelve specs** — 60 live against **67** retired in a **127**-entry file. **The
+  class merge is ruled as a PROJECT rather than a batch and its running order is in the queue
+  below.** What is still open in the rune layer is the **Devout's fifth** and the Shared Mark's own
+  magnitude. `docs/spec-recon.html` is still the document authoring reads; §7 of
+  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
+  its own (what rung 2 should ASK).**
+- **Next letter: FS.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -155,21 +145,82 @@ the things a later batch must not re-derive from scratch:
   faults reported in place** — a card that FEEDS an engine without READING it counts as
   engine-free there, which under-states the Pyromancer and the Survivalist most.
 
-### `master.html`'s RUN-SAVE FIGURES ARE STALE — **FOUND AT FQ, MEASURED, DELIBERATELY NOT FIXED**
+### THE RUN-SAVE FIGURES ARE FIXED — **AND "IT IS A TWO-NUMBER EDIT" WAS WRONG (CLOSED AT FR §1)**
 
-**`docs/master.html` says the run save is *format v8* and that a save *older than v8* is refused
-and cleared.** `scripts/run_state.gd` writes **v12** (`save_run`) and refuses below **v10**
-(`load_run`). **Both figures are wrong in the one document whose whole job is current truth**, and
-they have been since BM took the version to 10.
+**Struck through rather than deleted, because the reasoning is what a later queue item should
+inherit.** `master.html` now says the save is **v12** and refuses below **v10**.
 
-- **Found while editing the adjacent profile block at FQ §1**, not by a sweep — nothing sweeps
-  `master.html` for agreement with the code, which is the general form of this item.
-- **NOT FIXED AT FQ**, because correcting it is outside a brief that forbade moving anything and
-  the paragraph is not one §1 or §2 required. **It is a two-number edit** and the numbers are
-  measured above, so the batch that takes it does not need to re-derive them.
-- **THE PROSE AROUND THEM IS STILL RIGHT** — the *refused and cleared rather than half-loaded*
-  reasoning, and the AN/AI precedents, all still describe what `load_run()` does. It is the two
-  version numbers alone that moved.
+- **~~It is a two-number edit~~ — FALSE, AND THIS IS THE HALF WORTH KEEPING.** The clause giving
+  the REASON for the refusal (*"holds a flat 12-slot line and a single slot index, which has no
+  honest place on a lattice"*) is **BK's v8** reason. The live threshold is **BM's v10**, whose
+  reason is different: the final zone gained a **seventeenth slot**, so a v9 save's final-zone map
+  has no position to walk onto after its boss. **A v9 save HAS the lattice.** Changing only the
+  digits would have produced a sentence that was newly false rather than merely stale — and it
+  would have read as freshly checked.
+- **THE GENERAL FORM: WHEN A QUEUE ITEM PRICES A DOC REPAIR, IT IS PRICING THE NUMBERS AND NOT THE
+  SENTENCE.** Read the reason as well as the figure before quoting a cost.
+- **`CLAUDE.md` CARRIED THE CORRECT REASON THROUGHOUT**, which is why the two rule files did not
+  drift together: the one with an instrument reading it stayed right.
+
+### FOUR DRAFTED ABILITIES ARE NAMED AND DESCRIBED NOWHERE — **FOUND AT FR §2, OWED**
+
+**`Arcane Surge`, `Divine Wrath`, `Mana Shield` and `Reality Fracture` appear in `master.html`
+ONLY inside §6b's draft-pool list.** They are live, drafted, working cards with no row in the
+drafted-abilities table and no description anywhere in the document.
+
+- **All four are Batch DY vault re-homes** — DY moved seven finished abilities out of the deleted
+  `CLASS_POOLS` container into live pools, and four of them never got their rows written.
+- **The other 23 entries absent from that table ARE described**, beside their spec's kit in
+  §6.1–§6.4, so this is a gap of four and not of twenty-seven.
+- **NOT FIXED AT FR because writing their rows is AUTHORING**, which a document batch may not do.
+  **The gap is now stated in the document itself** (§6b's table heading names all four), so a
+  reader meets it rather than assuming the list is complete.
+
+### `master.html` §3b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION — **FR §2, NOT FIXED**
+
+*"30 of the 66 damaging abilities never state their damage in prose."* **The whole corpus gives 75
+with `damage > 0`; the draft pools give 39.** Neither is 66. The denominator is a past batch's own
+classification and is not recoverable from the tree, so **the figure was reported and deliberately
+not corrected** — correcting it would mean inventing a population.
+
+### TWO SMALL DOC REPAIRS FR FOUND AND DID NOT TAKE
+
+- **`scripts/events.gd:8–12`'s comment carries the same false worked example the document did** —
+  *"Health for a rune, gold for maximum health, health for talent points"* — and `talent_points`
+  has never been an event verb. **It is code, FR's brief forbade touching code, and
+  `docs/instrument-rules.md` records that a `.gd` comment is an asserted surface.** Two-line fix.
+- **`master.html:108` reads *"clearing any encounter heals **the every hero** 15% of max HP"*.**
+  One word. It is outside a NUMBER sweep's scope, and by the time it was noticed the tree was
+  frozen for the battery — a post-run edit would have made the shipped tree differ from the
+  verified one.
+
+### THE INSTRUMENT RECOMMENDATION FR OWES — **REPORTED, RULED ON NOWHERE (FR §3)**
+
+**A gate checking that every number `master.html` states matches the constant it names is NOT
+worth building, and that answer is on the record rather than left as "nobody built one".** It
+would have caught **zero of the fourteen** defects FR found, because the part of the document that
+names constants is already right: 1,265 mechanical comparisons across the talent tables, the
+ability stat lines, the bestiary and the pool tables returned **3 raw flags and 0 true defects**.
+EB declined the header sweep at 118 rows for 16 defects; this is ~1,265 rows for 0.
+
+**WHAT IS WORTH BUILDING IS DOC-vs-DOC, AND IT IS SMALL:**
+
+- **A heading/table pairing check** — *the spec a §7 heading names must be the spec whose lanes the
+  table beneath it lists*, and *a count in a table's heading must equal the rows in that table*.
+  That reaches FR's largest finding (8 mis-paired headings) plus two more, needs no code at all,
+  and its failure mode is noise rather than silence.
+- **One arm on `check_es` §4(2).** That gate already PRINTS the per-spec core-kit tag census every
+  battery and its own comment says *"It is a REPORT."* FR's "DEBUFF for seven" (it is five) is that
+  printed table's figure, copied into THREE documents (`master.html`, `CLAUDE.md` and this file)
+  and drifted in all three. **One arm comparing the
+  document's sentence to the census the battery already computes would have caught it the day it
+  moved.**
+
+**AND THE FAILURE MODE IS THE ARGUMENT AGAINST THE BIG GATE.** Every hole FR's own instruments had
+— a regex needing a closing paren, a curly apostrophe, a line break inside "Speed\n125", a
+fixed-width window running into the next card's numbers, a name matching inside another name —
+**printed a clean zero**. A document gate fails toward FEWER findings, and a gate that has quietly
+stopped asking reads exactly like a clean one.
 
 ### THE MERGE'S RUNNING ORDER — **RECORDED AT FQ §3 SO THE SEQUENCE SURVIVES A COMPACTION**
 
@@ -580,7 +631,9 @@ and every authored rune, and the draft card shows it.
   surface may not BRANCH on one is asserted directly over `TAG_ORDER` rather than by proxy.
 - **AND THE FIRST THING THE MACHINERY MEASURED IS THE CONSTRAINT ON EVERY FUTURE THRESHOLD RUNE.**
   The protected cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on
-  **DEBUFF for seven**, while **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly one**.
+  **DEBUFF for FIVE** (corrected at FR §2 — it read *seven* here, in `CLAUDE.md` and in
+  `master.html`, and **seven is the OFFENSE column**), while **MARK is zero for all twelve** and
+  **TEMPO reaches 1 on exactly one**.
   See the WHERE block; `check_es` §4 prints the per-spec table every battery run rather than this
   file carrying a second copy of it.
 

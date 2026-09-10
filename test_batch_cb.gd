@@ -1177,10 +1177,19 @@ func _docs() -> void:
 	# FLATNESS claim became a FLOOR claim — nine pools are deeper than eight
 	# now, so "all twelve draft from eight" would be a doc describing a shape
 	# the game no longer has.
-	ok(master.contains("hundred and forty-two"),
-		"master.html states the new draft count in words")
-	ok(master.contains("All twelve specs draft from at least eight"),
-		"master.html records the FLOOR, which is what survived DO")
+	# BATCH FR MOVED BOTH AGAIN, FOR DO'S OWN REASON, AND THE COUNT NEEDLE NOW
+	# NAMES THE DRAFT RATHER THAN THE TABLE. DS took the Hunter three to ten and
+	# DY lifted the floor to ten and the draft to 154 — so "at least eight" had
+	# gone from a floor to a true-but-dead statement, and "a hundred and
+	# forty-two" named neither the draft (154) nor the table under that heading
+	# (127). **THE PIN IS THE DRAFT'S OWN COUNT** because that is the number the
+	# pools decide: a later batch that authors a card moves it, and this arm says
+	# so. The table's own 127 is deliberately NOT pinned here — it is a fact about
+	# how much of the draft §6b catalogues, and check_cb has never asserted that.
+	ok(master.contains("hundred and fifty-four"),
+		"master.html states the draft count in words")
+	ok(master.contains("All twelve specs draft from at least ten"),
+		"master.html records the FLOOR, which DS and DY moved to ten")
 	# The pool summary rows moved with the pools, or a player reads five where
 	# the game offers eight.
 	# RE-POINTED BY DO: the table is regenerated from the live pools and the

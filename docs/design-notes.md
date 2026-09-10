@@ -8044,3 +8044,34 @@ it, so no existing profile changes behaviour. **It is a line the merge moves, no
 uses**: the batch that renames a talent id raises it, and every older profile is refused rather
 than half-read — which is the honest answer, because FP measured what the tolerant read returns and
 it is a silent lie in three fields at once.
+
+---
+
+## Batch FR — why a stale number in the current-truth document is a different kind of defect
+
+**The rule that `master.html` is corrected toward the code has existed for many batches, and this
+batch is the first time anything swept the whole document against it.** Fourteen defects came back,
+and what is worth recording is not the count but the SHAPE: **five of the fourteen are the document
+contradicting itself, in one case eighty lines apart and in another eight.** A reader who checks a
+figure against the code will catch a stale one; a reader who checks it against the paragraph above
+it would have caught five of these for free, and nobody was doing the cheaper thing.
+
+**The run-save entry is the case that argues for reading the reason and not only the number.** The
+open queue had priced it as *a two-number edit* and it was not: the clause explaining WHY a save is
+refused described the v8 boundary, and the live boundary is v10 with a different reason underneath
+it. **Correcting only the digits would have produced a sentence that was newly false rather than
+merely stale** — a v9 save does have the lattice — and it would have read as freshly checked.
+
+**The eight mis-paired talent headings are the other shape, and they are the more interesting
+one.** No number is wrong anywhere in §7: all 324 cells match the trees name for name and figure
+for figure. What was wrong was which heading sat above which table, so a reader looking up the
+Holy's tree read the Pyromancer's and every individual fact on the page was true. **A document can
+be entirely correct line by line and still tell a reader something false**, and no sweep that
+checks values against the code can see it.
+
+**On why so much of it was stale in the same places.** Three of the strata — the enemy tier range,
+the budget ramp, the run-save reason — are all pre-lattice, all from the era when a zone held
+twelve slots, and all survived Batch BK's own sweep. Two more are FF-era rune figures superseded by
+FK. **The document does not rot evenly; it rots where a batch changed a mechanism and swept the
+section it was writing in.** That is CLAUDE.md's own EH observation, and it holds here at a larger
+scale than it was found at.

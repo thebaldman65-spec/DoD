@@ -15,6 +15,103 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-09 &mdash; Batch FR: THE NUMBERS THIS DOCUMENT STATES, AND A READER FOR THE RULE</h2>
+<p><b>NO MERGE WORK, AND NOT ONE RUNE, CARD, ABILITY, TALENT, CONSTANT OR MAGNITUDE MOVED.</b>
+This batch corrected documents toward the code and never the reverse. Where the sweep found the
+CODE looking odd it reported and changed nothing.</p>
+
+<p><b>&sect;1 &mdash; THE RUN-SAVE FIGURES, AND IT WAS NOT THE TWO-NUMBER EDIT THE QUEUE
+PREDICTED.</b> <code>master.html</code> said the run save is <b>format v8</b> and that a save
+<b>older than v8</b> is refused. <code>run_state.save_run</code> writes <b>v12</b> and
+<code>load_run</code> refuses below <b>v10</b>. <b>The REASON attached to the threshold was stale
+too</b>: the clause <i>"holds a flat 12-slot line and a single slot index, which has no honest
+place on a lattice"</i> is the <b>v8/BK</b> refusal, and the live threshold is <b>v10/BM</b>,
+whose reason is different &mdash; the final zone gained a <b>seventeenth slot</b>, so a v9 save's
+final-zone map has no position to walk onto after its boss. <b>A v9 save HAS the lattice.</b>
+Changing only the numbers would have manufactured a new false claim, which is DR's Flash Freeze
+rule arriving through a repair. <code>CLAUDE.md</code> carried the correct reason the whole time.</p>
+
+<p><b>&sect;1b &mdash; <code>docs/ways-of-working.md</code> HAS A READER: <code>check_fr.gd</code>,
+25 checks.</b> FQ &sect;2e measured that file at <b>ZERO readers</b> &mdash; no gate, no suite, no
+script &mdash; so the branch rule it had just recorded was enforced by nothing, which is BN's
+run-save warning again. <b>THE GATE SAYS IN ITS OWN HEADER WHAT IT CANNOT DO.</b> Six of that
+file's eight rule blocks are about how a batch comes to EXIST and leave no artefact in the tree;
+asserting them would be a check that always passes, which is worse than none. It asserts the two
+rules that have artefacts and the file's own housekeeping rules: the branch rule (name read OUT of
+the rule, ref present in <code>.git</code>, the version guard present in <code>profile.gd</code>,
+<code>CLAUDE.md</code> pointing here and NOT restating the branch name), the no-second-copy rule
+as a 60-character line comparison, every path it names resolving, the conflict table covering
+FQ's eight measured files, and it staying the smallest of the three rule files with no batch
+block. <b>&sect;1 is TWO FACTS AND NOT THEIR CONJUNCTION</b> and the header says so: a gate reads
+refs and cannot walk ancestry, so a branch cut from BEFORE the guard would satisfy both arms.
+<b>EIGHT CONTROLS, EACH ON THE ARM IT AIMS AT</b>, both touched files restored by md5.</p>
+
+<p><b>&sect;2 &mdash; THE SWEEP: FOURTEEN DEFECTS, AND THE DOCUMENT CONTRADICTS ITSELF FIVE
+TIMES.</b> Every numeric claim in <code>master.html</code> was read against the code. Beyond
+&sect;1: <b>the enemy tier ladder runs 1&ndash;16, not 1&ndash;11</b> (two sites &mdash; the
+clamp is <code>SLOTS_PER_ZONE</code>, and 11 is a pre-lattice figure); <b>the power-budget ramp's
+formula and all five of its worked bands are stale</b> (the slope is <b>5/14</b> and not a half,
+and the code's own comment names the change); <b>the event verb vocabulary lists
+<code>talent_points</code>, which does not exist</b>, and omits <code>ability_draft</code>, which
+does &mdash; and its worked example offered a conversion the vocabulary cannot express; <b>the
+drafted-abilities table heading claims 142 / 118 / 24 against a table of 127 / 103 / 24 and pools
+of 154 / 129 / 25</b>; a whole <b>stale "the floor is eight" stratum</b> in &sect;6b, sixty lines
+under the line that correctly says the floor is TEN; <b>"fifteen at the cheapest spec" is
+sixteen</b> (driven in the engine); <b>"DEBUFF for seven" is FIVE</b> &mdash; and 7 is the
+OFFENSE column, so the slip was a column; <b>the capstone shelf sits behind difficulty THREE</b>,
+contradicting the row-gating table eight lines above it; <b>the Sharpshooter's third lane is
+PACE</b>, not TEMPO, which is now an archetype tag; and the rune file is <b>127 entries, 67
+retired</b> against the document's 126 / 66 &mdash; with a whole <b>FF-era stratum</b> still
+saying the live pool is 21 runes across four specs in an 87-entry file.</p>
+
+<p><b>&sect;2b &mdash; AND EIGHT OF THE TWELVE TALENT-TREE HEADINGS SAT ABOVE THE WRONG TREE'S
+TABLE.</b> Each <code>&lt;p&gt;<b>Spec</b> &mdash; LANE &middot; LANE &middot; LANE&lt;/p&gt;</code>
+is followed within four lines by a table whose header row names the lanes; the tables are in
+canonical <code>SPEC_IDS</code> order and the headings were not. <b>The Holy heading introduced
+the Pyromancer's tree, the Devout's the Cryomancer's, the Sharpshooter's the Arcanist's</b>, and
+so on &mdash; only Berserker, Swordmaster, Warden and (by coincidence) Occultist lined up.
+<b>The repair is a pure permutation of the file's own lines</b>, asserted as one, so no literal
+could be lost or gained by it.</p>
+
+<p><b>&sect;2c &mdash; WHAT THE SWEEP FOUND CLEAN, WHICH IS THE LARGER HALF AND IS MEASURED
+RATHER THAN ASSUMED.</b> All <b>324</b> talent cells compared name-for-name and number-sequence
+for number-sequence against <code>Talents.desc_for()</code>: <b>0 mismatches over 291
+number-bearing cells</b>, under a two-armed control. All <b>154</b> draft-pool entries and all
+<b>44</b> boss-pool entries match name for name. <b>296</b> ability stat fields across 84 cards:
+<b>0 real defects</b> &mdash; the three raw flags are figures dealt inside a handler, which
+<code>battle.gd</code>'s own comment names. The bestiary's <b>156</b> fields against
+<code>enemies.json</code>: <b>0</b>, under a five-armed control. The archetype-tag corpus (227,
+BREAK primary 0, OFFENSE 70, the eight MARK leads), <code>PROTECTED_CORES</code>, every item
+price, every modifier severity and description, every event weight and bane magnitude, and the
+class stat table all read exactly.</p>
+
+<p><b>&sect;2d &mdash; TWO SUITE NEEDLES MOVED BECAUSE TWO SENTENCES MOVED, WHICH IS DO'S OWN
+PRECEDENT.</b> <code>test_batch_cb</code> pinned <i>"hundred and forty-two"</i> and <i>"All twelve
+specs draft from at least eight"</i> &mdash; the two stale figures &sect;2 corrected. The
+unmodified suite was run against the new tree FIRST and read <b>1730 checks / 2 failures</b>,
+exactly the two predicted and nothing else; both were re-pointed with their reason, and
+<b>the count pin now names the DRAFT (154) rather than the table</b>, because that is the number
+the pools decide. 1730 / 0 afterwards, at the same check count.</p>
+
+<p><b>&sect;3 &mdash; CAN THIS BE AN INSTRUMENT? PARTLY, AND THE RATIO IS MEASURED RATHER THAN
+ESTIMATED.</b> Reported in <code>docs/reports/FR.md</code> &sect;3 and ruled on nowhere. The
+short answer: <b>the structured tables are worth gating and the prose is not.</b> Three
+instruments built for this sweep resolved <b>776 fields</b> at a false-alarm rate that fell to
+<b>zero</b> once name-boundary, window-overrun and wrong-field faults were fixed &mdash; but the
+first drafts of the same instruments reported <b>20 flags of which 18 were their own faults</b>,
+and every one failed toward FEWER findings. <b>Nine of the fourteen defects are in PROSE that no
+table-shaped check can reach</b>, and five of those are the document contradicting itself, which
+is the cheapest check nobody has built.</p>
+
+<p><b>&sect;4 &mdash; WHAT MOVED.</b> <code>docs/master.html</code> (throughout),
+<code>CLAUDE.md</code> (three second copies of the same figures), <code>check_fr.gd</code>
+(<b>NEW</b>), <code>test_batch_cb.gd</code> (two needles re-pointed),
+<code>run_battery.sh</code>, <code>baselines.json</code> (two rows &mdash; its own, and
+<code>check_parse</code> 178&nbsp;&rarr;&nbsp;179), <code>pin-manifest.json</code>,
+<code>docs/ways-of-working.md</code>, <code>docs/design-notes.md</code>, this file,
+<code>docs/state.md</code> and <code>docs/reports/FR.md</code>. <b>No <code>.gd</code> under
+<code>scripts/</code> was touched and no file under <code>data/</code> was touched.</b></p>
+
 <h2>2026-09-09 &mdash; Batch FQ: THE VERSION GUARD, AND THE BRANCH</h2>
 <p><b>NO MERGE WORK.</b> No spec dissolved, no pool merged, no engine became a rune, no node
 moved, and <b>not one rune, card, ability, talent, constant or magnitude moved.</b> This batch is

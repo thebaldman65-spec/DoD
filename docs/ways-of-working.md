@@ -16,6 +16,13 @@ neighbour in another file, it POINTS at it and does not restate it.**
 **KEEP IT SMALL AND KEEP IT STABLE.** It has no batch blocks, no measurements that go stale and no
 history. What happened is `docs/changelog.html`'s; where the project is is `docs/state.md`'s.
 
+**AND SOMETHING READS THIS FILE NOW: `check_fr.gd`, every battery (FR §1).** From FL to FQ nothing
+in the tree opened it, so the branch rule below was enforced by nothing at all. **The gate asserts
+what it can and says in its own header what it cannot** — the branch rule, the no-second-copy rule,
+that every path named here resolves, that the conflict table still names the files it was measured
+over, and that this file stays the smallest of the three. **The rules above the branch section are
+about people and are checked by nobody**, which is stated there rather than left to be discovered.
+
 ---
 
 ## DESIGN IS SETTLED BEFORE A BRIEF EXISTS

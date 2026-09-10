@@ -2044,8 +2044,8 @@ runes have always carried their own.
 · **PRICE WAS THE OPEN QUESTION THIS RULING LEFT BEHIND, AND EZ §0 ANSWERED IT: 100g, FLAT**
   (corrected at Batch FG §3 — this bullet went on stating the question as open for seven batches
   after it was closed, and *A RUNE IS 100g, FLAT* is 330 lines further down this same file). The
-  53 offerable runes it named are retired; **all 21 live runes read 100g and `check_ez` §0 asserts
-  it as an equality.** The 66 retired keep their authored prices — 100 ×42, 75 ×14, 160 ×6,
+  53 offerable runes it named are retired; **all 60 live runes read 100g and `check_ez` §0 asserts
+  it as an equality.** The 67 retired keep their authored prices — 100 ×43, 75 ×14, 160 ×6,
   120 ×3, 50 ×1 — as the record of what the old pool charged, and the generated stat family keeps
   `TEMPLATE_PRICE` = 50. **Neither is a second pricing rule.**
 · **`Runes.is_cost` NEVER READ RARITY AND IS UNAFFECTED**, which is worth writing down because
@@ -2426,11 +2426,11 @@ function in the project, and EZ's own charter forbids moving an ability, a magni
 > rune's worth is contextual, so the player pays for FIT rather than for magnitude.**
 
 **THIS CLOSES THE PRICING QUESTION ES §1 OPENED AND `docs/state.md` HAS CARRIED SINCE.** The
-retired 66 keep their authored prices (50g ×1, 75g ×14, 100g ×42, 120g ×3, 160g ×6) unmoved, as the
+retired 67 keep their authored prices (50g ×1, 75g ×14, 100g ×43, 120g ×3, 160g ×6) unmoved, as the
 record of what the old pool charged — **the breakdown was WRONG ON ARRIVAL and is corrected at
 Batch FG §3**: EZ wrote `100g ×27, 120g ×6, 160g ×5`, and the file said `×41`, `×3` and `×6` on the
-day it was written, so the TOTAL was measured and the split was not. FC's retirement has since
-taken the total to 66; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
+day it was written, so the TOTAL was measured and the split was not. FC's and FO's retirements
+have since taken the total to 67; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
 Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
 the absence of a rule. `check_ez` §0 asserts the flat 100 as an EQUALITY over the live pool.
 
