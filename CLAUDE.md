@@ -267,8 +267,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   reading the rest.
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
 
-## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 290 KiB (STANDING, RULED AT EE §1)
-> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 290 KiB.**
+## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 340 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1)
+> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 340 KiB.**
 > **When it is reached the answer is a SPLIT. It is never a prune.** The 3%-of-sync target this
 > replaces is retired: three readings killed it and all three are recorded below, so nobody derives
 > it again.
@@ -284,13 +284,23 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **NEVER-QUOTED IS NOT DEAD.** "Neither asserted nor quoted" is a fact about citation, not about
   load. **Nobody quotes the rule they are obeying**, so a well-obeyed rule and a dead one produce
   identical evidence under a citation count. **Do not prune this file by a reference count.**
-- **THE 290 KiB IS DERIVED, NOT CHOSEN.** The FLOOR is measured: DZ's prune produced **210.59 KiB**
-  with the narrative gone, and everything added since has been tested live. The HEADROOM is measured:
-  the largest single-batch growth on record is **+8.09 KiB**, and **a ceiling within one batch's
-  reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten of
-  those. 210.59 + 80.90 = 291.49, **stated as 290 and rounded DOWN** — a ceiling above its own
-  derivation is one nobody trusts.
-- **THE PROCEDURE AT 290 KiB IS A SPLIT, AND IT HAS BEEN TAKEN TWICE (EF §2, FF §1).** A ceiling
+- **THE 340 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS (ruled by the
+  designer at FU §1).** The FLOOR is measured: FF's split left **261.03 KiB** of this file alone,
+  after ED had read every never-cited block and retired none and FF had classified all 105 by what
+  each binds — the most recent reading of this file with nothing in it but tested rules. The
+  HEADROOM is measured: the largest single-batch growth on record is **+8.10 KiB**, and **a ceiling
+  within one batch's reach fires on whoever writes the big batch rather than on the file's
+  condition**, so it is ten of those. 261.03 + 81.00 = 342.03, **stated as 340 and rounded DOWN** —
+  a ceiling above its own derivation is one nobody trusts.
+  · **EE's 290 WAS THE SAME ARITHMETIC ON INPUTS FORTY BATCHES OLD, AND RAISING IT IS NOT A
+    RETREAT.** Its floor was DZ's 210.59 KiB, taken before the instrument half left this file, and
+    its headroom was ten of EB's +8,287 B. **EZ has since grown the file by +8,293 B — six bytes
+    more — so the record the headroom term reads is EZ's now.** **A ceiling with no cut available
+    and no seam available is a wall**, and the batch that meets it is the one that discovers this
+    mid-write: ED and FF measured that there is nothing to cut, FF measured that there is nowhere to
+    move it, and FT reached it with less headroom than one standing rule costs. **Recorded so the
+    raise is not read later as a ceiling abandoned.**
+- **THE PROCEDURE AT THE CEILING IS A SPLIT, AND IT HAS BEEN TAKEN TWICE (EF §2, FF §1).** A ceiling
   in KiB is a ceiling on the READ, not on how many rules the project may hold — **splitting caps
   the read without capping the rules, and pruning caps the rules, which is why it was always the
   wrong instrument.** **Take CW's split discipline with it**: both halves name each other by
@@ -303,20 +313,34 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     instrument half. **The `STANDING REFERENCE` blocks are NOT the seam this block used to name
     them as** — there are eight of them now, not seven, and the two largest (the protected cores,
     and engine/axis/tag) are the vocabulary every new card is authored against, so the tiebreak
-    keeps both. **The next batch to reach 290 KiB has two moves and both are the designer's:
-    re-derive the ceiling per half (EF costed it and deliberately did not take it), or overturn
-    the one-way tiebreak.** The classification and its per-group sizes are in `docs/reports/FF.md`
-    §1 — do not re-derive them from a proposal.
+    keeps both. **FF named two moves and both were the designer's: re-derive the ceiling per half
+    (EF costed it and deliberately did not take it), or overturn the one-way tiebreak. FU TOOK THE
+    FIRST** — the 340 above is this file's own ceiling off this file's own post-split reading —
+    **and the second is what is left.** The classification and its per-group sizes are in
+    `docs/reports/FF.md` §1 — do not re-derive them from a proposal.
+  · **AT 340 KiB THE PROCEDURE IS EXHAUSTED, AND THE NEXT QUESTION IS NAMED HERE SO IT IS NOT
+    REDISCOVERED (FU §1).** Split-never-prune has no seam left of the kind it takes, and the ceiling
+    has been re-derived once. **A second re-derivation is not the same move made twice**: every
+    audit of this file has found nothing dead, so its next rules-only reading would be its own size
+    on the day, and a ceiling derived from a file's own size moves with the file. **THE SEAM THAT
+    EXISTS IS BY SUBJECT, NOT BY WHAT A RULE BINDS.** At FF's classification COMBAT RESOLUTION LAW
+    was **66.74 KiB** over 24 blocks and CARD / ABILITY AUTHORING LAW **59.12 KiB** over 21, and
+    either could become a reference this file points at, the way `docs/instrument-rules.md` did.
+    **It is a real seam and it is not the one FF's tiebreak allows** — the tiebreak keeps every rule
+    about what the game may contain in the required read, and both subjects are exactly that — **so
+    taking it is overturning the tiebreak for a subject, and that is the designer's ruling.** Both
+    figures are FF's, measured on a 280.80 KiB file: re-measure them before quoting them as this
+    file's shape.
   · **TAKE A SPLIT AT A MEASURED SEAM, NOT AT A REACHED CEILING (STANDING, EF §2).** EF split at
     52.50 KiB of headroom rather than at zero. **A seam is cleaner measured than reached**, and a
     split taken under a ceiling is a split taken in a hurry — which is the same argument that made
     the prune the wrong instrument.
-- **THE 290 KiB BINDS THIS FILE, THE REQUIRED READ — AND ITS DERIVATION NOW COVERS TWO FILES.** The
-  FLOOR term was measured on a file that still held the instrument half, so **290 is conservative
-  for this file alone: it fires later than its own derivation would, never earlier.** Re-deriving it
-  per half is a RULING and EF did not take it; the arithmetic for both halves is in
-  `docs/reports/EF.md` §2. **`docs/instrument-rules.md` is under the same procedure and has no
-  stated ceiling yet.**
+- **THE 340 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
+  derived on a file that still held the instrument half, so it was conservative for this file alone
+  and fired later than its own derivation would have. **FF's post-split reading carries no such
+  term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` is under
+  the same procedure and has no stated ceiling yet**; deriving one is a ruling nobody has taken, and
+  the arithmetic is in `docs/reports/EF.md` §2.
 - **DO NOT STATE THIS FILE'S LIVE SIZE IN THIS FILE.** The live reading belongs in `docs/state.md`
   and the batch report. **A file that records its own size changes it by recording it**, which is
   the same shape as *an instrument's corpus must not contain what the instrument rewrites*, in
@@ -324,10 +348,12 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **AND SOMETHING MEASURES IT NOW: `check_fg.gd` §2, EVERY BATTERY (Batch FG).** From EE to FG this
   ceiling had no instrument at all — the number was stated here and nothing ever read the file
   against it, which is how the changelog's own threshold came to be crossed four batches running
-  with a green tree. **The gate parses the bar out of the two sentences above rather than holding a
-  copy**, and asserts they agree; over the ceiling is a printed WARNING, and over it by more than
-  the largest single-batch growth on record is a FAILURE. **The reasoning for the two arms is the
-  LAST standing rule in the index above**, in `docs/instrument-rules.md`, written beside the
+  with a green tree. **The gate parses the bar out of the two sentences above, and since FU §1 it
+  holds no copy of the number anywhere** — its form check carried the old ceiling as a literal
+  until the ceiling moved and took it red, which is the second-copy defect arriving inside the gate
+  written against it. It asserts the statements agree; over the ceiling is a printed WARNING, and
+  over it by more than the largest single-batch growth on record is a FAILURE. **The reasoning for
+  the two arms is FG §2's row in the index above**, in `docs/instrument-rules.md`, written beside the
   changelog's own threshold — its title is not repeated here, because a title repeated in this file
   is a second place a pin can resolve, which is the hazard the index bullet above names. **Reword
   either sentence and the gate says it cannot find its bar** — which is deliberate, and is why the
@@ -1629,6 +1655,16 @@ divides by, so a term there compounds with Chilled, Slowed, Quick Draw and Wrath
 **Measured rather than argued: the control that adds one made the live delta read x0.6296 where
 the engine's own arithmetic says x0.6800.**
 
+**AND CHANNEL'S BUILD HALF IS ONE TERM, NOT TWO (FU §2).** A free cast counts as a floor value of
+Mana rather than zero: every CAST books `max(net, CHANNEL_CAST_FLOOR)` at the one spend line, so
+the engine keeps its shape — builds per Mana spent — and **a parallel cast-counter is what this
+rules out**, because it would be a second mechanism for one question. *A cast* is that line's own
+`not is_counter`, the definition the Killing Cold and the Overtone already read. **The floor's
+reason is a RELATION, not a number**: it is the cheapest price a Mage can pay, so it lifts no card
+he pays for, and `check_ft` §5 asserts the relation — **the day a cheaper Mage card is authored
+that gate reds, and the answer is a ruling on the floor, never an exemption for the card.** It
+stays element-blind: the door reads the cost, the cast flag and the floor, and never the ability.
+
 ## STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
 may be authored into the Survivalist's tree, or into any existing spec, until that spec is
@@ -1725,12 +1761,16 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   whatever the talents (Soul Glut included); the amplification is ALLOWED to run |
   battle.gd ~7846 (const), applied at the strike-loop leech block ~5680.
 · **mana_spent** (Channel, uncapped) | **a FLAT CAP on the READ, not on the ledger** —
-  `channel_steps()` is `mini(mana_spent / 40, 6)`, so the counter goes on climbing and stops
-  paying at six steps. **THE ECONOMY IS THE REAL GOVERNOR AND IT IS TIGHTER THAN THE CAP**: Mana
-  starts at 100, caps at 100 and regenerates 12 a turn, so he cannot have spent more than
-  `100 + 12(N-1)` by his Nth turn whatever he casts | `channel_steps()`/`channel_bonus()` in
-  `unit.gd` (THE ONE PLACE THE SPLIT IS DECIDED); the ledger is written at
-  `note_resource_spent`, the one net-off-the-bar door CZ §1 already books Rage through.
+  `channel_steps()` is `mini(mana_spent / CHANNEL_MANA_PER_STEP, CHANNEL_MAX_STEPS)`, so the
+  counter goes on climbing and stops paying at the cap; **and since FU §2 a CAST books at least
+  `CHANNEL_CAST_FLOOR`**, so a free cast builds. **THE BAR GOVERNS A SHORT FIGHT AND THE CAP A LONG
+  ONE — AND FT's ECONOMY WAS WRONG, SO THIS ROW NO LONGER SAYS THE BAR IS TIGHTER**: Mana starts at
+  100 and caps at 100, but a Mage regenerates **22** a turn, not 12 — Evocation, the Mage class
+  passive, is on every Mage — and the floor adds at most its own value a cast, so the ledger can
+  outrun the cap within a normal fight's length. How often it does is measured, not argued, in
+  `docs/reports/FU.md` §2 | `channel_steps()`/`channel_bonus()` in `unit.gd` (THE ONE PLACE THE
+  SPLIT IS DECIDED); the ledger is written at `note_resource_spent`, the one net-off-the-bar door
+  CZ §1 already books Rage through.
 · **momentum** (Warrior spine) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
   clamps at `MOMENTUM_MAX_STEPS`, so this is the one of the three that never accumulates past its
   ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one step a turn, and only for

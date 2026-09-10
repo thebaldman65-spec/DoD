@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1448,
+  "total": 1446,
   "source": 1113,
   "other": 89,
-  "document": 246
+  "document": 244
  },
  "source_residency": {
   "code": 668,
@@ -2536,28 +2536,6 @@
   },
   {
    "s": "check_fg.gd",
-   "fn": "_s1_the_changelog",
-   "h": "docs/instrument-rules.md",
-   "n": "THE THRESHOLD IS 400 KB",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fg.gd#30"
-  },
-  {
-   "s": "check_fg.gd",
-   "fn": "_s2_the_required_read",
-   "h": "CLAUDE.md",
-   "n": "THE CEILING IS 290 KiB",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fg.gd#62"
-  },
-  {
-   "s": "check_fg.gd",
    "fn": "_s3_the_rule_and_the_gate",
    "h": "CLAUDE.md",
    "n": null,
@@ -2932,7 +2910,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ft.gd#324"
+   "g": "check_ft.gd#325"
   },
   {
    "s": "check_ft.gd",
@@ -2943,7 +2921,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ft.gd#458"
+   "g": "check_ft.gd#459"
   },
   {
    "s": "test_batch_ah.gd",

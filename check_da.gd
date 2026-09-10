@@ -90,6 +90,17 @@ const WALK_EXEMPT := {
 	# canonical walk for the enumeration, pools for the membership question the
 	# enumeration cannot answer.
 	"check_fk.gd": "asks whether a rune's `requires_ability` is EARNABLE by its scoped spec — it reads both draft pools because the award chain does, and calls `Classes.ability_corpus()` for the walk itself",
+	# **BATCH FU — THE FIFTH TIME THE MARK OVER-FIRES, AND IT IS FK's REASON
+	# EXACTLY.** `check_ft` §5h asserts that Channel's free-cast floor sits at or
+	# under the cheapest price a MAGE can pay — the relation that is the floor's
+	# reason. Its population is `Classes.ability_corpus()`; which of those cards a
+	# Mage can HOLD is the award chain's question, answered by the pools the chain
+	# reads (boss, spec draft, class draft) and the kit as spawned. **A flat list
+	# cannot say whether a Mage can hold Blink**, so this is the `check_dn` and
+	# `check_fk` shape. **FU's first draft DID walk the pools itself**, and this
+	# section caught it in the acceptance battery at 43 / 2 — the population was
+	# moved onto the corpus BEFORE this row was written, not instead of it.
+	"check_ft.gd": "asks which corpus cards a MAGE can hold, for Channel's floor relation — it reads both draft pools because the award chain does, and calls `Classes.ability_corpus()` for the walk itself",
 }
 
 

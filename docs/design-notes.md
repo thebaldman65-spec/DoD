@@ -8194,3 +8194,47 @@ in the report.
 **And why a natural expiry does not feed the meter.** A clock running out is time passing, not a
 hero acting. A meter that built from it would build for a hero doing nothing, which is the
 perpetual-motion shape FC §2 already ruled against on a different meter.
+
+## Batch FU — the ceiling moves, and Channel gets its number
+
+**Why 340 is not a retreat.** EE's 290 was never chosen; it was arithmetic — a measured floor plus
+ten of the worst batch on record — and both of its inputs were forty batches old. Re-running the
+same arithmetic on today's inputs gives 342. What made the re-run necessary is that the file had
+become a wall: ED and FF had measured that there is nothing dead to cut, FF had measured that there
+is no seam of the kind the procedure takes, and FT arrived with less headroom than a single standing
+rule costs. A ceiling that can only be met by refusing to write rules is not measuring the file any
+more.
+
+**Why the subject seam is named and not taken.** It is real — combat law and card law are each big
+enough to be a reference file — but it is not the seam EF's tiebreak allows, because the tiebreak's
+whole point is that a rule about what the game may contain is in the one file a batch must read.
+Overturning that is a decision about how the project reads its own rules, and it is the designer's.
+Writing it down now is what stops the next batch at the ceiling from discovering the dead end
+mid-write, which is exactly how FT met this one.
+
+**Why the watcher's copy matters more than its size.** `check_fg` was built on the rule that a
+second copy of a number is this project's oldest defect, and it parses its bars out of prose for
+exactly that reason. It still held a copy — in the check that asserted the prose's FORM — and
+nothing could see it until a bar actually moved. A gate is only as copy-free as its least-examined
+line.
+
+**Why a floor and not a cast counter.** The engine is "builds per Mana spent". A counter of casts
+would be a second engine answering the same question beside it; a floor keeps one ledger and lets a
+free cast carry a nominal value inside it.
+
+**Why 10.** Not because 10 feels right, but because it is Blink's price — the cheapest thing a Mage
+can pay for. A floor at that price can never make a paid card worth more than it cost, so in play it
+touches the free casts and nothing else. That relation is what the gate asserts, so the number
+cannot outlive its reason.
+
+**Why 42, and why the three specs do not land together.** The target was half the cap by the end of
+a normal fight. At 42 every Mage spec's median end-of-fight meter is exactly three steps. The
+Cryomancer still sits higher and the Arcanist lower, because the Cryomancer simply takes more turns
+in a fight than the Arcanist — and a per-cast floor cannot fix a difference in how many casts there
+are. Closing it with a rate per spec would turn a class core into a spec engine, which is the one
+thing a class core is not allowed to be.
+
+**And why the floor turned out small.** FT's picture was a Mage who runs dry and falls back to his
+free basic. The measurement says he mostly does not: every Mage regenerates 22 a turn, not 12, so
+free casts are roughly one cast in eight. The ruling is still right — a free cast now builds — but
+most of the meter's speed was always going to come from the step.

@@ -1905,19 +1905,32 @@ var sanctity_active := false
 # rule a core engine has to satisfy. `check_ft` §1 asserts that property against
 # the function's own source rather than trusting this paragraph.
 #
-# **THE RATE AND THE PAYOUT ARE FLAGGED, NOT TUNED (`docs/reports/FT.md` §1).**
-# The three constants below are placeholders chosen so the machinery can be
-# driven and measured; the report states what a Mage's meter reads at turn 5 and
-# turn 10 at a realistic spend, and the designer rules.
-const CHANNEL_MANA_PER_STEP := 40
+# **THE RATE IS RULED AT FU §2; THE PAYOUT AND THE CAP ARE STILL FT's.** The
+# designer ruled that FREE CASTS BUILD and set a target rather than a number: a
+# Mage reaches ROUGHLY HALF the cap by the end of a normal fight, with the cap
+# left to long fights and bosses. The step below is the one that lands all three
+# Mage specs' median at three steps on driven rung-1 trash fights; the reading,
+# and the spread between the specs that one step cannot close, are in
+# `docs/reports/FU.md` §2. FT's 40 was a placeholder chosen so it could drive.
+const CHANNEL_MANA_PER_STEP := 42
 const CHANNEL_MAX_STEPS := 6
 const CHANNEL_STEP_BONUS := 0.03
+# **A FREE CAST COUNTS AS A FLOOR VALUE OF MANA RATHER THAN ZERO (FU §2).** One
+# term, not two: every CAST books `max(net, floor)` at `note_resource_spent`, so
+# the engine keeps its stated shape — builds per Mana spent — and a cast that
+# took nothing off the bar carries a nominal value. A parallel cast-counter
+# would be a second mechanism for one question. **THE FLOOR IS THE CHEAPEST
+# PRICE A MAGE CAN PAY (Blink, 10), SO IT LIFTS NO CARD HE PAYS FOR** — a Mage's
+# price is 10 or more, or zero under Effortless — and in play it touches the
+# free casts and nothing else. That relation is the number's reason, and
+# `check_ft` §5 asserts it rather than trusting this comment.
+const CHANNEL_CAST_FLOOR := 10
 # **AND "SPELL DAMAGE" IS A RULING, NOT MACHINERY.** There is no `is_spell` flag
 # on `Ability`. The available partition is `dmg_type`, so *spell* has to mean
 # *not physical* — or Channel pays into all damage and buys the basic attack
 # with it. The constant is the ruling's one line; `channel_bonus()` reads it.
 const CHANNEL_SPARES_PHYSICAL := true
-var mana_spent := 0        # NET Mana off the bar, by `note_resource_spent`
+var mana_spent := 0        # NET Mana off the bar, by `note_resource_spent` — a CAST books at least the floor
 
 # ── MOMENTUM (Warrior) — builds per exchange, pays initiative ────────────────
 #
@@ -3138,12 +3151,21 @@ func return_to_idle() -> void:
 # term readable by a Mage, which is the failure `check_em` §2 exists to catch in
 # the other direction.
 #
-# **AND IT STILL CANNOT SEE WHAT WAS CAST.** The only two things this function
-# looks at are the integer the bar moved by and the name of the bar. `check_ft`
-# §1 asserts that over this function's own source: no `ab`, no `dmg_type`, no
-# ability name, no school. That is what makes Channel element-blind BY
-# CONSTRUCTION rather than by intention.
-func note_resource_spent(amount: int) -> void:
+# **AND IT STILL CANNOT SEE WHAT WAS CAST.** The only things this function looks
+# at are the integer the bar moved by, the name of the bar, whether its caller
+# says the booking is a CAST, and the floor. `check_ft` §1 asserts that over this
+# function's own source: no `ab`, no `dmg_type`, no ability name, no school. That
+# is what makes Channel element-blind BY CONSTRUCTION rather than by intention.
+#
+# **BATCH FU — A FREE CAST BOOKS THE FLOOR, AND ONLY A CAST DOES.** `cast` is
+# true from one caller: the spend line in `_resolve`, for a resolution that is
+# not a counter. It defaults to FALSE, so the other three callers — Last Rites,
+# Reckless Abandon and Blood Debt's Rage-equivalent — and every suite that calls
+# this door directly book exactly what they always did. **The floor names Mana:
+# Blood Frenzy's ledger is not Channel's and does not move.**
+func note_resource_spent(amount: int, cast := false) -> void:
+	if cast and resource_name == "Mana":
+		amount = maxi(amount, CHANNEL_CAST_FLOOR)
 	if amount <= 0:
 		return
 	if resource_name == "Rage":

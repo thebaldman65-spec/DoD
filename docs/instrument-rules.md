@@ -145,7 +145,7 @@ below.
 | the bar | where it is stated | what watched it | what happened |
 |---|---|---|---|
 | `docs/changelog.html` at 400 KB | CW §4, the block above | nothing, from CW to FG | crossed at FB/FC and **four batches went past in silence** |
-| `CLAUDE.md` at 290 KiB | EE §1, `CLAUDE.md`'s ceiling block | nothing, from EE to FG | not yet crossed — **found out by measuring rather than by arriving** |
+| `CLAUDE.md` at 290 KiB (340 since FU §1) | EE §1, `CLAUDE.md`'s ceiling block | nothing, from EE to FG | not yet crossed — **found out by measuring rather than by arriving** |
 
 - **THE FAILURE MODE IS NOT THAT THE BAR IS WRONG. IT IS THAT NOTHING LOOKS.** `check_dv` §4
   printed the live changelog's ENTRY COUNT every single battery from DV onward and nothing
@@ -174,11 +174,18 @@ below.
   of leaving a gate measuring against the copy nobody updated. **A gate that falls back to a
   hardcoded bar when it cannot find the rule is worse than one that fails**: the rule is the
   authority, and a gate that cannot find it must say so.
+  · **AND IT DID HOLD ONE, IN THE CHECK THAT ASSERTED THE RULE'S FORM (found at FU §1).** Both
+    form checks were `contains()` on the whole sentence, number included, so the first batch to
+    move a bar took the gate red with a correct rule and a correct file — **22 / 1, while its parse
+    arms had already followed the new number.** A gate that parses a number out of prose can still
+    hold a copy in the check that asserts the prose's FORM. **Assert the form with the same pattern
+    that parses the number**, never with a literal of the sentence.
 - **THE COST OF THE MISS IS THE MEASURE OF THE RULE.** Four batches of drift cost one whole batch
   to repair, and the repair moved 36 entries and re-pointed two gates. That is cheap because the
   changelog is append-only prose. **The same silence on a bar with a harder procedure behind it is
   not cheap**, and `CLAUDE.md`'s is the harder one: FF measured that there is no third seam of its
-  kind, so the next batch to reach 290 KiB has two moves and both are the designer's. **Finding
+  kind, so the batch that met 290 KiB had two moves and both were the designer's — FU §1 took one,
+  and `CLAUDE.md`'s ceiling block names what is left at 340. **Finding
   that out early is the whole value.**
 
 ## ON A SPLIT-CLAUSE CARD, EVERY PIN NAMES THE CLAUSE IT PINS (STANDING, Batch DM §2)

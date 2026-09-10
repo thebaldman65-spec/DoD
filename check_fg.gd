@@ -42,6 +42,11 @@
 #     that states them, because a second copy of a number is this project's
 #     oldest recurring defect. It asserts that EVERY statement of a bar in its
 #     own file AGREES, so a half-edited rule reds rather than drifting.
+#     **AND UNTIL FU §1 IT HELD ONE ANYWAY**: each form check was `contains()`
+#     on the whole sentence, number included, so moving the ceiling to 340
+#     took §2 red against a correct rule and a correct file while its parse
+#     arms had already followed. The form is asserted by the pattern that
+#     parses the number now, and no literal of either bar is left in here.
 #   IT MEASURES BYTES, NEVER CHARACTERS. `String.length()` is a CHARACTER
 #     count and `CLAUDE.md` holds 1,959 bytes of multi-byte punctuation — 1.91
 #     KiB, against a ceiling whose whole margin is measured in KiB. A gate
@@ -111,10 +116,12 @@ func _s1_the_changelog() -> void:
 	print("\n§1 — docs/changelog.html against the threshold the rule states")
 	var ir := FileAccess.get_file_as_string("res://docs/instrument-rules.md")
 	ok(ir.length() > 40000, "§1: docs/instrument-rules.md read back %d chars" % ir.length())
-	ok(ir.contains("THE THRESHOLD IS 400 KB"),
-		"§1: the rule no longer states the changelog threshold in the form this gate reads")
-
+	# THE FORM IS ASSERTED BY THE PATTERN THAT PARSES THE NUMBER (FU §1). This
+	# arm was `contains()` on the sentence with its number in it, which is a
+	# second copy of the bar; the pattern finds the form whatever the number is.
 	var bars := _bar_from_rule(ir, "THE THRESHOLD IS ([0-9]+(?:\\.[0-9]+)?) KB")
+	ok(bars.size() >= 1,
+		"§1: the rule no longer states the changelog threshold in the form this gate reads")
 	ok(bars.size() == 1,
 		"§1: the rule states %d DIFFERENT changelog thresholds %s — they must agree" % [
 			bars.size(), bars])
@@ -169,14 +176,17 @@ func _s2_the_required_read() -> void:
 	print("\n§2 — CLAUDE.md against the ceiling the rule states")
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(cm.length() > 100000, "§2: CLAUDE.md read back %d chars" % cm.length())
-	ok(cm.contains("THE CEILING IS 290 KiB"),
+	# THE FORM IS ASSERTED BY THE PATTERN THAT PARSES THE NUMBER (FU §1). This
+	# arm was `contains("THE CEILING IS 290 KiB")` — the old ceiling, copied —
+	# and moving the ceiling to 340 took it red while the parse below followed.
+	var bars := _bar_from_rule(cm, "THE CEILING IS ([0-9]+(?:\\.[0-9]+)?) KiB")
+	ok(bars.size() >= 1,
 		"§2: CLAUDE.md no longer states its ceiling in the form this gate reads")
 
 	# THE FILE SAYS IT TWICE — the heading and the rule sentence under it — and
 	# THAT IS THE POINT OF READING THEM ALL: two copies of a number that
 	# disagree is the defect, and a gate that read only the first would not see
 	# it. Every occurrence is collected and the SET must have one member.
-	var bars := _bar_from_rule(cm, "THE CEILING IS ([0-9]+(?:\\.[0-9]+)?) KiB")
 	ok(bars.size() == 1,
 		"§2: CLAUDE.md states %d DIFFERENT ceilings %s — the copies disagree" % [bars.size(), bars])
 	var growth := _bar_from_rule(cm,

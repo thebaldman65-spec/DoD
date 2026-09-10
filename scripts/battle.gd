@@ -8034,7 +8034,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	var cz_res_before: int = attacker.resource
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
-	attacker.note_resource_spent(cz_res_before - attacker.resource)
+	# BATCH FU — AND THE DOOR IS TOLD WHETHER THIS WAS A CAST, which is how
+	# Channel counts a free cast as a floor value of Mana rather than zero.
+	# `not is_counter` is this line's own definition of a cast — the Killing
+	# Cold and the Overtone below read it the same way — so a retaliation books
+	# what it always did, and a Rage bar is untouched because the floor names Mana.
+	attacker.note_resource_spent(cz_res_before - attacker.resource, not is_counter)
 	attacker.refresh_bars()
 	# BATCH FK — THE RUNE OF THE KILLING COLD, AND THE OVERTONE'S CAST COUNTER.
 	# Both are "whenever he casts", and this is the one line every ability in

@@ -18,6 +18,12 @@
 #   §4  THE ANTI-INERT WALK — every field this batch declares is read somewhere
 #       in `scripts/`, and every payout is guarded. A payload that attaches and
 #       pays exactly 1.0000 is this project's most common shipped defect.
+#   §5  CHANNEL'S FLOOR (Batch FU) — a free cast counts as a floor value of
+#       Mana, driven through `_resolve` at all three Mage specs: a free cast
+#       books the floor, a costed one its net and never net + floor, a clamped
+#       one the floor, a counter nothing and a Warrior nothing — and the
+#       floor's REASON is asserted as a relation, at or under the cheapest
+#       price a Mage can pay.
 #
 # **WHY §0 IS FIRST AND WHY IT IS THE POINT.** This batch lands on `class-merge`
 # with the game still whole. Three engines exist, can be driven, and are reached
@@ -66,6 +72,7 @@ func _initialize() -> void:
 	await _s2_momentum()
 	await _s3_sanctity()
 	_s4_anti_inert()
+	await _s5_the_floor()
 	_g.report(self)
 
 
@@ -216,9 +223,12 @@ func _s1_channel() -> void:
 			blind = false
 	ok(blind,
 		"§1a: it names no ability, element, school or damage type — it reads the COST")
+	# BATCH FU — POINTED AT THE NEW FORM. The door also reads whether its caller
+	# says the booking is a cast, and the floor; the blind half above is the
+	# same list and still names nothing about what was cast.
 	ok(body.contains("resource_name") and body.contains("mana_spent")
-			and body.contains("rage_spent"),
-		"§1a: ...and what it DOES read is the bar's name and the two spend meters")
+			and body.contains("rage_spent") and body.contains("CHANNEL_CAST_FLOOR"),
+		"§1a: ...and what it DOES read is the bar's name, the two spend meters and the floor")
 
 	# (b) TWO FIELDS, NOT ONE. `rage_spent` holding Mana is a name that lies,
 	# and a shared field would make Blood Frenzy's second term readable by a
@@ -1012,3 +1022,224 @@ func _s4_anti_inert() -> void:
 	ok(guarded == PAYOUTS.size(),
 		"§4: all %d payouts open with their own switch (CHECKED %d of %d)"
 			% [PAYOUTS.size(), guarded, PAYOUTS.size()])
+
+
+# ── §5 ──────────────────────────────────────────────────────────────────────
+# BATCH FU — A FREE CAST COUNTS AS A FLOOR VALUE OF MANA, DRIVEN AT ALL THREE
+# MAGE SPECS.
+#
+# **THE RULING IS ONE TERM, NOT TWO.** A cast books `max(net, floor)`, so the
+# engine keeps its stated shape — builds per Mana spent — and a cast that took
+# nothing off the bar carries a nominal value instead of zero. A parallel
+# cast-counter would have been a second mechanism for one question.
+#
+# **A STATIC CHECK CANNOT TELL THE FLOOR APART FROM ITS TWO WRONG VERSIONS**: one
+# that lands on a cast that was never free (a per-cast bonus added on top), and
+# one that misses a cast that was. Both read correctly off the constant and off
+# the function. So every arm below goes through `_resolve` — the one line every
+# cast in the game pays at — on a real spawned Mage of each spec.
+#
+# **AND THE FLOOR'S REASON IS A RELATION, SO THE RELATION IS ASSERTED (h).** The
+# floor is the cheapest price a Mage can pay, which is what makes "it lifts no
+# card he pays for" true. A card authored under it is the day (h) reds, and the
+# answer is a ruling on the floor rather than an exemption for the card.
+func _s5_the_floor() -> void:
+	print("\n§5 — a free cast counts as a floor value of Mana, driven at all three Mage specs")
+	var fl := BattleUnit.CHANNEL_CAST_FLOOR
+	ok(fl > 1 and fl < BattleUnit.CHANNEL_MANA_PER_STEP,
+		"§5: the floor is %d Mana, above one and below the %d-Mana step — a nominal value, not a step"
+			% [fl, BattleUnit.CHANNEL_MANA_PER_STEP])
+
+	# (g) THE DOOR ITSELF, BEFORE ANYTHING IS SPAWNED. A direct call is not a
+	# cast unless its caller says so — which is what keeps `check_cz`'s and §1c's
+	# direct calls byte-identical — and the floor names Mana and nothing else.
+	var m := BattleUnit.new()
+	m.resource_name = "Mana"
+	m.note_resource_spent(0)
+	ok(m.mana_spent == 0, "§5g: a zero that is not a cast reads %d, want 0 — the door's default" % m.mana_spent)
+	m.note_resource_spent(0, true)
+	ok(m.mana_spent == fl, "§5g: a zero that IS a cast reads %d, want the floor, %d" % [m.mana_spent, fl])
+	m.note_resource_spent(-25, true)
+	ok(m.mana_spent == 2 * fl,
+		"§5g: a cast that handed back more than it took is still a cast — reads %d, want %d"
+			% [m.mana_spent, 2 * fl])
+	m.note_resource_spent(fl + 7, true)
+	ok(m.mana_spent == 3 * fl + 7,
+		"§5g: a cast above the floor books its net, never net + floor — reads %d, want %d" % [m.mana_spent, 3 * fl + 7])
+	var w := BattleUnit.new()
+	w.resource_name = "Rage"
+	w.note_resource_spent(0, true)
+	ok(w.rage_spent == 0 and w.mana_spent == 0,
+		"§5g: a Warrior's free cast reads %d Rage and %d Mana, want 0 and 0 — no floor on Rage" % [w.rage_spent, w.mana_spent])
+	m.free()
+	w.free()
+
+	var free_books := []
+	# (h)'s MEMBERSHIP: every card name a Mage of any spec can hold. The pools say
+	# WHO CAN HOLD a card, which is the award chain's question; what EXISTS is the
+	# corpus walk after the loop (DA §3).
+	var mage_names := {}
+	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+		var scene: Node = await Gate.spawn(self, ["berserker", spec, "holy", "sharpshooter"])
+		var heroes: Array = scene.get("heroes")
+		var war: BattleUnit = heroes[0]
+		var mage: BattleUnit = heroes[1]
+		var foe: BattleUnit = scene.get("enemies")[0]
+		# EVERY ENEMY IS MADE UNKILLABLE, not only the target: Barrage's random
+		# hits find the lowest-health bodies, and a board that empties ends the
+		# fight under the arms that are still measuring it.
+		for e in scene.get("enemies"):
+			e.max_hp = 500000
+			e.hp = 500000
+
+		# (h) MEMBERSHIP, NOT A WALK. The kit this Mage holds as spawned (overrides
+		# included), and every channel the award chain reads for his spec — the
+		# boss pool, his spec draft pool and his class-wide draft pool, FJ §1's
+		# three, all landing in `bm_abilities` through one `hold_ability()`.
+		for a in mage.abilities:
+			if a != null:
+				mage_names[String(a.display_name)] = true
+		for nm in Classes.spec_pool(spec) + Classes.spec_draft_pool(spec) \
+				+ Classes.class_draft_pool(Classes.class_of_spec(spec)):
+			mage_names[String(nm)] = true
+
+		# THE TWO CARDS ARE FOUND OFF THE PRICE, NOT NAMED. The free one is
+		# whatever costs nothing here — the basic, today, on all three — and the
+		# costed one is the cheapest card at or over the floor with no refund of
+		# its own, so its whole cost is what the spend line nets.
+		var free_ab: Ability = null
+		var paid_ab: Ability = null
+		var paid_c := 1 << 30
+		for cand in mage.abilities:
+			if cand == null:
+				continue
+			var c: int = scene._eff_cost(mage, cand, foe)
+			if c == 0 and free_ab == null:
+				free_ab = cand
+			if c >= fl and cand.resource_gain == 0 and c < paid_c:
+				paid_ab = cand
+				paid_c = c
+		ok(free_ab != null and paid_ab != null,
+			"§5 %s: a free card and a costed card to drive (%s / %s)" % [spec,
+				free_ab.display_name if free_ab else "none",
+				paid_ab.display_name if paid_ab else "none"])
+		if free_ab == null or paid_ab == null:
+			scene.queue_free()
+			await process_frame
+			continue
+
+		# (a) A FREE CAST BOOKS EXACTLY THE FLOOR AND TAKES NOTHING OFF THE BAR.
+		# The floor is a nominal value on the LEDGER; the bar never sees it.
+		var d := await _cast_delta(scene, mage, free_ab, foe, false, mage.max_resource)
+		ok(int(d["bar"]) == 0,
+			"§5a %s: %s took %d off the bar, want 0 — a free cast spends nothing" % [
+				spec, free_ab.display_name, int(d["bar"])])
+		ok(int(d["mana"]) == fl,
+			"§5a %s: ...and the ledger reads %d, want the floor, %d" % [spec, int(d["mana"]), fl])
+		free_books.append(int(d["mana"]))
+
+		# (b) A COSTED CAST BOOKS WHAT LEFT THE BAR, AND NOT THE FLOOR ON TOP.
+		d = await _cast_delta(scene, mage, paid_ab, foe, false, mage.max_resource)
+		ok(int(d["mana"]) == paid_c,
+			"§5b %s: %s reads %d, want its %d net and never %d — the floor is a minimum, not a bonus" % [
+				spec, paid_ab.display_name, int(d["mana"]), paid_c, paid_c + fl])
+
+		# (c) A CAST THAT TOOK LESS THAN THE FLOOR BOOKS THE FLOOR. The clamp at
+		# zero is the honest way to put a sub-floor net on a real cast: the bar
+		# holds one less than the floor and the card costs more.
+		d = await _cast_delta(scene, mage, paid_ab, foe, false, fl - 1)
+		ok(int(d["mana"]) == fl,
+			"§5c %s: a cast that could only take %d reads %d, want the floor, %d — max(net, floor) is one term" % [
+				spec, fl - 1, int(d["mana"]), fl])
+
+		# (d) A RETALIATION IS NOT A CAST. `_resolve`'s `is_counter` is the line's
+		# own definition — the Killing Cold and the Overtone read it the same way —
+		# and a counter that booked the floor would pay a Mage for being struck.
+		d = await _cast_delta(scene, mage, free_ab, foe, true, mage.max_resource)
+		ok(int(d["mana"]) == 0,
+			"§5d %s: a counter reads %d, want 0 — a retaliation is not a cast" % [spec, int(d["mana"])])
+
+		# (e) THE RAGE HALF IS UNTOUCHED. The same line books a Warrior's free
+		# basic, and the floor names Mana.
+		var war_free: Ability = null
+		for cand in war.abilities:
+			if cand != null and scene._eff_cost(war, cand, foe) == 0:
+				war_free = cand
+				break
+		ok(war_free != null, "§5e %s: the Warrior holds a free card" % spec)
+		if war_free != null:
+			d = await _cast_delta(scene, war, war_free, foe, false, 0)
+			ok(int(d["rage"]) == 0 and int(d["mana"]) == 0,
+				"§5e %s: the Warrior's free %s reads %d Rage and %d Mana, want 0 and 0" % [
+					spec, war_free.display_name, int(d["rage"]), int(d["mana"])])
+		scene.queue_free()
+		await process_frame
+
+	# (f) ELEMENT-BLIND, DRIVEN. Fire, frost and arcane book the same floor. The
+	# SOURCE assertion in §1a is the proof; this is the drive beside it.
+	ok(free_books.size() == 3 and free_books.count(fl) == 3,
+		"§5f: the free casts of all three Mage specs read %s, want [%d, %d, %d] — identical, the floor" % [str(free_books), fl, fl, fl])
+
+	# (h) THE RELATION, OVER THE CORPUS. `Classes.ability_corpus()` is the one
+	# authorised walk (DA §3, and `check_da` §3 is what said so when this section's
+	# first draft walked the pools itself); a card is in the population when a
+	# Mage can hold it. A membership name the corpus does not contain is COUNTED,
+	# not dropped — it would otherwise shrink the population unseen and read
+	# exactly like a pass.
+	var corpus: Array = Classes.ability_corpus()
+	var corpus_names := {}
+	var held := 0
+	var cheapest := 1 << 30
+	var cheapest_name := ""
+	for ab in corpus:
+		corpus_names[String(ab.display_name)] = true
+		if not mage_names.has(String(ab.display_name)):
+			continue
+		held += 1
+		if ab.cost > 0 and ab.cost < cheapest:
+			cheapest = ab.cost
+			cheapest_name = ab.display_name
+	var outside := 0
+	for nm in mage_names:
+		if not corpus_names.has(nm):
+			outside += 1
+	print("  §5h: CHECKED %d corpus cards; %d a Mage can hold, %d membership names outside the corpus; cheapest price %d (%s)"
+		% [corpus.size(), held, outside, cheapest, cheapest_name])
+	ok(corpus.size() >= 200 and held >= 30 and outside == 0,
+		"§5h: the corpus walk read %d cards, %d a Mage can hold, %d membership names outside it — the population is the corpus, not a sample"
+			% [corpus.size(), held, outside])
+	ok(fl <= cheapest,
+		"§5h: the floor %d is at or under the cheapest price a Mage can pay (%s, %d) — it lifts no card he pays for"
+			% [fl, cheapest_name, cheapest])
+
+
+# One cast through the real path, from a chosen starting bar, returning what it
+# did to the bar and to both ledgers. The victim is put back first, `dead`
+# included, for §1e's reason.
+func _cast_delta(scene: Node, u: BattleUnit, ab: Ability, victim: BattleUnit,
+		counter: bool, start: int) -> Dictionary:
+	victim.hp = victim.max_hp
+	victim.dead = false
+	victim.pressure = 0
+	victim.broken = false
+	victim.broken_pending = false
+	victim.refresh_bars()
+	u.resource = start
+	var bar0 := u.resource
+	var mana0 := u.mana_spent
+	var rage0 := u.rage_spent
+	seed(90210)
+	var done := [false]
+	var task := func():
+		await scene._resolve(u, ab, victim, "good", counter)
+		done[0] = true
+	task.call()
+	for _i in 400:
+		if done[0]:
+			break
+		if scene.sc_active:
+			scene.sc_pos = 0.99
+			scene._grade_skill_check()
+		await process_frame
+	return {"bar": bar0 - u.resource, "mana": u.mana_spent - mana0,
+		"rage": u.rage_spent - rage0}

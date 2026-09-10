@@ -13,112 +13,73 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-09 (Batch FT).*
+*Last rewritten: 2026-09-10 (Batch FU).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FT — THREE SPINES, BUILT ON NOBODY. THE FIRST BATCH ON `class-merge`.** Nothing
-  was merged: no spec dissolved, no pool moved, no engine became a rune, no talent node moved and
-  **no hero gained a meter**. `main` is untouched and still playable. Full working:
-  **`docs/reports/FT.md`**.
-- **MOMENTUM (Warrior), CHANNEL (Mage) AND SANCTITY (Cleric) EXIST AS MACHINERY WITH NO OWNER.**
-  Declared, drivable, paying what they compute — and **unreachable from any live hero**. The safety
-  property is three switches (`momentum_active`, `channel_active`, `sanctity_active`), all FALSE,
-  with every payout guarded on its own and returning its identity value without it.
-- **`check_ft` §0 IS WRITTEN TO INVERT, AND THAT IS WHAT MAKES THE BRANCH SAFE.** It asserts four
-  ways: no spec passive names one of the three; nothing under `scripts/` or `data/` ASSIGNS a
-  switch (comment-stripped, over 28 files, matching an assignment shape rather than a mention); the
-  matcher is proved able to bite on a constructed line; and a live four-spec party reads all twelve
-  switch and all twelve payout readings at their identity value. **The batch that attaches a spine
-  takes §0 red and rewrites it** — `check_ez` §1 and `check_fk` §2 both went through this.
-- **CHANNEL IS TWO LINES AND ONE RULING, AS FP PRICED IT.** `note_resource_spent` now books Mana
-  into its own `mana_spent` beside Rage's — **two fields, because `rage_spent` holding Mana is a
-  name that lies and a shared field would make Blood Frenzy's second term readable by a Mage.**
-  **Its element-blindness is asserted against the function's own source**, not driven: a function
-  that reads the ability and happens not to branch on it today passes every drive that exists.
-  There is no `is_spell` flag, so *spell damage* means *not physical* and that is one constant.
-- **MOMENTUM'S WINDOW IS THE ONE DECISION A LATER READER WILL GET WRONG.** `battle_turn` is stamped
-  from `_turns_taken`, which counts UNIT turns across the whole field — so a hero deals on index N
-  and is struck back on N+3, and **a meter keyed on that index would read zero forever.** It
-  carries `trance_taken`'s span instead, with two accumulators of its own because Battle Trance
-  CONSUMES that field. **Damage TAKEN per turn existed twice over; damage DEALT per turn did not
-  exist in any shape**, and building it was the batch's real work.
-- **AND ITS PAYOUT IS ONE FUNCTION AT THREE SCHEDULING SITES, NOT A SEVENTH TERM IN
-  `effective_speed()`.** That function is what every `next_time` write divides by, so a term there
-  compounds with Chilled, Slowed, Quick Draw and Wrath at once — **measured, not argued: the
-  control that adds one made the live delta read x0.6296 where the arithmetic says x0.6800.** The
-  three are the post-cast schedule, the gated-failure schedule and the initiative PREVIEW.
-- **SANCTITY'S POTENCY HALF WAS MEASURED AND DELIBERATELY NOT BUILT.** `STATUS_INFO` holds **156
-  ids and not one magnitude**. **Duration is a parameter at all 249 authoring sites; potency is at
-  81, and 93 of the 156 declared ids carry no magnitude at any site at all** — so a general potency
-  multiplier reaches about a third and reads as working. **What shipped is duration alone, keyed on
-  the APPLIER**, as the fourth clause of a sentence Permafrost, Emberkeep and the two row-8 nodes
-  already write. Its coverage is printed rather than described: **214 `_apply_status` sites, 110
-  carrying a source, 104 not.**
-- **AND THE ANTI-FARMING RULE IS ONE SENTENCE: ONE EVENT PER (TURN, BODY, STATUS).** Eight
-  apply-and-remove cycles on one body in one turn book ONE; a refresh books nothing; a removal that
-  removes nothing books nothing; a cleanse books what it actually took; **and a natural expiry is
-  NOT a removal** — a clock running out is time passing, not a hero acting.
-- **NINE NEGATIVE CONTROLS, ALL NINE BIT, EACH WITH A DIFFERENT SIGNATURE**, and the tree was
-  restored byte-exactly afterwards. **The one worth carrying: dropping ONE of the three initiative
-  read sites made the live delta read x1.0000** — this project's most common shipped defect wearing
-  its own name, caught by the arm that exists for it.
-- **THE LIVE A/Bs ARE SEEDED AND THAT IS THE INSTRUMENT'S OWN SCAR.** `randf_range(0.9, 1.1)` is on
-  every blow; six-pair sums still left a physical control reading between **x0.9537 and x1.0349
-  across three runs**, which swallows a real finding and manufactures a false one in equal measure.
-  Seeded, Channel reproduces its own arithmetic live at **x1.1799**, the same card read as physical
-  moves by **x1.0000**, and Momentum's `next_time` delta is **x0.6800**. **Three other confounds
-  had to be closed first**: the victim died on the control arm and the second arm read 0; the
-  Arcanist's Resonance ramps with every cast and biased the ratio to x1.2422; and the first reading
-  of every pair is a warm-up that measured 0 twice. **The physical control had to become THE SAME
-  CARD with its type changed** — its first draft used the Sharpshooter's Aimed Shot and read
-  x1.1015 on a payout that pays physical nothing, because his basic is a SEQUENCE.
-- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED, AND THAT IS A RULING.** It shows
-  only what is currently in the game, and **nothing a player can meet changed** — all three payouts
-  return their identity value for every hero that exists. Three engines nobody can reach are not in
-  the game, and a stamp is a claim about the document. It moves when a spine is attached.
-- **WHAT MOVED:** `scripts/unit.gd`, `scripts/battle.gd`, `check_ft.gd` (**NEW**), `run_battery.sh`
-  (one name), `baselines.json` (two rows — `check_ft` NEW, `check_parse` 180→181), `CLAUDE.md`
-  (a standing rule, three governor-table rows, and **the Overburn row's "THE ONE ... CEILING RATHER
-  THAN A COST" claim amended because three capped spines make it false** — the literal
-  `test_batch_bs` asserts is preserved verbatim inside the new sentence), `docs/changelog.html`,
-  `docs/design-notes.md`, `docs/reports/FT.md` (**NEW**) and this file. **`docs/master.html` did
-  NOT move** — see above. **The designer's four save files were copied to `save-backups/FT-…` and
-  md5-verified against the originals and against FS's backup before anything else happened; all
-  four match FS's exactly, so nothing has moved since.**
-- **THE BATTERY WAS RUN TWICE, WHICH IS WHAT A BATCH THAT WRITES AN INSTRUMENT OWES.** Pass 1 put
-  the **unmodified gates against the new code before any document moved**: **107 targets, ZERO
-  throws, ZERO timeouts, ZERO incomplete, all 47 suites green, `check_parse` 181/0 with the residue
-  still 4, `check_ft` 79/0, `check_de` 445 checks / 0 failures / 0 notices.** **PASS 2, THE
-  ACCEPTANCE RUN OVER THE SHIPPED TREE, IS THE SAME: 107 targets, zero throws, zero timeouts, zero
-  incomplete, the same one red, and the same counts.** Both over a frozen tree md5-stamped with
-  **absolute paths** across the whole working tree, tracked and untracked — **376 files, ZERO
-  DIFFER.**
-- **`CLAUDE.md` IS AT 287.85 KiB AND THAT LEAVES 2,206 BYTES.** `check_fg` measures it every
-  battery and this file does not have to remember the figure — but the HEADROOM is worth carrying
-  once: FT spent **4,148 bytes** of it on a standing rule, three governor-table rows and one
-  amended claim. **The next standing rule of any size needs a cut somewhere else first.**
-- **THE ONE RED IS THE SANCTIONED `check_cm_live` 13/4, PROVED SANCTIONED RATHER THAN ASSUMED.**
-  Its baseline note says *"identical on unmodified HEAD"* and does not enumerate the lines, so
-  HEAD's `unit.gd` and `battle.gd` were put back and the gate re-run: **the same four FAIL lines,
-  word for word.** A count matching a count is not the same claim. **And `check_es` was re-run
-  against the shipped `state.md`** — the obligation `docs/instrument-rules.md` records for a batch
-  that rewrites this file — at **57/0**.
-- **THE DOCUMENT EDITS WERE SWEPT AND THE SWEEP WAS PROVED ABLE TO BITE.** 1,845 needles over the
-  complete reader population of the four documents (64 / 21 / 7 / 12 readers), **1 LOST**, and that
-  one is a false positive run to ground: `check_ek`'s `TAG_CHECKERS` list of gate FILE NAMES
-  happened to overlap FS's *WHAT MOVED* line. **The control needle came off the needle list**
-  (`TABLE THAT IS A CEILING RATHER THAN A COST`, `test_batch_bs`'s and nobody else's) and read
-  LOST = 1 against both the edited copy and HEAD's.
-- **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
-  purpose-authored and charter-clean at **324 nodes**, and the rune layer is authored for all
-  twelve specs — 60 live against **67** retired in a **127**-entry file. **Step 1 of the merge's
-  running order is DONE.** What is still open in the rune layer is the **Devout's fifth** and the
-  Shared Mark's own magnitude. `docs/spec-recon.html` is still the document authoring reads; §7 of
-  `docs/reports/FK.md` is the correction to it.
-- **Next letter: FU.**
+- **Last batch: FU — THE CEILING MOVES, AND CHANNEL GETS ITS NUMBER. THE SECOND BATCH ON
+  `class-merge`.** Still nothing is attached to any hero: `check_ft` §0 asserts the three spines are
+  reachable by nobody and is still written to invert. `main` is untouched and still playable. Full
+  working: **`docs/reports/FU.md`**.
+- **`CLAUDE.md`'S CEILING IS 340 KiB, RULED BY THE DESIGNER, DERIVED BY EE's OWN METHOD WITH CURRENT
+  INPUTS.** FF's post-split **261.03 KiB** plus ten of the largest single-batch growth on record —
+  **EZ's +8,293 B (8.10 KiB), not EB's +8,287 B, which the brief quoted as current** — is 342.03,
+  stated as 340. `CLAUDE.md` reads **298,560 B = 291.56 KiB** after FU's own edits — +3,806 B, which **alone would have put it 1,600 B past the old 290** — and has **49,600 B = 48.44 KiB of headroom**, about 11.5 batches at FF's mean and six at the worst on record. `check_fg` prints the live figure every battery.
+- **WHAT HAPPENS AT 340 IS WRITTEN INTO THE CEILING BLOCK SO IT IS NOT REDISCOVERED.** EE's
+  split-never-prune has no seam left of its kind, a second re-derivation would take the file's own
+  size as its floor, and **the seam that exists is by SUBJECT** — combat law and card law, 66.74 and
+  59.12 KiB at FF's classification — which EF's one-way tiebreak does not allow. **Taking it is the
+  designer's.** The two figures are FF's, on a 280.80 KiB file, and are not re-derived.
+- **`check_fg` FOLLOWED THE NEW NUMBER AND HELD A COPY OF THE OLD ONE — THE FINDING THE BRIEF ASKED
+  FOR.** Its parse arms read 340 and EZ's 8.10 out of the rule with no edit; **its FORM check was the
+  literal `"THE CEILING IS 290 KiB"`**, so HEAD's gate read **22 / 1** against a correct rule and a
+  correct file, and §1 held the changelog's `"THE THRESHOLD IS 400 KB"` the same way. **Both form
+  checks now assert the form with the pattern that parses the number**; the count stays 22, and the
+  standing rule in `docs/instrument-rules.md` that said *"the gate holds no copy"* carries the
+  correction.
+- **AND THE PRE-PASS'S ONE UNPREDICTED RED WAS THE SAME PIN, READ BY A SECOND GATE.** `check_ed` read
+  18 / 0 with the ceiling pin already unresolvable — its population is `.gd` pins only — and **`check_ec`
+  §2, which reads document pins, went 24 / 2 on `check_fg`'s literal.** The prediction had named
+  `check_ed` as the only pin gate. **For a document edit the pin proof is `check_ec`, not `check_ed`**;
+  recorded in the queue as a procedure note.
+- **CHANNEL: A FREE CAST COUNTS AS A FLOOR VALUE OF MANA — ONE TERM, NOT TWO.** Every CAST books
+  `max(net, CHANNEL_CAST_FLOOR)` at `note_resource_spent`; the one spend line in `_resolve` says
+  whether it is a cast with `not is_counter`, the definition the Killing Cold and the Overtone already
+  read. **The door's new argument defaults to *not a cast*, so every other caller and every direct
+  suite call books what it always did, and the floor names Mana, so Blood Frenzy does not move.**
+  Still element-blind, asserted against the source, now including the floor.
+- **THE FLOOR IS 10 BECAUSE IT IS BLINK's PRICE — THE CHEAPEST A MAGE CAN PAY — SO IT LIFTS NO CARD HE
+  PAYS FOR.** `check_ft` §5h asserts the relation over every card a Mage can hold, so a cheaper Mage
+  card turns it red and the floor is owed a ruling. **THE STEP IS 42**, chosen on 7,797 driven
+  untalented rung-1 fights (100 runs a Mage spec): every spec's **median** end-of-trash-fight meter is
+  exactly **three steps (+9%)**, means **2.88 / 3.44 / 2.60** (Pyromancer / Cryomancer / Arcanist),
+  the cap in 1–5% of trash fights and 6–16% of boss fights.
+- **ONE PAIR CANNOT PUT ALL THREE ON THREE, AND THE REASON IS STRUCTURAL.** The Cryomancer takes 7.39
+  casts a trash fight and the Arcanist 5.57, at the same 24.6 Mana a costed cast; a per-cast floor
+  cannot move that and widens it slightly. **A per-spec rate would close it and would make a class
+  core a spec engine.**
+- **TWO FT FIGURES WERE WRONG AND BOTH ARE CORRECTED.** **A Mage regenerates 22 a turn, not 12** —
+  Evocation is the Mage class passive — so **free casts are only 8.6–14.6% of a Mage's casts**, not
+  FT's one-fight 2 of 6; the floor is a small term and the step does most of the work. `CLAUDE.md`'s
+  governor row no longer says the bar is tighter than the cap. **And rung-1 trash runs 8.2 rounds on
+  EO's own party now, not ~9.**
+- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED, AND THAT IS STILL FT's RULING.**
+  Nothing a player can meet changed: every payout is still at its identity value for every hero.
+- **WHAT MOVED:** `scripts/unit.gd` (seven code lines), `scripts/battle.gd` (one), `check_fg.gd`,
+  `check_ft.gd` (§1a and a new §5), `check_da.gd` (one reasoned `WALK_EXEMPT` row, after §5h's
+  population moved onto the corpus walk), `pin-manifest.json`, `baselines.json`, `CLAUDE.md`,
+  `docs/instrument-rules.md`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FU.md`
+  (**NEW**) and this file. **The designer's four save files were copied to `save-backups/FU-…` and
+  md5-verified against the originals and FT's backup before anything else happened; all four match
+  FT's exactly.**
+- **THE PRE-PASS PUT EVERY UNMODIFIED GATE AGAINST THE NEW TREE BEFORE ANY GATE WAS EDITED (FA §1b), AND ITS PREDICTION WAS WRITTEN BEFORE IT LAUNCHED.** 107 targets, zero throws, zero timeouts, zero incomplete, `Parse Error` and `SCRIPT ERROR` grepped from all 107 logs at zero, and the tree md5-frozen across the run with absolute paths — 396 files, the designer's four saves included, **zero differ**. **Three reds**: `check_cm_live` 13 / 4, sanctioned, its four FAIL lines identical to FT's own log word for word; `check_fg` **22 / 1, predicted**; and `check_ec` **24 / 2, NOT predicted** — the same pin, read by the document-pin gate. **With the literal out of `check_fg`, `check_fg` reads 22 / 0 and `check_ec` 23 / 0 standalone, and `check_ft` reads 112 / 0 on three identical readings.** **THE FIRST ACCEPTANCE RUN WAS RECONNAISSANCE**: 107 targets, zero throws, the freeze held — and `check_da` 43 / 2, because §5h's first draft walked the pools itself and the subset before it had been chosen by document readership, which `check_da` (a reader of gate SOURCE) is not. Fixed on the rule's own terms, re-verified, re-frozen. **THE ACCEPTANCE RUN OVER THE SHIPPED TREE: 107 targets, 0 throws, 0 timeouts, 0 incomplete, `Parse Error` and `SCRIPT ERROR` grepped from all 107 logs at 0; `check_de` 445 checks / 0 failures / 0 notices; the one red is `check_cm_live` 13 / 4 with its FAIL lines identical to FT's; and the freeze held — 396 files md5-stamped with absolute paths before and after, zero differ, the four saves identical.**
+- **Phase.** Unchanged from FT: the draft is complete at 154 of 154, the twelve trees are at 324
+  nodes, the rune layer holds 60 live against 67 retired, and **step 1 of the merge's running order
+  — the three spines — is DONE, with Channel's rate now ruled.** Open in the rune layer: the Devout's
+  fifth and the Shared Mark's magnitude.
+- **Next letter: FV.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -164,23 +125,27 @@ the things a later batch must not re-derive from scratch:
   faults reported in place** — a card that FEEDS an engine without READING it counts as
   engine-free there, which under-states the Pyromancer and the Survivalist most.
 
-### THE THREE SPINES ARE BUILT AND FIVE THINGS ARE FLAGGED, NOT TUNED — **OWED A RULING (FT)**
+### THE THREE SPINES ARE BUILT; CHANNEL'S RATE IS RULED AT FU, AND FOUR THINGS ARE STILL FLAGGED — **OWED A RULING (FT)**
 
-**None of the five blocks the next batch.** The machinery is drivable and every number is a named
+**None of the four blocks the next batch.** The machinery is drivable and every number is a named
 constant, so each ruling is a one-line change. Full working and the measurements:
-`docs/reports/FT.md`.
+`docs/reports/FT.md`, and for Channel's rate `docs/reports/FU.md` §2.
 
 - **CHANNEL'S PARTITION.** *Spell damage* = **not physical** (implemented,
   `CHANNEL_SPARES_PHYSICAL`), or Channel pays all damage and buys the basic attack with it. There
   is **no `is_spell` flag on `Ability`** and the only available partition is `dmg_type`, so those
   are the two readings that exist.
-- **CHANNEL'S RATE, AND THE MEASUREMENT MATTERS MORE THAN THE NUMBER.** At 40 Mana a step a Mage
-  reads **2 steps (+6%) by his fifth turn** at the observed spend. **The observation: a Pyromancer
-  in a standard warband fight spent 95 Mana over 6 turns — about 16 a turn — because his basic
-  attack is free and he falls back to it when the bar is low.** Mana starts at 100, caps at 100 and
-  regenerates 12 a turn, so the ceiling is `100 + 12(N-1)` whatever he casts. **The +18% cap is out
-  of reach of anything shorter than a boss.** The turn-10 figure is a projection from the observed
-  rate: a standard fight ends before a Mage takes ten turns.
+- **~~CHANNEL'S RATE~~ — RULED AND BUILT AT FU §2.** Free casts build: every CAST books
+  `max(net, CHANNEL_CAST_FLOOR)`, the floor is **10** (Blink's price, the cheapest a Mage can pay, so
+  it lifts no card he pays for) and the step is **42**, which puts every Mage spec's MEDIAN
+  end-of-trash-fight meter at three steps. **The half worth keeping is the correction to FT's own
+  figures**: a Mage regenerates **22**, not 12 — Evocation is the Mage class passive — and free casts
+  are **8.6–14.6%** of his casts in rung-1 trash, not FT's one-fight 2 of 6. The picture of a Mage
+  who runs dry and falls back to his basic came from one fight priced at the wrong economy.
+  - **THE SPREAD ONE RATE CANNOT CLOSE — A RULING ONLY IF IT MATTERS.** The Cryomancer ends a trash
+    fight near **3.4** steps and the Arcanist near **2.6**, because he takes 7.39 casts a fight to
+    the Arcanist's 5.57 at the same 24.6 Mana a costed cast. A floor widens the gap slightly; a
+    per-spec rate would close it and would make a class core a spec engine.
 - **MOMENTUM'S RATE.** 8 steps x 4% off the delay of his next turn = **−32% at the cap**, which is
   roughly a free turn every three.
 - **SANCTITY'S RATE, AND IT IS THE ONE TO READ AGAINST THE TRAFFIC.** 6 events a step, 5 steps,
@@ -197,6 +162,31 @@ constant, so each ruling is a one-line change. Full working and the measurements
   **The day a card or rune SPENDS one of the three, BI §1's antagonism arrives with it**, silently,
   because a spender reads exactly like a payer until somebody asks what the held half is worth.
   The rule is in `CLAUDE.md`.
+
+### `check_ed` READS SOURCE PINS ONLY; THE DOCUMENT HALF IS `check_ec` §2's — **FOUND AT FU §1c, A PROCEDURE NOTE, NOTHING OWED**
+
+**`check_ed` read 18 / 0 against HEAD's manifest while `check_fg`'s `CLAUDE.md` pin was already
+unresolvable**, because its §0 takes pins whose haystack ends in `.gd`. **`check_ec` §2 reads every
+`contains`-group member against the five tracked documents and caught the same pin at 24 / 2** — the
+pre-pass's one unpredicted red, because the prediction had named `check_ed` as the only pin gate.
+
+- **SO THE PROCEDURE BATCHES HAVE USED FOR A DOCUMENT EDIT — *"run `check_ed` against HEAD's
+  manifest with the edited documents in place"* — CANNOT SEE A DOCUMENT PIN. `check_ec` CAN**, and so
+  can `build_pin_manifest.py --check` with a regeneration diff written to the scratchpad (the module's
+  `open` patched, so the tracked file is never touched), which named the pin exactly.
+- **Nothing is broken and nothing is owed**: each gate's header says what it reads. **The half worth
+  keeping is the shape of the mistake** — a finding about one gate's population was written up as a
+  finding about the tree's, and the other gate that owns the half was one pre-pass away.
+
+### THE SUBJECT SEAM IN `CLAUDE.md` — **NAMED AT FU §1, OWED A RULING BEFORE THE FILE REACHES 340 KiB**
+
+**Recorded in `CLAUDE.md`'s ceiling block, where the batch at the ceiling will read it; carried here
+because it is a decision nobody has taken.** EE's split-never-prune has no seam left of its kind, and a
+second re-derivation of the ceiling would take the file's own size as its floor. **The seam that
+exists is by SUBJECT** — combat resolution law (66.74 KiB) or card authoring law (59.12 KiB) as a
+reference the main file points at, both figures FF's on a 280.80 KiB file — and **it requires
+overturning EF's one-way tiebreak for that subject.** **Better ruled with headroom than at the wall**
+(EF §2's rule: a seam is cleaner measured than reached).
 
 ### THE RUN-SAVE FIGURES ARE FIXED — **AND "IT IS A TWO-NUMBER EDIT" WAS WRONG (CLOSED AT FR §1)**
 
@@ -514,7 +504,8 @@ are closed, and carries the two things a later batch must not re-derive from scr
 - **THE CUT IS NOT A JUDGEMENT CALL ANY MORE AND NOBODY HAS TO REMEMBER IT.** `check_fg.gd` §1
   reads `docs/changelog.html` against CW §4's threshold **every battery**, prints both the decimal
   and binary figures beside the bar, WARNS over it and FAILS if a second batch passes without the
-  cut. `check_fg.gd` §2 does the same for `CLAUDE.md` against EE's 290 KiB. **A threshold with no
+  cut. `check_fg.gd` §2 does the same for `CLAUDE.md` against its ceiling — EE's 290 KiB, 340 since
+  FU §1. **A threshold with no
   instrument is a note, not a gate** — that is now a standing rule in
   `docs/instrument-rules.md`, beside the changelog block itself.
 - **A SAMPLE IS PART OF AN ASSERTION'S TERRITORY, AND A VACUITY THAT IS ONLY PRINTED IS ONE NOTHING
@@ -1654,12 +1645,11 @@ re-derived from the source at DM; not one was moved.**
   arithmetic behind the other three is still in `docs/reports/EC.md` §3 and a later batch reading
   that page needs to know which one was taken. **The live ceiling, the live sizes and the per-half
   growth rates are in the WHERE block and the knowledge-sync section; do not re-derive the ratio.**
-- **WHAT A CEILING SHOULD BE FOR EACH HALF — MEASURED AT EF §2, RULED ON NOWHERE, AND FF MAKES IT
-  THE LIVE QUESTION.** EE's 290 KiB was derived for one file and its FLOOR term held both halves, so
-  **290 is conservative for `CLAUDE.md` alone.** Per-half by EE's own method: **`CLAUDE.md` 220 KiB,
-  `docs/instrument-rules.md` 95 KiB**, and **the two sum to 315 rather than 290** because each half
-  carries its own ten-worst-batch headroom. **Taking those numbers is the designer's; the 290
-  stands until then.**
+- **WHAT A CEILING SHOULD BE FOR EACH HALF — `CLAUDE.md`'s HALF RULED AT FU §1 (340 KiB); THE
+  REFERENCE HALF STILL RULED ON NOWHERE.** EE's 290 KiB was derived for one file and its FLOOR term
+  held both halves. **FU re-derived `CLAUDE.md`'s own ceiling by EE's method off FF's post-split
+  reading (261.03 + ten × EZ's 8.10 = 342.03, stated as 340)**, which is the per-half move for that
+  file. `docs/instrument-rules.md` has no stated ceiling and deriving one is still the designer's.
   - **BOTH OF EF'S NUMBERS ARE NOW STALE IN OPPOSITE DIRECTIONS, WHICH IS WHY THIS ITEM MATTERS
     MORE THAN IT DID.** EF's **220 KiB for `CLAUDE.md` is BELOW the live file** (261.03) and always
     would have been within four batches at the measured rate — it was derived off a +6.30 KiB worst
@@ -1669,10 +1659,10 @@ re-derived from the source at DM; not one was moved.**
     as written; the METHOD is what survives.**
   - **AND FF MEASURED THAT THE ALTERNATIVE — ANOTHER SPLIT — IS GONE.** Three quarters of
     `CLAUDE.md` is rule about what the game may contain, held here by EF's one-way tiebreak, and
-    the residue is spent. **So the next batch to reach 290 KiB has exactly two moves and both are
-    rulings: derive a ceiling per half, or overturn the tiebreak** and accept that a batch may have
-    to open two files to find a rule about the game. **It is not looking for a seam.** Working:
-    `docs/reports/FF.md` §1, and the ceiling block in `CLAUDE.md` now says so.
+    the residue is spent. **FF named two moves and FU took the first; at 340 the one left is to
+    overturn the tiebreak for a SUBJECT** — see the subject-seam item above — and accept that a batch
+    may have to open two files to find a rule about the game. Working: `docs/reports/FF.md` §1 and
+    `docs/reports/FU.md` §1, and the ceiling block in `CLAUDE.md` says so.
 
 - **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
   `STACKS := 4` is a **direct-write probe depth**, not a carry ceiling — those checks write
@@ -2203,6 +2193,12 @@ re-derived from the source at DM; not one was moved.**
 ### HOW LONG A FIGHT IS
 **STALE SINCE DK. NOT ONE FIGURE BELOW HAS BEEN RE-MEASURED SINCE FIVE PARTY-WIDE EFFECTS BEGAN
 REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
+- **FU RE-MEASURED ONE CELL, THE ONE ITS BRIEF QUOTED: RUNG-1 UNTALENTED TRASH.** `DOD_SIM_ROWS=0`,
+  rung 1, `--run 100` per party, the default party with its Mage swapped: **7.48 / 8.23 / 8.04
+  rounds** for the Pyromancer / Cryomancer / Arcanist parties (n = 1,144 / 1,162 / 1,102 trash fights);
+  elite 7.27 / 7.79 / 7.33, boss 10.87 / 10.07 / 10.50. **The Cryomancer party IS the default party,
+  and EO read 9.1–9.2 on it** — so the "~9 rounds since EO" a brief quoted is about a round long now.
+  The ROWS=3 and ROWS=9 tables below were not re-run.
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
   both halves), over four `--run 25` sims, **after DA** — **DB through DG ran no sim and these are
   carried unchanged**:
@@ -2372,7 +2368,7 @@ the number.*
   own** — and then the threshold was crossed four batches before anyone noticed. **`check_fg` §1
   prints the live figure and the headroom against the bar every battery. Read that.**
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
-  measured in KiB against a **290 KiB ceiling** whose procedure is a SPLIT, **and EF and FF both
+  measured in KiB against a **340 KiB ceiling** (EE's 290 until FU §1) whose procedure is a SPLIT, **and EF and FF both
   took one.** **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
   and the headroom every battery, and the two figures this bullet used to carry (EP's 217.17 and
   EU's 235.11, "about twelve batches") are exactly the kind of number that was stale by the time
@@ -2566,67 +2562,22 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**ONE BATTERY AT FI CERTIFIED, AFTER TWO PRE-PASSES THAT WERE NOT DISCARDED BUT USED.** The tree was
-**md5-stamped with ABSOLUTE paths before the acceptance run and re-compared after: 403 files, ZERO
-drift, none appearing or vanishing.** The freeze covered TRACKED AND UNTRACKED files, so the new
-gate was inside it — a `git ls-files` freeze would have left `check_fi.gd` out of the population it
-was meant to protect.
+**FU's PRE-PASS: EVERY UNMODIFIED GATE AGAINST THE NEW CODE AND THE NEW `CLAUDE.md`, BEFORE ANY GATE WAS
+EDITED.** The prediction was written to the scratchpad before the launch, and it named two of the three
+reds. **The third is the half worth keeping**: `check_ec` §2 reads document pins, and the prediction had
+named `check_ed` as the only pin gate — which reads `.gd` pins only.
 
-| | FI pre-pass A | FI pre-pass B | **FI's acceptance** |
+| | FU pre-pass | FU acceptance 1 (reconnaissance) | FU acceptance 2 (certifying) |
 |---|---|---|---|
-| what was in the tree | the redirect only, no gate edited | all code, no docs | **everything** |
-| **suite failures** | 0 | 0 | **0** |
-| **throws, grepped from the log FILES** | 2 (predicted) | 0 | **0** |
-| `check_cm_live` (deliberate) | 4 | 4 | **4** |
-| check counts outside their band | 2 (predicted) | 0 | **0** |
-| `check_de` | 402 / 7 / 0 | 406 / 0 / 0 | **406 / 0 / 0** |
-| run harness | — | 22 / 166 / 8 | **22 / 166 / 8** |
-| **the player's 62,360 B save afterwards** | **DESTROYED** | byte-identical | **byte-identical** |
-
-**PRE-PASS A IS THE ONE WORTH KEEPING.** It ran HEAD's unmodified instruments against the new code
-before any gate was edited, and **its two reds were the two written down beforehand** — `check_ct`
-and `check_eg`, both holding `run.SAVE_PATH` in a local across a `save_run()` that had moved. **It
-also destroyed the save**, which the prediction file had named as the hazard to watch, and chasing
-that is what found the twenty-four targets that never use the autoload at all. **A pre-pass that
-only confirms what you expected has told you less than one that also fires the hazard you wrote
-down.**
-
-**ZERO `Parse Error` AND ZERO `SCRIPT ERROR` ACROSS ALL 99 LOGS**, grepped from the log FILES rather
-than read off a tally or an exit code. **The only `FAIL:` lines anywhere in the acceptance run are
-`check_cm_live`'s four**, the recorded deliberate red. **`check_de` read 406 / 0 / 0 — zero NOTICES
-as well as zero errors**, so every count in the tree matches its baseline exactly. `check_de` has no
-row of its own and its own **+4** was predicted from the new baseline row.
-
-**THE THREE BASELINE ROWS WERE WRITTEN BEFORE THE RUN, EACH OFF THREE IDENTICAL STANDALONE
-READINGS** — `check_fi` [27, 27] new, `check_parse` 172 → 173, `check_ct` 113 → 114. **A NEW GATE
-OWES TWO ROWS**, its own and `check_parse`'s, and both were written. `check_parse` reads **173 with
-RESIDUE 4** (`check_ck_width`, `check_cu`, `check_cv`, `check_dn` — the four long-standing ones),
-which is that walk confirming the repo root is clean.
-
-**THE TWO STANDING REDS ARE STANDING AND NOTHING ELSE IS RED.** `check_cm_live` reads **13 / 4**
-against a recorded 13 / 4 and `test_rune_battle` **97 / 0** against its recorded band. **Neither
-moved and no third appeared.** `check_map_screen: OK`; `check_ct_map` **83 / 0**.
-
-**SIX NEGATIVE CONTROLS WERE ARMED. ALL SIX BIT.** Full table in `docs/reports/FI.md` §4.
-
-| control | armed on | armed | disarmed |
-|---|---|---|---|
-| **A — the repair itself, TWO-ARMED** | `test_batch_ah` against HEAD's `run_state.gd`, then FI's | save **ABSENT** | save **byte-identical** |
-| **B — `_init()` is load-bearing** | the redirect moved back into `_ready()` | save **ABSENT** again | byte-identical |
-| **C — §5's corpus sweep** | the player's path literal added to `check_eb.gd` | `check_fi` **27 / 1**, naming the file | 27 / 0 |
-| **D — §2's needles** | one file operation put back on the const | §2, §4 and **§6** fail; **the save is destroyed** | 27 / 0 |
-| **E — §3's player arms** | `argv_is_harness` made to answer TRUE for everything | **27 / 2** — both player arms | 27 / 0 |
-| **F — the redirect itself** | the `_init()` body deleted | **27 / 2** — §1's two arms | 27 / 0 |
-
-**CONTROL D IS THE ONE THAT MATTERS, BECAUSE THE GATE REPORTED ITS OWN DAMAGE.** With
-`clear_save()` put back on the const, `check_fi` §6 printed *"the player's run save is NOT as this
-gate found it"* — the arm that exists for exactly that, firing on exactly that, on a real 62,360 B
-file that was restored from the hash-verified backup immediately afterwards. **An arm that has never
-fired is an arm nobody has read.**
-
-**AND THE DOC EDITS CARRY A NEEDLE PROOF OF THEIR OWN.** Every string literal of four characters or
-longer in each of the **59 doc-reading targets**, tested against six documents as they stood at HEAD
-and as they stand now: **88,368 (needle, document) pairs, ZERO LOST**. The 29 GAINED were each
-checked against `pin-manifest.json` and against whether their target opens that document at all —
-**none is pinned and none is used negatively**, which is the direction that turns a red assertion
-green with a false message.
+| what was in the tree | code + `CLAUDE.md`; every gate and suite HEAD's | everything, §5h walking the pools | everything, §5h on the corpus walk |
+| targets / throws / timeouts / incomplete | 107 / 0 / 0 / 0 | 107 / 0 / 0 / 0 | **107 / 0 / 0 / 0** |
+| `Parse Error` + `SCRIPT ERROR`, grepped from every log | 0 | 0 | **0** |
+| `check_cm_live` (deliberate) | 13 / 4 — FAIL lines identical to FT's | 13 / 4, identical | 13 / 4 — FAIL lines identical to FT's |
+| `check_fg` | **22 / 1 — predicted** (the form arm's literal) | 22 / 0 | **22 / 0** |
+| `check_ec` | **24 / 2 — not predicted** (the same pin) | 23 / 0 | **23 / 0** |
+| `check_da` | 42 / 0 | **43 / 2 — §5h walked the pools** | **43 / 0** |
+| `check_ft` | 79 / 0 (HEAD's gate, new code) | 112 / 0 | **112 / 0** |
+| `check_de` | 445 / 2 / 1 | 445 / 1 / 1 | **445 / 0 / 0** |
+| run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 |
+| the freeze | 396 files, zero differ | 396 files, zero differ | 396 files md5-stamped with absolute paths before and after, zero differ, the four saves identical |
+| the designer's four save files | byte-identical | byte-identical | byte-identical |
