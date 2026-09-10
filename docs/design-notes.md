@@ -4,6 +4,97 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Two things that read like nothing, and one of them was a gate being cut in half (Batch FS) — 2026-09-09
+
+The brief called §1 a battery defect and said it was worse on a branch. Both halves are right, and
+the second one is the reason it was worth a batch rather than a note.
+
+**The fault is that `--quit-after` counts FRAMES.** FR used it as a hang guard on a pre-check,
+picked 900, and three gates printed no summary line. That reading nearly went into a report as
+*"these three report no readable count"* — which is a true and unremarkable property of seven
+targets in this battery. They were being cut in half. **What makes it a defect rather than a
+mistake is that nothing anywhere could have told the two apart**: both exit 0, both leave a short
+log of ordinary progress output, and the battery printed `checks=?` for each. I measured the exit
+code rather than assuming it, because that assumption is exactly the kind this project has been
+burned by.
+
+**The branch is what turns an annoyance into a real hazard.** For roughly eight of the merge's
+fourteen batches, 52 targets carrying 71.6% of the project's asserted checks are red. In that tree
+a silent gate reads as one more thing the merge broke. It is the one condition under which nobody
+would go looking, and it is the condition this fault was waiting for.
+
+**The fix I did not take was a new mechanism.** The obvious move is to make every target print a
+completion line, which is 105 files. The obvious second move is to detect truncation from the
+outside, which cannot be done — I checked. What the project already had was `baselines.json`'s
+`expect` field: a per-row string that only a complete run prints, asserted by `check_de`, written
+at DE and set on exactly one row out of the seven that needed it. **The mechanism was five years
+of good judgement away from being enough and one field short of being applied.** So the change is
+that field on the other six rows, one printed line each in the two gates that ended with no
+terminal output at all, and — the part that makes it stick — an arm in `check_de` refusing a
+`checks: null` row that carries no marker. A future no-count target cannot join the table silently
+now, which is the difference between a fix and a repair.
+
+**A count is its own marker, and that is why this is small.** Every counting target prints its
+tally in its final summary, so a count present already proves the target reached its end. The rule
+therefore binds only the seven targets an absent verdict says nothing about. Writing it any wider
+would have been ceremony.
+
+**And the control found a defect I had just written.** Folding the two scene runs into `run_one` —
+so that `check_ct_map`, the only target in the battery under a frame budget, would get a watchdog
+and a completion test — I wrote `target=(${SCENE[$name]:---script $name.gd})`. zsh does not
+word-split an unquoted expansion, so the default arrived as one token, Godot never saw a `--script`
+flag, and the target sat until the watchdog killed it. **That is the same fault as the flags STRING
+at the top of that very file, which cost a battery and has a comment nine lines long explaining
+it.** Reading the diff did not find it. The two-armed control did, in the arm that exists only to
+show the fix does not fire when it should not. I have come to think that arm is the whole control:
+the first arm proves a message can be printed, and the second proves the machine still works.
+
+## The pairing check, and what a document can be wrong about (Batch FS) — 2026-09-09
+
+FR's answer to *"can this be an instrument?"* was mostly no, and the reasoning is the interesting
+part: 1,265 mechanical comparisons of every number `master.html` states against the constant it
+names returned three raw flags and **zero** true defects, and would have caught **none** of the
+fourteen defects that batch found by reading. The part of the document that names a constant is
+already right. That is a strong argument against a large gate, and the recommendation that came
+with it was for a small one that looks nothing like it.
+
+**The largest defect FR found needed no code at all.** Eight of the twelve §7 talent headings sat
+above the wrong tree's table — the Holy heading over the Pyromancer's tree, the Devout's over the
+Cryomancer's — while every one of the 324 cells was correct, name for name and figure for figure.
+A document can be right line by line and still tell a reader something false. **No check that
+compares a value against a constant can see that. A check that compares two parts of the same
+document can, and it is about forty lines.**
+
+It found one on its first run: the Arcanist heading naming CONTROL over a table listing Entropy.
+The lane was renamed at Batch AT and `talents.gd`'s own comment records the reason — *"Control" is
+the Cryomancer's identity word* — so the heading has been three specs' worth of batches out of
+date, and it survived a batch that read every number in the document. It is the same shape as FR's
+Sharpshooter TEMPO/Pace finding, one spec along, which is the argument for the instrument in
+miniature: **a person reading carefully found eleven of twelve, and a comparison finds twelve of
+twelve every battery from now on.**
+
+**The first draft of the gate was wrong in the way this whole shape is dangerous.** It read nine
+headings of twelve, zipped them against twelve tables, and printed four confident mismatches — all
+four false, and all four naming real specs with real lanes. Three headings wrap across a line break
+in the source and a line-anchored match dropped them; the comparison then slid three places out of
+step. **It did not look like a broken instrument. It looked like a finding.** Everything is matched
+on a whitespace-flattened copy now and the population is asserted at twelve, which is the arm that
+turns a wrong answer into a red one.
+
+**What the gate cannot see is written in its header rather than in a report.** It asserts that two
+parts of one document AGREE. It cannot assert that either is TRUE: a heading and a table that are
+both wrong agree, and it is silent on them. That boundary is the price of the shape, and stating it
+at the site is what stops the next batch reading a clean run as more than it is.
+
+**And the same batch closed the other half of FR's recommendation.** `check_es` §4 has PRINTED the
+per-spec core-kit tag census on every battery run since ES and its own comment said *"It is a
+REPORT."* FR found *"DEBUFF for seven"* — the census says five, and seven is the OFFENSE column —
+in three documents, corrected them, and reported the sweep clean. **One arm comparing the sentence
+to the number the gate had just computed found two of those three documents still saying seven.**
+One of them wrapped `DEBUFF for` and `seven` across a newline, which is why a line-anchored sweep
+had read it clean. A number a battery already computes and asserts nothing about is not a
+measurement; it is a decoration that happens to be printed near one.
+
 ## The cut was the easy half; the finding was that nobody was looking (Batch FG) — 2026-09-06
 
 The brief said the changelog cut was mechanical and its procedure already written, and that the

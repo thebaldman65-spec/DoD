@@ -75,6 +75,16 @@ func _initialize() -> void:
 			pd_worst = maxi(pd_worst, line.length())
 	print("  passive_desc widest authored line: %d chars (not draft-card text;" % pd_worst)
 	print("          soft-wrapped on the sheet, hand-wrapped for the chip tooltip)")
+	# BATCH FS — THE COMPLETION MARKER, AND IT IS THE WHOLE OF WHAT THIS GATE
+	# SAYS ABOUT ITSELF. This target reports NEITHER a check count nor a failure
+	# count: it is a width REPORT, and `baselines.json` recorded that as a known
+	# blind spot rather than closing it. **`--quit-after` is FRAMES**, and a
+	# target cut off part-way prints a short log and exits 0 — which is
+	# byte-identical to a target that prints no count BY DESIGN. This line is
+	# printed only after every reading above it has been taken, so its ABSENCE
+	# is the truncation. `baselines.json` pins it as this row's `expect` and
+	# `check_de` §1 asserts it every battery.
+	print("check_cl_width: report complete")
 	quit(0)
 
 

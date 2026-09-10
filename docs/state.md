@@ -13,84 +13,104 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-09 (Batch FR).*
+*Last rewritten: 2026-09-09 (Batch FS).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FR — THE NUMBERS `master.html` STATES, SWEPT AGAINST THE CODE, AND A READER FOR
-  THE BRANCH RULE. NO MERGE WORK.** Nothing touched `class-merge`, and **not one rune, card,
+- **Last batch: FS — A TRUNCATED GATE THAT NOW SAYS SO, A DOC-vs-DOC READER, AND THE SYNC LIST.
+  THE LAST BATCH BEFORE `class-merge`.** Nothing touched `class-merge`, and **not one rune, card,
   ability, talent, constant or magnitude moved** — no `.gd` under `scripts/` and no file under
-  `data/` was edited at all. Full working: **`docs/reports/FR.md`**.
-- **THE SWEEP FOUND FOURTEEN DEFECTS, AND FIVE OF THEM ARE THE DOCUMENT CONTRADICTING ITSELF.**
-  Every numeric claim in `master.html` was read against the code. The run save (v8 → **v12**,
-  refusing below **v10**); the enemy tier ladder (**1–11 → 1–16**, two sites); the power-budget
-  ramp (the slope is **5/14**, not a half, and all five worked bands were wrong); the event verb
-  vocabulary (it listed **`talent_points`**, which exists nowhere, and omitted **`ability_draft`**,
-  which is live); the drafted-abilities heading (**142/118/24** against a table of 127/103/24 and
-  pools of 154/129/25); a whole **"the floor is eight"** stratum sixty lines under the line that
-  says TEN; **"fifteen at the cheapest spec"** (sixteen, driven); **"DEBUFF for seven"** (five —
-  and 7 is the OFFENSE column); the capstone shelf (**difficulty 3**, not 2); the Sharpshooter's
-  third lane (**Pace**, not TEMPO); and the rune file (**127 entries / 67 retired**, against a
-  whole FF-era stratum still saying 21 live across four specs in an 87-entry file).
-- **AND EIGHT OF THE TWELVE TALENT-TREE HEADINGS SAT ABOVE THE WRONG TREE'S TABLE.** The Holy
-  heading introduced the Pyromancer's tree, the Devout's the Cryomancer's, and so on — **only
-  Berserker, Swordmaster, Warden and, by coincidence, Occultist lined up.** **Not one number in §7
-  is wrong**: all 324 cells match the trees name for name and figure for figure. **A document can
-  be correct line by line and still tell a reader something false**, and no doc-vs-code check can
-  see it. The repair is a **pure permutation of the file's own lines**, asserted as one.
-- **THE STALE STRATA CLUSTER BY ERA, WHICH IS THE PATTERN WORTH KEEPING.** The run-save reason,
-  the tier range and the budget ramp are all **pre-lattice** — from when a zone held twelve slots —
-  and all three survived the batch that changed it. Two more are FF-era rune figures superseded by
-  FK. **The document rots where a batch changed a mechanism and swept the section it was writing
-  in**, which is CLAUDE.md's own EH observation at a larger scale than it was found at.
-- **THE QUEUE'S "IT IS A TWO-NUMBER EDIT" WAS FALSE, AND THAT IS THE SHARPEST FINDING.** FQ routed
-  the run-save figures here saying *the prose around them is still right*. **It was not.** The
-  reason attached to the threshold (*"a flat 12-slot line … no honest place on a lattice"*) is
-  **BK's v8** reason; the live threshold is **BM's v10**, whose reason is the final zone's
-  **seventeenth slot**. **A v9 save HAS the lattice**, so changing only the digits would have
-  manufactured a new false claim that read as freshly checked. `CLAUDE.md` carried the correct
-  reason the whole time.
-- **`docs/ways-of-working.md` HAS A READER NOW — `check_fr.gd`, 25 checks, and it says in its own
-  header what it CANNOT assert.** FQ measured that file at zero readers. Six of its eight rule
-  blocks are about how a batch comes to EXIST and leave no artefact in the tree; **a check claiming
-  to assert those would always pass, which is worse than none.** It asserts the branch rule (the
-  name read OUT of the rule, the ref present in `.git`, the guard present in `profile.gd`,
-  `CLAUDE.md` pointing here and NOT restating the branch name), the file's own no-second-copy rule
-  as a 60-character line comparison, that every path it names resolves, the conflict table, and
-  that it stays the smallest of the three rule files. **§1 is TWO FACTS AND NOT THEIR
-  CONJUNCTION** — a gate reads refs and cannot walk ancestry, so a branch cut from BEFORE the guard
-  satisfies both arms, and that hole is named rather than papered over. **EIGHT CONTROLS, each on
-  the arm it aims at**, both touched files restored by md5.
-- **THE TABLES ARE CLEAN AND THAT IS MEASURED, NOT ASSUMED.** 1,265 mechanical comparisons: all
-  **324** talent cells (names AND full number sequences, two-armed control), **296** ability stat
-  fields, **156** bestiary fields (five-armed control), **198** pool names. **3 raw flags, 0 true
-  defects** — all three are figures dealt inside a handler, which `battle.gd`'s own comment names.
-- **SO §3'S ANSWER IS MOSTLY NO, AND IT IS ON THE RECORD.** A gate checking that every number the
-  document states matches the constant it names **would have caught ZERO of the fourteen**, because
-  the part that names constants is already right. **EB declined the header sweep at 118 rows for 16
-  defects; this is ~1,265 rows for 0.** What IS worth building is **doc-vs-doc**: a heading/table
-  pairing check reaches D10 (8 sites), D11 and D5 for a handful of lines, and `check_es` §4's
-  core-kit census — which the battery already computes and asserts nothing about — needs one arm.
-- **TWO SUITE NEEDLES MOVED, WHICH IS DO'S OWN PRECEDENT.** `test_batch_cb` pinned the two stale
-  figures. **The unmodified suite was run against the new tree FIRST and read 1730 / 2** — exactly
-  the two predicted — and reads **1730 / 0** re-pointed, at the same check count.
-- **WHAT MOVED:** `docs/master.html` (throughout), `CLAUDE.md` (three second copies of the same
-  figures — a literal sweep over all 63 of its readers reads **0 LOST / 0 GAINED**),
-  `check_fr.gd` (**NEW**), `test_batch_cb.gd`, `run_battery.sh`, `baselines.json` (two rows — its
-  own, and `check_parse` 178→179), `pin-manifest.json`, `docs/ways-of-working.md`,
-  `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FR.md` (**NEW**) and this file.
-  **The designer's four save files were copied to `save-backups/FR-20260909-155944/` and
-  md5-verified against the originals before anything else happened.**
+  `data/` was edited. Full working: **`docs/reports/FS.md`**.
+- **`--quit-after` IS FRAMES, AND A TRUNCATED TARGET USED TO BE BYTE-IDENTICAL TO ONE THAT PRINTS
+  NO VERDICT BY DESIGN.** Both exit **0** — measured, not assumed — both leave a short log of
+  ordinary progress output, and the battery printed `checks=?` for each. **FR'S REASSURANCE WAS
+  FALSE**: it recorded *"`run_battery.sh` does not use the flag"*, and HEAD's line 176 passed
+  `--quit-after 900` to `check_ct_map` — the battery's ONE frame-budgeted target, and also one of
+  the two written out by hand with **no watchdog and no completion test**. **The budgets, bisected
+  to ±14 frames: `check_cs` completes at 1518, `check_dk` at 3614, `check_dm` at 7115**, so 900 was
+  59%, 25% and 13% of what they needed.
+- **THE MECHANISM IS A COMPLETION MARKER AND THE PROJECT ALREADY HAD ONE, SET ON ONE ROW OF SEVEN.**
+  `baselines.json`'s `expect` is a line only a COMPLETE run prints. It is on **all seven** no-count
+  rows now; `check_de` §1 asserts each and **§2 REFUSES a `checks: null` row that carries no
+  marker**, so a future one cannot join the table silently. Two of the seven printed no terminal
+  line at all (`check_cl_width`, `check_map`) and were given one. `run_battery.sh` reads the same
+  markers live and prints **`*** NO VERDICT — INCOMPLETE ***` with the frame budget named**; the
+  budget itself moved into a per-target table beside `EXTRA`/`TMO`, and **both scene runs go through
+  `run_one`**. **A count is its own marker**, so the rule binds only the seven.
+- **THE SEVEN THAT PRINT NO VERDICT BY DESIGN, ON THE RECORD:** `check_cl_resolver`,
+  `check_cl_width`, `check_cm`, `check_cn`, `check_flow`, `check_map`, `check_map_screen`. Five
+  print `NAME: 0 failures`; two are pure reports. **The list is not written twice** — the runner
+  names it and `check_de` derives it from `baselines.json`, and §2 stops the two drifting.
+- **PROVED FOUR WAYS, AND ARM B IS THE ONE THAT FOUND SOMETHING.** A gate truncated at 30 frames
+  reported INCOMPLETE with the budget named (and `check_de` red on it independently); **the same
+  gate with the budget removed read 104/0** — but on the first attempt it read *TIMED OUT after
+  240s*, because `target=(${SCENE[$name]:---script $name.gd})` is ONE token in zsh and Godot never
+  saw a `--script` flag. **That is the flags-STRING scar from the top of that same file in
+  different syntax, and reading the diff did not find it.** Arms C and D: the new marker stripped
+  from a completed log reds `check_de`; an `expect` deleted from a row reds the new ratchet.
+- **`check_fs.gd` IS THE DOC-vs-DOC PAIRING CHECK — FR's OWN RECOMMENDATION — AND IT FOUND A
+  DEFECT FR's FOURTEEN-DEFECT READ MISSED.** §1 pairs each §7 heading's three lane names against
+  the `<th>` row beneath it, asserts the section reads heading-then-table twelve times over, and
+  asserts no spec heads two trees. §2 reads §6b's four stated counts **as words** and compares them
+  to the rows the table carries, plus the paragraph's own arithmetic (103 + 24 = 127, and
+  154 − 127 = 27). **THE FINDING: the Arcanist heading named CONTROL over a table listing Entropy**
+  — the lane was renamed at Batch AT and `talents.gd`'s own comment says why. Same shape as FR's
+  Sharpshooter TEMPO/Pace, one spec along, one word, one surface.
+- **AND ITS FIRST DRAFT READ NINE HEADINGS OF TWELVE AND PRINTED FOUR CONFIDENT FALSE MISMATCHES.**
+  Three headings wrap across a line break; a line-anchored match dropped them and the comparison
+  slid three places out of step. **It looked like a finding, not like a broken instrument.**
+  Everything is matched on a whitespace-flattened copy, the three wrapped headings are pinned by
+  name, and the word reader and the lane comparison are driven in both directions through the same
+  function §1 calls. **WHAT IT CANNOT SEE IS IN ITS HEADER**: it asserts two parts of one document
+  AGREE, never that either is TRUE.
+- **`check_es` §4's CORE-KIT CENSUS IS ASSERTED FOR THE FIRST TIME, AND THE ARM BIT TWICE.** That
+  gate has PRINTED the census every battery since ES and its own comment said *"It is a REPORT."*
+  FR corrected *"DEBUFF for seven"* (it is **five**; seven is the OFFENSE column) and reported the
+  sweep clean — **`CLAUDE.md` and this file's OTHER copy were both still saying seven**, and this
+  file's wraps `DEBUFF for` and `seven` across a newline, which is why a line-anchored sweep read it
+  clean. Both corrected. **THE ARMS ARE A FIXED TEN, one per DOCUMENT and never one per figure**,
+  because this file is inside the swept population and is written after the run. **`check_es` is
+  now the only gate that reads this file's CONTENT** — ten others name the path and every one does
+  so in a comment — so **a batch that rewrites this file owes `check_es` a re-run against the
+  shipped tree.** That obligation is in `docs/instrument-rules.md`.
+- **`docs/changelog.html` AND `docs/design-notes.md` KEEP THE STALE FIGURE ON PURPOSE.** They are
+  dated per-batch records; correcting one rewrites history, which is why the audit documents are
+  kept as written too.
+- **THE SYNC LIST IS RE-DERIVED AND ONE ENTRY IS DISPUTED.** Figures are in `docs/reports/FS.md`
+  §3 and the durable ones are in `CLAUDE.md`; **run `claude_md_census.py`, do not quote a total from
+  here.** What is worth carrying: the archive's **bytes have not moved and its share has** (14.2%
+  → 13.0%, neither file changed), so `CLAUDE.md` carries bytes now and not a percentage; **the root
+  pattern `test_batch_*` + `check_*` leaves FIVE suite files selected** (`test_runes`,
+  `test_rune_battle`, `test_run_harness`, `gate_fixture`, `suite_fixture`, 137,755 B) and
+  *"all root `.gd` files"* is the same set with no exception list; and **`docs/reports/` is
+  disputed** — `CLAUDE.md` has said MUST STAY SELECTED since EE, the brief says it is already
+  deselected, and the picker's state is not in the repo. **The disagreement is on the rule's own
+  line in `CLAUDE.md` now.** `docs/talent-audit.html` is the same shape: listed as ruled-and-applied
+  in the brief, recorded here as unable to leave while DN §8 is open.
+- **AND THE PIN MANIFEST IS BLIND TO BOTH DOCUMENT GATES.** `build_pin_manifest.py` binds a holder
+  off a literal `"res://…"` in the `var` statement, so a gate keeping its path in a `const`
+  contributes ZERO pins — `check_fr` contributes four and **none into the file it exists to read**;
+  `check_fs` contributes none. **Regeneration is then a no-op that reports success.** Recorded in
+  `docs/instrument-rules.md` beside FH's typed-holder rule; not closed.
+- **WHAT MOVED:** `run_battery.sh`, `baselines.json` (three rows — `check_fs` NEW,
+  `check_parse` 179→180, `check_es` 47→57, plus a completion marker on each of the seven no-count
+  rows), `check_fs.gd` (**NEW**), `check_de.gd`, `check_es.gd`, `check_cl_width.gd`,
+  `check_map.gd`, `docs/master.html` (one lane name and the stamp), `CLAUDE.md`,
+  `docs/instrument-rules.md`, `docs/changelog.html`, `docs/design-notes.md`,
+  `docs/reports/FS.md` (**NEW**) and this file. **`pin-manifest.json` DID NOT MOVE** — see above.
+  **The designer's four save files were copied to `save-backups/FS-20260909-182928/` and
+  md5-verified against the originals before anything else happened, and against FR's backup first.**
+- **THE BATTERY: 106 targets, `check_de` 441 checks / 0 failures / 0 notices, ZERO THROWS, and the
+  only red is the sanctioned `check_cm_live` 13/4** with its four FAIL lines identical to the ones
+  its baseline note records. `check_fs` 39/0, `check_parse` 180/0 with the residue still 4,
+  `check_es` 57/0. **The tree was frozen over 373 files with absolute paths and ZERO DIFFER.**
 - **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
   THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FR spent 11 bytes of `CLAUDE.md`'s headroom**
-  (three figure corrections, near size-neutral) and wrote **no standing rule**: the rules it would
-  have written are already there — *the code's field is authoritative and master.html is corrected
-  toward it*, *sweep for every copy of a corrected claim* (EH §2), and *a section being current is
-  not evidence that the section above it is*. What is new is a RECOMMENDATION, and §3 of the brief
-  says to recommend and rule on nothing.
+  FIGURES** — read them off that gate's output. **FS spent about 1.1 KiB of `CLAUDE.md`'s headroom**
+  (the sync block's figures and the disputed-entry line) and wrote **no standing rule into it**: the
+  two rules it earned are instrument rules and are in `docs/instrument-rules.md`.
 - **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide), all twelve
   talent trees are purpose-authored and charter-clean at **324 nodes**, and **the rune layer is
   authored for all twelve specs** — 60 live against **67** retired in a **127**-entry file. **The
@@ -99,7 +119,7 @@ last exactly one.*
   magnitude. `docs/spec-recon.html` is still the document authoring reads; §7 of
   `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
   its own (what rung 2 should ASK).**
-- **Next letter: FS.**
+- **Next letter: FT.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -194,7 +214,7 @@ not corrected** — correcting it would mean inventing a population.
   frozen for the battery — a post-run edit would have made the shipped tree differ from the
   verified one.
 
-### THE INSTRUMENT RECOMMENDATION FR OWES — **REPORTED, RULED ON NOWHERE (FR §3)**
+### ~~THE INSTRUMENT RECOMMENDATION FR OWES~~ — **BOTH HALVES BUILT AT FS §2. NOTHING IS OWED.**
 
 **A gate checking that every number `master.html` states matches the constant it names is NOT
 worth building, and that answer is on the record rather than left as "nobody built one".** It
@@ -221,6 +241,56 @@ EB declined the header sweep at 118 rows for 16 defects; this is ~1,265 rows for
 fixed-width window running into the next card's numbers, a name matching inside another name —
 **printed a clean zero**. A document gate fails toward FEWER findings, and a gate that has quietly
 stopped asking reads exactly like a clean one.
+
+**BOTH ARE BUILT AND BOTH BIT.** `check_fs.gd` is the pairing check (39 checks) and it found the
+**Arcanist heading naming CONTROL over a table listing Entropy** — renamed at Batch AT, and FR's
+own fourteen-defect read had missed it. `check_es` §4(2b) is the census arm, and it found
+**`CLAUDE.md` and this file both still saying "DEBUFF for seven"** after FR reported that sweep
+clean; this file's copy wraps the phrase across a newline. **The transferable half, which is why
+this item is kept:** *the failure mode above is real and this gate's own first draft demonstrated
+it* — a line-anchored heading match read 9 of 12 and printed four confident FALSE mismatches, which
+**looks like a finding rather than like a broken instrument.** The population is asserted at twelve
+now. **The big value gate is still not built and that answer is unchanged.**
+
+### TWO SYNC DESELECTIONS ARE DISPUTED BETWEEN THE REPO AND A BRIEF — **OWED A ONE-LINE RULING (FS §3)**
+
+**The picker's selection state is not in the repo and no instrument can read it**, so this is the
+one class of question where the tree cannot settle a disagreement. Both are recorded on
+`CLAUDE.md`'s own deselection lines rather than only here, because a rule contradicted by a ruling
+that lives in a report is a rule a future batch follows.
+
+- **`docs/reports/` — 74 files, 2,007,731 B, growing by one every batch.** `CLAUDE.md` has listed
+  it as MUST STAY SELECTED since EE and this file declined to move it on exactly that ground; **FS's
+  brief opens §3 with *"Reports are already deselected."*** It is the largest single item still in
+  question. **Do not read the absence of a change as agreement.**
+- **`docs/talent-audit.html` — 165.03 KiB of the 207.63 the two audit documents carry.** FS's brief
+  lists it and `docs/text-audit.html` as *"both ruled and applied"*; this file records that the
+  talent audit **cannot** leave while DN §8 is open, and §8.1.1's own heading reads *"THE CHARTER
+  CONTRADICTS ITSELF ABOUT THOSE 75, AND SOMEBODY HAS TO RULE."* The text audit is genuinely ruled
+  and applied and is not in question.
+- **AND THE DESELECTION PATTERN ITSELF NEEDS ONE WORD CHANGING.** *"Every `test_batch_*.gd` and
+  `check_*.gd` at the repo ROOT"* leaves **five** suite files selected — `test_runes.gd`,
+  `test_rune_battle.gd`, `test_run_harness.gd`, `gate_fixture.gd`, `suite_fixture.gd`, 137,755 B.
+  ***All root `.gd` files*** is the same set with no exception list to remember. This half is a
+  wording fix rather than a ruling.
+
+### THE PIN MANIFEST IS BLIND TO A GATE THAT HOLDS ITS PATH IN A `const` — **FOUND AT FS, RECORDED, NOT CLOSED**
+
+`build_pin_manifest.py` binds a holder off a literal `"res://…"` **inside the `var` statement**, so
+`const DOC := "res://docs/master.html"` followed by `var doc := FileAccess.get_file_as_string(DOC)`
+binds nothing — and a needle written as a named constant is not a literal at the call site either.
+**`check_fr` contributes four pins and NONE of them is into `ways-of-working.md`, the file it exists
+to read; `check_fs` contributes zero.** Two document gates, and `check_ed` is blind to everything
+either of them asserts.
+
+- **THE DANGEROUS HALF IS THAT REGENERATION THEN REPORTS SUCCESS**, which is FH's own tell one step
+  along: not the typed-holder shape, the named-constant one. It is in `docs/instrument-rules.md`
+  beside FH's rule.
+- **THIS IS NOT AN ARGUMENT FOR INLINING THE PATH.** Named constants are how a gate states a
+  boundary once; the sweep that actually protects a document edit is the reader-pool needle sweep,
+  which reads `check_fs.gd` like any other reader. **It is an argument for knowing which instrument
+  you are trusting** — a clean `check_ed` over a new document gate means nothing at all.
+- **Closing it is a change to the generator's binding rule and is a batch of its own.**
 
 ### THE MERGE'S RUNNING ORDER — **RECORDED AT FQ §3 SO THE SEQUENCE SURVIVES A COMPACTION**
 
@@ -599,7 +669,7 @@ deliberately.
   **Thresholds are the default shape and a splash pays for breadth**, both ruled. **The one hard
   constraint on whoever authors the first is measured and printed every battery run**: the protected
   cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on **DEBUFF for
-  seven**, so those two magnitudes are already spent; **MARK is zero for all twelve and TEMPO reaches
+  FIVE**, so those two magnitudes are already spent; **MARK is zero for all twelve and TEMPO reaches
   1 on exactly one**, so those two are the ones a draft can actually move. **And the place a rune
   reads it in a fight is the SPAWN, not the strike loop** — the loadout cannot change during a
   battle. `CLAUDE.md` carries all of that as a standing rule.

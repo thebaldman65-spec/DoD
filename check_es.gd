@@ -556,6 +556,7 @@ func _s4_tags_are_read() -> void:
 		summary.append("%s %d" % [t4, int(met_at_two[String(t4)])])
 	print("    specs meeting a 2+ threshold on the CORE KIT ALONE, of 12:  %s"
 		% "  ".join(summary))
+	_s4_documents_agree(met_at_two)
 
 	# (3) THE CENSUS IS COMPLETE AND ITS ZEROS ARE REAL. A census that omitted an
 	# absent tag would make "you hold none of this" indistinguishable from "this
@@ -659,6 +660,127 @@ func _s4_tags_are_read() -> void:
 			"§4: a threshold ABOVE the live count (%s %d) reads as met" % [probe, n3 + 1])
 	ok(not Runes.tag_threshold_met(lo_names, "NOT_A_TAG", 1),
 		"§4: a threshold on a word that is not a tag reads as met")
+
+
+# ── §4(2b) — AND THE DOCUMENTS THAT QUOTE THAT TABLE MUST AGREE WITH IT ─────
+#
+# **BATCH FS. THE CENSUS ABOVE HAS BEEN PRINTED EVERY BATTERY SINCE ES AND
+# ASSERTED BY NOTHING**, and this gate's own comment said so: *"It is a
+# REPORT."* FR found *"DEBUFF for seven"* — the census says **five**, and seven
+# is the OFFENSE column — standing in `master.html`, in `CLAUDE.md` AND in
+# `docs/state.md`, having drifted in all three. **The number the battery was
+# already computing was three feet away from the sentence that disagreed with
+# it.** One arm closes that, and it would have caught the slip the day it moved.
+#
+# **THE POPULATION IS EVERY CURRENT-TRUTH DOCUMENT, NOT THE TWO FR HAPPENED TO
+# CHECK.** FR corrected `master.html` and one of `state.md`'s two copies and
+# reported the sweep clean; FS found the figure still stale in `CLAUDE.md` and
+# in `state.md`'s OTHER copy, which wraps `DEBUFF for` and `seven` across a line
+# break and is invisible to a line-anchored read. Everything below is matched on
+# a WHITESPACE-FLATTENED copy for that reason.
+#
+# **WHAT IS DELIBERATELY OUT OF THE POPULATION, AND WHY:** `docs/changelog.html`
+# and `docs/design-notes.md` are DATED, PER-BATCH RECORDS — what a batch found
+# and why it ruled as it did, newest first. They carry this figure too, as ES
+# and FR wrote it at the time. **Correcting a dated entry is rewriting history**,
+# which is the same reason `docs/talent-audit.html` and `docs/rune-audit.html`
+# are kept as written. A record of a measurement is not a claim about today.
+#
+# **AND WHAT THIS ARM CANNOT SEE:** it reads the `TAG for <number>` shape. A
+# document that states the same fact in another form — a table, a percentage, a
+# sentence that names no tag — is not reached, and the liveness arm below is the
+# only thing standing between that and a silent zero.
+# **THE TWO THAT MUST STATE IT AND THE ONE THAT MAY.** `master.html` §6c states
+# it as current truth and `CLAUDE.md` carries it as a standing rule, so a window
+# missing from either is the extractor breaking rather than the claim going
+# away. `docs/state.md` is REWRITTEN EVERY BATCH and its own rule is that it
+# points at this gate instead of carrying a second copy — so it is swept if it
+# has one and is not required to.
+const CENSUS_DOCS_REQUIRED := ["res://docs/master.html", "res://CLAUDE.md"]
+const CENSUS_DOCS_SWEPT := ["res://docs/state.md"]
+
+
+func _small_number(word: String) -> int:
+	const W := {
+		"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+		"six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+		"eleven": 11, "twelve": 12,
+	}
+	var w := word.to_lower().strip_edges()
+	if W.has(w):
+		return int(W[w])
+	if w.is_valid_int():
+		return int(w)
+	return -1
+
+
+func _s4_documents_agree(met_at_two: Dictionary) -> void:
+	var flat_rx := RegEx.new()
+	flat_rx.compile("\\s+")
+	# `TAG for <word>` inside a window opened by the phrase the claim is made in.
+	var claim := RegEx.new()
+	# A FIXED WINDOW, GREEDY AND BOUNDED. The claim runs ~70 characters from the
+	# phrase; 200 covers it with room and is short enough that two claims in one
+	# file cannot fall inside one window and hide the second — which is how a
+	# greedy window loses a conjunction.
+	claim.compile("2\\+ threshold(.{0,200})")
+	var pair := RegEx.new()
+	pair.compile("([A-Z]{4,8}) for ([a-zA-Z]+)")
+	# **ONE ASSERTION PER DOCUMENT, NOT ONE PER FIGURE, AND THE REASON IS THIS
+	# GATE'S CHECK COUNT.** `docs/state.md` is REWRITTEN EVERY BATCH and is inside
+	# the swept population; a count that rose and fell with how many times that
+	# file happened to state the claim would be a baseline nothing could hold,
+	# and it would move in the batch AFTER the one that caused it, because
+	# `state.md` is written after the verification run. **The arms below are a
+	# fixed ten regardless of what the documents say.** The per-figure detail is
+	# in the failure message, which is where it is useful anyway.
+	var checked := 0
+	var total_windows := 0
+	for path in CENSUS_DOCS_REQUIRED + CENSUS_DOCS_SWEPT:
+		var raw := FileAccess.get_file_as_string(String(path))
+		ok(raw.length() > 0, "§4: %s is missing or empty, so its census claims are unread" % path)
+		if raw.length() == 0:
+			continue
+		var flat := flat_rx.sub(raw, " ", true)
+		var here := 0
+		var read_here := 0
+		var wrong: Array = []
+		for w in claim.search_all(flat):
+			here += 1
+			for m in pair.search_all(w.get_string(1)):
+				var tag := m.get_string(1)
+				if not met_at_two.has(tag):
+					continue
+				var said := _small_number(m.get_string(2))
+				if said < 0:
+					continue
+				checked += 1
+				read_here += 1
+				if said != int(met_at_two[tag]):
+					wrong.append("%s for %s (the census says %d)"
+						% [tag, m.get_string(2), int(met_at_two[tag])])
+		total_windows += here
+		ok(wrong.is_empty(),
+			"§4: %s disagrees with the census THIS GATE JUST PRINTED: %s"
+				% [path, ", ".join(PackedStringArray(wrong))])
+		if CENSUS_DOCS_REQUIRED.has(String(path)):
+			ok(here >= 1,
+				"§4: %s no longer states the core-kit threshold claim — it is a document that carries it by rule, so this is the extractor breaking rather than the claim going away"
+					% path)
+		print("      %-28s %d claim window(s), %d figure(s) read" % [
+			String(path).trim_prefix("res://"), here, read_here])
+	# THE LIVENESS ARM, AND IT IS THE WHOLE OF WHAT MAKES THE ZERO ABOVE WORTH
+	# ANYTHING. This sweep passes by finding no disagreement, which is what a
+	# sweep that has stopped matching also does. **A window that opens on a
+	# phrase can be closed by a rewording nobody thinks of as a change**, and
+	# that failure prints a clean zero.
+	ok(checked >= 4,
+		"§4: only %d tag figures were compared against the printed census; a sweep matching nothing reads exactly like a clean one"
+			% checked)
+	ok(_small_number("five") == 5 and _small_number("ten") == 10 and _small_number("nope") == -1,
+		"§4: the word reader is not reading words")
+	print("    CHECKED %d stated tag figures in %d claim windows across %d documents"
+		% [checked, total_windows, CENSUS_DOCS_REQUIRED.size() + CENSUS_DOCS_SWEPT.size()])
 
 
 # ── §5 — A SPLASH PAYS FOR BREADTH ──────────────────────────────────────────

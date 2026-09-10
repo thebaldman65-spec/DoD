@@ -15,6 +15,123 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-09 &mdash; Batch FS: A TRUNCATED GATE, A DOC-vs-DOC READER, AND THE SYNC LIST</h2>
+<p><b>ON <code>main</code>, AND THE LAST BATCH BEFORE <code>class-merge</code> TAKES OVER. NO MERGE
+WORK, NOTHING TOUCHED <code>class-merge</code>, AND NOT ONE RUNE, CARD, ABILITY, TALENT, CONSTANT
+OR MAGNITUDE MOVED.</b> No file under <code>data/</code> and no <code>.gd</code> under
+<code>scripts/</code> was edited. Full working: <code>docs/reports/FS.md</code>.</p>
+
+<p><b>&sect;1 &mdash; A GATE THAT WAS CUT OFF NOW SAYS SO, AND IT USED TO BE INDISTINGUISHABLE FROM
+ONE THAT PRINTS NO VERDICT BY DESIGN.</b> <code>--quit-after N</code> is <b>FRAMES</b>, not
+seconds. FR ran a pre-check with <code>--quit-after 900</code> as a hang guard and three gates
+&mdash; <code>check_cs</code>, <code>check_dk</code>, <code>check_dm</code> &mdash; printed no
+summary line at all; the reading was very nearly recorded as <i>"these three report no readable
+count"</i>, which is a real property of <b>seven</b> targets in this battery. <b>The two outcomes
+are byte-identical from outside and that was measured rather than assumed: a truncated run and a
+complete one both exit 0.</b> <b>THE BUDGET WAS BETWEEN THREE AND EIGHT TIMES TOO SMALL</b> &mdash;
+bisected to &plusmn;14 frames, <code>check_cs</code> completes at <b>1518</b>,
+<code>check_dk</code> at <b>3614</b> and <code>check_dm</code> at <b>7115</b>.</p>
+
+<p><b>THE MECHANISM IS A COMPLETION MARKER AND THE PROJECT ALREADY HAD ONE.</b>
+<code>baselines.json</code> has carried an <code>expect</code> string per row since DE &mdash; a
+line only a COMPLETE run prints &mdash; and it was set on <b>one</b> of the seven rows that report
+no check count. It is on all seven now; <code>check_de</code> &sect;1 asserts each and
+<b><code>check_de</code> &sect;2 refuses a no-count row that carries no marker</b>, so a future one
+cannot join the table silently. Two of the seven printed no terminal line at all
+(<code>check_cl_width</code>, <code>check_map</code>) and were given one.
+<code>run_battery.sh</code> reads the same markers live and prints <b>*** NO VERDICT &mdash;
+INCOMPLETE ***</b> with the frame budget named, instead of <code>checks=?</code> for both cases;
+the frame budget itself moved out of an inline literal into a per-target table beside
+<code>EXTRA</code> and <code>TMO</code>, and <b>the two scene runs go through
+<code>run_one</code></b> now, so <code>check_ct_map</code> &mdash; the only target in the battery
+under a frame budget &mdash; has a watchdog and a completion test for the first time.
+<b>PROVED FOUR WAYS</b>: a real gate truncated at 30 frames (reported INCOMPLETE, budget named),
+<b>the same gate with the budget removed</b> (104 checks / 0 failures), the new marker stripped
+from a completed log (<code>check_de</code> reds), and an <code>expect</code> removed from a row
+(the new ratchet reds).</p>
+
+<p><b>THE SEVEN THAT PRINT NO VERDICT BY DESIGN, ON THE RECORD RATHER THAN INFERRED:</b>
+<code>check_cl_resolver</code>, <code>check_cl_width</code>, <code>check_cm</code>,
+<code>check_cn</code>, <code>check_flow</code>, <code>check_map</code> and
+<code>check_map_screen</code>. Five print <code>NAME: 0 failures</code>; two are pure reports.</p>
+
+<p><b>&sect;2 &mdash; THE DOC-vs-DOC PAIRING CHECK IS BUILT: <code>check_fs.gd</code>, 39 checks,
+AND IT FOUND A DEFECT FR'S OWN FOURTEEN-DEFECT READ MISSED.</b> FR measured the doc-vs-code value
+gate as not worth building &mdash; 1,265 mechanical comparisons, 3 raw flags, <b>0 true defects,
+and it would have caught none of the fourteen</b> &mdash; and recommended this instead.
+<b>&sect;1 pairs each &sect;7 talent heading's three lane names against the header row of the table
+beneath it</b>, asserts the section reads heading-then-table twelve times over, and asserts no spec
+heads two trees. <b>&sect;2 reads &sect;6b's four stated counts AS WORDS</b> and compares them to
+the rows the table actually carries, plus the paragraph's own arithmetic. <b>THE FINDING: the
+Arcanist heading named CONTROL over a table listing Entropy.</b> The lane was renamed at Batch AT
+and <code>talents.gd</code>'s own comment says so &mdash; the same shape as FR's Sharpshooter
+TEMPO/Pace defect, one spec along, and it survived a batch that read every number in the document.
+<b>The heading now says ENTROPY.</b></p>
+
+<p><b>AND THE FIRST DRAFT OF THAT GATE READ NINE HEADINGS OF TWELVE AND PRINTED FOUR CONFIDENT
+FALSE MISMATCHES</b>, because three headings wrap across a line break and a line-anchored match
+dropped them, sliding the comparison three places out of step. Everything is matched on a
+whitespace-flattened copy now, the three wrapped headings are pinned by name, and both extractors
+and the word reader are driven in each direction. <b>WHAT THE GATE CANNOT SEE IS STATED IN ITS OWN
+HEADER</b>: it asserts that two parts of one document AGREE, never that either is TRUE &mdash; a
+heading and a table that are both wrong agree, and it is silent on them.</p>
+
+<p><b>AND <code>check_es</code> &sect;4's CORE-KIT CENSUS IS ASSERTED FOR THE FIRST TIME.</b> That
+gate has PRINTED the per-spec tag census every battery since ES and its own comment said <i>"It is
+a REPORT."</i> FR found <b>"DEBUFF for seven"</b> &mdash; the census says <b>FIVE</b>, and seven is
+the OFFENSE column &mdash; standing in three documents and drifted in all three, and reported the
+correction swept. <b>THE ARM WAS ARMED ON THE LIVE TREE AND BIT TWICE: <code>CLAUDE.md</code> and
+<code>docs/state.md</code> were both still saying seven.</b> <code>state.md</code>'s surviving copy
+wraps <i>"DEBUFF for"</i> and <i>"seven"</i> across a line break, which is why a line-anchored sweep
+read it clean. Both are corrected; the gate compares 8 stated figures across 4 claim windows in 3
+documents every battery. <b><code>docs/changelog.html</code> and <code>docs/design-notes.md</code>
+carry the figure too and are deliberately NOT corrected</b> &mdash; they are dated, per-batch
+records of what a batch found, and correcting one is rewriting history.</p>
+
+<p><b>&sect;3 &mdash; THE SYNC DESELECTION LIST, RE-DERIVED RATHER THAN QUOTED.</b> Not a repo
+change: every file stays tracked and Claude Code goes on reading it off disk. The sync set is
+<b>239 files / 12,915,830 B = 12.3175 MiB</b> today. <b>Applying the five items lands at 129 files
+/ 7.2578 MiB &mdash; 41.1% off.</b> <code>DoD-archive/</code> is 1,680,660 B (<b>13.0%</b>, not
+FH's 14.2% &mdash; the same two files, a bigger denominator); the root suites and gates are
+<b>104 files / 2.9347 MiB = 23.8%</b>; <code>pin-manifest.json</code> 333,103 B;
+the two audit documents 212,616 B; <code>docs/build_docs.py</code> 1,764 B. <b>THE ROOT PATTERN
+LEAVES FIVE SUITE FILES BEHIND</b> &mdash; <code>test_runes.gd</code>,
+<code>test_rune_battle.gd</code>, <code>test_run_harness.gd</code>, <code>gate_fixture.gd</code>
+and <code>suite_fixture.gd</code>, 137,755 B between them &mdash; because none of them starts
+<code>test_batch_</code> or <code>check_</code>. <b>THE PERCENTAGES ARE OUT OF <code>CLAUDE.md</code>
+NOW AND THE BYTES ARE IN</b>: a share moves whenever any other file does.</p>
+
+<p><b>AND ONE ENTRY IS RECORDED AS DISPUTED RATHER THAN RULED.</b> <code>CLAUDE.md</code> has said
+<code>docs/reports/</code> must stay selected since EE; FS's brief states the reports are already
+deselected. The picker's state is not in the repo and no instrument can read it. <b>It is the
+largest item still in question &mdash; 74 files, 2,007,731 B, growing by one a batch</b> &mdash; and
+the disagreement is now written on the rule's own line instead of in a report.
+<code>docs/talent-audit.html</code> carries the same shape: the brief lists it as ruled and applied,
+and <code>docs/state.md</code> records that it <b>cannot</b> leave the sync because DN &sect;8 is an
+open question.</p>
+
+<p><b>AND A DEFECT THIS BATCH INTRODUCED AND ITS OWN CONTROL CAUGHT.</b> Folding the scene runs
+into <code>run_one</code> was written <code>target=(${SCENE[$name]:---script $name.gd})</code>
+&mdash; and <b>zsh does not word-split an unquoted expansion</b>, so the whole default arrived as
+ONE token, Godot never saw a <code>--script</code> flag, and both targets sat until the watchdog
+killed them at 240s. It is the same fault as the flags STRING at the top of that very file, in
+different syntax. <b>The truncation control found it; reading did not.</b></p>
+
+<p><b>WHAT MOVED:</b> <code>run_battery.sh</code>, <code>baselines.json</code> (three rows &mdash;
+<code>check_fs</code> new, <code>check_parse</code> 179&rarr;180, <code>check_es</code>
+47&rarr;57, plus a completion marker on each of the seven no-count rows),
+<code>check_fs.gd</code> (<b>NEW</b>), <code>check_de.gd</code>, <code>check_es.gd</code>,
+<code>check_cl_width.gd</code>, <code>check_map.gd</code>, <code>docs/master.html</code> (one lane
+name and the stamp), <code>CLAUDE.md</code>, <code>docs/instrument-rules.md</code>,
+<code>docs/design-notes.md</code>, this file,
+<code>docs/state.md</code> and <code>docs/reports/FS.md</code> (<b>NEW</b>).
+<b><code>pin-manifest.json</code> DID NOT MOVE, AND THAT IS ITSELF A FINDING:</b> the generator
+binds a holder off a literal <code>"res://&hellip;"</code> in the <code>var</code> statement, so a
+gate that holds its document path in a <code>const</code> &mdash; which is what
+<code>check_fr</code> does and what <code>check_fs</code> now does &mdash; contributes ZERO pins.
+Regenerating is a no-op and reports success. It is the FH rule one step along: not the typed-holder
+shape, the named-constant one.</p>
+
 <h2>2026-09-09 &mdash; Batch FR: THE NUMBERS THIS DOCUMENT STATES, AND A READER FOR THE RULE</h2>
 <p><b>NO MERGE WORK, AND NOT ONE RUNE, CARD, ABILITY, TALENT, CONSTANT OR MAGNITUDE MOVED.</b>
 This batch corrected documents toward the code and never the reverse. Where the sweep found the

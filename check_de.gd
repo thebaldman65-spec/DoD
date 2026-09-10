@@ -335,6 +335,40 @@ func _sweep(targets: Dictionary) -> void:
 	_ratchet_set("check count", recorded_unreadable_checks, seen_unreadable_checks, ran)
 	_ratchet_set("failure count", recorded_unreadable_fails, seen_unreadable_fails, ran)
 
+	# ── BATCH FS — A ROW WITH NO COUNT MUST CARRY A COMPLETION MARKER ────────
+	#
+	# **`--quit-after` IS FRAMES, AND A TRUNCATED TARGET PRINTS NO VERDICT.** FR
+	# ran three gates under a frame budget chosen for a fourth; all three were
+	# cut off mid-run and all three printed no summary line, which is BYTE-
+	# IDENTICAL to the seven targets in this table that print no count BY
+	# DESIGN. Both exit 0. So `checks: null` meant two things — "this target
+	# says nothing" and "this target never finished" — and nothing in the tree
+	# could separate them.
+	#
+	# **THE `expect` FIELD WAS ALREADY THE ANSWER AND WAS SET ON ONE ROW.** It
+	# pins a line that only a COMPLETE run prints, and §1 above asserts it. What
+	# was missing is the rule that makes it universal: **a row that reports no
+	# check count is the one row an absent verdict tells you nothing about, so
+	# that is exactly the row that owes a marker.** With this arm a truncated
+	# no-count target fails §1 by the marker's absence instead of passing
+	# silently, and a future no-count target cannot join the table without one.
+	#
+	# **IT IS A PROPERTY OF THE TABLE AND NOT OF THE RUN**, so it is asserted
+	# over every recorded row rather than only the ones this invocation ran — a
+	# subset run must not be able to certify the shape of a row it skipped.
+	var markerless: Array = []
+	for name2 in names:
+		if targets[name2].get("checks", null) != null:
+			continue
+		if String(targets[name2].get("expect", "")).strip_edges() == "":
+			markerless.append(name2)
+	ok(markerless.is_empty(),
+		"every no-count row carries an `expect` completion marker — WITHOUT ONE, A TRUNCATED RUN AND A SILENT ONE ARE THE SAME OUTPUT (missing: %s)"
+			% ", ".join(PackedStringArray(markerless)))
+	print("  %d of %d rows report no check count; %d of them pin a completion marker"
+		% [recorded_unreadable_checks.size(), names.size(),
+			recorded_unreadable_checks.size() - markerless.size()])
+
 
 func _ratchet_set(what: String, recorded: Array, seen: Array, ran: Array) -> void:
 	var lost: Array = []

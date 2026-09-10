@@ -111,6 +111,15 @@ func _initialize() -> void:
 			w[ty] = float(walked[p][ty]) / N
 		print("  %-9s walked/zone %s | zero-blacksmith routes %.1f%% | elites %s" % [
 			p, _fmt(w), 100.0 * zero_smith[p] / N, _pct(elite_hist[p])])
+	# BATCH FS — THE COMPLETION MARKER. This gate is a generation REPORT and
+	# prints no check count, so "it printed no verdict" carried no information:
+	# a target truncated by a FRAME budget prints a short log and exits 0, which
+	# is byte-identical to this one finishing normally. The line is printed after
+	# the last policy row, so its absence is the truncation. `baselines.json`
+	# pins it as this row's `expect` and `check_de` §1 asserts it every battery.
+	# It carries no digits on purpose: the failure grep takes the LAST match, and
+	# `reach-contiguity failures: N` above is the one this row's band reads.
+	print("check_map: report complete")
 	quit(0)
 
 

@@ -70,7 +70,7 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_ec check_ed check_eg check_eh check_ek check_el check_em
        check_es check_et check_eu check_ev check_ew check_ez check_fd
        check_fe check_ff check_fg check_fh check_fi check_fk check_fm check_fn
-       check_fo check_fq check_fr)
+       check_fo check_fq check_fr check_fs)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -98,6 +98,65 @@ TIMEOUT=${DOD_SUITE_TIMEOUT:-240}
 # per-target, the same shape `EXTRA` already uses for flags.
 typeset -A TMO
 TMO[check_map]=600
+
+# BATCH FS §1 — A TRUNCATED TARGET MUST NOT READ LIKE A SILENT ONE.
+#
+# `--quit-after N` IS FRAMES, NOT SECONDS. FR ran a doc pre-check with
+# `--quit-after 900` as a hang guard and three gates — check_cs, check_dk and
+# check_dm — printed no summary line at all. The reading was very nearly
+# recorded as "these three report no readable count", which is a REAL property
+# of seven targets in this battery. They were being cut off mid-run.
+#
+# THE TWO OUTCOMES ARE INDISTINGUISHABLE FROM THE OUTSIDE, and that was
+# measured rather than assumed: a truncated run and a complete one BOTH exit 0
+# (FS ran check_cs both ways and diffed the codes), both print a short log, and
+# neither says which happened. `checks=?` therefore meant two things, and on the
+# class-merge branch — where 52 engine-bound targets go red for eight batches —
+# a silent gate would be read as merge breakage rather than as the runner.
+#
+# THE MECHANISM IS A COMPLETION MARKER, AND IT IS THE ONE THE TABLE ALREADY
+# HAD. `baselines.json` has carried an `expect` string per row since DE — a
+# line that only a COMPLETE run prints — and it was set on exactly ONE row.
+# It is now set on every row that reports no check count, `check_de` §1 asserts
+# it, and `check_de` §2 REFUSES a no-count row that carries no marker, so a
+# future no-count target cannot join the table silently. The same markers are
+# read live here, so this run's own report says which of the two happened
+# instead of printing `checks=?` for both.
+#
+# A COUNT IS ITS OWN MARKER: every counting target in this battery prints its
+# tally in its FINAL summary, so a count present means the target reached its
+# end. The list below is therefore only the targets that print no count at all,
+# and it is DERIVED, not guessed — it is every row in `baselines.json` whose
+# `checks` is null, and `check_de` §2 fails if the two populations disagree.
+NO_COUNT=(check_cl_resolver check_cl_width check_cm check_cn check_flow
+          check_map check_map_screen)
+
+# AND THE FRAME BUDGET IS PER-TARGET RATHER THAN A SHARED LITERAL, WHICH IS THE
+# OTHER HALF OF THE SAME FAULT. FR's pre-check cut three gates at a number
+# chosen for a fourth. MEASURED AT FS by bisecting each one to +/-14 frames:
+# check_cs completes at 1518, check_dk at 3614 and check_dm at 7115, and the
+# boundary reproduces (check_cs was run twice on each side of it). So 900 was
+# 59%, 25% and 13% of what the three of them actually needed.
+#
+# `check_ct_map` drives its own stages and quits itself; its budget is a hang
+# guard and is the ONLY --quit-after in this battery. It lives here, beside the
+# target it belongs to, in the same shape EXTRA and TMO already use.
+typeset -A QAF
+QAF[check_ct_map]=900
+
+# THE TWO TARGETS THAT ARE SCENES RATHER THAN SCRIPTS. `check_parse` harvests
+# every scene path in this file by pattern, so both stay written out in full
+# here rather than being assembled from $name — a path this script builds at run
+# time is a target that gate cannot see. (And the first draft of this comment
+# spelled the pattern out with a placeholder name, which that same gate then
+# read as a battery target and reported MISSING. A comment naming the string a
+# gate matches is an asserted surface.) Both get the same watchdog and the same
+# completion test as everything else now.
+typeset -A SCENE
+SCENE[check_map_screen]="res://check_map_screen.tscn"
+SCENE[check_ct_map]="res://check_ct_map.tscn"
+TMO[check_map_screen]=600
+TMO[check_ct_map]=600
 # BATCH DE — `TMO[test_batch_cd]=2400` IS GONE AND SO IS THE REASON FOR IT.
 # DD gave that suite a 2400s bound because its §1 spawned forty-five child
 # Godots — it ran the battery inside the battery, about 22 minutes of a run
@@ -110,8 +169,32 @@ run_one() {
   echo "$name" >> "$RAN"
   local -a flags
   flags=(${=EXTRA[$name]})
+  # BATCH FS — THE FRAME BUDGET TRAVELS WITH THE TARGET. It used to be an inline
+  # literal on one line of this script; a budget written beside one target and
+  # applied to another is how FR cut three gates at a number chosen for a fourth.
+  [[ -n ${QAF[$name]} ]] && flags+=(--quit-after ${QAF[$name]})
   local limit=${TMO[$name]:-$TIMEOUT}
-  "$GODOT" --headless --path . "${flags[@]}" --script "$name.gd" >"$log" 2>&1 &
+  # BATCH FS — AND THE TWO SCENE RUNS COME THROUGH HERE NOW. They used to be
+  # written out by hand below with no watchdog and no completion test at all,
+  # which is why `check_ct_map` — the ONLY target in this battery under a frame
+  # budget — was the one target that could be silently truncated. `--script` is
+  # the default; a name in SCENE is launched as a scene instead.
+  #
+  # WRITTEN OUT LONG-HAND, BECAUSE THE SHORT FORM IS THIS FILE'S OLDEST SCAR.
+  # `target=(${SCENE[$name]:---script $name.gd})` looks right and is not:
+  # **zsh does not word-split an unquoted parameter expansion**, so the whole
+  # default arrives as ONE token, Godot never sees a `--script` flag, and the
+  # target sits until the watchdog kills it. That is the same fault the flags
+  # STRING at the top of this file cost a battery for. It was reintroduced here
+  # at FS and caught by FS's own truncation control, which is the only reason
+  # this comment is not a third scar.
+  local -a target
+  if [[ -n ${SCENE[$name]} ]]; then
+    target=("${SCENE[$name]}")
+  else
+    target=(--script "$name.gd")
+  fi
+  "$GODOT" --headless --path . "${flags[@]}" "${target[@]}" >"$log" 2>&1 &
   local pid=$! waited=0 timedout=0
   while kill -0 $pid 2>/dev/null; do
     if (( waited >= limit )); then
@@ -140,12 +223,32 @@ run_one() {
     | tail -1 | grep -oE '[0-9]+')
   local throws=$(grep -cE 'SCRIPT ERROR|Parse Error' "$log")
   local faillines=$(grep -cE '^ *FAIL' "$log")
+  # BATCH FS — THE THREE OUTCOMES, AND `checks=?` IS NO LONGER ONE OF THEM.
+  # A target is COMPLETE if it printed a count (every counting target prints
+  # its tally last) or, for a target that prints none by design, if it printed
+  # its own `name:` end marker. Anything else was CUT OFF, and says so.
+  local marker=0
+  grep -qE "^$name: " "$log" && marker=1
+  local by_design=0
+  (( ${NO_COUNT[(I)$name]} )) && by_design=1
   if (( timedout )); then
     printf '%-22s *** TIMED OUT after %ss *** (no count; %s log lines)\n' \
       "$name" "$limit" "$(wc -l < "$log" | tr -d ' ')"
+  elif [[ -z "$checks" && $marker -eq 0 ]]; then
+    # NOT SILENT — INCOMPLETE. It printed no tally and never reached the end
+    # marker, so it did not finish. If it was running under a frame budget,
+    # that budget is the first thing to raise.
+    printf '%-22s *** NO VERDICT — INCOMPLETE: no count and no `%s:` end marker (%s log lines%s) ***\n' \
+      "$name" "$name" "$(wc -l < "$log" | tr -d ' ')" \
+      "${QAF[$name]:+, --quit-after ${QAF[$name]} FRAMES}"
+  elif [[ -z "$checks" ]]; then
+    printf '%-22s checks=%-6s fails=%-4s throws=%-3s FAILlines=%-4s %s\n' \
+      "$name" "none" "${fails:-none}" "$throws" "$faillines" \
+      "$( (( by_design )) && echo 'COMPLETE (prints no count by design)' \
+          || echo 'COMPLETE but prints NO COUNT and has no baselines.json row saying so' )"
   else
     printf '%-22s checks=%-6s fails=%-4s throws=%-3s FAILlines=%s\n' \
-      "$name" "${checks:-?}" "${fails:-?}" "$throws" "$faillines"
+      "$name" "$checks" "${fails:-?}" "$throws" "$faillines"
   fi
 }
 
@@ -158,26 +261,26 @@ for n in 1 2 3; do
   echo "harness_$n" >> "$RAN"
   DOD_GATE=$n "$GODOT" --headless --path . --script test_run_harness.gd \
     >"$OUT/harness_$n.log" 2>&1
+  # BATCH FS — AND THE HARNESS OWES THE SAME ANSWER. Its verdict grep prints an
+  # EMPTY field when the target did not reach its verdict, which read as a gate
+  # with nothing to say. An empty verdict is now named as an incomplete run.
+  hv=$(grep -oE 'GATE [0-9] (PASS|FAIL)[^)]*\)?' "$OUT/harness_$n.log" | tail -1)
   printf 'GATE %s  %s  throws=%s\n' "$n" \
-    "$(grep -oE 'GATE [0-9] (PASS|FAIL)[^)]*\)?' "$OUT/harness_$n.log" | tail -1)" \
+    "${hv:-*** NO VERDICT — INCOMPLETE: never printed GATE $n PASS/FAIL ***}" \
     "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/harness_$n.log")"
 done
 echo "=== SCENE RUNS (autoloads do not resolve under --script) ==="
-echo "check_map_screen" >> "$RAN"
-"$GODOT" --headless --path . res://check_map_screen.tscn >"$OUT/check_map_screen.log" 2>&1
-printf 'check_map_screen        %s  throws=%s\n' \
-  "$(grep -oE '[0-9]+ checks[^:]*' "$OUT/check_map_screen.log" | tail -1)" \
-  "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_map_screen.log")"
 # BATCH CT: the pouch render gate. Measures every drawn button's rect against the
 # 1280-wide viewport at 4, 5 and 6 slots — an off-screen button is a DRAW-time
 # fact no parse gate and no source read can see, which is exactly how CT's brief
 # came to assert that six buttons fit a row that holds five.
-echo "check_ct_map" >> "$RAN"
-"$GODOT" --headless --path . --quit-after 900 res://check_ct_map.tscn \
-  >"$OUT/check_ct_map.log" 2>&1
-printf 'check_ct_map            %s  throws=%s\n' \
-  "$(grep -oE '[0-9]+ checks / [0-9]+ failures' "$OUT/check_ct_map.log" | tail -1)" \
-  "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_ct_map.log")"
+#
+# BATCH FS — BOTH GO THROUGH `run_one` NOW. Written out by hand these two had no
+# watchdog, no `$RAN` line written by the runner, and — for `check_ct_map`, the
+# one target in this battery carrying a `--quit-after` — no way at all to tell a
+# cut-off run from a finished one. Their scene paths and their budgets are in
+# SCENE and QAF above.
+for n in check_map_screen check_ct_map; do run_one $n; done
 # BATCH DE — THE COUNT DIFFER, AND IT IS A PROPERTY OF THE RUN.
 # It reads the logs above and `baselines.json`; it spawns nothing, so the
 # nesting DD paid 20 minutes for is now structurally impossible rather than

@@ -966,6 +966,13 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   flag is rejected, and the suite silently runs at the default step — reporting failures that read
   as real. Use `fps=(--fixed-fps 12)`. **The bash habit silently under-runs the one suite that
   most needs the flag.**
+  · **IT CAME BACK AT FS AND IN THE SAME FILE.** Folding the two scene runs into `run_one` was
+    written `target=(${SCENE[$name]:---script $name.gd})`, which looks like a default and is one
+    token: Godot never saw a `--script` flag, ran the project instead, and sat until the watchdog
+    killed it at 240s. **A `${...:-default}` whose default is more than one word is the same
+    defect wearing a different syntax.** Write the branch out long-hand. It was caught by FS's own
+    truncation control and not by reading — which is the argument for arming a control on a runner
+    change at all.
 - **`\n` IN A GDSCRIPT STRING IS TWO CHARACTERS, SO A `\bword\b` REGEX SILENTLY FAILS ON EVERY
   HAND-WRAPPED TOOLTIP.** The `n` of the escape is a WORD character, so `"this\nbeast's own gift"`
   has no word boundary before the word — and a rename pass skips exactly the multi-line
@@ -1357,3 +1364,68 @@ a census is taken.
 - **THE TELL IS `--check` SAYING `current`.** A manifest that cannot see a gate's pins is a
   manifest with nothing to add, so the regeneration is a no-op and reports success. **Grep the
   regenerated manifest for the gate's own filename before believing it.**
+- **AND THE SAME HOLE HAS A SECOND MOUTH: A PATH HELD IN A `const`.** The binding needs a literal
+  `"res://…"` **inside the `var` statement**, so `const DOC := "res://docs/master.html"` followed
+  by `var doc := FileAccess.get_file_as_string(DOC)` binds nothing either — and a needle written as
+  a named constant (`doc.contains(S7_OPEN)`) is not a literal at the call site, so it would not be
+  recorded even if the holder were bound. **Measured at FS: `check_fr` contributes 4 pins and NONE
+  of them is into `ways-of-working.md`, the file it exists to read; `check_fs` contributes ZERO.**
+  Two gates, and the manifest is blind to what both of them assert about a document.
+  **THIS IS NOT AN ARGUMENT FOR INLINING THE PATH.** Named constants are how a gate says the same
+  boundary twice without a second copy, and the sweep that actually protects a document edit is the
+  reader-pool needle sweep, not the manifest. **It is an argument for knowing which instrument you
+  are trusting**: `check_ed` is a ratchet on the pins it can SEE, and its clean reading over a new
+  document gate means nothing at all.
+
+## STANDING RULE — A TARGET CUT OFF BY A FRAME BUDGET IS INDISTINGUISHABLE FROM ONE THAT PRINTS NO VERDICT (Batch FR §5a, closed at Batch FS §1)
+> **`--quit-after N` IS FRAMES, NOT SECONDS.** FR ran a doc pre-check with `--quit-after 900` as a
+> hang guard and three gates — `check_cs`, `check_dk`, `check_dm` — printed no summary line at all.
+> The reading was very nearly recorded as *"these three report no readable count"*, which is a REAL
+> property of seven targets in this battery. **They were being cut off mid-run**, and the two
+> outcomes produce byte-identical evidence: both exit **0**, both print a short log, and neither
+> says which happened.
+
+- **THE EXIT CODE IS NOT THE TELL AND WAS MEASURED RATHER THAN ASSUMED.** FS ran `check_cs` under a
+  30-frame budget and with none: **exit 0 both times.** The truncated run's log is six lines of
+  ordinary progress output. This is the same reason the project's parse floor greps stderr rather
+  than reading a tally — **a Godot target that dies part-way still exits clean.**
+- **THE BUDGET WAS THREE TO EIGHT TIMES TOO SMALL AND NOBODY COULD HAVE GUESSED THAT EITHER.**
+  Bisected at FS to ±14 frames: `check_cs` completes at **1518**, `check_dk` at **3614**,
+  `check_dm` at **7115**. A budget chosen for one fixture-driven gate is not a budget for another,
+  because what a gate spends is `await process_frame` calls and those scale with what it drives.
+  **A shared frame literal is the defect; a per-target budget beside the target is the fix.**
+- **THE MECHANISM IS A COMPLETION MARKER, AND THE PROJECT ALREADY HAD ONE.** `baselines.json` has
+  carried an `expect` string per row since DE — a line only a COMPLETE run prints — and it was set
+  on exactly ONE of the seven rows that report no check count. It is on all seven now,
+  `check_de` §1 asserts each, and **`check_de` §2 refuses a `checks: null` row that carries no
+  marker**, so a future no-count target cannot join the table silently. `run_battery.sh` reads the
+  same markers live and prints `*** NO VERDICT — INCOMPLETE ***` with the frame budget named,
+  instead of `checks=?` for both cases.
+- **A COUNT IS ITS OWN MARKER; A REPORT IS NOT.** Every counting target in this battery prints its
+  tally in its FINAL summary, so a count present means the target reached its end. The rule
+  therefore only binds the targets that print no count — which is exactly the population an absent
+  verdict says nothing about. Two of the seven printed no terminal line at all
+  (`check_cl_width`, `check_map`) and were given one.
+- **AND THE POPULATION IS ON THE RECORD RATHER THAN INFERRED.** The seven that print no check
+  count by design are `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn`, `check_flow`,
+  `check_map` and `check_map_screen`. Five of them print `NAME: 0 failures`; two are pure reports.
+  **The list is not written twice**: `run_battery.sh` names it for the live report and `check_de`
+  derives it from `baselines.json`, and `check_de` §2 is what stops the two drifting.
+- **AND ONE GATE NOW READS A FILE THAT IS WRITTEN AFTER THE VERIFICATION RUN, WHICH IS AN
+  OBLIGATION AND NOT A DEFECT.** FS §2 put `docs/state.md` into `check_es` §4(2b)'s swept
+  population, because that is where FR's third stale copy of the core-kit figure was standing.
+  **It is the only gate that reads that file's CONTENT** — ten others name it and every one of
+  them does so inside a comment, and `check_fr` §4 asserts only that the path resolves. Two things
+  follow and both are load-bearing:
+  · **THE ARMS ARE A FIXED TEN, ONE PER DOCUMENT AND NEVER ONE PER FIGURE.** A check count that
+    rose and fell with how often `state.md` happened to state the claim would move in the batch
+    AFTER the one that caused it, and no baseline can hold a number like that.
+  · **A BATCH THAT REWRITES `docs/state.md` OWES `check_es` A RE-RUN AGAINST THE SHIPPED TREE**,
+    and owes the reading in its report. The rewrite lands behind the battery by convention, so
+    without that re-run every batch would ship a `state.md` nothing had read.
+- **THE PROOF IS THE PART THAT TRANSFERS.** A fix that makes the two distinguishable in theory and
+  not in the battery's own output is not a fix. FS armed it four ways: a real gate truncated at 30
+  frames (reported as INCOMPLETE, with the budget named), **the same gate with the budget removed**
+  (104 checks / 0 failures), the new marker stripped from a completed log (`check_de` reds), and an
+  `expect` field removed from a row (the §2 ratchet reds). **The second arm is the one that matters
+  — the first alone only proves the message can be printed.**
