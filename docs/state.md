@@ -13,113 +13,112 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-09 (Batch FS).*
+*Last rewritten: 2026-09-09 (Batch FT).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FS — A TRUNCATED GATE THAT NOW SAYS SO, A DOC-vs-DOC READER, AND THE SYNC LIST.
-  THE LAST BATCH BEFORE `class-merge`.** Nothing touched `class-merge`, and **not one rune, card,
-  ability, talent, constant or magnitude moved** — no `.gd` under `scripts/` and no file under
-  `data/` was edited. Full working: **`docs/reports/FS.md`**.
-- **`--quit-after` IS FRAMES, AND A TRUNCATED TARGET USED TO BE BYTE-IDENTICAL TO ONE THAT PRINTS
-  NO VERDICT BY DESIGN.** Both exit **0** — measured, not assumed — both leave a short log of
-  ordinary progress output, and the battery printed `checks=?` for each. **FR'S REASSURANCE WAS
-  FALSE**: it recorded *"`run_battery.sh` does not use the flag"*, and HEAD's line 176 passed
-  `--quit-after 900` to `check_ct_map` — the battery's ONE frame-budgeted target, and also one of
-  the two written out by hand with **no watchdog and no completion test**. **The budgets, bisected
-  to ±14 frames: `check_cs` completes at 1518, `check_dk` at 3614, `check_dm` at 7115**, so 900 was
-  59%, 25% and 13% of what they needed.
-- **THE MECHANISM IS A COMPLETION MARKER AND THE PROJECT ALREADY HAD ONE, SET ON ONE ROW OF SEVEN.**
-  `baselines.json`'s `expect` is a line only a COMPLETE run prints. It is on **all seven** no-count
-  rows now; `check_de` §1 asserts each and **§2 REFUSES a `checks: null` row that carries no
-  marker**, so a future one cannot join the table silently. Two of the seven printed no terminal
-  line at all (`check_cl_width`, `check_map`) and were given one. `run_battery.sh` reads the same
-  markers live and prints **`*** NO VERDICT — INCOMPLETE ***` with the frame budget named**; the
-  budget itself moved into a per-target table beside `EXTRA`/`TMO`, and **both scene runs go through
-  `run_one`**. **A count is its own marker**, so the rule binds only the seven.
-- **THE SEVEN THAT PRINT NO VERDICT BY DESIGN, ON THE RECORD:** `check_cl_resolver`,
-  `check_cl_width`, `check_cm`, `check_cn`, `check_flow`, `check_map`, `check_map_screen`. Five
-  print `NAME: 0 failures`; two are pure reports. **The list is not written twice** — the runner
-  names it and `check_de` derives it from `baselines.json`, and §2 stops the two drifting.
-- **PROVED FOUR WAYS, AND ARM B IS THE ONE THAT FOUND SOMETHING.** A gate truncated at 30 frames
-  reported INCOMPLETE with the budget named (and `check_de` red on it independently); **the same
-  gate with the budget removed read 104/0** — but on the first attempt it read *TIMED OUT after
-  240s*, because `target=(${SCENE[$name]:---script $name.gd})` is ONE token in zsh and Godot never
-  saw a `--script` flag. **That is the flags-STRING scar from the top of that same file in
-  different syntax, and reading the diff did not find it.** Arms C and D: the new marker stripped
-  from a completed log reds `check_de`; an `expect` deleted from a row reds the new ratchet.
-- **`check_fs.gd` IS THE DOC-vs-DOC PAIRING CHECK — FR's OWN RECOMMENDATION — AND IT FOUND A
-  DEFECT FR's FOURTEEN-DEFECT READ MISSED.** §1 pairs each §7 heading's three lane names against
-  the `<th>` row beneath it, asserts the section reads heading-then-table twelve times over, and
-  asserts no spec heads two trees. §2 reads §6b's four stated counts **as words** and compares them
-  to the rows the table carries, plus the paragraph's own arithmetic (103 + 24 = 127, and
-  154 − 127 = 27). **THE FINDING: the Arcanist heading named CONTROL over a table listing Entropy**
-  — the lane was renamed at Batch AT and `talents.gd`'s own comment says why. Same shape as FR's
-  Sharpshooter TEMPO/Pace, one spec along, one word, one surface.
-- **AND ITS FIRST DRAFT READ NINE HEADINGS OF TWELVE AND PRINTED FOUR CONFIDENT FALSE MISMATCHES.**
-  Three headings wrap across a line break; a line-anchored match dropped them and the comparison
-  slid three places out of step. **It looked like a finding, not like a broken instrument.**
-  Everything is matched on a whitespace-flattened copy, the three wrapped headings are pinned by
-  name, and the word reader and the lane comparison are driven in both directions through the same
-  function §1 calls. **WHAT IT CANNOT SEE IS IN ITS HEADER**: it asserts two parts of one document
-  AGREE, never that either is TRUE.
-- **`check_es` §4's CORE-KIT CENSUS IS ASSERTED FOR THE FIRST TIME, AND THE ARM BIT TWICE.** That
-  gate has PRINTED the census every battery since ES and its own comment said *"It is a REPORT."*
-  FR corrected *"DEBUFF for seven"* (it is **five**; seven is the OFFENSE column) and reported the
-  sweep clean — **`CLAUDE.md` and this file's OTHER copy were both still saying seven**, and this
-  file's wraps `DEBUFF for` and `seven` across a newline, which is why a line-anchored sweep read it
-  clean. Both corrected. **THE ARMS ARE A FIXED TEN, one per DOCUMENT and never one per figure**,
-  because this file is inside the swept population and is written after the run. **`check_es` is
-  now the only gate that reads this file's CONTENT** — ten others name the path and every one does
-  so in a comment — so **a batch that rewrites this file owes `check_es` a re-run against the
-  shipped tree.** That obligation is in `docs/instrument-rules.md`.
-- **`docs/changelog.html` AND `docs/design-notes.md` KEEP THE STALE FIGURE ON PURPOSE.** They are
-  dated per-batch records; correcting one rewrites history, which is why the audit documents are
-  kept as written too.
-- **THE SYNC LIST IS RE-DERIVED AND ONE ENTRY IS DISPUTED.** Figures are in `docs/reports/FS.md`
-  §3 and the durable ones are in `CLAUDE.md`; **run `claude_md_census.py`, do not quote a total from
-  here.** What is worth carrying: the archive's **bytes have not moved and its share has** (14.2%
-  → 13.0%, neither file changed), so `CLAUDE.md` carries bytes now and not a percentage; **the root
-  pattern `test_batch_*` + `check_*` leaves FIVE suite files selected** (`test_runes`,
-  `test_rune_battle`, `test_run_harness`, `gate_fixture`, `suite_fixture`, 137,755 B) and
-  *"all root `.gd` files"* is the same set with no exception list; and **`docs/reports/` is
-  disputed** — `CLAUDE.md` has said MUST STAY SELECTED since EE, the brief says it is already
-  deselected, and the picker's state is not in the repo. **The disagreement is on the rule's own
-  line in `CLAUDE.md` now.** `docs/talent-audit.html` is the same shape: listed as ruled-and-applied
-  in the brief, recorded here as unable to leave while DN §8 is open.
-- **AND THE PIN MANIFEST IS BLIND TO BOTH DOCUMENT GATES.** `build_pin_manifest.py` binds a holder
-  off a literal `"res://…"` in the `var` statement, so a gate keeping its path in a `const`
-  contributes ZERO pins — `check_fr` contributes four and **none into the file it exists to read**;
-  `check_fs` contributes none. **Regeneration is then a no-op that reports success.** Recorded in
-  `docs/instrument-rules.md` beside FH's typed-holder rule; not closed.
-- **WHAT MOVED:** `run_battery.sh`, `baselines.json` (three rows — `check_fs` NEW,
-  `check_parse` 179→180, `check_es` 47→57, plus a completion marker on each of the seven no-count
-  rows), `check_fs.gd` (**NEW**), `check_de.gd`, `check_es.gd`, `check_cl_width.gd`,
-  `check_map.gd`, `docs/master.html` (one lane name and the stamp), `CLAUDE.md`,
-  `docs/instrument-rules.md`, `docs/changelog.html`, `docs/design-notes.md`,
-  `docs/reports/FS.md` (**NEW**) and this file. **`pin-manifest.json` DID NOT MOVE** — see above.
-  **The designer's four save files were copied to `save-backups/FS-20260909-182928/` and
-  md5-verified against the originals before anything else happened, and against FR's backup first.**
-- **THE BATTERY: 106 targets, `check_de` 441 checks / 0 failures / 0 notices, ZERO THROWS, and the
-  only red is the sanctioned `check_cm_live` 13/4** with its four FAIL lines identical to the ones
-  its baseline note records. `check_fs` 39/0, `check_parse` 180/0 with the residue still 4,
-  `check_es` 57/0. **The tree was frozen over 373 files with absolute paths and ZERO DIFFER.**
-- **`CLAUDE.md` IS UNDER A 290 KiB CEILING AND `docs/changelog.html` UNDER CW §4's 400 KB
-  THRESHOLD. `check_fg` MEASURES BOTH EVERY BATTERY AND THIS FILE DOES NOT HAVE TO REMEMBER THE
-  FIGURES** — read them off that gate's output. **FS spent about 1.1 KiB of `CLAUDE.md`'s headroom**
-  (the sync block's figures and the disputed-entry line) and wrote **no standing rule into it**: the
-  two rules it earned are instrument rules and are in `docs/instrument-rules.md`.
-- **Phase.** The ability draft is **COMPLETE at 154 of 154** (129 spec + 25 class-wide), all twelve
-  talent trees are purpose-authored and charter-clean at **324 nodes**, and **the rune layer is
-  authored for all twelve specs** — 60 live against **67** retired in a **127**-entry file. **The
-  class merge is ruled as a PROJECT rather than a batch and its running order is in the queue
-  below.** What is still open in the rune layer is the **Devout's fifth** and the Shared Mark's own
-  magnitude. `docs/spec-recon.html` is still the document authoring reads; §7 of
-  `docs/reports/FK.md` is the correction to it. **The ladder still has an open design question of
-  its own (what rung 2 should ASK).**
-- **Next letter: FT.**
+- **Last batch: FT — THREE SPINES, BUILT ON NOBODY. THE FIRST BATCH ON `class-merge`.** Nothing
+  was merged: no spec dissolved, no pool moved, no engine became a rune, no talent node moved and
+  **no hero gained a meter**. `main` is untouched and still playable. Full working:
+  **`docs/reports/FT.md`**.
+- **MOMENTUM (Warrior), CHANNEL (Mage) AND SANCTITY (Cleric) EXIST AS MACHINERY WITH NO OWNER.**
+  Declared, drivable, paying what they compute — and **unreachable from any live hero**. The safety
+  property is three switches (`momentum_active`, `channel_active`, `sanctity_active`), all FALSE,
+  with every payout guarded on its own and returning its identity value without it.
+- **`check_ft` §0 IS WRITTEN TO INVERT, AND THAT IS WHAT MAKES THE BRANCH SAFE.** It asserts four
+  ways: no spec passive names one of the three; nothing under `scripts/` or `data/` ASSIGNS a
+  switch (comment-stripped, over 28 files, matching an assignment shape rather than a mention); the
+  matcher is proved able to bite on a constructed line; and a live four-spec party reads all twelve
+  switch and all twelve payout readings at their identity value. **The batch that attaches a spine
+  takes §0 red and rewrites it** — `check_ez` §1 and `check_fk` §2 both went through this.
+- **CHANNEL IS TWO LINES AND ONE RULING, AS FP PRICED IT.** `note_resource_spent` now books Mana
+  into its own `mana_spent` beside Rage's — **two fields, because `rage_spent` holding Mana is a
+  name that lies and a shared field would make Blood Frenzy's second term readable by a Mage.**
+  **Its element-blindness is asserted against the function's own source**, not driven: a function
+  that reads the ability and happens not to branch on it today passes every drive that exists.
+  There is no `is_spell` flag, so *spell damage* means *not physical* and that is one constant.
+- **MOMENTUM'S WINDOW IS THE ONE DECISION A LATER READER WILL GET WRONG.** `battle_turn` is stamped
+  from `_turns_taken`, which counts UNIT turns across the whole field — so a hero deals on index N
+  and is struck back on N+3, and **a meter keyed on that index would read zero forever.** It
+  carries `trance_taken`'s span instead, with two accumulators of its own because Battle Trance
+  CONSUMES that field. **Damage TAKEN per turn existed twice over; damage DEALT per turn did not
+  exist in any shape**, and building it was the batch's real work.
+- **AND ITS PAYOUT IS ONE FUNCTION AT THREE SCHEDULING SITES, NOT A SEVENTH TERM IN
+  `effective_speed()`.** That function is what every `next_time` write divides by, so a term there
+  compounds with Chilled, Slowed, Quick Draw and Wrath at once — **measured, not argued: the
+  control that adds one made the live delta read x0.6296 where the arithmetic says x0.6800.** The
+  three are the post-cast schedule, the gated-failure schedule and the initiative PREVIEW.
+- **SANCTITY'S POTENCY HALF WAS MEASURED AND DELIBERATELY NOT BUILT.** `STATUS_INFO` holds **156
+  ids and not one magnitude**. **Duration is a parameter at all 249 authoring sites; potency is at
+  81, and 93 of the 156 declared ids carry no magnitude at any site at all** — so a general potency
+  multiplier reaches about a third and reads as working. **What shipped is duration alone, keyed on
+  the APPLIER**, as the fourth clause of a sentence Permafrost, Emberkeep and the two row-8 nodes
+  already write. Its coverage is printed rather than described: **214 `_apply_status` sites, 110
+  carrying a source, 104 not.**
+- **AND THE ANTI-FARMING RULE IS ONE SENTENCE: ONE EVENT PER (TURN, BODY, STATUS).** Eight
+  apply-and-remove cycles on one body in one turn book ONE; a refresh books nothing; a removal that
+  removes nothing books nothing; a cleanse books what it actually took; **and a natural expiry is
+  NOT a removal** — a clock running out is time passing, not a hero acting.
+- **NINE NEGATIVE CONTROLS, ALL NINE BIT, EACH WITH A DIFFERENT SIGNATURE**, and the tree was
+  restored byte-exactly afterwards. **The one worth carrying: dropping ONE of the three initiative
+  read sites made the live delta read x1.0000** — this project's most common shipped defect wearing
+  its own name, caught by the arm that exists for it.
+- **THE LIVE A/Bs ARE SEEDED AND THAT IS THE INSTRUMENT'S OWN SCAR.** `randf_range(0.9, 1.1)` is on
+  every blow; six-pair sums still left a physical control reading between **x0.9537 and x1.0349
+  across three runs**, which swallows a real finding and manufactures a false one in equal measure.
+  Seeded, Channel reproduces its own arithmetic live at **x1.1799**, the same card read as physical
+  moves by **x1.0000**, and Momentum's `next_time` delta is **x0.6800**. **Three other confounds
+  had to be closed first**: the victim died on the control arm and the second arm read 0; the
+  Arcanist's Resonance ramps with every cast and biased the ratio to x1.2422; and the first reading
+  of every pair is a warm-up that measured 0 twice. **The physical control had to become THE SAME
+  CARD with its type changed** — its first draft used the Sharpshooter's Aimed Shot and read
+  x1.1015 on a payout that pays physical nothing, because his basic is a SEQUENCE.
+- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED, AND THAT IS A RULING.** It shows
+  only what is currently in the game, and **nothing a player can meet changed** — all three payouts
+  return their identity value for every hero that exists. Three engines nobody can reach are not in
+  the game, and a stamp is a claim about the document. It moves when a spine is attached.
+- **WHAT MOVED:** `scripts/unit.gd`, `scripts/battle.gd`, `check_ft.gd` (**NEW**), `run_battery.sh`
+  (one name), `baselines.json` (two rows — `check_ft` NEW, `check_parse` 180→181), `CLAUDE.md`
+  (a standing rule, three governor-table rows, and **the Overburn row's "THE ONE ... CEILING RATHER
+  THAN A COST" claim amended because three capped spines make it false** — the literal
+  `test_batch_bs` asserts is preserved verbatim inside the new sentence), `docs/changelog.html`,
+  `docs/design-notes.md`, `docs/reports/FT.md` (**NEW**) and this file. **`docs/master.html` did
+  NOT move** — see above. **The designer's four save files were copied to `save-backups/FT-…` and
+  md5-verified against the originals and against FS's backup before anything else happened; all
+  four match FS's exactly, so nothing has moved since.**
+- **THE BATTERY WAS RUN TWICE, WHICH IS WHAT A BATCH THAT WRITES AN INSTRUMENT OWES.** Pass 1 put
+  the **unmodified gates against the new code before any document moved**: **107 targets, ZERO
+  throws, ZERO timeouts, ZERO incomplete, all 47 suites green, `check_parse` 181/0 with the residue
+  still 4, `check_ft` 79/0, `check_de` 445 checks / 0 failures / 0 notices.** **PASS 2, THE
+  ACCEPTANCE RUN OVER THE SHIPPED TREE, IS THE SAME: 107 targets, zero throws, zero timeouts, zero
+  incomplete, the same one red, and the same counts.** Both over a frozen tree md5-stamped with
+  **absolute paths** across the whole working tree, tracked and untracked — **376 files, ZERO
+  DIFFER.**
+- **`CLAUDE.md` IS AT 287.85 KiB AND THAT LEAVES 2,206 BYTES.** `check_fg` measures it every
+  battery and this file does not have to remember the figure — but the HEADROOM is worth carrying
+  once: FT spent **4,148 bytes** of it on a standing rule, three governor-table rows and one
+  amended claim. **The next standing rule of any size needs a cut somewhere else first.**
+- **THE ONE RED IS THE SANCTIONED `check_cm_live` 13/4, PROVED SANCTIONED RATHER THAN ASSUMED.**
+  Its baseline note says *"identical on unmodified HEAD"* and does not enumerate the lines, so
+  HEAD's `unit.gd` and `battle.gd` were put back and the gate re-run: **the same four FAIL lines,
+  word for word.** A count matching a count is not the same claim. **And `check_es` was re-run
+  against the shipped `state.md`** — the obligation `docs/instrument-rules.md` records for a batch
+  that rewrites this file — at **57/0**.
+- **THE DOCUMENT EDITS WERE SWEPT AND THE SWEEP WAS PROVED ABLE TO BITE.** 1,845 needles over the
+  complete reader population of the four documents (64 / 21 / 7 / 12 readers), **1 LOST**, and that
+  one is a false positive run to ground: `check_ek`'s `TAG_CHECKERS` list of gate FILE NAMES
+  happened to overlap FS's *WHAT MOVED* line. **The control needle came off the needle list**
+  (`TABLE THAT IS A CEILING RATHER THAN A COST`, `test_batch_bs`'s and nobody else's) and read
+  LOST = 1 against both the edited copy and HEAD's.
+- **Phase.** The ability draft is **COMPLETE at 154 of 154**, all twelve talent trees are
+  purpose-authored and charter-clean at **324 nodes**, and the rune layer is authored for all
+  twelve specs — 60 live against **67** retired in a **127**-entry file. **Step 1 of the merge's
+  running order is DONE.** What is still open in the rune layer is the **Devout's fifth** and the
+  Shared Mark's own magnitude. `docs/spec-recon.html` is still the document authoring reads; §7 of
+  `docs/reports/FK.md` is the correction to it.
+- **Next letter: FU.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -164,6 +163,40 @@ the things a later batch must not re-derive from scratch:
   in `relics.gd`); and the **card classification in §4c is coarse, with both of its instrument
   faults reported in place** — a card that FEEDS an engine without READING it counts as
   engine-free there, which under-states the Pyromancer and the Survivalist most.
+
+### THE THREE SPINES ARE BUILT AND FIVE THINGS ARE FLAGGED, NOT TUNED — **OWED A RULING (FT)**
+
+**None of the five blocks the next batch.** The machinery is drivable and every number is a named
+constant, so each ruling is a one-line change. Full working and the measurements:
+`docs/reports/FT.md`.
+
+- **CHANNEL'S PARTITION.** *Spell damage* = **not physical** (implemented,
+  `CHANNEL_SPARES_PHYSICAL`), or Channel pays all damage and buys the basic attack with it. There
+  is **no `is_spell` flag on `Ability`** and the only available partition is `dmg_type`, so those
+  are the two readings that exist.
+- **CHANNEL'S RATE, AND THE MEASUREMENT MATTERS MORE THAN THE NUMBER.** At 40 Mana a step a Mage
+  reads **2 steps (+6%) by his fifth turn** at the observed spend. **The observation: a Pyromancer
+  in a standard warband fight spent 95 Mana over 6 turns — about 16 a turn — because his basic
+  attack is free and he falls back to it when the bar is low.** Mana starts at 100, caps at 100 and
+  regenerates 12 a turn, so the ceiling is `100 + 12(N-1)` whatever he casts. **The +18% cap is out
+  of reach of anything shorter than a boss.** The turn-10 figure is a projection from the observed
+  rate: a standard fight ends before a Mage takes ten turns.
+- **MOMENTUM'S RATE.** 8 steps x 4% off the delay of his next turn = **−32% at the cap**, which is
+  roughly a free turn every three.
+- **SANCTITY'S RATE, AND IT IS THE ONE TO READ AGAINST THE TRAFFIC.** 6 events a step, 5 steps,
+  +1 turn a step — so a full meter adds **5 turns** to a status he applies. **"From any source, on
+  anyone" is a very wide door**: the meter fills from the whole party's status traffic and from the
+  enemies', not from his casting, so the rate cannot be judged from what a Cleric does on his turn.
+- **AND THE ONE THAT IS NOT A NUMBER: HOW A SECOND METER DISPLAYS.** The nameplate bar is ONE fill,
+  ONE colour chosen by a ternary on the NAME and ONE label, and it breaks by construction under two
+  currencies. **The game already answered this three times and never widened the bar** — Faith,
+  Loyalty and Ruin all display as chips. **A chip costs nothing and cannot show a fill**, which is
+  what a ramping meter most wants to show. That is the trade.
+- **AND THE THING TO WATCH RATHER THAN RULE:** all three are LEDGERS — they accumulate, pay while
+  held, and are never consumed, which is `faith_peak`'s shape and the repair BI §1 prescribes.
+  **The day a card or rune SPENDS one of the three, BI §1's antagonism arrives with it**, silently,
+  because a spender reads exactly like a payer until somebody asks what the held half is worth.
+  The rule is in `CLAUDE.md`.
 
 ### THE RUN-SAVE FIGURES ARE FIXED — **AND "IT IS A TWO-NUMBER EDIT" WAS WRONG (CLOSED AT FR §1)**
 
@@ -298,7 +331,8 @@ either of them asserts.
 its own branch with `main` staying playable** (`docs/ways-of-working.md`). **None of the below was
 done at FQ.** The order is recorded so it is not re-litigated batch by batch:
 
-1. **THE THREE SPINES, ON NOBODY.** Momentum, Channel and Sanctity built and tested **before a
+1. **~~THE THREE SPINES, ON NOBODY~~ — DONE AT BATCH FT, AND THE FLAGGED RATES ARE BELOW.**
+   Momentum, Channel and Sanctity built and tested **before a
    single spec dissolves**. FP measured that this touches **none of the 400 authored things**.
    Channel is nearly free (`note_resource_spent` is already generic and books the NET at the one
    line every ability pays through; its payout `dmg_bonus` is read at **one** site and is

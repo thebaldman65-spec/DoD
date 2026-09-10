@@ -1862,6 +1862,231 @@ var _base_tint := Color.WHITE
 var _base_scale := 2.6
 
 
+
+# ═════════════════════════════════════════════════════════════════════════════
+# BATCH FT — THE THREE CLASS SPINES, BUILT ON NOBODY
+#
+# MOMENTUM (Warrior), CHANNEL (Mage) and SANCTITY (Cleric) are the three cores
+# the class merge needs and the game does not have. They are built here as
+# MACHINERY WITH NO OWNER: every field below is declared, every payout below is
+# reachable, and NOTHING in `scripts/` or `data/` turns any of them on.
+#
+# **THE THREE SWITCHES ARE THE WHOLE SAFETY PROPERTY.** Each spine's payout is
+# guarded on its own `*_active` flag, every flag defaults FALSE, and no spec
+# passive, talent payload, rune payload or card handler writes one. `check_ft`
+# §0 asserts that — over the live spec table and over the whole of `scripts/`
+# and `data/` — and it is the assertion that INVERTS the day a spine is
+# attached, the way `check_ez` §1 and `check_fk` §2 both did.
+#
+# **THE BUILDING HALVES ARE NOT GUARDED AND THAT IS DELIBERATE.** `mana_spent`,
+# the two Momentum accumulators and the Sanctity event ledger fill for
+# everybody, because a counter that only runs for its owner is a counter no gate
+# can drive on an ordinary hero — and each of them costs one integer. **THE
+# PAYOUTS ARE WHAT THE FLAGS STOP**, and there are exactly three of them:
+# `channel_bonus`, `momentum_delay_mult` and `sanctity_turn_bonus`.
+#
+# WHAT IS NOT HERE: no display. §0 of `docs/reports/FT.md` reports what these
+# three will need when they are attached; the bar is a single fill and a single
+# label and it is not widened here.
+# ═════════════════════════════════════════════════════════════════════════════
+
+# The three switches. Nothing writes them. See above.
+var momentum_active := false
+var channel_active := false
+var sanctity_active := false
+
+# ── CHANNEL (Mage) — builds per Mana spent, pays spell damage ────────────────
+#
+# **IT READS THE COST AND NEVER THE ABILITY, WHICH IS WHAT MAKES IT A CORE.**
+# The build half is `note_resource_spent` below: it takes a plain integer that
+# `battle.gd` computed as the NET off the bar, and the only other thing it looks
+# at is `resource_name`. It cannot see the element, the school, the target or
+# the card, so a Pyromancer and a Cryomancer build it identically — which is the
+# rule a core engine has to satisfy. `check_ft` §1 asserts that property against
+# the function's own source rather than trusting this paragraph.
+#
+# **THE RATE AND THE PAYOUT ARE FLAGGED, NOT TUNED (`docs/reports/FT.md` §1).**
+# The three constants below are placeholders chosen so the machinery can be
+# driven and measured; the report states what a Mage's meter reads at turn 5 and
+# turn 10 at a realistic spend, and the designer rules.
+const CHANNEL_MANA_PER_STEP := 40
+const CHANNEL_MAX_STEPS := 6
+const CHANNEL_STEP_BONUS := 0.03
+# **AND "SPELL DAMAGE" IS A RULING, NOT MACHINERY.** There is no `is_spell` flag
+# on `Ability`. The available partition is `dmg_type`, so *spell* has to mean
+# *not physical* — or Channel pays into all damage and buys the basic attack
+# with it. The constant is the ruling's one line; `channel_bonus()` reads it.
+const CHANNEL_SPARES_PHYSICAL := true
+var mana_spent := 0        # NET Mana off the bar, by `note_resource_spent`
+
+# ── MOMENTUM (Warrior) — builds per exchange, pays initiative ────────────────
+#
+# **BOTH HALVES, IN THE SAME TURN.** A step is booked only for a turn in which
+# he BOTH dealt damage and took it, which is what makes a Berserker and a Warden
+# build it identically: it reads the exchange, not the style.
+#
+# **AND "A TURN" IS THE SPAN BETWEEN HIS TURNS, NOT THE GLOBAL INDEX.** That is
+# the one decision in this engine that a reader will get wrong. `battle_turn` is
+# stamped from `_turns_taken`, which counts UNIT turns across the whole field —
+# so a hero deals on index N and is struck back on N+3, and a meter keyed on
+# that index would see the two halves of one exchange as different turns and
+# never book anything. `trance_taken`'s own comment argues this out in full and
+# picks the span; Momentum wants the same window, so it carries the same shape.
+#
+# **TWO ACCUMULATORS RATHER THAN A READ OF `trance_taken`**, because Battle
+# Trance CONSUMES that field — `battle.gd` zeroes it at every tick — and two
+# readers of one consumed accumulator is one of them getting a zero it did not
+# earn. The taken half rides `_report_taken`, the one door below every death
+# refusal; the dealt half rides `battle.gd`'s `_book_dealt`, which hangs off the
+# `dmg_hero_` branch of `_stat` — the single site every hero damage credit in
+# the game already passes through, with companions routed to their hunter by
+# `_contrib_name` for free. Both are zeroed when a step is decided.
+const MOMENTUM_MAX_STEPS := 8
+const MOMENTUM_STEP_HASTE := 0.04
+var momentum := 0
+var momentum_dealt := 0    # damage DEALT since his last turn
+var momentum_taken := 0    # damage TAKEN since his last turn
+
+# ── SANCTITY (Cleric) — builds per status transition, pays duration ──────────
+#
+# **IT IS NOT TRAPPER'S READER AND THE DIFFERENCE IS THE WHOLE DESIGN.**
+# `battle._status_count` reads a target's status LIST at strike time over the
+# curated `DEBUFF_IDS` allowlist — a STATE reader, debuffs only, one body.
+# Sanctity counts APPLICATION EVENTS: any status, any body, any source, as they
+# happen. A state reader cannot see a status that landed and left, and an event
+# counter cannot see a status that has been standing since turn one. Reusing
+# Trapper's would have measured the wrong thing quietly.
+#
+# **THE LEDGER IS STATIC BECAUSE THE EVENT STREAM IS GLOBAL.** "From any source,
+# on anyone" means every Sanctity holder sees the same stream, so there is one
+# count rather than one per holder. `battle.gd` resets it at every battle start.
+#
+# **WHAT STOPS APPLY-AND-REMOVE FARMING: A (TURN, BODY, STATUS) DEDUPE.** A
+# status arriving and leaving the same body inside one turn books ONE event, not
+# two, and a re-application of a status already standing books NONE — only a
+# status that was not on that body and now is, or was and now is not, counts.
+# So churning one status on one body is worth one event however many times it is
+# done, while a Consecration landing on four allies is worth four, which is the
+# breadth the engine is supposed to reward. The ledger holds one turn's keys.
+#
+# **AND A NATURAL EXPIRY IS NOT A REMOVAL.** `tick_statuses` running a clock out
+# is time passing, not a hero acting, and a meter that builds from it would
+# build for a hero doing nothing. The removal half is the ACTIVE paths only —
+# `remove_status` and `purge_debuffs` — and the ruling is in the report.
+const SANCTITY_PER_STEP := 6
+const SANCTITY_MAX_STEPS := 5
+const SANCTITY_STEP_TURNS := 1
+static var sanctity_events := 0
+static var _sanctity_seen := {}
+static var _sanctity_turn := -1
+
+
+# THE ONE DOOR into the Sanctity ledger. `body` is who the status moved on and
+# `id` is which status moved; the caller has already decided that it MOVED.
+static func note_status_event(body, id: String) -> void:
+	if body == null or not is_instance_valid(body):
+		return
+	var turn: int = int(body.battle_turn)
+	if turn > _sanctity_turn:
+		_sanctity_turn = turn
+		_sanctity_seen.clear()
+	var key := "%d:%s" % [body.get_instance_id(), id]
+	if _sanctity_seen.has(key):
+		return
+	_sanctity_seen[key] = true
+	sanctity_events += 1
+
+
+# Called by `battle.gd` when a battle begins. The ledger is static, so without
+# this the second battle in a process would start on the first one's count.
+static func reset_sanctity() -> void:
+	sanctity_events = 0
+	_sanctity_seen = {}
+	_sanctity_turn = -1
+
+
+# ── THE THREE METERS, AND THE THREE PAYOUTS ─────────────────────────────────
+#
+# Every `*_steps()` returns the METER and is readable on any hero; every payout
+# returns its IDENTITY value unless that spine's switch is on. The split is
+# `frenzy_rage_steps()`'s: a sampler can read the meter without the payout, and
+# a payout can be turned off without blinding the meter.
+
+func channel_steps() -> int:
+	return mini(mana_spent / CHANNEL_MANA_PER_STEP, CHANNEL_MAX_STEPS)
+
+
+# Channel's payout, read at the ONE general damage multiplier in the game
+# (`battle.gd`'s `raw *= 1.0 + attacker.dmg_bonus + ...`). `dmg_type` is taken
+# so the *spell* ruling above has somewhere to live; the BUILD half never sees
+# it. Returns 0.0 for everybody until a hero is given the spine.
+func channel_bonus(dmg_type: String) -> float:
+	if not channel_active:
+		return 0.0
+	if CHANNEL_SPARES_PHYSICAL and dmg_type == "physical":
+		return 0.0
+	return channel_steps() * CHANNEL_STEP_BONUS
+
+
+# CALLED AT THE TOP OF THIS UNIT'S TURN, once, by the turn loop. It closes the
+# span that has just ended: a step is booked only if BOTH halves of the exchange
+# landed inside it, and the two accumulators are cleared either way so the next
+# span starts empty. **AND turns is a SPAN, so it is closed whether or not a
+# step was earned** — leaving the counters standing on a quiet span would let a
+# turn he only dealt on and a later turn he only took on add up to a step
+# between them, which is the opposite of what "both, in the same turn" means.
+#
+# Returns true when a step was booked, so a driver can see it and so this can be
+# read without a second accessor.
+func note_momentum_turn() -> bool:
+	var earned := momentum_dealt > 0 and momentum_taken > 0
+	momentum_dealt = 0
+	momentum_taken = 0
+	if not earned:
+		return false
+	momentum = mini(momentum + 1, MOMENTUM_MAX_STEPS)
+	return true
+
+
+# Momentum's payout, as a MULTIPLIER ON THE DELAY a scheduled turn costs — the
+# one quantity `next_time` is written from. It is a multiplier rather than a
+# seventh term in `effective_speed()` deliberately: that function is what all
+# 23 `next_time` writes divide by, so a term there bends the whole timeline
+# continuously and compounds with Chilled, Slowed, Quick Draw and Wrath. This
+# scales the delay of the turn being scheduled and nothing else.
+#
+# **IT IS ONE FUNCTION AND THREE READ SITES, WHICH IS `_bond_convert`'S SHAPE
+# AND NOT A SECOND WRITER OF TURN ORDER.** The three are the post-cast schedule,
+# the gated-failure schedule (which exists to charge a lost cast the same tempo
+# a landed one costs) and the initiative PREVIEW (which would otherwise draw a
+# timeline the fight does not honour). A fourth read site is a batch that has to
+# come back here.
+func momentum_delay_mult() -> float:
+	if not momentum_active:
+		return 1.0
+	return maxf(1.0 - momentum * MOMENTUM_STEP_HASTE, 0.1)
+
+
+func sanctity_steps() -> int:
+	return mini(sanctity_events / SANCTITY_PER_STEP, SANCTITY_MAX_STEPS)
+
+
+# Sanctity's payout: EXTRA TURNS on a status this unit applies. Read at
+# `battle._apply_status`, off the APPLIER, and never off the victim — which is
+# the read `mod_status_turns` (Fleeting) already occupies pointing the other way.
+#
+# **DURATION ALONE, AND THE REPORT SAYS WHY.** A general POTENCY multiplier does
+# not exist and cannot be reached from one line. `STATUS_INFO` holds 156 ids and
+# NOT ONE MAGNITUDE: strength arrives as the per-call `power` and `tick`
+# arguments, and **93 of those 156 never carry one at any application site at
+# all** — their numbers are written in the handler that reads the status. A
+# multiplier at the funnel would reach about a third and read as working. `docs/reports/
+# FT.md` §3 carries the census and the staged plan; this is the reachable stage.
+func sanctity_turn_bonus() -> int:
+	if not sanctity_active:
+		return 0
+	return sanctity_steps() * SANCTITY_STEP_TURNS
+
 func setup(config: Dictionary) -> void:
 	for key in config:
 		if key != "sheet_dir" and key != "sprite_scale":
@@ -2448,6 +2673,12 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		entry["short"] = "C1"
 		entry["desc"] = _chilled_desc(1, turns < 0)
 	statuses.append(entry)
+	# BATCH FT — SANCTITY's LANDING half, and it is on THIS path deliberately.
+	# The refresh branch above returns before here, so a Burn re-applied to a
+	# body that is already burning books NOTHING: the event is a status ARRIVING
+	# on a body that did not have it. That is the half of the anti-farming rule
+	# that lives in the shape of the function rather than in the ledger.
+	note_status_event(self, id)
 	float_text(label, color)
 	_refresh_chips()
 
@@ -2485,8 +2716,16 @@ static func _chilled_desc(stacks: int, permanent := false) -> String:
 		stacks, effect, clock]
 
 
+# BATCH FT — SANCTITY's REMOVAL half is here and in `purge_debuffs`, and it
+# counts a DELTA rather than a call. This function filters unconditionally: it
+# is called on statuses that are not standing (a consumer that does not check
+# first, a cleanse aimed at a clean body) and those calls must book nothing.
+# Comparing the sizes is what makes "removed" mean removed.
 func remove_status(id: String) -> void:
+	var before := statuses.size()
 	statuses = statuses.filter(func(s): return s.id != id)
+	if statuses.size() < before:
+		note_status_event(self, id)
 	_refresh_chips()
 
 
@@ -2523,9 +2762,19 @@ func purge_debuffs() -> int:
 	# cleanse. Batch BA leans on this: Harvest is now paid for what the purge
 	# actually TOOK, so what survives here is what it is not billed for.
 	var before := statuses.size()
+	# BATCH FT — SANCTITY's other removal door. The ids are captured BEFORE the
+	# filter because a cleanse takes several at once and the ledger is keyed on
+	# (body, status): three debuffs off one body is three statuses leaving, and
+	# one already-clean body is none. A count alone could not say which.
+	var was: Array = []
+	for s in statuses:
+		was.append(String(s.id))
 	statuses = statuses.filter(
 		func(s): return s.id == "broken" or s.get("sticky", false) \
 			or not DEBUFF_IDS.has(s.id))
+	for gone_id in was:
+		if not has_status(gone_id):
+			note_status_event(self, gone_id)
 	_refresh_chips()
 	return before - statuses.size()
 
@@ -2874,10 +3123,33 @@ func return_to_idle() -> void:
 # talent HE chose converts into survival, it is the one node in the game that
 # already couples his two resources, and excluding it would mean the deeper he
 # invests in the Fury lane the less his own passive notices.
+#
+# **BATCH FT — THE SAME DOOR NOW BOOKS MANA, AND CHANNEL IS THE WHOLE REASON.**
+# The paragraph above is a description of a property, not of Rage: measuring the
+# NET off the bar catches the waivers, the discounts, the refunds and the clamp
+# at zero for MANA exactly as it does for Rage, and there are only two primary
+# resources in the game (`Classes.hero_config` decides `resource_name` once,
+# Rage for the Warrior and Mana for the other three, with no spec override).
+#
+# **TWO FIELDS AND NOT ONE, WHICH IS EM'S CHARTER APPLIED.** `rage_spent`
+# holding Mana is a name that lies — the objection FO §1 raised against
+# `rune_hex_threshold` — and the two meters are read by two different engines
+# with two different bands. A shared field would also make Blood Frenzy's second
+# term readable by a Mage, which is the failure `check_em` §2 exists to catch in
+# the other direction.
+#
+# **AND IT STILL CANNOT SEE WHAT WAS CAST.** The only two things this function
+# looks at are the integer the bar moved by and the name of the bar. `check_ft`
+# §1 asserts that over this function's own source: no `ab`, no `dmg_type`, no
+# ability name, no school. That is what makes Channel element-blind BY
+# CONSTRUCTION rather than by intention.
 func note_resource_spent(amount: int) -> void:
-	if amount <= 0 or resource_name != "Rage":
+	if amount <= 0:
 		return
-	rage_spent += amount
+	if resource_name == "Rage":
+		rage_spent += amount
+	elif resource_name == "Mana":
+		mana_spent += amount
 
 
 # BATCH CZ §1 — THE SECOND TERM ITSELF, in steps of the same band. Its own
@@ -3461,6 +3733,13 @@ func _report_taken(amount: int, hp_before: int) -> void:
 	# books health actually removed rather than damage aimed. It is unbounded
 	# only between two of his turns; battle.gd zeroes it at every tick.
 	trance_taken += lost
+	# BATCH FT — MOMENTUM'S TAKEN HALF rides the SAME one door for the same two
+	# reasons: a future damage source cannot forget to report to it, and it
+	# books health actually removed rather than damage aimed. It is its own
+	# accumulator rather than a read of `trance_taken` above because that one is
+	# CONSUMED — battle.gd zeroes it at every tick of the Trance — and a second
+	# reader of a consumed field reads zeros it did not earn.
+	momentum_taken += lost
 	if damage_taken_cb.is_valid():
 		damage_taken_cb.call(self, lost, hp_before)
 

@@ -250,6 +250,20 @@
    "expect": "check_flow: ",
    "note": "BATCH FS — THE COMPLETION MARKER. This row reports no check count, so an absent verdict used to carry no information: `--quit-after` is FRAMES, and a target cut off mid-run prints a short log and exits 0, which is byte-identical to a target that prints no count BY DESIGN. `expect` pins a line only a COMPLETE run reaches; `check_de` §1 asserts it and §2 refuses a no-count row that has none."
   },
+  "check_ft": {
+   "kind": "gate",
+   "checks": [
+    79,
+    79
+   ],
+   "fails": [
+    0,
+    0
+   ],
+   "checks_obs": 1,
+   "fails_obs": 1,
+   "note": "**NEW AT FT. THE THREE CLASS SPINES, AND THE PROOF THAT NOBODY HOLDS ONE.** FT builds MOMENTUM (Warrior), CHANNEL (Mage) and SANCTITY (Cleric) as machinery with no owner: the engines the class merge needs, on the branch, with the game still whole. **§0 IS THE SECTION THAT INVERTS AND IT IS WHY THE BATCH IS SAFE TO LAND** — no spec passive names one of the three, nothing under `scripts/` or `data/` assigns a spine switch, and a live four-spec party spawns with all twelve switch/payout readings at their identity value. The day a spine is attached this section goes red and the batch attaching it rewrites it, the way `check_ez` §1 and `check_fk` §2 both did. **§1 ASSERTS CHANNEL'S BLINDNESS AGAINST THE SOURCE AND ITS PAYOUT AGAINST A HEALTH BAR.** The build half is `note_resource_spent`, which may name no ability, element, school or damage type; the payout is the game's one general damage multiplier. **§2 IS BOTH HALVES OR NO STEP**, the span between one hero's turns rather than the global turn index (`trance_taken`'s own argument), one step a turn, and ONE function read at THREE sites with `effective_speed()` deliberately carrying no term — a seventh term there compounds with Chilled, Slowed, Quick Draw and Wrath at once. **§3 IS AN EVENT COUNTER AND NOT TRAPPER'S STATE READER**, and its anti-farming rule is one sentence: ONE EVENT PER (TURN, BODY, STATUS). Eight apply-and-remove cycles on one body in one turn book one; the same status on a second body books a second; a refresh books nothing; a natural expiry books nothing. §3i COUNTS the reachable population and prints CHECKED n of m — 214 `_apply_status` sites, 110 carrying a source, 104 not. **THE THREE LIVE A/Bs ARE SEEDED, AND THAT IS THE INSTRUMENT'S OWN SCAR.** `randf_range(0.9, 1.1)` is on every blow; six-pair sums still left a physical control reading between x0.9537 and x1.0349 across three runs, which swallows a real finding and manufactures a false one in equal measure. Re-seeding puts both arms on the same draw: Channel now reproduces its own arithmetic live at x1.1799 against x1.1800, the same card read as physical moves by x1.0000, and Momentum's live `next_time` delta is x0.6800 exactly. **The Arcanist's Resonance ramps with every cast and had to be zeroed too**, and the physical control had to become THE SAME CARD with its type changed — its first draft used the Sharpshooter's Aimed Shot and read x1.1015 on a payout that pays physical nothing, because his basic is a SEQUENCE and his Focus climbs. **NINE NEGATIVE CONTROLS, ALL NINE BIT, EACH WITH A DIFFERENT SIGNATURE:** a hero given Channel in `scripts/` (3), the build half taught to read the ability (1), a seventh term in `effective_speed()` (2 — including the live delta moving to x0.6296, the compounding measured), the (turn, body, status) dedupe removed (4), the permanence guard off the duration payout (1), a payout's switch guard deleted (4), Channel no longer sparing physical (2), ONE of the three initiative read sites dropped (3 — the live delta read x1.0000, which is this project's most common shipped defect wearing its own name), and the cleanse door booking a count instead of the ids (1). **WHAT IT CANNOT SEE IS IN ITS HEADER:** it asserts the three are unreachable and that each PAYS when switched on by hand. It says nothing about whether the rates are right — those are flagged, not tuned, and `docs/reports/FT.md` carries them for the designer."
+  },
   "check_map": {
    "kind": "gate",
    "checks": null,
@@ -274,8 +288,8 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    180,
-    180
+    181,
+    181
    ],
    "checks_obs": 1,
    "fails": [
@@ -283,7 +297,7 @@
     0
    ],
    "fails_obs": 10,
-   "note": "**BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
+   "note": "**BATCH FT MOVED IT 180 -> 181, AND THE +1 IS `check_ft.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FT added one gate and edited two game scripts, which moves no file into or out of the population. **BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
   },
   "harness_1": {
    "kind": "harness",

@@ -975,6 +975,13 @@ func _ready() -> void:
 		Engine.max_fps = 0
 		if sim_started_ms == 0:
 			sim_started_ms = Time.get_ticks_msec()
+	# BATCH FT — SANCTITY'S EVENT LEDGER IS STATIC, SO A BATTLE HAS TO OPEN IT.
+	# "From any source, on anyone" means one count rather than one per holder,
+	# and one count means one place that clears it. Without this line the second
+	# battle in a process — every sim, and every gate that spawns twice — would
+	# start on the first one's tally. It sits above `_spawn_units`, which is the
+	# first thing that can apply a status.
+	BattleUnit.reset_sanctity()
 	_init_items()
 	_build_arena()
 	_build_ui()
@@ -2468,7 +2475,13 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 	if preview_unit != null and preview_ability != null:
 		for entry in sim:
 			if entry.unit == preview_unit:
-				entry.t += preview_ability.delay * 100.0 / preview_unit.effective_speed()
+				# BATCH FT — MOMENTUM'S PAYOUT, READ SITE 3 OF 3, and it is the
+				# one a static check would miss. This is the initiative PREVIEW:
+				# without the term the bar would draw a timeline the fight does
+				# not honour, which is a lie the player can see and no gate
+				# asserting on `next_time` would ever notice.
+				entry.t += preview_unit.momentum_delay_mult() \
+					* preview_ability.delay * 100.0 / preview_unit.effective_speed()
 	for i in 14:
 		var best: Dictionary = sim[0]
 		for entry in sim:
@@ -2647,6 +2660,15 @@ func _run_battle() -> void:
 			active_unit.set_plate_active(false)
 		active_unit = u
 		u.set_plate_active(true)
+		# BATCH FT — MOMENTUM'S STEP IS DECIDED HERE, ONCE, AND THIS IS THE ONE
+		# PLACE THAT CAN DECIDE IT. The span it closes is "since this unit's
+		# last turn", so the moment the span ends is the moment the unit is
+		# chosen to act — above the DoT loop, above the intent, above anything
+		# that could add to either accumulator inside the turn that is starting.
+		# The engine reads the EXCHANGE: a step is booked only if he both dealt
+		# and took inside that span, which is what makes a Berserker and a
+		# Warden build it identically.
+		u.note_momentum_turn()
 		if sim:
 			if u.is_hero and not u.is_companion:
 				_cy_turns += 1
@@ -9767,7 +9789,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# made "every beast reads it" look covered while it was not.
 			if attacker.is_hero:
 				raw *= _party_mark_mult(strike_target)
-			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
+			# BATCH FT — CHANNEL'S PAYOUT SITS IN THIS SUM AND NOWHERE ELSE.
+			# `dmg_bonus` is the ONE general damage multiplier in the game and
+			# this is its one read site, so a class core paying "spell damage"
+			# has exactly one honest place to land. `channel_bonus` returns 0.0
+			# for every hero in the game today (`channel_active` is false for
+			# all of them and nothing sets it) and takes `ab.dmg_type` only so
+			# the *not physical* ruling has somewhere to live — the BUILD half
+			# in `note_resource_spent` still cannot see the ability at all.
+			raw *= 1.0 + attacker.dmg_bonus + attacker.channel_bonus(ab.dmg_type) \
+				+ float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
 			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
 			# gone and Singularity no longer caps it. That is the whole bargain:
@@ -12386,7 +12417,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Talent: Instinctive Rotation — the swap costs no turn",
 				"#b0a8e0")
 		_swapped_free = false
-		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
+		# BATCH FT — MOMENTUM'S PAYOUT, READ SITE 1 OF 3. It scales the DELAY
+		# the turn being scheduled costs rather than adding a seventh term to
+		# `effective_speed()`, which is what all 23 `next_time` writes divide by
+		# and would compound with Chilled, Slowed, Quick Draw and Wrath at once.
+		# `momentum_delay_mult()` returns exactly 1.0 for every hero in the game
+		# today. The three sites read ONE function, which is `_bond_convert`'s
+		# shape — one place deciding one thing, read from several.
+		attacker.next_time += attacker.momentum_delay_mult() \
+			* eff_delay * 100.0 / attacker.effective_speed()
 
 
 # ---------- GLACIAL HOLD (Batch AS §1) — the Cryomancer's spine ----------
@@ -13004,6 +13043,30 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			eff_turns = -1
 		elif id == "cons_ground" and src.eternal_ground > 0:
 			eff_turns = -1
+	# BATCH FT — SANCTITY'S PAYOUT, AND IT IS THE FOURTH CLAUSE OF THE SAME
+	# SENTENCE THE THREE ABOVE WRITE. Permafrost, Emberkeep and the two row-8
+	# nodes all lengthen a status SCOPED TO THE SRC; a class core paying
+	# "duration" is that shape with the scope widened from one status to all of
+	# them, so it lands here rather than in `add_status`.
+	#
+	# **OFF THE APPLIER, NEVER OFF THE VICTIM — AND THAT IS THE DIFFERENCE FROM
+	# FLEETING.** `mod_status_turns` is the game's one general duration term and
+	# it is read in `add_status` off the body RECEIVING the status. Sanctity is
+	# the other direction, and a function that receives no source cannot ask it.
+	#
+	# **THE `turns > 0` GUARD IS EMBERKEEP'S GUARD FOR EMBERKEEP'S REASON**: a
+	# negative count is a PERMANENCE FLAG, and adding to it would produce a
+	# number nothing downstream understands and quietly un-permanent a
+	# battle-long status.
+	#
+	# **AND THIS REACHES 110 OF THE 214 SITES, WHICH IS SAID OUT LOUD RATHER
+	# THAN LEFT TO BE DISCOVERED.** 104 `_apply_status` calls pass no `src` at
+	# all and the 36 direct `add_status` calls have no source parameter — so 93
+	# real-duration applications in the game cannot see this line. `check_ft`
+	# §3 asserts that population rather than describing it, and
+	# `docs/reports/FT.md` §3 carries the census.
+	if eff_turns > 0 and src != null and src.sanctity_active:
+		eff_turns += src.sanctity_turn_bonus()
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
 	# (only sites that pass src are counted; the changelog owns the list).
@@ -24652,7 +24715,11 @@ func _gated_failure(u: BattleUnit, ab: Ability) -> void:
 	_message("%s's %s slips away!" % [u.unit_name, ab.display_name])
 	_log("%s: %s is LOST — a Sloppy check loses this cast. Nothing was spent: no %s, no cooldown, only the turn." % [
 		u.unit_name, ab.display_name, u.resource_name], "#e05050")
-	u.next_time += ab.delay * 100.0 / u.effective_speed()
+	# BATCH FT — MOMENTUM'S PAYOUT, READ SITE 2 OF 3. This line exists so a lost
+	# 6.0-delay cast costs the same tempo a landed one does; leaving the term
+	# off here would have made a Sloppy check the one place his own engine
+	# stopped applying, which is the asymmetry that sentence forbids.
+	u.next_time += u.momentum_delay_mult() * ab.delay * 100.0 / u.effective_speed()
 	await _wait(0.6)
 
 
@@ -26295,6 +26362,16 @@ func _sig(passive: String, n := 1) -> void:
 
 # One stat counter, accumulated across all simulated battles.
 func _stat(key: String, amount := 1.0) -> void:
+	# BATCH FT — MOMENTUM'S DEALT LEDGER RIDES THIS ONE DOOR, and it is ABOVE
+	# the `sim` branch on purpose. Everything below books into one of two
+	# places depending on which bot is driving; a per-turn ledger a passive
+	# reads has to be written on BOTH paths or the meter is blind in exactly
+	# the mode the balance simulator measures it in. Every hero damage credit
+	# in the game arrives here as a `dmg_hero_` key — 34 call sites and
+	# counting — and `_book_dealt` resolves the name, which is how a beast's
+	# work reaches its hunter without this line knowing what a beast is.
+	if key.begins_with("dmg_hero_"):
+		_book_dealt(key.trim_prefix("dmg_hero_"), amount)
 	if sim:
 		sim_stats[key] = sim_stats.get(key, 0.0) + amount
 		# Batch W: battle-local slice of the contribution metrics — summed
@@ -26406,6 +26483,29 @@ func _book_healing(owner, amount: float, healed: BattleUnit) -> void:
 	for stale in u.heal_by_turn.keys():
 		if int(stale) < u.battle_turn - 1:
 			u.heal_by_turn.erase(stale)
+
+
+# BATCH FT — MOMENTUM'S DEALT HALF, on `_book_healing`'s shape and for its
+# reasons: one credit door, and a NAME resolved to a body, because several
+# credit sites hand over a name rather than a unit. It accumulates over the span
+# between this hero's turns (`unit.gd` argues that window out where the field is
+# declared) and `note_momentum_turn` clears it, so it is bounded by the timeline
+# rather than by a key limit.
+#
+# **THE POOL KEYS DO NOT REACH HERE.** `_stat` also carries `pool_dmg_hero_`,
+# which does not begin with `dmg_hero_`, so the guard above is exact rather than
+# nearly right.
+#
+# **AND THE BEAST'S WORK IS THE BEASTMASTER'S WITHOUT THIS LINE KNOWING IT.**
+# `_contrib_name` has already folded a companion into its `pack_master` by the
+# time the key is built, so a beast cannot open a second ledger of its own.
+func _book_dealt(name: String, amount: float) -> void:
+	if amount <= 0.0 or name == "" or name == "(unattributed)":
+		return
+	var u := _hero_named(name)
+	if u == null:
+		return
+	u.momentum_dealt += int(round(amount))
 
 
 # A living hero by display name, or null. The mirror of `_contrib_name`: several

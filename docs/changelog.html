@@ -15,6 +15,106 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-09 &mdash; Batch FT: THREE SPINES, BUILT ON NOBODY</h2>
+<p><b>THE FIRST BATCH ON <code>class-merge</code>, AND NOTHING WAS MERGED.</b> No spec dissolved,
+no pool moved, no engine became a rune, no talent node moved and <b>no hero gained a meter</b>.
+<code>main</code> is untouched and still playable. Full working:
+<code>docs/reports/FT.md</code>.</p>
+
+<p><b>&sect;0 &mdash; MOMENTUM (Warrior), CHANNEL (Mage) AND SANCTITY (Cleric) NOW EXIST AS
+MACHINERY WITH NO OWNER.</b> They are declared, they can be driven, they pay what they compute
+&mdash; and <b>nothing in <code>scripts/</code> or <code>data/</code> can reach any of them</b>.
+The safety property is three switches: <code>momentum_active</code>, <code>channel_active</code>
+and <code>sanctity_active</code> default FALSE, every payout opens with its own switch and returns
+its identity value without it. <b><code>check_ft</code> &sect;0 asserts that four ways</b> &mdash;
+no spec passive names one of the three; nothing under either directory ASSIGNS a switch (a
+comment-stripped sweep over 28 files, matching an assignment shape rather than a mention); the
+matcher is proved able to bite against a constructed line; and a live four-spec party spawns with
+all twelve switch readings false and all twelve payout readings at their identity value.
+<b>IT IS WRITTEN TO INVERT</b>: the batch that attaches a spine takes &sect;0 red and rewrites it,
+the way <code>check_ez</code> &sect;1 and <code>check_fk</code> &sect;2 both did.</p>
+
+<p><b>&sect;1 &mdash; CHANNEL BUILDS ON THE COST AND CANNOT SEE WHAT WAS CAST.</b>
+<code>note_resource_spent</code> booked Rage only; it books Mana into its own
+<code>mana_spent</code> now &mdash; <b>two fields and not one</b>, because <code>rage_spent</code>
+holding Mana is a name that lies and a shared field would make Blood Frenzy's second term readable
+by a Mage. <b>The element-blindness is asserted against the function's own source</b>, not driven:
+a function that reads the ability and happens not to branch on it today passes every drive that
+exists. The payout lands in the game's ONE general damage multiplier.
+<b>&ldquo;Spell damage&rdquo; is a RULING and not machinery</b> &mdash; there is no
+<code>is_spell</code> flag on <code>Ability</code>, so it has to mean <i>not physical</i>, and that
+reading is one constant.</p>
+
+<p><b>&sect;2 &mdash; MOMENTUM READS THE EXCHANGE, AND &ldquo;A TURN&rdquo; IS THE SPAN BETWEEN HIS
+TURNS.</b> Damage TAKEN per turn existed twice over; <b>damage DEALT per turn did not exist in any
+shape</b>, and building it was the batch's real work. <b>The window is the one decision a reader
+will get wrong</b>: <code>battle_turn</code> counts UNIT turns across the whole field, so a hero
+deals on index N and is struck back on N+3 &mdash; a meter keyed on that index would see the two
+halves of one exchange as different turns and <b>read zero forever</b>. It carries
+<code>trance_taken</code>'s window instead, with two accumulators of its own because Battle Trance
+CONSUMES that field. <b>The payout is a multiplier on the DELAY, read from ONE function at THREE
+scheduling sites</b> &mdash; the post-cast schedule, the gated-failure schedule and the initiative
+PREVIEW &mdash; rather than a seventh term in <code>effective_speed()</code>, which every
+<code>next_time</code> write divides by. <b>Measured rather than argued: a control that adds one
+made the live delta read x0.6296 where the engine's own arithmetic says x0.6800.</b></p>
+
+<p><b>&sect;3 &mdash; SANCTITY IS AN EVENT COUNTER AND NOT TRAPPER'S STATE READER, AND ITS POTENCY
+LAYER WAS MEASURED BEFORE IT WAS BUILT.</b> Trapper's breadth term reads a target's status LIST at
+strike time over the curated debuff allowlist; Sanctity counts APPLICATION EVENTS from any source
+on anyone. A status that lands and leaves is invisible to the first and is a real event to the
+second. <b>The anti-farming rule is one sentence: ONE EVENT PER (TURN, BODY, STATUS)</b> &mdash;
+eight apply-and-remove cycles on one body in one turn book ONE (the control that removes the dedupe
+reads 16), a refresh books nothing, a removal that removes nothing books nothing, and a cleanse
+books what it actually took. <b>A natural expiry is NOT a removal</b>, ruled here: a clock running
+out is time passing, not a hero acting.</p>
+
+<p><b>AND THE POTENCY HALF WAS NOT BUILT, WHICH IS THE FINDING.</b> <code>STATUS_INFO</code> holds
+<b>156 status ids and not one magnitude</b>; strength arrives as the per-call <code>power</code>
+and <code>tick</code> arguments and everything else lives in the handler that reads the status.
+<b>Duration is a parameter at all 249 authoring sites, so one line reaches every one of them.
+Potency is a parameter at 81, and 93 of the 156 declared ids carry no magnitude at any site at
+all</b> &mdash; so a general potency multiplier would reach about a third of the statuses and read
+as working. <b>What shipped is the staged version: DURATION ALONE, keyed on the APPLIER</b>, as the
+fourth clause of a sentence the file already writes three times (Permafrost, Emberkeep and the two
+row-8 nodes all lengthen a status scoped to the src). Its coverage is COUNTED and printed rather
+than described: <b>214 <code>_apply_status</code> call sites, 110 carrying a source, 104 not.</b></p>
+
+<p><b>&sect;4 &mdash; NINE NEGATIVE CONTROLS, ALL NINE BIT, EACH WITH A DIFFERENT SIGNATURE.</b>
+A hero given Channel in <code>scripts/</code> (3 reds); the build half taught to read the ability
+(1); a seventh term in <code>effective_speed()</code> (2); the dedupe removed (4); the permanence
+guard off the duration payout (1); a payout's switch guard deleted (4); Channel no longer sparing
+physical (2); <b>ONE of the three initiative read sites dropped (3 &mdash; and the live delta then
+read x1.0000, this project's most common shipped defect wearing its own name)</b>; and the cleanse
+door booking a count instead of the ids (1). The tree was restored byte-exactly afterwards.</p>
+
+<p><b>&sect;5 &mdash; THE THREE LIVE A/Bs ARE SEEDED, AND THAT IS THE INSTRUMENT'S OWN SCAR.</b>
+<code>randf_range(0.9, 1.1)</code> is on every blow. Six-pair sums still left a physical control
+reading between x0.9537 and x1.0349 across three runs &mdash; a spread that swallows a real finding
+and manufactures a false one in equal measure. Re-seeding puts both arms on the same draw: Channel
+now reproduces its own arithmetic live at <b>x1.1799</b> against x1.1800, the same card read as
+physical moves by <b>x1.0000</b>, and Momentum's live <code>next_time</code> delta is
+<b>x0.6800</b> exactly. <b>Three other confounds had to be closed first</b>: the victim died on the
+control arm and the second arm read 0; the Arcanist's Resonance ramps with every cast and biased
+the ratio to x1.2422; and the first reading of every pair is a warm-up that measured 0 twice.
+<b>The physical control had to become THE SAME CARD with its type changed</b> &mdash; its first
+draft used the Sharpshooter's Aimed Shot and read x1.1015 on a payout that pays physical nothing,
+because his basic is a SEQUENCE and his Focus climbs.</p>
+
+<p><b>&sect;6 &mdash; <code>master.html</code> IS NOT EDITED AND ITS STAMP IS NOT BUMPED, AND THAT
+IS A RULING RATHER THAN AN OMISSION.</b> That document shows only what is currently in the game
+(the designer's 07-20 rule), and <b>nothing a player can meet changed</b>: all three payouts return
+their identity value for every hero that exists. Three engines nobody can reach are not in the
+game, and a stamp is a claim about the document. It moves when a spine is attached.</p>
+
+<p><b>FLAGGED, NOT TUNED &mdash; five things need the designer and none of them blocks the next
+batch.</b> Channel's partition (<i>not physical</i>, or all damage including the basic attack);
+Channel's rate, where <b>40 Mana a step gives a Mage 2 steps by his fifth turn at the observed
+spend of about 16 Mana a turn</b> &mdash; too slow to be felt in an ordinary fight and about right
+for a boss; Momentum's rate (8 steps x 4% off the delay, roughly a free turn every three);
+Sanctity's rate, which has to be read against the whole party's status traffic rather than against
+his own casting; and <b>how a second meter DISPLAYS</b>, where a chip is the existing answer
+(Faith, Loyalty and Ruin all use one) and costs nothing, but a chip cannot show a fill.</p>
+
 <h2>2026-09-09 &mdash; Batch FS: A TRUNCATED GATE, A DOC-vs-DOC READER, AND THE SYNC LIST</h2>
 <p><b>ON <code>main</code>, AND THE LAST BATCH BEFORE <code>class-merge</code> TAKES OVER. NO MERGE
 WORK, NOTHING TOUCHED <code>class-merge</code>, AND NOT ONE RUNE, CARD, ABILITY, TALENT, CONSTANT

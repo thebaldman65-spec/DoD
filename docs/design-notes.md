@@ -8166,3 +8166,31 @@ twelve slots, and all survived Batch BK's own sweep. Two more are FF-era rune fi
 FK. **The document does not rot evenly; it rots where a batch changed a mechanism and swept the
 section it was writing in.** That is CLAUDE.md's own EH observation, and it holds here at a larger
 scale than it was found at.
+
+## Batch FT — three spines, built on nobody
+
+**Why the three cores were built before anything merged.** FP measured that building them touches
+none of the 400 authored things, and that is the whole argument: every other step of the merge
+breaks the game for a stretch, and this one does not. It also means the hardest question in the
+merge — *what does a Warrior's engine reward?* — gets answered and driven while the game still
+works, instead of being answered inside a tree that has fifty red targets.
+
+**Why they are attached to nobody.** A core that exists and is reachable is a design decision made
+by accident. Three switches, all false, and a gate that says so, means the designer rules on the
+rates and the partition with the machinery in front of him rather than in the abstract — and the
+day a spine goes on a hero, the gate goes red and somebody has to look.
+
+**Why Momentum reads the exchange rather than damage.** Both halves in one span is what makes a
+Berserker and a Warden build it identically. A meter that paid for dealing alone would be a
+Berserker's, and one that paid for taking alone would invert against every batch that helps the
+party — which is CZ §1's standing rule, one engine along.
+
+**Why Sanctity's potency half was not built.** `STATUS_INFO` holds 156 ids and not one magnitude.
+A multiplier at the funnel would reach about a third of them and read as working, which is worse
+than not having one: it would be quietly wrong for two thirds of the game and nothing would say so.
+Duration is reachable in one line and potency is not, so duration is what shipped and the census is
+in the report.
+
+**And why a natural expiry does not feed the meter.** A clock running out is time passing, not a
+hero acting. A meter that built from it would build for a hero doing nothing, which is the
+perpetual-motion shape FC §2 already ruled against on a different meter.

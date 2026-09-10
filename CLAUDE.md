@@ -1598,6 +1598,37 @@ RE-COUPLE THEM.** Faith's held half must never read `faith_stacks` again; that i
 test_batch_bi's first negative control, and the mis-write reads as a smaller number rather than
 as a bug.
 
+## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
+**A core engine rewards a PATTERN and pays in a NEUTRAL currency**, so it says nothing about how a
+hero fights. Burn, Chilled, Resonance, Mercy, Faith, Ruin, Frenzy, plating and stances are BUILD
+identities and none may be a core. Focus already satisfies the rule and is the Hunter's; **Momentum
+(Warrior), Channel (Mage) and Sanctity (Cleric) are the other three and were built at FT.**
+
+**AND ALL THREE ACCUMULATE AND PAY WHILE HELD AND ARE NEVER CONSUMED, WHICH IS BI §1's PRESCRIBED
+SHAPE RATHER THAN THE ONE IT WARNS ABOUT.** BI §1's antagonism needs a meter that both pays while
+HELD and is CONSUMED at a threshold — two effects reading one number and wanting opposite things
+from it. **A ledger has no spend, so there is nothing to be antagonistic with**: `mana_spent`,
+`momentum` and `sanctity_events` are `faith_peak`'s shape, the repair BI §1 itself prescribes.
+**THE DAY A CARD OR RUNE IS AUTHORED THAT SPENDS ONE OF THE THREE, BI §1 ARRIVES WITH IT** — and
+it arrives silently, because a spender reads exactly like a payer until somebody asks what the
+held half is worth. That is the thing to check, and it is why this paragraph is here rather than
+in a report.
+
+**THE THREE ARE BUILT ON NOBODY AND `check_ft` §0 IS WHAT KEEPS THEM THERE.** Each payout is
+guarded on its own `*_active` switch, every switch defaults false, and **nothing under `scripts/`
+or `data/` assigns one**. The gate asserts that over the live spec table, over a comment-stripped
+sweep of both directories, over a constructed control line that proves the sweep can bite, and
+over a driven four-spec party. **IT IS WRITTEN TO INVERT**: the batch that attaches a spine takes
+§0 red and rewrites it, which is what `check_ez` §1 and `check_fk` §2 both did and were better for.
+
+**AND A SPINE'S PAYOUT GOES WHERE THE GAME ALREADY DECIDES THAT THING ONCE.** Channel's lands in
+the one general damage multiplier; Sanctity's lands beside Permafrost and Emberkeep, which already
+lengthen a status scoped to the applier; Momentum's is ONE function read at THREE scheduling sites
+rather than a seventh term in `effective_speed()` — that function is what every `next_time` write
+divides by, so a term there compounds with Chilled, Slowed, Quick Draw and Wrath at once.
+**Measured rather than argued: the control that adds one made the live delta read x0.6296 where
+the engine's own arithmetic says x0.6800.**
+
 ## STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
 may be authored into the Survivalist's tree, or into any existing spec, until that spec is
@@ -1658,8 +1689,8 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   over-lighting is how he loses". **THERE IS NO DRAIN.** The governor is now a **PLAIN FLAT
   CAP** and nothing lifts it: +2% a burn-turn to +40%, full stop. `_overburn_capped`,
   `_overburn_drain` and `_overburn_tick` are DELETED, so a meter that keeps climbing simply
-  stops paying past 20 burn-turns and costs nothing to hold. **THIS IS THE ONE GOVERNOR IN THE
-  TABLE THAT IS A CEILING RATHER THAN A COST**, and that is deliberate — the cost was the fault
+  stops paying past 20 burn-turns and costs nothing to hold. **THIS WAS THE ONLY GOVERNOR IN THE
+  TABLE THAT IS A CEILING RATHER THAN A COST UNTIL BATCH FT PUT THREE MORE BESIDE IT**, and that is deliberate — the cost was the fault
   BS removed | `_overburn_mult` (the ONE place the cap is decided), OVERBURN_STEP/CAP consts.
 · **Loyalty** (per beast, no ceiling) | the beast's DEATH breaks the meter (Steadfast Bond
   keeps a share); plus BOND_MITIGATION_MAX 0.75 clamps Savage Presence so an uncapped boon can
@@ -1693,6 +1724,24 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   LIFESTEAL caps at RUIN_LEECH_CAP = 0.40 of the damage dealt, whatever the stacks and
   whatever the talents (Soul Glut included); the amplification is ALLOWED to run |
   battle.gd ~7846 (const), applied at the strike-loop leech block ~5680.
+· **mana_spent** (Channel, uncapped) | **a FLAT CAP on the READ, not on the ledger** —
+  `channel_steps()` is `mini(mana_spent / 40, 6)`, so the counter goes on climbing and stops
+  paying at six steps. **THE ECONOMY IS THE REAL GOVERNOR AND IT IS TIGHTER THAN THE CAP**: Mana
+  starts at 100, caps at 100 and regenerates 12 a turn, so he cannot have spent more than
+  `100 + 12(N-1)` by his Nth turn whatever he casts | `channel_steps()`/`channel_bonus()` in
+  `unit.gd` (THE ONE PLACE THE SPLIT IS DECIDED); the ledger is written at
+  `note_resource_spent`, the one net-off-the-bar door CZ §1 already books Rage through.
+· **momentum** (Warrior spine) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
+  clamps at `MOMENTUM_MAX_STEPS`, so this is the one of the three that never accumulates past its
+  ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one step a turn, and only for
+  a turn carrying BOTH halves of the exchange | `note_momentum_turn()` in `unit.gd`.
+· **sanctity_events** (Cleric spine, uncapped, static, battle-scoped) | **a FLAT CAP on the READ**
+  (`sanctity_steps()` is `mini(events / 6, 5)`) **plus a DEDUPE that is the real governor**: ONE
+  EVENT PER (TURN, BODY, STATUS), so churning one status on one body is worth one however many
+  times it is done. **THE BATTLE RESET IS THE SECOND GOVERNOR and it is faith_peak's** —
+  `BattleUnit.reset_sanctity()` is called from `battle._ready()` above `_spawn_units`, because a
+  STATIC ledger without one opens the second battle in a process on the first one's tally |
+  `note_status_event()`/`sanctity_steps()` in `unit.gd`.
 · **faith_peak** (never falls in battle) | the BATTLE RESET: `_reset_faith_meters()` zeroes
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.

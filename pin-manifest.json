@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1446,
-  "source": 1111,
+  "total": 1448,
+  "source": 1113,
   "other": 89,
   "document": 246
  },
  "source_residency": {
-  "code": 667,
-  "absent": 296,
+  "code": 668,
+  "absent": 297,
   "runtime": 81,
   "narrow": 24,
   "unresolved": 1,
@@ -2922,6 +2922,28 @@
    "k": "literal",
    "how": "read",
    "g": "check_fr.gd#50"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s2_momentum",
+   "h": "scripts/battle.gd",
+   "n": "momentum_delay_mult()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#324"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s3_sanctity",
+   "h": "scripts/battle.gd",
+   "n": "func add_status",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#458"
   },
   {
    "s": "test_batch_ah.gd",
