@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Systems Reconnaissance (Batch FW)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-09-10 (Batch FW &mdash; first pass)</b></p>
+<h1>DAWN OF DECAY — THE SYSTEMS RECONNAISSANCE</h1>
+
+<p><i>What the merged talent layer can reach, derived from the code. <b>This is a REPORT. Nothing
+was authored, built, merged, changed, retired or retuned</b> &mdash; no node was proposed, named,
+sketched or reserved; no system was extended; no constant and no magnitude moved. It is written to
+be open while <b>274 talent nodes</b> are authored, so <b>every system section below stands alone</b>
+and repeats what it needs rather than pointing at another section.</i></p>
+
+<p style="border:2px solid #a00; padding:8px"><b>THE LINE, AS THE DESIGNER RULED IT.</b><br>
+<b>&ldquo;A talent may not touch a rune, an ability, a passive or an engine. Everything else is fair
+game.&rdquo;</b><br><br>
+<b>WHAT THIS PAGE MEASURES AGAINST IT.</b> FP asked which of the 324 nodes <i>happen</i> to be
+engine-free and found 50. <b>This page asks the opposite question: which SYSTEMS exist that no rune,
+ability, passive or engine owns &mdash; and, in each, what a node could say.</b> For every system it
+reports four things: <b>what exists</b>; whether it is <b>already parametric</b> (driven by named
+constants or fields a per-hero value could feed) or <b>authored per site</b> (its numbers written
+wherever they are used, so a node cannot reach it until a layer is built); <b>what a node reaches
+TODAY</b> with no new machinery; and <b>what would need building</b>.</p>
+
+<h2 id="sr-howto">SR-HOWTO &mdash; HOW TO READ A SECTION</h2>
+
+<p><b>Every heading on this page carries its section's identifier</b> &mdash; <code>SR-CHECK</code>,
+<code>SR-BREAK</code>, <code>SR-POUCH</code> and so on &mdash; <b>in the heading text itself</b>,
+and every subsection repeats it. Two recon documents already share sub-headings across eight and
+twelve sections; a search for &ldquo;What would need building&rdquo; here returns
+<code>SR-TIMELINE &middot; 4 &middot; What would need building</code>, which says which system it
+is. <b>Search for the identifier, not the topic word.</b></p>
+
+<p><b>Every system section has the same six numbered parts:</b></p>
+<ol>
+<li><b>What exists</b> &mdash; constants with their values, fields, functions, and read sites as
+LINES (EV's rule: the read site is the line, not the function).</li>
+<li><b>Already parametric?</b> &mdash; one of <b>PARAMETRIC</b> (a named constant, table or field a
+node's value could feed), <b>PARTLY</b>, or <b>PER-SITE</b> (the numbers live at the places they are
+used). <b><code>SC_PROFILE_DEFAULT</code> is the shape of the first</b>: a dict of dials, one caller
+using a non-default copy. <b><code>STATUS_INFO</code> is the shape of the last</b>: ids and prose, no
+magnitude, every strength authored at the call.</li>
+<li><b>What a node reaches TODAY</b> &mdash; a payload key a node can write <i>now</i>, that this
+system already reads. See the plumbing box below: <b>today means a <code>BattleUnit</code> field,
+written at battle spawn.</b></li>
+<li><b>What would need building</b> &mdash; the missing hook, and where it would go.</li>
+<li><b>Who owns any of it</b> &mdash; whether a rune, an ability, a passive or an engine owns the
+system or a part of it, with the reason.</li>
+<li><b>Distinct things a node could say</b> &mdash; the count &sect;4 totals. <b>A distinct thing is a
+different dial or a different condition, never a different magnitude</b>: <i>+10% Break damage</i>
+and <i>+15% Break damage</i> are one; <i>+Break damage</i> and <i>Break damage on a Perfect</i> are
+two. Each is marked <b>TODAY</b> (a field exists and this system already reads it), <b>SMALL</b> (one new field and one read line at a site that already exists), <b>LARGE</b> (a new door, layer, run-side reader or piece of UI) or <b>RULING</b> (the line's edge or a standing rule decides it first).</li>
+</ol>
+<h2 id="sr-answer">SR-ANSWER &mdash; THE ANSWER, BEFORE THE WORKING</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>THE LAYER CAN REACH MORE SYSTEMS THAN FP'S SURVIVORS SUGGEST AND
+FAR FEWER THINGS THAN 274 NODES NEED.</b> Twenty-one systems belong to no rune, ability, passive or engine outright.
+Between them a node could say about 159 different things; 127 need no ruling; 50 can be said today.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Measured</th><th>Figure</th><th>Where</th></tr>
+<tr><td><b>Systems no rune, ability, passive or engine owns outright</b></td><td><b>21 sections</b> &mdash; the brief's
+ten, and eleven its list missed</td><td>&sect;1</td></tr>
+<tr><td><b>Distinct things a node could say under the line</b></td><td><b>159</b> &mdash; <b>127</b> needing no ruling
+(<b>50 TODAY</b>, 63 SMALL, 14 LARGE), <b>32</b> waiting on one</td><td>&sect;4</td></tr>
+<tr><td><b>FP's 50 survivors that survive the designer's line</b></td><td><b>43</b> (38 without a caveat; one never
+fires) &mdash; <b>so the bill is 281, not 274</b></td><td>&sect;3 G</td></tr>
+<tr><td><b>What a merged tree of 81 can say today</b></td><td><b>about 50 different things</b> &mdash; so <b>at least 31
+nodes a tree, 124 of 324, are stat creep</b> before a hook is built</td><td>&sect;4</td></tr>
+<tr><td><b>The brief's systems a node cannot reach at all today</b></td><td><b>the pouch's structure, gold, the shop,
+the map and the loadout</b> &mdash; a node's number is read only inside a battle</td><td>SR-PLUMB</td></tr>
+<tr><td><b>The largest single conflict</b></td><td><b>EN &sect;4 puts the purse, the pouch, the shop, a victory's pay
+and an elite's drop on the RELIC side</b>; 15 of the 32 ruling-gated things wait on it</td><td>&sect;3 A2</td></tr>
+</table>
+
+<h3>SR-ANSWER &middot; Each system: parametric, or authored per site</h3>
+<p><b><code>SC_PROFILE_DEFAULT</code> is the shape the brief asked to find</b> &mdash; a dict of dials, proven, one caller
+using a non-default copy. <b>Sanctity's potency layer is the shape in the other direction</b> &mdash; numbers authored
+wherever they are used, unreachable until a layer is built.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>System</th><th>Its shape</th><th>A node reaches it today?</th></tr>
+<tr><td>SR-CHECK</td><td><b>PARAMETRIC AND UNSPENT</b> &mdash; the <code>SC_PROFILE_DEFAULT</code> shape itself</td><td>only by
+listening to the grade (one field); no unit field reaches the bar</td></tr>
+<tr><td>SR-BREAK</td><td>victim side <b>PARAMETRIC</b>; attacker side reaches 3 of 31 sources; what Broken does <b>PER-SITE</b></td><td><b>yes &mdash; 9 things</b></td></tr>
+<tr><td>SR-STATUS</td><td>potency <b>PER-SITE</b> &mdash; the <code>STATUS_INFO</code> shape itself; duration PARTLY</td><td>by count,
+never by worth &mdash; 7 things</td></tr>
+<tr><td>SR-TIMELINE</td><td>MOSTLY PARAMETRIC</td><td>Speed, and one trigger</td></tr>
+<tr><td>SR-POUCH</td><td>PARTLY &mdash; only through its inputs</td><td><b>no</b></td></tr>
+<tr><td>SR-CRIT</td><td>chance <b>PARAMETRIC</b>; the multiplier <b>PER-SITE</b></td><td>yes &mdash; 3 things</td></tr>
+<tr><td>SR-LOADOUT</td><td>PARTLY &mdash; a boss-count ladder and literals</td><td><b>no</b></td></tr>
+<tr><td>SR-GOLD</td><td>literals and party-wide relic sums</td><td><b>no</b></td></tr>
+<tr><td>SR-MAP</td><td>parametric by the difficulty rung only</td><td><b>no</b></td></tr>
+<tr><td>SR-PARTY</td><td><b>PARAMETRIC</b> in a fight, <b>PER-SITE</b> between fights</td><td>yes &mdash; 3 things, in a fight</td></tr>
+<tr><td>SR-STATS</td><td>scalars <b>PARAMETRIC</b>; dictionaries unwritable</td><td>yes &mdash; 5 things</td></tr>
+<tr><td>SR-HEAL</td><td>received trapped; done <b>PER-SITE</b> (11 of 68 calls); shields <b>PER-SITE</b></td><td>2 things</td></tr>
+<tr><td>SR-RESOURCE</td><td>PARTLY</td><td>yes &mdash; 7 things</td></tr>
+<tr><td>SR-COOLDOWN</td><td>per ability, one helper</td><td>yes &mdash; 6 things</td></tr>
+<tr><td>SR-INTENT</td><td><b>PER-SITE</b> &mdash; nothing reads it</td><td><b>no</b></td></tr>
+<tr><td>SR-THREAT</td><td>PARTLY</td><td>one field</td></tr>
+<tr><td>SR-EVADE</td><td>PARTLY</td><td>yes &mdash; 4 things</td></tr>
+<tr><td>SR-DOT</td><td><b>PER-SITE</b>, and every tick is owned</td><td><b>no</b></td></tr>
+<tr><td>SR-TRIGGER</td><td><b>PER-SITE BY CONSTRUCTION</b> &mdash; no data hook exists</td><td>only through fields that already ride a trigger</td></tr>
+<tr><td>SR-MODIFIER</td><td>PARAMETRIC per-unit fields, assigned over by the bargain</td><td>as effects counted elsewhere</td></tr>
+<tr><td>SR-INTERFERE</td><td>two of four flavours are already keys</td><td><b>no</b></td></tr>
+</table>
+
+<h2 id="sr-coverage">SR-COVERAGE &mdash; COVERAGE, STATED BEFORE ANY FINDING</h2>
+<p><b>An audit that overstates its reach is worse than a narrow one that admits its edges.</b> This is what was
+derived, how, and what was not.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>How it was derived</th><th>Reached?</th></tr>
+<tr><td><b>324 nodes, 304 stat fields, 33 ability payloads</b></td><td>Parsed out of <code>Talents.LANE_TREES</code>
+(comments stripped outside strings, then a literal evaluation): 12 &times; 27, every id unique; 291 stat payloads and 33
+ability payloads at the top level</td><td><b>Complete</b></td></tr>
+<tr><td><b>FP's 50 survivors</b></td><td>Each followed to every read site and the guard chain above it, and classified
+under the designer's line</td><td><b>50 / 50</b></td></tr>
+<tr><td><b>The 21 systems</b></td><td>Seven read-only surveys over comment-stripped source (string literals kept, because
+this code's reads are string-keyed). <b>Every load-bearing claim was re-read against the code by hand before it was
+written here</b>, and every provenance claim checked in git (blame, <code>log -S</code>)</td><td><b>Complete for what each
+section lists</b></td></tr>
+<tr><td><b>Statuses</b></td><td>156 <code>STATUS_INFO</code> ids, 34 <code>DEBUFF_IDS</code>, 214 funnel sites and 35
+direct writes, counted; and the ownership census over <b>172 rows</b> &mdash; all 156 registry ids and 16 statuses written without a registry row &mdash; each application site attributed by its <code>_resolve_special</code> arm or its guard chain</td><td><b>Complete</b>; the ownership census <b>can miss</b> a status applied
+inside a called helper or at a node's own read site</td></tr>
+<tr><td><b>Break, the timeline, heals, relics, items, bargains, events</b></td><td>31 Break-bearing <code>take_hit</code>
+calls and 15 Break checks; 23 <code>next_time</code> writes (14 relative, 9 absolute); 68 heal calls; 25 relic-hook read
+sites; 8 items; 20 bargain modifiers; 13 event verbs</td><td><b>Complete</b></td></tr>
+<tr><td style="background:#fee"><b>NOT REACHED &mdash; balance</b></td><td>Not one magnitude measured, no sim run. <b>TODAY
+means a node can say it, never that saying it is worth a point.</b></td><td><b>0%</b></td></tr>
+<tr><td style="background:#fee"><b>NOT REACHED &mdash; anything driven</b></td><td>No probe, no fight, no screen. Three
+claims are inferences from reading and are marked where they appear: Overpressure never fires; a fallen hero never
+reaches the map; the Survivalist's passive barb skips his poison lane.</td><td><b>0%</b></td></tr>
+<tr><td style="background:#ffd"><b>A JUDGEMENT, STATED</b></td><td>What counts as one &ldquo;distinct thing&rdquo; in
+&sect;4 is a rule applied by hand, the same way in every section. Each section lists its things, so the count can be taken
+again.</td><td><b>Stated, not measured</b></td></tr>
+<tr><td style="background:#fee"><b>NOT REACHED &mdash; the enemy side, and drawing</b></td><td>Read only where a system
+touches it; the drawing code only for the bar.</td><td><b>Where named</b></td></tr>
+</table>
+
+<h2 id="sr-premises">&sect;0 &mdash; SR-PREMISES &mdash; THE BRIEF'S PREMISES, CHECKED FIRST</h2>
+<p><b>Twenty-six checkable claims. Eight held outright and five held with a qualifier; one is stale, five are half true,
+four are false, and three are recorded nowhere in the repo.</b> None of them changed what had to be measured; <b>two
+change the answer</b> &mdash; the survivors (so the bill is 281) and Poison (so the free status set is 4).</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>Premise</th><th>Verdict</th><th>What the repo says</th></tr>
+<tr><td>1</td><td>FP measured the survivors &mdash; 50 of 324, four specs contributing zero</td><td><b>HELD</b></td><td><code>merge-recon.html</code> &sect;3b</td></tr>
+<tr><td>2</td><td>A survivor is a node that happens to be engine-free</td><td style="background:#ffd"><b>HELD FOR FP'S RULE &mdash; AND IT IS 43 UNDER THE LINE</b></td><td>re-sorted in &sect;3 G: three touch an ability, one a passive, three a spec status</td></tr>
+<tr><td>3</td><td>CN made the skill-check profile a five-field dict</td><td style="background:#ffd"><b>STALE</b></td><td>five at CN (<code>8c3c676</code>); six since CS added <code>press_taper</code> (<code>5d43b07</code>); <code>check_cn</code> pins six. Three code comments still say five fields or three call sites</td></tr>
+<tr><td>4</td><td>Exactly one thing has ever used it</td><td><b>HELD</b></td><td>one non-default profile, the Sharpshooter's basic; the live Long Draw rune writes into that family</td></tr>
+<tr><td>5</td><td>FT found <code>STATUS_INFO</code> holds 156 ids and not one magnitude</td><td><b>HELD</b></td><td>156 ids, each <code>[label, chip, colour, tooltip]</code>; first found at FP, restated at FT; 93 never carry a magnitude at any site</td></tr>
+<tr><td>6</td><td>EY moved the sweep to 1.00 and it was one constant reaching every check</td><td><b>HELD</b></td><td><code>831b05c</code>, one executable line; it reaches the Sharpshooter as tolerance, not pace</td></tr>
+<tr><td>7</td><td>Break: every hero generates it and no engine owns it</td><td style="background:#ffd"><b>HELD, WITH A QUALIFIER</b></td><td>every live basic carries pressure (the Devout's only Break is Smite and Chastise); nothing owns the meter, but four engines are wired to it and Sanctity counts it</td></tr>
+<tr><td>8</td><td>FV just added an initiative write and named the constraint</td><td style="background:#fee"><b>FALSE</b></td><td><b>FT</b> (<code>97577a1</code>) wrote Momentum's initiative payout and the <i>&ldquo;NOT A SECOND WRITER OF TURN ORDER&rdquo;</i> comment; <code>next_time</code> writes are 23 before FT and 23 now; FV added a blow-met door and a rate constant. <i>&ldquo;A second set of rules for one question&rdquo;</i> is <code>check_ft.gd:601</code>, FT's. <b>The constraint itself is real</b> (SR-TIMELINE)</td></tr>
+<tr><td>9</td><td>CT built the whole item system and no talent has ever touched it</td><td style="background:#ffd"><b>FIRST HALF FALSE, SECOND HELD</b></td><td>items predate the changelog (git: shared party items <code>a98618e</code>, 2026-07-03; potions <code>ca16ad0</code>); CT made the pouch slot-limited and added three items, percentages, sell-back and swap offers. No node or rune payload has ever named an item field</td></tr>
+<tr><td>10</td><td>Crit: the surplus conversion EW built</td><td><b>HELD</b></td><td><code>CRIT_EXCESS_STEP</code> 0.50, the rate ruled at EX</td></tr>
+<tr><td>11</td><td>The loadout: slot count, the ladder, <b>swap cost</b>, the no-return ledger</td><td style="background:#ffd"><b>HALF FALSE</b></td><td><b>no swap cost exists</b> &mdash; benching free and reversible since EG; the ladder and the ledger hold</td></tr>
+<tr><td>12</td><td>Gold and the shop: the Peddler, the sell-back</td><td><b>HELD</b></td><td>the merchant node (TRADE) opens the shop, titled &ldquo;The Wandering Peddler&rdquo;; sell-back 40%</td></tr>
+<tr><td>13</td><td>The map: <b>what a rest does</b>, the severity floor</td><td style="background:#ffd"><b>HALF FALSE</b></td><td><b>there are no rests</b> (removed at AN &sect;6; <code>rest_heal_add</code> has no read site); the floor holds</td></tr>
+<tr><td>14</td><td>The party: revive, death, <b>downed heroes</b>, the end-of-battle heal</td><td style="background:#ffd"><b>HALF FALSE</b></td><td><b>no downed state exists</b> anywhere in the repo; the rest holds</td></tr>
+<tr><td>15</td><td>Enemy interference: queued since CM</td><td style="background:#fee"><b>NOT SUPPORTED</b></td><td>the earliest record is CT's comment (<code>battle.gd:5337-5341</code>); <code>state.md</code>'s line arrived at CW, &ldquo;carried from CX&rdquo;</td></tr>
+<tr><td>16</td><td>Four flavours from Shadow Hearts; the one idea that passed the designer's &ldquo;does it add to the loop&rdquo; test</td><td style="background:#fee"><b>NOT IN THE TREE</b></td><td>neither is recorded anywhere in the repo; both are the brief's account</td></tr>
+<tr><td>17</td><td>Burn is the Pyromancer's</td><td style="background:#ffd"><b>HELD, WITH NAMED EXCEPTIONS</b></td><td>Choking Smoke (the Survivalist), Umbral Mirror's reflections, two enemies</td></tr>
+<tr><td>18</td><td>Poison is nobody's in particular</td><td style="background:#fee"><b>FALSE FOR HEROES</b></td><td>every hero-side path is the Survivalist's, and <code>CLAUDE.md</code> BA &sect;1 says so as a standing rule; four enemy kinds apply it too</td></tr>
+<tr><td>19</td><td>The basic attack is <code>abilities[0]</code></td><td style="background:#ffd"><b>PARTLY</b></td><td>one of <b>three</b> definitions in the code; four specs override slot 0</td></tr>
+<tr><td>20</td><td>An item has a handler and a cost</td><td style="background:#ffd"><b>PARTLY</b></td><td>the handler holds; the cost is gold and one use a turn &mdash; no turn, no resource &mdash; and an item is never an <code>Ability</code></td></tr>
+<tr><td>21</td><td>Fault Line, Turn the Blade and Bring It Down all generate Break</td><td style="background:#ffd"><b>TWO OF THREE</b></td><td>Bring It Down is a damage buff and deals no Break (<code>battle.gd:9610-9611</code>); the Breaker lane is the Swordmaster's; no passive owns the meter</td></tr>
+<tr><td>22</td><td>274 nodes is the target</td><td style="background:#ffd"><b>HELD AS THE PLAN</b></td><td>324 &minus; 50 under FP's rule; under the line the salvage is 43 and the bill 281; both assume four trees of 81, which nothing rules</td></tr>
+<tr><td>23</td><td>DN priced a restructure at 97 new nodes and it was not taken</td><td><b>HELD</b></td><td><code>merge-recon.html</code> &sect;5c; FP &sect;4</td></tr>
+<tr><td>24</td><td>FO found searches return the wrong spec's section when eight sections share headings</td><td style="background:#fee"><b>NOT FOUND</b></td><td>not in <code>FO.md</code>, its changelog entry or <code>docs/</code> (FO's premise 17 is a different fault). Every heading here carries its identifier anyway</td></tr>
+<tr><td>25</td><td>FD found 54 rows where the brief said two; DV found one walk where DW found three</td><td style="background:#ffd"><b>HELD (FD); NOT RE-CHECKED (DV, DW)</b></td><td><code>CLAUDE.md</code> FD &sect;2: 54 of 227 rows, the brief had named two cards</td></tr>
+<tr><td>26</td><td>FV found the Warden's Momentum hole was real and it became its batch</td><td><b>HELD</b></td><td><code>docs/reports/FV.md</code> &sect;1</td></tr>
+</table>
+<h2 id="sr-plumb">SR-PLUMB &mdash; HOW A NODE REACHES ANYTHING AT ALL <span style="font-weight:normal">(read this once; every section repeats the one line it needs)</span></h2>
+
+<p style="border:2px solid #a00; padding:8px"><b>A NODE IS A NUMBER ADDED TO A HERO'S BATTLE CONFIG AT SPAWN.
+That is the whole of the machinery.</b> <code>Talents.apply_from_tree</code> runs inside the battle spawn
+(<code>battle.gd:1202-1203</code>; the sim's test hook at <code>:1216</code>; the hero sheet builds a
+throwaway copy to draw, <code>party_screen.gd:169</code>), and <code>BattleUnit.setup</code> copies every
+config key onto the unit with <code>set()</code> (<code>unit.gd:2163-2166</code>). <b>No node's number is
+read anywhere outside a battle</b> &mdash; not by the map, the shop, the pouch, the bargain, the events or
+the victory screen. The run's only reads of talents are the loadout handoff, the save's cleanup of
+unknown ids, ability ownership (which reads grants, and no node grants), and display.</p>
+
+<h3>SR-PLUMB &middot; What a payload can say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Arm</th><th>What it does</th><th>Nodes using it (of 324)</th><th>Under the line</th></tr>
+<tr><td><code>stat {field: n}</code></td><td>adds <code>n &times; ranks</code> to <code>cfg[field]</code></td>
+<td><b>291</b>, writing <b>304 distinct fields</b> &mdash; <b>301 of them written by exactly one node</b></td>
+<td>the whole of the layer's reach</td></tr>
+<tr><td><code>ability {name, add / set}</code></td><td>edits every copy of one named ability in the kit</td>
+<td><b>33</b> (34 counting sub-payloads), across 25 abilities</td><td><b>forbidden</b> &mdash; it touches an
+ability by construction</td></tr>
+<tr><td><code>new_ability</code> / <code>grant_ability</code></td><td>adds an ability</td><td><b>0</b> (forbidden
+since DO)</td><td>forbidden</td></tr>
+<tr><td><code>also [&hellip;]</code>, <code>condition</code></td><td>a second payload; a gate. The only
+conditions are <code>has_node</code> and <code>owns_ability</code></td><td>9 carry <code>also</code>; 5
+conditions, all <code>has_node</code></td><td><code>owns_ability</code> would be a bet on a card</td></tr>
+</table>
+<p><b>ONE ARM PER PAYLOAD.</b> <code>stat</code>, <code>new_ability</code>, <code>grant_ability</code> and
+<code>ability</code> are one if/elif chain (<code>talents.gd:2857-2886</code>); a second in the same payload is
+silently dropped, which is why <code>also</code> exists.</p>
+
+<h3>SR-PLUMB &middot; The seven traps a new node walks into, each silent</h3>
+<ol>
+<li><b>A NAME THE UNIT DOES NOT DECLARE PAYS NOTHING.</b> <code>set()</code> ignores an unknown property
+without a word. <b>A new dial is one <code>var</code> in <code>unit.gd</code> plus one read line</b>, and a
+misspelt one is free, inert and invisible.</li>
+<li><b>THE ZERO-START TRAP.</b> The stat arm adds to <code>cfg.get(field, 0)</code>
+(<code>talents.gd:2859-2861</code>) &mdash; <b>not to the unit's own default</b>. The starting config carries
+only a dozen keys (health, armor, attack, constitution, speed, stability, resource and the like), so a field
+whose unit default is NOT zero and is NOT in that config comes out as <code>0 + n</code>:
+<code>healing_received_mult</code> (default 1.0), <code>parry_chance</code> (&minus;1.0, a sentinel),
+<code>mod_speed_mult</code> and <code>mod_cost_mult</code> (1.0), <code>mod_bd_mult</code> (100),
+<code>second_max</code> (100), <code>overcharge_mult</code> (0.5), <code>mercy_threshold</code> (0.5).
+<b>A +10% healing-received node would set that hero's healing received to a tenth.</b> Nothing errors.</li>
+<li><b>TWO CLASS PASSIVES ASSIGN OVER THE TREE.</b> The spawn writes the class passives AFTER the talent tree,
+and writes them with <code>=</code>: <code>healing_received_mult = 1.15</code> for every Cleric (Holy Conduit)
+and <code>mana_regen_bonus = 10</code> for every Mage (Evocation) (<code>battle.gd:1274-1279</code>). <b>A node
+writing either field is silently replaced on that class.</b> And a matching battle modifier later assigns over
+a node's <code>mod_*</code> field the same way (<code>battle.gd:1783-1876</code>).</li>
+<li><b>A DICTIONARY CANNOT BE WRITTEN.</b> <code>resists</code> and <code>type_dmg_bonus</code> are dicts, and
+payloads only write scalars (the Ashen Skin comment, <code>battle.gd:1369-1375</code>). <b>A node touching a
+damage type or a resistance needs a spawn-side line of its own</b>, as Ashen Skin has.</li>
+<li><b>&ldquo;PARTY-WIDE&rdquo; MEANS THE BEST HOLDER, AND SOMETIMES ONLY WHILE HE LIVES.</b>
+<code>_max_hero_rank</code> takes the <b>MAX, not the sum</b>, over the living heroes (15 call lines, 13
+fields); <code>_living_hero_with</code> takes the <b>first living holder</b> (29 call sites); a few effects are
+<b>stamped once at spawn</b> and outlive their holder. <b>Two heroes holding one party-wide node do not stack,
+and a live read goes quiet when its holder dies.</b></li>
+<li><b>THE ORDINARY STRIKE LOOP IS NOT EVERY ATTACK.</b> <code>_resolve</code> sends any ability carrying a
+<code>special</code> to its handler BEFORE the strike loop (<code>battle.gd:8171</code>: <code>if ab.special !=
+"": await _resolve_special(&hellip;)</code>), and <b>70% of the corpus carries one</b> (FJ's live dump: 160 of
+227). <b>A node read inside the strike loop pays only on attacks without a <code>special</code></b>, unless a
+handler copies the read &mdash; which is how No Quarter came to have a second copy inside Guard Change.</li>
+<li><b>A FIELD ANY RUNE WRITES &mdash; LIVE OR RETIRED &mdash; IS GUARDED BY <code>check_em</code>.</b> Its &sect;1 walks every entry of <code>runes.json</code>, retired ones included, and reds on any rune writing a field a live node writes, unless the field is in <code>UNIT_MATH</code> &mdash; which it asserts as an equality. <b>So a new node on <code>armor</code>, <code>max_hp</code>, <code>mana_regen_bonus</code>, <code>resource</code>, <code>healing_received_mult</code>, or the idle <code>mindfulness_ranks</code>, <code>beacon_ranks</code> and <code>capacitor_ranks</code>, takes that gate red</b> until <code>UNIT_MATH</code> gains a row with its reason &mdash; an instrument edit the authoring batch owes, not a defect.</li>
+</ol>
+<p><b>WHAT THIS MEANS FOR EVERY &ldquo;TODAY&rdquo; ON THIS PAGE:</b> TODAY means <i>a field a payload can
+write, that this system already reads, with none of the seven traps in the way</i>. Where a trap applies, the
+section says so.</p>
+<hr><h1 id="sr-systems">&sect;1 &mdash; SR-SYSTEMS &mdash; THE SYSTEMS, ONE SECTION EACH</h1>
+<p><i>The brief's ten first, in its order. Each section stands alone, repeats the one line of machinery it needs, and ends with its count.</i></p>
+<hr><h2 id="sr-check">SR-CHECK &mdash; THE SKILL CHECK <span style="font-weight:normal">(the timing bar, all four cases)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-CHECK IN ONE SENTENCE: PARAMETRIC, PROVEN, ALMOST
+UNSPENT &mdash; AND NOT ONE UNIT FIELD REACHES THE BAR.</b> Grading, drawing and the sweep all read
+one six-dial profile, and exactly one caller hands it anything but the default. <b>But
+<code>_run_skill_check</code> takes no unit</b>, so a node today can only <i>listen</i> to the grade
+&mdash; one field already does &mdash; and cannot <i>change</i> the bar until a hook exists.</p>
+
+<h3>SR-CHECK &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Thing</th><th>Value / shape</th><th>Where</th></tr>
+<tr><td><code>SC_PROFILE_DEFAULT</code></td><td><b>SIX keys</b>: <code>perfect_half</code> 0.045,
+<code>good_half</code> 0.16, <code>centre</code> 0.5, <code>sweep_time</code> <b>1.00</b>,
+<code>presses</code> 1, <code>press_taper</code> 1.0. <b>CN shipped five</b> (commit
+<code>8c3c676</code>, sweep 0.72); <b>CS added <code>press_taper</code></b> (<code>5d43b07</code>);
+<b>EY moved the sweep to 1.00</b> (<code>831b05c</code>). <code>check_cn</code> pins all six and
+their count.</td><td><code>battle.gd:53-60</code>; <code>check_cn.gd:19-22, 39</code></td></tr>
+<tr><td><code>_apply_sc_profile</code></td><td>Merges a profile over the default; clamps
+<code>centre</code>, <code>sweep_time</code>, <code>presses</code>, <code>press_taper</code>.
+<b>The two half-widths are not clamped.</b> Writes <code>sc_profile</code> and resizes both zone
+rects, so what is graded and what is drawn are one dict. Three callers: UI setup, bar open, each
+press of a sequence.</td><td><code>battle.gd:2070-2097</code>; callers <code>:2054, :24174,
+:24361</code></td></tr>
+<tr><td><code>_run_skill_check(cancellable, mode, profile)</code></td><td><b>No unit
+parameter.</b> Two callers: a cast, and the defensive brace. <code>mode</code> picks only the hint,
+tint, result text and orientation card.</td><td><code>battle.gd:24129-24342</code>; callers
+<code>:4093, :24801</code></td></tr>
+<tr><td>The sweep</td><td>Cursor moves <code>sc_dir &times; delta / sweep_time</code>, re-reading
+<code>sweep_time</code> every frame; <b>every press starts at 0.0 moving right</b></td>
+<td><code>battle.gd:24470-24482</code>; <code>:24251-24252</code></td></tr>
+<tr><td>The grader</td><td><code>_grade_skill_check()</code> takes no arguments (a standing rule)
+and measures distance from <code>centre</code> against the half-widths</td>
+<td><code>battle.gd:24691-24699</code></td></tr>
+<tr><td>The grades</td><td>Damage &times;<b>1.15 / 1.0 / 0.6</b> and Break &times;<b>1.25 / 1.0 /
+0.5</b> (Perfect / Good / Sloppy) &mdash; <b>inline literals, not named constants</b></td>
+<td><code>battle.gd:8092-8093</code></td></tr>
+<tr><td>Who gets a bar</td><td><code>Ability.runs_skill_check()</code>; a slot-0 basic resolves at a
+fixed Good except the Sharpshooter's</td><td><code>ability.gd:319-326</code>;
+<code>battle.gd:4047-4048</code></td></tr>
+<tr><td>Gated</td><td>Reckless Abandon, Boil Over, Requiem, Unleash, Death Ray &mdash; a Sloppy spends
+the turn and consumes nothing</td><td><code>_gated_failure</code>,
+<code>battle.gd:24724-24737</code></td></tr>
+<tr><td>Defensive</td><td>Offered to Heavy Plating, or Seasoned in Defensive stance or under
+Formless; <b>returns a boolean</b>; a Perfect brace is &times;0.85 damage and &times;0.75 Break</td>
+<td><code>_has_defensive_check</code> <code>:15385-15391</code>; <code>_defensive_brace</code>
+<code>:24772-24812</code>; <code>:10272-10275</code>, <code>:10490-10493</code></td></tr>
+<tr><td>The multi-press ladder</td><td>The Sharpshooter's basic only: 1 press + 1 per 50 Focus, cap 4
+(+1 with the Long Draw rune); each later press narrows by 0.85; his pace is the literal 0.52 s and
+his half-widths inherit the default's sweep through <code>scale</code> (1.6346 today)</td>
+<td><code>battle.gd:23304-23374</code>; <code>SS_SEQ_*</code> <code>:78-137</code></td></tr>
+<tr><td>The bot</td><td>Rolls Perfect/Good/Sloppy 20/65/15 per press, and 0.20 on a brace. <b>It never
+reads a profile.</b></td><td><code>battle.gd:4075-4076</code>; <code>:24793-24794</code></td></tr>
+<tr><td>Enemies</td><td><b>Never graded</b> &mdash; an enemy turn resolves at
+<code>"good"</code></td><td><code>battle.gd:7389</code></td></tr>
+</table>
+
+<h3>SR-CHECK &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARAMETRIC, FOR SIX NUMBERS A BAR, AND PROVEN END TO END</b> &mdash; the Sharpshooter's
+profile is the one non-default that exists, handed in at <code>:4094</code>, and it grades and draws
+correctly on every press. <code>centre</code> is read at <code>:2078, :2087, :24693</code> and every
+profile sets it to 0.5: <b>wired and unused</b>, as <code>CLAUDE.md</code> says.
+<b>NOT PARAMETRIC:</b> the start position and direction, whether the zones are visible, any speed
+change mid-sweep, the grade multipliers (inline), the brace's magnitudes (a local read on two lines),
+and the bot's odds.</p>
+
+<h3>SR-CHECK &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>ONE FIELD, AND IT LISTENS RATHER THAN CHANGES.</b> <code>holy_light_pct</code>
+(<code>unit.gd:887</code>) is read at <code>battle.gd:8160-8168</code> under
+<code>grade == "perfect" and holy_light_pct &gt; 0 and resource_name == "Mana"</code> &mdash; no
+spec, no passive, no ability in the guard. Written today by <code>hl_holy_light</code> (Holy, Mercy
+lane, row 2). <b>Any Mana user holding the field is paid on every Perfect.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field a node writes today</th><th>What it reads</th><th>Under the line?</th></tr>
+<tr><td><code>holy_light_pct</code></td><td>the grade, the class resource</td><td><b>YES</b> &mdash;
+reusable by a Mana class tree with no code change</td></tr>
+<tr><td><code>swordsmanship_parry</code> (<code>sm_swordsmanship</code>)</td><td>the grade, inside
+Guard Change's handler (<code>:20759-20767</code>)</td><td>NO &mdash; an ability</td></tr>
+<tr><td><code>spray</code> (<code>ss_spray</code>)</td><td>caps Focus at 50, so bounds the
+Sharpshooter's presses</td><td>NO &mdash; an engine</td></tr>
+<tr><td><code>rune_long_draw_presses</code></td><td>adds a press to his sequence</td><td>NO &mdash;
+a rune's</td></tr>
+</table>
+<p><b>THE MECHANISM, WHICH IS THE SAME FOR EVERY SECTION ON THIS PAGE:</b> a payload's
+<code>stat</code> block writes any key into the hero's config, and <code>unit.setup</code> copies each
+key with <code>set()</code> (<code>unit.gd:2164-2166</code>) &mdash; <b>which silently ignores a key
+the unit does not declare.</b> So a new dial costs one <code>var</code> in <code>unit.gd</code> and one
+read line, and <b>a misspelt one costs nothing and pays nothing, with no error.</b></p>
+
+<h3>SR-CHECK &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>A per-hero profile hook.</b> The hero is in scope where a cast's bar opens (<code>:4093-4094</code>)
+and the struck hero where a brace opens (<code>:24801</code>); <code>_run_skill_check</code> is not.
+The smallest form merges a hero's keys into the profile argument at those two lines and teaches
+<code>_apply_sc_profile</code> any new key. <b>The grader stays argument-free.</b> The
+Sharpshooter's <code>scale</code> formula is the ready template for a change that holds difficulty
+constant.</li>
+<li><b>A per-hero term on the grade multipliers</b> at <code>:8092-8093</code>.</li>
+<li><b>A floor on the half-widths</b> in <code>_apply_sc_profile</code> &mdash; any dial that narrows
+a window needs one, and they are the only unclamped keys.</li>
+<li><b>A Perfect streak.</b> Nothing counts Perfects; <code>crit_streak</code> is the only streak on
+a unit.</li>
+<li><b>A reader for the brace.</b> A successful brace is read by two lines and one tally; nothing else
+reacts to it.</li>
+<li><b>Bot rolls that read the profile.</b> Until then <b>any change to a window is invisible to
+every sim</b>, which <code>CLAUDE.md</code> already records.</li>
+</ul>
+
+<h3>SR-CHECK &middot; 5 &middot; Who owns any of it</h3>
+<ul>
+<li><b>UNOWNED:</b> the bar, the default profile, the grade multipliers, the Perfect as an event.</li>
+<li><b>OWNED BY AN ENGINE / PASSIVE / RUNE:</b> the Sharpshooter's sequence (his passive, his slot 0,
+Focus; the Long Draw rune writes into it); the defensive bar's <i>eligibility</i> (Heavy Plating;
+Seasoned plus stance; the Formless status).</li>
+<li><b>OWNED BY ABILITIES:</b> the <code>gated</code> flag (five cards) and every Perfect bonus (131
+lines test <code>is_perfect</code>, nearly all of them one card's bonus).</li>
+<li><b>AND A STANDING RULE BINDS ANY NODE THAT MOVES A WINDOW.</b> <code>CLAUDE.md</code>'s
+<i>VARY THE CHARACTER, HOLD THE DIFFICULTY CONSTANT</i> governs every profile, with two opt-in
+exceptions: the Sharpshooter, and a relic that swaps a hero's bar for a riskier one &mdash;
+<b>which does not exist</b> (the rule's line is its only mention). <b>A node that makes a hero's bar
+easier or harder is a third exception and needs a ruling.</b> A node that changes the bar's
+<i>character</i> at constant difficulty does not.</li>
+</ul>
+
+<h3>SR-CHECK &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Status</th></tr>
+<tr><td>1</td><td><b>A Perfect pays</b> (a resource today; health, a shield, tempo or Break are the
+same trigger paying another currency)</td><td><b>TODAY</b> for Mana users; one field and one line for
+any other currency</td></tr>
+<tr><td>2</td><td><b>A Sloppy is softened</b> (a consolation, or a smaller penalty)</td><td>SMALL &mdash; a gated Sloppy never reaches <code>_resolve</code>, so it is excluded</td></tr>
+<tr><td>3</td><td><b>The stakes move</b> &mdash; a Perfect worth more, or a Sloppy costing less</td>
+<td>SMALL (the inline multipliers); changes the stakes, not the difficulty</td></tr>
+<tr><td>4</td><td><b>The bar's tempo</b> at constant difficulty (sweep and widths scaled together)</td>
+<td>SMALL &mdash; the profile hook</td></tr>
+<tr><td>5</td><td><b>An off-centre window</b> (<code>centre</code>)</td><td>SMALL &mdash; hook only; grading and drawing already honour it</td></tr>
+<tr><td>6</td><td><b>Risk reshaped</b> &mdash; Good narrowed to widen Perfect, or the reverse</td>
+<td><b>RULING</b> &mdash; it is the unbuilt relic exception's shape</td></tr>
+<tr><td>7</td><td><b>A Perfect streak pays</b></td><td>SMALL &mdash; a counter</td></tr>
+<tr><td>8</td><td><b>A brace pays</b></td><td><b>RULING</b> &mdash; only a hero who braces can use it, and two passives decide who braces</td></tr>
+<tr><td>9</td><td><b>Interference resisted, or paid through</b></td><td>LARGE &mdash; needs <a href="#sr-interfere">SR-INTERFERE</a> built first</td></tr>
+</table>
+<p><b>SR-CHECK TOTAL: 9 distinct things &mdash; 1 TODAY, 5 SMALL, 1 LARGE, 2 RULING.</b> Three of them (4, 5 and 6) are &ldquo;character&rdquo; dials the standing profile rule governs.
+Off the table by the line: the press count (an engine's), the gated flag and every Perfect bonus
+(abilities'), and whether a card runs a bar at all (an ability's).</p>
+
+<p><b>SR-CHECK &middot; FOUND IN PASSING, NOT FIXED (a report touches no code):</b> the first-bar
+orientation card still tells the player <i>&ldquo;Every action runs a timing check&rdquo;</i>
+(<code>battle.gd:24398</code>) &mdash; false since CN took the bar off basics, pure buffs, shields
+and debuff appliers; and three comments still describe the profile as <i>five</i> fields or the
+check as having <i>three</i> call sites (<code>:23</code>, <code>:919-920</code>,
+<code>:929-935</code>). The first is player-facing text; all four go to <code>docs/state.md</code>'s
+queue.</p>
+<hr><h2 id="sr-break">SR-BREAK &mdash; BREAK <span style="font-weight:normal">(Pressure, stability, the Broken window, and what Break damage reads)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-BREAK IN ONE SENTENCE: NO ENGINE OWNS THE METER, ITS
+VICTIM SIDE IS FULLY PARAMETRIC, ITS ATTACKER SIDE REACHES 3 OF 31 SOURCES, WHAT &ldquo;BROKEN&rdquo;
+DOES IS LITERALS &mdash; AND HEROES CARRY THE SAME METER.</b> It is the richest system on this page
+today: nine things a node can say with no new code, most of them already said by FP's survivors.</p>
+
+<h3>SR-BREAK &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>The meter:</b> <code>stability</code> is 100 for every class and all 21 enemy kinds; <code>constitution</code>
+is the divisor (85&ndash;130 on heroes, 60&ndash;170 on enemies, the three bosses at 150 / 160 / 170);
+<code>Ability.pressure</code> is Break damage per hit &mdash; <b>76 of the 227 abilities carry it</b>.</li>
+<li><b>Every live basic attack carries pressure</b>: Strike 18, Fireball and Frostbolt 15, Arcane Explosion
+10 twice, Smite 16, Shadowrend 16, Quick Shot 14. <b>Pressure-bearing DRAFT cards per spec re-derive EP
+&sect;2's figures exactly</b> &mdash; Sharpshooter 6, Arcanist 5, Berserker / Swordmaster / Pyromancer /
+Occultist 4, Cryomancer 3, Beastmaster and Survivalist 2, Warden and Holy 1, <b>the Devout 0</b>.</li>
+<li><b>The attacker side</b> is in the strike loop: the ability's pressure &times; the grade (1.25 / 1.0 /
+0.5) &times; 1.5 on a crit, &times; 0.25 if parried, then per-card riders, then <code>broken_will_ranks</code>
+and <code>rune_bd_bonus</code> (their only reads, <code>battle.gd:10472-10480</code>), then the brace's
+&times;0.75.</li>
+<li><b>The victim side is one block every source passes through</b> (<code>unit.gd:3655-3778</code>):
+effective constitution, <code>BD &times; 100 / constitution</code>, Breaking Darkness, Devotion, Hold the
+Line, the modifiers, Immovable, Ironclad's cap, then the fill &mdash; <b>at stability the unit Breaks and the
+meter is clamped to it, so overflow is lost</b>.</li>
+<li><b>ONLY 3 OF THE 31 BREAK-BEARING <code>take_hit</code> CALLS TAKE THEIR VALUE FROM THE STRIKE LOOP</b>
+(the hit, Long Watch's carry, the Sundering splash). The other 28 &mdash; twelve card handlers passing raw
+pressure and sixteen constants &mdash; never see grade, crit, Broken Will or the brace. <b>And there are 15
+separate &ldquo;did this hit Break it&rdquo; checks</b>, no single one.</li>
+<li><b>The Broken window:</b> the unit loses its next turn (its declared intent is discarded), then recovers to
+0 &mdash; or to <b>50</b> for an enemy while any hero holds Guard Breaker. <b>Only Overpower extends it</b> (+1
+turn), so an enemy can never extend a hero's. While Broken: armor &times;0.7, <b>+25% crit chance against it
+(written out three times)</b>, no Block, no parry, a charged wind-up dropped, and Break dealt to it thrown
+away. <b>Bosses refuse hard control until Broken</b>, at one refusal (<code>battle.gd:12952</code>) that a
+standing rule (CR &sect;1) forbids duplicating.</li>
+<li><b>HEROES HAVE THE SAME METER.</b> 42 of the 50 enemy abilities carry pressure (up to 56). A Broken hero
+loses his turn, takes &minus;30% armor and +25% crit against him, cannot Block or parry, <b>and the enemy AI
+hunts him</b> (the Broken-hero exploit, <code>battle.gd:7449-7457</code>).</li>
+</ul>
+
+<h3>SR-BREAK &middot; 2 &middot; Already parametric?</h3>
+<p><b>VICTIM SIDE: PARAMETRIC</b> &mdash; fields and statuses through one block. <b>ATTACKER SIDE: PARTLY</b>
+&mdash; two per-hero multipliers exist and reach 3 of 31 sources. <b>WHAT BROKEN DOES: PER-SITE</b> &mdash;
+armor &times;0.7, the +25% (three copies), recovery to 0 or 50, and the window's length are literals.</p>
+
+<h3>SR-BREAK &middot; 3 &middot; What a node reaches TODAY</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Effect</th><th>Written today by</th></tr>
+<tr><td><code>broken_will_ranks</code></td><td>+% Break &mdash; <b>strike loop only (3 of 31 sources)</b></td><td>Broken Will (Occultist)</td></tr>
+<tr><td><code>sundering_shot</code></td><td>flat Break on a crit</td><td>Sundering Shot (Sharpshooter)</td></tr>
+<tr><td><code>sunder_shot</code></td><td>armor penetration thins the target's constitution &mdash; <b>worth nothing without penetration</b></td><td>Sunder Shot</td></tr>
+<tr><td><code>bonecracker_ranks</code>, <code>off_balance_ranks</code></td><td>+damage against the Broken</td><td>Bonecracker; Off Balance</td></tr>
+<tr><td><code>blood_communion</code></td><td>a hero dealing Break heals the lowest ally</td><td>Blood Communion</td></tr>
+<tr><td><code>no_quarter_ranks</code></td><td>+45 resource on a Break &mdash; <b>fires at 2 of the 15 checks</b></td><td>No Quarter</td></tr>
+<tr><td><code>guard_breaker</code></td><td>an enemy recovers to 50, not 0 (on or off)</td><td>Guard Breaker (party-wide)</td></tr>
+<tr><td><code>constitution</code>, <code>stability</code>, <code>immovable</code>, <code>unrelenting_ranks</code>, <code>toughness_ranks</code></td><td>this hero resists Break, or cannot be Broken</td><td>spec stats; Immovable, Unrelenting Assault, Toughness</td></tr>
+<tr><td><code>devoutness_ranks</code></td><td>the party takes less Break (the best holder, stamped at spawn)</td><td>Devoutness</td></tr>
+</table>
+<p><b>Traps:</b> <code>mod_bd_mult</code> sits in the zero-start trap; <code>rune_bd_bonus</code> would work and
+is a RUNE's field. <b>And Overpressure (<code>sm_overpressure</code>) never fires</b>: its read is the
+<i>enemy's</i> own field and nothing copies the node's value onto an enemy (<code>unit.gd:3743</code>).</p>
+
+<h3>SR-BREAK &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>The Overpressure stamp</b> &mdash; the copy-onto-the-target pattern Sunder Shot already uses
+(<code>battle.gd:10614-10631</code>). Without it a shipped node does nothing.</li>
+<li><b>One entry point for heroes dealing Break</b>, so a Break multiplier reaches 31 sources and not 3 (LARGE).</li>
+<li><b>Fields for what Broken does</b> &mdash; the armor shred, the three copies of the +25%, the recovery level,
+the window.</li>
+<li><b>One &ldquo;this hit Broke it&rdquo; hook</b> in place of fifteen checks.</li>
+<li><b>A way for a hero to shed his own Pressure</b> on something other than a Block.</li>
+</ul>
+
+<h3>SR-BREAK &middot; 5 &middot; Who owns any of it</h3>
+<p><b>NOTHING OWNS THE METER, AND NO PASSIVE'S ENGINE READS IT</b> &mdash; checked across all twelve. <b>But four
+engines are wired to it:</b> Heavy Plating's block roll and pity climb are switched off while their holder is
+Broken; the defensive brace (Heavy Plating, Seasoned) scales the Break a hero takes; boss freezes and the
+madness charms gate on Broken (Glacial Hold, the Old Gods); Resonance is the Break of two Arcanist cards.
+<b>Sanctity counts every Break and every recovery as a status event; Momentum ignores Break entirely</b> &mdash;
+a turn that only deals Break books no exchange. <b>The Breaker lane is a talent lane</b> (the Swordmaster's),
+not a passive, and <b>participation is uneven</b> (EP &sect;2, standing): the Devout drafts no pressure at all.</p>
+
+<h3>SR-BREAK &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>You Break harder</td><td><b>TODAY</b> (3 of 31 sources); LARGE to reach every source</td></tr>
+<tr><td>2</td><td>Your crits crack guards</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>Penetration is Break</td><td><b>TODAY</b> (needs penetration)</td></tr>
+<tr><td>4</td><td>Kill what is down</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>Breaking heals the party</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>Breaking refuels you</td><td><b>TODAY</b> (2 of 15 checks)</td></tr>
+<tr><td>7</td><td>They do not get their guard back</td><td><b>TODAY</b> at a fixed 50</td></tr>
+<tr><td>8</td><td>I do not break</td><td><b>TODAY</b></td></tr>
+<tr><td>9</td><td>We do not break</td><td><b>TODAY</b></td></tr>
+<tr><td>10</td><td>Hold the window open (an extra Broken turn)</td><td>SMALL</td></tr>
+<tr><td>11</td><td>Overflow becomes damage</td><td>SMALL (the missing stamp)</td></tr>
+<tr><td>12</td><td>The Broken are softer (armor, crit)</td><td>SMALL</td></tr>
+<tr><td>13</td><td>Shake it off (shed your own Pressure on a trigger)</td><td>SMALL</td></tr>
+<tr><td>14</td><td>Push a Broken enemy's next turn back</td><td>SMALL (the push arithmetic exists)</td></tr>
+<tr><td>15</td><td>Control a boss before it Breaks</td><td><b>RULING</b> &mdash; CR &sect;1's one refusal</td></tr>
+</table>
+<p><b>SR-BREAK TOTAL: 15 distinct things &mdash; 9 TODAY, 5 SMALL, 1 RULING.</b> Most of the nine are already
+survivors' words, so a merged tree restates them rather than discovers them.</p>
+
+<hr><h2 id="sr-status">SR-STATUS &mdash; STATUSES, GENERICALLY <span style="font-weight:normal">(duration, resistance, how many, what removes them, <code>DEBUFF_IDS</code>, the cleanse path)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-STATUS IN ONE SENTENCE: ONE FUNNEL, 156 IDS, NO MAGNITUDE
+ANYWHERE, ONE VICTIM-SIDE DURATION TERM A NODE CAN WRITE TODAY, THE ONLY APPLIER-SIDE TERM AN ENGINE'S &mdash;
+AND STATUS RESISTANCE DOES NOT EXIST.</b> This is the system FT found authored per site, and the census below
+says what a node can still reach through it: the <i>counts</i> of statuses, never their <i>worth</i>.</p>
+
+<h3>SR-STATUS &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b><code>STATUS_INFO</code>: 156 ids, every entry exactly <code>[label, chip tag, colour, tooltip]</code></b>
+(<code>battle.gd:152-513</code>). <b>No magnitude.</b> The only strength table is
+<code>DOT_STATUSES = {burn: 6, poison: 3}</code>. <b>93 of the 156 never carry a power or tick at any site</b>
+&mdash; their numbers live in the code that reads them.</li>
+<li><b><code>DEBUFF_IDS</code>: 34 ids</b> (<code>unit.gd:19</code>; <code>bleed</code>, <code>melted</code> and
+<code>broken</code> have no <code>STATUS_INFO</code> row), <b>read at 17 code sites</b>: the three cleanses,
+Trapper's breadth, Overwhelm, Iron Will, Pleasure from Pain, Harvest, Salve, Dominant Presence, Downwind,
+Hallowed, Umbral Mirror, and <b>the Occultist's passive, which turns every debuff he lands through a card's data
+field into Ruin</b>. <code>DISPEL_NEVER</code> holds 11.</li>
+<li><b>The funnel, <code>_apply_status</code>: 214 sites, 110 passing a source, 104 not</b>; <b>35 more write
+<code>add_status</code> directly</b> and skip every refusal and extension. The refusals are exactly three: a
+boss's hard control until Broken, Ironclad, Hallowed. The applier-side extensions: Permafrost, Emberkeep, The
+Whole Room, Eternal Ground &mdash; and Sanctity's, keyed on the applier and switched off.</li>
+<li><b>A re-application is NOT uniformly &ldquo;the max of both&rdquo;</b> (<code>unit.gd:2685-2736</code>):
+Poison adds a stack and RESETS the timer, so a shorter one shortens it; Chilled adds a stack (cap 4) and resets;
+Ruin adds a stack; <b>Burn ADDS its turns</b>; only the default branch takes the max of duration and power.</li>
+<li><b>Duration's one general term</b> is <code>mod_status_turns</code> &mdash; keyed on the BEARER, written only by
+the Fleeting modifier (&minus;1), and it moves buffs and debuffs alike. Durations tick at the start of the
+bearer's turn (<code>tick_statuses</code>, <code>unit.gd:2942</code>), stunned and frozen turns included.</li>
+<li><b>Removal is three functions that skip different things</b>: <code>dispel_one_debuff</code> (5 callers),
+<code>purge_debuffs</code> (5), <code>_cleansable_debuffs</code> (the Cleansing Draught and the enemy's Cleansing
+Rite) &mdash; plus 63 <code>remove_status</code> calls and natural expiry.</li>
+<li><b>No status cap exists</b>; Chilled's stack cap is 4.</li>
+</ul>
+
+<h3>SR-STATUS &middot; 2 &middot; Already parametric?</h3>
+<p><b>DURATION: PARTLY</b> &mdash; per call, plus one bearer-side offset that cannot tell a buff from a debuff,
+plus an engine's applier-side term. <b>POTENCY: PER-SITE</b> &mdash; the defining example of the shape.
+<b>RESISTANCE: NOT PARAMETRIC</b> &mdash; Umbral Mirror's chance is the only number. <b>CLEANSING:</b> fixed
+functions, counts per node.</p>
+
+<h3>SR-STATUS &middot; 3 &middot; What a node reaches TODAY</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Effect</th><th>Notes</th></tr>
+<tr><td><code>mod_status_turns</code></td><td>&plusmn;N turns on every timed status landing on the holder</td><td>buffs and debuffs alike; Fleeting ASSIGNS over it</td></tr>
+<tr><td><code>overwhelm_ranks</code></td><td>+damage per distinct debuff on the target</td><td>no class in the guard</td></tr>
+<tr><td><code>iron_will_ranks</code></td><td>&minus;damage taken per debuff on the holder</td><td></td></tr>
+<tr><td><code>pleasure_pct</code></td><td>a party heal per unique enemy debuff</td><td></td></tr>
+<tr><td><code>dominant_ranks</code></td><td>armor per debuff landed</td><td><b>only 18 of 214 sites report to it</b></td></tr>
+<tr><td><code>mirror_ranks</code></td><td>a chance an enemy's debuff rebounds</td><td>party-wide; the only resist-like knob</td></tr>
+<tr><td><code>field_medic</code></td><td>N debuffs washed off afflicted allies a turn</td><td>fully generic</td></tr>
+</table>
+<p><b>Out by the line:</b> <code>force_of_nature</code> (rewrites Trapper &mdash; a passive),
+<code>sanctity_active</code> (an engine's switch), the <code>status_turns</code> payload key (an ability), and the
+Burn and Poison tick fields (owned statuses).</p>
+
+<h3>SR-STATUS &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>Debuffs shorter, buffs untouched</b> &mdash; a <code>DEBUFF_IDS</code> test inside <code>add_status</code>,
+and Fleeting taught to add rather than assign.</li>
+<li><b>This hero's applications last longer</b> &mdash; a field beside Sanctity's line (<code>battle.gd:13082</code>).
+It reaches only the 110 sites that pass a source. <b>And either duration term owes the same edit in the recast
+predictor</b> (<code>_recast_writes</code>, <code>_status_write_improves</code>) &mdash; <code>CLAUDE.md</code>'s
+<i>A STATUS DURATION IS DECLARED TWICE</i>.</li>
+<li><b>Potency, generally &mdash; LARGE.</b> It is Sanctity's missing half, and FP and FT both measured it as the
+largest unbuilt layer in the game.</li>
+<li><b>Resistance</b> &mdash; one check beside Hallowed (<code>:12993</code>) covers every status an enemy puts on
+a hero today (all seven arrive through one data-field path). It must not become a second boss rule.</li>
+<li><b>A payoff per BUFF held &mdash; LARGE</b>: hero bodies carry bookkeeping chips (the passive chips, Faith,
+Loyalty&hellip;), so &ldquo;a buff&rdquo; needs a registry before it can be counted.</li>
+</ul>
+
+<h3>SR-STATUS &middot; 5 &middot; Who owns any of it</h3>
+<p><b>The funnel, the registry, the tick, the three removal functions and <code>DEBUFF_IDS</code> are unowned.</b>
+Individual statuses mostly are not: <b>of the 165 statuses a hero can apply, 23 are an engine's, 112 are one spec's, 26 are shared, and 4 are free</b> &mdash; the full census is <a href="#sr-line-status">SR-LINE's
+status table</a>. <b>A node that reads statuses by COUNT (per debuff, per unique debuff) is free of every one of
+them</b>; a node that reads a named one inherits that status's owner.</p>
+
+<h3>SR-STATUS &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Statuses on this hero last longer or shorter</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>Enemy debuffs rebound</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>Cleanse N a turn</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>Damage per debuff on the target</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>Mitigation per debuff on self</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>A heal per unique enemy debuff</td><td><b>TODAY</b></td></tr>
+<tr><td>7</td><td>Armor per debuff landed</td><td><b>TODAY</b> (18 of 214 sites)</td></tr>
+<tr><td>8</td><td>Debuffs shorter, buffs untouched</td><td>SMALL</td></tr>
+<tr><td>9</td><td>Resist a debuff</td><td>SMALL</td></tr>
+<tr><td>10</td><td>Cleanse on a new trigger</td><td>SMALL</td></tr>
+<tr><td>11</td><td>Applications that cannot be cleansed</td><td>SMALL (&ldquo;sticky&rdquo; exists only for poison)</td></tr>
+<tr><td>12</td><td>Statuses are stronger</td><td>LARGE &mdash; the potency layer</td></tr>
+<tr><td>13</td><td>A payoff per buff held</td><td>LARGE &mdash; a buff registry</td></tr>
+<tr><td>14</td><td>This hero's applications last longer</td><td><b>RULING</b> &mdash; it is Sanctity's own payout, a second writer beside an engine's</td></tr>
+</table>
+<p><b>SR-STATUS TOTAL: 14 distinct things &mdash; 7 TODAY, 4 SMALL, 2 LARGE, 1 RULING.</b></p>
+<hr><h2 id="sr-timeline">SR-TIMELINE &mdash; THE INITIATIVE TIMELINE <span style="font-weight:normal">(delay, turn order, <code>effective_speed</code>, tempo)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-TIMELINE IN ONE SENTENCE: ONE ARITHMETIC EVERYWHERE &mdash;
+<code>delay &times; 100 / effective_speed()</code> &mdash; WITH SPEED A FIELD A NODE CAN ADD TO TODAY, AND
+EVERYTHING CONDITIONAL NEEDING A TERM WHOSE PLACEMENT A STANDING SHAPE AND A GATE ALREADY GOVERN.</b></p>
+
+<h3>SR-TIMELINE &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b><code>effective_speed()</code></b> (<code>unit.gd:3019-3040</code>) multiplies six terms: <code>speed</code>,
+<code>mod_speed_mult</code> (the Frenzied modifier), Slowed &times;0.75, Chilled by stacks, Quick Draw
+&times;1.5, Divine Wrath &times;1.15.</li>
+<li><b>23 <code>next_time</code> writes, all in <code>battle.gd</code> &mdash; 23 before FT and 23 now.</b> 14
+are relative and divide by <code>effective_speed()</code>; 9 place a unit at an absolute point (the opening,
+Watchtower, the Hourglass, a hold, a summon, Rally, Preparation, a free action). <b>FT's own comments say all
+23 divide by it; 14 do.</b></li>
+<li><b>Turn order</b>: <code>_next_unit()</code> takes the smallest <code>next_time</code> among heroes and enemies
+&mdash; <b>companions are never in it</b>, and a tie goes to the hero.</li>
+<li><b>The delay ladder is a standing rule</b> (CY &sect;1, CZ &sect;4): <code>BASIC_DELAY</code> 2.0 &rarr;
+<code>BUFF_DELAY_CAP</code> 1.0 &rarr; <code>DELAY_FLOOR</code> 0.5, each written against the one above.</li>
+<li><b>Momentum's payout is FT's</b> (commit <code>97577a1</code>): <code>momentum_delay_mult()</code>, <b>one
+function read at three sites</b> &mdash; the post-cast schedule, the gated-failure schedule, and the turn bar's
+preview &mdash; floored at 0.68 by the cap, and switched off (<code>momentum_active</code> is written nowhere).
+Its comment is where <i>&ldquo;NOT A SECOND WRITER OF TURN ORDER&rdquo;</i> lives
+(<code>unit.gd:2124-2136</code>); <i>&ldquo;a second set of rules for one question&rdquo;</i> is
+<code>check_ft.gd:601</code>, also FT's.</li>
+<li><b>What moves units:</b> Reality Fracture's <code>delay_push</code> (the only one), Rally
+(<code>_rally_forward</code>), the Cryomancer's Shockwave, the Slowed appliers, Watchtower, Preparation,
+<code>_grant_free_action</code> (two callers, both runes), the Hourglass item, and <b>Tracker &mdash; the Hunter
+CLASS PASSIVE &mdash; which owns the opening move</b>.</li>
+</ul>
+
+<h3>SR-TIMELINE &middot; 2 &middot; Already parametric?</h3>
+<p><b>MOSTLY.</b> One arithmetic, <code>speed</code> a per-unit field, delay per ability. <b>Hard-coded:</b> four
+ability-name delay overrides, an opening seed with no per-hero term, and &ldquo;jump to the front&rdquo; written
+out at five sites (<code>_grant_free_action</code> is the one reusable helper).</p>
+
+<h3>SR-TIMELINE &middot; 3 &middot; What a node reaches TODAY</h3>
+<ul>
+<li><b><code>speed</code></b> &mdash; in the hero's starting config, so a payload adds to it correctly; written
+today by Fletcher's Speed and the Fleetstep relic.</li>
+<li><b><code>watchtower</code></b> &mdash; when any hero falls below 25%, the holder is pulled forward; no class in
+the guard.</li>
+<li><b>Trap:</b> <code>mod_speed_mult</code> (zero-start, and Frenzied assigns over it).</li>
+</ul>
+
+<h3>SR-TIMELINE &middot; 4 &middot; What would need building &mdash; and the constraint the brief names</h3>
+<p style="border:2px solid #a00; padding:8px"><b>A TALENT TEMPO TERM MUST BE READ WHERE MOMENTUM'S IS, OR THE TURN
+BAR DRAWS A TIMELINE THE FIGHT DOES NOT HONOUR.</b> Three sites, not one: the post-cast schedule, the gated
+failure, the preview. <b>And it cannot be a seventh factor in <code>effective_speed()</code></b> without bending
+all fourteen relative writes and compounding with Chilled, Slowed, Quick Draw and Wrath &mdash; the reason FT gave
+for not putting Momentum there. <b><code>check_ft</code> pins <code>momentum_delay_mult()</code> at exactly three
+reads</b>, so a talent term is its own function mirrored at the same three lines, not a fourth read of
+Momentum's.</p>
+<ul>
+<li><b>An opening-position term</b> (<code>battle.gd:1700-1704</code>) &mdash; but the opening move is the Hunter's
+class passive.</li>
+<li><b>Extra turns on a trigger</b> through <code>_grant_free_action</code>, each caller with its own latch (its
+header requires one).</li>
+<li><b>Push-back on a trigger</b>, reusing <code>delay_push</code>'s arithmetic.</li>
+<li><b>A slow floor</b> &mdash; a new <code>effective_speed()</code> term, which would soften Chilled (an engine) as
+well as Slowed.</li>
+<li><b>A party tempo aura</b> &mdash; a spawn-time stamp (the Devoutness pattern).</li>
+</ul>
+
+<h3>SR-TIMELINE &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Engines:</b> Momentum (the delay multiplier, off), Glacial Hold (holds and releases), Chilled (a speed term).
+<b>Class passive:</b> Tracker (the opening). <b>Cards and runes:</b> every ability's delay, Rally, Preparation,
+Quick Draw, Divine Wrath, Reality Fracture; Last Word and Slaughterhouse. <b>Unowned:</b> <code>speed</code>, the
+arithmetic, the ladder's constants, the opening seed for everyone but the Hunter, and turn order itself.</p>
+
+<h3>SR-TIMELINE &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Raw tempo (+Speed)</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>When an ally falls low, I answer</td><td><b>TODAY</b> (the health trigger)</td></tr>
+<tr><td>3</td><td>My turns cost less time</td><td>SMALL &mdash; its own function, read at Momentum's three sites</td></tr>
+<tr><td>4</td><td>Shove an enemy back on a trigger</td><td>SMALL</td></tr>
+<tr><td>5</td><td>Hand an ally my turn on a trigger</td><td>SMALL (<code>_rally_forward</code> exists)</td></tr>
+<tr><td>6</td><td>An extra action on a trigger</td><td>SMALL (<code>_grant_free_action</code>, with a latch)</td></tr>
+<tr><td>7</td><td>A party tempo aura</td><td>SMALL</td></tr>
+<tr><td>8</td><td>First move of the fight</td><td><b>RULING</b> &mdash; the Hunter's class passive</td></tr>
+<tr><td>9</td><td>Slows bite this hero less</td><td><b>RULING</b> &mdash; the same term softens Chilled</td></tr>
+</table>
+<p><b>SR-TIMELINE TOTAL: 9 distinct things &mdash; 2 TODAY, 5 SMALL, 2 RULING.</b></p>
+
+<hr><h2 id="sr-pouch">SR-POUCH &mdash; ITEMS AND THE POUCH</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-POUCH IN ONE SENTENCE: NO NODE HAS EVER TOUCHED IT,
+NO NODE CAN TODAY, AND ITS STRUCTURE SITS ON THE RELIC SIDE OF A STANDING RULE.</b> A node's numbers
+land on a battle config at spawn and nowhere else, so the pouch's slots, caps, prices and loot are
+out of reach until a run-side reader of talents exists &mdash; and <code>CLAUDE.md</code>'s EN &sect;4
+already names <i>&ldquo;the pouch&rdquo;</i> as what a RELIC is for. <b>Using an item mid-fight is the
+one part a node could reach by the talent test, and that needs a field read inside the item's own
+handler.</b></p>
+
+<h3>SR-POUCH &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Item</th><th>Effect</th><th>Price</th><th>Stack cap</th><th>In battle</th><th>On the map</th></tr>
+<tr><td>Health Potion</td><td>20% of the target's max HP (<code>HEALTH_POTION_PCT</code>)</td><td>30</td><td>6</td><td>a heal flagged external</td><td>yes</td></tr>
+<tr><td>Mana Potion</td><td>40% of max resource (<code>MANA_POTION_PCT</code>)</td><td>30</td><td>6</td><td>any living hero, Rage included</td><td>Mana users only</td></tr>
+<tr><td>Bomb</td><td>50 &times; (1 + 0.02 &times; wins) to every enemy; <b>no Break</b></td><td>45</td><td>6</td><td>yes</td><td>refused</td></tr>
+<tr><td>Revive Potion</td><td>a fallen ally at 50%, re-slotted in the turn order</td><td>80</td><td>6</td><td>yes</td><td>yes (see SR-PARTY)</td></tr>
+<tr><td>Defense Potion</td><td>+10% armor to living heroes, 3 turns (<code>fortify</code>)</td><td>40</td><td>6</td><td>yes</td><td>button live, toasts a refusal</td></tr>
+<tr><td>Cleansing Draught</td><td>strip one hero's debuffs</td><td>35</td><td>4</td><td>yes</td><td>refused</td></tr>
+<tr><td>Cursed Visage</td><td><code>hexed</code> on every enemy, battle-long</td><td>100</td><td>2</td><td>yes</td><td>refused</td></tr>
+<tr><td>Resonating Hourglass</td><td>the chosen hero acts next (writes <code>next_time</code>)</td><td>90</td><td>2</td><td>yes</td><td>refused</td></tr>
+</table>
+<ul>
+<li><b>Constants</b> (all <code>run_state.gd</code>): <code>ITEM_SLOTS_BY_ZONE</code> [4, 5, 6] <code>:169</code>;
+<code>ITEM_CAP</code> 6 <code>:116</code>; <code>ITEM_STACK_CAPS</code> <code>:119</code>;
+<code>ITEM_PRICES</code> <code>:138-139</code>; <code>SELL_FRACTION</code> 0.4 <code>:146</code>;
+<code>LOOT_POOL</code> <code>:109-110</code>. The values are functions &mdash;
+<code>health_potion_heal</code> <code>:2572</code>, <code>mana_potion_restore</code> <code>:2576</code>,
+<code>bomb_damage</code> <code>:2583</code>.</li>
+<li><b>Using one costs no turn</b>, one item per hero per turn (<code>battle.gd:5218-5220</code>;
+<code>item_used</code> reset at <code>:3705</code>); the handler is <code>_use_item</code>
+(<code>battle.gd:5229</code>), one arm per item.</li>
+<li><b>Where items come from:</b> the opening pouch (health 2, mana 1, bomb 1, revive 1), the
+<code>start_items</code> relic, elite spoils (one drop plus <code>loot_extra</code>), the severity-2
+bargain reward, events, and the Peddler. <b>Not</b> ordinary fights, the mini-boss or bosses. A grant
+with no free slot becomes a swap offer, always declinable.</li>
+</ul>
+
+<h3>SR-POUCH &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARTLY &mdash; THROUGH ITS INPUTS ONLY.</b> Potency reads max HP, max resource and combat wins;
+there is no multiplier and no per-hero term. Relic hooks reach it party-wide
+(<code>start_items</code>, <code>loot_extra</code>, <code>shop_discount</code>). <b>The Health Potion
+goes through the generic heal pipeline</b> (<code>heal_amount</code>, flagged external), so every
+healing-received term already applies to it.</p>
+
+<h3>SR-POUCH &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>NOTHING ITEM-SPECIFIC.</b> Of 351 distinct dictionary keys in <code>talents.gd</code> and 168 payload
+keys in <code>runes.json</code>, none names an item, gold, the shop or the map, and
+<code>git log -S potion</code> over <code>talents.gd</code> finds no commit at all. <b>Indirectly</b>:
+a healing-received node reaches the Health Potion (counted under <a href="#sr-heal">SR-HEAL</a>, not
+here), and the Warden's Endurance already resets on an external heal, which a potion is.</p>
+<p><b>THE MECHANISM, REPEATED BECAUSE THIS SECTION STANDS ALONE:</b> a node's payload is applied by
+<code>Talents.apply_from_tree</code> into the hero's config inside the battle spawn
+(<code>battle.gd:1202-1203</code>; the sim's own path at <code>:1216</code>) and copied onto the unit.
+<b>Nothing outside battle reads a node's numbers</b> &mdash; the run's only talent reads are the loadout
+handoff, the save's cleanup of unknown ids, ability ownership (which reads grants, and no node
+grants), and display.</p>
+
+<h3>SR-POUCH &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>In battle:</b> a field on the user or the target, read inside the relevant <code>_use_item</code> arm.
+<b>And the sim's potion does not go through that function</b>: the bot drinks at <code>battle.gd:3778-3788</code>
+for a flat <b>40</b> (<code>heal_amount(40, true)</code>), not the shared 20% &mdash; so a hook in
+<code>_use_item</code> would miss every sim, and the sim already measures a different potion from the
+player's (a queue finding; see the report).</li>
+<li><b>The pouch's structure</b> &mdash; slots, caps, prices, sale value, loot rolls &mdash; is read only
+by run, shop and map code. <b>Reaching any of it needs a run-side reader of equipped talents, which
+does not exist.</b></li>
+</ul>
+
+<h3>SR-POUCH &middot; 5 &middot; Who owns any of it</h3>
+<ul>
+<li><b>No rune, ability, passive or engine.</b> Items share machinery with abilities &mdash;
+<code>revive()</code> with Resurrection, the cleanse derivation with Cleansing Rite, <code>next_time</code>
+with the Watchtower &mdash; but own none of it, and <code>fortify</code> and <code>hexed</code> are
+applied by an item and by nothing else.</li>
+<li><b>EN &sect;4 (standing): &ldquo;If it sets the run up &mdash; the purse, the pouch, the shop
+&hellip; &mdash; it is a RELIC.&rdquo;</b> By that rule the pouch's structure is relic territory.
+<b>Using</b> an item is read inside a hero's turn, which is the rule's test for a talent.</li>
+<li><b>AND A NODE KEYED ON USE DEPENDS ON THE POUCH HOLDING SOMETHING.</b> The standing charter (DO/DP) names abilities and statuses; an item is neither, so whether such a node is a bet is a reading rather than a rule. Only the opening four items are guaranteed, and only at the start of a run.</li>
+</ul>
+
+<h3>SR-POUCH &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Status</th></tr>
+<tr><td>1</td><td>Items this hero uses are stronger</td><td>SMALL &mdash; a field per arm</td></tr>
+<tr><td>2</td><td>More than one item a turn</td><td>SMALL</td></tr>
+<tr><td>3</td><td>A chance an item is not consumed</td><td>SMALL</td></tr>
+<tr><td>4</td><td>Using an item moves the user's own initiative</td><td>SMALL</td></tr>
+<tr><td>5</td><td>A revived hero returns stronger</td><td>SMALL (shared with SR-PARTY)</td></tr>
+<tr><td>6</td><td>The Bomb breaks</td><td>SMALL</td></tr>
+<tr><td>7</td><td>More slots, deeper stacks</td><td><b>RULING</b> &mdash; EN &sect;4 (the relic side)</td></tr>
+</table>
+<p><b>SR-POUCH TOTAL: 7 distinct things &mdash; 0 TODAY, 6 SMALL, 1 RULING (EN &sect;4).</b> A node keyed on USING an item depends on the pouch holding one; the standing charter names abilities and statuses, not items, so whether that is a bet is a reading (<a href="#sr-line">SR-LINE</a> D).</p>
+
+<hr><h2 id="sr-crit">SR-CRIT &mdash; CRIT <span style="font-weight:normal">(the base rate, the surplus conversion, the multiplier)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-CRIT IN ONE SENTENCE: CHANCE IS AN ADDITIVE TABLE WITH ONE
+UNOWNED FIELD THAT EVERY ROLL READS; THE MULTIPLIER IS A LITERAL TYPED FOUR TIMES; THE SURPLUS RATE IS ONE RULED
+CONSTANT.</b> FP's warning stands beside it: the Sharpshooter's twelve survivors are proof the dial works, not
+proof there is room left on it.</p>
+
+<h3>SR-CRIT &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Thing</th><th>Value / shape</th><th>Where</th></tr>
+<tr><td><code>CRIT_CHANCE</code></td><td>0.10</td><td><code>battle.gd:7802</code></td></tr>
+<tr><td>The crit multiplier</td><td><b>1.5, a literal at four places</b> &mdash; no constant. Lethal Aim replaces it with
+2.0 and more (a passive)</td><td><code>battle.gd:9085, 14675, 22465, 22622</code></td></tr>
+<tr><td><code>CRIT_EXCESS_STEP</code></td><td>0.50 (EW's conversion; the rate ruled at EX) through
+<code>_crit_excess_mult</code>, at the four roll sites: the strike loop, heal crits, the ghost hit, the companion
+hit</td><td><code>battle.gd:7831</code>; <code>:14661-14662</code></td></tr>
+<tr><td>The strike loop's chance</td><td><b>12 statements, 13 terms</b>: the base (0.25 on Pommel Strike) and +0.25
+against a Broken target; Resonance (engine); <code>crit_bonus</code>; Aguila's boon (engine); against a Stunned
+target (a node); Overpower (an ability); the Aggressive stance (engine); Detonation (an ability); against a Held
+target (engine); Sweeping Strikes (an ability); Focus and Tunnel Vision (engine)</td>
+<td><code>battle.gd:8987-9037</code></td></tr>
+<tr><td>On-crit riders</td><td><b>check no class</b>: Follow-Through, Sundering Shot, Exposed Nerve, Through and
+Through. Five more riders force a crit after the roll (White Heat has no writer)</td>
+<td><code>battle.gd:10699-10716</code>; <code>:9041-9069</code></td></tr>
+<tr><td>Heal crits</td><td>only while <code>triage_heal</code> is non-zero</td><td><code>battle.gd:14671-14676</code></td></tr>
+<tr><td>Penetration</td><td><code>ab.armor_pierce + pierce_bonus</code>, clamped; armor capped at 0.85;
+<code>ab.armor_pierce</code> is set by nothing but the Piercing upgrade</td><td><code>battle.gd:10337-10359</code></td></tr>
+<tr><td>A crit's Break</td><td>a flat &times;1.5</td><td><code>battle.gd:10401</code></td></tr>
+</table>
+
+<h3>SR-CRIT &middot; 2 &middot; Already parametric?</h3>
+<p><b>CHANCE: PARAMETRIC</b> &mdash; one base constant, one surplus helper, and <code>crit_bonus</code> reaching all
+four rolls (a companion inherits it). <b>MULTIPLIER: PER-SITE</b> &mdash; four literals. <b>SURPLUS RATE:</b> one
+constant, no per-hero term. <b>PENETRATION: PARAMETRIC.</b></p>
+
+<h3>SR-CRIT &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b><code>crit_bonus</code></b> and <b><code>pierce_bonus</code></b> (both in <code>check_em</code>'s
+<code>UNIT_MATH</code>, the nine fields both layers write), and the on-crit rider fields, read with no class check:
+<code>follow_through</code>, <code>sundering_shot</code>, <code>exposed_nerve</code>, <code>whetstone</code>,
+<code>temporal_ranks</code>, <code>through_and_through</code> (which welds &ldquo;ignore armor&rdquo; to &ldquo;a
+crit refunds its cost&rdquo;). <code>precision_ranks</code> works and reads a <b>Stunned</b> target &mdash; a status
+only some cards apply.</p>
+
+<h3>SR-CRIT &middot; 4 &middot; What would need building</h3>
+<p>A crit-multiplier field (the four literals); a per-hero surplus rate; a party crit aura; heal crits without
+Triage's healing bundled in; crits that Break harder; resistance to penetration (the only field is a rune's).</p>
+
+<h3>SR-CRIT &middot; 5 &middot; Who owns any of it</h3>
+<p><b><code>crit_bonus</code> and <code>pierce_bonus</code> belong to nobody</b> &mdash; nodes, runes, a relic and a
+battle modifier write them. The Resonance, Aguila, stance, Held, Focus and Tunnel Vision terms ride engines; the
+Pommel Strike, Overpower, Detonation and Sweeping Strikes terms ride abilities. <b>EW's standing rule:</b> the
+conversion reads the ASSEMBLED TOTAL, never a source &mdash; a node adds chance and never owns the ceiling.</p>
+
+<h3>SR-CRIT &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>More crit chance</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>A crit pays (a cooldown tick, Break, a status, Attack, a refund)</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>Armor penetration</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>Crit against a target state (Broken already pays everyone; others)</td><td>SMALL</td></tr>
+<tr><td>5</td><td>Crit damage</td><td>SMALL (four literals)</td></tr>
+<tr><td>6</td><td>A party crit aura</td><td>SMALL</td></tr>
+<tr><td>7</td><td>Heals can crit, unbundled</td><td>SMALL</td></tr>
+<tr><td>8</td><td>Crits Break harder</td><td>SMALL</td></tr>
+<tr><td>9</td><td>Enemies penetrate this hero less</td><td>SMALL</td></tr>
+<tr><td>10</td><td>This hero's surplus converts at another rate</td><td><b>RULING</b> &mdash; EX ruled the rate</td></tr>
+</table>
+<p><b>SR-CRIT TOTAL: 10 distinct things &mdash; 3 TODAY, 6 SMALL, 1 RULING.</b></p>
+
+<hr><h2 id="sr-loadout">SR-LOADOUT &mdash; THE LOADOUT <span style="font-weight:normal">(slot count, the growth ladder, swap cost, the no-return ledger)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-LOADOUT IN ONE SENTENCE: FP CALLED IT THE MOST INTERESTING
+UNSPENT SYSTEM, AND TODAY IT IS ENTIRELY OUT OF REACH &mdash; NO LOADOUT FUNCTION READS A HERO'S TALENTS, THE SLOT CAP
+TAKES NO HERO, AND THERE IS NO SWAP COST TO DISCOUNT.</b></p>
+
+<h3>SR-LOADOUT &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>The ladder:</b> <code>ABILITY_SLOTS_BY_BOSS</code> [7, 8, 9, 10] (<code>run_state.gd:1873</code>);
+<code>ability_slot_cap()</code> is indexed by zone bosses cleared and <b>takes no hero &mdash; party-wide by
+construction</b> &mdash; and is called on 12 lines. <code>core_slots</code> is 3 (the Holy's 4).</li>
+<li><b>Pool and loadout:</b> <code>bm_abilities</code> never shrinks; <code>bm_equipped</code> defaults to the
+whole pool. The doors: unequip, equip (refused when full), <code>hold_ability</code>.</li>
+<li><b>The no-return ledger:</b> <code>decline_draft</code> refuses the WHOLE offer and is the ledger's only
+writer; the zone-boss chain (boss pool &rarr; spec draft &rarr; class draft) never reads it.</li>
+<li><b>The offer:</b> three cards (the literal 3, in four places), each 25% class-wide, filling short; from elites
+(every living hero) and an event verb. <b>The merchant's draft is retired</b> (FD &sect;1).</li>
+<li><b>Swaps happen on the map only</b>, and as a bench-when-full choice while taking a card; never in battle.
+<b>THERE IS NO SWAP COST</b> &mdash; benching has been free and reversible since EG. <b>There is no reroll.</b></li>
+</ul>
+
+<h3>SR-LOADOUT &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARTLY</b> &mdash; the cap by boss count only; the offer size a literal in four places; the class share one
+constant; the ledger nothing.</p>
+
+<h3>SR-LOADOUT &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>NOTHING.</b> A node's payload lands on a battle config at spawn and nowhere else, and no loadout function
+reads a hero's talents.</p>
+
+<h3>SR-LOADOUT &middot; 4 &middot; What would need building</h3>
+<p><b>A map-time read of the hero's talents</b> &mdash; cheap in principle: they sit on the member record, fixed for
+the run, and <code>Talents.has_node</code> already answers the question. <b>A per-hero slot bonus then changes
+<code>ability_slot_cap()</code> and its twelve callers</b>; an offer-size dial changes four literals.</p>
+
+<h3>SR-LOADOUT &middot; 5 &middot; Who owns any of it</h3>
+<p><b>No rune, ability, passive or engine.</b> A core-size dial would touch passive data (the core is sized to what
+each passive needs). <b>EG's standing rulings bind</b>: a bench is not a drop, the no-return rule, the cap binds
+every source. <b>And EN &sect;4 reaches in</b>: the offer is rolled on the elite and victory paths, and &ldquo;elite
+spoils&rdquo; and the victory screen are RELIC read sites.</p>
+
+<h3>SR-LOADOUT &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>An extra ability slot for this hero</td><td>LARGE (then SMALL)</td></tr>
+<tr><td>2</td><td>Reroll an offer</td><td>LARGE</td></tr>
+<tr><td>3</td><td>A fourth card in draft offers</td><td><b>RULING</b> &mdash; EN &sect;4 (elite spoils)</td></tr>
+<tr><td>4</td><td>A fourth card in the boss offer</td><td><b>RULING</b> &mdash; EN &sect;4 (what a victory pays)</td></tr>
+<tr><td>5</td><td>A tilted spec / class split</td><td><b>RULING</b> &mdash; EN &sect;4 (the same roll)</td></tr>
+<tr><td>6</td><td>A second pick from an elite</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>7</td><td>Refused cards come back</td><td><b>RULING</b> &mdash; EG's no-return ledger</td></tr>
+<tr><td>8</td><td>Decline one card, not the offer</td><td><b>RULING</b> &mdash; the same ledger</td></tr>
+</table>
+<p><b>SR-LOADOUT TOTAL: 8 distinct things &mdash; 0 TODAY, 2 LARGE, 6 RULING.</b> A swap cost is not a dial: there is
+none, and adding one would reverse EG.</p>
+<hr><h2 id="sr-gold">SR-GOLD &mdash; GOLD AND THE SHOP <span style="font-weight:normal">(the Peddler, the smith, the sell-back)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-GOLD IN ONE SENTENCE: EVERY DIAL IS A LITERAL OR A
+PARTY-WIDE RELIC SUM, NO NODE REACHES ANY OF THEM, AND EN &sect;4 NAMES THE PURSE AND THE SHOP AS
+RELIC TERRITORY.</b> The one gold idea a talent could own by the standing rule is gold read
+<i>during a fight</i>.</p>
+
+<h3>SR-GOLD &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Gold in</th><th>Amount</th><th>Where</th></tr>
+<tr><td>Run start</td><td>60, plus the <code>start_gold</code> relics</td><td><code>run_state.gd:590</code></td></tr>
+<tr><td>A win, by node</td><td>fight 45&ndash;60; elite and mini-boss 80&ndash;100; zone boss 110&ndash;130;
+end boss 150&ndash;180; all &times; (1 + <code>gold_find_mult</code>)</td><td><code>award_gold</code>
+<code>run_state.gd:2411-2430</code></td></tr>
+<tr><td>A bargain</td><td>severity 1/2/3/4 pays 40/80/140/220 (&times; <code>gold_find_mult</code>)</td>
+<td><code>run_state.gd:2674-2679, 2800-2805</code></td></tr>
+<tr><td>Relics, events, selling</td><td><code>victory_gold</code> +20; 16 event effects (+20 to +200, &minus;30 to
+&minus;200, one &minus;25%); an item sells for 40% of its discounted price</td><td><code>battle.gd:25002</code>;
+<code>events.gd:221-227</code>; <code>shop_screen.gd:327-353</code></td></tr>
+</table>
+<ul>
+<li><b>Gold out:</b> items at list price &times; (1 &minus; <code>shop_discount</code>); <b>runes at 100</b>
+(all 60 live); the blacksmith at 150 / 225 / 300 by zone (<code>run_state.gd:3321-3327</code>); events;
+<code>draft_price()</code> is kept and <b>has no caller</b>.</li>
+<li><b>The Peddler IS the merchant</b>: the <code>merchant</code> node type (five a zone), labelled TRADE,
+opening <code>shop_screen.gd</code> titled &ldquo;The Wandering Peddler&rdquo;. It sells all eight
+items without running out, one rune offer per hero per visit, <b>no reroll</b>, and a two-press Sell.
+A severity-4 bargain can summon one after the fight.</li>
+<li><b>The blacksmith</b> (six a zone) offers three upgrades across the party; one purchase ends the
+visit.</li>
+</ul>
+
+<h3>SR-GOLD &middot; 2 &middot; Already parametric?</h3>
+<p><b>ONLY THROUGH PARTY-WIDE RELIC SUMS</b> &mdash; <code>start_gold</code>, <code>gold_find_mult</code>,
+<code>victory_gold</code>, <code>shop_discount</code>. Every other number is a literal and nothing has a
+per-hero term.</p>
+
+<h3>SR-GOLD &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>NONE.</b> <code>award_gold</code> reads the node type, a roll and relic hooks; the shop, smith,
+bargain and event screens never name a talent. A node's payload lands on the battle config at spawn
+(<code>battle.gd:1202-1203</code>) and nowhere else.</p>
+
+<h3>SR-GOLD &middot; 4 &middot; What would need building</h3>
+<p><b>A run-side reader of equipped talents</b> at <code>award_gold</code>, the price functions, the sale
+value and the bargain's payout &mdash; and it would be a party-wide sum shaped exactly like
+<code>relic_add</code>, which is the argument that it is a relic's job rather than a talent's.</p>
+
+<h3>SR-GOLD &middot; 5 &middot; Who owns any of it</h3>
+<p><b>No rune, ability, passive or engine.</b> <b>EN &sect;4 names &ldquo;the purse&rdquo;, &ldquo;the
+shop&rdquo; and &ldquo;what a victory pays&rdquo; as RELIC territory</b>, by read site. The one exception
+the rule's own test allows is gold read while a turn resolves.</p>
+
+<h3>SR-GOLD &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Status</th></tr>
+<tr><td>1</td><td>More gold per win</td><td><b>RULING</b> &mdash; EN &sect;4 (a party-wide relic hook already exists)</td></tr>
+<tr><td>2</td><td>A better sell-back</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>3</td><td>One sink priced apart (the smith, runes or items)</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>4</td><td>A second commission at the smith</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>5</td><td>More rune offers, or a reroll, at the Peddler</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>6</td><td>A bigger or different bargain payout</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+<tr><td>7</td><td>Gold held is power in a fight</td><td>SMALL &mdash; <b>talent side</b> (read mid-turn)</td></tr>
+</table>
+<p><b>SR-GOLD TOTAL: 7 distinct things &mdash; 0 TODAY, 1 SMALL, 6 RULING &mdash; all six on the relic side of a standing rule the designer's line does not mention.</b></p>
+
+<hr><h2 id="sr-map">SR-MAP &mdash; THE MAP <span style="font-weight:normal">(routing, node types, the bargain, the severity floor)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-MAP IN ONE SENTENCE: A REAL ROUTING CHOICE AND A
+BARGAIN TABLE, PARAMETRIC ONLY BY THE DIFFICULTY RUNG, REACHED BY NO NODE &mdash; AND THERE ARE NO REST
+NODES.</b> What a rest does is answered by <i>nothing</i>: rests were removed at AN &sect;6, and the one
+relic hook left for them is read by nothing.</p>
+
+<h3>SR-MAP &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>Structure:</b> three zones of 16 slots plus the end boss's slot on the last board &mdash; 49
+encounters. Per zone: 6 elites (non-adjacent columns), 6 blacksmiths, 5 merchants, 5 events, fights
+fill the rest; the mini-boss at slot 7, the zone boss at 15 (<code>run_state.gd:23-61, 780-851</code>).</li>
+<li><b>Routing is a real choice:</b> 14 branching columns &times; 3 rows, 2&ndash;3 wide, non-crossing
+weighted edges, all converging on the mini-boss and the boss. <code>DOD_SIM_ROUTE</code> only picks the
+bot's preference.</li>
+<li><b>No rests.</b> Clearing any slot heals the party <code>SLOT_HEAL_PCT</code> 0.15 plus the
+<code>victory_heal_pct</code> relic (<code>run_state.gd:2912-2916</code>). <b><code>rest_heal_add</code>
+has no read site</b> &mdash; it appears only as data on two relics (<code>relics.gd:69, 118</code>).</li>
+<li><b>The bargain:</b> before every elite and mini-boss, three options and no decline; 20 modifiers at
+severities 1&ndash;4 (6/6/4/4), each with a reward by severity. <code>roll_offer</code> draws one
+&ldquo;safe&rdquo; option at or below <code>severity_floor</code> &mdash; 2, 3 and 4 at rungs 1&ndash;3
+&mdash; and the rest from above it (<code>run_state.gd:2719-2754, 1101-1111</code>).
+<code>arm_fixed_modifier</code> (rung 3 only) puts a severity-3+ modifier on the mini-boss and bosses
+with no reward.</li>
+</ul>
+
+<h3>SR-MAP &middot; 2 &middot; Already parametric?</h3>
+<p><b>ONLY BY THE DIFFICULTY RUNG</b> (the severity floor and the fixed modifier). The one map relic hook
+is dead.</p>
+
+<h3>SR-MAP &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>NONE.</b> Generation, composition, <code>roll_offer</code> and <code>arm_fixed_modifier</code> read
+no talent; <code>map_screen.gd</code>'s talent reads are display and debug. A node's payload lands on the
+battle config at spawn and nowhere else. <i>(A bargain's modifiers act on unit fields while turns
+resolve; whether a node could safely write those fields was not traced.)</i></p>
+
+<h3>SR-MAP &middot; 4 &middot; What would need building</h3>
+<p><b>The same run-side talent reader SR-GOLD needs</b>, at generation, routing, the offer and the
+reward. A per-hero resistance to a modifier is different: it is <b>a field read at each modifier's read
+site</b>, inside the fight.</p>
+
+<h3>SR-MAP &middot; 5 &middot; Who owns any of it</h3>
+<p><b>No rune, ability, passive or engine. The DIFFICULTY RUNG owns the severity floor and the fixed
+modifier</b>, and two standing rules guard the rung (EO &sect;2 and EP &sect;2): <b>a node that exempts a
+hero from what a rung asks is a ruling, not a dial.</b> EN &sect;4 puts the spawn line and elite drops on
+the relic side.</p>
+
+<h3>SR-MAP &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Status</th></tr>
+<tr><td>1</td><td>Scouting &mdash; see an event's kind or a boss before stepping on it (both hidden on purpose)</td><td>LARGE</td></tr>
+<tr><td>2</td><td>Travel off the drawn edges (the debug free-travel flag is the precedent)</td><td>LARGE</td></tr>
+<tr><td>3</td><td>A different bargain &mdash; a fourth option, a reroll, a decline, a chosen severity</td><td><b>RULING</b> &mdash; the rung owns the bargain's floor (EO &sect;2, EP &sect;2)</td></tr>
+<tr><td>4</td><td>A modifier bites this hero less</td><td>SMALL &mdash; talent side (read mid-fight)</td></tr>
+<tr><td>5</td><td>Rung 3's fixed modifier spares this hero</td><td><b>RULING</b> &mdash; the rung's rules</td></tr>
+<tr><td>6</td><td>Clearing a slot heals this hero more</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+</table>
+<p><b>SR-MAP TOTAL: 6 distinct things &mdash; 0 TODAY, 1 SMALL, 2 LARGE, 3 RULING.</b></p>
+
+<hr><h2 id="sr-party">SR-PARTY &mdash; THE PARTY <span style="font-weight:normal">(death, the refusals, revive, the end-of-battle heal)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-PARTY IN ONE SENTENCE: INSIDE A FIGHT IT IS ALREADY
+TALENT TERRITORY &mdash; FOUR DEATH-REFUSING FIELDS ARE NODE FIELDS &mdash; AND BETWEEN FIGHTS IT IS
+LITERALS AND RELIC SUMS.</b> There is no &ldquo;downed&rdquo; state anywhere in the repo: a hero is alive
+or <code>dead</code>, and <b>a won fight returns every fallen hero at 20%</b>, so the map never holds a
+fallen hero.</p>
+
+<h3>SR-PARTY &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>The four death refusals (both <code>take_hit</code> and <code>take_tick_damage</code>)</th><th>Granted by</th></tr>
+<tr><td>the <code>undying</code> status (<code>unit.gd:3567 / 3880</code>)</td><td>Hold the Line &mdash; an ability</td></tr>
+<tr><td><code>undying_rage</code>, once a battle (<code>:3572 / 3883</code>)</td><td>node <code>bz_undying</code> &mdash; <b>no spec in the guard</b></td></tr>
+<tr><td><code>_ashes_guard</code>, once a battle (<code>:3577 / 3888</code>)</td><td>Ashes of Al'ar &mdash; an ability</td></tr>
+<tr><td><code>_holy_reversal</code>: Rite of Return, then Intercession, then Martyrdom (returns at 30%)
+(<code>:3578 / 3889</code>)</td><td>two Holy abilities and node <code>hl_capacitor</code></td></tr>
+</table>
+<ul>
+<li><b>Lethal-hit caps before the blow lands:</b> Stable Alignment (node <code>ar_stable</code>, caps one
+hit, <code>unit.gd:3458</code>); Event Horizon (reads Resonance &mdash; an engine); Kiln-Forged (reads
+Burning foes &mdash; an engine); Bloodbond and Bear the Brunt (abilities).</li>
+<li><b><code>revive()</code> has two callers</b>: the Revive Potion (50%) and Resurrection (25%, or 100%
+empowered). Revival is the Holy's exclusive axis among abilities and not exclusive as a channel.</li>
+<li><b>No &ldquo;downed&rdquo; state</b> &mdash; a case-insensitive search of every <code>.gd</code>,
+<code>.md</code>, <code>.html</code> and <code>.json</code> in the repo finds none.</li>
+<li><b>After a won fight:</b> <code>sync_victory_state</code> sets every hero to at least 20% of max
+(<code>unit.gd:1039-1041</code>), then the slot-clear heal adds 15%; +2% base Attack and HP per win
+(<code>battle.gd:1388-1396</code>); a new zone fully restores HP and Mana
+(<code>run_state.gd:2215-2227</code>). <b>What carries:</b> HP, max HP, Mana (Mana users), two rune
+carries. <b>What does not:</b> statuses, cooldowns, Rage, other second resources, and death.</li>
+</ul>
+
+<h3>SR-PARTY &middot; 2 &middot; Already parametric?</h3>
+<p><b>IN A FIGHT, YES</b> &mdash; <code>undying_rage</code>, <code>martyrdom</code>, <code>stable_ranks</code>
+are node fields read with no spec guard. <b>BETWEEN FIGHTS, NO</b> &mdash; the 20% floor, the revive
+fractions, the 30% and the zone restore are literals; the victory heal and mana are relic sums.</p>
+
+<h3>SR-PARTY &middot; 3 &middot; What a node reaches TODAY</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Effect</th><th>Under the line?</th></tr>
+<tr><td><code>undying_rage</code></td><td>refuse death once a battle</td><td><b>YES</b></td></tr>
+<tr><td><code>stable_ranks</code></td><td>cap one hit at a share of max HP</td><td><b>YES</b></td></tr>
+<tr><td>the lethal-hit resource payments (Rage at <code>unit.gd:3436</code>, Mana at <code>:3448</code>)</td>
+<td>part of a lethal hit is paid from the class resource</td><td><b>YES</b> &mdash; the class resource is
+not on the line's list</td></tr>
+<tr><td><code>martyrdom</code></td><td>the first hero to fall returns at 30%</td><td><b>A RULING</b> &mdash; it
+rides the Holy's revival chain and rewrites Resurrection</td></tr>
+</table>
+
+<h3>SR-PARTY &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>A field read inside <code>sync_victory_state</code></b> &mdash; the two rune carries (Resonance,
+Mercy) are the working precedent: read at the sync, stored on the member, read back at spawn.</li>
+<li><b>Revive-on-death</b> is on the relic header's own NEEDS PLUMBING list.</li>
+<li><b>A persistent death</b>, if falling is ever meant to matter after the fight.</li>
+</ul>
+
+<h3>SR-PARTY &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Revival is the Holy's</b> as an ability (and not as a channel). <b>The victory heal is relic side
+by EN &sect;4; the death refusals are read mid-turn, so talent side.</b> Two refusals and two caps are
+abilities', and two caps read engines.</p>
+
+<h3>SR-PARTY &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Status</th></tr>
+<tr><td>1</td><td>Refuse death once</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>Cap the size of one hit</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>Pay a lethal hit out of the class resource</td><td><b>TODAY</b> (Rage and Mana forms)</td></tr>
+<tr><td>4</td><td>The first to fall returns</td><td><b>RULING</b> &mdash; the Holy's revival axis, and it rewrites Resurrection</td></tr>
+<tr><td>5</td><td>A fallen hero leaves the fight higher than 20%</td><td><b>RULING</b> &mdash; EN &sect;4 (the victory screen)</td></tr>
+<tr><td>6</td><td>Carry something into the next fight &mdash; resource, a second resource, a status</td><td><b>RULING</b> &mdash; EN &sect;4's overlap (read at the victory and at the spawn)</td></tr>
+<tr><td>7</td><td>This hero returns stronger when revived</td><td>SMALL</td></tr>
+<tr><td>8</td><td>This hero's share of the victory heal</td><td><b>RULING</b> &mdash; EN &sect;4</td></tr>
+</table>
+<p><b>SR-PARTY TOTAL: 8 distinct things &mdash; 3 TODAY, 1 SMALL, 4 RULING.</b></p>
+<hr><h1 id="sr-added">SR-ADDED &mdash; THE SYSTEMS THE BRIEF'S LIST MISSED</h1>
+<p><i>The brief's list was written from memory and asked for what it missed. Every section below is a
+universal system no single spec's engine owns, found by sweeping the code rather than by recalling it.
+Each stands alone.</i></p>
+
+<hr><h2 id="sr-stats">SR-STATS &mdash; THE BASE STATS AND THE DAMAGE PIPELINE</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-STATS IN ONE SENTENCE: EVERY SCALAR STAT IS A FIELD A NODE CAN
+ADD TO, AND THE TWO DICTIONARIES &mdash; RESISTANCES AND PER-TYPE DAMAGE &mdash; CANNOT BE WRITTEN BY A PAYLOAD AT
+ALL.</b> This is where stat creep lives, and there are about a dozen distinct stats to creep.</p>
+
+<h3>SR-STATS &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Class base</th><th>Health</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource</th></tr>
+<tr><td>Warrior</td><td>154</td><td>0.25</td><td>95</td><td>110</td><td>Rage, 0 of 100</td></tr>
+<tr><td>Mage</td><td>99</td><td>0.10</td><td>110</td><td>85</td><td>Mana, 100 of 100</td></tr>
+<tr><td>Cleric</td><td>121</td><td>0.15</td><td>85</td><td>100</td><td>Mana, 100 of 100</td></tr>
+<tr><td>Hunter</td><td>110</td><td>0.12</td><td>105</td><td>95</td><td>Mana, 100 of 100</td></tr>
+</table>
+<ul>
+<li><b>Each spec overrides health, armor and constitution</b> (<code>SPEC_INFO</code>) &mdash; so a merged class
+needs one stat line, which FP &sect;1b already called a decision with a cliff under it. Attack comes from role
+(Damage 100, Tank 75, Support 50). <b>Resistances are a per-spec dictionary over seven damage types.</b></li>
+<li><b>The strike's damage:</b> <code>damage% &times; attack &times; randf_range(0.9, 1.1) &times; grade</code>, the
+parry's &times;0.25, the crit, then <code>&times; (1 + dmg_bonus + channel_bonus + type_dmg_bonus[type])</code>
+&mdash; <b>the one general damage multiplier in the game, read at one site</b> (<code>battle.gd:9807-9815</code>)
+&mdash; then <code>&times; (1 + dmg_taken_bonus)</code>, resistance by type, penetration, armor, a floor of 1.
+Around it sit roughly 120 other modifications of the raw figure, <b>almost all of them on a named ability, a status,
+an engine or one node's field</b>.</li>
+<li><b><code>check_em.UNIT_MATH</code> lists the nine fields both layers write</b>, asserted as an equality:
+<code>crit_bonus</code>, <code>speed</code>, <code>max_hp_pct</code>, <code>block_chance</code>,
+<code>parry_bonus</code>, <code>dmg_bonus</code>, <code>dmg_taken_bonus</code>, <code>pierce_bonus</code>,
+<code>bleed_bonus</code>.</li>
+</ul>
+
+<h3>SR-STATS &middot; 2 &middot; Already parametric?</h3>
+<p><b>SCALARS: PARAMETRIC</b> &mdash; any declared field lands on the unit. <b>DICTIONARIES: NOT</b> &mdash; payloads
+write scalars only, which is why Ashen Skin needed a spawn line of its own. <b>The roll's range and the grades:</b>
+literals.</p>
+
+<h3>SR-STATS &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>Clean:</b> <code>max_hp_pct</code>, <code>attack</code>, <code>dmg_bonus</code>, <code>dmg_taken_bonus</code>
+&mdash; plus the stats counted in their own sections (<code>speed</code>, <code>stability</code>,
+<code>constitution</code>, <code>crit_bonus</code>, <code>parry_bonus</code>, <code>pierce_bonus</code>,
+<code>max_resource</code>). <b><code>armor</code> and flat <code>max_hp</code> work mechanically</b> and are also
+written by runes (retired ones). <b>Traps:</b> <code>parry_chance</code> (write <code>parry_bonus</code>),
+<code>healing_received_mult</code> and <code>mana_regen_bonus</code> (class passives assign over them &mdash; see
+<a href="#sr-plumb">SR-PLUMB</a>).</p>
+<p><b>AND AN INSTRUMENT EDIT RIDES WITH SOME OF THEM:</b> <code>check_em</code> &sect;1 walks every entry of <code>runes.json</code>, retired ones included, so a new node writing <code>armor</code> or flat <code>max_hp</code> &mdash; fields retired runes wrote &mdash; takes it red until <code>UNIT_MATH</code> gains a row with its reason (<a href="#sr-plumb">SR-PLUMB</a>, trap 7).</p>
+
+<h3>SR-STATS &middot; 4 &middot; What would need building</h3>
+<p><b>Per-type damage and per-type resistance</b> &mdash; a dictionary hook at the spawn, Ashen Skin's pattern
+(LARGE); <b>the roll's range</b> (SMALL).</p>
+
+<h3>SR-STATS &middot; 5 &middot; Who owns any of it</h3>
+<p><b>The scalar pipelines belong to nobody. The one general damage multiplier is shared with Channel</b>, a class
+spine that is switched off. <code>healing_received_mult</code> is the Cleric class passive's field and
+<code>mana_regen_bonus</code> the Mage's. <b>And EN &sect;4's rune clause</b> (&ldquo;a stat, a resource&rdquo;) puts
+stats in both layers, separated by scope &mdash; the run's kit or the account's &mdash; not by field.</p>
+
+<h3>SR-STATS &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>More health</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>More Attack</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>More armor</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>More damage dealt</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>Less damage taken</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>A steadier roll</td><td>SMALL</td></tr>
+<tr><td>7</td><td>More damage of one type</td><td>LARGE</td></tr>
+<tr><td>8</td><td>Resist one type</td><td>LARGE</td></tr>
+</table>
+<p><b>SR-STATS TOTAL: 8 distinct things &mdash; 5 TODAY, 1 SMALL, 2 LARGE.</b> Crit, penetration, parry, block, speed,
+constitution, stability, the pool and Bleed are counted in their own sections.</p>
+
+<hr><h2 id="sr-heal">SR-HEAL &mdash; HEALING AND SHIELDS</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-HEAL IN ONE SENTENCE: THE RECEIVE PIPELINE IS SHARED BUT ITS ONE
+MULTIPLIER IS A TRAP AND A CLASS PASSIVE'S; &ldquo;HEALING DONE&rdquo; REACHES 11 OF 68 HEAL CALLS AND SITS BESIDE AN
+ENGINE; SHIELDS HAVE NO POTENCY TERM AT ALL.</b></p>
+
+<h3>SR-HEAL &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>Receiving</b> is <code>heal_amount</code> (<code>unit.gd:3962-4095</code>): the refusals, then
+<code>healing_received_mult</code> (1.0 on the unit; <b>the Cleric class passive assigns 1.15 after the tree</b>),
+Rally &times;1.30, Frostbite &times;0.5, Last Hope below 25%, a floor at zero, overheal recorded.</li>
+<li><b>Doing</b> is <code>_healing_done_mult</code> = 1 + Mercy (the Holy's engine) + <code>triage_heal</code> +
+<code>sanctum</code> &mdash; <b>applied at 11 of the 68 <code>heal_amount</code> call lines</b>
+(<code>battle.gd:14633-14640</code>). Heal crits need Triage. Overheal feeds only Holy lanes.</li>
+<li><b>Lifesteal</b> is an ability field (<code>lifesteal</code>, <code>heal_missing</code>);
+<code>rune_lifesteal</code> is idle (its only writer a retired rune).</li>
+<li><b>Shields:</b> one shared <code>barrier</code> status; a re-application keeps the larger; six grant sites each
+set their own power; <b>no potency field</b>.</li>
+</ul>
+
+<h3>SR-HEAL &middot; 2 &middot; Already parametric?</h3>
+<p><b>RECEIVING: a field &mdash; trapped</b> (zero-start) <b>and assigned over on Clerics. DOING: PER-SITE</b> (11 of
+68). <b>SHIELDS: PER-SITE.</b></p>
+
+<h3>SR-HEAL &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><code>last_hope_pct</code> (the party heals more below 25% &mdash; a spawn stamp), <code>triage_heal</code> (heal-done
+and heal crits, bundled), <code>beacon_ranks</code> (a turn-start heal for heroes under 25% &mdash; no node writes it,
+its only writer a retired rune) and <code>capacitor_ranks</code> (likewise idle).</p>
+
+<h3>SR-HEAL &middot; 4 &middot; What would need building</h3>
+<p><b>One heal-done door</b>, so a percentage reaches all 68 calls (LARGE); <b>a barrier potency term</b> at the status
+funnel (SMALL); <b>a lifesteal field that is not a rune's</b> (SMALL); <b>a healing-received term that survives the
+Cleric passive's assignment</b> (SMALL &mdash; and it edits a passive's line).</p>
+
+<h3>SR-HEAL &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Mercy owns heal-done's one term; Conviction owns the divine barrier's payout; the Holy owns the overheal
+lanes.</b> The receive pipeline and the barrier status are shared, and <code>healing_received_mult</code> is the
+Cleric class passive.</p>
+
+<h3>SR-HEAL &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Heal more when low</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>A turn-start heal for the low</td><td><b>TODAY</b> (an idle field; owes a <code>check_em</code> row)</td></tr>
+<tr><td>3</td><td>Shields are stronger</td><td>SMALL</td></tr>
+<tr><td>4</td><td>Lifesteal</td><td>SMALL</td></tr>
+<tr><td>5</td><td>Overheal becomes a shield</td><td>SMALL</td></tr>
+<tr><td>6</td><td>Heal more (done)</td><td>LARGE &mdash; one door</td></tr>
+<tr><td>7</td><td>Be healed more (received)</td><td><b>RULING</b> &mdash; the Cleric class passive's field</td></tr>
+</table>
+<p><b>SR-HEAL TOTAL: 7 distinct things &mdash; 2 TODAY, 3 SMALL, 1 LARGE, 1 RULING.</b></p>
+
+<hr><h2 id="sr-resource">SR-RESOURCE &mdash; THE CLASS RESOURCE</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-RESOURCE IN ONE SENTENCE: TWO CURRENCIES, NOT FOUR &mdash; RAGE
+FOR THE WARRIOR, MANA FOR THE OTHER THREE CLASSES &mdash; AND ONE SPEND DOOR THAT TWO ENGINES READ, SO A NODE THAT
+DISCOUNTS, REFUNDS OR SPENDS MOVES AN ENGINE'S INPUT.</b></p>
+
+<h3>SR-RESOURCE &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>Rage</b> (the Warrior; opens at 0) and <b>Mana</b> (Mage, Cleric and Hunter; open at 100); every pool is 100.
+Mana regenerates 12 + <code>mana_regen_bonus</code> a turn (the Mage's Evocation assigns 10), doubled under Mana
+Well; Rage gains a flat 5 a turn and 10 a hit taken. A &ldquo;Focus&rdquo; drip branch can never run.</li>
+<li><b>Spending is one line</b> (<code>battle.gd:8035-8037</code>), and <code>note_resource_spent</code> books Rage
+into <code>rage_spent</code> (Blood Frenzy's second term) and <b>Mana into <code>mana_spent</code> (Channel's
+ledger)</b>.</li>
+<li><b>Costs are per ability</b>; <code>_eff_cost</code> holds the discounts (Snap Shot, Twin Hunt, the upgraded
+Execute, Lone Hunter's percentage, the Warded modifier). No general discount field exists.</li>
+<li><b>Paying damage from the pool:</b> Conversion, Feedback Loop, Perfect Conversion (Mana); Last Rites (Rage, below
+25%). <b>Siphon</b> gains Mana from damage dealt. <b>Second Wind</b> grants 60 and clears every cooldown.</li>
+</ul>
+
+<h3>SR-RESOURCE &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARTLY</b> &mdash; Mana regeneration is a field (assigned over on Mages); Rage's gains are literals; costs are per
+ability.</p>
+
+<h3>SR-RESOURCE &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><code>max_resource</code> (in the config, so it adds correctly); <code>opening_rage</code>;
+<code>mana_regen_bonus</code> on Clerics and Hunters (silently replaced on Mages); refunds by reuse &mdash;
+<code>bloodied_momentum_ranks</code> (a kill), <code>no_quarter_ranks</code> (a Break), <code>scavenger_ranks</code>,
+<code>second_wind</code>; <code>snap_shot</code> (the first casts free &mdash; and they skip their cooldowns);
+<code>conversion_ranks</code>, <code>siphon_ranks</code>, <code>holy_light_pct</code> (Mana); <code>last_rites</code>
+(Rage). <code>lone_hunter</code> discounts any hero who is not a Beastmaster &mdash; <b>its guard names a spec</b>, so it
+is not a clean discount after a merge.</p>
+
+<h3>SR-RESOURCE &middot; 4 &middot; What would need building</h3>
+<p>Rage a turn; Rage a hit taken; a clean universal discount; resource on every cast; an opening floor for Mana
+heroes; overflow above the cap; a Rage form of Conversion.</p>
+
+<h3>SR-RESOURCE &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Neither currency is on the line's list, and FP's survivors lean on both.</b> But <b>the spend door is two
+engines' input</b>: spending more feeds Blood Frenzy or Channel, and a discount or a refund starves Channel, because it
+books the NET. The Mage's regeneration value is Evocation's. See <a href="#sr-line">SR-LINE</a> F2&ndash;F3.</p>
+
+<h3>SR-RESOURCE &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>A bigger pool</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>Open the fight with more</td><td><b>TODAY</b> (Rage); a Mana floor is SMALL</td></tr>
+<tr><td>3</td><td>Regenerate more</td><td><b>TODAY</b> (Cleric, Hunter; replaced on Mages)</td></tr>
+<tr><td>4</td><td>Refuel on a kill or a Break</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>The first casts are free</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>Damage is paid from the pool</td><td><b>TODAY</b></td></tr>
+<tr><td>7</td><td>Resource from damage dealt</td><td><b>TODAY</b> (Mana)</td></tr>
+<tr><td>8</td><td>Everything costs less</td><td>SMALL</td></tr>
+<tr><td>9</td><td>Resource on every cast</td><td>SMALL</td></tr>
+<tr><td>10</td><td>Overflow above the cap</td><td>SMALL</td></tr>
+<tr><td>11</td><td>Resource from a hit taken (Rage has it as a literal)</td><td>SMALL</td></tr>
+</table>
+<p><b>SR-RESOURCE TOTAL: 11 distinct things &mdash; 7 TODAY, 4 SMALL.</b></p>
+
+<hr><h2 id="sr-cooldown">SR-COOLDOWN &mdash; COOLDOWNS</h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-COOLDOWN IN ONE SENTENCE: PER-ABILITY COOLDOWNS, ONE EVENT-DRIVEN
+TICK HELPER, NO REDUCTION FIELD &mdash; AND THE UNIVERSAL NODES THAT EXIST WORK BECAUSE OF HOW THEIR GUARDS HAPPEN TO BE
+WRITTEN.</b></p>
+
+<h3>SR-COOLDOWN &middot; 1 &middot; What exists</h3>
+<ul>
+<li><code>start_cooldown</code> sets the ability's cooldown + 1 (<code>unit.gd:3014-3016</code>);
+<code>tick_cooldowns</code> takes one off every entry at the start of a turn, stunned and frozen turns included.</li>
+<li><b>Casts that start no cooldown:</b> Snap Shot, Improvised, Rapid Fire, Terminal Velocity (and Fuse, which nothing
+writes).</li>
+<li><b><code>_tick_cooldowns(unit, turns, skip)</code> has seven callers</b> &mdash; Practised Hands, Answering Steel,
+Battle Poise, Follow-Through, Frostbound Hours (on a hold's release &mdash; an engine event), Blessing of Zeal with
+Crusade, Blink &mdash; and a fifth hand-written tick loop still stands for Mindfulness, a field only a retired rune
+writes. <b>Eight sites clear one cooldown outright</b>; Second Wind clears all. <b>No reduction field exists.</b></li>
+</ul>
+
+<h3>SR-COOLDOWN &middot; 2 &middot; Already parametric?</h3>
+<p><b>PER-ABILITY, with one tick helper</b>; nothing modifies <code>start_cooldown</code>.</p>
+
+<h3>SR-COOLDOWN &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><code>follow_through</code> (a tick on a crit), <code>practised_hands</code> (a tick on every cast),
+<code>improvised</code> (the opening casts start no cooldown), <code>snap_shot</code>, <code>rapid_fire</code> (a chance
+to skip), <code>second_wind</code> (a full reset at low health), <code>mindfulness_ranks</code> (a periodic tick; idle).
+<b>18 node payloads set one named ability's cooldown</b> &mdash; all out by the line.</p>
+
+<h3>SR-COOLDOWN &middot; 4 &middot; What would need building</h3>
+<p>A reduction at <code>start_cooldown</code>, flat or by percentage; a node-owned periodic tick; a party-wide tick not
+tied to an engine.</p>
+
+<h3>SR-COOLDOWN &middot; 5 &middot; Who owns any of it</h3>
+<p><b>The helper is nobody's</b>, and <code>CLAUDE.md</code>'s DR &sect;1 already records cooldown manipulation as a
+shared axis (seven callers, not the Swordmaster's). Most modifiers name an ability; Frostbound Hours' trigger is an
+engine's.</p>
+
+<h3>SR-COOLDOWN &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>A tick on a crit</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>A tick on every cast</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>The opening casts start no cooldown</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>A chance to skip a cooldown</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>A reset at low health</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>A periodic extra tick</td><td><b>TODAY</b> (an idle field; owes a <code>check_em</code> row)</td></tr>
+<tr><td>7</td><td>Every cooldown shorter</td><td>SMALL</td></tr>
+<tr><td>8</td><td>A party-wide tick</td><td>SMALL</td></tr>
+</table>
+<p><b>SR-COOLDOWN TOTAL: 8 distinct things &mdash; 6 TODAY, 2 SMALL.</b></p>
+<hr><h2 id="sr-intent">SR-INTENT &mdash; ENEMY INTENT <span style="font-weight:normal">(the declared-action store)</span></h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-INTENT IN ONE SENTENCE: EVERY ENEMY DECLARES ITS NEXT
+ACTION AND THE PLAYER SEES IT &mdash; AND NOT ONE LINE OF HERO-SIDE CODE READS IT.</b> Every node that
+answers an intent is therefore SMALL (one read line), and none exists.</p>
+<h3>SR-INTENT &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>The store</b> is a dict on each enemy: ability, target, turns, support, message, logs, category
+(<code>battle.gd:7095-7101</code>), written by <code>_declare_intent</code> at battle start, after each enemy
+turn and after a lost turn.</li>
+<li><b>Re-validation</b> (<code>_revalidate_intent</code>, <code>:7146-7193</code>): a gone target is re-picked
+inside the same ability, an unusable ability falls back to the basic and LOGS it, a lost turn discards.
+Hijacks (Hysteria, Bewitch, Psychosis) are counted apart.</li>
+<li><b>Categories are derived from the ability's own fields</b> in a fixed order &mdash; windup, mend,
+bolster, sweep, crush, afflict, strike (<code>:7021-7042</code>) &mdash; so a new enemy classifies itself.</li>
+<li><b>A standing rule: no predicted damage number may ship</b> (BL &sect;1). An intent carries a category and
+an ability's name, never a magnitude. <b>Hidden intent is flagged and unbuilt.</b></li>
+</ul>
+<h3>SR-INTENT &middot; 2 &middot; Already parametric?</h3>
+<p><b>PER-SITE</b> &mdash; the category is data-derived, but nothing about intent is a dial.</p>
+<h3>SR-INTENT &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>NOTHING READS IT.</b> Outside the intent block, <code>.intent</code> is touched only by the turn bar's
+display (<code>:2520-2535</code>) and the clear-on-death (<code>:2627-2628</code>). The one node that bends a
+declaration does so at SELECTION, not by reading it: Ghillie Suit's re-pick (see
+<a href="#sr-threat">SR-THREAT</a>).</p>
+<h3>SR-INTENT &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>A hero-side read of <code>e.intent["category"]</code></b> &mdash; one line per node, at whatever moment
+the node pays.</li>
+<li><b>A field-driven suppression</b> at the Heads Down hook (<code>:7232</code>), for a node that denies a
+declared ability.</li>
+<li><b>A hook when a declaration fails or falls back</b> &mdash; today those are counters only
+(<code>:7134, :7164</code>).</li>
+</ul>
+<h3>SR-INTENT &middot; 5 &middot; Who owns any of it</h3>
+<p><b>No engine.</b> Cards bend it &mdash; Heads Down (Sharpshooter), Feint (Swordmaster), the Warden's taunts,
+the Occultist's madness charms &mdash; and <b>the no-predicted-number rule binds any node that would show
+one.</b></p>
+<h3>SR-INTENT &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Paid, or protected, against an enemy declaring a given category (a crush, a windup, an affliction)</td><td>SMALL</td></tr>
+<tr><td>2</td><td>Paid when an enemy's declaration fails or falls back</td><td>SMALL</td></tr>
+<tr><td>3</td><td>A declared ability is downgraded to the enemy's basic</td><td>SMALL</td></tr>
+<tr><td>4</td><td>A declaration is delayed</td><td>SMALL (it writes the timeline &mdash; see SR-TIMELINE's writer rule)</td></tr>
+<tr><td>5</td><td>More is revealed (a second turn ahead)</td><td>LARGE &mdash; a UI, and the no-number rule</td></tr>
+</table>
+<p><b>SR-INTENT TOTAL: 5 distinct things &mdash; 0 TODAY, 4 SMALL, 1 LARGE.</b> One read line unlocks the
+whole family, which makes this the cheapest untouched system on the page.</p>
+
+<hr><h2 id="sr-threat">SR-THREAT &mdash; TAUNT, THREAT AND TARGETING</h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-THREAT IN ONE SENTENCE: AN ENEMY PICKS BY LOWEST HEALTH
+40% OF THE TIME AND BY A WEIGHTED THREAT ROLL 60% &mdash; AND THE ONLY WEIGHT IN THAT ROLL IS THE WARRIOR
+CLASS PASSIVE, WRITTEN AS A LITERAL.</b> One field reaches targeting today; drawing fire would sit on a
+passive.</p>
+<h3>SR-THREAT &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>Normal targeting</b> (<code>battle.gd:7461</code>): 40% <code>_lowest_hp</code>, 60%
+<code>_threat_pick</code>. <b><code>_threat_pick</code> weighs <code>hero_key == "warrior"</code> at 1.2 and
+everyone else at 1.0</b> (<code>:7519-7528</code>) &mdash; that literal IS the Warrior class passive,
+<i>Threatening Presence</i> (<code>classes.gd:12-13</code>).</li>
+<li><b>Taunt is the <code>mocked</code> status</b>, its power the taunter's hero index (100+ for a companion);
+it narrows the target list. Appliers: Mocking Blow (the Warden's core), Eye of the Storm and Vendetta (Warden
+draft), and the bear's two taunts. Nodes that read it: Provoke (widens Mocking Blow), The Whole Room (makes a
+hero's taunt permanent), Grudge (punishes the taunted).</li>
+<li><b>Re-picks</b>: the Broken-hero exploit (<code>:7449-7457</code>), Savage Presence, Stalking Horse, and
+the evasion re-pick <code>_evade_chance</code> (<code>:13746-13755</code>) &mdash; Ghillie and Camouflage as
+independent chances, read for <b>any non-companion hero</b>.</li>
+</ul>
+<h3>SR-THREAT &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARTLY.</b> <code>ghillie</code> is a field; the 1.2 and the 40/60 split are literals.</p>
+<h3>SR-THREAT &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b><code>ghillie</code></b> &mdash; enemies re-pick away from this hero. No spec in the guard; written today
+by <code>sv_ghillie</code>. <code>provoke_ranks</code>, <code>whole_room</code> and <code>grudge_ranks</code>
+also read, <b>but only for a hero holding a taunt card</b> &mdash; a bet under the standing DO/DP charter.</p>
+<h3>SR-THREAT &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>A <code>threat_weight</code> field read in <code>_threat_pick</code></b> in place of the
+<code>hero_key</code> literal &mdash; one line. <b>But the literal it replaces is a CLASS PASSIVE</b>, so a node
+there touches a passive by the letter: see <a href="#sr-line">SR-LINE</a>.</li>
+<li><b>A taunt a node grants</b> &mdash; none exists without a card.</li>
+</ul>
+<h3>SR-THREAT &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Taunt is the Warden's cards' and the bear's. Threat weight is the Warrior's class passive. The re-pick
+and the 40/60 split belong to no one.</b></p>
+<h3>SR-THREAT &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Enemies look past this hero</td><td><b>TODAY</b> (<code>ghillie</code>)</td></tr>
+<tr><td>2</td><td>This hero draws fire</td><td><b>RULING</b> &mdash; the Warrior class passive</td></tr>
+<tr><td>3</td><td>This hero is picked on lowest health less often (the 40/60 split, per hero)</td><td>SMALL</td></tr>
+<tr><td>4</td><td>The Broken-hero exploit spares this hero</td><td>SMALL</td></tr>
+<tr><td>5</td><td>A taunt lasts, or pays when it holds</td><td><b>RULING</b> &mdash; a bet under DO/DP: only a taunt card applies one</td></tr>
+</table>
+<p><b>SR-THREAT TOTAL: 5 distinct things &mdash; 1 TODAY, 2 SMALL, 2 RULING.</b></p>
+
+<hr><h2 id="sr-evade">SR-EVADE &mdash; ACCURACY, MISS, PARRY AND BLOCK</h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-EVADE IN ONE SENTENCE: THE MISS ROLL IS UNOWNED AND HAS
+NO ACCURACY OR EVASION STAT; PARRY IS UNIVERSAL WITH A BASELINE; BLOCK IS AN ENGINE'S &mdash; AND A STANDING
+RULE FIXES WHERE ANY NEW DEFENCE MAY RESOLVE.</b></p>
+<h3>SR-EVADE &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b>Constants</b> (<code>battle.gd:7799-7801</code>): <code>MISS_CHANCE</code> 0.05,
+<code>PARRY_CHANCE</code> 0.05 (the hero baseline), <code>ENEMY_PARRY_CHANCE</code> 0.025.</li>
+<li><b><code>_miss_chance</code></b>: <code>no_cover</code> returns 0; otherwise the base, +0.20 Dazed, +0.50
+Blind, + the party's best <code>numbing_ranks</code> against a Chilled attacker, +0.25 against an Elusive
+defender, + <code>heat_haze</code> against a Burning attacker. <b>An area attack never rolls a miss.</b></li>
+<li><b>Block</b> resolves Interpose charges, then base <code>block_chance</code>, then the Heavy Plating slice,
+then Covering Guard. <b><code>block_chance</code> defaults to 0.0 and has no baseline</b> (FP &sect;1b).</li>
+<li><b>Parry</b> is melee-only unless the defender has <code>deflection</code>; <code>_roll_parry</code> reads
+banked guards, Feint, the base chance, <code>parry_bonus</code>, <code>parry_up</code>, Answering Steel; a parry
+takes 75% off. <b><code>parry_chance</code>'s &minus;1.0 means &ldquo;use the baseline&rdquo;</b>, so parry is
+universal and the Swordmaster's 0.12 is an override.</li>
+<li><b>There is no evasion stat and no accuracy stat.</b></li>
+</ul>
+<h3>SR-EVADE &middot; 2 &middot; Already parametric?</h3>
+<p><b>PARTLY</b> &mdash; the three bases are named constants; Dazed, Blind and Elusive are literals.</p>
+<h3>SR-EVADE &middot; 3 &middot; What a node reaches TODAY</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Field</th><th>Effect</th><th>Under the line?</th></tr>
+<tr><td><code>no_cover</code></td><td>this hero's attacks cannot miss</td><td><b>YES</b></td></tr>
+<tr><td><code>deflection</code></td><td>parries ranged blows too</td><td><b>YES</b></td></tr>
+<tr><td><code>parry_bonus</code></td><td>+parry (a stat)</td><td><b>YES</b></td></tr>
+<tr><td><code>hit_and_run</code></td><td>applying a status grants Elusive</td><td><b>YES</b></td></tr>
+<tr><td><code>block_chance</code></td><td>+Block</td><td><b>A RULING</b> &mdash; Block is the Warden's
+engine (Heavy Plating reads it)</td></tr>
+<tr><td><code>heat_haze</code>, <code>numbing_ranks</code></td><td>misses off Burning / Chilled attackers</td>
+<td>NO &mdash; engines' statuses</td></tr>
+</table>
+<p><b>AND THE ZERO-START TRAP BITES HERE:</b> a node writing <code>parry_chance</code> instead of
+<code>parry_bonus</code> starts from 0 and erases the &minus;1.0 sentinel.</p>
+<h3>SR-EVADE &middot; 4 &middot; What would need building</h3>
+<ul>
+<li><b>An accuracy field and an evasion field</b> in <code>_miss_chance</code>, and <b>an on-dodge hook</b> not
+tied to one card.</li>
+<li><b>THE BINDING CONSTRAINT, STANDING SINCE FV &sect;1:</b> Momentum's taken half books a blow that REACHES a
+body at ONE line, <code>note_blow_met()</code> (<code>battle.gd:8447</code>), below both miss rolls and above
+the Block roll. <b>A new block, parry or absorb must resolve BELOW that line, or it re-opens the hole for the
+very blows it stops.</b> An evasion that makes a blow MISS belongs above it &mdash; a miss never reached him,
+by FV's own ruling.</li>
+</ul>
+<h3>SR-EVADE &middot; 5 &middot; Who owns any of it</h3>
+<p><b>The miss roll: nobody. Parry: universal. Block: the Warden's engine and his stat line.</b> Dazed and
+Blind are applied by spec cards.</p>
+<h3>SR-EVADE &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Cannot miss</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>Parry ranged blows</td><td><b>TODAY</b></td></tr>
+<tr><td>3</td><td>Parry more (a stat)</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>Elusive when you afflict</td><td><b>TODAY</b></td></tr>
+<tr><td>5</td><td>Accuracy</td><td>SMALL</td></tr>
+<tr><td>6</td><td>Evasion</td><td>SMALL &mdash; above the Momentum door</td></tr>
+<tr><td>7</td><td>A riposte not tied to a card</td><td>SMALL &mdash; below the Momentum door</td></tr>
+<tr><td>8</td><td>Block more</td><td><b>RULING</b> &mdash; Block is an engine's</td></tr>
+</table>
+<p><b>SR-EVADE TOTAL: 8 distinct things &mdash; 4 TODAY, 3 SMALL, 1 RULING.</b></p>
+
+<hr><h2 id="sr-dot">SR-DOT &mdash; DAMAGE OVER TIME</h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-DOT IN ONE SENTENCE: TWO STATUSES TICK, BOTH ARE OWNED,
+NOTHING MULTIPLIES A TICK, AND A TICK THAT KILLS NEVER REACHES THE ON-KILL HOOK.</b></p>
+<h3>SR-DOT &middot; 1 &middot; What exists</h3>
+<ul>
+<li><b><code>DOT_STATUSES</code> is <code>{burn: 6, poison: 3}</code></b> (<code>battle.gd:546</code>). A tick's
+strength is snapshotted from the applier's Attack when it lands (<code>_dot_tick</code>,
+<code>:13299-13305</code>); the tick loop runs at the bearer's turn start (<code>:2677-2784</code>) and applies
+fire and nature resists.</li>
+<li><b>A tick kill logs the death and does not call <code>_on_enemy_death</code></b>
+(<code>:2782-2784</code>), so nothing that pays on a kill sees it.</li>
+<li><b>Bleed is a buildup meter, not a tick</b>; 17 sites call <code>take_tick_damage</code>.</li>
+<li><b>The relic header's &ldquo;NEEDS PLUMBING: DoT-tick multipliers&rdquo; is still true</b> &mdash; nothing
+multiplies a tick.</li>
+</ul>
+<h3>SR-DOT &middot; 2 &middot; Already parametric?</h3>
+<p><b>PER-SITE</b> &mdash; potency is snapshotted at the call; the one tick term (<code>accelerant_ranks</code>)
+is Burn's.</p>
+<h3>SR-DOT &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><code>mod_bleed_add</code> &mdash; Bleed on every damaging hit, read off the attacker &mdash; <b>but Bleed is built only by the Berserker's cards and the Beastmaster's Canis</b> and a Bloodletting modifier assigns over the field.
+<b>Nothing else.</b></p>
+<h3>SR-DOT &middot; 4 &middot; What would need building</h3>
+<p><b>A tick multiplier keyed on the applier</b> (the applier's name is already captured on the status) and
+<b>an on-kill call for a tick kill</b>.</p>
+<h3>SR-DOT &middot; 5 &middot; Who owns any of it</h3>
+<p><b>Every tick is owned:</b> Burn is the Pyromancer's engine, and <b>Poison is the Survivalist's by a standing
+rule</b> (BA &sect;1: <i>&ldquo;POISON ITSELF IS NOT RESERVED AND STAYS ENTIRELY THE SURVIVALIST'S&rdquo;</i>).
+So <b>&ldquo;your damage over time hits harder&rdquo; touches two owned statuses and nothing else</b> &mdash; a
+ruling (<a href="#sr-line">SR-LINE</a>).</p>
+<h3>SR-DOT &middot; 6 &middot; Distinct things a node could say</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The thing</th><th>Cost</th></tr>
+<tr><td>1</td><td>Ticks ON this hero hit softer</td><td>SMALL &mdash; enemies apply them, so it is universal</td></tr>
+<tr><td>2</td><td>A tick that kills counts as a kill</td><td>SMALL</td></tr>
+<tr><td>3</td><td>This hero's ticks hit harder</td><td><b>RULING</b> &mdash; every tick is owned</td></tr>
+</table>
+<p><b>SR-DOT TOTAL: 3 distinct things &mdash; 0 TODAY, 2 SMALL, 1 RULING.</b></p>
+
+<hr><h2 id="sr-trigger">SR-TRIGGER &mdash; THE MOMENTS A NODE CAN LISTEN TO</h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-TRIGGER IN ONE SENTENCE: THERE IS NO DATA-DRIVEN HOOK.</b>
+A payload can add to a field, edit an ability or grant one &mdash; it cannot say &ldquo;when X happens&rdquo;.
+<b>Every trigger in the 324 is a hand-written read line at the place X already happens</b>, and the places are
+well worn.</p>
+<h3>SR-TRIGGER &middot; 1 &middot; What exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Site</th><th>Node fields it already reads</th></tr>
+<tr><td>the strike path in <code>_resolve</code> (on-crit, on-parry, on-block, on-miss sites inside it)</td><td><b>143</b></td></tr>
+<tr><td><code>_resolve_special</code></td><td>19</td></tr>
+<tr><td>the spawn (<code>_spawn_units</code>)</td><td>18</td></tr>
+<tr><td>health thresholds crossed, in <code>take_hit</code></td><td>15</td></tr>
+<tr><td>the turn-start block</td><td>14</td></tr>
+<tr><td><code>_on_enemy_death</code> (37 callers)</td><td>5</td></tr>
+<tr><td><code>_row8_turn_start</code></td><td>5</td></tr>
+<tr><td><code>_apply_status</code></td><td>4</td></tr>
+<tr><td><code>heal_amount</code></td><td>1</td></tr>
+<tr><td>the one damage door (<code>_on_damage_taken</code>), <code>_check_end</code>, <code>sync_victory_state</code></td><td><b>0</b></td></tr>
+</table>
+<p><i>Counted by the survey that found them (a field read at the site, off a comment-stripped source); the
+figures are for orientation, not asserted.</i> The unit carries <b>20 single-slot callbacks</b>
+(<code>*_cb</code>, <code>unit.gd:917-1720</code>), each wired at spawn to exactly one handler. <b>There is no
+on-Perfect hook</b> (131 lines test <code>is_perfect</code>, almost all one card's bonus).</p>
+<h3>SR-TRIGGER &middot; 2 &middot; Already parametric?</h3>
+<p><b>PER-SITE, BY CONSTRUCTION.</b></p>
+<h3>SR-TRIGGER &middot; 3 &middot; What a node reaches TODAY</h3>
+<p><b>Only the triggers an existing field already rides</b> &mdash; listed in each system's own section.</p>
+<h3>SR-TRIGGER &middot; 4 &middot; What would need building</h3>
+<p><b>Per trigger: one field and one read line at an existing site (SMALL).</b> <b>A data vocabulary for
+triggers</b> &mdash; a payload arm that says &ldquo;on X, do Y&rdquo; &mdash; would be real machinery (LARGE),
+and it is the same gap the relic header lists from the relic side (<i>on-kill and per-turn procs</i>).</p>
+<h3>SR-TRIGGER &middot; 5 &middot; Who owns any of it</h3>
+<p><b>The sites are unowned; many are inside an engine's branch</b>, and a read placed inside one inherits its
+guard.</p>
+<h3>SR-TRIGGER &middot; 6 &middot; Distinct things a node could say</h3>
+<p><b>The general moments no other section owns</b>, each counted once whatever it pays:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>#</th><th>The moment</th><th>Cost</th></tr>
+<tr><td>1</td><td>On a kill</td><td>SMALL (the site exists; tick kills miss it &mdash; SR-DOT)</td></tr>
+<tr><td>2</td><td>At the start of this hero's turn</td><td>SMALL</td></tr>
+<tr><td>3</td><td>At the start of the battle</td><td>SMALL</td></tr>
+<tr><td>4</td><td>When this hero crosses a health threshold</td><td>SMALL</td></tr>
+<tr><td>5</td><td>When an ally falls</td><td>SMALL</td></tr>
+<tr><td>6</td><td>When this hero is healed</td><td>SMALL</td></tr>
+<tr><td>7</td><td>When a status this hero applied expires</td><td>SMALL (<code>_on_status_expired</code>)</td></tr>
+</table>
+<p><b>SR-TRIGGER TOTAL: 7 distinct moments &mdash; 0 TODAY as new content (every existing trigger field is one
+node's), 7 SMALL.</b> The on-crit, on-Break, on-Perfect, on-block and on-parry moments are counted in their own
+systems' sections.</p>
+
+<hr><h2 id="sr-modifier">SR-MODIFIER &mdash; BATTLE MODIFIERS <span style="font-weight:normal">(what a bargain does to a unit)</span></h2>
+<p style="border:2px solid #000; padding:8px"><b>SR-MODIFIER IN ONE SENTENCE: CHEAP PER-UNIT FIELDS READ
+WHEREVER THE UNIT APPEARS &mdash; BUT A MATCHING MODIFIER ASSIGNS OVER A NODE'S VALUE, AND THREE OF THEM SIT IN
+THE ZERO-START TRAP.</b></p>
+<ul>
+<li><b>What exists:</b> 20 modifiers (severity 6/6/4/4) stamped on every unit by <code>_stamp_modifier</code>
+(<code>battle.gd:1783-1876</code>) into <code>mod_*</code> fields (<code>unit.gd:273-286</code>), read at their
+own sites (speed, cost, Break taken, Bleed added, recoil, status duration). <b>The stamp ASSIGNS</b>
+(<code>u.mod_speed_mult = 1.3</code>).</li>
+<li><b>TODAY:</b> <code>mod_status_turns</code> (every status on this hero lasts longer or shorter &mdash;
+buffs and debuffs alike, see <a href="#sr-status">SR-STATUS</a>), <code>mod_bleed_add</code> (Bleed, built by the Berserker's cards and Canis), <code>mod_recoil</code> (a cost, not a gift). <code>mod_speed_mult</code>, <code>mod_cost_mult</code>
+and <code>mod_bd_mult</code> start at 1.0 / 1.0 / 100 on the unit and at <b>0</b> in the config &mdash; the trap.</li>
+<li><b>SMALL:</b> a node paid while fighting under a bargain &mdash; one read of <code>_active_modifier()</code>
+(<code>:1770-1774</code>).</li>
+<li><b>Owned by:</b> no engine &mdash; the run layer. <b>SR-MODIFIER TOTAL: 1 distinct thing (bargain-aware),
+SMALL</b>; the fields themselves are counted where their effect lives.</li>
+</ul>
+
+<hr><h2 id="sr-out">SR-OUT &mdash; SYSTEMS OUT OF REACH, AND WHY</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>System</th><th>What exists</th><th>Why a node cannot touch it</th></tr>
+<tr><td><b>Events</b></td><td>20 events (8 boon, 8 trade-off, 4 bane) and 13 verbs, run on the party dict out
+of battle</td><td>No node is read outside battle; and <b>EN &sect;4 puts setting up the run on the RELIC
+side</b></td></tr>
+<tr><td><b>Ability upgrades</b></td><td>eight (Honed, Quickened, Effortless, Swift, Weighted, Widened, Piercing,
+Certain), stamped last at spawn</td><td><b>An upgrade is a change to an ability</b> &mdash; the line</td></tr>
+<tr><td><b>Relics</b></td><td>25 relics, three a run, 18 hooks read at spawn, victory and in the economy</td>
+<td>A separate permanent layer, party-wide and chosen before there are specs &mdash; <b>EN &sect;4 is the
+standing seam</b>. (The <code>rest_heal_add</code> hook has no reader; two relics carry it and one pays
+nothing at all.)</td></tr>
+<tr><td><b>Summons and companions</b></td><td>three summons, the Beastmaster's</td><td><b>An exclusive axis
+and an engine's body</b> (DR &sect;1). A node reaches a companion only as an ally</td></tr>
+<tr><td><b>Enemy scaling and the rung</b></td><td>zone multipliers, <code>DIFFICULTIES</code>, +2.5% health
+and +2% attack a slot</td><td>No hero field reaches it, <b>and the rung gates the talent rows themselves</b>
+(EN &sect;3); two standing rules guard what it may scale</td></tr>
+<tr><td><b>The recap ledgers</b></td><td>the run summary's tallies</td><td>Not gameplay</td></tr>
+</table>
+<hr><h2 id="sr-interfere">&sect;2 &mdash; SR-INTERFERE &mdash; ENEMIES ATTACKING THE SKILL CHECK <span style="font-weight:normal">(never built)</span></h2>
+
+<p style="border:2px solid #000; padding:8px"><b>SR-INTERFERE IN ONE SENTENCE: TWO OF THE FOUR
+FLAVOURS ARE ALREADY PROFILE KEYS, TWO ARE NOT, ALL FOUR NEED ONE HOOK FROM A HERO TO THE BAR &mdash;
+AND NO INSTRUMENT THE PROJECT OWNS COULD EVER MEASURE ANY OF THEM.</b> A talent can answer it only
+after that hook exists; today a node can pay on a Perfect but cannot know the Perfect was landed
+through interference, and cannot resist it at all. <i>Nothing below rules on whether to build it.</i></p>
+
+<h3>SR-INTERFERE &middot; Where the idea is recorded</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Record</th><th>Where</th><th>What it says</th></tr>
+<tr><td>The open queue</td><td><code>docs/state.md</code>, under <i>&ldquo;Named by the designer,
+carried from CX&rdquo;</i> &mdash; the line arrived with CW's split (commit <code>9a1ad44</code>)</td>
+<td><i>&ldquo;Enemy interference as a status. Not yet specified.&rdquo;</i></td></tr>
+<tr><td>CW's report</td><td><code>docs/reports/CW.md:129</code></td><td>one of the six items CW's
+brief named</td></tr>
+<tr><td><b>The earliest mention in the tree</b></td><td><code>battle.gd:5337-5341</code>, the CT
+&sect;4 Cleansing Draught block</td><td><i>&ldquo;a party without a Cleric has no answer to a debuff
+at all &mdash; and that worsens the moment enemy interference lands.&rdquo;</i></td></tr>
+</table>
+<p><b>THE FOUR FLAVOURS AND &ldquo;SHADOW HEARTS&rdquo; APPEAR NOWHERE IN THE TREE</b> &mdash; not in
+the changelog, its archive, <code>design-notes.md</code>, <code>master.html</code> or either concept
+<code>.docx</code>. The one &ldquo;Shadow Hearts&rdquo; in the code (<code>battle.gd:24202</code>) is
+CS's partial-credit rule for the Sharpshooter's sequence, a different idea. <b>&ldquo;Queued since
+CM&rdquo; is not supported by anything in the repo: the earliest record is CT's comment.</b> The
+flavours below are the brief's.</p>
+
+<h3>SR-INTERFERE &middot; The four flavours against the bar that exists</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Flavour</th><th>Existing key that expresses it</th><th>What drawing / grading lacks</th>
+<th>Where it would go</th><th>Difficulty, under the project's &ldquo;time in the window&rdquo;
+model</th></tr>
+<tr><td><b>(a) Varying sweep speed</b></td><td><code>sweep_time</code> &mdash; but only as a
+CONSTANT; it is re-read every frame, and nothing writes it mid-sweep</td><td>a time-varying term</td>
+<td>the sweep, <code>_process</code> <code>:24475</code></td><td>a difficulty change; priceable</td></tr>
+<tr><td><b>(b) A reversed cursor</b></td><td><b>none.</b> <code>sc_dir</code> exists
+(<code>:910</code>) but every press starts at 0.0 moving right (<code>:24251-24252</code>)</td>
+<td>a start/direction key, or a mid-sweep flip</td><td><code>:24251-24252</code></td>
+<td><b>zero while the window sits at the centre</b> &mdash; a mirror image of a centred window is the
+same window; the only cost is surprise</td></tr>
+<tr><td><b>(c) An invisible window</b></td><td><b>none.</b> The zones are always drawn while the bar
+is up</td><td>a visibility key</td><td><code>_apply_sc_profile</code> <code>:2088-2097</code></td>
+<td><b>outside the model</b> &mdash; it cannot be priced as time</td></tr>
+<tr><td><b>(d) A tightened window</b></td><td><code>perfect_half</code>, <code>good_half</code>,
+<code>press_taper</code> &mdash; <b>fully expressed</b></td><td>a merge at the two call sites (a cast
+passes <code>{}</code>, a brace passes nothing), and a floor, because the half-widths are unclamped</td>
+<td><code>:4094</code>, <code>:24801</code>, <code>:2078</code></td><td>a difficulty change;
+priceable</td></tr>
+</table>
+<p><b>(b) AND (c) ARE NEAR NO-OPS WHILE <code>centre</code> IS 0.5</b>: a reversed cursor finds a
+centred window at the same moment, and a hidden centred window is where the player already aims.
+<b>Both only bite in combination with an off-centre window</b> &mdash; which is <code>centre</code>, the
+one key that is wired and unused. And <b>hiding must never move the window</b>, or the player
+&ldquo;would be aiming at a lie&rdquo; (<code>battle.gd:922-925</code>'s own words).</p>
+
+<h3>SR-INTERFERE &middot; What building it would take</h3>
+<ol>
+<li><b>The interference, as a status on the HERO.</b> A <code>STATUS_INFO</code> row, an
+<code>_apply_status</code> call, and membership of <code>DEBUFF_IDS</code> so a cleanse removes it
+&mdash; the Cleansing Draught comment already assumes exactly that. <b>An enemy ability can already
+apply a status from data</b> (<code>enemies.json</code> carries 15 <code>applies_status</code>
+entries). Carrying it on the enemy's ABILITY instead needs a new <code>Ability</code> field:
+<code>Ability.make</code> builds with <code>set()</code> and drops an unknown key silently
+(<code>ability.gd:329-332</code>).</li>
+<li><b>One helper that turns the hero's statuses into profile keys</b>, called where each bar opens:
+<code>:4094</code> (a cast &mdash; the acting hero is in scope) and <code>:24801</code> (a brace &mdash;
+the enemy attacker and the declared hero are in scope). <b>For an area attack the brace pool is every
+hero, and one bar is shared, so whose status governs it is undefined.</b></li>
+<li><b>New keys for (b) and (c)</b> in <code>_run_skill_check</code> (start and direction) and
+<code>_apply_sc_profile</code> (visibility), and <b>a time-varying term for (a)</b> in the sweep.</li>
+<li><b>A floor on the half-widths</b>, for (d).</li>
+<li><b>A ruling under the standing profile rule.</b> <i>VARY THE CHARACTER, HOLD THE DIFFICULTY
+CONSTANT</i> allows two OPT-IN exceptions; interference is not opt-in. (a) and (d) change difficulty,
+(b) changes only character, (c) is outside the rule's model. <b>The harm the rule names is permanent
+and spec-level</b> &mdash; a spec a player loses access to &mdash; <b>and interference would be
+temporary and cleansable</b>, which matters to the ruling and does not settle it.</li>
+<li><b>The orientation card owes a sentence</b>, as the gated and defensive bars each have one.</li>
+</ol>
+
+<h3>SR-INTERFERE &middot; The defensive bar, and the rule that already protects it</h3>
+<p><b>It can be interfered with</b> &mdash; the brace runs the same bar. <b>And it cannot be made to
+hurt:</b> <code>_defensive_brace</code> returns a BOOLEAN, so interference could only lower the chance
+of the &times;0.85 / &times;0.75 brace, never enlarge a blow. <i>THE DEFENSIVE CHECK CAN ONLY MITIGATE</i>
+stays structural. <b>But it would tax a feature two passives own</b> (Heavy Plating; Seasoned in
+Defensive stance), and it lands on the enemy's turn.</p>
+
+<h3>SR-INTERFERE &middot; Why nothing could measure it</h3>
+<p><b>THE BOT NEVER READS A PROFILE.</b> It rolls a grade off fixed odds (<code>:4075-4076</code>, and
+0.20 on a brace). So <b>every flavour reads in every sim as a status that does nothing</b>, and any cost
+figure would come from the stated 60 ms timing-error model that <code>CLAUDE.md</code> already calls
+a guess about human reflexes. <b>And enemies are never graded</b> (<code>:7389</code>), so interference
+would be the game's first one-sided bar mechanic.</p>
+
+<h3>SR-INTERFERE &middot; Could a talent answer it?</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>A node that&hellip;</th><th>Today</th><th>The minimal plumbing</th></tr>
+<tr><td><b>resists interference</b></td><td><b>No</b> &mdash; no unit field reaches the bar</td>
+<td>one unit <code>var</code> the step-2 helper reads (a shorter duration, a weaker key, or immunity to
+one flavour)</td></tr>
+<tr><td><b>pays on a Perfect landed THROUGH interference</b></td><td><b>Half</b> &mdash; a node can pay
+on a Perfect now (<code>holy_light_pct</code>, <a href="#sr-check">SR-CHECK</a>) but nothing records
+that interference was active</td><td>one per-bar flag on <code>sc_sequence</code>'s pattern (written by
+the bar, cleared at <code>:4045</code>, read after <code>_resolve</code>), plus one read line</td></tr>
+<tr><td><b>reads interference some other way</b> &mdash; e.g. is paid when an enemy applies it</td>
+<td><b>Only as a status</b>: a node reading &ldquo;a debuff landed on me&rdquo; is a
+<a href="#sr-status">SR-STATUS</a> question, and no such door exists for heroes generically</td>
+<td>see SR-STATUS</td></tr>
+</table>
+<p><b>SO THIS IS EXACTLY THE KIND OF THING THE LAYER IS FOR, AND NONE OF IT EXISTS YET.</b> Every node
+that answers interference is <b>zero today</b>, and every one of them is <b>one field and one line</b>
+once the helper in step 2 exists &mdash; which is itself small. <b>Three distinct things</b>: resist it,
+pay through it, and (if statuses on heroes get a door) be paid when it lands.</p>
+<hr><h2 id="sr-line">&sect;3 &mdash; SR-LINE &mdash; WHAT THE LINE EXCLUDES, PRECISELY</h2>
+
+<p><i>The brief asks four questions and says the designer rules on the edges. Each answer gives the letter, the
+spirit and the reason; <b>this page rules on none of them.</b> Two standing rules come first, because between them
+they decide more nodes than every edge together.</i></p>
+
+<h3>SR-LINE &middot; A &middot; Two standing rules the line runs into</h3>
+<p style="border:2px solid #a00; padding:8px"><b>A1 &mdash; THE DO CHARTER PERMITS WHAT THE LINE FORBIDS.</b>
+<code>CLAUDE.md</code>: <i>&ldquo;A talent modifying the spec's PROTECTED CORE is guaranteed and permitted&rdquo;</i>
+&mdash; <i>&ldquo;THE LAST SENTENCE IS THE RULING AND IT IS WORTH 83 NODES&rdquo;</i> &mdash; <i>&ldquo;DO NOT RE-OPEN
+THIS AS AN OPEN QUESTION.&rdquo;</i> The charter's permitted list is a stat, the spec's own passive, the spec's own
+resource, the protected core, and another node in the same tree. <b>The line keeps the stat, the resource and the
+other node, and forbids the passive and the core.</b> So it narrows a ruling <code>CLAUDE.md</code> records as
+settled; the 33 node payloads that edit an ability today were legal under DO and are all out under the line.
+<b>That is the designer's to overturn, and nothing on this page assumes it has been.</b></p>
+<p style="border:2px solid #a00; padding:8px"><b>A2 &mdash; EN &sect;4 PUTS HALF OF THE BRIEF'S LIST ON THE RELIC
+SIDE.</b> <i>&ldquo;If it sets the run up &mdash; the purse, the pouch, the shop, the spawn line, what a victory pays,
+what an elite drops &mdash; it is a RELIC.&rdquo;</i> By read site that is gold, the shop, the pouch's structure, the
+victory heal, the draft offer's size and the map's rewards. <b>And the rule has no tiebreak for a per-hero run
+effect</b>: the talent test is <i>&ldquo;read while a turn resolves, OR must know which spec the hero is&rdquo;</i>, and
+a per-hero run effect passes both. The brief says everything outside the line is fair game; <b>EN &sect;4 says
+otherwise for these, and 15 of the 32 ruling-gated things on this page wait on that seam alone.</b></p>
+
+<h3 id="sr-line-status">SR-LINE &middot; B &middot; Is a STATUS an engine's?</h3>
+<ul>
+<li><b>THE CENSUS: of 165 statuses a hero can apply, 23 are ENGINE-OWNED, 112 SPEC-EXCLUSIVE, 26 SHARED</b> (13 only through a class-wide card, 13 across specs) <b>and 4 FREE</b> (<code>broken</code>, <code>class_passive</code>, <code>fortify</code>, <code>hexed</code>). 5 more can never be applied (<code>focus</code>, <code>melted</code>, <code>rampage</code>, <code>seeding</code>, <code>ward</code>) and 2 are enemy-only &mdash; 172 rows in the table below.</li>
+<li><b>BURN IS THE PYROMANCER'S</b> &mdash; his engine's currency, nearly every source his &mdash; with named
+exceptions: the Survivalist's Choking Smoke (a deliberate cross-spec feeder), Umbral Mirror's reflections, and two
+enemies.</li>
+<li><b>POISON IS NOT &ldquo;NOBODY'S&rdquo;. Every hero-side path is the Survivalist's</b> &mdash; his cards, his
+passive's barb, his lane, the Second Barb rune, and Quartermaster, which puts HIS poison on other heroes' basic attacks
+&mdash; and <code>CLAUDE.md</code> says so as a standing rule (BA &sect;1): <i>&ldquo;POISON ITSELF IS NOT RESERVED AND
+STAYS ENTIRELY THE SURVIVALIST'S.&rdquo;</i> Four enemy kinds apply it too.</li>
+<li><b>WHAT &ldquo;FREE&rdquo; MEANS WHEN THE LINE MEETS THE CHARTER.</b> The line forbids an engine's status; the
+standing DO/DP charter forbids depending on a status <i>&ldquo;the spec has no guaranteed way to apply&rdquo;</i>.
+After the merge a spec-exclusive status arrives with that spec's cards, which are drawn &mdash; <b>so the 113 are
+legal by the line and bets by the charter</b>, unless every spec of a class can apply them. The class-wide cards'
+statuses are free within one class and still a bet on the card being offered (nothing guarantees a hero any class-wide
+card &mdash; FP premise 12).</li>
+<li><b>AND THE WAY AROUND ALL OF IT ALREADY SHIPS: READ STATUSES BY COUNT.</b> Overwhelm, Iron Will, Pleasure from
+Pain, Dominant Presence and Field Medic name no status; they read <code>DEBUFF_IDS</code>. That is the shape a merged
+tree can use without touching any owner (<a href="#sr-status">SR-STATUS</a>).</li>
+</ul>
+<p><b>THE STATUS TABLE.</b> Mapped by the survey from every application site (214 through the funnel, 33 direct), each
+attributed to its <code>_resolve_special</code> arm, then to the ability and its pools, or by its guard chain to a node,
+passive, rune or item. <i>It can miss a status applied inside a called helper or at a node's own read site, and
+&ldquo;can apply&rdquo; means a live path exists, not that every cast applies it.</i> [DEBUFF_IDS] marks what Trapper
+counts; Downwind can copy any of those onto a second enemy.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Status id</th><th>Label</th><th>Hero appliers</th><th>Enemy appliers</th><th>Classification</th></tr>
+<tr><td><code>aegis_wall</code></td><td>Aegis Wall</td><td>Warden: Aegis Wall (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>alms</code></td><td>Alms</td><td>Holy: Alms (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>anointed</code></td><td>Anointed</td><td>Occultist: Anointing (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>answering_steel</code></td><td>Answering Steel</td><td>Swordmaster: Answering Steel (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>anvil</code></td><td>Anvil</td><td>Warden: Anvil (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>arcane_echo</code></td><td>Arcane Echo</td><td>Arcanist: Arcane Echo (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>arrows</code></td><td>Arcane Arrows</td><td>Hunter class-wide: Arcane Arrows (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>barrier</code></td><td>Barrier</td><td>Devout: Divine Shield (core) / Blessing of Zeal (core) / Mantle (draft) via _grant_divine_shield ‖ Holy: Alms (draft) via _alms_spill; hl_vestments (Blessed Vestments) ‖ Mage class-wide: Magic Barrier (class-wide draft) ‖ Pyromancer: Funeral Pyre (draft) ‖ dead site(s): L16994: no ability has special "barrier"</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>battle_poise</code></td><td>Battle Poise</td><td>Swordmaster: Battle Poise (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>battle_shout</code></td><td>Battle Shout</td><td>Berserker: Battle Shout (boss); Battle Shout (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>battle_trance</code></td><td>Battle Trance</td><td>Warrior class-wide: Battle Trance (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>bear_brunt</code></td><td>Bear the Brunt</td><td>Beastmaster: Bear the Brunt (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>berserk</code></td><td>Berserk</td><td>Berserker: Berserk (draft) chip</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>berserk_risk</code></td><td>Berserk</td><td>Berserker: Berserk (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bestial</code></td><td>Bestial Wrath</td><td>Beastmaster: Bestial Wrath (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bewitch</code> [DEBUFF_IDS]</td><td>Bewitched</td><td>Occultist: Bewitch (core)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bleed</code> [DEBUFF_IDS]</td><td>Bleed (meter chip)</td><td>chip written by unit.gd:2906–2923 from <code>bleed_buildup</code>; builders (Berserker Wildstrikes and Hack and Slash, the Beastmaster's Canis) <b>not censused</b></td><td>—</td><td>SHARED (inferred)</td></tr>
+<tr><td><code>blight</code> [DEBUFF_IDS]</td><td>Blighted</td><td>Occultist: Blight the Well (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>blind</code> [DEBUFF_IDS]</td><td>Blind</td><td>Beastmaster: Aguila under Bestial Wrath (boss); Kill Command (core) ‖ Survivalist: Choking Smoke (draft); Stalking Horse (draft) cycle; rune second_barb (LIVE) cycle on the Trapper barb</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>blood_debt</code></td><td>Blood Debt</td><td>Berserker: Blood Debt (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>blood_price</code></td><td>Blood Price</td><td>Berserker: Blood Price (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bloodbond</code></td><td>Bloodbond</td><td>Beastmaster: Bloodbond (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>boil_over</code></td><td>Boil Over</td><td>Berserker: Boil Over (draft)</td><td>—</td><td>ENGINE-OWNED — Blood Frenzy (frenzy_bonus unit.gd:3263)</td></tr>
+<tr><td><code>bracing</code></td><td>Bracing</td><td>Swordmaster: sm_footwork (Bracing)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>breaking_darkness</code> [DEBUFF_IDS]</td><td>Breaking Darkness</td><td>Occultist: Breaking Darkness (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bring_it_down</code></td><td>Bring It Down</td><td>Beastmaster: Bring It Down (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>broken</code> [DEBUFF_IDS]</td><td>BROKEN</td><td>anyone's Break damage (unit.gd:3772)</td><td>enemies Break heroes</td><td>UNIVERSAL/FREE (every cleanse and count skips it)</td></tr>
+<tr><td><code>bulwark</code></td><td>Bulwark of Fortitude</td><td>Devout: Bulwark of Fortitude (boss); Bulwark of Fortitude (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>bulwark_line</code></td><td>Bulwark Line</td><td>Warden: Shieldwall (core); wd_bannerman (Bulwark Line); wd_shieldwall (Shield Mastery)</td><td>—</td><td>ENGINE-OWNED — Heavy Plating (_plating_slice 15564)</td></tr>
+<tr><td><code>burn</code> [DEBUFF_IDS]</td><td>Burn</td><td>Occultist: oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Pyromancer: Detonation (core); Ember Debt (draft); Fireball (core); Firedraw (draft); Firestorm (boss); Firestorm (draft); Flamewave (core); Immolate (boss/draft) retaliation; Pyre Wake (draft); Wildfire (core); py_arson (Conflagration); py_ashes (Wildfire Spread); py_implosion (Aftershock); py_molten (Backblast); py_spreading (Chain Ignition); rune cinder_trail (RETIRED, spec:pyromancer); rune ember_leap (LIVE, Pyromancer) ‖ Survivalist: Choking Smoke (draft) ‖ dead site(s): L24080: perfect_id "burn" has no carrier</td><td>Ashblade: Flame Lick 60%; Ash-Wrought Tyrant [boss]: Immolating Wave 80% AoE</td><td>ENGINE-OWNED — Overburn (_total_burn_turns battle.gd:13311)</td></tr>
+<tr><td><code>camouflage</code></td><td>Camouflage</td><td>Hunter class-wide: Camouflage (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>capacitor</code></td><td>Holy Capacitor</td><td>Holy: capacitor_ranks: only RETIRED rune triage_ward</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>caught</code> [DEBUFF_IDS]</td><td>Caught Fast</td><td>Survivalist: sv_caught (Caught Fast)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>charging</code></td><td>(wind-up)</td><td>—</td><td>Ash Hurler: Siege Stone (windup, self)</td><td>ENEMY-ONLY</td></tr>
+<tr><td><code>chilled</code> [DEBUFF_IDS]</td><td>Chilled</td><td>Battle modifier: Hoarfrost battle modifier (all units, both sides) ‖ Cryomancer: Blizzard (core); Cryoclasm (draft); Deep Winter (draft); Frostbind (draft) partner copy; Frostbolt (core); Glacial Prison (draft); Hoarfrost Armor (draft) retaliation; Killing Frost (draft); Razor Ice (core); Rime (boss/draft) echo; Rimebinding (draft); cr_bitter (Bitter Cold); cr_emp_frostbolt (Deep Chill); cr_eternal (Eternal Winter); cr_freezing (Killing Frost); cr_grasp (Winter's Grasp); cr_razor_hone (Honed Shards); cr_whiteout (Whiteout); rune glass_prison (LIVE, spec:cryomancer)</td><td>Hoarfrost battle modifier stamps EVERY unit</td><td>ENGINE-OWNED — Glacial Hold (Permafrost clause battle.gd:13003; freeze at 4, 13208)</td></tr>
+<tr><td><code>class_passive</code></td><td>(class passive chip)</td><td>Every hero: every hero (class passive chip)</td><td>—</td><td>UNIVERSAL/FREE</td></tr>
+<tr><td><code>cons_ground</code></td><td>Consecrated Ground</td><td>Devout: Consecrated Ground (core)</td><td>—</td><td>ENGINE-OWNED — Conviction (_ground_faith_tick 16597, _faith_stack_mult 16234)</td></tr>
+<tr><td><code>consecration</code></td><td>Consecration</td><td>Cleric class-wide: Consecration (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>covenant</code></td><td>Covenant of Ash</td><td>Occultist: Covenant of Ash (draft)</td><td>—</td><td>ENGINE-OWNED — Old Gods (read in _gain_ruin 15847)</td></tr>
+<tr><td><code>covering_guard</code></td><td>Covering Guard</td><td>Warden: Covering Guard (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>cripple</code> [DEBUFF_IDS]</td><td>Cripple</td><td>Berserker: bz_hemorrhage (Hemorrhage) ‖ Hunter class-wide: Bola (class-wide draft) ‖ Occultist: Shadowrend (core); oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Survivalist: Hamstring (boss); Shrapnel Charge (core); Stalking Horse (draft) cycle; rune second_barb (LIVE) cycle on the Trapper barb; rune weeping_wound (RETIRED, spec:mystic); sv_coated (Coated Blades); sv_rigging (Quick Rigging) ‖ Swordmaster: Lunge (boss); Lunge (draft)</td><td>Wolfrider: Ride-by Slash 50%; Grave Totem: Grasping Roots 60%</td><td>SHARED</td></tr>
+<tr><td><code>crossfire</code></td><td>Crossfire</td><td>Sharpshooter: Crossfire (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>crushing_blows</code></td><td>Crushing Blows</td><td>Berserker: bz_crushing_blows (Crushing Blows)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>dazed</code> [DEBUFF_IDS]</td><td>Dazed</td><td>Beastmaster: Summon Aguila (core) / Call of the Wild (boss) dive ‖ Occultist: Bewitch (core) via _bewitched_strike; oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Sharpshooter: Pinning Shot (boss) ‖ Survivalist: Stalking Horse (draft) cycle; rune second_barb (LIVE) cycle on the Trapper barb ‖ Swordmaster: Sweeping Strikes (boss) ‖ Warrior class-wide: Charge (class-wide draft)</td><td>Withered Warden [boss]: Timber Slam 100%; The Hollow Crown [boss]: Hollow Wail 70% AoE</td><td>SHARED</td></tr>
+<tr><td><code>deadfall</code></td><td>Deadfall</td><td>Survivalist: Deadfall (boss) chip</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>deathwish</code></td><td>Deathwish</td><td>Berserker: bz_deathwish (Deathwish)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>decay</code> [DEBUFF_IDS]</td><td>Decay</td><td>Occultist: Hex of Ruin (core); oc_emp_hex (Empowered Hex); oc_torment (Lingering Torment)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>devotion</code></td><td>Devotion Aura</td><td>Devout: dv_devoutness (Devoutness)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>discipline</code></td><td>Discipline</td><td>Swordmaster: Discipline (draft)</td><td>—</td><td>ENGINE-OWNED — Stances (_swordmaster_switch 15462)</td></tr>
+<tr><td><code>divine_presence</code></td><td>Divine Presence</td><td>Holy: Divine Presence (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>downwind</code></td><td>Downwind</td><td>Survivalist: Downwind (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>dug_in</code></td><td>Dug In</td><td>Sharpshooter: Dug In (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>elem_weak</code> [DEBUFF_IDS]</td><td>Elemental Weakness</td><td>Warden: Crushing Blow (core); wd_elem_weak (Elemental Weakness)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>elusive</code></td><td>Elusiveness</td><td>Beastmaster: Summons (core) / Call the Wilds (draft) via _do_summon ‖ Survivalist: sv_hitrun (Hit and Run)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>emberkeep</code></td><td>Emberkeep</td><td>Pyromancer: Emberkeep (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>empower</code></td><td>Empower</td><td>Warden: Mocking Blow (core); wd_tank_spank (Tank and Spank)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>endurance</code></td><td>Endurance</td><td>Warden: wd_endurance (Endurance)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>enraged</code></td><td>Enraged</td><td>Berserker: node <code>bz_enraged</code> (unit.gd:3590), on himself</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>exhorted</code></td><td>Exhortation</td><td>Cleric class-wide: Exhortation (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>exposed</code> [DEBUFF_IDS]</td><td>Exposed</td><td>Beastmaster: Aguila strikes (Summon Aguila, core) ‖ Occultist: Hex of Ruin (core); oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Sharpshooter: Called Shot (boss); ss_exposed_nerve (Exposed Nerve) ‖ Survivalist: Hamstring (boss); Stalking Horse (draft) cycle; rune second_barb (LIVE) cycle on the Trapper barb; sv_virulence (Distillate) ‖ Swordmaster: Lunge (boss); Lunge (draft)</td><td>Orc Hexer: Withering Hex 70%</td><td>SHARED</td></tr>
+<tr><td><code>eye_storm</code></td><td>Eye of the Storm</td><td>Warden: Eye of the Storm (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>faith</code></td><td>Faith</td><td>Devout: Conviction passive (Faith chip)</td><td>—</td><td>ENGINE-OWNED — Conviction (_reset_faith_meters 16309, chip 16260)</td></tr>
+<tr><td><code>fault_line</code></td><td>Fault Line</td><td>Sharpshooter: Fault Line (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>feigned_guard</code></td><td>Feigned Guard</td><td>Swordmaster: Feigned Guard (draft)</td><td>—</td><td>ENGINE-OWNED — Stances (_eff_stance 15337)</td></tr>
+<tr><td><code>feint_guard</code></td><td>Feint</td><td>Swordmaster: Feint (draft) chip</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>feinted</code></td><td>Feinted</td><td>Swordmaster: Feint (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>focus</code></td><td>Focus</td><td>dead site(s): L17003: no ability has special "focus"</td><td>—</td><td>DEAD (no live applier)</td></tr>
+<tr><td><code>formless</code></td><td>Formless</td><td>Swordmaster: Formless (draft); Guard Change (core); rune open_line (LIVE, spec:swordmaster)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>formless_recoil</code></td><td>Formless</td><td>Swordmaster: Formless (draft) expiry</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>fortified</code></td><td>Fortified</td><td>Devout: Fortified Spirit (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>fortify</code></td><td>Fortify</td><td>Item: Defense Potion</td><td>—</td><td>UNIVERSAL/FREE</td></tr>
+<tr><td><code>frostbind</code> [DEBUFF_IDS]</td><td>Frostbind</td><td>Cryomancer: Frostbind (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>frostbite</code> [DEBUFF_IDS]</td><td>Frostbite</td><td>Cryomancer: Rime (boss); Rime (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>frozen</code> [DEBUFF_IDS]</td><td>Frozen</td><td>Cryomancer: Glacial Hold: 4th Chilled stack from any source, or Glacial Prison/Cryoclasm (draft)</td><td>—</td><td>ENGINE-OWNED — Glacial Hold (_hold_freeze 12608, _hold_sync 12887)</td></tr>
+<tr><td><code>ghostpack</code></td><td>Ghostpack</td><td>Beastmaster: Ghostpack (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>heads_down</code> [DEBUFF_IDS]</td><td>Heads Down</td><td>Sharpshooter: Heads Down (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>held_breath</code></td><td>Held Breath</td><td>Sharpshooter: Hold Breath (core); ss_second_nature (Second Nature)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>hexed</code> [DEBUFF_IDS]</td><td>Hexed</td><td>Item: Cursed Visage</td><td>—</td><td>UNIVERSAL/FREE</td></tr>
+<tr><td><code>high_guard</code></td><td>High Guard</td><td>Swordmaster: sm_high_guard (High Guard)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>hold_bd</code></td><td>Hold the Line</td><td>Warden: Hold the Line (boss); Hold the Line (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>hunt_mark</code></td><td>Marked</td><td>Beastmaster: Mark of the Hunt (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>hysteria</code> [DEBUFF_IDS]</td><td>Mass Hysteria</td><td>Occultist: Mass Hysteria (boss); Mass Hysteria (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>immolate</code></td><td>Immolate</td><td>Pyromancer: Immolate (boss); Immolate (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>instinct</code></td><td>Hunter's Instinct</td><td>Beastmaster: Hunter's Instinct (core); bm_instinctive (Instinctive)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>intercession</code></td><td>Intercession</td><td>Holy: Intercession (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>invig</code></td><td>Invigoration</td><td>Occultist: Dark Pact (core); oc_invigoration (Invigoration)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>iron_will</code></td><td>Iron Will</td><td>Warden: wd_iron_will (Iron Will)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>ironclad</code></td><td>Ironclad</td><td>Warrior class-wide: Ironclad (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>keen_eyes</code></td><td>Eagle Eyes</td><td>Beastmaster: Pack passive: Aguila boon chip</td><td>—</td><td>ENGINE-OWNED — Pack (Aguila boon chip 3486-3493)</td></tr>
+<tr><td><code>killing_edge</code></td><td>Killing Edge</td><td>Swordmaster: sm_keen_edge (Killing Edge)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>last_howl</code></td><td>Last Howl</td><td>Beastmaster: Last Howl (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>loyalty</code></td><td>Loyalty</td><td>Beastmaster: Pack passive (Loyalty chip)</td><td>—</td><td>ENGINE-OWNED — Pack/Loyalty (chip _stamp_loyalty_chip 14480)</td></tr>
+<tr><td><code>mana_shield</code></td><td>Mana Shield</td><td>Mage class-wide: Mana Shield (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>mana_well</code></td><td>Mana Well</td><td>Mage class-wide: Mana Well (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>melted</code> [DEBUFF_IDS]</td><td>Melt Armor</td><td>dead site(s): L2779: melt_ranks has no writer</td><td>—</td><td>DEAD (no live applier)</td></tr>
+<tr><td><code>mirror</code></td><td>Mirror Image</td><td>Mage class-wide: Mirror Image (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>mocked</code> [DEBUFF_IDS]</td><td>Mocked</td><td>Beastmaster: Bestial Wrath (boss); Summon Ursus (core) / Call of the Wild (boss) roar; Summon Ursus (core) / Call of the Wild (boss) roar; node bm_herald widens ‖ Warden: Eye of the Storm (draft); Mocking Blow (core); Vendetta (draft); wd_taunt_master (Provoke)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>null_field</code></td><td>Null Field</td><td>Arcanist: Null Field (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>open_guard</code></td><td>Open Guard</td><td>Swordmaster: Precision Strike (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>overcharged</code></td><td>Overcharged</td><td>Arcanist: Overcharge (boss); Overcharge (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>parry_up</code></td><td>Parry Up</td><td>Swordmaster: Guard Change (core); Precision Strike (draft); sm_swordsmanship (Swordsmanship)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>party_mark</code></td><td>Hunter's Mark</td><td>Hunter class-wide: Hunter's Mark (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>penance</code> [DEBUFF_IDS]</td><td>Penance</td><td>Occultist: Penance (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>poison</code> [DEBUFF_IDS]</td><td>Poison</td><td>Occultist: oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Survivalist: Explosive Shot (boss); Stalking Horse (draft) cycle; Survivalist poison door _apply_poison: Shrapnel Charge (core), snare spring (core), Venom Coating (boss), Coated Blades node, Loaded Shot (draft) perfect, Stalking Horse (draft), Second Barb rune; Quartermaster node puts it on OTHER heroes' basics; Trapper PASSIVE barb on being struck (25%; every strike with Thin Blood rune); rune second_barb (LIVE) cycle on the Trapper barb ‖ dead site(s): L11233: guard "Poisoned Arrow" names no ability</td><td>Orc Archer: Poison Arrow 70%; Rot Behemoth: Rotting Fist 50%; Withered Warden [boss]: Roots of Wrath 100% AoE; The Hollow Crown [boss]: The Long Dark 90% AoE rung3</td><td>SHARED</td></tr>
+<tr><td><code>primal_surge</code></td><td>Primal Surge</td><td>Beastmaster: Primal Surge (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>psychosis</code> [DEBUFF_IDS]</td><td>Psychosis</td><td>Occultist: Mind Flay (boss); Mind Flay (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>quarry</code></td><td>Quarry</td><td>Sharpshooter: Quarry's Mark (draft)</td><td>—</td><td>ENGINE-OWNED — Focus (_sharpshooter_focus 23511)</td></tr>
+<tr><td><code>quickdraw</code></td><td>Quick Draw</td><td>Sharpshooter: Quick Draw (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>rally_heal</code></td><td>Rallied</td><td>Warden: wd_rally (Rally)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>rampage</code></td><td>Rampage</td><td>dead site(s): L17380: no ability has special "rampage"</td><td>—</td><td>DEAD (no live applier)</td></tr>
+<tr><td><code>reacquire</code></td><td>Reacquire</td><td>Sharpshooter: Reacquire (draft)</td><td>—</td><td>ENGINE-OWNED — Focus (_sharpshooter_focus 23511)</td></tr>
+<tr><td><code>reckless_abandon</code></td><td>Reckless Abandon</td><td>Berserker: Reckless Abandon (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>recompense</code></td><td>Recompense</td><td>Warden: Recompense (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>renewal</code></td><td>Renewal</td><td>Holy: Renewal (core); Resurrection (core) ‖ Occultist: Dark Pact (core)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>resonant_field</code></td><td>Resonant Field</td><td>Arcanist: Resonant Field (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>retaliate</code></td><td>Retaliation</td><td>Warden: Retaliation (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>rime</code></td><td>Rime</td><td>Cryomancer: Rime (boss); Rime (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>rimeguard</code></td><td>Hoarfrost Armor</td><td>Cryomancer: Hoarfrost Armor (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>rite_return</code></td><td>Rite of Return</td><td>Holy: Rite of Return (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>roar</code></td><td>Guardian's Roar</td><td>Beastmaster: Summon Ursus (core) arrival</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>ruin</code> [DEBUFF_IDS]</td><td>Ruin</td><td>Occultist: Old Gods passive via _gain_ruin (16 callers); Transference (draft)</td><td>—</td><td>ENGINE-OWNED — Old Gods (_gain_ruin 15847, _detonate_ruin 16003)</td></tr>
+<tr><td><code>ruin_primed</code></td><td>Ruin (primed)</td><td>Occultist: Old Gods passive: primer at the threshold</td><td>—</td><td>ENGINE-OWNED — Old Gods (_gain_ruin 15847)</td></tr>
+<tr><td><code>salve</code></td><td>Salve</td><td>Survivalist: Salve (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>sanctified</code></td><td>Hallowed</td><td>Holy: Divine Plea (boss); Divine Plea (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>scent</code></td><td>Scent of Blood</td><td>Berserker: bz_gushing (Scent of Blood)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>seeding</code></td><td>Seeding Embers</td><td>dead site(s): L3539: seeding_ranks has no writer</td><td>—</td><td>DEAD (no live applier)</td></tr>
+<tr><td><code>shield_charges</code></td><td>Interpose</td><td>Warden: Interpose (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>shielded</code></td><td>Shielded</td><td>—</td><td>Orc Shieldmaster: Shielding (enemy_shield); Hollow Crown [boss]: Regalia (enemy_shield)</td><td>ENEMY-ONLY</td></tr>
+<tr><td><code>shieldwall</code></td><td>Shieldwall</td><td>Warden: Shieldwall (core); wd_shieldwall (Shield Mastery)</td><td>—</td><td>ENGINE-OWNED — Heavy Plating (_plating_slice 15564)</td></tr>
+<tr><td><code>slow</code> [DEBUFF_IDS]</td><td>Slowed</td><td>Hunter class-wide: Bola (class-wide draft) ‖ Occultist: oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Sharpshooter: Pinning Shot (boss) ‖ Survivalist: Hamstring (boss); Shrapnel Charge (core); Stalking Horse (draft) cycle; rune second_barb (LIVE) cycle on the Trapper barb; sv_slow_acting (Slow Acting) ‖ dead site(s): L11228: guard "Shrapnel" names no ability</td><td>Bog Troll: Swampy Grasp 70%</td><td>SHARED</td></tr>
+<tr><td><code>slow_burn</code> [DEBUFF_IDS]</td><td>Slow Burn</td><td>Pyromancer: Slow Burn (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>snare_line</code></td><td>Snare Line</td><td>Survivalist: Snare Line (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>snared</code> [DEBUFF_IDS]</td><td>Snared</td><td>Survivalist: Snare Trap (core)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>spec_passive</code></td><td>(spec passive chip)</td><td>Every hero: every hero (spec passive chip)</td><td>—</td><td>ENGINE-OWNED — every engine's display chip</td></tr>
+<tr><td><code>spirit_heal</code></td><td>Spirit Bond</td><td>Beastmaster: Spirit Bond (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>spirit_mana</code></td><td>Spirit Flow</td><td>Beastmaster: Spirit Bond (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>spite</code></td><td>Spite</td><td>Berserker: Spite (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>stabilized</code></td><td>Stabilized</td><td>Arcanist: Stabilize (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>stalking_horse</code></td><td>Stalking Horse</td><td>Survivalist: Stalking Horse (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>standard</code></td><td>Standard</td><td>Warden: wd_standard (Standard Bearer)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>stunned</code> [DEBUFF_IDS]</td><td>Stunned</td><td>Survivalist: Snare Line (draft) spring on a Chilled body; _spring_trap: Snare Trap (core) / Snare Line (draft) / Deadfall (boss) ‖ Swordmaster: Counter Time (draft); Pommel Strike (core) ‖ Warden: wd_ricochet (Ricochet)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>succession</code></td><td>Succession</td><td>Beastmaster: Succession (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>suffering</code> [DEBUFF_IDS]</td><td>Suffering</td><td>Occultist: Suffering (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>sunder</code> [DEBUFF_IDS]</td><td>Sunder</td><td>Devout: dv_judgement (Judgement) ‖ Occultist: oc_mirror (Umbral Mirror: reflects an ENEMY applies_status back onto it) ‖ Sharpshooter: Called Shot (boss) ‖ Warden: Crushing Blow (core) ‖ dead site(s): L24077: perfect_id "sunder" has no carrier</td><td>Orc Raider: Sundering Strike 60%; Ash-Wrought Tyrant [boss]: Tyrant's Verdict 70%; The Hollow Crown [boss]: Sundering Decree 80% rung2</td><td>SHARED</td></tr>
+<tr><td><code>surge</code></td><td>Surge</td><td>Arcanist: Arcane Surge (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>tempo</code></td><td>Pivot</td><td>Swordmaster: sm_deep_thrust (Pivot)</td><td>—</td><td>ENGINE-OWNED — Stances (written by _swordmaster_switch 15498)</td></tr>
+<tr><td><code>thick_hide</code></td><td>Thick Hide</td><td>Survivalist: Thick Hide (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>threshold_lock</code></td><td>Threshold</td><td>Arcanist: Threshold (draft)</td><td>—</td><td>ENGINE-OWNED — Resonance (_gain_resonance 14569)</td></tr>
+<tr><td><code>tripwire</code></td><td>Tripwire</td><td>Survivalist: Tripwire (core); sv_forest (The Whole Forest)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>turn_the_blade</code></td><td>Turn the Blade</td><td>Warden: Turn the Blade (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>umbral_sigil</code> [DEBUFF_IDS]</td><td>Umbral Sigil</td><td>Occultist: Umbral Sigil (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>unburdened</code></td><td>Unburdened</td><td>Cleric class-wide: Unburden (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>undying</code></td><td>Undying</td><td>Warden: Hold the Line (boss); Hold the Line (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>undying_rage</code></td><td>Undying Rage</td><td>Berserker: bz_undying (Undying Rage)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>unity</code></td><td>Unity</td><td>Devout: Sacred Resolve (boss); Sacred Resolve (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>unmade</code> [DEBUFF_IDS]</td><td>Unmaking</td><td>Arcanist: Unmaking (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>unrelenting</code></td><td>Unrelenting Assault</td><td>Berserker: node <code>bz_unrelenting</code> (unit.gd:3603), on himself</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>unslaked</code></td><td>Unslaked</td><td>Berserker: Unslaked (draft)</td><td>—</td><td>ENGINE-OWNED — Blood Frenzy (frenzy_bonus unit.gd:3263)</td></tr>
+<tr><td><code>vendetta</code></td><td>Vendetta</td><td>Warden: Vendetta (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>vengeance</code></td><td>Vengeance</td><td>Beastmaster: bm_vengeance (Vengeance)</td><td>—</td><td>ENGINE-OWNED — Pack (_bond_reach 14243)</td></tr>
+<tr><td><code>venom_coat</code></td><td>Venom Coating</td><td>Survivalist: Venom Coating (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>vespers</code></td><td>Vespers</td><td>Holy: Vespers (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>vigil</code></td><td>Undying Vigil</td><td>Cleric class-wide: Undying Vigil (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>vigor</code></td><td>Vigor</td><td>Beastmaster: Spirit Bond (boss)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>vow</code></td><td>Vow of Suffering</td><td>Devout: Vow of Suffering (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>waiting_guard</code></td><td>Waiting Guard</td><td>Swordmaster: sm_waiting_guard (Waiting Guard)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>warcry</code></td><td>Warcry</td><td>Warrior class-wide: Warcry (class-wide draft)</td><td>—</td><td>SHARED</td></tr>
+<tr><td><code>ward</code></td><td>Ward</td><td>dead site(s): L8183: perfect_id "ward" has no carrier</td><td>—</td><td>DEAD (no live applier)</td></tr>
+<tr><td><code>wheeling_edge</code></td><td>Wheeling Cut</td><td>Swordmaster: Wheeling Cut (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>wheeling_guard</code></td><td>Wheeling Cut</td><td>Swordmaster: Wheeling Cut (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>wrath</code></td><td>Divine Wrath</td><td>Devout: Divine Wrath (draft)</td><td>—</td><td>SPEC-EXCLUSIVE</td></tr>
+<tr><td><code>zeal</code></td><td>Blessing of Zeal</td><td>Devout: Blessing of Zeal (core)</td><td>—</td><td>ENGINE-OWNED — Conviction (_gain_faith 16387)</td></tr>
+</table>
+
+<h3>SR-LINE &middot; C &middot; Is the BASIC ATTACK an ability?</h3>
+<p><b>By the letter, yes</b> &mdash; slot 0 holds an <code>Ability</code> like any other. <b>In spirit it is
+universal</b>: every hero has one, every live basic carries pressure, the delay ladder is written against
+<code>BASIC_DELAY</code>, and a basic resolves at a fixed Good. <b>But the code carries three definitions of it, not
+one:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Definition</th><th>Where</th><th>What it catches</th></tr>
+<tr><td><code>ab == u.abilities[0]</code></td><td>the skill check's no-bar test (<code>battle.gd:4047-4048</code>), the
+Sharpshooter's sequence (<code>:23304-23306</code>), the bot</td><td>slot 0 &mdash; which four specs override (Fireball,
+Frostbolt, Arcane Explosion, Shadowrend), so a class's basic is not one card</td></tr>
+<tr><td><code>ab.cost == 0</code></td><td>Coated Blades (<code>battle.gd:11981</code>)</td><td><b>any free
+ability</b> &mdash; Blood Offering, Blood Price, Reckless Abandon and Divine Plea among them</td></tr>
+<tr><td><code>ab.damage &gt; 0 and ab.cost == 0 and not is_counter</code></td><td>Quartermaster
+(<code>battle.gd:12061-12063</code>)</td><td>any free damaging cast</td></tr>
+</table>
+<p><b>Two nodes already key on &ldquo;your basic attack&rdquo;</b> &mdash; Coated Blades and Quartermaster, both Poison,
+both the Survivalist's. <b>A ruling that a node may touch the basic attack also has to say which of the three it
+means</b>, because they are three different populations.</p>
+
+<h3>SR-LINE &middot; D &middot; Is an ITEM an ability?</h3>
+<p><b>No, by construction</b>: an item is an <code>ITEM_INFO</code> entry resolved by an arm of <code>_use_item</code>,
+never an <code>Ability</code> object. <i>&ldquo;It has a handler and a cost&rdquo;</i> &mdash; the handler holds; the
+cost is a gold price and one item a turn, and an item costs no turn and no resource. It shares machinery with abilities
+(<code>revive()</code>, the cleanse derivation, <code>next_time</code>) and owns two statuses outright
+(<code>fortify</code>, <code>hexed</code>). <b>By EN &sect;4 the pouch is relic territory; USING an item in a fight is
+read mid-turn, which is the talent test.</b> The charter's guarantee rule names abilities and statuses; an item is
+neither, so whether a node keyed on using one is a bet is a reading, not a rule.</p>
+
+<h3>SR-LINE &middot; E &middot; Is BREAK an engine?</h3>
+<p><b>No passive's accrual or payout reads the meter</b> &mdash; checked across all twelve. <b>The Breaker lane is a
+TALENT lane</b> (the Swordmaster's nine nodes), not a passive. <b>Fault Line and Turn the Blade generate Break; Bring It
+Down does not</b> &mdash; it is a damage buff (<code>battle.gd:9610-9611</code>). So &ldquo;no passive owns it&rdquo;
+holds. <b>But Break is wired into four engines and one spine</b> (<a href="#sr-break">SR-BREAK</a> &middot; 5), and its
+participation is uneven by EP &sect;2's standing measurement: <b>the Devout drafts no pressure at all.</b></p>
+
+<h3>SR-LINE &middot; F &middot; Edges the brief did not list, found in the code</h3>
+<ol>
+<li><b>IS A CLASS PASSIVE A PASSIVE?</b> Four exist: Threatening Presence (the Warrior &mdash; the 1.2 threat
+literal), Holy Conduit (the Cleric &mdash; healing received 1.15), Tracker (the Hunter &mdash; the opening move),
+Evocation (the Mage &mdash; +10 Mana a turn). <b>By the letter, yes.</b> And two of them assign over fields a stat node
+would naturally write, so a node there is silently replaced on that class whatever the ruling.</li>
+<li><b>IS A CLASS SPINE AN ENGINE?</b> The proposal calls each a &ldquo;CORE ENGINE&rdquo;; FT calls them class cores
+and ledgers. <b>By the letter a node may not touch Momentum, Channel, Sanctity or Focus &mdash; and all four read
+universal traffic.</b> Channel books every Mana a Mage spends, so a discount or a refund lowers it; Momentum books an
+exchange whenever a Warrior deals and is reached; Sanctity books every status applied or removed on anyone; Focus is
+the Hunter's. <b>&ldquo;May not touch an engine&rdquo; cannot mean &ldquo;may not change what an engine reads&rdquo;
+without excluding most of this page for three classes. The ruling is which it means.</b></li>
+<li><b>IS THE CLASS RESOURCE AN ENGINE?</b> Not on the list, and FP's survivors lean on it. But the spend door is
+Blood Frenzy's and Channel's input &mdash; question 2 arriving through the resource.</li>
+<li><b>IS A RUNE-NAMED FIELD A RUNE?</b> EM's charter: <i>&ldquo;THE FIELD NAME IS THE RULE: <code>rune_X</code>
+BESIDE <code>X</code>.&rdquo;</i> Three idle fields a node could write today are rune-named
+(<code>rune_lifesteal</code>, <code>rune_execute_bonus</code>, <code>rune_resist_pierce</code>) &mdash; out by the
+letter; their non-rune twins are one field each.</li>
+<li><b>A SHARED FIELD IS NOT A TOUCHED RUNE.</b> Nine fields are written by both layers
+(<code>check_em.UNIT_MATH</code>), and EN &sect;4 separates the layers by scope, not by field.</li>
+<li><b>A COMPANION IS NOT AN ENGINE BY BEING AN ALLY.</b> A node that reaches &ldquo;allies&rdquo; reaches a companion
+under the ally word; anything that summons, or pays for a summon, is the Beastmaster's exclusive axis (DR &sect;1).</li>
+</ol>
+
+<h3>SR-LINE &middot; G &middot; FP's 50 survivors, re-sorted under the line</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Class</th><th>Survivors (FP)</th><th>CLEAN under the line</th><th>Not clean, and why</th></tr>
+<tr><td><b>Warrior</b></td><td>20</td><td><b>18</b></td><td>Grudge, The Whole Room &mdash; a SPEC STATUS: only the Warden's
+taunt cards and his core Mocking Blow carry the hero index they read (the bear's taunts carry 100 + an index and can never
+satisfy either)</td></tr>
+<tr><td><b>Mage</b></td><td>6</td><td><b>3</b></td><td>Feedback Loop, Perfect Conversion, Blowback &mdash; an ABILITY: they
+run only on recoil, which exists on Arcane Cannon, Magi's Wrath and one battle modifier</td></tr>
+<tr><td><b>Cleric</b></td><td>6</td><td><b>4</b></td><td>Cackling Mirror &mdash; a PASSIVE (gated on the Occultist's passive
+through <code>_living_occultist()</code>); Corrupted Channeling &mdash; a SPEC STATUS (Cripple)</td></tr>
+<tr><td><b>Hunter</b></td><td>18</td><td><b>18</b></td><td>&mdash;</td></tr>
+<tr><td><b>TOTAL</b></td><td><b>50</b></td><td><b>43</b></td><td><b>3 ability, 1 passive, 3 spec status</b></td></tr>
+</table>
+<ul>
+<li><b>Of the 43, 38 carry no caveat.</b> One never fires (Overpressure); four carry a coupling &mdash; Last Rites feeds
+Blood Frenzy's <code>rage_spent</code> as a side effect, No Quarter pays at two of fifteen Break checks (one inside Guard
+Change's handler), Off Balance's wide half needs Punishment, Sunder Shot is worth nothing without Armor Piercer. <b>Eight
+of the 43 are pure stat nodes.</b></li>
+<li><b>THE BILL MOVES WITH IT: 324 &minus; 43 = 281 new nodes</b> &mdash; Warrior 63, Mage 78, Cleric 77, Hunter 63 &mdash;
+if the four trees hold 324 between them; 282 if the inert Overpressure is not counted as salvage.</li>
+<li><b>FP's recon carries five claims this corrects</b> (recorded here and in <code>docs/state.md</code>;
+<code>merge-recon.html</code> is regenerated, never hand-edited): Overpressure counted as live; Grudge and The Whole Room
+&ldquo;conditional on Provoke and the bear&rdquo; (Provoke is a node that widens Mocking Blow); Cackling Mirror listed as
+engine-free; &ldquo;five of the six Arcanist survivors are one idea&rdquo; (three run on two cards' recoil); &ldquo;six of
+the Swordmaster's nine are Break nodes&rdquo; (five by lane, four by read site).</li>
+<li><b>Worth knowing before authoring:</b> Woodcraft and Unwavering Faith are the same node (<code>max_hp_pct</code> 0.2);
+Improvised overlaps Snap Shot; and three names collide under a merge &mdash; Spite (a Warden node and a Berserker card, one
+class once merged), Whetstone (a Swordmaster node and a live Swordmaster rune), Second Wind (a Berserker node and a Holy
+card).</li>
+<li><b>And a caveat on most of the 43:</b> their reads sit in <code>_resolve</code>'s ordinary strike branch, which an
+ability carrying a <code>special</code> never reaches (<a href="#sr-plumb">SR-PLUMB</a>, trap 6).</li>
+</ul>
+<hr><h2 id="sr-count">&sect;4 &mdash; SR-COUNT &mdash; HOW MUCH IS ACTUALLY THERE</h2>
+
+<p style="border:3px solid #a00; padding:10px"><b>THE ANSWER, NOT SOFTENED: 274 IS REACHABLE AS A COUNT AND NOT AS A
+NUMBER OF DIFFERENT THINGS.</b><br><br>
+<b>Under the designer's line there are about 159 distinct things a node could say across 21 systems. 127 need no ruling,
+and 50 of those can be said today.</b> A merged tree holds 81 nodes, and <b>today's machinery gives a tree about 50
+different things to say &mdash; so at least 31 nodes in every tree, 124 of the 324, must be a second magnitude of
+something the same tree already says. That is the stat creep, measured, before a single hook is built.</b><br><br>
+<b>Building every small hook ends the forced creep and not the sameness</b>: four trees of 81 drawn from one pool of about
+113 ideas are one list dealt four times, and any two of them share at least 49 ideas by arithmetic alone.<br><br>
+<b>DN's sentence priced a restructure at 97 nodes. This page's: the merged layer is being asked for 281 nodes &mdash; not
+274, because seven of FP's survivors do not survive the line &mdash; and it has about 127 things to say.</b></p>
+
+<h3>SR-COUNT &middot; The rule the count was taken by</h3>
+<p><b>A distinct thing is a different dial or a different condition.</b> Magnitudes are one thing; one trigger paying in
+two currencies is one thing; each thing is counted in exactly one section. <b>Costs:</b> <b>TODAY</b> &mdash; a field
+exists, this system reads it, no trap in the way; <b>SMALL</b> &mdash; one new field and one read line at a site that
+already exists; <b>LARGE</b> &mdash; a new door, layer, run-side reader, dictionary hook or piece of UI; <b>RULING</b>
+&mdash; the line's edge or a standing rule has to be decided first. <b>This is a judgement applied the same way everywhere,
+not a measurement</b>; every section lists its things so the count can be taken again.</p>
+
+<h3>SR-COUNT &middot; The table</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>System</th><th>Distinct things</th><th>TODAY</th><th>SMALL</th><th>LARGE</th><th>RULING</th></tr>
+<tr><td><a href="#sr-check">SR-CHECK</a> &mdash; the skill check</td><td>9</td><td>1</td><td>5</td><td>1</td><td>2</td></tr>
+<tr><td><a href="#sr-break">SR-BREAK</a> &mdash; Break</td><td>15</td><td><b>9</b></td><td>5</td><td>0</td><td>1</td></tr>
+<tr><td><a href="#sr-status">SR-STATUS</a> &mdash; statuses, generically</td><td>14</td><td><b>7</b></td><td>4</td><td>2</td><td>1</td></tr>
+<tr><td><a href="#sr-timeline">SR-TIMELINE</a> &mdash; initiative</td><td>9</td><td>2</td><td>5</td><td>0</td><td>2</td></tr>
+<tr><td><a href="#sr-pouch">SR-POUCH</a> &mdash; items and the pouch</td><td>7</td><td>0</td><td>6</td><td>0</td><td>1</td></tr>
+<tr><td><a href="#sr-crit">SR-CRIT</a> &mdash; crit</td><td>10</td><td>3</td><td>6</td><td>0</td><td>1</td></tr>
+<tr><td><a href="#sr-loadout">SR-LOADOUT</a> &mdash; the loadout</td><td>8</td><td>0</td><td>0</td><td>2</td><td><b>6</b></td></tr>
+<tr><td><a href="#sr-gold">SR-GOLD</a> &mdash; gold and the shop</td><td>7</td><td>0</td><td>1</td><td>0</td><td><b>6</b></td></tr>
+<tr><td><a href="#sr-map">SR-MAP</a> &mdash; the map</td><td>6</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+<tr><td><a href="#sr-party">SR-PARTY</a> &mdash; the party</td><td>8</td><td>3</td><td>1</td><td>0</td><td>4</td></tr>
+<tr><td><a href="#sr-stats">SR-STATS</a> &mdash; base stats, damage</td><td>8</td><td>5</td><td>1</td><td>2</td><td>0</td></tr>
+<tr><td><a href="#sr-heal">SR-HEAL</a> &mdash; healing and shields</td><td>7</td><td>2</td><td>3</td><td>1</td><td>1</td></tr>
+<tr><td><a href="#sr-resource">SR-RESOURCE</a> &mdash; the class resource</td><td>11</td><td><b>7</b></td><td>4</td><td>0</td><td>0</td></tr>
+<tr><td><a href="#sr-cooldown">SR-COOLDOWN</a> &mdash; cooldowns</td><td>8</td><td><b>6</b></td><td>2</td><td>0</td><td>0</td></tr>
+<tr><td><a href="#sr-intent">SR-INTENT</a> &mdash; enemy intent</td><td>5</td><td>0</td><td>4</td><td>1</td><td>0</td></tr>
+<tr><td><a href="#sr-threat">SR-THREAT</a> &mdash; threat and targeting</td><td>5</td><td>1</td><td>2</td><td>0</td><td>2</td></tr>
+<tr><td><a href="#sr-evade">SR-EVADE</a> &mdash; accuracy, parry, block</td><td>8</td><td>4</td><td>3</td><td>0</td><td>1</td></tr>
+<tr><td><a href="#sr-dot">SR-DOT</a> &mdash; damage over time</td><td>3</td><td>0</td><td>2</td><td>0</td><td>1</td></tr>
+<tr><td><a href="#sr-trigger">SR-TRIGGER</a> &mdash; the moments</td><td>7</td><td>0</td><td><b>7</b></td><td>0</td><td>0</td></tr>
+<tr><td><a href="#sr-modifier">SR-MODIFIER</a> &mdash; battle modifiers</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td><a href="#sr-interfere">SR-INTERFERE</a> &mdash; answers to interference</td><td>3</td><td>0</td><td>0</td><td>3</td><td>0</td></tr>
+<tr><td><b>TOTAL</b></td><td><b>159</b></td><td><b>50</b></td><td><b>63</b></td><td><b>14</b></td><td><b>32</b></td></tr>
+</table>
+
+<h3>SR-COUNT &middot; What the totals say</h3>
+<ol>
+<li><b>159 distinct things; 127 need no ruling (50 today, 63 small, 14 large); 32 wait on one.</b> Of the 32:
+<b>15 on EN &sect;4's relic seam</b>, 7 on standing mechanical rulings (CN's profile rule, CR &sect;1, EX's rate, EG's
+ledger, the rung's rules), 5 on an engine's or a passive's gate, 3 on a class passive, and 2 on an ability or a card the
+hero must draw.</li>
+<li><b>THE TARGET.</b> Under FP's rule the bill was 274 (61 / 75 / 75 / 63). Under the line the salvage is 43, so the bill
+is <b>281 (63 / 78 / 77 / 63)</b>. <b>Both assume four trees of 81 &mdash; 324 between them &mdash; and nothing in the repo
+rules that size.</b></li>
+<li><b>A TREE OF 81, TODAY: ABOUT 50 THINGS TO SAY.</b> The fifty are class-blind except for a handful that belong to one
+currency, so every tree can use nearly all of them &mdash; and <b>at least 31 of each tree's 81 nodes, 124 of the 324
+(38%), must be a second magnitude of something the same tree already says.</b> The salvage does not add room: FP's
+survivors are instances of these same fifty.</li>
+<li><b>WITH EVERY SMALL HOOK BUILT: ABOUT 113 THINGS, AND THE TREES CONVERGE.</b> A tree of 81 can then be distinct within
+itself. But <b>any two trees of 81 drawn from 113 share at least 49 ideas</b>, and what separates them is the class
+resource (Rage against Mana), their salvage (the Warrior and the Hunter keep 18 each; the Mage 3, the Cleric 4) and the
+dozen dials that belong to one class &mdash; the brace, the threat weight, the opening move, a currency's own tricks. The 63
+hooks are 63 separate field-and-line changes, each with its own gate reading.</li>
+<li><b>THE VARIABLE THAT DECIDES THE CREEP IS THE TREE'S SIZE, AND NOBODY HAS RULED IT.</b> At 81 a tree, repetition is
+forced; at 27 a tree &mdash; 108 in all, a bill of 65 &mdash; today's machinery alone has room for every tree to be
+distinct. FP's own migration bullet already spoke of trees &ldquo;three times shallower&rdquo;. <b>This page does not
+choose.</b></li>
+<li><b>WHERE THE ROOM IS.</b> The richest systems today are Break (9), the class resource (7), statuses read by count (7),
+cooldowns (6) and the base stats (5) &mdash; <b>and most of Break's nine and the cooldowns' six are already the survivors'
+own words.</b> The most untouched room is the trigger sites (7, all small), intent (5, none built), the skill check (7
+clear, one of them reachable today) and the timeline (5 small). <b>The pouch, gold and the shop, the map and the loadout
+&mdash; four of the brief's ten &mdash; hold 28 things between them, none reachable today, 16 waiting on a ruling and 12 of
+those on EN &sect;4.</b></li>
+<li><b>THE PURE STATS ARE ABOUT A DOZEN OF THE 127</b> &mdash; health, Attack, armor, damage dealt and taken, crit,
+penetration, parry, speed, constitution, stability, the pool and its regeneration. Everything else is a rule or a
+trigger.</li>
+</ol>
+
+<hr><h2 id="sr-not">SR-NOT &mdash; WHAT THIS PAGE DELIBERATELY DOES NOT SAY</h2>
+<ul>
+<li><b>No node is proposed, named, sketched or reserved.</b> A &ldquo;distinct thing&rdquo; is a dial or a condition, not
+content &mdash; the content is written with the designer.</li>
+<li><b>No edge of the line is ruled on</b>, nor the DO charter, nor EN &sect;4's seam, nor interference, nor the tree
+size.</li>
+<li><b>No SMALL or LARGE item is recommended.</b> They are priced so a decision has its inputs.</li>
+<li><b>No balance.</b> TODAY means a node can say it, never that saying it is worth a point.</li>
+<li><b>Nothing was driven</b> &mdash; no probe, no fight, no screen. Three claims are inferences from reading and say so where
+they appear: Overpressure never fires; a fallen hero never reaches the map; the Survivalist's passive barb skips his poison
+lane.</li>
+<li><b><code>docs/merge-recon.html</code> is not edited.</b> Its five superseded claims are recorded in &sect;3 and in
+<code>docs/state.md</code>, because a recon is regenerated rather than hand-edited.</li>
+</ul>
+
+<hr>
+<p><i>Batch FW. Report only. Nothing was authored, built, merged, changed, retired or retuned. Full working:
+<code>docs/reports/FW.md</code>.</i></p>
+</body></html>

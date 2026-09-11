@@ -13,79 +13,115 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-10 (Batch FV).*
+*Last rewritten: 2026-09-10 (Batch FW).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FV — MOMENTUM'S RATE AND SANCTITY'S. THE THIRD BATCH ON `class-merge`.** Still nothing
-  is attached to any hero: `check_ft` §0 asserts the three spines are reachable by nobody and is still
-  written to invert. `main` is untouched and still playable. Full working: **`docs/reports/FV.md`**.
-- **§1 — THE WARDEN HOLE WAS REAL, AND IT WAS THE BATCH.** Momentum's taken half booked HEALTH LOST, so
-  a blow the Warrior's defence turned booked nothing. **Driven on HEAD: a BLOCK, an Interpose charge,
-  an absolute PARRY (a Feint charge, and a Swordmaster's Untouchable) and a barrier that ate the whole
-  blow each left the span empty — no exchange however much he had dealt.** An ordinary parry lands a
-  quarter of the blow and booked; a miss never reached him and books nothing, before and after.
-- **THE REPAIR: `note_blow_met()`, ONE CALL IN `_resolve`'s STRIKE LOOP, BELOW BOTH MISS ROLLS AND ABOVE
-  THE BLOCK ROLL.** Every blow that reaches a body books `momentum_met`, and the step reads the taken
-  half as health lost OR a blow met. **A second field, not a floor on the health ledger** — a turned
-  blow and a Burn tick are two populations, where a free cast and a costed one were one. **A hero no
-  blow reaches and who loses no health books no exchange, however much he deals** — stated in
-  `CLAUDE.md`, asserted in `check_ft` §6d.
-- **WHAT THE HOLE COST (100 driven runs a Warrior spec, untalented, rung 1, 13,714 fights across the
-  five arms with every fight's probe proved against the game's own ledgers):** exchanges a trash fight
-  under FT's rule against the repair — **Warden 1.08 → 2.77**, Swordmaster 1.75 → 2.28, Berserker 1.32 →
-  1.84. **The Warden's meter was two fifths of what it should have been**, and in the spans the hole
-  emptied, a Devout's shield eating a blow whole (74%) was a larger cause than his own Block (37%).
-- **§2 — MOMENTUM'S RATE IS AT ITS STOP: ONE STEP AN EXCHANGE, NOW A NAMED CONSTANT
-  (`MOMENTUM_EXCHANGES_PER_STEP` = 1).** The brief's premise — that the meter would outrun a third of
-  the cap — is FALSE: a trash fight ends at **1.84 / 2.75 / 2.27** steps (Berserker / Warden /
-  Swordmaster) against 2.67, and the cap is reached in under 2% of them. **An exchange books at most
-  once a turn**, and two exchanges a step would put every spec near one step. **Why so few**: the
-  first span of a fight holds no action of his, his last action lands in a span the fight never closes,
-  and in the rest the enemy reaches him in only 38–47% of spans.
-- **AND IT DOES NOT COMPOUND — DRIVEN LIVE AGAINST STUBBED, AS THE BRIEF ASKED.** With the payout on
-  for the Warrior (in the probe only), he takes +0.24 / +0.99 / +0.60 turns a trash fight and his
-  end-of-fight meter moves **+0.07 / +0.12 / −0.01** steps (no spec past two standard errors); in boss
-  fights it FALLS by 0.28 and 0.31. **A hastened turn closes a shorter span that the enemy reaches less
-  often**, so late in a fight the share of spans booking an exchange DROPS. **No lower cap is needed**;
-  `docs/reports/FV.md` §2c shows what 6 / 5 / 4 / 3 would do, and `CLAUDE.md` binds the batch that
-  makes an exchange easier to book to re-run the live pair. **Sanctity's duration does not compound
-  either**: live, the three Cleric meters move −0.10 to +0.07 steps, the one clear movement DOWN (the
-  Devout's longer statuses land again less often).
-- **§3 — SANCTITY'S RATE IS 16 EVENTS A STEP (was FT's 6, which put every Cleric party AT THE CAP in
-  78–97% of trash fights).** At 16 a trash fight ends at **3.03 (Devout) / 2.06 (Holy) / 2.28
-  (Occultist)** steps — 2.46 across the three against 2.5, medians 3 / 2 / 2. The spread is the PARTY's
-  traffic: the Devout's party makes 40% more events than the Holy's, and the Holy drives one event in
-  twenty of her own meter.
-- **AND WHAT THE MISSING POTENCY HALF WOULD BE WORTH, SO 16 IS RE-READ RATHER THAN TRUSTED.** Both halves
-  are keyed on the applier. **Holy**: everything her payout reaches carries a magnitude — but 1.3
-  applications a fight. **Devout**: nothing — his reachable applications are all Consecrated Ground,
-  and the Divine Shield's barrier is applied WITHOUT a source. **Occultist**: 1.5% — Ruin is
-  battle-long and carries no magnitude at the funnel. `CLAUDE.md` now binds the potency batch to
-  re-measure the rate in the same batch.
-- **FT's TWO CONSTRAINTS HOLD, AND THE BEAST HALF IS DRIVEN NOW** (`check_ft` §6f, on a summoned
-  Ursus); in live traffic the dedupe refused 0.08–0.24 calls a fight.
-- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED** (FT's ruling). **The subject seam is
-  not taken. The potency layer is not built.**
-- **WHAT MOVED:** `scripts/unit.gd` (the met field and its door, the two-door read, the named Momentum
-  rate and its exchange ledger, Sanctity's rate), `scripts/battle.gd` (one call, one comment),
-  `check_ft.gd` (§2 read through the exchange ledger, §6 new), `pin-manifest.json`, `baselines.json`,
-  `CLAUDE.md`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FV.md` (**NEW**) and this
-  file. **The designer's four save files were copied to `save-backups/FV-…` and md5-verified against
-  the originals and FU's backup before anything else happened; all four match FU's exactly.**
-- **THE VERIFICATION IS IN `docs/reports/FV.md` §5, AND THE PRE-PASS PREDICTION WAS WRITTEN BEFORE IT
-  LAUNCHED:** every unmodified gate against the new tree, with only `check_cm_live`'s sanctioned 13 / 4
-  red and `check_ft` at 112 / 0 as HEAD's gate on the new code — because the rate is still 1, §2a's
-  `momentum == 1` still holds. **It read exactly that: 107 targets, 0 throws, 0 `Parse Error`, the one
-  sanctioned red, `check_de` 445 / 0 / 0, and the freeze held across 403 files.** **THE ACCEPTANCE RUN OVER THE SHIPPED TREE: 107 / 0 / 0 / 0 targets / throws / timeouts / incomplete, `Parse Error` and `SCRIPT ERROR` at 0, `check_ft` 140 / 0 on its new row, `check_de` 445 / 0 / 0, the one red `check_cm_live` 13 / 4 — the four FAIL lines word for word, and the freeze held — 402 files md5-stamped with absolute paths before and after, zero differ.**
-- **Phase.** Step 1 of the merge's running order — the three spines — is DONE, and with FV **all three
-  rates are set**. Still flagged: Channel's partition, how a second meter displays, and the potency
-  half. Open in the rune layer: the Devout's fifth and the Shared Mark's magnitude.
-- **Next letter: FW.**
+- **Last batch: FW — WHAT THE MERGED TALENT LAYER CAN REACH. REPORT ONLY; THE FOURTH BATCH ON `class-merge`.**
+  Nothing was authored, built, merged or changed — no code, no gate, no baseline row, no manifest entry, no
+  `CLAUDE.md` rule. `main` is untouched and still playable. The deliverable is **`docs/systems-recon.html`**;
+  full working **`docs/reports/FW.md`**.
+- **THE ANSWER: 274 IS REACHABLE AS A COUNT AND NOT AS A NUMBER OF DIFFERENT THINGS.** Twenty-one systems belong
+  to no rune, ability, passive or engine outright. Between them a node could say about **159** distinct things
+  under the designer's line; **127** need no ruling (**50 today**, 63 small builds, 14 large) and **32** wait on
+  one. **A tree of 81 can say about fifty things today**, so at least 31 nodes a tree — **124 of 324** — are a
+  second magnitude of something the same tree already says. With every small hook built, every tree can be
+  distinct within itself, and any two still share at least 49 ideas.
+- **THE BILL UNDER THE LINE IS 281, NOT 274.** 43 of FP's 50 survivors survive the designer's line — three touch
+  an ability, one a passive, three a spec status — so Warrior 63, Mage 78, Cleric 77, Hunter 63 (282 if the inert
+  Overpressure is not counted). **Both figures assume four trees of 81, and nothing rules the size**: at 27 a tree,
+  today's machinery alone would fill each tree with distinct nodes.
+- **A NODE IS READ ONLY INSIDE A BATTLE** — a number added to the hero's config at spawn — so the pouch's
+  structure, gold, the shop, the map and the loadout are unreachable today. **Seven silent traps** in that
+  machinery are written in the recon's SR-PLUMB: an undeclared name pays nothing; a payload adds to zero, not to
+  the unit's default; two class passives assign over the tree; dictionaries cannot be written; "party-wide" is the
+  best living holder; the strike loop misses every ability with a `special`; and `check_em` walks every rune,
+  retired ones included.
+- **§3's EDGES ARE THE DESIGNER'S AND ARE LISTED IN THE QUEUE BELOW** — the DO charter against the line, EN §4's
+  relic seam, the class spines' two readings, the class passives, the basic attack's three definitions, spec
+  statuses under DO/DP, and the tree size. **§2's interference is priced, not ruled.**
+- **WHAT MOVED:** `docs/systems-recon.html` (**NEW**), `docs/changelog.html`, `docs/reports/FW.md` (**NEW**) and
+  this file. **Nothing else** — no `.gd`, no `.json`, no `CLAUDE.md`, no `master.html`. The designer's four save
+  files were copied to `save-backups/FW-20260910-173706` before anything else happened and md5-verified against
+  the originals and FV's backup.
+- **VERIFICATION:** **in `docs/reports/FW.md` §5, written after the acceptance run — which is why this file points there
+  rather than quoting it: `check_es` §4 opens this file, so a cell written behind the battery would owe a
+  post-run proof of its own.**
+- **Phase.** Step 1 of the merge's running order — the three spines — is done. **Step 2, the talent layer, now
+  has its recon**; the rulings in its §3 and the trees' size come before a node is authored.
+- **Next letter: FX.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE MERGED TALENT LAYER'S RECON IS WRITTEN AND ITS EDGES ARE UNRULED — **OWED A RULING BEFORE AUTHORING (FW)**
+
+**Full evidence: `docs/systems-recon.html`** — every system in its own `SR-` section; §3 (`SR-LINE`) holds the
+edges and §4 (`SR-COUNT`) the count. The brief said the designer rules on the edges; FW ruled on none. **These are
+the things a later batch must not re-derive:**
+
+1. **THE DO CHARTER AGAINST THE LINE.** `CLAUDE.md` records as settled that a node may modify its spec's protected
+   core — *"worth 83 nodes"*, *"DO NOT RE-OPEN THIS AS AN OPEN QUESTION"* — and the line forbids touching any
+   ability. The 33 node payloads that edit an ability today were legal under DO and are all out under the line.
+2. **EN §4's RELIC SEAM.** *"If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory
+   pays, what an elite drops — it is a RELIC."* The brief lists those systems as fair game; **15 of the recon's 32
+   ruling-gated things wait on this seam alone**, and the rule has no tiebreak for a per-hero run effect, which
+   passes both of its tests.
+3. **THE CLASS SPINES — TWO READINGS OF "TOUCH".** Momentum, Channel, Sanctity and Focus are engines by the letter,
+   and all four read universal traffic (Mana spent, exchanges, every status event). "May not touch an engine" means
+   either "may not read or write one" or "may not change what one reads" — **and the second excludes most of the
+   recon for three classes.**
+4. **THE FOUR CLASS PASSIVES** — Threatening Presence, Holy Conduit, Tracker, Evocation — are passives by the
+   letter, and two of them assign over the fields a stat node would naturally write.
+5. **THE BASIC ATTACK HAS THREE DEFINITIONS IN THE CODE** — `abilities[0]`; `cost == 0`; `damage > 0 and cost == 0
+   and not is_counter`. A ruling that a node may touch "the basic attack" also has to say which.
+6. **SPEC STATUSES AFTER THE MERGE** are legal by the line and bets by the DO/DP charter unless every spec of a
+   class can apply them. Reading statuses **by count** (`DEBUFF_IDS`) is the shape that touches no owner.
+7. **THE TREES' SIZE.** 274 (281 under the line) assumes four trees of 81. At 81 a tree, today's machinery forces
+   at least 124 of the 324 nodes to be magnitude repeats; at 27 a tree it forces none. Nothing rules it.
+8. **ENEMY INTERFERENCE WITH THE SKILL CHECK** — priced in `SR-INTERFERE`: two flavours are profile keys, all four
+   need one hero-to-bar hook, and no instrument could measure any of them because the bot never reads a profile.
+   Built, it would be a third, non-opt-in exception to the standing profile rule.
+9. **AND ONE SYNC LINE:** `CLAUDE.md`'s must-stay-selected list names `spec-recon.html` and `merge-recon.html` but
+   not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
+   forbade rules); **selecting it in the picker is the designer's**.
+
+### FOUND AT FW AND NOT FIXED — **A REPORT TOUCHES NO CODE; THE FIRST THREE ARE PLAYER-FACING**
+
+- **PLAYER-FACING:** the first-bar orientation card says *"Every action runs a timing check"* (`battle.gd:24398`)
+  — false since CN took the bar off basics, pure buffs, shields and debuff appliers.
+- **PLAYER-FACING:** the map's help text says *"ELITES pay a talent point and a rune"* (`map_screen.gd:158`) —
+  nothing in a run has awarded a talent point since BM.
+- **PLAYER-FACING:** Cracked Hourglass says *"every hero recovers 30% Mana"*, and `Run.restore_mana` refills only
+  the mage and cleric keys — the Hunter, a Mana user, gets nothing (`run_state.gd:1356-1360`).
+- **The sim bot's Health Potion heals a flat 40** (`battle.gd:3778-3788`), not `Run.health_potion_heal`'s 20% of
+  maximum — against `CLAUDE.md`'s CT §6 (*"battle and map both CALL them"*), so every sim item-economy figure
+  measures a different potion from the player's.
+- **Overpressure (`sm_overpressure`) never fires**: its read is the enemy's own field and nothing copies the node's
+  value onto an enemy (`unit.gd:3743`).
+- **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult` is read at two,
+  `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing.
+- **`CLAUDE.md`'s recast block says `add_status` resolves a re-application as the max of duration and power** —
+  true only of its default branch: Poison and Chilled reset the timer (so Poison can shorten), Burn adds turns,
+  Ruin adds a stack (`unit.gd:2685-2736`).
+- **`CLAUDE.md`'s "four death-refusals"** are four call lines holding six refusals, with four more lethal refusals
+  above the subtraction that ticks never reach. **Its CV §1 cites `tick_statuses` at `unit.gd:2171`; it is at
+  `:2942`.**
+- **Stale comments:** three still call the skill-check profile five fields or `_run_skill_check` three call sites
+  (`battle.gd:23`, `:919-920`, `:929-935`); FT's own say all 23 `next_time` writes divide by `effective_speed()` —
+  14 do.
+- **Never-applied content:** the `ward`, `focus`, `rampage`, `seeding` and `melted` statuses; Weight of Ruin's
+  "half speed" has no read site; White Heat and Fuse have no writer; the "Focus" resource drip cannot run.
+- **A tick that kills skips `_on_enemy_death`** (`battle.gd:2782-2784`), so nothing that pays on a kill sees a
+  Burn or Poison kill.
+- **The Survivalist's passive barb calls `_apply_status`, not `_apply_poison`** — an inference: his poison-lane
+  nodes would not reach it.
+- **`merge-recon.html` carries five claims FW corrects** (a recon is regenerated, never hand-edited): Overpressure
+  counted live; Grudge and The Whole Room's reason; Cackling Mirror counted engine-free; the Arcanist's "one idea";
+  the Swordmaster's "six Break nodes".
+- **Names a merge makes collide:** Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
+  live rune), Second Wind (a Berserker node and a Holy card).
 
 ### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
 
@@ -348,8 +384,9 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    unbuilt system in the game and is wanted independently of the merge**: its reading half is the
    cheapest of the three (`add_status` is a single funnel), and its PAYOUT does not exist anywhere,
    because `STATUS_INFO` holds 156 ids and carries **no magnitude at all**.
-2. **THE TALENT LAYER — 274 new nodes**, authored by the designer and the assistant together.
-   **The long pole.**
+2. **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
+   designer and the assistant together. **The long pole. Its recon is `docs/systems-recon.html` (FW), and the
+   rulings in that document's §3 come before a node is written.**
 3. **ENGINES TO RUNES, each with its enabler.**
 4. **POOL MERGING.**
 5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
@@ -2586,18 +2623,9 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**FV's PRE-PASS AND ACCEPTANCE RUNS ARE IN `docs/reports/FV.md` §5; this table carries their headline
-cells.** The prediction column was written before the pre-pass launched, **and the pre-pass read exactly
-the prediction** — no red that was not named in advance.
-
-| | FV pre-pass — predicted | FV pre-pass — read | FV acceptance — the shipped tree |
-|---|---|---|---|
-| what was in the tree | the engine and every document edit; every gate, suite, `baselines.json` and `pin-manifest.json` HEAD's | the same | everything shipped: the repaired `check_ft` (140), its row, the manifest at 1,452 |
-| targets / throws / timeouts / incomplete | 107 / 0 / 0 / 0 | **107 / 0 / 0 / 0** | **107 / 0 / 0 / 0** |
-| `Parse Error` + `SCRIPT ERROR`, grepped from every log | 0 | **0** | **0** |
-| `check_cm_live` (deliberate) | 13 / 4 — FAIL lines identical to FU's | **13 / 4 — the four FAIL lines word for word** | **13 / 4 — the four FAIL lines word for word** |
-| `check_ft` | 112 / 0 (HEAD's gate, new code) | **112 / 0** | **140 / 0** (the new gate, on its new row) |
-| `check_de` | 445 / 0 / 0 | **445 / 0 / 0** | **445 / 0 / 0** |
-| run harness (gates 1 / 2 / 3) | 22 / 166 / 8 | **22 / 166 / 8** | **22 / 166 / 8** |
-| the freeze | — | **403 files md5-stamped with absolute paths before and after, zero differ** | **402 files md5-stamped with absolute paths before and after, zero differ** |
-| the designer's four save files | byte-identical | **byte-identical** | **byte-identical** |
+**FW's verification is in `docs/reports/FW.md` §5, written after the acceptance run.** FW moved no code, no gate,
+no baseline row and no manifest entry, so there was no pre-pass to predict against: the documents were proved by
+the literal sweep against HEAD (every string literal of four characters or more in every `.gd`, read raw, lowered
+and whitespace-flattened), by `build_pin_manifest.py --check`, and by the full battery over the finished tree.
+**The figures live in the report and not here**, because this file is read by `check_es` §4 and a cell written
+behind the run would owe a post-run proof of its own.
