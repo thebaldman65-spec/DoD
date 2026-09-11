@@ -33,6 +33,18 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX DELETED THE TREE THIS FILE WAS WRITTEN ABOUT. The twelve spec trees
+# are gone (`Talents.LANE_TREES`, and every oc_* node with it); the Occultist
+# buys into the ONE class tree — twenty-seven `tn_*` nodes in three tiers of
+# nine. EVERY FIELD READ SITE STOOD, so every MECHANIC this file drives is still
+# driven, off the exact payload its retired node carried (`RETIRED`, below), or
+# off the precedent-mapped `tn_*` node that carries the same field and number.
+# Every question about the tree's SHAPE is asked of the one tree wherever it
+# still has a subject there. What asked about the Occultist tree ITSELF — its
+# ids, lanes, rows, slots, homes, names, per-node magnitudes and tooltips, and
+# Ruined Mind's text — is deleted at its own site under DG §2, and each site
+# says what it asked, why the subject is gone and how many checks went.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -101,8 +113,67 @@ func _run() -> void:
 
 # ---------- helpers ----------
 
+# BATCH FX: the tree the Occultist buys into — the ONE class tree, since the
+# twelve spec trees are deleted. `generate_tree` still takes the spec.
 func _tree() -> Array:
 	return Talents.generate_tree("occultist", "cleric")
+
+
+# ---------- BATCH FX: the retired nodes this suite still drives ----------
+#
+# FX deleted the Occultist tree (and the Devout's, whose Fervor §7 drives), and
+# every field below kept its declaration and its read site (FX kept every one: a
+# field no node writes is dormant, not deleted). So each live question is still
+# asked — of the EXACT payload the retired node carried, lifted verbatim from
+# HEAD's `LANE_TREES`. `_spawn` hands each one it is given to the Cleric as a
+# node BESIDE the live tree, so `apply_from_tree` applies it at the point in the
+# spawn the spec tree always did: after the earned picks, before the class
+# passive, the runes and the upgrades. No live `tn_*` node writes these fields.
+const RETIRED := {
+	# FX: the payload the retired oc_avatar_ruin (Avatar of Ruin) carried — the
+	# node is deleted, the field and its read site stand.
+	"oc_avatar_ruin": {"name": "Avatar of Ruin", "payload": {"stat": {"avatar_ruin": 5}}},
+	# FX: the payload the retired oc_soul_leech (Soul Leech) carried — the node is
+	# deleted, the field and its read site stand.
+	"oc_soul_leech": {"name": "Soul Leech", "payload": {"stat": {"soul_leech_step": 3}}},
+	# FX: the payload the retired oc_gluttony (Gluttony) carried — the node is
+	# deleted, the field and its read site stand.
+	"oc_gluttony": {"name": "Gluttony", "payload": {"stat": {"gluttony_ranks": 3}}},
+	# FX: the payload the retired oc_soul_glut (Soul Glut) carried — the node is
+	# deleted, the field and its read site stand.
+	"oc_soul_glut": {"name": "Soul Glut", "payload": {"stat": {"soul_glut": 1}}},
+	# FX: the payload the retired oc_deep_hex (Deeper Hex) carried — the node is
+	# deleted, the field and its read site stand.
+	"oc_deep_hex": {"name": "Deeper Hex", "payload": {"stat": {"deep_hex_step": 3}}},
+	# FX: the payload the retired dv_fervor (Fervor) carried — the node is
+	# deleted, the field and its read site stand.
+	"dv_fervor": {"name": "Fervor", "payload": {"stat": {"fervor": 1}}},
+}
+
+
+# FX: every cell of the ONE tree, worn — what `Profile.worn_talents` hands a
+# class that has bought the whole tree (a cell owned is a cell worn).
+func _all_cells() -> Dictionary:
+	var out := {}
+	for t in _tree():
+		out[String(t["id"])] = 1
+	return out
+
+
+# FX: a Cleric's tree for one spawn — the live tree (the same one tree for every
+# spec), plus a node for each RETIRED id the spawn learns. An id that is in
+# NEITHER would apply nothing in silence, so it fails here instead of passing.
+func _member_tree(learned: Dictionary) -> Array:
+	var tree := _tree()
+	for id in learned:
+		if not Talents.node_in_tree(tree, String(id)).is_empty():
+			continue
+		if not RETIRED.has(id):
+			ok(false, "the spawn learns %s, which is neither a live node nor a RETIRED payload" % id)
+			continue
+		tree.append({"id": String(id), "name": String(RETIRED[id]["name"]), "desc": "",
+			"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _node(id: String) -> Dictionary:
@@ -143,9 +214,14 @@ func _foe(scene: Node, idx: int) -> BattleUnit:
 func _spawn(learned: Dictionary, member_patch := {},
 		lineup := ["raider"]) -> Node:
 	# A crit is the worst coin to leave live in a test that reads an exact heal.
+	# BATCH FX: his tree is the one tree plus any RETIRED payload the spawn learns
+	# (`_member_tree`), written through `patch` — which the fixture applies AFTER
+	# it sets the tree, so the fixture itself did not move.
+	var patch: Dictionary = member_patch.duplicate()
+	patch["tree"] = _member_tree(learned)
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", "occultist", "beastmaster"],
-		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: member_patch},
+		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: patch},
 		"deterministic": true, "crit": -10.0})
 
 
@@ -155,144 +231,91 @@ func _kill(scene: Node) -> void:
 
 # ---------- §3 the tree's shape ----------
 
-const IDS := ["oc_emp_hex", "oc_deep_hex", "oc_channeling", "oc_broken_will",
-	"oc_grim", "oc_entropy", "oc_unravel",
-	"oc_spread", "oc_whispers", "oc_mind_flay", "oc_mirror", "oc_delirium",
-	"oc_cackling", "oc_torment",
-	"oc_soul_leech", "oc_invigoration", "oc_gluttony", "oc_pleasure",
-	"oc_murderous", "oc_pact_flesh", "oc_barter",
-	"oc_avatar_ruin", "oc_hysteria", "oc_soul_glut"]
-
-
+# BATCH FX — THE OCCULTIST TREE IS DELETED, SO THIS SECTION ASKS WHAT STILL HAS
+# A SUBJECT. The Occultist buys into the ONE class tree; its size, its distinct
+# ids, the rank each node is worn at, the tier each node sits in and its
+# partition into tiers are questions with true answers there, and each is asked
+# of it below. The per-node walks cover 27 nodes, as they covered his 27.
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Occultist tree holds 24 nodes (got %d)" % tree.size())
-	# EVERY ID SURVIVES AND RE-SPECS IN PLACE — no new ids, none deleted, so
-	# saved picks migrate and no save version moves.
+	# RE-POINTED (FX): the one tree holds 27 nodes — three tiers of nine.
+	ok(tree.size() == 27,
+		"the one tree the Occultist buys into holds 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for t in tree:
 		seen[String(t.get("id", ""))] = true
-	for id in IDS:
-		ok(seen.has(id), "the id %s survives" % id)
-	ok(seen.size() == 27, "...and no id was added (got %d distinct)" % seen.size())
-	var per_lane := {}
-	var caps := 0
-	var cap_lanes := {}
+	# FX: DG §2 — 24 CHECKS DELETED HERE. "the id %s survives", over the 24 ids
+	# Batch L's tree shipped (the deleted `IDS` table): every id survived and
+	# re-specced in place, which is why saved picks migrated and no save version
+	# moved. FX deleted every one (Profile moved to v3; `Run._migrate_trees`
+	# drops a retired id from a saved member), so there is no id left to find.
+	# RE-POINTED (FX): no id is carried twice in the one tree.
+	ok(seen.size() == 27,
+		"...and the one tree carries 27 distinct ids — none twice (got %d distinct)" % seen.size())
+	# A cell owned is a cell worn, and the handoff is where a node's RANK comes
+	# from now — so "a single-rank node" is asked of what the handoff wears.
+	var worn := Talents.worn_learned(tree, seen)
+	var per_tier := {}
 	for t in tree:
-		var lane := String(t.get("lane", ""))
-		var row := int(t.get("row", 0))
-		ok(t.has("ranks") and int(t["ranks"]) == 1,
-			"%s is a single-rank node" % t.get("id", ""))
-		if row == Talents.CAPSTONE_ROW:
-			caps += 1
-			cap_lanes[lane] = true
-			ok(bool(t.get("capstone", false)),
-				"%s on row 8 is flagged capstone" % t.get("id", ""))
-		else:
-			ok(row >= 1 and row <= Talents.CAPSTONE_ROW,
-				"%s sits on a real row (got %d)" % [t.get("id", ""), row])
-			per_lane[lane] = per_lane.get(lane, 0) + 1
-	ok(caps == 3, "exactly three capstones (got %d)" % caps)
-	ok(cap_lanes.size() == 3, "the three capstones sit on three different lanes")
-	for lane in ["Ruin", "Madness", "Leech"]:
-		ok(per_lane.get(lane, 0) == Talents.ROWS,
-			"lane %s holds 8 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
-	# Every row of every lane is filled exactly once — the row IS the choice.
-	var slots := {}
-	for t in tree:
-		var key := "%s/%d" % [t.get("lane", ""), t.get("row", 0)]
-		ok(not slots.has(key), "no two nodes share the slot %s" % key)
-		slots[key] = true
+		# RE-POINTED (FX): asked of the rank the FX handoff wears the node at.
+		ok(int(worn.get(String(t.get("id", "")), 0)) == 1,
+			"%s is worn at a single rank" % t.get("id", ""))
+		# RE-POINTED (FX): the one tree has no capstone row, so every node stands
+		# where the old `else` branch stood — and "sits on a real row" is asked of
+		# the position it has now, its TIER.
+		var tier := int(t.get("tier", 0))
+		ok(tier >= 1 and tier <= Talents.TIERS,
+			"%s sits in a real tier (got %d)" % [t.get("id", ""), tier])
+		per_tier[tier] = per_tier.get(tier, 0) + 1
+	# FX: DG §2 — 2 CHECKS DELETED HERE: "exactly three capstones" and "the three
+	# capstones sit on three different lanes". The one tree has no capstone row
+	# and no lanes.
+	# RE-POINTED (FX): "lane X holds its 8 row nodes" becomes "tier N holds its
+	# nine" — the one tree's partition, asked of the one tree.
+	for tier in range(1, Talents.TIERS + 1):
+		ok(per_tier.get(tier, 0) == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier, Talents.NODES_PER_TIER,
+				per_tier.get(tier, 0)])
+	# FX: DG §2 — 27 CHECKS DELETED HERE: "no two nodes share the slot
+	# <lane>/<row>" — every row of every lane filled exactly once, because the
+	# row WAS the choice. The one tree has no lanes and no rows, and no node is a
+	# choice against another: a cell bought is a cell worn.
 	# Any exclusive reference must name a node that exists.
 	for t in tree:
 		for ex in t.get("exclusive_with", []):
 			ok(seen.has(String(ex)),
 				"%s's exclusive reference %s names a live node" % [t.get("id", ""), ex])
-	# ALL THREE LANE NAMES AND THESES STAND — this is the one Cleric tree that
-	# did not need re-aiming, so every node sits exactly where Batch L put it.
-	for pair in [["oc_emp_hex", "Ruin", 1], ["oc_deep_hex", "Ruin", 2],
-			["oc_channeling", "Ruin", 3], ["oc_broken_will", "Ruin", 4],
-			["oc_grim", "Ruin", 5], ["oc_entropy", "Ruin", 6],
-			["oc_unravel", "Ruin", 7],
-			["oc_spread", "Madness", 1], ["oc_whispers", "Madness", 2],
-			["oc_mind_flay", "Madness", 3], ["oc_mirror", "Madness", 4],
-			["oc_delirium", "Madness", 5], ["oc_cackling", "Madness", 6],
-			["oc_torment", "Madness", 7],
-			["oc_soul_leech", "Leech", 1], ["oc_invigoration", "Leech", 2],
-			["oc_gluttony", "Leech", 3], ["oc_pleasure", "Leech", 4],
-			["oc_murderous", "Leech", 5], ["oc_pact_flesh", "Leech", 6],
-			["oc_barter", "Leech", 7],
-			# BATCH BM moved the capstone shelf to row 9.
-			["oc_avatar_ruin", "Ruin", 9], ["oc_hysteria", "Madness", 9],
-			["oc_soul_glut", "Leech", 9]]:
-		var n := _node(String(pair[0]))
-		ok(String(n.get("lane", "")) == String(pair[1])
-			and int(n.get("row", 0)) == int(pair[2]),
-			"%s sits at %s row %d (got %s row %s)" % [pair[0], pair[1], pair[2],
-				n.get("lane", ""), n.get("row", 0)])
-	# The names, by name rather than by id — a re-spec that forgot its label
-	# would pass every structural check above.
-	for pair in [["oc_emp_hex", "Empowered Hex"], ["oc_deep_hex", "Deeper Hex"],
-			["oc_channeling", "Corrupted Channeling"], ["oc_broken_will", "Broken Will"],
-			["oc_grim", "Grim Focus"], ["oc_entropy", "Entropy"],
-			["oc_unravel", "Unraveling"], ["oc_spread", "Spread of Madness"],
-			# BATCH DO renamed both cells when their cards left for the draft.
-			["oc_whispers", "Whispers"], ["oc_mind_flay", "Bedlam"],
-			["oc_mirror", "Umbral Mirror"], ["oc_delirium", "Delirium"],
-			["oc_cackling", "Cackling Mirror"], ["oc_torment", "Lingering Torment"],
-			["oc_soul_leech", "Soul Leech"], ["oc_invigoration", "Invigoration"],
-			["oc_gluttony", "Gluttony"], ["oc_pleasure", "Pleasure from Pain"],
-			["oc_murderous", "Murderous Intent"], ["oc_pact_flesh", "Pact of Flesh"],
-			["oc_barter", "Dark Barter"], ["oc_avatar_ruin", "Avatar of Ruin"],
-			["oc_hysteria", "Pandemonium"], ["oc_soul_glut", "Soul Glut"]]:
-		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
-			"%s is named %s (got %s)" % [pair[0], pair[1],
-				_node(String(pair[0])).get("name", "")])
+	# FX: DG §2 — 48 CHECKS DELETED HERE: the 24 "sits at <lane> row <n>" homes
+	# (Ruin / Madness / Leech, rows 1-7, and BM's row-9 capstones) and the 24 "is
+	# named <name>" labels, DO's two renames (Whispers, Bedlam) among them. Both
+	# asked where an Occultist node sat and what it was called; FX deleted the
+	# nodes, the lanes and the rows. The mechanics under five of those names are
+	# still driven live below, off `RETIRED`.
 
 
 # ---------- §3 the magnitudes, one per node ----------
 
 func _magnitudes() -> void:
-	# Field, node, value. THE COUNTER HOLDS THE MAGNITUDE, so the number here
-	# is the number the tooltip prints and the number the read site uses.
-	for row in [["oc_emp_hex", "emp_hex_ranks", 100],
-			["oc_deep_hex", "deep_hex_step", 3],
-			["oc_channeling", "channeling_ranks", 60],
-			["oc_broken_will", "broken_will_ranks", 25],
-			["oc_grim", "grim_ranks", 80],
-			["oc_entropy", "entropy_ranks", 20],
-			["oc_unravel", "unravel_ranks", 4],
-			["oc_spread", "spread_ranks", 60],
-			["oc_spread", "spread_ruin", 2],
-			# BATCH DP: 45 percentage points on Psychosis's 50% seize chance became
-			# +2 Ruin on `OLD_GODS_MARK`'s 2. THE FIELD KEPT ITS NAME because it
-			# kept its SHAPE — an INCREASE on a base the kit already pays.
-			["oc_whispers", "whispers_step", 2],
-			["oc_mirror", "mirror_ranks", 45],
-			["oc_delirium", "delirium_ranks", 3],
-			["oc_cackling", "cackling_ranks", 15],
-			["oc_torment", "torment_ranks", 5],
-			["oc_soul_leech", "soul_leech_step", 3],
-			["oc_invigoration", "invigoration_ranks", 8],
-			["oc_gluttony", "gluttony_ranks", 3],
-			["oc_murderous", "murderous_ranks", 35],
-			["oc_pact_flesh", "pact_flesh_ranks", 15],
-			["oc_barter", "barter_step", 20],
-			["oc_avatar_ruin", "avatar_ruin", 5],
-			["oc_soul_glut", "soul_glut", 1]]:
-		var got = _stat_of(String(row[0]), String(row[1]))
-		ok(got != null and int(got) == int(row[2]),
-			"%s writes %s = %d (got %s)" % [row[0], row[1], int(row[2]), got])
+	# **BATCH FX — 23 CHECKS DELETED HERE, UNDER DG §2** (and 8 more below). This
+	# section asked each Occultist node to carry its final magnitude: 21 of the 22
+	# "node writes field = N" rows (DP's Whispers at +2 among them), and Pleasure
+	# from Pain's two — it writes `pleasure_pct` = 2.5, and NOT `pleasure_ranks`.
+	# FX deleted the twelve spec trees, so no node carries those numbers. THE
+	# FIELDS AND READ SITES STAND: §5 below still pins every read site's units,
+	# and the live sections drive Deeper Hex, Soul Leech, Gluttony, Soul Glut and
+	# Avatar of Ruin — inlined from `RETIRED` — through the spawn.
+	# RE-POINTED (FX): Broken Will is the one row with a precedent-mapped node in
+	# the one tree — tn_break carries oc_broken_will's field and magnitude.
+	var got = _stat_of("tn_break", "broken_will_ranks")
+	ok(got != null and int(got) == 25,
+		"tn_break writes broken_will_ranks = 25, Broken Will's own number (got %s)" % got)
 	# PLEASURE FROM PAIN IS FRACTIONAL, and that is why its field was renamed:
 	# Runes.STAT_INT_KEYS coerces anything ending in "_ranks" to an int, which
-	# would silently round 2.5 down to 2.
-	var pp = _stat_of("oc_pleasure", "pleasure_pct")
-	ok(pp != null and is_equal_approx(float(pp), 2.5),
-		"Pleasure from Pain writes pleasure_pct = 2.5 (got %s)" % pp)
-	ok(_stat_of("oc_pleasure", "pleasure_ranks") == null,
-		"...and NOT pleasure_ranks, which would be coerced to an int")
+	# would silently round 2.5 down to 2. The node is gone (FX); the FIELD and
+	# its read site stand, and the coercion list is still what decides whether a
+	# rune writing a fraction into it would be rounded.
 	ok(not Runes.STAT_INT_KEYS.has("pleasure_pct"),
-		"...and pleasure_pct is deliberately absent from STAT_INT_KEYS")
+		"pleasure_pct is deliberately absent from STAT_INT_KEYS — the field is fractional")
 	# The three counters holding an INCREASE on a base the kit already pays are
 	# named `_step` (and a FOURTH, barter_step, has the same shape and takes the
 	# same treatment — reported rather than silently generalised).
@@ -302,21 +325,11 @@ func _magnitudes() -> void:
 			"%s is registered in STAT_INT_KEYS (the AA trap)" % step_field)
 	ok(Runes.STAT_INT_KEYS.has("spread_ruin"),
 		"spread_ruin is registered too — a rune writes it")
-	# The rendered tooltip, which is what a player actually reads.
-	for pair in [["oc_deep_hex", "take 5% more damage"],
-			["oc_whispers", "marks 4 Ruin instead of the base 2"],
-			["oc_soul_leech", "rises to 5% per stack"],
-			["oc_barter", "heals every other hero 35%"],
-			["oc_pact_flesh", "a cost of 5% rather than 20%"],
-			["oc_pleasure", "every hero heals 2.5%"],
-			["oc_avatar_ruin", "every 5th stack instead of every 10th"]]:
-		var txt := Talents.desc_for(_node(String(pair[0])), 1)
-		ok(txt.contains(String(pair[1])),
-			"%s's tooltip reads '%s' (got: %s)" % [pair[0], pair[1], txt])
-	# Empowered Hex is "always" now, so it has no {v} left to render.
-	ok(Talents.desc_for(_node("oc_emp_hex"), 1).contains("ALWAYS")
-		and not Talents.desc_for(_node("oc_emp_hex"), 1).contains("{v}"),
-		"Empowered Hex's tooltip says ALWAYS and leaves no placeholder behind")
+	# FX: DG §2 — 8 CHECKS DELETED HERE: the seven rendered tooltips (Deeper Hex,
+	# Whispers, Soul Leech, Dark Barter, Pact of Flesh, Pleasure from Pain, Avatar
+	# of Ruin) and Empowered Hex's "says ALWAYS and leaves no placeholder". Each
+	# read the `desc` / `scale` text of an Occultist node; FX deleted the nodes,
+	# so there is no text left for a player — or a check — to read.
 
 
 # ---------- §5 the counters are ADDITIVE at their read sites ----------
@@ -424,21 +437,20 @@ func _no_exclusive_pairs() -> void:
 	# Batch L already retired Pact of Flesh <-> Grim Focus (a CROSS-LANE pair
 	# that Batch AI's row exclusivity would have destroyed anyway). §5 asked
 	# whether another survives: none does, in the data OR in CLAUDE.md's prose.
-	var pf := _node("oc_pact_flesh")
-	var gf := _node("oc_grim")
-	ok((pf.get("exclusive_with", []) as Array).is_empty()
-		and (gf.get("exclusive_with", []) as Array).is_empty(),
-		"the retired Pact of Flesh <-> Grim Focus pair left nothing behind")
-	ok(String(pf.get("lane", "")) != String(gf.get("lane", "")),
-		"...and they are still in different lanes, so both are reachable")
+	# **BATCH FX — 2 CHECKS DELETED HERE, UNDER DG §2.** "the retired Pact of
+	# Flesh <-> Grim Focus pair left nothing behind" and "...and they are still in
+	# different lanes, so both are reachable" asked about two nodes of the
+	# Occultist tree (oc_pact_flesh, oc_grim); FX deleted them and their lanes. The
+	# live half of §5's question survives, below, asked of the tree he buys.
 	var live_pairs := 0
 	for t in _tree():
 		live_pairs += (t.get("exclusive_with", []) as Array).size()
-	ok(live_pairs == 0, "the Occultist tree names no exclusive pair at all (%d)" % live_pairs)
+	# RE-POINTED (FX): the same walk, over the one tree the Occultist buys into.
+	ok(live_pairs == 0, "the one tree names no exclusive pair at all (%d)" % live_pairs)
 	var guide := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(not guide.contains("oc_pact_flesh↔") and not guide.contains("oc_grim↔"),
 		"...and CLAUDE.md's prose list names none of his either")
-	_report.append("exclusive pairs on the Occultist tree: 0 (data and prose)")
+	_report.append("exclusive pairs on the one tree the Occultist buys: 0 (data and prose)")
 
 
 # ---------- §2 the boss rule is LEGIBLE, and unpatched ----------
@@ -516,10 +528,13 @@ func _boss_legibility() -> void:
 	# WHAT REPLACES IT IS STRONGER: the lane's row-8 cell is the EXCEPTION to
 	# the boss rule now, so it is the one node that must still name it, and
 	# naming a rule you are the exception to cannot be done vacuously.
-	var rm_txt := Talents.desc_for(_node("oc_permanent"), 1)
-	ok(rm_txt.contains("boss"), "Ruined Mind names the boss rule it excepts (got: %s)" % rm_txt)
-	ok(rm_txt.contains("Ruin"),
-		"...and pays for the exception in RUIN, which the passive guarantees (got: %s)" % rm_txt)
+	# **BATCH FX — 2 CHECKS DELETED HERE, UNDER DG §2.** "Ruined Mind names the
+	# boss rule it excepts" and "...and pays for the exception in RUIN" read the
+	# text of oc_permanent, the lane's row-8 cell. FX deleted it with its lane and
+	# row, and no node of the one tree excepts the boss rule, so there is no
+	# exception left to name it. Its field, `broken_mind`, is dormant and its
+	# read site stands. THE RULE ITSELF IS STILL STATED — on the two cards, in
+	# the glossary and in the tooltips, below — and still pinned there.
 	for card in ["Mind Flay", "Mass Hysteria"]:
 		var ab: Ability = Classes.spec_pool_ability("occultist", card)
 		ok(ab != null and ab.description.contains("BROKEN"),
@@ -586,8 +601,13 @@ func _rune_audit() -> void:
 	# one, so "5% more from Ruined targets" has no equivalent. It keeps the
 	# RELATIONSHIP it always had — exactly one node's worth of each dial.
 	var hc: Dictionary = data["hollow_chalice"]["payload"]["stat"]
-	ok(int(hc.get("rune_soul_leech_step", 0)) == int(_stat_of("oc_soul_leech", "soul_leech_step"))
-		and int(hc.get("rune_gluttony_ranks", 0)) == int(_stat_of("oc_gluttony", "gluttony_ranks")),
+	# RE-POINTED (FX): "one node's worth" is the magnitude each retired node
+	# carried, inlined in `RETIRED` — the same payloads `_live_lifesteal_cap`
+	# drives — since the nodes it used to be read off are deleted.
+	ok(int(hc.get("rune_soul_leech_step", 0))
+			== int(RETIRED["oc_soul_leech"]["payload"]["stat"]["soul_leech_step"])
+		and int(hc.get("rune_gluttony_ranks", 0))
+			== int(RETIRED["oc_gluttony"]["payload"]["stat"]["gluttony_ranks"]),
 		"the Hollow Chalice still pays one node's worth of each dial")
 	ok(String(data["hollow_chalice"]["desc"]).contains("per stack"),
 		"...and its description was rewritten to the new units, not left lying")
@@ -680,12 +700,23 @@ func _fervor_unmoved() -> void:
 	# batch — so the ground pays 1 with the node or without it. The finding
 	# AX pinned is now HISTORY; what is worth pinning at this site is that the
 	# drip is Batch AW §2's base and nothing deepens it.
+	# RE-POINTED (FX): Fervor's cell went with the Devout tree, and the talent
+	# layer this site speaks for is the ONE tree now — so "nothing deepens the
+	# drip" is asked of every node of it: none writes the increase, and none
+	# promises it.
 	var dv_tree := Talents.generate_tree("inquisitor", "cleric")
-	var fervor := Talents.node_in_tree(dv_tree, "dv_fervor")
-	ok(not (fervor.get("payload", {}).get("stat", {}) as Dictionary).has("fervor_step"),
-		"Fervor no longer writes an increase on the drip at all (Batch BH §2)")
-	ok(not Talents.desc_for(fervor, 1).contains("per ally per turn"),
-		"...and its text no longer promises a deeper drip")
+	var deepens := 0
+	var promises := 0
+	for t in dv_tree:
+		if (t.get("payload", {}).get("stat", {}) as Dictionary).has("fervor_step"):
+			deepens += 1
+		if Talents.desc_for(t, 1).contains("per ally per turn"):
+			promises += 1
+	ok(deepens == 0,
+		"no node of the one tree writes an increase on the drip (%d of %d do; Batch BH §2)"
+			% [deepens, dv_tree.size()])
+	ok(promises == 0,
+		"...and no node's text promises a deeper drip (%d of %d do)" % [promises, dv_tree.size()])
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	# RE-POINTED AT BATCH DF, AND STRENGTHENED RATHER THAN FOLLOWED. DA §1 gave
 	# the drip a NAMED constant, so the literal `1` left the call site — but the
@@ -871,6 +902,7 @@ func _live_detonation_payload() -> void:
 # ---------- live: §3 Avatar of Ruin moves the threshold to 5 ----------
 
 func _live_avatar_of_ruin() -> void:
+	# FX: oc_avatar_ruin is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"oc_avatar_ruin": 1})
 	var occ := _hero(scene, 2)
 	var foe := _foe(scene, 0)
@@ -922,6 +954,7 @@ func _live_lifesteal_per_stack() -> void:
 func _live_lifesteal_cap() -> void:
 	# Soul Leech, Gluttony AND Soul Glut all learned — 2+3+3 = 8% a stack, so
 	# the cap bites at five stacks and everything past it is refused.
+	# FX: all three are inlined from `RETIRED` — the exact payloads they carried.
 	var scene := await _spawn({"oc_soul_leech": 1, "oc_gluttony": 1,
 		"oc_soul_glut": 1})
 	var occ := _hero(scene, 2)
@@ -962,6 +995,7 @@ func _live_lifesteal_cap() -> void:
 # ---------- live: §1 the AMPLIFICATION is deliberately uncapped ----------
 
 func _live_amplification() -> void:
+	# FX: oc_deep_hex is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"oc_deep_hex": 1})
 	var occ := _hero(scene, 2)
 	var hero := _hero(scene, 0)
@@ -1000,10 +1034,15 @@ func _live_fallbacks() -> void:
 	# neither. THE RUNE OF THE FLAYED MIND STILL GRANTS MIND FLAY, and that is
 	# the distinction the charter is built on: a rune is bought with knowledge
 	# of the run in front of you.
-	var granted := await _spawn({"oc_mind_flay": 1, "oc_hysteria": 1})
+	# RE-POINTED (FX): both spawns learned oc_mind_flay and oc_hysteria, two cells
+	# FX deleted. The question — does buying the talents hand the card out, or
+	# upgrade an earned one — is asked of an Occultist wearing EVERY cell of the
+	# one tree, none of which grants, so nothing can collide.
+	var granted := await _spawn(_all_cells())
 	var occ := _hero(granted, 2)
-	ok(_find(occ, "Mind Flay") == null, "the row-3 cell grants no Mind Flay (DO)")
-	ok(_find(occ, "Mass Hysteria") == null, "the capstone grants no Mass Hysteria (DO)")
+	ok(_find(occ, "Mind Flay") == null,
+		"wearing every cell of the one tree grants no Mind Flay (DO; FX)")
+	ok(_find(occ, "Mass Hysteria") == null, "...nor Mass Hysteria (DO; FX)")
 	var base_mf: Ability = Classes.spec_pool_ability("occultist", "Mind Flay")
 	ok(base_mf != null and base_mf.choose_two and not base_mf.choose_three,
 		"...and the CARD still takes TWO minds, unchanged by the move")
@@ -1014,7 +1053,7 @@ func _live_fallbacks() -> void:
 	# EARNED FIRST, then the node: it upgrades instead of granting. Earned picks
 	# go on BEFORE the tree at both kit-assembly sites (the AH ordering fix),
 	# which is what makes cfg["abilities"] the honest question.
-	var owned := await _spawn({"oc_mind_flay": 1, "oc_hysteria": 1},
+	var owned := await _spawn(_all_cells(),
 		{"bm_abilities": ["Mind Flay", "Mass Hysteria"]})
 	var occ2 := _hero(owned, 2)
 	var mf2 := _find(occ2, "Mind Flay")
@@ -1039,11 +1078,21 @@ func _live_fallbacks() -> void:
 	ok(n_flay == 1, "...and neither node double-granted (%d Mind Flays)" % n_flay)
 	await _kill(owned)
 	# NEITHER CELL OWES A FALLBACK ANY MORE, BECAUSE NEITHER CAN COLLIDE.
-	for id in ["oc_mind_flay", "oc_hysteria"]:
-		ok(Talents.granted_name(_payload(id)) == "",
-			"%s grants nothing, so it owes no fallback (DO's charter)" % id)
-		ok(not (_payload(id) as Dictionary).has("upgrade"),
-			"...and carries no `upgrade` arm either")
+	# **BATCH FX — 2 CHECKS DELETED HERE, UNDER DG §2, AND 2 RE-POINTED.** The loop
+	# asked both questions of oc_mind_flay and oc_hysteria, two deleted cells.
+	# Each question is asked ONCE now, of every cell of the one tree — the half
+	# of each pair that would repeat it word for word is the half that went.
+	var grants := 0
+	var arms := 0
+	for t in _tree():
+		if Talents.granted_name(t.get("payload", {})) != "":
+			grants += 1
+		if (t.get("payload", {}) as Dictionary).has("upgrade"):
+			arms += 1
+	ok(grants == 0, "no cell of the one tree grants, so none owes a fallback (%d of %d do)"
+		% [grants, _tree().size()])
+	ok(arms == 0, "...and none carries an `upgrade` arm either (%d of %d do)"
+		% [arms, _tree().size()])
 
 
 # ---------- live: §7 the ground still pays 2 a turn with Fervor ----------
@@ -1060,6 +1109,10 @@ func _live_fervor() -> void:
 		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.party[i]["talents"] = {"dv_fervor": 1} if i == 2 else {}
+		# FX: dv_fervor is inlined from `RETIRED` — the Devout's tree is the one
+		# tree now, plus the exact payload the retired node carried.
+		if i == 2:
+			run.party[i]["tree"] = _member_tree(run.party[i]["talents"])
 		run.sync_spec_hp(i)
 	run.specs_chosen = true
 	run.active = true

@@ -566,6 +566,24 @@ const CLASH_EXEMPT := {
 	# renaming a fourth thing. **An item carries no tag**, so nothing can ever
 	# render `DEFENSE` and `Defense` as two labels on one row.
 	"DEFENSE": ["item:Defense Potion", "item:defense"],
+	# **BATCH FX ADDED FIVE, ON THREE TAGS, AND THEY ARE THE FIRST THAT ARE
+	# NODES OF THE ONE TREE.** FX named five of its twenty-seven nodes with a tag
+	# word, and this equality turned all five into a decision the day the tree
+	# landed — which is what the set comparison is for.
+	# **BREAK AND RESOURCE MEAN WHAT THE TAGS MEAN.** `You Break Harder` and `We
+	# Do Not Break` move a Break meter — the enemy's, and the heroes' own — and
+	# `A Bigger Resource Pool` and `Pay a Lethal Hit out of Your Resource Pool`
+	# move Rage or Mana: the same-meaning collision EL's rule ships and names.
+	# **`Mitigation per Debuff You Carry` IS THE OTHER CASE.** The word does
+	# different work there: the node pays for debuffs the hero CARRIES, where the
+	# tag means debuffs a card LANDS. That is exactly the case the Standing
+	# Mark's comment above says this list exists to record rather than to hide.
+	# **AND ALL FIVE NAMES ARE THE DESIGNER'S** — the brief's own labels — so a
+	# rename is queued as a ruling, not taken by this batch.
+	"BREAK": ["node:We Do Not Break", "node:You Break Harder"],
+	"RESOURCE": ["node:A Bigger Resource Pool",
+		"node:Pay a Lethal Hit out of Your Resource Pool"],
+	"DEBUFF": ["node:Mitigation per Debuff You Carry"],
 }
 
 func _s4_name_sweep() -> void:
@@ -574,26 +592,47 @@ func _s4_name_sweep() -> void:
 	var labels: Array = _status_labels(battle_src)
 	ok(labels.size() >= 150,
 		"the status-label arm read a real population (%d labels)" % labels.size())
+	# BATCH FX — THE TALENT HALF IS THE ONE TREE, AND ITS POPULATION IS ASSERTED
+	# FROM BOTH SIDES. The twelve spec trees are deleted and every hero wears
+	# `Talents.TREE`, so the node and lane arms walk it ONCE.
+	#   · THE NODE ARM GAINS A POSITIVE ARM. It must read every node of the tree
+	#     by name. The population it walks fell from 324 names across twelve trees
+	#     to 27, and the equality below can only see a blind node arm on a tag
+	#     whose exemption names a node — five names on three tags since FX — so
+	#     the population is asserted directly rather than left to that overlap.
+	#   · THE LANE ARM IS RE-POINTED RATHER THAN DELETED. It asserted `>= 30`
+	#     distinct lanes so that EL §3's lane sweep could not go blind while lanes
+	#     existed. FX ruled the tree FLAT — no lanes and no rows — so the live
+	#     answer is ZERO, and it is asserted as zero: an arm with nothing to read
+	#     that SAYS so, rather than one that prints like a clean sweep. The day a
+	#     `lane` key comes back this reds, and the floor comes back with it.
+	var tree_names: Array = _node_names()
+	ok(tree_names.size() == Talents.TREE.size() and not tree_names.is_empty(),
+		"the node arm read the one tree (%d names off %d nodes)" % [
+			tree_names.size(), Talents.TREE.size()])
 	var lanes_seen := {}
-	for sp0 in Talents.LANE_TREES:
-		for ln in _lane_names(String(sp0)):
-			lanes_seen[ln] = true
-	ok(lanes_seen.size() >= 30,
-		"the lane arm read a real population (%d distinct lanes)" % lanes_seen.size())
+	for ln in _lane_names():
+		lanes_seen[ln] = true
+	ok(lanes_seen.is_empty(),
+		"the one tree carries a `lane` again (%s) — EL §3's lane arm has a population, and it is owed its floor back"
+			% ", ".join(lanes_seen.keys()))
+	print("    the talent half: CHECKED %d node names and %d lanes in the one tree of %d nodes"
+		% [tree_names.size(), lanes_seen.size(), Talents.TREE.size()])
 	for tag in Classes.TAG_ORDER:
 		var word := String(tag).to_lower()
 		var clashes: Array = []
 		for ab in Classes.ability_corpus():
 			if _has_word(ab.display_name.to_lower(), word):
 				clashes.append("ability:" + ab.display_name)
-		for spec in Talents.LANE_TREES:
-			for node_name in _node_names(String(spec)):
-				if _has_word(node_name.to_lower(), word):
-					clashes.append("node:" + node_name)
-			# BATCH EL §3 — THE LANE, WHICH THIS SWEEP COULD NOT SEE.
-			for lane_name in _lane_names(String(spec)):
-				if _has_word(lane_name.to_lower(), word):
-					clashes.append("lane:" + lane_name)
+		# BATCH FX — ONE TREE, WORN BY EVERY SPEC, SO IT IS WALKED ONCE.
+		for node_name in tree_names:
+			if _has_word(String(node_name).to_lower(), word):
+				clashes.append("node:" + String(node_name))
+		# BATCH EL §3 — THE LANE, WHICH THIS SWEEP COULD NOT SEE. Asserted empty
+		# above since FX, and walked anyway, so a lane that comes back is swept.
+		for lane_name in lanes_seen:
+			if _has_word(String(lane_name).to_lower(), word):
+				clashes.append("lane:" + String(lane_name))
 		# BATCH EL §3 — THE ITEMS. `defense` is an item id and the pouch button
 		# renders "Defense" on the very screen the tag line is drawn on.
 		for iid in Run.ITEM_IDS:
@@ -664,13 +703,13 @@ func _status_labels(src: String) -> Array:
 	return out
 
 
-# BATCH EL §3 — LANE NAMES. They live under a `"lane"` key on every node, so
+# BATCH EL §3 — LANE NAMES. They lived under a `"lane"` key on every node, so
 # `_collect_names`'s `"name"` walk never reached one, and `Tempo` sat in nine
-# of them while EK's sweep reported the tag clean.
-func _lane_names(spec: String) -> Array:
+# of them while EK's sweep reported the tag clean. BATCH FX: the walk is over
+# the ONE tree, which carries no lane — §4's population arm asserts exactly that.
+func _lane_names() -> Array:
 	var seen := {}
-	var tree = Talents.LANE_TREES.get(spec, {})
-	_collect_lanes(tree, seen)
+	_collect_lanes(Talents.TREE, seen)
 	return seen.keys()
 
 
@@ -685,10 +724,11 @@ func _collect_lanes(o, seen: Dictionary) -> void:
 			_collect_lanes(x, seen)
 
 
-func _node_names(spec: String) -> Array:
+# BATCH FX — THE ONE TREE'S NODE NAMES. Every hero wears `Talents.TREE`, so
+# there is one population where there were twelve.
+func _node_names() -> Array:
 	var out: Array = []
-	var tree = Talents.LANE_TREES.get(spec, {})
-	_collect_names(tree, out)
+	_collect_names(Talents.TREE, out)
 	return out
 
 

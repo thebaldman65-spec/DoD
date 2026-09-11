@@ -139,9 +139,14 @@ func _source_guard() -> void:
 	# Both magnitudes the fix deliberately did NOT touch.
 	ok(src.contains("const HOLD_RELEASE_STACKS := 1"),
 		"§1: the release still comes back on 1 stack — no magnitude moved")
-	var tal := _src("res://scripts/talents.gd")
-	ok(tal.contains("\"payload\": {\"stat\": {\"honed_shards_ranks\": 3}}"),
-		"§1: Honed Shards still applies 3 — the guard fixes control flow, not numbers")
+	# BATCH FX — ONE CHECK DELETED HERE (DG §2). It pinned Honed Shards' payload
+	# (`honed_shards_ranks` 3) in `talents.gd`, as the second of the two
+	# magnitudes BN's fix deliberately left alone. FX deleted the twelve spec
+	# trees and the node with them, so that authored magnitude exists nowhere a
+	# check can read it — no node of the one tree writes the field, and no rune
+	# does. What survives of the question is asserted live: the release still
+	# lands `HOLD_RELEASE_STACKS` plus the ranks, 1 + 3 = 4, with the retired
+	# payload inlined (see RETIRED), and the first magnitude is pinned above.
 
 
 # ---------- §2 THE LADDER ----------
@@ -208,6 +213,47 @@ func _difficulty_table() -> void:
 
 # ---------- live harness ----------
 
+# BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED. FX deleted the twelve spec
+# trees, so the three Cryomancer ids this suite learns are in no tree a hero can
+# buy, and a learned id the member's tree does not hold applies NOTHING at the
+# spawn — which is why every Honed Shards check went red, and why several more
+# went on passing for the wrong reason: "the release does not re-freeze" and "a
+# move is not a release" are trivially true of a release that lays no stacks and
+# a Shockwave that cannot fire, which is exactly the trap this suite's header
+# warns about. The FIELDS those nodes wrote and their read sites stand (dormant,
+# not deleted). Each payload is copied verbatim from the retired node and rides
+# the Cryomancer's tree as a fixture cell, so it reaches the unit through the
+# SAME spawn path learning the node did (`Talents.apply_from_tree`, then
+# `BattleUnit.setup`) — which is why "Honed Shards is learned and pays 3" still
+# asks something.
+#   FX: the payload the retired cr_razor_hone (Honed Shards) carried — the node
+#       is deleted, the field and its read site (`_hold_release_body`) stand.
+#   FX: the payload the retired cr_icy_veins (Shockwave) carried — the node is
+#       deleted, the field and its read site (`_hero_shattered_tempo`) stand.
+#   FX: the payload the retired cr_lance_focus (Focused Lance) carried — the node
+#       is deleted; its edit to Ice Lance rides `apply_payload`'s live `ability`
+#       arm. Nothing here casts Ice Lance (the id was learned for the Cryoclasm
+#       GRANT that DO removed), so it is carried only to keep the board as measured.
+const RETIRED := {
+	"cr_razor_hone": {"name": "Honed Shards",
+		"payload": {"stat": {"honed_shards_ranks": 3}}},
+	"cr_icy_veins": {"name": "Shockwave", "payload": {"stat": {"shattered_tempo": 2.0}}},
+	"cr_lance_focus": {"name": "Focused Lance",
+		"payload": {"ability": "Ice Lance", "add": {"damage": 15, "pressure": 15}}},
+}
+
+
+# The Cryomancer's tree for a spawn: the one class tree, plus one fixture cell
+# for every RETIRED id in `learned`, carrying that node's payload and nothing else.
+func _tree_with_retired(spec: String, learned: Dictionary) -> Array:
+	var tree: Array = Talents.generate_tree(spec, "")
+	for id in learned:
+		if RETIRED.has(id):
+			tree.append({"id": String(id), "name": String(RETIRED[id]["name"]),
+				"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
+
+
 # Same shape as test_batch_as's: a real battle scene with the enemies' turns
 # off, determinism forced rather than retried (the AK/AL/AR discipline).
 # BATCH DO added `earned`. Cryoclasm used to arrive from `cr_lance_focus`'s
@@ -217,7 +263,8 @@ func _difficulty_table() -> void:
 func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
 		earned: Array = []) -> Node:
 	var opts := {"difficulty": "wanderer", "enemies": lineup, "node_type": ty,
-		"talents": {1: learned.duplicate()}, "deterministic": true}
+		"talents": {1: learned.duplicate()}, "deterministic": true,
+		"patch": {1: {"tree": _tree_with_retired("cryomancer", learned)}}}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
 	return await Fixture.spawn(self,

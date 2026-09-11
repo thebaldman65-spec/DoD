@@ -157,9 +157,10 @@ func _hunter_pass(spec: String) -> void:
 		run.party[i]["talents"] = {}
 		run.sync_spec_hp(i)
 	var equipped: Array = _equip_all(run.party[3])
-	# The Pack: the capstone that makes per-beast terms count twice.
-	if spec == "beastmaster":
-		run.party[3]["talents"] = {"bm_the_pack": 1}
+	# The Pack: the capstone that makes per-beast terms count twice. It was
+	# learned here through `talents` (`{"bm_the_pack": 1}`) until BATCH FX; the
+	# node is deleted with the twelve spec trees, so its payload is written onto
+	# the spawned hunter in the `beastmaster` arm below instead.
 	run.specs_chosen = true
 	run.active = true
 	run.encounter = {"type": "fight", "theme": "Warband",
@@ -219,6 +220,15 @@ func _hunter_pass(spec: String) -> void:
 				"beastmaster: the Loosened Straps armor cost never applied (%.2f)" % \
 					hunter.armor)
 			# TWO beasts, because that is where his per-beast terms double.
+			# FX: the payload the retired bm_the_pack (The Pack) carried — the node
+			# is deleted, the field and its read site stand. `{"stat":
+			# {"the_pack": 1}}` is written onto the spawned hunter instead of being
+			# learned at the spawn: every read of `the_pack` is at a summon or a
+			# turn (`_beast_cap` is the one the two summons below ask), none at the
+			# spawn, so the field lands where it is read. Without it the second
+			# summon SWAPS the first out, the Pack check below reads 1, and the
+			# first summon's unawaited arrival resumes on a freed body.
+			hunter.the_pack = 1
 			scene.call("_do_summon", hunter, "ursus")
 			for _i in 4:
 				await process_frame

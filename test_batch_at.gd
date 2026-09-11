@@ -41,6 +41,24 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+# BATCH FX RE-POINTED THIS FILE IN PLACE, AND ITS SUBJECT WENT WITH THE TWELVE
+# TREES. The Arcanist wears the ONE class tree now (`generate_tree` answers it
+# for every spec with a class), and the 24 nodes the tables below record exist
+# nowhere a check can read them. Each section says at its site what moved and
+# by exactly how many checks; in short:
+#   * the SHAPE questions the one tree still answers (its size, unique ids,
+#     single ranks, no dangling exclusivity, three full tiers) are asked of it;
+#     the lane / row / capstone / name / tooltip questions are DELETED under
+#     DG §2, because FX deleted their subject — except Conversion's, whose field
+#     AND magnitude `tn_resource_ward` carries, so its questions go there;
+#   * every MECHANIC this file drives still has its field and its read site, so
+#     RETIRED carries the exact payload each retired node carried and `_spawn`
+#     installs it inline through the real `apply_from_tree` — not one live
+#     assertion moved;
+#   * "a dropped id voids a saved tree" is asked of FX's load migration, which
+#     DROPS a saved pick on a deleted id and keeps one on a live id.
+# The tables below stay AT's record of its 24 nodes; RETIRED is FX's record of
+# what they carried.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -134,6 +152,105 @@ const TOOLTIPS := {
 const CURVE := {5: [22, 11], 8: [54, 27], 12: [117, 59], 16: [204, 102]}
 
 
+# ── BATCH FX: THE RETIRED PAYLOADS ──────────────────────────────────────────
+# FX deleted the twelve spec trees and the 27 Arcanist nodes with them. EVERY
+# FIELD THEY WROTE AND EVERY READ SITE STANDS (dormant: no node writes one), so
+# each question this file drove through a node is re-pointed by installing the
+# EXACT payload the retired node carried, transcribed here from the tree FX
+# deleted. `_retired_tree` builds an inline tree out of it and `_spawn` hands
+# that to the real `apply_from_tree`, so a live check learns `ar_harmonics`
+# exactly as it did before FX; only the source of the payload moved.
+# id -> [name, payload]. 28 entries.
+# PLUS ONE CRYOMANCER NODE, because §8's Shatter check spawns a Cryomancer
+# learning `cr_shatter` and that payload has to come from somewhere too.
+const RETIRED := {
+	# FX: the payload the retired ar_harmonics (Harmonics) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_harmonics": ["Harmonics", {"stat": {"harmonics_ranks": 1}}],
+	# FX: the payload the retired ar_mastery (Attunement) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_mastery": ["Attunement", {"stat": {"attunement_crit": 1}}],
+	# FX: the payload the retired ar_charged (Charged Bolts) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_charged": ["Charged Bolts", {"stat": {"charged_bolts_ranks": 5}}],
+	# FX: the payload the retired ar_overcharge (Overdraw) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"ar_overcharge": ["Overdraw", {"ability": "Arcane Cannon", "add": {"cost": -10}, "set": {"cooldown": 1}}],
+	# FX: the payload the retired ar_core (Resonant Core) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_core": ["Resonant Core", {"stat": {"resonant_core_ranks": 1}}],
+	# FX: the payload the retired ar_critical_mass (Critical Mass) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_critical_mass": ["Critical Mass", {"stat": {"critical_mass_stacks": 4}}],
+	# FX: the payload the retired ar_unlimited (Cascade) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_unlimited": ["Cascade", {"stat": {"cascade_stacks": 1}}],
+	# FX: the payload the retired ar_conduit (Conduit) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_conduit": ["Conduit", {"stat": {"conduit_step": 0.5}}],
+	# FX: the payload the retired ar_volatility (Volatility) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_volatility": ["Volatility", {"stat": {"volatility_ranks": 30, "volatility_recoil": 25}}],
+	# FX: the payload the retired ar_temporal (Temporal Rift) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_temporal": ["Temporal Rift", {"stat": {"temporal_ranks": 40}}],
+	# FX: the payload the retired ar_suppressing (Suppressing Fire) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_suppressing": ["Suppressing Fire", {"stat": {"suppressing_ranks": 2}}],
+	# FX: the payload the retired ar_cannoneer (Cannoneer) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_cannoneer": ["Cannoneer", {"stat": {"cannoneer_ranks": 4}}],
+	# FX: the payload the retired ar_barrister (Barrage Master) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"ar_barrister": ["Barrage Master", {"ability": "Arcane Barrage", "add": {"random_hits": 3}}],
+	# FX: the payload the retired ar_mindfulness (Terminal Velocity) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_mindfulness": ["Terminal Velocity", {"stat": {"terminal_velocity": 15}}],
+	# FX: the payload the retired ar_conversion (Conversion) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_conversion": ["Conversion", {"stat": {"conversion_ranks": 30}}],
+	# FX: the payload the retired ar_on_edge (On the Edge) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_on_edge": ["On the Edge", {"stat": {"on_edge_threshold": 35.0, "on_edge_stacks": 4}}],
+	# FX: the payload the retired ar_meltdown (Feedback Loop) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_meltdown": ["Feedback Loop", {"stat": {"feedback_ranks": 30}}],
+	# FX: the payload the retired ar_stable (Stable Alignment) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_stable": ["Stable Alignment", {"stat": {"stable_ranks": 25}}],
+	# FX: the payload the retired ar_still (Backlash) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_still": ["Backlash", {"stat": {"backlash_stacks": 1}}],
+	# FX: the payload the retired ar_attunement (Siphon) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_attunement": ["Siphon", {"stat": {"siphon_ranks": 20}}],
+	# FX: the payload the retired ar_ward (Event Horizon) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_ward": ["Event Horizon", {"stat": {"event_horizon": 15}}],
+	# FX: the payload the retired ar_convergence (Harmonic Convergence) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_convergence": ["Harmonic Convergence", {"stat": {"convergence": 10}}],
+	# FX: the payload the retired ar_blowback (Blowback) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_blowback": ["Blowback", {"stat": {"blowback": 100}}],
+	# FX: the payload the retired ar_entropy_toll (Entropy's Toll) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_entropy_toll": ["Entropy's Toll", {"stat": {"entropy_toll": 3}}],
+	# FX: the payload the retired ar_singularity (Singularity) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_singularity": ["Singularity", {"stat": {"singularity_crit_build": 2, "singularity_kill_build": 3}}],
+	# FX: the payload the retired ar_wrath (Unchained) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_wrath": ["Unchained", {"stat": {"wrath_step_double": 1}}],
+	# FX: the payload the retired ar_timelord (Perfect Conversion) carried — the node is deleted,
+	# the field and its read site stand.
+	"ar_timelord": ["Perfect Conversion", {"stat": {"perfect_conversion": 1}}],
+	# FX: the payload the retired cr_shatter (Shardfall) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_shatter": ["Shardfall", {"ability": "Razor Ice", "add": {"multi_hits": 3}, "set": {"cooldown": 1}}],
+}
+
+
 func _initialize() -> void:
 	# Children added in _initialize never fire _ready (root not ready) — park
 	# on the first process_frame, the CLAUDE.md gotcha.
@@ -146,6 +263,22 @@ func ok(cond: bool, msg: String) -> void:
 		fails.append(msg)
 
 
+# BATCH FX — the tree a member wears, built from RETIRED: one node per id,
+# carrying the retired node's exact payload. An id the record does not hold is
+# a FAILED check rather than a silent no-op, because a learned id that installs
+# nothing is exactly the fault FX left in every suite that learned a deleted id.
+func _retired_tree(ids: Array) -> Array:
+	var out: Array = []
+	for id in ids:
+		if not RETIRED.has(id):
+			ok(false, "%s is not in the RETIRED record, so nothing installs it" % id)
+			continue
+		var rec: Array = RETIRED[id]
+		out.append({"id": String(id), "name": String(rec[0]),
+			"payload": (rec[1] as Dictionary).duplicate(true)})
+	return out
+
+
 func _run() -> void:
 	await process_frame
 	Profile.save_path = "user://profile_batch_at_test.json"
@@ -154,7 +287,8 @@ func _run() -> void:
 
 	_tree_shape()
 	_node_table()
-	_magnitudes()
+	# BATCH FX: awaited now — §3 measures the retired payloads on a live spawn.
+	await _magnitudes()
 	_curve_maths()
 	_kit()
 	_source_audit()
@@ -183,115 +317,206 @@ func _run() -> void:
 
 # ---------- §3 the shape ----------
 
+func _tree() -> Array:
+	return Talents.generate_tree("arcanist", "mage")
+
+
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 91 checks -> 85. The tree an
+# Arcanist wears is the ONE class tree, so the shape questions it still answers
+# are asked of it.
+#   * KEPT, ASKED OF THE ONE TREE (82): its size, 27 single ranks, 27 unique
+#     ids, and 27 nodes whose `exclusive_with` names nothing dangling (FX: no
+#     node is exclusive, so every one reads empty).
+#   * RE-POINTED, 3 -> 3: "lane X holds rows 1-8 plus its capstone" asked that
+#     each lane be full. The one tree's bands are its three tiers, so each must
+#     hold nine.
+#   * DELETED, 6 CHECKS (DG §2 — FX deleted the twelve spec trees and the lanes
+#     and capstone shelf with them): the 3 "is a capstone and sits on the
+#     shelf", "exactly 3 capstones", "exactly 3 lanes" and "the Control lane is
+#     gone" — a lane name, and there are no lanes for it to be absent from.
 func _tree_shape() -> void:
-	var tree: Array = Talents.LANE_TREES["arcanist"]
-	ok(tree.size() == 27, "the tree holds 24 nodes (got %d)" % tree.size())
-	var per_lane := {}
-	var caps := 0
+	var tree: Array = _tree()
+	ok(tree.size() == 27, "the tree an Arcanist wears holds 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for n in tree:
-		var lane := String(n["lane"])
-		var row := int(n["row"])
-		per_lane[lane] = per_lane.get(lane, []) + [row]
-		if n.get("capstone", false):
-			caps += 1
-			ok(row == Talents.CAPSTONE_ROW, "%s is a capstone and sits on the shelf" % n["id"])
-		ok(int(n["ranks"]) == 1, "%s is a single-rank node" % n["id"])
+		ok(int(n.get("ranks", 1)) == 1, "%s is a single-rank node" % n["id"])
 		ok(not seen.has(n["id"]), "%s appears exactly once" % n["id"])
 		seen[n["id"]] = true
-		# The tree carries no exclusive_with references at all — the ROW does
-		# the barring since Batch AI — so "valid exclusive references" is the
-		# assertion that none has crept back in pointing at a node that moved.
+		# The tree carries no exclusive_with references at all — the ROW did the
+		# barring from Batch AI to FX, and FX made no node exclusive — so "valid
+		# exclusive references" is the assertion that none has crept back in
+		# pointing at a node that does not exist.
 		var excl := String(n.get("exclusive_with", ""))
 		ok(excl == "" or seen.has(excl) or tree.any(func(m): return String(m["id"]) == excl),
 			"%s's exclusive_with names a node that exists" % n["id"])
-	ok(caps == 3, "exactly 3 capstones (got %d)" % caps)
-	ok(per_lane.size() == 3, "exactly 3 lanes (got %d)" % per_lane.size())
-	for lane in ["Resonance", "Overload", "Entropy"]:
-		var rows: Array = per_lane.get(lane, [])
-		rows.sort()
-		ok(rows == [1, 2, 3, 4, 5, 6, 7, 8, 9],
-			"lane %s holds rows 1-8 plus its capstone (got %s)" % [lane, rows])
-	# §3: the lane formerly called Control is ENTROPY, because after AS
-	# "Control" is the Cryomancer's identity word.
-	ok(not per_lane.has("Control"),
-		"the Control lane is gone — it is ENTROPY now")
+	# Literals on purpose: a check that reads the constant it checks has stopped
+	# asking its question.
+	for tier in [1, 2, 3]:
+		var held := Talents.tier_nodes(tree, tier).size()
+		ok(held == 9, "tier %d holds nine nodes (got %d)" % [tier, held])
 
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 120 checks -> 53.
+#   * INVERTED, 24 -> 26: "X survives (a dropped id voids a saved tree)" was the
+#     migration promise. FX deleted all 24 ids and keeps the promise in
+#     `Run._migrate_trees`, which swaps a saved tree for the one tree on load and
+#     DROPS every pick the one tree does not hold — so a dropped id voids
+#     nothing. Each id is asked that, driven on a member saved before FX, and
+#     two LIVENESS ARMS prove the drop is a selection rather than a wipe: the
+#     saved tree is swapped, and a pick the one tree holds survives the load.
+#   * RE-POINTED, 24 -> 27: "is one of the 24 authored ids" — NO NEW IDS — asked
+#     that the tree hold nothing but its authored population. That population
+#     is the ONE tree's now, node for node, and BM's row-8 carve-out has no row
+#     to skip.
+#   * DELETED, 72 CHECKS (DG §2 — FX deleted the Arcanist tree): each of the 24
+#     ids' row, lane and name. NODES stays as AT's record of what it shipped.
 func _node_table() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["arcanist"]:
-		by_id[String(n["id"])] = n
+	var run: Node = root.get_node("/root/Run")
+	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
+	var member: Dictionary = run.party[1]
+	member["spec"] = "arcanist"
+	var retired_ids: Array = []
+	for id in RETIRED:
+		if String(id).begins_with("ar_"):
+			retired_ids.append(id)
+	member["tree"] = _retired_tree(retired_ids)
+	var saved := {"tn_health": 1}
 	for id in NODES:
-		ok(by_id.has(id), "%s survives (a dropped id voids a saved tree)" % id)
-		if not by_id.has(id):
-			continue
-		var n: Dictionary = by_id[id]
-		ok(int(n["row"]) == NODES[id][0],
-			"%s sits on row %d (got %d)" % [id, NODES[id][0], int(n["row"])])
-		ok(String(n["lane"]) == NODES[id][1],
-			"%s is in lane %s (got %s)" % [id, NODES[id][1], n["lane"]])
-		ok(String(n["name"]) == NODES[id][2],
-			"%s is named %s (got %s)" % [id, NODES[id][2], n["name"]])
-	# NO NEW IDS EITHER — the promise runs both ways, and a 25th id would mean
-	# a save version move nobody asked for.
-	for id in by_id:
-		# BATCH BM: skip row 8 — this batch's table is ITS OWN record of ITS OWN
-		# 24 nodes, and BM added a row-8 node to every lane. The check exists to
-		# prove the twenty-four survive unchanged, not that nothing else exists.
-		if int(by_id[id]["row"]) == 8:
-			continue
-		ok(NODES.has(id), "%s is one of the 24 authored ids" % id)
+		saved[id] = 1
+	member["talents"] = saved
+	run._migrate_trees()
+	var kept: Dictionary = run.party[1].get("talents", {})
+	ok(run.party[1].get("tree", []) == _tree(),
+		"a tree saved before FX is swapped for the one tree on load")
+	ok(kept.has("tn_health"),
+		"...and a pick the one tree holds SURVIVES that load (the liveness arm)")
+	for id in NODES:
+		ok(not kept.has(id),
+			"%s is DROPPED on load — FX deleted it, so a saved pick on it voids nothing" % id)
+	var the_tree := Talents.tree()
+	for n in _tree():
+		ok(Talents.node_in_tree(the_tree, String(n["id"])) == n,
+			"%s is one of the one tree's nodes, unchanged — no new id" % String(n["id"]))
 
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 103 checks -> 51.
+#   * RE-POINTED TO THE PRECEDENT, 5 -> 5: Conversion (ar_conversion) is
+#     deleted, and `tn_resource_ward` carries its field AND its magnitude —
+#     conversion_ranks 30, the Mana form (FX §3's precedent, TAKEN) — so its
+#     three payload questions and its two tooltip questions are asked of the
+#     live node, as the precedent rule prefers.
+#   * RE-POINTED, 42 -> 42: each other PAYLOADS row asked that the node write
+#     its field at the design number (two checks), and Volatility's recoil and
+#     On the Edge's payout asked the same of their second fields. The nodes are
+#     deleted and the FIELDS stand (FX kept every read site), so each asks that
+#     the field is still a real BattleUnit property and that the exact payload
+#     the retired node carried — installed inline from RETIRED through the real
+#     spawn — lands on the Arcanist at exactly that number over a spawn that
+#     learned nothing. PAYLOADS and RETIRED are two transcriptions of one
+#     record, so a drift in either reds here.
+#   * RE-POINTED, 4 -> 4: the conduit-float trap is asked of the LIVE writer of
+#     the curve step (the Resonant Core rune, through `Runes.build`'s int
+#     coercion) where it asked the node, and its two name checks stand as they
+#     were; Barrage Master is the ABILITY arm of `apply_payload`, driven with its
+#     exact payload on a fresh Arcanist kit.
+#   * DELETED, 52 CHECKS (DG §2 — FX deleted the nodes, and a payload's form and
+#     a tooltip are properties of a node): 14 "is a real magnitude, not a rank-1
+#     stand-in" (the payload is this file's own inline record now, so its value
+#     could only answer itself) and TOOLTIPS' 38 — "renders N" and "resolved its
+#     {v}" for the 19 nodes that are not Conversion. The one tree's nodes carry
+#     no `scale` and no `{v}`. TOOLTIPS stays as AT's record.
 func _magnitudes() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["arcanist"]:
-		by_id[String(n["id"])] = n
+	var ward := Talents.node_in_tree(Talents.tree(), "tn_resource_ward")
+	var fields: Array = ["volatility_recoil", "on_edge_stacks"]
+	var learn := {}
 	for id in PAYLOADS:
-		if not by_id.has(id):
+		if id == "ar_conversion":
 			continue
-		var stat: Dictionary = by_id[id].get("payload", {}).get("stat", {})
+		learn[id] = 1
+		fields.append(String(PAYLOADS[id][0]))
+	var specs := ["berserker", "arcanist", "inquisitor", "beastmaster"]
+	var bare := await _spawn({}, ["raider"], specs)
+	var base := _fields_of(_arc(bare), fields)
+	bare.queue_free()
+	await process_frame
+	var worn := await _spawn(learn, ["raider"], specs)
+	var got := _fields_of(_arc(worn), fields)
+	worn.queue_free()
+	await process_frame
+	for id in PAYLOADS:
 		var field: String = PAYLOADS[id][0]
-		ok(stat.has(field), "%s writes %s" % [id, field])
-		if stat.has(field):
-			ok(abs(float(stat[field]) - float(PAYLOADS[id][1])) < 0.001,
-				"%s writes %s = %s (got %s)" % [id, field, PAYLOADS[id][1], stat[field]])
-		# ADDITIVE, NOT RANKED: a bare 1 standing in for a multiplier is the
-		# form this batch removed. The four legitimate 1s are counted stacks.
-		if not field in ["harmonics_ranks", "attunement_crit", "resonant_core_ranks",
-				"cascade_stacks", "backlash_stacks",
-				"perfect_conversion"]:
+		if id == "ar_conversion":
+			var stat: Dictionary = ward.get("payload", {}).get("stat", {})
+			ok(stat.has(field), "%s's precedent, tn_resource_ward, writes %s" % [id, field])
+			if stat.has(field):
+				ok(abs(float(stat[field]) - float(PAYLOADS[id][1])) < 0.001,
+					"...at %s's own %s = %s (got %s)" % [id, field, PAYLOADS[id][1], stat[field]])
 			ok(float(stat.get(field, 0)) != 1.0,
-				"%s's %s is a real magnitude, not a rank-1 stand-in" % [id, field])
+				"...a real magnitude, not a rank-1 stand-in (%s)" % field)
+			continue
+		ok(got.get(field) != null,
+			"the field %s the retired %s wrote still stands on BattleUnit (got %s)"
+				% [field, id, str(got.get(field))])
+		ok(_landed(got, base, field, PAYLOADS[id][1]),
+			"the retired %s's payload lands %s = %s on the Arcanist (got %s over a bare %s)"
+				% [id, field, PAYLOADS[id][1], str(got.get(field)), str(base.get(field))])
 	# Conduit's counter must be a FLOAT and must NOT end in "_ranks", or
 	# Runes.STAT_INT_KEYS coerces 0.5 to 0 and the node goes silently inert.
-	var cd: Dictionary = by_id["ar_conduit"].get("payload", {}).get("stat", {})
-	ok(cd.get("conduit_step", 0) is float, "conduit_step is a FLOAT")
+	# BATCH FX RE-POINTED THE FIRST OF THE THREE: the node that wrote
+	# conduit_step is deleted, and the writer of the curve step left is the
+	# Resonant Core rune's `rune_conduit_step` — so the float is asked of the
+	# payload `Runes.build` hands the spawn, which is where the coercion runs.
+	var core_built: Dictionary = Runes.build("resonant_core").get("payload", {}).get("stat", {})
+	ok(core_built.get("rune_conduit_step", 0) is float,
+		"the curve step stays a FLOAT through the rune coercion (rune_conduit_step %s)"
+			% str(core_built.get("rune_conduit_step")))
 	ok(not "conduit_step".ends_with("_ranks"),
 		"conduit_step does not end in _ranks (the AA float-into-int trap)")
 	ok(not Runes.STAT_INT_KEYS.has("conduit_step"),
 		"conduit_step is not in STAT_INT_KEYS either")
 	# Volatility carries TWO magnitudes: the damage add and the recoil SET.
-	var vol: Dictionary = by_id["ar_volatility"].get("payload", {}).get("stat", {})
-	ok(int(vol.get("volatility_recoil", 0)) == 25,
-		"Volatility sets Cannon's recoil to 25%")
+	ok(_landed(got, base, "volatility_recoil", 25),
+		"Volatility's retired payload sets Cannon's recoil to 25%% (got %s)"
+			% str(got.get("volatility_recoil")))
 	# On the Edge carries the threshold AND the payout.
-	var oe: Dictionary = by_id["ar_on_edge"].get("payload", {}).get("stat", {})
-	ok(int(oe.get("on_edge_stacks", 0)) == 4, "On the Edge pays 4 Resonance")
+	ok(_landed(got, base, "on_edge_stacks", 4),
+		"On the Edge's retired payload pays 4 Resonance (got %s)" % str(got.get("on_edge_stacks")))
 	# Barrage Master rides the ability, not a stat.
-	var bm: Dictionary = by_id["ar_barrister"].get("payload", {})
-	ok(String(bm.get("ability", "")) == "Arcane Barrage"
-			and int(bm.get("add", {}).get("random_hits", 0)) == 3,
-		"Barrage Master adds 3 bolts to Arcane Barrage")
-	# ...and the tooltip half: the rendered number a player actually reads.
-	for id in TOOLTIPS:
-		if not by_id.has(id):
-			continue
-		var shown := String(Talents.desc_for(by_id[id], 1))
-		ok(shown.contains(TOOLTIPS[id]),
-			"%s's tooltip renders %s (got %s)" % [id, TOOLTIPS[id], shown])
-		ok(not shown.contains("{v}"), "%s's tooltip resolved its {v}" % id)
+	# FX: the payload the retired ar_barrister (Barrage Master) carried — the
+	# node is deleted, the ability and the arm it rode stand.
+	var kit := {"abilities": Classes.spec_abilities("arcanist")}
+	var bolts_before := -1
+	for ab in kit["abilities"]:
+		if ab.display_name == "Arcane Barrage":
+			bolts_before = ab.random_hits
+	Talents.apply_payload(kit, (RETIRED["ar_barrister"][1] as Dictionary).duplicate(true), 1, {})
+	var bolts_after := -1
+	for ab in kit["abilities"]:
+		if ab.display_name == "Arcane Barrage":
+			bolts_after = ab.random_hits
+	ok(bolts_before >= 0 and bolts_after == bolts_before + 3,
+		"Barrage Master adds 3 bolts to Arcane Barrage (%d -> %d)" % [bolts_before, bolts_after])
+	# ...and the tooltip half, asked of Conversion's precedent alone.
+	var shown := String(Talents.desc_for(ward, 1))
+	ok(shown.contains(TOOLTIPS["ar_conversion"]),
+		"ar_conversion's precedent's tooltip renders %s (got %s)" % [TOOLTIPS["ar_conversion"], shown])
+	ok(not shown.contains("{v}"), "ar_conversion's precedent's tooltip resolved its {v}")
+
+
+# BATCH FX — each named field's value on a spawned hero, or null where he has
+# none: `get` answers null for a property BattleUnit does not declare.
+func _fields_of(u: BattleUnit, fields: Array) -> Dictionary:
+	var out := {}
+	for f in fields:
+		out[f] = u.get(f) if u != null else null
+	return out
+
+
+# BATCH FX — did an inline payload land exactly `want` on top of a bare spawn?
+func _landed(got: Dictionary, base: Dictionary, f: String, want) -> bool:
+	if got.get(f) == null or base.get(f) == null:
+		return false
+	return is_equal_approx(float(got[f]) - float(base[f]), float(want))
 
 
 # ---------- §1 the compounding curve ----------
@@ -460,8 +685,13 @@ func _rune_audit() -> void:
 		"the Arcanist has 9 spec runes (got %d)" % arcanist_runes.size())
 	# Every counter a rune writes must be written by a node OR still have a live
 	# read site. This is the assertion that caught real breakage in AR and AS.
+	# BATCH FX: "noded" is asked of the tree an Arcanist wears — the ONE tree, no
+	# node of which writes an Arcanist counter, so every rune field below has to
+	# earn its pass on a live read site. The Arcanist's OWN counters, which the
+	# Mage-wide runes must not write, are the fields the retired nodes wrote;
+	# they are read off RETIRED further down, where this loop used to find them.
 	var node_fields := {}
-	for n in Talents.LANE_TREES["arcanist"]:
+	for n in _tree():
 		for f in n.get("payload", {}).get("stat", {}):
 			node_fields[String(f)] = true
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
@@ -501,7 +731,15 @@ func _rune_audit() -> void:
 		"...and its other two clauses are untouched, because their read sites were kept")
 	# THE THREE MAGE CLASS-WIDE RUNES TOUCH NO ARCANIST COUNTER — asserted, not
 	# assumed, because a collision there would re-tune a rune for every mage.
-	var arc_fields := node_fields.duplicate()
+	# BATCH FX: the Arcanist's counters are the fields his retired nodes wrote
+	# (RETIRED), not the one tree's — asked of the one tree, this would find the
+	# tree's shared unit-math fields (dmg_bonus, max_hp_pct — `check_em.UNIT_MATH`
+	# rules them not talent-keyed) and stop asking about the Arcanist at all.
+	var arc_fields := {}
+	for rid in RETIRED:
+		if String(rid).begins_with("ar_"):
+			for f in (RETIRED[rid][1] as Dictionary).get("stat", {}):
+				arc_fields[String(f)] = true
 	for extra in ["mindfulness_ranks", "arcane_mastery_ranks", "critical_mass_ranks",
 			"rune_on_edge_ranks", "on_edge_stacks", "volatility_recoil"]:
 		arc_fields[extra] = true
@@ -564,6 +802,11 @@ func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight",
 		"talents": {1: learned.duplicate()}, "deterministic": true, "crit": -10.0}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	# BATCH FX: every id a check here learns is deleted, so the member's tree is
+	# the inline one RETIRED builds — the exact payloads, through the real
+	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
+	if not learned.is_empty():
+		opts["patch"] = {1: {"tree": _retired_tree(learned.keys())}}
 	return await Fixture.spawn(self, specs, opts)
 
 

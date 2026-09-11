@@ -37,6 +37,23 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+# BATCH FX RE-POINTED THIS FILE IN PLACE, AND ITS SUBJECT WENT WITH THE TWELVE
+# TREES. The Cryomancer wears the ONE class tree now (`generate_tree` answers it
+# for every spec with a class), and the 24 nodes the tables below record exist
+# nowhere a check can read them. Each section says at its site what moved and
+# by exactly how many checks; in short:
+#   * the SHAPE questions the one tree still answers (its size, single ranks,
+#     no exclusivity, three full tiers) are asked of it; the lane / row /
+#     capstone / name / tooltip questions are DELETED under DG §2, because FX
+#     deleted their subject;
+#   * every MECHANIC this file drives still has its field and its read site, so
+#     RETIRED carries the exact payload each retired node carried and `_spawn`
+#     installs it inline through the real `apply_from_tree` — not one live
+#     assertion moved;
+#   * "a lost id voids every saved tree" is asked of FX's load migration, which
+#     DROPS a saved pick on a deleted id and keeps one on a live id.
+# The tables below stay AS's record of its 24 nodes; RETIRED is FX's record of
+# what they carried.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -131,6 +148,100 @@ const ABILITY_NODES := {
 }
 
 
+# ── BATCH FX: THE RETIRED PAYLOADS ──────────────────────────────────────────
+# FX deleted the twelve spec trees and the 27 Cryomancer nodes with them. EVERY
+# FIELD THEY WROTE AND EVERY READ SITE STANDS (dormant: no node writes one), so
+# each question this file drove through a node is re-pointed by installing the
+# EXACT payload the retired node carried, transcribed here from the tree FX
+# deleted. `_retired_tree` builds an inline tree out of it and `_spawn` hands
+# that to the real `apply_from_tree`, so a live check learns `cr_freezing`
+# exactly as it did before FX; only the source of the payload moved.
+# id -> [name, payload]. 27 entries.
+const RETIRED := {
+	# FX: the payload the retired cr_hungering (Hungering Cold) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_hungering": ["Hungering Cold", {"stat": {"hungering_ranks": 3}}],
+	# FX: the payload the retired cr_emp_frostbolt (Deep Chill) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_emp_frostbolt": ["Deep Chill", {"stat": {"deep_chill_ranks": 1}}],
+	# FX: the payload the retired cr_grasp (Winter's Grasp) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_grasp": ["Winter's Grasp", {"stat": {"grasp_ranks": 2}}],
+	# FX: the payload the retired cr_rime (Snowblind) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_rime": ["Snowblind", {"ability": "Blizzard", "add": {"cost": -10}, "set": {"cooldown": 2}}],
+	# FX: the payload the retired cr_icy_resolve (Icy Resolve) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_icy_resolve": ["Icy Resolve", {"ability": "Blizzard", "add": {"damage": 10}}],
+	# FX: the payload the retired cr_whiteout (Whiteout) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_whiteout": ["Whiteout", {"stat": {"whiteout_ranks": 3}}],
+	# FX: the payload the retired cr_splinter (Splintering Shards) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_splinter": ["Splintering Shards", {"stat": {"splinter_ranks": 1}}],
+	# FX: the payload the retired cr_frostbite (Brittle Ice) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_frostbite": ["Brittle Ice", {"stat": {"frostbite_ranks": 6}}],
+	# FX: the payload the retired cr_bitter (Bitter Cold) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_bitter": ["Bitter Cold", {"stat": {"bitter_cold_ranks": 2}}],
+	# FX: the payload the retired cr_frigid (Frigid Grip) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_frigid": ["Frigid Grip", {"stat": {"frigid_ranks": 10}}],
+	# FX: the payload the retired cr_numbing (Numbing Cold) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_numbing": ["Numbing Cold", {"ability": "Ice Lance", "add": {"cost": -10}, "set": {"cooldown": 1}}],
+	# FX: the payload the retired cr_frost_ward (Second Prison) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_frost_ward": ["Second Prison", {"stat": {"second_prison": 1}}],
+	# FX: the payload the retired cr_cold_snap (Cold Snap) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_cold_snap": ["Cold Snap", {"stat": {"cold_snap_ranks": 15}}],
+	# FX: the payload the retired cr_glacial (Glacial Economy) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_glacial": ["Glacial Economy", {"stat": {"glacial_ranks": 15}}],
+	# FX: the payload the retired cr_hypothermia (Hypothermia) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_hypothermia": ["Hypothermia", {"stat": {"hypothermia_ranks": 3}}],
+	# FX: the payload the retired cr_freezing (Killing Frost) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_freezing": ["Killing Frost", {"stat": {"killing_frost": 15}}],
+	# FX: the payload the retired cr_crystal (Crystal Edge) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_crystal": ["Crystal Edge", {"stat": {"crystal_edge_ranks": 15}}],
+	# FX: the payload the retired cr_lance_focus (Focused Lance) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_lance_focus": ["Focused Lance", {"ability": "Ice Lance", "add": {"damage": 15, "pressure": 15}}],
+	# FX: the payload the retired cr_piercing (Piercing Ice) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_piercing": ["Piercing Ice", {"stat": {"piercing_ice_ranks": 30}}],
+	# FX: the payload the retired cr_razor_hone (Honed Shards) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_razor_hone": ["Honed Shards", {"stat": {"honed_shards_ranks": 3}}],
+	# FX: the payload the retired cr_icy_veins (Shockwave) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_icy_veins": ["Shockwave", {"stat": {"shattered_tempo": 2.0}}],
+	# FX: the payload the retired cr_winters_depth (Winter's Depth) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_winters_depth": ["Winter's Depth", {"stat": {"winters_depth": 8}}],
+	# FX: the payload the retired cr_cold_storage (Cold Storage) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_cold_storage": ["Cold Storage", {"stat": {"cold_storage": 5}}],
+	# FX: the payload the retired cr_frostbound (Frostbound Hours) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_frostbound": ["Frostbound Hours", {"stat": {"frostbound_hours": 3}}],
+	# FX: the payload the retired cr_shatter (Shardfall) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"cr_shatter": ["Shardfall", {"ability": "Razor Ice", "add": {"multi_hits": 3}, "set": {"cooldown": 1}}],
+	# FX: the payload the retired cr_absolute (Absolute Zero) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_absolute": ["Absolute Zero", {"stat": {"absolute_zero": 1}}],
+	# FX: the payload the retired cr_eternal (Eternal Winter) carried — the node is deleted,
+	# the field and its read site stand.
+	"cr_eternal": ["Eternal Winter", {"stat": {"eternal_winter": 1}}],
+}
+
+
 func _initialize() -> void:
 	# Children added in _initialize never fire _ready (root not ready) — park
 	# on the first process_frame, the CLAUDE.md gotcha.
@@ -143,6 +254,22 @@ func ok(cond: bool, msg: String) -> void:
 		fails.append(msg)
 
 
+# BATCH FX — the tree a member wears, built from RETIRED: one node per id,
+# carrying the retired node's exact payload. An id the record does not hold is
+# a FAILED check rather than a silent no-op, because a learned id that installs
+# nothing is exactly the fault FX left in every suite that learned a deleted id.
+func _retired_tree(ids: Array) -> Array:
+	var out: Array = []
+	for id in ids:
+		if not RETIRED.has(id):
+			ok(false, "%s is not in the RETIRED record, so nothing installs it" % id)
+			continue
+		var rec: Array = RETIRED[id]
+		out.append({"id": String(id), "name": String(rec[0]),
+			"payload": (rec[1] as Dictionary).duplicate(true)})
+	return out
+
+
 func _run() -> void:
 	await process_frame
 	Profile.save_path = "user://profile_batch_as_test.json"
@@ -151,7 +278,8 @@ func _run() -> void:
 
 	_tree_shape()
 	_node_table()
-	_magnitudes()
+	# BATCH FX: awaited now — §3 measures the retired payloads on a live spawn.
+	await _magnitudes()
 	_ability_nodes()
 	_initiative_audit()
 	_rune_audit()
@@ -181,117 +309,162 @@ func _run() -> void:
 
 # ---------- 1. the shape ----------
 
+func _tree() -> Array:
+	return Talents.generate_tree("cryomancer", "mage")
+
+
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 88 checks -> 58. The tree a
+# Cryomancer wears is the ONE class tree, so the shape questions it still
+# answers are asked of it.
+#   * KEPT, ASKED OF THE ONE TREE (55): its size, 27 single ranks, 27 nodes
+#     carrying no authored exclusive pair (FX: no node is exclusive).
+#   * RE-POINTED, 3 -> 3: "lane X holds 8 rows + a capstone" asked that each
+#     lane be full. The one tree's bands are its three tiers, so each must hold
+#     nine.
+#   * DELETED, 30 CHECKS (DG §2 — FX deleted the twelve spec trees and the
+#     lanes, rows and capstone shelf with them): "exactly 3 capstones", "exactly
+#     3 lanes", the 27 "one node in <lane>:<row>" cells and "SHATTERPOINT is
+#     gone" — a lane name, and there are no lanes for it to be absent from.
 func _tree_shape() -> void:
-	var tree: Array = Talents.LANE_TREES["cryomancer"]
-	ok(tree.size() == 27, "the tree holds 24 nodes (got %d)" % tree.size())
-	var per_lane := {}
-	var rows := {}
-	var capstones := 0
+	var tree: Array = _tree()
+	ok(tree.size() == 27, "the tree a Cryomancer wears holds 27 nodes (got %d)" % tree.size())
 	for n in tree:
-		var lane := String(n["lane"])
-		var row := int(n["row"])
-		per_lane[lane] = int(per_lane.get(lane, 0)) + 1
-		rows["%s:%d" % [lane, row]] = int(rows.get("%s:%d" % [lane, row], 0)) + 1
-		if n.get("capstone", false):
-			capstones += 1
-		ok(int(n["ranks"]) == 1, "%s is a single rank" % n["id"])
+		ok(int(n.get("ranks", 1)) == 1, "%s is a single rank" % n["id"])
 		ok(not n.has("exclusive_with"),
-			"%s carries no authored exclusive pair (Batch AI made rows do that)" % n["id"])
-	ok(capstones == 3, "exactly 3 capstones (got %d)" % capstones)
-	ok(per_lane.size() == 3, "exactly 3 lanes (got %d)" % per_lane.size())
-	for lane in ["Winter", "Deep Freeze", "Thaw"]:
-		ok(int(per_lane.get(lane, 0)) == Talents.CAPSTONE_ROW,
-			"lane %s holds 8 rows + a capstone (got %d)" % [lane, per_lane.get(lane, 0)])
-	for key in rows:
-		ok(int(rows[key]) == 1, "one node in %s" % key)
-	# SHATTERPOINT is the only lane name that changed, and it must be gone —
-	# the Rune of the Honed Lance is tagged by lane and would go homeless.
-	ok(not per_lane.has("Shatterpoint"),
-		"SHATTERPOINT is gone: the lane that was lying about its job is THAW")
+			"%s carries no authored exclusive pair (FX: no node is exclusive)" % n["id"])
+	# Literals on purpose: a check that reads the constant it checks has stopped
+	# asking its question.
+	for tier in [1, 2, 3]:
+		var held := Talents.tier_nodes(tree, tier).size()
+		ok(held == 9, "tier %d holds nine nodes (got %d)" % [tier, held])
 
 
-# ---------- 2. every id survives ----------
+# ---------- 2. what a saved pick on each id does now ----------
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 120 checks -> 53.
+#   * INVERTED, 24 -> 26: "id X survives (a lost id voids every saved tree)"
+#     was the migration promise. FX deleted all 24 ids and keeps the promise in
+#     `Run._migrate_trees`, which swaps a saved tree for the one tree on load and
+#     DROPS every pick the one tree does not hold — so a lost id voids nothing.
+#     Each id is asked that, driven on a member saved before FX, and two
+#     LIVENESS ARMS prove the drop is a selection rather than a wipe: the saved
+#     tree is swapped, and a pick the one tree holds survives the same load.
+#   * RE-POINTED, 24 -> 27: "no node was ADDED" asked that the tree hold nothing
+#     but its authored population. That population is the ONE tree's now, node
+#     for node, and BM's row-8 carve-out has no row to skip.
+#   * DELETED, 72 CHECKS (DG §2 — FX deleted the Cryomancer tree): each of the
+#     24 ids' row, lane and name. NODES stays as AS's record of what it shipped.
 func _node_table() -> void:
-	var tree: Array = Talents.LANE_TREES["cryomancer"]
-	var by_id := {}
-	for n in tree:
-		by_id[String(n["id"])] = n
+	var run: Node = root.get_node("/root/Run")
+	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
+	var member: Dictionary = run.party[1]
+	member["spec"] = "cryomancer"
+	member["tree"] = _retired_tree(RETIRED.keys())
+	var saved := {"tn_health": 1}
 	for id in NODES:
-		var want: Array = NODES[id]
-		ok(by_id.has(id), "id %s survives (a lost id voids every saved tree)" % id)
-		if not by_id.has(id):
-			continue
-		var n: Dictionary = by_id[id]
-		ok(int(n["row"]) == want[0],
-			"%s sits in row %d (got %d)" % [id, want[0], n["row"]])
-		ok(String(n["lane"]) == want[1],
-			"%s sits in lane %s (got %s)" % [id, want[1], n["lane"]])
-		ok(String(n["name"]) == want[2],
-			"%s is named %s (got %s)" % [id, want[2], n["name"]])
-	for id in by_id:
-		# BATCH BM: skip row 8 — this batch's table is ITS OWN record of ITS OWN
-		# 24 nodes, and BM added a row-8 node to every lane. The check exists to
-		# prove the twenty-four survive unchanged, not that nothing else exists.
-		if int(by_id[id]["row"]) == 8:
-			continue
-		ok(NODES.has(id), "no node was ADDED: %s is not in the table" % id)
+		saved[id] = 1
+	member["talents"] = saved
+	run._migrate_trees()
+	var kept: Dictionary = run.party[1].get("talents", {})
+	ok(run.party[1].get("tree", []) == _tree(),
+		"a tree saved before FX is swapped for the one tree on load")
+	ok(kept.has("tn_health"),
+		"...and a pick the one tree holds SURVIVES that load (the liveness arm)")
+	for id in NODES:
+		ok(not kept.has(id),
+			"id %s is DROPPED on load — FX deleted it, so a saved pick on it voids nothing" % id)
+	var the_tree := Talents.tree()
+	for n in _tree():
+		ok(Talents.node_in_tree(the_tree, String(n["id"])) == n,
+			"no node was ADDED: %s is one of the one tree's nodes, unchanged" % String(n["id"]))
 
 
-# ---------- 3. additive magnitudes, payload and tooltip ----------
+# ---------- 3. additive magnitudes, as they land on the hero ----------
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 50 checks -> 19.
+#   * RE-POINTED, 19 -> 19: each PAYLOADS row, and the two counters PAYLOADS
+#     does not carry (Shockwave's float 2.0 and Honed Shards' 3), asked that the
+#     node's payload write its field at the design number, in the units the read
+#     site sums. The node is deleted and the FIELD stands (FX kept every read
+#     site), so each row installs the exact payload the retired node carried —
+#     inline, from RETIRED, through the real spawn — and asks that it lands on
+#     the Cryomancer at exactly that number over a spawn that learned nothing.
+#     PAYLOADS and RETIRED are two transcriptions of one record, so a drift in
+#     either reds here, and so does a dormant field the spawn stopped writing.
+#   * DELETED, 31 CHECKS (DG §2 — a tooltip is a property of a node, and FX
+#     deleted the nodes; the one tree's nodes carry no `scale` and no `{v}`):
+#     TOOLTIPS' 30 — "renders N" and "resolved its placeholder" for 15 nodes —
+#     and "Splintering Shards is certain, not a roll", which read the deleted
+#     cr_splinter's desc. TOOLTIPS stays as AS's record.
 func _magnitudes() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["cryomancer"]:
-		by_id[String(n["id"])] = n
+	var fields: Array = ["shattered_tempo", "honed_shards_ranks"]
+	var learn := {"cr_icy_veins": 1, "cr_razor_hone": 1}
 	for id in PAYLOADS:
-		if not by_id.has(id):
-			continue
+		learn[id] = 1
+		fields.append(String(PAYLOADS[id][0]))
+	var bare := await _spawn({}, ["raider", "raider"])
+	var base := _fields_of(_cryo(bare), fields)
+	bare.queue_free()
+	await process_frame
+	var worn := await _spawn(learn, ["raider", "raider"])
+	var got := _fields_of(_cryo(worn), fields)
+	worn.queue_free()
+	await process_frame
+	for id in PAYLOADS:
 		var want: Array = PAYLOADS[id]
-		var cfg := {"abilities": []}
-		Talents.apply_payload(cfg, by_id[id]["payload"], 1, {})
-		ok(int(cfg.get(want[0], 0)) == want[1],
-			"%s writes %s = %d (got %s)" % [id, want[0], want[1], cfg.get(want[0], "nothing")])
-	# The two counters that are not ints.
-	var st_cfg := {"abilities": []}
-	Talents.apply_payload(st_cfg, by_id["cr_icy_veins"]["payload"], 1, {})
-	ok(abs(float(st_cfg.get("shattered_tempo", 0.0)) - 2.0) < 0.001,
-		"Shockwave writes 2.0 of initiative push")
-	var hs_cfg := {"abilities": []}
-	Talents.apply_payload(hs_cfg, by_id["cr_razor_hone"]["payload"], 1, {})
-	ok(int(hs_cfg.get("honed_shards_ranks", 0)) == 3,
-		"Honed Shards writes 3 stacks")
-	for id in TOOLTIPS:
-		if not by_id.has(id):
-			continue
-		var shown := Talents.desc_for(by_id[id], 1)
-		ok(shown.contains(TOOLTIPS[id]),
-			"%s's tooltip renders %s (got: %s)" % [id, TOOLTIPS[id], shown])
-		ok(not shown.contains("{v}"), "%s's tooltip resolved its placeholder" % id)
-	# Splintering Shards has no {v} left, deliberately: ALWAYS is not a number.
-	var sp := Talents.desc_for(by_id["cr_splinter"], 1)
-	ok(sp.contains("ALWAYS"), "Splintering Shards is certain, not a roll")
+		var f := String(want[0])
+		ok(_landed(got, base, f, want[1]),
+			"the retired %s's payload lands %s = %d on the Cryomancer (got %s over a bare %s)"
+				% [id, f, want[1], str(got.get(f)), str(base.get(f))])
+	# The two counters PAYLOADS does not carry, and the first is the float.
+	ok(_landed(got, base, "shattered_tempo", 2.0),
+		"Shockwave's retired payload lands 2.0 of initiative push (got %s)"
+			% str(got.get("shattered_tempo")))
+	ok(_landed(got, base, "honed_shards_ranks", 3),
+		"Honed Shards' retired payload lands 3 stacks (got %s)"
+			% str(got.get("honed_shards_ranks")))
+
+
+# BATCH FX — each named field's value on a spawned hero, or null where he has
+# none: `get` answers null for a property BattleUnit does not declare.
+func _fields_of(u: BattleUnit, fields: Array) -> Dictionary:
+	var out := {}
+	for f in fields:
+		out[f] = u.get(f) if u != null else null
+	return out
+
+
+# BATCH FX — did an inline payload land exactly `want` on top of a bare spawn?
+func _landed(got: Dictionary, base: Dictionary, f: String, want) -> bool:
+	if got.get(f) == null or base.get(f) == null:
+		return false
+	return is_equal_approx(float(got[f]) - float(base[f]), float(want))
 
 
 # ---------- the four ability nodes ----------
 
 func _ability_nodes() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["cryomancer"]:
-		by_id[String(n["id"])] = n
 	# BATCH DO — THE NODES STOPPED GRANTING AND THE CARDS DID NOT STOP EXISTING,
 	# SO THIS SECTION ASKS THE SAME FOUR QUESTIONS OF THE DRAFT POOL. Every
 	# number below is the number the node's payload used to carry — they were
 	# lifted VERBATIM into `Classes.draft_ability`, so a drift between the two
 	# would show up here as a changed cost, initiative or cooldown.
+	# BATCH FX RE-POINTED THE GATE, NOT THE QUESTIONS (28 -> 28). Each row opened
+	# on the deleted tree and skipped when the id was missing — which, with the
+	# tree gone, would have skipped all 24 silently. The questions are about the
+	# CARD, which stands, so they are asked of it directly; the one that read the
+	# node ("grants NOTHING") is asked of the tree a Cryomancer wears: owning
+	# every cell of it still leaves him without the card.
+	var wearer := {"key": "mage", "spec": "cryomancer", "tree": _tree(),
+		"talents": {}, "bm_abilities": []}
+	for n in wearer["tree"]:
+		wearer["talents"][String(n["id"])] = 1
+	var worn_names: Array = Talents.ability_names(wearer)
 	for id in ABILITY_NODES:
-		if not by_id.has(id):
-			continue
 		var want: Array = ABILITY_NODES[id]
-		var cfg := {"abilities": []}
-		Talents.apply_payload(cfg, by_id[id]["payload"], 1, {})
-		ok(cfg["abilities"].is_empty(),
-			"%s grants NOTHING — a talent may not (DO's charter)" % id)
+		ok(not worn_names.has(String(want[0])),
+			"%s's card, %s, is granted by NO node of the tree he wears — a talent may not (DO's charter)"
+				% [id, want[0]])
 		var ab: Ability = Classes.spec_pool_ability("cryomancer", String(want[0]))
 		ok(ab != null, "%s's card, %s, is drafted now" % [id, want[0]])
 		if ab == null:
@@ -397,14 +570,12 @@ func _rune_audit() -> void:
 	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
 	# Every lane tag must name a lane that EXISTS — the Honed Lance was tagged
 	# Shatterpoint, which stopped being a lane.
-	var lanes := []
-	for n in Talents.LANE_TREES["cryomancer"]:
-		if not lanes.has(String(n["lane"])):
-			lanes.append(String(n["lane"]))
-	for id in cryo:
-		var lane := String(pool[id].get("lane", ""))
-		if lane != "":
-			ok(lanes.has(lane), "the rune %s is tagged with a live lane (%s)" % [id, lane])
+	# BATCH FX — 3 CHECKS DELETED HERE (DG §2): "the rune X is tagged with a live
+	# lane", for bitter_grip (Deep Freeze), honed_lance (Thaw) and killing_cold
+	# (Winter). FX deleted every talent lane with the twelve trees, so no rune's
+	# `lane` tag can name a live one: the tags are history (EM's own word for
+	# them), all three runes are retired, and none of the Cryomancer's five live
+	# runes carries a lane at all. There is no lane left to ask the question of.
 	# The re-pointed magnitudes, in the units their read sites now sum.
 	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
 	# from the talent trees, so each clause below writes `rune_X` instead of
@@ -428,10 +599,20 @@ func _rune_audit() -> void:
 	# NUMBING VEIL HAS NO NODE AND THE READ SITE IS KEPT. That is §5's rule
 	# made a fact: a rune whose node is gone is flagged for re-authoring, not
 	# silently deleted. If a later batch re-nodes it, this check comes down.
+	# BATCH FX: "no node writes it" is asked of the tree a Cryomancer wears — the
+	# ONE tree. The Cryomancer's OWN counters (the fields the Mage-wide runes must
+	# not write, below) are the fields his retired nodes wrote, read off RETIRED:
+	# asked of the one tree instead, that question would find the tree's shared
+	# unit-math fields (dmg_bonus, max_hp_pct — `check_em.UNIT_MATH` rules them
+	# not talent-keyed) and would stop asking about the Cryomancer at all.
 	var node_fields := []
-	for n in Talents.LANE_TREES["cryomancer"]:
+	for n in _tree():
 		for f in n["payload"].get("stat", {}):
 			node_fields.append(String(f))
+	var cryo_fields := []
+	for rid in RETIRED:
+		for f in (RETIRED[rid][1] as Dictionary).get("stat", {}):
+			cryo_fields.append(String(f))
 	ok(not node_fields.has("numbing_ranks"),
 		"no node writes numbing_ranks any more (Glacial Prison took the id)")
 	ok(bsrc.contains('chance += 0.01 * _max_hero_rank("numbing_ranks")'),
@@ -447,23 +628,23 @@ func _rune_audit() -> void:
 	# future re-tune of one cannot silently re-tune the other.
 	for id in mage:
 		for f in pool[id].get("payload", {}).get("stat", {}):
-			ok(not node_fields.has(String(f)),
-				"the Mage rune %s does not write a Cryomancer node counter (%s)" % [id, f])
+			ok(not cryo_fields.has(String(f)),
+				"the Mage rune %s does not write a Cryomancer counter (%s)" % [id, f])
 
 
 # ---------- §6: the dissolved pair ----------
 
 func _dissolved_pair() -> void:
-	# cold_snap <-> bitter_cold was an authored exclusive pair. Both sit in
-	# the SAME lane now (Deep Freeze rows 6 and 2), so a player can hold both
-	# and a rune writing either counter is legal.
-	var by_id := {}
-	for n in Talents.LANE_TREES["cryomancer"]:
-		by_id[String(n["id"])] = n
-	ok(String(by_id["cr_cold_snap"]["lane"]) == String(by_id["cr_bitter"]["lane"]),
-		"cold_snap and bitter_cold share a lane, so they are not exclusive")
-	ok(int(by_id["cr_cold_snap"]["row"]) != int(by_id["cr_bitter"]["row"]),
-		"...and different rows, so BOTH are reachable")
+	# cold_snap <-> bitter_cold was an authored exclusive pair. Both sat in
+	# the SAME lane (Deep Freeze rows 6 and 2), so a player could hold both
+	# and a rune writing either counter was legal.
+	# BATCH FX — 2 CHECKS DELETED HERE (DG §2): "cold_snap and bitter_cold share a
+	# lane" and "...and different rows". FX deleted both nodes and the lanes and
+	# rows with them. The live half of "nothing is exclusive" is asked of the one
+	# tree in §1 (no node carries an `exclusive_with`), and both counters stand
+	# dormant with their read sites (cold_snap_ranks and bitter_cold_ranks, §3).
+	# The sentence in the DG block below that points "above" at the pair is
+	# therefore history: what it pointed at is the check FX deleted here.
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
 	# BATCH DG §2 — ASSERTIONS DELETED HERE, AND IT IS A DELIBERATE EXCEPTION TO
 	# "NEVER DELETE AN ASSERTION", RECORDED AS ONE. They pinned CLAUDE.md's
@@ -496,6 +677,11 @@ func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
 		"talents": {1: learned.duplicate()}, "deterministic": true}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	# BATCH FX: every id a check here learns is deleted, so the member's tree is
+	# the inline one RETIRED builds — the exact payloads, through the real
+	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
+	if not learned.is_empty():
+		opts["patch"] = {1: {"tree": _retired_tree(learned.keys())}}
 	return await Fixture.spawn(self,
 		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 

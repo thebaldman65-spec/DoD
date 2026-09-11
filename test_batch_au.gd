@@ -40,6 +40,38 @@ extends SceneTree
 const Fixture = preload("res://suite_fixture.gd")
 
 
+# BATCH FX — THE NODES THIS SUITE LEARNED ARE DELETED; THEIR FIELDS ARE NOT.
+# FX removed the twelve spec trees, and every read site of every field they
+# wrote was KEPT (a field no node writes is dormant, not deleted; the ability
+# arm of `apply_payload` is live machinery that runes reach). So each retired
+# node the live checks used to learn is carried below as the EXACT payload it
+# carried, and `_fx_tree` hands the spawn the live tree PLUS those nodes: the
+# payload still goes through `Talents.apply_from_tree` at the real spawn,
+# which is the path the old learn took. None of these has a precedent-mapped
+# `tn_*` node (same field AND magnitude), so none is learned by a live id.
+const FX_RETIRED := {
+	# FX: the payload the retired py_firestorm (Sky Ablaze) carried — the node is deleted, the field and its read site stand.
+	"py_firestorm": {"name": "Sky Ablaze",
+		"payload": {"ability": "Flamewave", "add": {"damage": 10}, "set": {"cooldown": 1}}},
+	# FX: the payload the retired cr_rime (Snowblind) carried — the node is deleted, the field and its read site stand.
+	"cr_rime": {"name": "Snowblind",
+		"payload": {"ability": "Blizzard", "add": {"cost": -10}, "set": {"cooldown": 2}}},
+	# FX: the payload the retired ar_overcharge (Overdraw) carried — the node is deleted, the field and its read site stand.
+	"ar_overcharge": {"name": "Overdraw",
+		"payload": {"ability": "Arcane Cannon", "add": {"cost": -10}, "set": {"cooldown": 1}}},
+	# FX: the payload the retired ar_wrath (Unchained) carried — the node is deleted, the field and its read site stand.
+	"ar_wrath": {"name": "Unchained", "payload": {"stat": {"wrath_step_double": 1}}},
+	# FX: the payload the retired ar_singularity (Singularity) carried — the node is deleted, the field and its read site stand.
+	"ar_singularity": {"name": "Singularity",
+		"payload": {"stat": {"singularity_crit_build": 2, "singularity_kill_build": 3}}},
+	# FX: the payload the retired ar_mastery (Attunement) carried — the node is deleted, the field and its read site stand.
+	"ar_mastery": {"name": "Attunement", "payload": {"stat": {"attunement_crit": 1}}},
+	# FX: the payload the retired ar_mindfulness (Terminal Velocity) carried — the node is deleted, the field and its read site stand.
+	"ar_mindfulness": {"name": "Terminal Velocity",
+		"payload": {"stat": {"terminal_velocity": 15}}},
+}
+
+
 var checks := 0
 var fails: Array = []
 var _report: Array = []
@@ -236,13 +268,13 @@ func _fallback_no_double_spend() -> void:
 func _arcanist_authored() -> void:
 	# THE CHARTER, AS A PROPERTY RATHER THAN AS A COUNT. The live number is
 	# printed beside it so a regression names itself instead of just failing.
+	# BATCH FX: asked of THE ONE TREE — the twelve spec trees it walked are
+	# deleted, and the tree every class buys into is the whole population now.
 	var granting: Array = []
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			var pay: Dictionary = n.get("payload", {})
-			if Talents.granted_name(pay) != "":
-				granting.append("%s/%s -> %s" % [
-					spec, n["id"], Talents.granted_name(pay)])
+	for n in Talents.TREE:
+		var pay: Dictionary = n.get("payload", {})
+		if Talents.granted_name(pay) != "":
+			granting.append("%s -> %s" % [n["id"], Talents.granted_name(pay)])
 	ok(granting.is_empty(),
 		"NO talent node grants an ability (%d do: %s)" % [
 			granting.size(), ", ".join(granting)])
@@ -251,23 +283,47 @@ func _arcanist_authored() -> void:
 			Classes.talent_granted_names().size())
 	# The two nodes this section was named for keep their ids and their cells
 	# and now modify the PROTECTED CORE instead of handing out a card.
-	var by_id := {}
-	for n2 in Talents.LANE_TREES["arcanist"]:
-		by_id[String(n2["id"])] = n2
-	var oc: Dictionary = by_id["ar_overcharge"].get("payload", {})
-	ok(String(oc.get("ability", "")) == "Arcane Cannon",
-		"ar_overcharge points at Arcane Cannon, which every Arcanist owns")
-	ok(not oc.has("upgrade") and not oc.has("new_ability"),
-		"...and carries neither a grant nor a collision fallback")
-	# ar_wrath kept the half that was already charter-clean: the step-doubling
-	# was an `also` payload beside the grant, and it is the whole node now.
+	# BATCH FX — BOTH NODES ARE DELETED, AND THE RULE THEY WERE THE EXAMPLES OF
+	# WAS SUPERSEDED BY THE DESIGNER'S LINE. DO let a node modify the PROTECTED
+	# CORE instead of granting (ar_overcharge's Arcane Cannon edit), and
+	# ar_wrath kept only its step-doubling stat. FX's line — a talent may not
+	# touch a rune, an ability, a passive or an engine — took the protected-core
+	# permission away and left every node a single `stat` block (CLAUDE.md: the
+	# DO block's "SUPERSEDED IN ITS PERMITTED LIST AT FX"). So the four
+	# questions are asked of EVERY node of the one tree, in the form the
+	# superseding rule gives them: no node edits an ability, the protected core
+	# included; none carries a grant or its collision fallback; every payload is
+	# the lone `stat` block ar_wrath's whole payload was; and no node carries
+	# the `no_fallback` opt-out that went with the grants.
+	var edits: Array = []
+	var fallbacks: Array = []
+	var not_stat: Array = []
+	var opt_outs: Array = []
+	for n2 in Talents.TREE:
+		var p2: Dictionary = n2.get("payload", {})
+		var nid := String(n2["id"])
+		if p2.has("ability"):
+			edits.append(nid)
+		if p2.has("upgrade") or p2.has("new_ability"):
+			fallbacks.append(nid)
+		if p2.keys() != ["stat"]:
+			not_stat.append(nid)
+		if p2.has("no_fallback"):
+			opt_outs.append(nid)
+	ok(edits.is_empty(),
+		"no node edits an ability, the protected core included — FX's line superseded DO's permission (%s)" % \
+			", ".join(edits))
+	ok(fallbacks.is_empty(),
+		"...and none carries a grant or a collision fallback (%s)" % ", ".join(fallbacks))
 	# The FIELD and its one read site did not move, so AU §4's negative control
-	# (putting the doubling back on Singularity) still bites.
-	var wr: Dictionary = by_id["ar_wrath"].get("payload", {})
-	ok(int((wr.get("stat", {}) as Dictionary).get("wrath_step_double", 0)) == 1,
-		"ar_wrath still carries the step-doubling, as its whole payload now")
-	ok(not wr.has("no_fallback"),
-		"...and its `no_fallback` opt-out went with the grant it opted out of")
+	# (putting the doubling back on Singularity) still bites — and the retired
+	# node's payload is still driven live, below, off FX_RETIRED.
+	ok(not_stat.is_empty(),
+		"every node's whole payload is one `stat` block, ar_wrath's shape (%s)" % \
+			", ".join(not_stat))
+	ok(opt_outs.is_empty(),
+		"...and no node carries the `no_fallback` opt-out that went with the grants (%s)" % \
+			", ".join(opt_outs))
 	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
 	ok(usrc.count("wrath_step_double") == 2,
 		"`wrath_step_double` still has exactly its field and its one read site")
@@ -295,14 +351,19 @@ func _arcanist_authored() -> void:
 	# way, and 324 green lines that can only move together are 324 lines that
 	# say one thing. The offenders are NAMED in the message, so a regression
 	# still arrives with its spec and its id attached.
-	for exempt in Talents.LANE_TREES:
-		var bad: Array = []
-		for n3 in Talents.LANE_TREES[exempt]:
-			if Talents.granted_name(n3.get("payload", {})) != "":
-				bad.append(String(n3["id"]))
-		ok(bad.is_empty(),
-			"%s grants no ability from any of its 27 cells (%s)" % [
-				exempt, ", ".join(bad)])
+	# BATCH FX: each spec's tree is the one `generate_tree` DEALS it — the one
+	# tree, for every spec with a class — and the size is asserted beside the
+	# property, so a spec dealt an empty tree cannot pass it vacuously.
+	for key3 in Classes.SPEC_IDS:
+		for exempt in Classes.SPEC_IDS[key3]:
+			var bad: Array = []
+			var dealt: Array = Talents.generate_tree(String(exempt), String(key3))
+			for n3 in dealt:
+				if Talents.granted_name(n3.get("payload", {})) != "":
+					bad.append(String(n3["id"]))
+			ok(bad.is_empty() and dealt.size() == 27,
+				"%s grants no ability from any of its 27 cells (%d dealt; %s)" % [
+					exempt, dealt.size(), ", ".join(bad)])
 	_report.append("ability-granting talent nodes: %d (DO's charter); "
 		% granting.size() + "ability-granting RUNES: %d" % rune_grants)
 
@@ -342,36 +403,21 @@ func _death_ray_numbers() -> void:
 # ---------- §4 the two capstones ----------
 
 func _capstone_payloads() -> void:
-	var by_id := {}
-	for n in Talents.LANE_TREES["arcanist"]:
-		by_id[String(n["id"])] = n
-	var sg: Dictionary = by_id["ar_singularity"].get("payload", {}).get("stat", {})
-	ok(int(sg.get("singularity_crit_build", 0)) == 2,
-		"Singularity: critical hits build 2 ADDITIONAL Resonance")
-	ok(int(sg.get("singularity_kill_build", 0)) == 3,
-		"Singularity: every enemy killed builds 3")
-	ok(not sg.has("wrath_step_double") and not sg.has("singularity"),
-		"Singularity NO LONGER touches the damage step")
-	var wr: Dictionary = by_id["ar_wrath"].get("payload", {})
-	ok(not wr.get("stat", {}).has("singularity_crit_build"),
-		"...and Magi's Wrath does not take a build-rate clause in exchange")
-	ok(String(by_id["ar_singularity"]["lane"]) == "Resonance"
-		and int(by_id["ar_singularity"]["row"]) == Talents.CAPSTONE_ROW,
-		"Singularity stays the RESONANCE capstone — it is the effect that moved")
-	ok(String(by_id["ar_wrath"]["lane"]) == "Overload"
-		and int(by_id["ar_wrath"]["row"]) == Talents.CAPSTONE_ROW,
-		"Magi's Wrath stays the OVERLOAD capstone")
-	ok(String(by_id["ar_timelord"]["name"]) == "Perfect Conversion",
-		"Perfect Conversion (Entropy) is unchanged")
-	# Both descriptions have to describe what they now do — the tooltip is the
-	# only place a player meets either number.
-	ok(String(by_id["ar_singularity"]["desc"]).contains("2")
-		and String(by_id["ar_singularity"]["desc"]).contains("3"),
-		"Singularity's tooltip names both of its numbers")
-	ok(not String(by_id["ar_singularity"]["desc"]).to_lower().contains("doubles"),
-		"...and no longer promises a doubling it does not do")
-	ok(String(by_id["ar_wrath"]["desc"]).contains("3%"),
-		"Magi's Wrath's tooltip names the doubled step")
+	# BATCH FX DELETED TEN CHECKS HERE, WITH THEIR SUBJECT (DG §2). They read
+	# three nodes OUT OF THE ARCANIST'S TREE: Singularity's payload (2 per crit,
+	# 3 per kill, and no step-doubling field — three checks), Magi's Wrath's
+	# payload (no build-rate clause — one), both capstones' lane and their row
+	# being the capstone shelf (two), Perfect Conversion's name (one), and three
+	# tooltip texts (Singularity names 2 and 3, Singularity never says
+	# "doubles", the Wrath names 3%). FX deleted the twelve spec trees, the
+	# capstone shelf (`CAPSTONE_ROW`) and all three nodes, and no node of the
+	# one tree carries any of those fields, lanes, rows, names or texts — there
+	# is nothing left anywhere for the ten to read, and asserting them against
+	# this suite's own FX_RETIRED copy would be a check agreeing with itself.
+	# THE MECHANIC SURVIVES AND IS STILL DRIVEN: both fields and their read
+	# sites stand, `_live_capstones` learns each node's exact payload and
+	# asserts the stamp, the untouched step and the once-per-death kill clause
+	# live, and the arithmetic this section owned is kept below.
 	# THE ARITHMETIC §4 ASKED TO BE CHECKED RATHER THAN ASSUMED.
 	var u := BattleUnit.new()
 	u.second_resource_name = "Resonance"
@@ -438,16 +484,28 @@ func _source_audit() -> void:
 	# §2 WAS REALLY GUARDING SURVIVES AND IS ASSERTED HERE: a node the player
 	# is not wearing must never be a bare greyed square — it wears a glyph and
 	# its tooltip NAMES what stands in its row.
+	# BATCH FX INVERTED THREE OF THESE AND RE-POINTED THE FOURTH. BM's
+	# unlock-is-not-equip rule is RETIRED — A CELL BOUGHT IS A CELL WORN, its
+	# premise (one node per row) is gone — and so is every row and the capstone
+	# shelf. A negative control that encoded a retired rule inverts to the rule
+	# that replaced it rather than disappearing, so: the build screen must now
+	# say BUYING IS WEARING in words; an owned cell's tooltip says who wears it,
+	# where an unlocked one said what equipping it would close (nothing is
+	# exclusive, so there is nothing to close); and an unworn node's tooltip
+	# names the one reason a cell can be unworn now — it was not bought — where
+	# it named the node holding its row. The capstone shelf's stricter rule has
+	# NO successor, so its pin moves to the sheet's own record that the shelf
+	# and exclusivity went with FX, which is where the retirement is written.
 	var build_src := FileAccess.get_file_as_string("res://scripts/talents_screen.gd")
-	ok(psrc.contains("const LOCK_GLYPH"), "an unequipped node wears a lock glyph")
-	ok(psrc.contains("%s holds this row"),
-		"...and its tooltip NAMES what holds the row instead")
-	ok(build_src.contains("unlocking is not equipping"),
-		"the build screen states the unlock-is-not-equip rule in words")
-	ok(build_src.contains("it will replace"),
-		"...and a node's tooltip says what equipping it would close")
-	ok(psrc.contains("ONE PER HERO, EVER"),
-		"the capstone shelf states its stricter rule")
+	ok(psrc.contains("const LOCK_GLYPH"), "an unworn node wears a lock glyph")
+	ok(psrc.contains("not bought"),
+		"...and its tooltip NAMES why it is unworn — not bought (FX: no row holds it instead)")
+	ok(build_src.contains("CLICK a cell to buy it — every hero of this class wears it"),
+		"the build screen states, in words, the rule that REPLACED unlock-is-not-equip: buying is wearing")
+	ok(build_src.contains("OWNED — every hero of this class wears it, every run."),
+		"...and an owned cell's tooltip says who wears it, where it said what equipping would close")
+	ok(psrc.contains("capstone shelf, and nothing is exclusive"),
+		"the sheet records that the capstone shelf and its stricter rule went with FX")
 
 
 # NEGATIVE CONTROLS, as source assertions for the two shapes that would
@@ -478,9 +536,35 @@ func _spawn(learned: Dictionary, specs: Array, member_patch := {},
 	# THE CRIT ABOVE ALL ON THIS SPEC: a crit builds 2 where an ordinary hit
 	# builds 1, so one unlucky coin turns "Singularity grants 2 extra" into "it
 	# granted 4". Checks that WANT a crit set `crit_bonus` back themselves.
+	# BATCH FX: a learned node the one tree does not hold rides in on the
+	# member's tree with its retired payload (`_fx_tree`); the fixture writes
+	# `patch` after the member is built, so the spawn applies it.
+	var patch: Dictionary = member_patch.duplicate()
+	if not learned.is_empty():
+		patch["tree"] = _fx_tree(learned)
 	return await Fixture.spawn(self, specs,
-		{"enemies": lineup, "talents": {1: learned.duplicate()}, "patch": {1: member_patch},
+		{"enemies": lineup, "talents": {1: learned.duplicate()}, "patch": {1: patch},
 		"deterministic": true, "crit": -10.0})
+
+
+# The live tree, plus every learned node it no longer holds, carried with the
+# exact payload FX_RETIRED records. A learned id that is neither is a FAILURE
+# rather than a silent no-op: it would learn nothing, and every check reading
+# its field would read the field's zero as if the node had been measured.
+func _fx_tree(learned: Dictionary) -> Array:
+	var tree: Array = Talents.tree()
+	for id in learned:
+		var sid := String(id)
+		if not Talents.node_in_tree(tree, sid).is_empty():
+			continue
+		if not FX_RETIRED.has(sid):
+			checks += 1
+			fails.append("FX: `%s` is neither a live node nor a carried retired payload" % sid)
+			continue
+		var r: Dictionary = FX_RETIRED[sid]
+		tree.append({"id": sid, "name": String(r["name"]), "desc": "",
+			"payload": (r["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _hero(scene: Node, idx: int) -> BattleUnit:
@@ -829,8 +913,9 @@ func _live_debug_grant() -> void:
 				continue
 			if Classes.spec_abilities(spec).any(func(a): return a.display_name == entry2):
 				continue
+			# BATCH FX: the spec's OWN tree is the one `generate_tree` deals it.
 			if Talents.granted_ability(entry2) != null \
-					and Talents.LANE_TREES[spec].any(func(n):
+					and Talents.generate_tree(spec, h.hero_key).any(func(n):
 						return Talents.granted_name(n.get("payload", {})) == entry2):
 				continue
 			ok(not names.has(entry2),

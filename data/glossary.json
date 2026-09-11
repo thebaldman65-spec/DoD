@@ -17,7 +17,7 @@
   "term": "The Extra Turn",
   "category": "combat",
   "short": "A second turn taken immediately, and your own statuses tick again for it.",
-  "long": "An extra turn is a WHOLE turn, not a free action. When one is granted you are pulled straight to the front of the initiative bar and act again at once - and because it is a real turn, everything that happens at the start of YOUR turn happens again: your damage-over-time effects bite, your buffs and shields count down, and your cooldowns tick. That last part is usually in your favour. What does NOT re-tick is anything standing on an ENEMY: their Burn, Poison and Chill count down on THEIR turns, so the board you spent a turn arming is untouched by your second action. Preparation (Survivalist) is the only source of one, and it is deliberately DELAYED - you take the extra turn after your NEXT turn, not this one, so it is a setup card rather than a way to act twice on the spot. Only one may ever be pending: Preparation cannot be cast while one is waiting, so extra turns can never chain. Two nearby effects are NOT extra turns and are worth telling apart: Rally hands one ALLY the next slot in the order (they still spend that turn, and nobody gains one), and Instinctive Rotation makes a Beastmaster's companion swap cost no turn at all (one specific action becomes free).",
+  "long": "An extra turn is a WHOLE turn, not a free action. When one is granted you are pulled straight to the front of the initiative bar and act again at once - and because it is a real turn, everything that happens at the start of YOUR turn happens again: your damage-over-time effects bite, your buffs and shields count down, and your cooldowns tick. That last part is usually in your favour. What does NOT re-tick is anything standing on an ENEMY: their Burn, Poison and Chill count down on THEIR turns, so the board you spent a turn arming is untouched by your second action. Preparation (Survivalist) is the only source of one, and it is deliberately DELAYED - you take the extra turn after your NEXT turn, not this one, so it is a setup card rather than a way to act twice on the spot. Only one may ever be pending: Preparation cannot be cast while one is waiting, so extra turns can never chain. One nearby effect is NOT an extra turn and is worth telling apart: Rally hands one ALLY the next slot in the order (they still spend that turn, and nobody gains one).",
   "see_also": [
    "initiative",
    "pressure_break"
@@ -87,7 +87,7 @@
   "term": "Parry",
   "category": "combat",
   "short": "A parried hit still lands, but at a quarter strength.",
-  "long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried (unless a talent says otherwise), area attacks cannot be parried, and a Broken unit cannot parry at all.",
+  "long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried, area attacks cannot be parried, and a Broken unit cannot parry at all.",
   "see_also": [
    "miss",
    "status_broken"
@@ -98,7 +98,7 @@
   "term": "Stance (Seasoned Fighter)",
   "category": "combat",
   "short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him, and two REQUIRE a guard.",
-  "long": "Only the Swordmaster has stances, and he is normally in one of two - FORMLESS is the one card that puts him in neither and both at once. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
+  "long": "Only the Swordmaster has stances, and he is normally in one of two - FORMLESS is the one card that puts him in neither and both at once. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
   "see_also": [
    "parry",
    "crit",
@@ -132,7 +132,7 @@
   "term": "Hero and Ally",
   "category": "combat",
   "short": "A HERO is one of your four. An ALLY is a hero OR a companion - the two words are not interchangeable, and there is no third word.",
-  "long": "Your side of the field can hold more than four bodies. The four are HEROES. A Beastmaster's companion - Ursus, Canis or Aguila - fights beside them, takes hits, and can be healed, but it is NOT a hero: it is an ALLY, and so is every hero. The distinction is load-bearing because most broad talents deliberately pay the four and not the companion; under THE PACK a Beastmaster fields two companions at once, and a buff that reached all six would be worth half again as much in his build as in anyone else's. So the wording tells you which you are getting. A talent that says HERO pays the four - Standard Bearer's lent armor, Bulwark of Fortitude, the Devout's Healing Pulse, the Occultist's Ruin heals, Rallying Cry, War Stomp and Rallying Shout's RESOURCE clause (a companion has no resource bar to fill), Devoutness and Last Hope (both stamped on the four before any companion is called), Cleansing Waters (it rolls once a turn and a companion never takes one) and Tank and Spank's Empower (a companion's blows are paid on their own path and read no Empower). BATCH DM READ THE LAST SIX CARDS CLAUSE BY CLAUSE AND ADDED FOUR MORE: Consecrated Ground (its mitigation is a choice, but its Faith drip is refused twice over - a companion takes no turn and Faith itself is heroes-only), Divine Wrath (BOTH halves fail, and for different reasons - the damage is read in a strike loop a companion's blows never enter, the speed in a turn order it is not in), Battle Shout's damage (the same strike loop) and Sacred Resolve (its apply and all three of its splits walk the four). An effect that says ALLY pays companions too - Rally's healing bonus, Hold the Line's Break cut and its no-death window, Sanctuary's heal, the Field Medic's cleanses, Harvest's reading of who opened a wound, and Rallying Shout's Pressure clause (a companion has a Break meter, so it sheds the 30 like anyone else). Targeting follows the same rule: a single-target support ability you aim by hand CAN be aimed at a companion, so Divine Shield on the bear is a legal and sometimes correct play, while the same shield's Radient Aegis echo can only land on a hero. Faith is heroes-only outright - a companion can never hold a stack of it. AND THERE ARE ONLY THE TWO WORDS: no vaguer third word appears anywhere player-facing, because a vaguer word reads as EITHER - and that ambiguity is what let Rallying Shout pay only the four for the life of the project while its card promised the shed to everyone standing. THAT CARD IS NOW THE WORKED EXAMPLE OF A CARD WITH TWO CLAUSES OF DIFFERENT SHAPE: its Pressure half says ALLY and reaches a companion's Break meter, and its resource half says HERO in the same sentence, because a companion has no resource bar. AND A CLAUSE CAN BE NARROWER THAN EITHER WORD: Battle Shout and Hold the Line each hand FIVE RAGE TO THE CASTER ALONE, which is neither the four nor the five, so each card says so in its own sentence rather than inside the group clause.",
+  "long": "Your side of the field can hold more than four bodies. The four are HEROES. A Beastmaster's companion - Ursus, Canis or Aguila - fights beside them, takes hits, and can be healed, but it is NOT a hero: it is an ALLY, and so is every hero. The distinction is load-bearing because most broad talents deliberately pay the four and not the companion; under THE PACK a Beastmaster fields two companions at once, and a buff that reached all six would be worth half again as much in his build as in anyone else's. So the wording tells you which you are getting. An effect that says HERO pays the four - Bulwark of Fortitude, the Occultist's Ruin heals, War Stomp and Rallying Shout's RESOURCE clause (a companion has no resource bar to fill), and the talents We Do Not Break and Heal More When Low (both stamped on the four before any companion is called). BATCH DM READ THE LAST SIX CARDS CLAUSE BY CLAUSE AND ADDED FOUR MORE: Consecrated Ground (its mitigation is a choice, but its Faith drip is refused twice over - a companion takes no turn and Faith itself is heroes-only), Divine Wrath (BOTH halves fail, and for different reasons - the damage is read in a strike loop a companion's blows never enter, the speed in a turn order it is not in), Battle Shout's damage (the same strike loop) and Sacred Resolve (its apply and all three of its splits walk the four). An effect that says ALLY pays companions too - Hold the Line's Break cut and its no-death window, Sanctuary's heal, the cleanses of the talent Cleanse Debuffs Each Turn, Harvest's reading of who opened a wound, and Rallying Shout's Pressure clause (a companion has a Break meter, so it sheds the 30 like anyone else). Targeting follows the same rule: a single-target support ability you aim by hand CAN be aimed at a companion, so Divine Shield on the bear is a legal and sometimes correct play. Faith is heroes-only outright - a companion can never hold a stack of it. AND THERE ARE ONLY THE TWO WORDS: no vaguer third word appears anywhere player-facing, because a vaguer word reads as EITHER - and that ambiguity is what let Rallying Shout pay only the four for the life of the project while its card promised the shed to everyone standing. THAT CARD IS NOW THE WORKED EXAMPLE OF A CARD WITH TWO CLAUSES OF DIFFERENT SHAPE: its Pressure half says ALLY and reaches a companion's Break meter, and its resource half says HERO in the same sentence, because a companion has no resource bar. AND A CLAUSE CAN BE NARROWER THAN EITHER WORD: Battle Shout and Hold the Line each hand FIVE RAGE TO THE CASTER ALONE, which is neither the four nor the five, so each card says so in its own sentence rather than inside the group clause.",
   "see_also": [
    "pack_bond",
    "fallen"
@@ -199,7 +199,7 @@
   "term": "Glacial Hold",
   "category": "statuses",
   "short": "The Cryomancer's freeze: indefinite, and only he can end it.",
-  "long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy, two with Second Prison, any number under Absolute Zero; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source (+30% with Killing Frost), so the hold is a damage window as well as a lockdown - a HERO's window: the multiplier is read in the hero strike loop only, and a companion's jaws never see it. A released enemy comes back on 1 stack of Chilled. GLACIAL PRISON WILL NOT BE CAST ONTO A HELD ENEMY: the ice is already as deep as it goes, so the button greys out once every enemy in front of you is frozen rather than spending the turn on nothing. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
+  "long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source, so the hold is a damage window as well as a lockdown - a HERO's window: the multiplier is read in the hero strike loop only, and a companion's jaws never see it. A released enemy comes back on 1 stack of Chilled. GLACIAL PRISON WILL NOT BE CAST ONTO A HELD ENEMY: the ice is already as deep as it goes, so the button greys out once every enemy in front of you is frozen rather than spending the turn on nothing. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
   "see_also": [
    "status_chilled",
    "status_frozen",
@@ -246,7 +246,7 @@
   "term": "Poison",
   "category": "statuses",
   "short": "Stacking nature damage at each turn start.",
-  "long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, plus a flat bonus per stack from Potent Toxins, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it. The Survivalist's Venom lane makes each application CARRY a second affliction: Coated Blades adds Cripple, Distillate adds Exposed, Slow Acting adds Slowed. Some poisons (Slow Acting, Perfected Toxin) are sticky and cannot be cleansed - and a sticky poison survives a Harvest, so Harvest is not paid for it. CREEPING DEATH reads the clock: applying any status to a poisoned enemy refreshes that poison to full duration, and if the poison is PERMANENT - which is what Perfected Toxin makes it - there is no duration to refresh, so it adds a stack instead, once per enemy per turn. You cannot extend forever, so you deepen.",
+  "long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it.",
   "see_also": [
    "dmg_nature",
    "status_burn"
@@ -257,7 +257,7 @@
   "term": "Bleed",
   "category": "statuses",
   "short": "Buildup meter: at 100 the target bleeds out for 20% max HP.",
-  "long": "Wounding attacks add Bleed buildup (0-100). The meter never decays - it only climbs - and at 100 the target BLEEDS OUT: an immediate 20% of its max HP, ignoring armor and dealing no Break, after which the meter resets and builds again. Berserker talents feed on bleedouts and can chain the burst to other enemies.",
+  "long": "Wounding attacks add Bleed buildup (0-100). The meter never decays - it only climbs - and at 100 the target BLEEDS OUT: an immediate 20% of its max HP, ignoring armor and dealing no Break, after which the meter resets and builds again.",
   "see_also": [
    "pressure_break"
   ]
@@ -340,7 +340,7 @@
   "term": "Bewitched",
   "category": "statuses",
   "short": "Charmed: strikes its own allies, dazing them.",
-  "long": "A bewitched unit turns on its own side, basic-attacking its allies and Dazing them with every strike. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+  "long": "A bewitched unit turns on its own side, basic-attacking its allies and Dazing them with every strike. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first.",
   "see_also": [
    "status_psychosis",
    "status_hysteria"
@@ -351,7 +351,7 @@
   "term": "Psychosis",
   "category": "statuses",
   "short": "50% each turn to act against its own side.",
-  "long": "Madness: each turn there is a 50% chance the unit turns on its own - attacking a fellow, or casting its helpful magic on the enemy side. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+  "long": "Madness: each turn there is a 50% chance the unit turns on its own - attacking a fellow, or casting its helpful magic on the enemy side. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first.",
   "see_also": [
    "status_bewitch",
    "status_hysteria"
@@ -372,7 +372,7 @@
   "term": "Ruin",
   "category": "statuses",
   "short": "Marked 2 per debuff: +2% damage taken per stack; no cap, never clears.",
-  "long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken (5% with Deeper Hex), and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the heroes are mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten - and the Avatar of Ruin capstone moves that to every fifth.",
+  "long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken, and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the heroes are mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten.",
   "see_also": [
    "res_ruin",
    "dmg_shadow"
@@ -383,7 +383,7 @@
   "term": "Mass Hysteria",
   "category": "statuses",
   "short": "Next turn: strikes a fellow with double Break damage.",
-  "long": "The maddened unit spends its next turn striking one of its own with DOUBLE Break damage, Sundering them in the bargain. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+  "long": "The maddened unit spends its next turn striking one of its own with DOUBLE Break damage, Sundering them in the bargain. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first.",
   "see_also": [
    "status_psychosis",
    "status_sunder"
@@ -425,7 +425,7 @@
   "term": "Snared",
   "category": "statuses",
   "short": "A trap waits: next action springs a stun and poison.",
-  "long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. Trap talents add crippling, bone-breaking Break damage, or wounds that refuse healing. A SNARE IS SET UNDER ONE ENEMY AND SPRINGS ONCE; a Deadfall is untargeted, takes whoever acts next, and springs three times over a fight with two turns of rest between.",
+  "long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. A SNARE IS SET UNDER ONE ENEMY AND SPRINGS ONCE; a Deadfall is untargeted, takes whoever acts next, and springs three times over a fight with two turns of rest between.",
   "see_also": [
    "status_stunned",
    "status_caught"
@@ -436,7 +436,7 @@
   "term": "Caught Fast",
   "category": "statuses",
   "short": "Cannot be healed.",
-  "long": "The trap's teeth hold the wound open: this unit cannot be healed at all - potions, spells, and regeneration all fail while it lasts.",
+  "long": "The trap's teeth hold the wound open: this unit cannot be healed at all - potions, spells, and regeneration all fail while it lasts. NOTE: nothing in the game applies this today. The Survivalist talent that did went with the twelve talent trees, and the status is kept so a later tree, rune or card can point at it again.",
   "see_also": [
    "status_snared"
   ]
@@ -596,7 +596,7 @@
   "term": "The Mercy Window",
   "category": "resources",
   "short": "Mercy is paid for CROSSING below half health, once - and at the cap the stack is simply lost.",
-  "long": "Mercy has two edges and both are easy to meet without ever being told about them. THE FIRST IS THAT IT PAYS FOR A CROSSING, NOT FOR A STATE: an ally earns the Holy cleric a stack at the moment they fall below half of their maximum health, and never again while they stay there. Heroes already bloodied are heroes paying her nothing. GUARDIAN ANGEL WIDENS THAT WINDOW - the line moves up from 50% toward 65%, so allies cross it sooner and cross it more often. THE SECOND EDGE IS THE CAP: she holds at most 5 (MARTYR'S VIGOR raises the ceiling), and a stack earned while she is full is thrown away entirely. Two things catch it - the GRACE talent turns the wasted stack into healing for the ally who earned it, and the drafted ALMS turns it into a ward on the same ally - and they stack, because one pays health a full bar discards and the other pays a barrier a full bar keeps. The drafted DIVINE PRESENCE answers the first edge from the other side: it pays her 2 Mercy on every second turn of hers on which nobody crossed at all, which is exactly the turn the passive leaves her empty - and two stacks arriving together can cross the cap from below, which is what hands the spare one to Alms. The drafted VESPERS is the one card that refuses a crossing outright: it absorbs the blow that would take an ally below the line, and a crossing that never happens earns her nothing.",
+  "long": "Mercy has two edges and both are easy to meet without ever being told about them. THE FIRST IS THAT IT PAYS FOR A CROSSING, NOT FOR A STATE: an ally earns the Holy cleric a stack at the moment they fall below half of their maximum health, and never again while they stay there. Heroes already bloodied are heroes paying her nothing. THE SECOND EDGE IS THE CAP: she holds at most 5, and a stack earned while she is full is thrown away entirely. The drafted ALMS catches it, turning the wasted stack into a ward on the ally who earned it. The drafted DIVINE PRESENCE answers the first edge from the other side: it pays her 2 Mercy on every second turn of hers on which nobody crossed at all, which is exactly the turn the passive leaves her empty - and two stacks arriving together can cross the cap from below, which is what hands the spare one to Alms. The drafted VESPERS is the one card that refuses a crossing outright: it absorbs the blow that would take an ally below the line, and a crossing that never happens earns her nothing.",
   "see_also": [
    "res_mercy",
    "res_empower"
@@ -618,7 +618,7 @@
   "term": "Faith",
   "category": "resources",
   "short": "The Devout's gift: stacks that grow on shielded allies and on holy ground, and pay off the deepest count you have held.",
-  "long": "Faith lives mostly on the Devout's ALLIES - but he carries it too, and HIS never releases: his count holds at 3, paying him exactly what it pays everyone else. Under BINDING OATH every ally release swears him another. Two things build it for everyone: every hit a Divine Shield absorbs builds TWO stacks on its bearer, and every hero standing on Consecrated Ground gains one at the start of their turn (cap 3). WHAT A STACK IS WORTH IS PAID ON THE HIGHEST COUNT YOU HAVE HELD THIS BATTLE, not on the count you hold right now - so a release never takes the benefit away, and Faith is a high-water mark rather than a balance. Each of those stacks grants 2% damage reduction and +1.5% damage dealt; APOSTLE adds another 1x and FERVOR another again while the carrier stands on Consecrated Ground, so the two together make a stack worth TRIPLE - 6% and +4.5% - and never quadruple, because the nodes add to the base rather than multiplying each other. At 3 an ALLY'S Faith releases - a heal of 15%+ max HP - and the COUNT resets to build again while the high-water mark stands. The bar is short deliberately: the lane is built on frequency of release rather than depth of hold, because a release that never fires is worth nothing at any depth. The builders are drips rather than bursts on purpose - a shielded ally HOLDS what one absorbed hit gives him, and holding is what the high-water mark is for. A builder large enough to fill the bar in one event would delete the held half of the meter. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with. The high-water mark is per-battle: the next fight opens at zero.",
+  "long": "Faith lives mostly on the Devout's ALLIES - but he carries it too, and HIS never releases: his count holds at 3, paying him exactly what it pays everyone else. Two things build it for everyone: every hit a Divine Shield absorbs builds TWO stacks on its bearer, and every hero standing on Consecrated Ground gains one at the start of their turn (cap 3). WHAT A STACK IS WORTH IS PAID ON THE HIGHEST COUNT YOU HAVE HELD THIS BATTLE, not on the count you hold right now - so a release never takes the benefit away, and Faith is a high-water mark rather than a balance. Each of those stacks grants 2% damage reduction and +1.5% damage dealt. At 3 an ALLY'S Faith releases - a heal of 15%+ max HP - and the COUNT resets to build again while the high-water mark stands. The bar is short deliberately: the lane is built on frequency of release rather than depth of hold, because a release that never fires is worth nothing at any depth. The builders are drips rather than bursts on purpose - a shielded ally HOLDS what one absorbed hit gives him, and holding is what the high-water mark is for. A builder large enough to fill the bar in one event would delete the held half of the meter. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with. The high-water mark is per-battle: the next fight opens at zero.",
   "see_also": [
    "res_mercy"
   ]
@@ -628,7 +628,7 @@
   "term": "Focus",
   "category": "resources",
   "short": "The Sharpshooter's aim: builds on one target, lost on switching.",
-  "long": "Every attack on the SAME target builds +20 Focus and THE METER HAS NO CEILING; switching targets dumps it to zero, and a kill banks up to 50 toward the next mark (all of it under Overkill). THE PAYOFF CONVERTS AT 100: the first 100 points each grant +0.5% critical chance, and every point beyond 100 grants +0.5% of critical MULTIPLIER instead - so Lethal Aim's x2 becomes x2.5 at 200 Focus and x3 at 300, and it never stops paying. Patience buys certainty first, then force. Deep Focus moves that conversion point down to 60; Spray of Arrows is the one talent that still imposes a ceiling, at 50. Coup de Grace spends the whole meter but reads at most 200 points of it, and the One Shot capstone fires at 200. HIS BASIC ATTACK IS ALSO A FOCUS ENGINE IN ITS OWN RIGHT: it runs a multi-press skill check that grows with the Focus he already holds - one press, plus one per 50 Focus, capped at four - and pays 8 Focus a landed press plus 20 for a full sequence, on top of the +20 above. The deeper the meter, the faster it fills.",
+  "long": "Every attack on the SAME target builds +20 Focus and THE METER HAS NO CEILING; switching targets dumps it to zero, and a kill banks up to 50 toward the next mark. THE PAYOFF CONVERTS AT 100: the first 100 points each grant +0.5% critical chance, and every point beyond 100 grants +0.5% of critical MULTIPLIER instead - so Lethal Aim's x2 becomes x2.5 at 200 Focus and x3 at 300, and it never stops paying. Patience buys certainty first, then force. Coup de Grace spends the whole meter but reads at most 200 points of it. HIS BASIC ATTACK IS ALSO A FOCUS ENGINE IN ITS OWN RIGHT: it runs a multi-press skill check that grows with the Focus he already holds - one press, plus one per 50 Focus, capped at four - and pays 8 Focus a landed press plus 20 for a full sequence, on top of the +20 above. The deeper the meter, the faster it fills.",
   "see_also": [
    "crit",
    "status_quickdraw",
@@ -640,7 +640,7 @@
   "term": "Pack Bond",
   "category": "combat",
   "short": "The Beastmaster's passive: each active companion grants its own boon.",
-  "long": "Every companion the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts every hero's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. PAST 8 LOYALTY THE METER CONVERTS AND THIS IS THE HALF THAT RECEIVES: a stack past the point stops adding to the companion's strike damage and feeds this boon instead, so it grows at double the step above 8. HE NORMALLY FIELDS ONE COMPANION; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent companion's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one companion, arriving deep, growing twice as fast.",
+  "long": "Every companion the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts every hero's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. PAST 8 LOYALTY THE METER CONVERTS AND THIS IS THE HALF THAT RECEIVES: a stack past the point stops adding to the companion's strike damage and feeds this boon instead, so it grows at double the step above 8. HE FIELDS ONE COMPANION AT A TIME.",
   "see_also": [
    "res_loyalty"
   ]
@@ -673,7 +673,7 @@
   "term": "Loyalty",
   "category": "resources",
   "short": "The Beastmaster's bond, built per companion, uncapped, lost with it.",
-  "long": "Each living companion builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that companion's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, and it never plateaus. PAST 8 STACKS THE METER CONVERTS: the first 8 buy the companion's strike damage, and every stack past 8 stops adding to the strike and feeds the Pack Bond boon instead - so the boon climbs at double its step above the point (x3.4 at ten, x7.4 at twenty) while the strike step holds at what 8 stacks bought. Nothing is capped: a converted stack is paid in full, into the other half. The four cards that spend the RAW stack count - Unleash, Primal Surge, Last Howl and Bring It Down - and all three companion gifts are untouched by the split, because it changes what a stack PAYS and they count stacks. Exactly one talent still imposes a cap: Wild Rotation holds it at 3, and that is the price of swapping freely. A companion's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership. It also decides who leaves: under The Pack a third summon replaces whichever standing companion holds LESS Loyalty (a tie falls to the older), so depth is never traded away for a fresh arrival.",
+  "long": "Each living companion builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that companion's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, and it never plateaus. PAST 8 STACKS THE METER CONVERTS: the first 8 buy the companion's strike damage, and every stack past 8 stops adding to the strike and feeds the Pack Bond boon instead - so the boon climbs at double its step above the point (x3.4 at ten, x7.4 at twenty) while the strike step holds at what 8 stacks bought. Nothing is capped: a converted stack is paid in full, into the other half. The four cards that spend the RAW stack count - Unleash, Primal Surge, Last Howl and Bring It Down - and all three companion gifts are untouched by the split, because it changes what a stack PAYS and they count stacks. A companion's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership.",
   "see_also": [
    "boss_trophies"
   ]
@@ -690,10 +690,10 @@
  },
  {
   "id": "talent_lanes",
-  "term": "Talent Lanes",
+  "term": "The Talent Tree",
   "category": "progression",
-  "short": "Three lanes crossed by eight rows, plus a capstone shelf at row 9.",
-  "long": "Each spec's tree is three themed LANES crossed by eight ROWS, plus a capstone shelf at row 9 - 27 CELLS in all. A ROW HOLDS ONE NODE PER LANE AND YOU EQUIP EXACTLY ONE for a run: the other two are shut until the run ends. ROW 8 is the node that only matters once the rest of the lane is bought - it reads what the lane has accumulated, removes a constraint it has worked around, or converts its currency into something new. It is never a bigger version of a node above it. The CAPSTONE SHELF is one per hero, ever, from any lane, and it sits behind difficulty 2.",
+  "short": "One tree of twenty-seven nodes in three tiers of nine, bought per CLASS.",
+  "long": "There is ONE talent tree, and every class buys into it out of its own purse - a Berserker, a Warden and a Swordmaster all spend the Warrior's points in the same twenty-seven nodes. The nodes sit in three TIERS of nine, and within a tier there are no lanes, no rows and no prerequisites: you buy what you can afford. Every node is a stat or a rule the battle already reads - none of them touches a rune, an ability, a passive or an engine - and no node grants an ability.",
   "see_also": [
    "talent_cost",
    "talent_points"
@@ -703,8 +703,8 @@
   "id": "talent_cost",
   "term": "Tier Costs",
   "category": "progression",
-  "short": "A cell costs by tier: rows 1-3 cost 1 point, 4-6 cost 2, 7-9 cost 3.",
-  "long": "Unlocking a cell costs by the tier its row sits in: rows 1-3 cost 1 point, rows 4-6 cost 2, rows 7-9 cost 3. Twenty-seven cells is 54 POINTS TO FILL ONE SPEC, which at 3 points a completed run is eighteen completions. Points are freely reassignable between runs at no cost - pull one back out and put it somewhere else, or respec the whole spec - and never during a run. The real price of a pick is still the two doors it closes in that row.",
+  "short": "A cell costs its tier: tier 1 costs 1 point, tier 2 costs 2, tier 3 costs 3.",
+  "long": "Buying a cell costs its tier: tier 1 cells cost 1 point, tier 2 cost 2, tier 3 cost 3. Twenty-seven cells is 54 POINTS TO FILL THE TREE FOR ONE CLASS, which at 3 points a completed run is eighteen completions. Points are freely reassignable between runs at no cost - respec the whole class and spend them again - and never during a run.",
   "see_also": [
    "talent_lanes",
    "talent_points"
@@ -714,8 +714,8 @@
   "id": "talent_points",
   "term": "Talent Points",
   "category": "progression",
-  "short": "Earned per spec, per zone boss, and banked forever. A run pays none.",
-  "long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER SPEC PER ZONE BOSS DEFEATED - three zone bosses, so 3 a spec for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the specs among your heroes earn. Points are per spec and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
+  "short": "Earned per class, per zone boss, and banked forever. A run pays none.",
+  "long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER CLASS PER ZONE BOSS DEFEATED - three zone bosses, so 3 a class for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the classes among your heroes earn, and every spec of a class spends that class's purse. Points are per class and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
   "see_also": [
    "talent_cost",
    "elites"
@@ -932,10 +932,10 @@
  },
  {
   "id": "talent_unlock",
-  "term": "Unlock vs Equip",
+  "term": "Bought Is Worn",
   "category": "progression",
-  "short": "Buying a cell unlocks an OPTION. It does not equip it.",
-  "long": "This is the distinction the whole talent system rests on. BUYING a cell spends points and unlocks it forever. EQUIPPING is a separate act: you still take ONE node per row, and it locks for the whole run the moment your spec is confirmed. Owning all three cells in a row makes that row a real three-way argument; owning one leaves no argument in it. That is why filling a tree makes your choices better rather than making them for you.",
+  "short": "A cell bought is a cell worn - there is no equip step.",
+  "long": "BUYING a cell spends points and owns it forever, and an owned cell is WORN: no node in the tree is exclusive, so there is nothing to choose between and no separate equip step. Every cell a class owns is on every hero of that class, every run, and it locks for the whole run the moment the spec is confirmed.",
   "see_also": [
    "talent_lanes",
    "talent_cost",
@@ -944,10 +944,10 @@
  },
  {
   "id": "talent_rows",
-  "term": "Row Unlocks",
+  "term": "Tier Gates",
   "category": "progression",
-  "short": "Rows open by beating the END BOSS: 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3.",
-  "long": "A fresh save has NO ROWS, no points and no talents at all. Beating the end boss on difficulty 1 opens rows 1-3; difficulty 2 opens 4-6; difficulty 3 opens 7-9, the capstone shelf with them. ROW UNLOCKS ARE GLOBAL - they apply to every spec at once, unlike points, which are per spec. A tier arrives FULLY unlocked, so beating difficulty 2 makes all nine cells of rows 4-6 buyable at once. That is what an uncapped bank is for.",
+  "short": "A tier opens by beating the END BOSS on its difficulty AND owning three cells of the tier below.",
+  "long": "A fresh save has NO TIERS, no points and no talents at all. A tier has TWO GATES and needs both. THE DIFFICULTY GATE: beating the end boss on difficulty 1 opens tier 1, difficulty 2 opens tier 2, difficulty 3 opens tier 3 - and it is GLOBAL, applying to every class at once, unlike points, which are per class. THE SPEND GATE: tier 2 opens for a class once it owns three tier-1 cells, and tier 3 once it owns three tier-2 cells. The build screen names which gate is shutting a tier, because one is fixed by winning and the other by buying.",
   "see_also": [
    "talent_points",
    "difficulty_ladder",
@@ -959,7 +959,7 @@
   "term": "The Difficulty Ladder",
   "category": "run",
   "short": "Three rungs, chosen at the draft. Each above the first adds a named twist.",
-  "long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so untalented heroes can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every spec at once.",
+  "long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so untalented heroes can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every class at once.",
   "see_also": [
    "talent_rows",
    "end_boss",
@@ -971,8 +971,8 @@
   "id": "end_boss",
   "term": "The End Boss",
   "category": "run",
-  "short": "A fourth boss after zone 3. Awards a relic, no points, and opens talent rows.",
-  "long": "Three ZONE BOSSES pay a talent point apiece; after the third zone stands THE END BOSS, the forty-ninth encounter. It is FIXED rather than drawn from a pool, so it can be learned, and it GAINS STATS AND MECHANICS WITH DIFFICULTY - a fourth ability at rung 2 and a fifth at rung 3. It always awards a relic. It awards NO talent points and no ability pick, because nothing follows it. What it does award is the tier of talent rows matching the rung you beat it on.",
+  "short": "A fourth boss after zone 3. Awards a relic, no points, and opens a talent tier.",
+  "long": "Three ZONE BOSSES pay a talent point apiece; after the third zone stands THE END BOSS, the forty-ninth encounter. It is FIXED rather than drawn from a pool, so it can be learned, and it GAINS STATS AND MECHANICS WITH DIFFICULTY - a fourth ability at rung 2 and a fifth at rung 3. It always awards a relic. It awards NO talent points and no ability pick, because nothing follows it. What it does award is the talent tier matching the rung you beat it on.",
   "see_also": [
    "talent_rows",
    "difficulty_ladder",
@@ -1067,7 +1067,7 @@
   "term": "Blood Frenzy's floor",
   "category": "combat",
   "short": "The Berserker keeps HALF the biggest Frenzy bonus he reaches, even after he is healed back up.",
-  "long": "Blood Frenzy pays the Berserker +2% damage for every 5% of maximum health he is MISSING, so his power rises as he falls - AND +2% for every 5 Rage he has SPENT this battle, which is the half of it he controls. Five Rage is 5% of a full Rage bar, so both terms pay at the same rate off their own bar. The two are ADDED and then capped at twenty steps, which is exactly where the missing-health term already topped out: spending Rage fills the band SOONER, never deeper, so a Berserker already at death's door gains nothing from it and one who is untouched is no longer stuck at zero. Rage spent counts what actually left the bar, so a card that hands some back is worth only the difference and a waived cost is worth nothing. The floor is the half of it people miss: the highest bonus he reaches in a battle leaves a permanent mark worth HALF of it, and his live bonus never drops below that mark for the rest of the fight. Heal him to full and he keeps the floor. It is why diving early is worth something even if the heroes pull him straight back out, and it resets with each new battle. THREE THINGS CHANGE IT. Scar Tissue (talent) makes the floor keep 85% of the peak instead of half - or all of it alongside Unstoppable. UNSLAKED (draft card) makes it keep the FULL bonus for a few turns, so the play is to cast it and then dive. BOIL OVER (draft card) spends the live bonus as damage and then leaves him receiving ONLY the floor for two turns - the floor itself is untouched, which is exactly why a deep one makes that recovery cost almost nothing.",
+  "long": "Blood Frenzy pays the Berserker +2% damage for every 5% of maximum health he is MISSING, so his power rises as he falls - AND +2% for every 5 Rage he has SPENT this battle, which is the half of it he controls. Five Rage is 5% of a full Rage bar, so both terms pay at the same rate off their own bar. The two are ADDED and then capped at twenty steps, which is exactly where the missing-health term already topped out: spending Rage fills the band SOONER, never deeper, so a Berserker already at death's door gains nothing from it and one who is untouched is no longer stuck at zero. Rage spent counts what actually left the bar, so a card that hands some back is worth only the difference and a waived cost is worth nothing. The floor is the half of it people miss: the highest bonus he reaches in a battle leaves a permanent mark worth HALF of it, and his live bonus never drops below that mark for the rest of the fight. Heal him to full and he keeps the floor. It is why diving early is worth something even if the heroes pull him straight back out, and it resets with each new battle. TWO THINGS CHANGE IT. UNSLAKED (draft card) makes it keep the FULL bonus for a few turns, so the play is to cast it and then dive. BOIL OVER (draft card) spends the live bonus as damage and then leaves him receiving ONLY the floor for two turns - the floor itself is untouched, which is exactly why a deep one makes that recovery cost almost nothing.",
   "see_also": [
    "stance",
    "protected_core"
@@ -1078,7 +1078,7 @@
   "term": "Heavy Plating's climb",
   "category": "combat",
   "short": "The Warden's Block chance rises with every hit that gets through - and a successful Block throws all of it away.",
-  "long": "Heavy Plating gives the Warden a flat 15% Block chance, and adds another 8% every time an attack gets THROUGH him (Plate Discipline steepens that to 20% a hit), up to +40%. It is bad-luck protection: the longer he goes without blocking, the likelier the next block becomes. THE CATCH IS THAT BLOCKING RESETS THE CLIMB TO ZERO, which is what makes his defence a sawtooth rather than a ramp - and several of his talents (Tenacity's +15 maximum health, Rally's healing bonus to every ally) only fire on a Heavy Plating block, so he wants the blocks and pays for them. THREE DRAFT CARDS ANSWER THE RESET AND TWO OF THEM CANNOT BE USED TOGETHER. ANVIL stops Blocking resetting the climb at all, so it reaches its ceiling and stays there. RECOMPENSE is paid BY the reset instead, returning Rage equal to the percentage points it took. Holding both means the second is paid nothing while the first is up - they are two answers to the same problem rather than a stack. TURN THE BLADE ignores the reset entirely and makes each Block deal Break damage back to the attacker.",
+  "long": "Heavy Plating gives the Warden a flat 15% Block chance, and adds another 8% every time an attack gets THROUGH him, up to +40%. It is bad-luck protection: the longer he goes without blocking, the likelier the next block becomes. THE CATCH IS THAT BLOCKING RESETS THE CLIMB TO ZERO, which is what makes his defence a sawtooth rather than a ramp. THREE DRAFT CARDS ANSWER THE RESET AND TWO OF THEM CANNOT BE USED TOGETHER. ANVIL stops Blocking resetting the climb at all, so it reaches its ceiling and stays there. RECOMPENSE is paid BY the reset instead, returning Rage equal to the percentage points it took. Holding both means the second is paid nothing while the first is up - they are two answers to the same problem rather than a stack. TURN THE BLADE ignores the reset entirely and makes each Block deal Break damage back to the attacker.",
   "see_also": [
    "pressure_break",
    "res_rage",

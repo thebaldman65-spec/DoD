@@ -25,6 +25,14 @@
 #     read higher, and nothing would crash);
 #   · Communion still rolling for a parked ally (the row would land outside its
 #     bracket and look like a mis-tune rather than a missing condition).
+#
+# BATCH FX DELETED THE TWELVE SPEC TREES — Communion, Apostle and Wardstone
+# with them. Every field and read site this suite drives was kept, so the live
+# checks learn each retired node's EXACT payload through the real spawn
+# (FX_RETIRED, `_fx_tree`), and Devoutness is learned as `tn_unbreaking`, its
+# precedent-mapped node (same field, same magnitude). What went is what only a
+# node could answer — Communion's payload and its tooltip — five checks,
+# deleted where they stood.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -45,6 +53,25 @@ const RATE_AT_PEAK := 0.01 * COMMUNION * HELD_MAX
 # Trials per measured rate. At p=0.60 the 3-sigma band is +/-4.2 points against
 # the +/-5 asserted below, so the band cannot flap.
 const TRIALS := 1200
+
+# BATCH FX — THE NODES THIS SUITE LEARNED ARE DELETED; THEIR FIELDS ARE NOT. FX
+# removed the twelve spec trees and kept every read site of every field they
+# wrote (a field no node writes is dormant, not deleted; the ability arm of
+# `apply_payload` is live machinery that runes reach). Each retired node a live
+# check learned is carried here as the EXACT payload it carried, and `_fx_tree`
+# hands the spawn the live tree PLUS those nodes, so the payload still goes
+# through `Talents.apply_from_tree` at the real spawn — the path the old learn
+# took. Devoutness is NOT here: `tn_unbreaking` writes the same field at the
+# same magnitude (devoutness_ranks 20) and is learned instead.
+const FX_RETIRED := {
+	# FX: the payload the retired dv_communion (Communion) carried — the node is deleted, the field and its read site stand.
+	"dv_communion": {"name": "Communion", "payload": {"stat": {"communion_ranks": 15}}},
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is deleted, the field and its read site stand.
+	"dv_apostle": {"name": "Apostle", "payload": {"stat": {"apostle": 1}}},
+	# FX: the payload the retired dv_bulwark (Wardstone) carried — the node is deleted, the field and its read site stand.
+	"dv_bulwark": {"name": "Wardstone",
+		"payload": {"ability": "Divine Shield", "set": {"cost": 0}}},
+}
 
 var checks := 0
 var fails: Array = []
@@ -82,7 +109,8 @@ func _run() -> void:
 	_every_reducer_has_a_term()
 	# §2 — the condition
 	_the_condition_is_at_the_gate()
-	_the_tooltip_states_the_cliff()
+	# `_the_tooltip_states_the_cliff` (§2, four checks) was DELETED at FX — see
+	# its record where it stood.
 
 	await _live_bulwark_reaches_the_prevented_door()
 	await _live_break_never_enters_the_contribution_slice()
@@ -115,8 +143,8 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
-func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(Talents.LANE_TREES["inquisitor"], id)
+# `_node(id)` read a node out of the Devout's tree; it went with the five
+# checks FX deleted (their records are at §2 below).
 
 
 func _devout(scene: Node) -> BattleUnit:
@@ -135,8 +163,33 @@ func _spawn(learned := {}, earned: Array = []) -> Node:
 		"slices": true}
 	if not earned.is_empty():
 		opts["bm"] = {2: earned}
+	# BATCH FX: a learned node the one tree does not hold rides in on the
+	# Devout's tree with its retired payload; the fixture writes `patch` after
+	# the member is built, so the spawn applies it.
+	if not learned.is_empty():
+		opts["patch"] = {2: {"tree": _fx_tree(learned)}}
 	return await Fixture.spawn(self,
 		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
+
+
+# The live tree, plus every learned node it no longer holds, carried with the
+# exact payload FX_RETIRED records. A learned id that is neither is a FAILURE
+# rather than a silent no-op: it would learn nothing, and every check reading
+# its field would read the field's zero as if the node had been measured.
+func _fx_tree(learned: Dictionary) -> Array:
+	var tree: Array = Talents.tree()
+	for id in learned:
+		var sid := String(id)
+		if not Talents.node_in_tree(tree, sid).is_empty():
+			continue
+		if not FX_RETIRED.has(sid):
+			checks += 1
+			fails.append("FX: `%s` is neither a live node nor a carried retired payload" % sid)
+			continue
+		var r: Dictionary = FX_RETIRED[sid]
+		tree.append({"id": sid, "name": String(r["name"]), "desc": "",
+			"payload": (r["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _kill(scene: Node) -> void:
@@ -335,32 +388,27 @@ func _the_condition_is_at_the_gate() -> void:
 	# what the chance is.
 	ok(src.contains("if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:"),
 		"§2: the chance expression is unchanged — this is a condition, not a reprice")
-	var n := _node("dv_communion")
-	ok(not n.is_empty() and int(n["payload"]["stat"]["communion_ranks"]) == COMMUNION,
-		"§2: and the node still pays %d" % COMMUNION)
+	# BATCH FX DELETED ONE CHECK HERE (DG §2): "and the node still pays 15" read
+	# dv_communion's payload out of the Devout's tree, and FX deleted the tree
+	# and the node — no node of the one tree writes `communion_ranks`. The 15 is
+	# still what every live rate below drives (FX_RETIRED's copy of the retired
+	# payload), and the Devout is asserted to have learned it at 15 at the spawn.
 
 
 # AN ABILITY WHOSE CHANCE RISES WITH STACKS AND THEN VANISHES AT THE TOP READS
 # AS A BUG. The tooltip has to say the cliff out loud, and it has to frame the
 # rule as an inclusion — fervor spreads to those still building — because that
 # is what the mechanic actually is.
-func _the_tooltip_states_the_cliff() -> void:
-	var n := _node("dv_communion")
-	if n.is_empty():
-		return
-	var txt := Talents.desc_for(n, 1)
-	ok(txt.contains("still BUILDING Faith"),
-		"§2: the tooltip frames it as an inclusion (reads: %s)" % txt)
-	# BATCH DC: the tooltip states WHERE the chance peaks rather than printing the
-	# product, because the product moves with the threshold and the position does
-	# not. One below `FAITH_RELEASE` is the peak, and CZ §2 made that two.
-	ok(txt.contains("peaks on a hero holding %d" % HELD_MAX),
-		"§2: it names the peak chance at two stacks, one below the threshold")
-	ok(txt.contains("not rolled for at all"),
-		"§2: and it states the cliff at the threshold outright")
-	# The reprice BE shipped is still rendered by the same tooltip.
-	ok(txt.contains("(%d x their own Faith stacks)%%" % COMMUNION),
-		"§2: the %d still renders" % COMMUNION)
+#
+# §2 — `_the_tooltip_states_the_cliff` — DELETED AT BATCH FX, FOUR CHECKS, WITH
+# ITS SUBJECT (DG §2). They read dv_communion's rendered tooltip: that it framed
+# the rule as an inclusion ("still BUILDING Faith"), named the peak at two
+# stacks, stated the cliff at the threshold ("not rolled for at all"), and
+# still rendered the 15. FX deleted the twelve spec trees and Communion with
+# them, so no surface in the game states the cliff any more and there is no
+# tooltip left for the four to read. THE CLIFF ITSELF IS STILL PINNED WHERE IT
+# LIVES: `_the_condition_is_at_the_gate` asserts the condition at the walk, and
+# the live rates drive it — 30% at the top of the band, 0% at the threshold.
 
 
 # ---------- live: §1 ----------
@@ -408,7 +456,9 @@ func _live_bulwark_reaches_the_prevented_door() -> void:
 # that would catch the negative control (Break folded into the share) even if
 # the fold happened somewhere other than the table.
 func _live_break_never_enters_the_contribution_slice() -> void:
-	var scene := await _spawn({"dv_bulwark": 1, "dv_devoutness": 1},
+	# BATCH FX: Devoutness is learned as its precedent-mapped node, We Do Not
+	# Break (`tn_unbreaking` — devoutness_ranks 20, the same field and magnitude).
+	var scene := await _spawn({"dv_bulwark": 1, "tn_unbreaking": 1},
 		["Bulwark of Fortitude"])
 	var dv := _devout(scene)
 	var war: BattleUnit = scene.get("heroes")[0]

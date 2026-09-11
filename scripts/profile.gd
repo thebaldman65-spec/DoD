@@ -46,23 +46,30 @@ static var loaded := false
 # refused profile is every run the player has ever finished, so deleting it
 # would BE the destruction the guard exists to prevent. It refuses, it keeps
 # its hands off the file, and it says so.
-const VERSION := 2
+#
+# BATCH FX §4 — VERSION 3 IS THE MERGED TALENT LEDGER, AND IT IS THE BATCH FQ
+# BUILT THIS GUARD FOR. The tree keys to the CLASS now, so the ledger does:
+# FOUR purses (one per class) where v2 held twelve (one per spec), a class's
+# owned cells in the one twenty-seven-node tree, and NO equipped loadout —
+# nothing in the tree is exclusive, so a cell bought is a cell worn. A v2
+# profile is FOLDED on load (`_migrate`, below); the file is not touched until
+# the next `_save()`, which writes it at v3.
+const VERSION := 3
 
 # BATCH FQ §1 — THE FLOOR. The oldest profile this build will read.
-# v1 predates the meta talent ledger and loads TOLERANTLY on purpose, for the
-# reason BM's comment above gives: it arrives at zero points, zero cells and
-# tier 0, which is the correct state for a save that never completed a run
-# under that system. There is nothing below v1, so the floor refuses nothing
-# today — **it is the line the merge moves.** The batch that renames a talent
-# id raises this to its own VERSION and every older profile is refused, which
-# is the honest answer, because FP measured what the tolerant read returns
-# and it is a silent lie in three fields at once.
+# FQ set it to 1 and called it **the line the merge moves**, and FX moved it:
+# **the floor is the oldest version this build carries a written migration
+# for**, and FX's is ONE STEP — v2 to v3, the purse fold. A v1 profile predates
+# the meta ledger entirely; reading one would mean re-deriving BM's tolerant
+# v1-to-v2 merge and then folding what it produced, a two-step path nothing has
+# ever driven. It is REFUSED instead, which keeps the file intact for a build
+# that reads it — the refusal never writes.
 #
 # A PROFILE WITH NO VERSION KEY READS 0 AND IS REFUSED. `run_state.load_run()`
 # treats a missing version exactly the same way (`int(data.get("version", 0))`
 # against a floor), and a JSON dictionary this build never wrote is not a
 # profile just because it parses.
-const MIN_VERSION := 1
+const MIN_VERSION := 2
 
 # BATCH FQ §1 — THE CEILING, WHICH IS THE HALF THAT IS LIVE TODAY.
 # A profile written at version 99 loads CLEAN under the code this replaces, is
@@ -72,6 +79,9 @@ const MIN_VERSION := 1
 # writes vN and a build that writes vN+1 against ONE `user://profile.json`.
 # The forward case stops being hypothetical the day the merge bumps VERSION,
 # and it is the branch itself that makes it routine.
+# **FX BUMPED IT, SO THIS IS NOW THE CASE IT DESCRIBES**: once this build has
+# saved a folded profile at v3, `main`'s build (v2) meets a version above its
+# own and refuses it — without deleting it — until the merge lands there.
 #
 # Set when `_load()` REFUSED the file on disk. Two things follow and both
 # matter: **`_save()` becomes a NO-OP**, so the refused file is never
@@ -80,6 +90,14 @@ const MIN_VERSION := 1
 static var refused := false
 static var refused_reason := ""
 static var refused_version := 0
+
+# BATCH FX §4 — WHAT THE FOLD DID, when this session's load folded a v2 file.
+# `migrated_from` is the version that was read (0 when nothing was folded) and
+# `fold_report` is {class: {"specs": {spec: points}, "purse": points}} — the
+# twelve purses in and the four out, so a gate can drive the fold on a copy
+# and read exactly what it decided without re-deriving it.
+static var migrated_from := 0
+static var fold_report := {}
 
 
 static func _load() -> Dictionary:
@@ -91,14 +109,15 @@ static func _load() -> Dictionary:
 		refused = false
 		refused_reason = ""
 		refused_version = 0
+		migrated_from = 0
+		fold_report = {}
 		data = {"version": VERSION, "runs_started": {}, "runs_completed": {},
 			"wipes": {}, "forfeits": {}, "bosses_killed": {}, "events_seen": {},
 			"zones_cleared": 0, "flags": {},
-			# --- the meta talent ledger (Batch BM §4) ---
-			"talent_points": {},    # spec -> points EARNED, ever
-			"talent_cells": {},     # spec -> {node id: true}
-			"talent_equipped": {},  # spec -> {row (as String): node id}
-			"talent_tier": 0}       # global rows unlocked, 0-3
+			# --- the meta talent ledger (Batch BM §4, keyed to the CLASS at FX) ---
+			"talent_points": {},    # class -> points EARNED, ever
+			"talent_cells": {},     # class -> {node id: true} — owned, and so worn
+			"talent_tier": 0}       # global end-boss rung beaten, 0-3
 		if FileAccess.file_exists(save_path):
 			var file := FileAccess.open(save_path, FileAccess.READ)
 			var read: Variant = JSON.parse_string(file.get_as_text())
@@ -117,14 +136,75 @@ static func _load() -> Dictionary:
 			if found > VERSION:
 				_refuse(found, "it was written by a NEWER build than this one")
 				return data
+			# BATCH FX §4 — THE FOURTH REFUSAL, AND IT IS THE FOLD'S. An older
+			# version in range is MIGRATED before a single key is merged, and a
+			# file the migration cannot place is refused exactly like the three
+			# above: nothing merged, nothing written.
+			if found < VERSION:
+				var why := _migrate(read as Dictionary, found)
+				if why != "":
+					_refuse(found, why)
+					return data
 			for key in read:
 				data[key] = read[key]
 			# Only reached on an ACCEPTED load, and it is an upgrade rather
-			# than a coercion: a v1 profile merged over v2 defaults genuinely
-			# IS a v2 profile. A refused version never gets here, which is
-			# the whole of "no silent coercion".
+			# than a coercion: a migrated v2 profile merged over v3 defaults
+			# genuinely IS a v3 profile. A refused version never gets here,
+			# which is the whole of "no silent coercion".
 			data["version"] = VERSION
 	return data
+
+
+# BATCH FX §4 — THE FOLD, AND IT HAPPENS ONCE. A v2 profile carries TWELVE
+# purses, one per spec; v3 carries FOUR, one per class, because the tree keys
+# to the class. **A MERGED PURSE TAKES THE HIGHEST OF ITS CLASS'S THREE, NOT
+# THE SUM** (ruled by the designer): 3 points on each of three Warrior specs is
+# 3, not 9, because the merged tree is a third the size of the three it
+# replaces and a sum would hand most of it over the day the merge lands.
+#
+# THE CELLS AND THE LOADOUT DO NOT CARRY. Every id in a v2 ledger names a node
+# of the twelve deleted trees, and nothing in this build can price or wear one.
+# **Dropping them costs no POINT**: a purse is points EARNED and what is
+# available is earned minus what the owned cells cost, so a folded purse
+# arrives whole and unspent. `talent_tier` is global and carries unchanged.
+#
+# **A PURSE THIS BUILD CANNOT PLACE IS REFUSED, NEVER DROPPED.** A key that is
+# not one of the twelve specs, or a value that is not a number, would otherwise
+# fold into nothing — a purse silently zeroed, which is the one outcome the
+# version guard exists to prevent (FQ). Refusing writes nothing, so the file
+# survives for a build that can read it.
+#
+# **AND IT CANNOT BE ITERATED ON.** The fold is written to disk by the next
+# `_save()`; after that the twelve purses exist only in a backup. A batch that
+# re-rules the fold rules it for profiles not yet folded.
+#
+# Returns "" when the fold landed, or the reason it was refused.
+static func _migrate(read: Dictionary, found: int) -> String:
+	if found != 2:
+		return "no migration from version %d is written" % found
+	var old: Variant = read.get("talent_points", {})
+	if not (old is Dictionary):
+		return "its talent points are not readable"
+	var folded := {}
+	var report := {}
+	for spec in old:
+		var cls := Classes.class_of_spec(String(spec))
+		if cls == "":
+			return "it holds talent points for '%s', which is not a spec this build knows" % spec
+		var v: Variant = (old as Dictionary)[spec]
+		if not (v is int or v is float):
+			return "its talent points for '%s' are not a number" % spec
+		folded[cls] = maxi(int(folded.get(cls, 0)), int(v))
+		if not report.has(cls):
+			report[cls] = {"specs": {}, "purse": 0}
+		(report[cls]["specs"] as Dictionary)[String(spec)] = int(v)
+		report[cls]["purse"] = folded[cls]
+	read["talent_points"] = folded
+	read["talent_cells"] = {}
+	read.erase("talent_equipped")
+	migrated_from = found
+	fold_report = report
+	return ""
 
 
 static func _save() -> void:
@@ -259,45 +339,49 @@ static func distinct_events_seen() -> int:
 	return _load()["events_seen"].size()
 
 
-# ---------- BATCH BM §4: the meta talent ledger ----------
+# ---------- BATCH BM §4: the meta talent ledger, KEYED TO THE CLASS AT FX ----------
 #
-# THE ONE DISTINCTION THIS WHOLE SECTION EXISTS TO KEEP: a CELL is bought
-# once and forever; EQUIPPING is a separate act and it is what a run reads.
-# Buying never equips. `Talents` owns the rules (costs, tiers, what may be
-# bought or equipped); this owns the ledger and nothing else.
+# A CELL is bought once and forever, out of the CLASS's banked points, and —
+# since FX — a cell owned is a cell worn: the tree has no rows and nothing in
+# it is exclusive, so there is no second act to perform. `Talents` owns the
+# rules (costs, both tier gates, what may be bought or refunded); this owns
+# the ledger and nothing else.
 #
-# JSON keys are strings, so the equipped map is keyed on String(row) — every
-# accessor here converts, and no caller outside this file ever sees it.
+# EVERY ACCESSOR BELOW TAKES A CLASS KEY ("warrior", "mage", "cleric",
+# "hunter"). The specs still exist and still key the chronicle above; only the
+# talent ledger merged. A caller holding a spec asks `Classes.class_of_spec`.
 
 # ---- earning ----
 
-# 1 point per spec per ZONE BOSS defeated, and only for specs that played.
+# 1 point per CLASS per ZONE BOSS defeated, and only for classes that played.
 # A run that dies in zone 2 has already banked 1 or 2: that partial credit
-# is the mechanism, not a separate rule. The END boss awards none.
+# is the mechanism, not a separate rule. The END boss awards none. Takes the
+# party's SPECS because that is what a victory holds; two specs of one class
+# in one list (a party never has that, a test can) still pay that class once.
 static func award_zone_boss_points(specs: Array) -> void:
 	var purse: Dictionary = _load()["talent_points"]
-	var paid := false
+	var paid := {}
 	for spec in specs:
-		var key := String(spec)
-		if key == "":
+		var cls := Classes.class_of_spec(String(spec))
+		if cls == "" or paid.has(cls):
 			continue
-		purse[key] = int(purse.get(key, 0)) + 1
-		paid = true
-	if paid:
+		purse[cls] = int(purse.get(cls, 0)) + 1
+		paid[cls] = true
+	if not paid.is_empty():
 		_save()
 
 
-static func talent_points_earned(spec: String) -> int:
-	return int(_load()["talent_points"].get(spec, 0))
+static func talent_points_earned(class_key: String) -> int:
+	return int(_load()["talent_points"].get(class_key, 0))
 
 
-# ---- the row tier (GLOBAL — points are per spec, rows are not) ----
+# ---- the row tier (GLOBAL — points are per class, tiers are not) ----
 
 static func talent_tier() -> int:
 	return clampi(int(_load().get("talent_tier", 0)), 0, Talents.MAX_TIER)
 
 
-# Beating the end boss on difficulty N opens tier N for EVERY spec at once.
+# Beating the end boss on difficulty N opens tier N for EVERY class at once.
 # It never falls: clearing difficulty 1 after difficulty 3 changes nothing.
 static func note_end_boss(difficulty_tier: int) -> void:
 	var want := clampi(difficulty_tier, 0, Talents.MAX_TIER)
@@ -307,131 +391,78 @@ static func note_end_boss(difficulty_tier: int) -> void:
 	_save()
 
 
-# ---- cells: the permanent unlock ledger ----
+# ---- cells: the permanent ledger ----
 
-static func talent_cells(spec: String) -> Dictionary:
+static func talent_cells(class_key: String) -> Dictionary:
 	var all: Dictionary = _load()["talent_cells"]
-	return all.get(spec, {})
+	return all.get(class_key, {})
 
 
-static func owns_cell(spec: String, id: String) -> bool:
-	return bool(talent_cells(spec).get(id, false))
+static func owns_cell(class_key: String, id: String) -> bool:
+	return bool(talent_cells(class_key).get(id, false))
 
 
 # Points still available: earned minus what the owned cells cost. There is
 # no second accounting anywhere, so a refund cannot disagree with a spend.
-static func talent_points_available(spec: String) -> int:
-	var tree := Talents.generate_tree(spec, "")
-	return talent_points_earned(spec) \
-		- Talents.cells_spent(tree, talent_cells(spec))
+static func talent_points_available(class_key: String) -> int:
+	return talent_points_earned(class_key) \
+		- Talents.cells_spent(Talents.tree(), talent_cells(class_key))
 
 
 # Buy a cell. Returns true when it landed. Refuses politely — the build
 # screen greys on `Talents.can_buy` and this re-checks it, so the two can
 # never disagree the way two read sites of one question always eventually do.
-static func buy_cell(spec: String, id: String) -> bool:
-	var tree := Talents.generate_tree(spec, "")
-	var cells := talent_cells(spec)
-	var check := Talents.can_buy(tree, id, cells, talent_points_available(spec),
-		talent_tier())
+static func buy_cell(class_key: String, id: String) -> bool:
+	var tree := Talents.tree()
+	var cells := talent_cells(class_key)
+	var check := Talents.can_buy(tree, id, cells,
+		talent_points_available(class_key), talent_tier())
 	if not bool(check["ok"]):
 		return false
 	cells[id] = true
-	_load()["talent_cells"][spec] = cells
+	_load()["talent_cells"][class_key] = cells
 	_save()
 	return true
 
 
 # Pull a point back out. A spent point can be reassigned at no cost, any
 # time OUTSIDE a run — the caller owns that gate, because only it knows
-# whether a run is in flight. Un-owning a cell also un-equips it.
-static func refund_cell(spec: String, id: String) -> bool:
-	var cells := talent_cells(spec)
-	if not bool(cells.get(id, false)):
+# whether a run is in flight. `Talents.can_refund` refuses a cell whose
+# tier the tier above still stands on; the full respec is the way out.
+static func refund_cell(class_key: String, id: String) -> bool:
+	var cells := talent_cells(class_key)
+	if not bool(Talents.can_refund(Talents.tree(), id, cells)["ok"]):
 		return false
 	cells.erase(id)
-	_load()["talent_cells"][spec] = cells
-	var equipped := talent_equipped(spec)
-	for row in equipped.keys():
-		if String(equipped[row]) == id:
-			equipped.erase(row)
-	_load()["talent_equipped"][spec] = equipped
+	_load()["talent_cells"][class_key] = cells
 	_save()
 	return true
 
 
-# A full respec: every point back, every cell and every equip cleared.
-static func respec(spec: String) -> void:
-	_load()["talent_cells"][spec] = {}
-	_load()["talent_equipped"][spec] = {}
-	_save()
-
-
-# ---- equipping: one node per row, and a run reads exactly this ----
-
-static func talent_equipped(spec: String) -> Dictionary:
-	var all: Dictionary = _load()["talent_equipped"]
-	return all.get(spec, {})
-
-
-static func equip_cell(spec: String, id: String) -> bool:
-	var tree := Talents.generate_tree(spec, "")
-	var equipped := _row_keyed(talent_equipped(spec))
-	var check := Talents.can_equip(tree, id, talent_cells(spec), equipped)
-	if not bool(check["ok"]):
-		return false
-	var row := int(Talents.node_in_tree(tree, id).get("row", 1))
-	var store := talent_equipped(spec)
-	store[str(row)] = id
-	_load()["talent_equipped"][spec] = store
-	_save()
-	return true
-
-
-static func unequip_row(spec: String, row: int) -> void:
-	var store := talent_equipped(spec)
-	if not store.has(str(row)):
-		return
-	store.erase(str(row))
-	_load()["talent_equipped"][spec] = store
+# A full respec: every point back and every cell cleared.
+static func respec(class_key: String) -> void:
+	_load()["talent_cells"][class_key] = {}
 	_save()
 
 
 # THE HANDOFF INTO A RUN. Returns the {id: 1} set every read site already
-# speaks, built from the loadout the player configured between runs. A cell
-# that is equipped but no longer owned (a refund, a tree edit) is dropped
-# here rather than carried, so the run can never wear something unpaid for.
-static func equipped_talents(spec: String) -> Dictionary:
-	if spec == "" or not Talents.has_tree(spec):
+# speaks: every cell the class owns, because a cell owned is worn. A cell
+# the tree no longer holds is dropped here rather than carried, so the run
+# can never wear something the tree cannot price.
+static func worn_talents(class_key: String) -> Dictionary:
+	if class_key == "":
 		return {}
-	var tree := Talents.generate_tree(spec, "")
-	var cells := talent_cells(spec)
-	var out := {}
-	for row_key in talent_equipped(spec):
-		var id := String(talent_equipped(spec)[row_key])
-		if id == "" or not bool(cells.get(id, false)):
-			continue
-		if not Talents.node_in_tree(tree, id).is_empty():
-			out[id] = 1
-	return out
+	return Talents.worn_learned(Talents.tree(), talent_cells(class_key))
 
 
 # The map burger's debug grant (Batch BM, replacing "+200 talent points"):
-# 60 points to every spec — past the 54 a full tree costs — and every row
+# 60 points to every CLASS — past the 54 the whole tree costs — and every
 # tier open. Gated by `Run.debug_enabled()` at the ONE dispatch site, which
 # is also the one place `Run.debug_used` is written, so a run that used it
 # still says so in its summary.
 static func debug_grant_meta() -> void:
 	var purse: Dictionary = _load()["talent_points"]
-	for spec in Classes.all_specs():
-		purse[String(spec)] = maxi(int(purse.get(String(spec), 0)), 60)
+	for cls in Classes.SPEC_IDS:
+		purse[String(cls)] = maxi(int(purse.get(String(cls), 0)), 60)
 	_load()["talent_tier"] = Talents.MAX_TIER
 	_save()
-
-
-# The equipped map with INT row keys, which is what Talents.can_equip reads.
-static func _row_keyed(store: Dictionary) -> Dictionary:
-	var out := {}
-	for k in store:
-		out[int(k)] = String(store[k])
-	return out

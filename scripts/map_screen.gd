@@ -2373,11 +2373,12 @@ func _on_burger(id: int) -> void:
 			_draw_screen()
 		11:
 			# BATCH BM: there is no in-run purse to fill. The tester's
-			# equivalent is a META grant — 60 points to every spec, which is
-			# past the 54 a full tree costs — plus every row tier open.
+			# equivalent is a META grant — 60 points to every class (FX: the
+			# purse keys to the class), past the 54 the whole tree costs —
+			# plus every tier open.
 			Profile.debug_grant_meta()
 			_draw_screen()
-			_toast("DEBUG: 60 talent points to every spec, all rows open")
+			_toast("DEBUG: 60 talent points to every class, every tier open")
 		12:
 			Run.heal_party(1.0)
 			Run.restore_mana(1.0)

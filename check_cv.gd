@@ -11,7 +11,8 @@
 #      37 CU named. §3 asks for "any other ability carrying a `perfect_text`
 #      with no bar" and that is not a question a NAMED list can answer — the
 #      list is the thing under suspicion. The 220 names below are every
-#      `display_name` in classes.gd and talents.gd.
+#      `display_name` in classes.gd and talents.gd — and since BATCH FX
+#      talents.gd defines none, so the list stands as classes.gd's.
 #
 #   2. THE DURATION CONVENTION (§1). Every node whose text states a fixed
 #      number of turns, printed beside the value its read site applies, so
@@ -19,6 +20,10 @@
 #
 #   3. THE NODE DUMP, as CU's — through `Talents.desc_for`, the tooltip's own
 #      function, so what is read here is what the player reads.
+#
+# BATCH FX — passes 2 and 3 read the ONE tree (`Talents.TREE`). The twelve spec
+# trees they walked are deleted, and a node carries a TIER where it carried a
+# spec, a lane and a row, so the dump's keys moved with it.
 extends SceneTree
 
 # Every ability defined anywhere in the game.
@@ -148,32 +153,30 @@ func _initialize() -> void:
 	var turn_re := RegEx.new()
 	turn_re.compile("(?i)([0-9]+) turns?")
 	var stated := 0
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			var rendered: String = Talents.desc_for(n, 1)
-			var ms := turn_re.search_all(rendered)
-			if ms.is_empty():
-				continue
-			stated += 1
-			var counts := []
-			for m in ms:
-				counts.append(m.get_string(1))
-			print("  %-22s %s   %s" % [n.get("id", ""), str(counts),
-				rendered.substr(0, 78)])
+	for n in Talents.tree():
+		var rendered: String = Talents.desc_for(n, 1)
+		var ms := turn_re.search_all(rendered)
+		if ms.is_empty():
+			continue
+		stated += 1
+		var counts := []
+		for m in ms:
+			counts.append(m.get_string(1))
+		print("  %-22s %s   %s" % [n.get("id", ""), str(counts),
+			rendered.substr(0, 78)])
 	print("  %d nodes state a fixed turn count." % stated)
 
 	print("\n=== PASS 3: THE NODE DUMP ===")
 	var out := []
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			out.append({
-				"spec": spec, "id": n.get("id", ""), "name": n.get("name", ""),
-				"lane": n.get("lane", ""), "row": n.get("row", 0),
-				"desc_raw": n.get("desc", ""),
-				"desc_rendered": Talents.desc_for(n, 1),
-				"scale": n.get("scale", {}), "payload": n.get("payload", {}),
-			})
-	print("  NODES: %d (expected %d)" % [out.size(), 12 * Talents.CELLS_PER_SPEC])
+	for n in Talents.tree():
+		out.append({
+			"id": n.get("id", ""), "name": n.get("name", ""),
+			"tier": n.get("tier", 0),
+			"desc_raw": n.get("desc", ""),
+			"desc_rendered": Talents.desc_for(n, 1),
+			"scale": n.get("scale", {}), "payload": n.get("payload", {}),
+		})
+	print("  NODES: %d (expected %d)" % [out.size(), Talents.TIERS * Talents.NODES_PER_TIER])
 	var dump := OS.get_environment("DOD_DUMP")
 	if dump != "":
 		var f := FileAccess.open(dump, FileAccess.WRITE)

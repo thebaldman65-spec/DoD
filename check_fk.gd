@@ -353,11 +353,21 @@ func _s6_the_standing_ground_is_absent() -> void:
 		"§6: Consecrated Ground no longer stamps the whole party — the rune is authorable now")
 	ok(battle.contains('_gain_faith(u, FAITH_PER_GROUND_TURN, "ground")'),
 		"§6: the ground's drip no longer pays the hero standing in it")
-	# ...and Fervor still grants no Faith, which is the brief's OTHER false
-	# premise. It is a payout multiplier and it has never touched the drip.
-	var talents := FileAccess.get_file_as_string("res://scripts/talents.gd")
-	ok(talents.contains("It grants no extra Faith at all."),
-		"§6: Fervor's own text no longer says it grants no Faith")
+	# ...and Fervor granted no Faith, which was the brief's OTHER false premise:
+	# a payout multiplier that never touched the drip.
+	#
+	# **BATCH FX — ONE CHECK STOOD HERE AND IT IS DELETED UNDER DG §2.** It
+	# pinned Fervor's own desc in `talents.gd` ("It grants no extra Faith at
+	# all.") so that the brief's claim — *Fervor is the node that already extends
+	# the ground to allies* — stayed visibly false. **FX deleted the twelve spec
+	# trees and `dv_fervor` with them**: the one tree has no node of that name, no
+	# Faith node at all (a talent may not touch an engine), and nothing writing
+	# its `fervor` field; no rune writes `fervor` either (swept over
+	# `data/runes.json`). The premise has no subject left anywhere a check can
+	# read, so there is nothing to re-point it at. The field and its read sites
+	# stand, dormant, in `battle.gd`. **The two assertions above are the REASON
+	# the Standing Ground is inert, and they are untouched** — this section still
+	# asks its question; only the record of a second, now-moot premise is gone.
 
 
 # **STRIP THE COMMENT, KEEP THE STRINGS.** FJ §5's rule: half this codebase's

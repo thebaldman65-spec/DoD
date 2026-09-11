@@ -70,7 +70,7 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_ec check_ed check_eg check_eh check_ek check_el check_em
        check_es check_et check_eu check_ev check_ew check_ez check_fd
        check_fe check_ff check_fg check_fh check_fi check_fk check_fm check_fn
-       check_fo check_fq check_fr check_fs check_ft)
+       check_fo check_fq check_fr check_fs check_ft check_fx)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -157,6 +157,17 @@ SCENE[check_map_screen]="res://check_map_screen.tscn"
 SCENE[check_ct_map]="res://check_ct_map.tscn"
 TMO[check_map_screen]=600
 TMO[check_ct_map]=600
+# BATCH FX — `check_fx` WAITS RATHER THAN WORKS, AND ITS LOW CPU IS NOT A HANG.
+# It drives every node of the talent tree through `_resolve` live, and
+# `battle._wait()` awaits a real timer — the hit animation's pause — unless the
+# battle is in `sim` mode. The gate deliberately does not set `sim`, because
+# that would change what "every node pays, live" measures. MEASURED at FX over
+# the finished tree: 354 s wall, with §0-§4(a) done in about 3 s and the rest
+# spent in §4(b) at a few percent CPU. The 240 s default killed it inside §4(b)
+# in the pre-pass, printed as "TIMED OUT", and left `check_de` reading its count
+# as `?`. So it gets its own bound at about twice the measurement, the way
+# `check_map` got its own, and the global bound stays sharp for everything else.
+TMO[check_fx]=720
 # BATCH DE — `TMO[test_batch_cd]=2400` IS GONE AND SO IS THE REASON FOR IT.
 # DD gave that suite a 2400s bound because its §1 spawned forty-five child
 # Godots — it ran the battery inside the battery, about 22 minutes of a run
@@ -256,7 +267,7 @@ echo "=== SUITES ==="
 for s in $SUITES; do run_one $s; done
 echo "=== GATES ==="
 for g in $GATES; do run_one $g; done
-echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/166/8) ==="
+echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/382/8) ==="
 for n in 1 2 3; do
   echo "harness_$n" >> "$RAN"
   DOD_GATE=$n "$GODOT" --headless --path . --script test_run_harness.gd \

@@ -3090,13 +3090,15 @@ func effective_armor() -> float:
 func _refresh_chips() -> void:
 	# Iron Will's chip tracks the live debuff count (this runs on every
 	# status change, so the readout can never go stale).
+	# BATCH FX — the chip no longer says "the Warden": the counter is written
+	# by a node every class can buy, and the chip rides the counter.
 	if iron_will_ranks > 0:
 		for s in statuses:
 			if s.id == "iron_will":
 				var n := count_debuffs()
 				var pct := 12 * iron_will_ranks * n
 				s.short = "-%d%%" % pct
-				s.desc = "Iron Will: takes 12%% less damage\nfor every debuff on the Warden.\nCurrently -%d%% (%d debuff%s)." % [
+				s.desc = "Iron Will: takes 12%% less damage\nfor every debuff carried.\nCurrently -%d%% (%d debuff%s)." % [
 					pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
@@ -3441,7 +3443,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			resource -= paid
 			note_resource_spent(paid)  # BATCH CZ §1 — it left the bar
 			float_text("-%d Rage" % paid, Color(0.9, 0.35, 0.3))
-			_proc_log("Talent: Last Rites — %s pays %d of the wound in Rage" % [
+			_proc_log("Talent: Pay a Lethal Hit out of Your Resource Pool — %s pays %d of the wound in Rage" % [
 				unit_name, paid])
 	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
 	# ADDITIVE — the counter is percentage POINTS of the hit (Batch AT).
@@ -3451,7 +3453,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			amount -= converted
 			resource -= converted
 			float_text("-%d Mana" % converted, Color(0.5, 0.7, 1.0))
-			_proc_log("Talent: Conversion — %s pays %d of the hit in Mana" % [
+			_proc_log("Talent: Pay a Lethal Hit out of Your Resource Pool — %s pays %d of the hit in Mana" % [
 				unit_name, converted])
 	# Stable Alignment (Arcanist talent): one attack can only cut so deep.
 	# ADDITIVE — the counter IS the cap as a % of max health (Batch AT).
@@ -3573,7 +3575,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		undying_rage_used = true
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
-		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
+		_proc_log("Talent: Refuse Death Once — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
 	# BATCH BL §2 — BOOKED BELOW ALL FOUR DEATH-REFUSALS (Hold the Line, Undying
@@ -3884,7 +3886,7 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		undying_rage_used = true
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
-		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
+		_proc_log("Talent: Refuse Death Once — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
 	# BATCH BL §2 — same rule as take_hit: below every death-refusal.

@@ -142,10 +142,9 @@ func _draw_screen() -> void:
 		var dbtn := Button.new()
 		dbtn.text = "%s%d — %s" % ["[*] " if difficulty == key else "",
 			int(def["rung"]), def["name"]]
-		dbtn.tooltip_text = "%s\nEnemies at %d%% strength.\nBeating the end boss here opens talent rows %d-%d." % [
+		dbtn.tooltip_text = "%s\nEnemies at %d%% strength.\nBeating the end boss here opens talent tier %d." % [
 			def["blurb"], int(round(float(def["mult"]) * 100)),
-			Talents.rows_unlocked(int(def["rung"]) - 1) + 1,
-			Talents.rows_unlocked(int(def["rung"]))]
+			Talents.tiers_open(int(def["rung"]))]
 		dbtn.custom_minimum_size = Vector2(140, 40)
 		dbtn.position = Vector2(dx, 640)
 		dbtn.add_theme_font_size_override("font_size", 13)

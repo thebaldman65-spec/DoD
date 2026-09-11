@@ -415,12 +415,26 @@ func _coverage(data: Dictionary) -> void:
 			ok(live_with_lane.is_empty(),
 				"%s: %s are live and still carry a `lane` — the severed rule is back"
 					% [spec, live_with_lane])
-			# Lanes come out of LANE_TREES, never a written list (Batch Y's
-			# 70%-vs-53% drift is the precedent for not trusting prose).
-			var tree_lanes := {}
-			for node in Talents.generate_tree(spec, key):
-				if String(node.get("lane", "")) != "":
-					tree_lanes[String(node["lane"])] = true
+			# ── BATCH FX — THE TWO ASSERTIONS THAT READ THE TALENT TREE ARE
+			#    DELETED (DG §2), AND THE RECORD THEY SAT BESIDE IS STILL PINNED ──
+			# This walk derived each spec's lanes out of its talent tree (never a
+			# written list — Batch Y's 70%-vs-53% drift was the precedent) and
+			# asked the tree two things: that every lane rune names a lane its
+			# spec's tree holds (`names lane '…', which is not in its … entry` —
+			# one check a lane rune, 3 a spec, 36 in all) and that the three lane
+			# runes cover every lane that tree has (`covers N of M lanes` — one a
+			# spec, 12). **FX DELETED THE TWELVE SPEC TREES, AND THEIR LANES WITH
+			# THEM**: the one class tree has no lanes, and no lane is recorded
+			# anywhere a check can read it. Both questions lost their SUBJECT, not
+			# their answer — 48 checks, deleted, and this is the site that says so.
+			# **WHAT THE RETIRED SET ITSELF STILL SAYS IS STILL ASSERTED**, because
+			# none of it ever needed the tree: four runes a spec, three of them on
+			# three DISTINCT lanes (`two runes on lane`, below), exactly one splash,
+			# exactly one lane rune charging for its upside and never the splash.
+			# The `lane` field on those 65 entries is HISTORY now — no script reads
+			# it but `Runes.build`, which copies it onto the instance, and nothing
+			# renders it. The live pool carrying no lane is the half that still
+			# binds, and it is asserted above.
 			var covered := {}
 			var splash := 0
 			# **BATCH ES §3 — DERIVED THROUGH `is_cost`, NOT OFF A FLAG.** The
@@ -440,14 +454,9 @@ func _coverage(data: Dictionary) -> void:
 					continue
 				if charges:
 					costed_on_lane += 1
-				ok(tree_lanes.has(lane),
-					"%s: rune %s names lane '%s', which is not in its LANE_TREES entry" % [
-						spec, id, lane])
 				ok(not covered.has(lane), "%s: two runes on lane '%s'" % [spec, lane])
 				covered[lane] = true
 			ok(splash == 1, "%s: %d splash runes, expected exactly 1" % [spec, splash])
-			ok(covered.size() == tree_lanes.size(),
-				"%s: covers %d of %d lanes" % [spec, covered.size(), tree_lanes.size()])
 			ok(costed_on_lane == 1,
 				"%s: %d lane runes charge for their upside, expected exactly 1" % [
 					spec, costed_on_lane])

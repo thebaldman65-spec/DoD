@@ -357,22 +357,30 @@ func _names() -> void:
 			seen[n] = cls
 	# Against every TALENT-GRANTED ability in the game, which is the half that
 	# actually bit this batch — see `_backdraft_collision` below.
-	for spec in Classes.SPEC_IDS:
-		var tree: Array = Talents.LANE_TREES.get(spec, [])
-		for node in tree:
-			var payload: Dictionary = node.get("payload", {})
-			for key in ["new_ability", "grant_ability"]:
-				if not payload.has(key):
-					continue
-				var granted = payload[key]
-				var gname: String = granted if granted is String \
-					else String(granted.get("display_name", ""))
-				if gname == "":
-					continue
-				for n in NINE:
-					ok(gname != n,
-						"%s does not collide with the %s talent grant '%s'" % [
-							n, spec, gname])
+	#
+	# **BATCH FX — RE-POINTED AT THE ONE TREE, AND IT HAD BEEN WALKING NOTHING.**
+	# It read `Talents.LANE_TREES.get(spec, [])` over `Classes.SPEC_IDS`, whose
+	# keys are the four CLASSES, while the twelve trees were keyed by SPEC — so
+	# on the tree FX replaced every lookup missed and the loop walked zero nodes.
+	# (It would have met no grant anyway: the last one left the trees at DO.)
+	# FX deleted the twelve trees, and this walks every node of the one tree
+	# that replaced them. It still meets no grant, because that tree grants
+	# nothing — and `_backdraft_collision` below now ASSERTS that, over a walk it
+	# proves is real, so this loop's silence is a stated rule, not a blind spot.
+	for node in Talents.TREE:
+		var payload: Dictionary = node.get("payload", {})
+		for key in ["new_ability", "grant_ability"]:
+			if not payload.has(key):
+				continue
+			var granted = payload[key]
+			var gname: String = granted if granted is String \
+				else String(granted.get("display_name", ""))
+			if gname == "":
+				continue
+			for n in NINE:
+				ok(gname != n,
+					"%s does not collide with the one tree's talent grant '%s'" % [
+						n, gname])
 	# And against every RUNE name in the pool — the last third of BR §1's
 	# sweep, read off the live data rather than from a transcription here.
 	for rid in Runes.ids():
@@ -395,16 +403,39 @@ func _backdraft_collision() -> void:
 	# the node must not carry the name and must not grant anything, and the
 	# ability must be a real draft card. A batch that "restored" either half
 	# would re-create the fault CB found.
-	var found_node := false
-	for node in Talents.LANE_TREES.get("pyromancer", []):
-		if String(node.get("id", "")) == "py_melt":
-			found_node = true
-			ok(String(node.get("name", "")) != "Backdraft",
-				"py_melt no longer collides with the card name (it is: %s)"
-					% String(node.get("name", "")))
-			ok(Talents.granted_name(node.get("payload", {})) == "",
-				"py_melt grants nothing — a talent may not (DO's charter)")
-	ok(found_node, "the py_melt node still exists, with its id and its cell")
+	#
+	# **BATCH FX — BOTH HALVES RE-POINTED AT THE ONE TREE, AND ONE CHECK DELETED
+	# (DG §2).** FX deleted the twelve spec trees and `py_melt` with them, so the
+	# two halves are asked of the tree a Pyromancer wears now: NO node of
+	# `Talents.TREE` carries the name Backdraft, and NO node of it grants
+	# anything at all — DO's charter, which FX's line keeps (a talent may not
+	# touch an ability). THE THIRD CHECK IS DELETED, AND IT WAS ONE CHECK: "the
+	# py_melt node still exists, with its id and its cell" asked that the cell DO
+	# re-authored had kept its id, lane and row, so a saved allocation priced off
+	# that row stayed right. Its subject is a cell of a deleted tree and nothing
+	# in the one tree answers it — no node there is py_melt or re-authors it, and
+	# the v3 fold drops every v2 cell. Pinning the id ABSENT instead would assert
+	# a fact about FX rather than about this card, and would put a dead id back
+	# into the code as a live-looking literal. **IT WAS ALSO THE GUARD THAT THE
+	# TWO CHECKS BESIDE IT HAD RUN AT ALL** — with the node not found they
+	# silently did not — and that half is live, because a walk over an empty
+	# tree passes both. So each of the two now carries its own proof that the
+	# walk read a real tree: the guard's question is kept without its subject.
+	var walked := 0
+	var named := 0
+	var grants := 0
+	for node in Talents.TREE:
+		walked += 1
+		if String(node.get("name", "")) == "Backdraft":
+			named += 1
+		if Talents.granted_name(node.get("payload", {})) != "":
+			grants += 1
+	ok(walked > 0 and named == 0,
+		"no node of the one tree carries the card name Backdraft (%d of %d nodes do)"
+			% [named, walked])
+	ok(walked > 0 and grants == 0,
+		"no node of the one tree grants anything — a talent may not (DO's charter, kept by FX's line; %d of %d nodes do)"
+			% [grants, walked])
 	# The name resolves to the DRAFT card now, and to nothing else.
 	ok(Classes.draft_ability("Backdraft") != null,
 		"Backdraft is a DRAFT card now")

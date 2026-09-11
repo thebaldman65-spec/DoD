@@ -37,13 +37,12 @@
 #                            v1 floor: carried items are never drunk.
 #                            Run sims only — sweep/standalone battles
 #                            stay dry so Batch R/S baselines hold.
-#   Talents (DOD_SIM_BUILDS) "spec:LaneName,..." — buy that lane's node in
-#                            every row, top to bottom, then its capstone
-#                            (Batch AI: a lane holds one node per row, so
-#                            this is always a complete 8-node build).
-#                            Default = each tree's first lane. Elite points
-#                            go to the second node in the lowest row that
-#                            has one, from the next lane in tree order.
+#   Talents (DOD_SIM_TIERS)  BATCH FX: the one class tree, every cell of
+#                            the first N tiers (0-3, default 3 — the whole
+#                            tree). DOD_SIM_ROWS is honoured as its old
+#                            meaning, rows/3 tiers (3 / 6 / 9 -> 1 / 2 / 3).
+#                            DOD_SIM_BUILDS is RETIRED: it named a LANE, and
+#                            the tree has none.
 #   Trophies (DOD_SIM_TROPHIES) comma list of preferred ability names;
 #                            default = first unowned in the spec's pool.
 #   Events                   take the first valid choice; the report
@@ -51,10 +50,11 @@
 #   Blacksmith               buy the first offered pairing when the gold
 #                            clears the 40g reserve (Batch BK §3).
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
-#   Elite rune spoils        pick-of-3 resolved instantly: build-lane
-#                            match first, then spec-scoped, else the
-#                            first candidate; auto-equip while a slot
-#                            (Run.rune_slots: 2/3/4 by zone) is free.
+#   Elite rune spoils        pick-of-3 resolved instantly: spec-scoped
+#                            first, else the first candidate (the build-lane
+#                            preference went with the lanes at FX);
+#                            auto-equip while a slot (Run.rune_slots:
+#                            2/3/4 by zone) is free.
 #
 # NEVER PERSISTS: Run.sim_run gates save_run/clear_save, and this file
 # never calls Relics.unlock_random or any Profile hook — a simulated run
@@ -79,11 +79,10 @@ static var event_counts := {}     # event id -> times fired across all runs
 # stage-0b resolution block counts boss reaches, which is still a real thing.
 static var boss_entries := 0
 static var boss_nodes_sum := 0.0  # avg nodes EQUIPPED entering a boss
-static var rows_built := Talents.CAPSTONE_ROW  # DOD_SIM_ROWS: rows the loadout fills
+static var tiers_built := Talents.TIERS  # DOD_SIM_TIERS: tiers the build fills
 static var diff_id := "wanderer"   # the rung this invocation walked, cached at
 static var diff_rung := 1          # start_run — RunSim may never name `Run`
 static var route := "balanced"
-static var builds := {}           # spec -> target lane name
 static var shops_on := true       # Batch U shop policy (DOD_SIM_SHOPS=off -> v1 floor)
 static var items_on := true       # Batch U drink policy (DOD_SIM_ITEMS=off -> v1 floor)
 # Batch AN §3: what the bot took at the offer screen. offer_severity_sum /
@@ -209,17 +208,25 @@ static func begin(run: Node, n: int) -> void:
 		route = "balanced"
 	shops_on = not OS.get_environment("DOD_SIM_SHOPS") in ["off", "0"]
 	items_on = not OS.get_environment("DOD_SIM_ITEMS") in ["off", "0"]
-	for pair in OS.get_environment("DOD_SIM_BUILDS").split(",", false):
-		var bits: PackedStringArray = pair.split(":")
-		if bits.size() == 2:
-			builds[bits[0].strip_edges()] = bits[1].strip_edges()
-	# BATCH BM: DOD_SIM_ROWS is how many of the nine rows the equipped
-	# loadout fills — 0 for an untalented party, 3 / 6 / 9 for the builds §7
-	# pairs with each rung. Default 9 (a full tree); 0 is a real value, so
-	# the check is "was it set", not "is it non-zero".
+	# BATCH FX — DOD_SIM_BUILDS NAMED A LANE, AND THE TREE HAS NONE. It is
+	# retired rather than left meaning something else; a script still setting
+	# it is told so instead of silently getting the default.
+	if OS.get_environment("DOD_SIM_BUILDS") != "":
+		push_warning("DOD_SIM_BUILDS is retired (Batch FX): the talent tree has no lanes. Ignored.")
+	# BATCH BM: how deep the build is — 0 for an untalented party, and a rung's
+	# worth for the builds §7 pairs with each rung. FX re-cut it by TIER:
+	# DOD_SIM_TIERS is 0-3 (default 3, the whole tree); DOD_SIM_ROWS keeps its
+	# old meaning as rows/3, so every script that set 0 / 3 / 6 / 9 still asks
+	# for the same depth. 0 is a real value, so the check is "was it set", not
+	# "is it non-zero".
+	var tiers_env := OS.get_environment("DOD_SIM_TIERS")
 	var rows_env := OS.get_environment("DOD_SIM_ROWS")
-	rows_built = clampi(int(rows_env), 0, Talents.CAPSTONE_ROW) if rows_env != "" \
-		else Talents.CAPSTONE_ROW
+	if tiers_env != "":
+		tiers_built = clampi(int(tiers_env), 0, Talents.TIERS)
+	elif rows_env != "":
+		tiers_built = clampi(int(rows_env) / 3, 0, Talents.TIERS)
+	else:
+		tiers_built = Talents.TIERS
 	start_run(run)
 
 
@@ -711,9 +718,9 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
 		# Pick-of-3 (Batch X), resolved instantly by bot policy — dumb and
-		# printed in the report header: prefer a candidate whose lane
-		# matches the spec's DOD_SIM_BUILDS target lane, then any
-		# spec-scoped candidate, else the first. Auto-equip while a slot
+		# printed in the report header: prefer a spec-scoped candidate,
+		# else the first (the build-lane preference went with the talent
+		# lanes at FX). Auto-equip while a slot
 		# (Run.rune_slots) is free. Empty = DOD_SIM_RUNES=off — the elite
 		# still drops its item.
 		var candidates: Array = run.roll_rune_candidates(looter)
@@ -961,15 +968,16 @@ static func _award_draft(run: Node, m: Dictionary) -> void:
 		draft_dropped += 1
 
 
-# BATCH BM — THE BOT NO LONGER SPENDS POINTS, IT EQUIPS A LOADOUT. Talents
+# BATCH BM — THE BOT NO LONGER SPENDS POINTS, IT WEARS A BUILD. Talents
 # are meta progression now: there is no in-run purse, and what a run wears is
-# decided before it starts. DOD_SIM_BUILDS still names a lane per spec and
-# still means "that lane's node in every row"; DOD_SIM_ROWS says how many of
-# the nine rows the build is allowed to fill, which is what makes §7's
-# "rows 1-3 at rung 1, 1-6 at rung 2, 1-9 at rung 3" measurable.
+# decided before it starts.
+# BATCH FX — THE BUILD IS EVERY CELL OF THE FIRST `tiers_built` TIERS OF THE
+# ONE CLASS TREE. There is no lane to choose and nothing exclusive to choose
+# between, so a tier's depth is the whole of a build's description, which is
+# what keeps §7's "tier 1 at rung 1, 1-2 at rung 2, all at rung 3" measurable.
 #
 # IT NEVER READS Profile. A sim that read the player's ledger would make
-# every baseline depend on whoever ran it; the loadout is installed on
+# every baseline depend on whoever ran it; the build is installed on
 # `Run.sim_talents` and `Run.equip_spec_talents` reads that under sim_run.
 static func install_builds(run: Node) -> void:
 	var loadout := {}
@@ -977,41 +985,16 @@ static func install_builds(run: Node) -> void:
 		var tree: Array = Talents.generate_tree(String(spec), "")
 		if tree.is_empty():
 			continue
-		var target := _target_lane(String(spec), tree)
 		var learned := {}
-		for row in range(1, mini(rows_built, Talents.CAPSTONE_ROW) + 1):
-			var picked := ""
-			for t in Talents.row_nodes(tree, row):
-				if String(t.get("lane", "")) == target:
-					picked = String(t["id"])
-					break
-			# The capstone shelf has no lane purity, so a lane whose shelf
-			# entry sits elsewhere still takes one — the first on the shelf.
-			if picked == "" and row == Talents.CAPSTONE_ROW:
-				var shelf := Talents.row_nodes(tree, row)
-				if not shelf.is_empty():
-					picked = String(shelf[0]["id"])
-			if picked != "":
-				learned[picked] = 1
+		for t in tree:
+			if Talents.tier_of(t) <= tiers_built:
+				learned[String(t["id"])] = 1
 		loadout[String(spec)] = learned
 	run.sim_talents = loadout
 
 
-static func _target_lane(spec: String, tree: Array) -> String:
-	var want := String(builds.get(spec, ""))
-	if want != "":
-		return want
-	return String(tree[0].get("lane", ""))
-
-
 static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dictionary:
 	var spec := String(member.get("spec", ""))
-	var tree: Array = member.get("tree", [])
-	var target := _target_lane(spec, tree) if not tree.is_empty() else ""
-	if target != "":
-		for c in candidates:
-			if String(c.get("lane", "")) == target:
-				return c
 	for c in candidates:
 		if String(c.get("scope", "")) == "spec:%s" % spec:
 			return c
@@ -1072,30 +1055,22 @@ static func _print_report(battle) -> void:
 		wipes.size(), 100.0 * wipes.size() / runs])
 	var relics_env := OS.get_environment("DOD_SIM_RELICS")
 	var troph := OS.get_environment("DOD_SIM_TROPHIES")
-	var builds_env := OS.get_environment("DOD_SIM_BUILDS")
 	var shops_desc := "on(heal<50% first, then priciest unowned incl. runes; 40g reserve)" \
 		if shops_on else "OFF(v1 floor: buy nothing)"
 	var items_desc := "on(drink Health Potion <35% HP)" \
 		if items_on else "OFF(v1 floor: never drinks)"
 	print("Policies: route=%s shops=%s" % [route, shops_desc])
 	# BATCH DB §3 — THE CAVEAT IS PRINTED BESIDE THE FIGURE, NOT FILED AWAY.
-	# `DOD_SIM_BUILDS` defaults to each tree's FIRST lane, so the other two
-	# thirds of every talent tree have never appeared in ANY measurement taken
-	# in this project — Glacial Prison, Second Prison, Cold Snap, Glacial
-	# Economy and Absolute Zero among them. THIS IS NOT A BUG: a fixed default
-	# party is exactly what makes arms comparable across batches. It is a
-	# permanent caveat on every sim figure, and it belongs where the next person
-	# reading one will actually meet it. The counts are DERIVED, so a lane or a
-	# spec added later moves them without anybody remembering to.
-	var lanes_total := Talents.LANES * Classes.all_specs().size()
-	var lanes_seen := Classes.all_specs().size()
-	var builds_desc := builds_env
-	if builds_desc == "":
-		builds_desc = "default(FIRST LANE of each tree — %d of %d lanes NEVER MEASURED)" % [
-			lanes_total - lanes_seen, lanes_total]
+	# BATCH FX — AND THE CAVEAT DB PRINTED HERE IS GONE WITH ITS CAUSE. It said
+	# two thirds of every tree had never been measured, because a build was one
+	# LANE; the tree has no lanes now, and a build is every cell of its tiers,
+	# so no node of the tree is outside a full-depth sim. The depth is printed
+	# instead, because it is the one thing a build can vary.
+	var builds_desc := "every cell of tiers 1-%d of the one class tree" % tiers_built \
+		if tiers_built > 0 else "untalented"
 	print("          items=%s builds=%s relics=%s" % [items_desc, builds_desc,
 		relics_env if relics_env != "" else "none"])
-	print("          trophies=%s runes=elite-pick(lane>spec>first)+auto-equip(2/3/4 slots) events=first-valid" % [
+	print("          trophies=%s runes=elite-pick(spec>first)+auto-equip(2/3/4 slots) events=first-valid" % [
 		troph if troph != "" else "first-in-pool"])
 	# Mirrors Run.runes_mode() without touching the autoload (RunSim reads
 	# no autoloads — the injection discipline).
@@ -1105,16 +1080,17 @@ static func _print_report(battle) -> void:
 	# BATCH BM: the RUNG this row was walked at, read off the live run rather
 	# than off the env — Batch Y's "standard" still resolves and maps to rung
 	# 2, so an old script's row would otherwise print a name the ladder does
-	# not have. `rows=` is the equipped loadout's depth, which is the OTHER
-	# axis §7 pairs with the rung.
+	# not have. `tiers=` is the build's depth, which is the OTHER axis §7
+	# pairs with the rung (BATCH FX: it read `rows=` of 9 until the tree lost
+	# its rows).
 	# THE INJECTION DISCIPLINE (the Events pattern): a class_name script cannot
 	# name an autoload — `Run` does not resolve here, and a --script test proves
 	# it by failing to compile. Both are cached at start_run, where the run
 	# object is in hand.
 	var diff := diff_id
 	var rung := diff_rung
-	print("          map=branch (BATCH BM: 3 zones x 16 slots + the END BOSS = 49 encounters)  difficulty=%s rung %d of 3 (DOD_SIM_DIFFICULTY)  rows=%d of %d equipped (DOD_SIM_ROWS)" % [
-		diff, rung, rows_built, Talents.CAPSTONE_ROW])
+	print("          map=branch (BATCH BM: 3 zones x 16 slots + the END BOSS = 49 encounters)  difficulty=%s rung %d of 3 (DOD_SIM_DIFFICULTY)  tiers=%d of %d worn (DOD_SIM_TIERS)" % [
+		diff, rung, tiers_built, Talents.TIERS])
 	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
@@ -1319,8 +1295,8 @@ static func _print_report(battle) -> void:
 	# talent points. What it wears was decided before it started, and THAT is
 	# what the harness now reports. Meta points banked per run are a Profile
 	# number and deliberately not measured here (a sim never touches Profile).
-	print("Talent rows equipped: %d of %d   (nodes/hero %.1f over %d boss fights)" % [
-		rows_built, Talents.CAPSTONE_ROW,
+	print("Talent tiers worn: %d of %d   (nodes/hero %.1f over %d boss fights)" % [
+		tiers_built, Talents.TIERS,
 		boss_nodes_sum / maxf(boss_entries, 1.0), boss_entries])
 	var ev_parts := PackedStringArray()
 	var ev_ids: Array = event_counts.keys()
@@ -1479,8 +1455,8 @@ static func _print_report(battle) -> void:
 	# depth= is out of 49 SLOTS (BATCH BM added the end boss) not 48, and route= is a real axis again rather
 	# than three names for one walk. A row carrying `map=line` is an AN-to-BJ
 	# row; `map=branch` is BK or later; anything else predates both.
-	print("Matrix row: route=%s  map=branch  diff=%s(r%d) rows=%d  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 49)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
-		route, diff, rung, rows_built,
+	print("Matrix row: route=%s  map=branch  diff=%s(r%d) tiers=%d  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 49)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
+		route, diff, rung, tiers_built,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		power_mult,
 		(offer_severity_sum / float(maxi(offer_count, 1))),

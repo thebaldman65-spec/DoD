@@ -38,6 +38,18 @@
 # that bumps either does not fail this gate for bumping it. **The RELATION is
 # pinned and the NUMBERS are not.**
 #
+# **BATCH FX MOVED BOTH NUMBERS (v3, floor 2) AND NOT ONE ARM BELOW NEEDED A
+# LITERAL FOR IT** — the relation doing its job. What FX did change is the
+# SHAPE: v3 keys the talent ledger to the CLASS, so the accepted fixture is
+# v3-shaped (class purses, cells in the one tree, no loadout) and every purse
+# is read by a class key; the round trip's accessor for the equipped LOADOUT is
+# deleted with the loadout (§3 records it at the site). A v2 file is no longer
+# loaded as-is — it is FOLDED — and the fold, its own refusal, the refused
+# fold's untouched file and the moved floor are all driven by `check_fx` §3.
+# This gate keeps FQ's four questions — refuse a newer build, refuse below the
+# floor, refuse rather than zero an unreadable file, never overwrite a refused
+# one — and does not repeat that section.
+#
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_fq.gd
 extends SceneTree
@@ -52,6 +64,9 @@ const SCRATCH := "user://check_fq_profile.json"
 
 var _g := Gate.new()
 
+# The path the redirect replaced, put back by `_cleanup()` as its last act.
+var _real_path := ""
+
 
 func ok(cond: bool, what: String) -> void:
 	_g.ok(cond, what)
@@ -59,6 +74,7 @@ func ok(cond: bool, what: String) -> void:
 
 func _initialize() -> void:
 	await process_frame
+	_real_path = Profile.save_path
 	Profile.save_path = SCRATCH
 	print("BATCH FQ — THE PROFILE'S VERSION GUARD")
 	_s0_the_redirect()
@@ -94,6 +110,11 @@ func _reload() -> void:
 
 
 # A profile with something in every bucket, so §3 has something to lose.
+#
+# BATCH FX — v3-SHAPED. The chronicle buckets are still keyed by SPEC; the talent
+# ledger is keyed by CLASS, its cells name nodes of the one tree (read off
+# `Talents.tree()` rather than typed, so a re-authored node cannot strand this
+# fixture), and there is no `talent_equipped` — v3 has no loadout.
 func _populated() -> Dictionary:
 	return {
 		"version": Profile.VERSION,
@@ -105,16 +126,44 @@ func _populated() -> Dictionary:
 		"events_seen": {"blood_altar": 2, "cursed_idol": 3},
 		"zones_cleared": 13,
 		"flags": {"run_framing_seen": true, "skill_check_taught": true},
-		"talent_points": {"berserker": 68, "holy": 66},
-		"talent_cells": {"berserker": {"bz_savagery": true, "bz_hemorrhage": true}},
-		"talent_equipped": {"berserker": {"1": "bz_savagery"}},
+		"talent_points": {"warrior": 68, "cleric": 66},
+		"talent_cells": {"warrior": {_cell(0): true, _cell(1): true}},
 		"talent_tier": 3,
 	}
 
 
+# The id of the n-th tier-1 node: cells a class can own at any rung past 0.
+func _cell(n: int) -> String:
+	return String(Talents.tier_nodes(Talents.tree(), 1)[n]["id"])
+
+
+# Every accessor §3's round trip compares, read in ONE place so the before and
+# the after cannot drift apart.
+func _accessors() -> Dictionary:
+	return {
+		"points_warrior": Profile.talent_points_earned("warrior"),
+		"points_cleric": Profile.talent_points_earned("cleric"),
+		"avail_warrior": Profile.talent_points_available("warrior"),
+		"tier": Profile.talent_tier(),
+		"cells_warrior": Profile.talent_cells("warrior").size(),
+		"worn_warrior": Profile.worn_talents("warrior").size(),
+		"owns": Profile.owns_cell("warrior", _cell(0)),
+		"completions": Profile.completions_for("berserker"),
+		"events": Profile.distinct_events_seen(),
+		"flag": Profile.flag("run_framing_seen"),
+		"zones": int(Profile._load()["zones_cleared"]),
+	}
+
+
+# The scratch file goes, and the redirect is undone LAST with nothing loaded:
+# the in-memory profile is the scratch one, so it is dropped first, and a stray
+# read after this point would read the real file rather than write over it.
 func _cleanup() -> void:
 	if FileAccess.file_exists(SCRATCH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SCRATCH))
+	Profile.loaded = false
+	Profile.data = {}
+	Profile.save_path = _real_path
 
 
 # ═══ §0 — THE REDIRECT, ASSERTED BEFORE ANYTHING WRITES ══════════════════════
@@ -143,8 +192,8 @@ func _s1_refuses_and_accepts() -> void:
 	_reload()
 	ok(not Profile.refused,
 		"§1a: a profile written at the CURRENT version was REFUSED — the guard refuses everything, and §2's arms below are passing vacuously")
-	ok(Profile.talent_points_earned("berserker") == 68,
-		"§1a: an accepted profile did not read its own purse back (got %d, wrote 68)" % Profile.talent_points_earned("berserker"))
+	ok(Profile.talent_points_earned("warrior") == 68,
+		"§1a: an accepted profile did not read its own purse back (got %d, wrote 68)" % Profile.talent_points_earned("warrior"))
 	ok(Profile.talent_tier() == 3,
 		"§1a: an accepted profile did not read its own tier back")
 	ok(Profile.refusal_message() == "",
@@ -154,11 +203,11 @@ func _s1_refuses_and_accepts() -> void:
 	# §1b — BELOW THE FLOOR. A missing version key reads 0, which is the shape
 	# `run_state.load_run()` refuses and the shape a file this build never wrote
 	# arrives in.
-	_write(JSON.stringify({"talent_points": {"berserker": 68}}))
+	_write(JSON.stringify({"talent_points": {"warrior": 68}}))
 	_reload()
 	ok(Profile.refused,
 		"§1b: a profile with NO VERSION KEY was accepted — it reads 0, which is below the floor, and its keys were merged over the defaults")
-	ok(Profile.talent_points_earned("berserker") == 0,
+	ok(Profile.talent_points_earned("warrior") == 0,
 		"§1b: a REFUSED profile's purse was read anyway — the refusal returned before the merge and it did not")
 
 	# §1c — ABOVE THE CEILING. The half that is live today: under the code this
@@ -212,14 +261,16 @@ func _s1_refuses_and_accepts() -> void:
 	_write(JSON.stringify(_populated()))
 	_reload()
 	var live_hash := _hash()
-	var before_points := Profile.talent_points_earned("berserker")
+	var before_points := Profile.talent_points_earned("warrior")
+	# The award still takes the party's SPECS and pays each spec's CLASS once
+	# (FX): a Berserker's zone boss is a point in the Warrior's purse.
 	Profile.award_zone_boss_points(["berserker"])
 	ok(_hash() != live_hash,
 		"§1g: an ACCEPTED profile did NOT write on a point earned — `_save()` is inert, the game has silently stopped saving, and every arm in §2 is passing because nothing writes at all")
-	ok(Profile.talent_points_earned("berserker") == before_points + 1,
-		"§1g: the point earned did not reach the purse (%d -> %d)" % [before_points, Profile.talent_points_earned("berserker")])
+	ok(Profile.talent_points_earned("warrior") == before_points + 1,
+		"§1g: the point earned did not reach the purse (%d -> %d)" % [before_points, Profile.talent_points_earned("warrior")])
 	print("  accepted profile WRITES: %d -> %d points, file changed"
-		% [before_points, Profile.talent_points_earned("berserker")])
+		% [before_points, Profile.talent_points_earned("warrior")])
 	print("  refused: no-key, +1, 99, non-dict, non-JSON — 5 shapes")
 
 
@@ -277,36 +328,19 @@ func _s3_round_trip() -> void:
 	ok(not Profile.refused, "§3: the round-trip profile was refused — every arm below is vacuous")
 
 	# Read every accessor BEFORE the save.
-	var before := {
-		"points_bz": Profile.talent_points_earned("berserker"),
-		"points_holy": Profile.talent_points_earned("holy"),
-		"avail_bz": Profile.talent_points_available("berserker"),
-		"tier": Profile.talent_tier(),
-		"cells_bz": Profile.talent_cells("berserker").size(),
-		"equipped_bz": Profile.talent_equipped("berserker").size(),
-		"learned_bz": Profile.equipped_talents("berserker").size(),
-		"owns": Profile.owns_cell("berserker", "bz_savagery"),
-		"completions": Profile.completions_for("berserker"),
-		"events": Profile.distinct_events_seen(),
-		"flag": Profile.flag("run_framing_seen"),
-		"zones": int(Profile._load()["zones_cleared"]),
-	}
+	#
+	# BATCH FX — THE LEDGER ACCESSORS TAKE A CLASS KEY NOW, AND ONE ROW IS
+	# DELETED (1 check). `equipped_bz` read `Profile.talent_equipped` — the
+	# per-row equipped LOADOUT — and v3 has no loadout: the one tree has no rows
+	# and no exclusive node, so a cell owned is a cell worn, and the accessor
+	# went with its subject (FX deleted it; the DG §2 exception). `learned_bz`
+	# read `Profile.equipped_talents`, the set a run wore, and its live form is
+	# `Profile.worn_talents` — so that row is RE-POINTED (`worn_warrior`), not
+	# deleted. The rest keep their question under a class key.
+	var before := _accessors()
 	Profile._save()
 	_reload()
-	var after := {
-		"points_bz": Profile.talent_points_earned("berserker"),
-		"points_holy": Profile.talent_points_earned("holy"),
-		"avail_bz": Profile.talent_points_available("berserker"),
-		"tier": Profile.talent_tier(),
-		"cells_bz": Profile.talent_cells("berserker").size(),
-		"equipped_bz": Profile.talent_equipped("berserker").size(),
-		"learned_bz": Profile.equipped_talents("berserker").size(),
-		"owns": Profile.owns_cell("berserker", "bz_savagery"),
-		"completions": Profile.completions_for("berserker"),
-		"events": Profile.distinct_events_seen(),
-		"flag": Profile.flag("run_framing_seen"),
-		"zones": int(Profile._load()["zones_cleared"]),
-	}
+	var after := _accessors()
 	for k in before:
 		ok(before[k] == after[k],
 			"§3: `%s` did not survive a save/load round trip (%s -> %s)" % [k, str(before[k]), str(after[k])])

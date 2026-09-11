@@ -27,6 +27,13 @@
 # the new value (it is a GUARD, not a magnitude), and §4's answer about the
 # contribution metric, which is a finding this batch reports and does not act
 # on.
+#
+# BATCH FX DELETED THE TWELVE SPEC TREES, AND COMMUNION WITH THEM. The field
+# (`communion_ranks`) and its one read site were KEPT, so every measured rate
+# is still asked: the Devout learns the retired node's EXACT payload through
+# the real spawn (FX_RETIRED, `_fx_tree`). What went is what only the node
+# could answer — its payload, scale, lane, row and tooltip — seven checks,
+# deleted where they stood.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -37,7 +44,23 @@ const Fixture = preload("res://suite_fixture.gd")
 
 # The design number, in one place: the tree payload, the tooltip and every
 # measured rate below are all checked against THIS.
+# BATCH FX: the tree payload and the tooltip went with the node; the measured
+# rates are still checked against it, driving FX_RETIRED's copy of the payload.
 const COMMUNION := 15
+
+# BATCH FX — THE NODES THIS SUITE LEARNED ARE DELETED; THEIR FIELDS ARE NOT. FX
+# removed the twelve spec trees and kept every read site of every field they
+# wrote (a field no node writes is dormant, not deleted). Each retired node a
+# live check learned is carried here as the EXACT payload it carried, and
+# `_fx_tree` hands the spawn the live tree PLUS those nodes, so the payload
+# still goes through `Talents.apply_from_tree` at the real spawn — the path the
+# old learn took. Neither has a precedent-mapped `tn_*` node.
+const FX_RETIRED := {
+	# FX: the payload the retired dv_communion (Communion) carried — the node is deleted, the field and its read site stand.
+	"dv_communion": {"name": "Communion", "payload": {"stat": {"communion_ranks": 15}}},
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is deleted, the field and its read site stand.
+	"dv_apostle": {"name": "Apostle", "payload": {"stat": {"apostle": 1}}},
+}
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2. The threshold is mirrored
 # ONCE per suite so the next move costs one line rather than a dozen literals.
 const RELEASE := 3
@@ -74,8 +97,8 @@ func _run() -> void:
 	Profile.loaded = false
 	Profile.data = {}
 
-	_the_number()
-	_the_tooltip_agrees()
+	# `_the_number` and `_the_tooltip_agrees` (§1, seven checks) were DELETED
+	# at FX — see their record where they stood.
 	_one_read_site()
 	_the_guard_is_not_a_magnitude()
 	_contribution_cannot_see_break()
@@ -110,8 +133,8 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
-func _node() -> Dictionary:
-	return Talents.node_in_tree(Talents.LANE_TREES["inquisitor"], "dv_communion")
+# `_node()` read dv_communion out of the Devout's tree; it went with the seven
+# checks FX deleted (their record is at §1 below).
 
 
 func _devout(scene: Node) -> BattleUnit:
@@ -122,10 +145,35 @@ func _devout(scene: Node) -> BattleUnit:
 # `learned` lands on the Cleric slot, which is where the Devout stands.
 func _spawn(learned := {}) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
+	# BATCH FX: a learned node the one tree does not hold rides in on the
+	# Devout's tree with its retired payload; the fixture writes `patch` after
+	# the member is built, so the spawn applies it.
+	var opts := {"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "heal_mult": 1.0, "sim": true}
+	if not learned.is_empty():
+		opts["patch"] = {2: {"tree": _fx_tree(learned)}}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "heal_mult": 1.0, "sim": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
+
+
+# The live tree, plus every learned node it no longer holds, carried with the
+# exact payload FX_RETIRED records. A learned id that is neither is a FAILURE
+# rather than a silent no-op: it would learn nothing, and every check reading
+# its field would read the field's zero as if the node had been measured.
+func _fx_tree(learned: Dictionary) -> Array:
+	var tree: Array = Talents.tree()
+	for id in learned:
+		var sid := String(id)
+		if not Talents.node_in_tree(tree, sid).is_empty():
+			continue
+		if not FX_RETIRED.has(sid):
+			checks += 1
+			fails.append("FX: `%s` is neither a live node nor a carried retired payload" % sid)
+			continue
+		var r: Dictionary = FX_RETIRED[sid]
+		tree.append({"id": sid, "name": String(r["name"]), "desc": "",
+			"payload": (r["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _kill(scene: Node) -> void:
@@ -149,33 +197,20 @@ func _isolate(scene: Node, target: BattleUnit, stacks: int) -> void:
 
 # ---------- §1: the number ----------
 
-func _the_number() -> void:
-	var n := _node()
-	ok(not n.is_empty(), "§1: dv_communion is still in the Faith lane")
-	if n.is_empty():
-		return
-	ok(int(n["payload"]["stat"]["communion_ranks"]) == COMMUNION,
-		"§1: Communion pays %d, not 40 (reads %s)" % [
-			COMMUNION, n["payload"]["stat"]["communion_ranks"]])
-	# THE PAIR IS THE POINT: the payload is what the code pays and the scale is
-	# what the tooltip renders. A reprice that moves one and not the other
-	# leaves the node lying rather than mistuned, which is worse.
-	ok(int(n["scale"]["step"]) == COMMUNION,
-		"§1: the tooltip's scale moved with the payload (reads %s)" % \
-			n["scale"]["step"])
-	ok(String(n["lane"]) == "Faith" and int(n["row"]) == 1,
-		"§1: it is still Faith row 1 — this is a reprice, not a re-spec")
-	ok(int(n["ranks"]) == 1, "§1: still a single-rank node")
-
-
-func _the_tooltip_agrees() -> void:
-	var n := _node()
-	if n.is_empty():
-		return
-	var txt := Talents.desc_for(n, 1)
-	ok(txt.contains("(%d x their own Faith stacks)%%" % COMMUNION),
-		"§1: the tooltip renders %d (reads %s)" % [COMMUNION, txt])
-	ok(not txt.contains("40"), "§1: and 40 appears nowhere in it")
+# §1 — `_the_number` AND `_the_tooltip_agrees` — DELETED AT BATCH FX, SEVEN
+# CHECKS, WITH THEIR SUBJECT (DG §2). They read dv_communion OUT OF THE
+# DEVOUT'S TREE: that it was still in the Faith lane (1), that its payload
+# paid 15 rather than 40 (1) and its tooltip scale said 15 (1), that it was
+# still Faith row 1 (1) and single-rank (1), and that its rendered tooltip read
+# "(15 x their own Faith stacks)%" with no 40 anywhere in it (2). FX deleted
+# the twelve spec trees and Communion with them, and no node of the one tree
+# writes `communion_ranks`: there is no payload, scale, lane, row or tooltip
+# left for the seven to read, and asserting FX_RETIRED's 15 against COMMUNION
+# would be this suite agreeing with itself. THE NUMBER IS STILL PINNED WHERE IT
+# PAYS: the field and its read site stand, every live rate below drives the
+# retired payload through the real spawn and `_gain_faith`, and
+# `_one_read_site` still asserts the one read site and that nothing — no rune,
+# no node — writes the field.
 
 
 # The counter keeps its meaning AND its units, so there is exactly one place a
@@ -193,14 +228,20 @@ func _one_read_site() -> void:
 		"§1: no rune writes communion_ranks — the reprice reaches every payer")
 	# Counted off the live trees rather than off a grep, so a renamed node or a
 	# second writer in any of the twelve trips it.
+	# BATCH FX: counted off THE ONE TREE. Its one writer, dv_communion, is
+	# deleted and no node of the one tree writes the field — it is DORMANT,
+	# which is FX's stated rule for a field no node writes (not deleted: its
+	# read site above stands). So the expected writer set is EMPTY, and it is
+	# the same guard: a node authored onto `communion_ranks` would move every
+	# rate below without this suite being asked.
 	var writers: Array = []
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			var pay: Dictionary = n.get("payload", {})
-			if Dictionary(pay.get("stat", {})).has("communion_ranks"):
-				writers.append("%s/%s" % [spec, n["id"]])
-	ok(writers == ["inquisitor/dv_communion"],
-		"§1: exactly one node in twelve trees writes it (%s)" % ", ".join(writers))
+	for n in Talents.TREE:
+		var pay: Dictionary = n.get("payload", {})
+		if Dictionary(pay.get("stat", {})).has("communion_ranks"):
+			writers.append(String(n["id"]))
+	ok(writers.is_empty(),
+		"§1 (FX): no node of the one tree writes it — the field is dormant (%s)" % \
+			", ".join(writers))
 
 
 # THE GUARD IS NOT A MAGNITUDE. At 40 it stopped a certainty; at 15 it stops a

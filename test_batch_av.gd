@@ -32,6 +32,17 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX DELETED THE TREE THIS FILE WAS WRITTEN ABOUT. The twelve spec trees
+# are gone (`Talents.LANE_TREES`, and every hl_* node with it); the Holy Cleric
+# buys into the ONE class tree — twenty-seven `tn_*` nodes in three tiers of
+# nine. EVERY FIELD READ SITE STOOD, so every MECHANIC this file drives is still
+# driven, off the exact payload its retired node carried (`RETIRED`, below).
+# Every question about the tree's SHAPE is asked of the one tree wherever it
+# still has a subject there. What asked about the Holy tree ITSELF — its ids,
+# lanes, rows, homes, names, per-node magnitudes and payload shapes — is
+# deleted at its own site under DG §2, and each site says what it asked, why the
+# subject is gone and how many checks went.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -98,8 +109,95 @@ func _run() -> void:
 
 # ---------- helpers ----------
 
+# BATCH FX: the tree the Holy Cleric buys into — the ONE class tree, since the
+# twelve spec trees are deleted. `generate_tree` still takes the spec.
 func _tree() -> Array:
 	return Talents.generate_tree("holy", "cleric")
+
+
+# ---------- BATCH FX: the retired Holy nodes this suite still drives ----------
+#
+# FX deleted the Holy tree, and every field below kept its declaration and its
+# read site (FX kept every one: a field no node writes is dormant, not deleted).
+# So each live question is still asked — of the EXACT payload the retired node
+# carried, lifted verbatim from HEAD's `LANE_TREES["holy"]`. `_spawn` hands each
+# one it is given to the Cleric as a node BESIDE the live tree, so
+# `apply_from_tree` applies it at the point in the spawn the Holy tree always
+# did: after the earned picks, before the class passive, the runes and the
+# upgrades. No live `tn_*` node writes any of these fields.
+const RETIRED := {
+	# FX: the payload the retired hl_zealous (Zealous Light) carried — the node
+	# is deleted, the field and its read site stand.
+	"hl_zealous": {"name": "Zealous Light", "payload": {"stat": {"zealous_mercy": 2}}},
+	# FX: the payload the retired hl_martyr (Martyr's Vigor) carried — the node
+	# is deleted, the field and its read site stand.
+	"hl_martyr": {"name": "Martyr's Vigor", "payload": {"stat": {"mercy_cap_bonus": 3}}},
+	# FX: the payload the retired hl_soothe (Soothing Touch) carried — the node
+	# is deleted; the `ability` arm and its `also` are live machinery (runes).
+	"hl_soothe": {"name": "Soothing Touch", "payload": {"ability": "Heal",
+		"add": {"cost": -10}, "also": [{"ability": "Renewal", "add": {"cost": -10}}]}},
+	# FX: the payload the retired hl_swift (Swift Mending) carried — the node is
+	# deleted; the `ability` arm and its `also` are live machinery (runes).
+	"hl_swift": {"name": "Swift Mending", "payload": {"ability": "Heal",
+		"set": {"cooldown": 0}, "also": [{"ability": "Hymn of Hope", "add": {"cooldown": -1}}]}},
+	# FX: the payload the retired hl_serenity (Serenity) carried — the node is
+	# deleted; the `ability` arm is live machinery (runes).
+	"hl_serenity": {"name": "Serenity", "payload": {"ability": "Resurrection",
+		"set": {"faith_cost": 0, "cooldown": 1}}},
+	# FX: the payload the retired hl_resurrection (Grace) carried — the node is
+	# deleted, the field and its read site stand.
+	"hl_resurrection": {"name": "Grace", "payload": {"stat": {"grace_pct": 20}}},
+	# FX: the payload the retired hl_capacitor (Martyrdom) carried — the node is
+	# deleted; the `ability` arm and the `martyrdom` field in its `also` stand.
+	"hl_capacitor": {"name": "Martyrdom", "payload": {"ability": "Resurrection",
+		"set": {"faith_cost": 0, "cooldown": 0}, "also": [{"stat": {"martyrdom": 1}}]}},
+	# FX: the payload the retired hl_beacon (Hour of Need) carried — the node is
+	# deleted, the field and its read site stand.
+	"hl_beacon": {"name": "Hour of Need", "payload": {"stat": {"holy_vigil_pct": 15}}},
+	# FX: the payload the retired hl_vestments (Blessed Vestments) carried — the
+	# node is deleted, the field and its read site stand.
+	"hl_vestments": {"name": "Blessed Vestments", "payload": {"stat": {"vestments_pct": 25}}},
+	# FX: the payload the retired hl_ardor (Ardor) carried — the node is deleted,
+	# the field and its read site stand.
+	"hl_ardor": {"name": "Ardor", "payload": {"stat": {"ardor_at": 3}}},
+	# FX: the payload the retired hl_avatar (Avatar of Mercy) carried — the node
+	# is deleted, the field and its read site stand.
+	"hl_avatar": {"name": "Avatar of Mercy", "payload": {"stat": {"avatar_of_mercy": 1}}},
+}
+
+# FX: every counter the retired Holy tree wrote — its 27 nodes' `stat` payloads
+# and their `also` halves, inlined from HEAD's `LANE_TREES["holy"]`. The tree is
+# deleted; every one of these fields is still declared on `BattleUnit`.
+const HOLY_COUNTERS := ["triage_heal", "on_mend_pct", "cascade_pct", "overflow_pct",
+	"heavenly_step", "holy_light_pct", "zealous_mercy", "sanctified_pct", "grace_pct",
+	"ardor_at", "mercy_cap_bonus", "guardian_step", "divine_presence_pct",
+	"last_hope_pct", "holy_vigil_pct", "vestments_pct", "font_of_light",
+	"mercy_aegis", "watchtower", "sanctum", "avatar_of_mercy", "martyrdom"]
+
+
+# FX: every cell of the ONE tree, worn — what `Profile.worn_talents` hands a
+# class that has bought the whole tree (a cell owned is a cell worn).
+func _all_cells() -> Dictionary:
+	var out := {}
+	for t in _tree():
+		out[String(t["id"])] = 1
+	return out
+
+
+# FX: the Cleric's tree for one spawn — the live tree, plus a node for each
+# RETIRED id the spawn learns. An id that is in NEITHER would apply nothing in
+# silence, so it fails here instead of passing quietly.
+func _member_tree(learned: Dictionary) -> Array:
+	var tree := _tree()
+	for id in learned:
+		if not Talents.node_in_tree(tree, String(id)).is_empty():
+			continue
+		if not RETIRED.has(id):
+			ok(false, "the spawn learns %s, which is neither a live node nor a RETIRED payload" % id)
+			continue
+		tree.append({"id": String(id), "name": String(RETIRED[id]["name"]), "desc": "",
+			"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _node(id: String) -> Dictionary:
@@ -138,8 +236,13 @@ func _spawn(learned: Dictionary, member_patch := {},
 	# THE CRIT ROLL MATTERS MORE HERE THAN ANYWHERE: Triage turns a heal crit
 	# into a Radiant Cascade splash, so one unlucky coin doubles a measured
 	# heal. Checks that WANT a crit set `crit_bonus` back themselves.
+	# BATCH FX: her tree is the one tree plus any RETIRED payload the spawn learns
+	# (`_member_tree`), written through `patch` — which the fixture applies AFTER
+	# it sets the tree, so the fixture itself did not move.
+	var patch: Dictionary = member_patch.duplicate()
+	patch["tree"] = _member_tree(learned)
 	return await Fixture.spawn(self, ["berserker", "pyromancer", "holy", "beastmaster"],
-		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: member_patch},
+		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: patch},
 		"deterministic": true, "crit": -10.0})
 
 
@@ -206,154 +309,83 @@ func _kit_and_pool() -> void:
 
 # ---------- §3 the shape ----------
 
+# BATCH FX — THE HOLY TREE IS DELETED, SO THIS SECTION ASKS WHAT STILL HAS A
+# SUBJECT. The tree the Holy Cleric buys into is the ONE class tree; its size,
+# its partition into tiers, the rank each node is worn at, its distinct ids and
+# the absence of any capstone flag or exclusive node are questions with true
+# answers there, and each is asked of it below. The per-node walk covers 27
+# nodes, as it covered the Holy tree's 27.
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Holy tree holds 24 nodes (got %d)" % tree.size())
-	var lanes := {}
-	var per_lane := {}
-	var caps: Array = []
+	# RE-POINTED (FX): the one tree holds 27 nodes — three tiers of nine.
+	ok(tree.size() == 27,
+		"the one tree the Holy Cleric buys into holds 27 nodes (got %d)" % tree.size())
+	# A cell owned is a cell worn, and the handoff is where a node's RANK comes
+	# from now — so "a single rank" is asked of what the handoff wears.
+	var every_cell := {}
+	for t in tree:
+		every_cell[String(t["id"])] = true
+	var worn := Talents.worn_learned(tree, every_cell)
+	var per_tier := {}
 	var ids := {}
 	for t in tree:
-		var lane := String(t.get("lane", ""))
-		var row := int(t.get("row", 0))
-		lanes[lane] = true
 		ids[String(t["id"])] = true
-		if row == Talents.CAPSTONE_ROW:
-			caps.append(String(t["id"]))
-			ok(bool(t.get("capstone", false)),
-				"%s sits on row 8 and carries the capstone flag" % t["id"])
-		else:
-			per_lane[lane] = int(per_lane.get(lane, 0)) + 1
-			ok(not bool(t.get("capstone", false)),
-				"%s is not on row 8 and must not claim the flag" % t["id"])
-		ok(int(t.get("ranks", 0)) == 1, "%s is a single rank" % t["id"])
+		var tier := int(t.get("tier", 0))
+		per_tier[tier] = int(per_tier.get(tier, 0)) + 1
+		# RE-POINTED (FX): the one tree has NO capstone row, so every node stands
+		# where the old `else` branch stood — off it — and none may claim the flag.
+		ok(not bool(t.get("capstone", false)),
+			"%s claims no capstone flag — the one tree has no capstone row" % t["id"])
+		# RE-POINTED (FX): asked of the rank the FX handoff wears the node at.
+		ok(int(worn.get(String(t["id"]), 0)) == 1, "%s is worn at a single rank" % t["id"])
+		# RE-POINTED (FX): the one tree, where no node is exclusive at all.
 		ok(not t.has("exclusive_with"),
 			"%s carries no leftover exclusive_with" % t["id"])
-	ok(lanes.has("Radiance") and lanes.has("Mercy") and lanes.has("Vigil"),
-		"the lanes are Radiance / Mercy / VIGIL (got %s)" % str(lanes.keys()))
-	ok(not lanes.has("Sanctuary"),
-		"NOTHING still calls the third lane Sanctuary")
-	for lane in ["Radiance", "Mercy", "Vigil"]:
-		ok(int(per_lane.get(lane, 0)) == Talents.ROWS,
-			"%s holds 7 nodes in rows 1-7 (got %s)" % [lane, per_lane.get(lane, 0)])
-	ok(caps.size() == 3, "three capstones (got %d)" % caps.size())
-	# EVERY ID SURVIVES — the batch's own promise, and the reason no save
-	# version moves. This is the list Batch AI shipped, checked verbatim.
-	for id in ["hl_triage", "hl_soothe", "hl_on_mend", "hl_capacitor", "hl_swift",
-			"hl_brilliance", "hl_overflow", "hl_heavenly", "hl_holy_light",
-			"hl_zealous", "hl_sanctified", "hl_resurrection", "hl_ardor",
-			"hl_martyr", "hl_guardian", "hl_presence", "hl_last_hope",
-			"hl_inner_faith", "hl_vestments", "hl_beacon", "hl_serenity",
-			"hl_divine_plea", "hl_avatar", "hl_sanctum"]:
-		ok(ids.has(id), "id survives and re-specs in place: %s" % id)
-	ok(ids.size() == 27, "no id was added (got %d distinct)" % ids.size())
-	# The homes the batch names by hand.
-	for pair in [["hl_divine_plea", "Radiance", 4], ["hl_resurrection", "Mercy", 5],
-			["hl_inner_faith", "Vigil", 4], ["hl_beacon", "Vigil", 5],
-			["hl_vestments", "Vigil", 6], ["hl_serenity", "Vigil", 7],
-			# BATCH BM moved the capstone shelf to row 9.
-			["hl_sanctum", "Radiance", 9], ["hl_avatar", "Mercy", 9],
-			["hl_capacitor", "Vigil", 9]]:
-		var n := _node(String(pair[0]))
-		ok(String(n.get("lane", "")) == String(pair[1])
-			and int(n.get("row", 0)) == int(pair[2]),
-			"%s sits at %s row %d (got %s row %s)" % [pair[0], pair[1], pair[2],
-				n.get("lane", ""), n.get("row", 0)])
-	# The renames, by name rather than by id — a re-spec that forgot its label
-	# would pass every structural check above.
-	# hl_beacon RE-POINTED IN PLACE BY BATCH AW §9, with the reason here: AV
-	# shipped it as "Shared Vigil" and FLAGGED the collision with the Warden's
-	# Banner row-6 node of the same name rather than shipping it silently. AW
-	# took the designer's call — his triggers on standing strong and keeps the
-	# name; hers is "Hour of Need". A LABEL ONLY: `holy_vigil_pct` and every
-	# read site are untouched, and the magnitude check below still reads 15.
-	# BATCH DO: `hl_inner_faith` keeps its id and its cell and is "Inner Faith"
-	# now — its card left for the draft, and a node named after a live DRAFT
-	# CARD is the `wd_spiked`/Spite collision.
-	for pair in [["hl_resurrection", "Grace"], ["hl_inner_faith", "Inner Faith"],
-			["hl_beacon", "Hour of Need"], ["hl_capacitor", "Martyrdom"],
-			["hl_sanctum", "Sanctum"], ["hl_serenity", "Serenity"],
-			["hl_vestments", "Blessed Vestments"]]:
-		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
-			"%s is named %s" % [pair[0], pair[1]])
+	# FX: DG §2 — 2 CHECKS DELETED HERE. They asked that the Holy tree's lanes
+	# were Radiance / Mercy / VIGIL, and that nothing still called the third lane
+	# Sanctuary. FX deleted the twelve spec trees and the one tree has no lanes,
+	# so the subject exists nowhere a check can read it.
+	# RE-POINTED (FX): "each lane holds its 7 row nodes" becomes "each TIER holds
+	# its nine" — the one tree's partition, asked of the one tree.
+	for tier in range(1, Talents.TIERS + 1):
+		ok(int(per_tier.get(tier, 0)) == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %s)" % [tier, Talents.NODES_PER_TIER,
+				per_tier.get(tier, 0)])
+	# FX: DG §2 — 1 CHECK DELETED HERE ("three capstones"). The one tree has no
+	# capstone row; the per-node walk above asks that no node claims one.
+	# FX: DG §2 — 24 CHECKS DELETED HERE. "id survives and re-specs in place" was
+	# AV's promise that every Holy id survived, and the reason no save version
+	# moved. FX deleted every one (Profile moved to v3; `Run._migrate_trees` drops
+	# a retired id from a saved member), so there is no id left for it to find.
+	# RE-POINTED (FX): no id is carried twice in the one tree.
+	ok(ids.size() == 27,
+		"the one tree carries 27 distinct ids — none twice (got %d distinct)" % ids.size())
+	# FX: DG §2 — 16 CHECKS DELETED HERE: the 9 "sits at <lane> row <n>" homes
+	# the batch named by hand, and the 7 "is named <name>" renames (Grace, Inner
+	# Faith, Hour of Need, Martyrdom, Sanctum, Serenity, Blessed Vestments). Both
+	# asked where a Holy node sat and what it was called; FX deleted the nodes,
+	# the lanes and the rows. The mechanics under five of those names are still
+	# driven live below, off `RETIRED`.
 
 
 # ---------- §3 the magnitudes, which are final ----------
 
 func _magnitudes() -> void:
-	for probe in [
-			["hl_triage", "triage_heal", 15],
-			["hl_on_mend", "on_mend_pct", 35],
-			["hl_brilliance", "cascade_pct", 75],
-			["hl_overflow", "overflow_pct", 60],
-			["hl_heavenly", "heavenly_step", 7],      # 5 + 7 = 12%
-			["hl_holy_light", "holy_light_pct", 8],
-			["hl_zealous", "zealous_mercy", 2],
-			["hl_sanctified", "sanctified_pct", 35],
-			["hl_resurrection", "grace_pct", 20],
-			["hl_ardor", "ardor_at", 3],
-			["hl_martyr", "mercy_cap_bonus", 3],      # 5 + 3 = 8
-			["hl_guardian", "guardian_step", 15],     # 50 + 15 = 65%
-			["hl_presence", "divine_presence_pct", 8],
-			["hl_last_hope", "last_hope_pct", 40],
-			["hl_beacon", "holy_vigil_pct", 15],
-			["hl_vestments", "vestments_pct", 25],
-			["hl_sanctum", "sanctum", 1],
-			["hl_avatar", "avatar_of_mercy", 1]]:
-		var got = _stat_of(String(probe[0]), String(probe[1]))
-		ok(got != null and int(got) == int(probe[2]),
-			"%s writes %s = %s (got %s)" % [probe[0], probe[1], probe[2], got])
-	# The two ability-payload nodes: written that way so no field EXISTS that
-	# could reach the health an ally returns at.
-	var sooth := _payload("hl_soothe")
-	ok(int(sooth.get("add", {}).get("cost", 0)) == -10
-		and String(sooth.get("ability", "")) == "Heal",
-		"Soothing Touch takes 10 Mana off Heal")
-	var sooth_also: Array = sooth.get("also", [])
-	ok(sooth_also.size() == 1
-		and String(sooth_also[0].get("ability", "")) == "Renewal"
-		and int(sooth_also[0].get("add", {}).get("cost", 0)) == -10,
-		"...and 10 off Renewal")
-	var swift := _payload("hl_swift")
-	ok(int(swift.get("set", {}).get("cooldown", -1)) == 0
-		and String(swift.get("ability", "")) == "Heal",
-		"Swift Mending zeroes Heal's cooldown outright")
-	var swift_also: Array = swift.get("also", [])
-	ok(swift_also.size() == 1
-		and String(swift_also[0].get("ability", "")) == "Hymn of Hope"
-		and int(swift_also[0].get("add", {}).get("cooldown", 0)) == -1,
-		"...and takes a turn off Hymn of Hope")
-	var ser := _payload("hl_serenity")
-	ok(String(ser.get("ability", "")) == "Resurrection"
-		and int(ser.get("set", {}).get("faith_cost", -1)) == 0
-		and int(ser.get("set", {}).get("cooldown", -1)) == 1,
-		"Serenity waives the Mercy and drops the cooldown to 1")
-	var ser_writes: Array = []
-	for part in ["stat", "set", "add"]:
-		for f in ser.get(part, {}):
-			ser_writes.append(String(f))
-	for extra in ser.get("also", []):
-		for part2 in ["stat", "set", "add"]:
-			for f2 in extra.get(part2, {}):
-				ser_writes.append(String(f2))
-	ok(ser_writes.size() == 2 and ser_writes.has("faith_cost")
-		and ser_writes.has("cooldown"),
-		"...and touches NOTHING ELSE — nothing that could reach the return health (%s)" % str(ser_writes))
-	var mar := _payload("hl_capacitor")
-	var mar_also: Array = mar.get("also", [])
-	ok(mar_also.size() == 1
-		and int(mar_also[0].get("stat", {}).get("martyrdom", 0)) == 1,
-		"Martyrdom's automatic return rides the `also` half of its payload")
-	ok(String(mar.get("ability", "")) == "Resurrection"
-		and int(mar.get("set", {}).get("faith_cost", -1)) == 0
-		and int(mar.get("set", {}).get("cooldown", -1)) == 0,
-		"Martyrdom waives the Mercy and the cooldown entirely")
-	# Row 8 is one per hero, ever — so the three must be on three lanes.
-	var cap_lanes := {}
-	for t in _tree():
-		if int(t.get("row", 0)) == Talents.CAPSTONE_ROW:
-			cap_lanes[String(t.get("lane", ""))] = true
-	ok(cap_lanes.size() == 3, "the three capstones sit on three different lanes")
+	# **BATCH FX — 26 CHECKS DELETED HERE, UNDER DG §2.** This section asked each
+	# Holy node to carry its final magnitude: 17 of the 18 "node writes field = N"
+	# rows; the 8 that read the SHAPE of an ability-editing payload (Soothing
+	# Touch and Swift Mending — the `add` / `set` and their `also` halves —
+	# Serenity with "touches NOTHING ELSE", and Martyrdom's `set` and `also`); and
+	# "the three capstones sit on three different lanes". FX deleted the twelve
+	# spec trees, so no node carries those numbers or shapes and there are no
+	# lanes. THE FIELDS AND READ SITES STAND: §5 below still pins every read
+	# site's units, and the live sections drive each payload — inlined from
+	# `RETIRED` — through the spawn and assert what it pays.
+	# RE-POINTED (FX): Last Hope is the one row with a precedent-mapped node in
+	# the one tree — tn_last_hope carries hl_last_hope's field and magnitude.
+	var got = _stat_of("tn_last_hope", "last_hope_pct")
+	ok(got != null and int(got) == 40,
+		"tn_last_hope writes last_hope_pct = 40, Last Hope's own number (got %s)" % got)
 
 
 # ---------- §5 additive, not ranked ----------
@@ -425,21 +457,26 @@ func _additive_units() -> void:
 # left to fall back FROM, and a fallback for a grant that cannot happen would be
 # machinery nothing can reach.
 func _authored_fallbacks() -> void:
-	var plea := _payload("hl_divine_plea")
-	ok(Talents.granted_name(plea) == "",
-		"Divine Plea's cell hands out NOTHING (DO's charter)")
-	ok(not plea.has("upgrade"),
-		"...so it carries no collision fallback either")
+	# **BATCH FX — 3 CHECKS DELETED HERE, UNDER DG §2.** "Divine Plea's cell hands
+	# out NOTHING", "Intercession's cell hands out NOTHING" and the Intercession
+	# twin of "...so it carries no fallback" asked about two cells of the Holy tree
+	# (hl_divine_plea, hl_inner_faith), and FX deleted that tree. What the four
+	# asked is still asked — of EVERY cell of the one tree: whether it grants (the
+	# walk below) and whether it carries a collision fallback (once, over all 27).
 	ok(Classes.spec_draft_pool("holy").has("Divine Plea"),
 		"...while the card itself drafts from the Cleric")
-	var ice := _payload("hl_inner_faith")
-	ok(Talents.granted_name(ice) == "",
-		"Intercession's cell hands out NOTHING (DO's charter)")
-	ok(not ice.has("upgrade"), "...so it carries no fallback either")
 	ok(Classes.spec_draft_pool("holy").has("Intercession"),
 		"...and Intercession drafts from the Cleric — earnable for the first time")
+	# RE-POINTED (FX): "...so it carries no collision fallback", of the whole tree.
+	var arms := 0
+	for t in _tree():
+		if (t.get("payload", {}) as Dictionary).has("upgrade"):
+			arms += 1
+	ok(arms == 0, "no cell of the one tree carries a collision fallback (%d of %d do)"
+		% [arms, _tree().size()])
 	# NOW EVERY CELL IN HER TREE IS IN THAT POSITION, not just the capstones.
-	for cap in Talents.LANE_TREES["holy"]:
+	# RE-POINTED (FX): her tree is the one tree, and it grants nothing at all.
+	for cap in _tree():
 		ok(Talents.granted_name(cap.get("payload", {})) == "",
 			"%s grants no ability, so it owes no fallback" % String(cap["id"]))
 	# AU §1's rule reaching a RUNE grant needed no new machinery, and that is
@@ -491,34 +528,26 @@ func _rune_audit() -> void:
 	ok(int(sv.get("rune_divine_presence_pct", 0)) == 2
 		and not sv.has("divine_presence_pct"),
 		"the Sleepless Vigil pays its advertised 2%% and pays it once")
-	# THE BY-NAME LANE REFERENCE, which is exactly the kind that breaks
-	# quietly: a dead lane name would leave the rune homeless in the bot's
-	# build policy and in the per-lane coverage test.
-	ok(String(Runes.config("sleepless_vigil").get("lane", "")) == "Vigil",
-		"the Sleepless Vigil's lane tag moved Sanctuary -> Vigil")
-	var lanes := {}
-	for t in _tree():
-		lanes[String(t.get("lane", ""))] = true
-	for id in Runes.ids():
-		var cfg: Dictionary = Runes.config(id)
-		if String(cfg.get("scope", "")) != "spec:holy":
-			continue
-		var lane := String(cfg.get("lane", ""))
-		ok(lane == "" or lanes.has(lane),
-			"%s's lane tag '%s' names a live Holy lane" % [id, lane])
+	# **BATCH FX — 10 CHECKS DELETED HERE, UNDER DG §2.** "the Sleepless Vigil's
+	# lane tag moved Sanctuary -> Vigil" and the walk of the nine spec:holy runes,
+	# "%s's lane tag names a live Holy lane", asked that a rune's by-name lane
+	# reference found a lane of the Holy tree, so it was not homeless in the bot's
+	# build policy or the per-lane coverage test. FX deleted the trees, the one
+	# tree has no lanes, and the per-lane build policy went with them: a tag can
+	# name nothing live, and nothing in `scripts/` reads a rune's `lane` (only
+	# `Runes.build` copies it onto the instance). Three retired Holy runes still
+	# carry one (Radiance, Mercy, Vigil) — inert data, reported rather than touched.
 	# THE THREE CLERIC CLASS-WIDE RUNES TOUCH NO HOLY COUNTER.
-	var holy_fields := {}
-	for t in _tree():
-		for f in t.get("payload", {}).get("stat", {}):
-			holy_fields[String(f)] = true
-		for extra in t.get("payload", {}).get("also", []):
-			for f2 in extra.get("stat", {}):
-				holy_fields[String(f2)] = true
+	# RE-POINTED (FX): the Holy counters are the FIELDS the retired Holy tree
+	# wrote, every one still declared and read, so the set is `HOLY_COUNTERS`
+	# rather than a walk of a tree that no longer holds them. (The one tree's own
+	# fields are general stats — `speed`, which the Martyr rune writes, among
+	# them — and a rune sharing unit math is not talent-keyed: EM's UNIT_MATH.)
 	for id in ["zealotry", "martyr", "binding_souls"]:
 		var cfg2: Dictionary = Runes.config(id)
 		ok(String(cfg2.get("scope", "")) == "class:cleric", "%s is class-wide" % id)
 		for f3 in cfg2["payload"].get("stat", {}):
-			ok(not holy_fields.has(String(f3)),
+			ok(not HOLY_COUNTERS.has(String(f3)),
 				"%s must not write the Holy tree counter %s" % [id, f3])
 	# LAST RITES: its grant now COLLIDES rather than granting, so its text has
 	# to stop promising an ability she already owns.
@@ -537,15 +566,14 @@ func _negative_control_source() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(not bsrc.contains("0.5 + 0.03 *"),
 		"NEGATIVE CONTROL: no path leaves the Mercy window at 50 + 3 (the old 53%)")
-	var ga := int(_stat_of("hl_guardian", "guardian_step"))
-	ok(ga == 15, "NEGATIVE CONTROL: Guardian Angel is 15 points, not 3")
-	var ser := _payload("hl_serenity")
-	var mar := _payload("hl_capacitor")
-	for pay in [ser, mar]:
-		for part in ["set", "add"]:
-			for f in pay.get(part, {}):
-				ok(String(f) in ["faith_cost", "cooldown"],
-					"NEGATIVE CONTROL: a reversal node touches only cost and cooldown (found %s)" % f)
+	# **BATCH FX — 5 CHECKS DELETED HERE, UNDER DG §2.** "Guardian Angel is 15
+	# points, not 3" read the magnitude off hl_guardian, and "a reversal node
+	# touches only cost and cooldown" (four: two fields each) read the `set` of
+	# hl_serenity and hl_capacitor. FX deleted all three nodes. The SOURCE halves
+	# stand and are asserted here — no 53% window survives (above), exactly one
+	# reassignment of the return health, nothing named Serenity reaches it
+	# (below) — and `_live_serenity` / `_live_martyrdom` drive both retired
+	# payloads, inlined from `RETIRED`, and measure the return health untouched.
 	# The return health lives in ONE place — the resurrection branch — and no
 	# talent field reaches it.
 	# BATCH CQ §3 — RE-POINTED TO THE FOLDED SOURCE. CN §3 folded the perfect's
@@ -582,13 +610,21 @@ func _live_kit_at_spawn() -> void:
 	ok(c.second_max == 5, "...against the base ceiling of 5")
 	await _kill(scene)
 	# The two grants, and the repriced openers, on a full build.
-	var built := await _spawn({"hl_divine_plea": 1, "hl_inner_faith": 1,
-		"hl_zealous": 1, "hl_martyr": 1, "hl_soothe": 1, "hl_swift": 1})
+	# RE-POINTED (FX): the build wears EVERY cell of the one tree, so the DO
+	# checks below are asked of the tree the Cleric really buys, plus the four
+	# retired payloads the repricing checks drive (Zealous Light, Martyr's Vigor,
+	# Soothing Touch, Swift Mending), inlined from `RETIRED`. It learned
+	# hl_divine_plea and hl_inner_faith for the DO checks; FX deleted both cells.
+	var built_learned := _all_cells()
+	for id in ["hl_zealous", "hl_martyr", "hl_soothe", "hl_swift"]:
+		built_learned[id] = 1
+	var built := await _spawn(built_learned)
 	var c2 := _hero(built, 2)
 	# BATCH DO: the two cards are DRAFTED now, so a build that buys the cells
 	# and nothing else holds neither. That is the charter working, not a gap.
-	ok(_find(c2, "Divine Plea") == null, "the row-4 cell grants no Divine Plea (DO)")
-	ok(_find(c2, "Intercession") == null, "the Vigil row-4 cell grants no Intercession (DO)")
+	ok(_find(c2, "Divine Plea") == null,
+		"wearing every cell of the one tree grants no Divine Plea (DO; FX)")
+	ok(_find(c2, "Intercession") == null, "...nor Intercession (DO; FX)")
 	ok(c2.second_resource == 2, "Zealous Light opens her on 2 Mercy (got %d)" % c2.second_resource)
 	ok(c2.second_max == 8, "Martyr's Vigor raises the ceiling to 8 (got %d)" % c2.second_max)
 	var heal := _find(c2, "Heal")
@@ -606,7 +642,10 @@ func _live_kit_at_spawn() -> void:
 func _live_intercession() -> void:
 	# (i) NOTHING WHEN SHE HOLDS NONE. The window is open, the blow lands, the
 	# hero dies — the price is paid on TRIGGER, so an empty hand buys nothing.
-	var empty := await _spawn({"hl_inner_faith": 1})
+	# FX: these three spawns learned hl_inner_faith, which granted Intercession
+	# before DO and has been irrelevant here since — every check below lays the
+	# window by hand. FX deleted the node, so they learn nothing.
+	var empty := await _spawn({})
 	var c := _hero(empty, 2)
 	var victim := _hero(empty, 0)
 	c.second_resource = 0
@@ -622,7 +661,7 @@ func _live_intercession() -> void:
 	ok(c.second_resource == 0, "...and nothing was spent")
 	await _kill(empty)
 	# (ii) IT FIRES, ONCE, AND COSTS A STACK ON TRIGGER.
-	var live := await _spawn({"hl_inner_faith": 1})
+	var live := await _spawn({})
 	var c2 := _hero(live, 2)
 	c2.second_resource = 3
 	c2.sanctified_pct = 0  # the refund roll is a separate node; force the spend
@@ -649,7 +688,7 @@ func _live_intercession() -> void:
 	# crosses the Mercy window on the way down, so their own fall earns her
 	# the stack the refusal spends. It is free exactly once, and only against
 	# a genuine one-shot — anyone already wounded pays for it properly.
-	var oneshot := await _spawn({"hl_inner_faith": 1})
+	var oneshot := await _spawn({})
 	var c5 := _hero(oneshot, 2)
 	c5.second_resource = 0
 	c5.sanctified_pct = 0
@@ -663,11 +702,13 @@ func _live_intercession() -> void:
 		"...because the fall itself earned the stack it spent (%d)" % c5.second_resource)
 	await _kill(oneshot)
 	# (iii) THE WINDOW LENGTH, cast for real, and the authored fallback.
-	var short_w := await _spawn({"hl_inner_faith": 1})
+	# RE-POINTED (FX): the fallback question is asked of a Cleric wearing EVERY
+	# cell of the one tree — none of which grants, so nothing can collide.
+	var short_w := await _spawn(_all_cells())
 	var c3 := _hero(short_w, 2)
 	ok(c3.intercession_long == 0, "no fallback without an earned copy")
 	await _kill(short_w)
-	var long_w := await _spawn({"hl_inner_faith": 1},
+	var long_w := await _spawn(_all_cells(),
 		{"bm_abilities": ["Intercession"]})
 	var c4 := _hero(long_w, 2)
 	# BATCH DO: `intercession_long` is READ-ONLY-ZERO — an `upgrade` arm fires
@@ -694,6 +735,7 @@ func _live_serenity() -> void:
 	ok(r0 != null and r0.faith_cost == 1 and r0.cooldown == 3,
 		"without Serenity the raise costs 1 Mercy on a 3-turn cooldown")
 	await _kill(plain)
+	# FX: hl_serenity is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"hl_serenity": 1})
 	var c := _hero(scene, 2)
 	var res := _find(c, "Resurrection")
@@ -723,6 +765,7 @@ func _live_serenity() -> void:
 # ---------- live: Grace ----------
 
 func _live_grace() -> void:
+	# FX: hl_resurrection (Grace) is inlined from `RETIRED` — the exact payload.
 	var scene := await _spawn({"hl_resurrection": 1})
 	var c := _hero(scene, 2)
 	ok(c.grace_pct == 20, "Grace is stamped at 20%% of her maximum health")
@@ -763,6 +806,7 @@ func _live_grace() -> void:
 # ---------- live: Martyrdom ----------
 
 func _live_martyrdom() -> void:
+	# FX: hl_capacitor (Martyrdom) is inlined from `RETIRED` — the exact payload.
 	var scene := await _spawn({"hl_capacitor": 1})
 	var c := _hero(scene, 2)
 	ok(c.martyrdom == 1, "Martyrdom is stamped on the Cleric")
@@ -786,6 +830,7 @@ func _live_martyrdom() -> void:
 func _live_vigil_and_vestments() -> void:
 	# SHARED VIGIL. The same blow, twice, differing only in whether ANYONE is
 	# under the line — so the 15% is measured rather than asserted.
+	# FX: hl_beacon (Hour of Need) is inlined from `RETIRED` — the exact payload.
 	var scene := await _spawn({"hl_beacon": 1})
 	var c := _hero(scene, 2)
 	ok(c.holy_vigil_pct == 15, "Hour of Need is stamped at 15%")
@@ -833,6 +878,7 @@ func _live_vigil_and_vestments() -> void:
 		_report.append("Hour of Need measured at %.1f%% damage taken" % (cut * 100.0))
 	await _kill(scene)
 	# BLESSED VESTMENTS: her healing leaves a barrier worth a quarter of it.
+	# FX: hl_vestments is inlined from `RETIRED` — the exact payload it carried.
 	var vest := await _spawn({"hl_vestments": 1})
 	var c2 := _hero(vest, 2)
 	ok(c2.vestments_pct == 25, "Blessed Vestments is stamped at 25%")
@@ -901,6 +947,7 @@ func _live_bot_policy() -> void:
 		"the cleric policy knows Intercession exists")
 	ok(bsrc.count("func _holy_empower_ok") == 1,
 		"the Empower rule has exactly one implementation")
+	# FX: hl_ardor is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"hl_ardor": 1})
 	var c := _hero(scene, 2)
 	var res := _find(c, "Resurrection")
@@ -946,6 +993,7 @@ func _live_bot_policy() -> void:
 # ---------- Avatar of Mercy: Empower now GENERATES ----------
 
 func _live_avatar() -> void:
+	# FX: hl_avatar is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"hl_avatar": 1})
 	var c := _hero(scene, 2)
 	ok(c.avatar_of_mercy == 1, "Avatar of Mercy is stamped")

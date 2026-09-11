@@ -3,13 +3,20 @@
 #   §1  DEEPENING HEX SUBTRACTS 2 — the arithmetic driven on a live board at
 #       every rung, EZ §5's "never shallower" property restated against the
 #       subtraction, and THE FLOOR asserted as a ruling rather than as a guard
-#       against a division by zero
+#       against a division by zero. **BATCH FX deleted the capstone the floor
+#       was priced against**: §1c carries the live relation now (10, 2 and 3;
+#       nothing installs a shallower step; the floor binds no live build), and
+#       RUIN_FLOOR is queued for a ruling
 #   §2  THE WIDE WATCH IS RETIRED AND THE SHARED MARK REPLACES IT — the
 #       retirement in both directions (kept AND unofferable), the new rune
 #       driven on a live board through the HERO path and the COMPANION path,
 #       and `_gain_focus` proved to be the only way in BEHAVIOURALLY
 #   §3  THE `Overkill` COLLISION, ASSERTED RATHER THAN REPORTED — two nodes,
-#       two specs, one word, and this batch ruled on none of it
+#       two specs, one word, and this batch ruled on none of it. **BATCH FX
+#       deleted both nodes**: eight of its nine checks went with them (DG §2,
+#       recorded at the section), and the ninth asserts that no node or rune
+#       carries Overkill's clause — it lives only on the retired Wide Watch,
+#       whose return is queued for the designer
 #
 # **WHY THIS BATCH EARNS A GATE.** It encodes two rulings and both decay
 # silently, in opposite directions:
@@ -51,6 +58,9 @@ const DRIVE := ["occultist", "warden", "sharpshooter", "beastmaster"]
 # floor's REASON is still true, not only that the floor is still 3: a floor of 3
 # under a capstone of 5 and a subtraction of 2 is exactly-reaching, and if either
 # of those moves the floor is answering a question nobody asked any more.
+# BATCH FX: the capstone is deleted, so CAPSTONE_INSTALLS is the retired Avatar of
+# Ruin's value and nothing live installs it. §1d–§1g drive it as a CONSTRUCTED
+# state; §1c carries the live relation, which is 10, 2 and 3 only.
 const BASE_THRESHOLD := 10
 const CAPSTONE_INSTALLS := 5
 const HEX_SUBTRACTS := 2
@@ -151,18 +161,42 @@ func _s1_data() -> void:
 		"§1c: `_ruin_threshold` no longer reads as a floored subtraction")
 	ok(not bsrc.contains("mini(step, occ.rune_hex_threshold)"),
 		"§1c: the retired `mini` is still in the fight")
-	# The capstone's own installed value, off the TREE rather than written in.
-	var cap := 0
-	for nd in Talents.LANE_TREES.get("occultist", []):
-		if String((nd as Dictionary).get("id", "")) == "oc_avatar_ruin":
-			cap = int((((nd as Dictionary).get("payload", {}) as Dictionary)
-				.get("stat", {}) as Dictionary).get("avatar_ruin", 0))
-	ok(cap == CAPSTONE_INSTALLS,
-		"§1c: Avatar of Ruin installs %d, not %d — `%d - %d` no longer reaches the floor exactly"
-			% [cap, CAPSTONE_INSTALLS, CAPSTONE_INSTALLS, HEX_SUBTRACTS])
-	ok(CAPSTONE_INSTALLS - HEX_SUBTRACTS == FLOOR,
-		"§1c: the floor is no longer the exact bottom of the live tree (%d - %d != %d)"
-			% [CAPSTONE_INSTALLS, HEX_SUBTRACTS, FLOOR])
+	# ── BATCH FX: THE CAPSTONE THAT JUSTIFIED 3 AS `5 - 2` WENT WITH THE TWELVE
+	# TREES, AND THESE TWO ARMS CARRY THE STATE IT LEFT ───────────────────────
+	# RUIN_FLOOR was priced as `5 - 2 = 3`: Avatar of Ruin (`oc_avatar_ruin`)
+	# installed a step of 5, Deepening Hex subtracts 2, and 3 was exactly the
+	# deepest the live tree could reach. **That capstone went with the twelve
+	# trees at FX.** No node of the one tree writes `avatar_ruin` — a talent may
+	# not touch an engine — and no rune does; the field and its read site in
+	# `_ruin_threshold` stand, dormant. **The floor stands until the designer
+	# re-rules it (FX report, NEEDS A RULING)**, so these two arms assert what is
+	# true today rather than staying red until somebody rules:
+	#   · the live relation is made of three numbers and only three — the base
+	#     step (10) and the floor (3), pinned against the source above, and the
+	#     rune's subtraction (2), pinned against its payload in §1a;
+	#   · NOTHING installs a shallower step — asserted over every node of the one
+	#     tree AND every rune payload, retired ones included (a saved run can
+	#     still hold a retired rune);
+	#   · so the floor binds NO live build: the deepest a live Occultist reaches
+	#     is 10 - 2 = 8, and 3 is below it.
+	# **A node or rune that writes `avatar_ruin` again brings back the original
+	# question** — is the floor still the exact bottom of what can be reached? —
+	# and the first arm below is what reds to say so. §1d–§1g still drive the
+	# retired capstone's 5 as a CONSTRUCTED state, which is how the floor is
+	# proved to bite at all.
+	var step_writers: Array = []
+	for nd in Talents.TREE:
+		if _writes_key((nd as Dictionary).get("payload", {}), "avatar_ruin"):
+			step_writers.append("node:" + String((nd as Dictionary).get("id", "")))
+	for rid in data:
+		if _writes_key((data[rid] as Dictionary).get("payload", {}), "avatar_ruin"):
+			step_writers.append("rune:" + String(rid))
+	ok(step_writers.is_empty(),
+		"§1c: %s write `avatar_ruin` — a shallower Ruin step is installable again, so RUIN_FLOOR's original question is back: is %d still the exact bottom of what can be reached?"
+			% [step_writers, FLOOR])
+	ok(FLOOR < BASE_THRESHOLD - HEX_SUBTRACTS,
+		"§1c: the floor (%d) is no longer below the only live step (%d - %d) — it binds a live build now, which is not the state FX left"
+			% [FLOOR, BASE_THRESHOLD, HEX_SUBTRACTS])
 
 
 func _s1_driven() -> void:
@@ -307,6 +341,11 @@ func _s2_data() -> void:
 		"§2a: the retirement string names no batch — a retirement must be DECLARATIVE")
 	ok(r.contains("LOST:"),
 		"§2a: the retirement string names no LOSS — that is the record a future author needs")
+	# BATCH FX — THIS NEEDLE STILL RESOLVES, AND WHAT IT NAMES IS A NODE FX
+	# DELETED. The retirement string is the RECORD of why the rune was retired and
+	# the record did not change; what changed is that its reason no longer holds,
+	# which §3 records against the one tree — the Wide Watch's return is queued
+	# for the designer.
 	ok(r.contains("Overkill"),
 		"§2a: the retirement string does not name the NODE the rune duplicated — `it was weak` is not the reason")
 	ok(String(ww.get("name", "")) == "Wide Watch"
@@ -555,86 +594,76 @@ func _s2_driven() -> void:
 		"§2g: a companion striking a DIFFERENT enemy paid %d Focus" % ss.second_resource)
 
 
-# ═══ §3 — THE `Overkill` COLLISION ═══════════════════════════════════════════
+# ═══ §3 — THE `Overkill` COLLISION, AND THE NODE THE WIDE WATCH'S RETIREMENT NAMES
 #
 # **THIS BATCH RULED ON NOTHING HERE AND THE GATE IS WHY THE FINDING SURVIVES.**
 # A collision reported in a batch report is a collision nobody reads again —
-# `docs/reports/` is the one file class no instrument covers. These arms assert
-# the FACT, so the day either node is renamed the gate says so and the record is
-# corrected rather than quietly becoming false.
+# `docs/reports/` is the one file class no instrument covers.
 #
-# **AND IT IS A LABEL COLLISION, NOT A BREAK (BR §1).** `Classes.pool_ability`
-# is keyed on an ABILITY `display_name`; nothing resolves a talent node by name,
-# and these are two nodes in two trees with two ids. The arm below asserts the
-# ids are distinct, which is the property that makes it safe — not an opinion
-# that it is safe.
+# ── BATCH FX: EIGHT OF THIS SECTION'S NINE CHECKS ARE DELETED UNDER DG §2 ─────
+# They asserted the COLLISION ITSELF, off the twelve spec trees: that exactly two
+# talent nodes were named `Overkill` (1); that their ids were `bz_warcry` and
+# `ss_overkill` (1), in the Berserker's and the Sharpshooter's trees (1); that the
+# two ids were distinct, which is what made it a label collision and not a break
+# (1); that the Sharpshooter's sat in his `Penetration` lane (1) and that his tree
+# still had a `Precision` lane for the note-needles to mean anything (1); and, off
+# the note that sat beside `bz_warcry` in `talents.gd`, that the note named
+# Penetration and never Precision (2). **FX deleted the twelve spec trees**: both
+# nodes, both lanes and the note are gone, the one tree has no lanes, and no node
+# of it is named `Overkill`. There is no collision left and nothing to re-point
+# those eight at. **The RECORD of the collision outlives it**: `CLAUDE.md` still
+# carries "`Overkill` IS TWO LIVE TALENT NODES AT ROW 7 IN TWO TREES", which is
+# now false — the drift these arms were written to surface. It is REPORTED, not
+# asserted, because that file is not this gate's to correct.
+#
+# ── THE NINTH CARRIES THE STATE FX LEFT, AND IT IS THE TRIPWIRE ──────────────
+# It ties §3 to §2. The Wide Watch was retired because the Sharpshooter's
+# Overkill already kept his Focus "in FULL" through a kill — the rune's whole
+# clause by a different route. **That reason went with `ss_overkill` at FX.** No
+# node of the one tree carries the clause, by its text or by its `overkill`
+# field (whose read sites stand, dormant, in the kill carry and in
+# `_sharpshooter_focus`), and no rune writes `overkill` — so the clause now lives
+# ONLY on the retired rune, whose kept half §2a still pins. **Whether the Wide
+# Watch returns is queued for the designer** (FX report, NEEDS A RULING). Until
+# then this arm asserts the present truth, and the day a node or rune carries the
+# clause again it reds: the retirement's reason is back, and the queued question
+# changes with it.
 
 func _s3_the_collision() -> void:
-	print("\n§3 — the `Overkill` collision, asserted and ruled on by nothing")
-	var found: Array = []
-	for ckey in Talents.LANE_TREES:
-		for nd in Talents.LANE_TREES[ckey]:
-			if String((nd as Dictionary).get("name", "")) == "Overkill":
-				found.append({"key": String(ckey),
-					"id": String((nd as Dictionary).get("id", "")),
-					"lane": String((nd as Dictionary).get("lane", "")),
-					"row": int((nd as Dictionary).get("row", 0))})
-	ok(found.size() == 2,
-		"§3: %d talent nodes are named `Overkill`, not the two FO confirmed — %s"
-			% [found.size(), found])
-	if found.size() != 2:
-		return
-	var ids: Array = []
-	var trees: Array = []
-	for f in found:
-		ids.append(String((f as Dictionary)["id"]))
-		trees.append(String((f as Dictionary)["key"]))
-	ids.sort()
-	trees.sort()
-	ok(ids == ["bz_warcry", "ss_overkill"],
-		"§3: the two `Overkill` ids are %s — FO's report names `bz_warcry` and `ss_overkill`" % [ids])
-	ok(trees == ["berserker", "sharpshooter"],
-		"§3: the two sit in %s — FO's report names the Berserker's and the Sharpshooter's" % [trees])
-	ok(ids[0] != ids[1],
-		"§3: the two nodes share an ID as well as a name — that IS a break, not a label collision")
-	# **AND THE SHARPSHOOTER'S IS THE ONE THE RETIRED RUNE DUPLICATED**, which is
-	# what ties §3 to §2: if that node's own text stops carrying the Focus clause,
-	# the Wide Watch's retirement string stops being true.
-	var ss_desc := ""
-	for nd2 in Talents.LANE_TREES.get("sharpshooter", []):
-		if String((nd2 as Dictionary).get("id", "")) == "ss_overkill":
-			ss_desc = String((nd2 as Dictionary).get("desc", ""))
-	ok(ss_desc.contains("Focus in FULL"),
-		"§3: the Sharpshooter's Overkill no longer carries the Focus clause — the Wide Watch's retirement string is now false")
-	# THE LANE THE SOURCE COMMENT NAMES. `talents.gd`'s own note beside
-	# `bz_warcry` says the Sharpshooter's Overkill is in his **Precision** lane
-	# and it is in **Penetration** — one word wrong in the one place a designer
-	# reading the Berserker tree would meet it. FO corrected the comment; this is
-	# what stops it drifting back.
-	var lane := ""
-	for f2 in found:
-		if String((f2 as Dictionary)["id"]) == "ss_overkill":
-			lane = String((f2 as Dictionary)["lane"])
-	ok(lane == "Penetration",
-		"§3: the Sharpshooter's Overkill sits in the `%s` lane" % lane)
-	var tsrc: String = FileAccess.get_file_as_string("res://scripts/talents.gd")
-	# **THE NEEDLE IS THE SENTENCE, NOT THE WORD, AND THE REASON IS THAT
-	# `Precision` IS A REAL LANE — the SHARPSHOOTER's OWN Lane A** (Focus, crit
-	# chance, crit damage), which is exactly why the wrong word was a natural
-	# thing to write. A bare `"Precision lane"` needle would red the day anybody
-	# writes a true sentence about that lane. The false CLAIM is the pairing, so
-	# the pairing is what is pinned, in both directions.
-	ok(not tsrc.contains("Precision lane already has"),
-		"§3: `talents.gd` says the Sharpshooter's `Precision lane already has` a talent called Overkill again — it is his PENETRATION lane")
-	ok(tsrc.contains("Penetration lane already has"),
-		"§3: the note beside `bz_warcry` no longer names the lane at all — the correction was deleted rather than made")
-	var precision_lane := false
-	for nd3 in Talents.LANE_TREES.get("sharpshooter", []):
-		if String((nd3 as Dictionary).get("lane", "")) == "Precision":
-			precision_lane = true
-	ok(precision_lane,
-		"§3: the Sharpshooter has no `Precision` lane at all — the needle above is guarding the wrong thing")
-	print("    Overkill x2: bz_warcry (berserker/Warpath/7), ss_overkill (sharpshooter/Penetration/7)")
+	print("\n§3 — the node the Wide Watch's retirement names, asked of the one tree")
+	var raw: String = FileAccess.get_file_as_string("res://data/runes.json")
+	var runes: Dictionary = JSON.parse_string(raw) as Dictionary
+	var carriers: Array = []
+	for nd in Talents.TREE:
+		var node := nd as Dictionary
+		if String(node.get("desc", "")).contains("Focus in FULL") \
+				or _writes_key(node.get("payload", {}), "overkill"):
+			carriers.append("node:" + String(node.get("id", "")))
+	for rid in runes:
+		if _writes_key((runes[rid] as Dictionary).get("payload", {}), "overkill"):
+			carriers.append("rune:" + String(rid))
+	ok(carriers.is_empty(),
+		"§3: %s carry Overkill's Focus clause again — the reason the Wide Watch was retired is back, and the ruling queued on its return has a different question to answer"
+			% [carriers])
+	print("    Overkill's Focus clause: carried by %s — it lives only on the retired Wide Watch"
+		% ("no node of the one tree and no rune" if carriers.is_empty() else ", ".join(carriers)))
+
+
+# Does any dictionary inside this payload carry `key`? A payload can nest
+# (`also`, `upgrade`), so the walk is recursive. BATCH FX — §1c and §3 ask it of
+# every node of the one tree and every rune payload.
+func _writes_key(o, key: String) -> bool:
+	if o is Dictionary:
+		if (o as Dictionary).has(key):
+			return true
+		for k in o:
+			if _writes_key(o[k], key):
+				return true
+	elif o is Array:
+		for x in o:
+			if _writes_key(x, key):
+				return true
+	return false
 
 
 # Both bodies back to full and alive before an arm. `check_dj` §1's idiom.

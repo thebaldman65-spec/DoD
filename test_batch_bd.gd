@@ -99,12 +99,47 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
+# BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED. FX deleted the twelve spec
+# trees, so the three Snares ids §2 learns are in no tree a hero can buy, and a
+# learned id the member's tree does not hold applies NOTHING at the spawn — which
+# is the whole of why §2's live check went red (every node read 0). The FIELDS
+# those nodes wrote and their read sites (`_spring_trap`, and the snare branch of
+# `_resolve`) stand, dormant rather than deleted, so the question still has a
+# true answer. Each payload is copied verbatim from the retired node and rides
+# the Survivalist's tree as a fixture cell, so it reaches the unit through the
+# SAME spawn path learning the node did (`Talents.apply_from_tree`, then
+# `BattleUnit.setup`) — which is why "Bone Breaker pays 90" still asks something.
+#   FX: the payload the retired sv_bone (Bone Breaker) carried — the node is
+#       deleted, the field and its read site (`_spring_trap`) stand.
+#   FX: the payload the retired sv_cruel (Cruel Devices) carried — the node is
+#       deleted, the field and its read site (`_spring_trap`) stand.
+#   FX: the payload the retired sv_caught (Caught Fast) carried — the node is
+#       deleted, the field and its read site (`_spring_trap`) stand.
+const RETIRED := {
+	"sv_bone": {"name": "Bone Breaker", "payload": {"stat": {"bone_breaker": 90}}},
+	"sv_cruel": {"name": "Cruel Devices", "payload": {"stat": {"cruel_ranks": 50}}},
+	"sv_caught": {"name": "Caught Fast", "payload": {"stat": {"caught_fast": 5}}},
+}
+
+
+# The Survivalist's tree for a spawn: the one class tree, plus one fixture cell
+# for every RETIRED id in `learned`, carrying that node's payload and nothing else.
+func _tree_with_retired(spec: String, learned: Dictionary) -> Array:
+	var tree: Array = Talents.generate_tree(spec, "")
+	for id in learned:
+		if RETIRED.has(id):
+			tree.append({"id": String(id), "name": String(RETIRED[id]["name"]),
+				"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
+
+
 func _spawn(learned := {}, lineup := ["raider", "archer"]) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
 	return await Fixture.spawn(self, ["berserker", "cryomancer", "inquisitor", "mystic"],
 		{"enemies": lineup, "talents": {3: learned.duplicate()},
 		"bm": {3: ["Deadfall", "Snare Trap"]}, "bm_all": true, "slot_idx": 0,
-		"deterministic": true, "heal_mult": 1.0, "sim": true})
+		"deterministic": true, "heal_mult": 1.0, "sim": true,
+		"patch": {3: {"tree": _tree_with_retired("mystic", learned)}}})
 
 
 func _kill(scene: Node) -> void:
@@ -220,6 +255,8 @@ func _one_writer_for_the_chip() -> void:
 	# BATCH BM: Set and Forget (Survivalist, Snares row 8) puts the trap back
 	# out at his turn start, so there is a FOURTH caller. The property the
 	# check exists for — ONE writer, everybody else calls it — is unchanged.
+	# (FX retired that node with the twelve trees; its field and that caller in
+	# `battle.gd` stand, so the count does not move.)
 	ok(src.count("_stamp_deadfall_chip(") == 5,
 		"§2: ...and four callers besides the definition (reads %d)" % \
 			src.count("_stamp_deadfall_chip("))
@@ -363,6 +400,9 @@ func _live_boss_shrugs_unless_broken() -> void:
 # §2 — THREE TALENT NODES NOW PAY PER SPRING, AND THAT IS THREE TIMES WHAT THEY
 # USED TO. None of them is changed here; what is measured is the TOTAL, so the
 # next decision has the figure. Bone Breaker is the largest number in the batch.
+# BATCH FX: all three nodes went with the twelve trees; `_spawn` inlines the
+# payload each carried (see RETIRED), so the three fields and their read site
+# are measured exactly as they were — the same numbers, reached the same way.
 func _live_nodes_pay_per_spring() -> void:
 	var scene := await _spawn({"sv_bone": 1, "sv_cruel": 1, "sv_caught": 1})
 	var sv := _sv(scene)
@@ -420,6 +460,9 @@ func _live_cap_counts_a_deadfall_as_one() -> void:
 		# Deadfall Network installs a cap of THREE. Three CHARGES must not read
 		# as three occupants, or the node it is supposed to make valuable would
 		# be spent on one trap.
+		# FX: the payload the retired sv_network (Deadfall Network) carried — the
+		# node is deleted, the field and its read site stand. This check always
+		# set the field directly, so nothing here moved.
 		sv.deadfall_network = 3
 		ok(bool(scene.call("_ability_usable", sv, snare)),
 			"under Deadfall Network the three charges are ONE occupant, not three")

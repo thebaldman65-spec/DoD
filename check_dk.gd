@@ -38,6 +38,14 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
+# BATCH FX — THE NODE IDS IN THESE LABELS NAME NODES THE ONE TREE REPLACED OR
+# DELETED, AND NOT ONE PIN MOVED. Each entry pins a READ SITE in `battle.gd`, and
+# FX kept every read site: `rally`, `tank_spank_ranks`, `rallying_cry` and
+# `waters_ranks` are dormant (nothing writes them), while `field_medic`,
+# `devoutness_ranks` and `last_hope_pct` are written by `tn_cleanse`,
+# `tn_unbreaking` and `tn_last_hope` at the old magnitudes. A dormant read site
+# is still the collection DK ruled on, so the ruling is still asserted here.
+#
 # THE FOUR THAT WIDENED, each pinned by its own read line. A fragment that stops
 # matching is a REGRESSION here rather than a notice: DK ruled on these, so a
 # site that goes back to bare `heroes` has undone the ruling.
@@ -108,14 +116,34 @@ const NARROW := {
 
 # The node/ability texts, and which WORD each must carry now. The four widened
 # keep "ally" and are TRUE for the first time; the seven say "hero".
+#
+# **BATCH FX — FIVE ENTRIES HERE WERE TALENT-NODE TEXTS, AND THE TREES THEY LIVED
+# IN ARE DELETED.** Two have a PRECEDENT-MAPPED SUCCESSOR in the one tree, on the
+# same field at the same magnitude, and the needle follows the text there:
+#   · Devoutness (`dv_devoutness`, devoutness_ranks 20) -> `tn_unbreaking`, whose
+#     desc renders its number where the old one carried `{v}`. It still says
+#     HERO, for DK's reason: the figure is stamped at party spawn, before a beast
+#     exists.
+#   · Last Hope (`hl_last_hope`, last_hope_pct 40) -> `tn_last_hope`, which took
+#     the node's wording VERBATIM, so that needle did not have to move at all.
+# **THREE ARE DELETED UNDER DG §2 — THREE CHECKS** — because neither the one
+# tree nor any rune carries their node or their field (swept over
+# `data/runes.json`), so no text exists anywhere to carry the word:
+#   · Tank and Spank (`wd_tank_spank`): "Mocking Blow ALWAYS Empowers a random
+#     hero (2 turns)." — `tank_spank_ranks` is written by nothing now.
+#   · Rallying Cry (`wd_stomp_drill`): "every hero regains {v}% of their maximum
+#     resource" — `rallying_cry` is written by nothing now.
+#   · Cleansing Waters (`dv_waters`): "each hero has a {v}% chance each turn" —
+#     `waters_ranks` is written by nothing now.
+# Their READ SITES are what DK ruled on, and FX kept every one, dormant: the
+# `NARROW` pins above still assert each walks the four, so the half of the
+# ruling that is about the game is still asked. The three CARD texts below (War
+# Stomp twice, Rallying Shout) are ability descriptions in `classes.gd`.
 const TEXT_IS_HERO := [
-	"Mocking Blow ALWAYS Empowers a random hero (2 turns).",
-	"every hero regains {v}% of their maximum resource",
 	"Heroes regain 20% of their resource",
 	"and 15 BD each. Heroes regain 10%",
 	"every other hero\\nregains 30% of their resource.",
-	"each hero has a {v}% chance each turn",
-	"Every hero takes {v}% less Break damage.",
+	"Every hero takes 20% less Break damage.",
 	"Heroes under 25% of their maximum health receive 40% more healing.",
 ]
 
@@ -396,9 +424,18 @@ func _texts() -> void:
 	# `Classes.draft_ability` — verbatim, which is why the same words are still
 	# there to pin. The read site did not move at all, so DK's ruling stands
 	# exactly as it was: `_hero_side()` still covers a beast.
+	# BATCH FX — TWO TALENT TEXTS STOOD HERE AND ONE HAS A SUCCESSOR. Field Medic
+	# (`sv_medic`, field_medic 2) -> `tn_cleanse`, the same field at the same
+	# magnitude, whose desc renders the 2 where the old one carried `{v}`. It
+	# still says ALLY and is still TRUE: `fm_pool` walks `_hero_side()` (the
+	# WIDENED pin above) and §2 still drives a poisoned beast through it.
+	# **RALLY IS DELETED UNDER DG §2 — ONE CHECK.** `wd_rally`'s text ("grants
+	# every ally +30% healing received") went with the twelve trees, and no node
+	# of the one tree and no rune writes its `rally` field, so no text exists to
+	# carry the word. Its read site stands, dormant and still WIDENED, and §2's
+	# RALLY arm still measures what the status pays a beast (1000 -> 1300).
 	var allies := {
-		"wd_rally Rally": "grants every ally +30% healing received",
-		"sv_medic Field Medic": "cleanse {v} debuffs from random allies",
+		"tn_cleanse (was sv_medic Field Medic)": "cleanse 2 debuffs from random allies",
 	}
 	for what in allies:
 		ok(tal.contains(allies[what]),

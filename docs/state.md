@@ -13,55 +13,93 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-10 (Batch FW).*
+*Last rewritten: 2026-09-11 (Batch FX).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FW — WHAT THE MERGED TALENT LAYER CAN REACH. REPORT ONLY; THE FOURTH BATCH ON `class-merge`.**
-  Nothing was authored, built, merged or changed — no code, no gate, no baseline row, no manifest entry, no
-  `CLAUDE.md` rule. `main` is untouched and still playable. The deliverable is **`docs/systems-recon.html`**;
-  full working **`docs/reports/FW.md`**.
-- **THE ANSWER: 274 IS REACHABLE AS A COUNT AND NOT AS A NUMBER OF DIFFERENT THINGS.** Twenty-one systems belong
-  to no rune, ability, passive or engine outright. Between them a node could say about **159** distinct things
-  under the designer's line; **127** need no ruling (**50 today**, 63 small builds, 14 large) and **32** wait on
-  one. **A tree of 81 can say about fifty things today**, so at least 31 nodes a tree — **124 of 324** — are a
-  second magnitude of something the same tree already says. With every small hook built, every tree can be
-  distinct within itself, and any two still share at least 49 ideas.
-- **THE BILL UNDER THE LINE IS 281, NOT 274.** 43 of FP's 50 survivors survive the designer's line — three touch
-  an ability, one a passive, three a spec status — so Warrior 63, Mage 78, Cleric 77, Hunter 63 (282 if the inert
-  Overpressure is not counted). **Both figures assume four trees of 81, and nothing rules the size**: at 27 a tree,
-  today's machinery alone would fill each tree with distinct nodes.
-- **A NODE IS READ ONLY INSIDE A BATTLE** — a number added to the hero's config at spawn — so the pouch's
-  structure, gold, the shop, the map and the loadout are unreachable today. **Seven silent traps** in that
-  machinery are written in the recon's SR-PLUMB: an undeclared name pays nothing; a payload adds to zero, not to
-  the unit's default; two class passives assign over the tree; dictionaries cannot be written; "party-wide" is the
-  best living holder; the strike loop misses every ability with a `special`; and `check_em` walks every rune,
-  retired ones included.
-- **§3's EDGES ARE THE DESIGNER'S AND ARE LISTED IN THE QUEUE BELOW** — the DO charter against the line, EN §4's
-  relic seam, the class spines' two readings, the class passives, the basic attack's three definitions, spec
-  statuses under DO/DP, and the tree size. **§2's interference is priced, not ruled.**
-- **WHAT MOVED:** `docs/systems-recon.html` (**NEW**), `docs/changelog.html`, `docs/reports/FW.md` (**NEW**) and
-  this file. **Nothing else** — no `.gd`, no `.json`, no `CLAUDE.md`, no `master.html`. The designer's four save
-  files were copied to `save-backups/FW-20260910-173706` before anything else happened and md5-verified against
-  the originals and FV's backup.
-- **VERIFICATION:** **in `docs/reports/FW.md` §5, written after the acceptance run — which is why this file points there
-  rather than quoting it: `check_es` §4 opens this file, so a cell written behind the battery would owe a
-  post-run proof of its own.**
-- **Phase.** Step 1 of the merge's running order — the three spines — is done. **Step 2, the talent layer, now
-  has its recon**; the rulings in its §3 and the trees' size come before a node is authored.
-- **Next letter: FX.**
+- **Last batch: FX — ONE TALENT TREE, KEYED TO THE CLASS. THE FIFTH BATCH ON `class-merge`, AND THE FIRST THAT
+  MERGES ANYTHING.** The twelve spec trees and their 324 nodes are deleted. ONE tree of 27 nodes, in three tiers of
+  nine at 1 / 2 / 3 points (54 in all), is bought per CLASS: a Berserker spends the Warrior's purse. No spec
+  dissolved, no pool merged, no engine moved and no spine was attached. `main` is untouched. Full working:
+  **`docs/reports/FX.md`**.
+- **BUYING IS WEARING.** Nothing in the tree is exclusive, so there is no equip step: every cell a class owns is on
+  every hero of that class, every run. **A tier needs both gates:**
+  - The difficulty gate: `TIERS_OPEN [0, 1, 2, 3]`, so rung N's end boss opens tier N for every class.
+  - The spend gate: `TIER_SPEND_MIN` cells of the tier below, per class. **3 is a candidate, and the number is the
+    designer's to set** (FX §1 prices 1 and 9).
+- **THE PROFILE IS v3 AND KEYED TO THE CLASS (`MIN_VERSION` 2).** A v2 profile folds its twelve spec purses into
+  four by MAX on load, once. **The designer's save folds to Warrior 68, Mage 65, Cleric 66, Hunter 68.** Every class
+  can buy the whole 54-point tree the first time this build is launched, so that save cannot feel the spend gate.
+  The v2 file stays on disk until the first save. `save-backups/FX-20260910-231422` holds all four save files,
+  md5-verified.
+- **THE TWENTY-SEVEN:**
+  - 18 magnitudes are taken from a surviving precedent.
+  - 4 come from a live node outside FW's 43.
+  - **5 are proposed** against a stated reference.
+  - **4 of the brief's nodes were not TODAY for a four-class tree**, and an alternate from its list stands in each
+    place.
+
+  All of it is under FX's **NEEDS A RULING**, and the queue item below carries it.
+- **THE READ SITES STAYED, SO MOST OF THE OLD TREES' FIELDS ARE DORMANT.** 275 of the 304 fields the twelve trees
+  wrote have no writer now, and their read sites stand for the next tree, rune or card. **Queue items below that
+  cite a deleted node read as history.** The node is gone, and its field is dormant unless the one tree carries it;
+  the comment above each node in `talents.gd` names its precedent.
+- **A NEW GATE, `check_fx`**, asserts the shape, both gates, the class ledger, the fold (driven on a copy) and every
+  node paying live on every class. **51 targets were repaired to intent**: 25,636 checks became 20,638, and
+  the 1,864 deleted each asked about the deleted trees themselves and are recorded at their sites. No mechanic
+  check was deleted.
+- **FOUND ON THE WAY: TWO SCENE GATES HAD BEEN RE-SAVING THE PLAYER'S PROFILE ON EVERY BATTERY, BYTE-IDENTICALLY,
+  FOR MANY BATCHES.** Every md5 freeze was blind to it until FX's fold made the same write destructive in the
+  reconnaissance run. The profile was restored from the verified backup, and both gates now write a scratch file.
+- **WHAT MOVED:**
+  - Eleven game scripts and `data/glossary.json`.
+  - `CLAUDE.md`, and `docs/master.html` (§7 rewritten, a sweep outside it, the stamp).
+  - The changelog, the design notes, this file, `docs/instrument-rules.md` and `sim.sh`.
+  - `check_fx.gd` (**NEW**), and 54 instrument files: 52 repaired to the new tree, and two redirected to a
+    scratch profile.
+  - `run_battery.sh`, `baselines.json` and `pin-manifest.json`.
+  - `docs/reports/FX.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/FX.md` §7**, written after the acceptance run. This file points there
+  rather than quoting it, because `check_es` §4 opens this file.
+- **Phase.** Steps 1 (the three spines) and 2 (the talent layer) of the merge's running order are done. **Step 3,
+  engines to runes, is next**, and FP's measurements for it stand.
+- **Next letter: FY.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE MERGED TALENT LAYER'S RECON IS WRITTEN AND ITS EDGES ARE UNRULED — **OWED A RULING BEFORE AUTHORING (FW)**
+### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
+
+**FX BUILT THE LAYER AND LEFT FIVE THINGS FOR THE DESIGNER** (`docs/reports/FX.md`, under NEEDS A RULING):
+
+1. **`TIER_SPEND_MIN` is a candidate at 3**, and the brief made it the designer's. FX §1 prices 1 and 9.
+2. **Five magnitudes are PROPOSED**, each against a stated reference (FX §3): More Attack +10, More Armor +5%,
+   A Bigger Resource Pool +20, More Damage Dealt +10% and Less Damage Taken 10%.
+3. **Four of the brief's nodes are swapped for alternates**, because none is TODAY for a tree four classes buy:
+   regenerate more resource, debuffs expire sooner, a Perfect pays, and Elusive while afflicted. Each would need
+   a hook (FX §2).
+4. **Two names deviate from the brief's labels**, each for a stated reason: Cleanse Debuffs Each Turn, and
+   Breaking Heals a Hero.
+5. **The playtest save cannot feel the spend gate.** Its folded purses (65–68) exceed the tree's 54.
+6. **The Wide Watch's retirement has lost its reason.** Overkill (`ss_overkill`) is deleted, so the rune's clause
+   exists only on the retired rune. Whether it returns is the designer's. `check_fo` §3 carries the state.
+7. **Deepening Hex's floor has lost its derivation.** `RUIN_FLOOR` 3 was Avatar of Ruin's 5 minus 2. The deepest a
+   live Occultist now reaches is every 8th stack, so the floor binds no live build: keep 3 or re-rule it.
+   `check_fo` §1c carries the state.
+8. **Five node names use a tag word** (BREAK, RESOURCE, DEBUFF). All five are recorded in `check_ek`'s
+   `CLASH_EXEMPT`, and the DEBUFF one uses the word differently. A rename is the designer's call.
+
+**FW's list below is kept as the record. FX ruled two of its nine (the DO charter and the trees' size).** The
+other seven bind the NEXT node authored rather than this tree, because no node of the 27 reaches a relic hook, a
+spine, a class passive, the basic attack or a spec status.
 
 **Full evidence: `docs/systems-recon.html`** — every system in its own `SR-` section; §3 (`SR-LINE`) holds the
 edges and §4 (`SR-COUNT`) the count. The brief said the designer rules on the edges; FW ruled on none. **These are
 the things a later batch must not re-derive:**
 
-1. **THE DO CHARTER AGAINST THE LINE.** `CLAUDE.md` records as settled that a node may modify its spec's protected
+1. **~~THE DO CHARTER AGAINST THE LINE~~. RULED AT FX: THE LINE SUPERSEDES DO's PERMITTED LIST**, and
+   `CLAUDE.md`'s DO block now opens with that. FW's text: `CLAUDE.md` records as settled that a node may modify its spec's protected
    core — *"worth 83 nodes"*, *"DO NOT RE-OPEN THIS AS AN OPEN QUESTION"* — and the line forbids touching any
    ability. The 33 node payloads that edit an ability today were legal under DO and are all out under the line.
 2. **EN §4's RELIC SEAM.** *"If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory
@@ -78,7 +116,7 @@ the things a later batch must not re-derive:**
    and not is_counter`. A ruling that a node may touch "the basic attack" also has to say which.
 6. **SPEC STATUSES AFTER THE MERGE** are legal by the line and bets by the DO/DP charter unless every spec of a
    class can apply them. Reading statuses **by count** (`DEBUFF_IDS`) is the shape that touches no owner.
-7. **THE TREES' SIZE.** 274 (281 under the line) assumes four trees of 81. At 81 a tree, today's machinery forces
+7. **~~THE TREES' SIZE~~. RULED AT FX: ONE TREE OF 27, KEYED TO THE CLASS.** FW's text: 274 (281 under the line) assumes four trees of 81. At 81 a tree, today's machinery forces
    at least 124 of the 324 nodes to be magnitude repeats; at 27 a tree it forces none. Nothing rules it.
 8. **ENEMY INTERFERENCE WITH THE SKILL CHECK** — priced in `SR-INTERFERE`: two flavours are profile keys, all four
    need one hero-to-bar hook, and no instrument could measure any of them because the bot never reads a profile.
@@ -86,6 +124,45 @@ the things a later batch must not re-derive:**
 9. **AND ONE SYNC LINE:** `CLAUDE.md`'s must-stay-selected list names `spec-recon.html` and `merge-recon.html` but
    not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
    forbade rules); **selecting it in the picker is the designer's**.
+
+### FOUND AT FX AND NOT FIXED — **NONE BLOCKS A BATCH; THE FIRST TWO ARE PLAYER-FACING WORDING**
+
+- **THE STATUS NAMES KEEP THEIR PRECEDENTS' WORDS.** The `iron_will` chip reads "Iron Will" and the `undying_rage`
+  chip reads "Undying Rage", while the log lines beside them name the node of the one tree. Renaming a chip after its
+  applier is the designer's call.
+- **THE "BUILDS WITH" LINES IN master.html §6 WHOSE EVERY PARTNER WAS A DELETED NODE WERE REFILLED WITH LIVE CARDS**
+  (for example Hoarfrost Armor → Killing Frost, Alms ↔ Divine Presence). That is card copy nobody chose.
+- **275 of the 304 fields the twelve trees wrote are dormant**: their read sites stand and nothing writes them. What a
+  player could meet:
+  - the Devout's Faith lane has only the Binding Oath rune's opening Faith;
+  - the two-companion mode (`the_pack`) is unreachable;
+  - the Mercy line sits at half health always;
+  - nothing buys the Bared Guard's cost back.
+- **154 log labels and about a dozen status chips on dormant read sites still name deleted nodes.** They cannot fire
+  today. `docs/reports/FX.md` §9 says where the list is.
+- **About 349 comment lines in `scripts/` carry the retired vocabulary**:
+  - the SYNERGY and AXIS lines in `classes.gd`;
+  - `unit.gd`'s field headers;
+  - the `DOD_SIM_TALENTS` example at `battle.gd:1205`;
+  - `Run._migrate_trees`' "are refunded";
+  - "Richocet" at `battle.gd:8647` and `unit.gd:457`.
+- **Suite checks that cannot fail, all older than FX:**
+  - `test_batch_bw`'s kit sweep runs 0 checks;
+  - two of `test_batch_bs`'s Forge Body checks;
+  - `test_batch_al`'s Toughness check;
+  - `test_batch_av`'s no-Mercy raise;
+  - `test_batch_aw`/`ax`'s exclusive-reference loop, which is empty.
+- **master.html inconsistencies the sweep found and left, all older than FX:**
+  - §3's elite talent point contradicts §8;
+  - §4.3's Seasoned Fighter half-health wording;
+  - the Parry Up row credits the retired Still Wrist;
+  - Overcharge is "half" in one place and "FULL" in another;
+  - §12's "talent-gated abilities".
+- **`CLAUDE.md`'s EM block says the rune `lane` fields are "STILL SHOWN".** 36 retired runes carry them, and nothing
+  renders them.
+- **Four control copies left user-data folders under Godot's `app_userdata`**: "DoD G2 curcopy", "DoD G2
+  headcopy", "DoD G6 ctlcopy" and "Dawn of Decay FX ctl". Each was renamed so that its `user://` could not reach the
+  player's save folder. They can be deleted.
 
 ### FOUND AT FW AND NOT FIXED — **A REPORT TOUCHES NO CODE; THE FIRST THREE ARE PLAYER-FACING**
 
@@ -98,7 +175,8 @@ the things a later batch must not re-derive:**
 - **The sim bot's Health Potion heals a flat 40** (`battle.gd:3778-3788`), not `Run.health_potion_heal`'s 20% of
   maximum — against `CLAUDE.md`'s CT §6 (*"battle and map both CALL them"*), so every sim item-economy figure
   measures a different potion from the player's.
-- **Overpressure (`sm_overpressure`) never fires**: its read is the enemy's own field and nothing copies the node's
+- **MOOT AT FX** (the node is deleted with its tree, and no magnitude came from it). **Overpressure
+  (`sm_overpressure`) never fired**: its read is the enemy's own field and nothing copies the node's
   value onto an enemy (`unit.gd:3743`).
 - **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult` is read at two,
   `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing.
@@ -115,12 +193,14 @@ the things a later batch must not re-derive:**
   "half speed" has no read site; White Heat and Fuse have no writer; the "Focus" resource drip cannot run.
 - **A tick that kills skips `_on_enemy_death`** (`battle.gd:2782-2784`), so nothing that pays on a kill sees a
   Burn or Poison kill.
-- **The Survivalist's passive barb calls `_apply_status`, not `_apply_poison`** — an inference: his poison-lane
+- **The Survivalist's passive barb calls `_apply_status`, not `_apply_poison`**. **This is moot for the nodes at FX**:
+  the poison lane is deleted, though the call itself is unchanged. FW's text: — an inference: his poison-lane
   nodes would not reach it.
 - **`merge-recon.html` carries five claims FW corrects** (a recon is regenerated, never hand-edited): Overpressure
   counted live; Grudge and The Whole Room's reason; Cackling Mirror counted engine-free; the Arcanist's "one idea";
   the Swordmaster's "six Break nodes".
-- **Names a merge makes collide:** Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
+- **MOOT AT FX.** All three nodes are deleted, and none of the one tree's 27 names collides with anything (swept for
+  exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
 ### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
@@ -384,7 +464,8 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    unbuilt system in the game and is wanted independently of the merge**: its reading half is the
    cheapest of the three (`add_status` is a single funnel), and its PAYOUT does not exist anywhere,
    because `STATUS_INFO` holds 156 ids and carries **no magnitude at all**.
-2. **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
+2. **~~THE TALENT LAYER~~. DONE AT BATCH FX: ONE TREE OF 27, KEYED TO THE CLASS, NOT 274 NODES.** The old plan
+   read: **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
    designer and the assistant together. **The long pole. Its recon is `docs/systems-recon.html` (FW), and the
    rulings in that document's §3 come before a node is written.**
 3. **ENGINES TO RUNES, each with its enabler.**
@@ -414,6 +495,9 @@ payload.** Three surviving Warden nodes died to this at FP.
   `block_chance: 0.20` in its own payload, so a merged Warden node can partially self-enable —
   which makes the survivor question *"does it reach a non-zero base"* rather than
   *"does it name the engine"*.
+- **AT FX ALL THREE NODES WENT WITH THEIR TREES** (`sm_sword_mastery`, `wd_unkillable`, `wd_mountain`). The one
+  tree writes `parry_bonus` (Parry More, at Sword Mastery's number) and no `block_chance`, so the finding binds the
+  engine move, not the tree.
 
 ### THE RUNE LAYER'S OWED ITEMS — **NONE. FN CLOSED THE LAST THREE.**
 

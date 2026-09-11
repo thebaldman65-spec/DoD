@@ -29,6 +29,20 @@
 #   6. LIVE — a spawned battle, because First Blood's opening Rage, the
 #      Overkill reset, Second Wind's cleared cooldowns and the Measured/
 #      Reckless cancellation only exist at battle time.
+#
+# BATCH FX DELETED THE SUBJECT OF ITEMS 1 AND 2, AND RE-POINTED THE REST. The
+# twelve per-spec trees are gone (324 nodes): a Berserker wears the Warrior's
+# cells of the ONE tree, `Talents.TREE` — 27 nodes in three tiers of nine, no
+# lanes, no rows, no capstone shelf. EVERY FIELD this file drives kept its
+# read site in battle.gd / unit.gd, so every MECHANIC question above still has
+# a true answer, and each is now driven off the EXACT payload the retired node
+# carried (`RETIRED`, below — copied out of the deleted table, never re-typed).
+# The questions about the deleted tree ITSELF — a node's row, lane, name,
+# capstone flag, scale text, and its id surviving a re-author — have no
+# subject left anywhere, so they are deleted AT THEIR SITES (DG §2), each with
+# its exact count. Where the one tree asks the same question, it is asked of
+# the one tree instead: its size and tiers, a worn cell's single rank, and —
+# DO's charter, which FX's line keeps — that nothing a hero wears grants.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -40,37 +54,11 @@ const Fixture = preload("res://suite_fixture.gd")
 var checks := 0
 var fails: Array = []
 
-# id -> [row, lane, name]. The layout table of BATCH_AJ.md §Layout,
-# transcribed once so a re-cut has to come here and say so.
-const NODES := {
-	"bz_savagery": [1, "Bloodletting", "Savagery"],
-	"bz_unstoppable": [1, "Fury", "Unstoppable"],
-	"bz_vitality": [1, "Warpath", "First Blood"],
-	"bz_hemorrhage": [2, "Bloodletting", "Hemorrhage"],
-	"bz_reckless": [2, "Fury", "Reckless Fury"],
-	"bz_bloodlust_node": [2, "Warpath", "Flurry"],
-	"bz_crushing_blows": [3, "Bloodletting", "Crushing Blows"],
-	# BATCH DO renamed both cells when their cards left for the draft — a node
-	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
-	"bz_battle_shout": [3, "Fury", "Battle Roar"],
-	"bz_thick_skin": [3, "Warpath", "Bloodied Momentum"],
-	"bz_arterial": [4, "Bloodletting", "Arterial Spray"],
-	"bz_deathwish": [4, "Fury", "Deathwish"],
-	"bz_relentless": [4, "Warpath", "Relentless"],
-	"bz_gushing": [5, "Bloodletting", "Scent of Blood"],
-	"bz_frenzied_edge": [5, "Fury", "Scar Tissue"],
-	"bz_bloodied_hide": [5, "Warpath", "Second Wind"],
-	"bz_bloodcraze": [6, "Bloodletting", "Bloodcraze"],
-	"bz_measured": [6, "Fury", "Measured Rage"],
-	"bz_unrelenting": [6, "Warpath", "Unrelenting Assault"],
-	"bz_feast": [7, "Bloodletting", "Blood Tithe"],
-	"bz_enraged": [7, "Fury", "Enraged"],
-	"bz_warcry": [7, "Warpath", "Overkill"],
-	# BATCH BM moved the capstone shelf to row 9 (rows 1-8 are lanes now).
-	"bz_exsanguinate": [9, "Bloodletting", "Exsanguination"],
-	"bz_undying": [9, "Fury", "Undying Rage"],
-	"bz_rampage": [9, "Warpath", "Bloodstorm"],
-}
+# BATCH FX — THE LAYOUT TABLE IS DELETED WITH ITS SUBJECT. `NODES` transcribed
+# BATCH_AJ.md §Layout — the row, the lane and the name of each of the 24
+# Berserker nodes — "so a re-cut has to come here and say so". FX deleted the
+# twelve spec trees, so no Berserker node, row or lane is left for a re-cut to
+# move. §2 records the 99 checks that read the table and why each went.
 
 # id -> [stat field, value the PAYLOAD writes]. Only the nodes whose
 # payload is a stat; the ability-payload and grant nodes are checked in
@@ -118,6 +106,75 @@ const SCALE_VALUES := {
 	"bz_unrelenting": 40.0,
 }
 
+# BATCH FX — WHAT THE TWO TABLES ABOVE ARE ASKED OF NOW. The nodes are deleted;
+# the questions are not. A PAYLOADS row is asked of the payload the RETIRED
+# node carried (below), applied the way the spawn applies it — except the one
+# row whose field AND magnitude a node of the one tree took (talents.gd names
+# each precedent above its node), which is asked of that live node, because
+# there the question is still asked of a node a player can buy. SCALE_VALUES'
+# design numbers are what `desc_for` must render off the retired nodes' exact
+# desc and scale; §3 records which half of that loop went, and why.
+const PRECEDENT := {"bz_undying": "tn_refuse_death"}
+
+# BATCH FX — THE PAYLOADS THE RETIRED BERSERKER NODES CARRIED, copied verbatim
+# out of the deleted `Talents.LANE_TREES["berserker"]` (ints stay ints, floats
+# stay floats, `also` halves and their `has_node` conditions included). The
+# nodes are deleted; every field they wrote and every read site those fields
+# pay through still stands, so what this file asked of the nodes it asks of
+# these. The ids are the retired ids because the conditions name them. Only
+# the fourteen SCALE_VALUES nodes carry their desc and scale, for §3.
+const RETIRED := {
+	"bz_savagery": {"payload": {"stat": {"bleed_bonus": 15}},
+		"desc": "All bleed-building Berserker abilities build +{v} more Bleed.",
+		"scale": {"step": 15}},  # Savagery
+	"bz_unstoppable": {"payload": {"stat": {"bloodrage_step_bonus": 1.5}},
+		"desc": "Blood Frenzy grants {v}% damage for every 5% of health missing (up from the base 2%).",
+		"scale": {"base": 2.0, "step": 1.5}},  # Unstoppable
+	"bz_vitality": {"payload": {"stat": {"opening_rage": 40}},
+		"desc": "The Berserker begins every battle with {v} Rage.",
+		"scale": {"step": 40}},  # First Blood
+	"bz_hemorrhage": {"payload": {"stat": {"hemorrhage_ranks": 1}},
+		"desc": "Enemies at {v} or more bloodloss are Crippled.",
+		"scale": {"base": 60}},  # Hemorrhage
+	"bz_reckless": {"payload": {"stat": {"dmg_bonus": 0.2, "dmg_taken_bonus": 0.15}}},  # Reckless Fury
+	"bz_bloodlust_node": {"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 2}}},  # Flurry
+	"bz_crushing_blows": {"payload": {"stat": {"crushing_blows_ranks": 1}, "also": [{"condition": {"has_node": "bz_savagery"}, "stat": {"crushing_blows_ranks": 1}}]},
+		"desc": "For every 20 points of bloodloss on the enemy team, gain {v}% armor penetration. With Savagery, every 15 points instead.",
+		"scale": {"step": 9}},  # Crushing Blows
+	"bz_thick_skin": {"payload": {"stat": {"bloodied_momentum_ranks": 1}},
+		"desc": "When an enemy is slain, the Berserker gains {v} Rage.",
+		"scale": {"step": 40}},  # Bloodied Momentum
+	"bz_arterial": {"payload": {"stat": {"arterial_ranks": 1}},
+		"desc": "When an enemy bleeds out, {v}% of its blood buildup transfers to another living enemy.",
+		"scale": {"step": 100}},  # Arterial Spray
+	"bz_deathwish": {"payload": {"stat": {"deathwish_ranks": 1}},
+		"desc": "+{v}% damage dealt while below 35% health.",
+		"scale": {"step": 25}},  # Deathwish
+	"bz_relentless": {"payload": {"ability": "Hack and Slash", "add": {"cost": -15}, "set": {"bleed_chance": 1.0}},
+		"desc": "Hack and Slash costs {v} less Rage, and its bleed rolls ALWAYS land.",
+		"scale": {"step": 15}},  # Relentless
+	"bz_gushing": {"payload": {"stat": {"scent_ranks": 1}},
+		"desc": "+{v}% damage for each enemy that has bled out this battle.",
+		"scale": {"step": 10}},  # Scent of Blood
+	"bz_frenzied_edge": {"payload": {"stat": {"scar_tissue_ranks": 1}, "also": [{"condition": {"has_node": "bz_unstoppable"}, "stat": {"scar_tissue_ranks": 1}}]}},  # Scar Tissue
+	"bz_bloodied_hide": {"payload": {"stat": {"second_wind": 1}}},  # Second Wind
+	"bz_bloodcraze": {"payload": {"stat": {"bloodcraze": 1}},
+		"desc": "When an enemy bleeds out, the Berserker heals {v}% of max HP.",
+		"scale": {"step": 12}},  # Bloodcraze
+	"bz_measured": {"payload": {"stat": {"dmg_taken_bonus": -0.2}, "also": [{"condition": {"has_node": "bz_reckless"}, "stat": {"measured_cancels_reckless": 1}}]}},  # Measured Rage
+	"bz_unrelenting": {"payload": {"stat": {"unrelenting_ranks": 1}},
+		"desc": "Dropping below 25% health grants +{v} Constitution for 3 turns (at most once every 5 turns).",
+		"scale": {"step": 40}},  # Unrelenting Assault
+	"bz_feast": {"payload": {"stat": {"blood_tithe_ranks": 1}},
+		"desc": "An enemy bleeding out grants the Berserker {v} Rage.",
+		"scale": {"step": 45}},  # Blood Tithe
+	"bz_enraged": {"payload": {"stat": {"enraged_ranks": 1}},
+		"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
+		"scale": {"step": 12}},  # Enraged
+	"bz_warcry": {"payload": {"stat": {"overkill_reset": 1}}},  # Overkill
+	"bz_exsanguinate": {"payload": {"stat": {"exsanguination": 1}}},  # Exsanguination
+}
+
 
 func _initialize() -> void:
 	# Children added in _initialize never fire _ready (root not ready) — park
@@ -162,91 +219,159 @@ func _run() -> void:
 	quit(1 if fails.size() > 0 else 0)
 
 
+# The tree a Berserker buys into. BATCH FX: `generate_tree` answers the tree
+# the spec's CLASS buys into, and for every class that is the ONE tree.
 func _tree() -> Array:
 	return Talents.generate_tree("berserker", "warrior")
 
 
+# BATCH FX — a retired node rebuilt inline from RETIRED: its id, its exact
+# payload, and (for §3's `desc_for` machinery) its desc and scale. `{}` for an
+# id RETIRED does not carry, which every caller reads as "not in the tree".
 func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(_tree(), id)
+	if not RETIRED.has(id):
+		return {}
+	var n: Dictionary = (RETIRED[id] as Dictionary).duplicate(true)
+	n["id"] = id
+	return n
+
+
+# BATCH FX — the retired nodes as a tree `apply_from_tree` can walk. `_member`
+# hands it to the payload machinery, and `_spawn` hands it to the Berserker as
+# his member `tree`: the battle spawn applies `Run.party[i]["tree"]` against
+# his learned dict, so a retired id he learns pays exactly what its node paid.
+func _retired_tree() -> Array:
+	var out: Array = []
+	for id in RETIRED:
+		out.append(_node(String(id)))
+	return out
+
+
+# The payload a PAYLOADS row is asked of: the live node's where the one tree
+# took the field at the same magnitude (PRECEDENT), else the retired node's.
+func _payload(id: String) -> Dictionary:
+	if PRECEDENT.has(id):
+		return Talents.node_in_tree(Talents.tree(), String(PRECEDENT[id])).get("payload", {})
+	return _node(id).get("payload", {})
+
+
+func _label(id: String) -> String:
+	if PRECEDENT.has(id):
+		return "%s (%s's precedent)" % [PRECEDENT[id], id]
+	return id
+
+
+# BATCH FX — every cell of the one tree, WORN: what a Berserker walks in
+# wearing once the Warrior's purse has bought the whole tree. It comes out of
+# `Talents.worn_learned`, the door `Profile.worn_talents` reads, so this is the
+# real {id: rank} set a run hands the spawn, not a hand-built one.
+func _all_worn() -> Dictionary:
+	var cells := {}
+	for n in Talents.tree():
+		cells[String(n["id"])] = true
+	return Talents.worn_learned(Talents.tree(), cells)
+
+
+# `_applied`'s twin for the one tree, worn whole. What §6 used to ask of a CELL
+# that might grant (DO's charter) it asks of this: a hero wears the whole tree
+# now, so a grant could only ever come back through it.
+func _applied_live(earned: Array = [], abilities: Array = []) -> Dictionary:
+	var member := {"key": "warrior", "spec": "berserker", "talents": _all_worn(),
+		"tree": _tree(), "bm_abilities": earned}
+	var cfg := {"abilities": abilities}
+	Talents.apply_from_tree(cfg, member["tree"], member["talents"], member)
+	return cfg
 
 
 # ---------- 1. the shape ----------
-
+#
+# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE, AND DELETED ITS GRID.
+# `generate_tree("berserker", ...)` answers the tree the Berserker's CLASS buys
+# into — `Talents.TREE`, the same 27 nodes for every class — so what this
+# section asked of the Berserker tree it asks of that one: its size, one entry
+# per id, and a single rank per node, which the one tree decides in
+# `Talents.worn_learned` (the door `Profile.worn_talents` reads), since no node
+# carries a `ranks` key any more.
+#
+# DELETED UNDER DG §2 — 54 CHECKS, each about the deleted grid:
+#   27  "row R/lane L holds one node (<id>)" — no node sits in a row or a lane
+#   27  "<id> carries the capstone flag iff it is on the shelf" — no shelf
+# THE FILL CHECK IS RE-POINTED ONTO THE TIERS. "row R has a <lane> node" (27,
+# one per cell of the 9 x 3 grid) asked whether every cell of the shape was
+# filled; the one tree's shape is three tiers of NODES_PER_TIER, so each tier
+# is asked to hold that many — 3 checks where there were 27.
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Berserker tree holds 27 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27,
+		"the tree a Berserker buys into holds 27 nodes (got %d)" % tree.size())
 	var seen: Dictionary = {}
-	var grid: Dictionary = {}
 	for n in tree:
 		var id := String(n["id"])
 		ok(not seen.has(id), "node id %s appears exactly once" % id)
 		seen[id] = true
-		ok(int(n["ranks"]) == 1, "%s holds a single rank" % id)
-		var key := "%d/%s" % [int(n["row"]), String(n["lane"])]
-		ok(not grid.has(key), "row %s holds one node (%s)" % [key, id])
-		grid[key] = id
-	# BATCH BM: rows 1-8 are lane rows, all 3-wide; row 9 is the capstone
-	# shelf, also 3-wide but flagged, and NOT lane-gated.
-	for row in range(1, Talents.CAPSTONE_ROW + 1):
-		for lane in ["Bloodletting", "Fury", "Warpath"]:
-			ok(grid.has("%d/%s" % [row, lane]),
-				"row %d has a %s node" % [row, lane])
-	for n in tree:
-		var is_cap: bool = int(n["row"]) == Talents.CAPSTONE_ROW
-		ok(bool(n.get("capstone", false)) == is_cap,
-			"%s carries the capstone flag iff it is on the shelf" % String(n["id"]))
+		ok(int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"%s is worn at a single rank" % id)
+	for tier in range(1, Talents.TIERS + 1):
+		ok(Talents.tier_nodes(tree, tier).size() == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier, Talents.NODES_PER_TIER,
+				Talents.tier_nodes(tree, tier).size()])
 
 
 # ---------- 2. every id, row, lane and name ----------
-
+#
+# BATCH FX DELETED THIS SECTION'S SUBJECT, AND ITS 99 CHECKS WENT WITH IT (DG §2):
+#   24  "<id> is still in the tree" — the migration promise ("a rename here
+#       silently voids every saved tree"), which FX retired with the trees:
+#       `Run._migrate_trees` drops every id the one tree does not hold, and the
+#       v2 fold drops a profile's cells
+#   24  "<id> sits on row R"   24  "<id> is in the L lane"   24  "<id> is named N"
+#    3  the two in-place re-specs — bz_vitality kept its id as First Blood,
+#       bz_warcry kept its id as Overkill, and Overkill no longer edits Battle
+#       Shout's cooldown — asserted as ids and names surviving a re-author
+# No Berserker node exists for an id, a row, a lane or a name to be true of.
+# What those two re-specced nodes PAID is still asked, off their exact retired
+# payloads: First Blood's opening Rage and Overkill's reset are PAYLOADS rows in
+# §3 and live battles in §7.
 func _node_table() -> void:
-	for id in NODES:
-		var n := _node(String(id))
-		ok(not n.is_empty(), "%s is still in the tree" % id)
-		if n.is_empty():
-			continue
-		var want: Array = NODES[id]
-		ok(int(n["row"]) == int(want[0]),
-			"%s sits on row %d (got %d)" % [id, int(want[0]), int(n["row"])])
-		ok(String(n["lane"]) == String(want[1]),
-			"%s is in the %s lane (got %s)" % [id, want[1], n["lane"]])
-		ok(String(n["name"]) == String(want[2]),
-			"%s is named %s (got %s)" % [id, want[2], n["name"]])
-	# The two in-place re-specs, called out because the migration promise is
-	# exactly "the id survived while the effect changed".
-	ok(String(_node("bz_vitality")["name"]) == "First Blood" \
-			and _node("bz_vitality")["payload"]["stat"].has("opening_rage"),
-		"bz_vitality kept its id and became First Blood")
-	ok(String(_node("bz_warcry")["name"]) == "Overkill" \
-			and _node("bz_warcry")["payload"]["stat"].has("overkill_reset"),
-		"bz_warcry kept its id and became Overkill")
-	ok(not _node("bz_warcry")["payload"].has("ability"),
-		"Overkill no longer modifies Battle Shout's cooldown")
+	pass
 
 
 # ---------- 3. the magnitudes, payload AND tooltip ----------
-
+#
+# BATCH FX. THE PAYLOAD HALF is a MECHANIC question — does the payload write its
+# field at its magnitude — and every field kept its read site, so each PAYLOADS
+# row is asked of the exact payload the retired node carried, applied through
+# `Talents.apply_payload` as the spawn applies it. The ctx is empty, so an
+# `also` half stays dark and only the base half is read — which is what the row
+# always pinned. Undying Rage's row is asked of the one tree's node that took its
+# field and magnitude (PRECEDENT).
+#
+# THE TOOLTIP HALF SPLITS IN TWO. `desc_for` is live machinery — the build
+# screen and the hero sheet both call it — and at FX its `{v}` / scale branch
+# lost every live input (no node of the one tree and no rune carries a scale).
+# So the three checks per node that prove IT — the placeholder consumed, the
+# design number reached the string, no dead decimal left — are driven off the
+# retired nodes' exact desc and scale. What asked about the deleted NODE has no
+# node to ask. DELETED UNDER DG §2 — 30 CHECKS:
+#   14  "<id> carries a scale for its tooltip"
+#   14  "<id> renders <n>" — the suite's own base + step sum over the node's scale
+#    2  Reckless Fury's tooltip states both numbers, and it carries no scale
+# Reckless Fury's two PAYLOAD numbers are still asked, off its exact payload.
 func _magnitudes() -> void:
 	for id in PAYLOADS:
-		var n := _node(String(id))
-		if n.is_empty():
-			continue
 		var want: Array = PAYLOADS[id]
-		var stat: Dictionary = n["payload"].get("stat", {})
-		ok(stat.has(want[0]), "%s writes %s" % [id, want[0]])
-		if stat.has(want[0]):
-			ok(is_equal_approx(float(stat[want[0]]), float(want[1])),
-				"%s writes %s = %s (got %s)" % [id, want[0], want[1],
-					stat[want[0]]])
+		var label := _label(String(id))
+		var cfg := {"abilities": []}
+		Talents.apply_payload(cfg, _payload(String(id)), 1, {})
+		ok(cfg.has(want[0]), "%s writes %s" % [label, want[0]])
+		if cfg.has(want[0]):
+			ok(is_equal_approx(float(cfg[want[0]]), float(want[1])),
+				"%s writes %s = %s (got %s)" % [label, want[0], want[1],
+					cfg[want[0]]])
 	for id in SCALE_VALUES:
 		var n := _node(String(id))
 		if n.is_empty():
 			continue
-		var sc: Dictionary = n.get("scale", {})
-		ok(not sc.is_empty(), "%s carries a scale for its tooltip" % id)
-		var rendered := float(sc.get("base", 0.0)) + float(sc.get("step", 0.0))
-		ok(is_equal_approx(rendered, float(SCALE_VALUES[id])),
-			"%s renders %s (got %s)" % [id, SCALE_VALUES[id], rendered])
 		# desc_for is what the party screen actually shows: prove the
 		# placeholder is consumed and the number reaches the string.
 		#
@@ -265,17 +390,15 @@ func _magnitudes() -> void:
 			% [id, want_txt, shown])
 		ok(not shown.contains(want_txt + ".0"),
 			"%s's tooltip carries no dead decimal: \"%s\"" % [id, shown])
-	# Reckless Fury carries two DIFFERENT numbers, so it has no scale and
-	# writes them out — assert both reach the tooltip.
-	var rk := _node("bz_reckless")
-	ok(is_equal_approx(float(rk["payload"]["stat"]["dmg_bonus"]), 0.20),
+	# Reckless Fury carries two DIFFERENT numbers in one payload — assert both
+	# land, applied off the payload the retired node carried. (Its tooltip and
+	# its lack of a scale were the two checks deleted above.)
+	var rk := {"abilities": []}
+	Talents.apply_payload(rk, _payload("bz_reckless"), 1, {})
+	ok(is_equal_approx(float(rk.get("dmg_bonus", 0.0)), 0.20),
 		"Reckless Fury deals +20%")
-	ok(is_equal_approx(float(rk["payload"]["stat"]["dmg_taken_bonus"]), 0.15),
+	ok(is_equal_approx(float(rk.get("dmg_taken_bonus", 0.0)), 0.15),
 		"Reckless Fury takes +15%")
-	ok(String(rk["desc"]).contains("20%") and String(rk["desc"]).contains("15%"),
-		"Reckless Fury's tooltip states both numbers")
-	ok(not rk.has("scale"),
-		"Reckless Fury carries no scale — one {v} cannot render two numbers")
 
 
 # ---------- 4. the two ability-modifying nodes ----------
@@ -325,9 +448,16 @@ func _find_in(list: Array, name: String) -> Ability:
 	return null
 
 
+# BATCH FX: the member's tree is the RETIRED nodes rebuilt inline — their exact
+# payloads, `also` halves and `has_node` conditions included — because §4 and
+# §5 ask about those payloads and the machinery that applies them
+# (`apply_from_tree`, `apply_payload`'s ability and stat arms, `also`,
+# `condition`), all of which runes still use. The ids are the retired ids,
+# because the conditions name them. The one tree carries no ability edit and no
+# condition anywhere, so there is no live node for these to be asked of.
 func _member(learned: Dictionary, earned: Array = []) -> Dictionary:
 	return {"key": "warrior", "spec": "berserker", "talents": learned,
-		"tree": _tree(), "bm_abilities": earned}
+		"tree": _retired_tree(), "bm_abilities": earned}
 
 
 func _applied(learned: Dictionary, earned: Array = [],
@@ -403,12 +533,20 @@ func _conditional_halves() -> void:
 # which path ran is READ-ONLY-ZERO. **The index is the sharp one** — a 1 or a 2
 # is only writable by a grant, so it is the single value that catches a
 # regression here no matter how it is reintroduced.
+#
+# BATCH FX RE-POINTED THE CELL TO THE TREE. The two cells this asked about
+# (bz_battle_shout, bz_rampage) went with the twelve trees, and a Berserker
+# wears the one tree WHOLE now — every cell the Warrior owns — so "does what
+# the hero wears hand out Battle Shout or Rampage" is asked of every cell of the
+# one tree, worn (`_applied_live`). That is DO's charter, which FX's line keeps:
+# the tree grants no ability. The indices stay the sharp half, for the same
+# reason as before: only a grant's collision could write them.
 
 func _upgrade_paths() -> void:
-	# --- Battle Shout: the node grants nothing and the card is drafted.
-	var bs_grant := _applied({"bz_battle_shout": 1}, [], [])
+	# --- Battle Shout: the tree grants nothing and the card is drafted.
+	var bs_grant := _applied_live([], [])
 	ok(_names(bs_grant["abilities"]).is_empty(),
-		"Battle Shout's node hands out NOTHING (DO's charter)")
+		"the whole one tree, worn, hands out NOTHING — no Battle Shout (DO's charter)")
 	ok(int(bs_grant.get("battle_shout_node", 0)) == 0,
 		"...and `battle_shout_node` is read-only-zero — only a grant could write it")
 	ok(Classes.spec_draft_pool("berserker").has("Battle Shout"),
@@ -417,11 +555,11 @@ func _upgrade_paths() -> void:
 	# nothing away, which is what "the existing pick, unchanged" means.
 	var earned := [Classes.spec_pool_ability("berserker", "Battle Shout")]
 	ok(earned[0] != null, "Battle Shout still resolves out of the Berserker pool")
-	# A hero who has EARNED it and also buys the cell keeps exactly one copy —
-	# the same anti-double-grant property, reached the other way.
-	var bs_up := _applied({"bz_battle_shout": 1}, ["Battle Shout"], earned)
+	# A hero who has EARNED it and also wears the whole tree keeps exactly one
+	# copy — the same anti-double-grant property, reached the other way.
+	var bs_up := _applied_live(["Battle Shout"], earned)
 	ok(_names(bs_up["abilities"]).count("Battle Shout") == 1,
-		"an earned Battle Shout is never doubled by the cell")
+		"an earned Battle Shout is never doubled by the tree")
 	ok(int(bs_up.get("battle_shout_node", 0)) == 0,
 		"...and the index STILL reads zero — no collision happened")
 	# THE CARD CARRIES ONE MAGNITUDE NOW, AND IT IS THE ONE THE HANDLER PAYS.
@@ -435,27 +573,27 @@ func _upgrade_paths() -> void:
 		"...and 2 turns")
 	ok(bs_ab != null and not String(bs_ab.description).contains("18%"),
 		"...and promises no upgrade nothing can grant")
-	# --- Rampage, the capstone, same shape.
-	var rp_grant := _applied({"bz_rampage": 1}, [], [])
+	# --- Rampage, same shape.
+	var rp_grant := _applied_live([], [])
 	ok(_names(rp_grant["abilities"]).is_empty(),
-		"Rampage's capstone hands out NOTHING (DO's charter)")
+		"the whole one tree, worn, hands out NOTHING — no Rampage (DO's charter)")
 	ok(int(rp_grant.get("rampage_upgraded", 0)) == 0,
 		"...and `rampage_upgraded` is read-only-zero")
 	var rp_earned := [Classes.spec_pool_ability("berserker", "Rampage")]
 	ok(rp_earned[0] != null, "Rampage still resolves out of the Berserker pool")
 	ok(Classes.spec_draft_pool("berserker").has("Rampage"),
 		"...and drafts from the Berserker as well")
-	var rp_up := _applied({"bz_rampage": 1}, ["Rampage"], rp_earned)
+	var rp_up := _applied_live(["Rampage"], rp_earned)
 	ok(_names(rp_up["abilities"]).count("Rampage") == 1,
-		"an earned Rampage is never doubled by the cell")
+		"an earned Rampage is never doubled by the tree")
 	ok(int(rp_up.get("rampage_upgraded", 0)) == 0,
 		"...and its index reads zero too")
 	# --- BOTH ACQUISITION ORDERS STILL MATTER, AND THE ANSWER IS NOW THE SAME
 	# EITHER WAY, which is the point: the order used to decide grant-versus-
 	# upgrade, and there is nothing left for it to decide.
-	var node_first := _applied({"bz_battle_shout": 1}, [], [])
+	var node_first := _applied_live([], [])
 	ok(int(node_first.get("battle_shout_node", 0)) == 0,
-		"node first, pick later: still zero — the cell grants nothing to count")
+		"tree first, pick later: still zero — the tree grants nothing to count")
 	var pool_ab := Classes.spec_pool_ability("berserker", "Battle Shout")
 	var after: Array = node_first["abilities"]
 	var dupe := false
@@ -474,14 +612,28 @@ func _names(list: Array) -> Array:
 
 
 # ---------- 7. live ----------
+#
+# BATCH FX: every battle below is driven off a retired node's exact payload.
+# FX: the payloads the retired bz_vitality (First Blood — opening_rage 40),
+# bz_warcry (Overkill — overkill_reset 1), bz_bloodied_hide (Second Wind —
+# second_wind 1), bz_measured (Measured Rage) with bz_reckless (Reckless Fury),
+# and bz_frenzied_edge (Scar Tissue) with bz_unstoppable (Unstoppable) carried —
+# each node is deleted, each field and its read site stand, and the battle reads
+# every one of those fields at the spawn or in the fight exactly as it did.
 
 # Spawns a real battle with a Berserker in slot 0 carrying `learned`.
 # Enemies are switched OFF so nothing acts on its own — every check below
 # drives the state it reads.
+# BATCH FX: he carries the RETIRED nodes as his member `tree` (the fixture's
+# `patch`), so a retired id in `learned` has him wear exactly the payload that
+# node carried — the battle spawn applies `Run.party[i]["tree"]` against his
+# learned dict. With nothing learned the inline tree pays nothing, which is what
+# the live tree pays a Berserker with nothing learned.
 func _spawn(learned: Dictionary, lineup: Array) -> Node:
 	return await Fixture.spawn(self,
 		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": lineup, "talents": {0: learned.duplicate()}})
+		{"enemies": lineup, "talents": {0: learned.duplicate()},
+			"patch": {0: {"tree": _retired_tree()}}})
 
 
 func _bz(scene: Node) -> BattleUnit:

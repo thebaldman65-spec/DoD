@@ -111,6 +111,49 @@ func _const(scene: Node, name: String) -> int:
 	return int(scene.get_script().get_script_constant_map()[name])
 
 
+# BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED. FX deleted the twelve spec
+# trees, so every id this suite learns is in no tree a hero can buy, and a
+# learned id the member's tree does not hold applies NOTHING at the spawn — which
+# is the whole of why §1's and §2's live checks went red. The FIELDS those nodes
+# wrote, and every read site in `battle.gd`, stand (dormant, not deleted), so the
+# question each check asks still has a true answer. Each payload below is copied
+# verbatim from the retired node and rides the learner's tree as a fixture cell
+# (`_tree_with_retired`), so it reaches the unit through the SAME spawn path that
+# learning the node did: `Talents.apply_from_tree` in `battle.gd`'s spawn, then
+# `BattleUnit.setup`. That is also why "the hunter holds The Pack" and "the hero
+# holds Creeping Death AND Perfected Toxin" still ask something: the field is
+# written by the spawn, never by this suite.
+#   FX: the payload the retired bm_the_pack (The Pack) carried — the node is
+#       deleted, the field and its read sites (`_beast_cap`, `_swap_victim`) stand.
+#   FX: the payload the retired sv_creeping (Creeping Death) carried — the node
+#       is deleted, the field and its read site (`_creeping_refresh`) stand.
+#   FX: the payload the retired sv_epidemic (Perfected Toxin) carried — the node
+#       is deleted, the field and its read sites (`_apply_poison`,
+#       `_perfected_toxin_tick`) stand.
+#   FX: the payload the retired sv_virulence (Distillate) carried — the node is
+#       deleted, the field and its read site (`_apply_poison`) stand.
+#   FX: the payload the retired sv_slow_acting (Slow Acting) carried — the node
+#       is deleted, the field and its read site (`_apply_poison`) stand.
+const RETIRED := {
+	"bm_the_pack": {"name": "The Pack", "payload": {"stat": {"the_pack": 1}}},
+	"sv_creeping": {"name": "Creeping Death", "payload": {"stat": {"creeping_death": 1}}},
+	"sv_epidemic": {"name": "Perfected Toxin", "payload": {"stat": {"perfected_toxin": 2}}},
+	"sv_virulence": {"name": "Distillate", "payload": {"stat": {"virulence_ranks": 2}}},
+	"sv_slow_acting": {"name": "Slow Acting", "payload": {"stat": {"slow_acting": 1}}},
+}
+
+
+# The learner's tree for a spawn: the one class tree, plus one fixture cell for
+# every RETIRED id in `learned`, carrying that node's payload and nothing else.
+func _tree_with_retired(spec: String, learned: Dictionary) -> Array:
+	var tree: Array = Talents.generate_tree(spec, "")
+	for id in learned:
+		if RETIRED.has(id):
+			tree.append({"id": String(id), "name": String(RETIRED[id]["name"]),
+				"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
+
+
 # One spawn for every live check. `specs` is warrior/mage/cleric/hunter order;
 # `learned` lands on the hero named by `learner`. `mod_id` arms a bargain the
 # way the offer screen does — it is read at `_ready`, so it must be set BEFORE
@@ -119,7 +162,8 @@ func _spawn(specs: Array, learned := {}, learner := 3, mod_id := "",
 		lineup := ["raider", "raider"]) -> Node:
 	return await Fixture.spawn(self, specs,
 		{"enemies": lineup, "talents": {learner: learned.duplicate()}, "slot_idx": 0,
-		"modifier": mod_id, "deterministic": true})
+		"modifier": mod_id, "deterministic": true,
+		"patch": {learner: {"tree": _tree_with_retired(String(specs[learner]), learned)}}})
 
 
 func _kill(scene: Node) -> void:
@@ -180,12 +224,17 @@ func _swap_rule_source() -> void:
 		"§1: both swap tooltips describe the Loyalty rule")
 	ok(not src.contains("replaces the OLDER") and not src.contains("the OLDER of the two"),
 		"§1: no tooltip still says OLDER")
-	var pack: Dictionary = Talents.node_in_tree(
-		Talents.generate_tree("beastmaster", "hunter"), "bm_the_pack")
-	ok(String(pack.get("desc", "")).contains("LESS Loyalty"),
-		"§1: The Pack's own description carries the corrected rule")
-	ok(not String(pack.get("desc", "")).contains("OLDER"),
-		"§1: ...and no longer says OLDER")
+	# BATCH FX — TWO CHECKS DELETED HERE, THE ONE NARROW EXCEPTION (DG §2). They
+	# read The Pack's own node text (`bm_the_pack`, the Beastmaster capstone) and
+	# asked that it carry the corrected rule ("LESS Loyalty") and no longer say
+	# OLDER — the third of the three surfaces the paragraph above names. FX
+	# deleted the twelve spec trees and the capstone with them, so that text
+	# exists nowhere a check can read it: no node of the one tree writes
+	# `the_pack`, and no rune does. (The second of the two was already passing
+	# VACUOUSLY, on the empty string an absent node returns.) The RULE is still
+	# asserted wherever it still lives — both swap tooltips above, the live swap
+	# below with the retired payload inlined, and §7's glossary pin, re-pointed to
+	# the text that superseded it.
 
 
 # ---------- §1 live: the swap takes the SHALLOWER bond ----------
@@ -194,6 +243,9 @@ func _swap_rule_source() -> void:
 # the OLDER one, so AY's rule and Batch Q's rule name DIFFERENT victims here. A
 # test where the oldest also holds the least Loyalty proves nothing.
 func _live_swap_takes_the_shallower() -> void:
+	# FX: `bm_the_pack` is RETIRED — `_spawn` inlines the payload it carried
+	# (the_pack 1) through the spawn's own talent path (see RETIRED), here and in
+	# the three §1 live functions after this one.
 	var scene := await _spawn(["berserker", "pyromancer", "inquisitor", "beastmaster"],
 		{"bm_the_pack": 1})
 	var h := _hero(scene, 3)
@@ -320,18 +372,22 @@ func _creeping_source() -> void:
 	# `_turns_taken` had to leave `_run_battle` to be testable at all.
 	ok(src.contains("\nvar _turns_taken := 0"),
 		"§2: the turn counter is a field, not a local inside `_run_battle`")
-	var node: Dictionary = Talents.node_in_tree(
-		Talents.generate_tree("mystic", "hunter"), "sv_creeping")
-	var desc := String(node.get("desc", ""))
-	ok(desc.contains("refreshes") and desc.contains("adds a stack"),
-		"§2: the node text carries BOTH clauses")
-	ok(desc.contains("once per enemy per turn"),
-		"§2: ...and states the governor, so the text reads correctly either way")
+	# BATCH FX — TWO CHECKS DELETED HERE (DG §2). They read Creeping Death's own
+	# node text (`sv_creeping`, the Survivalist's Venom lane) and asked that it
+	# carry BOTH clauses and state the once-per-enemy-per-turn governor. FX
+	# deleted the twelve spec trees and that text with them — no node of the one
+	# tree writes `creeping_death`, and no rune does — so the subject exists
+	# nowhere a check can read it. The two clauses and the governor are still
+	# asserted where they live: at the site, above, and driven live below with the
+	# retired payload inlined.
 
 
 # ---------- §2 live: the refresh clause, unchanged and ungoverned ----------
 
 func _live_creeping_refresh_is_ungoverned() -> void:
+	# FX: every Survivalist id §2 learns is RETIRED — `_spawn` inlines the payload
+	# each carried through the spawn's own talent path (see RETIRED), here and in
+	# the two §2 live functions after this one.
 	var scene := await _spawn(["berserker", "pyromancer", "inquisitor", "mystic"],
 		{"sv_creeping": 1})
 	var h := _hero(scene, 3)
@@ -826,10 +882,20 @@ func _docs() -> void:
 		ok(doc.contains(", ".join(Classes.spec_pool(spec))),
 			"§7: §6a lists %s's spec pool verbatim" % spec)
 	var gl := _src("res://data/glossary.json")
-	ok(gl.contains("there is no duration to refresh, so it adds a stack instead"),
-		"§7: the glossary's Poison entry names Creeping Death's split behaviour")
-	ok(gl.contains("holds LESS Loyalty"),
-		"§7: the Pack Bond and Loyalty entries carry the corrected swap rule")
+	# BATCH FX — BOTH PINS RE-POINTED TO THE TEXT THAT SUPERSEDED THEM. The two
+	# clauses they read taught a player what a TALENT did — Creeping Death's
+	# refresh-or-stack split, and The Pack's two-companion swap — and FX deleted
+	# the twelve spec trees those nodes lived in, so the glossary's Poison, Pack
+	# Bond and Loyalty entries were cut back to what a player can still meet. The
+	# Poison entry now states only the clock rule that survives (a new stack
+	# refreshes the timer) and no longer teaches the retired split, which is what
+	# the absence half records; the Pack Bond entry states the rule that replaced
+	# the swap — one companion at a time.
+	ok(gl.contains("each new stack refreshes the timer")
+			and not gl.to_lower().contains("creeping death"),
+		"§7: the glossary's Poison entry states the clock rule that survives FX, and no longer teaches Creeping Death's retired split")
+	ok(gl.contains("HE FIELDS ONE COMPANION AT A TIME"),
+		"§7: the Pack Bond entry states the rule that superseded The Pack's swap — one companion at a time")
 	ok(gl.contains("There are twenty, weighted toward the mild end"),
 		"§7: the Modifier entry counts twenty")
 	# §7 asked for "a Rot entry IF the modifier list is enumerated there". IT IS

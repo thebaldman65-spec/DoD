@@ -420,19 +420,27 @@ func _names() -> void:
 	# closer than BP's Precision Strike / Precision Strikes. It is NAMED here so
 	# the sweep still reports it every run instead of falling silent, and the
 	# other eight are asserted clean, so a NEW collision cannot hide behind it.
-	const FLAGGED_NODE_COLLISIONS := {"Divine Presence": "hl_presence"}
+	#
+	# **BATCH FX — THE ONE FLAGGED COLLISION IS GONE WITH ITS NODE, AND THE PIN
+	# INVERTS BACK RATHER THAN BEING DROPPED.** `hl_presence` was a node of the
+	# Holy tree, and FX deleted all twelve spec trees with every node on them.
+	# The one tree that replaced them is twenty-seven stat nodes and none wears a
+	# card's name, so DIVINE PRESENCE is asserted CLEAN like the other eight, and
+	# a NEW collision in the one tree still trips for any of the nine. The sweep
+	# reads `Talents.TREE` — the ONE tree, once — rather than the same tree dealt
+	# twelve times through `generate_tree`. **AND THE FLAGGED PIN WAS DOING A
+	# SECOND JOB THE INVERSION WOULD HAVE LOST**: it was the sweep's only POSITIVE
+	# arm, the one proof that `node_names` held a real tree, and nine absence
+	# checks over an empty dictionary pass while reading nothing. So every check
+	# now also requires the sweep to have read a real tree.
+	var walked := 0
 	var node_names := {}
-	for spec in Classes.SPEC_IDS:
-		for sp in Classes.SPEC_IDS[spec]:
-			for node in Talents.generate_tree(String(sp), String(spec)):
-				node_names[String(node.get("name", ""))] = 1
+	for node in Talents.TREE:
+		walked += 1
+		node_names[String(node.get("name", ""))] = 1
 	for n in NINE:
-		if FLAGGED_NODE_COLLISIONS.has(n):
-			ok(node_names.has(n),
-				"%s collides with the talent node %s — FLAGGED, shipped as specified"
-					% [n, String(FLAGGED_NODE_COLLISIONS[n])])
-			continue
-		ok(not node_names.has(n), "no talent NODE is called %s" % n)
+		ok(walked > 0 and not node_names.has(n),
+			"no talent NODE of the one tree is called %s (read %d nodes)" % [n, walked])
 	var runes_src := _src("res://data/runes.json")
 	for n in NINE:
 		ok(not runes_src.contains('"%s"' % n), "no rune is called %s" % n)
@@ -616,8 +624,18 @@ func _docs() -> void:
 		"...and names no card CG deleted or renamed")
 	ok(gl.contains("DIVINE PRESENCE"),
 		"...naming the live card instead")
-	ok(gl.contains("GUARDIAN ANGEL WIDENS THAT WINDOW"),
-		"...including that the line moves")
+	# **BATCH FX — RE-POINTED AT THE SUPERSEDING TEXT, ON CG'S OWN RULE JUST
+	# ABOVE.** This read `GUARDIAN ANGEL WIDENS THAT WINDOW`: the entry taught
+	# that the Mercy line moves, because the Holy node Guardian Angel
+	# (`hl_guardian`) moved it toward 65%. FX deleted the node with its tree,
+	# nothing writes `guardian_step` now (no node, no rune), so in play the line
+	# stands at half — and the entry was rewritten to teach it there. A glossary
+	# teaching a mover nobody can own is worse than one that omits it, so the
+	# pin asserts the line the entry now states AND that the deleted mover is
+	# not taught, in either case.
+	ok(gl.contains("fall below half of their maximum health")
+			and not gl.contains("GUARDIAN ANGEL") and not gl.contains("Guardian Angel"),
+		"...teaching the line where it now stands, at half, and no mover FX deleted")
 	# THE ENTRY IS THE ONLY ONE ADDED. CB added one for the same reason: the
 	# glossary teaches what a player has nowhere else to learn, not every status.
 	var gj: Array = JSON.parse_string(gl)
@@ -964,6 +982,10 @@ func _live_vespers() -> void:
 	# 65%; the ally stands `absorb` above THAT line and takes exactly `absorb`,
 	# so the blow crosses the 65% line and does not come anywhere near the 50%
 	# one. A ward reading a literal half never fires here at all.
+	# BATCH FX: Guardian Angel (`hl_guardian`) went with the twelve spec trees,
+	# so nothing in play moves the line now — but `mercy_threshold` and its read
+	# site stand (a dormant field, not a deleted one), and this drives the FIELD
+	# directly, so the question is asked unchanged.
 	holy.second_resource = 0
 	ally.mercy_threshold = 0.65
 	var wide := int(ally.max_hp * 0.65)

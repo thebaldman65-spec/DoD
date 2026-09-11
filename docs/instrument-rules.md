@@ -1073,14 +1073,14 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   `CLAUDE.md` — **that table is the reference; do not restate it here or there.**
   · **TUNE AGAINST THE CURVE, NEVER ONE POINT.** The ~85% win-rate target describes TOP-BAND
     (budget 10-12) encounters only, and attrition (deaths/battle) is the sensitive dial.
-  · **ALWAYS PRINT THE BUILD STRING BESIDE A RUN NUMBER.** `DOD_SIM_BUILDS` defaults to each
-    tree's FIRST lane, so a default-vs-named comparison is a two-hero difference, not a
-    four-hero one — a confound with a known sign.
-  · **NO SIM FIGURE MAY BE QUOTED ABOUT A CARD IN A NON-DEFAULT LANE, AND SEVERAL HAVE BEEN.**
-    `Talents.LANES` is 3 across twelve specs, so two thirds of the lanes have never appeared in
-    any measurement taken here. That is not a bug — a fixed default party is what makes arms
-    comparable — it is a permanent caveat, and the sim prints the unmeasured count beside
-    `builds=` so it arrives with the number.
+  · **ALWAYS PRINT THE BUILD STRING BESIDE A RUN NUMBER.** The sim prints `builds=` (the tiers of
+    the one class tree the party wears — FX) beside every run, because two rows taken at different
+    depths are two different parties.
+  · **NO SIM FIGURE TAKEN BEFORE FX MAY BE QUOTED ABOUT A NODE, AND SEVERAL HAVE BEEN.** Until FX
+    a build was ONE LANE of each spec's tree, so two thirds of the lanes never appeared in any
+    measurement taken here, and every fully-talented row wore nine nodes a hero. **The one tree has
+    no lanes: a full-depth build wears all twenty-seven nodes**, so a pre-FX row and a post-FX row
+    describe different parties and are never compared.
   · **A ROW IS ONLY COMPARABLE WITH ROWS TAKEN UNDER THE SAME STRUCTURE.** No pre-BK row is
     comparable with a post-BK one (`map=branch`, 48 slots, three real route policies rather
     than three samples of one), and **`DOD_SIM_DIFFICULTY` DEFAULTS TO RUNG 1 — an unset flag is

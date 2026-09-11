@@ -452,36 +452,44 @@ func _names() -> void:
 			ok(not NINE.has(ab.display_name),
 				"%s's kit does not already hold %s" % [spec, ab.display_name])
 	# THE COLLISION THIS BATCH FOUND AND RESOLVED, PINNED IN BOTH DIRECTIONS.
-	# `wd_grudge` is a WARDEN THREAT-lane talent (+25% damage against enemies his
-	# taunt binds) and the Rune of Grudges pays into the same term — the same
+	# `wd_grudge` was a WARDEN THREAT-lane talent (+25% damage against enemies
+	# his taunt binds) and the Rune of Grudges pays into the same term — the same
 	# spec, the same lane, one row apart from where the card would have sat. The
-	# TALENT keeps the name (its id is save-migrated and its ranks travel with
-	# it); the UNSHIPPED CARD moved to VENDETTA. Both halves are asserted,
-	# because either one silently reverting is how the collision comes back.
-	var wd_tree: Array = Talents.LANE_TREES.get("warden", [])
-	var grudge_node := {}
-	for node in wd_tree:
-		if String(node.get("id", "")) == "wd_grudge":
-			grudge_node = node
-	ok(not grudge_node.is_empty(), "the wd_grudge talent still exists")
-	ok(String(grudge_node.get("name", "")) == "Grudge",
-		"and it KEEPS the name Grudge — the talent is the one with saved ranks")
+	# TALENT kept the name (its id was save-migrated and its ranks travelled with
+	# it); the UNSHIPPED CARD moved to VENDETTA.
+	#
+	# **FX DELETED THE TWELVE SPEC TREES, AND THE TALENT HALF WENT WITH THEM
+	# (DG §2 — 2 CHECKS REMOVED, recorded here at the site).** Two checks read
+	# the Warden tree: that `wd_grudge` still existed, and that it still carried
+	# the name Grudge. Their subject was one node of one deleted tree; the ONE
+	# tree holds no node paying `grudge_ranks` to re-point them at, and FX's
+	# profile fold drops the v2 cells, so no saved ranks are left for the name to
+	# protect. **THE CARD HALF IS UNCHANGED AND STILL ASKED** — no ability is
+	# named Grudge and nothing resolves the name — and the label sweep below
+	# walks the ONE tree, so a node re-introducing a card's name still trips it.
+	# (`grudge_ranks` itself is dormant, not deleted: the one read site sums it
+	# with the retired rune's own `rune_grudge_bonus`, so neither leans on the
+	# other.)
 	ok(Classes.draft_ability("Grudge") == null,
 		"no ABILITY is named Grudge — the card is Vendetta")
 	ok(Classes.pool_ability("Grudge") == null,
 		"and nothing resolves the name Grudge as an ability")
 	ok(Classes.draft_ability("Vendetta") != null, "Vendetta is the card")
-	# THE OTHER EIGHT ARE CLEAN AGAINST EVERY TALENT NODE IN THE GAME. A node's
-	# name is not an ability name and nothing resolves it, so this is the LABEL
-	# sweep BR §1 asks for — it reports rather than breaks, and it is what
-	# caught Grudge.
+	# THE NINE ARE CLEAN AGAINST EVERY TALENT NODE IN THE GAME. A node's name is
+	# not an ability name and nothing resolves it, so this is the LABEL sweep BR
+	# §1 asks for — it reports rather than breaks.
+	# RE-POINTED AT FX TO THE ONE TREE (`Talents.TREE`), AND THE RE-POINT CLOSES
+	# A HOLE THAT STOOD AT HEAD: this walked `Classes.SPEC_IDS`, whose keys are
+	# the four CLASSES, and looked each one up in a table keyed by SPEC, so every
+	# lookup came back empty and all nine checks passed against an empty
+	# dictionary. It walks the tree itself now — 27 names — and the count is
+	# unchanged, one check a card.
 	var node_names: Dictionary = {}
-	for spec in Classes.SPEC_IDS:
-		for node in Talents.LANE_TREES.get(spec, []):
-			node_names[String(node.get("name", ""))] = spec
+	for node in Talents.TREE:
+		node_names[String(node.get("name", ""))] = String(node.get("id", ""))
 	for n in NINE:
 		ok(not node_names.has(n),
-			"%s collides with no talent node (it would sit in %s)" % [
+			"%s collides with no talent node (it would be %s)" % [
 				n, node_names.get(n, "")])
 	# AND AGAINST EVERY LIVE STATUS LABEL, so two chips can never read the same
 	# word (BT's Hoarfrost rule).
@@ -991,6 +999,11 @@ func _live_blood_debt() -> void:
 	ok(int(debt_st.get("turns", 0)) < 0,
 		"and it is BATTLE-LONG (turns %d)" % int(debt_st.get("turns", 0)))
 	# FIRST BLEEDOUT. Slaughterhouse is armed so the meter falls to 50, not 0.
+	# FX: armed by hand with the payload the retired bz_slaughterhouse
+	# (Slaughterhouse) carried, `slaughterhouse` 50 — the node is deleted, the
+	# field and its read site stand. Nothing live writes the field now (the
+	# Berserker's Slaughterhouse RUNE shares the name and writes a different
+	# field), so the re-bleed this card pairs with is reachable only by hand.
 	bz.slaughterhouse = 50
 	bz.hp = 40
 	scene.call("_add_bleed_with_burst", foe, 100)
@@ -1222,7 +1235,10 @@ func _live_shield_slam() -> void:
 	var small: int = before_small - foe.hp
 	ok(small > 0, "Shield Slam lands a blow (%d)" % small)
 	# HEAVY PLATING GROWS HIS MAXIMUM MID-BATTLE — Tenacity adds +15 a block —
-	# so this is the state the card has to keep pace with.
+	# so this is the state the card has to keep pace with. FX: the Tenacity node
+	# (wd_tenacity) is deleted with the Warden tree and `tenacity` has no live
+	# writer, so the maximum is moved by hand and the check asserts the LIVE
+	# read, whatever moves the maximum.
 	wd.max_hp = 600
 	wd.hp = 600
 	wd.resource = wd.max_resource
@@ -1391,7 +1407,9 @@ func _live_aegis_wall() -> void:
 	ok(not paid_on_hit,
 		"AND A HIT THAT GETS THROUGH PAYS NOTHING — it reads BLOCKS, not damage")
 	# THE LIVE MAXIMUM. Tenacity grows it +15 a block, so the heal must grow with
-	# it — a cast-time snapshot pays the old number forever.
+	# it — a cast-time snapshot pays the old number forever. FX: the Tenacity
+	# node is deleted and `tenacity` has no live writer; the maximum is moved by
+	# hand and the LIVE read is what is asserted.
 	wd.block_chance = 1.0
 	wd.max_hp = 1000
 	wd.hp = 100

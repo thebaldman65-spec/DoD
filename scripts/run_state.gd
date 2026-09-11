@@ -27,7 +27,7 @@ const BOSS_SLOT := SLOTS_PER_ZONE - 1
 const BRANCH_COLUMNS := 14  # 1-based columns 1..14; the mini-boss sits between 7 and 8
 
 # BATCH BM §6 — THE FOURTH BOSS. Three ZONE bosses pay a meta talent point
-# each; the END BOSS pays a relic and gates the meta tree's row tiers. It is
+# each; the END BOSS pays a relic and gates the talent tree's tiers. It is
 # ONE EXTRA SLOT appended to the FINAL zone only, index SLOTS_PER_ZONE, so
 # the run is 3 x 16 + 1 = 49 encounters (BK settled on 48).
 # It is FIXED, not drawn from a pool, so it can be learned.
@@ -1053,7 +1053,7 @@ func compose_budget(budget: int, roster := 1) -> Array:
 const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 
 # BATCH BM §5 — THE DIFFICULTY LADDER. Three rungs, and the ladder is what
-# rows 4-9 of the meta tree are FOR: vertical progression with nothing
+# tiers 2 and 3 of the talent tree are FOR: vertical progression with nothing
 # absorbing it means the game only ever gets easier.
 #
 # `difficulty` was Batch Y's alpha testing lever — a String var, saved with
@@ -2379,6 +2379,12 @@ func load_run() -> bool:
 # Trees are FIXED definitions in code: always swap the saved snapshot for
 # the live tree so balance edits reach old saves.
 #
+# BATCH FX — AND THE LIVE TREE IS THE ONE CLASS TREE NOW, SO A RUN SAVED UNDER
+# THE TWELVE LANDS HERE WITH EVERY ID GONE. Each is dropped by the loop below
+# (none of the 324 exists in the new tree), so a resumed run wears nothing it
+# did not buy in this tree — and no save version moves, because a member dict
+# with fewer talents is a shape this build already reads.
+#
 # Batch AN dropped the pre-Batch-AI branch that used to live here: only v7
 # saves reach this function now (load_run refuses anything older), and every
 # v7 save was written by a build whose trees are already rows. Ranks carry,
@@ -2454,15 +2460,22 @@ func bank_zone_boss_points() -> void:
 
 # THE HANDOFF FROM THE META LAYER INTO THE RUN, called the moment a spec is
 # confirmed — from BOTH paths (the spec screen and RunSim.start_run), the
-# sync_spec_hp pattern. It copies the loadout the player configured BETWEEN
-# runs onto the member, and from here it is locked: nothing in a run writes
+# sync_spec_hp pattern. It copies what the player bought BETWEEN runs onto the
+# member, and from here it is locked: nothing in a run writes
 # `member["talents"]` again.
+# BATCH FX — WHAT IS COPIED IS THE CLASS's LEDGER. The tree keys to the class
+# and a cell owned is a cell worn, so a Berserker walks in wearing every cell
+# the Warrior's purse has bought. The name still says "spec" because the spec
+# is what triggers it: an unawakened hero has no class tree to wear yet.
 func equip_spec_talents(idx: int) -> void:
 	if idx < 0 or idx >= party.size():
 		return
 	var spec := String(party[idx].get("spec", ""))
-	party[idx]["talents"] = Profile.equipped_talents(spec) if not sim_run \
-		else sim_equipped_talents(spec)
+	if spec == "":
+		party[idx]["talents"] = {}
+		return
+	party[idx]["talents"] = Profile.worn_talents(Classes.class_of_spec(spec)) \
+		if not sim_run else sim_equipped_talents(spec)
 
 
 # The sim's own loadout source. A sim must never read Profile (it would make

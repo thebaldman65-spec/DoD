@@ -206,40 +206,24 @@ func _initialize() -> void:
 		"§3a: RunSim's report prints the table (a run is the standard source — only a run meets a boss)")
 
 	# ---------- §2: the tooltip corrections hold ----------
-	# Unbroken Watch: desc, scale and payload all say 1 now, matching the
-	# gate-only read site. IF A LATER BATCH IMPLEMENTS THE MAGNITUDE (passing
-	# the field as the _gain_loyalty amount), it must flip these knowingly.
-	var bm_tree: Array = Talents.LANE_TREES["beastmaster"]
-	var unbroken: Dictionary = {}
-	for n in bm_tree:
-		if n["id"] == "bm_unbroken":
-			unbroken = n
-	ok(int(unbroken["payload"]["stat"]["unbroken_watch"]) == 1
-		and int(unbroken["scale"]["step"]) == 1,
-		"§2: Unbroken Watch pays the +1 its read site actually grants (the tooltip lied at +2)")
+	# **BATCH FX — THREE OF BJ's TOOLTIP CORRECTIONS ARE DELETED WITH THEIR
+	# SUBJECT (DG §2), AND THIS IS THE SITE THAT RECORDS IT. 3 CHECKS REMOVED.**
+	# BJ pinned three corrections it had made to TALENT NODES, each read out of
+	# the deleted spec trees: (1) Unbroken Watch (`bm_unbroken`) paying the +1
+	# its gate-only read site grants — its payload and its `scale.step` both 1,
+	# where the tooltip had said +2; (2) the Warden's row-1 node (`wd_ricochet`)
+	# spelled Ricochet, where it had read Richocet; and (3) Kiln-Forged
+	# (`py_undying_flame`, re-pointed there by BS §3 when Cauterise stopped
+	# reading a drain) stating the board gate its read site enforces — "3 or
+	# more enemies are Burning". Each asked what ONE NODE'S AUTHORED TEXT said,
+	# and FX deleted the twelve spec trees and all 324 of their nodes, so there
+	# is no node, name, desc or scale left to read. NONE OF THE THREE HAS A
+	# SUCCESSOR: no node of the one tree writes `unbroken_watch`,
+	# `ricochet_ranks` or `kiln_forged_at`, and no rune does either, so there is
+	# no live text to re-point them at. THE READ SITES STAND (dormant, not
+	# deleted), and the one BJ pinned as a SHAPE is still pinned just below.
 	ok(bsrc.contains("if u.unbroken_watch > 0 and not tick_b.damaged_since_turn:"),
-		"§2: ...and the read site is still the gate-only shape the desc now describes")
-	var wd_tree: Array = Talents.LANE_TREES["warden"]
-	var rico_name := ""
-	for n in wd_tree:
-		if n["id"] == "wd_ricochet":
-			rico_name = String(n["name"])
-	ok(rico_name == "Ricochet",
-		"§2: the Warden row-1 node is spelled Ricochet (was Richocet)")
-	# RE-POINTED IN PLACE BY BATCH BS §3. BJ's tooltip audit found that Cauterise
-	# promised something its read site qualified — Kiln-Forged's floor took
-	# precedence and the desc did not say so — and pinned the correction here.
-	# BOTH NODES CHANGED WHAT THEY DO: `py_cauterize` is Ash Lung now and
-	# `py_undying_flame` is Kiln-Forged, and neither reads a drain, so the
-	# precedence has nothing left to state. THE QUESTION BJ WAS REALLY ASKING —
-	# does the tooltip state the qualification its read site enforces? — is kept
-	# and pointed at the surviving one: Kiln-Forged's guard is GATED ON THE
-	# BOARD, and a card that did not say so would be the same failure.
-	var py_tree: Array = Talents.LANE_TREES["pyromancer"]
-	for n in py_tree:
-		if n["id"] == "py_undying_flame":
-			ok(String(n["desc"]).contains("or more enemies are Burning"),
-				"§2: Kiln-Forged states the board gate its read site enforces")
+		"§2: Unbroken Watch's read site is still the gate-only shape BJ corrected its desc to (dormant since FX)")
 	# Reality Fracture's perfect is INERT and pinned as such (the White Flame
 	# pattern): implementing it is a design decision a later batch must make
 	# against this check, not a drive-by.
@@ -288,7 +272,11 @@ func _initialize() -> void:
 	# the LIVE economy rather than a dead one — is exactly the right question
 	# and is unchanged; BM replaced the economy underneath it, so the strings
 	# move with it. A cell costs by TIER now, and nothing in a run pays a point.
-	ok(glossary.contains("rows 1-3 cost 1 point"),
+	# **BATCH FX RE-POINTED THE FIRST AGAIN, FOR BM's OWN REASON.** BM's tier
+	# was a band of three ROWS ("rows 1-3 cost 1 point"); the one tree has no
+	# rows, and `talent_cost` prices the TIER itself now. Same question, same
+	# label — the needle moved with the economy's new noun.
+	ok(glossary.contains("tier 1 cells cost 1 point"),
 		"§2: talent_cost describes the TIER pricing")
 	ok(not glossary.contains("ceil(N/3)"),
 		"§2: ...and the AI-era curve is gone from it")

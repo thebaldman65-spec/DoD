@@ -1,2660 +1,375 @@
-# Talent trees. Every spec is 3 lanes x 8 ROWS plus a capstone shelf at row 9
-# (BATCH BM). Equipped talents: {id: ranks} — but ranks are always 1, so the
-# dict is really a set; the shape stays because every read site in the game
-# speaks it. Tooltips never say "per rank" — descs hold a "{v}" placeholder
-# and a "scale" {base, step}; desc_for() renders the value at rank 1, which
-# since Batch AI is the only value a node ever has.
+# THE TALENT TREE — ONE TREE, TWENTY-SEVEN NODES (BATCH FX).
 #
-# BATCH BM: TALENTS ARE META PROGRESSION AND THE LOAD-BEARING DISTINCTION IS
-# THAT BUYING A CELL UNLOCKS AN OPTION, NOT A NODE.
-#   - A CELL is a (spec, node) pair bought once, permanently, out of that
-#     spec's banked points on `Profile`. It is never spent again.
-#   - EQUIPPING is separate and per-run: you still pick ONE node per row and
-#     it locks for the whole run. Owning all three cells in a row makes that
-#     row a real three-way argument; owning one leaves no argument in it.
-#     THAT IS WHY TWENTY BATCHES OF ROW PRICING STILL DESCRIBE THE ENDGAME —
-#     a row is still priced against two closed doors. Do not collapse it.
-#   - Cells cost by TIER: rows 1-3 cost 1 point, 4-6 cost 2, 7-9 cost 3.
-#     27 cells = 54 points to fill one spec.
-#   - Rows unlock GLOBALLY (every spec at once) by end-boss difficulty
-#     beaten: 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3. A fresh save has no
-#     rows and no points, so it has no talents at all.
-#   - Points are PER SPEC and never transfer. They are freely reassignable
-#     between runs and never during one.
+# **ONE TREE, NOT FOUR, AND IT KEYS TO THE CLASS.** Every hero wears the same
+# twenty-seven nodes, and each CLASS buys them out of its own purse on
+# `Profile` — a Berserker, a Warden and a Swordmaster all spend the Warrior's
+# points in this one tree. The designer ruled the shape at FX: FW measured that
+# any two class trees would share at least 49 ideas by arithmetic alone,
+# because under the line nothing left is class-specific, so four trees would be
+# one list dealt four times. The specs still exist; only the talent layer
+# merged.
+#
+# **THE LINE, RULED AT FX: A TALENT MAY NOT TOUCH A RUNE, AN ABILITY, A PASSIVE
+# OR AN ENGINE.** So every node below is `stat` payloads on fields the battle
+# already reads — no `ability` edit, no grant, no condition — and the tree
+# grants no ability (DO's rule, which the line keeps).
+#
+# THE SHAPE:
+#   - THREE TIERS OF NINE. A cell costs its tier (1 / 2 / 3), so the whole tree
+#     is 9 + 18 + 27 = 54 points — BM's curve, unchanged.
+#   - FLAT WITHIN A TIER: no lanes, no rows, no graph and no per-node
+#     prerequisite. Within an open tier a class buys what it can afford.
+#   - BOTH GATES APPLY TO A TIER. The DIFFICULTY gate is BM's and EN §3's
+#     (`TIERS_OPEN`, keyed on the end-boss rung beaten — a fresh profile opens
+#     nothing, which is the tutorial gate). The SPEND gate is FX's: a tier opens
+#     only once `TIER_SPEND_MIN` cells of the tier below are bought.
+#   - NO NODE IS EXCLUSIVE, SO BUYING A CELL IS WEARING IT. BM's unlock-is-not-
+#     equip distinction priced a choice of ONE node per row against two closed
+#     doors; with no rows and nothing exclusive there is nothing left to choose
+#     between, and an equip step would be a click that can only ever say yes.
+#     Every cell a class owns is on every hero of that class, every run.
 #
 # THE LEDGER LIVES ON `Profile`; this file owns the SHAPE of the tree and the
-# rules about it, and answers both questions (`can_buy`, `can_equip`) so the
-# build screen, the run and the tests cannot disagree.
+# rules about it, and answers `can_buy` / `can_refund` so the build screen, the
+# run and the tests cannot disagree.
 class_name Talents
 
-const LANE_NAMES := {"devotion": "Devotion", "pack": "The Pack", "handler": "Handler"}
-
-# Rows 1-8 are the lanes; row 9 is the capstone shelf.
-const ROWS := 8
-const CAPSTONE_ROW := 9
-# Every spec's tree: 9 rows x 3 lanes.
-const LANES := 3
-const CELLS_PER_SPEC := CAPSTONE_ROW * LANES
-# What a cell costs, by tier. Rows 1-3 tier 1, 4-6 tier 2, 7-9 tier 3 — and
-# the price IS the tier, so a full spec is 9*1 + 9*2 + 9*3 = 54 points.
+# How many tiers, how many nodes in each, and what a cell in each costs. The
+# price IS the tier, so a full tree is 9*1 + 9*2 + 9*3 = 54 points.
+const TIERS := 3
+const NODES_PER_TIER := 9
 const TIER_COSTS := [1, 2, 3]
-# How many rows a difficulty tier opens. tier 0 = a fresh profile: NO rows.
-const TIER_ROWS := [0, 3, 6, 9]
+
+# THE DIFFICULTY GATE — how many tiers a profile may buy into, indexed by
+# `Profile.talent_tier()`: the highest rung whose END BOSS has fallen, 0-3. A
+# fresh profile opens NOTHING, and that is the rule rather than a default: rung
+# 1 is the only door into the talent layer (EN §3, standing). It is BM's
+# `[0, 3, 6, 9]` read in tiers instead of rows, so the shape is unchanged —
+# rung 1 opens the first third of the tree, rung 2 the second, rung 3 the rest.
+const TIERS_OPEN := [0, 1, 2, 3]
 const MAX_TIER := 3
 
-const LANE_TREES := {
-	"berserker": [
-		# Purpose-designed lanes (Batch C, 07-27); Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row; BATCH AJ re-authored all
-		# 24 nodes for that structure. Every id survives and re-specs in
-		# place, so saved picks migrate.
-		#
-		# BATCH AJ, the shape of the re-author. A node is a ROW now, not one
-		# of three ranks, so every magnitude below is priced against the two
-		# doors it closes rather than against its own old rank 1 — which came
-		# out 2-3x across the board. The rows are THEMED: each one asks a
-		# question and each lane answers it its own way (1 the opening, 2 the
-		# wound, 3 what the wound pays, 4 the edge, 5 what compounds,
-		# 6 refusal, 7 the finish, 8 the capstone).
-		#
-		# TWO NODES CHANGED WHAT THEY DO, both re-specced in place:
-		#   - bz_vitality was Vitality (+5% max HP) and is now FIRST BLOOD.
-		#     A flat health dial is not an opening; 40 Rage at the bell is.
-		#   - bz_warcry was Deafening Cry (Battle Shout's cooldown) and is
-		#     now OVERKILL. Batch AI's mechanical row assignment had put it
-		#     in the same row as Battle Shout itself, and two exclusive
-		#     nodes where one exists only to modify the other is a row with
-		#     a dead option in it.
-		#     (The batch doc calls this id `bz_deafening`. The live id has
-		#     been `bz_warcry` since Batch AG, which the doc itself records
-		#     — the doc's own rule, "every node keeps its existing id so
-		#     saved trees migrate", is what settles it. Same for `bz_scar` /
-		#     `bz_flurry` / `bz_momentum` / `bz_second_wind`, whose live ids
-		#     are bz_frenzied_edge / bz_bloodlust_node / bz_thick_skin /
-		#     bz_bloodied_hide. The doc's ids are the tidy version of names
-		#     the nodes already carry.)
-		#
-		# TWO CROSS-ROW CONDITIONS (payload `condition` + has_node, Batch AI
-		# §5) — Crushing Blows reads Savagery, Scar Tissue reads Unstoppable.
-		# Neither needed a new field: both already read their counter as an
-		# INDEX, so the conditional half simply adds a second point to it and
-		# the read site knows 2 means "and the partner node too". A third,
-		# Measured Rage's, could not be written that way and carries the one
-		# flag field it needs.
-		# --- Lane A: Bloodletting — wounds as an engine: keep bleed high,
-		# or burst it. Bleedout is no longer just a meter reset. ---
-		{"id": "bz_savagery", "name": "Savagery", "ranks": 1, "lane": "Bloodletting", "row": 1,
-			"desc": "All bleed-building Berserker abilities build +{v} more Bleed.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"bleed_bonus": 15}}},
-		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 1, "lane": "Bloodletting", "row": 2,
-			"desc": "Enemies at {v} or more bloodloss are Crippled.",
-			"scale": {"base": 60},
-			"payload": {"stat": {"hemorrhage_ranks": 1}}},
-		# The conditional half adds a SECOND point to the same counter, and
-		# battle.gd reads 2 as "Savagery too" — 15 points of bloodloss per
-		# step instead of 20. See the header note on cross-row conditions.
-		{"id": "bz_crushing_blows", "name": "Crushing Blows", "ranks": 1, "lane": "Bloodletting", "row": 3,
-			"desc": "For every 20 points of bloodloss on the enemy team, gain {v}% armor penetration. With Savagery, every 15 points instead.",
-			"scale": {"step": 9},
-			"payload": {"stat": {"crushing_blows_ranks": 1},
-				"also": [
-					{"condition": {"has_node": "bz_savagery"},
-						"stat": {"crushing_blows_ranks": 1}},
-				]}},
-		# Re-spec (was Arterial Rhythm, +4 BD on Hack and Slash).
-		{"id": "bz_arterial", "name": "Arterial Spray", "ranks": 1, "lane": "Bloodletting", "row": 4,
-			"desc": "When an enemy bleeds out, {v}% of its blood buildup transfers to another living enemy.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"arterial_ranks": 1}}},
-		# Re-spec (was Gushing Wounds, a Savagery duplicate; same id, so
-		# saved ranks carry — the cr_frostbite "Brittle Ice" trick). The
-		# compounding ramp the archetype was missing.
-		{"id": "bz_gushing", "name": "Scent of Blood", "ranks": 1, "lane": "Bloodletting", "row": 5,
-			"desc": "+{v}% damage for each enemy that has bled out this battle.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"scent_ranks": 1}}},
-		{"id": "bz_bloodcraze", "name": "Bloodcraze", "ranks": 1, "lane": "Bloodletting", "row": 6,
-			"desc": "When an enemy bleeds out, the Berserker heals {v}% of max HP.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"bloodcraze": 1}}},
-		# Re-spec (was Feast of Ruin, a Bloodcraze duplicate). The first
-		# node that ties Bleed to Rage — those systems never touched.
-		{"id": "bz_feast", "name": "Blood Tithe", "ranks": 1, "lane": "Bloodletting", "row": 7,
-			"desc": "An enemy bleeding out grants the Berserker {v} Rage.",
-			"scale": {"step": 45},
-			"payload": {"stat": {"blood_tithe_ranks": 1}}},
-		# --- Lane B: Fury — the risk dial: how far over the edge? ---
-		{"id": "bz_unstoppable", "name": "Unstoppable", "ranks": 1, "lane": "Fury", "row": 1,
-			"desc": "Blood Frenzy grants {v}% damage for every 5% of health missing (up from the base 2%).",
-			"scale": {"base": 2.0, "step": 1.5},
-			"payload": {"stat": {"bloodrage_step_bonus": 1.5}}},
-		# The two numbers differ now, so they are written out rather than
-		# rendered from one {v}.
-		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 1, "lane": "Fury", "row": 2,
-			"desc": "+20% damage dealt AND +15% damage taken.",
-			"payload": {"stat": {"dmg_bonus": 0.20, "dmg_taken_bonus": 0.15}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Battle Shout; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies BLOODLUST, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "bz_battle_shout", "name": "Battle Roar", "ranks": 1, "lane": "Fury", "row": 3,
-			"desc": "Bloodlust costs {v} less Rage and deals +8% of Attack.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Bloodlust", "add": {"cost": -10, "damage": 8}}},
-		# Re-spec (was a flat +4% damage dial): same name, now conditional.
-		{"id": "bz_deathwish", "name": "Deathwish", "ranks": 1, "lane": "Fury", "row": 4,
-			"desc": "+{v}% damage dealt while below 35% health.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"deathwish_ranks": 1}}},
-		# Re-spec (was Frenzied Edge, +2% crit): deepens the Blood Frenzy
-		# floor directly — the lane's signature. Second point = Unstoppable
-		# was taken too, and the floor stops falling entirely.
-		{"id": "bz_frenzied_edge", "name": "Scar Tissue", "ranks": 1, "lane": "Fury", "row": 5,
-			"desc": "The Blood Frenzy floor holds 85% of your peak bonus (instead of 50%). With Unstoppable, it holds 100% and never falls at all.",
-			"payload": {"stat": {"scar_tissue_ranks": 1},
-				"also": [
-					{"condition": {"has_node": "bz_unstoppable"},
-						"stat": {"scar_tissue_ranks": 1}},
-				]}},
-		# Moved from Warpath: its exclusive partner lives here — the player
-		# should see both doors in one column.
-		#
-		# The cross-row half is the one that could NOT be folded into a
-		# counter: taking both nodes has to leave the damage-taken term at
-		# exactly zero, not at some sum of -0.20 and +0.15. So the flag says
-		# "cancelled" and the single read site zeroes the term outright —
-		# which also means a later re-tune of either number cannot silently
-		# break the promise.
-		{"id": "bz_measured", "name": "Measured Rage", "ranks": 1, "lane": "Fury", "row": 6,
-			"desc": "Take 20% less damage. With Reckless Fury, it cancels that node's +15% damage taken entirely instead — leaving the +20% dealt clean.",
-			"payload": {"stat": {"dmg_taken_bonus": -0.20},
-				"also": [
-					{"condition": {"has_node": "bz_reckless"},
-						"stat": {"measured_cancels_reckless": 1}},
-				]}},
-		{"id": "bz_enraged", "name": "Enraged", "ranks": 1, "lane": "Fury", "row": 7,
-			"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
-			"scale": {"step": 12},
-			"payload": {"stat": {"enraged_ranks": 1}}},
-		# --- Lane C: Warpath — momentum: keep swinging, or survive to
-		# keep swinging. ---
-		# Re-spec (was Vitality, +5% max HP; same id, so saved picks carry).
-		{"id": "bz_vitality", "name": "First Blood", "ranks": 1, "lane": "Warpath", "row": 1,
-			"desc": "The Berserker begins every battle with {v} Rage.",
-			"scale": {"step": 40},
-			"payload": {"stat": {"opening_rage": 40}}},
-		# "Flurry" since 07-27 — the ability Bloodlust kept the name; the id
-		# stays bz_bloodlust_node so saved ranks survive (the cr_frostbite →
-		# "Brittle Ice" trick).
-		{"id": "bz_bloodlust_node", "name": "Flurry", "ranks": 1, "lane": "Warpath", "row": 2,
-			"desc": "Hack and Slash strikes 2 additional times (5 in total).",
-			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 2}}},
-		# Re-spec (was Thick Skin, flat -3% damage taken).
-		{"id": "bz_thick_skin", "name": "Bloodied Momentum", "ranks": 1, "lane": "Warpath", "row": 3,
-			"desc": "When an enemy is slain, the Berserker gains {v} Rage.",
-			"scale": {"step": 40},
-			"payload": {"stat": {"bloodied_momentum_ranks": 1}}},
-		# The reliability half is bought PERMANENTLY here rather than earned
-		# per cast (the Batch AG rule): `set` writes the ability's own
-		# bleed_chance to 1.0, so no new field and no second read site — the
-		# roll at the strike loop simply always passes.
-		{"id": "bz_relentless", "name": "Relentless", "ranks": 1, "lane": "Warpath", "row": 4,
-			"desc": "Hack and Slash costs {v} less Rage, and its bleed rolls ALWAYS land.",
-			"scale": {"step": 15},
-			"payload": {"ability": "Hack and Slash", "add": {"cost": -15},
-				"set": {"bleed_chance": 1.0}}},
-		# Re-spec (was Bloodied Hide, +3% armor): the near-death moment
-		# becomes a whole turn instead of just a scare.
-		{"id": "bz_bloodied_hide", "name": "Second Wind", "ranks": 1, "lane": "Warpath", "row": 5,
-			"desc": "The first time you drop below 25% health each battle, immediately gain 60 Rage and clear every cooldown.",
-			"payload": {"stat": {"second_wind": 1}}},
-		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 1, "lane": "Warpath", "row": 6,
-			"desc": "Dropping below 25% health grants +{v} Constitution for 3 turns (at most once every 5 turns).",
-			"scale": {"step": 40},
-			"payload": {"stat": {"unrelenting_ranks": 1}}},
-		# Re-spec (was Deafening Cry, -1 turn on Battle Shout's cooldown;
-		# same id, so saved picks carry). See the header note: a node whose
-		# only job was to modify a node in its own exclusive row.
-		# NOTE for the designer: the Sharpshooter's Penetration lane already has
-		# a talent called Overkill (a kill's overflow damage carries to
-		# another enemy). Different trees, different ids, so nothing breaks —
-		# but two nodes share a name in the glossary and the tooltips now.
-		# BATCH FO §3 — CONFIRMED, AND THE LANE WORD IS CORRECTED: this note
-		# said `Precision` and his Overkill is `ss_overkill`, Penetration row 7,
-		# the same row as this one. **Nothing is renamed** — a node's name
-		# resolves nothing, so BR §1 calls this a LABEL collision and its
-		# disposition is *ships and is flagged*. `check_fo` §3 asserts the pair
-		# off the trees, because a collision recorded only beside one of its two
-		# halves is one the other half's author never meets.
-		{"id": "bz_warcry", "name": "Overkill", "ranks": 1, "lane": "Warpath", "row": 7,
-			"desc": "Killing an enemy clears the cooldowns of Hack and Slash and Wildstrikes.",
-			"payload": {"stat": {"overkill_reset": 1}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# CONVERTS: bleedout stops being terminal for the meter, so the four
-		# nodes downstream of a bleedout event can fire on one enemy repeatedly.
-		{"id": "bz_slaughterhouse", "name": "Slaughterhouse", "ranks": 1, "lane": "Bloodletting", "row": 8,
-			"desc": "Blood buildup no longer resets when an enemy bleeds out — it falls to {v} instead, so the same enemy can bleed out again and again.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"slaughterhouse": 50}}},
-		# REMOVES A CONSTRAINT: the lane sells living low and low is where it kills
-		# him. Rage — which Warpath and Bloodletting both pile up — becomes health.
-		{"id": "bz_last_rites", "name": "Last Rites", "ranks": 1, "lane": "Fury", "row": 8,
-			"desc": "While below 25% health, damage is taken out of Rage first — {v} Rage per point of damage — and only bites health once the tank is empty.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"last_rites": 1}}},
-		# READS AN ACCUMULATED QUANTITY: seven rows fill the tank and nothing has
-		# ever paid for HOLDING it. Now the lane has an argument against spending.
-		{"id": "bz_bloodwake", "name": "Bloodwake", "ranks": 1, "lane": "Warpath", "row": 8,
-			"desc": "+1% damage for every {v} Rage the Berserker is currently holding.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"bloodwake": 4}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# Re-spec (was a passive stat pile: +10 Bleed, Hemorrhage one step).
-		{"id": "bz_exsanguinate", "name": "Exsanguination", "ranks": 1, "lane": "Bloodletting", "row": 9,
-			"capstone": true,
-			"desc": "Bleedout deals 35% of max HP (up from 20%), and the victim's full blood buildup surges to another living enemy — chaining across the field.",
-			"payload": {"stat": {"exsanguination": 1}}},
-		# Re-spec (was +12% HP / -5% damage taken) and moved from Warpath:
-		# the risk capstone belongs to Fury.
-		{"id": "bz_undying", "name": "Undying Rage", "ranks": 1, "lane": "Fury", "row": 9,
-			"capstone": true,
-			"desc": "While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).",
-			"payload": {"stat": {"undying_rage": 1}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Rampage; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies WILDSTRIKES, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "bz_rampage", "name": "Bloodstorm", "ranks": 1, "lane": "Warpath", "row": 9,
-			"capstone": true,
-			"desc": "Wildstrikes deals +{v}% of Attack to every enemy, and its cooldown falls to 1.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Wildstrikes", "add": {"damage": 10}, "set": {"cooldown": 1}}},
-	],
-	"swordmaster": [
-		# Purpose-designed lanes (Batch F, 07-30); Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row; BATCH AK re-authored all
-		# 24 nodes for that structure. Every id survives and re-specs in
-		# place, so saved ranks migrate. Duelist and Poise were the same
-		# lane twice (all parry and defence), while NOTHING in the tree
-		# touched Break — the kit's engine since Batch E. So all parry
-		# lives in Poise now, and Duelist became BREAKER: Break generation
-		# and Broken-window exploitation.
-		#
-		# BATCH AK, the shape of the re-author. The rows are exclusive, so
-		# a number that was one of three ranks is now the whole node and
-		# has to be worth a row; every magnitude below is priced against
-		# the two doors it closes, not against its own old rank 1. Three
-		# nodes changed what they DO rather than how much:
-		#   - Sunder Guard pointed at Shatterpoint, an ability §1 makes
-		#     earnable, so it now points at the Guard Change §1 guarantees
-		#     him — and pays extra if he draws Shatterpoint anyway.
-		#   - Swordsmanship was a flat number he owned; it is now a spike
-		#     he earns on the skill check.
-		#   - Punishment and Off Balance used to be an exclusive pair in
-		#     one lane. Split across rows 6 and 7 they are both reachable,
-		#     and two "damage versus Broken" nodes stacking would be
-		#     redundant rather than interesting — so the second one widens
-		#     what counts as a window instead of adding to the same number.
-		# --- Lane A: Blade — damage, crit, and the Aggressive stance. ---
-		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 1, "lane": "Blade", "row": 1,
-			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"seasoned_off_bonus": 0.12}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Lunge; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies OVERPOWER, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "sm_lunge", "name": "Committed Thrust", "ranks": 1, "lane": "Blade", "row": 2,
-			"desc": "Overpower costs {v} less Rage and builds 10 Rage on the blow.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Overpower", "add": {"cost": -10, "resource_gain": 10}}},
-		# Re-spec (was Keen Edge, flat +2% crit; same id, so saved ranks
-		# carry): keyed to the stance — Aggressive gets an identity past
-		# its flat +15%.
-		{"id": "sm_keen_edge", "name": "Killing Edge", "ranks": 1, "lane": "Blade", "row": 3,
-			"desc": "+{v}% critical strike chance while in the Aggressive stance.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"killing_edge_ranks": 1}}},
-		# BATCH DO — RE-POINTED. It read *"Dazed, Crippled and Exposed"* and the
-		# Swordmaster guarantees NONE of the three: Dazed comes only from Charge
-		# (class draft) or Sweeping Strikes (a `SPEC_POOLS` trophy), and Crippled
-		# and Exposed came only from `sm_lunge` — WHICH LEFT THE TREE IN THIS SAME
-		# BATCH, so the last non-drawn source went with it. STUNNED is what POMMEL
-		# STRIKE applies, and Pommel Strike is PROTECTED CORE.
-		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 1, "lane": "Blade", "row": 4,
-			"desc": "+{v}% critical strike chance against Stunned targets.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"precision_ranks": 1}}},
-		# The Lunge half is an ability hook resolved at the CAST site, not
-		# at apply time: Lunge is both this lane's row-2 node and a spec
-		# pool entry, so a Lunge earned AFTER this node was taken has to
-		# benefit too — which a stat written once at spawn could not do.
-		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 1, "lane": "Blade", "row": 5,
-			"desc": "Overpower gains +{v}% critical strike chance.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"blade_crit_ranks": 1}}},
-		# Re-spec (was Momentum, a flat +3% damage dial): pairs with
-		# Precision Strikes — one crits into debuffs, this damages into
-		# them.
-		{"id": "sm_momentum_sm", "name": "Overwhelm", "ranks": 1, "lane": "Blade", "row": 6,
-			"desc": "+{v}% damage for every debuff on the target. Broken is a Break-meter state rather than an affliction and is not one of them.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"overwhelm_ranks": 1}}},
-		# Re-spec (was Deep Thrust, +5 Pommel damage): pays for pressing
-		# the button the whole spec turns on.
-		{"id": "sm_deep_thrust", "name": "Pivot", "ranks": 1, "lane": "Blade", "row": 7,
-			"desc": "Switching stance grants +{v}% damage for 2 turns.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"tempo_ranks": 1}}},
-		# --- Lane B: Poise — the defensive half, and ALL the parry
-		# (Swordsmanship, Sword Mastery and Riposte move in from Duelist:
-		# everything that answers being hit lives here). ---
-		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 1, "lane": "Poise", "row": 1,
-			"desc": "The Defensive stance blocks an additional {v}% damage taken.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"seasoned_def_bonus": 0.12}}},
-		# Moved from Duelist: parry belongs with the guard.
-		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 1, "lane": "Poise", "row": 2,
-			"desc": "+{v}% parry chance.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"parry_bonus": 0.12}}},
-		# Re-spec (was Footwork, +3% armor): Defensive stance comes to mean
-		# "hard to Break", not just "takes less damage".
-		{"id": "sm_footwork", "name": "Bracing", "ranks": 1, "lane": "Poise", "row": 3,
-			"desc": "+{v} Constitution while in the Defensive stance.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"bracing_ranks": 1}}},
-		# Re-spec (Batch AK; the id and the Guard Change site both survive
-		# from Batch AH, only the shape of the reward changed): a flat
-		# parry number he owned becomes a spike he earns on the skill
-		# check. Same total parry over a fight only if he keeps hitting
-		# perfects — which is the point.
-		# `swordsmanship_parry` is ADDITIVE on top of the perfect's own 10%,
-		# which is what the scale's base/step spell out: 10 from the ability,
-		# 15 from this node, 25 rendered. It is additive rather than a
-		# replacement because the Rune of the Still Wrist pays into the same
-		# field — a max() would leave that rune silently inert on its own.
-		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 1, "lane": "Poise", "row": 4,
-			"desc": "A PERFECT Guard Change grants +{v}% parry chance for 2 turns, instead of the usual 10%.",
-			"scale": {"base": 10, "step": 15},
-			"payload": {"stat": {"swordsmanship_parry": 0.15}}},
-		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "lane": "Poise", "row": 5,
-			"desc": "Take 40% less damage for 3 turns after parrying an attack.",
-			"payload": {"stat": {"high_guard": 1}}},
-		# Moved from Duelist: the parry payoff sits behind the parry lane.
-		# Batch AK upgraded the counter from a basic Strike to a free
-		# Overpower — it reuses Opportunist's recast machinery, so the two
-		# parry answers in this tree finally speak the same language.
-		{"id": "sm_riposte", "name": "Riposte", "ranks": 1, "lane": "Poise", "row": 6,
-			"desc": "Counter Attack: immediately answer every parry with a free Overpower.",
-			"payload": {"stat": {"counter_attacks": 1}}},
-		# Re-spec (was Composure, flat -4% damage taken): the node that
-		# makes a parry build viable — without it the whole cluster is dead
-		# weight against archers and casters. Unchanged in Batch AK: it is
-		# binary and already large.
-		{"id": "sm_composure", "name": "Deflection", "ranks": 1, "lane": "Poise", "row": 7,
-			"desc": "The Swordmaster's parry works against RANGED attacks too — arrows and spells alike.",
-			"payload": {"stat": {"deflection": 1}}},
-		# --- Lane C: Breaker (was Duelist) — fill their meter, then live
-		# in the window. This lane did not exist before. ---
-		# Re-spec (was Flourish, -5 Sweeping Strikes cost).
-		{"id": "sm_flourish", "name": "Pressure Point", "ranks": 1, "lane": "Breaker", "row": 1,
-			"desc": "Pommel Strike deals +{v} Break damage.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"pressure_point_ranks": 1}}},
-		# Re-spec (Batch AK; was "Shatterpoint +8 Break damage"). The old
-		# node pointed at an ability he may never draw. This one points at
-		# the ability the kit correction GUARANTEES him, and the `also`
-		# half pays extra if he draws the other anyway.
-		{"id": "sm_blade_dance", "name": "Sunder Guard", "ranks": 1, "lane": "Breaker", "row": 2,
-			"desc": "Guard Change deals {v} Break damage to EVERY enemy (up from 15 to one).",
-			"scale": {"step": 40},
-			"payload": {"stat": {"guard_change_bd": 40}}},
-		# Moved from Poise: debuff-fed armor is pressure bookkeeping.
-		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 1, "lane": "Breaker", "row": 3,
-			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle. The growth is unbounded but armor is not: no amount of it reduces a blow by more than 85%.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"dominant_ranks": 1}}},
-		# Moved from Duelist. Batch AK widened the trigger: a parried blow
-		# is as much an opening as a whiffed one, and it makes the node
-		# live in the Defensive guard the rest of the tree keeps selling.
-		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "lane": "Breaker", "row": 4,
-			"desc": "When an enemy attack MISSES the Swordmaster or is PARRIED, he counter attacks with Overpower (free).",
-			"payload": {"stat": {"opportunist": 1}}},
-		# Re-spec (was Perfect Form, a Swordsmanship duplicate): closes the
-		# loop — the Break refunds Rage toward the Overpower you want to
-		# spend inside the window you just opened.
-		{"id": "sm_perfect_form", "name": "No Quarter", "ranks": 1, "lane": "Breaker", "row": 5,
-			"desc": "Breaking an enemy grants the Swordmaster {v} Rage.",
-			"scale": {"step": 45},
-			"payload": {"stat": {"no_quarter_ranks": 1}}},
-		# Re-spec (was +6 Overpower damage). No longer exclusive with Off
-		# Balance — they sit in different rows now, and taking both widens
-		# the window instead of doubling the number.
-		{"id": "sm_punish", "name": "Punishment", "ranks": 1, "lane": "Breaker", "row": 6,
-			"desc": "Overpower deals +{v}% damage against Broken targets.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"punishment_ranks": 1}}},
-		# Re-spec (was Guarded Frame, +5% max health): the broad half. The
-		# `also` half is the cross-row condition — with Punishment taken it
-		# widens what counts as a window rather than stacking onto the same
-		# "versus Broken" number.
-		{"id": "sm_guarded", "name": "Off Balance", "ranks": 1, "lane": "Breaker", "row": 7,
-			"desc": "All the Swordmaster's damage is increased by {v}% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"off_balance_ranks": 1},
-				"also": [
-					{"condition": {"has_node": "sm_punish"},
-						"stat": {"off_balance_wide": 1}},
-				]}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# READS AN ACCUMULATED QUANTITY: five crit nodes in the lane and every one
-		# pays per hit. This pays for the VOLUME of crits across the whole fight.
-		{"id": "sm_whetstone", "name": "Whetstone", "ranks": 1, "lane": "Blade", "row": 8,
-			"desc": "Every critical strike permanently raises the Swordmaster's Attack by {v} for the rest of the battle.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"whetstone": 3}}},
-		# REMOVES A CONSTRAINT: parry is a dice roll the lane can deepen but never
-		# plan around. Waiting banks certainty instead of a bigger number.
-		{"id": "sm_waiting_guard", "name": "Waiting Guard", "ranks": 1, "lane": "Poise", "row": 8,
-			"desc": "Every turn the Swordmaster is not struck, he banks a Guard — the next attack against him is parried automatically. He may bank {v}.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"waiting_guard": 3}}},
-		# CONVERTS: Break dealt past a full meter is pure waste today. It becomes
-		# damage, which is the one thing the Breaker lane cannot buy with Break.
-		{"id": "sm_overpressure", "name": "Overpressure", "ranks": 1, "lane": "Breaker", "row": 8,
-			"desc": "Break damage the Swordmaster deals past a full meter is not wasted — it lands as damage instead, {v}% of a point apiece.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"overpressure": 100}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# BATCH DO — RE-AUTHORED. This cell granted Execute; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies POMMEL STRIKE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "sm_execute", "name": "Finisher", "ranks": 1, "lane": "Blade", "row": 9,
-			"capstone": true,
-			"desc": "Pommel Strike deals +{v}% of Attack, and its cooldown falls to 1.",
-			"scale": {"step": 30},
-			"payload": {"ability": "Pommel Strike", "add": {"damage": 30}, "set": {"cooldown": 1}}},
-		# Re-spec (was +5% parry / -5% damage taken): the Defensive stance
-		# becomes a genuine wall against melee — and every parry a stun.
-		{"id": "sm_untouchable", "name": "Untouchable", "ranks": 1, "lane": "Poise", "row": 9,
-			"capstone": true,
-			"desc": "While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.",
-			"payload": {"stat": {"untouchable": 1}}},
-		# Re-spec (was En Garde, +4% crit / +4% parry): the lane's thesis
-		# as a win condition — they never get their guard back.
-		{"id": "sm_en_garde", "name": "Guard Breaker", "ranks": 1, "lane": "Breaker", "row": 9,
-			"capstone": true,
-			"desc": "When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.",
-			"payload": {"stat": {"guard_breaker": 1}}},
-	],
-	"warden": [
-		# Purpose-designed lanes (Batch H, 07-30). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. Every id
-		# survives and re-specs in place, so saved ranks migrate (no new
-		# rank cap is below its old one — nobody gets a refund). Half the
-		# old tree was damage dials on a 75-Attack tank, so the offensive
-		# payloads convert into currencies he actually spends: mitigation,
-		# Break pressure, threat, and party protection.
-		#
-		# BATCH AL (08-06) re-authored all 24 for row exclusivity, the same
-		# pass AK and AJ ran on the Swordmaster and the Berserker. A node is
-		# a ROW now, not one of three ranks, so it is priced against the two
-		# doors it closes — roughly 3-4x the old rank-1 values.
-		#
-		# ROWS ARE THEMED, not merely exclusive: 1 who your defence pays /
-		# 2 how much you hold / 3 attrition / 4 what compounds / 5 active
-		# defence / 6 the engine running / 7 the last stand / 8 capstone.
-		# Row 1 is the model for the whole tree — one trigger (a Block, a
-		# taunt), three beneficiaries: him, them, the party.
-		#
-		# TWO RE-SPECS IN PLACE, both for the same reason: AH moved the
-		# ability they modified into the earnable spec pool, so each was
-		# dead on a Warden who never drew it. wd_stomp_drill (War Stomp's
-		# refuel) and wd_bannerman (Interpose's charges) now key to
-		# something he always has.
-		# **BATCH DO CUT THE `owns_ability` RIDERS THAT USED TO SIT ON TOP.**
-		# A rider that pays only a Warden who DREW War Stomp or Interpose is
-		# the bet the talent charter forbids — a bonus clause on a drawn card
-		# is still a bet. The clauses went, and `rallying_stomp_ranks` and
-		# `bulwark_line_ranks` went with them: field, payload and read site.
-		#
-		# ONE CROSS-ROW CONDITION: Spite and Bruising Guard used to be an
-		# exclusive fork (reflect the damage, or convert the blocks into
-		# Break). Split across rows 5 and 6 both are reachable, so the
-		# second one welds the pair into one Break engine — `spite_break`.
-		# --- Lane A: Plate — mitigation and the block payoffs.
-		# Everything that answers being hit. ---
-		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 1, "lane": "Plate", "row": 1,
-			"desc": "Every time you Block an attack, heal for {v}% of the health you brought into the battle.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"unkillable_ranks": 1}}},
-		{"id": "wd_toughness", "name": "Toughness", "ranks": 1, "lane": "Plate", "row": 2,
-			"desc": "Constitution is increased by {v}% of maximum HP.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"toughness_ranks": 1}}},
-		{"id": "wd_endurance", "name": "Endurance", "ranks": 1, "lane": "Plate", "row": 3,
-			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).",
-			"scale": {"step": 3},
-			"payload": {"stat": {"endurance_ranks": 1}}},
-		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "lane": "Plate", "row": 4,
-			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 15 for the rest of the battle.",
-			"payload": {"stat": {"tenacity": 1}}},
-		# Re-spec (Batch AB, same id so saved ranks migrate and nobody is
-		# refunded): Shieldwall stopped granting charges, so "+1 charge/rank"
-		# stopped meaning anything. The stance's length is the dial now.
-		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 1, "lane": "Plate", "row": 5,
-			"desc": "Shieldwall's stance holds {v} turns longer — 5 turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"shield_mastery_ranks": 1}}},
-		# Re-spec (was Layered Plating, a flat armor dial; same id, so saved
-		# ranks carry): the lane's signature — tightens the cadence of the
-		# Batch G pity ramp, so the cap arrives in two unblocked hits instead
-		# of five and every on-Block talent fires far more often.
-		{"id": "wd_plating", "name": "Plate Discipline", "ranks": 1, "lane": "Plate", "row": 6,
-			"desc": "Heavy Plating's climbing Block bonus grows +{v}% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).",
-			"scale": {"step": 12},
-			"payload": {"stat": {"plate_discipline_ranks": 1}}},
-		# Re-spec (was Immovable, a flat damage-taken dial — that NAME moved
-		# to the Plate capstone): a Broken unit cannot Block at all, so
-		# getting Broken switches his identity off. Blocking holds that off.
-		{"id": "wd_immovable", "name": "Battered Not Broken", "ranks": 1, "lane": "Plate", "row": 7,
-			"desc": "Blocking an attack removes {v} Break from the Warden's own meter.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"battered_ranks": 1}}},
-		# --- Lane B: Threat — he wants to be hit. This lane is what
-		# happens to whoever obliges. ---
-		{"id": "wd_ricochet", "name": "Ricochet", "ranks": 1, "lane": "Threat", "row": 1,
-			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
-			"scale": {"step": 35},
-			"payload": {"stat": {"ricochet_ranks": 1}}},
-		# Re-spec (was Taunt Master, -1 Mocking cooldown; ranks 1 → 2): the
-		# taunt engine widens — more of the room swings at the wall. The
-		# base ability already drags in one extra foe; this is on top.
-		{"id": "wd_taunt_master", "name": "Provoke", "ranks": 1, "lane": "Threat", "row": 2,
-			"desc": "Mocking Blow taunts {v} additional foes.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"provoke_ranks": 1}}},
-		# Re-spec IN MEANING (same id, same name, same idea — adversity
-		# makes him stronger — converted into the currency a tank banks):
-		# was +5%/rank DAMAGE per debuff, ~14 damage at full stack on a
-		# 75-Attack character.
-		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 1, "lane": "Threat", "row": 3,
-			"desc": "The Warden takes {v}% less damage for every debuff currently on him, to a maximum of 90%.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"iron_will_ranks": 1}}},
-		{"id": "wd_sundering", "name": "Sundering", "ranks": 1, "lane": "Threat", "row": 4,
-			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
-			"scale": {"step": 100},
-			"payload": {"stat": {"sundering_ranks": 1}}},
-		# Re-spec (was Spiked Bulwark, a Richocet deepener). Used to be an
-		# EXCLUSIVE fork with Bruising Guard; Batch AL put them in different
-		# rows, so both are reachable and Bruising Guard's `also` half welds
-		# them together instead (see there).
-		{"id": "wd_spiked", "name": "Spite", "ranks": 1, "lane": "Threat", "row": 5,
-			"desc": "Attackers that damage the Warden take {v}% of that damage back.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"spite_ranks": 1}}},
-		# Re-spec (was Shattering Blow, +5 Crushing damage): the more
-		# interesting half of the old fork — on a character who blocks
-		# constantly and is attacked more than anyone, this quietly makes
-		# him a Break engine for the whole party.
-		#
-		# The cross-row half needed its OWN field rather than a second point
-		# on the counter: `bruising_ranks` sets a flat Break number on the
-		# block, while the rider adds Break to a completely different event
-		# (Spite's reflect, at the damage site). Two events, two fields.
-		{"id": "wd_shatter_guard", "name": "Bruising Guard", "ranks": 1, "lane": "Threat", "row": 6,
-			"desc": "Blocking an attack deals {v} Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"bruising_ranks": 1},
-				"also": [
-					{"condition": {"has_node": "wd_spiked"},
-						"stat": {"spite_break": 1}},
-				]}},
-		# Re-spec (same name, was a flat +3% damage dial): the damage he
-		# does keep is aimed at whoever he's holding.
-		{"id": "wd_grudge", "name": "Grudge", "ranks": 1, "lane": "Threat", "row": 7,
-			"desc": "+{v}% damage against enemies currently taunted by the Warden.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"grudge_ranks": 1}}},
-		# --- Lane C: Banner — the half that protects other people. ---
-		# Batch AL made the Empower CERTAIN. Mocking Blow is free and sits on
-		# his rotation constantly, so a chance roll there is noise rather
-		# than tension — you cannot plan around it and you barely notice it
-		# fire. No {v}: the node has no number left to render.
-		# BATCH DK §2 — HERO, BECAUSE A BEAST'S BLOWS READ NO EMPOWER. The status
-		# applies to a companion perfectly well; it is the PAYOUT that never
-		# arrives. A beast strikes through `_companion_hit`, which is its own
-		# damage path and reads none of the hero strike loop's multiplier block —
-		# `battle.gd` says so at the `last_howl_dmg` site: "a beast's blows go
-		# through `_companion_hit`, which never reads this block". MEASURED over
-		# 40 seeded blows with the chip standing: 34392 damage against 34392, a
-		# ratio of exactly 1.0000. Widening the loop would have hung a visible
-		# chip on a beast and changed nothing, which is worse than the narrow
-		# word — it would READ as working.
-		# **THIS WAS `CLAUDE.md`'s WORKED EXAMPLE OF THE ALLY/HERO DISTINCTION.**
-		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 1, "lane": "Banner", "row": 1,
-			"desc": "Mocking Blow ALWAYS Empowers a random hero (2 turns).",
-			"payload": {"stat": {"tank_spank_ranks": 1}}},
-		{"id": "wd_rally", "name": "Rally", "ranks": 1, "lane": "Banner", "row": 2,
-			"desc": "Every attack Blocked by Heavy Plating grants every ally +30% healing received for 3 turns.",
-			"payload": {"stat": {"rally": 1}}},
-		# RE-SPEC (Batch AL; was Rallying Stomp, "War Stomp restores +5% more
-		# resource" — and before that Stomp Drill, -5 cost). Same id, so
-		# saved picks migrate. Batch AH made War Stomp EARNABLE rather than
-		# part of the opening kit, which left this node dead on a Warden who
-		# never drew it. The party refuel is Banner's real cargo, so it now
-		# happens on its own, at his turn.
-		# **BATCH DO: THE "AND WAR STOMP DEEPENS IT IF HE HAS IT" HALF IS GONE.**
-		# It rode an `owns_ability` condition, which was the honest instrument
-		# for the question it asked — but the question itself is the one the
-		# charter forbids a talent to ask.
-		# BATCH DK §2 — HERO, BECAUSE A BEAST HAS NO RESOURCE BAR. A companion is
-		# built with no `resource_name`, and `unit.gd` renders its plate without a
-		# resource bar, so a refuel would restore nothing anyone could spend. The
-		# loop's own `resource_name == ""` guard already says this; the word now
-		# agrees with it.
-		# **CORRECTED AT DL §1: `max_resource` IS NOT 0 ON A COMPANION.** This
-		# comment said it was. It is `unit.gd`'s default **100**, never overridden
-		# at the summon — measured on a live Ursus. So `resource_name == ""` is the
-		# ONLY thing standing between these loops and a beast banking 30 points of
-		# a bar that does not exist, and the guard is the ruling rather than a
-		# decoration on it.
-		{"id": "wd_stomp_drill", "name": "Rallying Cry", "ranks": 1, "lane": "Banner", "row": 3,
-			"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"rallying_cry": 4}}},
-		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 1, "lane": "Banner", "row": 4,
-			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
-			"scale": {"step": 20},
-			"payload": {"stat": {"elem_weak_ranks": 1}}},
-		# RE-SPEC (Batch AL; was "Interpose grants each ally +1 shield
-		# charge", and before that Bannerman, a flat max-HP dial). Same id,
-		# same fix as Rallying Cry above: AH made Interpose earnable, so the
-		# node keys to SHIELDWALL — which he has always had since Batch G
-		# promoted it into the base kit — and Interpose rides on top.
-		#
-		# The ally grant rides the same Heavy Plating slice of the block roll
-		# that Shieldwall's own stance does, so the cover is real Block, not
-		# a separate mitigation site.
-		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 1, "lane": "Banner", "row": 5,
-			"desc": "Shieldwall also grants every other hero +{v}% Block chance for its duration.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"bulwark_ally_block": 10}}},
-		# Re-spec (was Fortress, a flat max-HP dial): conditional on the
-		# Warden being healthy — the party's mitigation depends on keeping
-		# him standing, so healing him is protecting everyone.
-		{"id": "wd_fortress", "name": "Shared Vigil", "ranks": 1, "lane": "Banner", "row": 6,
-			"desc": "Heroes take {v}% less damage while the Warden is above 50% health.",
-			"scale": {"step": 12},
-			"payload": {"stat": {"shared_vigil_ranks": 1}}},
-		# Re-spec (was Veteran's Will, an Iron Will deepener): the lane's
-		# thesis in one node — he eats what would have killed you.
-		{"id": "wd_veteran", "name": "Steadfast", "ranks": 1, "lane": "Banner", "row": 7,
-			"desc": "When damage would drop a hero below 20% health, the Warden absorbs {v}% of it instead.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"steadfast_ranks": 1}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# CONVERTS: the lane spends seven rows preventing damage and prevention
-		# buys nothing. The bank pays out through the one button he already swings.
-		{"id": "wd_iron_debt", "name": "Debt of Iron", "ranks": 1, "lane": "Plate", "row": 8,
-			"desc": "Every point of damage his armor and Blocks refuse is banked. Crushing Blow spends the bank, dealing {v}% of it as bonus damage.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"iron_debt": 10}}},
-		# REMOVES A CONSTRAINT: Provoke widens the taunt and the clock still runs
-		# it out. The room stays angry.
-		{"id": "wd_whole_room", "name": "The Whole Room", "ranks": 1, "lane": "Threat", "row": 8,
-			"desc": "Taunts the Warden applies never expire.",
-			"payload": {"stat": {"whole_room": 1}}},
-		# CONVERTS: his armor is the deepest number in the tree and it has always
-		# been his alone. Banner's thesis is that it should not be.
-		{"id": "wd_standard", "name": "Standard Bearer", "ranks": 1, "lane": "Banner", "row": 8,
-			"desc": "Every other hero is protected by {v}% of the Warden's own armor value, on top of their own.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"standard_bearer": 50}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# Re-spec (was The Mountain, a stat pile; the name comes from the
-		# old wd_immovable filler): being Broken is the one thing that
-		# turns a block build off — this removes it. Precedent: the
-		# Devout's Bulwark of Fortitude.
-		{"id": "wd_mountain", "name": "Immovable", "ranks": 1, "lane": "Plate", "row": 9,
-			"capstone": true,
-			"desc": "The Warden cannot be Broken, and his Block chance is increased by 20%.",
-			"payload": {"stat": {"immovable": 1, "block_chance": 0.20}}},
-		# Re-spec (was Avenger, a Richocet/Sundering stat pile). Once per
-		# TURN, not per block — at his block rate against a full field,
-		# per-block would be absurd.
-		{"id": "wd_avenger", "name": "Vengeful Guardian", "ranks": 1, "lane": "Threat", "row": 9,
-			"capstone": true,
-			"desc": "The first attack the Warden Blocks each turn is answered with a free Crushing Blow.",
-			"payload": {"stat": {"vengeful_guardian": 1}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Hold the Line; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies SHIELDWALL, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "wd_hold_line", "name": "Braced", "ranks": 1, "lane": "Banner", "row": 9,
-			"capstone": true,
-			"desc": "Shieldwall costs no Rage at all, and its cooldown falls to {v}.",
-			"scale": {"step": 1},
-			"payload": {"ability": "Shieldwall", "set": {"cost": 0, "cooldown": 1}}},
-	],
-	"pyromancer": [
-		# Purpose-designed lanes (Batch N, 07-31), re-cut into 7 exclusive rows
-		# plus a capstone row by Batch AI, and RE-AUTHORED AROUND OVERBURN by
-		# Batch AR. Every one of the 24 ids survives and re-specs in place, so
-		# saved picks migrate and NO SAVE VERSION MOVES; the changelog carries
-		# the full old-name -> new-name mapping table.
-		#
-		# The spine is COMMITMENT. Overburn pays +2% damage per turn of Burn
-		# standing on the enemy team and charges 1 Mana a turn for each of them
-		# — the reward caps at +40% and THE COST DOES NOT. Every lane answers
-		# the same question a different way: KINDLING lights more fires,
-		# INFERNO stands in them longer, DETONATION cashes them in. Each row
-		# asks one question — 1 the spark / 2 the spread / 3 what the heat
-		# gives / 4 the tool / 5 what compounds / 6 what you accept / 7 the
-		# trigger / 8 the capstone.
-		#
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED. Several fields are fed by a rune
-		# as well as by a node (accelerant_ranks, conflagration_ranks), so each
-		# node writes its own magnitude in the units its read site adds up —
-		# the node pays its number, the rune pays its number, and stacked they
-		# pay the sum. That is the Batch AL repair rule applied up front.
-		# --- Lane A: KINDLING — how fast you light up. ---
-		{"id": "py_kindling", "name": "Cinder Trail", "ranks": 1, "lane": "Kindling", "row": 1,
-			"desc": "Fireball's Burn lasts {v} turn longer — 4 turns instead of 3.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"cinder_trail_ranks": 1}}},
-		{"id": "py_accelerant", "name": "Accelerant", "ranks": 1, "lane": "Kindling", "row": 2,
-			"desc": "Your Burn ticks deal +{v}% of Attack, on top of the base 6%.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"accelerant_ranks": 4}}},
-		{"id": "py_arson", "name": "Conflagration", "ranks": 1, "lane": "Kindling", "row": 3,
-			"desc": "Flamewave applies +{v} turns of Burn, fresh fires and extensions alike.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"conflagration_ranks": 2}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Backdraft; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies WILDFIRE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "py_melt", "name": "Melt", "ranks": 1, "lane": "Kindling", "row": 4,
-			"desc": "Wildfire's cooldown falls to {v}.",
-			"scale": {"step": 1},
-			"payload": {"ability": "Wildfire", "set": {"cooldown": 1}}},
-		{"id": "py_ashes", "name": "Wildfire Spread", "ranks": 1, "lane": "Kindling", "row": 5,
-			"desc": "Wildfire applies {v} turn of Burn to non-burning enemies before it consumes.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"wildfire_spread": 1}}},
-		{"id": "py_explosive", "name": "Explosive Force", "ranks": 1, "lane": "Kindling", "row": 6,
-			"desc": "Critical hits with fire abilities extend the target's Burn by {v} turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"explosive_ranks": 2}}},
-		{"id": "py_spreading", "name": "Chain Ignition", "ranks": 1, "lane": "Kindling", "row": 7,
-			"desc": "An enemy that dies Burning splits its remaining Burn turns among the survivors.",
-			"payload": {"stat": {"ember_wind": 1}}},
-		# --- Lane B: INFERNO — the fire that shields you. ---
-		# BATCH BS §3. It was "how much heat you can stand", and SEVEN OF ITS
-		# EIGHT NODES READ OVERBURN'S MANA DRAIN — an entire column existed to
-		# mitigate one punishing passive, which is one node with eight prices
-		# (BC's diagnosis, BH's proof) wearing the costume of a lane. The drain
-		# is deleted (battle.gd's `_overburn_mult` carries the argument) and the
-		# column is re-authored around the one thing the Pyromancer most lacks
-		# and his theme most obviously supports: ARMOURED IN HIS OWN ELEMENT.
-		# ALL EIGHT IDS SURVIVE AT THEIR OWN ROWS, so a saved pick migrates.
-		# ROWS 1-7 ARE SEVEN DIFFERENT KINDS OF PROTECTION — flat mitigation,
-		# resistance and sustain, evasion, retaliation, an emergency, a
-		# death-refusal, and a scaling that pays both ways. NO NODE IS A LARGER
-		# MAGNITUDE OF ANOTHER, which is exactly what the old lane failed.
-		{"id": "py_pyromaniac", "name": "Ember Shroud", "ranks": 1, "lane": "Inferno", "row": 1,
-			"desc": "While ANY enemy is Burning, you take {v}% less damage.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"ember_shroud": 8}}},
-		{"id": "py_invigorating", "name": "Ashen Skin", "ranks": 1, "lane": "Inferno", "row": 2,
-			"desc": "+{v}% fire resistance, and every Burn tick YOU applied heals you for 10% of it.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"ashen_skin": 25, "ashen_skin_heal": 10}}},
-		{"id": "py_firebrand", "name": "Heat Haze", "ranks": 1, "lane": "Inferno", "row": 3,
-			"desc": "Enemies that are Burning have a {v}% chance to miss you.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"heat_haze": 20}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Immolate; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies FLAMEWAVE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "py_flame_shield", "name": "Emberwall", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "Flamewave costs {v} less Mana and deals 15 more Break damage.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Flamewave", "add": {"cost": -10, "pressure": 15}}},
-		{"id": "py_molten", "name": "Backblast", "ranks": 1, "lane": "Inferno", "row": 5,
-			"desc": "Once per battle, the first time you drop below 40% health: every enemy is set Burning 4 turns and you heal {v}% of maximum.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"backblast": 15}}},
-		{"id": "py_undying_flame", "name": "Kiln-Forged", "ranks": 1, "lane": "Inferno", "row": 6,
-			"desc": "You cannot be reduced below 1 health by any single hit while {v} or more enemies are Burning.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"kiln_forged_at": 3}}},
-		{"id": "py_cauterize", "name": "Ash Lung", "ranks": 1, "lane": "Inferno", "row": 7,
-			"desc": "For every Burning enemy you take {v}% less damage and deal {v}% more. Uncapped.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"ash_lung_pct": 4}}},
-		# --- Lane C: DETONATION — how big the trigger is. ---
-		{"id": "py_shockwave", "name": "Focused Flame", "ranks": 1, "lane": "Detonation", "row": 1,
-			"desc": "Detonation's Burn bonus rises from 250% to {v}%.",
-			"scale": {"base": 250, "step": 75},
-			"payload": {"stat": {"focused_flame": 1}}},
-		{"id": "py_supernova", "name": "Pressure Cooker", "ranks": 1, "lane": "Detonation", "row": 2,
-			"desc": "Detonation deals +{v} Break damage to a Burning target.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"pressure_cooker": 1}}},
-		{"id": "py_implosion", "name": "Aftershock", "ranks": 1, "lane": "Detonation", "row": 3,
-			"desc": "Detonation re-applies {v} turns of Burn to the target after consuming.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"aftershock": 2}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Pyroblast; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies DETONATION, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "py_focused", "name": "Concussion", "ranks": 1, "lane": "Detonation", "row": 4,
-			"desc": "Detonation deals +{v}% of Attack.",
-			"scale": {"step": 15},
-			"payload": {"ability": "Detonation", "add": {"damage": 15}}},
-		{"id": "py_seeding", "name": "Crucible", "ranks": 1, "lane": "Detonation", "row": 5,
-			"desc": "Consuming Burn refunds {v} Mana per turn instead of 1.",
-			"scale": {"base": 1, "step": 1},
-			"payload": {"stat": {"crucible": 1}}},
-		# No field and no read site: it SETS the ability's own cooldown, the
-		# way Relentless sets Hack and Slash's bleed_chance. Ability upgrades
-		# run after the tree, so a Quickened Detonation still gets its cut.
-		{"id": "py_rekindle", "name": "Twin Detonation", "ranks": 1, "lane": "Detonation", "row": 6,
-			"desc": "Detonation's cooldown drops to {v}.",
-			"scale": {"step": 1},
-			"payload": {"ability": "Detonation", "set": {"cooldown": 1}}},
-		{"id": "py_warm_glow", "name": "Total Commitment", "ranks": 1, "lane": "Detonation", "row": 7,
-			"desc": "Detonation consumes Burn from the target and the two enemies adjacent to it.",
-			"payload": {"stat": {"total_commitment": 1}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# READS AN ACCUMULATED QUANTITY: seven rows spread fire and nothing pays
-		# for HOW MUCH of the field is lit — only for lighting it.
-		{"id": "py_sea_of_flame", "name": "Sea of Flame", "ranks": 1, "lane": "Kindling", "row": 8,
-			"desc": "+{v}% fire damage for every enemy currently Burning.",
-			"scale": {"step": 7},
-			"payload": {"stat": {"sea_of_flame": 7}}},
-		# READS AN ACCUMULATED QUANTITY, THEN CONVERTS IT (BATCH BS §3). Rows 1-7
-		# spend the whole lane turning fire into survival; this reads HOW MUCH
-		# fire is standing — burn TURNS, not burning bodies — and turns the
-		# survival back into damage. The two quantities diverge hard on purpose:
-		# four enemies at four turns each is 16, and Firestorm alone puts 12-16
-		# on the board in one cast, so the 50% cap needs about fifty burn-turns
-		# and will rarely be reached.
-		{"id": "py_forge_body", "name": "Forge Body", "ranks": 1, "lane": "Inferno", "row": 8,
-			"desc": "Damage taken is reduced {v}% per remaining Burn turn on the field, up to 50% — and the damage prevented is dealt to a random Burning enemy as fire.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"forge_body_pct": 1}}},
-		# READS AN ACCUMULATED QUANTITY, ACROSS CASTS — the one axis the lane has
-		# never had. Cataclysm eats the field in one blast; this eats time.
-		{"id": "py_powder_keg", "name": "Powder Keg", "ranks": 1, "lane": "Detonation", "row": 8,
-			"desc": "{v}% of the damage each Detonation deals is banked and added to the next one.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"powder_keg": 30}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# BATCH DO — RE-AUTHORED. This cell granted Firestorm; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies FLAMEWAVE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "py_firestorm", "name": "Sky Ablaze", "ranks": 1, "lane": "Kindling", "row": 9,
-			"capstone": true,
-			"desc": "Flamewave deals +{v}% of Attack, and its cooldown falls to 1.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Flamewave", "add": {"damage": 10}, "set": {"cooldown": 1}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Phoenix Rebirth; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies DETONATION, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "py_rebirth", "name": "Rekindled", "ranks": 1, "lane": "Inferno", "row": 9,
-			"capstone": true,
-			"desc": "Detonation costs no Mana at all.",
-			"payload": {"ability": "Detonation", "set": {"cost": 0}}},
-		{"id": "py_hellfire", "name": "Cataclysm", "ranks": 1, "lane": "Detonation", "row": 9,
-			"capstone": true,
-			"desc": "Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.",
-			"payload": {"stat": {"cataclysm": 1}}},
-	],
-	"cryomancer": [
-		# BATCH AS — re-authored around GLACIAL HOLD: control is deciding WHEN
-		# the enemy acts, not how hard it hits. SHATTERPOINT is renamed THAW,
-		# because a control spec whose payoff lane was burst (four crit dials)
-		# was a damage spec wearing a coat. Winter and Deep Freeze keep theirs.
-		#
-		# EVERY ONE OF THE 24 IDS SURVIVES AND RE-SPECS IN PLACE, so saved picks
-		# migrate and NO SAVE VERSION MOVES. Ten ids changed lane — legal, and
-		# the full old->new mapping table is in the changelog.
-		#
-		# EACH ROW ASKS ONE QUESTION: 1 the opening / 2 the spread / 3 what the
-		# slow is worth / 4 the tool / 5 the hold / 6 the price / 7 the release /
-		# 8 the capstone.
-		#
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED (Batch AS §5): every counter below
-		# writes its own magnitude in the units its read site sums. Under the old
-		# `1 x step` form a rune writing the same field silently inherited the
-		# node's multiplier — four Cryomancer spec runes ride these counters.
-		# --- Lane WINTER — buy more time. ---
-		{"id": "cr_hungering", "name": "Hungering Cold", "ranks": 1, "lane": "Winter", "row": 1,
-			"desc": "Chilled enemies deal {v}% less damage per stack of Chilled.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"hungering_ranks": 3}}},
-		# Re-spec (was Empowered Frostbolt, a flat damage add on the same
-		# ability): the free pump doubles instead of hitting harder.
-		{"id": "cr_emp_frostbolt", "name": "Deep Chill", "ranks": 1, "lane": "Winter", "row": 2,
-			"desc": "Frostbolt applies {v} stacks of Chilled instead of 1.",
-			"scale": {"base": 1, "step": 1},
-			"payload": {"stat": {"deep_chill_ranks": 1}}},
-		{"id": "cr_grasp", "name": "Winter's Grasp", "ranks": 1, "lane": "Winter", "row": 3,
-			"desc": "At the start of each of his turns, {v} random Chilled enemies gain a stack.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"grasp_ranks": 2}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Rime; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies BLIZZARD, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "cr_rime", "name": "Snowblind", "ranks": 1, "lane": "Winter", "row": 4,
-			"desc": "Blizzard costs {v} less Mana, and its cooldown falls to 2.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Blizzard", "add": {"cost": -10}, "set": {"cooldown": 2}}},
-		# BATCH DO — RE-AUTHORED. It read *"Rime lasts 2 additional turns"*,
-		# and Rime left the tree for the draft in this batch, so the whole node
-		# became a bet on a card the hero may never be dealt. Blizzard is
-		# PROTECTED CORE and is the lane's own subject.
-		{"id": "cr_icy_resolve", "name": "Icy Resolve", "ranks": 1, "lane": "Winter", "row": 5,
-			"desc": "Blizzard strikes for +{v}% of Attack.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Blizzard", "add": {"damage": 10}}},
-		# Re-spec (was a Daze roll on Blizzard, in the wrong lane): the storm
-		# stops being a chance at a status and becomes three quarters of a hold
-		# across the WHOLE field.
-		{"id": "cr_whiteout", "name": "Whiteout", "ranks": 1, "lane": "Winter", "row": 6,
-			"desc": "Blizzard applies {v} stacks of Chilled to every enemy instead of 1-2.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"whiteout_ranks": 3}}},
-		# The roll is GONE, deliberately: a node that decides whether the spec's
-		# win condition happens this turn must not be a coin flip.
-		{"id": "cr_splinter", "name": "Splintering Shards", "ranks": 1, "lane": "Winter", "row": 7,
-			"desc": "Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.",
-			"payload": {"stat": {"splinter_ranks": 1}}},
-		# --- Lane DEEP FREEZE — spend it on denial. ---
-		{"id": "cr_frostbite", "name": "Brittle Ice", "ranks": 1, "lane": "Deep Freeze", "row": 1,
-			"desc": "Every hero is {v}% likelier to land a critical hit on a Held enemy.",
-			"scale": {"step": 6},
-			"payload": {"stat": {"frostbite_ranks": 6}}},
-		{"id": "cr_bitter", "name": "Bitter Cold", "ranks": 1, "lane": "Deep Freeze", "row": 2,
-			"desc": "Freezing an enemy applies {v} stacks of Chilled to every other enemy.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"bitter_cold_ranks": 2}}},
-		# THE NODE §0 EXISTS FOR: at 10 points a stack this is what makes the
-		# initiative bar visibly move, and it only works because the reschedule
-		# reads effective_speed() (audited in Batch AS — it always has).
-		{"id": "cr_frigid", "name": "Frigid Grip", "ranks": 1, "lane": "Deep Freeze", "row": 3,
-			"desc": "Every stack of Chilled slows {v}% harder.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"frigid_ranks": 10}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Glacial Prison; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies ICE LANCE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "cr_numbing", "name": "Numbing Cold", "ranks": 1, "lane": "Deep Freeze", "row": 4,
-			"desc": "Ice Lance costs {v} less Mana, and its cooldown falls to 1.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Ice Lance", "add": {"cost": -10}, "set": {"cooldown": 1}}},
-		# FORCED ASSIGNMENT, reported not hidden (Batch AS §9): Second Prison
-		# has no ancestor in this tree. cr_frost_ward held a damage reduction
-		# against Chilled attackers — the closest thing to "fewer enemies get to
-		# swing at you", and a slot had to hold it.
-		{"id": "cr_frost_ward", "name": "Second Prison", "ranks": 1, "lane": "Deep Freeze", "row": 5,
-			"desc": "He can hold TWO enemies at once instead of one.",
-			"payload": {"stat": {"second_prison": 1}}},
-		# Re-spec, NOT a reprice: it used to extend Frozen's duration, which an
-		# indefinite hold makes meaningless. Now the hold DOES something while
-		# it lasts — denial converts into the party's Break.
-		{"id": "cr_cold_snap", "name": "Cold Snap", "ranks": 1, "lane": "Deep Freeze", "row": 6,
-			"desc": "A held enemy's Break meter fills {v} at the start of each of his turns.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"cold_snap_ranks": 15}}},
-		{"id": "cr_glacial", "name": "Glacial Economy", "ranks": 1, "lane": "Deep Freeze", "row": 7,
-			"desc": "Freezing an enemy restores {v}% of his maximum Mana.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"glacial_ranks": 15}}},
-		# --- Lane THAW — spend it on the window. ---
-		{"id": "cr_hypothermia", "name": "Hypothermia", "ranks": 1, "lane": "Thaw", "row": 1,
-			"desc": "Enemies take {v}% more damage per stack of Chilled.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"hypothermia_ranks": 3}}},
-		# Re-spec (was Freezing Advance, "+damage on the enemy you just froze"):
-		# the same question asked of the hold instead of the moment.
-		{"id": "cr_freezing", "name": "Killing Frost", "ranks": 1, "lane": "Thaw", "row": 2,
-			"desc": "The held-enemy damage bonus rises from +15% to +{v}%.",
-			"scale": {"base": 15, "step": 15},
-			"payload": {"stat": {"killing_frost": 15}}},
-		{"id": "cr_crystal", "name": "Crystal Edge", "ranks": 1, "lane": "Thaw", "row": 3,
-			"desc": "Ice Lance deals an extra {v}% of Attack per Chilled stack (on top of the base 5%).",
-			"scale": {"step": 15},
-			"payload": {"stat": {"crystal_edge_ranks": 15}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Cryoclasm; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies ICE LANCE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "cr_lance_focus", "name": "Focused Lance", "ranks": 1, "lane": "Thaw", "row": 4,
-			"desc": "Ice Lance deals +{v}% of Attack and 15 more Break damage.",
-			"scale": {"step": 15},
-			"payload": {"ability": "Ice Lance", "add": {"damage": 15, "pressure": 15}}},
-		{"id": "cr_piercing", "name": "Piercing Ice", "ranks": 1, "lane": "Thaw", "row": 5,
-			"desc": "Ice Lance gains {v}% critical strike damage.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"piercing_ice_ranks": 30}}},
-		# Re-spec in place: it rode Ice Lance CRITS, it rides Ice Lance's
-		# RELEASE now — and because it lives in _hold_release, Shatter and an
-		# evicted prison inherit it with no second implementation.
-		{"id": "cr_razor_hone", "name": "Honed Shards", "ranks": 1, "lane": "Thaw", "row": 6,
-			"desc": "A release applies {v} stacks of Chilled to the thawed enemy.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"honed_shards_ranks": 3}}},
-		# Re-spec (was Icy Veins, "an Ice Lance kill empowers the next lance" —
-		# the Lance's payoff paying forward, which is what this does too). The
-		# purest thing in the tree: the release is paid out in TIME.
-		{"id": "cr_icy_veins", "name": "Shockwave", "ranks": 1, "lane": "Thaw", "row": 7,
-			"desc": "Releasing a hold pushes every OTHER enemy back {v} on the initiative timeline.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"shattered_tempo": 2.0}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# CONVERTS: stacks buy damage, slow and freezes. They have never bought
-		# Break. (The direction asked for self-sustaining accumulation; Eternal
-		# Winter already IS that, and a node that freezes more often feeds the
-		# open _hold_release/_hold_freeze recursion. Reported in the changelog.)
-		{"id": "cr_winters_depth", "name": "Winter's Depth", "ranks": 1, "lane": "Winter", "row": 8,
-			"desc": "Every stack of Chilled lowers its bearer's Constitution by {v}%, by at most 75% and never below 10 Constitution — the colder they are, the easier they Break.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"winters_depth": 8}}},
-		# READS AN ACCUMULATED QUANTITY (how many he holds) and pays the PARTY a
-		# second currency while the hold lasts.
-		{"id": "cr_cold_storage", "name": "Cold Storage", "ranks": 1, "lane": "Deep Freeze", "row": 8,
-			"desc": "At the start of each of his turns every hero regains {v}% of their maximum resource for each enemy he is holding.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"cold_storage": 5}}},
-		# READS AN ACCUMULATED QUANTITY (turns held) and buys TIME with it — the
-		# party's cooldowns, which nothing in the tree has ever touched.
-		{"id": "cr_frostbound", "name": "Frostbound Hours", "ranks": 1, "lane": "Thaw", "row": 8,
-			"desc": "Releasing a hold takes one turn off every hero's cooldowns for every {v} turns the enemy spent held.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"frostbound_hours": 3}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# BATCH DO — RE-AUTHORED. This cell granted Shatter; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies RAZOR ICE, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "cr_shatter", "name": "Shardfall", "ranks": 1, "lane": "Thaw", "row": 9,
-			"capstone": true,
-			"desc": "Razor Ice strikes {v} additional times, and its cooldown falls to 1.",
-			"scale": {"step": 3},
-			"payload": {"ability": "Razor Ice", "add": {"multi_hits": 3}, "set": {"cooldown": 1}}},
-		# Re-specced (Batch AS): "freezing no longer reduces stacks" is
-		# redundant under an indefinite hold, so the capstone buys CAPACITY.
-		{"id": "cr_absolute", "name": "Absolute Zero", "ranks": 1, "lane": "Deep Freeze", "row": 9,
-			"capstone": true,
-			"desc": "No limit on how many enemies he can hold at once.",
-			"payload": {"stat": {"absolute_zero": 1}}},
-		{"id": "cr_eternal", "name": "Eternal Winter", "ranks": 1, "lane": "Winter", "row": 9,
-			"capstone": true,
-			"desc": "EVERY enemy gains 1 stack of Chilled at the start of each of his turns.",
-			"payload": {"stat": {"eternal_winter": 1}}},
-	],
-	"arcanist": [
-		# Purpose-designed lanes (Batch P, 07-31); Batch AI cut them into 7
-		# exclusive rows + a capstone row; BATCH AT re-authored all 24 at row
-		# pricing around ESCALATION — nothing early, everything late. EVERY ID
-		# SURVIVES and re-specs in place, so saved picks migrate and no save
-		# version moves. The full old->new mapping is in the changelog.
-		# THE LANE FORMERLY CALLED CONTROL IS **ENTROPY**: after Batch AS,
-		# "Control" is the Cryomancer's identity word, and the lane was never
-		# about control anyway — it turns his own danger into fuel.
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
-		# magnitude in the units its read site sums (AR/AS's form).
-		# --- Lane RESONANCE — build higher, sooner. ---
-		# Re-spec in place: it already WAS Harmonics, and Arcane Explosion is
-		# the free build engine, so the lane opens on the button he presses
-		# when he has nothing better to do.
-		{"id": "ar_harmonics", "name": "Harmonics", "ranks": 1, "lane": "Resonance", "row": 1,
-			"desc": "Arcane Explosion builds {v} Resonance instead of 1.",
-			"scale": {"base": 1, "step": 1},
-			"payload": {"stat": {"harmonics_ranks": 1}}},
-		# Re-spec (was Arcane Mastery, +1%/rank crit per stack — which the
-		# passive now pays as a flat 1% per stack all by itself). The node that
-		# owned "crit x Resonance" owns it still: a crit BUILDS more now.
-		{"id": "ar_mastery", "name": "Attunement", "ranks": 1, "lane": "Resonance", "row": 2,
-			"desc": "A critical hit builds {v} Resonance instead of 2.",
-			"scale": {"base": 2, "step": 1},
-			"payload": {"stat": {"attunement_crit": 1}}},
-		# Re-spec in place: it paid Mana AT the ceiling, and there is no
-		# ceiling — so it pays for the stacks he is HOLDING instead.
-		{"id": "ar_charged", "name": "Charged Bolts", "ranks": 1, "lane": "Resonance", "row": 3,
-			"desc": "Every damaging cast restores {v}% of maximum Mana per 4 stacks held.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"charged_bolts_ranks": 5}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Overcharge; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies ARCANE CANNON, a PROTECTED CORE ability, which the hero owns in every run.
-		# THE NAME MOVED TOO. A node called "Overcharge" beside a DRAFT CARD
-		# called Overcharge is the `wd_spiked`/Spite trap DN documented — a
-		# matcher reading node text cannot tell which one is meant.
-		{"id": "ar_overcharge", "name": "Overdraw", "ranks": 1, "lane": "Resonance", "row": 4,
-			"desc": "Arcane Cannon costs {v} less Mana, and its cooldown falls to 1.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Arcane Cannon", "add": {"cost": -10}, "set": {"cooldown": 1}}},
-		# Re-spec (was +1 maximum Resonance — a ceiling that no longer exists).
-		# Straightforward runway, paid on the turn rather than the cast.
-		{"id": "ar_core", "name": "Resonant Core", "ranks": 1, "lane": "Resonance", "row": 5,
-			"desc": "The first damaging cast of each of his turns builds {v} additional Resonance.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"resonant_core_ranks": 1}}},
-		# Re-spec in place: every third crit used to hit harder, it BUILDS now.
-		# The old counter (critical_mass_ranks) is RUNE-ONLY and its read site
-		# is kept — the Rune of the Wide Current still pays the old clause.
-		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 1, "lane": "Resonance", "row": 6,
-			"desc": "Every third critical hit builds {v} Resonance.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"critical_mass_stacks": 4}}},
-		# THE LANE'S THESIS, and re-specced from Unlimited Power (whose whole
-		# premise was overflow AT a cap): the curve gets steeper the higher it
-		# already is.
-		{"id": "ar_unlimited", "name": "Cascade", "ranks": 1, "lane": "Resonance", "row": 7,
-			"desc": "At 10 or more stacks, every damaging cast builds {v} additional Resonance.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"cascade_stacks": 1}}},
-		# --- Lane OVERLOAD — each stack worth more, for a bigger bill. ---
-		# Re-spec in place: it deepened a LINEAR per-stack term; it deepens the
-		# COMPOUNDING step now. NOTE the units — conduit_step is percentage
-		# POINTS on the curve's step, and it is a FLOAT, so it must never be
-		# named "_ranks" (Runes.STAT_INT_KEYS would coerce 0.5 to 0).
-		{"id": "ar_conduit", "name": "Conduit", "ranks": 1, "lane": "Overload", "row": 1,
-			"desc": "The damage curve's step rises from 1.5% to {v}% per stack. With Unchained, which adds another 1.5 points, the step is 3.5% per stack.",
-			"scale": {"base": 1.5, "step": 0.5},
-			"payload": {"stat": {"conduit_step": 0.5}}},
-		# Re-spec in place (it was Cannon AND Wrath, +5%/rank each way): the
-		# Cannon alone now, and the bill is a SET not an add — 15% -> 25%.
-		{"id": "ar_volatility", "name": "Volatility", "ranks": 1, "lane": "Overload", "row": 2,
-			"desc": "Arcane Cannon deals +{v}% damage, and its recoil rises from 15% to 25%.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"volatility_ranks": 30, "volatility_recoil": 25}}},
-		# Re-spec in place: it was a CHANCE to echo for 25%; it is a certain
-		# echo for 40% now. A coin flip on a crit is variance on variance.
-		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 1, "lane": "Overload", "row": 3,
-			"desc": "A critical hit echoes for {v}% of its damage against a random enemy.",
-			"scale": {"step": 40},
-			"payload": {"stat": {"temporal_ranks": 40}}},
-		{"id": "ar_suppressing", "name": "Suppressing Fire", "ranks": 1, "lane": "Overload", "row": 4,
-			"desc": "Each bolt of Arcane Barrage deals {v}% of Attack more than the previous one.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"suppressing_ranks": 2}}},
-		# Re-spec in place: it deepened Cannon's per-stack DAMAGE, which §2
-		# takes off the ability entirely (the passive does that now). Break is
-		# a different axis, so the node moves onto the axis that survives.
-		{"id": "ar_cannoneer", "name": "Cannoneer", "ranks": 1, "lane": "Overload", "row": 5,
-			"desc": "Arcane Cannon's Break damage rises from 5 to {v} per Resonance stack.",
-			"scale": {"base": 5, "step": 4},
-			"payload": {"stat": {"cannoneer_ranks": 4}}},
-		{"id": "ar_barrister", "name": "Barrage Master", "ranks": 1, "lane": "Overload", "row": 6,
-			"desc": "Arcane Barrage fires {v} additional bolts.",
-			"scale": {"step": 3},
-			"payload": {"ability": "Arcane Barrage", "add": {"random_hits": 3}}},
-		# FORCED-ISH ASSIGNMENT, reported not hidden (Batch AT §9): the node
-		# was Mindfulness ("all your cooldowns tick down 1 extra turn every N
-		# turns"), and cooldown acceleration is the closest surviving intent to
-		# "the payoff nuke stops having a cooldown". It crosses Control ->
-		# Overload, which is legal. mindfulness_ranks is RUNE-ONLY now and its
-		# read site is kept (the Rune of the Unquiet Mind still pays it).
-		{"id": "ar_mindfulness", "name": "Terminal Velocity", "ranks": 1, "lane": "Overload", "row": 7,
-			"desc": "At {v} or more Resonance, Death Ray has no cooldown.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"terminal_velocity": 15}}},
-		# --- Lane ENTROPY — turn the danger into fuel. Losing Stabilize cost
-		# him his Mana valve as well as his defence, and that is intended: his
-		# Mana comes from being hurt now, so the more dangerous his own build
-		# gets, the more it feeds itself. ---
-		{"id": "ar_conversion", "name": "Conversion", "ranks": 1, "lane": "Entropy", "row": 1,
-			"desc": "{v}% of damage taken is paid as Mana instead of health.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"conversion_ranks": 30}}},
-		# Re-spec in place: the threshold is fixed at 35% now (it used to RISE
-		# with ranks off a base of 20) and the payout is 4 stacks, not 1.
-		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 1, "lane": "Entropy", "row": 2,
-			"desc": "Surviving an attack below {v}% health builds 4 Resonance.",
-			"scale": {"step": 35},
-			"payload": {"stat": {"on_edge_threshold": 35.0, "on_edge_stacks": 4}}},
-		{"id": "ar_meltdown", "name": "Feedback Loop", "ranks": 1, "lane": "Entropy", "row": 3,
-			"desc": "{v}% of recoil damage is paid as Mana instead of health.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"feedback_ranks": 30}}},
-		# KEPT DELIBERATELY, where Arcane Ward and Still Mind were not: a cap
-		# on any single hit is what makes a COMPOUNDING death curve survivable
-		# enough to be interesting rather than random.
-		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 1, "lane": "Entropy", "row": 4,
-			"desc": "No single attack can take more than {v}% of your maximum health.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"stable_ranks": 25}}},
-		# FORCED ASSIGNMENT, reported not hidden (Batch AT §9): Backlash has no
-		# ancestor in this tree. ar_still held Still Mind, whose entire subject
-		# (Stabilize's floor) left the opening three — a slot had to hold it,
-		# and this is the one whose old design died most completely.
-		{"id": "ar_still", "name": "Backlash", "ranks": 1, "lane": "Entropy", "row": 5,
-			"desc": "Resonance also builds when he takes damage: {v} stack per hit received.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"backlash_stacks": 1}}},
-		# Re-spec (was Mana Attunement, "Mana every time you gain a stack"):
-		# the same passive Mana income, paid on the damage he deals instead of
-		# the stacks he banks — because he can no longer vent for Mana.
-		# BJ §2: "all damage" overstated — the pool is strike damage (what
-		# `total_dealt` accumulates); Temporal Rift's echo lands outside it
-		# and is never siphoned. Desc corrected toward the code.
-		{"id": "ar_attunement", "name": "Siphon", "ranks": 1, "lane": "Entropy", "row": 6,
-			"desc": "{v}% of the damage his strikes deal is restored as Mana.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"siphon_ranks": 20}}},
-		# THE LANE'S THESIS, re-specced from Arcane Ward (which softened the
-		# per-stack penalty): the reward for escalating is that escalating
-		# stops killing you — and it only switches on once he is deep enough
-		# to need it.
-		{"id": "ar_ward", "name": "Event Horizon", "ranks": 1, "lane": "Entropy", "row": 7,
-			"desc": "While at {v} or more Resonance, no single attack can reduce him below 1 health.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"event_horizon": 15}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# READS AN ACCUMULATED QUANTITY: the build rate reads the build. This is
-		# the lane BH's leave-one-out grid should be run on (§7).
-		{"id": "ar_convergence", "name": "Harmonic Convergence", "ranks": 1, "lane": "Resonance", "row": 8,
-			"desc": "Every {v} stacks of Resonance he holds, all Resonance gains are increased by 1.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"convergence": 10}}},
-		# CONVERTS: the bill stops being his. Recoil is the lane's signature cost
-		# and it becomes the lane's output.
-		{"id": "ar_blowback", "name": "Blowback", "ranks": 1, "lane": "Overload", "row": 8,
-			"desc": "{v}% of all recoil is dealt to the enemy team instead of to him, split evenly between them.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"blowback": 100}}},
-		# CONVERTS, from the other side of the ground Perfect Conversion holds:
-		# that capstone REFUSES self-harm, this one SPENDS it deliberately.
-		{"id": "ar_entropy_toll", "name": "Entropy's Toll", "ranks": 1, "lane": "Entropy", "row": 8,
-			"desc": "At the end of each of his turns the Arcanist pays 5% of his current health and banks {v} Resonance.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"entropy_toll": 3}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# BATCH AU §4 — THE TWO CAPSTONES WERE IN THE WRONG LANES AND ARE
-		# UNCROSSED HERE. Doubling the damage STEP is the Overload lane's entire
-		# thesis, so it went to Magi's Wrath; this one takes BUILD RATE, which
-		# is the Resonance lane's.
-		# WHY THE NUMBERS LOOK SMALL, AND WHY SMALL IS CORRECT: damage is
-		# step x N(N+1)/2, so it is QUADRATIC in the stack count and only
-		# LINEAR in the step (AT measured it). Doubling the build rate roughly
-		# QUADRUPLES the payout while doubling the step merely doubles it — a
-		# capstone that doubled the build rate would be twice the capstone
-		# sitting beside it on the same shelf. It is also deliberately
-		# SELF-SCALING: the passive grants +1% crit per stack, so crits rise
-		# with the curve and the build rate feeds itself LATE without
-		# compounding from turn one.
-		# CRIT BUILDING IS ADDITIVE: Attunement (row 2) sets it to 3, this adds
-		# 2 on top for 5. Not the higher of the two, and summed at exactly one
-		# read site in battle.gd.
-		{"id": "ar_singularity", "name": "Singularity", "ranks": 1, "lane": "Resonance", "row": 9,
-			"capstone": true,
-			"desc": "Critical hits build 2 ADDITIONAL Resonance, and every enemy killed builds 3.",
-			"payload": {"stat": {"singularity_crit_build": 2, "singularity_kill_build": 3}}},
-		# BATCH DO — RE-AUTHORED, AND IT IS THE ONE THAT LOST ALMOST NOTHING.
-		# It granted Magi's Wrath AND carried the step-doubling on `also`; the
-		# card moved into `SPEC_DRAFT_POOLS` and THE PASSIVE HALF IS NOW THE
-		# WHOLE NODE. `wrath_step_double` keeps its name, its unit and its one
-		# read site in `unit.resonance_dmg_step()` — nothing there moved, which
-		# is why AU §4's negative control still bites. `no_fallback` goes with
-		# the grant it opted out of.
-		{"id": "ar_wrath", "name": "Unchained", "ranks": 1, "lane": "Overload", "row": 9,
-			"capstone": true,
-			"desc": "The damage curve's step DOUBLES: 1.5% to 3% per stack, or 3.5% with Conduit.",
-			"payload": {"stat": {"wrath_step_double": 1}}},
-		# RE-SPECCED FROM MASTER OF MOMENTS, whose free venting died with
-		# Stabilize — it was the most anti-escalation node in the game. The id
-		# is kept; the name had to change because it no longer described
-		# anything. The natural end of the lane: his self-harm stops being harm.
-		{"id": "ar_timelord", "name": "Perfect Conversion", "ranks": 1, "lane": "Entropy", "row": 9,
-			"capstone": true,
-			"desc": "ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.",
-			"payload": {"stat": {"perfect_conversion": 1}}},
-	],
-	"holy": [
-		# BATCH AV — HOLY: REVERSAL. Purpose-designed lanes (Batch J, 07-30),
-		# re-cut into 7 exclusive rows + a capstone row by Batch AI, and now
-		# RE-AUTHORED around one spine: NOTHING IS FINAL, NO LOSS PERMANENT.
-		# EVERY ONE OF THE 24 IDS SURVIVES AND RE-SPECS IN PLACE — no new ids,
-		# none deleted, NO SAVE VERSION MOVE (still v7). The old->new mapping
-		# table is in the changelog.
-		#
-		# THE REPRICING IS THE POINT. Her magnitudes were the worst-priced of
-		# the twelve: a 5% dispel chance, 1% of maximum Mana, 1% of an ally's
-		# health, a threshold moved 50 -> 53. Those were rank-1 values in a
-		# three-rank tree, and as whole ROWS costing two other options they
-		# were not decisions. Where the Mage trees needed 3x, hers needed 4-5x.
-		# MERCY ITSELF IS UNTOUCHED BY DESIGNER DECISION — the generator, the
-		# +5%/stack, the spend costs, the Empower surcharge and the
-		# perfect-forgo all stand exactly as they were. The tree moves around it.
-		#
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED (AR/AS/AT's form): every counter
-		# writes its own magnitude in the units its read site sums, so a node's
-		# 15 and a rune's 3 each pay what they advertise, alone and stacked.
-		# Two counters are the INCREASE on a base the passive already pays
-		# (`heavenly_step` on Mercy's 5%, `guardian_step` on the 50% window) —
-		# AT's `cannoneer_ranks` precedent, and the only honest additive form
-		# when the base exists without the node.
-		#
-		# --- Lane A: RADIANCE — throughput: bigger heals, cheaper heals,
-		# less waste. ---
-		{"id": "hl_triage", "name": "Triage", "ranks": 1, "lane": "Radiance", "row": 1,
-			"desc": "Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by 15%.",
-			"payload": {"stat": {"triage_heal": 15}}},
-		# Re-priced AND widened: 5 Mana off Renewal alone was a rounding error
-		# on a 20-Mana cast. Both of her Mana casts now, 10 each.
-		{"id": "hl_soothe", "name": "Soothing Touch", "ranks": 1, "lane": "Radiance", "row": 2,
-			"desc": "Heal and Renewal each cost 10 less Mana.",
-			"payload": {"ability": "Heal", "add": {"cost": -10},
-				"also": [{"ability": "Renewal", "add": {"cost": -10}}]}},
-		{"id": "hl_on_mend", "name": "On the Mend", "ranks": 1, "lane": "Radiance", "row": 3,
-			"desc": "Renewal ticks have a 35% chance to dispel one harmful effect from the bearer.",
-			"payload": {"stat": {"on_mend_pct": 35}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Divine Plea; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies HYMN OF HOPE, a PROTECTED CORE ability, which the hero owns in every run.
-		# It spends MERCY, which is the spec's own resource — the second of the
-		# charter's three permitted subjects rather than the first.
-		{"id": "hl_divine_plea", "name": "Benediction", "ranks": 1, "lane": "Radiance", "row": 4,
-			"desc": "Hymn of Hope costs no Mercy at all.",
-			"payload": {"ability": "Hymn of Hope", "set": {"faith_cost": 0}}},
-		# Re-priced: -1 turn on a 1-turn cooldown was the whole cooldown, said
-		# small. Say it plainly, and give the Hymn the turn as well.
-		{"id": "hl_swift", "name": "Swift Mending", "ranks": 1, "lane": "Radiance", "row": 5,
-			"desc": "Heal has no cooldown at all, and Hymn of Hope's drops by 1.",
-			"payload": {"ability": "Heal", "set": {"cooldown": 0},
-				"also": [{"ability": "Hymn of Hope", "add": {"cooldown": -1}}]}},
-		# One half of the wasted-healing fork: crit investment pays out
-		# sideways — it needs Triage to fire at all.
-		{"id": "hl_brilliance", "name": "Radiant Cascade", "ranks": 1, "lane": "Radiance", "row": 6,
-			"desc": "A CRITICAL heal also splashes 75% of its value onto the lowest-health other hero.",
-			"payload": {"stat": {"cascade_pct": 75}}},
-		# The other half: raw output spills over instead of being wasted.
-		{"id": "hl_overflow", "name": "Overflow", "ranks": 1, "lane": "Radiance", "row": 7,
-			"desc": "60% of any overhealing spills onto the lowest-health other hero immediately.",
-			"payload": {"stat": {"overflow_pct": 60}}},
-		# --- Lane B: MERCY — the resource economy: earning stacks, holding
-		# them, spending them, and Empower. ---
-		{"id": "hl_heavenly", "name": "Heavenly Aura", "ranks": 1, "lane": "Mercy", "row": 1,
-			"desc": "Each stack of Mercy grants 12% healing done, up from the base 5%.",
-			"payload": {"stat": {"heavenly_step": 7}}},
-		{"id": "hl_holy_light", "name": "Holy Light", "ranks": 1, "lane": "Mercy", "row": 2,
-			"desc": "Perfect casts restore 8% of your maximum Mana.",
-			"payload": {"stat": {"holy_light_pct": 8}}},
-		{"id": "hl_zealous", "name": "Zealous Light", "ranks": 1, "lane": "Mercy", "row": 3,
-			"desc": "The Cleric begins each battle with 2 Mercy.",
-			"payload": {"stat": {"zealous_mercy": 2}}},
-		{"id": "hl_sanctified", "name": "Sanctified", "ranks": 1, "lane": "Mercy", "row": 4,
-			"desc": "Spending Mercy has a 35% chance to consume no stacks.",
-			"payload": {"stat": {"sanctified_pct": 35}}},
-		# RE-SPEC — the slot Resurrection vacated when it joined the opening
-		# kit. The id is kept (§8's instruction) and carries GRACE, which
-		# closes a real dead end: at maximum stacks every further crossing
-		# paid her nothing, the one place her reactive economy wasted what it
-		# earned.
-		{"id": "hl_resurrection", "name": "Grace", "ranks": 1, "lane": "Mercy", "row": 5,
-			"desc": "When a hero would earn you a stack of Mercy while you are at maximum, the stack instead heals that hero for 20% of your maximum health.",
-			"payload": {"stat": {"grace_pct": 20}}},
-		# A rhythm rather than a discount — bank to the threshold, then
-		# Empower freely until you drop below it. Re-priced 4 -> 3: at 4 of a
-		# base 5 the window was one stack wide.
-		{"id": "hl_ardor", "name": "Ardor", "ranks": 1, "lane": "Mercy", "row": 6,
-			"desc": "While the Cleric holds 3 or more Mercy, Empowering consumes no stack.",
-			"payload": {"stat": {"ardor_at": 3}}},
-		# The lane's payoff: a bigger cap is more held bonus AND more banked
-		# spenders at once. 5 -> 8 (the counter is the increase on the base 5).
-		{"id": "hl_martyr", "name": "Martyr's Vigor", "ranks": 1, "lane": "Mercy", "row": 7,
-			"desc": "Mercy's maximum rises to 8.",
-			"payload": {"stat": {"mercy_cap_bonus": 3}}},
-		# --- Lane C: VIGIL — the fallen and the nearly-fallen. RENAMED FROM
-		# SANCTUARY: "Radiance is heal bigger, Sanctuary is stop people dying"
-		# was one axis with two names. Radiance keeps throughput, Mercy keeps
-		# the economy, and this lane takes REVERSAL — which is what gives her
-		# three real questions instead of two. ---
-		{"id": "hl_guardian", "name": "Guardian Angel", "ranks": 1, "lane": "Vigil", "row": 1,
-			"desc": "Heroes falling below 65% health earn you a stack of Mercy, up from 50%.",
-			"payload": {"stat": {"guardian_step": 15}}},
-		{"id": "hl_presence", "name": "Divine Presence", "ranks": 1, "lane": "Vigil", "row": 2,
-			"desc": "At the end of your turn, the lowest-health hero is healed for 8% of their maximum health.",
-			"payload": {"stat": {"divine_presence_pct": 8}}},
-		# BATCH DK §2 — HERO, FOR DEVOUTNESS'S REASON EXACTLY: `last_hope_bonus`
-		# is stamped party-wide in the same spawn block, before a companion is on
-		# the field. The field itself is read in `heal_amount` and would pay a
-		# beast if it were ever set on one.
-		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 1, "lane": "Vigil", "row": 3,
-			"desc": "Heroes under 25% of their maximum health receive 40% more healing.",
-			"payload": {"stat": {"last_hope_pct": 40}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Intercession; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies RENEWAL, a PROTECTED CORE ability, which the hero owns in every run.
-		{"id": "hl_inner_faith", "name": "Inner Faith", "ranks": 1, "lane": "Vigil", "row": 4,
-			"desc": "Renewal's cooldown falls to {v}.",
-			"scale": {"step": 1},
-			"payload": {"ability": "Renewal", "set": {"cooldown": 1}}},
-		# RE-SPEC of hl_beacon (turn-start pulse on the nearly-dead) — the
-		# nearest surviving intent: something automatic that fires because a
-		# hero is at death's door, without a cast.
-		# BATCH AW §9 — RENAMED "Hour of Need". Batch AV shipped it as SHARED
-		# VIGIL and FLAGGED the collision rather than hiding it: the Warden's
-		# Banner row-6 node has carried that name since Batch AL. His triggers
-		# on him standing strong, hers on a hero being near death, so HIS keeps
-		# the name that fits it. THIS IS A LABEL ONLY — the counter
-		# `holy_vigil_pct` and every read site are untouched.
-		{"id": "hl_beacon", "name": "Hour of Need", "ranks": 1, "lane": "Vigil", "row": 5,
-			"desc": "While any hero is below 30% health, every hero takes 15% less damage.",
-			"payload": {"stat": {"holy_vigil_pct": 15}}},
-		# Re-spec: the ward stops riding Renewal and rides the HEALING, so
-		# every cast leaves something behind.
-		{"id": "hl_vestments", "name": "Blessed Vestments", "ranks": 1, "lane": "Vigil", "row": 6,
-			"desc": "Your healing also grants the recipient a shield worth 25% of the heal's value for 2 turns.",
-			"payload": {"stat": {"vestments_pct": 25}}},
-		# THE ROW-7 STATEMENT: reversal stops being a once-a-fight miracle.
-		# It deliberately does NOT touch the health the ally returns at —
-		# that is Empower's job, and stepping on it would make Empower
-		# pointless. Written as an ability payload for exactly that reason:
-		# there is no field here that COULD reach the return health.
-		{"id": "hl_serenity", "name": "Serenity", "ranks": 1, "lane": "Vigil", "row": 7,
-			"desc": "Resurrection costs no Mercy, and its cooldown drops to 1.",
-			"payload": {"ability": "Resurrection",
-				"set": {"faith_cost": 0, "cooldown": 1}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# CONVERTS: seven rows make overhealing bigger and Overflow spills it
-		# sideways. This turns the waste into the resource that pays for casting.
-		{"id": "hl_font", "name": "Font of Light", "ranks": 1, "lane": "Radiance", "row": 8,
-			"desc": "Overhealing is drawn back as Mana — {v} Mana for every 2 points wasted.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"font_of_light": 1}}},
-		# READS AN ACCUMULATED QUANTITY: Mercy held has only ever paid HER. It
-		# pays the party now — a currency the meter could not previously buy.
-		{"id": "hl_communion_mercy", "name": "Communion of Mercy", "ranks": 1, "lane": "Mercy", "row": 8,
-			"desc": "Every stack of Mercy the Cleric holds grants every hero {v}% damage reduction.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"mercy_aegis": 2}}},
-		# REMOVES A CONSTRAINT: the lane's reversals all arrive on her turn, and
-		# her turn is the thing she cannot schedule. Now she can.
-		{"id": "hl_watchtower", "name": "Watchtower", "ranks": 1, "lane": "Vigil", "row": 8,
-			"desc": "When any hero drops below {v}% health the Cleric's turn comes immediately (at most once a turn).",
-			"scale": {"step": 25},
-			"payload": {"stat": {"watchtower": 25}}},
-		# --- Capstones (row 9): take ONE, no lane requirement, ever ---
-		# RE-SPEC of hl_sanctum (Living Sanctum, whose party-echo premise is
-		# gone). The Radiance capstone now: everything bigger, and nothing
-		# wasted at all.
-		{"id": "hl_sanctum", "name": "Sanctum", "ranks": 1, "lane": "Radiance", "row": 9,
-			"capstone": true,
-			"desc": "Your healing is increased by 60%, and ALL of your overhealing spills onto the lowest-health other hero.",
-			"payload": {"stat": {"sanctum": 1}}},
-		# Empower goes unconditional AND becomes a generator — the payoff for
-		# a lane built on the resource. Supersedes Ardor rather than stacking
-		# with it (the free-Empower checks are either/or, never a double
-		# refund). The old per-turn +1 Mercy is GONE: it made the resource a
-		# clock rather than something the party earned her.
-		{"id": "hl_avatar", "name": "Avatar of Mercy", "ranks": 1, "lane": "Mercy", "row": 9,
-			"capstone": true,
-			"desc": "Empowering never consumes a stack, and every Empowered cast GRANTS 1 Mercy instead.",
-			"payload": {"stat": {"avatar_of_mercy": 1}}},
-		# RE-SPEC of hl_capacitor (Holy Capacitor) — the batch's one FULLY
-		# FORCED assignment, reported not hidden: Martyrdom has no ancestor
-		# anywhere in the old tree, and Capacitor's overheal battery was the
-		# design with no successor. The Vigil capstone: reversal on tap.
-		{"id": "hl_capacitor", "name": "Martyrdom", "ranks": 1, "lane": "Vigil", "row": 9,
-			"capstone": true,
-			"desc": "Resurrection has no cooldown and costs no Mercy, and the first hero to fall each battle is returned automatically at 30% health.",
-			"payload": {"ability": "Resurrection",
-				"set": {"faith_cost": 0, "cooldown": 0},
-				"also": [{"stat": {"martyrdom": 1}}]}},
-	],
-	"inquisitor": [
-		# THE DEVOUT (spec id is legacy) — purpose-designed lanes (Batch K,
-		# 07-30), re-cut into 7 exclusive rows + a capstone row by Batch AI, and
-		# RE-AUTHORED AT ROW PRICING BY BATCH AW. The spine: HE LENDS OUT HIS OWN
-		# BULK AND COLLECTS DIVIDENDS — Conviction's third clause (battle.gd
-		# `_conviction_growth`) raises his maximum on every Faith release, and his
-		# whole kit already reads that maximum, so one clause makes it all
-		# escalate off OTHER PEOPLE'S survival rather than his own casting.
-		# EVERY ID SURVIVES AND RE-SPECS IN PLACE; no save version moves.
-		# MAGNITUDES ARE 4-5x, not the Mage trees' 3x, for the same reason
-		# Holy's were: these were rank-1 values on a support whose numbers were
-		# the smallest in the game. EVERY COUNTER IS ADDITIVE — it writes its own
-		# magnitude in the units its read site sums. FOUR hold the INCREASE on a
-		# base the kit pays WITHOUT the node and are named `_step` for it
-		# (Stalwart on Divine Shield's 30%, Righteous Fire on the ground's
-		# 10%, Blessed are the Faithful on the release's 15%, Fervor on the
-		# ground's base 1 Faith) — AV's `guardian_step` precedent.
-		# --- Lane BULWARK — THE LOAN ITSELF: invest deeply in one ally. Faith
-		# comes FROM absorbs, so this lane is the engine block of the whole
-		# Conviction system. ---
-		{"id": "dv_barrier", "name": "Blessed Barrier", "ranks": 1, "lane": "Bulwark", "row": 1,
-			"desc": "Divine Shield converts {v}% of the damage it absorbs into healing for its holder.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"blessed_barrier_ranks": 20}}},
-		{"id": "dv_aegis", "name": "Radient Aegis", "ranks": 1, "lane": "Bulwark", "row": 2,
-			"desc": "Casting Divine Shield has a {v}% chance to cast it again on another hero.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"aegis_ranks": 60}}},
-		{"id": "dv_afterglow", "name": "Afterglow", "ranks": 1, "lane": "Bulwark", "row": 3,
-			"desc": "When Divine Shield breaks, its holder is healed for {v}% of the Devout's max health.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"afterglow_ranks": 20}}},
-		{"id": "dv_warded", "name": "Warded Robes", "ranks": 1, "lane": "Bulwark", "row": 4,
-			"desc": "While Divine Shield holds, its holder has +{v}% armor.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"warded_ranks": 25}}},
-		# The counter holds the INCREASE on the 30% the ability pays without it.
-		{"id": "dv_stalwart", "name": "Stalwart", "ranks": 1, "lane": "Bulwark", "row": 5,
-			"desc": "Divine Shield absorbs {v}% of the Devout's max health (up from the base 35%).",
-			"scale": {"base": 35, "step": 20},
-			"payload": {"stat": {"stalwart_step": 20}}},
-		# BASTION GOING TO ZERO IS THE LANE'S STATEMENT and the direct answer to
-		# the other half of §2's problem: a shield every turn is a Faith engine.
-		# The strongest node in the tree.
-		{"id": "dv_bastion", "name": "Bastion", "ranks": 1, "lane": "Bulwark", "row": 6,
-			"desc": "Divine Shield has no cooldown at all.",
-			"payload": {"ability": "Divine Shield", "set": {"cooldown": 0}}},
-		{"id": "dv_unyielding", "name": "Unyielding Aegis", "ranks": 1, "lane": "Bulwark", "row": 7,
-			"desc": "When Divine Shield breaks, it immediately re-forms at {v}% of its original strength (once per cast).",
-			"scale": {"step": 90},
-			"payload": {"stat": {"unyielding_ranks": 90}}},
-		# --- Lane FAITH — WHAT THE RETURNS PAY: invest in the dividend itself.
-		# Earn the stacks faster, keep them longer, spend them deeper. ---
-		# BATCH BE §1 — 40 -> 15, AND THE NUMBER BEHIND IT: BC's leave-one-out grid
-		# read this one row-1 node at 80% contribution against 47% withheld
-		# (healing 2255 against 444). At 40 an ally holding three or more stacks
-		# advanced with CERTAINTY, so a release deterministically produced further
-		# releases; at 15 nothing is ever guaranteed (15% at one stack, 45% at
-		# three, 60% at four) and the chain decays instead of sustaining. The
-		# counter keeps its meaning and its units — AW's reprice took it 20 -> 40
-		# and this takes it below where it started.
-		# BATCH BF §2 — THE CONDITION, AND IT IS WRITTEN AS AN INCLUSION BECAUSE
-		# THE MECHANIC READS BETTER THAT WAY: fervor spreads to allies who are
-		# STILL BUILDING it. An ally sitting at the threshold is not building —
-		# he is at the payout. BATCH CZ §2 moved that threshold from five to
-		# three, so the cliff moved with it and the node's text says three.
-		# The cliff (its peak one stack below, 0% at the threshold) is stated
-		# outright: an ability whose chance climbs with stacks and then vanishes at the top
-		# reads as a bug unless the tooltip says otherwise.
-		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
-			"desc": "When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"communion_ranks": 15}}},
-		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third
-		# clause: it raises the base that every payout in his kit — and every
-		# growth increment — scales from.
-		{"id": "dv_unwavering", "name": "Unwavering Faith", "ranks": 1, "lane": "Faith", "row": 2,
-			"desc": "Increases the Devout's maximum health by {v}%.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"max_hp_pct": 0.20}}},
-		# BATCH DK §2 — HERO, AND THE OBSTACLE IS THE STAMP'S TIMING RATHER THAN
-		# THE EFFECT. The aura IS receivable: measured on a beast wearing
-		# `devotion` at 20, a 40-BD blow banked 32. But it is stamped ONCE in the
-		# party-spawn block, before any companion exists, so widening the
-		# collection there would reach an empty array — a beast summoned on turn
-		# four would still get nothing. Reaching it wants a re-stamp on summon,
-		# which is a second write site for one node's worth of effect.
-		{"id": "dv_devoutness", "name": "Devoutness", "ranks": 1, "lane": "Faith", "row": 3,
-			"desc": "Every hero takes {v}% less Break damage.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"devoutness_ranks": 20}}},
-		# The counter holds the INCREASE on the release's base 15%.
-		{"id": "dv_faithful", "name": "Blessed are the Faithful", "ranks": 1, "lane": "Faith", "row": 4,
-			"desc": "The heal at 3 stacks of Faith restores {v}% max health (up from the base 15%).",
-			"scale": {"base": 15, "step": 20},
-			"payload": {"stat": {"faithful_step": 20}}},
-		# Two magnitudes, two fields: the heal is a percentage, the Faith is a
-		# stack count, and one counter cannot honestly hold both.
-		{"id": "dv_covenant", "name": "Sacred Covenant", "ranks": 1, "lane": "Faith", "row": 5,
-			"desc": "Should a shield prevent lethal damage, its holder is healed for {v}% max health and gains 2 Faith stacks.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"covenant_heal": 25, "covenant_faith": 2}}},
-		# BATCH BH §2 — RE-SPECCED ONTO CONVICTION'S HELD HALF, AND THE REASON IS
-		# STRUCTURAL RATHER THAN NUMERICAL. BC's decomposition proved this lane
-		# was one node with eight prices: THREE of the eight multiplied release
-		# FREQUENCY and one multiplied release MAGNITUDE, so buying down the lane
-		# compounded instead of choosing. Fervor was one of the three — a deeper
-		# drip is more releases — and its old subject (the drip itself) is base
-		# kit anyway since Batch AW §2. It now doubles what a HELD stack is worth
-		# while the ground is up, which is an axis the lane has never had, and it
-		# ADDS NO RELEASES AT ALL. Stacks with Apostle for QUADRUPLE, which is a
-		# real build rather than a coincidence: both nodes now want the party
-		# carrying stacks instead of cycling them.
-		# The base drip of 1 Faith per ally per turn is UNCHANGED and still needs
-		# no node (`battle._ground_faith_tick`).
-		# No `scale`: like Apostle, the payload is a GATE and the two magnitudes
-		# it doubles are battle.gd constants, so the tooltip states them outright
-		# rather than rendering one and hiding the other (`desc_for` renders a
-		# single {v}).
-		# BATCH BI §1 — THE MAGNITUDES CHANGED UNDER IT AND SO DID THE WAY IT
-		# COMPOSES WITH APOSTLE. Both nodes double the held value; MULTIPLIED
-		# they reach x4, which is the compounding fault this whole arc exists to
-		# remove rebuilt on the new axis. They are ADDITIVE — base 1x, Fervor
-		# +1x, Apostle +1x, so both together are x3 — and the tooltip says
-		# "triple" rather than "quadruple" for that reason. See
-		# `battle._faith_stack_mult`, which is written as a sum on purpose.
-		{"id": "dv_fervor", "name": "Fervor", "ranks": 1, "lane": "Faith", "row": 6,
-			"desc": "While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.",
-			"payload": {"stat": {"fervor": 1}}},
-		# BATCH BH §2 — THE LARGEST UNTOUCHED AXIS IN THE LANE: THE DEVOUT'S OWN
-		# FAITH. Its old effect (a release leaves a remnant standing) was the
-		# lane's THIRD frequency multiplier — keeping 3 of 5 means the next
-		# release costs two stacks rather than five — so it is deleted rather
-		# than re-priced, and `oath_ranks` went with it.
-		# What replaces it fits the node's NAME exactly and costs the lane
-		# nothing in frequency: HIS stacks pay while held and never release
-		# (`battle._gain_faith`). It also makes the lane's last pick a different
-		# KIND of thing rather than a larger version of its first.
-		# CORRECTION TOWARD THE CODE, because the brief's premise for this node
-		# was stale: it says the Devout "has no meter of his own anywhere in his
-		# kit". He has had one since Batch AW §2 — Consecrated Ground drips onto
-		# its own caster and `_gain_faith` never excluded him — AND IT RELEASED,
-		# which was an uncounted frequency source. The re-spec closes that too.
-		{"id": "dv_oath", "name": "Binding Oath", "ranks": 1, "lane": "Faith", "row": 7,
-			"desc": "Whenever a hero's Faith releases, the Devout gains {v} stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"oath_faith": 1}}},
-		# --- Lane ZEAL — EVERYONE, SHALLOWLY: invest a little in the whole
-		# party. (Its old thesis was "everything else he casts", which is the
-		# fault Holy's Sanctuary had — a lane named after the leftovers.) ---
-		# BATCH DK §2 — HERO, BECAUSE THE EFFECT FIRES PER TURN AND A COMPANION
-		# TAKES NONE. It rolls on the ACTING unit at its turn start, and
-		# `_next_unit()` walks `heroes + enemies`; a beast is summoned with
-		# `next_time = INF` and is drawn from the timeline never. This one is
-		# STRUCTURAL rather than a scope choice — no collection anywhere reaches
-		# it, so "fixing the code" would mean moving the effect off turns
-		# entirely, which is a different card.
-		{"id": "dv_waters", "name": "Cleansing Waters", "ranks": 1, "lane": "Zeal", "row": 1,
-			"desc": "While Consecrated Ground holds, each hero has a {v}% chance each turn to be cleansed of one harmful effect.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"waters_ranks": 50}}},
-		# The counter holds the INCREASE on the ground's base 10% reflect.
-		{"id": "dv_righteous", "name": "Righteous Fire", "ranks": 1, "lane": "Zeal", "row": 2,
-			"desc": "Consecrated Ground reflects {v}% of damage taken (up from the base 10%).",
-			"scale": {"base": 10, "step": 25},
-			"payload": {"stat": {"righteous_step": 25}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Sacred Resolve; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies BLESSING OF ZEAL, a PROTECTED CORE ability, which the hero owns in every run.
-		# THE RUNE OF BINDING SOULS ALSO GRANTS SACRED RESOLVE, so this node and
-		# that rune were a LIVE DUPLICATION until this batch. The rune keeps its
-		# grant — runes are allowed to grant, talents are not.
-		{"id": "dv_resolve", "name": "Unshaken", "ranks": 1, "lane": "Zeal", "row": 3,
-			"desc": "Blessing of Zeal costs {v} less Mana.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Blessing of Zeal", "add": {"cost": -10}}},
-		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,
-			"desc": "While Consecrated Ground holds, every hero heals {v}% of the Devout's max health each turn.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"pulse_ranks": 8}}},
-		{"id": "dv_crusade", "name": "Crusade", "ranks": 1, "lane": "Zeal", "row": 5,
-			"desc": "Blessing of Zeal ticks its target's cooldowns down {v} additional turn(s) on cast.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"crusade_ranks": 3}}},
-		# A THIRD FAITH SOURCE, AND THAT IS WHY IT EARNS A ROW: a shield inside
-		# the blessing feeds Conviction, and the blessing already doubles Faith
-		# gain — so the doubling finally travels WITH a source.
-		{"id": "dv_purity", "name": "Purity", "ranks": 1, "lane": "Zeal", "row": 6,
-			"desc": "Blessing of Zeal also grants its target a Divine Shield absorbing {v}% of the Devout's max health.",
-			"scale": {"step": 35},
-			"payload": {"stat": {"purity_ranks": 35}}},
-		{"id": "dv_lifewell", "name": "Lifewell", "ranks": 1, "lane": "Zeal", "row": 7,
-			"desc": "Damage reflected by Consecrated Ground heals every hero for {v}% of the amount reflected.",
-			"scale": {"step": 80},
-			"payload": {"stat": {"lifewell_ranks": 80}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# REMOVES A CONSTRAINT: a second shield replaces the first, so the lane's
-		# whole investment thesis has been capped at one cast's worth all game.
-		{"id": "dv_layered", "name": "Layered Faith", "ranks": 1, "lane": "Bulwark", "row": 8,
-			"desc": "A Divine Shield cast on an ally who already holds one ADDS to it instead of replacing it, with no limit.",
-			"payload": {"stat": {"layered_faith": 1}}},
-		# READS AN ACCUMULATED QUANTITY ACROSS THE PARTY and touches NO frequency
-		# term — the lane holds three already (BI's antagonism rule).
-		{"id": "dv_creed", "name": "Creed", "ranks": 1, "lane": "Faith", "row": 8,
-			"desc": "Faith is held in common: every hero is paid for the HIGHEST peak any hero has reached this battle, not their own.",
-			"payload": {"stat": {"creed": 1}}},
-		# REMOVES A CONSTRAINT: the banners are the lane and the clock is what
-		# the lane spends its tempo fighting.
-		{"id": "dv_eternal_ground", "name": "Eternal Ground", "ranks": 1, "lane": "Zeal", "row": 8,
-			"desc": "Consecrated Ground never expires.",
-			"payload": {"stat": {"eternal_ground": 1}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# BATCH DO — RE-AUTHORED, AND CV'S RULING IS PRESERVED BY NOT BEING
-		# TOUCHED. CV ruled Bulwark of Fortitude's 5% party heal UNCONDITIONAL
-		# (CR §7) rather than a dead Perfect clause, and that ruling lives in the
-		# ABILITY'S text, in `Classes.pending_talent_ability` — which this batch
-		# does not open. The card moved into `SPEC_DRAFT_POOLS` by NAME only.
-		# `dv_bastion` (row 6) already takes Divine Shield's COOLDOWN, so the
-		# capstone takes its COST: the two together are a free shield every turn,
-		# which is the Faith engine this lane has always been selling.
-		{"id": "dv_bulwark", "name": "Wardstone", "ranks": 1, "lane": "Bulwark", "row": 9,
-			"capstone": true,
-			"desc": "Divine Shield costs no Mana at all.",
-			"payload": {"ability": "Divine Shield", "set": {"cost": 0}}},
-		# BATCH BG §2 — RE-SPECCED OFF THE FREQUENCY AXIS, and the id, the lane
-		# and the payload field all survive so no save migrates. It used to
-		# park allies at 5 so every further gain re-triggered a release; BF
-		# measured that at −8 one-hero and −2 all four AFTER the Communion
-		# repair, i.e. TAKING THE CAPSTONE LOWERED THE ENGINE IT SITS ON.
-		#
-		# RE-PRICING COULD NOT HAVE FIXED THAT AND NEITHER NODE WAS WRONG ON
-		# ITS OWN — THE AXIS WAS. Apostle multiplied release FREQUENCY, the
-		# exact term BE and BF spent two batches taming, so a capstone whose
-		# whole effect was that term would keep producing the same cancellation
-		# at any price. Conviction has two halves — what a stack does WHILE
-		# HELD and what happens when the threshold RELEASES — and all eight nodes
-		# touch the release half. The held half was the one untouched,
-		# capstone-sized axis in the lane. See battle.gd's `_faith_stack_mult`.
-		# BATCH BI §1 — same two corrections as Fervor: the per-stack figures came
-		# down because the held value now reads the battle's PEAK rather than the
-		# current count (a peak ratchets to five and stays there, so the old
-		# numbers paid roughly double in practice), and the two doublers ADD
-		# rather than multiply. At x3 on a peak of five this is 30% mitigation
-		# and +22.5% damage on every ally while the ground holds — a capstone
-		# plus a row-6 node, and it is meant to be strong.
-		{"id": "dv_apostle", "name": "Apostle", "ranks": 1, "lane": "Faith", "row": 9,
-			"capstone": true,
-			"desc": "Every stack of Faith a hero carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. With Fervor, on Consecrated Ground, they count TRIPLE. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.",
-			"payload": {"stat": {"apostle": 1}}},
-		# The counter is the gate AND the magnitude — one field, one read site.
-		{"id": "dv_judgement", "name": "Judgement", "ranks": 1, "lane": "Zeal", "row": 9,
-			"capstone": true,
-			"desc": "While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.",
-			"payload": {"stat": {"judgement": 40}}},
-	],
-	"mystic": [
-		# Survivalist — 7 exclusive rows + a capstone row (Batch AI). RE-AUTHORED
-		# BY BATCH BA (08-09), the LAST of the twelve, around a spine that was
-		# already half-written: ATTRITION — BREADTH OF AFFLICTION, NOT DEPTH OF
-		# ONE. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so saved picks migrate and
-		# no save version moves.
-		#
-		# THE ONE TREE IN THE GAME WHOSE CEILING IS CORRECT AND STAYS: Trapper
-		# pays +8% per DIFFERENT status, and breadth is bounded by how many
-		# distinct debuffs exist — a design constant, not a dial. Overburn,
-		# Loyalty, Focus, Resonance and Ruin all lost their ceilings; this one
-		# keeps its.
-		#
-		# LANE NAMES AND THESES ALL STAND, re-aimed only in what VENOM's nodes DO:
-		# the affliction that ticks · the affliction that stops · the affliction
-		# that adds up. Each Venom node now hangs a DIFFERENT affliction off the
-		# poison, so the lane named for his signature damage stops fighting his
-		# own passive (a poison build earned +8% where a five-affliction build
-		# earned +40%).
-		#
-		# THE CONTAGION SPACE IS RESERVED FOR A FUTURE SPEC — see CLAUDE.md's
-		# standing design rule. Poison is his and stays his; anything that SPREADS
-		# ON ITS OWN (enemy to enemy, corpse to living, field-wide infection) is
-		# off-limits to this tree. Four nodes were re-specced off it.
-		#
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
-		# magnitude in the units its read site sums (AR/AS/AT/AV/AW/AX/AY/AZ).
-		# --- Lane A: Venom — the affliction that TICKS ---
-		# Deliberately FLAT damage rather than a percentage of Attack: converting
-		# it would change `_apply_poison`'s units and every rune riding
-		# `potent_ranks` with it, for a gain the reprice already delivers. 8x the
-		# value, same units, no read-site change — so the two runes that pay into
-		# it still pay exactly what their text advertises.
-		{"id": "sv_potent", "name": "Potent Toxins", "ranks": 1, "lane": "Venom", "row": 1,
-			"desc": "Your Poison deals +{v} damage per stack.", "scale": {"step": 8},
-			"payload": {"stat": {"potent_ranks": 8}}},
-		{"id": "sv_coated", "name": "Coated Blades", "ranks": 1, "lane": "Venom", "row": 2,
-			"desc": "Your basic attack applies Poison for 2 turns and Cripple for 2 turns.",
-			"payload": {"stat": {"coated_blades": 1}}},
-		# RENAMED from Virulence — a pathogen term the reserved spec wants back.
-		# The id survives, the mechanic survives, only the name goes.
-		{"id": "sv_virulence", "name": "Distillate", "ranks": 1, "lane": "Venom", "row": 3,
-			"desc": "Your Poison applications add +{v} extra stacks and apply Exposed for 3 turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"virulence_ranks": 2}}},
-		{"id": "sv_slow_acting", "name": "Slow Acting", "ranks": 1, "lane": "Venom", "row": 4,
-			"desc": "Your Poison deals HALF damage but lasts TWICE as long, cannot be cleansed, and applies Slowed for 3 turns.",
-			"payload": {"stat": {"slow_acting": 1}}},
-		# RE-SPECCED — the corpse transfer is gone (contagion). Keeping the wound
-		# open is craft: it reads the status-application path, not a death.
-		# BATCH BB §2 gave it its second clause: Perfected Toxin leaves no clock
-		# to refresh, so against a permanent poison the node deepens instead.
-		{"id": "sv_creeping", "name": "Creeping Death", "ranks": 1, "lane": "Venom", "row": 5,
-			"desc": "Applying any status OTHER than the Poison itself to a Poisoned enemy refreshes its Poison to full duration — or, if that Poison is permanent, adds a stack instead (once per enemy per turn).",
-			"payload": {"stat": {"creeping_death": 1}}},
-		# The only node in the lane that was already pointed at BREADTH rather
-		# than depth, and tissue death from venom is what venomous bites do — so
-		# it keeps its name as well as its job.
-		{"id": "sv_necrosis", "name": "Necrosis", "ranks": 1, "lane": "Venom", "row": 6,
-			"desc": "Poisoned enemies take +{v}% damage from ALL sources, not just yours.",
-			"scale": {"step": 35},
-			"payload": {"stat": {"necrosis": 35}}},
-		# REPLACES Plague Bearer (transmission). Party-wide craft with nothing
-		# self-propagating — he oils their blades. The closest thing to Plague
-		# Bearer's REACH that stays out of the reserved space.
-		{"id": "sv_plague", "name": "Quartermaster", "ranks": 1, "lane": "Venom", "row": 7,
-			"desc": "Every other hero's basic attacks also apply your Poison.",
-			"payload": {"stat": {"quartermaster": 1}}},
-		# --- Lane B: Snares — the affliction that STOPS ---
-		{"id": "sv_wire", "name": "Reinforced Wire", "ranks": 1, "lane": "Snares", "row": 1,
-			"desc": "Tripwire's retaliation deals +{v}% of your Attack.", "scale": {"step": 35},
-			"payload": {"stat": {"wire_ranks": 35}}},
-		{"id": "sv_rigging", "name": "Quick Rigging", "ranks": 1, "lane": "Snares", "row": 2,
-			"desc": "Snare Trap's cooldown is reduced by {v}, and its spring also applies Cripple.",
-			"scale": {"step": 2},
-			# TWO HALVES, TWO PAYLOADS. `apply_payload` is an if/elif chain, so a
-			# node carrying `stat` AND `ability` would silently drop the second —
-			# which is EXACTLY what had happened here: the cooldown clause has had
-			# no implementation at all since Batch 33 (unit.gd's own comment said
-			# "(payload)" and no payload existed). The `also` key is the one
-			# sanctioned way to hang a second half off a node (Batch AK).
-			"payload": {"stat": {"quick_rigging": 2},
-				"also": [{"ability": "Snare Trap", "add": {"cooldown": -2}}]}},
-		{"id": "sv_cruel", "name": "Cruel Devices", "ranks": 1, "lane": "Snares", "row": 3,
-			"desc": "Your traps deal +{v}% damage.", "scale": {"step": 50},
-			"payload": {"stat": {"cruel_ranks": 50}}},
-		# A BYPASS, NOT A MAGNITUDE: nothing here to reprice — the same call AZ
-		# made for No Cover.
-		{"id": "sv_snap_shut", "name": "Snap Shut", "ranks": 1, "lane": "Snares", "row": 4,
-			"desc": "Tripwire also retaliates against RANGED attackers, not only melee.",
-			"payload": {"stat": {"snap_shut": 1}}},
-		{"id": "sv_caught", "name": "Caught Fast", "ranks": 1, "lane": "Snares", "row": 5,
-			"desc": "Enemies caught by your traps cannot be healed for {v} turns.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"caught_fast": 5}}},
-		{"id": "sv_bone", "name": "Bone Breaker", "ranks": 1, "lane": "Snares", "row": 6,
-			"desc": "Your traps apply {v} Break damage when they spring.",
-			"scale": {"step": 90},
-			"payload": {"stat": {"bone_breaker": 90}}},
-		# THE COUNTER IS THE GATE AND THE MAGNITUDE IN ONE FIELD (AW's
-		# `judgement`): it holds the trap CAP it installs, so `_ability_usable`
-		# reads the number rather than carrying a hardcoded 2 beside it.
-		{"id": "sv_network", "name": "Deadfall Network", "ranks": 1, "lane": "Snares", "row": 7,
-			"desc": "You may have THREE traps active at once.",
-			"payload": {"stat": {"deadfall_network": 3}}},
-		# --- Lane C: Guerilla — the affliction that ADDS UP ---
-		{"id": "sv_woodcraft", "name": "Woodcraft", "ranks": 1, "lane": "Guerilla", "row": 1,
-			"desc": "+{v}% maximum Health.", "scale": {"step": 20},
-			"payload": {"stat": {"max_hp_pct": 0.20}}},
-		{"id": "sv_hitrun", "name": "Hit and Run", "ranks": 1, "lane": "Guerilla", "row": 2,
-			"desc": "Whenever you apply a status to an enemy, you gain Elusive for {v} turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"hit_and_run": 2}}},
-		{"id": "sv_scavenger", "name": "Scavenger", "ranks": 1, "lane": "Guerilla", "row": 3,
-			"desc": "Restore {v}% maximum Mana whenever an enemy dies.", "scale": {"step": 25},
-			"payload": {"stat": {"scavenger_ranks": 25}}},
-		{"id": "sv_medic", "name": "Field Medic", "ranks": 1, "lane": "Guerilla", "row": 4,
-			"desc": "At the start of your turn, cleanse {v} debuffs from random allies.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"field_medic": 2}}},
-		{"id": "sv_vulture", "name": "Vulture", "ranks": 1, "lane": "Guerilla", "row": 5,
-			"desc": "+{v}% damage against enemies afflicted by 3 or more different statuses. Broken is not one of them.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"vulture": 60}}},
-		{"id": "sv_ghillie", "name": "Ghillie Suit", "ranks": 1, "lane": "Guerilla", "row": 6,
-			"desc": "Enemies are {v}% less likely to target you while another ally lives.",
-			"scale": {"step": 65},
-			"payload": {"stat": {"ghillie": 65}}},
-		{"id": "sv_improvised", "name": "Improvised", "ranks": 1, "lane": "Guerilla", "row": 7,
-			"desc": "The first {v} abilities you use each fight do not start their cooldowns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"improvised": 2}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY — the BA contagion
-		# reservation holds: nothing spreads between enemies or from a corpse.
-		{"id": "sv_cocktail", "name": "Cocktail", "ranks": 1, "lane": "Venom", "row": 8,
-			"desc": "At the start of a Poisoned enemy's turn its Poison gains a stack for every {v} OTHER statuses it carries. Broken is not counted.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"cocktail": 2}}},
-		# REMOVES A CONSTRAINT: a trap is spent the moment it works, so the lane
-		# pays a turn for every spring it wants.
-		{"id": "sv_set_forget", "name": "Set and Forget", "ranks": 1, "lane": "Snares", "row": 8,
-			"desc": "A sprung trap re-arms itself at the start of the Survivalist's next turn.",
-			"payload": {"stat": {"set_and_forget": 1}}},
-		# THE COUNT ITSELF BECOMES THE WEAPON: Improvised pays for the first two
-		# actions; this pays for every action after them.
-		{"id": "sv_practised", "name": "Practised Hands", "ranks": 1, "lane": "Guerilla", "row": 8,
-			"desc": "Every ability the Survivalist uses takes {v} turn off all his OTHER cooldowns.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"practised_hands": 1}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# REPLACES Epidemic (a pandemic — field-wide infection, reserved). It
-		# keeps the UNCLEANSABLE identity that made Epidemic a capstone and drops
-		# the contagion; the `sticky` flag it needs already exists in
-		# `unit.purge_debuffs` and the dispel path, so this is a re-point rather
-		# than new machinery. The counter is the gate AND the per-turn rise.
-		{"id": "sv_epidemic", "name": "Perfected Toxin", "ranks": 1, "lane": "Venom", "row": 9,
-			"capstone": true,
-			"desc": "Your Poison cannot be cleansed, never expires, and its tick rises by {v} each turn it persists.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"perfected_toxin": 2}}},
-		{"id": "sv_forest", "name": "The Whole Forest", "ranks": 1, "lane": "Snares", "row": 9,
-			"capstone": true,
-			"desc": "Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.",
-			"payload": {"stat": {"whole_forest": 1}}},
-		# UNCHANGED IN DESIGN — already 2.5x the base and already the breadth
-		# capstone. The counter carries the percentage now (additive), so the
-		# read site reads a number rather than deriving one from a flag.
-		{"id": "sv_force", "name": "Force of Nature", "ranks": 1, "lane": "Guerilla", "row": 9,
-			"capstone": true,
-			"desc": "Trapper's bonus rises to +{v}% per different status — Broken excluded — and applies to every hero's damage.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"force_of_nature": 20}}},
-	],
-	"sharpshooter": [
-		# Batch AI re-cut this tree's tiers into 7 exclusive rows + a capstone
-		# row; every node costs 1 point and holds a single rank. RE-AUTHORED BY
-		# BATCH AZ (08-08) around a spine: PATIENCE — his power is in not looking
-		# away. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so saved picks migrate
-		# and no save version moves.
-		#
-		# THE LANE NAMES AND THESES ALL STAND — Precision, Penetration and Pace
-		# were never lying about their jobs, so unlike the Cryomancer's
-		# Shatterpoint or the Arcanist's Control nothing needed re-aiming.
-		#
-		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
-		# magnitude in the units its read site sums (percentage POINTS unless
-		# said otherwise), so a node and a rune each pay their advertised number
-		# alone AND stacked. Repricing is 3-4x, not the Cleric three's 4-5x —
-		# his numbers were never the smallest in the game.
-		# --- Lane A: Precision — Focus, crit chance, crit damage ---
-		{"id": "ss_steady", "name": "Steady Hands", "ranks": 1, "lane": "Precision", "row": 1,
-			"desc": "+{v}% critical chance.", "scale": {"step": 15},
-			"payload": {"stat": {"crit_bonus": 0.15}}},
-		{"id": "ss_perfect_form", "name": "Perfect Form", "ranks": 1, "lane": "Precision", "row": 2,
-			"desc": "Critical hits grant +{v} Focus.", "scale": {"step": 40},
-			"payload": {"stat": {"perfect_form": 40}}},
-		# RE-SPECCED (was "the Focus cap rises from 100 to 150"): §1 took the
-		# ceiling away, so the old node had no premise left. It is the cleanest
-		# re-spec available — same name, same lane, and it becomes a DIAL on the
-		# new mechanic rather than a dead ceiling raise. The counter holds the
-		# DROP so it stays additive (the Rune of the Deep Sight adds 8 more).
-		{"id": "ss_deep_focus", "name": "Deep Focus", "ranks": 1, "lane": "Precision", "row": 3,
-			"desc": "Focus turns into force sooner: the conversion point falls from 100 Focus to {v}.",
-			"scale": {"base": 100, "step": -40},
-			"payload": {"stat": {"deep_focus": 40}}},
-		{"id": "ss_exec_eye", "name": "Executioner's Eye", "ranks": 1, "lane": "Precision", "row": 4,
-			"desc": "Lethal Aim's critical multiplier rises to x{v}.",
-			"scale": {"base": 2.0, "step": 0.5},
-			"payload": {"stat": {"lethal_eye_ranks": 50}}},
-		# The wording change is LOAD-BEARING, not cosmetic. It used to SET the
-		# multiplier to 1.5, which was coherent only while it was exclusive with
-		# Executioner's Eye — and §4 shows that pair is dead (rows 4 and 5 of one
-		# lane, so row exclusivity lets a player hold both). Written as -0.5 it
-		# COMPOSES: x1.5 alone, x2.0 with Executioner's Eye, and the trade
-		# survives in both builds.
-		{"id": "ss_consistent", "name": "Consistent Aim", "ranks": 1, "lane": "Precision", "row": 5,
-			"desc": "Your critical multiplier is reduced by 0.5 — but you gain +60% critical chance.",
-			"payload": {"stat": {"consistent_aim": 50, "crit_bonus": 0.60}}},
-		# RE-SPECCED (was "switching targets HALVES your Focus"): a spec about
-		# not looking away must not sell a discount on looking away, least of all
-		# in the spine's own lane — the same shape as Flame Shield and Stabilize.
-		# It rewards STAYING now. Spray of Arrows remains the honest way out.
-		{"id": "ss_unwavering", "name": "Unwavering", "ranks": 1, "lane": "Precision", "row": 6,
-			"desc": "Each consecutive turn attacking the same enemy grants +{v} additional Focus, rising by {v} again each turn to a maximum of +50. Switching resets it.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"unwavering": 10}}},
-		{"id": "ss_tunnel", "name": "Tunnel Vision", "ranks": 1, "lane": "Precision", "row": 7,
-			"desc": "+{v}% critical chance against the enemy you attacked last turn; -{v}% against every other enemy.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"tunnel_vision": 100}}},
-		# --- Lane B: Penetration — armor, Break, finishing the party's work ---
-		{"id": "ss_piercer", "name": "Armor Piercer", "ranks": 1, "lane": "Penetration", "row": 1,
-			"desc": "Your attacks ignore {v}% of the target's armor.", "scale": {"step": 30},
-			"payload": {"stat": {"pierce_bonus": 0.30}}},
-		{"id": "ss_sundering", "name": "Sundering Shot", "ranks": 1, "lane": "Penetration", "row": 2,
-			"desc": "Critical hits apply {v} Break damage.", "scale": {"step": 45},
-			"payload": {"stat": {"sundering_shot": 45}}},
-		{"id": "ss_bonecracker", "name": "Bonecracker", "ranks": 1, "lane": "Penetration", "row": 3,
-			"desc": "+{v}% damage against Broken enemies.", "scale": {"step": 40},
-			"payload": {"stat": {"bonecracker_ranks": 40}}},
-		# `opp_aim_step` is the INCREASE on the 2% the kit pays WITHOUT the node
-		# (AV's `guardian_step` form), so tripling the scaling is written as 4.
-		# It is a FLOAT and must stay OUT of Runes.STAT_INT_KEYS.
-		{"id": "ss_opp_aim", "name": "Opportunist's Aim", "ranks": 1, "lane": "Penetration", "row": 4,
-			"desc": "Powershot's Break scaling TRIPLES: +6% damage per full point instead of +2%.",
-			"payload": {"stat": {"opp_aim_step": 4.0}}},
-		{"id": "ss_exposed_nerve", "name": "Exposed Nerve", "ranks": 1, "lane": "Penetration", "row": 5,
-			"desc": "Critical hits apply Exposed for 3 turns, and you deal +{v}% damage to Exposed enemies.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"exposed_nerve": 15}}},
-		# A BYPASS, NOT A MAGNITUDE: there is nothing here to reprice, so it is
-		# the one node in the tree that is byte-unchanged.
-		{"id": "ss_no_cover", "name": "No Cover", "ranks": 1, "lane": "Penetration", "row": 6,
-			"desc": "Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.",
-			"payload": {"stat": {"no_cover": 1}}},
-		# The second clause ties the lane to the spine: a kill-chain is the one
-		# time switching targets is not disloyalty, so it does not cost the bond.
-		{"id": "ss_overkill", "name": "Overkill", "ranks": 1, "lane": "Penetration", "row": 7,
-			"desc": "Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.",
-			"payload": {"stat": {"overkill": 1}}},
-		# --- Lane C: Pace — speed, cooldowns, Focus acceleration ---
-		{"id": "ss_fletcher", "name": "Fletcher's Speed", "ranks": 1, "lane": "Pace", "row": 1,
-			"desc": "+{v} Speed.", "scale": {"step": 18},
-			"payload": {"stat": {"speed": 18.0}}},
-		{"id": "ss_snap", "name": "Snap Shot", "ranks": 1, "lane": "Pace", "row": 2,
-			"desc": "The first {v} abilities you use each fight cost no Mana and do not start their cooldowns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"snap_shot": 2}}},
-		{"id": "ss_muscle", "name": "Muscle Memory", "ranks": 1, "lane": "Pace", "row": 3,
-			"desc": "Focus gain per attack increases by {v}.", "scale": {"step": 30},
-			"payload": {"stat": {"muscle_memory_ranks": 30}}},
-		# 150 OPENS HIM PAST THE CONVERSION POINT, which is the Pace lane's whole
-		# argument in one node: he arrives already converting rather than earning
-		# his way there.
-		{"id": "ss_volley", "name": "Opening Volley", "ranks": 1, "lane": "Pace", "row": 4,
-			"desc": "You begin every fight with {v} Focus.", "scale": {"step": 150},
-			"payload": {"stat": {"opening_volley": 150}}},
-		{"id": "ss_follow", "name": "Follow-Through", "ranks": 1, "lane": "Pace", "row": 5,
-			"desc": "Critical hits reduce ALL your cooldowns by {v}.", "scale": {"step": 2},
-			"payload": {"stat": {"follow_through": 2}}},
-		{"id": "ss_second_nature", "name": "Second Nature", "ranks": 1, "lane": "Pace", "row": 6,
-			"desc": "Hold Breath's guaranteed critical applies to your next {v} attacks.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"second_nature": 4}}},
-		{"id": "ss_spray", "name": "Spray of Arrows", "ranks": 1, "lane": "Pace", "row": 7,
-			"desc": "Your single-target attacks strike {v} additional random enemies for 50% damage — but Focus can never exceed 50.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"spray": 2}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# THE CONVERSION POINT STOPS BEING A THRESHOLD: Focus pays continuously
-		# and the payout no longer empties the meter that earned it.
-		{"id": "ss_continuous", "name": "Continuous Aim", "ranks": 1, "lane": "Precision", "row": 8,
-			"desc": "Focus pays without a threshold: every point grants +{v}% damage, on top of everything the conversion already buys.",
-			"scale": {"base": 0.0, "step": 0.6},
-			"payload": {"stat": {"continuous_aim": 6}}},
-		# ARMOR AND BREAK STOP BEING SEPARATE PROBLEMS: his armor penetration
-		# thins Constitution by the same share.
-		{"id": "ss_sunder_shot", "name": "Sunder Shot", "ranks": 1, "lane": "Penetration", "row": 8,
-			"desc": "The armor the Sharpshooter ignores is also Constitution he ignores: a target resists his Break damage {v}% less for each point of his armor penetration, by at most 75% and never below 10 Constitution.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"sunder_shot": 100}}},
-		# THE METER SURVIVES WHAT CLEARS IT: the payout halves it rather than
-		# emptying it (Overkill covers the kill; this covers the conversion).
-		{"id": "ss_metronome", "name": "Metronome", "ranks": 1, "lane": "Pace", "row": 8,
-			"desc": "When Focus is spent it falls to {v}% of what it was rather than to zero.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"metronome": 50}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# THE THRESHOLD REPLACES "at maximum Focus", which §1 made meaningless.
-		# The field is the gate AND the magnitude (AW's `judgement` precedent).
-		{"id": "ss_one_shot", "name": "One Shot", "ranks": 1, "lane": "Precision", "row": 9,
-			"capstone": true,
-			"desc": "At {v} or more Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.",
-			"scale": {"step": 200},
-			"payload": {"stat": {"one_shot": 200}}},
-		{"id": "ss_tnt", "name": "Through and Through", "ranks": 1, "lane": "Penetration", "row": 9,
-			"capstone": true,
-			"desc": "Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.",
-			"payload": {"stat": {"through_and_through": 1}}},
-		{"id": "ss_rapid", "name": "Rapid Fire", "ranks": 1, "lane": "Pace", "row": 9,
-			"capstone": true,
-			"desc": "Each ability you use has a {v}% chance not to consume its cooldown.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"rapid_fire": 50}}},
-	],
-	"beastmaster": [
-		# Purpose-designed lanes (Batch 30, 07-25), re-cut into 7 exclusive rows
-		# + a capstone row by Batch AI, and RE-AUTHORED BY BATCH AY (08-08)
-		# around a spine: PARTNERSHIP — his power lives in another body, and it
-		# is the only resource in the game that can die. EVERY ID SURVIVES AND
-		# RE-SPECS IN PLACE, so saved picks migrate and no save version moves.
-		#
-		# THE LANE THESES SHARPENED WITHOUT RENAMING: DEVOTION is partnership in
-		# DEPTH (one beast, further); THE PACK is partnership in BREADTH (many
-		# beasts, rotated); HANDLER is what he does when the partnership is not
-		# the answer.
-		#
-		# EVERY COUNTER IS ADDITIVE (the AR/AS/AT/AV/AW/AX form): the payload
-		# holds the MAGNITUDE and the read site applies no step of its own. TWO
-		# hold the INCREASE on a base the kit already pays without the node and
-		# are named `_step` for it (AV's `guardian_step` precedent) —
-		# `wild_communion_step` on the passive's own 5%, `absolute_step` on the
-		# Pack Bond boon's own 20%. BOTH ARE IN `Runes.STAT_INT_KEYS`: neither
-		# ends in "_ranks" and both are written by runes, so without that entry
-		# JSON's float slides into a typed int var and the hero fails to spawn.
-		#
-		# WATCH THE ONE NAME TRAP: `wild_communion_step` IS NOT `communion_ranks`
-		# — that is the Devout's, and Batch 29 crossed the two once already.
-		# --- Lane DEVOTION: one beast, deeper ---
-		{"id": "bm_communion", "name": "Wild Communion", "ranks": 1, "lane": "devotion", "row": 1,
-			"desc": "Companion strike damage per Loyalty stack rises to {v}% (from the base 5%).",
-			"scale": {"base": 5, "step": 7},
-			"payload": {"stat": {"wild_communion_step": 7}}},
-		# BJ §2: THE TOOLTIP LIED — it promised +2 while the read site
-		# (battle.gd's companion-tick block) reads the field as a GATE and
-		# pays a fixed +1; the magnitude was never read anywhere. Corrected
-		# toward the code: desc, scale and payload all say 1 now, so the
-		# field stays gate-and-magnitude-in-one if a later batch decides the
-		# node should pay more (that is a design decision, and the read site
-		# would need to pass the field as the amount).
-		{"id": "bm_unbroken", "name": "Unbroken Watch", "ranks": 1, "lane": "devotion", "row": 2,
-			"desc": "The active companion gains +{v} additional Loyalty on any turn it took no damage.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"unbroken_watch": 1}}},
-		# RE-SPECCED, NOT REPRICED: it used to raise a ceiling, and Batch AY §2
-		# removed the ceiling. It is the lane's thesis now — the dial on the
-		# curve itself, and Ancient Pact stacks on top of it (+70% a stack).
-		{"id": "bm_absolute", "name": "Absolute Devotion", "ranks": 1, "lane": "devotion", "row": 3,
-			"desc": "The Pack Bond boon grows {v}% per Loyalty stack instead of the base 20%.",
-			"scale": {"base": 20, "step": 15},
-			"payload": {"stat": {"absolute_step": 15}}},
-		# BATCH DO — RE-AUTHORED. It read *"Bestial Wrath lasts 1 turn longer per
-		# Loyalty stack"*, and Bestial Wrath is a `SPEC_POOLS` entry — a zone-boss
-		# trophy. The whole node did nothing without the draw. Kill Command is
-		# PROTECTED CORE and is the devotion lane's own payoff button.
-		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "row": 4,
-			"desc": "Kill Command costs {v} less Mana, and its cooldown falls to 2.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Kill Command", "add": {"cost": -10}, "set": {"cooldown": 2}}},
-		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "row": 5,
-			"desc": "A companion's death returns {v}% of its Loyalty rather than breaking it — the meter survives it whole.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"steadfast_bond": 100}}},
-		# RE-SPECCED, NOT REPRICED: tripling AT a threshold is meaningless once
-		# the threshold is a curve. It doubles the STEP now, whatever Absolute
-		# Devotion made it — the deep-partnership build, terrifying and fragile
-		# in equal measure.
-		{"id": "bm_ancient_pact", "name": "Ancient Pact", "ranks": 1, "lane": "devotion", "row": 6,
-			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source at all.",
-			"payload": {"stat": {"ancient_pact": 1}}},
-		# RE-SPECCED PAYOFF: a higher ceiling was its reward and there is no
-		# ceiling. It arrives deep and grows twice as fast instead. THE FIELD IS
-		# THE GATE AND THE MAGNITUDE IN ONE (AW's `judgement` precedent): 6 is
-		# the Loyalty it seats the beast at, and `> 0` is "Lone Bond is taken".
-		# IT ALSO HOLDS THE BEAST CAP AT ONE, which is what makes it and The
-		# Pack impossible to hold together — see battle._beast_cap.
-		{"id": "bm_lone_bond", "name": "Lone Bond", "ranks": 1, "lane": "devotion", "row": 7,
-			"desc": "One companion per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at {v} Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.",
-			"scale": {"step": 6},
-			"payload": {"stat": {"lone_bond": 6}}},
-		# --- Lane THE PACK: many beasts, rotated ---
-		{"id": "bm_whistle", "name": "Quick Whistle", "ranks": 1, "lane": "pack", "row": 1,
-			"desc": "Swap Companion has NO cooldown (it shaves {v} turns off the shared 3).",
-			"scale": {"step": 3},
-			"payload": {"stat": {"quick_whistle_ranks": 3}}},
-		{"id": "bm_momentum", "name": "Feral Momentum", "ranks": 1, "lane": "pack", "row": 2,
-			"desc": "+{v}% companion damage for each DIFFERENT companion summoned this fight.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"momentum_ranks": 25}}},
-		{"id": "bm_shared", "name": "Shared Devotion", "ranks": 1, "lane": "pack", "row": 3,
-			"desc": "Summoning or swapping grants +{v} Loyalty to EVERY companion, not only the arriving one.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"shared_devotion": 2}}},
-		{"id": "bm_herald", "name": "Herald", "ranks": 1, "lane": "pack", "row": 4,
-			"desc": "Arrival effects strike {v} ADDITIONAL targets: Guardian's Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"herald": 2}}},
-		# MAGNITUDE DELIBERATELY UNCHANGED. Batch AY §1 gave it a new job rather
-		# than a bigger number: with The Pack it now carries a THIRD (absent)
-		# beast's boon rather than a first's, and it must stay meaningfully
-		# different from the two at full strength beside it.
-		{"id": "bm_menagerie", "name": "Menagerie", "ranks": 1, "lane": "pack", "row": 5,
-			"desc": "Every companion summoned this fight keeps its Pack Bond boon at {v}% strength while it is away.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"menagerie": 50}}},
-		# Two magnitudes, two fields — one counter cannot honestly hold a call
-		# count and a Loyalty total (AW's `covenant` precedent).
-		{"id": "bm_no_beast_left", "name": "None Left Behind", "ranks": 1, "lane": "pack", "row": 6,
-			"desc": "A companion's death makes your next {v} summons cost no Mana and ignore their cooldown, and each arriving companion enters at 5 Loyalty.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"no_beast_left": 2, "no_beast_left_loyalty": 5}}},
-		# THE FIELD IS THE GATE AND THE MAGNITUDE IN ONE: 3 is the Loyalty cap
-		# it imposes, and that cap IS its cost — the one node in the game that
-		# still hands `_loyalty_cap` a number.
-		{"id": "bm_wild_rotation", "name": "Wild Rotation", "ranks": 1, "lane": "pack", "row": 7,
-			"desc": "Swap Companion has no cooldown — rotate every turn, each arrival effect firing as it comes. Loyalty caps at {v}.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"wild_rotation": 3}}},
-		# --- Lane HANDLER: when the partnership is not the answer ---
-		{"id": "bm_masters_aim", "name": "Master's Aim", "ranks": 1, "lane": "handler", "row": 1,
-			"desc": "Quick Shot deals +{v}% of your Attack.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"masters_aim_ranks": 25}}},
-		{"id": "bm_beast_within", "name": "The Wild Within", "ranks": 1, "lane": "handler", "row": 2,
-			"desc": "+{v}% companion maximum health.",
-			"scale": {"step": 40},
-			"payload": {"stat": {"companion_hp_pct": 0.40}}},
-		# BATCH DO — RE-AUTHORED. It read *"Spirit Bond restores +30% more maximum
-		# Mana"* and nothing else; Spirit Bond is a `SPEC_POOLS` entry, so the node
-		# was one sentence about a card the hero may never be dealt. Hunter's
-		# Instinct is PROTECTED CORE and `bm_instinctive` (row 4) already reads it.
-		{"id": "bm_reserves", "name": "Deep Reserves", "ranks": 1, "lane": "handler", "row": 3,
-			"desc": "Hunter's Instinct costs {v} less Mana.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Hunter's Instinct", "add": {"cost": -10}}},
-		{"id": "bm_instinctive", "name": "Instinctive", "ranks": 1, "lane": "handler", "row": 4,
-			"desc": "Hunter's Instinct empowers {v} Quick Shots instead of 3.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"instinctive": 8}}},
-		{"id": "bm_symbiosis", "name": "Symbiosis", "ranks": 1, "lane": "handler", "row": 5,
-			"desc": "Whenever your companion strikes, you restore {v}% maximum Mana.",
-			"scale": {"step": 6},
-			"payload": {"stat": {"symbiosis": 6}}},
-		{"id": "bm_vengeance", "name": "Vengeance", "ranks": 1, "lane": "handler", "row": 6,
-			"desc": "When a companion dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the companion — and deal +{v}% damage while it holds.",
-			"scale": {"step": 30},
-			"payload": {"stat": {"vengeance": 1, "vengeance_dmg": 30}}},
-		{"id": "bm_lone_hunter", "name": "Lone Hunter", "ranks": 1, "lane": "handler", "row": 7,
-			"desc": "While no companion stands, your abilities cost {v}% less and you deal +30% damage.",
-			"scale": {"step": 50},
-			"payload": {"stat": {"lone_hunter": 50, "lone_hunter_dmg": 30}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# LOYALTY BUYS A KIND RATHER THAN A QUANTITY: past a depth the beast's
-		# arrival effect becomes something it does, not something it did.
-		{"id": "bm_kindred", "name": "Kindred", "ranks": 1, "lane": "devotion", "row": 8,
-			"desc": "At {v} or more Loyalty the companion's arrival effect fires again at the start of each of the Beastmaster's turns.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"kindred": 8}}},
-		# ROTATION STOPS COSTING WHAT IT COSTS: BJ measured 0.05 swaps a trash
-		# battle. The verb costs a TURN, and that is what this removes.
-		{"id": "bm_free_swap", "name": "Instinctive Rotation", "ranks": 1, "lane": "pack", "row": 8,
-			"desc": "Swapping a companion no longer costs the Beastmaster his turn — he acts again immediately.",
-			"payload": {"stat": {"free_swap": 1}}},
-		# THE BEAST'S ABSENCE BECOMES AN ASSET: Vengeance inherits the boon; this
-		# inherits the STRIKE, so an empty field still fights as a pair.
-		{"id": "bm_ghost_pack", "name": "Ghost Pack", "ranks": 1, "lane": "handler", "row": 8,
-			"desc": "While no companion stands, the Beastmaster's attacks still draw a companion strike at {v}% power.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"ghost_pack": 60}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		{"id": "bm_one_soul", "name": "One Soul", "ranks": 1, "lane": "devotion", "row": 9,
-			"capstone": true,
-			"desc": "You and every companion you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.",
-			"payload": {"stat": {"one_soul": 1}}},
-		# BUILT BY BATCH AY §1. It had read "coming soon" in the shelf since
-		# Batch 30; most of the machinery was already here (`unit.beasts` is an
-		# Array, `unit.loyalty` is keyed by kind, `_bond_mult` is one site), so
-		# this was an unfinished switch rather than unbuilt machinery.
-		{"id": "bm_the_pack", "name": "The Pack", "ranks": 1, "lane": "pack", "row": 9,
-			"capstone": true,
-			"desc": "TWO companions may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.",
-			"payload": {"stat": {"the_pack": 1}}},
-		{"id": "bm_apex", "name": "Apex Predator", "ranks": 1, "lane": "handler", "row": 9,
-			"capstone": true,
-			"desc": "Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command's cooldown resets whenever an enemy dies.",
-			"payload": {"stat": {"apex": 1}}},
-	],
-	"occultist": [
-		# Purpose-designed lanes (Batch L, 07-30), re-priced by Batch AX
-		# (08-08). Batch AI re-cut the tiers into 7 exclusive rows + a capstone
-		# row; Batch L's cross-lane plumbing is intact and was the reason this
-		# tree needed the LEAST structural work of the Cleric three — Ruin /
-		# Madness / Leech are genuinely distinct axes and no lane is lying about
-		# its job. AX gave it the same 4-5x repricing Holy and the Devout took,
-		# and a spine: CORRUPTION — his power is not in him at all, it is in
-		# what he has done to them. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so
-		# saved picks migrate and no save version moves.
-		#
-		# EVERY COUNTER IS ADDITIVE (the AR/AS/AT/AV/AW form): the payload holds
-		# the MAGNITUDE and the read site applies no step of its own.
-		# --- Lane RUIN — the mark: stack it, blow it, chain it. Batch AX
-		# repriced the lane around §1's new corruption: the stacks never wash
-		# off, so every per-stack node here is a dial on a number with no
-		# ceiling. Broken Will and Entropy are ALSO §2's two-step plan — the
-		# Break that unlocks the Madness lane against a boss — and they are
-		# priced with that job in mind, not just as damage dials. ---
-		# The chance IS the counter now (100 = always), so a rune adding to it
-		# cannot overflow into nonsense.
-		{"id": "oc_emp_hex", "name": "Empowered Hex", "ranks": 1, "lane": "Ruin", "row": 1,
-			"desc": "Hex of Ruin ALWAYS applies Decay to each target it curses (10 Break damage per turn, 3 turns).",
-			"payload": {"stat": {"emp_hex_ranks": 100}}},
-		# THE MOST DANGEROUS NODE IN THE GAME and it wants watching: against
-		# uncapped stacks this is a multiplier on a number with no ceiling. At
-		# twenty stacks it is +100% damage taken. That is the intended shape of a
-		# long boss fight, and it is the first thing to check if a boss row comes
-		# back absurd. The counter holds the INCREASE on the passive's own 2%.
-		{"id": "oc_deep_hex", "name": "Deeper Hex", "ranks": 1, "lane": "Ruin", "row": 2,
-			"desc": "Each stack of Ruin makes its bearer take {v}% more damage (up from the base 2%).",
-			"scale": {"base": 2, "step": 3},
-			"payload": {"stat": {"deep_hex_step": 3}}},
-		{"id": "oc_channeling", "name": "Corrupted Channeling", "ranks": 1, "lane": "Ruin", "row": 3,
-			"desc": "Whenever a Crippled enemy attacks, a random hero heals for {v}% of the damage it dealt.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"channeling_ranks": 60}}},
-		{"id": "oc_broken_will", "name": "Broken Will", "ranks": 1, "lane": "Ruin", "row": 4,
-			"desc": "The Occultist deals {v}% more Break damage.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"broken_will_ranks": 25}}},
-		{"id": "oc_grim", "name": "Grim Focus", "ranks": 1, "lane": "Ruin", "row": 5,
-			"desc": "Ruin detonations deal {v}% more damage.",
-			"scale": {"step": 80},
-			"payload": {"stat": {"grim_ranks": 80}}},
-		{"id": "oc_entropy", "name": "Entropy", "ranks": 1, "lane": "Ruin", "row": 6,
-			"desc": "Enemies bearing any Ruin take {v} Break damage at the start of each of their turns.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"entropy_ranks": 20}}},
-		# One propagation per detonation (battle.gd enforces it): a seeded enemy
-		# is only ARMED here, and armed Ruin fires at its own turn start.
-		{"id": "oc_unravel", "name": "Unraveling", "ranks": 1, "lane": "Ruin", "row": 7,
-			"desc": "When Ruin detonates, every other enemy gains {v} Ruin.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"unravel_ranks": 4}}},
-		# --- Lane MADNESS — enemies turned on each other. §2: EVERY EFFECT IN
-		# THIS LANE IS REFUSED BY A BOSS UNTIL IT IS BROKEN. That is not a hole,
-		# it is a task, and the task is the Ruin lane's job (Broken Will,
-		# Entropy). The fix Batch AX shipped was LEGIBILITY, not a workaround:
-		# the rule is stated here, in the glossary and in the tooltips. ---
-		# Two magnitudes, two fields: a chance and a stack count, and one counter
-		# cannot honestly hold both (AW's `covenant` precedent).
-		# BATCH DP — RE-POINTED ONTO RUIN. It read PSYCHOSIS, which only Mind Flay
-		# applies, and DO moved that card into the draft — so the node became a bet
-		# on a card the Occultist may never be dealt. IT READS AN APPLICATION NOW:
-		# the passive's own mark, which he is guaranteed in every run. THE TWO
-		# FIELDS ARE KEPT ON PURPOSE — the Rune of the Whispering Dark writes BOTH,
-		# so re-pointing onto a new field would have left two thirds of a 100g rune
-		# paying nothing, in silence.
-		# THE CONTAGION FIRES ON A MARK, WHERE UNRAVELING (Ruin row 7) FIRES ON A
-		# DETONATION. The two never read the same event.
-		{"id": "oc_spread", "name": "Spread of Madness", "ranks": 1, "lane": "Madness", "row": 1,
-			"desc": "Each mark of Ruin the Occultist lands has a {v}% chance to leap to another enemy, which catches 2 Ruin.",
-			"scale": {"step": 60},
-			"payload": {"stat": {"spread_ranks": 60, "spread_ruin": 2}}},
-		# BATCH DP — RE-POINTED ONTO RUIN. Same bet as Spread of Madness and the
-		# same repair: it dialled PSYCHOSIS's seize chance, and Psychosis left the
-		# tree with Mind Flay at DO. IT READS AN APPLICATION MAGNITUDE NOW — how
-		# deep the passive's own mark bites — which is the lever AY §8 identified as
-		# the real constraint (generation, not the threshold).
-		# THE FIELD KEEPS ITS `_step` NAME AND ITS MEANING: it still holds the
-		# INCREASE on a base the kit already pays, so its STAT_INT_KEYS entry stays
-		# honest. Only the base moved, 50% -> `OLD_GODS_MARK`.
-		{"id": "oc_whispers", "name": "Whispers", "ranks": 1, "lane": "Madness", "row": 2,
-			"desc": "Every debuff the Occultist applies marks {v} Ruin instead of the base 2.",
-			"scale": {"base": 2, "step": 2},
-			"payload": {"stat": {"whispers_step": 2}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Mind Flay; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies BEWITCH, a PROTECTED CORE ability, which the hero owns in every run.
-		# THE RUNE OF THE FLAYED MIND ALSO GRANTS MIND FLAY — the second of the
-		# two live duplications, and it sits in this same Madness lane.
-		{"id": "oc_mind_flay", "name": "Bedlam", "ranks": 1, "lane": "Madness", "row": 3,
-			"desc": "Bewitch costs {v} less Mana.",
-			"scale": {"step": 10},
-			"payload": {"ability": "Bewitch", "add": {"cost": -10}}},
-		{"id": "oc_mirror", "name": "Umbral Mirror", "ranks": 1, "lane": "Madness", "row": 4,
-			"desc": "When an enemy would debuff a hero, there is a {v}% chance the debuff rebounds onto the attacker instead (and counts toward Ruin).",
-			"scale": {"step": 45},
-			"payload": {"stat": {"mirror_ranks": 45}}},
-		# THE cross-lane node — every maddened strike builds toward a detonation.
-		# BATCH DP — TEXT ONLY, AND THE CODE WAS ALREADY RIGHT. It named Psychotic
-		# and Hysterical, two statuses only drawn cards apply; its READ SITE names
-		# no status at all and never has (`not attacker.is_hero and not
-		# strike_target.is_hero`). The text now says what the code does, which is
-		# also what `oc_cackling` one row down has always said — the same trigger
-		# deserves the same sentence. NOT NARROWED TO "Bewitched": that would have
-		# UNDER-stated the payload the moment Mind Flay is drafted, which is DM's
-		# seventh family, and an absent clause does not mis-say so no test catches it.
-		{"id": "oc_delirium", "name": "Delirium", "ranks": 1, "lane": "Madness", "row": 5,
-			"desc": "When an enemy strikes a fellow, the victim is marked with {v} Ruin.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"delirium_ranks": 3}}},
-		{"id": "oc_cackling", "name": "Cackling Mirror", "ranks": 1, "lane": "Madness", "row": 6,
-			"desc": "When an enemy strikes a fellow, every hero heals {v}% of the damage dealt.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"cackling_ranks": 15}}},
-		{"id": "oc_torment", "name": "Lingering Torment", "ranks": 1, "lane": "Madness", "row": 7,
-			"desc": "An expiring madness effect leaves Decay behind for {v} turns (10 Break damage per turn).",
-			"scale": {"step": 5},
-			"payload": {"stat": {"torment_ranks": 5}}},
-		# --- Lane LEECH — suffering into sustain. Holy restores, the Devout
-		# prevents, the Occultist siphons. The passive's draught is PER STACK
-		# since Batch AX (2% each, replacing the flat 10%-while-any-Ruin), so
-		# these two dials finally reward the depth the passive was ignoring —
-		# and ALL OF IT sits under §1's 40%-of-damage-dealt cap. ---
-		# The counter holds the INCREASE on the passive's own 2% per stack.
-		{"id": "oc_soul_leech", "name": "Soul Leech", "ranks": 1, "lane": "Leech", "row": 1,
-			"desc": "The Ruin lifesteal rises to {v}% per stack (up from the base 2%). Capped at 40% of the damage dealt.",
-			"scale": {"base": 2, "step": 3},
-			"payload": {"stat": {"soul_leech_step": 3}}},
-		{"id": "oc_invigoration", "name": "Invigoration", "ranks": 1, "lane": "Leech", "row": 2,
-			"desc": "Dark Pact also restores {v}% of the Occultist's maximum Mana each turn for 3 turns.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"invigoration_ranks": 8}}},
-		{"id": "oc_gluttony", "name": "Gluttony", "ranks": 1, "lane": "Leech", "row": 3,
-			"desc": "The Ruin lifesteal drinks another {v}% per stack. Capped at 40% of the damage dealt.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"gluttony_ranks": 3}}},
-		# A FRACTIONAL magnitude, so the field must NOT end in "_ranks" —
-		# Runes.STAT_INT_KEYS coerces anything with that suffix to an int.
-		{"id": "oc_pleasure", "name": "Pleasure from Pain", "ranks": 1, "lane": "Leech", "row": 4,
-			"desc": "At the end of the Occultist's turn, every hero heals {v}% of his maximum health for every UNIQUE debuff on the enemy team.",
-			"scale": {"step": 2.5},
-			"payload": {"stat": {"pleasure_pct": 2.5}}},
-		{"id": "oc_murderous", "name": "Murderous Intent", "ranks": 1, "lane": "Leech", "row": 5,
-			"desc": "When a Bewitched enemy kills one of its fellows, the lowest-health hero heals {v}% of the Occultist's maximum health.",
-			"scale": {"step": 35},
-			"payload": {"stat": {"murderous_ranks": 35}}},
-		# The in-lane fork: one ability, pay less or get more. Dark Pact is the
-		# one place he trades his own body for the party's. The counter is
-		# percentage POINTS off the base cost of 20%.
-		{"id": "oc_pact_flesh", "name": "Pact of Flesh", "ranks": 1, "lane": "Leech", "row": 6,
-			"desc": "Dark Pact bleeds {v}% less of the Occultist's maximum health — a cost of 5% rather than 20%.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"pact_flesh_ranks": 15}}},
-		# The other jaw of the fork. A FOURTH counter holding the INCREASE on a
-		# base the kit already pays (Dark Pact's 15%), so it takes the `_step`
-		# name the other three do — §5 named three; this one has the same shape.
-		{"id": "oc_barter", "name": "Dark Barter", "ranks": 1, "lane": "Leech", "row": 7,
-			"desc": "Dark Pact heals every other hero {v}% of their maximum health (up from the base 15%).",
-			"scale": {"base": 15, "step": 20},
-			"payload": {"stat": {"barter_step": 20}}},
-		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
-		# the lane is bought. Each one READS an accumulated quantity, REMOVES a
-		# constraint the lane has worked around all game, or CONVERTS the lane's
-		# currency into something it could not previously buy — never a larger
-		# magnitude of a node above it (the BC/BH fault). ---
-		# THE MARK'S DEPTH BUYS SOMETHING OTHER THAN DAMAGE: past a depth, Ruin
-		# is control rather than amplification.
-		{"id": "oc_weight", "name": "Weight of Ruin", "ranks": 1, "lane": "Ruin", "row": 8,
-			"desc": "An enemy bearing {v} or more Ruin moves at half speed and cannot be healed.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"weight_of_ruin": 8}}},
-		# BATCH DP — RE-POINTED ONTO RUIN, AND RENAMED WITH IT. "Permanent Delusion"
-		# made Psychosis, Bewitchment and Hysteria eternal; two of the three are
-		# drawn, so two thirds of the node was a bet on the draw.
-		# IT READS THE STACK COUNT NOW, AS A THRESHOLD — the only row-8 read in the
-		# lane, and the row-8 shape exactly: it REMOVES THE CONSTRAINT THIS LANE HAS
-		# WORKED AROUND ALL GAME, stated six comment-lines above ('EVERY EFFECT IN
-		# THIS LANE IS REFUSED BY A BOSS UNTIL IT IS BROKEN'), and pays for it out of
-		# the one currency the passive guarantees.
-		# IT IS SELF-ENABLING AND THAT IS DELIBERATE: the boss refuses the charm
-		# inside `_apply_status`, but the `bewitch` handler marks Ruin on the very
-		# next line REGARDLESS — so a refused cast still deepens the mark that will
-		# eventually open the gate. Nothing had to be added to make that true.
-		# SCOPED TO BEWITCH ALONE, matching the text word for word. Widening it to
-		# Psychosis and Hysteria would be a BONUS rather than a bet (Bewitch carries
-		# the node on its own) — but a clause the text does not state is DM's seventh
-		# family, so it is a decision, not a freebie.
-		{"id": "oc_permanent", "name": "Ruined Mind", "ranks": 1, "lane": "Madness", "row": 8,
-			"desc": "A boss bearing {v} or more Ruin can no longer resist the Occultist's Bewitchment.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"broken_mind": 10}}},
-		# THE PARTY DRINKS FROM SOMETHING OTHER THAN HIS MARKS — his Break, which
-		# Broken Will and Entropy spend the lane above building.
-		{"id": "oc_blood_communion", "name": "Blood Communion", "ranks": 1, "lane": "Leech", "row": 8,
-			"desc": "Every point of Break damage the Occultist deals heals the lowest-health hero for {v}% of its value.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"blood_communion": 20}}},
-		# --- Capstones (row 9): take ONE, no lane requirement ---
-		# RE-SPECCED, because keeping the stacks is the DEFAULT now (Batch AX
-		# §1). Its old job — "detonations no longer consume their stacks" — is
-		# what the passive does without it, so the capstone moves the THRESHOLD
-		# instead: it doubles his detonation rate, and it is the answer for a
-		# player who wants the payoff back in ordinary fights. The counter is the
-		# GATE AND THE MAGNITUDE in one field (AW's `judgement` precedent): it
-		# holds the threshold it installs.
-		{"id": "oc_avatar_ruin", "name": "Avatar of Ruin", "ranks": 1, "lane": "Ruin", "row": 9,
-			"capstone": true,
-			"desc": "Ruin detonates every 5th stack instead of every 10th.",
-			"payload": {"stat": {"avatar_ruin": 5}}},
-		# BATCH DO — RE-AUTHORED. This cell granted Mass Hysteria; a talent may not
-		# grant an ability, so the card moved into `SPEC_DRAFT_POOLS` whole and
-		# the cell now modifies HEX OF RUIN, a PROTECTED CORE ability, which the hero owns in every run.
-		# Every debuff applied marks 2 Ruin, so an AoE Hex is the passive's own
-		# multiplier rather than a new mechanic.
-		{"id": "oc_hysteria", "name": "Pandemonium", "ranks": 1, "lane": "Madness", "row": 9,
-			"capstone": true,
-			"desc": "Hex of Ruin curses EVERY enemy, and its Break damage rises from 15 to {v}.",
-			"scale": {"base": 15, "step": 25},
-			"payload": {"ability": "Hex of Ruin", "set": {"aoe": true}, "add": {"pressure": 25}}},
-		{"id": "oc_soul_glut", "name": "Soul Glut", "ranks": 1, "lane": "Leech", "row": 9,
-			"capstone": true,
-			"desc": "Whenever a hero heals by striking a Ruined target, every hero heals for the same amount. Still under the 40% cap.",
-			"payload": {"stat": {"soul_glut": 1}}},
-	],
-}
+# THE SPEND GATE (FX §1) — how many cells of the tier BELOW must be owned
+# before a tier opens. Counted in CELLS, so it means the same thing at both
+# gates: three tier-1 cells open tier 2, three tier-2 cells open tier 3.
+# **THE NUMBER IS A CANDIDATE AND IT IS THE DESIGNER'S TO SET** — its range is 1
+# (the gate is decorative) to 9 (the tier below must be bought out). 3 is
+# derived rather than chosen: it is the three nodes of a tier a hero used to
+# wear in a run (one per row, three rows to a tier), and it is exactly the
+# purse one completed run banks (a point per zone boss). `docs/reports/FX.md` §1
+# prices both ends of the range.
+const TIER_SPEND_MIN := 3
+
+# ── THE TWENTY-SEVEN ──────────────────────────────────────────────────────────
+#
+# **EVERY NODE IS A STAT PAYLOAD ON A FIELD THE BATTLE ALREADY READS** — FW's
+# TODAY — and no two nodes write the same field, so no node is a second
+# magnitude of another. **WHERE ONE OF FP's SURVIVING NODES ALREADY SAID THE
+# THING, ITS MAGNITUDE AND ITS WORDING WERE TAKEN** (FX §3); the comment above
+# each node names its precedent, or says there was none and what the proposed
+# number was priced against. The wording lost its pronouns (the text standard)
+# and the spec it no longer belongs to; no magnitude moved in the carry.
+#
+# **FOUR OF THE BRIEF'S TWENTY-SEVEN WERE NOT TODAY FOR A TREE ALL FOUR CLASSES
+# BUY, AND AN ALTERNATE STANDS IN EACH PLACE** (FX §2): *regenerate more
+# resource* pays no Warrior (Rage has no regeneration field) and no Mage
+# (Evocation assigns over the field at the spawn); *debuffs on you expire
+# sooner* has no field — the one that exists moves buffs as well; *a Perfect
+# pays* pays Mana only; and *Elusive while you carry an affliction* has no field
+# — the one that exists pays when a hero AFFLICTS. None was rescued with a hook.
+#
+# AND MOST OF THESE FIELDS ARE READ IN `_resolve`'s ORDINARY STRIKE BRANCH, which
+# an ability carrying a `special` never reaches (FW's trap 6): damage dealt and
+# taken, Break dealt, penetration and every on-crit rider pay on ordinary blows.
+const TREE := [
+	# ── TIER 1 — one point each. Stat creep, and the designer ruled it correct. ──
+	# PRECEDENT: Woodcraft (sv_woodcraft) and Unwavering Faith (dv_unwavering),
+	# which were the same node twice — max_hp_pct 0.20. TAKEN.
+	{"id": "tn_health", "name": "More Health", "tier": 1,
+		"desc": "+20% maximum Health.",
+		"payload": {"stat": {"max_hp_pct": 0.20}}},
+	# NO PRECEDENT: no node ever wrote `attack`. PROPOSED at +10, priced against
+	# the party Attack boons two events pay (+10%, Blood Altar and Training
+	# Grounds), which is +10 on a base-100 hero.
+	{"id": "tn_attack", "name": "More Attack", "tier": 1,
+		"desc": "+10 Attack.",
+		"payload": {"stat": {"attack": 10}}},
+	# NO PRECEDENT: no node ever wrote `armor`. PROPOSED at +0.05, the relic
+	# layer's own armor hook (`hero_armor_add`, 0.05) — the one permanent armor
+	# bonus that ships.
+	{"id": "tn_armor", "name": "More Armor", "tier": 1,
+		"desc": "+5% armor.",
+		"payload": {"stat": {"armor": 0.05}}},
+	# PRECEDENT: Steady Hands (ss_steady) — crit_bonus 0.15. TAKEN.
+	{"id": "tn_crit", "name": "More Crit Chance", "tier": 1,
+		"desc": "+15% critical chance.",
+		"payload": {"stat": {"crit_bonus": 0.15}}},
+	# PRECEDENT: Fletcher's Speed (ss_fletcher) — speed 18. TAKEN.
+	{"id": "tn_speed", "name": "More Speed", "tier": 1,
+		"desc": "+18 Speed.",
+		"payload": {"stat": {"speed": 18.0}}},
+	# PRECEDENT: Sword Mastery (sm_sword_mastery) — parry_bonus 0.12. TAKEN.
+	{"id": "tn_parry", "name": "Parry More", "tier": 1,
+		"desc": "+12% parry chance.",
+		"payload": {"stat": {"parry_bonus": 0.12}}},
+	# NO PRECEDENT: no node ever wrote `max_resource`. PROPOSED at +20, priced
+	# against Woodcraft's +20% maximum Health, taken as the same share of a
+	# 100-point pool.
+	{"id": "tn_pool", "name": "A Bigger Resource Pool", "tier": 1,
+		"desc": "+20 maximum Rage or Mana.",
+		"payload": {"stat": {"max_resource": 20}}},
+	# NO SURVIVING PRECEDENT: Reckless Fury paid +20% WITH +15% damage taken and
+	# is not one of the 43. PROPOSED at +10%, the relic hook `hero_attack_mult`
+	# (0.10), which lands in this same field at the spawn.
+	{"id": "tn_damage", "name": "More Damage Dealt", "tier": 1,
+		"desc": "+10% damage dealt.",
+		"payload": {"stat": {"dmg_bonus": 0.10}}},
+	# NO SURVIVING PRECEDENT: Measured Rage paid 20% as a row-6 node conditional
+	# on Reckless Fury, and is not one of the 43. PROPOSED at 10%, the mirror of
+	# More Damage Dealt.
+	{"id": "tn_guard", "name": "Less Damage Taken", "tier": 1,
+		"desc": "10% less damage taken.",
+		"payload": {"stat": {"dmg_taken_bonus": -0.10}}},
+
+	# ── TIER 2 — two points each. Each reads a condition rather than adding a number. ──
+	# PRECEDENT: Broken Will (oc_broken_will) — broken_will_ranks 25. TAKEN.
+	{"id": "tn_break", "name": "You Break Harder", "tier": 2,
+		"desc": "Deals 25% more Break damage.",
+		"payload": {"stat": {"broken_will_ranks": 25}}},
+	# ALTERNATE, IN THE PLACE OF *REGENERATE MORE RESOURCE* (see the header).
+	# PRECEDENT: Blood Communion (oc_blood_communion) — blood_communion 20. TAKEN.
+	# THE BRIEF'S LABEL WAS "Breaking heals the party", AND BOTH HALVES OF IT
+	# ARE WRONG HERE: the word *party* is retired from player-facing text
+	# (CLAUDE.md, HERO AND ALLY — `test_batch_bx` §4b reads this file), and the
+	# read site heals ONE body, the lowest-health hero. The name says that.
+	{"id": "tn_break_heal", "name": "Breaking Heals a Hero", "tier": 2,
+		"desc": "Every point of Break damage dealt heals the lowest-health hero for 20% of its value.",
+		"payload": {"stat": {"blood_communion": 20}}},
+	# PRECEDENT: Follow-Through (ss_follow) — follow_through 2. TAKEN.
+	{"id": "tn_crit_cooldown", "name": "A Cooldown Ticks on a Crit", "tier": 2,
+		"desc": "Critical hits reduce ALL cooldowns by 2.",
+		"payload": {"stat": {"follow_through": 2}}},
+	# ALTERNATE, IN THE PLACE OF *DEBUFFS ON YOU EXPIRE SOONER* (see the header).
+	# PRECEDENT: Bonecracker (ss_bonecracker) — bonecracker_ranks 40. TAKEN.
+	{"id": "tn_kill_down", "name": "Kill What Is Down", "tier": 2,
+		"desc": "+40% damage against Broken enemies.",
+		"payload": {"stat": {"bonecracker_ranks": 40}}},
+	# PRECEDENT: Field Medic (sv_medic) — field_medic 2. TAKEN, and it is TWO:
+	# the brief's label said "one", and the precedent's magnitude is the answer
+	# (FX §3), so the name carries no number rather than the wrong one.
+	{"id": "tn_cleanse", "name": "Cleanse Debuffs Each Turn", "tier": 2,
+		"desc": "At the start of this hero's turn, cleanse 2 debuffs from random allies.",
+		"payload": {"stat": {"field_medic": 2}}},
+	# PRECEDENT: Last Hope (hl_last_hope) — last_hope_pct 40. Not one of the 43,
+	# so it is a REFERENCE rather than salvage; a live node whose number has run.
+	# PARTY-WIDE BY ITS READ SITE: the spawn stamps the best holder's figure on
+	# every hero, so two holders in one party do not stack.
+	{"id": "tn_last_hope", "name": "Heal More When Low", "tier": 2,
+		"desc": "Heroes under 25% of their maximum health receive 40% more healing.",
+		"payload": {"stat": {"last_hope_pct": 40}}},
+	# PRECEDENT: Iron Will (wd_iron_will) — iron_will_ranks 1, which the read
+	# site multiplies by 12. Not one of the 43: a REFERENCE, a live node.
+	{"id": "tn_iron_will", "name": "Mitigation per Debuff You Carry", "tier": 2,
+		"desc": "Takes 12% less damage for every debuff currently carried, to a maximum of 90%.",
+		"payload": {"stat": {"iron_will_ranks": 1}}},
+	# PRECEDENT: Armor Piercer (ss_piercer) — pierce_bonus 0.30. TAKEN.
+	{"id": "tn_pierce", "name": "Armor Penetration", "tier": 2,
+		"desc": "Attacks ignore 30% of the target's armor.",
+		"payload": {"stat": {"pierce_bonus": 0.30}}},
+	# PRECEDENT: Ghillie Suit (sv_ghillie) — ghillie 65. TAKEN.
+	{"id": "tn_look_past", "name": "Enemies Look Past You", "tier": 2,
+		"desc": "Enemies are 65% less likely to target this hero while another ally lives.",
+		"payload": {"stat": {"ghillie": 65}}},
+
+	# ── TIER 3 — three points each. ──
+	# ALTERNATE, IN THE PLACE OF *A PERFECT PAYS* (see the header).
+	# PRECEDENT: Whetstone (sm_whetstone) — whetstone 3. TAKEN.
+	{"id": "tn_crit_pays", "name": "A Crit Pays", "tier": 3,
+		"desc": "Every critical strike raises Attack by 3 for the rest of the battle.",
+		"payload": {"stat": {"whetstone": 3}}},
+	# PRECEDENT: Undying Rage (bz_undying) — undying_rage 1. Not one of the 43:
+	# a REFERENCE, a live node. Its field carries a rider the read site pays and
+	# no payload can take off — 50% more damage below a quarter's health until
+	# the refusal is spent (`battle.gd`'s strike loop) — so the text states it.
+	# AND THE REFUSAL ITSELF IS NOT GATED ON HEALTH, which the old text implied:
+	# `unit.gd` refuses the killing hit whatever health it landed on.
+	{"id": "tn_refuse_death", "name": "Refuse Death Once", "tier": 3,
+		"desc": "Once per battle, the hit that would kill leaves 1 HP instead. Until that happens, deals 50% more damage below 25% health.",
+		"payload": {"stat": {"undying_rage": 1}}},
+	# PRECEDENTS, ONE PER CURRENCY: Last Rites (bz_last_rites) — last_rites 1,
+	# the Rage form — and Conversion (ar_conversion) — conversion_ranks 30, the
+	# Mana form. BOTH TAKEN. Each read site tests `resource_name`, so the node
+	# writes both fields and every hero is paid in the one he holds.
+	{"id": "tn_resource_ward", "name": "Pay a Lethal Hit out of Your Resource Pool", "tier": 3,
+		"desc": "Rage: below 25% health, damage is paid out of Rage first, 1 Rage a point, and reaches health only once the Rage is gone. Mana: 30% of all damage taken is paid as Mana instead of health.",
+		"payload": {"stat": {"last_rites": 1, "conversion_ranks": 30}}},
+	# PRECEDENT: No Cover (ss_no_cover) — no_cover 1. TAKEN.
+	{"id": "tn_no_miss", "name": "You Cannot Miss", "tier": 3,
+		"desc": "Attacks cannot be made to miss: Blind and Dazed do not affect them, and Elusive does not protect against them.",
+		"payload": {"stat": {"no_cover": 1}}},
+	# ALTERNATE, IN THE PLACE OF *ELUSIVE WHILE YOU CARRY AN AFFLICTION* (see the
+	# header). PRECEDENT: Devoutness (dv_devoutness) — devoutness_ranks 20. Not
+	# one of the 43: a REFERENCE, a live node. PARTY-WIDE BY ITS READ SITE, like
+	# Last Hope: the best holder's figure is stamped on every hero.
+	{"id": "tn_unbreaking", "name": "We Do Not Break", "tier": 3,
+		"desc": "Every hero takes 20% less Break damage.",
+		"payload": {"stat": {"devoutness_ranks": 20}}},
+	# PRECEDENT: Sundering Shot (ss_sundering) — sundering_shot 45. TAKEN.
+	{"id": "tn_crack_guards", "name": "Your Crits Crack Guards", "tier": 3,
+		"desc": "Critical hits deal 45 Break damage.",
+		"payload": {"stat": {"sundering_shot": 45}}},
+	# PRECEDENT: No Quarter (sm_perfect_form) — no_quarter_ranks 1, which the
+	# read site multiplies by 45. TAKEN. It refills whatever pool the hero has,
+	# so the text names both.
+	{"id": "tn_break_refuel", "name": "Breaking an Enemy Refuels You", "tier": 3,
+		"desc": "Breaking an enemy grants 45 Rage or Mana.",
+		"payload": {"stat": {"no_quarter_ranks": 1}}},
+	# PRECEDENT: Rapid Fire (ss_rapid) — rapid_fire 50. TAKEN.
+	{"id": "tn_skip_cooldown", "name": "A Chance to Skip a Cooldown Entirely", "tier": 3,
+		"desc": "Each ability used has a 50% chance not to start its cooldown.",
+		"payload": {"stat": {"rapid_fire": 50}}},
+	# PRECEDENT: Snap Shot (ss_snap) — snap_shot 2. TAKEN. The read site counts
+	# only an ability that costs something, and the text says so.
+	{"id": "tn_free_casts", "name": "Your First Casts of a Fight Are Free", "tier": 3,
+		"desc": "Each fight, the first 2 abilities that cost anything cost nothing and start no cooldown.",
+		"payload": {"stat": {"snap_shot": 2}}},
+]
 
 
 # ---------- the tree's shape, read off the data ----------
 
-# Every node in a row, across all three lanes, in lane order. Row 9 is the
-# capstone shelf.
-static func row_nodes(tree_nodes: Array, row: int) -> Array:
+# The tree every hero wears, as a copy a caller may keep.
+static func tree() -> Array:
+	return TREE.duplicate(true)
+
+
+# Which tier a node sits in.
+static func tier_of(node: Dictionary) -> int:
+	return clampi(int(node.get("tier", 1)), 1, TIERS)
+
+
+# Every node in a tier, in authored order.
+static func tier_nodes(tree_nodes: Array, tier: int) -> Array:
 	var out: Array = []
 	for t in tree_nodes:
-		if int(t.get("row", 0)) == row:
+		if tier_of(t) == tier:
 			out.append(t)
 	return out
 
 
-# The ids EQUIPPED in a row. Exactly one, ever — the shape is an Array
-# because every caller wants to name what is closing a door.
-static func row_picks(tree_nodes: Array, learned: Dictionary, row: int) -> Array:
-	var out: Array = []
-	for t in row_nodes(tree_nodes, row):
-		if int(learned.get(t["id"], 0)) > 0:
-			out.append(String(t["id"]))
-	return out
+# ---------- BATCH BM's meta layer, re-cut by tier at FX ----------
+
+# What a cell in this TIER costs. The price IS the tier (1/2/3), and ONE place
+# decides it, so the price and the gate cannot drift.
+static func cell_cost(tier: int) -> int:
+	return TIER_COSTS[clampi(tier, 1, TIERS) - 1]
 
 
-static func row_picked(tree_nodes: Array, learned: Dictionary, row: int) -> bool:
-	return not row_picks(tree_nodes, learned, row).is_empty()
+# How many tiers a profile at this difficulty tier may buy into. A tier arrives
+# FULLY open — beating difficulty 2 makes every tier-2 cell buyable at once, so
+# far as the spend gate allows — which is what makes an uncapped bank worth
+# having.
+static func tiers_open(difficulty_tier: int) -> int:
+	return TIERS_OPEN[clampi(difficulty_tier, 0, MAX_TIER)]
 
 
-static func has_capstone(tree_nodes: Array, learned: Dictionary) -> bool:
-	return row_picked(tree_nodes, learned, CAPSTONE_ROW)
+static func tier_open(tier: int, difficulty_tier: int) -> bool:
+	return tier <= tiers_open(difficulty_tier)
 
 
-# ---------- BATCH BM: the meta layer's rules ----------
-
-# Which difficulty tier a row sits behind: rows 1-3 tier 1, 4-6 tier 2,
-# 7-9 tier 3. ONE place decides it, so the price and the gate cannot drift.
-static func tier_of_row(row: int) -> int:
-	return clampi(int(ceil(row / 3.0)), 1, MAX_TIER)
-
-
-# What a cell in this row costs. The price IS the tier (1/2/3).
-static func cell_cost(row: int) -> int:
-	return TIER_COSTS[tier_of_row(row) - 1]
+# The lowest end-boss rung that opens this tier — what a locked cell's reason
+# names. Read off `TIERS_OPEN` rather than assumed equal to the tier, so a
+# re-mapped table cannot leave the message saying the old thing.
+static func difficulty_for_tier(tier: int) -> int:
+	for d in range(0, MAX_TIER + 1):
+		if tiers_open(d) >= tier:
+			return d
+	return MAX_TIER
 
 
-# How many rows a profile at this difficulty tier may buy into. A tier
-# arrives FULLY unlocked — beating difficulty 2 makes all nine cells of rows
-# 4-6 buyable at once, which is what makes an uncapped bank worth having.
-static func rows_unlocked(tier: int) -> int:
-	return TIER_ROWS[clampi(tier, 0, MAX_TIER)]
-
-
-static func row_unlocked(row: int, tier: int) -> bool:
-	return row <= rows_unlocked(tier)
-
-
-# What filling one spec costs, in points. 9 cells at each tier price = 54.
-static func full_spec_cost() -> int:
+# What filling the whole tree costs, in points. 9 cells at each tier price = 54.
+static func full_tree_cost() -> int:
 	var total := 0
-	for row in range(1, CAPSTONE_ROW + 1):
-		total += cell_cost(row) * LANES
+	for tier in range(1, TIERS + 1):
+		total += cell_cost(tier) * NODES_PER_TIER
 	return total
 
 
-# CAN THIS CELL BE BOUGHT? {ok, why, cost}. `cells` is the spec's unlocked
-# set ({id: true}), `points` its banked purse, `tier` the GLOBAL row tier.
-# "why" prefixes matter to the build screen's greying: Owned / Locked / Cost.
+# How many cells of this tier a ledger owns.
+static func bought_in_tier(tree_nodes: Array, cells: Dictionary, tier: int) -> int:
+	var n := 0
+	for t in tier_nodes(tree_nodes, tier):
+		if bool(cells.get(String(t["id"]), false)):
+			n += 1
+	return n
+
+
+# THE SPEND GATE. Tier 1 has nothing below it; every higher tier needs
+# `TIER_SPEND_MIN` cells owned in the tier directly below.
+static func spend_gate_met(tree_nodes: Array, cells: Dictionary, tier: int) -> bool:
+	if tier <= 1:
+		return true
+	return bought_in_tier(tree_nodes, cells, tier - 1) >= TIER_SPEND_MIN
+
+
+# CAN THIS CELL BE BOUGHT? {ok, why, cost}. `cells` is the class's owned set
+# ({id: true}), `points` its available purse, `difficulty_tier` the GLOBAL rung
+# tier. "why" prefixes matter to the build screen's greying: Owned / Locked /
+# Costs. Both gates answer "Locked", and each names what opens it.
 static func can_buy(tree_nodes: Array, id: String, cells: Dictionary,
-		points: int, tier: int) -> Dictionary:
+		points: int, difficulty_tier: int) -> Dictionary:
 	var t := node_in_tree(tree_nodes, id)
 	if t.is_empty():
 		return {"ok": false, "why": "Unknown", "cost": 0}
-	var row := int(t.get("row", 1))
-	var cost := cell_cost(row)
+	var tier := tier_of(t)
+	var cost := cell_cost(tier)
 	if bool(cells.get(id, false)):
 		return {"ok": false, "why": "Owned", "cost": cost}
-	if not row_unlocked(row, tier):
+	if not tier_open(tier, difficulty_tier):
 		return {"ok": false, "cost": cost,
-			"why": "Locked: beat the end boss on difficulty %d" % tier_of_row(row)}
+			"why": "Locked: beat the end boss on difficulty %d" % difficulty_for_tier(tier)}
+	if not spend_gate_met(tree_nodes, cells, tier):
+		return {"ok": false, "cost": cost,
+			"why": "Locked: own %d more in tier %d first" % [
+				TIER_SPEND_MIN - bought_in_tier(tree_nodes, cells, tier - 1), tier - 1]}
 	if points < cost:
 		return {"ok": false, "cost": cost,
 			"why": "Costs %d — you have %d" % [cost, points]}
 	return {"ok": true, "why": "", "cost": cost}
 
 
-# CAN THIS CELL BE EQUIPPED? A separate question from can_buy and THE one
-# the unlock-is-not-equip distinction lives in: owning a cell makes it an
-# OPTION. `equipped` is {row: id}. Equipping replaces whatever held the row.
-static func can_equip(tree_nodes: Array, id: String, cells: Dictionary,
-		equipped: Dictionary) -> Dictionary:
+# CAN THIS CELL BE REFUNDED? A refund that leaves a tier short of
+# `TIER_SPEND_MIN` while the tier above it holds cells would strand every one of
+# them — owned, worn, and behind a gate that no longer opens — so it is refused,
+# and the full respec (which clears every tier at once) is the way out.
+static func can_refund(tree_nodes: Array, id: String, cells: Dictionary) -> Dictionary:
 	var t := node_in_tree(tree_nodes, id)
 	if t.is_empty():
 		return {"ok": false, "why": "Unknown"}
 	if not bool(cells.get(id, false)):
-		return {"ok": false, "why": "Not unlocked — buy the cell first"}
-	var row := int(t.get("row", 1))
-	if String(equipped.get(row, "")) == id:
-		return {"ok": false, "why": "Equipped"}
+		return {"ok": false, "why": "Not owned"}
+	var tier := tier_of(t)
+	if tier < TIERS and bought_in_tier(tree_nodes, cells, tier + 1) > 0 \
+			and bought_in_tier(tree_nodes, cells, tier) - 1 < TIER_SPEND_MIN:
+		return {"ok": false,
+			"why": "Tier %d holds cells that need %d owned here" % [tier + 1, TIER_SPEND_MIN]}
 	return {"ok": true, "why": ""}
 
 
-# The {row: id} loadout rendered as the {id: ranks} set every read site in
-# the game already speaks — Run.party members, apply_from_tree, battle.gd.
-# Ids the tree no longer holds are dropped rather than carried.
-static func equipped_learned(tree_nodes: Array, equipped: Dictionary) -> Dictionary:
+# THE LEDGER AS THE {id: ranks} SET every read site in the game already speaks
+# — Run.party members, apply_from_tree, battle.gd. Buying is wearing, so this is
+# every owned cell the tree still holds; an id it no longer holds is dropped
+# rather than carried.
+static func worn_learned(tree_nodes: Array, cells: Dictionary) -> Dictionary:
 	var learned := {}
-	for row in equipped:
-		var id := String(equipped[row])
-		if id != "" and not node_in_tree(tree_nodes, id).is_empty():
-			learned[id] = 1
+	for id in cells:
+		if bool(cells[id]) and not node_in_tree(tree_nodes, String(id)).is_empty():
+			learned[String(id)] = 1
 	return learned
 
 
-# What a spec's ledger has SPENT, read off the cells it owns. Points earned
-# minus this is what is available — so a respec is "drop a cell, get its
+# What a class's ledger has SPENT, read off the cells it owns. Points earned
+# minus this is what is available — so a respec is "drop the cells, get their
 # price back" with no second accounting anywhere.
 static func cells_spent(tree_nodes: Array, cells: Dictionary) -> int:
 	var total := 0
@@ -2663,7 +378,7 @@ static func cells_spent(tree_nodes: Array, cells: Dictionary) -> int:
 			continue
 		var t := node_in_tree(tree_nodes, String(id))
 		if not t.is_empty():
-			total += cell_cost(int(t.get("row", 1)))
+			total += cell_cost(tier_of(t))
 	return total
 
 
@@ -2742,27 +457,28 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 # the earnable pools read, so a pool copy can never drift from the copy a
 # talent purchase hands out.
 static func granted_ability(display_name: String) -> Ability:
-	for spec_key in LANE_TREES:
-		for node in LANE_TREES[spec_key]:
-			var pay: Dictionary = node.get("payload", {})
-			if pay.has("new_ability") \
-					and String(pay["new_ability"]["display_name"]) == display_name:
-				return Ability.make(pay["new_ability"])
-			if pay.has("grant_ability") and String(pay["grant_ability"]) == display_name:
-				return Classes.pending_talent_ability(display_name)
+	for node in TREE:
+		var pay: Dictionary = node.get("payload", {})
+		if pay.has("new_ability") \
+				and String(pay["new_ability"]["display_name"]) == display_name:
+			return Ability.make(pay["new_ability"])
+		if pay.has("grant_ability") and String(pay["grant_ability"]) == display_name:
+			return Classes.pending_talent_ability(display_name)
 	return null
 
 
+# BATCH FX — THE TREE KEYS TO THE CLASS, AND THERE IS ONE. `generate_tree`
+# still takes the hero's SPEC, because that is what every caller holds, and
+# answers "the tree this spec's class buys into" — which is `TREE` for every
+# class. A spec with no class (an unawakened hero) has none.
 static func has_tree(spec: String) -> bool:
-	return LANE_TREES.has(spec)
+	return Classes.class_of_spec(spec) != ""
 
 
 static func generate_tree(spec: String, _class_key: String) -> Array:
-	# Trees are FIXED definitions in code. Specs without one get "coming
-	# soon" (there are none today — all 12 are authored).
-	if LANE_TREES.has(spec):
-		return LANE_TREES[spec].duplicate(true)
-	return []
+	if not has_tree(spec):
+		return []
+	return tree()
 
 
 static func node_in_tree(tree_nodes: Array, id: String) -> Dictionary:

@@ -15,6 +15,71 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-11 &mdash; Batch FX: ONE TALENT TREE, KEYED TO THE CLASS</h2>
+<p><b>THE FIFTH BATCH ON <code>class-merge</code>, AND THE FIRST THAT MERGES ANYTHING: THE TALENT LAYER, AND ONLY
+THAT.</b> The twelve spec trees and their 324 nodes are deleted. ONE tree of 27 nodes stands in their place, in
+three tiers of nine at 1 / 2 / 3 points (54 in all). Each CLASS buys into it out of its own purse, so a Berserker, a
+Swordmaster and a Warden all spend the Warrior's points. <b>What did not happen:</b> no spec dissolved, no pool merged,
+no engine became a rune and no spine was attached (<code>check_ft</code> &sect;0 holds). No node is read outside a
+battle, and the relic seam stands. Full working: <code>docs/reports/FX.md</code>.</p>
+
+<p><b>THE LINE, AS RULED: <i>&ldquo;A talent may not touch a rune, an ability, a passive or an
+engine.&rdquo;</i></b> Every node is one <code>stat</code> payload on a field the battle already reads. None grants,
+none edits an ability, and none carries a condition.</p>
+
+<p><b>BUYING IS WEARING.</b> Nothing in the tree is exclusive, so BM's equip step had nothing left to choose between,
+and it is gone: every cell a class owns is on every hero of that class, every run. <b>A TIER NEEDS BOTH GATES.</b> The
+first is the difficulty gate, BM's shape read in tiers: <code>TIERS_OPEN [0, 1, 2, 3]</code>, so rung N's end boss
+opens tier N for every class at once. The second is a new spend gate: <code>TIER_SPEND_MIN</code> cells of the tier
+below, per class. <b>3 is a candidate, and the number is the designer's.</b> At 1 the gate is decoration; at 9 a tier
+must be bought out, and a class's first tier-3 node costs thirty points.</p>
+
+<p><b>THE TWENTY-SEVEN.</b> 23 come from the brief and 4 are alternates from its own list, because four of its nodes
+were not TODAY for a tree four classes buy:</p>
+<ul>
+<li><i>Regenerate more resource</i> pays no Warrior and no Mage (Evocation assigns over the field at the spawn).</li>
+<li><i>Debuffs on you expire sooner</i> has no field that spares buffs.</li>
+<li><i>A Perfect pays</i> paid Mana only.</li>
+<li><i>Elusive while you carry an affliction</i> has no field; the one nearby pays when a hero afflicts.</li>
+</ul>
+<p><b>18 magnitudes are TAKEN from a surviving precedent, 4 come from a live node outside FW's 43, and 5 are
+PROPOSED</b> against a named reference. None came from a dead node. No two nodes write one field, and the one node on
+a per-currency field writes both currencies: <i>Pay a Lethal Hit out of Your Resource Pool</i> carries Last Rites for
+Rage and Conversion for Mana.</p>
+
+<p><b>THE FOLD: TWELVE SPEC PURSES BECOME FOUR CLASS PURSES BY MAX, ONCE (RULED BY THE DESIGNER).</b>
+<code>Profile</code> is v3 and its floor moved to 2. A purse that cannot be placed, or a file this build cannot read,
+is REFUSED and left untouched. The fold was driven live on a copy of the designer's save before anything wrote it:
+Warrior 68, Mage 65, Cleric 66, Hunter 68, where a sum would have given 188 each. <b>Every class can buy the whole
+tree the day this lands</b>, so that save cannot feel the spend gate. All four save files were backed up and
+hash-verified first.</p>
+
+<p><b>WHAT READ THE TREES.</b> Twenty-two symbols were deleted, and <code>LANE_TREES</code> alone was read by 32
+files. The reconnaissance battery ran every gate unmodified against the new tree: 28 suites, 7 gates and the run
+harness could not parse, and 10 suites and 4 gates were red. <b>51 targets were repaired to the new tree's
+intent: 25,636 checks became 20,638.</b> Each of the 1,864 deleted checks asked about the deleted trees themselves: a
+node's row, lane, name, tooltip or capstone flag. Each is recorded at its site. No mechanic check was deleted,
+because every payload a suite used to learn is carried inline and still lands through the real spawn. <b>The runes
+read no
+node</b>: none carries a condition, none names a node id, and <code>has_node(</code> is in <code>talents.gd</code>
+alone.</p>
+
+<p><b>A NEW GATE, <code>check_fx</code> (494 checks)</b>, asserts the shape, both gates, the class ledger, the fold,
+and every node paying live on every class. Its ten negative controls were each read by their FAIL text.</p>
+
+<p><b>FIVE PLAYER-FACING TEXTS PROMISED A DELETED NODE'S EFFECT, AND THE CLAUSE WAS CUT FROM EACH:</b> Answering
+Steel, Savage Sweep, Fault Line, the Devout's Conviction passive and Shieldwall's block. <b>The combat log now names
+the node of the one tree that fired</b> (Parry More, Refuse Death Once, and so on); the status chips keep their own
+names. <b>One retired rune's reason and one rune floor rested on deleted nodes</b>: the Wide Watch's retirement, and
+Deepening Hex's floor. Both are queued for the designer, and <code>check_fo</code> carries the state each left.</p>
+
+<p><b>AND THE RECONNAISSANCE BATTERY WROTE THE DESIGNER'S PROFILE.</b> Two scene gates had re-saved it on every
+battery, byte-identically, for many batches. Every md5 freeze was blind to it until FX's fold made the same write
+destructive. The profile was restored from the verified backup, and both gates now write a scratch file.</p>
+
+<p><b>MOST OF THE OLD TREES' FIELDS ARE DORMANT, NOT DELETED.</b> 275 of the 304 fields the twelve trees wrote have no
+writer now, and every read site stands for the next tree, rune or card.</p>
+
 <h2>2026-09-10 &mdash; Batch FW: WHAT THE MERGED TALENT LAYER CAN REACH</h2>
 <p><b>REPORT ONLY, AND THE FOURTH BATCH ON <code>class-merge</code>. NOTHING WAS AUTHORED, BUILT, MERGED OR CHANGED</b>
 &mdash; no node proposed, no system extended, no constant or magnitude moved, and no gate, baseline row, manifest entry

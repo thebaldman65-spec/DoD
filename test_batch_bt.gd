@@ -368,27 +368,37 @@ func _names() -> void:
 			seen[n] = true
 	ok(dupes.is_empty(),
 		"no ability name is used twice across the whole draft (%s)" % str(dupes))
-	# THE ONE COLLISION THIS BATCH SHIPS, PINNED BY NAME SO IT CANNOT BE
-	# "DISCOVERED" AGAIN: KILLING FROST is also a Cryomancer talent NODE
-	# (`cr_freezing`, Thaw row 2). SAME SPEC — a Cryomancer holding the node can
+	# THE ONE COLLISION THIS BATCH SHIPPED, PINNED BY NAME SO IT COULD NOT BE
+	# "DISCOVERED" AGAIN: KILLING FROST was also a Cryomancer talent NODE
+	# (`cr_freezing`, Thaw row 2). SAME SPEC — a Cryomancer holding the node could
 	# draft the card — what BR called the Iron Will shape (BATCH CK §2 resolved
 	# THAT one by renaming the card to Ironclad) rather than BP's Precision
-	# Strike. It is a LABEL collision only, and these two checks are what say
-	# so: the node's counter and the card's handler share no field.
-	# `LANE_TREES[spec]` is a FLAT ARRAY of node dicts, not a dict of lanes —
-	# indexing it by lane throws, and a throw ABORTS THIS WHOLE FUNCTION while
-	# the suite still prints "0 failures" (the BC trap). Caught here by the
-	# count, which is exactly what that trap is caught by.
+	# Strike. It was a LABEL collision only: the node's counter and the card's
+	# handler shared no field.
+	#
+	# **BATCH FX RESOLVED IT BY DELETION, SO THE PIN INVERTS — test_batch_br's
+	# CK §2 shape.** FX deleted the twelve spec trees and `cr_freezing` with the
+	# Cryomancer's; a Cryomancer now wears the ONE tree (`Talents.TREE`, handed
+	# out by `generate_tree`), and no node of it is called Killing Frost. The
+	# question is unchanged — does this card share its name with a talent node a
+	# Cryomancer can hold? — and its answer moved to NO. A node that takes the
+	# name back re-opens BT's same-spec collision and reds here. The size term
+	# is what stops the absence passing on an empty tree.
+	#
+	# DG §2 — TWO CHECKS REMOVED HERE BY BATCH FX, AND THEIR SUBJECT IS GONE.
+	# They asserted the colliding node's id (`cr_freezing`) and that its counter
+	# was a stat field (`killing_frost`) — the two facts that made the collision
+	# a LABEL one. No tree holds a colliding node any more, so neither has
+	# anything to read. The CARD half they were weighed against is still
+	# asserted on the next line but one.
+	var cryo_tree: Array = Talents.generate_tree("cryomancer",
+		Classes.class_of_spec("cryomancer"))
 	var node_named := false
-	for node in Talents.LANE_TREES["cryomancer"]:
+	for node in cryo_tree:
 		if String(node.get("name", "")) == "Killing Frost":
 			node_named = true
-			ok(String(node["id"]) == "cr_freezing",
-				"the colliding node is cr_freezing")
-			ok(node["payload"]["stat"].has("killing_frost"),
-				"...and its counter is `killing_frost`, a stat field")
-	ok(node_named,
-		"KILLING FROST collides with a live Cryomancer node — reported, not resolved")
+	ok(not cryo_tree.is_empty() and not node_named,
+		"KILLING FROST collides with NO node of the one tree a Cryomancer wears (%d nodes read) — FX deleted cr_freezing with his tree" % cryo_tree.size())
 	ok(Classes.draft_ability("Killing Frost").special == "killing_frost",
 		"...and the CARD's half is a `special`, which nothing resolves as a name")
 	# Hoarfrost Armor's adjacency: the modifier is `hoarfrost` and the STATUS

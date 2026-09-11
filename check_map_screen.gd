@@ -23,6 +23,15 @@ func _ready() -> void:
 		Run.party[i]["spec"] = ["berserker", "cryomancer", "inquisitor",
 			"beastmaster"][i]
 	Run.specs_chosen = true
+	# BATCH FX — A SCRATCH PROFILE, NEVER THE PLAYER'S. This line wrote the real
+	# `user://profile.json` on every battery since it was added: the flag was
+	# already set, so each write was byte-identical and every md5 freeze read it
+	# as untouched. The day the profile format moved (FX's v2 -> v3 fold) the
+	# same call wrote the fold over the designer's file. The flag goes on a
+	# scratch file now, which is also where the map screen reads it back.
+	Profile.save_path = "user://check_map_screen_profile.json"
+	Profile.loaded = false
+	Profile.data = {}
 	Profile.set_flag("run_framing_seen")   # skip the orientation card
 
 
@@ -169,6 +178,7 @@ func _process(_d: float) -> void:
 				print("check_map_screen: TAG MISMATCH — the loadout panel's ES census did not draw or did not move on a swap")
 			else:
 				print("check_map_screen: TAG MISMATCH — the draft card drew no tag line")
+			_drop_scratch_profile()
 			get_tree().quit(0 if _ek_tags_ok else 1)
 	stage += 1
 
@@ -243,3 +253,13 @@ func _tally(n: Node) -> Dictionary:
 		out["btn"] += int(sub["btn"])
 		out["line"] += int(sub["line"])
 	return out
+
+
+# BATCH FX — the scratch profile goes, and the path goes back to the player's,
+# so nothing that runs after this gate in one process inherits the redirect.
+func _drop_scratch_profile() -> void:
+	if FileAccess.file_exists(Profile.save_path) and Profile.save_path != "user://profile.json":
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Profile.save_path))
+	Profile.save_path = "user://profile.json"
+	Profile.loaded = false
+	Profile.data = {}

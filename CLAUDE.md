@@ -644,7 +644,7 @@ copy with `const ITEM_PRICES := preload("res://scripts/shop_screen.gd").ITEM_PRI
   `GATE 3 PASS`. The only tells were `throws=3` beside them and **GATE 2 reporting 57 checks against
   its documented 165** — it ran barely a third of itself and said PASS. **This is exactly why the
   battery reports the throw count beside the check count** (CD's rule), and exactly why the live
-  counts 22/166/8 are written into `run_battery.sh`'s own header. **Read both. A gate that passes
+  counts 22/382/8 are written into `run_battery.sh`'s own header. **Read both. A gate that passes
   with throws is not a gate that passed.**
 - **THE FIX IS RUNTIME, NOT COMPILE TIME:** `ITEM_PRICES` and `SELL_FRACTION` now live in
   `run_state.gd` beside `ITEM_INFO` and the stack caps — §6's "single place these numbers are
@@ -1335,11 +1335,12 @@ as a live decision.
   and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
 - `scripts/classes.gd`: hero configs, core kits, spec info/abilities, passives.
-- `scripts/talents.gd`: 12 fixed trees, each 3 lanes x 7 exclusive ROWS + a
-  capstone row (Batch AI). {id: ranks} learned dicts (ranks always 1 now).
-  `apply_payload` shared with shop runes, and the ONE read site for a
-  payload's `condition`. Owns `ability_names` (Run.owned_ability_names
-  forwards to it — autoloads don't resolve inside a class_name script).
+- `scripts/talents.gd`: ONE tree of 27 nodes in three tiers of nine, bought
+  per CLASS (Batch FX — the twelve spec trees are deleted). {id: ranks}
+  learned dicts (ranks always 1). `apply_payload` shared with shop runes, and
+  the ONE read site for a payload's `condition`. Owns `ability_names`
+  (Run.owned_ability_names forwards to it — autoloads don't resolve inside a
+  class_name script).
 - `scripts/relics.gd`: permanent unlocks (user://relics.json), 1 per boss kill.
 - `scripts/battle.gd`: the big one — initiative timeline, Pressure/Break,
   skill checks, statuses, AoE/random-hits, damage types + resists, items,
@@ -1352,30 +1353,34 @@ as a live decision.
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## STANDING RULES — TALENTS ARE META PROGRESSION (Batch BM)
-**BUYING A CELL UNLOCKS AN OPTION. IT DOES NOT EQUIP IT.** This is the load-bearing rule of the
-whole talent system and it is the one a later batch would most easily collapse. A CELL is a
-(spec, node) pair bought ONCE, permanently, out of that spec's banked points on `Profile`.
-EQUIPPING is a separate act and it is what a run reads: **you still pick ONE node per row, and
-it locks for the run.** Owning all three cells in a row makes that row a real three-way
-argument; owning one leaves no argument in it. **THAT IS WHY TWENTY BATCHES OF ROW PRICING
-DESCRIBE THE ENDGAME RATHER THAN NEEDING A THIRD PASS** — a row is still priced against two
-closed doors. Collapsing the two into one click turns every tree into a checklist and throws
-AJ-through-BA away. `Talents.can_buy` and `Talents.can_equip` are separate questions on purpose;
-test_batch_bm's negative control 1 builds the collapse and proves it is rejected.
-· **EARNING** — 1 point per spec per ZONE BOSS defeated (3 a completed run; a zone-2 wipe still
-  banks 1 or 2, and that partial credit is the mechanism, not a rule). Only specs that PLAYED
-  earn. Points are PER SPEC and never transfer; banking is uncapped. **NOTHING IN A RUN AWARDS
-  ONE** and the END BOSS awards none either — it awards a relic and opens rows.
-· **SPENDING** — cells cost by TIER: rows 1-3 cost 1, rows 4-6 cost 2, rows 7-9 cost 3.
-  **27 cells = 54 points a spec = 18 completions.** `Talents.tier_of_row` / `cell_cost` /
-  `rows_unlocked` are the ONE place any of it is decided.
+**A CELL BOUGHT IS A CELL WORN (Batch FX).** BM's load-bearing rule was that buying a cell
+unlocks an OPTION and equipping it is a separate act — you picked ONE node per row and it locked
+for the run, so owning all three cells of a row made that row a real three-way argument. **FX
+RETIRED IT WITH ITS PREMISE**: the one class tree has no rows and no node in it is exclusive
+(ruled by the designer), so there is nothing left to choose between, and an equip step would be
+a click that can only ever say yes. **Every cell a class owns is on every hero of that class,
+every run.** Do not re-add an equip step without a constraint for it to choose against — that is
+a new design, not a restoration. `Talents.can_buy` and `Talents.can_refund` are the two
+questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are deleted.
+· **EARNING** — 1 point per CLASS per ZONE BOSS defeated (3 a completed run; a zone-2 wipe still
+  banks 1 or 2, and that partial credit is the mechanism, not a rule). Only classes that PLAYED
+  earn. Points are PER CLASS and never transfer; banking is uncapped. **NOTHING IN A RUN AWARDS
+  ONE** and the END BOSS awards none either — it awards a relic and opens a tier.
+· **SPENDING** — a cell costs its TIER: 1, 2 or 3. **27 cells = 54 points a class = 18
+  completions.** `Talents.cell_cost`, `tiers_open` and `spend_gate_met` are the ONE place any of
+  it is decided.
 · **RESPEC** — free, any time OUTSIDE a run, NEVER during one. The build screen's `_locked()`
-  is the gate and every mutator re-checks it.
-· **ROW GATING IS GLOBAL** — rows 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3, for EVERY SPEC AT
-  ONCE. Points are per spec; rows are not. A tier arrives FULLY unlocked, which is what an
-  uncapped bank is for. A fresh save has NO rows, NO points and no talents at all.
-· **VERSIONS** — `Profile` is **v2** (tolerant load: a v1 profile arrives at tier 0 with zero
-  points, the correct state). The run save is **v12** and **a pre-v10 save is REFUSED and
+  is the gate and every mutator re-checks it. A single refund that would strand the tier above
+  it is refused (`Talents.can_refund`); the respec clears every tier at once.
+· **A TIER HAS TWO GATES AND NEEDS BOTH (FX).** The DIFFICULTY gate is GLOBAL — tier 1 at
+  difficulty 1, 2 at 2, 3 at 3, for EVERY CLASS AT ONCE (`Talents.TIERS_OPEN`, BM's `[0, 3, 6, 9]`
+  read in tiers). The SPEND gate is per class: `TIER_SPEND_MIN` cells owned in the tier below open
+  the next. **THE SPEND MINIMUM IS THE DESIGNER'S TO SET AND 3 IS A CANDIDATE** — `docs/reports/FX.md`
+  §1 prices both ends of its 1-9 range. A fresh save has NO tiers, NO points and no talents.
+· **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
+  by a one-step migration** that folds its twelve spec purses into four. **Its floor,
+  `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
+  is REFUSED rather than silently zeroed. The run save is **v12** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
   **v11 (CT) and v12 (EG) ARE BOTH TOLERANT AND NEITHER MOVED THE REFUSAL THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
@@ -1384,15 +1389,76 @@ test_batch_bm's negative control 1 builds the collapse and proves it is rejected
   `Run.award_spec_point`, `member["talent_points"]`, `member["talent_flex"]`,
   `Talents.can_learn`, `Talents.purse_for`, `Talents.points_spent`, `MAX_PER_ROW`, the events
   verb `talent_points` and both relics' `start_talent_points` hook. **`Run.tally` never had a
-  talent counter** — checked, not assumed; the brief expected one.
+  talent counter** — checked, not assumed; the brief expected one. **AND AT FX:** `LANE_TREES`
+  (the twelve trees and their 324 nodes), `LANE_NAMES`, `TIER_ROWS`, `ROWS`, `CAPSTONE_ROW`,
+  `LANES`, `CELLS_PER_SPEC`, the row functions, `can_equip`, `equipped_learned`,
+  `Profile.talent_equipped` / `equip_cell` / `unequip_row` / `equipped_talents`, and the lane
+  build `DOD_SIM_BUILDS` drove (`RunSim.builds`, `_target_lane`, `rows_built`). **The variable
+  itself is still read, only to warn that it is retired**, so it is the one name on this list
+  that is not absent.
 · **SUPERSEDED FIGURES, NAMED AS SUPERSEDED: BK's 10.9 / 10.8 / 6.0 talent points per hero per
   run, and every "nodes owned entering a boss" reading before BM.** They measured a per-run
-  purse that does not exist. Never compare a post-BM number against them.
+  purse that does not exist. Never compare a post-BM number against them. **AND EVERY SIM FIGURE
+  TAKEN FULLY TALENTED BEFORE FX MEASURED A PARTY WEARING ONE LANE OF EACH SPEC TREE; A
+  FULL-DEPTH SIM AFTER FX WEARS ALL TWENTY-SEVEN NODES OF THE ONE TREE.** Not the same party.
 · **THE HANDOFF** is `Run.equip_spec_talents(idx)`, called from BOTH paths (the spec screen and
-  RunSim.start_run — the sync_spec_hp pattern). A real run reads `Profile.equipped_talents`; a
-  SIM reads `Run.sim_talents`, installed by `RunSim.install_builds`. **RunSim CALLS Profile
-  nowhere at all** — a sim that read the player's ledger would make every baseline depend on
-  whoever ran it.
+  RunSim.start_run — the sync_spec_hp pattern). A real run reads `Profile.worn_talents` for the
+  spec's CLASS; a SIM reads `Run.sim_talents`, installed by `RunSim.install_builds`. **RunSim
+  CALLS Profile nowhere at all** — a sim that read the player's ledger would make every baseline
+  depend on whoever ran it.
+
+## STANDING RULE — ONE TALENT TREE, KEYED TO THE CLASS (Batch FX, ruled by the designer)
+> **One tree, not four: twenty-seven nodes in three tiers of nine at 1 / 2 / 3, a 54-point tree
+> every class buys into out of its own purse. A talent may not touch a rune, an ability, a
+> passive or an engine — so every node is a stat payload on a field the battle already reads.**
+
+**THE SHAPE IS THE DESIGNER'S, AND ITS REASON TRAVELS WITH IT.** FW measured that under that line
+nothing left is class-specific — any two class trees would share at least 49 ideas by arithmetic —
+so four trees would be one list dealt four times. **The specs still exist; only the talent layer
+merged.** A Berserker wears the Warrior's cells.
+· **NO TWO NODES WRITE ONE FIELD.** A node is a second magnitude of another only by sharing its
+  field, and `check_fx` §1 asserts the tree holds none. That is the whole of BM's row-8 rule that
+  survives the lanes.
+· **A NODE MUST PAY EVERY CLASS THAT CAN BUY IT.** The tree is one population of four classes, so a
+  field read for one currency pays a whole class nothing — the project's most common shipped
+  defect, a payload that attaches and pays 1.0000. **FX swapped four of its brief's twenty-seven
+  out for exactly that** (regenerating resource paid no Warrior and no Mage; a Perfect paying Mana
+  paid no Warrior; two had no field at all). **A node on a per-currency field writes every
+  currency's field or it does not ship** — the Rage-and-Mana node is the worked example — and
+  `check_fx` §4 drives every node on all four classes.
+· **WHERE A SURVIVING NODE ALREADY SAID THE THING, ITS MAGNITUDE AND WORDING WERE TAKEN**, and the
+  comment above each node in `talents.gd` names it. A node with no precedent carries a PROPOSED
+  number and the reference it was priced against; each is the designer's to re-rule (FX §3).
+· **TWO NODES ARE PARTY-WIDE BY THEIR READ SITE** — the Last Hope and Devoutness fields stamp the
+  best holder's figure on every hero — so two holders in one party do not stack. That is the read
+  site's shape and not a defect in the node.
+· **AND THE NODES OTHER STANDING RULES NAME ARE GONE.** Rules throughout this file cite a deleted
+  node as their worked example or as a live source. Among them:
+  - BH §2's lane grid.
+  - EP §4's Bared Guard refund (`sm_def_stance`).
+  - FN's two zero-worth pairs (Avatar of Ruin, Overkill), and FO's `Overkill` label collision.
+  - ER's Loyalty thresholds and rates (Kindred, Lone Bond, None Left Behind, Absolute Devotion,
+    Ancient Pact, Wild Communion).
+  - The governor table's node terms (Steadfast Bond, Wild Rotation, Deep Focus, Conduit, Soul
+    Glut).
+  - DR §1's cooldown callers, and CZ §4's Instinctive Rotation.
+  - BR §1's Rally and Iron Will label collisions, and CK's note that the Warden talent keeps the
+    name Iron Will. The `iron_will` chip keeps the name; the node that writes the field is
+    *Mitigation per Debuff You Carry*.
+  - FO §1's floor for Deepening Hex (`RUIN_FLOOR` 3, priced as Avatar of Ruin's 5 − 2) and FO §2's
+    Wide Watch retirement (Overkill already kept Focus whole). **Both reasons went with their
+    nodes, and both are queued for a ruling** (FX report). `check_fo` §1c and §3 carry the state
+    they left.
+
+  **Read every such citation as the record of why the rule exists, not as a claim that the node
+  is live.** The node is deleted and its field is DORMANT: the read site stands and nothing writes
+  it, unless one of the twenty-seven carries the field (the comment above each node in
+  `talents.gd` names its precedent). **The rules themselves stand**, for the day a tree, a rune or
+  a card writes the field again. `docs/reports/FX.md` §9 counts the dormant fields.
+· **THE FOLD WAS MAX, NOT SUM, AND IT HAPPENS ONCE** (ruled by the designer): a merged purse takes
+  the highest of its class's three spec purses, because the tree is a third the size of the three
+  it replaced. After a profile's first save at v3 the twelve purses exist only in a backup, and
+  `main`'s v2 build refuses the v3 file — without deleting it — until the merge lands there.
 
 ## STANDING RULE — A RELIC SETS UP THE RUN; A TALENT CHANGES WHAT A SPEC DOES IN A FIGHT (Batch EN §4)
 > **Both are permanent meta-progression, and nothing in the project said what each was FOR.
@@ -1412,11 +1478,12 @@ the talent trees are **the only meta layer that reaches a turn as it resolves.**
 **THE SECOND AXIS FOLLOWS FROM WHEN EACH IS CHOSEN.** Relics are assigned at the DRAFT, **before
 specs are chosen**, so a relic *cannot* be about a spec — it is party-wide by construction rather
 than by preference. Talents are copied off `Profile` the moment a spec is confirmed and locked for
-the run, so a talent can only be about that spec.
+the run, so a talent can only be about that hero — and since FX the tree keys to the CLASS, so
+what a hero wears is what the class his spec belongs to has bought.
 
 **THE RULE FOR A FUTURE AUTHOR, AND THE TELL IS THE READ SITE:**
 - **If the effect must be read while a turn resolves, or must know which spec the hero is, it is a
-  TALENT.** It costs points, it is bought per spec, and it is gated behind a difficulty rung.
+  TALENT.** It costs points, it is bought per class, and it is gated behind a difficulty rung.
 - **If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory pays,
   what an elite drops — it is a RELIC.** It is earned automatically, it is party-wide, and adding
   one on an existing hook is **pure data**.
@@ -1433,22 +1500,14 @@ UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (
 the draft assigns relics before there are specs to assign them to.
 
 ## STANDING RULE — WHAT MAKES A ROW-8 NODE (Batch BM §2), AND BH'S FIFTEEN POINTS
-**ROW 8 IS THE NODE THAT ONLY MATTERS ONCE THE REST OF THE LANE IS BOUGHT — a payoff that reads
-the build itself rather than adding to it.** Every future node authored into row 8, and any node
-authored anywhere, must do ONE of these: **READ an accumulated quantity** the lane has spent
-rows building and pay off its DEPTH rather than its existence; **REMOVE a constraint** the lane
-has been working around all game; or **CONVERT** the lane's currency into something it could not
-previously buy. **IT MUST NOT BE A LARGER MAGNITUDE OF ANY NODE ABOVE IT.** A lane whose every
-node multiplies the same term is one node with several prices (BC diagnosed it, BH proved it).
-**THE TEST IS MECHANICAL AND IT SHIPS: test_batch_bm fails any row-8 payload that writes a stat
-field an earlier node in the SAME LANE writes.** A shared field is the signature of a re-skin.
-**AND BH'S FIFTEEN-POINT RULE IS A STANDING TEST FOR ANY NEW NODE:** under leave-one-out, no
-single node should move its lane's headline by more than about fifteen points. Read it with BH's
-three caveats (a lane that does little passes trivially; a compounding lane under-reports every
-node in it; a FLAT grid on a lane that does something is a finding, not a null result).
-**THE LANE THIS IS OWED ON AND WAS NOT RUN: Harmonic Convergence (Arcanist, Resonance row 8).**
-It reads the build rate, and AT §3 measured that build rate beats per-stack value QUADRATICALLY
-on a triangular curve. One `DOD_SIM_TALENTS` string with the id withheld is the whole harness.
+**RETIRED WITH ITS SUBJECT AT FX: THE ONE TALENT TREE HAS NO LANES AND NO ROWS.** Row 8 was the
+node that only mattered once the rest of its LANE was bought, and BH's fifteen-point
+leave-one-out read a LANE's headline; neither a lane nor a row exists any more, and Harmonic
+Convergence — the lane it was owed on — went with the twelve trees. **What survives of both is the
+property that made them rules: NO NODE MAY BE A LARGER MAGNITUDE OF ANOTHER.** A shared field is
+still the signature of a re-skin (BC diagnosed it, BH proved it), and in the one tree it is
+asserted over the whole tree rather than a lane: no two nodes write one field (`check_fx` §1). **A
+batch that authors a second node on a field the tree already writes has authored the re-skin.**
 
 ## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
 **`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
@@ -1479,21 +1538,21 @@ one node whose lineup does not come out of the budget system), so it can be lear
 **gains stats AND MECHANICS with difficulty** — `Enemies.config(kind, rung)` drops any ability
 tagged `"rung": N` below that rung, and **the end boss is the only user**; every other kind reads
 identically at every rung. It awards a relic ALWAYS, no ability pick, no talent points, and
-**`Profile.note_end_boss(rung)` is what opens the meta tree's row tiers.** ZONE BOSSES — the
+**`Profile.note_end_boss(rung)` is what opens the talent tree's tiers.** ZONE BOSSES — the
 third included, which used to BE the end boss — now pay a point, a relic and an ability pick and
 open what follows them.
 
 ### THE STARTER RUNG IS A META-PROGRESSION GATE AND MAY NOT BE REMOVED AS A BALANCE CHANGE (STANDING, EN §3)
-> **Rung 1 is not the easy difficulty. It is the only door into the talent trees, and a fresh
+> **Rung 1 is not the easy difficulty. It is the only door into the talent tree, and a fresh
 > profile has to walk through it with nothing.**
 
 **EN WAS ASKED TO REMOVE IT AND STOPPED, WHICH IS WHAT ITS OWN BRIEF INSTRUCTED ON FINDING A GATE.**
 The chain is four links and every one of them is in the code:
 `battle._resolve_boss` → `Profile.note_end_boss(Run.difficulty_rung())` → `talent_tier = rung` →
-`Talents.rows_unlocked(tier)` off **`TIER_ROWS [0, 3, 6, 9]`**. **TIER 0 OPENS NO ROWS AT ALL**, and
-`Talents.can_buy` refuses every locked cell with *"Locked: beat the end boss on difficulty N"*. So
-**clearing rung 1 is the only thing in the game that opens rows 1-3 of all twelve trees**, and it
-opens them for every spec at once.
+`Talents.tiers_open(tier)` off **`TIERS_OPEN [0, 1, 2, 3]`** (BM's `[0, 3, 6, 9]`, read in tiers since
+FX). **TIER 0 OPENS NOTHING AT ALL**, and `Talents.can_buy` refuses every locked cell with *"Locked:
+beat the end boss on difficulty N"*. So **clearing rung 1 is the only thing in the game that opens
+tier 1 of the talent tree**, and it opens it for every class at once.
 - **THE MEASUREMENT THAT DECIDES IT, TAKEN AT EN ON THE LIVE TREE** (`DOD_SIM_ROWS=0`, `--run 30` a
   rung — BN's own instrument, re-run): **untalented completion is 97% at rung 1, 3% at rung 2 and
   0% at rung 3.** Removing rung 1 moves the first meta unlock from a one-attempt clear to roughly
@@ -1507,7 +1566,7 @@ opens them for every spec at once.
   (`battle.gd` `_resolve_boss`, both halves), so the relic ladder is difficulty-independent and
   would survive a removal. **The talent ladder would not.**
 - **AND A REMOVAL RENUMBERS.** `def["rung"]` IS the talent tier index — `draft_screen` advertises
-  each rung's unlock as `rows_unlocked(rung - 1) + 1 .. rows_unlocked(rung)`, `enemies.json` tags
+  each rung's unlock as `tiers_open(rung)`, `enemies.json` tags
   two end-boss abilities `"rung": 2` and `"rung": 3`, and `Enemies.config(kind, rung)` drops
   anything above the rung played. **Re-homing an unlock is a design decision and it is not a
   batch's to take.** `run_state.gd` already refuses a pre-v10 save; **do not invent a second
@@ -1725,7 +1784,7 @@ Half of these were documented only in changelog entries; this is the record. Not
 and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run summary's "not a
 clean data point" line. Sims can never reach the UI surfaces (`_debug_allowed()` excludes
 sim/autoplay/sim_run).
-· MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | +200 Talent Points (all) |
+· MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | 60 Talent Points to every class, every tier open |
   Full Heal Party | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Spec
   Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle (spec-scoped, AU §5;
   also armable headlessly via `DOD_SIM_GRANT_ALL=1`) | Free Travel check =
@@ -1742,7 +1801,8 @@ sim/autoplay/sim_run).
   (force-learn ids), `DOD_SIM_ABILITIES` (append pending/pool abilities by name),
   `DOD_SIM_GRANT_ALL`, `DOD_SIM_ROTATE` (all twelve specs), `DOD_SIM_ROUTE`
   (greedy|default|cautious|elites — one walk since AN), `DOD_SIM_SHOPS`/`DOD_SIM_ITEMS`
-  (economy policies, def on), `DOD_SIM_BUILDS` (def each tree's FIRST lane — the BG confound),
+  (economy policies, def on), `DOD_SIM_TIERS` (tiers of the one class tree the build wears, def 3
+  — FX; `DOD_SIM_ROWS` still reads as rows/3, and `DOD_SIM_BUILDS` is RETIRED with the lanes and warns if set),
   `DOD_SIM_TROPHIES`, `DOD_SIM_RELICS`, `DOD_SIM_RUNES` (full|stats|off, def full),
   `DOD_SIM_RUNE_ECON=rich` / `DOD_SIM_RUNE_POWER=<mult>` (AD experiment arms, double-gated on
   Run.sim_run), `DOD_SIM_DIFFICULTY` (wanderer|warden|ruin = rungs 1-3 at x0.50 / x1.00 /
@@ -1873,6 +1933,14 @@ cards drafted with no damage figure at all.
   rejects. They were not wrong before; they were invisible.** CL cleans them up.
 
 ## STANDING RULE — A TALENT MAY NOT GRANT AN ABILITY, NOR DEPEND ON ONE THE HERO IS NOT GUARANTEED (Batch DO, status half at DP)
+
+> **SUPERSEDED IN ITS PERMITTED LIST AT FX, BY THE DESIGNER'S LINE: A TALENT MAY NOT TOUCH A RUNE,
+> AN ABILITY, A PASSIVE OR AN ENGINE.** Of what DO permitted, the STAT and the RESOURCE survive;
+> the spec's PASSIVE, its PROTECTED CORE and the cross-row conditional do not. **The protected-core
+> ruling below — "worth 83 nodes", "DO NOT RE-OPEN" — is overturned by that line, and it went with
+> the twelve trees whose 83 nodes it priced.** The no-grant half and the status half STAND, and the
+> one tree obeys both: every node is a stat payload, none grants, none carries a condition. The
+> text below is kept as the record of what was ruled, not as a rule that binds.
 
 > **A talent may not grant an ability, and may not depend on an ability or status the hero is not
 > guaranteed to have.** Talents are chosen before the run knowing nothing; abilities come from the
@@ -2820,11 +2888,13 @@ runes the charter empties, and whether the lane rule is replaced with anything.
   was blind to 80 of its 85 sites while printing a clean zero. **A control for a sweep like this
   must be armed on a DOTTED read.**
 · **A TALENT NODE WRITING THE SAME FIELD DOES NOT BY ITSELF MAKE A RUNE TALENT-KEYED.**
-  `crit_bonus`, `speed`, `max_hp_pct`, `block_chance`, `parry_bonus`, `dmg_bonus`,
-  `dmg_taken_bonus`, `pierce_bonus` and `bleed_bonus` are the unit's own math, read in global
-  pipelines that relics also write. **They are `check_em.UNIT_MATH`, asserted as an EQUALITY**, so
-  a tenth needs a line and a reason. (`armor` is NOT among them: EJ's report said nine and listed
-  ten, and no live node writes `armor` at all.)
+  `crit_bonus`, `speed`, `max_hp_pct`, `parry_bonus`, `dmg_bonus`, `dmg_taken_bonus`,
+  `pierce_bonus` and `armor` are the unit's own math, read in global pipelines that relics also
+  write. **They are `check_em.UNIT_MATH`, asserted as an EQUALITY**, so a ninth needs a line and a
+  reason. **The table follows the tree.** `armor` is on it because More Armor writes it (and the
+  relic hook `hero_armor_add` writes the same field). `block_chance` and `bleed_bonus` are off it
+  because no node writes either. Both fields and their read sites stand, and a row comes back the
+  day a node writes its field again (FX).
 · **`rune_X` INHERITS NOTHING FROM `X`.** `Runes._typed_payload` restores an int for a field ending
   `_ranks` or listed in `STAT_INT_KEYS`, so **a `rune_` int whose name does not end `_ranks` needs
   its own row there** — and a `rune_` FLOAT must be in neither, or the coercion rounds the rune

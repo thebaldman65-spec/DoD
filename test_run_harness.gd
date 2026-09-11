@@ -136,12 +136,19 @@ func _src(path: String) -> String:
 	return f.get_as_text() if f != null else ""
 
 
-# Every point banked by every spec. A total rather than a per-spec read, so
-# "the walk banked nothing" cannot be satisfied by looking at the wrong spec.
+# Every point banked by every CLASS. A total rather than a per-class read, so
+# "the walk banked nothing" cannot be satisfied by looking at the wrong purse.
+#
+# BATCH FX — THE PURSE KEYS TO THE CLASS (Profile v3), SO THIS SUMS THE FOUR
+# CLASS PURSES. It summed the twelve SPEC keys, and under v3 no spec key holds a
+# purse: that sum reads 0 whatever was banked, so "the whole walk banked
+# NOTHING" and "a SIM banks nothing" would both have passed on a ledger they
+# never read — the zero-assertion shape this file's header exists to forbid,
+# arriving through a helper instead of through an abort.
 func _purse_total() -> int:
 	var total := 0
-	for spec in Classes.all_specs():
-		total += Profile.talent_points_earned(String(spec))
+	for cls in Classes.SPEC_IDS:
+		total += Profile.talent_points_earned(String(cls))
 	return total
 
 
@@ -282,6 +289,12 @@ func _seeded() -> void:
 #   §2 THE LOADOUT. What a run WEARS is legal: exactly one node per row, every
 #      id real, every rank 1, and nothing bought along the way. These are BM's
 #      own assertions, running for the first time.
+#      BATCH FX re-cut §2 for the one class tree: the depth is `tiers_built`
+#      (every cell of every tier the build reaches, NODES_PER_TIER a tier), and
+#      "one node per row" is re-pointed to the two tier gates — there are no
+#      rows and nothing in the tree is exclusive, so what makes a worn set
+#      legal now is that each cell's tier is open and its spend gate is met.
+#      §1's purse reads the CLASS of each spec, because the ledger keys to it.
 #
 # THE DIVERGENCE FROM THE BRIEF, STATED: Batch CA §3 offered the income rules
 # as "a starting point and not an instruction" and asked that a different
@@ -358,25 +371,41 @@ func _gate_talent_conservation() -> void:
 	# may touch the run save.
 	run.sim_run = false
 	run.bank_zone_boss_points()
+	# BATCH FX — EVERY READ BELOW ASKS THE CLASS OF THE SPEC THAT PLAYED. The
+	# question did not move — a zone boss pays the heroes who fought it — but the
+	# purse keys to the CLASS now (Profile v3), and a SPEC key reads 0 whatever
+	# was banked. SPECS is one spec of each class, so each class is paid once.
 	for spec in SPECS:
-		_check("a zone boss banks 1 to %s" % spec,
-			Profile.talent_points_earned(spec), 1)
-	_check("a spec that did not play banks 0",
-		Profile.talent_points_earned("holy"), 0)
-	_check("the party's specs each bank their own", _purse_total(), SPECS.size())
+		_check("a zone boss banks 1 to %s's class" % spec,
+			Profile.talent_points_earned(Classes.class_of_spec(spec)), 1)
+	# BATCH FX — "A SPEC THAT DID NOT PLAY BANKS 0" CANNOT BE ASKED OF A SPEC ANY
+	# MORE, because no spec holds a purse: read alone, Holy's key is 0 by
+	# construction and the check could not fail. Both halves are asked in one
+	# check instead — Holy holds nothing of her own, AND the point her CLASS holds
+	# is the one the Devout (SPECS[2]) earned — so it cannot pass on a ledger it
+	# never read. The class-level form, "a class whose hero sat out banks
+	# nothing", is the un-awakened arm below.
+	_check("a spec that did not play holds no purse; its class's point is the Devout's",
+		[Profile.talent_points_earned("holy"),
+			Profile.talent_points_earned(Classes.class_of_spec("holy"))], [0, 1])
+	_check("the party's classes each bank their own", _purse_total(), SPECS.size())
 	# A run that dies in zone 2 keeps what the zone bosses it CLEARED paid.
 	# Partial credit is the mechanism, not a rule beside it.
 	run.bank_zone_boss_points()
 	for spec in SPECS:
-		_check("a zone-2 wipe keeps 2 for %s" % spec,
-			Profile.talent_points_earned(spec), 2)
-	# An un-awakened hero has no spec and banks nothing.
+		_check("a zone-2 wipe keeps 2 for %s's class" % spec,
+			Profile.talent_points_earned(Classes.class_of_spec(spec)), 2)
+	# An un-awakened hero has no spec and banks nothing — and since FX, nothing
+	# for his CLASS either: the Warrior's hero sits this bank out, so the
+	# Warrior's purse stays at 2 while the three classes that played go to 3.
 	var held := String(run.party[0]["spec"])
 	run.party[0]["spec"] = ""
 	run.bank_zone_boss_points()
 	_check("an un-awakened hero banks nothing", Profile.talent_points_earned(""), 0)
-	_check("the awakened three still banked", Profile.talent_points_earned(SPECS[1]), 3)
-	_check("the un-awakened one did not", Profile.talent_points_earned(held), 2)
+	_check("the awakened three still banked",
+		Profile.talent_points_earned(Classes.class_of_spec(SPECS[1])), 3)
+	_check("the un-awakened one did not",
+		Profile.talent_points_earned(Classes.class_of_spec(held)), 2)
 	run.party[0]["spec"] = held
 	run.sim_run = true
 	# THE END BOSS AWARDS NONE, and that is a rule about what `_resolve_boss`
@@ -416,11 +445,18 @@ func _gate_talent_conservation() -> void:
 	for i in run.party.size():
 		run.equip_spec_talents(i)
 	_check("the sim installed a loadout", run.sim_talents.is_empty(), false)
+	# BATCH FX — THE DEPTH IS CELLS OF THE ONE TREE. `RunSim.rows_built` went with
+	# the rows; `tiers_built` is the build's depth now, and a build wears EVERY
+	# cell of every tier it reaches, so a member wears NODES_PER_TIER cells a
+	# tier (27 at the default full depth, where the one-lane build wore 9).
+	# Written off the tree's own constants rather than by re-walking
+	# `install_builds`, so the two are independent readings of one number.
+	var depth: int = Talents.NODES_PER_TIER * RunSim.tiers_built
 	for m in run.party:
 		_check("no in-run purse on the member (%s)" % m["spec"],
 			m.has("talent_points") or m.has("talent_flex"), false)
 		_check("the member wears the installed loadout (%s)" % m["spec"],
-			(m.get("talents", {}) as Dictionary).size(), RunSim.rows_built)
+			(m.get("talents", {}) as Dictionary).size(), depth)
 	for m in run.party:
 		var tree: Array = m["tree"]
 		var learned: Dictionary = m.get("talents", {})
@@ -437,18 +473,27 @@ func _gate_talent_conservation() -> void:
 		# still worth gating, and is what the loop asserts now, is that THE
 		# LOADOUT A RUN WEARS IS LEGAL: exactly one node per row, every id
 		# real, every rank 1, and nothing bought along the way.
-		var by_row := {}
+		#
+		# BATCH FX RE-POINTED THE LEGALITY QUESTION, ONE CHECK A WORN CELL AS
+		# BEFORE. "Exactly one node per row" priced BM's choice of ONE node per
+		# row; the one tree has no rows and no node in it is exclusive, so a row
+		# has no second node to refuse (every cell now reads row 0, and the old
+		# check reds on the second of them). What makes a worn set legal NOW is
+		# the two tier gates, which CLAUDE.md's BM block states: the cell's tier
+		# is one this build opened, and the tier below it holds `TIER_SPEND_MIN`
+		# worn cells.
 		for id in learned:
 			var n2 := Talents.node_in_tree(tree, String(id))
-			var r := int(n2.get("row", 0))
-			_check("row %d holds ONE equipped node (%s)" % [r, m["spec"]],
-				by_row.has(r), false)
-			by_row[r] = id
+			var ctier := Talents.tier_of(n2)
+			_check("tier %d is open to the build and its spend gate is met (%s/%s)"
+					% [ctier, m["spec"], id],
+				ctier <= RunSim.tiers_built and Talents.spend_gate_met(tree, learned, ctier),
+				true)
 		_check("no in-run purse survives (%s)" % m["spec"],
 			m.has("talent_points") or m.has("talent_flex"), false)
 		# The harness equips the same depth for every hero, so the count is
-		# exactly what DOD_SIM_ROWS asked for.
-		_check("loadout depth (%s)" % m["spec"], learned.size(), RunSim.rows_built)
+		# exactly what the build asked for, in cells (DOD_SIM_TIERS since FX).
+		_check("loadout depth (%s)" % m["spec"], learned.size(), depth)
 	# BATCH CA: "nothing was spent in a run" used to be `_check(replay_total, 0)`
 	# against a local initialised to 0 and never touched — a check that could
 	# only ever pass, which is the same gap this whole batch is about arriving
@@ -462,8 +507,16 @@ func _gate_talent_conservation() -> void:
 		_check("Talents.%s is gone" % verb, ts.contains("func %s(" % verb), false)
 	_check("MAX_PER_ROW is gone", ts.contains("MAX_PER_ROW"), false)
 	_check("the meta spend door exists", ts.contains("func can_buy("), true)
-	_check("buying and equipping are separate questions",
-		ts.contains("func can_equip("), true)
+	# BATCH FX — INVERTED, NOT DELETED. BM's rule was that buying a cell unlocks
+	# an OPTION and equipping it is a second act, and this pinned the two doors
+	# apart. FX RETIRED THE RULE WITH ITS PREMISE — nothing in the one tree is
+	# exclusive, so a cell bought is a cell worn, and CLAUDE.md's BM block
+	# records the retirement — so the check asks the new rule the same question:
+	# the equip door is GONE, and the one door from owned to worn is there. Both
+	# halves in one check, so an unreadable `talents.gd` cannot pass it on the
+	# absence alone.
+	_check("buying IS wearing — can_equip is gone and worn_learned is the one door",
+		not ts.contains("func can_equip(") and ts.contains("func worn_learned("), true)
 	_profile_restore()
 	_finish()
 

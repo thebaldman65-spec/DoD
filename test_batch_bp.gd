@@ -416,6 +416,9 @@ func _warrior_draft_flow() -> void:
 func _live_berserker() -> void:
 	# SLAUGHTERHOUSE is learned deliberately: §2 says the interaction "should
 	# hold here too", and the only way to know is to drive it.
+	# FX: its node is RETIRED with the twelve trees — `_spawn` inlines the payload
+	# it carried (slaughterhouse 50) through the spawn's own talent path; see
+	# RETIRED.
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		{"berserker": ["Blood Offering", "Gut Rip"]},
 		["raider", "raider", "archer"],
@@ -490,6 +493,9 @@ func _live_berserker() -> void:
 	# Blood Tithe pays 45 Rage per enemy bleedout and Slaughterhouse re-seeds
 	# the meter — neither can fire off a private burst written inside the
 	# ability, which is exactly the failure §2 names.
+	# FX: the payload the retired bz_feast (Blood Tithe) carried — the node is
+	# deleted, the field and its read site (`_add_bleed_with_burst`) stand. This
+	# check always set the field directly, so nothing here moved.
 	bz.hp = bz.max_hp
 	bz.blood_tithe_ranks = 1
 	bz.bloodcraze = 0
@@ -1060,13 +1066,45 @@ func _log_has(scene: Node, needle: String) -> bool:
 
 # ---------- the live harness (the BO shape) ----------
 
+# BATCH FX — THE PAYLOAD THE RETIRED NODE CARRIED. FX deleted the twelve spec
+# trees, so `bz_slaughterhouse` is in no tree a hero can buy, and a learned id
+# the member's tree does not hold applies NOTHING at the spawn — which is the
+# whole of why §2's Slaughterhouse check read 0. The field and its read site
+# (`_add_bleed_with_burst`) stand, dormant rather than deleted. The payload is
+# copied verbatim from the retired node and rides the learner's tree as a
+# fixture cell, so it reaches the unit through the SAME spawn path learning the
+# node did (`Talents.apply_from_tree`, then `BattleUnit.setup`).
+#   FX: the payload the retired bz_slaughterhouse (Slaughterhouse) carried — the
+#       node is deleted, the field and its read site stand.
+const RETIRED := {
+	"bz_slaughterhouse": {"name": "Slaughterhouse",
+		"payload": {"stat": {"slaughterhouse": 50}}},
+}
+
+
+# A learner's tree for a spawn: the one class tree, plus one fixture cell for
+# every RETIRED id in `learned`, carrying that node's payload and nothing else.
+func _tree_with_retired(spec: String, learned: Dictionary) -> Array:
+	var tree: Array = Talents.generate_tree(spec, "")
+	for id in learned:
+		if RETIRED.has(id):
+			tree.append({"id": String(id), "name": String(RETIRED[id]["name"]),
+				"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
+
+
 func _spawn(specs: Array, granted: Dictionary, lineup: Array,
 		learned := {}) -> Node:
 	# Block is zeroed too — every block in this suite has to be one Covering
 	# Guard bought.
+	var patch := {}
+	for spec in learned:
+		var at: int = specs.find(spec)
+		if at >= 0:
+			patch[at] = {"tree": _tree_with_retired(String(spec), learned[spec])}
 	return await Fixture.spawn(self, specs,
 		{"difficulty": "wanderer", "enemies": lineup, "talents_by_spec": learned,
-		"bm_by_spec": granted, "deterministic": true})
+		"bm_by_spec": granted, "deterministic": true, "patch": patch})
 
 
 func _hero(scene: Node, passive: String) -> BattleUnit:

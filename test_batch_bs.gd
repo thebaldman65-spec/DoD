@@ -21,6 +21,15 @@
 # largest, with the whole re-authored lane learned.
 #
 # §3 — EACH OF THE EIGHT NODES applies its stated effect and sits at its row.
+# **BATCH FX DELETED THE TWELVE SPEC TREES, AND THE INFERNO LANE WITH THEM.**
+# The FIELDS and every read site stand (dormant — a later tree, rune or card
+# may point at one again), so every live check below still measures its
+# effect, driving the exact payload the retired cell carried: `INFERNO` is
+# that record, and `_spawn` hands it to the Pyromancer as an inline tree
+# through the same `apply_from_tree` door. The on-paper half — ids, lane, rows,
+# names and shipped magnitudes — went with its subject (DG §2, counted at
+# `_lane_shape`), and what still has a live answer is asked of the one tree the
+# Pyromancer wears.
 # THE FIVE MOST ABLE TO SILENTLY DO NOTHING ARE BUILT SO A BROKEN
 # IMPLEMENTATION STILL FAILS, because each would otherwise pass on code that
 # does the wrong thing:
@@ -69,33 +78,36 @@ const BACKBLAST_AT_TEST := 0.40
 var checks := 0
 var fails: Array = []
 
-# The re-authored lane, transcribed once: id -> [row, name, stat field, value].
-# THE IDS ARE THE OLD ONES BY DESIGN — §3 says all eight survive and re-spec in
-# place, so a save holding a row-5 pick still resolves. This table is the
-# machine-checkable half of that promise.
+# THE RE-AUTHORED LANE, AND SINCE BATCH FX THE RECORD OF IT: id -> [name, the
+# payload the cell carried]. FX deleted the twelve spec trees, so these ids are
+# in no tree the game builds; each payload is the one the retired cell carried,
+# BYTE FOR BYTE (the deleted `pyromancer` tree as FX found it), and `_spawn`
+# hands the ones a check learns to the Pyromancer as an inline tree. The node
+# is deleted; the field and its read site stand. Emberwall is an ABILITY edit
+# (BATCH DO moved the Immolate card into the draft and re-authored the cell),
+# so it rides the `ability` arm of the same door.
 const INFERNO := {
-	"py_pyromaniac":    [1, "Ember Shroud", "ember_shroud", 8],
-	"py_invigorating":  [2, "Ashen Skin", "ashen_skin", 25],
-	"py_firebrand":     [3, "Heat Haze", "heat_haze", 20],
-	# BATCH DO: the card moved into the draft and the CELL was re-authored.
-	"py_flame_shield":  [4, "Emberwall", "", 0],
-	"py_molten":        [5, "Backblast", "backblast", 15],
-	"py_undying_flame": [6, "Kiln-Forged", "kiln_forged_at", 3],
-	"py_cauterize":     [7, "Ash Lung", "ash_lung_pct", 4],
-	"py_forge_body":    [8, "Forge Body", "forge_body_pct", 1],
+	"py_pyromaniac":    ["Ember Shroud", {"stat": {"ember_shroud": 8}}],
+	"py_invigorating":  ["Ashen Skin", {"stat": {"ashen_skin": 25, "ashen_skin_heal": 10}}],
+	"py_firebrand":     ["Heat Haze", {"stat": {"heat_haze": 20}}],
+	"py_flame_shield":  ["Emberwall", {"ability": "Flamewave", "add": {"cost": -10, "pressure": 15}}],
+	"py_molten":        ["Backblast", {"stat": {"backblast": 15}}],
+	"py_undying_flame": ["Kiln-Forged", {"stat": {"kiln_forged_at": 3}}],
+	"py_cauterize":     ["Ash Lung", {"stat": {"ash_lung_pct": 4}}],
+	"py_forge_body":    ["Forge Body", {"stat": {"forge_body_pct": 1}}],
 }
 
-# Every id of the whole tree — §6's audit asks for "every id present", and the
-# cheapest way to break a re-spec is to drop one on the way through.
-const ALL_IDS := [
-	"py_kindling", "py_accelerant", "py_arson", "py_melt", "py_ashes",
-	"py_explosive", "py_spreading", "py_sea_of_flame",
-	"py_pyromaniac", "py_invigorating", "py_firebrand", "py_flame_shield",
-	"py_molten", "py_undying_flame", "py_cauterize", "py_forge_body",
-	"py_shockwave", "py_supernova", "py_implosion", "py_focused",
-	"py_seeding", "py_rekindle", "py_warm_glow", "py_powder_keg",
-	"py_firestorm", "py_rebirth", "py_hellfire",
-]
+# FX: the payload the retired `py_seeding` (Crucible, Detonation row 5) carried
+# — `_live_ember_debt` learns it to prove the refund is the PASSIVE's. The node
+# is deleted; the field and its read site stand.
+const CRUCIBLE := {
+	"py_seeding": ["Crucible", {"stat": {"crucible": 1}}],
+}
+
+# `ALL_IDS` — the Pyromancer tree's twenty-seven ids, which `_tree_audit`
+# checked "every id present" against — WENT WITH ITS SUBJECT AT FX. That audit
+# is re-pointed at the one tree and reads its ids off `Talents.TREE`, so no
+# second copy of the tree lives in this file.
 
 
 func _initialize() -> void:
@@ -214,90 +226,97 @@ func _deletions() -> void:
 # ---------- §3: the lane, on paper ----------
 
 func _lane_shape() -> void:
-	var tree: Array = Talents.LANE_TREES.get("pyromancer", [])
-	var by_id := {}
+	# BATCH FX — THE LANE IS DELETED, AND WHAT IT WAS CHECKED FOR IS ASKED OF
+	# THE TREE THE PYROMANCER WEARS NOW: the one tree, out of `generate_tree`.
+	#
+	# DG §2 — THIRTY-NINE CHECKS REMOVED HERE, AND THEIR SUBJECT IS GONE. They
+	# read the eight re-authored Inferno cells off the Pyromancer's own tree and
+	# asked that each id survived (8), sat in the Inferno lane (8), at its row
+	# (8), under its name (8), and wrote its shipped field at its shipped
+	# magnitude (7 — Emberwall is an ability edit, so it had no field row). FX
+	# deleted the twelve spec trees: there is no Pyromancer tree, no lane, no row
+	# and no shipped cell left in the game for any of the five to read. The
+	# PAYLOADS are not lost — `INFERNO` carries each one byte for byte, and every
+	# live check below loads it through the spawn and measures what it does.
+	var tree: Array = Talents.generate_tree("pyromancer",
+		Classes.class_of_spec("pyromancer"))
+	var writers := {}
+	var tree_fields := {}
+	var field_writes := 0
 	for n in tree:
-		by_id[String(n["id"])] = n
-	for id in INFERNO:
-		var want: Array = INFERNO[id]
-		ok(by_id.has(id), "%s survives (no id was deleted)" % id)
-		if not by_id.has(id):
-			continue
-		var n: Dictionary = by_id[id]
-		ok(String(n.get("lane", "")) == "Inferno", "%s is in INFERNO" % id)
-		ok(int(n.get("row", 0)) == want[0],
-			"%s sits at row %d (got %s)" % [id, want[0], str(n.get("row", 0))])
-		ok(String(n.get("name", "")) == want[1],
-			"%s is '%s' (got '%s')" % [id, want[1], String(n.get("name", ""))])
-		if String(want[2]) != "":
-			var pay: Dictionary = n["payload"].get("stat", {})
-			ok(pay.get(want[2], null) == want[3],
-				"%s writes %s = %d (got %s)" % [id, want[2], want[3],
-					str(pay.get(want[2], null))])
-	# ROW 8 MUST NOT WRITE A FIELD AN EARLIER NODE IN THE SAME LANE WRITES —
-	# BM's mechanical test for a re-skin, checked here too because this batch
-	# re-authored every field in the lane and that is exactly when a row-8
-	# node quietly becomes a bigger row 1.
-	var row8: Dictionary = by_id.get("py_forge_body", {})
-	var row8_fields: Array = row8.get("payload", {}).get("stat", {}).keys()
-	for id in INFERNO:
-		if id == "py_forge_body":
-			continue
-		var pay: Dictionary = by_id.get(id, {}).get("payload", {}).get("stat", {})
-		for f in row8_fields:
-			ok(not pay.has(f),
-				"row 8's %s is not also written by %s" % [String(f), id])
-	# THE LANE'S SHAPE, PER BM'S RULE: rows 1-7 are DIFFERENT KINDS of
-	# protection rather than one kind at seven prices. Asserted as the count of
-	# DISTINCT stat fields the lane writes — one node that was a bigger copy of
-	# another would share one.
-	var lane_fields := {}
-	for id in INFERNO:
-		var pay: Dictionary = by_id.get(id, {}).get("payload", {}).get("stat", {})
-		for f in pay:
-			lane_fields[f] = true
-	ok(lane_fields.size() >= 8,
-		"the lane writes %d distinct fields — no node is a re-skin of another" % \
-			lane_fields.size())
+		for f in (n.get("payload", {}).get("stat", {}) as Dictionary):
+			writers[String(f)] = int(writers.get(String(f), 0)) + 1
+			tree_fields[String(f)] = true
+			field_writes += 1
+	# RE-POINTED BY FX — BM's mechanical test for a re-skin, which this section
+	# ran on ROW 8 against its seven lane-mates because this batch re-authored
+	# every field in the lane. Row 8 went with the rows; the property that made
+	# it a rule survives and is asked over the WHOLE tree (CLAUDE.md, the row-8
+	# block, "RETIRED WITH ITS SUBJECT AT FX"): no node writes a field another
+	# node writes. ONE CHECK PER NODE, naming it, so a re-skin says which node it
+	# is — which is why the count here is the tree's 27 where it was row 8's 7.
+	for n in tree:
+		var shared: Array = []
+		for f in (n.get("payload", {}).get("stat", {}) as Dictionary):
+			if int(writers[String(f)]) > 1:
+				shared.append(String(f))
+		ok(shared.is_empty(),
+			"%s writes no field another node of the tree writes (shared: %s)" % [
+				String(n["id"]), str(shared)])
+	# THE SHAPE, PER BM'S RULE, RE-POINTED BY FX: "the lane writes N distinct
+	# fields — one node that was a bigger copy of another would share one". Over
+	# the tree the count that says so is exact rather than a floor: as many
+	# distinct fields as field writes. The size term keeps it off an empty tree.
+	ok(not tree.is_empty() and tree_fields.size() == field_writes,
+		"the tree writes %d distinct fields in %d writes — no node is a re-skin of another" % [
+			tree_fields.size(), field_writes])
 	# ...and NOT ONE of them is the old passive's cost. The whole diagnosis was
 	# that seven of eight nodes read one term; this is the assertion that the
-	# re-author actually removed the shape rather than renaming it.
+	# re-author actually removed the shape rather than renaming it. RE-POINTED BY
+	# FX to the tree the Pyromancer wears: the fields are deleted from `unit.gd`
+	# (§2), so a node writing one would pay nothing and say nothing.
 	for dead in ["fire_walker", "kiln_forged", "ash_lung", "cauterise",
 			"invigorating_ranks", "heat_haze_ranks", "forge_body"]:
-		ok(not lane_fields.has(dead),
-			"no Inferno node still writes %s" % dead)
+		ok(not tree_fields.has(dead),
+			"no node of the tree a Pyromancer wears still writes %s" % dead)
 
 
 func _tree_audit() -> void:
-	var tree: Array = Talents.LANE_TREES.get("pyromancer", [])
-	# 24 NODES PLUS 3 CAPSTONES = 27 ENTRIES: 7 rows x 3 lanes, plus BM's row 8,
-	# plus the capstone shelf. §6 asks for "24 nodes, 3 capstones", which is the
-	# same count read the way the tree data is laid out.
-	ok(tree.size() == 27, "the tree holds 24 nodes + 3 capstones (got %d)" % tree.size())
+	# BATCH FX — RE-POINTED AT THE TREE THE PYROMANCER WEARS, WHICH IS THE ONE
+	# TREE. §6's audit asked for "24 nodes, 3 capstones, every id present", and
+	# the cheapest way to break a tree is still to drop an id on the way through
+	# — now through `generate_tree`, the door every spec's tree comes out of.
+	var tree: Array = Talents.generate_tree("pyromancer",
+		Classes.class_of_spec("pyromancer"))
+	# 27 NODES, THREE TIERS OF NINE (FX's shape, ruled by the designer). It was
+	# 7 rows x 3 lanes, plus BM's row 8, plus the capstone shelf — the same 27
+	# read the way the old tree was laid out.
+	ok(tree.size() == 27, "the tree holds 27 nodes — three tiers of nine (got %d)" % tree.size())
 	var ids := {}
-	var caps := 0
-	var lanes := {"Kindling": 0, "Inferno": 0, "Detonation": 0}
-	var row8 := 0
+	var tiers := {1: 0, 2: 0, 3: 0}
 	for n in tree:
 		var id := String(n["id"])
 		ok(not ids.has(id), "%s appears once" % id)
 		ids[id] = true
-		var lane := String(n.get("lane", ""))
-		ok(lanes.has(lane), "%s is in a real lane (%s)" % [id, lane])
-		if bool(n.get("capstone", false)):
-			caps += 1
-		elif int(n.get("row", 0)) == 8:
-			row8 += 1
-		elif lanes.has(lane):
-			lanes[lane] += 1
-	ok(caps == 3, "3 capstones (got %d)" % caps)
-	ok(row8 == 3, "3 row-8 nodes (got %d)" % row8)
-	for lane in lanes:
-		ok(lanes[lane] == 7, "%s holds 7 rows 1-7 (got %d)" % [lane, lanes[lane]])
-	for id in ALL_IDS:
-		ok(ids.has(id), "%s is present" % id)
-	ok(ids.size() == ALL_IDS.size(),
-		"and nothing else is (%d ids vs %d expected)" % [ids.size(), ALL_IDS.size()])
+		var tier := int(n.get("tier", 0))
+		ok(tiers.has(tier), "%s is in a real tier (%d)" % [id, tier])
+		if tiers.has(tier):
+			tiers[tier] += 1
+	# DG §2 — TWO CHECKS REMOVED HERE BY BATCH FX, AND THEIR SUBJECT IS GONE:
+	# "3 capstones" and "3 row-8 nodes". FX deleted the capstone flag and the
+	# rows with the twelve trees, and the one tree has neither, so there is
+	# nothing for either count to read. The lane counts beside them had a live
+	# equivalent — a tier holds nine where a lane held seven — and are
+	# re-pointed on the next line.
+	for tier in tiers:
+		ok(tiers[tier] == 9, "tier %d holds nine (got %d)" % [tier, tiers[tier]])
+	# EVERY ID PRESENT, AND NOTHING ELSE — re-pointed from the Pyromancer tree's
+	# own twenty-seven (`ALL_IDS`, gone with them) to the one tree's, read off
+	# `Talents.TREE` and compared with what `generate_tree` hands a Pyromancer.
+	for t in Talents.TREE:
+		ok(ids.has(String(t["id"])), "%s is present" % String(t["id"]))
+	ok(ids.size() == Talents.TREE.size(),
+		"and nothing else is (%d ids vs %d in the one tree)" % [ids.size(), Talents.TREE.size()])
 	# Exclusive references, where any survive: a node naming a partner that no
 	# longer exists is the quiet failure a re-spec invites.
 	for n in tree:
@@ -377,9 +396,28 @@ func _docs() -> void:
 		+ " does not read as the spec losing its identity")
 	ok(not master.contains("the reward caps and the cost"),
 		"§5: the old asymmetry claim is gone from master.html")
-	ok(master.contains("Ember Shroud") and master.contains("Backblast")
-		and master.contains("Heat Haze"),
-		"§5: §7's Inferno column carries the re-authored nodes")
+	# RE-POINTED BY BATCH FX. This read `contains` for three of the re-authored
+	# Inferno cells (Ember Shroud, Backblast, Heat Haze) as the proof that §7
+	# carried the lane BS rebuilt. FX deleted the twelve trees and REWROTE §7 for
+	# the one tree, so the Inferno column went with its subject — and
+	# master.html records only what is in the game now, never a retirement. The
+	# rule the pin enforced — the design document's talent section carries the
+	# talents a Pyromancer actually wears — is asked of that rewrite: §7, SLICED
+	# ON ITS OWN HEADING, names every node of the one tree. The names are read
+	# off `Talents.TREE` rather than copied here, so no second copy of the tree
+	# lives in this file, and the heading is asserted in the same breath because
+	# a missing anchor would slice nothing and pass.
+	var s7_at := master.find("<h2>7. Talents</h2>")
+	var s7 := ""
+	if s7_at >= 0:
+		var s7_end := master.find("<h2>", s7_at + 4)
+		s7 = master.substr(s7_at, (s7_end - s7_at) if s7_end > s7_at else -1)
+	var s7_missing: Array = []
+	for t in Talents.TREE:
+		if not s7.contains(String(t["name"])):
+			s7_missing.append(String(t["name"]))
+	ok(s7_at >= 0 and s7_missing.is_empty(),
+		"§5 (FX): §7 carries the one tree the Pyromancer wears — every node, by name (missing: %s)" % str(s7_missing))
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch BS — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old
@@ -446,10 +484,31 @@ func _spawn(learned: Dictionary, lineup: Array) -> Node:
 	# `no_cover` is a miss BYPASS, so a suite that arms it on everybody can never
 	# see Heat Haze work at all (BQ's Mirror Image lesson, arriving through the
 	# other door). That check reads `_miss_chance` directly instead.
+	#
+	# BATCH FX — THE CELLS THIS SUITE LEARNS ARE RETIRED, SO THEIR PAYLOADS RIDE
+	# AN INLINE TREE. `learned` still names the retired ids; each is handed to
+	# the Pyromancer as a one-cell node carrying the exact payload the deleted
+	# cell carried (`INFERNO` / `CRUCIBLE`), patched over the member's tree AFTER
+	# the fixture builds it. The battle spawn applies it through the same
+	# `Talents.apply_from_tree` -> `apply_payload` door a learned cell always
+	# went through, so the spawn-time halves — Ashen Skin's resist, the
+	# Flamewave edit, the magnitudes every "loads its magnitude" check reads —
+	# land exactly where they always did. An id this suite carries no payload
+	# for is a harness fault and fails out loud rather than spawning bare.
+	var opts := {"enemies": lineup, "talents": {1: learned.duplicate()},
+		"deterministic": true, "crit": -1.0}
+	if not learned.is_empty():
+		var inline: Array = []
+		for id in learned:
+			var rec: Array = INFERNO.get(id, CRUCIBLE.get(id, []))
+			if rec.is_empty():
+				fails.append("harness: %s is not a retired cell this suite carries a payload for" % id)
+				continue
+			inline.append({"id": String(id), "name": String(rec[0]), "tier": 1,
+				"desc": "", "payload": (rec[1] as Dictionary).duplicate(true)})
+		opts["patch"] = {1: {"tree": inline}}
 	return await Fixture.spawn(self,
-		["berserker", "pyromancer", "inquisitor", "beastmaster"],
-		{"enemies": lineup, "talents": {1: learned.duplicate()}, "deterministic": true,
-		"crit": -1.0})
+		["berserker", "pyromancer", "inquisitor", "beastmaster"], opts)
 
 
 func _py(scene: Node) -> BattleUnit:
@@ -491,12 +550,15 @@ func _live_no_bill() -> void:
 	# where the old bill was largest, with the WHOLE re-authored lane learned —
 	# because the seven nodes that used to act on the drain are exactly where a
 	# surviving fragment of it would hide.
+	# FX: the payloads the eight retired Inferno cells carried, all at once
+	# (`INFERNO`, inlined by `_spawn`) — the nodes are deleted, every field and
+	# read site they reached stands, and that is where a fragment would hide.
 	var lane := {}
 	for id in INFERNO:
 		lane[id] = 1
 	var scene := await _spawn(lane, ["raider", "raider", "raider", "raider"])
 	var py := _py(scene)
-	ok(py != null, "the Pyromancer spawned holding the whole Inferno lane")
+	ok(py != null, "the Pyromancer spawned holding every payload the retired Inferno lane carried")
 	if py == null:
 		scene.queue_free()
 		return
@@ -552,6 +614,8 @@ func _live_ember_shroud() -> void:
 	# ROW 1: flat, on from turn one, gated on ANY enemy burning. Measured as a
 	# PAIR against the same blow — unlit, then lit — because "he took damage"
 	# proves nothing on its own.
+	# FX: the payload the retired py_pyromaniac (Ember Shroud) carried — the node
+	# is deleted, the field and its read site stand. `_spawn` inlines it.
 	var scene := await _spawn({"py_pyromaniac": 1}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -578,6 +642,9 @@ func _live_ember_shroud() -> void:
 func _live_ashen_skin() -> void:
 	# ROW 2, BOTH HALVES. The resistance lands at spawn (a dict entry, so it
 	# cannot ride a payload) and the heal reads the tick HE applied.
+	# FX: the payload the retired py_invigorating (Ashen Skin) carried, both
+	# fields — the node is deleted, the fields and their read sites (the spawn
+	# resist block and the DoT tick loop) stand. `_spawn` inlines it.
 	var scene := await _spawn({"py_invigorating": 1}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -635,6 +702,9 @@ func _live_heat_haze() -> void:
 	# reasons: the harness arms `no_cover` on everybody for determinism, and
 	# `no_cover` is a BYPASS that returns 0.0 before any term is added — so a
 	# swing-based check could only ever measure zero (BQ's Mirror Image lesson).
+	# FX: the payload the retired py_firebrand (Heat Haze) carried — the node is
+	# deleted, the field and its read site in `_miss_chance` stand. `_spawn`
+	# inlines it.
 	var scene := await _spawn({"py_firebrand": 1}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -672,6 +742,9 @@ func _live_heat_haze() -> void:
 
 func _live_immolate() -> void:
 	# ROW 4. It kept its id and its ability slot and lost BOTH Overburn clauses.
+	# FX: the payload the retired py_flame_shield (Emberwall) carried — an
+	# ABILITY edit on Flamewave — inlined by `_spawn`, so the board is the one
+	# this check always stood on. The node is deleted; the `ability` arm stands.
 	var scene := await _spawn({"py_flame_shield": 1}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -681,11 +754,17 @@ func _live_immolate() -> void:
 	# grant an ability, so the card is a draft entry and the node is `Emberwall`.
 	# The rest of this check drives the `immolate` STATUS directly, which is
 	# what it was always really about, so it is unaffected.
+	# RE-POINTED BY BATCH FX: "the node" went with the twelve trees, so the
+	# question is asked of both things in the talent layer that could still
+	# hand him Immolate — the retired cell's own payload, worn above, and the
+	# ONE tree every hero wears (`Talents.granted_ability` reads it), which
+	# grants nothing at all.
 	var has_it := false
 	for ab in py.abilities:
 		if ab.display_name == "Immolate":
 			has_it = true
-	ok(not has_it, "the node no longer grants Immolate — it is drafted now (DO)")
+	ok(not has_it and Talents.granted_ability("Immolate") == null,
+		"no talent grants Immolate — not the retired cell's payload, not the one tree; it is drafted now (DO)")
 	var foe: BattleUnit = scene.get("enemies")[0]
 	py.hp = py.max_hp
 	_seeded()
@@ -712,6 +791,9 @@ func _live_backblast() -> void:
 	# ROW 5, THE EMERGENCY. Built so a hook with NO THRESHOLD and a hook with NO
 	# ONCE-PER-BATTLE FLAG both fail: driven above the line (nothing), across it
 	# (everything), and again below it (nothing more).
+	# FX: the payload the retired py_molten (Backblast) carried — the node is
+	# deleted, the field and its read site in `_backblast_check` stand. `_spawn`
+	# inlines it.
 	var scene := await _spawn({"py_molten": 1}, ["raider", "raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -770,6 +852,9 @@ func _live_kiln_forged() -> void:
 	# ROW 6, THE DEATH-REFUSAL. "He survived" is trivially true of a guard with
 	# no gate, so THE SAME LETHAL BLOW is landed at two burning enemies and at
 	# three, with nothing else different between the two.
+	# FX: the payload the retired py_undying_flame (Kiln-Forged) carried — the
+	# node is deleted, the field and its read site in `take_hit` stand, and the
+	# board hook is stamped on every unit at spawn. `_spawn` inlines it.
 	var scene := await _spawn({"py_undying_flame": 1},
 		["raider", "raider", "raider"])
 	var py := _py(scene)
@@ -811,6 +896,9 @@ func _live_kiln_forged() -> void:
 func _live_ash_lung() -> void:
 	# ROW 7, AND BOTH HALVES ARE MEASURED SEPARATELY. A node that scaled only
 	# one way would read exactly like a working node from either side alone.
+	# FX: the payload the retired py_cauterize (Ash Lung) carried — the node is
+	# deleted, the field and both of its read sites (dealt and taken) stand.
+	# `_spawn` inlines it.
 	var scene := await _spawn({"py_cauterize": 1}, ["raider", "raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -826,10 +914,12 @@ func _live_ash_lung() -> void:
 	# land the right way round. That is a check passing by luck, which is worse
 	# than a check that fails.
 	# Raised to 20 for the measurement, the gap is 20% against 60% and no roll
-	# can bridge it; the SHIPPED magnitude of 4 is asserted separately, off the
-	# payload, in `_lane_shape`. What is under test here is the SHAPE — does the
-	# term scale with the count, and is it read on BOTH sides — which is exactly
-	# what an amplified magnitude isolates.
+	# can bridge it; the magnitude of 4 the retired cell shipped is what
+	# `INFERNO` inlines, and it is asserted LOADED through the spawn two lines
+	# above (it was pinned off the tree data in `_lane_shape` until FX deleted
+	# the tree). What is under test here is the SHAPE — does the term scale with
+	# the count, and is it read on BOTH sides — which is exactly what an
+	# amplified magnitude isolates.
 	py.ash_lung_pct = 20
 	scene.call("_apply_status", foes[0], "burn", 4, 0, 6, py)
 	py.hp = py.max_hp
@@ -896,6 +986,9 @@ func _live_ash_lung() -> void:
 func _live_forge_body() -> void:
 	# ROW 8. IT READS BURN TURNS, NOT BURNING BODIES, and the two agree at one
 	# turn each — so it is measured where they DIFFER BY CONSTRUCTION.
+	# FX: the payload the retired py_forge_body (Forge Body) carried — the node
+	# is deleted, the field and its read site in `_resolve`'s strike-target
+	# block stand. `_spawn` inlines it.
 	var scene := await _spawn({"py_forge_body": 1}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -1003,6 +1096,10 @@ func _live_ember_debt() -> void:
 	# CRUCIBLE DOUBLES IT, because the refund is the PASSIVE's and Ember Debt
 	# carries no copy of it. This is the assertion that the one-door rule is
 	# real rather than coincidental.
+	# FX: the payload the retired py_seeding (Crucible) carried — the node is
+	# deleted, the field and its read site in `_overburn_refund` stand, and that
+	# read site being the PASSIVE's is the whole point of this half. `_spawn`
+	# inlines it (`CRUCIBLE`).
 	var cruc := await _spawn({"py_seeding": 1}, ["raider", "raider"])
 	var py2 := _py(cruc)
 	if py2 != null:

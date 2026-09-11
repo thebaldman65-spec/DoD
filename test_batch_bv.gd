@@ -445,33 +445,39 @@ func _names() -> void:
 			== "Mark of the Hunt",
 		"Mark of the Hunt still resolves to itself")
 	# GHOSTPACK vs GHOST PACK — THE CLOSEST COLLISION THE PROJECT HAS HAD, and
-	# it SHIPS FLAGGED per BR §1 (a node's name is not an ability name; nothing
-	# resolves it). `bm_ghost_pack` is a Beastmaster HANDLER ROW 8 node, i.e.
-	# THE SAME SPEC — a Beastmaster can hold both — and the two are one space
-	# apart AND mechanically adjacent. These checks pin what actually matters:
-	# the node is still a node, the card is still a card, and neither resolver
-	# can reach the other.
-	var node_found := false
-	for node in Talents.LANE_TREES.get("beastmaster", []):
-		if String(node.get("id", "")) == "bm_ghost_pack":
-			node_found = true
-			ok(String(node.get("name", "")) == "Ghost Pack",
-				"the NODE is still named 'Ghost Pack' (two words)")
-	ok(node_found, "the bm_ghost_pack node is still in the Beastmaster tree")
+	# it SHIPPED FLAGGED per BR §1 (a node's name is not an ability name; nothing
+	# resolves it). `bm_ghost_pack` was a Beastmaster HANDLER ROW 8 node, i.e.
+	# THE SAME SPEC — a Beastmaster could hold both — and the two were one space
+	# apart AND mechanically adjacent.
+	#
+	# **FX DELETED THE TWELVE SPEC TREES, AND THE NODE HALF OF THIS COLLISION
+	# WENT WITH THEM (DG §2 — 2 CHECKS REMOVED, recorded here at the site).** Two
+	# checks read the Beastmaster tree: that `bm_ghost_pack` was still in it, and
+	# that it was still named 'Ghost Pack' (two words). Their subject was one
+	# node of one deleted tree, and the ONE tree holds no node paying
+	# `ghost_pack` to re-point them at, so there is nothing left for either to
+	# read. **THE CARD HALF IS UNCHANGED AND STILL ASKED**: the card resolves to
+	# itself, and the two-word name resolves to no ability. The label sweep just
+	# below walks the ONE tree, so a node re-introducing a card's exact name
+	# still trips it.
 	ok(Classes.pool_ability("Ghostpack") != null
 		and Classes.pool_ability("Ghostpack").special == "ghostpack",
 		"the CARD 'Ghostpack' (one word) resolves to itself")
 	ok(Classes.pool_ability("Ghost Pack") == null,
-		"and 'Ghost Pack' resolves to NO ability — the node is not draftable")
+		"and 'Ghost Pack' resolves to NO ability — the name was the retired node's, never a card's")
 	# NO TALENT NODE ANYWHERE CARRIES ONE OF THE NINE NAMES EXACTLY. A node with
 	# an ability's name is a label collision the project ships and flags; a node
 	# with the SAME name would still not break `pool_ability`, but it is the
 	# thing BR §1 asks to be swept for, so it is swept mechanically.
-	for spec in Talents.LANE_TREES:
-		for node in Talents.LANE_TREES[spec]:
-			ok(not (String(node.get("name", "")) in NINE),
-				"talent node '%s' (%s) does not carry one of the nine names"
-					% [String(node.get("name", "")), spec])
+	# RE-POINTED AT FX TO THE ONE TREE (`Talents.TREE`). It walked the twelve
+	# spec trees, one check a node — 12 x 27 = 324 — and FX deleted them for one
+	# tree of 27 that every class buys into. The SAME question over the live
+	# population is 27 checks: nothing stopped running, the population shrank to
+	# the tree that exists.
+	for node in Talents.TREE:
+		ok(not (String(node.get("name", "")) in NINE),
+			"talent node '%s' (%s) does not carry one of the nine names"
+				% [String(node.get("name", "")), String(node.get("id", ""))])
 
 
 func _status_registry() -> void:
@@ -707,12 +713,19 @@ func _docs() -> void:
 
 # ---------- live harness ----------
 
-func _spawn(hunter_spec: String, lineup: Array, learned := {}) -> Node:
+func _spawn(hunter_spec: String, lineup: Array, learned := {}, inline_tree := []) -> Node:
 	# `_run_battle` OPENS WITH `await _wait(0.6)` ON A REAL SceneTreeTimer.
 	# `fast` scales those timers and NOTHING the battle computes.
-	return await Fixture.spawn(self, ["berserker", "arcanist", "holy", hunter_spec],
-		{"enemies": lineup, "talents": {3: learned.duplicate()}, "frames": 90, "fast": true,
-		"deterministic": true, "crit": -1.0})
+	var opts := {"enemies": lineup, "talents": {3: learned.duplicate()}, "frames": 90,
+		"fast": true, "deterministic": true, "crit": -1.0}
+	# FX: `inline_tree` stands in for the hunter's tree when a check needs a
+	# payload no live node carries (the twelve spec trees are deleted). The
+	# fixture's `patch` writes it over member 3's tree AFTER the ONE tree is
+	# generated, so the payload still reaches the unit through the real spawn
+	# read (`Talents.apply_from_tree`), not by a field set by hand.
+	if not inline_tree.is_empty():
+		opts["patch"] = {3: {"tree": inline_tree.duplicate(true)}}
+	return await Fixture.spawn(self, ["berserker", "arcanist", "holy", hunter_spec], opts)
 
 
 func _hunter(scene: Node, passive: String) -> BattleUnit:
@@ -898,6 +911,11 @@ func _live_savage_sweep() -> void:
 	if bm2 == null:
 		scene2.queue_free()
 		return
+	# FX: `the_pack` is armed by hand here, as it always was. It is the payload
+	# the retired bm_the_pack (The Pack, the Beastmaster capstone) carried; the
+	# node is deleted and nothing live writes the field now, but the field and
+	# its read sites stand, so the ordered-action rule still has a true answer
+	# on a two-beast board.
 	bm2.the_pack = 1
 	await scene2.call("_do_summon", bm2, "ursus")
 	await scene2.call("_do_summon", bm2, "canis")
@@ -958,9 +976,11 @@ func _live_ghostpack() -> void:
 	ok(bm.kinds_summoned.has("ursus"),
 		"but the summoned-this-battle ledger remembers it")
 	# THE NODE MUST BE OFF, or Ghost Pack's own beastless strike would be
-	# indistinguishable from the card's.
+	# indistinguishable from the card's. FX: the node is deleted with the
+	# Beastmaster tree; its field `ghost_pack` and the beastless-strike read site
+	# in `battle.gd` stand (dormant), so this guard still asks its live question.
 	ok(bm.ghost_pack == 0,
-		"the Ghost Pack NODE is not learned, so any strike below is the CARD's")
+		"the `ghost_pack` field is unwritten (its node went with the trees at FX), so any strike below is the CARD's")
 	await scene.call("_resolve", bm, _card("Ghostpack"), bm, "good")
 	ok(bm.has_status("ghostpack"), "the window is open")
 	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. Ghostpack's cooldown is 5, so the
@@ -1155,7 +1175,9 @@ func _live_trophy_shot() -> void:
 		scene.queue_free()
 		return
 	# OVERKILL MUST BE OFF, or its own carry keeps the meter whole and hides
-	# everything this check is looking at.
+	# everything this check is looking at. FX: the Overkill node (ss_overkill)
+	# is deleted and nothing live writes `overkill`; the field and its read
+	# sites stand, so zeroing it still guards this check.
 	ss.overkill = 0
 	var foes := _live_foes(scene)
 	# (a) A DIFFERENT ability kills: the meter clamps to 50.
@@ -1427,8 +1449,20 @@ func _live_preparation() -> void:
 	# an unaccelerated build's would. The loop plays it out honestly — cast
 	# whenever the gate allows, tick at the end of every turn, tick cooldowns as
 	# a turn does — and reports what actually happens.
+	#
+	# FX: the payload the retired sv_improvised (Improvised) carried — the node
+	# is deleted, the field and its read site stand. `{"stat": {"improvised": 2}}`
+	# is that node's payload byte for byte (Survivalist, Guerilla row 7). No node
+	# in the ONE tree writes `improvised` — the nearest, tn_free_casts, writes a
+	# DIFFERENT field (`snap_shot`) — so there is no precedent node to learn and
+	# the payload rides a ONE-NODE INLINE TREE (see `_spawn`). It is applied by
+	# the real spawn read (`Talents.apply_from_tree` -> `apply_payload`'s stat
+	# arm), which keeps the first assertion below a measurement of the field
+	# arriving rather than an echo of a value written by hand.
+	var improvised_node := {"id": "fx_inline_improvised", "name": "Improvised",
+		"tier": 1, "desc": "", "payload": {"stat": {"improvised": 2}}}
 	var scene2 := await _spawn("mystic", ["raider", "raider"],
-		{"sv_improvised": 1})
+		{"fx_inline_improvised": 1}, [improvised_node])
 	var sv2 := _hunter(scene2, "trapper")
 	if sv2 == null:
 		scene2.queue_free()
@@ -1471,7 +1505,7 @@ func _live_preparation() -> void:
 	# turn is a REAL turn and ticks the cooldown with it. Pinned as a number so a
 	# later batch that changes Preparation's cooldown sees this move.
 	ok(first_five == 3,
-		"REPORTED, NOT TUNED: a Guerilla build gets %d Preparations in its first"
+		"REPORTED, NOT TUNED: a build carrying Improvised's payload gets %d Preparations in its first"
 			% first_five
 			+ " five turns (two free, then one the shortened clock allows) —"
 			+ " §4 predicted two")

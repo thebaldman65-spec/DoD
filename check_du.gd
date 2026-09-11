@@ -3,7 +3,8 @@
 #
 #   §0  the premises this whole gate stands on, re-derived rather than inherited
 #   §1  CRIPPLE — measured on real blows, not asserted from a read site
-#   §2  CHILLED — both terms, measured, and the node magnitude read off the tree
+#   §2  CHILLED — both terms, measured, at the magnitude the retired node carried
+#       (read off the tree until BATCH FX deleted it — see `_hungering_rank`)
 #   §3  WHAT A COMPANION CAN ACTUALLY REACH, and the arm that is unreachable
 #   §4  the term that is deliberately still unread, and why it would pay nothing
 #   §5  the corpus reaches every spec's LIVE basic attack
@@ -97,15 +98,34 @@ func _foe(scene: Node) -> BattleUnit:
 	return null
 
 
-# The live rank of the node that deepens the chill malus, READ OFF THE TREE.
-# Typing 3 in here would make §2's expected ratio agree with itself instead of
-# with the game — the exact shape of a check that has stopped asking.
+# The rank of the node that deepens the chill malus.
+#
+# **IT WAS READ OFF THE TREE, AND THE REASON STILL STANDS**: typing 3 in here
+# would make §2's expected ratio agree with itself instead of with the game —
+# the exact shape of a check that has stopped asking.
+#
+# **BATCH FX DELETED THE NODE AND KEPT THE FIELD.** `cr_hungering` (Hungering
+# Cold, the Cryomancer's Winter lane) went with the twelve spec trees, and no
+# node of the one tree writes `hungering_ranks`. FX kept every field read site,
+# so the field is DORMANT rather than gone: the hero strike loop and
+# `_companion_hit` both still read it through
+# `_max_hero_rank("hungering_ranks", "rune_hungering_ranks")`, which is the read
+# site §2's node arms measure. Its only other writer is a RETIRED rune
+# (`long_winter`), on the `rune_` half and at a different magnitude, so nothing
+# live carries this number. **The number is therefore the retired node's own,
+# taken from its payload and landed through the live stat applicator** rather
+# than typed as a bare 3 — the arm still measures the FIELD at its read site, at
+# the magnitude a player last held, and a change to how a stat payload lands
+# reaches this arm too.
+# FX: the payload the retired cr_hungering (Hungering Cold) carried — the node
+# is deleted, the field and its read site stand.
+const RETIRED_HUNGERING := {"stat": {"hungering_ranks": 3}}
+
+
 func _hungering_rank() -> int:
-	for node in Talents.LANE_TREES.get("cryomancer", []):
-		if String(node.get("id", "")) == "cr_hungering":
-			return int((node.get("payload", {}).get("stat", {}) as Dictionary)
-				.get("hungering_ranks", 0))
-	return 0
+	var cfg := {}
+	Talents.apply_payload(cfg, RETIRED_HUNGERING, 1, {})
+	return int(cfg.get("hungering_ranks", 0))
 
 
 func _live(scene: Node) -> void:
@@ -181,10 +201,10 @@ func _live(scene: Node) -> void:
 		"Cripple moves a companion's damage by %.4f, want %.4f — the read at `_companion_hit` is gone or has been retuned, and an enemy debuff is paying nothing again" % [r1, CRIPPLE_MULT])
 
 	# ── §2 — CHILLED, BOTH TERMS ────────────────────────────────────────────
-	print("\n§2 — both chilled terms, measured, against the live node magnitude")
+	print("\n§2 — both chilled terms, measured, at the retired node's magnitude")
 	var hr := _hungering_rank()
 	ok(hr > 0,
-		"the node that deepens the chill malus writes rank 0 — §2's second arm would measure nothing")
+		"the retired node's payload lands `hungering_ranks` %d — §2's second arm would measure nothing" % hr)
 	# ARM A — one stack, no rank anywhere. Below the threshold and with no node
 	# behind it, the correct answer is NO CHANGE, and asserting that is what
 	# stops a batch from making the malus flat.

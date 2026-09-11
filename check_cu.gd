@@ -8,8 +8,9 @@
 # TWO PASSES, and the second is the one that found four of the six bucket-1
 # items:
 #
-#   1. DUMP every node in every tree, from the LIVE `Talents.LANE_TREES` and
-#      through `Talents.desc_for` — the same function the tooltip calls — so
+#   1. DUMP every node of the tree, from the LIVE `Talents.TREE` — the ONE tree
+#      since BATCH FX; the twelve spec trees this used to dump are deleted —
+#      and through `Talents.desc_for`, the same function the tooltip calls, so
 #      the audit reads what the player reads rather than a hand-parse of
 #      talents.gd. Set DOD_DUMP to a path to write the JSON.
 #
@@ -18,18 +19,42 @@
 #      NO amount of reading talents.gd could have shown that: the claim is in
 #      the node, the refutation is in `Ability.runs_skill_check()`. This is
 #      the brief's "if a node cannot be audited without running it, run it".
+#      Since FX the names are DERIVED from the one tree (`_named_by_tree`)
+#      rather than typed, and under the designer's line it names none.
 extends SceneTree
 
-# Every ability a talent node names, whether it grants it or modifies it.
-const NAMED := ["Guard Change", "Shieldwall", "Execute", "Immolate",
-	"Phoenix Rebirth", "Rime", "Divine Shield", "Pyroblast", "Shatter",
-	"Magi's Wrath", "Overcharge", "Rampage", "Battle Shout", "Lunge",
-	"Sacred Resolve", "Bulwark of Fortitude", "Mass Hysteria", "Mind Flay",
-	"Divine Plea", "Intercession", "Hack and Slash", "Overpower",
-	"Pommel Strike", "Resurrection", "Detonation", "Arcane Cannon",
-	"Powershot", "Hex of Ruin", "Dark Pact", "Consecrated Ground",
-	"Mocking Blow", "Crushing Blow", "War Stomp", "Interpose", "Shatterpoint",
-	"Wildstrikes", "Quick Shot"]
+# BATCH FX — `NAMED`, the hand list of the thirty-seven abilities the 324 nodes
+# of the twelve spec trees named, is DELETED: every node it was read off went
+# with the trees. Pass 2 asks the ONE tree instead, and derives the names:
+# every ability a node's payload names (an edit, a grant) plus every corpus
+# name its rendered text carries on word boundaries.
+func _named_by_tree() -> Array:
+	var corpus: Array = []
+	for ab in Classes.ability_corpus():
+		corpus.append(String(ab.display_name))
+	var named: Array = []
+	for n in Talents.tree():
+		var pay: Dictionary = n.get("payload", {})
+		for key in ["ability", "grant_ability"]:
+			if pay.has(key) and not named.has(String(pay[key])):
+				named.append(String(pay[key]))
+		var g := Talents.granted_name(pay)
+		if g != "" and not named.has(g):
+			named.append(g)
+		var text := Talents.desc_for(n, 1)
+		for nm in corpus:
+			if String(nm).length() >= 4 and _bounded(text, String(nm)) \
+					and not named.has(String(nm)):
+				named.append(String(nm))
+	return named
+
+
+func _bounded(hay: String, needle: String) -> bool:
+	var esc := ""
+	for c in needle:
+		esc += ("\\" + c) if "\\^$.|?*+()[]{}".contains(c) else c
+	var re := RegEx.create_from_string("(?<![A-Za-z])" + esc + "(?![A-Za-z])")
+	return re != null and re.search(hay) != null
 
 
 func _find(n: String):
@@ -56,19 +81,20 @@ func _find(n: String):
 
 func _initialize() -> void:
 	var out := []
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			out.append({
-				"spec": spec, "id": n.get("id", ""), "name": n.get("name", ""),
-				"lane": n.get("lane", ""), "row": n.get("row", 0),
-				"desc_raw": n.get("desc", ""),
-				"desc_rendered": Talents.desc_for(n, 1),
-				"scale": n.get("scale", {}), "payload": n.get("payload", {}),
-				"granted": Talents.granted_name(n.get("payload", {})),
-				"collision": Talents.collision_kind(n.get("payload", {})),
-			})
-	print("NODES: %d (expected %d = 12 specs x %d cells)" % [out.size(),
-		12 * Talents.CELLS_PER_SPEC, Talents.CELLS_PER_SPEC])
+	# BATCH FX — the ONE tree. A node carries a TIER where it carried a spec, a
+	# lane and a row, so those three keys left the dump with the twelve trees.
+	for n in Talents.tree():
+		out.append({
+			"id": n.get("id", ""), "name": n.get("name", ""),
+			"tier": n.get("tier", 0),
+			"desc_raw": n.get("desc", ""),
+			"desc_rendered": Talents.desc_for(n, 1),
+			"scale": n.get("scale", {}), "payload": n.get("payload", {}),
+			"granted": Talents.granted_name(n.get("payload", {})),
+			"collision": Talents.collision_kind(n.get("payload", {})),
+		})
+	print("NODES: %d (expected %d = %d tiers x %d nodes)" % [out.size(),
+		Talents.TIERS * Talents.NODES_PER_TIER, Talents.TIERS, Talents.NODES_PER_TIER])
 	var dump := OS.get_environment("DOD_DUMP")
 	if dump != "":
 		var f := FileAccess.open(dump, FileAccess.WRITE)
@@ -78,7 +104,9 @@ func _initialize() -> void:
 			print("DUMPED to ", dump)
 
 	print("\nSKILL-CHECK BARS (bar=false means a node's \"Perfect:\" clause is dead):")
-	for n in NAMED:
+	var named := _named_by_tree()
+	print("  the tree names %d abilities, in its payloads and its text" % named.size())
+	for n in named:
 		var ab = _find(n)
 		if ab == null:
 			print("  %-22s <not found>" % n)

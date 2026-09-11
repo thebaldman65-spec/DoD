@@ -16,7 +16,8 @@
 #                               DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off (both
 #                               on by default: heal-first shopping with a
 #                               40g reserve, drink a Health Potion under
-#                               35% HP) / DOD_SIM_BUILDS / DOD_SIM_TROPHIES /
+#                               35% HP) / DOD_SIM_TIERS (FX; DOD_SIM_BUILDS is
+#                               retired with the lanes) / DOD_SIM_TROPHIES /
 #                               DOD_SIM_RELICS.
 # Batch BK: a run is a GENERATED BRANCHING MAP again (3 zones x 16 slots,
 #   3 rows wide, 48 encounters), so DOD_SIM_ROUTE is a real axis for the

@@ -6,6 +6,11 @@
 #   1. SHAPE — every tree is 3 lanes x 7 rows + a capstone row, one node per
 #      lane per row, single rank, no leftover tier/exclusive_with. The four
 #      class batches re-author all 252 nodes; this is the mould they pour into.
+#      BATCH FX RE-POINTED IT TO THE ONE TREE: the twelve spec trees are
+#      deleted, so the mould is asked of `Talents.TREE` — 27 nodes in three
+#      tiers of nine, single rank, flat within a tier (no lane, no row, no
+#      capstone), nothing exclusive, no per-node gate — and every spec is
+#      asserted to be dealt exactly that tree.
 #   2. GATING — row 1 open, row N needs row N-1, capstones need 7/7 and take
 #      one, any lane.
 #   3. THE ELITE CRACK (§6) — a second node in a picked row costs a FLEX
@@ -61,59 +66,92 @@ func _go() -> void:
 # ---------- 1. shape ----------
 
 func _shape() -> void:
+	# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE, AND THE COUNT FELL WITH
+	# ITS POPULATION, NOT WITH ITS QUESTIONS. It walked twelve trees of 27 — 324
+	# nodes in 108 rows — and asked six things of every node, two of every row
+	# and two of every tree. FX deleted the twelve trees (`LANE_TREES`,
+	# `row_nodes`, `CAPSTONE_ROW` went with them); what every spec is dealt now
+	# is ONE tree of 27 nodes in three tiers of nine. So the per-SPEC questions
+	# are still asked per spec — its size, and which tree it is — and the
+	# per-ROW and per-NODE questions are asked of the one tree's three tiers and
+	# 27 nodes, ONCE. Twelve walks of one list would be twelve lines saying one
+	# thing (test_batch_au's own argument against 324 lines that move together).
+	# The row's questions become the tier's: a tier holds nine where a row held
+	# three, and "one node per lane" becomes "no lane at all" — FX's tree is
+	# FLAT within a tier (no lanes, no rows, no graph, no per-node prerequisite).
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			var tree: Array = Talents.generate_tree(spec, key)
-			# BATCH BM: 8 lane rows + the capstone shelf at row 9.
-			ok(tree.size() == 27, "%s: %d nodes, want 27 (8 rows x 3 + 3 capstones)" % [
+			ok(tree.size() == 27, "%s: %d nodes, want 27 (three tiers of nine)" % [
 				spec, tree.size()])
-			var seen_rows := {}
-			for row in range(1, Talents.CAPSTONE_ROW + 1):
-				var nodes: Array = Talents.row_nodes(tree, row)
-				ok(nodes.size() == 3, "%s row %d holds %d nodes, want 3" % [
-					spec, row, nodes.size()])
-				var lanes := {}
-				for t in nodes:
-					seen_rows[String(t["id"])] = true
-					lanes[String(t.get("lane", ""))] = true
-					ok(int(t["ranks"]) == 1, "%s/%s: ranks %d, want 1" % [
-						spec, t["id"], int(t["ranks"])])
-					ok(not t.has("tier"),
-						"%s/%s still carries the retired 'tier'" % [spec, t["id"]])
-					ok(not t.has("exclusive_with"),
-						"%s/%s still carries the retired 'exclusive_with'" % [spec, t["id"]])
-					ok(not t.has("node_gated"),
-						"%s/%s still carries the retired 'node_gated'" % [spec, t["id"]])
-					ok(t.has("desc") and String(t["desc"]) != "",
-						"%s/%s has no desc" % [spec, t["id"]])
-					# capstone flag and row 8 must agree, or the shelf layout
-					# and the gate disagree about what a capstone is.
-					ok((row == Talents.CAPSTONE_ROW) == bool(t.get("capstone", false)),
-						"%s/%s: capstone flag disagrees with row %d" % [spec, t["id"], row])
-				ok(lanes.size() == 3,
-					"%s row %d spans %d lanes, want 3 (one per lane)" % [
-						spec, row, lanes.size()])
-			ok(seen_rows.size() == 27,
-				"%s: %d nodes carry a row 1-9 — some node is off the grid" % [
-					spec, seen_rows.size()])
+			# The per-spec half of "no node is off the grid": the tree this spec
+			# is dealt IS the one tree whose grid the walk below places, node for
+			# node — so a spec dealt a tree of its own again trips here first.
+			ok(tree == Talents.TREE,
+				"%s is dealt THE one tree, not a tree of its own" % spec)
+	var seen := {}
+	for tier in range(1, Talents.TIERS + 1):
+		var nodes: Array = Talents.tier_nodes(Talents.TREE, tier)
+		ok(nodes.size() == 9, "tier %d holds %d nodes, want 9" % [tier, nodes.size()])
+		for t in nodes:
+			var id := String(t["id"])
+			seen[id] = true
+			# FX's node carries no `ranks` key at all — a single rank by
+			# construction — so the question is that none declares more than one.
+			ok(int(t.get("ranks", 1)) == 1, "%s: ranks %d, want 1" % [
+				id, int(t.get("ranks", 1))])
+			# AI RETIRED a `tier` key and FX brought the word back with a new
+			# meaning (1-3, the price). The stale-field question is now that the
+			# key is FX's and agrees with the tier it is walked in — read RAW,
+			# because `tier_nodes` clamps and would place a tier-5 node in tier 3.
+			ok(int(t.get("tier", 0)) == tier, "%s: tier %s, want %d (FX's 1-3)" % [
+				id, t.get("tier", "missing"), tier])
+			ok(not t.has("exclusive_with"),
+				"%s carries an 'exclusive_with' — no node is exclusive (FX)" % id)
+			ok(not t.has("node_gated"),
+				"%s carries a 'node_gated' — no node has a prerequisite (FX)" % id)
+			ok(t.has("desc") and String(t["desc"]) != "", "%s has no desc" % id)
+			# The shelf the flag used to agree with is gone: a capstone key on a
+			# node of the one tree describes a layout that does not exist.
+			ok(not t.has("capstone"),
+				"%s carries a capstone flag — the one tree has no shelf" % id)
+		var laned: Array = []
+		for t2 in nodes:
+			if t2.has("lane") or t2.has("row"):
+				laned.append(String(t2["id"]))
+		ok(laned.is_empty(),
+			"tier %d is not flat — %s carry a lane or a row" % [tier, ", ".join(laned)])
+	ok(seen.size() == 27,
+		"%d distinct nodes sit in a tier 1-3, want 27 — some node is off the grid" % \
+			seen.size())
 
 
 # ---------- 2. gating ----------
 
 func _hooks(run: Node) -> void:
+	# BATCH FX — THE IDS ARE THE ONE TREE'S NOW. `has_node` is a lookup in the
+	# learned dict and names no tree, so the machinery is exactly what it was.
+	# What had to move is the learned dict: `bz_battle_shout` is a deleted node,
+	# and a member learning an id its own tree does not hold makes the DO check
+	# below pass for the wrong reason — an id nobody's tree holds grants nothing
+	# whether or not a node CAN grant. So the member buys the WHOLE one tree,
+	# which is the strongest form of "buying a node grants nothing".
 	var m := {"key": "warrior", "spec": "berserker", "talents": {},
 		"tree": Talents.generate_tree("berserker", "warrior")}
-	ok(not Talents.has_node(m["talents"], "bz_battle_shout"), "has_node: false when untaken")
+	ok(not Talents.has_node(m["talents"], "tn_crit"), "has_node: false when untaken")
 	ok(not Talents.owns_ability(m, "Battle Shout"), "owns_ability: false for an unowned card")
-	m["talents"] = {"bz_battle_shout": 1}
-	ok(Talents.has_node(m["talents"], "bz_battle_shout"), "has_node: true when taken")
+	var every_cell := {}
+	for t in m["tree"]:
+		every_cell[String(t["id"])] = true
+	m["talents"] = Talents.worn_learned(m["tree"], every_cell)
+	ok(Talents.has_node(m["talents"], "tn_crit"), "has_node: true when taken")
 	# BATCH DO — RE-POINTED TO THE OTHER DOOR, BECAUSE THE FIRST ONE IS SHUT.
 	# `owns_ability` used to be reachable two ways: the kit held the card, or a
 	# TALENT granted it. No talent grants anything now, so buying the node can
 	# no longer make this true — and the EARNED path is the one that still
 	# matters, because it is the only one a payload condition could ever read.
 	ok(not Talents.owns_ability(m, "Battle Shout"),
-		"owns_ability: still false — buying a node grants nothing (DO's charter)")
+		"owns_ability: still false — buying the WHOLE tree grants nothing (DO's charter, FX's line)")
 	m["bm_abilities"] = ["Battle Shout"]
 	ok(Talents.owns_ability(m, "Battle Shout"),
 		"owns_ability: TRUE once the card is actually earned")
@@ -134,15 +172,19 @@ func _hooks(run: Node) -> void:
 # ---------- 4b. payload.condition, the one read site ----------
 
 func _conditions() -> void:
-	var m := {"key": "warrior", "spec": "berserker", "talents": {"bz_battle_shout": 1},
+	# BATCH FX: the learned id and the condition ids are the ONE tree's (the
+	# two it used, `bz_battle_shout` and `bz_savagery`, are deleted). The
+	# `condition` arm is live machinery — runes reach it — and names no tree,
+	# so every payload below is exactly the payload it was.
+	var m := {"key": "warrior", "spec": "berserker", "talents": {"tn_crit": 1},
 		"tree": Talents.generate_tree("berserker", "warrior")}
 	var ctx := {"learned": m["talents"], "member": m}
 	var cfg := {"abilities": []}
 
-	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_savagery"},
+	Talents.apply_payload(cfg, {"condition": {"has_node": "tn_attack"},
 		"stat": {"p1": 5}}, 1, ctx)
 	ok(not cfg.has("p1"), "condition has_node UNMET: the payload does nothing at all")
-	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_battle_shout"},
+	Talents.apply_payload(cfg, {"condition": {"has_node": "tn_crit"},
 		"stat": {"p2": 5}}, 1, ctx)
 	ok(int(cfg.get("p2", 0)) == 5, "condition has_node MET: the payload applies")
 	# BATCH DO — the CONDITION KIND is still live machinery and is exercised
@@ -156,30 +198,31 @@ func _conditions() -> void:
 	Talents.apply_payload(cfg, {"condition": {"owns_ability": "Battle Shout"},
 		"stat": {"p3": 3}}, 1, ctx)
 	ok(int(cfg.get("p3", 0)) == 3, "condition owns_ability MET: the payload applies")
+	# BATCH FX: asked of THE ONE TREE, which is the whole talent population now
+	# that the twelve spec trees are deleted.
 	var owns_users := 0
-	for spec2 in Talents.LANE_TREES:
-		for n2 in Talents.LANE_TREES[spec2]:
-			if JSON.stringify(n2.get("payload", {})).contains("owns_ability"):
-				owns_users += 1
+	for n2 in Talents.TREE:
+		if JSON.stringify(n2.get("payload", {})).contains("owns_ability"):
+			owns_users += 1
 	ok(owns_users == 0,
 		"...and no talent payload reads it any more (%d do)" % owns_users)
 	Talents.apply_payload(cfg, {"condition": {"owns_ability": "Nope"},
 		"stat": {"p4": 3}}, 1, ctx)
 	ok(not cfg.has("p4"), "condition owns_ability UNMET: the payload does nothing")
 	# Both forms in one condition: ALL must hold.
-	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_battle_shout",
+	Talents.apply_payload(cfg, {"condition": {"has_node": "tn_crit",
 		"owns_ability": "Nope"}, "stat": {"p5": 1}}, 1, ctx)
 	ok(not cfg.has("p5"), "a two-part condition needs BOTH halves")
 	# A conditional payload with no ctx is inert, not silently unconditional —
 	# an effect that fails to appear is a bug you can see.
-	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_battle_shout"},
+	Talents.apply_payload(cfg, {"condition": {"has_node": "tn_crit"},
 		"stat": {"p6": 1}}, 1, {})
 	ok(not cfg.has("p6"), "no ctx: a conditional payload stays inert")
 	# ...and an UNconditional payload is untouched by any of this.
 	Talents.apply_payload(cfg, {"stat": {"p7": 1}}, 1, {})
 	ok(int(cfg.get("p7", 0)) == 1, "no condition: applies exactly as before")
 	# Conditions gate ability grants too, not just stats.
-	Talents.apply_payload(cfg, {"condition": {"has_node": "bz_savagery"},
+	Talents.apply_payload(cfg, {"condition": {"has_node": "tn_attack"},
 		"new_ability": {"display_name": "Ghost", "cost": 0}}, 1, ctx)
 	ok(cfg["abilities"].is_empty(), "a gated new_ability is not granted either")
 
@@ -198,21 +241,26 @@ func _migration(run: Node) -> void:
 	run.zone_idx = 2
 	run.slot_idx = 6
 	# A current save keeps its picks: migration must never eat live state.
+	# BATCH FX: a LIVE pick is an id of the one tree — `bz_savagery` is a node
+	# FX deleted, so it is now exactly the dead id the second half drops.
 	for m in run.party:
 		m["spec"] = "berserker"
-		m["talents"] = {"bz_savagery": 1}
+		m["talents"] = {"tn_attack": 1}
 	run._migrate_trees()
 	for m in run.party:
-		ok(m["talents"].has("bz_savagery"), "a live save keeps its picks")
+		ok(m["talents"].has("tn_attack"), "a live save keeps its picks")
 		ok(not m["tree"].is_empty(), "...on a live tree")
 	# BATCH BM RE-POINTED THE SECOND HALF: a dead node used to REFUND into the
 	# member's purse, and there is no in-run purse to refund into any more —
 	# the meta ledger already gave the cell's price back when the tree changed
 	# under it. What still has to hold, and is the real hazard, is that a
 	# member never carries a node the live tree does not define.
+	# BATCH FX: and the dead id a real save carries now is a deleted lane
+	# node, so one is dropped beside the invented one, in the same assertion.
 	for m in run.party:
-		m["talents"] = {"bz_savagery": 1, "no_such_node": 1}
+		m["talents"] = {"tn_attack": 1, "no_such_node": 1, "bz_savagery": 1}
 	run._migrate_trees()
 	for m in run.party:
-		ok(not m["talents"].has("no_such_node"), "a dead node is dropped")
+		ok(not m["talents"].has("no_such_node") and not m["talents"].has("bz_savagery"),
+			"a dead node is dropped — an invented id, and a lane node FX deleted")
 		ok(not m.has("talent_points"), "...and no purse is invented to refund it")

@@ -41,6 +41,26 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX REPAIRED THIS FILE IN PLACE, and every change is recorded AT ITS
+# SITE (CQ §3: a stale assertion is repaired to intent, never deleted). FX
+# deleted the twelve spec trees, and with them every node this file was written
+# about: the Beastmaster wears the ONE class tree now — twenty-seven nodes in
+# three tiers of nine — and not one of its nodes is his. What FX KEPT is every
+# field those nodes wrote and every read site in `battle.gd` and `unit.gd`, so:
+#   * each LIVE section that learned a retired node wears that node's EXACT
+#     payload (`RETIRED`, copied from the deleted tree) on its member's tree for
+#     that one spawn, and every effect assertion is unchanged;
+#   * §3's shape questions are asked of the one tree, and the 24 ids that used
+#     to "survive" are asked what their survival was for — whether a SAVE
+#     holding them still loads — which FX answers by dropping them;
+#   * the two ABILITY-arm payloads (Devoted Fury, Deep Reserves) are driven
+#     through `apply_payload`'s ability arm, which runes still use;
+#   * every check whose subject was the deleted tree itself — a node's
+#     magnitude, row, lane, capstone flag, text or tooltip scale — is DELETED
+#     under DG §2's one exception, with the count at each site.
+# FX DELETED 81 CHECKS HERE (486 -> 405): §3's shape 31, §3's magnitudes 44,
+# §4's pairs 3, and §1's Lone Bond rows and texts 3.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -154,13 +174,118 @@ func _find(u: BattleUnit, name: String) -> Ability:
 
 # The party is warrior/mage/cleric/hunter, so the Beastmaster is slot 3.
 # `learned` lands on HIM; `cleric_learned` on the Cleric, for §8/§9.
+#
+# BATCH FX: a learned id the one tree no longer holds rides that member's
+# `tree` as its retired payload (`_worn_tree`) — the fixture's `patch`, which is
+# written after `sync_spec_hp` and before the battle reads the member.
 func _spawn(learned: Dictionary, cleric_spec := "occultist",
 		cleric_learned := {}, lineup := ["raider"]) -> Node:
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", cleric_spec, "beastmaster"],
 		{"enemies": lineup,
 		"talents": {2: cleric_learned.duplicate(), 3: learned.duplicate()},
+		"patch": {2: {"tree": _worn_tree(cleric_spec, cleric_learned)},
+			3: {"tree": _worn_tree("beastmaster", learned)}},
 		"deterministic": true, "crit": -10.0})
+
+
+# ── BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED ───────────────────────
+# FX deleted the twelve spec trees. EVERY FIELD these nodes wrote was kept, and
+# so was every read site — a field no node writes any more is DORMANT, not
+# deleted — so the questions this file asks of those fields still have true
+# answers. Each entry is the EXACT payload the node carried, copied from the
+# tree FX removed: the node is deleted, the field and its read site stand. The
+# Devout's Apostle is here because §9 learns it for the Cleric's slot.
+const RETIRED := {
+	# Wild Rotation — Loyalty caps at 3.
+	"bm_wild_rotation": {"stat": {"wild_rotation": 3}},
+	# The Pack — two companions at once.
+	"bm_the_pack": {"stat": {"the_pack": 1}},
+	# Lone Bond — one beast a fight, arriving at 6 Loyalty.
+	"bm_lone_bond": {"stat": {"lone_bond": 6}},
+	# One Soul — one health pool across the hunter and his beasts.
+	"bm_one_soul": {"stat": {"one_soul": 1}},
+	# Menagerie — an absent kind keeps its boon at 50%.
+	"bm_menagerie": {"stat": {"menagerie": 50}},
+	# Steadfast Bond — a death returns 100% of the Loyalty.
+	"bm_steadfast": {"stat": {"steadfast_bond": 100}},
+	# Vengeance — the fallen boon for the rest of the battle, +30% damage.
+	"bm_vengeance": {"stat": {"vengeance": 1, "vengeance_dmg": 30}},
+	# Devoted Fury — an ABILITY-arm payload: Kill Command -10 cost, cooldown 2.
+	"bm_devoted_fury": {"ability": "Kill Command", "add": {"cost": -10}, "set": {"cooldown": 2}},
+	# Deep Reserves — an ABILITY-arm payload: Hunter's Instinct -10 cost.
+	"bm_reserves": {"ability": "Hunter's Instinct", "add": {"cost": -10}},
+	# Apostle — the Devout's (`dv_apostle`), learned by §9's Cleric.
+	"dv_apostle": {"stat": {"apostle": 1}},
+}
+
+# THE BEASTMASTER'S COUNTERS — every stat field his retired tree wrote. The tree
+# is deleted and each of these still stands on `BattleUnit` with its read site,
+# so "his counters" are these fields now, not the fields of the one tree every
+# Hunter wears (`test_batch_ba` has named its spec's counters this way since BA).
+const BM_COUNTERS := ["wild_communion_step", "unbroken_watch", "absolute_step",
+	"steadfast_bond", "ancient_pact", "lone_bond", "quick_whistle_ranks",
+	"momentum_ranks", "shared_devotion", "herald", "menagerie", "no_beast_left",
+	"no_beast_left_loyalty", "wild_rotation", "masters_aim_ranks",
+	"companion_hp_pct", "instinctive", "symbiosis", "vengeance", "vengeance_dmg",
+	"lone_hunter", "lone_hunter_dmg", "kindred", "free_swap", "ghost_pack",
+	"one_soul", "the_pack", "apex"]
+
+# The one cell the saved member in `_migrated_talents` also holds: any id the
+# live tree carries would do.
+const LIVE_CELL := "tn_health"
+
+
+# The tree a member wears for ONE spawn: the live class tree, plus the retired
+# payload of every learned id the live tree no longer holds. It rides the
+# member's `tree`, so the spawn applies it through the one door every node takes
+# (`apply_from_tree` -> `apply_payload`) rather than as a field poked onto the
+# unit afterwards, which would skip whatever the spawn does with it.
+func _worn_tree(spec: String, learned: Dictionary) -> Array:
+	var t := Talents.generate_tree(spec, Classes.class_of_spec(spec))
+	for id in learned:
+		if RETIRED.has(id) and Talents.node_in_tree(t, id).is_empty():
+			t.append({"id": id, "payload": (RETIRED[id] as Dictionary).duplicate(true)})
+	return t
+
+
+func _ids(tree: Array) -> Array:
+	return tree.map(func(t): return String(t["id"]))
+
+
+# THE LOAD PATH'S OWN MIGRATION, driven on a member saved under the twelve
+# trees: it holds every id in `ids` plus `LIVE_CELL`. Returns the talents the
+# member comes out wearing. `Run` is an autoload, so it is fetched at RUNTIME (a
+# --script harness cannot name one), and its party is put back afterwards.
+func _migrated_talents(ids: Array) -> Dictionary:
+	var run: Node = root.get_node("/root/Run")
+	var kept: Array = run.party
+	var learned := {LIVE_CELL: 1}
+	for id in ids:
+		learned[id] = 1
+	run.party = [{"spec": "beastmaster", "key": "hunter", "tree": [],
+		"talents": learned}]
+	run.call("_migrate_trees")
+	var out: Dictionary = (run.party[0]["talents"] as Dictionary).duplicate()
+	run.party = kept
+	return out
+
+
+# BATCH FX: drives a retired node's ABILITY-arm payload through `apply_payload`
+# onto the Beastmaster's opening kit — built fresh, because `spec_abilities`
+# makes new cards on every call — and reports what the card came out as.
+func _arm_on_kit(retired_id: String, card: String) -> Dictionary:
+	var cfg := {"abilities": Classes.spec_abilities("beastmaster")}
+	var hit: Ability = null
+	for ab in cfg["abilities"]:
+		if ab.display_name == card:
+			hit = ab
+	if hit == null:
+		return {"found": false, "cfg": cfg, "base_cost": 0, "cost": 0, "cooldown": 0}
+	var base_cost := hit.cost
+	Talents.apply_payload(cfg, RETIRED[retired_id], 1, {})
+	return {"found": true, "cfg": cfg, "base_cost": base_cost, "cost": hit.cost,
+		"cooldown": hit.cooldown}
 
 
 func _summon(scene: Node, hunter: BattleUnit, kind: String) -> void:
@@ -175,6 +300,9 @@ func _kill(scene: Node) -> void:
 
 # ---------- §3 the tree's shape ----------
 
+# BATCH FX: `IDS` is still THIS BATCH'S RECORD OF ITS OWN 24 NODES — and every
+# one of them is RETIRED, because FX deleted the twelve spec trees. The table
+# stays: §3's save arm below asks each of these ids its question.
 const IDS := ["bm_communion", "bm_unbroken", "bm_absolute", "bm_devoted_fury",
 	"bm_steadfast", "bm_ancient_pact", "bm_lone_bond",
 	"bm_whistle", "bm_momentum", "bm_shared", "bm_herald", "bm_menagerie",
@@ -186,133 +314,122 @@ const IDS := ["bm_communion", "bm_unbroken", "bm_absolute", "bm_devoted_fury",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Beastmaster tree holds 24 nodes (got %d)" % tree.size())
-	var by_lane := {"devotion": 0, "pack": 0, "handler": 0}
-	var caps := 0
+	# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE. The Beastmaster wears the
+	# one class tree now — twenty-seven nodes in three tiers of nine — so every
+	# question below is asked of the tree he wears: its size, its ids, the rank
+	# each node is worn at, where each node sits, that nothing in it is
+	# exclusive, and how its levels are filled. Two questions were about a shape
+	# the one tree does not have, and are deleted where they stood.
+	ok(tree.size() == 27 and _ids(tree) == _ids(Talents.tree()),
+		"the Beastmaster wears the one class tree — 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for t in tree:
 		var id := String(t["id"])
 		ok(not seen.has(id), "id %s appears once" % id)
 		seen[id] = true
-		ok(int(t.get("ranks", 0)) == 1, "%s holds a single rank" % id)
-		var row := int(t.get("row", 0))
-		ok(row >= 1 and row <= Talents.CAPSTONE_ROW, "%s sits in a real row 1-9 (got %d)" % [id, row])
-		if bool(t.get("capstone", false)):
-			caps += 1
-			ok(row == Talents.CAPSTONE_ROW, "capstone %s is on the capstone shelf" % id)
-		else:
-			by_lane[String(t["lane"])] = by_lane[String(t["lane"])] + 1
-		# Batch AI's structure: exclusive references are by ROW, so no node may
-		# carry a stale `exclusive_with` pointing at an id that has moved.
+		# RE-POINTED (FX): a node carries no rank of its own any more. The ledger
+		# is what wears it, and it wears every node at exactly one
+		# (`Talents.worn_learned`, the door `Profile.worn_talents` goes through).
+		ok(not t.has("ranks")
+			and int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"%s is worn at a single rank" % id)
+		# RE-POINTED (FX): rows 1-9 are gone; the level a node sits at is its TIER.
+		var tier := int(t.get("tier", 0))
+		ok(tier >= 1 and tier <= Talents.TIERS,
+			"%s sits in a real tier 1-%d (got %d)" % [id, Talents.TIERS, tier])
+		# Batch AI's structure, and FX's: nothing in the one tree is exclusive,
+		# so no node may carry a stale `exclusive_with` pointing anywhere.
 		ok(not t.has("exclusive_with"),
-			"%s carries no stale exclusive_with — rows do the barring" % id)
-	ok(caps == 3, "three capstones (got %d)" % caps)
-	for lane in by_lane:
-		ok(by_lane[lane] == Talents.ROWS, "lane %s holds 8 rows (got %d)" % [lane, by_lane[lane]])
-	# EVERY ID SURVIVES: §11's whole promise, and the reason no save moves.
+			"%s carries no stale exclusive_with — nothing in the one tree is exclusive" % id)
+	# DELETED AT FX — 4 CHECKS: "three capstones", and for each of the three
+	# "capstone X is on the capstone shelf". The shelf was the capstone ROW of a
+	# spec tree; FX deleted the spec trees, and the one tree has no rows and no
+	# capstone, so neither question has anything left to read.
+	# RE-POINTED (FX): "lane X holds 8 rows" asked how the tree's levels are
+	# filled. The one tree's levels are its three TIERS, nine nodes to each.
+	for tier_n in range(1, Talents.TIERS + 1):
+		var in_tier := Talents.tier_nodes(tree, tier_n).size()
+		ok(in_tier == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier_n, Talents.NODES_PER_TIER, in_tier])
+	# RE-POINTED AND INVERTED (FX) — THE 24 IDS DID NOT SURVIVE. AY asserted that
+	# every one of them survives and re-specs in place because that is what let a
+	# SAVED tree load with no save version moving (§11's promise). FX deleted all
+	# 24 and kept the promise the other way: `Run._migrate_trees` swaps a saved
+	# member's tree for the live one and DROPS every id it no longer holds, so a
+	# resumed run wears nothing the tree cannot price and still no save version
+	# moves. So each id is asked the question its survival answered — does a
+	# save holding it still load clean — and the answer is that it is dropped,
+	# never carried as a dead node.
+	var migrated := _migrated_talents(IDS)
 	for id in IDS:
-		ok(not _node(id).is_empty(), "id %s survives and re-specs in place" % id)
-		# BATCH BM RE-POINTED THIS IN PLACE. `IDS` is THIS BATCH'S RECORD OF ITS OWN
-	# 24 NODES and stays that; BM added a row-8 node to every lane, so the live
-	# tree is 27. What the check exists to prove — that every one of the 24
-	# SURVIVES, which is what lets a saved tree migrate — is the loop above and
-	# is untouched. The count below allows exactly the three BM added.
-	ok(seen.size() == IDS.size() + 3,
-		"the 24 survive and BM added exactly 3 (tree %d, table %d)" % [seen.size(), IDS.size()])
-	# One node per lane per row, or the picker's "choose one" band is a lie.
-	var slots := {}
-	for t in tree:
-		var key := "%s:%d" % [t["lane"], int(t["row"])]
-		ok(not slots.has(key), "one node in %s" % key)
-		slots[key] = true
+		ok(not migrated.has(id),
+			"id %s is retired with its tree: a saved run holding it migrates with it DROPPED" % id)
+	# RE-POINTED (FX): "the 24 survive and BM added exactly 3" was the exact-count
+	# arm of the loop above, and it still is — exactly the 24 go and exactly the
+	# live cell the same member held stays, so the drop is the TREE's doing and
+	# not a wipe that would pass every line of the loop.
+	ok(migrated.size() == 1 and migrated.has(LIVE_CELL),
+		"the migration drops exactly the 24 and keeps the live cell %s (kept %s)" % [
+			LIVE_CELL, str(migrated.keys())])
+	# DELETED AT FX — 27 CHECKS: "one node in <lane>:<row>", once per node, which
+	# kept the picker's "choose one" band honest. FX retired the band with its
+	# premise — no lanes, no rows, nothing exclusive, and a cell bought is a cell
+	# worn — so there is no band left for a second node to crowd.
 
 
 # ---------- §3 the magnitudes, final ----------
 
 func _magnitudes() -> void:
-	# DEVOTION
-	ok(_stat_of("bm_communion", "wild_communion_step") == 7.0,
-		"Wild Communion: the strike step rises to 12%% (base 5 + 7)")
-	# RE-POINTED BY BATCH BJ §2, with the reason here: AY's payload said 2 but
-	# the read site has ALWAYS read the field as a gate and paid a fixed +1 —
-	# the magnitude was never read anywhere, so the tooltip lied. BJ corrected
-	# desc, scale and payload toward the code (behavior unchanged); paying 2
-	# is a design decision that would also need the read site to pass the
-	# field as the _gain_loyalty amount. test_batch_bj pins the gate shape.
-	ok(_stat_of("bm_unbroken", "unbroken_watch") == 1,
-		"Unbroken Watch: +1 additional Loyalty on an unbloodied turn (the +2 was a lie — BJ §2)")
-	ok(_stat_of("bm_absolute", "absolute_step") == 15.0,
-		"Absolute Devotion: the boon step rises to 35%% (base 20 + 15)")
-	# BATCH DO RE-AUTHORED THIS CELL AND THE STAT WENT WITH IT. It read
-	# "Bestial Wrath lasts 1 turn longer per Loyalty stack" — and Bestial Wrath
-	# is a `SPEC_POOLS` trophy, so the whole node did nothing without the draw.
-	# It points at KILL COMMAND now, which is PROTECTED CORE, through
-	# `apply_payload`'s ability branch rather than through a stat.
-	ok(_payload("bm_devoted_fury").get("ability", "") == "Kill Command",
-		"Devoted Fury modifies Kill Command, which every Beastmaster owns")
-	ok(_stat_of("bm_devoted_fury", "devoted_fury") == null,
-		"...and writes no `devoted_fury` counter at all now")
-	ok(_stat_of("bm_steadfast", "steadfast_bond") == 100,
-		"Steadfast Bond: the Loyalty returns in FULL (100%%)")
-	ok(_stat_of("bm_ancient_pact", "ancient_pact") == 1, "Ancient Pact is a flag")
-	ok(_stat_of("bm_lone_bond", "lone_bond") == 6,
-		"Lone Bond: the beast arrives at 6 Loyalty (the gate and the magnitude)")
-	# THE PACK
-	ok(_stat_of("bm_whistle", "quick_whistle_ranks") == 3,
-		"Quick Whistle shaves the whole 3-turn swap cooldown")
-	ok(_stat_of("bm_momentum", "momentum_ranks") == 25,
-		"Feral Momentum: +25%% per distinct beast")
-	ok(_stat_of("bm_shared", "shared_devotion") == 2,
-		"Shared Devotion: +2 Loyalty to every beast")
-	ok(_stat_of("bm_herald", "herald") == 2,
-		"Herald: TWO additional targets")
-	ok(_stat_of("bm_menagerie", "menagerie") == 50,
-		"Menagerie: HALF strength, deliberately unchanged")
-	ok(_stat_of("bm_no_beast_left", "no_beast_left") == 2,
-		"None Left Behind (was No Beast Left, BX §4): the next TWO summons are free")
-	ok(_stat_of("bm_no_beast_left", "no_beast_left_loyalty") == 5,
-		"...and each arrives at 5 Loyalty (two magnitudes, two fields)")
-	ok(_stat_of("bm_wild_rotation", "wild_rotation") == 3,
-		"Wild Rotation: Loyalty caps at 3 — the field IS the cap")
-	# HANDLER
-	ok(_stat_of("bm_masters_aim", "masters_aim_ranks") == 25,
-		"Master's Aim: +25%% of Attack on Quick Shot")
-	ok(abs(float(_stat_of("bm_beast_within", "companion_hp_pct")) - 0.40) < 0.001,
-		"The Wild Within (was Beast Within, BX §4): +40%% companion max health")
-	# BATCH DO: same shape. "Spirit Bond restores +30% more maximum Mana" was
-	# the ENTIRE node and Spirit Bond is a `SPEC_POOLS` trophy. It points at
-	# HUNTER'S INSTINCT now, which is PROTECTED CORE.
-	ok(_payload("bm_reserves").get("ability", "") == "Hunter's Instinct",
-		"Deep Reserves modifies Hunter's Instinct, which every Beastmaster owns")
-	ok(_stat_of("bm_reserves", "deep_reserves_ranks") == null,
-		"...and writes no `deep_reserves_ranks` counter at all now")
-	ok(_stat_of("bm_instinctive", "instinctive") == 8,
-		"Instinctive: 8 empowered Quick Shots")
-	ok(_stat_of("bm_symbiosis", "symbiosis") == 6,
-		"Symbiosis: 6%% max Mana per companion strike")
-	ok(_stat_of("bm_vengeance", "vengeance") == 1
-		and _stat_of("bm_vengeance", "vengeance_dmg") == 30,
-		"Vengeance: the boon flag plus its own +30%% damage")
-	ok(_stat_of("bm_lone_hunter", "lone_hunter") == 50
-		and _stat_of("bm_lone_hunter", "lone_hunter_dmg") == 30,
-		"Lone Hunter: -50%% cost, +30%% damage — two magnitudes, two fields")
-	# CAPSTONES
-	for cap_id in ["bm_one_soul", "bm_the_pack", "bm_apex"]:
-		ok(bool(_node(cap_id).get("capstone", false)), "%s is a capstone" % cap_id)
-	# §1: The Pack no longer says "coming soon" anywhere in the data.
-	ok(not _node("bm_the_pack").has("locked_note"),
-		"The Pack carries no locked_note — it is BUILT")
+	# DELETED AT FX — 20 CHECKS: the twenty stat magnitudes AY settled, each read
+	# off the node that owed it — Wild Communion's +7, Unbroken Watch's 1,
+	# Absolute Devotion's +15, Steadfast Bond's 100, Ancient Pact's flag, Lone
+	# Bond's 6, Quick Whistle's 3, Feral Momentum's 25, Shared Devotion's 2,
+	# Herald's 2, Menagerie's 50, None Left Behind's 2 and its 5, Wild
+	# Rotation's 3, Master's Aim's 25, The Wild Within's 0.40, Instinctive's 8,
+	# Symbiosis's 6, Vengeance's flag with its 30, and Lone Hunter's 50 with its
+	# 30. Their SUBJECT was the node, and FX deleted the tree that held it: no
+	# node of the one tree writes any of these fields and none is a precedent
+	# for one, so there is no node left to read a magnitude off. Every FIELD
+	# still stands with its read site, and the live sections below drive the
+	# ones AY measured at these magnitudes, off `RETIRED`.
+	#
+	# RE-POINTED (FX) — THE TWO ABILITY-ARM NODES. Devoted Fury and Deep Reserves
+	# were never stats: DO pointed each at a PROTECTED CORE card through
+	# `apply_payload`'s ability branch, and that branch is live machinery (runes
+	# still use it). So each node's own payload is driven through it, onto the
+	# Beastmaster's own opening kit — the thing the node checks stood for: the
+	# edit lands on a card every Beastmaster owns, and writes no stat on the way.
+	var kc := _arm_on_kit("bm_devoted_fury", "Kill Command")
+	ok(bool(kc["found"]) and int(kc["cost"]) == int(kc["base_cost"]) - 10
+		and int(kc["cooldown"]) == 2,
+		"Devoted Fury's payload modifies Kill Command, which every Beastmaster owns (cost %d -> %d, cooldown %d)" % [
+			int(kc["base_cost"]), int(kc["cost"]), int(kc["cooldown"])])
+	ok(not (kc["cfg"] as Dictionary).has("devoted_fury"),
+		"...and writes no `devoted_fury` counter at all")
+	var hi := _arm_on_kit("bm_reserves", "Hunter's Instinct")
+	ok(bool(hi["found"]) and int(hi["cost"]) == int(hi["base_cost"]) - 10,
+		"Deep Reserves' payload modifies Hunter's Instinct, which every Beastmaster owns (cost %d -> %d)" % [
+			int(hi["base_cost"]), int(hi["cost"])])
+	ok(not (hi["cfg"] as Dictionary).has("deep_reserves_ranks"),
+		"...and writes no `deep_reserves_ranks` counter at all")
+	# DELETED AT FX — 3 CHECKS: "bm_one_soul / bm_the_pack / bm_apex is a
+	# capstone". The flag lived on the nodes of a deleted tree, and the one tree
+	# has no capstone.
+	# DELETED AT FX — 1 CHECK: "The Pack carries no locked_note — it is BUILT".
+	# Its subject was the node's own data and the node is deleted; that The Pack
+	# IS built — two beasts standing, both boons at full — is §1's live arm, which
+	# still runs, off the node's retired payload.
+	# §1: nothing in the data says "coming soon" — RE-POINTED (FX) to the tree
+	# the Beastmaster wears now, node for node.
 	for t in _tree():
 		var d := String(t.get("desc", "")).to_lower()
 		ok(not d.contains("coming soon"),
 			"%s does not read 'coming soon'" % t["id"])
-	# Every rendered tooltip must show the design value, not a stale one.
-	for id in IDS:
-		var n := _node(id)
-		if not n.has("scale"):
-			continue
-		var shown := Talents.desc_for(n, 1)
-		ok(not shown.contains("{v}"), "%s renders its {v}" % id)
+	# DELETED AT FX — 20 CHECKS: "<id> renders its {v}", for each of the 24 that
+	# carried a `scale`. The subject was each deleted node's tooltip scale. No
+	# node of the one tree carries a `scale` or a `{v}` — each states its number
+	# in its own text, which `check_fx` §1 holds to its payload — and none of his
+	# was a precedent, so there is no tooltip left that renders his numbers.
 
 
 # ---------- §6 the counters are ADDITIVE at their read sites ----------
@@ -372,31 +489,57 @@ func _additive_units() -> void:
 func _counter_name_trap() -> void:
 	# `wild_communion_step` is the BEASTMASTER's. `communion_ranks` is the
 	# DEVOUT's, and Batch 29 crossed the two once already.
-	var bm_fields := {}
-	for t in _tree():
-		for f in t.get("payload", {}).get("stat", {}):
-			bm_fields[f] = true
-	ok(not bm_fields.has("communion_ranks"),
-		"NO Beastmaster node writes communion_ranks — that is the Devout's")
-	ok(bm_fields.has("wild_communion_step"),
-		"...and one writes wild_communion_step, which is his")
-	var dv_fields := {}
-	# THE DEVOUT'S SPEC ID IS "inquisitor" — the rename never reached the id,
-	# and Talents.LANE_TREES is the one place that holds a tree by spec id.
-	for t in Talents.generate_tree("inquisitor", "cleric"):
-		for f in t.get("payload", {}).get("stat", {}):
-			dv_fields[f] = true
-	ok(dv_fields.has("communion_ranks"),
-		"the Devout still writes communion_ranks")
-	ok(not dv_fields.has("wild_communion_step"),
-		"...and never wild_communion_step")
+	#
+	# RE-POINTED IN PLACE (FX), AND THE QUESTION IS THE SAME ONE. AY walked the
+	# two SPEC TREES because they were what wrote both counters. FX deleted both
+	# trees, and both heroes wear the one class tree now, which writes neither.
+	# So the walk is over the writers each spec still has — the tree he wears
+	# plus every rune of his own spec — and the Devout's half is asked of the one
+	# place that still makes `communion_ranks` his: the read site, which reads it
+	# off the Devout and off nobody else.
+	var pool := {}
+	for rid in Runes.ids():
+		pool[rid] = Runes.config(rid)
+	var bm_fields := _writer_fields(_tree(), pool, "spec:beastmaster")
+	ok(not bm_fields.has("communion_ranks") and not bm_fields.has("rune_communion_ranks"),
+		"NO Beastmaster writer writes communion_ranks — that is the Devout's")
+	ok(bm_fields.has("rune_wild_communion_step"),
+		"...and one writes wild_communion_step's rune half, which is his")
+	# THE DEVOUT'S SPEC ID IS "inquisitor" — the rename never reached the id.
+	var dv_fields := _writer_fields(Talents.generate_tree("inquisitor", "cleric"), pool,
+		"spec:inquisitor")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	ok(bsrc.contains("devout.communion_ranks"),
+		"the Devout still owns communion_ranks — battle.gd reads it off the Devout")
+	ok(not dv_fields.has("wild_communion_step")
+		and not dv_fields.has("rune_wild_communion_step"),
+		"...and no Devout writer ever writes wild_communion_step")
+	# The one tree is worn by both BY RULING (FX: one tree, every class), so its
+	# fields are shared by construction and are not the trap. The trap is a SPEC
+	# counter written from both sides.
+	var tree_fields := _writer_fields(Talents.tree(), {}, "")
 	var crossed: Array = []
 	for f in bm_fields:
-		if dv_fields.has(f):
+		if dv_fields.has(f) and not tree_fields.has(f):
 			crossed.append(f)
 	ok(crossed.is_empty(),
 		"no counter is shared between the Beastmaster and the Devout (got %s)" % \
 			str(crossed))
+
+
+# BATCH FX: every stat field a spec's writers write — the tree it wears, plus
+# every rune of its own scope (retired entries included: `Runes.ids()` is the
+# file, which is what this section has always walked).
+func _writer_fields(tree: Array, pool: Dictionary, scope: String) -> Dictionary:
+	var out := {}
+	for t in tree:
+		for f in t.get("payload", {}).get("stat", {}):
+			out[f] = true
+	for id in pool:
+		if scope != "" and String(pool[id].get("scope", "")) == scope:
+			for f in pool[id].get("payload", {}).get("stat", {}):
+				out[f] = true
+	return out
 
 
 # ---------- §5 the trophy-pool collision cannot arise ----------
@@ -419,16 +562,20 @@ func _no_ability_grants() -> void:
 	# The other half: every trophy the pool offers him is absent from the tree,
 	# so no trophy can land on a node's grant.
 	var tree_names := Talents.ability_names({"spec": "beastmaster",
-		"key": "hunter", "talents": _learn_all()})
+		"key": "hunter", "tree": _tree(), "talents": _learn_all()})
 	for trophy in Classes.SPEC_POOLS["beastmaster"]:
 		ok(not tree_names.has(trophy),
 			"the trophy %s is not also a tree grant" % trophy)
 
 
+# RE-POINTED (FX): learns every node of the tree he wears now. It learned the 24
+# table ids, against a member carrying NO `tree` — and `ability_names` walks the
+# member's tree, so the grant half never reached a node at all. With the tree on
+# the member it asks what it always meant to: a fully-learned tree adds nothing.
 func _learn_all() -> Dictionary:
 	var all := {}
-	for id in IDS:
-		all[id] = 1
+	for t in _tree():
+		all[String(t["id"])] = 1
 	return all
 
 
@@ -483,10 +630,12 @@ func _rune_audit() -> void:
 	ok(abs(float(wild["rune_companion_hp_pct"]) - 0.05) < 0.001,
 		"...and +5%% companion health, untouched")
 	# THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO BEASTMASTER COUNTER.
+	# RE-POINTED (FX): his counters were his tree's fields. The tree is deleted
+	# and the counters stand, so the walk is over `BM_COUNTERS` — not over the
+	# one tree, which every Hunter wears by ruling and which is nobody's.
 	var bm_fields := {}
-	for t in _tree():
-		for f in t.get("payload", {}).get("stat", {}):
-			bm_fields[f] = true
+	for f in BM_COUNTERS:
+		bm_fields[f] = true
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
 			continue
@@ -494,6 +643,8 @@ func _rune_audit() -> void:
 			ok(not bm_fields.has(f),
 				"the class-wide rune %s does not write the Beastmaster counter %s" % [id, f])
 	# No lane tag went stale: his lanes are lowercase and did not rename.
+	# (FX: no tree has lanes now, and a rune's `lane` records HISTORY — CLAUDE.md,
+	# EM. The tag must still be one of his three names and not a stale rename.)
 	var lanes := {"devotion": true, "pack": true, "handler": true}
 	for id in bm_runes:
 		var lane := String(pool[id].get("lane", ""))
@@ -532,20 +683,12 @@ func _bot_policy_source() -> void:
 # ---------- §4 the exclusive pairs ----------
 
 func _exclusive_pairs() -> void:
-	# LONE BOND <-> WILD ROTATION SURVIVES, and it survives because ROW
-	# EXCLUSIVITY enforces it: both sit in row 7. Stated so a later batch does
-	# not "fix" a pair that is already being enforced correctly.
-	ok(int(_node("bm_lone_bond")["row"]) == 7
-		and int(_node("bm_wild_rotation")["row"]) == 7,
-		"Lone Bond and Wild Rotation share row 7 — the pair is enforced by the row")
-	# STEADFAST BOND <-> VENGEANCE IS DEAD: rows 5 and 6 of DIFFERENT lanes, so
-	# row exclusivity lets a player hold both.
-	ok(int(_node("bm_steadfast")["row"]) == 5
-		and String(_node("bm_steadfast")["lane"]) == "devotion",
-		"Steadfast Bond sits in Devotion row 5")
-	ok(int(_node("bm_vengeance")["row"]) == 6
-		and String(_node("bm_vengeance")["lane"]) == "handler",
-		"Vengeance sits in Handler row 6 — a player can hold both")
+	# DELETED AT FX — 3 CHECKS: "Lone Bond and Wild Rotation share row 7 — the
+	# pair is enforced by the row", "Steadfast Bond sits in Devotion row 5" and
+	# "Vengeance sits in Handler row 6 — a player can hold both". Each read a
+	# deleted node's row and lane; FX deleted the rows, the lanes and the nodes,
+	# and nothing in the one tree is exclusive. That the two halves of the dead
+	# pair COMPOSE is still driven live (`_live_vengeance_and_steadfast`).
 	# ...and no prose list still claims otherwise.
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(not claude.contains("steadfast_bond/vengeance"),
@@ -781,17 +924,15 @@ func _live_swap_replaces_shallower() -> void:
 
 func _live_lone_bond_closes_the_pack() -> void:
 	# "One beast per fight" plus "two beasts at once" is the ONE combination
-	# that must be impossible — and row exclusivity does NOT prevent it (Lone
-	# Bond is Devotion row 7, The Pack is a row-8 capstone with no lane
-	# purity), so it is resolved where the number is read.
-	var lb: Dictionary = _node("bm_lone_bond")
-	var tp: Dictionary = _node("bm_the_pack")
-	ok(int(lb["row"]) == 7 and int(tp["row"]) == Talents.CAPSTONE_ROW,
-		"Lone Bond is row 7 and The Pack is row 8 — different rows, both pickable")
-	ok(String(lb["desc"]).to_lower().contains("the pack"),
-		"Lone Bond's own text says it closes The Pack")
-	ok(String(tp["desc"]).to_lower().contains("lone bond"),
-		"...and The Pack's says the same from its side")
+	# that must be impossible — and no exclusivity prevents it (it never did:
+	# the two sat in different rows, and since FX nothing is exclusive at all),
+	# so it is resolved where the number is read.
+	# DELETED AT FX — 3 CHECKS: "Lone Bond is row 7 and The Pack is row 8 —
+	# different rows, both pickable", and each node's TEXT naming the other
+	# ("Lone Bond's own text says it closes The Pack", "...and The Pack's says
+	# the same from its side"). All three read a deleted node's row or desc. The
+	# rule they framed is untouched and is driven below: with both FIELDS worn,
+	# Lone Bond wins where the number is read.
 	var scene := await _spawn({"bm_lone_bond": 1, "bm_the_pack": 1})
 	var h := _hero(scene, 3)
 	ok(h.lone_bond == 6 and h.the_pack == 1, "a player CAN hold both nodes")
@@ -960,7 +1101,7 @@ func _live_vengeance_and_steadfast() -> void:
 	var scene := await _spawn({"bm_steadfast": 1, "bm_vengeance": 1})
 	var h := _hero(scene, 3)
 	ok(h.steadfast_bond == 100 and h.vengeance == 1 and h.vengeance_dmg == 30,
-		"Steadfast Bond and Vengeance are both learned (rows 5 and 6, different lanes)")
+		"Steadfast Bond and Vengeance are both worn (their retired payloads, together)")
 	await _summon(scene, h, "canis")
 	h.loyalty["canis"] = 12
 	var beast: BattleUnit = scene.call("_beasts", h)[0]

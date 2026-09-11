@@ -1,8 +1,26 @@
 # BATCH FS — THE DOC-vs-DOC PAIRING CHECK.
 #
-#   §1  A §7 HEADING NAMES THE TREE ITS TABLE LISTS
+#   §1  §7'S STATED SHAPE AGREES WITH THE TREE TABLE UNDER IT (re-pointed at FX)
 #   §2  A COUNT IN A TABLE'S HEADING EQUALS THE ROWS IN THAT TABLE
 #   §3  THE EXTRACTORS ARE STILL EXTRACTING (the liveness arm)
+#
+# ── FX: §1's SUBJECT WENT WITH THE TWELVE TREES, AND ITS QUESTION DID NOT ────
+# §1 used to pair each of twelve §7 lane headings with the tree table beneath it.
+# FX deleted the twelve spec trees. §7 now carries ONE tree of twenty-seven
+# nodes, so there is no heading left to put above the wrong table, and the
+# twelve-way pairing has no subject anywhere a check can read (DG §2).
+# **Deleted with it, and counted: 22 checks.** §1 lost its twelve per-tree
+# pairings, its three twelve-shaped structure checks and its duplicate-heading
+# check (16). §3 lost its twelve-and-twelve walk check, its three wrapped-heading
+# names and its two lane probes (6).
+#
+# **THE QUESTION SURVIVES, AND §1 NOW ASKS IT OF THE ONE TREE:** does what §7
+# SAYS about its tree agree with the table §7 prints under it? That covers the
+# node count, the tiers and their size, each tier's price and the total. It is
+# still two parts of one document, and it is still FR's defect in its new shape:
+# a table can be right row by row and still sit under a sentence that describes
+# a different tree. §1 adds 10 checks and §3 adds 6, so the gate goes 39 -> 33.
+# Nothing in §1 is pinned to the code's 27, because `check_fx` §1 owns that.
 #
 # ── WHY THIS GATE EXISTS ────────────────────────────────────────────────────
 # FR read every numeric claim in `master.html` against the code — 1,265
@@ -23,19 +41,15 @@
 # compares two parts of the same document can.
 #
 # ── WHAT THIS GATE CANNOT SEE, SAID FIRST ───────────────────────────────────
-# **A HEADING THAT NAMES THE WRONG TREE IS MECHANICAL. A HEADING THAT NAMES THE
-# RIGHT TREE OVER A SUBTLY WRONG TABLE IS NOT.** This gate asserts that two
-# parts of the document AGREE. It cannot assert that either is TRUE:
+# **A SENTENCE THAT DESCRIBES THE WRONG TREE IS MECHANICAL. A SENTENCE THAT
+# DESCRIBES THE RIGHT TREE OVER A SUBTLY WRONG TABLE IS NOT.** This gate asserts
+# that two parts of the document AGREE. It cannot assert that either is TRUE:
 #
-#   · If a heading and its table were BOTH re-pointed at the wrong spec, they
-#     agree and this gate is silent. Only `master.html` §7 against
-#     `Talents.desc_for()` sees that, and FR measured all 324 cells clean.
-#   · If a lane were RENAMED in the code and in neither place here, the two
-#     halves still agree. **This gate is doc-vs-doc by construction** — that is
-#     what makes it cheap and what makes its failure mode noise rather than
-#     silence, and it is also its ceiling.
-#   · It reads the LANE NAMES and the ROW COUNTS. It reads no cell. A wrong
-#     magnitude inside a correctly-paired table is invisible here.
+#   · If the sentence and the table were BOTH changed to the same wrong shape,
+#     they agree and this gate is silent. Only `master.html` §7 against the
+#     code sees that.
+#   · It reads the stated shape and the TIER column. It reads no node's text.
+#     A wrong magnitude inside a correctly-shaped table is invisible here.
 #   · §2 asserts that a stated count matches the rows the document actually
 #     carries. It cannot say whether the population the document chose to
 #     catalogue is the right one — §6b catalogues 127 of a 154-card draft on
@@ -51,12 +65,13 @@
 #
 # ── AND THE EXTRACTOR MUST READ UNWRAPPED TEXT, WHICH IS NOT A DETAIL ───────
 # **THE FIRST DRAFT OF §1 READ NINE HEADINGS OF TWELVE AND REPORTED FOUR
-# MISMATCHES, ALL FOUR OF THEM FALSE.** Three headings — the Arcanist's, the
-# Holy's and the Devout's — wrap across a line break in the source, so a
-# line-anchored match skipped them, and the nine it did find were then zipped
-# against twelve tables and slid three places out of step. **It looked exactly
-# like a real finding.** Everything below is matched on a WHITESPACE-FLATTENED
-# copy of §7 for that reason, and §3 asserts the population is twelve.
+# MISMATCHES, ALL FOUR OF THEM FALSE.** Three headings wrapped across a line
+# break in the source, so a line-anchored match skipped them, and the nine it did
+# find were then zipped against twelve tables and slid three places out of step.
+# **It looked exactly like a real finding.** Everything below is matched on a
+# WHITESPACE-FLATTENED copy of the document for that reason. The one tree's node
+# count and its prices wrap across a line break in the source in the same way,
+# and §3 asserts both are read.
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_fs.gd
@@ -74,12 +89,10 @@ const S7_OPEN := "<h2>7. Talents</h2>"
 const S7_CLOSE := "<h2>8. Economy</h2>"
 const S6B_ANCHOR := "drafted abilities catalogued here"
 
-# THE POPULATIONS, PINNED. Twelve specs and one row of `<th>`s each. These are
-# floors-as-equalities on purpose: the tree count is a settled fact of the game
-# (`3 lanes x 8 rows + a capstone`, twelve specs), and a thirteenth spec is a
-# thing a batch does deliberately and would come here to say so.
-const SPEC_TREES := 12
-const LANES_PER_TREE := 3
+# §7's two tables, by their header rows. A header row renamed is a table this
+# gate can no longer find, and §1 and §3 both say so rather than reading zero.
+const TREE_HEAD := "<tr><th>Tier</th><th>Node</th><th>What it does</th></tr>"
+const GATE_HEAD := "<tr><th>Tier</th><th>Open by difficulty after</th></tr>"
 
 
 func ok(cond: bool, what: String) -> void:
@@ -109,7 +122,7 @@ func _initialize() -> void:
 	await process_frame
 	print("BATCH FS — THE DOC-vs-DOC PAIRING CHECK")
 	print("  IT ASSERTS THAT TWO PARTS OF ONE DOCUMENT AGREE.")
-	print("  IT CANNOT ASSERT THAT EITHER IS TRUE — a heading and a table that")
+	print("  IT CANNOT ASSERT THAT EITHER IS TRUE — a sentence and a table that")
 	print("  are BOTH wrong agree, and this gate is silent on them. The header")
 	print("  of this file states the boundary in full.")
 	var doc := FileAccess.get_file_as_string(DOC)
@@ -121,109 +134,124 @@ func _initialize() -> void:
 	ok(s7.length() > 0,
 		"§0: §7 does not slice — `%s` .. `%s` no longer bound a section, so every arm below would read an empty string"
 			% [S7_OPEN, S7_CLOSE])
-	var heads: Array = []
-	var tables: Array = []
-	var order := ""
-	if s7.length() > 0:
-		var walked := _walk_s7(_flat(s7))
-		heads = walked[0]
-		tables = walked[1]
-		order = String(walked[2])
-	_s1_pairing(heads, tables, order)
+	var shape := _s1_shape(_flat(s7))
 	_s2_counts(_flat(doc))
-	_s3_liveness(doc, heads, tables)
+	_s3_liveness(doc, shape)
 	_g.report(self)
 
 
-# ── THE ONE WALK BOTH §1 AND §3 READ ────────────────────────────────────────
-#
-# ONE regex alternation over the flattened section, so headings and tables come
-# back INTERLEAVED IN DOCUMENT ORDER. Two separate searches would each be in
-# order and would say nothing about how they sit relative to one another, which
-# is the entire question: FR's defect was a heading in the wrong PLACE, not a
-# heading with the wrong CONTENT.
-#
-# A LANE HEADING IS A `<p>` WITH EXACTLY THREE ALL-CAPS BOLD SPANS IN IT. That
-# is a derived rule and not a list of twelve names: §7 holds other `<p><b>X</b>
-# — ...` paragraphs (the reassignable-points note is one) and they carry zero,
-# while the Occultist's heading carries several bold spans that are NOT lanes
-# and every one of them has a lower-case letter in it. §3 asserts the rule
-# selects exactly twelve.
-func _walk_s7(flat: String) -> Array:
-	var heads: Array = []
-	var tables: Array = []
-	var order := ""
-	var lane_b := _rx("<b>([A-Z][A-Z '’-]*?)</b>")
-	var thc := _rx("<th>(.*?)</th>")
-	# Either a paragraph opening `<p><b>Name</b> —` or a table's header row.
-	# The dash is written BOTH ways in this document, so both are matched.
-	var tok := _rx("<p><b>([A-Za-z][A-Za-z ]*?)</b> (?:—|&mdash;) (.*?)</p>|<tr><th>Row</th>(.*?)</tr>")
-	for m in tok.search_all(flat):
-		if m.get_string(1) != "":
-			var lanes: Array = []
-			for l in lane_b.search_all(m.get_string(2)):
-				lanes.append(l.get_string(1))
-			if lanes.size() == LANES_PER_TREE:
-				heads.append([m.get_string(1), lanes])
-				order += "H"
-		else:
-			var cols: Array = []
-			for c in thc.search_all(m.get_string(3)):
-				cols.append(c.get_string(1))
-			tables.append(cols)
-			order += "T"
-	return [heads, tables, order]
+# ── THE TWO TABLES §1 READS ─────────────────────────────────────────────────
+# The tree table's rows as [tier, name], in document order, and the tiers the
+# difficulty table opens. Each is bounded by its own header row and the next
+# `</table>`, so a row of one can never be read as a row of the other.
+func _tree_rows(flat7: String) -> Array:
+	var a := flat7.find(TREE_HEAD)
+	if a < 0:
+		return []
+	var b := flat7.find("</table>", a)
+	if b < 0:
+		return []
+	var out: Array = []
+	for m in _rx("<tr><td>([0-9]+)</td><td>(.*?)</td><td>(.*?)</td></tr>").search_all(flat7.substr(a, b - a)):
+		out.append([int(m.get_string(1)), m.get_string(2)])
+	return out
 
 
-# ── §1 — A HEADING NAMES THE TREE ITS TABLE LISTS ───────────────────────────
-func _s1_pairing(heads: Array, tables: Array, order: String) -> void:
-	print("\n§1 — a §7 heading names the tree whose lanes the table under it lists")
-	ok(heads.size() == SPEC_TREES,
-		"§1: found %d lane headings in §7, expected %d — THE EXTRACTOR IS THE POPULATION, and a short read pairs the wrong table with the wrong heading and calls it a finding"
-			% [heads.size(), SPEC_TREES])
-	ok(tables.size() == SPEC_TREES,
-		"§1: found %d tree tables in §7, expected %d" % [tables.size(), SPEC_TREES])
-	# THE ALTERNATION ITSELF. A heading that has drifted BELOW its table still
-	# pairs by index and would read clean; the shape says so directly.
-	var want := ""
-	for i in range(SPEC_TREES):
-		want += "HT"
-	ok(order == want,
-		"§1: §7 does not read heading-then-table twelve times over (got `%s`) — a heading that has moved past its own table still pairs by index"
-			% order)
-	if heads.size() != tables.size():
-		print("    counts disagree; the per-tree comparison is skipped rather than zipped out of step")
-		return
-	var mismatched: Array = []
-	var seen_specs := {}
-	for i in range(heads.size()):
-		var spec := String(heads[i][0])
-		var lanes: Array = heads[i][1]
-		var cols: Array = tables[i]
-		seen_specs[spec] = int(seen_specs.get(spec, 0)) + 1
-		# THE SAME FUNCTION §3 DRIVES. A control on a private copy of the
-		# comparison proves nothing about the copy that runs here.
-		var same := _lanes_agree(lanes, cols)
-		ok(same,
-			"§1: the %s heading names %s and the table beneath it lists %s — ONE OF THE TWO IS ABOVE THE WRONG TREE"
-				% [spec, lanes, cols])
-		if not same:
-			mismatched.append(spec)
-		print("    %-14s %-46s %s" % [spec, ", ".join(PackedStringArray(lanes)),
-			"" if same else "<-- against " + ", ".join(PackedStringArray(cols))])
-	# AND NO SPEC IS INTRODUCED TWICE. Eight headings permuted among themselves
-	# leave every name present exactly once, so this is not what caught FR's
-	# defect — it catches the OTHER shape, a heading duplicated or dropped by a
-	# repair, which is precisely what a permutation edit risks.
+func _gate_tiers(flat7: String) -> Array:
+	var a := flat7.find(GATE_HEAD)
+	if a < 0:
+		return []
+	var b := flat7.find("</table>", a)
+	if b < 0:
+		return []
+	var out: Array = []
+	# The fresh-save row carries a dash, not a tier, and is not a tier opened.
+	for m in _rx("<tr><td>([0-9]+)</td>").search_all(flat7.substr(a, b - a)):
+		out.append(int(m.get_string(1)))
+	return out
+
+
+# ── §1 — §7'S STATED SHAPE AGREES WITH THE TREE TABLE UNDER IT ─────────────
+#
+# Every figure is read as the document states it — the node count and the tiers
+# in WORDS, the prices and the total as digits — and each is compared with what
+# the table under it actually carries. **The per-tier comparison is ONE
+# assertion, not one per tier**, so this gate's count does not rise and fall with
+# how many tiers a sentence happens to describe (`check_es` §4's reason).
+func _s1_shape(flat7: String) -> Dictionary:
+	print("\n§1 — §7's stated shape agrees with the tree table under it")
+	var m_nodes := _rx("one talent tree of <b>([a-z]+(?:-[a-z]+)?) nodes</b>").search(flat7)
+	var m_tiers := _rx("Structure: ([a-z]+) TIERS of ([a-z]+)\\.").search(flat7)
+	var m_price := _rx("tier 1 cells cost ([0-9]+) points?, tier 2 cost ([0-9]+), tier 3 cost ([0-9]+)").search(flat7)
+	var m_total := _rx("the whole tree is <b>([0-9]+) points</b>").search(flat7)
+	var read_all := m_nodes != null and m_tiers != null and m_price != null and m_total != null
+	ok(read_all,
+		"§1: §7's stated shape no longer matches its sentences (nodes %s / tiers %s / prices %s / total %s) — the arms below would read nothing"
+			% [m_nodes != null, m_tiers != null, m_price != null, m_total != null])
+	var rows := _tree_rows(flat7)
+	ok(rows.size() > 0, "§1: §7's tree table parsed to zero rows, so every comparison below is vacuous")
+	var shape := {"nodes": 0, "rows": rows.size(), "prices_read": m_price != null}
+	if not read_all:
+		return shape
+	var said_nodes := _words_to_int(m_nodes.get_string(1))
+	var said_tiers := _words_to_int(m_tiers.get_string(1))
+	var said_per := _words_to_int(m_tiers.get_string(2))
+	var prices := [int(m_price.get_string(1)), int(m_price.get_string(2)), int(m_price.get_string(3))]
+	var said_total := int(m_total.get_string(1))
+	shape["nodes"] = said_nodes
+	ok(said_nodes == rows.size(),
+		"§1: §7 says its tree has %d nodes and the table under it lists %d" % [said_nodes, rows.size()])
+	var per_tier := {}
+	var column: Array = []
+	var seen := {}
 	var dupes: Array = []
-	for s in seen_specs:
-		if int(seen_specs[s]) != 1:
-			dupes.append("%s x%d" % [s, int(seen_specs[s])])
-	ok(dupes.is_empty(),
-		"§1: a spec heads more than one tree in §7 (%s)" % ", ".join(PackedStringArray(dupes)))
-	print("    %d of %d headings pair with the table beneath them%s" % [
-		heads.size() - mismatched.size(), heads.size(),
-		"" if mismatched.is_empty() else "; MIS-PAIRED: " + ", ".join(PackedStringArray(mismatched))])
+	for r in rows:
+		var t := int(r[0])
+		per_tier[t] = int(per_tier.get(t, 0)) + 1
+		column.append(t)
+		var nm := String(r[1])
+		if seen.has(nm):
+			dupes.append(nm)
+		seen[nm] = true
+	ok(per_tier.size() == said_tiers,
+		"§1: §7 says %d tiers and its table lists %d distinct tiers (%s)" % [said_tiers, per_tier.size(), per_tier.keys()])
+	var short: Array = []
+	for t in per_tier:
+		if int(per_tier[t]) != said_per:
+			short.append("tier %d lists %d" % [int(t), int(per_tier[t])])
+	ok(short.is_empty(),
+		"§1: §7 says a tier is %d nodes and the table disagrees: %s" % [said_per, ", ".join(PackedStringArray(short))])
+	# THE SAME FUNCTION §3 DRIVES. A control on a private copy of the comparison
+	# proves nothing about the copy that runs here.
+	ok(_tiers_in_order(column),
+		"§1: the tier column of §7's table goes backwards — a node is printed inside another tier's band, which is FR's heading-over-the-wrong-table in the one tree's shape")
+	var priced := 0
+	for t in per_tier:
+		if int(t) >= 1 and int(t) <= prices.size():
+			priced += int(per_tier[t]) * int(prices[int(t) - 1])
+	ok(priced == said_total,
+		"§1: the table's rows at §7's stated prices come to %d points, and §7 says the whole tree is %d" % [priced, said_total])
+	ok(said_tiers * said_per == said_nodes,
+		"§1: §7's own arithmetic does not close — %d tiers of %d is not %d nodes" % [said_tiers, said_per, said_nodes])
+	ok(dupes.is_empty(), "§1: a node is printed twice in §7's table (%s)" % ", ".join(PackedStringArray(dupes)))
+	var opened := _gate_tiers(flat7)
+	var want: Array = []
+	for t in range(1, said_tiers + 1):
+		want.append(t)
+	ok(opened == want,
+		"§1: §7's difficulty table opens tiers %s, and the section describes %d tiers" % [opened, said_tiers])
+	print("    stated  %d nodes = %d tiers of %d, at %s a cell, %d points" % [said_nodes, said_tiers, said_per, prices, said_total])
+	print("    counted %d rows %s, %d points at the stated prices; the difficulty table opens %s" % [rows.size(), per_tier, priced, opened])
+	return shape
+
+
+func _tiers_in_order(column: Array) -> bool:
+	var last := 0
+	for t in column:
+		if int(t) < last:
+			return false
+		last = int(t)
+	return true
 
 
 # ── §2 — A COUNT IN A HEADING EQUALS THE ROWS UNDER IT ──────────────────────
@@ -363,33 +391,31 @@ func _words_to_int(phrase: String) -> int:
 
 # ── §3 — THE EXTRACTORS ARE STILL EXTRACTING ────────────────────────────────
 #
-# BOTH ARMS ABOVE PASS BY FINDING NOTHING — no mis-paired heading, no count
-# that disagrees. **A gate whose clean state is "no findings" reads identically
-# to a gate that has stopped looking**, and this gate's own first draft proved
-# the point: a line-anchored heading match read 9 of 12 and printed four
-# confident false mismatches. Every population §1 and §2 depend on is asserted
-# here, and the word reader is driven on values it cannot get wrong.
-func _s3_liveness(doc: String, heads: Array, tables: Array) -> void:
+# BOTH ARMS ABOVE PASS BY FINDING NOTHING — no disagreeing shape, no count that
+# disagrees. **A gate whose clean state is "no findings" reads identically to a
+# gate that has stopped looking**, and this gate's own first draft proved the
+# point: a line-anchored heading match read 9 of 12 and printed four confident
+# false mismatches. Every population §1 and §2 depend on is asserted here, and
+# the word reader is driven on values it cannot get wrong.
+func _s3_liveness(doc: String, shape: Dictionary) -> void:
 	print("\n§3 — the extractors, armed")
 	ok(doc.contains(S7_OPEN) and doc.contains(S7_CLOSE),
 		"§3: §7's own boundaries are gone from the document")
 	ok(doc.contains(S6B_ANCHOR),
 		"§3: §6b's anchor `%s` is gone, so §2 reads nothing" % S6B_ANCHOR)
-	ok(heads.size() == SPEC_TREES and tables.size() == SPEC_TREES,
-		"§3: the §7 walk returned %d headings and %d tables — §1's comparison is only as good as this"
-			% [heads.size(), tables.size()])
-	# THE WRAPPED HEADINGS, BY NAME. These three wrap across a line break in the
-	# source and are the three a line-anchored extractor drops. They are pinned
-	# so the flattening cannot be quietly removed.
-	var found: Array = []
-	for h in heads:
-		found.append(String(h[0]))
-	for spec in ["Arcanist", "Holy", "Devout"]:
-		ok(found.has(spec),
-			"§3: the %s heading is not in the walk — it wraps across a line break in the source, and its absence means the flattening has stopped happening"
-				% spec)
+	ok(int(shape["rows"]) > 0 and int(shape["nodes"]) > 0,
+		"§3: the §7 read returned %d table rows against a stated %d nodes — §1's comparison is only as good as this"
+			% [int(shape["rows"]), int(shape["nodes"])])
+	# THE WRAPPED STATEMENTS, BY WHAT THEY SAY. The node count and the prices
+	# each wrap across a line break in the source, so a line-anchored reader
+	# drops both. They are asserted read so the flattening cannot be quietly
+	# removed.
+	ok(int(shape["nodes"]) > 0,
+		"§3: §7's node count is not read — it wraps across a line break in the source, and its absence means the flattening has stopped happening")
+	ok(bool(shape["prices_read"]),
+		"§3: §7's tier prices are not read — the sentence wraps across a line break in the source, and its absence means the flattening has stopped happening")
 	# THE WORD READER, both ways. A reader that returned a constant would pass
-	# every arm in §2.
+	# every arm in §1 and §2.
 	ok(_words_to_int("one hundred and twenty-seven") == 127,
 		"§3: the word reader misreads `one hundred and twenty-seven`")
 	ok(_words_to_int("one hundred and fifty-four") == 154,
@@ -397,20 +423,10 @@ func _s3_liveness(doc: String, heads: Array, tables: Array) -> void:
 	ok(_words_to_int("twenty-four") == 24, "§3: the word reader misreads `twenty-four`")
 	ok(_words_to_int("one hundred and three") == 103,
 		"§3: the word reader misreads `one hundred and three`")
+	ok(_words_to_int("twenty-seven") == 27, "§3: the word reader misreads `twenty-seven`")
 	ok(_words_to_int("not a number") == 0,
 		"§3: the word reader returns a number for a phrase that holds none")
-	# AND THE PAIRING COMPARISON ITSELF, driven on a pair it must reject. §1
-	# passes by finding nothing; this is the arm that says it would find one.
-	var probe_same := _lanes_agree(["RUIN", "MADNESS", "LEECH"], ["Ruin", "Madness", "Leech"])
-	var probe_diff := _lanes_agree(["RUIN", "MADNESS", "LEECH"], ["Ruin", "Madness", "Entropy"])
-	ok(probe_same, "§3: the lane comparison rejects a pair that differs only in case")
-	ok(not probe_diff, "§3: the lane comparison accepts a table that lists a different lane")
-
-
-func _lanes_agree(lanes: Array, cols: Array) -> bool:
-	if lanes.size() != cols.size():
-		return false
-	for j in range(lanes.size()):
-		if String(lanes[j]).to_upper() != String(cols[j]).to_upper():
-			return false
-	return true
+	# AND THE TIER-ORDER COMPARISON ITSELF, driven on a column it must reject.
+	# §1 passes by finding nothing; this is the arm that says it would find one.
+	ok(_tiers_in_order([1, 1, 2, 2, 3, 3]), "§3: the tier-order check rejects a column that never goes backwards")
+	ok(not _tiers_in_order([1, 1, 2, 1, 3]), "§3: the tier-order check accepts a column with a node in another tier's band")

@@ -136,8 +136,27 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
-func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(Talents.LANE_TREES["inquisitor"], id)
+# ── BATCH FX — THE FAITH NODES THIS SUITE LEARNS ARE DELETED; THEIR FIELDS ARE NOT ──
+# FX deleted the twelve spec trees, and with them the five Faith-lane nodes the
+# live checks below learn. Every field those nodes wrote, and every read site
+# of it in `battle.gd`, was KEPT (dormant, not deleted), so each live question
+# still has a true answer. It is driven with the EXACT payload the node
+# carried, copied from the deleted inquisitor tree, on a node of that id added
+# to the Devout's own tree — so the field still arrives through the real spawn
+# path (`member["tree"]` and `member["talents"]` into `Talents.apply_from_tree`,
+# then `BattleUnit.setup`), and only the node around it is gone.
+const RETIRED := {
+	# FX: the payload the retired dv_fervor (Fervor) carried — the node is deleted, the field and its read site stand.
+	"dv_fervor": {"stat": {"fervor": 1}},
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is deleted, the field and its read site stand.
+	"dv_apostle": {"stat": {"apostle": 1}},
+	# FX: the payload the retired dv_oath (Binding Oath) carried — the node is deleted, the field and its read site stand.
+	"dv_oath": {"stat": {"oath_faith": 1}},
+	# FX: the payload the retired dv_communion (Communion) carried — the node is deleted, the field and its read site stand.
+	"dv_communion": {"stat": {"communion_ranks": 15}},
+	# FX: the payload the retired dv_covenant (Sacred Covenant) carried — the node is deleted, the field and its read site stand.
+	"dv_covenant": {"stat": {"covenant_heal": 25, "covenant_faith": 2}},
+}
 
 
 func _run_obj():
@@ -148,12 +167,31 @@ func _devout(scene: Node) -> BattleUnit:
 	return scene.call("_living_devout")
 
 
+# The Devout's tree for a spawn that learns retired nodes: the live tree plus
+# one node per learned id, carrying exactly that id's payload. An id missing
+# from `RETIRED` is an authoring slip in THIS file and is made loud — it would
+# otherwise spawn a Devout with nothing learned, and read as a failed rate.
+func _retired_tree(learned: Dictionary) -> Array:
+	var tree := Talents.tree()
+	for id in learned:
+		if not RETIRED.has(String(id)):
+			push_error("test_batch_bi: no retired payload for `%s`" % id)
+			continue
+		tree.append({"id": String(id), "name": String(id), "tier": 1, "desc": "",
+			"payload": (RETIRED[String(id)] as Dictionary).duplicate(true)})
+	return tree
+
+
 func _spawn(learned := {}) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
+	var opts := {"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true}
+	# BATCH FX: every id a live check learns is a RETIRED node, so its payload
+	# rides in on the Devout's own tree — member 2, the one `talents` names.
+	if not learned.is_empty():
+		opts["patch"] = {2: {"tree": _retired_tree(learned)}}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
 
 func _kill(scene: Node) -> void:
@@ -319,7 +357,8 @@ func _the_multiplier_is_a_sum_not_a_product() -> void:
 
 # A PLAYER MEETS THE RULE BEFORE ANY NUMBER. The held benefit persisting past
 # the release that spent it is a change to what the RESOURCE IS, so the status
-# chip default, the passive block, the two nodes and the glossary all say so.
+# chip default, the passive block and the glossary all say so — and the two
+# nodes did too, until FX deleted them (see the site below).
 func _the_two_texts_state_the_peak_rule() -> void:
 	var bsrc := _src("res://scripts/battle.gd")
 	var i := bsrc.find("\"faith\": [\"Faith\"")
@@ -334,19 +373,18 @@ func _the_two_texts_state_the_peak_rule() -> void:
 		"§1: ...and so does Conviction's passive block")
 	ok(csrc.substr(j, 700).contains("2 a hit"),
 		"§1: ...which also states §2's new absorb rate")
-	# The two doubling nodes must not promise a quadruple any more.
-	var fd := Talents.desc_for(_node("dv_fervor"), 1)
-	var ad := Talents.desc_for(_node("dv_apostle"), 1)
-	ok(fd.to_lower().contains("triple") and not fd.to_lower().contains("quadruple"),
-		"§1: Fervor's text says TRIPLE and never quadruple")
-	ok(fd.contains("%d%%" % (BASE_MITIGATION * FERVOR_MULT))
-			and fd.contains("+%d%%" % (BASE_DAMAGE * FERVOR_MULT)),
-		"§1: ...and states its own doubled pair at the new rates")
-	ok(ad.contains("%d%%" % (BASE_MITIGATION * APOSTLE_MULT))
-			and ad.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT)),
-		"§1: Apostle's text states its doubled pair at the new rates")
-	ok(ad.to_lower().contains("highest count held"),
-		"§1: ...and that a release never takes the value away")
+	# **BATCH FX — THE TWO NODE TEXTS ARE DELETED WITH THEIR SUBJECT (DG §2). 4
+	# CHECKS REMOVED HERE.** This section read the descs of `dv_fervor` and
+	# `dv_apostle` out of the deleted inquisitor tree: that Fervor's said TRIPLE
+	# and never quadruple and stated its own doubled pair (4% / +3%), and that
+	# Apostle's stated its doubled pair and that a release never takes the value
+	# away. FX deleted the twelve spec trees and all 324 of their nodes, and
+	# neither node has a successor in the one tree (none of the twenty-seven
+	# writes a Faith field), so there is no text left to read. The surfaces a
+	# player still meets the peak rule on — the status chip, the passive block
+	# and the glossary — are asserted around this comment, and the additive x3
+	# the two texts promised is MEASURED by `_live_fervor_and_apostle_are_additive`,
+	# on the exact payloads the nodes carried (`RETIRED`, above).
 	var glossary := _src("res://data/glossary.json")
 	ok(glossary.contains("faith_peak") or glossary.to_lower().contains("highest"),
 		"§1: the glossary's Faith entry carries the peak rule")

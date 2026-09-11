@@ -26,6 +26,13 @@
 # test that re-derives the formula it checks proves nothing. Damage carries a
 # uniform ±10% roll, so every rate is a SUM over `HITS` casts (CLAUDE.md's
 # standing trap: even with crit suppressed, one cast passes a wrong curve).
+#
+# BATCH FX DELETED THE TWELVE SPEC TREES, AND APOSTLE WITH THEM. The `apostle`
+# field and its one read site were kept, so both rates and both negative
+# controls are still measured: the Devout learns the retired node's EXACT
+# payload through the real spawn (FX_RETIRED, `_fx_tree`). What went is what
+# only the node could answer — its desc, its shelf and its payload key — six
+# checks, deleted where they stood.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -72,6 +79,22 @@ const BAND := 0.03
 const RATE_AT_PEAK := 0.30
 const TRIALS := 600
 
+# BATCH FX — THE NODES THIS SUITE LEARNED ARE DELETED; THEIR FIELDS ARE NOT. FX
+# removed the twelve spec trees and kept every read site of every field they
+# wrote (a field no node writes is dormant, not deleted). Each retired node a
+# live check learned is carried here as the EXACT payload it carried, and
+# `_fx_tree` hands the spawn the live tree PLUS those nodes, so the payload
+# still goes through `Talents.apply_from_tree` at the real spawn — the path the
+# old learn took. None of the three has a precedent-mapped `tn_*` node.
+const FX_RETIRED := {
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is deleted, the field and its read site stand.
+	"dv_apostle": {"name": "Apostle", "payload": {"stat": {"apostle": 1}}},
+	# FX: the payload the retired dv_communion (Communion) carried — the node is deleted, the field and its read site stand.
+	"dv_communion": {"name": "Communion", "payload": {"stat": {"communion_ranks": 15}}},
+	# FX: the payload the retired dv_oath (Binding Oath) carried — the node is deleted, the field and its read site stand.
+	"dv_oath": {"name": "Binding Oath", "payload": {"stat": {"oath_faith": 1}}},
+}
+
 var checks := 0
 var fails: Array = []
 # A live check that THROWS mid-way aborts its own function while the suite
@@ -101,7 +124,8 @@ func _run() -> void:
 	Profile.data = {}
 
 	# source-level: the shape of the re-spec
-	_the_capstone_describes_the_held_half()
+	# `_the_capstone_describes_the_held_half` (§2, six checks) was DELETED at
+	# FX — see its record where it stood.
 	_the_release_branch_no_longer_names_the_capstone()
 	_one_multiplier_one_gate()
 	_the_chip_and_the_passive_name_the_doubling()
@@ -137,8 +161,8 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
-func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(Talents.LANE_TREES["inquisitor"], id)
+# `_node(id)` read a node out of the Devout's tree; it went with the six checks
+# FX deleted (their record is at the first source-level section below).
 
 
 func _devout(scene: Node) -> BattleUnit:
@@ -151,10 +175,35 @@ func _devout(scene: Node) -> BattleUnit:
 # and crit_bonus at −10 puts the crit chance below zero on both sides.
 func _spawn(learned := {}) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
+	# BATCH FX: a learned node the one tree does not hold rides in on the
+	# Devout's tree with its retired payload; the fixture writes `patch` after
+	# the member is built, so the spawn applies it.
+	var opts := {"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true}
+	if not learned.is_empty():
+		opts["patch"] = {2: {"tree": _fx_tree(learned)}}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
+
+
+# The live tree, plus every learned node it no longer holds, carried with the
+# exact payload FX_RETIRED records. A learned id that is neither is a FAILURE
+# rather than a silent no-op: it would learn nothing, and every check reading
+# its field would read the field's zero as if the node had been measured.
+func _fx_tree(learned: Dictionary) -> Array:
+	var tree: Array = Talents.tree()
+	for id in learned:
+		var sid := String(id)
+		if not Talents.node_in_tree(tree, sid).is_empty():
+			continue
+		if not FX_RETIRED.has(sid):
+			checks += 1
+			fails.append("FX: `%s` is neither a live node nor a carried retired payload" % sid)
+			continue
+		var r: Dictionary = FX_RETIRED[sid]
+		tree.append({"id": sid, "name": String(r["name"]), "desc": "",
+			"payload": (r["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _kill(scene: Node) -> void:
@@ -221,24 +270,20 @@ func _damage_taken(scene: Node, carrier: BattleUnit, stacks: int) -> float:
 
 # THE NODE'S OWN TEXT IS THE SPEC. A capstone whose description still promises
 # the old behaviour is a bug report from every player who takes it.
-func _the_capstone_describes_the_held_half() -> void:
-	var n := _node("dv_apostle")
-	ok(not n.is_empty(), "§2: dv_apostle is still in the Faith lane at row 8")
-	var d: String = String(n.get("desc", ""))
-	ok(d.contains("%d%%" % (BASE_MITIGATION * APOSTLE_MULT)),
-		"§2: the capstone states its doubled mitigation per stack (now 4%)")
-	ok(d.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT)),
-		"§2: ...and its doubled damage dealt per stack (now +3%)")
-	ok(not d.to_lower().contains("no longer consume"),
-		"§2: ...and it no longer promises releases that consume nothing")
-	# The id, the lane and the payload field all survive, so no save migrates.
-	# BATCH BM moved the capstone SHELF from row 8 to row 9 (rows 1-8 are lanes
-	# now). The id, the lane and the payload field are what a save keys on and
-	# all three are untouched; the row is the shelf's, not the node's.
-	ok(String(n.get("lane", "")) == "Faith" and int(n.get("row", 0)) == Talents.CAPSTONE_ROW,
-		"§2: id, lane and the capstone shelf are unchanged")
-	ok(n.get("payload", {}).get("stat", {}).has("apostle"),
-		"§2: ...and the payload still writes the same `apostle` field")
+#
+# §2 — `_the_capstone_describes_the_held_half` — DELETED AT BATCH FX, SIX
+# CHECKS, WITH ITS SUBJECT (DG §2). They read dv_apostle OUT OF THE DEVOUT'S
+# TREE: that it was still there (1), that its desc stated the doubled
+# mitigation (4%) and the doubled damage dealt (+3%) per stack (2) and no
+# longer promised releases that consume nothing (1), that its lane and row
+# were the Faith capstone shelf — which is what a save keyed on (1) — and that
+# its payload still wrote `apostle` (1). FX deleted the twelve spec trees, the
+# capstone shelf and Apostle, and folds a v2 profile by dropping its cells, so
+# no save keys on the node either; no node of the one tree writes `apostle`,
+# and there is no desc, lane, row or payload left for the six to read. THE
+# DOUBLING IS STILL MEASURED WHERE IT PAYS: the field and its one read site
+# stand (`_one_multiplier_one_gate` below), and every live check drives the
+# retired payload through the real spawn.
 
 
 # THE NEGATIVE CONTROL THAT MATTERS, at the source. The old behaviour lived in
@@ -323,8 +368,13 @@ func _the_chip_and_the_passive_name_the_doubling() -> void:
 	var csrc := _src("res://scripts/classes.gd")
 	var j := csrc.find("\"passive_desc\": \"Conviction:")
 	ok(j > 0, "§2: the Devout's passive block is findable")
-	ok(csrc.substr(j, 600).contains("Apostle adds another 1x"),
-		"§2: ...and the passive block names Apostle's share of the multiplier")
+	# FX: Apostle (`dv_apostle`) and Fervor (`dv_fervor`) went with the twelve
+	# trees, and `apostle` and `fervor` are dormant: their read sites stand and
+	# nothing writes them. The question this asked, "does the player read the
+	# rule the arithmetic uses", now has the answer "the passive names neither
+	# share", so the block is asked not to promise one a player cannot buy.
+	ok(not csrc.substr(j, 600).contains("Apostle") and not csrc.substr(j, 600).contains("Fervor"),
+		"§2: ...and the passive block no longer names Apostle or Fervor, which FX deleted")
 	# BATCH CQ §3 — FLATTENED BEFORE THE READ. CL's prose pass re-wrapped the
 	# Devout's passive block and the line break now falls between "HELD" and
 	# "THIS BATTLE", so a raw substring search misses a sentence that is still

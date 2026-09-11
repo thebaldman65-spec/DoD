@@ -4,31 +4,38 @@
 # touches `Run`, so it works with no run in flight and refuses to work with
 # one (see `_locked`).
 #
-# THE ONE THING THIS SCREEN EXISTS TO MAKE LEGIBLE: BUYING A CELL UNLOCKS AN
-# OPTION, IT DOES NOT EQUIP IT. Two clicks, two states, two colours, and the
-# legend says so in words — because the whole design collapses into "a tree
-# you fill in" the moment a player believes one click does both.
-#   dark      not unlocked (and the tooltip says what it costs, or which
-#             difficulty opens its row)
-#   bronze    UNLOCKED — an option this row now argues over
-#   green     EQUIPPED — the one node in its row that a run will wear
+# BATCH FX — ONE TREE, KEYED TO THE CLASS, AND A CELL BOUGHT IS A CELL WORN.
+# The screen lists the four CLASSES, not the twelve specs: a Berserker, a
+# Warden and a Swordmaster all spend the Warrior's purse in the same
+# twenty-seven cells. The tree is three tiers of nine with no lanes and no
+# rows, and nothing in it is exclusive, so there is nothing to equip — ONE
+# click buys a cell and the cell is on every hero of that class from the next
+# run on. What the screen exists to make legible now is the pair of TIER
+# GATES, because a tier can be shut for two different reasons and a player
+# fixes them differently:
+#   dark        not owned, and buyable (the tooltip names the price)
+#   green       OWNED — worn by every hero of this class, every run
+#   dark red    the tier is shut: by difficulty (beat an end boss) or by
+#               spend (own more cells in the tier below) — the tier's own
+#               label says which
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const BACK_POS := Vector2(300, 96)
 const BACK_SIZE := Vector2(956, 592)
-const LANE_COL_X := [520.0, 776.0, 1032.0]
-const ROW_Y := [150.0, 198.0, 246.0, 294.0, 342.0, 390.0, 438.0, 486.0]
-const CAP_Y := 552.0
-const NODE := 40.0
+# Nine cells across each tier band, and three bands down the board.
+const COL_X0 := 452.0
+const COL_STEP := 98.0
+const TIER_Y := [168.0, 358.0, 548.0]
+const NODE := 42.0
+const LABEL_W := 94.0
 
-const C_LOCKED := Color(0.24, 0.24, 0.27)
-const C_OWNED := Color(0.72, 0.55, 0.28)
-const C_EQUIPPED := Color(0.36, 0.72, 0.40)
+const C_OPEN := Color(0.24, 0.24, 0.27)
+const C_OWNED := Color(0.36, 0.72, 0.40)
 const C_TIER_SHUT := Color(0.35, 0.16, 0.16)
 
-var spec := ""
+var class_key := ""
 var _tip: PanelContainer
 var _tip_name: Label
 var _tip_desc: Label
@@ -37,8 +44,8 @@ var _tip_state: Label
 
 func _ready() -> void:
 	Music.play("menu")
-	var ids: Array = Classes.all_specs()
-	spec = String(ids[0]) if not ids.is_empty() else ""
+	var keys: Array = Classes.SPEC_IDS.keys()
+	class_key = String(keys[0]) if not keys.is_empty() else ""
 	_draw_screen()
 
 
@@ -77,8 +84,8 @@ func _draw_screen() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
-	_draw_spec_list()
-	if spec == "" or not Talents.has_tree(spec):
+	_draw_class_list()
+	if class_key == "":
 		return
 	_draw_header()
 	_draw_tree()
@@ -94,43 +101,58 @@ func _on_back() -> void:
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 
-# ---------- the twelve specs down the left edge ----------
+# ---------- the four classes down the left edge ----------
 
-func _draw_spec_list() -> void:
+func _class_name(key: String) -> String:
+	return key.capitalize()
+
+
+# Which specs spend this class's purse — said on the button, because the
+# merge is the thing a returning player most needs told.
+func _class_specs_line(key: String) -> String:
+	var names := PackedStringArray()
+	for spec in Classes.SPEC_IDS.get(key, []):
+		names.append(String(Classes.SPEC_INFO[String(spec)]["name"]))
+	return ", ".join(names)
+
+
+func _draw_class_list() -> void:
 	var y := 96.0
-	for id in Classes.all_specs():
-		var sid := String(id)
+	for key in Classes.SPEC_IDS:
+		var ck := String(key)
 		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(250, 44)
+		btn.custom_minimum_size = Vector2(250, 58)
 		btn.position = Vector2(24, y)
 		btn.add_theme_font_size_override("font_size", 13)
-		var avail := Profile.talent_points_available(sid)
-		btn.text = "%s%s" % [String(Classes.SPEC_INFO[sid]["name"]),
-			"" if avail < 1 else "   (%d)" % avail]
-		btn.disabled = sid == spec
-		if avail > 0 and sid != spec:
+		var avail := Profile.talent_points_available(ck)
+		btn.text = "%s%s\n%s" % [_class_name(ck),
+			"" if avail < 1 else "   (%d)" % avail, _class_specs_line(ck)]
+		btn.disabled = ck == class_key
+		if avail > 0 and ck != class_key:
 			btn.modulate = Color(1.0, 0.9, 0.45)
 		btn.pressed.connect(Music.click)
-		btn.pressed.connect(_select_spec.bind(sid))
+		btn.pressed.connect(_select_class.bind(ck))
 		add_child(btn)
-		y += 48.0
+		y += 64.0
 
 
-func _select_spec(id: String) -> void:
-	spec = id
+func _select_class(key: String) -> void:
+	class_key = key
 	_draw_screen()
 
 
-# ---------- the header: the purse, the tier, and the rules in one line ----------
+# ---------- the header: the purse, the tiers, and the rules in one line ----------
 
 func _draw_header() -> void:
 	var tier := Profile.talent_tier()
-	var earned := Profile.talent_points_earned(spec)
-	var avail := Profile.talent_points_available(spec)
+	var earned := Profile.talent_points_earned(class_key)
+	var avail := Profile.talent_points_available(class_key)
+	var open_n := Talents.tiers_open(tier)
 	var hdr := Label.new()
-	hdr.text = "%s — %d point%s available of %d banked   ·   rows 1-%d unlocked   ·   a full tree is %d" % [
-		String(Classes.SPEC_INFO[spec]["name"]), avail, "" if avail == 1 else "s",
-		earned, Talents.rows_unlocked(tier), Talents.full_spec_cost()]
+	hdr.text = "%s — %d point%s available of %d banked   ·   %s   ·   the whole tree is %d" % [
+		_class_name(class_key), avail, "" if avail == 1 else "s", earned,
+		"no tier open yet" if open_n < 1 else "tiers 1-%d open by difficulty" % open_n,
+		Talents.full_tree_cost()]
 	hdr.add_theme_font_size_override("font_size", 14)
 	hdr.add_theme_color_override("font_color", Color(0.88, 0.8, 0.62))
 	hdr.position = Vector2(BACK_POS.x, 66)
@@ -138,8 +160,9 @@ func _draw_header() -> void:
 	add_child(hdr)
 
 	var legend := Label.new()
-	legend.text = "CLICK to unlock a cell  ·  CLICK AN UNLOCKED CELL to equip it for your next run  " \
-		+ "·  unlocking is not equipping: you still take ONE node per row"
+	legend.text = "CLICK a cell to buy it — every hero of this class wears it, every run  " \
+		+ "·  a tier opens when its end boss falls AND %d cells of the tier below are owned" \
+		% Talents.TIER_SPEND_MIN
 	legend.add_theme_font_size_override("font_size", 11)
 	legend.add_theme_color_override("font_color", Color(0.6, 0.56, 0.5))
 	legend.position = Vector2(BACK_POS.x, 86)
@@ -157,9 +180,9 @@ func _draw_header() -> void:
 		return
 
 	var respec := Button.new()
-	respec.text = "Respec %s" % String(Classes.SPEC_INFO[spec]["name"])
-	respec.tooltip_text = "Every point back, every cell and every equip cleared. Costs nothing, ever."
-	respec.custom_minimum_size = Vector2(220, 38)
+	respec.text = "Respec %s" % _class_name(class_key)
+	respec.tooltip_text = "Every point back and every cell cleared. Costs nothing, ever."
+	respec.custom_minimum_size = Vector2(220, 30)
 	respec.position = Vector2(BACK_POS.x, 690)
 	respec.add_theme_font_size_override("font_size", 13)
 	respec.pressed.connect(Music.click)
@@ -170,33 +193,27 @@ func _draw_header() -> void:
 func _on_respec() -> void:
 	if _locked():
 		return
-	Profile.respec(spec)
+	Profile.respec(class_key)
 	_draw_screen()
 
 
-# ---------- the grid ----------
+# ---------- the board: three tiers of nine ----------
 
-func _row_y(row: int) -> float:
-	if row >= Talents.CAPSTONE_ROW:
-		return CAP_Y
-	return ROW_Y[clampi(row - 1, 0, ROW_Y.size() - 1)]
-
-
-func _lane_order(tree: Array) -> Array:
-	var lanes: Array = []
-	for t in tree:
-		var lane := str(t.get("lane", ""))
-		if lane != "" and not lanes.has(lane):
-			lanes.append(lane)
-	return lanes.slice(0, 3)
+# Why a tier is shut, in the player's words, or "" when it is open. The two
+# gates are different problems: one is fixed by winning, the other by buying.
+func _tier_shut_reason(tier: int, tree: Array, cells: Dictionary, diff_tier: int) -> String:
+	if not Talents.tier_open(tier, diff_tier):
+		return "beat the end boss on difficulty %d" % Talents.difficulty_for_tier(tier)
+	if not Talents.spend_gate_met(tree, cells, tier):
+		return "own %d more in tier %d" % [
+			Talents.TIER_SPEND_MIN - Talents.bought_in_tier(tree, cells, tier - 1), tier - 1]
+	return ""
 
 
 func _draw_tree() -> void:
-	var tree: Array = Talents.generate_tree(spec, "")
-	var cells := Profile.talent_cells(spec)
-	var equipped := Profile.talent_equipped(spec)
-	var tier := Profile.talent_tier()
-	var lanes := _lane_order(tree)
+	var tree: Array = Talents.tree()
+	var cells := Profile.talent_cells(class_key)
+	var diff_tier := Profile.talent_tier()
 
 	var back := ColorRect.new()
 	back.position = BACK_POS
@@ -204,55 +221,33 @@ func _draw_tree() -> void:
 	back.color = Color(0.05, 0.05, 0.06)
 	add_child(back)
 
-	for ci in mini(LANE_COL_X.size(), lanes.size()):
-		var hdr := Label.new()
-		hdr.text = str(Talents.LANE_NAMES.get(lanes[ci], lanes[ci])).to_upper()
-		hdr.add_theme_font_size_override("font_size", 13)
-		hdr.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
-		hdr.position = Vector2(LANE_COL_X[ci] - 110, BACK_POS.y + 4)
-		hdr.size = Vector2(220, 16)
-		hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(hdr)
-
-	# One label per row saying what the row costs and whether it is open at
-	# all. A locked TIER reads differently from an unaffordable cell — those
-	# are different problems and a player fixes them differently.
-	for row in range(1, Talents.CAPSTONE_ROW + 1):
-		var open_row := Talents.row_unlocked(row, tier)
+	for tier in range(1, Talents.TIERS + 1):
+		var y: float = TIER_Y[tier - 1]
+		var shut := _tier_shut_reason(tier, tree, cells, diff_tier)
+		var band := ColorRect.new()
+		band.position = Vector2(BACK_POS.x + 8, y - 44)
+		band.size = Vector2(BACK_SIZE.x - 16, 170)
+		band.color = Color(1, 1, 1, 0.03) if shut == "" else Color(0.35, 0.10, 0.10, 0.10)
+		add_child(band)
 		var lbl := Label.new()
-		lbl.text = "row %d  ·  %dp" % [row, Talents.cell_cost(row)] if open_row \
-			else "row %d  ·  diff %d" % [row, Talents.tier_of_row(row)]
-		lbl.add_theme_font_size_override("font_size", 10)
+		lbl.text = "TIER %d  ·  %dp a cell  ·  %d of %d owned%s" % [tier,
+			Talents.cell_cost(tier), Talents.bought_in_tier(tree, cells, tier),
+			Talents.NODES_PER_TIER, "" if shut == "" else "  ·  SHUT: %s" % shut]
+		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.add_theme_color_override("font_color",
-			Color(0.62, 0.55, 0.38) if open_row else C_TIER_SHUT)
-		lbl.position = Vector2(BACK_POS.x + 8, _row_y(row) - 7)
-		lbl.size = Vector2(LANE_COL_X[0] - BACK_POS.x - 60, 14)
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			Color(0.62, 0.55, 0.38) if shut == "" else Color(0.85, 0.45, 0.40))
+		lbl.position = Vector2(BACK_POS.x + 16, y - 40)
+		lbl.size = Vector2(BACK_SIZE.x - 32, 14)
 		add_child(lbl)
-
-	var cap := Label.new()
-	cap.text = "— CAPSTONE SHELF · ONE PER HERO, EVER · any lane —"
-	cap.add_theme_font_size_override("font_size", 11)
-	cap.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
-	cap.position = Vector2(BACK_POS.x, CAP_Y - 30)
-	cap.size = Vector2(BACK_SIZE.x, 13)
-	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(cap)
-
-	for t in tree:
-		var col := maxi(lanes.find(str(t.get("lane", ""))), 0)
-		var row2 := int(t.get("row", 1))
-		_make_node(t, cells, equipped, tier,
-			Vector2(LANE_COL_X[col], _row_y(row2)))
+		var col := 0
+		for t in Talents.tier_nodes(tree, tier):
+			_make_node(t, cells, shut != "", Vector2(COL_X0 + COL_STEP * col - 118.0, y))
+			col += 1
 
 
-func _make_node(t: Dictionary, cells: Dictionary, equipped: Dictionary,
-		tier: int, center: Vector2) -> void:
+func _make_node(t: Dictionary, cells: Dictionary, tier_shut: bool, center: Vector2) -> void:
 	var id := String(t["id"])
-	var row := int(t.get("row", 1))
 	var owned := bool(cells.get(id, false))
-	var is_eq := String(equipped.get(str(row), "")) == id
-	var open_row := Talents.row_unlocked(row, tier)
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(NODE, NODE)
@@ -260,16 +255,15 @@ func _make_node(t: Dictionary, cells: Dictionary, equipped: Dictionary,
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.10, 0.10, 0.12)
-	sb.border_color = C_EQUIPPED if is_eq else (C_OWNED if owned \
-		else (C_LOCKED if open_row else C_TIER_SHUT))
-	sb.set_border_width_all(3 if is_eq else 2)
+	sb.border_color = C_OWNED if owned else (C_TIER_SHUT if tier_shut else C_OPEN)
+	sb.set_border_width_all(3 if owned else 2)
 	sb.set_corner_radius_all(6)
 	var hover: StyleBoxFlat = sb.duplicate()
 	hover.border_color = Color(0.91, 0.78, 0.35)
 	btn.add_theme_stylebox_override("normal", sb)
 	btn.add_theme_stylebox_override("hover", hover)
 	btn.add_theme_stylebox_override("pressed", hover)
-	btn.text = "♛" if t.get("capstone", false) else ("⚔" if owned else "⊘")
+	btn.text = "⚔" if owned else "⊘"
 	btn.add_theme_font_size_override("font_size", 17)
 	btn.add_theme_color_override("font_color",
 		Color(0.75, 0.75, 0.8) if owned else Color(0.30, 0.30, 0.34))
@@ -280,23 +274,29 @@ func _make_node(t: Dictionary, cells: Dictionary, equipped: Dictionary,
 	btn.mouse_exited.connect(_hide_tip)
 	add_child(btn)
 
+	var name_lbl := Label.new()
+	name_lbl.text = String(t["name"])
+	name_lbl.add_theme_font_size_override("font_size", 10)
+	name_lbl.add_theme_color_override("font_color",
+		Color(0.80, 0.86, 0.78) if owned else Color(0.55, 0.53, 0.50))
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.position = Vector2(center.x - LABEL_W / 2.0, center.y + NODE / 2.0 + 4)
+	name_lbl.size = Vector2(LABEL_W, 60)
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(name_lbl)
 
-# ONE CLICK, TWO MEANINGS, AND THE ORDER IS THE DESIGN: an unowned cell is
-# BOUGHT; an owned one is EQUIPPED. A player never has to learn a modifier
-# key, and the second click is the one that teaches them the distinction.
+
+# ONE CLICK, ONE MEANING: an unowned cell is BOUGHT, and a bought cell is worn.
+# Clicking an owned cell does nothing — pulling a point back is the respec,
+# which cannot strand a tier the way a single refund can.
 func _on_node(id: String) -> void:
 	if _locked():
 		return
+	if Profile.owns_cell(class_key, id):
+		return
 	Music.click()
-	if Profile.owns_cell(spec, id):
-		var tree: Array = Talents.generate_tree(spec, "")
-		var row := int(Talents.node_in_tree(tree, id).get("row", 1))
-		if String(Profile.talent_equipped(spec).get(str(row), "")) == id:
-			Profile.unequip_row(spec, row)
-		else:
-			Profile.equip_cell(spec, id)
-	else:
-		Profile.buy_cell(spec, id)
+	Profile.buy_cell(class_key, id)
 	_draw_screen()
 
 
@@ -326,6 +326,8 @@ func _build_tip() -> void:
 	_tip_name.add_theme_font_override("font", bold)
 	_tip_name.add_theme_font_size_override("font_size", 15)
 	_tip_name.add_theme_color_override("font_color", Color.WHITE)
+	_tip_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip_name.custom_minimum_size = Vector2(320, 0)
 	box.add_child(_tip_name)
 	_tip_desc = Label.new()
 	_tip_desc.add_theme_font_size_override("font_size", 12)
@@ -344,37 +346,27 @@ func _build_tip() -> void:
 
 func _show_tip(t: Dictionary, center: Vector2) -> void:
 	var id := String(t["id"])
-	var row := int(t.get("row", 1))
-	var tree: Array = Talents.generate_tree(spec, "")
-	var cells := Profile.talent_cells(spec)
-	var equipped := Profile.talent_equipped(spec)
+	var tier := Talents.tier_of(t)
+	var tree: Array = Talents.tree()
+	var cells := Profile.talent_cells(class_key)
 	_tip_name.text = String(t["name"])
 	_tip_desc.text = Talents.desc_for(t, 1)
-	var state := "Capstone shelf" if row >= Talents.CAPSTONE_ROW \
-		else "Row %d of %d" % [row, Talents.ROWS]
-	state += "  ·  %d point%s" % [Talents.cell_cost(row),
-		"" if Talents.cell_cost(row) == 1 else "s"]
+	var state := "Tier %d of %d  ·  %d point%s" % [tier, Talents.TIERS,
+		Talents.cell_cost(tier), "" if Talents.cell_cost(tier) == 1 else "s"]
 	if bool(cells.get(id, false)):
-		if String(equipped.get(str(row), "")) == id:
-			state += "\nEQUIPPED — click to take it off."
-		else:
-			state += "\nUNLOCKED but not equipped. Click to equip it; it will replace"
-			state += " whatever else holds this row."
-			var held := String(equipped.get(str(row), ""))
-			if held != "":
-				state += "\nThis row currently holds %s." % \
-					Talents.node_in_tree(tree, held).get("name", held)
+		state += "\nOWNED — every hero of this class wears it, every run."
 	else:
 		var check := Talents.can_buy(tree, id, cells,
-			Profile.talent_points_available(spec), Profile.talent_tier())
-		state += "\n%s" % ("Click to unlock this cell." if check["ok"] else String(check["why"]))
-		state += "\nUnlocking makes it an OPTION for this row — it does not equip it."
+			Profile.talent_points_available(class_key), Profile.talent_tier())
+		state += "\n%s" % ("Click to buy it." if check["ok"] else String(check["why"]))
 	if _locked():
 		state += "\nA run is in flight; nothing here can change until it ends."
 	_tip_state.text = state
 	_tip.visible = true
 	_tip.reset_size()
-	var pos := center + Vector2(-NODE / 2.0 - _tip.size.x - 10, -24)
+	var pos := center + Vector2(NODE / 2.0 + 10, -24)
+	if pos.x + _tip.size.x > 1268.0:
+		pos.x = center.x - NODE / 2.0 - _tip.size.x - 10
 	pos.x = maxf(pos.x, 12.0)
 	pos.y = clampf(pos.y, 12.0, 720.0 - _tip.size.y - 12.0)
 	_tip.position = pos

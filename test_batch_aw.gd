@@ -33,6 +33,18 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX DELETED THE TREE THIS FILE WAS WRITTEN ABOUT. The twelve spec trees
+# are gone (`Talents.LANE_TREES`, and every dv_* node with it); the Devout buys
+# into the ONE class tree — twenty-seven `tn_*` nodes in three tiers of nine.
+# EVERY FIELD READ SITE STOOD, so every MECHANIC this file drives is still
+# driven, off the exact payload its retired node carried (`RETIRED`, below), or
+# off the precedent-mapped `tn_*` node that carries the same field and number.
+# Every question about the tree's SHAPE is asked of the one tree wherever it
+# still has a subject there. What asked about the Devout tree ITSELF — its ids,
+# lanes, rows, slots, homes, names, per-node magnitudes, payload shapes and
+# tooltips — is deleted at its own site under DG §2, and each site says what it
+# asked, why the subject is gone and how many checks went.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -99,8 +111,73 @@ func _run() -> void:
 
 # ---------- helpers ----------
 
+# BATCH FX: the tree the Devout buys into — the ONE class tree, since the
+# twelve spec trees are deleted. `generate_tree` still takes the spec.
 func _tree() -> Array:
 	return Talents.generate_tree("inquisitor", "cleric")
+
+
+# ---------- BATCH FX: the retired Devout nodes this suite still drives ----------
+#
+# FX deleted the Devout tree, and every field below kept its declaration and its
+# read site (FX kept every one: a field no node writes is dormant, not deleted).
+# So each live question is still asked — of the EXACT payload the retired node
+# carried, lifted verbatim from HEAD's `LANE_TREES["inquisitor"]`. `_spawn` hands
+# each one it is given to the Devout as a node BESIDE the live tree, so
+# `apply_from_tree` applies it at the point in the spawn the Devout tree always
+# did: after the earned picks, before the class passive, the runes and the
+# upgrades. No live `tn_*` node writes any of these fields.
+const RETIRED := {
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is
+	# deleted, the field and its read site stand.
+	"dv_apostle": {"name": "Apostle", "payload": {"stat": {"apostle": 1}}},
+	# FX: the payload the retired dv_fervor (Fervor) carried — the node is
+	# deleted, the field and its read site stand.
+	"dv_fervor": {"name": "Fervor", "payload": {"stat": {"fervor": 1}}},
+	# FX: the payload the retired dv_stalwart (Stalwart) carried — the node is
+	# deleted, the field and its read site stand.
+	"dv_stalwart": {"name": "Stalwart", "payload": {"stat": {"stalwart_step": 20}}},
+	# FX: the payload the retired dv_bastion (Bastion) carried — the node is
+	# deleted; the `ability` arm it rode is live machinery (runes use it).
+	"dv_bastion": {"name": "Bastion", "payload": {"ability": "Divine Shield",
+		"set": {"cooldown": 0}}},
+}
+
+# FX: every counter the retired Devout tree wrote — its 27 nodes' `stat`
+# payloads, inlined from HEAD's `LANE_TREES["inquisitor"]`. The tree is deleted;
+# every one of these is still declared on `BattleUnit` except `max_hp_pct`, which
+# is a cfg field the spawn block consumes (see `_cfg_consumed`).
+const DEVOUT_COUNTERS := ["blessed_barrier_ranks", "aegis_ranks", "afterglow_ranks",
+	"warded_ranks", "stalwart_step", "unyielding_ranks", "communion_ranks",
+	"max_hp_pct", "devoutness_ranks", "faithful_step", "covenant_heal",
+	"covenant_faith", "fervor", "oath_faith", "waters_ranks", "righteous_step",
+	"pulse_ranks", "crusade_ranks", "purity_ranks", "lifewell_ranks",
+	"layered_faith", "creed", "eternal_ground", "apostle", "judgement"]
+
+
+# FX: every cell of the ONE tree, worn — what `Profile.worn_talents` hands a
+# class that has bought the whole tree (a cell owned is a cell worn).
+func _all_cells() -> Dictionary:
+	var out := {}
+	for t in _tree():
+		out[String(t["id"])] = 1
+	return out
+
+
+# FX: the Devout's tree for one spawn — the live tree, plus a node for each
+# RETIRED id the spawn learns. An id that is in NEITHER would apply nothing in
+# silence, so it fails here instead of passing quietly.
+func _member_tree(learned: Dictionary) -> Array:
+	var tree := _tree()
+	for id in learned:
+		if not Talents.node_in_tree(tree, String(id)).is_empty():
+			continue
+		if not RETIRED.has(id):
+			ok(false, "the spawn learns %s, which is neither a live node nor a RETIRED payload" % id)
+			continue
+		tree.append({"id": String(id), "name": String(RETIRED[id]["name"]), "desc": "",
+			"payload": (RETIRED[id]["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _node(id: String) -> Dictionary:
@@ -144,9 +221,14 @@ func _hero(scene: Node, idx: int) -> BattleUnit:
 func _spawn(learned: Dictionary, member_patch := {},
 		lineup := ["raider"]) -> Node:
 	# A crit is the worst coin to leave live on a spec measured in healing.
+	# BATCH FX: his tree is the one tree plus any RETIRED payload the spawn learns
+	# (`_member_tree`), written through `patch` — which the fixture applies AFTER
+	# it sets the tree, so the fixture itself did not move.
+	var patch: Dictionary = member_patch.duplicate()
+	patch["tree"] = _member_tree(learned)
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", "inquisitor", "beastmaster"],
-		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: member_patch},
+		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: patch},
 		"deterministic": true, "crit": -10.0})
 
 
@@ -156,54 +238,55 @@ func _kill(scene: Node) -> void:
 
 # ---------- §3 the tree's shape ----------
 
-const IDS := ["dv_barrier", "dv_aegis", "dv_afterglow", "dv_warded",
-	"dv_stalwart", "dv_bastion", "dv_unyielding",
-	"dv_communion", "dv_unwavering", "dv_devoutness", "dv_faithful",
-	"dv_covenant", "dv_fervor", "dv_oath",
-	"dv_waters", "dv_righteous", "dv_resolve", "dv_pulse", "dv_crusade",
-	"dv_purity", "dv_lifewell",
-	"dv_bulwark", "dv_apostle", "dv_judgement"]
-
-
+# BATCH FX — THE DEVOUT TREE IS DELETED, SO THIS SECTION ASKS WHAT STILL HAS A
+# SUBJECT. The Devout buys into the ONE class tree; its size, its distinct ids,
+# the rank each node is worn at, the tier each node sits in and its partition
+# into tiers are questions with true answers there, and each is asked of it
+# below. The per-node walks cover 27 nodes, as they covered the Devout's 27.
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Devout tree holds 24 nodes (got %d)" % tree.size())
-	# EVERY ID SURVIVES AND RE-SPECS IN PLACE — no new ids, none deleted, so
-	# saved picks migrate and no save version moves.
+	# RE-POINTED (FX): the one tree holds 27 nodes — three tiers of nine.
+	ok(tree.size() == 27,
+		"the one tree the Devout buys into holds 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for t in tree:
 		seen[String(t.get("id", ""))] = true
-	for id in IDS:
-		ok(seen.has(id), "the id %s survives" % id)
-	ok(seen.size() == 27, "...and no id was added (got %d distinct)" % seen.size())
-	var per_lane := {}
-	var caps := 0
-	var cap_lanes := {}
+	# FX: DG §2 — 24 CHECKS DELETED HERE. "the id %s survives", over the 24 ids AW
+	# shipped (the deleted `IDS` table): every id survived and re-specced in
+	# place, which is why saved picks migrated and no save version moved. FX
+	# deleted every one (Profile moved to v3; `Run._migrate_trees` drops a
+	# retired id from a saved member), so there is no id left for it to find.
+	# RE-POINTED (FX): no id is carried twice in the one tree.
+	ok(seen.size() == 27,
+		"...and the one tree carries 27 distinct ids — none twice (got %d distinct)" % seen.size())
+	# A cell owned is a cell worn, and the handoff is where a node's RANK comes
+	# from now — so "a single-rank node" is asked of what the handoff wears.
+	var worn := Talents.worn_learned(tree, seen)
+	var per_tier := {}
 	for t in tree:
-		var lane := String(t.get("lane", ""))
-		var row := int(t.get("row", 0))
-		ok(t.has("ranks") and int(t["ranks"]) == 1,
-			"%s is a single-rank node" % t.get("id", ""))
-		if row == Talents.CAPSTONE_ROW:
-			caps += 1
-			cap_lanes[lane] = true
-			ok(bool(t.get("capstone", false)),
-				"%s on row 8 is flagged capstone" % t.get("id", ""))
-		else:
-			ok(row >= 1 and row <= Talents.CAPSTONE_ROW,
-				"%s sits on a real row (got %d)" % [t.get("id", ""), row])
-			per_lane[lane] = per_lane.get(lane, 0) + 1
-	ok(caps == 3, "exactly three capstones (got %d)" % caps)
-	ok(cap_lanes.size() == 3, "the three capstones sit on three different lanes")
-	for lane in ["Bulwark", "Faith", "Zeal"]:
-		ok(per_lane.get(lane, 0) == Talents.ROWS,
-			"lane %s holds 8 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
-	# Every row of every lane is filled exactly once — the row IS the choice.
-	var slots := {}
-	for t in tree:
-		var key := "%s/%d" % [t.get("lane", ""), t.get("row", 0)]
-		ok(not slots.has(key), "no two nodes share the slot %s" % key)
-		slots[key] = true
+		# RE-POINTED (FX): asked of the rank the FX handoff wears the node at.
+		ok(int(worn.get(String(t.get("id", "")), 0)) == 1,
+			"%s is worn at a single rank" % t.get("id", ""))
+		# RE-POINTED (FX): the one tree has no capstone row, so every node stands
+		# where the old `else` branch stood — and "sits on a real row" is asked of
+		# the position it has now, its TIER.
+		var tier := int(t.get("tier", 0))
+		ok(tier >= 1 and tier <= Talents.TIERS,
+			"%s sits in a real tier (got %d)" % [t.get("id", ""), tier])
+		per_tier[tier] = per_tier.get(tier, 0) + 1
+	# FX: DG §2 — 2 CHECKS DELETED HERE: "exactly three capstones" and "the three
+	# capstones sit on three different lanes". The one tree has no capstone row
+	# and no lanes.
+	# RE-POINTED (FX): "lane X holds its 8 row nodes" becomes "tier N holds its
+	# nine" — the one tree's partition, asked of the one tree.
+	for tier in range(1, Talents.TIERS + 1):
+		ok(per_tier.get(tier, 0) == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier, Talents.NODES_PER_TIER,
+				per_tier.get(tier, 0)])
+	# FX: DG §2 — 27 CHECKS DELETED HERE: "no two nodes share the slot
+	# <lane>/<row>" — every row of every lane filled exactly once, because the
+	# row WAS the choice. The one tree has no lanes and no rows, and no node is a
+	# choice against another: a cell bought is a cell worn.
 	# Any exclusive reference must name a node that exists (the shape audit
 	# test_batch_ai does generically, repeated here because AW moves lanes'
 	# contents around).
@@ -211,114 +294,36 @@ func _tree_shape() -> void:
 		for ex in t.get("exclusive_with", []):
 			ok(seen.has(String(ex)),
 				"%s's exclusive reference %s names a live node" % [t.get("id", ""), ex])
-	# The lane NAMES stay; only two theses were re-aimed.
-	for pair in [["dv_barrier", "Bulwark", 1], ["dv_aegis", "Bulwark", 2],
-			["dv_afterglow", "Bulwark", 3], ["dv_warded", "Bulwark", 4],
-			["dv_stalwart", "Bulwark", 5], ["dv_bastion", "Bulwark", 6],
-			["dv_unyielding", "Bulwark", 7],
-			["dv_communion", "Faith", 1], ["dv_unwavering", "Faith", 2],
-			["dv_devoutness", "Faith", 3], ["dv_faithful", "Faith", 4],
-			["dv_covenant", "Faith", 5], ["dv_fervor", "Faith", 6],
-			["dv_oath", "Faith", 7],
-			["dv_waters", "Zeal", 1], ["dv_righteous", "Zeal", 2],
-			["dv_resolve", "Zeal", 3], ["dv_pulse", "Zeal", 4],
-			["dv_crusade", "Zeal", 5], ["dv_purity", "Zeal", 6],
-			["dv_lifewell", "Zeal", 7]]:
-		var n := _node(String(pair[0]))
-		ok(String(n.get("lane", "")) == String(pair[1])
-			and int(n.get("row", 0)) == int(pair[2]),
-			"%s sits at %s row %d (got %s row %s)" % [pair[0], pair[1], pair[2],
-				n.get("lane", ""), n.get("row", 0)])
-	# The names, by name rather than by id — a re-spec that forgot its label
-	# would pass every structural check above.
-	for pair in [["dv_barrier", "Blessed Barrier"], ["dv_aegis", "Radient Aegis"],
-			["dv_afterglow", "Afterglow"], ["dv_warded", "Warded Robes"],
-			["dv_stalwart", "Stalwart"], ["dv_bastion", "Bastion"],
-			["dv_unyielding", "Unyielding Aegis"], ["dv_communion", "Communion"],
-			["dv_unwavering", "Unwavering Faith"], ["dv_devoutness", "Devoutness"],
-			["dv_faithful", "Blessed are the Faithful"],
-			["dv_covenant", "Sacred Covenant"], ["dv_fervor", "Fervor"],
-			["dv_oath", "Binding Oath"], ["dv_waters", "Cleansing Waters"],
-			# BATCH DO renamed both cells when their cards left for the draft — a
-			# node named after a live DRAFT CARD is the `wd_spiked`/Spite trap.
-			["dv_righteous", "Righteous Fire"], ["dv_resolve", "Unshaken"],
-			# BATCH EL §1 RE-POINTED: dv_crusade is CRUSADE now — the name its own
-			# `crusade_ranks` counter always carried (CK's Ironclad precedent), so
-			# freeing `Tempo` for the tag brought in no new word.
-			["dv_pulse", "Healing Pulse"], ["dv_crusade", "Crusade"],
-			["dv_purity", "Purity"], ["dv_lifewell", "Lifewell"],
-			["dv_bulwark", "Wardstone"], ["dv_apostle", "Apostle"],
-			["dv_judgement", "Judgement"]]:
-		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
-			"%s is named %s" % [pair[0], pair[1]])
+	# FX: DG §2 — 45 CHECKS DELETED HERE: the 21 "sits at <lane> row <n>" homes
+	# (Bulwark / Faith / Zeal, rows 1-7) and the 24 "is named <name>" labels,
+	# DO's two renames (Righteous Fire, Unshaken) and EL's Crusade among them.
+	# Both asked where a Devout node sat and what it was called; FX deleted the
+	# nodes, the lanes and the rows. The mechanics under four of those names are
+	# still driven live below, off `RETIRED`.
 
 
 # ---------- §3 the magnitudes, which are final ----------
 
 func _magnitudes() -> void:
-	for probe in [
-			["dv_barrier", "blessed_barrier_ranks", 20],
-			["dv_aegis", "aegis_ranks", 60],
-			["dv_afterglow", "afterglow_ranks", 20],
-			["dv_warded", "warded_ranks", 25],
-			["dv_stalwart", "stalwart_step", 20],       # 35 + 20 = 55% (CV §2.1)
-			["dv_unyielding", "unyielding_ranks", 90],
-			# RE-POINTED IN PLACE BY BATCH BE, with the reason in the file: AW
-			# priced this at 40 and BC's leave-one-out grid then measured the
-			# node carrying the whole FAITH row (80% contribution against 47%
-			# withheld). At 40 an ally at three or more stacks advanced with
-			# CERTAINTY; 15 is the first value at which nothing is guaranteed.
-			# The counter's meaning and units are untouched — see test_batch_be
-			# for the three measured rates the number buys.
-			["dv_communion", "communion_ranks", 15],
-			["dv_devoutness", "devoutness_ranks", 20],
-			["dv_faithful", "faithful_step", 20],       # 15 + 20 = 35%
-			["dv_covenant", "covenant_heal", 25],
-			["dv_covenant", "covenant_faith", 2],
-			# BATCH BH §2 RE-POINTED BOTH OF THESE IN PLACE. Fervor and Binding
-			# Oath were re-specced off the release-frequency axis, so neither
-			# counter exists any more: `fervor_step` (the +1 on the ground's
-			# drip) and `oath_ranks` (the remnant a release left standing) were
-			# DELETED WITH THEIR READ SITES, not renamed. The question AW is
-			# asking here — "every node writes its own magnitude in the units
-			# its read site sums" — is asked of the replacements instead.
-			["dv_fervor", "fervor", 1],                 # a GATE, like apostle
-			["dv_oath", "oath_faith", 1],               # Faith HE gains per ally release
-			["dv_waters", "waters_ranks", 50],
-			["dv_righteous", "righteous_step", 25],     # 10 + 25 = 35%
-			["dv_pulse", "pulse_ranks", 8],
-			["dv_crusade", "crusade_ranks", 3],
-			["dv_purity", "purity_ranks", 35],
-			["dv_lifewell", "lifewell_ranks", 80],
-			["dv_apostle", "apostle", 1],
-			["dv_judgement", "judgement", 40]]:
-		var got = _stat_of(String(probe[0]), String(probe[1]))
-		ok(got != null and int(got) == int(probe[2]),
-			"%s writes %s = %s (got %s)" % [probe[0], probe[1], probe[2], got])
+	# **BATCH FX — 25 CHECKS DELETED HERE, UNDER DG §2.** This section asked each
+	# Devout node to carry its final magnitude: 20 of the 21 "node writes field =
+	# N" rows (BE's Communion at 15 and BH's Fervor and Binding Oath among them);
+	# Bastion's two payload-shape checks (it SETS Divine Shield's cooldown to 0
+	# and no longer merely subtracts a turn); and the three rendered tooltip
+	# totals (Stalwart 55, Blessed are the Faithful 35, Righteous Fire 35). FX
+	# deleted the twelve spec trees, so no node carries those numbers, shapes or
+	# texts. THE FIELDS AND READ SITES STAND: §6 below still pins every read
+	# site's units, and the live sections drive Bastion, Stalwart, Fervor and
+	# Apostle — inlined from `RETIRED` — through the spawn.
+	# RE-POINTED (FX): the two rows with a precedent-mapped node in the one tree
+	# are asked of it — each carries the retired node's field and magnitude.
+	var got = _stat_of("tn_unbreaking", "devoutness_ranks")
+	ok(got != null and int(got) == 20,
+		"tn_unbreaking writes devoutness_ranks = 20, Devoutness's own number (got %s)" % got)
 	# Unwavering Faith rides the generic max-HP stat, so it is a float.
-	var unw = _stat_of("dv_unwavering", "max_hp_pct")
+	var unw = _stat_of("tn_health", "max_hp_pct")
 	ok(unw != null and abs(float(unw) - 0.20) < 0.0001,
-		"Unwavering Faith raises his maximum 20%% (got %s)" % unw)
-	# BASTION GOES TO ZERO — a SET, not the old -1 add. The distinction is the
-	# node: "a shield every turn" is what makes it a Faith engine.
-	var bas := _payload("dv_bastion")
-	ok(String(bas.get("ability", "")) == "Divine Shield"
-		and bas.has("set") and int(bas["set"].get("cooldown", -1)) == 0,
-		"Bastion SETS Divine Shield's cooldown to 0 (got %s)" % str(bas))
-	ok(not bas.has("add"),
-		"...and no longer merely subtracts a turn (%s)" % str(bas.get("add", {})))
-	# The tooltips render the DESIGN value, and for most of this tree that is
-	# the only place the number appears outside a battle.gd read site.
-	# BATCH BH §2: `dv_fervor` left this list because it no longer HAS a
-	# rendered total — like Apostle it is a gate whose two magnitudes are
-	# battle.gd constants, so its tooltip states them outright and
-	# test_batch_bh asserts them there.
-	for pair in [["dv_stalwart", "55"], ["dv_faithful", "35"],
-			["dv_righteous", "35"]]:
-		var n := _node(String(pair[0]))
-		var shown := Talents.desc_for(n, 1)
-		ok(shown.contains(String(pair[1])),
-			"%s's tooltip renders its total %s (got %s)" % [pair[0], pair[1], shown])
+		"tn_health raises maximum health 20%%, Unwavering Faith's own number (got %s)" % unw)
 
 
 # ---------- §6 additive, not ranked ----------
@@ -399,15 +404,18 @@ func _dissolved_pair() -> void:
 	# Batch K authored Stalwart <-> Bastion as an in-lane fork — a bigger
 	# shield, or a more frequent one. BATCH AI'S ROW EXCLUSIVITY DESTROYED
 	# THAT FORK: they sit in rows 5 and 6 of one lane, so a player holds both.
-	var st := _node("dv_stalwart")
-	var ba := _node("dv_bastion")
-	ok(int(st.get("row", 0)) == 5 and int(ba.get("row", 0)) == 6,
-		"Stalwart and Bastion sit in DIFFERENT rows (5 and 6)")
-	ok(String(st.get("lane", "")) == String(ba.get("lane", "")),
-		"...of the same lane, so both are reachable on one build")
-	ok(not (st.get("exclusive_with", []) as Array).has("dv_bastion")
-		and not (ba.get("exclusive_with", []) as Array).has("dv_stalwart"),
-		"neither node still names the other as exclusive")
+	# **BATCH FX — 2 CHECKS DELETED HERE, UNDER DG §2.** "Stalwart and Bastion
+	# sit in DIFFERENT rows (5 and 6)" and "...of the same lane, so both are
+	# reachable on one build" asked where two Devout nodes sat; FX deleted the
+	# nodes, the lanes and the rows. Both payloads are still driven TOGETHER,
+	# live, in `_live_bastion_and_stalwart`, off `RETIRED`.
+	# RE-POINTED (FX): "neither node still names the other as exclusive", asked of
+	# the one tree — where no node names any other, because buying is wearing.
+	var named := 0
+	for t in _tree():
+		named += (t.get("exclusive_with", []) as Array).size()
+	ok(named == 0, "no node of the one tree names another as exclusive (%d references over %d nodes)"
+		% [named, _tree().size()])
 	# The prose list in CLAUDE.md is the last place the pair survived, and it
 	# has to stop claiming it (test_runes._exclusives has been a bare `pass`
 	# since Batch AI, so nothing else was watching).
@@ -447,16 +455,16 @@ func _authored_fallbacks() -> void:
 	# CV ruled Bulwark of Fortitude's 5% party heal UNCONDITIONAL (CR §7), and
 	# that ruling lives in the ABILITY'S text, in `Classes.pending_talent_ability`
 	# — which DO did not open. The card moved by NAME only.
-	var res := _payload("dv_resolve")
-	ok(Talents.granted_name(res) == "",
-		"the Zeal row-3 cell hands out NOTHING (DO's charter)")
-	ok(not res.has("upgrade"), "...so it carries no collision fallback either")
+	# **BATCH FX — 6 CHECKS DELETED HERE, UNDER DG §2.** "the Zeal row-3 cell
+	# hands out NOTHING", "the Bulwark capstone hands out NOTHING", the Bulwark
+	# twin of "...so it carries no fallback either", and — below — "NO capstone
+	# grants an ability any more" and the two "dv_apostle / dv_judgement grants
+	# no ability" checks asked about cells and capstones of the Devout tree, and FX
+	# deleted it; the one tree has no capstone row. What they asked is asked below
+	# of EVERY cell of the one tree: whether any grants, and whether any carries a
+	# collision fallback.
 	ok(Classes.spec_draft_pool("inquisitor").has("Sacred Resolve"),
 		"...while the card itself drafts from the Devout")
-	var bul := _payload("dv_bulwark")
-	ok(Talents.granted_name(bul) == "",
-		"the Bulwark capstone hands out NOTHING (DO's charter)")
-	ok(not bul.has("upgrade"), "...so it carries no fallback either")
 	ok(Classes.spec_draft_pool("inquisitor").has("Bulwark of Fortitude"),
 		"...while the card itself drafts from the Devout")
 	var card: Ability = Classes.pending_talent_ability("Bulwark of Fortitude")
@@ -477,27 +485,24 @@ func _authored_fallbacks() -> void:
 	# thirteen granting nodes in rows 2, 3 and 4 that a capstone-only count
 	# never sees.** The loop now asserts the population is EMPTY, over the whole
 	# layer rather than over row 9, and prints the live figure beside it.
-	var granting_caps: Array = []
+	# RE-POINTED (FX): the census DO inverted to ZERO "over the whole layer rather
+	# than over row 9" is taken over the ONE tree — which IS the whole layer now,
+	# every class's — together with the fallback half the per-cell checks asked.
 	var granting_all: Array = []
-	for spec in Talents.LANE_TREES:
-		for t in Talents.LANE_TREES[spec]:
-			if Talents.granted_name(t.get("payload", {})) == "":
-				continue
-			granting_all.append(String(t.get("id", "")))
-			if int(t.get("row", 0)) == Talents.CAPSTONE_ROW:
-				granting_caps.append(String(t.get("id", "")))
-	ok(granting_caps.is_empty(),
-		"NO capstone grants an ability any more (%d do: %s)" % [
-			granting_caps.size(), ", ".join(granting_caps)])
+	var arms := 0
+	for t in _tree():
+		if (t.get("payload", {}) as Dictionary).has("upgrade"):
+			arms += 1
+		if Talents.granted_name(t.get("payload", {})) == "":
+			continue
+		granting_all.append(String(t.get("id", "")))
+	ok(arms == 0, "no cell of the one tree carries a collision fallback (%d of %d do)"
+		% [arms, _tree().size()])
 	ok(granting_all.is_empty(),
-		"...and no node at ANY row does either (%d do: %s)" % [
+		"...and no node of the one tree grants an ability (%d do: %s)" % [
 			granting_all.size(), ", ".join(granting_all)])
-	_report.append("ability-granting talent nodes in the game: %d (DO's charter)"
+	_report.append("ability-granting talent nodes in the one tree: %d (DO's charter; FX)"
 		% granting_all.size())
-	# The other two Devout capstones grant nothing, so they owe nothing.
-	for cap in ["dv_apostle", "dv_judgement"]:
-		ok(Talents.granted_name(_payload(cap)) == "",
-			"%s grants no ability, so it owes no fallback" % cap)
 
 
 # ---------- §6 the rune audit ----------
@@ -563,31 +568,26 @@ func _rune_audit() -> void:
 	for f2 in ["faithful_step", "righteous_step", "stalwart_step", "oath_opening"]:
 		ok(Runes.STAT_INT_KEYS.has(f2),
 			"%s is listed in Runes.STAT_INT_KEYS" % f2)
-	# Lane tags must name a live lane, or the rune is homeless in the bot's
-	# build policy and in the per-lane coverage test (the AS Honed Lance).
-	var lanes := {}
-	for t in _tree():
-		lanes[String(t.get("lane", ""))] = true
-	for id2 in Runes.ids():
-		var cfg2: Dictionary = Runes.config(id2)
-		if String(cfg2.get("scope", "")) != "spec:inquisitor":
-			continue
-		var lane := String(cfg2.get("lane", ""))
-		ok(lane == "" or lanes.has(lane),
-			"%s's lane tag '%s' names a live Devout lane" % [id2, lane])
+	# **BATCH FX — 8 CHECKS DELETED HERE, UNDER DG §2.** The walk of the eight
+	# spec:inquisitor runes, "%s's lane tag names a live Devout lane", asked that a
+	# rune's lane tag found a lane of the Devout tree, so it was not homeless in
+	# the bot's build policy or the per-lane coverage test (the AS Honed Lance).
+	# FX deleted the trees, the one tree has no lanes, and the per-lane build
+	# policy went with them: a tag can name nothing live, and nothing in
+	# `scripts/` reads a rune's `lane` (only `Runes.build` copies it onto the
+	# instance). Three retired Devout runes still carry one (Bulwark, Faith, Zeal)
+	# — inert data, reported rather than touched.
 	# THE THREE CLERIC CLASS-WIDE RUNES TOUCH NO DEVOUT COUNTER.
-	var dv_fields := {}
-	for t2 in _tree():
-		for f3 in t2.get("payload", {}).get("stat", {}):
-			dv_fields[String(f3)] = true
-		for extra in t2.get("payload", {}).get("also", []):
-			for f4 in extra.get("stat", {}):
-				dv_fields[String(f4)] = true
+	# RE-POINTED (FX): the Devout counters are the FIELDS the retired Devout tree
+	# wrote, so the set is `DEVOUT_COUNTERS` rather than a walk of a tree that no
+	# longer holds them. (The one tree's own fields are general stats — `speed`,
+	# which the Martyr rune writes, among them — and a rune sharing unit math is
+	# not talent-keyed: EM's UNIT_MATH.)
 	for id3 in ["zealotry", "martyr", "binding_souls"]:
 		var cfg3: Dictionary = Runes.config(id3)
 		ok(String(cfg3.get("scope", "")) == "class:cleric", "%s is class-wide" % id3)
 		for f5 in cfg3["payload"].get("stat", {}):
-			ok(not dv_fields.has(String(f5)),
+			ok(not DEVOUT_COUNTERS.has(String(f5)),
 				"%s must not write the Devout tree counter %s" % [id3, f5])
 	# A RUNE WHOSE NODE IS GONE KEEPS ITS READ SITE AND IS FLAGGED, never
 	# silently deleted. AW retires no Devout node, so there is nothing to
@@ -628,36 +628,36 @@ func _bot_policy_source() -> void:
 # ---------- §9 the Holy rename ----------
 
 func _holy_rename() -> void:
-	var holy := Talents.generate_tree("holy", "cleric")
-	var beacon := Talents.node_in_tree(holy, "hl_beacon")
-	ok(String(beacon.get("name", "")) == "Hour of Need",
-		"hl_beacon is renamed Hour of Need (got %s)" % beacon.get("name", ""))
+	# **BATCH FX — 4 CHECKS DELETED HERE, UNDER DG §2.** "hl_beacon is renamed
+	# Hour of Need", "...and still writes holy_vigil_pct = 15", "the Warden's
+	# Shared Vigil keeps its name" (wd_fortress) and "...and exactly one is called
+	# Hour of Need" asked about two nodes of two deleted trees — the Holy's and the
+	# Warden's — and FX deleted both. The COUNTER half of the question stands and
+	# is asked below: the read site and its threshold are untouched, and
+	# `test_batch_av` drives the retired payload through them live.
 	# THE COUNTER AND EVERY READ SITE STAY EXACTLY AS THEY ARE — this is a
 	# label only, and a rename that moved a counter would be a silent re-tune.
-	ok(int(beacon.get("payload", {}).get("stat", {}).get("holy_vigil_pct", 0)) == 15,
-		"...and still writes holy_vigil_pct = 15")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bsrc.contains("0.01 * hv_c.holy_vigil_pct"),
 		"...against an untouched read site")
 	ok(bsrc.contains("const HOLY_VIGIL_AT := 0.30"),
 		"...and an untouched threshold")
-	# The WARDEN keeps the name: his triggers on him standing strong, which is
-	# what "Shared Vigil" describes.
-	var warden := Talents.generate_tree("warden", "warrior")
-	var fortress := Talents.node_in_tree(warden, "wd_fortress")
-	ok(String(fortress.get("name", "")) == "Shared Vigil",
-		"the Warden's Shared Vigil keeps its name")
 	# And the collision is gone: no two nodes in the game share a name across
 	# the Cleric and Warrior trees by accident again.
+	# RE-POINTED (FX): the collision the two name counts guarded — two nodes
+	# sharing one name — is asked of the ONE tree, every name at once. It is
+	# every node in the game now.
 	var names := {}
-	for spec in Talents.LANE_TREES:
-		for t in Talents.LANE_TREES[spec]:
-			var nm := String(t.get("name", ""))
-			names[nm] = names.get(nm, 0) + 1
-	ok(int(names.get("Shared Vigil", 0)) == 1,
-		"exactly one node in the game is called Shared Vigil (got %d)" % names.get("Shared Vigil", 0))
-	ok(int(names.get("Hour of Need", 0)) == 1,
-		"...and exactly one is called Hour of Need")
+	for t in _tree():
+		var nm := String(t.get("name", ""))
+		names[nm] = int(names.get(nm, 0)) + 1
+	var twice: Array = []
+	for nm in names:
+		if int(names[nm]) > 1:
+			twice.append(nm)
+	ok(twice.is_empty() and names.size() == _tree().size(),
+		"no two nodes of the one tree share a name (%d names over %d nodes; twice: %s)"
+			% [names.size(), _tree().size(), str(twice)])
 
 
 # ---------- negative controls, at the source ----------
@@ -801,6 +801,7 @@ func _live_apostle_stream() -> void:
 	# full 3%. The old number (13 x 15 on a 1000 base) is what it read while
 	# Apostle multiplied frequency; the new one is 13 x 30, and BG's own suite
 	# holds the negative control that the park is gone.
+	# FX: dv_apostle is inlined from `RETIRED` — the exact payload it carried.
 	var scene := await _spawn({"dv_apostle": 1})
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)
@@ -912,6 +913,7 @@ func _live_ground_drip() -> void:
 	# taking that off this lane is BH §2's whole subject. So the question the
 	# check asks now is the opposite one, and it is the negative control that
 	# would catch the node being put back: does Fervor leave the drip ALONE?
+	# FX: dv_fervor is inlined from `RETIRED` — the exact payload it carried.
 	var deep := await _spawn({"dv_fervor": 1})
 	var dv2 := _hero(deep, 2)
 	var ally2 := _hero(deep, 0)
@@ -930,17 +932,22 @@ func _live_fallbacks() -> void:
 	# The node GRANTS when the ability was not already in hand.
 	# BATCH DO: buying the cells hands out nothing, so a build with no earned
 	# cards holds neither ability. That is the charter working.
-	var granted := await _spawn({"dv_resolve": 1, "dv_bulwark": 1})
+	# RE-POINTED (FX): both spawns learned dv_resolve and dv_bulwark, two cells FX
+	# deleted. The question — does buying the talents hand the card out, or write
+	# the fallback counters — is asked of a Devout wearing EVERY cell of the one
+	# tree, none of which grants, so nothing can collide.
+	var granted := await _spawn(_all_cells())
 	var dv := _hero(granted, 2)
-	ok(_find(dv, "Sacred Resolve") == null, "the row-3 cell grants no Sacred Resolve (DO)")
-	ok(_find(dv, "Bulwark of Fortitude") == null, "the capstone grants no Bulwark (DO)")
+	ok(_find(dv, "Sacred Resolve") == null,
+		"wearing every cell of the one tree grants no Sacred Resolve (DO; FX)")
+	ok(_find(dv, "Bulwark of Fortitude") == null, "...nor Bulwark of Fortitude (DO; FX)")
 	ok(dv.resolve_extra_turns == 0 and dv.bulwark_extra_turns == 0,
 		"...and neither counter is written, because nothing can collide")
 	await _kill(granted)
 	# EARNED FIRST, then the node: it upgrades instead of granting. Earned
 	# picks go on BEFORE the tree at both kit-assembly sites (the AH ordering
 	# fix), which is what makes cfg["abilities"] the honest question.
-	var owned := await _spawn({"dv_resolve": 1, "dv_bulwark": 1},
+	var owned := await _spawn(_all_cells(),
 		{"bm_abilities": ["Sacred Resolve", "Bulwark of Fortitude"]})
 	var dv2 := _hero(owned, 2)
 	# BATCH DO: both counters are READ-ONLY-ZERO — an `upgrade` arm fires only
@@ -987,6 +994,8 @@ func _live_bastion_and_stalwart() -> void:
 	# shield absorbing 55% of his maximum, on no cooldown.
 	# BATCH CQ §3 — 55 SINCE CN §3'S FOLD: Divine Shield's base went 30% -> 35%
 	# (the perfect's share, folded in) and Stalwart still adds its 20 points.
+	# FX: dv_stalwart and dv_bastion are inlined from `RETIRED` — the exact
+	# payloads they carried, worn together as the pair always could be.
 	var scene := await _spawn({"dv_stalwart": 1, "dv_bastion": 1})
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)

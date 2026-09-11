@@ -106,16 +106,29 @@ func _test_earned_kit() -> void:
 	# id points at still applies — a tree that ran first would have had nothing
 	# to collide with and the count would be unchanged either way, so the
 	# DOUBLE-GRANT assertion below is the load-bearing half and always was.
-	var shout_id := "bz_battle_shout"
+	#
+	# BATCH FX RE-POINTED IT A THIRD TIME, AND THE QUESTION IS STILL THE SAME
+	# QUESTION. `bz_battle_shout` (Battle Roar, which edited Bloodlust) went with
+	# the twelve spec trees, so the cell this probe learned is in no tree a hero
+	# can buy: the first check below went red on it, and the second passed
+	# VACUOUSLY — `granted_name` of an empty payload is "". The Berserker wears
+	# the ONE class tree now, and FX's line (a talent may not touch a rune, an
+	# ability, a passive or an engine) means no cell in it can meet the earned
+	# copy at all. So the probe learns a LIVE cell of that tree, `tn_attack`,
+	# which keeps the tree RUNNING at the spawn after the earned copies go on.
+	# The two checks ask of it exactly what they asked of Battle Roar — a real
+	# cell of his tree, under its id, that grants nothing — and the double-grant
+	# count below stays the load-bearing half.
+	var cell_id := "tn_attack"
 	var tree: Array = Talents.generate_tree("berserker", "warrior")
-	var shout_node: Dictionary = Talents.node_in_tree(tree, shout_id)
-	ok(not shout_node.is_empty(),
-		"the Berserker tree still holds the `%s` cell, with its id" % shout_id)
-	ok(Talents.granted_name(shout_node.get("payload", {})) == "",
+	var cell_node: Dictionary = Talents.node_in_tree(tree, cell_id)
+	ok(not cell_node.is_empty(),
+		"the Berserker's class tree holds the `%s` cell the probe learns, with its id" % cell_id)
+	ok(Talents.granted_name(cell_node.get("payload", {})) == "",
 		"...and it grants nothing — a talent may not (DO's charter)")
 	var prep := func(run):
 		run.party[0]["bm_abilities"] = ["Battle Shout", "Crushing Blow"]
-		run.party[0]["talents"] = {shout_id: 1}
+		run.party[0]["talents"] = {cell_id: 1}
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		["raider", "archer", "raider"], "fight", prep)
 	var bz := _hero(scene, "bloodrage")

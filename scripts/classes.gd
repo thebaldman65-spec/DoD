@@ -1626,18 +1626,20 @@ static func ability_corpus() -> Array:
 static func talent_granted_names() -> Array:
 	var out: Array = []
 	var seen := {}
-	for spec_key in Talents.LANE_TREES:
-		for node in Talents.LANE_TREES[spec_key]:
-			var pay: Dictionary = node.get("payload", {})
-			var nm := ""
-			if pay.has("new_ability"):
-				nm = String(pay["new_ability"]["display_name"])
-			elif pay.has("grant_ability"):
-				nm = String(pay["grant_ability"])
-			if nm == "" or seen.has(nm):
-				continue
-			seen[nm] = true
-			out.append(nm)
+	# BATCH FX — ONE TREE, AND IT GRANTS NOTHING (DO's rule and FX's line), so
+	# this walk returns empty; it is kept because a grant authored into the
+	# tree later is exactly what the corpus has to see.
+	for node in Talents.TREE:
+		var pay: Dictionary = node.get("payload", {})
+		var nm := ""
+		if pay.has("new_ability"):
+			nm = String(pay["new_ability"]["display_name"])
+		elif pay.has("grant_ability"):
+			nm = String(pay["grant_ability"])
+		if nm == "" or seen.has(nm):
+			continue
+		seen[nm] = true
+		out.append(nm)
 	return out
 
 
@@ -2290,7 +2292,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack02", "special": "answering_steel",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Let the blade answer. For 6 turns your\nparry chance is +20%, and every attack\nyou PARRY grants 15 Rage and takes a\nturn off all your cooldowns. It pays\ntempo, not damage — Riposte's counter\nstill answers as well."})
+				"description": "Let the blade answer. For 6 turns your\nparry chance is +20%, and every attack\nyou PARRY grants 15 Rage and takes a\nturn off all your cooldowns. It pays\ntempo, not damage."})
 		# AXIS: being neither, and both. The stance is the spec's one binary and
 		# every card in his pool sits on one side of it; this is the card that
 		# refuses the question for three turns.
@@ -3743,7 +3745,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02", "special": "savage_sweep",
 				"perfect_id": "", "perfect_text": "5 Loyalty",
-				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs.\nThe run opens 12 Bleed on each, ANY\ncompanion — feeding a Berserker's\nBattle Shout and a Survivalist's\nTrapper."})
+				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nThe run opens 12 Bleed on each, ANY\ncompanion — feeding a Berserker's\nBattle Shout and a Survivalist's\nTrapper."})
 		# AXIS: what rotating actually buys. FERAL MOMENTUM and MENAGERIE both
 		# already reward having cycled, but both are small passive trickles; this
 		# is the Pack build's PAYOFF, and it is deliberately near-worthless to a
@@ -4376,7 +4378,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "fault_line",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 6 turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals 20 Break\ndamage. Deep Focus moves that line\ndown with it."})
+				"description": "For 6 turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals 20 Break\ndamage."})
 		# AXIS: driving an uncapped meter DEEP inside a single turn. Every other
 		# way he builds Focus pays once per turn on one mark, so the meter's
 		# depth is a function of how many turns he stays — this is the only thing
@@ -5418,7 +5420,7 @@ const SPEC_INFO := {
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
-		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 3 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. Apostle adds another 1x and Fervor another\non Consecrated Ground, so both together are triple, not\nquadruple. At 3 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
+		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 3 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. At 3 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
 		"blurb": "A living shrine — faith made armor for every hero."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,
@@ -5500,7 +5502,7 @@ static func spec_abilities(spec: String) -> Array:
 					"special": "shield_block", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 					"cooldown": 2,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Set the wall: +25% Block chance for\n3 turns. These count as HEAVY PLATING\nblocks, so they feed Tenacity and\nRally — Interpose's charges never do."}),
+					"description": "Set the wall: +25% Block chance for\n3 turns."}),
 			]
 		"swordmaster":
 			return [

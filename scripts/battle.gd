@@ -431,7 +431,7 @@ const STATUS_INFO := {
 	"recompense": ["Recompense", "Rc", Color(0.85, 0.80, 0.65), "Paid for the loss: every Heavy Plating\nreset returns Rage equal to the\npercentage points it took. ANVIL\nprevents those resets, so the two\nfight each other by design."],
 	"turn_the_blade": ["Turn the Blade", "TB", Color(0.80, 0.55, 0.95), "The block answers: every attack he\nBLOCKS deals Break damage back to the\nattacker, scaling on how much damage\nthe block refused."],
 	"discipline": ["Discipline", "Di", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
-	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage — Riposte still answers too."],
+	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage."],
 	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends he pays\nboth downsides."],
 	"formless_recoil": ["Formless", "Fm!", Color(0.55, 0.65, 0.80), "The form is paid for: he suffers BOTH\nstances' downsides at once — more\ndamage taken and less dealt — for two\nturns."],
 	# ---- BATCH DR §4: WHEELING CUT's two arrivals ----
@@ -1490,7 +1490,7 @@ func _spawn_units() -> void:
 		for h in heroes:
 			_apply_status(h, "devotion", -1, dvn_pct)
 			h.update_status("devotion", "DA",
-				"Devoutness: takes %d%% less\nBreak damage." % dvn_pct,
+				"We Do Not Break: takes %d%% less\nBreak damage." % dvn_pct,
 				dvn_pct)
 			# BATCH BF §1: the aura's Break cut is now a per-hero column, so it
 			# needs a name to sit under. Stamped straight onto the status rather
@@ -3057,7 +3057,7 @@ func _run_battle() -> void:
 				if fm_washed != "":
 					fm_ally.float_text("Cleansed: %s" % fm_washed,
 						Color(0.5, 0.95, 0.6))
-					_log("   → Field Medic: %s washes %s off %s" % [
+					_log("   → Cleanse Debuffs Each Turn: %s washes %s off %s" % [
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
 		# BATCH DS — SALVE (Survivalist draft), and it is the first HEAL in any
 		# of the twenty-four Hunter spec cards. It sits here, in his turn-start
@@ -7973,7 +7973,7 @@ func _roll_parry(defender: BattleUnit) -> String:
 	if roll < base:
 		return "reflexes"
 	if roll < base + talent:
-		return "Sword Mastery"
+		return "Parry More"
 	if roll < base + talent + buff:
 		return "Parry Up"
 	if roll < base + talent + buff + answering:
@@ -8060,7 +8060,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	if was_snap:
 		# Snap Shot: free, and the cooldown never starts.
 		attacker.snap_used += 1
-		_log("   → Snap Shot: no cost, no cooldown (%d of %d)" % [
+		_log("   → Your First Casts of a Fight Are Free: no cost, no cooldown (%d of %d)" % [
 			attacker.snap_used, attacker.snap_shot], "#b0a8e0")
 	elif not is_counter and not debug_cooldowns_off:
 		# Improvised (Survivalist): the opening abilities keep their cooldowns.
@@ -8076,7 +8076,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# the counter is the percentage itself (Batch AZ: 50).
 		elif attacker.rapid_fire > 0 and ab.cooldown > 0 \
 				and randf() < 0.01 * attacker.rapid_fire:
-			_log("   → Rapid Fire: the cooldown never starts", "#b0a8e0")
+			_log("   → A Chance to Skip a Cooldown Entirely: the cooldown never starts", "#b0a8e0")
 		# Fuse (Pyromancer talent): Detonation can reset its own cooldown.
 		elif ab.display_name == "Detonation" and attacker.fuse_ranks > 0 \
 				and randf() < 0.15 * attacker.fuse_ranks:
@@ -10037,7 +10037,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var pv_was := raw
 					raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)
 					_prev(strike_target, pv_was - raw)
-					_log("   → Talent: Iron Will — -%d%% (%d debuffs)" % [
+					_log("   → Talent: Mitigation per Debuff You Carry — -%d%% (%d debuffs)" % [
 						iw_pct, iw_n], "#b0a8e0")
 			# Shared Vigil (WARDEN, Banner row 6): the line holds while he
 			# stands tall — allies take less while he is above half health.
@@ -10710,7 +10710,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# which was a no-op then and is skipped now — no behaviour
 					# moved, and the log line is unchanged.
 					_tick_cooldowns(attacker, attacker.follow_through)
-					_log("   → Follow-Through: cooldowns tick %d" % \
+					_log("   → A Cooldown Ticks on a Crit: cooldowns tick %d" % \
 						attacker.follow_through, "#b0a8e0")
 				if attacker.through_and_through > 0 and ab.cost > 0:
 					attacker.resource = mini(attacker.resource + ab.cost,
@@ -11506,9 +11506,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.resource = mini(attacker.resource + nq_gain,
 						attacker.max_resource)
 					attacker.refresh_bars()
-					attacker.float_text("+%d Rage" % nq_gain, Color(1.0, 0.5, 0.4))
-					_log("   → Talent: No Quarter — the Break grants %s +%d Rage" % [
-						attacker.unit_name, nq_gain], "#b0a8e0")
+					# BATCH FX — THE POOL IS NAMED, NOT ASSUMED. The node is
+					# in a tree every class buys, and the refill has always
+					# landed in `resource`, so a Mage paid Mana while the text
+					# said Rage.
+					attacker.float_text("+%d %s" % [nq_gain, attacker.resource_name],
+						Color(1.0, 0.5, 0.4))
+					_log("   → Talent: Breaking an Enemy Refuels You — the Break grants %s +%d %s" % [
+						attacker.unit_name, nq_gain, attacker.resource_name], "#b0a8e0")
 			if result.died:
 				_stat("hero_deaths" if strike_target.is_hero else "enemy_deaths")
 				_sfx("death", -4.0)
@@ -13924,8 +13929,8 @@ func _party_mark_mult(victim: BattleUnit) -> float:
 func _evade_source(u: BattleUnit) -> String:
 	var has_camo := u.status_power("camouflage") > 0
 	if has_camo and u.ghillie > 0:
-		return "Camouflage + Ghillie Suit"
-	return "Camouflage" if has_camo else "Ghillie Suit"
+		return "Camouflage + Enemies Look Past You"
+	return "Camouflage" if has_camo else "Enemies Look Past You"
 
 
 # BATCH BQ — MIRROR IMAGE's spend, and it is a SINGLE-TARGET rule. True when an
@@ -18559,7 +18564,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var an2_pct := ANSWERING_PERFECT_PARRY
 			_apply_status(attacker, "answering_steel", an2_turns, an2_pct)
 			attacker.update_status("answering_steel", "+%d%%" % an2_pct,
-				"Answering Steel: +%d%% parry for %d more\nturn(s), and every attack he PARRIES\ngrants %d %s and takes a turn off all\nhis cooldowns. It pays tempo, not\ndamage — Riposte still answers too." % [
+				"Answering Steel: +%d%% parry for %d more\nturn(s), and every attack he PARRIES\ngrants %d %s and takes a turn off all\nhis cooldowns. It pays tempo, not\ndamage." % [
 					an2_pct, an2_turns, ANSWERING_RAGE, attacker.resource_name],
 				an2_pct)
 			_sfx("parry", -6.0, 0.8)
@@ -20750,7 +20755,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 							attacker.max_resource)
 						attacker.refresh_bars()
 						attacker.float_text("+%d Rage" % gc_nq, Color(1.0, 0.5, 0.4))
-						_log("   → Talent: No Quarter — the Break grants %s +%d Rage" % [
+						_log("   → Talent: Breaking an Enemy Refuels You — the Break grants %s +%d Rage" % [
 							attacker.unit_name, gc_nq], "#b0a8e0")
 			# The perfect's parry spike. SWORDSMANSHIP (and the Still Wrist
 			# rune, which pays into the same field) raises the GRANT itself
@@ -25206,14 +25211,15 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 	boss_text += "\n\nThe road ends here."
 	if not relic.is_empty():
 		boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
-	# BATCH BM §4: beating it opens a tier of the meta tree for EVERY spec at
-	# once. Points are per spec; rows are not.
+	# BATCH BM §4: beating it opens a tier of the meta tree for EVERY class at
+	# once. Points are per class (FX); tiers are not. The spend gate still
+	# stands inside the tier, so the line says the tier OPENED, not that its
+	# every cell can be bought today.
 	var tier_before := Profile.talent_tier()
 	Profile.note_end_boss(Run.difficulty_rung())
-	if Profile.talent_tier() > tier_before:
-		boss_text += "\n\nTALENT ROWS %d-%d ARE OPEN — for every spec." % [
-			Talents.rows_unlocked(tier_before) + 1,
-			Talents.rows_unlocked(Profile.talent_tier())]
+	if Talents.tiers_open(Profile.talent_tier()) > Talents.tiers_open(tier_before):
+		boss_text += "\n\nTALENT TIER %d IS OPEN — for every class." % \
+			Talents.tiers_open(Profile.talent_tier())
 	Profile.note_boss(Run.END_BOSS_KIND)
 	Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
 	# Batch Z: the summary needs the run state clear_save destroys — snapshot
@@ -26213,34 +26219,29 @@ func _top_rows(rows: Dictionary) -> String:
 	return text
 
 
-# One party member, one line: class/spec, talent lane spread, runes, trophies.
+# One party member, one line: class/spec, talent tier spread, runes, trophies.
 func _member_summary(member: Dictionary) -> String:
 	var spec := String(member.get("spec", ""))
 	var spec_name: String = Classes.SPEC_INFO[spec]["name"] \
 		if Classes.SPEC_INFO.has(spec) else String(member["key"]).capitalize()
 	var text := "%s (%s)" % [spec_name, String(member["key"]).capitalize()]
-	# Lane spread from the member's own tree: nodes owned per lane, in the
-	# tree's lane order (the same derivation the Party screen uses).
+	# BATCH FX — the spread is by TIER now: the one class tree has no lanes, so
+	# what a summary can say about a build is how deep into the tree it reaches.
 	var learned: Dictionary = member.get("talents", {})
-	var lane_counts := {}
-	var lane_order: Array = []
+	var tier_counts := {}
 	var node_count := 0
 	for node in member.get("tree", []):
-		var lane := String(node.get("lane", ""))
-		if lane != "" and not lane_order.has(lane):
-			lane_order.append(lane)
 		if learned.has(node["id"]):
 			node_count += 1
-			if lane != "":
-				lane_counts[lane] = int(lane_counts.get(lane, 0)) + 1
+			var tr := Talents.tier_of(node)
+			tier_counts[tr] = int(tier_counts.get(tr, 0)) + 1
 	if node_count > 0:
-		var lane_parts := PackedStringArray()
-		for lane in lane_order:
-			if int(lane_counts.get(lane, 0)) > 0:
-				lane_parts.append("%s %d" % [Talents.LANE_NAMES.get(lane, lane),
-					lane_counts[lane]])
+		var tier_parts := PackedStringArray()
+		for tr2 in range(1, Talents.TIERS + 1):
+			if int(tier_counts.get(tr2, 0)) > 0:
+				tier_parts.append("tier %d: %d" % [tr2, tier_counts[tr2]])
 		text += " — %d talent%s (%s)" % [node_count, "" if node_count == 1 else "s",
-			", ".join(lane_parts)]
+			", ".join(tier_parts)]
 	else:
 		text += " — no talents learned"
 	var rune_names := PackedStringArray()

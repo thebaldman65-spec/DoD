@@ -336,16 +336,34 @@ func _ironclad_rename() -> void:
 	ok(Classes.pool_ability("Ironclad") != null,
 		"`Ironclad` resolves to an ability")
 	ok(Classes.pool_ability("Iron Will") == null,
-		"`Iron Will` resolves to NO ability — it is the talent's name alone")
+		"`Iron Will` resolves to NO ability — since FX the name survives only on the `iron_will` status chip")
+	# BATCH FX — THE NODE IS THE ONE TREE'S NOW, AND THE WALK IS ONE WALK.
+	# `wd_iron_will` went with the twelve spec trees; its field AND its magnitude
+	# (`iron_will_ranks` 1) are carried by `tn_iron_will`, whose comment in
+	# `talents.gd` names the precedent — and every class buys it now, not only
+	# the Warden. The loop walked twelve trees looking for one node; the one tree
+	# is walked ONCE, or its node would be found twelve times and the name check
+	# would run twelve times over one fact.
+	#
+	# THE NAME PIN IS RE-POINTED TO WHAT IT WAS STANDING IN FOR. It read
+	# `name == "Iron Will"`: the TALENT's half of CK's settlement — the ability
+	# took `Ironclad`, and the talent kept a name no ability answers to. FX named
+	# every node for what it does, so the talent is no longer called Iron Will
+	# (the `iron_will` STATUS chip still is, in `battle.gd`). The settlement is
+	# asserted as it stands now: the talent carrying `iron_will_ranks` is named,
+	# and no ABILITY answers to that name — so the collision CK fixed still cannot
+	# come back from the talent's side. `Iron Will` resolving to no ability is
+	# asserted just above, unchanged.
 	var found_node := false
-	for spec in Classes.SPEC_INFO:
-		for n in Talents.generate_tree(spec, Classes.class_of_spec(spec)):
-			if String(n.get("id", "")) == "wd_iron_will":
-				found_node = true
-				ok(String(n.get("name", "")) == "Iron Will",
-					"the Warden node is still NAMED Iron Will (got '%s')"
-						% n.get("name", ""))
-	ok(found_node, "the `wd_iron_will` node still exists")
+	for n in Talents.tree():
+		var n_stat: Dictionary = (n.get("payload", {}) as Dictionary).get("stat", {})
+		if String(n.get("id", "")) == "tn_iron_will" and n_stat.has("iron_will_ranks"):
+			found_node = true
+			var n_name := String(n.get("name", ""))
+			ok(n_name != "" and Classes.pool_ability(n_name) == null,
+				"the node carrying iron_will_ranks is named something no ability answers to (got '%s')"
+					% n_name)
+	ok(found_node, "the `tn_iron_will` node (wd_iron_will's field and magnitude) exists")
 	# master.html carries BOTH rows — §4.6 held one where it now holds two.
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
 	ok(master.contains("Ironclad"), "master.html documents Ironclad")
@@ -448,10 +466,17 @@ func _authored_digits() -> void:
 		var pd := String(Classes.SPEC_INFO[spec].get("passive_desc", ""))
 		if pd != "" and paren.search(pd) != null:
 			corpus_hits += 1
-		for n in Talents.generate_tree(spec, Classes.class_of_spec(spec)):
-			var td := Talents.desc_for(n, 1)
-			if td != "" and paren.search(td) != null:
-				corpus_hits += 1
+	# BATCH FX — THE TALENT TREE IS WALKED ONCE, NOT ONCE A SPEC. There is one
+	# tree and every spec's `generate_tree` answers it, so a per-spec walk would
+	# count one node's authored digit twelve times against a CEILING. No node of
+	# the one tree carries one (`check_fx` §1 asserts it), so once or twelve times
+	# reads the same 0 today; what is corrected is the population — each authored
+	# field once, which is what this count is of. No check moves: this loop only
+	# feeds the ceiling below.
+	for n in Talents.tree():
+		var td := Talents.desc_for(n, 1)
+		if td != "" and paren.search(td) != null:
+			corpus_hits += 1
 	for rid in Runes.ids():
 		var rd := String(Runes.config(rid).get("desc", ""))
 		if rd != "" and paren.search(rd) != null:

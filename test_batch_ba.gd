@@ -37,6 +37,28 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX REPAIRED THIS FILE IN PLACE, and every change is recorded AT ITS
+# SITE (CQ §3: a stale assertion is repaired to intent, never deleted). FX
+# deleted the twelve spec trees, and with them every node this file was written
+# about: the Survivalist wears the ONE class tree now — twenty-seven nodes in
+# three tiers of nine. What FX KEPT is every field those nodes wrote and every
+# read site in `battle.gd` and `unit.gd`, and THREE of his nodes are precedents
+# the one tree took whole (field AND magnitude). So:
+#   * each LIVE section that learned a retired node wears that node's EXACT
+#     payload (`RETIRED`, copied from the deleted tree) on his tree for that one
+#     spawn — Quick Rigging's `also` arm included — and Woodcraft is learned as
+#     the node that took it; every effect assertion is unchanged;
+#   * §3's shape questions and §1's reservation are asked of the one tree, and
+#     the 24 ids that used to "survive" are asked what their survival was for —
+#     whether a SAVE holding them still loads — which FX answers by dropping them;
+#   * the three precedents' magnitudes and tooltips are asked of the one-tree
+#     nodes that took them;
+#   * every check whose subject was the deleted tree itself — a node's
+#     magnitude, row, lane, capstone flag, name or text — is DELETED under DG
+#     §2's one exception, with the count at each site.
+# FX DELETED 52 CHECKS HERE (690 -> 638): §3's shape 7, §3's magnitudes 41, §1's
+# two untouched-lane texts 2, and §4's pairs 2.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -132,9 +154,94 @@ func _hero(scene: Node, idx: int) -> BattleUnit:
 
 # The Survivalist sits in the HUNTER slot (index 3). His spec id is "mystic"
 # and must never be renamed — saves and trees key on it.
+#
+# BATCH FX: a learned id the one tree no longer holds rides his `tree` as its
+# retired payload (`_worn_tree`) — the fixture's `patch`, which is written after
+# `sync_spec_hp` and before the battle reads the member.
 func _spawn(learned: Dictionary, lineup := ["raider", "raider"]) -> Node:
 	return await Fixture.spawn(self, ["berserker", "pyromancer", "inquisitor", "mystic"],
-		{"enemies": lineup, "talents": {3: learned.duplicate()}, "deterministic": true})
+		{"enemies": lineup, "talents": {3: learned.duplicate()},
+		"patch": {3: {"tree": _worn_tree(learned)}}, "deterministic": true})
+
+
+# ── BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED ───────────────────────
+# FX deleted the twelve spec trees. EVERY FIELD these nodes wrote was kept, and
+# so was every read site — a field no node writes any more is DORMANT, not
+# deleted — so the questions this file asks of those fields still have true
+# answers. Each entry is the EXACT payload the node carried, copied from the
+# tree FX removed: the node is deleted, the field and its read site stand.
+# (Woodcraft is not here: the one tree's More Health took its field and its
+# magnitude, and a precedent is learned as the node that took it.)
+const RETIRED := {
+	# Potent Toxins — +8 Poison damage a stack.
+	"sv_potent": {"stat": {"potent_ranks": 8}},
+	# Coated Blades — the basic attack poisons and Cripples.
+	"sv_coated": {"stat": {"coated_blades": 1}},
+	# Distillate — +2 extra stacks, and Exposed.
+	"sv_virulence": {"stat": {"virulence_ranks": 2}},
+	# Slow Acting — half damage, twice as long, uncleansable, and Slowed.
+	"sv_slow_acting": {"stat": {"slow_acting": 1}},
+	# Creeping Death — another status refreshes the Poison.
+	"sv_creeping": {"stat": {"creeping_death": 1}},
+	# Quartermaster — every other hero's basic attack applies his Poison.
+	"sv_plague": {"stat": {"quartermaster": 1}},
+	# Quick Rigging — its own 2, and an `also` arm: Snare Trap's cooldown -2.
+	"sv_rigging": {"stat": {"quick_rigging": 2}, "also": [{"ability": "Snare Trap", "add": {"cooldown": -2}}]},
+	# Caught Fast — a trapped enemy cannot be healed for 5 turns.
+	"sv_caught": {"stat": {"caught_fast": 5}},
+	# Bone Breaker — a sprung trap deals 90 Break damage.
+	"sv_bone": {"stat": {"bone_breaker": 90}},
+	# Deadfall Network — three traps at once.
+	"sv_network": {"stat": {"deadfall_network": 3}},
+	# Hit and Run — 2 turns of Elusive after applying a status.
+	"sv_hitrun": {"stat": {"hit_and_run": 2}},
+	# Scavenger — 25% of maximum Mana on an enemy death.
+	"sv_scavenger": {"stat": {"scavenger_ranks": 25}},
+	# Improvised — the first 2 abilities start no cooldown.
+	"sv_improvised": {"stat": {"improvised": 2}},
+	# Perfected Toxin — the Poison never expires and its tick rises by 2.
+	"sv_epidemic": {"stat": {"perfected_toxin": 2}},
+}
+
+# The one cell the saved member in `_migrated_talents` also holds: any id the
+# live tree carries would do.
+const LIVE_CELL := "tn_health"
+
+
+# The tree he wears for ONE spawn: the live class tree, plus the retired payload
+# of every learned id the live tree no longer holds. It rides his `tree`, so the
+# spawn applies it through the one door every node takes (`apply_from_tree` ->
+# `apply_payload`, `also` arm and all) rather than as a field poked onto the unit
+# afterwards — which would skip what the spawn does with it (Quick Rigging's
+# edit to the Snare Trap card, for one).
+func _worn_tree(learned: Dictionary) -> Array:
+	var t := Talents.generate_tree("mystic", "hunter")
+	for id in learned:
+		if RETIRED.has(id) and Talents.node_in_tree(t, id).is_empty():
+			t.append({"id": id, "payload": (RETIRED[id] as Dictionary).duplicate(true)})
+	return t
+
+
+func _ids(tree: Array) -> Array:
+	return tree.map(func(t): return String(t["id"]))
+
+
+# THE LOAD PATH'S OWN MIGRATION, driven on a member saved under the twelve
+# trees: it holds every id in `ids` plus `LIVE_CELL`. Returns the talents the
+# member comes out wearing. `Run` is an autoload, so it is fetched at RUNTIME (a
+# --script harness cannot name one), and its party is put back afterwards.
+func _migrated_talents(ids: Array) -> Dictionary:
+	var run: Node = root.get_node("/root/Run")
+	var kept: Array = run.party
+	var learned := {LIVE_CELL: 1}
+	for id in ids:
+		learned[id] = 1
+	run.party = [{"spec": "mystic", "key": "hunter", "tree": [],
+		"talents": learned}]
+	run.call("_migrate_trees")
+	var out: Dictionary = (run.party[0]["talents"] as Dictionary).duplicate()
+	run.party = kept
+	return out
 
 
 func _rune_pool() -> Dictionary:
@@ -150,6 +257,9 @@ func _kill(scene: Node) -> void:
 
 # ---------- §3 the tree's shape ----------
 
+# BATCH FX: `IDS` is still THIS BATCH'S RECORD OF ITS OWN 24 NODES — and every
+# one of them is RETIRED, because FX deleted the twelve spec trees. The table
+# stays: §3's save arm below asks each of these ids its question.
 const IDS := ["sv_potent", "sv_coated", "sv_virulence", "sv_slow_acting",
 	"sv_creeping", "sv_necrosis", "sv_plague",
 	"sv_wire", "sv_rigging", "sv_cruel", "sv_snap_shut", "sv_caught",
@@ -161,102 +271,116 @@ const IDS := ["sv_potent", "sv_coated", "sv_virulence", "sv_slow_acting",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Survivalist tree holds 24 nodes (got %d)" % tree.size())
-	var by_lane := {"Venom": 0, "Snares": 0, "Guerilla": 0}
-	var caps := 0
+	# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE. The Survivalist wears the
+	# one class tree now — twenty-seven nodes in three tiers of nine — so every
+	# question below is asked of the tree he wears: its size, its ids, the rank
+	# each node is worn at, where each node sits, that nothing in it is
+	# exclusive, and how its levels are filled. Two questions were about a shape
+	# the one tree does not have, and are deleted where they stood.
+	ok(tree.size() == 27 and _ids(tree) == _ids(Talents.tree()),
+		"the Survivalist wears the one class tree — 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for t in tree:
 		var id := String(t["id"])
 		ok(not seen.has(id), "id %s appears once" % id)
 		seen[id] = true
-		ok(int(t.get("ranks", 0)) == 1, "%s holds a single rank" % id)
-		var row := int(t.get("row", 0))
-		ok(row >= 1 and row <= Talents.CAPSTONE_ROW, "%s sits in a real row 1-9 (got %d)" % [id, row])
-		if bool(t.get("capstone", false)):
-			caps += 1
-			ok(row == Talents.CAPSTONE_ROW, "capstone %s is on the capstone shelf" % id)
-		else:
-			by_lane[String(t["lane"])] = by_lane[String(t["lane"])] + 1
+		# RE-POINTED (FX): a node carries no rank of its own any more. The ledger
+		# is what wears it, and it wears every node at exactly one
+		# (`Talents.worn_learned`, the door `Profile.worn_talents` goes through).
+		ok(not t.has("ranks")
+			and int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"%s is worn at a single rank" % id)
+		# RE-POINTED (FX): rows 1-9 are gone; the level a node sits at is its TIER.
+		var tier := int(t.get("tier", 0))
+		ok(tier >= 1 and tier <= Talents.TIERS,
+			"%s sits in a real tier 1-%d (got %d)" % [id, Talents.TIERS, tier])
+		# Nothing in the one tree is exclusive, so no node may carry a stale
+		# `exclusive_with` pointing anywhere.
 		ok(not t.has("exclusive_with"),
-			"%s carries no stale exclusive_with — rows do the barring" % id)
-	ok(caps == 3, "three capstones (got %d)" % caps)
-	for lane in by_lane:
-		ok(by_lane[lane] == Talents.ROWS, "%s holds 8 rows (got %d)" % [lane, by_lane[lane]])
-	# §10: EVERY ONE OF THE 24 IDS SURVIVES AND RE-SPECS IN PLACE. This is what
-	# lets a saved tree migrate without a save version move.
+			"%s carries no stale exclusive_with — nothing in the one tree is exclusive" % id)
+	# DELETED AT FX — 4 CHECKS: "three capstones", and for each of the three
+	# "capstone X is on the capstone shelf". The shelf was the capstone ROW of a
+	# spec tree; FX deleted the spec trees, and the one tree has no rows and no
+	# capstone, so neither question has anything left to read.
+	# RE-POINTED (FX): "<lane> holds 8 rows" asked how the tree's levels are
+	# filled. The one tree's levels are its three TIERS, nine nodes to each.
+	for tier_n in range(1, Talents.TIERS + 1):
+		var in_tier := Talents.tier_nodes(tree, tier_n).size()
+		ok(in_tier == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier_n, Talents.NODES_PER_TIER, in_tier])
+	# RE-POINTED AND INVERTED (FX) — THE 24 IDS DID NOT SURVIVE. BA asserted that
+	# every one of them survives the re-author because that is what let a SAVED
+	# tree migrate with no save version moving (§10's promise). FX deleted all 24
+	# and kept the promise the other way: `Run._migrate_trees` swaps a saved
+	# member's tree for the live one and DROPS every id it no longer holds, so a
+	# resumed run wears nothing the tree cannot price and still no save version
+	# moves. So each id is asked the question its survival answered — does a
+	# save holding it still load clean — and the answer is that it is dropped,
+	# never carried as a dead node.
+	var migrated := _migrated_talents(IDS)
 	for id in IDS:
-		ok(seen.has(id), "id %s survives the re-author" % id)
-	# BATCH BM RE-POINTED THIS IN PLACE. `IDS` is THIS BATCH'S RECORD OF ITS OWN
-	# 24 NODES and stays that; BM added a row-8 node to every lane, so the live
-	# tree is 27. What the check exists to prove — that every one of the 24
-	# SURVIVES, which is what lets a saved tree migrate — is the loop above and
-	# is untouched. The count below allows exactly the three BM added.
-	ok(seen.size() == IDS.size() + 3,
-		"the 24 survive and BM added exactly 3 (got %d, table holds %d)" % [seen.size(), IDS.size()])
-	# The three lane names STAND — only what Venom's nodes DO was re-aimed.
-	for lane in ["Venom", "Snares", "Guerilla"]:
-		ok(by_lane.has(lane), "the lane %s still exists" % lane)
+		ok(not migrated.has(id),
+			"id %s is retired with its tree: a saved run holding it migrates with it DROPPED" % id)
+	# RE-POINTED (FX): "the 24 survive and BM added exactly 3" was the exact-count
+	# arm of the loop above, and it still is — exactly the 24 go and exactly the
+	# live cell the same member held stays, so the drop is the TREE's doing and
+	# not a wipe that would pass every line of the loop.
+	ok(migrated.size() == 1 and migrated.has(LIVE_CELL),
+		"the migration drops exactly the 24 and keeps the live cell %s (kept %s)" % [
+			LIVE_CELL, str(migrated.keys())])
+	# DELETED AT FX — 3 CHECKS: "the lane Venom / Snares / Guerilla still exists"
+	# ("only what Venom's nodes DO was re-aimed"). Each asked a deleted tree's
+	# lane, and no tree has lanes now; the names live on only as a retired
+	# rune's `lane` tag.
 
 
 # ---------- §3 the magnitudes, on the node that owes each one ----------
 
 func _magnitudes() -> void:
-	# Venom
-	ok(_stat_of("sv_potent", "potent_ranks") == 8, "Potent Toxins pays 8 flat per stack")
-	ok(_stat_of("sv_coated", "coated_blades") == 1, "Coated Blades is a FLAG, not an amount")
-	ok(_stat_of("sv_virulence", "virulence_ranks") == 2, "Distillate adds 2 extra stacks")
-	ok(_stat_of("sv_slow_acting", "slow_acting") == 1, "Slow Acting is a FLAG")
-	ok(_stat_of("sv_creeping", "creeping_death") == 1, "Creeping Death is a FLAG")
-	ok(_stat_of("sv_necrosis", "necrosis") == 35, "Necrosis pays 35 percentage points")
-	ok(_stat_of("sv_plague", "quartermaster") == 1, "Quartermaster is a FLAG")
-	# Snares
-	ok(_stat_of("sv_wire", "wire_ranks") == 35, "Reinforced Wire pays 35 percentage points")
-	ok(_stat_of("sv_rigging", "quick_rigging") == 2, "Quick Rigging carries its own 2")
-	ok(_stat_of("sv_cruel", "cruel_ranks") == 50, "Cruel Devices pays 50 percentage points")
-	ok(_stat_of("sv_snap_shut", "snap_shut") == 1, "Snap Shut is a BYPASS, not a magnitude")
-	ok(_stat_of("sv_caught", "caught_fast") == 5, "Caught Fast holds 5 turns")
-	ok(_stat_of("sv_bone", "bone_breaker") == 90, "Bone Breaker holds 90 Break damage")
-	ok(_stat_of("sv_network", "deadfall_network") == 3,
-		"Deadfall Network holds the CAP it installs — gate and magnitude in one field")
-	# Guerilla
-	ok(abs(float(_stat_of("sv_woodcraft", "max_hp_pct")) - 0.20) < 0.0001,
-		"Woodcraft pays 20% maximum Health")
-	ok(_stat_of("sv_hitrun", "hit_and_run") == 2, "Hit and Run holds 2 turns of Elusive")
-	ok(_stat_of("sv_scavenger", "scavenger_ranks") == 25, "Scavenger pays 25 percentage points")
-	ok(_stat_of("sv_medic", "field_medic") == 2, "Field Medic holds a COUNT of 2")
-	ok(_stat_of("sv_vulture", "vulture") == 60, "Vulture pays 60 percentage points")
-	ok(_stat_of("sv_ghillie", "ghillie") == 65, "Ghillie Suit holds a 65% chance")
-	ok(_stat_of("sv_improvised", "improvised") == 2, "Improvised holds a COUNT of 2")
-	# Row 8
-	ok(_stat_of("sv_epidemic", "perfected_toxin") == 2,
-		"Perfected Toxin holds the per-turn rise — gate and magnitude in one field")
-	ok(_stat_of("sv_forest", "whole_forest") == 1, "The Whole Forest is unchanged")
-	ok(_stat_of("sv_force", "force_of_nature") == 20,
-		"Force of Nature carries its percentage rather than deriving it from a flag")
+	# RE-POINTED (FX) — THREE OF HIS NODES ARE PRECEDENTS OF THE ONE TREE. FX took
+	# each one's FIELD AND MAGNITUDE unchanged (`talents.gd` names the precedent
+	# above each node), so for these three "is the magnitude on the node that
+	# owes it" still has a live answer: the node that owes it now is the one-tree
+	# node that took it, and it pays the same number.
+	ok(abs(float(_stat_of("tn_health", "max_hp_pct")) - 0.20) < 0.0001,
+		"More Health, Woodcraft's precedent, pays 20% maximum Health")
+	ok(_stat_of("tn_cleanse", "field_medic") == 2,
+		"Cleanse Debuffs Each Turn, Field Medic's precedent, holds a COUNT of 2")
+	ok(_stat_of("tn_look_past", "ghillie") == 65,
+		"Enemies Look Past You, Ghillie Suit's precedent, holds a 65% chance")
+	# DELETED AT FX — 21 CHECKS: the magnitudes of the nodes that are NOT
+	# precedents — Potent Toxins' 8, Coated Blades' flag, Distillate's 2, Slow
+	# Acting's flag, Creeping Death's flag, Necrosis's 35, Quartermaster's flag,
+	# Reinforced Wire's 35, Quick Rigging's 2, Cruel Devices' 50, Snap Shut's
+	# flag, Caught Fast's 5, Bone Breaker's 90, Deadfall Network's 3, Hit and
+	# Run's 2, Scavenger's 25, Vulture's 60, Improvised's 2, Perfected Toxin's 2,
+	# The Whole Forest's flag and Force of Nature's 20. Their SUBJECT was the
+	# node, and FX deleted the tree that held it; no node of the one tree writes
+	# any of these fields. Every FIELD still stands with its read site, and the
+	# live sections below drive the ones BA measured, at these magnitudes, off
+	# `RETIRED`.
 	# THE TOOLTIP IS THE OTHER PLACE THE DESIGN NUMBER APPEARS. A magnitude that
 	# lives only in a payload can drift from the text that sells it.
-	var pairs := {"sv_potent": "+8", "sv_virulence": "+2", "sv_necrosis": "+35%",
-		"sv_wire": "+35%", "sv_rigging": "by 2", "sv_cruel": "+50%",
-		"sv_caught": "5 turns", "sv_bone": "90 Break", "sv_network": "THREE",
-		"sv_woodcraft": "+20%", "sv_hitrun": "2 turns", "sv_scavenger": "25%",
-		"sv_medic": "2 debuffs", "sv_vulture": "+60%", "sv_ghillie": "65%",
-		"sv_improvised": "first 2", "sv_epidemic": "by 2", "sv_force": "+20%"}
+	# RE-POINTED (FX) for the three precedents: the one-tree node that took each
+	# magnitude states it in its own text.
+	var pairs := {"tn_health": ["sv_woodcraft", "+20%"],
+		"tn_cleanse": ["sv_medic", "2 debuffs"],
+		"tn_look_past": ["sv_ghillie", "65%"]}
 	for id in pairs:
 		var shown := Talents.desc_for(_node(id), 1)
-		ok(shown.contains(String(pairs[id])),
-			"%s's tooltip renders its magnitude (%s not in \"%s\")" % [
-				id, pairs[id], shown])
-	# The two renames, in the data rather than in a comment.
-	ok(String(_node("sv_virulence")["name"]) == "Distillate",
-		"sv_virulence carries Distillate — the mechanic kept, the pathogen name gone")
-	ok(String(_node("sv_plague")["name"]) == "Quartermaster",
-		"sv_plague carries Quartermaster")
-	ok(String(_node("sv_epidemic")["name"]) == "Perfected Toxin",
-		"sv_epidemic carries Perfected Toxin")
-	ok(String(_node("sv_creeping")["name"]) == "Creeping Death",
-		"sv_creeping KEEPS its name — it is a re-spec, not a replacement")
-	ok(String(_node("sv_necrosis")["name"]) == "Necrosis",
-		"Necrosis keeps its name: tissue death from venom is craft, not contagion")
+		ok(shown.contains(String(pairs[id][1])),
+			"%s (%s's precedent) renders its magnitude (%s not in \"%s\")" % [
+				id, pairs[id][0], pairs[id][1], shown])
+	# DELETED AT FX — 15 CHECKS: the same tooltip check for the fifteen nodes
+	# that are not precedents (sv_potent, sv_virulence, sv_necrosis, sv_wire,
+	# sv_rigging, sv_cruel, sv_caught, sv_bone, sv_network, sv_hitrun,
+	# sv_scavenger, sv_vulture, sv_improvised, sv_epidemic, sv_force). Each
+	# rendered a deleted node's own text.
+	# DELETED AT FX — 5 CHECKS: the renames, "in the data rather than in a
+	# comment" — sv_virulence carries Distillate, sv_plague Quartermaster,
+	# sv_epidemic Perfected Toxin, sv_creeping keeps Creeping Death, and Necrosis
+	# keeps its name. Each read a deleted node's name. The reservation those
+	# names obeyed is still asserted over every node the Survivalist wears, in §1.
 
 
 # ---------- §6 every counter is ADDITIVE at its READ SITE ----------
@@ -361,10 +485,10 @@ func _contagion_reserved() -> void:
 	ok(cm.to_lower().contains("self-propagating"),
 		"...and names what is off-limits, so a later batch cannot re-add it innocently")
 	# SNARES and GUERILLA were never disease and are untouched by the rule.
-	ok(String(_node("sv_snap_shut")["desc"]).contains("RANGED"),
-		"Snap Shut is untouched by §1")
-	ok(String(_node("sv_forest")["desc"]).contains("Tripwire"),
-		"The Whole Forest is untouched by §1")
+	# DELETED AT FX — 2 CHECKS: "Snap Shut is untouched by §1" and "The Whole
+	# Forest is untouched by §1", each reading a deleted node's text for the word
+	# that proved it unchanged ("RANGED", "Tripwire"). Both nodes went with the
+	# tree; the reservation itself is asserted above over the one tree he wears.
 
 
 # ---------- §5 the trophy-pool collision cannot arise ----------
@@ -380,9 +504,12 @@ func _no_ability_grants() -> void:
 			"%s grants no ability by name" % t["id"])
 		ok(Talents.granted_name(p) == "",
 			"%s reports no granted name" % t["id"])
+	# RE-POINTED (FX): learns every node of the tree he wears now, not the 24
+	# retired ids — which the one tree does not hold, so learning them would
+	# learn nothing and the comparison below would pass on an empty learn.
 	var learned := {}
-	for id in IDS:
-		learned[id] = 1
+	for t in _tree():
+		learned[String(t["id"])] = 1
 	var bare := {"key": "hunter", "spec": "mystic", "tree": _tree(),
 		"talents": {}, "bm_abilities": []}
 	var full := {"key": "hunter", "spec": "mystic", "tree": _tree(),
@@ -524,17 +651,13 @@ func _bot_policy_source() -> void:
 # ---------- §4 the exclusive pairs ----------
 
 func _exclusive_pairs() -> void:
-	# BOTH NAMED PAIRS GO. Virulence <-> Slow Acting dissolved on its own (rows
-	# 3 and 4 of ONE lane, so row exclusivity lets a player hold both), and
+	# BOTH NAMED PAIRS GO. Virulence <-> Slow Acting dissolved on its own, and
 	# Plague Bearer <-> Deadfall Network went with Plague Bearer.
-	var v_row := int(_node("sv_virulence")["row"])
-	var s_row := int(_node("sv_slow_acting")["row"])
-	ok(v_row != s_row and String(_node("sv_virulence")["lane"]) \
-			== String(_node("sv_slow_acting")["lane"]),
-		"Distillate and Slow Acting sit in DIFFERENT rows of ONE lane — a player holds both")
-	ok(int(_node("sv_plague")["row"]) == int(_node("sv_network")["row"]),
-		"Quartermaster and Deadfall Network share row 7, so row exclusivity "
-		+ "already enforces the choice and the pair needs no entry")
+	# DELETED AT FX — 2 CHECKS: "Distillate and Slow Acting sit in DIFFERENT rows
+	# of ONE lane — a player holds both" and "Quartermaster and Deadfall Network
+	# share row 7, so row exclusivity already enforces the choice". Each read a
+	# deleted node's row and lane; FX deleted the rows, the lanes and the nodes,
+	# and nothing in the one tree is exclusive.
 	# The prose list in CLAUDE.md must not name either.
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(not cm.contains("plague_bearer/deadfall") and not cm.contains("virulence/slow_acting"),
@@ -552,8 +675,11 @@ func _docs() -> void:
 	for banned in ["Plague Bearer", "Epidemic", "Virulence"]:
 		ok(not doc.contains(banned),
 			"master.html no longer documents %s" % banned)
-	for wanted in ["Quartermaster", "Perfected Toxin", "Distillate"]:
-		ok(doc.contains(wanted), "master.html documents %s" % wanted)
+	# FX — THREE CHECKS DELETED HERE (DG §2). They asked that master.html
+	# document Quartermaster, Perfected Toxin and Distillate, three Survivalist
+	# nodes BA authored. FX deleted the twelve spec trees and those nodes with
+	# them, and master.html no longer describes them. The contagion names above
+	# stay pinned ABSENT, because that reserve is a standing rule.
 	ok(doc.contains("+8%") and doc.contains("DIFFERENT status effect"),
 		"master.html still states Trapper's rate — the one ceiling that stays")
 	ok(doc.contains("bounded by how many distinct debuffs exist"),
@@ -561,7 +687,14 @@ func _docs() -> void:
 	var gloss := FileAccess.get_file_as_string("res://data/glossary.json")
 	ok(not gloss.contains("Epidemic"),
 		"the glossary's Poison entry no longer names Epidemic")
-	ok(gloss.contains("Perfected Toxin"), "...and names Perfected Toxin instead")
+	# RE-POINTED AND INVERTED (FX). BA's pin said the Poison entry names Perfected
+	# Toxin in Epidemic's place. FX deleted the tree that held Perfected Toxin and
+	# took the glossary's clauses naming deleted nodes with it, so the entry now
+	# describes Poison and names no node at all. The live question is the same
+	# one pointed the way the doc now answers it: the entry does not name a
+	# RETIRED node in the capstone's place either.
+	ok(not gloss.contains("Perfected Toxin"),
+		"...and names no retired node in its place — Perfected Toxin went with its tree")
 	# The passive the player reads on the awakening screen and the hero sheet.
 	var pd := String(Classes.SPEC_INFO["mystic"]["passive_desc"])
 	ok(pd.contains("DIFFERENT status"), "the in-game passive text still names breadth")
@@ -885,11 +1018,13 @@ func _live_snares_magnitudes() -> void:
 # ---------- §3 live: the Guerilla magnitudes land as written ----------
 
 func _live_guerilla_magnitudes() -> void:
-	var scene := await _spawn({"sv_woodcraft": 1})
+	# RE-POINTED (FX): Woodcraft is learned as More Health, the one-tree node that
+	# took its field and its magnitude (max_hp_pct 0.20) whole.
+	var scene := await _spawn({"tn_health": 1})
 	var h := _hero(scene, 3)
 	var bare := await _spawn_bare_hp()
 	ok(h.max_hp > bare,
-		"Woodcraft raises his maximum Health (%d over a bare %d)" % [h.max_hp, bare])
+		"More Health (Woodcraft's precedent) raises his maximum Health (%d over a bare %d)" % [h.max_hp, bare])
 	ok(abs(float(h.max_hp) / float(bare) - 1.20) < 0.02,
 		"...by 20%% (ratio %.3f)" % (float(h.max_hp) / float(bare)))
 	await _kill(scene)

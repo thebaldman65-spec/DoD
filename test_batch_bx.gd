@@ -46,6 +46,10 @@
 # · THE TWO RENAMED NODES KEEP THEIR IDS. That is §6's named negative control —
 #   a rename that moves an id breaks every saved build — so the ids, the rows,
 #   the lanes and the payload FIELDS are asserted unmoved beside the new names.
+#   BATCH FX DELETED BOTH NODES WITH THE TWELVE SPEC TREES, AND THE CONTROL
+#   INVERTED RATHER THAN DISAPPEARING: a saved build carrying either id now has
+#   it DROPPED by the run's tree migration, and each field the node paid keeps
+#   its read site. See §4 for what was re-pointed and the four checks deleted.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -877,49 +881,91 @@ func _rename() -> void:
 	# IDS. A rename that moved an id breaks every saved build, silently — the
 	# node simply stops being owned. Rows, lanes and payload FIELDS are asserted
 	# unmoved beside the new names.
+	#
+	# ── BATCH FX — BOTH NODES WERE DELETED WITH THE TWELVE SPEC TREES, AND THE
+	#    CONTROL INVERTS RATHER THAN DISAPPEARING ──────────────────────────────
+	# The Wild Within (`bm_beast_within`) and None Left Behind
+	# (`bm_no_beast_left`) have no node in the one class tree and no successor
+	# there: neither field is written by any node now. The control's four
+	# questions a node are answered like this:
+	#   · "IT STILL EXISTS BY ID" INVERTS. What it asked was what a SAVED BUILD
+	#     carrying the id meets, and the answer moved from "the same node" to "the
+	#     id is DROPPED": `Run._migrate_trees` swaps a saved member's tree for the
+	#     live one and drops every id the live tree does not hold. It is DRIVEN on
+	#     a member carrying both ids and a live cell beside them, and the live
+	#     cell must SURVIVE — so a migration that simply wiped the ledger cannot
+	#     pass the arm.
+	#   · "ITS PAYLOAD FIELD IS UNTOUCHED" RE-POINTS TO THE FIELD'S READ SITE. The
+	#     node is gone and the field is not: FX kept every field read site in
+	#     `battle.gd`, dormant rather than deleted, so a later tree, rune or card
+	#     can point at it again. Asserted comment-stripped, word-bounded.
+	#   · "IT IS NAMED X" AND "IT DID NOT MOVE ROW OR LANE" ARE DELETED (DG §2), 4
+	#     checks, 2 a node: a node's name, row and lane were the deleted trees'
+	#     own properties and exist nowhere a check can read them.
 	var want := {
-		"bm_beast_within": ["The Wild Within", "handler", 2, "companion_hp_pct"],
-		"bm_no_beast_left": ["None Left Behind", "pack", 6, "no_beast_left"],
+		"bm_beast_within": "companion_hp_pct",
+		"bm_no_beast_left": "no_beast_left",
 	}
-	var tree: Array = Talents.generate_tree("beastmaster", "hunter")
+	var run := _party()
+	var saved: Dictionary = {}
+	for m in run.party:
+		if String(m.get("spec", "")) == "beastmaster":
+			saved = m
+	saved["tree"] = []
+	saved["talents"] = {"bm_beast_within": 1, "bm_no_beast_left": 1, "tn_health": 1}
+	run._migrate_trees()
+	var kept: Dictionary = saved.get("talents", {})
+	var live_tree: Array = saved.get("tree", [])
+	var bat_code := _code("res://scripts/battle.gd")
 	for id in want:
-		var node: Dictionary = {}
-		for n in tree:
-			if String(n.get("id", "")) == id:
-				node = n
-		ok(not node.is_empty(), "§4: %s still exists by id" % id)
-		if node.is_empty():
-			continue
-		var spec: Array = want[id]
-		ok(String(node.get("name", "")) == String(spec[0]),
-			"§4: %s is named %s (got %s)" % [id, spec[0], node.get("name", "")])
-		ok(String(node.get("lane", "")) == String(spec[1])
-			and int(node.get("row", 0)) == int(spec[2]),
-			"§4: %s did not move row or lane" % id)
-		var payload: Dictionary = node.get("payload", {}).get("stat", {})
-		ok(payload.has(String(spec[3])),
-			"§4: %s's payload field %s is untouched" % [id, spec[3]])
+		ok(not kept.has(id) and Talents.node_in_tree(live_tree, String(id)).is_empty(),
+			"§4: %s went with the twelve trees — a saved build carrying it has it DROPPED, not carried" % id)
+		var field := String(want[id])
+		var read_site := RegEx.new()
+		read_site.compile("\\.%s\\b" % field)
+		ok(read_site.search(bat_code) != null,
+			"§4: %s's field `%s` keeps its read site in battle.gd — dormant, not deleted" % [id, field])
+	ok(kept.has("tn_health") and not live_tree.is_empty(),
+		"§4: ...and the migration is a FILTER, not a wipe — the live cell carried beside them survives, on the live tree")
 	# The two OLD names are gone from the live trees, so a saved BUILD screen
 	# cannot show one and the doc cannot disagree with the tree.
+	# BATCH FX — THE ONE TREE, WALKED ONCE: `generate_tree` answers the same
+	# twenty-seven nodes for every spec now, so the twelve-spec walk would read
+	# one tree twelve times over.
 	var names: Array = []
-	for spec_id in Classes.all_specs():
-		for n in Talents.generate_tree(String(spec_id), ""):
-			names.append(String(n.get("name", "")))
+	for n in Talents.tree():
+		names.append(String(n.get("name", "")))
 	ok(not names.has("Beast Within") and not names.has("No Beast Left"),
-		"§4: neither old node name survives anywhere in the twelve trees")
-	# AND THE TWO NEW ONES ARE CLEAN AGAINST THE WHOLE ROSTER (BR §1's sweep).
-	for new_name in ["The Wild Within", "None Left Behind"]:
-		ok(names.count(new_name) == 1,
-			"§4: %s names exactly one talent node (got %d)"
-				% [new_name, names.count(new_name)])
-		ok(Classes.pool_ability(new_name) == null,
-			"§4: ...and no ABILITY answers to it")
+		"§4: neither old node name survives anywhere in the one tree")
+	# AND THE NAMES THE TALENT TREE CARRIES ARE CLEAN AGAINST THE WHOLE ROSTER
+	# (BR §1's sweep). BATCH FX RE-POINTED THIS FROM THE TWO NAMES BX AUTHORED TO
+	# THE NAMES THAT EXIST: both BX nodes are gone, so "names exactly one talent
+	# node" and "no ABILITY answers to it" had no subject left in those two
+	# names — and the question they asked, whether a talent node's name is unique
+	# and collides with nothing, is live for every node in the one tree. Four
+	# per-name checks (2 names x 2) become two sweeps over all the tree's names,
+	# each naming what it caught; the rune half below walks the same names.
+	var repeated: Array = []
+	var ability_hits: Array = []
+	for nm in names:
+		if names.count(nm) != 1 and not repeated.has(nm):
+			repeated.append(nm)
+		if Classes.pool_ability(String(nm)) != null:
+			ability_hits.append(nm)
+	ok(repeated.is_empty() and names.size() > 20,
+		"§4: every node name in the one tree names exactly one node (%d names; repeated: %s)"
+			% [names.size(), ", ".join(repeated)])
+	ok(ability_hits.is_empty(),
+		"§4: ...and no ABILITY answers to any of them (%s)" % ", ".join(ability_hits))
 	var rune_names: Array = []
 	for rid in Runes.ids():
 		rune_names.append(String(Runes.config(String(rid)).get("name", "")))
-	ok(not rune_names.has("The Wild Within")
-		and not rune_names.has("None Left Behind"),
-		"§4: ...and no rune does either")
+	var rune_hits: Array = []
+	for nm in names:
+		if rune_names.has(nm):
+			rune_hits.append(nm)
+	ok(rune_hits.is_empty(),
+		"§4: ...and no rune does either (%s)" % ", ".join(rune_hits))
 	ok(rune_names.size() > 40,
 		"§4: ...checked against the whole rune pool (%d)" % rune_names.size())
 

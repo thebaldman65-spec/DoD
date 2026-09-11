@@ -3,12 +3,17 @@
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_do.gd 2>&1 | grep -E "Parse Error|SCRIPT ERROR"
 #
-# **THE RULE THIS FILE EXISTS FOR:** a talent may not grant an ability, and may
-# not depend on an ability the hero is not guaranteed to have. Talents are
+# **THE RULE THIS FILE EXISTS FOR, SINCE BATCH FX: THE DESIGNER'S LINE — a
+# talent may not touch a rune, an ability, a passive or an engine.** Talents are
 # chosen before the run knowing nothing; abilities come from the draft and runes
-# sharpen them. A talent modifying the spec's PROTECTED CORE is guaranteed and
-# permitted — that is the settled reading of the charter's own §1, and it is
-# what makes the trees 324-of-324 clean rather than 235.
+# sharpen them. DO's own rule was narrower — a talent may not GRANT an ability,
+# nor depend on one the hero is not guaranteed to have — and it PERMITTED a node
+# to modify the spec's PROTECTED CORE, which is what made the twelve spec trees
+# 324-of-324 clean rather than 235. **FX superseded that permitted list and
+# deleted the twelve trees with it** (CLAUDE.md's DO block now opens by saying
+# so). The one tree is twenty-seven stat nodes, so §1 asserts the line over
+# `Talents.TREE`; the no-grant half and the status half DO wrote still stand
+# inside it, and §4 still sweeps the second.
 #
 # **IT ASSERTS THE PROPERTY AND PRINTS THE LIVE COUNT, AND THAT ORDER IS THE
 # WHOLE LESSON OF DN.** DN's own gate asserted a NUMBER (`check_da` at 36) and
@@ -35,10 +40,10 @@ var checks := 0
 var fails := 0
 
 # The twenty-two abilities that left the talent trees for the draft, with the
-# node id each one used to hang on. THE ID IS THE HALF THAT MATTERS: every one
-# of those cells still exists, in the same lane and the same row, because a
-# node that MOVES row is mispriced by `Talents.cells_spent` and DN measured
-# that as a silent negative purse.
+# node id each one used to hang on. THE IDS ARE PROVENANCE NOW: they named cells
+# of the twelve spec trees, which BATCH FX deleted, and the half of §3 that held
+# each cell to its lane and row went with them (§3 says why). §2 reads only the
+# NAMES — where each card landed — and that question is unchanged.
 const MOVED := {
 	"Battle Shout": "bz_battle_shout", "Rampage": "bz_rampage",
 	"Lunge": "sm_lunge", "Execute": "sm_execute",
@@ -53,26 +58,11 @@ const MOVED := {
 	"Mind Flay": "oc_mind_flay", "Mass Hysteria": "oc_hysteria",
 }
 
-# Where each re-authored cell sat before DO opened it. Asserted rather than
-# derived, because "no node moves row or lane" is the batch's own promise and a
-# promise checked against the thing it describes is not checked at all.
-const CELL_HOME := {
-	"bz_battle_shout": ["Fury", 3], "bz_rampage": ["Warpath", 9],
-	"sm_lunge": ["Blade", 2], "sm_execute": ["Blade", 9],
-	"wd_hold_line": ["Banner", 9], "py_melt": ["Kindling", 4],
-	"py_flame_shield": ["Inferno", 4], "py_focused": ["Detonation", 4],
-	"py_firestorm": ["Kindling", 9], "py_rebirth": ["Inferno", 9],
-	"cr_rime": ["Winter", 4], "cr_numbing": ["Deep Freeze", 4],
-	"cr_lance_focus": ["Thaw", 4], "cr_shatter": ["Thaw", 9],
-	"ar_overcharge": ["Resonance", 4], "ar_wrath": ["Overload", 9],
-	"hl_divine_plea": ["Radiance", 4], "hl_inner_faith": ["Vigil", 4],
-	"dv_resolve": ["Zeal", 3], "dv_bulwark": ["Bulwark", 9],
-	"oc_mind_flay": ["Madness", 3], "oc_hysteria": ["Madness", 9],
-	# The three re-authored for the OTHER reason — they read a drawn ability
-	# rather than granting one.
-	"bm_devoted_fury": ["devotion", 4], "bm_reserves": ["handler", 3],
-	"cr_icy_resolve": ["Winter", 5],
-}
+# `CELL_HOME` — the lane and row each of the twenty-five cells DO re-authored
+# sat in, asserted rather than derived because "no node moves row or lane" was
+# DO's own promise — is DELETED with the half of §3 that read it. BATCH FX
+# deleted the twelve spec trees those cells belonged to; §3 gives the count and
+# the reason at the site where the assertions stood.
 
 # The payload terms §2's clause-cuts removed. A cut clause whose code keeps
 # paying it is the defect this project has found five times, so the terms are
@@ -151,68 +141,197 @@ func _esc(s: String) -> String:
 	return out
 
 
-# ---------------- §1 — THE CHARTER, AS TWO PROPERTIES ----------------
+# ---------------- §1 — THE LINE, AS TWO PROPERTIES OF THE ONE TREE ----------------
+#
+# **BATCH FX RE-POINTED BOTH PROPERTIES, AND THE RULE THEY ASSERT MOVED WITH
+# THEM.** This walk read the twelve spec trees — 324 nodes — and asked two
+# things: that no node GRANTS an ability, and that no node's text names an
+# ability outside its own spec's PROTECTED CORE. FX deleted the twelve trees and
+# superseded the permitted list with the designer's line, so both questions are
+# asked of `Talents.TREE`, under the line:
+#
+#   PROPERTY ONE, THE PAYLOAD. Every node is ONE `stat` block and nothing else.
+#   A stat block cannot grant, edit or condition anything, so the shape IS the
+#   line's structural half — and on top of it no field may be a rune's own
+#   (`rune_X`), and no grant or condition may hide anywhere in the payload.
+#   PROPERTY TWO, THE TEXT. No node's text names an ability or a passive AT
+#   ALL. The protected core is no longer an exemption — its permission is the
+#   half FX superseded — and a class-keyed node is worn by every spec, so there
+#   is no one spec whose core could guarantee the name anyway.
+#
+# **THE CONTROLS RUN THE PREDICATE THE WALK TRUSTS, NOT A COPY OF IT.** A
+# well-formed stat node must pass; a node carrying an `ability` edit, a
+# `grant_ability`, a rune's field, or text naming an ability must each be
+# caught. A predicate that had stopped biting would read clean over twenty-seven
+# honest nodes, which is the vacuous-check shape exactly.
+#
+# WHAT IS NOT DERIVED HERE, SAID RATHER THAN IMPLIED: an ENGINE reached through
+# an ordinary-looking stat field. No table in the game says which `BattleUnit`
+# fields belong to an engine, so that half is `check_fx` §4's, which drives
+# every node's field live on all four classes.
+
+# Everything the line forbids a node's payload to carry, as the reasons the node
+# fails it — EMPTY for a node that passes. The tree walk and its controls share
+# this one predicate.
+func _line_violations(n: Dictionary) -> Array:
+	var why: Array = []
+	var pay: Dictionary = n.get("payload", {})
+	if pay.keys() != ["stat"]:
+		why.append("its payload carries %s — a node is one `stat` block and nothing else" % str(pay.keys()))
+	var st: Dictionary = {}
+	if pay.get("stat", {}) is Dictionary:
+		st = pay.get("stat", {})
+	if st.is_empty():
+		why.append("it writes no field")
+	for f in st:
+		if String(f).begins_with("rune_"):
+			why.append("it writes `%s`, a rune's own field" % String(f))
+	var g := Talents.granted_name(pay)
+	if g != "":
+		why.append("it grants `%s`" % g)
+	if _carries(pay, "condition"):
+		why.append("it carries a condition")
+	return why
+
+
+# Does `key` appear anywhere in this payload, a sub-payload included?
+func _carries(x: Variant, key: String) -> bool:
+	if x is Dictionary:
+		for k in x:
+			if String(k) == key or _carries(x[k], key):
+				return true
+	elif x is Array:
+		for e in x:
+			if _carries(e, key):
+				return true
+	return false
+
+
+# Every name a node's text may not carry under the line, longest first so
+# "Battle Shout" is not eaten by a shorter name inside it: every ability in the
+# corpus (`Classes.ability_corpus()`, the one walk), every class passive, and
+# every spec passive as its own card names it — the words before the colon, or
+# before the dash where the card runs on without one.
+func _forbidden_names() -> Array:
+	var out: Array = []
+	for ab in Classes.ability_corpus():
+		out.append(String(ab.display_name))
+	for ck in Classes.CLASS_PASSIVES:
+		out.append(String((Classes.CLASS_PASSIVES[ck] as Dictionary).get("name", "")))
+	for spec in Classes.all_specs():
+		var pd := String((Classes.SPEC_INFO[spec] as Dictionary).get("passive_desc", ""))
+		var nm := pd.split(":")[0].split(" —")[0].strip_edges()
+		if nm != "" and nm != pd:
+			out.append(nm)
+	out.sort_custom(func(a, b): return String(a).length() > String(b).length())
+	return out
+
+
+# The barred names a node's rendered text carries, word-bounded, with the tree's
+# own node names resolved FIRST — a tree is a namespace, which is DN's rule and
+# the `wd_spiked`/Spite trap it came from. "Berserk" sits inside "Berserker" and
+# "Heal" inside "Health", which is why the match is bounded.
+# Returns [names, named_another_node].
+func _text_names(n: Dictionary, forbidden: Array, own: Dictionary) -> Array:
+	var masked := Talents.desc_for(n, 1)
+	var named: Array = []
+	var tree_ref := false
+	for nm in forbidden:
+		var s := String(nm)
+		if s.length() < 4 or not _bounded(masked, s):
+			continue
+		masked = masked.replace(s, "#".repeat(s.length()))
+		if String(n.get("name", "")) == s or own.has(s):
+			tree_ref = true
+			continue
+		named.append(s)
+	return [named, tree_ref]
+
+
+# A real ability name and a real rune-owned field, for the controls: a control
+# armed on a name nothing uses proves only that the name is not used.
+func _ability_needle() -> String:
+	for ab in Classes.ability_corpus():
+		if String(ab.display_name).length() >= 4:
+			return String(ab.display_name)
+	return ""
+
+
+func _a_rune_field() -> String:
+	var runes: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
+	if not (runes is Dictionary):
+		return ""
+	for rid in runes:
+		var pay: Variant = (runes[rid] as Dictionary).get("payload", {})
+		if not (pay is Dictionary):
+			continue
+		var st: Variant = (pay as Dictionary).get("stat", {})
+		if st is Dictionary:
+			for f in st:
+				if String(f).begins_with("rune_"):
+					return String(f)
+	return ""
+
+
 func _s1_charter() -> void:
-	print("\n§1 — the charter, asserted as a property and counted beside it")
-	var granting: Array = []
-	var nodes := 0
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			nodes += 1
-			var g := Talents.granted_name(n.get("payload", {}))
-			if g != "":
-				granting.append("%s/%s -> %s" % [spec, n["id"], g])
-	# PROPERTY ONE: no talent node grants an ability.
-	ok(granting.is_empty(),
-		"a talent node grants an ability: %s" % ", ".join(granting))
+	print("\n§1 — the designer's line, asserted over the one tree and counted beside it")
+	var tree: Array = Talents.tree()
+	var crossed: Array = []
+	for n in tree:
+		for why in _line_violations(n):
+			crossed.append("%s: %s" % [String(n.get("id", "?")), why])
+	# PROPERTY ONE: every node is a stat block that touches no rune, grants
+	# nothing and conditions nothing.
+	ok(crossed.is_empty(),
+		"a talent node crosses the designer's line — %s" % "; ".join(crossed))
+	ok(tree.size() == Talents.TIERS * Talents.NODES_PER_TIER,
+		"CHECKED %d nodes of the %d the tree's shape declares — the walk read less than the tree" % [
+			tree.size(), Talents.TIERS * Talents.NODES_PER_TIER])
 	ok(Classes.talent_granted_names().is_empty(),
 		"`Classes.talent_granted_names()` is not empty")
-	print("  %d nodes; %d grant an ability" % [nodes, granting.size()])
+	# THE CONTROLS FOR PROPERTY ONE — the positive arm, then one negative arm
+	# for each door the line shuts that the payload shape alone could hide.
+	var needle := _ability_needle()
+	var rune_field := _a_rune_field()
+	var good := {"id": "control_stat", "name": "Control", "tier": 1,
+		"desc": "+10 Attack.", "payload": {"stat": {"attack": 10}}}
+	ok(_line_violations(good).is_empty(),
+		"§1 control: a well-formed stat node FAILS the line (%s) — the predicate rejects what it should pass" % [
+			"; ".join(_line_violations(good))])
+	var edit := {"id": "control_edit", "name": "Control", "tier": 1, "desc": "",
+		"payload": {"ability": needle, "add": {"damage": 5}}}
+	ok(not _line_violations(edit).is_empty(),
+		"§1 control: a node EDITING `%s` passed the line — the walk above cannot see an ability edit" % needle)
+	var grant := {"id": "control_grant", "name": "Control", "tier": 1, "desc": "",
+		"payload": {"grant_ability": needle}}
+	ok(not _line_violations(grant).is_empty(),
+		"§1 control: a node GRANTING `%s` passed the line — the walk above cannot see a grant" % needle)
+	var on_rune := {"id": "control_rune", "name": "Control", "tier": 1, "desc": "",
+		"payload": {"stat": {rune_field: 1}}}
+	ok(rune_field != "" and not _line_violations(on_rune).is_empty(),
+		"§1 control: a node writing the rune field `%s` passed the line — the walk above cannot see a rune" % rune_field)
 
-	# PROPERTY TWO: no node names an ability outside its spec's PROTECTED CORE.
-	# Resolution order is DN's, and it is load-bearing: a talent tree is a
-	# NAMESPACE, so a node's own tree beats the global corpus. `wd_spiked` is
-	# NAMED "Spite" and the Berserker has a DRAFTED ability called Spite; a
-	# matcher without same-tree precedence invents a cross-spec bet that does
-	# not exist. Word boundaries matter for the same reason — "Berserk" sits
-	# inside "Berserker" and "Heal" inside "Health".
-	var corpus: Array = []
-	for ab in Classes.ability_corpus():
-		corpus.append(String(ab.display_name))
-	corpus.sort_custom(func(a, b): return a.length() > b.length())
-	var bets: Array = []
-	var core_readers := 0
+	# PROPERTY TWO: no node's text names an ability or a passive.
+	var forbidden := _forbidden_names()
+	var own := {}
+	for n2 in tree:
+		own[String(n2.get("name", ""))] = true
+	var named: Array = []
 	var tree_readers := 0
-	for spec in Talents.LANE_TREES:
-		var own_names := {}
-		for n2 in Talents.LANE_TREES[spec]:
-			own_names[String(n2["name"])] = true
-		var protected: Array = Classes.protected_names(spec)
-		var enablers: Array = Classes.core_enablers(spec)
-		for n3 in Talents.LANE_TREES[spec]:
-			var text := Talents.desc_for(n3, 1)
-			var masked := text
-			var named_core := false
-			var named_tree := false
-			for nm in corpus:
-				if nm.length() < 4 or not _bounded(masked, nm):
-					continue
-				masked = masked.replace(nm, "#".repeat(nm.length()))
-				if String(n3["name"]) == nm or own_names.has(nm):
-					named_tree = true
-					continue
-				if protected.has(nm) or enablers.has(nm):
-					named_core = true
-					continue
-				bets.append("%s/%s names `%s`" % [spec, n3["id"], nm])
-			if named_core:
-				core_readers += 1
-			if named_tree:
-				tree_readers += 1
-	ok(bets.is_empty(),
-		"a node names an ability outside its protected core: %s" % ", ".join(bets))
-	print("  %d nodes name a PROTECTED CORE ability; %d name a node in their own tree; %d name something drawn" % [
-		core_readers, tree_readers, bets.size()])
+	for n3 in tree:
+		var hit: Array = _text_names(n3, forbidden, own)
+		for nm in hit[0]:
+			named.append("%s names `%s`" % [String(n3.get("id", "?")), nm])
+		if bool(hit[1]):
+			tree_readers += 1
+	ok(named.is_empty(),
+		"a node's text names an ability or a passive — under the line a talent touches neither: %s" % ", ".join(named))
+	var probe := {"id": "control_text", "name": "Control", "tier": 1,
+		"desc": "%s strikes harder." % needle, "payload": {"stat": {"attack": 10}}}
+	ok(not (_text_names(probe, forbidden, own)[0] as Array).is_empty(),
+		"§1 control: a node whose text names `%s` was not caught — the text walk above is blind" % needle)
+	print("  %d nodes; %d cross the line; %d names barred from a node's text (abilities and passives); %d nodes name one, %d name another node" % [
+		tree.size(), crossed.size(), forbidden.size(), named.size(), tree_readers])
 
 
 # ---------------- §2 — WHERE THE TWENTY-TWO LANDED ----------------
@@ -254,23 +373,21 @@ func _s2_landed() -> void:
 	print("  %d pool entries checked, %d unresolved" % [spec_total, unresolved.size()])
 
 
-# ---------------- §3 — THE CELLS DID NOT MOVE, AND THE TERMS DID GO ----------
+# ---------------- §3 — THE CUT CLAUSES TOOK THEIR TERMS ----------------------
 func _s3_cells_and_terms() -> void:
-	print("\n§3 — no cell changed row or lane; the cut clauses took their terms")
-	for nid in CELL_HOME:
-		var want: Array = CELL_HOME[nid]
-		var found: Dictionary = {}
-		for spec in Talents.LANE_TREES:
-			for n in Talents.LANE_TREES[spec]:
-				if String(n["id"]) == nid:
-					found = n
-		ok(not found.is_empty(), "re-authored cell `%s` no longer exists" % nid)
-		if found.is_empty():
-			continue
-		ok(String(found["lane"]) == String(want[0]) and int(found["row"]) == int(want[1]),
-			"`%s` moved to %s/%d — it must stay at %s/%d (cells_spent prices off the ROW)" % [
-				nid, found["lane"], int(found["row"]), want[0], int(want[1])])
-	print("  %d re-authored cells, all in their original lane and row" % CELL_HOME.size())
+	print("\n§3 — the cut clauses took their terms")
+	# ── BATCH FX DELETED THIS SECTION'S FIRST HALF: FIFTY CHECKS, AND WHY. ──
+	# It walked `CELL_HOME` — the twenty-five cells DO re-authored, across nine
+	# specs — and asserted each one still EXISTED (25 checks) and still sat in
+	# its ORIGINAL lane and row (25 more), because `Talents.cells_spent` priced a
+	# saved cell off the row it currently sat in, and DN measured a moved cell
+	# driving a Berserker ledger to -2 available points, silently.
+	# **Every noun in that question is gone.** FX deleted the twelve spec trees
+	# and all twenty-five cells with them; the v2 fold drops every saved v2 cell
+	# (`Profile._migrate`), so no ledger can hold one; and the one tree has no
+	# lanes and no rows. A cell is priced off its TIER now, and `check_fx` §2
+	# drives that price through the ledger at every tier. There is no cell, lane
+	# or row left for these assertions to ask about — the DG §2 exception.
 	# THE NEGATIVE CONTROL'S PERMANENT HALF: the three terms are gone from the
 	# whole of `scripts/`, not just from the payload that used to write them.
 	#
@@ -300,51 +417,151 @@ func _s3_cells_and_terms() -> void:
 
 
 # ---------------- §4 — THE STATUS SWEEP. REPORTS, RULES ON NOTHING ----------
+#
+# **BATCH FX RE-POINTED THE SWEEP AT THE ONE TREE, AND THE STATUS HALF STANDS**
+# (CLAUDE.md's DO block says so). A node is worn by every spec of every class
+# now, so the status a node reads is weighed against EVERY spec's guaranteed
+# table rather than one spec's, and each row says how many specs lack a source.
+# It is still a REPORT: a text sweep cannot tell a node that pays on a status
+# from one that names a debuff landing on the HERO in order to shrug it off
+# (DP's caveat), and the one tree has a node of that second shape.
 func _s4_status_sweep() -> void:
-	print("\n§4 — nodes reading a status their own spec cannot guarantee")
+	print("\n§4 — nodes reading a status a wearer cannot guarantee")
 	print("  A REPORT, NOT A GATE. DN's instrument matched ability NAMES and this")
 	print("  class of bet is invisible to it — `sm_precision` was found by reading.")
+	var specs: Array = Classes.all_specs()
 	var rows: Array = []
-	for spec in Talents.LANE_TREES:
-		var guaranteed: Dictionary = GUARANTEED_STATUS.get(spec, {})
-		for n in Talents.LANE_TREES[spec]:
-			var text := Talents.desc_for(n, 1)
-			for sid in STATUS_FORMS:
-				if guaranteed.has(sid):
-					continue
-				for form in STATUS_FORMS[sid]:
-					if _bounded(text, String(form)):
-						rows.append("%-13s %-20s reads %s" % [spec, String(n["id"]), sid])
-						break
+	for n in Talents.tree():
+		var text := Talents.desc_for(n, 1)
+		for sid in STATUS_FORMS:
+			var reads := false
+			for form in STATUS_FORMS[sid]:
+				if _bounded(text, String(form)):
+					reads = true
+					break
+			if not reads:
+				continue
+			var lacking := 0
+			for spec in specs:
+				if not (GUARANTEED_STATUS.get(spec, {}) as Dictionary).has(sid):
+					lacking += 1
+			if lacking > 0:
+				rows.append("%-20s reads %-10s — no guaranteed source for %d of %d specs" % [
+					String(n.get("id", "?")), sid, lacking, specs.size()])
 	for r in rows:
 		print("    %s" % r)
-	print("  %d node/status pairs have no guaranteed source in their own spec." % rows.size())
-	# THE ONE THIS BATCH DID RULE ON, and it is asserted because §3 of the brief
-	# singled it out. `sm_precision` read Dazed, Crippled and Exposed; the
-	# Swordmaster guarantees none of the three, and the last non-drawn source of
-	# the other two — `sm_lunge` — left the tree in this same batch.
-	var prec := ""
-	for n2 in Talents.LANE_TREES["swordmaster"]:
-		if String(n2["id"]) == "sm_precision":
-			prec = Talents.desc_for(n2, 1)
-	ok(prec.contains("Stunned"), "sm_precision no longer reads Stunned")
-	for gone in ["Dazed", "Crippled", "Exposed"]:
-		ok(not prec.contains(gone),
-			"sm_precision still reads %s, which the Swordmaster cannot guarantee" % gone)
+	print("  %d node/status pairs a wearer cannot guarantee." % rows.size())
+	# ── THE ONE DO RULED ON: `sm_precision`. FX deleted the node, and the four
+	# checks on it split along the line the repair rules draw. ──
+	# DELETED, 1 CHECK: "the node's text reads Stunned". Its subject was the
+	# node's desc, and the node is gone; the live half of the same question —
+	# the PAYOUT moved onto `stunned` — is the read-site pin at the foot of this
+	# section, which stands.
+	# RE-POINTED, 3 CHECKS: "the text reads none of Dazed, Crippled, Exposed" is
+	# asked of the READ SITE, which FX kept (`precision_ranks` is dormant, not
+	# deleted — a later tree, rune or card may write it again). No statement
+	# that reads the field may gate it on a status the Swordmaster cannot
+	# guarantee, because that statement is where such a bet would be paid.
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	var reads_at: Array = []
+	for stmt in _statements_of(bsrc):
+		if String(stmt).contains("precision_ranks"):
+			reads_at.append(String(stmt))
+	for gone in ["dazed", "cripple", "exposed"]:
+		var gated: Array = []
+		for r2 in reads_at:
+			if String(r2).contains('has_status("%s")' % gone):
+				gated.append(String(r2).strip_edges().substr(0, 90))
+		ok(gated.is_empty(),
+			"the `precision_ranks` read site gates on `%s`, which the Swordmaster cannot guarantee: %s" % [
+				gone, str(gated)])
 	ok(bsrc.contains('attacker.precision_ranks > 0 and strike_target.has_status("stunned")'),
 		"the read site did not follow the text onto `stunned`")
+	print("  %d statements read `precision_ranks`; none gates it on dazed / cripple / exposed" % reads_at.size())
+
+
+# The code half of a source line: everything before a `#` outside a string
+# literal. A comment recording a removal names the thing removed (EV §5), so a
+# read site is judged on its code alone.
+func _code_part(line: String) -> String:
+	var quote := ""
+	var i := 0
+	while i < line.length():
+		var c := line[i]
+		if quote != "":
+			if c == "\\":
+				i += 2
+				continue
+			if c == quote:
+				quote = ""
+		elif c == "\"" or c == "'":
+			quote = c
+		elif c == "#":
+			return line.substr(0, i)
+		i += 1
+	return line
+
+
+# One logical statement per entry, comments stripped: a guard wrapped onto a
+# continuation line — a trailing backslash, or a bracket left open — is still
+# one statement. A bracket inside a string literal is not counted (EA §5).
+func _statements_of(src: String) -> Array:
+	var lines: Array = []
+	for raw in src.split("\n"):
+		lines.append(_code_part(String(raw)))
+	var out: Array = []
+	var i := 0
+	while i < lines.size():
+		var stmt := String(lines[i])
+		var j := i
+		while j < lines.size() - 1 and (stmt.strip_edges(false, true).ends_with("\\")
+				or _open_brackets(stmt) > 0):
+			j += 1
+			stmt += "\n" + String(lines[j])
+		out.append(stmt)
+		i = j + 1
+	return out
+
+
+func _open_brackets(t: String) -> int:
+	var depth := 0
+	var quote := ""
+	var i := 0
+	while i < t.length():
+		var c := t[i]
+		if quote != "":
+			if c == "\\":
+				i += 2
+				continue
+			if c == quote:
+				quote = ""
+		elif c == "\"" or c == "'":
+			quote = c
+		elif c == "(" or c == "[" or c == "{":
+			depth += 1
+		elif c == ")" or c == "]" or c == "}":
+			depth -= 1
+		i += 1
+	return depth
 
 
 # ---------------- §5 — THE STANDING RULE IS WRITTEN DOWN ----------------
 func _s5_recorded() -> void:
 	print("\n§5 — the rule is recorded where a later batch will read it")
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
-	ok(cm.contains("A talent may not grant an ability"),
-		"CLAUDE.md does not carry the charter sentence")
-	ok(cm.contains("PROTECTED CORE is guaranteed and permitted")
-		or cm.contains("protected core is guaranteed and permitted"),
-		"CLAUDE.md does not carry the ruling that settles §0 versus §1")
+	# BATCH FX — BOTH CLAUDE.md PINS RE-POINTED, NEITHER DELETED. The first read
+	# DO's charter sentence ("A talent may not grant an ability"); the rule this
+	# gate asserts is the designer's line now, and it lives in the standing rule
+	# for the one tree. The second read DO's ruling that a talent may modify the
+	# spec's PROTECTED CORE; FX superseded it and CLAUDE.md's DO block records the
+	# supersession, so the pin reads that record — a superseded rule is pinned at
+	# the text that supersedes it. Neither needle carries a batch code (EA §2),
+	# and each sits on ONE line of the file: the sentences around them wrap, and
+	# a raw `contains` cannot see across a line break.
+	ok(cm.contains("A talent may not touch a rune, an ability"),
+		"CLAUDE.md does not carry the designer's line — a talent may not touch a rune, an ability, a passive or an engine")
+	ok(cm.contains("its PROTECTED CORE and the cross-row conditional do not"),
+		"CLAUDE.md does not record that the protected-core permission was superseded")
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
 	# **BATCH DY §1 — THE NEEDLE IS RENDERED FROM THE LIVE POOLS, NOT AUTHORED.**
 	# It read the literal "149 of 149". That is a SECOND COPY OF A COUNT inside the check

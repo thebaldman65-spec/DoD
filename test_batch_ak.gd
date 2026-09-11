@@ -28,6 +28,22 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX DELETED THE TREE THOSE TABLES RECORDED, AND RE-POINTED WHAT IT PAID.
+# The twelve per-spec trees are gone (324 nodes): a Swordmaster wears the
+# Warrior's cells of the ONE tree, `Talents.TREE` — 27 nodes in three tiers of
+# nine, no lanes, no rows, no capstone shelf. EVERY FIELD this file drives kept
+# its read site in battle.gd / unit.gd, so every MECHANIC question still has a
+# true answer, and each is now driven off the EXACT payload the retired node
+# carried (`RETIRED`, below — copied out of the deleted table, never re-typed),
+# or off the one tree's own node where it took the field at the same magnitude
+# (`PRECEDENT`). The questions about the deleted tree ITSELF — a node's row,
+# lane, name, capstone flag, tooltip prose, and its id surviving a re-author —
+# have no subject left anywhere, so they are deleted AT THEIR SITES (DG §2),
+# each with its exact count. Where the one tree asks the same question, it is
+# asked of the one tree instead: its size and tiers, a cell's single rank and
+# its tier, and — DO's charter, which FX's line keeps — that nothing a hero
+# wears grants.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -39,38 +55,105 @@ const Fixture = preload("res://suite_fixture.gd")
 var checks := 0
 var fails: Array = []
 
-# id -> [row, lane, name, stat field, value]. The layout table of §Layout
-# and the magnitudes of §Rows 1-8, transcribed once so a re-tune has to
-# come here and say so.
-const NODES := {
-	"sm_agg_stance": [1, "Blade", "Aggressive Stance", "seasoned_off_bonus", 0.12],
-	"sm_def_stance": [1, "Poise", "Defensive Stance", "seasoned_def_bonus", 0.12],
-	"sm_flourish": [1, "Breaker", "Pressure Point", "pressure_point_ranks", 1],
-	# BATCH DO renamed both cells when their cards left for the draft — a node
-	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
-	"sm_lunge": [2, "Blade", "Committed Thrust", "", 0],
-	"sm_sword_mastery": [2, "Poise", "Sword Mastery", "parry_bonus", 0.12],
-	"sm_blade_dance": [2, "Breaker", "Sunder Guard", "guard_change_bd", 40],
-	"sm_keen_edge": [3, "Blade", "Killing Edge", "killing_edge_ranks", 1],
-	"sm_footwork": [3, "Poise", "Bracing", "bracing_ranks", 1],
-	"sm_dominant": [3, "Breaker", "Dominant Presence", "dominant_ranks", 1],
-	"sm_precision": [4, "Blade", "Precision Strikes", "precision_ranks", 1],
-	"sm_swordsmanship": [4, "Poise", "Swordsmanship", "swordsmanship_parry", 0.15],
-	"sm_opportunist": [4, "Breaker", "Opportunist", "opportunist", 1],
-	"sm_seasoned_node": [5, "Blade", "Seasoned Fighter", "blade_crit_ranks", 1],
-	"sm_high_guard": [5, "Poise", "High Guard", "high_guard", 1],
-	"sm_perfect_form": [5, "Breaker", "No Quarter", "no_quarter_ranks", 1],
-	"sm_momentum_sm": [6, "Blade", "Overwhelm", "overwhelm_ranks", 1],
-	"sm_riposte": [6, "Poise", "Riposte", "counter_attacks", 1],
-	"sm_punish": [6, "Breaker", "Punishment", "punishment_ranks", 1],
-	# BATCH EL §1 RE-POINTED: the node is PIVOT now — `Tempo` was freed for the
-	# archetype tag. The id and the counter did NOT move.
-	"sm_deep_thrust": [7, "Blade", "Pivot", "tempo_ranks", 1],
-	"sm_composure": [7, "Poise", "Deflection", "deflection", 1],
-	"sm_guarded": [7, "Breaker", "Off Balance", "off_balance_ranks", 1],
-	"sm_execute": [9, "Blade", "Finisher", "", 0],
-	"sm_untouchable": [9, "Poise", "Untouchable", "untouchable", 1],
-	"sm_en_garde": [9, "Breaker", "Guard Breaker", "guard_breaker", 1],
+# id -> [stat field, value]. BATCH FX: this was `NODES`, id -> [row, lane,
+# name, stat field, value] — the layout table of §Layout and the magnitudes of
+# §Rows 1-8, "transcribed once so a re-tune has to come here and say so". The
+# ROW, LANE and NAME columns are DELETED WITH THEIR SUBJECT (§3 records the
+# checks that read them). The two ability-editing cells, sm_lunge and
+# sm_execute, carried no stat field and are asked in the live half. What is
+# left is the MAGNITUDE column, and each row is asked of the payload the
+# RETIRED node carried (below) — or, where a node of the one tree took the
+# field at the same magnitude, of that live node (`PRECEDENT`).
+const PAYLOADS := {
+	"sm_agg_stance": ["seasoned_off_bonus", 0.12],  # Aggressive Stance
+	"sm_def_stance": ["seasoned_def_bonus", 0.12],  # Defensive Stance
+	"sm_flourish": ["pressure_point_ranks", 1],  # Pressure Point
+	"sm_sword_mastery": ["parry_bonus", 0.12],  # Sword Mastery
+	"sm_blade_dance": ["guard_change_bd", 40],  # Sunder Guard
+	"sm_keen_edge": ["killing_edge_ranks", 1],  # Killing Edge
+	"sm_footwork": ["bracing_ranks", 1],  # Bracing
+	"sm_dominant": ["dominant_ranks", 1],  # Dominant Presence
+	"sm_precision": ["precision_ranks", 1],  # Precision Strikes
+	"sm_swordsmanship": ["swordsmanship_parry", 0.15],  # Swordsmanship
+	"sm_opportunist": ["opportunist", 1],  # Opportunist
+	"sm_seasoned_node": ["blade_crit_ranks", 1],  # Seasoned Fighter
+	"sm_high_guard": ["high_guard", 1],  # High Guard
+	"sm_perfect_form": ["no_quarter_ranks", 1],  # No Quarter
+	"sm_momentum_sm": ["overwhelm_ranks", 1],  # Overwhelm
+	"sm_riposte": ["counter_attacks", 1],  # Riposte
+	"sm_punish": ["punishment_ranks", 1],  # Punishment
+	"sm_deep_thrust": ["tempo_ranks", 1],  # Pivot
+	"sm_composure": ["deflection", 1],  # Deflection
+	"sm_guarded": ["off_balance_ranks", 1],  # Off Balance
+	"sm_untouchable": ["untouchable", 1],  # Untouchable
+	"sm_en_garde": ["guard_breaker", 1],  # Guard Breaker
+}
+
+# BATCH FX — the retired nodes whose field AND magnitude a node of the one tree
+# took (talents.gd names each precedent above its node). Their rows are asked of
+# the live node, because there the question is still asked of a node a player
+# can buy: the node paying parry_bonus 0.12, and the node paying No Quarter.
+const PRECEDENT := {"sm_sword_mastery": "tn_parry", "sm_perfect_form": "tn_break_refuel"}
+
+# BATCH FX — THE PAYLOADS THE RETIRED SWORDMASTER NODES CARRIED, copied verbatim
+# out of the deleted `Talents.LANE_TREES["swordmaster"]` (ints stay ints, floats
+# stay floats, `also` halves and their `has_node` conditions included). The
+# nodes are deleted; every field they wrote and every read site those fields
+# pay through still stands, so what this file asked of the nodes it asks of
+# these. The ids are the retired ids because the conditions name them. Only the
+# fourteen DESC_NUMBERS nodes without a precedent carry their desc and scale,
+# for `desc_for`'s machinery in §4.
+const RETIRED := {
+	"sm_agg_stance": {"payload": {"stat": {"seasoned_off_bonus": 0.12}},
+		"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
+		"scale": {"step": 12}},  # Aggressive Stance
+	"sm_def_stance": {"payload": {"stat": {"seasoned_def_bonus": 0.12}},
+		"desc": "The Defensive stance blocks an additional {v}% damage taken.",
+		"scale": {"step": 12}},  # Defensive Stance
+	"sm_flourish": {"payload": {"stat": {"pressure_point_ranks": 1}},
+		"desc": "Pommel Strike deals +{v} Break damage.",
+		"scale": {"step": 30}},  # Pressure Point
+	"sm_lunge": {"payload": {"ability": "Overpower", "add": {"cost": -10, "resource_gain": 10}}},  # Committed Thrust
+	"sm_blade_dance": {"payload": {"stat": {"guard_change_bd": 40}},
+		"desc": "Guard Change deals {v} Break damage to EVERY enemy (up from 15 to one).",
+		"scale": {"step": 40}},  # Sunder Guard
+	"sm_keen_edge": {"payload": {"stat": {"killing_edge_ranks": 1}},
+		"desc": "+{v}% critical strike chance while in the Aggressive stance.",
+		"scale": {"step": 15}},  # Killing Edge
+	"sm_footwork": {"payload": {"stat": {"bracing_ranks": 1}},
+		"desc": "+{v} Constitution while in the Defensive stance.",
+		"scale": {"step": 30}},  # Bracing
+	"sm_dominant": {"payload": {"stat": {"dominant_ranks": 1}},
+		"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle. The growth is unbounded but armor is not: no amount of it reduces a blow by more than 85%.",
+		"scale": {"step": 15}},  # Dominant Presence
+	"sm_precision": {"payload": {"stat": {"precision_ranks": 1}},
+		"desc": "+{v}% critical strike chance against Stunned targets.",
+		"scale": {"step": 20}},  # Precision Strikes
+	"sm_swordsmanship": {"payload": {"stat": {"swordsmanship_parry": 0.15}},
+		"desc": "A PERFECT Guard Change grants +{v}% parry chance for 2 turns, instead of the usual 10%.",
+		"scale": {"base": 10, "step": 15}},  # Swordsmanship
+	"sm_opportunist": {"payload": {"stat": {"opportunist": 1}}},  # Opportunist
+	"sm_seasoned_node": {"payload": {"stat": {"blade_crit_ranks": 1}},
+		"desc": "Overpower gains +{v}% critical strike chance.",
+		"scale": {"step": 15}},  # Seasoned Fighter
+	"sm_high_guard": {"payload": {"stat": {"high_guard": 1}}},  # High Guard
+	"sm_momentum_sm": {"payload": {"stat": {"overwhelm_ranks": 1}},
+		"desc": "+{v}% damage for every debuff on the target. Broken is a Break-meter state rather than an affliction and is not one of them.",
+		"scale": {"step": 8}},  # Overwhelm
+	"sm_riposte": {"payload": {"stat": {"counter_attacks": 1}}},  # Riposte
+	"sm_punish": {"payload": {"stat": {"punishment_ranks": 1}},
+		"desc": "Overpower deals +{v}% damage against Broken targets.",
+		"scale": {"step": 60}},  # Punishment
+	"sm_deep_thrust": {"payload": {"stat": {"tempo_ranks": 1}},
+		"desc": "Switching stance grants +{v}% damage for 2 turns.",
+		"scale": {"step": 30}},  # Pivot
+	"sm_composure": {"payload": {"stat": {"deflection": 1}}},  # Deflection
+	"sm_guarded": {"payload": {"stat": {"off_balance_ranks": 1}, "also": [{"condition": {"has_node": "sm_punish"}, "stat": {"off_balance_wide": 1}}]},
+		"desc": "All the Swordmaster's damage is increased by {v}% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.",
+		"scale": {"step": 20}},  # Off Balance
+	"sm_execute": {"payload": {"ability": "Pommel Strike", "add": {"damage": 30}, "set": {"cooldown": 1}}},  # Finisher
+	"sm_untouchable": {"payload": {"stat": {"untouchable": 1}}},  # Untouchable
+	"sm_en_garde": {"payload": {"stat": {"guard_breaker": 1}}},  # Guard Breaker
 }
 
 # The number the tooltip must render for the nodes whose whole content is a
@@ -134,6 +217,72 @@ func _ability_names(list: Array) -> Array:
 	for a in list:
 		out.append(a.display_name)
 	return out
+
+
+# ---------- BATCH FX: the retired nodes inline, and the one tree worn whole ----------
+
+# The tree a Swordmaster buys into: `generate_tree` answers the tree the spec's
+# CLASS buys into, and for every class that is the ONE tree.
+func _tree() -> Array:
+	return Talents.generate_tree("swordmaster", "warrior")
+
+
+# A retired node rebuilt inline from RETIRED: its id, its exact payload and, for
+# the fourteen DESC_NUMBERS nodes without a precedent, its desc and scale. `{}`
+# for an id RETIRED does not carry, which every caller reads as "not there".
+func _retired_node(id: String) -> Dictionary:
+	if not RETIRED.has(id):
+		return {}
+	var n: Dictionary = (RETIRED[id] as Dictionary).duplicate(true)
+	n["id"] = id
+	return n
+
+
+# The retired nodes as a tree `apply_from_tree` can walk. `_member` hands it to
+# the payload machinery, and `_spawn` hands it to the Swordmaster as his member
+# `tree`: the battle spawn applies `Run.party[i]["tree"]` against his learned
+# dict, so a retired id he learns pays exactly what its node paid.
+func _retired_tree() -> Array:
+	var out: Array = []
+	for id in RETIRED:
+		out.append(_retired_node(String(id)))
+	return out
+
+
+# The node a PAYLOADS or DESC_NUMBERS row is asked of: the live node where the
+# one tree took the field at the same magnitude (PRECEDENT), else the retired one.
+func _row_node(id: String) -> Dictionary:
+	if PRECEDENT.has(id):
+		return Talents.node_in_tree(Talents.tree(), String(PRECEDENT[id]))
+	return _retired_node(id)
+
+
+func _label(id: String) -> String:
+	if PRECEDENT.has(id):
+		return "%s (%s's precedent)" % [PRECEDENT[id], id]
+	return id
+
+
+# Every cell of the one tree, WORN: what a Swordmaster walks in wearing once the
+# Warrior's purse has bought the whole tree. It comes out of
+# `Talents.worn_learned`, the door `Profile.worn_talents` reads, so this is the
+# real {id: rank} set a run hands the spawn, not a hand-built one.
+func _all_worn() -> Dictionary:
+	var cells := {}
+	for n in Talents.tree():
+		cells[String(n["id"])] = true
+	return Talents.worn_learned(Talents.tree(), cells)
+
+
+# `_applied`'s twin for the one tree, worn whole. What §6 used to ask of a CELL
+# that might grant (DO's charter) it asks of this: a hero wears the whole tree
+# now, so a grant could only ever come back through it.
+func _applied_live(earned: Array = [], abilities: Array = []) -> Dictionary:
+	var member := {"key": "warrior", "spec": "swordmaster", "talents": _all_worn(),
+		"tree": _tree(), "bm_abilities": earned}
+	var cfg := {"abilities": abilities}
+	Talents.apply_from_tree(cfg, member["tree"], member["talents"], member)
+	return cfg
 
 
 # ---------- 1. the kit correction ----------
@@ -209,103 +358,126 @@ func _pools_resolve() -> void:
 
 
 # ---------- 3. the tree still fits the Batch AI mould ----------
-
+#
+# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE, AND DELETED ITS LAYOUT.
+# `generate_tree("swordmaster", ...)` answers the tree the Swordmaster's CLASS
+# buys into — `Talents.TREE`, the same 27 nodes for every class — so what this
+# section asked of the Swordmaster tree it asks of that one: its size, one
+# entry per id, a single rank per cell (decided now by `Talents.worn_learned`,
+# the door `Profile.worn_talents` reads, since no node carries a `ranks` key),
+# and the tier each node carries. The walk used to skip row 8 and so read 24
+# nodes; the one tree has no row 8, so it reads all 27 — three more per
+# question, which is new content walked rather than coverage moved.
+#
+# THE `tier` CHECK IS INVERTED, NOT DELETED. It asserted each node carried NO
+# `tier`, because Batch AI had retired a per-node tier field. FX brought the key
+# back as the one tree's structure, so every node now MUST carry one and it must
+# be a tier the tree has — and that is what is asked.
+#
+# DELETED UNDER DG §2 — 144 CHECKS, each about the deleted Swordmaster tree:
+#   24  "'<id>' is a node the layout table names"  (NODES; no such node now)
+#   24  "'<id>' sits in row R"        24  "'<id>' sits in lane L"
+#   24  "'<id>' is named N"           24  "'<id>' is flagged capstone iff on the shelf"
+#   24  "'<id>' kept its id through the re-author" — the migration promise,
+#       which FX retired: `Run._migrate_trees` drops every id the one tree does
+#       not hold, and the v2 fold drops a profile's cells.
+# THE ROW CHECK IS RE-POINTED ONTO THE TIERS. "row R holds one node in each of
+# the 3 lanes" (9 rows) asked whether every cell of the shape was filled; the one
+# tree's shape is three tiers of NODES_PER_TIER, so each tier is asked to hold
+# that many — 3 checks where there were 9.
 func _tree_shape() -> void:
-	var tree: Array = Talents.generate_tree("swordmaster", "warrior")
+	var tree := _tree()
 	ok(tree.size() == 27, "the tree is 27 cells (has %d)" % tree.size())
 	var seen := {}
 	for node in tree:
-		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
-		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
-		# rather than being taught the three new ids: what the check exists to
-		# prove is that the twenty-four survive UNCHANGED, and asserting that
-		# nothing else exists would make every later addition a failure here
-		# instead of in the batch that made it.
-		if int(node["row"]) == 8:
-			continue
 		var id := String(node["id"])
-		ok(NODES.has(id), "'%s' is a node the layout table names" % id)
 		ok(not seen.has(id), "'%s' appears once" % id)
 		seen[id] = true
-		ok(int(node.get("ranks", 0)) == 1, "'%s' holds a single rank" % id)
-		ok(not node.has("tier"), "'%s' carries no retired tier field" % id)
-		if not NODES.has(id):
-			continue
-		var want: Array = NODES[id]
-		ok(int(node["row"]) == int(want[0]),
-			"'%s' sits in row %d, want %d" % [id, int(node["row"]), int(want[0])])
-		ok(String(node["lane"]) == String(want[1]),
-			"'%s' sits in lane %s, want %s" % [id, node["lane"], want[1]])
-		ok(String(node["name"]) == String(want[2]),
-			"'%s' is named '%s', want '%s'" % [id, node["name"], want[2]])
-		ok(node.get("capstone", false) == (int(want[0]) == Talents.CAPSTONE_ROW),
-			"'%s' is flagged capstone iff it sits on the shelf" % id)
-	for id in NODES:
-		ok(seen.has(id), "'%s' kept its id through the re-author" % id)
-	# One node per lane per row, the Batch AI rule the class batch must not
-	# break — the layout table is the promise, this is the check.
-	for row in range(1, Talents.CAPSTONE_ROW + 1):
-		var lanes := {}
-		for node in Talents.row_nodes(tree, row):
-			lanes[String(node["lane"])] = true
-		ok(lanes.size() == 3, "row %d holds one node in each of the 3 lanes" % row)
+		ok(int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"'%s' is worn at a single rank" % id)
+		ok(node.has("tier") and int(node["tier"]) == Talents.tier_of(node),
+			"'%s' carries its tier, one of the tree's %d (got %s)" % [id,
+				Talents.TIERS, str(node.get("tier", "none"))])
+	for tier in range(1, Talents.TIERS + 1):
+		ok(Talents.tier_nodes(tree, tier).size() == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (has %d)" % [tier, Talents.NODES_PER_TIER,
+				Talents.tier_nodes(tree, tier).size()])
 
 
 # ---------- 4. what each node is worth ----------
-
+#
+# BATCH FX. THE MAGNITUDE HALF is a MECHANIC question — does the payload write
+# its field at its magnitude — and every field kept its read site, so each
+# PAYLOADS row is asked of the exact payload the retired node carried, applied
+# as the spawn applies it; the two whose field and magnitude a node of the one
+# tree took are asked of that live node instead (PRECEDENT).
+#
+# THE TOOLTIP HALF SPLITS IN TWO. `desc_for` is live machinery — the build
+# screen and the hero sheet both call it — and at FX its `{v}` / scale branch
+# lost every live input (no node of the one tree and no rune carries a scale).
+# So the two checks per node that prove IT — the number reached the string, and
+# no placeholder was left — are driven off the retired nodes' exact desc and
+# scale, and off the live node's desc for the two precedents (the node paying
+# the magnitude says the magnitude). What asked about a deleted NODE has no
+# node to ask. DELETED UNDER DG §2 — 17 CHECKS:
+#   14  "'<id>' is in the tree", for the fourteen with no precedent
+#    1  High Guard's tooltip says 40% for 3 turns (battle.gd still applies
+#       `high_guard` for 3 turns; the prose that stated it went with the node)
+#    2  Riposte's tooltip names Overpower; Opportunist's names PARRIED (both
+#       counters still answer with Overpower, and §9 still reads it in the log)
 func _node_values() -> void:
-	var tree: Array = Talents.generate_tree("swordmaster", "warrior")
-	for node in tree:
-		var id := String(node["id"])
-		if not NODES.has(id):
-			continue
-		var field := String(NODES[id][3])
-		if field == "":
-			continue  # the two ability-granting nodes, covered in §5
+	for id in PAYLOADS:
+		var field := String(PAYLOADS[id][0])
 		var cfg := {"abilities": []}
-		Talents.apply_payload(cfg, node["payload"], 1,
+		Talents.apply_payload(cfg, _row_node(String(id)).get("payload", {}), 1,
 			{"learned": {id: 1}, "member": {}})
-		ok(cfg.has(field), "'%s' writes %s" % [id, field])
+		ok(cfg.has(field), "'%s' writes %s" % [_label(String(id)), field])
 		if cfg.has(field):
 			var got = cfg[field]
-			var want = NODES[id][4]
+			var want = PAYLOADS[id][1]
 			var same: bool = (abs(float(got) - float(want)) < 0.0001) \
 				if want is float else (got == want)
-			ok(same, "'%s' writes %s = %s, want %s" % [id, field, str(got), str(want)])
+			ok(same, "'%s' writes %s = %s, want %s" % [_label(String(id)), field,
+				str(got), str(want)])
 	# The tooltip has to render the number the designer chose, not the old
 	# one — the desc and the payload are two hand-written places.
 	for id in DESC_NUMBERS:
-		var node: Dictionary = Talents.node_in_tree(tree, id)
-		ok(not node.is_empty(), "'%s' is in the tree" % id)
+		var node := _row_node(String(id))
+		if PRECEDENT.has(id):
+			ok(not node.is_empty(), "'%s' is in the tree" % _label(String(id)))
 		if node.is_empty():
 			continue
 		var text := Talents.desc_for(node, 1)
 		ok(text.contains(String(DESC_NUMBERS[id])),
-			"'%s' tooltip renders %s: \"%s\"" % [id, DESC_NUMBERS[id], text])
-		ok(not text.contains("{v}"), "'%s' tooltip has no unrendered placeholder" % id)
-	# High Guard's whole content is prose, so it is checked by hand.
-	# BATCH CV §2.6 — 3 TURNS, NOT 2. `battle.gd`'s `_apply_status(strike_target,
-	# "high_guard", 3)` has always applied three; this suite pinned the tooltip's
-	# wrong number, which is CQ's "a suite asserting a pre-fold magnitude" shape
-	# from the other direction — the assertion was defending the defect.
-	var hg: Dictionary = Talents.node_in_tree(tree, "sm_high_guard")
-	ok(Talents.desc_for(hg, 1).contains("40%") \
-		and Talents.desc_for(hg, 1).contains("3 turns"),
-		"High Guard's tooltip says 40% for 3 turns")
-	# Riposte and Opportunist both answer with Overpower now; the tooltips
-	# have to say so or the player cannot tell they are the same answer.
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "sm_riposte"), 1).contains("Overpower"),
-		"Riposte's tooltip names Overpower, not a Strike")
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "sm_opportunist"), 1).contains("PARRIED"),
-		"Opportunist's tooltip names the parry trigger")
+			"'%s' tooltip renders %s: \"%s\"" % [_label(String(id)), DESC_NUMBERS[id], text])
+		ok(not text.contains("{v}"),
+			"'%s' tooltip has no unrendered placeholder" % _label(String(id)))
 
 
 # ---------- 5. the conditional halves ----------
-
+#
+# BATCH FX. `_member` hands the machinery the RETIRED nodes rebuilt inline —
+# their exact payloads, `also` halves and `has_node` conditions included —
+# because what this section asks is about those payloads and the machinery that
+# applies them (`apply_from_tree`, `apply_payload`'s stat arm, `also`,
+# `condition`), all of which runes still use. The ids are the retired ids,
+# because the conditions name them. The one tree carries no condition anywhere,
+# so there is no live node for the conditional checks to be asked of instead;
+# the two checks below that asked about a deleted node's PAYLOAD SHAPE are asked
+# of the one tree, and each says so where it stands.
 func _member(learned: Dictionary, earned: Array = []) -> Dictionary:
 	return {"key": "warrior", "spec": "swordmaster", "talents": learned,
-		"tree": Talents.generate_tree("swordmaster", "warrior"),
+		"tree": _retired_tree(),
 		"bm_abilities": earned}
+
+
+# Every payload in the one tree, as one string — what the Shatterpoint check
+# below reads now that the node it read is deleted.
+func _live_payloads() -> String:
+	var pays: Array = []
+	for n in _tree():
+		pays.append(n["payload"])
+	return JSON.stringify(pays)
 
 
 func _applied(learned: Dictionary, earned: Array = [],
@@ -334,10 +506,14 @@ func _conditional_halves() -> void:
 		"with Shatterpoint earned, Guard Change still gets its 40")
 	ok(int(with_sp.get("sunder_guard_bd", 0)) == 0,
 		"...and earning Shatterpoint pays NOTHING — the clause is gone (DO)")
-	ok(not JSON.stringify(Talents.node_in_tree(
-			Talents.generate_tree("swordmaster", "warrior"),
-			"sm_blade_dance")["payload"]).contains("Shatterpoint"),
-		"...and the payload no longer names Shatterpoint anywhere")
+	# BATCH FX RE-POINTED THE NEXT CHECK TO THE ONE TREE. It asked that the
+	# retired Sunder Guard's payload named Shatterpoint nowhere — that the rider
+	# could not come back. That node is deleted; the place a rider could come
+	# back through now is the tree a Swordmaster wears, and FX's line forbids a
+	# talent touching an ability at all. So it is asked of every payload in the
+	# one tree — and of a tree that is really there.
+	ok(not _tree().is_empty() and not _live_payloads().contains("Shatterpoint"),
+		"...and no payload in the one tree names Shatterpoint anywhere (FX's line)")
 	# The hook must read the LIVE ability list, so the base kit alone is
 	# not enough — Shatterpoint left it in §1.
 	ok(not Talents.owns_ability(_member({}), "Shatterpoint"),
@@ -364,12 +540,22 @@ func _conditional_halves() -> void:
 	# more, so asserting that its second half is inert would pass for no
 	# reason — the failure mode this project rates worse than a red. What
 	# replaces it is the assertion that it carries no `also` at all.
-	var tree: Array = Talents.generate_tree("swordmaster", "warrior")
-	ok(not (Talents.node_in_tree(tree, "sm_blade_dance")["payload"] as Dictionary).has("also"),
-		"Sunder Guard carries no conditional half at all now (DO)")
+	# BATCH FX RE-POINTED THAT ASSERTION TO THE ONE TREE: the node it read is
+	# deleted, and the one tree carries no conditional half anywhere — every node
+	# is a single stat payload — so "carries no `also`" is asked of every node of
+	# it, with the population printed so an empty tree cannot pass it. The
+	# inertness loop reads the retired Off Balance's exact payload, which still
+	# carries the `also` half it proves dark.
+	var live_also := 0
+	for n in _tree():
+		if (n["payload"] as Dictionary).has("also"):
+			live_also += 1
+	ok(live_also == 0 and not _tree().is_empty(),
+		"no node of the one tree carries a conditional half (%d of %d do)" % [
+			live_also, _tree().size()])
 	for id in ["sm_guarded"]:
 		var bare := {"abilities": []}
-		Talents.apply_payload(bare, Talents.node_in_tree(tree, id)["payload"], 1)
+		Talents.apply_payload(bare, _retired_node(id)["payload"], 1)
 		ok(int(bare.get("off_balance_wide", 0)) == 0,
 			"'%s' second half is inert on an empty ctx" % id)
 		# ...but the UNCONDITIONAL half still lands, or the node is broken.
@@ -387,9 +573,17 @@ func _upgrade_paths() -> void:
 	# card is still reachable, and the `_upgraded` flag that counted which path
 	# ran is READ-ONLY-ZERO. The flag is the sharp one: only a collision can
 	# write it, so it catches a regression however it is reintroduced.
-	var fresh := _applied({"sm_lunge": 1})
+	#
+	# BATCH FX RE-POINTED THE CELL TO THE TREE. The two cells this asked about
+	# (sm_lunge, sm_execute) went with the twelve trees, and a hero wears the one
+	# tree WHOLE now — every cell his class owns — so "does what the hero wears
+	# hand out Lunge or Execute" is asked of every cell of the one tree, worn
+	# (`_applied_live`). That is DO's charter, which FX's line keeps: the tree
+	# grants no ability. The index flags stay the sharp half: only a collision
+	# can write them, and a collision needs a grant.
+	var fresh := _applied_live()
 	ok(_ability_names(fresh["abilities"]).is_empty(),
-		"the Lunge cell hands out NOTHING (DO's charter)")
+		"the whole one tree, worn, hands out NOTHING — no Lunge (DO's charter)")
 	ok(int(fresh.get("lunge_upgraded", 0)) == 0,
 		"...and `lunge_upgraded` is read-only-zero — only a grant could write it")
 	ok(Classes.spec_draft_pool("swordmaster").has("Lunge"),
@@ -400,10 +594,10 @@ func _upgrade_paths() -> void:
 	ok(earned_lunge != null, "Lunge resolves out of the spec pool")
 	ok(earned_lunge != null and earned_lunge.cost == 25,
 		"...at the ordinary 25 Rage (got %d)" % (earned_lunge.cost if earned_lunge else -1))
-	# An earned copy plus the cell is still exactly one copy.
-	var up := _applied({"sm_lunge": 1}, ["Lunge"], [earned_lunge])
+	# An earned copy plus the whole tree is still exactly one copy.
+	var up := _applied_live(["Lunge"], [earned_lunge])
 	ok(_ability_names(up["abilities"]).count("Lunge") == 1,
-		"an earned Lunge is never doubled by the cell")
+		"an earned Lunge is never doubled by the tree")
 	ok(int(up.get("lunge_upgraded", 0)) == 0,
 		"...and the flag STILL reads zero — no collision happened")
 	# ...and the upgraded wording has no source any more, so it is asserted
@@ -413,18 +607,18 @@ func _upgrade_paths() -> void:
 			ok(not a.description.contains("Exposes AND"),
 				"...and the card no longer promises the node's upgrade")
 
-	# Execute, the same shape one row later.
-	var cap_fresh := _applied({"sm_execute": 1})
+	# Execute, the same shape.
+	var cap_fresh := _applied_live()
 	ok(_ability_names(cap_fresh["abilities"]).is_empty(),
-		"the Execute capstone hands out NOTHING (DO's charter)")
+		"the whole one tree, worn, hands out NOTHING — no Execute (DO's charter)")
 	ok(int(cap_fresh.get("execute_upgraded", 0)) == 0,
 		"...and `execute_upgraded` is read-only-zero")
 	ok(Classes.spec_draft_pool("swordmaster").has("Execute"),
 		"...while the card itself drafts from the Swordmaster")
 	var earned_exec := Classes.spec_pool_ability("swordmaster", "Execute")
-	var cap_up := _applied({"sm_execute": 1}, ["Execute"], [earned_exec])
+	var cap_up := _applied_live(["Execute"], [earned_exec])
 	ok(_ability_names(cap_up["abilities"]).count("Execute") == 1,
-		"an earned Execute is never doubled by the cell")
+		"an earned Execute is never doubled by the tree")
 	ok(int(cap_up.get("execute_upgraded", 0)) == 0,
 		"...and its flag reads zero too")
 	for a in cap_up["abilities"]:
@@ -470,8 +664,21 @@ func _no_rune_regression() -> void:
 
 # Spawns a battle FROZEN on the first hero turn: no autoplay, so nothing
 # acts on its own and every cast below is one this test drove.
+#
+# BATCH FX: the Swordmaster in slot 0 carries the RETIRED nodes as his member
+# `tree` (the fixture's `patch`, written before `prep` runs), so a `prep` that
+# hands him a retired id has him wear exactly the payload that node carried —
+# the battle spawn applies `Run.party[i]["tree"]` against his learned dict, and
+# every field the live half reads kept its read site. FX: the payloads the
+# retired sm_blade_dance (Sunder Guard), sm_swordsmanship (Swordsmanship),
+# sm_riposte (Riposte), sm_opportunist (Opportunist), sm_execute (Finisher),
+# sm_lunge (Committed Thrust), sm_guarded (Off Balance) and sm_punish
+# (Punishment) carried — each node is deleted, each field and its read site
+# stand. With nothing learned the inline tree pays nothing, which is what the
+# live tree pays a Swordmaster with nothing learned.
 func _spawn(specs: Array, lineup: Array, prep := Callable()) -> Node:
-	return await Fixture.spawn(self, specs, {"enemies": lineup, "prep": prep})
+	return await Fixture.spawn(self, specs, {"enemies": lineup, "prep": prep,
+		"patch": {0: {"tree": _retired_tree()}}})
 
 
 func _sm(scene: Node) -> BattleUnit:
@@ -671,8 +878,12 @@ func _live_execute() -> void:
 		# upgrade. The threshold/free-cast BRANCHES below are still live code
 		# (nothing writes the flag, so they are exercised by setting it here),
 		# which is why they are driven rather than deleted.
+		# FX: the payload the retired sm_execute (Finisher) carried — Pommel
+		# Strike +30% of Attack, cooldown 1 — is what he wears here, off the
+		# inline tree; the node is deleted, the flag and its read sites stand.
+		# §6 asks the same "nothing grants" question of the whole one tree.
 		ok(sm.execute_upgraded == 0,
-			"LIVE: `execute_upgraded` is read-only-zero — the capstone grants nothing")
+			"LIVE: `execute_upgraded` is read-only-zero — the retired Finisher's payload, worn, grants nothing")
 		sm.execute_upgraded = 1
 		var ex := _find(sm, "Execute")
 		ok(ex != null, "...and there is exactly one Execute on the bar")
@@ -720,8 +931,12 @@ func _live_lunge() -> void:
 	if sm != null and foe != null:
 		# BATCH DO: same shape. The flag has no writer, so the branch is driven
 		# from here rather than left unreachable and unproved.
+		# FX: the payload the retired sm_lunge (Committed Thrust) carried —
+		# Overpower 10 Rage cheaper, +10 Rage on the blow — is what he wears here,
+		# off the inline tree; the node is deleted, the flag and its read site
+		# stand. §6 asks the same "nothing grants" question of the whole one tree.
 		ok(sm.lunge_upgraded == 0,
-			"LIVE: `lunge_upgraded` is read-only-zero — the cell grants nothing")
+			"LIVE: `lunge_upgraded` is read-only-zero — the retired Committed Thrust's payload, worn, grants nothing")
 		sm.lunge_upgraded = 1
 		ok(_ability_names(sm.abilities).count("Lunge") == 1,
 			"...and there is still one Lunge on the bar")

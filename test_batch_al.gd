@@ -32,6 +32,22 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX DELETED THE TREE THOSE TABLES RECORDED, AND RE-POINTED WHAT IT PAID.
+# The twelve per-spec trees are gone (324 nodes): a Warden wears the Warrior's
+# cells of the ONE tree, `Talents.TREE` — 27 nodes in three tiers of nine, no
+# lanes, no rows, no capstone shelf. EVERY FIELD this file drives kept its read
+# site in battle.gd / unit.gd, so every MECHANIC question still has a true
+# answer, and each is now driven off the EXACT payload the retired node carried
+# (`RETIRED`, below — copied out of the deleted table, never re-typed), or off
+# the one tree's own node where it took the field at the same magnitude
+# (`PRECEDENT`). The questions about the deleted tree ITSELF — a node's row,
+# lane, name, capstone flag, tooltip prose, and its id surviving a re-author —
+# have no subject left anywhere, so they are deleted AT THEIR SITES (DG §2),
+# each with its exact count. Where the one tree asks the same question, it is
+# asked of the one tree instead: its size and tiers, a cell's single rank and
+# its tier, its tooltips naming no ability, and — DO's charter, which FX's line
+# keeps — that nothing a hero wears grants.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -43,38 +59,113 @@ const Fixture = preload("res://suite_fixture.gd")
 var checks := 0
 var fails: Array = []
 
-# id -> [row, lane, name, stat field, value]. The layout table and the
-# magnitudes of the batch doc, transcribed once so a re-tune has to come
-# here and say so.
-const NODES := {
-	"wd_unkillable": [1, "Plate", "Unkillable", "unkillable_ranks", 1],
-	# RE-POINTED BY BATCH BJ §2: AL's table enshrined the misspelling
-	# "Richocet"; the node is spelled Ricochet now (a text fix, nothing else).
-	"wd_ricochet": [1, "Threat", "Ricochet", "ricochet_ranks", 1],
-	"wd_tank_spank": [1, "Banner", "Tank and Spank", "tank_spank_ranks", 1],
-	"wd_toughness": [2, "Plate", "Toughness", "toughness_ranks", 1],
-	"wd_taunt_master": [2, "Threat", "Provoke", "provoke_ranks", 1],
-	"wd_rally": [2, "Banner", "Rally", "rally", 1],
-	"wd_endurance": [3, "Plate", "Endurance", "endurance_ranks", 1],
-	"wd_iron_will": [3, "Threat", "Iron Will", "iron_will_ranks", 1],
-	"wd_stomp_drill": [3, "Banner", "Rallying Cry", "rallying_cry", 4],
-	"wd_tenacity": [4, "Plate", "Tenacity", "tenacity", 1],
-	"wd_sundering": [4, "Threat", "Sundering", "sundering_ranks", 1],
-	"wd_elem_weak": [4, "Banner", "Elemental Weakness", "elem_weak_ranks", 1],
-	"wd_shieldwall": [5, "Plate", "Shield Mastery", "shield_mastery_ranks", 1],
-	"wd_spiked": [5, "Threat", "Spite", "spite_ranks", 1],
-	"wd_bannerman": [5, "Banner", "Bulwark Line", "bulwark_ally_block", 10],
-	"wd_plating": [6, "Plate", "Plate Discipline", "plate_discipline_ranks", 1],
-	"wd_shatter_guard": [6, "Threat", "Bruising Guard", "bruising_ranks", 1],
-	"wd_fortress": [6, "Banner", "Shared Vigil", "shared_vigil_ranks", 1],
-	"wd_immovable": [7, "Plate", "Battered Not Broken", "battered_ranks", 1],
-	"wd_grudge": [7, "Threat", "Grudge", "grudge_ranks", 1],
-	"wd_veteran": [7, "Banner", "Steadfast", "steadfast_ranks", 1],
-	"wd_mountain": [9, "Plate", "Immovable", "immovable", 1],
-	"wd_avenger": [9, "Threat", "Vengeful Guardian", "vengeful_guardian", 1],
-	# BATCH DO renamed the capstone when its card left for the draft — a node
-	# named after a live DRAFT CARD is the `wd_spiked`/Spite collision.
-	"wd_hold_line": [9, "Banner", "Braced", "", 0],
+# id -> [stat field, value]. BATCH FX: this was `NODES`, id -> [row, lane,
+# name, stat field, value] — the layout table and the magnitudes of the batch
+# doc, "transcribed once so a re-tune has to come here and say so". The ROW,
+# LANE and NAME columns are DELETED WITH THEIR SUBJECT (§1 records the checks
+# that read them). The ability-editing capstone, wd_hold_line, carried no stat
+# field and is asked in the live half. What is left is the MAGNITUDE column,
+# and each row is asked of the payload the RETIRED node carried (below) — or,
+# where a node of the one tree took the field at the same magnitude, of that
+# live node (`PRECEDENT`).
+const PAYLOADS := {
+	"wd_unkillable": ["unkillable_ranks", 1],  # Unkillable
+	"wd_ricochet": ["ricochet_ranks", 1],  # Ricochet
+	"wd_tank_spank": ["tank_spank_ranks", 1],  # Tank and Spank
+	"wd_toughness": ["toughness_ranks", 1],  # Toughness
+	"wd_taunt_master": ["provoke_ranks", 1],  # Provoke
+	"wd_rally": ["rally", 1],  # Rally
+	"wd_endurance": ["endurance_ranks", 1],  # Endurance
+	"wd_iron_will": ["iron_will_ranks", 1],  # Iron Will
+	"wd_stomp_drill": ["rallying_cry", 4],  # Rallying Cry
+	"wd_tenacity": ["tenacity", 1],  # Tenacity
+	"wd_sundering": ["sundering_ranks", 1],  # Sundering
+	"wd_elem_weak": ["elem_weak_ranks", 1],  # Elemental Weakness
+	"wd_shieldwall": ["shield_mastery_ranks", 1],  # Shield Mastery
+	"wd_spiked": ["spite_ranks", 1],  # Spite
+	"wd_bannerman": ["bulwark_ally_block", 10],  # Bulwark Line
+	"wd_plating": ["plate_discipline_ranks", 1],  # Plate Discipline
+	"wd_shatter_guard": ["bruising_ranks", 1],  # Bruising Guard
+	"wd_fortress": ["shared_vigil_ranks", 1],  # Shared Vigil
+	"wd_immovable": ["battered_ranks", 1],  # Battered Not Broken
+	"wd_grudge": ["grudge_ranks", 1],  # Grudge
+	"wd_veteran": ["steadfast_ranks", 1],  # Steadfast
+	"wd_mountain": ["immovable", 1],  # Immovable
+	"wd_avenger": ["vengeful_guardian", 1],  # Vengeful Guardian
+}
+
+# BATCH FX — the retired node whose field AND magnitude a node of the one tree
+# took (talents.gd names each precedent above its node). Its rows are asked of
+# the live node, because there the question is still asked of a node a player
+# can buy: the node paying Iron Will's 12% a debuff.
+const PRECEDENT := {"wd_iron_will": "tn_iron_will"}
+
+# BATCH FX — THE PAYLOADS THE RETIRED WARDEN NODES CARRIED, copied verbatim out
+# of the deleted `Talents.LANE_TREES["warden"]` (ints stay ints, floats stay
+# floats, `also` halves and their `has_node` conditions included). The nodes
+# are deleted; every field they wrote and every read site those fields pay
+# through still stands, so what this file asked of the nodes it asks of these.
+# The ids are the retired ids because the conditions name them. Only the
+# seventeen DESC_NUMBERS nodes without a precedent carry their desc and scale,
+# for `desc_for`'s machinery in §3.
+const RETIRED := {
+	"wd_unkillable": {"payload": {"stat": {"unkillable_ranks": 1}},
+		"desc": "Every time you Block an attack, heal for {v}% of the health you brought into the battle.",
+		"scale": {"step": 8}},  # Unkillable
+	"wd_ricochet": {"payload": {"stat": {"ricochet_ranks": 1}},
+		"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
+		"scale": {"step": 35}},  # Ricochet
+	"wd_tank_spank": {"payload": {"stat": {"tank_spank_ranks": 1}}},  # Tank and Spank
+	"wd_toughness": {"payload": {"stat": {"toughness_ranks": 1}},
+		"desc": "Constitution is increased by {v}% of maximum HP.",
+		"scale": {"step": 25}},  # Toughness
+	"wd_taunt_master": {"payload": {"stat": {"provoke_ranks": 1}},
+		"desc": "Mocking Blow taunts {v} additional foes.",
+		"scale": {"step": 2}},  # Provoke
+	"wd_rally": {"payload": {"stat": {"rally": 1}}},  # Rally
+	"wd_endurance": {"payload": {"stat": {"endurance_ranks": 1}},
+		"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).",
+		"scale": {"step": 3}},  # Endurance
+	"wd_stomp_drill": {"payload": {"stat": {"rallying_cry": 4}},
+		"desc": "At the start of each of the Warden's turns, every hero regains {v}% of their maximum resource.",
+		"scale": {"step": 4}},  # Rallying Cry
+	"wd_tenacity": {"payload": {"stat": {"tenacity": 1}}},  # Tenacity
+	"wd_sundering": {"payload": {"stat": {"sundering_ranks": 1}},
+		"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
+		"scale": {"step": 100}},  # Sundering
+	"wd_elem_weak": {"payload": {"stat": {"elem_weak_ranks": 1}},
+		"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
+		"scale": {"step": 20}},  # Elemental Weakness
+	"wd_shieldwall": {"payload": {"stat": {"shield_mastery_ranks": 1}},
+		"desc": "Shieldwall's stance holds {v} turns longer — 5 turns.",
+		"scale": {"step": 2}},  # Shield Mastery
+	"wd_spiked": {"payload": {"stat": {"spite_ranks": 1}},
+		"desc": "Attackers that damage the Warden take {v}% of that damage back.",
+		"scale": {"step": 30}},  # Spite
+	"wd_bannerman": {"payload": {"stat": {"bulwark_ally_block": 10}},
+		"desc": "Shieldwall also grants every other hero +{v}% Block chance for its duration.",
+		"scale": {"step": 10}},  # Bulwark Line
+	"wd_plating": {"payload": {"stat": {"plate_discipline_ranks": 1}},
+		"desc": "Heavy Plating's climbing Block bonus grows +{v}% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).",
+		"scale": {"step": 12}},  # Plate Discipline
+	"wd_shatter_guard": {"payload": {"stat": {"bruising_ranks": 1}, "also": [{"condition": {"has_node": "wd_spiked"}, "stat": {"spite_break": 1}}]},
+		"desc": "Blocking an attack deals {v} Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.",
+		"scale": {"step": 30}},  # Bruising Guard
+	"wd_fortress": {"payload": {"stat": {"shared_vigil_ranks": 1}},
+		"desc": "Heroes take {v}% less damage while the Warden is above 50% health.",
+		"scale": {"step": 12}},  # Shared Vigil
+	"wd_immovable": {"payload": {"stat": {"battered_ranks": 1}},
+		"desc": "Blocking an attack removes {v} Break from the Warden's own meter.",
+		"scale": {"step": 30}},  # Battered Not Broken
+	"wd_grudge": {"payload": {"stat": {"grudge_ranks": 1}},
+		"desc": "+{v}% damage against enemies currently taunted by the Warden.",
+		"scale": {"step": 25}},  # Grudge
+	"wd_veteran": {"payload": {"stat": {"steadfast_ranks": 1}},
+		"desc": "When damage would drop a hero below 20% health, the Warden absorbs {v}% of it instead.",
+		"scale": {"step": 60}},  # Steadfast
+	"wd_mountain": {"payload": {"stat": {"immovable": 1, "block_chance": 0.2}}},  # Immovable
+	"wd_avenger": {"payload": {"stat": {"vengeful_guardian": 1}}},  # Vengeful Guardian
+	"wd_hold_line": {"payload": {"ability": "Shieldwall", "set": {"cost": 0, "cooldown": 1}}},  # Braced
 }
 
 # The number the tooltip must render for every node whose content is a
@@ -88,17 +179,14 @@ const DESC_NUMBERS := {
 	"wd_immovable": "30", "wd_grudge": "25", "wd_veteran": "60",
 }
 
-# The magnitudes that live ONLY in a battle.gd read site. A tooltip cannot
-# prove these, so they are read off a spawned unit or asserted against the
-# source line further down; this table is what the prose has to agree with.
-const PROSE_NUMBERS := {
-	"wd_tenacity": ["15"],
-	"wd_rally": ["30", "3 turns"],
-	"wd_tank_spank": ["ALWAYS"],
-	"wd_plating": ["20%"],
-	"wd_shieldwall": ["5 turns"],
-	"wd_endurance": ["75"],
-}
+# BATCH FX — `PROSE_NUMBERS` IS DELETED WITH ITS SUBJECT. It held the numbers
+# six Warden tooltips stated in PROSE because the magnitude lived only in a
+# battle.gd read site — Tenacity's 15, Rally's 30% for 3 turns, Tank and
+# Spank's ALWAYS, Plate Discipline's 20%, Shield Mastery's 5 turns and
+# Endurance's 75 cap — so the prose "had to agree" with the read site. The
+# tooltips went with their nodes; the read sites did not, and the live half
+# still measures all of those but Endurance's cap off the exact retired
+# payloads. §3 records the 7 checks.
 
 
 func _initialize() -> void:
@@ -154,125 +242,221 @@ func _ability_names(list: Array) -> Array:
 	return out
 
 
-# ---------- 1. the tree still fits the Batch AI mould ----------
+# ---------- BATCH FX: the retired nodes inline, and the one tree worn whole ----------
 
+# The tree a Warden buys into: `generate_tree` answers the tree the spec's CLASS
+# buys into, and for every class that is the ONE tree.
+func _tree() -> Array:
+	return Talents.generate_tree("warden", "warrior")
+
+
+# A retired node rebuilt inline from RETIRED: its id, its exact payload and, for
+# the seventeen DESC_NUMBERS nodes without a precedent, its desc and scale. `{}`
+# for an id RETIRED does not carry, which every caller reads as "not there".
+func _retired_node(id: String) -> Dictionary:
+	if not RETIRED.has(id):
+		return {}
+	var n: Dictionary = (RETIRED[id] as Dictionary).duplicate(true)
+	n["id"] = id
+	return n
+
+
+# The retired nodes as a tree `apply_from_tree` can walk. `_member` hands it to
+# the payload machinery, and `_spawn` hands it to the Warden as his member
+# `tree`: the battle spawn applies `Run.party[i]["tree"]` against his learned
+# dict, so a retired id he learns pays exactly what its node paid.
+func _retired_tree() -> Array:
+	var out: Array = []
+	for id in RETIRED:
+		out.append(_retired_node(String(id)))
+	return out
+
+
+# The node a PAYLOADS or DESC_NUMBERS row is asked of: the live node where the
+# one tree took the field at the same magnitude (PRECEDENT), else the retired one.
+func _row_node(id: String) -> Dictionary:
+	if PRECEDENT.has(id):
+		return Talents.node_in_tree(Talents.tree(), String(PRECEDENT[id]))
+	return _retired_node(id)
+
+
+func _label(id: String) -> String:
+	if PRECEDENT.has(id):
+		return "%s (%s's precedent)" % [PRECEDENT[id], id]
+	return id
+
+
+# Every cell of the one tree, WORN: what a Warden walks in wearing once the
+# Warrior's purse has bought the whole tree. It comes out of
+# `Talents.worn_learned`, the door `Profile.worn_talents` reads, so this is the
+# real {id: rank} set a run hands the spawn, not a hand-built one.
+func _all_worn() -> Dictionary:
+	var cells := {}
+	for n in Talents.tree():
+		cells[String(n["id"])] = true
+	return Talents.worn_learned(Talents.tree(), cells)
+
+
+# `_applied`'s twin for the one tree, worn whole. What §5 used to ask of a CELL
+# that might grant (DO's charter) it asks of this: a hero wears the whole tree
+# now, so a grant could only ever come back through it.
+func _applied_live(earned: Array = [], abilities: Array = []) -> Dictionary:
+	var member := {"key": "warrior", "spec": "warden", "talents": _all_worn(),
+		"tree": _tree(), "bm_abilities": earned}
+	var cfg := {"abilities": abilities}
+	Talents.apply_from_tree(cfg, member["tree"], member["talents"], member)
+	return cfg
+
+
+# ---------- 1. the tree still fits the Batch AI mould ----------
+#
+# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE, AND DELETED ITS LAYOUT.
+# `generate_tree("warden", ...)` answers the tree the Warden's CLASS buys into —
+# `Talents.TREE`, the same 27 nodes for every class — so what this section
+# asked of the Warden tree it asks of that one: its size, one entry per id, a
+# single rank per cell (decided now by `Talents.worn_learned`, the door
+# `Profile.worn_talents` reads, since no node carries a `ranks` key), and the
+# tier each node carries. The walk used to skip row 8 and so read 24 nodes; the
+# one tree has no row 8, so it reads all 27 — three more per question, which is
+# new content walked rather than coverage moved.
+#
+# THE `tier` CHECK IS INVERTED, NOT DELETED. It asserted each node carried NO
+# `tier`, because Batch AI had retired a per-node tier field. FX brought the key
+# back as the one tree's structure, so every node now MUST carry one and it must
+# be a tier the tree has — and that is what is asked.
+#
+# DELETED UNDER DG §2 — 146 CHECKS, each about the deleted Warden tree:
+#   24  "'<id>' is a node the layout table names"  (NODES; no such node now)
+#   24  "'<id>' sits in row R"        24  "'<id>' sits in lane L"
+#   24  "'<id>' is named N"           24  "'<id>' is flagged capstone iff on the shelf"
+#   24  "'<id>' kept its id through the re-author" — the migration promise,
+#       which FX retired: `Run._migrate_trees` drops every id the one tree does
+#       not hold, and the v2 fold drops a profile's cells.
+#    2  the two in-place re-specs kept their ids under new names
+#       (wd_stomp_drill -> Rallying Cry, wd_bannerman -> Bulwark Line)
+# THE ROW CHECK IS RE-POINTED ONTO THE TIERS. "row R holds one node in each of
+# the 3 lanes" (9 rows) asked whether every cell of the shape was filled; the one
+# tree's shape is three tiers of NODES_PER_TIER, so each tier is asked to hold
+# that many — 3 checks where there were 9.
 func _tree_shape() -> void:
-	var tree: Array = Talents.generate_tree("warden", "warrior")
+	var tree := _tree()
 	ok(tree.size() == 27, "the tree is 27 cells (has %d)" % tree.size())
 	var seen := {}
 	for node in tree:
-		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
-		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
-		# rather than being taught the three new ids: what the check exists to
-		# prove is that the twenty-four survive UNCHANGED, and asserting that
-		# nothing else exists would make every later addition a failure here
-		# instead of in the batch that made it.
-		if int(node["row"]) == 8:
-			continue
 		var id := String(node["id"])
-		ok(NODES.has(id), "'%s' is a node the layout table names" % id)
 		ok(not seen.has(id), "'%s' appears once" % id)
 		seen[id] = true
-		ok(int(node.get("ranks", 0)) == 1, "'%s' holds a single rank" % id)
-		ok(not node.has("tier"), "'%s' carries no retired tier field" % id)
-		if not NODES.has(id):
-			continue
-		var want: Array = NODES[id]
-		ok(int(node["row"]) == int(want[0]),
-			"'%s' sits in row %d, want %d" % [id, int(node["row"]), int(want[0])])
-		ok(String(node["lane"]) == String(want[1]),
-			"'%s' sits in lane %s, want %s" % [id, node["lane"], want[1]])
-		ok(String(node["name"]) == String(want[2]),
-			"'%s' is named '%s', want '%s'" % [id, node["name"], want[2]])
-		ok(node.get("capstone", false) == (int(want[0]) == Talents.CAPSTONE_ROW),
-			"'%s' is flagged capstone iff it sits on the shelf" % id)
-	# EVERY id survives, which is what lets saved trees migrate and is why
-	# no save version moves in this batch.
-	for id in NODES:
-		ok(seen.has(id), "'%s' kept its id through the re-author" % id)
-	for row in range(1, Talents.CAPSTONE_ROW + 1):
-		var lanes := {}
-		for node in Talents.row_nodes(tree, row):
-			lanes[String(node["lane"])] = true
-		ok(lanes.size() == 3, "row %d holds one node in each of the 3 lanes" % row)
-	# The two re-specs happened IN PLACE: same ids, new names.
-	ok(String(Talents.node_in_tree(tree, "wd_stomp_drill")["name"]) == "Rallying Cry",
-		"wd_stomp_drill re-specced in place (was Rallying Stomp)")
-	ok(String(Talents.node_in_tree(tree, "wd_bannerman")["name"]) == "Bulwark Line",
-		"wd_bannerman kept its id through its second re-spec")
+		ok(int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"'%s' is worn at a single rank" % id)
+		ok(node.has("tier") and int(node["tier"]) == Talents.tier_of(node),
+			"'%s' carries its tier, one of the tree's %d (got %s)" % [id,
+				Talents.TIERS, str(node.get("tier", "none"))])
+	for tier in range(1, Talents.TIERS + 1):
+		ok(Talents.tier_nodes(tree, tier).size() == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (has %d)" % [tier, Talents.NODES_PER_TIER,
+				Talents.tier_nodes(tree, tier).size()])
 
 
 # ---------- 2. what each node is worth ----------
-
+#
+# BATCH FX. A MECHANIC question — does the payload write its field at its
+# magnitude — and every field kept its read site, so each PAYLOADS row is asked
+# of the exact payload the retired node carried, applied as the spawn applies
+# it; Iron Will's row is asked of the one tree's node that took its field and
+# magnitude (PRECEDENT).
 func _node_values() -> void:
-	var tree: Array = Talents.generate_tree("warden", "warrior")
-	for node in tree:
-		var id := String(node["id"])
-		if not NODES.has(id):
-			continue
-		var field := String(NODES[id][3])
-		if field == "":
-			continue  # the ability-granting capstone, covered in §4
+	for id in PAYLOADS:
+		var field := String(PAYLOADS[id][0])
 		var cfg := {"abilities": []}
-		Talents.apply_payload(cfg, node["payload"], 1,
+		Talents.apply_payload(cfg, _row_node(String(id)).get("payload", {}), 1,
 			{"learned": {id: 1}, "member": {}})
-		ok(cfg.has(field), "'%s' writes %s" % [id, field])
+		ok(cfg.has(field), "'%s' writes %s" % [_label(String(id)), field])
 		if cfg.has(field):
 			var got = cfg[field]
-			var want = NODES[id][4]
+			var want = PAYLOADS[id][1]
 			var same: bool = (abs(float(got) - float(want)) < 0.0001) \
 				if want is float else (got == want)
-			ok(same, "'%s' writes %s = %s, want %s" % [id, field, str(got), str(want)])
+			ok(same, "'%s' writes %s = %s, want %s" % [_label(String(id)), field,
+				str(got), str(want)])
 
 
 # ---------- 3. the tooltip renders the number the designer chose ----------
-
+#
+# BATCH FX SPLIT THIS SECTION. `desc_for` is live machinery — the build screen
+# and the hero sheet both call it — and at FX its `{v}` / scale branch lost every
+# live input (no node of the one tree and no rune carries a scale). So the two
+# checks per node that prove IT — the number reached the string, and no
+# placeholder was left — are driven off the retired nodes' exact desc and scale,
+# and off the live node's desc for Iron Will's precedent (the node paying the
+# magnitude says the magnitude). What asked about a deleted NODE's text has no
+# node to ask. DELETED UNDER DG §2 — 25 CHECKS:
+#   17  "'<id>' is in the tree", for the seventeen with no precedent
+#    7  PROSE_NUMBERS — six tooltips stating their read site's number in prose
+#       (the table's deletion record, above, names what the live half still
+#       measures)
+#    1  Bruising Guard's tooltip names Spite — the cross-row decision it
+#       advertised; §4 still proves the rider fires only with Spite, off the
+#       retired payloads
+# AND FOUR ARE RE-POINTED TO THE ONE TREE, because DO's rule about what a node
+# may ADVERTISE is a live rule — FX's line keeps it and widens it: a talent may
+# not touch an ability at all. Three asked a Warden node's text not to name an
+# ability it could not pay for (War Stomp, Interpose) or an upgrade it could
+# not grant; those are asked of every tooltip in the one tree. The fourth asked
+# Bulwark Line's text to STILL name Shieldwall because Shieldwall is protected
+# core — the carve-out DO permitted and FX's line OVERTURNED (CLAUDE.md, the DO
+# block: "SUPERSEDED IN ITS PERMITTED LIST AT FX") — so it INVERTS: no tooltip
+# in the one tree names Shieldwall either.
 func _tooltips() -> void:
-	var tree: Array = Talents.generate_tree("warden", "warrior")
 	for id in DESC_NUMBERS:
-		var node: Dictionary = Talents.node_in_tree(tree, id)
-		ok(not node.is_empty(), "'%s' is in the tree" % id)
+		var node := _row_node(String(id))
+		if PRECEDENT.has(id):
+			ok(not node.is_empty(), "'%s' is in the tree" % _label(String(id)))
 		if node.is_empty():
 			continue
 		var text := Talents.desc_for(node, 1)
 		ok(text.contains(String(DESC_NUMBERS[id])),
-			"'%s' tooltip renders %s: \"%s\"" % [id, DESC_NUMBERS[id], text])
+			"'%s' tooltip renders %s: \"%s\"" % [_label(String(id)), DESC_NUMBERS[id], text])
 		ok(not text.contains("{v}"),
-			"'%s' tooltip has no unrendered placeholder" % id)
-	# The nodes whose number lives only in battle.gd say it in prose.
-	for id in PROSE_NUMBERS:
-		var node: Dictionary = Talents.node_in_tree(tree, id)
-		if node.is_empty():
-			continue
-		var text := Talents.desc_for(node, 1)
-		for frag in PROSE_NUMBERS[id]:
-			ok(text.contains(String(frag)),
-				"'%s' tooltip states '%s': \"%s\"" % [id, frag, text])
-	# The three nodes with a second half have to advertise it, or the
-	# player cannot see the cross-row decision at all.
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_shatter_guard"), 1)
-		.contains("Spite"), "Bruising Guard's tooltip names Spite")
+			"'%s' tooltip has no unrendered placeholder" % _label(String(id)))
 	# BATCH DO — INVERTED, AND THE RULE IS THE SAME RULE. A node must ADVERTISE
 	# what it does; two of these advertised a clause that paid only a Warden who
 	# had DRAWN War Stomp or Interpose, which the charter forbids. The clauses
 	# are cut, so what must be true now is that the tooltips DO NOT name them —
 	# a text that kept the promise while the payload dropped it is the exact
 	# defect this project has found five times.
-	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_stomp_drill"), 1)
-		.contains("War Stomp"), "Rallying Cry's tooltip no longer names War Stomp (DO)")
-	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_bannerman"), 1)
-		.contains("Interpose"), "Bulwark Line's tooltip no longer names Interpose (DO)")
-	ok(Talents.desc_for(Talents.node_in_tree(tree, "wd_bannerman"), 1)
-		.contains("Shieldwall"), "...and still names Shieldwall, which is PROTECTED CORE")
-	ok(not Talents.desc_for(Talents.node_in_tree(tree, "wd_hold_line"), 1)
-		.contains("UPGRADES"), "the capstone tooltip states no upgrade path — it grants nothing")
+	var tips := _live_tooltips()
+	ok(not tips.is_empty() and not tips.contains("War Stomp"),
+		"no tooltip in the one tree names War Stomp (DO; FX's line)")
+	ok(not tips.is_empty() and not tips.contains("Interpose"),
+		"no tooltip in the one tree names Interpose (DO; FX's line)")
+	ok(not tips.is_empty() and not tips.contains("Shieldwall"),
+		"...nor Shieldwall — the protected-core carve-out was overturned at FX")
+	ok(not tips.is_empty() and not tips.contains("UPGRADES"),
+		"no tooltip in the one tree states an upgrade path — the tree grants nothing")
+
+
+# Every tooltip the one tree renders, joined — what a Warden's build screen shows.
+func _live_tooltips() -> String:
+	var out := PackedStringArray()
+	for n in _tree():
+		out.append(Talents.desc_for(n, 1))
+	return "\n".join(out)
 
 
 # ---------- 4. the conditional halves ----------
-
+#
+# BATCH FX. `_member` hands the machinery the RETIRED nodes rebuilt inline —
+# their exact payloads, `also` halves and `has_node` conditions included —
+# because what this section asks (and §6's stacking pair) is about those
+# payloads and the machinery that applies them (`apply_from_tree`,
+# `apply_payload`'s stat arm, `also`, `condition`), all of which runes still
+# use. The ids are the retired ids, because the conditions name them. The one
+# tree carries no condition anywhere, so there is no live node for these to be
+# asked of instead; the two checks that asked about deleted nodes' PAYLOAD
+# SHAPE are asked of the one tree, and say so where they stand.
 func _member(learned: Dictionary, earned: Array = []) -> Dictionary:
 	return {"key": "warrior", "spec": "warden", "talents": learned,
-		"tree": Talents.generate_tree("warden", "warrior"),
+		"tree": _retired_tree(),
 		"bm_abilities": earned}
 
 
@@ -346,20 +530,36 @@ func _conditional_halves() -> void:
 
 	# An empty ctx leaves a conditional half INERT — the Batch AI §5 rule:
 	# an effect that fails to appear is a bug you can see.
-	var tree: Array = Talents.generate_tree("warden", "warrior")
 	# BATCH DO: only `wd_shatter_guard` still HAS a second half — its partner
 	# is `wd_spiked`, a node in its own tree, which the charter permits. The
 	# other two lost theirs, so asserting inertness on them would pass for no
 	# reason; they are asserted to carry no `also` at all instead.
+	# BATCH FX: the inertness loop reads the retired Bruising Guard's exact
+	# payload, which still carries the `also` half it proves dark. The two
+	# "carries no conditional half" checks asked it of two retired nodes; those
+	# are deleted, and the one tree carries NO conditional half anywhere — no
+	# `also` and no `condition` on any node (FX's line) — so the pair is asked of
+	# every node of it, one check for each shape a conditional half can take,
+	# with the population printed so an empty tree cannot pass them.
 	for id in ["wd_shatter_guard"]:
 		var bare := {"abilities": []}
-		Talents.apply_payload(bare, Talents.node_in_tree(tree, id)["payload"], 1)
+		Talents.apply_payload(bare, _retired_node(id)["payload"], 1)
 		ok(int(bare.get("spite_break", 0)) == 0,
 			"'%s' second half is inert on an empty ctx" % id)
 		ok(bare.size() > 1, "'%s' first half still lands on an empty ctx" % id)
-	for id2 in ["wd_stomp_drill", "wd_bannerman"]:
-		ok(not (Talents.node_in_tree(tree, id2)["payload"] as Dictionary).has("also"),
-			"'%s' carries no conditional half at all now (DO)" % id2)
+	var with_also := 0
+	var with_condition := 0
+	for n in _tree():
+		var pay: Dictionary = n["payload"]
+		if pay.has("also"):
+			with_also += 1
+		if pay.has("condition"):
+			with_condition += 1
+	ok(with_also == 0 and not _tree().is_empty(),
+		"no node of the one tree carries an `also` half (%d of %d do)" % [
+			with_also, _tree().size()])
+	ok(with_condition == 0 and not _tree().is_empty(),
+		"...nor a `condition` (%d of %d do)" % [with_condition, _tree().size()])
 
 
 # ---------- 5. grant, or upgrade ----------
@@ -370,9 +570,16 @@ func _upgrade_path() -> void:
 	# `Braced`. What is asserted now is the three things that would break if a
 	# grant came back, plus the card's own numbers, which were lifted VERBATIM
 	# out of the payload and must not have drifted in the move.
-	var fresh := _applied({"wd_hold_line": 1})
+	#
+	# BATCH FX RE-POINTED THE CELL TO THE TREE. The capstone this asked about
+	# went with the twelve trees, and a Warden wears the one tree WHOLE now —
+	# every cell the Warrior owns — so "does what the hero wears hand out Hold
+	# the Line" is asked of every cell of the one tree, worn (`_applied_live`).
+	# That is DO's charter, which FX's line keeps: the tree grants no ability.
+	# The card's own numbers are asked as before; they never lived in the tree.
+	var fresh := _applied_live()
 	ok(_ability_names(fresh["abilities"]).is_empty(),
-		"the capstone hands out NOTHING (DO's charter)")
+		"the whole one tree, worn, hands out NOTHING — no Hold the Line (DO's charter)")
 	ok(int(fresh.get("hold_line_upgraded", 0)) == 0,
 		"...and `hold_line_upgraded` is read-only-zero — only a grant could write it")
 	ok(Classes.spec_draft_pool("warden").has("Hold the Line"),
@@ -388,10 +595,10 @@ func _upgrade_path() -> void:
 		# card, so it survived the move into `Classes.draft_ability` unedited.
 		ok(earned.description.contains("die\nfor 2 turns"),
 			"...and its no-death window is stated as APPLIED (CV §1)")
-	# An earned copy plus the cell is still exactly one copy, and no upgrade.
-	var up := _applied({"wd_hold_line": 1}, ["Hold the Line"], [earned])
+	# An earned copy plus the whole tree is still exactly one copy, and no upgrade.
+	var up := _applied_live(["Hold the Line"], [earned])
 	ok(_ability_names(up["abilities"]).count("Hold the Line") == 1,
-		"an earned Hold the Line is never doubled by the cell")
+		"an earned Hold the Line is never doubled by the tree")
 	ok(int(up.get("hold_line_upgraded", 0)) == 0,
 		"...and the flag STILL reads zero — no collision happened")
 	for a in up["abilities"]:
@@ -403,7 +610,10 @@ func _upgrade_path() -> void:
 	# upgrade, and must not double-grant either. That is a property of the
 	# ordering, not of the payload, and it is the half a future batch could
 	# break by moving the earned-picks block.
-	var member := _member({"wd_hold_line": 1}, ["Hold the Line"])
+	# BATCH FX: "capstone first" is the whole one tree first — a Warden wearing
+	# every cell, with the card in his pool but not yet on his bar.
+	var member := {"key": "warrior", "spec": "warden", "talents": _all_worn(),
+		"tree": _tree(), "bm_abilities": ["Hold the Line"]}
 	var late := {"abilities": []}
 	Talents.apply_from_tree(late, member["tree"], member["talents"], member)
 	var late_names := _ability_names(late["abilities"])
@@ -491,10 +701,24 @@ func _kit_unchanged() -> void:
 
 # Spawns a battle FROZEN on the first hero turn: no autoplay, so nothing
 # acts on its own and every cast below is one this test drove.
+#
+# BATCH FX: the Warden in slot 0 carries the RETIRED nodes as his member `tree`
+# (the fixture's `patch`), so a retired id in `learned` has him wear exactly the
+# payload that node carried — the battle spawn applies `Run.party[i]["tree"]`
+# against his learned dict, and every field the live half reads kept its read
+# site. FX: the payloads the retired wd_unkillable (Unkillable), wd_toughness
+# (Toughness), wd_stomp_drill (Rallying Cry), wd_tenacity (Tenacity),
+# wd_bannerman (Bulwark Line), wd_shatter_guard (Bruising Guard), wd_grudge
+# (Grudge), wd_hold_line (Braced), wd_shieldwall (Shield Mastery), wd_spiked
+# (Spite), wd_plating (Plate Discipline), wd_rally (Rally), wd_taunt_master
+# (Provoke) and wd_tank_spank (Tank and Spank) carried — each node is deleted,
+# each field and its read site stand. With nothing learned the inline tree pays
+# nothing, which is what the live tree pays a Warden with nothing learned.
 func _spawn(learned: Dictionary, lineup: Array, earned: Array = [],
 		runes: Array = []) -> Node:
 	return await Fixture.spawn(self, ["warden", "cryomancer", "holy", "mystic"],
-		{"enemies": lineup, "talents": {0: learned}, "bm": {0: earned}, "runes": {0: runes}})
+		{"enemies": lineup, "talents": {0: learned}, "bm": {0: earned}, "runes": {0: runes},
+			"patch": {0: {"tree": _retired_tree()}}})
 
 
 func _wd(scene: Node) -> BattleUnit:
@@ -546,10 +770,13 @@ func _live_fields() -> void:
 		# BATCH DO: the capstone grants nothing, so the card is EARNED above.
 		# What this proves is unchanged — the bar carries it — and it now also
 		# proves the cell did not quietly hand out a second copy.
+		# FX: the "cell" is the payload the retired wd_hold_line (Braced) carried
+		# — a Shieldwall edit, no grant — worn off the inline tree; §5 asks the
+		# same question of the whole one tree.
 		ok(_find(wd, "Hold the Line") != null,
 			"LIVE: the DRAFTED Hold the Line is on his bar")
 		ok(_ability_names(wd.abilities).count("Hold the Line") == 1,
-			"LIVE: ...exactly once — the cell grants nothing (DO)")
+			"LIVE: ...exactly once — the retired Braced payload, worn, grants nothing (DO)")
 		# Toughness reads the UNSCALED pool at spawn — 25% of max HP on top
 		# of the spec's own Constitution.
 		ok(wd.constitution > 100,
@@ -648,6 +875,11 @@ func _live_rallying_cry() -> void:
 		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.sync_spec_hp(i)
+	# FX: the payload the retired wd_stomp_drill (Rallying Cry) carried —
+	# rallying_cry 4 — worn off the inline tree; the node is deleted, the field
+	# and its turn-start read site stand. The Warden wears the retired nodes as
+	# his member `tree`, exactly as `_spawn` hands them to him.
+	run.party[0]["tree"] = _retired_tree()
 	run.party[0]["talents"] = {"wd_stomp_drill": 1}
 	run.specs_chosen = true
 	run.active = true
@@ -889,12 +1121,16 @@ func _live_hold_the_line() -> void:
 	# applied number, which is CV §1's convention, and the card carried that
 	# wording verbatim into `Classes.draft_ability`. This comment said "one
 	# turn" until DM §1.
+	# FX: the payload the retired wd_hold_line (Braced) carried — Shieldwall at
+	# no Rage, cooldown 1 — is what he wears in both spawns below, off the inline
+	# tree; the node is deleted, the flag and its read site stand. §5 asks the
+	# same "nothing grants" question of the whole one tree.
 	var scene := await _spawn({"wd_hold_line": 1}, ["raider"], ["Hold the Line"])
 	var wd := _wd(scene)
 	ok(wd != null, "the Hold the Line Warden spawned")
 	if wd != null:
 		ok(wd.hold_line_upgraded == 0,
-			"LIVE: `hold_line_upgraded` is read-only-zero — nothing grants (DO)")
+			"LIVE: `hold_line_upgraded` is read-only-zero — the retired Braced payload, worn, grants nothing (DO)")
 		await scene._resolve_special(wd, _find(wd, "Hold the Line"), wd, "good", 1.0)
 		ok(wd.status_power("hold_bd") == 50,
 			"the granted cast cuts 50%% of Break damage (got %d)" % \

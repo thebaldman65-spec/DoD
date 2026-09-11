@@ -32,6 +32,18 @@
 #   §2 THE GRID'S PREMISE. The FAITH lane is exactly the eight nodes the
 #      leave-one-out table names, in row order — so a later re-spec trips the
 #      table rather than silently invalidating it.
+#
+# BATCH FX DELETED THE TWELVE SPEC TREES, AND THIS SUITE WAS RE-POINTED IN PLACE.
+#   §0 is asked of the ONE tree: its ids are unique (the ledger keys on them),
+#      and because every class wears the same tree the harness now builds EVERY
+#      hero from a one-tree flag string — while a pre-FX lane flag string builds
+#      NOBODY, which is what makes every historical lane row irreproducible.
+#   §1 is unchanged in every question; the four nodes it learned are deleted,
+#      so each rides into the spawn with its exact retired payload (Devoutness
+#      is learned as `tn_unbreaking`, the precedent-mapped node — same field,
+#      same magnitude).
+#   §2 is DELETED (two checks), with its subject: the FAITH lane went with the
+#      tree, so the table it premises describes a lane that no longer exists.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -42,8 +54,30 @@ const Fixture = preload("res://suite_fixture.gd")
 
 # The eight FAITH nodes, in row order. THE LEAVE-ONE-OUT TABLE IS KEYED ON
 # THIS LIST, so it lives here rather than in a comment.
+# BATCH FX: all eight are DELETED with the lane. The list is kept because §0
+# still needs it — it is the historical flag string, and what the harness
+# builds from it now (nobody) is the thing worth pinning.
 const FAITH_LANE := ["dv_communion", "dv_unwavering", "dv_devoutness",
 	"dv_faithful", "dv_covenant", "dv_fervor", "dv_oath", "dv_apostle"]
+
+# BATCH FX — THE NODES §1 LEARNED ARE DELETED; THEIR FIELDS ARE NOT. FX removed
+# the twelve spec trees and kept every read site of every field they wrote (a
+# field no node writes is dormant, not deleted). Each retired node a live check
+# learned is carried here as the EXACT payload it carried, and `_fx_tree` hands
+# the spawn the live tree PLUS those nodes, so the payload still goes through
+# `Talents.apply_from_tree` at the real spawn — the path the old learn took.
+# Devoutness is NOT here: its precedent-mapped node `tn_unbreaking` writes the
+# same field at the same magnitude (devoutness_ranks 20) and is learned instead.
+const FX_RETIRED := {
+	# FX: the payload the retired dv_barrier (Blessed Barrier) carried — the node is deleted, the field and its read site stand.
+	"dv_barrier": {"name": "Blessed Barrier",
+		"payload": {"stat": {"blessed_barrier_ranks": 20}}},
+	# FX: the payload the retired dv_afterglow (Afterglow) carried — the node is deleted, the field and its read site stand.
+	"dv_afterglow": {"name": "Afterglow", "payload": {"stat": {"afterglow_ranks": 20}}},
+	# FX: the payload the retired dv_covenant (Sacred Covenant) carried — the node is deleted, the field and its read site stand.
+	"dv_covenant": {"name": "Sacred Covenant",
+		"payload": {"stat": {"covenant_heal": 25, "covenant_faith": 2}}},
+}
 
 # Every heal term `faith_report_line` prints, and the site that must write it.
 const HEAL_TERMS := ["release", "growth", "blessed", "afterglow", "pulse",
@@ -80,7 +114,8 @@ func _run() -> void:
 
 	_ids_are_disjoint()
 	_harness_is_per_hero()
-	_faith_lane_shape()
+	# `_faith_lane_shape` (§2, two checks) was DELETED at FX — see its record
+	# where the function stood.
 	_report_line_empty()
 	_report_line_terms()
 	_one_booking_door()
@@ -147,9 +182,34 @@ func _spawn(specs: Array, learned := {}, learner := 2,
 	# A test that reads an exact HEAL must pin `healing_received_mult`, or the
 	# Cleric class passive silently inflates every number it reads. And `_stat`
 	# only banks into `sim_stats` while `sim` is true.
-	return await Fixture.spawn(self, specs,
-		{"enemies": lineup, "talents": {learner: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "heal_mult": 1.0, "sim": true})
+	# BATCH FX: a learned node the one tree does not hold rides in on the
+	# learner's tree with its retired payload; the fixture writes `patch` after
+	# the member is built, so the spawn applies it.
+	var opts := {"enemies": lineup, "talents": {learner: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "heal_mult": 1.0, "sim": true}
+	if not learned.is_empty():
+		opts["patch"] = {learner: {"tree": _fx_tree(learned)}}
+	return await Fixture.spawn(self, specs, opts)
+
+
+# The live tree, plus every learned node it no longer holds, carried with the
+# exact payload FX_RETIRED records. A learned id that is neither is a FAILURE
+# rather than a silent no-op: it would learn nothing, and every check reading
+# its field would read the field's zero as if the node had been measured.
+func _fx_tree(learned: Dictionary) -> Array:
+	var tree: Array = Talents.tree()
+	for id in learned:
+		var sid := String(id)
+		if not Talents.node_in_tree(tree, sid).is_empty():
+			continue
+		if not FX_RETIRED.has(sid):
+			checks += 1
+			fails.append("FX: `%s` is neither a live node nor a carried retired payload" % sid)
+			continue
+		var r: Dictionary = FX_RETIRED[sid]
+		tree.append({"id": sid, "name": String(r["name"]), "desc": "",
+			"payload": (r["payload"] as Dictionary).duplicate(true)})
+	return tree
 
 
 func _kill(scene: Node) -> void:
@@ -167,23 +227,27 @@ func _stat_of(scene: Node, key: String) -> float:
 # because no two trees share an id. If a later batch ever gave two specs a
 # node id in common, a one-spec flag string would quietly build two heroes.
 func _ids_are_disjoint() -> void:
-	var owner_of := {}
+	# BATCH FX RE-POINTED THIS TO THE ONE TREE. The twelve trees whose ids had
+	# to be disjoint are deleted; what is left is one tree of 27, and its ids
+	# still have to be unique for a reason of their own — `node_in_tree`
+	# answers the FIRST match, and the class ledger (`worn_learned`,
+	# `cells_spent`) keys on the id, so two nodes sharing one would be one cell
+	# with two payloads and one price. The harness half of the old reason has
+	# INVERTED rather than vanished, and `_live_flag_string_builds_one_hero`
+	# pins what it inverted to.
+	var seen := {}
 	var collisions: Array = []
 	var total := 0
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			var id := String(n["id"])
-			total += 1
-			if owner_of.has(id):
-				collisions.append(id)
-			owner_of[id] = spec
-	# BATCH BM: 27 nodes a tree, so 324. The PROPERTY the check exists for —
-	# that every id is disjoint, which is what makes a one-spec DOD_SIM_TALENTS
-	# string build exactly one hero — is unchanged.
-	ok(total == 324, "§0: twelve trees of 27 nodes = 324 ids (read %d)" % total)
+	for n in Talents.TREE:
+		var id := String(n["id"])
+		total += 1
+		if seen.has(id):
+			collisions.append(id)
+		seen[id] = true
+	ok(total == 27, "§0: the one tree holds 27 ids — three tiers of nine (read %d)" % total)
 	ok(collisions.is_empty(),
-		"§0: no node id appears in two trees (%s)" % ", ".join(collisions))
-	_report.append("§0: %d node ids across twelve trees, %d collisions" % [
+		"§0: no node id appears twice in the one tree (%s)" % ", ".join(collisions))
+	_report.append("§0: %d node ids in the one tree, %d collisions" % [
 		total, collisions.size()])
 
 
@@ -205,28 +269,16 @@ func _harness_is_per_hero() -> void:
 		"§0: the force-learn is inside the per-hero spawn loop")
 
 
-func _faith_lane_shape() -> void:
-	var tree: Array = Talents.LANE_TREES["inquisitor"]
-	var lane: Array = []
-	for n in tree:
-		if String(n.get("lane", "")) == "Faith":
-			lane.append(String(n["id"]))
-	# BATCH BM RE-POINTED THIS IN PLACE: the grid is keyed on the EIGHT nodes
-	# that existed when it was measured, and BM added a ninth (Creed, row 8).
-	# The check asserts the eight are still there IN ORDER — which is what
-	# makes every historical cell comparable — rather than that the lane holds
-	# nothing else.
-	var kept: Array = []
-	for id in lane:
-		if FAITH_LANE.has(id):
-			kept.append(id)
-	ok(kept == FAITH_LANE,
-		"§2: the FAITH lane still holds the eight nodes the table names, in order")
-	# The table is a leave-ONE-out grid: eight rows, eight nodes.
-	# BATCH BM added a row-8 node to every lane, so FAITH is NINE now (the
-	# eight the grid was keyed on, plus Creed). The leave-one-out table below
-	# is keyed on the ORIGINAL EIGHT and stays comparable for that reason.
-	ok(lane.size() == 9, "§2: nine FAITH nodes = eight rows plus the shelf")
+# §2 — `_faith_lane_shape` — DELETED AT BATCH FX, TWO CHECKS, WITH ITS SUBJECT
+# (DG §2). It asked (1) whether the Devout's FAITH lane still held the eight
+# nodes the leave-one-out table names, in row order, and (2) whether the lane
+# was nine nodes — the eight plus BM's row-8 Creed. FX deleted the twelve spec
+# trees, the Devout's lane with them, and all nine of those nodes: there is no
+# lane left for either question to be asked of, and the one tree has no lanes
+# at all. THE TABLE IS HISTORY NOW, not a stale grid a re-spec could quietly
+# invalidate — CLAUDE.md's leave-one-out block is RETIRED WITH ITS SUBJECT AT
+# FX in the same words. The eight ids survive in `FAITH_LANE` because §0 still
+# drives them, and what the harness builds from them now is pinned there.
 
 
 # ---------- §1: the report line ----------
@@ -413,25 +465,39 @@ func _report_line_is_shared() -> void:
 # party builds the Devout and nobody else. THIS IS THE FINDING, so it is pinned
 # — if a later batch changes the harness, the historical rows stop meaning what
 # this batch says they mean and the test says so.
+#
+# BATCH FX RE-POINTED THIS IN PLACE, AND THE FINDING INVERTED. The harness is
+# unchanged — it walks every hero and keeps the ids present in that hero's own
+# tree — but every hero's own tree is now THE SAME tree, keyed to the class. So
+# a flag string is no longer one-spec by construction: an id of the one tree
+# builds EVERY hero, and each of the four is asserted to learn every id of it
+# (where the Devout alone learned the FAITH eight and the other three nothing).
+# And the pre-FX strings the historical rows were measured with — the FAITH
+# eight and BC's four-lane repair — now build NO hero at all, because the
+# harness drops an id no tree holds. That is the record worth pinning: a lane
+# row cannot be re-run on this tree, and the harness says nothing when asked to.
 func _live_flag_string_builds_one_hero() -> void:
 	var party := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 	var keys := ["warrior", "mage", "cleric", "hunter"]
+	var one_tree: Array = []
+	for t in Talents.TREE:
+		one_tree.append(String(t["id"]))
 	var built := 0
 	for i in party.size():
 		var tree := Talents.generate_tree(party[i], keys[i])
 		var n := 0
-		for id in FAITH_LANE:
+		for id in one_tree:
 			if not Talents.node_in_tree(tree, id).is_empty():
 				n += 1
 		if n > 0:
 			built += 1
-		if party[i] == "inquisitor":
-			ok(n == 8, "§0: the Devout learns all eight FAITH nodes")
-		else:
-			ok(n == 0, "§0: %s learns nothing from a FAITH flag string" % party[i])
-	ok(built == 1, "§0: ONE hero of four is built by a one-spec flag string")
-	# And the repair is a FLAGS change, not a harness change: name every lane
-	# and every hero builds.
+		ok(n == one_tree.size(),
+			"§0 (FX): %s learns every id of a one-tree flag string (%d of %d)" % [
+				party[i], n, one_tree.size()])
+	ok(built == 4, "§0 (FX): EVERY hero of four is built by one flag string — one tree, keyed to the class")
+	# The flag strings every historical row was measured with. BC's repair was
+	# a FLAGS change — name every lane and every hero builds — and against the
+	# one tree it builds nobody: not one of its ids is held by any hero's tree.
 	var four_lanes: Array = FAITH_LANE.duplicate()
 	for id in ["bz_savagery", "bz_hemorrhage", "bz_crushing_blows"]:
 		four_lanes.append(id)
@@ -446,7 +512,8 @@ func _live_flag_string_builds_one_hero() -> void:
 			if not Talents.node_in_tree(tree, String(id)).is_empty():
 				built4 += 1
 				break
-	ok(built4 == 4, "§0: a four-lane flag string builds all four heroes")
+	ok(built4 == 0,
+		"§0 (FX): a pre-FX four-lane flag string builds NO hero — every lane row is irreproducible (%d built)" % built4)
 	_live_ran += 1
 
 
@@ -520,8 +587,12 @@ func _live_devoutness_break_is_counted() -> void:
 	# dv_devoutness (Faith row 3): the party takes 20% less Break damage. It
 	# was counted NOWHERE — not in `prev_hero_`, correctly, and not anywhere
 	# else, which is the gap.
+	# BATCH FX: Devoutness is deleted, and its precedent-mapped node We Do Not
+	# Break (`tn_unbreaking`) writes the SAME field at the SAME magnitude —
+	# devoutness_ranks 20 — so the live node is learned rather than an inline
+	# payload. The spawn stamps the party blanket off it exactly as it did.
 	var scene := await _spawn(["berserker", "cryomancer", "inquisitor",
-		"beastmaster"], {"dv_devoutness": 1})
+		"beastmaster"], {"tn_unbreaking": 1})
 	var dv := _devout(scene)
 	var war: BattleUnit = scene.get("heroes")[0]
 	if dv != null:

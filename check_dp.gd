@@ -20,8 +20,21 @@
 # **THE TOLERATED PAIRS ARE NAMED WITH THEIR REASONS, AND THE RATCHET IS
 # ASYMMETRIC ON PURPOSE** (`baselines.json`'s own rule, one layer up): a pair
 # that is NOT in `KNOWN_PAIRS` is an ERROR, because it is a new bet; a known
-# pair that has GONE is a NOTICE, because that is a repair. Four of the six
-# tolerated pairs are instrument artefacts rather than bets and each says so.
+# pair that has GONE is a NOTICE, because that is a repair. At DP four of the
+# six tolerated pairs were instrument artefacts rather than bets, and each said so.
+#
+# **BATCH FX — THE POPULATION IS THE ONE TREE, WORN BY EVERY SPEC.** The twelve
+# spec trees are deleted and `Talents.generate_tree` hands every spec with a
+# class the same twenty-seven stat nodes, so §1 sweeps that tree once per spec
+# against THAT spec's guarantees — the property is unchanged, because a node
+# reading a status is still a bet for exactly the specs that cannot apply it.
+# The table is two rows now: No Cover's immunity pair moved to its
+# precedent-mapped successor (`tn_no_miss`, the same field and clause) and names
+# no spec; the other four rows retired with their nodes. **§2 AND FOUR OF §1's
+# CHECKS ARE DELETED UNDER DG §2 — SEVENTEEN IN ALL, RECORDED AT THE SITE** —
+# because the four Madness cells they asked about exist nowhere; §3, which pins
+# the READ SITES those cells moved, is untouched and still asks. §1 gained ONE
+# positive arm: the sweep must read a non-empty population.
 #
 # **IT READS `check_do`'s TABLES RATHER THAN COPYING THEM.** `GUARANTEED_STATUS`
 # and `STATUS_FORMS` are hand-authored maps of what each spec can reach without
@@ -40,41 +53,37 @@ extends SceneTree
 var checks := 0
 var fails := 0
 
-# WHERE EACH RE-POINTED CELL SITS, AND WHAT RUIN QUANTITY IT NOW READS.
-# The lane and row are asserted rather than derived: "no cell moves row or
-# lane" is this batch's own promise, and `Talents.cells_spent` prices a cell off
-# the row it CURRENTLY sits in — DN measured a move driving a full Berserker
-# ledger to -2 available points, silently, with nothing to refuse or log it.
-#
-# THE FOURTH COLUMN IS THE ANSWER TO "REPORT HOW THE FOUR DIFFER FROM EACH
-# OTHER". Four cells all reading "stacks of Ruin" would have flattened a lane
-# that was authored as a theme into one idea repeated four times. NONE OF THE
-# FOUR READS A DETONATION, and that is deliberate: Grim Focus (Ruin 5),
-# Unraveling (Ruin 7) and Avatar of Ruin (Ruin 9) already own that event.
-const REPOINTED := {
-	"oc_spread": ["Madness", 1, "APPLICATION (probabilistic) — a landing mark leaps"],
-	"oc_whispers": ["Madness", 2, "APPLICATION MAGNITUDE — how deep each mark bites"],
-	"oc_delirium": ["Madness", 5, "EVENT — an enemy-on-enemy strike, converted to Ruin"],
-	"oc_permanent": ["Madness", 8, "STACK COUNT — a depth threshold"],
-}
+# WHERE EACH RE-POINTED CELL SAT — THE TABLE IS DELETED AT BATCH FX, WITH THE
+# CELLS. It held DP's four Madness cells — `oc_spread` (row 1, an APPLICATION),
+# `oc_whispers` (row 2, an application MAGNITUDE), `oc_delirium` (row 5, an
+# EVENT) and `oc_permanent` (row 8, a STACK COUNT) — with the lane and row each
+# had to keep because `cells_spent` priced a cell off its ROW, and the four
+# distinct Ruin quantities that kept the lane from flattening. None of the four
+# exists after FX, so the table would describe nothing; what it fed is recorded
+# where §2 stood.
 
 # THE PAIRS §1 TOLERATES. A pair only matters if the status has NO guaranteed
-# source, and FOUR OF THESE SIX ARE NOT BETS AT ALL — the instrument matches a
-# rendered WORD, so it cannot tell a node reading a status from a node applying
-# one, nor an enemy's debuff landing on the HERO from the hero's landing on an
-# enemy. Every entry carries which of the three it is.
+# source. The instrument matches a rendered WORD, so it cannot tell a node
+# reading a status from a node applying one, nor an enemy's debuff landing on
+# the HERO from the hero's landing on an enemy. Every entry carries which of the
+# three it is.
+#
+# **BATCH FX — A KEY MAY NAME `*` FOR ITS SPEC.** The one tree is worn by EVERY
+# spec, so a node reading a status now appears once per spec that cannot apply
+# it. A row whose reason holds whatever the wearer — an IMMUNITY's does — says
+# `*`; a row that is a bet for some specs and not others still names its spec.
+#
+# **FOUR ROWS RETIRED WITH THEIR NODES AT FX**, and they were rows, not checks,
+# so no count moved: `swordmaster/sm_guarded/cripple` and `.../exposed` (Off
+# Balance's Punishment clause — a real bet, and a bonus clause),
+# `mystic/sv_virulence/exposed` (Distillate, its own source) and
+# `sharpshooter/ss_exposed_nerve/exposed` (Exposed Nerve, its own source). None
+# of those three nodes exists in the one tree or anywhere else. The fifth and
+# sixth rows were No Cover's, and they moved to its successor below.
 const KNOWN_PAIRS := {
-	"swordmaster/sm_guarded/cripple":
-		"A REAL BET, AND A BONUS CLAUSE. Off Balance pays against BROKEN unconditionally; the Exposed/Crippled half is gated on `sm_punish`, a TREE-INTERNAL condition the charter permits, and the Swordmaster's core declares only `stunned` (Pommel Strike). The node cannot go dead — only that clause can.",
-	"swordmaster/sm_guarded/exposed":
-		"The same clause and the same reasoning as its Crippled half.",
-	"mystic/sv_virulence/exposed":
-		"NOT A BET — THE NODE IS ITS OWN SOURCE. Distillate's first clause APPLIES Exposed ('Your Poison applications add +N extra stacks and apply Exposed for 3 turns'); there is nothing here it does not supply itself.",
-	"sharpshooter/ss_exposed_nerve/exposed":
-		"NOT A BET — THE NODE IS ITS OWN SOURCE. Exposed Nerve applies Exposed on a critical hit and then pays out against Exposed enemies. Clause one is the source of what clause two reads.",
-	"sharpshooter/ss_no_cover/dazed":
-		"NOT A BET, AND NOT A PAYOFF. No Cover is an IMMUNITY: Blind and Dazed are read on the HERO, applied by ENEMIES. 'Who applies it' has a different answer here than anywhere else in this sweep.",
-	"sharpshooter/ss_no_cover/blind":
+	"*/tn_no_miss/dazed":
+		"NOT A BET, AND NOT A PAYOFF. You Cannot Miss is an IMMUNITY: Blind and Dazed are read on the HERO, applied by ENEMIES. 'Who applies it' has a different answer here than anywhere else in this sweep. (No Cover's row until FX: `tn_no_miss` is its precedent-mapped successor — the same `no_cover` field, the same clause — and every spec wears it.)",
+	"*/tn_no_miss/blind":
 		"NOT A BET — the other half of the same immunity.",
 }
 
@@ -117,12 +126,25 @@ func _code_of(path: String) -> String:
 	return body
 
 
-func _node(nid: String) -> Dictionary:
-	for spec in Talents.LANE_TREES:
-		for n in Talents.LANE_TREES[spec]:
-			if String(n["id"]) == nid:
-				return n
-	return {}
+# A LIVE PAIR IS KNOWN IF ITS ROW MATCHES EXACTLY, OR ON THE `*` ROW FOR ITS
+# NODE AND STATUS — see KNOWN_PAIRS. (BATCH FX; this replaces the lookup that
+# found a node by id across the twelve deleted trees.)
+func _known(key: String) -> bool:
+	if KNOWN_PAIRS.has(key):
+		return true
+	var parts := key.split("/")
+	return parts.size() == 3 and KNOWN_PAIRS.has("*/%s/%s" % [parts[1], parts[2]])
+
+
+# Is a known row still matched by some live pair? The NOTICE direction.
+func _row_live(row: String, live: Dictionary) -> bool:
+	if not row.begins_with("*/"):
+		return live.has(row)
+	var tail := row.substr(1)
+	for k in live:
+		if String(k).ends_with(tail):
+			return true
+	return false
 
 
 # ---------------- §1 — THE PROPERTY, AND THE COUNT BESIDE IT ----------------
@@ -138,11 +160,21 @@ func _s1_property() -> void:
 	ok(not forms.is_empty() and not guaranteed_by_spec.is_empty(),
 		"the loaded tables are empty — the sweep would be vacuously green")
 
+	# BATCH FX — EACH SPEC'S TREE IS THE ONE TREE, asked for through the
+	# unchanged `generate_tree` door every caller uses and swept against THAT
+	# spec's guarantees, because one node can be a bet for one spec and not for
+	# another. The property is unchanged; only the population moved.
 	var live: Dictionary = {}
 	var nodes := 0
-	for spec in Talents.LANE_TREES:
+	var specs := 0
+	for spec in Classes.all_specs():
+		var tree_nodes: Array = Talents.generate_tree(String(spec),
+			Classes.class_of_spec(String(spec)))
+		if tree_nodes.is_empty():
+			continue
+		specs += 1
 		var guaranteed: Dictionary = guaranteed_by_spec.get(spec, {})
-		for n in Talents.LANE_TREES[spec]:
+		for n in tree_nodes:
 			nodes += 1
 			var text := Talents.desc_for(n, 1)
 			for sid in forms:
@@ -152,66 +184,63 @@ func _s1_property() -> void:
 					if _bounded(text, String(form)):
 						live["%s/%s/%s" % [spec, String(n["id"]), sid]] = true
 						break
+	# THE POSITIVE ARM, ADDED AT FX WITH THE POPULATION IT GUARDS. The sweep read
+	# twelve hand-authored trees; it now reads one 27-node tree through
+	# `generate_tree`, and a door that handed every spec an empty tree would
+	# leave the negative arm below green on nothing at all.
+	ok(nodes > 0,
+		"§1 read no talent node — `generate_tree` handed every spec an empty tree, so the property below is vacuously green")
 	var fresh: Array = []
 	for key in live:
-		if not KNOWN_PAIRS.has(key):
+		if not _known(String(key)):
 			fresh.append(String(key))
 	fresh.sort()
 	for f in fresh:
 		ok(false, "%s reads a status with no guaranteed applier — a NEW bet on the draw" % f)
 	ok(fresh.is_empty(),
-		"no talent node reads a status its spec cannot guarantee, outside the named six")
+		"no talent node reads a status its spec cannot guarantee, outside the named pairs")
 	# THE OTHER DIRECTION IS A NOTICE, NOT AN ASSERTION: a known pair going
 	# quiet is a REPAIR, and a gate that reds on a repair teaches the next
 	# batch to leave the defect alone.
 	var healed: Array = []
 	for key2 in KNOWN_PAIRS:
-		if not live.has(key2):
+		if not _row_live(String(key2), live):
 			healed.append(String(key2))
 	healed.sort()
 	for h in healed:
 		print("    NOTICE: `%s` is no longer live — a pair was repaired; retire its row." % h)
-	print("  %d nodes swept; %d live pairs, %d tolerated and named, %d new" % [
-		nodes, live.size(), live.size() - fresh.size(), fresh.size()])
-	for key3 in live:
-		var mark := "known" if KNOWN_PAIRS.has(key3) else "NEW"
+	print("  %d nodes swept across %d specs; %d live pairs, %d tolerated and named, %d new" % [
+		nodes, specs, live.size(), live.size() - fresh.size(), fresh.size()])
+	var keys: Array = live.keys()
+	keys.sort()
+	for key3 in keys:
+		var mark := "known" if _known(String(key3)) else "NEW"
 		print("    %-42s %s" % [String(key3), mark])
-	# AND THE BATCH'S OWN PROPERTY: not one of the four is in that set any more.
-	for nid in REPOINTED:
-		var still: Array = []
-		for key4 in live:
-			if String(key4).contains("/" + nid + "/"):
-				still.append(String(key4))
-		ok(still.is_empty(),
-			"`%s` still reads a status off the draw: %s" % [nid, ", ".join(still)])
+	# FOUR CHECKS STOOD HERE AND ARE DELETED AT BATCH FX UNDER DG §2 — counted
+	# with §2's thirteen where §2 stood. Each asked that one of DP's four
+	# re-pointed Madness cells (`oc_spread`, `oc_whispers`, `oc_delirium`,
+	# `oc_permanent`) no longer appeared in the live set. The four nodes are
+	# deleted, so the question has no subject; the property above covers every
+	# node that does exist.
 
 
-# ---------------- §2 — THE FOUR CELLS, WHERE THEY WERE ----------------
-func _s2_cells() -> void:
-	print("\n§2 — the four re-pointed cells, and what each one reads")
-	for nid in REPOINTED:
-		var want: Array = REPOINTED[nid]
-		var n := _node(nid)
-		ok(not n.is_empty(), "re-pointed cell `%s` no longer exists" % nid)
-		if n.is_empty():
-			continue
-		ok(String(n["lane"]) == String(want[0]) and int(n["row"]) == int(want[1]),
-			"`%s` moved to %s/%d — it must stay at %s/%d (cells_spent prices off the ROW)" % [
-				nid, n["lane"], int(n["row"]), want[0], int(want[1])])
-		var text := Talents.desc_for(n, 1)
-		ok(_bounded(text, "Ruin"),
-			"`%s` does not name Ruin — the lane was re-pointed onto it (got: %s)" % [nid, text])
-		print("    %-14s %-9s row %d   reads %s" % [nid, want[0], int(want[1]), want[2]])
-	# THE LANE'S CHARACTER SURVIVED, ASSERTED RATHER THAN CLAIMED: four distinct
-	# reads, not one idea repeated four times.
-	var reads := {}
-	for nid2 in REPOINTED:
-		reads[String((REPOINTED[nid2] as Array)[2])] = true
-	ok(reads.size() == REPOINTED.size(),
-		"the four cells read %d distinct quantities, not %d — the lane flattened" % [
-			reads.size(), REPOINTED.size()])
-	print("  %d cells, %d distinct Ruin quantities read, 0 reading a detonation" % [
-		REPOINTED.size(), reads.size()])
+# ---------------- §2 — THE FOUR CELLS, WHERE THEY WERE — DELETED AT FX ------
+# **THIRTEEN CHECKS STOOD HERE AND ARE DELETED UNDER DG §2 — SEVENTEEN IN ALL,
+# WITH THE FOUR §1 ASKED OF THE SAME FOUR NODES.** DP §2 asserted that the four
+# Madness cells DP re-pointed onto Ruin — `oc_spread` (row 1), `oc_whispers`
+# (row 2), `oc_delirium` (row 5) and `oc_permanent` (row 8) — still existed (4);
+# still sat in their ORIGINAL lane and row, because `cells_spent` priced a cell
+# off its row (4); still named Ruin in their rendered text (4); and between them
+# read four DISTINCT quantities, so the lane had not flattened into one idea
+# repeated four times (1). **FX deleted the twelve spec trees**: none of the four
+# exists, the Occultist has no Madness lane, the one tree has no lanes and no
+# rows (`cells_spent` prices off the TIER now), and no node of it touches Ruin —
+# FX's line forbids a talent touching an engine. No live subject exists for any
+# of the thirteen to be re-pointed at.
+# **WHAT SURVIVES THEM IS §3, UNTOUCHED**: the fields those cells wrote
+# (`spread_ranks`/`spread_ruin`, `whispers_step`, `delirium_ranks`,
+# `broken_mind`) are dormant rather than deleted, and every read site DP moved
+# is still pinned there, so the half of DP that is about the GAME is still asked.
 
 
 # ---------------- §3 — THE READ SITES FOLLOWED THE TEXT ----------------
@@ -368,7 +397,8 @@ func _s6_recorded() -> void:
 func _initialize() -> void:
 	print("check_dp — the Madness lane comes off the draw")
 	_s1_property()
-	_s2_cells()
+	# §2 — deleted at BATCH FX with the four cells it asked about (DG §2); the
+	# record of what it asserted is where the section stood.
 	_s3_read_sites()
 	_s4_rune_coupling()
 	_s5_rune_grants()

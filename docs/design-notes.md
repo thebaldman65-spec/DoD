@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## One tree, and the two decisions that came with it without being asked for (Batch FX) — 2026-09-11
+
+The shape is the designer's, and FW's arithmetic is its reason: under the line nothing left is
+class-specific, so four trees of 81 would have been one list of about fifty ideas dealt four times.
+**What the batch owned was everything under the shape**, and two of those decisions were never in
+the brief as decisions at all.
+
+**The first is that buying became wearing.** BM's equip step existed to price one real choice: one
+node of three per row, so owning all three cells of a row made the row an argument. The one tree
+has no rows and the designer ruled no node exclusive, so an equip step would be a click that can
+only say yes. I did not simplify the loadout away because it was convenient; there was nothing left
+for it to choose between. I wrote that into `CLAUDE.md` as the reason, because the thing most
+likely to happen next is somebody re-adding an equip step as a "restoration" of BM, and without a
+constraint to choose against it restores nothing.
+
+**The second is that four of the brief's twenty-seven had to be swapped out, and the reason is the
+tree's population rather than any one node.** A class tree is bought by four classes, so a field
+read for one currency pays three quarters of the game nothing. *Regenerate more resource* pays no
+Warrior (Rage has no regeneration field) and no Mage (Evocation assigns over the field at the
+spawn, so the node is overwritten before turn one). *A Perfect pays* paid Mana, and only Mana.
+*Debuffs expire sooner* and *Elusive while afflicted* each have one field nearby, and each of those
+fields does something else: one moves buffs as well, the other pays when the hero afflicts. **A node
+that attaches and pays 1.0000 is this project's most common shipped defect**, and the brief said to
+build no hooks, so each place took an alternate from the brief's own list. The node that pays in
+the resource pool shows the other way through: it writes both the Rage field and the Mana field,
+and each hero is paid in the one he holds.
+
+**I took the precedents' numbers wherever a surviving node already said the thing** (18 of 27), and
+took four more from live nodes that FW's re-sort had not counted among the 43, calling those
+references rather than salvage. A precedent's number has been played against; a proposed one has
+not. **The five with no precedent carry a number and the thing it was priced against**, and each is
+the designer's to re-rule. I did not want a reader to mistake one for a tuned value.
+
+**The spend minimum is a candidate, and 3 was derived rather than chosen.** It is the three nodes a
+hero used to wear in a tier (one per row, three rows to a tier), and it is exactly what one
+completed run banks. At 1 the gate is decoration. At 9 a class must buy tier 1 out before tier 2
+opens, and its first tier-3 node needs thirty points, about ten runs. **And none of it binds on the
+designer's own save**, which is the observation I would most want in front of me in their place:
+after the max fold the four purses are 65 to 68 against a 54-point tree, so every class can buy
+everything on the day the build lands. That is what taking the max of four debug grants of 60
+does. It is not a defect, but it means the playtest save cannot feel the gate the batch just built.
+
+**The thing I would keep from this batch is about the freeze, not the tree.** Two scene gates had
+re-saved the player's profile on every battery for many batches, with bytes identical to what was
+already there, so every md5 freeze read unchanged and every one was right to. The day the profile
+learned to fold on load, the same idempotent write replaced the designer's twelve purses with four
+in the reconnaissance run. The backup was taken and verified first, so nothing was lost, and both
+gates now write a scratch file. **But a hash proves the bytes did not change. It cannot prove that
+nothing wrote them**, and a write that has been invisible for a long time becomes destructive the
+moment the format under it changes, which is exactly the batch that most needs the file left alone.
+
 ## Two things that read like nothing, and one of them was a gate being cut in half (Batch FS) — 2026-09-09
 
 The brief called §1 a battery defect and said it was worse on a branch. Both halves are right, and

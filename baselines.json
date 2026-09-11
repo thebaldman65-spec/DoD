@@ -199,8 +199,8 @@
   "check_dk": {
    "kind": "gate",
    "checks": [
-    64,
-    64
+    60,
+    60
    ],
    "checks_obs": 1,
    "fails": [
@@ -208,7 +208,7 @@
     0
    ],
    "fails_obs": 1,
-   "note": "NEW AT DK. THE GATE FOR “four ally-worded effects reach the beast, and seven say hero because they cannot”. DJ §2 swept eleven ally-worded effects walking bare `heroes` and ruled on none; DK ruled, and they split FOUR and SEVEN. §1 pins BOTH populations by their own read lines and asserts each in the direction that can break it — a widened site going back to bare `heroes` is a REGRESSION, and a narrow site widening makes its `hero` text wrong. It also re-asserts that Harvest still spells its union out, because a receive-site's `dead` answer is not Harvest's. §2 IS THE LIVE HALF AND IT SUMMONS A REAL BEAR: Sanctuary heals it 1200 of a 10000 body, Hold the Line leaves it 20 Break from a 40-BD blow (exactly the base 50% cut) and holds it at 1 HP through a lethal one, Rally turns a 1000 heal into 1300, and the Field Medic's pool holds it once poisoned. SANCTUARY AND HOLD THE LINE ARE DRIVEN THROUGH `_resolve_special`; RALLY AND FIELD MEDIC LIVE INSIDE `_resolve`'s block branch and `_run_battle`'s turn-start block and cannot be called, so those evaluate the loop's own expression live — WHICH IS WHICH IS SAID RATHER THAN BLURRED. §2 ALSO CARRIES THE NEGATIVE CONTROL AND IT IS NOT OPTIONAL: the failure DK repairs was invisible in every battery ever run, so a check that passes on the fixed tree proves nothing. It empties `companions` for the length of one arm — precisely the pre-DK collection — and asserts the beast is untouched (Sanctuary heals it 0, Hold the Line leaves the full 40). §4 IS THE BATCH'S ACTUAL CARE: Tank and Spank was the fifth candidate to widen and was MEASURED instead. `empower` attaches to a companion cleanly and pays it nothing, because a beast's blows resolve through `_companion_hit`, its own damage path, which reads none of the hero strike loop's multipliers — 40 seeded blows read 34392 against 34392, ratio 1.0000. THE RULING IS PINNED AS THAT MEASUREMENT rather than as an assertion, so the day `_companion_hit` grows an `empower` read the gate says the ruling is stale instead of staying quietly true. §5 asserts the eleven texts — seven `hero`, four `ally` — in both directions, plus that no §2 text still carries its pre-DK wording. §6 asserts CV §4's false test is gone from CLAUDE.md, that master.html no longer flags Hold the Line as excluding companions, and that the glossary no longer lists Tank and Spank's Empower as an `ally` effect. Gate takes ~5s. ONE READING SUPPORTS THE 64."
+   "note": "**BATCH FX MOVED IT 64 -> 60:** 4 deleted: four deleted nodes' texts; their read sites stay pinned. NEW AT DK. THE GATE FOR “four ally-worded effects reach the beast, and seven say hero because they cannot”. DJ §2 swept eleven ally-worded effects walking bare `heroes` and ruled on none; DK ruled, and they split FOUR and SEVEN. §1 pins BOTH populations by their own read lines and asserts each in the direction that can break it — a widened site going back to bare `heroes` is a REGRESSION, and a narrow site widening makes its `hero` text wrong. It also re-asserts that Harvest still spells its union out, because a receive-site's `dead` answer is not Harvest's. §2 IS THE LIVE HALF AND IT SUMMONS A REAL BEAR: Sanctuary heals it 1200 of a 10000 body, Hold the Line leaves it 20 Break from a 40-BD blow (exactly the base 50% cut) and holds it at 1 HP through a lethal one, Rally turns a 1000 heal into 1300, and the Field Medic's pool holds it once poisoned. SANCTUARY AND HOLD THE LINE ARE DRIVEN THROUGH `_resolve_special`; RALLY AND FIELD MEDIC LIVE INSIDE `_resolve`'s block branch and `_run_battle`'s turn-start block and cannot be called, so those evaluate the loop's own expression live — WHICH IS WHICH IS SAID RATHER THAN BLURRED. §2 ALSO CARRIES THE NEGATIVE CONTROL AND IT IS NOT OPTIONAL: the failure DK repairs was invisible in every battery ever run, so a check that passes on the fixed tree proves nothing. It empties `companions` for the length of one arm — precisely the pre-DK collection — and asserts the beast is untouched (Sanctuary heals it 0, Hold the Line leaves the full 40). §4 IS THE BATCH'S ACTUAL CARE: Tank and Spank was the fifth candidate to widen and was MEASURED instead. `empower` attaches to a companion cleanly and pays it nothing, because a beast's blows resolve through `_companion_hit`, its own damage path, which reads none of the hero strike loop's multipliers — 40 seeded blows read 34392 against 34392, ratio 1.0000. THE RULING IS PINNED AS THAT MEASUREMENT rather than as an assertion, so the day `_companion_hit` grows an `empower` read the gate says the ruling is stale instead of staying quietly true. §5 asserts the eleven texts — seven `hero`, four `ally` — in both directions, plus that no §2 text still carries its pre-DK wording. §6 asserts CV §4's false test is gone from CLAUDE.md, that master.html no longer flags Hold the Line as excluding companions, and that the glossary no longer lists Tank and Spank's Empower as an `ally` effect. Gate takes ~5s. ONE READING SUPPORTS THE 64."
   },
   "check_dl": {
    "kind": "gate",
@@ -288,8 +288,8 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    181,
-    181
+    182,
+    182
    ],
    "checks_obs": 1,
    "fails": [
@@ -297,7 +297,7 @@
     0
    ],
    "fails_obs": 10,
-   "note": "**BATCH FT MOVED IT 180 -> 181, AND THE +1 IS `check_ft.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FT added one gate and edited two game scripts, which moves no file into or out of the population. **BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
+   "note": "**BATCH FX MOVED IT 181 -> 182:** check_fx.gd joined the population it parses. **BATCH FT MOVED IT 180 -> 181, AND THE +1 IS `check_ft.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FT added one gate and edited two game scripts, which moves no file into or out of the population. **BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
   },
   "harness_1": {
    "kind": "harness",
@@ -315,8 +315,8 @@
   "harness_2": {
    "kind": "harness",
    "checks": [
-    166,
-    166
+    382,
+    382
    ],
    "checks_obs": 9,
    "fails": [
@@ -324,7 +324,7 @@
     0
    ],
    "fails_obs": 31,
-   "note": "**SEEDED AT DX §2, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND NOT A FINDING.** Gate 2 walks three randomly GENERATED maps by taking `reachable()[0]` at every step and asserts each of six node types was crossed at least once; `test_run_harness.gd` called `seed()` ZERO times, and DW's acceptance went red on `the walk crossed a event`. **THIRTY SEEDED RUNS, THIRTY BYTE-IDENTICAL WALKS, 165 / 0 EVERY TIME**, plus this batch's battery. **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.** Over 400 unseeded walks the length is 49 every time and `fight`, `elite` and `miniboss` never approach zero — but **`blacksmith` reached ZERO once and `merchant` and `event` each came within one of it**, so THREE of the six types were at risk rather than the one that happened to fail, and the rate is well under DW's estimated 3% (2 observed in ~474 readings, counting DW's own and 40 clean standalone re-runs at HEAD). **THE ASSERTION IS NOT WIDENED** — the six being present is the question, so relaxing it to five would delete the check rather than repair it (DD's rule). **THE SEED IS TAKEN AT EVERY BOARD GENERATION RATHER THAN ONCE**: seeding once leaves zones 1 and 2 drawing off whatever the loop consumed before them, so one added RNG draw inside the walk would silently re-roll two of three boards; per-generation is `bo`'s per-pair seed one layer out. The three boards stay DIFFERENT from one another because `_generate_map` reads `zone_idx`. **NEGATIVE CONTROL: `seed(101)` misses `event` and fails gate 2 on DW's own assertion, reproduced on demand.** **`test_batch_at` §1 IS NOW THE ONLY ROW IN THIS FILE CARRYING A FLAKE FIELD.** **BATCH EE ADDED ONE CHECK, 165 -> 166**: gate 2's end-boss slice took `body.substr(body.find(\"# The end boss.\"))` with the locator unasserted, and the ONLY assertion on that slice is a NEGATIVE one — an empty slice satisfies it for every needle, in silence. The anchor is asserted now. It is a COMMENT in `battle.gd`, ED's fragile residency class, and `test_batch_bm` carried the same anchor with the same hole."
+   "note": "**BATCH FX MOVED IT 166 -> 382:** three checks per worn cell, and a member wears 27 cells now where it wore 9. **SEEDED AT DX §2, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND NOT A FINDING.** Gate 2 walks three randomly GENERATED maps by taking `reachable()[0]` at every step and asserts each of six node types was crossed at least once; `test_run_harness.gd` called `seed()` ZERO times, and DW's acceptance went red on `the walk crossed a event`. **THIRTY SEEDED RUNS, THIRTY BYTE-IDENTICAL WALKS, 165 / 0 EVERY TIME**, plus this batch's battery. **DW'S CHARACTERISATION WAS TOO NARROW IN BOTH HALVES.** Over 400 unseeded walks the length is 49 every time and `fight`, `elite` and `miniboss` never approach zero — but **`blacksmith` reached ZERO once and `merchant` and `event` each came within one of it**, so THREE of the six types were at risk rather than the one that happened to fail, and the rate is well under DW's estimated 3% (2 observed in ~474 readings, counting DW's own and 40 clean standalone re-runs at HEAD). **THE ASSERTION IS NOT WIDENED** — the six being present is the question, so relaxing it to five would delete the check rather than repair it (DD's rule). **THE SEED IS TAKEN AT EVERY BOARD GENERATION RATHER THAN ONCE**: seeding once leaves zones 1 and 2 drawing off whatever the loop consumed before them, so one added RNG draw inside the walk would silently re-roll two of three boards; per-generation is `bo`'s per-pair seed one layer out. The three boards stay DIFFERENT from one another because `_generate_map` reads `zone_idx`. **NEGATIVE CONTROL: `seed(101)` misses `event` and fails gate 2 on DW's own assertion, reproduced on demand.** **`test_batch_at` §1 IS NOW THE ONLY ROW IN THIS FILE CARRYING A FLAKE FIELD.** **BATCH EE ADDED ONE CHECK, 165 -> 166**: gate 2's end-boss slice took `body.substr(body.find(\"# The end boss.\"))` with the locator unasserted, and the ONLY assertion on that slice is a NEGATIVE one — an empty slice satisfies it for every needle, in silence. The anchor is asserted now. It is a COMMENT in `battle.gd`, ED's fragile residency class, and `test_batch_bm` carried the same anchor with the same hole."
   },
   "harness_3": {
    "kind": "harness",
@@ -370,8 +370,8 @@
   "test_batch_ai": {
    "kind": "suite",
    "checks": [
-    2219,
-    2219
+    228,
+    228
    ],
    "checks_obs": 1,
    "fails": [
@@ -379,13 +379,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. `owns_ability` used to be reachable two ways — the kit held the card, or a TALENT granted it. Only the EARNED path survives, so the probe earns the card; and the CONDITION KIND is asserted to have no payload user left in the trees (the three `owns_ability` riders were the only ones and all three were clause-cuts)."
+   "note": "**BATCH FX MOVED IT 2219 -> 228:** the shape walk asked its questions of twelve trees and asks them of the one tree now (27 nodes, 3 tiers); no question was deleted. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. `owns_ability` used to be reachable two ways — the kit held the card, or a TALENT granted it. Only the EARNED path survives, so the probe earns the card; and the CONDITION KIND is asserted to have no payload user left in the trees (the three `owns_ability` riders were the only ones and all three were clause-cuts)."
   },
   "test_batch_aj": {
    "kind": "suite",
    "checks": [
-    420,
-    420
+    213,
+    213
    ],
    "checks_obs": 1,
    "fails": [
@@ -393,13 +393,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. §6's grant-or-upgrade paths are INVERTED: the cells hand out nothing, the cards are drafted, and `battle_shout_node` / `rampage_upgraded` are asserted read-only-zero. The +2 is the Battle Shout card's ONE magnitude — +8% present, 18% absent — which closes the defect state.md has carried since DM."
+   "note": "**BATCH FX MOVED IT 420 -> 213:** 183 node-identity checks deleted with the twelve trees (grid, capstone, row/lane/name, id survival, scale renders); every mechanic check drives the retired payload inline. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. §6's grant-or-upgrade paths are INVERTED: the cells hand out nothing, the cards are drafted, and `battle_shout_node` / `rampage_upgraded` are asserted read-only-zero. The +2 is the Battle Shout card's ONE magnitude — +8% present, 18% absent — which closes the defect state.md has carried since DM."
   },
   "test_batch_ak": {
    "kind": "suite",
    "checks": [
-    496,
-    496
+    338,
+    338
    ],
    "checks_obs": 1,
    "fails": [
@@ -407,13 +407,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [529, 529] -> 495. -34. §2's class-pool resolve loop moved from `CLASS_POOLS` (61 names) to `CLASS_DRAFT_POOLS` (25). The stance-exclusion claim is re-pointed at the class-wide DRAFT, which is the live class-wide offer. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone. **EM MOVED IT 495 -> 496.** The Still Wrist rune writes `rune_swordsmanship_parry` now, so §7's two rune checks were repaired in place — the rune must pay ON ITS OWN and the pair must still sum to 0.20 — and a THIRD was added asserting the rune no longer writes the node's counter at all. **The LIVE arm did not move and is the one that mattered**: a rune-only Swordmaster still reads a 15%% perfect Guard Change, which is what a missed read-site edit would have taken to 10."
+   "note": "**BATCH FX MOVED IT 496 -> 338:** 161 node-identity checks deleted (layout, row, lane, name, capstone, kept-id; three tooltip prose checks); the per-node walk grew 24 to 27. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [529, 529] -> 495. -34. §2's class-pool resolve loop moved from `CLASS_POOLS` (61 names) to `CLASS_DRAFT_POOLS` (25). The stance-exclusion claim is re-pointed at the class-wide DRAFT, which is the live class-wide offer. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone. **EM MOVED IT 495 -> 496.** The Still Wrist rune writes `rune_swordsmanship_parry` now, so §7's two rune checks were repaired in place — the rune must pay ON ITS OWN and the pair must still sum to 0.20 — and a THIRD was added asserting the rune no longer writes the node's counter at all. **The LIVE arm did not move and is the one that mattered**: a rune-only Swordmaster still reads a 15%% perfect Guard Change, which is what a missed read-site edit would have taken to 10."
   },
   "test_batch_al": {
    "kind": "suite",
    "checks": [
-    623,
-    623
+    455,
+    455
    ],
    "checks_obs": 4,
    "fails": [
@@ -421,7 +421,7 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH FC MOVED IT 582 -> 583, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+1 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 583 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [559, 559] -> 561. +2. §5's `SPEC_POOLS` resolve loop walks 44 entries where it walked 42 — Holy's boss pool gained Dawnbreak and Sanctuary. **THIS ROW WAS PREDICTED UNCHANGED AND THE PREDICTION WAS WRONG**: DY's own table listed `al` as reading nothing DY touched, and it walks the BOSS pools. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH EZ MOVED IT 561 -> 582.** Its rune walk is per-entry and twenty-one entries arrived; no assertion changed. Three identical standalone readings of 582 / 0.  **BATCH FK MOVED IT 583 -> 622**: its loops walk the rune pool per entry, and thirty-nine entries were authored. **BATCH FO MOVED IT 622 -> 623, AND THE RISE IS ONE POOL ENTRY WALKED ONCE.** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
+   "note": "**BATCH FX MOVED IT 623 -> 455:** 171 node-identity checks deleted; the per-node walk grew 24 to 27; mechanic checks drive the retired payloads inline. **BATCH FC MOVED IT 582 -> 583, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+1 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 583 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [559, 559] -> 561. +2. §5's `SPEC_POOLS` resolve loop walks 44 entries where it walked 42 — Holy's boss pool gained Dawnbreak and Sanctuary. **THIS ROW WAS PREDICTED UNCHANGED AND THE PREDICTION WAS WRONG**: DY's own table listed `al` as reading nothing DY touched, and it walks the BOSS pools. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH EZ MOVED IT 561 -> 582.** Its rune walk is per-entry and twenty-one entries arrived; no assertion changed. Three identical standalone readings of 582 / 0.  **BATCH FK MOVED IT 583 -> 622**: its loops walk the rune pool per entry, and thirty-nine entries were authored. **BATCH FO MOVED IT 622 -> 623, AND THE RISE IS ONE POOL ENTRY WALKED ONCE.** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
   },
   "test_batch_an": {
    "kind": "suite",
@@ -440,8 +440,8 @@
   "test_batch_ar": {
    "kind": "suite",
    "checks": [
-    740,
-    740
+    512,
+    512
    ],
    "checks_obs": 1,
    "fails": [
@@ -449,13 +449,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [740, 740] -> 735. -5. The mage class-pool resolve loop moved from `CLASS_POOLS['mage']` (12) to `CLASS_DRAFT_POOLS['mage']` (7). Flame Shield's absence is asserted as `pool_ability() == null` now — the name is dead in EVERY pool, which is AR's real claim. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH FK MOVED IT 735 -> 740**: five `spec:pyromancer` runes joined the per-entry walk. `_overburn_refund`'s pinned call-site count did NOT move — the Pyre Debt and the Ember Leap live INSIDE that function and the Ashfall passes zero through the existing call."
+   "note": "**BATCH FX MOVED IT 740 -> 512:** 235 deleted (shape 76, node table 72, magnitudes 82, defence lane 5), 7 added (migration drops retired ids and keeps a live cell; dormant-field read sites). **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [740, 740] -> 735. -5. The mage class-pool resolve loop moved from `CLASS_POOLS['mage']` (12) to `CLASS_DRAFT_POOLS['mage']` (7). Flame Shield's absence is asserted as `pool_ability() == null` now — the name is dead in EVERY pool, which is AR's real claim. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH FK MOVED IT 735 -> 740**: five `spec:pyromancer` runes joined the per-entry walk. `_overburn_refund`'s pinned call-site count did NOT move — the Pyre Debt and the Ember Leap live INSIDE that function and the Ashfall passes zero through the existing call."
   },
   "test_batch_as": {
    "kind": "suite",
    "checks": [
-    399,
-    399
+    266,
+    266
    ],
    "checks_obs": 9,
    "fails": [
@@ -463,13 +463,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "DG §2 PREDICTION, WRITTEN BEFORE THE RUN. Two assertions DELETED — the deliberate, recorded exception to 'never delete an assertion': they pinned CLAUDE.md's EXCLUSIVE-PAIR LIST, which CW's split removed and whose strings exist nowhere in the repo or the archive, guarding a rule Batch AI had already retired to a bare `pass`. 396 -> 394 is the predicted fall; ANY OTHER SIZE MEANS SOMETHING ELSE WAS DELETED TOO. One sibling assertion in the same block is LEFT STANDING and passes VACUOUSLY (it reads a substring of a string that is now empty) — named at its site and carried in docs/state.md as owed, because six is the only sanctioned fall in this batch.  **BATCH FK MOVED the Cryomancer rune census 4 -> 9** (ET's four retired plus FK's five). The walk reads the FILE, retired included; the per-field assertions are the claim and the count is what catches a set going missing.  **BATCH FK MOVED IT 394 -> 399**: five `spec:cryomancer` runes joined the per-entry walk, and the Cryomancer census moved 4 -> 9 with them."
+   "note": "**BATCH FX MOVED IT 399 -> 266:** 138 deleted (shape 30, node table 72, magnitudes 31, rune lane tags 3, dissolved pair 2), 5 added. DG §2 PREDICTION, WRITTEN BEFORE THE RUN. Two assertions DELETED — the deliberate, recorded exception to 'never delete an assertion': they pinned CLAUDE.md's EXCLUSIVE-PAIR LIST, which CW's split removed and whose strings exist nowhere in the repo or the archive, guarding a rule Batch AI had already retired to a bare `pass`. 396 -> 394 is the predicted fall; ANY OTHER SIZE MEANS SOMETHING ELSE WAS DELETED TOO. One sibling assertion in the same block is LEFT STANDING and passes VACUOUSLY (it reads a substring of a string that is now empty) — named at its site and carried in docs/state.md as owed, because six is the only sanctioned fall in this batch.  **BATCH FK MOVED the Cryomancer rune census 4 -> 9** (ET's four retired plus FK's five). The walk reads the FILE, retired included; the per-field assertions are the claim and the count is what catches a set going missing.  **BATCH FK MOVED IT 394 -> 399**: five `spec:cryomancer` runes joined the per-entry walk, and the Cryomancer census moved 4 -> 9 with them."
   },
   "test_batch_at": {
    "kind": "suite",
    "checks": [
-    477,
-    477
+    352,
+    352
    ],
    "checks_obs": 17,
    "fails": [
@@ -477,13 +477,13 @@
     0
    ],
    "fails_obs": 19,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** **THE `flake` FIELD IS REMOVED AND THE FAILURE BAND TIGHTENED [0,1] -> [0,0]: DY §4 SEEDED §1's DAMAGE-CURVE PAIR AND IT SETTLED AT ZERO, SO IT WAS A FLAKE AND NOT A FINDING.** It is the LAST UNSEEDED flake in the project. **AND THE CENSUS WAS TWO ROWS, NOT ONE, WHICH THE RECORD GOT WRONG**: `docs/state.md` said `test_batch_at` was the only row still carrying a `flake` field, and `test_rune_battle` carries one too. Its field is KEPT deliberately — DF §0 seeded it at the site that flakes, but the recorded rate is a RACE UNDER MACHINE LOAD that a seed cannot fix. **So one row carries a `flake` field now and it is a seeded one.** Seeded PER-PAIR (DD's method, and literally the two lines the TAKEN loop twelve lines below has used since DD): both arms of a pair draw one identical stream, `_i` varies the draw across the ten pairs. **Six unseeded readings spanned 2.1189-2.2463; six seeded readings all read 2.1799**, against a band of 2.0-2.35 and a table value of 2.17. **THE BAND WAS NOT WIDENED — the band is the question.** The check count did not move: 467 over three standalone readings and battery 1. A seed is not an assertion.  **BATCH FK MOVED the Arcanist rune census 4 -> 9**, same reason.  **BATCH FK MOVED IT 467 -> 477**: five `spec:arcanist` runes joined the per-entry walk, and the Arcanist census moved 4 -> 9."
+   "note": "**BATCH FX MOVED IT 477 -> 352:** 130 deleted (shape 6, node table 72, magnitudes 52), 5 added. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** **THE `flake` FIELD IS REMOVED AND THE FAILURE BAND TIGHTENED [0,1] -> [0,0]: DY §4 SEEDED §1's DAMAGE-CURVE PAIR AND IT SETTLED AT ZERO, SO IT WAS A FLAKE AND NOT A FINDING.** It is the LAST UNSEEDED flake in the project. **AND THE CENSUS WAS TWO ROWS, NOT ONE, WHICH THE RECORD GOT WRONG**: `docs/state.md` said `test_batch_at` was the only row still carrying a `flake` field, and `test_rune_battle` carries one too. Its field is KEPT deliberately — DF §0 seeded it at the site that flakes, but the recorded rate is a RACE UNDER MACHINE LOAD that a seed cannot fix. **So one row carries a `flake` field now and it is a seeded one.** Seeded PER-PAIR (DD's method, and literally the two lines the TAKEN loop twelve lines below has used since DD): both arms of a pair draw one identical stream, `_i` varies the draw across the ten pairs. **Six unseeded readings spanned 2.1189-2.2463; six seeded readings all read 2.1799**, against a band of 2.0-2.35 and a table value of 2.17. **THE BAND WAS NOT WIDENED — the band is the question.** The check count did not move: 467 over three standalone readings and battery 1. A seed is not an assertion.  **BATCH FK MOVED the Arcanist rune census 4 -> 9**, same reason.  **BATCH FK MOVED IT 467 -> 477**: five `spec:arcanist` runes joined the per-entry walk, and the Arcanist census moved 4 -> 9."
   },
   "test_batch_au": {
    "kind": "suite",
    "checks": [
-    288,
-    288
+    278,
+    278
    ],
    "checks_obs": 1,
    "fails": [
@@ -491,13 +491,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [231, 231] -> 288. +57. §5's debug-grant control walked `CLASS_POOLS[class_of_spec(spec)]` — one list per spec, 12-18 names. It walks the SIBLING SPECS' own boss and draft pools now, which is what 'spec-foreign' always meant and is a wider set. A second assertion pins `class_pool()` itself DELETED, so the negative cannot be made false by re-adding the call. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH FX MOVED IT 288 -> 278:** 10 deleted: two capstones' payloads, lanes, shelf row, a name and three tooltips; the mechanic stays driven live. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [231, 231] -> 288. +57. §5's debug-grant control walked `CLASS_POOLS[class_of_spec(spec)]` — one list per spec, 12-18 names. It walks the SIBLING SPECS' own boss and draft pools now, which is what 'spec-foreign' always meant and is a wider set. A second assertion pins `class_pool()` itself DELETED, so the negative cannot be made false by re-adding the call. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_av": {
    "kind": "suite",
    "checks": [
-    356,
-    356
+    269,
+    269
    ],
    "checks_obs": 1,
    "fails": [
@@ -505,13 +505,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +26. §4's two authored fallbacks are inverted (no grant, no collision, no fallback) and the capstone-only loop widened to EVERY cell in the Holy tree, which is the population that is now uniform. `intercession_long` is asserted read-only-zero and its live branch driven from the suite rather than left unreachable.  **BATCH FK MOVED IT 351 -> 356**: five `spec:holy` runes joined the per-entry walk."
+   "note": "**BATCH FX MOVED IT 356 -> 269:** 87 node-identity checks deleted; precedent Last Hope asked of tn_last_hope; retired payloads inline. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +26. §4's two authored fallbacks are inverted (no grant, no collision, no fallback) and the capstone-only loop widened to EVERY cell in the Holy tree, which is the population that is now uniform. `intercession_long` is asserted read-only-zero and its live branch driven from the suite rather than left unreachable.  **BATCH FK MOVED IT 351 -> 356**: five `spec:holy` runes joined the per-entry walk."
   },
   "test_batch_aw": {
    "kind": "suite",
    "checks": [
-    355,
-    355
+    212,
+    212
    ],
    "checks_obs": 1,
    "fails": [
@@ -519,13 +519,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. Same inversion for the Devout's two. **CV'S RULING IS ASSERTED, NOT ASSUMED**: Bulwark of Fortitude's 5% party heal lives in `Classes.pending_talent_ability`, which DO did not open, and the suite now pins `{mhp:5}` on the card. AW's own capstone census is inverted too — it found NINE granting capstones against a brief that said one; it asserts ZERO now, over the whole layer rather than row 9.  **BATCH FK MOVED IT 351 -> 355**: four `spec:inquisitor` runes joined the per-entry walk. **FOUR AND NOT FIVE** — the Devout's fifth is owed; see `check_fk` §6 and `docs/reports/FK.md` §7."
+   "note": "**BATCH FX MOVED IT 355 -> 212:** 143 node-identity checks deleted; Devoutness and Unwavering Faith asked of tn_unbreaking and tn_health. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. Same inversion for the Devout's two. **CV'S RULING IS ASSERTED, NOT ASSUMED**: Bulwark of Fortitude's 5% party heal lives in `Classes.pending_talent_ability`, which DO did not open, and the suite now pins `{mhp:5}` on the card. AW's own capstone census is inverted too — it found NINE granting capstones against a brief that said one; it asserts ZERO now, over the whole layer rather than row 9.  **BATCH FK MOVED IT 351 -> 355**: four `spec:inquisitor` runes joined the per-entry walk. **FOUR AND NOT FIVE** — the Devout's fifth is owed; see `check_fk` §6 and `docs/reports/FK.md` §7."
   },
   "test_batch_ax": {
    "kind": "suite",
    "checks": [
-    356,
-    356
+    218,
+    218
    ],
    "checks_obs": 3,
    "fails": [
@@ -533,13 +533,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH FC MOVED IT 353 -> 356, AND THE +3 IS A REPAIR TO A CONTROL THAT WAS ALREADY TOO NARROW AT HEAD.** `_negative_control_source` read `substr(det_at, 2600)` of `_detonate_ruin`, **a function that was 2624 characters long before this batch touched anything** — 24 characters outside the control, shrinking with every line the function gains, and printing exactly as green at half coverage as at full. The body is DERIVED from the file's own declaration separator now (not from the next `func`: nine thousand characters of block comment sit between them). The +3 are the derivation's own assertions — the end is findable, the length is inside a band, and it holds exactly one function — so a window that becomes too narrow OR swallows the rest of the file is red rather than quiet. This is `instrument-rules.md`'s ED §2 rule paid, not a new one. **THREE IDENTICAL STANDALONE READINGS OF 356 / 0.**  |   BATCH DP: UNMOVED AT 348, AND THAT WAS PREDICTED. §3's `whispers_step` magnitude went 45 -> 2 and its tooltip needle followed the text; §5's three read-site needles followed their nodes onto Ruin. **§4's boss-rule block traded two checks for two**: `oc_spread` and `oc_whispers` were the last two nodes stating 'a boss resists until Broken' and they stated it because they modified PSYCHOSIS — re-pointed onto Ruin, which no boss resists, repeating it would be FALSE rather than redundant. What replaces it is stronger: the lane's row-8 cell is the EXCEPTION to the boss rule now, so it is the one node that must still name it, and naming a rule you are the exception to cannot be done vacuously. **EM MOVED IT 348 -> 350.** Spread of Madness sums its two halves into LOCALS at the read site, because the GUARD is what goes silently dead on an Occultist holding the Rune of the Whispering Dark and not the node. The two additive-units rows for it became four: the local AND the line that defines it, for each half. `entropy_ranks` is deliberately NOT re-keyed — it is one of the three drips with nothing underneath them — and its row is unchanged.  **BATCH EZ MOVED IT 352 -> 353, AND THE +1 IS A NEGATIVE CONTROL SPLIT IN TWO.** §1's lifesteal-cap check fingerprinted the read site as `RUIN_LEECH_CAP)` — the constant closing a `minf`. The Rune of the Standing Mark raises that CAP (40% -> 60%), so the site sums the constant with a rune-owned field into a local, exactly as `soul_leech_step + rune_soul_leech_step` does two lines above it. **THE FINGERPRINT MOVED AND THE PROPERTY DID NOT, AND IT IS ASSERTED MORE TIGHTLY THAN BEFORE**: the whole comment-stripped source may name the constant exactly TWICE — the `const` and the one read — where the old form allowed it anywhere else as long as one occurrence closed a paren. §6's negative control became two, because the cap's ASSEMBLY and its USE can now go missing separately. Three identical standalone readings of 353 / 0."
+   "note": "**BATCH FX MOVED IT 356 -> 218:** 138 node-identity checks deleted; Broken Will asked of tn_break; retired payloads inline. **BATCH FC MOVED IT 353 -> 356, AND THE +3 IS A REPAIR TO A CONTROL THAT WAS ALREADY TOO NARROW AT HEAD.** `_negative_control_source` read `substr(det_at, 2600)` of `_detonate_ruin`, **a function that was 2624 characters long before this batch touched anything** — 24 characters outside the control, shrinking with every line the function gains, and printing exactly as green at half coverage as at full. The body is DERIVED from the file's own declaration separator now (not from the next `func`: nine thousand characters of block comment sit between them). The +3 are the derivation's own assertions — the end is findable, the length is inside a band, and it holds exactly one function — so a window that becomes too narrow OR swallows the rest of the file is red rather than quiet. This is `instrument-rules.md`'s ED §2 rule paid, not a new one. **THREE IDENTICAL STANDALONE READINGS OF 356 / 0.**  |   BATCH DP: UNMOVED AT 348, AND THAT WAS PREDICTED. §3's `whispers_step` magnitude went 45 -> 2 and its tooltip needle followed the text; §5's three read-site needles followed their nodes onto Ruin. **§4's boss-rule block traded two checks for two**: `oc_spread` and `oc_whispers` were the last two nodes stating 'a boss resists until Broken' and they stated it because they modified PSYCHOSIS — re-pointed onto Ruin, which no boss resists, repeating it would be FALSE rather than redundant. What replaces it is stronger: the lane's row-8 cell is the EXCEPTION to the boss rule now, so it is the one node that must still name it, and naming a rule you are the exception to cannot be done vacuously. **EM MOVED IT 348 -> 350.** Spread of Madness sums its two halves into LOCALS at the read site, because the GUARD is what goes silently dead on an Occultist holding the Rune of the Whispering Dark and not the node. The two additive-units rows for it became four: the local AND the line that defines it, for each half. `entropy_ranks` is deliberately NOT re-keyed — it is one of the three drips with nothing underneath them — and its row is unchanged.  **BATCH EZ MOVED IT 352 -> 353, AND THE +1 IS A NEGATIVE CONTROL SPLIT IN TWO.** §1's lifesteal-cap check fingerprinted the read site as `RUIN_LEECH_CAP)` — the constant closing a `minf`. The Rune of the Standing Mark raises that CAP (40% -> 60%), so the site sums the constant with a rune-owned field into a local, exactly as `soul_leech_step + rune_soul_leech_step` does two lines above it. **THE FINGERPRINT MOVED AND THE PROPERTY DID NOT, AND IT IS ASSERTED MORE TIGHTLY THAN BEFORE**: the whole comment-stripped source may name the constant exactly TWICE — the `const` and the one read — where the old form allowed it anywhere else as long as one occurrence closed a paren. §6's negative control became two, because the cap's ASSEMBLY and its USE can now go missing separately. Three identical standalone readings of 353 / 0."
   },
   "test_batch_ay": {
    "kind": "suite",
    "checks": [
-    486,
-    486
+    405,
+    405
    ],
    "checks_obs": 1,
    "fails": [
@@ -547,26 +547,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. `bm_devoted_fury` and `bm_reserves` were the two nodes DN found DEAD without the draw — one sentence each about a `SPEC_POOLS` trophy. Both re-authored onto PROTECTED CORE, so each is asserted by its payload's `ability` target and by the ABSENCE of the stat it used to write."
+   "note": "**BATCH FX MOVED IT 486 -> 405:** 81 node-identity checks deleted (capstones, lane:row, BM magnitudes and renders, pairs); 24 id-survives checks inverted to the migration dropping them. BATCH DO PREDICTION, WRITTEN BEFORE THE ACCEPTANCE RUN. +2. `bm_devoted_fury` and `bm_reserves` were the two nodes DN found DEAD without the draw — one sentence each about a `SPEC_POOLS` trophy. Both re-authored onto PROTECTED CORE, so each is asserted by its payload's `ability` target and by the ABSENCE of the stat it used to write."
   },
   "test_batch_az": {
    "kind": "suite",
    "checks": [
-    519,
-    519
-   ],
-   "checks_obs": 9,
-   "fails": [
-    0,
-    0
-   ],
-   "fails_obs": 9
-  },
-  "test_batch_ba": {
-   "kind": "suite",
-   "checks": [
-    690,
-    690
+    450,
+    450
    ],
    "checks_obs": 9,
    "fails": [
@@ -574,13 +561,27 @@
     0
    ],
    "fails_obs": 9,
-   "note": "  **BATCH FK MOVED the `spec:mystic` rune census 4 -> 9**, same reason.  **BATCH FK MOVED the `spec:mystic` census 4 -> 9** and five runes joined the per-entry walk."
+   "note": "**BATCH FX MOVED IT 519 -> 450:** 69 node-identity checks deleted; the nine Sharpshooter precedents asked of their tn_ nodes."
+  },
+  "test_batch_ba": {
+   "kind": "suite",
+   "checks": [
+    635,
+    635
+   ],
+   "checks_obs": 9,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 9,
+   "note": "**BATCH FX MOVED IT 690 -> 635:** 55 deleted: 52 node-identity checks, and the 3 master.html pins on three deleted Survivalist names; three precedents asked of tn_health, tn_cleanse, tn_look_past.   **BATCH FK MOVED the `spec:mystic` rune census 4 -> 9**, same reason.  **BATCH FK MOVED the `spec:mystic` census 4 -> 9** and five runes joined the per-entry walk."
   },
   "test_batch_bb": {
    "kind": "suite",
    "checks": [
-    177,
-    177
+    173,
+    173
    ],
    "checks_obs": 9,
    "fails": [
@@ -588,20 +589,21 @@
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH FX MOVED IT 177 -> 173:** 4 deleted: the node texts of The Pack and Creeping Death; the glossary pins re-pointed to the new wording. Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bc": {
    "kind": "suite",
    "checks": [
-    91,
-    91
+    89,
+    89
    ],
    "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": "**BATCH FX MOVED IT 91 -> 89:** 2 deleted: the Faith lane's shape; the flag-string check inverted."
   },
   "test_batch_bd": {
    "kind": "suite",
@@ -620,21 +622,8 @@
   "test_batch_be": {
    "kind": "suite",
    "checks": [
-    34,
-    34
-   ],
-   "checks_obs": 9,
-   "fails": [
-    0,
-    0
-   ],
-   "fails_obs": 9
-  },
-  "test_batch_bf": {
-   "kind": "suite",
-   "checks": [
-    79,
-    79
+    27,
+    27
    ],
    "checks_obs": 9,
    "fails": [
@@ -642,28 +631,43 @@
     0
    ],
    "fails_obs": 9,
-   "note": "  **BATCH FK MOVED §2's Communion pin and made it two arms.** The Rune of the Fourth Stack moves `FAITH_RELEASE`, so the walk gates on a local — the pin names the local AND asserts it is DERIVED from the named constant, so a batch replacing the derivation with a digit is still caught. One check more.  **BATCH FK MOVED §2's Communion pin and made it two arms.** The Rune of the Fourth Stack moves `FAITH_RELEASE`, so the walk gates on a local — the pin names the local AND asserts it is DERIVED from the named constant, so a batch replacing the derivation with a digit is still caught."
+   "note": "**BATCH FX MOVED IT 34 -> 27:** 7 deleted: Communion's lane, payload, scale, row, rank and tooltip."
   },
-  "test_batch_bg": {
+  "test_batch_bf": {
    "kind": "suite",
    "checks": [
-    47,
-    47
+    74,
+    74
    ],
    "checks_obs": 9,
    "fails": [
     0,
     0
    ],
-   "fails_obs": 9
+   "fails_obs": 9,
+   "note": "**BATCH FX MOVED IT 79 -> 74:** 5 deleted: Communion's pay and four tooltip checks.   **BATCH FK MOVED §2's Communion pin and made it two arms.** The Rune of the Fourth Stack moves `FAITH_RELEASE`, so the walk gates on a local — the pin names the local AND asserts it is DERIVED from the named constant, so a batch replacing the derivation with a digit is still caught. One check more.  **BATCH FK MOVED §2's Communion pin and made it two arms.** The Rune of the Fourth Stack moves `FAITH_RELEASE`, so the walk gates on a local — the pin names the local AND asserts it is DERIVED from the named constant, so a batch replacing the derivation with a digit is still caught."
+  },
+  "test_batch_bg": {
+   "kind": "suite",
+   "checks": [
+    41,
+    41
+   ],
+   "checks_obs": 9,
+   "fails": [
+    0,
+    0
+   ],
+   "fails_obs": 9,
+   "note": "**BATCH FX MOVED IT 47 -> 41:** 6 deleted: Apostle's presence, text, lane, row and payload key; the passive is asked not to name Apostle or Fervor."
   },
   "test_batch_bh": {
    "kind": "suite",
    "checks": [
-    295,
-    295
+    280,
+    280
    ],
-   "note": "**BATCH FC MOVED IT 254 -> 255, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+1 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 255 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH EZ MOVED IT 233 -> 254**, and this row carried no note until now. The rise is a per-entry rune loop over a pool that went 65 -> 86 — the same shape as `test_batch_al`'s and `test_batch_cb`'s — and no assertion in the suite changed. Three identical standalone readings of 254 / 0.  **BATCH FK MOVED IT 255 -> 294**: its Faith walks are per-rune and four `spec:inquisitor` entries were authored. **BATCH FO MOVED IT 294 -> 295, AND THE RISE IS ONE POOL ENTRY WALKED ONCE.** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**",
+   "note": "**BATCH FX MOVED IT 295 -> 280:** 15 deleted: what four deleted Faith nodes were (Fervor, Oath, Communion, Covenant). **BATCH FC MOVED IT 254 -> 255, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+1 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 255 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH EZ MOVED IT 233 -> 254**, and this row carried no note until now. The rise is a per-entry rune loop over a pool that went 65 -> 86 — the same shape as `test_batch_al`'s and `test_batch_cb`'s — and no assertion in the suite changed. Three identical standalone readings of 254 / 0.  **BATCH FK MOVED IT 255 -> 294**: its Faith walks are per-rune and four `spec:inquisitor` entries were authored. **BATCH FO MOVED IT 294 -> 295, AND THE RISE IS ONE POOL ENTRY WALKED ONCE.** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**",
    "checks_obs": 4,
    "fails": [
     0,
@@ -674,8 +678,8 @@
   "test_batch_bi": {
    "kind": "suite",
    "checks": [
-    92,
-    92
+    88,
+    88
    ],
    "checks_obs": 9,
    "fails": [
@@ -683,13 +687,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "  **BATCH FK MOVED §2's absorb call-site pin and made it two arms.** The Deep Absorb adds to the rate and the Bare Altar doubles it, so the call passes a local; the section's own claim (every caller NAMES ITS SOURCE) is unmoved and the derivation from `FAITH_PER_ABSORB` is asserted separately. One check more.  **BATCH FK MOVED §2's absorb call-site pin and made it two arms.** The Deep Absorb adds to the rate and the Bare Altar doubles it, so the call passes a local; the section's own claim (every caller NAMES ITS SOURCE) is unmoved and the derivation from `FAITH_PER_ABSORB` is asserted separately."
+   "note": "**BATCH FX MOVED IT 92 -> 88:** 4 deleted: Fervor's and Apostle's texts.   **BATCH FK MOVED §2's absorb call-site pin and made it two arms.** The Deep Absorb adds to the rate and the Bare Altar doubles it, so the call passes a local; the section's own claim (every caller NAMES ITS SOURCE) is unmoved and the derivation from `FAITH_PER_ABSORB` is asserted separately. One check more.  **BATCH FK MOVED §2's absorb call-site pin and made it two arms.** The Deep Absorb adds to the rate and the Bare Altar doubles it, so the call passes a local; the section's own claim (every caller NAMES ITS SOURCE) is unmoved and the derivation from `FAITH_PER_ABSORB` is asserted separately."
   },
   "test_batch_bj": {
    "kind": "suite",
    "checks": [
-    73,
-    73
+    70,
+    70
    ],
    "checks_obs": 1,
    "fails": [
@@ -697,7 +701,7 @@
     0
    ],
    "fails_obs": 10,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [67, 67] -> 73. +6. §1's dead-symbol KEEP for `CLASS_POOLS` is INVERTED to a deletion pin, and each of the seven vault entries is now asserted with its HOME as well as its definition. BJ recorded the keep's reason and the seven's unreachability in adjacent lines; both are answered here. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH FX MOVED IT 73 -> 70:** 3 deleted: three deleted nodes' texts; the glossary pin reads the tier wording. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [67, 67] -> 73. +6. §1's dead-symbol KEEP for `CLASS_POOLS` is INVERTED to a deletion pin, and each of the seven vault entries is now asserted with its HOME as well as its definition. BJ recorded the keep's reason and the seven's unreachability in adjacent lines; both are answered here. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bk": {
    "kind": "suite",
@@ -729,8 +733,8 @@
   "test_batch_bm": {
    "kind": "suite",
    "checks": [
-    1891,
-    1891
+    773,
+    773
    ],
    "checks_obs": 1,
    "fails": [
@@ -738,13 +742,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "BATCH DO PREDICTION, CORRECTED AFTER THE ACCEPTANCE RUN CAUGHT IT — AND THE ROW MOVES RATHER THAN THE CODE, BECAUSE NOTHING STOPPED RUNNING. A FALL OF 3, WITH ZERO FAILURES, AND IT IS FULLY ATTRIBUTED. §1's row-8 duplicate-detector loops over every rows-1-to-7 node in a row-8 node's OWN LANE and emits one check per TOP-LEVEL `payload.stat` FIELD it finds — the instrument for \"a row-8 node must not re-write a field an earlier node in its lane already writes\". **THREE MID-TREE CELLS STOPPED WRITING A TOP-LEVEL STAT BECAUSE DO RE-AUTHORED THEM ONTO A PROTECTED CORE ABILITY INSTEAD**: `cr_icy_resolve` (cryomancer/Winter/5, `icy_resolve_ranks` -> Blizzard), `bm_devoted_fury` (beastmaster/devotion/4, `devoted_fury` -> Kill Command) and `bm_reserves` (beastmaster/handler/3, `deep_reserves_ranks` -> Hunter's Instinct). All three sat below row 8 in a lane that has one, so each contributed exactly one field to the loop. **MEASURED, NOT REASONED: the loop transcribed against the live tree reads 238, and 241 with the three fields restored — a delta of exactly 3.** The `also`-borne terms DO also cut (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`) do NOT appear here: this loop reads the TOP-LEVEL `stat` only, and all three of those nodes keep theirs. `test_batch_bm.gd` itself is byte-unedited by DO. **BATCH ED ADDED ONE CHECK, 1888 -> 1889**: NEGATIVE CONTROL 4 sliced `rs.substr(i, 300)` from an unasserted `find`; the anchor is asserted now, so the negative cannot go vacuous in silence."
+   "note": "**BATCH FX MOVED IT 1891 -> 773:** re-pointed to the class ledger and the one tree: 324 nodes to 27, twelve purses to four; 10 deleted (the capstone row and row-to-tier); buying-IS-wearing inverted; the v2 fold and 24 FX absence pins added. BATCH DO PREDICTION, CORRECTED AFTER THE ACCEPTANCE RUN CAUGHT IT — AND THE ROW MOVES RATHER THAN THE CODE, BECAUSE NOTHING STOPPED RUNNING. A FALL OF 3, WITH ZERO FAILURES, AND IT IS FULLY ATTRIBUTED. §1's row-8 duplicate-detector loops over every rows-1-to-7 node in a row-8 node's OWN LANE and emits one check per TOP-LEVEL `payload.stat` FIELD it finds — the instrument for \"a row-8 node must not re-write a field an earlier node in its lane already writes\". **THREE MID-TREE CELLS STOPPED WRITING A TOP-LEVEL STAT BECAUSE DO RE-AUTHORED THEM ONTO A PROTECTED CORE ABILITY INSTEAD**: `cr_icy_resolve` (cryomancer/Winter/5, `icy_resolve_ranks` -> Blizzard), `bm_devoted_fury` (beastmaster/devotion/4, `devoted_fury` -> Kill Command) and `bm_reserves` (beastmaster/handler/3, `deep_reserves_ranks` -> Hunter's Instinct). All three sat below row 8 in a lane that has one, so each contributed exactly one field to the loop. **MEASURED, NOT REASONED: the loop transcribed against the live tree reads 238, and 241 with the three fields restored — a delta of exactly 3.** The `also`-borne terms DO also cut (`sunder_guard_bd`, `rallying_stomp_ranks`, `bulwark_line_ranks`) do NOT appear here: this loop reads the TOP-LEVEL `stat` only, and all three of those nodes keep theirs. `test_batch_bm.gd` itself is byte-unedited by DO. **BATCH ED ADDED ONE CHECK, 1888 -> 1889**: NEGATIVE CONTROL 4 sliced `rs.substr(i, 300)` from an unasserted `find`; the anchor is asserted now, so the negative cannot go vacuous in silence."
   },
   "test_batch_bn": {
    "kind": "suite",
    "checks": [
-    81,
-    81
+    80,
+    80
    ],
    "checks_obs": 9,
    "fails": [
@@ -752,7 +756,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
+   "note": "**BATCH FX MOVED IT 81 -> 80:** 1 deleted: the pin on Honed Shards' payload text; the live stack check covers it. Repaired at DF: every failure in this suite was STALE. See docs/reports/DF.md §2."
   },
   "test_batch_bo": {
    "kind": "suite",
@@ -799,8 +803,8 @@
   "test_batch_br": {
    "kind": "suite",
    "checks": [
-    1592,
-    1592
+    1590,
+    1590
    ],
    "checks_obs": 1,
    "fails": [
@@ -808,13 +812,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1450, 1450] -> 1592. +142. TRANCHE_4's leak control moved to `SPEC_POOLS` as in `bq` (+132), and §4's class-draft x spec-draft cross product grew with the Mage pool, 24 x 12 -> 25 x 12 (+12). DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH FK RE-POINTED §1's hit-loop locator.** The loop is a `while` now, because the Rune of the Butcher's Bill adds a strike from INSIDE the body and `for hit_i in total_hits` evaluates its range once. **The claim did not move** — the section slices the loop to check where charges are spent — and `ok(loop_start > 0, \"the hit loop is locatable\")` is what caught the change."
+   "note": "**BATCH FX MOVED IT 1592 -> 1590:** 2 deleted: the Warcry node's id and name; the name sweep runs over the one tree. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1450, 1450] -> 1592. +142. TRANCHE_4's leak control moved to `SPEC_POOLS` as in `bq` (+132), and §4's class-draft x spec-draft cross product grew with the Mage pool, 24 x 12 -> 25 x 12 (+12). DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH FK RE-POINTED §1's hit-loop locator.** The loop is a `while` now, because the Rune of the Butcher's Bill adds a strike from INSIDE the body and `for hit_i in total_hits` evaluates its range once. **The claim did not move** — the section slices the loop to check where charges are spent — and `ok(loop_start > 0, \"the hit loop is locatable\")` is what caught the change."
   },
   "test_batch_bs": {
    "kind": "suite",
    "checks": [
-    267,
-    267
+    246,
+    246
    ],
    "checks_obs": 1,
    "fails": [
@@ -822,13 +826,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH ED ADDED ONE CHECK, 266 -> 267.** The kiln tick slice took `src.substr(src.find(\"func take_tick_damage\"))` with the locator unasserted, so a renamed function would have made `not tick_body.contains(\"kiln_forged_at\")` true by reading nothing. The anchor is asserted now. ED's sweep found 87 `find`-then-`substr` slices in the tree and this was one of THREE that were live, resolving and unguarded."
+   "note": "**BATCH FX MOVED IT 267 -> 246:** 41 deleted (the eight Inferno cells' ids, lanes, rows, names and magnitudes; capstone and row-8 counts), 20 added (the re-skin check per node of the one tree). **BATCH ED ADDED ONE CHECK, 266 -> 267.** The kiln tick slice took `src.substr(src.find(\"func take_tick_damage\"))` with the locator unasserted, so a renamed function would have made `not tick_body.contains(\"kiln_forged_at\")` true by reading nothing. The anchor is asserted now. ED's sweep found 87 `find`-then-`substr` slices in the tree and this was one of THREE that were live, resolving and unguarded."
   },
   "test_batch_bt": {
    "kind": "suite",
    "checks": [
-    375,
-    375
+    373,
+    373
    ],
    "checks_obs": 1,
    "fails": [
@@ -836,7 +840,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [407, 407] -> 375. -32. The leak control over `CLASS_POOLS` is gone (BT_CARDS x 4 classes); the `SPEC_POOLS` half beside it is untouched and still asserts the same claim about the boss channel. The byte-freeze size pin is replaced by a source pin on the container's ABSENCE. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH FX MOVED IT 375 -> 373:** 2 deleted: the Killing Frost node's id and field. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [407, 407] -> 375. -32. The leak control over `CLASS_POOLS` is gone (BT_CARDS x 4 classes); the `SPEC_POOLS` half beside it is untouched and still asserts the same claim about the boss channel. The byte-freeze size pin is replaced by a source pin on the container's ABSENCE. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bu": {
    "kind": "suite",
@@ -855,8 +859,8 @@
   "test_batch_bv": {
    "kind": "suite",
    "checks": [
-    864,
-    864
+    565,
+    565
    ],
    "checks_obs": 1,
    "fails": [
@@ -864,13 +868,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [900, 900] -> 864. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH FX MOVED IT 864 -> 565:** 2 deleted (the Ghost Pack node); the label sweep walks 27 nodes, not 324. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [900, 900] -> 864. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bw": {
    "kind": "suite",
    "checks": [
-    515,
-    515
+    513,
+    513
    ],
    "checks_obs": 1,
    "fails": [
@@ -878,13 +882,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [551, 551] -> 515. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
+   "note": "**BATCH FX MOVED IT 515 -> 513:** 2 deleted (the Grudge node); the label sweep, vacuous at HEAD, reads the live tree. **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [551, 551] -> 515. -36. As `bu`. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone."
   },
   "test_batch_bx": {
    "kind": "suite",
    "checks": [
-    161,
-    161
+    156,
+    156
    ],
    "checks_obs": 1,
    "fails": [
@@ -892,13 +896,13 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH EG, WRITTEN BEFORE THE ACCEPTANCE RUN OFF ONE STANDALONE READING OF 161.** [157, 157] -> 161. +4. §2's cap block reads `run.ability_slot_cap()` instead of a constant — the count does not move for that — and gains three checks where BO's DROP rule inverts: the benched card leaves the LOADOUT, is KEPT in the pool, is not ledgered, and is still never re-offered. The party-screen arm gains the same pool assertion after the confirm. The fourth is the door count: `Run.unequip_earned_ability(` reads 2 in `map_screen.gd` because two SCREENS call one door, and the loadout panel is named beside it so a third caller has to move the line."
+   "note": "**BATCH FX MOVED IT 161 -> 156:** 4 deleted (two nodes' names, rows and lanes), four per-name checks folded into two sweeps, 1 control added. **BATCH EG, WRITTEN BEFORE THE ACCEPTANCE RUN OFF ONE STANDALONE READING OF 161.** [157, 157] -> 161. +4. §2's cap block reads `run.ability_slot_cap()` instead of a constant — the count does not move for that — and gains three checks where BO's DROP rule inverts: the benched card leaves the LOADOUT, is KEPT in the pool, is not ledgered, and is still never re-offered. The party-screen arm gains the same pool assertion after the confirm. The fourth is the door count: `Run.unequip_earned_ability(` reads 2 in `map_screen.gd` because two SCREENS call one door, and the loadout panel is named beside it so a third caller has to move the line."
   },
   "test_batch_cb": {
    "kind": "suite",
    "checks": [
-    1730,
-    1730
+    1729,
+    1729
    ],
    "checks_obs": 4,
    "fails": [
@@ -906,7 +910,7 @@
     0
    ],
    "fails_obs": 2,
-   "note": "**BATCH FC MOVED IT 1361 -> 1370, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+9 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 1370 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1203, 1203] -> 1172. -31. NINE x 4 leak assertions gone, less the source pin; `CLASS_POOLS['mage'] == 12` replaced by the absence pin. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH EZ MOVED IT 1172 -> 1361 — the largest single rise in the batch, and it is 9 checks per new rune.** A per-entry schema walk over a pool that went 65 -> 86; no assertion changed. Three identical standalone readings of 1361 / 0.  **BATCH FK MOVED IT 1370 -> 1721**: its walks are per-rune-entry and thirty-nine were authored. **CB's own `Backdraft` assertions are what dated the brief's premise** — it has asserted since CB that the node `py_melt` *\"no longer collides with the card name\"* and that *\"Backdraft is a DRAFT card now\"*, so FK's rename to the Ember Leap follows a ruling the project already made. **BATCH FO MOVED IT 1721 -> 1730, AND THE RISE IS ONE POOL ENTRY WALKED NINE TIMES (its BR §1 arm asserts NINE names are not rune names, once per entry).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
+   "note": "**BATCH FX MOVED IT 1730 -> 1729:** 1 deleted: py_melt's id and cell. **BATCH FC MOVED IT 1361 -> 1370, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+9 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 1370 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   **BATCH DY, WRITTEN AFTER BATTERY 1 AND BEFORE THE ACCEPTANCE RUN.** [1203, 1203] -> 1172. -31. NINE x 4 leak assertions gone, less the source pin; `CLASS_POOLS['mage'] == 12` replaced by the absence pin. DY grew `SPEC_DRAFT_POOLS` 125 -> 129 and `CLASS_DRAFT_POOLS` 24 -> 25, grew `SPEC_POOLS` 42 -> 44 (Holy's boss pool 1 -> 3), and DELETED `CLASS_POOLS` (61 entries, four classes) after re-homing the seven abilities it alone listed. **THE ABILITY CORPUS DID NOT MOVE (227 both sides) — that is what §0's ordering was for.** Every loop that walks a grown pool rises; every loop that walked the deleted dict is gone.  **BATCH EZ MOVED IT 1172 -> 1361 — the largest single rise in the batch, and it is 9 checks per new rune.** A per-entry schema walk over a pool that went 65 -> 86; no assertion changed. Three identical standalone readings of 1361 / 0.  **BATCH FK MOVED IT 1370 -> 1721**: its walks are per-rune-entry and thirty-nine were authored. **CB's own `Backdraft` assertions are what dated the brief's premise** — it has asserted since CB that the node `py_melt` *\"no longer collides with the card name\"* and that *\"Backdraft is a DRAFT card now\"*, so FK's rename to the Ember Leap follows a ruling the project already made. **BATCH FO MOVED IT 1721 -> 1730, AND THE RISE IS ONE POOL ENTRY WALKED NINE TIMES (its BR §1 arm asserts NINE names are not rune names, once per entry).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
   },
   "test_batch_cd": {
    "kind": "suite",
@@ -971,8 +975,8 @@
   "test_runes": {
    "kind": "suite",
    "checks": [
-    5354,
-    5354
+    5306,
+    5306
    ],
    "checks_obs": 4,
    "fails": [
@@ -980,13 +984,13 @@
     0
    ],
    "fails_obs": 9,
-   "note": "**BATCH FM MOVED IT 5246 -> 5318, AND ALL +72 ARE IN `_exhaustion`.** FM §1 removes the generated stat family from every offer path, so that section's subject INVERTS — it asserted *\"an offer list can never come back empty: a hero holding every rune they can roll still gets something\"*, which is now the opposite of the designer's ruling. **The question it was really asking survives and is asked at BOTH ends instead of one**: with the pouch ONE SHORT of exhausted an offer must arrive and be named and payloaded (12 specs x 5 draws x 3 checks = 180, the arm a restored floor could not fake), and with the pouch EXHAUSTED every draw must be EMPTY (12 x 5 = 60), plus a per-spec eligibility floor (12) that fails the day the sample spec has nothing to draw. 180 + 60 + 12 = 252 against the old 180. **AND THE OLD BODY WAS HALF VACUOUS**: it filled the pouch with the six TEMPLATE names beside the authored ones, which exhausted the pool exactly while that family WAS the pool and match nothing `eligible_ids` returns against FK's authored one. **`_rich_grant` AND THE CACHE BAND EACH MOVED A CLAIM AND NO COUNT.** The grant's fifth ask asserted `not extra.is_empty()` — *\"the grant died once the spec set ran out\"* — which went red on all twelve; it asserts the FALLBACK IS TAKEN now (`extra.is_empty() == Runes.pool_empty_for(member)`), which is two-armed by construction and comes back on its own the day a class-scoped rune is authored. The cache-triple band moved **70-95 -> an equality at 100**, which that arm's own failure message predicted in writing — *\"the template family being removed... drives it to 100\"* — and it is STRICTER than the band it replaces: all sixty live entries are `spec:`-scoped, so a candidate that is not the holder's own is a scope leak and reds on the first triple. **THREE IDENTICAL STANDALONE READINGS OF 5318 / 0, WRITTEN BEFORE THE BATTERY.**  |   **BATCH FC MOVED IT 3803 -> 3839, AND THE +36 IS SPLIT BY CONTROLLED ARMS RATHER THAN DERIVED BY ARGUMENT.** Three readings, each against a different `data/runes.json` with the FC suite fixed: **HEAD's data -> 3803** (identical to HEAD/HEAD, so the suite's new arms add ZERO when nothing is retired after ET — that is the control), **the retirement alone, 86 entries / 20 live -> 3802** (net **-1**: Split Tongue leaves the live population and joins the retired one, and the two new arms fire once), and **the full batch, 87 / 21 -> 3839** (so the new entry alone is **+37**, across `_schema`, `_payloads`, `_costs`, `_int_restore`, `_power_arm` and its scaled second pass). -1 + 37 = +36. **`data/runes.json` was restored from a pre-arm copy and md5-verified after each arm.** **THE COVERAGE WALK'S POPULATION WAS NARROWED, NOT ITS ASSERTIONS LOOSENED**: `mine` was \"every retired spec rune\" and is \"every retired spec rune authored under the lane rule\" now, discriminated by `RUNE_SHAPES` membership — which IS the vintage, needs no list, and classifies the next EZ-era retirement with no edit. Without it the Occultist read 5 lane-rule runes and 2 splashes for a retirement doing exactly the right thing. **`UNSCALABLE` DID NOT MOVE**: `split_tongue` is still a member for `comet`'s reason, and a retired entry is still in `data`, so its membership check still resolves. **THREE IDENTICAL STANDALONE READINGS OF 3839 / 0, WRITTEN BEFORE THE BATTERY.**  |   **BATCH FB MOVED IT 3804 -> 3803, AND THE -1 IS FA's +1 GOING BACK THE WAY IT CAME.** Split Tongue's `set` loses `\"damage\": 12`, and `_int_restore` loops `[\"add\", \"set\"]` asserting every field in `Runes.AB_INT_KEYS` survived JSON as an INT; `damage` was the only one of those keys the payload carried, so removing it removes exactly one assertion. `aoe` is a bool and is not in `AB_INT_KEYS`, so the surviving `set` contributes none. **THE COUNT WAS OBSERVED BEFORE IT WAS PREDICTED-AND-CONFIRMED**: HEAD's unmodified suite against the new `data/runes.json` read 3803 / 0 in the pre-edit pass, which located the whole fall in one assertion before this row moved. **`UNSCALABLE` DID NOT MOVE AND THAT IS STILL DELIBERATE** — `split_tongue` remains a member for `comet`'s reason, and with the damage clause gone its payload is a bare `set` of a FLAG plus a stat flag, which is if anything a purer case of the thing the power arm refuses to scale. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 3803 / 0.**  |   **BATCH FA MOVED IT 3803 -> 3804, AND THE +1 IS ONE CHECK IN ONE SECTION.** Split Tongue's payload gains `\"damage\": 12` inside the `set` it already carried, and `_int_restore` loops `[\"add\", \"set\"]` asserting every field in `Runes.AB_INT_KEYS` survived JSON as an INT rather than a float. `damage` is one of those keys, so the new field is one new assertion — and it PASSES, which is the half worth recording: the int-restore machinery already covered a `set` field and did not need extending. **`UNSCALABLE` DID NOT MOVE AND THAT IS DELIBERATE**: the entry is still there for `comet`'s reason — a `set` is an absolute assignment the power arm correctly refuses to scale, and 12 is not less scalable than a flag. **BATCH ET MOVED IT 3118 -> 3022, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS, AND THE -96 IS COUNTED OFF THE DIFF RATHER THAN GUESSED — IT IS ONE SECTION.** `_rich_grant` goes 132 -> 36. It ran 12 (`own > 0`) + 36x3 (a grant per surviving spec rune, three checks each) + 12 (the fallback past the spec set); with every entry retired the 36 grants are 0, and the `own > 0` check — literally *\"the retirement left its own set empty\"* — is a statement of ET's ruling rather than an alarm, so it becomes a TWO-ARMED block of 2 checks a spec: 24 + 0 + 12 = 36. **NO OTHER SECTION MOVED AND THAT WAS PREDICTED BEFORE THE EDIT**: the unrepaired tree read exactly 3010 (= 3118 - 108), which located the whole fall in one place before a line was changed. **TWO OTHER SECTIONS WENT RED AND NEITHER MOVED A COUNT**, because each is one `ok()` either way: `_start_rune_pool`'s 20-70%% band on spec runes in a cache triple is now two-armed off the pool (zero when nothing is eligible, the band when something is), and `_requires_ability`'s `_reachable` was RE-POINTED from offerability onto SCOPE — nine entries read as unreachable purely because nothing is offered, and the question that section asks is about the AUTHORED entry. **SKIPPING RETIRED ENTRIES WAS THE OTHER REPAIR AND IT IS THE SILENT ONE**: all three sections would have looped over nothing and printed like a clean run, which is the shape EO's own comment in `test_rune_battle` warns about one file over.  |   **BATCH ES MOVED IT 3101 -> 3118, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS, AND THE +17 IS COUNTED OFF THE DIFF RATHER THAN GUESSED.** `_schema` goes from 7 checks an entry plus a conditional cost-price check (65x7 + 17 = 472) to 9 an entry (65x9 = 585): the rarity-key check becomes TWO absence pins (`rarity` and `scarred`, ES §1/§3), the scarred-undercuts-its-clean-peer check has no peer left to undercut and goes, and a new pin says `display_name` adds no prefix. That is +113. `_scarred` (17 entries x 3) becomes `_costs` (1 population assertion + 2 for the one named exception), called twice as before: 102 -> 6, which is -96. +113 - 96 = +17.  |   **EM MOVED IT 3121 -> 3125.** The cfg-ordering probe loop gained the two RUNE-written ceiling fields (`rune_zealous_mercy`, `rune_opening_volley`), which are the names a derivation running before the rune block would now leave as duds; the node's two are still checked. Two checks apiece. **Two other repairs in this file added no checks and both would otherwise have gone VACUOUS rather than red**: the `ceiling_writers` floor counted the old field names and would have fallen 2 -> 0, and `BOOLEAN_READ_FIELDS`' payload lookup returned null on the bare name and `continue`d past its own assertion. **EO MOVED IT 3125 -> 3101, AND THE ROW IS MOVED RATHER THAN THE SUITE REPAIRED.** `_rich_grant` asked every spec for the literal 4 spec runes it was authored; EO §3 retires twelve, some specs keep 2 or 3, and `grant_rune` then CORRECTLY falls back to the ordinary roll — which read as nine failures against an arm whose question is “do the spec’s own runes reach the spec’s hero”. It asks for the number that SURVIVES now, derived from `eligible_ids`, so a further retirement or a restored re-author needs no edit there; the 24-check drop is that loop running 2-4 times a spec instead of 4 across twelve specs. The eligibility arm gained nothing net: it was one-armed (`rolls for its own spec`) and is two-armed now (`retired rolls for NOBODY` / `live still rolls`), which is the same count of checks over the same population and is deliberate — an EXEMPTION arm would read green on the day the whole file stopped rolling.  **BATCH EZ MOVED IT 3022 -> 3803, AND THREE OF ITS SECTIONS WERE RE-POINTED RATHER THAN LEFT TO ROT.** Most of the +781 is per-entry loops over a pool that went 65 -> 86. The three re-points: (1) **the roll test gained a THIRD ARM** — a rune whose `requires_ability` names an ability outside the DERIVABLE kit correctly does not roll for a member who has drafted nothing, and Ambush requires Called Volley, a DRAFT card. The arm is two-way, so a requirement pointing at a name nothing resolves still turns it red, and it asks through `Runes.kit_names` — the same door `eligible_ids` itself uses. (2) **the coverage walk is SPLIT**: one rune per talent lane plus one splash, with exactly one of the four charging for its upside, is the OLD authoring rule and now governs the 65 ET retired and nothing else — ES §5 severed the lane rule and EZ's twenty-one carry no `lane` at all, so under the unsplit walk all of them read as splashes and the per-spec count went 4 -> 9 (10 for the Beastmaster). The retired half keeps every assertion it had; the live half is FLOORED and printed, because which specs get authored next is content, and what IS asserted of it is the thing that cannot be intentional — a live rune carrying a `lane`, which would mean the severed rule had come back. (3) **`split_tongue` JOINS `UNSCALABLE`**, as a real member rather than an exemption: its whole payload is a `set` (an absolute assignment the arm correctly refuses to scale) plus a FLAG, and three is not more `aoe` than one. **A HOLE IN THE POWER ARM IS RECORDED BESIDE IT**: the walk reads `stat` and `add` at the TOP LEVEL and does not descend into `also`. Nothing is unmeasured today — no rune's `also` carries a magnitude — but the day one does, the probe will call it a dud rather than scale it. Three identical standalone readings of 3803 / 0.  **BATCH FK MOVED IT 3839 -> 5246.** The schema and silent-dud walks are per-entry, so thirty-nine entries add ~1,400 checks. **AND THE CACHE-TRIPLE BAND MOVED 20-70 -> 70-95**, which the failure message itself predicted: before FK eight specs had no spec rune and drew from the six templates alone, so the twelve-spec average sat inside 20-70; every spec is authored now and the arithmetic is 1 - C(6,3)/C(11,3) = 88% for a five-rune spec. **Measured 83% across the mix.** The band still catches a set going missing (rate falls) and the template family's removal (rate -> 100), both of which a later batch will do. **BATCH FO MOVED IT 5318 -> 5354, AND THE RISE IS ONE POOL ENTRY WALKED THIRTY-SIX TIMES (three separate `Runes.ids()` walks).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
+   "note": "**BATCH FX MOVED IT 5354 -> 5306:** 48 deleted: the lane-coverage walk over the twelve trees. **BATCH FM MOVED IT 5246 -> 5318, AND ALL +72 ARE IN `_exhaustion`.** FM §1 removes the generated stat family from every offer path, so that section's subject INVERTS — it asserted *\"an offer list can never come back empty: a hero holding every rune they can roll still gets something\"*, which is now the opposite of the designer's ruling. **The question it was really asking survives and is asked at BOTH ends instead of one**: with the pouch ONE SHORT of exhausted an offer must arrive and be named and payloaded (12 specs x 5 draws x 3 checks = 180, the arm a restored floor could not fake), and with the pouch EXHAUSTED every draw must be EMPTY (12 x 5 = 60), plus a per-spec eligibility floor (12) that fails the day the sample spec has nothing to draw. 180 + 60 + 12 = 252 against the old 180. **AND THE OLD BODY WAS HALF VACUOUS**: it filled the pouch with the six TEMPLATE names beside the authored ones, which exhausted the pool exactly while that family WAS the pool and match nothing `eligible_ids` returns against FK's authored one. **`_rich_grant` AND THE CACHE BAND EACH MOVED A CLAIM AND NO COUNT.** The grant's fifth ask asserted `not extra.is_empty()` — *\"the grant died once the spec set ran out\"* — which went red on all twelve; it asserts the FALLBACK IS TAKEN now (`extra.is_empty() == Runes.pool_empty_for(member)`), which is two-armed by construction and comes back on its own the day a class-scoped rune is authored. The cache-triple band moved **70-95 -> an equality at 100**, which that arm's own failure message predicted in writing — *\"the template family being removed... drives it to 100\"* — and it is STRICTER than the band it replaces: all sixty live entries are `spec:`-scoped, so a candidate that is not the holder's own is a scope leak and reds on the first triple. **THREE IDENTICAL STANDALONE READINGS OF 5318 / 0, WRITTEN BEFORE THE BATTERY.**  |   **BATCH FC MOVED IT 3803 -> 3839, AND THE +36 IS SPLIT BY CONTROLLED ARMS RATHER THAN DERIVED BY ARGUMENT.** Three readings, each against a different `data/runes.json` with the FC suite fixed: **HEAD's data -> 3803** (identical to HEAD/HEAD, so the suite's new arms add ZERO when nothing is retired after ET — that is the control), **the retirement alone, 86 entries / 20 live -> 3802** (net **-1**: Split Tongue leaves the live population and joins the retired one, and the two new arms fire once), and **the full batch, 87 / 21 -> 3839** (so the new entry alone is **+37**, across `_schema`, `_payloads`, `_costs`, `_int_restore`, `_power_arm` and its scaled second pass). -1 + 37 = +36. **`data/runes.json` was restored from a pre-arm copy and md5-verified after each arm.** **THE COVERAGE WALK'S POPULATION WAS NARROWED, NOT ITS ASSERTIONS LOOSENED**: `mine` was \"every retired spec rune\" and is \"every retired spec rune authored under the lane rule\" now, discriminated by `RUNE_SHAPES` membership — which IS the vintage, needs no list, and classifies the next EZ-era retirement with no edit. Without it the Occultist read 5 lane-rule runes and 2 splashes for a retirement doing exactly the right thing. **`UNSCALABLE` DID NOT MOVE**: `split_tongue` is still a member for `comet`'s reason, and a retired entry is still in `data`, so its membership check still resolves. **THREE IDENTICAL STANDALONE READINGS OF 3839 / 0, WRITTEN BEFORE THE BATTERY.**  |   **BATCH FB MOVED IT 3804 -> 3803, AND THE -1 IS FA's +1 GOING BACK THE WAY IT CAME.** Split Tongue's `set` loses `\"damage\": 12`, and `_int_restore` loops `[\"add\", \"set\"]` asserting every field in `Runes.AB_INT_KEYS` survived JSON as an INT; `damage` was the only one of those keys the payload carried, so removing it removes exactly one assertion. `aoe` is a bool and is not in `AB_INT_KEYS`, so the surviving `set` contributes none. **THE COUNT WAS OBSERVED BEFORE IT WAS PREDICTED-AND-CONFIRMED**: HEAD's unmodified suite against the new `data/runes.json` read 3803 / 0 in the pre-edit pass, which located the whole fall in one assertion before this row moved. **`UNSCALABLE` DID NOT MOVE AND THAT IS STILL DELIBERATE** — `split_tongue` remains a member for `comet`'s reason, and with the damage clause gone its payload is a bare `set` of a FLAG plus a stat flag, which is if anything a purer case of the thing the power arm refuses to scale. **WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS OF 3803 / 0.**  |   **BATCH FA MOVED IT 3803 -> 3804, AND THE +1 IS ONE CHECK IN ONE SECTION.** Split Tongue's payload gains `\"damage\": 12` inside the `set` it already carried, and `_int_restore` loops `[\"add\", \"set\"]` asserting every field in `Runes.AB_INT_KEYS` survived JSON as an INT rather than a float. `damage` is one of those keys, so the new field is one new assertion — and it PASSES, which is the half worth recording: the int-restore machinery already covered a `set` field and did not need extending. **`UNSCALABLE` DID NOT MOVE AND THAT IS DELIBERATE**: the entry is still there for `comet`'s reason — a `set` is an absolute assignment the power arm correctly refuses to scale, and 12 is not less scalable than a flag. **BATCH ET MOVED IT 3118 -> 3022, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS, AND THE -96 IS COUNTED OFF THE DIFF RATHER THAN GUESSED — IT IS ONE SECTION.** `_rich_grant` goes 132 -> 36. It ran 12 (`own > 0`) + 36x3 (a grant per surviving spec rune, three checks each) + 12 (the fallback past the spec set); with every entry retired the 36 grants are 0, and the `own > 0` check — literally *\"the retirement left its own set empty\"* — is a statement of ET's ruling rather than an alarm, so it becomes a TWO-ARMED block of 2 checks a spec: 24 + 0 + 12 = 36. **NO OTHER SECTION MOVED AND THAT WAS PREDICTED BEFORE THE EDIT**: the unrepaired tree read exactly 3010 (= 3118 - 108), which located the whole fall in one place before a line was changed. **TWO OTHER SECTIONS WENT RED AND NEITHER MOVED A COUNT**, because each is one `ok()` either way: `_start_rune_pool`'s 20-70%% band on spec runes in a cache triple is now two-armed off the pool (zero when nothing is eligible, the band when something is), and `_requires_ability`'s `_reachable` was RE-POINTED from offerability onto SCOPE — nine entries read as unreachable purely because nothing is offered, and the question that section asks is about the AUTHORED entry. **SKIPPING RETIRED ENTRIES WAS THE OTHER REPAIR AND IT IS THE SILENT ONE**: all three sections would have looped over nothing and printed like a clean run, which is the shape EO's own comment in `test_rune_battle` warns about one file over.  |   **BATCH ES MOVED IT 3101 -> 3118, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS, AND THE +17 IS COUNTED OFF THE DIFF RATHER THAN GUESSED.** `_schema` goes from 7 checks an entry plus a conditional cost-price check (65x7 + 17 = 472) to 9 an entry (65x9 = 585): the rarity-key check becomes TWO absence pins (`rarity` and `scarred`, ES §1/§3), the scarred-undercuts-its-clean-peer check has no peer left to undercut and goes, and a new pin says `display_name` adds no prefix. That is +113. `_scarred` (17 entries x 3) becomes `_costs` (1 population assertion + 2 for the one named exception), called twice as before: 102 -> 6, which is -96. +113 - 96 = +17.  |   **EM MOVED IT 3121 -> 3125.** The cfg-ordering probe loop gained the two RUNE-written ceiling fields (`rune_zealous_mercy`, `rune_opening_volley`), which are the names a derivation running before the rune block would now leave as duds; the node's two are still checked. Two checks apiece. **Two other repairs in this file added no checks and both would otherwise have gone VACUOUS rather than red**: the `ceiling_writers` floor counted the old field names and would have fallen 2 -> 0, and `BOOLEAN_READ_FIELDS`' payload lookup returned null on the bare name and `continue`d past its own assertion. **EO MOVED IT 3125 -> 3101, AND THE ROW IS MOVED RATHER THAN THE SUITE REPAIRED.** `_rich_grant` asked every spec for the literal 4 spec runes it was authored; EO §3 retires twelve, some specs keep 2 or 3, and `grant_rune` then CORRECTLY falls back to the ordinary roll — which read as nine failures against an arm whose question is “do the spec’s own runes reach the spec’s hero”. It asks for the number that SURVIVES now, derived from `eligible_ids`, so a further retirement or a restored re-author needs no edit there; the 24-check drop is that loop running 2-4 times a spec instead of 4 across twelve specs. The eligibility arm gained nothing net: it was one-armed (`rolls for its own spec`) and is two-armed now (`retired rolls for NOBODY` / `live still rolls`), which is the same count of checks over the same population and is deliberate — an EXEMPTION arm would read green on the day the whole file stopped rolling.  **BATCH EZ MOVED IT 3022 -> 3803, AND THREE OF ITS SECTIONS WERE RE-POINTED RATHER THAN LEFT TO ROT.** Most of the +781 is per-entry loops over a pool that went 65 -> 86. The three re-points: (1) **the roll test gained a THIRD ARM** — a rune whose `requires_ability` names an ability outside the DERIVABLE kit correctly does not roll for a member who has drafted nothing, and Ambush requires Called Volley, a DRAFT card. The arm is two-way, so a requirement pointing at a name nothing resolves still turns it red, and it asks through `Runes.kit_names` — the same door `eligible_ids` itself uses. (2) **the coverage walk is SPLIT**: one rune per talent lane plus one splash, with exactly one of the four charging for its upside, is the OLD authoring rule and now governs the 65 ET retired and nothing else — ES §5 severed the lane rule and EZ's twenty-one carry no `lane` at all, so under the unsplit walk all of them read as splashes and the per-spec count went 4 -> 9 (10 for the Beastmaster). The retired half keeps every assertion it had; the live half is FLOORED and printed, because which specs get authored next is content, and what IS asserted of it is the thing that cannot be intentional — a live rune carrying a `lane`, which would mean the severed rule had come back. (3) **`split_tongue` JOINS `UNSCALABLE`**, as a real member rather than an exemption: its whole payload is a `set` (an absolute assignment the arm correctly refuses to scale) plus a FLAG, and three is not more `aoe` than one. **A HOLE IN THE POWER ARM IS RECORDED BESIDE IT**: the walk reads `stat` and `add` at the TOP LEVEL and does not descend into `also`. Nothing is unmeasured today — no rune's `also` carries a magnitude — but the day one does, the probe will call it a dud rather than scale it. Three identical standalone readings of 3803 / 0.  **BATCH FK MOVED IT 3839 -> 5246.** The schema and silent-dud walks are per-entry, so thirty-nine entries add ~1,400 checks. **AND THE CACHE-TRIPLE BAND MOVED 20-70 -> 70-95**, which the failure message itself predicted: before FK eight specs had no spec rune and drew from the six templates alone, so the twelve-spec average sat inside 20-70; every spec is authored now and the arithmetic is 1 - C(6,3)/C(11,3) = 88% for a five-rune spec. **Measured 83% across the mix.** The band still catches a set going missing (rate falls) and the template family's removal (rate -> 100), both of which a later batch will do. **BATCH FO MOVED IT 5318 -> 5354, AND THE RISE IS ONE POOL ENTRY WALKED THIRTY-SIX TIMES (three separate `Runes.ids()` walks).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
   },
   "check_do": {
    "kind": "gate",
    "checks": [
-    131,
-    131
+    86,
+    86
    ],
    "checks_obs": 1,
    "fails": [
@@ -994,13 +998,13 @@
     0
    ],
    "fails_obs": 1,
-   "note": "BATCH DO's gate. **IT ASSERTS THE PROPERTY AND PRINTS THE COUNT, AND THAT ORDER IS THE WHOLE LESSON OF DN** — DN's own gate asserted a NUMBER and its first battery caught it, costing a second thirty-five-minute frozen run. §1 asserts that NO talent node grants an ability and that NO node names an ability outside its spec's PROTECTED CORE, resolving same-tree names before the global corpus and matching on word boundaries (the `wd_spiked`/Spite and Berserk/Berserker traps), and prints 324 / 0 / 98 / 1 / 0 beside them. §2 asserts each of the twenty-two moved cards drafts from exactly ONE spec pool and resolves, and that NO pool entry anywhere resolves to nothing — the sharp half, because eight of the sixteen relocated definitions were reachable only through `pool_ability`'s fall-through to the trees, so a missed relocation would silently have emptied a `SPEC_POOLS` entry the zone boss offers. §3 asserts all twenty-five re-authored cells are in their ORIGINAL lane and row (`cells_spent` prices off the row, and DN measured a MOVE driving a Berserker ledger to -2 available points, silently), and that the three cut payload terms are absent from the whole of `scripts/` — COMMENT LINES STRIPPED FIRST, because a comment recording a cut necessarily NAMES what was cut, and that fired during DO's own control run. §4 is a REPORT: it prints every node reading a status its own spec cannot guarantee (twelve pairs, six of them DO's own) and asserts only `sm_precision`, which §3 of the brief singled out. §5 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, never the class one, so §3's two-call fingerprint does not match — and its header does not NAME the forbidden call either, which it did in its first draft and went 37/2 on. EIGHT NEGATIVE CONTROLS WERE RUN AND ALL EIGHT BIT: the three cut terms restored (1 failure each), a grant put back on `ar_wrath` (2), a cell MOVED from row 3 to row 7 (1), `sm_precision`'s Dazed restored (4), Backdraft pulled from its draft pool (1 here and 4 in check_cz), and a deliberate syntax error in `relics.gd` (26 Parse Errors on the check_parse stderr grep, 0 once reverted)."
+   "note": "**BATCH FX MOVED IT 131 -> 86:** 51 deleted (CELL_HOME's 25 cells and sm_precision's text), 6 added (the designer's line, with both arms). BATCH DO's gate. **IT ASSERTS THE PROPERTY AND PRINTS THE COUNT, AND THAT ORDER IS THE WHOLE LESSON OF DN** — DN's own gate asserted a NUMBER and its first battery caught it, costing a second thirty-five-minute frozen run. §1 asserts that NO talent node grants an ability and that NO node names an ability outside its spec's PROTECTED CORE, resolving same-tree names before the global corpus and matching on word boundaries (the `wd_spiked`/Spite and Berserk/Berserker traps), and prints 324 / 0 / 98 / 1 / 0 beside them. §2 asserts each of the twenty-two moved cards drafts from exactly ONE spec pool and resolves, and that NO pool entry anywhere resolves to nothing — the sharp half, because eight of the sixteen relocated definitions were reachable only through `pool_ability`'s fall-through to the trees, so a missed relocation would silently have emptied a `SPEC_POOLS` entry the zone boss offers. §3 asserts all twenty-five re-authored cells are in their ORIGINAL lane and row (`cells_spent` prices off the row, and DN measured a MOVE driving a Berserker ledger to -2 available points, silently), and that the three cut payload terms are absent from the whole of `scripts/` — COMMENT LINES STRIPPED FIRST, because a comment recording a cut necessarily NAMES what was cut, and that fired during DO's own control run. §4 is a REPORT: it prints every node reading a status its own spec cannot guarantee (twelve pairs, six of them DO's own) and asserts only `sm_precision`, which §3 of the brief singled out. §5 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, never the class one, so §3's two-call fingerprint does not match — and its header does not NAME the forbidden call either, which it did in its first draft and went 37/2 on. EIGHT NEGATIVE CONTROLS WERE RUN AND ALL EIGHT BIT: the three cut terms restored (1 failure each), a grant put back on `ar_wrath` (2), a cell MOVED from row 3 to row 7 (1), `sm_precision`'s Dazed restored (4), Backdraft pulled from its draft pool (1 here and 4 in check_cz), and a deliberate syntax error in `relics.gd` (26 Parse Errors on the check_parse stderr grep, 0 once reverted)."
   },
   "check_dp": {
    "kind": "gate",
    "checks": [
-    48,
-    48
+    32,
+    32
    ],
    "checks_obs": 3,
    "fails": [
@@ -1008,7 +1012,7 @@
     0
    ],
    "fails_obs": 1,
-   "note": "BATCH DP's gate, and it extends `check_do` rather than repeating it: the ability rule and the STATUS rule are the same rule, and DO's ability-matching instrument could not see this class of bet at all (`sm_precision` named no ability and was still a bet). §1 sweeps every node's rendered text against every status form and ASSERTS THE PROPERTY, printing 324 / 6 / 6 / 0 beside it. **THE RATCHET IS ASYMMETRIC ON PURPOSE, which is this file's own rule one layer up**: a pair NOT in `KNOWN_PAIRS` is an ERROR (a new bet), a known pair that has GONE is a NOTICE (a repair) — a gate that reds on a repair teaches the next batch to leave the defect alone. **IT READS `check_do`'s `GUARANTEED_STATUS` AND `STATUS_FORMS` RATHER THAN COPYING THEM**, and asserts the load, because a second copy of a hand-authored table is this project's oldest recurring defect. §2 asserts the four re-pointed cells are in their ORIGINAL lane and row, name Ruin, and read FOUR DISTINCT quantities — an application, its magnitude, an event and a depth threshold — because four cells all reading 'stacks of Ruin' would flatten a lane authored as a theme; none reads a DETONATION, which Grim Focus, Unraveling and Avatar of Ruin already own. §3 asserts the six new read sites exist, the four old ones are GONE (a field read in two places under two meanings is a silent order-dependence), that `permanent_delusion` is absent from `scripts/` WITH COMMENT LINES STRIPPED FIRST (DO's scar — prose recording a removal necessarily names what was removed), and that no `_gain_ruin` call quotes `OLD_GODS_MARK` directly, so a sixth passive site cannot be added that Whispers silently fails to reach. §4 is the check that would have caught the cost this batch nearly paid: **every stat field any rune writes has a live read site in `scripts/`** (116 fields across 65 runes, 0 dead) — the Rune of the Whispering Dark writes `spread_ranks` AND `spread_ruin`, so a fresh field name would have left two of its four clauses paying nothing in silence. §5 asserts every rune grant still RESOLVES (a rune grant goes through `Classes.pending_talent_ability`, not the draft resolver, so DO moving card NAMES while DEFINITIONS stayed put is the only reason four granting runes still work) and REPORTS the two that now duplicate a draft card's grant. §6 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, and its header does not name the other call either. NINE NEGATIVE CONTROLS WERE RUN AND ALL NINE BEHAVED: the four cells' old texts restored (5, 5, 6, 6 failures), the Ruined Mind read site defeated (3), the Whispering Dark's `spread_ruin` renamed (5), a sixth `_gain_ruin` call made to quote the constant (3) — and **the comment-stripping trap controlled from BOTH sides**: `permanent_delusion` as a COMMENT left it GREEN, the same identifier as CODE turned it RED. **EM MOVED IT 43 -> 48 AND THE +5 IS §4's TWO WHISPERING DARK ROWS REPAIRED TO INTENT PLUS THREE NEW ONES.** DP asked *does this rune still pay?* and asked it by pinning the two fields the rune SHARED with the node (`spread_ranks`, `spread_ruin`). **The charter is exactly that sharing**, so EM re-keyed the rune onto `rune_spread_ranks`/`rune_spread_ruin` and the old rows would have called a LIVE rune dead. The repair asserts the rune's own fields, ASSERTS THEIR VALUES (15 and 1 — a rename that dropped the number would pass a name check), and asserts the node's two fields are ABSENT from the rune. §3's two read-site rows moved with the code: the guard sums both halves into locals now, and the locals AND their definitions are pinned, because the guard is the half that goes silently dead. **The general §4 property did not move and could not have** — `code.contains(field)` is a SUBSTRING test and `rune_spread_ranks` contains `spread_ranks`, which is worth knowing about that instrument."
+   "note": "**BATCH FX MOVED IT 48 -> 32:** 17 deleted (the four Madness cells DP re-pointed and their rows), 1 added (the sweep read the tree). BATCH DP's gate, and it extends `check_do` rather than repeating it: the ability rule and the STATUS rule are the same rule, and DO's ability-matching instrument could not see this class of bet at all (`sm_precision` named no ability and was still a bet). §1 sweeps every node's rendered text against every status form and ASSERTS THE PROPERTY, printing 324 / 6 / 6 / 0 beside it. **THE RATCHET IS ASYMMETRIC ON PURPOSE, which is this file's own rule one layer up**: a pair NOT in `KNOWN_PAIRS` is an ERROR (a new bet), a known pair that has GONE is a NOTICE (a repair) — a gate that reds on a repair teaches the next batch to leave the defect alone. **IT READS `check_do`'s `GUARANTEED_STATUS` AND `STATUS_FORMS` RATHER THAN COPYING THEM**, and asserts the load, because a second copy of a hand-authored table is this project's oldest recurring defect. §2 asserts the four re-pointed cells are in their ORIGINAL lane and row, name Ruin, and read FOUR DISTINCT quantities — an application, its magnitude, an event and a depth threshold — because four cells all reading 'stacks of Ruin' would flatten a lane authored as a theme; none reads a DETONATION, which Grim Focus, Unraveling and Avatar of Ruin already own. §3 asserts the six new read sites exist, the four old ones are GONE (a field read in two places under two meanings is a silent order-dependence), that `permanent_delusion` is absent from `scripts/` WITH COMMENT LINES STRIPPED FIRST (DO's scar — prose recording a removal necessarily names what was removed), and that no `_gain_ruin` call quotes `OLD_GODS_MARK` directly, so a sixth passive site cannot be added that Whispers silently fails to reach. §4 is the check that would have caught the cost this batch nearly paid: **every stat field any rune writes has a live read site in `scripts/`** (116 fields across 65 runes, 0 dead) — the Rune of the Whispering Dark writes `spread_ranks` AND `spread_ruin`, so a fresh field name would have left two of its four clauses paying nothing in silence. §5 asserts every rune grant still RESOLVES (a rune grant goes through `Classes.pending_talent_ability`, not the draft resolver, so DO moving card NAMES while DEFINITIONS stayed put is the only reason four granting runes still work) and REPORTS the two that now duplicate a draft card's grant. §6 asserts the standing rule is written down. **IT NEEDS NO `check_da` WALK_EXEMPT ENTRY**: it reads only the SPEC draft pool, and its header does not name the other call either. NINE NEGATIVE CONTROLS WERE RUN AND ALL NINE BEHAVED: the four cells' old texts restored (5, 5, 6, 6 failures), the Ruined Mind read site defeated (3), the Whispering Dark's `spread_ruin` renamed (5), a sixth `_gain_ruin` call made to quote the constant (3) — and **the comment-stripping trap controlled from BOTH sides**: `permanent_delusion` as a COMMENT left it GREEN, the same identifier as CODE turned it RED. **EM MOVED IT 43 -> 48 AND THE +5 IS §4's TWO WHISPERING DARK ROWS REPAIRED TO INTENT PLUS THREE NEW ONES.** DP asked *does this rune still pay?* and asked it by pinning the two fields the rune SHARED with the node (`spread_ranks`, `spread_ruin`). **The charter is exactly that sharing**, so EM re-keyed the rune onto `rune_spread_ranks`/`rune_spread_ruin` and the old rows would have called a LIVE rune dead. The repair asserts the rune's own fields, ASSERTS THEIR VALUES (15 and 1 — a rename that dropped the number would pass a name check), and asserts the node's two fields are ABSENT from the rune. §3's two read-site rows moved with the code: the guard sums both halves into locals now, and the locals AND their definitions are pinned, because the guard is the half that goes silently dead. **The general §4 property did not move and could not have** — `code.contains(field)` is a SUBSTRING test and `rune_spread_ranks` contains `spread_ranks`, which is worth knowing about that instrument."
   },
   "check_dr": {
    "kind": "gate",
@@ -1153,8 +1157,8 @@
   "check_ek": {
    "kind": "gate",
    "checks": [
-    45,
-    45
+    46,
+    46
    ],
    "checks_obs": 3,
    "fails": [
@@ -1162,7 +1166,7 @@
     0
    ],
    "fails_obs": 3,
-   "note": "**BATCH FN MOVED IT 46 -> 45, AND THE -1 IS `TAG_CONSUMERS` GOING EMPTY.** EZ moved `talents.gd` into that category because `condition_met` handed the whole `cond` dict to `Runes.loadout_condition_met`; FN retired both tag conditions and removed the door, so that file names no word of the tag surface at all and moves back into `NO_TAG_FILES`. **The two consumer arms (-2) are replaced by one `NO_TAG_FILES` arm (+1)**, which is a TIGHTER bound — \"names nothing\" against \"names exactly the door\" — not a looser one, and it is the direction EZ's own comment said this category could move back in. **`TAG_SURFACE` LOST EIGHT WORDS AND THAT MOVES NO COUNT**: `threshold_met`, `breadth_met_fraction`, `loadout_condition_met`, `threshold_line`, `breadth_line`, `primary_tag_count`, `primary_tag_census` and `primary_tag_peak` are not in the tree any more, and a word here is a WAY TO READ A TAG — one that does not exist cannot be one. **`TAG_CHECKERS` GAINED `check_fn.gd`, WHICH IS THE FIFTH BATCH RUNNING TO LEARN THAT A NEW GATE JOINS THAT LIST BY EXISTING** — this time it was predicted and listed before the battery rather than after it. **THREE IDENTICAL STANDALONE READINGS OF 45 / 0.**  |  **BATCH ES MOVED IT 43 -> 45, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS.** §3's display-surface rule is re-pointed rather than loosened and the +2 is its new shape: it used to forbid `map_screen.gd` naming anything but the line builder, which was a PROXY for `does not branch on a tag` that ES made wrong without making the property wrong (a census IS a display, and two screens take one now). The property itself is asserted directly now — a surface may not name a tag WORD — over `map_screen.gd` and `party_screen.gd`, one check each, derived from `TAG_ORDER` so an eighth tag is covered by doing nothing. The four old `w3` reach-past-the-builder checks and the one builder-count check are untouched.  |  **NEW AT EK, MOVED AT EL. THE GATE FOR TWO RULINGS, AND §3 IS THE ONE THAT DECAYS SILENTLY.** EK ships a shared vocabulary carried by every ability in the corpus and every authored rune, shown on the draft card, and it ships MECHANICALLY INERT BY DECISION: no clause reads a tag count, no card's behaviour changes, no magnitude moves. **Inertness is the property nothing else in the tree would notice losing**, so §3 sweeps every `.gd` in the repo comment-stripped for the ten names in the tag surface. **EL §3 SPLIT THAT ASSERTION IN TWO BECAUSE IT WAS TWO CLAIMS AND ONLY ONE IS ABOUT THE GAME**: the files in the SHIPPED GAME naming a tag are pinned at THREE (`classes.gd` and `runes.gd` define, `map_screen.gd` displays) and the TARGETS that check one are listed separately — rolled into one number, writing a new gate was indistinguishable from breaking the rule, and EL's brief forbade the number moving. The game half did not move; the target half went two to three when `check_el` arrived. ZERO is still asserted separately in the six files a mechanic would have to live in. §1's POPULATION IS `Classes.ability_corpus()` AND THAT IS DA §3's RULE APPLIED RATHER THAN EXEMPTED. §2 pins the vocabulary at SEVEN (six at EK; MARK joined at EL) with at most two tags a card and the primary first, and PRINTS the spread rather than asserting it (DX §1) — the EQUALITY is what makes an eighth a decision somebody made. §4 re-runs the BR §1 name sweep LIVE, and **EL FOUND THREE HOLES IN IT**: talent and rune LANES were invisible (`_collect_names` reads `\"name\"` keys and a lane lives under `\"lane\"`, so `Tempo` sat in nine Sharpshooter nodes while the sweep called the tag clean), ITEMS and RELICS were absent entirely (`defense` is the Defense Potion), and **the status-LABEL arm asked whether the source contained `[\"Ward\",` — an exact whole label — so it was blind to every label merely CONTAINING the word**, which is why the `party_mark` chip labelled \"Hunter's Mark\" went unseen. All three closed; both new arms assert their own population (EA §5). §4 also compares each tag's clash set against a NAMED `CLASH_EXEMPT` as an EQUALITY rather than skipping it, so the two same-meaning collisions EL ships (MARK with three ability names and a chip; DEFENSE with the Defense Potion) cannot hide a fifth. §5 pins CK §1's one-builder rule one layer down. **THE LIVE HALF IS NOT HERE**: the draft card's tag line is driven in `check_map_screen`, which WITHHOLDS its verdict on a mismatch. THE COUNT MOVED 39 -> 43 AT EL: §3 splits one assertion into two (+1), §4 adds two population assertions (+2) and one more tag to sweep (+1).  **BATCH EZ MOVED IT 45 -> 46, AND THIS IS THE BATCH §3 WAS KEPT AUTHORED FOR.** EK's claim was that nothing reads a tag for anything but DISPLAY; EZ ends that deliberately — eight of the twenty-one runes are gated on §0's loadout conditions, so a payload is now refused or applied on the strength of a tag count. `TAG_SURFACE` gains the eight new ways to read one; `TAG_CHECKERS` gains `check_ez.gd`; and a THIRD category, `TAG_CONSUMERS`, is added for `talents.gd` — a file that reaches the machinery through the one door (`Runes.loadout_condition_met`) without holding any of it. **That moved `talents.gd` out of `NO_TAG_FILES` and the gate did not get weaker for it**: a consumer is asserted to name EXACTLY the door and no other word of the surface, and no tag WORD at all, which is a tighter bound than \"none\". `battle.gd` still holds zero, which is what says ES §4's \"read at the SPAWN, never in the strike loop\" is still obeyed. §4's MARK exemption gains a fifth entry, `rune:Standing Mark` — the first that is a rune, and a same-meaning collision under EL's shipping rule.  **BATCH FK ADDED THE NINTH `TAG_CHECKER` and it is the FOURTH batch running to learn that a new gate joins that list by existing.** `check_fk` §2 reads `tag_threshold` and `tag_breadth` off the payloads to assert no FK rune carries either. Listed, not exempted."
+   "note": "**BATCH FX MOVED IT 45 -> 46:** 1 added (the name arm read all 27); five FX node names recorded in CLASH_EXEMPT. **BATCH FN MOVED IT 46 -> 45, AND THE -1 IS `TAG_CONSUMERS` GOING EMPTY.** EZ moved `talents.gd` into that category because `condition_met` handed the whole `cond` dict to `Runes.loadout_condition_met`; FN retired both tag conditions and removed the door, so that file names no word of the tag surface at all and moves back into `NO_TAG_FILES`. **The two consumer arms (-2) are replaced by one `NO_TAG_FILES` arm (+1)**, which is a TIGHTER bound — \"names nothing\" against \"names exactly the door\" — not a looser one, and it is the direction EZ's own comment said this category could move back in. **`TAG_SURFACE` LOST EIGHT WORDS AND THAT MOVES NO COUNT**: `threshold_met`, `breadth_met_fraction`, `loadout_condition_met`, `threshold_line`, `breadth_line`, `primary_tag_count`, `primary_tag_census` and `primary_tag_peak` are not in the tree any more, and a word here is a WAY TO READ A TAG — one that does not exist cannot be one. **`TAG_CHECKERS` GAINED `check_fn.gd`, WHICH IS THE FIFTH BATCH RUNNING TO LEARN THAT A NEW GATE JOINS THAT LIST BY EXISTING** — this time it was predicted and listed before the battery rather than after it. **THREE IDENTICAL STANDALONE READINGS OF 45 / 0.**  |  **BATCH ES MOVED IT 43 -> 45, WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS.** §3's display-surface rule is re-pointed rather than loosened and the +2 is its new shape: it used to forbid `map_screen.gd` naming anything but the line builder, which was a PROXY for `does not branch on a tag` that ES made wrong without making the property wrong (a census IS a display, and two screens take one now). The property itself is asserted directly now — a surface may not name a tag WORD — over `map_screen.gd` and `party_screen.gd`, one check each, derived from `TAG_ORDER` so an eighth tag is covered by doing nothing. The four old `w3` reach-past-the-builder checks and the one builder-count check are untouched.  |  **NEW AT EK, MOVED AT EL. THE GATE FOR TWO RULINGS, AND §3 IS THE ONE THAT DECAYS SILENTLY.** EK ships a shared vocabulary carried by every ability in the corpus and every authored rune, shown on the draft card, and it ships MECHANICALLY INERT BY DECISION: no clause reads a tag count, no card's behaviour changes, no magnitude moves. **Inertness is the property nothing else in the tree would notice losing**, so §3 sweeps every `.gd` in the repo comment-stripped for the ten names in the tag surface. **EL §3 SPLIT THAT ASSERTION IN TWO BECAUSE IT WAS TWO CLAIMS AND ONLY ONE IS ABOUT THE GAME**: the files in the SHIPPED GAME naming a tag are pinned at THREE (`classes.gd` and `runes.gd` define, `map_screen.gd` displays) and the TARGETS that check one are listed separately — rolled into one number, writing a new gate was indistinguishable from breaking the rule, and EL's brief forbade the number moving. The game half did not move; the target half went two to three when `check_el` arrived. ZERO is still asserted separately in the six files a mechanic would have to live in. §1's POPULATION IS `Classes.ability_corpus()` AND THAT IS DA §3's RULE APPLIED RATHER THAN EXEMPTED. §2 pins the vocabulary at SEVEN (six at EK; MARK joined at EL) with at most two tags a card and the primary first, and PRINTS the spread rather than asserting it (DX §1) — the EQUALITY is what makes an eighth a decision somebody made. §4 re-runs the BR §1 name sweep LIVE, and **EL FOUND THREE HOLES IN IT**: talent and rune LANES were invisible (`_collect_names` reads `\"name\"` keys and a lane lives under `\"lane\"`, so `Tempo` sat in nine Sharpshooter nodes while the sweep called the tag clean), ITEMS and RELICS were absent entirely (`defense` is the Defense Potion), and **the status-LABEL arm asked whether the source contained `[\"Ward\",` — an exact whole label — so it was blind to every label merely CONTAINING the word**, which is why the `party_mark` chip labelled \"Hunter's Mark\" went unseen. All three closed; both new arms assert their own population (EA §5). §4 also compares each tag's clash set against a NAMED `CLASH_EXEMPT` as an EQUALITY rather than skipping it, so the two same-meaning collisions EL ships (MARK with three ability names and a chip; DEFENSE with the Defense Potion) cannot hide a fifth. §5 pins CK §1's one-builder rule one layer down. **THE LIVE HALF IS NOT HERE**: the draft card's tag line is driven in `check_map_screen`, which WITHHOLDS its verdict on a mismatch. THE COUNT MOVED 39 -> 43 AT EL: §3 splits one assertion into two (+1), §4 adds two population assertions (+2) and one more tag to sweep (+1).  **BATCH EZ MOVED IT 45 -> 46, AND THIS IS THE BATCH §3 WAS KEPT AUTHORED FOR.** EK's claim was that nothing reads a tag for anything but DISPLAY; EZ ends that deliberately — eight of the twenty-one runes are gated on §0's loadout conditions, so a payload is now refused or applied on the strength of a tag count. `TAG_SURFACE` gains the eight new ways to read one; `TAG_CHECKERS` gains `check_ez.gd`; and a THIRD category, `TAG_CONSUMERS`, is added for `talents.gd` — a file that reaches the machinery through the one door (`Runes.loadout_condition_met`) without holding any of it. **That moved `talents.gd` out of `NO_TAG_FILES` and the gate did not get weaker for it**: a consumer is asserted to name EXACTLY the door and no other word of the surface, and no tag WORD at all, which is a tighter bound than \"none\". `battle.gd` still holds zero, which is what says ES §4's \"read at the SPAWN, never in the strike loop\" is still obeyed. §4's MARK exemption gains a fifth entry, `rune:Standing Mark` — the first that is a rune, and a same-meaning collision under EL's shipping rule.  **BATCH FK ADDED THE NINTH `TAG_CHECKER` and it is the FOURTH batch running to learn that a new gate joins that list by existing.** `check_fk` §2 reads `tag_threshold` and `tag_breadth` off the payloads to assert no FK rune carries either. Listed, not exempted."
   },
   "check_eh": {
    "kind": "gate",
@@ -1195,8 +1199,8 @@
   "check_em": {
    "kind": "gate",
    "checks": [
-    412,
-    412
+    416,
+    416
    ],
    "checks_obs": 4,
    "fails": [
@@ -1204,7 +1208,7 @@
     0
    ],
    "fails_obs": 3,
-   "note": "**BATCH FC MOVED IT 286 -> 289, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+3 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 289 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   BATCH EM's gate, and EJ §5 named this batch as its home: *the property a future gate wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.* **§1 DERIVES the property from `Talents.LANE_TREES` and `runes.json`** rather than from a list of field names, so a tree that stops existing takes its fields with it. The judgement it needs is `UNIT_MATH` — nine fields a node writes that are nevertheless the UNIT's own math (`crit_bonus`, `speed`, global damage, the crit/parry/turn-order pipelines relics also write) — **asserted as an EQUALITY**, and it found EJ's own miscount on its first run: that report says NINE and lists TEN, and the tenth (`armor`) is written by no live node at all. **§2 IS THE ONE THAT EARNS THE GATE.** Splitting `X` into `X` and `rune_X` is safe in the arithmetic and lethal in the GUARD: `if occ.spread_ranks > 0` is FALSE for a hero holding the rune and not the node, so the clause pays nothing and nothing throws. It sweeps STATEMENTS (a guard and its payout are two statements; an expression is often three lines) and fails if any statement reads one half without the other — 47 pairs, 97 readings, 0 holes. **ITS FIRST VERSION WAS WRONG AND ITS OWN HEADER SAYS HOW**: it excluded a match preceded by a word character OR A DOT, and `attacker.vulture` has a dot in front of it, so it was blind to 80 of its 85 sites while printing a clean zero. §3 asserts every `rune_` field survives `_typed_payload` as the type its BattleUnit partner is DECLARED — both directions, because an int loading as a float fails the spawn outright and a float coerced to int rounds the rune quietly under strength (the Bared Guard's -0.15 would flatten to 0). §4 pins the three clauses with no home as an EQUALITY, so the day one is answered this gate reds and the answer is to DELETE its row. **FIVE NEGATIVE CONTROLS, ALL FIVE BIT, EACH IN ITS OWN SECTION**: a clause re-keyed back onto the node (§1, 2 failures), one dotted read site disarmed (§2), a float field added to `STAT_INT_KEYS` (§3), one of the three re-keyed (§4 and §2 both), and an eleventh `UNIT_MATH` row (the equality). **Written BEFORE the battery off three identical standalone readings of 210 checks / 0 failures.** It needs no `check_da` WALK_EXEMPT entry: it reads ONE ability-source family (`LANE_TREES`) and returns no corpus.  **BATCH EZ MOVED IT 223 -> 286, AND THE +63 IS ITS OWN LOOP WALKING NEW CONTENT.** §1's derivation — no rune writes a live talent node's counter — is per-ENTRY over `runes.json`, so authoring twenty-one runes raises the count by construction. **The property is unchanged and none of the twenty-one writes a node counter**: all 21 write `rune_`-prefixed fields whose only writer anywhere in the project is `data/runes.json`, which `check_ez` §4 asserts independently by sweeping the comment-stripped source of all five game scripts for a WRITE. Three identical standalone readings of 286 / 0.  **BATCH FK MOVED IT 417 -> 409, AND THE MOVE IS THE FAULT THIS GATE CAUGHT.** FK's first cut named two rune fields `rune_whetstone` and `rune_slaughterhouse`, and `whetstone` and `slaughterhouse` are LIVE talent counters (Swordmaster Blade r8, Berserker Bloodletting r8) — so EM's rule claimed every read of `attacker.whetstone` owed a `+ attacker.rune_whetstone`, which is false. **NINE REDS, and the repair was a rename and not an exemption**: `rune_growing_edge` and `rune_bleedout_action`. The count falls because the extractor's population shrinks back to what it was before those two names existed. **BATCH FO MOVED IT 409 -> 412, AND THE RISE IS ONE POOL ENTRY WALKED THREE TIMES (its stat-clause census reads 179 clauses across 127 runes now).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
+   "note": "**BATCH FX MOVED IT 412 -> 416:** 4 added: no rune names a node by id or name, with two negative arms; UNIT_MATH follows the tree. **BATCH FC MOVED IT 286 -> 289, AND THE RISE IS ONE POOL ENTRY WALKED BY A PER-ENTRY LOOP (+3 a rune).** FC §3 retires Split Tongue and authors the Rune of the Shared Ruin in its place; the retired entry is KEPT, so `data/runes.json` goes 86 -> 87 while the LIVE count stays at 21. **NOT ONE ASSERTION IN THIS TARGET CHANGED.** **THIS ROW WAS NOT PREDICTED AND SHOULD HAVE BEEN**: it came back as a `check_de` NOTICE on the acceptance run, and `test_batch_bh`'s own note already named this suite as one of the pool-walkers whose count moves with the file's size. **ATTRIBUTED IN BOTH DIRECTIONS RATHER THAN ARGUED**: with HEAD's 86-entry `data/runes.json` and every other FC change in place, this target read its OLD number exactly; with FC's 87, its new one. Three identical standalone readings of 289 / 0 afterwards, and `check_de` re-run over the SAME battery logs read 382 / 0 / 0 notices.  |   BATCH EM's gate, and EJ §5 named this batch as its home: *the property a future gate wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.* **§1 DERIVES the property from `Talents.LANE_TREES` and `runes.json`** rather than from a list of field names, so a tree that stops existing takes its fields with it. The judgement it needs is `UNIT_MATH` — nine fields a node writes that are nevertheless the UNIT's own math (`crit_bonus`, `speed`, global damage, the crit/parry/turn-order pipelines relics also write) — **asserted as an EQUALITY**, and it found EJ's own miscount on its first run: that report says NINE and lists TEN, and the tenth (`armor`) is written by no live node at all. **§2 IS THE ONE THAT EARNS THE GATE.** Splitting `X` into `X` and `rune_X` is safe in the arithmetic and lethal in the GUARD: `if occ.spread_ranks > 0` is FALSE for a hero holding the rune and not the node, so the clause pays nothing and nothing throws. It sweeps STATEMENTS (a guard and its payout are two statements; an expression is often three lines) and fails if any statement reads one half without the other — 47 pairs, 97 readings, 0 holes. **ITS FIRST VERSION WAS WRONG AND ITS OWN HEADER SAYS HOW**: it excluded a match preceded by a word character OR A DOT, and `attacker.vulture` has a dot in front of it, so it was blind to 80 of its 85 sites while printing a clean zero. §3 asserts every `rune_` field survives `_typed_payload` as the type its BattleUnit partner is DECLARED — both directions, because an int loading as a float fails the spawn outright and a float coerced to int rounds the rune quietly under strength (the Bared Guard's -0.15 would flatten to 0). §4 pins the three clauses with no home as an EQUALITY, so the day one is answered this gate reds and the answer is to DELETE its row. **FIVE NEGATIVE CONTROLS, ALL FIVE BIT, EACH IN ITS OWN SECTION**: a clause re-keyed back onto the node (§1, 2 failures), one dotted read site disarmed (§2), a float field added to `STAT_INT_KEYS` (§3), one of the three re-keyed (§4 and §2 both), and an eleventh `UNIT_MATH` row (the equality). **Written BEFORE the battery off three identical standalone readings of 210 checks / 0 failures.** It needs no `check_da` WALK_EXEMPT entry: it reads ONE ability-source family (`LANE_TREES`) and returns no corpus.  **BATCH EZ MOVED IT 223 -> 286, AND THE +63 IS ITS OWN LOOP WALKING NEW CONTENT.** §1's derivation — no rune writes a live talent node's counter — is per-ENTRY over `runes.json`, so authoring twenty-one runes raises the count by construction. **The property is unchanged and none of the twenty-one writes a node counter**: all 21 write `rune_`-prefixed fields whose only writer anywhere in the project is `data/runes.json`, which `check_ez` §4 asserts independently by sweeping the comment-stripped source of all five game scripts for a WRITE. Three identical standalone readings of 286 / 0.  **BATCH FK MOVED IT 417 -> 409, AND THE MOVE IS THE FAULT THIS GATE CAUGHT.** FK's first cut named two rune fields `rune_whetstone` and `rune_slaughterhouse`, and `whetstone` and `slaughterhouse` are LIVE talent counters (Swordmaster Blade r8, Berserker Bloodletting r8) — so EM's rule claimed every read of `attacker.whetstone` owed a `+ attacker.rune_whetstone`, which is false. **NINE REDS, and the repair was a rename and not an exemption**: `rune_growing_edge` and `rune_bleedout_action`. The count falls because the extractor's population shrinks back to what it was before those two names existed. **BATCH FO MOVED IT 409 -> 412, AND THE RISE IS ONE POOL ENTRY WALKED THREE TIMES (its stat-clause census reads 179 clauses across 127 runes now).** §2 retires the Wide Watch and authors the Shared Mark in its place; the ENTRY is KEPT (the Melted Armor contract), so a one-out-one-in replacement leaves the LIVE pool at sixty and grows the FILE 126 -> 127. Every walk over `Runes.ids()` therefore reads one more entry. **Same shape as FC's move recorded above, same cause, and it is a NOTICE rather than an error: a RISING count is new content walked, a FALLING one is coverage lost.**"
   },
   "check_es": {
    "kind": "gate",
@@ -1377,8 +1381,8 @@
   "check_fk": {
    "kind": "gate",
    "checks": [
-    64,
-    64
+    63,
+    63
    ],
    "checks_obs": 3,
    "fails": [
@@ -1386,7 +1390,7 @@
     0
    ],
    "fails_obs": 3,
-   "note": "**BATCH FN MOVED NO COUNT AND INVERTED §2's SECOND ARM.** `STILL_GATED` asserted that the eight shipped gated runes still carried BOTH their condition and their label, so that \"none of the thirty-nine is authored\" could not be satisfied by quietly ungating the ones that were owed a repair. **FN paid the repair**, so the constant is `WAS_GATED` and the arm asserts none of the eight carries either — the same guard against a silent re-gating that the original was against a silent ungating. **AND THE FIVE COMMENTS IN THIS FILE THAT SAID SIX NOW SAY EIGHT**: it was always eight (four THRESHOLD, four BREADTH), this constant always held the right list, and eleven lines across five files disagreed with it — FL §2a derived the count off this very constant and FN corrected all eleven. **The count does not move: the arm is one `ok` either way, and the five corrections are comments.**  |  NEW AT FK. **THE INSTRUMENT FOR THE FORTY, AND ITS REASON TO EXIST IS §3.** A rune is three things — a JSON entry, a declared field and a read site — and `runes.json` shows one of them; §3 walks all three for all thirty-nine, so a payload that applies and pays nothing (DK measured Empower attaching to a beast at exactly 1.0000) is caught by the gate rather than by a player. **§1** is the pool census and asserts the two scope strings that would roll for nobody are absent AND that `spec:inquisitor` and `spec:mystic` are present, because the absence alone passes on a deleted set. **§2** asserts no FK rune carries a THRESHOLD or a BREADTH — the two secondaries the designer retired going forward — AND that the six already-shipped gated ones are STILL GATED, because the negative alone is satisfiable by ungating the six that are owed a repair. **§4** is the coercion list in both directions: an int MISSING from `STAT_INT_KEYS` fails the spawn loudly, a float wrongly ON it flattens to zero silently. **§5** resolves every `requires_ability` against the corpus AND against the scoped hero's own four earnable channels, because a rune naming an ability its spec cannot earn is inert for everyone who can buy it. **§6** asserts the Rune of the Standing Ground is ABSENT and asserts the REASON — Consecrated Ground already kindles every hero standing in it (AW §2) — so the day a batch narrows that, the gate says the rune is authorable rather than a report nobody re-reads saying so. **ARMED, WITH A TWO-ARMED PAIR ON §3**: an undeclared field reds §3 and §4; the same field declared+written+READ is green and declared+written+NOT-read is red at *\"writes a field NOTHING READS (1 mentions)\"* — the first arm proves the walk sees a MISSING field and only the pair proves it sees an INERT one. §6's control narrows the ground to its caster and reds. **THE ROW IS WRITTEN BEFORE THE BATTERY**, off three identical standalone readings of 64/0."
+   "note": "**BATCH FX MOVED IT 64 -> 63:** 1 deleted: Fervor's text; the Standing Ground's reason still stands. **BATCH FN MOVED NO COUNT AND INVERTED §2's SECOND ARM.** `STILL_GATED` asserted that the eight shipped gated runes still carried BOTH their condition and their label, so that \"none of the thirty-nine is authored\" could not be satisfied by quietly ungating the ones that were owed a repair. **FN paid the repair**, so the constant is `WAS_GATED` and the arm asserts none of the eight carries either — the same guard against a silent re-gating that the original was against a silent ungating. **AND THE FIVE COMMENTS IN THIS FILE THAT SAID SIX NOW SAY EIGHT**: it was always eight (four THRESHOLD, four BREADTH), this constant always held the right list, and eleven lines across five files disagreed with it — FL §2a derived the count off this very constant and FN corrected all eleven. **The count does not move: the arm is one `ok` either way, and the five corrections are comments.**  |  NEW AT FK. **THE INSTRUMENT FOR THE FORTY, AND ITS REASON TO EXIST IS §3.** A rune is three things — a JSON entry, a declared field and a read site — and `runes.json` shows one of them; §3 walks all three for all thirty-nine, so a payload that applies and pays nothing (DK measured Empower attaching to a beast at exactly 1.0000) is caught by the gate rather than by a player. **§1** is the pool census and asserts the two scope strings that would roll for nobody are absent AND that `spec:inquisitor` and `spec:mystic` are present, because the absence alone passes on a deleted set. **§2** asserts no FK rune carries a THRESHOLD or a BREADTH — the two secondaries the designer retired going forward — AND that the six already-shipped gated ones are STILL GATED, because the negative alone is satisfiable by ungating the six that are owed a repair. **§4** is the coercion list in both directions: an int MISSING from `STAT_INT_KEYS` fails the spawn loudly, a float wrongly ON it flattens to zero silently. **§5** resolves every `requires_ability` against the corpus AND against the scoped hero's own four earnable channels, because a rune naming an ability its spec cannot earn is inert for everyone who can buy it. **§6** asserts the Rune of the Standing Ground is ABSENT and asserts the REASON — Consecrated Ground already kindles every hero standing in it (AW §2) — so the day a batch narrows that, the gate says the rune is authorable rather than a report nobody re-reads saying so. **ARMED, WITH A TWO-ARMED PAIR ON §3**: an undeclared field reds §3 and §4; the same field declared+written+READ is green and declared+written+NOT-read is red at *\"writes a field NOTHING READS (1 mentions)\"* — the first arm proves the walk sees a MISSING field and only the pair proves it sees an INERT one. §6's control narrows the ground to its caster and reds. **THE ROW IS WRITTEN BEFORE THE BATTERY**, off three identical standalone readings of 64/0."
   },
   "check_fm": {
    "kind": "gate",
@@ -1419,8 +1423,8 @@
   "check_fo": {
    "kind": "gate",
    "checks": [
-    93,
-    93
+    85,
+    85
    ],
    "checks_obs": 1,
    "fails": [
@@ -1428,13 +1432,13 @@
     0
    ],
    "fails_obs": 1,
-   "note": "**NEW AT FO. TWO RULINGS, AND THEY DECAY IN OPPOSITE DIRECTIONS.** §1 — Deepening Hex SUBTRACTS 2 rather than installing 8, under `RUIN_FLOOR := 3`. **The `mini` it replaces was CLOSED at the bottom and a subtraction is OPEN**: nothing could compose with `mini(step, 8)` below the capstone's own 5, and everything composes with a subtraction, so at the floor the rune is worth EXACTLY ZERO again — the hole FN measured, arriving by a new route. §1e is therefore a **STRICT** inequality on both builds rather than EZ §5's property alone, because *never shallower* is satisfied by `mini` itself; §1c pins **10, 5 and 2 as well as the 3**, because the floor's reason is a RELATION between them and a floor of 3 under a capstone that had moved to 4 answers nothing; §1f drives BOTH floor edges on a live board at thresholds the live tree cannot reach, which is the point — it guards a composition that does not exist yet; §1g walks real stacks onto a real enemy with the SEVENTH as its control and an unruned mark as its second. §2 — the Wide Watch is RETIRED and the Shared Mark replaces it, and **the KEPT half is asserted as hard as the retired half**: entry, payload, `rune_wide_watch` field and the read site in `_sharpshooter_focus` are all pinned PRESENT, because the tempting green on the day something reds is to delete one of the four and a saved run reads all of them. §2f proves `_gain_focus` is the only way in **BEHAVIOURALLY** — the meter is parked on Spray of Arrows' 50-point ceiling, which lives inside that function and nowhere else — with the ceiling lifted as its positive arm. §2g drives the COMPANION path on a live Canis: *ally* is heroes AND companions (CV §4), a beast's blows never enter the hero strike loop, and **the party the arm needs is ILLEGAL** (one class each, and the Sharpshooter IS the Hunter), so the fixture is what makes DK §1's measurement possible at all. §3 asserts the `Overkill` collision off the TREES — two nodes, two ids, row 7 in both — because `docs/reports/` is the one file class no instrument reads, and it pins the corrected lane word as a SENTENCE rather than as `Precision`, which is a real lane and is the Sharpshooter's own."
+   "note": "**BATCH FX MOVED IT 93 -> 85:** 8 deleted: the Overkill collision's two nodes and lanes; §1c and §3 carry the state FX left. **NEW AT FO. TWO RULINGS, AND THEY DECAY IN OPPOSITE DIRECTIONS.** §1 — Deepening Hex SUBTRACTS 2 rather than installing 8, under `RUIN_FLOOR := 3`. **The `mini` it replaces was CLOSED at the bottom and a subtraction is OPEN**: nothing could compose with `mini(step, 8)` below the capstone's own 5, and everything composes with a subtraction, so at the floor the rune is worth EXACTLY ZERO again — the hole FN measured, arriving by a new route. §1e is therefore a **STRICT** inequality on both builds rather than EZ §5's property alone, because *never shallower* is satisfied by `mini` itself; §1c pins **10, 5 and 2 as well as the 3**, because the floor's reason is a RELATION between them and a floor of 3 under a capstone that had moved to 4 answers nothing; §1f drives BOTH floor edges on a live board at thresholds the live tree cannot reach, which is the point — it guards a composition that does not exist yet; §1g walks real stacks onto a real enemy with the SEVENTH as its control and an unruned mark as its second. §2 — the Wide Watch is RETIRED and the Shared Mark replaces it, and **the KEPT half is asserted as hard as the retired half**: entry, payload, `rune_wide_watch` field and the read site in `_sharpshooter_focus` are all pinned PRESENT, because the tempting green on the day something reds is to delete one of the four and a saved run reads all of them. §2f proves `_gain_focus` is the only way in **BEHAVIOURALLY** — the meter is parked on Spray of Arrows' 50-point ceiling, which lives inside that function and nowhere else — with the ceiling lifted as its positive arm. §2g drives the COMPANION path on a live Canis: *ally* is heroes AND companions (CV §4), a beast's blows never enter the hero strike loop, and **the party the arm needs is ILLEGAL** (one class each, and the Sharpshooter IS the Hunter), so the fixture is what makes DK §1's measurement possible at all. §3 asserts the `Overkill` collision off the TREES — two nodes, two ids, row 7 in both — because `docs/reports/` is the one file class no instrument reads, and it pins the corrected lane word as a SENTENCE rather than as `Precision`, which is a real lane and is the Sharpshooter's own."
   },
   "check_fq": {
    "kind": "gate",
    "checks": [
-    48,
-    48
+    47,
+    47
    ],
    "fails": [
     0,
@@ -1442,7 +1446,7 @@
    ],
    "checks_obs": 1,
    "fails_obs": 1,
-   "note": "**NEW AT FQ. THE PROFILE'S VERSION GUARD.** `Profile._load()` had no version branch at all: it merged every key it found over the defaults and stamped `data[\"version\"] = VERSION` unconditionally, reading the old value nowhere. §1 drives the branch in BOTH directions (a current-version profile is ACCEPTED and reads its purse back; five shapes are refused — no version key, +1, 99, non-dictionary, non-JSON), because a guard that never refuses and a guard that refuses everything pass the same static check. **§2 IS THE ARM THE BATCH EXISTS FOR**: the file hashed across five write paths, since `_save()` overwriting on the next point earned is what destroys twelve purses, not the read. §3 is the lossless round trip. §4b drives `_save()` as the FIRST call of a session — the only state that tells `if refused` placed before `_load()` apart from after it, and the spelling that looks correct either way. **NO VERSION LITERAL IS PINNED** (instrument-rules' standing rule, learned three times off the run save): every arm reads `Profile.VERSION` / `Profile.MIN_VERSION` and pins the RELATION. **§1g WAS ADDED AFTER THE FIRST DRAFT AND IT IS THE POSITIVE ARM FOR ALL OF §2.** With `_save()` made inert in an out-of-repo copy — the game silently never saving again — the gate read **46 checks / 0 failures**: every §2 arm asserts the file did NOT change, and a save that never writes satisfies all of them, while §3's round trip re-reads a file it never rewrote. §1g asserts an ACCEPTED profile WRITES, and is the only arm that tells a guarded save from a dead one. Two-armed: it reds against the inert copy and passes against the live one."
+   "note": "**BATCH FX MOVED IT 48 -> 47:** 1 deleted: the talent_equipped round-trip row; the guard is v3 / MIN 2. **NEW AT FQ. THE PROFILE'S VERSION GUARD.** `Profile._load()` had no version branch at all: it merged every key it found over the defaults and stamped `data[\"version\"] = VERSION` unconditionally, reading the old value nowhere. §1 drives the branch in BOTH directions (a current-version profile is ACCEPTED and reads its purse back; five shapes are refused — no version key, +1, 99, non-dictionary, non-JSON), because a guard that never refuses and a guard that refuses everything pass the same static check. **§2 IS THE ARM THE BATCH EXISTS FOR**: the file hashed across five write paths, since `_save()` overwriting on the next point earned is what destroys twelve purses, not the read. §3 is the lossless round trip. §4b drives `_save()` as the FIRST call of a session — the only state that tells `if refused` placed before `_load()` apart from after it, and the spelling that looks correct either way. **NO VERSION LITERAL IS PINNED** (instrument-rules' standing rule, learned three times off the run save): every arm reads `Profile.VERSION` / `Profile.MIN_VERSION` and pins the RELATION. **§1g WAS ADDED AFTER THE FIRST DRAFT AND IT IS THE POSITIVE ARM FOR ALL OF §2.** With `_save()` made inert in an out-of-repo copy — the game silently never saving again — the gate read **46 checks / 0 failures**: every §2 arm asserts the file did NOT change, and a save that never writes satisfies all of them, while §3's round trip re-reads a file it never rewrote. §1g asserts an ACCEPTED profile WRITES, and is the only arm that tells a guarded save from a dead one. Two-armed: it reds against the inert copy and passes against the live one."
   },
   "check_fr": {
    "kind": "gate",
@@ -1461,8 +1465,8 @@
   "check_fs": {
    "kind": "gate",
    "checks": [
-    39,
-    39
+    33,
+    33
    ],
    "fails": [
     0,
@@ -1470,7 +1474,21 @@
    ],
    "checks_obs": 1,
    "fails_obs": 1,
-   "note": "**NEW AT FS. THE DOC-vs-DOC PAIRING CHECK — FR's OWN RECOMMENDATION, AND THE ONLY SHAPE IT SAID WAS WORTH BUILDING.** FR read every numeric claim in `master.html` against the code (1,265 comparisons, 3 raw flags, 0 true defects) and concluded the value gate would have caught ZERO of the fourteen defects it found, because the part of the document that names a constant is already right. Its largest finding needed no code at all: **eight of the twelve §7 talent headings sat above the wrong tree's table while all 324 cells were correct.** §1 pairs each heading's three lane names against the `<th>` row of the table beneath it, asserts the section reads heading-then-table twelve times over, and asserts no spec heads two trees. §2 reads §6b's four stated counts AS WORDS and compares them to the rows the table actually carries, plus the paragraph's own arithmetic (the split sums, and draft minus table equals the remainder the same sentence names). §3 is the liveness arm and it is not decoration: **the first draft of §1 read 9 headings of 12 and printed four confident false mismatches**, because three headings wrap across a line break and a line-anchored match dropped them, sliding the zip three places out of step. Everything is matched on a whitespace-flattened copy, the three wrapped headings are pinned by name, and the word reader and the lane comparison are both driven in each direction. **IT WAS ARMED ON THE LIVE TREE AND FOUND A DEFECT FR'S OWN READ MISSED:** the Arcanist heading named CONTROL over a table listing Entropy — the lane was renamed at Batch AT and `talents.gd`'s own comment says so. Same shape as FR's D11 and one spec along. **WHAT IT CANNOT SEE IS IN ITS HEADER:** it asserts that two parts of one document AGREE, never that either is TRUE, and it reads lane names and row counts and no cell."
+   "note": "**BATCH FX MOVED IT 39 -> 33, AND §1 NOW ASKS THE ONE TREE.** §1 paired twelve §7 lane headings with the tree tables beneath them; FX deleted the twelve trees, so that pairing has no subject (DG §2) and 22 checks went with it (16 in §1; in §3 the twelve-and-twelve walk, three wrapped-heading names and two lane probes). §1 now asks whether what §7 SAYS about its one tree (node count and tiers in words, prices and total in digits) agrees with the table §7 prints under it, and never goes backwards in the tier column: 10 checks. §3 asserts the population, the two wrapped statements and the tier-order comparison both ways: 6 more. Nothing in §1 is pinned to the code's 27, which check_fx §1 owns. **NEW AT FS. THE DOC-vs-DOC PAIRING CHECK — FR's OWN RECOMMENDATION, AND THE ONLY SHAPE IT SAID WAS WORTH BUILDING.** FR read every numeric claim in `master.html` against the code (1,265 comparisons, 3 raw flags, 0 true defects) and concluded the value gate would have caught ZERO of the fourteen defects it found, because the part of the document that names a constant is already right. Its largest finding needed no code at all: **eight of the twelve §7 talent headings sat above the wrong tree's table while all 324 cells were correct.** §1 pairs each heading's three lane names against the `<th>` row of the table beneath it, asserts the section reads heading-then-table twelve times over, and asserts no spec heads two trees. §2 reads §6b's four stated counts AS WORDS and compares them to the rows the table actually carries, plus the paragraph's own arithmetic (the split sums, and draft minus table equals the remainder the same sentence names). §3 is the liveness arm and it is not decoration: **the first draft of §1 read 9 headings of 12 and printed four confident false mismatches**, because three headings wrap across a line break and a line-anchored match dropped them, sliding the zip three places out of step. Everything is matched on a whitespace-flattened copy, the three wrapped headings are pinned by name, and the word reader and the lane comparison are both driven in each direction. **IT WAS ARMED ON THE LIVE TREE AND FOUND A DEFECT FR'S OWN READ MISSED:** the Arcanist heading named CONTROL over a table listing Entropy — the lane was renamed at Batch AT and `talents.gd`'s own comment says so. Same shape as FR's D11 and one spec along. **WHAT IT CANNOT SEE IS IN ITS HEADER:** it asserts that two parts of one document AGREE, never that either is TRUE, and it reads lane names and row counts and no cell."
+  },
+  "check_fx": {
+   "kind": "gate",
+   "checks": [
+    494,
+    494
+   ],
+   "fails": [
+    0,
+    0
+   ],
+   "checks_obs": 1,
+   "fails_obs": 1,
+   "note": "**BATCH FX MOVED IT 493 -> 494:** the drive reports a field the tree stops writing instead of throwing (the zero-start control truncated it at 468). **NEW AT FX. THE ONE TALENT TREE, KEYED TO THE CLASS.** §0 proves the gate's own Profile writes go to a scratch file. **§1 THE SHAPE:** 27 nodes in three tiers of nine at 1/2/3 (54), unique ids, every payload exactly one `stat` block on a field BattleUnit declares, NO TWO NODES WRITE ONE FIELD (the surviving half of BM's row-8 rule), no digit in parentheses, and each node's text agrees with its magnitude through a field -> factor/phrase table, so a payload that moves without its text reds; the tree grants nothing. **§2 THE GATES AND THE LEDGER:** the purse is the CLASS's (two Warrior specs in one party pay the class once, a spec key has no purse), TIERS_OPEN [0,1,2,3] and nothing opens at rung 0, the spend gate names the tier below and the difficulty gate still binds with the spend met, buying is wearing, the class purses stay apart, a refund cannot strand a tier, respec is whole, and the run reads the ledger through the spec's class. TIER_SPEND_MIN is READ and only its 1-9 range is asserted: the number is the designer's. **§3 THE FOLD, DRIVEN ON A COPY:** twelve spec purses fold by MAX into four, matching fold_report; cells and the loadout are dropped, the tier and every other bucket kept; the file stays v2 on disk until the first save; 3/3/3 folds to 3, not 9; an unplaceable purse or a non-number is REFUSED with the file hash unchanged; MIN_VERSION moved past 1. **§4 EVERY NODE PAYS, LIVE, ON EVERY CLASS:** (a) one battle with all 27 on four heroes against one with none, 112 field landings, max_hp x1.2 and both party-wide stamps; (b) all 27 read sites driven through the battle's own functions. **§5 THE RUNES READ NO NODE:** no rune carries a condition, `has_node(` appears only in talents.gd, and the tree carries no condition. Ten negative controls in docs/reports/FX.md, each read by its FAIL text."
   }
  }
 }

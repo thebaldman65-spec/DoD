@@ -35,6 +35,27 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+#
+# BATCH FX REPAIRED THIS FILE IN PLACE, and every change is recorded AT ITS
+# SITE (CQ §3: a stale assertion is repaired to intent, never deleted). FX
+# deleted the twelve spec trees, and with them every node this file was written
+# about: the Sharpshooter wears the ONE class tree now — twenty-seven nodes in
+# three tiers of nine. What FX KEPT is every field those nodes wrote and every
+# read site in `battle.gd` and `unit.gd`, and NINE of his nodes are precedents
+# the one tree took whole (field AND magnitude). So:
+#   * each LIVE section that learned a retired node wears that node's EXACT
+#     payload (`RETIRED`, copied from the deleted tree) on his tree for that one
+#     spawn, and every effect assertion is unchanged;
+#   * §3's shape questions are asked of the one tree, and the 24 ids that used
+#     to "survive" are asked what their survival was for — whether a SAVE
+#     holding them still loads — which FX answers by dropping them;
+#   * the nine precedents' magnitudes, and the tooltips of the eight that
+#     carried a `scale`, are asked of the one-tree nodes that took them;
+#   * every check whose subject was the deleted tree itself — a node's
+#     magnitude, row, lane, capstone flag, text or tooltip scale — is DELETED
+#     under DG §2's one exception, with the count at each site.
+# FX DELETED 69 CHECKS HERE (519 -> 450): §3's shape 32, §3's magnitudes 33,
+# and §4's pairs 4.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -127,10 +148,92 @@ func _hero(scene: Node, idx: int) -> BattleUnit:
 
 
 # The Sharpshooter sits in the HUNTER slot (index 3).
+#
+# BATCH FX: a learned id the one tree no longer holds rides his `tree` as its
+# retired payload (`_worn_tree`) — the fixture's `patch`, which is written after
+# `sync_spec_hp` and before the battle reads the member.
 func _spawn(learned: Dictionary, lineup := ["raider", "raider"]) -> Node:
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", "inquisitor", "sharpshooter"],
-		{"enemies": lineup, "talents": {3: learned.duplicate()}, "deterministic": true})
+		{"enemies": lineup, "talents": {3: learned.duplicate()},
+		"patch": {3: {"tree": _worn_tree(learned)}}, "deterministic": true})
+
+
+# ── BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED ───────────────────────
+# FX deleted the twelve spec trees. EVERY FIELD these nodes wrote was kept, and
+# so was every read site — a field no node writes any more is DORMANT, not
+# deleted — so the questions this file asks of those fields still have true
+# answers. Each entry is the EXACT payload the node carried, copied from the
+# tree FX removed: the node is deleted, the field and its read site stand.
+const RETIRED := {
+	# Deep Focus — the conversion point drops 40 (100 -> 60).
+	"ss_deep_focus": {"stat": {"deep_focus": 40}},
+	# Executioner's Eye — +0.50 of critical multiplier (x2.5).
+	"ss_exec_eye": {"stat": {"lethal_eye_ranks": 50}},
+	# Consistent Aim — -0.50 of critical multiplier, for +60% critical chance.
+	"ss_consistent": {"stat": {"consistent_aim": 50, "crit_bonus": 0.6}},
+	# Unwavering — +10 Focus a consecutive turn on one mark.
+	"ss_unwavering": {"stat": {"unwavering": 10}},
+	# Overkill — the carry keeps his Focus whole.
+	"ss_overkill": {"stat": {"overkill": 1}},
+	# One Shot — the threshold is 200 Focus.
+	"ss_one_shot": {"stat": {"one_shot": 200}},
+	# Opening Volley — he opens the fight holding 150 Focus.
+	"ss_volley": {"stat": {"opening_volley": 150}},
+	# Spray of Arrows — two extra enemies, and Focus caps at 50.
+	"ss_spray": {"stat": {"spray": 2}},
+}
+
+# THE SHARPSHOOTER'S COUNTERS — every stat field his retired tree wrote. The tree
+# is deleted and each of these still stands on `BattleUnit` with its read site,
+# so "his counters" are these fields now, not the fields of the one tree every
+# Hunter wears (`test_batch_ba` has named its spec's counters this way since BA).
+const SS_COUNTERS := ["crit_bonus", "perfect_form", "deep_focus",
+	"lethal_eye_ranks", "consistent_aim", "unwavering", "tunnel_vision",
+	"pierce_bonus", "sundering_shot", "bonecracker_ranks", "opp_aim_step",
+	"exposed_nerve", "no_cover", "overkill", "speed", "snap_shot",
+	"muscle_memory_ranks", "opening_volley", "follow_through", "second_nature",
+	"spray", "continuous_aim", "sunder_shot", "metronome", "one_shot",
+	"through_and_through", "rapid_fire"]
+
+# The one cell the saved member in `_migrated_talents` also holds: any id the
+# live tree carries would do.
+const LIVE_CELL := "tn_crit"
+
+
+# The tree he wears for ONE spawn: the live class tree, plus the retired payload
+# of every learned id the live tree no longer holds. It rides his `tree`, so the
+# spawn applies it through the one door every node takes (`apply_from_tree` ->
+# `apply_payload`) rather than as a field poked onto the unit afterwards — which
+# would skip what the spawn does with it (Opening Volley's opening Focus, for one).
+func _worn_tree(learned: Dictionary) -> Array:
+	var t := Talents.generate_tree("sharpshooter", "hunter")
+	for id in learned:
+		if RETIRED.has(id) and Talents.node_in_tree(t, id).is_empty():
+			t.append({"id": id, "payload": (RETIRED[id] as Dictionary).duplicate(true)})
+	return t
+
+
+func _ids(tree: Array) -> Array:
+	return tree.map(func(t): return String(t["id"]))
+
+
+# THE LOAD PATH'S OWN MIGRATION, driven on a member saved under the twelve
+# trees: it holds every id in `ids` plus `LIVE_CELL`. Returns the talents the
+# member comes out wearing. `Run` is an autoload, so it is fetched at RUNTIME (a
+# --script harness cannot name one), and its party is put back afterwards.
+func _migrated_talents(ids: Array) -> Dictionary:
+	var run: Node = root.get_node("/root/Run")
+	var kept: Array = run.party
+	var learned := {LIVE_CELL: 1}
+	for id in ids:
+		learned[id] = 1
+	run.party = [{"spec": "sharpshooter", "key": "hunter", "tree": [],
+		"talents": learned}]
+	run.call("_migrate_trees")
+	var out: Dictionary = (run.party[0]["talents"] as Dictionary).duplicate()
+	run.party = kept
+	return out
 
 
 func _kill(scene: Node) -> void:
@@ -139,6 +242,9 @@ func _kill(scene: Node) -> void:
 
 # ---------- §3 the tree's shape ----------
 
+# BATCH FX: `IDS` is still THIS BATCH'S RECORD OF ITS OWN 24 NODES — and every
+# one of them is RETIRED, because FX deleted the twelve spec trees. The table
+# stays: §3's save arm below asks each of these ids its question.
 const IDS := ["ss_steady", "ss_perfect_form", "ss_deep_focus", "ss_exec_eye",
 	"ss_consistent", "ss_unwavering", "ss_tunnel",
 	"ss_piercer", "ss_sundering", "ss_bonecracker", "ss_opp_aim",
@@ -150,137 +256,144 @@ const IDS := ["ss_steady", "ss_perfect_form", "ss_deep_focus", "ss_exec_eye",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Sharpshooter tree holds 24 nodes (got %d)" % tree.size())
-	var by_lane := {"Precision": 0, "Penetration": 0, "Pace": 0}
-	var caps := 0
+	# BATCH FX RE-POINTED THIS SECTION TO THE ONE TREE. The Sharpshooter wears the
+	# one class tree now — twenty-seven nodes in three tiers of nine — so every
+	# question below is asked of the tree he wears: its size, its ids, the rank
+	# each node is worn at, where each node sits, that nothing in it is
+	# exclusive, and how its levels are filled. Three questions were about a
+	# shape the one tree does not have, and are deleted where they stood.
+	ok(tree.size() == 27 and _ids(tree) == _ids(Talents.tree()),
+		"the Sharpshooter wears the one class tree — 27 nodes (got %d)" % tree.size())
 	var seen := {}
 	for t in tree:
 		var id := String(t["id"])
 		ok(not seen.has(id), "id %s appears once" % id)
 		seen[id] = true
-		ok(int(t.get("ranks", 0)) == 1, "%s holds a single rank" % id)
-		var row := int(t.get("row", 0))
-		ok(row >= 1 and row <= Talents.CAPSTONE_ROW, "%s sits in a real row 1-9 (got %d)" % [id, row])
-		if bool(t.get("capstone", false)):
-			caps += 1
-			ok(row == Talents.CAPSTONE_ROW, "capstone %s is on the capstone shelf" % id)
-		else:
-			by_lane[String(t["lane"])] = by_lane[String(t["lane"])] + 1
-		# Batch AI's structure: exclusive references are by ROW, so no node may
-		# carry a stale `exclusive_with` pointing at an id that has moved.
+		# RE-POINTED (FX): a node carries no rank of its own any more. The ledger
+		# is what wears it, and it wears every node at exactly one
+		# (`Talents.worn_learned`, the door `Profile.worn_talents` goes through).
+		ok(not t.has("ranks")
+			and int(Talents.worn_learned(tree, {id: true}).get(id, 0)) == 1,
+			"%s is worn at a single rank" % id)
+		# RE-POINTED (FX): rows 1-9 are gone; the level a node sits at is its TIER.
+		var tier := int(t.get("tier", 0))
+		ok(tier >= 1 and tier <= Talents.TIERS,
+			"%s sits in a real tier 1-%d (got %d)" % [id, Talents.TIERS, tier])
+		# Batch AI's structure, and FX's: nothing in the one tree is exclusive,
+		# so no node may carry a stale `exclusive_with` pointing anywhere.
 		ok(not t.has("exclusive_with"),
-			"%s carries no stale exclusive_with — rows do the barring" % id)
-	ok(caps == 3, "three capstones (got %d)" % caps)
-	for lane in by_lane:
-		ok(by_lane[lane] == Talents.ROWS, "lane %s holds 8 rows (got %d)" % [lane, by_lane[lane]])
-	# EVERY ID SURVIVES: §9's whole promise, and the reason no save moves.
+			"%s carries no stale exclusive_with — nothing in the one tree is exclusive" % id)
+	# DELETED AT FX — 4 CHECKS: "three capstones", and for each of the three
+	# "capstone X is on the capstone shelf". The shelf was the capstone ROW of a
+	# spec tree; FX deleted the spec trees, and the one tree has no rows and no
+	# capstone, so neither question has anything left to read.
+	# RE-POINTED (FX): "lane X holds 8 rows" asked how the tree's levels are
+	# filled. The one tree's levels are its three TIERS, nine nodes to each.
+	for tier_n in range(1, Talents.TIERS + 1):
+		var in_tier := Talents.tier_nodes(tree, tier_n).size()
+		ok(in_tier == Talents.NODES_PER_TIER,
+			"tier %d holds %d nodes (got %d)" % [tier_n, Talents.NODES_PER_TIER, in_tier])
+	# RE-POINTED AND INVERTED (FX) — THE 24 IDS DID NOT SURVIVE. AZ asserted that
+	# every one of them survives and re-specs in place because that is what let a
+	# SAVED tree load with no save version moving (§9's promise). FX deleted all
+	# 24 and kept the promise the other way: `Run._migrate_trees` swaps a saved
+	# member's tree for the live one and DROPS every id it no longer holds, so a
+	# resumed run wears nothing the tree cannot price and still no save version
+	# moves. So each id is asked the question its survival answered — does a
+	# save holding it still load clean — and the answer is that it is dropped,
+	# never carried as a dead node.
+	var migrated := _migrated_talents(IDS)
 	for id in IDS:
-		ok(not _node(id).is_empty(), "id %s survives and re-specs in place" % id)
-		# BATCH BM RE-POINTED THIS IN PLACE. `IDS` is THIS BATCH'S RECORD OF ITS OWN
-	# 24 NODES and stays that; BM added a row-8 node to every lane, so the live
-	# tree is 27. What the check exists to prove — that every one of the 24
-	# SURVIVES, which is what lets a saved tree migrate — is the loop above and
-	# is untouched. The count below allows exactly the three BM added.
-	ok(seen.size() == IDS.size() + 3,
-		"the 24 survive and BM added exactly 3 (tree %d, table %d)" % [seen.size(), IDS.size()])
-	# One node per lane per row, or the picker's "choose one" band is a lie.
-	var slots := {}
-	for t in tree:
-		var key := "%s:%d" % [t["lane"], int(t["row"])]
-		ok(not slots.has(key), "one node in %s" % key)
-		slots[key] = true
-	# THE LANE NAMES AND THESES ALL STAND — nothing was renamed, unlike AS's
-	# Shatterpoint or AT's Control.
-	ok(String(_node("ss_steady")["lane"]) == "Precision"
-		and String(_node("ss_piercer")["lane"]) == "Penetration"
-		and String(_node("ss_fletcher")["lane"]) == "Pace",
-		# BATCH EL §1 RE-POINTED: the third lane is PACE now. `Tempo` was a
-		# LANE as well as a chip and three nodes — the surface EK's own sweep
-		# missed, because it collected `"name"` keys and a lane lives under
-		# `"lane"`. The lane's THESIS did not move.
-		"the three lane names are Precision / Penetration / Pace")
+		ok(not migrated.has(id),
+			"id %s is retired with its tree: a saved run holding it migrates with it DROPPED" % id)
+	# RE-POINTED (FX): "the 24 survive and BM added exactly 3" was the exact-count
+	# arm of the loop above, and it still is — exactly the 24 go and exactly the
+	# live cell the same member held stays, so the drop is the TREE's doing and
+	# not a wipe that would pass every line of the loop.
+	ok(migrated.size() == 1 and migrated.has(LIVE_CELL),
+		"the migration drops exactly the 24 and keeps the live cell %s (kept %s)" % [
+			LIVE_CELL, str(migrated.keys())])
+	# DELETED AT FX — 27 CHECKS: "one node in <lane>:<row>", once per node, which
+	# kept the picker's "choose one" band honest. FX retired the band with its
+	# premise — no lanes, no rows, nothing exclusive, and a cell bought is a cell
+	# worn — so there is no band left for a second node to crowd.
+	# DELETED AT FX — 1 CHECK: "the three lane names are Precision / Penetration
+	# / Pace" (EL §1 renamed the third). It read three deleted nodes' lanes, and
+	# no tree has lanes now; the one place the names still live is a retired
+	# rune's `lane` tag, which §6 still checks.
 
 
 # ---------- §3 the magnitudes, final ----------
 
 func _magnitudes() -> void:
-	# PRECISION
-	ok(abs(float(_stat_of("ss_steady", "crit_bonus")) - 0.15) < 0.001,
-		"Steady Hands: +15% critical chance")
-	ok(_stat_of("ss_perfect_form", "perfect_form") == 40,
-		"Perfect Form: crits grant +40 Focus")
-	ok(_stat_of("ss_deep_focus", "deep_focus") == 40,
-		"Deep Focus: the conversion point drops 40 (100 -> 60)")
-	ok(_stat_of("ss_exec_eye", "lethal_eye_ranks") == 50,
-		"Executioner's Eye: +0.50 of critical multiplier (x2.5)")
-	ok(_stat_of("ss_consistent", "consistent_aim") == 50,
-		"Consistent Aim: -0.50 of critical multiplier — SUBTRACTED, not set")
-	ok(abs(float(_stat_of("ss_consistent", "crit_bonus")) - 0.60) < 0.001,
-		"...in exchange for +60% critical chance")
-	ok(_stat_of("ss_unwavering", "unwavering") == 10,
-		"Unwavering: +10 Focus per consecutive turn on one mark")
-	ok(_stat_of("ss_tunnel", "tunnel_vision") == 100,
-		"Tunnel Vision: +/-100% critical chance")
-	# PENETRATION
-	ok(abs(float(_stat_of("ss_piercer", "pierce_bonus")) - 0.30) < 0.001,
-		"Armor Piercer: 30% of armor ignored")
-	ok(_stat_of("ss_sundering", "sundering_shot") == 45,
-		"Sundering Shot: 45 Break damage on a crit")
-	ok(_stat_of("ss_bonecracker", "bonecracker_ranks") == 40,
-		"Bonecracker: +40% against Broken enemies")
-	ok(abs(float(_stat_of("ss_opp_aim", "opp_aim_step")) - 4.0) < 0.001,
-		"Opportunist's Aim: +4 on Powershot's own 2%/point — a TRIPLING")
-	ok(_stat_of("ss_exposed_nerve", "exposed_nerve") == 15,
-		"Exposed Nerve: +15% against Exposed enemies (gate and magnitude in one)")
-	ok(_stat_of("ss_no_cover", "no_cover") == 1,
-		"No Cover is a BYPASS — a flag, with nothing to reprice")
-	ok(_stat_of("ss_overkill", "overkill") == 1,
-		"Overkill is a flag too — its second clause is a rule, not an amount")
-	ok(String(_node("ss_overkill")["desc"]).to_lower().contains("keeps your focus in full"),
-		"...and its text says the carry keeps the Focus whole")
-	# TEMPO
-	ok(abs(float(_stat_of("ss_fletcher", "speed")) - 18.0) < 0.001,
-		"Fletcher's Speed: +18 Speed")
-	ok(_stat_of("ss_snap", "snap_shot") == 2,
-		"Snap Shot: the first TWO abilities are free")
-	ok(_stat_of("ss_muscle", "muscle_memory_ranks") == 30,
-		"Muscle Memory: +30 Focus per attack")
-	ok(_stat_of("ss_volley", "opening_volley") == 150,
-		"Opening Volley: he opens holding 150 — past the conversion point")
-	ok(_stat_of("ss_follow", "follow_through") == 2,
-		"Follow-Through: crits tick every cooldown by 2")
-	ok(_stat_of("ss_second_nature", "second_nature") == 4,
-		"Second Nature: the held breath covers FOUR attacks")
-	ok(_stat_of("ss_spray", "spray") == 2,
-		"Spray of Arrows: TWO additional enemies")
-	# CAPSTONES
-	ok(_stat_of("ss_one_shot", "one_shot") == 200,
-		"One Shot: the threshold is 200 Focus, replacing 'at maximum Focus'")
-	ok(_stat_of("ss_tnt", "through_and_through") == 1,
-		"Through and Through is unchanged — a flag")
-	ok(_stat_of("ss_rapid", "rapid_fire") == 50,
-		"Rapid Fire: 50% of casts skip their cooldown, up from 35%")
-	for cap_id in ["ss_one_shot", "ss_tnt", "ss_rapid"]:
-		ok(bool(_node(cap_id).get("capstone", false)), "%s is a capstone" % cap_id)
-	# NO NODE STILL DESCRIBES A CEILING §1 removed.
+	# RE-POINTED (FX) — NINE OF HIS NODES ARE PRECEDENTS OF THE ONE TREE. FX took
+	# each one's FIELD AND MAGNITUDE unchanged (`talents.gd` names the precedent
+	# above each node), so for these nine "is the final magnitude on the node
+	# that owes it" still has a live answer: the node that owes it now is the
+	# one-tree node that took it, and it pays the same number.
+	ok(abs(float(_stat_of("tn_crit", "crit_bonus")) - 0.15) < 0.001,
+		"More Crit Chance, Steady Hands' precedent: +15% critical chance")
+	ok(abs(float(_stat_of("tn_pierce", "pierce_bonus")) - 0.30) < 0.001,
+		"Armor Penetration, Armor Piercer's precedent: 30% of armor ignored")
+	ok(_stat_of("tn_crack_guards", "sundering_shot") == 45,
+		"Your Crits Crack Guards, Sundering Shot's precedent: 45 Break damage on a crit")
+	ok(_stat_of("tn_kill_down", "bonecracker_ranks") == 40,
+		"Kill What Is Down, Bonecracker's precedent: +40% against Broken enemies")
+	ok(_stat_of("tn_no_miss", "no_cover") == 1,
+		"You Cannot Miss, No Cover's precedent, is a BYPASS — a flag, with nothing to reprice")
+	ok(abs(float(_stat_of("tn_speed", "speed")) - 18.0) < 0.001,
+		"More Speed, Fletcher's Speed's precedent: +18 Speed")
+	ok(_stat_of("tn_free_casts", "snap_shot") == 2,
+		"Your First Casts of a Fight Are Free, Snap Shot's precedent: the first TWO abilities are free")
+	ok(_stat_of("tn_crit_cooldown", "follow_through") == 2,
+		"A Cooldown Ticks on a Crit, Follow-Through's precedent: crits tick every cooldown by 2")
+	ok(_stat_of("tn_skip_cooldown", "rapid_fire") == 50,
+		"A Chance to Skip a Cooldown Entirely, Rapid Fire's precedent: 50% of casts skip their cooldown")
+	# DELETED AT FX — 17 CHECKS: the magnitudes of the nodes that are NOT
+	# precedents — Perfect Form's 40, Deep Focus's 40, Executioner's Eye's 50,
+	# Consistent Aim's 50 and its +0.60, Unwavering's 10, Tunnel Vision's 100,
+	# Opportunist's Aim's 4.0, Exposed Nerve's 15, Overkill's flag and its text
+	# ("keeps your Focus in full"), Muscle Memory's 30, Opening Volley's 150,
+	# Second Nature's 4, Spray of Arrows' 2, One Shot's 200 and Through and
+	# Through's flag. Their SUBJECT was the node, and FX deleted the tree that
+	# held it; no node of the one tree writes any of these fields. Every FIELD
+	# still stands with its read site, and the live sections below drive the ones
+	# AZ measured, at these magnitudes, off `RETIRED`.
+	# DELETED AT FX — 3 CHECKS: "ss_one_shot / ss_tnt / ss_rapid is a capstone".
+	# The flag lived on the nodes of a deleted tree; the one tree has no capstone.
+	# NO NODE STILL DESCRIBES A CEILING §1 removed — RE-POINTED (FX) to the tree
+	# he wears now, node for node.
 	for t in _tree():
 		var d := String(t.get("desc", "")).to_lower()
 		ok(not d.contains("focus cap"),
 			"%s does not describe a Focus cap" % t["id"])
 		ok(not d.contains("at maximum focus"),
 			"%s does not say 'at maximum Focus'" % t["id"])
-	# Every rendered tooltip must show the design value, not a stale one, and
-	# a node with a `scale` must actually consume it.
-	for id in IDS:
-		var n := _node(id)
-		if not n.has("scale"):
-			continue
-		var shown := Talents.desc_for(n, 1)
-		ok(not shown.contains("{v}"), "%s renders its {v}" % id)
-	ok(Talents.desc_for(_node("ss_deep_focus"), 1).contains("to 60"),
-		"Deep Focus's tooltip renders the conversion point as 60")
-	ok(Talents.desc_for(_node("ss_exec_eye"), 1).contains("x2.5"),
-		"Executioner's Eye's tooltip renders x2.5")
+	# Every rendered tooltip must show the design value, not a stale one.
+	# RE-POINTED (FX) FOR THE EIGHT PRECEDENTS THAT CARRIED A `scale`: the design
+	# value each one rendered is the number the one-tree node that took it states
+	# in its own text, so the question is asked of that text.
+	# DELETED AT FX — 11 CHECKS: the same "<id> renders its {v}" for the eleven
+	# scaled nodes that are NOT precedents (Perfect Form, Deep Focus,
+	# Executioner's Eye, Unwavering, Tunnel Vision, Exposed Nerve, Muscle Memory,
+	# Opening Volley, Second Nature, Spray of Arrows, One Shot). Their subject was
+	# a deleted node's tooltip scale, and no text carries it now.
+	var shown := {"ss_steady": ["tn_crit", "+15% critical chance"],
+		"ss_piercer": ["tn_pierce", "ignore 30% of the target's armor"],
+		"ss_sundering": ["tn_crack_guards", "45 Break damage"],
+		"ss_bonecracker": ["tn_kill_down", "+40% damage against Broken"],
+		"ss_fletcher": ["tn_speed", "+18 Speed"],
+		"ss_snap": ["tn_free_casts", "first 2 abilities"],
+		"ss_follow": ["tn_crit_cooldown", "cooldowns by 2"],
+		"ss_rapid": ["tn_skip_cooldown", "50% chance"]}
+	for id in shown:
+		var text := Talents.desc_for(_node(String(shown[id][0])), 1)
+		ok(text.contains(String(shown[id][1])) and not text.contains("{v}"),
+			"%s's number renders on %s, the node that took it (%s not in \"%s\")" % [
+				id, shown[id][0], shown[id][1], text])
+	# DELETED AT FX — 2 CHECKS: "Deep Focus's tooltip renders the conversion point
+	# as 60" and "Executioner's Eye's tooltip renders x2.5". Both rendered a
+	# deleted node's scale, and neither node was a precedent.
 
 
 # ---------- §6 the counters are ADDITIVE at their read sites ----------
@@ -400,14 +513,14 @@ func _no_ability_grants() -> void:
 			"%s owes no authored fallback (it grants nothing to collide)" % t["id"])
 	# The other half: every trophy the pool offers him is absent from the tree.
 	var tree_names := Talents.ability_names({"spec": "sharpshooter",
-		"key": "hunter", "talents": _learn_all()})
+		"key": "hunter", "tree": _tree(), "talents": _learn_all()})
 	for trophy in Classes.SPEC_POOLS["sharpshooter"]:
 		ok(not tree_names.has(trophy),
 			"the trophy %s is not also a tree grant" % trophy)
 	# ...and the tree ADDS nothing to the list the action bar builds: fully
 	# learned, it names exactly what an unlearned one does.
 	var bare := Talents.ability_names({"spec": "sharpshooter", "key": "hunter",
-		"talents": {}})
+		"tree": _tree(), "talents": {}})
 	ok(tree_names.size() == bare.size(),
 		"a fully-learned tree adds NO ability to the bar (%d vs %d)" % [
 			tree_names.size(), bare.size()])
@@ -415,10 +528,14 @@ func _no_ability_grants() -> void:
 		ok(bare.has(n), "%s comes from the kit, not from a node" % n)
 
 
+# RE-POINTED (FX): learns every node of the tree he wears now. It learned the 24
+# table ids, against a member carrying NO `tree` — and `ability_names` walks the
+# member's tree, so the grant half never reached a node at all. With the tree on
+# both members it asks what it always meant to: a fully-learned tree adds nothing.
 func _learn_all() -> Dictionary:
 	var all := {}
-	for id in IDS:
-		all[id] = 1
+	for t in _tree():
+		all[String(t["id"])] = 1
 	return all
 
 
@@ -480,10 +597,12 @@ func _rune_audit() -> void:
 		and int(level["rune_bonecracker_ranks"]) == 12,
 		"the Level Aim still pays 4% armor, +10 Focus and +12% vs Broken")
 	# THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO SHARPSHOOTER COUNTER.
+	# RE-POINTED (FX): his counters were his tree's fields. The tree is deleted
+	# and the counters stand, so the walk is over `SS_COUNTERS` — not over the
+	# one tree, which every Hunter wears by ruling and which is nobody's.
 	var ss_fields := {}
-	for t in _tree():
-		for f in t.get("payload", {}).get("stat", {}):
-			ss_fields[f] = true
+	for f in SS_COUNTERS:
+		ss_fields[f] = true
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
 			continue
@@ -492,6 +611,8 @@ func _rune_audit() -> void:
 				"the class-wide rune %s does not write the Sharpshooter counter %s" % [id, f])
 	# No lane tag went stale: his lanes did not rename (the AS Honed Lance
 	# lesson, checked even though nothing moved).
+	# (FX: no tree has lanes now, and a rune's `lane` records HISTORY — CLAUDE.md,
+	# EM. The tag must still be one of his three names and not a stale rename.)
 	var lanes := {"Precision": true, "Penetration": true, "Pace": true}
 	for id in ss_runes:
 		var lane := String(pool[id].get("lane", ""))
@@ -523,22 +644,13 @@ func _bot_policy_source() -> void:
 # ---------- §4 the exclusive pairs ----------
 
 func _exclusive_pairs() -> void:
-	# EXECUTIONER'S EYE <-> CONSISTENT AIM IS DEAD. Batch 32 authored it as a
-	# fork; Batch AI's row exclusivity destroyed it — rows 4 and 5 of ONE lane,
-	# so a player holds both. §3's `-0.5` rewording is what makes that coherent.
-	ok(int(_node("ss_exec_eye")["row"]) == 4
-		and String(_node("ss_exec_eye")["lane"]) == "Precision",
-		"Executioner's Eye sits in Precision row 4")
-	ok(int(_node("ss_consistent")["row"]) == 5
-		and String(_node("ss_consistent")["lane"]) == "Precision",
-		"Consistent Aim sits in Precision row 5 — a player can hold both")
-	# TUNNEL VISION <-> SPRAY OF ARROWS SURVIVES, and it survives because ROW
-	# EXCLUSIVITY enforces it: both sit in row 7. Stated so a later batch does
-	# not "fix" a pair already being enforced correctly.
-	ok(int(_node("ss_tunnel")["row"]) == 7 and int(_node("ss_spray")["row"]) == 7,
-		"Tunnel Vision and Spray of Arrows share row 7 — the pair is enforced by the row")
-	ok(String(_node("ss_tunnel")["lane"]) != String(_node("ss_spray")["lane"]),
-		"...and they are in different lanes, which is what makes the row bar them")
+	# DELETED AT FX — 4 CHECKS: "Executioner's Eye sits in Precision row 4",
+	# "Consistent Aim sits in Precision row 5 — a player can hold both", "Tunnel
+	# Vision and Spray of Arrows share row 7 — the pair is enforced by the row"
+	# and "...and they are in different lanes". Each read a deleted node's row
+	# and lane; FX deleted the rows, the lanes and the nodes, and nothing in the
+	# one tree is exclusive. That the dissolved pair COMPOSES to x2.0 is still
+	# driven live (`_live_crit_mult_pair`).
 	# ...and no prose list still claims the dissolved one.
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(not claude.contains("ss_exec_eye↔"),

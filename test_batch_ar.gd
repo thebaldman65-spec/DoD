@@ -36,6 +36,23 @@
 # and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
 # every id and every question this file asks is otherwise untouched — the
 # tables below are the batch's own record of its 24 nodes and stay that.
+# BATCH FX RE-POINTED THIS FILE IN PLACE, AND ITS SUBJECT WENT WITH THE TWELVE
+# TREES. The Pyromancer wears the ONE class tree now (`generate_tree` answers it
+# for every spec with a class), and the 24 nodes the tables below record exist
+# nowhere a check can read them. Each section says at its site what moved and
+# by exactly how many checks; in short:
+#   * the SHAPE questions the one tree still answers (its size, unique ids,
+#     single ranks, no exclusivity, a real tier per node, three full tiers) are
+#     asked of it; the lane / row / capstone / name / tooltip questions are
+#     DELETED under DG §2, because FX deleted their subject;
+#   * every MECHANIC this file drives still has its field and its read site, so
+#     RETIRED carries the exact payload each retired node carried and `_spawn`
+#     installs it inline through the real `apply_from_tree` — not one live
+#     assertion moved;
+#   * "a saved pick still resolves" is asked of FX's load migration, which
+#     DROPS a saved pick on a deleted id and keeps one on a live id.
+# The tables below stay AR's record of its 24 nodes; RETIRED is FX's record of
+# what they carried.
 extends SceneTree
 
 # BATCH DD — THE ONE AUTHORED BATTLE FIXTURE FOR THE SUITES. `_spawn` stood in
@@ -154,6 +171,100 @@ const ABILITY_NODES := {
 }
 
 
+# ── BATCH FX: THE RETIRED PAYLOADS ──────────────────────────────────────────
+# FX deleted the twelve spec trees and the 27 Pyromancer nodes with them. EVERY
+# FIELD THEY WROTE AND EVERY READ SITE STANDS (dormant: no node writes one), so
+# each question this file drove through a node is re-pointed by installing the
+# EXACT payload the retired node carried, transcribed here from the tree FX
+# deleted. `_retired_tree` builds an inline tree out of it and `_spawn` hands
+# that to the real `apply_from_tree`, so a live check learns `py_seeding`
+# exactly as it did before FX; only the source of the payload moved.
+# id -> [name, payload]. 27 entries.
+const RETIRED := {
+	# FX: the payload the retired py_kindling (Cinder Trail) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_kindling": ["Cinder Trail", {"stat": {"cinder_trail_ranks": 1}}],
+	# FX: the payload the retired py_accelerant (Accelerant) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_accelerant": ["Accelerant", {"stat": {"accelerant_ranks": 4}}],
+	# FX: the payload the retired py_arson (Conflagration) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_arson": ["Conflagration", {"stat": {"conflagration_ranks": 2}}],
+	# FX: the payload the retired py_melt (Melt) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_melt": ["Melt", {"ability": "Wildfire", "set": {"cooldown": 1}}],
+	# FX: the payload the retired py_ashes (Wildfire Spread) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_ashes": ["Wildfire Spread", {"stat": {"wildfire_spread": 1}}],
+	# FX: the payload the retired py_explosive (Explosive Force) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_explosive": ["Explosive Force", {"stat": {"explosive_ranks": 2}}],
+	# FX: the payload the retired py_spreading (Chain Ignition) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_spreading": ["Chain Ignition", {"stat": {"ember_wind": 1}}],
+	# FX: the payload the retired py_pyromaniac (Ember Shroud) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_pyromaniac": ["Ember Shroud", {"stat": {"ember_shroud": 8}}],
+	# FX: the payload the retired py_invigorating (Ashen Skin) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_invigorating": ["Ashen Skin", {"stat": {"ashen_skin": 25, "ashen_skin_heal": 10}}],
+	# FX: the payload the retired py_firebrand (Heat Haze) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_firebrand": ["Heat Haze", {"stat": {"heat_haze": 20}}],
+	# FX: the payload the retired py_flame_shield (Emberwall) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_flame_shield": ["Emberwall", {"ability": "Flamewave", "add": {"cost": -10, "pressure": 15}}],
+	# FX: the payload the retired py_molten (Backblast) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_molten": ["Backblast", {"stat": {"backblast": 15}}],
+	# FX: the payload the retired py_undying_flame (Kiln-Forged) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_undying_flame": ["Kiln-Forged", {"stat": {"kiln_forged_at": 3}}],
+	# FX: the payload the retired py_cauterize (Ash Lung) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_cauterize": ["Ash Lung", {"stat": {"ash_lung_pct": 4}}],
+	# FX: the payload the retired py_shockwave (Focused Flame) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_shockwave": ["Focused Flame", {"stat": {"focused_flame": 1}}],
+	# FX: the payload the retired py_supernova (Pressure Cooker) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_supernova": ["Pressure Cooker", {"stat": {"pressure_cooker": 1}}],
+	# FX: the payload the retired py_implosion (Aftershock) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_implosion": ["Aftershock", {"stat": {"aftershock": 2}}],
+	# FX: the payload the retired py_focused (Concussion) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_focused": ["Concussion", {"ability": "Detonation", "add": {"damage": 15}}],
+	# FX: the payload the retired py_seeding (Crucible) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_seeding": ["Crucible", {"stat": {"crucible": 1}}],
+	# FX: the payload the retired py_rekindle (Twin Detonation) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_rekindle": ["Twin Detonation", {"ability": "Detonation", "set": {"cooldown": 1}}],
+	# FX: the payload the retired py_warm_glow (Total Commitment) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_warm_glow": ["Total Commitment", {"stat": {"total_commitment": 1}}],
+	# FX: the payload the retired py_sea_of_flame (Sea of Flame) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_sea_of_flame": ["Sea of Flame", {"stat": {"sea_of_flame": 7}}],
+	# FX: the payload the retired py_forge_body (Forge Body) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_forge_body": ["Forge Body", {"stat": {"forge_body_pct": 1}}],
+	# FX: the payload the retired py_powder_keg (Powder Keg) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_powder_keg": ["Powder Keg", {"stat": {"powder_keg": 30}}],
+	# FX: the payload the retired py_firestorm (Sky Ablaze) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_firestorm": ["Sky Ablaze", {"ability": "Flamewave", "add": {"damage": 10}, "set": {"cooldown": 1}}],
+	# FX: the payload the retired py_rebirth (Rekindled) carried — the node is deleted,
+	# the ability and the arm it rode stand.
+	"py_rebirth": ["Rekindled", {"ability": "Detonation", "set": {"cost": 0}}],
+	# FX: the payload the retired py_hellfire (Cataclysm) carried — the node is deleted,
+	# the field and its read site stand.
+	"py_hellfire": ["Cataclysm", {"stat": {"cataclysm": 1}}],
+}
+
+
 func _initialize() -> void:
 	# Children added in _initialize never fire _ready (root not ready) — park
 	# on the first process_frame, the CLAUDE.md gotcha.
@@ -166,6 +277,22 @@ func ok(cond: bool, msg: String) -> void:
 		fails.append(msg)
 
 
+# BATCH FX — the tree a member wears, built from RETIRED: one node per id,
+# carrying the retired node's exact payload. An id the record does not hold is
+# a FAILED check rather than a silent no-op, because a learned id that installs
+# nothing is exactly the fault FX left in every suite that learned a deleted id.
+func _retired_tree(ids: Array) -> Array:
+	var out: Array = []
+	for id in ids:
+		if not RETIRED.has(id):
+			ok(false, "%s is not in the RETIRED record, so nothing installs it" % id)
+			continue
+		var rec: Array = RETIRED[id]
+		out.append({"id": String(id), "name": String(rec[0]),
+			"payload": (rec[1] as Dictionary).duplicate(true)})
+	return out
+
+
 func _run() -> void:
 	await process_frame
 	Profile.save_path = "user://profile_batch_ar_test.json"
@@ -174,7 +301,8 @@ func _run() -> void:
 
 	_tree_shape()
 	_node_table()
-	_magnitudes()
+	# BATCH FX: awaited now — §3 measures the retired payloads on a live spawn.
+	await _magnitudes()
 	_ability_nodes()
 	_kit()
 	_pools()
@@ -206,70 +334,91 @@ func _tree() -> Array:
 	return Talents.generate_tree("pyromancer", "mage")
 
 
-func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(_tree(), id)
-
-
 # ---------- 1. the shape ----------
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 188 checks -> 112. The tree a
+# Pyromancer wears is the ONE class tree, so every shape question it still
+# answers is asked of it, and the ones about lanes, rows and the capstone shelf
+# are deleted because FX deleted all three.
+#   * KEPT, ASKED OF THE ONE TREE (82): its size, 27 unique ids, 27 single
+#     ranks, 27 nodes carrying no `exclusive_with` (FX: no node is exclusive).
+#   * INVERTED (27): "carries no leftover tier" kept Batch AI's rows clean of
+#     the old ranked field. FX's tiers ARE the shape now, so each node must sit
+#     in a real one — the rule reversed, not dropped (the negative-control rule).
+#   * RE-POINTED, 24 -> 3: "row N has a <lane> node" asked that every cell of
+#     the 8 x 3 grid be filled. The one tree's cells are three tiers of nine, so
+#     each tier must hold nine; the other 21 cells do not exist.
+#   * DELETED, 76 CHECKS (DG §2 — FX deleted the twelve spec trees and the rows,
+#     lanes and capstone shelf with them, so nothing a check can read carries
+#     any of the three): 27 "row/lane holds one node", the 21 grid cells above,
+#     27 "carries the capstone flag iff it is on the capstone row" and 1 "the
+#     capstone shelf holds 3".
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 27, "the Pyromancer tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the tree a Pyromancer wears holds 27 nodes (got %d)" % tree.size())
 	var seen: Dictionary = {}
-	var grid: Dictionary = {}
 	for n in tree:
 		var id := String(n["id"])
 		ok(not seen.has(id), "node id %s appears exactly once" % id)
 		seen[id] = true
-		ok(int(n["ranks"]) == 1, "%s holds a single rank" % id)
-		ok(not n.has("tier"), "%s carries no leftover tier" % id)
+		ok(int(n.get("ranks", 1)) == 1, "%s holds a single rank" % id)
+		ok(int(n.get("tier", 0)) >= 1 and int(n.get("tier", 0)) <= 3,
+			"%s sits in a real tier, 1-3 — the tier is the shape now (got %s)"
+				% [id, str(n.get("tier", "none"))])
 		ok(not n.has("exclusive_with"), "%s carries no leftover exclusive_with" % id)
-		var key := "%d/%s" % [int(n["row"]), String(n["lane"])]
-		ok(not grid.has(key), "row %s holds one node (%s)" % [key, id])
-		grid[key] = id
-	for row in range(1, 9):
-		for lane in ["Kindling", "Inferno", "Detonation"]:
-			ok(grid.has("%d/%s" % [row, lane]),
-				"row %d has a %s node" % [row, lane])
-	var caps := 0
-	for n in tree:
-		var is_cap: bool = int(n["row"]) == Talents.CAPSTONE_ROW
-		ok(bool(n.get("capstone", false)) == is_cap,
-			"%s carries the capstone flag iff it is on row 8" % String(n["id"]))
-		if is_cap:
-			caps += 1
-	ok(caps == 3, "the capstone shelf holds 3 (got %d)" % caps)
+	# The literals 9 and 1-3 are deliberate: a check that reads the constant it
+	# is checking has stopped asking its question (this file's ABILITY_NODES rule).
+	for tier in [1, 2, 3]:
+		var held := Talents.tier_nodes(tree, tier).size()
+		ok(held == 9, "tier %d holds nine nodes (got %d)" % [tier, held])
 
 
-# ---------- 2. every id, row, lane and name ----------
+# ---------- 2. every id, and what a saved pick on it does now ----------
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 141 checks -> 74.
+#   * INVERTED, 24 -> 26: "SURVIVES — a saved pick on it still resolves" was
+#     AR's migration promise. FX deleted all 24 ids and keeps the promise in
+#     `Run._migrate_trees`, which swaps a saved tree for the one tree on load and
+#     DROPS every pick the one tree does not hold. Each id is asked that, driven
+#     on a member saved before FX, and two LIVENESS ARMS prove the drop is a
+#     selection rather than a wipe: the saved tree is swapped, and a pick the
+#     one tree holds survives the same load.
+#   * RE-POINTED, 24 -> 27: "is one of the 24 surviving ids, not a new one"
+#     asked that the tree hold nothing but its authored population. That
+#     population is the ONE tree's now, node for node, and the row-8 carve-out
+#     BM wrote has no row to skip.
+#   * KEPT (21): the table's own size, and the twenty re-specced names that must
+#     stay absent — asked of the tree a Pyromancer wears.
+#   * DELETED, 72 CHECKS (DG §2 — FX deleted the Pyromancer tree): each of the
+#     24 ids' row, lane and name. NODES stays as AR's record of what it shipped.
 func _node_table() -> void:
 	ok(NODES.size() == 24, "the transcribed table itself holds 24 entries")
+	# A member saved before FX: the retired tree, every id AR shipped learned,
+	# and one cell the one tree holds.
+	var run: Node = root.get_node("/root/Run")
+	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
+	var member: Dictionary = run.party[1]
+	member["spec"] = "pyromancer"
+	member["tree"] = _retired_tree(RETIRED.keys())
+	var saved := {"tn_health": 1}
 	for id in NODES:
-		var n := _node(String(id))
-		ok(not n.is_empty(),
-			"%s SURVIVES — a saved pick on it still resolves" % id)
-		if n.is_empty():
-			continue
-		var want: Array = NODES[id]
-		ok(int(n["row"]) == int(want[0]),
-			"%s sits on row %d (got %d)" % [id, int(want[0]), int(n["row"])])
-		ok(String(n["lane"]) == String(want[1]),
-			"%s is in the %s lane (got %s)" % [id, want[1], n["lane"]])
-		ok(String(n["name"]) == String(want[2]),
-			"%s is named %s (got %s)" % [id, want[2], n["name"]])
-	# ...and nothing NEW appeared: no id was added to carry a re-spec.
+		saved[id] = 1
+	member["talents"] = saved
+	run._migrate_trees()
+	var kept: Dictionary = run.party[1].get("talents", {})
+	ok(run.party[1].get("tree", []) == _tree(),
+		"a tree saved before FX is swapped for the one tree on load")
+	ok(kept.has("tn_health"),
+		"...and a pick the one tree holds SURVIVES that load (the liveness arm)")
+	for id in NODES:
+		ok(not kept.has(id),
+			"%s is DROPPED on load — FX deleted it, so a saved pick on it resolves to nothing rather than dangling" % id)
+	# ...and nothing NEW appeared: every node of the tree a Pyromancer wears is
+	# one of THE tree's, unchanged — no spec-specific node rides along.
+	var the_tree := Talents.tree()
 	for n in _tree():
-		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
-		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
-		# rather than being taught the three new ids: what the check exists to
-		# prove is that the twenty-four survive UNCHANGED, and asserting that
-		# nothing else exists would make every later addition a failure here
-		# instead of in the batch that made it.
-		if int(n["row"]) == 8:
-			continue
-		ok(NODES.has(String(n["id"])),
-			"%s is one of the 24 surviving ids, not a new one" % String(n["id"]))
+		ok(Talents.node_in_tree(the_tree, String(n["id"])) == n,
+			"%s is one of the one tree's nodes, unchanged — not a new one" % String(n["id"]))
 	# The names that must be GONE, because their nodes were re-specced away.
 	# A leftover would mean an id got duplicated rather than re-used.
 	var live_names: Array = []
@@ -290,63 +439,94 @@ func _node_table() -> void:
 			"'%s' is gone from the tree (Batch AR re-specced its id)" % dead)
 
 
-# ---------- 3. the magnitudes, in the payload AND the tooltip ----------
+# ---------- 3. the magnitudes, as they land on the hero ----------
 
+# BATCH FX RE-POINTED THIS SECTION IN PLACE: 122 checks -> 40.
+#   * RE-POINTED, 37 -> 37: each PAYLOADS row asked that the node write its
+#     field at the design number. The node is deleted and the FIELD stands (FX
+#     kept every read site), so each row now asks that the field is still a real
+#     BattleUnit property and that the retired payload — installed inline from
+#     RETIRED through the real spawn — lands on the Pyromancer at exactly that
+#     number, measured against a spawn that learned nothing. PAYLOADS and RETIRED
+#     are two transcriptions of one record, so a drift in either reds here, and
+#     so does a dormant field the spawn stopped writing. Ashen Skin's second
+#     field is still asked for by name (BS §3).
+#   * RE-POINTED, 3 -> 3: Twin Detonation's three payload questions are the
+#     ABILITY arm of `apply_payload`, which runes still ride; driven with its
+#     exact payload on a fresh Pyromancer kit.
+#   * DELETED, 82 CHECKS (DG §2 — FX deleted the nodes, and a payload's shape and
+#     a tooltip are properties of a node): 18 "writes exactly N field(s)" (the
+#     payload is this file's own inline record now, so its size could only
+#     answer itself) and SCALE_VALUES' 64 — "carries a scale", "renders N",
+#     "shows N" and "left no {v}" for 16 nodes. The one tree's nodes carry no
+#     `scale` and no `{v}` at all. SCALE_VALUES stays as AR's record.
 func _magnitudes() -> void:
+	var fields: Array = []
+	var learn := {}
 	for id in PAYLOADS:
-		var n := _node(String(id))
-		if n.is_empty():
-			continue
+		learn[id] = 1
+		fields.append(String(PAYLOADS[id][0]))
+		for extra in EXTRA_PAYLOAD_FIELDS.get(id, {}):
+			fields.append(String(extra))
+	var bare := await _spawn({}, ["raider", "raider"])
+	var base := _fields_of(_py(bare), fields)
+	bare.queue_free()
+	await process_frame
+	var worn := await _spawn(learn, ["raider", "raider"])
+	var got := _fields_of(_py(worn), fields)
+	worn.queue_free()
+	await process_frame
+	for id in PAYLOADS:
 		var want: Array = PAYLOADS[id]
-		var pay: Dictionary = n["payload"].get("stat", {})
-		ok(pay.has(want[0]),
-			"%s writes %s (got %s)" % [id, want[0], str(pay.keys())])
-		if pay.has(want[0]):
-			ok(pay[want[0]] == want[1],
-				"%s writes %s = %s (got %s)" % [id, want[0], str(want[1]),
-					str(pay[want[0]])])
-		# RE-POINTED IN PLACE BY BATCH BS §3. AR could say "exactly one field"
-		# because every Pyromancer node held one magnitude. ASHEN SKIN HOLDS
-		# TWO — a fire resistance and a share of its own Burn tick — and the
-		# house rule is AW's: one counter cannot honestly hold two different
-		# quantities, so it gets two. The question the check is really asking is
-		# unchanged and is now asked properly: does the node write ONLY what
-		# this table says it writes? A third field trips it.
+		var f := String(want[0])
+		ok(got.get(f) != null,
+			"the field %s the retired %s wrote still stands on BattleUnit (got %s)"
+				% [f, id, str(got.get(f))])
+		ok(_landed(got, base, f, want[1]),
+			"the retired %s's payload lands %s = %s on the Pyromancer (got %s over a bare %s)"
+				% [id, f, str(want[1]), str(got.get(f)), str(base.get(f))])
 		var allowed: Dictionary = EXTRA_PAYLOAD_FIELDS.get(id, {})
-		ok(pay.size() == 1 + allowed.size(),
-			"%s writes exactly %d field(s) (got %s)" % [id, 1 + allowed.size(),
-				str(pay.keys())])
 		for extra in allowed:
-			ok(pay.get(extra, null) == allowed[extra],
-				"%s also writes %s = %s (got %s)" % [id, extra,
-					str(allowed[extra]), str(pay.get(extra, null))])
-	for id in SCALE_VALUES:
-		var n2 := _node(String(id))
-		if n2.is_empty():
-			continue
-		ok(n2.has("scale"), "%s carries a scale so its tooltip renders a number" % id)
-		var sc: Dictionary = n2.get("scale", {})
-		var val := float(sc.get("base", 0.0)) + float(sc.get("step", 0.0))
-		ok(is_equal_approx(val, float(SCALE_VALUES[id])),
-			"%s renders %s (got %s)" % [id, str(SCALE_VALUES[id]), str(val)])
-		# ...and the rendered tooltip really contains it, with no dead decimal
-		# (the Batch AP trim).
-		var shown := Talents.desc_for(n2, 1)
-		var txt := String.num(float(SCALE_VALUES[id]), 2)
-		if txt.contains("."):
-			txt = txt.rstrip("0").rstrip(".")
-		ok(shown.contains(txt), "%s's tooltip shows %s (%s)" % [id, txt, shown])
-		ok(not shown.contains("{v}"), "%s's tooltip left no {v} unrendered" % id)
+			ok(_landed(got, base, String(extra), allowed[extra]),
+				"%s also lands %s = %s (got %s over a bare %s)" % [id, extra,
+					str(allowed[extra]), str(got.get(extra)), str(base.get(extra))])
 	# Twin Detonation is the ONE node whose magnitude is an ability field
 	# rather than a stat: it SETS Detonation's cooldown, the way Relentless
 	# sets Hack and Slash's bleed_chance.
-	var twin := _node("py_rekindle")
-	ok(twin.get("payload", {}).has("ability"),
-		"Twin Detonation edits the ability, not a counter")
-	ok(String(twin.get("payload", {}).get("ability", "")) == "Detonation",
-		"...specifically Detonation")
-	ok(int(twin.get("payload", {}).get("set", {}).get("cooldown", -1)) == 1,
-		"...setting its cooldown to 1")
+	# FX: the payload the retired py_rekindle (Twin Detonation) carried — the
+	# node is deleted, the ability and the arm it rode stand.
+	var kit := {"abilities": Classes.spec_abilities("pyromancer")}
+	var cds := {}
+	for ab in kit["abilities"]:
+		cds[ab.display_name] = ab.cooldown
+	Talents.apply_payload(kit, (RETIRED["py_rekindle"][1] as Dictionary).duplicate(true), 1, {})
+	ok(kit.keys() == ["abilities"], "Twin Detonation edits the ability, not a counter")
+	var det_cd := -1
+	var others_still := true
+	for ab in kit["abilities"]:
+		if ab.display_name == "Detonation":
+			det_cd = ab.cooldown
+		elif ab.cooldown != int(cds[ab.display_name]):
+			others_still = false
+	ok(others_still, "...specifically Detonation")
+	ok(det_cd == 1, "...setting its cooldown to 1 (got %d)" % det_cd)
+
+
+# BATCH FX — each named field's value on a spawned hero, or null where he has
+# none: `get` answers null for a property BattleUnit does not declare, which is
+# exactly the "the field still stands" question.
+func _fields_of(u: BattleUnit, fields: Array) -> Dictionary:
+	var out := {}
+	for f in fields:
+		out[f] = u.get(f) if u != null else null
+	return out
+
+
+# BATCH FX — did an inline payload land exactly `want` on top of a bare spawn?
+func _landed(got: Dictionary, base: Dictionary, f: String, want) -> bool:
+	if got.get(f) == null or base.get(f) == null:
+		return false
+	return is_equal_approx(float(got[f]) - float(base[f]), float(want))
 
 
 # ---------- the four ability grants ----------
@@ -357,13 +537,22 @@ func _ability_nodes() -> void:
 	# `Classes.draft_ability`, so cost, initiative and cooldown are asserted
 	# against exactly the values the node used to carry: a drift in the move
 	# shows up here.
+	# BATCH FX RE-POINTED THE GATE, NOT THE QUESTIONS (40 -> 40). Each row
+	# opened on `_node(id)` and skipped when it came back empty — which, with
+	# the tree deleted, would have skipped all 35 silently. The seven questions
+	# are about the CARD, which stands, so they are asked of it directly; the
+	# one that read the node ("grants NOTHING") is asked of the tree a
+	# Pyromancer wears: owning every cell of it still leaves him without the card.
+	var wearer := {"key": "mage", "spec": "pyromancer", "tree": _tree(),
+		"talents": {}, "bm_abilities": []}
+	for n in wearer["tree"]:
+		wearer["talents"][String(n["id"])] = 1
+	var worn_names: Array = Talents.ability_names(wearer)
 	for id in ABILITY_NODES:
-		var n := _node(String(id))
-		if n.is_empty():
-			continue
 		var want: Array = ABILITY_NODES[id]
-		ok(Talents.granted_name(n["payload"]) == "",
-			"%s grants NOTHING — a talent may not (DO's charter)" % id)
+		ok(not worn_names.has(String(want[0])),
+			"%s's card, %s, is granted by NO node of the tree he wears — a talent may not (DO's charter)"
+				% [id, want[0]])
 		ok(Classes.spec_draft_pool("pyromancer").has(String(want[0])),
 			"%s's card, %s, drafts from the Pyromancer" % [id, want[0]])
 		var ab: Ability = Classes.spec_pool_ability("pyromancer", String(want[0]))
@@ -513,16 +702,25 @@ func _no_defence() -> void:
 	# Every mitigating node is in INFERNO and nowhere else — a Kindling or
 	# Detomation node that started reducing damage would be the lane's thesis
 	# leaking, which is exactly the shape BS was written to remove.
+	# BATCH FX — 5 CHECKS DELETED HERE (DG §2), AND THE FLOOR RE-POINTED. The five
+	# asked "X mitigates, so it is in INFERNO" of the five mitigating Pyromancer
+	# nodes; FX deleted the lanes and those nodes with them, so no node has a lane
+	# for the question to read. The floor asked that the Inferno LANE carry at
+	# least five, which was a lane's size. The claim that survives the lane is
+	# BS's own — his defence is EARNED IN THE TREE, not opened in the kit — and
+	# the tree he wears is the one class tree now, whose mitigation is its own
+	# (Less Damage Taken; Mitigation per Debuff You Carry). So the floor asks that
+	# it is there at all: 5 -> 1, moved because its subject (a lane's size) is
+	# deleted, not because of what the sweep happens to count today.
 	var mitigating := 0
 	for n in _tree():
 		var d := String(n.get("desc", "")).to_lower()
 		if d.contains("less damage") or d.contains("cannot be reduced") \
 				or d.contains("chance to miss you") or d.contains("resistance"):
 			mitigating += 1
-			ok(String(n.get("lane", "")) == "Inferno",
-				"%s mitigates, so it is in INFERNO" % String(n["id"]))
-	ok(mitigating >= 5,
-		"the Inferno lane really does defend him (%d mitigating nodes)" % mitigating)
+	ok(mitigating >= 1,
+		"the tree he wears still defends him while the kit stays all fire (%d mitigating nodes)"
+			% mitigating)
 	# Immolate keeps its id and its slot and is a DEFENSIVE ability now: the
 	# Overburn clauses went with the drain and the cap.
 	var imm: Ability = Classes.spec_pool_ability("pyromancer", "Immolate")
@@ -561,9 +759,22 @@ func _rune_audit() -> void:
 			"...and %s is rune-only now — no node writes it" % field)
 	# The shared ones: a node AND a rune feed these, and because the read site
 	# ADDS the field they must each pay their own advertised number.
-	for field in ["accelerant_ranks", "conflagration_ranks"]:
-		ok(stat_fields.has(field),
-			"%s is written by a node as well as a rune" % field)
+	# BATCH FX INVERTED THIS PAIR IN PLACE (2 -> 4). FX deleted Accelerant and
+	# Conflagration, so NO node writes either field any more; each is DORMANT —
+	# kept, with its read site, for a later tree, rune or card to point at again
+	# (FX's rule). Both halves are asked: nothing in the one tree writes it, and
+	# the read site still sums it beside the rune's own field.
+	var shared := {
+		"accelerant_ranks": "applier.accelerant_ranks + applier.rune_accelerant_ranks",
+		"conflagration_ranks":
+			"attacker.conflagration_ranks \\\n\t\t\t\t\t+ attacker.rune_conflagration_ranks",
+	}
+	for field in shared:
+		ok(not stat_fields.has(field),
+			"%s is DORMANT: FX deleted the node that wrote it, and no node of the one tree does"
+				% field)
+		ok(src.contains(String(shared[field])),
+			"...and its read site still sums %s beside the rune's own field" % field)
 	# THE ONE WITH NEITHER. Overburn has no per-turn step to raise, and
 	# inventing one would be the guess §4 forbids — so this is FLAGGED, and
 	# the flag is this assertion. If a later batch re-authors the White Flame,
@@ -616,6 +827,11 @@ func _spawn(learned: Dictionary, lineup: Array, earned: Array = []) -> Node:
 		"deterministic": true}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	# BATCH FX: every id a check here learns is deleted, so the member's tree is
+	# the inline one RETIRED builds — the exact payloads, through the real
+	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
+	if not learned.is_empty():
+		opts["patch"] = {1: {"tree": _retired_tree(learned.keys())}}
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", "inquisitor", "beastmaster"], opts)
 

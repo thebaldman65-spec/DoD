@@ -425,11 +425,16 @@ func _weaker_half() -> void:
 	# PERMANENT and free; the card is two turns on a 4-turn cooldown for 20
 	# Mana, so for a Survivalist already holding it the card is close to a dead
 	# draw. Reported rather than re-tuned; the check pins the comparison.
-	var ghillie_pct := 0
-	for node in Talents.LANE_TREES.get("mystic", []):
-		if String(node.get("id", "")) == "sv_ghillie":
-			ghillie_pct = int(node.get("payload", {}).get("stat", {}).get("ghillie", 0))
-	ok(ghillie_pct == 65, "§2: Ghillie Suit is a permanent 65%% (got %d)" % ghillie_pct)
+	# BATCH FX — RE-POINTED TO THE PRECEDENT-MAPPED NODE, SAME FIELD AND SAME
+	# MAGNITUDE. FX deleted the twelve spec trees and Ghillie Suit (`sv_ghillie`)
+	# with the Survivalist's; its field and its 65 were TAKEN into the one tree
+	# as `tn_look_past` ("Enemies Look Past You"), which a Hunter's purse buys
+	# and every Hunter then wears. The comparison this pins is unchanged — the
+	# node is permanent and costs no Mana, the card is two turns of a 4-turn clock.
+	var look_past: Dictionary = Talents.node_in_tree(Talents.tree(), "tn_look_past")
+	var ghillie_pct := int(look_past.get("payload", {}).get("stat", {}).get("ghillie", 0))
+	ok(ghillie_pct == 65,
+		"§2: the node paying Ghillie Suit's field (tn_look_past, FX) is a permanent 65%% (got %d)" % ghillie_pct)
 	var battle_src := _src("res://scripts/battle.gd")
 	ok(battle_src.contains("const CAMOUFLAGE_PCT := 70"),
 		"§2: Camouflage is 70%, ABOVE the node — bought with Mana, a turn and a clock")
@@ -518,12 +523,21 @@ func _names_swept() -> void:
 	# both are shipped as specified and flagged — a node's name is not an
 	# ability name and nothing resolves it. These checks are the report, kept
 	# where a later batch will meet it.
+	# BATCH FX — THE ROSTER A CARD NAME IS SWEPT AGAINST IS THE ONE TREE NOW.
+	# FX deleted the twelve spec trees, so the talent names a card can collide
+	# with are the twenty-seven in `Talents.TREE`, which every hero of every
+	# class wears. Name -> id.
 	var node_names := {}
-	for spec in Talents.LANE_TREES:
-		for node in Talents.LANE_TREES[spec]:
-			node_names[String(node.get("name", ""))] = spec
-	ok(node_names.get("Rally", "") == "warden",
-		"§1 COLLISION: 'Rally' is also a Warden talent node (Banner row 2)")
+	for node in Talents.TREE:
+		node_names[String(node.get("name", ""))] = String(node.get("id", ""))
+	# INVERTED BY FX, IN CK §2's SHAPE BELOW: BR shipped Rally as a LABEL
+	# collision with the Warden's Rally node (Banner row 2), and FX resolved it
+	# by deleting the Warden tree with that node in it. No node of the one tree
+	# is called Rally; a node that takes the name back re-opens the collision and
+	# reds here. The size term keeps every absence in this function from passing
+	# on an empty roster.
+	ok(node_names.size() > 0 and not node_names.has("Rally"),
+		"§1 COLLISION RESOLVED (FX): 'Rally' names no node of the one tree (%d names read) — the Warden's Rally node went with his tree" % node_names.size())
 	# RE-POINTED AND PARTLY INVERTED BY BATCH CK §2. BR asserted that "Iron
 	# Will" named a Warrior CARD, a Warden NODE and a live status LABEL all at
 	# once, and that nothing broke because the ability's own status id was
@@ -535,8 +549,19 @@ func _names_swept() -> void:
 	# be called Iron Will (renaming the wrong half would satisfy a one-sided
 	# check), and the CARD must no longer be. A one-sided version of this passes
 	# if a later batch renames the talent instead.
-	ok(node_names.get("Iron Will", "") == "warden",
-		"§1: 'Iron Will' is the Warden talent node (Threat row 3) — and, since CK §2, only that")
+	# RE-POINTED BY FX, AND BOTH ENDS ARE STILL ASSERTED. The talent end is
+	# `tn_iron_will` now — the Warden's Iron Will taken into the one tree with
+	# its field and magnitude (iron_will_ranks 1) and renamed "Mitigation per
+	# Debuff You Carry" by FX's own ruling, not by the wrong-half accident this
+	# check was written to catch. So the node must still exist and still pay
+	# iron_will_ranks, and NO node may carry the name Iron Will — or Ironclad,
+	# which would re-open the collision from the card's side. The card end is
+	# the next check, unchanged; the word itself lives on as the node's CHIP
+	# label, pinned below.
+	var iw_node: Dictionary = Talents.node_in_tree(Talents.tree(), "tn_iron_will")
+	ok(iw_node.get("payload", {}).get("stat", {}).has("iron_will_ranks")
+		and not node_names.has("Iron Will") and not node_names.has("Ironclad"),
+		"§1 (FX): the Warden's Iron Will is tn_iron_will in the one tree ('%s', still iron_will_ranks) — and no node is called Iron Will or Ironclad" % String(iw_node.get("name", "")))
 	ok(not Classes.class_draft_pool("warrior").has("Iron Will")
 		and Classes.class_draft_pool("warrior").has("Ironclad"),
 		"§1 (CK §2): ...and no longer a Warrior card — that card is Ironclad")
@@ -577,17 +602,17 @@ func _names_swept() -> void:
 		"§1: ...and it resolves to itself, which a duplicate would have broken")
 	ok(not Classes.class_draft_pool("warrior").has("Second Wind"),
 		"§1: ...so the Warrior card is BATTLE TRANCE instead")
-	# `Warcry` is not `Battle Shout`, and `bz_warcry` is a node ID whose NAME is
-	# Overkill (Batch AJ re-specced it in place). Recorded so the id does not
-	# read as a collision to somebody grepping.
-	var found_bz_warcry := false
-	for node2 in Talents.LANE_TREES.get("berserker", []):
-		if String(node2.get("id", "")) == "bz_warcry":
-			found_bz_warcry = true
-			ok(String(node2.get("name", "")) != "Warcry",
-				"§1: the `bz_warcry` node ID carries the name '%s', not 'Warcry'" % \
-					node2.get("name", ""))
-	ok(found_bz_warcry, "§1: ...and that node id still exists to be checked")
+	# `Warcry` is not `Battle Shout`, and `bz_warcry` WAS a node ID whose NAME
+	# was Overkill (Batch AJ re-specced it in place), recorded so the id would
+	# not read as a collision to somebody grepping.
+	#
+	# DG §2 — TWO CHECKS REMOVED HERE BY BATCH FX, AND THEIR SUBJECT IS GONE.
+	# They found the Berserker node with the id `bz_warcry`, asserted its name
+	# was not 'Warcry', and asserted (liveness) that the id still existed to be
+	# checked. FX deleted the twelve spec trees; that id is in no tree, no script
+	# and no data file now, so there is no id left to misread and nothing for
+	# either check to find. The NAME half of the question is still asked:
+	# 'Warcry' is in the ten-name loop above, against the one tree.
 
 
 # ---------- §4 THE DRAFT READS THE NEW POOLS ----------
@@ -877,10 +902,14 @@ func _live_arcane_arrows() -> void:
 
 
 func _live_camouflage() -> void:
+	# BATCH FX — THE SURVIVALIST LEARNS `tn_look_past`, GHILLIE SUIT'S
+	# PRECEDENT-MAPPED SUCCESSOR (ghillie 65, the same field at the same
+	# magnitude). `sv_ghillie` went with the twelve spec trees; every check below
+	# reads the `ghillie` FIELD and its read site in `_evade_chance`, which stand.
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		{"mystic": ["Camouflage"]},
 		["raider", "chief", "archer"],
-		{"mystic": {"sv_ghillie": 1}})
+		{"mystic": {"tn_look_past": 1}})
 	var hunter := _hero(scene, "trapper")
 	ok(hunter != null, "the Survivalist spawned for the Camouflage check")
 	if hunter == null:
@@ -891,7 +920,7 @@ func _live_camouflage() -> void:
 	if camo == null:
 		await _drop(scene)
 		return
-	ok(hunter.ghillie == 65, "§2: ...on a Survivalist who ALSO holds Ghillie Suit (%d)" % hunter.ghillie)
+	ok(hunter.ghillie == 65, "§2: ...on a Survivalist who ALSO wears Ghillie Suit's field, through tn_look_past (%d)" % hunter.ghillie)
 	# GHILLIE ALONE.
 	var ghillie_only: float = scene.call("_evade_chance", hunter)
 	ok(is_equal_approx(ghillie_only, 0.65),

@@ -490,44 +490,30 @@ func _draw_detail() -> void:
 	tree_header.size = Vector2(700, 22)
 	add_child(tree_header)
 
-	if spec == "":
+	if spec == "" or not Talents.has_tree(spec):
 		tree_header.text = "TALENTS — the %s awakens after your first victory." % key.capitalize()
 		return
-	# Only designed (fixed) trees exist; the rest are on the way.
-	if not Talents.has_tree(spec):
-		tree_header.text = "TALENTS — %s tree" % Classes.SPEC_INFO[spec]["name"]
-		var soon := Label.new()
-		soon.text = "Coming soon."
-		soon.add_theme_font_override("font", NAME_FONT)
-		soon.add_theme_font_size_override("font_size", 30)
-		soon.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
-		soon.position = Vector2(500, 300)
-		soon.size = Vector2(744, 40)
-		soon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(soon)
-		return
-	# BATCH BM: the in-run tree is READ-ONLY and says so. Talents are chosen
+	# BATCH BM: the in-run tree is READ-ONLY and says so. Talents are bought
 	# between runs on the build screen and lock the moment a spec is
 	# confirmed; nothing on this page can change them.
-	tree_header.text = "TALENTS — %s    (LOCKED FOR THIS RUN)" % \
-		Classes.SPEC_INFO[spec]["name"]
-	_draw_lane_tree(member)
+	# BATCH FX: the tree is the CLASS's — one tree every class buys into — so
+	# the heading names the class whose purse it is, not the spec.
+	tree_header.text = "TALENTS — the %s tree    (LOCKED FOR THIS RUN)" % key.capitalize()
+	_draw_class_tree(member)
 	# Batch AN: owed ability, upgrade and rune picks resolve on the MAP CARD,
 	# not here. This page is the sheet — what the hero is, and what their
 	# points can buy.
 
 
-# ---------- the talent tree: 3 lanes x 8 rows + the capstone shelf ----------
+# ---------- the talent tree: three tiers of nine (BATCH FX) ----------
 #
-# BATCH BM MADE THIS PAGE READ-ONLY, AND THAT IS THE WHOLE CHANGE HERE. The
-# tree is chosen BETWEEN runs on the build screen (talents.tscn) and locks
-# the instant a spec is confirmed, so the sheet's job is to say what the hero
-# is wearing and to make plain that it cannot be changed in a run. What used
-# to live here — can_learn, purse_for, the click-to-spend handler and the
-# sibling-dimming that helped a player DECIDE — went with the decision.
-# What stays is the LEGIBILITY half AU §2 built: the row bands, the CHOOSE
-# ONE labels and the named reason a node is dark, because a player reading
-# their own build still needs to see the doors that were closed.
+# BATCH BM MADE THIS PAGE READ-ONLY. Talents are bought BETWEEN runs on the
+# build screen (talents.tscn) and lock the instant a spec is confirmed, so the
+# sheet's job is to say what the hero is wearing and to make plain it cannot
+# change in a run.
+# BATCH FX RE-CUT IT FOR THE ONE CLASS TREE. There are no lanes, no rows and no
+# capstone shelf, and nothing is exclusive, so there are no closed doors left
+# to show — a cell is WORN or it is not, and the tiers are the only structure.
 
 const TREE_BACK_POS := Vector2(500, 96)
 const TREE_BACK_SIZE := Vector2(744, 566)
@@ -537,97 +523,47 @@ var _tree_tip_name: Label
 var _tree_tip_desc: Label
 var _tree_tip_state: Label
 
-const LANE_COL_X := [620.0, 872.0, 1124.0]
-# Nine rows in the same 566px of board: rows 1-8 stack, row 9 is the shelf.
-const LANE_ROW_Y := [148.0, 196.0, 244.0, 292.0, 340.0, 388.0, 436.0, 484.0]
-const LANE_CAP_Y := 560.0
-const TREE_NODE_SIZE := 38.0
-const ROW_BAND_PAD := 30.0
-const ROW_BAND_H := 42.0
-const ROW_BAND_COLOR := Color(1, 1, 1, 0.035)
-const ROW_BAND_DECIDED := Color(0.55, 0.45, 0.20, 0.10)
+# Nine cells across each tier band, three bands down the board.
+const TREE_COL_X0 := 540.0
+const TREE_COL_STEP := 83.0
+const TREE_TIER_Y := [170.0, 352.0, 534.0]
+const TREE_NODE_SIZE := 34.0
+const TREE_LABEL_W := 80.0
 const LOCK_GLYPH := "\u2298"
 
 
-# Lane order comes from the tree itself (first appearance) — the columns
-# read left to right in the order the tree was authored.
-func _tree_lanes(tree: Array) -> Array:
-	var lanes: Array = []
-	for t in tree:
-		var lane := str(t.get("lane", ""))
-		if lane != "" and not lanes.has(lane):
-			lanes.append(lane)
-	return lanes.slice(0, 3)
-
-
-func _row_y(row: int) -> float:
-	if row >= Talents.CAPSTONE_ROW:
-		return LANE_CAP_Y
-	return LANE_ROW_Y[clampi(row - 1, 0, LANE_ROW_Y.size() - 1)]
-
-
-func _draw_lane_tree(member: Dictionary) -> void:
+func _draw_class_tree(member: Dictionary) -> void:
 	var tree: Array = member.get("tree", [])
 	var learned: Dictionary = member.get("talents", {})
-	var lane_order := _tree_lanes(tree)
 	var back := ColorRect.new()
 	back.position = TREE_BACK_POS
 	back.size = TREE_BACK_SIZE
 	back.color = Color(0.05, 0.05, 0.06)
 	add_child(back)
-	for row in range(1, Talents.ROWS + 1):
-		var band_y: float = _row_y(row)
-		var decided := not Talents.row_picks(tree, learned, row).is_empty()
+	for tier in range(1, Talents.TIERS + 1):
+		var y: float = TREE_TIER_Y[tier - 1]
+		var worn_n := 0
+		for t in Talents.tier_nodes(tree, tier):
+			if int(learned.get(t["id"], 0)) > 0:
+				worn_n += 1
 		var band := ColorRect.new()
-		band.position = Vector2(LANE_COL_X[0] - ROW_BAND_PAD, band_y - ROW_BAND_H / 2.0)
-		band.size = Vector2(
-			LANE_COL_X[LANE_COL_X.size() - 1] + ROW_BAND_PAD - band.position.x,
-			ROW_BAND_H)
-		band.color = ROW_BAND_DECIDED if decided else ROW_BAND_COLOR
+		band.position = Vector2(TREE_BACK_POS.x + 6, y - 40)
+		band.size = Vector2(TREE_BACK_SIZE.x - 12, 160)
+		band.color = Color(1, 1, 1, 0.035)
 		add_child(band)
 		var band_lbl := Label.new()
-		band_lbl.text = "row %d" % row
-		band_lbl.add_theme_font_size_override("font_size", 9)
+		band_lbl.text = "TIER %d  ·  %d of %d worn" % [tier, worn_n, Talents.NODES_PER_TIER]
+		band_lbl.add_theme_font_size_override("font_size", 11)
 		band_lbl.add_theme_color_override("font_color",
-			Color(0.62, 0.55, 0.38) if decided else Color(0.4, 0.4, 0.45))
-		band_lbl.position = Vector2(TREE_BACK_POS.x + 4, band_y - 6)
-		band_lbl.size = Vector2(LANE_COL_X[0] - ROW_BAND_PAD - TREE_BACK_POS.x - 8, 13)
-		band_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			Color(0.62, 0.55, 0.38) if worn_n > 0 else Color(0.4, 0.4, 0.45))
+		band_lbl.position = Vector2(TREE_BACK_POS.x + 12, y - 36)
+		band_lbl.size = Vector2(TREE_BACK_SIZE.x - 24, 13)
 		add_child(band_lbl)
-	for ci in mini(LANE_COL_X.size(), lane_order.size()):
-		var v := ColorRect.new()
-		v.position = Vector2(LANE_COL_X[ci], TREE_BACK_POS.y + 18)
-		v.size = Vector2(1, TREE_BACK_SIZE.y - 30)
-		v.color = Color(1, 1, 1, 0.05)
-		add_child(v)
-		var lane: String = lane_order[ci]
-		var taken := 0
-		for t in tree:
-			if str(t.get("lane", "")) == lane and int(learned.get(t["id"], 0)) > 0:
-				taken += 1
-		var hdr := Label.new()
-		hdr.text = "%s — %d" % [
-			str(Talents.LANE_NAMES.get(lane, lane)).to_upper(), taken]
-		hdr.add_theme_font_size_override("font_size", 13)
-		hdr.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
-		hdr.position = Vector2(LANE_COL_X[ci] - 110, TREE_BACK_POS.y + 2)
-		hdr.size = Vector2(220, 16)
-		hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(hdr)
-	var cap_lbl := Label.new()
-	cap_lbl.text = "\u2014 CAPSTONE \u00b7 ONE PER HERO, EVER \u00b7 any lane \u2014"
-	cap_lbl.add_theme_font_size_override("font_size", 11)
-	cap_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
-	cap_lbl.position = Vector2(TREE_BACK_POS.x, LANE_CAP_Y - 30)
-	cap_lbl.size = Vector2(TREE_BACK_SIZE.x, 13)
-	cap_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(cap_lbl)
-	for talent in tree:
-		var lane2: String = str(talent.get("lane", ""))
-		var col := maxi(lane_order.find(lane2), 0)
-		var row2 := int(talent.get("row", 1))
-		var center := Vector2(LANE_COL_X[col], _row_y(row2))
-		_make_tree_node(talent, learned, center)
+		var col := 0
+		for t in Talents.tier_nodes(tree, tier):
+			_make_tree_node(t, learned,
+				Vector2(TREE_COL_X0 + TREE_COL_STEP * col, y))
+			col += 1
 	_build_tree_tip()
 
 
@@ -656,6 +592,8 @@ func _build_tree_tip() -> void:
 	_tree_tip_name.add_theme_font_override("font", bold)
 	_tree_tip_name.add_theme_font_size_override("font_size", 15)
 	_tree_tip_name.add_theme_color_override("font_color", Color.WHITE)
+	_tree_tip_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tree_tip_name.custom_minimum_size = Vector2(300, 0)
 	tip_box.add_child(_tree_tip_name)
 	_tree_tip_desc = Label.new()
 	_tree_tip_desc.add_theme_font_size_override("font_size", 12)
@@ -670,12 +608,12 @@ func _build_tree_tip() -> void:
 	add_child(_tree_tip)
 
 
-# A node on the SHEET is one of exactly two things — equipped, or not — and
+# A node on the SHEET is one of exactly two things — worn, or not — and
 # neither is clickable. `Button` survives only because it is the cheapest
 # hover surface; `disabled` stays false or the tooltip stops firing.
 func _make_tree_node(talent: Dictionary, learned: Dictionary,
 		center: Vector2) -> void:
-	var equipped := int(learned.get(talent["id"], 0)) > 0
+	var worn := int(learned.get(talent["id"], 0)) > 0
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(TREE_NODE_SIZE, TREE_NODE_SIZE)
 	btn.position = center - Vector2(TREE_NODE_SIZE / 2.0, TREE_NODE_SIZE / 2.0)
@@ -683,50 +621,48 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary,
 	btn.mouse_default_cursor_shape = Control.CURSOR_ARROW
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.10, 0.10, 0.12)
-	sb.border_color = Color(0.32, 0.62, 0.34) if equipped else Color(0.22, 0.22, 0.25)
+	sb.border_color = Color(0.32, 0.62, 0.34) if worn else Color(0.22, 0.22, 0.25)
 	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(6)
 	btn.add_theme_stylebox_override("normal", sb)
 	btn.add_theme_stylebox_override("hover", sb)
 	btn.add_theme_stylebox_override("pressed", sb)
-	btn.text = ("\u265b" if talent.get("capstone", false) else "\u2694") \
-		if equipped else LOCK_GLYPH
-	btn.add_theme_font_size_override("font_size", 17)
+	btn.text = "\u2694" if worn else LOCK_GLYPH
+	btn.add_theme_font_size_override("font_size", 15)
 	btn.add_theme_color_override("font_color",
-		Color(0.58, 0.58, 0.64) if equipped else Color(0.30, 0.30, 0.34))
+		Color(0.58, 0.58, 0.64) if worn else Color(0.30, 0.30, 0.34))
 	btn.add_theme_color_override("font_hover_color", Color(0.75, 0.75, 0.8))
-	if not equipped:
+	if not worn:
 		btn.modulate = Color(0.55, 0.55, 0.55)
-	btn.mouse_entered.connect(_show_tree_tip.bind(talent, equipped, center))
+	btn.mouse_entered.connect(_show_tree_tip.bind(talent, worn, center))
 	btn.mouse_exited.connect(_hide_tree_tip)
 	add_child(btn)
+	var name_lbl := Label.new()
+	name_lbl.text = String(talent["name"])
+	name_lbl.add_theme_font_size_override("font_size", 9)
+	name_lbl.add_theme_color_override("font_color",
+		Color(0.78, 0.84, 0.76) if worn else Color(0.45, 0.44, 0.42))
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.position = Vector2(center.x - TREE_LABEL_W / 2.0,
+		center.y + TREE_NODE_SIZE / 2.0 + 3)
+	name_lbl.size = Vector2(TREE_LABEL_W, 56)
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(name_lbl)
 
 
-func _show_tree_tip(talent: Dictionary, equipped: bool, center: Vector2) -> void:
+func _show_tree_tip(talent: Dictionary, worn: bool, center: Vector2) -> void:
 	_tree_tip_name.text = talent["name"]
 	_tree_tip_desc.text = Talents.desc_for(talent, 1)
-	var row := int(talent.get("row", 1))
-	var state := "Capstone" if row >= Talents.CAPSTONE_ROW \
-		else "Row %d of %d" % [row, Talents.ROWS]
-	if equipped:
-		state += "  \u2014  EQUIPPED"
-	else:
-		# Name what is standing in this row rather than leaving a bare grey
-		# node: on the sheet the question is always "what did I take instead".
-		var tree: Array = Run.party[selected].get("tree", [])
-		var learned: Dictionary = Run.party[selected].get("talents", {})
-		var mine: Array = Talents.row_picks(tree, learned, row)
-		if mine.is_empty():
-			state += "  \u2014  nothing equipped in this row"
-		else:
-			state += "  \u2014  %s holds this row" % \
-				Talents.node_in_tree(tree, String(mine[0])).get("name", mine[0])
-	state += "\nTalents are chosen between runs and locked for this one."
+	var state := "Tier %d of %d" % [Talents.tier_of(talent), Talents.TIERS]
+	state += "  \u2014  WORN" if worn else "  \u2014  not bought"
+	state += "\nTalents are bought between runs and locked for this one."
 	_tree_tip_state.text = state
 	_tree_tip.visible = true
 	_tree_tip.reset_size()
 	var pos := center + Vector2(-TREE_NODE_SIZE / 2.0 - _tree_tip.size.x - 10, -24)
 	pos.x = maxf(pos.x, 12.0)
+	pos.y = clampf(pos.y, 12.0, 720.0 - _tree_tip.size.y - 12.0)
 	_tree_tip.position = pos
 
 

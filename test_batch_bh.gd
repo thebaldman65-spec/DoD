@@ -100,7 +100,8 @@ func _run() -> void:
 	_never_twice_across_eight()
 
 	# ---- §2: the Faith lane's second axis ----
-	_the_two_nodes_describe_their_new_axes()
+	# BATCH FX: `_the_two_nodes_describe_their_new_axes` is deleted with its
+	# subject — the site where it stood records what it asked (15 checks, DG §2).
 	_the_deleted_fields_are_gone()
 	_one_multiplier_two_gates()
 	_the_rune_is_repointed()
@@ -141,8 +142,23 @@ func _src(path: String) -> String:
 	return "" if f == null else f.get_as_text()
 
 
-func _node(id: String) -> Dictionary:
-	return Talents.node_in_tree(Talents.LANE_TREES["inquisitor"], id)
+# ── BATCH FX — THE FAITH NODES THIS SUITE LEARNS ARE DELETED; THEIR FIELDS ARE NOT ──
+# FX deleted the twelve spec trees, and with them the three Faith-lane nodes
+# §2's live checks learn. Every field those nodes wrote, and every read site
+# of it in `battle.gd`, was KEPT (dormant, not deleted), so each live question
+# below still has a true answer. It is driven with the EXACT payload the node
+# carried, copied from the deleted inquisitor tree, on a node of that id added
+# to the Devout's own tree — so the field still arrives through the real spawn
+# path (`member["tree"]` and `member["talents"]` into `Talents.apply_from_tree`,
+# then `BattleUnit.setup`), and only the node around it is gone.
+const RETIRED := {
+	# FX: the payload the retired dv_fervor (Fervor) carried — the node is deleted, the field and its read site stand.
+	"dv_fervor": {"stat": {"fervor": 1}},
+	# FX: the payload the retired dv_apostle (Apostle) carried — the node is deleted, the field and its read site stand.
+	"dv_apostle": {"stat": {"apostle": 1}},
+	# FX: the payload the retired dv_oath (Binding Oath) carried — the node is deleted, the field and its read site stand.
+	"dv_oath": {"stat": {"oath_faith": 1}},
+}
 
 
 func _run_obj():
@@ -153,12 +169,31 @@ func _devout(scene: Node) -> BattleUnit:
 	return scene.call("_living_devout")
 
 
+# The Devout's tree for a spawn that learns retired nodes: the live tree plus
+# one node per learned id, carrying exactly that id's payload. An id missing
+# from `RETIRED` is an authoring slip in THIS file and is made loud — it would
+# otherwise spawn a Devout with nothing learned, and read as a failed rate.
+func _retired_tree(learned: Dictionary) -> Array:
+	var tree := Talents.tree()
+	for id in learned:
+		if not RETIRED.has(String(id)):
+			push_error("test_batch_bh: no retired payload for `%s`" % id)
+			continue
+		tree.append({"id": String(id), "name": String(id), "tier": 1, "desc": "",
+			"payload": (RETIRED[String(id)] as Dictionary).duplicate(true)})
+	return tree
+
+
 func _spawn(learned := {}) -> Node:
 	# `_stat` only banks into `sim_stats` while `sim` is true.
+	var opts := {"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
+		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true}
+	# BATCH FX: every id a live check learns is a RETIRED node, so its payload
+	# rides in on the Devout's own tree — member 2, the one `talents` names.
+	if not learned.is_empty():
+		opts["patch"] = {2: {"tree": _retired_tree(learned)}}
 	return await Fixture.spawn(self,
-		["berserker", "cryomancer", "inquisitor", "beastmaster"],
-		{"enemies": ["raider"], "talents": {2: learned.duplicate()}, "slot_idx": 0,
-		"deterministic": true, "crit": -10.0, "heal_mult": 1.0, "sim": true, "slices": true})
+		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
 
 func _kill(scene: Node) -> void:
@@ -518,55 +553,32 @@ func _never_twice_across_eight() -> void:
 
 
 # ---------- §2: the shape of the re-spec ----------
-
-func _the_two_nodes_describe_their_new_axes() -> void:
-	var fv := _node("dv_fervor")
-	ok(not fv.is_empty() and int(fv.get("row", 0)) == 6
-			and String(fv.get("lane", "")) == "Faith",
-		"§2: dv_fervor keeps its id, lane and row 6")
-	var fd := Talents.desc_for(fv, 1)
-	ok(fd.contains("Consecrated Ground") and fd.to_lower().contains("double"),
-		"§2: Fervor's text is the ground doubling a HELD stack")
-	ok(fd.contains("%d%%" % (BASE_MITIGATION * FERVOR_MULT))
-			and fd.contains("+%d%%" % (BASE_DAMAGE * FERVOR_MULT)),
-		"§2: ...and states both doubled magnitudes (6%% and +4%%)")
-	ok(fd.to_lower().contains("no extra faith"),
-		"§2: ...and says outright that it grants no Faith — the frequency claim")
-	# BATCH BI §1 INVERTED THIS. BH asked whether Fervor's text names the
-	# QUADRUPLE it made with Apostle; the two add rather than multiply now, so
-	# the text must say TRIPLE — and must not say quadruple, because a tooltip
-	# promising x4 is exactly the compounding the re-spec removed.
-	ok(fd.to_lower().contains("triple") and not fd.to_lower().contains("quadruple"),
-		"§2/BI: ...and names the Apostle stack as TRIPLE, not quadruple")
-	ok(int((fv.get("payload", {}).get("stat", {}) as Dictionary).get("fervor", 0)) == 1,
-		"§2: Fervor's payload is the `fervor` gate")
-	ok(not (fv.get("payload", {}).get("stat", {}) as Dictionary).has("fervor_step"),
-		"§2: ...and no longer writes `fervor_step`")
-
-	var bo := _node("dv_oath")
-	ok(not bo.is_empty() and int(bo.get("row", 0)) == 7
-			and String(bo.get("lane", "")) == "Faith",
-		"§2: dv_oath keeps its id, lane and row 7")
-	var bd := Talents.desc_for(bo, 1)
-	ok(bd.contains("Devout") and bd.to_lower().contains("himself"),
-		"§2: Binding Oath's text is about the Devout's OWN Faith")
-	ok(bd.to_lower().contains("never releases"),
-		"§2: ...and states the rule that keeps it off the frequency axis")
-	ok(not bd.to_lower().contains("keep 3") and not bd.to_lower().contains("instead of resetting"),
-		"§2: ...and no longer promises a release remnant")
-	ok(int((bo.get("payload", {}).get("stat", {}) as Dictionary).get("oath_faith", 0)) == 1,
-		"§2: Binding Oath's payload is `oath_faith`")
-	ok(not (bo.get("payload", {}).get("stat", {}) as Dictionary).has("oath_ranks"),
-		"§2: ...and no longer writes `oath_ranks`")
-
-	# Communion is the lane's ONE surviving frequency node and is untouched.
-	var cm := _node("dv_communion")
-	ok(int((cm.get("payload", {}).get("stat", {}) as Dictionary).get("communion_ranks", 0)) == 15,
-		"§2: Communion still pays 15 — the lane keeps exactly one frequency node")
-	# Sacred Covenant's +2 stays: one small frequency term is not the fault.
-	var cv := _node("dv_covenant")
-	ok(int((cv.get("payload", {}).get("stat", {}) as Dictionary).get("covenant_faith", 0)) == 2,
-		"§2: Sacred Covenant still grants its 2 Faith on a lethal save")
+#
+# **BATCH FX — `_the_two_nodes_describe_their_new_axes` IS DELETED WITH ITS
+# SUBJECT (DG §2), AND THIS IS THE SITE THAT RECORDS IT. 15 CHECKS REMOVED.**
+# It read four NODES of the Devout's Faith lane out of the deleted inquisitor
+# tree and asked what each one WAS: that `dv_fervor` kept its id, its lane and
+# row 6, that its TEXT was the ground doubling a held stack, stated both
+# doubled magnitudes, said outright that it grants no Faith and named the
+# Apostle stack TRIPLE and never quadruple, and that its payload was the
+# `fervor` gate and no longer `fervor_step` (7 checks); that `dv_oath` kept its
+# id, lane and row 7, that its text was about the Devout's OWN Faith, said it
+# never releases and promised no remnant, and that its payload was
+# `oath_faith` and no longer `oath_ranks` (6); and that Communion still paid
+# 15 and Sacred Covenant still granted 2 (2). Every one of the fifteen asks
+# what a deleted node's id, lane, row, desc or authored payload says. FX
+# deleted the twelve spec trees and all 324 of their nodes, so there is no
+# node left to read, and none of the four has a successor in the one tree —
+# no node of the twenty-seven writes a Faith field.
+#
+# WHAT IS NOT LOST, AND WHERE IT IS STILL ASKED. The FIELDS and their read
+# sites stand. `_the_deleted_fields_are_gone` still pins `fervor_step` and
+# `oath_ranks` absent from BattleUnit, `battle.gd`, the tree and the rune
+# pool, and the three replacements present; `_one_multiplier_two_gates` still
+# pins where `fervor` and `apostle` are read; and every `_live_*` check below
+# still MEASURES what those fields pay, driven by the exact payloads the nodes
+# carried (`RETIRED`, above) — so the magnitudes the fifteen pinned as TEXT are
+# asserted there as BEHAVIOUR.
 
 
 # A field that changed MEANING must be DELETED with its read site, not renamed
