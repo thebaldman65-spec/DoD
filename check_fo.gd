@@ -4,19 +4,23 @@
 #       every rung, EZ §5's "never shallower" property restated against the
 #       subtraction, and THE FLOOR asserted as a ruling rather than as a guard
 #       against a division by zero. **BATCH FX deleted the capstone the floor
-#       was priced against**: §1c carries the live relation now (10, 2 and 3;
-#       nothing installs a shallower step; the floor binds no live build), and
-#       RUIN_FLOOR is queued for a ruling
+#       was priced against, and BATCH FY re-derived the floor against the live
+#       game (ruled by the designer)**: 8, because nothing installs a shallower
+#       step than 10 and the rune subtracts 2. §1c pins the three numbers AS A
+#       RELATION, and §1e asks the property of every step a live payload can
+#       install rather than of a capstone that no longer exists
 #   §2  THE WIDE WATCH IS RETIRED AND THE SHARED MARK REPLACES IT — the
 #       retirement in both directions (kept AND unofferable), the new rune
 #       driven on a live board through the HERO path and the COMPANION path,
-#       and `_gain_focus` proved to be the only way in BEHAVIOURALLY
+#       and `_gain_focus` proved to be the only way in BEHAVIOURALLY. **BATCH
+#       FY §3 restated the retirement's reason** (ruled: it stays retired, and
+#       the Shared Mark holds its place), and §2a asserts the string records
+#       THAT reason and no longer offers FO's as a live one
 #   §3  THE `Overkill` COLLISION, ASSERTED RATHER THAN REPORTED — two nodes,
 #       two specs, one word, and this batch ruled on none of it. **BATCH FX
 #       deleted both nodes**: eight of its nine checks went with them (DG §2,
 #       recorded at the section), and the ninth asserts that no node or rune
-#       carries Overkill's clause — it lives only on the retired Wide Watch,
-#       whose return is queued for the designer
+#       carries Overkill's clause — it lives only on the retired Wide Watch
 #
 # **WHY THIS BATCH EARNS A GATE.** It encodes two rulings and both decay
 # silently, in opposite directions:
@@ -54,17 +58,20 @@ const Gate = preload("res://gate_fixture.gd")
 const SEAT := {"occultist": 0, "warden": 1, "sharpshooter": 2, "beastmaster": 3}
 const DRIVE := ["occultist", "warden", "sharpshooter", "beastmaster"]
 
-# THE TWO NUMBERS THE FLOOR IS PRICED AGAINST. Held here so §1g asserts the
-# floor's REASON is still true, not only that the floor is still 3: a floor of 3
-# under a capstone of 5 and a subtraction of 2 is exactly-reaching, and if either
-# of those moves the floor is answering a question nobody asked any more.
-# BATCH FX: the capstone is deleted, so CAPSTONE_INSTALLS is the retired Avatar of
-# Ruin's value and nothing live installs it. §1d–§1g drive it as a CONSTRUCTED
-# state; §1c carries the live relation, which is 10, 2 and 3 only.
+# THE TWO NUMBERS THE FLOOR IS PRICED AGAINST. Held here so §1c asserts the
+# floor's REASON is still true, not only that the floor is still its number: FO's
+# floor of 3 sat exactly on a capstone of 5 minus a subtraction of 2, and if
+# either moved the floor was answering a question nobody asked any more.
+# BATCH FX deleted the capstone, so CAPSTONE_INSTALLS is the retired Avatar of
+# Ruin's value and nothing live installs it. **BATCH FY RE-DERIVED THE FLOOR
+# (ruled by the designer):** the deepest the live game reaches is the base step
+# minus the rune — 10 - 2 — so FLOOR is 8 and the relation §1c pins is
+# `FLOOR == BASE_THRESHOLD - HEX_SUBTRACTS`. The retired 5 is driven in §1f as a
+# CONSTRUCTED step below the floor, which is where it sits now.
 const BASE_THRESHOLD := 10
 const CAPSTONE_INSTALLS := 5
 const HEX_SUBTRACTS := 2
-const FLOOR := 3
+const FLOOR := 8
 
 var _g := Gate.new()
 
@@ -130,14 +137,14 @@ func _s1_data() -> void:
 	#
 	# **THE FLOOR IS ON THE CARD BECAUSE IT IS A RULE THE PLAYER MEETS.** A
 	# value left off a line is a stat nobody knows they have (`text-standard`
-	# §1), and a subtraction with an invisible bottom is exactly that: an
-	# Occultist holding the capstone reads 5 and gets 3, and reads nothing
-	# telling him why it stops there.
+	# §1), and a subtraction with an invisible bottom is exactly that. BATCH FY:
+	# the floor is 8 now, and the card states the number the code floors at —
+	# the needle is built off FLOOR so the card and the constant cannot part.
 	var d := String(e.get("desc", ""))
 	ok(d.contains("TWO stacks sooner"),
 		"§1b: the card no longer states the SUBTRACTION — reads `%s`" % d)
-	ok(d.contains("every 3rd"),
-		"§1b: the card no longer states the FLOOR — reads `%s`" % d)
+	ok(d.contains("never sooner than every %s" % _ordinal(FLOOR)),
+		"§1b: the card no longer states the FLOOR of %d — reads `%s`" % [FLOOR, d])
 	ok(int(e.get("price", 0)) == 100,
 		"§1b: Deepening Hex left the flat 100g (%s)" % e.get("price", "<absent>"))
 	ok(not e.has("retired"),
@@ -145,11 +152,14 @@ func _s1_data() -> void:
 
 	# ── (c) THE FLOOR AND THE TWO NUMBERS IT IS PRICED AGAINST ──────────────
 	#
-	# **A FLOOR IS A RULING AND ITS REASON IS AN ARITHMETIC RELATION.** Three is
-	# chosen because `5 - 2` reaches it exactly: it is the deepest the live tree
-	# can go, so it changes nothing today and refuses everything below. If the
-	# capstone or the subtraction moves, that relation is broken and the floor is
-	# answering a question nobody asked — so all three are asserted together.
+	# **A FLOOR IS A RULING AND ITS REASON IS AN ARITHMETIC RELATION.** FO chose
+	# 3 because `5 - 2` reached it exactly: the deepest the live tree could go, so
+	# it changed nothing and refused everything below. **FY re-derived it the same
+	# way against the live game: 8, because `10 - 2` reaches it exactly** — the
+	# capstone that installed 5 went with the twelve trees at FX and nothing
+	# installs a shallower step. If the base or the subtraction moves, that
+	# relation is broken and the floor is answering a question nobody asked — so
+	# all three are asserted together, and the relation is asserted as one.
 	var bsrc: String = Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	ok(bsrc.contains("const RUIN_FLOOR := %d" % FLOOR),
@@ -161,29 +171,29 @@ func _s1_data() -> void:
 		"§1c: `_ruin_threshold` no longer reads as a floored subtraction")
 	ok(not bsrc.contains("mini(step, occ.rune_hex_threshold)"),
 		"§1c: the retired `mini` is still in the fight")
-	# ── BATCH FX: THE CAPSTONE THAT JUSTIFIED 3 AS `5 - 2` WENT WITH THE TWELVE
-	# TREES, AND THESE TWO ARMS CARRY THE STATE IT LEFT ───────────────────────
-	# RUIN_FLOOR was priced as `5 - 2 = 3`: Avatar of Ruin (`oc_avatar_ruin`)
-	# installed a step of 5, Deepening Hex subtracts 2, and 3 was exactly the
-	# deepest the live tree could reach. **That capstone went with the twelve
-	# trees at FX.** No node of the one tree writes `avatar_ruin` — a talent may
-	# not touch an engine — and no rune does; the field and its read site in
-	# `_ruin_threshold` stand, dormant. **The floor stands until the designer
-	# re-rules it (FX report, NEEDS A RULING)**, so these two arms assert what is
-	# true today rather than staying red until somebody rules:
-	#   · the live relation is made of three numbers and only three — the base
-	#     step (10) and the floor (3), pinned against the source above, and the
-	#     rune's subtraction (2), pinned against its payload in §1a;
+	# ── BATCH FY §2: THE FLOOR, RE-DERIVED AGAINST THE LIVE GAME (ruled by the
+	# designer: "re-derive against the live tree") ────────────────────────────
+	# FO priced RUIN_FLOOR as `5 - 2 = 3` off Avatar of Ruin (`oc_avatar_ruin`),
+	# which installed a step of 5. **That capstone went with the twelve trees at
+	# FX**, and FX's two arms here asserted the state it left: nothing installs a
+	# shallower step, and 3 bound no live build. FY re-derived the floor by FO's
+	# own method: the deepest a live Occultist reaches is the base step minus the
+	# rune, `10 - 2`, so the floor is 8 and it sits EXACTLY on the one live build
+	# — it changes nothing today and refuses everything below, as FO's did.
+	#   · the live relation is three numbers and one equation — the base step
+	#     (10) and the floor (8), pinned against the source above, the rune's
+	#     subtraction (2), pinned against its payload in §1a, and
+	#     `FLOOR == BASE_THRESHOLD - HEX_SUBTRACTS`;
 	#   · NOTHING installs a shallower step — asserted over every node of the one
 	#     tree AND every rune payload, retired ones included (a saved run can
-	#     still hold a retired rune);
-	#   · so the floor binds NO live build: the deepest a live Occultist reaches
-	#     is 10 - 2 = 8, and 3 is below it.
-	# **A node or rune that writes `avatar_ruin` again brings back the original
-	# question** — is the floor still the exact bottom of what can be reached? —
-	# and the first arm below is what reds to say so. §1d–§1g still drive the
-	# retired capstone's 5 as a CONSTRUCTED state, which is how the floor is
-	# proved to bite at all.
+	#     still hold a retired rune).
+	# **A node or rune that writes `avatar_ruin` again brings back the question**
+	# — and because the floor now sits on the rune's own result, the question
+	# arrives at once: a step of 9 leaves the rune one stack, 8 leaves it none,
+	# and below 8 the floor RAISES the step, so the rune would make that holder's
+	# detonation shallower. The first arm below is what reds to say so; §1e asks
+	# the property of every step a live payload can install, and §1f drives the
+	# retired capstone's 5 as a CONSTRUCTED step below the floor.
 	var step_writers: Array = []
 	for nd in Talents.TREE:
 		if _writes_key((nd as Dictionary).get("payload", {}), "avatar_ruin"):
@@ -192,10 +202,25 @@ func _s1_data() -> void:
 		if _writes_key((data[rid] as Dictionary).get("payload", {}), "avatar_ruin"):
 			step_writers.append("rune:" + String(rid))
 	ok(step_writers.is_empty(),
-		"§1c: %s write `avatar_ruin` — a shallower Ruin step is installable again, so RUIN_FLOOR's original question is back: is %d still the exact bottom of what can be reached?"
-			% [step_writers, FLOOR])
-	ok(FLOOR < BASE_THRESHOLD - HEX_SUBTRACTS,
-		"§1c: the floor (%d) is no longer below the only live step (%d - %d) — it binds a live build now, which is not the state FX left"
+		"§1c: %s write `avatar_ruin` — a shallower Ruin step is installable again, so RUIN_FLOOR's question is back: is %d still the exact bottom of what can be reached? (below %d the floor RAISES the step)"
+			% [step_writers, FLOOR, FLOOR])
+	# BATCH FY — THE ANCHOR ABOVE IS AN ABSENCE, SO IT GETS ITS POSITIVE ARM. The
+	# same walk over the same population, pointed at the field the rune DOES
+	# write, must find the rune and only the rune. Without this, a walk that
+	# reached no payload at all would satisfy "nothing writes `avatar_ruin`"
+	# exactly as well as a clean tree does.
+	var deepen_writers: Array = []
+	for nd in Talents.TREE:
+		if _writes_key((nd as Dictionary).get("payload", {}), "rune_hex_deepen"):
+			deepen_writers.append("node:" + String((nd as Dictionary).get("id", "")))
+	for rid in data:
+		if _writes_key((data[rid] as Dictionary).get("payload", {}), "rune_hex_deepen"):
+			deepen_writers.append("rune:" + String(rid))
+	ok(deepen_writers == ["rune:deepening_hex"],
+		"§1c: the writer walk found %s writing `rune_hex_deepen`, not exactly the Deepening Hex rune — the walk above it is not reaching the payloads it claims to clear"
+			% [deepen_writers])
+	ok(FLOOR == BASE_THRESHOLD - HEX_SUBTRACTS,
+		"§1c: the floor (%d) is not the base step minus the rune (%d - %d) — the relation FY derived it from is broken, so the floor answers a question nobody asked"
 			% [FLOOR, BASE_THRESHOLD, HEX_SUBTRACTS])
 
 
@@ -208,7 +233,7 @@ func _s1_driven() -> void:
 		return
 	var occ: BattleUnit = heroes[int(SEAT["occultist"])]
 
-	# ── (d) THE ARITHMETIC AT EVERY RUNG ────────────────────────────────────
+	# ── (d) THE ARITHMETIC ON THE LIVE BOARD ────────────────────────────────
 	occ.rune_hex_deepen = 0
 	occ.avatar_ruin = 0
 	var base: int = scene._ruin_threshold()
@@ -218,51 +243,81 @@ func _s1_driven() -> void:
 	var runed: int = scene._ruin_threshold()
 	ok(runed == BASE_THRESHOLD - HEX_SUBTRACTS,
 		"§1d: the rune alone reads %d, not %d" % [runed, BASE_THRESHOLD - HEX_SUBTRACTS])
-	occ.avatar_ruin = CAPSTONE_INSTALLS
-	var both: int = scene._ruin_threshold()
-	ok(both == CAPSTONE_INSTALLS - HEX_SUBTRACTS,
-		"§1d: rune AND capstone reads %d, not %d" % [both,
-			CAPSTONE_INSTALLS - HEX_SUBTRACTS])
+	# BATCH FY — THE DORMANT READ, KEPT AND ASSERTED. Nothing writes `avatar_ruin`
+	# since FX, and its read in `_ruin_threshold` stands for the next writer: set
+	# by hand, it still installs its step. (FO's "rune AND capstone reads 3" arm
+	# asked the capstone build, which no longer exists; its step now sits below
+	# the floor and is driven in §1f, where that state belongs.)
 	occ.rune_hex_deepen = 0
+	occ.avatar_ruin = CAPSTONE_INSTALLS
 	var cap_only: int = scene._ruin_threshold()
 	ok(cap_only == CAPSTONE_INSTALLS,
-		"§1d: the capstone alone reads %d, not %d" % [cap_only, CAPSTONE_INSTALLS])
+		"§1d: the dormant `avatar_ruin` read no longer installs its step (reads %d, not %d) — the read site the next writer would reach has gone"
+			% [cap_only, CAPSTONE_INSTALLS])
+	occ.avatar_ruin = 0
 
-	# ── (e) EZ §5's PROPERTY, RESTATED AGAINST THE SUBTRACTION ──────────────
+	# ── (e) EZ §5's PROPERTY, ASKED OF EVERY STEP A LIVE PAYLOAD CAN INSTALL ─
 	#
 	# **THE ASSERTION IS NOT DELETED FOR HAVING HAD ITS SUBJECT CHANGED.** EZ §5
 	# asserted the rune can never make a capstone holder's detonation SHALLOWER;
-	# that is the property, and it is asserted here as an INEQUALITY over both
-	# builds rather than as the two values above — a value arm passes on the two
-	# numbers this batch happens to ship, and the property is what survives the
-	# next re-tune. **A gate that stops asking is the failure forty batches have
-	# been removing.**
-	ok(runed <= base,
-		"§1e: holding the rune made an UNTALENTED hex SHALLOWER (%d > %d)" % [runed, base])
-	ok(both <= cap_only,
-		"§1e: holding the rune made a CAPSTONE hex SHALLOWER (%d > %d) — the fault the `mini` existed to stop"
-			% [both, cap_only])
-
-	# **AND THE HALF THE `mini` COULD NOT GIVE: IT IS WORTH SOMETHING.** FN
-	# measured the rune at EXACTLY ZERO for a capstone holder and that is what
-	# this batch took. A property arm alone would pass on `mini` again, which
-	# satisfies "never shallower" perfectly and pays nothing — so the STRICT
-	# inequality is asserted on both builds, and it is the arm that reds the day
-	# anything else lowers the threshold onto the floor.
-	ok(runed < base,
-		"§1e: the rune is worth ZERO to an untalented Occultist (%d == %d)" % [runed, base])
-	ok(both < cap_only,
-		"§1e: the rune is worth ZERO to a capstone holder (%d == %d) — FN's hole is OPEN again"
-			% [both, cap_only])
-	ok(cap_only - both == HEX_SUBTRACTS and base - runed == HEX_SUBTRACTS,
-		"§1e: the rune pays %d to a capstone holder and %d without — it is not the same %d to every build"
-			% [cap_only - both, base - runed, HEX_SUBTRACTS])
-
-	# ── (f) THE FLOOR BITES, AND IT IS DRIVEN AT BOTH EDGES ─────────────────
+	# that is the property, and FO asked it of two builds, untalented and
+	# capstone. **The capstone is gone, so FY asks it of the POPULATION instead**:
+	# the base step, plus every step any node of the one tree or any rune payload
+	# (retired included) writes into `avatar_ruin`. Today that is the base alone,
+	# and the day a payload installs a step the property is asked of it without an
+	# edit here — which is where a floor sitting on the rune's own result would
+	# show up first.
 	#
-	# Unreachable in the live tree — nothing installs a threshold of 4 or 3 — so
-	# the state is CONSTRUCTED rather than waited for. That is the whole point:
-	# the floor guards a composition that does not exist YET.
+	# **AND THE HALF THE `mini` COULD NOT GIVE: IT IS WORTH SOMETHING.** FN
+	# measured the rune at EXACTLY ZERO for a capstone holder and that is what FO
+	# took. A property arm alone would pass on `mini` again, which satisfies
+	# "never shallower" perfectly and pays nothing — so the STRICT inequality is
+	# asserted on every step, and it is the arm that reds the day anything lowers
+	# the threshold onto the floor.
+	var steps: Array = [BASE_THRESHOLD]
+	var raw_r: String = FileAccess.get_file_as_string("res://data/runes.json")
+	var runes_d: Dictionary = JSON.parse_string(raw_r) as Dictionary
+	for nd in Talents.TREE:
+		for v in _values_of_key((nd as Dictionary).get("payload", {}), "avatar_ruin"):
+			if not steps.has(int(v)):
+				steps.append(int(v))
+	for rid in runes_d:
+		for v in _values_of_key((runes_d[rid] as Dictionary).get("payload", {}), "avatar_ruin"):
+			if not steps.has(int(v)):
+				steps.append(int(v))
+	ok(not steps.is_empty() and int(steps[0]) == BASE_THRESHOLD,
+		"§1e: the population of steps does not start at the base %d (%s) — the arms below read nothing"
+			% [BASE_THRESHOLD, str(steps)])
+	var asked := 0
+	for s in steps:
+		occ.avatar_ruin = 0 if int(s) == BASE_THRESHOLD else int(s)
+		occ.rune_hex_deepen = 0
+		var bare: int = scene._ruin_threshold()
+		occ.rune_hex_deepen = HEX_SUBTRACTS
+		var held: int = scene._ruin_threshold()
+		ok(held <= bare,
+			"§1e: at a step of %d holding the rune made the hex SHALLOWER (%d > %d) — the fault the `mini` existed to stop"
+				% [int(s), held, bare])
+		ok(held < bare,
+			"§1e: at a step of %d the rune is worth ZERO (%d == %d) — FN's hole is OPEN again"
+				% [int(s), held, bare])
+		ok(bare - held == HEX_SUBTRACTS,
+			"§1e: at a step of %d the rune pays %d, not the same %d it pays every build"
+				% [int(s), bare - held, HEX_SUBTRACTS])
+		asked += 1
+	occ.avatar_ruin = 0
+	print("    §1e: CHECKED %d of %d live step(s) %s — the base, and every step a live payload installs"
+		% [asked, steps.size(), str(steps)])
+
+	# ── (f) THE FLOOR BITES, AND IT IS DRIVEN AT BOTH EDGES AND BELOW ───────
+	#
+	# Unreachable in the live game — nothing installs a step below 10 — so the
+	# state is CONSTRUCTED rather than waited for. That is the whole point: the
+	# floor guards a composition that does not exist YET. **BELOW THE FLOOR IT
+	# RAISES THE STEP**, and since FY the retired capstone's 5 is such a step:
+	# a holder of both would detonate LATER with the rune than without it. That is
+	# the ruled floor's shape (FO's own arm raised a step of 1 to its floor), and
+	# it is why §1c's writer arm reds before any live build can meet it.
 	occ.rune_hex_deepen = HEX_SUBTRACTS
 	occ.avatar_ruin = FLOOR + 1
 	var edge: int = scene._ruin_threshold()
@@ -273,6 +328,10 @@ func _s1_driven() -> void:
 	var atfloor: int = scene._ruin_threshold()
 	ok(atfloor == FLOOR,
 		"§1f: at the floor itself the subtraction read %d" % atfloor)
+	occ.avatar_ruin = CAPSTONE_INSTALLS
+	ok(scene._ruin_threshold() == FLOOR,
+		"§1f: the retired capstone's step (%d), below the floor, read %d rather than the floor %d"
+			% [CAPSTONE_INSTALLS, scene._ruin_threshold(), FLOOR])
 	occ.avatar_ruin = 1
 	ok(scene._ruin_threshold() == FLOOR,
 		"§1f: a threshold BELOW the floor was not raised to it (%d) — `st %% step` is a division"
@@ -341,13 +400,23 @@ func _s2_data() -> void:
 		"§2a: the retirement string names no batch — a retirement must be DECLARATIVE")
 	ok(r.contains("LOST:"),
 		"§2a: the retirement string names no LOSS — that is the record a future author needs")
-	# BATCH FX — THIS NEEDLE STILL RESOLVES, AND WHAT IT NAMES IS A NODE FX
-	# DELETED. The retirement string is the RECORD of why the rune was retired and
-	# the record did not change; what changed is that its reason no longer holds,
-	# which §3 records against the one tree — the Wide Watch's return is queued
-	# for the designer.
-	ok(r.contains("Overkill"),
-		"§2a: the retirement string does not name the NODE the rune duplicated — `it was weak` is not the reason")
+	# BATCH FY §3 — THE REASON IS RESTATED, RULED BY THE DESIGNER: the Wide
+	# Watch STAYS RETIRED, and the reason is now that its place is filled. FO's
+	# string recorded "it was authored against a base a node already provided",
+	# and FX deleted that node, so the string as written told a future author the
+	# collision was still there. This arm used to require the string to NAME the
+	# node (Overkill) it duplicated; it now requires the CURRENT reason — the
+	# Shared Mark holds the slot — and that the restatement is dated. **The
+	# negative anchor is paired with those two positive arms**: FO's sentence may
+	# not stand in the string as a live reason, and the string must still say
+	# what the rune is retired FOR. (Naming Overkill as history is allowed; the
+	# string does, as a reason it records as VOID.)
+	ok(r.contains("Shared Mark"),
+		"§2a: the retirement string does not record the CURRENT reason — the Shared Mark holds the Wide Watch's place (FY §3)")
+	ok(r.contains("BATCH FY"),
+		"§2a: the retirement string does not date the restated reason — a retirement must be DECLARATIVE")
+	ok(not r.contains("AUTHORED AGAINST A BASE A NODE ALREADY PROVIDED"),
+		"§2a: the retirement string still offers FO's reason as live — that base was deleted at FX, and the sentence would send a future author looking for a collision that is not there")
 	ok(String(ww.get("name", "")) == "Wide Watch"
 			and String(ww.get("scope", "")) == "spec:sharpshooter"
 			and int(ww.get("price", 0)) == 100,
@@ -617,17 +686,18 @@ func _s2_driven() -> void:
 # asserted, because that file is not this gate's to correct.
 #
 # ── THE NINTH CARRIES THE STATE FX LEFT, AND IT IS THE TRIPWIRE ──────────────
-# It ties §3 to §2. The Wide Watch was retired because the Sharpshooter's
+# It ties §3 to §2. The Wide Watch was retired at FO because the Sharpshooter's
 # Overkill already kept his Focus "in FULL" through a kill — the rune's whole
 # clause by a different route. **That reason went with `ss_overkill` at FX.** No
 # node of the one tree carries the clause, by its text or by its `overkill`
 # field (whose read sites stand, dormant, in the kill carry and in
 # `_sharpshooter_focus`), and no rune writes `overkill` — so the clause now lives
-# ONLY on the retired rune, whose kept half §2a still pins. **Whether the Wide
-# Watch returns is queued for the designer** (FX report, NEEDS A RULING). Until
-# then this arm asserts the present truth, and the day a node or rune carries the
-# clause again it reds: the retirement's reason is back, and the queued question
-# changes with it.
+# ONLY on the retired rune, whose kept half §2a still pins. **BATCH FY §3 RULED
+# THAT IT STAYS RETIRED** (the designer): the Shared Mark holds its place, and
+# that is the reason §2a now requires the string to record. This arm still
+# asserts the present truth, and the day a node or rune carries the clause again
+# it reds: a duplicate of the retired rune's clause is live, which is FO's reason
+# arriving back beside FY's.
 
 func _s3_the_collision() -> void:
 	print("\n§3 — the node the Wide Watch's retirement names, asked of the one tree")
@@ -643,7 +713,7 @@ func _s3_the_collision() -> void:
 		if _writes_key((runes[rid] as Dictionary).get("payload", {}), "overkill"):
 			carriers.append("rune:" + String(rid))
 	ok(carriers.is_empty(),
-		"§3: %s carry Overkill's Focus clause again — the reason the Wide Watch was retired is back, and the ruling queued on its return has a different question to answer"
+		"§3: %s carry Overkill's Focus clause again — the retired Wide Watch's clause is live elsewhere, which is FO's reason for retiring it arriving back beside FY's (its place is filled)"
 			% [carriers])
 	print("    Overkill's Focus clause: carried by %s — it lives only on the retired Wide Watch"
 		% ("no node of the one tree and no rune" if carriers.is_empty() else ", ".join(carriers)))
@@ -664,6 +734,34 @@ func _writes_key(o, key: String) -> bool:
 			if _writes_key(x, key):
 				return true
 	return false
+
+
+# Every value a payload writes into `key`, walked the way `_writes_key` walks.
+# BATCH FY — §1e asks the property of every step a live payload installs, so it
+# needs the values, not only whether one exists.
+func _values_of_key(o, key: String) -> Array:
+	var out: Array = []
+	if o is Dictionary:
+		if (o as Dictionary).has(key):
+			out.append((o as Dictionary)[key])
+		for k in o:
+			if String(k) != key:
+				out.append_array(_values_of_key(o[k], key))
+	elif o is Array:
+		for x in o:
+			out.append_array(_values_of_key(x, key))
+	return out
+
+
+# The ordinal the card writes a step in — "every 8th", "every 3rd".
+func _ordinal(n: int) -> String:
+	var suffix := "th"
+	if n % 100 < 11 or n % 100 > 13:
+		match n % 10:
+			1: suffix = "st"
+			2: suffix = "nd"
+			3: suffix = "rd"
+	return "%d%s" % [n, suffix]
 
 
 # Both bodies back to full and alive before an arm. `check_dj` §1's idiom.

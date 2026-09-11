@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Systems Reconnaissance (Batch FW)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-10 (Batch FW &mdash; first pass)</b></p>
+<p align="right"><b>Last updated: 2026-09-11 (Batch FY &mdash; <a href="#sr-reach">SR-REACH</a>, the reach every TODAY was missing); first pass 2026-09-10 (Batch FW)</b></p>
 <h1>DAWN OF DECAY — THE SYSTEMS RECONNAISSANCE</h1>
 
 <p><i>What the merged talent layer can reach, derived from the code. <b>This is a REPORT. Nothing
@@ -48,8 +48,105 @@ system or a part of it, with the reason.</li>
 <li><b>Distinct things a node could say</b> &mdash; the count &sect;4 totals. <b>A distinct thing is a
 different dial or a different condition, never a different magnitude</b>: <i>+10% Break damage</i>
 and <i>+15% Break damage</i> are one; <i>+Break damage</i> and <i>Break damage on a Perfect</i> are
-two. Each is marked <b>TODAY</b> (a field exists and this system already reads it), <b>SMALL</b> (one new field and one read line at a site that already exists), <b>LARGE</b> (a new door, layer, run-side reader or piece of UI) or <b>RULING</b> (the line's edge or a standing rule decides it first).</li>
+two. Each is marked <b>TODAY</b> (a field exists and this system already reads it), <b>SMALL</b> (one new field and one read line at a site that already exists), <b>LARGE</b> (a new door, layer, run-side reader or piece of UI) or <b>RULING</b> (the line's edge or a standing rule decides it first).
+<b>TODAY MEANS <i>SOME HERO</i>, NOT <i>EVERY HERO</i> &mdash; read <a href="#sr-reach">SR-REACH</a> before
+authoring from any TODAY on this page (Batch FY).</b></li>
 </ol>
+
+<h2 id="sr-reach">SR-REACH &mdash; BATCH FY'S CORRECTION: TODAY MEANS <i>SOME HERO</i>, NOT <i>EVERY HERO</i></h2>
+
+<p style="border:3px solid #a00; padding:10px"><b>WHAT TODAY MEANT, EXACTLY, AND WHAT IT DID NOT.</b> Every
+TODAY on this page is a statement about a FIELD and a READ SITE: <i>a payload can write this field, this system
+already reads it, and none of the seven traps is in the way</i>. <b>It is not a statement about which heroes the
+read site pays.</b> The page was written for FOUR class trees (&sect;4: <i>&ldquo;every tree can use nearly all
+of them&rdquo;</i>), and under that shape a TODAY that pays only one currency is still usable &mdash; it goes in
+that currency's tree. <b>Batch FX then built ONE tree that all four classes buy</b>, and for that shape a TODAY is
+usable only if its read site pays <b>every class that can buy it</b>. Four of FX's brief's twenty-seven were not,
+and this section is the column the page was missing.<br><br>
+<b>OF THE FIFTY TODAY ITEMS: 37 pay every class; 6 are class-conditional; 1 pays one spec; 5 pay the party once,
+from its best or first holder; 1 pays a holder only relative to the other heroes.</b> The page flagged five of the
+six class-conditional items inside their cost cells, did not flag the one-spec item at all, and dropped every
+qualifier from the &sect;4 tally and from <a href="#sr-answer">SR-ANSWER</a>'s <i>&ldquo;50 can be said
+today&rdquo;</i>. <b>Nothing else on this page is re-derived here</b>: no balance, no magnitude, and the SMALL,
+LARGE and RULING costs are untouched.</p>
+
+<h3>SR-REACH &middot; How it was taken</h3>
+<p>Every TODAY item's read site was followed to its guard chain in the FY tree (comment-stripped source), and four
+facts were driven live in a scratch probe rather than read: <b>all twenty-seven fields of the one tree land at their
+payload value on all twelve specs</b> (so no spec or class passive assigns over any of them &mdash;
+<code>check_fx</code> &sect;4a measures four specs); <b>every spec's slot-0 basic attack is an ordinary blow</b>
+(no <code>special</code>), so a field read only in <code>_resolve</code>'s ordinary strike branch reaches every
+spec through its basic; <b>a debuff landed through the generic <code>_apply_status</code> funnel makes no hero
+Elusive on any of the twelve specs, while the Survivalist's own Snare Trap does</b>; and <b>the enemy target
+distribution with no Ghillie holder, one holder and four holders</b> (below). Full working:
+<code>docs/reports/FY.md</code> &sect;1.</p>
+
+<h3>SR-REACH &middot; The fifty, by reach</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Reach</th><th>Items (section &middot; number)</th><th>Why, at the read site</th></tr>
+<tr><td><b>EVERY CLASS</b> &mdash; <b>23</b></td><td>SR-STATS 1, 2, 3, 5 &middot; SR-TIMELINE 1 &middot;
+SR-EVADE 2, 3 &middot; SR-BREAK 8 &middot; SR-STATUS 1, 3, 5, 6 &middot; SR-PARTY 1, 2 &middot; SR-HEAL 2 &middot;
+SR-RESOURCE 1, 4, 5 &middot; SR-COOLDOWN 2&ndash;6</td><td>No class, spec, currency or passive in the guard; a
+victim-side field is read off whatever blow the enemy lands, which no hero's kit decides. <b>Two carry a caveat the
+reach does not show:</b> SR-STATUS 1 (<code>mod_status_turns</code>) is ASSIGNED over by the Fleeting bargain
+(<code>_stamp_modifier</code>) &mdash; a trap by SR-PLUMB's own definition &mdash; and moves buffs as well as
+debuffs; SR-RESOURCE 4 and SR-COOLDOWN 5 pay whatever pool the hero holds while their float text names one currency
+(<i>+40 Rage</i>, <i>+60 Rage</i>, <i>+N Mana</i>).</td></tr>
+<tr><td><b>EVERY CLASS, THROUGH HIS ORDINARY BLOWS</b> &mdash; <b>14</b></td><td>SR-STATS 4 &middot; SR-CRIT 1&ndash;3
+&middot; SR-EVADE 1 &middot; SR-BREAK 1&ndash;6 &middot; SR-STATUS 4, 7 &middot; SR-COOLDOWN 1</td><td>Read in
+<code>_resolve</code>'s ordinary strike branch, which an ability carrying a <code>special</code> never reaches
+(SR-PLUMB trap 6). <b>None pays a spec zero</b>, because every basic is an ordinary blow &mdash; but the share
+varies by spec: the Beastmaster's reachable damaging cards are one ordinary card of eight, and his companions'
+blows reach none of these except crit chance; the Holy and the Devout reach one ordinary damaging card each besides
+Smite. SR-EVADE 1 pays single-target blows only (an area, multi-hit, random-hit or chosen-pair blow never rolls a
+miss); SR-STATUS 7 reaches only the apply sites that report to it (FW counted 18 of 214).</td></tr>
+<tr><td><b>CLASS-CONDITIONAL</b> &mdash; <b>6</b></td><td>SR-CHECK 1 &middot; SR-RESOURCE 2, 3, 6, 7 &middot;
+SR-PARTY 3</td><td><b>SR-CHECK 1</b> (<code>holy_light_pct</code>): the guard reads <code>resource_name ==
+"Mana"</code> &mdash; never a Warrior; and only a cast that runs the bar can grade Perfect. <b>SR-RESOURCE 2</b>
+(<code>opening_rage</code>): a floor, and a Mana hero already opens at his carried Mana &mdash; the Warrior only.
+<b>SR-RESOURCE 3</b> (<code>mana_regen_bonus</code>): the drip reads it under <code>resource_name == "Mana"</code>,
+Rage's drip is a literal with no field, and Evocation ASSIGNS the field on every Mage after the tree &mdash; the
+Cleric and the Hunter only. <b>SR-RESOURCE 6 and SR-PARTY 3</b> (<code>last_rites</code>,
+<code>conversion_ranks</code>, the Feedback Loop and Perfect Conversion fields): each field's guard names one
+currency, so a node pays every class only by writing both (Batch FX did). <b>SR-RESOURCE 7</b>
+(<code>siphon_ranks</code>): <code>resource_name == "Mana"</code>. <b>The page flagged five of the six in their
+cost cells</b> (SR-RESOURCE 6 only through its field list).</td></tr>
+<tr><td><b>ONE SPEC</b> &mdash; <b>1</b></td><td>SR-EVADE 4 (<i>Elusive when you afflict</i>,
+<code>hit_and_run</code>)</td><td><b>Unflagged, and the page's widest miss.</b> Its read site is
+<code>_hit_and_run</code>, and every path into it is the Survivalist's: Hamstring, Snare Trap, his poison
+(<code>_apply_poison</code>) and his traps (<code>_spring_trap</code>). It is not <i>&ldquo;applying a status
+grants Elusive&rdquo;</i>: a debuff through the generic funnel never reaches it. <b>Measured</b> on all twelve
+specs, as above.</td></tr>
+<tr><td><b>THE PARTY, ONCE</b> &mdash; <b>5</b></td><td>SR-BREAK 7, 9 &middot; SR-STATUS 2 &middot; SR-HEAL 1
+&middot; SR-TIMELINE 2</td><td>Read off the party's best holder (<code>_max_hero_rank</code>, or a spawn stamp
+taking the <code>maxi</code>: Devoutness, Last Hope, the Mirror) or its FIRST living holder
+(<code>_living_hero_with</code>: Guard Breaker, Watchtower). <b>Every hero is paid, so the reach looks like every
+class &mdash; but only one holder's copy does anything</b>: in a tree every class buys, the second, third and
+fourth class to buy one of these is paid nothing in any party that already holds it.</td></tr>
+<tr><td><b>RELATIVE</b> &mdash; <b>1</b></td><td>SR-THREAT 1 (<i>enemies look past this hero</i>,
+<code>ghillie</code>)</td><td>A ONE-STEP re-pick: a blow aimed at a holder moves to a random other hero, and the new
+target is not re-rolled. <b>It pays a holder only relative to heroes who do not hold it.</b> Measured over 4,000
+paired draws, heroes at 90 / 50 / 70 / 80% health: no holder &mdash; warrior 16.9%, mage 54.6%, cleric 14.6%,
+hunter 13.9%; the mage alone holding it &mdash; mage 19.9%; <b>all four holding it &mdash; 22.9 / 30.4 / 23.7 /
+22.9%, so three of the four heroes are targeted MORE than with no holder at all.</b></td></tr>
+</table>
+
+<h3>SR-REACH &middot; What to read a TODAY as, from here</h3>
+<ul>
+<li><b>For a tree every class buys, a TODAY is usable only in the EVERY CLASS row.</b> A class-conditional item
+needs a field for each currency, or it pays three quarters of the game nothing; the one-spec item needs its read
+site wired into the generic funnel; a party-once item pays one buyer per party; a relative item pays nothing when
+everybody buys it.</li>
+<li><b>AND &sect;4's COUNT DOUBLE-COUNTS BY ITS OWN RULE</b> (<i>&ldquo;one trigger paying in two currencies is one
+thing; each thing is counted in exactly one section&rdquo;</i>): SR-CRIT 2 (<i>a crit pays &mdash; a cooldown tick,
+Break, a status, Attack, a refund</i>) already contains SR-COOLDOWN 1 and SR-BREAK 2; SR-BREAK 6 is the Break half
+of SR-RESOURCE 4; SR-PARTY 3 and SR-RESOURCE 6 name the same two fields. <b>So the distinct TODAY things are at
+most 46, not 50.</b> Nothing else in the count was re-taken.</li>
+<li><b>THE TABLES ABOVE KEEP THEIR TODAY MARKS</b>, because the mark is still true of what it says: this section
+adds the reach it did not say. A section's own qualifier (<i>&ldquo;for Mana users&rdquo;</i>, <i>&ldquo;Cleric,
+Hunter&rdquo;</i>) is the reach for that item and agrees with the table here.</li>
+</ul>
+
 <h2 id="sr-answer">SR-ANSWER &mdash; THE ANSWER, BEFORE THE WORKING</h2>
 
 <p style="border:2px solid #000; padding:8px"><b>THE LAYER CAN REACH MORE SYSTEMS THAN FP'S SURVIVORS SUGGEST AND
@@ -61,7 +158,7 @@ Between them a node could say about 159 different things; 127 need no ruling; 50
 <tr><td><b>Systems no rune, ability, passive or engine owns outright</b></td><td><b>21 sections</b> &mdash; the brief's
 ten, and eleven its list missed</td><td>&sect;1</td></tr>
 <tr><td><b>Distinct things a node could say under the line</b></td><td><b>159</b> &mdash; <b>127</b> needing no ruling
-(<b>50 TODAY</b>, 63 SMALL, 14 LARGE), <b>32</b> waiting on one</td><td>&sect;4</td></tr>
+(<b>50 TODAY</b>, 63 SMALL, 14 LARGE), <b>32</b> waiting on one. <b>TODAY is <i>some hero</i>: 37 of the 50 pay every class, and by &sect;4's own rule at most 46 are distinct &mdash; <a href="#sr-reach">SR-REACH</a></b></td><td>&sect;4</td></tr>
 <tr><td><b>FP's 50 survivors that survive the designer's line</b></td><td><b>43</b> (38 without a caveat; one never
 fires) &mdash; <b>so the bill is 281, not 274</b></td><td>&sect;3 G</td></tr>
 <tr><td><b>What a merged tree of 81 can say today</b></td><td><b>about 50 different things</b> &mdash; so <b>at least 31
@@ -478,9 +575,9 @@ not a passive, and <b>participation is uneven</b> (EP &sect;2, standing): the De
 <tr><td>4</td><td>Kill what is down</td><td><b>TODAY</b></td></tr>
 <tr><td>5</td><td>Breaking heals the party</td><td><b>TODAY</b></td></tr>
 <tr><td>6</td><td>Breaking refuels you</td><td><b>TODAY</b> (2 of 15 checks)</td></tr>
-<tr><td>7</td><td>They do not get their guard back</td><td><b>TODAY</b> at a fixed 50</td></tr>
+<tr><td>7</td><td>They do not get their guard back</td><td><b>TODAY</b> at a fixed 50 &mdash; <b>FY: the party, once</b> (its first living holder; a second holder adds nothing, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>8</td><td>I do not break</td><td><b>TODAY</b></td></tr>
-<tr><td>9</td><td>We do not break</td><td><b>TODAY</b></td></tr>
+<tr><td>9</td><td>We do not break</td><td><b>TODAY</b> &mdash; <b>FY: the party, once</b> (its best holder, stamped at spawn, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>10</td><td>Hold the window open (an extra Broken turn)</td><td>SMALL</td></tr>
 <tr><td>11</td><td>Overflow becomes damage</td><td>SMALL (the missing stamp)</td></tr>
 <tr><td>12</td><td>The Broken are softer (armor, crit)</td><td>SMALL</td></tr>
@@ -572,7 +669,7 @@ them</b>; a node that reads a named one inherits that status's owner.</p>
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>#</th><th>The thing</th><th>Cost</th></tr>
 <tr><td>1</td><td>Statuses on this hero last longer or shorter</td><td><b>TODAY</b></td></tr>
-<tr><td>2</td><td>Enemy debuffs rebound</td><td><b>TODAY</b></td></tr>
+<tr><td>2</td><td>Enemy debuffs rebound</td><td><b>TODAY</b> &mdash; <b>FY: the party, once</b> (its best holder, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>3</td><td>Cleanse N a turn</td><td><b>TODAY</b></td></tr>
 <tr><td>4</td><td>Damage per debuff on the target</td><td><b>TODAY</b></td></tr>
 <tr><td>5</td><td>Mitigation per debuff on self</td><td><b>TODAY</b></td></tr>
@@ -661,7 +758,7 @@ arithmetic, the ladder's constants, the opening seed for everyone but the Hunter
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>#</th><th>The thing</th><th>Cost</th></tr>
 <tr><td>1</td><td>Raw tempo (+Speed)</td><td><b>TODAY</b></td></tr>
-<tr><td>2</td><td>When an ally falls low, I answer</td><td><b>TODAY</b> (the health trigger)</td></tr>
+<tr><td>2</td><td>When an ally falls low, I answer</td><td><b>TODAY</b> (the health trigger) &mdash; <b>FY: the party, once</b> (only the first living holder is pulled, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>3</td><td>My turns cost less time</td><td>SMALL &mdash; its own function, read at Momentum's three sites</td></tr>
 <tr><td>4</td><td>Shove an enemy back on a trigger</td><td>SMALL</td></tr>
 <tr><td>5</td><td>Hand an ally my turn on a trigger</td><td>SMALL (<code>_rally_forward</code> exists)</td></tr>
@@ -1206,7 +1303,7 @@ Cleric class passive.</p>
 <h3>SR-HEAL &middot; 6 &middot; Distinct things a node could say</h3>
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>#</th><th>The thing</th><th>Cost</th></tr>
-<tr><td>1</td><td>Heal more when low</td><td><b>TODAY</b></td></tr>
+<tr><td>1</td><td>Heal more when low</td><td><b>TODAY</b> &mdash; <b>FY: the party, once</b> (its best holder, stamped at spawn, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>2</td><td>A turn-start heal for the low</td><td><b>TODAY</b> (an idle field; owes a <code>check_em</code> row)</td></tr>
 <tr><td>3</td><td>Shields are stronger</td><td>SMALL</td></tr>
 <tr><td>4</td><td>Lifesteal</td><td>SMALL</td></tr>
@@ -1266,7 +1363,7 @@ books the NET. The Mage's regeneration value is Evocation's. See <a href="#sr-li
 <tr><td>3</td><td>Regenerate more</td><td><b>TODAY</b> (Cleric, Hunter; replaced on Mages)</td></tr>
 <tr><td>4</td><td>Refuel on a kill or a Break</td><td><b>TODAY</b></td></tr>
 <tr><td>5</td><td>The first casts are free</td><td><b>TODAY</b></td></tr>
-<tr><td>6</td><td>Damage is paid from the pool</td><td><b>TODAY</b></td></tr>
+<tr><td>6</td><td>Damage is paid from the pool</td><td><b>TODAY</b> &mdash; <b>FY: one currency per field</b> (Last Rites pays Rage; the Conversion family pays Mana, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>7</td><td>Resource from damage dealt</td><td><b>TODAY</b> (Mana)</td></tr>
 <tr><td>8</td><td>Everything costs less</td><td>SMALL</td></tr>
 <tr><td>9</td><td>Resource on every cast</td><td>SMALL</td></tr>
@@ -1411,7 +1508,7 @@ and the 40/60 split belong to no one.</b></p>
 <h3>SR-THREAT &middot; 6 &middot; Distinct things a node could say</h3>
 <table border="1" cellpadding="4" cellspacing="0">
 <tr><th>#</th><th>The thing</th><th>Cost</th></tr>
-<tr><td>1</td><td>Enemies look past this hero</td><td><b>TODAY</b> (<code>ghillie</code>)</td></tr>
+<tr><td>1</td><td>Enemies look past this hero</td><td><b>TODAY</b> (<code>ghillie</code>) &mdash; <b>FY: relative</b> (a one-step re-pick onto another hero, so it pays a holder only against heroes who do not hold it; with all four holding it, three were targeted more, <a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>2</td><td>This hero draws fire</td><td><b>RULING</b> &mdash; the Warrior class passive</td></tr>
 <tr><td>3</td><td>This hero is picked on lowest health less often (the 40/60 split, per hero)</td><td>SMALL</td></tr>
 <tr><td>4</td><td>The Broken-hero exploit spares this hero</td><td>SMALL</td></tr>
@@ -1446,7 +1543,7 @@ universal and the Swordmaster's 0.12 is an override.</li>
 <tr><td><code>no_cover</code></td><td>this hero's attacks cannot miss</td><td><b>YES</b></td></tr>
 <tr><td><code>deflection</code></td><td>parries ranged blows too</td><td><b>YES</b></td></tr>
 <tr><td><code>parry_bonus</code></td><td>+parry (a stat)</td><td><b>YES</b></td></tr>
-<tr><td><code>hit_and_run</code></td><td>applying a status grants Elusive</td><td><b>YES</b></td></tr>
+<tr><td><code>hit_and_run</code></td><td>applying a status grants Elusive &mdash; <b>FY: only through the Survivalist's own paths</b> (Hamstring, Snare Trap, his poison, his traps); a debuff through the generic funnel never reaches <code>_hit_and_run</code> (<a href="#sr-reach">SR-REACH</a>)</td><td><b>YES</b></td></tr>
 <tr><td><code>block_chance</code></td><td>+Block</td><td><b>A RULING</b> &mdash; Block is the Warden's
 engine (Heavy Plating reads it)</td></tr>
 <tr><td><code>heat_haze</code>, <code>numbing_ranks</code></td><td>misses off Burning / Chilled attackers</td>
@@ -1473,7 +1570,7 @@ Blind are applied by spec cards.</p>
 <tr><td>1</td><td>Cannot miss</td><td><b>TODAY</b></td></tr>
 <tr><td>2</td><td>Parry ranged blows</td><td><b>TODAY</b></td></tr>
 <tr><td>3</td><td>Parry more (a stat)</td><td><b>TODAY</b></td></tr>
-<tr><td>4</td><td>Elusive when you afflict</td><td><b>TODAY</b></td></tr>
+<tr><td>4</td><td>Elusive when you afflict</td><td><b>TODAY</b> &mdash; <b>FY: the Survivalist only</b>, measured on all twelve specs (<a href="#sr-reach">SR-REACH</a>)</td></tr>
 <tr><td>5</td><td>Accuracy</td><td>SMALL</td></tr>
 <tr><td>6</td><td>Evasion</td><td>SMALL &mdash; above the Momentum door</td></tr>
 <tr><td>7</td><td>A riposte not tied to a card</td><td>SMALL &mdash; below the Momentum door</td></tr>
@@ -2090,7 +2187,7 @@ hero must draw.</li>
 <li><b>THE TARGET.</b> Under FP's rule the bill was 274 (61 / 75 / 75 / 63). Under the line the salvage is 43, so the bill
 is <b>281 (63 / 78 / 77 / 63)</b>. <b>Both assume four trees of 81 &mdash; 324 between them &mdash; and nothing in the repo
 rules that size.</b></li>
-<li><b>A TREE OF 81, TODAY: ABOUT 50 THINGS TO SAY.</b> The fifty are class-blind except for a handful that belong to one
+<li><b>A TREE OF 81, TODAY: ABOUT 50 THINGS TO SAY.</b> <b>(Batch FY: this sentence assumes four class trees, and it undercounts the handful &mdash; six items are class-conditional, one pays a single spec, five pay the party once and one is relative. For one tree every class buys, read <a href="#sr-reach">SR-REACH</a>.)</b> The fifty are class-blind except for a handful that belong to one
 currency, so every tree can use nearly all of them &mdash; and <b>at least 31 of each tree's 81 nodes, 124 of the 324
 (38%), must be a second magnitude of something the same tree already says.</b> The salvage does not add room: FP's
 survivors are instances of these same fifty.</li>

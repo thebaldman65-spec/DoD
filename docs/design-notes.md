@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## TODAY was a costing for four trees, the floor sits on the rune, and a retirement says why now (Batch FY) — 2026-09-11
+
+**The costing FX drew its twenty-seven from was right about what it measured and wrong about the
+question FX asked of it.** FW's TODAY says a field exists and a system reads it. It never said
+*every hero*, and it did not need to: FW was pricing four class trees, where a Mana-only idea simply
+goes in a Mana class's tree. The designer then ruled one tree that every class buys, and under that
+shape a TODAY is only as good as its reach. So I did not treat §1 as "four bad nodes". I treated it
+as a missing column, and I wrote the column into the recon itself, because the recon is what the
+next author will open. I did not write a rule. The brief said to report and rule on nothing, and
+whether a party-wide node or a relative one belongs in a tree every class buys is a design question.
+
+**Only two of the four failures were the class shape, and both were already written in FW's own
+cost cells.** The other two were never the item FW costed: one had been marked SMALL, and the other
+was FW's item with its trigger reversed. The finding I most want kept is about that reversed item.
+Its TODAY twin, "Elusive when you afflict", pays only the Survivalist. Every path into its read site
+is his own, and the recon says nothing about that. Had the brief transcribed it correctly, the node
+would still have failed. The costing's blind spot is real; it just was not where the brief placed it.
+
+**The floor went to 8 because the ruled method gives 8.** FO set the floor at the deepest the live
+tree could reach. Today nothing lowers the base step, and the rune takes two off it, so the deepest
+reachable is 8. The brief also had a second clause: if nothing lowers the threshold, the floor is
+only an arithmetic guard and goes to the designer. I read that clause as the case where nothing at
+all reaches below the base step, and the rune still does. I recorded that reading so it can be
+overruled in one line. **The consequence is the part I wanted written down.** A floor sitting exactly
+on the rune's own result meets the next thing that lowers the base at once. Below 8 it raises the
+step, so the rune would make detonation later, which is the fault EZ's `mini` existed to stop.
+Nothing does that today, and `check_fo` goes red the day anything could.
+
+**A retirement string is a reason, so it has to be the reason that still holds.** FO's string was
+true when written and became a pointer to a collision that FX deleted. I kept the old reason in the
+string, marked void, rather than erasing it. FN's zero measurement is the kind of history a future
+author needs. But the sentence that leads is the current reason: the Shared Mark holds the place.
+
 ## One tree, and the two decisions that came with it without being asked for (Batch FX) — 2026-09-11
 
 The shape is the designer's, and FW's arithmetic is its reason: under the line nothing left is

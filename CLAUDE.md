@@ -1447,8 +1447,9 @@ merged.** A Berserker wears the Warrior's cells.
     *Mitigation per Debuff You Carry*.
   - FO §1's floor for Deepening Hex (`RUIN_FLOOR` 3, priced as Avatar of Ruin's 5 − 2) and FO §2's
     Wide Watch retirement (Overkill already kept Focus whole). **Both reasons went with their
-    nodes, and both are queued for a ruling** (FX report). `check_fo` §1c and §3 carry the state
-    they left.
+    nodes, and BOTH WERE RULED AT FY** (the designer): the floor was re-derived against the live
+    game to 8 (`10 - 2`), and the Wide Watch stays retired because the Shared Mark holds its place.
+    The two rules below say so where they stand, and `check_fo` §1c and §2a carry both.
 
   **Read every such citation as the record of why the rule exists, not as a claim that the node
   is live.** The node is deleted and its field is DORMANT: the read site stands and nothing writes
@@ -2413,10 +2414,18 @@ like it and the threshold sits on the floor.
   threshold of 1 every stack detonates, which is a different mechanic wearing the same name.**
   Pick the number at which the mechanic stops being itself, not the number at which the code stops
   working.
-· **THE FLOOR'S REASON IS A RELATION, SO ASSERT THE TERMS TOGETHER.** 3 is chosen because `5 - 2`
-  reaches it exactly — the deepest the live tree can go — so it changes nothing today and refuses
-  everything below. `check_fo` §1c pins **10, 5 and 2 as well as the 3**, because a floor of 3
-  under a capstone that had moved to 4 is answering a question nobody is asking any more.
+· **THE FLOOR'S REASON IS A RELATION, SO ASSERT THE TERMS TOGETHER.** FO chose 3 because `5 - 2`
+  reached it exactly — the deepest the live tree could go — so it changed nothing and refused
+  everything below. **FX deleted the capstone that installed 5, and FY re-derived the floor the
+  same way against what is left (ruled by the designer): 8, because nothing installs a step below
+  10 and `10 - 2` reaches it exactly.** `check_fo` §1c pins **10, 2 and 8 and the relation between
+  them**, because a floor that no longer equals the base minus the rune is answering a question
+  nobody is asking any more — which is exactly the state FX left 3 in.
+· **AND A FLOOR SITTING ON THE RUNE'S OWN RESULT MEETS THE NEXT THING THAT LOWERS THE BASE AT ONCE
+  (FY §2).** At 8, a base step of 9 leaves the rune one stack, 8 leaves it none, and **below 8 `maxi`
+  RAISES the step** — the rune would make that holder's detonation SHALLOWER, the fault EZ's `mini`
+  existed to stop. Nothing lowers the base today; `check_fo` §1c reds the day anything writes
+  `avatar_ruin`, and that day the floor is owed a ruling, not an arithmetic slide.
 · **AND A FLOOR RE-OPENS THE HOLE IT WAS BUILT BESIDE.** At the floor the rune is worth EXACTLY
   ZERO again — the fault FN measured, arriving by a new route. **A PROPERTY ARM CANNOT CATCH
   THAT**: *never shallower* is satisfied by `mini` itself, which pays a capstone holder nothing.
@@ -2851,9 +2860,13 @@ door both offer paths use — skips it.
   `test_runes`'s grant loop asked for the literal 4 every spec was authored and read nine
   failures the moment some specs kept 2. It asks for the number that survives now.
 · **AND A REPLACEMENT KEEPS THE RETIRED RUNE'S READ SITE (Batch FO §2, the Split Tongue
-  precedent).** The Wide Watch is retired because **Overkill already keeps his Focus whole through
-  a kill** — the rune sat one `elif` ABOVE the arm that clamps, so a holder of both got exactly
-  nothing and the node's own log line could never print. **The entry, the payload, the
+  precedent).** The Wide Watch was retired at FO because **Overkill already kept his Focus whole
+  through a kill** — the rune sat one `elif` ABOVE the arm that clamps, so a holder of both got
+  exactly nothing and the node's own log line could never print. **That node went with the twelve
+  trees at FX, and FY RULED THAT THE RUNE STAYS RETIRED FOR THE REASON THAT IS LEFT: the Shared Mark
+  holds its place** (the designer). **A RETIREMENT STRING RECORDS THE REASON THAT HOLDS NOW**, and a
+  reason whose base was deleted is marked void in it rather than left reading as live — a stale
+  reason sends the next author looking for a collision that is not there. **The entry, the payload, the
   `rune_wide_watch` field AND the arm in `_sharpshooter_focus` all stay**: a saved run holding it
   is still paid, and deleting any of the four is the tempting green on the day something reds.
   `check_fo` §2a pins all four PRESENT and pins `eligible_ids` refusing it — **the kept half is

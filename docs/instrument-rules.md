@@ -1061,10 +1061,18 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   240, for wall-clock speed). 12 makes each frame a big TIME step, because a real-play battle
   paces itself with `create_timer` waits. **Any future suite that must run a REAL-PLAY battle to
   completion wants the same trick.**
-- **RUNNING THE FULL BATTERY DESTROYS THE PLAYER'S IN-PROGRESS RUN.** Many suites spawn a live
-  battle, so `user://run_save.bin` is gone afterwards and per-suite backups buy nothing (a later
-  suite wipes it again). **Copy it aside before a battery run if the designer has a run going**,
-  and say so afterwards either way. The META layer (`profile.json`, `relics.json`) is safe.
+- **RUNNING THE FULL BATTERY USED TO DESTROY THE PLAYER'S IN-PROGRESS RUN, AND SINCE FI IT
+  CANNOT.** Many suites spawn a live battle, and until FI `user://run_save.bin` was gone
+  afterwards. FI's redirect (`Run.save_path`, above) closed that, and FY §5b measured it closed over
+  every target: the file's md5 and modification time did not move. **Copy it aside before a
+  battery run if the designer has a run going**, and say so afterwards either way; a redirect is
+  code, and code moves.
+  **THE META LAYER IS SAFE BY STATE, NOT BY CONSTRUCTION (FY §5b).** No target writes
+  `profile.json`, because every writer points `Profile.save_path` at its own file first. **But
+  `Relics.SAVE_PATH` is a `const` with no redirect**, and any gate that reaches `_resolve_boss`,
+  directly or through a live run, reaches `Relics.unlock_random()`. So the day any relic is locked,
+  the battery unlocks relics at random in the player's file. It has not happened only because every
+  relic is unlocked; the open item is in `docs/state.md`.
 - **THE SIM IS `./sim.sh`.** `N` = N battles of the fixed raider/chief/archer/archer lineup (kit
   smoke only — **its win% carries NO difficulty signal**); `--sweep N` = N battles at each budget
   3/6/9/12; `--run N` = N complete runs with progression both sides, ending in the run report and

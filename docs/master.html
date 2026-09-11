@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-11 (Batch FX &mdash; one talent tree of twenty-seven nodes, keyed to the class)</b></p>
+<p align="right"><b>Last updated: 2026-09-11 (Batch FY &mdash; the Ruin floor at the bottom of the live game, and the Wide Watch retired for the reason that holds)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2445,19 +2445,20 @@ it and flagged it without retuning.
 <b>10 &rarr; 8</b>, where <code>mini(step, 8)</code>
 would pay nothing to any build whose threshold already sat at 8 or under. The <code>mini</code>
 was correct and deliberate (it stopped the rune pushing detonation BACK), and a subtraction keeps
-that property while working for every build. <b>The floor is <code>RUIN_FLOOR := 3</code></b>: the
+that property while working for every build. <b>The floor is <code>RUIN_FLOOR := 8</code></b>, the
+exact bottom of what the live game reaches: nothing installs a step below 10 and the rune subtracts
+2, so the floor changes nothing and refuses everything below; <code>check_fo</code> &sect;1c pins 10, 2
+and 8 as one relation. The
 arithmetic only needs a floor above zero &mdash; <code>st % step</code> is a division &mdash; but
 <b>at a threshold of 1 every stack detonates, which is a different mechanic wearing the same
 name</b>. <b>A subtraction is OPEN at the bottom where
 an assignment is not</b>, so <code>check_fo</code> §1 asserts the rune is worth a STRICT two stacks
 rather than merely never worth less &mdash; the day something else lowers the
 threshold onto the floor, that arm names the rune.
-<br><b>THE WIDE WATCH IS RETIRED AND THE SHARED MARK REPLACES IT (Batch FO §2).</b> Overkill's own
-node text kept his Focus whole through a kill, and the rune sat one <code>elif</code>
-above the arm that clamps &mdash; so a Sharpshooter holding both got nothing, and the talent's log
-line could never print. <b>And there was nowhere left for a Focus-preservation rune to go</b>: the
-meter is lost three ways and all three were covered &mdash; a kill (Overkill), a payout (Metronome)
-and a target switch (the Keen Focus rune). <b>Retired the way every retirement is: KEPT, and said
+<br><b>THE WIDE WATCH IS RETIRED AND THE SHARED MARK HOLDS ITS PLACE.</b> It stays retired because
+its place in the Sharpshooter's set is filled: the Shared Mark took it one-for-one, and it builds the
+meter where the Wide Watch defended it. What the retirement costs is the rune's own clause &mdash; a
+kill leaves his Focus at the 50 retained, and nothing live keeps it whole. <b>Retired the way every retirement is: KEPT, and said
 to be kept</b> &mdash; the entry, the payload, the field and <b>the read site in
 <code>_sharpshooter_focus</code></b> all stay, so a saved run holding it still works and is still
 paid; only <code>eligible_ids</code> refuses it.

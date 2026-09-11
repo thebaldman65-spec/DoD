@@ -454,21 +454,31 @@ func _s5_the_read_sites() -> void:
 	ok(scene._ruin_threshold() == 10, "§5: Ruin detonates every 10th by default")
 	occ.rune_hex_deepen = 2
 	ok(scene._ruin_threshold() == 8, "§5: Deepening Hex takes two off it — 10 to 8")
-	# **AND IT STILL CANNOT UNDO THE CAPSTONE.** Avatar of Ruin installs 5; a
-	# rune that ASSIGNED would push detonation back to 8 and read as working.
-	occ.avatar_ruin = 5
-	ok(scene._ruin_threshold() == 3,
-		"§5: ...and with Avatar of Ruin held it reads 3 — the rune never makes it SHALLOWER")
-	ok(scene._ruin_threshold() < 5,
-		"§5: ...and it is worth SOMETHING to that holder, which the `mini` never was")
+	# **AND IT STILL NEVER MAKES THE DETONATION SHALLOWER, ON THE STEP THAT IS
+	# LIVE.** EZ asked this of an Avatar of Ruin holder (the capstone installed
+	# 5). **BATCH FX deleted the capstone** and BATCH FY re-derived the floor
+	# against what is left (ruled by the designer): nothing installs a step
+	# below 10, the rune subtracts 2, so `RUIN_FLOOR` is 8 — the exact bottom of
+	# the live game, FO's method with FO's capstone gone. **The arms ask the same
+	# two questions of the one live step** rather than being deleted with their
+	# subject: never shallower, and worth SOMETHING, which the `mini` never was.
+	occ.rune_hex_deepen = 0
+	var hx_bare: int = scene._ruin_threshold()
+	occ.rune_hex_deepen = 2
+	var hx_held: int = scene._ruin_threshold()
+	ok(hx_held <= hx_bare,
+		"§5: ...and on the live step the rune never makes it SHALLOWER (%d > %d)" % [hx_held, hx_bare])
+	ok(hx_held < hx_bare,
+		"§5: ...and it is worth SOMETHING on that step, which the `mini` never was for a capstone holder")
 	# **THE FLOOR, WHICH THE `mini` NEVER NEEDED.** A subtraction is open at the
 	# bottom where an assignment is not: anything else that lowers the threshold
-	# composes with this rune. `RUIN_FLOOR` is 3 — the exact bottom of the live
-	# tree — and it is driven here at an edge the live tree cannot reach, because
-	# what it guards is a composition that does not exist yet.
-	occ.avatar_ruin = 4
-	ok(scene._ruin_threshold() == 3,
-		"§5: ...and the floor holds a 4-threshold at 3 rather than letting the subtraction reach 2")
+	# composes with this rune. `RUIN_FLOOR` is 8 and it is driven here one above
+	# itself, an edge the live game cannot reach, because what it guards is a
+	# composition that does not exist yet. (`check_fo` §1f drives the step below
+	# it, where the floor RAISES the step — the retired capstone's 5 is there now.)
+	occ.avatar_ruin = 9
+	ok(scene._ruin_threshold() == 8,
+		"§5: ...and the floor holds a 9-threshold at 8 rather than letting the subtraction reach 7")
 	occ.avatar_ruin = 0
 	occ.rune_hex_deepen = 0
 

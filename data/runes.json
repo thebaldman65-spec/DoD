@@ -469,7 +469,7 @@
 	"deepening_hex": {
 		"name": "Deepening Hex", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "Ruin detonates TWO stacks sooner, whatever the threshold is \u2014 every 8th instead of every 10th, and never sooner than every 3rd.",
+		"desc": "Ruin detonates TWO stacks sooner, whatever the threshold is \u2014 every 8th instead of every 10th, and never sooner than every 8th.",
 		"payload": {"stat": {"rune_hex_deepen": 2}}
 	},
 	"standing_mark": {
@@ -559,7 +559,7 @@
 		"name": "Wide Watch", "scope": "spec:sharpshooter",
 		"price": 100,
 		"desc": "Focus carries in FULL through a kill rather than the 50 retained.",
-		"retired": "RETIRED at BATCH FO \u00a72 \u2014 kept, and said to be kept. LOST: nothing a Sharpshooter holding OVERKILL was not already getting, and THAT is the record. **IT WAS AUTHORED AGAINST A BASE A NODE ALREADY PROVIDED** \u2014 not \"it was weak\": Overkill (Penetration row 7) reads \"the carry keeps your Focus in FULL rather than dropping it to the usual 50\", which is this rune\u2019s whole clause by a different route, and `_sharpshooter_focus` sits the rune ONE `elif` above the arm that clamps. **FN MEASURED IT AT EXACTLY ZERO** for a holder of both, with a cosmetic tell besides: with the rune held the Overkill log line can never print, so the player is told the rune did what his talent did. **AND THERE WAS NOWHERE LEFT FOR A FOCUS-PRESERVATION RUNE TO GO.** His meter is lost three ways and all three were already covered \u2014 a kill drops it to 50 unless Overkill keeps it whole, a payout zeroes it unless Metronome halves it, and a target switch clears it unless the Keen Focus rune halves it. **A rune whose base is another effect cannot be repriced into rightness**, the Split Tongue precedent. Its `rune_wide_watch` read site in `_sharpshooter_focus` is KEPT and still pays a saved run holding it, the `rune_entropy_ranks` contract. Replaced by the Shared Mark, which BUILDS the meter rather than defending it.",
+		"retired": "RETIRED at BATCH FO \u00a72, AND ITS REASON RESTATED AT BATCH FY \u00a73 \u2014 kept, and said to be kept. **IT STAYS RETIRED BECAUSE ITS SLOT IS FILLED:** the Shared Mark holds the place this one held in the Sharpshooter's set, taken one-for-one at FO \u2014 a rune that BUILDS the meter where this one defended it. LOST: the Focus carry through a kill \u2014 held, this rune keeps his Focus in FULL through a kill rather than dropping it to the 50 retained, and since FX nothing live does that. **FO's REASON IS VOID AND IS NOT THE REASON NOW.** FO retired it because a Sharpshooter talent node, Overkill, already carried the same clause, so a holder of both got exactly nothing (FN's measurement); that node went with the twelve spec trees at FX and `check_fo` \u00a73 asserts no node or rune carries the clause, so this rune duplicates nothing live. Its `rune_wide_watch` read site in `_sharpshooter_focus` is KEPT and still pays a saved run holding it, the `rune_entropy_ranks` contract.",
 		"payload": {"stat": {"rune_wide_watch": 1}}
 	},
 	"shared_mark": {

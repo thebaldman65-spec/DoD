@@ -13,59 +13,52 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-11 (Batch FX).*
+*Last rewritten: 2026-09-11 (Batch FY).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FX — ONE TALENT TREE, KEYED TO THE CLASS. THE FIFTH BATCH ON `class-merge`, AND THE FIRST THAT
-  MERGES ANYTHING.** The twelve spec trees and their 324 nodes are deleted. ONE tree of 27 nodes, in three tiers of
-  nine at 1 / 2 / 3 points (54 in all), is bought per CLASS: a Berserker spends the Warrior's purse. No spec
-  dissolved, no pool merged, no engine moved and no spine was attached. `main` is untouched. Full working:
-  **`docs/reports/FX.md`**.
-- **BUYING IS WEARING.** Nothing in the tree is exclusive, so there is no equip step: every cell a class owns is on
-  every hero of that class, every run. **A tier needs both gates:**
-  - The difficulty gate: `TIERS_OPEN [0, 1, 2, 3]`, so rung N's end boss opens tier N for every class.
-  - The spend gate: `TIER_SPEND_MIN` cells of the tier below, per class. **3 is a candidate, and the number is the
-    designer's to set** (FX §1 prices 1 and 9).
-- **THE PROFILE IS v3 AND KEYED TO THE CLASS (`MIN_VERSION` 2).** A v2 profile folds its twelve spec purses into
-  four by MAX on load, once. **The designer's save folds to Warrior 68, Mage 65, Cleric 66, Hunter 68.** Every class
-  can buy the whole 54-point tree the first time this build is launched, so that save cannot feel the spend gate.
-  The v2 file stays on disk until the first save. `save-backups/FX-20260910-231422` holds all four save files,
-  md5-verified.
-- **THE TWENTY-SEVEN:**
-  - 18 magnitudes are taken from a surviving precedent.
-  - 4 come from a live node outside FW's 43.
-  - **5 are proposed** against a stated reference.
-  - **4 of the brief's nodes were not TODAY for a four-class tree**, and an alternate from its list stands in each
-    place.
+- **Last batch: FY — WHY FOUR NODES COULD NOT PAY EVERY CLASS. THE SIXTH BATCH ON `class-merge`.** It carried a
+  report, two rulings the designer took, and two checks on what FX left. No node was swapped and no magnitude moved.
+  `main` is untouched. Full working: **`docs/reports/FY.md`**.
+- **FW's TODAY MEANS *SOME HERO*, AND THE RECON NOW SAYS SO.** Of FX's four failures, two were the class shape: a
+  field read for one currency. FW had flagged both in its own cost cells. The other two were never TODAY: one was
+  FW's SMALL item, and the other was FW's item with its trigger reversed. **The reversed item's TODAY twin pays the
+  Survivalist alone**, measured. Of the fifty TODAY items:
+  - 37 pay every class;
+  - 6 are class-conditional;
+  - 1 pays a single spec;
+  - 5 pay the party once;
+  - 1 is relative.
 
-  All of it is under FX's **NEEDS A RULING**, and the queue item below carries it.
-- **THE READ SITES STAYED, SO MOST OF THE OLD TREES' FIELDS ARE DORMANT.** 275 of the 304 fields the twelve trees
-  wrote have no writer now, and their read sites stand for the next tree, rune or card. **Queue items below that
-  cite a deleted node read as history.** The node is gone, and its field is dormant unless the one tree carries it;
-  the comment above each node in `talents.gd` names its precedent.
-- **A NEW GATE, `check_fx`**, asserts the shape, both gates, the class ledger, the fold (driven on a copy) and every
-  node paying live on every class. **51 targets were repaired to intent**: 25,636 checks became 20,638, and
-  the 1,864 deleted each asked about the deleted trees themselves and are recorded at their sites. No mechanic
-  check was deleted.
-- **FOUND ON THE WAY: TWO SCENE GATES HAD BEEN RE-SAVING THE PLAYER'S PROFILE ON EVERY BATTERY, BYTE-IDENTICALLY,
-  FOR MANY BATCHES.** Every md5 freeze was blind to it until FX's fold made the same write destructive in the
-  reconnaissance run. The profile was restored from the verified backup, and both gates now write a scratch file.
+  **`docs/systems-recon.html` carries the reach as SR-REACH**, with a local note on each unflagged row.
+- **DEEPENING HEX'S FLOOR IS 8** (ruled: re-derive against the live tree). Nothing installs a Ruin step below 10,
+  and the rune subtracts 2. Nothing in play moves. **The floor now sits on the rune's own result**, so the next
+  thing that lowers the base step meets it at once. `check_fo` §1c pins 10, 2 and 8 as one relation.
+- **THE WIDE WATCH STAYS RETIRED** (ruled), and its string now says why: the Shared Mark holds its place. FO's
+  reason is marked void, because its node went at FX.
+- **NO TARGET WRITES THE PLAYER'S `profile.json`.** This was the first census of it. All 108 targets ran in a copy
+  whose three save writers printed each path they wrote. Twelve targets write a profile, each to its own scratch
+  file, and none writes the player's. **Found beside it:** four gates reach the boss-victory handler
+  (`check_ea`, `check_eg` and `check_eh` call it directly; `check_fh` reaches it through its live run's boss
+  kills), and that handler's first line unlocks a relic and saves `user://relics.json` (a constant path with no
+  redirect). The designer's file has every relic unlocked, so the save never happens. **The first locked relic
+  makes those gates write the player's file** (queue item below).
+- **FX's 1,864 DELETED CHECKS WERE AUDITED INDEPENDENTLY: none measured an outcome, and the count reproduces file
+  by file.** About 202 asserted a deleted node's payload content, which FX's summary list leaves out. About 80
+  design numbers on dormant fields are now asserted nowhere in their suites.
 - **WHAT MOVED:**
-  - Eleven game scripts and `data/glossary.json`.
-  - `CLAUDE.md`, and `docs/master.html` (§7 rewritten, a sweep outside it, the stamp).
-  - The changelog, the design notes, this file, `docs/instrument-rules.md` and `sim.sh`.
-  - `check_fx.gd` (**NEW**), and 54 instrument files: 52 repaired to the new tree, and two redirected to a
-    scratch profile.
-  - `run_battery.sh`, `baselines.json` and `pin-manifest.json`.
-  - `docs/reports/FX.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/FX.md` §7**, written after the acceptance run. This file points there
-  rather than quoting it, because `check_es` §4 opens this file.
-- **Phase.** Steps 1 (the three spines) and 2 (the talent layer) of the merge's running order are done. **Step 3,
-  engines to runes, is next**, and FP's measurements for it stand.
-- **Next letter: FY.**
+  - `scripts/battle.gd`: `RUIN_FLOOR` and comments.
+  - `data/runes.json`: one number on Deepening Hex's card, and the Wide Watch's `retired` string.
+  - `check_fo.gd` (85 → 87) and `check_ez.gd` (98, re-pointed in place).
+  - `CLAUDE.md`, `docs/master.html` and its stamp, `docs/systems-recon.html`, the changelog, the design notes, this
+    file, `baselines.json` and `pin-manifest.json`.
+  - `docs/reports/FY.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/FY.md` §6**, written after the acceptance run.
+- **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
+  to runes, is next**, and FP's measurements for it stand.
+- **Next letter: FZ.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -78,15 +71,21 @@ last exactly one.*
    A Bigger Resource Pool +20, More Damage Dealt +10% and Less Damage Taken 10%.
 3. **Four of the brief's nodes are swapped for alternates**, because none is TODAY for a tree four classes buy:
    regenerate more resource, debuffs expire sooner, a Perfect pays, and Elusive while afflicted. Each would need
-   a hook (FX §2).
+   a hook (FX §2). **FY §1 re-read the four:** two are the currency shape FW had flagged, and two were never TODAY
+   in FW's own costing.
+   - *Debuffs expire sooner* is FW's SMALL item.
+   - *Elusive while afflicted* is FW's TODAY item with its trigger reversed. That TODAY item pays the Survivalist
+     alone, measured.
 4. **Two names deviate from the brief's labels**, each for a stated reason: Cleanse Debuffs Each Turn, and
    Breaking Heals a Hero.
 5. **The playtest save cannot feel the spend gate.** Its folded purses (65–68) exceed the tree's 54.
-6. **The Wide Watch's retirement has lost its reason.** Overkill (`ss_overkill`) is deleted, so the rune's clause
-   exists only on the retired rune. Whether it returns is the designer's. `check_fo` §3 carries the state.
-7. **Deepening Hex's floor has lost its derivation.** `RUIN_FLOOR` 3 was Avatar of Ruin's 5 minus 2. The deepest a
-   live Occultist now reaches is every 8th stack, so the floor binds no live build: keep 3 or re-rule it.
-   `check_fo` §1c carries the state.
+6. **~~The Wide Watch's retirement has lost its reason~~ — RULED AT FY §3: it stays retired, because the Shared
+   Mark holds its place.** The retirement string says so and marks FO's reason void. `check_fo` §2a asserts the
+   current reason, the date, and FO's sentence absent.
+7. **~~Deepening Hex's floor has lost its derivation~~ — RULED AT FY §2: re-derived against the live game to 8**
+   (`10 - 2`, since nothing installs a shallower step). **FY read the brief's *"if nothing lowers the threshold"*
+   clause as not applying**, because the rune itself still does, and recorded that reading for confirmation (FY,
+   NEEDS A RULING). `check_fo` §1c pins the relation.
 8. **Five node names use a tag word** (BREAK, RESOURCE, DEBUFF). All five are recorded in `check_ek`'s
    `CLASH_EXEMPT`, and the DEBUFF one uses the word differently. A rename is the designer's call.
 
@@ -124,6 +123,55 @@ the things a later batch must not re-derive:**
 9. **AND ONE SYNC LINE:** `CLAUDE.md`'s must-stay-selected list names `spec-recon.html` and `merge-recon.html` but
    not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
    forbade rules); **selecting it in the picker is the designer's**.
+
+### FY §1: THREE NODES PAY BY WHO ELSE HOLDS THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS — **OWED A RULING**
+
+**FY reported and ruled on nothing** (`docs/reports/FY.md` §1). None of this is the class shape that sank FX's four.
+Each is a way a node of a tree every class buys can pay a BUYER nothing:
+
+1. **Heal More When Low and We Do Not Break are party-wide by their read site** (a spawn stamp taking the best
+   holder's figure). In any party, the second, third and fourth class to buy one is paid nothing. FX recorded the
+   shape; whether *"a node must pay every class that can buy it"* is a rule about recipients or about buyers is the
+   question.
+2. **Enemies Look Past You is relative, and its text is false whenever other heroes hold it.** Measured over 4,000
+   paired draws, with all four heroes holding it, three of the four were targeted MORE than with nobody holding it
+   (22.9 / 30.4 / 23.7 / 22.9% against 16.9 / 54.6 / 14.6 / 13.9%). **Player-facing:** the card says *"65% less
+   likely to target this hero"*. The designer's save can buy it on every class on day one.
+3. **Three of the 27 are one idea by FW's own count**: A Cooldown Ticks on a Crit, A Crit Pays and Your Crits Crack
+   Guards. They write three fields, so `check_fx` §1 passes, but SR-CRIT 2 counts one trigger in any currency as
+   one thing. By the same rule, the distinct TODAY count is at most 46, not 50 (SR-REACH).
+4. **Deepening Hex's card** reads *"every 8th instead of every 10th, and never sooner than every 8th"*, and its
+   *"whatever the threshold is"* holds at the one live step only. The wording is the designer's.
+
+### FOUR GATES CAN WRITE THE PLAYER'S `relics.json` THE DAY A RELIC IS LOCKED — **FOUND AT FY §5b, NOT FIXED**
+
+**The same shape FX found in the profile, one file over.** `battle._resolve_boss` opens with
+`Relics.unlock_random()`, and that function calls `Relics.save_data()`, which writes `Relics.SAVE_PATH`, the constant
+`user://relics.json`. **There is no redirect**: the path is a `const`, unlike `Run.save_path` (FI) and
+`Profile.save_path`. `check_ea`, `check_eg` and `check_eh` call `_resolve_boss` directly, and `check_fh` reaches it
+through the boss kills of its live run. **FY's pre-pass counted 14 reaches in one battery** (2, 4, 3 and 5), and
+`check_fh`'s share moves with how far its autoplay run gets. **The designer's file has all 25 relics unlocked**, so
+`unlock_random()` returns before it saves. That is why the census saw no relic write,
+and why the file has not been written since 2026-08-30.
+- **The day any relic is locked** — a fresh profile, a relic added to the pool by the merge, a reset — every battery
+  would permanently unlock relics at random in the player's file, one for each reach while any is still locked.
+- `docs/reports/FY.md` §5b carries the census and the pre-pass reading of which targets reach the call.
+- **Nothing is broken today and nothing was changed.** A redirect is a code change to `relics.gd` (a `save_path`
+  var with FI's harness rule) and it is owed a batch.
+
+### FOUND AT FY AND NOT FIXED — **INSTRUMENT HYGIENE FROM THE §5c AUDIT; NONE CHANGES A VERDICT TODAY**
+
+- **About 108 checks pass by default:** 81 *"single rank"* checks (`test_batch_ar`, `as`, `at`) read
+  `n.get("ranks", 1)` off a tree with no `ranks` key, and 27 `exclusive_with` checks (`at`) read a field that is
+  always empty.
+- **`check_dk`'s four surviving *"no text still says ally"* needles cannot fail** (they look for deleted nodes'
+  texts or a `{v}` the tree never uses) and still count toward its 60.
+- **`test_batch_ay`'s `_worn_tree` silently skips an unknown id**, against FX's *"fails loudly"*.
+- **`test_batch_ba`'s FX header says 52 deleted (690 → 638)**; the truth is 55 (690 → 635).
+- **About 80 design numbers on dormant fields are asserted nowhere in their suites.** Pressure Cooker's `+25` Break
+  was never measured at either commit.
+- **`check_fx` §4 lands the payloads on one spec per class and drives 24 of 27 read sites on one hero.** FY's probe
+  landed all 27 on all twelve specs. A twelve-spec arm would close the gap for the next node.
 
 ### FOUND AT FX AND NOT FIXED — **NONE BLOCKS A BATCH; THE FIRST TWO ARE PLAYER-FACING WORDING**
 
@@ -529,7 +577,7 @@ reasoning is not re-derived.
 worth EXACTLY ZERO and left the pricing question alone.**
 
 - **~~DEEPENING HEX IS WORTH EXACTLY ZERO TO AN OCCULTIST HOLDING AVATAR OF RUIN~~ — CLOSED AT
-  FO §1. IT SUBTRACTS 2 NOW, UNDER A FLOOR OF 3.** **The transferable half, which is why this item
+  FO §1. IT SUBTRACTS 2 NOW, UNDER A FLOOR OF 3 — RE-DERIVED TO 8 AT FY §2, THE BOTTOM OF THE LIVE GAME.** **The transferable half, which is why this item
   is kept:** the `mini` was CORRECT and was written for a real reason, and **the correct behaviour
   was what made the rune inert** — there was nothing to repair in the handler, only a decision to
   take. **And the fix's own shape is the new hazard**: a subtraction is OPEN at the bottom where an
@@ -537,7 +585,8 @@ worth EXACTLY ZERO and left the pricing question alone.**
   inequality on both builds rather than a property arm, because *never shallower* is satisfied by
   `mini` itself.
 - **~~THE WIDE WATCH IS WORTH EXACTLY ZERO TO A SHARPSHOOTER HOLDING OVERKILL~~ — CLOSED AT FO §2.
-  RETIRED, KEPT, AND REPLACED BY THE SHARED MARK.** **The transferable half:** the brief said the
+  RETIRED, KEPT, AND REPLACED BY THE SHARED MARK. FY §3 restated why it stays retired: its place is filled,
+  because FX deleted the node it duplicated.** **The transferable half:** the brief said the
   two texts match *word for word* and they do not — **the longest shared phrase is `rather than`**
   and the node's clause appears in zero rune `desc` strings. **The duplication was in the CODE and
   is invisible to a text sweep**, which is FK §7's Standing Ground shape. Its read site, field,

@@ -15718,14 +15718,27 @@ const RUIN_THRESHOLD := 10
 
 
 # BATCH FO §1 — THE FLOOR UNDER THE RUIN THRESHOLD, AND THE NUMBER IS A RULING
-# RATHER THAN AN ARITHMETIC CONSEQUENCE.
+# RATHER THAN AN ARITHMETIC CONSEQUENCE. RE-DERIVED AT BATCH FY §2 (ruled by the
+# designer: "re-derive against the live tree").
 #
-# **THREE IS THE DEEPEST THE LIVE TREE CAN REACH**: Avatar of Ruin installs 5
-# and Deepening Hex subtracts 2, so `maxi(5 - 2, 3)` is 3 and this floor changes
-# nothing today. **IT IS NOT CHOSEN TO CHANGE NOTHING** — it is chosen because a
-# subtraction is open at the bottom where the `mini` it replaced was not, and the
-# next thing that lowers this number composes with the rune rather than
-# competing with it.
+# **EIGHT IS THE DEEPEST THE LIVE GAME CAN REACH**: nothing installs a shallower
+# step than `RUIN_THRESHOLD` any more, and Deepening Hex subtracts 2, so
+# `maxi(10 - 2, 8)` is 8 and this floor changes nothing today. The relation is
+# `RUIN_FLOOR == RUIN_THRESHOLD - (the rune's subtraction)`, and `check_fo` §1c
+# pins the three numbers together. FO priced the floor the same way against the
+# capstone that installed 5 (`5 - 2 = 3`); FX deleted that capstone with the
+# twelve trees, and `avatar_ruin`'s read site below stands with no writer.
+# **IT IS NOT CHOSEN TO CHANGE NOTHING** — it is chosen because a subtraction is
+# open at the bottom where the `mini` it replaced was not, and the next thing
+# that lowers this number composes with the rune rather than competing with it.
+#
+# **AND AT EIGHT THE FLOOR SITS ON THE RUNE'S OWN RESULT**, so the next thing
+# that lowers the base threshold meets it at once: a base of 9 leaves the rune
+# one stack, a base of 8 leaves it none, and below 8 `maxi` RAISES the step —
+# the rune would make that holder's detonation SHALLOWER, the fault EZ's `mini`
+# existed to stop. Nothing lowers the base today, and `check_fo` §1c goes red the
+# day anything writes `avatar_ruin` again, which is when this number is owed a
+# ruling rather than an arithmetic slide.
 #
 # **WHY NOT 1, WHICH IS ALL THE ARITHMETIC NEEDS.** `_gain_ruin` arms on
 # `st % step == 0` and `_stamp_ruin_chip` prints `int(stacks / step)`, so ZERO is
@@ -15735,7 +15748,7 @@ const RUIN_THRESHOLD := 10
 # same name, and the detonation stops being a payoff the mark is *earned* toward.
 # 2 is the same objection one step along.
 #
-# **THREE KEEPS THE SHAPE AX BUILT AND BF PRICED.** The detonation is periodic
+# **A FLOOR KEEPS THE SHAPE AX BUILT AND BF PRICED.** The detonation is periodic
 # and the period is what the Occultist's whole Ruin lane accumulates against;
 # the chip says *"Ruin detonates at N stacks"* and N has to be a cadence for
 # that sentence to mean anything. **A floor is not a balance number here — it is
@@ -15743,12 +15756,12 @@ const RUIN_THRESHOLD := 10
 # design decision that has to be taken on purpose.
 #
 # **AND THE HAZARD THE FLOOR CREATES IS NAMED RATHER THAN LEFT TO BE FOUND:**
-# the day anything else lowers the threshold to 3 or below, Deepening Hex is
+# the day anything else lowers the threshold to the floor, Deepening Hex is
 # worth EXACTLY ZERO again — the same shape FN flagged on the `mini`, arriving
 # through the floor instead. `check_fo` §1 asserts the floor bites AND asserts
 # that at today's numbers the rune is still worth its full 2, so a future
-# threshold change cannot quietly re-open the hole this batch closed.
-const RUIN_FLOOR := 3
+# threshold change cannot quietly re-open the hole FO closed.
+const RUIN_FLOOR := 8
 
 # §1's runaway guard. The per-stack lifesteal reads uncapped stacks, so without
 # this the party would out-heal its own damage on a long boss. Soul Leech,
@@ -15783,7 +15796,9 @@ func _old_gods_mark() -> int:
 func _ruin_threshold() -> int:
 	var occ := _living_occultist()
 	# `avatar_ruin` is the GATE AND THE MAGNITUDE in one field (AW's `judgement`
-	# precedent): it holds the threshold the capstone installs.
+	# precedent): it holds the threshold the capstone installed. **NOTHING WRITES
+	# IT SINCE BATCH FX** — the capstone went with the twelve trees — so this read
+	# stands dormant and every live Occultist reads `RUIN_THRESHOLD`.
 	var step := RUIN_THRESHOLD
 	if occ != null and occ.avatar_ruin > 0:
 		step = occ.avatar_ruin
@@ -15791,17 +15806,19 @@ func _ruin_threshold() -> int:
 	#
 	# **THE `mini` IT REPLACES WAS CORRECT AND WAS WRITTEN FOR A REAL REASON.**
 	# EZ chose it so a rune sold as *deepening* the hex could never make a
-	# capstone holder's detonation SHALLOWER: Avatar of Ruin installs 5, and an
+	# capstone holder's detonation SHALLOWER: Avatar of Ruin installed 5, and an
 	# ASSIGNMENT of 8 would have pushed him back from every 5th stack to every
 	# 8th, which is the class of fault that reads exactly like the rune working.
-	# **THAT PROPERTY STILL HOLDS HERE** — a subtraction can only ever lower the
-	# number — and `check_ez` §5 still asserts it in both directions rather than
-	# being deleted for having had its subject changed.
+	# **THAT PROPERTY HOLDS ON EVERY STEP AT OR ABOVE THE FLOOR** — there a
+	# subtraction can only lower the number — and `check_ez` §5 and `check_fo`
+	# §1e still assert it rather than being deleted for having had their subject
+	# changed. Below the floor `maxi` raises the step to it, which is the floor
+	# biting (see the constant).
 	#
 	# **WHAT THE `mini` COST WAS THE CAPSTONE HOLDER, AND FN MEASURED IT AT
 	# ZERO.** `mini(5, 8)` is 5, so an Occultist holding Avatar of Ruin bought
-	# the rune and got nothing at all. The subtraction pays every build the same
-	# TWO stacks: **10 → 8 without the capstone, 5 → 3 with it.**
+	# the rune and got nothing at all. The subtraction pays every live build the
+	# same TWO stacks — and since FX there is one live build: **10 → 8.**
 	#
 	# **THE FLOOR IS `RUIN_FLOOR` AND IT IS DELIBERATE, NOT A GUARD AGAINST
 	# ZERO.** A subtraction is open at the bottom in a way an assignment never
