@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1446,
-  "source": 1113,
+  "total": 1452,
+  "source": 1119,
   "other": 89,
   "document": 244
  },
  "source_residency": {
-  "code": 668,
+  "code": 674,
   "absent": 297,
   "runtime": 81,
   "narrow": 24,
@@ -2910,7 +2910,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ft.gd#325"
+   "g": "check_ft.gd#326"
   },
   {
    "s": "check_ft.gd",
@@ -2921,7 +2921,73 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ft.gd#459"
+   "g": "check_ft.gd#460"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "continue",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "slice",
+   "g": "check_ft.gd#857"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "note_blow_met()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#842"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "note_blow_met()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#853"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "strike_target.float_text(\"MISS\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#855"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "strike_target.float_text(\"MISS\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#857"
+  },
+  {
+   "s": "check_ft.gd",
+   "fn": "_s6_blow_met",
+   "h": "scripts/battle.gd",
+   "n": "var block_source",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ft.gd#854"
   },
   {
    "s": "test_batch_ah.gd",

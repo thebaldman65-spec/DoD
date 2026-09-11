@@ -8,7 +8,7 @@
 #   §1  CHANNEL — the build half reads the COST and cannot see the ability,
 #       asserted against `note_resource_spent`'s own source AND driven; the
 #       payout moves real damage at the one general multiplier.
-#   §2  MOMENTUM — BOTH halves in ONE span or no step, one step per turn, and
+#   §2  MOMENTUM — BOTH halves in ONE span or no exchange, one exchange a turn, and
 #       the payout read from ONE function at THREE sites with `effective_speed`
 #       deliberately untouched.
 #   §3  SANCTITY — an EVENT counter and not Trapper's state reader, a refresh
@@ -24,6 +24,14 @@
 #       one the floor, a counter nothing and a Warrior nothing — and the
 #       floor's REASON is asserted as a relation, at or under the cheapest
 #       price a Mage can pay.
+#   §6  MOMENTUM'S TAKEN HALF IS A BLOW MET (Batch FV) — driven through
+#       `_resolve` from a live enemy into a live Warrior: a BLOCKED blow, an
+#       Interpose charge, an ordinary PARRY, a Feint and an Untouchable
+#       absolute parry and a barrier that eats the whole blow each book the
+#       taken half, and a MISS books nothing; the door is ONE line above the
+#       Block roll; the meter steps on every Nth exchange and is still capped
+#       in the field; a hero no blow reaches builds nothing however much he
+#       deals; and FT's two Sanctity constraints hold on a REAL companion.
 #
 # **WHY §0 IS FIRST AND WHY IT IS THE POINT.** This batch lands on `class-merge`
 # with the game still whole. Three engines exist, can be driven, and are reached
@@ -49,7 +57,7 @@ const SWITCHES := ["momentum_active", "channel_active", "sanctity_active"]
 # The fields this batch declares on `BattleUnit`. §4 asserts each is read
 # somewhere under `scripts/`, which is `check_fk` §3's walk pointed at a spine.
 const FT_FIELDS := ["momentum", "momentum_dealt", "momentum_taken",
-	"mana_spent", "sanctity_events"]
+	"mana_spent", "sanctity_events", "momentum_met", "momentum_exchanges"]
 
 # The three payouts. Each returns its IDENTITY value with its switch off.
 const PAYOUTS := {
@@ -73,6 +81,7 @@ func _initialize() -> void:
 	await _s3_sanctity()
 	_s4_anti_inert()
 	await _s5_the_floor()
+	await _s6_blow_met()
 	_g.report(self)
 
 
@@ -460,15 +469,20 @@ func _s2_momentum() -> void:
 	ok(not bz.note_momentum_turn(), "§2a: taking alone books nothing — the accumulators were cleared")
 	bz.momentum_dealt = 40
 	bz.momentum_taken = 40
-	ok(bz.note_momentum_turn(), "§2a: dealing AND taking in one span books a step")
-	ok(bz.momentum == 1, "§2a: ...and the meter reads 1")
+	ok(bz.note_momentum_turn(), "§2a: dealing AND taking in one span books an exchange")
+	# BATCH FV — READ THROUGH THE LEDGER, so the arm states the rate rather than
+	# assuming it: the meter is the exchanges over `MOMENTUM_EXCHANGES_PER_STEP`.
+	ok(bz.momentum_exchanges == 1
+			and bz.momentum == 1 / BattleUnit.MOMENTUM_EXCHANGES_PER_STEP,
+		"§2a: ...and the ledger reads 1 exchange, the meter %d step at %d exchanges a step"
+			% [bz.momentum, BattleUnit.MOMENTUM_EXCHANGES_PER_STEP])
 
 	# (b) THE SPAN IS CLOSED WHETHER OR NOT A STEP WAS EARNED. Leaving a lone
 	# accumulator standing would let a turn he only dealt on and a later turn he
 	# only took on add up to a step between them — the opposite of "both halves,
 	# in the same turn".
-	ok(bz.momentum_dealt == 0 and bz.momentum_taken == 0,
-		"§2b: booking a step clears both accumulators")
+	ok(bz.momentum_dealt == 0 and bz.momentum_taken == 0 and bz.momentum_met == 0,
+		"§2b: closing the span clears all three accumulators")
 	bz.momentum_dealt = 40
 	bz.note_momentum_turn()
 	bz.momentum_taken = 40
@@ -488,8 +502,8 @@ func _s2_momentum() -> void:
 	wd.momentum = 0
 	wd.momentum_dealt = 40
 	wd.momentum_taken = 40
-	ok(wd.note_momentum_turn() and wd.momentum == 1,
-		"§2c: the Warden books the same step off the same span the Berserker did")
+	ok(wd.note_momentum_turn() and wd.momentum_exchanges == 1,
+		"§2c: the Warden books the same exchange off the same span the Berserker did")
 	var u_src := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/unit.gd"))
 	var step_body := ""
@@ -1243,3 +1257,342 @@ func _cast_delta(scene: Node, u: BattleUnit, ab: Ability, victim: BattleUnit,
 		await process_frame
 	return {"bar": bar0 - u.resource, "mana": u.mana_spent - mana0,
 		"rage": u.rage_spent - rage0}
+
+# ── §6 ──────────────────────────────────────────────────────────────────────
+# BATCH FV — MOMENTUM'S TAKEN HALF IS A BLOW MET, AND THE METER HAS A RATE.
+#
+# **THE HOLE, AS IT WAS FOUND.** `momentum_taken` books HEALTH LOST, off the one
+# door below every death refusal — so a blow the Warrior's defence turned booked
+# nothing at all. Driven on HEAD before anything moved, a Warden struck and
+# BLOCKED, struck through an Interpose charge, struck and absolutely parried
+# (Feint, and a Swordmaster's Untouchable) and struck into a barrier that ate
+# the whole blow each left the span EMPTY: no exchange, however much he had
+# dealt. **That is FT's `battle_turn` failure in a new place** — it ships, it
+# runs, it reads zero with no error — and it bites hardest on the spec whose
+# whole kit is not losing health.
+#
+# **THE REPAIR IS A SECOND DOOR, NOT A SECOND RULE.** `note_blow_met()` is called
+# at ONE line in `_resolve`'s strike loop, below both miss rolls and above the
+# Block roll, so every blow that REACHES a body books it and no missed blow
+# can. (b) drives every case through the real path; (c) asserts the door is
+# one line in the one place; (a) drives the rate; (d) states the consequence the
+# brief asked to have stated rather than discovered; (f) re-confirms FT's two
+# Sanctity constraints on a REAL companion, which FT argued by construction.
+func _s6_blow_met() -> void:
+	print("\n§6 — Momentum's taken half is a blow met, and the meter has a rate (Batch FV)")
+	var n := BattleUnit.MOMENTUM_EXCHANGES_PER_STEP
+	ok(n >= 1, "§6: the rate is %d exchanges a step — at least one, or the step divides by zero" % n)
+
+	# (a) THE RATE, DRIVEN ON A FRESH UNIT. A step lands on every Nth exchange,
+	# never before, and the meter is still capped IN THE FIELD — so it never
+	# holds a value past its ceiling however long the fight runs.
+	var u := BattleUnit.new()
+	var at_first := -1
+	for i in n * BattleUnit.MOMENTUM_MAX_STEPS + n + 1:
+		u.momentum_dealt = 1
+		u.momentum_taken = 1
+		u.note_momentum_turn()
+		if at_first < 0 and u.momentum > 0:
+			at_first = i + 1
+	ok(at_first == n,
+		"§6a: the first step lands on exchange %d, want %d — the rate, not one step an exchange" % [at_first, n])
+	ok(u.momentum_exchanges == n * BattleUnit.MOMENTUM_MAX_STEPS + n + 1,
+		"§6a: every exchange is counted on the ledger (%d of %d)" % [u.momentum_exchanges,
+			n * BattleUnit.MOMENTUM_MAX_STEPS + n + 1])
+	ok(u.momentum == BattleUnit.MOMENTUM_MAX_STEPS,
+		"§6a: past the cap the meter reads %d, want %d — capped in the field" % [u.momentum,
+			BattleUnit.MOMENTUM_MAX_STEPS])
+	var one := BattleUnit.new()
+	one.momentum_dealt = 100000
+	one.momentum_taken = 100000
+	one.momentum_met = 50
+	one.note_momentum_turn()
+	ok(one.momentum_exchanges == 1,
+		"§6a: a span booked with everything at once is ONE exchange (read %d) — at most one a turn" % one.momentum_exchanges)
+	u.free()
+	one.free()
+
+	# (d) THE STATED CONSEQUENCE. A hero no blow reaches and who loses no health
+	# books no exchange, however much he deals — the spine reads the exchange,
+	# not the output, and this is the arm that keeps that from being discovered.
+	var idle := BattleUnit.new()
+	idle.momentum_dealt = 100000
+	ok(not idle.note_momentum_turn() and idle.momentum_exchanges == 0,
+		"§6d: dealing 100000 with no blow met and no health lost books nothing (read %d exchanges)"
+			% idle.momentum_exchanges)
+	idle.free()
+
+	# (b) EVERY CASE, DRIVEN THROUGH `_resolve` FROM A LIVE ENEMY INTO A LIVE
+	# WARDEN. The fixture's `deterministic` board turns the random defences off;
+	# each arm then turns ONE on by hand, so the blow's fate is the arm's and
+	# nobody else's. `taken` is the health ledger and `met` the new door — the
+	# four turned blows must read taken 0 AND met 1, or the arm would pass on a
+	# door that simply wrote the health ledger.
+	Engine.time_scale = 20.0
+	var scene: Node = await Gate.spawn(self,
+		["warden", "cryomancer", "inquisitor", "beastmaster"], {"deterministic": true})
+	var wd: BattleUnit = scene.get("heroes")[0]
+	ok(wd.passive_id == "heavy_plating", "§6b: seat 0 is a Warden")
+	var foe := _fv_foe(scene)
+	var fab := _fv_ab(foe)
+	ok(foe != null and fab != null and not foe.is_ranged,
+		"§6b: a melee enemy with a plain single-target blow to strike with (%s)"
+			% (fab.display_name if fab != null else "none"))
+	if foe == null or fab == null:
+		scene.queue_free()
+		Engine.time_scale = 1.0
+		return
+	foe.no_cover = 1
+	foe.crit_bonus = -1.0
+	var rows := []
+
+	_fv_reset(wd)
+	var r := await _fv_blow(scene, foe, fab, wd, 611)
+	rows.append(["landed", r])
+	ok(int(r["met"]) == 1 and int(r["taken"]) > 0 and int(r["lost"]) > 0,
+		"§6b: a LANDED blow reads met %d, taken %d — want 1 and the health it removed (%d)"
+			% [int(r["met"]), int(r["taken"]), int(r["lost"])])
+
+	_fv_reset(wd)
+	wd.block_chance = 10.0
+	r = await _fv_blow(scene, foe, fab, wd, 612)
+	rows.append(["blocked", r])
+	ok(int(r["lost"]) == 0 and int(r["taken"]) == 0 and int(r["met"]) == 1,
+		"§6b: a BLOCKED blow reads lost %d, taken %d, met %d — want 0, 0, 1" % [int(r["lost"]),
+			int(r["taken"]), int(r["met"])])
+	ok(bool(r["exchange"]), "§6b: ...and with a deal beside it the span books an exchange")
+
+	_fv_reset(wd)
+	wd.add_status("shield_charges", "Interpose", "IP1", Color.WHITE, 3, "", 1)
+	r = await _fv_blow(scene, foe, fab, wd, 613)
+	rows.append(["interpose", r])
+	ok(int(r["lost"]) == 0 and int(r["taken"]) == 0 and int(r["met"]) == 1 and bool(r["exchange"]),
+		"§6b: a blow an INTERPOSE charge blocks reads lost %d, taken %d, met %d, exchange %s — want 0, 0, 1, true"
+			% [int(r["lost"]), int(r["taken"]), int(r["met"]), str(r["exchange"])])
+
+	_fv_reset(wd)
+	wd.parry_chance = 1.0
+	r = await _fv_blow(scene, foe, fab, wd, 614)
+	rows.append(["parried", r])
+	ok(int(r["met"]) == 1 and int(r["taken"]) > 0 and bool(r["exchange"]),
+		"§6b: an ordinary PARRY lands a quarter — met %d, taken %d — and books either way"
+			% [int(r["met"]), int(r["taken"])])
+
+	_fv_reset(wd)
+	wd.feint_guards = 1
+	r = await _fv_blow(scene, foe, fab, wd, 615)
+	rows.append(["feint", r])
+	ok(int(r["lost"]) == 0 and int(r["taken"]) == 0 and int(r["met"]) == 1 and bool(r["exchange"]),
+		"§6b: a FEINT absolute parry reads lost %d, taken %d, met %d, exchange %s — want 0, 0, 1, true"
+			% [int(r["lost"]), int(r["taken"]), int(r["met"]), str(r["exchange"])])
+
+	_fv_reset(wd)
+	wd.add_status("barrier", "Barrier", "Br", Color.WHITE, 3, "", 100000)
+	r = await _fv_blow(scene, foe, fab, wd, 616)
+	rows.append(["absorbed", r])
+	ok(int(r["lost"]) == 0 and int(r["taken"]) == 0 and int(r["met"]) == 1 and bool(r["exchange"]),
+		"§6b: a blow a BARRIER eats whole reads lost %d, taken %d, met %d, exchange %s — want 0, 0, 1, true"
+			% [int(r["lost"]), int(r["taken"]), int(r["met"]), str(r["exchange"])])
+
+	# A MISS, CONSTRUCTED: the attacker blinded and the no-cover bypass lifted,
+	# every defence still off, so a blow that removes nothing is a blow that
+	# missed. Seeded, so the same swing misses every run.
+	_fv_reset(wd)
+	foe.no_cover = 0
+	foe.add_status("blind", "Blind", "Bl", Color.WHITE, 99, "")
+	var miss := {}
+	for i in 60:
+		var mr := await _fv_blow(scene, foe, fab, wd, 700 + i)
+		if int(mr["lost"]) == 0:
+			miss = mr
+			break
+		_fv_reset(wd)
+	foe.no_cover = 1
+	foe.remove_status("blind")
+	ok(not miss.is_empty(), "§6b: a blinded attacker missed inside sixty seeded swings")
+	if not miss.is_empty():
+		rows.append(["missed", miss])
+		ok(int(miss["met"]) == 0 and int(miss["taken"]) == 0 and not bool(miss["exchange"]),
+			"§6b: a MISS reads met %d, taken %d, exchange %s — want 0, 0, false: a blow that never reached him"
+				% [int(miss["met"]), int(miss["taken"]), str(miss["exchange"])])
+	scene.queue_free()
+	await process_frame
+
+	# THE SWORDMASTER'S ABSOLUTE PARRY, on his own board: Untouchable in the
+	# Defensive stance zeroes damage, the floor of one and the Break together.
+	var scene2: Node = await Gate.spawn(self,
+		["swordmaster", "cryomancer", "inquisitor", "beastmaster"], {"deterministic": true})
+	var sm: BattleUnit = scene2.get("heroes")[0]
+	var foe2 := _fv_foe(scene2)
+	var fab2 := _fv_ab(foe2)
+	foe2.no_cover = 1
+	foe2.crit_bonus = -1.0
+	_fv_reset(sm)
+	sm.parry_chance = 1.0
+	sm.untouchable = 1
+	sm.stance = "defensive"
+	r = await _fv_blow(scene2, foe2, fab2, sm, 617)
+	rows.append(["untouchable", r])
+	ok(int(r["lost"]) == 0 and int(r["taken"]) == 0 and int(r["met"]) == 1 and bool(r["exchange"]),
+		"§6b: an UNTOUCHABLE absolute parry reads lost %d, taken %d, met %d, exchange %s — want 0, 0, 1, true"
+			% [int(r["lost"]), int(r["taken"]), int(r["met"]), str(r["exchange"])])
+	sm.untouchable = 0
+	scene2.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+	for row in rows:
+		var rr: Dictionary = row[1]
+		print("  §6b: %-11s lost %4d  taken %4d  met %d  exchange %s" % [row[0],
+			int(rr["lost"]), int(rr["taken"]), int(rr["met"]), str(rr["exchange"])])
+
+	# (c) THE DOOR IS ONE LINE, IN THE ONE PLACE. Counted on the comment-stripped
+	# source: one call in `battle.gd`, none anywhere else under `scripts/`, and it
+	# sits below the per-hit miss and above the Block roll — a door below the
+	# Block roll would miss every blocked blow, and one above the miss would pay
+	# for a swing that never connected.
+	var bsrc := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
+	ok(bsrc.count("note_blow_met()") == 1,
+		"§6c: `note_blow_met()` is called at exactly 1 site in battle.gd (found %d)" % bsrc.count("note_blow_met()"))
+	# A CALL, NOT A NAME. The door's own `func note_blow_met()` declaration in
+	# `unit.gd` carries the same text, and a declaration is not a call site —
+	# this arm's first reading counted it and read "found 1" on a correct tree.
+	var elsewhere := 0
+	var src := _sources("res://scripts")
+	for path in src:
+		if String(path).ends_with("battle.gd"):
+			continue
+		for raw in String(src[path]).split("\n"):
+			var line := String(raw)
+			if line.contains("note_blow_met()") \
+					and not line.strip_edges().begins_with("func "):
+				elsewhere += 1
+	ok(elsewhere == 0,
+		"§6c: ...and it is called nowhere else under scripts/ (found %d call sites)" % elsewhere)
+	var at_call := bsrc.find("note_blow_met()")
+	var at_block := bsrc.find("var block_source", at_call)
+	# THE PER-HIT MISS BY ITS OWN LINE. This arm's first draft searched back for
+	# the nearest `_stat("attack_miss")`, and a door moved ABOVE the per-hit miss
+	# found the single-target miss instead — with a `continue` in between — and
+	# passed; the distance arm caught that control (C2) and this one did not.
+	# `strike_target.float_text("MISS"` is the per-hit miss's own text and occurs
+	# once, so the arm now asks the question its message names.
+	var per_hit := bsrc.rfind("strike_target.float_text(\"MISS\"", at_call)
+	ok(at_call > 0 and at_block > at_call and at_block - at_call < 400,
+		"§6c: the door stands immediately above the Block roll (%d characters before it)" % (at_block - at_call))
+	ok(at_call > 0 and per_hit > 0
+			and bsrc.count("strike_target.float_text(\"MISS\"") == 1
+			and bsrc.substr(per_hit, at_call - per_hit).contains("continue"),
+		"§6c: ...and below the per-hit miss, which `continue`s past it")
+
+	# (f) FT'S TWO SANCTITY CONSTRAINTS, ON A REAL COMPANION. FT argued the beast
+	# case by construction — the count is on the funnel and the funnel runs once
+	# per body. Driven here: one application to a summoned beast is ONE event,
+	# the same status on its hunter is a second body and a second event, a refresh
+	# is nothing, and eight apply-and-remove cycles on the beast are still one.
+	var scene3: Node = await Gate.spawn(self,
+		["berserker", "cryomancer", "inquisitor", "beastmaster"])
+	var bm: BattleUnit = null
+	for h in scene3.get("heroes"):
+		if h.passive_id == "pack":
+			bm = h
+	ok(bm != null, "§6f: the board fields a Beastmaster")
+	if bm != null:
+		await scene3._do_summon(bm, "ursus")
+		var comps: Array = scene3.get("companions")
+		ok(comps.size() > 0, "§6f: the summon put a companion on the field")
+		if comps.size() > 0:
+			var beast: BattleUnit = comps[0]
+			_clear(beast)
+			_clear(bm)
+			_advance(scene3)
+			beast.battle_turn = bm.battle_turn
+			BattleUnit.reset_sanctity()
+			scene3._apply_status(beast, "sunder", 3, 0, 0, bm)
+			ok(BattleUnit.sanctity_events == 1,
+				"§6f: one status on the BEAST books %d event, want 1 — not double-counted" % BattleUnit.sanctity_events)
+			scene3._apply_status(bm, "sunder", 3, 0, 0, bm)
+			ok(BattleUnit.sanctity_events == 2,
+				"§6f: the same status on its HUNTER books a second (read %d) — a second body" % BattleUnit.sanctity_events)
+			scene3._apply_status(beast, "sunder", 3, 0, 0, bm)
+			ok(BattleUnit.sanctity_events == 2,
+				"§6f: re-applying it to the beast is a refresh and books nothing (read %d)" % BattleUnit.sanctity_events)
+			_clear(beast)
+			_advance(scene3)
+			beast.battle_turn = bm.battle_turn
+			BattleUnit.reset_sanctity()
+			for _i in 8:
+				beast.add_status("sunder", "Sunder", "D", Color.WHITE, 3, "")
+				beast.remove_status("sunder")
+			ok(BattleUnit.sanctity_events == 1,
+				"§6f: eight apply-and-remove cycles on the beast in one turn book %d, want 1 — no farming" % BattleUnit.sanctity_events)
+	scene3.queue_free()
+	await process_frame
+
+
+func _fv_foe(scene: Node) -> BattleUnit:
+	for e in scene.get("enemies"):
+		if not e.is_ranged:
+			return e
+	return null
+
+
+func _fv_ab(foe: BattleUnit) -> Ability:
+	if foe == null:
+		return null
+	for a in foe.abilities:
+		if a != null and a.damage > 0 and not a.aoe and a.special == "" \
+				and a.multi_hits == 0 and a.random_hits == 0:
+			return a
+	return null
+
+
+# Everything the §6 arms turn on by hand, turned off again, and the three
+# accumulators emptied — so each arm reads its own blow and nothing an earlier
+# arm left standing.
+func _fv_reset(v: BattleUnit) -> void:
+	v.hp = v.max_hp
+	v.dead = false
+	v.pressure = 0
+	v.broken = false
+	v.broken_pending = false
+	_clear(v)
+	v.block_chance = -10.0
+	v.parry_chance = 0.0
+	v.feint_guards = 0
+	v.banked_guards = 0
+	v.momentum_dealt = 0
+	v.momentum_taken = 0
+	v.momentum_met = 0
+	v.refresh_bars()
+
+
+# One enemy blow through the real path. Returns the health it removed, what it
+# booked on each ledger, and whether the span would book an exchange had he
+# dealt in it — the engine's own answer, read off `note_momentum_turn`.
+func _fv_blow(scene: Node, foe: BattleUnit, ab: Ability, v: BattleUnit,
+		s: int) -> Dictionary:
+	foe.hp = foe.max_hp
+	foe.dead = false
+	var hp0 := v.hp
+	var t0 := v.momentum_taken
+	var m0 := v.momentum_met
+	seed(s)
+	var done := [false]
+	var task := func():
+		await scene._resolve(foe, ab, v, "good")
+		done[0] = true
+	task.call()
+	for _i in 3000:
+		if done[0]:
+			break
+		if scene.sc_active:
+			scene.sc_pos = 0.99
+			scene._grade_skill_check()
+		await process_frame
+	var out := {"lost": hp0 - v.hp, "taken": v.momentum_taken - t0,
+		"met": v.momentum_met - m0}
+	v.momentum_dealt = 1
+	var ex0 := v.momentum_exchanges
+	v.note_momentum_turn()
+	out["exchange"] = v.momentum_exchanges > ex0
+	return out

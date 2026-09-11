@@ -2665,9 +2665,10 @@ func _run_battle() -> void:
 		# last turn", so the moment the span ends is the moment the unit is
 		# chosen to act — above the DoT loop, above the intent, above anything
 		# that could add to either accumulator inside the turn that is starting.
-		# The engine reads the EXCHANGE: a step is booked only if he both dealt
-		# and took inside that span, which is what makes a Berserker and a
-		# Warden build it identically.
+		# The engine reads the EXCHANGE: an exchange is booked only if he both
+		# dealt and was reached inside that span — health lost, or a blow met
+		# (FV §1) — which is what makes a Berserker and a Warden build it
+		# identically.
 		u.note_momentum_turn()
 		if sim:
 			if u.is_hero and not u.is_companion:
@@ -8436,6 +8437,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.dead:
 						break
 					continue
+			# BATCH FV §1 — MOMENTUM'S TAKEN HALF, SECOND DOOR: A BLOW MET. Every
+			# blow past the miss rolls reaches this line and no missed blow does —
+			# the single-target miss is the branch above this loop and the per-hit
+			# miss `continue`s just above — so a blow the Block roll below stops, a
+			# parry turns or a barrier eats whole is booked HERE, where the health
+			# door in `unit._report_taken` cannot see it. It sits ABOVE the Block
+			# roll because a blocked blow `continue`s out of this iteration.
+			strike_target.note_blow_met()
 			# Block: negates 100% of the hit — damage, Break damage, and on-hit
 			# effects. Sources (logged): Interpose charges (guaranteed), the
 			# base Block stat, or Heavy Plating. Broken units cannot Block.

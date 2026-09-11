@@ -13,73 +13,77 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-10 (Batch FU).*
+*Last rewritten: 2026-09-10 (Batch FV).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FU — THE CEILING MOVES, AND CHANNEL GETS ITS NUMBER. THE SECOND BATCH ON
-  `class-merge`.** Still nothing is attached to any hero: `check_ft` §0 asserts the three spines are
-  reachable by nobody and is still written to invert. `main` is untouched and still playable. Full
-  working: **`docs/reports/FU.md`**.
-- **`CLAUDE.md`'S CEILING IS 340 KiB, RULED BY THE DESIGNER, DERIVED BY EE's OWN METHOD WITH CURRENT
-  INPUTS.** FF's post-split **261.03 KiB** plus ten of the largest single-batch growth on record —
-  **EZ's +8,293 B (8.10 KiB), not EB's +8,287 B, which the brief quoted as current** — is 342.03,
-  stated as 340. `CLAUDE.md` reads **298,560 B = 291.56 KiB** after FU's own edits — +3,806 B, which **alone would have put it 1,600 B past the old 290** — and has **49,600 B = 48.44 KiB of headroom**, about 11.5 batches at FF's mean and six at the worst on record. `check_fg` prints the live figure every battery.
-- **WHAT HAPPENS AT 340 IS WRITTEN INTO THE CEILING BLOCK SO IT IS NOT REDISCOVERED.** EE's
-  split-never-prune has no seam left of its kind, a second re-derivation would take the file's own
-  size as its floor, and **the seam that exists is by SUBJECT** — combat law and card law, 66.74 and
-  59.12 KiB at FF's classification — which EF's one-way tiebreak does not allow. **Taking it is the
-  designer's.** The two figures are FF's, on a 280.80 KiB file, and are not re-derived.
-- **`check_fg` FOLLOWED THE NEW NUMBER AND HELD A COPY OF THE OLD ONE — THE FINDING THE BRIEF ASKED
-  FOR.** Its parse arms read 340 and EZ's 8.10 out of the rule with no edit; **its FORM check was the
-  literal `"THE CEILING IS 290 KiB"`**, so HEAD's gate read **22 / 1** against a correct rule and a
-  correct file, and §1 held the changelog's `"THE THRESHOLD IS 400 KB"` the same way. **Both form
-  checks now assert the form with the pattern that parses the number**; the count stays 22, and the
-  standing rule in `docs/instrument-rules.md` that said *"the gate holds no copy"* carries the
-  correction.
-- **AND THE PRE-PASS'S ONE UNPREDICTED RED WAS THE SAME PIN, READ BY A SECOND GATE.** `check_ed` read
-  18 / 0 with the ceiling pin already unresolvable — its population is `.gd` pins only — and **`check_ec`
-  §2, which reads document pins, went 24 / 2 on `check_fg`'s literal.** The prediction had named
-  `check_ed` as the only pin gate. **For a document edit the pin proof is `check_ec`, not `check_ed`**;
-  recorded in the queue as a procedure note.
-- **CHANNEL: A FREE CAST COUNTS AS A FLOOR VALUE OF MANA — ONE TERM, NOT TWO.** Every CAST books
-  `max(net, CHANNEL_CAST_FLOOR)` at `note_resource_spent`; the one spend line in `_resolve` says
-  whether it is a cast with `not is_counter`, the definition the Killing Cold and the Overtone already
-  read. **The door's new argument defaults to *not a cast*, so every other caller and every direct
-  suite call books what it always did, and the floor names Mana, so Blood Frenzy does not move.**
-  Still element-blind, asserted against the source, now including the floor.
-- **THE FLOOR IS 10 BECAUSE IT IS BLINK's PRICE — THE CHEAPEST A MAGE CAN PAY — SO IT LIFTS NO CARD HE
-  PAYS FOR.** `check_ft` §5h asserts the relation over every card a Mage can hold, so a cheaper Mage
-  card turns it red and the floor is owed a ruling. **THE STEP IS 42**, chosen on 7,797 driven
-  untalented rung-1 fights (100 runs a Mage spec): every spec's **median** end-of-trash-fight meter is
-  exactly **three steps (+9%)**, means **2.88 / 3.44 / 2.60** (Pyromancer / Cryomancer / Arcanist),
-  the cap in 1–5% of trash fights and 6–16% of boss fights.
-- **ONE PAIR CANNOT PUT ALL THREE ON THREE, AND THE REASON IS STRUCTURAL.** The Cryomancer takes 7.39
-  casts a trash fight and the Arcanist 5.57, at the same 24.6 Mana a costed cast; a per-cast floor
-  cannot move that and widens it slightly. **A per-spec rate would close it and would make a class
-  core a spec engine.**
-- **TWO FT FIGURES WERE WRONG AND BOTH ARE CORRECTED.** **A Mage regenerates 22 a turn, not 12** —
-  Evocation is the Mage class passive — so **free casts are only 8.6–14.6% of a Mage's casts**, not
-  FT's one-fight 2 of 6; the floor is a small term and the step does most of the work. `CLAUDE.md`'s
-  governor row no longer says the bar is tighter than the cap. **And rung-1 trash runs 8.2 rounds on
-  EO's own party now, not ~9.**
-- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED, AND THAT IS STILL FT's RULING.**
-  Nothing a player can meet changed: every payout is still at its identity value for every hero.
-- **WHAT MOVED:** `scripts/unit.gd` (seven code lines), `scripts/battle.gd` (one), `check_fg.gd`,
-  `check_ft.gd` (§1a and a new §5), `check_da.gd` (one reasoned `WALK_EXEMPT` row, after §5h's
-  population moved onto the corpus walk), `pin-manifest.json`, `baselines.json`, `CLAUDE.md`,
-  `docs/instrument-rules.md`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FU.md`
-  (**NEW**) and this file. **The designer's four save files were copied to `save-backups/FU-…` and
-  md5-verified against the originals and FT's backup before anything else happened; all four match
-  FT's exactly.**
-- **THE PRE-PASS PUT EVERY UNMODIFIED GATE AGAINST THE NEW TREE BEFORE ANY GATE WAS EDITED (FA §1b), AND ITS PREDICTION WAS WRITTEN BEFORE IT LAUNCHED.** 107 targets, zero throws, zero timeouts, zero incomplete, `Parse Error` and `SCRIPT ERROR` grepped from all 107 logs at zero, and the tree md5-frozen across the run with absolute paths — 396 files, the designer's four saves included, **zero differ**. **Three reds**: `check_cm_live` 13 / 4, sanctioned, its four FAIL lines identical to FT's own log word for word; `check_fg` **22 / 1, predicted**; and `check_ec` **24 / 2, NOT predicted** — the same pin, read by the document-pin gate. **With the literal out of `check_fg`, `check_fg` reads 22 / 0 and `check_ec` 23 / 0 standalone, and `check_ft` reads 112 / 0 on three identical readings.** **THE FIRST ACCEPTANCE RUN WAS RECONNAISSANCE**: 107 targets, zero throws, the freeze held — and `check_da` 43 / 2, because §5h's first draft walked the pools itself and the subset before it had been chosen by document readership, which `check_da` (a reader of gate SOURCE) is not. Fixed on the rule's own terms, re-verified, re-frozen. **THE ACCEPTANCE RUN OVER THE SHIPPED TREE: 107 targets, 0 throws, 0 timeouts, 0 incomplete, `Parse Error` and `SCRIPT ERROR` grepped from all 107 logs at 0; `check_de` 445 checks / 0 failures / 0 notices; the one red is `check_cm_live` 13 / 4 with its FAIL lines identical to FT's; and the freeze held — 396 files md5-stamped with absolute paths before and after, zero differ, the four saves identical.**
-- **Phase.** Unchanged from FT: the draft is complete at 154 of 154, the twelve trees are at 324
-  nodes, the rune layer holds 60 live against 67 retired, and **step 1 of the merge's running order
-  — the three spines — is DONE, with Channel's rate now ruled.** Open in the rune layer: the Devout's
-  fifth and the Shared Mark's magnitude.
-- **Next letter: FV.**
+- **Last batch: FV — MOMENTUM'S RATE AND SANCTITY'S. THE THIRD BATCH ON `class-merge`.** Still nothing
+  is attached to any hero: `check_ft` §0 asserts the three spines are reachable by nobody and is still
+  written to invert. `main` is untouched and still playable. Full working: **`docs/reports/FV.md`**.
+- **§1 — THE WARDEN HOLE WAS REAL, AND IT WAS THE BATCH.** Momentum's taken half booked HEALTH LOST, so
+  a blow the Warrior's defence turned booked nothing. **Driven on HEAD: a BLOCK, an Interpose charge,
+  an absolute PARRY (a Feint charge, and a Swordmaster's Untouchable) and a barrier that ate the whole
+  blow each left the span empty — no exchange however much he had dealt.** An ordinary parry lands a
+  quarter of the blow and booked; a miss never reached him and books nothing, before and after.
+- **THE REPAIR: `note_blow_met()`, ONE CALL IN `_resolve`'s STRIKE LOOP, BELOW BOTH MISS ROLLS AND ABOVE
+  THE BLOCK ROLL.** Every blow that reaches a body books `momentum_met`, and the step reads the taken
+  half as health lost OR a blow met. **A second field, not a floor on the health ledger** — a turned
+  blow and a Burn tick are two populations, where a free cast and a costed one were one. **A hero no
+  blow reaches and who loses no health books no exchange, however much he deals** — stated in
+  `CLAUDE.md`, asserted in `check_ft` §6d.
+- **WHAT THE HOLE COST (100 driven runs a Warrior spec, untalented, rung 1, 13,714 fights across the
+  five arms with every fight's probe proved against the game's own ledgers):** exchanges a trash fight
+  under FT's rule against the repair — **Warden 1.08 → 2.77**, Swordmaster 1.75 → 2.28, Berserker 1.32 →
+  1.84. **The Warden's meter was two fifths of what it should have been**, and in the spans the hole
+  emptied, a Devout's shield eating a blow whole (74%) was a larger cause than his own Block (37%).
+- **§2 — MOMENTUM'S RATE IS AT ITS STOP: ONE STEP AN EXCHANGE, NOW A NAMED CONSTANT
+  (`MOMENTUM_EXCHANGES_PER_STEP` = 1).** The brief's premise — that the meter would outrun a third of
+  the cap — is FALSE: a trash fight ends at **1.84 / 2.75 / 2.27** steps (Berserker / Warden /
+  Swordmaster) against 2.67, and the cap is reached in under 2% of them. **An exchange books at most
+  once a turn**, and two exchanges a step would put every spec near one step. **Why so few**: the
+  first span of a fight holds no action of his, his last action lands in a span the fight never closes,
+  and in the rest the enemy reaches him in only 38–47% of spans.
+- **AND IT DOES NOT COMPOUND — DRIVEN LIVE AGAINST STUBBED, AS THE BRIEF ASKED.** With the payout on
+  for the Warrior (in the probe only), he takes +0.24 / +0.99 / +0.60 turns a trash fight and his
+  end-of-fight meter moves **+0.07 / +0.12 / −0.01** steps (no spec past two standard errors); in boss
+  fights it FALLS by 0.28 and 0.31. **A hastened turn closes a shorter span that the enemy reaches less
+  often**, so late in a fight the share of spans booking an exchange DROPS. **No lower cap is needed**;
+  `docs/reports/FV.md` §2c shows what 6 / 5 / 4 / 3 would do, and `CLAUDE.md` binds the batch that
+  makes an exchange easier to book to re-run the live pair. **Sanctity's duration does not compound
+  either**: live, the three Cleric meters move −0.10 to +0.07 steps, the one clear movement DOWN (the
+  Devout's longer statuses land again less often).
+- **§3 — SANCTITY'S RATE IS 16 EVENTS A STEP (was FT's 6, which put every Cleric party AT THE CAP in
+  78–97% of trash fights).** At 16 a trash fight ends at **3.03 (Devout) / 2.06 (Holy) / 2.28
+  (Occultist)** steps — 2.46 across the three against 2.5, medians 3 / 2 / 2. The spread is the PARTY's
+  traffic: the Devout's party makes 40% more events than the Holy's, and the Holy drives one event in
+  twenty of her own meter.
+- **AND WHAT THE MISSING POTENCY HALF WOULD BE WORTH, SO 16 IS RE-READ RATHER THAN TRUSTED.** Both halves
+  are keyed on the applier. **Holy**: everything her payout reaches carries a magnitude — but 1.3
+  applications a fight. **Devout**: nothing — his reachable applications are all Consecrated Ground,
+  and the Divine Shield's barrier is applied WITHOUT a source. **Occultist**: 1.5% — Ruin is
+  battle-long and carries no magnitude at the funnel. `CLAUDE.md` now binds the potency batch to
+  re-measure the rate in the same batch.
+- **FT's TWO CONSTRAINTS HOLD, AND THE BEAST HALF IS DRIVEN NOW** (`check_ft` §6f, on a summoned
+  Ursus); in live traffic the dedupe refused 0.08–0.24 calls a fight.
+- **`docs/master.html` IS NOT EDITED AND ITS STAMP IS NOT BUMPED** (FT's ruling). **The subject seam is
+  not taken. The potency layer is not built.**
+- **WHAT MOVED:** `scripts/unit.gd` (the met field and its door, the two-door read, the named Momentum
+  rate and its exchange ledger, Sanctity's rate), `scripts/battle.gd` (one call, one comment),
+  `check_ft.gd` (§2 read through the exchange ledger, §6 new), `pin-manifest.json`, `baselines.json`,
+  `CLAUDE.md`, `docs/changelog.html`, `docs/design-notes.md`, `docs/reports/FV.md` (**NEW**) and this
+  file. **The designer's four save files were copied to `save-backups/FV-…` and md5-verified against
+  the originals and FU's backup before anything else happened; all four match FU's exactly.**
+- **THE VERIFICATION IS IN `docs/reports/FV.md` §5, AND THE PRE-PASS PREDICTION WAS WRITTEN BEFORE IT
+  LAUNCHED:** every unmodified gate against the new tree, with only `check_cm_live`'s sanctioned 13 / 4
+  red and `check_ft` at 112 / 0 as HEAD's gate on the new code — because the rate is still 1, §2a's
+  `momentum == 1` still holds. **It read exactly that: 107 targets, 0 throws, 0 `Parse Error`, the one
+  sanctioned red, `check_de` 445 / 0 / 0, and the freeze held across 403 files.** **THE ACCEPTANCE RUN OVER THE SHIPPED TREE: 107 / 0 / 0 / 0 targets / throws / timeouts / incomplete, `Parse Error` and `SCRIPT ERROR` at 0, `check_ft` 140 / 0 on its new row, `check_de` 445 / 0 / 0, the one red `check_cm_live` 13 / 4 — the four FAIL lines word for word, and the freeze held — 402 files md5-stamped with absolute paths before and after, zero differ.**
+- **Phase.** Step 1 of the merge's running order — the three spines — is DONE, and with FV **all three
+  rates are set**. Still flagged: Channel's partition, how a second meter displays, and the potency
+  half. Open in the rune layer: the Devout's fifth and the Shared Mark's magnitude.
+- **Next letter: FW.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -125,11 +129,12 @@ the things a later batch must not re-derive from scratch:
   faults reported in place** — a card that FEEDS an engine without READING it counts as
   engine-free there, which under-states the Pyromancer and the Survivalist most.
 
-### THE THREE SPINES ARE BUILT; CHANNEL'S RATE IS RULED AT FU, AND FOUR THINGS ARE STILL FLAGGED — **OWED A RULING (FT)**
+### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED — **OWED A RULING (FT)**
 
-**None of the four blocks the next batch.** The machinery is drivable and every number is a named
+**None of it blocks the next batch.** The machinery is drivable and every number is a named
 constant, so each ruling is a one-line change. Full working and the measurements:
-`docs/reports/FT.md`, and for Channel's rate `docs/reports/FU.md` §2.
+`docs/reports/FT.md`, for Channel's rate `docs/reports/FU.md` §2, and for Momentum's and Sanctity's
+`docs/reports/FV.md`.
 
 - **CHANNEL'S PARTITION.** *Spell damage* = **not physical** (implemented,
   `CHANNEL_SPARES_PHYSICAL`), or Channel pays all damage and buys the basic attack with it. There
@@ -146,12 +151,23 @@ constant, so each ruling is a one-line change. Full working and the measurements
     fight near **3.4** steps and the Arcanist near **2.6**, because he takes 7.39 casts a fight to
     the Arcanist's 5.57 at the same 24.6 Mana a costed cast. A floor widens the gap slightly; a
     per-spec rate would close it and would make a class core a spec engine.
-- **MOMENTUM'S RATE.** 8 steps x 4% off the delay of his next turn = **−32% at the cap**, which is
-  roughly a free turn every three.
-- **SANCTITY'S RATE, AND IT IS THE ONE TO READ AGAINST THE TRAFFIC.** 6 events a step, 5 steps,
-  +1 turn a step — so a full meter adds **5 turns** to a status he applies. **"From any source, on
-  anyone" is a very wide door**: the meter fills from the whole party's status traffic and from the
-  enemies', not from his casting, so the rate cannot be judged from what a Cleric does on his turn.
+- **~~MOMENTUM'S RATE~~ — SET AT FV §2, AND ITS TAKEN HALF REPAIRED AT FV §1.** One step an exchange,
+  now `MOMENTUM_EXCHANGES_PER_STEP` = 1 — the rate is at its stop, because a normal fight already ends
+  around a third of the cap and an exchange books at most once a turn. **The taken half counts a blow
+  MET as well as health lost**, so a Block, an absolute parry and a shield that eats a blow whole all
+  book now. The cap (8 steps × 4% = −32%) is flagged, not tuned, and is a long-fight event.
+  - **ONE CONSEQUENCE FV STATES AND DOES NOT RULE: HEALTH A WARRIOR TAKES FROM HIMSELF BOOKS THE TAKEN
+    HALF**, because the health door books any health lost. In rung-1 trash no span booked on it alone;
+    in elite fights 5–9% of spans did. Whether paying your own health is half of an exchange is the
+    designer's; `docs/reports/FV.md` §1 carries the reading and its caveat.
+- **~~SANCTITY'S RATE~~ — SET AT FV §3: 16 EVENTS A STEP, AGAINST HALF A PAYOUT.** FT's 6 put every
+  Cleric party at the cap in 78–97% of trash fights; 16 ends a normal fight at 3.03 / 2.06 / 2.28
+  steps (Devout / Holy / Occultist). **Owed a re-reading the day the potency half lands** — `CLAUDE.md`
+  binds the potency batch to re-measure it in that same batch.
+  - **AND TWO THINGS THAT ARE NOT RATES DECIDE WHAT POTENCY WOULD BE WORTH, BOTH FOUND AT FV §3:** the
+    Devout's Divine Shield barrier is applied WITHOUT a `src`, so no payout keyed on the applier reaches
+    his shields; and the Occultist's Ruin is battle-long and magnitude-free at the funnel. **Neither is
+    owed until a potency half exists; both are what that batch meets first.**
 - **AND THE ONE THAT IS NOT A NUMBER: HOW A SECOND METER DISPLAYS.** The nameplate bar is ONE fill,
   ONE colour chosen by a ternary on the NAME and ONE label, and it breaks by construction under two
   currencies. **The game already answered this three times and never widened the bar** — Faith,
@@ -321,7 +337,8 @@ either of them asserts.
 its own branch with `main` staying playable** (`docs/ways-of-working.md`). **None of the below was
 done at FQ.** The order is recorded so it is not re-litigated batch by batch:
 
-1. **~~THE THREE SPINES, ON NOBODY~~ — DONE AT BATCH FT, AND THE FLAGGED RATES ARE BELOW.**
+1. **~~THE THREE SPINES, ON NOBODY~~ — DONE AT BATCH FT; CHANNEL'S RATE SET AT FU, MOMENTUM'S AND
+   SANCTITY'S AT FV.**
    Momentum, Channel and Sanctity built and tested **before a
    single spec dissolves**. FP measured that this touches **none of the 400 authored things**.
    Channel is nearly free (`note_resource_spent` is already generic and books the NET at the one
@@ -2199,6 +2216,13 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   elite 7.27 / 7.79 / 7.33, boss 10.87 / 10.07 / 10.50. **The Cryomancer party IS the default party,
   and EO read 9.1–9.2 on it** — so the "~9 rounds since EO" a brief quoted is about a round long now.
   The ROWS=3 and ROWS=9 tables below were not re-run.
+- **FV READ THE SAME CELL ON FIVE PARTIES (`DOD_SIM_ROWS=0`, rung 1, `--run 100` each).** Trash rounds
+  **8.47** on the default party itself (Berserker / Cryomancer / Devout / Beastmaster, n = 1,206, SD
+  2.62) — FU's 8.23 on the same party is 0.24 rounds away, about 2.3 combined standard errors at FV's
+  spread, with nothing that plays changed between the two batches — and **10.44** with
+  the Warden in the Berserker's seat, **9.11** with the Swordmaster, **7.71** with the Holy in the
+  Devout's and **6.10** with the Occultist. **A fight's length is a property of the PARTY**, so a
+  rounds figure travels only beside the party it was taken on.
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
   both halves), over four `--run 25` sims, **after DA** — **DB through DG ran no sim and these are
   carried unchanged**:
@@ -2562,22 +2586,18 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**FU's PRE-PASS: EVERY UNMODIFIED GATE AGAINST THE NEW CODE AND THE NEW `CLAUDE.md`, BEFORE ANY GATE WAS
-EDITED.** The prediction was written to the scratchpad before the launch, and it named two of the three
-reds. **The third is the half worth keeping**: `check_ec` §2 reads document pins, and the prediction had
-named `check_ed` as the only pin gate — which reads `.gd` pins only.
+**FV's PRE-PASS AND ACCEPTANCE RUNS ARE IN `docs/reports/FV.md` §5; this table carries their headline
+cells.** The prediction column was written before the pre-pass launched, **and the pre-pass read exactly
+the prediction** — no red that was not named in advance.
 
-| | FU pre-pass | FU acceptance 1 (reconnaissance) | FU acceptance 2 (certifying) |
+| | FV pre-pass — predicted | FV pre-pass — read | FV acceptance — the shipped tree |
 |---|---|---|---|
-| what was in the tree | code + `CLAUDE.md`; every gate and suite HEAD's | everything, §5h walking the pools | everything, §5h on the corpus walk |
-| targets / throws / timeouts / incomplete | 107 / 0 / 0 / 0 | 107 / 0 / 0 / 0 | **107 / 0 / 0 / 0** |
-| `Parse Error` + `SCRIPT ERROR`, grepped from every log | 0 | 0 | **0** |
-| `check_cm_live` (deliberate) | 13 / 4 — FAIL lines identical to FT's | 13 / 4, identical | 13 / 4 — FAIL lines identical to FT's |
-| `check_fg` | **22 / 1 — predicted** (the form arm's literal) | 22 / 0 | **22 / 0** |
-| `check_ec` | **24 / 2 — not predicted** (the same pin) | 23 / 0 | **23 / 0** |
-| `check_da` | 42 / 0 | **43 / 2 — §5h walked the pools** | **43 / 0** |
-| `check_ft` | 79 / 0 (HEAD's gate, new code) | 112 / 0 | **112 / 0** |
-| `check_de` | 445 / 2 / 1 | 445 / 1 / 1 | **445 / 0 / 0** |
-| run harness | 22 / 166 / 8 | 22 / 166 / 8 | 22 / 166 / 8 |
-| the freeze | 396 files, zero differ | 396 files, zero differ | 396 files md5-stamped with absolute paths before and after, zero differ, the four saves identical |
-| the designer's four save files | byte-identical | byte-identical | byte-identical |
+| what was in the tree | the engine and every document edit; every gate, suite, `baselines.json` and `pin-manifest.json` HEAD's | the same | everything shipped: the repaired `check_ft` (140), its row, the manifest at 1,452 |
+| targets / throws / timeouts / incomplete | 107 / 0 / 0 / 0 | **107 / 0 / 0 / 0** | **107 / 0 / 0 / 0** |
+| `Parse Error` + `SCRIPT ERROR`, grepped from every log | 0 | **0** | **0** |
+| `check_cm_live` (deliberate) | 13 / 4 — FAIL lines identical to FU's | **13 / 4 — the four FAIL lines word for word** | **13 / 4 — the four FAIL lines word for word** |
+| `check_ft` | 112 / 0 (HEAD's gate, new code) | **112 / 0** | **140 / 0** (the new gate, on its new row) |
+| `check_de` | 445 / 0 / 0 | **445 / 0 / 0** | **445 / 0 / 0** |
+| run harness (gates 1 / 2 / 3) | 22 / 166 / 8 | **22 / 166 / 8** | **22 / 166 / 8** |
+| the freeze | — | **403 files md5-stamped with absolute paths before and after, zero differ** | **402 files md5-stamped with absolute paths before and after, zero differ** |
+| the designer's four save files | byte-identical | **byte-identical** | **byte-identical** |

@@ -1665,6 +1665,46 @@ he pays for, and `check_ft` §5 asserts the relation — **the day a cheaper Mag
 that gate reds, and the answer is a ruling on the floor, never an exemption for the card.** It
 stays element-blind: the door reads the cost, the cast flag and the floor, and never the ability.
 
+**AND MOMENTUM'S TAKEN HALF IS A BLOW MET, NOT HEALTH LOST (FV §1).** `momentum_taken` books health
+actually removed, so a blow the Warrior's defence turned — a BLOCK, an absolute PARRY, a barrier that
+ate it whole — booked NOTHING, driven on HEAD before anything moved, and the spec whose kit is not
+losing health was the one the meter could not see. **`note_blow_met()` is the second door: ONE call
+in `_resolve`'s strike loop, below both miss rolls and above the Block roll**, so every blow that
+REACHES a body books `momentum_met` and no missed blow can. **Two things bind whoever touches that
+loop next.** A new defence must resolve BELOW that line — a block, parry or absorb written above it
+re-opens the hole for exactly the blows it stops. And a blow that reaches a hero WITHOUT passing
+that loop books only the health it removes, so a new blow path that bypasses it owes the door a call
+of its own. **A hero no blow reaches and who loses no health books NO exchange, however much he
+deals** — the spine reads the exchange, not the output, and that is a stated consequence rather than
+a defect: do not "fix" it with a step for dealing alone, which is CZ §1's inversion one engine
+along. **It is a SECOND FIELD and not a floor on the health ledger**, the one respect in which it
+differs from Channel's shape: a free cast and a costed one are one population differing in amount,
+while a blow turned aside and a tick taken are two, and a count folded into `momentum_taken` would
+make a health figure lie to the first thing that reads its size.
+
+**AND THE TWO REMAINING RATES ARE SET AGAINST THE DESIGNER'S TARGETS, AND EACH CARRIES THE CONDITION
+UNDER WHICH IT IS RE-READ (FV §2, §3).**
+- **MOMENTUM'S RATE IS AT ITS STOP: ONE STEP AN EXCHANGE, `MOMENTUM_EXCHANGES_PER_STEP` = 1.** The
+  target was roughly a third of the cap by the end of a normal fight, and one step an exchange
+  already ends a normal fight around it, because an exchange books at most once a turn and in most
+  spans the enemy does not reach him. **A slower rate is not a brake on this meter; it moves every
+  Warrior further from the target.** If it is ever wanted faster, the lever is what counts as an
+  exchange, and that is a ruling on the rule rather than a tuning of the rate. **AND ITS PAYOUT DOES
+  NOT FEED ITS BUILD — MEASURED LIVE AGAINST STUBBED**: it buys turns, not exchanges, because a
+  hastened turn closes a shorter span that the enemy reaches less often, so a lower cap is not the
+  brake this meter needs. **A batch that makes an exchange easier to book weakens that thinning and
+  re-runs the live pair in the same batch.**
+- **SANCTITY'S RATE IS SET AGAINST HALF A PAYOUT, AND THE BATCH THAT BUILDS THE OTHER HALF RE-MEASURES
+  IT IN THE SAME BATCH.** `SANCTITY_PER_STEP` puts the three Cleric parties near half the cap with
+  duration as the only payout; once potency exists a step buys more on every application that
+  carries a magnitude, and a rate left alone would be set against a payout that no longer exists.
+  **And the potency half is worth almost nothing to two of the three Clerics until two things change
+  that are not rates**: the Devout's Divine Shield barrier is applied WITHOUT a `src`, so no payout
+  keyed on the applier can reach it, and the Occultist's Ruin is battle-long and carries no magnitude
+  at the funnel.
+- **THE SPREAD BETWEEN SPECS IS REPORTED AND NEVER CLOSED WITH A PER-SPEC RATE** — FU's rule for
+  Channel, held for both of these. A class core with a rate per spec is a spec engine.
+
 ## STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
 may be authored into the Survivalist's tree, or into any existing spec, until that spec is
@@ -1773,12 +1813,16 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   CZ §1 already books Rage through.
 · **momentum** (Warrior spine) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
   clamps at `MOMENTUM_MAX_STEPS`, so this is the one of the three that never accumulates past its
-  ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one step a turn, and only for
-  a turn carrying BOTH halves of the exchange | `note_momentum_turn()` in `unit.gd`.
+  ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one EXCHANGE a turn, a step on
+  every `MOMENTUM_EXCHANGES_PER_STEP`-th (FV §2), and an exchange only for a turn carrying BOTH
+  halves: he dealt, and the fight reached him — health lost, or a blow met (FV §1) |
+  `note_momentum_turn()` and `note_blow_met()` in `unit.gd`; the one blow-met call is in
+  `_resolve`'s strike loop.
 · **sanctity_events** (Cleric spine, uncapped, static, battle-scoped) | **a FLAT CAP on the READ**
-  (`sanctity_steps()` is `mini(events / 6, 5)`) **plus a DEDUPE that is the real governor**: ONE
-  EVENT PER (TURN, BODY, STATUS), so churning one status on one body is worth one however many
-  times it is done. **THE BATTLE RESET IS THE SECOND GOVERNOR and it is faith_peak's** —
+  (`sanctity_steps()` is `mini(events / SANCTITY_PER_STEP, SANCTITY_MAX_STEPS)`, the constants
+  named rather than copied here) **plus a DEDUPE that is the real governor**: ONE EVENT PER (TURN,
+  BODY, STATUS), so churning one status on one body is worth one however many times it is done.
+  **THE BATTLE RESET IS THE SECOND GOVERNOR and it is faith_peak's** —
   `BattleUnit.reset_sanctity()` is called from `battle._ready()` above `_spawn_units`, because a
   STATIC ledger without one opens the second battle in a process on the first one's tally |
   `note_status_event()`/`sanctity_steps()` in `unit.gd`.

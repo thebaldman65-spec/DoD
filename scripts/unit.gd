@@ -1879,7 +1879,7 @@ var _base_scale := 2.6
 # attached, the way `check_ez` §1 and `check_fk` §2 both did.
 #
 # **THE BUILDING HALVES ARE NOT GUARDED AND THAT IS DELIBERATE.** `mana_spent`,
-# the two Momentum accumulators and the Sanctity event ledger fill for
+# the Momentum accumulators and the Sanctity event ledger fill for
 # everybody, because a counter that only runs for its owner is a counter no gate
 # can drive on an ordinary hero — and each of them costs one integer. **THE
 # PAYOUTS ARE WHAT THE FLAGS STOP**, and there are exactly three of them:
@@ -1934,9 +1934,14 @@ var mana_spent := 0        # NET Mana off the bar, by `note_resource_spent` — 
 
 # ── MOMENTUM (Warrior) — builds per exchange, pays initiative ────────────────
 #
-# **BOTH HALVES, IN THE SAME TURN.** A step is booked only for a turn in which
-# he BOTH dealt damage and took it, which is what makes a Berserker and a Warden
-# build it identically: it reads the exchange, not the style.
+# **BOTH HALVES, IN THE SAME TURN.** An EXCHANGE is booked only for a turn in
+# which he BOTH dealt damage and the fight reached him — a blow met him, or he
+# lost health — which is what makes a Berserker and a Warden build it
+# identically: it reads the exchange, not the style. **THE METER STEPS ON EVERY
+# `MOMENTUM_EXCHANGES_PER_STEP`-th EXCHANGE (FV §2), AND A HERO NO BLOW REACHES
+# AND WHO LOSES NO HEALTH BOOKS NO EXCHANGE, HOWEVER MUCH HE DEALS.** That is a
+# consequence of reading the exchange rather than the output, stated here so it
+# is not discovered.
 #
 # **AND "A TURN" IS THE SPAN BETWEEN HIS TURNS, NOT THE GLOBAL INDEX.** That is
 # the one decision in this engine that a reader will get wrong. `battle_turn` is
@@ -1953,12 +1958,41 @@ var mana_spent := 0        # NET Mana off the bar, by `note_resource_spent` — 
 # refusal; the dealt half rides `battle.gd`'s `_book_dealt`, which hangs off the
 # `dmg_hero_` branch of `_stat` — the single site every hero damage credit in
 # the game already passes through, with companions routed to their hunter by
-# `_contrib_name` for free. Both are zeroed when a step is decided.
+# `_contrib_name` for free. All of them are zeroed when the span is closed.
+#
+# **AND THE TAKEN HALF HAS A SECOND DOOR, BECAUSE HEALTH LOST IS NOT THE SAME AS
+# BEING STRUCK (FV §1).** `momentum_taken` books health actually removed, so a
+# blow his defence turned booked NOTHING: a BLOCK, an absolute PARRY (Feint,
+# Untouchable) and a barrier that ate the whole blow each left the span empty —
+# driven, not argued — which is FT's `battle_turn` failure in a new place, and
+# it bit hardest on the spec that stands in front. `momentum_met` counts every
+# blow that REACHES him, whatever his defence then does with it, and it is
+# written at the one line in `battle.gd`'s strike loop that every such blow
+# passes, above the Block roll. A MISS never reaches that line and books
+# nothing. **IT IS A SECOND FIELD RATHER THAN A FLOOR ON THE HEALTH LEDGER**,
+# which is how Channel's free cast was handled (FU §2): a free cast and a costed
+# one are ONE population — casts — differing in amount, while a blow turned
+# aside and a Burn tick taken are two, and folding a count into
+# `momentum_taken` would make a health figure lie to the first thing that reads
+# its size.
 const MOMENTUM_MAX_STEPS := 8
 const MOMENTUM_STEP_HASTE := 0.04
+# **FV §2 — THE RATE IS EXCHANGES A STEP, AND IT IS AT ITS STOP.** The
+# designer's target was ROUGHLY A THIRD OF THE CAP by the end of a normal fight,
+# on the premise that the meter would outrun it. Measured on driven untalented
+# rung-1 fights it does the reverse: at one step an exchange a normal fight ends
+# around that third, two of the three Warrior specs under it, and the cap is a
+# long-fight event. An exchange is booked at most once a turn, so FT's rate is
+# the fastest this shape offers and any slower one moves every spec further from
+# the target. The constant is named so a ruling is one line; the reading, and
+# the spread between the specs that no single rate can close, are in
+# `docs/reports/FV.md` §2.
+const MOMENTUM_EXCHANGES_PER_STEP := 1
 var momentum := 0
+var momentum_exchanges := 0  # exchanges booked this battle; the meter steps on every Nth
 var momentum_dealt := 0    # damage DEALT since his last turn
 var momentum_taken := 0    # damage TAKEN since his last turn
+var momentum_met := 0      # blows that REACHED him since his last turn (FV §1)
 
 # ── SANCTITY (Cleric) — builds per status transition, pays duration ──────────
 #
@@ -1986,7 +2020,16 @@ var momentum_taken := 0    # damage TAKEN since his last turn
 # is time passing, not a hero acting, and a meter that builds from it would
 # build for a hero doing nothing. The removal half is the ACTIVE paths only —
 # `remove_status` and `purge_debuffs` — and the ruling is in the report.
-const SANCTITY_PER_STEP := 6
+#
+# **FV §3 — THE RATE IS SET AGAINST THE DESIGNER'S TARGET: ROUGHLY HALF THE CAP
+# BY THE END OF A NORMAL FIGHT**, Channel's target, on driven untalented rung-1
+# fights beside each Cleric spec. FT's placeholder put the meter AT THE CAP in
+# most fights, because the ledger counts every status anyone applies to anyone.
+# **AND IT IS SET AGAINST HALF A PAYOUT** — duration only — so the day the
+# potency half lands this number is owed a re-reading rather than trust. The
+# reading, the spread between the specs and what each half can reach are in
+# `docs/reports/FV.md` §3.
+const SANCTITY_PER_STEP := 16
 const SANCTITY_MAX_STEPS := 5
 const SANCTITY_STEP_TURNS := 1
 static var sanctity_events := 0
@@ -2042,23 +2085,40 @@ func channel_bonus(dmg_type: String) -> float:
 
 
 # CALLED AT THE TOP OF THIS UNIT'S TURN, once, by the turn loop. It closes the
-# span that has just ended: a step is booked only if BOTH halves of the exchange
-# landed inside it, and the two accumulators are cleared either way so the next
-# span starts empty. **AND turns is a SPAN, so it is closed whether or not a
-# step was earned** — leaving the counters standing on a quiet span would let a
-# turn he only dealt on and a later turn he only took on add up to a step
-# between them, which is the opposite of what "both, in the same turn" means.
+# span that has just ended: an EXCHANGE is booked only if BOTH halves landed
+# inside it — he dealt, and the fight reached him (health lost, or a blow met) —
+# and the accumulators are cleared either way so the next span starts empty.
+# **AND turns is a SPAN, so it is closed whether or not an exchange was
+# earned** — leaving the counters standing on a quiet span would let a turn he
+# only dealt on and a later turn he only took on add up to an exchange between
+# them, which is the opposite of what "both, in the same turn" means.
 #
-# Returns true when a step was booked, so a driver can see it and so this can be
-# read without a second accessor.
+# **THE METER STEPS ON EVERY `MOMENTUM_EXCHANGES_PER_STEP`-th EXCHANGE AND IS
+# CAPPED IN THE FIELD (FV §2)**, so it still never holds a value past its
+# ceiling and still moves at most one step a turn.
+#
+# Returns true when an EXCHANGE was booked, so a driver can see it and so this
+# can be read without a second accessor.
 func note_momentum_turn() -> bool:
-	var earned := momentum_dealt > 0 and momentum_taken > 0
+	var earned := momentum_dealt > 0 and (momentum_taken > 0 or momentum_met > 0)
 	momentum_dealt = 0
 	momentum_taken = 0
+	momentum_met = 0
 	if not earned:
 		return false
-	momentum = mini(momentum + 1, MOMENTUM_MAX_STEPS)
+	momentum_exchanges += 1
+	if momentum_exchanges % MOMENTUM_EXCHANGES_PER_STEP == 0:
+		momentum = mini(momentum + 1, MOMENTUM_MAX_STEPS)
 	return true
+
+
+# BATCH FV §1 — THE TAKEN HALF'S SECOND DOOR. `battle.gd` calls this for every
+# blow that REACHES this unit — above the Block roll, so a blocked, parried or
+# wholly absorbed blow books it as surely as one that lands. A miss never gets
+# here. It books a count and never a size: the field's own comment says why this
+# is not a floor written into the health ledger.
+func note_blow_met() -> void:
+	momentum_met += 1
 
 
 # Momentum's payout, as a MULTIPLIER ON THE DELAY a scheduled turn costs — the

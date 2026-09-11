@@ -8238,3 +8238,56 @@ thing a class core is not allowed to be.
 free basic. The measurement says he mostly does not: every Mage regenerates 22 a turn, not 12, so
 free casts are roughly one cast in eight. The ruling is still right — a free cast now builds — but
 most of the meter's speed was always going to come from the step.
+
+## Batch FV — Momentum's rate and Sanctity's
+
+**Why a blow met counts, and why that is not a softening of "both halves".** Momentum was always
+meant to read the EXCHANGE — he swings, and the fight swings back at him. FT wired the second half to
+health lost because that was the one door that already existed, and it books what the player felt.
+But a Warrior's defence exists precisely so that the fight's swing costs him nothing: a Block,
+Untouchable, a Feint charge, a Devout's shield. Reading health lost made the meter blind to every one
+of those, and blindest on the Warden, whose whole kit is not losing health. A blow that reached him and
+was turned is still the enemy's half of the exchange; counting it is the spine meaning what it says.
+
+**Why a miss does not count.** A miss never reached him. There is no exchange in it — the enemy's
+swing failed on its own — and letting it book would make a Warrior build off the enemy's bad luck.
+
+**Why a second field and not Channel's floor.** Channel's floor could be one term because a free
+cast and a costed cast are the same event differing only in size. A turned blow and a Burn tick are
+not the same event at all, and pouring a count into the health ledger would make a number that says
+"health" stop meaning health the first time anything reads its size.
+
+**And why a hero no blow reaches builds nothing.** That is the design, not a gap: the spine rewards
+standing in the exchange, and a Warrior the enemy ignores is not in one. It is written down so that
+nobody later adds a step for dealing alone — which would make Momentum a damage meter, and invert it
+against every batch that keeps the party from being hit.
+
+**Why Momentum's rate did not move.** The brief asked for a rate that holds a Warrior to a third of
+the cap, expecting the meter to run away. It does not run: the enemy reaches a given Warrior in under
+half of his spans, the first span of a fight holds nothing of his, and his last action falls in a span
+the fight never closes — so at one step an exchange a normal fight already ends around a third of the
+cap. A slower rate would only have moved every Warrior further from the target, so FT's rate stays,
+named now so that a later ruling is one line.
+
+**Why Sanctity's rate is 16, and why it is owed a re-reading.** The target was Channel's — half the
+cap by the end of a normal fight — because duration is a flat benefit. FT's 6 turned out to be a full
+meter, not a slow one: every Cleric party reached the cap in most fights, because the ledger counts
+every status anyone applies to anyone. At 16 the three Cleric parties end a normal fight around two
+to three steps. But the payout is only half built — duration, not potency — and the half that is
+missing is worth wildly different amounts to the three: nearly everything the Holy's payout reaches
+carries a magnitude, while nothing the Devout's reaches does and the Occultist's engine is a
+battle-long stack the duration half never touches. A rate set against half a payout is a statement
+about that half; the day the other half lands it has to be read again, not trusted.
+
+**Why the spread is left open, for both.** The Devout's party makes far more status traffic than the
+Holy's, and the Warden is struck far more often than the Berserker; no single rate makes either
+difference go away. Closing them with a rate per spec would turn a class core into a spec engine,
+which is the one thing a core is not allowed to be — the answer Channel got at FU.
+
+**Why no cap, when the brief expected one.** The worry was that initiative compounds: more turns,
+more exchanges, a meter feeding itself hardest late in a fight. Driven both ways, the payout bought
+the turns and not the exchanges, because an exchange is booked per span and a hastened turn closes a
+shorter span that the enemy reaches less often. Late in a fight — exactly where the feedback was
+feared — the meter books less, not more. A cap is the honest brake on a self-feeding meter, and this
+one is not feeding itself; the table of what a lower cap would do is kept so the question can be
+answered quickly if a later rule makes exchanges easier to book.

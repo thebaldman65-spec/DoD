@@ -15,6 +15,89 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-10 &mdash; Batch FV: MOMENTUM'S RATE AND SANCTITY'S</h2>
+<p><b>THE THIRD BATCH ON <code>class-merge</code>, AND STILL NOTHING IS ATTACHED TO ANY HERO.</b>
+<code>check_ft</code> &sect;0 still asserts that the three spines are reachable by nobody and is still
+the section that inverts. No spec dissolved, no pool merged, no engine became a rune, no talent node
+moved, and Sanctity's potency half is not built. <b><code>docs/master.html</code> is not edited and its
+stamp is not bumped</b>. Full working: <code>docs/reports/FV.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE WARDEN HOLE WAS REAL, AND IT WAS THE BATCH.</b> Momentum's taken half booked
+HEALTH LOST, off the one door below every death refusal &mdash; so a blow the Warrior's defence turned
+booked nothing. Driven through the real strike path on HEAD before anything moved, a Warden struck and
+<b>blocked</b>, struck through an <b>Interpose</b> charge, struck and <b>absolutely parried</b> (a Feint
+charge, and a Swordmaster's Untouchable) and struck into a <b>barrier that ate the whole blow</b> each
+left the span empty: no exchange, however much he had dealt. <b>An ordinary parry still lands a quarter
+of the blow, so it booked; a miss never reached him, so it booked nothing and still does.</b> Four
+cases reading zero made it, by the brief's own rule, the batch.</p>
+
+<p><b>THE REPAIR IS A SECOND DOOR, ONE LINE.</b> <code>note_blow_met()</code> is called at one line in
+<code>_resolve</code>'s strike loop, below both miss rolls and above the Block roll, so every blow that
+REACHES a body books <code>momentum_met</code> and no missed blow can; the step reads the taken half as
+health lost <i>or</i> a blow met. <b>It is a second field and not a floor on the health ledger</b>
+&mdash; the one place it differs from Channel's shape: a free cast and a costed one are one population,
+a turned blow and a Burn tick are two. <b>And the consequence is stated rather than discovered: a hero
+no blow reaches and who loses no health books no exchange, however much he deals.</b></p>
+
+<p><b>WHAT THE HOLE COST, ON 100 DRIVEN RUNS A WARRIOR SPEC.</b> Untalented, rung 1, beside the
+Cryomancer, the Devout and the Beastmaster, every span booked by a temporary probe that was proved
+against the game's own ledgers fight by fight &mdash; 13,714 fights across the five arms, none
+disagreeing &mdash; and then removed byte-exactly. Exchanges a trash fight, FT's rule against the
+repair: <b>Warden 1.08 &rarr; 2.77</b>, Swordmaster 1.75 &rarr; 2.28, Berserker 1.32 &rarr; 1.84.
+<b>The Warden's meter was two fifths of what it should have been</b>, and in the spans the hole emptied,
+a blow a Devout's shield ate whole (74%) was a larger cause than his own Block (37%).</p>
+
+<p><b>&sect;2 &mdash; MOMENTUM'S RATE IS AT ITS STOP, AND THE BRIEF'S PREMISE WAS THE REVERSE.</b> The
+target was roughly a third of the cap by the end of a normal fight &mdash; 2.67 of 8 steps &mdash; on
+the premise that the meter would outrun it. <b>It does not.</b> At FT's one step an exchange, with a
+blow met counting, a trash fight ends at means of <b>1.84 (Berserker), 2.75 (Warden) and 2.27
+(Swordmaster)</b>, and the cap is reached in under 2% of them. An exchange books at most once a turn,
+and two exchanges a step would put every spec near one step. <b>So the rate stays one step an exchange,
+now a named constant, <code>MOMENTUM_EXCHANGES_PER_STEP</code>.</b> The exchange is rare for structural
+reasons: the first span of a fight holds no action of his, his last action lands in a span the fight
+never closes, and in the rest the enemy reaches him in under half. <b>The spread is fight length and
+how often each deals</b> &mdash; the Warden takes 10.2 turns a trash fight to the Berserker's 6.7
+&mdash; and a per-spec rate would close it by making a class core a spec engine.</p>
+
+<p><b>AND IT DOES NOT COMPOUND &mdash; DRIVEN LIVE AGAINST STUBBED, AS THE BRIEF ASKED.</b> With the
+payout switched on for the Warrior (in the probe, and only there), it buys him a quarter of a turn to
+a whole turn more a fight and moves the end-of-fight meter by <b>+0.07, +0.12 and &minus;0.01 steps</b>
+in trash; in boss fights the meter <b>falls</b>. <b>A hastened turn closes a shorter span, and the enemy
+reaches a shorter span less often</b> &mdash; so late in a fight, where the brief expected the meter to
+feed itself hardest, the share of spans booking an exchange drops. No lower cap is needed; the report
+shows what one would do. <b>And duration does not compound either</b>: with Sanctity's payout live the
+three Cleric meters move by &minus;0.10 to +0.07 steps, the one clear movement DOWN &mdash; the Devout's
+longer statuses land again less often.</p>
+
+<p><b>&sect;3 &mdash; SANCTITY'S RATE IS 16 EVENTS A STEP, ON THE HALF THAT EXISTS.</b> FT's 6 was not a
+slow rate but a full meter: every Cleric party reached the cap in 78&ndash;97% of trash fights, because
+the ledger counts every status anyone applies to anyone. At 16 a normal fight ends at <b>3.03 (Devout),
+2.06 (Holy) and 2.28 (Occultist)</b> steps &mdash; 2.46 across the three against a target of 2.5.
+<b>The spread is the party's traffic, not the Cleric's</b>: the Devout's party makes 40% more events
+than the Holy's, and the Holy drives only one event in twenty of her own meter.</p>
+
+<p><b>AND WHAT THE MISSING POTENCY HALF WOULD BE WORTH, SO THE RATE IS RE-READ RATHER THAN TRUSTED.</b>
+Both halves are keyed on the applier, so the question is what each Cleric applies with himself as the
+source. <b>For the Holy, everything her payout reaches carries a magnitude</b> (Renewal, Vespers)
+&mdash; but that is 1.3 applications a fight. <b>For the Devout, nothing</b>: his reachable
+applications are all Consecrated Ground, and the Divine Shield's barrier &mdash; the one whose power is
+the absorb &mdash; is applied without a source. <b>For the Occultist, 1.5%</b>: his engine is Ruin,
+battle-long and magnitude-free at the funnel. 16 is a rate for this payout and is owed a re-reading the
+day the other half lands; <code>CLAUDE.md</code> says so where the potency batch will read it.</p>
+
+<p><b>FT's TWO CONSTRAINTS STILL HOLD, AND THE BEAST HALF IS DRIVEN NOW.</b> One status on a summoned
+Ursus is one event, the same status on its Beastmaster is a second body, and eight apply-and-remove
+cycles on the beast in one turn are still one. In live traffic the dedupe refused 0.08&ndash;0.24 calls
+a fight: nothing in the shipped game churns a status inside a turn.</p>
+
+<p><b>WHAT MOVED:</b> <code>scripts/unit.gd</code> (the met field and its door, the two-door read, the
+named Momentum rate and its exchange ledger, Sanctity's rate), <code>scripts/battle.gd</code> (one call
+and one comment), <code>check_ft.gd</code> (&sect;2 read through the exchange ledger, &sect;6 new),
+<code>pin-manifest.json</code> (regenerated), <code>baselines.json</code>, <code>CLAUDE.md</code> (the
+class-core block and two governor rows), this file, <code>docs/design-notes.md</code>,
+<code>docs/state.md</code> and <code>docs/reports/FV.md</code> (new).
+<b><code>docs/master.html</code> did not move.</b></p>
+
 <h2>2026-09-10 &mdash; Batch FU: THE CEILING MOVES, AND CHANNEL GETS ITS NUMBER</h2>
 <p><b>THE SECOND BATCH ON <code>class-merge</code>, AND STILL NOTHING IS ATTACHED TO ANY HERO.</b>
 <code>check_ft</code> &sect;0 still asserts that the three spines are reachable by nobody, and it is
