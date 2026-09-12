@@ -11,9 +11,8 @@ batch VERIFIES itself is here. A rule that governs what the GAME may contain is 
 **Where a rule does both, it stayed in `CLAUDE.md`** — a batch that reads only one of the two must
 not be able to miss a rule about the game, so the tiebreak runs one way only.
 
-**EVERY RULE BELOW IS THE `CLAUDE.md` TEXT, MOVED AND NOT REWRITTEN.** Not one character inside a
-moved block was edited, and the two halves were asserted to re-concatenate byte for byte against
-the pre-split file before either was trusted — at EF §2 and again at FF §2. **Only the THREE `##`
+The two halves were asserted to re-concatenate byte for byte against
+the pre-split file before either was trusted — at EF §2 and again at FF §2. **The THREE `##`
 section headings that carry orphaned material are new**, and each is marked as this file's own:
 EF's two carry the orphaned `###` blocks, and FF's carries the four bullets that came out of
 `CLAUDE.md`'s *Working agreement*. **NEVER PROVE A SPLIT BY COMPARING SIZES** — two sizes agreeing
@@ -30,7 +29,7 @@ against it is inside the instruments' territory rather than outside it.
 
 **THIS FILE IS UNDER THE SAME CEILING PROCEDURE AS `CLAUDE.md` AND HAS NO STATED CEILING YET.** A
 ceiling is DERIVED, not chosen, and deriving one is a ruling; the arithmetic is in
-`docs/reports/EF.md` §2 and the live size is in `docs/state.md`. **Do not state this file's live
+`docs/reports/EF.md` §2 and the live size is printed by `check_fr` §5 every battery. **Do not state this file's live
 size in this file.**
 
 ---
@@ -83,8 +82,8 @@ below.
     `.length()` reports a file smaller than the census does and says nothing about it.
 - **CUT AT A BATCH BOUNDARY AND EDIT NO ENTRY.** The live file starts at a batch; the archive
   ends at the one before it.
-- **ARCHIVE MEANS MOVE OUT OF THE REPO, NEVER DELETE** — to `/Users/zipples/Documents/DoD-archive/`,
-  beside the `.docx` exports. **The live file never moves**, which is why `docs/build_docs.py`
+- **ARCHIVE MEANS MOVE, NEVER DELETE** — to `DoD-archive/changelog-archive.html`.
+  **The live file never moves**, which is why `docs/build_docs.py`
   reads it by relative path and keeps working.
 - **ASSERT THE HALVES RE-CONCATENATE BYTE FOR BYTE BEFORE TRUSTING THE SPLIT.** Extract every
   `<h2>` heading from the original and from both halves: the counts must sum, with zero overlap
@@ -130,10 +129,6 @@ below.
     passed with the first deleted. **A cut writes its own batch into that header, so pin THAT**,
     and note that `check_ec` §1 counted this among nine live alternations and correctly reported
     it satisfied: reading a group by its operator is not the same as the group asking anything.
-- **A FILE IN THE ARCHIVE IS NOT IN VERSION CONTROL AND IS NOT BACKED UP BY GITHUB.** If the
-  machine is lost, it is lost with it. The archive folder must live somewhere the machine backs
-  up — iCloud-synced Documents, a Time Machine target, or a second private repo. **At BZ none of
-  the three was in place, and it is the designer's call to fix.**
 
 ## A CEILING NOBODY MEASURES IS A CEILING THAT GETS CROSSED SILENTLY (STANDING, Batch FG §2)
 > **A THRESHOLD WITH NO INSTRUMENT IS A NOTE, NOT A GATE.** A number written into a rule is a
@@ -440,7 +435,7 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   moves across this repair means an assertion was removed rather than re-pointed. All thirteen
   targets DX touched read their baselines exactly.
 - **A FROZEN COLLECTION IS NOT A GROWING ONE AND ITS EQUALITY IS CORRECT.** The changelog ARCHIVE
-  keeps `== 149` because only a cut moves it. **Ask whether a batch doing its job would ADD to it
+  keeps its equality because only a cut moves it. **Ask whether a batch doing its job would ADD to it
   — that is the whole test.** (`CLASS_POOLS`' byte-freeze pins were the other example DX named;
   **DY §3 deleted that dict**, and those six pins assert its ABSENCE off the source now, which is
   the same claim made about a structure that is gone.)
@@ -512,7 +507,7 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   states, silently. Demanding every member reds a genuine alternation — and **a false alarm is how
   an instrument gets switched off**, which is why the header sweep was left un-gated at 118 rows
   for 16 defects.
-- **MEASURED, ON THIS TREE: 103 asserting statements, 125 members, 10 CONJUNCTIONS and 9
+- **MEASURED: 103 asserting statements, 125 members, 10 CONJUNCTIONS and 9
   ALTERNATIONS.** Six of the nine alternations have a member that is legitimately absent, so a
   repair that treated every group as a conjunction would raise **six false alarms on the first
   run**. All ten conjunctions hold in full, so the hole cost nothing HERE — **it was a live
@@ -580,7 +575,7 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
 - **THIS IS EC §1'S DEFECT IN A SECOND INSTRUMENT, AND EC'S OWN CENSUS WAS THE VICTIM.** EC closed
   the or-group boundary in the DOCUMENT sweep and measured the source population at **915** with a
   `.{0,600}` window still open. `ok(src.contains(A) and src.contains(B), …)` yielded A and stepped
-  over B. **The live figure is 1014.** A census cannot audit itself: the same statements are read
+  over B. A census cannot audit itself: the same statements are read
   either way and the total looks plausible at both.
 - **THE TELL IS A COUNT THAT MOVES WHEN THE CAPTURE NARROWS**, not a failure. Nothing errored, and
   the population was quoted into a brief and a report before anybody re-derived it.
@@ -861,20 +856,19 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
 - **A COUNT THAT NOBODY DIFFS IS A WORD.** Printing a number is not enough: two suites printed
   counts that were wrong by 125 and 2,434 checks and nobody saw it for twelve batches. **A count
   is only visible at a glance if something is comparing it to what it should be.**
-  `test_batch_cd` §1 is what diffs them.
 - **AND AN INSTRUMENT'S SCOPE IS PART OF ITS READING (STANDING, SET AT DD §1).** `cd`'s table held
   **five suites out of forty-five** from CD until DD — **a ninth of the project** — and the cost was
   measured rather than argued: **repairing five suites at DC did not move `cd` by one line, because
   none of the five was in the table.** A green differ over a ninth of the tree reads exactly like a
   green differ over the tree. **When a rule says "nothing moved", ask what it was watching.**
-  - **IT IS `[checks_lo, checks_hi, fails_lo, fails_hi]` PER SUITE NOW, NOT A FLOOR.** A floor
+  - A floor
     cannot see a count that RISES, and `bx` gained five checks at CX and `al` lost one at CV —
     both found batches later, by accident, by somebody verifying something else.
   - **THE FAILURE HALF IS THE HALF A FLOOR NEVER HAD.** **A failure count moving inside an
     already-red suite is invisible in an aggregate**, and that is exactly how `test_batch_bi` stayed
     wrong for four batches while its suite was red for an unrelated reason.
-  - **BANDS, WITH THE OBSERVATION COUNT BESIDE THEM.** `an` **6047–6063** (ten observations), `bk`
-    129–130 (five), `bo` 0–1 failures. **A band written from too few readings reads a normal run as
+  - **BANDS, WITH THE OBSERVATION COUNT BESIDE THEM.**
+    **A band written from too few readings reads a normal run as
     a regression** — the same failure as a wrong count, in the opposite direction.
   - **AND A BAND WRITTEN TO A SAMPLE'S EXACT EXTREMES IS ONE OF THOSE. DD MEASURED IT.** `an`'s
     band was written from nine observations as 6047–6054 and **was exceeded on its tenth reading,
@@ -884,10 +878,7 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     **the floor is the half that catches a real fault** — a section that stopped running costs
     hundreds of checks, not five — so the floor stays tight and the ceiling takes the headroom.
     **Headroom goes where a reading demands it**, so every number in the table is traceable to a
-    run: `bk` has not been exceeded and was not widened.
-  - **AND IT COSTS 22 MINUTES: IT RUNS THE BATTERY INSIDE THE BATTERY.** `run_battery.sh` carries
-    `TMO[test_batch_cd]=2400` for that, because **at the 240s default the sweep is killed before it
-    prints a row, and a killed suite reports NO COUNT.**
+    run.
 - **VERIFY A PARSE BY GREPPING STDERR, NEVER BY A TALLY.** `grep -cE "Parse Error|SCRIPT ERROR"`
   over the run's own stream is the authority. **Godot returns a NON-NULL GDScript for a file whose
   parse failed** — it prints the error and hands back the resource anyway — so `load(path) != null`
@@ -941,13 +932,12 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
 - **BUT THE AUTOLOAD NODE ITSELF EXISTS UNDER `--script`, AND BATCH FI LEANS ON IT.** This bullet
   used to end *"a test that needs one must be a SCENE run"*, and that is not what was measured.
   `/root/Run` is ABSENT during `_initialize()` and PRESENT after the first `process_frame`, with
-  `_ready()` already run — which is why every gate's `root.get_node("/root/Run")` works, and why a
-  redirect decided in `Run._ready()` fires in all 98 battery targets and not just the two scene
-  ones. **The identifier and the node are two different facts and only one of them is unavailable.**
+  `_ready()` already run — which is why every gate's `root.get_node("/root/Run")` works.
+  **The identifier and the node are two different facts and only one of them is unavailable.**
 - **A HARNESS PROCESS CANNOT REACH THE PLAYER'S RUN SAVE, AND NOTHING HAS TO REMEMBER THAT
   (Batch FI).** It could until FI, and this bullet used to read *"copy `run_save.bin` aside before
   a battery run"* — which is DISCIPLINE, and thirty batches of it did not stop the file being
-  destroyed. `Run.save_path` is a var now and `Run._ready()` points it at `Run.TEST_SAVE_PATH` for
+  destroyed. `Run.save_path` is a var now and `Run._init()` points it at `Run.TEST_SAVE_PATH` for
   any process launched with `--script`, with a scene that is not the project's main scene, or
   headless. **A gate run BY HAND gets the harness path on the same terms as one run by the
   battery**, which is why the redirect is a property of the process and not of a wrapper script.
@@ -1031,9 +1021,10 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   `check_parse.gd` force-loads all of them in one pass and is the faster gate —
   **and since EI it force-loads the gates, the suites, both fixtures and the
   data JSON too, off a population derived from `run_battery.sh`.** The rule
-  that binds it is in `CLAUDE.md`; this line is the pointer, not a second copy.
+  that binds it is the parse-floor bullet above, in FF §1's block;
+  this line is the pointer, not a second copy.
 - **`check_cm.gd` (Batch CM) is the GATED-ABILITY invariant gate**, and it is the enforcement
-  behind the no-gated-healing rule in `CLAUDE.md`: it walks the whole 211-ability corpus and fails
+  behind the no-gated-healing rule in `CLAUDE.md`: it walks the whole ability corpus and fails
   if the gated set is not the five §1 names, if any gated ability heals or revives, if the draft
   card's tell disagrees with the flag, or if the tell breaks the standard's 44-character ceiling. **Run it
   in any batch that touches `Ability.gated` or adds an ability.**
@@ -1429,7 +1420,7 @@ a census is taken.
 - **AND ONE GATE NOW READS A FILE THAT IS WRITTEN AFTER THE VERIFICATION RUN, WHICH IS AN
   OBLIGATION AND NOT A DEFECT.** FS §2 put `docs/state.md` into `check_es` §4(2b)'s swept
   population, because that is where FR's third stale copy of the core-kit figure was standing.
-  **It is the only gate that reads that file's CONTENT** — ten others name it and every one of
+  **It is the only gate that reads that file's CONTENT** — others name it and every one of
   them does so inside a comment, and `check_fr` §4 asserts only that the path resolves. Two things
   follow and both are load-bearing:
   · **THE ARMS ARE A FIXED TEN, ONE PER DOCUMENT AND NEVER ONE PER FIGURE.** A check count that

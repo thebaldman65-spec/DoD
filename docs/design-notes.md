@@ -4,6 +4,48 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The list ran out before the ruling did, and a rule file stops describing what is gone (Batch GA) — 2026-09-11
+
+**I stopped at the list because the brief said to, and because both ways of not stopping were worse.** The ruling was
+to replace Enemies Look Past You. The brief gave five alternates and a test: take one that pays every class, or say so
+and stop. **Three of the five were already in the tree**, because FX took them as alternates for its own four.
+Taking one again meant one of two things:
+- a second node on a field the tree already writes, which is the re-skin `CLAUDE.md`'s one-tree rule forbids;
+- a new effect under an old name, which is authoring.
+
+The other two pay the party once, which the brief named as the same defect in a different shape. A node from outside
+the list would have been my choice of content, and content is the designer's. So the node stays, still false when
+other heroes hold it, until the designer names its replacement. The report gives the recon's rows to choose from and
+does not rank them.
+
+**The crit ruling is recorded here because the recon is where it would otherwise be misread.** FW's counting rule is
+*one trigger paying in two currencies is one thing*, and it is a rule for counting what a page can say. FY applied it
+to the tree and found three nodes on one idea. It was right to report that, because nobody had asked the question.
+The designer's answer is that the rule counts the recon's things and does not limit the tree. **The limit on the tree
+is the field rule**: no two nodes write one field, and `check_fx` §1 asserts it. A player meets the three as three
+purchases.
+
+**The brief named two different nodes as the other two of the three.** More Crit Chance and Armor Penetration are
+SR-CRIT's other rows and count as separate things. They sit at tiers 1 and 2, beside A Crit Pays at 3, which is where
+"three different depths" comes from. FY's three sit at tiers 2, 3 and 3. I recorded the ruling against FY's three,
+because that is the question it answers, and I kept the brief's reason as it was given.
+
+**In the instrument rules I deleted what was gone and corrected what had moved, and the file's own rules decided which
+was which.** The brief carried DR's rule: where the thing a claim describes is gone, delete the claim. The same file's
+EB §2 rule says a claim about something that only moved is corrected, because deleting it throws away something true.
+- The archive did not stop existing when FH brought it into the repo.
+- The redirect did not stop existing when FI moved it from `_ready()` to `_init()`.
+
+So those, and two more like them, are corrections. The five figures went because the file's DJ §3 rule says a live
+number in prose is a copy that rots. I wrote the list down before touching the file, because the brief asked for that
+and because every sweep of this kind so far has come back short.
+
+**The relic redirect is deferred with its measurement beside it, so the day it matters is not a surprise.** Nothing
+writes the player's relic file today, only because every relic is unlocked. The first locked relic changes that, and
+every battery then becomes up to fourteen random unlocks in that file. It could come from a reset, a fresh profile, or
+a relic the merge adds. The ruling puts the fix after the game can be played. The queue item is where the next person
+will look before locking a relic, so that is where the number lives.
+
 ## TODAY was a costing for four trees, the floor sits on the rune, and a retirement says why now (Batch FY) — 2026-09-11
 
 **The costing FX drew its twenty-seven from was right about what it measured and wrong about the

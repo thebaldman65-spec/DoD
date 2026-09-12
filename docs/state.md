@@ -13,42 +13,48 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-11 (Batch FZ).*
+*Last rewritten: 2026-09-11 (Batch GA).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FZ — A BRIEF PRICES WHAT IT ASKS FOR. THE SEVENTH BATCH ON `class-merge`.** One rule, written into
-  `docs/ways-of-working.md` beside *DESIGN IS SETTLED BEFORE A BRIEF EXISTS*. No game code, no data file, no node, no
-  rune and no magnitude moved. `main` is untouched. Full working: **`docs/reports/FZ.md`**.
-- **THE RULE.** Before an instruction that sweeps, censuses, drives or walks a population, the brief states how large
-  that population is and roughly what the work costs, and when it does not know, it asks for the size before the run.
-  Its three instances travel with it:
-  - DD's *"Widen it to all 45"*, which took the battery from 29.6 minutes to about fifty;
-  - FY's §5 profile census, modelled on FI's 98 isolated runs;
-  - FY's §1, which read as a drive would have been 108 live battles.
+- **Last batch: GA — NO ALTERNATE ON THE LIST QUALIFIES, AND EIGHTEEN STALE CLAIMS LEAVE `docs/instrument-rules.md`.
+  THE EIGHTH BATCH ON `class-merge`.** No game code, no data file, no node, no rune and no magnitude moved. `main` is
+  untouched. Full working: **`docs/reports/GA.md`**.
+- **§1: ENEMIES LOOK PAST YOU IS RULED OUT, AND THE REPLACEMENT STOPPED AT THE LIST, AS THE BRIEF SAID IT SHOULD.**
+  None of the five approved alternates qualifies:
+  - **three are already in the tree**, because FX took them as alternates for its own four (Kill What Is Down, A Crit
+    Pays, Breaking Heals a Hero);
+  - **two pay the party once** (SR-REACH): one reads its first living holder, the other its best holder.
 
-  **Nothing in the tree can check it**, because a brief is not in the repository. `check_fr.gd`'s header says so,
-  beside the six rules it already could not assert.
-- **THE COROLLARY WAS ALREADY RECORDED, SO IT WAS NOT WRITTEN AGAIN.** `docs/instrument-rules.md`'s DE rule says a
-  suite that spawns suites squares the work when you widen it. The DD instance points at it. `CLAUDE.md` carries only
-  that rule's heading, in its index.
-- **THE BRIEF'S PREMISES: THE RULE STANDS, AND THREE INCIDENTAL CLAIMS WERE OFF** (`docs/reports/FZ.md` §0):
-  - DD's file is `test_batch_cd`, and there has never been a `check_cd`;
-  - DE did not undo DD's widening: it moved the comparison out of the suite, and the coverage stayed;
-  - all three quotes are paraphrases, and FY's census instruction was a seven-word clause and *"Take it."*, not
-    eight words.
+  **The node stays until the designer names a replacement.** The queue item below carries the population to choose
+  from. Heal More When Low and We Do Not Break stay, as ruled.
+- **§2: THE THREE CRIT NODES STAY, RULED.** The counting rule is how `docs/systems-recon.html` counts distinct things,
+  and it is not a limit on what a tree may contain. The ruling and its reason are in `docs/design-notes.md`. **The
+  brief named More Crit Chance and Armor Penetration, but FY's three are A Cooldown Ticks on a Crit, A Crit Pays and
+  Your Crits Crack Guards** (GA §0).
+- **§3: `docs/instrument-rules.md` IS SWEPT: 18 OF ITS 81 PRESENT-TENSE CLAIMS ABOUT THE TREE WERE STALE.** FZ's two
+  plus sixteen more:
+  - nine described something gone, and are deleted;
+  - four named something that moved, and are corrected;
+  - five were stale figures.
+
+  The census was written before the first correction (GA §3). Three claims of the same shape outside the file are
+  queued below.
+- **§4: THE RELIC REDIRECT IS DEFERRED, RULED**, until the game runs and can be test-played. Its queue item carries
+  FY's measurement. **Deepening Hex's floor stays at 8**, and its card wording is not touched.
 - **WHAT MOVED:**
-  - `docs/ways-of-working.md`: the rule.
-  - `check_fr.gd`: its header comment only. Still 25 checks.
-  - The changelog, this file and `docs/reports/FZ.md` (**NEW**).
+  - `docs/instrument-rules.md`: the eighteen corrections, and nothing else.
+  - The changelog, `docs/design-notes.md`, this file and `docs/reports/GA.md` (**NEW**).
   - **`docs/master.html` is not edited and its stamp is not bumped**, because nothing a player can meet changed. The
     brief's *"and the stamp"* is read as this file's *Last rewritten* line, which is FU's reading of the same words.
-- **VERIFICATION:** in **`docs/reports/FZ.md` §4**, written after the acceptance run.
+  - **Not edited:** `CLAUDE.md`, `baselines.json` (no count moves), `pin-manifest.json`, every gate and suite, and every
+    `scripts/` and `data/` file.
+- **VERIFICATION:** in **`docs/reports/GA.md` §5**, written after the acceptance run.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is next**, and FP's measurements for it stand.
-- **Next letter: GA.**
+- **Next letter: GB.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -74,8 +80,8 @@ last exactly one.*
    current reason, the date, and FO's sentence absent.
 7. **~~Deepening Hex's floor has lost its derivation~~ — RULED AT FY §2: re-derived against the live game to 8**
    (`10 - 2`, since nothing installs a shallower step). **FY read the brief's *"if nothing lowers the threshold"*
-   clause as not applying**, because the rune itself still does, and recorded that reading for confirmation (FY,
-   NEEDS A RULING). `check_fo` §1c pins the relation.
+   clause as not applying**, because the rune itself still does, and recorded that reading for confirmation.
+   **CONFIRMED AT GA: the floor stays at 8**, and its card wording is not touched. `check_fo` §1c pins the relation.
 8. **Five node names use a tag word** (BREAK, RESOURCE, DEBUFF). All five are recorded in `check_ek`'s
    `CLASH_EXEMPT`, and the DEBUFF one uses the word differently. A rename is the designer's call.
 
@@ -114,26 +120,50 @@ the things a later batch must not re-derive:**
    not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
    forbade rules); **selecting it in the picker is the designer's**.
 
-### FY §1: THREE NODES PAY BY WHO ELSE HOLDS THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS — **OWED A RULING**
+### FY §1: THREE NODES PAY BY WHO ELSE HOLDS THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS — **RULED AT GA; THE REPLACEMENT WAITS ON A PICK**
 
-**FY reported and ruled on nothing** (`docs/reports/FY.md` §1). None of this is the class shape that sank FX's four.
-Each is a way a node of a tree every class buys can pay a BUYER nothing:
+**The designer ruled three of the four at GA and confirmed the floor under the fourth** (`docs/reports/GA.md` §1 and
+§2). One ruling is blocked, and one wording is still owed:
 
-1. **Heal More When Low and We Do Not Break are party-wide by their read site** (a spawn stamp taking the best
-   holder's figure). In any party, the second, third and fourth class to buy one is paid nothing. FX recorded the
-   shape; whether *"a node must pay every class that can buy it"* is a rule about recipients or about buyers is the
-   question.
-2. **Enemies Look Past You is relative, and its text is false whenever other heroes hold it.** Measured over 4,000
-   paired draws, with all four heroes holding it, three of the four were targeted MORE than with nobody holding it
-   (22.9 / 30.4 / 23.7 / 22.9% against 16.9 / 54.6 / 14.6 / 13.9%). **Player-facing:** the card says *"65% less
-   likely to target this hero"*. The designer's save can buy it on every class on day one.
-3. **Three of the 27 are one idea by FW's own count**: A Cooldown Ticks on a Crit, A Crit Pays and Your Crits Crack
-   Guards. They write three fields, so `check_fx` §1 passes, but SR-CRIT 2 counts one trigger in any currency as
-   one thing. By the same rule, the distinct TODAY count is at most 46, not 50 (SR-REACH).
-4. **Deepening Hex's card** reads *"every 8th instead of every 10th, and never sooner than every 8th"*, and its
-   *"whatever the threshold is"* holds at the one live step only. The wording is the designer's.
+1. **~~Heal More When Low and We Do Not Break are party-wide by their read site~~ — RULED AT GA: BOTH STAY.** They
+   are redundant when stacked, not false, and that is a different problem. FY's text: in any party, the second, third
+   and fourth class to buy one is paid nothing.
+2. **ENEMIES LOOK PAST YOU — RULED AT GA: REPLACE IT. BLOCKED, BECAUSE NONE OF THE FIVE APPROVED ALTERNATES
+   QUALIFIES, SO IT STAYS UNTIL THE DESIGNER NAMES ONE.** Its text is still false whenever other heroes hold it. FY
+   measured three of the four heroes targeted MORE with all four holding it than with nobody holding it: 22.9 / 30.4 /
+   23.7 / 22.9% against 16.9 / 54.6 / 14.6 / 13.9%. **Player-facing:** the card says *"65% less likely to target
+   this hero"*.
+   - **Three of the five are already in the tree**, taken by FX as alternates for its own four. *Kill what is down*
+     is Kill What Is Down (`bonecracker_ranks`), *a crit pays* is A Crit Pays (`whetstone`), and *Breaking heals the
+     party* is Breaking Heals a Hero (`blood_communion`). A second copy would be a second node on a field the tree
+     already writes.
+   - **The other two pay the party once.** *When an ally falls low I answer* reads its first living holder
+     (`_living_hero_with("watchtower")`), and *enemy debuffs rebound* reads its best holder
+     (`_max_hero_rank("mirror_ranks")`).
+   - **THE POPULATION TO CHOOSE FROM, MEASURED.** Of SR-REACH's 37 every-class items, the tree writes the field of
+     23, writes one more in part, and does not write **13** at all. `docs/reports/GA.md` §1 lists the 13 with their
+     fields and caveats. It lists them as a measurement, not as a recommendation.
+3. **~~Three of the 27 are one idea by FW's own count~~ — RULED AT GA: ALL THREE STAY.** A Cooldown Ticks on a Crit, A
+   Crit Pays and Your Crits Crack Guards are three purchases, and a player meets them as three.
+   - **The counting rule is how `docs/systems-recon.html` counts distinct things, not a limit on what a tree may
+     contain.** The limit is `CLAUDE.md`'s field rule, which `check_fx` §1 asserts. The reasoning is in
+     `docs/design-notes.md` (GA).
+   - **The brief named More Crit Chance and Armor Penetration as two of the three.** Those are SR-CRIT's other two
+     rows, counted as distinct things, at tiers 1 and 2. FY's three sit at tiers 2, 3 and 3.
+4. **Deepening Hex's card** reads *"every 8th instead of every 10th, and never sooner than every 8th"*. Its
+   *"whatever the threshold is"* holds at the one live step only. **The floor stays at 8 (confirmed at GA). The
+   wording is still the designer's, and GA did not touch it.**
 
-### FOUR GATES CAN WRITE THE PLAYER'S `relics.json` THE DAY A RELIC IS LOCKED — **FOUND AT FY §5b, NOT FIXED**
+### FOUR GATES CAN WRITE THE PLAYER'S `relics.json` THE DAY A RELIC IS LOCKED — **FOUND AT FY §5b; DEFERRED BY RULING AT GA UNTIL THE GAME CAN BE TEST-PLAYED**
+
+**RULED AT GA: DEFERRED, TO BE REVISITED ONCE THE GAME RUNS AND CAN BE TEST-PLAYED. THE MEASUREMENT TRAVELS WITH
+THE DEFERRAL.**
+- **Four gates reach `Relics.unlock_random()` 14 times in one battery**: `check_ea` 2, `check_eg` 4, `check_eh` 3 and
+  `check_fh` 5 (FY §5b's pre-pass). `check_fh`'s share moves with how far its autoplay run gets.
+- **It is harmless only because every relic is unlocked.** GA checked that again: all 25 of the pool's 25 are in the
+  player's file.
+- **The first locked relic makes it permanent.** Each reach then unlocks one relic at random in the player's file,
+  until none is left locked, so up to 14 a battery.
 
 **The same shape FX found in the profile, one file over.** `battle._resolve_boss` opens with
 `Relics.unlock_random()`, and that function calls `Relics.save_data()`, which writes `Relics.SAVE_PATH`, the constant
@@ -163,19 +193,36 @@ and why the file has not been written since 2026-08-30.
 - **`check_fx` §4 lands the payloads on one spec per class and drives 24 of 27 read sites on one hero.** FY's probe
   landed all 27 on all twelve specs. A twelve-spec arm would close the gap for the next node.
 
-### `docs/instrument-rules.md` STILL DESCRIBES DD's DIFFER IN THE PRESENT TENSE — **FOUND AT FZ, NOT FIXED**
+### ~~`docs/instrument-rules.md` STILL DESCRIBES DD's DIFFER IN THE PRESENT TENSE~~ — **CLOSED AT GA §3, WITH SIXTEEN MORE**
 
-**Two bullets under *GATES THAT PASS WITHOUT ASKING THEIR QUESTION* were written at DD and read as current:**
-- *"`test_batch_cd` §1 is what diffs them"*;
-- *"AND IT COSTS 22 MINUTES: IT RUNS THE BATTERY INSIDE THE BATTERY. `run_battery.sh` carries
-  `TMO[test_batch_cd]=2400` for that"*.
+**Both of FZ's bullets are deleted**: *"`test_batch_cd` §1 is what diffs them"*, and *"AND IT COSTS 22 MINUTES …
+`TMO[test_batch_cd]=2400`"*. That is DR's rule: the thing they describe is gone, so the claim goes rather than being
+re-tensed. **A sweep of the whole file found sixteen more**, and the census was written before the first correction
+(`docs/reports/GA.md` §3).
 
-**Both went at DE.** The same file's *THE COUNT DIFFER IS A PROPERTY OF THE RUN* block, about 600 lines above them,
-says the 2400-second bound *"is gone"* and that the differ is `check_de`. `run_battery.sh`'s own comment says the
-same, and `test_batch_cd.gd` spawns nothing now. **So the file gives two readings of one fact**, which is the shape
-`docs/ways-of-working.md`'s preamble names as the reason for its no-second-copy rule.
-- No gate pins either sentence (swept at FZ), so the repair is a change of tense and a pointer to the DE block.
-- **Not taken at FZ**, whose brief forbade rewriting any other rule.
+**The half worth keeping:** FZ found two by reading, and a population sweep of the same file found eighteen.
+- Nine described something gone.
+- Four named something that had only moved, and were corrected under the file's own EB §2 rule.
+- Five were stale figures.
+
+### FOUND AT GA AND NOT FIXED — **THE SAME SHAPE OUTSIDE `docs/instrument-rules.md`; NONE IS PLAYER-FACING**
+
+- **`CLAUDE.md`'s index of the reference file (*"WHAT IS OVER THERE"*) lists three rows whose rule is not over
+  there.**
+  - *A FALLBACK IS WHAT MAKES ITS CONSUMERS LOOK FINE* (FM §1) is a heading in neither file.
+  - *A GATED RUNE AT A FLAT PRICE IS STRICTLY WORSE THAN A BARE ONE* (FN §1) is a `##` heading in `CLAUDE.md` itself.
+  - *THE `.docx` EXPORTS STAY STALE* (FN §3) says in its own cell that `CLAUDE.md` carries it.
+
+  **The FR §5a / FS §1 block that IS over there has no row.** The index's *"The last four rows are FG's, FH's and
+  FI's"* stopped being true when three more rows were added after them. `check_ff` §1 and §4 read that index, and
+  GA's brief did not include `CLAUDE.md`.
+- **`scripts/run_state.gd`:198**, FI's header comment, says the save redirect is *"decided once in `_ready()`"*. The
+  comment above `_init()`, fifteen lines below it, says **"`_init`, NOT `_ready`"**, and that matches the code. A
+  comment is an asserted surface, so its repair owes the source literal sweep.
+- **Two claims in `docs/instrument-rules.md` are dated readings that GA did not re-derive, and it says so rather than
+  passing them:** DX §1's *"THIRTY-FIVE ASSERT A FLOOR NOW"* and EU's *"ALL FIVE ARE CORRECT TODAY"*.
+- **This file's own *Knowledge sync, re-measured at EG* section** carries EG's 104.70 KiB for
+  `docs/instrument-rules.md`. The live size is `check_fr` §5's print, and the reference points there now.
 
 ### FOUND AT FX AND NOT FIXED — **NONE BLOCKS A BATCH; THE FIRST TWO ARE PLAYER-FACING WORDING**
 
