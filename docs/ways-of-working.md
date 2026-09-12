@@ -41,6 +41,42 @@ was wanted — and by then the discovery arrives as a report rather than as a co
   that rule and still be under-specified**, because verification catches a claim that is false and
   cannot catch a decision that was never made.
 
+## A BRIEF PRICES WHAT IT ASKS FOR
+
+> **Before an instruction that sweeps, censuses, drives or walks a population, the brief states how
+> large that population is and roughly what the work costs — and if it does not know, it says so
+> and asks for the size before the run rather than after.**
+>
+> **A one-line instruction can be an hour of batteries.** *"Take the census"* over 98 targets run
+> alone against a fresh copy is not the same size as the sentence that asks for it, and neither is
+> *"drive all 27 across four classes."*
+>
+> **The failure is asymmetric.** An under-priced instruction costs a session; an over-priced one
+> costs a sentence. **When the size is unknown, ask for the method and the population first and
+> defer the run.**
+
+**Three instances, kept with the rule because a rule with its history attached survives a
+compaction.** Each was a sentence or less.
+
+· **DD §1: *"Widen it to all 45."*** What it widened was `test_batch_cd`'s count table, and that
+  suite answered its question by spawning a child Godot for every suite it watched — so the
+  widening ran the battery inside the battery, and **29.6 minutes became about fifty** (DE
+  measured 49.9 minutes). **DE, the next batch, moved the comparison out of the suite** into a
+  post-pass that spawns nothing. Why widening a walk that itself walks squares the work is already
+  a rule, in `docs/instrument-rules.md` under
+  *THE COUNT DIFFER IS A PROPERTY OF THE RUN, NOT OF A SUITE IN IT*, and it is not restated here.
+· **FY §5: *"report whether any OTHER target writes profile.json"*, and then *"Take it."*** It was
+  modelled on FI's census, which ran all 98 battery targets **each alone against a fresh copy of
+  the save**. FY ran every target once in a single copy instead, with the three save writers each
+  printing the path it wrote into its own target's log, so the census fitted inside a battery the
+  batch already owed. **The method set the price, and the brief named neither.**
+· **FY §1: *"Report the failure mode across the whole 27, not just the four."*** Read as a drive,
+  that is twenty-seven nodes on four classes: **108 live battles**. What was wanted was a reading
+  for the shape, and nothing in the sentence said which of the two it was.
+· **NOTHING IN THE TREE CAN CHECK THIS RULE.** A brief is not in the repository, so no file differs
+  according to whether an instruction was priced. `check_fr.gd` names it among the rules it cannot
+  assert, and like the rules around it, it is kept by people rather than by an instrument.
+
 ## RECON BEFORE AUTHORING
 
 > **Before content is written for an area, a batch reads out what already exists there: the

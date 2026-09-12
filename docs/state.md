@@ -13,52 +13,42 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-11 (Batch FY).*
+*Last rewritten: 2026-09-11 (Batch FZ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: FY — WHY FOUR NODES COULD NOT PAY EVERY CLASS. THE SIXTH BATCH ON `class-merge`.** It carried a
-  report, two rulings the designer took, and two checks on what FX left. No node was swapped and no magnitude moved.
-  `main` is untouched. Full working: **`docs/reports/FY.md`**.
-- **FW's TODAY MEANS *SOME HERO*, AND THE RECON NOW SAYS SO.** Of FX's four failures, two were the class shape: a
-  field read for one currency. FW had flagged both in its own cost cells. The other two were never TODAY: one was
-  FW's SMALL item, and the other was FW's item with its trigger reversed. **The reversed item's TODAY twin pays the
-  Survivalist alone**, measured. Of the fifty TODAY items:
-  - 37 pay every class;
-  - 6 are class-conditional;
-  - 1 pays a single spec;
-  - 5 pay the party once;
-  - 1 is relative.
+- **Last batch: FZ — A BRIEF PRICES WHAT IT ASKS FOR. THE SEVENTH BATCH ON `class-merge`.** One rule, written into
+  `docs/ways-of-working.md` beside *DESIGN IS SETTLED BEFORE A BRIEF EXISTS*. No game code, no data file, no node, no
+  rune and no magnitude moved. `main` is untouched. Full working: **`docs/reports/FZ.md`**.
+- **THE RULE.** Before an instruction that sweeps, censuses, drives or walks a population, the brief states how large
+  that population is and roughly what the work costs, and when it does not know, it asks for the size before the run.
+  Its three instances travel with it:
+  - DD's *"Widen it to all 45"*, which took the battery from 29.6 minutes to about fifty;
+  - FY's §5 profile census, modelled on FI's 98 isolated runs;
+  - FY's §1, which read as a drive would have been 108 live battles.
 
-  **`docs/systems-recon.html` carries the reach as SR-REACH**, with a local note on each unflagged row.
-- **DEEPENING HEX'S FLOOR IS 8** (ruled: re-derive against the live tree). Nothing installs a Ruin step below 10,
-  and the rune subtracts 2. Nothing in play moves. **The floor now sits on the rune's own result**, so the next
-  thing that lowers the base step meets it at once. `check_fo` §1c pins 10, 2 and 8 as one relation.
-- **THE WIDE WATCH STAYS RETIRED** (ruled), and its string now says why: the Shared Mark holds its place. FO's
-  reason is marked void, because its node went at FX.
-- **NO TARGET WRITES THE PLAYER'S `profile.json`.** This was the first census of it. All 108 targets ran in a copy
-  whose three save writers printed each path they wrote. Twelve targets write a profile, each to its own scratch
-  file, and none writes the player's. **Found beside it:** four gates reach the boss-victory handler
-  (`check_ea`, `check_eg` and `check_eh` call it directly; `check_fh` reaches it through its live run's boss
-  kills), and that handler's first line unlocks a relic and saves `user://relics.json` (a constant path with no
-  redirect). The designer's file has every relic unlocked, so the save never happens. **The first locked relic
-  makes those gates write the player's file** (queue item below).
-- **FX's 1,864 DELETED CHECKS WERE AUDITED INDEPENDENTLY: none measured an outcome, and the count reproduces file
-  by file.** About 202 asserted a deleted node's payload content, which FX's summary list leaves out. About 80
-  design numbers on dormant fields are now asserted nowhere in their suites.
+  **Nothing in the tree can check it**, because a brief is not in the repository. `check_fr.gd`'s header says so,
+  beside the six rules it already could not assert.
+- **THE COROLLARY WAS ALREADY RECORDED, SO IT WAS NOT WRITTEN AGAIN.** `docs/instrument-rules.md`'s DE rule says a
+  suite that spawns suites squares the work when you widen it. The DD instance points at it. `CLAUDE.md` carries only
+  that rule's heading, in its index.
+- **THE BRIEF'S PREMISES: THE RULE STANDS, AND THREE INCIDENTAL CLAIMS WERE OFF** (`docs/reports/FZ.md` §0):
+  - DD's file is `test_batch_cd`, and there has never been a `check_cd`;
+  - DE did not undo DD's widening: it moved the comparison out of the suite, and the coverage stayed;
+  - all three quotes are paraphrases, and FY's census instruction was a seven-word clause and *"Take it."*, not
+    eight words.
 - **WHAT MOVED:**
-  - `scripts/battle.gd`: `RUIN_FLOOR` and comments.
-  - `data/runes.json`: one number on Deepening Hex's card, and the Wide Watch's `retired` string.
-  - `check_fo.gd` (85 → 87) and `check_ez.gd` (98, re-pointed in place).
-  - `CLAUDE.md`, `docs/master.html` and its stamp, `docs/systems-recon.html`, the changelog, the design notes, this
-    file, `baselines.json` and `pin-manifest.json`.
-  - `docs/reports/FY.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/FY.md` §6**, written after the acceptance run.
+  - `docs/ways-of-working.md`: the rule.
+  - `check_fr.gd`: its header comment only. Still 25 checks.
+  - The changelog, this file and `docs/reports/FZ.md` (**NEW**).
+  - **`docs/master.html` is not edited and its stamp is not bumped**, because nothing a player can meet changed. The
+    brief's *"and the stamp"* is read as this file's *Last rewritten* line, which is FU's reading of the same words.
+- **VERIFICATION:** in **`docs/reports/FZ.md` §4**, written after the acceptance run.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is next**, and FP's measurements for it stand.
-- **Next letter: FZ.**
+- **Next letter: GA.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -172,6 +162,20 @@ and why the file has not been written since 2026-08-30.
   was never measured at either commit.
 - **`check_fx` §4 lands the payloads on one spec per class and drives 24 of 27 read sites on one hero.** FY's probe
   landed all 27 on all twelve specs. A twelve-spec arm would close the gap for the next node.
+
+### `docs/instrument-rules.md` STILL DESCRIBES DD's DIFFER IN THE PRESENT TENSE — **FOUND AT FZ, NOT FIXED**
+
+**Two bullets under *GATES THAT PASS WITHOUT ASKING THEIR QUESTION* were written at DD and read as current:**
+- *"`test_batch_cd` §1 is what diffs them"*;
+- *"AND IT COSTS 22 MINUTES: IT RUNS THE BATTERY INSIDE THE BATTERY. `run_battery.sh` carries
+  `TMO[test_batch_cd]=2400` for that"*.
+
+**Both went at DE.** The same file's *THE COUNT DIFFER IS A PROPERTY OF THE RUN* block, about 600 lines above them,
+says the 2400-second bound *"is gone"* and that the differ is `check_de`. `run_battery.sh`'s own comment says the
+same, and `test_batch_cd.gd` spawns nothing now. **So the file gives two readings of one fact**, which is the shape
+`docs/ways-of-working.md`'s preamble names as the reason for its no-second-copy rule.
+- No gate pins either sentence (swept at FZ), so the repair is a change of tense and a pointer to the DE block.
+- **Not taken at FZ**, whose brief forbade rewriting any other rule.
 
 ### FOUND AT FX AND NOT FIXED — **NONE BLOCKS A BATCH; THE FIRST TWO ARE PLAYER-FACING WORDING**
 

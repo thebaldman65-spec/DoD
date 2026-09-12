@@ -17,16 +17,18 @@
 #
 # ── WHAT THIS GATE CANNOT DO, SAID FIRST ────────────────────────────────────
 # **MOST OF THAT FILE IS NOT MECHANICALLY CHECKABLE AND THIS GATE DOES NOT
-# PRETEND OTHERWISE.** Six of its eight rule blocks are about how a batch comes
-# to EXIST — design settled before a brief, a recon read before authoring, the
-# assistant able to state what a thing changes and reads, findings routed to the
-# queue, implementation calls belonging to the batch, a batch being mostly
-# transcription. **Not one of those leaves an artefact in the tree.** There is
-# no file whose contents differ according to whether the designer and the
-# assistant settled a name in conversation first. A check claiming to assert
-# them would be a check that always passes, which is worse than none — it would
-# make the file look instrumented while enforcing nothing, and that is precisely
-# the fault this gate was built to end.
+# PRETEND OTHERWISE.** Seven of its nine rule blocks are about how a batch comes
+# to EXIST — design settled before a brief, a brief pricing what it asks for, a
+# recon read before authoring, the assistant able to state what a thing changes
+# and reads, findings routed to the queue, implementation calls belonging to the
+# batch, a batch being mostly transcription. **Not one of those leaves an
+# artefact in the tree.** There is no file whose contents differ according to
+# whether the designer and the assistant settled a name in conversation first,
+# and none according to whether a brief said how large a population it sent a
+# batch to walk: a brief is not in the repository (FZ). A check claiming to
+# assert them would be a check that always passes, which is worse than none —
+# it would make the file look instrumented while enforcing nothing, and that is
+# precisely the fault this gate was built to end.
 #
 # **SO IT ASSERTS THE TWO RULES THAT HAVE ARTEFACTS, AND THE FILE'S OWN
 # HOUSEKEEPING RULES, AND SAYS SO.** The branch rule has a git ref and a
