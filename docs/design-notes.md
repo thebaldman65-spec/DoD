@@ -4,6 +4,49 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Six rules whose facts moved, and a ruling recorded before it is built says so (Batch GC) — 2026-09-13
+
+**The four retirements are marked, not corrected, because a rule corrected to describe a dead feature is still a rule
+about a dead feature.** BH's fifteen-point test read a lane's headline, and there are no lanes; the honest edit was to
+take the rule out and say where it went. Two blocks already disagreed about it: BM §2's said it had retired with the
+lanes, and BH §2's, further down the same file, went on stating it as a rule. A reader who meets the second block first
+has no reason to go looking for the first. BA's contagion reservation keeps its point, that a disease spec is planned
+and its idea is not to be spent early, and loses only the clause that reserved a tree nobody has. CN's relic was the
+purest case: named as an opt-in exception to the difficulty rule, and never written. A conditional ("if such a relic is
+ever authored") would have kept a sentence about something that does not exist, and the next sweep would have had to
+find it again.
+
+**The skill-check cap is amended rather than dropped, and the reason it keeps is not quite the reason it was given.**
+CS capped the Sharpshooter's chain at four because Focus has no ceiling, and a chain that followed it would tighten past
+what a player without the reflexes can hold. That argument had two halves and EY's slower bar split them. At four
+presses the chain now lands almost every time on the project's own timing model, so "four is hard enough" is no longer
+true and no longer needed. Past four it is still true, because each press is narrower than the last and nothing widens
+them, so a chain long enough to follow Focus collapses however slow the bar is. What the cap protects is the bound, not
+the number. That is also why a rune may raise it and a batch may not: a rune is a choice the player buys, by a fixed
+amount, and a batch raising the constant changes the most-used action of every Sharpshooter at once.
+
+**Working the arithmetic for the amendment turned up something about the rune itself.** Long Draw's card says the press
+it adds buys no widening, so the chain is harder to hold. That is true at the top stage only. Below 150 Focus the added
+press takes the widening the table gives a longer chain, a table solved to make a longer chain exactly as easy to hold,
+so at three stages of four the rune costs nothing at all. Whether the card's words or the rune's shape should change is
+the designer's, and it is surfaced rather than decided.
+
+**`RULED, NOT BUILT` is a category and not a correction to one line, because the fault is in how rulings are written
+down, not in any one ruling.** FT recorded that Focus "is the Hunter's". That was the ruling, correctly transcribed, in
+the tense the rule file uses for everything it says. The file has one tense because it describes what the game is, and a
+decision taken ahead of its build is not yet part of the game; the marker is what lets the file say both kinds of thing
+without the reader having to know which is which. The census before the marking found ten claims of that shape among
+881, all in the merge's two unbuilt halves (whose core is attached, and whether the engines have moved), and none in the
+design document or the source. That is what should be true of documents that describe the game rather than the plan for
+it. It also found the opposite fault nearly fourteen times as often: text still describing what the merge had already
+changed. That half is a different category and is queued rather than fixed, because the brief that ruled this one did
+not rule those rules.
+
+**Deflection stands because the sweep picked it before anyone did.** The designer's own label contains the glossary's
+word for the mechanic and shares a word with four other names a player can meet; the precedent's name collides with
+nothing and is already the word the combat log prints. Recording the sweep beside the ruling is what stops a later
+session reading "a noun among phrases" as an inconsistency to tidy.
+
 ## Deflection takes the cell, and three files are swept for what they state (Batch GB) — 2026-09-12
 
 **I proposed the precedent's name over the brief's label because the name sweep said to.** The brief's label is the

@@ -40,6 +40,10 @@ was wanted — and by then the discovery arrives as a report rather than as a co
   been handed. This one governs how the brief came to be written. **A brief can pass every check in
   that rule and still be under-specified**, because verification catches a claim that is false and
   cannot catch a decision that was never made.
+· **AND A RULING SETTLED HERE IS NOT YET A FACT ABOUT THE GAME.** Until a batch builds it, the rule
+  file marks it `RULED, NOT BUILT` — that is `CLAUDE.md`'s rule and is not restated here. **A brief
+  that states a ruling in the present tense hands the batch the same false fact**, and the batch has
+  no way to tell a transcribed decision from a description of the code it is about to change.
 
 ## A BRIEF PRICES WHAT IT ASKS FOR
 
@@ -162,14 +166,15 @@ the three anyone predicts, and the two hardest entries are not documents at all.
 | `docs/reports/XX.md` | One new file per batch. Cannot conflict. |
 | `run_battery.sh` | Both sides' `GATES` / `SUITES` entries survive — it is one array and a target is a name. |
 | `pin-manifest.json` | **NEVER hand-merged. It is DERIVED.** Take either side and re-run `build_pin_manifest.py`; `check_ed` is what says the result is right. |
-| `baselines.json` | Both sides' ROWS survive, but **a count is not a fact about a file, it is a fact about a GAME** — every engine-bound row measured on the branch is wrong for `main` and the reverse. Rows merge; numbers are re-measured. |
+| `baselines.json` | Both sides' ROWS survive, but **a count is not a fact about a file, it is a fact about a GAME** — once the engines move, every engine-bound row measured on the branch is wrong for `main` and the reverse (the move is RULED, NOT BUILT). Rows merge; numbers are re-measured. |
 | `CLAUDE.md` | See below. |
 | `docs/master.html` | **The hardest one, and it is not `CLAUDE.md`.** See below. |
 
 · **`CLAUDE.md` RECONCILES BY WHAT A RULE IS ABOUT, NOT BY WHO WROTE IT.** A rule that names no
   spec, engine or node **is true on both sides** — instrument rules, working agreements, the
   verification floor — and **both sides' additions are kept**. A rule that NAMES one is a claim
-  about a game only one side has, and at the merge point the branch's reading wins, because the
+  about a game only one side has — a node's since FX; a spec's or an engine's once they dissolve,
+  which is RULED, NOT BUILT — and at the merge point the branch's reading wins, because the
   branch's game is the one that ships. **THIS IS A TRIAGE AND NOT A DECISION PROCEDURE**: it says
   which rules need a human read, and roughly half of them do.
 · **`master.html` IS HARDER BECAUSE IT IS THE ONE DOCUMENT THAT IS NOT ALLOWED TO HOLD HISTORY.**

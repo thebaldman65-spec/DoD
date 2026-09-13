@@ -39,6 +39,25 @@ an instruction. Cite the batch that set it in parentheses for provenance, and st
 not measured as a share of anything, and it does not state its own live size: writing that number
 into this file changes it.
 
+**A RULING RECORDED BEFORE IT IS BUILT SAYS SO (STANDING, SET AT GC, RULED BY THE DESIGNER).**
+> **`CLAUDE.md` states what the game IS; a decision taken and not yet implemented is marked
+> RULED, NOT BUILT until it is. A batch reads the present tense as a fact.**
+
+- **THE MARKER IS THAT EXACT PHRASE, WRITTEN BESIDE THE CLAIM IT QUALIFIES**, so one sweep finds every
+  instance and a reader meets it where the claim is. `docs/state.md`, `docs/instrument-rules.md` and
+  `docs/ways-of-working.md` use the same phrase for the same reason.
+- **THE BATCH THAT BUILDS THE THING TAKES THE MARKER OFF, IN THE SAME BATCH.** A marker that outlives
+  its build is this fault pointed the other way: *"not built"* is read as a fact too, and a batch routes
+  around, or builds a second time, something that exists.
+- **THE WORKED EXAMPLE IS FT §1**, which recorded Focus as the Hunter's class core while the only hero
+  who carries Focus is the Sharpshooter. **GC's census of 881 claims resting on a merge
+  ruling, across the five documents that state the present and the game's own source, found ten of
+  that shape, FT §1's among them**: six say a class core is attached, three describe the engine
+  move as done, and one named a relic that was never authored. None is in `docs/master.html` or in
+  the source (`docs/reports/GC.md` §3).
+- **`docs/master.html` NEVER CARRIES IT.** That document shows only what is in the game, so a thing
+  ruled and not built is absent from it rather than marked in it.
+
 ## THE INSTRUMENT RULES LIVE IN `docs/instrument-rules.md` (STANDING, SET AT EF §2)
 > **THIS FILE IS THE REQUIRED READ. `docs/instrument-rules.md` IS A REFERENCE IT POINTS AT, AND IT
 > IS OPENED WHEN A BATCH BUILDS, REPAIRS OR RUNS AN INSTRUMENT.** There are not two files a batch
@@ -162,7 +181,8 @@ than moved there** — FG's, FH's, FI's, and FR §5a's as FS §1 closed it:
   the real battle path. Four suites (al, bp, br, bw) hung for five batches on
   `_defensive_brace`'s `else` branch awaiting `_skill_done` — a signal only a key press emits —
   at zero CPU, mid-battle. **A Profile flag is not a bot guard**
-  either: `check_cm_live.gd` set two by hand, which is one file knowing about the trap.
+  either: `check_cm_live.gd` set two by hand, which is one file knowing about the trap. **Any
+  future headless modal will hit this.**
 - **ALL PLAYER-FACING TEXT IS WRITTEN TO `docs/text-standard.html` (STANDING, SET AT BATCH CJ).
   EVERY BATCH FROM CJ FORWARD, INCLUDING TUNING THAT COMES OUT OF PLAYTESTING.** Ability
   `description` and `perfect_text`, `passive_desc`, status/chip text, talent nodes, runes,
@@ -461,8 +481,12 @@ those are a PROFILE rather than constants.**
 > access to through no fault of their build**, which is the failure mode that sank timed hits in
 > Legend of Dragoon and Mother 3.
 >
-> **TWO DELIBERATE EXCEPTIONS, BOTH OPT-IN:** the **Sharpshooter**, whose bar is meant to be
-> harder and to pay more, and the **relic that swaps a hero's bar for a riskier one while held.**
+> **ONE DELIBERATE EXCEPTION, AND IT IS OPT-IN:** the **Sharpshooter**, whose bar is meant to be
+> harder and to pay more. *(A second, a relic swapping a hero's bar for a riskier one, was named
+> here from CN and never authored: no relic in `relics.gd` has ever touched the bar. GC deleted
+> the clause, ruled by the designer, rather than keep it as a conditional.)* **The Long Draw rune,
+> which adds a press at every stage and lifts the cap by the same one, is sanctioned where the cap
+> is — the sequence block below — and it is opt-in because it is bought.**
 >
 > **THE SHARPSHOOTER'S EXCEPTION IS SPENT, AND IT IS A FIXED OFFSET RATHER THAN A SLOPE:** 15%
 > less timing tolerance than everybody else's, the same 15% at one press and at four. Harder than
@@ -784,11 +808,30 @@ The brief is the shared record; leaving an error in it means the next brief inhe
 (`lethal_aim`) and off **slot 0**, never off a name, because his basic IS Quick Shot and two other
 specs carry the same object.
 - **ONE PRESS, PLUS ONE PER 50 FOCUS HELD, CAPPED AT FOUR**, read at the moment the bar opens.
-  The Long Draw rune raises both the count and the cap by its own figure.
-- **THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE. DO NOT RAISE IT.** Focus has no ceiling,
-  so an uncapped rule makes deep Focus a nine-press sequence with a tightening window **on the
-  action he presses most** — an ability a player without the reflexes cannot use. `check_cs.gd`
-  asserts the cap and the reason sits beside `SS_SEQ_MAX_PRESSES`.
+- **THE CAP IS FOUR, AND A RUNE MAY RAISE IT. A BATCH MAY NOT (AMENDED AT GC, RULED BY THE
+  DESIGNER).** The Long Draw rune is the sanctioned exception: it adds one press at every stage and
+  raises the cap by that same one. At the top stage its five-press chain opens at the four-press
+  row — `SS_SEQ_OPEN` has four rows and is deliberately not extended — so the fifth press is one
+  more taper step with no widening to pay for it, which is the rune's cost. `check_cs.gd` asserts
+  the cap, `check_ez` §5 the rune, and the reason sits beside `SS_SEQ_MAX_PRESSES`.
+  · **CS'S REASON, KEPT RATHER THAN DROPPED:** *"Focus has no ceiling, so an uncapped rule makes
+    400 Focus a nine-press sequence with a tightening window on his most-used action — an ability
+    a player without the reflexes simply cannot use."* **Four is the ceiling; Focus keeps climbing
+    and the sequence does not.** The half worth keeping is the BOUND: a chain whose length follows
+    a meter with no ceiling has no length.
+  · **WHY A RUNE MAY AND A BATCH MAY NOT.** A batch that raises `SS_SEQ_MAX_PRESSES` lengthens every
+    Sharpshooter's most-used action for every player at once, which is CN's *spec a player can lose
+    access to through no fault of their build*. A rune IS the build: bought per hero, per run,
+    declinable, and written with the designer. It raises the cap by its own fixed figure, so the
+    chain still does not follow Focus. **A rune that raised the cap by an amount read off Focus
+    would be the uncapped rule again, and this amendment does not sanction it.**
+  · **EY'S SLOWER BAR OUTGREW THE REASON AT FOUR AND NOT PAST IT, SO ONLY THE SECOND HALF IS KEPT.**
+    At the base sweep of 1.00, `check_cs`'s own model lands the capped four-press chain 98.8% of the
+    time and his opening window is 97.3% of the track (EY §1b): at the cap the difficulty half of
+    the reason no longer holds, and nothing here rests on it. **Past the cap it still holds,
+    because the taper compounds** — the same model lands a nine-press chain 49.5% of the time
+    (19.5% at 0.72). The slower bar moved the collapse about two presses deeper and did not remove
+    it. The table is in `docs/reports/GC.md` §2.
 - **PARTIAL CREDIT: every landed press counts, a miss ENDS the sequence and keeps what came
   before.** "Landed" is Good or better. **This REPLACED CN's worst-grade combine rather than
   joining it** — `_worse_grade` and `_GRADE_ORDER` are deleted, so both behaviours are not left
@@ -1523,8 +1566,12 @@ the draft assigns relics before there are specs to assign them to.
 **RETIRED WITH ITS SUBJECT AT FX: THE ONE TALENT TREE HAS NO LANES AND NO ROWS.** Row 8 was the
 node that only mattered once the rest of its LANE was bought, and BH's fifteen-point
 leave-one-out read a LANE's headline; neither a lane nor a row exists any more, and Harmonic
-Convergence — the lane it was owed on — went with the twelve trees. **What survives of both is the
-property that made them rules: NO NODE MAY BE A LARGER MAGNITUDE OF ANOTHER.** A shared field is
+Convergence — the lane it was owed on — went with the twelve trees. **BH §2's own block went on
+standing further down this file, written as a live rule, until GC deleted it (ruled by the
+designer):** its text and its three caveats on reading a lane's grid are in the file as GB left it
+(`fce040c`), and BI §1's rule, which the third caveat pointed at, stands on its own. **What
+survives of both is the property that made them rules: NO NODE MAY BE A LARGER MAGNITUDE OF
+ANOTHER.** A shared field is
 still the signature of a re-skin (BC diagnosed it, BH proved it), and in the one tree it is
 asserted over the whole tree rather than a lane: no two nodes write one field (`check_fx` §1). **A
 batch that authors a second node on a field the tree already writes has authored the re-skin.**
@@ -1665,27 +1712,6 @@ the two functions or it reports nothing.
 · Renderer `_append_breakdown(...)` is written ONCE and called TWICE (whole run, final battle);
   everything goes into the SAME line list `_summary_plain_text` walks, so the Copy button stays
   complete. **Not a defeat-only screen** — wipes, forfeits and completions all get it.
-## STANDING RULE — FIFTEEN POINTS UNDER LEAVE-ONE-OUT IS WHAT MAKES A LANE A LANE (Batch BH §2)
-**If withholding any single node moves a lane's headline contribution by more than about fifteen
-points, that lane is not a set of choices — it is ONE choice with several prices, and no amount
-of re-pricing will make it behave.** BC's grid had Communion at THIRTY-THREE on the Devout's
-Faith lane, and four consecutive batches then tuned magnitudes on a lane whose fault was its
-shape. This is a test you can run on a tree before anybody plays it, and it is cheap:
-`DOD_SIM_TALENTS` with one id withheld is the whole harness.
-**TWO CAVEATS THAT MUST TRAVEL WITH IT, both learned by running it (BH §2):**
-· **A LANE THAT DOES LITTLE PASSES TRIVIALLY.** No node can move a headline by fifteen points
-when the whole lane is worth three above ungeared. Read the grid against the lane's own
-distance from the ungeared floor, never as an absolute.
-· **THE GRID UNDER-REPORTS EVERY NODE IN A COMPOUNDING LANE.** Where several nodes multiply the
-same term, withholding one leaves the others multiplying, so each reads small and the total is
-large. BC measured Binding Oath at one point on exactly this lane. **A small leave-one-out
-number is evidence of a node's marginal worth, NOT of its structural role.**
-· **A THIRD CAVEAT, ADDED BY BATCH BI §1, AND IT IS THE ONE THAT NEARLY GOT MISSED: A FLAT GRID
-ON A LANE THAT DOES SOMETHING IS A FINDING, NOT A NULL RESULT.** BH's grid moved by at most one
-point in any cell and read as "the lane is fine, just small". It was the signature of the
-antagonism in the standing rule directly below — every node's contribution was being eaten by
-its neighbour's — and no amount of re-pricing would have found it.
-
 ## STANDING RULE — HELD VALUE AND SPEND FREQUENCY ARE ANTAGONISTIC ON A SINGLE METER (Batch BI §1)
 **A resource that both (a) pays something while HELD and (b) is CONSUMED at a threshold has two
 effects reading one number and wanting opposite things from it: the spend wants it empty, the
@@ -1709,8 +1735,10 @@ as a bug.
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
 **A core engine rewards a PATTERN and pays in a NEUTRAL currency**, so it says nothing about how a
 hero fights. Burn, Chilled, Resonance, Mercy, Faith, Ruin, Frenzy, plating and stances are BUILD
-identities and none may be a core. Focus already satisfies the rule and is the Hunter's; **Momentum
-(Warrior), Channel (Mage) and Sanctity (Cleric) are the other three and were built at FT.**
+identities and none may be a core. Focus already satisfies the rule, and it is ruled the Hunter's
+core — **RULED, NOT BUILT: only the Sharpshooter carries Focus today, as his spec's meter.** **Momentum
+(Warrior), Channel (Mage) and Sanctity (Cleric) are the other three; their machinery was built at FT,
+and attaching each to its class is RULED, NOT BUILT** (the switches below).
 
 **AND ALL THREE ACCUMULATE AND PAY WHILE HELD AND ARE NEVER CONSUMED, WHICH IS BI §1's PRESCRIBED
 SHAPE RATHER THAN THE ONE IT WARNS ABOUT.** BI §1's antagonism needs a meter that both pays while
@@ -1789,8 +1817,9 @@ UNDER WHICH IT IS RE-READ (FV §2, §3).**
 
 ## STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
-may be authored into the Survivalist's tree, or into any existing spec, until that spec is
-built.** Off-limits: transmission between enemies, transmission from a corpse, field-wide
+may be authored into any existing spec until that spec is built.** *(The rule also reserved the
+Survivalist's TREE. FX deleted the twelve spec trees, and GC retired that clause, ruled by the
+designer, rather than leave it reserving a tree that does not exist.)* Off-limits: transmission between enemies, transmission from a corpse, field-wide
 infection — anything that spreads WITHOUT the hero acting. **POISON ITSELF IS NOT RESERVED
 AND STAYS ENTIRELY THE SURVIVALIST'S**: poison is craft — curare, hemlock, a blade wiped on
 the right leaf. The distinction to hold is *a hunter who knows which plant does what* versus
@@ -1895,14 +1924,15 @@ was written. No meter is ungoverned. meter | what governs it | where the governo
   `docs/reports/FU.md` §2 | `channel_steps()`/`channel_bonus()` in `unit.gd` (THE ONE PLACE THE
   SPLIT IS DECIDED); the ledger is written at `note_resource_spent`, the one net-off-the-bar door
   CZ §1 already books Rage through.
-· **momentum** (Warrior spine) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
+· **momentum** (the Warrior spine — RULED, NOT BUILT; machinery on nobody) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
   clamps at `MOMENTUM_MAX_STEPS`, so this is the one of the three that never accumulates past its
   ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one EXCHANGE a turn, a step on
   every `MOMENTUM_EXCHANGES_PER_STEP`-th (FV §2), and an exchange only for a turn carrying BOTH
   halves: he dealt, and the fight reached him — health lost, or a blow met (FV §1) |
   `note_momentum_turn()` and `note_blow_met()` in `unit.gd`; the one blow-met call is in
   `_resolve`'s strike loop.
-· **sanctity_events** (Cleric spine, uncapped, static, battle-scoped) | **a FLAT CAP on the READ**
+· **sanctity_events** (the Cleric spine — RULED, NOT BUILT; machinery on nobody; uncapped, static,
+  battle-scoped) | **a FLAT CAP on the READ**
   (`sanctity_steps()` is `mini(events / SANCTITY_PER_STEP, SANCTITY_MAX_STEPS)`, the constants
   named rather than copied here) **plus a DEDUPE that is the real governor**: ONE EVENT PER (TURN,
   BODY, STATUS), so churning one status on one body is worth one however many times it is done.
@@ -3701,6 +3731,15 @@ call and one string).
   than assumed, and it is what made the two `Long Watch` runes safe as well, until FK renamed the Holy's `Carried
   Mercy`** — the Warden's and the Holy's have disjoint spec scopes and `_scope_ok` runs before the dedupe, so no hero can ever
   hold both and the dedupe can never mis-fire.
+· **CONFIRMED AT GC — THE TIER-2 NODE IS *DEFLECTION*, AND THE NAME IS NOT REVISITED (ruled by the
+  designer).** GB swept it against **746 names in ten populations** — abilities, enemies, enemy
+  abilities, glossary terms, items, talent nodes, relics, runes retired included, statuses by id
+  and by label, and the tags — and it met **nothing: no exact, no contained and no shared-word
+  hit.** It is the precedent node's own name (`sm_composure`) and the field's (`deflection`), and
+  it is what the read site's log line already prints. **The designer's own label, *Parry Ranged
+  Blows*, near-misses five** — the glossary's own term *Parry*, the abilities Crushing Blow and
+  Mocking Blow, the node Parry More and the status Parry Up. That sweep is the reason for the name,
+  and it is recorded with the ruling so the name is not revisited.
 
 ## STANDING RULE — A RUNE'S CLAUSE MUST BE CHECKED AGAINST THE BASE KIT, NOT ONLY AGAINST THE
 ## TALENT TREES AND THE CARDS (Batch FK §7)

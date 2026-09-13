@@ -13,43 +13,44 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-12 (Batch GB).*
+*Last rewritten: 2026-09-13 (Batch GC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GB — DEFLECTION TAKES THE CELL ENEMIES LOOK PAST YOU HELD, AND THREE FILES ARE SWEPT FOR WHAT THEY
-  STATE. THE NINTH BATCH ON `class-merge`.** One talent node is replaced; no rune, spine, pool or other magnitude
-  moved. `main` is untouched. Full working: **`docs/reports/GB.md`**.
-- **§1: ENEMIES LOOK PAST YOU IS RETIRED OUTRIGHT, AND `tn_deflection` TAKES ITS CELL AT TIER 2 (SR-EVADE 2).** It
-  writes `deflection`, the one field the parry gate reads for a ranged blow, so a hero holding it parries a ranged
-  attack as a melee one. Nothing else writes the field, and parry reached no ranged blow before it: read at the gate,
-  and measured at 0 of 2,574 ranged blows on four classes and 0 of 2,860 on twelve specs.
-- **§2: THE MAGNITUDE IS THE PRECEDENT'S, TAKEN.** The deleted Swordmaster node Deflection wrote `deflection` 1, and
-  its read site read the holder's own field, so it could fire. The gate is a switch, so 1 is all of it.
-- **§3: THE NAME AND CARD TEXT ARE PROPOSED FOR THE DESIGNER TO CONFIRM** — *Deflection*, *"This hero's Parry works
-  against ranged attacks too."* The sweep and the two alternatives are under NEEDS A RULING in `docs/reports/GB.md`.
-  The ruling that a node's text must be true when every hero holds it is written into `CLAUDE.md`'s FX block.
-- **§4: `CLAUDE.md`, `scripts/run_state.gd`'S COMMENTS AND THIS FILE ARE SWEPT WHOLE, GA's WAY**: a census of every
-  present-tense claim against HEAD first, then GA's rules. `CLAUDE.md` held 1,179 claims and 195 were stale,
-  `run_state.gd`'s comments 563 and 106, and this file 1,022 and 220. The brief's three — the index rows, the
-  `_ready()` comment and the 104.70 KiB figure — are closed with the rest. What the sweep found elsewhere is queued below under *FOUND AT GB
-  AND NOT FIXED*, and six standing rules whose facts moved under them go to the designer.
-- **§5: NOT DONE, AS RULED.** The three crit nodes, Heal More When Low and We Do Not Break stay. The relic redirect
-  stays deferred. Deepening Hex's floor stays at 8, its wording untouched. No spec dissolves, no pool merges, no
-  engine becomes a rune and no spine is attached.
-- **WHAT MOVED:**
-  - `scripts/talents.gd` (one node) and `data/glossary.json` (the Parry entry).
-  - `docs/master.html`: the parry rule, two card rows, the tree table, §7's prose and the stamp.
-  - `CLAUDE.md` (the index, one new rule in the FX block, and the census corrections), `scripts/run_state.gd`
-    (comments only), this file, the changelog, `docs/design-notes.md` and `docs/reports/GB.md` (**NEW**).
-  - Instruments: `check_fx`, `test_batch_ak`, `test_batch_ba` and `test_batch_br` — whose §5 pin also moves, to
-    the claim its stale figure recorded — and the `baselines.json` rows whose counts moved.
-- **VERIFICATION:** in **`docs/reports/GB.md`**, written after the acceptance run.
+- **Last batch: GC — SIX RULES WHOSE FACTS MOVED, AND A RULING RECORDED BEFORE IT IS BUILT SAYS SO. THE TENTH BATCH ON
+  `class-merge`, AND IT MOVED DOCUMENTS ONLY.** No node, rune, magnitude, constant or line of game code moved. `main`
+  is untouched. Full working: **`docs/reports/GC.md`**.
+- **§1: FOUR RULES RETIRE, EACH MARKED AS HISTORY.** BH §2's fifteen-point leave-one-out block is deleted (it read a
+  lane, and BM §2 had recorded its retirement since FX); BA §1 no longer reserves the Survivalist's tree; CN's opt-in
+  relic exception is deleted, because no such relic has ever existed; and `docs/instrument-rules.md`'s second copy of
+  CQ §1's bot-guard rule is deleted, its one extra sentence moving home to `CLAUDE.md`.
+- **§2: THE SKILL-CHECK CAP IS AMENDED — FOUR, AND A RUNE MAY RAISE IT; A BATCH MAY NOT.** Long Draw is the sanctioned
+  exception. CS's reason is restated, and EY's slower bar split it: on `check_cs`'s model the capped chain lands 98.8%,
+  so the difficulty-at-four half is outgrown, while a nine-press chain still lands 49.5%, so the bound is what the cap
+  keeps. **Found on the way and surfaced: Long Draw's card is true at one stage of four** (queued below,
+  PLAYER-FACING).
+- **§3: `RULED, NOT BUILT` IS A CATEGORY.** FT §1's *Focus is the Hunter's* is marked, and a census of 881 claims resting
+  on a merge ruling — in the five documents that state the present and the game's own source — found ten of that
+  shape: eight are marked, one (CN's relic) went with §1, and one is left unmarked with its reason. The rule is written
+  into `CLAUDE.md`'s file-purpose block, and `docs/ways-of-working.md` points at it for the brief that transcribes a
+  ruling. **The census also found 138 claims pointing the other way**, still describing what the merge has already
+  moved: eleven close here (seven with §1, four in this file) and the rest are queued below.
+- **§4: DEFLECTION IS CONFIRMED** as the tier-2 node's name, and GB's sweep is recorded with the ruling in `CLAUDE.md`'s
+  name-sweep block so the name is not revisited.
+- **§5: NOT DONE, AS RULED.** The five player-facing items stay queued and the quit/resume skip is next. The three crit
+  nodes, Heal More When Low and We Do Not Break stay; the relic redirect stays deferred; no spec dissolves, no pool
+  merges, no engine becomes a rune and no spine is attached.
+- **WHAT MOVED:** `CLAUDE.md`, `docs/instrument-rules.md`, `docs/ways-of-working.md`, this file, the changelog,
+  `docs/design-notes.md` and `docs/reports/GC.md` (**NEW**). **No source, data, suite, gate, `baselines.json` row or
+  `pin-manifest.json` pin moved.** `docs/master.html` is not edited, so its stamp is not bumped; *"the stamp"* in the
+  brief is read as this file's *Last rewritten* line (FU §0's reading).
+- **VERIFICATION:** in **`docs/reports/GC.md`**, written after the acceptance run.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
-  to runes, is next**, and FP's measurements for it stand.
-- **Next letter: GC.**
+  to runes, is RULED, NOT BUILT, and is the next merge step**; the quit/resume skip (queued under GB's findings below)
+  is the next batch, and it is not merge work.
+- **Next letter: GD.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -98,7 +99,9 @@ the things a later batch must not re-derive:**
    ruling-gated things wait on this seam alone**, and the rule has no tiebreak for a per-hero run effect, which
    passes both of its tests.
 3. **THE CLASS SPINES — TWO READINGS OF "TOUCH".** Momentum, Channel, Sanctity and Focus are engines by the letter,
-   and all four read universal traffic (Mana spent, exchanges, every status event). "May not touch an engine" means
+   and as class spines all four are **RULED, NOT BUILT**: the three are machinery on nobody (FT), and Focus is the
+   Sharpshooter's meter, built off his own attacks and cards rather than off universal traffic. The other three read
+   universal traffic (Mana spent, exchanges, every status event). "May not touch an engine" means
    either "may not read or write one" or "may not change what one reads" — **and the second excludes most of the
    recon for three classes.**
 4. **THE FOUR CLASS PASSIVES** — Threatening Presence, Holy Conduit, Tracker, Evocation — are passives by the
@@ -116,16 +119,18 @@ the things a later batch must not re-derive:**
    not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
    forbade rules); **selecting it in the picker is the designer's**.
 
-### FY §1: THREE NODES PAID BY WHO ELSE HELD THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS — **RULED AT GA; THE REPLACEMENT TAKEN AT GB**
+### FY §1: THREE NODES PAID BY WHO ELSE HELD THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS — **RULED AT GA; THE REPLACEMENT TAKEN AT GB, ITS NAME CONFIRMED AT GC**
 
 **The designer ruled three of the four at GA and confirmed the floor under the fourth** (`docs/reports/GA.md` §1 and
-§2), and named the replacement at GB (`docs/reports/GB.md` §1). One wording is still owed:
+§2); GB's replacement took the cell (`docs/reports/GB.md` §1) and its name was confirmed at GC (`docs/reports/GC.md`
+§4). One wording is still owed:
 
 1. **~~Heal More When Low and We Do Not Break are party-wide by their read site~~ — RULED AT GA: BOTH STAY.** They
    are redundant when stacked, not false, and that is a different problem. FY's text: in any party, the second, third
    and fourth class to buy one is paid nothing.
-2. **~~ENEMIES LOOK PAST YOU~~ — RULED AT GA: REPLACE IT. REPLACED AT GB BY *DEFLECTION* (SR-EVADE 2), UNDER A NAME
-   PROPOSED FOR THE DESIGNER TO CONFIRM.** The node is retired outright and `tn_deflection` takes its cell, writing
+2. **~~ENEMIES LOOK PAST YOU~~ — RULED AT GA: REPLACE IT. REPLACED AT GB BY *DEFLECTION* (SR-EVADE 2), AND THE NAME
+   CONFIRMED BY THE DESIGNER AT GC**, with GB's sweep recorded beside the ruling in `CLAUDE.md`'s name-sweep block so
+   the name is not revisited: it met nothing in 746 names, and the brief's label *Parry Ranged Blows* near-misses five. The node is retired outright and `tn_deflection` takes its cell, writing
    `deflection` 1: the deleted Swordmaster precedent's own magnitude, and all of it, because the parry gate asks
    `deflection > 0`. **Its read site asks about the defender and nobody else**, so its card is true however many
    heroes hold it — the property the old card lacked (FY measured three of the four heroes targeted MORE with all
@@ -206,7 +211,49 @@ re-tensed. **A sweep of the whole file found sixteen more**, and the census was 
 - **~~This file's *Knowledge sync* section carries EG's 104.70 KiB~~ — CLOSED AT GB §4:** the heaviest-files list and
   its figures are gone, and the section names the instruments that print the live sizes.
 
-### FOUND AT GB AND NOT FIXED — **THE §4 CENSUS'S FINDINGS OUTSIDE ITS THREE FILES; THE FIRST THREE ARE PLAYER-FACING**
+### FOUND AT GC AND NOT FIXED — **ONE PLAYER-FACING CARD, A SEVENTH RULE WHOSE FACTS MOVED, AND THE CENSUS'S OTHER DIRECTION**
+
+**GC's §3 census read 881 claims resting on a merge ruling** — in `CLAUDE.md`, this file, `docs/instrument-rules.md`,
+`docs/ways-of-working.md`, `docs/master.html` and the game's own source — and found ten stating an unbuilt ruling as
+built. **It found 138 pointing the other way**: text still describing what the merge has already moved. Eleven of those
+closed at GC (seven with §1's retirements, four in this file). The rest are below by kind, counted by file as the
+census found them, and the tables are in `docs/reports/GC.md` §3.
+
+- **PLAYER-FACING: LONG DRAW'S CARD IS TRUE AT ONE STAGE OF FOUR.** *"… the added press buys no widening, so the
+  sequence is harder to hold."* `_sharpshooter_basic_profile` takes the opening widening off the press count with the
+  rune's press included, so below 150 Focus the added press DOES buy the widening the table gives the longer chain, and
+  on `check_cs`'s model the chain holds as well or marginally better with the rune (98.5 / 98.7 / 98.8% against
+  97.7 / 98.5 / 98.7%). Only at 150+ is it harder (96.0% against 98.8%). `check_ez` §5 asserts the cost at 300 Focus
+  only. **Owed a ruling: the fix is either the card's words or the rune's shape** (GC §2b).
+- **A SEVENTH RULE WHOSE FACTS MOVED UNDER IT — REPORT-ONLY, LIKE GB's SIX.** `CLAUDE.md`'s EN §4 block is headed *"A
+  TALENT CHANGES WHAT A SPEC DOES IN A FIGHT"*, and its first rule bullet says an effect that *"must know which spec the
+  hero is … is a TALENT"*. Since FX a talent is a stat payload every class buys and every hero of the class wears, so an
+  effect that must know the spec cannot be one. One clause of the block was updated for FX; the rule was not.
+  `docs/master.html`'s relic paragraph carries the same sentence.
+- **DELETED THINGS NAMED AS LIVE — THE CENSUS'S OTHER DIRECTION, AND MOSTLY FX's:**
+  - `CLAUDE.md`, 66: deleted talent nodes, lanes, rows and capstones cited in rules. FX's block tells the reader to take
+    each as the record, and GB kept them on that ground; its list says *"Among them"*, and most are not on it.
+  - this file, 38: the Loyalty item and the block that declares *"NONE OF IT IS STALE"* still price nodes FX deleted
+    (Kindred, Quick Whistle, Ancient Pact, Feral Momentum); `Talents.LANES` and the lane-build sim policy are cited as
+    live; DN §8 is called open though DO ruled it.
+  - `docs/master.html`, 28: the talent-point economy in §2, §3 and §5 still reads as it did before BM (a point on
+    awakening, on every elite, mini-boss and boss); a builds-with cell names the Poise lane; Harvest is said to sit in
+    the Hunter class pool (it is only in the Survivalist's boss pool); "the talent trees" stays plural in three places.
+    It also carries the per-hero relic ruling as unbuilt, a plan in the one document that holds none.
+  - `docs/instrument-rules.md`, 3: a talent granting an ability (none has since DO), *"A LANE ROW IS ONE FULLY-BUILT
+    HERO"*, and Battered Not Broken removing banked Break (the node is gone).
+  - the game's source, 3, all wording: `battle.gd`'s zone-boss comment banks *"PER SPEC"*, and two comments call
+    `talents` an equipped loadout.
+- **`docs/systems-recon.html` still lists the bar-swap relic as the second opt-in exception** (it already says the relic
+  does not exist). A recon is regenerated, never hand-edited.
+- **`test_batch_ba` §1 still sweeps the one class tree for the words BA §1 reserved**, which the rule no longer asks of
+  the tree. It asserts something stricter than the rule and is harmless.
+- **THE CATEGORY HAS NO INSTRUMENT.** A gate could assert, for each marked claim, the fact that makes it unbuilt — only
+  the Sharpshooter carries Focus, the three `*_active` switches are unassigned, no engine rune exists — so the day one
+  is built the gate reds and says the marker is owed its removal. Nothing does today.
+- **`docs/ways-of-working.md`'s conflict table says this file "has no reader"**; `check_es` §4 reads it.
+
+### FOUND AT GB AND NOT FIXED — **THE §4 CENSUS'S FINDINGS OUTSIDE ITS THREE FILES; FOUR ARE PLAYER-FACING AND THE QUIT/RESUME SKIP IS NEXT; THE SIX RULES CLOSED AT GC**
 
 The census that swept `CLAUDE.md`, `scripts/run_state.gd`'s comments and this file read every claim against the
 code, and some of what it found lives elsewhere. **The tables are in `docs/reports/GB.md` §4.**
@@ -227,9 +274,11 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
 - **THE FIXED MODIFIER NEVER REACHES A MINI-BOSS.** At rung 3 `arm_fixed_modifier` arms the mini-boss on entry, and
   the bargain that always follows overwrites it (`accept_offer`); RunSim takes the bargain first, so the guard skips
   arming. The mini-boss entry in the fixed list is dead in both flows.
-- **QUITTING AT AN ELITE'S OR MINI-BOSS'S OFFER, OR MID-FIGHT, WALKS PAST THE FIGHT.** The node is marked visited and
-  saved before the offer or the battle opens, `load_run` clears the encounter, and the map never re-enters it.
-  Worked out from the code at GB, not driven.
+- **PLAYER-FACING, AND THE NEXT BATCH (GC §5): QUITTING AT AN ELITE'S OR MINI-BOSS'S OFFER, OR MID-FIGHT, WALKS PAST
+  THE FIGHT.** It is the one item here that costs the player an encounter rather than misinforming them. The node is
+  marked visited and saved before the offer or the battle opens, `load_run` clears the encounter, and the map never
+  re-enters it. Worked out from the code at GB, not driven. **GC read the sites it rests on on `main` too, and they are
+  the same**, so it likely predates the merge; driving it is the next batch's.
 - **NOTHING STOPS `DOD_SIM_RUNES` CHANGING A REAL GAME.** `runes_mode()` reads the environment with no `sim_run` gate,
   and the `test_runes` assertion a `run_state.gd` comment claimed for it never existed: the purity arm covers the
   economy and power flags only. *Stats* or *off* left exported in a player's shell changes a real run.
@@ -262,17 +311,11 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
 - **DORMANT BRANCHES THAT ONLY SUITES DRIVE.** `free_swap`, `layered_faith`, `communion_ranks`, the talent half of
   `spread_ranks` and `crushing_blows_ranks` have no writer in `scripts/` or `data/`; suites set them by hand, so they
   exercise code no player can reach, and `master.html` still documents Crushing Blows.
-- **`CLAUDE.md`, REPORT-ONLY: RULES WHOSE FACTS MOVED UNDER THEM.** A fix rewrites a standing rule, so each is the
-  designer's or a later batch's:
-  - BH §2's *fifteen points under leave-one-out* is still written as a live rule, while the BM §2 block says it
-    retired with the lanes at FX; BA §1 still reserves *"the Survivalist's tree"*, which no longer exists.
-  - FT §1 says Focus *"is the Hunter's"*; only the Sharpshooter carries it.
-  - CN's profile rule names *"the relic that swaps a hero's bar for a riskier one"* as an opt-in exception; no such
-    relic has ever existed.
-  - CS's *"CAPPED AT FOUR … DO NOT RAISE IT"* stands beside the Long Draw rune, which raises the cap. GB noted the
-    rune under the rule rather than re-ruling the cap.
-  - `docs/instrument-rules.md` carries a near-verbatim second copy of CQ §1's *"IS THERE ANYBODY THERE TO PRESS?"*,
-    against the rule that a rule lives in one file.
+- **~~`CLAUDE.md`, REPORT-ONLY: RULES WHOSE FACTS MOVED UNDER THEM~~ — ALL SIX RULED BY THE DESIGNER AND CLOSED AT
+  GC** (`docs/reports/GC.md`). BH §2's block is deleted and BM §2's says where it went; BA §1 no longer reserves the
+  Survivalist's tree; CN's relic clause is deleted; the second copy of CQ §1 left `docs/instrument-rules.md`; CS's cap
+  is amended (four, and a rune may raise it); and FT §1's Focus claim is marked `RULED, NOT BUILT`, the first entry of
+  a category.
 
 ### FOUND AT FX AND NOT FIXED — **NONE BLOCKS A BATCH; THE FIRST TWO ARE PLAYER-FACING WORDING**
 
@@ -354,12 +397,12 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–2 BUILT, 3–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
 nothing: it measured what dissolving the twelve specs into their four classes would cost, and the
-ruling is the designer's. **Nothing below is a recommendation about whether to do it.** These are
+ruling was the designer's, taken at FQ. **Nothing below is a recommendation about whether to do it.** These are
 the things a later batch must not re-derive from scratch:
 
 - **THE SIZE, IN BATCHES: TWELVE TO FOURTEEN, AND THE GAME IS BROKEN THROUGH ROUGHLY EIGHT OF
@@ -373,7 +416,9 @@ the things a later batch must not re-derive from scratch:
   simultaneously, because there is no state in which the Berserker has merged and the Warden has
   not: they would need one tree and two. **So "merge one class as a pilot" is not a pilot** — it
   is four batches, eight to thirteen nodes salvaged out of 81, and a battery whose engine-bound
-  targets do not care that only a quarter of the game moved.
+  targets do not care that only a quarter of the game moved. **FX has since merged the TREE on its own, ahead
+  of the pools and the stat lines, so the tree half of *simultaneously* did not hold and the pilot's salvage out
+  of 81 is moot; the engine half stands.**
 - **THE PROFILE MIGRATION IS WRITTEN ONCE AND CANNOT BE ITERATED ON LIVE**, and the one part that
   is a ruling rather than a programming step is **how twelve purses fold into four**: a player with
   3 points on each of three Warrior specs has 9, and **sum rewards breadth while max rewards
@@ -631,8 +676,9 @@ unconditional source is `_plating_slice`, which opens on `u.passive_id == "heavy
 `wd_unkillable` (on a Block) genuinely does not, and the two are indistinguishable from the
 payload.** Three surviving Warden nodes died to this at FP.
 
-- **AN ENGINE RUNE CARRYING HEAVY PLATING INSTALLS A CLIMB ON A BASE OF ZERO**, and
-  `PROTECTED_CORES` cannot see it **because the enabler table names ABILITIES and this is a STAT**.
+- **AN ENGINE RUNE CARRYING HEAVY PLATING WOULD INSTALL A CLIMB ON A BASE OF ZERO** (engine runes are
+  **RULED, NOT BUILT**), and `PROTECTED_CORES` cannot see it **because the enabler table names ABILITIES and
+  this is a STAT**.
 - **THE TABLE SAYS SO ITSELF, WHICH IS THE PART TO KEEP.** `PROTECTED_CORES["warden"]` carries
   `"enablers": []` with the `why` *"Heavy Plating is a Block-chance rule; it reads no ability."*
   **The gap is not an oversight the merge discovers — it is documented in the table that has the
@@ -830,6 +876,9 @@ This item carries the two things a later batch must not re-derive from scratch:
   nothing in EY touched it. **But there is no tolerance left to spend on him**, and `check_cs` §4's
   flat-difficulty assertion now passes at **0.011 against its 0.02 bound** where it used to pass at
   0.003. **The next batch to widen a window is the one that finds out.**
+- **AND GC §2 READ CS's CAP AGAINST IT.** On the same model the capped chain lands 98.8% of the time, so the cap
+  no longer rests on four being hard; a nine-press chain still lands 49.5%, so the bound is what it keeps. The cap is
+  amended — four, and a rune may raise it — and `CLAUDE.md`'s sequence block says why.
 - **DIFFICULTY IS BOUGHT WITH `sweep_time`, NOT WITH THE HALF-WIDTHS**, and the reason is a standing
   rule in `CLAUDE.md` now: a half-width is a fraction of the TRACK, so widening it redraws what the
   player is aiming at, while the sweep buys the same seconds and leaves every zone where it was.

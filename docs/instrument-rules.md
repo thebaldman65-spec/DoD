@@ -943,13 +943,10 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   battery**, which is why the redirect is a property of the process and not of a wrapper script.
   `check_fi` is the instrument. **THE META LAYER IS NOT UNDER THIS**: `Profile.save_path` is still
   swapped by hand in each suite's own `_run` preamble, and `relics.json` by nobody.
-- **"IS THERE ANYBODY THERE TO PRESS?" IS ONE QUESTION, ASKED IN ONE PLACE** —
-  `battle._nobody_can_press()` is `sim or autoplay or DisplayServer.get_name() == "headless"`.
-  **`sim or autoplay` names the two BOTS, not the absence of a player**: a hand-driven suite is
-  neither, because it sets `Run.active` and clears `sim`/`autoplay`/`sim_run` precisely to get the
-  real battle path. Four suites hung for five batches awaiting a signal only a key press emits.
-  **A PROFILE FLAG IS NOT A BOT GUARD** — setting one by hand is one file knowing about the trap.
-  Any future headless modal will hit this.
+- **THE BOT GUARD (`battle._nobody_can_press()`, CQ §1) IS A RULE OF `CLAUDE.md`'s *Working
+  agreement* AND IS KEPT THERE ONLY.** A near-verbatim second copy stood here until GC deleted it,
+  ruled by the designer: the guard decides how a battle waits for a player, which makes it a rule
+  about the game, and a rule lives in one file.
 - **`test_batch_bl.gd` NEEDS `--fixed-fps 12`, AND IT IS NOT THE `sim.sh` FLAG** (which passes
   240, for wall-clock speed). 12 makes each frame a big TIME step, because a real-play battle
   paces itself with `create_timer` waits. **Any future suite that must run a REAL-PLAY battle to
