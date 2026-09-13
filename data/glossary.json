@@ -87,7 +87,7 @@
   "term": "Parry",
   "category": "combat",
   "short": "A parried hit still lands, but at a quarter strength.",
-  "long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried, area attacks cannot be parried, and a Broken unit cannot parry at all.",
+  "long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried unless the defender holds the Deflection talent, area attacks cannot be parried, and a Broken unit cannot parry at all.",
   "see_also": [
    "miss",
    "status_broken"

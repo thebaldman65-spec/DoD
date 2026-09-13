@@ -176,10 +176,16 @@ const TREE := [
 	{"id": "tn_pierce", "name": "Armor Penetration", "tier": 2,
 		"desc": "Attacks ignore 30% of the target's armor.",
 		"payload": {"stat": {"pierce_bonus": 0.30}}},
-	# PRECEDENT: Ghillie Suit (sv_ghillie) — ghillie 65. TAKEN.
-	{"id": "tn_look_past", "name": "Enemies Look Past You", "tier": 2,
-		"desc": "Enemies are 65% less likely to target this hero while another ally lives.",
-		"payload": {"stat": {"ghillie": 65}}},
+	# IN THE CELL ENEMIES LOOK PAST YOU FILLED UNTIL GB RETIRED IT BY RULING: its
+	# text was false whenever it was not the only holder (FY §1), and in one tree
+	# that every hero of a class wears, it never is. SR-EVADE 2.
+	# PRECEDENT: Deflection (sm_composure) — deflection 1. TAKEN. The read site
+	# asks `deflection > 0`, so the magnitude is a switch and 1 is all of it. It
+	# reads the DEFENDER and nobody else, so what it pays one hero does not
+	# depend on who else holds it — the property its cell was retired for.
+	{"id": "tn_deflection", "name": "Deflection", "tier": 2,
+		"desc": "This hero's Parry works against ranged attacks too.",
+		"payload": {"stat": {"deflection": 1}}},
 
 	# ── TIER 3 — three points each. ──
 	# ALTERNATE, IN THE PLACE OF *A PERFECT PAYS* (see the header).

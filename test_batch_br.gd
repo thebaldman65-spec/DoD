@@ -426,15 +426,21 @@ func _weaker_half() -> void:
 	# Mana, so for a Survivalist already holding it the card is close to a dead
 	# draw. Reported rather than re-tuned; the check pins the comparison.
 	# BATCH FX — RE-POINTED TO THE PRECEDENT-MAPPED NODE, SAME FIELD AND SAME
-	# MAGNITUDE. FX deleted the twelve spec trees and Ghillie Suit (`sv_ghillie`)
-	# with the Survivalist's; its field and its 65 were TAKEN into the one tree
-	# as `tn_look_past` ("Enemies Look Past You"), which a Hunter's purse buys
-	# and every Hunter then wears. The comparison this pins is unchanged — the
-	# node is permanent and costs no Mana, the card is two turns of a 4-turn clock.
-	var look_past: Dictionary = Talents.node_in_tree(Talents.tree(), "tn_look_past")
-	var ghillie_pct := int(look_past.get("payload", {}).get("stat", {}).get("ghillie", 0))
-	ok(ghillie_pct == 65,
-		"§2: the node paying Ghillie Suit's field (tn_look_past, FX) is a permanent 65%% (got %d)" % ghillie_pct)
+	# MAGNITUDE: `tn_look_past` ("Enemies Look Past You") took Ghillie Suit's
+	# field and its 65 into the one tree.
+	# BATCH GB — REPAIRED TO THE QUESTION THAT IS LEFT, BECAUSE NO NODE PAYS IT
+	# NOW. GB retired Enemies Look Past You by ruling (its text was false whenever
+	# it was not the only holder) and Deflection took its cell, so no node of the
+	# one tree writes `ghillie`: Camouflage is the only evasion a hero can hold,
+	# and the finding above has no node beside it. Asserted off the tree, so a
+	# node that writes the field again turns this red and re-opens the finding.
+	# The read site stands, and `_live_camouflage` still drives it.
+	var ghillie_writers: Array = []
+	for gn in Talents.tree():
+		if ((gn.get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).has("ghillie"):
+			ghillie_writers.append(String(gn["id"]))
+	ok(ghillie_writers.is_empty(),
+		"§2: a node of the one tree writes Ghillie Suit's field again (%s) — the finding below is live once more" % str(ghillie_writers))
 	var battle_src := _src("res://scripts/battle.gd")
 	ok(battle_src.contains("const CAMOUFLAGE_PCT := 70"),
 		"§2: Camouflage is 70%, ABOVE the node — bought with Mana, a turn and a clock")
@@ -902,14 +908,24 @@ func _live_arcane_arrows() -> void:
 
 
 func _live_camouflage() -> void:
-	# BATCH FX — THE SURVIVALIST LEARNS `tn_look_past`, GHILLIE SUIT'S
+	# BATCH FX — THE SURVIVALIST LEARNED `tn_look_past`, GHILLIE SUIT'S
 	# PRECEDENT-MAPPED SUCCESSOR (ghillie 65, the same field at the same
-	# magnitude). `sv_ghillie` went with the twelve spec trees; every check below
-	# reads the `ghillie` FIELD and its read site in `_evade_chance`, which stand.
+	# magnitude).
+	# BATCH GB — AND NOW NO NODE WRITES THE FIELD. GB retired Enemies Look Past
+	# You by ruling and Deflection took its cell, so the Survivalist wears EVERY
+	# node of the one tree here and must carry no Ghillie field at all: that is
+	# the negative half, asserted on the live spawn, and Deflection landing is its
+	# positive arm (a tree that never landed would read 0 as well). The field is
+	# then set on the unit at the retired precedent's 65, so every read-site check
+	# below still measures `_evade_chance` — the site stands, and it is what a
+	# node or rune writing the field again would pay through.
+	var every_node := {}
+	for tn in Talents.tree():
+		every_node[String(tn["id"])] = 1
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		{"mystic": ["Camouflage"]},
 		["raider", "chief", "archer"],
-		{"mystic": {"tn_look_past": 1}})
+		{"mystic": every_node})
 	var hunter := _hero(scene, "trapper")
 	ok(hunter != null, "the Survivalist spawned for the Camouflage check")
 	if hunter == null:
@@ -920,7 +936,10 @@ func _live_camouflage() -> void:
 	if camo == null:
 		await _drop(scene)
 		return
-	ok(hunter.ghillie == 65, "§2: ...on a Survivalist who ALSO wears Ghillie Suit's field, through tn_look_past (%d)" % hunter.ghillie)
+	ok(hunter.ghillie == 0 and hunter.deflection == 1,
+		"§2: a Survivalist wearing all %d nodes carries a Ghillie field of %d (want 0 — a node writes it again) and Deflection %d (want 1 — the tree landed at all)" % [
+			every_node.size(), hunter.ghillie, hunter.deflection])
+	hunter.ghillie = 65
 	# GHILLIE ALONE.
 	var ghillie_only: float = scene.call("_evade_chance", hunter)
 	ok(is_equal_approx(ghillie_only, 0.65),
@@ -955,9 +974,11 @@ func _live_camouflage() -> void:
 		"§6: ...and the old Ghillie-only roll is GONE, not left beside it")
 	# THE FINDING, PINNED: for a Survivalist already holding the node this is
 	# close to a dead draw — 65% for free and permanent against 89.5% for 20
-	# Mana, a turn and two turns of clock.
+	# Mana, a turn and two turns of clock. BATCH GB: no node holds the field now,
+	# so the finding has no build to be about and is kept as the read site's
+	# arithmetic — Camouflage over a standing 65 adds under a quarter.
 	ok(both - ghillie_only < 0.25,
-		"§2 FINDING (reported, not re-tuned): the card adds %.1f points to a Ghillie build" % \
+		"§2 FINDING (moot since GB — no node writes the field): Camouflage adds %.1f points over a standing 65" % \
 			((both - ghillie_only) * 100.0))
 	await _drop(scene)
 
@@ -1515,7 +1536,12 @@ func _docs() -> void:
 	# WHAT CLAUDE.md SHOULD CARRY IS THE RULE THE TWELVE PAID FOR, and it does.
 	ok(claude.contains("THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR"),
 		"§5: ...and CLAUDE.md carries the class-seam rule the twelve paid for")
-	ok(claude.contains("is 24 of a target 24"),
+	# RE-POINTED AT BATCH GB, TO THE CLAIM THE FIGURE STOOD FOR. The needle was the
+	# figure "is 24 of a target 24", and GB §4's census of `CLAUDE.md` found it stale:
+	# `CLASS_DRAFT_POOLS` holds 25 against the original target of 24. GA's rule deletes a
+	# stale figure rather than replacing it, so the sentence now says the tranche meets its
+	# own target, and this asks for the claim the figure recorded: the tranche is paid.
+	ok(claude.contains("THE CLASS-WIDE TRANCHE IS PAID IN FULL"),
 		"§5: ...recording both halves of them as paid")
 
 

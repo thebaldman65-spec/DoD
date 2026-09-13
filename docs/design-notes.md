@@ -4,6 +4,54 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Deflection takes the cell, and three files are swept for what they state (Batch GB) — 2026-09-12
+
+**I proposed the precedent's name over the brief's label because the name sweep said to.** The brief's label is the
+recon's, *Parry ranged blows*. Swept against every ability, node, status, rune, tag, relic, item, enemy and
+glossary term, with a near-miss treated as a hit as the brief asked, it contains the glossary's own *Parry* and shares
+a word with two abilities (Mocking Blow, Crushing Blow), the node Parry More and the status Parry Up. *Parry Ranged
+Attacks* loses the two abilities and gains the node More Attack. *Deflection* collides with nothing. It is also the node's own precedent, the name of the field it writes, and the word the read
+site's log line already prints when a ranged blow is turned. The other twenty-six names are phrases and this one is a
+noun, which is the cost. Both alternatives are in the report, and the name is the designer's to confirm.
+
+**The text had one job, and it is the one the old node failed.** *This hero's Parry works against ranged attacks
+too.* The read site asks one question of one unit, the defender, so the sentence is true for every hero who holds it
+however many others do. Enemies Look Past You read the same way on the card and paid by moving the blow to somebody
+else. I dropped the precedent's *"arrows and spells alike"*: a spell that strikes an area is still not parried, and
+flavour a player could take as a rule is cut under the text standard.
+
+**The magnitude is the precedent's because the read site leaves nothing else to choose.** `deflection > 0` is a
+switch, and the deleted Swordmaster node wrote 1. Before inheriting it I checked the one thing that disqualified
+Overpressure: whether the value could ever reach the site. It could. The spawn copies every config key onto the unit,
+the site reads the holder's own field, and eight enemy kinds attack from range. The precedent was also never FX's to
+take, because FP's survivor list for the Swordmaster leaves it out, and FX drew its precedents from that list.
+
+**A new id rather than the old one, because an id is a name code keys on.** Keeping `tn_look_past` would have carried
+any owned cell straight across, and it would have left a parry node wearing a targeting id, the kind of trap `CLAUDE.md`
+keeps a section for. A cell whose id leaves the tree already refunds itself: `cells_spent` skips it and
+`worn_learned` drops it. The designer's file is still v2 on disk and owns no cell of the one tree, so nothing was
+carried or lost.
+
+**The glossary was the one surface the swap made false.** Its Parry entry said ranged attacks cannot be parried,
+which stopped being true for a holder the moment the node existed. `master.html` said the same, and its two card
+rows that stacked Camouflage with the retired node describe a node that no longer exists. The field and its read site
+stay: `_evade_chance` still combines the two, and the next thing to write `ghillie` pays through it.
+
+**The suites were repaired to the question each was asking, and one question had lost its subject.** `test_batch_ba`
+asked whether the node that owes Ghillie Suit's 65 pays it. No node owes it now, which is exactly the case FX deleted
+twenty-one of its siblings under, so those two checks went the same way with their count at the site.
+`test_batch_br`'s comparison is kept on the read site. It first asserts that a Survivalist wearing all twenty-seven
+nodes carries no Ghillie field, then sets the field to measure the stacking. `check_fx` drives the new node on all
+four classes as the defender, with a melee blow proving the forced parry was on the table and the log line counted
+as the payout happens.
+
+**Three files, swept the way GA swept the fourth, and the census came first for the same reason.** A correction made
+while the claims are still being read shapes what is found next, so every present-tense claim was tabled against
+HEAD's snapshot before a word moved. The rules were GA's and were not re-argued: what is gone is deleted, what moved is
+renamed, and a stale figure is deleted rather than replaced, because a replacement is the next stale figure. A deleted
+node cited as the reason a rule exists stays, because FX's block tells the reader to take it that way. Where a fix
+would have rewritten a rule rather than a fact inside one, it went to the designer instead.
+
 ## The list ran out before the ruling did, and a rule file stops describing what is gone (Batch GA) — 2026-09-11
 
 **I stopped at the list because the brief said to, and because both ways of not stopping were worse.** The ruling was

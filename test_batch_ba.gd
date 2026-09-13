@@ -337,17 +337,22 @@ func _tree_shape() -> void:
 # ---------- §3 the magnitudes, on the node that owes each one ----------
 
 func _magnitudes() -> void:
-	# RE-POINTED (FX) — THREE OF HIS NODES ARE PRECEDENTS OF THE ONE TREE. FX took
+	# RE-POINTED (FX) — TWO OF HIS NODES ARE PRECEDENTS OF THE ONE TREE. FX took
 	# each one's FIELD AND MAGNITUDE unchanged (`talents.gd` names the precedent
-	# above each node), so for these three "is the magnitude on the node that
+	# above each node), so for these two "is the magnitude on the node that
 	# owes it" still has a live answer: the node that owes it now is the one-tree
 	# node that took it, and it pays the same number.
 	ok(abs(float(_stat_of("tn_health", "max_hp_pct")) - 0.20) < 0.0001,
 		"More Health, Woodcraft's precedent, pays 20% maximum Health")
 	ok(_stat_of("tn_cleanse", "field_medic") == 2,
 		"Cleanse Debuffs Each Turn, Field Medic's precedent, holds a COUNT of 2")
-	ok(_stat_of("tn_look_past", "ghillie") == 65,
-		"Enemies Look Past You, Ghillie Suit's precedent, holds a 65% chance")
+	# DELETED AT GB — 2 CHECKS: Ghillie Suit's 65 and its tooltip, both asked of
+	# Enemies Look Past You (`tn_look_past`), the node that took them at FX. GB
+	# retired that node by ruling — its text was false whenever it was not the
+	# only holder — so no node of the one tree writes `ghillie` now, and
+	# sv_ghillie joins the twenty-one below for their reason. The field and its
+	# read site stand, and `test_batch_br` §6 still drives them with the field set
+	# on the unit.
 	# DELETED AT FX — 21 CHECKS: the magnitudes of the nodes that are NOT
 	# precedents — Potent Toxins' 8, Coated Blades' flag, Distillate's 2, Slow
 	# Acting's flag, Creeping Death's flag, Necrosis's 35, Quartermaster's flag,
@@ -361,11 +366,10 @@ func _magnitudes() -> void:
 	# `RETIRED`.
 	# THE TOOLTIP IS THE OTHER PLACE THE DESIGN NUMBER APPEARS. A magnitude that
 	# lives only in a payload can drift from the text that sells it.
-	# RE-POINTED (FX) for the three precedents: the one-tree node that took each
-	# magnitude states it in its own text.
+	# RE-POINTED (FX) for the precedents, two since GB: the one-tree node that
+	# took each magnitude states it in its own text.
 	var pairs := {"tn_health": ["sv_woodcraft", "+20%"],
-		"tn_cleanse": ["sv_medic", "2 debuffs"],
-		"tn_look_past": ["sv_ghillie", "65%"]}
+		"tn_cleanse": ["sv_medic", "2 debuffs"]}
 	for id in pairs:
 		var shown := Talents.desc_for(_node(id), 1)
 		ok(shown.contains(String(pairs[id][1])),

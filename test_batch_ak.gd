@@ -93,7 +93,12 @@ const PAYLOADS := {
 # took (talents.gd names each precedent above its node). Their rows are asked of
 # the live node, because there the question is still asked of a node a player
 # can buy: the node paying parry_bonus 0.12, and the node paying No Quarter.
-const PRECEDENT := {"sm_sword_mastery": "tn_parry", "sm_perfect_form": "tn_break_refuel"}
+# BATCH GB — AND THE NODE PAYING deflection 1. Deflection took `sm_composure`'s
+# field and its magnitude into the cell Enemies Look Past You held, so that row
+# is asked of the live node as well. It carries no number, so it adds no
+# tooltip check: DESC_NUMBERS does not name it.
+const PRECEDENT := {"sm_sword_mastery": "tn_parry", "sm_perfect_form": "tn_break_refuel",
+	"sm_composure": "tn_deflection"}
 
 # BATCH FX — THE PAYLOADS THE RETIRED SWORDMASTER NODES CARRIED, copied verbatim
 # out of the deleted `Talents.LANE_TREES["swordmaster"]` (ints stay ints, floats
@@ -409,7 +414,7 @@ func _tree_shape() -> void:
 # BATCH FX. THE MAGNITUDE HALF is a MECHANIC question — does the payload write
 # its field at its magnitude — and every field kept its read site, so each
 # PAYLOADS row is asked of the exact payload the retired node carried, applied
-# as the spawn applies it; the two whose field and magnitude a node of the one
+# as the spawn applies it; the three whose field and magnitude a node of the one
 # tree took are asked of that live node instead (PRECEDENT).
 #
 # THE TOOLTIP HALF SPLITS IN TWO. `desc_for` is live machinery — the build

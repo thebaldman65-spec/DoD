@@ -87,7 +87,6 @@ const TEXT := {
 	"last_hope_pct": [1.0, "receive %d% more healing"],
 	"iron_will_ranks": [12.0, "%d% less damage for every debuff"],
 	"pierce_bonus": [100.0, "ignore %d% of the target's armor"],
-	"ghillie": [1.0, "%d% less likely to target"],
 	"whetstone": [1.0, "Attack by %d"],
 	"undying_rage": [50.0, "%d% more damage below 25% health"],
 	"last_rites": [1.0, "%d Rage a point"],
@@ -98,8 +97,9 @@ const TEXT := {
 	"rapid_fire": [1.0, "%d% chance not to start"],
 	"snap_shot": [1.0, "first %d abilities"],
 }
-# A field whose card states no number: the payload is a switch.
-const SWITCHES := ["no_cover"]
+# A field whose card states no number: the payload is a switch. Deflection's is
+# one too — its read site asks `deflection > 0` — so its card states the rule.
+const SWITCHES := ["no_cover", "deflection"]
 
 var _g := Gate.new()
 
@@ -560,7 +560,7 @@ func _costed(heroes: Dictionary) -> Array:
 const DRIVEN_FIELDS := ["attack", "armor", "crit_bonus", "speed", "parry_bonus",
 	"max_resource", "dmg_bonus", "dmg_taken_bonus", "broken_will_ranks",
 	"blood_communion", "follow_through", "bonecracker_ranks", "last_hope_pct",
-	"iron_will_ranks", "pierce_bonus", "ghillie", "whetstone", "undying_rage",
+	"iron_will_ranks", "pierce_bonus", "deflection", "whetstone", "undying_rage",
 	"last_rites", "conversion_ranks", "no_cover", "devoutness_ranks",
 	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot"]
 
@@ -797,13 +797,51 @@ func _drive(scene: Node, fields: Dictionary) -> void:
 	ok(int(pe1["dmg"]) > int(pe0["dmg"]), "§4b: tn_pierce — %d into 50%% armor, %d without" % [
 		int(pe1["dmg"]), int(pe0["dmg"])])
 	paid += 1
-	# Enemies Look Past You: the evasion re-pick's own chance.
-	var ev0: float = scene._evade_chance(war)
-	war.ghillie = int(v["ghillie"])
-	var ev1: float = scene._evade_chance(war)
-	war.ghillie = 0
-	ok(ev0 == 0.0 and absf(ev1 - 0.01 * float(v["ghillie"])) < 0.0001,
-		"§4b: tn_look_past — the re-pick chance read %s with it and %s without" % [str(ev1), str(ev0)])
+	# Deflection: a RANGED blow reaches the parry roll only with it. The read
+	# site asks about the DEFENDER and nobody else, so each class is driven as
+	# the defender in turn — what one hero holds pays that hero whoever else
+	# holds it, which is the property GB put it in Enemies Look Past You's cell
+	# for. The parry is forced to a certainty so the arm measures the gate and
+	# not the roll. A MELEE blow is the positive arm: it is parried with the node
+	# and without it, which proves the forced parry was on the table. And the
+	# payout is counted as it happens, off the read site's own "turns the shot
+	# aside" line, as well as off the health the blow took.
+	var log_box = scene.get("history")
+	ok(foe_ab != null and not foe_ab.aoe and log_box != null,
+		"§4b: tn_deflection — the enemy's ordinary blow is an area attack (no parry reaches one) or the battle log is missing, so the arm below would read nothing")
+	var was_ranged: bool = foe.is_ranged
+	var turned := {}
+	for k in ["warrior", "mage", "cleric", "hunter"]:
+		var h: BattleUnit = heroes[k]
+		h.parry_chance = 1.0
+		var cells: Array = []
+		for ranged in [false, true]:
+			foe.is_ranged = ranged
+			for on in [0, int(v["deflection"])]:
+				h.deflection = on
+				h.statuses.clear()
+				h.hp = h.max_hp
+				log_box.clear()
+				var blow := await _blow(scene, foe, foe_ab, h)
+				cells.append([int(blow["dmg"]),
+					String(log_box.get_parsed_text()).count("turns the shot aside")])
+		h.deflection = 0
+		h.parry_chance = 0.0
+		h.statuses.clear()
+		h.hp = h.max_hp
+		turned[k] = cells
+	foe.is_ranged = was_ranged
+	# Each cell is [health the blow took, "turns the shot aside" lines], in the
+	# order melee without, melee with, ranged without, ranged with.
+	for k in turned:
+		var c: Array = turned[k]
+		var melee_parried: bool = c[0][0] == c[1][0] and c[0][1] == 0 and c[1][1] == 0
+		var ranged_refused: bool = c[2][0] > c[1][0] and c[2][1] == 0
+		var ranged_turned: bool = c[3][0] == c[1][0] and c[3][1] >= 1
+		ok(melee_parried and ranged_refused and ranged_turned,
+			"§4b: tn_deflection — the %s as defender read [health taken, lines]: melee %s / %s, ranged %s / %s (without / with)" % [
+				k, str(c[0]), str(c[1]), str(c[2]), str(c[3])])
+	print("  (b) tn_deflection, [health taken, lines] melee without / with, ranged without / with: %s" % str(turned))
 	paid += 1
 
 	# ── TIER 3 ──

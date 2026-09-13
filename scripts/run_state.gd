@@ -2,10 +2,10 @@
 # run's generated zone map. Persists across scene switches within one run.
 extends Node
 
-# BATCH BK: A RUN IS A BRANCHING MAP AGAIN — 3 zones x 16 slots = 48
-# encounters, the third zone's boss being the end boss. (§1 says 49; 3 x 16
+# BATCH BK: A RUN IS A BRANCHING MAP AGAIN — 3 zones x 16 slots + 1 = 49
+# encounters, the slot after the third zone's boss being the end boss. (§1 says 49; 3 x 16
 # is 48, and the brief's own "was 36" was 3 x 12 by the same construction, so
-# the slip is in the brief and the figure everywhere here is 48.)
+# the slip is in the brief and the figure everywhere here was 48.)
 # Batch AN deleted the OLD
 # branching generator and put a LINE in its place; this is not that generator
 # coming back. What AN deleted guaranteed routes (`_ensure_key_route` /
@@ -70,12 +70,12 @@ const MIN_COLUMN := 2
 # +2%-per-win rate the heroes do. Revive (50%) and Defense (+10% armor) were
 # already percentages and are UNTOUCHED.
 #
-# THIS TABLE IS THE ONLY PLACE THESE NUMBERS ARE WRITTEN. Battle and map both
+# THIS TABLE IS WHERE THESE NUMBERS ARE WRITTEN. Battle and map both
 # read it, and both read the constants below rather than repeating a literal,
 # so the two can never drift.
 const HEALTH_POTION_PCT := 0.20   # of the target's MAXIMUM health
 # FLAGGED (§6 asked for the figure to be flagged): 40% of a base 100
-# max_resource is the current flat 40 exactly, so a run opens unchanged on
+# max_resource is the old flat 40 exactly, so a run opens unchanged on
 # this one. Every hero starts at max_resource 100 (BattleUnit.max_resource),
 # which is what makes the match exact rather than approximate.
 const MANA_POTION_PCT := 0.40     # of the target's MAXIMUM resource
@@ -187,7 +187,7 @@ const SAVE_PATH := "user://run_save.bin"
 # BATCH FI — THE PLAYER'S PATH IS OPT-IN, AND ONLY THE SHIPPED GAME OPTS IN.
 #
 # `SAVE_PATH` above is still a `const` and still the player's file, because
-# three gates read it to MEAN exactly that. What moved is which path the four
+# gates read it to MEAN exactly that. What moved is which path the four
 # file operations below actually use: `save_path`, a var, the shape
 # `Profile.save_path` has had since Batch 40.
 #
@@ -196,7 +196,7 @@ const SAVE_PATH := "user://run_save.bin"
 # delete a real run in progress, and why a wrapper script was the wrong answer:
 # a wrapper is bypassed by running one gate alone, which is exactly how the
 # save went missing. The redirect is a property of the PROCESS instead, decided
-# once in `_ready()` from how the process was launched, so a gate run by hand
+# once in `_init()` from how the process was launched, so a gate run by hand
 # gets the harness path on the same terms as a gate run by the battery.
 const TEST_SAVE_PATH := "user://run_save_harness.bin"
 
@@ -205,7 +205,7 @@ var save_path := SAVE_PATH
 
 # **`_init`, NOT `_ready`, AND THAT DISTINCTION WAS MEASURED RATHER THAN
 # REASONED.** The first draft did this in `_ready()` and `test_batch_ah` deleted
-# a real save straight through it: **twenty-four targets do not use the autoload
+# a real save straight through it: **some targets do not use the autoload
 # at all** — they `load("res://scripts/run_state.gd").new()` and drive the
 # instance directly, which is never added to a tree, so `_ready()` never fires
 # and the instance kept the player's path. `_init()` runs on `.new()` and on the
@@ -219,8 +219,8 @@ func _init() -> void:
 # **THE ARGUMENTS ARE PASSED IN SO BOTH DIRECTIONS CAN BE ASSERTED.** A
 # resolver that reads `OS.get_cmdline_args()` itself can only ever be tested in
 # the one process the test happens to run in — which is a harness process, so
-# the player's arm would never execute. `check_fi` §4 drives four argvs through
-# this and pins two TRUE and two FALSE.
+# the player's arm would never execute. `check_fi` §3 drives four argvs through
+# `argv_is_harness` below and pins two TRUE and two FALSE.
 #
 # THE THREE SHAPES A NON-PLAYER PROCESS HAS, ALL MEASURED RATHER THAN ASSUMED
 # (the engine strips `--headless`, `--path` and `--quit-after` from
@@ -242,7 +242,7 @@ func save_path_is_harness(args: PackedStringArray, main_scene: String) -> bool:
 # **SPLIT OUT SO IT CAN BE ASSERTED IN BOTH DIRECTIONS, AND NOT COPIED TO DO
 # IT.** Every process that could run the assertion is headless, so the clause
 # above short-circuits and the argv reading below would never execute under
-# test. The alternative was for the gate to re-implement these four lines
+# test. The alternative was for the gate to re-implement these six lines
 # beside its own assertions, which is the second copy of a helper that this
 # project has paid for more than once. `check_fi` §3 calls THIS.
 func argv_is_harness(args: PackedStringArray, main_scene: String) -> bool:
@@ -256,9 +256,7 @@ func argv_is_harness(args: PackedStringArray, main_scene: String) -> bool:
 # Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
 # slot draws ONE zone from its authored candidate pool — zones are
 # designed FOR a position (openers are not finales), so pools are
-# per-slot, never flat. Every zone runs the same FLOORS tiers: the
-# talent economy (~35 points/run) assumes 3 zones x 11 tiers, so a new
-# zone keeps 11 tiers or the cost curve gets revisited. A zone def
+# per-slot, never flat. Every zone runs the same SLOTS_PER_ZONE tiers. A zone def
 # carries its display name (art + save key), its boss kind, and a
 # roster id per slot it can host — roster ids are what the "zones"
 # tags in enemies.json actually mean. The Forest of Old hosts slots 1
@@ -298,14 +296,13 @@ var items := {}            # item id -> count (shared inventory)
 # map[slot + 1] (not row numbers: rows get pruned, indices do not shift under
 # you). The party's position is the pair (slot_idx, node_idx).
 var map: Array = []
-var slot_idx := -1         # -1 = zone not entered; 0..15 = standing on that slot
+var slot_idx := -1         # -1 = zone not entered; 0..16 = standing on that slot
 var node_idx := 0          # which node of map[slot_idx] the party stands on
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
 # The modifier the player accepted at the offer screen, live for exactly
 # one battle (§3). Cleared when that battle resolves. Not saved: quitting
-# between the offer and the fight forfeits the offer, and the slot is
-# re-offered — the same shape as pending_event.
+# between the offer and the fight forfeits the offer — the same shape as pending_event.
 var pending_modifier := ""
 var pending_reward := {}   # the reward the accepted option pays on victory
 # BATCH CT §3 — DROPS THAT HAVE NO SLOT, WAITING FOR THE MAP TO ASK.
@@ -344,12 +341,11 @@ var debug_grant_all := false
 # run (v5); once true it never clears, because a run that was
 # debug-touched stays debug-touched. Written in exactly TWO places, both
 # at the top of a debug dispatch: map_screen._on_burger and
-# battle._on_debug_menu. Sims can never set it (RunSim loads neither
-# scene, and the menus do not exist off the scene tree).
+# battle._on_debug_menu. Sims can never set it.
 var debug_used := false
 
-# Free Travel (Batch AC, map burger check item): while on, every node on
-# the board is clickable, ignoring links and position. Session-scoped,
+# Free Travel (Batch AC, map burger check item): while on, every node in
+# the next slot is clickable, ignoring links. Session-scoped,
 # never saved. The click still runs the normal path, so the run advances
 # honestly — debug_used above is what marks the run, not a fake board.
 var debug_free_travel := false
@@ -358,7 +354,7 @@ var debug_free_travel := false
 # cleared when it resolves. A summoned node is entered IN PLACE and runs
 # for real, but it must not corrupt the two records testers and sims
 # read — so this flag switches OFF the run ledger (tally_add /
-# tally_damage below) and the one Profile booking a summoned node can
+# tally_damage below) and a Profile booking a summoned node can
 # reach (battle.gd's wipe branch). Never saved.
 var debug_summon := false
 var pending_event := ""    # event id the event screen resolves (not saved:
@@ -404,7 +400,7 @@ func reset_tally() -> void:
 
 func tally_add(key: String, amount := 1) -> void:
 	# Batch AC: a debug-summoned node never happened as far as the ledger
-	# is concerned. Its gold, rests, battles and elites stay out, so a
+	# is concerned. Its gold, battles and elites stay out, so a
 	# summoned shop cannot silently inflate the economy line of a summary
 	# a tester pastes back as feedback.
 	if debug_summon:
@@ -430,7 +426,7 @@ func tally_damage(hero_name: String, amount: float) -> void:
 # BATCH BL §2 — THE ONE BOUNDED WRITER, shared by the dealt map and the taken
 # map so the cap cannot be honoured by one and forgotten by the other. `book` is
 # hero -> key -> amount; a key already present always lands on its own row, so
-# the bound bites only on the (N+1)th DISTINCT key a hero ever sees.
+# the bound bites only on the 24th DISTINCT key a hero ever sees.
 func _tally_book(book: Dictionary, hero_name: String, key: String,
 		amount: float) -> void:
 	var rows: Dictionary = book.get(hero_name, {})
@@ -916,7 +912,7 @@ func current_node() -> Dictionary:
 
 
 # Where the party stands in the WHOLE run, 1-49 — the readout the zone
-# header and the run summary both want. 0 before the first slot is entered.
+# header wants. 0 before the first slot is entered.
 # BATCH BM: 49, not 48. The final zone carries a seventeenth slot.
 func run_slot_number() -> int:
 	if slot_idx < 0:
@@ -936,8 +932,8 @@ func is_end_boss_slot(slot: int) -> bool:
 
 
 # Every node reachable from (slot, node), as a Dictionary of "slot,index"
-# keys. The map screen greys what a step has closed off, the sim measures
-# foreclosure with it, and the test asserts the entry guarantee against it.
+# keys. The map screen greys what a step has closed off, and the
+# test asserts the entry guarantee against it.
 func reachable_from(slot: int, node: int) -> Dictionary:
 	var seen := {}
 	var frontier: Array = [[slot, node]]
@@ -1040,7 +1036,7 @@ func compose_budget(budget: int, roster := 1) -> Array:
 
 
 # The budget scales across EACH ZONE (tier = the floor within the zone,
-# 1-11 with the boss on 11) as a continuous ramp (Batch T): the old three
+# 1-16 with the boss on 16) as a continuous ramp (Batch T): the old three
 # bands (3-6 / 6-9 / 10-12) put a cliff exactly at tier 4, and 40 of 50
 # simulated wipes landed on it. Later zones restart the ladder with a
 # tougher roster carrying higher base stats.
@@ -1097,7 +1093,7 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 #   severity_floor  — the guaranteed mild bargain option gets less mild:
 #                     roll_offer draws its safe slot from severity <= N.
 #   fixed_modifier  — the mini-boss, the zone bosses and the end boss carry
-#                     a modifier, which today they never do.
+#                     a modifier.
 const DIFFICULTIES := {
 	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
@@ -1197,7 +1193,7 @@ func battle_budget(tier := -1) -> int:
 
 func compose(node_type: String, tier := -1) -> Array:
 	var budget := battle_budget(tier)
-	# The ramp's tier-6 roll can dip to 5, but the cheapest elite theme
+	# The ramp's tier-6 roll can dip to 4, but the cheapest elite theme
 	# (Rage Company) needs 6 in every roster — below that an elite node
 	# would silently degrade to the plain-mob fallback while still paying
 	# elite rewards. Floor it; elite means elite.
@@ -1354,7 +1350,7 @@ func sync_spec_hp(idx: int) -> void:
 		member["hp"] = int(member["hp"]) + delta
 
 
-# Resting restores spirit as well as flesh (Mage/Cleric mana pools).
+# Restores spirit (Mage/Cleric mana pools).
 func restore_mana(pct: float) -> void:
 	for member in party:
 		if member["key"] == "mage" or member["key"] == "cleric":
@@ -1382,7 +1378,7 @@ func random_loot() -> String:
 # with a stale export in their shell would silently be in an experiment
 # arm; these two cannot be, because a real run never sets sim_run. Asserted
 # in test_runes.gd, not just intended.
-const RICH_SLOTS := 4  # DOD_SIM_RUNE_ECON=rich: every slot open from tier 1
+const RICH_SLOTS := 4  # DOD_SIM_RUNE_ECON=rich: a fourth slot, which no real run has
 
 
 # "rich" = acquisition raised, authored content untouched.
@@ -1432,8 +1428,8 @@ func runes_mode() -> String:
 #
 # It used to read *"returns {} when runes are off — every call site skips
 # empties"*, and both halves have changed. **`Runes.generate` returns `{}` on an
-# EXHAUSTED POOL now**, which a real run reaches: every rune is spec-scoped and
-# five per hero, so a hero who has seen his five draws nothing. Skipping an
+# EXHAUSTED POOL now**, which a real run reaches: every rune is spec-scoped,
+# so a hero who has seen his spec's set draws nothing. Skipping an
 # empty is what made the failure invisible, so the four offer sites ANNOUNCE it
 # instead (FM §2) — an empty panel that says nothing reads as a bug, and the
 # designer will hit this inside a run.
@@ -1441,13 +1437,12 @@ func runes_mode() -> String:
 # **AND THIS IS THE ONE PLACE THE GENERATED STAT FAMILY IS STILL REACHABLE**,
 # reported rather than left to be found: the `"stats"` branch below hands back a
 # `Runes.template_rune` directly. It is behind `DOD_SIM_RUNES`, an environment
-# variable no player sets and one `test_runes._arm_purity` asserts cannot arm a
-# real game, and the flag's whole documented purpose is to run the sim on
+# variable no player sets, and the flag's whole documented purpose is to run the sim on
 # exactly that family. **Closing it would delete a measurement arm rather than
 # an offer**, so it stands and is named here.
 # exclude_names: names this draw may not return even though the hero does
 # not own them — the candidates already in the triple being rolled. Empty
-# for every ordinary single-rune caller (shop, elite cache), so their
+# for every ordinary single-rune caller (shop, `grant_rune`), so their
 # behaviour is untouched.
 func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 	match runes_mode():
@@ -1458,8 +1453,8 @@ func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 	return _apply_rune_power(Runes.generate(member, zone_idx + 1, exclude_names))
 
 
-# The single choke point for the power arm: generate_rune is the only path
-# that turns an authored entry into a rune instance a hero can wear, so
+# The single choke point for the power arm: generate_rune and grant_rune are the only paths
+# that turn an authored entry into a rune instance a hero can wear, so
 # scaling here covers the Peddler, the elite cache and the rich arm's
 # grants at once. Generated stat sticks (tpl_*) are NOT authored content
 # and are deliberately left alone — the hypothesis under test is about the
@@ -1475,7 +1470,7 @@ func _apply_rune_power(rune: Dictionary) -> Dictionary:
 
 # DOD_SIM_RUNE_ECON=rich: the crudest probe that answers "what happens when
 # the runes actually arrive" — a spec-eligible authored rune handed over
-# rather than shopped for. Prefers the four written for THIS spec, because
+# rather than shopped for. Prefers the ones written for THIS spec, because
 # those are the entries the dilution question is actually about; falls back
 # to the ordinary roll when the spec's set is exhausted. Honours
 # DOD_SIM_RUNES (nothing under off, stat sticks under stats) so the arms
@@ -1546,9 +1541,9 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 # **`eligible_ids` IS THE ONE DOOR AND EVERY SITE THAT *ROLLS* AN OFFER GOES
 # THROUGH IT — THE HOLE WAS THAT THE CACHE DOES NOT ROLL AT THE OFFER.**
 # `roll_rune_candidates` runs at DROP time and stores its triple on the member,
-# where it rides the save until the player answers it. The screen that shows it
-# and `map_screen._pick_rune` both read that stored array straight, so between
-# the drop and the pick NOTHING re-asks the pool anything — and two facts can
+# where it rides the save until the player answers it. Before FD, the screen
+# that showed it and `map_screen._pick_rune` both read that stored array straight,
+# so between the drop and the pick NOTHING re-asked the pool anything — and two facts can
 # move in that window:
 #
 #   * **A RUNE CAN BE RETIRED.** `Runes.is_retired` had ZERO callers in the
@@ -1573,8 +1568,8 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 # read the same array, so the index a button carries still names the rune the
 # button showed.
 #
-# **THE TOP-UP CANNOT COME BACK EMPTY IN A REAL RUN.** `generate_rune` returns
-# `{}` only under `DOD_SIM_RUNES=off`, and under that flag `roll_rune_candidates`
+# **THE TOP-UP COULD NOT COME BACK EMPTY IN A REAL RUN UNTIL FM §1.** `generate_rune`
+# returned `{}` only under `DOD_SIM_RUNES=off`, and under that flag `roll_rune_candidates`
 # returns `[]` and nothing is ever queued — so a non-empty queue means runes
 # were on when it was written. The loop still breaks rather than spinning, and
 # `_pick_rune` refuses an empty triple, because "cannot happen" is not the same
@@ -1620,13 +1615,13 @@ func rune_choice(member: Dictionary) -> Array:
 #   `rune_candidates`     elite cache / bargain -> `_pick_rune`      RE-ASKED (FD)
 #   `draft_candidates`    elite victory        -> `take_draft_ability`  RE-ASKED
 #   `pending_item_offers` loot / relic / event -> `_check_item_offers`  RE-ASKED
-#   `bm_candidates`       ZONE BOSS            -> `_pick_ability`       **NOT**
-#   `up_candidates`       MINI-BOSS            -> `_pick_upgrade`       **NOT**
+#   `bm_candidates`       ZONE BOSS            -> `_pick_ability`       RE-ASKED (FE)
+#   `up_candidates`       MINI-BOSS            -> `_pick_upgrade`       RE-ASKED (FE)
 #
 # `pending_item_offers` is the fifth and FD did not have it; it re-asks the
 # POUCH at resolution (`if not Run.needs_slot(id)`) and says so in as many
 # words. The shop and the blacksmith are NOT in this population: both roll into
-# a screen-local `offers` in `_ready` and neither is saved.
+# a screen-local `offers` (the blacksmith's is `offer`) in `_ready` and neither is saved.
 #
 # **REACHABILITY IS STRUCTURAL, NOT INCIDENTAL.** `MINI_SLOT` and `BOSS_SLOT`
 # are FIXED slots — one mini-boss and one zone boss per zone, three zones, and
@@ -1772,24 +1767,25 @@ func owed_ability_picks() -> int:
 	return n
 
 
-# Every ability display name the hero can already cast: core kit + spec kit
+# Every ability display name the hero already owns: core kit + spec kit
 # + kit-override renames + earned picks, PLUS anything a learned talent node
 # grants. Without the talent half a Berserker who bought Battle Shout in the
-# tree could be offered it again as a pick that does nothing.
+# tree could have been offered it again as a pick that did nothing, until DO
+# moved it out of the tree.
 # THE implementation lives in Talents.ability_names (Batch AI) so a node's
 # `condition` can read it — autoload identifiers do not resolve inside a
 # class_name script, so the list had to live on the class side of the fence.
-# This stays as the name every screen already calls.
 func owned_ability_names(member: Dictionary) -> Array:
 	return Talents.ability_names(member)
 
 
 # Queue one ability award on a hero: the offer is rolled NOW and stored, so
-# the pick waiting on the hero card is the pick that dropped. Returns false
-# when nothing is left to offer (spec pool exhausted, or no spec).
+# the pick waiting on the hero card is the pick that dropped — re-asked, never
+# rerolled, by `ability_choice` when it is answered. Returns false
+# when nothing is left to offer (all three tiers exhausted, or no spec).
 #
 # BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class
-# draw Batch AH built is dropped, because abilities are spec-locked now.
+# draw Batch AH built is dropped, because abilities were spec-locked then.
 #
 # **AND BATCH DY §3 DELETED THE OTHER HALF OF THAT DRAW.** This comment used to
 # end "`Classes.CLASS_POOLS` / `class_pool()` are left standing and still
@@ -1801,8 +1797,9 @@ func owned_ability_names(member: Dictionary) -> Array:
 # those were the hero's own PROTECTED CORE. **RE-OPENING A CLASS DRAW IS A
 # DESIGN DECISION WITH A CURATION BILL, NOT A ONE-LINE CHANGE**, and if it is
 # ever taken it reads `Classes.CLASS_DRAFT_POOLS` — which is live and curated —
-# rather than a second dict rebuilt from scratch. The award below is
-# SPEC_POOLS-only and that is the standing ruling.
+# rather than a second dict rebuilt from scratch. The award below was
+# SPEC_POOLS-only then, and that was the standing ruling until EA §1 and EH §1
+# widened it into the chain below.
 func award_ability_pick(member: Dictionary) -> bool:
 	var offer := roll_spec_ability_offer(member)
 	if offer.is_empty():
@@ -1826,8 +1823,8 @@ func award_ability_pick(member: Dictionary) -> bool:
 		# `ABILITY_SLOT_CAP - core_slots(spec)` earned cards — four, or three
 		# for Holy — against pools of ten to thirteen, and what he CARRIED was
 		# what he HELD. **EG BROKE BOTH TERMS ONE BATCH LATER.** The cap is a
-		# ladder to ten, so the loadout bound alone takes that floor to 3 for
-		# seven specs and 2 for the Occultist; and a benched card is KEPT, so
+		# ladder to ten, so the loadout bound alone takes that floor as low as
+		# 3, and to 2 for the Occultist; and a benched card is KEPT, so
 		# `owned_ability_names` reads a pool the slot cap does not bound at all
 		# and the true worst case floors at ZERO. **EA's ruling is overturned
 		# in its second tier only and not in its reasoning: a zone-boss award
@@ -1898,7 +1895,7 @@ func note_zone_boss_cleared() -> void:
 # question of the form "does this hero already own that card" reads it, through
 # `owned_ability_names` -> `Talents.ability_names` -> `Runes.kit_names`, and
 # that is why the pool and not the loadout is the set those readers want: a
-# card benched on the party screen is still owned, and re-offering it would be
+# card benched on the map screen is still owned, and re-offering it would be
 # a duplicate.
 #
 # `bm_equipped` IS THE LOADOUT AND IS NEW. It is the subset the hero actually
@@ -1917,7 +1914,8 @@ func earned_ability_names(member: Dictionary) -> Array:
 
 
 # What the hero fights with: the pool minus whatever is benched. A member that
-# has never benched anything carries no `bm_equipped` key and reads its pool.
+# has never taken or benched a card since EG carries no `bm_equipped` key and
+# reads its pool.
 func equipped_ability_names(member: Dictionary) -> Array:
 	return member.get("bm_equipped", member.get("bm_abilities", [])).duplicate()
 
@@ -1932,7 +1930,7 @@ func equipped_ability_names(member: Dictionary) -> Array:
 # reads EMPTY.
 #
 # **IT READS NO TAG AND MUST NOT.** This is the list; what the list MEANS is
-# `Classes.tag_census`'s question, asked through `Runes.loadout_tag_census`.
+# `Classes.tag_census`'s question.
 # Keeping the two apart is what keeps `run_state.gd` out of `check_ek` §3's
 # tag population, which is asserted at zero for this file by name.
 #
@@ -1949,7 +1947,8 @@ func loadout_ability_names(member: Dictionary) -> Array:
 	return out
 
 
-# Benched: held, and not carried. The party screen's swap list.
+# Benched: held, and not carried. The hero sheet, the map's Kit button and the
+# run summary read it.
 func benched_ability_names(member: Dictionary) -> Array:
 	var carried: Array = equipped_ability_names(member)
 	return earned_ability_names(member).filter(
@@ -2066,8 +2065,8 @@ func draft_card_is_class(spec_left: int, class_left: int) -> bool:
 	return randf() < Classes.CLASS_DRAFT_SHARE
 
 
-# EVERY OFFER IS 3 CARDS. If the pool cannot fill three — likely until tranche
-# 3 — IT FILLS SHORT RATHER THAN PADDING WITH REPEATS. That is AP §3's existing
+# EVERY OFFER IS 3 CARDS. If the pool cannot fill three,
+# IT FILLS SHORT RATHER THAN PADDING WITH REPEATS. That is AP §3's existing
 # rule for upgrade offers, applied unchanged.
 func roll_draft_offer(member: Dictionary) -> Array:
 	var pools := draft_pool_left(member)
@@ -2111,7 +2110,7 @@ func owed_draft_picks() -> int:
 # earned ability the incoming card displaces from the LOADOUT, and a name that
 # is not an EARNED ability is refused outright — a protected ability can never
 # be named here. **BATCH EG §2: THE BENCHED CARD IS KEPT.** It stays in the
-# pool, it is swappable back on the party screen, and it does not enter the
+# pool, it is swappable back on the map screen, and it does not enter the
 # no-return ledger. The shape of the take is deliberately unchanged — at the
 # cap you still choose — because the complaint the batch answers is that the
 # choice was PERMANENT, not that it existed.
@@ -2154,7 +2153,8 @@ func decline_draft(member: Dictionary) -> bool:
 	return true
 
 
-# THE MERCHANT'S PRICE, by zone — the third pick source (§3). Sits below the
+# THE MERCHANT'S PRICE, by zone — the third pick source (§3) until FD §1
+# withdrew it; kept with no game caller. Sits below the
 # blacksmith's [150, 225, 300] on purpose: the smith buys a permanent upgrade
 # to something you already hold, and BK measured it converting 41-47% of ALL
 # run income. An ability is the cheaper, more frequent question.
@@ -2238,8 +2238,8 @@ func save_run() -> void:
 	# (the honesty flag). v6 (Batch AI): the ROW tree — members carry
 	# talent_flex and no talent_order, and anything older has its tree wiped
 	# and its points re-issued on load (_migrate_trees). Loading stays
-	# tolerant of older saves via .get defaults — never drop player state
-	# silently.
+	# tolerant of the older saves load_run admits, via .get
+	# defaults — never drop player state silently.
 	# v7 (Batch AN): the LINE. v8 (BATCH BK): THE LATTICE. `map[slot]` is an
 	# ARRAY of nodes and the position is the PAIR (slot_idx, node_idx), so a
 	# v7 save's flat 12-slot line indexes into a structure that is not there.
@@ -2250,7 +2250,8 @@ func save_run() -> void:
 	# v9 (BATCH BL §2): the recap's new ledgers — dealt-by-ability, taken-by-
 	# source, taken totals, killing blows, and the final-battle copy of all
 	# four. TOLERANT, unlike the v8 refusal above: these are counters, not
-	# structure, so a v8 save loads and simply starts them mid-run at zero. A
+	# structure, so a v8 save loaded and simply started them mid-run at zero
+	# until v10 refused it. A
 	# recap that begins counting halfway through a resumed run is a smaller lie
 	# than a wiped run, which is the test v8 failed and this one passes.
 	# v10 (BATCH BM): talents are META now. `party[i]["talents"]` is the
@@ -2314,7 +2315,7 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	var save_version := int(data.get("version", 0))
-	# Batch BK: a pre-v8 save describes a board this build cannot render or
+	# Batch BK and BM: a pre-v10 save describes a board this build cannot render or
 	# walk. Refuse it and delete it, rather than half-loading a run whose
 	# every "next node" call would index a dictionary that is not there.
 	if save_version < 10:
@@ -2347,8 +2348,9 @@ func load_run() -> bool:
 	tally = data.get("tally", {})
 	if tally.is_empty():
 		reset_tally()
-	# BATCH BL §2: a v8 save carries a tally with none of the recap's new keys.
-	# Seed the missing ones rather than refusing the save — every writer above
+	# BATCH BL §2: a v8 save carries a tally with none of the recap's new keys,
+	# and the refusal above now stops one before this line. Seed the missing
+	# ones rather than refusing the save — every writer above
 	# assumes they exist, and a resumed run should lose the recap's history, not
 	# the run.
 	for k in ["dealt", "taken", "taken_total"]:
@@ -2359,8 +2361,9 @@ func load_run() -> bool:
 	if not (tally.get("final") is Dictionary):
 		tally["final"] = {"dealt": {}, "taken": {}, "taken_total": {}, "kills": []}
 	_migrate_trees()
-	# A pre-AC (v4) save loads with the honesty flag false — it predates
-	# every tool that could have set it. The session-scoped toggles are
+	# A pre-AC (v4) save loaded with the honesty flag false — it predated
+	# every tool that could have set it — until the refusal above.
+	# The session-scoped toggles are
 	# never saved, so a resumed run always resumes with them off.
 	debug_used = bool(data.get("debug_used", false))
 	debug_summon = false
@@ -2386,9 +2389,9 @@ func load_run() -> bool:
 # with fewer talents is a shape this build already reads.
 #
 # Batch AN dropped the pre-Batch-AI branch that used to live here: only v7
-# saves reach this function now (load_run refuses anything older), and every
+# saves reached this function then (load_run refused anything older), and every
 # v7 save was written by a build whose trees are already rows. Ranks carry,
-# and points in nodes that shrank or vanished are refunded.
+# and points in nodes that shrank or vanished were refunded until BM (below).
 func _migrate_trees() -> void:
 	for member in party:
 		var spec: String = member.get("spec", "")
@@ -2422,7 +2425,7 @@ func award_gold(node_type: String) -> int:
 	match node_type:
 		"elite", "miniboss":
 			# Elites pay out hard — seeking them out is how skilled players snowball.
-			# The mini-boss matches them: its own spoil is the ability pick.
+			# The mini-boss matches them: its own spoil is the ability upgrade pick.
 			amount = randi_range(80, 100)
 		"boss":
 			amount = randi_range(110, 130)
@@ -2448,10 +2451,10 @@ func award_gold(node_type: String) -> int:
 # entering a boss" reading. Those measured a per-run purse that no longer
 # exists; do not compare any post-BM number against them.
 
-# 1 point per spec per zone boss, to Profile, for the specs that were in the
-# party. Called from BOTH victory paths (battle.gd and RunSim), and NEVER by
-# a sim — a simulated run must not touch the player's ledger, so the caller
-# checks `sim_run` exactly as it does for save_run.
+# 1 point per class per zone boss, to Profile, for the classes that were in the
+# party. Called from `battle._resolve_boss`, and NEVER by
+# a sim — a simulated run must not touch the player's ledger, so this function
+# checks `sim_run` itself, exactly as save_run does.
 func bank_zone_boss_points() -> void:
 	if sim_run:
 		return
@@ -2599,7 +2602,7 @@ func bomb_damage() -> int:
 
 # ---------- Batch AN §3: the offer ----------
 #
-# Before every FIGHT and ELITE slot the player is shown three options and
+# Before every ELITE and MINI-BOSS slot the player is shown three options and
 # picks one. Each option is one MODIFIER plus one REWARD, both visible
 # before choosing, and the reward is read off the modifier's SEVERITY —
 # authoring a modifier is therefore authoring one number, not a pairing.
@@ -2614,7 +2617,7 @@ func bomb_damage() -> int:
 # run with a pending modifier still resolves).
 #
 # THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
-# the severity 1-2 pool, so the safe slot on every card all run is served by
+# the rung's mild pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
 # actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4.
 #
@@ -2626,8 +2629,9 @@ func bomb_damage() -> int:
 # (one field, added back at the victory sync) and Batch AW then BUILT EXACTLY
 # THAT PATTERN FOR THE OPPOSITE SIGN — `conviction_hp_gained` accumulates growth
 # and the sync subtracts it. `rot_hp_lost` accumulates the reduction and the
-# sync ADDS it back. Both victory syncs carry all three fields now, and the
-# ordering is stated at each of them because this is the site with a five-figure
+# sync ADDS it back. The one victory sync, `BattleUnit.sync_victory_state`
+# (Batch BJ §1), carries all three fields now, and the ordering is stated there
+# because this is the site with a five-figure
 # max-HP runaway in its history (Batch W).
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
@@ -2711,24 +2715,24 @@ func reward_text(reward: Dictionary) -> String:
 
 # Three distinct modifiers, each paired with one reward its severity allows.
 #
-# THE FLOOR IS THE POINT: every offer holds at least one option of severity
-# 1 or 2, so a party down to its last few HP always has a survivable choice.
+# THE FLOOR IS THE POINT: every offer holds at least one option from the rung's
+# mild pool, so a party down to its last few HP always has a survivable choice.
 # It is enforced by CONSTRUCTION (the first draw comes from the low pool)
 # rather than by rejecting rolls, so it cannot fail on an unlucky table.
 #
-# BATCH AQ §2: the other two slots come from the severity 3-4 pool ALONE.
+# BATCH AQ §2: the other two slots came from the severity 3-4 pool ALONE.
 # They used to draw from low + high together, which was tolerable at six
 # modifiers and would not have been at nineteen — twelve of them low, so most
 # offers would have come out as three cheap options paying three cheap
 # rewards. The pool would have got deeper and the decision blander. Filling
-# from the high pool makes every offer read the same way: ONE SAFE OPTION,
+# from the high pool made every offer read the same way: ONE SAFE OPTION,
 # TWO GAMBLES. The floor still guarantees the safe one, so a wounded party is
 # never cornered.
 # BATCH BM §5, TWIST ONE: THE SEVERITY FLOOR RISES WITH THE RUNG. The
 # guaranteed mild option is still guaranteed — the floor is still enforced by
 # construction rather than by rejecting rolls — but "mild" means severity <=
 # 2 at rung 1, <= 3 at rung 2 and <= 4 at rung 3, so by the top rung the safe
-# slot is only nominally safe. Every offer still reads ONE SAFE, TWO GAMBLES.
+# slot is only nominally safe.
 func roll_offer() -> Array:
 	var floor_sev := int(difficulty_def()["severity_floor"])
 	var low: Array = []
@@ -2752,8 +2756,9 @@ func roll_offer() -> Array:
 	# so a floor of 4 leaves nothing above it and BOTH gambles fall through to
 	# here and are drawn from the whole twenty. Measured over 400 offers a rung,
 	# mean severity offered is 2.83 / 3.29 / 2.31: RUNG 3'S BARGAINS COME OUT
-	# MILDER THAN RUNG 1'S. Reported at EP §1 and ruled on nowhere — that brief
-	# is rung 2's. An offer short of three options would still be worse than a
+	# MILDER THAN RUNG 1'S. Reported at EP §1 and ruled on after it: a real
+	# defect, rung 3's, to be fixed separately — that brief is rung 2's.
+	# An offer short of three options would still be worse than a
 	# second low one, which is why the clause itself is correct and stays.
 	while picked.size() < 3 and not low.is_empty():
 		picked.append(low.pop_front())
@@ -2767,8 +2772,8 @@ func roll_offer() -> Array:
 	return offer
 
 
-# BATCH BM §5, TWIST TWO: FIXED ENCOUNTERS CARRY A MODIFIER, which today
-# they never do. The mini-boss, the three zone bosses and the end boss are
+# BATCH BM §5, TWIST TWO: FIXED ENCOUNTERS CARRY A MODIFIER, which before BM
+# they never did. The mini-boss, the three zone bosses and the end boss are
 # the only nodes a route cannot duck, so a modifier on them is a real
 # escalation the player has to build against rather than route around.
 # It is NOT a bargain: there is no offer, no choice and NO REWARD — the
@@ -2846,7 +2851,7 @@ func claim_reward() -> Dictionary:
 			#
 			# **THE PICK PREFERS SOMEONE IT CAN ACTUALLY PAY**, which is the
 			# idiom `events.gd`'s own rune verb already uses one function over
-			# (it prefers a hero with a free slot and falls back to the party).
+			# (it prefers a payable hero with a free slot and falls back to any payable one).
 			# `party.pick_random()` was exhaustive when every hero could always
 			# take one; now a random pick can land on the one exhausted hero in
 			# a party of four and throw the reward away. The fallback keeps the
@@ -2902,7 +2907,7 @@ func next_after_scene() -> String:
 	return "res://scenes/map.tscn"
 
 
-# Arm the event a MERCHANT/EVENT node draws when the party steps onto it.
+# Arm the event an EVENT node draws when the party steps onto it.
 # Returns false when nothing is eligible (the pool is spent for this run and
 # every requirement filtered) — the caller walks on rather than showing an
 # empty screen.
@@ -2918,7 +2923,7 @@ func begin_event_node() -> bool:
 
 # ---------- Batch AN §6: attrition ----------
 
-# Clearing ANY slot heals the party this much. It rides the SAME
+# Winning ANY battle heals the party this much. It rides the SAME
 # `victory_heal_pct` hook the Chalice of Dawn already uses rather than a new
 # one, so the relic's 10% stacks on top for 25% and there is still exactly
 # one read site for "how much does a victory heal".
@@ -2945,15 +2950,15 @@ func victory_heal_pct() -> float:
 # given upgrade appears about half as often. That is the point — variety
 # across runs — but it also means A HERO CAN FINISH A RUN HAVING BEEN OFFERED
 # A POOL THAT NEVER INCLUDED THE ONE THEIR BUILD WANTED. That is correct for a
-# roguelike, not a bug, and the changelog says so.
+# roguelike, not a bug, and the archived changelog and master.html say so.
 #
 # TWO DESCRIPTIONS WERE CORRECTED IN BATCH AP, because they were authored
 # before anything read them and both named the wrong thing:
 #   Effortless zeroes `cost` ONLY and never `faith_cost` — Mercy is the Holy
 #   Cleric's identity resource and a free Resurrection is a different game.
 #   Swift was written as "+2 initiative speed", but delays across the whole
-#   roster run 1.5-4.0, so subtracting 2 would take most abilities to
-#   near-zero. It is a 25% cut floored at 1.0 instead — the one balance
+#   roster are short enough that subtracting 2 would take most abilities to
+#   near-zero. It is a 25% cut, floored at 1.0 until CZ §4, instead — the one balance
 #   judgement in that batch, flagged rather than buried.
 # BATCH BH §1 — THE POOL GOES FROM FOUR TO EIGHT. The recorded ceiling is
 # about eight and eight is the TARGET, not a step toward twelve: a hero draws
@@ -2985,7 +2990,7 @@ func victory_heal_pct() -> float:
 #      reach. On its authored eligibility Certain would have been a pool entry
 #      that could never be offered. THE RELIABILITY AXIS THE HERO ROSTER
 #      ACTUALLY HAS IS `bleed_chance` (Hack and Slash and Wildstrikes both roll
-#      0.5, and the Relentless talent exists to buy exactly this), so Certain
+#      0.5, and the Relentless talent existed to buy exactly this until FX), so Certain
 #      covers both fields: the axis the brief asked for, through the door the
 #      game actually has.
 #
@@ -3034,10 +3039,10 @@ const ABILITY_UPGRADES := {
 #
 # BATCH BH §1 — THE FOUR NEW ONES GO AFTER THE FOUR OLD ONES, AND THAT IS A
 # COMPATIBILITY SURFACE RATHER THAN A PREFERENCE. This list is what every
-# ability-granting talent node falls back on when its grant collides with an
-# already-owned copy, so a node that granted Honed yesterday must grant Honed
-# today. Appending keeps every existing fallback byte-identical; inserting
-# anywhere else would silently re-point nine live nodes.
+# ability-granting talent node fell back on, until DO, when its grant collided
+# with an already-owned copy, so a node that granted Honed yesterday had to grant
+# Honed today. Appending keeps every existing fallback byte-identical; inserting
+# anywhere else would have silently re-pointed live nodes.
 const UPGRADE_PRIORITY := ["up_damage", "up_cooldown", "up_free", "up_speed",
 	"up_break", "up_wide", "up_pierce", "up_certain"]
 
@@ -3099,9 +3104,8 @@ func upgrade_fits(id: String, ab: Ability) -> bool:
 #
 # ORDER IS LOAD-BEARING: this runs AFTER `Talents.apply_from_tree` and after
 # the equipped-rune pass, never before. Several talents SET an ability field
-# rather than add to it — the Resonant Hymn node sets Hymn of Hope's cost to
-# 25 — so an Effortless applied first would be silently overwritten by the
-# talent. Upgrades go last, so they always win.
+# rather than add to it until FX, so an Effortless applied first would have
+# been silently overwritten by the talent. Upgrades go last, so they always win.
 #
 # An entry naming an ability the hero no longer holds is skipped in silence:
 # it can happen across a spec reroll and is not an error.
@@ -3143,7 +3147,7 @@ func apply_upgrades(member: Dictionary, abilities: Array,
 			continue  # the ability left the kit — nothing to upgrade, not an error
 		var pick := fallback_upgrade_id(fb_ab, carried.get(fb_name, []))
 		if pick == "":
-			continue  # an honest dead end; the node's tooltip says so
+			continue  # an honest dead end; the node's tooltip said so until BM
 		_stamp_upgrade(pick, fb_ab)
 		carried[fb_name] = carried.get(fb_name, []) + [pick]
 		landed[fb_name] = landed.get(fb_name, []) + [upgrade_name(pick)]
@@ -3196,7 +3200,8 @@ func _stamp_upgrade(id: String, ab: Ability) -> void:
 # The generic talent fallback's choice: the first upgrade in UPGRADE_PRIORITY
 # that FITS this ability (AP §3's eligibility rules, reused not re-written) and
 # is not in `already`. "" when every eligible upgrade is already on it — the
-# node grants nothing, and the hero screen says so rather than staying silent.
+# node grants nothing, and until BM the hero screen said so rather than
+# staying silent.
 func fallback_upgrade_id(ab: Ability, already: Array = []) -> String:
 	if ab == null:
 		return ""
@@ -3210,7 +3215,7 @@ func fallback_upgrade_id(ab: Ability, already: Array = []) -> String:
 
 
 # What a hero's tree node would actually hand them if its grant collided right
-# now, as a sentence — the hero screen's collision line. "" when the node has
+# now, as a sentence — the hero screen's collision line until BM. "" when the node has
 # nothing to say (it does not grant an ability, or the hero does not own it).
 # Reads `member["upgrades"]` for what the ability already carries, which is the
 # same data apply_upgrades reads, so the tooltip cannot promise a second Honed.
@@ -3246,8 +3251,8 @@ func upgrade_desc(id: String) -> String:
 
 
 # Has this hero already taken this upgrade, on any ability? THIS IS AP'S
-# ONCE-PER-RUN RULE and it has exactly one consumer, `roll_upgrade_offer` —
-# i.e. the MINI-BOSS PICK POOL.
+# ONCE-PER-RUN RULE and it has exactly two consumers, `roll_upgrade_offer` and
+# `upgrade_choice` — i.e. the MINI-BOSS PICK POOL.
 #
 # BATCH BK: A BOUGHT UPGRADE IS SKIPPED HERE. The blacksmith writes into the
 # same `member["upgrades"]` list on purpose (one list is what makes a bought
@@ -3411,8 +3416,8 @@ func buy_blacksmith(pairing: Dictionary) -> bool:
 	return true
 
 
-# Batch AN §4: zone bosses draw from the hero's SPEC POOL ONLY — the class
-# draw Batch AH added is dropped, abilities are spec-locked now. Spec pools
+# Batch AN §4: zone bosses drew from the hero's SPEC POOL ONLY — the class
+# draw Batch AH added is dropped, abilities were spec-locked then. Spec pools
 # are 2-5 deep, so this offers what exists and fills short rather than
 # padding from somewhere the batch just closed off.
 func roll_spec_ability_offer(member: Dictionary) -> Array:
@@ -3447,8 +3452,8 @@ func roll_spec_ability_offer(member: Dictionary) -> Array:
 # the POOL is unbounded, because a benched card is kept, so what a hero owns is
 # every card he has ever taken rather than every card he currently carries.
 # `owned_ability_names` reads the pool, so the fallback's filter is what widens.
-# **`check_ea` §1 derives the live floor every battery run and asserts it clears
-# the award count** — the arithmetic is measured there and is not restated here,
+# **`check_ea` §1 derives the live floor every battery run and asserts it is
+# never zero** — the arithmetic is measured there and is not restated here,
 # because a second copy of a number is what goes stale.
 #
 # AND IT DELIBERATELY DOES NOT CONSULT `draft_refused`, which is the one
@@ -3485,14 +3490,14 @@ func roll_spec_fallback_offer(member: Dictionary) -> Array:
 # **WHY THE CLASS-WIDE POOL IS A REAL FLOOR AND WHERE THAT CLAIM STOPS.** No
 # sibling spec can drain it: every hero filters this pool against HIS OWN
 # `owned_ability_names`, and no hero can hold another spec's picks, so three
-# specs sharing six cards is three independent sixes rather than a shared one.
+# specs sharing one pool is three independent pools rather than a shared one.
 # **BUT IT IS NOT UNEMPTIABLE, AND SAYING SO WOULD BE EA's OWN MISTAKE AGAIN.**
 # Roughly one draft card in four is class-wide, and `draft_card_is_class`
 # returns TRUE unconditionally once the spec side is dry — so a hero who takes
 # at every offer drains his spec pool and then this one. What actually holds
 # the floor up is arithmetic, not structure: emptying all three tiers means
-# OWNING every name in both draft pools, 16 for nine specs and up to 20 for the
-# Pyromancer, and one draft offer pays at most one card. `check_eh` §1 derives
+# OWNING every name in both draft pools, up to 20 for the
+# Pyromancer, and one draft offer pays at most one card. `check_ea` §1 derives
 # both bounds every run — the LOADOUT bound is asserted, the POOL bound is
 # printed — which is the split EG §1 left behind rather than a new one.
 #
