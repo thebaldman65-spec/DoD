@@ -123,6 +123,14 @@ last exactly one.*
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
+### TWO DEFECTS THAT ARE `main`'s TOO — **RECORDED HERE AT GG FROM `class-merge`; THE REST OF THIS FILE IS FS's**
+
+- **A QUIT AT A BARGAIN OR INSIDE A FIGHT WALKS PAST THE FIGHT, AND AT A ZONE BOSS LEAVES THE HEROES ON A BOARD WITH
+  NOTHING TO PRESS — FIXED ON `class-merge` AT GF (`bc6e258`), NOT HERE; AND BESIDE IT, THE END BOSS HAS NO BUTTON** (the
+  map draws sixteen columns and the end boss stands in the seventeenth, so no run reaches it), **FOUND AT GF ON BOTH
+  BRANCHES AND FIXED ON NEITHER.** Both were driven on this branch as well as on the merge branch; the working is
+  `docs/reports/GF.md` on `class-merge`.
+
 ### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
