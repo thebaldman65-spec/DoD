@@ -288,8 +288,8 @@
   "check_parse": {
    "kind": "gate",
    "checks": [
-    182,
-    182
+    183,
+    183
    ],
    "checks_obs": 1,
    "fails": [
@@ -297,7 +297,7 @@
     0
    ],
    "fails_obs": 10,
-   "note": "**BATCH FX MOVED IT 181 -> 182:** check_fx.gd joined the population it parses. **BATCH FT MOVED IT 180 -> 181, AND THE +1 IS `check_ft.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FT added one gate and edited two game scripts, which moves no file into or out of the population. **BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
+   "note": "**BATCH GF MOVED IT 182 -> 183:** check_gf.gd joined the population it parses; GF edited six game scripts, which moves no file into or out of it. **BATCH FX MOVED IT 181 -> 182:** check_fx.gd joined the population it parses. **BATCH FT MOVED IT 180 -> 181, AND THE +1 IS `check_ft.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FT added one gate and edited two game scripts, which moves no file into or out of the population. **BATCH FS MOVED IT 179 -> 180, AND THE +1 IS `check_fs.gd` ITSELF.** This gate's count IS its coverage — it walks every target the battery spawns, the transitive closure of that, the game tree and the data, and prints the number of distinct files it loaded. A walk that quietly stops covering something is a FALL and reds here; a batch that adds a target is a RISE and owes this row. FS added one gate and re-pointed the two SCENE runs through `run_one`, which moves no file into or out of the population. **AND THE +1 IS NOT AUTOMATIC:** FS's first draft of a comment in `run_battery.sh` spelled out a scene path with a placeholder name, which this gate harvested as a battery target and reported MISSING — 181 checks and 1 failure. A comment naming the string a gate matches is an asserted surface."
   },
   "harness_1": {
    "kind": "harness",
@@ -1489,6 +1489,20 @@
    "checks_obs": 2,
    "fails_obs": 2,
    "note": "**BATCH GB MOVED IT 494 -> 496, OFF ONE STANDALONE READING WRITTEN BEFORE THE BATTERY:** §1 -2, because Deflection's field is a switch (`deflection > 0`), so the text-table row and the phrase check Enemies Look Past You's `ghillie` carried leave with it; §4b +4, because the one-check ghillie arm became Deflection's arm, one premise check and one check per class with a RANGED and a MELEE blow each, read off the health taken and off the read site's own log line. HEAD's copy read 493 / 2 against the new tree first: the text row and the retired field, both predicted. **BATCH FX MOVED IT 493 -> 494:** the drive reports a field the tree stops writing instead of throwing (the zero-start control truncated it at 468). **NEW AT FX. THE ONE TALENT TREE, KEYED TO THE CLASS.** §0 proves the gate's own Profile writes go to a scratch file. **§1 THE SHAPE:** 27 nodes in three tiers of nine at 1/2/3 (54), unique ids, every payload exactly one `stat` block on a field BattleUnit declares, NO TWO NODES WRITE ONE FIELD (the surviving half of BM's row-8 rule), no digit in parentheses, and each node's text agrees with its magnitude through a field -> factor/phrase table, so a payload that moves without its text reds; the tree grants nothing. **§2 THE GATES AND THE LEDGER:** the purse is the CLASS's (two Warrior specs in one party pay the class once, a spec key has no purse), TIERS_OPEN [0,1,2,3] and nothing opens at rung 0, the spend gate names the tier below and the difficulty gate still binds with the spend met, buying is wearing, the class purses stay apart, a refund cannot strand a tier, respec is whole, and the run reads the ledger through the spec's class. TIER_SPEND_MIN is READ and only its 1-9 range is asserted: the number is the designer's. **§3 THE FOLD, DRIVEN ON A COPY:** twelve spec purses fold by MAX into four, matching fold_report; cells and the loadout are dropped, the tier and every other bucket kept; the file stays v2 on disk until the first save; 3/3/3 folds to 3, not 9; an unplaceable purse or a non-number is REFUSED with the file hash unchanged; MIN_VERSION moved past 1. **§4 EVERY NODE PAYS, LIVE, ON EVERY CLASS:** (a) one battle with all 27 on four heroes against one with none, 112 field landings, max_hp x1.2 and both party-wide stamps; (b) all 27 read sites driven through the battle's own functions. **§5 THE RUNES READ NO NODE:** no rune carries a condition, `has_node(` appears only in talents.gd, and the tree carries no condition. Ten negative controls in docs/reports/FX.md, each read by its FAIL text. **GB's acceptance battery read it again, 496 / 0, and the row rests on that reading too.**"
+  },
+  "check_gf": {
+   "kind": "gate",
+   "checks": [
+    98,
+    98
+   ],
+   "fails": [
+    0,
+    0
+   ],
+   "checks_obs": 2,
+   "fails_obs": 2,
+   "note": "NEW AT GF. A QUIT PUTS THE HEROES BACK WHERE THEY WERE STANDING, AND THE GATE PLAYS EVERY QUIT THROUGH THE REAL SCREENS. Each arm quits at one branch of `Run.resume_scene` -- through the battle's own Exit to Main Menu where the screen is a battle, and by leaving the scene as a closed window does elsewhere -- then sets every run field the resume reads to a wrong value and presses the real Continue button, so only the file on disk can answer. THE ELITE: its bargain comes back as the same three terms over the same warband, at the same position and health; a bargain taken and a fight quit come back as the same fight with the bargain armed; a won fight comes back as the map, paid once, with its draft overlay reopened and its rune picks unchanged. A PLAIN FIGHT quit twice restarts twice and pays nothing; won, it is no longer pending and the map's nodes press. THE ZONE BOSS: a quit mid-fight comes back as the boss; beaten on its card, the run descends once, keeps the ability pick, leaves the slot ladder alone and writes the new zone to disk, and a second quit does not move the party again. THE EVENT comes back as itself and, answered, gives way to the map; a bought merchant is visited once and then the map. THE v12 SAVE: a control arm at v13 reaches the offer; the same save at v12 with the four keys erased lands on the map, because nothing in a v12 file can recover the fight; and a v12 save on a zone boss descends. The player's run save is hashed before and after with both arms unconditional, and the gate's Profile writes go to a scratch file. HEAD's code read 98 / 42 through a shim adding only the one name the gate calls. Written before the battery off two standalone readings of 98 / 0, one in an isolated copy and one in the real tree, with the four saves hashed unchanged across the second."
   }
  }
 }

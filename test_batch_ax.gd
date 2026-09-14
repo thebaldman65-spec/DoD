@@ -561,8 +561,13 @@ func _boss_legibility() -> void:
 	ok(bw != null and bw.description.contains("BOSS RESISTS UNTIL BROKEN"),
 		"Bewitch's tooltip states it too")
 	# AND THE RUIN ENTRY WAS REWRITTEN WHOLESALE.
+	# BATCH GF — RE-POINTED, NOT DELETED. The entry said the mark NEVER CLEARS,
+	# and four things take it away: an enemy mender's Cleansing Rite, Harvest,
+	# the Occultist's own Requiem and the Open Wound rune. GF corrected the
+	# entry toward the code, and the pin follows the corrected sentence: the mark
+	# has no maximum and does not wear off, which is the permanence AX asked for.
 	var ruin_long := String(by_id.get("status_ruin", {}).get("long", ""))
-	for phrase in ["NO MAXIMUM", "NEVER CLEARS", "TENTH", "40%", "SURVIVE"]:
+	for phrase in ["NO MAXIMUM", "DOES NOT WEAR OFF", "TENTH", "40%", "SURVIVE"]:
 		ok(ruin_long.contains(phrase),
 			"the Ruin glossary entry states '%s'" % phrase)
 

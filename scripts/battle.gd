@@ -184,7 +184,7 @@ const STATUS_INFO := {
 	"bewitch": ["Bewitched", "Bw", Color(0.75, 0.35, 0.85), "Charmed: basic-attacks its own\nallies, Dazing them with every\nstrike."],
 	"psychosis": ["Psychosis", "Py", Color(0.82, 0.42, 0.92), "Madness: 50% each turn to turn on\nits own — attacking a fellow, or\ncasting its helpful magic on the\nenemy side."],
 	"decay": ["Decay", "Dc", Color(0.62, 0.52, 0.35), "Rotting: takes 10 Break damage at\nthe start of each turn."],
-	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. No ceiling,\nnever clears; detonates every 10th\nstack."],
+	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. No ceiling,\ndoes not wear off; detonates every\n10th stack."],
 	"ruin_primed": ["Ruin (primed)", "R!", Color(0.9, 0.3, 0.9), "The Old Gods reach through: Ruin\ndetonates when this unit next\nacts — and the stacks REMAIN."],
 	"hysteria": ["Mass Hysteria", "MH", Color(0.9, 0.5, 0.9), "Next turn: strikes a fellow with\nDOUBLE Break damage, Sundering\nthem."],
 	"invig": ["Invigoration", "Iv", Color(0.45, 0.6, 0.95), "Restores Mana at the start of\neach turn (Dark Pact talent)."],
@@ -214,7 +214,7 @@ const STATUS_INFO := {
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
-	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole warband."],
+	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
 	# THE WHOLE REASON IT WAS TOUCHED. It read "+8% damage, plus 1% per 20 blood
 	# buildup on the enemy party (at cast time)": correct for `battle_shout_node`
@@ -2237,7 +2237,9 @@ func _on_burger(id: int) -> void:
 			get_tree().change_scene_to_file("res://scenes/draft.tscn")
 		1:
 			_open_settings_overlay()
-		2:  # The run resumes from the last saved map node.
+		2:  # The run resumes where `Run.resume_scene` places it: THIS fight,
+			# from its opening (BATCH GF). It used to say "the last saved map
+			# node" — which was this node, already counted as walked.
 			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 		3:
 			_open_glossary()
@@ -17125,7 +17127,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Retaliation stance" % attacker.unit_name, "#70d878")
 		"phoenix":
 			var sacrifice := int(attacker.hp * 0.15)
+			var ph_before: int = attacker.hp
 			attacker.hp = maxi(attacker.hp - sacrifice, 1)
+			_book_self_cost(attacker, ph_before, ab.display_name)  # BATCH GF: the recap
 			attacker.resource = attacker.max_resource
 			attacker.refresh_bars()
 			attacker.float_text("-%d" % sacrifice, Color(1.0, 0.4, 0.5))
@@ -17363,7 +17367,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var pact_cost := 0
 			if pact_pct > 0.0:
 				pact_cost = maxi(int(round(attacker.max_hp * pact_pct)), 1)
+				var dp_before: int = attacker.hp
 				attacker.hp = maxi(attacker.hp - pact_cost, 1)
+				_book_self_cost(attacker, dp_before, ab.display_name)  # BATCH GF: the recap
 				attacker.float_text("-%d" % pact_cost, Color(1.0, 0.4, 0.5))
 				attacker.refresh_bars()
 			elif attacker.pact_flesh_ranks > 0:
@@ -17963,11 +17969,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			#
 			# The health is removed DIRECTLY rather than through `take_hit`,
 			# deliberately: this is a price he pays, not a wound anyone dealt.
-			# Routing it through the damage path would feed Blood Price, the
-			# recap's damage-taken ledger and every on-damage rider with an
-			# event that had no attacker.
+			# Routing it through the damage path would feed Blood Price and
+			# every on-damage rider with an event that had no attacker. The
+			# recap's damage-taken ledger is booked on its own, as his own
+			# cost, through `_book_self_cost` (BATCH GF — until GF it was
+			# skipped with the riders, and the recap never saw the price).
 			var bo_cost: int = maxi(int(round(attacker.hp * 0.20)), 1)
+			var bo_before: int = attacker.hp
 			attacker.hp = maxi(attacker.hp - bo_cost, 1)
+			_book_self_cost(attacker, bo_before, ab.display_name)
 			var bo_rage := 60
 			attacker.resource = mini(attacker.resource + bo_rage,
 				attacker.max_resource)
@@ -20626,7 +20636,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("† %s dies" % target.unit_name, "#e05050")
 					_on_enemy_death(target)
 			else:
+				var bp_before: int = attacker.hp
 				attacker.hp = maxi(attacker.hp - bp_cost, 1)
+				_book_self_cost(attacker, bp_before, ab.display_name)  # BATCH GF: the recap
 				attacker.float_text("-%d" % bp_cost, Color(1.0, 0.4, 0.5))
 			# The self-cut banks its Frenzy floor immediately, like any hit
 			# taken (Batch A rule: dives count even if healed away).
@@ -21579,9 +21591,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE HEALTH IS REMOVED DIRECTLY RATHER THAN THROUGH `take_hit`, on
 			# BLOOD OFFERING's precedent and for a second reason of its own.
 			# First, this is a PRICE SHE PAYS, not a wound anyone dealt: the
-			# damage path would feed Blood Price, the recap's damage-taken
-			# ledger and every on-damage rider with an event that has no
-			# attacker. Second, and this is the one specific to Mercy: crossing
+			# damage path would feed Blood Price and every on-damage rider with
+			# an event that has no attacker (the recap's ledger is booked on
+			# its own, through `_book_self_cost`, since BATCH GF). Second, and
+			# this is the one specific to Mercy: crossing
 			# below half health is exactly what GENERATES a Mercy stack, so a
 			# hit routed through `take_hit` would sometimes pay a fourth one and
 			# the card would stop paying "exactly 3".
@@ -21613,7 +21626,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				if sg_h.hp <= sg_h.max_hp * sg_h.mercy_threshold:
 					sg_low += 1
 			var sg_grant := 4 + sg_low * SHARED_GRIEF_PER_WOUNDED
+			var sg_hp_before: int = attacker.hp
 			attacker.hp = maxi(attacker.hp - sg_cost, 1)
+			_book_self_cost(attacker, sg_hp_before, ab.display_name)
 			attacker.refresh_bars()
 			attacker.float_text("-%d" % sg_cost, Color(0.85, 0.35, 0.35))
 			if attacker.second_resource_name != "Mercy":
@@ -25173,15 +25188,17 @@ func _check_end() -> void:
 			for member in Run.party:
 				if Run.award_upgrade_pick(member):
 					mb_names.append(_hero_label(member))
-			# APPEND, never assign. A mini-boss carries no bargain today (§3
-			# offers precede fights and elites only), so `spoils` is empty
-			# here — but assigning would silently swallow the bargain line the
-			# moment that changes, and a reward that vanishes without a word
-			# is the exact failure the item cap's refusal message exists to
-			# avoid.
+			# APPEND, never assign. A mini-boss carries a bargain (AO §2 put the
+			# offer in front of it), so the bargain's line is already in
+			# `spoils` by here, and assigning would swallow it — a reward that
+			# vanishes without a word is the exact failure the item cap's
+			# refusal message exists to avoid.
 			spoils += "\n\nTHE WAY IS OPEN"
 			if not mb_names.is_empty():
-				spoils += "\nABILITY UPGRADE: %s may choose one of three\non their card." % \
+				# BATCH GF — "one of three" UNTIL GF: `roll_upgrade_offer` offers
+				# what fits and "shows what exists rather than padding", so an
+				# offer can hold one or two, and one line names every hero paid.
+				spoils += "\nABILITY UPGRADE: %s may choose one\non their card." % \
 					" and ".join(mb_names)
 		Run.save_run()
 		_sfx("victory", -4.0)
@@ -25220,17 +25237,21 @@ func _check_end() -> void:
 # ---------- the boss slots (Batch AN §4, rewired by BATCH BM §6) ----------
 #
 # THREE ZONE BOSSES, THEN A FOURTH BOSS AFTER ZONE 3. A zone boss — INCLUDING
-# THE THIRD, which used to be the end boss — awards an ability pick for every
-# hero from that hero's SPEC POOL, a relic unlock, and BANKS ONE META TALENT
-# POINT PER SPEC to Profile. The END BOSS is its own slot: it awards a relic,
-# always; NO ability pick (nothing follows it); NO talent points; and it is
-# what OPENS THE META TREE'S ROW TIERS at the difficulty it was beaten on.
+# THE THIRD, which used to be the end boss — awards every hero an ability pick
+# (the spec pool first, then EA's and EH's two fallbacks), a relic unlock, and
+# BANKS ONE META TALENT POINT PER CLASS to Profile (`award_zone_boss_points`
+# pays each class once since FX). The END BOSS is its own slot: it awards a
+# relic, always; NO ability pick (nothing follows it); NO talent points; and it
+# is what OPENS THE META TREE'S TIERS at the difficulty it was beaten on.
 func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 	var relic := Relics.unlock_random()
 	var boss_text := "+%d gold." % gold_gain
 	if not is_end:
 		Run.bank_zone_boss_points()
-		boss_text += "\n\nEach spec that walked this road banks 1 talent point."
+		# BATCH GF — "EACH SPEC" UNTIL GF, AND NO SPEC HAS BANKED ANYTHING SINCE FX:
+		# the purse keys to the class, and `award_zone_boss_points` pays a class
+		# once however many of its specs walked.
+		boss_text += "\n\nEach class that walked this road banks 1 talent point."
 		# BATCH CT §1 — THE POUCH GROWS, AND IT IS ANNOUNCED HERE.
 		# §1 said to copy the rune ladder's zone-victory announcement; there is
 		# no such announcement to copy (Batch AN §9 deleted the rune ladder
@@ -25272,9 +25293,18 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 				cap_now, cap_before]
 		var picked: Array = _award_ability_picks()
 		if not picked.is_empty():
-			boss_text += "\n\nNEW ABILITY: %s may choose one of three\non their card." % \
+			# BATCH GF — "one of three" UNTIL GF, AND AN AWARD CAN BE SHORT: every
+			# tier is `slice(0, 3)` of what is left, and the Devout's boss pool
+			# holds two. The count is not written into a line that names several
+			# heroes at once, each with an offer of its own size.
+			boss_text += "\n\nNEW ABILITY: %s may choose one\non their card." % \
 				" and ".join(picked)
-			Run.save_run()
+		# BATCH GF — SAVED WHETHER OR NOT A PICK WAS AWARDED. The slot ladder moved
+		# two lines up and it is run state; inside the `if` above it reached the
+		# disk only when some hero was paid. A resume from this card DESCENDS
+		# (`Run.resume_scene`), and it must descend with the ladder where the boss
+		# left it.
+		Run.save_run()
 		Profile.note_boss(Run.boss_kind())
 		Profile.note_zone_cleared()
 		var onward: String = "Descend into %s" % Run.next_zone_name() \
@@ -25351,9 +25381,9 @@ func _to_map() -> void:
 
 
 # Batch BK §3: the ONE interstitial a fight can still queue — the merchant the
-# bargain's severity-4 reward bought. Run.next_after_scene consumes the flag,
-# so quitting on the victory screen simply drops it rather than stranding the
-# player on a screen that never comes.
+# bargain's severity-4 reward bought. Run.next_after_scene consumes the flag.
+# BATCH GF: it said a quit on the victory screen "simply drops it"; the flag is
+# saved, and `Run.resume_scene` visits the merchant, as this button would have.
 func _to_after() -> void:
 	var next := Run.next_after_scene()
 	Run.save_run()
@@ -26076,6 +26106,18 @@ func _award_ability_picks() -> Array:
 	return named
 
 
+# BATCH GF — THE BOSS THE HEROES ACTUALLY FACED. A boss node composes its warband
+# from every enemy the zone's roster tags with the `boss` role — the Hollow Crown
+# among them in every zone — so `Run.boss_kind()`, the zone's named boss, is not
+# always the one on the field, and a summary that said "facing the Withered
+# Warden" above a final-battle line listing the Hollow Crown contradicted itself.
+func _boss_in_warband() -> String:
+	for kind in Run.encounter.get("enemies", []):
+		if "boss" in Enemies.roles(String(kind)):
+			return Enemies.unit_name(String(kind))
+	return Enemies.unit_name(Run.boss_kind())
+
+
 func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 	var fallen: Array = []
 	for h in heroes:
@@ -26090,7 +26132,11 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		"zone_num": Run.zone_idx + 1,
 		"zone_name": Run.zone_name,
 		"tier": clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE),
+		# BATCH GF: the zone's own slot count, which the map header prints beside
+		# the same position — sixteen, or seventeen on the final board.
+		"zone_slots": Run.map.size() if not Run.map.is_empty() else Run.SLOTS_PER_ZONE,
 		"boss_name": Enemies.unit_name(Run.boss_kind()),
+		"boss_fought": _boss_in_warband(),
 		"encounter_type": String(Run.encounter.get("type", "fight")),
 		"encounter_theme": String(Run.encounter.get("theme", "Warband")),
 		"enemy_names": enemy_names,
@@ -26125,9 +26171,18 @@ func _summary_lines(snap: Dictionary) -> Array:
 	else:
 		var depth := ""
 		if snap["encounter_type"] == "boss":
-			depth = "facing the %s" % snap["boss_name"]
+			# BATCH GF: the boss in the final battle's own warband, not the zone's
+			# named one — the two can differ (see `_boss_in_warband`).
+			depth = "facing the %s" % String(snap.get("boss_fought", snap["boss_name"]))
+		elif snap["encounter_type"] == "endboss":
+			depth = "facing the %s" % Enemies.unit_name(Run.END_BOSS_KIND)
 		else:
-			depth = "Tier %d of 10" % mini(int(snap["tier"]), 10)
+			# BATCH GF — "Tier N of 10" UNTIL GF, capped at ten on a zone of
+			# sixteen, so a wipe at encounter 13 read "Tier 10 of 10". It says
+			# what the map's own header says, off the same count; the end boss,
+			# which had fallen through to here, is named above like the others.
+			depth = "encounter %d of %d" % [int(snap["tier"]),
+				int(snap.get("zone_slots", Run.SLOTS_PER_ZONE))]
 		# Batch AA: a forfeit is reported as a forfeit. Folding it into the
 		# wipe wording would poison every alpha wipe-rate a tester pastes back.
 		if snap["outcome"] == "forfeit":
@@ -26151,9 +26206,11 @@ func _summary_lines(snap: Dictionary) -> Array:
 	# A forfeit reports the same block: the fight the tester walked away
 	# from is the most useful thing in the whole summary.
 	if snap["outcome"] != "complete":
+		# BATCH GF: the END BOSS had no row and fell through to "A fight".
 		var kind_label: String = {"fight": "A fight", "elite": "An ELITE fight",
 			"miniboss": "The zone's MINI-BOSS",
-			"boss": "The zone boss"}.get(snap["encounter_type"], "A fight")
+			"boss": "The zone boss",
+			"endboss": "The END BOSS"}.get(snap["encounter_type"], "A fight")
 		lines.append(["s", "The final battle"])
 		lines.append(["p", "%s — %s: %s." % [kind_label, snap["encounter_theme"],
 			", ".join(snap["enemy_names"])]])
@@ -26194,9 +26251,14 @@ func _summary_lines(snap: Dictionary) -> Array:
 			final.get("taken_total", {}), final.get("kills", []), "final battle")
 	# --- the run economy ---
 	lines.append(["s", "The run in numbers"])
-	lines.append(["p", "Battles won: %d of %d   Elites taken: %d" % [
+	# BATCH GF — TWO LABELS CORRECTED TOWARD THE COUNTERS THEY PRINT. `elites` is
+	# booked by the elite's victory AND the mini-boss's, so it said "Elites"
+	# over both; `gold_earned` is booked by the victory purse, the bargain's gold
+	# AND a sale at the Peddler, so "earned in combat" was false of every sale.
+	# Event gold books to neither counter, which the line does not claim.
+	lines.append(["p", "Battles won: %d of %d   Elites and mini-bosses taken: %d" % [
 		snap["combat_wins"], int(tally.get("battles", 0)), int(tally.get("elites", 0))]])
-	lines.append(["p", "Gold: %d earned in combat, %d spent at shops, %d unspent" % [
+	lines.append(["p", "Gold: %d earned in fights, bargains and sales, %d spent at shops and the forge, %d unspent" % [
 		int(tally.get("gold_earned", 0)), int(tally.get("gold_spent", 0)), snap["gold"]]])
 	# (The "Rests taken" half of this line died with the rest nodes in AN; the
 	# tally key had no writer and the line could only ever print 0 — BJ §1.)
@@ -26810,11 +26872,21 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	# eating a hit is not the hunter's health, so companions stay out too.
 	if sim:
 		return
+	_book_taken(victim, lost, hp_before)
+
+
+# BATCH GF — THE RECAP'S TAKEN LEDGER, LIFTED OUT OF THE DOOR ABOVE SO THAT A
+# COST CAN REACH THE LEDGER WITHOUT REACHING THE RIDERS IN FRONT OF IT. The body
+# is the door's own and unchanged; `_on_damage_taken` calls it where it ran, and
+# `_book_self_cost` is its one other caller.
+func _book_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	# SELF-INFLICTED IS DECIDED BY IDENTITY: the victim is the unit currently
-	# acting. That covers Blood Price, Dark Pact, Cauterise, the Overburn drain
-	# and recoil in one rule, and it cannot go stale the way a list of ability
-	# names would. §2 asks that a hero killed by his own Overburn drain reads as
-	# killed by his own Overburn drain, and this is the line that delivers it.
+	# acting. That covers Cauterise, the Overburn drain and recoil in one rule,
+	# and it cannot go stale the way a list of ability names would — and since
+	# GF the direct costs `_book_self_cost` books (Blood Price's and Dark Pact's
+	# among them), under a frame that names the payer. §2 asks that a hero
+	# killed by his own Overburn drain reads as killed by his own Overburn
+	# drain, and this is the line that delivers it.
 	var self_hit: bool = _dmg_src != null and _dmg_src == victim
 	var source := "themself" if self_hit else _taken_source(_dmg_src)
 	var label := _dmg_label if _dmg_label != "" else "unknown"
@@ -26834,6 +26906,31 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 			"zone": Run.zone_idx + 1 if Run.active else 0,
 			"tier": clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE) if Run.active else 0,
 		})
+
+
+# BATCH GF — A HEALTH COST PAID DIRECTLY IS BOOKED TO THE RECAP, AND TO NOTHING
+# ELSE. Five `_resolve_special` branches take a hero's own health without
+# `take_hit` — Phoenix Rebirth, Dark Pact, Blood Offering, Blood Price and Shared
+# Grief — and two say why at the site: the damage path would feed Blood Price,
+# Second Wind, Battle Trance, Momentum and Backblast with a blow nobody struck.
+# What that also skipped was the recap, so none of the five reached the
+# taken-by-source rows and the summary's "self-inflicted costs are marked as the
+# hero's own" was false of every one. This books the health that actually left
+# — the DELTA, `_report_taken`'s rule, because each cost is floored at 1 — under
+# a frame naming the hero and the card, restores the frame it found, and calls
+# none of the riders. A sixth direct cost owes this call.
+func _book_self_cost(u: BattleUnit, hp_before: int, label: String) -> void:
+	if u == null or not u.is_hero or u.is_companion or sim:
+		return
+	var lost := hp_before - u.hp
+	if lost <= 0:
+		return
+	var was_src := _dmg_src
+	var was_label := _dmg_label
+	var was_name := _dmg_src_name
+	_dmg_frame(u, label)
+	_book_taken(u, lost, hp_before)
+	_dmg_frame(was_src, was_label, was_name)
 
 
 # BACKBLAST (Pyromancer, Inferno row 5 — BATCH BS §3): once per battle, the

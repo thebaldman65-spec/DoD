@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-13 (Batch GE &mdash; no permanent layer is spec-specific, and the relic paragraph says so)</b></p>
+<p align="right"><b>Last updated: 2026-09-14 (Batch GF &mdash; a quit puts the heroes back where they were standing)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -103,23 +103,28 @@ showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
 <li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
 every hero 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
-Chalice of Dawn relic stacks its 10% on top for 25%). Talent points come from the beats
-that matter — <b>1 for confirming a spec, then 1 apiece from every elite, mini-boss and
-boss</b>, the final boss included (§7). Regular fights award none. <b>Since Batch BK the
-per-run total is a function of the route</b>, not a constant: the mini-boss and boss floor is
-6 a run, and every elite the route reaches adds one. The <b>mini-boss</b>
-hands every hero a <b>generic ability upgrade, three offered</b>; <b>all three zone bosses</b>
-hand every hero an <b>ability pick, three offered</b>, and <b>one more ability slot</b>, drawn
+Chalice of Dawn relic stacks its 10% on top for 25%). <b>No victory in a run pays a talent
+point</b> except a zone boss's, which banks one for each class among the heroes to the profile
+(§7). The <b>mini-boss</b>
+hands every hero a <b>generic ability upgrade, up to three offered</b>; <b>all three zone bosses</b>
+hand every hero an <b>ability pick, up to three offered</b>, and <b>one more ability slot</b>, drawn
 from that hero's spec pool first — and when that is spent, from his spec draft pool, and when
 that is spent too, from his class-wide draft pool, so the award can never pay nothing
 (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
-<li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v12</b>) after every
-completed encounter AND after spec confirmation (including debug rerolls); Continue resumes at
-the map. Loading swaps each member's saved tree snapshot for the live definition, so balance
-edits reach a run in flight, and refunds points sunk into nodes that no longer exist. A
+<li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v13</b>) the moment the heroes
+step onto a node, again when what stands there is resolved, AND after spec confirmation
+(including debug rerolls). <b>Continue puts the heroes back where they were standing:</b> a
+bargain they walked away from is offered again &mdash; the same three &mdash; a fight they quit
+is fought again from its opening, against the same warband, on the same terms and with the
+heroes' health as it was when they stepped onto it, and an event they had drawn is waiting for
+them. A zone boss beaten on its card descends to the next zone, and a merchant a bargain bought
+is visited. The fight itself is never saved, so nothing it pays is paid until it is won. A
+Peddler or a forge left in the middle of a visit is gone. Loading swaps each member's saved tree
+snapshot for the live definition, so balance edits reach a run in flight, and drops any node
+that no longer exists. A
 save <b>older than v10</b> is <b>refused and cleared</b> rather than half-loaded: the final
 zone gained a <b>seventeenth slot</b> at v10, so a v9 save's final-zone map has no position to
 walk onto after its boss, and the migration would have to invent one. (Batch BK made the same
@@ -209,15 +214,13 @@ nearly out, so the cost of the last step is visible on the board.
 which boss they drew only by fighting the mini-boss.</p>
 <p><b>The mini-boss holds the middle of every zone.</b> Slot 8 is an <b>elite warband carrying
 a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a
-longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100) and 1 talent
-point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). <b>The offer precedes
+longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)</b>, and its own spoil is a <b>generic ability
+upgrade</b> (§6a). <b>The offer precedes
 it</b> (§3a). <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
-<p><b>Elites are the snowball engine.</b> An elite kill pays <b>1 talent point</b>, drops a
+<p><b>Elites are the snowball engine.</b> An elite kill drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
 hero's card), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
-zone and a route meets two to four of them, so <b>talent points per run are now a function of
-the route</b> rather than a constant: the guaranteed floor is 2 a zone (mini-boss and boss)
-plus 1 for the awakening.</p>
+zone and a route meets two to four of them.</p>
 <p><b>Blacksmith</b> and <b>Merchant</b> are §8's trade nodes. <b>Event (???)</b> is §3b.</p>
 
 <h3>3a. The offer &mdash; three bargains</h3>
@@ -372,11 +375,13 @@ slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2
 Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3 — behemoths walk
 the old woods). Random slot draws sit behind the DOD_ZONE_ROTATION=1 flag until each
 pool holds ~2 candidates; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
-the stat multiplier (§4.3). The finale's boss — the <b>Withered Warden</b> again, by
-design — is the FINAL boss: the run ends on its death.</li>
-<li><b>Zone completion:</b> killing zone 1's or zone 2's boss awards a relic unlock, gold,
-1 talent point, an <b>ability pick for every hero</b> (§6a), and fully restores every hero
-(HP and Mana) before the descent.</li>
+the stat multiplier (§4.3). The finale ends in a zone boss like the other two, and
+the <b>END BOSS</b> stands in a seventeenth slot after it: the run ends on the END BOSS's
+death.</li>
+<li><b>Zone completion:</b> killing a zone's boss — the third zone's included — awards a relic
+unlock, gold, 1 talent point for each class among the heroes and an <b>ability pick for every
+hero</b> (§6a); zone 1's and zone 2's also fully restore every hero (HP and Mana) before the
+descent.</li>
 <li><b>Map screen:</b> zone art background, a <b>position readout</b>
 ("Zone 2 of 3 — encounter 7 of 16 (23 of 48) — the Ash Tyrant waits"), the <b>lattice</b>,
 and <b>all four hero stat cards</b>.
@@ -553,9 +558,8 @@ chance roll.</b> On those the Perfect does not add damage or a hit — it remove
 Wildstrikes and Hack and Slash land their Bleed on every strike, Blizzard puts 2 stacks of
 Chilled on every enemy instead of 1–2, Firestorm spreads its bolts evenly across the living
 instead of scattering them, Arcane Barrage never strikes the same enemy twice while an
-unstruck one stands, Triple Shot pays out one guaranteed critical, and Pommel Strike and a
-perfectly rigged Snare Trap land their Stun even on an unbroken boss. Abilities with no roll
-to remove keep an ordinary bonus &mdash; a perfect Deadfall gets a fourth spring.</p>
+unstruck one stands, Triple Shot pays out one guaranteed critical, and Pommel Strike lands its
+Stun even on an unbroken boss. Abilities with no roll to remove keep an ordinary bonus.</p>
 <h3>4.3 Attack resolution pipeline</h3>
 <p>Per strike, in order: <b>ability % × the attacker's current Attack</b> × random variance
 (0.9–1.1) × grade multiplier × crit (×1.5; the Sharpshooter's Lethal Aim ×2, rising with Focus) × attacker modifiers ×
@@ -741,7 +745,9 @@ its Bestial Wrath strikes 2 turns).</td></tr>
 likely to miss them.</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
 ward.</td></tr>
-<tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, never clears):
+<tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, and it does not wear
+off — only an enemy mender's Cleansing Rite, Harvest, Requiem and the Open Wound rune take it
+away):
 +2% damage taken per stack; heroes striking the bearer heal 2% of damage dealt per
 stack (capped at 40%). Every TENTH stack it is PRIMED and detonates on the bearer's
 next turn — and the stacks SURVIVE the blast.</td></tr>
@@ -1033,11 +1039,12 @@ supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo 
 perfect bonus.</b> At maximum stacks a
 further crossing is wasted unless <b>Alms</b> holds, which turns it into a ward for the
 ally who earned it.</li>
-<li><b>Runaway Resonance (ARCANIST passive, NO MAXIMUM):</b> only the Arcanist spec has
-the bar, and it is the only resource in the game with no ceiling. Three clauses:
+<li><b>Runaway Resonance (ARCANIST passive, no practical maximum):</b> only the Arcanist
+spec has the bar, and the meter stops at 99. Three clauses:
 <ul>
-<li><b>No ceiling.</b> +1 per damaging cast, +2 on a crit (parry counters grant nothing),
-and <b>nothing removes it</b> — it persists to the end of the battle. Overcharge moves the
+<li><b>No practical ceiling.</b> +1 per damaging cast, +2 on a crit (parry counters grant
+nothing), and <b>it does not decay</b> — nothing resets it before the battle ends, and only
+the three earned cards below take it away. Overcharge moves the
 build RATE, never a cap (once per battle, gain half your current stacks — all of them on a
 perfect cast).</li>
 <li><b>The curve compounds.</b> At N stacks the damage bonus is <b>1.5% ×
@@ -1059,12 +1066,12 @@ tabulates is a figure nobody can plan against:
 <tr><td>12</td><td>+117%</td><td>+59%</td></tr>
 <tr><td>16</td><td>+204%</td><td>+102%</td></tr>
 </table>
-The nameplate readout shows the raw stack count and both live percentages; because there
-is no maximum, its bar fills toward 15 stacks and pins there. <b>Two earned cards remove Resonance and nothing else
+The nameplate readout shows the raw stack count and both live percentages; its bar fills
+toward 15 stacks and pins there. <b>Three earned cards take Resonance away and nothing else
 does</b>: <b>Stabilize</b> vents everything above 2 — the escape hatch from the ramp, which is
-why it is a spec-pool pick rather than part of the opening three — and <b>Arcane Bolt</b>
+why it is a spec-pool pick rather than part of the opening three — <b>Arcane Bolt</b>
 halves the meter after the blow it is paid out of, which is the card's cost rather than an
-escape.</li>
+escape, and <b>Threshold</b> sets the meter to 15, which from above 15 takes stacks away.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
@@ -1248,7 +1255,7 @@ the ladder are set out in full further down this section.
 <table border="1" cellpadding="4">
 <tr><th>Source</th><th>Offer</th></tr>
 <tr><td><b>Elite</b></td><td><b>Always</b>, on victory — <b>to every living hero</b>, each
-from their own pool, on <b>one screen of four columns</b>. Elites run 0–3 per zone, so drafts
+from their own pool, on <b>one screen of four columns</b>. Six elites stand in every zone, so drafts
 are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.</td></tr>
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
 new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
@@ -1610,7 +1617,7 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Aimed Volley</b></td><td>20 Mana, 2.5, 3cd, one enemy</td><td><b>Three shots at 12% of Attack</b> each with <b>8 Break damage a shot</b> — 24 across the volley (Perfect: a fourth shot).</td><td>The reliable strike. Every Hunter kit is built on a conditional; this works when nothing is set up yet, and being multi-hit is what makes it play with a charge bank.</td></tr>
 <tr><td><b>Bola</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Applies <b>Slowed and Crippled for 4 turns</b>. No damage and no Break.</td><td>Two afflictions on one card and nothing else — the price of the breadth is that it is all it does.</td></tr>
 <tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 6 turns <b>every ally deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit — the only amplifier for everyone the class has. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every companion reads it.</td></tr>
-<tr><td><b>Arcane Arrows</b></td><td>25 Mana, 1.0, 5cd, self</td><td><b>6 charges</b>: each of his next five <b>hits</b> also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b> — they wait until spent, and a three-shot volley spends three.</td><td>A charge bank, which the class has never had.</td></tr>
+<tr><td><b>Arcane Arrows</b></td><td>25 Mana, 1.0, 5cd, self</td><td><b>6 charges</b>: each of his next six <b>hits</b> also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b> — they wait until spent, and a three-shot volley spends three.</td><td>A charge bank, which the class has never had.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; WARRIOR</b> (all three specs) &mdash; <i>three spines that are all melee, all Rage-driven and all reactive: none can make something happen on turn one</i></td></tr>
 <tr><td><b>Battle Trance</b></td><td>15 Rage, 1.0, 4cd, self</td><td>For 4 turns, at the start of each of his turns he heals <b>3% of maximum health plus half of all damage taken since his last turn</b>.</td><td>Recovery that scales with the beating. It reads damage <i>taken</i>, not missing health — and it is delayed, so it is not mitigation and cannot save him from a killing blow.</td></tr>
 <tr><td><b>Rally</b></td><td>15 Rage, 1.5, 4cd, one ally</td><td>That ally <b>acts next</b>, jumping straight to the front of the initiative order, and regains 15% of their resource. It cannot target the caster.</td><td>Giving away tempo — the only ability in the game that hands an ally a turn, and the only tempo tool a class with none can have.</td></tr>
@@ -1626,7 +1633,7 @@ the draft card shows them.</b> A tag names what a card is <i>for</i>, in a vocab
 across the whole roster, so a player choosing between three cards can see which direction each
 one points before reading a word of the description.</p>
 <p><b>The word ARCHETYPE is doing two jobs in this document and they are not related.</b> &sect;6
-above uses it for a <i>specialization's</i> role &mdash; Ramp, Rush, Nuker, Warder and the rest,
+above uses it for a <i>specialization's</i> role &mdash; Ramp, Nuker, Warder and the rest,
 one per spec, which decides base Attack. <b>A tag is a property of a CARD, not of a hero</b>, and
 nothing reads both.</p>
 <table>
@@ -2007,8 +2014,9 @@ real pool to spend from, because Dark Pact pays in his blood and his heals key o
 maximum; deep shadow affinity, and cleansing flame finds the corrupt).<br>
 Passive <i>Wrath of the Old Gods</i>: every debuff the
 Occultist applies marks its victim with <b>2 Ruin</b>. <b>Ruin has NO MAXIMUM and it
-NEVER CLEARS</b> — corruption that resets is not corruption — so the chip counts a
-number that only climbs, all fight. Each stack: the target takes +2% damage (an amplification
+does not wear off</b>, so the chip counts a number that climbs all fight unless one of four
+things takes it away: an enemy mender's Cleansing Rite, a hero's Harvest, the Occultist's
+own Requiem, and the Open Wound rune, which wears it down a stack a turn. Each stack: the target takes +2% damage (an amplification
 that is deliberately uncapped), and heroes striking it
 heal <b>2% of the damage dealt PER STACK</b>, and <b>the whole draught is capped at 40% of the
 damage dealt</b>, whatever the stacks. <b>Every TENTH stack</b> the mark is primed and
@@ -2330,11 +2338,11 @@ pick from the spec pool (falling back to that hero's spec draft pool and then to
 class-wide draft pool when the pool above is spent, so the pick always lands), and banks
 <b>one meta talent point per class</b>. The <b>END BOSS</b> pays gold and a relic,
 always — no ability pick (nothing follows it), no slot and no points.</li>
-<li><b>Abilities:</b> <b>three picks per run</b>, one from each zone boss, three
+<li><b>Abilities:</b> <b>three picks per run</b>, one from each zone boss, up to three
 offered each time and drawn from that hero's <b>spec pool</b> — or from his <b>spec draft
 pool</b> when the boss pool has been emptied, or his <b>class-wide draft pool</b> when that is
 empty too, so no award is ever silent (§6a). The end boss awards none.
-Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
+Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, up to three offered — three a
 run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40,
 <b>Cleansing Draught 35, Resonating Hourglass 90, Cursed Visage 100</b>. <b>The five original
@@ -2664,7 +2672,7 @@ PER-HERO RULING IS STILL UNBUILT.</b> `Run.active_relics` is a flat list of up t
 both accessors (`Run.relic_add` / `relic_dict`) take a hook and nothing else — so every
 equipped relic reaches every hero, at all 25 read sites. The ruling that a relic is
 assigned to ONE hero at pickup stands and has never been started; CX scoped it and stopped,
-and it is a save-format change (v12 &rarr; v13) touching four signatures, both acquisition
+and it is a save-format change touching four signatures, both acquisition
 sites and 13 of the 25 relic descriptions, with four hooks still unruled. <b>The draft also
 assigns relics BEFORE specs are chosen</b>, so "which hero" has the least information behind
 it at exactly the moment it would be asked.
@@ -2900,7 +2908,7 @@ onward on Shift + the same key, see §6a).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), <b>Forfeit Run</b> (ends the
 run where it stands, behind a confirmation with a reason picker — see §2 and §11a),
 Glossary, Settings (overlay with volume + fullscreen — the battle isn't lost), Exit to Main
-Menu (run resumes from the last saved node).</li>
+Menu (Continue returns to this fight, from its opening).</li>
 <li><b>Stalemate hint:</b> if a single battle runs to an absurd length, a one-line
 non-blocking note appears saying the fight is not resolving and that Forfeit Run is in the
 menu. It appears once and changes nothing about the battle — no HP, no outcome.</li>
@@ -3028,8 +3036,8 @@ picked), the final battle (type, theme, and lineup) and which heroes fell,
 the heroes as they stood (per hero: spec, talent count with its <b>tier spread</b>, runes
 equipped, abilities earned), <b>damage share per hero across the whole run</b>, the three
 breakdowns below, the run economy
-(battles won, elites taken, gold earned / spent / unspent, rests, events seen, relics
-carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
+(battles won, elites and mini-bosses taken, gold earned / spent / unspent, events seen,
+relics carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
 there are any — so a session of runs accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
 the clipboard: a wipe becomes a report the player can paste back to the designer, which is
 feedback data with no telemetry to build. If any debug tool was used at any point in the
@@ -3055,7 +3063,7 @@ as a wipe wants to know what ended it.</p>
 <p><b>Two structural rules behind it:</b> (1) the summary <b>snapshots run state before the
 save is cleared</b>, never by reordering the save logic — a run that stays resumable after
 death is a worse bug than a missing summary. (2) The per-run ledger (damage per hero, gold,
-elites, rests, battles) lives on the <b>Run</b> autoload, not the battle scene, because the
+elites, battles) lives on the <b>Run</b> autoload, not the battle scene, because the
 battle scene reloads between fights; it is banked once per battle from a battle-local slice,
 written only in real play so the simulation harness's own statistics path can never
 double-count it. The three breakdowns above follow both rules, and each per-hero map is
@@ -3189,7 +3197,7 @@ Everything else is real: a summoned shop has real offers and spends real gold, a
 rest really heals, a summoned fight is a real battle at the current tier's scaling, with
 real rewards. (There is no Summon Boss: "Jump to Boss Tier" already goes there.)</li>
 <li><b>Debug visits do not count.</b> A summoned node is excluded from the two records that
-are read as data: it never bumps the run ledger (battles, gold, rests, elites, damage) and
+are read as data: it never bumps the run ledger (battles, gold, elites, damage) and
 never books anything in the persistent Profile — including the wipe, if the heroes die in a
 summoned fight. One session flag guards all of it. Free travel is the opposite case and is
 deliberately excluded from this rule: the heroes really are there and really did the thing.</li>

@@ -579,7 +579,7 @@ const CLASS_DRAFT_SHARE := 0.25
 #   shipped in the kit, not because the passive needs them.
 const PROTECTED_CORES := {
 	"berserker": {"slots": 3, "enablers": [],
-		"why": "Blood Frenzy reads his own health bar and nothing else."},
+		"why": "Blood Frenzy reads his health bar and the Rage he spends; neither needs an ability."},
 	"warden": {"slots": 3, "enablers": [],
 		"why": "Heavy Plating is a Block-chance rule; it reads no ability."},
 	# BATCH BP corrected this `why` toward the code rather than leaving it to

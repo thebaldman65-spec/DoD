@@ -154,7 +154,12 @@ func _s0_premises() -> void:
 	var bs := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bs.contains("func _award_ability_picks() -> Array:"),
 		"§0: `_award_ability_picks` is gone — §2 is driving a loop that moved")
-	ok(bs.contains("boss_text += \"\\n\\nNEW ABILITY: %s may choose one of three"),
+	# BATCH GF — RE-POINTED, NOT DELETED. The card said a hero may choose one
+	# of THREE, and an award can offer fewer (FM §3: a count written into a
+	# sentence is a lie the day the offer can come back short), so GF took the
+	# figure out of the sentence. The pin still asks what it was written to ask:
+	# is the award announced on the victory card.
+	ok(bs.contains("boss_text += \"\\n\\nNEW ABILITY: %s may choose one"),
 		"§0: the victory card's award announcement has moved or been reworded")
 	# (4) THE ARITHMETIC §1 IS DERIVED FROM.
 	var run_gd := load("res://scripts/run_state.gd")

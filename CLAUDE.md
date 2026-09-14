@@ -1401,7 +1401,8 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v12, auto-saved after every slot), relic slots
+  save (user://run_save.bin v13, auto-saved at every step onto a node and at every
+  resolution; `resume_scene` places a resumed run — GF), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
   and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
@@ -1451,9 +1452,9 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
 · **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
   by a one-step migration** that folds its twelve spec purses into four. **Its floor,
   `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
-  is REFUSED rather than silently zeroed. The run save is **v12** and **a pre-v10 save is REFUSED and
+  is REFUSED rather than silently zeroed. The run save is **v13** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
-  **v11 (CT) and v12 (EG) ARE BOTH TOLERANT AND NEITHER MOVED THE REFUSAL THRESHOLD** — the
+  **v11 (CT), v12 (EG) AND v13 (GF) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
   with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.**
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
@@ -1721,17 +1722,20 @@ maths.**
 `take_hit` and `take_tick_damage`. It reports the **DELTA,
 not the argument** (a 52 into a hero on 40 is 40 taken, or the column disagrees with the health
 bar) and sits **BELOW ALL FOUR DEATH-REFUSALS** — above them it would count health handed straight
-back AND file a refused death as a killing blow. **Health removed anywhere else is not
-booked, and five `_resolve_special` branches remove it directly** (`phoenix`, `dark_pact`,
-`blood_offering`, `blood_price`, `shared_grief`), so a new damage source must go through one of
-the two functions or it reports nothing.
+back AND file a refused death as a killing blow. **Five `_resolve_special` branches remove a
+hero's own health directly** (`phoenix`, `dark_pact`, `blood_offering`, `blood_price`,
+`shared_grief`) — a price paid, not a wound dealt, so none may feed an on-damage rider — **and each
+books the delta through `_book_self_cost`, which reaches the recap's ledger and nothing else (GF).**
+A new damage source goes through one of the two functions; a new direct cost calls
+`_book_self_cost`. Anything else reports nothing.
 · **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry** —
   one site covering the strike, its splash, echoes, the reflect/retaliation it draws and the
   recoil it costs — **re-established after each nested `await _resolve`** (a counter leaves the
   frame pointing at itself) and set explicitly at the DoT tick loop, from the status's `src_name`,
   because the applier may be dead. **SELF-INFLICTED IS DECIDED BY IDENTITY** (`victim ==
   _dmg_src`), which covers recoil and any self-cost that passes the door in one rule and cannot go
-  stale the way a name list would; Blood Price's and Dark Pact's direct costs never reach it.
+  stale the way a name list would; the five direct costs reach it through `_book_self_cost`, which
+  frames the payer and the card around the one booking and restores the frame it found.
 · **BY KIND, NEVER BY INSTANCE** — `_taken_source` reads `BattleUnit.enemy_kind`, stamped AFTER
   the "boss" alias resolves. `unit_name` happens to agree today; keying on that agreement would
   make the aggregation an accident the first uniquely-named enemy breaks.
@@ -2633,6 +2637,44 @@ five reachable at once.
   "carries every rune written for that awakening" at three-of-five is a lie; CO §3's rule that a
   refusal names its cause is what forces the fork. **One door — `Runes.empty_offer_reason` — because
   four sites print it.**
+
+## STANDING RULE — A STEP IN FLIGHT RIDES THE SAVE, AND A RESUME PUTS THE PARTY BACK IN IT (Batch GF)
+
+> **The save a node writes as the party steps onto it already carries the step. Whatever the step
+> started and has not finished — the encounter, the bargain rolled for it and the one taken, the
+> event drawn — rides that save until it resolves, and `Run.resume_scene` is the one place a
+> resumed run is placed.**
+
+**IT WAS DRIVEN, AND IT WAS `main`'s TOO.** None of the four was saved and `load_run` set them to
+nothing, so a quit on an elite's or a mini-boss's bargain, inside any fight, or through the battle's
+own *Exit to Main Menu* resumed onto the map PAST the fight — and a quit inside a zone boss, or on
+its victory card, onto a board with nothing left to press. Every quit point was played through the
+real screens on both branches and both read the same (`docs/reports/GF.md` §1).
+- **THE STEP STAYS AT THE CLICK.** `Run.advance` marks the node visited and moves the position the
+  moment it is pressed; that is the commitment to the route, and the fight's own scaling reads the
+  position. What was missing was a record of the unfinished step, not a later step — do not move
+  the advance to fix a resume.
+- **THE RESOLUTION IS MARKED WHERE EVERY VICTORY PASSES, BEFORE ITS FIRST SAVE.** `claim_reward`
+  marks the encounter `resolved` and `resume_scene` never re-enters a resolved one, so a won fight
+  can be neither fought nor paid twice. **A new victory path that saves before `claim_reward`
+  re-opens that inverse**; a wipe and a forfeit clear the save outright.
+- **A QUIT INSIDE A FIGHT RESTARTS IT.** The battle's own state is never saved, so a resumed fight
+  opens from its beginning — the same warband, the party as it stood when it stepped on, the same
+  bargain — and nothing it pays is paid until it is won. Whether a quit should ever cost more than
+  a restart is the designer's.
+- **WHAT A RESUME WILL SHOW AGAIN IS FROZEN ON THE RUN, NEVER ROLLED BY THE SCREEN** — FD §1's rule,
+  one door along. The bargain is rolled once per encounter (`encounter_offer`); `roll_offer` stays a
+  pure roll, because the suites sample it. **The Peddler and the forge still roll in their own
+  `_ready`, and that is why a resume does not re-enter them**: a quit there still loses the node.
+- **THE RESUME DOES WHAT THE ABANDONED BUTTON WOULD HAVE DONE** — the merchant a bargain bought is
+  visited, and a zone boss beaten on its card descends — **and every branch that changes the run
+  saves before it returns**, so a second quit resumes to the same place and never skips a zone.
+- **A NEW THING THAT CAN BE PENDING OWES THE SAVE ITS KEY AND `resume_scene` ITS BRANCH, IN THE SAME
+  BATCH.** `check_gf` quits at every branch through the real screens and presses the real Continue.
+- **v13 IS TOLERANT.** A v12 save carries no record and lands where a v12 build landed it — past a
+  pending fight, which nothing in the file can recover — except on a non-final zone's boss, where it
+  descends rather than strands: re-fighting a boss that did fall would bank its points and its relic
+  twice. An older build reading v13 ignores the four keys and loses only the record.
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 

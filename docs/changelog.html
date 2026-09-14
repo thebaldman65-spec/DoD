@@ -15,6 +15,61 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-14 &mdash; Batch GF: A QUIT PUTS THE HEROES BACK WHERE THEY WERE STANDING</h2>
+<p><b>THE TWELFTH BATCH ON <code>class-merge</code>, AND NOT MERGE WORK:</b> the defect it repairs is <code>main</code>'s
+too, and older than the merge. <code>main</code> is untouched. Full working: <code>docs/reports/GF.md</code>.</p>
+
+<p><b>QUITTING AT A BARGAIN OR IN THE MIDDLE OF A FIGHT NO LONGER WALKS PAST THE FIGHT.</b> The game saves the moment
+the heroes step onto a node, and that save already had the step in it &mdash; but not the fight standing there, the
+bargain offered for it, or the one taken. Continue then opened the map one step on: an elite quit at its bargain, or any
+fight quit in the middle &mdash; through the battle's own <i>Exit to Main Menu</i> as much as by closing the window
+&mdash; was simply gone, with its rewards. At a zone boss it was worse: a quit inside the boss fight, or on its victory
+card, left the heroes on a board with nothing to press. Every quit point was played through the real screens, on this
+branch and on <code>main</code>, and the two read the same.</p>
+<ul>
+<li><b>Continue now puts the heroes back where they were standing.</b> A bargain they walked away from is offered again,
+the same three terms; a fight they quit is fought again from its opening, against the same warband, on the terms they
+took and with their health as it was when they stepped on; an event they had drawn is waiting for them. A zone boss
+beaten on its card descends to the next zone, and a merchant a bargain bought is visited.</li>
+<li><b>The fight itself is not saved, so a quit inside one restarts it</b>, and nothing it pays is paid until it is won.
+A fight that was won is never fought, or paid, again.</li>
+<li><b>The run save moves to v13</b>, and an older save still loads. It carries no record of an unfinished step, so it
+resumes where it always did &mdash; except on a zone boss, where it now descends instead of stranding. The designer's own
+run save was read from a copy: it stands on a won elite, and loses nothing.</li>
+<li><b>Not changed:</b> a Peddler or a forge left in the middle of a visit is still gone on Continue. Both roll their stock
+on their own screens, and re-entering either would make a quit a reroll. Queued.</li>
+</ul>
+
+<p><b>FOUND WHILE PLAYING IT, AND NOT FIXED HERE: THE END BOSS HAS NO BUTTON.</b> The map draws sixteen columns and the end
+boss stands in the seventeenth, so after the third zone boss the road ahead is drawn and cannot be pressed &mdash; on
+<code>main</code> too. It is its own defect, and it is at the top of the queue.</p>
+
+<p><b>THE STALE PLAYER-FACING TEXTS, EACH SURFACE SWEPT RATHER THAN EACH NAMED LINE:</b></p>
+<ul>
+<li><b>The zone boss's victory card</b> said each spec banks a talent point; a class banks it, once. The same card and the
+mini-boss's said a hero <i>&ldquo;may choose one of three&rdquo;</i>, and both awards can offer fewer, so the figure is
+gone. The master document's copies of what a victory pays in talent points &mdash; a point on awakening and on every
+elite, mini-boss and boss &mdash; went with it: only a zone boss banks one.</li>
+<li><b>The run summary</b> said <i>&ldquo;Tier N of 10&rdquo;</i> on a zone of sixteen encounters; it says
+<i>&ldquo;encounter N of 16&rdquo;</i>, as the map does, and names the end boss when the heroes fall to it rather than
+calling it a fight. Its economy line counted mini-bosses as elites and sales as combat gold, and now says what its
+counters hold; the master document's copies of that line lose the rests the game no longer has.</li>
+<li><b>The fight recap</b> missed five health costs the heroes pay themselves &mdash; Phoenix Rebirth, Dark Pact, Blood
+Offering, Blood Price and Shared Grief. They are booked as the hero's own now, and still feed nothing that reacts to a
+blow. A wipe at a zone boss now names the boss that was actually on the field.</li>
+<li><b>The glossary was read whole against the code, not just at its item entry:</b> 745 claims across its 98 entries,
+95 of them stale, in 46 entries. The item entry names all eight items, their percentages and where each works. Among the
+rest: the Ruin mark can be stripped, Deadfall springs four times, Arcane Arrows banks six charges, the Empower key is C,
+Feint's two branches were described the wrong way round, a wipe keeps your talents, a benched card stays yours, the
+difficulty entry names the three rungs, and a run is 49 encounters with the end boss last. Where the thing described is
+gone &mdash; loot nodes, talent points from elites, tag-reading runes, a second companion &mdash; the claim is deleted
+rather than rewritten. The same claims were corrected where the game says them too: the Ruin and Umbral Sigil chips and
+the first-run card that said elites pay a talent point &mdash; and where the master document repeats them: Ruin can be
+stripped, Resonance stops at 99 and a third card, Threshold, takes it away, six elites stand in every zone, Arcane Arrows
+forks six hits, only Pommel Strike's Perfect lands a Stun on an unbroken boss, no Deadfall has a Perfect, and no spec
+plays the Rush archetype.</li>
+</ul>
+
 <h2>2026-09-13 &mdash; Batch GE: LONG DRAW'S MISS COSTS FOCUS, AND NO PERMANENT LAYER IS SPEC-SPECIFIC</h2>
 <p><b>THE ELEVENTH BATCH ON <code>class-merge</code>.</b> One rune gets a real cost, its card and the three other places
 that named the old one move with it, and the rule that sent spec-specific effects to the talents is rewritten for the

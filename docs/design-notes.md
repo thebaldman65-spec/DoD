@@ -4,6 +4,45 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A quit puts the heroes back where they were standing (Batch GF) — 2026-09-14
+
+**The fix is the save, not the step.** The map marks a node visited and moves the party onto it the moment it is
+pressed, and the save written there already has the step in it. The other shape was to hold the step back — save the
+position before the node and move only on a win. It was not taken, because the step is the commitment: the route is
+chosen at the click, the fight's own scaling reads the position, and a step held back would let a quit take a
+different road. What the save lacked was a record that the step was unfinished. With it the position stays where the
+player put it and the resume knows something is still standing there.
+
+**A quit inside a fight restarts it rather than resuming it.** The battle's own state — the timeline, every status and
+meter, the turn in progress — has never been saved, and saving it would be a far larger change than this defect. A
+restart from the step is what the save can honestly reproduce: the same warband, the same terms, the heroes' health as
+they stepped on. It does let a player abandon a fight that is going badly and start it again. That is strictly less
+than before, when the quit skipped the fight outright and kept the heroes' health, and it is the answer most
+roguelikes give; whether a quit should cost more is the designer's.
+
+**The win is marked in `claim_reward` because the inverse was the danger.** An encounter that survives a quit could
+survive a win and be fought, and paid, twice. Every victory in a run calls `claim_reward` before its first save — it
+is already where the bargain stops applying — so the mark reaches the disk ahead of any save that carries the victory's
+rewards. Erasing the encounter would have been simpler and wrong: the completion summary still reads it.
+
+**The bargain is frozen on the encounter because the screen used to roll it on every open.** Nobody could see that
+while a quit on the offer threw the fight away; once the resume brings the player back to the offer, a roll on every
+open turns a quit into a reroll of the terms — the elite cache's fault from FD, one screen along. `roll_offer` stays a
+pure roll, because the balance suites sample it hundreds of times and a remembered roll would read as one sample.
+
+**The Peddler and the forge are not re-entered.** Both roll their stock inside their own screens, so re-entering one on
+resume would make a quit a reroll of the shop. Freezing their stock is a change to two screens, which is the shape the
+brief ruled out, so a quit there still loses the visit, and it is queued.
+
+**A zone boss beaten on its card descends on resume, from an old save too.** The card's button is the only way off
+that board, so a quit on the card left the heroes on a map with nothing to press. The resume does what the button would
+have done. A save written by an older build cannot say whether the boss fell there; descending is the safe answer,
+because fighting again a boss that did fall would bank its talent points and its relic twice.
+
+**Two of the texts lost a figure rather than gaining a correct one.** The zone boss's and the mini-boss's award lines
+said *"one of three"*, and both awards can offer fewer. Each line names every hero paid at once, each with an offer of
+its own size, so no single number is right for the line; the count is on the hero's card, where the choice is made.
+
 ## Long Draw's miss costs Focus, and no permanent layer is spec-specific (Batch GE) — 2026-09-13
 
 **The drain is sixteen because a missed press was never earned.** Taking back eight would charge the player for a

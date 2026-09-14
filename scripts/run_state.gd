@@ -301,10 +301,20 @@ var node_idx := 0          # which node of map[slot_idx] the party stands on
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
 # The modifier the player accepted at the offer screen, live for exactly
-# one battle (§3). Cleared when that battle resolves. Not saved: quitting
-# between the offer and the fight forfeits the offer — the same shape as pending_event.
+# one battle (§3). Cleared when that battle resolves.
+#
+# BATCH GF — AND ALL FOUR OF THESE ARE SAVED NOW: `encounter` (with the bargain
+# rolled for it, the one taken, and `resolved` once the fight is won), the two
+# below, and `pending_event`. None was. The save the node writes as the party
+# steps onto it already carries the step, so a quit anywhere between that save
+# and the fight's end resumed PAST the fight — and at a zone boss, onto a road
+# with nothing on it. `resume_scene` is where a resumed run is placed.
 var pending_modifier := ""
 var pending_reward := {}   # the reward the accepted option pays on victory
+# BATCH GF — THE NODES A BARGAIN PRECEDES, written once because two places ask:
+# the map's step onto a node, and the resume that puts a party back in front of
+# one. A second copy of this list is how the two would come to disagree.
+const BARGAIN_NODES := ["elite", "miniboss"]
 # BATCH CT §3 — DROPS THAT HAVE NO SLOT, WAITING FOR THE MAP TO ASK.
 # A drop, an elite cache or an event can hand the party a type it has no slot
 # for. That is NOT the refusal a full stack gets: it is a CHOICE, offered as
@@ -2289,8 +2299,24 @@ func save_run() -> void:
 	#     `draft_refused` has since BO, so it is saved and loaded with the party
 	#     and needs no key here. A member without it reads its whole pool as its
 	#     loadout, which is what a v11 member meant.
+	# v13 (BATCH GF): THE STEP THE PARTY HAS TAKEN AND NOT FINISHED. `encounter`
+	# (the warband stepped onto, the bargain rolled for it as `offer`, the one
+	# taken as `bargain`, and `resolved` once the fight is won),
+	# `pending_modifier`, `pending_reward` and `pending_event`. None was saved,
+	# and the save `_on_node_pressed` writes as the party steps onto a node
+	# already carries the step, so a quit anywhere between that save and the
+	# fight's end — at the bargain, mid-fight, through the battle's own Exit to
+	# Main Menu — resumed PAST the fight, and at a zone boss onto a board with
+	# nothing left on it. TOLERANT, like v11 and v12: a v12 save carries no
+	# record, loads exactly as a v12 build loaded it, and the refusal threshold
+	# below does not move. **An older build reading a v13 save ignores the four
+	# keys and loses only the record** — the defect it already has — so this
+	# version needs no ceiling of the kind `Profile` carries; the first run-save
+	# change an older build could misread destructively is the one that does.
 	file.store_var({
-		"version": 12, "party": party, "items": items, "gold": gold,
+		"version": 13, "party": party, "items": items, "gold": gold,
+		"encounter": encounter, "pending_modifier": pending_modifier,
+		"pending_reward": pending_reward, "pending_event": pending_event,
 		"zone_bosses_cleared": zone_bosses_cleared,
 		"pending_item_offers": pending_item_offers,
 		"tally": tally, "debug_used": debug_used,
@@ -2368,13 +2394,19 @@ func load_run() -> bool:
 	debug_used = bool(data.get("debug_used", false))
 	debug_summon = false
 	debug_free_travel = false
-	pending_event = ""
-	pending_modifier = ""
-	pending_reward = {}
+	# BATCH GF — THE STEP IN FLIGHT IS RESTORED, NOT CLEARED. These four lines
+	# set it to nothing, and nothing is what told the resume that the fight the
+	# party had stepped into was over. A v12 save carries none of them and loads
+	# exactly as it always did; `resume_scene` decides what the record means.
+	pending_event = String(data.get("pending_event", ""))
+	pending_modifier = String(data.get("pending_modifier", ""))
+	var saved_reward: Variant = data.get("pending_reward", {})
+	pending_reward = saved_reward if saved_reward is Dictionary else {}
+	var saved_encounter: Variant = data.get("encounter", {})
+	encounter = saved_encounter if saved_encounter is Dictionary else {}
 	# BATCH CT §3: a v10 save has no offers and loads with none, which is right —
 	# it was written by a build that could not create one.
 	pending_item_offers = data.get("pending_item_offers", [])
-	encounter = {}
 	active = true
 	return true
 
@@ -2801,6 +2833,26 @@ func arm_fixed_modifier(node_type: String) -> void:
 func accept_offer(option: Dictionary) -> void:
 	pending_modifier = String(option.get("modifier", ""))
 	pending_reward = (option.get("reward", {}) as Dictionary).duplicate()
+	# BATCH GF — THE BARGAIN TAKEN IS PART OF THE STEP IN FLIGHT, SO IT IS SAVED
+	# THE MOMENT IT IS TAKEN. Without this a quit mid-fight would resume onto the
+	# offer screen, and the terms of one fight could be chosen twice.
+	if not encounter.is_empty():
+		encounter["bargain"] = option.duplicate(true)
+		save_run()
+
+
+# BATCH GF — THE BARGAIN IS ROLLED ONCE FOR AN ENCOUNTER AND KEPT ON IT.
+# The offer screen rolled in its `_ready`, which cost nothing while a quit on
+# that screen threw the fight away with it. Now a resume puts the party back in
+# front of the same screen, and a roll on every open would turn a quit into a
+# reroll of the terms — FD §1's rule, that a repair recomputed on every screen
+# open is a reroll, which is a different feature. `roll_offer` stays a pure
+# roll, because the suites sample it hundreds of times.
+func encounter_offer() -> Array:
+	if not (encounter.get("offer") is Array):
+		encounter["offer"] = roll_offer()
+		save_run()
+	return encounter["offer"]
 
 
 # Pay the accepted option's reward. Called on VICTORY — the modifier is the
@@ -2812,6 +2864,14 @@ func claim_reward() -> Dictionary:
 	var reward := pending_reward
 	pending_reward = {}
 	pending_modifier = ""
+	# BATCH GF — THE FIGHT IS WON, SO THE STEP IS FINISHED, AND THIS IS WHERE IT
+	# IS SAID. Every run-mode victory calls this before its first save, which is
+	# what makes it the place: every save from here on carries the encounter
+	# marked `resolved`, and `resume_scene` never re-enters a resolved one — so a
+	# won fight cannot be fought, or paid, twice. The record is marked rather
+	# than erased because the completion summary still reads it.
+	if not encounter.is_empty():
+		encounter["resolved"] = true
 	if reward.is_empty():
 		return {"text": "", "shop": false}
 	match String(reward.get("kind", "")):
@@ -2905,6 +2965,50 @@ func next_after_scene() -> String:
 		pending_shop = false
 		return "res://scenes/shop.tscn"
 	return "res://scenes/map.tscn"
+
+
+# BATCH GF — WHERE A RESUMED RUN IS PLACED, DECIDED HERE AND NOWHERE ELSE.
+# `main_menu._on_continue` loads the save and asks this. It used to open the map
+# every time, and the map reads the position — which the node's own save had
+# already moved onto the node, so whatever stood on it was walked by. In order:
+#   * an EVENT drawn and not answered opens again: the same event;
+#   * an ENCOUNTER stepped onto and not won is fought again FROM ITS OPENING —
+#     the same warband, the party as it stood when it stepped on, and the same
+#     bargain: the offer screen, showing the same three, if none was taken yet,
+#     and the battle if one was. The fight itself is never saved, so a quit
+#     inside one restarts it, and nothing it would have paid is paid until it is
+#     won (`claim_reward` marks it resolved before the victory's first save);
+#   * a MERCHANT the bargain bought and the player never reached is visited —
+#     what the victory card's Continue does;
+#   * a ZONE BOSS beaten on a board not yet left is left — what the card's
+#     "Descend into" does. A v12 save standing there cannot say whether the boss
+#     fell, and it descends too: re-fighting a boss that DID fall would bank its
+#     talent points and its relic twice, and staying is a board with nothing
+#     left on it to press.
+# Anything else opens the map, as it always did. Every branch that changes the
+# run saves before it returns, so a second quit resumes to the same place.
+func resume_scene() -> String:
+	if pending_event != "":
+		return "res://scenes/event.tscn"
+	if encounter_pending():
+		if String(encounter.get("type", "")) in BARGAIN_NODES \
+				and not encounter.has("bargain"):
+			return "res://scenes/offer.tscn"
+		return "res://scenes/battle.tscn"
+	if pending_shop:
+		var shop := next_after_scene()
+		save_run()
+		return shop
+	if slot_idx == BOSS_SLOT and has_next_zone():
+		advance_zone()
+		save_run()
+	return "res://scenes/map.tscn"
+
+
+# An encounter the party stepped onto and has not won. A wipe or a forfeit
+# clears the save outright, so no lost fight can be pending on disk.
+func encounter_pending() -> bool:
+	return not encounter.is_empty() and not bool(encounter.get("resolved", false))
 
 
 # Arm the event an EVENT node draws when the party steps onto it.

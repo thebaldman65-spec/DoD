@@ -104,8 +104,11 @@ func _on_new_game() -> void:
 
 
 func _on_continue() -> void:
+	# BATCH GF — THE RUN SAYS WHERE IT RESUMES. This opened the map every time,
+	# and the map reads a position the node's own save had already moved past
+	# the node, so a fight or bargain the party had stepped into was walked by.
 	if Run.load_run():
-		get_tree().change_scene_to_file("res://scenes/map.tscn")
+		get_tree().change_scene_to_file(Run.resume_scene())
 
 
 func _on_talents() -> void:

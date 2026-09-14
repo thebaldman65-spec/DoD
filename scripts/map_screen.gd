@@ -155,7 +155,7 @@ func _maybe_show_framing() -> bool:
 		"the end. Scroll it and read the whole zone before you step.\n\n" +
 		"Nothing is guaranteed on a route. Step down a row and the corridor\n" +
 		"above you is closed for the next few columns — that IS the choice.\n\n" +
-		"ELITES pay a talent point and a rune, and cost you health. The\n" +
+		"ELITES pay a draft pick and a rune, and cost you health. The\n" +
 		"SMITH sells ability upgrades for gold. TRADE is the Peddler. ??? is\n" +
 		"something standing on the road, and you will not know what until\n" +
 		"you stand on it.\n\n" +
@@ -2330,7 +2330,8 @@ func _on_node_pressed(j: int) -> void:
 	Run.save_run()
 	# Batch AO §2: the offer is an EVENT, not a toll booth — fights and bosses
 	# walk straight in, elites and mini-bosses are preceded by the bargain.
-	if ty in ["elite", "miniboss"]:
+	# BATCH GF: the list is `Run.BARGAIN_NODES`, which `Run.resume_scene` reads too.
+	if ty in Run.BARGAIN_NODES:
 		get_tree().change_scene_to_file("res://scenes/offer.tscn")
 	else:
 		get_tree().change_scene_to_file("res://scenes/battle.tscn")

@@ -13,41 +13,97 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-13 (Batch GE).*
+*Last rewritten: 2026-09-14 (Batch GF).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GE — LONG DRAW'S MISS COSTS FOCUS, AND NO PERMANENT LAYER IS SPEC-SPECIFIC. THE ELEVENTH BATCH ON
-  `class-merge`.** `main` is untouched. Full working: **`docs/reports/GE.md`**.
-- **§1: WITH THE LONG DRAW HELD, A MISSED PRESS DRAINS 16 FOCUS.** `SS_SEQ_MISS_DRAIN` is twice
-  `SS_SEQ_FOCUS_PER_PRESS`, decided in `_pay_sequence_focus` beside partial credit as one net `_gain_focus` call, and
-  floored at 0 there. The bar and the bot record the miss (`missed`) where it happens, so a cancel is not a miss. The
-  card's words are PROPOSED for the designer to confirm (queued below), and the three co-sites moved with it: the
-  `battle.gd` clamp comment, `check_ez` §5's *"the cost is real"*, and the `CLAUDE.md` sequence sentence. **On
-  `check_cs`'s model it is still a gain at every stage — +8.0 / +7.9 / +7.8 / +6.5 Focus a basic — and on the sim
-  bot's roll a loss at every stage** (queued below, owed a ruling).
-- **§2: NO PERMANENT LAYER IS SPEC-SPECIFIC, AND THE RULE SAYS SO.** `CLAUDE.md`'s EN §4 block sends an effect that must
-  know the spec to the RUNES. Five places carried the old claim — the block's heading, its second-axis paragraph and its
-  first rule bullet, the DO block's note on the halves that stand with the status half beneath it, and
-  `docs/master.html`'s relic paragraph — and all five are corrected. The master.html paragraph's other wrong claims went
-  with it: rest nodes as a read site, *"every hook is read at exactly one site"*, 19 hooks, and a run-start hook for
-  talent points.
-- **§3: NOT DONE, AS RULED.** The cap and `SS_SEQ_OPEN` stay; the five player-facing items stay queued and the
-  quit/resume skip is next; the relic redirect stays deferred; no spec dissolves, no pool merges, no engine becomes a
-  rune and no spine is attached.
-- **WHAT MOVED:** `scripts/battle.gd`, `scripts/unit.gd` (one comment), `data/runes.json` (one card), `check_cs.gd`
-  (§1 +2, §7 +24), `check_ez.gd` (§5 +5), `baselines.json` (their two rows), `pin-manifest.json` (regenerated for the
-  new pins), `CLAUDE.md`, `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and
-  `docs/reports/GE.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GE.md`**, written after the acceptance run.
+- **Last batch: GF — A QUIT PUTS THE HEROES BACK WHERE THEY WERE STANDING. THE TWELFTH BATCH ON `class-merge`, AND
+  NOT MERGE WORK.** `main` is untouched. Full working: **`docs/reports/GF.md`**.
+- **§1: DRIVEN AT EVERY QUIT POINT THROUGH THE REAL SCREENS, ON BOTH BRANCHES, AND `main` READS THE SAME — THE DEFECT
+  IS `main`'s AND PREDATES THE MERGE.** The save a node writes as the party steps onto it already carried the step,
+  while `encounter`, the bargain and `pending_event` were never saved and `load_run` cleared them. A quit at an
+  elite's or a mini-boss's bargain, inside any fight, or through the battle's own Exit to Main Menu resumed PAST the
+  fight; inside a zone boss or on its card, and inside the end boss, onto a board with nothing to press. An event, a
+  Peddler or a forge quit in the middle was walked past too. The post-fight offers — the elite's draft and rune cache,
+  the mini-boss's upgrade, the zone boss's ability pick — all survived a quit, the last on a stranded board.
+- **§2: THE REPAIR IS THE SAVE AND ONE RESUME DECISION.** The run save is v13 (tolerant; the refusal threshold stays at
+  10) and carries the step in flight; `claim_reward` marks the encounter resolved before any victory's first save;
+  `Run.resume_scene` is the one place a resumed run is placed — the same bargain (frozen by `encounter_offer`), the same
+  fight from its opening, the same event, the bought merchant, a beaten zone boss's descent. **A quit inside a fight
+  restarts it.** `check_gf` (**NEW**) drives every branch through the real screens and presses the real Continue.
+- **§3: THE FOUR PLAYER-FACING TEXTS, EACH SURFACE SWEPT:** the zone boss's card (a class banks the point; *"one of
+  three"* gone from it and the mini-boss's), the run summary (*"encounter N of M"*, the end boss named, the economy
+  labels), the fight recap (the five direct health costs booked through `_book_self_cost`), and the glossary — every
+  entry read against the code, 95 stale claims in 46 entries corrected, and `docs/master.html`'s copies of them
+  with it (`docs/reports/GF.md` §3).
+- **FOUND AND NOT FIXED — THE END BOSS HAS NO BUTTON** (first in the queue below): the map draws sixteen columns and
+  the end boss stands in the seventeenth, so no run reaches it through the map, on either branch.
+- **WHAT MOVED:** `scripts/run_state.gd`, `scripts/battle.gd`, `scripts/main_menu.gd`, `scripts/offer_screen.gd`,
+  `scripts/map_screen.gd` (two lines), `scripts/classes.gd` (one internal string), `data/glossary.json`,
+  `check_gf.gd` (**NEW**), `check_ea.gd` and `test_batch_ax.gd` (one pin re-pointed in each), `run_battery.sh` (+1 gate), `baselines.json`, `pin-manifest.json`, `CLAUDE.md`, `docs/master.html` and
+  its stamp, this file, the changelog, `docs/design-notes.md` and `docs/reports/GF.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GF.md`**, written before the acceptance run; its figures were added after it.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
-  to runes, is RULED, NOT BUILT, and is the next merge step**; the quit/resume skip (queued under GB's findings below)
-  is the next batch, and it is not merge work.
-- **Next letter: GF.** No batch GD was built (queued under GE's findings below).
+  to runes, is RULED, NOT BUILT, and is the next merge step.** The end boss's missing button is the next batch, and it
+  is not merge work either.
+- **Next letter: GG.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE END BOSS HAS NO BUTTON — **FOUND AT GF, NOT FIXED, AND THE NEXT BATCH (PLAYER-FACING, AND `main`'s TOO)**
+
+- **No run reaches the end boss through the map.** `map_screen._draw_lattice` draws `for s in Run.SLOTS_PER_ZONE` —
+  sixteen columns — and the end boss is the final zone's seventeenth slot (`END_BOSS_SLOT`, appended by
+  `_generate_map`). After the third zone boss's *"Walk on"*, `Run.reachable()` returns the end boss and the map draws
+  no button for it: the edge to it is drawn, because the edge loop reads `map[s + 1]`, and the node is not. Driven at
+  GF on both branches, with a quit and without one. The loop is BK's and the end boss is BM's, so a player's run has
+  ended at the third zone boss ever since — **and beating the end boss is the only thing that opens a talent tier**
+  (EN §3).
+- **Why no battery saw it:** `check_fh` §1 "completes" runs by calling `_on_node_pressed` directly rather than pressing
+  a lattice button, and the map gates draw the screen without pressing the column it lacks.
+- **What the fix needs** (not done at GF, which was one defect): the loop and the lattice's width read the board's own
+  size, and the node needs a label and a tooltip — `NODE_LABELS` has no `endboss` row and `_node_tooltip` no branch,
+  so the default would print *"Encounter 17 of 16"*. Those are player-facing words.
+
+### FOUND AT GF AND NOT FIXED
+
+- **A PEDDLER OR A FORGE QUIT IN THE MIDDLE OF A VISIT IS STILL WALKED PAST.** Both roll their stock in their own
+  `_ready`, so re-entering one on resume would make a quit a reroll of the shop, and freezing the stock is a change to
+  two screens, which GF's brief ruled out. Driven at GF: the node is visited and saved at the step, and Continue opens
+  the map past it.
+- **PLAYER-FACING, THE DESIGNER'S IF IT SHOULD COST MORE: A QUIT INSIDE A FIGHT RESTARTS IT.** The battle is never
+  saved, so a resumed fight opens from its beginning, with the party's health at the step and nothing paid; a player
+  can abandon a losing fight and start it over. Strictly less than before GF, when the quit skipped the fight and kept
+  the health.
+- **THE ZONE BOSS FOUGHT IS NOT ALWAYS THE ONE THE GAME NAMES.** A boss node composes its warband from every enemy the
+  zone's roster tags with the `boss` role, and the Hollow Crown — the end boss's kind — carries `"zones": [1, 2, 3]`,
+  so zone 1's boss fight drew it in GF's drives. The map's header (*"the %s waits"*), `Profile.note_boss` and the
+  run summary's final-battle line all name `ZONE_DEFS`' boss. GF made the summary name the boss in the warband (§3);
+  the header and the profile's boss tally are not GF's surfaces. Whether the end boss's kind belongs in the zone
+  rosters is content.
+- **`docs/master.html`'s debug paragraph** still says *"a summoned rest really heals"* (the Rest summon went with the
+  rest nodes) and names *"Jump to Boss Tier"* (the item is *Jump to Boss Slot*). Outside GF's surfaces.
+- **A MINI-BOSS CAN AWARD AN UPGRADE THE FORGE ALREADY PUT ON THE SAME ABILITY.** `roll_upgrade_offer` drops an
+  upgrade only through `has_upgrade`, which ignores a bought entry on purpose (the forge is not the mini-boss's pool),
+  and then pairs it with any ability it fits, the forged one included; `upgrade_choice` re-asks the same question. The
+  forge's own roll refuses a pairing the hero already carries, so the rule its comment states (*never twice on one
+  ability*) holds from one side only, and six of the eight upgrades stack when stamped twice (FE §2: Honed 25 → 38
+  → 57). Read in the code at GF, not driven.
+- **COPIES OF TWO CLAIMS THE GLOSSARY CORRECTED ARE LEFT IN A RULE AND IN COMMENTS.** `CLAUDE.md`'s governor table
+  still calls Resonance uncapped with two removers and Ruin never-clearing; `battle.gd`'s comment above the Arcanist's
+  `second_max = 99` says Resonance has no ceiling at all, and the header of Runaway Resonance's first clause says
+  nothing removes it. Arcane Arrows' handler comment says five is what the card promises, beside an
+  `ARCANE_ARROW_CHARGES` of 5 that nothing reads; the card and the handler pay six, and so does the glossary now. None
+  of these is player-facing.
+- **WHAT THE GLOSSARY CENSUS LEFT AS IT IS.** Nine claims no code can settle (intent, such as the class-wide cards
+  being weaker on purpose) stand as written. Decay and Elemental Weakness are described as live statuses and nothing
+  can apply either today, because each one's applier depends on a field nothing writes; Melted Armor's and Caught
+  Fast's entries say so of themselves and these two do not, and a note is content. Card and chip text still uses group
+  words the hero/ally rule retires (*"the line"*, *"everyone"*); the glossary no longer says otherwise, and the cards
+  are authored text. No spec plays the Rush archetype, which `Classes.ARCHETYPE_DESC` and `docs/master.html` §6's
+  table still define.
 
 ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
 
@@ -288,32 +344,30 @@ census found them, and the tables are in `docs/reports/GC.md` §3.
   is built the gate reds and says the marker is owed its removal. Nothing does today.
 - **`docs/ways-of-working.md`'s conflict table says this file "has no reader"**; `check_es` §4 reads it.
 
-### FOUND AT GB AND NOT FIXED — **THE §4 CENSUS'S FINDINGS OUTSIDE ITS THREE FILES; FOUR ARE PLAYER-FACING AND THE QUIT/RESUME SKIP IS NEXT; THE SIX RULES CLOSED AT GC**
+### FOUND AT GB AND NOT FIXED — **THE §4 CENSUS'S FINDINGS OUTSIDE ITS THREE FILES; THE THREE PLAYER-FACING TEXTS, THE RECAP GAP AND THE QUIT/RESUME SKIP CLOSED AT GF; THE SIX RULES CLOSED AT GC**
 
 The census that swept `CLAUDE.md`, `scripts/run_state.gd`'s comments and this file read every claim against the
 code, and some of what it found lives elsewhere. **The tables are in `docs/reports/GB.md` §4.**
 
-- **PLAYER-FACING:** a zone boss's victory text says *"Each spec that walked this road banks 1 talent point"*
-  (`battle._resolve_boss`). Since FX the point banks once per CLASS; with one hero of each class the numbers agree
-  and the word does not.
-- **PLAYER-FACING:** the run summary prints *"Tier N of 10"*, capped at 10 (`battle._summary_lines`), and a zone has
-  sixteen slots, so a wipe at slot 13 reads *"Tier 10 of 10"*.
-- **PLAYER-FACING:** the glossary's item entry still says *"Five items"* and quotes the old flat figures (a 40 HP
-  Health Potion, 40 Mana or Rage). The pouch holds eight types, and the potions are percentages of maximum since CT.
-- **THE RECAP LEDGER MISSES FIVE HEALTH COSTS.** The `phoenix`, `dark_pact`, `blood_offering`, `blood_price` and
-  `shared_grief` branches of `_resolve_special` subtract health directly, so none reaches `take_hit` or
-  `take_tick_damage` and none is booked; Blood Price's and Dark Pact's costs never reach the self-inflicted row.
-  `CLAUDE.md`'s BL §2 block says so now. The repair is code.
+- **~~PLAYER-FACING: a zone boss's victory text says each spec banks a talent point~~ — CLOSED AT GF §3:** it says
+  each class banks it, and the card's *"one of three"*, and the mini-boss's, lost the figure: both offers can be
+  short.
+- **~~PLAYER-FACING: the run summary prints "Tier N of 10"~~ — CLOSED AT GF §3:** it prints *"encounter N of M"* off
+  the zone's own slot count, and the summary's surface was swept with it (`docs/reports/GF.md` §3).
+- **~~PLAYER-FACING: the glossary's item entry says "Five items" and the old flat figures~~ — CLOSED AT GF §3,** with
+  every other entry of the glossary read against the code (`docs/reports/GF.md` §3).
+- **~~THE RECAP LEDGER MISSES FIVE HEALTH COSTS~~ — CLOSED AT GF §3:** each of the five books the health it takes
+  through `_book_self_cost`, which reaches the recap's ledger and none of the on-damage riders. A swept census of
+  every direct health write in `battle.gd` and `unit.gd` found these five and no sixth.
 - **A FORFEIT BOOKS A SUMMONED NODE.** `Run.debug_summon` switches off the run ledger and the wipe branch's Profile
   booking, and `_do_forfeit`'s `Profile.note_forfeit` is not guarded. Debug-only.
 - **THE FIXED MODIFIER NEVER REACHES A MINI-BOSS.** At rung 3 `arm_fixed_modifier` arms the mini-boss on entry, and
   the bargain that always follows overwrites it (`accept_offer`); RunSim takes the bargain first, so the guard skips
   arming. The mini-boss entry in the fixed list is dead in both flows.
-- **PLAYER-FACING, AND THE NEXT BATCH (GC §5): QUITTING AT AN ELITE'S OR MINI-BOSS'S OFFER, OR MID-FIGHT, WALKS PAST
-  THE FIGHT.** It is the one item here that costs the player an encounter rather than misinforming them. The node is
-  marked visited and saved before the offer or the battle opens, `load_run` clears the encounter, and the map never
-  re-enters it. Worked out from the code at GB, not driven. **GC read the sites it rests on on `main` too, and they are
-  the same**, so it likely predates the merge; driving it is the next batch's.
+- **~~QUITTING AT AN ELITE'S OR MINI-BOSS'S OFFER, OR MID-FIGHT, WALKS PAST THE FIGHT~~ — CLOSED AT GF, DRIVEN AND
+  REPAIRED.** GB's reading of the mechanism held; driving it found it wider — a zone boss and the end boss strand the
+  party, and an event is walked past too — and live on `main`, where it predates the merge (`docs/reports/GF.md`
+  §1).
 - **NOTHING STOPS `DOD_SIM_RUNES` CHANGING A REAL GAME.** `runes_mode()` reads the environment with no `sim_run` gate,
   and the `test_runes` assertion a `run_state.gd` comment claimed for it never existed: the purity arm covers the
   economy and power flags only. *Stats* or *off* left exported in a player's shell changes a real run.

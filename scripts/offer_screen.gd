@@ -38,7 +38,10 @@ func _ready() -> void:
 		get_tree().change_scene_to_file.call_deferred("res://scenes/map.tscn")
 		return
 	Music.play("map")
-	offer = Run.roll_offer()
+	# BATCH GF — THE SAME THREE EVERY TIME THIS SCREEN OPENS FOR ONE ENCOUNTER.
+	# The roll is kept on the encounter and saved with it, so a resumed run shows
+	# the bargains the player walked away from rather than rolling new terms.
+	offer = Run.encounter_offer()
 	_draw_screen()
 
 
