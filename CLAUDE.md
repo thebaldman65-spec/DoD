@@ -811,9 +811,10 @@ specs carry the same object.
 - **THE CAP IS FOUR, AND A RUNE MAY RAISE IT. A BATCH MAY NOT (AMENDED AT GC, RULED BY THE
   DESIGNER).** The Long Draw rune is the sanctioned exception: it adds one press at every stage and
   raises the cap by that same one. At the top stage its five-press chain opens at the four-press
-  row — `SS_SEQ_OPEN` has four rows and is deliberately not extended — so the fifth press is one
-  more taper step with no widening to pay for it, which is the rune's cost. `check_cs.gd` asserts
-  the cap, `check_ez` §5 the rune, and the reason sits beside `SS_SEQ_MAX_PRESSES`.
+  row — `SS_SEQ_OPEN` has four rows and is deliberately not extended, and GE §3 ruled that it stays
+  so — so the fifth press is one more taper step with no widening. **THAT NARROWING IS NOT THE
+  RUNE'S COST: THE COST IS THE MISS** (the partial-credit bullet below, GE §1). `check_cs.gd`
+  asserts the cap, `check_ez` §5 the rune, and the reason sits beside `SS_SEQ_MAX_PRESSES`.
   · **CS'S REASON, KEPT RATHER THAN DROPPED:** *"Focus has no ceiling, so an uncapped rule makes
     400 Focus a nine-press sequence with a tightening window on his most-used action — an ability
     a player without the reflexes simply cannot use."* **Four is the ceiling; Focus keeps climbing
@@ -836,6 +837,26 @@ specs carry the same object.
   before.** "Landed" is Good or better. **This REPLACED CN's worst-grade combine rather than
   joining it** — `_worse_grade` and `_GRADE_ORDER` are deleted, so both behaviours are not left
   reachable.
+  · **WITH THE LONG DRAW HELD, A MISS COSTS (STANDING, SET AT GE §1, RULED BY THE DESIGNER).** The
+    press that breaks the chain takes back `SS_SEQ_MISS_DRAIN`, TWICE what a press pays — the press
+    attempted and one already banked — and the constant is written against
+    `SS_SEQ_FOCUS_PER_PRESS`, so the relation is the rule and not the 16 it evaluates to. **IT IS
+    DECIDED IN `_pay_sequence_focus`, WHERE PARTIAL CREDIT ALREADY IS, AND NOWHERE ELSE**: one net
+    figure through one `_gain_focus` call, because what a broken chain is worth is one question and
+    a second site would be a second answer to it. **IT READS `missed`, WHICH THE BAR AND THE BOT
+    WRITE WHERE THE MISS HAPPENS, NEVER "NOT FULL"** — a cancel is not full either, and a cast the
+    player withdrew is not a press he missed. **THE FLOOR IS ZERO AND IT IS `_gain_focus`'s**: a
+    hero at 8 Focus who misses his first press lands at 0. `check_cs` §7 drives a miss at every
+    press, with the rune and without.
+  · **PRICE A RUNE'S COST IN WHAT THE CHAIN PAYS, NEVER IN HOW OFTEN IT LANDS (GE §1).** EZ and GC
+    both called the fifth press's narrowing the rune's cost off a landing rate, and at 150+ Focus
+    the rune still paid about seven Focus a basic more than the bare chain, because partial credit
+    pays the presses that land. **The drain did not make it a trade either; it made the gain
+    smaller.** On `check_cs`'s model a chain breaks 1.2–4.0% of the time, so sixteen Focus a miss
+    costs 0.2–0.6 a basic against the seven or eight the added press pays, and `check_cs` §7
+    prints the worth every battery. The sim bot's flat 85%-a-press roll prices the same rune as a
+    LOSS at every stage. Whether it should be a trade on the player's model is the designer's; the
+    tables are in `docs/reports/GE.md` §1.
 - **IT PAYS IN FOCUS, NOT DAMAGE.** Damage resolves off the FIRST press's grade and later presses
   add none — a deep-Focus Sharpshooter **ramps faster, he does not hit harder per swing**, because
   Focus already converts to crit chance and then crit multiplier.
@@ -1521,7 +1542,7 @@ merged.** A Berserker wears the Warrior's cells.
   it replaced. After a profile's first save at v3 the twelve purses exist only in a backup, and
   `main`'s v2 build refuses the v3 file — without deleting it — until the merge lands there.
 
-## STANDING RULE — A RELIC SETS UP THE RUN; A TALENT CHANGES WHAT A SPEC DOES IN A FIGHT (Batch EN §4)
+## STANDING RULE — A RELIC SETS UP THE RUN; A TALENT CHANGES WHAT A CLASS DOES IN A FIGHT; ONLY A RUNE KNOWS THE SPEC (Batch EN §4, amended at GE §2)
 > **Both are permanent meta-progression, and nothing in the project said what each was FOR.
 > The read site is what separates them, and it separates them cleanly.**
 
@@ -1535,23 +1556,35 @@ prices, elite spoils (a rest-node hook has had no reader since AN removed rest n
 *"NEEDS PLUMBING (declared out for now)"* list — on-kill and per-turn procs, revive-on-death,
 enemy-side auras, DoT-tick and Break-damage multipliers — **is precisely the in-combat category.**
 A talent counter, by contrast, is a `BattleUnit` field read inside `battle.gd`'s combat math, and
-the talent trees are **the only meta layer that reaches a turn as it resolves.**
+the one talent tree is **the only meta layer that reaches a turn as it resolves.**
 
 **THE SECOND AXIS FOLLOWS FROM WHEN EACH IS CHOSEN.** Relics are assigned at the DRAFT, **before
 specs are chosen**, so a relic *cannot* be about a spec — it is party-wide by construction rather
 than by preference. Talents are copied off `Profile` the moment a spec is confirmed and locked for
-the run, so a talent can only be about that hero — and since FX the tree keys to the CLASS, so
-what a hero wears is what the class his spec belongs to has bought.
+the run, **but since FX the tree keys to the CLASS**: every hero of a class wears every cell the
+class has bought, whichever spec he is, and every node must pay every class that can buy it — so a
+talent cannot be about a spec either.
+
+**NO PERMANENT LAYER IS SPEC-SPECIFIC ANY MORE (RULED BY THE DESIGNER AT GE §2), AND THAT IS WHAT FX
+INTENDED, NOT A GAP IT LEFT.** A relic is party-wide because it is chosen before a spec exists; a
+talent is class-wide because one tree serves every spec of every class. **THE ONE LAYER THAT CAN
+STILL BE TIED TO A SPEC IS THE RUNE** — bought by one hero, for one run, and scoped to a spec or a
+class. Stated here so the question is closed rather than left for a later batch to infer.
 
 **THE RULE FOR A FUTURE AUTHOR, AND THE TELL IS THE READ SITE:**
-- **If the effect must be read while a turn resolves, or must know which spec the hero is, it is a
-  TALENT.** It costs points, it is bought per class, and it is gated behind a difficulty rung.
+- **If the effect must be read while a turn resolves, and pays every hero who wears it whatever his
+  spec, it is a TALENT.** It costs points, it is bought per class, it is gated behind a difficulty
+  rung, and it must pay every class that can buy it (FX). **An effect that must know which spec the
+  hero is cannot be one** — the tree has no spec to know. This bullet sent that effect to the
+  talents until GE §2, which FX's one tree had already made impossible.
 - **If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory pays,
   what an elite drops — it is a RELIC.** It is earned automatically, it is party-wide, and adding
   one on an existing hook is **pure data**.
 - **If it is this run's kit rather than this account's — a stat, a resource, or the mechanics and
   values of a core ability, draft ability or passive — it is a RUNE** (the charter, Batch EM).
-  Runes are the run-scoped, per-hero, bought layer between the two permanent ones.
+  Runes are the run-scoped, per-hero, bought layer between the two permanent ones. **AND IF IT MUST
+  KNOW WHICH SPEC THE HERO IS, IT IS A RUNE (GE §2, ruled by the designer)**: a rune is scoped to a
+  spec or a class and bought by one hero, which is what makes it the only layer that can know.
 - **A NEW HOOK IS A BIGGER DECISION THAN A NEW RELIC.** Every hook was built to be read at one site;
   a second read site for one hook is how the vocabulary stops being auditable, and several hooks
   already have more than one (`docs/state.md` carries the census).
@@ -1993,8 +2026,12 @@ cards drafted with no damage figure at all.
 > the spec's PASSIVE, its PROTECTED CORE and the cross-row conditional do not. **The protected-core
 > ruling below — "worth 83 nodes", "DO NOT RE-OPEN" — is overturned by that line, and it went with
 > the twelve trees whose 83 nodes it priced.** The no-grant half and the status half STAND, and the
-> one tree obeys both: every node is a stat payload, none grants, none carries a condition. The
-> text below is kept as the record of what was ruled, not as a rule that binds.
+> one tree obeys both: every node is a stat payload, none grants, none carries a condition.
+> **Read *the spec* in both halves, and in the RESOURCE that survives, as every class that can buy
+> the node** — a talent belongs to no spec since FX (the relic/talent block above, GE §2), so the
+> resource survives only as FX's every-currency rule, and a node may read a status only if every
+> hero who wears it has a guaranteed way to apply it. The text below is kept as the record of what
+> was ruled, not as a rule that binds.
 
 > **A talent may not grant an ability, and may not depend on an ability or status the hero is not
 > guaranteed to have.** Talents are chosen before the run knowing nothing; abilities come from the
@@ -2041,6 +2078,9 @@ SECOND READING STANDS: the hero owns its core kit in EVERY run, so modifying it 
 > **A talent may not read a status the spec has no guaranteed way to apply.**
 > The ability rule and the status rule are the same rule — `sm_precision` named no ability and
 > was still a bet, and the ability-matching instrument could not see it.
+>
+> *Since FX, read* the spec *as every class that can buy the node (the note at the head of this
+> block, GE §2).*
 
 **A RULING CAN CREATE A DEFECT WITHOUT ANYONE MAKING A MISTAKE.** Moving the only two appliers of a
 status into the draft turned four tree-internal dependencies — which the charter explicitly permits

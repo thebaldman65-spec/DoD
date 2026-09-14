@@ -94,6 +94,16 @@ const SS_SEQ_FOCUS_PER_PRESS := 8
 # The full-sequence bonus: EVERY press landed, at any press count. A partial
 # sequence pays its per-press Focus and no bonus.
 const SS_SEQ_FULL_BONUS := 20
+# BATCH GE §1 — THE LONG DRAW'S MISS, AND IT IS THE RUNE'S COST (ruled by the
+# designer). With the rune held, the press that breaks the chain takes back
+# TWICE what a press pays: the press attempted and one already banked. Taking
+# back one is barely a cost, since a missed press was never earned; taking the
+# whole sequence would make the rune unplayable at depth, where the chain is
+# longest. **WRITTEN AGAINST `SS_SEQ_FOCUS_PER_PRESS`, NEVER AS THE 16 IT
+# EVALUATES TO** — the reason is a relation, so moving the per-press figure
+# moves this with it, and `check_cs` pins both the number and the relation.
+# It is decided in `_pay_sequence_focus`, where partial credit already is.
+const SS_SEQ_MISS_DRAIN := SS_SEQ_FOCUS_PER_PRESS * 2
 
 # §4 — THE WINDOW TIGHTENS, BUT THE SEQUENCE DOES NOT GET HARDER.
 #
@@ -4079,8 +4089,12 @@ func _player_turn(u: BattleUnit) -> void:
 					if one == "fail":
 						break
 					seq_landed += 1
+				# BATCH GE §1 — AND WHETHER A MISS ENDED IT, written here where the
+				# roll failed: the Long Draw charges for a miss at the payout, and a bot
+				# that recorded none would play the rune with no cost at all.
 				sc_sequence = {"presses": seq_presses, "landed": seq_landed,
-					"full": seq_landed >= seq_presses}
+					"full": seq_landed >= seq_presses,
+					"missed": seq_landed < seq_presses}
 				break
 			# Auto-cast abilities (no target click) can cancel during the skill check.
 			# BATCH CM §1 — the bar is told WHICH KIND of cast it is grading, so the
@@ -23371,15 +23385,18 @@ func _sharpshooter_basic_profile(u: BattleUnit) -> Dictionary:
 	var presses := _sequence_presses(u)
 	var scale: float = float(SC_PROFILE_DEFAULT["sweep_time"]) \
 		* SS_SEQ_OFFSET / SS_SEQ_SWEEP
-	# BATCH EZ §3 — AND THIS CLAMP IS THE LONG DRAW'S ENTIRE COST, WHICH IS
-	# WHY IT IS NOT A DEFENSIVE BOUND. `SS_SEQ_OPEN` is a four-entry table
-	# SOLVED so that a one-, two-, three- or four-press sequence lands with the
-	# same probability — CS §4's demand that a deeper sequence must not be
-	# likelier to break. **The rune adds a fifth press and the table is NOT
-	# extended**, deliberately: the extra press opens at the four-press widening
-	# and then takes another `SS_SEQ_TAPER` step, so the sequence really does
-	# get harder to hold together. That is the "but the windows are narrower"
-	# half of the card, and it is the only place it lives.
+	# BATCH EZ §3, RE-READ AT GE — THIS CLAMP IS NOT THE LONG DRAW'S COST.
+	# `SS_SEQ_OPEN` is a four-entry table SOLVED so that a one-, two-, three- or
+	# four-press sequence lands with the same probability — CS §4's demand that
+	# a deeper sequence must not be likelier to break. The rune's press is
+	# counted IN `presses`, so below 150 Focus it opens at the longer chain's
+	# row and the chain holds as well as the bare one (GC §2b); only at the top
+	# stage does a fifth press open at the four-press row and take one more
+	# `SS_SEQ_TAPER` step. **THE TABLE STAYS AT FOUR ROWS, BY RULING (GE §3)**,
+	# and what EZ read into this clamp was never a price in Focus: on
+	# `check_cs`'s model the rune still paid about seven Focus a basic more than
+	# the bare chain at the top stage. **THE COST IS THE MISS**, priced in
+	# `_pay_sequence_focus` off `SS_SEQ_MISS_DRAIN`.
 	#
 	# **THE 15% PER-PRESS TAPER THE BRIEF NAMES IS ALREADY SHIPPED** —
 	# `SS_SEQ_TAPER` is 0.85 and has been since CS — so the rune does not move
@@ -23403,20 +23420,33 @@ func _sharpshooter_basic_profile(u: BattleUnit) -> Dictionary:
 # per-press Focus and no bonus, which is §2's partial credit read into the
 # payout: the presses he landed are worth what they were worth.
 #
+# **BATCH GE §1 — AND WITH THE LONG DRAW HELD, A MISS COSTS.** The press that
+# breaks the chain takes back `SS_SEQ_MISS_DRAIN` from what the chain paid, in
+# the SAME `_gain_focus` call as the partial credit — one net figure, so a miss
+# on the first press drains the meter and a miss late in a long chain still
+# nets Focus. **IT IS DECIDED HERE AND NOWHERE ELSE**, because "what is a
+# broken chain worth" is one question and a second site would be a second
+# answer to it. It reads `missed`, which the bar and the bot write where the
+# miss happens, never "not full": a CANCEL is not full either, and a cast the
+# player withdrew is not a press he missed.
+#
 # **IT PAYS OFF `sc_sequence` AND NOTHING ELSE.** An EMPTY dictionary means no
 # bar and no bot roll produced a sequence this turn, and it pays nothing — the
 # state the no-bar branch leaves behind, and the one honest answer there.
 #
 # **`_gain_focus` IS THE ONLY WAY IN**, so Spray of Arrows' 50-point ceiling,
 # the conversion-point signature and the deepest-Focus ledger all see this Focus
-# exactly as they see the engine's. A second write site would be a second set of
-# rules for the same meter.
+# exactly as they see the engine's — and its floor at zero is what keeps a drain
+# from reading below it. A second write site would be a second set of rules for
+# the same meter.
 func _pay_sequence_focus(u: BattleUnit, ab: Ability) -> void:
 	if not _is_sharpshooter_basic(u, ab) or u.dead or sc_sequence.is_empty():
 		return
 	var landed := int(sc_sequence.get("landed", 0))
 	var presses := int(sc_sequence.get("presses", 0))
-	if landed <= 0:
+	var drain: int = SS_SEQ_MISS_DRAIN if (u.rune_long_draw_presses > 0
+		and bool(sc_sequence.get("missed", false))) else 0
+	if landed <= 0 and drain <= 0:
 		if presses > 1:
 			_log("   → The chain broke on the first shot — no Focus from the sequence",
 				"#909090")
@@ -23425,11 +23455,26 @@ func _pay_sequence_focus(u: BattleUnit, ab: Ability) -> void:
 	var full: bool = bool(sc_sequence.get("full", false))
 	if full:
 		gain += SS_SEQ_FULL_BONUS
-	_gain_focus(u, gain)
+	var before := u.second_resource
+	_gain_focus(u, gain - drain)
 	if full:
 		_log("   → The sequence holds — %d of %d, +%d Focus (%d + the %d full-sequence bonus)" % [
 			landed, presses, gain, landed * SS_SEQ_FOCUS_PER_PRESS,
 			SS_SEQ_FULL_BONUS], "#a0d060")
+	elif drain > 0:
+		# THE LINE PRINTS WHAT THE METER ACTUALLY MOVED. The floor at zero can
+		# take less than the drain, and a line quoting the ruled figure over a
+		# meter that did not move by it would be the log lying.
+		var moved := u.second_resource - before
+		var stopped := " (the meter stops at 0)" if moved > gain - drain else ""
+		if landed <= 0:
+			_log("   → The chain broke on the first shot — the Long Draw's miss costs %d Focus%s" % [
+				-moved, stopped], "#e07050")
+		else:
+			_log("   → The chain broke at %d of %d — the %d shot%s landed %s %d, the Long Draw's miss takes back %d: %+d Focus%s" % [
+				landed, presses, landed, "" if landed == 1 else "s", "pays" if landed == 1 else "pay",
+				gain, drain, moved,
+				stopped], "#e07050")
 	else:
 		_log("   → The chain broke at %d of %d — the %d shot%s already landed still pay: +%d Focus" % [
 			landed, presses, landed, "" if landed == 1 else "s", gain], "#e0a050")
@@ -23478,6 +23523,14 @@ func _gain_focus(u: BattleUnit, amount: int) -> void:
 	if u.second_resource > before:
 		u.float_text("+%d Focus" % (u.second_resource - before),
 			Color(0.55, 0.85, 0.40))
+	elif u.second_resource < before:
+		# BATCH GE §1 — A NEGATIVE AMOUNT IS A DRAIN, AND IT COMES IN THIS WAY
+		# TOO: the Long Draw's miss is the one caller that can pass one. The floor
+		# above keeps it from reading below zero, and the ledger below records a
+		# depth REACHED, so a drain cannot move it. The loss floats the way a gain
+		# does, because a meter that falls in silence reads as a bug.
+		u.float_text("-%d Focus" % (before - u.second_resource),
+			Color(0.90, 0.45, 0.35))
 	# BATCH AZ §0 — the deepest Focus reached, banked AT THE GAIN SITE because a
 	# switch, a kill and One Shot all wipe the meter (the AY Loyalty precedent,
 	# unguarded for the same reason: a test that cannot read the instrument
@@ -24119,7 +24172,7 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 #
 # PRESSES: a profile asking for more than one window runs the sweep that many
 # times, STOPS AT THE FIRST MISS, and RETURNS THE FIRST PRESS'S GRADE — how
-# many landed travels back in `sc_sequence`. A cancel on ANY press cancels the
+# many landed, and whether a miss ended it (GE), travels back in `sc_sequence`. A cancel on ANY press cancels the
 # whole check rather than the press, because a player who has decided not to
 # cast is not asking to skip a repetition.
 #
@@ -24256,7 +24309,7 @@ func _run_skill_check(cancellable := false, mode := "",
 	var grade := "fail"
 	var landed := 0
 	var cancelled := false
-	sc_sequence = {"presses": presses, "landed": 0, "full": false}
+	sc_sequence = {"presses": presses, "landed": 0, "full": false, "missed": false}
 	for i in presses:
 		if presses > 1:
 			_apply_press_window(seq_base, base_good, base_perfect, i)
@@ -24284,6 +24337,10 @@ func _run_skill_check(cancellable := false, mode := "",
 			# stopped would read as dropped input, which is the one way a check
 			# the player DID press can feel like a bug.
 			_sfx("click", -12.0, 0.55)
+			# BATCH GE §1 — A MISS, RECORDED WHERE IT HAPPENS. The Long Draw
+			# charges for it at the payout; a CANCEL leaves this loop too and is
+			# not a miss, so the payout reads this key and never "not full".
+			sc_sequence["missed"] = true
 			break
 		landed += 1
 		# The running tally, and only when there IS one to keep: a player being
@@ -24311,7 +24368,7 @@ func _run_skill_check(cancellable := false, mode := "",
 		# A cancel on ANY press cancels the whole check rather than the press: a
 		# player who has decided not to cast is not asking to skip a repetition.
 		# Nothing was earned, so nothing is reported as earned.
-		sc_sequence = {"presses": presses, "landed": 0, "full": false}
+		sc_sequence = {"presses": presses, "landed": 0, "full": false, "missed": false}
 		sc_root.visible = false
 		return "cancel"
 	match grade:

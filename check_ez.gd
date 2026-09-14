@@ -411,6 +411,21 @@ func _s4_the_payloads() -> void:
 # below would be reading a detonation nobody drove. The primer is stripped
 # after, never instead: the stacks must go through the real door so the chip,
 # the depth stat and Covenant of Ash all see them exactly as the game does.
+# BATCH GE §1 — what `_pay_sequence_focus` paid off one broken chain (two of
+# five landed), with the Long Draw held or not and the miss recorded or not.
+# The record is the shape the bar and the bot build, so the read site answers
+# exactly the question it answers in a fight.
+func _ld_paid(scene: Node, ss: BattleUnit, rune: int, missed: bool) -> int:
+	ss.rune_long_draw_presses = rune
+	ss.second_resource = 100
+	scene.sc_sequence = {"presses": 5, "landed": 2, "full": false, "missed": missed}
+	scene._pay_sequence_focus(ss, ss.abilities[0])
+	var paid: int = ss.second_resource - 100
+	ss.rune_long_draw_presses = 0
+	scene.sc_sequence = {}
+	return paid
+
+
 func _sr_seed(scene: Node, e: BattleUnit, n: int) -> void:
 	e.remove_status("ruin")
 	e.remove_status("ruin_primed")
@@ -754,11 +769,13 @@ func _s5_the_read_sites() -> void:
 		ss.rune_long_draw_presses = 0
 		ok(withr == base + 1,
 			"§5: Long Draw adds a press at %d Focus (%d -> %d)" % [f, base, withr])
-	# **THE COST, WHICH IS THE HALF THAT COULD SILENTLY NOT EXIST.** The fifth
+	# **THE TABLE IS NOT EXTENDED, AND GE §3 RULED THAT IT STAYS SO.** The fifth
 	# press opens at the FOUR-press widening and then takes another taper step,
 	# so its Good window is strictly narrower than the four-press sequence's
-	# last press. A `SS_SEQ_OPEN` quietly extended to five entries would make
-	# the rune a pure upside and nothing else would notice.
+	# last press. **EZ WROTE THIS ARM AS THE RUNE'S COST AND IT NEVER WAS ONE**:
+	# priced in Focus on `check_cs`'s model the rune still paid about seven a
+	# basic more than the bare chain at this stage (GC §2b, GE §1). It stays as
+	# a pin on the table's four rows; the cost is the miss, driven below.
 	ss.second_resource = 300
 	var p4: Dictionary = scene._sharpshooter_basic_profile(ss)
 	ss.rune_long_draw_presses = 1
@@ -771,8 +788,33 @@ func _s5_the_read_sites() -> void:
 	var last4: float = float(p4["good_half"]) * pow(float(p4["press_taper"]), 3)
 	var last5: float = float(p5["good_half"]) * pow(float(p5["press_taper"]), 4)
 	ok(last5 < last4,
-		"§5: ...and the fifth press is NARROWER than the fourth was (%.4f < %.4f) — the cost is real"
+		"§5: ...and the fifth press is NARROWER than the fourth was (%.4f < %.4f) — the table stays at four rows"
 			% [last5, last4])
+
+	# ---- Sharpshooter: the Long Draw's cost is the MISS (Batch GE §1) ----
+	# The read site is `_pay_sequence_focus`, driven off a record shaped as the
+	# bar and the bot write it, on ONE broken chain with and without the rune.
+	# `check_cs` §7 drives the bar itself press by press; this is the rune's
+	# field reaching the payout. A record with no miss in it — a cancel's — is
+	# the paired arm: the drain must need the miss, not merely the rune.
+	var ld_bare: int = _ld_paid(scene, ss, 0, true)
+	ok(ld_bare == 2 * scene.SS_SEQ_FOCUS_PER_PRESS,
+		"§5: without the rune a chain broken after two keeps its two presses (%+d)" % ld_bare)
+	var ld_rune: int = _ld_paid(scene, ss, 1, true)
+	ok(ld_rune == ld_bare - scene.SS_SEQ_MISS_DRAIN,
+		"§5: ...with the Long Draw the miss takes back %d — the rune's cost (%+d)"
+			% [scene.SS_SEQ_MISS_DRAIN, ld_rune])
+	var ld_kept: int = _ld_paid(scene, ss, 1, false)
+	ok(ld_kept == ld_bare,
+		"§5: ...and a record with no miss in it takes nothing, rune or not (%+d)" % ld_kept)
+	# **THE CARD MOVES WITH THE COST.** Its number is read off the constant, and
+	# the clause that named the widening as the cost is asserted gone beside it.
+	var ld_desc := String(Runes.config("long_draw_press").get("desc", ""))
+	ok(ld_desc.contains("drains %d Focus" % scene.SS_SEQ_MISS_DRAIN),
+		"§5: Long Draw's card names the miss and its price off the constant — %d Focus (%s)"
+			% [scene.SS_SEQ_MISS_DRAIN, ld_desc])
+	ok(not ld_desc.contains("buys no widening"),
+		"§5: ...and no longer names the widening as its cost")
 
 	# ---- Beastmaster: the split point moves, through EU's own slot ----
 	ok(scene._bond_convert(bm) == 8, "§5: Loyalty converts at 8 by default")

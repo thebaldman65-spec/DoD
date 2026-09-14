@@ -13,44 +13,39 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-13 (Batch GC).*
+*Last rewritten: 2026-09-13 (Batch GE).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GC — SIX RULES WHOSE FACTS MOVED, AND A RULING RECORDED BEFORE IT IS BUILT SAYS SO. THE TENTH BATCH ON
-  `class-merge`, AND IT MOVED DOCUMENTS ONLY.** No node, rune, magnitude, constant or line of game code moved. `main`
-  is untouched. Full working: **`docs/reports/GC.md`**.
-- **§1: FOUR RULES RETIRE, EACH MARKED AS HISTORY.** BH §2's fifteen-point leave-one-out block is deleted (it read a
-  lane, and BM §2 had recorded its retirement since FX); BA §1 no longer reserves the Survivalist's tree; CN's opt-in
-  relic exception is deleted, because no such relic has ever existed; and `docs/instrument-rules.md`'s second copy of
-  CQ §1's bot-guard rule is deleted, its one extra sentence moving home to `CLAUDE.md`.
-- **§2: THE SKILL-CHECK CAP IS AMENDED — FOUR, AND A RUNE MAY RAISE IT; A BATCH MAY NOT.** Long Draw is the sanctioned
-  exception. CS's reason is restated, and EY's slower bar split it: on `check_cs`'s model the capped chain lands 98.8%,
-  so the difficulty-at-four half is outgrown, while a nine-press chain still lands 49.5%, so the bound is what the cap
-  keeps. **Found on the way and surfaced: Long Draw's card is true at one stage of four** (queued below,
-  PLAYER-FACING).
-- **§3: `RULED, NOT BUILT` IS A CATEGORY.** FT §1's *Focus is the Hunter's* is marked, and a census of 881 claims resting
-  on a merge ruling — in the five documents that state the present and the game's own source — found ten of that
-  shape: eight are marked, one (CN's relic) went with §1, and one is left unmarked with its reason. The rule is written
-  into `CLAUDE.md`'s file-purpose block, and `docs/ways-of-working.md` points at it for the brief that transcribes a
-  ruling. **The census also found 138 claims pointing the other way**, still describing what the merge has already
-  moved: eleven close here (seven with §1, four in this file) and the rest are queued below.
-- **§4: DEFLECTION IS CONFIRMED** as the tier-2 node's name, and GB's sweep is recorded with the ruling in `CLAUDE.md`'s
-  name-sweep block so the name is not revisited.
-- **§5: NOT DONE, AS RULED.** The five player-facing items stay queued and the quit/resume skip is next. The three crit
-  nodes, Heal More When Low and We Do Not Break stay; the relic redirect stays deferred; no spec dissolves, no pool
-  merges, no engine becomes a rune and no spine is attached.
-- **WHAT MOVED:** `CLAUDE.md`, `docs/instrument-rules.md`, `docs/ways-of-working.md`, this file, the changelog,
-  `docs/design-notes.md` and `docs/reports/GC.md` (**NEW**). **No source, data, suite, gate, `baselines.json` row or
-  `pin-manifest.json` pin moved.** `docs/master.html` is not edited, so its stamp is not bumped; *"the stamp"* in the
-  brief is read as this file's *Last rewritten* line (FU §0's reading).
-- **VERIFICATION:** in **`docs/reports/GC.md`**, written after the acceptance run.
+- **Last batch: GE — LONG DRAW'S MISS COSTS FOCUS, AND NO PERMANENT LAYER IS SPEC-SPECIFIC. THE ELEVENTH BATCH ON
+  `class-merge`.** `main` is untouched. Full working: **`docs/reports/GE.md`**.
+- **§1: WITH THE LONG DRAW HELD, A MISSED PRESS DRAINS 16 FOCUS.** `SS_SEQ_MISS_DRAIN` is twice
+  `SS_SEQ_FOCUS_PER_PRESS`, decided in `_pay_sequence_focus` beside partial credit as one net `_gain_focus` call, and
+  floored at 0 there. The bar and the bot record the miss (`missed`) where it happens, so a cancel is not a miss. The
+  card's words are PROPOSED for the designer to confirm (queued below), and the three co-sites moved with it: the
+  `battle.gd` clamp comment, `check_ez` §5's *"the cost is real"*, and the `CLAUDE.md` sequence sentence. **On
+  `check_cs`'s model it is still a gain at every stage — +8.0 / +7.9 / +7.8 / +6.5 Focus a basic — and on the sim
+  bot's roll a loss at every stage** (queued below, owed a ruling).
+- **§2: NO PERMANENT LAYER IS SPEC-SPECIFIC, AND THE RULE SAYS SO.** `CLAUDE.md`'s EN §4 block sends an effect that must
+  know the spec to the RUNES. Five places carried the old claim — the block's heading, its second-axis paragraph and its
+  first rule bullet, the DO block's note on the halves that stand with the status half beneath it, and
+  `docs/master.html`'s relic paragraph — and all five are corrected. The master.html paragraph's other wrong claims went
+  with it: rest nodes as a read site, *"every hook is read at exactly one site"*, 19 hooks, and a run-start hook for
+  talent points.
+- **§3: NOT DONE, AS RULED.** The cap and `SS_SEQ_OPEN` stay; the five player-facing items stay queued and the
+  quit/resume skip is next; the relic redirect stays deferred; no spec dissolves, no pool merges, no engine becomes a
+  rune and no spine is attached.
+- **WHAT MOVED:** `scripts/battle.gd`, `scripts/unit.gd` (one comment), `data/runes.json` (one card), `check_cs.gd`
+  (§1 +2, §7 +24), `check_ez.gd` (§5 +5), `baselines.json` (their two rows), `pin-manifest.json` (regenerated for the
+  new pins), `CLAUDE.md`, `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and
+  `docs/reports/GE.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GE.md`**, written after the acceptance run.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is RULED, NOT BUILT, and is the next merge step**; the quit/resume skip (queued under GB's findings below)
   is the next batch, and it is not merge work.
-- **Next letter: GD.**
+- **Next letter: GF.** No batch GD was built (queued under GE's findings below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -211,7 +206,42 @@ re-tensed. **A sweep of the whole file found sixteen more**, and the census was 
 - **~~This file's *Knowledge sync* section carries EG's 104.70 KiB~~ — CLOSED AT GB §4:** the heaviest-files list and
   its figures are gone, and the section names the instruments that print the live sizes.
 
-### FOUND AT GC AND NOT FIXED — **ONE PLAYER-FACING CARD, A SEVENTH RULE WHOSE FACTS MOVED, AND THE CENSUS'S OTHER DIRECTION**
+### FOUND AT GE AND NOT FIXED — **LONG DRAW IS STILL A GAIN ON THE PLAYER'S MODEL (OWED A RULING), AND ITS NEW WORDS AWAIT CONFIRMATION**
+
+- **OWED A RULING: THE DRAIN MADE LONG DRAW'S GAIN SMALLER, NOT A TRADE, ON `check_cs`'s OWN MODEL.** With the rune
+  held, a missed press drains 16 Focus (GE §1). Priced in Focus a basic, the rune against the bare chain, on the model
+  `check_cs` §7 prints every battery:
+
+  | Focus | presses, bare → rune | chain lands, bare → rune | worth before GE | worth now |
+  |---|---|---|---|---|
+  | 0–49 | 1 → 2 | 97.7% → 98.5% | +8.22 | +7.98 |
+  | 50–99 | 2 → 3 | 98.5% → 98.7% | +8.06 | +7.86 |
+  | 100–149 | 3 → 4 | 98.7% → 98.8% | +8.01 | +7.82 |
+  | 150+ | 4 → 5 | 98.8% → 96.0% | +7.14 | +6.50 |
+
+  - **A chain breaks too rarely on that model for a per-miss price to reach a trade.** Break-even is about 180 Focus a
+    miss at 150+, more than the meter holds at the bottom of that stage, and over 550 below it.
+  - **The sim bot prices it the other way.** It lands a flat 85% of presses, and on its roll the rune with the drain
+    is a LOSS at every stage (−1.2 / −3.4 / −5.3 / −6.9 Focus a basic).
+  - **The model's one assumption decides it.** At a timing SD of 100 ms rather than 60, the rune is a trade at 150+
+    only (−3.6) and stays a gain below it. `docs/reports/GE.md` §1 carries the tables.
+  Which model the rune should answer to is the designer's. Rune content is written with the designer, so no number
+  moved beyond the ruled 16 and no alternative is offered here.
+- **LONG DRAW'S NEW WORDS ARE PROPOSED, NOT CONFIRMED:** *"His basic attack runs one EXTRA press at every stage — but a
+  missed press drains 16 Focus."* `check_ez` §5 reads the number off `SS_SEQ_MISS_DRAIN`, so a confirmed rewording that
+  keeps *"drains 16 Focus"* needs no gate edit, and one that drops the phrase moves that arm.
+- **BATCH GD's BRIEF WAS NEVER BUILT, AND GE's SUPERSEDES BOTH ITS SECTIONS.** No GD commit exists on either branch.
+  Its §1 ruled GC's second fix — the added press takes no widening at any stage — which GE's brief priced as only a
+  smaller gain (+6.3 / +7.0 / +7.1 / +7.1 on the same model); its §2 restated the relic/talent seam, which GE §2
+  replaced with the ruling above. Recorded so the letter is not read as a lost batch.
+- **`relics.gd`'s header still says every hook is read at exactly one site and names rest nodes** — FW's item below,
+  unchanged; `docs/master.html`'s copy of the same claims was corrected at GE §2.
+- **THE §2 SWEEP'S RESIDUE, ALL OF IT ALREADY QUEUED UNDER GC:** `docs/master.html` still says *"the talent trees"* in
+  two places (the rune-condition door and EM's charter line), still prices talent points the pre-BM way in §2, and
+  still carries DO's move of twenty-two cards as history; `CLAUDE.md`'s name-sweep block still cites deleted Warden
+  nodes. None of them says a talent is tied to a spec; each is the census's other direction.
+
+### FOUND AT GC AND NOT FIXED — **THE CARD AND THE SEVENTH RULE CLOSED AT GE; THE CENSUS'S OTHER DIRECTION IS STILL QUEUED**
 
 **GC's §3 census read 881 claims resting on a merge ruling** — in `CLAUDE.md`, this file, `docs/instrument-rules.md`,
 `docs/ways-of-working.md`, `docs/master.html` and the game's own source — and found ten stating an unbuilt ruling as
@@ -219,13 +249,18 @@ built. **It found 138 pointing the other way**: text still describing what the m
 closed at GC (seven with §1's retirements, four in this file). The rest are below by kind, counted by file as the
 census found them, and the tables are in `docs/reports/GC.md` §3.
 
-- **PLAYER-FACING: LONG DRAW'S CARD IS TRUE AT ONE STAGE OF FOUR.** *"… the added press buys no widening, so the
+- **~~PLAYER-FACING: LONG DRAW'S CARD IS TRUE AT ONE STAGE OF FOUR~~ — CLOSED AT GE §1, BY A RULING ON THE RUNE'S
+  COST RATHER THAN EITHER FIX BELOW:** with the rune held a missed press drains 16 Focus, and the card's new words await
+  confirmation (under GE's findings). GC's text: *"… the added press buys no widening, so the
   sequence is harder to hold."* `_sharpshooter_basic_profile` takes the opening widening off the press count with the
   rune's press included, so below 150 Focus the added press DOES buy the widening the table gives the longer chain, and
   on `check_cs`'s model the chain holds as well or marginally better with the rune (98.5 / 98.7 / 98.8% against
   97.7 / 98.5 / 98.7%). Only at 150+ is it harder (96.0% against 98.8%). `check_ez` §5 asserts the cost at 300 Focus
   only. **Owed a ruling: the fix is either the card's words or the rune's shape** (GC §2b).
-- **A SEVENTH RULE WHOSE FACTS MOVED UNDER IT — REPORT-ONLY, LIKE GB's SIX.** `CLAUDE.md`'s EN §4 block is headed *"A
+- **~~A SEVENTH RULE WHOSE FACTS MOVED UNDER IT~~ — CLOSED AT GE §2, RULED BY THE DESIGNER:** the rule sends an effect
+  that must know the spec to the RUNES and says no permanent layer is spec-specific, and `docs/master.html`'s relic
+  paragraph is rewritten with it. That paragraph made the claim in other words rather than carrying the sentence. GC's
+  text: `CLAUDE.md`'s EN §4 block is headed *"A
   TALENT CHANGES WHAT A SPEC DOES IN A FIGHT"*, and its first rule bullet says an effect that *"must know which spec the
   hero is … is a TALENT"*. Since FX a talent is a stat payload every class buys and every hero of the class wears, so an
   effect that must know the spec cannot be one. One clause of the block was updated for FX; the rule was not.
@@ -238,7 +273,7 @@ census found them, and the tables are in `docs/reports/GC.md` §3.
     live; DN §8 is called open though DO ruled it.
   - `docs/master.html`, 28: the talent-point economy in §2, §3 and §5 still reads as it did before BM (a point on
     awakening, on every elite, mini-boss and boss); a builds-with cell names the Poise lane; Harvest is said to sit in
-    the Hunter class pool (it is only in the Survivalist's boss pool); "the talent trees" stays plural in three places.
+    the Hunter class pool (it is only in the Survivalist's boss pool); "the talent trees" stays plural in three places (the one in the relic paragraph corrected at GE §2).
     It also carries the per-hero relic ruling as unbuilt, a plan in the one document that holds none.
   - `docs/instrument-rules.md`, 3: a talent granting an ability (none has since DO), *"A LANE ROW IS ONE FULLY-BUILT
     HERO"*, and Battered Not Broken removing banked Break (the node is gone).
@@ -373,7 +408,8 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   value onto an enemy.
 - **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult` is read at two,
   `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing and
-  neither does Martyr's Knucklebone's *"rest nodes restore 10% more"* (GB).
+  neither does Martyr's Knucklebone's *"rest nodes restore 10% more"* (GB). **`docs/master.html`'s copy of the claim was
+  corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own.
 - **`CLAUDE.md`'s recast block says `add_status` resolves a re-application as the max of duration and power** —
   true only of its default branch: Poison and Chilled reset the timer (so Poison can shorten), Burn adds turns,
   Ruin adds a stack (`unit.gd:2685-2736`).

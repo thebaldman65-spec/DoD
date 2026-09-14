@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-12 (Batch GB &mdash; Deflection, and a ranged attack can be parried)</b></p>
+<p align="right"><b>Last updated: 2026-09-13 (Batch GE &mdash; no permanent layer is spec-specific, and the relic paragraph says so)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2668,19 +2668,24 @@ and it is a save-format change (v12 &rarr; v13) touching four signatures, both a
 sites and 13 of the 25 relic descriptions, with four hooks still unruled. <b>The draft also
 assigns relics BEFORE specs are chosen</b>, so "which hero" has the least information behind
 it at exactly the moment it would be asked.
-<br><b>WHAT A RELIC IS FOR, versus a talent (Batch EN §4).</b> A relic sets up the RUN and a
-talent changes what a SPEC does inside a fight: every hook below is read at exactly one
-site, and not one of those sites is inside a turn — they are run start, battle SPAWN (base
-stats, before turn one), the victory screen, gold awards, rest nodes, shop prices and elite
-spoils. The category `relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death,
-enemy auras, DoT and Break multipliers — is exactly the in-combat one, and the talent trees
-are the only meta layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
-effect expressed through an audited <b>hook vocabulary</b> (19 hooks, listed atop relics.gd:
-run-start gold/points/items, per-hero stat boosts at battle spawn — attack, typed damage, max
+<br><b>WHAT A RELIC IS FOR, versus a talent and a rune (Batch EN §4).</b> A relic sets up the
+RUN, a talent changes what every hero of a CLASS does inside a fight, and a rune is the one
+layer that can be tied to a SPEC. <b>No permanent layer is spec-specific.</b> A relic is chosen
+at the draft, before any spec exists, and reaches all four heroes; the one talent tree is bought
+per class, and every node pays every class that can buy it, whichever spec wears it. An effect
+that must know which spec a hero is belongs on a rune, which one hero buys for one run and which
+is scoped to a spec or a class. Not one relic hook is read inside a turn — the read sites are run
+start, battle SPAWN (base stats, before turn one), the victory screen, gold awards, shop prices
+and elite spoils, 25 in all, and six of the hooks are read at more than one. The category
+`relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
+Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
+layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
+effect expressed through an audited <b>hook vocabulary</b> (18 hooks, listed atop relics.gd:
+run-start gold/items, per-hero stat boosts at battle spawn — attack, typed damage, max
 HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
-gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook is DEAD — rest
-nodes no longer exist, and the two relics carrying it, Cairnmoss Poultice and Martyr's
-Knucklebone, are left as written pending a design pass). Scalar hooks SUM and dict hooks merge
+gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook has no reader, because
+the map has no rest node, so Cairnmoss Poultice pays nothing and Martyr's Knucklebone pays only
+its victory heal, both pending a design pass). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard opens the run with a potion of each kind; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six non-physical damage

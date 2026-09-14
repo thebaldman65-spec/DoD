@@ -15,6 +15,51 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-13 &mdash; Batch GE: LONG DRAW'S MISS COSTS FOCUS, AND NO PERMANENT LAYER IS SPEC-SPECIFIC</h2>
+<p><b>THE ELEVENTH BATCH ON <code>class-merge</code>.</b> One rune gets a real cost, its card and the three other places
+that named the old one move with it, and the rule that sent spec-specific effects to the talents is rewritten for the
+one tree. <code>main</code> is untouched. Full working: <code>docs/reports/GE.md</code>.</p>
+
+<p><b>A MISSED PRESS DRAINS FOCUS WHEN THE LONG DRAW IS HELD</b> (ruled by the designer). The Sharpshooter's chain pays
+8 Focus a landed press and 20 more for a full chain, and a miss used to end the chain and keep what came before. With
+the rune, the press that breaks the chain now takes back <b>16 Focus</b>: twice what a press pays, the press attempted
+and one already banked. It is decided where partial credit already is, as one net figure, so a miss on the first press
+drains the meter and a miss late in a long chain still nets Focus. <b>Focus stops at 0</b>: a Sharpshooter at 8 Focus
+who misses lands at 0, not at &minus;8. A cancelled cast is not a miss and costs nothing. The number is written against
+the per-press figure, so it moves if that does.</p>
+<ul>
+<li><b>The card's new words are proposed for the designer to confirm:</b> <i>&ldquo;His basic attack runs one EXTRA
+press at every stage &mdash; but a missed press drains 16 Focus.&rdquo;</i> The old clause, <i>&ldquo;the added press
+buys no widening, so the sequence is harder to hold&rdquo;</i>, described a cost the rune never charged.</li>
+<li><b>The three other places that named the old cost moved with it:</b> the comment beside the opening-widening clamp
+in <code>battle.gd</code>, <code>check_ez</code> &sect;5's <i>&ldquo;the cost is real&rdquo;</i>, and the sentence in
+<code>CLAUDE.md</code>'s sequence block. The table the old cost lived in keeps its four rows, as ruled.</li>
+<li><b>Driven on the real bar:</b> a chain missed at each of its five presses in turn, with the rune and without, a
+full chain, a cancel, and the floor at 8 Focus. <code>check_cs</code> &sect;7 does it every battery, and a lost Focus
+now floats over the Sharpshooter the way a gained one always has.</li>
+</ul>
+
+<p><b>WHAT THE RUNE IS WORTH NOW, AND IT IS STILL A GAIN.</b> Priced on <code>check_cs</code>'s own timing model at the
+four Focus stages, the rune pays about <b>+8.0 / +7.9 / +7.8 / +6.5 Focus a basic</b> more than the bare chain, against
++8.2 / +8.1 / +8.0 / +7.1 before the drain. On that model a chain breaks between 1.2% and 4.0% of the time, so a
+16-point drain costs a fifth to two thirds of a point a basic while the added press pays seven or eight. <b>The drain
+made the gain smaller; it did not make the rune a trade.</b> The sim bot, which lands a flat 85% of presses, prices the
+same rune as a loss at every stage. Which of the two the rune should answer to is the designer's call.</p>
+
+<p><b>NO PERMANENT LAYER IS SPEC-SPECIFIC ANY MORE, AND THE RULES SAY SO</b> (ruled by the designer). Since FX there is
+one talent tree, every class buys it and every node must pay every class, so no talent can know which spec a hero is.
+<code>CLAUDE.md</code>'s relic-and-talent rule still sent an effect that must know the spec to the talents. It now sends
+it to the <b>runes</b>, which one hero buys for one run and which are scoped to a spec or a class, and it says plainly
+that neither permanent layer can be tied to a spec: that is what FX intended, not a gap it left.
+<code>docs/master.html</code> made the same claim in other words, <i>&ldquo;a talent changes what a SPEC does inside a
+fight&rdquo;</i>, and the same paragraph listed rest nodes as a place relics are read seven lines before saying rest
+nodes do not exist. The paragraph is rewritten, and three more of its claims were wrong and are corrected with it: the
+hook count, a run-start hook for talent points, and <i>&ldquo;every hook is read at exactly one site&rdquo;</i>.</p>
+
+<p><b>STILL NOT DONE, AS RULED:</b> the cap and <code>SS_SEQ_OPEN</code> do not move; the five player-facing items stay
+queued and the quit/resume skip is next; the relic redirect stays deferred; no spec dissolves, no pool merges, no
+engine becomes a rune and no spine is attached.</p>
+
 <h2>2026-09-13 &mdash; Batch GC: SIX RULES WHOSE FACTS MOVED, AND A RULING RECORDED BEFORE IT IS BUILT SAYS SO</h2>
 <p><b>THE TENTH BATCH ON <code>class-merge</code>, AND IT MOVES DOCUMENTS ONLY.</b> No node, rune, magnitude, constant
 or line of game code moved, and <code>docs/master.html</code> is not edited. <code>main</code> is untouched. Full

@@ -571,7 +571,7 @@
 	"long_draw_press": {
 		"name": "Long Draw", "scope": "spec:sharpshooter",
 		"price": 100,
-		"desc": "His basic attack runs one EXTRA press at every stage — but the added press buys no widening, so the sequence is harder to hold.",
+		"desc": "His basic attack runs one EXTRA press at every stage — but a missed press drains 16 Focus.",
 		"payload": {"stat": {"rune_long_draw_presses": 1}}
 	},
 	"long_leash": {

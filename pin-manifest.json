@@ -2,21 +2,65 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1460,
-  "source": 1127,
+  "total": 1464,
+  "source": 1131,
   "other": 93,
   "document": 240
  },
  "source_residency": {
-  "code": 676,
+  "narrow": 30,
+  "code": 679,
   "absent": 298,
   "runtime": 80,
-  "narrow": 29,
   "unresolved": 1,
   "comment": 40,
   "alt-sibling": 3
  },
  "pins": [
+  {
+   "s": "check_cs.gd",
+   "fn": "_s7_the_long_draw_miss",
+   "h": "scripts/battle.gd",
+   "n": "\"missed\":",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_cs.gd#246"
+  },
+  {
+   "s": "check_cs.gd",
+   "fn": "_s7_the_long_draw_miss",
+   "h": "scripts/battle.gd",
+   "n": "sc_sequence = {",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_cs.gd#241"
+  },
+  {
+   "s": "check_cs.gd",
+   "fn": "_s7_the_long_draw_miss",
+   "h": "scripts/battle.gd",
+   "n": "sc_sequence[\"missed\"] = true",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_cs.gd#252"
+  },
+  {
+   "s": "check_cs.gd",
+   "fn": "_s7_the_long_draw_miss",
+   "h": "scripts/battle.gd",
+   "n": "}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_cs.gd#243"
+  },
   {
    "s": "check_da.gd",
    "fn": "_s2_table",
@@ -2049,7 +2093,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#307",
+   "g": "check_ez.gd#316",
    "expr": "rq_key"
   },
   {
@@ -2061,7 +2105,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#308",
+   "g": "check_ez.gd#317",
    "expr": "rq_key"
   },
   {
@@ -2073,7 +2117,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#309"
+   "g": "check_ez.gd#318"
   },
   {
    "s": "check_ez.gd",
@@ -2084,7 +2128,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#313"
+   "g": "check_ez.gd#322"
   },
   {
    "s": "check_ez.gd",
@@ -2095,7 +2139,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#312"
+   "g": "check_ez.gd#321"
   },
   {
    "s": "check_ez.gd",
@@ -2106,7 +2150,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#305"
+   "g": "check_ez.gd#314"
   },
   {
    "s": "check_fd.gd",
@@ -14524,7 +14568,7 @@
    "h": "docs/master.html",
    "n": "all four heroes",
    "p": "+",
-   "r": "alt-sibling",
+   "r": "code",
    "k": "literal",
    "how": "derived",
    "g": "test_batch_bx.gd#558",

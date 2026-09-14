@@ -4,6 +4,37 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Long Draw's miss costs Focus, and no permanent layer is spec-specific (Batch GE) — 2026-09-13
+
+**The drain is sixteen because a missed press was never earned.** Taking back eight would charge the player for a
+press the chain had already not paid him for; taking back the whole sequence would make the rune unplayable at depth,
+where the chain is longest and he has the most to lose. Twice the per-press figure is the smallest number that is a
+cost: the press he missed and one he had banked. It is written as that relation rather than as sixteen, so the day the
+per-press figure moves, the cost moves with it.
+
+**It lives where partial credit is decided, and it is one net figure.** What a broken chain is worth is one question.
+A second site that took Focus away after the payout would be a second answer to it, and it would let the chain's gain
+reach the conversion signature and the deepest-Focus ledger on the way up before the drain took it back down. One
+call carrying the net means the meter moves once, by what the chain was worth.
+
+**A miss is recorded where it happens, not inferred.** A cancelled cast also leaves the chain short of full, and a
+player who withdrew a cast has not missed a press. So the bar and the bot write the miss at the moment it happens, and
+the payout reads that rather than "not full".
+
+**It did not make the rune a trade on the model the project uses for the bar, and that is reported rather than
+tuned.** At the live sweep the bar lands a chain almost every time, so a cost charged per miss is charged rarely: at
+150 Focus a five-press chain breaks about one time in twenty-five, and the added press pays on the other twenty-four.
+The sim bot misses about one press in seven and prices the same rune as a loss. The two models disagree about the rune
+because they disagree about the player, and which one the rune should answer to is a design question rather than a
+number to move.
+
+**No permanent layer can know the spec, and that is what FX was for.** A relic is chosen before a spec exists and
+reaches every hero. The talent tree is one tree every class buys, and a node that paid one spec would pay the rest of
+its class nothing, which FX made the rule rather than the exception. So the rule that sent spec-specific effects to
+the talents had been pointing, since FX, at a layer that could no longer hold them. The only layer that still can is
+the rune: one hero buys it for one run, and it is scoped to a spec or a class. Saying so in the rule closes the
+question rather than leaving the next author to rediscover it from the tree.
+
 ## Six rules whose facts moved, and a ruling recorded before it is built says so (Batch GC) — 2026-09-13
 
 **The four retirements are marked, not corrected, because a rule corrected to describe a dead feature is still a rule

@@ -1463,7 +1463,7 @@ var rune_wide_watch := 0      # rune-owned: the Wide Watch 1 (a FLAG) — RETIRE
                               # a saved run holding the rune keeps working, the
                               # `rune_split_tongue` contract
 var rune_shared_mark := 0     # rune-owned: the Shared Mark 1 (a FLAG)
-var rune_long_draw_presses := 0 # rune-owned: the Long Draw +1 press at every stage
+var rune_long_draw_presses := 0 # rune-owned: the Long Draw +1 press at every stage, and a missed press then drains `SS_SEQ_MISS_DRAIN` (GE)
 # Beastmaster —
 var rune_long_leash := 0      # rune-owned: the Long Leash +3 to the split point
 var rune_shared_hide := 0     # rune-owned: the Shared Hide 1 (a FLAG)

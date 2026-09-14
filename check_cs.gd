@@ -75,6 +75,14 @@ func _initialize() -> void:
 		"per-press Focus is 8 — the docs quote it; move both or neither")
 	ok(battle.SS_SEQ_FULL_BONUS == 20,
 		"the full-sequence bonus is 20 — the docs quote it; move both or neither")
+	# BATCH GE §1 — THE LONG DRAW'S MISS IS PINNED THE SAME WAY, AND BOTH HALVES.
+	# The card quotes the number, so it must not move silently; and the REASON
+	# is a relation — twice what a press pays — so the relation is pinned too,
+	# and a drain retyped as a literal reds here the day the per-press moves.
+	ok(battle.SS_SEQ_MISS_DRAIN == 16,
+		"the Long Draw's miss drains 16 — the card quotes it; move both or neither")
+	ok(battle.SS_SEQ_MISS_DRAIN == 2 * battle.SS_SEQ_FOCUS_PER_PRESS,
+		"...and it is TWICE what a press pays: the press attempted and one already banked")
 	ok(battle.SS_SEQ_STEP == 50, "one extra press per 50 Focus")
 	ok(battle.SS_SEQ_OPEN.size() == battle.SS_SEQ_MAX_PRESSES,
 		"the widening table has exactly one row per allowed press count")
@@ -244,6 +252,10 @@ func _initialize() -> void:
 	ok(total / 4000.0 > 2.0 and total / 4000.0 < 4.0,
 		"the bot's sequence is partial credit rather than all-or-nothing")
 
+	# ---------- BATCH GE §1 — THE LONG DRAW'S MISS ----------
+	print("BATCH GE §1 — the Long Draw's miss, driven at every press, with the rune and without")
+	await _s7_the_long_draw_miss(scene, ss, battle)
+
 	_report()
 
 
@@ -347,6 +359,124 @@ func _drive_and_resolve(scene: Node, ss: BattleUnit, focus: int, n: int) -> Dict
 	var before := foe.hp
 	await scene._resolve(ss, ss.abilities[0], foe, String(bar["grade"]))
 	return {"dealt": before - foe.hp, "focus": int(bar["focus"])}
+
+
+# ---------- BATCH GE §1 — THE LONG DRAW'S MISS, DRIVEN PRESS BY PRESS ----------
+#
+# **THE BAR ITSELF, NOT THE MODEL.** §4 walks the model; this drives the real
+# bar through `_drive` and reads what `_pay_sequence_focus` actually paid. A
+# drain that fired on the wrong press, fired twice or never fired would pass
+# every static check in this file, and each of those leaves a different number
+# at some press — so every press is driven and every figure is exact.
+func _s7_the_long_draw_miss(scene: Node, ss: BattleUnit, battle) -> void:
+	var per: int = battle.SS_SEQ_FOCUS_PER_PRESS
+	var drain: int = battle.SS_SEQ_MISS_DRAIN
+	var bonus: int = battle.SS_SEQ_FULL_BONUS
+	var top: int = 3 * battle.SS_SEQ_STEP  # 150, the top stage, where the rune runs five
+	# WITH THE RUNE: five presses at the top stage, and a miss at each in turn.
+	ss.rune_long_draw_presses = 1
+	for k in [1, 2, 3, 4, 5]:
+		var plan: Array = []
+		for i in k:
+			plan.append("fail" if i == k - 1 else "good")
+		var r := await _drive(scene, ss, top, plan)
+		ok(int(r["max_presses_seen"]) == k and int(r["landed"]) == k - 1,
+			"GE rune, miss at press %d of 5: the bar stops there with %d landed (swept %d, landed %d)" % [
+				k, k - 1, int(r["max_presses_seen"]), int(r["landed"])])
+		ok(int(r["focus"]) == (k - 1) * per - drain,
+			"GE rune, miss at press %d of 5: %d for the presses landed, %d taken back — %+d (got %+d)" % [
+				k, (k - 1) * per, drain, (k - 1) * per - drain, int(r["focus"])])
+	var full5 := await _drive(scene, ss, top, ["good", "good", "good", "good", "good"])
+	ok(int(full5["max_presses_seen"]) == 5 and bool(full5["full"]),
+		"GE rune, no miss: all five presses swept and landed")
+	ok(int(full5["focus"]) == 5 * per + bonus,
+		"GE rune, no miss: a full chain drains nothing — %+d (got %+d)" % [
+			5 * per + bonus, int(full5["focus"])])
+	# A CANCEL IS NOT A MISS. It breaks the same loop and leaves the chain
+	# short of full, which is exactly why the payout reads `missed`.
+	var cancelled := await _drive(scene, ss, top, ["good", "cancel"])
+	ok(String(cancelled["grade"]) == "cancel" and int(cancelled["focus"]) == 0,
+		"GE rune: a cancelled cast drains nothing — withdrawing is not missing (got %+d)" % \
+			int(cancelled["focus"]))
+	# THE FLOOR IS ZERO AND IT IS `_gain_focus`'s. At 8 Focus the rune runs two
+	# presses; the first missed takes 16 from 8 and stops at 0. The arm beside it
+	# is the same miss above the floor, so a floor that zeroed EVERY drain reds.
+	var at8 := await _drive(scene, ss, 8, ["fail"])
+	ok(int(at8["max_presses_seen"]) == 1 and ss.second_resource == 0,
+		"GE rune: a hero at 8 Focus who misses lands at 0, never at %d (reads %d)" % [
+			8 - drain, ss.second_resource])
+	await _drive(scene, ss, 24, ["fail"])
+	ok(ss.second_resource == 24 - drain,
+		"GE rune: ...and at 24 Focus the same miss takes all %d (reads %d)" % [
+			drain, ss.second_resource])
+	ss.rune_long_draw_presses = 0
+	# WITHOUT THE RUNE: four presses at the same Focus. A miss at each keeps
+	# what came before and takes nothing — and there is no fifth press to miss.
+	for k in [1, 2, 3, 4]:
+		var plan: Array = []
+		for i in k:
+			plan.append("fail" if i == k - 1 else "good")
+		var r := await _drive(scene, ss, top, plan)
+		ok(int(r["focus"]) == (k - 1) * per,
+			"GE bare, miss at press %d of 4: keeps %d and loses nothing (got %+d)" % [
+				k, (k - 1) * per, int(r["focus"])])
+	var fifth := await _drive(scene, ss, top, ["good", "good", "good", "good", "fail"])
+	ok(int(fifth["max_presses_seen"]) == 4 and int(fifth["focus"]) == 4 * per + bonus,
+		"GE bare: there is no fifth press — full at four, %+d (swept %d, got %+d)" % [
+			4 * per + bonus, int(fifth["max_presses_seen"]), int(fifth["focus"])])
+	await _drive(scene, ss, 8, ["fail"])
+	ok(ss.second_resource == 8,
+		"GE bare: at 8 Focus a miss takes nothing (reads %d)" % ss.second_resource)
+	ss.second_resource = 0
+	# EVERY RECORD THE FILE BUILDS CARRIES `missed` — the bar's opening, its
+	# cancel, and the bot's roll. The bot never runs the bar (§5 says why it is
+	# not driven here), so its record is asserted as a property of every writer:
+	# a writer without the key hands the sim a Long Draw with no cost.
+	var src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
+	var writers := 0
+	var bad: Array = []
+	var at := src.find("sc_sequence = {")
+	while at >= 0:
+		var lit := src.substr(at, src.find("}", at) - at + 1)
+		if lit != "sc_sequence = {}":
+			writers += 1
+			if not lit.contains("\"missed\":"):
+				bad.append(lit.replace("\n", " ").replace("\t", "").left(90))
+		at = src.find("sc_sequence = {", at + 1)
+	print("  GE: CHECKED %d sequence records built in battle.gd" % writers)
+	ok(writers >= 3, "GE: the record writers are found — the bar's two and the bot's (%d)" % writers)
+	ok(bad.is_empty(), "GE: every sequence record carries `missed` (%s)" % [bad])
+	ok(src.count("sc_sequence[\"missed\"] = true") == 1,
+		"GE: ...and the bar sets it at the one place a press fails")
+	# THE RUNE'S WORTH ON §4's MODEL, PRINTED AND NOT ASSERTED. The ruling asked
+	# for a trade; whether this reads as one is the designer's call, and a gate
+	# that asserted a sign would be the gate ruling.
+	for n in [1, 2, 3, 4]:
+		var held: int = (n - 1) * battle.SS_SEQ_STEP
+		var bare := _model_worth(scene, ss, held, 0)
+		ss.rune_long_draw_presses = 1
+		var rune := _model_worth(scene, ss, held, drain)
+		ss.rune_long_draw_presses = 0
+		print("  GE model, %d+ Focus: bare %.2f, with the Long Draw %.2f — worth %+.2f Focus a basic" % [
+			held, bare, rune, rune - bare])
+	ss.second_resource = 0
+
+
+# E[Focus a basic] on §4's model: each press lands with 1 - miss_risk, the
+# chain stops at the first miss, per-press and full-sequence Focus as paid, and
+# `drain` taken on a miss. The floor is ignored; it binds below 16 Focus only.
+func _model_worth(scene: Node, ss: BattleUnit, focus: int, drain: int) -> float:
+	var battle := load("res://scripts/battle.gd")
+	ss.second_resource = focus
+	var prof: Dictionary = scene._sharpshooter_basic_profile(ss)
+	var reach := 1.0
+	var e := 0.0
+	for i in int(prof["presses"]):
+		var tol: float = float(prof["good_half"]) * float(prof["sweep_time"]) \
+			* pow(float(prof["press_taper"]), float(i))
+		reach *= 1.0 - _miss_risk(tol)
+		e += reach * battle.SS_SEQ_FOCUS_PER_PRESS
+	return e + reach * battle.SS_SEQ_FULL_BONUS - (1.0 - reach) * drain
 
 
 # BATCH DB — one shape for every gate: `NAME: N checks / M failures`.
