@@ -2661,7 +2661,11 @@ real screens on both branches and both read the same (`docs/reports/GF.md` §1).
 - **A QUIT INSIDE A FIGHT RESTARTS IT.** The battle's own state is never saved, so a resumed fight
   opens from its beginning — the same warband, the party as it stood when it stepped on, the same
   bargain — and nothing it pays is paid until it is won. Whether a quit should ever cost more than
-  a restart is the designer's.
+  a restart is the designer's. **A RESUME WAS COSTED AT GG, AND IT IS A PROJECT, NOT A BATCH.** A battle can
+  be picked up only at the top of `_run_battle`'s turn loop, because everywhere else a suspended function
+  holds the fight. It must be re-entered past an opening that may not run twice, the global dice cannot be
+  read back, and an open bar lives inside a suspended cast. **Do not snapshot a fight anywhere but a turn
+  boundary**, and read `docs/reports/GG.md` §1 before building any of it; its §2d prices the four answers.
 - **WHAT A RESUME WILL SHOW AGAIN IS FROZEN ON THE RUN, NEVER ROLLED BY THE SCREEN** — FD §1's rule,
   one door along. The bargain is rolled once per encounter (`encounter_offer`); `roll_offer` stays a
   pure roll, because the suites sample it. **The Peddler and the forge still roll in their own
@@ -3003,6 +3007,14 @@ door both offer paths use — skips it.
   is still paid, and deleting any of the four is the tempting green on the day something reds.
   `check_fo` §2a pins all four PRESENT and pins `eligible_ids` refusing it — **the kept half is
   asserted as hard as the retired half.**
+· **A GLOSSARY ENTRY IS RETIRED, NEVER ANNOTATED (Batch GG, ruled by the designer).** A player reads the
+  glossary to learn what the game does, so an entry for something nothing in the game can produce is worse
+  than no entry. **It keeps its `id` and its text in `data/glossary.json` and gains a `retired` string**
+  naming the batch and what is lost. **`Glossary.in_category` — the one door the panel lists through — skips
+  it, and the panel's see-also loop asks `Glossary.is_retired`**, so no live entry links to it. `entry()`
+  and `status_short()` still resolve it, and `test_batch_ce`'s 98 counts the file, not the panel. **THIS
+  BLOCK'S OWN PRECEDENT IS NOW THE SHAPE THE RULING RETIRES**: Melted Armor's entry annotates itself, and so
+  does Caught Fast's; whether they retire too is open (`docs/state.md`).
 
 ## STANDING RULE — A RUNE IS DISCONNECTED FROM THE TALENT TREES (Batch EM, the designer's charter)
 

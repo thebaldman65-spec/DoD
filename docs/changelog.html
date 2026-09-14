@@ -15,6 +15,45 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-14 &mdash; Batch GG: A MID-FIGHT SAVE IS A PROJECT, AND TWO GLOSSARY ENTRIES RETIRE</h2>
+<p><b>THE THIRTEENTH BATCH ON <code>class-merge</code>, AND NOT MERGE WORK.</b> <code>main</code> takes one documentation
+commit and nothing else. Full working: <code>docs/reports/GG.md</code>.</p>
+
+<p><b>A QUIT INSIDE A FIGHT STILL RESTARTS IT.</b> The brief asked for a quit fight to resume where it was left, and to
+cost it first and stop if it was large. It is large, so nothing of it is built:</p>
+<ul>
+<li><b>A battle can only be picked up between two turns.</b> Everywhere else the fight is paused inside code that cannot
+be saved.</li>
+<li><b>Each unit carries about a hundred and thirty things a fight changes</b>, beside the battle's own forty or so.</li>
+<li><b>The game's dice cannot be put back the way they were.</b></li>
+<li><b>An open skill check is open inside that paused code.</b></li>
+</ul>
+<p>Four answers are priced for the designer, from the full capture to leaving the restart. The recommended middle keeps
+the restart but carries the heroes' health, Mana and spent items through a quit, so quitting a losing fight can only
+cost. One more thing turned up while pricing it: <b>today a quit after the last hero falls, before the defeat screen,
+restarts a fight that was already lost.</b> Whichever answer is taken has to close that.</p>
+
+<p><b>DECAY AND ELEMENTAL WEAKNESS LEAVE THE GLOSSARY.</b> Nothing in the game can apply either — each one's only way
+in is a talent the one class tree replaced — and a player reads the glossary to learn what the game does, so an entry
+for something nothing produces is worse than no entry. <b>Ruled by the designer: retire them, do not annotate
+them.</b></p>
+<ul>
+<li>The panel no longer lists either, and no entry links to them: Resists &amp; Vulnerabilities used to link
+Elemental Weakness.</li>
+<li>Both stay in the glossary's data, text untouched, each carrying a note of why it is retired and what comes back if
+anything applies it again.</li>
+<li>The design document's status table no longer describes Decay as something that happens, and one card's
+<i>Builds with</i> line no longer offers it.</li>
+</ul>
+<p><b>Melted Armor and Caught Fast are the same case</b>: nothing applies either, and their entries say so of themselves.
+The ruling named two, so they stay, and the question is the designer's.</p>
+
+<p><b><code>main</code> GETS A NOTE, NOT THE FIX.</b> One line in <code>main</code>'s <code>docs/state.md</code>. It names
+the quit defect GF repaired here — a quit at a bargain or inside a fight walks past it, and at a zone boss strands the
+heroes — and says it is fixed on this branch. It also names the end boss's missing button, which both branches share.</p>
+
+<p><b>Not changed:</b> no card, rune, node, number or engine; the run save is still v13. The end boss is next.</p>
+
 <h2>2026-09-14 &mdash; Batch GF: A QUIT PUTS THE HEROES BACK WHERE THEY WERE STANDING</h2>
 <p><b>THE TWELFTH BATCH ON <code>class-merge</code>, AND NOT MERGE WORK:</b> the defect it repairs is <code>main</code>'s
 too, and older than the merge. <code>main</code> is untouched. Full working: <code>docs/reports/GF.md</code>.</p>

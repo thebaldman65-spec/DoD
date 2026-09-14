@@ -127,6 +127,9 @@ func _show_entry(id: String) -> void:
 	var text := "[i][color=#b8ae98]%s[/color][/i]\n\n%s" % [e["short"], e["long"]]
 	var links := PackedStringArray()
 	for other_id in e.get("see_also", []):
+		# BATCH GG: a retired entry is off the list, so nothing links to it.
+		if Glossary.is_retired(String(other_id)):
+			continue
 		var other := Glossary.entry(String(other_id))
 		if not other.is_empty():
 			links.append("[url=%s]%s[/url]" % [other_id, other["term"]])

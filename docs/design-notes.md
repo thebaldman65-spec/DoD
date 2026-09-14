@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A mid-fight save is a project, and two glossary entries retire (Batch GG) — 2026-09-14
+
+**Why the resume stopped at a report.** The brief said to cost it before building it and stop if it was large.
+
+- **A fight can only be picked up between two turns.** Everywhere else it is paused in the middle of code that cannot
+  be saved.
+- **Picking it up there still means rebuilding every unit without re-running the opening of the battle.**
+- **A fight changes far more on each unit than the brief's list.**
+- **The dice cannot be put back.**
+
+Any of those alone is a batch, and together they are several. Building a quarter of it would have left a resume that
+works in a fixture and fails the first time a new card adds a field nobody listed.
+
+**Why the middle is the one recommended.** The restart's fault is not that it restarts; it is that a quit costs
+nothing. Carrying the heroes' losses through a quit keeps the restart — the one thing the save can honestly reproduce —
+and removes the reason to quit, because the warband's losses reset and the heroes' do not. It writes only at the one
+point where nothing is paused, and only fields the save already holds.
+
+**Why a glossary entry is retired rather than annotated.** The designer's reason: a player reads the glossary to learn
+what the game does, so an entry that says *this exists but nothing produces it* teaches something about the code and
+nothing about the game. Rune retirement already had the right shape. The entry stops being shown and keeps everything
+else, so the day something applies Decay again, bringing it back is one deleted line.
+
+**Why the link goes with the entry.** Resists & Vulnerabilities pointed at Elemental Weakness. A link to a page the
+list no longer carries would have shown the retired entry anyway, one click in. So the panel asks one question — is
+this retired — in both places it reaches an entry.
+
+**Why the entries stay in the file.** The suite that counts the glossary counts it as a list of decisions, and its own
+comment says each entry is one. Retiring an entry is a decision about showing it, not about whether it was ever
+written.
+
+**Why the design document says "nothing applies it" rather than dropping the row.** Its status table already keeps
+several statuses nothing applies, each saying so. Decay was the one row still describing itself as live, and the fix
+was to make it read like its neighbours rather than to decide, in passing, a question about that table the ruling did
+not ask.
+
 ## A quit puts the heroes back where they were standing (Batch GF) — 2026-09-14
 
 **The fix is the save, not the step.** The map marks a node visited and moves the party onto it the moment it is

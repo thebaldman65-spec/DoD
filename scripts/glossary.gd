@@ -52,7 +52,20 @@ static func entry(id: String) -> Dictionary:
 
 static func in_category(cat: String) -> Array:
 	_load()
-	return _entries.filter(func(e): return String(e["category"]) == cat)
+	return _entries.filter(func(e): return String(e["category"]) == cat \
+		and String(e.get("retired", "")) == "")
+
+
+# BATCH GG — A RETIRED ENTRY LEAVES THE PANEL AND KEEPS ITS ID. An entry for
+# something nothing in the game can produce is RETIRED, never annotated (ruled
+# by the designer): a player reads the glossary to learn what the game does.
+# It stays in data/glossary.json with its text untouched and a `retired`
+# string naming what is lost; `entries()`, `entry()` and `status_short()` all
+# still resolve it; and the panel neither lists it (`in_category`, above) nor
+# links to it (the see-also loop asks this). The day something produces it
+# again, deleting the string is the whole of bringing the entry back.
+static func is_retired(id: String) -> bool:
+	return String(entry(id).get("retired", "")) != ""
 
 
 # The contextual hook (status chips): a battle status id's one-line

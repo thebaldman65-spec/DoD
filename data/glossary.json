@@ -361,6 +361,7 @@
   "id": "status_decay",
   "term": "Decay",
   "category": "statuses",
+  "retired": "RETIRED at BATCH GG — kept, and said to be kept. Nothing in the game can apply Decay: its two appliers are talent riders, Empowered Hex on Hex of Ruin and Lingering Torment as a madness ends, and each reads a talent field that nothing has written since Batch FX replaced the twelve spec trees with one. LOST: the Decay entry in the glossary panel. KEPT: this entry's text, the status id, its chip and its turn-start Break tick. Deleting this string brings the entry back, and it is owed back the day anything applies Decay again.",
   "short": "10 Break damage at the start of each turn.",
   "long": "Rot eats at the will: a decaying unit takes 10 Break damage at each of its turn starts, marching its own meter toward a Break with no further help.",
   "see_also": [
@@ -403,6 +404,7 @@
   "id": "status_elem_weak",
   "term": "Elemental Weakness",
   "category": "statuses",
+  "retired": "RETIRED at BATCH GG — kept, and said to be kept. Nothing in the game can apply Elemental Weakness: its one applier is a Crushing Blow rider that reads a talent field nothing has written since Batch FX replaced the twelve spec trees with one. LOST: the Elemental Weakness entry in the glossary panel, and the Resists & Vulnerabilities entry's link to it. KEPT: this entry's text, the status id, its chip and the resistance it lowers at the strike. Deleting this string brings the entry and the link back, and it is owed back the day anything applies Elemental Weakness again.",
   "short": "Elemental resistances reduced.",
   "long": "The victim's resistances to non-physical schools are lowered while this holds, deepening every elemental hit against it.",
   "see_also": [

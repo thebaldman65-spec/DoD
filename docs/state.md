@@ -13,42 +13,34 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-14 (Batch GF).*
+*Last rewritten: 2026-09-14 (Batch GG).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GF — A QUIT PUTS THE HEROES BACK WHERE THEY WERE STANDING. THE TWELFTH BATCH ON `class-merge`, AND
-  NOT MERGE WORK.** `main` is untouched. Full working: **`docs/reports/GF.md`**.
-- **§1: DRIVEN AT EVERY QUIT POINT THROUGH THE REAL SCREENS, ON BOTH BRANCHES, AND `main` READS THE SAME — THE DEFECT
-  IS `main`'s AND PREDATES THE MERGE.** The save a node writes as the party steps onto it already carried the step,
-  while `encounter`, the bargain and `pending_event` were never saved and `load_run` cleared them. A quit at an
-  elite's or a mini-boss's bargain, inside any fight, or through the battle's own Exit to Main Menu resumed PAST the
-  fight; inside a zone boss or on its card, and inside the end boss, onto a board with nothing to press. An event, a
-  Peddler or a forge quit in the middle was walked past too. The post-fight offers — the elite's draft and rune cache,
-  the mini-boss's upgrade, the zone boss's ability pick — all survived a quit, the last on a stranded board.
-- **§2: THE REPAIR IS THE SAVE AND ONE RESUME DECISION.** The run save is v13 (tolerant; the refusal threshold stays at
-  10) and carries the step in flight; `claim_reward` marks the encounter resolved before any victory's first save;
-  `Run.resume_scene` is the one place a resumed run is placed — the same bargain (frozen by `encounter_offer`), the same
-  fight from its opening, the same event, the bought merchant, a beaten zone boss's descent. **A quit inside a fight
-  restarts it.** `check_gf` (**NEW**) drives every branch through the real screens and presses the real Continue.
-- **§3: THE FOUR PLAYER-FACING TEXTS, EACH SURFACE SWEPT:** the zone boss's card (a class banks the point; *"one of
-  three"* gone from it and the mini-boss's), the run summary (*"encounter N of M"*, the end boss named, the economy
-  labels), the fight recap (the five direct health costs booked through `_book_self_cost`), and the glossary — every
-  entry read against the code, 95 stale claims in 46 entries corrected, and `docs/master.html`'s copies of them
-  with it (`docs/reports/GF.md` §3).
-- **FOUND AND NOT FIXED — THE END BOSS HAS NO BUTTON** (first in the queue below): the map draws sixteen columns and
-  the end boss stands in the seventeenth, so no run reaches it through the map, on either branch.
-- **WHAT MOVED:** `scripts/run_state.gd`, `scripts/battle.gd`, `scripts/main_menu.gd`, `scripts/offer_screen.gd`,
-  `scripts/map_screen.gd` (two lines), `scripts/classes.gd` (one internal string), `data/glossary.json`,
-  `check_gf.gd` (**NEW**), `check_ea.gd` and `test_batch_ax.gd` (one pin re-pointed in each), `run_battery.sh` (+1 gate), `baselines.json`, `pin-manifest.json`, `CLAUDE.md`, `docs/master.html` and
-  its stamp, this file, the changelog, `docs/design-notes.md` and `docs/reports/GF.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GF.md`**, written before the acceptance run; its figures were added after it.
+- **Last batch: GG — A MID-FIGHT SAVE IS A PROJECT, AND TWO GLOSSARY ENTRIES RETIRE. THE THIRTEENTH BATCH ON
+  `class-merge`, AND NOT MERGE WORK.** `main` took one documentation commit (§4) and nothing else. Full working:
+  **`docs/reports/GG.md`**.
+- **§1–§2: A QUIT FIGHT THAT RESUMES WHERE IT WAS IS COSTED, AND IT IS A PROJECT, SO NOTHING OF IT IS BUILT — AS THE
+  BRIEF INSTRUCTED.** The only resumable point is the top of `_run_battle`'s turn loop; a fight writes 130 fields on
+  each unit and about forty on the battle; the global dice cannot be read back; an open bar lives inside a suspended
+  cast. **Four answers are priced for the designer** (`docs/reports/GG.md` §2d, and the item below). The run save stays
+  **v13**. **A quit inside a fight still restarts it.**
+- **§3: DECAY AND ELEMENTAL WEAKNESS ARE RETIRED FROM THE GLOSSARY, KEPT AND SAID TO BE KEPT.** Nothing applies either:
+  each one's applier reads a talent field nothing has written since FX. Each entry carries a `retired` string, the
+  panel neither lists nor links a retired entry, and `data/glossary.json` still holds 98. `docs/master.html`'s Decay
+  row and Penance's *Builds with* line are corrected.
+- **§4: `main`'s `docs/state.md` NAMES BOTH OF `main`'s DEFECTS** — the quit, fixed here at GF, and the end boss's
+  missing button — in one documentation commit.
+- **WHAT MOVED:** `data/glossary.json`, `scripts/glossary.gd`, `scripts/glossary_panel.gd`, `CLAUDE.md`,
+  `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and `docs/reports/GG.md`
+  (**NEW**); on `main`, `docs/state.md` alone.
+- **VERIFICATION:** in **`docs/reports/GG.md`**, written before the acceptance run; its figures were added after it.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is RULED, NOT BUILT, and is the next merge step.** The end boss's missing button is the next batch, and it
   is not merge work either.
-- **Next letter: GG.**
+- **Next letter: GH.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -67,16 +59,35 @@ last exactly one.*
   size, and the node needs a label and a tooltip — `NODE_LABELS` has no `endboss` row and `_node_tooltip` no branch,
   so the default would print *"Encounter 17 of 16"*. Those are player-facing words.
 
+### A QUIT INSIDE A FIGHT RESTARTS IT — **COSTED AT GG: A PROJECT; FOUR ANSWERS PRICED, OWED A RULING (PLAYER-FACING)**
+
+- **Today a quit on a losing fight is a free retry of the whole fight.** The battle is never saved, so a resumed fight
+  opens from its beginning:
+  - the warband comes back fresh and the heroes at the health they stepped on with;
+  - every item the abandoned fight used is back in the pouch (the battle writes the pouch back only in `_check_end`);
+  - the opening turn order and every roll are new.
+- **AND THE WINDOW RUNS PAST THE LOSS.** `_resolve` always waits on its animations after the blow it deals, and the wipe
+  clears the save only in `_check_end`, once the acting unit's turn is over. So a quit after the last hero falls, and
+  before the defeat screen, restarts a fight that was already lost. Read in the code, not driven.
+- **A RESUME WHERE IT WAS LEFT IS A PROJECT, NOT A BATCH** (`docs/reports/GG.md` §1). A battle can be picked up only at
+  the top of `_run_battle`'s turn loop, it must be re-entered past an opening that may not run twice, a fight writes
+  130 fields on each unit, the dice cannot be read back, and an open bar lives inside a suspended cast. **Four answers
+  (GG §2d):**
+  - **A.** The full capture, with nothing left to retry: three batches or more.
+  - **B.** A turn-boundary resume that leaves one action to re-roll: two batches or more.
+  - **C.** **THE RECOMMENDED MIDDLE** — the heroes' health, Mana and pouch ride the save at every turn boundary, so a
+    quit can only cost: one batch, no save version. It owes three answers: a fallen hero (the spawn clamps to 1 HP),
+    the meters the save does not carry, and companions.
+  - **D.** Leave the restart.
+
+  **A closes the post-loss window by itself; B and C need the wipe's clear moved to the moment the last hero falls.**
+
 ### FOUND AT GF AND NOT FIXED
 
 - **A PEDDLER OR A FORGE QUIT IN THE MIDDLE OF A VISIT IS STILL WALKED PAST.** Both roll their stock in their own
   `_ready`, so re-entering one on resume would make a quit a reroll of the shop, and freezing the stock is a change to
   two screens, which GF's brief ruled out. Driven at GF: the node is visited and saved at the step, and Continue opens
   the map past it.
-- **PLAYER-FACING, THE DESIGNER'S IF IT SHOULD COST MORE: A QUIT INSIDE A FIGHT RESTARTS IT.** The battle is never
-  saved, so a resumed fight opens from its beginning, with the party's health at the step and nothing paid; a player
-  can abandon a losing fight and start it over. Strictly less than before GF, when the quit skipped the fight and kept
-  the health.
 - **THE ZONE BOSS FOUGHT IS NOT ALWAYS THE ONE THE GAME NAMES.** A boss node composes its warband from every enemy the
   zone's roster tags with the `boss` role, and the Hollow Crown — the end boss's kind — carries `"zones": [1, 2, 3]`,
   so zone 1's boss fight drew it in GF's drives. The map's header (*"the %s waits"*), `Profile.note_boss` and the
@@ -98,12 +109,25 @@ last exactly one.*
   `ARCANE_ARROW_CHARGES` of 5 that nothing reads; the card and the handler pay six, and so does the glossary now. None
   of these is player-facing.
 - **WHAT THE GLOSSARY CENSUS LEFT AS IT IS.** Nine claims no code can settle (intent, such as the class-wide cards
-  being weaker on purpose) stand as written. Decay and Elemental Weakness are described as live statuses and nothing
-  can apply either today, because each one's applier depends on a field nothing writes; Melted Armor's and Caught
-  Fast's entries say so of themselves and these two do not, and a note is content. Card and chip text still uses group
+  being weaker on purpose) stand as written. **Decay and Elemental Weakness were RETIRED at GG**, by the designer's
+  ruling (`docs/reports/GG.md` §3). **Melted Armor and Caught Fast are the same case and are OWED A RULING**:
+  nothing applies either (`melt_ranks` and `caught_fast` have no writer), their entries annotate themselves, and
+  the ruling named two. Card and chip text still uses group
   words the hero/ally rule retires (*"the line"*, *"everyone"*); the glossary no longer says otherwise, and the cards
   are authored text. No spec plays the Rush archetype, which `Classes.ARCHETYPE_DESC` and `docs/master.html` §6's
   table still define.
+
+### FOUND AT GG AND NOT FIXED — **NONE IS PLAYER-FACING**
+
+- **Nothing asserts the glossary's retirement.** `check_et` §1 asserts every retired rune carries its string; no gate
+  reads a glossary entry's `retired` key or drives the panel's two doors. GG was IMPLEMENT ONLY and proved it with a
+  scratch probe (28 checks, a control arm among them — `docs/reports/GG.md`, VERIFICATION). A gate is owed to a test
+  batch.
+- **`classes.gd`'s SYNERGY comment above Penance still says *"DECAY and ENTROPY grind the same enemy's clock"***, and
+  both are dormant (`entropy_ranks` has no writer either). `docs/master.html`'s copy of it is corrected; the comment is
+  not player-facing.
+- **Frostbind's `partner` is stored as a `unit_name`**, so two units of one name would make `_frostbind_partner`
+  ambiguous. Nothing has shown it happening; it matters to any capture that re-points units by name.
 
 ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
 
