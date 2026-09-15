@@ -128,7 +128,7 @@ last exactly one.*
 - **A QUIT AT A BARGAIN OR INSIDE A FIGHT WALKS PAST THE FIGHT, AND AT A ZONE BOSS LEAVES THE HEROES ON A BOARD WITH
   NOTHING TO PRESS — FIXED ON `class-merge` AT GF (`bc6e258`), NOT HERE; AND BESIDE IT, THE END BOSS HAS NO BUTTON** (the
   map draws sixteen columns and the end boss stands in the seventeenth, so no run reaches it), **FOUND AT GF ON BOTH
-  BRANCHES AND FIXED ON NEITHER.** Both were driven on this branch as well as on the merge branch; the working is
+  BRANCHES; FIXED ON `class-merge` AT GI AND NOT HERE, BY RULING — IT ARRIVES WITH THE MERGE, AS DOES GI's FIX FOR A ZONE BOSS THAT CAN FIELD THE HOLLOW CROWN, WHICH IS `main`'s TOO.** Both were driven on this branch as well as on the merge branch; the working is
   `docs/reports/GF.md` on `class-merge`.
 
 ### THE CLASS MERGE IS MEASURED AND UNRULED — **THE LARGEST OPEN DECISION ON THIS LIST (FP)**
