@@ -1646,6 +1646,24 @@ identically at every rung. It awards a relic ALWAYS, no ability pick, no talent 
 **`Profile.note_end_boss(rung)` is what opens the talent tree's tiers.** ZONE BOSSES — the
 third included, which used to BE the end boss — now pay a point, a relic and an ability pick and
 open what follows them.
+· **A LOOP OVER THE BOARD READS THE BOARD'S OWN SIZE, NEVER `SLOTS_PER_ZONE` (GI).** Every zone
+  generates `SLOTS_PER_ZONE` slots and the final board carries one more, so a count taken off the
+  constant is short on exactly one board, and the slot it drops is the end boss.
+  `map_screen._draw_lattice` looped the constant from BK to GI and drew no button for the
+  seventeenth column: no run reached the end boss through the map, and no battery target could
+  see it, because `check_fh` §8 reaches the end boss by calling the node handler and the
+  map-screen gates draw zone 1, or a zone-1 board relabelled as the third. **`Run.map.size()` is
+  the width of the board in front of the player; `SLOTS_PER_ZONE` is what a zone GENERATES**, and
+  the tier ladder, the budget ramp and `BOSS_SLOT` rightly read the constant.
+· **A ZONE BOSS NODE FIELDS THE BOSS ITS ZONE NAMES (GI).** `compose("boss")` fills the escort's
+  `boss` role with `boss_kind()` — `ZONE_DEFS`' one boss for the zone — and not with the roster's
+  `boss`-tagged kinds. The end boss's kind carries every roster, so filling the role off the
+  roster fielded it in about one zone boss in seven, in every zone, while the map's readout,
+  `Profile.note_boss` and the zone itself named the zone's own. **The node's identity is the
+  authority and the creature follows it**: relabelling the node to follow the creature would have
+  left the end boss turning up as an ordinary zone's boss. The roster tags are content and did not
+  move, and the one caller that still fills the role off the roster is `compose_test`, the
+  `DOD_SIM_THEME` hook, which ignores run state by design.
 
 ### THE STARTER RUNG IS A META-PROGRESSION GATE AND MAY NOT BE REMOVED AS A BALANCE CHANGE (STANDING, EN §3)
 > **Rung 1 is not the easy difficulty. It is the only door into the talent tree, and a fresh
@@ -2704,9 +2722,13 @@ real screens on both branches and both read the same (`docs/reports/GF.md` §1).
   ledger, the turn order and the dice open as at any fight's start. **DO NOT CARRY ONE OF THEM TO MAKE A
   QUIT COSTLIER**: each is something the fight built, and carrying it hands the quitter what the
   abandoned fight earned. The ruling's two additions are a hero who fell and a companion standing.
-- **RAGE IS NOT CARRIED, THOUGH THE BRIEF LISTED IT.** Every fight opens Rage at nothing, plus its floors,
-  so carrying it is that same reward. It is owed a ruling (`docs/state.md`); carrying it is one member key
-  and one spawn line.
+- **RAGE IS NOT CARRIED, THOUGH THE BRIEF LISTED IT — AND THE DESIGNER HAS RULED THAT IT RESETS (recorded
+  at GI).** Every fight opens Rage at nothing, plus its floors, so carrying it is that same reward.
+- **WHAT A QUIT STILL BUYS IS ACCEPTED, NOT OPEN (RULED BY THE DESIGNER, RECORDED AT GI).** A quit taken before
+  anything is lost rolls the opening again — the turn order and the enemies' first declared moves — and a quit
+  clears the heroes' cooldowns and statuses along with the warband's. Closing either needs the fight itself
+  captured, which is GG's project, and a quit already costs health, Mana, items and a death, which is the
+  substance. **Do not queue either as a defect**; `docs/state.md` records both as ACCEPTED with this reason.
 - **A HERO WHO FELL IS A MEMBER AT 0 HEALTH**, the reading events' `revive_pct` already makes. The spawn
   keeps its floor of 1 for the opening and lays the fallen down once the field is built
   (`_lay_down_the_fallen`), so no stamp reads a hero dead that the opening read alive, and nothing of a

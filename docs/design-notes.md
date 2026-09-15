@@ -4,6 +4,36 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The end boss has a button, and a zone boss is its zone's own (Batch GI) — 2026-09-14
+
+**Why the map widened rather than the end boss moving.** Three shapes were on the table: draw the final board's
+seventeenth column like any other, keep sixteen and carry the heroes from the third zone boss straight into the end
+boss, or put the end boss in the sixteenth column in place of the third zone boss. The board already had seventeen
+columns — the end boss was appended there when it was added, and the save, the resume, the run's 49 and the rewards
+all agreed — so the first is the only one that changes nothing but the drawing. The second loses the map step in
+between, and that step is where the third zone boss's ability pick and its new slot are spent: they would arrive
+after the fight they were for. The third is not a layout question at all. It removes an encounter, and with it the
+third zone boss's point, relic, pick and slot, which is a decision about what the last encounter is — the designer's.
+
+**Why the zone's name decides the boss, and not the creature.** Each zone names one boss, and everything a player
+reads agrees: the readout, the profile's tally of bosses killed, the zone itself. The mismatch came from the escort's
+`boss` role being filled from every boss-tagged enemy the zone's roster allows, and the end boss is tagged into all
+three rosters. Relabelling the node to follow the creature would have made the words honest and left the end boss —
+the one fight built to be learned and met once — turning up as an ordinary zone's boss. So the role is filled with the
+zone's own boss, and the roster tags are left as they are: whether the end boss belongs in them is content.
+
+**Why the label reuses END BOSS.** It is what the glossary, the framing card and the run summary already call this
+node, and a new word would be a second name for one thing on the one screen where the player meets it. The tooltip
+copies the zone boss's two sentences — what it is, then what to expect — and where the zone boss's says the player will
+not know which boss waits, the end boss's says the opposite, because it is always the same one.
+
+**Why the readout names what waits.** Past the third zone boss, "the Withered Warden waits" named a boss the heroes had
+just killed. The readout names the next fight's boss now, so the words and the fight agree at the moment the player
+chooses it.
+
+**Why the two quit consequences are accepted.** Closing either needs the whole fight saved, which GG priced as a
+project of several batches, and a quit already costs health, Mana, items and a death, which is the part that mattered.
+
 ## A quit fight restarts, but the heroes' losses do not (Batch GH) — 2026-09-14
 
 **Why the losses are saved as they land.** Nothing in the game hooks a closed window, so what comes back after a quit

@@ -13,65 +13,69 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-14 (Batch GH).*
+*Last rewritten: 2026-09-14 (Batch GI).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GH — A QUIT FIGHT RESTARTS, BUT THE PARTY'S LOSSES DO NOT. THE FOURTEENTH BATCH ON `class-merge`, AND
-  NOT MERGE WORK.** `main` is untouched. Full working: **`docs/reports/GH.md`**.
-- **§1: GG's OPTION C, RULED BY THE DESIGNER AND BUILT.** A fight quit before it is won still restarts from its opening
-  against the warband at full strength, and the party comes back as it stood at the quit: health, Mana, every item used,
-  a hero who fell still down, a companion standing back at its health. Every meter, status and cooldown opens as at any
-  fight's start. The losses reach the save as each one lands (`battle._bank_party_losses`), so a quit inside an enemy's
-  swing keeps the swing. **Rage resets, where the brief listed it as carrying** — owed a ruling (the queue).
-- **§2: A QUIT AFTER THE LAST HERO FALLS NO LONGER RESCUES THE FIGHT.** The last fall reaches the save as it lands; the
-  resumed battle opens with no hero standing and decides the defeat at once, down the wipe's own path.
-- **§3: NO SAVE VERSION MOVED.** The run save is **v13**.
-- **§4: THE INVERSE AND THE ESCAPE, DRIVEN.** A second quit deducts nothing twice and re-spends nothing. **What a quit
-  still buys** is in the queue.
-- **WHAT MOVED:** `scripts/battle.gd`, `scripts/run_state.gd` (comments), `check_gf.gd` and `check_dr.gd` (re-pointed),
-  `baselines.json`, `CLAUDE.md`, `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and
-  `docs/reports/GH.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GH.md`**, written before the acceptance run; its figures were added after it.
+- **Last batch: GI — THE END BOSS HAS A BUTTON, AND A ZONE BOSS IS THE ONE ITS ZONE NAMES. THE FIFTEENTH BATCH ON
+  `class-merge`, AND NOT MERGE WORK.** `main` takes one line of documentation (§5). Full working:
+  **`docs/reports/GI.md`**.
+- **§1: THE LATTICE DRAWS THE BOARD IT IS HANDED.** `map_screen._draw_lattice`'s width and both loops read
+  `Run.map.size()` rather than `SLOTS_PER_ZONE`, so the final board draws its seventeenth column and the end boss is
+  stepped onto through its own button. **The width was the batch's implementation call and nothing else reads the
+  drawn width**: the tier ladder, the budget ramp, `compose`, the boss band and the sim read the constant, which is
+  what a zone GENERATES, and none of them moved. The other two shapes are costed in GI §1; putting the end boss in the
+  sixteenth column removes the third zone boss and is a design question, so it was not taken.
+- **§2: A ZONE BOSS NODE FIELDS THE BOSS ITS ZONE NAMES.** The node's identity is the authority; `Run.compose` fills the
+  escort's `boss` role from `ZONE_DEFS`. On HEAD the Hollow Crown filled it in about one zone boss in seven, in every
+  zone; after, in none (GI §2).
+- **§3: THE END BOSS'S WORDS ARE PROPOSED, NOT CONFIRMED** — the label, the tooltip and the readout's name (the closed
+  end-boss item below).
+- **§4: RAGE'S RESET IS RULED, AND WHAT A QUIT STILL BUYS IS ACCEPTED, NOT OPEN** (the quit item below).
+- **§5: `main`'s NOTE NOW SAYS THE END BOSS IS FIXED ON `class-merge` ONLY**, which is the ruling; its code is untouched.
+- **WHAT MOVED:** `scripts/map_screen.gd`, `scripts/run_state.gd`, `scripts/enemies.gd` (one helper) and
+  `scripts/battle.gd` (a comment and the end boss's summary line), `CLAUDE.md`, `docs/master.html` and its stamp, this
+  file, the changelog, `docs/design-notes.md` and `docs/reports/GI.md` (**NEW**). **`baselines.json` is unchanged**: the unmodified gates read every target at its row against the new code, so no row moved.
+- **VERIFICATION:** in **`docs/reports/GI.md`**, written before the acceptance run; its figures were added after it.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
-  to runes, is RULED, NOT BUILT, and is the next merge step.** The end boss's missing button is the next batch, and it
-  is not merge work either.
-- **Next letter: GI.**
+  to runes, is RULED, NOT BUILT, and is the next merge step.**
+- **Next letter: GJ.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### THE END BOSS HAS NO BUTTON — **FOUND AT GF, NOT FIXED, AND THE NEXT BATCH (PLAYER-FACING, AND `main`'s TOO)**
+### ~~THE END BOSS HAS NO BUTTON~~ — **CLOSED AT GI ON `class-merge` ONLY; ITS WORDS ARE OWED A CONFIRMATION, AND ONE INSTRUMENT GAP IS OWED**
 
-- **No run reaches the end boss through the map.** `map_screen._draw_lattice` draws `for s in Run.SLOTS_PER_ZONE` —
-  sixteen columns — and the end boss is the final zone's seventeenth slot (`END_BOSS_SLOT`, appended by
-  `_generate_map`). After the third zone boss's *"Walk on"*, `Run.reachable()` returns the end boss and the map draws
-  no button for it: the edge to it is drawn, because the edge loop reads `map[s + 1]`, and the node is not. Driven at
-  GF on both branches, with a quit and without one. The loop is BK's and the end boss is BM's, so a player's run has
-  ended at the third zone boss ever since — **and beating the end boss is the only thing that opens a talent tier**
-  (EN §3).
-- **Why no battery saw it:** `check_fh` §1 "completes" runs by calling `_on_node_pressed` directly rather than pressing
-  a lattice button, and the map gates draw the screen without pressing the column it lacks.
-- **What the fix needs** (not done at GF, which was one defect): the loop and the lattice's width read the board's own
-  size, and the node needs a label and a tooltip — `NODE_LABELS` has no `endboss` row and `_node_tooltip` no branch,
-  so the default would print *"Encounter 17 of 16"*. Those are player-facing words.
+- **Fixed, on this branch only (ruled).** `map_screen._draw_lattice`'s width and both loops read `Run.map.size()`, so
+  the final board draws its seventeenth column. Driven through the real screens: whole runs to the end boss, its own
+  button pressed and the end boss killed, and on HEAD the same drive stopping on a board with nothing to press
+  (`docs/reports/GI.md` §7). `main` still carries the defect, and its note says so.
+- **OWED A CONFIRMATION (PLAYER-FACING): THE END BOSS'S WORDS ARE PROPOSED.** The label is *END BOSS*; the tooltip is
+  *"The END BOSS. Nothing goes around it."* over *"It is always the Hollow Crown, and the road ends here."*; and past
+  the third zone boss the readout ends *"— the Hollow Crown waits"*. What they were written to match — the zone boss's
+  label, tooltip and readout, verbatim — is in `docs/reports/GI.md` §3.
+- **OWED TO A TEST BATCH: NOTHING IN THE BATTERY PRESSES THE END BOSS'S BUTTON.** `check_fh` §8 still reaches the end
+  boss by calling `_on_node_pressed`, and the map-screen gates draw zone 1 or a zone-1 board relabelled as the third
+  (`check_flow`, `check_ct_map`), so a regression of the draw would pass the battery exactly as the defect did. GI was
+  IMPLEMENT ONLY; its proof is the drive.
 
-### A QUIT FIGHT RESTARTS AGAINST A RESET WARBAND, AND THE PARTY'S LOSSES CARRY — **GG's OPTION C, RULED AND BUILT AT GH; TWO QUESTIONS OWED (PLAYER-FACING)**
+### A QUIT FIGHT RESTARTS AGAINST A RESET WARBAND, AND THE PARTY'S LOSSES CARRY — **GG's OPTION C, RULED AND BUILT AT GH; RAGE RULED AND THE TWO REMAINDERS ACCEPTED AT GI**
 
-- **RAGE RESETS; THE BRIEF LISTED IT AS CARRYING. OWED A RULING.** Every fight opens Rage at nothing, plus First Blood's
-  and Bottled Storm's floors, and Rage does not outlive a fight today. Carrying it through a quit would hand a quitter
-  the Rage the abandoned fight built — the reward the ruling resets the meters to prevent — so it was built as
-  resetting. Carrying it is one member key and one spawn line (`docs/reports/GH.md` §1).
-- **WHAT A QUIT STILL BUYS, DRIVEN AT GH (`docs/reports/GH.md` §4). WHETHER THE QUIT SHOULD COST MORE IS THE
-  DESIGNER'S.**
-  - **A quit before anything is lost costs nothing and rolls the opening again**: the turn order and every enemy's
-    declared first action. Driven on both builds: nobody had acted, and the resumed opening differed in both.
-  - **Cooldowns, once-a-fight refusals and every status on the party clear with the warband's**, and every meter —
-    Rage, Focus, Faith and the rest — opens at nothing.
-  - **Everything else is as it stood**: health, Mana, the pouch, a fallen hero, a standing companion's health.
+- **~~RAGE RESETS; THE BRIEF LISTED IT AS CARRYING. OWED A RULING~~ — RULED BY THE DESIGNER, RECORDED AT GI: RAGE
+  RESETS.** Every fight opens it at nothing, plus First Blood's and Bottled Storm's floors, and carrying it through a
+  quit would hand the quitter the Rage the abandoned fight built.
+- **ACCEPTED, NOT OPEN — WHAT A QUIT STILL BUYS (RULED BY THE DESIGNER, RECORDED AT GI).** Both were driven at GH
+  (`docs/reports/GH.md` §4b):
+  - **A quit before anything is lost rolls the opening again**: the turn order and every enemy's declared first action.
+  - **A quit clears the heroes' cooldowns, once-a-fight refusals and statuses** along with the warband's, and every
+    meter — Rage, Focus, Faith and the rest — opens at nothing.
 
-  Closing the first two needs the fight itself captured — GG's A or B, a project (`docs/reports/GG.md` §2d).
+  **The reason, kept with the ruling so neither is rediscovered as a defect:** closing either needs the fight itself
+  captured — GG's A or B, a project of several batches (`docs/reports/GG.md` §2d) — and a quit already costs health,
+  Mana, items and a death, which is the substance. **An accepted consequence and an open defect read identically in a
+  queue; these two are accepted.** `CLAUDE.md`'s GH block says the same where a batch reads the rule.
+- **Everything else is as it stood**: health, Mana, the pouch, a fallen hero, a standing companion's health.
 
 ### FOUND AT GF AND NOT FIXED
 
@@ -79,12 +83,12 @@ last exactly one.*
   `_ready`, so re-entering one on resume would make a quit a reroll of the shop, and freezing the stock is a change to
   two screens, which GF's brief ruled out. Driven at GF: the node is visited and saved at the step, and Continue opens
   the map past it.
-- **THE ZONE BOSS FOUGHT IS NOT ALWAYS THE ONE THE GAME NAMES.** A boss node composes its warband from every enemy the
-  zone's roster tags with the `boss` role, and the Hollow Crown — the end boss's kind — carries `"zones": [1, 2, 3]`,
-  so zone 1's boss fight drew it in GF's drives. The map's header (*"the %s waits"*), `Profile.note_boss` and the
-  run summary's final-battle line all name `ZONE_DEFS`' boss. GF made the summary name the boss in the warband (§3);
-  the header and the profile's boss tally are not GF's surfaces. Whether the end boss's kind belongs in the zone
-  rosters is content.
+- **~~THE ZONE BOSS FOUGHT IS NOT ALWAYS THE ONE THE GAME NAMES~~ — CLOSED AT GI, AT THE SITE WHERE THE TWO PARTED.**
+  `Run.compose("boss")` fills the escort's `boss` role with the zone's named boss (`ZONE_DEFS`), no longer with every
+  `boss`-tagged kind the roster allows. Measured on HEAD through the composer: the Hollow Crown in 286, 309 and 335 of
+  2,000 zone-boss warbands in zones 1, 2 and 3; after, in 0 of 6,000. **The roster tags did not move** — whether the end
+  boss's kind belongs in them is still content — and the one reader that still fills a boss from them is the
+  `DOD_SIM_THEME` hook, which ignores run state by design.
 - **`docs/master.html`'s debug paragraph** still says *"a summoned rest really heals"* (the Rest summon went with the
   rest nodes) and names *"Jump to Boss Tier"* (the item is *Jump to Boss Slot*). Outside GF's surfaces.
 - **A MINI-BOSS CAN AWARD AN UPGRADE THE FORGE ALREADY PUT ON THE SAME ABILITY.** `roll_upgrade_offer` drops an
@@ -137,6 +141,21 @@ last exactly one.*
 - **`check_gf`'s health arms read the party at the instant `load_run` returns.** The resumed fight writes the live
   member as it goes, so a read taken after its first frames reads that fight rather than the disk — found while
   re-pointing, and stated at the arm.
+
+### FOUND AT GI AND NOT FIXED
+
+- **PLAYER-FACING: THE MINI-BOSS'S NODE IS LABELLED *WARDEN*, AND THREE LIVE NAMES CARRY THE WORD.** GI's BR §1 sweep
+  of the map's labels found it in the Withered Warden — the first and third zones' boss, named in the readout on the
+  same screen — in the Warden spec, and in the second difficulty rung. BR §1 ships a label collision and flags it;
+  renaming a label is the designer's.
+- **PLAYER-FACING, SMALL: THE END BOSS'S SUMMARY LINE NAMES IT TWICE.** A run that ends at the end boss prints *"The END
+  BOSS — The Hollow Crown: The Hollow Crown."* under *The final battle*, because the node's theme and its one enemy are
+  both the Crown. It is the line's ordinary shape (kind — theme: enemies), driven at GI through a forfeit; its words
+  are the designer's.
+- **THE SIM NEVER FIGHTS THE END BOSS.** `run_sim.on_battle_end` ends a run at the third zone boss — its own comment
+  says so and calls closing it a batch of its own, because every sim baseline would move — so each completion the sim
+  prints is a third-zone-boss completion, and nothing but a drive has ever measured the end boss's fight. It was
+  recorded in the source and nowhere else.
 
 ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
 

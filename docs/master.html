@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-14 (Batch GH &mdash; a quit fight restarts, but the heroes' losses do not)</b></p>
+<p align="right"><b>Last updated: 2026-09-14 (Batch GI &mdash; the end boss has a button, and a zone boss is its zone's own)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -149,13 +149,16 @@ deep. The final zone carries one extra slot after its boss.</p>
 <tr><td>1&ndash;7</td><td>branching, 3 nodes per column</td></tr>
 <tr><td>8</td><td><b>MINI-BOSS</b> &mdash; every path converges</td></tr>
 <tr><td>9&ndash;15</td><td>branching, 3 nodes per column</td></tr>
-<tr><td>16</td><td><b>ZONE BOSS</b> &mdash; every path converges. Pays gold, a relic, an
+<tr><td>16</td><td><b>ZONE BOSS</b> &mdash; every path converges. The boss is always the zone's
+own &mdash; the Withered Warden in the Forest of Old, the Ash-Wrought Tyrant in the Scarlands &mdash;
+with an escort drawn from the budget. Pays gold, a relic, an
 ability pick, and banks <b>one meta talent point per class</b>.</td></tr>
 <tr><td>17</td><td><b>THE END BOSS</b> &mdash; the final zone only. A single <b>FIXED</b>
 encounter (The Hollow Crown), so it can be learned: not drawn from a pool and not composed
 from the budget system. It <b>gains stats AND mechanics with difficulty</b> — one extra
 ability at rung 2 and another at rung 3. It always awards a relic, awards <b>no talent
-points</b>, and beating it is what <b>opens the talent tree's tiers</b>.</td></tr>
+points</b>, and beating it is what <b>opens the talent tree's tiers</b>. On the map it is the
+final board's seventeenth column, labelled <b>END BOSS</b>, one step past the zone boss.</td></tr>
 </table>
 <p><b>14 branching columns &times; 3 rows = 42 node positions</b>, of which pruning (below)
 removes two or three &mdash; a real zone holds <b>~39.7 nodes</b> and its columns are 2 or 3
@@ -388,8 +391,11 @@ unlock, gold, 1 talent point for each class among the heroes and an <b>ability p
 hero</b> (§6a); zone 1's and zone 2's also fully restore every hero (HP and Mana) before the
 descent.</li>
 <li><b>Map screen:</b> zone art background, a <b>position readout</b>
-("Zone 2 of 3 — encounter 7 of 16 (23 of 48) — the Ash Tyrant waits"), the <b>lattice</b>,
-and <b>all four hero stat cards</b>.
+("Zone 2 of 3 — encounter 7 of 16 (23 of 49) — the Ash-Wrought Tyrant waits"; past the final
+zone's boss it names what waits next: "Zone 3 of 3 — encounter 16 of 17 (48 of 49) — the Hollow
+Crown waits"), the <b>lattice</b>, and <b>all four hero stat cards</b>. The final zone's lattice
+is seventeen columns wide, and its last node is the <b>END BOSS</b>, whose tooltip reads
+"The END BOSS. Nothing goes around it. It is always the Hollow Crown, and the road ends here."
 <br><b>The cards sit on the LEFT EDGE, stacked</b> (Batch BK), so the right two thirds belong
 to the map. Each carries portrait, spec name, HP bar with numbers, resource bar, <b>three rune
 slots</b> (filled or empty — click one to open that hero's pouch), an <b>&#9670;N
@@ -2813,7 +2819,7 @@ and 7</b> — the power-3 bruisers filled the gap that made exact budgets repeti
 Generation is two-step: a <b>theme</b> is chosen, then the budget fills its <b>ROLE
 pools</b> — themes declare roles (skirmisher / sniper / bulwark / mender / hexer / brute /
 elite / boss), and any zone-legal enemy tagged with the role is eligible, so warbands vary
-run to run. min_weak counts units of power ≤ 1. <b>No warband ever fields more than two
+run to run &mdash; except a zone boss's <b>boss</b> role, which is always that zone's own boss. min_weak counts units of power ≤ 1. <b>No warband ever fields more than two
 mender-tagged kinds</b>, counted by role tag no matter which pool claimed them — two heals
 plus a cleanse is a wall rather than a question. The distinct
 warband count now exceeds <b>23,500</b> across the budget bands. Themes that cannot
@@ -2831,7 +2837,7 @@ spend a given budget simply do not appear on that roll.</p>
 <tr><td>Rage Company</td><td>Heavy offence</td><td>elite + brutes + ≥2 skirmishers</td><td>elite</td></tr>
 <tr><td>Guardian Circle</td><td>Constant wards</td><td>≥3 bulwarks</td><td>fight</td></tr>
 <tr><td>Elite Patrol</td><td>Few high-value enemies (≤4)</td><td>elite + bulwark + mender (+brute)</td><td>elite</td></tr>
-<tr><td>Boss Escort</td><td>The boss and its court</td><td>boss + any support roles</td><td>boss</td></tr>
+<tr><td>Boss Escort</td><td>The boss and its court</td><td>the zone's own boss + any support roles</td><td>boss</td></tr>
 </table>
 <p><b>Tier scaling is zone-local:</b> every zone replays the 1–16 tier ladder — enemy
 <b>Attack grows +2%</b> and <b>HP +2.5% of base per tier within the zone</b>, on top of a

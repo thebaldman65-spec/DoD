@@ -27,6 +27,9 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 const NODE_LABELS := {
 	"fight": "Fight", "elite": "ELITE", "boss": "BOSS", "miniboss": "WARDEN",
 	"blacksmith": "Smith", "merchant": "Trade", "event": "???",
+	# BATCH GI — PROPOSED, AND THE DESIGNER CONFIRMS IT: the name the glossary,
+	# the framing card and the run summary already give this node.
+	"endboss": "END BOSS",
 }
 const NODE_COLORS := {
 	"fight": Color(0.75, 0.72, 0.65), "elite": Color(0.95, 0.55, 0.3),
@@ -40,6 +43,8 @@ const NODE_COLORS := {
 	# boon and a bane are indistinguishable on the board on purpose — a
 	# visibly-bad node is a wall with extra steps, not a gamble.
 	"event": Color(0.72, 0.55, 0.95),
+	# BATCH GI — the zone boss's red, because it is a boss: the last one.
+	"endboss": Color(0.9, 0.3, 0.35),
 }
 
 # The lattice geometry. Column c sits at LAT_X0 + c * LAT_X_STEP inside the
@@ -242,7 +247,12 @@ func _draw_header() -> void:
 
 	# The readout says where the party is in the ZONE and in the RUN — the
 	# line is 36 slots long and a player should never have to count dots.
-	var boss_name: String = Enemies.unit_name(Run.boss_kind())
+	# BATCH GI — AND IT NAMES WHAT THE NEXT STEP FIGHTS. Past the final zone's
+	# boss the next node is the end boss and the zone's boss is already down, so
+	# "the Withered Warden waits" would name a corpse.
+	var waits_kind: String = Run.END_BOSS_KIND if _next_is_end_boss() \
+		else Run.boss_kind()
+	var boss_name: String = Enemies.name_after_the(waits_kind)
 	var subtitle := Label.new()
 	var here := Run.slot_idx + 1
 	if here < 1:
@@ -298,6 +308,15 @@ func _draw_header() -> void:
 	add_child(burger)
 
 
+# BATCH GI — whether the node the next step reaches is the end boss, read off
+# the board rather than off the zone number: only the final board carries one,
+# and only that board's boss leads to it.
+func _next_is_end_boss() -> bool:
+	var nxt: int = Run.slot_idx + 1
+	return nxt >= 0 and nxt < Run.map.size() and not Run.map[nxt].is_empty() \
+		and String(Run.map[nxt][0].get("type", "")) == "endboss"
+
+
 # ---------- the lattice ----------
 
 # The whole zone, drawn once, inside a clipped viewport that scrolls. Order
@@ -316,7 +335,13 @@ func _draw_lattice() -> void:
 	var inner := Node2D.new()
 	view.add_child(inner)
 
-	var content_w: float = LAT_X0 * 2.0 + (Run.SLOTS_PER_ZONE - 1) * LAT_X_STEP \
+	# BATCH GI — THE LATTICE DRAWS THE BOARD IT IS HANDED, NOT A CONSTANT. Every
+	# zone is `SLOTS_PER_ZONE` wide and the final one is one wider — the end boss
+	# is appended after its boss (`Run._build_lattice`) — so the width, and both
+	# loops below, read `Run.map.size()`. They read the constant from BK to GI,
+	# and the seventeenth column was never drawn: the edge to the end boss was,
+	# because the edge loop reads `map[s + 1]`, and the node itself was not.
+	var content_w: float = LAT_X0 * 2.0 + (Run.map.size() - 1) * LAT_X_STEP \
 		+ NODE_W
 	var max_scroll: float = maxf(content_w - VIEW_W, 0.0)
 	# Centre the party's own column on entry, then hold wherever the player
@@ -341,7 +366,7 @@ func _draw_lattice() -> void:
 	var free_travel: bool = Run.debug_enabled() and Run.debug_free_travel
 	var reach: Array = Run.reachable()
 
-	for s in Run.SLOTS_PER_ZONE:
+	for s in Run.map.size():
 		for j in Run.map[s].size():
 			var node: Dictionary = Run.map[s][j]
 			var from_pos := _node_pos(s, node) + Vector2(NODE_W * 0.5, NODE_H * 0.5)
@@ -362,7 +387,7 @@ func _draw_lattice() -> void:
 					edge.default_color = Color(0.2, 0.19, 0.24, 0.5)
 				inner.add_child(edge)
 
-	for s in Run.SLOTS_PER_ZONE:
+	for s in Run.map.size():
 		for j in Run.map[s].size():
 			_draw_node(inner, s, j, s == next_slot, reach, live, free_travel)
 
@@ -483,7 +508,15 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 			else "The zone's boss. Nothing goes around it."
 		var tail := "\n\nA bargain is offered before it." if ty == "miniboss" else ""
 		return "%s\nYou will not know which until you meet it.%s" % [what, tail]
-	var head := "Encounter %d of %d" % [s + 1, Run.SLOTS_PER_ZONE]
+	# BATCH GI — PROPOSED, AND THE DESIGNER CONFIRMS IT. The zone boss's two
+	# sentences, for the one boss that is always the same creature (its node is
+	# never composed) and after which there is no road.
+	if ty == "endboss":
+		return "The END BOSS. Nothing goes around it.\nIt is always the %s, and the road ends here." \
+			% Enemies.name_after_the(Run.END_BOSS_KIND)
+	# BATCH GI — the zone's own length, as the header and the run summary print
+	# it: sixteen, or seventeen on the final board.
+	var head := "Encounter %d of %d" % [s + 1, Run.map.size()]
 	match ty:
 		"blacksmith":
 			return ("%s — THE BLACKSMITH\nThree ability upgrades on the counter, " +

@@ -1213,13 +1213,21 @@ func compose(node_type: String, tier := -1) -> Array:
 	# a boss-tier health pool" — the composition is an elite's, and the
 	# health multiplier that makes it a mini-boss is applied at spawn).
 	var theme_key := "elite" if node_type == "miniboss" else node_type
+	# BATCH GI — A ZONE BOSS NODE FIELDS THE BOSS ITS ZONE NAMES. The escort's
+	# `boss` role used to resolve to every kind the roster tags `boss`, and the
+	# END boss's kind carries all three rosters, so about one zone boss in seven
+	# was the Hollow Crown while the map, the profile's tally and the zone's own
+	# art named the zone's boss. `ZONE_DEFS` gives a zone ONE boss, and that is
+	# the node's identity; the creature follows it. The end boss stays the one
+	# node that is never composed at all (`_compose_warbands`).
+	var named_boss := boss_kind() if node_type == "boss" else ""
 	var candidates: Array = []
 	for theme_name in THEMES:
 		if THEMES[theme_name]["nodes"].has(theme_key):
 			candidates.append(theme_name)
 	candidates.shuffle()
 	for theme_name in candidates:
-		var combos := _theme_combos(THEMES[theme_name], budget)
+		var combos := _theme_combos(THEMES[theme_name], budget, -1, named_boss)
 		if combos.is_empty():
 			continue  # theme can't spend this budget — try another
 		last_theme = theme_name
@@ -1242,7 +1250,8 @@ func compose(node_type: String, tier := -1) -> Array:
 # Roles resolve to the kinds legal in the CURRENT zone; a kind with two
 # role tags is claimed by the first pooled role that wants it, so pool
 # caps never double-count.
-func _theme_combos(spec: Dictionary, budget: int, roster := -1) -> Array:
+func _theme_combos(spec: Dictionary, budget: int, roster := -1,
+		named_boss := "") -> Array:
 	if roster <= 0:
 		roster = active_roster() if active else 1
 	var zone_kinds := Enemies.kinds_for_roster(roster)
@@ -1250,10 +1259,17 @@ func _theme_combos(spec: Dictionary, budget: int, roster := -1) -> Array:
 	var claimed := {}
 	for role in spec["pool"]:
 		var lst: Array = []
-		for kind in zone_kinds:
-			if not claimed.has(kind) and Enemies.roles(kind).has(role):
-				lst.append(kind)
-				claimed[kind] = true
+		# BATCH GI — on a zone boss node the `boss` role is the zone's named boss
+		# and nothing else (`compose` says why). Every other caller passes none
+		# and resolves the role against the roster as it always did.
+		if role == "boss" and named_boss != "":
+			lst.append(named_boss)
+			claimed[named_boss] = true
+		else:
+			for kind in zone_kinds:
+				if not claimed.has(kind) and Enemies.roles(kind).has(role):
+					lst.append(kind)
+					claimed[kind] = true
 		role_kinds[role] = lst
 	var results: Array = []
 	_combo_walk(spec, spec["pool"].keys(), role_kinds, 0, budget, [], {}, results)

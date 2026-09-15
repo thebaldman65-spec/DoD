@@ -44,6 +44,14 @@ static func unit_name(kind: String) -> String:
 	return str(_load().get(kind, {}).get("unit_name", kind.capitalize()))
 
 
+# BATCH GI — THE NAME INSIDE A SENTENCE THAT ALREADY SAYS "the". One kind's
+# name carries its own article ("The Hollow Crown"), so a line written "the %s
+# waits" printed it twice. Every other kind reads the same through either door.
+static func name_after_the(kind: String) -> String:
+	var n := unit_name(kind)
+	return n.substr(4) if n.begins_with("The ") else n
+
+
 # Resist profile straight from the data (dmg_type -> fraction; negative =
 # vulnerable). The map screen reads this to preview a warband's identity.
 static func resists_for(kind: String) -> Dictionary:

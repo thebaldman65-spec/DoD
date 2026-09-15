@@ -26281,11 +26281,14 @@ func _award_ability_picks() -> Array:
 	return named
 
 
-# BATCH GF — THE BOSS THE HEROES ACTUALLY FACED. A boss node composes its warband
-# from every enemy the zone's roster tags with the `boss` role — the Hollow Crown
-# among them in every zone — so `Run.boss_kind()`, the zone's named boss, is not
-# always the one on the field, and a summary that said "facing the Withered
-# Warden" above a final-battle line listing the Hollow Crown contradicted itself.
+# BATCH GF — THE BOSS THE HEROES ACTUALLY FACED. A boss node used to compose its
+# warband from every enemy the zone's roster tags with the `boss` role — the
+# Hollow Crown among them in every zone — so `Run.boss_kind()`, the zone's named
+# boss, was not always the one on the field, and a summary that said "facing the
+# Withered Warden" above a final-battle line listing the Hollow Crown
+# contradicted itself. BATCH GI: `Run.compose` fields the zone's named boss now,
+# so the two agree; this still reads the warband, because the warband is what
+# was fought.
 func _boss_in_warband() -> String:
 	for kind in Run.encounter.get("enemies", []):
 		if "boss" in Enemies.roles(String(kind)):
@@ -26350,7 +26353,8 @@ func _summary_lines(snap: Dictionary) -> Array:
 			# named one — the two can differ (see `_boss_in_warband`).
 			depth = "facing the %s" % String(snap.get("boss_fought", snap["boss_name"]))
 		elif snap["encounter_type"] == "endboss":
-			depth = "facing the %s" % Enemies.unit_name(Run.END_BOSS_KIND)
+			# BATCH GI: `name_after_the`, or the Crown's own "The" prints twice.
+			depth = "facing the %s" % Enemies.name_after_the(Run.END_BOSS_KIND)
 		else:
 			# BATCH GF — "Tier N of 10" UNTIL GF, capped at ten on a zone of
 			# sixteen, so a wipe at encounter 13 read "Tier 10 of 10". It says
