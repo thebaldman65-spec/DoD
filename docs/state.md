@@ -13,52 +13,108 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-14 (Batch GI).*
+*Last rewritten: 2026-09-15 (Batch GJ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GI — THE END BOSS HAS A BUTTON, AND A ZONE BOSS IS THE ONE ITS ZONE NAMES. THE FIFTEENTH BATCH ON
-  `class-merge`, AND NOT MERGE WORK.** `main` takes one line of documentation (§5). Full working:
-  **`docs/reports/GI.md`**.
-- **§1: THE LATTICE DRAWS THE BOARD IT IS HANDED.** `map_screen._draw_lattice`'s width and both loops read
-  `Run.map.size()` rather than `SLOTS_PER_ZONE`, so the final board draws its seventeenth column and the end boss is
-  stepped onto through its own button. **The width was the batch's implementation call and nothing else reads the
-  drawn width**: the tier ladder, the budget ramp, `compose`, the boss band and the sim read the constant, which is
-  what a zone GENERATES, and none of them moved. The other two shapes are costed in GI §1; putting the end boss in the
-  sixteenth column removes the third zone boss and is a design question, so it was not taken.
-- **§2: A ZONE BOSS NODE FIELDS THE BOSS ITS ZONE NAMES.** The node's identity is the authority; `Run.compose` fills the
-  escort's `boss` role from `ZONE_DEFS`. On HEAD the Hollow Crown filled it in about one zone boss in seven, in every
-  zone; after, in none (GI §2).
-- **§3: THE END BOSS'S WORDS ARE PROPOSED, NOT CONFIRMED** — the label, the tooltip and the readout's name (the closed
-  end-boss item below).
-- **§4: RAGE'S RESET IS RULED, AND WHAT A QUIT STILL BUYS IS ACCEPTED, NOT OPEN** (the quit item below).
-- **§5: `main`'s NOTE NOW SAYS THE END BOSS IS FIXED ON `class-merge` ONLY**, which is the ruling; its code is untouched.
-- **WHAT MOVED:** `scripts/map_screen.gd`, `scripts/run_state.gd`, `scripts/enemies.gd` (one helper) and
-  `scripts/battle.gd` (a comment and the end boss's summary line), `CLAUDE.md`, `docs/master.html` and its stamp, this
-  file, the changelog, `docs/design-notes.md` and `docs/reports/GI.md` (**NEW**). **`baselines.json` is unchanged**: the unmodified gates read every target at its row against the new code, so no row moved.
-- **VERIFICATION:** in **`docs/reports/GI.md`**, written before the acceptance run; its figures were added after it.
+- **Last batch: GJ — THE FINAL FIGHT BECOMES OBSERVABLE. THE SIXTEENTH BATCH ON `class-merge`, AND NOT MERGE
+  WORK.** `main` is untouched. Full working: **`docs/reports/GJ.md`**.
+- **§1: THE SIM FIGHTS THE END BOSS, AND EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT.**
+  `run_sim.on_battle_end` pays the third zone boss as it pays the other two and walks on to the end boss.
+  `Completed` is the end boss killed, and the third zone boss's count prints beside it off the same runs
+  (`completions=` and `z3boss=` in the Matrix row). **Read every completion this project quoted before GJ — BN's
+  sweep, EN's 97 / 3 / 0, EO's arms, EP's 22%, every arm since — as a third-zone-boss figure.** The three rungs,
+  re-measured both ways, are in the first item of the queue below.
+- **§2: `check_gj` PRESSES THE END BOSS'S BUTTON EVERY BATTERY** — a whole run walked through the real screens, the
+  END BOSS pressed through its own button, the victory read (the gold, a relic, a talent tier, the profile's write,
+  the run save deleted, Continue greyed) and a defeat read. **70 checks, 41 s standalone**, so it runs every battery.
+- **§3: NO RUNG DISCOUNTS THE END BOSS.** `Run.end_boss_mult` is the zone ladder with the rung floored at 1.0: rung 1
+  meets it at rung 2's strength, and rungs 2 and 3 are bit-identical. **Which reading of the ruling that is, is owed
+  a confirmation** (the rulings item below). **The floor-health test still passes the wrong way:** a party with every hero at 1 health beat it in 7 of 7 drives at rung 1, as on HEAD (the finding under GJ below).
+- **§4: THE MINI-BOSS READS MINI-BOSS**, on its node and on its bargain, and **a run ended at the end boss names it
+  once.**
+- **WHAT MOVED:** `scripts/run_sim.gd`, `scripts/run_state.gd` (`end_boss_mult`), `scripts/battle.gd` (the spawn's
+  end-boss branch and the summary line), `scripts/map_screen.gd` and `scripts/offer_screen.gd` (the word),
+  `scripts/draft_screen.gd` and `data/glossary.json` (the rung-1 claim), `scripts/relics.gd` (a `save_path` var),
+  `gate_fixture.gd` (the screen primitives), `check_gj.gd` (**NEW**), `run_battery.sh`, `baselines.json`,
+  `CLAUDE.md`, `docs/instrument-rules.md`, `docs/master.html` and its stamp, this file, the changelog,
+  `docs/design-notes.md` and `docs/reports/GJ.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GJ.md`**, written before the acceptance run; its figures were added after it.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is RULED, NOT BUILT, and is the next merge step.**
-- **Next letter: GJ.**
+- **Next letter: GK.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### ~~THE END BOSS HAS NO BUTTON~~ — **CLOSED AT GI ON `class-merge` ONLY; ITS WORDS ARE OWED A CONFIRMATION, AND ONE INSTRUMENT GAP IS OWED**
+### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT — **RE-MEASURED AT GJ, BOTH WAYS**
+
+- **Until GJ the sim ended every run at the third zone boss**, so a "completion" was a run that killed the third zone
+  boss — encounter 48 of 49, never the end boss. **That is what EN's 97 / 3 / 0, EO's and EP's arms and every
+  completion quoted since measured.** They stay readable as that: they are not wrong, they are a different count.
+- **The three rungs untalented, 150 runs a rung** (`DOD_SIM_ROWS=0`, the balanced route, the standard four specs —
+  EO's method), both counts off the same runs:
+
+  | rung | to the third zone boss (what "completion" meant before GJ) | to the end boss (GJ) | end boss met / stopped the run |
+  |---|---|---|---|
+  | 1 Wanderer | 93% (±4.0) | 93% (±4.0) | 140 / 0 |
+  | 2 Warden | 5% (±3.6) | 5% (±3.6) | 8 / 0 |
+  | 3 Ruin | 0% (±0.9) | 0% (±0.9) | 0 / 0 |
+
+- **THE DELTA IS ZERO, AND THAT IS THE FINDING.** The end boss stopped none of the 140 runs that reached it at rung 1 and none of the 8 at rung 2, and at rung 3 no run reached it — so counting the final fight moves no rung's completion by a run. Every pre-GJ untalented figure also reads as a completion to the end boss at these rungs; what it never measured was a question an untalented party could fail at the end, and there is none. The drives say why (the finding under GJ below): the end boss acts once or twice before it is Broken and held.
+- **THE CONTROL:** HEAD's sim, which stops at the third zone boss, read **89%** at rung 1 over 150 runs
+  on the same day, beside GJ's 93% to the third zone boss — the old count reads the same through the new sim.
+- **THE RUNG-1 SPLIT:** with only §3's floor taken back out of GJ's code, rung 1 reads **94%** to the end
+  boss (met 141, stopped 0). The gap to 93% is what the end boss's full strength costs on the
+  first rung; the gap to the third-zone-boss count is the final fight itself.
+- **NOT RE-MEASURED, BY THE BRIEF'S SCOPE:** EP's rows-3 and rows-9 arms, EV's, FV's and every other arm. Each stays a
+  third-zone-boss figure until a batch re-reads it.
+
+### GJ's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE**
+
+1. **WHICH READING OF "THE END BOSS IS NOT SCALED BY THE DIFFICULTY MULTIPLIER".** Built: the rung may not DISCOUNT
+   it (`maxf(mult, 1.0)`), which keeps rungs 2 and 3 bit-identical as the brief required. The other reading — the
+   rung term taken off outright, rung 2's values at every rung — would take rung 3's x1.30 off the end boss (1,910
+   health against 2,490, Attack 334 against 434). It is one line either way (`Run.end_boss_mult`).
+2. **THE RUNG-1 WORDS ARE PROPOSED.** The draft screen's Wanderer tooltip reads *"Enemies at 50% strength, the end
+   boss at full."* where it read *"Enemies at 50% strength."*, and the glossary's road entry *"its enemies hit half
+   as hard - all but the END BOSS - "*. Each was a claim §3 made false.
+3. **THE END BOSS'S TOOLTIP AND ITS READOUT NAME (GI) ARE STILL OWED A CONFIRMATION.** GJ's brief confirmed the END
+   BOSS label; it said nothing of the tooltip or of the readout's *"— the Hollow Crown waits"*.
+
+### FOUND AT GJ AND NOT FIXED
+
+- **THE DESIGNER'S, AND PLAYER-VISIBLE: THE END BOSS'S FIGHT IS TOO SHORT TO TEST A PARTY, AND §3 DID NOT CHANGE THAT.**
+  Driven to the end boss at rung 1 and set to 1 health a hero before the step, the party won 7 of 7 on GJ's code and
+  7 of 7 on HEAD's; at full health 7 of 7; with the Devout already down as well, 3 of 4. In every fight the Crown
+  opens with Regalia — a ward, no damage — and casts one to four abilities in all before it dies, Broken once or
+  twice and, Broken, open to a freeze that takes its turn. The multiplier §3 lifted doubles each blow it lands
+  (Crown of Thorns 49 → 98 on the same hero, same seed) and it lands few. What would make the last fight able to
+  kill a party on the floor — its opening, its health, whether a Broken end boss can be held — is content, and the
+  end boss is a placeholder by the designer's decision (`docs/master.html` §13). Tables: `docs/reports/GJ.md` §3.
+- **THE SCREEN PRIMITIVES ARE IN THREE DRIVERS AND AUTHORED ONCE FOR ONE.** `gate_fixture.gd` holds them since GJ
+  and `check_gj` reads them there; `check_fh` and `check_gf` still carry their own copies, which is DA §3's tell.
+  Moving the two onto the fixture is a consolidation owed to a test batch.
+- **THE SIM'S OTHER FIGURES MOVED WITH IT AND WERE NOT RE-READ.** A run now pays three zone-boss ability awards (the
+  report's ceiling reads 3.00, not 2.00), its slot ladder reaches 10, the end boss's fight joins the `boss` rounds
+  bucket, and a full clear is depth 49 in the report and the Matrix row.
+- **TWO OF THE BRIEF'S PREMISES DID NOT HOLD** (GJ §0): a whole run is not longer than anything in the battery
+  (`check_gj` plays one in under a minute; `check_fx` and `check_map` run five to six), and no gate reads the sim's
+  output — sixteen targets read `run_sim.gd`'s source text and `test_run_harness` calls two of its setup functions,
+  and none runs a `--run`.
+
+### ~~THE END BOSS HAS NO BUTTON~~ — **CLOSED AT GI ON `class-merge` ONLY; ITS LABEL CONFIRMED AND ITS INSTRUMENT GAP CLOSED AT GJ; TWO WORDINGS STILL OWED**
 
 - **Fixed, on this branch only (ruled).** `map_screen._draw_lattice`'s width and both loops read `Run.map.size()`, so
-  the final board draws its seventeenth column. Driven through the real screens: whole runs to the end boss, its own
-  button pressed and the end boss killed, and on HEAD the same drive stopping on a board with nothing to press
-  (`docs/reports/GI.md` §7). `main` still carries the defect, and its note says so.
-- **OWED A CONFIRMATION (PLAYER-FACING): THE END BOSS'S WORDS ARE PROPOSED.** The label is *END BOSS*; the tooltip is
-  *"The END BOSS. Nothing goes around it."* over *"It is always the Hollow Crown, and the road ends here."*; and past
-  the third zone boss the readout ends *"— the Hollow Crown waits"*. What they were written to match — the zone boss's
-  label, tooltip and readout, verbatim — is in `docs/reports/GI.md` §3.
-- **OWED TO A TEST BATCH: NOTHING IN THE BATTERY PRESSES THE END BOSS'S BUTTON.** `check_fh` §8 still reaches the end
-  boss by calling `_on_node_pressed`, and the map-screen gates draw zone 1 or a zone-1 board relabelled as the third
-  (`check_flow`, `check_ct_map`), so a regression of the draw would pass the battery exactly as the defect did. GI was
-  IMPLEMENT ONLY; its proof is the drive.
+  the final board draws its seventeenth column (`docs/reports/GI.md` §7). `main` still carries the defect, and its
+  note says so.
+- **THE LABEL *END BOSS* IS CONFIRMED** — GJ's brief calls it confirmed. **Its tooltip** (*"The END BOSS. Nothing goes
+  around it."* over *"It is always the Hollow Crown, and the road ends here."*) **and the readout's *"— the Hollow
+  Crown waits"* are still owed a confirmation** (GJ's rulings item above).
+- **~~OWED TO A TEST BATCH: NOTHING IN THE BATTERY PRESSES THE END BOSS'S BUTTON~~ — CLOSED AT GJ.** `check_gj` walks a
+  whole run through the real screens and presses it every battery; with GI's lattice fix reverted it reads 25 / 3,
+  all three at the missing button.
 
 ### A QUIT FIGHT RESTARTS AGAINST A RESET WARBAND, AND THE PARTY'S LOSSES CARRY — **GG's OPTION C, RULED AND BUILT AT GH; RAGE RULED AND THE TWO REMAINDERS ACCEPTED AT GI**
 
@@ -142,20 +198,17 @@ last exactly one.*
   member as it goes, so a read taken after its first frames reads that fight rather than the disk — found while
   re-pointing, and stated at the arm.
 
-### FOUND AT GI AND NOT FIXED
+### FOUND AT GI AND NOT FIXED — **ALL THREE CLOSED AT GJ**
 
-- **PLAYER-FACING: THE MINI-BOSS'S NODE IS LABELLED *WARDEN*, AND THREE LIVE NAMES CARRY THE WORD.** GI's BR §1 sweep
-  of the map's labels found it in the Withered Warden — the first and third zones' boss, named in the readout on the
-  same screen — in the Warden spec, and in the second difficulty rung. BR §1 ships a label collision and flags it;
-  renaming a label is the designer's.
-- **PLAYER-FACING, SMALL: THE END BOSS'S SUMMARY LINE NAMES IT TWICE.** A run that ends at the end boss prints *"The END
-  BOSS — The Hollow Crown: The Hollow Crown."* under *The final battle*, because the node's theme and its one enemy are
-  both the Crown. It is the line's ordinary shape (kind — theme: enemies), driven at GI through a forfeit; its words
-  are the designer's.
-- **THE SIM NEVER FIGHTS THE END BOSS.** `run_sim.on_battle_end` ends a run at the third zone boss — its own comment
-  says so and calls closing it a batch of its own, because every sim baseline would move — so each completion the sim
-  prints is a third-zone-boss completion, and nothing but a drive has ever measured the end boss's fight. It was
-  recorded in the source and nowhere else.
+- **~~PLAYER-FACING: THE MINI-BOSS'S NODE IS LABELLED *WARDEN*~~ — CLOSED AT GJ, RULED BY THE DESIGNER: IT READS
+  *MINI-BOSS*,** on the node and in its bargain's opener, the two surfaces the old word reached. A census of every
+  string in `scripts/` and `data/` that carries *warden* finds the Warden spec, the second rung, and the Withered
+  Warden with its forest's lore, and no mini-boss. The label fits the button at 66 px of 68 closed and 76 of 76 open,
+  and a BR §1 sweep over 1,249 live names finds nothing called it (GJ §4).
+- **~~PLAYER-FACING, SMALL: THE END BOSS'S SUMMARY LINE NAMES IT TWICE~~ — CLOSED AT GJ:** a lineup that is only the
+  creature its theme names prints the name once — *"The END BOSS — The Hollow Crown."*
+- **~~THE SIM NEVER FIGHTS THE END BOSS~~ — CLOSED AT GJ:** it does, and prints both counts (the first item of the
+  queue).
 
 ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
 
@@ -271,8 +324,10 @@ and why the file has not been written since 2026-08-30.
 - **The day any relic is locked** — a fresh profile, a relic added to the pool by the merge, a reset — every battery
   would permanently unlock relics at random in the player's file, one for each reach while any is still locked.
 - `docs/reports/FY.md` §5b carries the census and the pre-pass reading of which targets reach the call.
-- **Nothing is broken today and nothing was changed.** A redirect is a code change to `relics.gd` (a `save_path`
-  var with FI's harness rule) and it is owed a batch.
+- **Nothing is broken today. GJ ADDED THE VAR AND NOT THE RULE:** `Relics.save_path` (default `SAVE_PATH`) exists
+  since GJ, and `check_gj` points it at a scratch file of its own before its end boss dies, so the gate that presses
+  the end boss is not a fifth reacher. **The four gates FY §5b counted still write the default** — the deferral stands,
+  and closing it is now one redirect line in each of the four, or FI's harness rule given to the var.
 
 ### FOUND AT FY AND NOT FIXED — **INSTRUMENT HYGIENE FROM THE §5c AUDIT; NONE CHANGES A VERDICT TODAY**
 
@@ -1101,18 +1156,21 @@ rung's.** The high pool holds **8 / 4 / 0**. **The stale comment that said other
 the behaviour is untouched.** **RULED AFTER EP: it is a real defect and it is rung 3's — *"fix E
 separately whenever convenient."* It is not bundled into the rung-2 work above.**
 
-### THE RUN REPORT'S WIPE TABLE IS BANDED FOR A TWELVE-SLOT ZONE — **NAMED AT EP §1c, NOT FIXED**
+### THE RUN REPORT'S WIPE TABLE IS BANDED FOR A TWELVE-SLOT ZONE — **NAMED AT EP §1c, NOT FIXED; GJ GAVE THE END BOSS ITS OWN COLUMN**
 
 `run_sim.gd` bands `tier >= 11` as **"boss"** and its per-tier table loops `for ft in range(1, 12)`
 labelling `ft == 11` as the boss. **A zone has held SIXTEEN slots since BATCH BK; the zone boss is
 slot 16 and the mini-boss slot 8.** So the band is six slots and the per-tier table **silently
 drops slots 12–16**, which is where most wipes happen — its printed win rates are optimistic by
-construction. `_finish_run`'s comment still says the ladder is *"(zone-1)\*11 + tier, so a full
-clear is 33"* while the code reads `SLOTS_PER_ZONE`. **Reading the printed table literally reverses
+construction. (`_finish_run`'s comment said the ladder was *"(zone-1)\*11 + tier, so a full clear is 33"*;
+GJ corrected it to the code's `(zone-1)*16 + slot` and a full clear of 49.) **Reading the printed table literally reverses
 this batch's own answer** (it says 57 wipes at "boss" where 7 are at the zone boss). **The true
 distribution is available today from the per-run progress line, which carries the exact slot** —
 which is why EP measured rather than repaired, and why repairing it is a small, clearly-scoped
 instrument batch rather than an emergency.
+- **GJ added an `end boss` column** for slot 17, which only the final board carries, so the end boss's wipes — no run
+  reached it before GJ — never fall into the band. The band, the per-tier table's range and the queued repair are
+  untouched.
 
 ### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ALL THREE ARE CLOSED NOW (ET, EZ, AND FN'S RETIREMENT OF TAG CONDITIONS)**
 

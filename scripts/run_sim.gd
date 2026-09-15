@@ -68,7 +68,16 @@ static var active := false
 static var runs_target := 0
 static var runs_done := 0
 static var completed := 0
-static var wipes: Array = []      # [{zone: 1-3, tier: 1-11}]
+# BATCH GJ §1 — THE RUN ENDS AT THE END BOSS NOW, AND THE OLD MEANING STAYS
+# READABLE BESIDE THE NEW ONE. `completed` counts a run that KILLED THE END
+# BOSS. Until GJ it counted a run that killed the THIRD ZONE BOSS, because the
+# sim ended every run there and never walked the seventeenth slot, so every
+# completion figure dated before GJ is that older count. The report prints both
+# off the same runs, and the gap between them is exactly the end boss's fight.
+static var third_boss_kills := 0   # runs past the third zone boss — `completed` before GJ
+static var endboss_fights := 0     # runs that stepped onto the end boss and fought it
+static var endboss_kills := 0      # ...and killed it; `completed` must equal this
+static var wipes: Array = []      # [{zone: 1-3, tier: 1-17}]
 # "zone,tier" -> accumulators; every count is per FIGHT at that tier.
 static var tier_stats := {}
 static var event_counts := {}     # event id -> times fired across all runs
@@ -184,7 +193,7 @@ static var worn_kind := {}          # spec|class|universal|stick -> runes worn
 # an instrument that could not have seen anything smaller than a large
 # effect. These are the continuous metrics that replace it as primary —
 # stored per RUN so the report can print a spread, not just a point.
-static var depth_reached: Array = []  # absolute slot at run end, 1..48
+static var depth_reached: Array = []  # absolute slot at run end, 1..49 (1..48 before GJ)
 static var r8_samples: Array = []     # one ratio@z1t8 per run that fought it
 static var _run_r8 := -1.0
 
@@ -702,6 +711,10 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	# Shared inventory back to the run (mirrors the real end-of-battle sync).
 	for id in battle.items:
 		run.items[id] = battle.items[id][1]
+	# BATCH GJ §1 — the end boss's fight is booked whichever way it goes, so the
+	# report can say how many runs met it and how many it stopped.
+	if String(run.encounter.get("type", "")) == "endboss":
+		endboss_fights += 1
 	if not victory:
 		wipes.append({"zone": run.zone_idx + 1, "tier": run.slot_idx + 1})
 		_finish_run(run, battle, false)
@@ -779,27 +792,31 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	if node_type == "miniboss":
 		_award_upgrades(run)
 	if node_type == "boss":
-		# The END boss awards no ability pick (§4) — nothing follows it.
+		# BATCH EG §1 — THE SLOT BEFORE THE AWARD, the same order
+		# `battle._resolve_boss` uses, so the bot's hero has the new slot to
+		# receive the pick into.
+		#
+		# BATCH GJ §1 — AND THE THIRD ZONE BOSS PAYS AS THE OTHER TWO DO,
+		# BECAUSE IN THE GAME IT DOES. Until GJ this branch was gated on
+		# `has_next_zone()` and ended the run at the third zone boss, so the sim
+		# saw a slot ladder of 7 -> 8 -> 9, paid two ability awards a run where
+		# the game pays three, and never walked the `endboss` node: every
+		# completion it printed was a third-zone-boss completion. A zone boss's
+		# award is the same on every board; only the descent is not, because the
+		# final zone has no zone after it — its boss leads on to the end boss, one
+		# slot further, which the walk below reaches like any other fight.
+		run.note_zone_boss_cleared()
+		_award_trophies(run)  # never Relics.unlock_random — that persists
 		if run.has_next_zone():
-			# BATCH EG §1 — THE SLOT BEFORE THE AWARD, the same order
-			# `battle._resolve_boss` uses, so the bot's hero has the new slot
-			# to receive the pick into.
-			#
-			# **AND THIS BRANCH IS WHY THE SIM ONLY EVER SEES 7 -> 8 -> 9.**
-			# It gates the award on `has_next_zone()`, so the THIRD zone boss
-			# — which pays a pick in the real game (BM §6 made the end boss a
-			# separate slot) — ends the run here instead: `run_over` is set
-			# below and the `endboss` node is never walked. The report line
-			# that read `ceiling 2.00 (zone bosses only)` was that same
-			# assumption written as a literal. **PRE-EXISTING AND REPORTED,
-			# NOT FIXED HERE**: closing it moves every sim baseline in the
-			# project, which is its own batch. `check_eg` §3 drives all three
-			# grants on a real `_resolve_boss` instead.
-			run.note_zone_boss_cleared()
-			_award_trophies(run)  # never Relics.unlock_random — that persists
 			run.advance_zone()
 		else:
-			run_over = true
+			third_boss_kills += 1
+	elif node_type == "endboss":
+		# The end boss awards no ability pick (BM §4) — nothing follows it — and
+		# its relic and its talent tier are persistent, so the sim books neither.
+		# Its death ends the run, and that is what `completed` counts since GJ.
+		endboss_kills += 1
+		run_over = true
 	# Batch BK §3: the merchant and the event are MAP NODES now — walked to,
 	# or walked past — and walk_to_next_fight resolves them. The one thing a
 	# fight can still queue is the bargain's bought merchant.
@@ -829,10 +846,11 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	for id in run.items:
 		items_left += int(run.items[id])
 	# Stage 0b primary metric: how far the run actually got, on the same
-	# absolute ladder the wipe median uses ((zone-1)*11 + tier, so a full
-	# clear is 33). A mean over per-run samples, never a median — the median
-	# is the knife-edge statistic Batch AB caught flipping a whole zone on a
-	# two-run difference.
+	# absolute ladder the wipe median uses ((zone-1)*16 + slot). A full clear
+	# is 49 since GJ, the end boss's slot; it was 48 before, because the sim
+	# stopped every run on the third zone boss. A mean over per-run samples,
+	# never a median — the median is the knife-edge statistic Batch AB caught
+	# flipping a whole zone on a two-run difference.
 	depth_reached.append(run.zone_idx * run.SLOTS_PER_ZONE + run.slot_idx + 1)
 	if _run_r8 >= 0.0:
 		r8_samples.append(_run_r8)
@@ -1053,6 +1071,15 @@ static func _print_report(battle) -> void:
 	print("Runs: %d    Completed: %d (%.0f%%)    Wiped: %d (%.0f%%)" % [
 		runs_done, completed, 100.0 * completed / runs,
 		wipes.size(), 100.0 * wipes.size() / runs])
+	# BATCH GJ §1 — BOTH DEFINITIONS, OFF THE SAME RUNS. `Completed` is the end
+	# boss killed; before GJ it was the third zone boss killed, and every figure
+	# the project quoted until then is that one. The difference is the end boss.
+	print("  GJ: 'Completed' is the END BOSS killed. The third zone boss — what it counted before GJ — fell in %d (%.0f%%); the end boss was met %d times and stopped %d." % [
+		third_boss_kills, 100.0 * third_boss_kills / runs, endboss_fights,
+		endboss_fights - endboss_kills])
+	if completed != endboss_kills:
+		print("  WARNING: %d runs counted complete but %d end bosses were killed — a run ended complete without the end boss's death" % [
+			completed, endboss_kills])
 	var relics_env := OS.get_environment("DOD_SIM_RELICS")
 	var troph := OS.get_environment("DOD_SIM_TROPHIES")
 	var shops_desc := "on(heal<50% first, then priciest unowned incl. runes; 40g reserve)" \
@@ -1140,7 +1167,7 @@ static func _print_report(battle) -> void:
 	var p_adj := clampf(p, 0.5 / runs, 1.0 - 0.5 / runs)
 	var p_sd := sqrt(p_adj * (1.0 - p_adj))
 	print("\nINSTRUMENT RESOLUTION (Batch AD stage 0b) — read this before the numbers:")
-	print("  PRIMARY   depth reached      mean %.2f  SD %.2f  SE %.2f   (absolute slot, 1-48; a full clear is 48)" % [
+	print("  PRIMARY   depth reached      mean %.2f  SD %.2f  SE %.2f   (absolute slot, 1-49; a full clear is 49 — 48 before GJ, when the sim stopped at the third zone boss)" % [
 		d_mean, d_sd, d_sd / sqrt(maxf(float(n_runs), 1.0))])
 	print(_resolution_line(d_sd, n_runs, "%.2f tiers"))
 	print("  PRIMARY   ratio@z1t8        mean %.3f  SD %.3f  SE %.3f   (%d of %d runs reached t8)" % [
@@ -1162,6 +1189,12 @@ static func _print_report(battle) -> void:
 	print("  SECONDARY completions       %.0f%% (%d of %d)   95%% band +/-%.1f pts" % [
 		100.0 * p, completed, n_runs, 100.0 * 1.96 * p_sd / sqrt(runs)])
 	print(_resolution_line(100.0 * p_sd, n_runs, "%.1f pts"))
+	# BATCH GJ §1 — THE OLD MEANING, BESIDE THE NEW, WITH ITS OWN BAND.
+	var p3 := float(third_boss_kills) / runs
+	var p3_adj := clampf(p3, 0.5 / runs, 1.0 - 0.5 / runs)
+	print("  SECONDARY third zone boss   %.0f%% (%d of %d)   95%% band +/-%.1f pts   <- what 'completions' counted before GJ" % [
+		100.0 * p3, third_boss_kills, n_runs,
+		100.0 * 1.96 * sqrt(p3_adj * (1.0 - p3_adj)) / sqrt(runs)])
 	print("            ^ AT THIS n, COMPLETIONS CANNOT DISTINGUISH A SMALL CHANGE FROM NOISE.")
 	print("              Never quote it on its own; it is a binary read on a 2-6% event.")
 	print("  SECONDARY wipe median       knife-edge at n=50 (Batch AB: a true null-change")
@@ -1170,12 +1203,18 @@ static func _print_report(battle) -> void:
 
 	print("\nWipe tier distribution:")
 	for z in range(1, 4):
-		var bands := {"t1-3": 0, "t4-7": 0, "t8-10": 0, "boss": 0}
+		# BATCH GJ §1 — THE END BOSS GETS ITS OWN COLUMN. It is the seventeenth
+		# slot, which only the final board carries, and no run reached it before
+		# GJ; folded into `boss` it would hide inside a band that already holds
+		# tiers 11-15 (EP's twelve-slot banding, queued and not touched here).
+		var bands := {"t1-3": 0, "t4-7": 0, "t8-10": 0, "boss": 0, "end boss": 0}
 		for w in wipes:
 			if int(w["zone"]) != z:
 				continue
 			var wt := int(w["tier"])
-			if wt >= 11:
+			if wt > 16:
+				bands["end boss"] += 1
+			elif wt >= 11:
 				bands["boss"] += 1
 			elif wt >= 8:
 				bands["t8-10"] += 1
@@ -1183,8 +1222,9 @@ static func _print_report(battle) -> void:
 				bands["t4-7"] += 1
 			else:
 				bands["t1-3"] += 1
-		print("  zone %d: t1-3 x%-3d t4-7 x%-3d t8-10 x%-3d boss x%d" % [
-			z, bands["t1-3"], bands["t4-7"], bands["t8-10"], bands["boss"]])
+		print("  zone %d: t1-3 x%-3d t4-7 x%-3d t8-10 x%-3d boss x%-3d end boss x%d" % [
+			z, bands["t1-3"], bands["t4-7"], bands["t8-10"], bands["boss"],
+			bands["end boss"]])
 
 	print("\nPer-tier averages (all runs reaching that tier):")
 	print("  zone tier   fights   win%   deaths/fight   hero HP% entering")
@@ -1344,7 +1384,7 @@ static func _print_report(battle) -> void:
 	# choices each. "taken" below the ceiling means a hero ran its two pools
 	# dry, which is the only way an award can pass a hero by.
 	print("\nAbility economy (per run, per hero):")
-	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 2.00 (the zone bosses the SIM plays — see _award_trophies)" % [
+	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 3.00 (one per zone boss — GJ; it read 2.00 while the sim stopped at the third)" % [
 		ability_offered / runs / 4.0, ability_taken / runs / 4.0,
 		ability_taken / runs / 4.0])
 	print("  Upgrades %.2f/hero/run taken   ceiling 3.00 (one per mini-boss)" % [
@@ -1411,7 +1451,7 @@ static func _print_report(battle) -> void:
 	print("\nRoute agency:")
 	print("  Walk steps per run: %.1f   reachable nodes per step %.2f" % [
 		walk_steps / runs, reach_sum / steps])
-	print("    (48 on a full clear: 42 branching columns plus the 6 forced steps onto the mini-bosses and bosses)")
+	print("    (49 on a full clear: 42 branching columns, the 6 forced steps onto the mini-bosses and bosses, and the end boss — 48 before GJ)")
 	print("  DECISIONS — steps offering a real choice: %.1f per run, %.0f%% of steps (%d of %d)" % [
 		choice_steps / runs, 100.0 * choice_steps / steps, choice_steps,
 		walk_steps])
@@ -1455,14 +1495,17 @@ static func _print_report(battle) -> void:
 	# depth= is out of 49 SLOTS (BATCH BM added the end boss) not 48, and route= is a real axis again rather
 	# than three names for one walk. A row carrying `map=line` is an AN-to-BJ
 	# row; `map=branch` is BK or later; anything else predates both.
-	print("Matrix row: route=%s  map=branch  diff=%s(r%d) tiers=%d  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 49)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
+	# BATCH GJ §1 — `completions=` is the END BOSS killed since GJ; `z3boss=` is
+	# the third zone boss killed, which is what `completions=` meant on every row
+	# before GJ. A pre-GJ row compares with `z3boss=`, never with `completions=`.
+	print("Matrix row: route=%s  map=branch  diff=%s(r%d) tiers=%d  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 49)  ratio@z1t8=%s  completions=%.0f%%  z3boss=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
 		route, diff, rung, tiers_built,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		power_mult,
 		(offer_severity_sum / float(maxi(offer_count, 1))),
 		_mean(depth_reached),
 		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
-		r8_desc, 100.0 * completed / runs, med_desc,
+		r8_desc, 100.0 * completed / runs, 100.0 * third_boss_kills / runs, med_desc,
 		100.0 * choice_steps / steps])
 
 	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; potions are never drunk ON THE MAP (Batch AN made them usable there and the bot does not); the bargain policy is severity-extreme only, never a read of the modifier against the heroes; shop rune picks ignore build synergy (priciest first).")

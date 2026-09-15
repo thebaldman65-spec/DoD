@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-14 (Batch GI &mdash; the end boss has a button, and a zone boss is its zone's own)</b></p>
+<p align="right"><b>Last updated: 2026-09-15 (Batch GJ &mdash; the final fight becomes observable)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -57,7 +57,7 @@ twist</b> as well as scaling, because stat inflation alone is a wall and a named
 ladder. <b>Every scaling number below is provisional and is the designer's to set.</b>
 <table border="1" cellpadding="4">
 <tr><th>Rung</th><th>Enemies</th><th>Twist</th><th>Opens</th></tr>
-<tr><td><b>1 — Wanderer</b></td><td>×0.50 <b>damage only</b><br>(full health)</td><td>none</td><td>talent tier 1</td></tr>
+<tr><td><b>1 — Wanderer</b></td><td>×0.50 <b>damage only</b><br>(full health; <b>never the end boss</b>, which meets rung 1 at rung 2's strength)</td><td>none</td><td>talent tier 1</td></tr>
 <tr><td><b>2 — Warden</b></td><td>×1.00 <b>damage</b><br>(health <b>identical to rung 1</b>)</td><td>the severity floor rises: the guaranteed
 mild bargain option may be severity 3</td><td>talent tier 2</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td>the floor rises again (severity 4), and
@@ -85,6 +85,16 @@ fights an arm &mdash; 19 points at 3.7 standard errors. Rungs 2 and 3 did not
 move, by construction &mdash; the health multiplier floors the rung at 1.0, so rung 2's ×1.00 and
 rung 3's ×1.30 are bit-identical to what they were. <b>The ×0.50 damage scale itself was NOT
 tuned and is the designer's.</b>
+<br><b>THE END BOSS TAKES NO DISCOUNT FROM A RUNG (Batch GJ).</b> Its spawn reads one multiplier for
+health and Attack, the zone ladder with the rung floored at 1.0: at rung 1 it has rung 2's health
+and Attack (1,910 and 334 against rung 1's 167), and rungs 2 and 3 field it exactly as before. A
+last boss that cannot kill heroes on the floor teaches nothing, and rung 1 exists to teach.
+<br>Heroes at 1 health still beat it at rung 1 &mdash; in 7 of 7 driven runs, as in 7 of 7 on the code before &mdash; because it opens with Regalia, a ward, and is Broken and held before it has acted three times.
+<br><b>WHAT A COMPLETION FIGURE COUNTS.</b> The completion figures above count runs that killed the
+<b>third zone boss</b>, not the end boss: the simulator that took them ended a run there. Measured to
+the end boss, untalented, 150 runs a rung, a balanced route and the standard four specs:
+<b>93% / 5% / 0%</b> at rungs 1 / 2 / 3, against <b>93% / 5% /
+0%</b> to the third zone boss off the same runs. The end boss stopped none of the runs that reached it &mdash; 140 at rung 1 and 8 at rung 2 &mdash; so counting it moves no rung's figure; at rung 3 no run reached it.
 <br><b>RUNG 1 IS A META-PROGRESSION GATE, NOT AN EASY MODE, AND REMOVING IT IS NOT A BALANCE
 CHANGE (Batch EN §3).</b> Beating the end boss on a rung sets <code>Profile.talent_tier</code> to
 that rung, and tier 0 — a fresh save — opens <b>no talent tier at all</b>: clearing rung 1 is the
@@ -147,7 +157,8 @@ deep. The final zone carries one extra slot after its boss.</p>
 <table border="1" cellpadding="4">
 <tr><th>Slot</th><th>Contents</th></tr>
 <tr><td>1&ndash;7</td><td>branching, 3 nodes per column</td></tr>
-<tr><td>8</td><td><b>MINI-BOSS</b> &mdash; every path converges</td></tr>
+<tr><td>8</td><td><b>MINI-BOSS</b> &mdash; every path converges. Its node reads <b>MINI-BOSS</b> on the map,
+and its bargain opens "The MINI-BOSS of this zone blocks the road."</td></tr>
 <tr><td>9&ndash;15</td><td>branching, 3 nodes per column</td></tr>
 <tr><td>16</td><td><b>ZONE BOSS</b> &mdash; every path converges. The boss is always the zone's
 own &mdash; the Withered Warden in the Forest of Old, the Ash-Wrought Tyrant in the Scarlands &mdash;
@@ -156,7 +167,8 @@ ability pick, and banks <b>one meta talent point per class</b>.</td></tr>
 <tr><td>17</td><td><b>THE END BOSS</b> &mdash; the final zone only. A single <b>FIXED</b>
 encounter (The Hollow Crown), so it can be learned: not drawn from a pool and not composed
 from the budget system. It <b>gains stats AND mechanics with difficulty</b> — one extra
-ability at rung 2 and another at rung 3. It always awards a relic, awards <b>no talent
+ability at rung 2 and another at rung 3, and <b>no rung softens it</b>: at rung 1 it has rung 2's
+health and Attack, and rung 3 raises both. It always awards a relic, awards <b>no talent
 points</b>, and beating it is what <b>opens the talent tree's tiers</b>. On the map it is the
 final board's seventeenth column, labelled <b>END BOSS</b>, one step past the zone boss.</td></tr>
 </table>
@@ -3045,7 +3057,8 @@ playing a materially worse game and would report it as shallow.</li>
 <p><b>The run summary</b> replaces both end panels, and serves all three endings — completion,
 wipe, and forfeit. It reports the outcome and depth reached (<b>"Forfeited — Zone N …"</b>
 reads distinctly from "Wiped", in its own colour, and carries the <b>reason</b> the player
-picked), the final battle (type, theme, and lineup) and which heroes fell,
+picked), the final battle (type, theme, and lineup &mdash; a lineup that is only the creature its theme
+names, which is the end boss, is named once: "The END BOSS &mdash; The Hollow Crown.") and which heroes fell,
 the heroes as they stood (per hero: spec, talent count with its <b>tier spread</b>, runes
 equipped, abilities earned), <b>damage share per hero across the whole run</b>, the three
 breakdowns below, the run economy
@@ -3146,10 +3159,11 @@ zone 1: read the LOW budgets off this. <i>Fully talented</i>
 (<code>DOD_SIM_TALENTS</code> naming every node of the one tree): read the TOP budget off this. A single build level makes either the
 early game or the late game look wrong for a reason that is not real.</li>
 <li><b>Run harness:</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default 50) plays
-N COMPLETE runs headlessly — the real generated 48-encounter map, real warbands at real budgets
+N COMPLETE runs headlessly — the real generated 49-encounter map, the end boss included, real warbands at real budgets
 WITH enemy tier scaling and the zone slot multiplier, HP/mana/items carried between
 battles, talent points earned and spent, elite runes and boss picks collected, all three
-zone slots — and prints the run report: completion/wipe rates, wipe distribution,
+zone slots — and prints the run report: completion (a run that killed the end boss, with the count
+that killed the third zone boss printed beside it) and wipe rates, wipe distribution,
 per-slot win/death/HP averages, and the measured hero-vs-warband power table (the
 progression counterweight, measured instead of modelled), plus the run economy: gold
 earned/spent/unspent, items used and carried unused, merchants met and events fired, and
@@ -3259,8 +3273,8 @@ at the template when convenient. Battle backgrounds: authored at ≈1280×720 (u
 
 <h2>13. Known Gaps / Next Steps</h2>
 <ul>
-<li><b>Rung 1's landing zone is a cliff, and 70% sits inside it.</b> Untalented completion reads
-28% at &times;0.60 and 83% at &times;0.50, so one step of the multiplier is worth 55 points and
+<li><b>Rung 1's landing zone is a cliff, and 70% sits inside it.</b> Untalented completion to the
+third zone boss reads 28% at &times;0.60 and 83% at &times;0.50, so one step of the multiplier is worth 55 points and
 the value that would land on the stated target was never sampled. The shipped &times;0.50 is the
 nearest sampled value, not a tuned one; the finer sweep (&times;0.58 to &times;0.52) is cheap
 and has not been run.</li>

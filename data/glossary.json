@@ -927,7 +927,7 @@
   "term": "The Road (Difficulty)",
   "category": "run",
   "short": "Three rungs - Wanderer, Warden and Ruin - chosen at the draft.",
-  "long": "At the draft you choose the road, one of three rungs (see The Difficulty Ladder). WANDERER is the first: its enemies hit half as hard, and it is where a profile with no talents belongs. WARDEN is the game as designed. RUIN makes the enemies 1.3 times as strong, and its bargains harsher. Beating the END BOSS on a rung is what opens that tier of the talent tree.",
+  "long": "At the draft you choose the road, one of three rungs (see The Difficulty Ladder). WANDERER is the first: its enemies hit half as hard - all but the END BOSS - and it is where a profile with no talents belongs. WARDEN is the game as designed. RUIN makes the enemies 1.3 times as strong, and its bargains harsher. Beating the END BOSS on a rung is what opens that tier of the talent tree.",
   "see_also": [
    "zones_tiers"
   ]

@@ -73,7 +73,8 @@ func _draw_screen() -> void:
 	if enc_type == "elite":
 		opener = "An ELITE warband stands in the road."
 	elif enc_type == "miniboss":
-		opener = "The WARDEN of this zone blocks the road."
+		# BATCH GJ §4 — the node's own label, MINI-BOSS since GJ (it read WARDEN).
+		opener = "The MINI-BOSS of this zone blocks the road."
 	var sub := Label.new()
 	sub.text = opener \
 		+ "  Choose the terms you will fight on —\n" \

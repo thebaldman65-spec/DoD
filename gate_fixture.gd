@@ -252,3 +252,154 @@ func report(tree: SceneTree) -> void:
 		name = s.resource_path.get_file().get_basename()
 	print("%s: %d checks / %d failures" % [name, checks, fails])
 	tree.quit(1 if fails > 0 else 0)
+
+
+# ── BATCH GJ — THE SCREEN PRIMITIVES, AUTHORED ONCE ─────────────────────────
+# A drive through the real screens needs the same small readers every time.
+# `check_fh` and `check_gf` each carry their own copies — two, one under DA §3's
+# tell of THREE — and `check_gj` is the third driver, so it reads them from here
+# rather than making the third copy. Moving the other two onto these is a
+# consolidation of its own, owed and not taken: GJ was IMPLEMENT ONLY and those
+# two gates' readings are not what it changed. Nothing here names `Run`.
+
+# `Engine.time_scale` is re-asserted every frame: a Break's hitstop puts it back
+# to the literal 1.0 (FH's measured trap).
+static func frames(tree: SceneTree, n: int) -> void:
+	for _i in n:
+		Engine.time_scale = 100.0
+		await tree.process_frame
+
+
+static func buttons(n: Node, out: Array, visible_only := true) -> void:
+	if n == null or n.is_queued_for_deletion():
+		return
+	if n is Button:
+		if not visible_only or (n as Button).visible:
+			out.append(n)
+	for c in n.get_children():
+		buttons(c, out, visible_only)
+
+
+# The first ENABLED visible button whose text begins with one of the prefixes,
+# tried in prefix order, is pressed; its text comes back, or "" when none would.
+static func press(n: Node, prefixes: Array) -> String:
+	var btns: Array = []
+	buttons(n, btns)
+	for p in prefixes:
+		for b in btns:
+			var t := String((b as Button).text)
+			if t.begins_with(String(p)) and not (b as Button).disabled:
+				(b as Button).emit_signal("pressed")
+				return t
+	return ""
+
+
+static func overlay(screen: Node, z: int) -> Node:
+	var found: Node = null
+	if screen == null:
+		return found
+	for c in screen.get_children():
+		if c is Control and (c as Control).z_index == z and not c.is_queued_for_deletion():
+			found = c
+	return found
+
+
+# The screen named by the FILE it was loaded from: the main menu's root node is
+# called "Screen", which a name match cannot tell apart from anything (GF).
+static func scene_name(tree: SceneTree) -> String:
+	var cur: Node = tree.current_scene
+	if cur == null:
+		return "<none>"
+	var base := String(cur.scene_file_path).get_file().get_basename()
+	var named := {"main_menu": "MainMenu", "map": "Map", "offer": "Offer",
+		"event": "Event", "shop": "Shop", "blacksmith": "Blacksmith",
+		"party": "Party", "draft": "Draft", "spec_choice": "SpecChoice"}
+	if named.has(base):
+		return String(named[base])
+	if base == "bat" + "tle":
+		return "Battle"
+	return base if base != "" else String(cur.name)
+
+
+# The ENABLED button whose `pressed` is bound to `method` with exactly `args`,
+# found by what it does rather than by what it says: a relabelled button is
+# still found, and a button wired to nothing never is.
+static func bound_button(n: Node, method: String, args: Array) -> Button:
+	var btns: Array = []
+	buttons(n, btns, false)
+	for b in btns:
+		if (b as Button).disabled:
+			continue
+		for c in (b as Button).pressed.get_connections():
+			var cb: Callable = c["callable"]
+			if cb.get_method() == method and cb.get_bound_arguments() == args:
+				return b
+	return null
+
+
+# Every button bound to the map's node handler, pressable or not: the lattice
+# draws exactly one per node on the board.
+static func lattice_buttons(screen: Node) -> Array:
+	var out: Array = []
+	var btns: Array = []
+	buttons(screen, btns, false)
+	for b in btns:
+		for c in (b as Button).pressed.get_connections():
+			if (c["callable"] as Callable).get_method() == "_on_node_pressed":
+				out.append(b)
+				break
+	return out
+
+
+# The next slot's node indices a player can press, read off each enabled
+# lattice button's own binding, sorted.
+static func open_nodes(screen: Node) -> Array:
+	var out: Array = []
+	for b in lattice_buttons(screen):
+		if (b as Button).disabled:
+			continue
+		for c in (b as Button).pressed.get_connections():
+			var cb: Callable = c["callable"]
+			if cb.get_method() == "_on_node_pressed" and not cb.get_bound_arguments().is_empty():
+				out.append(int(cb.get_bound_arguments()[0]))
+	out.sort()
+	return out
+
+
+# Every text a screen shows: buttons, labels, and rich text as it is parsed.
+static func texts(n: Node) -> Array:
+	var out: Array = []
+	var stack: Array = [n]
+	while not stack.is_empty():
+		var cur: Node = stack.pop_back()
+		if cur == null or cur.is_queued_for_deletion():
+			continue
+		if cur is Button:
+			out.append(String((cur as Button).text))
+		elif cur is RichTextLabel:
+			out.append(String((cur as RichTextLabel).get_parsed_text()))
+		elif cur is Label:
+			out.append(String((cur as Label).text))
+		for k in cur.get_children():
+			stack.append(k)
+	return out
+
+
+static func has_text(n: Node, needle: String) -> bool:
+	for t in texts(n):
+		if String(t).contains(needle):
+			return true
+	return false
+
+
+static func menu_button(screen: Node) -> MenuButton:
+	var stack: Array = [screen]
+	while not stack.is_empty():
+		var cur: Node = stack.pop_back()
+		if cur == null:
+			continue
+		if cur is MenuButton and String((cur as MenuButton).text) == "☰":
+			return cur
+		for k in cur.get_children():
+			stack.append(k)
+	return null

@@ -142,9 +142,14 @@ func _draw_screen() -> void:
 		var dbtn := Button.new()
 		dbtn.text = "%s%d — %s" % ["[*] " if difficulty == key else "",
 			int(def["rung"]), def["name"]]
-		dbtn.tooltip_text = "%s\nEnemies at %d%% strength.\nBeating the end boss here opens talent tier %d." % [
-			def["blurb"], int(round(float(def["mult"]) * 100)),
-			Talents.tiers_open(int(def["rung"]))]
+		# BATCH GJ §3 — A RUNG THAT SOFTENS ITS ENEMIES SAYS THE END BOSS IS NOT
+		# ONE OF THEM: `Run.end_boss_mult` floors the rung at 1.0. PROPOSED WORDS.
+		var strength := "Enemies at %d%% strength." % int(round(float(def["mult"]) * 100))
+		if float(def["mult"]) < 1.0:
+			strength = "Enemies at %d%% strength, the end boss at full." \
+				% int(round(float(def["mult"]) * 100))
+		dbtn.tooltip_text = "%s\n%s\nBeating the end boss here opens talent tier %d." % [
+			def["blurb"], strength, Talents.tiers_open(int(def["rung"]))]
 		dbtn.custom_minimum_size = Vector2(140, 40)
 		dbtn.position = Vector2(dx, 640)
 		dbtn.add_theme_font_size_override("font_size", 13)

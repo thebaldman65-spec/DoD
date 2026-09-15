@@ -1678,6 +1678,14 @@ func _spawn_units() -> void:
 		zone_tier = clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE)
 		slot_mult = Run.zone_base_mult(Run.zone_idx + 1)
 		hp_mult = Run.zone_base_mult_hp(Run.zone_idx + 1)
+		# BATCH GJ §3 — THE END BOSS TAKES NO DISCOUNT FROM THE RUNG. Its two
+		# multipliers are one, `Run.end_boss_mult` — the ladder with the rung
+		# floored at 1.0 — so rung 1 meets it at rung 2's strength and rungs 2 and
+		# 3 spawn it exactly as before. Keyed on the NODE, not the creature: GI
+		# made the node's identity the authority for what a boss node fields.
+		if String(Run.encounter.get("type", "")) == "endboss":
+			slot_mult = Run.end_boss_mult(Run.zone_idx + 1)
+			hp_mult = Run.end_boss_mult(Run.zone_idx + 1)
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
@@ -26391,8 +26399,17 @@ func _summary_lines(snap: Dictionary) -> Array:
 			"boss": "The zone boss",
 			"endboss": "The END BOSS"}.get(snap["encounter_type"], "A fight")
 		lines.append(["s", "The final battle"])
-		lines.append(["p", "%s — %s: %s." % [kind_label, snap["encounter_theme"],
-			", ".join(snap["enemy_names"])]])
+		# BATCH GJ §4 — ONE NAME FOR ONE CREATURE. The line is `kind — theme:
+		# enemies`, and the end boss's theme IS its one enemy's name, so a run
+		# ended at it read "The END BOSS — The Hollow Crown: The Hollow Crown."
+		# A warband that is only the creature its theme names prints the name
+		# once; every other warband keeps the ordinary shape.
+		var fb_names: Array = snap["enemy_names"]
+		if fb_names.size() == 1 and String(fb_names[0]) == String(snap["encounter_theme"]):
+			lines.append(["p", "%s — %s." % [kind_label, String(fb_names[0])]])
+		else:
+			lines.append(["p", "%s — %s: %s." % [kind_label, snap["encounter_theme"],
+				", ".join(snap["enemy_names"])]])
 		if not (snap["fallen"] as Array).is_empty():
 			lines.append(["p", "Fallen: %s." % ", ".join(snap["fallen"])])
 	elif String(snap.get("closing_text", "")) != "":

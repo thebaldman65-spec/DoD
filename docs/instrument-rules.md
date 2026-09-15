@@ -1081,6 +1081,13 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     comparable with a post-BK one (`map=branch`, 48 slots, three real route policies rather
     than three samples of one), and **`DOD_SIM_DIFFICULTY` DEFAULTS TO RUNG 1 — an unset flag is
     NOT the old baseline.** Set `warden` explicitly for a baseline row.
+  · **A COMPLETION DATED BEFORE GJ COUNTS THE THIRD ZONE BOSS, NEVER THE END BOSS (GJ).** Until GJ
+    `run_sim.on_battle_end` ended every run at the third zone boss, so every completion the project
+    quoted before it — BN's sweep, EN's, EO's and EP's arms and every one since — stops at encounter
+    48 of 49. **The sim fights the end boss now and prints both off the same runs**: `completions=`
+    is the end boss killed and `z3boss=` beside it is the old count. **A pre-GJ figure compares with
+    `z3boss=` only**, and the gap between the two is the end boss's fight. `docs/state.md` carries
+    the three rungs' untalented figures both ways.
   · **A LANE ROW IS ONE FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.** Those rows are
     honest A/B comparisons of a spec's lanes against each other; they are NOT "how much of a
     real party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE** — unbuilt allies

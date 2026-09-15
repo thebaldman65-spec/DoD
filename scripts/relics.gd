@@ -123,14 +123,22 @@ const POOL := {
 
 static var unlocked: Array = []
 static var loaded := false
+# BATCH GJ — THE FILE AN UNLOCK IS WRITTEN TO IS A VAR NOW, `Profile.save_path`'s
+# shape, AND ONLY A GATE MOVES IT. `SAVE_PATH` stays the const and stays the
+# player's file. `check_gj` points this at a scratch file before its end boss
+# dies, because it asserts the relic that death unlocks and an unlock is a
+# WRITE — with any relic locked, a gate reaching `_resolve_boss` writes the file
+# (FY §5b). The four gates FY §5b counted still write the default: that item is
+# deferred by ruling (GA) and GJ does not touch it.
+static var save_path := SAVE_PATH
 
 
 static func load_data() -> void:
 	if loaded:
 		return
 	loaded = true
-	if FileAccess.file_exists(SAVE_PATH):
-		var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if FileAccess.file_exists(save_path):
+		var file := FileAccess.open(save_path, FileAccess.READ)
 		var data: Variant = JSON.parse_string(file.get_as_text())
 		if data is Array:
 			# Drop relics that no longer exist in the pool.
@@ -138,7 +146,7 @@ static func load_data() -> void:
 
 
 static func save_data() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(unlocked))
 
 

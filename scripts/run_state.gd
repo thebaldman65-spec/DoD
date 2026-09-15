@@ -1180,6 +1180,27 @@ func zone_base_mult_hp(slot: int) -> float:
 	return _zone_ladder(slot) * maxf(difficulty_mult(), 1.0)
 
 
+# BATCH GJ §3 — THE END BOSS IS NOT DISCOUNTED BY THE RUNG (ruled by the designer).
+#
+# Rung 1's x0.50 reached the final fight, and a party with every hero at 1
+# health beat the end boss on it (GI's drive): a last boss that cannot kill a
+# party on the floor teaches nothing, and rung 1 exists to teach. So the end
+# boss's two multipliers are one, and it is the health path's — the zone ladder
+# with the rung FLOORED AT 1.0. The Crown carries authored numbers
+# (`data/enemies.json`) and meets every rung with them unscaled by a discount,
+# which at rung 1 means rung 2's values.
+#
+# **A FLOOR, NOT A REMOVAL, AND THE BRIEF'S OWN CHECK IS WHY.** Taking the rung
+# term off outright would also take rung 3's x1.30 off the end boss — 23% less
+# health and attack on the rung built to be hardest — and the ruling came with
+# "rungs 2 and 3 must not move". `maxf` returns x1.00 and x1.30 untouched, so
+# above rung 1 this is bit-identical to what the spawn computed before and only
+# rung 1's end boss moves. The other reading is one line and is owed a ruling
+# (`docs/reports/GJ.md`, NEEDS A RULING).
+func end_boss_mult(slot: int) -> float:
+	return _zone_ladder(slot) * maxf(difficulty_mult(), 1.0)
+
+
 # The tier is the SLOT NUMBER (1-16). Batch T's ramp was fitted against slot
 # DEPTH and Batch AN kept it byte-for-byte on a 12-slot line; BATCH BK §5
 # RESCALES IT ACROSS 16 AND CHANGES NOTHING ELSE. Both ENDS are held exactly

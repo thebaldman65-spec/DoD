@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The final fight is measured, and no rung softens the last boss (Batch GJ) — 2026-09-15
+
+**Why the end boss takes no discount from the rung.** The first rung exists to teach, and it teaches by letting a
+mistake cost less, not by never asking the question (EO). The end boss is the last question a run asks, and the rung's
+discount reached it too: at half damage, heroes at 1 health beat it. A discount that reaches the final fight means the
+run ends on a question asked at half volume, so the end boss meets the first rung at the second rung's strength and the
+first rung keeps forgiving everywhere before it.
+
+**Why a floor, not the rung taken off.** The ruling came with its own test — the second and third rungs must not move —
+and taking the rung term off outright would have taken the third rung's x1.30 off its last boss: the hardest rung's
+final fight 23% weaker, which nothing asked for. The floor, EO's own shape for health, removes exactly the discount and
+nothing else. Which of the two the ruling meant is still the designer's to confirm; either is one line.
+
+**Why it did not answer what the floor test found.** Heroes at 1 health still beat it on the first rung — 7 of 7
+drives — because the fight is short: the Crown opens with a ward, is Broken within a couple of rounds, and a Broken
+boss can be frozen out of its turn. The multiplier doubles each blow it lands, and it lands one or two. So the lever
+for a last boss that can kill a party on the floor is the fight's shape — its opening, its health, what a Broken end
+boss is open to — and that is content rather than a scale. It is recorded, not tuned: the end boss is a placeholder by
+decision.
+
+**Why the simulator prints both completions.** A completion figure that quietly changed meaning is the exact fault DJ's
+rule is about: the old figures stop at the third zone boss and the new ones at the end boss, and one number cannot be
+both. Printing both off the same runs keeps every old figure readable and makes the gap between them — the end boss's
+fight — a measurement rather than an argument. It measured a gap of zero: no untalented run that reached the end boss lost to it, at any rung.
+
+**Why the check turns the enemy's attacks off.** What the check is for is the road and the end: that every board draws
+its buttons, that the end boss can be pressed, and what its death and its victory write. Whether the bot can win a run
+is a balance fact that moves with every number the designer touches, and a check that went red on it would go red on
+ordinary design work. The switch is the battle fixture's own, and the defeat the check reads is built down the path a
+quit after the last fall already takes.
+
+**Why MINI-BOSS.** One word was naming four things — the mini-boss's node, the Withered Warden, the Warden spec and the
+second rung — two of them on the same screen. MINI-BOSS says what the node is, in the voice END BOSS was confirmed in,
+and nothing else in the game is called it.
+
+
 ## The end boss has a button, and a zone boss is its zone's own (Batch GI) — 2026-09-14
 
 **Why the map widened rather than the end boss moving.** Three shapes were on the table: draw the final board's

@@ -1654,7 +1654,9 @@ open what follows them.
   see it, because `check_fh` §8 reaches the end boss by calling the node handler and the
   map-screen gates draw zone 1, or a zone-1 board relabelled as the third. **`Run.map.size()` is
   the width of the board in front of the player; `SLOTS_PER_ZONE` is what a zone GENERATES**, and
-  the tier ladder, the budget ramp and `BOSS_SLOT` rightly read the constant.
+  the tier ladder, the budget ramp and `BOSS_SLOT` rightly read the constant. **`check_gj` presses
+  the end boss's own button every battery since GJ**, at the end of a whole run walked through the
+  real screens, so a regression of the draw goes red where the defect did not.
 · **A ZONE BOSS NODE FIELDS THE BOSS ITS ZONE NAMES (GI).** `compose("boss")` fills the escort's
   `boss` role with `boss_kind()` — `ZONE_DEFS`' one boss for the zone — and not with the roster's
   `boss`-tagged kinds. The end boss's kind carries every roster, so filling the role off the
@@ -1664,6 +1666,18 @@ open what follows them.
   left the end boss turning up as an ordinary zone's boss. The roster tags are content and did not
   move, and the one caller that still fills the role off the roster is `compose_test`, the
   `DOD_SIM_THEME` hook, which ignores run state by design.
+· **NO RUNG DISCOUNTS THE END BOSS (GJ, ruled by the designer).** Its spawn reads one multiplier for
+  health and Attack alike, `Run.end_boss_mult` — the zone ladder with the rung FLOORED AT 1.0, the
+  health path's own shape — so rung 1 meets it at rung 2's health and Attack, and rungs 2 and 3
+  spawn it exactly as they did. Rung 1's x0.50 reached the final fight, and **a last boss that
+  cannot kill a party on the floor teaches nothing; rung 1 exists to teach.** It is keyed on the
+  NODE (`encounter.type == "endboss"`), GI's authority rule, never on the creature. **A FLOOR, NOT
+  A REMOVAL:** taking the rung term off outright would also take rung 3's x1.30 off the end boss,
+  and the ruling came with *"rungs 2 and 3 must not move"*; which of the two readings the ruling
+  meant is owed a confirmation (`docs/state.md`). **AND THE MULTIPLIER WAS NOT WHAT LET A PARTY ON
+  THE FLOOR WIN:** heroes at 1 health beat the Crown at rung 1 in 7 of 7 driven runs on GJ's code and 7 of 7 on HEAD's, because
+  it opens with Regalia, a ward, and is Broken and held before it has acted three times — its fight is decided by
+  its length, not by the multiplier it takes (`docs/reports/GJ.md` §3).
 
 ### THE STARTER RUNG IS A META-PROGRESSION GATE AND MAY NOT BE REMOVED AS A BALANCE CHANGE (STANDING, EN §3)
 > **Rung 1 is not the easy difficulty. It is the only door into the talent tree, and a fresh
@@ -2203,6 +2217,8 @@ health never poses the question.
   change to rung 1** — rung 2's ×1.00 and rung 3's ×1.30 come back untouched, proved bit-identical
   rather than argued. A future rung BELOW 1.0 gets the same treatment for free; a rung above it is
   unaffected by construction.
+· **THE END BOSS IS THE ONE ENCOUNTER THE DAMAGE DISCOUNT DOES NOT REACH (GJ, ruled).** Its spawn
+  takes the health path's floor for Attack too; the BM reference block records it and why.
 · **THE LADDER CARRIES EXACTLY FOUR FIELDS WITH A CONSEQUENCE**, and a fifth added without a
   reader is a field that lies: `rung` (the meta gate and the enemy-ability filter), `mult`,
   `severity_floor` (the bargain floor) and `fixed_modifier` (rung 3's unduckable nodes).

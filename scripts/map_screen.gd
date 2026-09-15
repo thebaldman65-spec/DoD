@@ -25,7 +25,11 @@ extends Node2D
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const NODE_LABELS := {
-	"fight": "Fight", "elite": "ELITE", "boss": "BOSS", "miniboss": "WARDEN",
+	"fight": "Fight", "elite": "ELITE", "boss": "BOSS", "miniboss": "MINI-BOSS",
+	# BATCH GJ §4 — IT READ "WARDEN", the word the Withered Warden, the Warden
+	# spec and the second difficulty rung also carry: four things, one word, and
+	# the Warden the zone's readout names stands two columns along. MINI-BOSS is
+	# the plain voice the END BOSS label below was confirmed in.
 	"blacksmith": "Smith", "merchant": "Trade", "event": "???",
 	# BATCH GI — PROPOSED, AND THE DESIGNER CONFIRMS IT: the name the glossary,
 	# the framing card and the run summary already give this node.
