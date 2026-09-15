@@ -4,9 +4,11 @@
 #       the same three terms, and the party is not one step further on
 #   §2  MID-FIGHT — quit inside a plain fight, through the battle's own Exit to
 #       Main Menu and again the way a closed window quits: Continue opens the
-#       same fight, from its opening, twice, and nothing is paid
+#       same fight, from its opening, twice, and nothing is paid — and (GH) the
+#       party comes back as the quit left it on disk, never as it stepped on
 #   §3  AFTER THE BARGAIN — quit inside the elite's fight: Continue opens the
-#       battle, not the offer, with the bargain that was taken armed
+#       battle, not the offer, with the bargain that was taken armed, and the
+#       party as the quit left it (GH)
 #   §4  THE INVERSE — each resumed fight is won and its card quit: Continue opens
 #       the map past it, the victory was paid once, and the post-fight offers
 #       (the draft, the rune cache) are still owed
@@ -52,6 +54,10 @@ var _g := Gate.new()
 var _run: Node = null
 var _player_save := PackedByteArray()
 var _had_player_save := false
+# BATCH GH — the party's health as `load_run` put it, read in the same call as the
+# press: the resumed fight writes the live member as it goes, so a read taken after
+# its first frames reads that fight, not the disk.
+var _loaded_hp: Array = []
 
 
 func ok(cond: bool, what: String) -> void:
@@ -331,6 +337,49 @@ func _walk_to(want: String) -> int:
 	return -1
 
 
+# BATCH GH — WHAT A QUIT LEFT, READ OFF THE DISK, AND WHAT THE LIVE FIGHT HOLDS.
+# A quit inside a fight carries the party's losses now (the warband resets and
+# the party does not), and what it carries is exactly what the save holds when
+# the process goes: the ☰ writes the party as it stands, and a closed window
+# leaves whatever the last loss wrote. So the arms read the DISK at the quit.
+func _disk_hp() -> Array:
+	var out: Array = []
+	for m in _disk().get("party", []):
+		out.append(int(m.get("hp", -1)))
+	return out
+
+
+func _live_hp(s: Node) -> Array:
+	var out: Array = []
+	if not _is_battle(s):
+		return out
+	for h in s.get("heroes"):
+		out.append(0 if bool(h.get("dead")) else int(h.get("hp")))
+	return out
+
+
+# BATCH GH — FIGHT UNTIL A HERO HAS LOST HEALTH. GF's two turns could end with
+# nobody hurt, and a quit with nothing lost comes back the same under the restart
+# GF built and under the carry GH builds — the arms below would pass on either
+# rule. `opened` is the health this fight opened with. The loss is read LIVE, so
+# the loop stops at the same moment on a build that never writes it: whether it
+# reached the save is the first arm's question, not this loop's.
+func _fight_until_hurt(s: Node, opened: Array) -> void:
+	if not _is_battle(s):
+		return
+	var guard := 0
+	while not bool(s.get("battle_over")) and guard < FRAME_CAP:
+		Engine.time_scale = 100.0
+		await process_frame
+		guard += 1
+		if int(s.get("_turns_taken")) < 2:
+			continue
+		var live := _live_hp(s)
+		for i in mini(live.size(), opened.size()):
+			if int(live[i]) < int(opened[i]):
+				return
+
+
 # ── A QUIT, AND THE RESUME ───────────────────────────────────────────────────
 
 # THE ☰ IS PRESSED ONLY ON THE BATTLE. The map carries a ☰ too, and its item 2
@@ -348,6 +397,10 @@ func _quit(via_menu: bool) -> void:
 
 
 func _clobber() -> void:
+	# BATCH GH — the party's health too, so the health that comes back can only
+	# have come off the disk: the fight writes the live member as it goes.
+	for m in _run.party:
+		m["hp"] = -7
 	_run.encounter = {"type": "fight", "enemies": ["gf_clobbered"], "theme": "clobbered"}
 	_run.pending_modifier = "gf_clobbered"
 	_run.pending_reward = {"kind": "gf_clobbered"}
@@ -371,6 +424,7 @@ func _continue() -> String:
 		return "no Continue button"
 	_clobber()
 	cont.emit_signal("pressed")
+	_loaded_hp = _hp()
 	for _i in 60:
 		await _frames(1)
 		if _scene_name() != "MainMenu":
@@ -473,16 +527,23 @@ func _s1_to_s4_the_elite() -> void:
 		"§3: the save does not record the bargain taken (%s)" % str(enc3.get("bargain", "<absent>")))
 	ok(String(d3.get("pending_modifier", "")) == took,
 		"§3: the save does not carry the armed modifier (%s)" % str(d3.get("pending_modifier", "<absent>")))
-	await _fight_a_little(current_scene)
+	await _fight_until_hurt(current_scene, hp_at_step)
 	ok(_is_battle(current_scene) and not bool(current_scene.get("battle_over")), "§3: the fight ended before the quit could be made inside it")
 	await _quit(true)
+	var left3 := _disk_hp()
 	landed = await _continue()
 	ok(landed == "Battle", "§3: Continue opened %s, not the elite's fight" % landed)
 	ok(landed != "Offer", "§3: Continue opened the OFFER again — the terms of one fight could be chosen twice")
 	ok(String(_run.pending_modifier) == took, "§3: the resumed fight is not under the bargain taken ('%s', took '%s')" % [String(_run.pending_modifier), took])
 	ok(Dictionary(_run.pending_reward) == took_reward, "§3: the resumed fight does not owe the bargain's reward")
 	ok(_kinds(current_scene) == warband, "§3: the resumed fight is not the elite's warband (%s)" % str(_kinds(current_scene)))
-	ok(_hp() == hp_at_step, "§3: the fight did not restart from the party's health at the step")
+	# BATCH GH — THE PARTY COMES BACK AS THE QUIT LEFT IT, NOT AS IT STEPPED ON. It
+	# asked for the health at the step until GH, which is the free retry the ruling
+	# closes. THE PAIR: the health the quit left, and never the step's; and the
+	# precondition that a loss reached the save, or both read the same.
+	ok(left3 != hp_at_step, "§3: no loss had reached the save when the quit was made — the carry cannot be read (%s)" % str(left3))
+	ok(_loaded_hp == left3, "§3: the resumed party's health is %s, not the %s the quit left on disk" % [str(_loaded_hp), str(left3)])
+	ok(_loaded_hp != hp_at_step, "§3: the quit handed back the health the fight took (%s) — the free retry the ruling closes" % str(hp_at_step))
 
 	# ── §4 — win it, quit on its card ──
 	print("\n§4 — win the resumed elite, quit on its card")
@@ -529,17 +590,26 @@ func _s2_to_s4_the_plain_fight() -> void:
 	await _frames(6)
 	ok(_scene_name() == "Battle", "§2: stepping onto the fight opened %s" % _scene_name())
 	var warband: Array = _sorted(Array(_run.encounter.get("enemies", [])))
+	var hp_opened := hp_at_step
 	for attempt in ["the battle's own Exit to Main Menu", "a closed window"]:
-		await _fight_a_little(current_scene)
+		await _fight_until_hurt(current_scene, hp_opened)
 		ok(_is_battle(current_scene) and not bool(current_scene.get("battle_over")), "§2: the fight ended before a quit could be made inside it (%s)" % attempt)
 		await _quit(attempt.begins_with("the battle"))
+		var left := _disk_hp()
 		var landed := await _continue()
 		ok(landed == "Battle", "§2: after quitting through %s, Continue opened %s, not the fight" % [attempt, landed])
 		ok(landed != "Map", "§2: after quitting through %s, Continue opened the MAP — the fight was walked past" % attempt)
 		ok(_kinds(current_scene) == warband, "§2: the resumed fight is not the warband stepped onto (%s)" % attempt)
-		ok(_hp() == hp_at_step, "§2: the fight did not restart from the party's health at the step (%s)" % attempt)
+		# BATCH GH — AS THE QUIT LEFT IT, the second time as much as the first: the
+		# second quit's arm is also the inverse, because a loss deducted twice would
+		# come back lower than the disk holds. The precondition asks for a NEW loss
+		# since this fight opened, so the second attempt carries something of its own.
+		ok(left != hp_opened, "§2: no loss had reached the save when the quit was made — the carry cannot be read (%s)" % attempt)
+		ok(_loaded_hp == left, "§2: the resumed party's health is %s, not the %s the quit left on disk (%s)" % [str(_loaded_hp), str(left), attempt])
+		ok(_loaded_hp != hp_at_step, "§2: the quit handed back the health the fight took — the free retry the ruling closes (%s)" % attempt)
 		ok(int(_run.gold) == gold_at_step, "§2: a fight not yet won paid gold (%s)" % attempt)
 		ok([int(_run.slot_idx), int(_run.node_idx)] == at, "§2: the party moved (%s)" % attempt)
+		hp_opened = _loaded_hp
 
 	print("\n§4 — win the resumed fight, quit on its card")
 	await _fight_to_end(current_scene)

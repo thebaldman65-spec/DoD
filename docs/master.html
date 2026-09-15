@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-14 (Batch GG &mdash; a mid-fight save is costed, and two glossary entries retire)</b></p>
+<p align="right"><b>Last updated: 2026-09-14 (Batch GH &mdash; a quit fight restarts, but the heroes' losses do not)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -113,14 +113,19 @@ that is spent too, from his class-wide draft pool, so the award can never pay no
 (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
-<li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
+<li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft. Quitting after the last
+hero falls does not undo it: Continue opens straight onto the defeat.</li>
 <li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v13</b>) the moment the heroes
-step onto a node, again when what stands there is resolved, AND after spec confirmation
-(including debug rerolls). <b>Continue puts the heroes back where they were standing:</b> a
-bargain they walked away from is offered again &mdash; the same three &mdash; a fight they quit
-is fought again from its opening, against the same warband, on the same terms and with the
-heroes' health as it was when they stepped onto it, and an event they had drawn is waiting for
-them. A zone boss beaten on its card descends to the next zone, and a merchant a bargain bought
+step onto a node, again when what stands there is resolved, again inside a fight each time the
+heroes lose health, spend Mana or use an item, AND after spec confirmation (including debug
+rerolls). <b>Continue puts the heroes back where they were standing:</b> a bargain they walked
+away from is offered again &mdash; the same three &mdash; a fight they quit is fought again from
+its opening, against the same warband at full strength and on the same terms, and an event they
+had drawn is waiting for them. <b>What the heroes lost before the quit stays lost:</b> each hero's
+health and Mana as they stood, every item used, a hero who fell still fallen, and a companion still
+standing back at its health &mdash; one that fell is not brought back. Everything a fight builds
+opens as it does at the start of any fight: every meter, status and cooldown, and Rage. A zone
+boss beaten on its card descends to the next zone, and a merchant a bargain bought
 is visited. The fight itself is never saved, so nothing it pays is paid until it is won. A
 Peddler or a forge left in the middle of a visit is gone. Loading swaps each member's saved tree
 snapshot for the live definition, so balance edits reach a run in flight, and drops any node
@@ -2908,7 +2913,7 @@ onward on Shift + the same key, see §6a).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), <b>Forfeit Run</b> (ends the
 run where it stands, behind a confirmation with a reason picker — see §2 and §11a),
 Glossary, Settings (overlay with volume + fullscreen — the battle isn't lost), Exit to Main
-Menu (Continue returns to this fight, from its opening).</li>
+Menu (Continue returns to this fight, from its opening, with the heroes as they stood).</li>
 <li><b>Stalemate hint:</b> if a single battle runs to an absurd length, a one-line
 non-blocking note appears saying the fight is not resolving and that Forfeit Run is in the
 menu. It appears once and changes nothing about the battle — no HP, no outcome.</li>

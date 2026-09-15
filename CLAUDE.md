@@ -693,8 +693,9 @@ whole stack — six Health Potions are one slot, not six. **4 → 5 → 6 by zon
   `slots_used()` is `items.size()` and never a count of positive stacks — if an emptied stack freed
   its slot the cap would stop binding exactly when it should be biting. **Every writer of
   `Run.items` must respect this**; `events.gd`'s negative-count take is the one direct write an event makes,
-  and it is deliberate for exactly this reason; the map's item use and the two end-of-battle syncs
-  write counts directly too, and every one of them leaves the key standing at zero.
+  and it is deliberate for exactly this reason; the map's item use, the two end-of-battle syncs and
+  a fight's loss bank (`battle._bank_party_losses`, GH) write counts directly too, and every one of
+  them leaves the key standing at zero.
 - **TWO WALLS, AND THEY MUST NEVER BE CONFLATED: NO ROOM IS A CHOICE, A FULL STACK IS A WALL.**
   A grant with no slot becomes a **swap offer** queued on `Run.pending_item_offers` and resolved by
   the map's owed-pick overlay (take it and give up a named stack, or **decline** — declining is
@@ -1401,8 +1402,9 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v13, auto-saved at every step onto a node and at every
-  resolution; `resume_scene` places a resumed run — GF), relic slots
+  save (user://run_save.bin v13, auto-saved at every step onto a node, at every
+  resolution, and inside a fight as each party loss lands — GH; `resume_scene` places
+  a resumed run — GF), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
   and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
@@ -1456,7 +1458,9 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
   **v11 (CT), v12 (EG) AND v13 (GF) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
-  with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.**
+  with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **GH MOVED NO
+  VERSION**: a fight's losses are written to `hp`, `mana` and `items`, which v13 already carries, and
+  to one member key, `companions_standing`, riding the party dict the way `bm_equipped` does.
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
   `Run.award_spec_point`, `member["talent_points"]`, `member["talent_flex"]`,
   `Talents.can_learn`, `Talents.purse_for`, `Talents.points_spent`, `MAX_PER_ROW`, the events
@@ -2658,10 +2662,10 @@ real screens on both branches and both read the same (`docs/reports/GF.md` §1).
   marks the encounter `resolved` and `resume_scene` never re-enters a resolved one, so a won fight
   can be neither fought nor paid twice. **A new victory path that saves before `claim_reward`
   re-opens that inverse**; a wipe and a forfeit clear the save outright.
-- **A QUIT INSIDE A FIGHT RESTARTS IT.** The battle's own state is never saved, so a resumed fight
-  opens from its beginning — the same warband, the party as it stood when it stepped on, the same
-  bargain — and nothing it pays is paid until it is won. Whether a quit should ever cost more than
-  a restart is the designer's. **A RESUME WAS COSTED AT GG, AND IT IS A PROJECT, NOT A BATCH.** A battle can
+- **A QUIT INSIDE A FIGHT RESTARTS IT, AGAINST A RESET WARBAND; THE PARTY'S LOSSES DO NOT RESET (GH, the
+  block below).** The battle's own state is never saved, so a resumed fight opens from its beginning —
+  the same warband at full strength, the same bargain — and nothing it pays is paid until it is won.
+  **A RESUME WAS COSTED AT GG, AND IT IS A PROJECT, NOT A BATCH.** A battle can
   be picked up only at the top of `_run_battle`'s turn loop, because everywhere else a suspended function
   holds the fight. It must be re-entered past an opening that may not run twice, the global dice cannot be
   read back, and an open bar lives inside a suspended cast. **Do not snapshot a fight anywhere but a turn
@@ -2679,6 +2683,44 @@ real screens on both branches and both read the same (`docs/reports/GF.md` §1).
   pending fight, which nothing in the file can recover — except on a non-final zone's boss, where it
   descends rather than strands: re-fighting a boss that did fall would bank its points and its relic
   twice. An older build reading v13 ignores the four keys and loses only the record.
+
+## STANDING RULE — A QUIT FIGHT RESTARTS, BUT THE PARTY'S LOSSES DO NOT (Batch GH, ruled by the designer)
+
+> **The warband resets and the party does not.** A fight quit before it is won restarts from its opening,
+> against the warband at full strength, and the party comes back as it stood at the quit: its health, its
+> Mana, the pouch, a hero who fell still down, and a companion still standing at its health. **A quit on a
+> losing fight spends everything it spent for nothing.**
+
+- **THE LOSSES REACH THE SAVE AS THEY LAND, NOT AT A TURN'S END.** Nothing hooks a closed window, so what
+  the save holds when the process goes is what comes back; saved only between turns, a quit inside an
+  enemy's swing would take back the swing and the death it dealt. `battle._bank_party_losses` is called
+  from every door that books a loss — BL's one damage door (below every refusal, so a hero at zero there
+  has fallen), `_book_self_cost`, the spend line every cast pays at, the pouch, and a companion called
+  in — and from the top of the turn loop and the battle's *Exit to Main Menu*, which take whatever else
+  moved. **A NEW SOURCE OF A PARTY LOSS OWES ONE OF THOSE DOORS**, or a quit refunds it.
+- **WHAT CARRIES IS WHAT OUTLIVES A FIGHT TODAY, AND THAT IS THE RULE FOR EVERY FIELD THE RULING DOES NOT
+  NAME.** Health and Mana are the member fields a won fight writes, and the pouch is `Run.items`; nothing
+  else a unit or a battle holds outlives a fight, so every meter, status, cooldown, one-a-fight flag and
+  ledger, the turn order and the dice open as at any fight's start. **DO NOT CARRY ONE OF THEM TO MAKE A
+  QUIT COSTLIER**: each is something the fight built, and carrying it hands the quitter what the
+  abandoned fight earned. The ruling's two additions are a hero who fell and a companion standing.
+- **RAGE IS NOT CARRIED, THOUGH THE BRIEF LISTED IT.** Every fight opens Rage at nothing, plus its floors,
+  so carrying it is that same reward. It is owed a ruling (`docs/state.md`); carrying it is one member key
+  and one spawn line.
+- **A HERO WHO FELL IS A MEMBER AT 0 HEALTH**, the reading events' `revive_pct` already makes. The spawn
+  keeps its floor of 1 for the opening and lays the fallen down once the field is built
+  (`_lay_down_the_fallen`), so no stamp reads a hero dead that the opening read alive, and nothing of a
+  death fires again. **A companion at zero is falling, not standing** — the damage door reports above
+  `_die()` — and one standing returns through `_do_summon`'s `returning` path, the one door a body
+  reaches the field, without the call: no announcement, no arrival gain, no arrival effect.
+- **THE LAST FALL IS ON THE SAVE AS IT LANDS, SO A QUIT BEFORE THE DEFEAT SCREEN DOES NOT RESCUE THE
+  FIGHT.** The resumed battle opens with no hero standing, and `_run_battle`'s first lines decide that
+  defeat down the wipe's own path.
+- **ABSOLUTE VALUES, NEVER DELTAS, AND NOTHING ONCE THE FIGHT IS DECIDED.** A second quit deducts nothing
+  twice; a victory's save, written after its heal, is never overwritten; a wipe's cleared file is never
+  re-created. The FK banks a spawn consumed go back onto the saved copy only, because the restart
+  replays the fight they opened.
+- **IT MOVED NO SAVE VERSION** (VERSIONS, under TALENTS ARE META PROGRESSION).
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 

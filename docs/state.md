@@ -13,34 +13,32 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-14 (Batch GG).*
+*Last rewritten: 2026-09-14 (Batch GH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GG — A MID-FIGHT SAVE IS A PROJECT, AND TWO GLOSSARY ENTRIES RETIRE. THE THIRTEENTH BATCH ON
-  `class-merge`, AND NOT MERGE WORK.** `main` took one documentation commit (§4) and nothing else. Full working:
-  **`docs/reports/GG.md`**.
-- **§1–§2: A QUIT FIGHT THAT RESUMES WHERE IT WAS IS COSTED, AND IT IS A PROJECT, SO NOTHING OF IT IS BUILT — AS THE
-  BRIEF INSTRUCTED.** The only resumable point is the top of `_run_battle`'s turn loop; a fight writes 130 fields on
-  each unit and about forty on the battle; the global dice cannot be read back; an open bar lives inside a suspended
-  cast. **Four answers are priced for the designer** (`docs/reports/GG.md` §2d, and the item below). The run save stays
-  **v13**. **A quit inside a fight still restarts it.**
-- **§3: DECAY AND ELEMENTAL WEAKNESS ARE RETIRED FROM THE GLOSSARY, KEPT AND SAID TO BE KEPT.** Nothing applies either:
-  each one's applier reads a talent field nothing has written since FX. Each entry carries a `retired` string, the
-  panel neither lists nor links a retired entry, and `data/glossary.json` still holds 98. `docs/master.html`'s Decay
-  row and Penance's *Builds with* line are corrected.
-- **§4: `main`'s `docs/state.md` NAMES BOTH OF `main`'s DEFECTS** — the quit, fixed here at GF, and the end boss's
-  missing button — in one documentation commit.
-- **WHAT MOVED:** `data/glossary.json`, `scripts/glossary.gd`, `scripts/glossary_panel.gd`, `CLAUDE.md`,
-  `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and `docs/reports/GG.md`
-  (**NEW**); on `main`, `docs/state.md` alone.
-- **VERIFICATION:** in **`docs/reports/GG.md`**, written before the acceptance run; its figures were added after it.
+- **Last batch: GH — A QUIT FIGHT RESTARTS, BUT THE PARTY'S LOSSES DO NOT. THE FOURTEENTH BATCH ON `class-merge`, AND
+  NOT MERGE WORK.** `main` is untouched. Full working: **`docs/reports/GH.md`**.
+- **§1: GG's OPTION C, RULED BY THE DESIGNER AND BUILT.** A fight quit before it is won still restarts from its opening
+  against the warband at full strength, and the party comes back as it stood at the quit: health, Mana, every item used,
+  a hero who fell still down, a companion standing back at its health. Every meter, status and cooldown opens as at any
+  fight's start. The losses reach the save as each one lands (`battle._bank_party_losses`), so a quit inside an enemy's
+  swing keeps the swing. **Rage resets, where the brief listed it as carrying** — owed a ruling (the queue).
+- **§2: A QUIT AFTER THE LAST HERO FALLS NO LONGER RESCUES THE FIGHT.** The last fall reaches the save as it lands; the
+  resumed battle opens with no hero standing and decides the defeat at once, down the wipe's own path.
+- **§3: NO SAVE VERSION MOVED.** The run save is **v13**.
+- **§4: THE INVERSE AND THE ESCAPE, DRIVEN.** A second quit deducts nothing twice and re-spends nothing. **What a quit
+  still buys** is in the queue.
+- **WHAT MOVED:** `scripts/battle.gd`, `scripts/run_state.gd` (comments), `check_gf.gd` and `check_dr.gd` (re-pointed),
+  `baselines.json`, `CLAUDE.md`, `docs/master.html` and its stamp, this file, the changelog, `docs/design-notes.md` and
+  `docs/reports/GH.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GH.md`**, written before the acceptance run; its figures were added after it.
 - **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
   to runes, is RULED, NOT BUILT, and is the next merge step.** The end boss's missing button is the next batch, and it
   is not merge work either.
-- **Next letter: GH.**
+- **Next letter: GI.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
@@ -59,28 +57,21 @@ last exactly one.*
   size, and the node needs a label and a tooltip — `NODE_LABELS` has no `endboss` row and `_node_tooltip` no branch,
   so the default would print *"Encounter 17 of 16"*. Those are player-facing words.
 
-### A QUIT INSIDE A FIGHT RESTARTS IT — **COSTED AT GG: A PROJECT; FOUR ANSWERS PRICED, OWED A RULING (PLAYER-FACING)**
+### A QUIT FIGHT RESTARTS AGAINST A RESET WARBAND, AND THE PARTY'S LOSSES CARRY — **GG's OPTION C, RULED AND BUILT AT GH; TWO QUESTIONS OWED (PLAYER-FACING)**
 
-- **Today a quit on a losing fight is a free retry of the whole fight.** The battle is never saved, so a resumed fight
-  opens from its beginning:
-  - the warband comes back fresh and the heroes at the health they stepped on with;
-  - every item the abandoned fight used is back in the pouch (the battle writes the pouch back only in `_check_end`);
-  - the opening turn order and every roll are new.
-- **AND THE WINDOW RUNS PAST THE LOSS.** `_resolve` always waits on its animations after the blow it deals, and the wipe
-  clears the save only in `_check_end`, once the acting unit's turn is over. So a quit after the last hero falls, and
-  before the defeat screen, restarts a fight that was already lost. Read in the code, not driven.
-- **A RESUME WHERE IT WAS LEFT IS A PROJECT, NOT A BATCH** (`docs/reports/GG.md` §1). A battle can be picked up only at
-  the top of `_run_battle`'s turn loop, it must be re-entered past an opening that may not run twice, a fight writes
-  130 fields on each unit, the dice cannot be read back, and an open bar lives inside a suspended cast. **Four answers
-  (GG §2d):**
-  - **A.** The full capture, with nothing left to retry: three batches or more.
-  - **B.** A turn-boundary resume that leaves one action to re-roll: two batches or more.
-  - **C.** **THE RECOMMENDED MIDDLE** — the heroes' health, Mana and pouch ride the save at every turn boundary, so a
-    quit can only cost: one batch, no save version. It owes three answers: a fallen hero (the spawn clamps to 1 HP),
-    the meters the save does not carry, and companions.
-  - **D.** Leave the restart.
+- **RAGE RESETS; THE BRIEF LISTED IT AS CARRYING. OWED A RULING.** Every fight opens Rage at nothing, plus First Blood's
+  and Bottled Storm's floors, and Rage does not outlive a fight today. Carrying it through a quit would hand a quitter
+  the Rage the abandoned fight built — the reward the ruling resets the meters to prevent — so it was built as
+  resetting. Carrying it is one member key and one spawn line (`docs/reports/GH.md` §1).
+- **WHAT A QUIT STILL BUYS, DRIVEN AT GH (`docs/reports/GH.md` §4). WHETHER THE QUIT SHOULD COST MORE IS THE
+  DESIGNER'S.**
+  - **A quit before anything is lost costs nothing and rolls the opening again**: the turn order and every enemy's
+    declared first action. Driven on both builds: nobody had acted, and the resumed opening differed in both.
+  - **Cooldowns, once-a-fight refusals and every status on the party clear with the warband's**, and every meter —
+    Rage, Focus, Faith and the rest — opens at nothing.
+  - **Everything else is as it stood**: health, Mana, the pouch, a fallen hero, a standing companion's health.
 
-  **A closes the post-loss window by itself; B and C need the wipe's clear moved to the moment the last hero falls.**
+  Closing the first two needs the fight itself captured — GG's A or B, a project (`docs/reports/GG.md` §2d).
 
 ### FOUND AT GF AND NOT FIXED
 
@@ -128,6 +119,24 @@ last exactly one.*
   not player-facing.
 - **Frostbind's `partner` is stored as a `unit_name`**, so two units of one name would make `_frostbind_partner`
   ambiguous. Nothing has shown it happening; it matters to any capture that re-points units by name.
+
+### FOUND AT GH AND NOT FIXED
+
+- **An item is spent the moment it is pressed.** The save takes the count before a target is picked, so a quit inside
+  the target picker loses the item; cancelling the picker hands it back through `_refund_item`, which writes the save
+  again. A quit can only cost, and that is the direction this errs in.
+- **A loss reaches the save at once and a gain at the next door.** A heal, or a drip of Mana, that lands after the last
+  loss of a turn is lost to a closed-window quit taken before the next turn boundary; the battle's own *Exit to Main
+  Menu* writes everything. By design, for the same reason.
+- **Two health losses at a turn's start pass no door**: Fortified Spirit's loan running out, and a companion's Bestial
+  Wrath or Vigor fading. The next door writes them, and a restart's spawn clamps to a maximum without the loan anyway,
+  so neither can be refunded by a quit. A new effect that takes health at a turn start WITHOUT that clamp would owe
+  `_bank_party_losses` a call.
+- **A hero who fell plays the death animation as the restarted fight opens.** `_die()` is the one way down and it plays
+  it; nothing else of a death fires.
+- **`check_gf`'s health arms read the party at the instant `load_run` returns.** The resumed fight writes the live
+  member as it goes, so a read taken after its first frames reads that fight rather than the disk — found while
+  re-pointing, and stated at the arm.
 
 ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING**
 
@@ -2407,10 +2416,10 @@ re-derived from the source at DM; not one was moved.**
   INHERITS both half-widths through it**, so a change to the base sweep reaches him as tolerance
   and not as pace: his Perfect window is **76.5 ms**, still ×0.85 of the default's.
   **`check_cn.gd`'s `WANT_PROFILE` pins all six by number — moving one here is two edits.**
-- **Save versions: the run save is v12** (a pre-**v10** save is REFUSED and cleared — the version
-  and the threshold are different numbers and this file conflated them until EG, recording v10 while
-  CT had taken it to v11). **v11 (CT) and v12 (EG) are both TOLERANT and neither moved the
-  threshold.** Talent cells cost 1/2/3 by tier — **27 cells = 54 points a class.**
+- **Save versions: the run save is v13** (a pre-**v10** save is REFUSED and cleared — the version
+  and the threshold are different numbers). **v11 (CT), v12 (EG) and v13 (GF) are all TOLERANT and
+  none moved the threshold; GH moved no version.** Talent cells cost 1/2/3 by tier — **27 cells = 54
+  points a class.**
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide —
   **confirmed at EN as the code's behaviour, not just this file's memory of it.** The per-hero
   ruling stands and is unbuilt. **`CLAUDE.md` now carries the division of labour:** every relic

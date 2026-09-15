@@ -130,9 +130,13 @@ func _s1_summoning() -> void:
 	# AND THE SECOND DOOR: `_do_summon` is the only thing that puts a body on
 	# the field, so a card reaching it from another pool would be a summon
 	# without the `special`. Its callers are asserted by count-and-name.
+	# BATCH GH MOVED THE COUNT 3 -> 4, AND THE FOURTH IS NOT A NEW WAY IN:
+	# `_return_standing_beasts` fields again, at a restarted fight, a beast that
+	# stood when the fight was quit — a body only a summon put on the field — so
+	# the axis is still the Beastmaster's alone.
 	var code := _battle_code()
-	ok(code.count("_do_summon(") == 3,
-		"`_do_summon` has %d mentions in code, not 3 (its def, the `summon` special, Call the Wilds)" % \
+	ok(code.count("_do_summon(") == 4,
+		"`_do_summon` has %d mentions in code, not 4 (its def, the `summon` special, Call the Wilds, and a standing beast's return)" % \
 			code.count("_do_summon("))
 	ok(code.contains("\"call_wilds\":"),
 		"Call the Wilds is the one draft card that summons and it is the Beastmaster's")

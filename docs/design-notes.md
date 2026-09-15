@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A quit fight restarts, but the heroes' losses do not (Batch GH) — 2026-09-14
+
+**Why the losses are saved as they land.** Nothing in the game hooks a closed window, so what comes back after a quit
+is whatever the save held when the game went away. GG's recommendation wrote the heroes' state between turns, where
+nothing is paused. That would have left a turn's worth of losses refundable — an enemy's killing blow taken back by
+quitting before its animation finished — which is the exact thing the ruling closes. Writing a handful of fields is
+safe at any moment; only capturing the fight is not. So every place the game already books a loss writes the save
+too: the one damage door every hit and tick passes, the direct costs, the line every cast pays at, the pouch and a
+companion called in. Between turns the save takes whatever else moved.
+
+**Why a gain waits for the next door.** A heal that lands, followed by a quit before anything else happens, loses the
+heal. Writing every gain as well would be possible, but the ruling asks that a quit can only cost, and this way it can.
+
+**Why Rage resets although the ruling listed it.** The ruling's own test for everything it did not name was whether a
+thing outlives a fight today, and its reason for resetting the meters was that carrying them rewards the quit. Mana
+outlives a fight and is spent down; Rage does not outlive a fight and is built up. Carried, a Warrior who quit at 90
+Rage would open the restart at 90, where every other fight opens him at nothing. That is the reward the reason forbids,
+so it was built by the reason and asked about.
+
+**Why the fallen are laid down after the opening.** The restart replays the fight's opening, and the opening reads the
+heroes as they were when it first ran — auras, hooks and the bargain's terms all stamp before anyone falls. Laying the
+fallen down last means no stamp sees a hero dead that it saw alive the first time, and nothing of a death fires twice:
+the death happened in the fight the heroes walked away from.
+
+**Why a standing companion returns without its arrival.** It is the same body the summon built, so it comes through the
+same door. But its arrival — a taunt, a Bleed across the warband, a dive — happened in the abandoned fight, and played
+again against a fresh warband it would be a gift for quitting.
+
+**Why a quit after the last fall is decided when the fight opens, not by clearing the save at the fall.** Clearing the
+file at the last death would also end the run, but it would skip the defeat screen and the profile's count of wipes.
+Writing the fall and letting the resumed battle decide it sends the run down the one path a wipe already takes.
+
+**Why no version.** Everything written is a field the save already carries, plus one key on a hero's record, which is
+how several per-hero records already travel. An older build reading it restarts a fallen hero at 1 health, which is the
+softer restart it gives today.
+
 ## A mid-fight save is a project, and two glossary entries retire (Batch GG) — 2026-09-14
 
 **Why the resume stopped at a report.** The brief said to cost it before building it and stop if it was large.

@@ -1446,6 +1446,12 @@ func _spawn_units() -> void:
 			u.add_status("crushing_blows", "Crushing Blows", "+0%",
 				Color(0.86, 0.44, 0.30), -1, "")
 		if Run.active and i < Run.party.size():
+			# BATCH GH — A HERO WHO FELL IN THIS FIGHT AND WAS QUIT AWAY FROM COMES
+			# BACK DOWN. The floor of 1 stays for the spawn itself, so every stamp
+			# below reads him exactly as the fight's opening did; he falls once the
+			# field is built (`_lay_down_the_fallen`), and no death of his fires.
+			if int(Run.party[i]["hp"]) <= 0:
+				_fallen_at_spawn.append(u)
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
 				u.resource = clampi(Run.party[i].get("mana", u.resource), 0, u.max_resource)
@@ -1459,15 +1465,22 @@ func _spawn_units() -> void:
 			# THE NAME IS TESTED, NEVER THE FIELD — `second_resource` is Mercy,
 			# Resonance and Focus, and two separate keys is what keeps the three
 			# meters from reading each other's bank.
+			#
+			# BATCH GH — AND THE SAVE THIS FIGHT WRITES WHILE IT RUNS PUTS THE BANK
+			# BACK ON THE COPY IT WRITES (`_bank_party_losses`), because a quit
+			# restarts THIS fight and this was its opening. In memory the member
+			# keeps the consumed shape, so a won fight still banks afresh.
 			if u.second_resource_name == "Resonance" \
 					and Run.party[i].has("fk_resonance_carry"):
 				u.second_resource = mini(u.second_resource
 					+ int(Run.party[i]["fk_resonance_carry"]), u.second_max)
+				_spawn_banks[i] = {"fk_resonance_carry": Run.party[i]["fk_resonance_carry"]}
 				Run.party[i].erase("fk_resonance_carry")
 			if u.second_resource_name == "Mercy" \
 					and Run.party[i].has("fk_mercy_carry"):
 				u.second_resource = mini(u.second_resource
 					+ int(Run.party[i]["fk_mercy_carry"]), u.second_max)
+				_spawn_banks[i] = {"fk_mercy_carry": Run.party[i]["fk_mercy_carry"]}
 				Run.party[i].erase("fk_mercy_carry")
 			u.refresh_bars()
 		# Bottled Storm: battles open with a floor under the resource tank
@@ -1712,6 +1725,11 @@ func _spawn_units() -> void:
 	for u in heroes:
 		if u.hero_key == "hunter":
 			u.next_time = -0.01
+	# BATCH GH — THE PARTY'S LOSSES, LAID ON THE OPENING. Everything above is the
+	# fight's opening as it always ran, the warband's reset included; what the
+	# party lost before the quit goes on it here, last, so no stamp above reads it.
+	_return_standing_beasts()
+	_lay_down_the_fallen()
 
 
 # ══ BATCH FK — THE THREE STAMPED RUNES, WRITTEN ONTO THE ENEMY SIDE ════════
@@ -2240,6 +2258,9 @@ func _on_burger(id: int) -> void:
 		2:  # The run resumes where `Run.resume_scene` places it: THIS fight,
 			# from its opening (BATCH GF). It used to say "the last saved map
 			# node" — which was this node, already counted as walked.
+			# BATCH GH — against a reset warband, with the party as it stands
+			# here: what it lost is written before the scene goes.
+			_bank_party_losses()
 			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 		3:
 			_open_glossary()
@@ -2553,6 +2574,15 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 # ---------- battle loop ----------
 
 func _run_battle() -> void:
+	# BATCH GH — A FIGHT RESUMED WITH EVERY HERO DOWN WAS LOST BEFORE THE QUIT.
+	# The last death reaches the save the moment it lands (`_bank_party_losses`,
+	# from BL's one damage door), so a quit between that blow and `_check_end`
+	# comes back here with no hero standing. The defeat is decided now, down the
+	# one path a wipe takes: the quit does not rescue a lost fight, and a board
+	# with nobody on it to act would be a softlock rather than a fight.
+	if not heroes.is_empty() and heroes.all(func(h): return h.dead):
+		_check_end()
+		return
 	_stat("enemy_count", enemies.size())
 	await _wait(0.6)
 	_message("The Decay stirs...")
@@ -2595,6 +2625,10 @@ func _run_battle() -> void:
 	# no battle-start hook at all. Do not re-add one.
 	await _wait(0.8)
 	while not battle_over:
+		# BATCH GH — EVERY TURN BOUNDARY WRITES THE PARTY AS IT STANDS. A loss is
+		# written where it lands; this takes whatever else moved — a heal, a drip
+		# of Mana — so a quit between turns comes back exactly as it left.
+		_bank_party_losses()
 		# STALEMATE GUARD (Batch W, SIMS ONLY — real play is untouched).
 		# Some kits carry unbounded battle-long accumulators (the Warden's
 		# Endurance stacks armor 1%/rank per unhealed turn with NO cap, and
@@ -5238,6 +5272,7 @@ func _find_ability(u: BattleUnit, ability_name: String) -> Ability:
 func _refund_item(item_id: String) -> void:
 	items[item_id][1] += 1
 	item_used = false
+	_bank_party_losses()  # BATCH GH: the save gives it back with the pouch
 	if current_hero != null and not current_hero.dead:
 		_show_actions(current_hero)
 
@@ -5253,6 +5288,10 @@ func _use_item(item_id: String) -> void:
 	item_used = true
 	action_panel.visible = false
 	items[item_id][1] -= 1
+	# BATCH GH — AN ITEM IS SPENT THE MOMENT IT IS USED, and the save says so
+	# before its effect resolves; a target picker cancelled hands it back through
+	# `_refund_item`, which writes the pouch again.
+	_bank_party_losses()
 	match item_id:
 		"bomb":
 			# BATCH CT §6: the damage rides `Run.combat_wins` at the heroes' own
@@ -5325,6 +5364,7 @@ func _use_item(item_id: String) -> void:
 			if fallen.is_empty():
 				items[item_id][1] += 1
 				item_used = false
+				_bank_party_losses()
 				return
 			var target: BattleUnit
 			if fallen.size() == 1:
@@ -5452,6 +5492,7 @@ func _use_item(item_id: String) -> void:
 			# A queue that reorders invisibly reads as a bug (§4).
 			_rebuild_turn_bar()
 			await _wait(0.6)
+	_bank_party_losses()  # BATCH GH: and what the item did, once it has done it
 	if not battle_over and current_hero != null and not current_hero.dead:
 		_show_actions(current_hero)
 
@@ -8058,6 +8099,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# what it always did, and a Rage bar is untouched because the floor names Mana.
 	attacker.note_resource_spent(cz_res_before - attacker.resource, not is_counter)
 	attacker.refresh_bars()
+	# BATCH GH — WHAT A CAST PAID IS A PARTY LOSS THE MOMENT IT IS PAID. This is
+	# the one line every cast pays at, so a quit inside the cast it bought cannot
+	# hand the Mana back.
+	if attacker.is_hero:
+		_bank_party_losses()
 	# BATCH FK — THE RUNE OF THE KILLING COLD, AND THE OVERTONE'S CAST COUNTER.
 	# Both are "whenever he casts", and this is the one line every ability in
 	# the game passes through — the same property CZ §1 books its second term
@@ -22210,7 +22256,15 @@ func _swap_victim(hunter: BattleUnit) -> BattleUnit:
 var _swapped_free := false
 
 
-func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:
+#
+# BATCH GH — `returning` FIELDS A BEAST THAT WAS STANDING WHEN THE FIGHT WAS QUIT
+# (`_return_standing_beasts`, at the spawn). It is the same body built the same
+# way — the one place a body reaches the field stays this one — without the
+# call: no announcement, no arrival gain, no Shared Devotion and no arrival
+# effect, because the call already happened in the fight the party walked away
+# from, and a fresh one would hand a quitter an arrival against a fresh warband.
+func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null,
+		returning := false) -> void:
 	# Fallen beasts leave the field on the next call, exactly as the
 	# single-beast flow always did.
 	for old in hunter.beasts.duplicate():
@@ -22340,14 +22394,15 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	comp.bloodbond_cb = _on_bloodbond_guard
 	companions.append(comp)
 	hunter.beasts.append(comp)
-	_sfx("heal", -7.0, 0.6)
-	_message("%s answers the call!" % comp.unit_name)
-	_log("%s %s %s" % [hunter.unit_name,
-		"swaps in" if was_swap else "summons", comp.unit_name], "#70d878")
-	# BJ §3a: the SWAP is the Beastmaster's signature moment — the rotation
-	# his capstone lane is named for — not the plain summon.
-	if was_swap:
-		_sig("pack")
+	if not returning:
+		_sfx("heal", -7.0, 0.6)
+		_message("%s answers the call!" % comp.unit_name)
+		_log("%s %s %s" % [hunter.unit_name,
+			"swaps in" if was_swap else "summons", comp.unit_name], "#70d878")
+		# BJ §3a: the SWAP is the Beastmaster's signature moment — the rotation
+		# his capstone lane is named for — not the plain summon.
+		if was_swap:
+			_sig("pack")
 	# The wolf and the eagle are permanently Elusive (enemies miss them more).
 	if kind in ["canis", "aguila"]:
 		var el_info: Array = STATUS_INFO["elusive"]
@@ -22370,6 +22425,15 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		comp.no_heals = true
 	# One Soul: the hunter and EVERY beast he fields share every wound.
 	_sync_soul_bond(hunter)
+	# BATCH GH — a returning beast stops here: the body is fielded, its chip is
+	# drawn, and nothing below is a thing it has not already done once.
+	if returning:
+		_stamp_loyalty_chip(hunter, comp)
+		return
+	# BATCH GH — and a beast called in is on the save as it lands, so a quit
+	# before the arrival resolves does not leave the call paid for and the beast
+	# gone.
+	_bank_party_losses()
 	# Lone Bond seats its beast deep instead of granting the arrival gain.
 	if hunter.lone_bond == 0:
 		_gain_loyalty(hunter, kind)
@@ -24908,6 +24972,113 @@ func _defensive_brace(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 
 # ---------- end of battle ----------
 
+# ══ BATCH GH — A QUIT FIGHT RESTARTS, BUT THE PARTY'S LOSSES DO NOT ═════════
+#
+# **THE WARBAND RESETS AND THE PARTY DOES NOT (ruled by the designer).** The
+# battle itself is still never saved — GG costed that and it is a project — so a
+# fight quit before it is won still restarts from its opening, and the warband,
+# every meter, every status and every cooldown open as they do at the start of
+# any fight. What the party brings back is what it had lost: its health, its
+# Mana, the pouch, a hero who fell and the beasts still standing, each as it
+# stood at the quit. A quit on a losing fight spends all of it for nothing.
+#
+# **WRITTEN AS THE LOSS LANDS, NOT AT THE TURN'S END.** Nothing hooks a closed
+# window, so whatever the save holds when the process goes is what comes back.
+# Saved only between turns, a quit inside an enemy's swing would take back the
+# swing and the death it dealt, which is the scum the ruling closes. So every
+# door that books a loss calls this: BL's one damage door (every hit and tick,
+# below every death refusal, so a hero at zero there is a hero who fell), the
+# direct costs' door, the spend line every cast pays at, the pouch, and a beast
+# called in. The top of the turn loop and the battle's own Exit to Main Menu
+# write whatever else moved. A new source of a party loss owes one of them.
+#
+# **ONLY WHAT OUTLIVES A FIGHT TODAY IS WRITTEN**, and that is the rule for
+# every field the ruling does not name: health and Mana are the member fields a
+# won fight already writes, the pouch is `Run.items`, and nothing else a fight
+# changes outlives it. **RAGE IS NOT WRITTEN**: every fight opens it at nothing,
+# so carrying it would hand a quitter the Rage the abandoned fight built — the
+# reward the ruling resets the meters to prevent. The two ruled exceptions are
+# a fallen hero (health 0) and the beasts standing (`COMPANIONS_STANDING`).
+#
+# **ABSOLUTE VALUES, NEVER DELTAS**, so a second quit deducts nothing twice. And
+# nothing is written once the fight is decided: a victory writes its own save
+# after its heal, and a wipe or a forfeit clears the file.
+const COMPANIONS_STANDING := "companions_standing"
+var _fallen_at_spawn: Array = []
+# member index -> {FK bank key: value}, the banks this spawn consumed.
+var _spawn_banks := {}
+
+
+func _bank_party_losses() -> void:
+	if not Run.active or sim or battle_over or not is_inside_tree():
+		return
+	for i in mini(heroes.size(), Run.party.size()):
+		var h: BattleUnit = heroes[i]
+		var m: Dictionary = Run.party[i]
+		m["hp"] = 0 if h.dead else h.hp
+		if h.resource_name == "Mana":
+			m["mana"] = h.resource
+		# A beast at zero is FALLING, not standing: the damage door reports below
+		# every refusal but above `_die()`, so the blow that kills it is written
+		# here while `dead` is still false. Read as standing, a quit on that blow
+		# brought the bear back at 1 HP — the scum the ruling names.
+		var standing: Array = []
+		for b in _beasts(h):
+			if b.hp > 0:
+				standing.append({"kind": b.companion_kind, "hp": b.hp})
+		if standing.is_empty():
+			m.erase(COMPANIONS_STANDING)
+		else:
+			m[COMPANIONS_STANDING] = standing
+	for id in items:
+		Run.items[id] = int(items[id][1])
+	# The FK banks this spawn consumed go back onto the copy that is written and
+	# only there, so a restart opens with them as this fight's opening did.
+	for bi in _spawn_banks:
+		for bk in _spawn_banks[bi]:
+			Run.party[bi][bk] = _spawn_banks[bi][bk]
+	Run.save_run()
+	for bi in _spawn_banks:
+		for bk in _spawn_banks[bi]:
+			Run.party[bi].erase(bk)
+
+
+# A beast still standing at the quit returns as it was; one that fell stays
+# down (ruled by the designer). "As it was" is its body at the health it stood
+# at: its Loyalty is the hunter's, and Loyalty is a meter, so it opens as any
+# fight's does. A fallen beast is simply not brought back — within one fight a
+# Beastmaster may already call a fallen kind again, for a turn and its cost, and
+# after the quit he pays that again; what the quit no longer does is refund it.
+func _return_standing_beasts() -> void:
+	if not Run.active:
+		return
+	for i in mini(heroes.size(), Run.party.size()):
+		var rec: Variant = Run.party[i].get(COMPANIONS_STANDING, [])
+		if not (rec is Array):
+			continue
+		for b in rec:
+			if not (b is Dictionary):
+				continue
+			var kind := String((b as Dictionary).get("kind", ""))
+			if not COMPANION_STATS.has(kind) or int((b as Dictionary).get("hp", 0)) <= 0:
+				continue
+			_do_summon(heroes[i], kind, null, true)
+			var comp: BattleUnit = heroes[i].beasts.back()
+			comp.hp = clampi(int((b as Dictionary).get("hp", comp.max_hp)), 1, comp.max_hp)
+			comp.refresh_bars()
+
+
+# The heroes the save carries at zero fall once the field is built. Nothing of
+# a death fires — no refusal, no Last Word, no recap line — because the death
+# happened in the fight the party walked away from; this only puts it back.
+func _lay_down_the_fallen() -> void:
+	for u in _fallen_at_spawn:
+		u.hp = 0
+		u._die()
+		u.refresh_bars()
+	_fallen_at_spawn.clear()
+
+
 func _check_end() -> void:
 	if battle_over:
 		return
@@ -25080,6 +25251,10 @@ func _check_end() -> void:
 			# BattleUnit.sync_victory_state, shared with RunSim.on_battle_end
 			# (Batch BJ §1) — read the sign-order block there before touching it.
 			heroes[i].sync_victory_state(Run.party[i])
+		# BATCH GH — the beasts a quit would have brought back do not outlive the
+		# fight that fielded them; the next fight's Beastmaster calls his own.
+		for gh_m in Run.party:
+			gh_m.erase(COMPANIONS_STANDING)
 		var node_type := String(Run.encounter.get("type", "fight"))
 		# BATCH BM §6: NOTHING here awards a talent point any more. Fights,
 		# elites and mini-bosses pay gold and their own spoils; a ZONE BOSS
@@ -26857,6 +27032,13 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 			_log("† %s dies" % pn_owed.unit_name, "#e05050")
 		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
 		_penance_mirroring = false
+	# BATCH GH — THE PARTY'S HEALTH REACHES THE SAVE AS IT LEAVES, and this door is
+	# why that needs no list: every hit and every tick passes here, below every
+	# death refusal, so a hero at zero here is a hero who fell. A companion's
+	# health goes too, because a beast still standing at the quit returns as it
+	# was.
+	if victim.is_hero:
+		_bank_party_losses()
 	if not victim.is_hero or victim.is_companion:
 		return
 	# BACKBLAST (Pyromancer, Inferno row 5 — BATCH BS §3) RIDES BL'S ONE DOOR,
@@ -26931,6 +27113,9 @@ func _book_self_cost(u: BattleUnit, hp_before: int, label: String) -> void:
 	_dmg_frame(u, label)
 	_book_taken(u, lost, hp_before)
 	_dmg_frame(was_src, was_label, was_name)
+	# BATCH GH — a cost paid is a loss like a wound, and it reaches the save the
+	# same way (`_bank_party_losses`); it passes no damage door, so it calls here.
+	_bank_party_losses()
 
 
 # BACKBLAST (Pyromancer, Inferno row 5 — BATCH BS §3): once per battle, the

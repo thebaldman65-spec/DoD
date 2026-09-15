@@ -2313,6 +2313,12 @@ func save_run() -> void:
 	# keys and loses only the record** — the defect it already has — so this
 	# version needs no ceiling of the kind `Profile` carries; the first run-save
 	# change an older build could misread destructively is the one that does.
+	# BATCH GH MOVED NO VERSION. A fight now writes the party's losses while it
+	# runs, into fields this version already carries — a member's `hp` (0 for a
+	# hero who fell), its `mana`, and `items` — plus one member key,
+	# `companions_standing`, which rides the party dict the way `bm_equipped` and
+	# FK's two banks do. A GF build reading such a save restarts a fallen hero at
+	# 1 HP and fields no beast, which is a softer restart and not a misreading.
 	file.store_var({
 		"version": 13, "party": party, "items": items, "gold": gold,
 		"encounter": encounter, "pending_modifier": pending_modifier,
@@ -2973,11 +2979,14 @@ func next_after_scene() -> String:
 # already moved onto the node, so whatever stood on it was walked by. In order:
 #   * an EVENT drawn and not answered opens again: the same event;
 #   * an ENCOUNTER stepped onto and not won is fought again FROM ITS OPENING —
-#     the same warband, the party as it stood when it stepped on, and the same
-#     bargain: the offer screen, showing the same three, if none was taken yet,
-#     and the battle if one was. The fight itself is never saved, so a quit
-#     inside one restarts it, and nothing it would have paid is paid until it is
-#     won (`claim_reward` marks it resolved before the victory's first save);
+#     the same warband, reset, and the same bargain: the offer screen, showing
+#     the same three, if none was taken yet, and the battle if one was. The
+#     fight itself is never saved, so a quit inside one restarts it, and nothing
+#     it would have paid is paid until it is won (`claim_reward` marks it
+#     resolved before the victory's first save). BATCH GH: the party comes back
+#     as it stood at the quit, not at the step — the battle writes its health,
+#     Mana, pouch, fallen and standing beasts to the save as each loss lands
+#     (`battle._bank_party_losses`), so what the abandoned fight spent stays spent;
 #   * a MERCHANT the bargain bought and the player never reached is visited —
 #     what the victory card's Continue does;
 #   * a ZONE BOSS beaten on a board not yet left is left — what the card's
@@ -3006,7 +3015,9 @@ func resume_scene() -> String:
 
 
 # An encounter the party stepped onto and has not won. A wipe or a forfeit
-# clears the save outright, so no lost fight can be pending on disk.
+# clears the save outright. BATCH GH: a fight quit after its last hero fell and
+# before the defeat screen IS pending, with every hero at 0 — the fall reaches
+# the save as it lands — and the battle decides that defeat the moment it opens.
 func encounter_pending() -> bool:
 	return not encounter.is_empty() and not bool(encounter.get("resolved", false))
 
