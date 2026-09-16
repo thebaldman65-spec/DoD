@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Class Kit Reconnaissance (Batch GL)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-09-16 (Batch GL &mdash; first pass)</b></p>
+<h1>DAWN OF DECAY — THE CLASS KIT RECONNAISSANCE</h1>
+<p><i>What the four class kits could be made of, read out of the code. <b>This is a REPORT. Nothing was
+authored, moved, cut, reworded or built</b> &mdash; no card was proposed, no clause was cut, no pool, slot,
+talent node or rune moved, and <b>this page does not pick a kit</b>. It is written to be open while each
+class's three are chosen, so <b>every class section stands alone</b> and repeats what it needs rather than
+pointing at another section.</i></p>
+<p style="border:2px solid #a00; padding:8px"><b>THE RULING, AS THE BRIEF GIVES IT.</b><br>
+<b>&ldquo;Every class gets a small guaranteed kit. THREE abilities, INSIDE the slot count&rdquo;</b> &mdash; a
+protected core took a slot, and this is the same object. <b>&ldquo;Salvage what fits, author the
+gaps.&rdquo;</b><br><br>
+<b>THE HOLE IT ANSWERS.</b> A hero who takes the Warrior's, the Mage's or the Cleric's spine at class
+selection &mdash; the Rune of the Vanguard (Momentum), the Invoker (Channel) or the Hierophant (Sanctity),
+names proposed at GK &mdash; opens with his class's basic attack and nothing else, because a spine carries no
+lineage. <b>RULED, NOT BUILT: the pool merge</b>, after which no hero has a lineage kit at all.<br><br>
+<b>THE TEST EVERY CARD BELOW IS PUT TO.</b> A class kit ability must work for <b>every hero of its class,
+with any engine or none</b>. So it must not read an engine; must not read a status only one engine
+&mdash; or only one lineage's cards &mdash; produces; and must not need an enabler that travels with an
+engine.</p>
+<h2 id="kr-howto">KR-HOWTO &mdash; HOW TO READ A SECTION</h2>
+<p><b>Every heading on this page carries its section's identifier in its own text</b> &mdash;
+<code>KR-WARRIOR</code>, <code>KR-MAGE</code>, <code>KR-CLERIC</code>, <code>KR-HUNTER</code> &mdash; and every
+subsection repeats it, <code>systems-recon.html</code>'s convention. A search for &ldquo;The class-wide draft
+pool&rdquo; returns <code>KR-CLERIC &middot; 3 &middot; The class-wide draft pool</code>, which says whose it
+is. <b>Search for the identifier, not the topic word.</b></p>
+<p><b>Every class section has the same seven numbered parts:</b></p>
+<ol>
+<li><b>The basic attack</b> &mdash; what it is, what it costs, what it does, and whether it is one ability or
+several.</li>
+<li><b>The engines and what travels with them</b> &mdash; each engine rune of the class, its enablers, and the
+kit each one opens with.</li>
+<li><b>The class-wide draft pool</b> &mdash; the cards every hero of the class can draw.</li>
+<li><b>The protected cores that are not enablers</b> &mdash; what each lineage opens with beyond what its
+engine brings.</li>
+<li><b>The test, card by card</b> &mdash; one row per candidate.</li>
+<li><b>The count and the cover</b> &mdash; how many pass, and what the passing cards could guarantee.</li>
+<li><b>What a pick costs here</b> &mdash; what moves when a card leaves the place it is now.</li>
+</ol>
+<p><b>THE THREE VERDICTS, AND THE TWO NOTES.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Word</th><th>Means</th></tr>
+<tr style="background:#e6f4e6"><td><b>CLEAN</b></td><td>Reads no engine, no status only an engine or one lineage's cards lay,
+and needs no enabler. <b>It works alone for every hero of the class.</b> The cheapest salvage there is: the card
+moves as it stands.</td></tr>
+<tr style="background:#fff6d6"><td><b>ALMOST</b></td><td>One clause &mdash; or its Perfect &mdash; reads an engine and is
+inert without it. <b>Cut that clause and the card stands alone.</b> A rewording, not an authoring job, with one
+exception named where it occurs (Hold Breath, which also needs a line of code moved).</td></tr>
+<tr style="background:#fbe3e3"><td><b>BOUND</b></td><td>The card cannot be cast, or does next to nothing, without its engine
+or an enabler that travels with it. <b>Salvaging it is authoring.</b></td></tr>
+<tr><td><b>WORDING</b></td><td>A word on the card or its chip names an engine or a lineage the hero may not hold
+(&ldquo;the Devout's max health&rdquo;). <b>No mechanic is cut</b>; the text is false for some heroes.</td></tr>
+<tr><td><b>FEEDS</b></td><td>The card lays something an engine reads (Burn, Chilled, a debuff) without reading
+the engine itself. <b>Not a failure</b>: the card works alone, and it is worth more beside that engine.</td></tr>
+</table>
+<p><b>A BASIC-ATTACK OVERRIDE IS NOT A SLOT ABILITY.</b> Fireball, Frostbolt, Arcane Explosion and Shadowrend
+replace the class basic in slot 0 and sit outside the slot count (<code>Classes.enabler_slots</code>,
+classes.gd:1339-1354). They are tested and reported, and counted apart from the slot candidates.</p>
+
+<h2 id="kr-answer">KR-ANSWER &mdash; THE ANSWER, BEFORE THE WORKING</h2>
+<p style="border:2px solid #333; padding:8px"><b>TWELVE ABILITIES ARE NEEDED. NONE HAS TO BE WRITTEN.</b>
+Every class already holds at least nine cards that pass the test clean (eight for the Cleric on the stricter
+reading KR-TEST records) &mdash; <b>64 candidates across the four classes, 44 clean, 13 a clause away, 7 bound</b>. <b>So it is not twelve to write and not four: it is twelve to
+PICK.</b> What is scarce is not supply. It is three things the pick moves, and none of them is free:</p>
+<ol>
+<li><b>A class-wide card taken into the kit leaves every hero's draw of that class &mdash; and it is a spine-taker's
+whole supply.</b> A hero with no lineage draws every card of his run from his class's pool alone, the draft and the
+zone-boss award both (run_state.gd:2202-2214, 3801-3810). That pool is six cards (the Mage's seven). Three taken
+from it leave him three to earn (the Mage four).</li>
+<li><b>A lineage core taken into the kit is already in its lineage's opening kit</b> until the pool merge retires
+lineages (GK's interim) &mdash; so the builder that adds a class kit owes an answer for the hero who would hold it twice.</li>
+<li><b>The class-wide cards were authored WEAKER than spec abilities, on purpose</b> (&ldquo;weaker than spec
+abilities and unconditional&rdquo;, classes.gd:518-526), and EB &sect;1 ruled that <b>the protected core is the
+baseline</b>. A kit made of class-wide cards gives the baseline role to the cards written as the fallback.</li>
+</ol>
+<p><b>And the part that is not supply at all:</b> <b>no Hunter opens thin today.</b> The Hunter has no spine, so all
+three of his engines carry a lineage and its kit. The hole the kit answers is the Warrior's, the Mage's and the
+Cleric's until the pool merge, and every class's after it.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Class</th><th>Slot candidates</th><th>CLEAN</th><th>ALMOST (a clause to cut)</th><th>BOUND</th><th>To author, for a kit of three</th><th>What no passing card guarantees</th></tr>
+<tr><td><a href="#kr-warrior"><b>WARRIOR</b></a></td><td>15</td><td>14</td><td>1</td><td>0</td><td><b>0</b></td><td>a heal, a shield or a cleanse for another hero (his only way of guarding the others is Mocking Blow's taunt); a cooldown card</td></tr>
+<tr><td><a href="#kr-mage"><b>MAGE</b></a></td><td>16</td><td>11</td><td>4</td><td>1</td><td><b>0</b></td><td>anything for another hero but Dispel's cleanse &mdash; no heal of any kind, no buff, no shield on an ally</td></tr>
+<tr><td><a href="#kr-cleric"><b>CLERIC</b></a></td><td>16</td><td>10</td><td>4</td><td>2</td><td><b>0</b></td><td>a revive (Resurrection is bound), a taunt or an avoidance card, and a tempo or resource card (Blessing of Zeal's cooldown tick is a clause away)</td></tr>
+<tr><td><a href="#kr-hunter"><b>HUNTER</b></a></td><td>17</td><td>9</td><td>4</td><td>4</td><td><b>0</b></td><td>a heal, a shield or a cleanse for another hero; a tempo, cooldown or resource card</td></tr>
+<tr><td><b>ALL FOUR</b></td><td><b>64</b></td><td><b>44</b></td><td><b>13</b></td><td><b>7</b></td><td><b>0</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>Plus the four basic-attack overrides</b>, tested apart: Fireball, Frostbolt and Shadowrend are CLEAN
+(Frostbolt with a WORDING note), and Arcane Explosion is CLEAN with a WORDING note. <b>&ldquo;Salvage cleanly&rdquo;
+means the card works for every hero of its class. It does not mean the card is priced right as a card every
+hero is guaranteed</b> &mdash; Mocking Blow is free on a one-turn cooldown &mdash; and no balance was measured
+here. Authoring is owed only where the designer wants a kit to guarantee something in the right-hand column.</p>
+<h2 id="kr-coverage">KR-COVERAGE &mdash; COVERAGE, STATED BEFORE ANY FINDING</h2>
+<p><b>An audit that overstates its reach is worse than a narrow one that admits its edges.</b> This is what was
+derived, how, and what was not.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>How it was derived</th><th>Reached?</th></tr>
+<tr><td><b>The four class basics and the four overrides</b></td><td>Built by a headless probe through the game's own
+accessors (<code>Classes.kit</code>, <code>apply_kit_overrides</code>) in an isolated copy with its own
+<code>user://</code>; the no-bar rule read at its line.</td><td><b>8 / 8</b></td></tr>
+<tr><td><b>The sixteen enablers</b></td><td><code>Classes.core_enablers</code> per lineage, and
+<code>Classes.engine_enablers</code> per engine, through the probe.</td><td><b>16 / 16</b></td></tr>
+<tr><td><b>The class-wide draft pools</b></td><td><code>Classes.class_draft_pool</code> and
+<code>Classes.pool_ability</code>, through the probe.</td><td><b>25 / 25</b> (6 / 7 / 6 / 6)</td></tr>
+<tr><td><b>The protected cores that are not enablers</b></td><td><code>Classes.spec_abilities</code> less
+<code>core_enablers</code>, all twelve lineages, through the probe.</td><td><b>28 / 28</b></td></tr>
+<tr><td><b>Every opening kit</b></td><td><code>Classes.opening_kit</code> for each lineage with its engine held and
+dropped, and for no lineage, through the probe.</td><td><b>16 / 16</b></td></tr>
+<tr><td><b>Each card's read sites</b></td><td>Its <code>_resolve_special</code> arm, every line naming its display
+name or special id in <code>battle.gd</code>, <code>unit.gd</code>, <code>run_state.gd</code>,
+<code>classes.gd</code>, <code>runes.gd</code>, <code>ability.gd</code> and <code>talents.gd</code>, and the read
+and write sites of every status it lays &mdash; extracted by script, then <b>read by hand, and read a second time
+by four independent read-only census passes, one a class</b>. Where the two readings disagreed, the disagreement
+is recorded (KR-TEST).</td><td><b>68 / 68</b> candidates</td></tr>
+<tr><td><b>The gates a card can meet before it resolves</b></td><td><code>_ability_usable</code> and
+<code>_eff_cost</code>, read whole.</td><td><b>both</b></td></tr>
+<tr style="background:#fee"><td><b>NOT REACHED: balance.</b></td><td>Nothing here says whether a card is priced right
+as a guaranteed one, whether a kit is strong, or what a kit does to a sim. No sim was run.</td><td>out of scope</td></tr>
+<tr style="background:#ffe"><td><b>PARTIAL: a live drive.</b></td><td>No candidate was cast to reach its verdict: every
+verdict is a reading of the code, cited to its line. <b>The live defects in KR-FOUND were driven afterwards</b>, in a
+scratch probe on an isolated copy &mdash; Hold Breath, the three dead buttons, Split Shield and Dispel, 13 checks and 0
+failures (<code>docs/reports/GL.md</code>).</td><td><b>KR-FOUND 1, 2, 4, 5</b></td></tr>
+<tr style="background:#ffe"><td><b>PARTIAL: dormant fields and runes.</b></td><td>A handler that reads a talent field
+no node writes, or a field only a rune writes, is noted and not counted: neither is an engine. The one-tree talent
+payloads were not re-walked; the dormant-field lists are the census passes' and FX's.</td><td>noted, not counted</td></tr>
+<tr style="background:#ffe"><td><b>PARTIAL: the sim bot.</b></td><td>Where the bot casts a candidate only inside an
+engine branch, that is said. The bot's whole policy was not read.</td><td>where met</td></tr>
+</table>
+<h2 id="kr-premises">&sect;0 &mdash; KR-PREMISES &mdash; THE BRIEF'S PREMISES, CHECKED FIRST</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>The brief says</th><th>Verdict</th><th>What the repo says</th></tr>
+<tr><td>A hero who takes Momentum, Channel or Sanctity opens with his class's basic attack alone</td><td><b>HELD</b></td><td>GK's ruling 7; <code>Classes.opening_kit(class, "", [])</code> returns the basic alone for the Warrior, the Mage and the Cleric (the probe).</td></tr>
+<tr><td>The other twelve engines bring enablers; those three bring a rule</td><td><b>HALF FALSE</b></td><td><b>Nine</b> of the twelve bring enablers (sixteen across nine lineages). Blood Frenzy, Heavy Plating and Trapper bring none, and their holders still open with three abilities. <b>What the twelve bring is a LINEAGE</b> &mdash; its whole opening kit &mdash; and that is what a spine lacks.</td></tr>
+<tr><td>So three of fifteen engine runes produce a materially worse opening</td><td><b>HELD</b></td><td>For the Warrior, the Mage and the Cleric. <b>The Hunter has no spine</b>: all three of his engines carry a lineage, so no Hunter opens with Quick Shot alone today.</td></tr>
+<tr><td>A player cannot know that at the draft</td><td><b>FALSE AS WRITTEN</b></td><td>The class-selection card lists every ability the rune opens with, off the one builder the battle reads (<code>spec_choice_screen.gd</code>:141-152) &mdash; a spine's card lists one line. <b>What no card says</b> is that a spine-taker's every later card comes from his class pool alone (run_state.gd:2202-2214, 3801-3810).</td></tr>
+<tr><td>THREE abilities, INSIDE the slot count; a protected core took a slot and this is the same object</td><td><b>HELD</b></td><td><code>core_slots</code> is 3 for eleven lineages and 4 for Holy, and the basic sits outside it (<code>lineage_slots</code>, classes.gd:1357-1360; <code>ability_slots_used</code>, run_state.gd:2116-2121). Three kit abilities are three slots; the basic is not one of them.</td></tr>
+<tr><td>Remove the specs and a hero's entire kit is drafted</td><td><b>HELD, AS A RULING</b></td><td>The pool merge is RULED, NOT BUILT. Today a lineage hero keeps his lineage kit even with no engine (GK's ruling 5).</td></tr>
+<tr><td>GK found 67 of 104 targets red before repair, 42 throwing, 38 on <code>passive_id</code> alone</td><td><b>HELD</b></td><td><code>docs/reports/GK.md</code> &sect;3a: 67 of 104 red; 42 targets threw; 203 errors in 38 targets were the one deleted-field line.</td></tr>
+<tr><td>DV found <code>apply_kit_overrides</code> builds the four Mage specs' <code>abilities[0]</code> and the corpus returned the unoverridden Magic Bolt</td><td><b>MISATTRIBUTED, AND THE ERROR DV CORRECTED</b></td><td><b>DU &sect;4</b> found the corpus blind spot. <b>DV &sect;5</b> is the batch that corrected DU's &ldquo;four Mage specs&rdquo;: there are three, and the fourth override is <b>Shadowrend, the Occultist's &mdash; a Cleric</b> (<code>DoD-archive/changelog-archive.html</code>, DV's entry). So the Mage's slot 0 has four definitions and the Cleric's two.</td></tr>
+<tr><td><code>PROTECTED_CORES</code> names sixteen enablers across nine specs</td><td><b>HELD</b></td><td>classes.gd:580-613; the probe.</td></tr>
+<tr><td>The class-wide draft pools: six cards per class</td><td><b>FALSE FOR THE MAGE</b></td><td><b>Seven</b> &mdash; Mana Shield joined at DY &sect;1 &mdash; so <b>25</b> in all (classes.gd:527-545; <code>test_batch_cd.PER_CLASS_DEPTH</code>).</td></tr>
+<tr><td>Nine specs had three or more cores and only sixteen are enablers</td><td><b>FALSE COUNT</b></td><td><b>All twelve</b> lineages open with at least three abilities beside the basic (Holy four; the Beastmaster five in three slots); nine name enablers. The remainder is <b>28</b>: Warrior 8, Mage 7, Cleric 5, Hunter 8.</td></tr>
+<tr><td>The remainder were guaranteed abilities that no engine needs &mdash; exactly what a class kit is</td><td><b>PARTLY FALSE</b></td><td>Of the 28, <b>17 are CLEAN, 8 are ALMOST and 3 are BOUND</b>: Death Ray needs Resonance, Resurrection costs Mercy, Kill Command needs a companion only the Pack Bond summons bring. All three stay in their lineage's kit when the engine is dropped, as buttons that can never be pressed (KR-FOUND).</td></tr>
+<tr><td>The engines to test for: Rage, Focus, Loyalty, Faith, Mercy, Resonance, Ruin, Burn, Chilled, Frenzy, plating, stances, Trapper, Momentum, Channel, Sanctity</td><td><b>ONE IS NOT AN ENGINE</b></td><td><b>Rage is the Warrior's class resource</b> (classes.gd:61), held by every Warrior. Blood Frenzy (<code>bloodrage</code>) is the engine, and it reads Rage SPENT (CZ &sect;1): a card that builds or spends Rage feeds it without reading it. <b>Burn and Chilled are statuses cards lay</b>; Overburn and Glacial Hold read them. The test reads them as a status only one lineage's cards lay.</td></tr>
+<tr><td>FY's SR-REACH found TODAY meant <i>works for some hero</i></td><td><b>HELD</b></td><td><code>docs/reports/FY.md</code> &sect;1d. This page applies the same correction: <i>works</i> means for every hero of the class, with any engine or none.</td></tr>
+<tr><td>Two of FX's 27 nodes shipped against items that were never what they were written from</td><td><b>MISSTATED</b></td><td>The two were among the four of FX's <b>brief</b>'s nodes that failed, and FX swapped all four for alternates before it shipped (<code>docs/state.md</code>, FX's ruling item 3). None of the 27 that shipped rests on them.</td></tr>
+<tr><td>DN priced a restructure at 97 new nodes</td><td><b>HELD</b></td><td><code>docs/state.md</code> carries DN's text: 97 new nodes. The one tree (FX) is what superseded it.</td></tr>
+<tr><td>FO found the assistant's searches return the wrong spec's section when sections share headings; FW fixed that with SR- prefixes</td><td><b>NOT FOUND, AS AT FW</b></td><td>Nothing in <code>docs/reports/FO.md</code> or FO's changelog entry says it (FW &sect;0 found the same). The prefixes are FW's, and this page follows them.</td></tr>
+</table>
+<h2 id="kr-test">KR-TEST &mdash; THE TEST, AND HOW A CARD WAS PUT TO IT</h2>
+<h3>KR-TEST &middot; What counts as reading an engine</h3>
+<ul>
+<li><b>A direct read</b>: <code>has_engine(id)</code>, or one of the three spine switches.</li>
+<li><b>The engine's own meter</b>: the second resource (<code>second_resource</code>, which is Mercy, Resonance or Focus
+and is set up only for a hero holding that engine &mdash; battle.gd:1178-1186, 1347-1368), Faith (paid only while a
+hero holds Conviction &mdash; <code>_gain_faith</code>, battle.gd:16503-16505), Ruin (laid only while a hero holds the
+Old Gods &mdash; <code>_gain_ruin</code>, battle.gd:15958), Loyalty (refused without Pack Bond &mdash;
+<code>_gain_loyalty</code>, battle.gd:14533), a Glacial HOLD (recorded only under the engine &mdash;
+battle.gd:12742) and a stance's effect (read only under <code>has_engine("seasoned")</code> &mdash; battle.gd:9790, 10320).</li>
+<li><b>An enabler's presence</b>: a living companion (only the Pack Bond summons bring one), Consecrated Ground's
+status on the ground.</li>
+<li><b>NOT a read</b>: the class resource (Rage or Mana); a status any card of the class can lay; <b>an engine's payout
+on the card's number</b> &mdash; Overburn's damage term, Mercy's +5% healing a stack &mdash; which is the engine reading
+the card, and pays on every card alike.</li>
+</ul>
+<h3>KR-TEST &middot; What a party damage buff reaches</h3>
+<p><b>Warcry, Exhortation, Blessing of Zeal and Hunter's Mark are read in the ordinary strike path</b>
+(battle.gd:9689, 8423-8425, 9240, 9892) &mdash; and Hunter's Mark in a companion's blow as well (battle.gd:22833).
+<b>An ability that resolves in its own <code>special</code> handler computes its own damage and reads none of
+them</b>, which FW measured as about seventy per cent of the corpus. So &ldquo;every hero deals 20% more
+damage&rdquo; is true of the blows that pass the strike loop. It is true of all four cards alike, and it is written
+here once rather than on each row.</p>
+<h3>KR-TEST &middot; The precedent, applied</h3>
+<p><b>FY's SR-REACH</b> found that <i>TODAY</i> in the systems recon meant <i>a field exists and a read site reads it,
+for some hero</i>, and never said which. <b>The same slip is available here</b>: a card is &ldquo;engine-free&rdquo; in a
+lineage whose hero always holds the engine. So every card below was read for a hero of the class <b>holding no engine
+at all</b> &mdash; a legal state since GK (<code>Run.toggle_engine</code>) &mdash; and for one holding a different engine
+of the class. <b>The column that says what a card does for a hero with no engine is the one the verdict rests
+on.</b></p>
+<h3>KR-TEST &middot; Where the two readings disagreed</h3>
+<ul>
+<li><b>Arcane Explosion &mdash; resolved toward the census pass.</b> Its &ldquo;Builds 1 Resonance&rdquo; is the build
+<i>every</i> damaging cast pays a Resonance holder (battle.gd:12418-12457), not a clause of the card. Cutting the words
+cuts no mechanic, so it is CLEAN with a WORDING note, not ALMOST.</li>
+<li><b>Ministration &mdash; kept CLEAN; the census pass read ALMOST.</b> Its heal is multiplied by
+<code>_healing_done_mult</code>, which adds Mercy's +5% a stack (battle.gd:14727). That term is the engine's own payout on
+every heal (Mercy's text says so), and a Cleric without Mercy gets exactly the card's 20%. Read the stricter way, the
+cut is a term the engine applies to every heal, which is not the card's to lose.</li>
+<li><b>Divine Shield &mdash; kept CLEAN; the census pass read ALMOST.</b> The barrier stamps a hidden
+<code>divine</code> rider that only Faith and two Devout cards read (unit.gd:3396-3398), and the recast table counts the
+rider as an improvement (battle.gd:6069, 6104-6106). Without Conviction the rider pays nothing and harms nothing, and
+the card's text never mentions it: <b>it FEEDS Faith</b>. Its WORDING note stands either way.</li>
+<li><b>Quick Shot &mdash; the same fact, filed differently.</b> The Hunter pass read the class basic as ALMOST for its
+unreachable Perfect; this page reports the basics apart and records the same fact in each class's part 1.</li>
+<li><b>Every other card read the same way twice.</b> Read the stricter way, the Cleric would hold <b>eight</b> CLEAN
+rather than ten. <b>No count that decides anything moves</b>: nothing has to be authored either way.</li>
+</ul>
+<h1 id="kr-classes">KR-CLASSES &mdash; THE FOUR, ONE SECTION EACH</h1>
+<h2 id="kr-warrior">KR-WARRIOR &mdash; THE WARRIOR</h2>
+<p><b>Rage is the Warrior's class resource</b> (classes.gd:61): every Warrior starts a fight at 0 and builds it.
+<b>It is not an engine</b>, so a card that builds or spends Rage passes the test. <b>Taking the Rune of the Vanguard
+(Momentum) at class selection opens with Strike alone</b> &mdash; the hole this kit answers.</p>
+<h3>KR-WARRIOR &middot; 1 &middot; The basic attack</h3>
+<p><b>Strike</b> &mdash; free, 23% of Attack (physical), 18 Break damage, +20 Rage, 2.0 initiative, no cooldown
+(classes.gd:98-104). <b>One ability</b>: no Warrior lineage overrides it (<code>apply_kit_overrides</code> has no Warrior
+branch, classes.gd:5390-5418). <b>It resolves at a fixed Good</b> (battle.gd:4118-4119), so its Perfect &mdash;
+&ldquo;+10 bonus Rage&rdquo; &mdash; can never pay, though the battle tooltip and the hero sheet print it.</p>
+<h3>KR-WARRIOR &middot; 2 &middot; The engines and what travels with them</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Engine rune</th><th>Engine</th><th>Enablers (travel with it, take no slot)</th><th>Opens with, engine held</th><th>Opens with, engine dropped</th></tr>
+<tr><td>Rune of the Berserker</td><td>Blood Frenzy (<code>bloodrage</code>)</td><td>none</td><td>Strike, Bloodlust, Wildstrikes, Hack and Slash</td><td>the same</td></tr>
+<tr><td>Rune of the Warden</td><td>Heavy Plating (<code>heavy_plating</code>)</td><td>none &mdash; its base is the Warden stat block's <code>block_chance</code> 0.10, which stays with the lineage</td><td>Strike, Mocking Blow, Crushing Blow, Shieldwall</td><td>the same</td></tr>
+<tr><td>Rune of the Swordmaster</td><td>Stances (<code>seasoned</code>)</td><td><b>Guard Change</b></td><td>Strike, Overpower, Pommel Strike, Guard Change</td><td>Strike, Overpower, Pommel Strike</td></tr>
+<tr><td>Rune of the Vanguard <i>(proposed)</i></td><td>Momentum (spine)</td><td>none, and no lineage</td><td><b>Strike alone</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>The one enabler, Guard Change, does not read its engine</b> &mdash; but its whole first half is a stance flip
+that only the engine reads, so for any other Warrior it is fifteen Break damage and fifteen Rage. It is ALMOST.
+<b>Were it in the class kit, the stances engine would no longer need to bring it.</b></p>
+<h3>KR-WARRIOR &middot; 3 &middot; The class-wide draft pool</h3>
+<p><b>Six cards</b>: Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad (classes.gd:528-529). Every Warrior draws
+about one card in four from here (<code>CLASS_DRAFT_SHARE</code> 0.25, classes.gd:550). <b>A Vanguard-taker draws every
+card of his run from here and nowhere else</b>, and his zone-boss awards too (run_state.gd:2202-2214, 3801-3810).
+<b>All six pass clean.</b></p>
+<h3>KR-WARRIOR &middot; 4 &middot; The protected cores that are not enablers</h3>
+<p><b>Eight</b>: the Berserker's Bloodlust, Wildstrikes and Hack and Slash; the Warden's Mocking Blow, Crushing Blow
+and Shieldwall; the Swordmaster's Overpower and Pommel Strike. Each stays in its lineage's kit whether or not the engine
+is held. <b>All eight pass clean</b> &mdash; none of the three lineages' cores reads its engine.</p>
+<h3>KR-WARRIOR &middot; 5 &middot; The test, card by card</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>From</th><th>Verdict</th><th>What it reads</th><th>If ALMOST: the clause to cut</th><th>What it does for a hero holding no engine</th><th>Covers</th><th>Notes</th></tr>
+<tr style="background:#fff6d6"><td><b>Guard Change</b></td><td>enabler of Swordmaster</td><td><b>ALMOST</b></td><td>its stance flip (<code>_swordmaster_switch</code>, battle.gd:15582) is read only by the stances engine: the damage terms sit under <code>has_engine("seasoned")</code> (battle.gd:9790, 10320)</td><td>the stance half — for a Warrior without the engine the flip changes nothing</td><td>15 Break damage to the enemy nearest to Breaking, +15 Rage, 1.5 initiative, cooldown 1; a Perfect adds +10% Parry for 2 turns</td><td>Break, resource</td><td><b>WORDING:</b> the card and its log both say the guard changes<br>the stance engine's only enabler: in a class kit it would no longer need to travel</td></tr>
+<tr style="background:#e6f4e6"><td><b>Battle Trance</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_battle_trance_tick</code> (battle.gd:23285) reads its own status and <code>trance_taken</code></td><td>&mdash;</td><td>4 turns: each turn heals 3% of maximum health plus half the damage taken since the last</td><td>self-sustain</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Rally</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_rally_forward</code> (battle.gd:13815); gated only on another living hero (battle.gd:6205-6207)</td><td>&mdash;</td><td>one ally acts next and regains 15% of their resource; costs the Warrior his turn</td><td>tempo (ally), resource (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Charge</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a field card (no <code>special</code>, no name-keyed block)</td><td>&mdash;</td><td>25% of Attack, 20 Break damage, +30 Rage, 1.0 initiative; its one-turn Daze is removed at the start of the target's own turn, before any miss roll reads it (battle.gd:3295, 7981), so it never acts</td><td>single-target damage, Break, resource</td><td><b>WORDING:</b> "the target is DAZED for a turn" does nothing, and its Perfect ("Dazed for 2 turns") has no code</td></tr>
+<tr style="background:#e6f4e6"><td><b>Cleave</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a field card</td><td>&mdash;</td><td>three chosen enemies, 15% of Attack and 15 Break damage each</td><td>multi-target damage</td><td><b>WORDING:</b> its Perfect ("{atk:22}") has no code: a Perfect pays the ordinary x1.15 (battle.gd:8179-8180), about 17%</td></tr>
+<tr style="background:#e6f4e6"><td><b>Warcry</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>warcry</code> is read in the strike loop for any hero (battle.gd:9689)</td><td>&mdash;</td><td>every living hero deals 20% more damage for 4 turns</td><td>party damage buff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Ironclad</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>ironclad</code> is read at battle.gd:10020, 13079 and unit.gd:3797</td><td>&mdash;</td><td>4 turns: no Stun, Freeze, Daze or Break, and 15% less damage taken</td><td>self mitigation, control immunity</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Bloodlust</b></td><td>Berserker core</td><td><b>CLEAN</b></td><td>nothing — <code>heal_missing</code> is read for any attacker (battle.gd:12017)</td><td>&mdash;</td><td>26% of Attack and 18 Break damage; heals 30% of missing health; +10 Rage</td><td>single-target damage, self-sustain</td><td>the bot casts it only inside its Blood Frenzy branch (battle.gd:4656-4674)</td></tr>
+<tr style="background:#e6f4e6"><td><b>Wildstrikes</b></td><td>Berserker core</td><td><b>CLEAN</b></td><td>nothing — a field card; its Perfect sets the Bleed roll to certain (battle.gd:11228)</td><td>&mdash;</td><td>hits every enemy for 16% of Attack, each 50% to build 35 Bleed; +10 Rage</td><td>multi-target damage, Bleed</td><td>the bot casts it only inside its Blood Frenzy branch</td></tr>
+<tr style="background:#e6f4e6"><td><b>Hack and Slash</b></td><td>Berserker core</td><td><b>CLEAN</b></td><td>nothing — a field card (<code>multi_hits</code> 3, Bleed)</td><td>&mdash;</td><td>three hits of 10% of Attack on one enemy, each 50% to build 25 Bleed; +10 Rage</td><td>single-target damage, Break, Bleed</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Mocking Blow</b></td><td>Warden core</td><td><b>CLEAN</b></td><td>nothing — the taunt block reads <code>heroes.find(attacker)</code> (battle.gd:11267-11283)</td><td>&mdash;</td><td>free, cooldown 1: 27% of Attack; the target and one other enemy must attack the Warrior for 4 turns; +10 Rage</td><td>single-target damage, taunt</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Crushing Blow</b></td><td>Warden core</td><td><b>CLEAN</b></td><td>nothing — Sunder is a plain status (unit.gd:3112); the name-keyed blocks read dormant talent fields only</td><td>&mdash;</td><td>43% of Attack and 20 Break damage; Sunders armor 35% for 3 turns; +10 Rage</td><td>single-target damage, Break, debuff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Shieldwall</b></td><td>Warden core</td><td><b>CLEAN</b></td><td>nothing that needs the engine — <code>_plating_slice</code> adds the Shieldwall status for any hero (battle.gd:15656-15663) and the Block roll runs for any hero that is not Broken (battle.gd:8538, 8590)</td><td>&mdash;</td><td>+25% Block chance for 3 turns</td><td>self mitigation</td><td><b>WORDING:</b> its chip says the blocks "count as Heavy Plating blocks" (battle.gd:20916), and a block logs as Heavy Plating (battle.gd:8569) — a Warrior without the engine has no plating</td></tr>
+<tr style="background:#e6f4e6"><td><b>Overpower</b></td><td>Swordmaster core</td><td><b>CLEAN</b></td><td>nothing — its term reads the target's Break meter (battle.gd:9552-9553, 10774)</td><td>&mdash;</td><td>15% of Attack plus 0.5 a point of the target's Break meter, 20 Break damage; holds a Broken target Broken a turn longer; +10 Rage</td><td>single-target damage, Break</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Pommel Strike</b></td><td>Swordmaster core</td><td><b>CLEAN</b></td><td>nothing — its 25% crit is a name-keyed literal (battle.gd:9074); the Stun is a plain status</td><td>&mdash;</td><td>25% of Attack, 30 Break damage, 25% crit; Stuns 1 turn (a boss resists until Broken unless the strike is Perfect); +10 Rage</td><td>single-target damage, Break, control</td><td>&mdash;</td></tr>
+</table>
+<h3>KR-WARRIOR &middot; 6 &middot; The count and the cover</h3>
+<p><b>15 slot candidates: 14 CLEAN, 1 ALMOST, 0 BOUND.</b> <b>To author for a kit of three: 0.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What a kit could guarantee</th><th>CLEAN cards that give it</th><th>Only a clause away</th></tr>
+<tr><td><b>damage</b></td><td><b>Bleed</b>: Wildstrikes, Hack and Slash<br><b>multi-target damage</b>: Cleave, Wildstrikes<br><b>single-target damage</b>: Charge, Bloodlust, Hack and Slash, Mocking Blow, Crushing Blow, Overpower, Pommel Strike</td><td>&mdash;</td></tr>
+<tr><td><b>Break</b></td><td><b>Break</b>: Charge, Hack and Slash, Crushing Blow, Overpower, Pommel Strike</td><td>Break: Guard Change</td></tr>
+<tr><td><b>control and debuff</b></td><td><b>control</b>: Pommel Strike<br><b>debuff</b>: Crushing Blow</td><td>&mdash;</td></tr>
+<tr><td><b>guarding himself</b></td><td><b>control immunity</b>: Ironclad<br><b>self mitigation</b>: Ironclad, Shieldwall<br><b>self-sustain</b>: Battle Trance, Bloodlust</td><td>&mdash;</td></tr>
+<tr><td><b>guarding the others</b></td><td><b>taunt</b>: Mocking Blow</td><td>&mdash;</td></tr>
+<tr><td><b>lifting the others</b></td><td><b>party damage buff</b>: Warcry<br><b>resource (ally)</b>: Rally<br><b>tempo (ally)</b>: Rally</td><td>&mdash;</td></tr>
+<tr><td><b>tempo and resource</b></td><td><b>resource</b>: Charge</td><td>resource: Guard Change</td></tr>
+</table>
+<p><b>What no passing card guarantees:</b> a heal, a shield or a cleanse for another hero (his only way of guarding the others is Mocking Blow's taunt); a cooldown card.</p>
+<h3>KR-WARRIOR &middot; 7 &middot; What a pick costs here</h3>
+<ul>
+<li><b>From the class pool:</b> every card taken is one a Vanguard-taker can no longer earn. Six today; three if all
+three come from it. His run's supply stays six &mdash; three of them guaranteed from the first fight.</li>
+<li><b>From a lineage core:</b> a Berserker, Warden or Swordmaster already opens with his own three. A kit that
+includes one of them would hand that hero a second copy unless the builder refuses it.</li>
+<li><b>Slots:</b> a kit of three inside the cap of seven. A Vanguard-taker opens at 3 of 7; a Berserker or Warden at
+6 of 7; a Swordmaster at 5 of 7 (<code>lineage_slots</code> + 3, no overlap) &mdash; until the pool merge.</li>
+<li><b>The sim bot</b> casts Bloodlust, Wildstrikes, Mocking Blow, Shieldwall and Guard Change only inside its engine
+branches (battle.gd:4656-4760). A class kit owes it a class-level branch, or a sim never exercises the kit.</li>
+<li><b>Texts the code contradicts, on these cards:</b> Charge's Daze never acts (removed at the start of the target's
+own turn, battle.gd:3295, before its miss roll reads it, 7981) and its Perfect (&ldquo;Dazed for 2 turns&rdquo;) has no
+code; Cleave's Perfect (&ldquo;{atk:22}&rdquo;) has no code; Battle Trance's &ldquo;each of your turns&rdquo; pays three times in four, because the heal (battle.gd:3371) runs
+after the status ticks (3295); Shieldwall's chip calls its blocks Heavy Plating blocks; Strike's Perfect.</li>
+</ul>
+<h2 id="kr-mage">KR-MAGE &mdash; THE MAGE</h2>
+<p><b>Mana is the Mage's class resource</b>, regenerated at 22 a turn &mdash; 12 plus Evocation, the Mage class
+passive. <b>Taking the Rune of the Invoker (Channel) at class selection opens with Magic Bolt alone.</b> No class-wide
+Mage card lays Burn or Chilled: <b>both are laid only by the Pyromancer's and the Cryomancer's cards</b>, so a card that
+pays off either needs one of those beside it in the same kit.</p>
+<h3>KR-MAGE &middot; 1 &middot; The basic attack</h3>
+<p><b>Magic Bolt</b> &mdash; free, 25% of Attack (arcane), 14 Break damage, 2.0 initiative (classes.gd:112-118).
+<b>ONE SLOT, FOUR DEFINITIONS</b>: Magic Bolt while no Mage lineage engine is held; <b>Fireball</b> while Overburn is,
+<b>Frostbolt</b> while Glacial Hold is, <b>Arcane Explosion</b> while Resonance is (classes.gd:5398-5418). A carried
+engine's override takes slot 0 while Magic Bolt stands there and joins as a second free attack otherwise
+(classes.gd:1319-1331), so a Mage holding two of those engines opens with two free attacks. <b>Slot 0 resolves at a
+fixed Good</b> (battle.gd:4118-4119): Magic Bolt's Perfect (&ldquo;Restores 10 Mana&rdquo;) never pays.</p>
+<h3>KR-MAGE &middot; 2 &middot; The engines and what travels with them</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Engine rune</th><th>Engine</th><th>Enablers (travel with it, take no slot)</th><th>Opens with, engine held</th><th>Opens with, engine dropped</th></tr>
+<tr><td>Rune of the Pyromancer</td><td>Overburn (<code>overburn</code>)</td><td><b>Fireball</b> (the basic), <b>Detonation</b></td><td>Fireball, Detonation, Wildfire, Flamewave</td><td>Magic Bolt, Wildfire, Flamewave</td></tr>
+<tr><td>Rune of the Cryomancer</td><td>Glacial Hold (<code>permafrost</code>)</td><td><b>Frostbolt</b> (the basic), <b>Ice Lance</b></td><td>Frostbolt, Razor Ice, Blizzard, Ice Lance</td><td>Magic Bolt, Razor Ice, Blizzard</td></tr>
+<tr><td>Rune of the Arcanist</td><td>Runaway Resonance (<code>resonance</code>)</td><td><b>Arcane Explosion</b> (the basic)</td><td>Arcane Explosion, Arcane Cannon, Arcane Barrage, Death Ray</td><td>Magic Bolt, Arcane Cannon, Arcane Barrage, Death Ray</td></tr>
+<tr><td>Rune of the Invoker <i>(proposed)</i></td><td>Channel (spine)</td><td>none, and no lineage</td><td><b>Magic Bolt alone</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>Of the five enablers, three pass clean</b> (Fireball, Frostbolt, Arcane Explosion &mdash; all basic-attack
+overrides, outside the slot count) and <b>two are a clause away</b>: Detonation's Overburn refund and Ice Lance's
+release both need the engine. <b>Chilled works without Glacial Hold</b> &mdash; a stack slows, three cut damage, and a
+fourth freezes for ONE turn and drops the pile to one (battle.gd:13300, 12737-12741); only the HOLD is the engine's.</p>
+<h3>KR-MAGE &middot; 3 &middot; The class-wide draft pool</h3>
+<p><b>Seven cards, not six</b>: Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink, Mana Shield
+(classes.gd:539-540). Every Mage draws about one card in four from here; <b>an Invoker-taker draws every card of his run
+from here</b>, and his zone-boss awards too. <b>All seven pass clean.</b></p>
+<h3>KR-MAGE &middot; 4 &middot; The protected cores that are not enablers</h3>
+<p><b>Seven</b>: the Pyromancer's Wildfire and Flamewave; the Cryomancer's Razor Ice and Blizzard; the Arcanist's
+Arcane Cannon, Arcane Barrage and Death Ray. <b>Four pass clean, two are a clause away (Wildfire, Arcane Cannon) and one
+is bound (Death Ray).</b></p>
+<h3>KR-MAGE &middot; 5 &middot; The test, card by card</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>From</th><th>Verdict</th><th>What it reads</th><th>If ALMOST: the clause to cut</th><th>What it does for a hero holding no engine</th><th>Covers</th><th>Notes</th></tr>
+<tr style="background:#fff6d6"><td><b>Detonation</b></td><td>enabler of Pyromancer</td><td><b>ALMOST</b></td><td>"Overburn refunds 1 Mana for every turn consumed": <code>_overburn_refund</code> returns without the engine (battle.gd:14142, called at 11489)</td><td>the Overburn refund sentence</td><td>25% of Attack and 20 Break damage; consumes the target's Burn for 250% of what it had left (battle.gd:9419-9437) — so it pays its bonus only beside a Burn applier</td><td>single-target damage, Break, DoT payoff</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Ice Lance</b></td><td>enabler of Cryomancer</td><td><b>ALMOST</b></td><td>the RELEASE: <code>_hold_release</code> fires only on a held enemy (battle.gd:11796), and a hold is recorded only under the engine (battle.gd:12742)</td><td>"Cast on a HELD enemy it is the RELEASE — the ice breaks and the enemy returns on 1 stack"</td><td>35% of Attack and 15 Break damage, +5% of Attack a Chilled stack on the target (battle.gd:9305-9309), always crits a Frozen target (battle.gd:9127)</td><td>single-target damage, control payoff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Magic Barrier</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a plain <code>barrier</code> (battle.gd:18810-18832)</td><td>&mdash;</td><td>absorbs 20% of the Mage's maximum health for 3 turns</td><td>self shield</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Mirror Image</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_mirror_dodge</code> (battle.gd:14041)</td><td>&mdash;</td><td>the next four single-target attacks against the Mage miss</td><td>avoidance</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Magic Missiles</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a field card</td><td>&mdash;</td><td>three hits of 12% of Attack on one enemy, 3 Break damage each</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Mana Well</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_mana_regen</code> doubles for the status (battle.gd:13734-13738)</td><td>&mdash;</td><td>Mana regeneration doubled for 4 turns</td><td>resource</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Dispel</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>dispel_one_debuff</code> / <code>_dispellable_buffs</code> (battle.gd:18867-18914)</td><td>&mdash;</td><td>strips three harmful effects from an ally, or three beneficial ones from an enemy</td><td>cleanse (ally), strip (enemy)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Blink</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_tick_cooldowns</code> (battle.gd:18929)</td><td>&mdash;</td><td>every other cooldown of the Mage's loses two turns</td><td>cooldown</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Mana Shield</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — reads the class resource (unit.gd:3666)</td><td>&mdash;</td><td>for 3 turns half of the damage taken becomes Mana</td><td>resource</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Wildfire</b></td><td>Pyromancer core</td><td><b>ALMOST</b></td><td>two terms: <code>_overburn_mult</code> (battle.gd:14057, returns 1.0 without the engine) and <code>_overburn_refund</code> (battle.gd:21291); and it is REFUSED with no burning enemy (battle.gd:6398-6400)</td><td>the Overburn refund clause</td><td>every burning enemy loses a turn of Burn and takes 18% of Attack — castable only when something is already burning</td><td>multi-target damage, DoT payoff</td><td>cannot be cast alone: it needs a Burn applier in the same kit</td></tr>
+<tr style="background:#e6f4e6"><td><b>Flamewave</b></td><td>Pyromancer core</td><td><b>CLEAN</b></td><td>nothing — its Burn block reads the target's Burn only (battle.gd:11502-11520)</td><td>&mdash;</td><td>every enemy takes 15% of Attack and 2 turns of Burn (or 2 more turns if already burning)</td><td>multi-target damage, DoT</td><td>feeds Overburn</td></tr>
+<tr style="background:#e6f4e6"><td><b>Razor Ice</b></td><td>Cryomancer core</td><td><b>CLEAN</b></td><td>nothing — three stacks of plain Chilled</td><td>&mdash;</td><td>three hits of 15% of Attack on one enemy, each laying a stack of Chilled</td><td>single-target damage, Break, control</td><td><b>WORDING:</b> "three quarters of a hold" — without the engine there is no hold<br>feeds Glacial Hold</td></tr>
+<tr style="background:#e6f4e6"><td><b>Blizzard</b></td><td>Cryomancer core</td><td><b>CLEAN</b></td><td>nothing — plain Chilled (battle.gd:11537-11545)</td><td>&mdash;</td><td>every enemy takes 15% of Attack and 1-2 stacks of Chilled</td><td>multi-target damage, control</td><td><b>WORDING:</b> "It does NOT thaw a hold" names the engine's hold<br>feeds Glacial Hold</td></tr>
+<tr style="background:#fff6d6"><td><b>Arcane Cannon</b></td><td>Arcanist core</td><td><b>ALMOST</b></td><td>"BD = 5 x current stacks" reads the second resource (battle.gd:10493-10496), which is 0 without the engine; the card's own Break field is 0</td><td>the Break clause — the card then deals no Break damage at all</td><td>40% of Attack in arcane; the Mage takes 15% of the damage dealt as recoil</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Arcane Barrage</b></td><td>Arcanist core</td><td><b>CLEAN</b></td><td>nothing — its targeting narrows to the weakest (battle.gd:8459-8461)</td><td>&mdash;</td><td>six hits of 8% of Attack, each at one of the two or three weakest enemies</td><td>multi-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#fbe3e3"><td><b>Death Ray</b></td><td>Arcanist core</td><td><b>BOUND</b></td><td>REFUSED below 8 Resonance (battle.gd:6469), and only the engine builds Resonance</td><td>&mdash;</td><td>nothing: it can never be cast</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Fireball</b></td><td>enabler of Pyromancer &mdash; <b>a basic-attack override</b></td><td><b>CLEAN</b></td><td>nothing — Burn is a plain damage-over-time status (6% of the applier's Attack a turn); Overburn reads it, the card does not</td><td>&mdash;</td><td>free: 20% of Attack in fire, 15 Break damage, 3 turns of Burn</td><td>single-target damage, DoT</td><td>feeds Overburn; a basic-attack override (replaces Magic Bolt), outside the slot count</td></tr>
+<tr style="background:#e6f4e6"><td><b>Frostbolt</b></td><td>enabler of Cryomancer &mdash; <b>a basic-attack override</b></td><td><b>CLEAN</b></td><td>nothing — Chilled works alone (slows; a fourth stack freezes, battle.gd:13300); only its HOLD needs the engine (<code>_freeze_holds</code>, battle.gd:12668)</td><td>&mdash;</td><td>free: 20% of Attack in frost, 15 Break damage, a stack of Chilled</td><td>single-target damage, control</td><td><b>WORDING:</b> "Four stacks put the enemy in Glacial Hold — off the turn order until the Cryomancer releases it": without the engine four stacks are a ONE-turn freeze (battle.gd:12679-12680, 12737)<br>feeds Glacial Hold; a basic-attack override, outside the slot count</td></tr>
+<tr style="background:#e6f4e6"><td><b>Arcane Explosion</b></td><td>enabler of Arcanist &mdash; <b>a basic-attack override</b></td><td><b>CLEAN</b></td><td>nothing of its own — the Resonance it "builds" is the build EVERY damaging cast pays a Resonance holder (battle.gd:12418-12457), and <code>_gain_resonance</code> returns for anyone else (battle.gd:14662); its only card-keyed code is its two-different-targets rule (battle.gd:8477-8479)</td><td>&mdash;</td><td>free: two different random enemies, 10% of Attack and 10 Break damage each</td><td>multi-target damage</td><td><b>WORDING:</b> "Builds 1 Resonance (2 on a critical strike)" describes the engine's build, which a Mage without the engine never gets<br>a basic-attack override, outside the slot count; Magic Bolt builds Resonance identically</td></tr>
+</table>
+<h3>KR-MAGE &middot; 6 &middot; The count and the cover</h3>
+<p><b>16 slot candidates: 11 CLEAN, 4 ALMOST, 1 BOUND.</b> <b>To author for a kit of three: 0.</b> Beside them, 3 basic-attack overrides: Fireball (CLEAN), Frostbolt (CLEAN), Arcane Explosion (CLEAN).</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What a kit could guarantee</th><th>CLEAN cards that give it</th><th>Only a clause away</th></tr>
+<tr><td><b>damage</b></td><td><b>DoT</b>: Flamewave<br><b>multi-target damage</b>: Flamewave, Blizzard, Arcane Barrage<br><b>single-target damage</b>: Magic Missiles, Razor Ice</td><td>DoT payoff: Detonation, Wildfire<br>control payoff: Ice Lance<br>multi-target damage: Wildfire<br>single-target damage: Detonation, Ice Lance, Arcane Cannon</td></tr>
+<tr><td><b>Break</b></td><td><b>Break</b>: Razor Ice</td><td>Break: Detonation</td></tr>
+<tr><td><b>control and debuff</b></td><td><b>control</b>: Razor Ice, Blizzard<br><b>strip (enemy)</b>: Dispel</td><td>&mdash;</td></tr>
+<tr><td><b>guarding himself</b></td><td><b>avoidance</b>: Mirror Image<br><b>self shield</b>: Magic Barrier</td><td>&mdash;</td></tr>
+<tr><td><b>guarding the others</b></td><td><b>cleanse (ally)</b>: Dispel</td><td>&mdash;</td></tr>
+<tr><td><b>lifting the others</b></td><td><b>nothing</b></td><td>&mdash;</td></tr>
+<tr><td><b>tempo and resource</b></td><td><b>cooldown</b>: Blink<br><b>resource</b>: Mana Well, Mana Shield</td><td>&mdash;</td></tr>
+</table>
+<p><b>What no passing card guarantees:</b> anything for another hero but Dispel's cleanse &mdash; no heal of any kind, no buff, no shield on an ally.</p>
+<h3>KR-MAGE &middot; 7 &middot; What a pick costs here</h3>
+<ul>
+<li><b>From the class pool:</b> seven today; four if all three come from it.</li>
+<li><b>Pairs, not singles:</b> Detonation and Wildfire pay off Burn, and only Fireball and Flamewave lay it among these
+cards &mdash; Wildfire is <b>refused outright</b> with nothing burning (battle.gd:6398-6400). Ice Lance's two riders pay
+off Chilled and Frozen, which only Frostbolt, Razor Ice and Blizzard lay.</li>
+<li><b>An override in a kit is a free attack</b>, not a slot ability: it would take slot 0 from Magic Bolt, or sit beside
+it as a second free attack.</li>
+<li><b>Slots:</b> an Invoker-taker opens at 3 of 7; an Arcanist at 6 of 7; a Pyromancer or Cryomancer at 5 of 7.</li>
+<li><b>Two class cards collide today:</b> Dispel on an enemy strips the party's own Hunter's Mark (<code>party_mark</code>
+is in neither <code>DEBUFF_IDS</code> nor <code>DISPEL_NEVER</code>, battle.gd:7763-7770) &mdash; and Rime and Arcane Echo
+with it. Were both cards guaranteed, a Mage's Dispel on the marked enemy would take the Hunter's mark off it.</li>
+<li><b>Texts the code contradicts, on these cards:</b> Frostbolt's &ldquo;Glacial Hold&rdquo;, Razor Ice's &ldquo;three
+quarters of a hold&rdquo; and Blizzard's &ldquo;hold&rdquo; are the engine's; Arcane Explosion's &ldquo;Builds 1
+Resonance&rdquo;; Mana Well doubles three regeneration ticks in four, because the regeneration (battle.gd:3790) runs after
+the status ticks (3295).</li>
+</ul>
+<h2 id="kr-cleric">KR-CLERIC &mdash; THE CLERIC</h2>
+<p><b>Mana is the Cleric's class resource.</b> <b>Mercy is the only thing that gives a Cleric a second
+resource</b> (battle.gd:1183-1186), so any card priced in Mercy is refused to every other Cleric (battle.gd:6152).
+<b>Faith pays only while a living hero holds Conviction</b>, and <b>Ruin is laid only while one holds the Old Gods</b>.
+<b>Taking the Rune of the Hierophant (Sanctity) opens with Smite alone.</b> An ally-targeted Cleric card can target the
+Cleric himself (<code>_hero_side()</code>, battle.gd:4015-4016).</p>
+<h3>KR-CLERIC &middot; 1 &middot; The basic attack</h3>
+<p><b>Smite</b> &mdash; free, 44% of Attack (holy; 22 at the Cleric's 50 Attack), 16 Break damage, 2.0 initiative
+(classes.gd:133-142). <b>ONE SLOT, TWO DEFINITIONS</b>: Smite, and <b>Shadowrend</b> while the Old Gods are held
+(classes.gd:5391-5397) &mdash; free, 25% of Attack (shadow), 16 Break damage, Crippled 2 turns. <b>Slot 0 resolves at a
+fixed Good</b>: both Perfects (5% of maximum health) never pay.</p>
+<h3>KR-CLERIC &middot; 2 &middot; The engines and what travels with them</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Engine rune</th><th>Engine</th><th>Enablers (travel with it, take no slot)</th><th>Opens with, engine held</th><th>Opens with, engine dropped</th></tr>
+<tr><td>Rune of the Holy</td><td>Mercy (<code>mercy</code>)</td><td><b>Heal</b>, <b>Hymn of Hope</b></td><td>Smite, Heal, Renewal, Hymn of Hope, Resurrection</td><td>Smite, Renewal, Resurrection</td></tr>
+<tr><td>Rune of the Devout</td><td>Faith &mdash; Conviction (<code>conviction</code>; the lineage id is <code>inquisitor</code>)</td><td><b>Divine Shield</b>, <b>Consecrated Ground</b></td><td>Smite, Divine Shield, Consecrated Ground, Blessing of Zeal</td><td>Smite, Blessing of Zeal</td></tr>
+<tr><td>Rune of the Occultist</td><td>Ruin &mdash; Wrath of the Old Gods (<code>old_gods</code>)</td><td><b>Shadowrend</b> (the basic), <b>Hex of Ruin</b></td><td>Shadowrend, Hex of Ruin, Bewitch, Dark Pact</td><td>Smite, Bewitch, Dark Pact</td></tr>
+<tr><td>Rune of the Hierophant <i>(proposed)</i></td><td>Sanctity (spine)</td><td>none, and no lineage</td><td><b>Smite alone</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>Of the six enablers, three pass clean</b> (Shadowrend, Hex of Ruin, Divine Shield &mdash; each FEEDS its
+engine and reads nothing of it), <b>two are a clause away</b> (Heal's Empower, Consecrated Ground's Faith drip &mdash;
+its damage cut and reflect work for anyone, battle.gd:10096-10098, 10897) and <b>one is bound</b>: Hymn of Hope is
+priced in Mercy.</p>
+<h3>KR-CLERIC &middot; 3 &middot; The class-wide draft pool</h3>
+<p><b>Six cards</b>: Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil (classes.gd:541-542).
+Every Cleric draws about one card in four from here; <b>a Hierophant-taker draws every card of his run from here</b>, and
+his zone-boss awards too. <b>All six pass clean</b> (Ministration on the reading KR-TEST records).</p>
+<h3>KR-CLERIC &middot; 4 &middot; The protected cores that are not enablers</h3>
+<p><b>Five</b>: the Holy's Renewal and Resurrection; the Devout's Blessing of Zeal; the Occultist's Bewitch and Dark
+Pact. <b>Two pass clean (Bewitch, Dark Pact), two are a clause away (Renewal, Blessing of Zeal) and one is bound
+(Resurrection).</b></p>
+<h3>KR-CLERIC &middot; 5 &middot; The test, card by card</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>From</th><th>Verdict</th><th>What it reads</th><th>If ALMOST: the clause to cut</th><th>What it does for a hero holding no engine</th><th>Covers</th><th>Notes</th></tr>
+<tr style="background:#e6f4e6"><td><b>Hex of Ruin</b></td><td>enabler of Occultist</td><td><b>CLEAN</b></td><td>nothing — Exposed is a plain status; the Ruin mark is the engine's (battle.gd:11024)</td><td>&mdash;</td><td>three chosen enemies take 20% of Attack in shadow and 15 Break damage, and are Exposed 3 turns</td><td>multi-target damage, debuff</td><td><b>WORDING:</b> its NAME names the Occultist's stacks, which a Cleric without the engine never lays<br>feeds Ruin</td></tr>
+<tr style="background:#fff6d6"><td><b>Heal</b></td><td>enabler of Holy</td><td><b>ALMOST</b></td><td>"Empower for 1 Mercy": <code>_consume_empower</code> returns unless the second resource is Mercy (battle.gd:16952), which only the engine sets (battle.gd:1183-1186)</td><td>the Empower sentence ("also cleanses all harmful effects")</td><td>heals an ally for 40% of the Cleric's maximum health, cooldown 1</td><td>heal (ally)</td><td>Mercy's +5% a stack is the engine's payout on every heal (battle.gd:14727), not the card's</td></tr>
+<tr style="background:#fbe3e3"><td><b>Hymn of Hope</b></td><td>enabler of Holy</td><td><b>BOUND</b></td><td>its price is 1 Mercy (<code>faith_cost</code>), and the usability door refuses a hero with less (battle.gd:6152); only the engine gives a Cleric Mercy</td><td>&mdash;</td><td>nothing: it can never be cast</td><td>heal (party)</td><td>cutting the Mercy price leaves a FREE party heal on a 2-turn cooldown: a new price is authoring, not a cut</td></tr>
+<tr style="background:#e6f4e6"><td><b>Divine Shield</b></td><td>enabler of Devout</td><td><b>CLEAN</b></td><td>nothing — the barrier absorbs for anyone (<code>_grant_divine_shield</code>, battle.gd:15357); its <code>divine</code> rider pays Faith only through <code>_gain_faith</code>, which returns with no living Devout (battle.gd:16503-16505)</td><td>&mdash;</td><td>an ally gains a barrier worth 35% of the Cleric's maximum health that lasts until broken</td><td>shield (ally)</td><td><b>WORDING:</b> "absorbs 35% of the Devout's max health" names the lineage<br>feeds Faith</td></tr>
+<tr style="background:#fff6d6"><td><b>Consecrated Ground</b></td><td>enabler of Devout</td><td><b>ALMOST</b></td><td>the Faith drip: <code>_ground_faith_tick</code> returns with no living Devout (battle.gd:16712-16720)</td><td>"each is kindled 1 Faith at the start of their turn while it holds"</td><td>every hero takes 15% less damage (battle.gd:10096-10098) and reflects 10% of it (battle.gd:10897) for 3 turns</td><td>mitigation (party), retaliation</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Ministration</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing (battle.gd:18940-18962)</td><td>&mdash;</td><td>heals an ally for 20% of THEIR maximum health</td><td>heal (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Consecration</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_consecration_tick</code> (battle.gd:16744)</td><td>&mdash;</td><td>every hero regains 5% of maximum health each turn for 4 turns</td><td>heal (party)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Chastise</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a field card</td><td>&mdash;</td><td>25% of Attack in holy and 20 Break damage</td><td>single-target damage, Break</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Unburden</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing (battle.gd:18996-19015; read at 9956)</td><td>&mdash;</td><td>removes every harmful effect from an ally, who takes 20% less damage for 3 turns</td><td>cleanse (ally), mitigation (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Exhortation</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>exhorted</code> is read in the strike loop (battle.gd:8423)</td><td>&mdash;</td><td>every hero's next attack deals 35% more damage, banked until used</td><td>party damage buff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Undying Vigil</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — the heal hook is on the unit (unit.gd:4103)</td><td>&mdash;</td><td>for 4 turns every heal on one ally also heals a lower ally for half</td><td>heal (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Renewal</b></td><td>Holy core</td><td><b>ALMOST</b></td><td>the Empower branch reads Mercy through <code>_consume_empower</code> (battle.gd:16952)</td><td>"Empower for 1 Mercy: Renewal also blankets the Cleric"</td><td>an ally heals 15% of the Cleric's maximum health at the start of each turn for 5 turns</td><td>heal (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#fbe3e3"><td><b>Resurrection</b></td><td>Holy core</td><td><b>BOUND</b></td><td>its price is 1 Mercy (<code>faith_cost</code>, battle.gd:6152)</td><td>&mdash;</td><td>nothing: it can never be cast</td><td>revive</td><td>GK's lineage kit keeps it for a Holy who dropped Mercy: a button that can never be pressed</td></tr>
+<tr style="background:#fff6d6"><td><b>Blessing of Zeal</b></td><td>Devout core</td><td><b>ALMOST</b></td><td>"Faith gain is doubled": read inside <code>_gain_faith</code> (battle.gd:16507), which returns with no living Devout</td><td>"and their Faith gain is doubled while the zeal burns"</td><td>an ally deals 15% more damage for 4 turns (battle.gd:9240) and their cooldowns tick down a turn now</td><td>damage buff (ally), cooldown (ally)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Bewitch</b></td><td>Occultist core</td><td><b>CLEAN</b></td><td>nothing — the charm is a plain status (battle.gd:7387, 15693); its Ruin mark goes through <code>_gain_ruin</code>, which returns with no living Occultist (battle.gd:15958)</td><td>&mdash;</td><td>for 3 turns the target basic-attacks its own allies, Dazing them; a boss resists until Broken</td><td>control</td><td>feeds Ruin</td></tr>
+<tr style="background:#e6f4e6"><td><b>Dark Pact</b></td><td>Occultist core</td><td><b>CLEAN</b></td><td>nothing (battle.gd:17440-17484)</td><td>&mdash;</td><td>the Cleric loses 20% of maximum health; every other hero heals 15% of theirs; the Cleric regains 10% a turn for 3 turns</td><td>heal (party), self-sustain</td><td><b>WORDING:</b> "the Occultist regains" names the lineage</td></tr>
+<tr style="background:#e6f4e6"><td><b>Shadowrend</b></td><td>enabler of Occultist &mdash; <b>a basic-attack override</b></td><td><b>CLEAN</b></td><td>nothing — Cripple is a plain status; Ruin is marked by the ENGINE on the debuff (battle.gd:11024-11025), not by the card</td><td>&mdash;</td><td>free: 25% of Attack in shadow, 16 Break damage, Cripples 2 turns</td><td>single-target damage, debuff</td><td>feeds Ruin; a basic-attack override (replaces Smite), outside the slot count</td></tr>
+</table>
+<h3>KR-CLERIC &middot; 6 &middot; The count and the cover</h3>
+<p><b>16 slot candidates: 10 CLEAN, 4 ALMOST, 2 BOUND.</b> <b>To author for a kit of three: 0.</b> Beside them, 1 basic-attack override: Shadowrend (CLEAN).</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What a kit could guarantee</th><th>CLEAN cards that give it</th><th>Only a clause away</th></tr>
+<tr><td><b>damage</b></td><td><b>multi-target damage</b>: Hex of Ruin<br><b>single-target damage</b>: Chastise</td><td>&mdash;</td></tr>
+<tr><td><b>Break</b></td><td><b>Break</b>: Chastise</td><td>&mdash;</td></tr>
+<tr><td><b>control and debuff</b></td><td><b>control</b>: Bewitch<br><b>debuff</b>: Hex of Ruin</td><td>&mdash;</td></tr>
+<tr><td><b>guarding himself</b></td><td><b>self-sustain</b>: Dark Pact</td><td>&mdash;</td></tr>
+<tr><td><b>guarding the others</b></td><td><b>cleanse (ally)</b>: Unburden<br><b>heal (ally)</b>: Ministration, Undying Vigil<br><b>heal (party)</b>: Consecration, Dark Pact<br><b>mitigation (ally)</b>: Unburden<br><b>shield (ally)</b>: Divine Shield</td><td>heal (ally): Heal, Renewal<br>mitigation (party): Consecrated Ground<br>retaliation: Consecrated Ground</td></tr>
+<tr><td><b>lifting the others</b></td><td><b>party damage buff</b>: Exhortation</td><td>cooldown (ally): Blessing of Zeal<br>damage buff (ally): Blessing of Zeal</td></tr>
+<tr><td><b>tempo and resource</b></td><td><b>nothing</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>Guarding himself:</b> no Cleric card is self-only, and every ally-targeted card above can be cast on the Cleric himself (battle.gd:4015-4016) &mdash; Ministration, Undying Vigil, Unburden and Divine Shield among the clean ones; Dark Pact heals him back over three turns.</p>
+<p><b>What no passing card guarantees:</b> a revive (Resurrection is bound), a taunt or an avoidance card, and a tempo or resource card (Blessing of Zeal's cooldown tick is a clause away).</p>
+<h3>KR-CLERIC &middot; 7 &middot; What a pick costs here</h3>
+<ul>
+<li><b>From the class pool:</b> six today; three if all three come from it.</li>
+<li><b>The two bound cards are the Cleric's only revive and only party burst heal.</b> Both are priced in Mercy, so
+salvaging either is choosing a new price &mdash; a Mana cost, a cooldown &mdash; which is authoring, not a cut: with the
+Mercy cost cut and nothing put in its place, each would be free.</li>
+<li><b>Slots:</b> a Hierophant-taker opens at 3 of 7; a Devout at 4 of 7; a Holy or an Occultist at 5 of 7.</li>
+<li><b>Texts the code contradicts, on these cards:</b> Divine Shield says &ldquo;the Devout's max health&rdquo; and uses
+the caster's; Dark Pact says &ldquo;the Occultist regains&rdquo;; Hex of Ruin's name names the Occultist's stacks; Chastise's
+Perfect says 30 Break damage and pays 25; Hymn of Hope, Dark Pact and Resurrection say <i>ally</i> and reach heroes only;
+Renewal and Undying Vigil cast on a companion do nothing (a companion takes no turn, and its heal hook is wired on
+heroes only).</li>
+</ul>
+<h2 id="kr-hunter">KR-HUNTER &mdash; THE HUNTER</h2>
+<p><b>Mana is the Hunter's class resource.</b> <b>The Hunter has no spine</b>: his three engine runes all carry a
+lineage, he is dealt all three at every class selection (GK's ruling 8), and <b>no Hunter opens with Quick Shot alone
+today</b>. A kit is still owed after the pool merge. <b>A living companion comes only from the Pack Bond summons</b>, and
+Focus only from Lethal Aim (<code>_gain_focus</code>, battle.gd:23620).</p>
+<h3>KR-HUNTER &middot; 1 &middot; The basic attack</h3>
+<p><b>Quick Shot</b> &mdash; free, 20% of Attack (physical), 14 Break damage, 2.0 initiative (classes.gd:89-95).
+<b>ONE ABILITY, WHOSE BEHAVIOUR FORKS ON AN ENGINE</b>: for every Hunter it resolves at a fixed Good, except for one
+holding Lethal Aim, whose Quick Shot is the multi-press sequence that pays Focus (battle.gd:4118-4119, 23450-23452). It is
+<b>also Lethal Aim's enabler</b>, and every Hunter already holds it. Its Perfect (&ldquo;+10 bonus Mana&rdquo;) pays only
+inside that sequence.</p>
+<h3>KR-HUNTER &middot; 2 &middot; The engines and what travels with them</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Engine rune</th><th>Engine</th><th>Enablers (travel with it, take no slot)</th><th>Opens with, engine held</th><th>Opens with, engine dropped</th></tr>
+<tr><td>Rune of the Beastmaster</td><td>Loyalty &mdash; Pack Bond (<code>pack</code>)</td><td><b>Summon Ursus</b>, <b>Summon Canis</b>, <b>Summon Aguila</b></td><td>Quick Shot, the three summons, Hunter's Instinct, Kill Command</td><td>Quick Shot, Hunter's Instinct, Kill Command</td></tr>
+<tr><td>Rune of the Sharpshooter</td><td>Focus &mdash; Lethal Aim (<code>lethal_aim</code>)</td><td><b>Quick Shot</b> (the class basic)</td><td>Quick Shot, Aimed Shot, Powershot, Hold Breath</td><td>the same</td></tr>
+<tr><td>Rune of the Survivalist</td><td>Trapper (<code>trapper</code>; the lineage id is <code>mystic</code>)</td><td>none</td><td>Quick Shot, Tripwire, Shrapnel Charge, Snare Trap</td><td>the same</td></tr>
+</table>
+<p><b>The three summons are BOUND.</b> The summon itself reads no engine, but <b>the companion strikes beside
+the Hunter only when he holds Pack Bond</b> (battle.gd:12282), its boon reads nothing without it (battle.gd:14336), and
+Loyalty is refused (battle.gd:14533). What is left is a body that never takes a turn and one arrival effect.
+<b>Quick Shot is the class basic already.</b></p>
+<h3>KR-HUNTER &middot; 3 &middot; The class-wide draft pool</h3>
+<p><b>Six cards</b>: Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows (classes.gd:543-544).
+Every Hunter draws about one card in four from here. <b>All six pass clean.</b></p>
+<h3>KR-HUNTER &middot; 4 &middot; The protected cores that are not enablers</h3>
+<p><b>Eight</b>: the Beastmaster's Hunter's Instinct and Kill Command; the Sharpshooter's Aimed Shot, Powershot and Hold
+Breath; the Survivalist's Tripwire, Shrapnel Charge and Snare Trap. <b>Three pass clean (Powershot, Tripwire, Snare Trap),
+four are a clause away and one is bound (Kill Command).</b></p>
+<h3>KR-HUNTER &middot; 5 &middot; The test, card by card</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Card</th><th>From</th><th>Verdict</th><th>What it reads</th><th>If ALMOST: the clause to cut</th><th>What it does for a hero holding no engine</th><th>Covers</th><th>Notes</th></tr>
+<tr style="background:#fbe3e3"><td><b>Summon Ursus</b></td><td>enabler of Beastmaster</td><td><b>BOUND</b></td><td>the companion strikes alongside only a hero holding the engine (battle.gd:12282); its boon reads nothing without it (<code>_bond_reach</code>, battle.gd:14336); Loyalty is refused (<code>_gain_loyalty</code>, battle.gd:14533)</td><td>&mdash;</td><td>calls a 110-health bear; arriving, it taunts the weakest enemy for 2 turns — and then the body stands there: it takes no turn and never attacks</td><td>decoy, taunt</td><td>the arrival effect (battle.gd:22491-22583) and the body are all that survive</td></tr>
+<tr style="background:#fbe3e3"><td><b>Summon Canis</b></td><td>enabler of Beastmaster</td><td><b>BOUND</b></td><td>the companion strikes alongside only a hero holding the engine (battle.gd:12282); its boon reads nothing without it (<code>_bond_reach</code>, battle.gd:14336); Loyalty is refused (<code>_gain_loyalty</code>, battle.gd:14533)</td><td>&mdash;</td><td>calls an 80-health wolf, always Elusive; arriving, it lays 15 Bleed on every enemy — and then the body stands there: it takes no turn and never attacks</td><td>decoy, Bleed</td><td>the arrival effect (battle.gd:22491-22583) and the body are all that survive</td></tr>
+<tr style="background:#fbe3e3"><td><b>Summon Aguila</b></td><td>enabler of Beastmaster</td><td><b>BOUND</b></td><td>the companion strikes alongside only a hero holding the engine (battle.gd:12282); its boon reads nothing without it (<code>_bond_reach</code>, battle.gd:14336); Loyalty is refused (<code>_gain_loyalty</code>, battle.gd:14533)</td><td>&mdash;</td><td>calls an 80-health eagle, always Elusive; arriving, it dives an enemy for 15% of Attack and Dazes it — and then the body stands there: it takes no turn and never attacks</td><td>decoy, single-target damage</td><td>the arrival effect (battle.gd:22491-22583) and the body are all that survive</td></tr>
+<tr style="background:#e6f4e6"><td><b>Field Dressing</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing (battle.gd:19063-19077)</td><td>&mdash;</td><td>the Hunter heals 18% of maximum health and sheds one harmful effect</td><td>self-sustain, cleanse (self)</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Camouflage</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_evade_chance</code> (battle.gd:13838-13849)</td><td>&mdash;</td><td>for 3 turns enemies are 70% less likely to aim at the Hunter</td><td>avoidance</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Aimed Volley</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — a field card</td><td>&mdash;</td><td>three hits of 12% of Attack on one enemy, 8 Break damage each</td><td>single-target damage, Break</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Bola</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing (battle.gd:19097-19106)</td><td>&mdash;</td><td>the target is Slowed and Crippled for 4 turns</td><td>control, debuff</td><td>feeds Trapper's count</td></tr>
+<tr style="background:#e6f4e6"><td><b>Hunter's Mark</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_party_mark_mult</code> (battle.gd:14008)</td><td>&mdash;</td><td>for 6 turns every ally deals 15% more damage to the target</td><td>party damage buff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Arcane Arrows</b></td><td>class-wide pool</td><td><b>CLEAN</b></td><td>nothing — <code>_arcane_arrow_splash</code> (battle.gd:13873)</td><td>&mdash;</td><td>the next six hits each strike a second random enemy for half</td><td>multi-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Hunter's Instinct</b></td><td>Beastmaster core</td><td><b>ALMOST</b></td><td>the companion heal walks <code>_beasts</code> (battle.gd:12264-12271), which is empty without the engine's summons</td><td>"and heals your companion for 15% of its max health"</td><td>the next three Quick Shots each deal +10% of Attack (battle.gd:9281-9282)</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#fbe3e3"><td><b>Kill Command</b></td><td>Beastmaster core</td><td><b>BOUND</b></td><td>REFUSED with no living companion (battle.gd:6157-6159); companions come only from the engine's summons</td><td>&mdash;</td><td>nothing: it can never be cast</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Aimed Shot</b></td><td>Sharpshooter core</td><td><b>ALMOST</b></td><td>its Perfect pays Focus (<code>focus20</code> → <code>_gain_focus</code>, battle.gd:24246-24247), which returns without the engine (battle.gd:23620)</td><td>the Perfect ("+20 Focus") — the card would then run a bar with no Perfect</td><td>45% of Attack and 15 Break damage, cooldown 1</td><td>single-target damage</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Powershot</b></td><td>Sharpshooter core</td><td><b>CLEAN</b></td><td>nothing — it reads the target's Break meter (battle.gd:9449-9455)</td><td>&mdash;</td><td>20% of Attack and 20 Break damage, +2% a point of the target's Break meter</td><td>single-target damage, Break</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Hold Breath</b></td><td>Sharpshooter core</td><td><b>ALMOST</b></td><td>"+40 Focus" (<code>_gain_focus</code>, battle.gd:23620); AND the countdown that spends the held breath sits INSIDE the engine's block (battle.gd:12186 → 12228)</td><td>"+40 Focus" — and the countdown has to move out of the engine's block, which is code, not a word</td><td>without the engine the held breath is NEVER spent: every damaging attack for the rest of the fight is a guaranteed critical that ignores armor (battle.gd:9155, 10452-10456)</td><td>single-target damage</td><td>a live defect today: a Sharpshooter who drops his rune keeps this card</td></tr>
+<tr style="background:#e6f4e6"><td><b>Tripwire</b></td><td>Survivalist core</td><td><b>CLEAN</b></td><td>nothing — the retaliation reads the status only (battle.gd:12345)</td><td>&mdash;</td><td>for 6 turns every melee enemy that strikes a hero takes 75% of what it dealt</td><td>retaliation</td><td>&mdash;</td></tr>
+<tr style="background:#fff6d6"><td><b>Shrapnel Charge</b></td><td>Survivalist core</td><td><b>ALMOST</b></td><td>its Poison (and its Perfect's Slow) is applied inside <code>has_engine("trapper")</code> (battle.gd:12059-12068)</td><td>"leaving them Poisoned" (and the Perfect's Slowed)</td><td>two chosen enemies take 20% of Attack in nature and 25 Break damage, and are Crippled 3 turns</td><td>multi-target damage, Break, debuff</td><td>&mdash;</td></tr>
+<tr style="background:#e6f4e6"><td><b>Snare Trap</b></td><td>Survivalist core</td><td><b>CLEAN</b></td><td>nothing — the spring (battle.gd:3189-3195, <code>_spring_trap</code> 23359) reads the placer only</td><td>&mdash;</td><td>the next time the enemy acts it is Stunned 1 turn and Poisoned 4 (a boss resists until Broken)</td><td>control, DoT</td><td>feeds Trapper's count</td></tr>
+</table>
+<h3>KR-HUNTER &middot; 6 &middot; The count and the cover</h3>
+<p><b>17 slot candidates: 9 CLEAN, 4 ALMOST, 4 BOUND.</b> <b>To author for a kit of three: 0.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What a kit could guarantee</th><th>CLEAN cards that give it</th><th>Only a clause away</th></tr>
+<tr><td><b>damage</b></td><td><b>DoT</b>: Snare Trap<br><b>multi-target damage</b>: Arcane Arrows<br><b>single-target damage</b>: Aimed Volley, Powershot</td><td>multi-target damage: Shrapnel Charge<br>single-target damage: Hunter's Instinct, Aimed Shot, Hold Breath</td></tr>
+<tr><td><b>Break</b></td><td><b>Break</b>: Aimed Volley, Powershot</td><td>Break: Shrapnel Charge</td></tr>
+<tr><td><b>control and debuff</b></td><td><b>control</b>: Bola, Snare Trap<br><b>debuff</b>: Bola</td><td>debuff: Shrapnel Charge</td></tr>
+<tr><td><b>guarding himself</b></td><td><b>avoidance</b>: Camouflage<br><b>cleanse (self)</b>: Field Dressing<br><b>self-sustain</b>: Field Dressing</td><td>&mdash;</td></tr>
+<tr><td><b>guarding the others</b></td><td><b>retaliation</b>: Tripwire</td><td>&mdash;</td></tr>
+<tr><td><b>lifting the others</b></td><td><b>party damage buff</b>: Hunter's Mark</td><td>&mdash;</td></tr>
+<tr><td><b>tempo and resource</b></td><td><b>nothing</b></td><td>&mdash;</td></tr>
+</table>
+<p><b>What no passing card guarantees:</b> a heal, a shield or a cleanse for another hero; a tempo, cooldown or resource card.</p>
+<h3>KR-HUNTER &middot; 7 &middot; What a pick costs here</h3>
+<ul>
+<li><b>From the class pool:</b> six today; three if all three come from it. No Hunter draws from it alone today.</li>
+<li><b>Hold Breath is not a card to move as it stands.</b> The countdown that spends the held breath sits inside the
+Lethal Aim block (battle.gd:12186 &rarr; 12228), so for any other Hunter the &ldquo;next attack&rdquo; is <b>every attack for the
+rest of the fight</b>: a guaranteed critical that ignores armor (battle.gd:9155, 10452-10456). Salvaging it is a word
+AND a line of code moved. <b>It is live today</b> for a Sharpshooter who drops his rune.</li>
+<li><b>Poison:</b> among the passing cards only Snare Trap lays it; Shrapnel Charge's Poison is applied inside the
+Trapper block (battle.gd:12059-12068).</li>
+<li><b>Slots:</b> a Beastmaster opens at 5 of 7; a Sharpshooter or Survivalist at 6 of 7.</li>
+<li><b>Texts the code contradicts, on these cards:</b> Quick Shot's and Aimed Shot's Perfects pay only under Lethal Aim;
+Kill Command's &ldquo;The Pack: BOTH companions obey&rdquo; names a mode no player can reach (<code>the_pack</code> has no
+writer); Hold Breath's &ldquo;next attack&rdquo;.</li>
+</ul>
+<h2 id="kr-found">KR-FOUND &mdash; FOUND ON THE WAY, NOT FIXED</h2>
+<p><b>A report touches no code.</b> Each item is queued in <code>docs/state.md</code>. The first three are reachable in
+play today through GK's drop-to-nothing.</p>
+<ol>
+<li><b>HOLD BREATH NEVER RUNS OUT FOR A HUNTER WITHOUT LETHAL AIM.</b> The countdown that spends the held breath is
+inside the <code>has_engine("lethal_aim")</code> block (battle.gd:12186, 12228). A Sharpshooter who drops his rune keeps
+Hold Breath in his lineage kit (GK &sect;5's own table shows its chip standing), and after one cast every damaging attack
+he makes is a guaranteed critical that ignores armor. <b>Driven:</b> six Quick Shots after one cast, the status standing
+after every one and the mean hit 15.0 &rarr; 26.2; with Lethal Aim held, the first shot spends it.</li>
+<li><b>THREE LINEAGE CARDS ARE BUTTONS THAT CAN NEVER BE PRESSED ONCE THE ENGINE IS DROPPED.</b> Death Ray (below 8
+Resonance, battle.gd:6469), Resurrection (1 Mercy, battle.gd:6152 &mdash; its button label reads a bare &ldquo;1&rdquo;,
+battle.gd:6572-6573) and Kill Command (no living companion, battle.gd:6157-6159) stay in their lineage kits (GK &sect;5's
+table lists all three) and are refused for good &mdash; <b>driven</b>: each was refused in an engine-less kit, Resurrection
+with a hero down.</li>
+<li><b>LINEAGE CARDS WHOSE PAYLOAD SITS INSIDE THE ENGINE'S BLOCK</b>, so a lineage hero who drops the engine keeps a card
+that half-works: Shrapnel Charge's Poison, Hamstring's Slow and Exposed and Venom Coating's poison inside Trapper's block
+(battle.gd:12059-12079); Pinning Shot's Daze and Called Shot's rider inside Lethal Aim's (battle.gd:12214-12227).</li>
+<li><b>THE SPLIT SHIELD RUNE DOES NOTHING IN A FIGHT.</b> A live 100-gold Warden rune. <code>rune_split_shield</code> is
+read only by the recast table (battle.gd:5945); Shieldwall's cast (battle.gd:20902) lays the full wall on the Warden and
+nothing on an ally &mdash; <b>driven</b>: the cast laid 25 on the Warden and covered no ally, while the table proposed 12.
+<code>check_ez</code> &sect;5 drives the table, not the cast, and its comment says the two are the same answer.</li>
+<li><b>DISPEL STRIPS THE PARTY'S OWN MARKS.</b> <code>party_mark</code> (Hunter's Mark), <code>rime</code> and
+<code>arcane_echo</code> are in neither <code>DEBUFF_IDS</code> nor <code>DISPEL_NEVER</code>, so Dispel on an enemy
+counts them as its buffs (battle.gd:7763-7770) &mdash; the trap <code>DISPEL_NEVER</code>'s own comment describes.
+<b>Driven:</b> a Hunter's Mark laid, then a Mage's Dispel on that enemy, and the mark was gone.</li>
+<li><b>DIVINE SHIELD'S RECAST TABLE IGNORES THE BARE ALTAR RUNE</b>, which halves the cast (battle.gd:17157-17158): the table
+proposes the full 35% (battle.gd:6064), so it reads a wasted recast as an improvement. CR &sect;3's rule, one rune along.</li>
+<li><b>THE CLASS BASICS ADVERTISE A PERFECT NONE OF THEM CAN REACH</b> (Strike, Magic Bolt, Smite, Quick Shot, and the
+overrides at slot 0), on the battle tooltip and the hero sheet &mdash; the one exception is a Lethal Aim holder's Quick
+Shot. <code>test_batch_bo</code> &sect;5 passes them, because it asks <code>runs_skill_check()</code> and the cast path asks
+slot 0.</li>
+<li><b>CARD TEXTS THE CODE CONTRADICTS</b>, each listed in its class section's part 7: Charge's Daze; Cleave's Perfect; Battle Trance's and
+Mana Well's fourth turn; Chastise's Perfect; Frostbolt's, Razor Ice's and Blizzard's hold; Divine Shield's and Dark Pact's
+lineage words; Hymn of Hope's, Dark Pact's and Resurrection's <i>ally</i>; Renewal and Undying Vigil on a companion;
+Kill Command's two companions.</li>
+</ol>
+<h2 id="kr-not">KR-NOT &mdash; WHAT THIS PAGE DELIBERATELY DOES NOT SAY</h2>
+<ul>
+<li><b>Which three.</b> A recon reads out what is there; the pick is the designer's
+(<code>docs/ways-of-working.md</code>, RECON BEFORE AUTHORING).</li>
+<li><b>Whether any card is priced right as a guaranteed one.</b> No magnitude was measured or moved.</li>
+<li><b>The nine engine runes still owed</b>, <b>the Crown's Break and freeze resistance</b>, <b>the pool merge</b>, any
+talent node and any rune cost &mdash; all out of this batch by the brief (&sect;4).</li>
+<li><b>How a kit is built.</b> Where it lives, how it enters <code>Classes.opening_kit</code>, whether it is protected,
+how the pools and the bot learn it, and what the gates that pin the class pools do when three cards leave them &mdash;
+the build batch's.</li>
+</ul>
+</body></html>

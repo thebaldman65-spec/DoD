@@ -13,43 +13,109 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-15 (Batch GK).*
+*Last rewritten: 2026-09-16 (Batch GL).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GK — ENGINES BECOME RUNES. THE SEVENTEENTH BATCH ON `class-merge`, AND STEP 3 OF THE MERGE.** `main`
-  is untouched. Full working: **`docs/reports/GK.md`**.
-- **§1: THE FIFTEEN ENGINES ARE ENGINE RUNES**, one each in `data/runes.json` (`"engine": <id>`, scoped to its class,
-  an empty payload, the flat 100 gold): the twelve spec engines named for their specs — *Rune of the Berserker* to
-  *Rune of the Survivalist* — and the three spines **proposed** as the *Rune of the Vanguard* (Momentum), the
-  *Invoker* (Channel) and the *Hierophant* (Sanctity). **The charter's six a class is RULED, NOT BUILT: nine are
-  owed** — the Warrior, the Mage and the Cleric hold four, the Hunter three, and he is dealt all three every time.
-- **§2: THE MACHINERY.** Class selection deals three and the hero takes one (`Run.deal_engines`, frozen on the member;
-  `Run.awaken`, the one door, the sim's too). Two slots in `member["engines"]`, apart from the three ordinary ones;
-  the second arrives wherever runes do; drop and swap to nothing from the map's rune pouch (`Run.toggle_engine`); the
-  enabler travels with its engine and takes no slot (`Classes.opening_kit`, `Classes.lineage_slots`). **No save
-  version moved. A hero with no engine fights and wins. `passive_id` is deleted**: a unit holds `engines` and every
-  read is `has_engine(id)`; the three spine switches have one writer, `_sync_engine_switches`.
-- **THE LINEAGE.** The spec id survives as the hero's lineage, set by the engine taken at class selection (none, for a
-  spine), and it still keys the four layers GK did not merge — the opening kit, the stat block, the draft and boss
-  pools, the spec-scoped runes. **`awakened`, not a spec, is what "has chosen" means now.**
-- **§3: THE DAMAGE, THEN THE REPAIR.** The unmodified battery against GK's tree read **67 of 104 targets red and the
-  harness's gate 2** — 42 throwing, 38 of those on the deleted field, and every fixture-seated hero holding no engine
-  — and GK repaired it in a stated order in the same batch. **What is left red is what was red before it: `check_cm_live`'s one sanctioned red.**
-- **WHAT MOVED:** `data/runes.json` (the fifteen), `scripts/classes.gd`, `scripts/runes.gd`, `scripts/run_state.gd`,
-  `scripts/unit.gd`, `scripts/battle.gd`, `scripts/spec_choice_screen.gd` (class selection), `scripts/map_screen.gd`,
-  `scripts/party_screen.gd`, `scripts/shop_screen.gd`, `scripts/events.gd`, `scripts/profile.gd`,
-  `scripts/run_sim.gd`; both fixtures and 55 instruments — 24 gates and 31 suites, re-pointed and re-derived in a stated order (`docs/reports/GK.md` §3b) — and `pin-manifest.json`, regenerated; `baselines.json`, `CLAUDE.md` (the charter),
-  `docs/master.html` and its stamp, `data/glossary.json`, this file, the changelog, `docs/design-notes.md` and
-  `docs/reports/GK.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GK.md`**, written before the acceptance run; its figures were added after it.
-- **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are
-  done — step 3 without the nine engines, which are the designer's. **Step 4, the pool merge, is next.**
-- **Next letter: GL.**
+- **Last batch: GL — WHAT THE FOUR CLASS KITS COULD BE MADE OF. REPORT ONLY, AND THE EIGHTEENTH BATCH ON
+  `class-merge`.** `main` is untouched. Full working: **`docs/reports/GL.md`**; the deliverable is
+  **`docs/kit-recon.html`** (**NEW**), one self-contained `KR-` section a class.
+- **RULED BY THE DESIGNER IN GL's BRIEF — RULED, NOT BUILT: every class gets a small guaranteed kit, THREE abilities
+  INSIDE the slot count**, salvaged where a card fits and authored where none does. It answers GK's ruling 7 (a spine
+  opens with the basic alone).
+- **THE ANSWER: NONE OF THE TWELVE HAS TO BE WRITTEN.** 64 slot candidates — the 25 class-wide cards, the 28 protected
+  cores that are not enablers, the 11 enablers that are not basics — of which **44 pass clean, 13 pass with one clause
+  cut and 7 are bound to their engine**. Every class holds at least nine clean: Warrior 14, Mage 11, Cleric 10 (8 on the
+  stricter reading the recon records), Hunter 9. **Twelve to pick, not to write.**
+- **WHAT A PICK MOVES** (`docs/kit-recon.html` part 7 of each class): a class-wide card leaves every hero's class draw
+  and a spine-taker's whole supply (six cards, the Mage's seven); a lineage core already sits in its lineage's kit until
+  the pool merge; the class-wide cards were authored weaker than spec cards on purpose, and EB §1 made the core the
+  baseline.
+- **FOUND, AND LIVE TODAY THROUGH GK's DROP-TO-NOTHING:** Hold Breath never runs out for a Hunter without Lethal Aim;
+  Death Ray, Resurrection and Kill Command are buttons that can never be pressed in an engine-less lineage kit. **And a
+  live rune that does nothing:** Split Shield. The queue below carries all of it.
+- **WHAT MOVED:** `docs/kit-recon.html` (**NEW**), `docs/changelog.html` (one entry), this file, and
+  `docs/reports/GL.md` (**NEW**). **No code, no gate, no baseline row, no manifest entry, no `CLAUDE.md` rule, no
+  `master.html` edit.**
+- **VERIFICATION:** in **`docs/reports/GL.md`**, written after the acceptance run.
+- **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are done
+  — step 3 without its nine engines. **The class kit is ruled and recon'd; the designer picks the three. The Crown's
+  Break and freeze resistance is the batch after the kits** (GL's brief). Step 4 of the running order is the pool merge.
+- **Next letter: GM.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### THE CLASS KIT — **RULED, NOT BUILT; RECON'D AT GL (`docs/kit-recon.html`); THE PICK IS THE DESIGNER'S**
+
+Full working: `docs/reports/GL.md`, NEEDS A RULING.
+
+1. **WHICH THREE, FOR EACH CLASS.** The recon puts every candidate to one test — works for every hero of the class,
+   with any engine or none — and prints what each passing card could guarantee. **What no passing card guarantees:**
+   - the Warrior — a heal, a shield or a cleanse for another hero (Mocking Blow's taunt is his only guard for others);
+   - the Mage — anything for another hero but Dispel's cleanse;
+   - the Cleric — a revive (Resurrection costs Mercy), a taunt or avoidance card, a tempo or resource card;
+   - the Hunter — a heal, a shield or a cleanse for another hero, and a tempo or resource card.
+2. **WHERE A PICK COMES FROM, BECAUSE IT MOVES SOMETHING EITHER WAY.** A class-wide card taken into a kit leaves every
+   hero's class draw, and a spine-taker draws his whole run from that pool (`run_state.gd` `draft_pool_left`,
+   `roll_class_fallback_offer`): six cards, the Mage's seven, three once three leave. A lineage core taken into a kit is
+   already in its lineage's opening kit until the pool merge.
+3. **THE CLASS-WIDE CARDS WERE AUTHORED WEAKER THAN SPEC CARDS** (`classes.gd`'s pool header), and EB §1 ruled the
+   protected core is the baseline — a kit of class-wide cards hands the baseline role to the fallback cards.
+4. **SALVAGE THAT IS AUTHORING, NOT A CUT:** Hymn of Hope and Resurrection are priced only in Mercy, so either needs a
+   new price; Arcane Cannon's Break is five a Resonance stack, so without the engine it has none; Hold Breath needs a
+   line of code moved as well as a word cut (below).
+5. **TWO VERDICTS HAVE TWO READINGS**, recorded rather than resolved in the designer's direction: Ministration (Mercy's
+   +5% healing a stack multiplies it) and Divine Shield (a hidden `divine` rider only Faith reads) read CLEAN as the
+   engine's payout and a feed; a stricter reading makes both ALMOST and leaves the Cleric eight clean.
+
+### FOUND AT GL AND NOT FIXED — **THE FIRST THREE ARE LIVE TODAY THROUGH GK's DROP-TO-NOTHING**
+
+- **PLAYER-FACING, AND AN EXPLOIT: HOLD BREATH NEVER RUNS OUT FOR A HUNTER WITHOUT LETHAL AIM.** The countdown that
+  spends `held_breath` sits inside `battle.gd`'s `has_engine("lethal_aim")` block (12186 → 12228), so after one cast
+  every damaging attack is a guaranteed critical that ignores armor for the rest of the fight (9155, 10452-10456). A
+  Sharpshooter who unslots his rune keeps Hold Breath (GK §5's table shows its chip standing). **Driven in a scratch
+  probe** (`docs/reports/GL.md`): six Quick Shots after one cast, the status standing after every one, the mean hit
+  15.0 → 26.2; with Lethal Aim held, the first shot spends it.
+- **PLAYER-FACING: THREE LINEAGE CARDS BECOME BUTTONS THAT CAN NEVER BE PRESSED WHEN THE ENGINE IS DROPPED** — Death Ray
+  (below 8 Resonance, `battle.gd:6469`), Resurrection (1 Mercy, 6152; its label reads a bare "1", 6572-6573) and Kill
+  Command (no companion, 6157-6159). GK's lineage interim keeps all three in the kit. Driven: each refused in an
+  engine-less kit, Resurrection with a hero down. It widens GK's ruling 5.
+- **PLAYER-FACING: LINEAGE CARDS THAT HALF-WORK WHEN THE ENGINE IS DROPPED**, because their payload sits inside the
+  engine's block: Shrapnel Charge's Poison, Hamstring's Slow and Exposed and Venom Coating's poison inside Trapper's
+  (`battle.gd:12059-12079`); Pinning Shot's Daze and Called Shot's rider inside Lethal Aim's (12214-12227).
+- **PLAYER-FACING: THE SPLIT SHIELD RUNE DOES NOTHING IN A FIGHT.** A live 100-gold Warden rune:
+  `rune_split_shield` is read only by the recast table (`battle.gd:5945`), and Shieldwall's cast (20902) never splits
+  the wall — driven: the cast laid 25 on the Warden and covered no ally, the table proposed 12. **`check_ez` §5 drives
+  the table, not the cast**, and its comment says the two are one answer — a gate green over a dud since the rune was
+  authored.
+- **DISPEL STRIPS THE PARTY'S OWN MARKS.** `party_mark` (Hunter's Mark), `rime` and `arcane_echo` are in neither
+  `DEBUFF_IDS` nor `DISPEL_NEVER`, so `_dispellable_buffs` (`battle.gd:7763-7770`) hands them to a Mage's Dispel on an
+  enemy — the trap `DISPEL_NEVER`'s own comment describes. Driven: a Hunter's Mark laid, a Mage's Dispel on that
+  enemy, and the mark gone.
+- **DIVINE SHIELD'S RECAST PROPOSAL IGNORES THE BARE ALTAR RUNE**, which halves the cast (`battle.gd:17157-17158`); the
+  table proposes the full 35% (6064), so a wasted recast reads as an improvement. CR §3's rule, one live rune along.
+- **PLAYER-FACING: THE CLASS BASICS ADVERTISE A PERFECT NONE OF THEM CAN REACH** — Strike, Magic Bolt, Smite, Quick Shot
+  and the overrides in slot 0 resolve at a fixed Good (`battle.gd:4118-4119`), while the battle tooltip and the hero
+  sheet print their Perfect lines. A Lethal Aim holder's Quick Shot is the one exception. **`test_batch_bo` §5 passes
+  them**, because it asks `runs_skill_check()` and the cast path asks slot 0.
+- **PLAYER-FACING: CARD TEXTS THE CODE CONTRADICTS**, each in its class section of the recon: Charge's one-turn Daze
+  never acts (it ticks off at the target's turn start, `battle.gd:3295`, before any miss roll) and its Perfect has no
+  code; Cleave's Perfect has no code; Battle Trance and Mana Well pay three turns in four (their ticks run after
+  `tick_statuses`); Chastise's Perfect says 30 Break damage and pays 25; Frostbolt's, Razor Ice's and Blizzard's
+  "hold" is the engine's; Divine Shield names "the Devout's" health and Dark Pact "the Occultist"; Hymn of Hope, Dark
+  Pact and Resurrection say *ally* and reach heroes only; Renewal and Undying Vigil on a companion do nothing; Kill
+  Command's "both companions" names a mode nothing writes (`the_pack`); Arcane Explosion's "Builds 1 Resonance".
+- **THE SIM BOT CASTS SEVERAL CANDIDATES ONLY INSIDE ENGINE BRANCHES** (Bloodlust, Wildstrikes, Mocking Blow,
+  Shieldwall, Guard Change — `battle.gd:4656-4760`). A class kit owes the bot a class-level branch, or a sim never
+  plays the kit.
+- **A PARTY DAMAGE BUFF PAYS ON ORDINARY STRIKES ONLY.** Warcry, Exhortation, Blessing of Zeal and Hunter's Mark are
+  read in the strike path (`battle.gd:9689, 8423-8425, 9240, 9892`); a card resolving in its own `special` handler
+  reads none of them. True of all four; recorded once.
+- **ONE SYNC LINE, AS AT FW:** `CLAUDE.md`'s must-stay-selected list does not name `docs/kit-recon.html` (nor
+  `systems-recon.html`). GL added no `CLAUDE.md` line (the brief forbade rules); **selecting it in the picker is the
+  designer's**.
 
 ### GK's RULINGS OWED — **NINE; THE NAMES, THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE**
 
@@ -60,10 +126,13 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
 3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
    dropped"*.
 4. **An engine rune's cost** — the flat 100 gold until one is set.
-5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools.
+5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools. **GL found what
+   else he keeps**: Death Ray, Resurrection and Kill Command, which can then never be cast, a Hold Breath that never
+   runs out, and five lineage cards that half-work (GL's findings above).
 6. **Heavy Plating's base is a stat** — the Warden's 0.10 Block stays with the lineage, so another Warrior's plating
    climbs from zero plus its own slice.
-7. **A hero who takes a spine opens with his class's basic attack alone.**
+7. **A hero who takes a spine opens with his class's basic attack alone.** **The designer ruled the answer in GL's brief
+   — a class kit of three, RULED, NOT BUILT — and GL recon'd it** (the section above; `docs/kit-recon.html`).
 8. **The Hunter is dealt all three of his three** — no variety in the deal until his six exist.
 9. **No engine rune carries a tag** — `check_ek` exempts the fifteen as a set.
 
@@ -903,6 +972,8 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    rulings in that document's §3 come before a node is written.**
 3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK, WITHOUT THE NINE ENGINES THE CHARTER'S SIX A
    CLASS OWES**, which are the designer's.
+   - **AND A CLASS KIT OF THREE, RULED IN GL's BRIEF — RULED, NOT BUILT.** Its recon is `docs/kit-recon.html` (GL); the
+     brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
 4. **POOL MERGING.**
 5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
 6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks. **GK repaired the
@@ -3154,10 +3225,9 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**GB's verification is in `docs/reports/GB.md` §verification, written after the acceptance run.** GB moved a node,
-four instruments and three swept documents, so HEAD's unmodified gates ran against the new tree first and their
-readings stand beside the predictions in the report. The documents were proved by the literal sweep against HEAD
-(every string literal of four characters or more in every `.gd`, read raw, lowered and whitespace-flattened), by
-`build_pin_manifest.py --check`, and by the full battery over the finished tree.
-**The figures live in the report and not here**, because this file is read by `check_es` §4 and a cell written
-behind the run would owe a post-run proof of its own.
+**GL's verification is in `docs/reports/GL.md`, written after the acceptance run.** GL moved no code and no instrument:
+it added one document and one report and edited two more, so the documents were proved by the literal sweep against
+HEAD (every string literal of four characters or more in every `.gd`, read raw, lowered and whitespace-flattened), by
+`build_pin_manifest.py --check`, by the gates that read these documents run on their own, and by the full battery over
+the finished tree. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
+cell written behind the run would owe a post-run proof of its own.
