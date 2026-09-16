@@ -771,7 +771,7 @@ func _negative_control_source() -> void:
 func _live_curve() -> void:
 	var scene := await _spawn({})
 	var h := _hero(scene, 3)
-	ok(h != null and h.passive_id == "pack", "the Beastmaster spawned")
+	ok(h != null and h.has_engine("pack"), "the Beastmaster spawned")
 	await _summon(scene, h, "canis")
 	# Base step 20%: x2 at 5, x3 at 10, x5 at 20 — the three §11 names.
 	#
@@ -1131,7 +1131,7 @@ func _live_vengeance_and_steadfast() -> void:
 func _live_ruin_generation() -> void:
 	var scene := await _spawn({}, "occultist")
 	var occ := _hero(scene, 2)
-	ok(occ != null and occ.passive_id == "old_gods", "the Occultist spawned")
+	ok(occ != null and occ.has_engine("old_gods"), "the Occultist spawned")
 	var foe := _foe(scene, 0)
 	foe.max_hp = 100000
 	foe.hp = 100000

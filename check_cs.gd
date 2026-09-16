@@ -37,7 +37,7 @@ func _initialize() -> void:
 		["warden", "pyromancer", "holy", "sharpshooter"], {"deterministic": true})
 	var ss: BattleUnit = null
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "lethal_aim":
+		if not h.is_companion and h.has_engine("lethal_aim"):
 			ss = h
 	ok(ss != null, "the party has a Sharpshooter")
 	if ss == null:

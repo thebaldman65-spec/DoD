@@ -865,5 +865,96 @@
 		"price": 100,
 		"desc": "The barb fires on EVERY strike instead of a quarter — and his Poison deals no damage.",
 		"payload": {"stat": {"rune_thin_blood": 1}}
+	},
+
+	"engine_berserker": {
+		"name": "Rune of the Berserker", "scope": "class:warrior",
+		"price": 100, "engine": "bloodrage",
+		"desc": "The Berserker's engine.",
+		"payload": {}
+	},
+	"engine_warden": {
+		"name": "Rune of the Warden", "scope": "class:warrior",
+		"price": 100, "engine": "heavy_plating",
+		"desc": "The Warden's engine.",
+		"payload": {}
+	},
+	"engine_swordmaster": {
+		"name": "Rune of the Swordmaster", "scope": "class:warrior",
+		"price": 100, "engine": "seasoned",
+		"desc": "The Swordmaster's engine.",
+		"payload": {}
+	},
+	"engine_momentum": {
+		"name": "Rune of the Vanguard", "scope": "class:warrior",
+		"price": 100, "engine": "momentum",
+		"desc": "A Warrior engine.",
+		"payload": {}
+	},
+	"engine_pyromancer": {
+		"name": "Rune of the Pyromancer", "scope": "class:mage",
+		"price": 100, "engine": "overburn",
+		"desc": "The Pyromancer's engine.",
+		"payload": {}
+	},
+	"engine_cryomancer": {
+		"name": "Rune of the Cryomancer", "scope": "class:mage",
+		"price": 100, "engine": "permafrost",
+		"desc": "The Cryomancer's engine.",
+		"payload": {}
+	},
+	"engine_arcanist": {
+		"name": "Rune of the Arcanist", "scope": "class:mage",
+		"price": 100, "engine": "resonance",
+		"desc": "The Arcanist's engine.",
+		"payload": {}
+	},
+	"engine_channel": {
+		"name": "Rune of the Invoker", "scope": "class:mage",
+		"price": 100, "engine": "channel",
+		"desc": "A Mage engine.",
+		"payload": {}
+	},
+	"engine_holy": {
+		"name": "Rune of the Holy", "scope": "class:cleric",
+		"price": 100, "engine": "mercy",
+		"desc": "The Holy's engine.",
+		"payload": {}
+	},
+	"engine_inquisitor": {
+		"name": "Rune of the Devout", "scope": "class:cleric",
+		"price": 100, "engine": "conviction",
+		"desc": "The Devout's engine.",
+		"payload": {}
+	},
+	"engine_occultist": {
+		"name": "Rune of the Occultist", "scope": "class:cleric",
+		"price": 100, "engine": "old_gods",
+		"desc": "The Occultist's engine.",
+		"payload": {}
+	},
+	"engine_sanctity": {
+		"name": "Rune of the Hierophant", "scope": "class:cleric",
+		"price": 100, "engine": "sanctity",
+		"desc": "A Cleric engine.",
+		"payload": {}
+	},
+	"engine_beastmaster": {
+		"name": "Rune of the Beastmaster", "scope": "class:hunter",
+		"price": 100, "engine": "pack",
+		"desc": "The Beastmaster's engine.",
+		"payload": {}
+	},
+	"engine_sharpshooter": {
+		"name": "Rune of the Sharpshooter", "scope": "class:hunter",
+		"price": 100, "engine": "lethal_aim",
+		"desc": "The Sharpshooter's engine.",
+		"payload": {}
+	},
+	"engine_mystic": {
+		"name": "Rune of the Survivalist", "scope": "class:hunter",
+		"price": 100, "engine": "trapper",
+		"desc": "The Survivalist's engine.",
+		"payload": {}
 	}
 }

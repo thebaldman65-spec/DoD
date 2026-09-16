@@ -313,10 +313,12 @@ func _warrior_draft_flow() -> void:
 		"§7: ...and can take a card off it")
 	ok(run.earned_ability_names(m).has(cands[0]),
 		"§7: ...which lands in `bm_abilities`, the list a boss pick already writes")
-	# THE SEVEN-SLOT CAP, DRIVEN WITH A WARRIOR. His core is 3, so 4 earned
-	# abilities fill him and the fifth needs a drop.
-	ok(run.ability_slots_used(m) == 4,
-		"§7: 3 core + 1 earned = 4 of 7 (got %d)" % run.ability_slots_used(m))
+	# THE SEVEN-SLOT CAP, DRIVEN WITH A WARRIOR. **BATCH GK: his lineage counts
+	# 2, not 3** — Guard Change is the enabler his Stances need and sits outside
+	# the slot count (the charter) — so 5 earned abilities fill him and the sixth
+	# needs a drop.
+	ok(run.ability_slots_used(m) == Classes.lineage_slots("swordmaster") + 1,
+		"§7: 2 lineage + 1 earned = 3 of 7 (got %d)" % run.ability_slots_used(m))
 	# BATCH DR — **THE THREE FILLER NAMES MUST NOT BE DRAFTABLE, AND TWO OF
 	# THEM WERE.** This kit is hand-built to reach the cap, and §7 then TAKES
 	# `cands[1]` — a card drawn at random from his live draft pool. LUNGE and
@@ -346,10 +348,13 @@ func _warrior_draft_flow() -> void:
 	# carried.** Every other fixture in the tree stuffs `bm_abilities` on a
 	# member that has never taken a card, where the default already says that.
 	m.erase("bm_equipped")
+	# GK's FIFTH FILLER IS GUT RIP, A BERSERKER DRAFT CARD: in neither the
+	# Swordmaster's draft pool nor the Warrior class pool, so no `cands` draw can
+	# reach it — the rule DR set for the other three.
 	m["bm_abilities"] = [cands[0], "Sweeping Strikes", "Shatterpoint",
-		"Rallying Shout"]
+		"Rallying Shout", "Gut Rip"]
 	ok(run.ability_slots_used(m) == CAP,
-		"§7: four earned fills the cap at 7 (got %d)" % run.ability_slots_used(m))
+		"§7: five earned fill the cap at 7 (got %d)" % run.ability_slots_used(m))
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
 	# AT THE CAP A TAKE NEEDS A DROP, AND A PROTECTED ABILITY CAN NEVER BE THE
 	# ONE NAMED. Guard Change is his enabler; it is not in `bm_abilities`, so
@@ -885,7 +890,7 @@ func _live_warden() -> void:
 	wd.plating_bonus = 0.0
 	wd.remove_status("shieldwall")
 	wd.block_chance = 0.0
-	wd.passive_id = "none"   # strip the plating slice entirely
+	wd.engines = []   # strip the plating slice entirely
 	ok(scene.call("_live_block_chance", wd) < 0.01,
 		"§4: his live Block is zero again")
 	ally.hp = ally.max_hp
@@ -895,7 +900,7 @@ func _live_warden() -> void:
 	ok(ally.hp < ally_hp2,
 		"§4: ...SO THE SAME WARD STOPS COVERING (%d -> %d) — it was never a snapshot" % [
 			ally_hp2, ally.hp])
-	wd.passive_id = "heavy_plating"
+	wd.engines = ["heavy_plating"]
 	# THE DEAD WARDEN STOPS COVERING TOO — his body is the ward.
 	ok(ally.has_status("covering_guard"),
 		"§4: the ward is still standing on the ally")
@@ -1109,7 +1114,7 @@ func _spawn(specs: Array, granted: Dictionary, lineup: Array,
 
 func _hero(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

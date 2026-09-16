@@ -829,7 +829,7 @@ func _live_thresholds() -> void:
 	var scene := await _spawn({})
 	var occ := _hero(scene, 2)
 	var foe := _foe(scene, 0)
-	ok(occ != null and occ.passive_id == "old_gods", "slot 2 is the Occultist")
+	ok(occ != null and occ.has_engine("old_gods"), "slot 2 is the Occultist")
 	ok(scene._ruin_threshold() == 10, "the threshold is 10 with no capstone")
 	# Nine stacks is nothing at all — the old design would have blown twice by
 	# now, which is exactly §1's stated cost.
@@ -1111,6 +1111,8 @@ func _live_fervor() -> void:
 	var specs := ["berserker", "pyromancer", "inquisitor", "beastmaster"]
 	for i in run.party.size():
 		run.party[i]["spec"] = specs[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(specs[i]))
 		run.party[i]["tree"] = Talents.generate_tree(specs[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.party[i]["talents"] = {"dv_fervor": 1} if i == 2 else {}

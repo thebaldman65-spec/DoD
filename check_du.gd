@@ -150,8 +150,8 @@ func _live(scene: Node) -> void:
 		"`_hero_side()` does not hold the living companion — an enemy can no longer aim at it and §1's premise is gone")
 	ok(comp.is_hero and comp.is_companion,
 		"a companion is no longer built `is_hero` — every `not attacker.is_hero` gate in the strike loop changes meaning")
-	ok(comp.passive_id == "",
-		"a companion carries a `passive_id` now (`%s`) — the ten passive-gated terms are reachable and DT's count is stale" % comp.passive_id)
+	ok(comp.engines.is_empty(),
+		"a companion holds an engine now (`%s`) — the ten engine-gated terms are reachable and DT's count is stale" % str(comp.engines))
 	# THE ENEMY HALF, DERIVED FROM THE DATA AND NOT LISTED. Two abilities carry
 	# Cripple today; what matters is that the number is not zero, because a
 	# malus nothing applies is not an exploit.

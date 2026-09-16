@@ -641,7 +641,8 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 
 	var name_lbl := Label.new()
 	name_lbl.text = Classes.SPEC_INFO[spec]["name"] if spec != "" \
-		else "%s — Unawakened" % key.capitalize()
+		else (key.capitalize() if bool(member.get("awakened", false))
+			else "%s — Unawakened" % key.capitalize())
 	name_lbl.add_theme_font_size_override("font_size", 14)
 	name_lbl.add_theme_color_override("font_color", Color(0.9, 0.86, 0.76))
 	name_lbl.position = at + Vector2(58, 7)
@@ -708,7 +709,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	#
 	# The row it sits on is the rune slots'. It reads the ladder rather than a
 	# number, so it cannot drift from `ABILITY_SLOTS_BY_BOSS`.
-	if spec != "":
+	if spec != "" or bool(member.get("awakened", false)):
 		var load_btn := Button.new()
 		load_btn.position = at + Vector2(8 + Run.rune_slots() * 96, 62)
 		load_btn.custom_minimum_size = Vector2(CARD_W - 24 - Run.rune_slots() * 96, 26)
@@ -788,7 +789,14 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		add_child(pick_btn)
 	else:
 		var hint := Label.new()
-		hint.text = "click the card for talents and sheet"
+		# BATCH GK — THE CARD NAMES THE ENGINES HELD, or says there are none: a
+		# hero with no engine is a legal state and should read as one.
+		var held: Array = Runes.held_engines(member)
+		var held_titles := PackedStringArray()
+		for pid in held:
+			held_titles.append(Classes.engine_title(String(pid)))
+		hint.text = "engines: %s — click the card for the sheet" % (
+			" + ".join(held_titles) if not held.is_empty() else "none")
 		hint.add_theme_font_size_override("font_size", 11)
 		hint.add_theme_color_override("font_color", Color(0.5, 0.48, 0.52))
 		hint.position = at + Vector2(8, 124)
@@ -1657,7 +1665,8 @@ func _pick_rune(idx: int, choice: int) -> void:
 		if r.get("equipped", false):
 			worn += 1
 	rune["equipped"] = worn < Run.rune_slots()
-	member["runes"] = member.get("runes", []) + [rune]
+	# BATCH GK — THE ONE DOOR: an engine rune takes an engine slot, not the pouch.
+	Run.hold_rune(member, rune)
 	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()
@@ -1696,6 +1705,51 @@ func _open_rune_panel(idx: int) -> void:
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
+
+	# ── BATCH GK — THE TWO ENGINE SLOTS, AND DROP AND SWAP ──────────────────
+	#
+	# **THE CHARTER'S DROP AND SWAP HAPPEN HERE**, on the pouch's own shape: an
+	# engine rune is equipped into one of two dedicated slots or unequipped out of
+	# it, and unequipping every one is allowed — a hero with no engine is a legal
+	# state. An unequipped engine and its enablers leave the next fight; the rune
+	# is kept. `Run.toggle_engine` owns the rule; this panel only draws it.
+	var held_engines: Array = member.get("engines", [])
+	var worn_engines: int = Run.engines_worn(member)
+	var eng_head := Label.new()
+	eng_head.text = "ENGINES — %d of %d slots filled" % [worn_engines, Run.ENGINE_SLOTS]
+	eng_head.add_theme_font_size_override("font_size", 15)
+	eng_head.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45))
+	eng_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(eng_head)
+	if held_engines.is_empty():
+		var no_eng := Label.new()
+		no_eng.text = "No engine rune held. Engine runes come with the other runes."
+		no_eng.add_theme_font_size_override("font_size", 12)
+		no_eng.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
+		no_eng.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(no_eng)
+	for ei in held_engines.size():
+		var er: Dictionary = held_engines[ei]
+		var erow := HBoxContainer.new()
+		erow.add_theme_constant_override("separation", 10)
+		box.add_child(erow)
+		var e_on: bool = bool(er.get("equipped", false))
+		var etoggle := Button.new()
+		etoggle.text = "Unequip" if e_on else "Equip"
+		etoggle.custom_minimum_size = Vector2(84, 26)
+		etoggle.add_theme_font_size_override("font_size", 11)
+		etoggle.disabled = not e_on and worn_engines >= Run.ENGINE_SLOTS
+		etoggle.pressed.connect(Music.click)
+		etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
+		erow.add_child(etoggle)
+		var elbl := Label.new()
+		elbl.text = "%s%s — %s" % ["✦ " if e_on else "", er["name"], er["desc"]]
+		elbl.add_theme_font_size_override("font_size", 12)
+		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
+			else Color(0.62, 0.6, 0.57))
+		elbl.custom_minimum_size = Vector2(520, 20)
+		elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		erow.add_child(elbl)
 
 	if runes.is_empty():
 		var none := Label.new()
@@ -1743,6 +1797,18 @@ func _open_rune_panel(idx: int) -> void:
 		_rune_panel_for = -1
 		overlay.queue_free())
 	box.add_child(close)
+
+
+# BATCH GK — drop or swap one engine rune. The rule is `Run.toggle_engine`'s; a
+# refusal (both slots full) is the disabled button, never a silent no-op here.
+func _toggle_engine(idx: int, engine_idx: int, overlay: Control) -> void:
+	if not Run.toggle_engine(Run.party[idx], engine_idx):
+		return
+	Run.save_run()
+	overlay.queue_free()
+	_rune_panel_for = -1
+	_draw_screen()
+	_open_rune_panel(idx)
 
 
 func _toggle_rune(idx: int, rune_idx: int, overlay: Control) -> void:
@@ -1875,12 +1941,18 @@ func _open_loadout_panel(idx: int) -> void:
 	# `Classes.protected_names` rather than counted off `core_slots`: those two
 	# are different units and disagree on every one of the twelve specs (a
 	# Beastmaster is SIX names in three slots), and a list wants the names.
-	for pname in Classes.protected_names(spec):
+	# BATCH GK — THE KIT THIS HERO ACTUALLY OPENS WITH, engines included: an
+	# enabler travels with its engine and SITS OUTSIDE THE SLOT COUNT, so its row
+	# says ENABLER rather than CORE.
+	var enabler_names: Array = []
+	for pid in Runes.held_engines(member):
+		enabler_names.append_array(Classes.engine_enablers(String(pid)))
+	for pname in Run.opening_kit_names(member):
 		var prow := HBoxContainer.new()
 		prow.add_theme_constant_override("separation", 10)
 		rows.add_child(prow)
 		var plock := Label.new()
-		plock.text = "CORE"
+		plock.text = "ENABLER" if enabler_names.has(String(pname)) else "CORE"
 		plock.custom_minimum_size = Vector2(84, 26)
 		plock.add_theme_font_size_override("font_size", 11)
 		plock.add_theme_color_override("font_color", Color(0.55, 0.62, 0.85))
@@ -2478,6 +2550,10 @@ func _debug_reroll_specs() -> void:
 		member["spec"] = ""
 		member["talents"] = {}
 		member["tree"] = []
+		# BATCH GK — the engines were the choice, so they are what a reroll undoes.
+		member["engines"] = []
+		member["awakened"] = false
+		member.erase("engine_offer")
 	Run.specs_chosen = false
 	Run.save_run()
 	get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")

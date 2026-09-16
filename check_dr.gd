@@ -392,7 +392,9 @@ func _s7_names_and_total() -> void:
 func _s8_recorded() -> void:
 	print("\n§8 — the framework and the trap are recorded where a later batch reads them")
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
-	ok(cm.contains("An ENGINE is the spec's own currency"),
+	# BATCH GK — THE DEFINITION WAS REWRITTEN BY THE CHARTER: an engine is a rule
+	# a hero holds as a rune now, not a spec's own currency.
+	ok(cm.contains("An ENGINE is a rule that changes how a hero fights"),
 		"CLAUDE.md does not carry the ENGINE half of the framework")
 	ok(cm.contains("An AXIS is an effect type"),
 		"CLAUDE.md does not carry the AXIS half of the framework")
@@ -413,7 +415,7 @@ func _s9_live() -> void:
 		"sharpshooter"], {"deterministic": true})
 	var sm: BattleUnit = null
 	for h in scene.get("heroes"):
-		if h.passive_id == "seasoned":
+		if h.has_engine("seasoned"):
 			sm = h
 	ok(sm != null, "the Swordmaster spawned")
 	if sm == null:

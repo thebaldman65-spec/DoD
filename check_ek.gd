@@ -106,11 +106,26 @@ func _s1_coverage() -> void:
 			Classes.CARD_TAGS.size(), corpus.size()])
 
 	var rune_missing: Array = []
+	var engines_all := 0
+	var engines_untagged := 0
 	for rid in Runes.ids():
+		var is_engine := Runes.is_engine_rune(String(rid))
+		if is_engine:
+			engines_all += 1
 		if Runes.rune_tags(String(rid)).is_empty():
-			rune_missing.append(rid)
-	ok(rune_missing.is_empty(), "every authored rune carries a tag (%d without: %s)"
+			if is_engine:
+				engines_untagged += 1
+			else:
+				rune_missing.append(rid)
+	ok(rune_missing.is_empty(), "every authored ORDINARY rune carries a tag (%d without: %s)"
 		% [rune_missing.size(), ", ".join(rune_missing)])
+	# BATCH GK — THE ENGINE RUNES CARRY NONE, AND THIS GATE MAY NOT CLOSE THAT.
+	# A tag says what a payload does; an engine rune has no payload — its engine
+	# is a rule — and which words an engine wears is the designer's to say
+	# (NEEDS A RULING, GK's report). The exemption is the engine runes as a set.
+	ok(engines_all > 0 and engines_untagged == engines_all,
+		"...and the %d engine runes are exempt as a set, untagged until a ruling (%d untagged)"
+			% [engines_all, engines_untagged])
 	print("    the rune layer is %d authored runes" % Runes.ids().size())
 	var rune_orphan: Array = []
 	for rk in Runes.RUNE_TAGS:

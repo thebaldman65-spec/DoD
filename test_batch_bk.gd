@@ -523,11 +523,14 @@ func _section_events() -> void:
 	ok(Events.VERBS.has("rune_grant"), "§4: rune_grant is in the vocabulary")
 	run.new_run()
 	run.party[0]["spec"] = "berserker"
-	var worn_before: int = run.party[0].get("runes", []).size()
+	# BATCH GK — AN ENGINE RUNE IS A RUNE AND GOES TO THE ENGINE SLOTS
+	# (`Run.hold_rune`), so the party's runes are both pouches.
+	var worn_before: int = run.party[0].get("runes", []).size() \
+		+ run.party[0].get("engines", []).size()
 	Events.apply(run, {"effect": "rune_grant", "amount": 1})
 	var got := 0
 	for m3 in run.party:
-		got += m3.get("runes", []).size()
+		got += m3.get("runes", []).size() + m3.get("engines", []).size()
 	ok(got > worn_before, "§4: rune_grant delivers a rune to the party")
 	sections += 1
 

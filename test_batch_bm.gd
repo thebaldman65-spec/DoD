@@ -693,17 +693,24 @@ func _award_sites_deleted() -> void:
 		"the harness says its old talent metrics are gone")
 	_check(sim.contains("10.9"), "…and names BK's figure as superseded")
 	# THE HANDOFF: the awakening EQUIPS rather than pays, from BOTH paths.
-	_check(sc.contains("Run.equip_spec_talents(idx)"), "the spec screen equips")
-	_check(sim.contains("run.equip_spec_talents(i)"), "and so does the harness")
+	# BATCH GK — BOTH PATHS REACH IT THROUGH `Run.awaken`, the one door class
+	# selection and the sim share; the awakening is what equips.
+	var aw := rs.find("func awaken(")
+	_check(sc.contains("Run.awaken(idx, rune_id)") and aw >= 0
+			and rs.substr(aw, 700).contains("equip_spec_talents(idx)"),
+		"the class-selection screen awakens, and the awakening equips")
+	_check(sim.contains("run.awaken(i, "), "and so does the harness")
 	_check(rs.contains("func equip_spec_talents(idx: int) -> void:"),
 		"one implementation of the handoff")
 	# A SIM NEVER READS Profile: the loadout comes off Run.sim_talents.
 	# BATCH FX RE-POINTED THE FIRST: a real run reads its CLASS's worn set now —
 	# `Profile.worn_talents`, keyed by `Classes.class_of_spec` — where it read a
 	# spec's equipped loadout, which was deleted with the equip step.
-	_check(rs.contains("Profile.worn_talents(Classes.class_of_spec(spec))"),
-		"a real run reads Profile — the worn set of the spec's CLASS")
-	_check(rs.contains("else sim_equipped_talents(spec)"),
+	# BATCH GK — keyed to the hero's class directly (`member["key"]`): a hero who
+	# took a spine has no spec and still wears his class's cells.
+	_check(rs.contains("Profile.worn_talents(key)"),
+		"a real run reads Profile — the worn set of the hero's CLASS")
+	_check(rs.contains("else sim_equipped_talents(probe)"),
 		"a sim reads its own installed loadout instead")
 	# A bare `contains` trips on a COMMENT naming the thing it forbids, and
 	# naming it in a comment is exactly how this project asks a later batch

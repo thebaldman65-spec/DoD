@@ -99,7 +99,14 @@ func _schema(data: Dictionary) -> void:
 		for b in PAYLOAD_BRANCHES:
 			if e.get("payload", {}).has(b):
 				branches += 1
-		ok(branches == 1, "%s: payload must carry exactly 1 branch, has %d" % [id, branches])
+		# BATCH GK — AN ENGINE RUNE'S PAYLOAD IS ITS ENGINE, not a branch: empty by
+		# construction, with `engine` naming a class's engine for the spawn to read.
+		if String(e.get("engine", "")) != "":
+			ok(branches == 0 and Classes.engine_class(String(e["engine"])) != "",
+				"%s: an engine rune carries no payload branch and names a class's engine (%d, '%s')"
+					% [id, branches, e["engine"]])
+		else:
+			ok(branches == 1, "%s: payload must carry exactly 1 branch, has %d" % [id, branches])
 		var disp := Runes.display_name(e)
 		ok(not seen_names.has(disp), "%s: duplicate display name %s" % [id, disp])
 		seen_names[disp] = true
@@ -189,7 +196,10 @@ func _reachable(entry: Dictionary, ability_name: String) -> bool:
 				continue
 			if scope.begins_with("spec:") and scope.trim_prefix("spec:") != String(spec):
 				continue
-			var member := {"key": key, "spec": spec, "runes": []}
+			# BATCH GK — a hero of that lineage holding its engine rune, as class
+			# selection hands it: an enabler travels with the engine (the charter).
+			var member := {"key": key, "spec": spec, "runes": [],
+				"engines": Runes.engine_pouch_for_spec(spec)}
 			if Runes.kit_names(member).has(ability_name):
 				return true
 	return false
@@ -628,9 +638,11 @@ func _exhaustion() -> void:
 				ok(not offer.is_empty(),
 					"%s: a pool with one rune left returned an empty offer" % spec)
 				ok(String(offer.get("name", "")) != "", "%s: offer with no name" % spec)
+				# BATCH GK — an engine rune's payload is empty by construction.
 				ok((offer.get("payload", {}) as Dictionary) is Dictionary
-						and not (offer.get("payload", {}) as Dictionary).is_empty(),
-					"%s: offer with an empty payload" % spec)
+						and (not (offer.get("payload", {}) as Dictionary).is_empty()
+							or String(offer.get("engine", "")) != ""),
+					"%s: offer with an empty payload that is not an engine rune" % spec)
 			# EXHAUSTED. The ruling, asserted.
 			var all_of_them: Array = []
 			for id in elig:
@@ -817,8 +829,11 @@ func _power_arm(data: Dictionary, unit_props: Dictionary, unit_src: String,
 			"%s: new_ability has no magnitude and must not be touched" % id)
 		# The positive control: every entry NOT on the named list must
 		# actually respond to the arm, or the arm silently measures nothing.
-		if UNSCALABLE.has(id):
-			ok(not moved, "%s is on UNSCALABLE but the arm moved it — update the list" % id)
+		# BATCH GK — AN ENGINE RUNE HAS NO MAGNITUDE TO SCALE: its payload is empty
+		# and its engine is a rule, so the arm must leave it exactly as it found it —
+		# asserted, like the named list, not skipped.
+		if UNSCALABLE.has(id) or Runes.is_engine_rune(String(id)):
+			ok(not moved, "%s is on UNSCALABLE (or is an engine rune) but the arm moved it — update the list" % id)
 		else:
 			ok(moved, "%s: the power arm changed NOTHING — it is a dud in every arm" % id)
 	for id in UNSCALABLE:
@@ -965,6 +980,12 @@ func _start_rune_pool(run: Node) -> void:
 		"the roller AE measured is still live — it is the elite cache's now")
 	var trials := 0
 	var with_spec := 0
+	# BATCH GK — THE ENGINE RUNES ARE IN THE ORDINARY POOL (the charter), so a
+	# candidate may be one of the holder's CLASS's engine runes as well as his
+	# own spec's rune. Anything else is still the scope leak FM's line catches,
+	# asserted per candidate below.
+	var leaks: Array = []
+	var engine_candidates := 0
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			for i in 12:
@@ -974,6 +995,14 @@ func _start_rune_pool(run: Node) -> void:
 				ok(triple.size() == 3,
 					"%s: the cache deal rolled %d candidates" % [spec, triple.size()])
 				trials += 1
+				for c0 in triple:
+					var sc := String(c0.get("scope", ""))
+					if String(c0.get("engine", "")) != "":
+						engine_candidates += 1
+						if sc != "class:%s" % key:
+							leaks.append("%s <- %s" % [spec, c0.get("name", "")])
+					elif sc != "spec:%s" % spec:
+						leaks.append("%s <- %s" % [spec, c0.get("name", "")])
 				for c in triple:
 					if String(c.get("scope", "")) == "spec:%s" % spec:
 						with_spec += 1
@@ -1017,8 +1046,12 @@ func _start_rune_pool(run: Node) -> void:
 	# a cache — which is what ES §2's re-scope would do — turns it red on the
 	# first triple rather than after a twenty-five-point drift.
 	if any_spec_eligible:
-		ok(is_equal_approx(rate, 100.0),
-			"a spec rune is in the cache triple %.1f%% of the time, not 100%% — with the generated family out of the offer (FM §1) and all sixty live entries spec-scoped, a candidate that is not the holder's own is a scope leak" % rate)
+		ok(leaks.is_empty(),
+			"every cache candidate is the holder's own spec rune or one of his class's ENGINE runes (GK) — %d are neither: %s"
+				% [leaks.size(), leaks.slice(0, 6)])
+		ok(engine_candidates > 0,
+			"...and the engine runes the charter puts in the ordinary pool DO reach the cache (%d of %d candidates)"
+				% [engine_candidates, trials * 3])
 	else:
 		ok(is_zero_approx(rate),
 			"no spec rune is eligible for any spec (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)

@@ -38,7 +38,7 @@ func _initialize() -> void:
 	for h in scene.get("heroes"):
 		if h.is_companion:
 			continue
-		if String(h.passive_id) == "heavy_plating":
+		if h.has_engine("heavy_plating"):
 			warden = h
 		elif other == null:
 			other = h

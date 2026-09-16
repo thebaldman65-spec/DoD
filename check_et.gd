@@ -276,6 +276,7 @@ func _s2_the_offer_is_never_empty() -> void:
 	var empties: Array = []
 	var nameless: Array = []
 	var payloadless: Array = []
+	var engine_offers := 0
 	var non_template: Array = []
 	# BATCH FM §1 — offers that arrived where the ruling says none should.
 	var floored: Array = []
@@ -291,9 +292,14 @@ func _s2_the_offer_is_never_empty() -> void:
 			else:
 				if String(one.get("name", "")) == "":
 					nameless.append("%s/shop" % spec)
+				# BATCH GK — AN ENGINE RUNE'S PAYLOAD IS EMPTY BY CONSTRUCTION; its
+				# `engine` is what it does. Empty AND engineless is the fault.
 				if not (one.get("payload", {}) is Dictionary) \
-						or (one["payload"] as Dictionary).is_empty():
+						or ((one["payload"] as Dictionary).is_empty()
+							and String(one.get("engine", "")) == ""):
 					payloadless.append("%s/shop" % spec)
+				elif String(one.get("engine", "")) != "":
+					engine_offers += 1
 				if _is_retired(String(one.get("id", ""))):
 					non_template.append("%s/shop -> %s" % [spec, one.get("id", "")])
 			# (3) THE ELITE CACHE's pick-of-three, WITHOUT REPLACEMENT. A Warrior
@@ -345,6 +351,8 @@ func _s2_the_offer_is_never_empty() -> void:
 	ok(empties.is_empty(), "§2: an offer came back EMPTY — %s" % [empties])
 	ok(nameless.is_empty(), "§2: an offer came back with no name — %s" % [nameless])
 	ok(payloadless.is_empty(), "§2: an offer came back with an empty payload — %s" % [payloadless])
+	ok(engine_offers > 0,
+		"§2: ...and engine runes DO reach the Peddler (%d offers), so the exemption above is not vacuous" % engine_offers)
 	# A RETIRED ENTRY REACHING A LIVE OFFER is the one way ET could be wrong in
 	# the player's favour and still be wrong. **The claim above this used to be
 	# "and every one of them is a generated stat stick", which was ET's own
@@ -390,7 +398,8 @@ func _s3_retired_is_not_deleted() -> void:
 		var built: Dictionary = Runes.build(String(id))
 		if built.is_empty() or String(built.get("name", "")) == "" \
 				or not (built.get("payload", {}) is Dictionary) \
-				or (built["payload"] as Dictionary).is_empty() \
+				or ((built["payload"] as Dictionary).is_empty()
+					and String(built.get("engine", "")) == "") \
 				or int(built.get("price", 0)) <= 0:
 			unbuilt.append(String(id))
 	ok(unresolved.is_empty(), "§3: %s no longer resolve through `config`" % [unresolved])

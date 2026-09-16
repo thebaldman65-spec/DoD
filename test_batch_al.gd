@@ -723,7 +723,7 @@ func _spawn(learned: Dictionary, lineup: Array, earned: Array = [],
 
 func _wd(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "heavy_plating":
+		if not h.is_companion and h.has_engine("heavy_plating"):
 			return h
 	return null
 

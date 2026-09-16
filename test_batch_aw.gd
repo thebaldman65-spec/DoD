@@ -728,7 +728,7 @@ func _live_growth() -> void:
 	var scene := await _spawn({})
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)
-	ok(dv != null and dv.passive_id == "conviction", "slot 2 is the Devout")
+	ok(dv != null and dv.has_engine("conviction"), "slot 2 is the Devout")
 	# A BIG base, deliberately: at 100 max HP a 3% step rounds to 3 whether the
 	# clause is linear or compounding for the first several releases, so a
 	# small hero cannot tell the two apart. At 1000 they diverge immediately.

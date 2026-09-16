@@ -71,7 +71,7 @@ func _spawn(specs: Array, lineup: Array, node_type := "fight",
 
 func _hero(scene: Node, spec_passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == spec_passive:
+		if not h.is_companion and h.has_engine(spec_passive):
 			return h
 	return null
 

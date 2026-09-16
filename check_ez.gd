@@ -63,15 +63,21 @@ func _data() -> Dictionary:
 func _ez_ids() -> Array:
 	var out: Array = []
 	for id in _data():
-		if String((_data()[id] as Dictionary).get("retired", "")) == "":
+		# BATCH GK — the fifteen ENGINE runes are live and are not EZ's sixty: no
+		# shape, no archetype tag, no stat to land. §0 counts them beside it.
+		if String((_data()[id] as Dictionary).get("retired", "")) == "" \
+				and String((_data()[id] as Dictionary).get("engine", "")) == "":
 			out.append(String(id))
 	out.sort()
 	return out
 
 
 func _member(class_key: String, spec: String, drafted: Array = []) -> Dictionary:
+	# BATCH GK — seated by lineage, so holding that lineage's engine rune, as
+	# class selection hands it and as both fixtures now seat it.
 	return {"key": class_key, "spec": spec, "runes": [], "abilities": [],
-		"earned_abilities": [], "bm_abilities": drafted.duplicate()}
+		"earned_abilities": [], "bm_abilities": drafted.duplicate(),
+		"engines": Runes.engine_pouch_for_spec(spec)}
 
 
 # Every corpus card whose PRIMARY tag is `tag`, in `CARD_TAGS` order. The
@@ -103,7 +109,13 @@ func _s0_the_pool() -> void:
 	var ez := _ez_ids()
 	ok(ez.size() == 60, "§0: %d entries carry no retirement, expected 60 live runes"
 		% ez.size())
-	ok(data.size() == 127, "§0: the authored pool is %d entries, expected 127" % data.size())
+	ok(data.size() == 142, "§0: the authored pool is %d entries, expected 142 (GK's fifteen engine runes)" % data.size())
+	var eng := 0
+	for id0 in data:
+		if String((data[id0] as Dictionary).get("engine", "")) != "":
+			eng += 1
+	ok(eng == 15 and ez.size() + eng == 75,
+		"§0: ...and fifteen of them are ENGINE runes (GK), live beside the sixty and outside this gate's population (%d)" % eng)
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the

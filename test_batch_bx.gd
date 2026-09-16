@@ -272,6 +272,11 @@ func _ledger_per_member() -> void:
 	var run := _party(["cryomancer", "cryomancer", "inquisitor", "beastmaster"])
 	var a: Dictionary = run.party[0]
 	var b: Dictionary = run.party[1]
+	# BATCH GK — THE CLASS HALF OF THE DRAFT KEYS TO THE CLASS (`member["key"]`),
+	# not through the spec, so a Cryomancer lineage on the Warrior's seat drafts
+	# WARRIOR cards that B can never be offered — a red on every draw that dealt
+	# A one. One class AND one lineage is what gives the two heroes one pool now.
+	a["key"] = "mage"
 	ok(run.award_draft_pick(a), "§2: hero A is offered a draft")
 	var a_offer: Array = (a["draft_candidates"] as Array)[0].duplicate()
 	ok(a_offer.size() == 3, "§2: ...of three cards (got %d)" % a_offer.size())
@@ -355,7 +360,8 @@ func _cap_and_drop() -> void:
 	# node is on — which is the shape BO's own rule already demanded of a
 	# refusal setup (write it relative to the live pool, never to a count).
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
-	var core: int = Classes.core_slots("swordmaster")
+	# BATCH GK — the lineage's count, Guard Change outside it (the charter).
+	var core: int = Classes.lineage_slots("swordmaster")
 	var need: int = run.ability_slot_cap() - core
 	m["bm_abilities"] = pool.slice(0, need)
 	ok(run.ability_slots_used(m) == run.ability_slot_cap(),
@@ -591,7 +597,7 @@ func _live_one_action() -> void:
 	var capped: Dictionary = run2.party[0]
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
 	capped["bm_abilities"] = pool.slice(0,
-		run2.ability_slot_cap() - Classes.core_slots("swordmaster"))
+		run2.ability_slot_cap() - Classes.lineage_slots("swordmaster"))
 	ok(run2.ability_slots_full(capped), "§2: hero 0 is seated at the cap")
 	for m in run2.party:
 		run2.award_draft_pick(m)
@@ -730,7 +736,7 @@ func _spawn(hunter_spec: String, lineup: Array) -> Node:
 
 func _hunter(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "pack":
+		if not h.is_companion and h.has_engine("pack"):
 			return h
 	return null
 

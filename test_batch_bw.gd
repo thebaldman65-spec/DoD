@@ -639,7 +639,7 @@ func _source_rules() -> void:
 	# reading his real guard, or a Feigned Guard would silently hand an
 	# Aggressive build Defensive mitigation and delete the card's own synergy
 	# line. Asserted at the passive's own read site.
-	var at_seasoned := code.find('strike_target.passive_id == "seasoned"')
+	var at_seasoned := code.find('strike_target.has_engine("seasoned")')
 	ok(at_seasoned > 0, "the Seasoned Fighter mitigation site exists")
 	# RE-POINTED BY BATCH CI: THE SLICE WAS A FIXED 260-BYTE WINDOW, which is an
 	# accident of how long that branch happens to be — CI's Formless and
@@ -786,7 +786,7 @@ func _spawn(warrior_spec: String, lineup: Array, learned := {}) -> Node:
 
 func _warrior(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

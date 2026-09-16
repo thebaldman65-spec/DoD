@@ -444,9 +444,9 @@ func _live(battle_gd) -> void:
 	for h in heroes:
 		if h.is_companion:
 			continue
-		if h.passive_id == "bloodrage":
+		if h.has_engine("bloodrage"):
 			zerk = h
-		elif h.passive_id == "conviction":
+		elif h.has_engine("conviction"):
 			devout = h
 	ok(zerk != null, "no Berserker in the fixture")
 	ok(devout != null, "no Devout in the fixture")

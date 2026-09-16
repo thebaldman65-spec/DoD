@@ -63,8 +63,10 @@ func _initialize() -> void:
 # **THE THREE `DISPEL_NEVER` ENTRIES THAT ARE NOT MARKS ARE NAMED BY THE
 # COMMENT THAT PUT THEM THERE**, so this is not a second judgement: `ruin_primed`
 # is *"the primer rather than the mark"*, `charging` is *"a declared blow, not a
-# boon"*, and `spec_passive` is a hero's own passive.
-const NOT_A_MARK := ["ruin_primed", "charging", "spec_passive"]
+# boon"*, and `spec_passive` is a hero's own passive. **BATCH GK ADDED
+# `spec_passive_2`**, the chip of a hero's SECOND engine — the same kind as
+# `spec_passive`, put in `DISPEL_NEVER` beside it for the same reason.
+const NOT_A_MARK := ["ruin_primed", "charging", "spec_passive", "spec_passive_2"]
 
 # The two marks that are in NEITHER list, because they are neither dispellable
 # buffs nor debuffs — the card clears its own predecessor instead ("one mark at
@@ -86,8 +88,8 @@ func _s1_mark_population() -> void:
 			marks[String(sid)] = true
 	for extra in MARKS_OUTSIDE_DISPEL_NEVER:
 		marks[String(extra)] = true
-	ok(battle_gd.DISPEL_NEVER.size() == 11,
-		"DISPEL_NEVER still holds eleven ids — eight marks and three that are not (%d)"
+	ok(battle_gd.DISPEL_NEVER.size() == 12,
+		"DISPEL_NEVER still holds twelve ids — eight marks and four that are not (%d)"
 			% battle_gd.DISPEL_NEVER.size())
 	ok(marks.size() == 10, "the game names ten marks (%d: %s)" % [
 		marks.size(), ", ".join(marks.keys())])

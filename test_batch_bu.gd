@@ -598,7 +598,7 @@ func _spawn(spec: String, lineup: Array, learned := {}) -> Node:
 
 func _cleric(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

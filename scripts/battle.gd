@@ -1159,88 +1159,103 @@ func _spawn_units() -> void:
 		# would normally be unlocked by talents or boss trophies, so the
 		# reworked trees can be reviewed without spending points. Flip this
 		# const to false to restore gated unlocks.
+		#
+		# BATCH GK — THE ENGINES THIS HERO HOLDS, which is what `passive_id` was
+		# stamped from the spec to say. A run hero holds what his two engine
+		# slots hold, and that can be none; a bot battle outside a run
+		# (DOD_SIM_SPECS) holds its spec's own engine, the pick the sim makes at
+		# class selection. **THE OPENING KIT IS `Classes.opening_kit`'s** — the
+		# class kit, the lineage's abilities, and every held engine's enablers,
+		# which travel with it and leave with it.
+		var engines: Array = []
+		if Run.active and i < Run.party.size():
+			engines = Runes.held_engines(Run.party[i])
+		elif autoplay and spec != "":
+			engines = [Classes.engine_of_spec(spec)]
+		cfg["engines"] = engines
+		cfg["abilities"] = Classes.opening_kit(hero_keys[i], spec, engines)
+		# Arcane Resonance is the Arcanist's ENGINE and rides it (GK).
+		if engines.has("resonance"):
+			cfg["second_resource_name"] = "Resonance"
+			cfg["second_resource"] = 0
+			cfg["second_max"] = 5
+		# Mercy is the Holy Cleric's ENGINE and rides it (GK).
+		if engines.has("mercy"):
+			cfg["second_resource_name"] = "Mercy"
+			cfg["second_resource"] = 0
+			cfg["second_max"] = 5
 		if spec != "":
-			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
-			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
 			# Once awakened, the hero goes by their spec, not their class.
 			cfg["unit_name"] = Classes.SPEC_INFO[spec]["name"]
 			# Spec stat block (constitution/Attack/resists, plus max_hp and
 			# armor once a spec declares them) — the party sheet calls the
 			# SAME helper, so the two can never drift.
 			Classes.apply_spec_stats(cfg, spec)
-			# Arcane Resonance is the Arcanist's passive mechanic alone.
-			if spec == "arcanist":
-				cfg["second_resource_name"] = "Resonance"
-				cfg["second_resource"] = 0
-				cfg["second_max"] = 5
-			# Mercy is the Holy Cleric's passive mechanic alone.
-			if spec == "holy":
-				cfg["second_resource_name"] = "Mercy"
-				cfg["second_resource"] = 0
-				cfg["second_max"] = 5
 			# Specs with their own battle art override the shared Soldier sheet.
 			if SPEC_ART.has(spec):
 				for art_key in SPEC_ART[spec]:
 					cfg[art_key] = SPEC_ART[spec][art_key]
-			Classes.apply_kit_overrides(cfg, spec)
 			Classes.apply_passive(cfg, spec)
 			# Spec stat blocks may override max_hp (Berserker 175): re-read
 			# the scaling baseline AFTER the spec block so node scaling
 			# (+2% of base per win) compounds off the spec's base, not the
 			# class's 154 — the ordering trap from the batch doc.
 			base_hp = cfg["max_hp"]
-			if Run.active and i < Run.party.size():
-				# Earned abilities (mini-boss and boss picks) go on BEFORE the
-				# tree: several talents MODIFY an ability rather than grant
-				# it, and every `upgrade` path (Batch AK's Lunge and Execute,
-				# Batch AJ's Battle Shout and Rampage) asks whether the copy
-				# was ALREADY in the kit — a question only this ordering can
-				# answer. apply_from_tree refuses to double-grant either way.
-				#
-				# **BATCH EG §2 — THE LOADOUT, NOT THE POOL.** This is the one
-				# question in the project that wants `bm_equipped`: what the
-				# hero CARRIES into this fight. Every other reader of the two
-				# sets is asking what he OWNS, and owns is `bm_abilities`.
-				# `equipped_ability_names` reads the pool when nothing has ever
-				# been benched, so a member dict written before EG spawns
-				# exactly as it always did.
-				for bm_name in Run.equipped_ability_names(Run.party[i]):
-					var bm_ab := Classes.spec_pool_ability(spec, bm_name)
-					if bm_ab != null and not cfg["abilities"].any(
-							func(a): return a.display_name == bm_ab.display_name):
-						cfg["abilities"] = cfg["abilities"] + [bm_ab]
-				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
-					Run.party[i].get("talents", {}), Run.party[i])
-			elif autoplay:
-				# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
-				# talents on bot heroes whose spec tree holds the id (test hook).
-				var env_talents := OS.get_environment("DOD_SIM_TALENTS")
-				if env_talents != "":
-					var t_tree := Talents.generate_tree(spec, hero_keys[i])
-					var t_learned := {}
-					for pair in env_talents.split(","):
-						var bits: PackedStringArray = pair.split(":")
-						if not Talents.node_in_tree(t_tree, bits[0]).is_empty():
-							t_learned[bits[0]] = int(bits[1]) if bits.size() > 1 else 1
-					if not t_learned.is_empty():
-						Talents.apply_from_tree(cfg, t_tree, t_learned)
-				# DOD_SIM_ABILITIES="Resurrection,Divine Plea" appends pending
-				# talent abilities (defs in Classes) to the bot hero whose spec
-				# will own them — a test hook for talent-gated kit pieces whose
-				# tree isn't designed yet (Holy only, for now).
-				var env_abs := OS.get_environment("DOD_SIM_ABILITIES")
-				if env_abs != "" and spec == "holy":
-					for ab_name in env_abs.split(","):
-						var pending := Classes.pending_talent_ability(ab_name.strip_edges())
-						if pending != null:
-							cfg["abilities"] = cfg["abilities"] + [pending]
-				# The same hook feeds either earnable pool, by name.
-				if env_abs != "":
-					for ab_name in env_abs.split(","):
-						var bm_pending := Classes.spec_pool_ability(spec, ab_name.strip_edges())
-						if bm_pending != null and not cfg["abilities"].any(
-								func(a): return a.display_name == bm_pending.display_name):
-							cfg["abilities"] = cfg["abilities"] + [bm_pending]
+		# BATCH GK — EARNED CARDS AND THE CLASS TREE NO LONGER WAIT ON A SPEC. A
+		# hero who took a spine at class selection has no lineage and still
+		# carries what he drafted and wears what his class bought.
+		if Run.active and i < Run.party.size():
+			# Earned abilities (mini-boss and boss picks) go on BEFORE the
+			# tree: several talents MODIFY an ability rather than grant
+			# it, and every `upgrade` path (Batch AK's Lunge and Execute,
+			# Batch AJ's Battle Shout and Rampage) asks whether the copy
+			# was ALREADY in the kit — a question only this ordering can
+			# answer. apply_from_tree refuses to double-grant either way.
+			#
+			# **BATCH EG §2 — THE LOADOUT, NOT THE POOL.** This is the one
+			# question in the project that wants `bm_equipped`: what the
+			# hero CARRIES into this fight. Every other reader of the two
+			# sets is asking what he OWNS, and owns is `bm_abilities`.
+			# `equipped_ability_names` reads the pool when nothing has ever
+			# been benched, so a member dict written before EG spawns
+			# exactly as it always did.
+			for bm_name in Run.equipped_ability_names(Run.party[i]):
+				var bm_ab := Classes.spec_pool_ability(spec, bm_name)
+				if bm_ab != null and not cfg["abilities"].any(
+						func(a): return a.display_name == bm_ab.display_name):
+					cfg["abilities"] = cfg["abilities"] + [bm_ab]
+			Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
+				Run.party[i].get("talents", {}), Run.party[i])
+		elif autoplay and spec != "":
+			# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
+			# talents on bot heroes whose spec tree holds the id (test hook).
+			var env_talents := OS.get_environment("DOD_SIM_TALENTS")
+			if env_talents != "":
+				var t_tree := Talents.generate_tree(spec, hero_keys[i])
+				var t_learned := {}
+				for pair in env_talents.split(","):
+					var bits: PackedStringArray = pair.split(":")
+					if not Talents.node_in_tree(t_tree, bits[0]).is_empty():
+						t_learned[bits[0]] = int(bits[1]) if bits.size() > 1 else 1
+				if not t_learned.is_empty():
+					Talents.apply_from_tree(cfg, t_tree, t_learned)
+			# DOD_SIM_ABILITIES="Resurrection,Divine Plea" appends pending
+			# talent abilities (defs in Classes) to the bot hero whose spec
+			# will own them — a test hook for talent-gated kit pieces whose
+			# tree isn't designed yet (Holy only, for now).
+			var env_abs := OS.get_environment("DOD_SIM_ABILITIES")
+			if env_abs != "" and spec == "holy":
+				for ab_name in env_abs.split(","):
+					var pending := Classes.pending_talent_ability(ab_name.strip_edges())
+					if pending != null:
+						cfg["abilities"] = cfg["abilities"] + [pending]
+			# The same hook feeds either earnable pool, by name.
+			if env_abs != "":
+				for ab_name in env_abs.split(","):
+					var bm_pending := Classes.spec_pool_ability(spec, ab_name.strip_edges())
+					if bm_pending != null and not cfg["abilities"].any(
+							func(a): return a.display_name == bm_pending.display_name):
+						cfg["abilities"] = cfg["abilities"] + [bm_pending]
 		# Review aid: pre-grant unlockable abilities when the map-burger
 		# DEBUG toggle is armed. Dedupe keys on display_name, so
 		# talent-learned copies never double up.
@@ -1329,10 +1344,10 @@ func _spawn_units() -> void:
 		# RESONANCE_BAR_REF instead, because a bar with no maximum has nothing
 		# to fill. resonant_core_ranks no longer touches this: the node buys
 		# an extra stack on the first cast of each turn now.
-		if spec == "arcanist":
+		if engines.has("resonance"):
 			cfg["second_max"] = 99
 		# Mercy: Martyr's Vigor moves the ceiling, Zealous Light the start.
-		if spec == "holy":
+		if engines.has("mercy"):
 			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
 			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0))
 				+ int(cfg.get("rune_zealous_mercy", 0)),
@@ -1343,7 +1358,7 @@ func _spawn_units() -> void:
 		# number, and that cap IS its cost. Opening Volley says what he walks in
 		# holding, and it is ADDITIVE (the node 150, the Rune of the Long Draw
 		# another 60), so each pays its advertised number alone and both stacked.
-		if spec == "sharpshooter":
+		if engines.has("lethal_aim"):
 			cfg["second_resource_name"] = "Focus"
 			cfg["second_max"] = 50 if cfg.get("spray", 0) > 0 else FOCUS_UNCAPPED
 			var ss_open := int(cfg.get("opening_volley", 0)) \
@@ -1424,15 +1439,17 @@ func _spawn_units() -> void:
 		# battle owns what happens.
 		u.last_word_cb = _on_last_word
 		u.heal_above_half_cb = _on_hero_healed_above_half
-		if spec != "":
+		# BATCH GK — ONE CHIP PER HELD ENGINE, in slot order; the first keeps the
+		# id the one spec passive always used (`engine_chip_id`).
+		for pid in u.engines:
 			# BATCH CL §1 — resolved against the unit that was just spawned. Four
 			# specs overwrite this chip live in `refresh_bars` (bloodrage, heavy
 			# plating, seasoned and now resonance); the other eight read THIS
 			# string for the whole fight, so its tokens have to resolve here or
 			# they never resolve at all.
-			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
+			u.add_status(u.engine_chip_id(String(pid)), Classes.engine_title(String(pid)), "★",
 				Color(0.9, 0.78, 0.4), -1, Classes.resolve_values(
-					String(Classes.SPEC_INFO[spec]["passive_desc"]),
+					Classes.engine_desc(String(pid)),
 					Classes.value_ctx_from_unit(u)))
 		var class_passive: Dictionary = Classes.CLASS_PASSIVES[hero_keys[i]]
 		u.add_status("class_passive", class_passive["name"], "◆",
@@ -1524,7 +1541,7 @@ func _spawn_units() -> void:
 				dvn_st["src_name"] = dvn_src
 	# Conviction (Devout passive): Divine Shield absorbs build Faith, and
 	# lethal saves reward — both hook back into the battle scene.
-	if heroes.any(func(h): return h.passive_id == "conviction"):
+	if heroes.any(func(h): return h.has_engine("conviction")):
 		for h in heroes:
 			h.lethal_saved_cb = _on_lethal_saved
 			h.shield_absorbed_cb = _on_shield_absorbed
@@ -2386,7 +2403,7 @@ func _do_forfeit(reason_id: String, reason_label: String) -> void:
 		return
 	_close_forfeit_confirm()
 	battle_over = true
-	Profile.note_forfeit(Run.party.map(func(m): return m.get("spec", "")))
+	Profile.note_forfeit(Run.chronicle_keys())
 	# BATCH BL §2: a forfeit never reaches `_check_end`, so the fight being
 	# walked away from would be missing from the recap entirely — and §2 says
 	# that fight is exactly what the tester wants explained. Banked here, before
@@ -3532,7 +3549,7 @@ func _update_talent_chips() -> void:
 	# changes drive — Shieldwall's stance moves that total on its own clock,
 	# so re-read it on the same cadence as every other live chip.
 	for wd in heroes:
-		if not wd.dead and wd.passive_id == "heavy_plating":
+		if not wd.dead and wd.has_engine("heavy_plating"):
 			wd.refresh_bars()
 	# Pack Bond (Aguila): the party-wide crit boon shows as a live buff chip.
 	var ee_bonus := _party_crit_bonus()
@@ -3568,10 +3585,10 @@ func _update_talent_chips() -> void:
 	# onto rather than the spine itself.
 	var burn_turns := _total_burn_turns()
 	for h in heroes:
-		if h.dead or h.passive_id != "overburn":
+		if h.dead or not h.has_engine("overburn"):
 			continue
 		var ob_pct := int(round((_overburn_mult(h, burn_turns) - 1.0) * 100.0))
-		h.update_status("spec_passive", "+%d%%" % ob_pct,
+		h.update_status(h.engine_chip_id("overburn"), "+%d%%" % ob_pct,
 			"Overburn: +%d%% damage for every turn of Burn\non the enemy team, up to +%d%%.\nCurrently +%d%% (%d Burn turns standing).\nEvery turn of Burn you CONSUME refunds Mana." % [
 				int(OVERBURN_STEP), int(OVERBURN_CAP), ob_pct, burn_turns])
 	# Seeding Embers: harvest burning deaths (once per corpse).
@@ -4099,7 +4116,7 @@ func _player_turn(u: BattleUnit) -> void:
 			sc_sequence = {}
 			var ss_seq: bool = _is_sharpshooter_basic(u, ab)
 			if not ab.runs_skill_check() \
-					or (ab == u.abilities[0] and u.passive_id != "lethal_aim"):
+					or (ab == u.abilities[0] and not u.has_engine("lethal_aim")):
 				grade = "good"
 				break
 			if autoplay:
@@ -4636,7 +4653,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# below never casts his kit, so sims would call an untested kit
 			# "balanced"): Blood Price to throttle the Frenzy while healthy,
 			# sweep wide, then grind single targets.
-			if u.passive_id == "bloodrage":
+			if u.has_engine("bloodrage"):
 				var bprice := _find_ability(u, "Blood Price")
 				if bprice != null and u.ability_ready(bprice) \
 						and u.resource < 60 and u.hp > u.max_hp * 0.4:
@@ -4661,7 +4678,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# Break (55+ on the meter) is how the sim proves the
 			# Break-into-free-Overpower chain fires; Overpower spends the
 			# meter and holds Broken targets down.
-			if u.passive_id == "seasoned":
+			if u.has_engine("seasoned"):
 				var gchange := _find_ability(u, "Guard Change")
 				var sm_want := "defensive" if u.hp < u.max_hp * 0.45 else "aggressive"
 				# Pivot makes the swap itself profitable: a healthy Pivot
@@ -4716,7 +4733,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# wall up under pressure, keep the taunt and Sunder live, refuel
 			# the line, grind. Mocking Blow is free and builds 10 Rage — his
 			# engine — so it is never skipped once its taunt has lapsed.
-			if u.passive_id == "heavy_plating":
+			if u.has_engine("heavy_plating"):
 				var wd_idx := heroes.find(u)
 				var wd_inter := _find_ability(u, "Interpose")
 				if wd_inter != null and u.resource >= wd_inter.cost \
@@ -4954,7 +4971,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					and _ability_usable(u, clasp) and cryo_mark != null \
 					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack:
 				return [clasp, cryo_mark]
-			if u.passive_id == "permafrost" and cryo_mark != null:
+			if u.has_engine("permafrost") and cryo_mark != null:
 				return [u.abilities[0], cryo_mark]       # Frostbolt the mark
 			return [u.abilities[0], target_foe]          # basic bolt
 		"hunter":
@@ -7721,7 +7738,7 @@ func _cleansable_debuffs(u: BattleUnit) -> Array:
 # WIND-UP IS WHAT A BREAK IS FOR (Batch V), and handing that to a 15-Mana
 # utility card would quietly delete the Ash Hurler's whole lesson.
 const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
-	"hunt_mark", "ruin_primed", "charging", "spec_passive",
+	"hunt_mark", "ruin_primed", "charging", "spec_passive", "spec_passive_2",
 	# BATCH BW — `blood_debt` and `vendetta` are the party's OWN MARKS, laid on
 	# an enemy, and this list is what stops a Mage's Dispel stripping them FOR
 	# that enemy. They are deliberately NOT in `DEBUFF_IDS` (they are marks, and
@@ -7808,7 +7825,7 @@ func _likeliest_target(pool: Array) -> BattleUnit:
 # passive-driven mitigation like the Chilled swing malus).
 func _living_hero_passive(pid: String) -> BattleUnit:
 	for h in heroes:
-		if not h.dead and h.passive_id == pid:
+		if not h.dead and h.has_engine(pid):
 			return h
 	return null
 
@@ -8206,16 +8223,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# earning the ability from a pool never books another spec's row.
 		match ab.display_name:
 			"Detonation":
-				if attacker.passive_id == "overburn":
+				if attacker.has_engine("overburn"):
 					_sig("overburn")
 			"Death Ray":
-				if attacker.passive_id == "resonance":
+				if attacker.has_engine("resonance"):
 					_sig("resonance")
 			"Resurrection":
-				if attacker.passive_id == "mercy":
+				if attacker.has_engine("mercy"):
 					_sig("mercy")
 			"Guard Change":
-				if attacker.passive_id == "seasoned":
+				if attacker.has_engine("seasoned"):
 					_sig("seasoned")
 
 	# faith_cost = the secondary-resource price (Mercy for the Holy Cleric).
@@ -8556,7 +8573,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# (they test for "Heavy Plating") from firing off a
 					# teammate's block.
 					if strike_target.has_status("bulwark_line") \
-							and strike_target.passive_id != "heavy_plating":
+							and not strike_target.has_engine("heavy_plating"):
 						plate_label = "Bulwark Line"
 					# BATCH BP — COVERING GUARD. A THIRD SLICE, WITH THE WARDEN'S
 					# LIVE BLOCK CHANCE IN IT. This is not redirection: nothing
@@ -8600,7 +8617,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# BATCH BP: a Covering Guard block is his Block chance doing
 					# his job on another body, so it books here for the same
 					# reason an Interpose-covered ally's block does.
-					if strike_target.passive_id == "heavy_plating" \
+					if strike_target.has_engine("heavy_plating") \
 							or (block_source == "Interpose"
 							and String(charges.get("src_name", "")) != "") \
 							or block_source == "Covering Guard":
@@ -8638,7 +8655,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# remember: with no reset there is nothing to pay for. THEY ARE TWO
 					# ANSWERS TO THE SAME CRUELTY, NOT A STACK, and both cards say so on
 					# their own text rather than leaving a player to discover it.
-					if strike_target.passive_id == "heavy_plating" \
+					if strike_target.has_engine("heavy_plating") \
 							and strike_target.plating_bonus > 0.0:
 						if strike_target.has_status("anvil"):
 							_log("   → Anvil: the climb HOLDS at +%d%% — a block no longer resets it" % \
@@ -8866,7 +8883,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							if attacker.dead:
 								break
 					continue
-				elif strike_target.passive_id == "heavy_plating" \
+				elif strike_target.has_engine("heavy_plating") \
 						and strike_target.plating_bonus < 0.40:
 					# The hit got through — the plating learns: +8% Block per
 					# unblocked attack (cap +40%). Bad-luck protection, not
@@ -9099,7 +9116,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Past it the same half-percent a point buys critical MULTIPLIER
 			# instead, in the crit block below: chance cannot pass 100%, force
 			# can go on forever. Tunnel Vision commits wholly to the worked mark.
-			if attacker.passive_id == "lethal_aim" \
+			if attacker.has_engine("lethal_aim") \
 					and attacker.second_resource_name == "Focus":
 				crit_chance += attacker.focus_crit_chance()
 				if attacker.tunnel_vision > 0:
@@ -9153,7 +9170,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# paying. ONE implementation, on BattleUnit, so this site, the
 				# nameplate and the sim instrument cannot read different numbers.
 				var crit_mult := 1.5
-				if attacker.passive_id == "lethal_aim":
+				if attacker.has_engine("lethal_aim"):
 					crit_mult = attacker.lethal_crit_mult()
 				# Piercing Ice: the lance drives deeper on a crit. ADDITIVE —
 				# the counter is percentage POINTS of critical damage.
@@ -9504,14 +9521,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var fn_h := _living_hero_with("force_of_nature")
 					if fn_h != null:
 						raw *= 1.0 + 0.01 * fn_h.force_of_nature * sv_n
-					elif attacker.passive_id == "trapper":
+					elif attacker.has_engine("trapper"):
 						raw *= 1.0 + 0.08 * sv_n
 				# THE INSTRUMENT BATCH BA IS ABOUT (§0): the average count of
 				# distinct statuses on a target when a Survivalist strikes it.
 				# That count IS his damage multiplier, so it is the only figure
 				# that says whether the Venom carriers actually landed. Banked at
 				# the site that READS it, and only for him.
-				if sim and attacker.passive_id == "trapper" \
+				if sim and attacker.has_engine("trapper") \
 						and not strike_target.is_hero:
 					_stat("breadth_strikes")
 					_stat("breadth_sum", sv_n)
@@ -9592,7 +9609,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blood Frenzy v2: +2% (plus Unstoppable) per 5% missing, never
 			# below the ratcheting floor (half this battle's peak bonus) —
 			# the unit-side helper ratchets and returns in one motion.
-			if attacker.passive_id == "bloodrage":
+			if attacker.has_engine("bloodrage"):
 				raw *= 1.0 + attacker.frenzy_bonus()
 			# BATCH CI — UNSLAKED and BOIL OVER both live INSIDE the helper
 			# above (`frenzy_bonus`, unit.gd) rather than out here, which is what
@@ -9616,7 +9633,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# it is the only card in the game that CASHES the meter instead of
 			# carrying it, and the two turns below are what it pays for that.
 			if ab.display_name == "Boil Over" \
-					and attacker.passive_id == "bloodrage":
+					and attacker.has_engine("bloodrage"):
 				# IT TAKES THE GRADE MULTIPLIER AND **DELIBERATELY DRAWS NO
 				# VARIANCE ROLL OF ITS OWN**: `raw` above already carries one, and
 				# a second `randf_range` here would shift every later roll in the
@@ -9770,7 +9787,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.rune_execute_bonus * 100)), "#b0a8e0")
 			# Seasoned Fighter: the chosen stance decides the blade's weight —
 			# Aggressive presses (talent-deepened), Defensive pulls the cut.
-			if attacker.passive_id == "seasoned":
+			if attacker.has_engine("seasoned"):
 				# BATCH CI — FORMLESS AND DISCIPLINE BOTH LAND ON THE PASSIVE'S OWN
 				# READ SITE rather than at a third site of their own, so neither can
 				# drift from the thing it is quoting. FORMLESS holds BOTH stances'
@@ -9842,7 +9859,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						20 * attacker.off_balance_ranks, ob_word], "#b0a8e0")
 			# Pack Bond (Canis): the hunter runs down wounded prey — +15%
 			# damage per enemy under 35% health, scaled by the bond tier.
-			if attacker.is_hero and attacker.passive_id == "pack":
+			if attacker.is_hero and attacker.has_engine("pack"):
 				var bm_canis := _bond_mult(attacker, "canis")
 				if bm_canis > 0.0:
 					var bm_wounded := enemies.filter(func(en): return not en.dead and en.hp < en.max_hp * 0.35).size()
@@ -9909,7 +9926,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# CLAMP IS LOAD-BEARING under Batch AY's uncapped Loyalty: without
 			# it the multiplier crosses zero and enemy attacks start HEALING
 			# him (see BOND_MITIGATION_MAX).
-			if strike_target.is_hero and strike_target.passive_id == "pack":
+			if strike_target.is_hero and strike_target.has_engine("pack"):
 				var sp_ursus := _bond_mult(strike_target, "ursus")
 				if sp_ursus > 0.0:
 					var pv_was := raw
@@ -10162,7 +10179,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				for bl_h in heroes:
 					if not bl_h.dead and not bl_h.is_companion \
 							and bl_h.rune_bracing_line > 0 \
-							and bl_h.passive_id == "heavy_plating" \
+							and bl_h.has_engine("heavy_plating") \
 							and int(round(bl_h.plating_bonus * 100.0)) >= BRACING_LINE_LEVEL:
 						bl_w = bl_h
 						break
@@ -10300,7 +10317,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var sp_was := raw
 					raw *= 1.0 - 0.01 * sp_cut
 					_prev(strike_target, sp_was - raw)
-			if strike_target.passive_id == "seasoned":
+			if strike_target.has_engine("seasoned"):
 				var pv_was := raw
 				# BATCH CI — the mirror of the offence site above. The `maxf` floors
 				# are new and they guard the term THIS batch adds: Discipline caps at
@@ -11004,7 +11021,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							if not strike_target.dead:
 								_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
-					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
+					if attacker.has_engine("old_gods") and not strike_target.is_hero \
 							and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]):
 						# BATCH EZ §1 — SPLIT TONGUE. The curse is spoken to the
 						# whole line now (`aoe`, set on the Ability by the rune's
@@ -11325,7 +11342,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Survivalist holding both the card and the rune advances two cycles
 			# rather than sharing one — the two are different sources and
 			# sharing an index would make the pair narrower than either alone.
-			if strike_target.passive_id == "trapper" and not attacker.is_hero \
+			if strike_target.has_engine("trapper") and not attacker.is_hero \
 					and not attacker.dead \
 					and (strike_target.rune_thin_blood > 0 or randf() < 0.25):
 				if strike_target.rune_second_barb > 0:
@@ -11611,7 +11628,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_dmg_frame(attacker, ab.display_name)
 			# Mark of the Hunt: every strike on the marked prey feeds the
 			# hunter's Mana (3% max per hit).
-			if attacker.is_hero and attacker.passive_id == "pack" \
+			if attacker.is_hero and attacker.has_engine("pack") \
 					and not attacker.dead and strike_target.has_status("hunt_mark") \
 					and strike_target.status_power("hunt_mark") == heroes.find(attacker):
 				attacker.resource = mini(attacker.resource \
@@ -11714,7 +11731,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# on each of the three, and the streak advancing exactly once.
 			if attacker.is_hero and not is_counter and final > 0 \
 					and ab.display_name == "Drumfire" \
-					and attacker.passive_id == "lethal_aim" \
+					and attacker.has_engine("lethal_aim") \
 					and strike_target != null and not strike_target.is_hero \
 					and not attacker.dead:
 				if hit_i > 0:
@@ -12028,7 +12045,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# rather than as a write to `frenzy_floor`, which would be permanent
 		# where this is two turns.
 		if ab.display_name == "Boil Over" \
-				and attacker.passive_id == "bloodrage" and not is_counter:
+				and attacker.has_engine("bloodrage") and not is_counter:
 			var bo_turns := 1 if is_perfect else BOIL_OVER_RECOVERY
 			_apply_status(attacker, "boil_over", bo_turns)
 			attacker.update_status("boil_over", "Bo",
@@ -12039,7 +12056,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				" [PERFECT]" if is_perfect else ""], "#e07050")
 		# Survivalist on-hit package: Shrapnel's poison (perfect adds Slowed),
 		# Hamstring's trio, Coated Blades on basics, Venom Coating on all.
-		if attacker.is_hero and attacker.passive_id == "trapper" \
+		if attacker.is_hero and attacker.has_engine("trapper") \
 				and ab.damage > 0 and not is_counter:
 			var sv_turns := 4 if is_perfect else 3
 			for sv_t in [target, second_target, third_target]:
@@ -12134,7 +12151,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Potent Toxins, the carriers his Venom lane bought come with it, and the
 		# sim credits the tick to the Survivalist rather than to whoever swung.
 		if attacker.is_hero and not attacker.is_companion \
-				and attacker.passive_id != "trapper" \
+				and not attacker.has_engine("trapper") \
 				and ab.damage > 0 and ab.cost == 0 and not is_counter:
 			var qm_h := _living_hero_with("quartermaster")
 			if qm_h != null:
@@ -12166,7 +12183,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# flag on the ability, because it is a statement about where this card's
 		# Focus is counted and not a property another card should be able to
 		# inherit by accident.
-		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
+		if attacker.is_hero and attacker.has_engine("lethal_aim") \
 				and ab.damage > 0 and not is_counter and not _focus_safe(ab) \
 				and ab.display_name != "Drumfire" \
 				and target != null and not target.is_hero:
@@ -12262,7 +12279,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					hi_info[3], hi_left)
 		# The Beastmaster's beasts strike alongside the hunter (The Pack:
 		# both fire; a beast whose prey just fell picks the next weakest).
-		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
+		if attacker.is_hero and attacker.has_engine("pack") and ab.damage > 0 \
 				and not is_counter:
 			var comp_target: BattleUnit = target
 			var pack_now := _beasts(attacker)
@@ -13076,7 +13093,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# 3-turn clock.
 	var eff_turns := turns
 	if id == "chilled" and src != null and src.is_hero \
-			and src.passive_id == "permafrost":
+			and src.has_engine("permafrost"):
 		eff_turns = -1
 	# BATCH CB — EMBERKEEP (Pyromancer draft, tranche 3), AND THIS ONE CLAUSE IS
 	# THE WHOLE ABILITY. Burn the holder applies lands at DOUBLE duration.
@@ -14037,7 +14054,7 @@ func _mirror_dodge(attacker: BattleUnit, defender: BattleUnit) -> bool:
 
 
 func _overburn_mult(u: BattleUnit, burn_turns: int) -> float:
-	if u == null or u.passive_id != "overburn":
+	if u == null or not u.has_engine("overburn"):
 		return 1.0
 	var pct := minf(burn_turns * OVERBURN_STEP, OVERBURN_CAP)
 	return 1.0 + 0.01 * pct
@@ -14122,7 +14139,7 @@ func _forge_body_throw(hero: BattleUnit, prevented: float) -> void:
 # below that line would silently stop firing exactly when he is playing well,
 # which is the failure mode that reads as the rune working.
 func _overburn_refund(u: BattleUnit, turns_consumed: int) -> void:
-	if u == null or u.passive_id != "overburn" or turns_consumed <= 0:
+	if u == null or not u.has_engine("overburn") or turns_consumed <= 0:
 		return
 	# BATCH FK — THE RUNE OF THE EMBER LEAP. The consumed fire does not go out:
 	# it lands on the SHALLOWEST burning body at half the turns, which is the
@@ -14316,7 +14333,7 @@ func _bond_curve(hunter: BattleUnit, n: int) -> float:
 # one, so a saturation test on the curve alone would hand back stacks a
 # remembered bond was still spending.
 func _bond_reach(hunter: BattleUnit, kind: String) -> float:
-	if hunter == null or hunter.dead or hunter.passive_id != "pack":
+	if hunter == null or hunter.dead or not hunter.has_engine("pack"):
 		return 0.0
 	# The Pack: each active beast grants its own boon — this check simply
 	# matches any of them.
@@ -14513,7 +14530,7 @@ func _loyalty_cap(hunter: BattleUnit) -> int:
 # continuously with it. A beast's death breaks its meter (Steadfast Bond
 # keeps a share).
 func _gain_loyalty(hunter: BattleUnit, kind: String, amount := 1) -> void:
-	if hunter == null or hunter.dead or hunter.passive_id != "pack" or kind == "":
+	if hunter == null or hunter.dead or not hunter.has_engine("pack") or kind == "":
 		return
 	if hunter.one_soul > 0:
 		amount *= 2
@@ -14627,7 +14644,7 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 func _party_crit_bonus() -> float:
 	var best := 0.0
 	for h in heroes:
-		if not h.dead and not h.is_companion and h.passive_id == "pack":
+		if not h.dead and not h.is_companion and h.has_engine("pack"):
 			best = maxf(best, 0.10 * _bond_mult(h, "aguila"))
 	return best
 
@@ -15372,7 +15389,7 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 # only work while their shrine stands.
 func _living_devout() -> BattleUnit:
 	for h in heroes:
-		if not h.dead and h.passive_id == "conviction":
+		if not h.dead and h.has_engine("conviction"):
 			return h
 	return null
 
@@ -15460,9 +15477,9 @@ func _stance_satisfies(u: BattleUnit, want: String) -> bool:
 func _has_defensive_check(u: BattleUnit) -> bool:
 	if u == null or u.dead or not u.is_hero:
 		return false
-	if u.passive_id == "heavy_plating":
+	if u.has_engine("heavy_plating"):
 		return true
-	return u.passive_id == "seasoned" \
+	return u.has_engine("seasoned") \
 		and (u.stance == "defensive" or u.has_status("formless"))
 
 
@@ -15637,7 +15654,7 @@ func _live_block_chance(u: BattleUnit) -> float:
 # plus whichever stances are standing. Extracted from the roll itself so
 # Covering Guard cannot read a different number from the one the roll uses.
 func _plating_slice(u: BattleUnit) -> float:
-	var slice := (0.15 + u.plating_bonus) if u.passive_id == "heavy_plating" \
+	var slice := (0.15 + u.plating_bonus) if u.has_engine("heavy_plating") \
 		else 0.0
 	if u.has_status("shieldwall"):
 		slice += 0.01 * maxi(u.status_power("shieldwall"), 0)
@@ -15745,7 +15762,7 @@ func _ruin_focus(foes: Array, fallback: BattleUnit) -> BattleUnit:
 # Wrath of the Old Gods (Occultist passive): the living Occultist, or null.
 func _living_occultist() -> BattleUnit:
 	for h in heroes:
-		if not h.dead and h.passive_id == "old_gods":
+		if not h.dead and h.has_engine("old_gods"):
 			return h
 	return null
 
@@ -16023,40 +16040,46 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 # measurement changing the thing it measures.
 func _cy_sample() -> void:
 	for h in heroes:
-		if h.dead or h.is_companion or h.passive_id == "":
+		if h.dead or h.is_companion or h.engines.is_empty():
 			continue
-		var v := 0.0
-		match h.passive_id:
-			"bloodrage":
-				# The live band, exactly as `frenzy_bonus()` computes it, minus
-				# the ratchet. Reported as percentage points.
-				# BATCH CZ §1 — AND IT CARRIES BOTH TERMS NOW, summed and
-				# clamped the same way, or the instrument would report the
-				# half of the passive the batch did not change. `rage_spent`
-				# is a plain field read and `frenzy_rage_steps()` is pure, so
-				# the sampler stays read-only by construction.
-				var step: float = (2.0 + h.bloodrage_step_bonus
-					+ h.rune_bloodrage_step_bonus) / 100.0
-				var steps: int = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) \
-					+ h.frenzy_rage_steps()
-				var cur: float = mini(steps, BattleUnit.FRENZY_MAX_STEPS) * step
-				v = maxf(cur, h.frenzy_floor) * 100.0
-			"pack":
-				# The DEEPEST bond standing on any one beast — the meter Pack
-				# Bond's curve actually reads, one beast at a time.
-				for kind in h.loyalty:
-					v = maxf(v, float(int(h.loyalty[kind])))
-			"lethal_aim":
-				if h.second_resource_name == "Focus":
-					v = float(h.second_resource)
-			"conviction":
-				# `faith_peak` is already a per-battle high-water mark that
-				# never falls (Batch BI §1), so the max here is belt and braces.
-				v = float(maxi(h.faith_stacks, h.faith_peak))
-			_:
-				continue
-		if v > float(_cy_peak.get(h.passive_id, 0.0)):
-			_cy_peak[h.passive_id] = v
+		# BATCH GK — a hero can hold two engines, so each is sampled.
+		for cy_pid in h.engines:
+			_cy_sample_one(h, String(cy_pid))
+
+
+func _cy_sample_one(h: BattleUnit, pid: String) -> void:
+	var v := 0.0
+	match pid:
+		"bloodrage":
+			# The live band, exactly as `frenzy_bonus()` computes it, minus
+			# the ratchet. Reported as percentage points.
+			# BATCH CZ §1 — AND IT CARRIES BOTH TERMS NOW, summed and
+			# clamped the same way, or the instrument would report the
+			# half of the passive the batch did not change. `rage_spent`
+			# is a plain field read and `frenzy_rage_steps()` is pure, so
+			# the sampler stays read-only by construction.
+			var step: float = (2.0 + h.bloodrage_step_bonus
+				+ h.rune_bloodrage_step_bonus) / 100.0
+			var steps: int = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) \
+				+ h.frenzy_rage_steps()
+			var cur: float = mini(steps, BattleUnit.FRENZY_MAX_STEPS) * step
+			v = maxf(cur, h.frenzy_floor) * 100.0
+		"pack":
+			# The DEEPEST bond standing on any one beast — the meter Pack
+			# Bond's curve actually reads, one beast at a time.
+			for kind in h.loyalty:
+				v = maxf(v, float(int(h.loyalty[kind])))
+		"lethal_aim":
+			if h.second_resource_name == "Focus":
+				v = float(h.second_resource)
+		"conviction":
+			# `faith_peak` is already a per-battle high-water mark that
+			# never falls (Batch BI §1), so the max here is belt and braces.
+			v = float(maxi(h.faith_stacks, h.faith_peak))
+		_:
+			return
+	if v > float(_cy_peak.get(pid, 0.0)):
+		_cy_peak[pid] = v
 
 
 func _boss_fight() -> bool:
@@ -17818,7 +17841,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# It IS a debuff the Occultist applied, so the passive marks it
 				# — through the same call the generic hook makes, at the same
 				# magnitude, rather than a second rule of its own.
-				if attacker.passive_id == "old_gods":
+				if attacker.has_engine("old_gods"):
 					_gain_ruin(target, _old_gods_mark())
 				_sfx("bomb", -9.0, 0.7)
 				_message("%s poisons the well beneath %s" % [attacker.unit_name,
@@ -19875,7 +19898,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# further releases. So this pays its own payout at its own site and
 			# does NOT go through `_gain_faith`: no growth, no Communion, no
 			# Binding Oath, no chain.
-			if attacker.passive_id != "conviction":
+			if not attacker.has_engine("conviction"):
 				_log("%s: Blessing of the Faithful — only the Devout carries Faith that never releases" % \
 					attacker.unit_name, "#909090")
 			elif attacker.faith_stacks < JUBILEE_MIN_FAITH:
@@ -20696,7 +20719,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("-%d" % bp_cost, Color(1.0, 0.4, 0.5))
 			# The self-cut banks its Frenzy floor immediately, like any hit
 			# taken (Batch A rule: dives count even if healed away).
-			if attacker.passive_id == "bloodrage":
+			if attacker.has_engine("bloodrage"):
 				attacker.frenzy_bonus()
 			_sfx("crit", -8.0, 0.7)
 			attacker.resource = mini(attacker.resource + 30, attacker.max_resource)
@@ -23425,7 +23448,7 @@ func _focus_cap(u: BattleUnit) -> int:
 # flag and the question has to be asked of the caster. **THIS APPLIES TO HIS
 # BASIC ATTACK ONLY. No other ability of his changes.**
 func _is_sharpshooter_basic(u: BattleUnit, ab: Ability) -> bool:
-	return u != null and ab != null and u.passive_id == "lethal_aim" \
+	return u != null and ab != null and u.has_engine("lethal_aim") \
 		and not u.abilities.is_empty() and ab == u.abilities[0]
 
 
@@ -23573,7 +23596,7 @@ func _pay_sequence_focus(u: BattleUnit, ab: Ability) -> void:
 # the hunter branch can quietly break the meter the spec is made of. Any other
 # hunter keeps whatever the generic picker chose.
 func _focus_mark(u: BattleUnit, fallback: BattleUnit) -> BattleUnit:
-	if u.passive_id != "lethal_aim":
+	if not u.has_engine("lethal_aim"):
 		return fallback
 	if u.last_attack_target != null and not u.last_attack_target.dead:
 		return u.last_attack_target
@@ -25101,7 +25124,7 @@ func _check_end() -> void:
 		# Batch AX §0: the denominators for the two Ruin numbers. A run is mostly
 		# trash, so averaging detonations over ALL battles would bury the boss
 		# half — which is the half the design is aimed at.
-		if heroes.any(func(h): return h.passive_id == "old_gods"):
+		if heroes.any(func(h): return h.has_engine("old_gods")):
 			_stat("ruin_boss_battles" if _boss_fight() else "ruin_trash_battles")
 		# BATCH CY §0 — ROUNDS TO RESOLUTION, SPLIT THE WAY THE DESIGN SPLITS.
 		# Trash / elite / boss, because "how long is a fight" has three answers
@@ -25119,22 +25142,24 @@ func _check_end() -> void:
 		# And the four meters, banked per battle a spec STOOD in so the average
 		# is over its own fights rather than over every battle in the sim.
 		for cy_h in heroes:
-			if cy_h.is_companion or cy_h.passive_id == "":
+			if cy_h.is_companion:
 				continue
-			if not cy_h.passive_id in ["bloodrage", "pack", "lethal_aim", "conviction"]:
-				continue
-			_stat("cy_meter_n_" + cy_h.passive_id)
-			_stat("cy_meter_" + cy_h.passive_id,
-				float(_cy_peak.get(cy_h.passive_id, 0.0)))
-			# BATCH CZ §1 — THE RATE'S OWN DENOMINATOR, banked the same way and
-			# on the same tick so the two can never be averaged over different
-			# battles. `cy_meter_bloodrage` says how deep the band got; this
-			# says how much Rage was spent to get there, and the quotient is
-			# what `FRENZY_RAGE_PER_STEP` is set against. Read at battle END
-			# rather than sampled per turn, because `rage_spent` only ever
-			# rises — the end value IS the peak.
-			if cy_h.passive_id == "bloodrage":
-				_stat("cz_rage_spent", float(cy_h.rage_spent))
+			# BATCH GK — per held ENGINE: a hero holding two books both meters.
+			for cy_pid in cy_h.engines:
+				if not cy_pid in ["bloodrage", "pack", "lethal_aim", "conviction"]:
+					continue
+				_stat("cy_meter_n_" + cy_pid)
+				_stat("cy_meter_" + cy_pid,
+					float(_cy_peak.get(cy_pid, 0.0)))
+				# BATCH CZ §1 — THE RATE'S OWN DENOMINATOR, banked the same way and
+				# on the same tick so the two can never be averaged over different
+				# battles. `cy_meter_bloodrage` says how deep the band got; this
+				# says how much Rage was spent to get there, and the quotient is
+				# what `FRENZY_RAGE_PER_STEP` is set against. Read at battle END
+				# rather than sampled per turn, because `rage_spent` only ever
+				# rises — the end value IS the peak.
+				if cy_pid == "bloodrage":
+					_stat("cz_rage_spent", float(cy_h.rage_spent))
 		# BATCH BJ §3a — the signature table's numerators and denominators:
 		# for every spec STANDING in this battle, one denominator tick and this
 		# battle's moment counts, split trash/boss exactly as Ruin's are. The
@@ -25142,15 +25167,17 @@ func _check_end() -> void:
 		# beast deaths); specs without one simply never book it.
 		var sig_kind := "boss" if _boss_fight() else "trash"
 		for sg_h in heroes:
-			if sg_h.is_companion or sg_h.passive_id == "":
+			if sg_h.is_companion:
 				continue
-			_stat("sigb_%s_%s" % [sg_h.passive_id, sig_kind])
-			var sg_n: float = _b_sig.get(sg_h.passive_id, 0.0)
-			if sg_n > 0.0:
-				_stat("sig_%s_%s" % [sg_h.passive_id, sig_kind], sg_n)
-			var sg_n2: float = _b_sig.get(sg_h.passive_id + "_b", 0.0)
-			if sg_n2 > 0.0:
-				_stat("sig2_%s_%s" % [sg_h.passive_id, sig_kind], sg_n2)
+			# BATCH GK — per held ENGINE, as the meters above are.
+			for sg_pid in sg_h.engines:
+				_stat("sigb_%s_%s" % [sg_pid, sig_kind])
+				var sg_n: float = _b_sig.get(sg_pid, 0.0)
+				if sg_n > 0.0:
+					_stat("sig_%s_%s" % [sg_pid, sig_kind], sg_n)
+				var sg_n2: float = _b_sig.get(sg_pid + "_b", 0.0)
+				if sg_n2 > 0.0:
+					_stat("sig2_%s_%s" % [sg_pid, sig_kind], sg_n2)
 		# BATCH AW §0 — THE ONE NEW NUMBER, and it is the whole batch in one
 		# figure: how much maximum health Conviction lent the Devout over the
 		# course of this fight. Banked here rather than at the growth site so
@@ -25158,7 +25185,7 @@ func _check_end() -> void:
 		# alongside because §1 ships 3% uncapped as a deliberate trial and the
 		# Apostle row is what decides whether it needs a ceiling.
 		for cg_h in heroes:
-			if cg_h.passive_id != "conviction":
+			if not cg_h.has_engine("conviction"):
 				continue
 			_stat("conviction_growth", float(cg_h.conviction_hp_gained))
 			_stat("conviction_battles")
@@ -25408,7 +25435,7 @@ func _check_end() -> void:
 		# should not count a fight the tester conjured out of a menu. This
 		# is the one Profile booking a summoned node can reach.
 		if Run.active and not Run.debug_summon:
-			Profile.note_wipe(Run.party.map(func(m): return m.get("spec", "")))
+			Profile.note_wipe(Run.chronicle_keys())
 		# Batch Z: snapshot BEFORE the clear (see the completion branch).
 		var wipe_snap := _run_snapshot("wipe", "")
 		Run.active = false
@@ -25508,7 +25535,7 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 		boss_text += "\n\nTALENT TIER %d IS OPEN — for every class." % \
 			Talents.tiers_open(Profile.talent_tier())
 	Profile.note_boss(Run.END_BOSS_KIND)
-	Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
+	Profile.note_completion(Run.chronicle_keys())
 	# Batch Z: the summary needs the run state clear_save destroys — snapshot
 	# FIRST, never reorder the save logic (a reordering that leaves a dead run
 	# resumable is the worse bug).

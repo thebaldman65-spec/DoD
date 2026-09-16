@@ -783,13 +783,12 @@ static func config(id: String) -> Dictionary:
 # The one reader that wants the LOADOUT is `battle.gd`'s spawn, and it names
 # `Run.equipped_ability_names` directly rather than going through here.
 static func kit_names(member: Dictionary) -> Array:
-	var cfg: Dictionary = Classes.hero_config(String(member["key"]))
-	var spec := String(member.get("spec", ""))
-	if spec != "":
-		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
-		Classes.apply_kit_overrides(cfg, spec)
+	# BATCH GK — THE KIT IS THE ENGINES' AS WELL AS THE LINEAGE'S: an enabler
+	# travels with its engine, so the opening kit is `Classes.opening_kit`'s
+	# answer for what this hero holds, never the spec's alone.
 	var names: Array = []
-	for ab in cfg["abilities"]:
+	for ab in Classes.opening_kit(String(member["key"]),
+			String(member.get("spec", "")), held_engines(member)):
 		names.append(ab.display_name)
 	for trophy in member.get("bm_abilities", []):
 		names.append(String(trophy))
@@ -868,11 +867,18 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 	var kit := kit_names(member)
 	var out: Array = []
 	var data := _load()
+	# BATCH GK — an engine rune the hero already holds, slotted or not, is his:
+	# it lives in `member["engines"]`, which the pouch names above never see.
+	var held_ids: Array = []
+	for r in member.get("engines", []):
+		held_ids.append(String((r as Dictionary).get("id", "")))
 	for id in data:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
 			continue
 		if not _scope_ok(e, member):
+			continue
+		if held_ids.has(String(id)):
 			continue
 		var req := String(e.get("requires_ability", ""))
 		if req != "" and not kit.has(req):
@@ -1122,7 +1128,72 @@ static func build(id: String) -> Dictionary:
 		"lane": String(e.get("lane", "")),
 		"requires_ability": String(e.get("requires_ability", "")),
 		"equipped": false,
-	}
+	}.merged(_engine_fields(e), true)
+
+
+# ══ BATCH GK — THE ENGINE RUNES ════════════════════════════════════════════
+#
+# **AN ENGINE RUNE IS A RUNE THAT CARRIES AN ENGINE.** Its entry in `runes.json`
+# names the engine by id in `engine` and carries an empty payload: what it does
+# is the engine, which the spawn reads off the held set, not a stat written
+# through `apply_payload`. It is scoped to its class, so a Warrior is only ever
+# offered a Warrior's, and it rolls through `eligible_ids` like any other rune —
+# which is the charter's "the second comes from the ordinary rune pool".
+#
+# **HELD ENGINE RUNES LIVE IN `member["engines"]`, NOT IN THE POUCH**, so the
+# three ordinary slots and everything that counts them are untouched; an engine
+# rune's own `equipped` flag is its place in one of the two engine slots.
+
+# The instance's engine fields: the id, and a desc that is the entry's own line
+# followed by the engine's text — read off `Classes`, never copied into the data.
+static func _engine_fields(e: Dictionary) -> Dictionary:
+	var pid := String(e.get("engine", ""))
+	if pid == "":
+		return {}
+	return {"engine": pid, "desc": "%s %s" % [String(e["desc"]),
+		Classes.resolve_values(Classes.engine_desc(pid), {}).replace("\n", " ")]}
+
+
+static func is_engine_rune(id: String) -> bool:
+	return String(config(id).get("engine", "")) != ""
+
+
+# The rune that carries engine `pid`, or "". An EMPTY id names no engine and
+# returns "" — every ordinary rune's `engine` is empty too, so without the
+# guard a member with no spec was handed the first ordinary rune as his engine.
+static func engine_rune_id(pid: String) -> String:
+	if pid == "":
+		return ""
+	var data := _load()
+	for id in data:
+		if String((data[id] as Dictionary).get("engine", "")) == pid:
+			return String(id)
+	return ""
+
+
+# The engines a member HOLDS: the engine runes in his two slots, by engine id,
+# in slot order. **THE ONE ANSWER** — the spawn, the kit, the sheet and the map
+# all ask it.
+static func held_engines(member: Dictionary) -> Array:
+	var out: Array = []
+	for r in member.get("engines", []):
+		var rd: Dictionary = r
+		var pid := String(rd.get("engine", ""))
+		if bool(rd.get("equipped", false)) and pid != "" and not out.has(pid):
+			out.append(pid)
+	return out
+
+
+# What class selection hands a hero who takes spec `spec`'s engine: that rune,
+# slotted. A save written before the engines moved is migrated through this,
+# and so is every sim and fixture that seats a party by spec.
+static func engine_pouch_for_spec(spec: String) -> Array:
+	var id := engine_rune_id(Classes.engine_of_spec(spec))
+	if id == "":
+		return []
+	var r := build(id)
+	r["equipped"] = true
+	return [r]
 
 
 # ---------- Batch AD: the power probe (DOD_SIM_RUNE_POWER) ----------

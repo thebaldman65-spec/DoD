@@ -110,6 +110,12 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 	for i in run.party.size():
 		var spec := String(specs[i])
 		run.party[i]["spec"] = spec
+		# BATCH GK — A SPEC NO LONGER BRINGS ITS ENGINE; THE ENGINE IS A RUNE. A
+		# hero seated by lineage holds that lineage's engine rune, slotted, which
+		# is what class selection hands a player who takes it. A caller wanting
+		# him without it, or with a second, overrides `engines` after.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(spec)
+		run.party[i]["awakened"] = true
 		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
 		run.party[i]["runes"] = runes.get(i, [])
 		run.party[i]["talents"] = talents.get(i, talents_by_spec.get(spec, {}))

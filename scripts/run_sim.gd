@@ -268,10 +268,11 @@ static func start_run(run: Node) -> void:
 		specs = Classes.rotated_specs(runs_done)
 	for i in run.party.size():
 		var spec: String = specs[i] if i < specs.size() else default_specs[i]
-		run.party[i]["spec"] = spec
-		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
-		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
-		run.equip_spec_talents(i)  # BATCH BM: the meta loadout, locked here
+		# BATCH GK — THE SIM TAKES ITS SPEC'S ENGINE AT CLASS SELECTION, through
+		# the door the screen uses (`Run.awaken`), so a sim party is what a player
+		# who took those four engines fields: the lineage, the tree, the HP sync
+		# and the meta loadout all follow from the one call.
+		run.awaken(i, Runes.engine_rune_id(Classes.engine_of_spec(spec)))
 		var run_sn := String(Classes.SPEC_INFO[spec]["name"])
 		spec_runs[run_sn] = int(spec_runs.get(run_sn, 0)) + 1
 	# Batch AE: the sim gets the opening pick too, resolved through the same
@@ -456,7 +457,7 @@ static func _rich_top_up(run: Node) -> void:
 			if rune.is_empty() or owned_names.has(String(rune["name"])):
 				break
 			rune["equipped"] = true
-			m["runes"] = m.get("runes", []) + [rune]
+			run.hold_rune(m, rune)  # BATCH GK — an engine rune takes an engine slot
 			owned_names.append(String(rune["name"]))
 			rune_granted += 1
 			worn += 1
@@ -573,7 +574,7 @@ static func _shop_visit(run: Node) -> void:
 			var rune: Dictionary = offer["rune"]
 			rune["equipped"] = true
 			var member: Dictionary = run.party[offer["member_idx"]]
-			member["runes"] = member.get("runes", []) + [rune]
+			run.hold_rune(member, rune)  # BATCH GK — one door
 			runes_bought += 1
 			offers.remove_at(best_offer)
 	# A rune the party could not have taken is not a rune the economy
@@ -748,7 +749,7 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			rune_elite_taken += 1
 			if rune["equipped"]:
 				rune_elite_equipped += 1
-			looter["runes"] = looter.get("runes", []) + [rune]
+			run.hold_rune(looter, rune)  # BATCH GK — one door
 		# Batch AN §6: drops honour the per-type stack cap, through the same
 		# Run.add_item every other grant uses — a sim that could stockpile
 		# past the cap would report an economy the game cannot produce.

@@ -673,6 +673,8 @@ func _spawn_battle(run: Node, mod_id: String,
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	for i in run.party.size():
 		run.party[i]["spec"] = String(specs[i])
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(specs[i]))
 		run.party[i]["tree"] = Talents.generate_tree(run.party[i]["spec"],
 			run.party[i]["key"])
 		run.sync_spec_hp(i)

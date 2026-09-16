@@ -419,7 +419,7 @@ func _ability(name: String):
 
 func _hero(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.dead and not h.is_companion and h.passive_id == passive:
+		if not h.dead and not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

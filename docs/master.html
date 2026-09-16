@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-15 (Batch GJ &mdash; the final fight becomes observable)</b></p>
+<p align="right"><b>Last updated: 2026-09-15 (Batch GK &mdash; engines become runes)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -22,14 +22,14 @@ audit).</p>
 <h2>1. Concept</h2>
 <p>A turn-based four-hero roguelike. The world is being consumed by <b>the Decay</b>; the player
 commands <b>the Untouched</b> — four heroes immune to it — through zone after zone of corrupted
-enemies. Runs are short, buildcrafted, and repeatable: draft four heroes, awaken permanent
-specializations, route a branching map of encounters, defeat the zone boss, descend deeper. Death ends the run but
+enemies. Runs are short, buildcrafted, and repeatable: draft four heroes, take each an engine
+rune, route a branching map of encounters, defeat the zone boss, descend deeper. Death ends the run but
 feeds a permanent relic collection (meta-progression). Combat is timeline-initiative with a
 timing skill check on every action — the player's execution matters as much as their build.</p>
 
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
-<b>Spec Choice</b> (permanent; heroes begin with <b>no runes</b> and three empty slots) →
+<b>Class Selection</b> (each hero is dealt three of his class's engine runes and takes one; heroes begin with <b>no ordinary runes</b> and three empty slots) →
 <b>Map</b> (a generated 16-slot lattice) → the node you route to: <b>Battle</b>, or
 <b>Smith</b>, or <b>Trade</b>, or <b>???</b> — with <b>Offer</b> (three bargains) in front of
 every elite and mini-boss → back to the map → …
@@ -108,9 +108,11 @@ Rung 2 does not scale enemy HEALTH at all: the health multiplier floors the rung
 rung-2 enemy is exactly as durable as a rung-1 one and only its ATTACK doubles. The fights are
 therefore the same length — <b>rounds to resolution 7.8 against 7.4 on the same loadout</b> — and
 ask the same questions.</li>
-<li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
-showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
-blurb, passive, and full ability details. The choice is permanent for the run.</li>
+<li><b>Class selection:</b> before the first battle, each hero is dealt three of his class's
+engine runes and takes one (§6.0). Each card shows the rune, the <b>archetype</b> of the spec it
+carries in bold (mouseover for the archetype explanation) or its class for a class engine, the
+blurb, the engine's text, and every ability the rune opens with and its damage. The rune can be
+dropped or swapped later; the spec it carried is the hero's lineage for the whole run.</li>
 <li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
 every hero 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
 Chalice of Dawn relic stacks its 10% on top for 25%). <b>No victory in a run pays a talent
@@ -1022,11 +1024,11 @@ character art (see §12).</p>
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
 <tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance,
-UNCAPPED, as Arcanist)</td></tr>
-<tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
-Holy)</td></tr>
+UNCAPPED, holding Runaway Resonance)</td></tr>
+<tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5
+holding Mercy)</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100 (+ Focus,
-UNCAPPED, as Sharpshooter)</td></tr>
+UNCAPPED, holding Lethal Aim)</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
@@ -1100,21 +1102,22 @@ escape, and <b>Threshold</b> sets the meter to 15, which from above 15 takes sta
 <ul>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
-<li><b>Mage:</b> Magic Bolt — 25% Atk arcane / 14 BD / 2.0 (Perfect: +10 Mana); the
-Pyromancer's Magic Bolt is reforged into <b>Fireball</b>, the Cryomancer's into
-<b>Frostbolt</b>, and the Arcanist's into <b>Arcane Explosion</b> (see §6.2).</li>
-<li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
-Smite is corrupted into <b>Shadowrend</b> — 25% Atk shadow, Cripples 2 turns; both
+<li><b>Mage:</b> Magic Bolt — 25% Atk arcane / 14 BD / 2.0 (Perfect: +10 Mana); a Mage
+holding Overburn has it reforged into <b>Fireball</b>, Glacial Hold into <b>Frostbolt</b>, and
+Runaway Resonance into <b>Arcane Explosion</b> — each is its engine's enabler and travels with the
+rune (§6.0, §6.2).</li>
+<li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; a Cleric holding
+Wrath of the Old Gods has Smite corrupted into <b>Shadowrend</b> — 25% Atk shadow, Cripples 2 turns; both
 perfects: the Cleric recovers 5% max health).</li>
-<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (Perfect: +10 Mana). In a
-<b>Sharpshooter's</b> hands only, this is the multi-press SEQUENCE of §4.2; the Beastmaster and
-the Survivalist carry the same card and it resolves at a fixed Good for them, as every other
-basic attack does.</li>
+<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (Perfect: +10 Mana). In the
+hands of a Hunter holding <b>Lethal Aim</b> only, this is the multi-press SEQUENCE of §4.2; every
+other Hunter carries the same card and it resolves at a fixed Good, as every other basic attack
+does.</li>
 </ul>
 
 <h2>6. Archetypes &amp; Specializations</h2>
-<p>Archetypes are the design north star for every spec's kit. They appear in bold on the spec
-choice screen with a mouseover explanation.</p>
+<p>Archetypes are the design north star for every spec's kit. They appear in bold on the class-selection
+screen with a mouseover explanation.</p>
 <table border="1" cellpadding="4">
 <tr><th>Role</th><th>Archetype</th><th>Definition</th></tr>
 <tr><td rowspan="6">Damage (100 Atk)</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
@@ -1130,13 +1133,66 @@ choice screen with a mouseover explanation.</p>
 <p><b>Role sets base Attack</b> (Damage 100 / Tank 75 / Support 50) until per-spec stat
 blocks land. Bruiser counts as a DAMAGE archetype — the Swordmaster
 attacks at 100.</p>
-<p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
-per run and are permanent. When a spec's stat block raises max HP above the class base,
+<p>Every spec's passive is an <b>engine rune</b> (§6.0), and its opening abilities are the
+kit a hero opens with when he takes that spec's rune at class selection — his <b>lineage</b>, which
+does not change during the run. When the lineage's stat block raises max HP above the class base,
 <b>current HP rises by the same amount at the awakening</b> — the hero keeps any damage
 already taken, never walks into the next fight pre-wounded by their own promotion. <b>Constitution by spec</b> (role-based Break resistance; class base
 in §5 applies before awakening): Warden 130 (the hardest hero to Break), Swordmaster 120,
 Berserker 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist 95,
 Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
+
+<h3>6.0 Engine runes</h3>
+<p><b>A hero is a CLASS, and what made each specialization what it was is an ENGINE RUNE.</b> An
+engine is a rule that changes how a hero fights for the whole run: a meter is one way to build one,
+not the definition — Heavy Plating is a rule about Block, the stances are a state, and Trapper reads
+the board at the moment of a strike. <b>An engine rune of one class is never offered to another</b>:
+a Warrior can never hold Burn.</p>
+<ul>
+<li><b>Class selection deals three.</b> Before the first battle each hero is dealt three of his
+class's engine runes and takes one. The Warrior, the Mage and the Cleric have four each, so one is
+left out of every deal; the Hunter has three, so his are always the same three.</li>
+<li><b>Two engine slots.</b> A hero may hold two engine runes, in two slots of their own that do
+not compete with the three ordinary rune slots. The second comes from the ordinary rune offers —
+the Peddler, an elite's cache, a bargain, an event — mixed in with everything else, and only ever
+his class's. Each costs 100 gold at the Peddler, on the flat rune price.</li>
+<li><b>Drop and swap, to nothing.</b> The hero's rune pouch on the map equips and unequips engine
+runes. An unequipped rune is kept, and its engine is out of the next fight. <b>A hero with no
+engine is a legal state</b>: his class kit, his lineage's other abilities and his runes still
+fight, and nothing an engine grants is there.</li>
+<li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
+"needs" column of the table in §6a — come with the rune to any hero of the class who holds it, sit
+<b>outside the ability slot count</b>, and leave when it leaves: Overburn brings Fireball and
+Detonation, Pack Bond the three summons, Conviction Divine Shield and Consecrated Ground. A
+travelling basic attack replaces the class basic, or joins it as a second free attack when another
+engine's already has.</li>
+<li><b>The lineage.</b> The rune taken at class selection also decides, for the whole run, the
+hero's name, his stat block, his opening abilities, the draft and boss pools he draws from and the
+spec runes he is offered — all of them the spec's it carried. A hero who takes a class engine has
+no lineage, and opens with his class's basic attack alone.</li>
+</ul>
+<table border="1" cellpadding="4">
+<tr><th>Class</th><th>Engine rune</th><th>Engine</th><th>Travels with it</th></tr>
+<tr><td rowspan="4">Warrior</td><td>Rune of the Berserker</td><td>Blood Frenzy</td><td>—</td></tr>
+<tr><td>Rune of the Warden</td><td>Heavy Plating</td><td>—</td></tr>
+<tr><td>Rune of the Swordmaster</td><td>Seasoned Fighter (the stances)</td><td>Guard Change</td></tr>
+<tr><td>Rune of the Vanguard</td><td>Momentum</td><td>—</td></tr>
+<tr><td rowspan="4">Mage</td><td>Rune of the Pyromancer</td><td>Overburn</td><td>Fireball, Detonation</td></tr>
+<tr><td>Rune of the Cryomancer</td><td>Glacial Hold</td><td>Frostbolt, Ice Lance</td></tr>
+<tr><td>Rune of the Arcanist</td><td>Runaway Resonance</td><td>Arcane Explosion</td></tr>
+<tr><td>Rune of the Invoker</td><td>Channel</td><td>—</td></tr>
+<tr><td rowspan="4">Cleric</td><td>Rune of the Holy</td><td>Mercy</td><td>Heal, Hymn of Hope</td></tr>
+<tr><td>Rune of the Devout</td><td>Conviction</td><td>Divine Shield, Consecrated Ground</td></tr>
+<tr><td>Rune of the Occultist</td><td>Wrath of the Old Gods</td><td>Shadowrend, Hex of Ruin</td></tr>
+<tr><td>Rune of the Hierophant</td><td>Sanctity</td><td>—</td></tr>
+<tr><td rowspan="3">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>Summon Ursus, Summon Canis, Summon Aguila</td></tr>
+<tr><td>Rune of the Sharpshooter</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
+<tr><td>Rune of the Survivalist</td><td>Trapper</td><td>—</td></tr>
+</table>
+<p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
+fight quicker for every exchange — a turn that deals damage and is met by the fight; <b>Channel</b>
+adds to a Mage's non-physical damage for every 42 Mana spent in a fight; <b>Sanctity</b> lengthens
+every status a Cleric applies for every 16 statuses landing on or leaving a unit in a fight.</p>
 
 <h3>6a. Ability progression</h3>
 <p>Every hero <b>opens a run with its core attack plus 3 spec abilities</b> — four for the
@@ -1334,12 +1390,13 @@ decisions.</p>
 <p><b>The slot cap grows on every zone boss, and the protected core.</b> A hero carries
 <b>seven</b> abilities at the start of a run and <b>ten</b> by the end of it — one more slot
 after each of the three zone bosses, announced on the zone-victory screen beside the pouch. Every
-spec keeps a <b>protected core</b>: its passive, its basic attack, and the minimum abilities its
-passive needs to function. Protected abilities <b>can never be benched</b>, so every loadout
+hero keeps a <b>protected core</b>: his basic attack, his lineage's opening abilities, and every
+held engine's enablers (§6.0). Protected abilities <b>can never be benched</b>, so every loadout
 decision is among <i>earned</i> abilities — which keeps the choice clean and makes the cap unable
-to break a passive. The core counts against the cap, so most specs carry <b>3 protected and 4
-draftable</b> at the start and <b>3 and 7</b> at the end; Holy carries 4 and 3, growing to 4 and
-6.</p>
+to break an engine. <b>The core counts against the cap and an engine's enablers do not</b>: they
+sit outside the slot count, so a lineage fills <b>3</b> slots at the start (Berserker, Warden,
+Arcanist, Sharpshooter, Survivalist), <b>2</b> (Swordmaster, Pyromancer, Cryomancer, Holy,
+Occultist, Beastmaster) or <b>1</b> (Devout), and a hero with no lineage fills none.</p>
 <p><b>What a hero HOLDS and what a hero CARRIES are two different things.</b> Every card a hero
 takes is kept for the rest of the run. What the cap limits is how many of them are
 <b>carried</b> into a fight — the rest sit on the bench, and <b>swapping between them costs
@@ -1352,24 +1409,24 @@ point, full or not — a settled kit is a legitimate end state, and being forced
 make a good build worse as the run goes on. <b>A declined ability does not return
 to that run's pool</b>, so an offer can never re-present what was just refused.</p>
 
-<p><b>The twelve protected cores.</b> The "needs" column is the minimum the passive cannot
-function without, and it varies per spec rather than following a rule: Overburn is meaningless
+<p><b>The twelve protected cores.</b> The "needs" column is each engine's ENABLERS — the minimum
+it cannot function without, which travel with its rune and sit outside the slot count — and it varies per spec rather than following a rule: Overburn is meaningless
 without a Burn applier and without Detonation to spend it, so the Pyromancer's core is larger
 than the Berserker's, whose Blood Frenzy reads nothing but his own health bar. An empty cell is
 a real answer — those specs' opening abilities are protected because they shipped in the kit,
 not because the passive needs them.</p>
 <table border="1" cellpadding="4">
-<tr><th>Spec</th><th>Slots</th><th>Its passive needs</th><th>Why</th></tr>
+<tr><th>Lineage</th><th>Slots it fills</th><th>Its engine needs</th><th>Why</th></tr>
 <tr><td><b>Berserker</b></td><td>3</td><td>—</td><td>Blood Frenzy reads his own health bar and his own Rage spent, and no ability.</td></tr>
 <tr><td><b>Warden</b></td><td>3</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
-<tr><td><b>Swordmaster</b></td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — Precision Strike and Feint switch it too, but both are drafted, cost Rage and sit on cooldowns, so a half-inert passive cannot be left depending on them.</td></tr>
-<tr><td><b>Pyromancer</b></td><td>3</td><td>Fireball, Detonation</td><td>Overburn needs a Burn applier to build the field and a spender to empty it.</td></tr>
-<tr><td><b>Cryomancer</b></td><td>3</td><td>Frostbolt, Ice Lance</td><td>Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</td></tr>
+<tr><td><b>Swordmaster</b></td><td>2</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — Precision Strike and Feint switch it too, but both are drafted, cost Rage and sit on cooldowns, so a half-inert passive cannot be left depending on them.</td></tr>
+<tr><td><b>Pyromancer</b></td><td>2</td><td>Fireball, Detonation</td><td>Overburn needs a Burn applier to build the field and a spender to empty it.</td></tr>
+<tr><td><b>Cryomancer</b></td><td>2</td><td>Frostbolt, Ice Lance</td><td>Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</td></tr>
 <tr><td><b>Arcanist</b></td><td>3</td><td>Arcane Explosion</td><td>Runaway Resonance builds on damaging casts; the free core attack guarantees one every turn.</td></tr>
-<tr><td><b>Holy</b></td><td>4</td><td>Heal, Hymn of Hope</td><td>Mercy is earned passively and must be spendable — Hymn pays stacks outright, and Empower needs a heal to empower.</td></tr>
-<tr><td><b>Devout</b></td><td>3</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and the ground's drip is two thirds of all Faith.</td></tr>
-<tr><td><b>Occultist</b></td><td>3</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
-<tr><td><b>Beastmaster</b></td><td>3</td><td>All three summons</td><td>Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all. His five opening abilities cost three slots — the summons share one bar entry.</td></tr>
+<tr><td><b>Holy</b></td><td>2</td><td>Heal, Hymn of Hope</td><td>Mercy is earned passively and must be spendable — Hymn pays stacks outright, and Empower needs a heal to empower.</td></tr>
+<tr><td><b>Devout</b></td><td>1</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and the ground's drip is two thirds of all Faith.</td></tr>
+<tr><td><b>Occultist</b></td><td>2</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
+<tr><td><b>Beastmaster</b></td><td>2</td><td>All three summons</td><td>Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all. The summons travel with Pack Bond and fill no slot; his other two opening abilities fill two.</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn — and his Quick Shot alone runs the multi-press SEQUENCE (§4.2).</td></tr>
 <tr><td><b>Survivalist</b></td><td>3</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
 </table>
@@ -2581,7 +2638,8 @@ charged rather than a second pricing rule. <b>The two sentences this replaces</b
 true when ET wrote them, were superseded at EZ, and were named as stale by FD and left again by
 FE.</b> A false claim in this document does not decay and is not caught; it is only ever found by
 someone looking.
-<br><b>Heroes begin the run with no runes and three empty slots.</b> The first rune comes
+<br><b>Heroes begin the run with no ordinary runes and three empty slots</b> — and the engine
+rune each took at class selection, in the first of two engine slots of its own (§6.0). The first rune comes
 from the Peddler, an elite cache, or a severity-3-or-4 bargain. Every pick-of-three is
 resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
 drawn from a pool that already excludes the ones beside it, so a triple can never offer the
@@ -2961,22 +3019,24 @@ dedicated impact clips.</li>
 <li><b>Hero sheet</b> (opened by clicking a card on the map — the list view is gone, because
 the map's four cards are the hero list): a row of four buttons flips between heroes without
 returning to the map. <b>Awakened heroes are titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
-unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
+unawakened, or when the rune taken at class selection carried no spec — the same rule applies to battle nameplates, the initiative bar, and the combat
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
 pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explains node
 scaling and hovering <b>Resistances</b> lists all seven schools, physical included).
 Stats mirror the battle
 spawn math: Constitution uses the spec's value and Attack/HP include node
-scaling — the class passive + spec passive lines, ability chips (hover shows real
+scaling — the class passive + one line for each engine held
+(or "none held"), ability chips (hover shows real
 numbers AND the "% of Attack" scaling; a chip carrying an <b>ability upgrade</b> wears a gold
-<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots;
+<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the two engine slots;
 equipping happens on the map card, so one place writes it), and the class's talent tree:
 three tiers of nine, READ-ONLY, with every node the hero wears lit and each node's text on its
 tooltip. Talents are bought between runs on the build screen. Owed ability, upgrade and rune
 picks are resolved on the map card, not here.</li>
-<li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
-along on every path the class can take) and each ability's damage with its "% Atk" scaling.
+<li><b>Class selection screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
+along on every engine the class can take), the three engine runes dealt, and each ability the rune
+opens with and its damage with its "% Atk" scaling.
 The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of

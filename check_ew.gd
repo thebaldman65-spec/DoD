@@ -363,7 +363,7 @@ func _s5_no_enemy_reaches_it(scene: Node, src: String) -> void:
 	print("§5 — no enemy can reach the ceiling, and it is structural")
 	var bare := Gate.strip_comments(src)
 	var body := _body(bare, "_party_crit_bonus")
-	ok(body.contains("passive_id == \"pack\""),
+	ok(body.contains("has_engine(\"pack\")"),
 		"§5: the party boon is the pack passive's, so no enemy owns one")
 	# The gate at the read site is what actually keeps it off an enemy.
 	ok(bare.contains("if attacker.is_hero and not attacker.is_companion:"),
@@ -406,12 +406,12 @@ func _s6_focus_untouched(scene: Node) -> void:
 
 # ── HELPERS ────────────────────────────────────────────────────────────────
 
-# BY PASSIVE, because a BattleUnit carries no spec id — `passive_id` is the
-# one field on the unit that names which of the twelve it is, and it is what
-# `check_ev` reaches for as well.
+# BY ENGINE, because a BattleUnit carries no spec id — the engine it holds
+# (`has_engine`, GK) is what names which of the twelve a fixture seated, and
+# it is what `check_ev` reaches for as well.
 func _hero(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and h.passive_id == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

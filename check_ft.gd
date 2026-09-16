@@ -1,10 +1,13 @@
 # BATCH FT — THE THREE CLASS SPINES, AND THE PROOF THAT NOBODY HOLDS ONE.
 #
-#   §0  NOTHING IS ATTACHED, AND THIS IS THE SECTION THAT INVERTS. The three
-#       switches read FALSE on every live spec's spawn, no spec passive names
-#       one, and nothing under `scripts/` or `data/` assigns one. The day a
-#       spine is attached this section goes red and the batch attaching it
-#       rewrites it — the way `check_ez` §1 and `check_fk` §2 both did.
+#   §0  INVERTED AT BATCH GK — THE SWITCHES FOLLOW THE ENGINE RUNES. Written
+#       to go red the day a spine was attached, and GK attached all three as
+#       engine runes (the charter). No spec passive names one still; the ONE
+#       writer of the three switches is `BattleUnit._sync_engine_switches`,
+#       off the held `engines` at `setup`, and nothing else under `scripts/`
+#       or `data/` assigns one; and on a driven party a hero holding a
+#       spine's rune has that switch on while a hero holding none has all
+#       three off.
 #   §1  CHANNEL — the build half reads the COST and cannot see the ability,
 #       asserted against `note_resource_spent`'s own source AND driven; the
 #       payout moves real damage at the one general multiplier.
@@ -37,7 +40,10 @@
 # with the game still whole. Three engines exist, can be driven, and are reached
 # by nothing — so the branch stays playable and `main` stays untouched. An
 # assertion that they are unreachable is what makes that claim checkable instead
-# of a sentence in a report.
+# of a sentence in a report. **BATCH GK ENDED IT, AS IT WAS WRITTEN TO BE
+# ENDED:** the spines are engine runes and a hero reaches one by holding it, so
+# §0 asserts the one door the switches come through instead of the absence of
+# any.
 #
 # **WHAT THIS GATE CANNOT SEE, IN ITS OWN HEADER.** It asserts that the three
 # spines are UNREACHABLE and that each one PAYS when it is switched on by hand.
@@ -108,13 +114,31 @@ func _sources(dir_path: String) -> Dictionary:
 	return out
 
 
+# The body of the function whose line begins `head`, up to the next top-level
+# `func`. Empty when there is none, so an arm reading it fails rather than
+# reading an empty body as a pass.
+func _fn_body(src: String, head: String) -> String:
+	var at := src.find("\n" + head)
+	if at < 0:
+		return ""
+	var out := ""
+	var first := true
+	for raw in src.substr(at + 1).split("\n"):
+		var line := String(raw)
+		if not first and (line.begins_with("func ") or line.begins_with("static func ")):
+			break
+		first = false
+		out += line + "\n"
+	return out
+
+
 # ── §0 ──────────────────────────────────────────────────────────────────────
 func _s0_nothing_is_attached() -> void:
-	print("\n§0 — the three spines exist and nothing reaches them")
+	print("\n§0 — the three spines exist and ONE writer reaches them, off the held engine runes (GK)")
 
 	# (a) NO SPEC PASSIVE IS ONE OF THE THREE. `SPEC_INFO[spec]["passive"]` is
-	# what `passive_id` is stamped from, so this is the table a spine would have
-	# to enter to be attached at all.
+	# the lineage-to-engine table (`Classes.engine_of_spec`), so a spine is in no
+	# lineage: it reaches a hero only as a rune (GK).
 	var named := 0
 	for spec in Classes.SPEC_INFO:
 		var p := String(Classes.SPEC_INFO[spec].get("passive", ""))
@@ -126,20 +150,29 @@ func _s0_nothing_is_attached() -> void:
 	ok(Classes.SPEC_INFO.size() == 12,
 		"§0a: ...and the spec table is the whole twelve, so that sweep is not vacuous")
 
-	# (b) NOTHING UNDER `scripts/` OR `data/` ASSIGNS A SWITCH. The DECLARATION
-	# is excluded by matching an assignment shape — `X = ` or `X=` after a dot or
-	# a line start — while `var X := false` is not one. The gate's own file is
-	# OUTSIDE this population on purpose: it sets all three by hand to drive
-	# them, which is the only way to prove they pay anything.
+	# (b) INVERTED AT GK — THE SWITCHES HAVE ONE WRITER. This arm asserted that
+	# nothing under `scripts/` or `data/` assigned a switch; GK made the spines
+	# engine runes, so a hero holding one has its switch on, and what is asserted
+	# now is that every assignment is inside `BattleUnit._sync_engine_switches`
+	# and nowhere else — no other line in the game can turn a spine on or off
+	# behind the rune. The DECLARATION is excluded by matching an assignment
+	# shape — `X = ` or `X=` after a dot or a line start — while `var X := false`
+	# is not one. The gate's own file is OUTSIDE this population on purpose: it
+	# sets all three by hand to drive them, which is the only way to prove they
+	# pay anything.
 	var src := _sources("res://scripts")
 	src.merge(_sources("res://data"))
 	ok(src.size() >= 10,
 		"§0b: the swept population is %d .gd files under scripts/ and data/" % src.size())
 	var writes := 0
 	var where := []
+	var in_writer := 0
 	for path in src:
+		var fn := ""
 		for raw in String(src[path]).split("\n"):
 			var line := String(raw)
+			if line.begins_with("func ") or line.begins_with("static func "):
+				fn = line
 			for sw in SWITCHES:
 				var at := line.find(sw)
 				if at < 0:
@@ -150,10 +183,31 @@ func _s0_nothing_is_attached() -> void:
 				var rest := line.substr(at + sw.length()).strip_edges()
 				if rest.begins_with("=") and not rest.begins_with("=="):
 					writes += 1
-					where.append("%s: %s" % [path, line.strip_edges()])
-	ok(writes == 0,
-		"§0b: nothing under scripts/ or data/ assigns a spine switch (found %d: %s)"
-			% [writes, ", ".join(where)])
+					if path == "res://scripts/unit.gd" \
+							and fn.begins_with("func _sync_engine_switches("):
+						in_writer += 1
+					else:
+						where.append("%s: %s" % [path, line.strip_edges()])
+	ok(in_writer == SWITCHES.size(),
+		"§0b: `BattleUnit._sync_engine_switches` assigns each of the %d switches (found %d of %d writes)"
+			% [SWITCHES.size(), in_writer, writes])
+	ok(where.is_empty(),
+		"§0b: ...and NOTHING ELSE under scripts/ or data/ assigns a spine switch (found %d: %s)"
+			% [where.size(), ", ".join(where)])
+	# THE WRITER READS THE ONE ANSWER AND RUNS AT SETUP. Each switch is the held
+	# `engines` list's answer for its own spine, and `setup` calls the writer,
+	# so a unit's switches are whatever runes it was spawned holding.
+	var unit_src := String(src.get("res://scripts/unit.gd", ""))
+	var sync_body := _fn_body(unit_src, "func _sync_engine_switches(")
+	var reads := 0
+	for pair in [["momentum_active", "momentum"], ["channel_active", "channel"],
+			["sanctity_active", "sanctity"]]:
+		if sync_body.contains("%s = engines.has(\"%s\")" % pair):
+			reads += 1
+	ok(reads == 3,
+		"§0b: ...each switch is `engines.has(<its spine>)` in the writer (%d of 3)" % reads)
+	ok(_fn_body(unit_src, "func setup(").contains("_sync_engine_switches()"),
+		"§0b: ...and `setup` calls the writer")
 
 	# (c) AND THE ARM THAT PROVES (b) CAN BITE. The same matcher, run over a
 	# constructed line, has to find one — otherwise a zero above means only that
@@ -176,9 +230,12 @@ func _s0_nothing_is_attached() -> void:
 		"§0c: the matcher finds the constructed assignment and NOT the declaration beside it (%d)"
 			% probe_hits)
 
-	# (d) DRIVEN. A real party of four live specs spawns with all three switches
-	# off and all three payouts at their identity value. This is the arm that
-	# inverts: attaching a spine makes it red.
+	# (d) DRIVEN, BOTH HALVES. A party of four seated by lineage holds four
+	# lineage engines and no spine, so all three switches read off and all three
+	# payouts their identity value. GK attached the spines as RUNES, so this
+	# half no longer inverts by itself; the second board below is the half that
+	# does — the same four specs holding spine runes have exactly those switches
+	# on, and a payout the switch guards moves on the holder and not beside him.
 	var scene: Node = await Gate.spawn(self,
 		["berserker", "arcanist", "holy", "sharpshooter"])
 	var heroes: Array = scene.get("heroes")
@@ -199,6 +256,40 @@ func _s0_nothing_is_attached() -> void:
 	ok(identity == 12,
 		"§0d: and all three payouts return their identity value (%d of 12)" % identity)
 	scene.queue_free()
+	await process_frame
+
+	# THE ON HALF. Seat 0 holds his own engine AND Momentum (both slots), seat 1
+	# has dropped his own for Channel, seat 2 holds her own and Sanctity, seat 3
+	# holds his own alone.
+	var spine := {}
+	for pid in ["momentum", "channel", "sanctity"]:
+		var r := Runes.build(Runes.engine_rune_id(pid))
+		r["equipped"] = true
+		spine[pid] = r
+	var board: Node = await Gate.spawn(self,
+		["berserker", "arcanist", "holy", "sharpshooter"], {"party": {
+			0: {"engines": Runes.engine_pouch_for_spec("berserker") + [spine["momentum"]]},
+			1: {"engines": [spine["channel"]]},
+			2: {"engines": Runes.engine_pouch_for_spec("holy") + [spine["sanctity"]]}}})
+	var hs: Array = board.get("heroes")
+	ok(hs.size() == 4, "§0d: four heroes on the second board")
+	var want := [["momentum_active"], ["channel_active"], ["sanctity_active"], []]
+	var right := 0
+	for i in mini(hs.size(), 4):
+		for sw in SWITCHES:
+			if bool(hs[i].get(sw)) == (want[i] as Array).has(sw):
+				right += 1
+	ok(right == 12,
+		"§0d: each spine's switch is on for its holder and off for the other three (%d of 12)" % right)
+	# A SWITCH THAT IS ON MUST GATE A PAYOUT, not merely read true: the same two
+	# Momentum steps quicken the holder and leave the Sharpshooter at 1.0.
+	if hs.size() == 4:
+		hs[0].momentum = 2
+		hs[3].momentum = 2
+	ok(hs.size() == 4 and hs[0].momentum_delay_mult() < 1.0
+			and is_equal_approx(hs[3].momentum_delay_mult(), 1.0),
+		"§0d: two Momentum steps quicken its holder and not the hero without it")
+	board.queue_free()
 	await process_frame
 
 
@@ -498,7 +589,7 @@ func _s2_momentum() -> void:
 	var scene_b: Node = await Gate.spawn(self,
 		["warden", "arcanist", "holy", "sharpshooter"])
 	var wd: BattleUnit = scene_b.get("heroes")[0]
-	ok(wd.passive_id == "heavy_plating", "§2c: the second board's seat 0 is a Warden")
+	ok(wd.has_engine("heavy_plating"), "§2c: the second board's seat 0 is a Warden")
 	wd.momentum = 0
 	wd.momentum_dealt = 40
 	wd.momentum_taken = 40
@@ -518,11 +609,11 @@ func _s2_momentum() -> void:
 				break
 			step_body += line + "\n"
 	var spec_blind := true
-	for needle in ["passive_id", "spec", "stance", "hero_key", "unit_name"]:
+	for needle in ["passive_id", "has_engine", "engines", "spec", "stance", "hero_key", "unit_name"]:
 		if step_body.contains(needle):
 			spec_blind = false
 	ok(step_body.strip_edges() != "" and spec_blind,
-		"§2c: ...and the step function names no spec, passive, stance or hero key")
+		"§2c: ...and the step function names no spec, passive, engine, stance or hero key")
 	scene_b.queue_free()
 	await process_frame
 
@@ -1332,7 +1423,7 @@ func _s6_blow_met() -> void:
 	var scene: Node = await Gate.spawn(self,
 		["warden", "cryomancer", "inquisitor", "beastmaster"], {"deterministic": true})
 	var wd: BattleUnit = scene.get("heroes")[0]
-	ok(wd.passive_id == "heavy_plating", "§6b: seat 0 is a Warden")
+	ok(wd.has_engine("heavy_plating"), "§6b: seat 0 is a Warden")
 	var foe := _fv_foe(scene)
 	var fab := _fv_ab(foe)
 	ok(foe != null and fab != null and not foe.is_ranged,
@@ -1493,7 +1584,7 @@ func _s6_blow_met() -> void:
 		["berserker", "cryomancer", "inquisitor", "beastmaster"])
 	var bm: BattleUnit = null
 	for h in scene3.get("heroes"):
-		if h.passive_id == "pack":
+		if h.has_engine("pack"):
 			bm = h
 	ok(bm != null, "§6f: the board fields a Beastmaster")
 	if bm != null:

@@ -467,16 +467,28 @@ func _s2_data() -> void:
 	# is pinned, not this one string.
 	var of_live := 0
 	var live := 0
+	var engines := 0
+	var engines_of := 0
 	for id in data:
 		if (data[id] as Dictionary).has("retired"):
+			continue
+		# BATCH GK — THE FIFTEEN ENGINE RUNES ARE LIVE AND WEAR `Rune of the …` BY
+		# THE BRIEF: counted beside the pool, never inside it.
+		if String((data[id] as Dictionary).get("engine", "")) != "":
+			engines += 1
+			if String((data[id] as Dictionary).get("name", "")).begins_with("Rune of the "):
+				engines_of += 1
 			continue
 		live += 1
 		if String((data[id] as Dictionary).get("name", "")).to_lower().begins_with("rune of"):
 			of_live += 1
 	ok(of_live == 0,
-		"§2c: %d LIVE entries are named `Rune of the ...` — the bare convention is broken" % of_live)
+		"§2c: %d LIVE ordinary entries are named `Rune of the ...` — the bare convention is broken" % of_live)
 	ok(live == 60,
 		"§2c: the live pool is %d, not 60 — one out and one in was not the trade" % live)
+	ok(engines == 15 and engines_of == engines,
+		"§2c: ...and the fifteen ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
+			% [engines_of, engines])
 	ok(String(sm.get("scope", "")) == "spec:sharpshooter",
 		"§2c: the Shared Mark is scoped `%s`" % sm.get("scope", ""))
 	ok(int(sm.get("price", 0)) == 100, "§2c: the Shared Mark is not the flat 100g")
@@ -528,9 +540,9 @@ func _s2_driven() -> void:
 	# **THE SEATING IS ASSERTED, NOT ASSUMED.** A probe pointed at the wrong
 	# seat reads exactly like the rune paying nothing, and that is how this arm
 	# failed first.
-	ok(ss.passive_id == "lethal_aim",
-		"§2d: seat %d is not the Sharpshooter (passive `%s`)" % [int(SEAT["sharpshooter"]),
-			ss.passive_id])
+	ok(ss.has_engine("lethal_aim"),
+		"§2d: seat %d is not the Sharpshooter (engines `%s`)" % [int(SEAT["sharpshooter"]),
+			str(ss.engines)])
 	ok(ss.second_resource_name == "Focus",
 		"§2d: the holder's meter is `%s`, not Focus" % ss.second_resource_name)
 	ok(ss.rune_shared_mark == 1,
@@ -637,9 +649,9 @@ func _s2_driven() -> void:
 	ok(Classes.SPEC_IDS.get("hunter", []).has("sharpshooter")
 			and Classes.SPEC_IDS.get("hunter", []).has("beastmaster"),
 		"§2g: the two specs are no longer both Hunter — the unreachability this arm records has changed")
-	ok(bm.passive_id == "pack",
-		"§2g: seat %d is not the Beastmaster (passive `%s`)" % [int(SEAT["beastmaster"]),
-			bm.passive_id])
+	ok(bm.has_engine("pack"),
+		"§2g: seat %d is not the Beastmaster (engines `%s`)" % [int(SEAT["beastmaster"]),
+			str(bm.engines)])
 	await scene._do_summon(bm, "canis")
 	var comps: Array = scene.get("companions")
 	ok(comps.size() >= 1, "§2g: no companion was summoned (%d)" % comps.size())

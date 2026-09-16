@@ -140,7 +140,9 @@ func _s0_premises() -> void:
 	var cbody := code.substr(cb, (cb_end - cb) if cb_end > cb else 400)
 	ok(cbody.contains("Classes.class_draft_pool("),
 		"§0: the third tier no longer draws from `CLASS_DRAFT_POOLS` — DY §3's exemption is what makes it legal")
-	ok(cbody.contains("Classes.class_of_spec(spec)"),
+	# BATCH GK — keyed to `member["key"]`, the hero's own class with no lineage
+	# in the way, so a hero who took a spine reaches it too.
+	ok(cbody.contains("String(member.get(\"key\", \"\"))"),
 		"§0: the third tier no longer keys off the hero's own class")
 	ok(cbody.contains("owned_ability_names(member)"),
 		"§0: the third tier no longer excludes what the hero already holds")

@@ -546,7 +546,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 		# rest of the run (equip_spec_talents).
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talents": {}, "runes": []})
+			"talents": {}, "runes": [], "engines": []})
 	# ZONE FIRST, THEN THE POUCH. `add_item` reads `item_slots()`, which reads
 	# `zone_idx` — and this used to be assigned forty lines further down, so a
 	# SECOND run started in the same session would have sized the opening pouch
@@ -1458,6 +1458,117 @@ func rune_slots() -> int:
 		return RICH_SLOTS
 	return 3
 
+
+# ══ BATCH GK — THE TWO ENGINE SLOTS, AND CLASS SELECTION ════════════════════
+#
+# **TWO DEDICATED SLOTS THAT DO NOT COMPETE WITH THE THREE ABOVE** (the engine
+# rune charter, `CLAUDE.md`). A held engine rune lives in `member["engines"]`
+# with its own `equipped` flag, so the ordinary pouch and every count of it is
+# untouched. **The slot state rides the party dict** — saved wholesale, as
+# `bm_equipped` and GH's `companions_standing` do — so it moves NO save version;
+# `load_run` hands a member written before the engines moved his spec's rune.
+const ENGINE_SLOTS := 2
+
+
+func held_engines(member: Dictionary) -> Array:
+	return Runes.held_engines(member)
+
+
+func engines_worn(member: Dictionary) -> int:
+	var n := 0
+	for r in member.get("engines", []):
+		if bool((r as Dictionary).get("equipped", false)):
+			n += 1
+	return n
+
+
+# THE DRAFT OF THREE AT CLASS SELECTION. Dealt ONCE and frozen on the member —
+# FD §1's rule that what a screen shows again is frozen on the run and never
+# rolled by the screen — so redrawing the screen for the next hero does not
+# re-deal this one. **A class holding fewer than three engines is dealt what it
+# has** (BO's fill-short rule): the Hunter's three are always all three.
+func deal_engines(member: Dictionary) -> Array:
+	var dealt: Array = member.get("engine_offer", [])
+	if not dealt.is_empty():
+		return dealt
+	var pool: Array = []
+	for pid in Classes.class_engines(String(member["key"])):
+		var id := Runes.engine_rune_id(String(pid))
+		if id != "" and not Runes.is_retired(id):
+			pool.append(id)
+	pool.shuffle()
+	dealt = pool.slice(0, 3)
+	member["engine_offer"] = dealt
+	return dealt
+
+
+# THE ONE DOOR A HERO IS AWAKENED THROUGH — the class-selection screen and the
+# run sim both come here. It slots the one engine taken, and sets the LINEAGE
+# the unmerged layers still read (the opening kit, the stat block, the draft and
+# boss pools, the spec-scoped runes) to the spec that engine carried: "" for a
+# spine, whose hero opens with his class kit.
+func awaken(idx: int, rune_id: String) -> void:
+	if idx < 0 or idx >= party.size() or not Runes.is_engine_rune(rune_id):
+		return
+	var member: Dictionary = party[idx]
+	var rune := Runes.build(rune_id)
+	rune["equipped"] = true
+	member["engines"] = [rune]
+	member["spec"] = Classes.engine_spec(String(rune["engine"]))
+	member["tree"] = Talents.tree()
+	member["awakened"] = true
+	member.erase("engine_offer")
+	sync_spec_hp(idx)
+	equip_spec_talents(idx)
+
+
+# THE ONE PLACE A TAKEN RUNE IS PUT DOWN — the Peddler, the elite cache, the
+# bargain, the event verb and the sim all hand their rune here. An ordinary rune
+# goes in the pouch with the `equipped` its caller decided; an ENGINE rune goes
+# to the engine slots, slotted while one is free and held unslotted otherwise.
+func hold_rune(member: Dictionary, rune: Dictionary) -> void:
+	if String(rune.get("engine", "")) == "":
+		member["runes"] = member.get("runes", []) + [rune]
+		return
+	rune["equipped"] = engines_worn(member) < ENGINE_SLOTS
+	member["engines"] = member.get("engines", []) + [rune]
+
+
+# DROP AND SWAP, INCLUDING TO NOTHING. Unslotting an engine takes the engine and
+# its enablers out of the next fight and keeps the rune; slotting one is refused
+# only when both slots are full. **Zero engines is a legal state.**
+func toggle_engine(member: Dictionary, i: int) -> bool:
+	var held: Array = member.get("engines", [])
+	if i < 0 or i >= held.size():
+		return false
+	var r: Dictionary = held[i]
+	if bool(r.get("equipped", false)):
+		r["equipped"] = false
+		return true
+	if engines_worn(member) >= ENGINE_SLOTS:
+		return false
+	r["equipped"] = true
+	return true
+
+
+# The opening kit this hero holds, by display name — `Classes.opening_kit`'s.
+func opening_kit_names(member: Dictionary) -> Array:
+	var out: Array = []
+	for ab in Classes.opening_kit(String(member["key"]),
+			String(member.get("spec", "")), held_engines(member)):
+		out.append(ab.display_name)
+	return out
+
+
+# What `Profile`'s chronicle books a hero under: his lineage, or his class when
+# he has none (a spine taken at class selection).
+func chronicle_keys() -> Array:
+	var out: Array = []
+	for m in party:
+		var sp := String(m.get("spec", ""))
+		out.append(sp if sp != "" else String(m.get("key", "")))
+	return out
+
 # Runes mode (sim matrix flag, Batch X): full = the authored pool
 # (default), stats = the generated stat family only (approximately the
 # pre-Batch-X behaviour), off = no runes generated, offered, or dropped.
@@ -1627,7 +1738,8 @@ func rune_choice(member: Dictionary) -> Array:
 		return []
 	var triple: Array = queue[0]
 	var owned: Array = []
-	for r in member.get("runes", []):
+	# BATCH GK — an engine rune in the engine slots is owned too.
+	for r in member.get("runes", []) + member.get("engines", []):
 		owned.append(String(r["name"]))
 	var kept: Array = []
 	var taken: Array = []
@@ -1986,10 +2098,9 @@ func equipped_ability_names(member: Dictionary) -> Array:
 # and requires it to be `protected_names` name for name, because a census taken
 # over a list the fight does not use is a number about nothing.
 func loadout_ability_names(member: Dictionary) -> Array:
-	var spec := String(member.get("spec", ""))
-	if spec == "":
-		return []
-	var out: Array = Classes.protected_names(spec).duplicate()
+	# BATCH GK — the opening kit is the ENGINES' as well as the lineage's, so the
+	# list comes off the one builder rather than `protected_names(spec)`.
+	var out: Array = opening_kit_names(member)
 	out.append_array(equipped_ability_names(member))
 	return out
 
@@ -2003,10 +2114,11 @@ func benched_ability_names(member: Dictionary) -> Array:
 
 
 func ability_slots_used(member: Dictionary) -> int:
-	var spec := String(member.get("spec", ""))
-	if spec == "":
-		return 0
-	return Classes.core_slots(spec) + equipped_ability_names(member).size()
+	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter), so the
+	# lineage's opening abilities count LESS their enablers, and a hero with no
+	# lineage counts his carried cards alone.
+	return Classes.lineage_slots(String(member.get("spec", ""))) \
+		+ equipped_ability_names(member).size()
 
 
 func ability_slots_full(member: Dictionary) -> bool:
@@ -2088,15 +2200,19 @@ func _refuse_draft(member: Dictionary, name: String) -> void:
 # something already owned (from ANY source — kit, talent grant, boss pick or an
 # earlier draft) or already refused this run.
 func draft_pool_left(member: Dictionary) -> Dictionary:
+	# BATCH GK — THE CLASS SIDE KEYS TO THE CLASS, NOT THROUGH THE SPEC: a hero
+	# who took a spine at class selection has no lineage and still drafts his
+	# class's cards. The spec side is his lineage's pool until the pool merge.
+	# A member NOT YET AWAKENED — before class selection — drafts nothing.
 	var spec := String(member.get("spec", ""))
-	if spec == "":
+	if spec == "" and not bool(member.get("awakened", false)):
 		return {"spec": [], "class": []}
 	var blocked: Array = owned_ability_names(member)
 	blocked.append_array(draft_refused(member))
 	var spec_left: Array = Classes.spec_draft_pool(spec).filter(
 		func(n): return not blocked.has(n))
 	var class_left: Array = Classes.class_draft_pool(
-		Classes.class_of_spec(spec)).filter(func(n): return not blocked.has(n))
+		String(member.get("key", ""))).filter(func(n): return not blocked.has(n))
 	return {"spec": spec_left, "class": class_left}
 
 
@@ -2429,6 +2545,15 @@ func load_run() -> bool:
 		tally["kills"] = []
 	if not (tally.get("final") is Dictionary):
 		tally["final"] = {"dealt": {}, "taken": {}, "taken_total": {}, "kills": []}
+	# BATCH GK — A MEMBER WRITTEN BEFORE THE ENGINES MOVED holds his spec and no
+	# engine rune. TOLERANT, as v11–v13 were, and no version moves: the honest
+	# default is the engine that spec carried, slotted — what he was fighting with
+	# when the file was written.
+	for member in party:
+		if not (member as Dictionary).has("engines"):
+			member["engines"] = Runes.engine_pouch_for_spec(String(member.get("spec", "")))
+			if String(member.get("spec", "")) != "":
+				member["awakened"] = true
 	_migrate_trees()
 	# A pre-AC (v4) save loaded with the honesty flag false — it predated
 	# every tool that could have set it — until the refusal above.
@@ -2470,9 +2595,11 @@ func load_run() -> bool:
 func _migrate_trees() -> void:
 	for member in party:
 		var spec: String = member.get("spec", "")
-		if spec == "":
+		# BATCH GK — a hero with no lineage (a spine taken at class selection)
+		# still wears the class tree; only an unawakened member has none.
+		if spec == "" and not bool(member.get("awakened", false)):
 			continue
-		var live_tree := Talents.generate_tree(spec, member["key"])
+		var live_tree := Talents.tree()
 		member["tree"] = live_tree
 		# BATCH BM: there is no in-run purse to refund into any more. An id
 		# the live tree no longer holds is simply DROPPED — the meta ledger
@@ -2533,7 +2660,14 @@ func award_gold(node_type: String) -> int:
 func bank_zone_boss_points() -> void:
 	if sim_run:
 		return
-	Profile.award_zone_boss_points(party.map(func(m): return m.get("spec", "")))
+	# BATCH GK — BY CLASS: a hero with no lineage has no spec to map from. A
+	# member not yet AWAKENED banks nothing, for his class either (FX's rule):
+	# `spec == ""` no longer means that, since a hero who took a spine has none.
+	var keys: Array = []
+	for m in party:
+		if String(m.get("spec", "")) != "" or bool(m.get("awakened", false)):
+			keys.append(String(m.get("key", "")))
+	Profile.award_zone_boss_points(keys)
 
 
 # THE HANDOFF FROM THE META LAYER INTO THE RUN, called the moment a spec is
@@ -2548,12 +2682,18 @@ func bank_zone_boss_points() -> void:
 func equip_spec_talents(idx: int) -> void:
 	if idx < 0 or idx >= party.size():
 		return
-	var spec := String(party[idx].get("spec", ""))
-	if spec == "":
-		party[idx]["talents"] = {}
+	var member: Dictionary = party[idx]
+	var spec := String(member.get("spec", ""))
+	var key := String(member.get("key", ""))
+	# BATCH GK — THE TREE IS THE CLASS'S (FX), so a hero wears it from the moment
+	# he is awakened, lineage or none: a hero who took a spine at class selection
+	# has no spec and still wears every cell his class owns.
+	if spec == "" and not bool(member.get("awakened", false)):
+		member["talents"] = {}
 		return
-	party[idx]["talents"] = Profile.worn_talents(Classes.class_of_spec(spec)) \
-		if not sim_run else sim_equipped_talents(spec)
+	var probe := spec if spec != "" else String((Classes.SPEC_IDS.get(key, [""]) as Array)[0])
+	member["talents"] = Profile.worn_talents(key) \
+		if not sim_run else sim_equipped_talents(probe)
 
 
 # The sim's own loadout source. A sim must never read Profile (it would make
@@ -3659,11 +3799,12 @@ func roll_spec_fallback_offer(member: Dictionary) -> Array:
 # declined enough offers could drain the floor back below three — which is the
 # exact defect this chain exists to close.
 func roll_class_fallback_offer(member: Dictionary) -> Array:
-	var spec := String(member.get("spec", ""))
-	if spec == "":
+	# BATCH GK — keyed to the CLASS: a hero with no lineage reaches this tier
+	# once he is awakened; a member not yet through class selection does not.
+	if String(member.get("spec", "")) == "" and not bool(member.get("awakened", false)):
 		return []
 	var owned: Array = owned_ability_names(member)
 	var left: Array = Classes.class_draft_pool(
-		Classes.class_of_spec(spec)).filter(func(n): return not owned.has(n))
+		String(member.get("key", ""))).filter(func(n): return not owned.has(n))
 	left.shuffle()
 	return left.slice(0, 3)

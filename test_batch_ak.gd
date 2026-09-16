@@ -471,7 +471,10 @@ func _node_values() -> void:
 # the two checks below that asked about a deleted node's PAYLOAD SHAPE are asked
 # of the one tree, and each says so where it stands.
 func _member(learned: Dictionary, earned: Array = []) -> Dictionary:
+	# BATCH GK — a Swordmaster holding his engine rune, as class selection hands
+	# it: Guard Change is Stances' enabler and travels with it (the charter).
 	return {"key": "warrior", "spec": "swordmaster", "talents": learned,
+		"engines": Runes.engine_pouch_for_spec("swordmaster"),
 		"tree": _retired_tree(),
 		"bm_abilities": earned}
 
@@ -527,6 +530,12 @@ func _conditional_halves() -> void:
 		"...and owns it once it is earned")
 	ok(Talents.owns_ability(_member({}), "Guard Change"),
 		"every Swordmaster owns Guard Change from the start (the §1 guarantee)")
+	# BATCH GK — THE GUARANTEE IS THE ENGINE'S NOW: the enabler leaves with the
+	# engine rune (the charter), so a Swordmaster who dropped it lacks the card.
+	var dropped := _member({})
+	dropped["engines"] = []
+	ok(not Talents.owns_ability(dropped, "Guard Change"),
+		"...and a Swordmaster who has dropped his engine rune does not — the enabler left with it (GK)")
 
 	# --- Off Balance: the cross-row condition on has_node.
 	var solo := _applied({"sm_guarded": 1})
@@ -688,7 +697,7 @@ func _spawn(specs: Array, lineup: Array, prep := Callable()) -> Node:
 
 func _sm(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "seasoned":
+		if not h.is_companion and h.has_engine("seasoned"):
 			return h
 	return null
 

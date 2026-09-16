@@ -246,8 +246,11 @@ func _s3_the_record() -> void:
 	var used := rs.find("func ability_slots_used")
 	ok(used >= 0, "§3: `ability_slots_used` is gone — the cap has moved")
 	var ubody := rs.substr(used, 220)
-	ok(ubody.contains("Classes.core_slots(spec)"),
-		"§3: the CAP no longer reads `core_slots` — EG's finding has inverted")
+	# **BATCH GK — THE LADDER READS `lineage_slots` NOW**: `core_slots` less the
+	# enablers the lineage's engine needs, which sit outside the count (the
+	# charter). Still a SLOT count, never the name count below.
+	ok(ubody.contains("Classes.lineage_slots("),
+		"§3: the CAP no longer reads `lineage_slots` — the lineage's core less its engine's enablers (GK)")
 	ok(not ubody.contains("protected_names"),
 		"§3: the CAP reads `protected_names` now — it is a NAME count and the cap is a SLOT count")
 	var capf := rs.find("func ability_slot_cap")
@@ -278,8 +281,11 @@ func _s3_the_record() -> void:
 			if src.contains("protected_names("):
 				readers.append(f)
 	readers.sort()
-	ok(readers == ["classes.gd", "map_screen.gd", "run_state.gd"],
-		"§3: `protected_names` is read by %s, not by its definition, the loadout panel and the loadout list alone" % [readers])
+	# BATCH GK MOVED THE LOADOUT PANEL AND THE LOADOUT LIST to `Run.opening_kit_names`
+	# — the kit a hero's held engines leave him — so the definition's file is the
+	# one reader left.
+	ok(readers == ["classes.gd"],
+		"§3: `protected_names` is read by %s, not by its definition's file alone" % [readers])
 
 	# (2) ALL SEVEN ENABLERS ARE PROTECTED — AND THE TWO CORRECTED REASONS ARE
 	# ASSERTED AS FACTS, NOT LEFT IN PROSE. A right conclusion resting on a

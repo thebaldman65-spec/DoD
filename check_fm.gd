@@ -405,6 +405,8 @@ func _s2c_the_bargain() -> void:
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	for i in _run.party.size():
 		_run.party[i]["spec"] = SPECS[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
 	# ARM 1 — A FULL POOL.
 	_run.accept_offer({"modifier": "", "reward": {"kind": "rune"}})
 	var paid: Dictionary = _run.claim_reward()
@@ -437,6 +439,8 @@ func _s2d_the_event_verb() -> void:
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	for i in _run.party.size():
 		_run.party[i]["spec"] = SPECS[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
 	var got := String(Events.apply(_run, {"effect": "rune_grant", "amount": 1}))
 	print("    full pool, the event says: %s" % got)
 	ok(got.begins_with("RUNE: ") and not got.contains("nothing answers"),
@@ -604,6 +608,8 @@ func _fresh_map() -> Node:
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
 	for i in _run.party.size():
 		_run.party[i]["spec"] = SPECS[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
 		_run.party[i]["tree"] = Talents.generate_tree(SPECS[i], _run.party[i]["key"])
 		_run.sync_spec_hp(i)
 	_run.specs_chosen = true

@@ -417,14 +417,17 @@ func _cap_and_slots() -> void:
 	ok(run.ABILITY_SLOTS_BY_BOSS == [7, 8, 9, 10],
 		"§2: ...and grow one a zone boss to ten (EG §1)")
 	var m := {"key": "mage", "spec": "pyromancer", "bm_abilities": []}
-	ok(int(run.ability_slots_used(m)) == 3,
-		"§2: a fresh Pyromancer uses 3 of 7 (the protected core counts against it)")
+	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter). Overburn's
+	# enablers are Fireball and Detonation, so the Pyromancer's lineage opens
+	# using TWO slots — `Classes.lineage_slots` — and five earned cards fill him.
+	ok(int(run.ability_slots_used(m)) == 2 and Classes.lineage_slots("pyromancer") == 2,
+		"§2: a fresh Pyromancer uses 2 of 7 — his lineage's core less the enablers his engine needs")
 	ok(not run.ability_slots_full(m), "§2: ...and is not full")
-	m["bm_abilities"] = ["Immolate", "Firestorm", "Cinderfall"]
-	ok(int(run.ability_slots_used(m)) == 6, "§2: three earned takes him to 6")
-	ok(not run.ability_slots_full(m), "§2: ...still one slot open")
 	m["bm_abilities"] = ["Immolate", "Firestorm", "Cinderfall", "Ember Debt"]
-	ok(int(run.ability_slots_used(m)) == CAP, "§2: a fourth fills the kit")
+	ok(int(run.ability_slots_used(m)) == 6, "§2: four earned take him to 6")
+	ok(not run.ability_slots_full(m), "§2: ...still one slot open")
+	m["bm_abilities"] = ["Immolate", "Firestorm", "Cinderfall", "Ember Debt", "Slow Burn"]
+	ok(int(run.ability_slots_used(m)) == CAP, "§2: a fifth fills the kit")
 	ok(run.ability_slots_full(m), "§2: ...and the cap binds")
 	# A PROTECTED ABILITY CAN NEVER BE DROPPED, and the mechanism is that it is
 	# not in the drop list at all — there is no branch to get wrong.
@@ -780,7 +783,7 @@ func _spawn(specs: Array, granted: Dictionary, lineup: Array,
 
 func _hero(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

@@ -108,9 +108,10 @@ func _select_hero(idx: int) -> void:
 # them from the field would tidy the ragged block here and render the
 # Arcanist's block as one ~2000px line in the middle of a fight, which is the
 # exact failure §4.7 records for ability descriptions.
-func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
-	var desc: String = Classes.SPEC_INFO[spec]["passive_desc"]
-	match Classes.SPEC_INFO[spec]["passive"]:
+func _passive_desc_live(cfg: Dictionary, pid: String) -> String:
+	# BATCH GK — keyed on the ENGINE, which a hero holds, not the spec he is.
+	var desc: String = Classes.engine_desc(pid)
+	match pid:
 		"seasoned":
 			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps." % [
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))
@@ -142,9 +143,14 @@ func _draw_detail() -> void:
 	var cfg := Classes.hero_config(key)
 	var base_hp: int = cfg["max_hp"]  # node scaling works off the base
 	var spec: String = member.get("spec", "")
+	var awake: bool = spec != "" or bool(member.get("awakened", false))
+	# BATCH GK — THE OPENING KIT IS THE ENGINES' AS WELL AS THE LINEAGE'S, off the
+	# one builder the battle spawn reads, so the sheet and the fight cannot
+	# disagree about what an enabler that travelled or left has done to the kit.
+	var engines: Array = Runes.held_engines(member)
+	cfg["engines"] = engines
+	cfg["abilities"] = Classes.opening_kit(key, spec, engines)
 	if spec != "":
-		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
-		Classes.apply_kit_overrides(cfg, spec)
 		Classes.apply_passive(cfg, spec)
 		# Specced heroes use their spec's stat block — the SAME helper the
 		# battle spawn calls, so sheet and nameplate can never drift.
@@ -152,6 +158,7 @@ func _draw_detail() -> void:
 		# Spec blocks may override max_hp (Berserker 175): re-read the
 		# scaling baseline after the block, mirroring the battle spawn.
 		base_hp = cfg["max_hp"]
+	if awake:
 		# Earned abilities (Batch AH) — BEFORE the tree, exactly as the
 		# battle spawn orders them, so a talent that modifies a pool-bought
 		# ability shows the same numbers here that it will in the fight.
@@ -204,9 +211,11 @@ func _draw_detail() -> void:
 		cfg["attack"] = int(round(base_attack * (1.0 + 0.02 * Run.combat_wins)))
 		cfg["max_hp"] = int(cfg["max_hp"]) \
 			+ int(round(base_hp * 0.02 * Run.combat_wins))
-	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
-	# Awakened heroes are titled by spec; the class name only shows pre-spec.
-	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 6, 30)
+	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" \
+		else (String(cfg["unit_name"]) if awake else "Unawakened")
+	# Awakened heroes are titled by spec; the class name only shows pre-spec —
+	# and, since GK, on a hero whose engine carried no spec.
+	_title(spec_label if awake else "%s — Unawakened" % cfg["unit_name"], 6, 30)
 
 	# Left column: class blurb, stats, abilities (compact chips, hover detail).
 	var blurb := Label.new()
@@ -276,16 +285,26 @@ func _draw_detail() -> void:
 	var class_p: Dictionary = Classes.CLASS_PASSIVES[key]
 	var passive_lines := PackedStringArray(
 		["Class: %s — %s" % [class_p["name"], class_p["desc"]]])
-	if spec != "":
-		passive_lines.append("Passive: %s" % _passive_desc_live(cfg, spec))
+	# BATCH GK — ONE LINE PER HELD ENGINE, and "none" said out loud: a hero with
+	# no engine is a legal state, and the sheet names it rather than going quiet.
+	for pid in engines:
+		passive_lines.append("Engine: %s" % _passive_desc_live(cfg, String(pid)))
+	if engines.is_empty() and awake:
+		passive_lines.append("Engine: none held.")
 	var passive_label := Label.new()
 	passive_label.text = "\n".join(passive_lines)
 	passive_label.add_theme_font_size_override("font_size", 13)
 	passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
-	passive_label.position = Vector2(60, 132 + stat_rows.size() * 22)
-	passive_label.size = Vector2(400, 80)
+	passive_label.custom_minimum_size = Vector2(390, 0)
 	passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(passive_label)
+	# Two engines' text can outgrow the footprint one passive had, so the block
+	# scrolls rather than running into the ability header (EG's scroller rule).
+	var passive_scroll := ScrollContainer.new()
+	passive_scroll.position = Vector2(60, 132 + stat_rows.size() * 22)
+	passive_scroll.size = Vector2(400, 80)
+	passive_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(passive_scroll)
+	passive_scroll.add_child(passive_label)
 
 	var ability_header := Label.new()
 	# BATCH EG §1/§2 — THE HEADER CARRIES THE LADDER AND THE BENCH. The cap is
@@ -293,8 +312,8 @@ func _draw_detail() -> void:
 	# without saying how many slots it fills would be the one screen the player
 	# compares builds on and the one that cannot answer "have I room for
 	# another". The bench clause only appears when something is benched.
-	var bench: Array = Run.benched_ability_names(member) if spec != "" else []
-	ability_header.text = "ABILITIES  (hover for details)" if spec == "" \
+	var bench: Array = Run.benched_ability_names(member) if awake else []
+	ability_header.text = "ABILITIES  (hover for details)" if not awake \
 		else "ABILITIES  %d of %d slots%s  (hover for details)" % [
 			Run.ability_slots_used(member), Run.ability_slot_cap(),
 			"  —  %d benched, swap them on the map" % bench.size() \
@@ -435,8 +454,10 @@ func _draw_detail() -> void:
 	for rune in runes:
 		if rune.get("equipped", false):
 			equipped_count += 1
-	rune_header.text = "RUNES  (%d/%d equipped — swap them on the map)" % [
-		equipped_count, slot_cap]
+	# BATCH GK — the engine slots are counted beside the three ordinary ones.
+	var held_engines: Array = member.get("engines", [])
+	rune_header.text = "RUNES  (%d/%d equipped, %d/%d engines — swap them on the map)" % [
+		equipped_count, slot_cap, engines.size(), Run.ENGINE_SLOTS]
 	rune_header.add_theme_font_size_override("font_size", 15)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(60, 520)
@@ -458,14 +479,15 @@ func _draw_detail() -> void:
 	var rune_rows := VBoxContainer.new()
 	rune_rows.add_theme_constant_override("separation", 6)
 	rune_scroll.add_child(rune_rows)
-	for rune_entry in runes:
+	for rune_entry in held_engines + runes:
 		var rune: Dictionary = rune_entry
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		rune_rows.add_child(row)
 		var state := Label.new()
 		var is_on: bool = rune.get("equipped", false)
-		state.text = "WORN" if is_on else "pouch"
+		state.text = ("ENGINE" if rune.has("engine") else "WORN") if is_on \
+			else "pouch"
 		state.custom_minimum_size = Vector2(56, 20)
 		state.add_theme_font_size_override("font_size", 11)
 		state.add_theme_color_override("font_color",
@@ -490,7 +512,7 @@ func _draw_detail() -> void:
 	tree_header.size = Vector2(700, 22)
 	add_child(tree_header)
 
-	if spec == "" or not Talents.has_tree(spec):
+	if not awake:
 		tree_header.text = "TALENTS — the %s awakens after your first victory." % key.capitalize()
 		return
 	# BATCH BM: the in-run tree is READ-ONLY and says so. Talents are bought

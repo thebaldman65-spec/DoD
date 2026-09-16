@@ -764,7 +764,7 @@
   "term": "Runes",
   "category": "gear",
   "short": "This run's gear: three slots per hero, from the first step.",
-  "long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. A rune's SCOPE is the thing to read - universal, one class, or one spec - and it is what the shop row names beside the price. There are no rarity tiers and no quality ladder: a rune found in the first zone is drawn from the same pool as one found in the last, and what a rune does is in its own text rather than in a grade. Some runes charge for their upside, and the cost is always written in the text. Runes vanish with the run. Every authored rune costs 100 gold, flat - price does not signal power, so you pay for FIT rather than for magnitude.",
+  "long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. ENGINE RUNES are the other kind: each carries an engine - the rule that changes how a hero fights for the whole run - and belongs to one class. At class selection each hero is dealt three of the class's engine runes and takes one; a second can come from any rune offer, into two engine slots that sit apart from the three. Unequipping an engine rune takes its engine, and the abilities that engine needs, out of the next fight; the rune is kept. A rune's SCOPE is the thing to read - universal, one class, or one spec - and it is what the shop row names beside the price. There are no rarity tiers and no quality ladder: a rune found in the first zone is drawn from the same pool as one found in the last, and what a rune does is in its own text rather than in a grade. Some runes charge for their upside, and the cost is always written in the text. Runes vanish with the run. Every authored rune costs 100 gold, flat - price does not signal power, so you pay for FIT rather than for magnitude.",
   "see_also": [
    "scarred_runes",
    "relics_vs_runes"
@@ -1037,7 +1037,7 @@
   "term": "Ability Slots",
   "category": "progression",
   "short": "A kit holds seven abilities, and every zone boss adds a slot. At the cap, taking one means benching one.",
-  "long": "A hero's kit opens with room for SEVEN abilities and every zone boss adds one more, to ten - and the protected core counts against it, so most specs open with 3 filled and 4 to fill. AT THE CAP AN OFFER BECOMES TAKE-ONE-AND-BENCH-ONE: you pick the incoming ability and then name which of your EARNED abilities it benches. Only earned abilities can be benched; the protected core never can. A benched ability stays yours and can be carried again between fights; only an offer you DECLINE is gone for the run. The cap binds every source alike - though a zone boss raises it before it awards its own pick, so that pick never needs a bench.",
+  "long": "A hero's kit opens with room for SEVEN abilities and every zone boss adds one more, to ten - and the protected core counts against it, except an engine's enablers, which take no slot: most heroes open with 2 or 3 filled. AT THE CAP AN OFFER BECOMES TAKE-ONE-AND-BENCH-ONE: you pick the incoming ability and then name which of your EARNED abilities it benches. Only earned abilities can be benched; the protected core never can. A benched ability stays yours and can be carried again between fights; only an offer you DECLINE is gone for the run. The cap binds every source alike - though a zone boss raises it before it awards its own pick, so that pick never needs a bench.",
   "see_also": [
    "ability_draft",
    "protected_core",
@@ -1049,8 +1049,8 @@
   "id": "protected_core",
   "term": "Protected Abilities",
   "category": "progression",
-  "short": "The passive, the basic attack, and whatever the passive needs to work.",
-  "long": "Every spec keeps a PROTECTED CORE: its passive, its basic attack, and the minimum abilities its passive cannot function without. Protected abilities CAN NEVER BE BENCHED, which is what stops the slot cap from breaking a spec - a Pyromancer can never trade away the Detonation that Overburn exists to spend, and a Beastmaster can never trade away the summons Pack Bond reads. The minimum varies by spec rather than following a rule: Overburn needs a Burn applier AND a spender, while the Berserker's Blood Frenzy reads his health bar and the Rage he spends, and needs no particular ability at all.",
+  "short": "The basic attack, the opening kit, and whatever each held engine needs to work.",
+  "long": "Every hero keeps a PROTECTED CORE: the basic attack, the opening abilities of the engine rune taken at class selection, and each held engine's ENABLERS - the minimum abilities that engine cannot function without. Protected abilities CAN NEVER BE BENCHED, which is what stops the slot cap from breaking an engine. An enabler travels with its engine rune and takes no ability slot: a Mage holding Overburn holds Fireball and Detonation, and unequipping the rune takes both out of the next fight. The minimum varies by engine rather than following a rule: Overburn needs a Burn applier AND a spender, while Blood Frenzy reads the health bar and the Rage spent, and needs no particular ability at all.",
   "see_also": [
    "ability_slots",
    "ability_draft"

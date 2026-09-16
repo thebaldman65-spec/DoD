@@ -576,16 +576,28 @@ func _s3_the_rename() -> void:
 	# is really the retired pool's rather than a coincidence of five names.
 	var live_long: Array = []
 	var retired_long := 0
+	var engine_long := 0
 	for id2 in Runes.ids():
 		var nm2 := String(Runes.display_name(Runes.config(String(id2))))
 		if not nm2.begins_with("Rune of "):
 			continue
 		if Runes.is_retired(String(id2)):
 			retired_long += 1
+		elif Runes.is_engine_rune(String(id2)):
+			engine_long += 1
 		else:
 			live_long.append(nm2)
 	ok(live_long.is_empty(),
-		"§3: a LIVE rune still wears the retired pool's `Rune of…` shape — %s" % [live_long])
+		"§3: a LIVE ordinary rune still wears the retired pool's `Rune of…` shape — %s" % [live_long])
+	# BATCH GK — THE ENGINE RUNES WEAR IT BY THE BRIEF: "Rune of the Berserker"
+	# and the rest are the designer's names, and none is any other entry's name
+	# (GK's sweep). Asserted as the whole set, and not none.
+	var engines_n := 0
+	for id3 in Runes.ids():
+		if Runes.is_engine_rune(String(id3)):
+			engines_n += 1
+	ok(engines_n > 0 and engine_long == engines_n,
+		"§3: ...and every engine rune wears `Rune of the …` — the charter's names (%d of %d)" % [engine_long, engines_n])
 	ok(retired_long >= 60,
 		"§3: only %d retired runes wear that shape — the premise is not what it was"
 			% retired_long)

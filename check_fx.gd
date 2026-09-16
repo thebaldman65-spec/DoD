@@ -338,7 +338,8 @@ func _s2_gates_and_ledger() -> void:
 	# ── THE HANDOFF READS THE CLASS. Run is an autoload and does not resolve
 	# under --script, so the one line is read off the source.
 	var rs := FileAccess.get_file_as_string("res://scripts/run_state.gd")
-	ok(rs.contains("Profile.worn_talents(Classes.class_of_spec(spec))"),
+	# BATCH GK — keyed to `member["key"]`: the class, with no spec in the way.
+	ok(rs.contains("Profile.worn_talents(key)"),
 		"§2: the run handoff does not read the CLASS's worn cells")
 	print("  class purse; rung 0 opens nothing; tier 2 at rung 2 + %d below; tier 3 at rung 3; refund cannot strand; respec whole" % need)
 
@@ -754,6 +755,7 @@ func _drive(scene: Node, fields: Dictionary) -> void:
 	var gi := up.find("u.field_medic > 0")
 	var guard := up.substr(up.rfind("\n", gi), up.find("\n", gi) - up.rfind("\n", gi)) if gi >= 0 else ""
 	ok(pool.has(mage) and washed != "" and gi >= 0 and not guard.contains("passive_id")
+			and not guard.contains("has_engine")
 			and not guard.contains("hero_key") and not guard.contains("spec"),
 		"§4b: tn_cleanse — pool held the afflicted hero: %s; washed '%s'; guard `%s`" % [
 			str(pool.has(mage)), washed, guard.strip_edges()])

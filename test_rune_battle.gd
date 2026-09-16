@@ -152,6 +152,8 @@ func _hunter_pass(spec: String) -> void:
 	var chosen := ["berserker", "cryomancer", "holy", spec]
 	for i in run.party.size():
 		run.party[i]["spec"] = chosen[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(chosen[i]))
 		run.party[i]["tree"] = Talents.generate_tree(chosen[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.party[i]["talents"] = {}
@@ -342,6 +344,8 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 	var equipped := {}
 	for i in run.party.size():
 		run.party[i]["spec"] = chosen[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(chosen[i]))
 		run.party[i]["tree"] = Talents.generate_tree(chosen[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.sync_spec_hp(i)
@@ -377,7 +381,8 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 	var by_spec := {}
 	for h in heroes:
 		if not h.is_companion:
-			by_spec[String(h.passive_id)] = h
+			for pid in h.engines:
+				by_spec[String(pid)] = h
 
 	# ---- the runes reached the spawned hero ----
 	for spec in specs:
@@ -655,6 +660,8 @@ func _berserker_probe(mult: float) -> Dictionary:
 	var chosen := ["berserker", "cryomancer", "holy", "beastmaster"]
 	for i in run.party.size():
 		run.party[i]["spec"] = chosen[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(chosen[i]))
 		run.party[i]["tree"] = Talents.generate_tree(chosen[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
 		run.party[i]["talents"] = {}

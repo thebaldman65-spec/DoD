@@ -97,8 +97,14 @@ func _s1_the_pool() -> void:
 	var by_spec := {}
 	var priced_wrong: Array = []
 	var bad_scope: Array = []
+	var engines: Array = []
 	for id in Runes.ids():
 		if Runes.is_retired(String(id)):
+			continue
+		# BATCH GK — THE ENGINE RUNES ARE LIVE AND ARE NOT THIS POOL: class-scoped
+		# by the charter, and counted beside it below.
+		if Runes.is_engine_rune(String(id)):
+			engines.append(String(id))
 			continue
 		live.append(String(id))
 		var cfg: Dictionary = Runes.config(String(id))
@@ -133,6 +139,15 @@ func _s1_the_pool() -> void:
 		if Runes.config(String(id2)).has("lane"):
 			laned.append(id2)
 	ok(laned.is_empty(), "§1: an FK rune carries a `lane` — %s" % [laned])
+	var eng_bad: Array = []
+	for eid in engines:
+		var ecfg: Dictionary = Runes.config(String(eid))
+		if String(ecfg.get("scope", "")) != "class:" + Classes.engine_class(String(ecfg.get("engine", ""))) \
+				or int(ecfg.get("price", 0)) != 100:
+			eng_bad.append(String(eid))
+	ok(engines.size() == 15 and eng_bad.is_empty(),
+		"§1: ...and beside it the fifteen ENGINE runes (GK), each scoped to its engine's class at the interim 100g (%d; wrong: %s)"
+			% [engines.size(), eng_bad])
 	print("    live by spec: %s" % [by_spec])
 
 

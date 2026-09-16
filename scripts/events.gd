@@ -355,7 +355,8 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				if rune.is_empty():
 					break  # runes off — say nothing rather than lie
 				rune["equipped"] = not open_slot.is_empty()
-				taker["runes"] = taker.get("runes", []) + [rune]
+				# BATCH GK — through the one door, so an engine rune takes an engine slot.
+				run.hold_rune(taker, rune)
 				granted.append("%s (%s)" % [String(rune["name"]), _who(taker)])
 			if granted.is_empty():
 				# **AN EVENT IS A TRADE AND THE PLAYER HAS USUALLY PAID ALREADY**

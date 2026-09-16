@@ -363,8 +363,7 @@ func _buy_rune(offer_idx: int) -> void:
 	Run.gold -= _price(rune["price"])
 	Run.tally_add("gold_spent", _price(rune["price"]))
 	var member: Dictionary = Run.party[offer["member_idx"]]
-	var runes: Array = member.get("runes", [])
-	runes.append(rune)
-	member["runes"] = runes
+	# BATCH GK — an ENGINE rune goes to the engine slots, not the pouch; one door.
+	Run.hold_rune(member, rune)
 	offers.remove_at(offer_idx)
 	_draw_screen()

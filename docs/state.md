@@ -13,40 +13,75 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-15 (Batch GJ).*
+*Last rewritten: 2026-09-15 (Batch GK).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GJ — THE FINAL FIGHT BECOMES OBSERVABLE. THE SIXTEENTH BATCH ON `class-merge`, AND NOT MERGE
-  WORK.** `main` is untouched. Full working: **`docs/reports/GJ.md`**.
-- **§1: THE SIM FIGHTS THE END BOSS, AND EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT.**
-  `run_sim.on_battle_end` pays the third zone boss as it pays the other two and walks on to the end boss.
-  `Completed` is the end boss killed, and the third zone boss's count prints beside it off the same runs
-  (`completions=` and `z3boss=` in the Matrix row). **Read every completion this project quoted before GJ — BN's
-  sweep, EN's 97 / 3 / 0, EO's arms, EP's 22%, every arm since — as a third-zone-boss figure.** The three rungs,
-  re-measured both ways, are in the first item of the queue below.
-- **§2: `check_gj` PRESSES THE END BOSS'S BUTTON EVERY BATTERY** — a whole run walked through the real screens, the
-  END BOSS pressed through its own button, the victory read (the gold, a relic, a talent tier, the profile's write,
-  the run save deleted, Continue greyed) and a defeat read. **70 checks, 41 s standalone**, so it runs every battery.
-- **§3: NO RUNG DISCOUNTS THE END BOSS.** `Run.end_boss_mult` is the zone ladder with the rung floored at 1.0: rung 1
-  meets it at rung 2's strength, and rungs 2 and 3 are bit-identical. **Which reading of the ruling that is, is owed
-  a confirmation** (the rulings item below). **The floor-health test still passes the wrong way:** a party with every hero at 1 health beat it in 7 of 7 drives at rung 1, as on HEAD (the finding under GJ below).
-- **§4: THE MINI-BOSS READS MINI-BOSS**, on its node and on its bargain, and **a run ended at the end boss names it
-  once.**
-- **WHAT MOVED:** `scripts/run_sim.gd`, `scripts/run_state.gd` (`end_boss_mult`), `scripts/battle.gd` (the spawn's
-  end-boss branch and the summary line), `scripts/map_screen.gd` and `scripts/offer_screen.gd` (the word),
-  `scripts/draft_screen.gd` and `data/glossary.json` (the rung-1 claim), `scripts/relics.gd` (a `save_path` var),
-  `gate_fixture.gd` (the screen primitives), `check_gj.gd` (**NEW**), `run_battery.sh`, `baselines.json`,
-  `CLAUDE.md`, `docs/instrument-rules.md`, `docs/master.html` and its stamp, this file, the changelog,
-  `docs/design-notes.md` and `docs/reports/GJ.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GJ.md`**, written before the acceptance run; its figures were added after it.
-- **Phase.** Steps 1 (the spines) and 2 (the talent layer) of the merge's running order are done. **Step 3, engines
-  to runes, is RULED, NOT BUILT, and is the next merge step.**
-- **Next letter: GK.**
+- **Last batch: GK — ENGINES BECOME RUNES. THE SEVENTEENTH BATCH ON `class-merge`, AND STEP 3 OF THE MERGE.** `main`
+  is untouched. Full working: **`docs/reports/GK.md`**.
+- **§1: THE FIFTEEN ENGINES ARE ENGINE RUNES**, one each in `data/runes.json` (`"engine": <id>`, scoped to its class,
+  an empty payload, the flat 100 gold): the twelve spec engines named for their specs — *Rune of the Berserker* to
+  *Rune of the Survivalist* — and the three spines **proposed** as the *Rune of the Vanguard* (Momentum), the
+  *Invoker* (Channel) and the *Hierophant* (Sanctity). **The charter's six a class is RULED, NOT BUILT: nine are
+  owed** — the Warrior, the Mage and the Cleric hold four, the Hunter three, and he is dealt all three every time.
+- **§2: THE MACHINERY.** Class selection deals three and the hero takes one (`Run.deal_engines`, frozen on the member;
+  `Run.awaken`, the one door, the sim's too). Two slots in `member["engines"]`, apart from the three ordinary ones;
+  the second arrives wherever runes do; drop and swap to nothing from the map's rune pouch (`Run.toggle_engine`); the
+  enabler travels with its engine and takes no slot (`Classes.opening_kit`, `Classes.lineage_slots`). **No save
+  version moved. A hero with no engine fights and wins. `passive_id` is deleted**: a unit holds `engines` and every
+  read is `has_engine(id)`; the three spine switches have one writer, `_sync_engine_switches`.
+- **THE LINEAGE.** The spec id survives as the hero's lineage, set by the engine taken at class selection (none, for a
+  spine), and it still keys the four layers GK did not merge — the opening kit, the stat block, the draft and boss
+  pools, the spec-scoped runes. **`awakened`, not a spec, is what "has chosen" means now.**
+- **§3: THE DAMAGE, THEN THE REPAIR.** The unmodified battery against GK's tree read **67 of 104 targets red and the
+  harness's gate 2** — 42 throwing, 38 of those on the deleted field, and every fixture-seated hero holding no engine
+  — and GK repaired it in a stated order in the same batch. **What is left red is what was red before it: `check_cm_live`'s one sanctioned red.**
+- **WHAT MOVED:** `data/runes.json` (the fifteen), `scripts/classes.gd`, `scripts/runes.gd`, `scripts/run_state.gd`,
+  `scripts/unit.gd`, `scripts/battle.gd`, `scripts/spec_choice_screen.gd` (class selection), `scripts/map_screen.gd`,
+  `scripts/party_screen.gd`, `scripts/shop_screen.gd`, `scripts/events.gd`, `scripts/profile.gd`,
+  `scripts/run_sim.gd`; both fixtures and 55 instruments — 24 gates and 31 suites, re-pointed and re-derived in a stated order (`docs/reports/GK.md` §3b) — and `pin-manifest.json`, regenerated; `baselines.json`, `CLAUDE.md` (the charter),
+  `docs/master.html` and its stamp, `data/glossary.json`, this file, the changelog, `docs/design-notes.md` and
+  `docs/reports/GK.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GK.md`**, written before the acceptance run; its figures were added after it.
+- **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are
+  done — step 3 without the nine engines, which are the designer's. **Step 4, the pool merge, is next.**
+- **Next letter: GL.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GK's RULINGS OWED — **NINE; THE NAMES, THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GK.md`, NEEDS A RULING.
+
+1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
+2. **The three spines' rule texts** (`Classes.SPINE_INFO`), which no player read before GK.
+3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
+   dropped"*.
+4. **An engine rune's cost** — the flat 100 gold until one is set.
+5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools.
+6. **Heavy Plating's base is a stat** — the Warden's 0.10 Block stays with the lineage, so another Warrior's plating
+   climbs from zero plus its own slice.
+7. **A hero who takes a spine opens with his class's basic attack alone.**
+8. **The Hunter is dealt all three of his three** — no variety in the deal until his six exist.
+9. **No engine rune carries a tag** — `check_ek` exempts the fifteen as a set.
+
+### WHAT GK LEFT BROKEN
+
+- **Nothing it broke.** The repaired battery reads green but for `check_cm_live`'s standing sanctioned red (13 / 4, unchanged since before GK). Every row GK moved is in `baselines.json` with its reason.
+- **What GK left undone is not broken:** the nine engines, the pool merge, the engine-reading runes and cards, engine rune costs — `docs/reports/GK.md` §4 — and the rulings above.
+
+### FOUND AT GK AND NOT FIXED
+
+- **`save-backups/` is untracked and not ignored.** Every batch's player-save backup since FR sits there; each batch
+  staged by path, so none was ever committed, and a `git add -A` would commit them all. One `.gitignore` line.
+- **`check_fm` §2a's second arm is inert**: it names *"wait on cards they have not drafted"*, which the game no longer
+  prints (*"wait on abilities they have not earned"*); the check is an OR, so it passes on the other arm or on neither.
+- **Two comments in `battle.gd`** (DT's companion census) still name a companion's `passive_id`; it is `engines` that is
+  empty now, and the arithmetic they describe is unchanged.
+- **Five four-hero parties in the instruments seat a lineage on another class's seat** — all artificial; none reaches a class-keyed draw (a static sweep at GK), and the one that did is repaired.
+- **`test_batch_an` read its band's floor exactly (6,046)** on GK's repaired tree; the band is unchanged.
 
 ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT — **RE-MEASURED AT GJ, BOTH WAYS**
 
@@ -257,7 +292,8 @@ the things a later batch must not re-derive:**
 3. **THE CLASS SPINES — TWO READINGS OF "TOUCH".** Momentum, Channel, Sanctity and Focus are engines by the letter,
    and as class spines all four are **RULED, NOT BUILT**: the three are machinery on nobody (FT), and Focus is the
    Sharpshooter's meter, built off his own attacks and cards rather than off universal traffic. The other three read
-   universal traffic (Mana spent, exchanges, every status event). "May not touch an engine" means
+   universal traffic (Mana spent, exchanges, every status event). **GK: the three are engine runes now, held by
+   whoever takes one — no class carries a spine.** "May not touch an engine" means
    either "may not read or write one" or "may not change what one reads" — **and the second excludes most of the
    recon for three classes.**
 4. **THE FOUR CLASS PASSIVES** — Threatening Presence, Holy Conduit, Tracker, Evocation — are passives by the
@@ -448,7 +484,8 @@ census found them, and the tables are in `docs/reports/GC.md` §3.
   the tree. It asserts something stricter than the rule and is harmless.
 - **THE CATEGORY HAS NO INSTRUMENT.** A gate could assert, for each marked claim, the fact that makes it unbuilt — only
   the Sharpshooter carries Focus, the three `*_active` switches are unassigned, no engine rune exists — so the day one
-  is built the gate reds and says the marker is owed its removal. Nothing does today.
+  is built the gate reds and says the marker is owed its removal. Nothing does today. **GK ended two of those three
+  facts** (the switches have one writer; engine runes exist) **and nothing redded, which is this item's point.**
 - **`docs/ways-of-working.md`'s conflict table says this file "has no reader"**; `check_es` §4 reads it.
 
 ### FOUND AT GB AND NOT FIXED — **THE §4 CENSUS'S FINDINGS OUTSIDE ITS THREE FILES; THE THREE PLAYER-FACING TEXTS, THE RECAP GAP AND THE QUIT/RESUME SKIP CLOSED AT GF; THE SIX RULES CLOSED AT GC**
@@ -594,7 +631,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–2 BUILT, 3–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–3 BUILT (3 WITHOUT ITS NINE ENGINES), 4–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -607,7 +644,8 @@ the things a later batch must not re-derive from scratch:
   71.6% of the project's asserted checks are red** for as long as it takes. **This project has
   never worked in that condition**: every red it has carried has been the one sanctioned
   `check_cm_live` red with a note in `baselines.json`, and **a tree with fifty reds has no
-  differ.**
+  differ.** **GK MEASURED IT: the engine move read 67 of 104 targets red against the unmodified
+  battery, and GK repaired its own damage inside the same batch** (`docs/reports/GK.md` §3).
 - **THE ENGINE MOVE CANNOT BE STAGED PER SPEC, AND THIS IS THE STRUCTURAL ANSWER.** The unit of
   the merge is a **class** — three specs collapse into one pool, one tree and one stat line
   simultaneously, because there is no state in which the Berserker has merged and the Warden has
@@ -637,6 +675,10 @@ the things a later batch must not re-derive from scratch:
   engine-free there, which under-states the Pyromancer and the Survivalist most.
 
 ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED — **OWED A RULING (FT)**
+
+**GK MADE THEM REACHABLE, AS RUNES.** Each spine is an engine rune — the Rune of the Vanguard, the Invoker and the
+Hierophant, names proposed — and `BattleUnit._sync_engine_switches` is the three switches' one writer, so a hero
+holding one has its switch on and no class carries a spine.
 
 **None of it blocks the next batch.** The machinery is drivable and every number is a named
 constant, so each ruling is a one-line change. Full working and the measurements:
@@ -859,22 +901,24 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    read: **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
    designer and the assistant together. **The long pole. Its recon is `docs/systems-recon.html` (FW), and the
    rulings in that document's §3 come before a node is written.**
-3. **ENGINES TO RUNES, each with its enabler.**
+3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK, WITHOUT THE NINE ENGINES THE CHARTER'S SIX A
+   CLASS OWES**, which are the designer's.
 4. **POOL MERGING.**
 5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
-6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks.
+6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks. **GK repaired the
+   ones its own move broke** — the census and what is left are `docs/reports/GK.md` §3.
 
 ### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD**
 
 **`block_chance` has NO universal baseline.** It defaults to **0.0** (`unit.gd:142`) with no
 sentinel, the **Warden alone** declares it at **0.10** (`classes.gd`), and the only other
-unconditional source is `_plating_slice`, which opens on `u.passive_id == "heavy_plating"`. **The contrast is `parry_chance`**, which defaults to **−1.0** — a
+unconditional source is `_plating_slice`, which opens on `u.has_engine("heavy_plating")` (GK). **The contrast is `parry_chance`**, which defaults to **−1.0** — a
 *use-the-role-baseline* sentinel — against `PARRY_CHANCE := 0.05` for every hero. **So `sm_sword_mastery` (+parry%) genuinely survives a merge and
 `wd_unkillable` (on a Block) genuinely does not, and the two are indistinguishable from the
 payload.** Three surviving Warden nodes died to this at FP.
 
-- **AN ENGINE RUNE CARRYING HEAVY PLATING WOULD INSTALL A CLIMB ON A BASE OF ZERO** (engine runes are
-  **RULED, NOT BUILT**), and `PROTECTED_CORES` cannot see it **because the enabler table names ABILITIES and
+- **AN ENGINE RUNE CARRYING HEAVY PLATING INSTALLS A CLIMB ON A BASE OF ZERO — BUILT AT GK, AND OWED A RULING**
+  (GK's rulings item), and `PROTECTED_CORES` cannot see it **because the enabler table names ABILITIES and
   this is a STAT**.
 - **THE TABLE SAYS SO ITSELF, WHICH IS THE PART TO KEEP.** `PROTECTED_CORES["warden"]` carries
   `"enablers": []` with the `why` *"Heavy Plating is a Block-chance rule; it reads no ability."*
@@ -2072,7 +2116,7 @@ re-derived from the source at DM; not one was moved.**
   Mark, Necrosis, `cripple` and `chilled` (both terms)**. **MOST OF THE REMAINING MISSES ARE
   UNREACHABLE BY SHAPE RATHER THAN BY OVERSIGHT, AND THE SHAPE IS IN THE SIGNATURE**: the function
   takes a FLOAT, not an `Ability`, so all 26 ability-keyed terms cannot apply; a companion's
-  `passive_id` is `""` (10 more) and **every talent-rank field on it is zero, always** (20 more).
+  `engines` is empty — its `passive_id` was `""` until GK — (10 more) and **every talent-rank field on it is zero, always** (20 more).
   **Of the 76 still absent, all 76 fail the brief's own test — a term no companion can receive is a
   non-issue.**
   - **THE TWO THAT WERE LIVE ARE FIXED AND MEASURED.** **`cripple`** — enemies target

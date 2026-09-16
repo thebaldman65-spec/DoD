@@ -135,7 +135,12 @@ var max_resource := 100
 var second_resource_name := ""
 var second_resource := 0
 var second_max := 100
-var passive_id := ""       # specialization passive hook (see battle.gd)
+# BATCH GK — THE ENGINES THIS UNIT HOLDS, in engine-slot order, replacing the
+# one `passive_id` a spec stamped. An engine's id is its passive id (`bloodrage`,
+# `pack` …) and a hero may hold TWO, so every read is `has_engine(id)` — a single
+# string could only ever answer for one of them. Heroes get theirs from their
+# engine runes at spawn; companions and enemies hold none.
+var engines: Array = []
 var crit_bonus := 0.0      # from talents
 var parry_bonus := 0.0     # from talents
 var parry_chance := -1.0   # spec stat-block base; -1 = role baseline (battle.gd)
@@ -1890,10 +1895,31 @@ var _base_scale := 2.6
 # label and it is not widened here.
 # ═════════════════════════════════════════════════════════════════════════════
 
-# The three switches. Nothing writes them. See above.
+# The three switches. **BATCH GK: THEY FOLLOW THE ENGINES** — the three spines
+# are engine runes now, and `_sync_engine_switches` is the one place a switch is
+# written, off `engines` at `setup`. A hero who holds the rune has the switch on
+# and nobody else does; `check_ft` §0 is the gate that says so.
 var momentum_active := false
 var channel_active := false
 var sanctity_active := false
+
+
+func has_engine(pid: String) -> bool:
+	return engines.has(pid)
+
+
+# The chip an engine's live text lives on. The first engine keeps the id the one
+# spec passive always used, so a single-engine hero's chip is exactly what it
+# was; the second slot's engine gets its own.
+func engine_chip_id(pid: String) -> String:
+	var at := engines.find(pid)
+	return "spec_passive" if at <= 0 else "spec_passive_%d" % (at + 1)
+
+
+func _sync_engine_switches() -> void:
+	momentum_active = engines.has("momentum")
+	channel_active = engines.has("channel")
+	sanctity_active = engines.has("sanctity")
 
 # ── CHANNEL (Mage) — builds per Mana spent, pays spell damage ────────────────
 #
@@ -2164,6 +2190,7 @@ func setup(config: Dictionary) -> void:
 	for key in config:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
+	_sync_engine_switches()
 	# Weaknesses: listed damage types hit this unit 25% harder.
 	for weak_type in config.get("weak", []):
 		resists[weak_type] = float(resists.get(weak_type, 0.0)) - WEAKNESS_EXTRA
@@ -2572,9 +2599,9 @@ func refresh_bars() -> void:
 				String.num(lethal_crit_mult(), 2)]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
-	if passive_id == "bloodrage":
+	if has_engine("bloodrage"):
 		for s in statuses:
-			if s.id == "spec_passive":
+			if s.id == engine_chip_id("bloodrage"):
 				var step := 2.0 + bloodrage_step_bonus + rune_bloodrage_step_bonus
 				var live := frenzy_bonus() * 100.0
 				var floor_pct := frenzy_floor * 100.0
@@ -2596,9 +2623,9 @@ func refresh_bars() -> void:
 				break
 	# Heavy Plating chip shows the LIVE total Block chance — the whole value
 	# of the pity ramp is the player watching it climb toward the next Block.
-	if passive_id == "heavy_plating":
+	if has_engine("heavy_plating"):
 		for s in statuses:
-			if s.id == "spec_passive":
+			if s.id == engine_chip_id("heavy_plating"):
 				# Shieldwall's stance rides the same slice of the roll, so the
 				# live total has to carry it or the readout lies while it holds.
 				var wall := 0.0
@@ -2618,9 +2645,9 @@ func refresh_bars() -> void:
 				break
 	# Seasoned Fighter chip shows which guard is live; the tooltip carries
 	# both stances' numbers so the swap is an informed choice.
-	if passive_id == "seasoned":
+	if has_engine("seasoned"):
 		for s in statuses:
-			if s.id == "spec_passive":
+			if s.id == engine_chip_id("seasoned"):
 				var aggressive := stance == "aggressive"
 				var off_pct := int(round((0.15 + seasoned_off_bonus
 					+ rune_seasoned_off_bonus) * 100))
@@ -2640,9 +2667,9 @@ func refresh_bars() -> void:
 	# the one Ramp passive that never got one, and its nameplate (`_res2_text`,
 	# thirty lines up) has been printing these same two figures from these same
 	# two functions all along.
-	if passive_id == "resonance":
+	if has_engine("resonance"):
 		for s in statuses:
-			if s.id == "spec_passive":
+			if s.id == engine_chip_id("resonance"):
 				var dmg_pct := resonance_dmg_bonus() * 100.0
 				var taken_pct := resonance_taken_bonus() * 100.0
 				# Read off battle.gd's strike-loop crit expression rather than
@@ -3783,7 +3810,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	elif not just_broke:
 		play_anim("hurt")
 	# Blood Frenzy v2: every hit taken banks its floor immediately.
-	if passive_id == "bloodrage" and not dead:
+	if has_engine("bloodrage") and not dead:
 		frenzy_bonus()
 	refresh_bars()
 	return {"died": dead, "broke": just_broke, "bd": applied_bd}
@@ -3892,7 +3919,7 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	# BATCH BL §2 — same rule as take_hit: below every death-refusal.
 	_report_taken(amount, tick_hp_before)
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
-	if passive_id == "bloodrage" and not dead:
+	if has_engine("bloodrage") and not dead:
 		frenzy_bonus()
 	float_text(label, color)
 	if hp <= 0:

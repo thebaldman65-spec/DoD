@@ -273,7 +273,7 @@ func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
 
 func _cryo(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "permafrost":
+		if not h.is_companion and h.has_engine("permafrost"):
 			return h
 	return null
 

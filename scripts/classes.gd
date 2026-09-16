@@ -1189,6 +1189,177 @@ static func protected_names(spec: String) -> Array:
 	return out
 
 
+# ══ BATCH GK — THE ENGINE RUNES ═════════════════════════════════════════════
+#
+# **AN ENGINE IS WHAT A SPEC WAS, AND IT IS HELD NOW RATHER THAN CHOSEN.** The
+# designer's charter is in `CLAUDE.md`: every spec's passive is an ENGINE RUNE,
+# a hero is dealt three of his class's engines at class selection and takes one,
+# he may hold two, and each engine's ENABLER travels with it and sits outside
+# the slot count. **FIFTEEN EXIST** — the twelve spec passives and FT's three
+# spines — against the charter's six a class.
+#
+# **AN ENGINE'S ID IS ITS PASSIVE ID**, the string `battle.gd` and `unit.gd`
+# already branch on (`bloodrage`, `pack`, `lethal_aim` …), so nothing below is a
+# second copy of the spec tables: a spec engine's id, text and enablers ARE
+# `SPEC_INFO[spec]["passive"]`, its `passive_desc` and `PROTECTED_CORES[spec]`,
+# and the three spines carry the only new rows.
+#
+# **AND THE SPEC ID SURVIVES AS A LINEAGE, NOT AN IDENTITY.** Four layers are
+# not merged by GK — the opening kit, the stat block, the draft and boss pools,
+# and the spec-scoped runes — and each still keys on `member["spec"]`. The
+# lineage is set by the engine taken at class selection and does not change in a
+# run; a hero who takes a spine there has none and opens with his class kit. The
+# pool merge and the stat line are what retire it.
+#
+# **THE SPINES' TEXT IS PROPOSED, NOT CONFIRMED** (GK): FT built them with no
+# player-facing words at all, and a rune a player can hold has to say something.
+const SPINE_INFO := {
+	"momentum": {"class": "warrior", "name": "Momentum",
+		"passive_desc": "Momentum: a turn that deals damage and is met by the\nfight — a blow reaching the Warrior, or health lost — is an\nEXCHANGE. Every exchange makes the Warrior's later turns\nthis battle 4% quicker, up to 8."},
+	"channel": {"class": "mage", "name": "Channel",
+		"passive_desc": "Channel: every 42 Mana the Mage spends this battle adds\n+3% damage to non-physical attacks, up to 6 steps. Every\ncast counts as at least 10 Mana spent."},
+	"sanctity": {"class": "cleric", "name": "Sanctity",
+		"passive_desc": "Sanctity: every 16 changes to the statuses on the field\nthis battle — one landing on a unit or removed from one,\nfrom any source; a status running out does not count —\nadd 1 turn to each status the Cleric applies, up to 5."},
+}
+
+
+# The engine a spec carried, or "" for none.
+static func engine_of_spec(spec: String) -> String:
+	if spec == "" or not SPEC_INFO.has(spec):
+		return ""
+	return String(SPEC_INFO[spec]["passive"])
+
+
+# The spec an engine carries — its LINEAGE — or "" for a spine or an unknown id.
+static func engine_spec(pid: String) -> String:
+	for spec in SPEC_INFO:
+		if String(SPEC_INFO[spec]["passive"]) == pid:
+			return String(spec)
+	return ""
+
+
+static func engine_class(pid: String) -> String:
+	if SPINE_INFO.has(pid):
+		return String(SPINE_INFO[pid]["class"])
+	return class_of_spec(engine_spec(pid))
+
+
+# Every engine a class can hold, spec engines in SPEC_IDS order, then its spine.
+static func class_engines(class_key: String) -> Array:
+	var out: Array = []
+	for spec in SPEC_IDS.get(class_key, []):
+		out.append(engine_of_spec(String(spec)))
+	for pid in SPINE_INFO:
+		if String(SPINE_INFO[pid]["class"]) == class_key:
+			out.append(String(pid))
+	return out
+
+
+# What a chip calls the engine: the spec's name for a spec engine, the spine's own.
+static func engine_title(pid: String) -> String:
+	if SPINE_INFO.has(pid):
+		return String(SPINE_INFO[pid]["name"])
+	var spec := engine_spec(pid)
+	return String(SPEC_INFO[spec]["name"]) if spec != "" else ""
+
+
+static func engine_desc(pid: String) -> String:
+	if SPINE_INFO.has(pid):
+		return String(SPINE_INFO[pid]["passive_desc"])
+	var spec := engine_spec(pid)
+	return String(SPEC_INFO[spec]["passive_desc"]) if spec != "" else ""
+
+
+# **THE ENABLERS TRAVEL WITH THE ENGINE, AND THIS IS WHERE THEY ARE READ.** They
+# are `PROTECTED_CORES`' own column for the engine's lineage — authored there,
+# asserted by `test_batch_bo`, and not copied here. A spine has none.
+static func engine_enablers(pid: String) -> Array:
+	var spec := engine_spec(pid)
+	return core_enablers(spec) if spec != "" else []
+
+
+# **THE ONE BUILDER OF A HERO'S OPENING KIT** — the battle spawn, the hero sheet,
+# `Runes.kit_names` and the class-selection panel all read it, so what a hero
+# opens holding cannot be answered two ways (CK §1's rule, one layer down).
+#
+#   the class kit
+#   + the lineage's opening abilities, LESS its enablers when its engine is not held
+#   + the lineage's basic-attack override, only while its engine is held
+#   + every OTHER held engine's enablers
+#
+# **A TRAVELLING BASIC-ATTACK ENABLER** (Fireball, Frostbolt, Arcane Explosion,
+# Shadowrend) takes slot 0 when the class basic still stands there, and joins the
+# kit as a second free attack when another engine's override already does. An
+# enabler that IS the class basic (Quick Shot) is already held by every Hunter.
+static func opening_kit(class_key: String, spec: String, engines: Array) -> Array:
+	var cfg := {"abilities": kit(class_key)}
+	var own := engine_of_spec(spec)
+	if own != "":
+		var gone: Array = [] if engines.has(own) else core_enablers(spec)
+		for ab in spec_abilities(spec):
+			if ab != null and not gone.has(ab.display_name):
+				cfg["abilities"].append(ab)
+		if engines.has(own):
+			apply_kit_overrides(cfg, spec)
+	for pid in engines:
+		var es := engine_spec(String(pid))
+		if es == "" or es == spec:
+			continue
+		_carry_enablers(cfg, class_key, es)
+	return cfg["abilities"]
+
+
+static func _kit_holds(abilities: Array, name: String) -> bool:
+	for a in abilities:
+		if a != null and a.display_name == name:
+			return true
+	return false
+
+
+static func _carry_enablers(cfg: Dictionary, class_key: String, es: String) -> void:
+	var basic: String = kit(class_key)[0].display_name
+	var over := {"abilities": kit(class_key)}
+	apply_kit_overrides(over, es)
+	var over_ab: Ability = over["abilities"][0]
+	for name in core_enablers(es):
+		if _kit_holds(cfg["abilities"], String(name)):
+			continue
+		if over_ab.display_name == String(name) and String(name) != basic:
+			if cfg["abilities"][0].display_name == basic:
+				cfg["abilities"][0] = over_ab
+			else:
+				cfg["abilities"].append(over_ab)
+			continue
+		for ab in spec_abilities(es):
+			if ab != null and ab.display_name == String(name):
+				cfg["abilities"].append(ab)
+				break
+
+
+# **THE ENABLER SITS OUTSIDE THE SLOT COUNT**, so the slots a lineage's opening
+# abilities occupy are `core_slots` less the enablers among them — derived off
+# the live kit, with the three summons one bar entry as they always were. An
+# enabler that is a basic-attack override was never in `core_slots` at all.
+static func enabler_slots(spec: String) -> int:
+	var names: Array = core_enablers(spec)
+	var n := 0
+	var summons := false
+	for ab in spec_abilities(spec):
+		if ab == null or not names.has(ab.display_name):
+			continue
+		if ab.special == "summon":
+			summons = true
+		else:
+			n += 1
+	return n + (1 if summons else 0)
+
+
+static func lineage_slots(spec: String) -> int:
+	if spec == "" or not SPEC_INFO.has(spec):
+		return 0
+	return core_slots(spec) - enabler_slots(spec)
+
+
 static func spec_pool(spec: String) -> Array:
 	return SPEC_POOLS.get(spec, [])
 

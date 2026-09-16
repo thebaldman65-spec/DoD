@@ -513,7 +513,7 @@ func _spawn(learned: Dictionary, lineup: Array) -> Node:
 
 func _py(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "overburn":
+		if not h.is_companion and h.has_engine("overburn"):
 			return h
 	return null
 

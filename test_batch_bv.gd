@@ -586,14 +586,14 @@ func _source_rules() -> void:
 	var at_ls_hook := code.find('if ab.display_name == "Loaded Shot" and attacker.is_hero')
 	ok(at_ls_hook > 0,
 		"Loaded Shot's refresh is gated on the ABILITY, not on the Trapper passive")
-	var at_trapper := code.find('if attacker.is_hero and attacker.passive_id == "trapper"')
+	var at_trapper := code.find('if attacker.is_hero and attacker.has_engine("trapper")')
 	var at_qm := code.find("_living_hero_with(\"quartermaster\")")
 	ok(at_trapper > 0 and at_qm > 0 and at_ls_hook > at_trapper,
 		"and it sits AFTER the Survivalist package, so the turn's own work is refreshed too")
 	var at_cf_arm := code.find('if ab.display_name == "Crossfire" and attacker.is_hero')
 	ok(at_cf_arm > 0,
 		"Crossfire's window is gated on the ABILITY, not on the Lethal Aim passive")
-	var at_lethal := code.find('attacker.passive_id == "lethal_aim"')
+	var at_lethal := code.find('attacker.has_engine("lethal_aim")')
 	ok(at_lethal > 0 and at_cf_arm > at_lethal,
 		"and it is outside that block rather than merely before it")
 	# CALIBRATING SHOT'S GAIN *IS* PASSIVE-GATED AND MUST BE — Focus is the
@@ -730,7 +730,7 @@ func _spawn(hunter_spec: String, lineup: Array, learned := {}, inline_tree := []
 
 func _hunter(scene: Node, passive: String) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == passive:
+		if not h.is_companion and h.has_engine(passive):
 			return h
 	return null
 

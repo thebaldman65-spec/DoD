@@ -159,7 +159,10 @@ func _s1_rarity_is_gone() -> void:
 	# **BATCH FO: 126 -> 127.** §2 retires the Wide Watch and authors the Shared
 	# Mark in its place — the identical one-out-one-in shape FC's note above
 	# describes, and it leaves the LIVE count at sixty for the same reason.
-	ok(data.size() == 127, "§1: the authored pool is %d entries, expected 127" % data.size())
+	# **BATCH GK: 127 -> 142.** The fifteen ENGINE runes (the charter) are authored
+	# entries: class-scoped, the flat 100g, and an empty payload — the engine is
+	# what they do.
+	ok(data.size() == 142, "§1: the authored pool is %d entries, expected 142" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 

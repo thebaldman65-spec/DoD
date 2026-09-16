@@ -363,6 +363,10 @@ static func award_zone_boss_points(specs: Array) -> void:
 	var paid := {}
 	for spec in specs:
 		var cls := Classes.class_of_spec(String(spec))
+		# BATCH GK — A CLASS KEY IS ACCEPTED AS ITSELF. The run books its heroes by
+		# class now, because a hero who took a spine at class selection has no spec.
+		if Classes.SPEC_IDS.has(String(spec)):
+			cls = String(spec)
 		if cls == "" or paid.has(cls):
 			continue
 		purse[cls] = int(purse.get(cls, 0)) + 1

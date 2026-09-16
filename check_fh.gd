@@ -326,6 +326,8 @@ func _s1_the_whole_run() -> void:
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
 	for i in _run.party.size():
 		_run.party[i]["spec"] = SPECS[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
 		_run.party[i]["tree"] = Talents.generate_tree(SPECS[i], _run.party[i]["key"])
 		_run.sync_spec_hp(i)
 	_run.specs_chosen = true
@@ -823,6 +825,8 @@ func _fresh_map(bosses := 0) -> Node:
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
 	for i in _run.party.size():
 		_run.party[i]["spec"] = SPECS[i]
+		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
 		_run.party[i]["tree"] = Talents.generate_tree(SPECS[i], _run.party[i]["key"])
 		_run.sync_spec_hp(i)
 	_run.specs_chosen = true
@@ -1001,7 +1005,10 @@ func _s3_the_rune_offer() -> void:
 		var first: Dictionary = offers[0]
 		var who: int = int(first["member_idx"])
 		var rune: Dictionary = first["rune"]
-		for r in _run.party[who].get("runes", []):
+		# BATCH GK — AN ENGINE RUNE GOES TO THE ENGINE SLOTS (`Run.hold_rune`), so
+		# the hero's pouch is both lists.
+		for r in (_run.party[who].get("runes", []) as Array) \
+				+ (_run.party[who].get("engines", []) as Array):
 			owned_before.append(String((r as Dictionary).get("name", "")))
 		# THE PRICE IS ON THE BUTTON, and EZ §0 ruled a rune is 100g flat.
 		var gold_before: int = int(_run.gold)
@@ -1010,7 +1017,8 @@ func _s3_the_rune_offer() -> void:
 			await process_frame
 			bought = gold_before - int(_run.gold)
 			var owned_after: Array = []
-			for r2 in _run.party[who].get("runes", []):
+			for r2 in (_run.party[who].get("runes", []) as Array) \
+					+ (_run.party[who].get("engines", []) as Array):
 				owned_after.append(String((r2 as Dictionary).get("name", "")))
 			ok(owned_after.size() == owned_before.size() + 1,
 				"§3: a rune was bought for %dg and the hero's pouch did not grow" % bought)
@@ -1522,7 +1530,7 @@ func _s7_the_skill_check() -> void:
 	for h in scene.get("heroes"):
 		if h.is_companion:
 			continue
-		if String(h.passive_id) == "lethal_aim":
+		if h.has_engine("lethal_aim"):
 			ss = h
 		for a in h.abilities:
 			if a != null and a.gated and gated_ab == null:
@@ -1656,7 +1664,7 @@ func _s7_the_skill_check() -> void:
 	for h2 in dscene.get("heroes"):
 		if h2.is_companion:
 			continue
-		if String(h2.passive_id) == "heavy_plating":
+		if h2.has_engine("heavy_plating"):
 			warden = h2
 		elif other == null:
 			other = h2

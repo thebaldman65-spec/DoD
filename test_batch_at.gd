@@ -744,14 +744,21 @@ func _rune_audit() -> void:
 			"rune_on_edge_ranks", "on_edge_stacks", "volatility_recoil"]:
 		arc_fields[extra] = true
 	var mage_runes := 0
+	var mage_engines := 0
 	for id in Runes.ids():
 		if String(Runes.config(id).get("scope", "")) != "class:mage":
 			continue
-		mage_runes += 1
+		# BATCH GK — the four Mage ENGINE runes are class:mage too, with an empty
+		# payload; counted apart so the three ordinary ones stay pinned.
+		if Runes.is_engine_rune(String(id)):
+			mage_engines += 1
+		else:
+			mage_runes += 1
 		for f in Runes.config(id).get("payload", {}).get("stat", {}):
 			ok(not arc_fields.has(String(f)),
 				"the Mage-wide rune %s does not write the Arcanist counter %s" % [id, f])
 	ok(mage_runes == 3, "there are 3 Mage class-wide runes (got %d)" % mage_runes)
+	ok(mage_engines == 4, "...and 4 Mage ENGINE runes beside them (GK) (got %d)" % mage_engines)
 
 
 func _claude_md() -> void:
@@ -1178,7 +1185,7 @@ func _live_shatter() -> void:
 		["berserker", "cryomancer", "inquisitor", "beastmaster"], "fight", ["Shatter"])
 	var cryo: BattleUnit = null
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "permafrost":
+		if not h.is_companion and h.has_engine("permafrost"):
 			cryo = h
 	ok(cryo != null, "the Cryomancer spawned")
 	if cryo == null:

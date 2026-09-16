@@ -638,7 +638,7 @@ func _spawn(learned: Dictionary, lineup: Array) -> Node:
 
 func _bz(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "bloodrage":
+		if not h.is_companion and h.has_engine("bloodrage"):
 			return h
 	return null
 

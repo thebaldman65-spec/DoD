@@ -8716,3 +8716,58 @@ shorter span that the enemy reaches less often. Late in a fight — exactly wher
 feared — the meter books less, not more. A cap is the honest brake on a self-feeding meter, and this
 one is not feeding itself; the table of what a lower cap would do is kept so the question can be
 answered quickly if a later rule makes exchanges easier to book.
+
+## Batch GK — engines become runes
+
+**Why the spec's passive became a rune a hero holds, rather than a choice he makes at a menu.** The
+designer's charter: a hero is a class, and an engine is a rule that changes how he fights. Held as a
+rune, the identity is a decision the run keeps asking — it can be dropped, swapped or doubled — where
+the awakening screen asked it once and never again.
+
+**Why the spec id survives as a lineage.** Four layers are not merged yet — the opening kit, the stat
+block, the draft and boss pools, and the spec-scoped runes — and each needs a key. The engine taken
+at class selection is the natural one, because it is exactly the choice the spec screen used to make:
+a hero who takes the Rune of the Berserker fights, looks and drafts as a Berserker did. Keying those
+layers to whatever engines are held instead would have been the pool merge done early and badly.
+
+**Why the enabler travels, and why it takes no slot.** An engine without its enabler is a brick — the
+Beastmaster's summons are what Pack Bond reads. Charging slots for them would make a second engine a
+tax on the draft rather than a choice beside it.
+
+**Why dropping an engine keeps the rune.** The pouch already works that way for ordinary runes, and a
+drop that destroyed the rune would make "swap" mean "hope another is offered". Kept, the choice is
+reversible between fights, and the two slots are a loadout rather than a ledger.
+
+**Why `passive_id` was deleted rather than kept for the first engine.** A hero can hold two. A field
+that answers for one of them would be right for most heroes and silently wrong for the rest, which is
+the worst shape a read can have.
+
+**Why no save version moved.** The engine slots ride the party dict, as the loadout does, and a member
+written before GK has an honest default: the engine his spec carried, slotted — what he was fighting
+with when the file was written.
+
+**Why a hero who takes a class engine opens so thin.** The spec abilities are the lineage's opening
+kit until the pool merge moves them, and a class engine carries no lineage. He opens with his class's
+basic attack and drafts from his class's pool. It is the honest state of the game between this batch
+and the pool merge, and the report says so rather than papering it over.
+
+**Why the census came before a single repair.** The brief asked for the damage first, and the reason is the
+same one a differ exists for: a battery repaired as it is read loses the only reading of what the move itself
+broke. The unmodified gates were run once against the new tree, frozen before and after, and every red is on
+record before any gate changed.
+
+**Why the fixtures were repaired rather than every suite.** A suite that seats a Berserker meant a hero who
+fights with Blood Frenzy; before GK the spec brought it. Seating the lineage's engine rune in the two fixtures
+is the faithful translation of every one of those seats at once, and it is what class selection hands a
+player — so the suites go on measuring what they were written to measure, and a suite that wants a hero
+without his engine says so by emptying the list.
+
+**Why the engine runes are counted beside the pool and exempt only as a set.** An engine rune is live and
+drawable, so a count that folded it in would move with every engine the designer adds and stop meaning what
+it counted. Counted beside, the ordinary-rune invariants stay pinned and the engine runes get their own arm.
+And an exemption written as a list of ids is the shape that silently keeps exempting an id that has stopped
+being an engine; written as `is_engine_rune` with an arm that the set is not empty, it cannot.
+
+**Why `awakened` and not a spec.** A spine-taker has chosen and has no spec, so "spec is empty" stopped
+meaning "has not chosen" the moment spines became runes. Two payments read the old meaning and paid a member
+who had not chosen; they now read the flag the awakening writes.

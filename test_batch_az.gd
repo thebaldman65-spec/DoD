@@ -715,7 +715,7 @@ func _negative_control_source() -> void:
 func _live_uncapped() -> void:
 	var scene := await _spawn({})
 	var h := _hero(scene, 3)
-	ok(h != null and h.passive_id == "lethal_aim", "the Sharpshooter spawned")
+	ok(h != null and h.has_engine("lethal_aim"), "the Sharpshooter spawned")
 	ok(h.second_resource_name == "Focus", "...on Focus")
 	ok(scene.call("_focus_cap", h) == scene.get("FOCUS_UNCAPPED"),
 		"a plain Sharpshooter has NO Focus ceiling")

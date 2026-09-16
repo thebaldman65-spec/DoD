@@ -531,7 +531,7 @@ those are a PROFILE rather than constants.**
   the check that produces the Sloppy**, and obeying the bare criterion there would have deleted a
   feature in silence.
 - **BASIC ATTACKS RESOLVE AT A FIXED GOOD, EXCEPT THE SHARPSHOOTER'S.** Read off **slot 0** and
-  off the **hero's passive**, not off a name: his basic IS Quick Shot, the same object two other
+  off the **hero's held engine**, not off a name: his basic IS Quick Shot, the same object two other
   specs carry, so there is no card to flag.
 - **THE NO-CHECK TEST SITS ABOVE THE AUTOPLAY ROLL AND THAT ORDER IS LOAD-BEARING.** Leave the
   bot's Perfect roll on top and it rolls Perfects nobody can press for, **every folded bonus gets
@@ -805,7 +805,7 @@ The brief is the shared record; leaving an error in it means the next brief inhe
 
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
-`_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's passive
+`_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's held engine
 (`lethal_aim`) and off **slot 0**, never off a name, because his basic IS Quick Shot and two other
 specs carry the same object.
 - **ONE PRESS, PLUS ONE PER 50 FOCUS HELD, CAPPED AT FOUR**, read at the moment the bar opens.
@@ -1421,7 +1421,7 @@ as a live decision.
   sim/autoplay modes, victory/defeat flow.
 - `scripts/unit.gd`: combatant node (sheet animations, bars, status chips,
   bleed buildup meter, outline shader hover).
-- Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
+- Screens: main_menu → draft (pick 4 + relics) → class selection (`spec_choice.tscn`: three engine runes dealt, one taken — GK) →
   map (THE hub: the road, four hero cards, potions, burger) → offer (before
   every elite/mini-boss) → battle → sometimes shop and/or event → back to map.
   party.tscn is the HERO SHEET now, opened from a card.
@@ -1477,8 +1477,8 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
   purse that does not exist. Never compare a post-BM number against them. **AND EVERY SIM FIGURE
   TAKEN FULLY TALENTED BEFORE FX MEASURED A PARTY WEARING ONE LANE OF EACH SPEC TREE; A
   FULL-DEPTH SIM AFTER FX WEARS ALL TWENTY-SEVEN NODES OF THE ONE TREE.** Not the same party.
-· **THE HANDOFF** is `Run.equip_spec_talents(idx)`, called from BOTH paths (the spec screen and
-  RunSim.start_run — the sync_spec_hp pattern). A real run reads `Profile.worn_talents` for the
+· **THE HANDOFF** is `Run.equip_spec_talents(idx)`, called from `Run.awaken`, the one door the
+  class-selection screen and RunSim.start_run both use (GK). A real run reads `Profile.worn_talents` for the
   spec's CLASS; a SIM reads `Run.sim_talents`, installed by `RunSim.install_builds`. **RunSim
   CALLS Profile nowhere at all** — a sim that read the player's ledger would make every baseline
   depend on whoever ran it.
@@ -1565,7 +1565,7 @@ the one talent tree is **the only meta layer that reaches a turn as it resolves.
 
 **THE SECOND AXIS FOLLOWS FROM WHEN EACH IS CHOSEN.** Relics are assigned at the DRAFT, **before
 specs are chosen**, so a relic *cannot* be about a spec — it is party-wide by construction rather
-than by preference. Talents are copied off `Profile` the moment a spec is confirmed and locked for
+than by preference. Talents are copied off `Profile` the moment a hero is awakened and locked for
 the run, **but since FX the tree keys to the CLASS**: every hero of a class wears every cell the
 class has bought, whichever spec he is, and every node must pay every class that can buy it — so a
 talent cannot be about a spec either.
@@ -1805,13 +1805,71 @@ RE-COUPLE THEM.** Faith's held half must never read `faith_stacks` again; that i
 test_batch_bi's first negative control, and the mis-write reads as a smaller number rather than
 as a bug.
 
+## STANDING RULE — THE ENGINE RUNE CHARTER (Batch GK, the designer's)
+> **THERE ARE NO SPECS AND NO CORE ENGINES.** A hero is a CLASS. Everything that made a spec what it
+> was is now an ENGINE RUNE.
+>
+> **AN ENGINE IS A RULE THAT CHANGES HOW A HERO FIGHTS, FOR THE WHOLE RUN.** It is **not**
+> necessarily a resource. Of the engines that exist today, **Heavy Plating is a rule about block
+> chance, stances are a state, and Trapper is a read of the board at the moment of a strike** —
+> none of the three accrues anything. **A meter is one way to build an engine, not the definition.**
+>
+> **EACH CLASS HAS SIX ENGINE RUNES.** A hero only ever sees his own class's six. **A Warrior can
+> never hold Burn.**
+>
+> **AT CLASS SELECTION, BEFORE THE FIRST BATTLE, a hero is dealt THREE of his class's six and takes
+> ONE.**
+>
+> **A HERO MAY HOLD TWO ENGINE RUNES**, in **two dedicated slots** that do not compete with ordinary
+> runes.
+>
+> **THE SECOND COMES FROM THE ORDINARY RUNE POOL**, mixed in with everything else — still only ever
+> that class's six.
+>
+> **ENGINE RUNES CAN BE DROPPED AND SWAPPED, INCLUDING TO NOTHING.** A hero with no engine has no
+> identity and that is the player's decision to make. **This is a game about good decisions.**
+>
+> **AN ENGINE'S ENABLER TRAVELS WITH IT AND SITS OUTSIDE THE SLOT COUNT.** Drafting Loyalty brings
+> the three summons; drafting Faith brings Consecrated Ground. **An engine without its enabler is a
+> brick** — Quick Shot is the only Focus generator, Consecrated Ground is 66% of all Faith, and the
+> three summons are 10 of 10 Beastmaster cards. **The enabler leaves when the engine leaves.**
+
+**WHAT GK BUILT, CLAUSE BY CLAUSE.** Recorded in full before a line of code, on the brief's instruction.
+It supersedes the class-core half of FT §1's block below: **no class has a core.**
+- **BUILT (GK):** the fifteen engines that exist are engine runes — `data/runes.json` names each by
+  its passive id in `engine`, scoped to its class, so a Warrior can never hold Burn. The draft of three
+  at class selection (`Run.deal_engines`, frozen on the member; `Run.awaken` is the one door, the
+  sim's too). Two slots in `member["engines"]`, apart from the three ordinary ones. The second from the
+  ordinary pool (`eligible_ids` rolls them; `Run.hold_rune` slots one). Drop and swap, to nothing
+  (`Run.toggle_engine`, from the map's rune pouch). The enabler travels, leaves, and sits outside the
+  slot count (`Classes.opening_kit`, the one kit builder; `Classes.lineage_slots`). **`passive_id` is
+  deleted**: a unit holds `engines` and every read is `has_engine(id)`.
+- **RULED, NOT BUILT: six engine runes a class** — the Warrior, Mage and Cleric hold four and the
+  Hunter three, and the nine are the designer's. **RULED, NOT BUILT: there are no specs** — the spec
+  id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the four
+  layers GK does not merge (the opening kit, the stat block, the draft and boss pools, the spec-scoped
+  runes). A hero who takes a spine has none and opens with his class kit. The COST of an engine rune is
+  the flat 100g rule's, not a set price.
+- **AN ENABLER CANNOT BE A STAT, AND ONE IS**: the Warden's `block_chance` 0.10 is his lineage's stat
+  block, so Heavy Plating on another Warrior climbs from zero plus its own 15% slice.
+- **AN INSTRUMENT THAT SEATS A LINEAGE SEATS ITS ENGINE RUNE.** A spec no longer brings its engine: a
+  member with `spec` set and no `engines` spawns a hero whose every engine read is ZERO, and nothing throws —
+  GK's census found it the single largest cause of red. **Both fixtures seat it** (`Runes.engine_pouch_for_spec`,
+  and `awakened`); a hand-built seat must too, and a check about a hero WITHOUT his engine says so by emptying
+  `engines` after.
+- **A POPULATION THAT WALKS `data/runes.json` COUNTS THE ENGINE RUNES BESIDE IT, NEVER INSIDE IT**, and an
+  exemption for them is a SET — all of them, and not none — never an id list. An engine rune has no payload:
+  its engine is what it does, so a payload rule that meets one exempts it by `Runes.is_engine_rune` and asserts
+  the exempt population is non-empty.
+- **"HAS CHOSEN" IS `awakened`, NOT A SPEC.** A hero who takes a spine at class selection has no spec and has
+  chosen; a member not yet through class selection has neither. What reads the old meaning pays or offers the
+  wrong member — GK's census found two such (the zone-boss bank and the two fallback draft rolls).
+
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
-**A core engine rewards a PATTERN and pays in a NEUTRAL currency**, so it says nothing about how a
-hero fights. Burn, Chilled, Resonance, Mercy, Faith, Ruin, Frenzy, plating and stances are BUILD
-identities and none may be a core. Focus already satisfies the rule, and it is ruled the Hunter's
-core — **RULED, NOT BUILT: only the Sharpshooter carries Focus today, as his spec's meter.** **Momentum
-(Warrior), Channel (Mage) and Sanctity (Cleric) are the other three; their machinery was built at FT,
-and attaching each to its class is RULED, NOT BUILT** (the switches below).
+**ITS CORE HALF IS SUPERSEDED BY THE ENGINE RUNE CHARTER ABOVE: NO CLASS HAS A CORE (GK).** Momentum,
+Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and the Hierophant's engines (names
+PROPOSED at GK), and Focus is the Rune of the Sharpshooter's — held like the other eleven, never given.
+**What stands is the LEDGER half**, which the rest of this block is about.
 
 **AND ALL THREE ACCUMULATE AND PAY WHILE HELD AND ARE NEVER CONSUMED, WHICH IS BI §1's PRESCRIBED
 SHAPE RATHER THAN THE ONE IT WARNS ABOUT.** BI §1's antagonism needs a meter that both pays while
@@ -1823,12 +1881,12 @@ it arrives silently, because a spender reads exactly like a payer until somebody
 held half is worth. That is the thing to check, and it is why this paragraph is here rather than
 in a report.
 
-**THE THREE ARE BUILT ON NOBODY AND `check_ft` §0 IS WHAT KEEPS THEM THERE.** Each payout is
-guarded on its own `*_active` switch, every switch defaults false, and **nothing under `scripts/`
-or `data/` assigns one**. The gate asserts that over the live spec table, over a comment-stripped
-sweep of both directories, over a constructed control line that proves the sweep can bite, and
-over a driven four-spec party. **IT IS WRITTEN TO INVERT**: the batch that attaches a spine takes
-§0 red and rewrites it, which is what `check_ez` §1 and `check_fk` §2 both did and were better for.
+**THE SWITCHES FOLLOW THE ENGINE RUNES (GK), AND `check_ft` §0 — WRITTEN TO INVERT — INVERTED.** Each
+payout is guarded on its own `*_active` switch, every switch defaults false, and **its ONE writer is
+`BattleUnit._sync_engine_switches`**, off the unit's held `engines` at `setup`: a hero holding the
+spine's rune has that switch on and no other hero does. The gate asserts the one writer over a
+comment-stripped sweep of `scripts/` and `data/`, the constructed control line, and both halves on a
+driven party.
 
 **AND A SPINE'S PAYOUT GOES WHERE THE GAME ALREADY DECIDES THAT THING ONCE.** Channel's lands in
 the one general damage multiplier; Sanctity's lands beside Permafrost and Emberkeep, which already
@@ -1997,14 +2055,14 @@ was written. No meter is ungoverned. meter | what governs it | where the governo
   `docs/reports/FU.md` §2 | `channel_steps()`/`channel_bonus()` in `unit.gd` (THE ONE PLACE THE
   SPLIT IS DECIDED); the ledger is written at `note_resource_spent`, the one net-off-the-bar door
   CZ §1 already books Rage through.
-· **momentum** (the Warrior spine — RULED, NOT BUILT; machinery on nobody) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
+· **momentum** (the Warrior spine — the Rune of the Vanguard's engine since GK) | **CAPPED IN THE FIELD**, not on the read: `note_momentum_turn`
   clamps at `MOMENTUM_MAX_STEPS`, so this is the one of the three that never accumulates past its
   ceiling. **AND IT IS RATE-LIMITED BEFORE IT IS CAPPED** — at most one EXCHANGE a turn, a step on
   every `MOMENTUM_EXCHANGES_PER_STEP`-th (FV §2), and an exchange only for a turn carrying BOTH
   halves: he dealt, and the fight reached him — health lost, or a blow met (FV §1) |
   `note_momentum_turn()` and `note_blow_met()` in `unit.gd`; the one blow-met call is in
   `_resolve`'s strike loop.
-· **sanctity_events** (the Cleric spine — RULED, NOT BUILT; machinery on nobody; uncapped, static,
+· **sanctity_events** (the Cleric spine — the Rune of the Hierophant's engine since GK; uncapped, static,
   battle-scoped) | **a FLAT CAP on the READ**
   (`sanctity_steps()` is `mini(events / SANCTITY_PER_STEP, SANCTITY_MAX_STEPS)`, the constants
   named rather than copied here) **plus a DEDUPE that is the real governor**: ONE EVENT PER (TURN,
@@ -2852,8 +2910,8 @@ itself, and EZ's own charter forbids moving an ability, a magnitude or a constan
   plus the hunter's two that are about a bond which already broke (Last Howl and Vengeance).
 - **AND 76 OF THE BLOCK'S 78 ABSENT TERMS ARE UNREACHABLE BY SHAPE, WHICH IS WHY "EVERYTHING" WAS
   NEVER GOING TO MEAN 84.** DU §2 enumerated it: `_companion_hit` takes a float and not an
-  `Ability` (26 ability-keyed terms cannot apply), a companion's `passive_id` is always the empty
-  string (10 more), and a companion is never allocated a tree (20 more). **A term the beast cannot
+  `Ability` (26 ability-keyed terms cannot apply), a companion holds no engine
+  (10 more), and a companion is never allocated a tree (20 more). **A term the beast cannot
   be given is not turned on by any rune.**
 - **THE STALE-LIST TRAP IS REAL AND IS NOT AVOIDED HERE — IT IS NAMED.** `_shared_hide_mult` is
   ONE function and the list is in one place, which is the most that can be done short of the
@@ -3026,7 +3084,7 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
 - **ROWS 0 IS A NEAR-ZERO, NOT A STRUCTURAL ZERO, AND EW's REPORT SAYS OTHERWISE.** The conversion
   **can** fire with no talents equipped: measured **2 crossings in 40,437 hero strikes**, totals to
   **1.09**, with 208 strikes at or past 0.50. **`_party_crit_bonus()` is gated on
-  `passive_id == "pack"` and NOTHING ELSE** — no talent, no row — so Aguila's boon on an uncapped
+  `has_engine("pack")` and NOTHING ELSE** — no talent, no row — so Aguila's boon on an uncapped
   meter reaches a certainty at rows 0. It is still a sound noise floor (the crossings move that
   arm's mean by +0.0002% against a ±0.11% floor), **but it is a rare event and must not be asserted
   as impossible.** EX §2.
@@ -3204,7 +3262,10 @@ is SILENT: a spine that stops working because its enabler became draftable.** Ho
 at FOUR slots (Heal, Hymn of Hope), so she has the fewest earnable slots in the game; the
 Beastmaster's three summons are FIVE ABILITIES IN THREE SLOTS, because the summon picker has been
 one bar entry since AH. **The table itself is in `classes.gd` with a `why` on every row — read it
-there rather than copying it here.**
+there rather than copying it here.** **SINCE GK THE ENABLERS TRAVEL WITH THE ENGINE RUNE**:
+`Classes.engine_enablers` reads this column for an engine's lineage, `Classes.opening_kit` hands them
+to any hero of the class who holds that engine and takes them out of a lineage kit whose engine is not
+held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less the enablers).
 
 **THE DRAFT IS COMPLETE AND NOTHING IS OWED: 154 of 154, 129 spec + 25 class-wide.** All twelve
 specs draft from at least TEN; the Mage class pool holds seven and the other three hold six.
@@ -3403,9 +3464,9 @@ exactly the inverted card, and it would still read fine on the tooltip.
 
 **TWO THINGS WERE BOTH BEING CALLED "AXIS" AND SEPARATING THEM IS WHAT MAKES THE RULE WORKABLE.**
 
-> **An ENGINE is the spec's own currency** — stances, Loyalty, Focus, Resonance, Ruin, Faith,
-> Mercy, Burn, Chilled, Frenzy, Block. **Exclusive by construction, one per spec.** This is where
-> identity lives.
+> **An ENGINE is a rule that changes how a hero fights, for the whole run** (GK's charter) — stances,
+> Loyalty, Focus, Resonance, Ruin, Faith, Mercy, Burn, Chilled, Frenzy, Block. **Exclusive to its
+> class, held as a rune, two a hero at most.** This is where identity lives.
 >
 > **An AXIS is an effect type** — single-target damage, area damage, healing, shielding,
 > mitigation, control, tempo, Break, resource generation, meter manipulation. **Shared, and
@@ -3517,7 +3578,7 @@ Chilled.** The difference is not size and it is not confidence:
 · **NARROW, AND NAMED.** `_companion_hit` reads those two statuses — and, when its hunter holds the Shared Hide rune, the
   buffs that rune names — and nothing else. **Of the hero
   strike loop's 84 multiplier terms, 76 of the misses are unreachable BY SHAPE** — the function
-  takes a float and not an `Ability`, a companion's `passive_id` is always empty, and every
+  takes a float and not an `Ability`, a companion holds no engine, and every
   talent-rank field on one is always zero. **A GENERAL WIDENING WOULD HANG VISIBLE CHIPS ON A
   COMPANION THAT CHANGE NOTHING, WHICH IS WORSE THAN THE NARROW MISS BECAUSE IT READS AS WORKING.**
 · **A MAGNITUDE CHANGE IS MEASURED, NOT ASSERTED, AND THE GATE IS PART OF THE RULING.**
@@ -3534,7 +3595,7 @@ Chilled.** The difference is not size and it is not confidence:
 **THREE VOCABULARIES, AND THEY ARE NOT THE SAME ONE.** DR separated the first two; EK adds the
 third and it is the only one the player ever sees.
 
-> **An ENGINE is the spec's own currency.** Exclusive, one per spec. Identity.
+> **An ENGINE is a rule a hero holds as a rune** (GK). Exclusive to its class, two a hero at most. Identity.
 > **An AXIS is an effect type** — single-target damage, healing, control, tempo. Shared, internal
 > to the design audits, and **never shown to a player**.
 > **A TAG is what a card is FOR**, in seven words the player reads on the draft card:

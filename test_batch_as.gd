@@ -553,10 +553,13 @@ func _rune_audit() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var cryo := []
 	var mage := []
+	var mage_engines := []
 	for id in pool:
 		var r: Dictionary = pool[id]
 		if String(r.get("scope", "")) == "spec:cryomancer":
 			cryo.append(id)
+		elif String(r.get("scope", "")) == "class:mage" and String(r.get("engine", "")) != "":
+			mage_engines.append(id)   # BATCH GK — an engine rune, counted apart
 		elif String(r.get("scope", "")) == "class:mage":
 			mage.append(id)
 	# **BATCH FK MOVED IT 4 -> 9.** The four are ET's retired ones and FK
@@ -568,6 +571,7 @@ func _rune_audit() -> void:
 	# than deleted for that reason.
 	ok(cryo.size() == 9, "nine Cryomancer spec runes (got %d)" % cryo.size())
 	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
+	ok(mage_engines.size() == 4, "...and four Mage ENGINE runes beside them (GK) (got %d)" % mage_engines.size())
 	# Every lane tag must name a lane that EXISTS — the Honed Lance was tagged
 	# Shatterpoint, which stopped being a lane.
 	# BATCH FX — 3 CHECKS DELETED HERE (DG §2): "the rune X is tagged with a live
@@ -688,7 +692,7 @@ func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
 
 func _cryo(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == "permafrost":
+		if not h.is_companion and h.has_engine("permafrost"):
 			return h
 	return null
 

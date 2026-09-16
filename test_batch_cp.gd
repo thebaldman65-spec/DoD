@@ -672,7 +672,7 @@ const PASSIVE_OF := {"berserker": "bloodrage", "warden": "heavy_plating",
 func _hero(scene: Node, spec: String) -> BattleUnit:
 	var want := String(PASSIVE_OF.get(spec, spec))
 	for h in scene.get("heroes"):
-		if not h.is_companion and String(h.passive_id) == want:
+		if not h.is_companion and h.has_engine(want):
 			return h
 	return null
 

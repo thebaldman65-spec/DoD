@@ -585,15 +585,23 @@ func _rune_audit() -> void:
 		"vulture", "ghillie", "improvised", "perfected_toxin", "whole_forest",
 		"force_of_nature"]
 	var hunter_runes := 0
+	var hunter_engines := 0
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
 			continue
-		hunter_runes += 1
+		# BATCH GK — the three Hunter ENGINE runes are class:hunter too; their
+		# payload is empty, so the walk below passes them, and they are counted
+		# apart so the three ordinary ones stay pinned.
+		if String(pool[id].get("engine", "")) != "":
+			hunter_engines += 1
+		else:
+			hunter_runes += 1
 		var st: Dictionary = pool[id].get("payload", {}).get("stat", {})
 		for f in sv_fields:
 			ok(not st.has(f),
 				"the class:hunter rune %s touches no Survivalist counter (writes %s)" % [id, f])
 	ok(hunter_runes == 3, "three class:hunter runes checked (got %d)" % hunter_runes)
+	ok(hunter_engines == 3, "...and three class:hunter ENGINE runes beside them (GK) (got %d)" % hunter_engines)
 	# THE FLOAT TRAP, BOTH WAYS (§6, per AZ).
 	for f in ["vulture", "coated_blades", "necrosis", "quartermaster",
 			"perfected_toxin", "force_of_nature", "deadfall_network"]:

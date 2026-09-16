@@ -591,6 +591,6 @@ func _s7_the_chip(scene: Node, bm: BattleUnit, comp: BattleUnit) -> void:
 
 func _hunter(scene: Node) -> BattleUnit:
 	for h in scene.get("heroes"):
-		if not h.is_companion and h.passive_id == "pack":
+		if not h.is_companion and h.has_engine("pack"):
 			return h
 	return null
