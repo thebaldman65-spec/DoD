@@ -2083,8 +2083,9 @@ func equipped_ability_names(member: Dictionary) -> Array:
 #
 # **THE PROTECTED CORE PLUS THE EQUIPPED EARNED CARDS, IN THAT ORDER**, which
 # is exactly what `battle.gd`'s spawn assembles and exactly the 7-to-10 the slot
-# cap counts (`ability_slots_used` is `core_slots` + this function's second
-# half). `equipped_ability_names` alone is NOT the loadout — it is the earned
+# cap counts (`ability_slots_used` is the opening kit's slots — the lineage's
+# less its enablers, and the class kit's less what the lineage already counts
+# (GN) — plus this function's second half). `equipped_ability_names` alone is NOT the loadout — it is the earned
 # subset, and a hero who has drafted nothing carries a full bar through it that
 # reads EMPTY.
 #
@@ -2115,9 +2116,14 @@ func benched_ability_names(member: Dictionary) -> Array:
 
 func ability_slots_used(member: Dictionary) -> int:
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter), so the
-	# lineage's opening abilities count LESS their enablers, and a hero with no
-	# lineage counts his carried cards alone.
-	return Classes.lineage_slots(String(member.get("spec", ""))) \
+	# lineage's opening abilities count LESS their enablers.
+	# BATCH GN — THE CLASS KIT IS INSIDE IT: three slots, less any kit card the
+	# lineage's own slots already count (`Classes.kit_slots`), so a hero with no
+	# lineage opens at three and a Warden, whose kit holds two of the three, at
+	# four.
+	var spec := String(member.get("spec", ""))
+	return Classes.lineage_slots(spec) \
+		+ Classes.kit_slots(String(member.get("key", "")), spec) \
 		+ equipped_ability_names(member).size()
 
 

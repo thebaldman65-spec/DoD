@@ -1123,12 +1123,21 @@ func _s3_the_rune_offer() -> void:
 				retired.append(cid)
 		ok(retired.is_empty(),
 			"§3: the elite cache offered RETIRED runes — %s" % [retired])
-		var worn_before: int = int(looter.get("runes", []).size())
+		# BATCH GN — A RUNE ARRIVES IN THE POUCH, OR IN AN ENGINE SLOT IF IT IS AN
+		# ENGINE RUNE (`Run.hold_rune`, GK's one door). GN's code moved what this
+		# seed draws, the first candidate came up an engine rune, and a count of
+		# the pouch alone read "no rune arrived" for a rune that did.
+		var first: Dictionary = ((looter.get("rune_candidates", [[{}]]) as Array)[0] as Array)[0]
+		var worn_before: int = int(looter.get("runes", []).size()) \
+			+ int(looter.get("engines", []).size())
 		s3.call("_pick_rune", 1, 0)
 		await process_frame
 		await process_frame
-		ok(int(looter.get("runes", []).size()) == worn_before + 1,
+		ok(int(looter.get("runes", []).size()) + int(looter.get("engines", []).size())
+				== worn_before + 1,
 			"§3: the cache pick was answered and no rune arrived")
+		print("    the cache's first rune: %s%s" % [String(first.get("name", "?")),
+			" (an engine rune, so it took an engine slot)" if String(first.get("engine", "")) != "" else ""])
 		ok(int(looter.get("rune_picks_owed", 0)) == 0,
 			"§3: the cache pick was answered and is still owed")
 		print("    the cache was answered a node later: %d candidates, %d retired" % [

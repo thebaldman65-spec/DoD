@@ -74,8 +74,8 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
 const SPEC_TARGET := 129     # the twelve pools, summed from PER_SPEC_DEPTH
-const CLASS_TARGET := 25     # summed from PER_CLASS_DEPTH — no longer 4 x 6
-const DRAFT_TARGET := 154    # 129 + 25
+const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
+const DRAFT_TARGET := 149    # 129 + 20
 const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -110,12 +110,17 @@ const PER_SPEC_DEPTH := {
 # re-asserted over a tree that has moved past it — the exact fault the header
 # above names for the SPEC half. It is the same repair DO made there: one
 # authoritative table, summed, with every other suite asserting the FLOOR.
-# `CLASS_FLOOR` stays at SIX for `SPEC_FLOOR`'s reason — it catches a pool that
-# EMPTIES rather than tracking the deepening.
+# `CLASS_FLOOR` is a floor for `SPEC_FLOOR`'s reason — it catches a pool that
+# EMPTIES rather than tracking the deepening. It stood at SIX until GN.
+# **BATCH GN MOVED IT BY RULING, AND THE FLOOR WITH IT.** Five class-wide cards
+# went into the class kits (`Classes.CLASS_KITS`): Nexus Ward and Magic Missiles
+# out of the Mage pool (7 -> 5), Ministration, Unburden and Consecration out of
+# the Cleric's (6 -> 3). No card was deleted. `CLASS_FLOOR` follows the
+# shallowest pool the ruling leaves, three, for the reason it always had.
 const PER_CLASS_DEPTH := {
-	"warrior": 6, "mage": 7, "cleric": 6, "hunter": 6,
+	"warrior": 6, "mage": 5, "cleric": 3, "hunter": 6,
 }
-const CLASS_FLOOR := 6
+const CLASS_FLOOR := 3
 # BATCH DO DELETED `DEEP_SPECS`, AND DELETED IT RATHER THAN LEAVING IT.
 # It listed all twelve specs and existed only to answer "eight or five?" — a
 # question CI ended and DO replaced outright with `PER_SPEC_DEPTH` above. A
@@ -421,7 +426,7 @@ func _pools() -> void:
 		ok(cpool.size() == cwant,
 			"%s draws %d class-wide (want %d)" % [cls, cpool.size(), cwant])
 		ok(cpool.size() >= CLASS_FLOOR,
-			"...and %s is still at or above BR's floor of %d" % [cls, CLASS_FLOOR])
+			"...and %s is still at or above the class floor of %d" % [cls, CLASS_FLOOR])
 		var cseen := {}
 		for cn in cpool:
 			cseen[String(cn)] = 1

@@ -64,6 +64,14 @@ const UNGATED := ["deepening_hex", "wide_rite", "bracing_line", "long_watch",
 # agree with the class keys — `check_ez` §5 spawns exactly this way.)
 const DRIVE_ORDER := ["occultist", "warden", "sharpshooter", "beastmaster"]
 
+# **BATCH GN — THE ONE SPEC WHOSE POOL CANNOT STACK FIVE, AND WHAT IT CAN.** Three
+# DEFENSE cards left the Cleric class pool for the class kit, so an Occultist's
+# draftable pool holds two cards of any primary but DEBUFF — and DEBUFF is the tag
+# his own threshold rune named, which the stack must avoid. Two still fails both
+# retired rules (none of DEBUFF; a peak of two in two). An equality, so the day
+# the pool deepens this gate says so.
+const SHORT_BAR := {"occultist": 2}
+
 # **THE CONDITIONS THEY CARRIED, RE-IMPLEMENTED HERE SO §4 CAN BUILD AN ARM THAT
 # FAILS THEM.** This is the retired rule, kept in the gate that retired it —
 # `check_fd` §2's `_pre_fd_peak` precedent, and for the same reason: an arm
@@ -511,16 +519,16 @@ func _s4_on_a_failing_loadout() -> void:
 	var bars := {}
 	for sp in DRIVE_ORDER:
 		bars[sp] = _spec_bar(String(sp), _threshold_tag_of(String(sp)))
-		ok((bars[sp] as Array).size() == 5,
-			"§4: %s — no five-card single-tag bar exists in his own pool (%d)"
-				% [sp, (bars[sp] as Array).size()])
+		ok((bars[sp] as Array).size() == int(SHORT_BAR.get(sp, 5)),
+			"§4: %s — no %d-card single-tag bar exists in his own pool (%d)"
+				% [sp, int(SHORT_BAR.get(sp, 5)), (bars[sp] as Array).size()])
 
 	var landed := 0
 	var proved := 0
 	for id in UNGATED:
 		var cond: Dictionary = OLD_CONDITION[id]
 		var fail_bar: Array = bars.get(_spec_of(String(id)), [])
-		if fail_bar.size() < 5:
+		if fail_bar.size() < 2:
 			continue
 		# **THE CONTROL, AND IT RUNS FIRST.** The retired predicate,
 		# re-implemented from EZ §0's own arithmetic, says this bar FAILS. An
@@ -639,6 +647,7 @@ func _spec_bar(spec: String, avoid: String) -> Array:
 		for n in src:
 			if not pool.has(String(n)):
 				pool.append(String(n))
+	var best: Array = []
 	for t in Classes.TAG_ORDER:
 		var tag := String(t)
 		if tag == avoid:
@@ -649,7 +658,11 @@ func _spec_bar(spec: String, avoid: String) -> Array:
 				of_tag.append(String(nm))
 		if of_tag.size() >= 5:
 			return of_tag.slice(0, 5)
-	return []
+		if of_tag.size() > best.size():
+			best = of_tag
+	# BATCH GN — NO FIVE ON ANY TAG: the tallest stack there is, if it is a
+	# stack at all (`SHORT_BAR` pins which spec lands here and how tall).
+	return best if best.size() >= 2 else []
 
 
 # The tag the spec's own THRESHOLD rune named, off `OLD_CONDITION` rather than

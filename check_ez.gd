@@ -331,16 +331,25 @@ func _s3_the_lever_driven() -> void:
 	var run: Node = root.get_node("/root/Run")
 	var deb: Array = _cards_of("DEBUFF")
 	var non: Array = _cards_of("DEFENSE")
+	# BATCH GN — THE CARRIED HALF IS WHAT FITS BESIDE THE LIVE OPENING. The class
+	# kit's three count against the cap now, so four earned cards on this
+	# member's five-slot opening sit two over it and the carry door rightly
+	# refuses the card back. He carries what fits, and the lever is driven the
+	# same way: out, and in again.
+	var room: int = mini(4, run.ability_slot_cap() - Classes.lineage_slots("occultist") \
+		- Classes.kit_slots("mage", "occultist"))
 	var m := _member("mage", "occultist", [deb[0], deb[1], non[0], non[1]])
-	m["bm_equipped"] = [deb[0], deb[1], non[0], non[1]]
-	ok(run.equipped_ability_names(m).size() == 4, "§3: the hero opens carrying four")
+	m["bm_equipped"] = ([deb[0], deb[1], non[0], non[1]] as Array).slice(0, room)
+	ok(room >= 2 and run.equipped_ability_names(m).size() == room,
+		"§3: the hero opens carrying the %d that fit" % room)
 	ok(run.unequip_earned_ability(m, deb[0]), "§3: the bench door accepts the card")
-	ok(run.equipped_ability_names(m).size() == 3, "§3: the carried count falls to 3")
+	ok(run.equipped_ability_names(m).size() == room - 1,
+		"§3: the carried count falls to %d" % (room - 1))
 	ok((run.earned_ability_names(m) as Array).has(deb[0]),
 		"§3: ...and the benched card LEFT the pool — a bench is not a drop")
 	ok(run.equip_earned_ability(m, deb[0]), "§3: the carry door accepts it back")
-	ok(run.equipped_ability_names(m).size() == 4,
-		"§3: ...and the carried count is 4 again — benching is free and reversible")
+	ok(run.equipped_ability_names(m).size() == room,
+		"§3: ...and the carried count is %d again — benching is free and reversible" % room)
 	await process_frame
 
 

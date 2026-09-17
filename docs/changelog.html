@@ -15,6 +15,73 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-17 &mdash; Batch GN: THE FOUR CLASS KITS</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTIETH BATCH ON <code>class-merge</code>.</b> A hero who took Momentum, Channel or
+Sanctity at class selection opened with his class's basic attack and nothing else. <b>Every class now opens with
+three guaranteed abilities after its basic, whatever engine its hero takes, holds or drops, and they count against the
+slot cap.</b> The twelve were chosen with the designer and are transcribed here. <code>main</code> is untouched. Full
+working: <code>docs/reports/GN.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE TWELVE.</b> <b>Warrior:</b> Crushing Blow, Bloodlust, Mocking Blow. <b>Mage:</b> Magic Burst
+(new), Nexus Ward (Magic Barrier, renamed) and Magic Missiles. <b>Cleric:</b> Ministration, Unburden and Consecration
+&mdash; <b>no damage card, by ruling</b>: he attacks with Smite and drafts damage if he wants it. <b>Hunter:</b>
+Powershot, Snare Trap, Tripwire. <code>Classes.CLASS_KITS</code> names them and <code>Classes.opening_kit</code>, the one
+builder, adds them after the lineage's cards.</p>
+<ul>
+<li><b>EACH CARD KEEPS ITS ONE DEFINITION.</b> The six cores stay where their lineages define them and the five
+class-wide cards stay where the draft defines them; the kit resolves them through <code>pool_ability</code>. <b>Magic
+Burst</b> exists only in the kit and is defined in <code>class_kit_ability</code>: 40% of Attack as arcane, and it
+leaves the target with Elemental Weakness. <b>Its cost, cooldown, initiative, Break damage, Perfect and tags were not
+in the ruling and are PROPOSED</b> &mdash; 25 Mana, cooldown 2, initiative 3.0, 15 Break damage, a 46% Perfect,
+DEBUFF and BREAK &mdash; and wait on the designer.</li>
+<li><b>A CARD THE LINEAGE ALREADY OPENS WITH IS HELD ONCE AND COUNTED ONCE.</b> Four lineages share one: the
+Berserker (Bloodlust), the Warden (Mocking Blow and Crushing Blow), the Sharpshooter (Powershot) and the Survivalist
+(Tripwire and Snare Trap). The brief named two of the four.</li>
+<li><b>DRIVEN, ON HEROES HOLDING NO ENGINE.</b> All twelve were cast by a hero of their class with no lineage and no
+engine, and what each card promises was read off the board: a 128 blow reached the Mage for 108 through a 20-point
+ward, the same blow landed 100 on an Unburdened hero and 125 on a bare one, Powershot read 153 on an empty meter and
+306 on a meter at 50, and a snared enemy lost its turn and took Poison.</li>
+<li><b>FOUR KIT CARDS CARRIED WORDING THE STANDARD RULES OUT, AND THE BRIEF SAID TO FIX A KIT CARD'S:</b> Nexus Ward
+and Tripwire said <i>your</i>, Consecration <i>you all</i>, and Powershot's flavour said <i>the team</i>. Each is
+reworded, and no number moved. <b>Tripwire's "another ally" was measured</b>: a Beastmaster holds Tripwire now, and a
+melee blow on his bear is answered like a blow on a hero.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; ELEMENTAL WEAKNESS IS FILLED, NOT CREATED.</b> GG retired the status because nothing applied it.
+<b>Its retired definition was a resistance cut, not a multiplier</b>: every school but physical has its resistance
+lowered by the status's power, read in the strike loop. <b>That mechanism was taken, at the ruled 15 points for 3
+turns</b>, through one door, <code>_apply_elem_weak</code>. The ruling said <i>+15% damage taken</i>; the two agree
+where an enemy has no resistance (x1.148 to x1.150 measured, with rounding), and where it resists or is weak the cut
+pays a little more or a little less (x1.212 at +30%, x1.124 at &minus;20%). <b>Driven:</b> Magic Burst lays 15 for 3
+turns; a hit of each of the six other schools lands harder on the weakened target, and a physical hit does not.
+<b>The glossary entry is back</b>, naming the card. <b>Its only read site is the strike loop's</b>, like
+Exposed's; seventeen other non-physical reads &mdash; two damage ticks, a trap, and cards that compute their own damage
+&mdash; do not see it, and the report lists them.</p>
+
+<p><b>&sect;3 &mdash; WHAT A PICK COSTS.</b> A card moved into a kit leaves the class draft pool. <b>The pools read
+Warrior 6, Mage 5, Cleric 3 and Hunter 6</b> (the brief had the Hunter at seven and the Cleric going seven to four);
+the class-wide half is 20 and the draft 149 of 149. <b>What each hero opens at, of 7:</b> Berserker 5, Warden 4,
+Swordmaster 5, Pyromancer 5, Cryomancer 5, Arcanist 6, Holy 5, Devout 4, Occultist 5, Beastmaster 5, Sharpshooter 5,
+Survivalist 4, and a hero who took a spine 3. <b>Before GN they opened at 3, 3, 2, 2, 2, 3, 2, 1, 2, 2, 3, 3 and
+0</b>; the brief's 3 and 6 were GL's projections for a kit with no overlap.</p>
+
+<p><b>&sect;4 &mdash; THE BOT CASTS THE KIT.</b> Before GN an engine-less party cast two of the twelve. <b>A class branch,
+<code>_bot_class_kit_pick</code></b>, is consulted where the rotation fell back to the basic attack, above the drafted
+hook, and casts each card when it has something to do; the drafted hook leaves kit cards to it. Driven: the branch
+names each of the twelve on a board built for it, and a live autoplay stretch cast all twelve.</p>
+
+<p><b>&sect;5 &mdash; NOT DONE, AS RULED:</b> no engine rune, nothing for the Crown, no pool merge, talent node or
+rune cost. <code>data/runes.json</code> needed nothing: no rune names or reads a moved card. <b>Found and not
+fixed:</b> the victory card leaves out the Tollkeeper's Bell's 20 gold, so it says less than the purse gained.</p>
+
+<p><b>NEW GATE: <code>check_gn.gd</code></b> reads the kit, drives the twelve, Elemental Weakness, a spine-taker from
+class selection into his first battle (four abilities, not one), and the bot; it was armed against HEAD's code and
+three injections before it was trusted. <b>Twenty-eight instruments moved with the code</b> &mdash; twenty-seven found by running them unmodified against it first, and <code>check_ek</code>'s list of tag-reading gates by the pre-pass, which a new gate joins by existing:
+floors that followed the pools, slot fills that now leave room for the kit, the Magic Barrier rename, the corpus
+at 228 and two derived walks. <code>check_gj</code> &sect;4 stays red, on purpose: the seeded run now holds the
+Tollkeeper's Bell, and the arm is right. <b>A standing rule for the kit</b> in <code>CLAUDE.md</code>.
+<b>Rulings owed</b> are under their own heading in the report.</p>
+
 <h2>2026-09-16 &mdash; Batch GM: HOLD BREATH, AND CARDS THAT OUTLIVE THEIR ENGINE</h2>
 <p><b>IMPLEMENT ONLY, AND THE NINETEENTH BATCH ON <code>class-merge</code>.</b> GL found four defects live in play and
 reproduced them in real battles; <b>GM repairs three of them and the designer's ruling on the fourth</b>, sweeps for

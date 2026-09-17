@@ -181,6 +181,17 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 			var nm3: String = over_kit[i3].display_name
 			if i3 >= plain_kit.size() or nm3 != String(plain_kit[i3].display_name):
 				over_names[nm3] = true
+	# **BATCH GN — AND THE CLASS KITS, WHICH THE CL WALK CANNOT READ EITHER.** The
+	# complete walk reads `Classes.class_kit` beside the class draft pools; the CL
+	# walk stays frozen, so every kit card no older structure names is outside it.
+	# That half is DERIVED off `CLASS_KITS` the way the first half is derived off
+	# `apply_kit_overrides`: a kit card the CL walk still reaches (a lineage core)
+	# is not in the difference, and an ability outside every kit and pool is
+	# still in neither walk.
+	for kk in Classes.CLASS_KITS:
+		for kn in Classes.class_kit_names(String(kk)):
+			if not cl_names.has(String(kn)):
+				over_names[String(kn)] = true
 	var only_complete: Array = []
 	for ab3 in corpus:
 		if not cl_names.has(ab3.display_name):
@@ -189,10 +200,10 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 	var expected: Array = over_names.keys()
 	expected.sort()
 	ok(only_complete == expected,
-		"the walks differ by %s; the ONLY difference may be the kit overrides %s" % [
+		"the walks differ by %s; the ONLY difference may be the kit overrides and the class-kit cards no pool holds %s" % [
 			str(only_complete), str(expected)])
 	ok(cl.size() + expected.size() == corpus.size(),
-		"the CL walk reaches %d and the complete walk %d — that is %d apart, not the %d overrides" % [
+		"the CL walk reaches %d and the complete walk %d — that is %d apart, not the %d overrides and kit cards" % [
 			cl.size(), corpus.size(), corpus.size() - cl.size(), expected.size()])
 	print("  the complete walk reaches %d the CL walk cannot: %s" % [
 		expected.size(), ", ".join(expected)])

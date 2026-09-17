@@ -722,8 +722,10 @@ func _live_guard_change() -> void:
 			"LIVE: Guard Change is on his bar from turn one")
 		ok(_find(sm, "Shatterpoint") == null,
 			"LIVE: Shatterpoint is not, until he earns it")
-		ok(sm.abilities.size() == 4,
-			"LIVE: core attack + 3 spec abilities (has %d)" % sm.abilities.size())
+		# BATCH GN — and the Warrior class kit's three, none of them his lineage's.
+		ok(sm.abilities.size() == 4 + Classes.kit_slots("warrior", "swordmaster")
+				and _find(sm, "Crushing Blow") != null,
+			"LIVE: core attack + 3 spec abilities + the 3-card class kit (has %d)" % sm.abilities.size())
 		var foes: Array = plain.get("enemies")
 		for e in foes:
 			e.pressure = 0

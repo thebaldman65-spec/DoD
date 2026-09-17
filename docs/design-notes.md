@@ -8808,3 +8808,65 @@ and a mark the heroes laid is not a benefit to the enemy wearing it. The project
 already said Dispel must not take them; three had simply never been listed. Rime went on the Dispel list
 rather than the debuff list because the debuff list also feeds a Survivalist's count and a mender's rite,
 and moving those is a different decision.
+
+## Batch GN — the four class kits
+
+**Why a class kit at all.** A hero who takes a class engine at class selection carries no lineage, so he opened
+with his basic attack and nothing else, and the pool merge will leave every hero in that position. Three
+guaranteed abilities give every hero a real opening whatever engine he takes or drops, and they sit inside the slot
+count because a protected core always has: a guarantee that took no slot would be free power stacked on top of a
+full draft.
+
+**Why the kit is its own table rather than more cards in the class basic.** The basic attack is one object with
+rules of its own — it resolves at a fixed grade and an engine can replace it — and a good deal reads the class kit as
+exactly that one card. A separate list, walked by the one opening-kit builder, adds the three without changing what
+the basic is.
+
+**Why a card keeps its one definition where it was.** Six of the twelve are lineage cores and five were class-wide
+draft cards; each already had a single definition that the battle, the hero sheet and the resolver read. Copying
+them into the kit would have made two copies of every number, which is how a card comes to say one thing and do
+another. Magic Burst is the one card that exists only in a kit, so it has a home of its own.
+
+**Why a card that moved into a kit leaves its pool.** A guaranteed card offered again in a draft is an offer the hero
+can never take. The cost is real — the Cleric's class pool is three cards, and it is the whole supply of a Cleric who
+takes a class engine — and it is the cost the ruling named.
+
+**Why a shared core is held once and counted once.** Four lineages already open with a kit card. Holding it twice
+would put two buttons for one card on the bar and charge two slots for one card, so the builder skips the second
+copy and the slot count skips the card the lineage already counts.
+
+**Why Elemental Weakness lowers a resistance rather than multiplying damage.** The status already existed, with its
+chip, its glossary entry and one read site that lowers the victim's resistance to every school but physical; it had
+only lost its applier. Filling it kept that mechanism at the ruled fifteen and three turns. The two readings agree on
+a school the enemy neither resists nor is weak to, and the resistance reading adds the same fifteen percent of the
+blow before resistance on every other enemy — so a resisted school gains a little more, relative to what it was
+landing, and a weakness a little less.
+
+**Why it is element-blind.** The read site asks only whether the blow is physical. A Mage kit that favoured one
+school before he had drafted anything would steer his engine choice from the first fight, which is why Flamewave
+was refused; this one makes a Cleric's holy and a Survivalist's nature land harder as surely as his own arcane.
+
+**Why the Cleric's kit has no damage card.** He is a support class. Smite is his attack, and a Cleric who wants more
+damage drafts it; a kit card spent on damage would be a kit card not spent on the party.
+
+**Why the bot has a class branch.** Every simulated figure is a measurement of a hero playing his kit. Before this
+batch the bot cast some kit cards only inside one engine's rotation and never cast others, so a hero with a
+different engine, or none, was measured without them. The branch sits where the drafted-card hook sits — used only
+when the rotation had nothing better — so no engine rotation changed its priorities to make room.
+
+**Why the gate drives every card on a hero with no engine.** A kit card that needs an engine is the failure a kit
+exists to prevent, and it is invisible to a reading: the text looks right and the card is on the bar. Cast on a hero
+who holds nothing, a card either does what it says or it does not.
+**Why four kit cards were reworded and no others.** A kit card is on every hero of its class now, so a word on
+it that the text standard rules out is read by every player of that class. The brief said to fix a kit card's
+queued wording defect and leave the rest queued; a pronoun on a card is one of the queued kinds, and so is a third
+word for the heroes. The rewording changed words and no number.
+
+**Why Tripwire says "another ally" and not "another hero".** The retaliation reads any blow an enemy lands on the
+heroes' side, and since the kits a Beastmaster holds Tripwire beside his companions. Measured, a blow on his bear is
+answered. A card narrower than its code would be the one telling a lie.
+
+**Why the victory card's gold was reported and not fixed.** It was found by a gate this batch did not touch, in a
+screen this batch did not edit, and the fix is a change to what every victory card says. A batch that implements a
+ruling does not also change unrelated player-facing copy on its own judgement; the gate stays red so the defect is
+seen until it is ruled on.

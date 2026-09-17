@@ -157,9 +157,11 @@ func _pools() -> void:
 	# twice — so the setup stays byte-identical.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§5: the four class-wide pools are still named")
+	# BATCH GN — THE FLOOR IS THREE: five class-wide cards moved into the class
+	# kits by ruling, so the Mage pool reads five and the Cleric's three.
 	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() >= 6,
-			"§5: ...the %s one has FALLEN below the six BQ and BR filled it to" % ck)
+		ok(Classes.class_draft_pool(ck).size() >= 3,
+			"§5: ...the %s one has FALLEN below the three GN left it at" % ck)
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
 	# name that does not resolve is an offer that hands out nothing.
 	for spec3 in TRANCHE_2:
@@ -317,8 +319,10 @@ func _warrior_draft_flow() -> void:
 	# 2, not 3** — Guard Change is the enabler his Stances need and sits outside
 	# the slot count (the charter) — so 5 earned abilities fill him and the sixth
 	# needs a drop.
-	ok(run.ability_slots_used(m) == Classes.lineage_slots("swordmaster") + 1,
-		"§7: 2 lineage + 1 earned = 3 of 7 (got %d)" % run.ability_slots_used(m))
+	# BATCH GN — THE CLASS KIT'S THREE COUNT TOO (none is his lineage's).
+	ok(run.ability_slots_used(m) == Classes.lineage_slots("swordmaster")
+			+ Classes.kit_slots("warrior", "swordmaster") + 1,
+		"§7: 2 lineage + 3 kit + 1 earned = 6 of 7 (got %d)" % run.ability_slots_used(m))
 	# BATCH DR — **THE THREE FILLER NAMES MUST NOT BE DRAFTABLE, AND TWO OF
 	# THEM WERE.** This kit is hand-built to reach the cap, and §7 then TAKES
 	# `cands[1]` — a card drawn at random from his live draft pool. LUNGE and
@@ -351,10 +355,15 @@ func _warrior_draft_flow() -> void:
 	# GK's FIFTH FILLER IS GUT RIP, A BERSERKER DRAFT CARD: in neither the
 	# Swordmaster's draft pool nor the Warrior class pool, so no `cands` draw can
 	# reach it — the rule DR set for the other three.
-	m["bm_abilities"] = [cands[0], "Sweeping Strikes", "Shatterpoint",
-		"Rallying Shout", "Gut Rip"]
-	ok(run.ability_slots_used(m) == CAP,
-		"§7: five earned fill the cap at 7 (got %d)" % run.ability_slots_used(m))
+	# BATCH GN — THE FILL IS RELATIVE TO THE LIVE OPENING NOW (BO's rule): the
+	# class kit takes three of the seven, so TWO earned fill him, and Shatterpoint
+	# stays second because the bench below names it.
+	var fill: int = CAP - Classes.lineage_slots("swordmaster") \
+		- Classes.kit_slots("warrior", "swordmaster")
+	m["bm_abilities"] = ([cands[0], "Shatterpoint", "Sweeping Strikes",
+		"Rallying Shout", "Gut Rip"] as Array).slice(0, fill)
+	ok(run.ability_slots_used(m) == CAP and fill == 2,
+		"§7: %d earned fill the cap at 7 (got %d)" % [fill, run.ability_slots_used(m)])
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
 	# AT THE CAP A TAKE NEEDS A DROP, AND A PROTECTED ABILITY CAN NEVER BE THE
 	# ONE NAMED. Guard Change is his enabler; it is not in `bm_abilities`, so

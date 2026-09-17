@@ -563,16 +563,25 @@ func _s5_reported_not_fixed() -> void:
 	for cls3 in Classes.CLASS_DRAFT_POOLS:
 		for n4 in Classes.CLASS_DRAFT_POOLS[cls3]:
 			pooled[n4] = true
+	# **BATCH GN MOVED THIS FIGURE 43 -> 37, AND AGAIN NOTHING BECAME LESS
+	# REACHABLE.** A class holds a KIT OF THREE beside its basic now
+	# (`Classes.class_kit`), and a walk that says "every class kit" reads it.
+	# Five cards left the class pools for those kits and a sixth, Magic Burst, was
+	# authored into one, so none of the six joined this population; the six lineage
+	# cores the kits name (Bloodlust, Crushing Blow, Mocking Blow, Powershot, Snare
+	# Trap, Tripwire) left it, because a class kit now holds them too.
 	for key in ["warrior", "mage", "cleric", "hunter"]:
 		for kab in Classes.kit(key):
 			pooled[kab.display_name] = true
+		for kab2 in Classes.class_kit(key):
+			pooled[kab2.display_name] = true
 	var unseen: Array = []
 	for ab2 in Classes.ability_corpus():
 		if not pooled.has(ab2.display_name):
 			unseen.append(ab2.display_name)
 	unseen.sort()
-	ok(unseen.size() == 43,
-		"§5: %d abilities sit outside every pool and every class kit, not the 43 on record — re-derive it (%s)" % [
+	ok(unseen.size() == 37,
+		"§5: %d abilities sit outside every pool and every class kit, not the 37 on record — re-derive it (%s)" % [
 			unseen.size(), ", ".join(PackedStringArray(unseen))])
 	ok(unseen.size() > 0,
 		"§5: every ability is now in a pool or a class kit — a walk built the old way would agree with the corpus, and §5's finding is stale")

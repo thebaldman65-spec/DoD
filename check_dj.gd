@@ -342,8 +342,12 @@ func _sweep_ratchet(src: String) -> void:
 	# a Divine Plea can reach — and both are written the way every other walk in
 	# the file is, which is the property this count exists to hold: the number is
 	# a census of a consistent idiom, not a budget.
-	ok(filtered == 25,
-		"the `is_companion`-over-`heroes` population is %d, not the 25 after FK" % filtered)
+	# **BATCH GN MOVED IT 25 -> 26.** The bot's class-kit branch
+	# (`_bot_class_kit_pick`) walks `heroes` with the filter, written the way the
+	# drafted hook two functions above it is — the same correct no-op, and the
+	# count is a census of the idiom, as FK's two were.
+	ok(filtered == 26,
+		"the `is_companion`-over-`heroes` population is %d, not the 26 after GN" % filtered)
 	# **AND DK ASKED THE QUESTION THIS COUNT EXISTS FOR, AND THE ANSWER WAS
 	# NONE.** DK widened four ally-worded read sites to `_hero_side()`, which
 	# genuinely does hold companions — so a filter sitting on one of them would

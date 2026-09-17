@@ -284,8 +284,10 @@ func _s2_bound_cards() -> void:
 		var m_held := {"key": ck2, "spec": spec2,
 			"engines": Runes.engine_pouch_for_spec(String(spec2)), "bm_abilities": []}
 		var m_drop := {"key": ck2, "spec": spec2, "engines": [], "bm_abilities": []}
+		# BATCH GN — the opening is the lineage's count and the class kit's.
 		ok(run.ability_slots_used(m_held) == run.ability_slots_used(m_drop)
-				and run.ability_slots_used(m_drop) == Classes.lineage_slots(String(spec2)),
+				and run.ability_slots_used(m_drop) == Classes.lineage_slots(String(spec2))
+					+ Classes.kit_slots(ck2, String(spec2)),
 			"§2: %s's slot count is %d with the engine and without (the ruling freed no slot)"
 				% [spec2, run.ability_slots_used(m_drop)])
 

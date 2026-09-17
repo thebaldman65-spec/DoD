@@ -13,38 +13,90 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-16 (Batch GM).*
+*Last rewritten: 2026-09-17 (Batch GN).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GM — HOLD BREATH, AND CARDS THAT OUTLIVE THEIR ENGINE. IMPLEMENT ONLY, AND THE NINETEENTH BATCH ON
-  `class-merge`.** `main` is untouched. Full working: **`docs/reports/GM.md`**.
-- **REPAIRED, AND ALL FOUR DRIVEN LIVE EVERY BATTERY BY `check_gm` (NEW):**
-  - **Hold Breath is spent where it pays.** Its countdown left the Lethal Aim block, so the first damaging attack
-    spends the breath whichever engines the hero holds — and a Lethal Aim holder's area casts, Called Volley and
-    Drumfire, which the block left out, spend it too.
-  - **An engine's bound cards leave with it — RULED BY THE DESIGNER, BUILT.** Death Ray, Resurrection and Kill
-    Command are named in `Classes.ENGINE_BOUND`, and `Classes.opening_kit` takes them out with the enablers and puts
-    them back when the engine is slotted.
-  - **The Split Shield works in a fight.** Shieldwall's cast reads `_recast_writes`, and with the rune it names
-    another hero: half the wall is his and half is that hero's. `check_ez` §5 casts the card now.
-  - **Dispel leaves the heroes' work.** Hunter's Mark, Arcane Echo and Rime joined `battle.DISPEL_NEVER`, on the card
-    text's authority.
-- **THE SWEEP FOR §1's SHAPE FOUND ONE — HOLD BREATH** — over every status id with a spend site and every
-  charge-like unit field (`docs/reports/GM.md` §1).
-- **WHAT MOVED:** `scripts/battle.gd`, `scripts/classes.gd`, `check_gm.gd` (**NEW**), `check_ez.gd`, `check_el.gd`,
-  `check_di.gd`, `run_battery.sh`, `baselines.json`, `pin-manifest.json`, `CLAUDE.md` (four rules), `docs/instrument-rules.md` (one
-  bullet), `docs/master.html` (six rows and the stamp), `docs/changelog.html`, `docs/design-notes.md`, this file, and
-  `docs/reports/GM.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GM.md`**, written after the acceptance run.
+- **Last batch: GN — THE FOUR CLASS KITS. IMPLEMENT ONLY, AND THE TWENTIETH BATCH ON `class-merge`.** `main` is
+  untouched. Full working: **`docs/reports/GN.md`**.
+- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_gn` (NEW):**
+  - **Every class opens with three guaranteed abilities after its basic attack**, whatever engine its hero takes, holds
+    or drops, and they count against the slot cap. The Warrior: Crushing Blow, Bloodlust, Mocking Blow. The Mage:
+    Magic Burst (new), Nexus Ward (Magic Barrier, renamed), Magic Missiles. The Cleric: Ministration, Unburden,
+    Consecration — **no damage card, by ruling**. The Hunter: Powershot, Snare Trap, Tripwire. `Classes.CLASS_KITS`
+    names them, `Classes.opening_kit` adds them, and a card the lineage already opens with is held once and counted
+    once (the Berserker, the Warden, the Sharpshooter and the Survivalist each share one or two).
+  - **Elemental Weakness is back**, laid by Magic Burst: every school but physical has its resistance cut by 15 points
+    for 3 turns, read in the strike loop. The glossary entry returned with it.
+  - **The bot has a class branch** (`battle._bot_class_kit_pick`); a live autoplay stretch casts all twelve.
+- **WHAT THE PICKS COST:** the Mage class pool is five and the Cleric's three (the Warrior's and the Hunter's six), so
+  the draft is 149 of 149. A hero opens at 3 to 6 of his 7 slots — a spine-taker at 3, an Arcanist at 6
+  (`docs/reports/GN.md` §3).
+- **FOUR KIT CARDS WERE REWORDED TO THE TEXT STANDARD**, as the brief ordered for a kit card: Nexus Ward, Tripwire,
+  Consecration and Powershot. No number moved.
+- **WHAT MOVED:** `scripts/classes.gd`, `scripts/battle.gd`, `scripts/run_state.gd`, `data/glossary.json`,
+  `check_gn.gd` (**NEW**), twenty-eight instruments (`docs/reports/GN.md` §6), `run_battery.sh`, `baselines.json`,
+  `pin-manifest.json`, `CLAUDE.md` (one rule, and the sentences the kit made false), `docs/master.html` (the kit
+  table, the pools, the census figure and the stamp), `docs/changelog.html`, `docs/design-notes.md`, this file, and
+  `docs/reports/GN.md` (**NEW**). **`data/runes.json` needed nothing** — no rune names or reads a moved card.
+- **VERIFICATION:** in **`docs/reports/GN.md`**, written after the acceptance run. **`check_gj` §4 is red on purpose,
+  and the red is right** — FOUND AT GN below.
 - **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are done
-  — step 3 without its nine engines. **The class kit is ruled and recon'd; the designer picks the three. The Crown's
-  Break and freeze resistance is the batch after the kits.** Step 4 of the running order is the pool merge.
-- **Next letter: GN.**
+  — step 3 without its nine engines, and **with the class kits built at GN**. **The Crown's Break and freeze
+  resistance is the batch after the kits.** Step 4 of the running order is the pool merge.
+- **Next letter: GO.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GN's RULINGS OWED — **EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GN.md`, NEEDS A RULING.
+
+1. **MAGIC BURST'S UNRULED NUMBERS.** The ruling gave 40% of Attack in arcane and Elemental Weakness. Proposed, and
+   live until ruled: **25 Mana, cooldown 2, initiative 3.0, 15 Break damage, a 46% Perfect (the generic x1.15), tagged
+   DEBUFF and BREAK**, and its card text.
+2. **ELEMENTAL WEAKNESS IS A RESISTANCE CUT, NOT A MULTIPLIER.** The ruling said *+15% damage taken*; the retired
+   status cut resistance, and that mechanism was taken at the ruled 15 points. **They agree where an enemy resists
+   nothing** (x1.148–x1.150 measured, rounding) **and part where it does**: x1.212 at +30% resistance, x1.124 at
+   −20%. Which is meant is the designer's.
+3. **ITS COVERAGE IS THE STRIKE LOOP'S ALONE**, as Exposed's is. Seventeen other non-physical reads do not see it —
+   the poison and burn ticks, Arcane Arrows' splash, Arcane Echo's repeat, the Ruin detonation, Cinderfall, Winter's
+   Toll, Killing Frost, Pyre Wake, Requiem, Cull, Harvest, Wildfire, Reprisal, Suffering, a sprung trap and a shadow
+   payout in the damage door — and Unmaking's zeroed resistance ignores it.
+4. **THE FOUR REWORDINGS** — Nexus Ward *"20% of the Mage's maximum health"*, Tripwire *"another ally"*, Consecration
+   *"the ground underfoot"*, Powershot *"allies break them"* — are the batch's words, for confirmation.
+5. **NEXUS WARD CONTAINS THE `Ward` STATUS LABEL.** The BR §1 sweep over 1,309 names: Nexus Ward — 0 exact, 2
+   contained (the `ward` status id and its `Ward` label), 3 sharing a word (the Ironbark Ward relic and the retired
+   Triage Ward rune, id and name). Magic Burst — 0 exact, 0 contained, 2 sharing a word (Magic Bolt, Magic Missiles).
+   A label collision ships and is flagged; renaming is one string.
+6. **THE CLERIC'S CLASS POOL IS THREE** — Chastise, Exhortation and Undying Vigil are the whole draft of a Cleric who
+   took Sanctity, and an Occultist can no longer stack five cards on any tag but DEBUFF (`check_fn` §4 reads two).
+7. **A KIT OF CLASS-WIDE CARDS HANDS THE BASELINE ROLE TO CARDS AUTHORED WEAKER** (GL's item 3): the Mage's two and
+   all three of the Cleric's were authored as draft fallbacks.
+8. **CRUSHING BLOW IS ON EVERY WARRIOR NOW, AND THE ORC CHIEF'S ABILITY SHARES ITS NAME** (`docs/text-audit.html`
+   §CK, a designer question since CK). Its dormant Elemental Weakness rider (`elem_weak_ranks`, no writer) stays
+   dormant.
+
+### FOUND AT GN AND NOT FIXED
+
+- **PLAYER-FACING: THE VICTORY CARD LEAVES OUT THE TOLLKEEPER'S BELL.** Both victory cards print
+  `Run.award_gold`'s figure, and the Bell's +20 is paid beside it (`battle.gd`, the `victory_gold` hook), so the card
+  says 20 less than the purse gained. **`check_gj` §4 is red because of it**: GN's code moved what the gate's seeded
+  run draws, and that run now holds the Bell (card +178, purse +198). **HEAD's code with the Bell forced reds the same
+  arm** (card +157, purse +177). One expression in `battle.gd`; not in the brief. The red is sanctioned in
+  `baselines.json` until it is fixed.
+- **TRIPWIRE ANSWERS A BLOW ON A COMPANION.** The brief said *a hero*; the block reads any hero-side body, and a
+  Beastmaster holds Tripwire since GN — measured, a melee blow on his bear is answered for 75%. The card's *ally* is
+  the code's.
+- **MANA SHIELD IS STILL NEVER CAST BY THE BOT** (GM's item below); the class branch covers the kit cards only.
+- **THE WARRIOR'S OTHER ENGINE-ONLY BOT CASTS STAY** — Wildstrikes, Shieldwall and Guard Change are not kit cards.
+- **`check_fh` §3's cache can deal an ENGINE rune**, which takes an engine slot rather than the pouch; the gate counted
+  the pouch alone and read "no rune arrived" on GN's seed (repaired to count both).
+- **THREE CONTROL COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GN new", "Dawn of Decay
+  GN head" and "Dawn of Decay GN ctl". Each was renamed so its `user://` could not reach the player's saves. They can
+  be deleted.
 
 ### GM's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE**
 
@@ -93,32 +145,26 @@ Full working: `docs/reports/GM.md`, NEEDS A RULING.
 - **THE SIM BOT'S DRAFT WRAPPER CANNOT SEE MANA SHIELD.** It casts a card only if `Classes.draft_ability` resolves it,
   and Mana Shield — a vault card re-homed into the Mage's class pool at DY — does not.
 
-### THE CLASS KIT — **RULED, NOT BUILT; RECON'D AT GL (`docs/kit-recon.html`); THE PICK IS THE DESIGNER'S**
+### ~~THE CLASS KIT~~ — **BUILT AT GN; RECON'D AT GL (`docs/kit-recon.html`); WHAT THE RECON LEFT OPEN**
 
-Full working: `docs/reports/GL.md`, NEEDS A RULING.
+Full working: `docs/reports/GL.md` and `docs/reports/GN.md`.
 
-1. **WHICH THREE, FOR EACH CLASS.** The recon puts every candidate to one test — works for every hero of the class,
-   with any engine or none — and prints what each passing card could guarantee. **What no passing card guarantees:**
-   - the Warrior — a heal, a shield or a cleanse for another hero (Mocking Blow's taunt is his only guard for others);
-   - the Mage — anything for another hero but Dispel's cleanse;
-   - the Cleric — a revive (Resurrection costs Mercy), a taunt or avoidance card, a tempo or resource card;
-   - the Hunter — a heal, a shield or a cleanse for another hero, and a tempo or resource card.
-2. **WHERE A PICK COMES FROM, BECAUSE IT MOVES SOMETHING EITHER WAY.** A class-wide card taken into a kit leaves every
-   hero's class draw, and a spine-taker draws his whole run from that pool (`run_state.gd` `draft_pool_left`,
-   `roll_class_fallback_offer`): six cards, the Mage's seven, three once three leave. A lineage core taken into a kit is
-   already in its lineage's opening kit until the pool merge.
+1. **~~WHICH THREE, FOR EACH CLASS~~ — PICKED WITH THE DESIGNER AND BUILT AT GN** (the WHERE block above). What the
+   recon said no passing card guarantees still stands of the twelve: the Warrior guards the others only with Mocking
+   Blow's taunt, and the Hunter kit carries no heal, shield or cleanse for another hero.
+2. **~~WHERE A PICK COMES FROM~~ — MEASURED AT GN.** The five class-wide picks left their pools: the Mage's reads five
+   and the Cleric's three. The six cores are still in their lineages' opening kits, held once.
 3. **THE CLASS-WIDE CARDS WERE AUTHORED WEAKER THAN SPEC CARDS** (`classes.gd`'s pool header), and EB §1 ruled the
-   protected core is the baseline — a kit of class-wide cards hands the baseline role to the fallback cards.
-4. **SALVAGE THAT IS AUTHORING, NOT A CUT:** Hymn of Hope and Resurrection are priced only in Mercy, so either needs a
-   new price; Arcane Cannon's Break is five a Resonance stack, so without the engine it has none; Hold Breath needs a
-   line of code moved as well as a word cut (below).
-5. **TWO VERDICTS HAVE TWO READINGS**, recorded rather than resolved in the designer's direction: Ministration (Mercy's
-   +5% healing a stack multiplies it) and Divine Shield (a hidden `divine` rider only Faith reads) read CLEAN as the
-   engine's payout and a feed; a stricter reading makes both ALMOST and leaves the Cleric eight clean.
-6. **THE BOT NEVER CASTS THREE OF THE 64** — Powershot, Tripwire and Mana Shield — so a sim figure about a kit that
-   holds one measures a hero who never uses it (GM §5).
+   protected core is the baseline — **the Mage's and the Cleric's kits hand that role to fallback cards.** GN's
+   ruling 7.
+4. **~~SALVAGE THAT IS AUTHORING~~ — MOOT:** none of Hymn of Hope, Resurrection, Arcane Cannon or Hold Breath was
+   picked.
+5. **~~TWO VERDICTS HAVE TWO READINGS~~ — MOOT FOR THE KIT:** Ministration was picked and heals 20% of its target's
+   maximum on a Cleric holding no engine (driven, `check_gn` §1). Divine Shield was not picked.
+6. **~~THE BOT NEVER CASTS THREE OF THE 64~~ — TWO CLOSED AT GN:** Powershot and Tripwire are the Hunter kit's and the
+   class branch casts them. **Mana Shield is still never cast** (GM's item above).
 
-### FOUND AT GL AND NOT FIXED — **FOUR CLOSED AT GM: HOLD BREATH, THE DEAD BUTTONS, SPLIT SHIELD AND DISPEL**
+### FOUND AT GL AND NOT FIXED — **FOUR CLOSED AT GM: HOLD BREATH, THE DEAD BUTTONS, SPLIT SHIELD AND DISPEL; THE BOT'S KIT CARDS AT GN**
 
 - **~~PLAYER-FACING, AND AN EXPLOIT: HOLD BREATH NEVER RUNS OUT FOR A HUNTER WITHOUT LETHAL AIM~~ — CLOSED AT GM §1:
   the spend sits under the payout's gate, and `check_gm` §1 drives it with the engine and without.** GL's record: The countdown that
@@ -161,9 +207,11 @@ Full working: `docs/reports/GL.md`, NEEDS A RULING.
   "hold" is the engine's; Divine Shield names "the Devout's" health and Dark Pact "the Occultist"; Hymn of Hope, Dark
   Pact and Resurrection say *ally* and reach heroes only; Renewal and Undying Vigil on a companion do nothing; Kill
   Command's "both companions" names a mode nothing writes (`the_pack`); Arcane Explosion's "Builds 1 Resonance".
-- **THE SIM BOT CASTS SEVERAL CANDIDATES ONLY INSIDE ENGINE BRANCHES** (Bloodlust, Wildstrikes, Mocking Blow,
-  Shieldwall, Guard Change — `battle.gd:4656-4760`). A class kit owes the bot a class-level branch, or a sim never
-  plays the kit. **GM SHARPENED IT:** those five are the only candidates the bot casts solely inside an engine
+- **THE SIM BOT CASTS SEVERAL CANDIDATES ONLY INSIDE ENGINE BRANCHES — THE KIT CARDS CLOSED AT GN:** the class
+  branch (`_bot_class_kit_pick`) casts Bloodlust and Mocking Blow for any Warrior, and Powershot and Tripwire for any
+  Hunter; **Wildstrikes, Shieldwall and Guard Change are not kit cards and stay engine-only.** GL's record: (Bloodlust,
+  Wildstrikes, Mocking Blow, Shieldwall, Guard Change — `battle.gd:4656-4760`). A class kit owes the bot a class-level
+  branch, or a sim never plays the kit. **GM SHARPENED IT:** those five are the only candidates the bot casts solely inside an engine
   branch, all of them the Warrior's — the Mage, Cleric and Hunter branches key on the card, not the engine — and
   **Powershot, Tripwire and Mana Shield are never cast by the bot at all.**
 - **A PARTY DAMAGE BUFF PAYS ON ORDINARY STRIKES ONLY.** Warcry, Exhortation, Blessing of Zeal and Hunter's Mark are
@@ -188,8 +236,8 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
    leave with the engine (ruled) and the breath is spent — **and the rest is GM's ruling 1.**
 6. **Heavy Plating's base is a stat** — the Warden's 0.10 Block stays with the lineage, so another Warrior's plating
    climbs from zero plus its own slice.
-7. **A hero who takes a spine opens with his class's basic attack alone.** **The designer ruled the answer in GL's brief
-   — a class kit of three, RULED, NOT BUILT — and GL recon'd it** (the section above; `docs/kit-recon.html`).
+7. **~~A hero who takes a spine opens with his class's basic attack alone~~ — BUILT AT GN:** he opens with his basic
+   and his class kit of three, four abilities (`check_gn` §3 drives it from class selection into the first battle).
 8. **The Hunter is dealt all three of his three** — no variety in the deal until his six exist.
 9. **No engine rune carries a tag** — `check_ek` exempts the fifteen as a set.
 
@@ -1029,7 +1077,7 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    rulings in that document's §3 come before a node is written.**
 3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK, WITHOUT THE NINE ENGINES THE CHARTER'S SIX A
    CLASS OWES**, which are the designer's.
-   - **AND A CLASS KIT OF THREE, RULED IN GL's BRIEF — RULED, NOT BUILT.** Its recon is `docs/kit-recon.html` (GL); the
+   - **~~AND A CLASS KIT OF THREE, RULED IN GL's BRIEF~~ — BUILT AT GN.** Its recon is `docs/kit-recon.html` (GL); GN's
      brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
 4. **POOL MERGING.**
 5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
@@ -1402,7 +1450,7 @@ deliberately.
   **Thresholds are the default shape and a splash pays for breadth**, both ruled. **The one hard
   constraint on whoever authors the first is measured and printed every battery run**: the protected
   cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on **DEBUFF for
-  FIVE**, so those two magnitudes are already spent; **MARK is zero for all twelve and TEMPO reaches
+  SEVEN** (the class kits count, since GN), so those two magnitudes are already spent; **MARK is zero for all twelve and TEMPO reaches
   1 on exactly one**, so those two are the ones a draft can actually move. **And the place a rune
   reads it in a fight is the SPAWN, not the strike loop** — the loadout cannot change during a
   battle. `CLAUDE.md` carries all of that as a standing rule.
@@ -1435,8 +1483,9 @@ and every authored rune, and the draft card shows it.
   surface may not BRANCH on one is asserted directly over `TAG_ORDER` rather than by proxy.
 - **AND THE FIRST THING THE MACHINERY MEASURED IS THE CONSTRAINT ON EVERY FUTURE THRESHOLD RUNE.**
   The protected cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on
-  **DEBUFF for FIVE** (corrected at FR §2 — it read *seven* here, in `CLAUDE.md` and in
-  `master.html`, and **seven is the OFFENSE column**), while **MARK is zero for all twelve** and
+  **DEBUFF for SEVEN** — five until GN, whose class kits put Crushing Blow and Mocking Blow on every
+  Swordmaster and Snare Trap on every Beastmaster (FR §2 had corrected an earlier *seven* here that
+  was the OFFENSE column), while **MARK is zero for all twelve** and
   **TEMPO reaches 1 on exactly one**.
   `check_es` §4 prints the per-spec table every battery run rather than this
   file carrying a second copy of it.
@@ -2584,9 +2633,10 @@ re-derived from the source at DM; not one was moved.**
   losing theirs. SALVE kept its by joining `HEAL_SPECIALS` — its heal rides a status it applies,
   which is RENEWAL's shape. **`Ability.takes_delay_cap()` is the one function that
   unions them** and `Ability.make()` applies the clamp.
-- **THE ABILITY CORPUS IS 227 AND DY DID NOT MOVE IT — THAT WAS §0's WHOLE POINT.** Seven names
-  reached it through `class_pool()` and no other route; re-homing them before deleting the container
-  is why it reads 227 on both sides. **`Classes.vault_ability()` HOLDS TEN DEFINITIONS** and every
+- **THE ABILITY CORPUS IS 228 — GN'S MAGIC BURST IS THE ONE CARD ADDED.** `ability_corpus()` walks
+  `Classes.class_kit` beside the class pools, and the five cards that moved into the kits are reached
+  there. **DY did not move it** — seven names reached it through `class_pool()` and no other route;
+  re-homing them before deleting the container is why it read 227 on both sides of DY. **`Classes.vault_ability()` HOLDS TEN DEFINITIONS** and every
   one of them is now named by a live pool.
 - **AND THE TWO WALKS DELIBERATELY DO NOT AGREE.** DR moved it
   net +1 (one card retired, two authored), **DS moved it +6, and DU §4 moved it +4 WITHOUT
@@ -2601,8 +2651,9 @@ re-derived from the source at DM; not one was moved.**
   of those and `Classes.talent_granted_names()` is EMPTY.**
   **`check_cz` §0 ASSERTS A SET IDENTITY NOW RATHER THAN AN EQUALITY, WHICH IS NOT A LOOSENING**:
   the names the complete walk reaches and the CL walk cannot must be **exactly** the overridden
-  basics, **derived off `apply_kit_overrides` itself** so a fifth override is covered by doing
-  nothing. **The control's job is intact** — an ability falling outside every kit and pool would be
+  basics and the class-kit cards no pool or lineage holds (six since GN), **derived off
+  `apply_kit_overrides` and `CLASS_KITS` themselves** so a fifth override or a new kit card is
+  covered by doing nothing. **The control's job is intact** — an ability falling outside every kit and pool would be
   in NEITHER walk and cannot hide inside the difference. **`check_da` §3 asserts that no gate
   hand-rolls the walk**, with `check_cz`'s `_cl_only_corpus` named as the one deliberate exemption
   (its REASON string has now been corrected twice, at DO and at DU, for the same reason both times:
@@ -2634,26 +2685,32 @@ re-derived from the source at DM; not one was moved.**
   else** — not Fervor, not Apostle. **ALL NINE PLACES THAT SPEAK EITHER MAGNITUDE NOW AGREE**, as
   of DG §1: the two cards, the `passive_desc`, the `faith` chip, the glossary, two `master.html`
   sites and two source comments.
-- **The ability draft is COMPLETE at 154 of 154** — `SPEC_DRAFT_POOLS` is **129** and
-  `CLASS_DRAFT_POOLS` is **25**, counted out of `classes.gd`. **NEITHER HALF IS A FLAT MULTIPLE ANY
+- **The ability draft is COMPLETE at 149 of 149** — `SPEC_DRAFT_POOLS` is **129** and
+  `CLASS_DRAFT_POOLS` is **20**, counted out of `classes.gd` (**154 and 25 until GN moved five
+  class-wide cards into the class kits**). **NEITHER HALF IS A FLAT MULTIPLE ANY
   MORE.** DO's twenty-two took nine spec pools past eight, DR moved two of those nine (Swordmaster to
   TWELVE, Cryomancer down to ELEVEN), DS took the last three at eight to TEN, and **DY took the
   Warden to TEN, the Arcanist to TWELVE and the Devout to ELEVEN**. **THE SHALLOWEST SPEC POOL IN THE
   GAME IS TEN NOW** — the Warden's nine was the floor from DS to DY.
-  **AND THE CLASS HALF STOPPED BEING 4 × 6 AT DY: the MAGE pool draws SEVEN and the other three draw
-  six**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
+  **AND THE CLASS HALF STOPPED BEING 4 × 6 AT DY, AND GN THINNED IT: the Warrior and Hunter pools draw
+  six, the MAGE's FIVE and the CLERIC's THREE**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
   `SPEC_TARGET` has been since DO. **Do not write `12 * 8` or `4 * 6` again.**
-  The asserted FLOORS are **8** (spec) and **6** (class); they stay
+  The asserted FLOORS are **8** (spec) and **3** (class — six until GN); they stay
   there because they catch a pool that EMPTIES rather than tracking the deepening.
   **The one authoritative tables are `test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`; every
   other suite asserts a FLOOR and the TOTAL.**
 - **Ability slots are a LADDER: `ABILITY_SLOTS_BY_BOSS` = [7, 8, 9, 10]**, one rung per zone boss
-  cleared, read through `Run.ability_slot_cap()` and never off a constant. Twelve protected cores,
-  unchanged. **`core_slots` AND `protected_names().size()` DISAGREE ON ALL TWELVE SPECS AND THAT IS
-  BY CONSTRUCTION** — one is a SLOT count and the other a NAME count. `core_slots` is 3 for eleven
-  and 4 for Holy; `protected_names` returns 4 for ten, **5 for Holy and 6 for the Beastmaster**
-  (three summons are one bar entry). **The cap has always used `core_slots` and still does.**
-  Draftable goes 4 → 7 for eleven specs and **3 → 6 for Holy**.
+  cleared, read through `Run.ability_slot_cap()` and never off a constant. **A hero's opening is
+  `Classes.lineage_slots(spec)` (GK: the lineage's slots less its engine's enablers) plus
+  `Classes.kit_slots(class, spec)` (GN: the class kit less what the lineage already counts)**, and
+  `Run.ability_slots_used` adds the carried half. **At the first rung a hero opens at:** Berserker 5,
+  Warden 4, Swordmaster 5, Pyromancer 5, Cryomancer 5, Arcanist 6, Holy 5, Devout 4, Occultist 5,
+  Beastmaster 5, Sharpshooter 5, Survivalist 4, and a spine-taker 3 — so a Survivalist or a spine-taker
+  has three or four slots to draft into and an Arcanist one. **`protected_names` is a NAME count and
+  counts the kit too** (five to nine a spec); `core_slots` is the lineage's SLOT count before its
+  enablers come out, and `lineage_slots` is built from it. **`check_ea` §1 still prices a hero's
+  earnable slots as `cap - core_slots`**, which no opening has read since GK — its floors are
+  conservative, and its verdict holds.
 - **The pouch: 4 → 5 → 6 slots by zone** (`ITEM_SLOTS_BY_ZONE`), a slot holding one item TYPE and
   its whole stack. **Default per-type stack cap `ITEM_CAP` = 6**, with three exceptions
   (`ITEM_STACK_CAPS`): Cleansing Draught **4**, Cursed Visage **2**, Resonating Hourglass **2**.
@@ -3183,7 +3240,11 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### THE REST
 
-- **`check_cm_live` reports 4 failures. THIS IS THE ONE RED THAT IS ON PURPOSE.** Identical on
+- **`check_gj` reports 1 failure SINCE GN, AND IT IS ON PURPOSE: THE ARM IS RIGHT AND THE GAME IS WRONG.** §4 asserts
+  the victory card's gold is the gold that arrived, and the card leaves out the Tollkeeper's Bell (FOUND AT GN, above);
+  GN's code moved the gate's seeded run onto the Bell. HEAD's code with the Bell forced reds the same arm. It goes back
+  to zero the batch that fixes the card, and its row in `baselines.json` says so.
+- **`check_cm_live` reports 4 failures. THIS IS THE OLDER OF THE TWO REDS THAT ARE ON PURPOSE.** Identical on
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
   before and after the gate consolidation; DC through DR confirm them again.** It is the only thing
   that presses the defensive bar.
@@ -3282,8 +3343,8 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**GM's verification is in `docs/reports/GM.md`, written after the acceptance run.** GM moved game code in two files,
-so the repairs were driven live — in scratch probes on isolated copies of HEAD and of the new code, and by
-`check_gm` in the battery — and HEAD's unmodified gates and suites were run against the new code before any
-instrument moved. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
+**GN's verification is in `docs/reports/GN.md`, written after the acceptance run.** GN moved game code in three
+files and the glossary, so the twelve kit cards, Elemental Weakness, the spine-taker's first battle and the bot were
+driven live — in scratch probes on isolated copies of HEAD and of the new code, and by `check_gn` in the battery —
+and HEAD's unmodified gates and suites were run against the new code before any instrument moved. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
 cell written behind the run would owe a post-run proof of its own.

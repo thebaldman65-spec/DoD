@@ -185,14 +185,18 @@ func _pools() -> void:
 	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
 	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
 	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
-	ok(total >= 24,
-		"§0: the class-wide pool has FALLEN to %d, below the twenty-four that shipped" % total)
+	# BATCH GN — TWENTY: five class-wide cards moved into the class kits, by ruling.
+	ok(total >= 20,
+		"§0: the class-wide pool has FALLEN to %d, below the twenty GN left it at" % total)
 	# EVERY class pool holds six — the seam is closed, and this is the assertion
 	# that keeps it closed. BQ's own suite recorded the debt as an assertion so
 	# it stayed visible; this is the same discipline pointed the other way.
+	# BATCH GN — THE FLOOR IS THREE: the Mage pool reads five and the Cleric's
+	# three since five cards moved into the class kits. It still catches a pool
+	# that EMPTIES.
 	for cls2 in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls2).size() >= 6,
-			"§0: the %s class pool has FALLEN below six (%d)" % [
+		ok(Classes.class_draft_pool(cls2).size() >= 3,
+			"§0: the %s class pool has FALLEN below three (%d)" % [
 				cls2, Classes.class_draft_pool(cls2).size()])
 	for cls3 in TRANCHE_4:
 		var live: Array = Classes.class_draft_pool(cls3)

@@ -136,7 +136,10 @@ func _s1_ladder_live() -> void:
 		var spec := String(m["spec"])
 		# BATCH GK — a lineage counts `lineage_slots`: its engine's enablers sit
 		# outside the slot count (the charter).
-		var want: int = run.ability_slot_cap() - Classes.lineage_slots(spec)
+		# BATCH GN — and the class kit's three count too, less any the lineage
+		# already names, so "seated at the cap" is measured off the live opening.
+		var want: int = run.ability_slot_cap() - Classes.lineage_slots(spec) \
+			- Classes.kit_slots(String(m["key"]), spec)
 		m["bm_abilities"] = []
 		m.erase("bm_equipped")
 		for n in Classes.spec_draft_pool(spec).slice(0, want):
@@ -214,7 +217,10 @@ func _s2_pool_and_loadout() -> void:
 		"§2: a member with no `bm_equipped` carries its whole pool")
 	ok(run.benched_ability_names(m).is_empty(),
 		"§2: ...and has nothing benched")
-	ok(int(run.ability_slots_used(m)) == Classes.lineage_slots("swordmaster") + 2,
+	# BATCH GN — the core is the lineage's count and the class kit's.
+	var core: int = Classes.lineage_slots("swordmaster") \
+		+ Classes.kit_slots("warrior", "swordmaster")
+	ok(int(run.ability_slots_used(m)) == core + 2,
 		"§2: ...and the cap counts the core plus the loadout")
 
 	# A BENCH KEEPS THE CARD, WRITES NO LEDGER, AND IS REVERSIBLE.
@@ -227,7 +233,7 @@ func _s2_pool_and_loadout() -> void:
 		"§2: ...and the bench names it")
 	ok(run.draft_refused(m).is_empty(),
 		"§2: a BENCH does not write the no-return ledger")
-	ok(int(run.ability_slots_used(m)) == Classes.lineage_slots("swordmaster") + 1,
+	ok(int(run.ability_slots_used(m)) == core + 1,
 		"§2: ...and it frees its slot")
 	ok(run.equip_earned_ability(m, "Shatterpoint"), "§2: and it carries again")
 	ok(run.equipped_ability_names(m).has("Shatterpoint"), "§2: ...for nothing")

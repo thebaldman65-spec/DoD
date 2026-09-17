@@ -217,9 +217,12 @@ func _pools() -> void:
 		% draft_total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.
+	# BATCH GN — THE FLOOR IS THREE, BY RULING: five class-wide cards moved into
+	# the class kits, so the Mage pool reads five and the Cleric's three. It
+	# still catches a pool that EMPTIES, which is all this floor ever asked.
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() >= 6,
-			"%s's class pool has FALLEN below SIX" % cls)
+		ok(Classes.class_draft_pool(cls).size() >= 3,
+			"%s's class pool has FALLEN below THREE" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
@@ -1217,7 +1220,9 @@ func _docs() -> void:
 	# pools decide: a later batch that authors a card moves it, and this arm says
 	# so. The table's own 127 is deliberately NOT pinned here — it is a fact about
 	# how much of the draft §6b catalogues, and check_cb has never asserted that.
-	ok(master.contains("hundred and fifty-four"),
+	# BATCH GN MOVED IT AGAIN, FOR THE SAME REASON: five class-wide cards went
+	# into the class kits, so the draft reads a hundred and forty-nine.
+	ok(master.contains("hundred and forty-nine"),
 		"master.html states the draft count in words")
 	ok(master.contains("All twelve specs draft from at least ten"),
 		"master.html records the FLOOR, which DS and DY moved to ten")

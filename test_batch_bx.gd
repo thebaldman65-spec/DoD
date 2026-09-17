@@ -361,7 +361,9 @@ func _cap_and_drop() -> void:
 	# refusal setup (write it relative to the live pool, never to a count).
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
 	# BATCH GK — the lineage's count, Guard Change outside it (the charter).
-	var core: int = Classes.lineage_slots("swordmaster")
+	# BATCH GN — and the class kit's three, none of them his lineage's.
+	var core: int = Classes.lineage_slots("swordmaster") \
+		+ Classes.kit_slots("warrior", "swordmaster")
 	var need: int = run.ability_slot_cap() - core
 	m["bm_abilities"] = pool.slice(0, need)
 	ok(run.ability_slots_used(m) == run.ability_slot_cap(),
@@ -596,8 +598,11 @@ func _live_one_action() -> void:
 	var run2 := _party(["swordmaster", "arcanist", "holy", "sharpshooter"])
 	var capped: Dictionary = run2.party[0]
 	var pool: Array = Classes.spec_draft_pool("swordmaster")
+	# BATCH GN — and the class kit's three, none of them his lineage's, so the
+	# fill is what fits beside the live opening.
 	capped["bm_abilities"] = pool.slice(0,
-		run2.ability_slot_cap() - Classes.lineage_slots("swordmaster"))
+		run2.ability_slot_cap() - Classes.lineage_slots("swordmaster")
+			- Classes.kit_slots("warrior", "swordmaster"))
 	ok(run2.ability_slots_full(capped), "§2: hero 0 is seated at the cap")
 	for m in run2.party:
 		run2.award_draft_pick(m)

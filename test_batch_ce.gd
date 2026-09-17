@@ -257,9 +257,12 @@ func _pools() -> void:
 	ok(total >= 125, "...and the spec half has fallen below the 125 that shipped")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
+	# BATCH GN — THE FLOOR IS THREE, BY RULING: five class-wide cards moved into
+	# the class kits, so the Mage pool reads five and the Cleric's three. It
+	# still catches a pool that EMPTIES, which is all this floor ever asked.
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() >= 6,
-			"%s's class pool has FALLEN below SIX" % cls)
+		ok(Classes.class_draft_pool(cls).size() >= 3,
+			"%s's class pool has FALLEN below THREE" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])

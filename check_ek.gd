@@ -375,9 +375,15 @@ const TAG_DOOR := "loadout_condition_met"
 # **AND THIS ARM CAUGHT IT RATHER THAN THE BATCH PREDICTING IT**, which is the
 # same sentence the five notes above carry: the pre-pass that would have found
 # it has to run EVERY gate, and a chosen subset is what keeps missing this one.
+# **BATCH GN ADDED THE TWELFTH, AND IT IS THE SEVENTH BATCH RUNNING TO LEARN
+# THAT A NEW GATE JOINS THIS LIST BY EXISTING.** `check_gn.gd` §0 asserts that
+# Magic Burst and Nexus Ward — the kit's new card and its renamed one — each
+# carry a `CARD_TAGS` row. **It changes no behaviour and it is not exempted; it
+# is listed.** The pre-pass caught it, because the pre-pass ran every gate.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
-	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_map_screen.gd"]
+	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
+	"check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

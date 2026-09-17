@@ -4322,8 +4322,117 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	var pick := _autoplay_pick_kit(u)
 	if pick.is_empty() or pick[0] != u.abilities[0]:
 		return pick
+	var kit_pick := _bot_class_kit_pick(u)
+	if not kit_pick.is_empty():
+		return kit_pick
 	var drafted := _bot_drafted_pick(u)
 	return drafted if not drafted.is_empty() else pick
+
+
+# ══ BATCH GN §4 — THE CLASS KIT HAS A CLASS-LEVEL BRANCH ══════════════════════
+#
+# **EVERY HERO HOLDS HIS CLASS'S THREE, WHATEVER ENGINE HE HOLDS OR DOES NOT.**
+# The rotation above keys on engines for the Warrior and on card names for the
+# other three, so before GN the bot cast Bloodlust only under Blood Frenzy,
+# Mocking Blow only under Heavy Plating, and Powershot, Tripwire and Magic Burst
+# never; the Mage's and the Cleric's kit cards were cast only as drafted filler.
+# **A kit the bot does not cast makes every sim figure a measurement of a hero
+# who does not use his own kit.**
+#
+# **IT SITS WHERE THE DRAFTED HOOK SITS, ONE STEP ABOVE IT** (BO §5's shape):
+# it is consulted only when the rotation came back with the free basic attack,
+# so no engine rotation is re-weighted, and it comes before the drafted hook
+# because a guaranteed card is the hero's own. The drafted hook skips kit cards,
+# so this is the one place the bot decides them. Each card is cast when it has
+# something to do — the same honesty rule as the drafted refinements.
+func _bot_class_kit_pick(u: BattleUnit) -> Array:
+	var foes := enemies.filter(func(e): return not e.dead)
+	if foes.is_empty():
+		return []
+	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
+	var broken_foes := foes.filter(func(e): return e.broken)
+	var mark: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
+		else _lowest_hp(foes)
+	match u.hero_key:
+		"warrior":
+			var ck_lust := _bot_kit_card(u, "Bloodlust")
+			if ck_lust != null and u.hp < u.max_hp * 0.5:
+				return [ck_lust, mark]
+			# The taunt is his only guard for the others; it goes up whenever
+			# no enemy is already held to him (the Warden rotation's own test).
+			var ck_mock := _bot_kit_card(u, "Mocking Blow")
+			var ck_me := heroes.find(u)
+			if ck_mock != null and not foes.any(func(e): \
+					return e.has_status("mocked") and e.status_power("mocked") == ck_me):
+				return [ck_mock, mark]
+			var ck_crush := _bot_kit_card(u, "Crushing Blow")
+			if ck_crush != null and not mark.has_status("sunder"):
+				return [ck_crush, mark]
+		"mage":
+			var ck_ward := _bot_kit_card(u, "Nexus Ward")
+			if ck_ward != null and not u.has_status("barrier") \
+					and (u.hp < u.max_hp * 0.6 or foes.size() >= 3):
+				return [ck_ward, u]
+			# The weakness pays for three turns, so it wants an enemy that will
+			# still be standing — the healthiest one not already weakened (Arcane
+			# Echo's reason).
+			var ck_burst := _bot_kit_card(u, "Magic Burst")
+			if ck_burst != null:
+				var ck_fresh := foes.filter(func(e): return not e.has_status("elem_weak"))
+				if not ck_fresh.is_empty():
+					var ck_bt: BattleUnit = ck_fresh[0]
+					for ck_e in ck_fresh:
+						if ck_e.hp > ck_bt.hp:
+							ck_bt = ck_e
+					return [ck_burst, ck_bt]
+			var ck_miss := _bot_kit_card(u, "Magic Missiles")
+			if ck_miss != null:
+				return [ck_miss, mark]
+		"cleric":
+			var ck_mend := _bot_kit_card(u, "Ministration")
+			var ck_low := allies.filter(func(h): return h.hp < h.max_hp * 0.5)
+			if ck_mend != null and not ck_low.is_empty():
+				return [ck_mend, _lowest_hp(ck_low)]
+			var ck_lift := _bot_kit_card(u, "Unburden")
+			if ck_lift != null:
+				var ck_afflicted := allies.filter(
+					func(h): return not _cleansable_debuffs(h).is_empty())
+				if not ck_afflicted.is_empty():
+					return [ck_lift, _lowest_hp(ck_afflicted)]
+			var ck_hurt := allies.filter(func(h): return h.hp < h.max_hp * 0.8)
+			var ck_bless := _bot_kit_card(u, "Consecration")
+			if ck_bless != null and ck_hurt.size() >= 2 \
+					and not allies.any(func(h): return h.has_status("consecration")):
+				return [ck_bless, u]
+			if ck_mend != null and not ck_hurt.is_empty():
+				return [ck_mend, _lowest_hp(ck_hurt)]
+		"hunter":
+			# Aimed at the Lethal Aim holder's mark, so a switch never clears his
+			# Focus (AZ §7's rule reaches the kit too).
+			var ck_mark := _focus_mark(u, mark)
+			var ck_wire := _bot_kit_card(u, "Tripwire")
+			if ck_wire != null and not u.has_status("tripwire") \
+					and foes.any(func(e): return not e.is_ranged):
+				return [ck_wire, u]
+			var ck_snare := _bot_kit_card(u, "Snare Trap")
+			if ck_snare != null and not ck_mark.has_status("snared"):
+				return [ck_snare, ck_mark]
+			var ck_power := _bot_kit_card(u, "Powershot")
+			if ck_power != null:
+				return [ck_power, ck_mark]
+	return []
+
+
+# A kit card this hero holds and may cast now, or null. `_ability_usable` is the
+# player's door — cost, cooldown and every gate — so the bot and the button
+# cannot disagree.
+func _bot_kit_card(u: BattleUnit, card_name: String) -> Ability:
+	if not Classes.class_kit_holds(u.hero_key, card_name):
+		return null
+	var ab := _find_ability(u, card_name)
+	if ab == null or not _ability_usable(u, ab):
+		return null
+	return ab
 
 
 # A usable drafted ability and a sane target for it, or [] when there is none.
@@ -4339,6 +4448,10 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 	var mark: BattleUnit = _lowest_hp(foes)
 	for ab in u.abilities:
 		if Classes.draft_ability(ab.display_name) == null:
+			continue
+		# BATCH GN — a class-kit card is the class branch's, above, even where
+		# its one definition still lives among the drafted ones.
+		if Classes.class_kit_holds(u.hero_key, ab.display_name):
 			continue
 		if not _ability_usable(u, ab):
 			continue
@@ -11233,16 +11346,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Blood Debt: the debt is named on %s — every bleedout pays %s %d%% of maximum health%s" % [
 					strike_target.unit_name, attacker.unit_name, bd_pct,
 					" [PERFECT]" if is_perfect else ""], "#e05050")
-			# Crushing Blow (Warden talents): resist shred + BD splash.
+			# Crushing Blow (Warden talents): resist shred + BD splash. The shred
+			# reads a talent field nothing writes since FX, so it is dormant.
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
-				var shred := 20 * attacker.elem_weak_ranks
-				_apply_status(strike_target, "elem_weak", 3, shred, 0, attacker)
-				# The chip carries the talent-scaled number.
-				strike_target.update_status("elem_weak", "-%d%%" % shred,
-					"Elemental Weakness: all non-physical\nresistances reduced by %d%%." % shred,
-					shred)
-				_note_debuff_applied(attacker, "elem_weak")
+				_apply_elem_weak(strike_target, 20 * attacker.elem_weak_ranks,
+					3, attacker)
+			# BATCH GN §2 — MAGIC BURST LAYS ELEMENTAL WEAKNESS after its blow
+			# lands (a miss or a Block has already left this iteration), so its
+			# own hit is not raised and the next non-physical one is.
+			if ab.display_name == "Magic Burst" and not strike_target.dead:
+				_apply_elem_weak(strike_target, ELEM_WEAK_PCT, ELEM_WEAK_TURNS,
+					attacker)
 			if ab.display_name == "Crushing Blow" and attacker.sundering_ranks > 0 \
 					and attacker.is_hero:
 				var splash_bd := int(round(pr * 1.00 * attacker.sundering_ranks))
@@ -13438,6 +13553,44 @@ func _creeping_refresh(target: BattleUnit, applied_id: String) -> void:
 
 # DoT strength snapshots the APPLIER's Attack: Burn 6%, Poison 3% per stack.
 # Accelerant (Pyromancer talent) hardens Burn ticks by +1%/rank.
+# ══ BATCH GN §2 — ELEMENTAL WEAKNESS IS FILLED, NOT CREATED ══════════════════
+#
+# GG retired the glossary entry because nothing could apply the status: its one
+# applier was Crushing Blow's rider, which reads a talent field no node has
+# written since FX. **Magic Burst, the Mage's class-kit card, applies it now**,
+# and the retired machinery is what it fills — the `elem_weak` id, its chip, and
+# its ONE read site in the strike loop, which lowers the target's resistance to
+# every school but physical by the status's power in points.
+#
+# **THE RULING AND THE RETIRED DEFINITION, SIDE BY SIDE.** The ruling is +15%
+# damage taken from every non-physical attack for 3 turns. The retired
+# definition names the same set and a resistance, not a multiplier. TAKEN: the
+# retired mechanism at the ruled 15 and the 3 turns both name. The two agree
+# exactly on a school the target neither resists nor is weak to; either way a
+# weakened blow gains 15% of its size before resistance. `docs/reports/GN.md`
+# §2 carries the difference.
+#
+# **ONE DOOR, TWO APPLIERS.** The dormant rider and Magic Burst both write the
+# status here, so the chip is written once and a weaker write cannot overwrite a
+# stronger one downward (CP §0's clamp: `update_status` ASSIGNS the power).
+const ELEM_WEAK_PCT := 15
+const ELEM_WEAK_TURNS := 3
+
+
+func _apply_elem_weak(target: BattleUnit, pct: int, turns: int,
+		src: BattleUnit) -> void:
+	if target == null or target.dead:
+		return
+	var had: int = target.status_power("elem_weak")
+	_apply_status(target, "elem_weak", turns, pct, 0, src)
+	if pct >= had:
+		# The chip carries the number that stands.
+		target.update_status("elem_weak", "-%d%%" % pct,
+			"Elemental Weakness: all non-physical\nresistances reduced by %d%%." % pct,
+			pct)
+	_note_debuff_applied(src, "elem_weak")
+
+
 func _dot_tick(id: String, applier: BattleUnit) -> int:
 	if applier == null or not DOT_STATUSES.has(id):
 		return 0
@@ -18886,8 +19039,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("parry", -8.0, 0.9)
 			attacker.float_text("BARRIER %d" % mb_power, Color(0.40, 0.85, 0.95))
 			_message("%s raises a ward of raw magic" % attacker.unit_name)
-			_log("%s: Magic Barrier — absorbs %d (%d%% of maximum health) for 3 turns" % [
-				attacker.unit_name, mb_power, int(round(mb_pct * 100))], "#70d878")
+			_log("%s: %s — absorbs %d (%d%% of maximum health) for 3 turns" % [
+				attacker.unit_name, ab.display_name, mb_power,
+				int(round(mb_pct * 100))], "#70d878")
 		"mirror_image":
 			# AXIS: evasion rather than absorption. THE CHARGES LIVE IN THE
 			# STATUS'S POWER (the Interpose precedent) and the status is

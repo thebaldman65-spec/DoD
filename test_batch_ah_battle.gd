@@ -126,8 +126,11 @@ func _test_earned_kit() -> void:
 		"the Berserker's class tree holds the `%s` cell the probe learns, with its id" % cell_id)
 	ok(Talents.granted_name(cell_node.get("payload", {})) == "",
 		"...and it grants nothing — a talent may not (DO's charter)")
+	# BATCH GN — THE EARNED CLASS CARD IS WARCRY, ONE THE WARRIOR CLASS POOL
+	# HOLDS. Crushing Blow has been in no pool since DY deleted `CLASS_POOLS`, and
+	# since GN every Warrior opens holding it, so an "earned" copy asked nothing.
 	var prep := func(run):
-		run.party[0]["bm_abilities"] = ["Battle Shout", "Crushing Blow"]
+		run.party[0]["bm_abilities"] = ["Battle Shout", "Warcry"]
 		run.party[0]["talents"] = {cell_id: 1}
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		["raider", "archer", "raider"], "fight", prep)
@@ -136,7 +139,8 @@ func _test_earned_kit() -> void:
 	if bz != null:
 		var names := _names(bz)
 		ok(names.has("Battle Shout"), "an earned SPEC-pool ability is in the kit")
-		ok(names.has("Crushing Blow"), "an earned CLASS-pool ability is in the kit")
+		ok(names.has("Warcry") and Classes.class_draft_pool("warrior").has("Warcry"),
+			"an earned CLASS-pool ability is in the kit")
 		ok(names.count("Battle Shout") == 1, "and it is not double-granted")
 		# THE ORDERING PROOF, AS DO LEAVES IT. `battle_shout_node` counted which
 		# path ran (0 = earned only, 1 = granted, 2 = upgraded). No node grants,
@@ -157,8 +161,12 @@ func _test_earned_kit() -> void:
 		# The trimmed three are gone unless earned.
 		ok(not names.has("Blood Price"),
 			"a trimmed ability stays out of the kit until it is earned")
-		ok(names.size() == 1 + 3 + 2,
-			"core + 3 spec + 2 earned = %d abilities (got %d)" % [6, names.size()])
+		# BATCH GN — AND THE CLASS KIT JOINS THE BAR: Crushing Blow and Mocking
+		# Blow, with Bloodlust held once because it is his lineage's own.
+		ok(names.size() == 1 + 3 + 2 + 2 and names.count("Bloodlust") == 1
+				and names.has("Crushing Blow") and names.has("Mocking Blow"),
+			"core + 3 spec + 2 class kit + 2 earned = %d abilities, Bloodlust once (got %d)" % [
+				8, names.size()])
 	scene.free()
 
 

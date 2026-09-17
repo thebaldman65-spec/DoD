@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-16 (Batch GM &mdash; Hold Breath, and cards that outlive their engine)</b></p>
+<p align="right"><b>Last updated: 2026-09-17 (Batch GN &mdash; the four class kits)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -497,7 +497,7 @@ itself while it sweeps. <b>No healing or revival ability is ever gated.</b></p>
 <p><b>A RECAST THAT WOULD NOT IMPROVE IS REFUSED.</b> Re-applying a status keeps the BETTER of
 the two on both counts &mdash; the longer duration and the stronger power, never simply the newer
 one. Many powers are read LIVE at the moment of the cast (Vespers is a fifth of the Cleric's own
-maximum health, Magic Barrier a fifth of the Mage's, Divine Shield better than a third of the
+maximum health, Nexus Ward a fifth of the Mage's, Divine Shield better than a third of the
 Devout's), so recasting one while it still stands can produce a <i>smaller</i> number than the one
 already on the board. The smaller number is discarded; the turn, the resource and the cooldown are
 not. <b>So the cast is refused instead:</b> when an ability's whole effect is the status it
@@ -799,8 +799,11 @@ Shieldwall). Its blocks count as Heavy Plating blocks; the chip reads
 rune the wall is halved: +12% for him, and +12% Bulwark Line on the hero he sets it in front
 of.</td></tr>
 <tr><td>High Guard</td><td>Takes 40% less damage for 3 turns, after a parry (nothing in the game applies it at present).</td></tr>
-<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 20%
-(a Crushing Blow rider; nothing in the game applies it at present); the chip shows the reduction ("−20%").</td></tr>
+<tr><td>Elemental Weakness</td><td>For 3 turns the victim's resistance to every school but
+physical is 15% lower, so each of those schools lands harder on it; laid by <b>Magic Burst</b> (the
+Mage's class kit), and the chip shows the reduction ("&minus;15%"). It deepens an attack or an
+ability that strikes the victim; damage over time, a sprung trap, a Ruin detonation and the
+abilities that deal their own separate damage are not deepened.</td></tr>
 <tr><td>Enraged</td><td>+12% damage per stack for 5 turns, stacking &times;3, on dropping
 below half HP (nothing in the game applies it at present);
 the chip shows the live bonus.</td></tr>
@@ -1102,6 +1105,13 @@ halves the meter after the blow it is paid out of, which is the card's cost rath
 escape, and <b>Threshold</b> sets the meter to 15, which from above 15 takes stacks away.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
+<p><b>Every hero opens with his class's basic attack and his CLASS KIT: three abilities every
+hero of the class holds, whatever engine he takes, holds or drops.</b> The kit counts against
+the ability slot cap (&sect;6b) and can never be benched, exactly as a lineage's opening abilities
+cannot. A lineage that already opens with one of the kit's abilities holds it once and counts it
+once: the Berserker's Bloodlust, the Warden's Mocking Blow and Crushing Blow, the Sharpshooter's
+Powershot and the Survivalist's Tripwire and Snare Trap. None of the twelve reads an engine, and
+none sits in a draft or boss pool.</p>
 <ul>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
@@ -1117,6 +1127,23 @@ hands of a Hunter holding <b>Lethal Aim</b> only, this is the multi-press SEQUEN
 other Hunter carries the same card and it resolves at a fixed Good, as every other basic attack
 does.</li>
 </ul>
+<table border="1" cellpadding="4">
+<tr><th>Class</th><th>Class kit</th><th>Cost, initiative, cooldown, target</th><th>What it does</th></tr>
+<tr><td rowspan="3"><b>Warrior</b></td><td><b>Crushing Blow</b></td><td>20 Rage, 3.0, 2cd, one enemy</td><td><b>43% of Attack</b> and <b>20 Break damage</b>; Sunders the target (&minus;35% armor) for 3 turns. Builds 10 Rage (Perfect: +5 bonus BD).</td></tr>
+<tr><td><b>Bloodlust</b></td><td>25 Rage, 3.0, 2cd, one enemy</td><td><b>26% of Attack</b> and <b>18 Break damage</b>; heals <b>30% of his missing health</b>. Builds 10 Rage (Perfect: 45% of missing health).</td></tr>
+<tr><td><b>Mocking Blow</b></td><td>free, 2.0, 1cd, one enemy</td><td><b>27% of Attack</b> and 15 Break damage; the target and one other enemy must attack him for 4 turns. Builds 10 Rage (Perfect: 5 turns).</td></tr>
+<tr><td rowspan="3"><b>Mage</b></td><td><b>Magic Burst</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>40% of Attack</b> as arcane and 15 Break damage, and the target is left with <b>Elemental Weakness</b> for 3 turns: its resistance to every school but physical is 15% lower (&sect;4.6), so a Cleric's holy and a Survivalist's nature land harder on it as surely as the Mage's own arcane. A second burst refreshes the 3 turns (Perfect: 46% of Attack).</td></tr>
+<tr><td><b>Nexus Ward</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>20% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats a share of <i>everything</i> &mdash; area attacks included.</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td></tr>
+<tr><td rowspan="3"><b>Cleric</b></td><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td></tr>
+<tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>20% less damage for 3 turns</b>.</td></tr>
+<tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td></tr>
+<tr><td rowspan="3"><b>Hunter</b></td><td><b>Powershot</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>20% of Attack</b> and <b>20 Break damage</b>, +2% damage for every point of the target's Break meter already full.</td></tr>
+<tr><td><b>Snare Trap</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>The next time that enemy acts it is <b>Stunned for 1 turn</b> and <b>Poisoned for 4</b>. A boss shrugs the Stun off until it is Broken.</td></tr>
+<tr><td><b>Tripwire</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 6 turns every <b>melee</b> enemy that strikes an ally takes <b>75% of the damage it dealt</b>.</td></tr>
+</table>
+<p><b>The Cleric's kit is all healing and mitigation, and carries no damage card.</b> He is a
+support class: he attacks with Smite and drafts damage if he wants it.</p>
 
 <h2>6. Archetypes &amp; Specializations</h2>
 <p>Archetypes are the design north star for every spec's kit. They appear in bold on the class-selection
@@ -1179,7 +1206,8 @@ engine's already has.</li>
 <li><b>The lineage.</b> The rune taken at class selection also decides, for the whole run, the
 hero's name, his stat block, his opening abilities, the draft and boss pools he draws from and the
 spec runes he is offered — all of them the spec's it carried. A hero who takes a class engine has
-no lineage, and opens with his class's basic attack alone.</li>
+no lineage, and opens with his class's basic attack and his class kit (&sect;5.2) &mdash; four
+abilities.</li>
 </ul>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>Engine rune</th><th>Engine</th><th>Travels with it</th></tr>
@@ -1205,9 +1233,10 @@ adds to a Mage's non-physical damage for every 42 Mana spent in a fight; <b>Sanc
 every status a Cleric applies for every 16 statuses landing on or leaving a unit in a fight.</p>
 
 <h3>6a. Ability progression</h3>
-<p>Every hero <b>opens a run with its core attack plus 3 spec abilities</b> — four for the
-Holy Cleric, and five for the Beastmaster, whose three summons share one bar entry (see the
-protected-core table in §6b) — and <b>earns one boss pick from each of the three zone
+<p>Every hero <b>opens a run with its core attack, its class kit's three abilities (&sect;5.2) and
+its lineage's opening abilities</b> — three, four for the Holy Cleric, and five for the
+Beastmaster, whose three summons share one bar entry (see the protected-core table in §6b); a
+lineage ability the class kit already holds is held once — and <b>earns one boss pick from each of the three zone
 bosses</b>. The end boss awards none: the run is over and the pick would be dead value.
 <b>There is a cap and there is a swap step</b>: the cap is a ladder from seven carried
 abilities to ten, one rung per zone boss, and past the cap an incoming card is taken by
@@ -1311,7 +1340,7 @@ the fallback floored at six. <b>Batch EG broke both halves of that arithmetic on
 later</b> — the cap became a ladder to ten, and a benched card is now KEPT, so what a hero
 holds is every card he has ever taken rather than every card he currently carries. The floor
 fell to three, and to two for the Occultist. <b>The chain therefore ends on the hero's
-CLASS-WIDE draft pool</b>, six cards for three of the four classes and seven for the Mage,
+CLASS-WIDE draft pool</b>, six cards for the Warrior and the Hunter, five for the Mage and three for the Cleric,
 offered three at a time and announced exactly like any other award. It is class-locked
 rather than spec-locked, which is the one thing the third tier gives up — and it is not a
 re-opened class DRAW: it reads the live, curated class draft pools of §6b, not the
@@ -1393,20 +1422,21 @@ screen deliberately does NOT do this</b>: it is read in the same breath as a fig
 no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
 <p>This is <b>four times as much drafting</b> as one hero per elite. Every spec drafts from at
-least ten spec cards and six class-wide ones, and a run offers far more cards than a hero can
+least ten spec cards and three class-wide ones, and a run offers far more cards than a hero can
 carry — so the cap is what the draft is about. That is the intended shape: constant, meaningful
 decisions.</p>
 
 <p><b>The slot cap grows on every zone boss, and the protected core.</b> A hero carries
 <b>seven</b> abilities at the start of a run and <b>ten</b> by the end of it — one more slot
 after each of the three zone bosses, announced on the zone-victory screen beside the pouch. Every
-hero keeps a <b>protected core</b>: his basic attack, his lineage's opening abilities, and every
-held engine's enablers (§6.0). Protected abilities <b>can never be benched</b>, so every loadout
+hero keeps a <b>protected core</b>: his basic attack, his class kit (&sect;5.2), his lineage's
+opening abilities, and every held engine's enablers (§6.0). Protected abilities <b>can never be benched</b>, so every loadout
 decision is among <i>earned</i> abilities — which keeps the choice clean and makes the cap unable
 to break an engine. <b>The core counts against the cap and an engine's enablers do not</b>: they
-sit outside the slot count, so a lineage fills <b>3</b> slots at the start (Berserker, Warden,
-Arcanist, Sharpshooter, Survivalist), <b>2</b> (Swordmaster, Pyromancer, Cryomancer, Holy,
-Occultist, Beastmaster) or <b>1</b> (Devout), and a hero with no lineage fills none.</p>
+sit outside the slot count. The class kit fills <b>3</b> slots, and a lineage fills what its own
+opening abilities add beyond the kit: a hero opens at <b>6 of 7</b> (Arcanist), <b>5</b> (Berserker,
+Swordmaster, Pyromancer, Cryomancer, Holy, Occultist, Beastmaster, Sharpshooter), <b>4</b>
+(Warden, Devout, Survivalist) or <b>3</b> (a hero with no lineage).</p>
 <p><b>What a hero HOLDS and what a hero CARRIES are two different things.</b> Every card a hero
 takes is kept for the rest of the run. What the cap limits is how many of them are
 <b>carried</b> into a fight — the rest sit on the bench, and <b>swapping between them costs
@@ -1419,7 +1449,8 @@ point, full or not — a settled kit is a legitimate end state, and being forced
 make a good build worse as the run goes on. <b>A declined ability does not return
 to that run's pool</b>, so an offer can never re-present what was just refused.</p>
 
-<p><b>The twelve protected cores.</b> The "needs" column is each engine's ENABLERS — the minimum
+<p><b>The twelve protected cores.</b> The "slots" column is the lineage's own opening abilities,
+before the class kit's three are added and a shared ability is counted once. The "needs" column is each engine's ENABLERS — the minimum
 it cannot function without, which travel with its rune and sit outside the slot count — and it varies per spec rather than following a rule: Overburn is meaningless
 without a Burn applier and without Detonation to spend it, so the Pyromancer's core is larger
 than the Berserker's, whose Blood Frenzy reads nothing but his own health bar. An empty cell is
@@ -1442,7 +1473,7 @@ not because the passive needs them.</p>
 </table>
 
 <p><b>What the pool draws from.</b> Roughly <b>one card in four is class-wide</b>; the rest are
-spec. Class-wide abilities are deliberately untied and general — Magic Barrier, not Frostbolt —
+spec. Class-wide abilities are deliberately untied and general — Mirror Image, not Frostbolt —
 and the test is whether an ability would read as off-theme for any spec of that class. They are
 <b>weaker than spec abilities, and unconditional</b>: they feed no passive, so at equal power
 they would be a safe default that dilutes every build. Slightly weaker but always-on makes them
@@ -1465,15 +1496,17 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry&#x27;s Mark, Crossfire, Calibrating Shot, Trophy Shot, Reacquire, Fault Line, Drumfire, <b>Dug In</b>, <b>Heads Down</b></td></tr>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b></td></tr>
 <tr><td colspan="2"><b>Class-wide pools</b> — drawn by every spec of the class, at roughly one card in four</td></tr>
-<tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink, <b>Mana Shield</b> (seven — the one class pool that is not six)</td></tr>
-<tr><td><b>Cleric</b> (all three specs)</td><td>Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil</td></tr>
+<tr><td><b>Mage</b> (all three specs)</td><td>Mirror Image, Mana Well, Dispel, Blink, <b>Mana Shield</b> (five)</td></tr>
+<tr><td><b>Cleric</b> (all three specs)</td><td>Chastise, Exhortation, Undying Vigil (three)</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
 <tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> Every class pool holds at least six, so <b>one card in four is
+<p><b>THE DRAFT IS COMPLETE.</b> Every class pool holds at least three, so <b>one card in four is
 class-wide</b> and that seam draws a real entry for <b>every hero in the game</b> — no class
-rolls an empty pool and no offer loses its class card. <b>The draft stands at 154 of 154</b>
-&mdash; <b>129 spec</b> cards plus <b>25 class-wide</b> ones.
+rolls an empty pool and no offer loses its class card. <b>The draft stands at 149 of 149</b>
+&mdash; <b>129 spec</b> cards plus <b>20 class-wide</b> ones. The class kits (&sect;5.2) hold five
+cards that are guaranteed rather than drawn, and a hero with no lineage draws every later card
+from his class pool alone &mdash; three cards for a Cleric.
 <b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
 finished abilities had sat in a class-wide BOSS pool that no run could reach since Batch AN closed
 the class draw: <b>RALLYING SHOUT</b> to the Warden, <b>ARCANE SURGE</b> and <b>REALITY
@@ -1481,7 +1514,7 @@ FRACTURE</b> to the Arcanist, <b>DIVINE WRATH</b> to the Devout, <b>MANA SHIELD<
 class pool, and <b>DAWNBREAK</b> and <b>SANCTUARY</b> to the Holy Cleric's zone-boss pool in §6a,
 which had held one card against three awards. Every one already had its handler, its card text and
 its Perfect; not a line of new mechanics was written for any of them.
-<b>THE CLASS HALF IS NO LONGER A FLAT MULTIPLE</b> — the Mage draws seven, the other three six —
+<b>THE CLASS HALF IS NO LONGER A FLAT MULTIPLE</b> — the Warrior and the Hunter draw six, the Mage five and the Cleric three —
 and <b>the shallowest spec pool in the game is TEN now</b>, where the Warden's nine had been the
 floor.
 <b>BATCH DS CLOSED THE HUNTER CLASS GAP AND IS WHAT TOOK IT PAST 143.</b> Its three specs held
@@ -1530,7 +1563,7 @@ named partner is dead most of the time.</p>
 <tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other ally already below half health</td><td><b>The best coupling in the batch, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the heroes are healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
 </table>
 <p><b>What the nine deliberately do not do.</b> No new abilities (the pools were complete when DH
-wrote them and are complete at 154 now
+wrote them and are complete at 149 now
 and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
 vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
 so no card is dead when its partner is absent), and <b>no magnitude on an existing effect
@@ -1548,16 +1581,16 @@ unchanged — a run has to refuse further
 before an offer starts filling short.</p>
 
 <p><b>What a class-wide ability is, and is not.</b> Deliberately <b>untied and general</b> —
-Magic Barrier, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
+Mirror Image, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
 spec of that class. And <b>weaker than spec abilities, and unconditional</b> — they feed no
-passive (a Barrier does nothing for Overburn, a heal nothing for Ruin), so at equal power they
+passive (an image does nothing for Overburn, a blessing nothing for Ruin), so at equal power they
 would be a safe default that dilutes every build. Slightly weaker but always-on makes them the
 pick you take when your spec's engine is not online yet, which is a different role.</p>
 
-<p><b>The one hundred and twenty-seven drafted abilities catalogued here.</b> Each names the
+<p><b>The one hundred and twenty-two drafted abilities catalogued here.</b> Each names the
 axis it serves, and — from the first Mage nine onward — <b>what it builds with</b>. The one
-hundred and three spec cards come first; the twenty-four class-wide ones close the table.
-<b>The draft itself is one hundred and fifty-four</b> (the pools above): the twenty-seven not
+hundred and three spec cards come first; the nineteen class-wide ones close the table.
+<b>The draft itself is one hundred and forty-nine</b> (the pools above): the twenty-seven not
 listed here are described beside their spec's kit in §6.1&ndash;§6.4, <b>except four &mdash;
 Arcane Surge, Divine Wrath, Mana Shield and Reality Fracture &mdash; which are named in the
 pools and described nowhere.</b> Those four arrived when Batch DY emptied the vault and their
@@ -1688,19 +1721,14 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Thick Hide</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> he takes <b>6% less damage per DIFFERENT affliction standing on whoever is striking him</b>, <b>up to 30%</b>.</td><td>His passive pays him for <b>being struck</b> and Stalking Horse <b>pulls the field onto him</b>, and until now <b>nothing in his kit or pool supported being in the fray</b>. It is the first card that reads Trapper breadth <b>on the way in</b>.<br><b>Builds with:</b> <b>Stalking Horse</b> above everything — that card puts a different affliction on every attacker in turn, which is exactly the number this reads.</td></tr>
 <tr><td><b>Salve</b></td><td>25 Mana, 2.0, 5cd, self</td><td>For <b>3 turns</b> (Perfect: 4) he heals <b>2% of maximum health at the start of his turn per DIFFERENT affliction standing on the enemies</b>, <b>up to 10%</b>. Counted <b>once each across the field</b>, so a copied poison does not pay twice. <b>Nothing is consumed.</b></td><td><b>The first heal in any of the twenty-four Hunter spec cards.</b> The class was shortest of this axis by a distance — its only self-mending was one class card and a boss-pick Harvest.<br><b>Builds with:</b> <b>Harvest</b> as its <b>deliberate inverse</b> — that one burns the whole board for a burst and strips his own Trapper bonus; this drinks and leaves everything standing, so Hunt and Cull keep paying. <b>Choking Smoke</b> and <b>Downwind</b> are what make the board wide enough to drink from.</td></tr>
 <tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
-<tr><td><b>Magic Barrier</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>20% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats a share of <i>everything</i> — area attacks included.</td><td>The floor beneath all three Mage spines. Absorption, where Mirror Image is evasion.</td></tr>
-<tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than the Barrier against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
-<tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td><td>The reliable filler. Multi-hit, so it plays with anything reading hits rather than casts, and cheap enough to cast while saving for something bigger.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than Nexus Ward, the kit's barrier, against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
 <tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry. Until Batch CX the Crown&rsquo;s half could never fire, so in practice there was one source, not two.</td></tr>
 <tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
-<tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power and no baseline: none of the three can simply heal someone on turn one</i></td></tr>
-<tr><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td><td>The plain heal none of them has. Holy's healing is gated behind Mercy, the Devout's behind shields absorbing hits, the Occultist's behind marks on enemies.</td></tr>
-<tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td><td>Sustained rather than burst — the opposite read to Ministration.</td></tr>
+<tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power; the plain heal, the heal for every hero and the cleanse are every Cleric's class kit (&sect;5.2), so these are the rest</i></td></tr>
 <tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 30 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
-<tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>20% less damage for 3 turns</b>.</td><td>Cleanse with a tail. A pure cleanse is dead against a warband that applies nothing; the mitigation means it is never a wasted card.</td></tr>
 <tr><td><b>Exhortation</b></td><td>25 Mana, 1.0, 4cd, every hero</td><td><b>Every hero's next attack deals 35% more damage</b>. <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only offensive group buff a Cleric has.</td></tr>
-<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, whenever that ally is healed <b>by any source</b>, a second ally on lower health is healed for half as much.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other five play.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, whenever that ally is healed <b>by any source</b>, a second ally on lower health is healed for half as much.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with no healing whatsoever and the thinnest defensive kit in the game</i></td></tr>
 <tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only <b>unconditional</b> self-heal a Hunter can get, and <b>Batch DS corrected this sentence rather than leaving it to rot</b>: it read &quot;the only self-heal a Hunter can get&quot; from BR until DS, and that was already false when it was written &mdash; <b>Harvest heals</b>, and it sits in the Survivalist's boss pool and in the Hunter class pool. DS's <b>Salve</b> is a second. <b>The tree half of the claim is true and is kept</b>: nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
 <tr><td><b>Camouflage</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 3 turns enemies are <b>70% less likely to aim at him</b>.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
@@ -1786,7 +1814,7 @@ rune asks.</b> These are ES &sect;4/&sect;5's absolute-count shapes and they are
 first tag-reading rune would come back through.</p>
 <p><b>AND ITS ONE HARD CONSTRAINT IS MEASURED RATHER THAN LEFT TO BE DISCOVERED.</b> Before a
 single card is drafted, the protected cores alone already meet a 2+ threshold on <b>BREAK for ten
-of the twelve specs</b> and on <b>DEBUFF for five</b>; <b>MARK is zero for all twelve</b> and
+of the twelve specs</b> and on <b>DEBUFF for seven</b>; <b>MARK is zero for all twelve</b> and
 <b>TEMPO reaches 1 on exactly one</b>. A rune asking for 2+ BREAK would be on from the first
 fight for almost everyone and no swap could turn it off &mdash; a flat increment arriving through
 the cores instead of through the pool. The per-spec table is printed by <code>check_es</code> on
@@ -1797,6 +1825,7 @@ one.</b> <code>check_fd</code> &sect;2 asserts that no live rune carries a condi
 and names BREAK and OFFENSE &mdash; the two columns the demotion moved &mdash; separately.</p>
 
 <h3>6.1 Warrior</h3>
+<p>Every Warrior holds the class kit &mdash; <b>Crushing Blow, Bloodlust and Mocking Blow</b> (&sect;5.2) &mdash; whatever engine he holds. The Berserker's Bloodlust and the Warden's Mocking Blow and Crushing Blow below are those same cards, held once.</p>
 <ul>
 <li><b>Berserker (Ramp)</b> — <b>Stat block:</b> 175 HP / 15% armor / +10% shadow &amp;
 nature resist, −15% frost (the glass brawler: a bigger visible pool over mitigation —
@@ -1910,6 +1939,7 @@ talent grants either any more (Batch DO), so the node UPGRADES they used to coll
 read-only-zero</b> — the branches stand and nothing writes them.</li>
 </ul>
 <h3>6.2 Mage</h3>
+<p>Every Mage holds the class kit &mdash; <b>Magic Burst, Nexus Ward and Magic Missiles</b> (&sect;5.2) &mdash; whatever engine he holds.</p>
 <ul>
 <li><b>Pyromancer (Nuker)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% fire
 resist, &minus;20% frost (the burning glass: armoured in his own element, soft to its
@@ -2027,6 +2057,7 @@ costs 3.5 initiative instead).<br>
 <b>Talents:</b> the one tree, bought with the Mage's points — see §7.</li>
 </ul>
 <h3>6.3 Cleric</h3>
+<p>Every Cleric holds the class kit &mdash; <b>Ministration, Unburden and Consecration</b> (&sect;5.2) &mdash; whatever engine he holds.</p>
 <ul>
 <li><b>Holy (Healer)</b> — <b>Stat block:</b> 150 HP / 10% armor / +20% holy resist,
 −15% shadow (cloth and light: the least protection of the three, but a tall pool —
@@ -2145,6 +2176,7 @@ Break. That is not a hole in his kit, it is a two-step plan: Break the boss, the
 <b>Talents:</b> the one tree, bought with the Cleric's points — see §7.</li>
 </ul>
 <h3>6.4 Hunter</h3>
+<p>Every Hunter holds the class kit &mdash; <b>Powershot, Snare Trap and Tripwire</b> (&sect;5.2) &mdash; whatever engine he holds. The Sharpshooter's Powershot and the Survivalist's Tripwire and Snare Trap below are those same cards, held once.</p>
 <ul>
 <li><b>Beastmaster (Ramp)</b> — <b>Stat block:</b> 160 HP / 15% armor / +20% nature resist,
 +5% physical (the armor is a multiplier across up to three bodies — companions inherit it
@@ -2249,7 +2281,7 @@ landed press, plus 20 more for a full sequence. <b>His basic attack only; no oth
 his changes.</b><br>
 Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
 Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
-Break bar already FULL — the team breaks them, the marksman ends them.<br>
+Break bar already FULL — allies break them, the marksman ends them.<br>
 Hold Breath — 15 Mana, 1.5, 3cd (no skill check): +40 Focus, and the next attack is a
 GUARANTEED critical that ignores all armor.<br>
 <b>Spec pool (earnable, §6a)</b> — five of the designed eight (Disengage, Suppressing

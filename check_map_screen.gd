@@ -74,7 +74,15 @@ func _process(_d: float) -> void:
 			# passing.
 			var lm: Dictionary = Run.party[1]
 			var lpool: Array = Classes.spec_draft_pool(String(lm["spec"]))
-			for nm in lpool.slice(0, 3):
+			# BATCH GN — HELD TO WHAT FITS BESIDE THE LIVE OPENING. The class kit's
+			# three count against the cap, so three earned cards on the
+			# Cryomancer's five-slot opening leave him full with one benched, the
+			# carry door rightly refused it back, and the census below never saw
+			# a swap. He holds what fits — at least two, so the panel still draws
+			# a carried row and a benched one.
+			var lroom: int = Run.ability_slot_cap() - Run.ability_slots_used(
+				{"key": lm["key"], "spec": lm["spec"], "bm_abilities": []})
+			for nm in lpool.slice(0, mini(3, lroom)):
 				Run.hold_ability(lm, String(nm), true)
 			Run.unequip_earned_ability(lm, String(lpool[0]))
 			var lbefore: int = _tally(map_scene)["all"]
@@ -121,8 +129,11 @@ func _process(_d: float) -> void:
 			# Callable that does not bind fails at DRAW time.
 			var capped: Dictionary = Run.party[0]
 			var cap_pool: Array = Classes.spec_draft_pool(String(capped["spec"]))
+			# BATCH GN — FILLED TO THE CAP OFF THE LIVE OPENING, which counts the
+			# class kit; a fill off `core_slots` left him two over it.
 			capped["bm_abilities"] = cap_pool.slice(0,
-				Run.ability_slot_cap() - Classes.core_slots(String(capped["spec"])))
+				Run.ability_slot_cap() - Run.ability_slots_used(
+					{"key": capped["key"], "spec": capped["spec"], "bm_abilities": []}))
 			for m2 in Run.party:
 				Run.award_draft_pick(m2)
 			_open("four heroes owed a draft      ")

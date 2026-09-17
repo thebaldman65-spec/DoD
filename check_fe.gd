@@ -157,8 +157,10 @@ func _s1_rune_tags_follow_the_cards() -> void:
 		% card_break)
 	ok(card_offense == 70, "§1: the card OFFENSE column reads %d, not FD's 70"
 		% card_offense)
-	ok(Classes.CARD_TAGS.size() == 227,
-		"§1: the card table is %d rows, not 227" % Classes.CARD_TAGS.size())
+	# BATCH GN — AGAINST THE CORPUS, NOT A LITERAL (Magic Burst took it to 228).
+	ok(Classes.CARD_TAGS.size() == Classes.ability_corpus().size(),
+		"§1: the card table is %d rows against a corpus of %d"
+			% [Classes.CARD_TAGS.size(), Classes.ability_corpus().size()])
 
 
 # ── §1b — AND NOTHING READS A RUNE'S PRIMARY AS A CONDITION ─────────────────

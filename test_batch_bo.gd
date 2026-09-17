@@ -235,9 +235,11 @@ func _pools() -> void:
 	# is still what tells the answers apart.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§4: all four class-wide pools are named")
+	# BATCH GN — THE FLOOR IS THREE: five class-wide cards moved into the class
+	# kits by ruling, so the Mage pool reads five and the Cleric's three.
 	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() >= 6,
-			"§4: the %s class pool has FALLEN below the six BQ and BR filled it to" % ck)
+		ok(Classes.class_draft_pool(ck).size() >= 3,
+			"§4: the %s class pool has FALLEN below the three GN left it at" % ck)
 	ok(is_equal_approx(Classes.CLASS_DRAFT_SHARE, CLASS_SHARE),
 		"§4: roughly one card in four is class-wide")
 	# EVERY ENTRY RESOLVES. A pool name that does not resolve is an offer that
@@ -420,14 +422,18 @@ func _cap_and_slots() -> void:
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter). Overburn's
 	# enablers are Fireball and Detonation, so the Pyromancer's lineage opens
 	# using TWO slots — `Classes.lineage_slots` — and five earned cards fill him.
-	ok(int(run.ability_slots_used(m)) == 2 and Classes.lineage_slots("pyromancer") == 2,
-		"§2: a fresh Pyromancer uses 2 of 7 — his lineage's core less the enablers his engine needs")
+	# BATCH GN — AND THE CLASS KIT'S THREE ARE INSIDE THE COUNT TOO (none of them
+	# is his lineage's), so he opens at FIVE and two earned cards fill him. The
+	# walk below is the same walk, one card for every four it used to take.
+	ok(int(run.ability_slots_used(m)) == 5 and Classes.lineage_slots("pyromancer") == 2
+			and Classes.kit_slots("mage", "pyromancer") == 3,
+		"§2: a fresh Pyromancer uses 5 of 7 — his lineage's core less its enablers, and the class kit's three")
 	ok(not run.ability_slots_full(m), "§2: ...and is not full")
-	m["bm_abilities"] = ["Immolate", "Firestorm", "Cinderfall", "Ember Debt"]
-	ok(int(run.ability_slots_used(m)) == 6, "§2: four earned take him to 6")
+	m["bm_abilities"] = ["Immolate"]
+	ok(int(run.ability_slots_used(m)) == 6, "§2: one earned takes him to 6")
 	ok(not run.ability_slots_full(m), "§2: ...still one slot open")
-	m["bm_abilities"] = ["Immolate", "Firestorm", "Cinderfall", "Ember Debt", "Slow Burn"]
-	ok(int(run.ability_slots_used(m)) == CAP, "§2: a fifth fills the kit")
+	m["bm_abilities"] = ["Immolate", "Firestorm"]
+	ok(int(run.ability_slots_used(m)) == CAP, "§2: a second fills the kit")
 	ok(run.ability_slots_full(m), "§2: ...and the cap binds")
 	# A PROTECTED ABILITY CAN NEVER BE DROPPED, and the mechanism is that it is
 	# not in the drop list at all — there is no branch to get wrong.
@@ -617,10 +623,17 @@ func _take_decline_drop() -> void:
 		ok(not after.has(d2),
 			"§2: ...and cannot re-present a declined card (%s)" % d2)
 	# AT THE CAP AN OFFER IS TAKE-ONE-AND-DROP-ONE.
+	# BATCH GN — THE FILL IS RELATIVE TO THE LIVE OPENING (BO's rule): the
+	# class kit's two he does not already hold count too, so two earned cards
+	# fill him where four did. Pinning Shot stays first, because the bench below
+	# names it.
+	var fill3: int = CAP - Classes.lineage_slots("sharpshooter") \
+		- Classes.kit_slots("hunter", "sharpshooter")
 	var m3 := {"key": "hunter", "spec": "sharpshooter", "talents": {}, "tree": [],
-		"bm_abilities": ["Quick Draw", "Triple Shot", "Coup de Grâce",
-			"Pinning Shot"]}
-	ok(run.ability_slots_full(m3), "§2: the Sharpshooter's kit is full at 7")
+		"bm_abilities": (["Pinning Shot", "Quick Draw", "Triple Shot",
+			"Coup de Grâce"] as Array).slice(0, fill3)}
+	ok(run.ability_slots_full(m3) and fill3 == 2,
+		"§2: the Sharpshooter's kit is full at 7 — two earned on a five-slot opening (fill %d)" % fill3)
 	ok(run.award_draft_pick(m3), "§2: a full kit is still offered a draft")
 	var c3 := String(m3["draft_candidates"][0][0])
 	ok(run.take_draft_ability(m3, c3) == "the kit is full — name an ability to bench",

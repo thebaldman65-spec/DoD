@@ -473,8 +473,10 @@ const SPEC_DRAFT_POOLS := {
 # `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
 # one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
 #
-# **THE DRAFT IS 154 OF A TARGET 154 AS OF BATCH DY (129 spec + 25 class-wide),
-# AND NOTHING IS OWED.** It was 149 of 149 at DS (125 + 24). Tranche 3 closed with the Warrior third at 120 of 120,
+# **THE DRAFT IS 149 OF A TARGET 149 AS OF BATCH GN (129 spec + 20 class-wide),
+# AND NOTHING IS OWED.** GN moved five class-wide cards into the class kits
+# (`CLASS_KITS`), so the class half went 25 -> 20 without a card being deleted;
+# it was 154 of 154 at DY (129 + 25) and 149 of 149 at DS (125 + 24). Tranche 3 closed with the Warrior third at 120 of 120,
 # every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
 # half to 118. **DR MOVED IT TWICE IN ONE BATCH AND THE NET WAS +1**: down one
 # for the retirement of a strict duplicate in the Cryomancer's pool (§2), up
@@ -516,7 +518,7 @@ const SPEC_DRAFT_POOLS := {
 # duplication to anyone who has not read which channel reads which.
 #
 # THE AUTHORING RULES, RECORDED WITH THE CONTENT THEY GOVERN: a class-wide
-# ability is DELIBERATELY UNTIED AND GENERAL — Magic Barrier, not Frostbolt.
+# ability is DELIBERATELY UNTIED AND GENERAL — Mirror Image, not Frostbolt.
 # The test is whether it would read as off-theme for ANY spec of that class; if
 # a Pyromancer drawing it would feel like he wandered into the wrong tree, it is
 # a spec ability. And they are WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL:
@@ -536,10 +538,14 @@ const CLASS_DRAFT_POOLS := {
 	# **NO DUPLICATION EXISTS ANYWHERE**: derived over the whole corpus, it is
 	# the only ability in the game that converts damage taken into Mana.
 	# The Mage pool reads SEVEN; the other three still read six.
-	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
-		"Dispel", "Blink", "Mana Shield"],
-	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
-		"Exhortation", "Undying Vigil"],
+	# BATCH GN — FIVE CARDS LEFT FOR THE CLASS KITS, AND A POOL IS THE WHOLE
+	# SUPPLY OF A HERO WHO TOOK A SPINE. Magic Barrier (Nexus Ward since GN) and
+	# Magic Missiles left the Mage's, which reads FIVE; Ministration, Unburden
+	# and Consecration left the Cleric's, which reads THREE — so a Cleric who
+	# takes Sanctity draws his whole run from Chastise, Exhortation and Undying
+	# Vigil. The ruling named that cost. `CLASS_KITS` is where they went.
+	"mage": ["Mirror Image", "Mana Well", "Dispel", "Blink", "Mana Shield"],
+	"cleric": ["Chastise", "Exhortation", "Undying Vigil"],
 	"hunter": ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
 		"Hunter's Mark", "Arcane Arrows"],
 }
@@ -611,6 +617,103 @@ const PROTECTED_CORES := {
 	"mystic": {"slots": 3, "enablers": [],
 		"why": "Trapper's poison rides being struck, and its breadth term counts statuses from ANY source — including his allies'."},
 }
+
+
+# ══ BATCH GN — THE FOUR CLASS KITS ══════════════════════════════════════════
+#
+# **EVERY CLASS OPENS WITH THREE GUARANTEED ABILITIES, INSIDE THE SLOT COUNT**
+# (ruled by the designer). A hero who took a spine at class selection opened
+# with his basic attack alone (GK); a hero whose kit is drafted end to end —
+# the pool merge, RULED, NOT BUILT — would too. The kit is the answer to both,
+# and it is a protected core by another name: it takes slots, it cannot be
+# benched, and it leaves no pool it was never in.
+#
+# **WHERE EACH CARD CAME FROM, AND WHAT THE MOVE COST.** The Warrior's three
+# and the Hunter's three are lineage cores, so no pool moved for them. The
+# Mage's Nexus Ward and Magic Missiles and all three of the Cleric's were
+# class-wide draft cards, and a card moved into a kit LEAVES `CLASS_DRAFT_POOLS`
+# — which is the whole supply of a hero who took a spine. Magic Burst is new
+# and is defined in `class_kit_ability` below.
+#
+# **A CARD KEEPS ITS ONE DEFINITION WHERE IT WAS** (the AK resolver rule): the
+# six cores in `spec_abilities`, the five former class-wide cards in
+# `draft_ability`. This table names them and `class_kit` resolves them through
+# `pool_ability`, so the kit and the lineage kit are the same objects.
+#
+# **A CORE IN A KIT IS ALSO IN ITS LINEAGE'S OPENING KIT, AND IT IS HELD ONCE.**
+# `opening_kit` skips a kit card the lineage already opened with, and
+# `kit_slots` counts only the kit cards the lineage's slots do not already
+# count. Four lineages carry one: the Berserker (Bloodlust), the Warden (Mocking
+# Blow and Crushing Blow), the Sharpshooter (Powershot) and the Survivalist
+# (Tripwire and Snare Trap).
+#
+# **THE CLERIC'S KIT HAS NO DAMAGE CARD, AND THAT IS THE RULING, NOT AN
+# OVERSIGHT.** He is a support class: he attacks with Smite, his basic, and
+# drafts damage if he wants it.
+const CLASS_KITS := {
+	"warrior": ["Crushing Blow", "Bloodlust", "Mocking Blow"],
+	"mage": ["Magic Burst", "Nexus Ward", "Magic Missiles"],
+	"cleric": ["Ministration", "Unburden", "Consecration"],
+	"hunter": ["Powershot", "Snare Trap", "Tripwire"],
+}
+
+
+static func class_kit_names(class_key: String) -> Array:
+	return CLASS_KITS.get(class_key, [])
+
+
+static func class_kit_holds(class_key: String, display_name: String) -> bool:
+	return class_kit_names(class_key).has(display_name)
+
+
+# The kit as abilities, fresh on every call like `kit()`. A name that resolves
+# to nothing is skipped here and asserted by `check_gn`.
+static func class_kit(class_key: String) -> Array:
+	var out: Array = []
+	for nm in class_kit_names(class_key):
+		var ab := pool_ability(String(nm))
+		if ab != null:
+			out.append(ab)
+	return out
+
+
+# The kit cards the lineage's slots do not already count — a card the lineage
+# opens with outside its enablers is one slot, not two. Engine-agnostic, like
+# `lineage_slots`: the slot a card holds does not move with an engine.
+static func kit_slots(class_key: String, spec: String) -> int:
+	var counted: Array = []
+	for ab in spec_abilities(spec):
+		if ab != null and not core_enablers(spec).has(ab.display_name):
+			counted.append(ab.display_name)
+	var n := 0
+	for nm in class_kit_names(class_key):
+		if not counted.has(String(nm)):
+			n += 1
+	return n
+
+
+# A card that exists ONLY in a class kit is defined here, and `pool_ability`
+# reads it. One today.
+static func class_kit_ability(display_name: String) -> Ability:
+	match display_name:
+		# AXIS: the Mage's opener for the whole party. Elemental Weakness lowers
+		# the target's resistance to every school but physical, so a Cleric's
+		# holy and a Survivalist's nature land harder too — ELEMENT-BLIND BY
+		# CONSTRUCTION, because a Mage kit that pre-armed one engine is the
+		# defect Flamewave was refused for. The weakness is laid in the strike
+		# loop (`battle._apply_elem_weak`), after the blow lands.
+		# PROPOSED, NOT RULED: the cost, cooldown, initiative, Break damage and
+		# Perfect. The ruling named the 40% and the weakness; the rest is priced
+		# against Crushing Blow (43% and a three-turn debuff on a two-turn
+		# cooldown) and the Mage's other single-target casts (25 Mana, 3.0
+		# initiative, 15-20 Break damage). The Perfect is the ordinary one.
+		"Magic Burst":
+			return Ability.make({"display_name": "Magic Burst",
+				"dmg_type": "arcane", "cost": 25, "damage": 40, "pressure": 15,
+				"delay": 3.0, "cooldown": 2, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "{atk:46}",
+				"description": "Leaves the target with Elemental\nWeakness for 3 turns: 15% less\nresistance to every school but\nphysical. A second cast refreshes it."})
+	return null
 
 
 # ============ BATCH EK §1 / EL §2 — THE ARCHETYPE TAGS ============
@@ -790,7 +893,7 @@ const CARD_TAGS := {
 	# --- class:mage ---
 	"Blink": ["TEMPO"],
 	"Dispel": ["DEFENSE", "DEBUFF"],
-	"Magic Barrier": ["DEFENSE"],
+	"Nexus Ward": ["DEFENSE"],
 	"Magic Missiles": ["OFFENSE", "BREAK"],
 	"Mana Shield": ["DEFENSE", "RESOURCE"],
 	"Mana Well": ["RESOURCE"],
@@ -862,6 +965,8 @@ const CARD_TAGS := {
 	"Shieldwall": ["DEFENSE"],
 	# --- other ---
 	"Magic Bolt": ["OFFENSE", "BREAK"],
+	# --- kit:mage (GN) — its read site lays Elemental Weakness after the blow ---
+	"Magic Burst": ["DEBUFF", "BREAK"],
 	# --- spec:arcanist ---
 	"Arcane Bolt": ["OFFENSE", "BREAK"],
 	"Arcane Echo": ["MARK", "OFFENSE"],
@@ -1187,6 +1292,11 @@ static func protected_names(spec: String) -> Array:
 	for ab2 in spec_abilities(spec):
 		if ab2 != null and not out.has(ab2.display_name):
 			out.append(ab2.display_name)
+	# BATCH GN — the class kit is protected too, and a card the lineage already
+	# named is named once.
+	for nm in class_kit_names(class_key):
+		if not out.has(String(nm)):
+			out.append(String(nm))
 	return out
 
 
@@ -1328,11 +1438,17 @@ static func engine_bound(spec: String) -> Array:
 # `Runes.kit_names` and the class-selection panel all read it, so what a hero
 # opens holding cannot be answered two ways (CK §1's rule, one layer down).
 #
-#   the class kit
+#   the class basic
 #   + the lineage's opening abilities, LESS its enablers AND its bound cards
 #     (`ENGINE_BOUND`, GM §2) when its engine is not held
 #   + the lineage's basic-attack override, only while its engine is held
+#   + the class kit (`CLASS_KITS`, GN), LESS any card the lineage already
+#     opened with — THE DEDUPE IS HERE, and a Berserker holds Bloodlust once
 #   + every OTHER held engine's enablers
+#
+# **THE KIT GOES IN AFTER THE LINEAGE'S CARDS** so a lineage hero's bar keeps
+# the order it had, and the dedupe is one `_kit_holds` test on the line that
+# appends it.
 #
 # **A TRAVELLING BASIC-ATTACK ENABLER** (Fireball, Frostbolt, Arcane Explosion,
 # Shadowrend) takes slot 0 when the class basic still stands there, and joins the
@@ -1349,6 +1465,9 @@ static func opening_kit(class_key: String, spec: String, engines: Array) -> Arra
 				cfg["abilities"].append(ab)
 		if engines.has(own):
 			apply_kit_overrides(cfg, spec)
+	for ab in class_kit(class_key):
+		if not _kit_holds(cfg["abilities"], ab.display_name):
+			cfg["abilities"].append(ab)
 	for pid in engines:
 		var es := engine_spec(String(pid))
 		if es == "" or es == spec:
@@ -1710,6 +1829,10 @@ static func pool_ability(display_name: String) -> Ability:
 	var drafted := draft_ability(display_name)
 	if drafted != null:
 		return drafted
+	# BATCH GN — a card that lives only in a class kit.
+	var kit_only := class_kit_ability(display_name)
+	if kit_only != null:
+		return kit_only
 	var beast := beastmaster_pool_ability(display_name)
 	if beast != null:
 		return beast
@@ -1784,6 +1907,13 @@ static func ability_corpus() -> Array:
 	# roughly fifteen gates for no reason.
 	for key in ["warrior", "mage", "cleric", "hunter"]:
 		for ab in kit(key):
+			add.call(ab)
+		# BATCH GN — THE CLASS KITS, WALKED BEFORE THE POOLS THEY LEFT. Five
+		# cards reached this walk only through `class_draft_pool` until GN moved
+		# them into `CLASS_KITS`, so this loop is what keeps them in the corpus
+		# (DY §3's order: re-home, then remove). Magic Burst is new, and it is
+		# the corpus's one addition.
+		for ab in class_kit(key):
 			add.call(ab)
 		for nm in class_draft_pool(key):
 			add.call(pool_ability(String(nm)))
@@ -1862,7 +1992,12 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FIFTY-FOUR OF A TARGET 154 (BO..DY) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-NINE OF A TARGET 149 (BO..GN) --
+#
+# BATCH GN — FIVE OF THE CLASS-WIDE DEFINITIONS BELOW ARE CLASS-KIT CARDS NOW
+# (Nexus Ward, Magic Missiles, Ministration, Consecration, Unburden). They left
+# the draft pools and their one definition stays here, where the resolver
+# already reads it; `CLASS_KITS` names them.
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -2833,13 +2968,19 @@ static func draft_ability(display_name: String) -> Ability:
 		#
 		# AXIS: the floor beneath all three. ABSORPTION — it eats a share of
 		# everything, area attacks included.
-		"Magic Barrier":
-			return Ability.make({"display_name": "Magic Barrier",
+		#
+		# BATCH GN — RENAMED FROM MAGIC BARRIER, AND IN THE MAGE'S CLASS KIT NOW
+		# rather than his draft; the definition stays here, its one home. The
+		# NAME moved and nothing else did: the `magic_barrier` special, the
+		# `barrier` status it lays and every number are unchanged (CK's Ironclad
+		# precedent — the id is internal).
+		"Nexus Ward":
+			return Ability.make({"display_name": "Nexus Ward",
 				"dmg_type": "arcane", "cost": 25, "damage": 0, "pressure": 0,
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "magic_barrier",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise a ward of raw magic: absorbs\ndamage equal to 20% of your maximum\nhealth for 3 turns. It eats a share of\nEVERYTHING, area attacks included."})
+				"description": "Raise a ward of raw magic: absorbs\ndamage equal to 20% of the Mage's\nmaximum health for 3 turns. It eats a\nshare of EVERYTHING, area attacks\nincluded."})
 		# AXIS: evasion rather than absorption, and THE TWO MUST NOT BE A
 		# STRICT UPGRADE OF EACH OTHER IN EITHER DIRECTION — §2's rule applied
 		# inside one pool. Better than the Barrier against three big single
@@ -2928,7 +3069,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 5, "anim": "attack03",
 				"special": "consecration",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Bless the ground you all stand on: for\n4 turns EVERY HERO regains 5% of their\nmaximum health at the start of each of\ntheir turns."})
+				"description": "Bless the ground underfoot: for 4 turns\nEVERY HERO regains 5% of their maximum\nhealth at the start of each of their\nturns."})
 		# AXIS: something to do with a turn. All three Clerics have turns where
 		# nobody needs healing and their engine is not ready, and the Break
 		# means that turn still contributes.
@@ -5928,7 +6069,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Powershot", "cooldown": 2, "cost": 25, "damage": 20,
 					"pressure": 20, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nthe team breaks them, the marksman\nends them."}),
+					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nallies break them, the marksman\nends them."}),
 				Ability.make({"display_name": "Hold Breath", "cooldown": 3, "cost": 15, "special": "hold_breath",
 					"delay": 1.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
@@ -5939,7 +6080,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Tripwire", "cooldown": 4, "cost": 20, "special": "tripwire",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Rig the ground: for 6 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking your allies."}),
+					"description": "Rig the ground: for 6 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking another ally."}),
 				Ability.make({"display_name": "Shrapnel Charge", "cooldown": 2, "dmg_type": "nature",
 					"cost": 25, "damage": 20,
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,

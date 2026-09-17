@@ -1130,7 +1130,7 @@ second payload, and every enemy ability.
 > **A shield is played BEFORE the blow. A heal answers what just happened.**
 
 CY reported the six shields and changed none of them; **CZ ruled they take the cap** — Divine
-Shield, Interpose, Magic Barrier, Mantle, Mirror Image and Vespers, all now at `BUFF_DELAY_CAP`.
+Shield, Interpose, Nexus Ward (Magic Barrier until GN), Mantle, Mirror Image and Vespers, all now at `BUFF_DELAY_CAP`.
 **The mechanical criterion that separated them from pure buffs is still correct and is not what
 decided this**: *what kind of thing is this* and *what should it cost in tempo* are two questions,
 and conflating them is why they sat unruled for a batch.
@@ -1852,7 +1852,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   Hunter three, and the nine are the designer's. **RULED, NOT BUILT: there are no specs** — the spec
   id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the four
   layers GK does not merge (the opening kit, the stat block, the draft and boss pools, the spec-scoped
-  runes). A hero who takes a spine has none and opens with his class kit. The COST of an engine rune is
+  runes). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
   the flat 100g rule's, not a set price.
 - **AN ENABLER CANNOT BE A STAT, AND ONE IS**: the Warden's `block_chance` 0.10 is his lineage's stat
   block, so Heavy Plating on another Warrior climbs from zero plus its own 15% slice.
@@ -1903,6 +1903,33 @@ the block left out, spend what they were paid.
   Charge, Hamstring, Venom Coating, Pinning Shot and Called Shot apply part of what their text promises only while
   the engine is held (`docs/state.md`). BV moved Loaded Shot out of the Survivalist's block and Crossfire out of
   the Sharpshooter's for this reason: **the effect belongs to the ability, not to whoever is holding it.**
+
+## STANDING RULE — EVERY CLASS OPENS WITH A KIT OF THREE, INSIDE THE SLOT COUNT (Batch GN, ruled by the designer)
+> **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,
+> whatever engine he takes, holds or drops; they are protected, and they count against the slot cap.**
+
+- **ONE BUILDER, ONE DEDUPE.** `Classes.opening_kit` appends the kit after the lineage's cards and skips a kit card
+  the lineage already opened with, so a Berserker holds Bloodlust once. `Classes.kit_slots` counts the kit less what
+  the lineage's slots already count, and `Run.ability_slots_used` adds it: a hero with no lineage opens at 3, a Warden
+  (two shared cards) at 4. `protected_names` and `ability_corpus` walk the kit too.
+- **A KIT CARD KEEPS ITS ONE DEFINITION WHERE IT WAS** — a core in `spec_abilities`, a former class-wide card in
+  `draft_ability` — and `class_kit` resolves it through `pool_ability`. **A card that exists only in a kit is defined
+  in `class_kit_ability`.** Never a second copy.
+- **A CARD MOVED INTO A KIT LEAVES THE CLASS DRAFT POOL, AND THAT POOL IS A SPINE-TAKER'S WHOLE SUPPLY.** Moving one
+  is a cost the designer rules on, never a tidy-up. The kit is in no draft or boss pool (`check_gn` §0).
+- **A KIT CARD MUST WORK FOR EVERY HERO OF ITS CLASS WITH ANY ENGINE OR NONE**, and that is proved by driving it on a
+  hero who holds nothing (`check_gn` §1), never by reading it — a kit card that needs an engine is the failure the
+  kit exists to prevent.
+- **THE CLERIC'S KIT HAS NO DAMAGE CARD, AND THAT IS THE RULING.** He attacks with Smite and drafts damage if he wants
+  it. Do not "complete" his kit with one.
+- **A KIT CARD OWES THE BOT A CASE IN `battle._bot_class_kit_pick`**, which is consulted only where the rotation fell
+  back to the basic, above the drafted hook; the drafted hook skips kit cards. Without it a sim measures a hero who
+  does not use his own kit (`check_gn` §4 drives the picks and a live stretch).
+- **ELEMENTAL WEAKNESS IS MAGIC BURST'S, AND IT IS A RESISTANCE, NOT A MULTIPLIER.** It lowers the victim's
+  resistance to every school but physical by `ELEM_WEAK_PCT` points for `ELEM_WEAK_TURNS`, through one door,
+  `_apply_elem_weak`, which never writes a standing weakness down. **Its read site is the strike loop's alone**, like
+  Exposed's: a card that computes its own damage, a tick and a trap do not see it (`docs/reports/GN.md` §2). **It
+  stays ELEMENT-BLIND by construction**: the read asks whether the blow is physical and nothing else.
 
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
 **ITS CORE HALF IS SUPERSEDED BY THE ENGINE RUNE CHARTER ABOVE: NO CLASS HAS A CORE (GK).** Momentum,
@@ -2544,7 +2571,7 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   tag word, which `check_ek` §3 asserts at zero for that file by name.
 · **A THRESHOLD'S MAGNITUDE MUST BE CHOSEN AGAINST THE CORE-KIT BASELINE.** Before a card is
   drafted, the cores alone already meet a 2+ threshold on **BREAK for ten of the twelve specs**
-  and on **DEBUFF for five**; **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly
+  and on **DEBUFF for seven**; **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly
   one**. A rune asking 2+ BREAK is on from the first fight for almost everyone and no swap turns
   it off. `check_es` §4 prints the per-spec table every battery run.
 · **THE COUNT MUST BE VISIBLE AND MUST MOVE ON A SWAP.** A silent threshold is a stat nobody knows
@@ -3279,7 +3306,7 @@ is run state rather than a member key); the member keys (`draft_candidates`, `dr
 **A drafted card removes itself from the boss offer and vice versa; that one shared list is what
 lets a boss pool empty below its own depth.**
 · **THE CAP IS A LADDER AND IT BINDS EVERY SOURCE**, the boss pick included: a cap one pool can
-  walk past is not a cap. `Run.ability_slots_used` = `Classes.core_slots(spec)` + the LOADOUT, and
+  walk past is not a cap. `Run.ability_slots_used` = `Classes.lineage_slots(spec)` + `Classes.kit_slots` + the LOADOUT, and
   it is compared against **`Run.ability_slot_cap()`, never against a constant**.
 · **PROTECTED = THE OPENING KIT. EARNED = BENCHABLE, NEVER LOST.** `Run.unequip_earned_ability` is
   THE ONE PLACE a card leaves the loadout and it refuses anything not in `bm_abilities` — so "a
@@ -3306,8 +3333,9 @@ there rather than copying it here.** **SINCE GK THE ENABLERS TRAVEL WITH THE ENG
 to any hero of the class who holds that engine and takes them out of a lineage kit whose engine is not
 held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 154 of 154, 129 spec + 25 class-wide.** All twelve
-specs draft from at least TEN; the Mage class pool holds seven and the other three hold six.
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 149 of 149, 129 spec + 20 class-wide.** All twelve
+specs draft from at least TEN; the Warrior and Hunter class pools hold six, the Mage's five and the Cleric's three,
+since GN moved five class-wide cards into the class kits.
 **DO NOT RE-RECORD ANY PART OF THE DRAFT AS OWED.** In particular:
 · **THE WARRIOR POOLS WERE OWED AND ARE PAID** — Berserker Blood Offering / Gut Rip, Warden
   Covering Guard / Eye of the Storm, Swordmaster Precision Strike / Feint.
@@ -3320,7 +3348,7 @@ specs draft from at least TEN; the Mage class pool holds seven and the other thr
 · **NEITHER HALF IS A FLAT MULTIPLE ANY MORE.** Both expectations are summed tables
   (`test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`) — **do not write `12 * 8` or `4 * 6`
   again**, and do not quote the old ninety-six-card denominator, which died at CD §2.
-· **THE ASSERTED FLOORS ARE EIGHT (spec) AND SIX (class), AND BOTH ARE DELIBERATELY SLACK.** They
+· **THE ASSERTED FLOORS ARE EIGHT (spec) AND THREE (class, the Cleric's pool since GN), AND BOTH ARE DELIBERATELY SLACK.** They
   catch a pool that EMPTIES rather than tracking the deepening. **Every draft suite asserts the
   FLOOR and the TOTAL; the two tables above are the only authoritative depths.**
 · **A STANDING BLOCK STATES A NUMBER ONCE.** A superseded snapshot once sat forty-nine lines below
@@ -3334,7 +3362,7 @@ specs draft from at least TEN; the Mage class pool holds seven and the other thr
   measuring the fill-short rule the moment a pool deepens under it.
 
 **CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
-deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would read
+deliberately UNTIED AND GENERAL (Mirror Image, not Frostbolt — the test is whether it would read
 as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL** —
 they feed no passive, so at equal power they would be a safe default that dilutes every build.
 **VERIFY THE "WEAKER" HALF AGAINST THE LIVE SPEC KITS RATHER THAN TRUSTING THE BRIEF, AND CHECK IT
@@ -3349,7 +3377,7 @@ dominated by a basic.
 
 - **NEVER COMPARE AGAINST A CAP CONSTANT. ASK `Run.ability_slot_cap()`.** It is a function for the
   same reason `Run.item_slots()` is: the number moves inside a run. A suite that fills a hero "to
-  the cap" writes `run.ability_slot_cap() - Classes.core_slots(spec)` and never a literal — BO's
+  the cap" writes `run.ability_slot_cap()` less the opening slots (`lineage_slots` and `kit_slots`) and never a literal — BO's
   own rule about writing a refusal setup relative to the live pool, one door along.
 - **THE LADDER IS INDEXED BY ZONE BOSSES CLEARED, NOT BY `zone_idx`, AND THE TWO PART COMPANY ON
   THE THIRD BOSS.** BM §6 made the end boss a slot on the third zone's own board, so
@@ -3660,10 +3688,10 @@ third and it is the only one the player ever sees.
   `unit.gd`, `talents.gd`, `run_state.gd`, `run_sim.gd` and `ability.gd`.
 - **THE VOCABULARY IS MECHANICS BECAUSE THE CORPUS DOES NOT HOLD SIX STATUS NAMES, AND THAT IS
   MEASURED RATHER THAN ASSERTED.** The six biggest status FAMILIES in the game (Burn, Frost, Bleed,
-  Poison, Ruin, Mark) reach **40 of the 154 draft cards and leave 114 with nothing**. The reason is
+  Poison, Ruin, Mark) reach **40 of the 149 draft cards and leave 109 with nothing** (154 and 114 until GN moved five non-family cards into the kits). The reason is
   structural: **a status system belongs to one spec, so it does not vary inside the pool the player
-  is drafting from** — the Pyromancer's pool is 12 Burn cards of 13. The seven shipped cover **154
-  of 154**. Full working and the alternative set: `docs/reports/EK.md` §1.
+  is drafting from** — the Pyromancer's pool is 12 Burn cards of 13. The seven shipped cover **149
+  of 149**. Full working and the alternative set: `docs/reports/EK.md` §1.
 - **SEVEN IS THE CEILING AND AN EIGHTH NEEDS AN ARGUMENT (RULED AT EL §2).** A tag only means
   something if **holding two is notable**. Every word added divides the corpus finer, and the point
   at which a pool of ten to thirteen cards stops producing a repeated combination is the point at
@@ -3704,8 +3732,8 @@ third and it is the only one the player ever sees.
   had to be read. **A future rename is the same shape: two game files and a `sed`, plus the gates that pin the words
   and the documents.**
 - **A TAG IS DERIVED FROM THE READ SITE, NEVER FROM THE NAME OR THE DESCRIPTION**, and on this
-  corpus a field-level reading produces almost nothing: **`heal` is 0 on all 154 draft cards** and
-  123 of them carry a `special`. The read site of a card is its arm in `_resolve_special`, **plus
+  corpus a field-level reading produces almost nothing: **`heal` is 0 on all 149 draft cards** and
+  119 of them carry a `special`. The read site of a card is its arm in `_resolve_special`, **plus
   every block keyed on its `display_name` in the hero strike loop** (58 abilities carry one, and
   Blood Debt's whole payload is one of them), plus the card-specific helpers those call, **plus
   whatever reads the status a setup card lays** — Aegis Wall applies `aegis_wall` and nothing else,

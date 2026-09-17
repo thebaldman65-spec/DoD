@@ -402,9 +402,12 @@ func _s2_break_is_secondary_only() -> void:
 			break_first.size(), break_first.slice(0, 6)])
 	ok(only_break.is_empty(),
 		"§2: %s carry BREAK as their ONLY tag" % [only_break])
-	ok(Classes.CARD_TAGS.size() == 227,
-		"§2: the corpus is %d rows, not 227 — the transform moved a row"
-			% Classes.CARD_TAGS.size())
+	# BATCH GN — AGAINST THE CORPUS, NOT A LITERAL. Magic Burst took the corpus
+	# to 228 and this read 227; the question was always whether the transform
+	# moved a row, which is a table the size of the corpus it tags.
+	ok(Classes.CARD_TAGS.size() == Classes.ability_corpus().size(),
+		"§2: the table is %d rows against a corpus of %d — the transform moved a row"
+			% [Classes.CARD_TAGS.size(), Classes.ability_corpus().size()])
 	# **THE COUNT IS A FLOOR, NOT AN EQUALITY.** 54 rows moved to
 	# `["OFFENSE", "BREAK"]`; a card authored later may join them, and OFFENSE
 	# is where a BREAK card now lives. A floor says "the demotion happened"

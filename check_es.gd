@@ -512,11 +512,14 @@ func _s4_tags_are_read() -> void:
 	var mismatched: Array = []
 	for ckey in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[ckey]:
-			var cfg: Dictionary = Classes.hero_config(String(ckey))
-			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(String(spec))
-			Classes.apply_kit_overrides(cfg, String(spec))
+			# BATCH GN — THE SPAWN'S KIT IS `Classes.opening_kit`, READ THROUGH THE
+			# DOOR THE SPAWN READS IT THROUGH, WITH THE LINEAGE'S OWN ENGINE HELD. The
+			# copy this replaced was the spawn's kit as it stood before GK, and it
+			# missed the class kit the day there was one: every spec read as a
+			# disagreement while the two real builders agreed.
 			var spawned := {}
-			for ab in cfg["abilities"]:
+			for ab in Classes.opening_kit(String(ckey), String(spec),
+					[Classes.engine_of_spec(String(spec))]):
 				spawned[ab.display_name] = true
 			var prot := {}
 			for n in Classes.protected_names(String(spec)):

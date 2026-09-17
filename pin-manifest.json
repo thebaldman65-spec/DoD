@@ -1422,7 +1422,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#302"
+   "g": "check_dv.gd#304"
   },
   {
    "s": "check_dv.gd",
@@ -1433,7 +1433,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#304"
+   "g": "check_dv.gd#306"
   },
   {
    "s": "check_dv.gd",
@@ -1444,7 +1444,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#303"
+   "g": "check_dv.gd#305"
   },
   {
    "s": "check_dv.gd",
@@ -1455,7 +1455,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#305",
+   "g": "check_dv.gd#307",
    "alt": true
   },
   {
@@ -1467,7 +1467,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#305",
+   "g": "check_dv.gd#307",
    "alt": true
   },
   {
@@ -1590,7 +1590,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_eg.gd#125"
+   "g": "check_eg.gd#126"
   },
   {
    "s": "check_eg.gd",
@@ -1601,7 +1601,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_eg.gd#127"
+   "g": "check_eg.gd#128"
   },
   {
    "s": "check_eg.gd",
@@ -1612,7 +1612,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_eg.gd#126"
+   "g": "check_eg.gd#127"
   },
   {
    "s": "check_eg.gd",
@@ -1623,7 +1623,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_eg.gd#129"
+   "g": "check_eg.gd#130"
   },
   {
    "s": "check_eh.gd",
@@ -2069,7 +2069,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#190",
+   "g": "check_ez.gd#191",
    "alt": true
   },
   {
@@ -2081,20 +2081,8 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ez.gd#190",
+   "g": "check_ez.gd#191",
    "alt": true
-  },
-  {
-   "s": "check_ez.gd",
-   "fn": "_s5_the_read_sites",
-   "h": "scripts/battle.gd",
-   "n": null,
-   "p": "+",
-   "r": "runtime",
-   "k": "non-literal",
-   "how": "read",
-   "g": "check_ez.gd#321",
-   "expr": "rq_key"
   },
   {
    "s": "check_ez.gd",
@@ -2112,12 +2100,24 @@
    "s": "check_ez.gd",
    "fn": "_s5_the_read_sites",
    "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ez.gd#323",
+   "expr": "rq_key"
+  },
+  {
+   "s": "check_ez.gd",
+   "fn": "_s5_the_read_sites",
+   "h": "scripts/battle.gd",
    "n": "\n\t\t\"penance\":",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#323"
+   "g": "check_ez.gd#324"
   },
   {
    "s": "check_ez.gd",
@@ -2128,7 +2128,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#327"
+   "g": "check_ez.gd#328"
   },
   {
    "s": "check_ez.gd",
@@ -2139,7 +2139,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#326"
+   "g": "check_ez.gd#327"
   },
   {
    "s": "check_ez.gd",
@@ -2150,7 +2150,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#319"
+   "g": "check_ez.gd#320"
   },
   {
    "s": "check_fd.gd",
@@ -2620,7 +2620,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1349"
+   "g": "check_fh.gd#1351"
   },
   {
    "s": "check_fh.gd",
@@ -2631,7 +2631,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#729"
+   "g": "check_fh.gd#731"
   },
   {
    "s": "check_fh.gd",
@@ -2642,7 +2642,7 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#732"
+   "g": "check_fh.gd#734"
   },
   {
    "s": "check_fh.gd",
@@ -2653,7 +2653,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#732"
+   "g": "check_fh.gd#734"
   },
   {
    "s": "check_fh.gd",
@@ -2664,7 +2664,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#732"
+   "g": "check_fh.gd#734"
   },
   {
    "s": "check_fi.gd",
@@ -2851,7 +2851,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fn.gd#92"
+   "g": "check_fn.gd#93"
   },
   {
    "s": "check_fq.gd",
@@ -11620,7 +11620,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bo.gd#640",
+   "g": "test_batch_bo.gd#641",
    "expr": "n"
   },
   {
@@ -11632,7 +11632,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bo.gd#634"
+   "g": "test_batch_bo.gd#635"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11643,7 +11643,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#652"
+   "g": "test_batch_bo.gd#653"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11654,7 +11654,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#654"
+   "g": "test_batch_bo.gd#655"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11665,7 +11665,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#658"
+   "g": "test_batch_bo.gd#659"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11676,7 +11676,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#646",
+   "g": "test_batch_bo.gd#647",
    "alt": true
   },
   {
@@ -11688,7 +11688,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#648"
+   "g": "test_batch_bo.gd#649"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11699,7 +11699,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#631"
+   "g": "test_batch_bo.gd#632"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11710,7 +11710,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#649"
+   "g": "test_batch_bo.gd#650"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11721,7 +11721,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#646",
+   "g": "test_batch_bo.gd#647",
    "alt": true
   },
   {
@@ -11733,7 +11733,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#637",
+   "g": "test_batch_bo.gd#638",
    "alt": true
   },
   {
@@ -11745,7 +11745,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#650"
+   "g": "test_batch_bo.gd#651"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11756,7 +11756,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#637",
+   "g": "test_batch_bo.gd#638",
    "alt": true
   },
   {
@@ -11768,7 +11768,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#647"
+   "g": "test_batch_bo.gd#648"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11779,7 +11779,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#642"
+   "g": "test_batch_bo.gd#643"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11790,7 +11790,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#643"
+   "g": "test_batch_bo.gd#644"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11801,7 +11801,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#646",
+   "g": "test_batch_bo.gd#647",
    "alt": true
   },
   {
@@ -11813,7 +11813,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#644"
+   "g": "test_batch_bo.gd#645"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11824,7 +11824,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#612"
+   "g": "test_batch_bo.gd#613"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11835,7 +11835,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#627"
+   "g": "test_batch_bo.gd#628"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11868,7 +11868,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#250"
+   "g": "test_batch_bo.gd#251"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11879,7 +11879,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#268"
+   "g": "test_batch_bo.gd#269"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11890,7 +11890,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bo.gd#234"
+   "g": "test_batch_bo.gd#235"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11901,7 +11901,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#263"
+   "g": "test_batch_bo.gd#264"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11912,7 +11912,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#266"
+   "g": "test_batch_bo.gd#267"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11923,7 +11923,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#262"
+   "g": "test_batch_bo.gd#263"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11934,7 +11934,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#236"
+   "g": "test_batch_bo.gd#237"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11945,7 +11945,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#236"
+   "g": "test_batch_bo.gd#237"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11956,7 +11956,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#260"
+   "g": "test_batch_bo.gd#261"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11967,7 +11967,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#269"
+   "g": "test_batch_bo.gd#270"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11978,7 +11978,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#267"
+   "g": "test_batch_bo.gd#268"
   },
   {
    "s": "test_batch_bo.gd",
@@ -11989,7 +11989,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#263"
+   "g": "test_batch_bo.gd#264"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12000,7 +12000,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#261"
+   "g": "test_batch_bo.gd#262"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12011,7 +12011,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#269"
+   "g": "test_batch_bo.gd#270"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12022,7 +12022,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#230"
+   "g": "test_batch_bo.gd#231"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12033,7 +12033,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#266"
+   "g": "test_batch_bo.gd#267"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12044,7 +12044,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#265"
+   "g": "test_batch_bo.gd#266"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12055,7 +12055,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bo.gd#235"
+   "g": "test_batch_bo.gd#236"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12066,7 +12066,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#237"
+   "g": "test_batch_bo.gd#238"
   },
   {
    "s": "test_batch_bo.gd",
@@ -12077,7 +12077,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#259"
+   "g": "test_batch_bo.gd#260"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12121,7 +12121,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bp.gd#523",
+   "g": "test_batch_bp.gd#524",
    "expr": "String"
   },
   {
@@ -12133,7 +12133,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bp.gd#521",
+   "g": "test_batch_bp.gd#522",
    "expr": "String"
   },
   {
@@ -12145,7 +12145,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bp.gd#507"
+   "g": "test_batch_bp.gd#508"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12156,7 +12156,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#511"
+   "g": "test_batch_bp.gd#512"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12167,7 +12167,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#513"
+   "g": "test_batch_bp.gd#514"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12178,7 +12178,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#517"
+   "g": "test_batch_bp.gd#518"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12189,18 +12189,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#526"
-  },
-  {
-   "s": "test_batch_bp.gd",
-   "fn": "_docs",
-   "h": "docs/master.html",
-   "n": "From Aggressive",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bp.gd#524"
+   "g": "test_batch_bp.gd#527"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12217,12 +12206,23 @@
    "s": "test_batch_bp.gd",
    "fn": "_docs",
    "h": "docs/master.html",
+   "n": "From Aggressive",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bp.gd#526"
+  },
+  {
+   "s": "test_batch_bp.gd",
+   "fn": "_docs",
+   "h": "docs/master.html",
    "n": "From Defensive",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#524"
+   "g": "test_batch_bp.gd#525"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12233,7 +12233,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#504"
+   "g": "test_batch_bp.gd#505"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12244,7 +12244,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#528"
+   "g": "test_batch_bp.gd#529"
   },
   {
    "s": "test_batch_bp.gd",
@@ -12255,7 +12255,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#527",
+   "g": "test_batch_bp.gd#528",
    "alt": true
   },
   {
@@ -12267,7 +12267,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#527",
+   "g": "test_batch_bp.gd#528",
    "alt": true
   },
   {
@@ -12279,7 +12279,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bp.gd#408"
+   "g": "test_batch_bp.gd#409"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12290,7 +12290,7 @@
    "r": "absent",
    "k": "literal",
    "how": "inline",
-   "g": "test_batch_bq.gd#81"
+   "g": "test_batch_bq.gd#82"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12301,7 +12301,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bq.gd#574",
+   "g": "test_batch_bq.gd#575",
    "expr": "nm"
   },
   {
@@ -12313,7 +12313,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bq.gd#569"
+   "g": "test_batch_bq.gd#570"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12324,7 +12324,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#577"
+   "g": "test_batch_bq.gd#578"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12335,7 +12335,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#579"
+   "g": "test_batch_bq.gd#580"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12346,7 +12346,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#583"
+   "g": "test_batch_bq.gd#584"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12357,7 +12357,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#597"
+   "g": "test_batch_bq.gd#599"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12368,7 +12368,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#598"
+   "g": "test_batch_bq.gd#600"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12379,7 +12379,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#566"
+   "g": "test_batch_bq.gd#567"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12390,7 +12390,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#595"
+   "g": "test_batch_bq.gd#597"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12401,7 +12401,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#575"
+   "g": "test_batch_bq.gd#576"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12412,7 +12412,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#575"
+   "g": "test_batch_bq.gd#576"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12423,7 +12423,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#377"
+   "g": "test_batch_bq.gd#378"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12434,7 +12434,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#376"
+   "g": "test_batch_bq.gd#377"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12445,7 +12445,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#331"
+   "g": "test_batch_bq.gd#332"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12456,7 +12456,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#330"
+   "g": "test_batch_bq.gd#331"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12467,7 +12467,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#281"
+   "g": "test_batch_bq.gd#282"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12478,7 +12478,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#280"
+   "g": "test_batch_bq.gd#281"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12489,7 +12489,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#562"
+   "g": "test_batch_bq.gd#563"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12500,7 +12500,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#560"
+   "g": "test_batch_bq.gd#561"
   },
   {
    "s": "test_batch_bq.gd",
@@ -12511,7 +12511,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#114"
+   "g": "test_batch_bq.gd#115"
   },
   {
    "s": "test_batch_br.gd",
@@ -15199,7 +15199,7 @@
    "s": "test_batch_cb.gd",
    "fn": "_docs",
    "h": "docs/master.html",
-   "n": "hundred and fifty-four",
+   "n": "hundred and forty-nine",
    "p": "+",
    "r": "code",
    "k": "literal",

@@ -56,8 +56,16 @@ const Fixture = preload("res://suite_fixture.gd")
 
 # The twelve, by pool. Held here as a literal so the live dict and this file
 # have to agree — a name added to one and not the other trips.
+#
+# **BATCH GN MOVED FIVE OF THE TWELVE INTO THE CLASS KITS, BY RULING, AND RENAMED
+# ONE.** Magic Barrier is NEXUS WARD; it and Magic Missiles open every Mage's
+# kit, and Ministration, Unburden and Consecration open every Cleric's. A card in
+# a class kit leaves the class draw, so each of the twelve is now in its class
+# pool OR its class kit, never both and never neither — which is what §1 asserts.
+# The BQ changelog entry is history and names the card BQ shipped, so it is read
+# through `SHIPPED_AS`.
 const TRANCHE_3 := {
-	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
+	"mage": ["Nexus Ward", "Mirror Image", "Magic Missiles", "Mana Well",
 		"Dispel", "Blink"],
 	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
 		"Exhortation", "Undying Vigil"],
@@ -76,6 +84,8 @@ const TRANCHE_3 := {
 # against anything live. **THE CONTROL ITSELF IS NOT LOST**: what it protected
 # was "this batch's twelve did not leak into the boss channel", and the boss
 # channel is `SPEC_POOLS` alone now, which is what is asserted below.
+const SHIPPED_AS := {"Nexus Ward": "Magic Barrier"}
+
 const CLASS_POOLS_AT_BQ := {
 	"warrior": ["Bloodlust", "Wildstrikes", "Hack and Slash", "Blood Price",
 		"Battle Shout", "Rampage", "Mocking Blow", "Crushing Blow", "War Stomp",
@@ -175,8 +185,9 @@ func _pools() -> void:
 	# a regression. THE FLOOR IS THE HALF THIS SUITE OWNS: a pool quietly
 	# EMPTYING still trips it. The ONE surviving equality is `test_batch_cd`'s,
 	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
-	ok(total >= 24,
-		"§3/§4+BR: the class-wide half has FALLEN to %d, below the 24 that shipped" % total)
+	# BATCH GN — TWENTY: five of BQ's twelve moved into the class kits, by ruling.
+	ok(total >= 20,
+		"§3/§4+BR: the class-wide half has FALLEN to %d, below the 20 GN left it at" % total)
 	# **BATCH DY §1 — A FLOOR, NOT AN EQUALITY, AND DX'S OWN SWEEP MISSED THIS
 	# SITE.** DX §1 converted thirty-five draft equalities to floors and left
 	# exactly six, all in `test_batch_cd`. This was a seventh: the condition
@@ -185,13 +196,17 @@ func _pools() -> void:
 	# NEXT BATCH TO AUTHOR A CLASS-WIDE CARD WOULD TRIP**, and DY is that batch
 	# — Mana Shield takes the Mage class pool to SEVEN. The floor is what this
 	# suite owns; the authoritative per-class table is `test_batch_cd`'s.
+	# BATCH GN — THE FLOOR IS THREE (the Mage pool reads five and the Cleric's
+	# three), and a card is in the pool OR the class kit: a kit card offered in a
+	# draft is an offer nobody can take, and a card in neither is a card lost.
 	for cls in TRANCHE_3:
 		var live: Array = Classes.class_draft_pool(cls)
-		ok(live.size() >= 6,
-			"§3/§4: the %s class pool has FALLEN to %d, below the six that shipped" % [
+		ok(live.size() >= 3,
+			"§3/§4: the %s class pool has FALLEN to %d, below the three GN left it at" % [
 				cls, live.size()])
 		for nm in TRANCHE_3[cls]:
-			ok(live.has(nm), "§3/§4: %s is in the %s class pool" % [nm, cls])
+			ok(live.has(nm) != Classes.class_kit_holds(cls, nm),
+				"§3/§4: %s is in the %s class pool or its class kit, and in exactly one" % [nm, cls])
 	# THE DEBT WAS STATED AS AN ASSERTION rather than as prose, so that it stayed
 	# visible until it was paid. BATCH BR PAID IT, and the check INVERTS rather
 	# than being deleted — "the Hunter and Warrior pools emptied again" is the
@@ -223,16 +238,19 @@ func _pools() -> void:
 				"§1: ...and states a perfect exactly when it runs a check (%s)" % nm2)
 	# AND EVERY SPEC OF THE CLASS CAN DRAW IT — §6's own wording: a Pyromancer,
 	# a Cryomancer and an Arcanist must all be able to draw Magic Barrier.
+	# **BATCH GN — THE TWO CARDS §6 NAMES ARE CLASS-KIT CARDS NOW**, so the
+	# question "can every spec of the class get it" is answered by the opening
+	# kit, with the lineage's engine held and with it dropped.
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
 		ok(Classes.class_of_spec(spec) == "mage",
 			"§6: %s is a Mage, so the Mage class pool is his" % spec)
-		ok(Classes.class_draft_pool(Classes.class_of_spec(spec)).has("Magic Barrier"),
-			"§6: ...and %s can draw Magic Barrier" % spec)
+		ok(_opens_with("mage", spec, "Nexus Ward"),
+			"§6: ...and %s opens holding Nexus Ward, engine or none" % spec)
 	for spec2 in ["holy", "inquisitor", "occultist"]:
 		ok(Classes.class_of_spec(spec2) == "cleric",
 			"§6: %s is a Cleric, so the Cleric class pool is his" % spec2)
-		ok(Classes.class_draft_pool(Classes.class_of_spec(spec2)).has("Ministration"),
-			"§6: ...and %s can draw Ministration" % spec2)
+		ok(_opens_with("cleric", spec2, "Ministration"),
+			"§6: ...and %s opens holding Ministration, engine or none" % spec2)
 	# NOTHING IN THE CLASS POOL IS ALSO IN A SPEC POOL. The two sides of one
 	# offer must not be able to hold the same card.
 	for cls3 in Classes.CLASS_DRAFT_POOLS:
@@ -293,7 +311,7 @@ func _break_damage() -> void:
 	var want := {
 		"Chastise": 20,          # the one figure the brief names
 		"Magic Missiles": 3,     # PER BOLT — 9 across three, 12 on a perfect
-		"Magic Barrier": 0, "Mirror Image": 0, "Mana Well": 0, "Dispel": 0,
+		"Nexus Ward": 0, "Mirror Image": 0, "Mana Well": 0, "Dispel": 0,
 		"Blink": 0, "Ministration": 0, "Consecration": 0, "Unburden": 0,
 		"Exhortation": 0, "Undying Vigil": 0,
 	}
@@ -340,15 +358,19 @@ func _weaker_half() -> void:
 	ok(missiles.damage * missiles.multi_hits < barrage.damage * barrage.random_hits,
 		"§2: ...and under Arcane Barrage's (%d%%)" % [
 			barrage.damage * barrage.random_hits])
-	# MAGIC BARRIER AGAINST DIVINE SHIELD, the game's other absorb.
-	ok(0.15 < 0.30,
-		"§2: Magic Barrier's 15%% of maximum is under Divine Shield's 30%%")
-	var barrier: Ability = Classes.pool_ability("Magic Barrier")
+	# NEXUS WARD (MAGIC BARRIER UNTIL GN) AGAINST DIVINE SHIELD, the game's other
+	# absorb. The ward's figure has been 20% since CQ §3; the line said 15 until GN
+	# renamed the card under it.
+	ok(0.20 < 0.30,
+		"§2: Nexus Ward's 20%% of maximum is under Divine Shield's 30%%")
+	var barrier: Ability = Classes.pool_ability("Nexus Ward")
 	var shield: Ability = Classes.pool_ability("Divine Shield")
 	ok(barrier.cost > shield.cost and barrier.cooldown > shield.cooldown,
 		"§2: ...for more Mana and a longer cooldown")
-	# MIRROR IMAGE AND MAGIC BARRIER ARE NOT A STRICT UPGRADE OF EACH OTHER,
-	# which is §3's rule applied inside one pool. The structural proof is that
+	# MIRROR IMAGE AND NEXUS WARD ARE NOT A STRICT UPGRADE OF EACH OTHER,
+	# which was §3's rule applied inside one pool — and since GN one is the kit
+	# card every Mage holds and the other a draft card he may add beside it, so
+	# the rule matters more, not less. The structural proof is that
 	# each answers something the other cannot: the images are spent only by
 	# SINGLE-TARGET attacks, and the barrier eats a share of everything.
 	var battle_src := _src("res://scripts/battle.gd")
@@ -396,12 +418,14 @@ func _draft_flow() -> void:
 	var hunter: Dictionary = run.party[3]
 	hunter["spec"] = "sharpshooter"
 	var mage_left: Dictionary = run.draft_pool_left(mage)
-	ok(mage_left["class"].size() >= 6,
-		"§1: a Cryomancer's class side of the draft has FALLEN to %d, below six (DY took the Mage pool to seven)" % \
+	# BATCH GN — THREE: the Mage pool reads five and the Cleric's three since five
+	# cards moved into the class kits.
+	ok(mage_left["class"].size() >= 3,
+		"§1: a Cryomancer's class side of the draft has FALLEN to %d, below three (GN left the Mage pool at five)" % \
 			mage_left["class"].size())
 	var cleric_left: Dictionary = run.draft_pool_left(cleric)
-	ok(cleric_left["class"].size() >= 6,
-		"§1: an Occultist's class side has FALLEN below six (%d)" % cleric_left["class"].size())
+	ok(cleric_left["class"].size() >= 3,
+		"§1: an Occultist's class side has FALLEN below three (%d)" % cleric_left["class"].size())
 	var hunter_left: Dictionary = run.draft_pool_left(hunter)
 	# INVERTED BY BATCH BR, same reason as the pool check above: this recorded
 	# the debt in the ROLL rather than in the array, and the debt is paid.
@@ -409,9 +433,14 @@ func _draft_flow() -> void:
 		"§0+BR: a Sharpshooter's class side has FALLEN below the six BR paid (%d)" % \
 			hunter_left["class"].size())
 	# The no-return ledger covers a class card exactly as it covers a spec one.
-	mage["draft_refused"] = ["Magic Barrier"]
+	# BATCH GN — THE CARD IS ONE STILL IN THE POOL. Magic Barrier left it for the
+	# class kit, and a refusal of a card the pool no longer holds passes without
+	# asking anything, so the check stands on Mirror Image, and asserts first that
+	# the pool holds it.
+	mage["draft_refused"] = ["Mirror Image"]
 	var refused_left: Dictionary = run.draft_pool_left(mage)
-	ok(not refused_left["class"].has("Magic Barrier"),
+	ok(Classes.class_draft_pool("mage").has("Mirror Image")
+			and not refused_left["class"].has("Mirror Image"),
 		"§1: a refused class card does not come back this run")
 	mage["draft_refused"] = []
 	# AND A REAL OFFER NOW HOLDS THEM. Rolled many times because the seam is a
@@ -507,17 +536,19 @@ func _seam() -> void:
 # ---------- LIVE: THE MAGE SIX ----------
 
 func _live_barrier_and_mirror() -> void:
+	# BATCH GN — NEXUS WARD IS NOT GRANTED: it is the Mage class kit's, so the
+	# Pyromancer opens holding it, and only Mirror Image is earned.
 	var scene := await _spawn(["berserker", "pyromancer", "holy", "beastmaster"],
-		{"pyromancer": ["Magic Barrier", "Mirror Image"]},
+		{"pyromancer": ["Mirror Image"]},
 		["raider", "raider", "archer"])
 	var mage := _hero(scene, "overburn")
 	ok(mage != null, "the Pyromancer spawned")
 	if mage == null:
 		await _drop(scene)
 		return
-	var barrier: Ability = scene.call("_find_ability", mage, "Magic Barrier")
+	var barrier: Ability = scene.call("_find_ability", mage, "Nexus Ward")
 	var mirror: Ability = scene.call("_find_ability", mage, "Mirror Image")
-	ok(barrier != null, "§3: Magic Barrier is assembled onto the unit")
+	ok(barrier != null, "§3: Nexus Ward is on the unit, out of the Mage class kit")
 	ok(mirror != null, "§3: ...and Mirror Image")
 	if barrier == null or mirror == null:
 		await _drop(scene)
@@ -526,11 +557,11 @@ func _live_barrier_and_mirror() -> void:
 	var foe: BattleUnit = foes[0]
 	mage.resource = mage.max_resource
 	mage.hp = mage.max_hp
-	# ---- MAGIC BARRIER ABSORBS 20% OF **MAXIMUM** HEALTH ----
+	# ---- NEXUS WARD ABSORBS 20% OF **MAXIMUM** HEALTH ----
 	# BATCH CQ §3 — TWENTY SINCE CN §3'S FOLD (the perfect's 20% became the base).
 	await scene.call("_resolve", mage, barrier, mage, "good")
 	var want_absorb := int(round(mage.max_hp * 0.20))
-	ok(mage.has_status("barrier"), "§3: Magic Barrier lands a barrier")
+	ok(mage.has_status("barrier"), "§3: Nexus Ward lands a barrier")
 	ok(mage.status_power("barrier") == want_absorb,
 		"§3: ...worth 20%% of his MAXIMUM health (%d, wanted %d)" % [
 			mage.status_power("barrier"), want_absorb])
@@ -591,8 +622,10 @@ func _live_barrier_and_mirror() -> void:
 
 
 func _live_mana_well_and_blink() -> void:
+	# BATCH GN — THE DRAFTED CARD BLINK IS MEASURED AGAINST IS MIRROR IMAGE:
+	# Magic Missiles is the Mage class kit's now, so it is no longer drafted.
 	var scene := await _spawn(["berserker", "arcanist", "holy", "beastmaster"],
-		{"arcanist": ["Mana Well", "Blink", "Magic Missiles"]},
+		{"arcanist": ["Mana Well", "Blink", "Mirror Image"]},
 		["raider", "raider", "archer"])
 	var mage := _hero(scene, "resonance")
 	if mage == null:
@@ -606,10 +639,10 @@ func _live_mana_well_and_blink() -> void:
 		return
 	var well: Ability = scene.call("_find_ability", mage, "Mana Well")
 	var blink: Ability = scene.call("_find_ability", mage, "Blink")
-	var missiles: Ability = scene.call("_find_ability", mage, "Magic Missiles")
-	ok(well != null and blink != null and missiles != null,
-		"§3: Mana Well, Blink and Magic Missiles are all assembled onto the unit")
-	if well == null or blink == null or missiles == null:
+	var drafted: Ability = scene.call("_find_ability", mage, "Mirror Image")
+	ok(well != null and blink != null and drafted != null,
+		"§3: Mana Well, Blink and Mirror Image are all assembled onto the unit")
+	if well == null or blink == null or drafted == null:
 		await _drop(scene)
 		return
 	# ---- MANA WELL DOUBLES THE **LIVE** FIGURE, NOT A STALE CONSTANT ----
@@ -635,21 +668,21 @@ func _live_mana_well_and_blink() -> void:
 	mage.resource = mage.max_resource
 	mage.cooldowns.clear()
 	var foes: Array = scene.get("enemies")
-	# A DRAFTED ability's cooldown (Magic Missiles, earned this run) and a KIT
+	# A DRAFTED ability's cooldown (Mirror Image, earned this run) and a KIT
 	# ability's, put there by real casts rather than written in by hand.
-	await scene.call("_resolve", mage, missiles, foes[0], "good")
+	await scene.call("_resolve", mage, drafted, mage, "good")
 	var cannon: Ability = scene.call("_find_ability", mage, "Arcane Cannon")
 	if cannon != null:
 		mage.resource = mage.max_resource
 		await scene.call("_resolve", mage, cannon, foes[0], "good")
-	var missiles_cd := int(mage.cooldowns.get("Magic Missiles", 0))
+	var missiles_cd := int(mage.cooldowns.get("Mirror Image", 0))
 	var cannon_cd := int(mage.cooldowns.get("Arcane Cannon", 0))
 	ok(missiles_cd > 0, "§6: the DRAFTED ability is on cooldown (%d)" % missiles_cd)
 	ok(cannon_cd > 0, "§6: ...and so is a kit ability (%d)" % cannon_cd)
 	mage.resource = mage.max_resource
 	await scene.call("_resolve", mage, blink, mage, "good")
 	# BATCH CQ §3 — TWO TURNS SINCE CN §3'S FOLD, not one.
-	ok(int(mage.cooldowns.get("Magic Missiles", 0)) == missiles_cd - 2,
+	ok(int(mage.cooldowns.get("Mirror Image", 0)) == missiles_cd - 2,
 		"§6: Blink takes TWO turns off the DRAFTED ability's cooldown")
 	ok(int(mage.cooldowns.get("Arcane Cannon", 0)) == cannon_cd - 2,
 		"§6: ...and off the kit ability's")
@@ -747,8 +780,10 @@ func _live_dispel() -> void:
 # ---------- LIVE: THE CLERIC SIX ----------
 
 func _live_cleric_heals() -> void:
+	# BATCH GN — NOTHING IS GRANTED: Ministration and Consecration are the Cleric
+	# class kit's, so the Occultist opens holding both.
 	var scene := await _spawn(["berserker", "cryomancer", "occultist", "beastmaster"],
-		{"occultist": ["Ministration", "Consecration"]},
+		{"occultist": []},
 		["raider", "raider", "archer"])
 	var cleric := _hero(scene, "old_gods")
 	ok(cleric != null, "the Occultist spawned")
@@ -758,7 +793,7 @@ func _live_cleric_heals() -> void:
 	var minist: Ability = scene.call("_find_ability", cleric, "Ministration")
 	var consec: Ability = scene.call("_find_ability", cleric, "Consecration")
 	ok(minist != null and consec != null,
-		"§4: Ministration and Consecration are assembled onto the unit")
+		"§4: Ministration and Consecration are on the unit, out of the Cleric class kit")
 	if minist == null or consec == null:
 		await _drop(scene)
 		return
@@ -817,8 +852,9 @@ func _live_cleric_heals() -> void:
 
 
 func _live_chastise_and_unburden() -> void:
+	# BATCH GN — ONLY CHASTISE IS GRANTED: Unburden is the Cleric class kit's.
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "beastmaster"],
-		{"holy": ["Chastise", "Unburden"]}, ["raider", "raider", "archer"])
+		{"holy": ["Chastise"]}, ["raider", "raider", "archer"])
 	var cleric := _hero(scene, "mercy")
 	if cleric == null:
 		for h in scene.get("heroes"):
@@ -831,7 +867,7 @@ func _live_chastise_and_unburden() -> void:
 	var chastise: Ability = scene.call("_find_ability", cleric, "Chastise")
 	var unburden: Ability = scene.call("_find_ability", cleric, "Unburden")
 	ok(chastise != null and unburden != null,
-		"§4: Chastise and Unburden are assembled onto the unit")
+		"§4: Chastise (earned) and Unburden (the class kit's) are on the unit")
 	if chastise == null or unburden == null:
 		await _drop(scene)
 		return
@@ -1132,7 +1168,8 @@ func _docs() -> void:
 			(next_idx - head_idx) if next_idx > head_idx else -1)
 		for cls2 in TRANCHE_3:
 			for nm2 in TRANCHE_3[cls2]:
-				ok(entry.contains(nm2), "§5: the BQ entry names %s" % nm2)
+				var shipped := String(SHIPPED_AS.get(nm2, nm2))
+				ok(entry.contains(shipped), "§5: the BQ entry names %s" % shipped)
 		ok(entry.contains("Chastise"),
 			"§5: ...and carries the Chastise finding")
 	var glossary := _src("res://data/glossary.json")
@@ -1168,6 +1205,19 @@ func _spawn(specs: Array, granted: Dictionary, lineup: Array,
 	return await Fixture.spawn(self, specs,
 		{"difficulty": "wanderer", "enemies": lineup, "talents_by_spec": learned,
 		"bm_by_spec": granted, "deterministic": true, "enemies_keep_cover": true})
+
+
+# BATCH GN — does a hero of this class and lineage open holding the card, with
+# the lineage's engine held AND with it dropped? A class-kit card must be both.
+func _opens_with(class_key: String, spec: String, card: String) -> bool:
+	for engines in [[Classes.engine_of_spec(spec)], []]:
+		var held := false
+		for ab in Classes.opening_kit(class_key, spec, engines):
+			if ab.display_name == card:
+				held = true
+		if not held:
+			return false
+	return true
 
 
 func _hero(scene: Node, passive: String) -> BattleUnit:

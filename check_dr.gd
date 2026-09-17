@@ -378,8 +378,9 @@ func _s7_names_and_total() -> void:
 	# beside `PER_SPEC_DEPTH` — the authoritative table a new card must move.
 	ok(spec_total >= 125,
 		"the spec draft half has FALLEN to %d, below the 125 that shipped" % spec_total)
-	ok(class_total >= 24,
-		"the class draft half has FALLEN to %d, below the 24 that shipped" % class_total)
+	# BATCH GN — TWENTY: five class-wide cards moved into the class kits, by ruling.
+	ok(class_total >= 20,
+		"the class draft half has FALLEN to %d, below the 20 GN left it at" % class_total)
 	ok(spec_total + class_total >= 149,
 		"the draft has FALLEN to %d, below the 149 that shipped" % (spec_total + class_total))
 	print("  draft: %d spec + %d class-wide = %d" % [spec_total, class_total,
