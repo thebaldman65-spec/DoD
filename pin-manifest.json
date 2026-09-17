@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1467,
-  "source": 1134,
+  "total": 1470,
+  "source": 1137,
   "other": 93,
   "document": 240
  },
  "source_residency": {
   "narrow": 31,
-  "code": 681,
-  "absent": 298,
+  "code": 682,
+  "absent": 300,
   "runtime": 80,
   "unresolved": 1,
   "comment": 40,
@@ -1856,7 +1856,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#28",
+   "g": "check_el.gd#25",
    "alt": true
   },
   {
@@ -1868,7 +1868,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#28",
+   "g": "check_el.gd#25",
    "alt": true
   },
   {
@@ -1880,7 +1880,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_el.gd#129",
+   "g": "check_el.gd#126",
    "expr": "String"
   },
   {
@@ -1892,7 +1892,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#103"
+   "g": "check_el.gd#100"
   },
   {
    "s": "check_el.gd",
@@ -1903,7 +1903,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#111"
+   "g": "check_el.gd#108"
   },
   {
    "s": "check_el.gd",
@@ -1914,7 +1914,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#127"
+   "g": "check_el.gd#124"
   },
   {
    "s": "check_el.gd",
@@ -1925,7 +1925,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#107"
+   "g": "check_el.gd#104"
   },
   {
    "s": "check_el.gd",
@@ -1936,7 +1936,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#151"
+   "g": "check_el.gd#148"
   },
   {
    "s": "check_el.gd",
@@ -1947,7 +1947,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#152"
+   "g": "check_el.gd#149"
   },
   {
    "s": "check_es.gd",
@@ -3107,6 +3107,39 @@
    "k": "literal",
    "how": "read",
    "g": "check_fx.gd#705"
+  },
+  {
+   "s": "check_gm.gd",
+   "fn": "_s2_bound_cards",
+   "h": "scripts/battle.gd",
+   "n": ".equipped =",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gm.gd#181"
+  },
+  {
+   "s": "check_gm.gd",
+   "fn": "_s2_bound_cards",
+   "h": "scripts/battle.gd",
+   "n": "[\"equipped\"] =",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gm.gd#181"
+  },
+  {
+   "s": "check_gm.gd",
+   "fn": "_s2_bound_cards",
+   "h": "scripts/run_state.gd",
+   "n": "r[\"equipped\"] = false",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gm.gd#182"
   },
   {
    "s": "test_batch_ah.gd",

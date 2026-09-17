@@ -15,6 +15,80 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-16 &mdash; Batch GM: HOLD BREATH, AND CARDS THAT OUTLIVE THEIR ENGINE</h2>
+<p><b>IMPLEMENT ONLY, AND THE NINETEENTH BATCH ON <code>class-merge</code>.</b> GL found four defects live in play and
+reproduced them in real battles; <b>GM repairs three of them and the designer's ruling on the fourth</b>, sweeps for
+the shape the worst one belongs to, and reports what the ruling's words mean in the code. <code>main</code> is
+untouched. Full working: <code>docs/reports/GM.md</code>.</p>
+
+<p><b>&sect;1 &mdash; HOLD BREATH IS SPENT WHERE IT PAYS.</b> Its countdown sat inside the Lethal Aim block, so a
+Sharpshooter who dropped his rune kept the card and, after one cast, every damaging attack for the rest of the fight
+was a guaranteed critical that ignored armor. <b>The spend sits beside the block now, under the payout's own
+gate</b> &mdash; any damaging attack but a counter spends one shot &mdash; so the breath is spent by the first shot
+whichever engines the hero holds. Driven on the same seeded rolls: with no engine, six Quick Shots after one cast
+read <b>27.0</b> on HEAD with the status standing after all six, and <b>17.3</b> on GM &mdash; the first shot 26, the
+rest 15.6, the status spent by the first. With Lethal Aim both read 18.5. <b>And the same hole was inside the
+engine</b>: a Lethal Aim holder's area casts, Called Volley and Drumfire were paid the promised shot on every target
+and kept the breath, because the block left all three out. They spend it now.</p>
+<ul>
+<li><b>THE SWEEP FOR THE SHAPE FOUND ONE.</b> Every status id with a spend site and every charge-like unit field was
+read with its effective gates &mdash; the <code>if</code> chain, the early returns above it, and the gates every
+caller of its function carries. <b>Of 171 status ids, 45 have a spend site, six have every spend gated, and only
+Hold Breath is laid and paid outside the gate its spend sat in</b>; none of 68 charge-like fields is. The related
+shape &mdash; a card's own payload inside an engine's block &mdash; is GL's five, confirmed and queued.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES, RULED BY THE DESIGNER AND BUILT.</b>
+<b>Death Ray</b> (the Arcanist's), <b>Resurrection</b> (the Holy's) and <b>Kill Command</b> (the Beastmaster's) are
+the three lineage cards the usability door refuses without their engine. They are named in
+<code>Classes.ENGINE_BOUND</code> and <code>Classes.opening_kit</code> takes them out at the line that takes the
+enablers out, and puts them back when the engine is slotted.</p>
+<ul>
+<li><b>WHAT "ITS CARDS" MEANS, AND IT IS THREE POPULATIONS, NOT TWO.</b> The three that cannot work at all are all
+opening-kit cards and are the ones dropped. <b>GL's five that half-work are a different cut</b>: only Shrapnel
+Charge is in an opening kit, and Hamstring, Venom Coating, Pinning Shot and Called Shot are zone-boss cards a hero
+EARNED &mdash; and an earned card is never lost. <b>And a third population exists</b>: about twenty earned draft and
+boss cards are refused at the door without their engine. Neither of the other two is dropped; both wait on a
+ruling.</li>
+<li><b>A BOUND CARD IS NOT AN ENABLER.</b> It does not travel to another hero who takes the engine, and its slot
+stays counted, so no magnitude moved. <b>Kill Command is not quite "never usable"</b>: Call the Wilds, an earned
+draft card, summons a companion with no engine. It leaves anyway, as the ruling names it.</li>
+<li><b>NO PATH DROPS AN ENGINE INSIDE A FIGHT.</b> The battle reads the member's engines once, at the spawn, and
+nothing in <code>battle.gd</code> writes an engine's slot state. Driven: a drop written mid-fight left the fight's
+engine, bar and Death Ray's cooldown as they were, and the next fight opened without Death Ray.</li>
+<li><b>THE BARE-NUMBER LABEL SURVIVES, AND IT IS NOT RESURRECTION'S ANY MORE.</b> A Holy with no Mercy no longer holds
+Resurrection, but one who drafted <b>Divine Plea</b> sees its button read <i>"Divine Plea&nbsp;&nbsp;&nbsp;2"</i>.
+Reported, not fixed.</li>
+</ul>
+
+<p><b>&sect;3 &mdash; THE SPLIT SHIELD WORKS IN A FIGHT, AND ITS GATE ASKS THE CAST.</b> EZ built the rune into the
+recast table and never into Shieldwall's cast, so the cast laid the whole wall on the Warden and nothing on anybody.
+<b>The handler reads its writes off <code>_recast_writes</code> now</b>, so the table and the cast are one answer by
+construction. <b>With the rune, Shieldwall names another living hero</b>: half the wall is his (+12%) and half is
+that hero's, for the same turns; standing alone he keeps his half. The bot names the weakest hero it may.
+<b><code>check_ez</code> &sect;5's comment said driving the table was driving the cast</b>; it casts the card and
+reads what landed now.</p>
+<p><b>&sect;3 &mdash; DISPEL LEAVES THE HEROES' WORK, AND THE CARD TEXT DECIDED IT.</b> Dispel strips
+<i>beneficial</i> effects from an enemy, and a mark the heroes laid is not one. <b>Hunter's Mark, Arcane Echo and
+Rime were in neither of the lists Dispel's set is derived from</b>, so a Mage's Dispel took all three; all three are
+in <code>DISPEL_NEVER</code> now, and an enemy's own ward is still Dispel's to take. <b>Rime stays out of
+<code>DEBUFF_IDS</code></b>, which would also move a Survivalist's breadth and a mender's rite.</p>
+
+<p><b>&sect;4, &sect;5 &mdash; NOT DONE, AS RULED, AND THE QUEUE CONFIRMED.</b> No kit pick, no engine rune authored,
+nothing for the Crown, no pool merge, talent node or rune cost. Divine Shield's recast check and the Bare Altar, the
+basics' unreachable Perfect, the card texts and the sim bot stay queued &mdash; <b>and the bot's item is sharper than
+it read</b>: five of the 64 kit candidates are cast only inside an engine branch (all five the Warrior's), and
+<b>Powershot, Tripwire and Mana Shield are never cast by the bot at all</b>.</p>
+
+<p><b>NEW GATE: <code>check_gm.gd</code></b> drives all four repairs live, every negative anchor paired with its
+positive arm, and was armed against HEAD's code before it was trusted. <b>Three gates moved with the code, each run
+unmodified against it first</b>: <code>check_ez</code> &sect;5 casts the card, <code>check_el</code> counts fifteen
+ids and reads its two marks out of the list, and <code>check_di</code>'s call-site tripwire reads 215 &mdash; the one
+red the unmodified gates gave that nobody predicted, because the split is a new <code>_apply_status</code> site. <b>A standing rule each</b> for &sect;1, the
+bound cards, the cast that reads its table and the two lists Dispel's set is derived from, in
+<code>CLAUDE.md</code>; one in <code>docs/instrument-rules.md</code> for a gate that drives a stand-in.
+<b>Rulings owed</b> are under their own heading in the report.</p>
+
 <h2>2026-09-16 &mdash; Batch GL: WHAT THE FOUR CLASS KITS COULD BE MADE OF</h2>
 <p><b>REPORT ONLY, AND THE EIGHTEENTH BATCH ON <code>class-merge</code>. NOTHING WAS AUTHORED, MOVED, CUT OR BUILT</b>
 &mdash; no card was proposed or reworded, no pool, slot, talent node or rune moved, and no code, gate, baseline row,

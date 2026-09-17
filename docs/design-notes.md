@@ -8771,3 +8771,40 @@ being an engine; written as `is_engine_rune` with an arm that the set is not emp
 **Why `awakened` and not a spec.** A spine-taker has chosen and has no spec, so "spec is empty" stopped
 meaning "has not chosen" the moment spines became runes. Two payments read the old meaning and paid a member
 who had not chosen; they now read the flag the awakening writes.
+
+## Batch GM — Hold Breath, and cards that outlive their engine
+
+**Why the spend moved and the payout did not.** Two repairs would have stopped Hold Breath running
+forever: gate its payout on Lethal Aim as well, or take its spend out of Lethal Aim. The first makes the
+card do nothing for a Sharpshooter without the rune, which is the dead-button problem wearing another
+name. The second makes it do what its text says for everyone who holds it. A status is paid and spent by
+one rule, and the payout's rule was already the right one.
+
+**Why a Lethal Aim holder's area casts now spend the breath too.** They were always paid it — every target
+of an area cast took the guaranteed critical — and never spent it, because the engine block left them out.
+Moving the spend under the payout's gate closes that without a second decision: the cast that is paid is
+the cast that pays.
+
+**Why only three cards leave with an engine.** The ruling is about cards that outlive their engine, and the
+three that cannot be cast without it are the clear case: taking them away removes a button and nothing
+else. A card that half-works still does something, so taking it away takes something the hero could use;
+and an earned card is never lost, which the loadout rules promise. Those two are different questions, and
+the batch reports them rather than folding them into the first.
+
+**Why a bound card is not an enabler.** The relation runs the other way — the engine needs an enabler, a
+bound card needs the engine — and the enabler's two other behaviours, travelling to another hero and
+sitting outside the slot count, both move something a player can count. The ruling named only the leaving.
+
+**Why Shieldwall reads the recast table instead of the table reading Shieldwall.** The table already held
+the rune, the numbers and the ally, and it is what the refusal asks. Making the cast read it leaves one
+place a Shieldwall write is decided, so the next rune that moves it cannot be built into one and missed in
+the other.
+
+**Why the Split Shield asks for a hero.** Its text says the half goes to the ally he sets it in front of,
+which is a choice. A companion never rolls Block, so a hero is the only body the half can reach.
+
+**Why Dispel was repaired rather than reported.** Its card text strips beneficial effects from an enemy,
+and a mark the heroes laid is not a benefit to the enemy wearing it. The project's own rule for marks
+already said Dispel must not take them; three had simply never been listed. Rime went on the Dispel list
+rather than the debuff list because the debuff list also feeds a Survivalist's count and a mender's rite,
+and moving those is a different decision.

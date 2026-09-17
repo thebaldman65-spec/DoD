@@ -644,6 +644,12 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   SYMBOL TABLE of declarations, matched by equality, and the declarations have to be read with the
   string literals MASKED — an unmasked `func\s+(\w+)` scan declares the dead name back into
   existence out of the assertion that pins it absent.
+- **AND A GATE'S OWN COMMENT SAYING ITS ARM STANDS IN FOR THE THING IS THE SAME CLAIM, ONE LAYER UP (GM §3).**
+  `check_ez` §5 drove the Split Shield through `_recast_writes` and said the table was *"the same answer the cast
+  itself uses"*. From EZ to GM the cast never read the rune, so the section stayed green over a rune that did
+  nothing in a fight. **A GATE THAT DRIVES A STAND-IN DRIVES THE THING AS WELL**, or it is a check that has stopped
+  asking its question: `check_ez` §5 casts the card and reads what landed now, and `check_gm` §3 drives it through
+  a whole bot turn.
 
 ## ARM A NEGATIVE CONTROL ON A NEEDLE A SUITE DEMONSTRABLY READS (STANDING, SET AT EB §3)
 > **A control armed on unasserted prose reports the same green a working check does.** Arm it on

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-15 (Batch GK &mdash; engines become runes)</b></p>
+<p align="right"><b>Last updated: 2026-09-16 (Batch GM &mdash; Hold Breath, and cards that outlive their engine)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -795,7 +795,9 @@ shows the % gained at the moment of the shout.</td></tr>
 ("IP3" → "IP1").</td></tr>
 <tr><td>Shieldwall</td><td>+25% Block chance while the stance holds (the Warden's
 Shieldwall). Its blocks count as Heavy Plating blocks; the chip reads
-"+25% Block" and his passive chip folds it into the live total.</td></tr>
+"+25% Block" and his passive chip folds it into the live total. With the <b>Split Shield</b>
+rune the wall is halved: +12% for him, and +12% Bulwark Line on the hero he sets it in front
+of.</td></tr>
 <tr><td>High Guard</td><td>Takes 40% less damage for 3 turns, after a parry (nothing in the game applies it at present).</td></tr>
 <tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 20%
 (a Crushing Blow rider; nothing in the game applies it at present); the chip shows the reduction ("−20%").</td></tr>
@@ -832,8 +834,8 @@ Stabilize (2 turns; the chip shows the total).</td></tr>
 battle (it is once per battle).</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage (the Warden's Hold the Line).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (the Warden's Hold the Line).</td></tr>
-<tr><td>Bulwark Line</td><td>+10% Block chance for as long as the Warden's Shieldwall
-holds (nothing in the game applies it at present).
+<tr><td>Bulwark Line</td><td>+12% Block chance for as long as the Warden's Shieldwall
+holds: the half of the wall the <b>Split Shield</b> rune sets in front of another hero.
 Rides the Heavy Plating slice of the block roll, so it is real
 Block; a block it buys is logged as "(Bulwark Line)".</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
@@ -909,7 +911,8 @@ mark's cooldown).</td></tr>
 lives on at FULL strength for the rest of the battle
 (nothing in the game applies it at present).</td></tr>
 <tr><td>Held Breath</td><td>The Sharpshooter's next attack is a GUARANTEED critical and
-ignores all armor (Hold Breath).</td></tr>
+ignores all armor (Hold Breath). That attack spends it, whichever engines he holds &mdash; any
+damaging attack but a counter, an area attack included.</td></tr>
 <tr><td>Snared</td><td>A Survivalist trap waits underfoot: the next time this enemy acts
 it is Stunned 1 turn and Poisoned (bosses resist the stun unless Broken).</td></tr>
 <tr><td>Caught Fast</td><td>The trap's teeth hold the wound open: cannot be healed
@@ -1159,7 +1162,14 @@ his class's. Each costs 100 gold at the Peddler, on the flat rune price.</li>
 <li><b>Drop and swap, to nothing.</b> The hero's rune pouch on the map equips and unequips engine
 runes. An unequipped rune is kept, and its engine is out of the next fight. <b>A hero with no
 engine is a legal state</b>: his class kit, his lineage's other abilities and his runes still
-fight, and nothing an engine grants is there.</li>
+fight, and nothing an engine grants is there. <b>A drop changes the next fight, never the one in
+progress.</b></li>
+<li><b>An engine's bound abilities leave with it.</b> Three lineage abilities cannot be used
+without their engine, and are out of the kit while it is unequipped and back when it is equipped:
+<b>Death Ray</b> (the Arcanist's; it needs Resonance), <b>Resurrection</b> (the Holy's; it costs
+Mercy) and <b>Kill Command</b> (the Beastmaster's; it needs a companion, which the Pack Bond
+summons bring). Unlike an enabler, a bound ability does not come with the rune to another hero,
+and its ability slot stays counted.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6a — come with the rune to any hero of the class who holds it, sit
 <b>outside the ability slot count</b>, and leave when it leaves: Overburn brings Fireball and
@@ -1682,7 +1692,7 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than the Barrier against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td><td>The reliable filler. Multi-hit, so it plays with anything reading hits rather than casts, and cheap enough to cast while saving for something bigger.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
-<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry. Until Batch CX the Crown&rsquo;s half could never fire, so in practice there was one source, not two.</td></tr>
+<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry. Until Batch CX the Crown&rsquo;s half could never fire, so in practice there was one source, not two.</td></tr>
 <tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power and no baseline: none of the three can simply heal someone on turn one</i></td></tr>
 <tr><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td><td>The plain heal none of them has. Holy's healing is gated behind Mercy, the Devout's behind shields absorbing hits, the Occultist's behind marks on enemies.</td></tr>
@@ -1842,7 +1852,9 @@ Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 each to RANDOM
 enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead).<br>
 Shieldwall — 25 Rage, 1.0, 2cd, self-cast with no target selection: +25% Block chance for
-3 turns. The blocks it buys count as <b>Heavy Plating</b> blocks. The chip reads "+25% Block".<br>
+3 turns. The blocks it buys count as <b>Heavy Plating</b> blocks. The chip reads "+25% Block".
+<b>With the Split Shield rune it names another living hero</b>: the wall is split, +12% for him and
++12% for that hero, for the same 3 turns; standing alone, he keeps his half.<br>
 <i>Earnable (§6a):</i> Interpose — 25 Rage, 1.0 int, 4cd, self-cast with no
 target selection: every OTHER living
 ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the

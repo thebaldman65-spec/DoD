@@ -66,12 +66,20 @@ func _initialize() -> void:
 # boon"*, and `spec_passive` is a hero's own passive. **BATCH GK ADDED
 # `spec_passive_2`**, the chip of a hero's SECOND engine — the same kind as
 # `spec_passive`, put in `DISPEL_NEVER` beside it for the same reason.
-const NOT_A_MARK := ["ruin_primed", "charging", "spec_passive", "spec_passive_2"]
+# **BATCH GM §3 ADDED `rime`**, which the comment that put it there names as
+# not a mark: it is the party's work on an enemy, listed so Dispel leaves it.
+const NOT_A_MARK := ["ruin_primed", "charging", "spec_passive", "spec_passive_2",
+	"rime"]
 
-# The two marks that are in NEITHER list, because they are neither dispellable
-# buffs nor debuffs — the card clears its own predecessor instead ("one mark at
-# a time"), so `Dispel` never had a reason to be told about them.
-const MARKS_OUTSIDE_DISPEL_NEVER := ["party_mark", "arcane_echo"]
+# **THE TWO MARKS THAT STOOD OUTSIDE BOTH LISTS ARE INSIDE `DISPEL_NEVER` SINCE
+# GM §3, AND THE REASON THIS FILE GAVE FOR LEAVING THEM OUT WAS WRONG.** It said
+# the card clears its own predecessor ("one mark at a time"), so `Dispel` never
+# had a reason to be told about them. That rule governs the caster's own recast
+# and nothing else: `_dispellable_buffs` is DERIVED from absence in both lists,
+# so a mark in neither was a mark a Mage's Dispel could take — and GL drove one
+# doing it, a Hunter's Mark laid and gone after a Dispel. `party_mark` and
+# `arcane_echo` are read out of `DISPEL_NEVER` with the other eight now, which
+# is where this gate always said the game writes its marks down.
 
 
 func _s1_mark_population() -> void:
@@ -86,10 +94,10 @@ func _s1_mark_population() -> void:
 	for sid in battle_gd.DISPEL_NEVER:
 		if not NOT_A_MARK.has(String(sid)):
 			marks[String(sid)] = true
-	for extra in MARKS_OUTSIDE_DISPEL_NEVER:
-		marks[String(extra)] = true
-	ok(battle_gd.DISPEL_NEVER.size() == 12,
-		"DISPEL_NEVER still holds twelve ids — eight marks and four that are not (%d)"
+	# MOVED AT GM §3, 12 -> 15, AND THE LINE MOVES WITH ITS REASON: the two marks
+	# that stood outside the list joined it, and so did `rime`, which is not one.
+	ok(battle_gd.DISPEL_NEVER.size() == 15,
+		"DISPEL_NEVER holds fifteen ids — ten marks and five that are not (%d)"
 			% battle_gd.DISPEL_NEVER.size())
 	ok(marks.size() == 10, "the game names ten marks (%d: %s)" % [
 		marks.size(), ", ".join(marks.keys())])

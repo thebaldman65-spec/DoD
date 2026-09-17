@@ -1219,6 +1219,10 @@ answer and `RECAST_GATED` is the set; **its live size is in `docs/state.md`, not
   handler performs, reads every recast as an improvement, and stops refusing altogether.
   **ANY EDIT TO A DURATION, POWER OR RIDER ON A `RECAST_GATED` ABILITY OWES THE SAME EDIT AT
   `_recast_writes`.**
+- **AND A RUNE THAT MOVES A MEMBER'S WRITE IS BUILT IN THE CAST, NOT ONLY IN THE TABLE (GM §3).** EZ built the
+  Split Shield into `_recast_writes` alone: the table halved Shieldwall and covered an ally, while the cast laid the
+  whole wall and covered nobody. **Shieldwall's handler reads its writes off `_recast_writes` since GM**, which
+  makes the two one answer by construction — the shape to copy for any member a rune or a node can move.
 - **A HANDLER THAT GUARDS ITS OWN WRITE NEEDS THE GUARD MIRRORED, NOT THE VALUE (STANDING, DA §2).**
   Every other member of the set calls `_apply_status` unconditionally and lets `add_status`'s
   `max()` discard the weaker value; **Glacial Prison does not** — it reads
@@ -1864,6 +1868,41 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **"HAS CHOSEN" IS `awakened`, NOT A SPEC.** A hero who takes a spine at class selection has no spec and has
   chosen; a member not yet through class selection has neither. What reads the old meaning pays or offers the
   wrong member — GK's census found two such (the zone-boss bank and the two fallback draft rolls).
+- **AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES (GM §2, RULED BY THE DESIGNER).** A lineage card the
+  usability door refuses without its engine — Death Ray, Resurrection, Kill Command — is named in
+  `Classes.ENGINE_BOUND`, and `Classes.opening_kit` takes it out at the line that takes the enablers out and puts
+  it back when the engine is slotted. **A NEW LINEAGE CARD THE DOOR REFUSES WITHOUT ITS ENGINE OWES A ROW THERE IN
+  THE SAME BATCH**: `check_gm` §2 casts every lineage card with the engine gone and reds on a fourth.
+  · **IT IS NOT AN ENABLER AND MUST NOT BE MADE ONE.** An enabler is what the engine needs; a bound card is what
+    needs the engine. So a bound card does not travel to another hero who takes the engine and does not leave the
+    slot count — the slot it held stays counted, and no magnitude moved. Whether it should do either is open
+    (`docs/state.md`).
+  · **THE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE, AND THE EARNED CARDS THAT NEED ONE, ARE NOT IN IT.** A card
+    that still does something is a working card, and an earned card is never lost (EG), so neither is this rule's
+    to take. Both populations are in `docs/reports/GM.md` §2 and wait on a ruling.
+- **AND A FIGHT KEEPS WHAT IT OPENED WITH.** The battle reads the member's engines once, at the spawn, and nothing in
+  `battle.gd` writes an engine's slot state; the pouch's door is on the map. A drop takes effect at the next fight,
+  never inside one, so no card leaves while it is cooling down, chosen or resolving (`check_gm` §2).
+
+## STANDING RULE — A STATUS IS SPENT WHERE IT PAYS, NEVER WHERE AN ENGINE READS IT (Batch GM §1)
+> **A status, charge or bank a card lays is spent under the gate its payout is read under. Its countdown or its
+> removal never sits inside a `has_engine` block, a spine switch or a talent's guard the card itself does not
+> require.**
+
+**AN ENGINE CAN BE DROPPED SINCE GK, SO A GATE ON A SPEND IS A GUARANTEE NOBODY HOLDS.** Hold Breath's countdown sat
+inside the Lethal Aim block: a Sharpshooter who dropped his rune kept the card, and after one cast every damaging
+attack was a guaranteed critical that ignored armor for the rest of the fight — GL drove it. The spend sits beside
+the block now, under the payout's own gate, and a Lethal Aim holder's area casts, Called Volley and Drumfire, which
+the block left out, spend what they were paid.
+- **THE CENSUS FOUND ONE, AND ITS METHOD IS THE THING TO RE-RUN.** Every status id with a spend site and every
+  charge-like unit field, read with its EFFECTIVE gates: the `if` chain, the early returns above it, and the gates
+  every caller of its function carries. Hold Breath was the only status laid and paid outside the gate its spend
+  sat in (`docs/reports/GM.md` §1 carries the population). **A static census finds the next one; a live drive with
+  the engine gone proves it** (`check_gm` §1).
+- **A CARD'S OWN PAYLOAD INSIDE AN ENGINE'S BLOCK IS THE SAME SHAPE ONE STEP ALONG, AND IT IS OPEN.** Shrapnel
+  Charge, Hamstring, Venom Coating, Pinning Shot and Called Shot apply part of what their text promises only while
+  the engine is held (`docs/state.md`). BV moved Loaded Shot out of the Survivalist's block and Crossfire out of
+  the Sharpshooter's for this reason: **the effect belongs to the ability, not to whoever is holding it.**
 
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
 **ITS CORE HALF IS SUPERSEDED BY THE ENGINE RUNE CHARTER ABOVE: NO CLASS HAS A CORE (GK).** Momentum,
@@ -3710,6 +3749,12 @@ READ HERE THAN TO REDISCOVER.**
   party's own work inside the cleansable set for a mender's Cleansing Rite. `unit.gd`'s list names
   five existing deliberate absences for this reason. **The one that did belong is the one that
   lands on an enemy** — and being listed is what makes it feed a Survivalist's Trapper breadth.
+· **AND EVERY STATUS THE HEROES LAY ON AN ENEMY IS IN ONE OF TWO LISTS (GM §3).** `_dispellable_buffs` is DERIVED
+  from absence in both, so an enemy-side status in neither is one a Mage's Dispel strips — and Dispel's own text
+  strips only BENEFICIAL effects from an enemy. An affliction goes in `DEBUFF_IDS`; a MARK, or other work of the
+  heroes' that is not an affliction, goes in `battle.DISPEL_NEVER`. GM found three in neither — Hunter's Mark,
+  Arcane Echo and Rime — and listed all three there. **Rime is tagged an affliction and stays out of `DEBUFF_IDS`,
+  because that list also feeds a Survivalist's breadth and a mender's rite: a magnitude, and the designer's.**
 
 
 ## STANDING RULE — READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY (Batch BW §3)

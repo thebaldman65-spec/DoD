@@ -736,8 +736,16 @@ func _s5_the_read_sites() -> void:
 
 	# ---- Warden: the Split Shield halves the wall and reaches an ally ----
 	# `_recast_writes` is the ONE function that says what a cast would lay, and
-	# it is what the recast-refusal check reads — so driving it is driving the
-	# same answer the cast itself uses rather than a second copy of it.
+	# it is what the recast-refusal check reads.
+	#
+	# **BATCH GM §3 — THIS COMMENT SAID DRIVING THE TABLE WAS DRIVING "THE SAME
+	# ANSWER THE CAST ITSELF USES", AND FROM EZ TO GM IT WAS NOT.** The table
+	# carried the rune and Shieldwall's handler never read it: the cast laid the
+	# whole wall on the Warden and nothing on anybody, and this section stayed
+	# green over a rune that did nothing in a fight, because it asked the proxy
+	# and never the thing. The handler reads the table since GM, and the arms
+	# after the table's now CAST the card and read what landed — a gate that
+	# drives a stand-in drives the thing it stands in for as well.
 	var sw_ab: Ability = scene._find_ability(wd, "Shieldwall")
 	ok(sw_ab != null, "§5: the Warden holds Shieldwall")
 	var solo: Array = scene._recast_writes(wd, sw_ab, wd)
@@ -754,6 +762,15 @@ func _s5_the_read_sites() -> void:
 	ok(not split_ally.is_empty()
 			and int((split_ally[0] as Dictionary)["power"]) == scene.SHIELDWALL_BLOCK / 2,
 		"§5: ...and the ally gets the same half")
+	# THE CAST, set in front of the Occultist: what lands is what the table said.
+	wd.resource = wd.max_resource
+	await scene._resolve_special(wd, sw_ab, occ, "good", 1.0)
+	ok(wd.status_power("shieldwall") == int((split_self[0] as Dictionary)["power"]),
+		"§5: ...and the CAST lays his half, as the table said (%d)" % wd.status_power("shieldwall"))
+	ok(occ.status_power("bulwark_line") == int((split_ally[0] as Dictionary)["power"]),
+		"§5: ...and the CAST lays the ally's half, as the table said (%d)" % occ.status_power("bulwark_line"))
+	wd.remove_status("shieldwall")
+	occ.remove_status("bulwark_line")
 	wd.rune_split_shield = 0
 
 	# ---- Sharpshooter: the split point, and the RATE untouched ----

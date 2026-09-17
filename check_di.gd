@@ -89,7 +89,16 @@ const SRC_FLOOR := 107
 # `formless` is a self-buff on the Swordmaster and is correctly unstamped,
 # exactly as DS's four hero-side grants were. `SRC_FLOOR` is a RATCHET
 # (`with_src >= SRC_FLOOR`), so it does not have to move for the count to.
-const CALL_SITES := 214
+#
+# **BATCH GM MOVED IT 214 -> 215, AND SAYS WHY. Net +1, one arrival.** The Split
+# Shield's half is laid on the hero the Warden set the wall in front of, off
+# `_recast_writes`, through its own site in Shieldwall's handler — the cast had
+# never read the rune, so there was no such write before. It passes the Warden
+# as its source, as the handler's own wall and the Bulwark Line pass always
+# have, so `with_src` moves 110 -> 111 and the unstamped remainder stays 104.
+# Found by running this gate unmodified against GM's code, before it was
+# touched: it was the one red there that was not predicted.
+const CALL_SITES := 215
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

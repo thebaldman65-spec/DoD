@@ -3874,7 +3874,25 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		if ab.special in ["rally", "focus", "surge", "quickdraw",
+		# BATCH GM §3 — WITH THE SPLIT SHIELD HELD, SHIELDWALL NAMES AN ALLY. The
+		# rune's half goes to "the ally he sets it in front of", which is a choice,
+		# so the self-cast below does not apply: the picker offers the other living
+		# heroes (`_split_shield_allies`), the bot takes whatever its rotation
+		# named when that is one of them, and a Warden standing alone sets it in
+		# front of nobody — the target is himself and he keeps his half.
+		if ab.special == "shield_block" and u.rune_split_shield > 0:
+			var ss_pool := _split_shield_allies(u)
+			if ss_pool.is_empty():
+				target = u
+			elif autoplay:
+				target = auto_target if ss_pool.has(auto_target) \
+					else _lowest_hp(ss_pool)
+			elif ss_pool.size() == 1:
+				target = ss_pool[0]
+			else:
+				used_targeting = true
+				target = await _pick_target(ss_pool)
+		elif ab.special in ["rally", "focus", "surge", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "blood_price", "immolate", "stabilize",
@@ -4745,7 +4763,14 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				if wd_wall != null and u.resource >= wd_wall.cost \
 						and u.ability_ready(wd_wall) \
 						and (u.hp < u.max_hp * 0.5 or foes.size() >= 3):
-					return [wd_wall, u]
+					# BATCH GM §3 — with the Split Shield held the wall names an
+					# ally, and the bot names the weakest of the ones it may.
+					var wd_wall_at: BattleUnit = u
+					if u.rune_split_shield > 0:
+						var wd_split := _split_shield_allies(u)
+						if not wd_split.is_empty():
+							wd_wall_at = _lowest_hp(wd_split)
+					return [wd_wall, wd_wall_at]
 				var wd_mock := _find_ability(u, "Mocking Blow")
 				if wd_mock != null and u.ability_ready(wd_mock) \
 						and not foes.any(func(e): return e.has_status("mocked") \
@@ -7757,7 +7782,19 @@ const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
 	# laid on an enemy. Same two halves as the two marks above, for the same two
 	# reasons; the other five statuses the Hunter nine register sit on a HERO and
 	# belong in neither list.
-	"blood_debt", "vendetta", "reacquire"]
+	"blood_debt", "vendetta", "reacquire",
+	# BATCH GM §3 — THE THREE THE DERIVED RULE STILL HANDED TO DISPEL, AND THE
+	# CARD'S OWN TEXT DECIDES IT: Dispel strips "beneficial" effects from an
+	# enemy, and each of these is the party's work on the enemy wearing it.
+	# `party_mark` (Hunter's Mark) and `arcane_echo` are MARKS — each card
+	# clears its own last one, which governs the caster's recast and was
+	# never a reason to leave a Mage's Dispel able to take it. GL drove the
+	# first: a Hunter's Mark laid, a Mage's Dispel cast on that enemy, the mark
+	# gone. `rime` is NOT a mark, and it is here rather than in `DEBUFF_IDS` on
+	# purpose: that list also feeds a Survivalist's breadth count and a
+	# mender's Cleansing Rite, so moving it there would move two magnitudes,
+	# and this list moves only what Dispel may take.
+	"party_mark", "arcane_echo", "rime"]
 
 
 func _dispellable_buffs(u: BattleUnit) -> Array:
@@ -12225,15 +12262,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_:
 						_apply_status(target, "sunder", 2, 0, 0, attacker)
 				called_mode = ""
-			if attacker.has_status("held_breath"):
-				var hb_left := attacker.status_power("held_breath") - 1
-				if hb_left <= 0:
-					attacker.remove_status("held_breath")
-					_log("   → the held breath releases", "#909090")
-				else:
-					var hb_info: Array = STATUS_INFO["held_breath"]
-					attacker.update_status("held_breath", "HB%d" % hb_left,
-						hb_info[3], hb_left)
 			# Spray of Arrows: `spray` is HOW MANY extra enemies the shot finds
 			# (Batch AZ, 2). It is also the one node that still hands Focus a
 			# ceiling, and that cap is what the breadth costs.
@@ -12260,6 +12288,28 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_message("%s falls!" % sp_t.unit_name)
 						_log("† %s dies" % sp_t.unit_name, "#e05050")
 						_on_enemy_death(sp_t)
+		# BATCH GM §1 — THE HELD BREATH IS SPENT WHERE IT PAYS, AND NOWHERE ELSE.
+		# Its countdown sat inside the Lethal Aim block above until GM, so a hero
+		# without that engine was paid the promised shot on EVERY attack for the
+		# rest of the fight and never spent it — a Sharpshooter who dropped his
+		# rune kept Hold Breath in his lineage kit, and GL drove the mean hit from
+		# 15.0 to 26.2 over six shots. **THE GATE HERE IS THE PAYOUT'S OWN**: the
+		# guaranteed critical and the ignored armor are read for any damaging
+		# cast that is not a counter, so the same cast is what spends one shot.
+		# That also closes the same hole for a Lethal Aim holder, whose area
+		# casts, Called Volley and Drumfire took the promised shot on every
+		# target and kept the breath, because the engine block leaves all three
+		# out. A status whose expiry lives in an engine is a status that never
+		# expires for anyone who does not hold it.
+		if attacker.has_status("held_breath") and ab.damage > 0 and not is_counter:
+			var hb_left := attacker.status_power("held_breath") - 1
+			if hb_left <= 0:
+				attacker.remove_status("held_breath")
+				_log("   → the held breath releases", "#909090")
+			else:
+				var hb_info: Array = STATUS_INFO["held_breath"]
+				attacker.update_status("held_breath", "HB%d" % hb_left,
+					hb_info[3], hb_left)
 		# Hunter's Instinct: each empowered shot also tends every beast.
 		if ab.display_name == "Quick Shot" and not is_counter \
 				and attacker.has_status("instinct"):
@@ -15648,6 +15698,14 @@ func _live_block_chance(u: BattleUnit) -> float:
 		return 0.0
 	var bc := u.block_chance + _plating_slice(u)
 	return clampf(bc, 0.0, 1.0)
+
+
+# BATCH GM §3 — WHO A SPLIT SHIELD CAN BE SET IN FRONT OF: another living hero.
+# The player's picker and the bot both read this, so the two cannot offer
+# different bodies. A companion is not in `heroes`, and the Block roll skips a
+# companion outright, so a slice laid on one would pay nothing.
+func _split_shield_allies(u: BattleUnit) -> Array:
+	return heroes.filter(func(h): return not h.dead and h != u)
 
 
 # Heavy Plating's slice of the block roll: the passive's 15% plus its climb,
@@ -20907,18 +20965,54 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# it buys wake Tenacity and Rally — the trade the ability is for.
 			# Shield Mastery (the re-specced wd_shieldwall node) now buys
 			# DURATION, the perfect cast included — 2 turns per rank.
-			var wall_turns := 3 + 2 * attacker.shield_mastery_ranks
+			#
+			# BATCH GM §3 — THE CAST READS THE RECAST TABLE, SO THE TWO ARE ONE
+			# ANSWER BY CONSTRUCTION. EZ built the Split Shield into
+			# `_recast_writes` and never into this handler: the table proposed
+			# half a wall for him and half for an ally, while the cast laid the
+			# whole wall on him and nothing on anybody — and the gate that drove
+			# the table called it the cast's answer. Every write below is the
+			# table's own entry for the body it lands on, so a rune that moves
+			# the table moves the cast in the same line.
+			var wall: Dictionary = _recast_writes(attacker, ab, attacker)[0]
+			var wall_turns := int(wall["turns"])
+			var wall_pct := int(wall["power"])
 			_sfx("parry", -6.0, 0.5)
-			_apply_status(attacker, "shieldwall", wall_turns, SHIELDWALL_BLOCK,
+			_apply_status(attacker, "shieldwall", wall_turns, wall_pct,
 				0, attacker)
-			# Live-total chip, in Heavy Plating's house style.
-			attacker.update_status("shieldwall", "+%d%% Block" % SHIELDWALL_BLOCK,
+			# Live-total chip, in Heavy Plating's house style. It prints what
+			# STANDS after `add_status` took the larger power, and never assigns
+			# a smaller one over it (CP §0's clamp).
+			var wall_now := maxi(attacker.status_power("shieldwall"), wall_pct)
+			attacker.update_status("shieldwall", "+%d%% Block" % wall_now,
 				"Shieldwall: +%d%% Block chance for %d more turn(s).\nThese count as Heavy Plating blocks." % [
-					SHIELDWALL_BLOCK, wall_turns], SHIELDWALL_BLOCK)
+					wall_now, wall_turns], wall_now)
 			attacker.refresh_bars()
 			_message("%s sets the wall!" % attacker.unit_name)
 			_log("%s: Shieldwall — +%d%% Block chance for %d turns" % [
-				attacker.unit_name, SHIELDWALL_BLOCK, wall_turns], "#8c9cc8")
+				attacker.unit_name, wall_pct, wall_turns], "#8c9cc8")
+			# GM §3 — THE OTHER HALF, on the hero he set it in front of. The
+			# picker only offers another living hero (`_split_shield_allies`), and
+			# with nobody to offer it the target is himself and nothing is split
+			# off. The ally's write is the table's entry for that ally.
+			var split_to: BattleUnit = null
+			if attacker.rune_split_shield > 0 and target != null \
+					and target != attacker and not target.dead \
+					and not target.is_companion:
+				split_to = target
+				for sw in _recast_writes(attacker, ab, target):
+					var sw_id := String(sw["id"])
+					var sw_turns := int(sw["turns"])
+					var sw_pct := int(sw["power"])
+					_apply_status(target, sw_id, sw_turns, sw_pct, 0, attacker)
+					var sw_now := maxi(target.status_power(sw_id), sw_pct)
+					target.update_status(sw_id, "+%d%% Block" % sw_now,
+						"Split Shield: +%d%% Block chance for %d more turn(s)\n(half of the Warden's Shieldwall)." % [
+							sw_now, sw_turns], sw_now)
+					_log("   → Split Shield — the other half covers %s (+%d%% Block for %d turns)" % [
+						target.unit_name, sw_pct, sw_turns], "#8c9cc8")
+				target.float_text("COVERED", Color(0.75, 0.8, 0.95))
+				target.refresh_bars()
 			# Bulwark Line (Batch AL): the stance covers the LINE as well.
 			# The grant rides the same Heavy Plating slice of the block roll
 			# the Warden's own stance does, and holds exactly as long — so
@@ -20929,7 +21023,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var bl_pct: int = attacker.bulwark_ally_block
 				var bl_covered := 0
 				for h in heroes:
-					if h.dead or h.is_companion or h == attacker:
+					# GM §3 — the hero the split already covered holds the LARGER
+					# of the two (EZ's `maxi` in the table), so this pass leaves
+					# him alone rather than writing the smaller node figure over it.
+					if h.dead or h.is_companion or h == attacker or h == split_to:
 						continue
 					_apply_status(h, "bulwark_line", wall_turns, bl_pct, 0, attacker)
 					h.update_status("bulwark_line", "+%d%% Block" % bl_pct,

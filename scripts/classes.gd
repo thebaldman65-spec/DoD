@@ -660,8 +660,9 @@ const PROTECTED_CORES := {
 # WROTE DOWN WHAT ITS MARKS ARE** — *"the five MARKS the party applies —
 # covenant, quarry, snare_line, feinted, hunt_mark"*, plus `blood_debt`,
 # `vendetta` and `reacquire` named the same way, plus `party_mark` and
-# `arcane_echo` whose own card text says *"one mark at a time"*. **Ten cards
-# lay one, nine of them in the draft.** EK named MARK as the strongest seventh
+# `arcane_echo` whose own card text says *"one mark at a time"* — and those two
+# joined the list itself at GM §3, because a mark left off it was a mark a
+# Mage's Dispel could strip. **Ten cards lay one, nine of them in the draft.** EK named MARK as the strongest seventh
 # candidate off six of those ten and missed Covenant of Ash, Snare Line and
 # Feint, because it read the card texts rather than that list.
 #
@@ -1278,12 +1279,58 @@ static func engine_enablers(pid: String) -> Array:
 	return core_enablers(spec) if spec != "" else []
 
 
+# ══ BATCH GM §2 — AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES ═══════
+#
+# **RULED BY THE DESIGNER: "an engine's cards leave when the engine leaves,
+# exactly as its enabler does."** GK's lineage interim kept a lineage's whole
+# opening kit when its engine was dropped, and three of those cards can then
+# never be cast: the usability door refuses each one for a reason only the
+# engine can answer. They are listed here per lineage and read by the one kit
+# builder below at the exact line that already takes the enablers out.
+#
+# **THE RELATION IS THE ENABLER'S, POINTED THE OTHER WAY.** An enabler is what
+# the engine cannot work without; a bound card is what cannot work without the
+# engine. So this is its own table rather than more names in `enablers`, which
+# `test_batch_bo` asserts are in no pool, and which travel to any hero of the
+# class who holds the engine and sit outside the slot count. A bound card does
+# neither: it LEAVES, and that is all the ruling says.
+#   · Death Ray      — refused below `DEATH_RAY_STACKS` Resonance, and only
+#                      Runaway Resonance gives a Mage that meter;
+#   · Resurrection   — priced in Mercy, and only the Mercy engine gives a Cleric
+#                      a second resource to pay it from;
+#   · Kill Command   — refused with no companion, and only the Pack Bond summons
+#                      bring one into an opening kit.
+#
+# **AUTHORED, AND CHECKED IN BOTH DIRECTIONS** (`check_gm` §2): every name here
+# is refused to its lineage with the engine gone and castable with it held, on
+# the same board; and every OTHER card of a lineage's opening kit stays castable
+# with the engine gone, so a fourth bound card cannot hide.
+#
+# **WHAT IS DELIBERATELY NOT IN IT, AND WHY** (`docs/reports/GM.md` §2):
+#   · the lineage cards that HALF-work without their engine — they still do
+#     something, so taking them away takes a working card;
+#   · the EARNED cards that need an engine — a drafted or zone-boss card is
+#     never lost (EG), so "leaves" cannot mean what it means for a kit card.
+# **AND THE SLOT A BOUND CARD OCCUPIED STAYS COUNTED** — `lineage_slots` is not
+# engine-aware, so no magnitude moved; whether the slot frees is the designer's.
+const ENGINE_BOUND := {
+	"arcanist": ["Death Ray"],
+	"holy": ["Resurrection"],
+	"beastmaster": ["Kill Command"],
+}
+
+
+static func engine_bound(spec: String) -> Array:
+	return ENGINE_BOUND.get(spec, [])
+
+
 # **THE ONE BUILDER OF A HERO'S OPENING KIT** — the battle spawn, the hero sheet,
 # `Runes.kit_names` and the class-selection panel all read it, so what a hero
 # opens holding cannot be answered two ways (CK §1's rule, one layer down).
 #
 #   the class kit
-#   + the lineage's opening abilities, LESS its enablers when its engine is not held
+#   + the lineage's opening abilities, LESS its enablers AND its bound cards
+#     (`ENGINE_BOUND`, GM §2) when its engine is not held
 #   + the lineage's basic-attack override, only while its engine is held
 #   + every OTHER held engine's enablers
 #
@@ -1295,7 +1342,8 @@ static func opening_kit(class_key: String, spec: String, engines: Array) -> Arra
 	var cfg := {"abilities": kit(class_key)}
 	var own := engine_of_spec(spec)
 	if own != "":
-		var gone: Array = [] if engines.has(own) else core_enablers(spec)
+		var gone: Array = [] if engines.has(own) \
+			else core_enablers(spec) + engine_bound(spec)
 		for ab in spec_abilities(spec):
 			if ab != null and not gone.has(ab.display_name):
 				cfg["abilities"].append(ab)
