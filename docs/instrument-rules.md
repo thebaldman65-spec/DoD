@@ -11,6 +11,13 @@ batch VERIFIES itself is here. A rule that governs what the GAME may contain is 
 **Where a rule does both, it stayed in `CLAUDE.md`** — a batch that reads only one of the two must
 not be able to miss a rule about the game, so the tiebreak runs one way only.
 
+**HALF OF THAT TIEBREAK IS RETIRED AT GR §2, BY THE DESIGNER'S RULING.** *A rule that governs what
+the GAME may contain is in `CLAUDE.md`* is no longer the whole story: the rules about how a fight
+resolves, and nothing else, are in `docs/combat-rules.md`, a second reference `CLAUDE.md` points at.
+The rest stands — a rule that governs how a batch verifies itself is here, and a rule that belongs to
+two subjects stays in `CLAUDE.md`. **A batch meeting the paragraph above must not refuse a subject
+split on its strength.**
+
 The two halves were asserted to re-concatenate byte for byte against
 the pre-split file before either was trusted — at EF §2 and again at FF §2. **The THREE `##`
 section headings that carry orphaned material are new**, and each is marked as this file's own:

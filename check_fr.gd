@@ -54,6 +54,7 @@ var _g := Gate.new()
 const WOW := "res://docs/ways-of-working.md"
 const CM := "res://CLAUDE.md"
 const IR := "res://docs/instrument-rules.md"
+const CR := "res://docs/combat-rules.md"
 
 # The rule blocks this gate reads, by their own headings. §6 asserts each is
 # still there, so a rewrite that deletes a rule reds the gate rather than
@@ -154,6 +155,9 @@ func _s1_the_branch(wow: String) -> void:
 # The file's own preamble: *a second copy of a rule is the defect that let
 # CLAUDE.md contradict itself 1900 lines apart after CW's split.* Checkable as
 # written: no long run of this file may appear verbatim in either neighbour.
+# **THREE NEIGHBOURS SINCE GR §2.** `docs/combat-rules.md` holds the rules about
+# how a fight resolves, split out of CLAUDE.md by subject; a line of this file
+# copied out of one of them is the same second copy, so it is compared too.
 #
 # THE FLOOR IS 60 CHARACTERS AND IT IS NOT ARBITRARY. Shorter runs are shared
 # vocabulary — every rule file in this project says "the designer" and "a
@@ -163,6 +167,7 @@ func _s1_the_branch(wow: String) -> void:
 func _s2_no_second_copy(wow: String) -> void:
 	var cm := FileAccess.get_file_as_string(CM)
 	var ir := FileAccess.get_file_as_string(IR)
+	var cr := FileAccess.get_file_as_string(CR)
 	var dupes: Array = []
 	var compared := 0
 	for raw in wow.split("\n"):
@@ -176,9 +181,11 @@ func _s2_no_second_copy(wow: String) -> void:
 			dupes.append("CLAUDE.md: %s" % line.substr(0, 50))
 		elif ir.contains(line):
 			dupes.append("instrument-rules.md: %s" % line.substr(0, 50))
+		elif cr.contains(line):
+			dupes.append("combat-rules.md: %s" % line.substr(0, 50))
 	# CHECKED n OF m, PRINTED. A comparison that silently skipped every line
 	# reads exactly like a clean one, and this project has paid for that twice.
-	print("  §2: compared %d lines of %d against CLAUDE.md and instrument-rules.md"
+	print("  §2: compared %d lines of %d against CLAUDE.md, instrument-rules.md and combat-rules.md"
 		% [compared, wow.split("\n").size()])
 	ok(compared > 20,
 		"§2: only %d lines were long enough to compare — the arm has gone vacuous" % compared)
@@ -264,8 +271,12 @@ func _s5_small_and_no_history(wow: String) -> void:
 	var n_wow := FileAccess.get_file_as_bytes(WOW).size()
 	var n_cm := FileAccess.get_file_as_bytes(CM).size()
 	var n_ir := FileAccess.get_file_as_bytes(IR).size()
-	print("  §5: ways-of-working %d B, CLAUDE.md %d B, instrument-rules %d B" % [
-		n_wow, n_cm, n_ir])
+	# GR §2's reference is printed beside the other two and is not in the
+	# comparison: this file's claim is about its two neighbours from FL, and the
+	# third is printed so its size is read every battery rather than carried.
+	var n_cr := FileAccess.get_file_as_bytes(CR).size()
+	print("  §5: ways-of-working %d B, CLAUDE.md %d B, instrument-rules %d B, combat-rules %d B" % [
+		n_wow, n_cm, n_ir, n_cr])
 	ok(n_wow < n_cm and n_wow < n_ir,
 		"§5: ways-of-working.md is no longer the smallest of the three rule files")
 	var rx := RegEx.new()

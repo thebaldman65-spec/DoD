@@ -45,9 +45,13 @@ const Gate = preload("res://gate_fixture.gd")
 # CLAUDE.md and joined the moment it existed: an instrument's territory is a
 # CLAIM (EC §2), and a rules file the suites assert against, left outside the
 # sweep, is a population this gate would report clean without ever reading.
+# SIX SINCE GR §2, FOR THE SAME REASON: `docs/combat-rules.md` is the rules
+# about how a fight resolves, split out of CLAUDE.md by subject, and it joined
+# in the batch that created it.
 const DOCS := {
 	"res://CLAUDE.md": "CLAUDE.md",
 	"res://docs/instrument-rules.md": "docs/instrument-rules.md",
+	"res://docs/combat-rules.md": "docs/combat-rules.md",
 	"res://docs/master.html": "docs/master.html",
 	"res://docs/changelog.html": "docs/changelog.html",
 	"res://docs/design-notes.md": "docs/design-notes.md",

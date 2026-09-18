@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1470,
+  "total": 1475,
   "source": 1137,
   "other": 93,
-  "document": 240
+  "document": 245
  },
  "source_residency": {
   "narrow": 31,
@@ -2497,7 +2497,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#73"
+   "g": "check_ff.gd#85"
   },
   {
    "s": "check_ff.gd",
@@ -2508,7 +2508,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#74"
+   "g": "check_ff.gd#86"
   },
   {
    "s": "check_ff.gd",
@@ -2519,7 +2519,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#72"
+   "g": "check_ff.gd#84"
   },
   {
    "s": "check_ff.gd",
@@ -2530,7 +2530,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#69"
+   "g": "check_ff.gd#81"
   },
   {
    "s": "check_ff.gd",
@@ -2541,7 +2541,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#71"
+   "g": "check_ff.gd#83"
   },
   {
    "s": "check_ff.gd",
@@ -2552,7 +2552,63 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ff.gd#70"
+   "g": "check_ff.gd#82"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s5_the_subject_seam",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ff.gd#194",
+   "expr": "line4"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s5_the_subject_seam",
+   "h": "docs/combat-rules.md",
+   "n": "\n---\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#153"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s5_the_subject_seam",
+   "h": "docs/combat-rules.md",
+   "n": "REQUIRED TO READ IS `CLAUDE.md`",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#145"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s5_the_subject_seam",
+   "h": "docs/combat-rules.md",
+   "n": "THE SEAM IS WHAT A RULE IS ABOUT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#146"
+  },
+  {
+   "s": "check_ff.gd",
+   "fn": "_s5_the_subject_seam",
+   "h": "CLAUDE.md",
+   "n": "docs/combat-rules.md",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ff.gd#144"
   },
   {
    "s": "check_fg.gd",
@@ -2884,7 +2940,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_fr.gd#35",
+   "g": "check_fr.gd#36",
    "alt": true
   },
   {
@@ -2896,7 +2952,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_fr.gd#35",
+   "g": "check_fr.gd#36",
    "alt": true
   },
   {
@@ -2908,7 +2964,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fr.gd#49"
+   "g": "check_fr.gd#50"
   },
   {
    "s": "check_fr.gd",
@@ -2919,7 +2975,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fr.gd#50"
+   "g": "check_fr.gd#51"
   },
   {
    "s": "check_ft.gd",

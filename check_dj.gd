@@ -368,9 +368,15 @@ func _sweep_ratchet(src: String) -> void:
 # leave the next batch reading the wrong thing in the rule file. The changelog
 # and the batch reports are HISTORY and are deliberately not swept: they record
 # what was believed when they were written.
+# **AND THE RULE FILE IS TWO FILES SINCE GR §2.** The standing rule this belief
+# contradicts — `heroes` does not contain the companions — moved to
+# `docs/combat-rules.md` with the rest of the rules about how a fight resolves,
+# so that file is where the belief would come back, and it is swept beside the
+# file the rule left.
 func _prose() -> void:
 	var live := {
 		"res://CLAUDE.md": "CLAUDE.md",
+		"res://docs/combat-rules.md": "docs/combat-rules.md",
 		"res://docs/text-standard.html": "docs/text-standard.html",
 		"res://docs/talent-audit.html": "docs/talent-audit.html",
 	}

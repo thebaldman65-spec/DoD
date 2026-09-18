@@ -13,51 +13,88 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-18 (Batch GQ).*
+*Last rewritten: 2026-09-18 (Batch GR).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GQ — THE ENGINE CARDS SAY ONLY WHAT DIFFERS. IMPLEMENT ONLY, AND THE TWENTY-THIRD BATCH ON
-  `class-merge`.** A screen batch, outside the merge's running order. `main` is untouched. Full working:
-  **`docs/reports/GQ.md`**.
-- **BUILT, AND DRAWN ON EVERY DEAL EVERY BATTERY BY `check_gq` (NEW):**
-  - **A class-selection card is its rune's name, its engine rule and — for a rune that carries a lineage — the
-    abilities it opens with beyond the kit, BY NAME** (*"Also opens with: …"*). **That last clause is the designer's,
-    ruled mid-batch**: the brief said the rule alone, on the premise that only the rule differed, and that holds for the
-    twelve runes with no lineage (the three spines and all nine rule engines) and not for the twelve that carry one —
-    **each adds one to five abilities no other card offers, thirty-seven in all.** Where a rune's own basic takes the
-    class basic's place the card says so: *"Fireball (in place of Magic Bolt)"* — four runes, Shadowrend for Smite
-    the fourth.
-  - **The class basic and class kit appear ONCE, below the three cards,** at the figures of a hero holding no engine
-    — the class's own Attack. **A line under them names a dealt rune that would move one of those figures**, derived
-    rather than listed: only the Rune of the Warden, on a Warrior's screen (the Warden lineage attacks at 75). The
-    Occultist raises a Cleric's Attack to 100 and moves nothing shown, because Shadowrend replaces Smite, so it is not
-    named.
-  - **The archetype subtitle and the lineage blurb are gone from the card — and no other screen ever showed either**,
-    so no screen does now. `SPEC_INFO` keeps both fields; the archetype still sets a lineage's Attack through its role.
-  - **No card scrolls**: the text window is 280 pixels, the tallest rune text (the Beastmaster's) 277, and the lowest
-    line on any screen 691 of 720. Before, 22 of the 24 scrolled, the Beastmaster's by 877.
-  - **The class passive line is where it stood, ABOVE the cards**, so the kit below is not beside it (the brief put the
-    two together); the screen's own subtitle is unchanged.
-- **WHAT MOVED:** `scripts/spec_choice_screen.gd`, `check_gq.gd` (**NEW**), `run_battery.sh`, `baselines.json`,
-  `docs/master.html` (§1, §6, the screens list and the stamp), `docs/text-standard.html` (§1.2's row for this screen,
-  a §4.7 paragraph describing a defect CL §7 had fixed, and its stamp), `docs/changelog.html`, `docs/design-notes.md`,
-  this file, and `docs/reports/GQ.md` (**NEW**). **No engine, kit card, magnitude or rule moved; `CLAUDE.md` and
-  `pin-manifest.json` did not move** (the manifest regenerates byte-identical).
-- **VERIFICATION:** the acceptance battery is GREEN — 115 targets, `check_de` at 477 / 0 / 0 and `check_gq` at
-  5,112 / 0, and the only two reds are the standing sanctioned ones (`check_cm_live` 13 / 4, and `check_gj` §4's Bell
-  at the corrected +172 / +192). The unmodified battery ran green against the new screen before any gate existed or
-  was edited, so no instrument was repaired. Full working in **`docs/reports/GQ.md`**, written after the run.
-- **Phase.** Unchanged by GQ. Steps 1 (the spines), 2 (the talent layer), 3 (engines to runes, with its nine engines at
-  GO and its class kits at GN) and 4 (the pool merge) of the merge's running order are done. **The Crown's Break and
-  freeze resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
-- **Next letter: GR.**
+- **Last batch: GR — THE SUBJECT SEAM. IMPLEMENT ONLY, AND THE TWENTY-FOURTH BATCH ON `class-merge`.** A
+  documents batch outside the merge's running order: `CLAUDE.md` had crossed its 340 KiB ceiling at GP. `main` is
+  untouched. Full working: **`docs/reports/GR.md`**.
+- **BUILT: `CLAUDE.md` IS SPLIT BY SUBJECT — THE THIRD SPLIT, AND THE FIRST CUT BY WHAT A RULE IS ABOUT.** Nine rules
+  about how a fight resolves moved byte for byte to **`docs/combat-rules.md` (NEW)**, which `CLAUDE.md` points at and
+  indexes: the damage door and the recap ledgers, the status door and its clamps, hard control on a boss, the crit
+  conversion, a multi-hit's charges, `heroes` and `companions`, a widening, and enemy intent. **`CLAUDE.md` stays the
+  one file a batch must read**, and a rule about a fight that is also about a card, a rune or an engine stayed in it —
+  nine combat blocks did.
+  - **THE SUBJECT WAS MEASURED, NOT ASSUMED.** By GR's own classification of all 113 blocks, combat law is 55.97 KiB
+    and card law 85.89 (FF's 66.74 and 59.12 were thirty-six batches old), and **engine law has grown into a subject
+    of its own since FF**, 22.84 → 41.80 KiB. Outside the two whole-file sweeps (GB, GC), combat law was written into
+    by 4 of the 38 batch commits since FF, card and engine law by 7 each and rune law by 10. **Combat law moved
+    because batches read it least.**
+  - **THE ONE-WAY TIEBREAK'S GUARANTEE IS RETIRED, IN WRITING, IN BOTH RULE FILES** — *every rule about the game is in
+    the required read* no longer holds, and a batch meeting it must not refuse the split. What survives is that a rule
+    belonging to two subjects stays in `CLAUDE.md`.
+  - **THE SIZES:** `CLAUDE.md` 348,868 → 326,190 B = **318.54 KiB, 21.46 KiB under its
+    ceiling**, so `check_fg` §2 stops warning; `docs/combat-rules.md` 30,440 B, with no stated ceiling (a ruling, below).
+- **SIX INSTRUMENTS LEARNED THE NEW FILE:** `build_pin_manifest.py`, `check_ec` (23 → 24) and `check_ea` §3 — the three
+  EF widened for the instrument reference — plus `check_fr` §2, `check_dj` §6 (43 → 45; the rule its retired belief
+  contradicts is one of the nine) and `check_ff` (55 → 68): §4's index-hazard sweep covers both indexes, and a new §5
+  derives the combat seam's residency from its own index. `pin-manifest.json` 1,470 → 1,475 pins, the five §5 adds.
+- **WHAT MOVED:** `CLAUDE.md`, `docs/combat-rules.md` (**NEW**), `docs/instrument-rules.md` (the retirement), the six
+  instruments, `pin-manifest.json`, `baselines.json`, `docs/changelog.html`, `docs/design-notes.md`, this file and
+  `docs/reports/GR.md` (**NEW**). **No code, card, engine, rune, node or magnitude moved; no rule was rewritten and
+  nothing was pruned.** `docs/master.html` did not move: nothing a player meets changed.
+- **VERIFICATION:** the acceptance battery is GREEN — 115 targets in 55 minutes, `check_de` at 477 / 0 / 0, and the only two
+  reds are the standing sanctioned ones (`check_cm_live` 13 / 4, and `check_gj` §4's Bell at +172 / +192, its FAIL
+  line byte-identical to GQ's). **The unmodified battery ran against the split tree first** — 115 targets, 477 / 0 /
+  0, every target's count equal to GQ's acceptance run but the two known drifters inside their bands — **so no suite
+  needed re-pointing, and that is measured rather than assumed.** Full working in **`docs/reports/GR.md`**, written
+  after the run.
+- **Phase.** Unchanged by GR. Steps 1–4 of the merge's running order are done. **The Crown's Break and freeze
+  resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
+- **Next letter: GS.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### GQ's RULINGS OWED — **THREE; THE FIRST TWO ARE PLAYER-VISIBLE**
+### GR's RULINGS OWED — **TWO; NEITHER IS PLAYER-VISIBLE**
+
+Full working: `docs/reports/GR.md`, NEEDS A RULING.
+
+1. **`docs/combat-rules.md` HAS NO STATED CEILING**, like `docs/instrument-rules.md`. EE's method on its own record —
+   the file as split, 29.73 KiB, plus ten of the largest single-batch growth its nine blocks have ever had (+4,340 B,
+   the crit rule's birth at EW) — gives 72.11 KiB, stated **70 KiB**. It has grown +19.5 B a batch since FF, so the
+   figure is the designer's to adopt or not, not a wall anyone is near.
+2. **THE NEXT CEILING, AND BOTH MOVES LEFT FOR IT, ARE THE DESIGNER'S.** At FF's +4,315 B a batch `CLAUDE.md` meets 340
+   again in about 5.1 batches, at the +2,247 B its main half has grown since FF in about 9.8. There
+   is no fourth seam that batches read rarely: card, engine and rune law are what is left, and each is written into by
+   more batches than combat law was. **Rune law would come away cleanly** — 14 of its 15 blocks, 34.25 KiB, bind
+   nothing else — **and the merge's rune step reads it every batch.** The other move is a second re-derivation of the
+   ceiling, which `CLAUDE.md` says moves with the file. **Better ruled with headroom than at the wall** (EF §2).
+
+### FOUND AT GR AND NOT FIXED
+
+- **SIX OF THE BRIEF'S ATTRIBUTIONS NAME THE WRONG BATCH, AND NONE WAS LOAD-BEARING** (GR §0): the 340 KiB ceiling
+  is FU's raise of EE's rule; the one-way tiebreak and *what a rule binds, not what it is about* are EF §2's, which FF
+  applied; the nine blocks that stayed on it were EF's nine; *rewording the rule reds, rewording the index does not*
+  was EF's control pair; the instrument half growing twice as fast over five batches was EF's reading, and **FF had
+  already settled it over twenty-five** (EF→FE); and **`check_fg` holding a copy of the last figure was FU's finding
+  (FU §1b), not GQ's.** The measurements the brief asked for were taken either way.
+- **A POINTER INSIDE A MOVED RULE HAS POINTED AT THE WRONG PLACE SINCE EF.** *A status is applied with its `src`*
+  says *"see the second standing rule below, which DJ earned from this"* — DJ §3's *a number quoted from one document
+  into another stops being a measurement*, which EF moved to `docs/instrument-rules.md`. Moved byte for byte: a
+  pointer correction is a rule edit, and GR edits none.
+- **`docs/ways-of-working.md`'s HEADER STILL NAMES TWO RULE FILES** — *"`CLAUDE.md` and `docs/instrument-rules.md`
+  bind what a batch DOES"*, and *"a third file and not a third seam"*. True of what it names and silent on the third.
+  Not edited: the brief did not list the file, and `check_fr` reads it line by line.
+- **`claude_md_census.py` CENSUSES `CLAUDE.md` ALONE**, so the nine moved blocks have left its population and its
+  asserted / quoted / neither shares move by composition rather than by citation. A tool, not a gate; nothing in the
+  battery runs it.
+- **ONE CONTROL COPY LEFT A USER-DATA FOLDER** under Godot's `app_userdata`: "Dawn of Decay GR ctl", renamed before
+  anything ran in it so its `user://` could not reach the player's saves. It can be deleted.
+
+### GQ's RULINGS OWED — **TWO LEFT, BOTH PLAYER-VISIBLE; THE THIRD RULED AND TAKEN AT GR**
 
 Full working: `docs/reports/GQ.md`, NEEDS A RULING.
 
@@ -68,15 +105,15 @@ Full working: `docs/reports/GQ.md`, NEEDS A RULING.
 2. **THE CARD'S TEXT WINDOW IS FIXED AT 280 PIXELS**, so a deal of three short rules shows empty card space. Sized so no
    rune's text scrolls and the kit fits the screen, with the kit and the buttons in one place on every deal; cards fitted
    to the tallest text on the screen would move both from deal to deal, and were not taken.
-3. **`CLAUDE.md` IS PAST ITS CEILING** (FOUND AT GQ, below) — not player-facing; the move left is the subject seam,
-   which is the designer's.
+3. ~~**`CLAUDE.md` IS PAST ITS CEILING**~~ — **RULED BY THE DESIGNER AND TAKEN AT GR**: the subject seam, and combat
+   law moved to `docs/combat-rules.md` (GR's block above).
 
 ### FOUND AT GQ AND NOT FIXED
 
-- **`CLAUDE.md` CROSSED ITS 340 KiB CEILING AT GP: 348,868 B = 340.69 KiB** (GP added 3,894 B, from 344,974). `check_fg`
+- ~~**`CLAUDE.md` CROSSED ITS 340 KiB CEILING AT GP: 348,868 B = 340.69 KiB**~~ (GP added 3,894 B, from 344,974). `check_fg`
   §2 prints its CEILING WARNING and passes; **it FAILS past 356,454 B — 7,586 B away**, less than one large batch's
   rules. The subject seam below was carried as *"owed a ruling before the file reaches 340 KiB"*, and the file has
-  reached it. GQ added nothing to the file.
+  reached it. GQ added nothing to the file. **CLOSED AT GR by the subject seam: the file is 318.54 KiB.**
 - **PLAYER-FACING, MET ON THIS SCREEN FIRST: FOUR KIT TEXTS BREAK THE TEXT STANDARD.** Ministration's *"No stacks, no
   shields, no marks — it simply works"* and Magic Missiles' *"Cheap, certain, and it never needs anything to be true
   first"* are design rationale on a card; Magic Missiles restates *"12% of Attack each"* beside the line that prints it;
@@ -1062,16 +1099,10 @@ pre-pass's one unpredicted red, because the prediction had named `check_ed` as t
   keeping is the shape of the mistake** — a finding about one gate's population was written up as a
   finding about the tree's, and the other gate that owns the half was one pre-pass away.
 
-### THE SUBJECT SEAM IN `CLAUDE.md` — **NAMED AT FU §1, OWED A RULING BEFORE THE FILE REACHES 340 KiB — AND IT REACHED IT AT GP (FOUND AT GQ, above)**
+### ~~THE SUBJECT SEAM IN `CLAUDE.md`~~ — **RULED BY THE DESIGNER AND TAKEN AT GR: COMBAT LAW IS `docs/combat-rules.md`. NOTHING IS OWED FROM IT.**
 
-**Recorded in `CLAUDE.md`'s ceiling block, where the batch at the ceiling will read it; carried here
-because it is a decision nobody has taken.** EE's split-never-prune has no seam left of its kind, and a
-second re-derivation of the ceiling would take the file's own size as its floor. **The seam that
-exists is by SUBJECT** — combat resolution law (66.74 KiB) or card authoring law (59.12 KiB) as a
-reference the main file points at, both figures FF's on a 280.80 KiB file — and **it requires
-overturning EF's one-way tiebreak for that subject.** **Better ruled with headroom than at the wall**
-(EF §2's rule: a seam is cleaner measured than reached).
-
+**What is left is recorded in `CLAUDE.md`'s ceiling block, where the next batch at the ceiling will read it**, and
+the move that comes next is GR's ruling 2 above. Working: `docs/reports/GR.md` §1 and §5.
 ### THE RUN-SAVE FIGURES ARE FIXED — **AND "IT IS A TWO-NUMBER EDIT" WAS WRONG (CLOSED AT FR §1)**
 
 **Struck through rather than deleted, because the reasoning is what a later queue item should
@@ -2585,7 +2616,9 @@ re-derived from the source at DM; not one was moved.**
     the residue is spent. **FF named two moves and FU took the first; at 340 the one left is to
     overturn the tiebreak for a SUBJECT** — see the subject-seam item above — and accept that a batch
     may have to open two files to find a rule about the game. Working: `docs/reports/FF.md` §1 and
-    `docs/reports/FU.md` §1, and the ceiling block in `CLAUDE.md` says so.
+    `docs/reports/FU.md` §1, and the ceiling block in `CLAUDE.md` says so. **GR TOOK IT**, on the designer's
+    ruling: combat law is `docs/combat-rules.md`, a THIRD rule file, and like the instrument reference it has no
+    stated ceiling (GR's ruling 1).
 
 - **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
   `STACKS := 4` is a **direct-write probe depth**, not a carry ceiling — those checks write
@@ -3289,7 +3322,8 @@ the number.*
   figure was two files short before EV touched anything. **196 + EV's own two = 198**, which is the
   whole of the delta and is the only way to read this row that stays true.
 - **LIVE SIZES ARE PRINTED, NOT CARRIED.** `check_fg` §1 and §2 print `docs/changelog.html` and `CLAUDE.md`
-  against their bars, `check_fr` §5 prints `docs/instrument-rules.md`, `CLAUDE.md` and `docs/ways-of-working.md`,
+  against their bars, `check_fr` §5 prints `docs/instrument-rules.md`, `CLAUDE.md`, `docs/ways-of-working.md` and, since GR,
+  `docs/combat-rules.md`,
   and `claude_md_census.py` prints the file count and the byte total for any commit. **The archive is the
   heaviest file the census counts, and it is deselected from the sync**, so what the connector ingests does not
   move with it. **THE THRESHOLD ESTIMATE IS NOT IN THIS BLOCK AND THAT IS DELIBERATE**: it read seventeen →
@@ -3298,8 +3332,8 @@ the number.*
   batches before anyone noticed. **`check_fg` §1 prints the live figure and the headroom against the bar every
   battery. Read that.**
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
-  measured in KiB against a **340 KiB ceiling** (EE's 290 until FU §1) whose procedure is a SPLIT, **and EF and FF both
-  took one.** **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
+  measured in KiB against a **340 KiB ceiling** (EE's 290 until FU §1) whose procedure is a SPLIT, **and EF, FF and GR
+  each took one.** **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
   and the headroom every battery, and the two figures this bullet used to carry (EP's 217.17 and
   EU's 235.11, "about twelve batches") are exactly the kind of number that was stale by the time
   anybody read it. **The current reading is `check_fg` §2's print, and each batch report carries its own.**
@@ -3333,7 +3367,7 @@ the number.*
   it (FS §3), and moving it is a ruling. **`claude_md_census.py` IS A
   CANDIDATE TOO** by the same argument that deselects `build_pin_manifest.py` — it is a tool Claude
   Code runs off disk — **but it is 11.34 KiB and the saving is not worth a second entry to remember.**
-  **WHAT MUST STAY SELECTED NOW INCLUDES `docs/instrument-rules.md`** and is listed in `CLAUDE.md`:
+  **WHAT MUST STAY SELECTED NOW INCLUDES `docs/instrument-rules.md` AND, SINCE GR, `docs/combat-rules.md`** and is listed in `CLAUDE.md`:
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files cannot be archived (they must be in the repo to run) but they CAN be
   deselected from the sync.**

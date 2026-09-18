@@ -15,6 +15,59 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-18 &mdash; Batch GR: THE SUBJECT SEAM</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-FOURTH BATCH ON <code>class-merge</code>.</b> <code>CLAUDE.md</code>
+crossed its 340 KiB ceiling at GP and stood at 340.69 KiB. Its procedure is a split and never a
+prune, two audits had found nothing in it dead, and FF had measured that no seam of the kind the first two
+splits took was left. <b>The designer ruled the SUBJECT seam</b> &mdash; a cut by what a rule is ABOUT
+rather than by what it binds &mdash; and <b>nine rules about how a fight resolves moved, byte for byte, to a
+new reference, <code>docs/combat-rules.md</code></b>, which <code>CLAUDE.md</code> points at and indexes.
+<code>CLAUDE.md</code> is 318.54 KiB now and stays the one file a batch must read. <b>No rule was
+rewritten, nothing was pruned, and no code, card, engine, rune or magnitude moved.</b> <code>main</code> is
+untouched. Full working: <code>docs/reports/GR.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE SEAM WAS MEASURED BEFORE IT WAS TAKEN, AND THE TEST WAS WHICH SUBJECT BATCHES READ
+LEAST.</b> FF's figures for combat and card law were thirty-six batches old, so every one of the file's 113
+blocks was classified again by subject. Combat law is 55.97 KiB and card law 85.89, and <b>one subject has
+grown into its own since FF: engine law</b> &mdash; the charter, the kits and the rule engines &mdash; from
+22.84 KiB to 41.80. Outside the two whole-file sweeps, <b>combat law was written into by four of the
+thirty-eight batch commits since FF</b>, card and engine law by seven each and rune law by ten. Card law is
+the largest subject and nearly every content batch writes a card, so moving it would have sent most
+batches to two files; <b>combat law moved because batches read it least.</b></p>
+
+<p><b>&sect;2 &mdash; A RULE THAT BELONGS TO TWO SUBJECTS STAYED.</b> Half of combat law also binds a card,
+a rune or an engine &mdash; the skill check and its two children, the Sharpshooter's sequence, removing a
+skill check, the recast refusal and the two rules under it, the companion's blow &mdash; and all nine of
+those stayed in <code>CLAUDE.md</code>. What moved is the fight's own machinery: the damage door and the
+recap ledgers, the status door and its clamps, hard control on a boss, the crit conversion, a multi-hit's
+charges, <code>heroes</code> and <code>companions</code>, a widening, and enemy intent. <b>The one-way
+tiebreak's guarantee &mdash; every rule about the game is in the required read &mdash; is retired in writing
+where it is stated, in both rule files</b>, so a later batch meeting it does not refuse the split it stands
+in; what survives of it is that a rule belonging to two subjects stays in <code>CLAUDE.md</code>. The ceiling
+block records the ruling and says plainly that <b>there is no fourth seam that batches read rarely</b>.</p>
+
+<p><b>&sect;3 &mdash; EVERY PIN WAS MAPPED FIRST, AND NONE HAD TO MOVE.</b> None of the 70 pins the manifest
+records into <code>CLAUDE.md</code> lands in the nine blocks, a sweep of all 17,652 string literals in the
+tree's 147 scripts found none of the 82 the move takes out of <code>CLAUDE.md</code> asserted against it, and
+the whole battery was run unmodified against the split tree before any instrument was edited. <b>Six
+instruments learned the new file</b>: the pin manifest, <code>check_ec</code> and <code>check_ea</code> &sect;3,
+as they learned the instrument reference at EF; <code>check_fr</code> &sect;2's no-second-copy comparison;
+<code>check_dj</code> &sect;6, because the rule its retired belief contradicts is one of the nine; and
+<code>check_ff</code>, whose index-hazard sweep now covers both indexes and whose new &sect;5 derives the combat
+seam's residency from its own index &mdash; every row names one rule there, every rule there has its row, and
+no line of one stands in both files. Nine controls bit the edited instruments and left HEAD's green.</p>
+
+<p><b>&sect;4 &mdash; THE REJOIN, PROVED BY A SECOND SCRIPT AND NEVER BY A SIZE.</b> HEAD's 116 headings are the
+main half's 107 and the reference's nine, counted two ways, with no overlap and the order kept, and the two
+bodies rejoin byte for byte. Of seven controls, <b>a one-word misspelling inside a moved block &mdash; which
+changes no heading and no size &mdash; was caught by the byte-exact rejoin and by nothing else.</b></p>
+
+<p><b>&sect;5 &mdash; THE HEADROOM.</b> 21.46 KiB: about 5.1 batches at FF's +4,315 B a
+batch, about 9.8 at the +2,247 B a batch the main half has grown since FF, and 2.6
+at the largest batch on record. <b>The moved half grew 701 B in those thirty-six batches</b>, so it is the
+nearly static half, as the instrument reference was. The split's own cost inside <code>CLAUDE.md</code> is
+5,470 B: the new pointer block and index, the retirement, and the ceiling block's record.</p>
+
 <h2>2026-09-18 &mdash; Batch GQ: THE ENGINE CARDS SAY ONLY WHAT DIFFERS</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-THIRD BATCH ON <code>class-merge</code>.</b> The class-selection
 screen deals a hero three engine runes side by side, and <b>every card repeated the class's basic attack

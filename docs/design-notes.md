@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The subject seam (Batch GR) — 2026-09-18
+
+**Why a split again, and not a prune.** The ceiling is a ceiling on the read, not on how many rules the
+project may hold. Two audits read every uncited block of `CLAUDE.md` and found none dead, so cutting rules
+would have been choosing which true rules to forget. Moving a subject out keeps every rule and shortens the
+file a batch must read.
+
+**Why by subject, and why this subject.** The first two splits moved the rules about how a batch checks
+itself, and FF measured that nothing of that kind was left: three quarters of the file is rule about the
+game. The only cut left moves some rules about the game out of the required read, so the question is which
+subject a batch can best do without meeting there — the one it reads least. Counted by what batches wrote
+into since FF, combat law is that subject. Card law is the largest, and almost every content batch writes a
+card, which makes it the worst candidate rather than the best.
+
+**Why half of combat law stayed.** A rule about a fight that is also about a card, a rune or an engine stays
+where a batch working on that card, rune or engine will meet it. A batch writing a rune must still see that
+only a rune may raise the Sharpshooter's cap; a batch writing a card must still see which cards run the
+skill check. What moved binds nothing but the fight's own machinery.
+
+**Why the old tiebreak had to be retired in writing.** It said every rule about the game is in the required
+read, and that sentence is exactly what a later batch would cite to refuse or undo this split. Left standing
+beside a split that contradicts it, the file would contradict itself — the fault CW's split produced — so it
+is marked retired where it stands, in both rule files, with the reason.
+
+**Why a new file rather than the instrument reference.** `docs/instrument-rules.md` says it holds no rule
+about the game, and a batch opening it for an instrument rule should not wade through the battle engine. A
+third rule file costs a place in every instrument that names the rule files, and paying that is the price of
+a seam that is real.
+
 ## The engine cards say only what differs (Batch GQ) — 2026-09-18
 
 **Why the kit moved rather than shrank.** Every card repeated the class basic and the three class-kit

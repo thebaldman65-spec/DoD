@@ -7,8 +7,21 @@
 #       each one is in the reference and is NOT in `CLAUDE.md`
 #   §3  THE TIEBREAK STILL RUNS ONE WAY — both halves still declare which file
 #       is the required read
-#   §4  NO NEEDLE ANY READER ASSERTS INTO `CLAUDE.md` RESOLVES ONLY INSIDE THE
-#       INDEX — EF's hazard, swept live rather than checked once
+#   §4  NO NEEDLE ANY READER ASSERTS INTO `CLAUDE.md` RESOLVES ONLY INSIDE AN
+#       INDEX — EF's hazard, swept live rather than checked once, over BOTH
+#       indexes since GR §2
+#   §5  THE SUBJECT SEAM'S RESIDENCY (GR §2) — every row of the combat index
+#       names exactly one heading in `docs/combat-rules.md` and is the only line
+#       in `CLAUDE.md` that names it, every rule there has its row, and no line
+#       of a rule there also stands in `CLAUDE.md`. DERIVED FROM THE INDEX, not
+#       from a list typed here, so a rule a later batch moves joins by its row.
+#
+# **GR §2 SPLIT `CLAUDE.md` A THIRD TIME, BY SUBJECT, AND ADDED A SECOND INDEX.**
+# Nine rules about how a fight resolves went to `docs/combat-rules.md` and nine
+# more rows went into `CLAUDE.md` — nine more places a pin can resolve on a
+# title while the rule it names is gone, which is the hazard §4 exists for. So
+# §0 locates every index, §4 accuses a needle that resolves only inside any of
+# them, and §5 asks the seam's own residency questions of the new one.
 #
 # **WHY THIS BATCH EARNS A GATE, AND WHY §4 IS THE HALF WORTH HAVING.** EF
 # proved by control that an INDEX OF HEADINGS CAN SATISFY A PIN: rewording the
@@ -61,11 +74,16 @@ const MOVED := [
 ]
 
 const INDEX_OPEN := "**WHAT IS OVER THERE**"
+# GR §2's index, for the rules that went to `docs/combat-rules.md`. It opens on
+# its own words, so the two spans can never be read as one.
+const COMBAT_INDEX_OPEN := "**WHAT IS IN THE COMBAT RULES**"
 
 var _cm := ""
 var _ir := ""
 var _idx_from := -1
 var _idx_to := -1
+var _cidx_from := -1
+var _cidx_to := -1
 
 
 func ok(cond: bool, what: String) -> void:
@@ -89,6 +107,7 @@ func _initialize() -> void:
 	_s2_bodies()
 	_s3_the_tiebreak()
 	_s4_no_pin_lives_only_in_the_index()
+	_s5_the_subject_seam()
 	_g.report(self)
 
 
@@ -103,6 +122,24 @@ func _locate_index() -> void:
 	ok(_idx_to - _idx_from > 1500,
 		"§0: the index span is %d chars — too short to be the table, so §4 would be vacuous" % (_idx_to - _idx_from))
 	print("  index span: %d..%d (%d chars)" % [_idx_from, _idx_to, _idx_to - _idx_from])
+	# AND GR §2's, ASKED THE SAME THREE QUESTIONS. Its table is nine rows, so its
+	# floor is its own and not FF's: set under the span it measured (706 chars at
+	# GR), far above what an opener with no table under it would measure.
+	_cidx_from = _cm.find(COMBAT_INDEX_OPEN)
+	_cidx_to = _cm.find("\n## ", maxi(_cidx_from, 0))
+	ok(_cidx_from >= 0, "CLAUDE.md no longer carries the combat rules' index — §4 and §5 cannot ask their question")
+	ok(_cidx_to > _cidx_from,
+		"the combat rules' index has no closing `## ` heading after it, so §4's span is the rest of the file")
+	ok(_cidx_to - _cidx_from > 500,
+		"§0: the combat rules' index spans %d chars — too short to be the table, so §4 and §5 would be vacuous" % (
+			_cidx_to - _cidx_from))
+	print("  combat index span: %d..%d (%d chars)" % [_cidx_from, _cidx_to, _cidx_to - _cidx_from])
+
+
+# AN OCCURRENCE OUTSIDE EVERY INDEX. §4's question is asked of both tables now,
+# so a pin resolving only on a row of either one is the hazard.
+func _outside_every_index(o: int) -> bool:
+	return (o < _idx_from or o >= _idx_to) and (o < _cidx_from or o >= _cidx_to)
 
 
 func _is_heading_line(txt: String, needle: String) -> int:
@@ -195,9 +232,10 @@ func _s3_the_tiebreak() -> void:
 # the whole suite tree the way `check_ea` §3 does — matching the VARIABLE
 # holding the file, not the literal, because a needle can sit three hundred
 # lines below its read — and fails on any literal whose ONLY occurrence in
-# `CLAUDE.md` is inside the index table.
+# `CLAUDE.md` is inside the index table. **AND SINCE GR §2 INSIDE EITHER
+# INDEX**: the combat rules' nine rows are the same hazard.
 func _s4_no_pin_lives_only_in_the_index() -> void:
-	print("\n§4 — no needle any reader asserts into CLAUDE.md resolves only inside the index")
+	print("\n§4 — no needle any reader asserts into CLAUDE.md resolves only inside an index")
 	var dir := DirAccess.open("res://")
 	var files: Array = []
 	if dir != null:
@@ -240,14 +278,14 @@ func _s4_no_pin_lives_only_in_the_index() -> void:
 								# negative pin. Not this section's question.
 				var outside := false
 				for o in occ:
-					if o < _idx_from or o >= _idx_to:
+					if _outside_every_index(o):
 						outside = true
 				if not outside:
-					accused.append("%s: %s (%d occurrence(s), all in the index)" % [f2, lit, occ.size()])
+					accused.append("%s: %s (%d occurrence(s), all in an index)" % [f2, lit, occ.size()])
 	for a in accused:
 		ok(false, "§4: %s — the pin is satisfied by the INDEX and not by a rule" % a)
 	ok(accused.is_empty(),
-		"§4: every located needle resolves outside the index (%d literals across %d readers)" % [
+		"§4: every located needle resolves outside every index (%d literals across %d readers)" % [
 			scanned, readers])
 	# THE SWEEP PRINTS WHAT IT CHECKED. A regex matching no reader, or no
 	# literal, reports a clean tree exactly as loudly as a clean tree.
@@ -255,5 +293,103 @@ func _s4_no_pin_lives_only_in_the_index() -> void:
 		"§4: only %d files were found reading CLAUDE.md — the sweep is matching nothing" % readers)
 	ok(scanned >= 40,
 		"§4: only %d literals were swept — the call regex has stopped matching" % scanned)
-	print("  CHECKED %d literals across %d readers; %d resolve only in the index" % [
+	print("  CHECKED %d literals across %d readers; %d resolve only inside an index" % [
 		scanned, readers, accused.size()])
+
+
+# ── §5 — THE SUBJECT SEAM'S RESIDENCY (GR §2) ───────────────────────────────
+#
+# FF's §1 and §2 ask of its eight: the rule is a heading in the reference, it
+# survives in `CLAUDE.md` as one row and nothing else, and a sentence out of its
+# body proves the rule moved rather than only its title. §5 asks the same of
+# GR's seam, DERIVED FROM THE INDEX rather than from a list typed here — a rule
+# a later batch moves joins the check by getting its row, and one it drops is
+# a row that names nothing:
+#   · every row names a heading `docs/combat-rules.md` carries exactly once,
+#     and in `CLAUDE.md` the row is the only line that names it;
+#   · every rule heading in that file has exactly one row, so a rule moved
+#     there without its row — one `CLAUDE.md` no longer points at — is caught;
+#   · no line of a rule there stands verbatim in `CLAUDE.md`. A rule in two
+#     files is two rules, and a line out of a body is the member no index row
+#     carries. SIXTY CHARACTERS, the floor `check_fr` §2 reasons out.
+# Each is collected and asserted ONCE, so the count does not move when a rule
+# moves: the row count is printed, and floored at the nine GR moved.
+func _s5_the_subject_seam() -> void:
+	print("\n§5 — the subject seam: each combat index row names one rule, and no rule stands in both files")
+	# The holders are read from the path literal HERE, on the assignment line,
+	# so `build_pin_manifest.py` and `check_ea` §3 both see them (FF §2e).
+	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
+	var cr := FileAccess.get_file_as_string("res://docs/combat-rules.md")
+	ok(cr.length() > 10000, "§5: docs/combat-rules.md read back %d chars" % cr.length())
+	# THE TWO FILES DECLARE THE SEAM, EACH FROM ITS OWN SIDE.
+	ok(cm.contains("docs/combat-rules.md"),
+		"§5: CLAUDE.md no longer names the combat rules by path")
+	ok(cr.contains("REQUIRED TO READ IS `CLAUDE.md`"),
+		"§5: the combat rules no longer point back at the required read")
+	ok(cr.contains("THE SEAM IS WHAT A RULE IS ABOUT"),
+		"§5: the combat rules no longer state the test that put a rule there")
+
+	var rows: Array = []
+	if _cidx_from >= 0 and _cidx_to > _cidx_from:
+		for line in cm.substr(_cidx_from, _cidx_to - _cidx_from).split("\n"):
+			if line.begins_with("| ") and not line.begins_with("| |"):
+				rows.append(line.split("|")[1].strip_edges())
+	ok(rows.size() >= 9,
+		"§5: the combat index reads %d rows — GR moved nine, so the table or its parser has broken" % rows.size())
+	# THE RULE HEADINGS OF THE REFERENCE, below its own header. The header holds
+	# no `##` of its own, and the title is a single `#`.
+	var body_at := cr.find("\n---\n")
+	var heads: Array = []
+	for line2 in cr.substr(maxi(body_at, 0)).split("\n"):
+		if line2.begins_with("## ") or line2.begins_with("### "):
+			heads.append(line2)
+	var unnamed: Array = []
+	var not_a_row: Array = []
+	for core in rows:
+		var n_heads := 0
+		for h in heads:
+			if String(h).contains(core):
+				n_heads += 1
+		if n_heads != 1:
+			unnamed.append("%s (%d headings)" % [core, n_heads])
+		var lines_cm := 0
+		var row_cm := 0
+		for line3 in cm.split("\n"):
+			if line3.contains(core):
+				lines_cm += 1
+				if line3.begins_with("| "):
+					row_cm += 1
+		if lines_cm != 1 or row_cm != 1:
+			not_a_row.append("%s (%d lines, %d rows)" % [core, lines_cm, row_cm])
+	ok(unnamed.is_empty(),
+		"§5: an index row does not name exactly one heading in docs/combat-rules.md: %s" % ", ".join(unnamed))
+	ok(not_a_row.is_empty(),
+		"§5: a moved rule's title is in CLAUDE.md as something other than its one row: %s" % ", ".join(not_a_row))
+	var orphans: Array = []
+	for h2 in heads:
+		var n_rows := 0
+		for core2 in rows:
+			if String(h2).contains(core2):
+				n_rows += 1
+		if n_rows != 1:
+			orphans.append("%s (%d rows)" % [String(h2).substr(0, 70), n_rows])
+	ok(orphans.is_empty() and not heads.is_empty(),
+		"§5: a rule in docs/combat-rules.md has no single row in CLAUDE.md's index: %s" % ", ".join(orphans))
+	# NO RULE IN BOTH FILES. Headings and table rows are left out — a heading is
+	# what the index is FOR — and so are blockquote markers' bare lines.
+	var compared := 0
+	var dupes: Array = []
+	for raw in cr.substr(maxi(body_at, 0)).split("\n"):
+		var line4 := String(raw).strip_edges()
+		if line4.length() < 60 or line4.begins_with("#") or line4.begins_with("|"):
+			continue
+		compared += 1
+		if cm.contains(line4):
+			dupes.append(line4.substr(0, 60))
+	ok(compared >= 200,
+		"§5: only %d body lines were long enough to compare — the arm has gone vacuous" % compared)
+	ok(dupes.is_empty(),
+		"§5: %d line(s) of a rule in docs/combat-rules.md also stand in CLAUDE.md: %s" % [
+			dupes.size(), " / ".join(dupes)])
+	print("  %d rows, %d rule headings, %d body lines compared; %d unnamed, %d not a row, %d orphans, %d in both" % [
+		rows.size(), heads.size(), compared, unnamed.size(), not_a_row.size(), orphans.size(), dupes.size()])
