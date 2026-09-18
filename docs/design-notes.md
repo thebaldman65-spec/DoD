@@ -4,6 +4,52 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## One pool a class, and the gate that keeps it playable (Batch GP) — 2026-09-17
+
+**Why the shelves survived the merge.** The three lineage lists and the class-wide list are one pool
+now, and the obvious edit was to author a fifth container holding all 149 names by class. It was not
+taken. Those lists carry the authoring rules for their content — why a class-wide card is untied and
+general, why the Swordmaster's pool gained four axes on three cards, which seven abilities came out
+of the vault and why — and a new container would have orphaned all of it while adding a second thing
+to curate, which is exactly the shape DY §3 spent a batch deleting. So the pool is a FUNCTION over
+the lists that exist. What the merge cost them is their meaning, not their contents: they are
+shelves, and a reader who takes one for a hero's draw is wrong and still passes. That is why the
+gate asserts the draw reads `draft_pool` and nothing else.
+
+**Why the class-wide cards lost their share and kept their weakness.** One card in four was
+class-wide because a six-card shelf sat beside a twelve-card one and would otherwise never be seen.
+One pool has nothing to ration, so the seam went. The cards did not: they were authored deliberately
+weaker and unconditional, on the reasoning that at equal power an always-on card that feeds no
+passive is a safe default that dilutes every build. **The merge removes the reason and keeps the
+cards**, so six Warrior cards, six Hunter, five Mage and three Cleric are now simply the worst in
+their pools. Retuning them is a design decision with a content bill, and this batch authored
+nothing; it is recorded so the reader who finds them does not read deliberate weakness as a defect.
+
+**Why a card that reads an engine is gated and a card that half-works is not.** A pool three times
+deeper is three times as many chances to be offered something that does nothing. The line is drawn
+where the card stops doing its job at all, not where it stops doing all of it: Boil Over without
+Blood Frenzy still deals 22 damage and is a real pick; Threshold without Resonance says *"he holds
+no Resonance to set"* and is a wasted offer. A stricter line would take working cards away from
+heroes who could use them, which is the narrowness the merge exists to remove arriving through the
+gate instead of through the pool.
+
+**Why the population had to be driven and then read as well.** A field-level test misjudges 137
+abilities because they resolve inside a special handler, so every one of the 149 was cast twice.
+That found 28 of the 34. **It could not find the other six**, and the reason is worth keeping: a
+card whose payout is a LATER blow or a LATER death lands its status and moves the board identically
+on both arms. Unslaked changes one term inside `frenzy_bonus()` and every reader of that function's
+value sits inside a Blood Frenzy block; Intercession stamps a promise that is paid in Mercy when a
+hero would die. The drive is the instrument for most of the table and the read site is the
+instrument for the rest, and a batch that trusted either alone would have shipped a table that was
+wrong in one direction or the other.
+
+**Why the control had to change.** The gate's test is that a card casts differently with the engine
+and without, and its control is a card that must cast identically. The first control separated:
+Chastise under Conviction deals more damage, because Faith raises every cast. That is the ENGINE
+reading the card, which is the thing the whole section exists to tell apart from the card reading
+the engine — so a control may not be a card the engine buffs in passing, and the controls are now
+six cards no engine beside them can touch.
+
 ## The final fight is measured, and no rung softens the last boss (Batch GJ) — 2026-09-15
 
 **Why the end boss takes no discount from the rung.** The first rung exists to teach, and it teaches by letting a

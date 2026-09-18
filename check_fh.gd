@@ -1450,10 +1450,16 @@ func _s6_the_exhausted_pool() -> void:
 	ok(bool(_run.award_ability_pick(hero)), "§6: the ordinary boss award paid nothing")
 	var tier1: Array = hero["bm_candidates"]
 	print("    tier 1 (the boss pool) offered %d" % (tier1[0] as Array).size())
-	# TIER 3 — every pool but the class one emptied, by OWNING everything in
-	# them. `owned_ability_names` is what each roll subtracts, so a hero who
-	# holds the whole spec boss pool and the whole spec draft pool falls
-	# through to `roll_class_fallback_offer` and nowhere else.
+	# TIER 2 — the BOSS pool emptied, by OWNING everything in it.
+	# `owned_ability_names` is what each roll subtracts, so a hero who holds the
+	# whole spec boss pool falls through to the fallback and nowhere else.
+	#
+	# **BATCH GP — THIS WAS TIER 3 AND THE CHAIN IS TWO TIERS NOW.** The pool
+	# merge put the spec draft pool and the class-wide pool into one, so what
+	# EH §1 added as a third tier is the second tier's own depth: the arm below
+	# empties the boss pool alone and reads the fallback paying out of the whole
+	# CLASS pool. Emptying the draft pool as well — which is what the old arm
+	# did next — would now empty the chain and prove nothing but silence.
 	hero["bm_candidates"] = []
 	hero["bm_picks_owed"] = 0
 	# **THE POOLS ARE ASKED THROUGH `Run.draft_pool_left`, WHICH IS THE DRAFT'S
@@ -1467,15 +1473,14 @@ func _s6_the_exhausted_pool() -> void:
 	var everything: Array = []
 	for n in Classes.spec_pool(spec):
 		everything.append(String(n))
-	var pools_now: Dictionary = _run.draft_pool_left(hero)
-	for n2 in pools_now.get("spec", []):
-		everything.append(String(n2))
 	hero["bm_abilities"] = everything.duplicate()
 	hero["bm_equipped"] = []
 	ok(_run.roll_spec_ability_offer(hero).is_empty(),
 		"§6: the spec BOSS pool is not empty with every one of its names held")
-	ok(_run.roll_spec_fallback_offer(hero).is_empty(),
-		"§6: the spec DRAFT pool is not empty with every one of its names held")
+	# AND THE POSITIVE ARM BESIDE IT: the fallback is not empty, so what pays
+	# below is the fallback paying rather than the boss pool quietly refilling.
+	ok(not _run.roll_draft_fallback_offer(hero).is_empty(),
+		"§6: the class DRAFT pool is empty too — the tier below cannot be read")
 	var paid: bool = bool(_run.award_ability_pick(hero))
 	ok(paid, "§6: THE AWARD PAID NOTHING at an exhausted pool — EA §1's silence is back")
 	if not paid:
@@ -1483,9 +1488,8 @@ func _s6_the_exhausted_pool() -> void:
 	var q: Array = hero["bm_candidates"]
 	var offer: Array = q[q.size() - 1]
 	ok(not offer.is_empty(), "§6: the third tier queued an EMPTY offer")
-	var pools_after: Dictionary = _run.draft_pool_left(hero)
 	var from_class: Array = []
-	for n3 in pools_after.get("class", []):
+	for n3 in _run.draft_pool_left(hero):
 		from_class.append(String(n3))
 	for held in _run.owned_ability_names(hero):
 		from_class.append(String(held))
@@ -1495,7 +1499,7 @@ func _s6_the_exhausted_pool() -> void:
 			outside.append(String(c))
 	ok(outside.is_empty(),
 		"§6: the class fallback offered a card that is not in the class pool — %s" % [outside])
-	print("    tier 3 (the class pool) offered %d: %s" % [offer.size(), offer])
+	print("    tier 2 (the class pool) offered %d: %s" % [offer.size(), offer])
 	# AND IT IS ANSWERABLE ON THE REAL CARD. A tier that pays an offer nobody
 	# can press is the same silence with more steps.
 	s.call("_open_pick_overlay", 2)

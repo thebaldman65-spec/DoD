@@ -493,9 +493,9 @@ func _s4_what_the_grants_lose() -> void:
 				m["spec"] = String(spec)
 				# THE SINGLE DOOR the real draft reads, so this is what the hero
 				# can actually draw rather than what a table says.
-				var pools: Dictionary = run.draft_pool_left(m)
-				var drawable: bool = Array(pools["spec"]).has(nm) \
-					or Array(pools["class"]).has(nm)
+				# BATCH GP — ONE LIST since the pool merge, and the question
+				# it answers is unchanged: can this hero draw this name.
+				var drawable: bool = Array(run.draft_pool_left(m)).has(nm)
 				var core: bool = Classes.protected_names(String(spec)).has(nm)
 				if core:
 					collides.append(String(spec))

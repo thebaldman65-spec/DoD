@@ -246,7 +246,11 @@ const SPEC_POOLS := {
 # **DO NOT RE-CREATE IT.** A second dict of ability names keyed by class is
 # the shape this project spent eighteen batches carrying for nothing. If the
 # class draw is ever re-opened, it reads `CLASS_DRAFT_POOLS` below — which is
-# live, curated, and already drawn from.
+# live, curated, and already drawn from. **BATCH GP — AND SINCE THE POOL MERGE
+# THE THING KEYED BY CLASS IS `draft_pool()`, which is DERIVED from the shelves
+# below rather than being a third dict.** That is the rule met, not bent: the
+# hazard was a second authored container to curate, and a function that walks
+# the one that exists adds none.
 
 
 # ---------- THE ABILITY DRAFT (Batch BO) ----------
@@ -550,10 +554,191 @@ const CLASS_DRAFT_POOLS := {
 		"Hunter's Mark", "Arcane Arrows"],
 }
 
-# Roughly one card in four is class-wide; the rest are spec. Read by
-# `Run.roll_draft_offer` per CARD, so a three-card offer averages 0.75
-# class-wide entries rather than being forced to hold exactly one.
-const CLASS_DRAFT_SHARE := 0.25
+# ══ BATCH GP — THE TWO DICTS ABOVE ARE SHELVES OF ONE POOL ══════════════════
+#
+# **RULED: THE THREE SPEC POOLS AND THE CLASS-WIDE POOL OF A CLASS ARE ONE
+# POOL.** A hero draws from every card of his class. `draft_pool()` below is
+# THE pool and the only thing a draw may read; `spec_draft_pool()` and
+# `class_draft_pool()` still return exactly what they always returned, and what
+# they return is now a SHELF — where a card was authored, not a channel it is
+# drawn from. **A reader that takes `spec_draft_pool(his spec)` for "what this
+# hero can be offered" is wrong and still passes**, which is why `check_gp` §1
+# asserts the draw reads `draft_pool` and nothing else.
+#
+# **AND THE CLASS-WIDE CARDS LOSE THEIR SPECIAL STATUS WITH THE MERGE**
+# (ruled). They are ordinary cards in the pool: no share, no seam, no separate
+# tier. `CLASS_DRAFT_SHARE` and `Run.draft_card_is_class` STOOD HERE AND WENT
+# WITH THE MERGE — one card in four was the rule that kept a six-card shelf
+# reachable beside a twelve-card one, and one pool has nothing to ration.
+#
+# **WHAT THAT COSTS, RECORDED RATHER THAN DISCOVERED.** EB §1 ruled the
+# protected core is the baseline, and the authoring rule above this dict says
+# class-wide cards are **written WEAKER than spec cards** — deliberately, so a
+# safe always-on default could not dilute every build. In a merged pool that
+# reason is gone and they are simply **the worst cards in it**: six for the
+# Warrior and the Hunter, five for the Mage, three for the Cleric. **That is
+# accepted and is NOT repaired here — it is a rebalance owed** (GN's ruling 7,
+# `docs/state.md`). A later reader finding weak class-wide cards should know
+# they were authored that way on purpose.
+#
+# **THE BOSS POOLS ARE NOT MERGED AND ARE NOT TOUCHED** (ruled). `SPEC_POOLS`
+# stays spec-keyed and `roll_spec_ability_offer` still reads it, which is the
+# whole of BO's warning above this dict still standing: two pools feeding two
+# different channels look like duplication to anyone who has not read which
+# channel reads which. THE MERGE JOINED THE DRAFT'S TWO, NOT THE GAME'S THREE.
+#
+# **THE DEPTHS, DERIVED** (`check_gp` §1 derives them again every battery, and
+# no figure here is authored twice): Warrior 38, Mage 41, Cleric 34, Hunter 36
+# — 149, which is `SPEC_DRAFT_POOLS`' 129 plus `CLASS_DRAFT_POOLS`' 20 with no
+# card in both. A hero drew from 13 to 18 before the merge (his lineage's shelf
+# plus his class's) and a spine-taker from 3 to 6; he draws from 34 to 41 now.
+# **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
+# below: holding no engine at all he is offered 35 of the Warrior's 38, 29 of
+# the Mage's 41, 22 of the Cleric's 34 and 29 of the Hunter's 36.
+static func draft_pool(class_key: String) -> Array:
+	var out: Array = []
+	for spec in SPEC_IDS.get(class_key, []):
+		out.append_array(SPEC_DRAFT_POOLS.get(String(spec), []))
+	out.append_array(CLASS_DRAFT_POOLS.get(class_key, []))
+	return out
+
+
+# ══ BATCH GP §2 — A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO
+#                 HOLDS IT ═══════════════════════════════════════════════════
+#
+# **RULED, AND IT IS WHAT KEEPS A WIDE POOL FROM BEING A POOL OF DEAD CARDS.**
+# A Warrior draws from all 38; a card that READS an engine is offered only if he
+# holds that engine, because offering a Ruin card to a Cleric without Ruin is
+# offering a card that does nothing.
+#
+# **THE POPULATION WAS DERIVED AT THE READ SITE AND DRIVEN, NOT TAKEN FROM A
+# FIELD.** CN found 137 abilities a field-level test misjudges because they
+# resolve inside a special handler, and GL's own passes disagreed on three
+# cards. Every one of the 149 was cast on a hero of its class holding NO engine,
+# on a board dressed so that a no-op could only be the engine's fault (enemies
+# burning, chilled and poisoned; allies at half health and afflicted; a
+# companion standing); then each candidate was cast again with the engine held
+# and its own meter open. **The table is what those two arms disagreed about**
+# (`docs/reports/GP.md` §2). `check_gp` §2 drives both arms for every row.
+#
+# **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE:**
+#   · CANNOT WORK WITHOUT THE ENGINE — refused at the usability door, or it
+#     resolves and the log says it did nothing. **Gated: these 34.**
+#   · HALF-WORKS — Boil Over deals 22 against 89 and cashes no meter, Drumfire
+#     and Calibrating Shot fire and bank no Focus. **NOT gated**: a card that
+#     still does most of its job is a legitimate offer (GM's narrowing).
+#   · FEEDS an engine without reading it — Blight the Well marks Ruin through
+#     the generic hook, Call the Wilds summons at 0 Loyalty, every fire card
+#     builds the Overburn field. **NOT gated**: they work for anyone and they
+#     pre-arm an engine a hero might later draft.
+#
+# **THE GATE IS THE HOLDER'S, AND THAT IS EXACTLY RIGHT HERE FOR A REASON WORTH
+# WRITING DOWN.** Five of the eight producers are PARTY-level in the code
+# (`_living_hero_passive("permafrost")`, `_living_devout`, `_living_occultist`,
+# the Mercy holder, the Focus holder), so the strict reading would be "somebody
+# in the party holds it". The party is ONE HERO PER CLASS — `draft_screen`'s
+# ROSTER greys a picked class out — and every engine belongs to one class, so
+# the hero drafting IS the only possible holder of his class's engines. The two
+# readings coincide. **They stop coinciding the day two heroes of one class can
+# be seated**, and this comment is where that day is met.
+#
+# **WHAT IS DELIBERATELY NOT IN IT.** Covering Guard reads `block_chance`, a
+# STAT — `_live_block_chance` is `block_chance + _plating_slice`, and only the
+# Warden declares 0.10 — so a spine-taker lends a 0% block and a Warden without
+# Heavy Plating lends 10%. That is FP's `block_chance` finding and `PROTECTED_CORES`'
+# own documented hole (*the enabler concept has to cover STATS, not only
+# abilities*), NOT an engine read, and gating on it would be a second mechanism.
+# Battle Poise and Counter Time need the DEFENSIVE guard, which Formless,
+# Precision Strike, Feint and Wheeling Cut all reach with no engine at all —
+# four cards in the same merged pool — so they are conditional on a CARD, not on
+# an engine.
+const ENGINE_READ := {
+	# PERMAFROST — `_holds` is filled only by `_hold_freeze`, and `_freeze_holds`
+	# refuses to fill it unless a Glacial Hold holder lives. Four are refused at
+	# the door; Deep Winter resolves and says "he holds nothing, so there is no
+	# prison to copy".
+	"Winter's Toll": {"engine": "permafrost", "why": "bills a hold; refused with `_holds` empty"},
+	"Rimebinding": {"engine": "permafrost", "why": "copies a hold; refused with `_holds` empty"},
+	"Cryoclasm": {"engine": "permafrost", "why": "moves a prison; refused with `_holds` empty"},
+	"Shatter": {"engine": "permafrost", "why": "the mass release; refused with `_holds` empty"},
+	"Deep Winter": {"engine": "permafrost", "why": "copies a prison; resolves into nothing without one"},
+	# RESONANCE — the meter is installed by `_spawn_units` only for a holder
+	# (`cfg["second_resource_name"] = "Resonance"`), so every one of these reads
+	# a bar that does not exist. Two are refused at the door; five resolve and
+	# pay zero (+0 Resonance, -0%, "nothing to share", "no Resonance to set").
+	"Arcane Bolt": {"engine": "resonance", "why": "priced per stack; refused below 1"},
+	"Unmaking": {"engine": "resonance", "why": "priced per stack; refused below 1"},
+	"Threshold": {"engine": "resonance", "why": "sets the meter; \"he holds no Resonance to set\""},
+	"Null Field": {"engine": "resonance", "why": "5% mitigation a stack; -0% at none"},
+	"Inner Arcane": {"engine": "resonance", "why": "banks Resonance; +0 at none"},
+	"Overcharge": {"engine": "resonance", "why": "the storm feeds on itself; +0 at none"},
+	"Resonant Field": {"engine": "resonance", "why": "shares his own bonus; \"nothing to share\""},
+	# MERCY — the same install, for the Holy Cleric. Divine Plea is priced in it
+	# (`faith_cost` 2) and refused; the rest resolve and say they hold none.
+	# Intercession's hook is stamped only when a hero carries Mercy
+	# (`_spawn_units`) and `_on_intercession_save` needs 1 to pay.
+	"Divine Plea": {"engine": "mercy", "why": "costs 2 Mercy; refused against an absent bar"},
+	"Shared Grief": {"engine": "mercy", "why": "pays health FOR Mercy; \"holds no Mercy to gain\""},
+	"Divine Presence": {"engine": "mercy", "why": "a Mercy drip; \"no Mercy to keep the watch for\""},
+	"Alms": {"engine": "mercy", "why": "wards the ally who earned Mercy at the cap"},
+	"Intercession": {"engine": "mercy", "why": "the refusal is paid in Mercy; unhooked without it"},
+	# CONVICTION — `_gain_faith` returns at once with no Devout standing, and
+	# `_grant_divine_shield` is the ONLY writer of a barrier's `divine` flag:
+	# it is reached from Divine Shield (conviction's enabler, which travels with
+	# the engine) and from Mantle, which itself refuses with no Devout.
+	"Blessing of the Faithful": {"engine": "conviction", "why": "spends 3 Faith; refused below it"},
+	"Aegis Reversal": {"engine": "conviction", "why": "spends a DIVINE barrier; nothing else stamps one"},
+	"Elevation": {"engine": "conviction", "why": "hands over Faith; \"no Devout stands, so Faith pays nothing\""},
+	"Mantle": {"engine": "conviction", "why": "a real divine shield; \"finds nobody to lay it on\""},
+	"Ordination": {"engine": "conviction", "why": "grants Faith; \"finds nobody to ordain\""},
+	# OLD GODS — `_gain_ruin` returns at once with no Occultist standing, so no
+	# enemy carries a mark for either of these to spend. Both refused.
+	"Transference": {"engine": "old_gods", "why": "moves a Ruin mark; refused with none on the field"},
+	"Requiem": {"engine": "old_gods", "why": "consumes a Ruin mark; refused with none on the field"},
+	# PACK — `_gain_loyalty` returns at once without the engine, so a companion
+	# summoned by Call the Wilds stands at 0 Loyalty forever. THE COMPANION IS
+	# NOT THE GATE (Twin Hunt, Savage Sweep, Bloodbond and Call the Wilds itself
+	# all work at 0 bond); the BOND is. Ghostpack's payout sits inside
+	# `has_engine("pack")` in the strike loop — the status lands and does nothing.
+	"Unleash": {"engine": "pack", "why": "spends a bond; refused below 1 Loyalty"},
+	"Bring It Down": {"engine": "pack", "why": "\"no bond deep enough to call on\""},
+	"Last Howl": {"engine": "pack", "why": "+3% a stack of Loyalty a fallen companion held"},
+	"Succession": {"engine": "pack", "why": "50% of the outgoing bond, which is 0"},
+	"Ghostpack": {"engine": "pack", "why": "its strike rides the Pack block in `_resolve`"},
+	# LETHAL AIM — both `_sharpshooter_focus` call sites sit inside
+	# `has_engine("lethal_aim")`, and Focus is installed only for a holder. Each
+	# of these lays a mark whose WHOLE payload is Focus.
+	"Quarry's Mark": {"engine": "lethal_aim", "why": "doubles Focus from the marked enemy"},
+	"Reacquire": {"engine": "lethal_aim", "why": "banks Focus on leaving the named quarry"},
+	# HEAVY PLATING — both are read at one site each, and each site is inside the
+	# plating block in the strike loop. Anvil holds a climb that never climbs;
+	# Recompense is paid for a reset that never happens.
+	"Anvil": {"engine": "heavy_plating", "why": "holds the plating climb through a block"},
+	"Recompense": {"engine": "heavy_plating", "why": "pays Rage for a plating reset"},
+	# BLOOD FRENZY — **THE ROW A BOARD TEST CANNOT FIND, AND IT IS WHY THE TABLE
+	# WAS DERIVED AT THE READ SITE AS WELL AS DRIVEN.** Unslaked lands its status
+	# and moves the board identically with the engine and without: all it changes
+	# is `keep` inside `BattleUnit.frenzy_bonus()`, so the FLOOR ratchets either
+	# way. It is inert because nothing READS that floor without the engine —
+	# every caller of `frenzy_bonus()` that uses its return is inside a
+	# `has_engine("bloodrage")` block, the nameplate chip included. `check_gp`
+	# §2c drives it as a damage pair rather than as a board delta for that reason.
+	"Unslaked": {"engine": "bloodrage", "why": "raises the Blood Frenzy floor's ratchet; nothing reads the floor without the engine"},
+}
+
+
+# The engine a card reads, or "" for a card that reads none. THE ONE ANSWER, so
+# the offer, the zone-boss fallback and `check_gp` cannot disagree.
+static func engine_read(card_name: String) -> String:
+	return String(ENGINE_READ.get(card_name, {}).get("engine", ""))
+
+
+# What a hero holding `engines` may be offered out of `names`. A card reading no
+# engine is always offered; a card reading one is offered only to its holder.
+static func offerable(names: Array, engines: Array) -> Array:
+	return names.filter(func(n):
+		var e := engine_read(String(n))
+		return e == "" or engines.has(e))
 
 
 # ---------- THE PROTECTED CORE (Batch BO §2) ----------
@@ -1258,10 +1443,21 @@ static func card_tag_line(display_name: String) -> String:
 	return " · ".join(parts)
 
 
+# **BATCH GP — A SHELF, NOT A POOL.** This returns exactly what it always
+# returned and it is no longer what anybody draws from: the three spec shelves
+# and the class-wide shelf of a class are ONE pool now (`draft_pool` above).
+# It survives because WHERE A CARD WAS AUTHORED is still worth asking — every
+# depth, flatness and no-card-in-two-shelves assertion in the battery asks it —
+# and because its own header carries the authoring rules for that lineage.
+# **A reader that takes this for "what this hero can be offered" is wrong and
+# will still pass.**
 static func spec_draft_pool(spec: String) -> Array:
 	return SPEC_DRAFT_POOLS.get(spec, [])
 
 
+# **BATCH GP — A SHELF, NOT A POOL**, and the same warning: these six (five for
+# the Mage, three for the Cleric) are ordinary cards of the class pool now, with
+# no share and no tier of their own.
 static func class_draft_pool(class_name_key: String) -> Array:
 	return CLASS_DRAFT_POOLS.get(class_name_key, [])
 

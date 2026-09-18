@@ -67,16 +67,36 @@ const WALK_EXEMPT := {
 	# other source. A gate that uses the canonical walk AND the buckets is not
 	# the thing this rule is looking for.
 	"check_dn.gd": "reads the pools for BUCKET membership, and calls `Classes.ability_corpus()` for the walk itself",
+	# **BATCH GP — THE FIFTH TIME THE MARK OVER-FIRES, AND HERE THE TWO READS
+	# ARE THE SUBJECT RATHER THAN A SHORTCUT PAST ONE.** The pool merge made the
+	# three lineage shelves and the class-wide shelf of a class ONE POOL, and
+	# `check_gp` §0's whole job is the relation between them: it asserts
+	# `Classes.draft_pool(cls)` IS those four lists, in order, with no name
+	# twice and every class-wide card inside it. **A gate asserting that
+	# relation cannot be written without naming both sides of it.** It
+	# enumerates ONE CLASS'S DRAFT POOL and never the corpus — it calls
+	# `ability_corpus()` nowhere and needs nothing from it, because no question
+	# it asks is about the corpus — so it is not the defect this rule catches,
+	# which is a gate re-deriving the corpus and thereby missing the names that
+	# live in no pool. §3b sees nothing here: no function of it returns a
+	# collection built from the two.
+	"check_gp.gd": "§0 asserts `Classes.draft_pool` IS the shelves — the relation between the two IS its subject, and it enumerates one class pool, never the corpus",
 	# **BATCH EH §1 — A THIRD REASON THE MARK OVER-FIRES, AND IT WILL RECUR.**
-	# The zone-boss award is a CHAIN of three pools now — boss, then the hero's
+	# The zone-boss award was a CHAIN of three pools — boss, then the hero's
 	# spec draft pool, then his class-wide one — so a gate that measures the
 	# chain must read every pool the chain reads. That is the opposite of the
-	# defect this rule exists to catch: these two do not enumerate abilities at
-	# all, they measure DEPTH per spec and drive the tiers live, and neither
-	# returns a collection (§3b sees nothing here, which is the check that the
-	# shape is honest rather than merely declared).
+	# defect this rule exists to catch: it does not enumerate abilities at
+	# all, it measures DEPTH per spec, and it returns no collection (§3b sees
+	# nothing here, which is the check that the shape is honest rather than
+	# merely declared).
+	#
+	# **BATCH GP TOOK `check_eh.gd` OFF THIS LIST, AND THE REASON IS THE HALF
+	# WORTH KEEPING.** The pool merge made the chain TWO tiers reading one pool,
+	# so that gate stopped reading the class-wide accessor and stopped tripping
+	# the mark — **and this rule caught the exemption going stale**, because an
+	# exemption whose reason has expired is a suppression waiting to hide the
+	# next real walk. It is DELETED rather than reworded: the gate needs none.
 	"check_ea.gd": "measures the AWARD CHAIN's depth per spec — it reads both draft pools because the chain does",
-	"check_eh.gd": "drives the AWARD CHAIN's three tiers live — it reads both draft pools because the chain does",
 	# **BATCH FK — THE FOURTH TIME THE MARK OVER-FIRES, AND IT IS EH §1's REASON
 	# EXACTLY.** `check_fk` §5 asks whether a rune's `requires_ability` names an
 	# ability the SCOPED SPEC CAN ACTUALLY EARN — a rune naming one its hero

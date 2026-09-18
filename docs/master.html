@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-17 (Batch GO &mdash; the nine missing engines)</b></p>
+<p align="right"><b>Last updated: 2026-09-17 (Batch GP &mdash; the pools merge)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -120,9 +120,8 @@ point</b> except a zone boss's, which banks one for each class among the heroes 
 (§7). The <b>mini-boss</b>
 hands every hero a <b>generic ability upgrade, up to three offered</b>; <b>all three zone bosses</b>
 hand every hero an <b>ability pick, up to three offered</b>, and <b>one more ability slot</b>, drawn
-from that hero's spec pool first — and when that is spent, from his spec draft pool, and when
-that is spent too, from his class-wide draft pool, so the award can never pay nothing
-(§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
+from that hero's spec pool first — and when that is spent, from his CLASS DRAFT POOL, so the
+award can never pay nothing (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft. Quitting after the last
@@ -1295,12 +1294,13 @@ bosses</b>. The end boss awards none: the run is over and the pick would be dead
 abilities to ten, one rung per zone boss, and past the cap an incoming card is taken by
 BENCHING a carried one rather than by losing it. Both are §6b's, and the boss pick obeys the
 same cap the draft does.</p>
-<p><b>Each award offers up to 3 abilities the hero does not already own, and it reads three
-pools in order: his SPEC boss pool, then his spec DRAFT pool, then his CLASS-WIDE draft
-pool.</b> Abilities are spec-locked at the first two tiers and class-locked at the third: the
-old class-pool draw is gone and nothing here reaches a sibling CLASS. Spec pools are 2–5
-deep, so an offer shows what exists rather than padding — a hero deep into its pool may be
-offered two. The pick is resolved on that hero's map card, and the triple is rolled the
+<p><b>Each award offers up to 3 abilities the hero does not already own, and it reads two
+pools in order: his SPEC boss pool, then his CLASS DRAFT POOL.</b> Abilities are spec-locked at
+the boss tier and class-locked at the fallback: the old class-pool draw is gone and nothing here
+reaches a sibling CLASS. <b>Batch GP merged the draft's two pools into one</b>, so the chain lost
+the third tier it had rather than losing what that tier offered &mdash; the fallback reads all 34
+to 41 cards of the hero's class. Spec boss pools are 2&ndash;5 deep, so an offer shows what exists
+rather than padding &mdash; a hero deep into its pool may be offered two. The pick is resolved on that hero's map card, and the triple is rolled the
 moment the award drops — re-opening the card never rerolls it.</p>
 <p><b>The mini-boss award is different in kind:</b> a <b>generic ability upgrade</b>, chosen
 from three, attached to one ability the hero already owns. Upgrades <b>stack</b> on the same
@@ -1386,22 +1386,25 @@ skipped and the victory card did not name them. The award now falls back to a
 card from <b>that hero's own spec DRAFT pool that they do not already hold</b>,
 offered three at a time and announced exactly like any other award. It stays
 spec-locked, so nothing arrives that a sibling spec alone could reach.</p>
-<p><b>AND THERE IS A THIRD TIER UNDER IT, BECAUSE THE SECOND ONE CAN RUN OUT.</b> Batch EA
+<p><b>THERE WERE THREE TIERS UNTIL BATCH GP, AND THE POOL MERGE MADE THEM TWO.</b> Batch EA
 chose the spec-draft card <i>because</i> that pool could not empty: a hero carried at most
 four earned abilities (three for the Holy Cleric) against draft pools of ten to thirteen, so
 the fallback floored at six. <b>Batch EG broke both halves of that arithmetic one batch
 later</b> — the cap became a ladder to ten, and a benched card is now KEPT, so what a hero
 holds is every card he has ever taken rather than every card he currently carries. The floor
-fell to three, and to two for the Occultist. <b>The chain therefore ends on the hero's
-CLASS-WIDE draft pool</b>, six cards for the Warrior and the Hunter, five for the Mage and three for the Cleric,
-offered three at a time and announced exactly like any other award. It is class-locked
-rather than spec-locked, which is the one thing the third tier gives up — and it is not a
-re-opened class DRAW: it reads the live, curated class draft pools of §6b, not the
-61-entry container Batch DY deleted. <b>What it does not do is make the chain unemptiable.</b>
-No sibling drains it, because every hero filters it against what he himself owns; but roughly
-one draft card in four is class-wide, so a hero who takes at every offer drains his spec pool
-and then this one. What holds the floor up is arithmetic: emptying the chain means owning
-every card in both draft pools — sixteen at the cheapest spec — and an offer pays one card.</p>
+fell to three, and to two for the Occultist. Batch EH answered that with a third tier reading
+the class-wide pool; <b>Batch GP answered it with depth instead</b>, because the merge makes the
+second tier the hero's whole class pool — 38 for the Warrior, 41 for the Mage, 34 for the Cleric,
+36 for the Hunter — which is everything both old tiers held. It is class-locked rather than
+spec-locked, which is the one thing the merge gives up, and it is not a re-opened class DRAW:
+it reads the live, curated shelves of §6b, not the 61-entry container Batch DY deleted.
+<b>What it does not do is make the chain unemptiable.</b> No sibling drains it, because every
+hero filters it against what he himself owns; but the hero himself can, by taking at every
+offer. <b>And a hero is only offered what he can USE</b> — the 34 cards that read an engine are
+offered only to its holder (§6b) — so his reachable pool is smaller than his class pool: 35 of
+38, 29 of 41, 22 of 34 and 29 of 36 for a hero holding no engine at all. What holds the floor up
+is arithmetic: emptying the chain means owning every card he can be shown, and an offer pays
+one card.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
 yourself in embers and the next blow that would kill you this battle returns you at 40% of
 maximum health instead. Once per battle. It is the Mage class's only refusal of
@@ -1474,10 +1477,11 @@ damage in prose, so before this they drafted blind. <b>The offer / drop picker o
 screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
 no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
-<p>This is <b>four times as much drafting</b> as one hero per elite. Every spec drafts from at
-least ten spec cards and three class-wide ones, and a run offers far more cards than a hero can
-carry — so the cap is what the draft is about. That is the intended shape: constant, meaningful
-decisions.</p>
+<p>This is <b>four times as much drafting</b> as one hero per elite. <b>Since Batch GP every hero
+drafts from ONE pool, his class's</b> — 38 for the Warrior, 41 for the Mage, 34 for the Cleric and
+36 for the Hunter — where a lineage hero drew from 13 to 18 before and a hero who took a spine drew
+from 3 to 6. A run offers far more cards than a hero can carry, so the cap is what the draft is
+about. That is the intended shape: constant, meaningful decisions.</p>
 
 <p><b>The slot cap grows on every zone boss, and the protected core.</b> A hero carries
 <b>seven</b> abilities at the start of a run and <b>ten</b> by the end of it — one more slot
@@ -1525,15 +1529,34 @@ not because the passive needs them.</p>
 <tr><td><b>Survivalist</b></td><td>3</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
 </table>
 
-<p><b>What the pool draws from.</b> Roughly <b>one card in four is class-wide</b>; the rest are
-spec. Class-wide abilities are deliberately untied and general — Mirror Image, not Frostbolt —
-and the test is whether an ability would read as off-theme for any spec of that class. They are
-<b>weaker than spec abilities, and unconditional</b>: they feed no passive, so at equal power
-they would be a safe default that dilutes every build. Slightly weaker but always-on makes them
-the pick you take when your spec's engine is not online yet.</p>
+<p><b>What the pool draws from — ONE POOL A CLASS SINCE BATCH GP.</b> The three lineage shelves
+and the class-wide shelf below are a single pool now, and the class-wide cards are <b>ordinary
+cards in it</b>: no share, no seam, no tier of their own. Class-wide abilities are deliberately
+untied and general — Mirror Image, not Frostbolt — and the test is whether an ability would read
+as off-theme for any spec of that class. They are <b>weaker than spec abilities, and
+unconditional</b>: they feed no passive, so at equal power they would be a safe default that
+dilutes every build. <b>That reason is spent now</b> — in a merged pool they are simply the
+weakest cards in it, six for the Warrior and the Hunter, five for the Mage and three for the
+Cleric. <b>It is accepted, flagged, and a rebalance owed</b>; no card was retuned at the merge.</p>
 
-<p><b>The draft pools.</b> Separate from the §6a boss pools above: the boss pick still reads
-SPEC_POOLS, the draft reads these.</p>
+<p><b>A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT (Batch GP).</b> A wide
+pool is only worth having if what it widens is playable, and offering a Ruin card to a Cleric
+without Ruin is offering a card that does nothing. <b>Thirty-four of the 149 read one</b> — five
+of Permafrost, seven of Runaway Resonance, five of Mercy, five of Conviction, two of Wrath of the
+Old Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood Frenzy —
+and each was derived at the read site and driven both ways. <b>Three groups, and only the first is
+gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
+against 89 and cashes no meter; Drumfire and Calibrating Shot fire and bank no Focus) — a card
+that still does most of its job is a legitimate offer; and cards that FEED an engine without
+reading it (Blight the Well marks Ruin through the generic hook, Call the Wilds summons at 0
+Loyalty, every fire card builds the Overburn field) — they work for anyone and pre-arm an engine
+a hero might later draft. <b>What a hero holding no engine can be offered: 35 of 38, 29 of 41,
+22 of 34, 29 of 36.</b></p>
+
+<p><b>The draft shelves.</b> Separate from the §6a boss pools above: the boss pick still reads
+SPEC_POOLS and is untouched by the merge, the draft reads these. <b>They are SHELVES rather than
+pools since Batch GP</b> — where a card was authored, not a channel it is drawn from. Every row
+below is part of one pool, its class's.</p>
 <table border="1" cellpadding="4">
 <tr><th>Spec</th><th>Draft pool</th></tr>
 <tr><td><b>Berserker</b></td><td>Blood Offering, Gut Rip, Reckless Abandon, Berserk, Blood Debt, Unslaked, Spite, Boil Over, <b>Battle Shout</b>, <b>Rampage</b></td></tr>
@@ -1548,18 +1571,17 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds, Bloodbond, Savage Sweep, Ghostpack, Last Howl, Succession, Unleash, <b>Bear the Brunt</b>, <b>Bring It Down</b></td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry&#x27;s Mark, Crossfire, Calibrating Shot, Trophy Shot, Reacquire, Fault Line, Drumfire, <b>Dug In</b>, <b>Heads Down</b></td></tr>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b></td></tr>
-<tr><td colspan="2"><b>Class-wide pools</b> — drawn by every spec of the class, at roughly one card in four</td></tr>
+<tr><td colspan="2"><b>Class-wide shelves</b> — ordinary cards of the class pool since Batch GP, drawn at no special rate</td></tr>
 <tr><td><b>Mage</b> (all three specs)</td><td>Mirror Image, Mana Well, Dispel, Blink, <b>Mana Shield</b> (five)</td></tr>
 <tr><td><b>Cleric</b> (all three specs)</td><td>Chastise, Exhortation, Undying Vigil (three)</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
 <tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> Every class pool holds at least three, so <b>one card in four is
-class-wide</b> and that seam draws a real entry for <b>every hero in the game</b> — no class
-rolls an empty pool and no offer loses its class card. <b>The draft stands at 149 of 149</b>
-&mdash; <b>129 spec</b> cards plus <b>20 class-wide</b> ones. The class kits (&sect;5.2) hold five
-cards that are guaranteed rather than drawn, and a hero with no lineage draws every later card
-from his class pool alone &mdash; three cards for a Cleric.
+<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 149 of 149</b> &mdash; <b>129 spec</b>
+cards plus <b>20 class-wide</b> ones &mdash; and since Batch GP those are <b>four pools of 38, 41,
+34 and 36</b>. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
+<b>a hero with no lineage draws the whole class pool</b> where he drew his class-wide shelf alone
+before &mdash; three cards for a Cleric, thirty-four now.
 <b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
 finished abilities had sat in a class-wide BOSS pool that no run could reach since Batch AN closed
 the class draw: <b>RALLYING SHOUT</b> to the Warden, <b>ARCANE SURGE</b> and <b>REALITY

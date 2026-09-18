@@ -208,8 +208,13 @@ func _own_pools() -> void:
 	var dupes := 0
 	for m in run.party:
 		var spec := String(m["spec"])
-		var mine: Array = Classes.spec_draft_pool(spec).duplicate()
-		mine.append_array(Classes.class_draft_pool(Classes.class_of_spec(spec)))
+		# **BATCH GP — "THEIR OWN POOLS" IS ONE POOL AND IT IS THE CLASS'S.**
+		# The merge dissolved the three lineage shelves and the class-wide shelf
+		# of a class into one, so a Swordmaster is offered Berserker and Warden
+		# cards on purpose now. The question this section asks is unchanged and
+		# is still worth asking at volume: a hero is never offered a card from
+		# ANOTHER CLASS.
+		var mine: Array = Classes.draft_pool(Classes.class_of_spec(spec))
 		for _i in 200:
 			var offer: Array = run.roll_draft_offer(m)
 			if offer.is_empty():
@@ -223,7 +228,7 @@ func _own_pools() -> void:
 				if seen.has(String(card)):
 					dupes += 1
 				seen[String(card)] = true
-	ok(strays == 0, "§2: no hero was ever offered a card outside their own pools (%d strays)"
+	ok(strays == 0, "§2: no hero was ever offered a card outside their own CLASS pool (%d strays)"
 		% strays)
 	ok(empties == 0, "§2: every offer held at least one card (%d empty)" % empties)
 	ok(oversize == 0, "§2: no offer held more than three (%d oversize)" % oversize)
@@ -231,7 +236,10 @@ func _own_pools() -> void:
 
 	# THE NAMED CASE: A PYROMANCER IS NEVER OFFERED A WARDEN CARD. Asserted
 	# explicitly rather than left to the sweep above, because it is the sentence
-	# §2 is written in and a reader will look for it.
+	# §2 is written in and a reader will look for it. **BATCH GP — IT IS A
+	# CROSS-CLASS STATEMENT NOW**: the Warden is a Warrior and the Pyromancer a
+	# Mage, so the merge leaves it true for a different reason than it was
+	# written for. The arm beside it is the merge's own claim.
 	var pyro: Dictionary = run.party[1]
 	ok(String(pyro["spec"]) == "pyromancer", "§2: the harness seated a Pyromancer")
 	var warden_cards: Array = Classes.spec_draft_pool("warden")
@@ -247,6 +255,17 @@ func _own_pools() -> void:
 			if warden_cards.has(String(card)):
 				leaked += 1
 	ok(leaked == 0, "§2: a Pyromancer is NEVER offered a Warden card (%d leaks)" % leaked)
+	# **AND THE POSITIVE ARM THE MERGE ADDS: he IS offered a Cryomancer's.** A
+	# negative anchor alone would pass a draft that offered him nothing at all,
+	# and it would pass the pre-merge code this suite was written against.
+	var cryo_cards: Array = Classes.spec_draft_pool("cryomancer")
+	var sibling := 0
+	for _i in 200:
+		for card in run.roll_draft_offer(pyro):
+			if cryo_cards.has(String(card)):
+				sibling += 1
+	ok(sibling > 0,
+		"§2: a Pyromancer was offered a Cryomancer card 0 times in 200 rolls — the pools did not merge")
 	# Every card an offer can show must RESOLVE, or the column renders a name
 	# with no description and the player is choosing blind.
 	var unresolved := 0
@@ -288,8 +307,8 @@ func _ledger_per_member() -> void:
 	ok(run.draft_refused(b).is_empty(),
 		"§2: B's ledger is UNTOUCHED by A's decline (holds %d)"
 			% run.draft_refused(b).size())
-	var b_left: Array = run.draft_pool_left(b)["spec"]
-	b_left.append_array(run.draft_pool_left(b)["class"])
+	# BATCH GP — ONE LIST since the pool merge.
+	var b_left: Array = run.draft_pool_left(b)
 	var hidden := 0
 	for card in a_offer:
 		if not b_left.has(String(card)):
@@ -316,16 +335,17 @@ func _fill_short() -> void:
 	# now, and it is the same forced move test_batch_bo had to make at BW.
 	var run := _party(["warden", "arcanist", "holy", "mystic"])
 	var m: Dictionary = run.party[0]
-	var spec_pool: Array = Classes.spec_draft_pool("warden")
-	var class_pool: Array = Classes.class_draft_pool("warrior")
+	# BATCH GP — ONE POOL. The harness wore down two lists until the merge; it
+	# wears down the one the hero actually draws from now, which is what makes
+	# "fills short" measurable at all.
+	var whole: Array = Classes.draft_pool("warrior")
 	var refused: Array = []
-	# Leave exactly TWO cards standing across BOTH pools.
-	refused.append_array(spec_pool.slice(0, spec_pool.size() - 1))
-	refused.append_array(class_pool.slice(0, class_pool.size() - 1))
+	# Leave exactly TWO cards standing in it.
+	refused.append_array(whole.slice(0, whole.size() - 2))
 	m["draft_refused"] = refused
-	var left: Dictionary = run.draft_pool_left(m)
-	ok(int(left["spec"].size()) + int(left["class"].size()) == 2,
-		"§2: the harness wore the pools down to two cards")
+	var left: Array = run.draft_pool_left(m)
+	ok(left.size() == 2,
+		"§2: the harness wore the pool down to two cards (got %d)" % left.size())
 	var short_offers := 0
 	var padded := 0
 	for _i in 100:
@@ -340,7 +360,7 @@ func _fill_short() -> void:
 	ok(padded == 0, "§2: ...and NEVER pads with a repeat (%d padded)" % padded)
 	# Worn to nothing, `award_draft_pick` REFUSES rather than queueing an empty
 	# column — a hero with nothing left simply has no column on the screen.
-	m["draft_refused"] = spec_pool.duplicate() + class_pool.duplicate()
+	m["draft_refused"] = whole.duplicate()
 	ok(not run.award_draft_pick(m),
 		"§2: an exhausted pool queues NO pick at all")
 	ok(int(m.get("draft_picks_owed", 0)) == 0,
@@ -683,8 +703,13 @@ func _live_elite_victory() -> void:
 	var strays := 0
 	for m in run.party:
 		var spec := String(m["spec"])
-		var mine: Array = Classes.spec_draft_pool(spec).duplicate()
-		mine.append_array(Classes.class_draft_pool(Classes.class_of_spec(spec)))
+		# **BATCH GP — "THEIR OWN POOLS" IS ONE POOL AND IT IS THE CLASS'S.**
+		# The merge dissolved the three lineage shelves and the class-wide shelf
+		# of a class into one, so a Swordmaster is offered Berserker and Warden
+		# cards on purpose now. The question this section asks is unchanged and
+		# is still worth asking at volume: a hero is never offered a card from
+		# ANOTHER CLASS.
+		var mine: Array = Classes.draft_pool(Classes.class_of_spec(spec))
 		var queue: Array = m.get("draft_candidates", [])
 		if queue.is_empty():
 			strays += 1        # no column at all is itself a stray result here

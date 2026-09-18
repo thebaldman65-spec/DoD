@@ -3308,17 +3308,11 @@ remains open is design and is in `docs/state.md`: whether the lane rule is repla
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SLOT LADDER AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX, the cap and the loadout at EG)
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, on ONE SCREEN of four columns, each hero drawing
-from their OWN pools and keeping their OWN no-return ledger.**
-
-**BATCH FD §1 — THE MERCHANT IS NO LONGER ONE OF THE SOURCES, RULED BY THE DESIGNER.** BO §3
-built four (elite, merchant, event, zone boss) and the merchant's is withdrawn: **a draft pick is
-earned and never bought.** `Run.draft_price()` is KEPT with no game-side caller, on the Melted
-Armor contract, and **the other three are untouched** — a ruling that took a source it did not
-name would be the failure worth catching, so `check_fd` §1f asserts the three still stand in the
-same breath as the removal. `run_sim` never bought one, so no measured figure moves.
+from their OWN pool and keeping their OWN no-return ledger.**
 
 **A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
-`Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites and events offer;
+`Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are the SHELVES of what elites and events offer
+(`Classes.draft_pool` is the pool, GP);
 `SPEC_POOLS` is what a ZONE BOSS offers. **Sharing one pool would re-weight every boss offer in
 the game**, which is what "the existing pick, unchanged" forbids. **A drafted ability lands in
 `member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero sheet,
@@ -3339,9 +3333,10 @@ lets a boss pool empty below its own depth.**
 · **DECLINING REFUSES THE WHOLE OFFER; TAKING ONE REFUSES NOTHING; BENCHING ONE REFUSES NOTHING.**
   `draft_refused` is the no-return ledger, per hero per run, and **`decline_draft` is its only
   writer since EG.**
-· **THE OFFER FILLS SHORT rather than padding with repeats**, and `Run.draft_card_is_class` is the
-  one-in-four seam — **its own function precisely so a test can drive it 4000 times.** A check on
-  the roller that could only ever measure zero is a check that can only pass, which is a gap.
+· **THE OFFER FILLS SHORT rather than padding with repeats.** `Run.draft_card_is_class` was the
+  one-in-four seam and **went with the GP pool merge** — one pool has no sides to weight. BO's
+  reason for driving it thousands of times is kept and pointed at what replaced it: a class-wide
+  card must still REACH a hero, and with no seam the only thing that can hide one is the shuffle.
 · **THE UI IS THE EXISTING OVERLAY, NOT A SECOND ONE.**
 
 **THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE THING A
@@ -3356,9 +3351,11 @@ there rather than copying it here.** **SINCE GK THE ENABLERS TRAVEL WITH THE ENG
 to any hero of the class who holds that engine and takes them out of a lineage kit whose engine is not
 held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 149 of 149, 129 spec + 20 class-wide.** All twelve
-specs draft from at least TEN; the Warrior and Hunter class pools hold six, the Mage's five and the Cleric's three,
-since GN moved five class-wide cards into the class kits.
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 149 of 149, 129 spec + 20 class-wide — AND SINCE GP
+THAT IS FOUR POOLS OF 38 / 41 / 34 / 36.** All twelve lineage shelves hold at least TEN; the
+Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
+moved five class-wide cards into the class kits. **A hero drew from 13 to 18 before the merge and a
+spine-taker from 3 to 6.**
 **DO NOT RE-RECORD ANY PART OF THE DRAFT AS OWED.** In particular:
 · **THE WARRIOR POOLS WERE OWED AND ARE PAID** — Berserker Blood Offering / Gut Rip, Warden
   Covering Guard / Eye of the Storm, Swordmaster Precision Strike / Feint.
@@ -3391,6 +3388,48 @@ they feed no passive, so at equal power they would be a safe default that dilute
 **VERIFY THE "WEAKER" HALF AGAINST THE LIVE SPEC KITS RATHER THAN TRUSTING THE BRIEF, AND CHECK IT
 AGAINST THE FREE CORE ATTACK TOO** — a comparison against spec ABILITIES alone misses a card
 dominated by a basic.
+
+## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
+> **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
+> all of it — 38 / 41 / 34 / 36 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
+> SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
+> `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**
+>
+> **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
+> the table — 34 cards, one `why` apiece — and `Classes.offerable` is the one answer, asked by the
+> draft offer and by the zone-boss fallback so the two cannot disagree.
+
+- **THE TABLE IS AUTHORED, DERIVED AT THE READ SITE, AND DRIVEN BOTH WAYS.** A field-level test
+  misjudges 137 abilities (CN); the population came from casting every one of the 149 on a hero
+  holding NO engine, on a board dressed so a no-op could only be the engine's fault, and then
+  casting each candidate again with the engine held. **`check_gp` §2 drives both arms every
+  battery and carries a CONTROL** — six engine-free cards that must cast identically on both.
+- **A CONTROL CARD MAY NOT BE ONE THE ENGINE BUFFS IN PASSING.** Chastise under Conviction
+  separates because Faith raises every cast's damage — that is the engine reading the CARD, which
+  is the thing §2 exists to tell apart from the card reading the engine.
+- **THREE GROUPS AND ONLY ONE IS GATED.** CANNOT-work is gated; HALF-works is not (a card that
+  still does most of its job is a legitimate offer — Boil Over deals 22 against 89); FEEDS an
+  engine without reading it is not (it works for anyone and pre-arms an engine he might draft).
+- **A ROW WHOSE PAYOUT IS A LATER STRIKE OR A LATER EVENT CANNOT BE FOUND BY A BOARD TEST.**
+  Unslaked, Anvil and Recompense land and move nothing until a blow arrives; Intercession, Last
+  Howl and Succession until a death or a swap. Six of the 34 were found by READING the site and
+  are driven by their own event, not by the cast.
+- **THE GATE IS THE HOLDER'S AND THE CODE'S PRODUCERS ARE PARTY-LEVEL.** They coincide because
+  the party is one hero per class. **They part the day two heroes of one class can be seated.**
+- **THE CLASS-WIDE CARDS LOST THEIR TIER AND ARE NOW THE WORST CARDS IN EACH POOL.**
+  `CLASS_DRAFT_SHARE`, `Run.draft_card_is_class` and EH §1's third zone-boss tier are DELETED; the
+  award chain is two tiers. They were authored WEAKER on purpose (EB §1, and `CLASS_DRAFT_POOLS`'
+  own header), the merge removes the reason, **and the rebalance is OWED and not taken.**
+- **BOSS POOLS ARE NOT MERGED.** `SPEC_POOLS` stays spec-keyed and `roll_spec_ability_offer` still
+  reads it. The merge joined the DRAFT's two pools, not the game's three.
+
+**BATCH FD §1 — THE MERCHANT IS NO LONGER ONE OF THE SOURCES, RULED BY THE DESIGNER.** BO §3
+built four (elite, merchant, event, zone boss) and the merchant's is withdrawn: **a draft pick is
+earned and never bought.** `Run.draft_price()` is KEPT with no game-side caller, on the Melted
+Armor contract, and **the other three are untouched** — a ruling that took a source it did not
+name would be the failure worth catching, so `check_fd` §1f asserts the three still stand in the
+same breath as the removal. `run_sim` never bought one, so no measured figure moves.
 
 ## STANDING RULE — THE SLOT LADDER, AND THE POOL IS NOT THE LOADOUT (Batch EG)
 > **ABILITY SLOTS GROW ON A ZONE BOSS: `Run.ABILITY_SLOTS_BY_BOSS` is `[7, 8, 9, 10]` and
@@ -3474,17 +3513,24 @@ dominated by a basic.
 - **BATCH EH §1 TOOK THE THIRD TIER EA PRICED, AND EA'S RULING IS OVERTURNED IN ITS SECOND TIER
   ONLY, NEVER IN ITS REASONING.** The principle stands unchanged and is the reason the chain exists:
   a zone-boss award must always pay something real, and the baseline it replaced was silence. **The
-  class-wide tier is class-locked rather than spec-locked, which is the one thing it gives up**, and
+  fallback is class-locked rather than spec-locked, which is the one thing it gives up**, and
   it is NOT the thing DY §3 forbade — that rule bars re-creating the deleted `CLASS_POOLS`, and its
   own next sentence says a re-opened class draw reads `CLASS_DRAFT_POOLS`, which is what this reads.
-- **AND THE THIRD TIER DEEPENS THE FLOOR; IT DOES NOT REMOVE IT. DO NOT WRITE THAT IT CANNOT
+- **BATCH GP MADE THE CHAIN TWO TIERS, AND IT ANSWERED EH's PROBLEM WITH DEPTH RATHER THAN WITH A
+  TIER.** The pool merge put the spec draft pool and the class-wide pool into one, so the fallback
+  reads the hero's WHOLE CLASS POOL — everything both old tiers held — and
+  `roll_class_fallback_offer` is deleted rather than left as a second reader of the same names.
+  **EH's requirement is unchanged and binds the tier that inherited it.**
+- **AND THE FALLBACK DEEPENS THE FLOOR; IT DOES NOT REMOVE IT. DO NOT WRITE THAT IT CANNOT
   EMPTY.** EA chose the tier above it on exactly that claim, and the claim was true when written and
   false one batch later. **No SIBLING drains the class pool** — every hero filters it against what
-  he himself owns — **but the hero himself can**: roughly one draft card in four is class-wide, and
-  `draft_card_is_class` returns TRUE unconditionally once the spec side is dry. What holds the floor
-  up is arithmetic, not structure: emptying the chain means OWNING every card in both draft pools,
-  and an offer pays at most one. **Under a fully-held LOADOUT no hero can be paid nothing; under a
-  fully-held POOL every hero still can.** `check_eh` §2 asserts both directions.
+  he himself owns — **but the hero himself can**, by taking at every offer. What holds the floor
+  up is arithmetic, not structure: emptying the chain means OWNING every card he can be SHOWN, and
+  an offer pays at most one. **AND SINCE GP WHAT HE CAN BE SHOWN IS NARROWER THAN THE POOL:** the
+  engine gate takes out the cards that read an engine he does not hold — 22 of 34 for a Cleric
+  holding none — so the floor sits below the depth. **Under a fully-held LOADOUT no hero can be
+  paid nothing; under a fully-held POOL every hero still can.** `check_eh` §2 asserts both
+  directions and `check_gp` §2b prints the reachable count per class.
 
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the

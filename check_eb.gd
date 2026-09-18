@@ -47,7 +47,15 @@ const KNOWN_CROSSOVER := [["holy", "Renewal", "Divine Plea"]]
 # on roughly a one-in-eight draw. DR repaired it by choosing names no draw can
 # reach; the comment recording that repair was wrong about WHY until EB §2, and
 # the reason it gave — "in no DRAFT pool at all" — is false of one of the three.
-const BP_FILLERS := ["Sweeping Strikes", "Shatterpoint", "Rallying Shout"]
+# **BATCH GP RE-POINTED TWO OF THE THREE, AND THIS GATE IS WHAT CAUGHT IT.** The
+# pool merge made a Swordmaster's draw the whole WARRIOR pool, so Rallying Shout
+# (the Warden's shelf) and Gut Rip (the Berserker's) both became reachable by the
+# very draw `test_batch_bp` §7 needs them to be unreachable by — DR's one-in-eight
+# flake, returning through the merge. **The durable property is "in NO draft pool
+# anywhere", not "in another lineage's".** War Stomp and Interpose are `SPEC_POOLS`
+# boss-pick cards of the Warden and are in no draft pool at all, as Sweeping
+# Strikes and Shatterpoint are.
+const BP_FILLERS := ["Sweeping Strikes", "Shatterpoint", "War Stomp", "Interpose"]
 const BP_SPEC := "swordmaster"
 
 # §1's table, built inside a `-> void` section on purpose: `check_da` §3b's rule
@@ -167,18 +175,19 @@ func _s2_filler_invariant() -> void:
 	# and the pools, so a bare instance answers exactly as the live node does.
 	var run: Node = load("res://scripts/run_state.gd").new()
 	var member := {"key": "warrior", "spec": BP_SPEC, "bm_abilities": []}
-	var pools: Dictionary = run.draft_pool_left(member)
-	var spec_left: Array = pools["spec"]
-	var class_left: Array = pools["class"]
-	print("    a fresh %s can draw %d spec cards and %d class cards" % [
-		BP_SPEC, spec_left.size(), class_left.size()])
+	# BATCH GP — ONE LIST. `draft_pool_left` returned `{"spec": [], "class": []}`
+	# until the pool merge and returns the hero's whole class pool now, engine
+	# gate applied. Nothing this section asks changes: it asks what a live
+	# Swordmaster can DRAW, and the door is still the door.
+	var drawable: Array = run.draft_pool_left(member)
+	print("    a fresh %s can draw %d cards" % [BP_SPEC, drawable.size()])
 	# THE POPULATION AGAIN: an empty pool makes every "is not reachable" below
 	# true for the wrong reason.
-	ok(spec_left.size() >= 8 and class_left.size() >= 4,
-		"§2: the %s's live draw reads %d spec / %d class — a pool that small makes the checks below vacuous" % [
-			BP_SPEC, spec_left.size(), class_left.size()])
+	ok(drawable.size() >= 12,
+		"§2: the %s's live draw reads %d cards — a pool that small makes the checks below vacuous" % [
+			BP_SPEC, drawable.size()])
 	for nm in BP_FILLERS:
-		ok(not spec_left.has(nm) and not class_left.has(nm),
+		ok(not drawable.has(nm),
 			"§2: `test_batch_bp` §7's filler %s is reachable by a %s draw — §7's three checks will red on a draw that lands on it (DR's flake, returning)" % [
 				nm, BP_SPEC])
 	# AND THE FILLERS MUST STILL BE REAL CARDS. A filler that stopped resolving

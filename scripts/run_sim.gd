@@ -924,14 +924,14 @@ static func _award_trophies(run: Node) -> void:
 			# sim that kept skipping would under-measure exactly the
 			# population EA changed — the eight specs that can empty a boss
 			# pool. The sequence is duplicated; the pool and its filter are
-			# authored once, in `Run.roll_spec_fallback_offer`.
-			offer = run.roll_spec_fallback_offer(m)
-		if offer.is_empty():
-			# BATCH EH §1: and the THIRD tier, for the same reason. A bot that
-			# stopped at two would under-measure the case the third tier was
-			# built for — a hero holding his whole spec draft pool, which EG §2
-			# made reachable by keeping benched cards.
-			offer = run.roll_class_fallback_offer(m)
+			# authored once, in `Run.roll_draft_fallback_offer`.
+			#
+			# BATCH GP — THE CHAIN IS TWO TIERS, NOT THREE. EH §1's class-wide
+			# tier went with the pool merge: the fallback above reads the whole
+			# class pool now, so a third call would re-offer the same names. The
+			# bot follows the real flow, which is the only thing that keeps the
+			# sim measuring the draft the game has.
+			offer = run.roll_draft_fallback_offer(m)
 		if offer.is_empty():
 			continue
 		var pick := ""

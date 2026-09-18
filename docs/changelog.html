@@ -15,6 +15,69 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-17 &mdash; Batch GP: THE POOLS MERGE</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-SECOND BATCH ON <code>class-merge</code>.</b> This is the thing
+the whole merge was for. <b>The three spec pools and the class-wide pool of a class are one pool</b>,
+and the class-wide cards become ordinary cards in it. A hero drew from <b>13 to 18</b> cards before
+and a hero who took a spine from <b>3 to 6</b>; every hero draws from his whole class pool now
+&mdash; <b>Warrior 38, Mage 41, Cleric 34, Hunter 36</b>. <code>main</code> is untouched. Full
+working: <code>docs/reports/GP.md</code>.</p>
+
+<p><b>&sect;1 &mdash; ONE POOL A CLASS, AND THE SHELVES SURVIVE AS SHELVES.</b>
+<code>Classes.draft_pool(class_key)</code> is THE pool and the only thing a draw may read; it is
+DERIVED from the three lineage lists and the class-wide list rather than being a fifth container to
+curate. Those lists keep their names, their contents and their authoring headers, and they are
+<b>shelves</b> now &mdash; where a card was authored, not a channel it is drawn from. <b>The
+class-wide cards lost their tier:</b> <code>CLASS_DRAFT_SHARE</code>, <code>draft_card_is_class</code>
+and Batch EH's third zone-boss tier are deleted, and the award chain is two tiers &mdash; the boss
+pool, then the whole class pool. <b>The boss pools are not merged and are not touched.</b></p>
+
+<p><b>WHAT THAT COSTS, RECORDED RATHER THAN DISCOVERED.</b> The class-wide cards were authored
+<i>weaker than spec abilities and unconditional</i> on purpose &mdash; they feed no passive, so at
+equal power they would be a safe default that diluted every build. <b>The merge removes that reason
+and keeps the cards</b>: six for the Warrior and the Hunter, five for the Mage, three for the
+Cleric, and in a merged pool they are simply the worst cards in it. <b>Accepted, flagged, and a
+rebalance owed. No card was authored, retuned or rebalanced at the merge.</b></p>
+
+<p><b>&sect;2 &mdash; A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT.</b> This
+is what keeps a wide pool from being a pool of dead cards: offering a Ruin card to a Cleric without
+Ruin is offering a card that does nothing. <b>Thirty-four of the 149 read one</b> &mdash; five of
+Permafrost, seven of Runaway Resonance, five of Mercy, five of Conviction, two of Wrath of the Old
+Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood Frenzy. <b>The
+population was derived at the read site and driven both ways</b>: every one of the 149 was cast on a
+hero of its class holding NO engine, on a board dressed so a no-op could only be the engine's fault,
+and then each candidate was cast again with the engine held.</p>
+<ul>
+<li><b>Thirteen are refused at the door outright</b> &mdash; Winter's Toll, Rimebinding, Cryoclasm
+and Shatter with no hold to bill; Arcane Bolt and Unmaking priced per Resonance stack; Divine Plea
+priced in Mercy; Blessing of the Faithful below three Faith; Aegis Reversal with no DIVINE barrier
+to spend; Transference and Requiem with no Ruin on the field; Unleash below one Loyalty;
+Ghostpack.</li>
+<li><b>The rest resolve and say so.</b> <i>"he holds no Resonance to set"</i>, <i>"Mantle finds
+nobody to lay it on"</i>, <i>"no Devout stands, so Faith pays nothing"</i>, <i>"no bond deep enough
+to call on, so the horn buys nothing"</i>.</li>
+<li><b>Six could not be found by a board test at all</b>, and reading the site is what found them.
+Unslaked, Anvil and Recompense land and change nothing until a later blow; Intercession, Last Howl
+and Succession until a death or a swap. Each is driven by its own event instead.</li>
+<li><b>HALF-WORKING CARDS ARE NOT GATED</b> (a card that still does most of its job is a legitimate
+offer): Boil Over deals 22 against 89 and cashes no meter; Drumfire and Calibrating Shot fire and
+bank no Focus. <b>Nor are cards that FEED an engine without reading it</b>: Blight the Well marks
+Ruin through the generic hook, Call the Wilds summons at 0 Loyalty, every fire card builds the
+Overburn field.</li>
+</ul>
+<p><b>WHAT A HERO HOLDING NO ENGINE CAN ACTUALLY BE OFFERED: 35 of 38, 29 of 41, 22 of 34, 29 of
+36.</b> The merge did not move the narrowness somewhere else &mdash; the thinnest case is a Cleric
+at 22, against the 13 a Holy Cleric drew from before and the <b>three</b> a Sanctity-taker drew
+from. <b>And the Cleric is the one class no hero can reach the whole pool of:</b> three of his six
+engines gate cards and a hero holds two, so his best pair opens 32 of 34.</p>
+
+<p><b>&sect;3 &mdash; NEW GATE <code>check_gp</code>, 389 checks, AND ITS CONTROL IS THE ARM THAT
+MAKES IT MEAN ANYTHING.</b> Every row of the table is cast on both arms every battery; six
+engine-free cards are cast on the same two arms and must come back identical. A whole run is played
+on the real screens twice &mdash; once on a party holding no engine and once on one holding two
+apiece &mdash; and <b>the offers the engine-less party received are printed by name</b>: 40 cards
+across 30 battles and 49 maps, not one of them a card they could not use.</p>
+
 <h2>2026-09-17 &mdash; Batch GO: THE NINE MISSING ENGINES</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-FIRST BATCH ON <code>class-merge</code>.</b> GK turned the fifteen engines that
 existed into engine runes, and the charter gives every class six. <b>The nine that were missing are built</b>, so the

@@ -1863,9 +1863,7 @@ func ability_choice(member: Dictionary) -> Array:
 func _ability_topup(member: Dictionary, taken: Array) -> String:
 	var tier: Array = roll_spec_ability_offer(member)
 	if tier.is_empty():
-		tier = roll_spec_fallback_offer(member)
-	if tier.is_empty():
-		tier = roll_class_fallback_offer(member)
+		tier = roll_draft_fallback_offer(member)
 	for n in tier:
 		if not taken.has(String(n)):
 			return String(n)
@@ -1942,7 +1940,9 @@ func owned_ability_names(member: Dictionary) -> Array:
 # Queue one ability award on a hero: the offer is rolled NOW and stored, so
 # the pick waiting on the hero card is the pick that dropped — re-asked, never
 # rerolled, by `ability_choice` when it is answered. Returns false
-# when nothing is left to offer (all three tiers exhausted, or no spec).
+# when nothing is left to offer (BOTH tiers exhausted, or a member not yet
+# awakened — it was three tiers until the GP pool merge collapsed the second
+# and third into one, and it no longer needs a spec).
 #
 # BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class
 # draw Batch AH built is dropped, because abilities were spec-locked then.
@@ -1975,9 +1975,18 @@ func award_ability_pick(member: Dictionary) -> bool:
 		# drafted card removes itself from the boss offer. The Devout is the
 		# sharp case, not Holy: his boss pool is 2 and BOTH entries are
 		# draftable, so all three of his awards could pay nothing.
-		offer = roll_spec_fallback_offer(member)
-	if offer.is_empty():
-		# **BATCH EH §1 — THE THIRD TIER, AND EA PRICED IT.** EA chose the
+		#
+		# **BATCH GP — THE CHAIN IS TWO TIERS NOW AND IT USED TO BE THREE.**
+		# EH §1's third tier was the CLASS-WIDE pool, read after the spec draft
+		# pool; the merge put those two into one, so this line already offers
+		# everything that tier held and `roll_class_fallback_offer` is DELETED
+		# rather than left standing as a second reader of the same names.
+		# **EH's reasoning is kept in full below**, because it is what forbids
+		# this tier ever being narrowed back — the widening EH bought with an
+		# extra tier is the first fallback's own depth now.
+		#
+		# **BATCH EH §1 — THE THIRD TIER, AND EA PRICED IT. ITS POOL IS THE TIER
+		# THIS LINE READS SINCE GP; the reasoning is kept, not the tier.** EA chose the
 		# spec-draft card above SPECIFICALLY BECAUSE THAT POOL FLOORED AT SIX
 		# AND COULD NOT ITSELF EMPTY: a hero carried at most
 		# `ABILITY_SLOT_CAP - core_slots(spec)` earned cards — four, or three
@@ -1991,9 +2000,9 @@ func award_ability_pick(member: Dictionary) -> bool:
 		# must always pay something real, and the baseline it replaced was
 		# SILENCE** — `_award_ability_picks` skipped the hero with no
 		# acknowledgement at all, so a boss died and the victory card did not
-		# name them. That requirement carries here unchanged: this tier pays a
-		# real card and is announced like any other award.
-		offer = roll_class_fallback_offer(member)
+		# name them. That requirement carries here unchanged: the fallback pays
+		# a real card and is announced like any other award.
+		offer = roll_draft_fallback_offer(member)
 	if offer.is_empty():
 		return false
 	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
@@ -2203,56 +2212,49 @@ func _refuse_draft(member: Dictionary, name: String) -> void:
 	member["draft_refused"] = refused
 
 
-# What this hero could still be offered, split by side. Neither side may hold
-# something already owned (from ANY source — kit, talent grant, boss pick or an
-# earlier draft) or already refused this run.
-func draft_pool_left(member: Dictionary) -> Dictionary:
-	# BATCH GK — THE CLASS SIDE KEYS TO THE CLASS, NOT THROUGH THE SPEC: a hero
-	# who took a spine at class selection has no lineage and still drafts his
-	# class's cards. The spec side is his lineage's pool until the pool merge.
-	# A member NOT YET AWAKENED — before class selection — drafts nothing.
+# ══ BATCH GP — WHAT THIS HERO COULD STILL BE OFFERED: **ONE LIST** ══════════
+#
+# **IT RETURNED `{"spec": [...], "class": [...]}` UNTIL THE POOL MERGE AND IT
+# RETURNS AN ARRAY NOW**, because there is one pool. The two-sided shape was the
+# structure of the thing it described, and keeping it would have left every
+# caller free to go on believing a hero's lineage decides half his draw.
+# Changing the TYPE is deliberate: a caller that still reads `["spec"]` breaks
+# loudly instead of reading an empty side as an empty pool.
+#
+# Nothing in it may be something already owned (from ANY source — kit, talent
+# grant, boss pick or an earlier draft) or already refused this run.
+#
+# **AND THE ENGINE GATE IS HERE, AT THE ONE DOOR** (GP §2, ruled). A card that
+# READS an engine is offered only to a hero holding it: `Classes.offerable` is
+# the one answer, and the zone-boss fallback below asks it too, so the draft
+# offer, the fallback and the bot cannot disagree about what a hero may be shown.
+#
+# BATCH GK — IT KEYS TO THE CLASS, NOT THROUGH THE SPEC: a hero who took a spine
+# at class selection has no lineage and still drafts. A member NOT YET AWAKENED
+# — before class selection — drafts nothing.
+func draft_pool_left(member: Dictionary) -> Array:
 	var spec := String(member.get("spec", ""))
 	if spec == "" and not bool(member.get("awakened", false)):
-		return {"spec": [], "class": []}
+		return []
 	var blocked: Array = owned_ability_names(member)
 	blocked.append_array(draft_refused(member))
-	var spec_left: Array = Classes.spec_draft_pool(spec).filter(
+	var left: Array = Classes.draft_pool(String(member.get("key", ""))).filter(
 		func(n): return not blocked.has(n))
-	var class_left: Array = Classes.class_draft_pool(
-		String(member.get("key", ""))).filter(func(n): return not blocked.has(n))
-	return {"spec": spec_left, "class": class_left}
-
-
-# ROUGHLY ONE CARD IN FOUR IS CLASS-WIDE. Its own function so the ratio has a
-# seam a test can drive a few hundred times — with both pools empty until
-# tranche 2, a check on the ROLLER could only ever measure zero, and a check
-# that can only pass is a gap (the BK zero-blacksmith lesson).
-func draft_card_is_class(spec_left: int, class_left: int) -> bool:
-	if class_left < 1:
-		return false
-	if spec_left < 1:
-		return true
-	return randf() < Classes.CLASS_DRAFT_SHARE
+	return Classes.offerable(left, held_engines(member))
 
 
 # EVERY OFFER IS 3 CARDS. If the pool cannot fill three,
 # IT FILLS SHORT RATHER THAN PADDING WITH REPEATS. That is AP §3's existing
 # rule for upgrade offers, applied unchanged.
+#
+# **BATCH GP — ONE POOL, SO THERE IS NOTHING LEFT TO RATION.** `draft_card_is_class`
+# and `Classes.CLASS_DRAFT_SHARE` stood here and went with the merge: the
+# one-in-four seam existed to keep a six-card class shelf reachable beside a
+# twelve-card spec one, and a single shuffled list has no sides to weight.
 func roll_draft_offer(member: Dictionary) -> Array:
-	var pools := draft_pool_left(member)
-	var spec_left: Array = pools["spec"]
-	var class_left: Array = pools["class"]
-	spec_left.shuffle()
-	class_left.shuffle()
-	var out: Array = []
-	for _card in 3:
-		if spec_left.is_empty() and class_left.is_empty():
-			break
-		if draft_card_is_class(spec_left.size(), class_left.size()):
-			out.append(class_left.pop_back())
-		else:
-			out.append(spec_left.pop_back())
-	return out
+	var left: Array = draft_pool_left(member)
+	left.shuffle()
+	return left.slice(0, 3)
 
 
 # Queue one draft offer on a hero. The offer is ROLLED NOW and stored, so the
@@ -3763,55 +3765,50 @@ func roll_spec_ability_offer(member: Dictionary) -> Array:
 # re-present what was just turned down, and a zone boss is a different and
 # rarer event; and a run that declines enough offers could drain the floor
 # back below three, which is the exact defect this function exists to close.
-func roll_spec_fallback_offer(member: Dictionary) -> Array:
-	var spec := String(member.get("spec", ""))
-	if spec == "":
-		return []
-	var owned: Array = owned_ability_names(member)
-	var left: Array = Classes.spec_draft_pool(spec).filter(
-		func(n): return not owned.has(n))
-	left.shuffle()
-	return left.slice(0, 3)
-
-
-# **BATCH EH §1 — THE THIRD TIER, READ ONLY WHEN BOTH POOLS ABOVE COME BACK
-# EMPTY.** The chain is boss pool -> spec draft pool -> class-wide pool, and
-# the two above are BYTE-UNCHANGED: EA's ruling is overturned in its second
-# tier only, never in its reasoning.
-#
-# **AND THIS IS NOT THE THING DY §3 FORBADE, WHICH IS WORTH NAMING BECAUSE IT
-# LOOKS LIKE IT.** That rule says do not re-create `CLASS_POOLS` — the deleted
-# 61-entry container whose curation bill DY priced. Its own next sentence says
-# a re-opened class draw reads `CLASS_DRAFT_POOLS`, which is live, curated, and
-# exactly what this function reads. EA priced this option and recorded the same
-# exemption; nothing here rebuilds a second dict.
-#
-# **WHY THE CLASS-WIDE POOL IS A REAL FLOOR AND WHERE THAT CLAIM STOPS.** No
-# sibling spec can drain it: every hero filters this pool against HIS OWN
-# `owned_ability_names`, and no hero can hold another spec's picks, so three
-# specs sharing one pool is three independent pools rather than a shared one.
-# **BUT IT IS NOT UNEMPTIABLE, AND SAYING SO WOULD BE EA's OWN MISTAKE AGAIN.**
-# Roughly one draft card in four is class-wide, and `draft_card_is_class`
-# returns TRUE unconditionally once the spec side is dry — so a hero who takes
-# at every offer drains his spec pool and then this one. What actually holds
-# the floor up is arithmetic, not structure: emptying all three tiers means
-# OWNING every name in both draft pools, up to 20 for the
-# Pyromancer, and one draft offer pays at most one card. `check_ea` §1 derives
-# both bounds every run — the LOADOUT bound is asserted, the POOL bound is
-# printed — which is the split EG §1 left behind rather than a new one.
-#
-# AND IT DELIBERATELY DOES NOT CONSULT `draft_refused` EITHER, for the same
-# three reasons the tier above gives: neither channel it belongs to consults
-# it, refusal is the DRAFT's own memory of a rarer event, and a run that
-# declined enough offers could drain the floor back below three — which is the
-# exact defect this chain exists to close.
-func roll_class_fallback_offer(member: Dictionary) -> Array:
-	# BATCH GK — keyed to the CLASS: a hero with no lineage reaches this tier
-	# once he is awakened; a member not yet through class selection does not.
+# **BATCH GP — IT WAS `roll_spec_fallback_offer` AND IT READS THE CLASS POOL
+# NOW.** The rename is the point: keyed through the SPEC it returned nothing at
+# all for a hero who took a spine (`spec == ""` → `[]`), so the merge would
+# otherwise have left the second tier silent for exactly the heroes GK created.
+# It reads `Classes.draft_pool` — the one pool — and it asks the same engine
+# gate the draft offer asks, because a zone-boss award paying a card the hero
+# can never cast is the defect GP §2 exists to close arriving through the other
+# channel.
+func roll_draft_fallback_offer(member: Dictionary) -> Array:
 	if String(member.get("spec", "")) == "" and not bool(member.get("awakened", false)):
 		return []
 	var owned: Array = owned_ability_names(member)
-	var left: Array = Classes.class_draft_pool(
-		String(member.get("key", ""))).filter(func(n): return not owned.has(n))
+	var left: Array = Classes.draft_pool(String(member.get("key", ""))).filter(
+		func(n): return not owned.has(n))
+	left = Classes.offerable(left, held_engines(member))
 	left.shuffle()
 	return left.slice(0, 3)
+
+
+# **`roll_class_fallback_offer` STOOD HERE AND WENT WITH THE POOL MERGE (GP).**
+# EH §1 added it as a THIRD tier — boss pool -> spec draft pool -> class-wide
+# pool — because the spec draft pool could be emptied and EA had chosen it on a
+# claim that it could not be. **The merge answers that by depth instead of by a
+# tier**: the fallback above now reads all 34 to 41 cards of the class, which is
+# everything both old tiers held, so a second reader of the same names would
+# only be a way for the two to disagree.
+#
+# **WHAT MUST NOT BE RE-DERIVED, BECAUSE EH's REASONING IS STILL BINDING:**
+# **DO NOT WRITE THAT THE FALLBACK CANNOT EMPTY.** EA chose its tier on exactly
+# that claim and the claim was true when written and false one batch later — EG
+# made the cap a LADDER (so the loadout bound alone floors as low as 3, and 2
+# for the Occultist) and made a benched card KEPT, so `owned_ability_names`
+# reads a pool the slot cap does not bound at all and the true worst case floors
+# at ZERO. What holds the floor up is arithmetic, not structure: emptying the
+# chain means OWNING every name in the class pool — 34 to 41 — and one offer
+# pays at most one card. `check_ea` §1 derives both bounds every run.
+#
+# **AND THE MERGE ADDS A SECOND WAY TO EMPTY IT THAT NEITHER EA NOR EH HAD:**
+# the ENGINE GATE (GP §2). A hero holding no engine is never offered the 34
+# cards that read one, so his reachable pool is smaller than his class pool and
+# the floor is lower than the depth suggests. Derived per class in
+# `docs/reports/GP.md` §2 and printed by `check_gp` §2.
+#
+# **A ZONE-BOSS AWARD MUST ALWAYS PAY SOMETHING REAL**, which is EA's ruling and
+# is not overturned: the baseline it replaced was SILENCE —
+# `_award_ability_picks` skipped the hero with no acknowledgement at all, so a
+# boss died and the victory card did not name them.

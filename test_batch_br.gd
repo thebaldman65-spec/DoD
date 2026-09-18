@@ -635,20 +635,30 @@ func _draft_flow() -> void:
 	warrior["spec"] = "warden"
 	var hunter: Dictionary = run.party[3]
 	hunter["spec"] = "mystic"
-	var w_left: Dictionary = run.draft_pool_left(warrior)
-	ok(w_left["class"].size() == 6,
-		"§4: a Warden's class side of the draft holds six (%d)" % w_left["class"].size())
-	var h_left: Dictionary = run.draft_pool_left(hunter)
-	ok(h_left["class"].size() == 6,
-		"§4: a Survivalist's class side holds six (%d)" % h_left["class"].size())
+	# **BATCH GP — ONE LIST, SO "THE CLASS SIDE" IS COUNTED INSIDE IT.** The
+	# question BR asked — are all six class-wide cards really reachable — is
+	# unchanged; what moved is that they are reachable as ordinary cards of one
+	# pool rather than as a side of their own.
+	warrior["awakened"] = true
+	hunter["awakened"] = true
+	for pair in [[warrior, "warrior"], [hunter, "hunter"]]:
+		var mem: Dictionary = pair[0]
+		var ck := String(pair[1])
+		var left: Array = run.draft_pool_left(mem)
+		var wide := 0
+		for n in Classes.class_draft_pool(ck):
+			if left.has(String(n)):
+				wide += 1
+		ok(wide == 6,
+			"§4: a %s can reach %d of his six class-wide cards" % [ck, wide])
 	# The no-return ledger covers a class card exactly as it covers a spec one.
 	# RE-POINTED BY BATCH CK §2, AND IT HAD TO BE. With the card renamed, a
 	# ledger holding "Iron Will" refuses a name the pool never carried, so the
 	# `has()` below would read false for the wrong reason and the check would
 	# pass without asking its question — the exact fault CD §1 exists to close.
 	warrior["draft_refused"] = ["Ironclad"]
-	var refused_left: Dictionary = run.draft_pool_left(warrior)
-	ok(not refused_left["class"].has("Ironclad"),
+	var refused_left: Array = run.draft_pool_left(warrior)
+	ok(not refused_left.has("Ironclad"),
 		"§4: a refused class card does not come back this run")
 	warrior["draft_refused"] = []
 	# AND A REAL OFFER NOW HOLDS THEM. Rolled many times because the seam is a
@@ -703,9 +713,13 @@ func _draft_flow() -> void:
 	# 120), so the REFUSAL is written relative to the live pool size: everything
 	# but two. It cannot go stale again, because a deeper pool moves the setup
 	# and not the answer.
-	var wn_spec: Array = Classes.spec_draft_pool("swordmaster")
-	worn_hero["draft_refused"] = Classes.class_draft_pool("warrior").duplicate()
-	worn_hero["draft_refused"].append_array(wn_spec.slice(0, wn_spec.size() - 2))
+	# **BATCH GP — WORN RELATIVE TO THE ONE POOL**, which the merge made the
+	# whole WARRIOR pool: refusing the class shelf and a lineage shelf leaves two
+	# shelves standing and the offer fills full. Written against
+	# `Classes.draft_pool` it cannot go stale again, which is what the comment
+	# above already promised of the shape.
+	var wn_pool: Array = Classes.draft_pool("warrior")
+	worn_hero["draft_refused"] = wn_pool.slice(0, wn_pool.size() - 2)
 	var worn: Array = run.roll_draft_offer(worn_hero)
 	ok(worn.size() == 2,
 		"§4: a pool worn down to two fills SHORT rather than padding (%d)" % worn.size())
@@ -740,17 +754,28 @@ func _seam() -> void:
 	for cls3 in Classes.CLASS_DRAFT_POOLS:
 		ok(not Classes.class_draft_pool(cls3).is_empty(),
 			"§6: %s never rolls an empty class pool" % cls3)
-	ok(not run.draft_card_is_class(6, 0),
-		"§6: an EXHAUSTED class pool still falls entirely to the spec side")
-	ok(run.draft_card_is_class(0, 6),
-		"§6: ...and an exhausted spec pool entirely to the class side")
-	var class_cards := 0
-	for _k in 4000:
-		if run.draft_card_is_class(6, 6):
-			class_cards += 1
-	var share := class_cards / 4000.0
-	ok(share > 0.20 and share < 0.30,
-		"§6: the seam still fires at roughly one card in four (%.3f)" % share)
+	# **BATCH GP — `draft_card_is_class` AND ITS TWO DEGENERATE ENDS WENT WITH
+	# THE POOL MERGE.** One pool has no sides to fall between, so the three
+	# checks that stood here are replaced by the thing they were protecting: a
+	# class-wide card must still reach every class, which the loop above now
+	# measures through `roll_draft_offer` — the door the game asks — rather than
+	# through the seam that fed it. The SIBLING half is the merge's own claim
+	# and is new.
+	var seen_sib := {}
+	for spec4 in Classes.SPEC_DRAFT_POOLS:
+		var cls4: String = Classes.class_of_spec(String(spec4))
+		var others: Array = []
+		for sp5 in Classes.SPEC_IDS[cls4]:
+			if String(sp5) != String(spec4):
+				others.append_array(Classes.spec_draft_pool(String(sp5)))
+		var m4 := {"key": cls4, "spec": String(spec4), "bm_abilities": []}
+		for _j in 30:
+			for nm4 in run.roll_draft_offer(m4):
+				if others.has(String(nm4)):
+					seen_sib[spec4] = int(seen_sib.get(spec4, 0)) + 1
+	for spec5 in Classes.SPEC_DRAFT_POOLS:
+		ok(int(seen_sib.get(spec5, 0)) > 0,
+			"§6: a %s was offered NO sibling lineage's card over 30 offers — the pools did not merge" % spec5)
 
 
 # ---------- LIVE: THE HUNTER SIX ----------

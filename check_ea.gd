@@ -94,64 +94,59 @@ func _s0_premises() -> void:
 	var body := code.substr(aw, (aw_end - aw) if aw_end > aw else 2000)
 	ok(body.contains("var offer := roll_spec_ability_offer(member)"),
 		"§0: the award no longer opens on the SPEC BOSS pool (AN §4's standing ruling)")
-	ok(body.contains("roll_spec_fallback_offer(member)"),
+	ok(body.contains("roll_draft_fallback_offer(member)"),
 		"§0: the award no longer reads the fallback — EA §1's fix is gone")
-	# **BATCH EH §1 — AND THE THIRD TIER IS A PREMISE HERE, NOT A LOOSENING OF
-	# THE ONE BELOW IT.** The chain is boss -> spec draft -> class-wide, and §1's
-	# arithmetic reads all three; if the last one goes, §1 is measuring a depth
+	# **BATCH GP — THE CHAIN IS TWO TIERS AND IT WAS THREE.** EH §1's third tier
+	# was the CLASS-WIDE pool read under the spec draft pool; the pool merge put
+	# those two into one, so the tier above already offers everything the third
+	# one held and `roll_class_fallback_offer` is deleted. **EH's requirement is
+	# unchanged and is asserted on the tier that inherited it** — the fallback
+	# must read the whole CLASS pool, or §1's arithmetic is measuring a depth
 	# nothing draws from.
-	ok(body.contains("roll_class_fallback_offer(member)"),
-		"§0: the award no longer reads the CLASS-WIDE third tier — EH §1's fix is gone")
-	# THE ORDER IS PART OF THE RULING AND IS ASSERTED AS ORDER. A chain that
-	# reached the class-wide pool before the hero's own spec draft pool would
-	# pay a weaker card first and would pass every depth assertion in §1.
-	ok(body.find("roll_spec_fallback_offer(member)")
-			< body.find("roll_class_fallback_offer(member)"),
-		"§0: the class-wide tier is read BEFORE the spec draft tier — the chain has inverted")
+	#
+	# THE ORDER IS STILL PART OF THE RULING AND IS STILL ASSERTED AS ORDER: a
+	# chain that reached the draft pool before the hero's own boss pool would
+	# pay the wrong card first and would pass every depth assertion in §1.
+	ok(body.find("roll_spec_ability_offer(member)")
+			< body.find("roll_draft_fallback_offer(member)"),
+		"§0: the fallback is read BEFORE the boss pool — the chain has inverted")
+	ok(not body.contains("roll_class_fallback_offer"),
+		"§0: the award reads a third tier again — one pool has nothing left under it")
 	# BOTH FORMS OF THE DELETED CONTAINER, WHICH THE RAW-SOURCE WINDOW COULD
 	# NOT SAFELY ASK FOR: DY §3's own lesson is that eighteen files read
 	# `CLASS_POOLS` and a grep for the constant found eleven, because the
 	# accessor's callers never name it. `class_draft_pool(` is NOT a match for
-	# either needle and is the live, curated pool DY's next sentence names.
+	# either needle and is the live, curated SHELF DY's next sentence names.
 	ok(not body.contains("class_pool(") and not body.contains("CLASS_POOLS"),
 		"§0: the award reads the DELETED class boss pool again — the class draw is BACK")
-	# (2) THE SECOND TIER IS SPEC-LOCKED AND DRAWS FROM THE DRAFT POOL. A second
-	# tier that reached a class-wide pool would be a different ruling wearing
-	# this one's name — **and after EH that is no longer a hypothetical, it is
-	# the tier BELOW it.** Read off the stripped source for the same reason (1)
-	# is: `roll_class_fallback_offer`'s header names `spec_draft_pool` in prose.
-	var fb := code.find("func roll_spec_fallback_offer")
-	ok(fb >= 0, "§0: `roll_spec_fallback_offer` is gone")
+	# (2) THE FALLBACK DRAWS FROM THE HERO'S CLASS POOL AND EXCLUDES WHAT HE
+	# HOLDS. **It was SPEC-locked until the pool merge and is CLASS-locked now**,
+	# which is the ruling: AN §4's guarantee — nothing arrives that a sibling
+	# CLASS can reach — is what survives, and the SPEC lock is what the merge
+	# spends. Read off the stripped source for the same reason (1) is.
+	var fb := code.find("func roll_draft_fallback_offer")
+	ok(fb >= 0, "§0: `roll_draft_fallback_offer` is gone")
 	var fb_end := code.find("\nfunc ", fb + 1)
-	var fbody := code.substr(fb, (fb_end - fb) if fb_end > fb else 400)
-	ok(fbody.contains("Classes.spec_draft_pool(spec)"),
-		"§0: the fallback no longer draws from the hero's own SPEC DRAFT pool")
+	var fbody := code.substr(fb, (fb_end - fb) if fb_end > fb else 600)
+	ok(fbody.contains("Classes.draft_pool("),
+		"§0: the fallback no longer draws from the hero's own CLASS pool")
 	ok(fbody.contains("owned_ability_names(member)"),
 		"§0: the fallback no longer excludes what the hero already holds")
-	ok(not fbody.contains("class_draft_pool"),
-		"§0: the SPEC tier now reads the class-wide pool — the two tiers have merged")
-	# (2b) BATCH EH §1 — AND THE THIRD TIER, ASKED THE SAME THREE QUESTIONS.
-	# It is CLASS-wide by design and spec-locked by class: `class_of_spec` is
-	# what keeps AN §4's ruling — nothing arrives that a sibling CLASS can
-	# reach — while deliberately dropping the SPEC lock the tier above holds.
-	var cb := code.find("func roll_class_fallback_offer")
-	ok(cb >= 0, "§0: `roll_class_fallback_offer` is gone — EH §1's third tier has been deleted")
-	var cb_end := code.find("\nfunc ", cb + 1)
-	var cbody := code.substr(cb, (cb_end - cb) if cb_end > cb else 400)
-	ok(cbody.contains("Classes.class_draft_pool("),
-		"§0: the third tier no longer draws from `CLASS_DRAFT_POOLS` — DY §3's exemption is what makes it legal")
 	# BATCH GK — keyed to `member["key"]`, the hero's own class with no lineage
 	# in the way, so a hero who took a spine reaches it too.
-	ok(cbody.contains("String(member.get(\"key\", \"\"))"),
-		"§0: the third tier no longer keys off the hero's own class")
-	ok(cbody.contains("owned_ability_names(member)"),
-		"§0: the third tier no longer excludes what the hero already holds")
-	# AND NEITHER FALLBACK CONSULTS THE NO-RETURN LEDGER, WHICH IS THE ONE
-	# JUDGEMENT CALL BOTH HEADERS RECORD. A tier that filtered on
+	ok(fbody.contains("String(member.get(\"key\", \"\"))"),
+		"§0: the fallback no longer keys off the hero's own class")
+	# **BATCH GP — AND IT ASKS THE ENGINE GATE.** A zone-boss award paying a card
+	# the hero can never cast is GP §2's defect arriving through the other
+	# channel, and the two channels share one answer (`Classes.offerable`).
+	ok(fbody.contains("Classes.offerable("),
+		"§0: the fallback does not ask the engine gate — a zone boss can award a dead card")
+	# AND THE FALLBACK DOES NOT CONSULT THE NO-RETURN LEDGER, WHICH IS THE ONE
+	# JUDGEMENT CALL ITS HEADER RECORDS. A tier that filtered on
 	# `draft_refused` would be stricter than the channel it belongs to, and a
 	# run that declined enough offers could drain the floor back below three.
-	ok(not fbody.contains("draft_refused") and not cbody.contains("draft_refused"),
-		"§0: a fallback tier now filters on the no-return ledger — that is the defect the chain exists to close")
+	ok(not fbody.contains("draft_refused"),
+		"§0: the fallback now filters on the no-return ledger — that is the defect the chain exists to close")
 	# (3) THE SILENT ARM IS GONE FROM THE VICTORY CARD'S LOOP.
 	var bs := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bs.contains("func _award_ability_picks() -> Array:"),
@@ -355,22 +350,24 @@ func _s1_depth() -> void:
 	# SECOND HALF IS TRUE AND THE FIRST DOES NOT FOLLOW FROM IT.** No SIBLING
 	# drains it — every hero filters this pool against his own
 	# `owned_ability_names`, so three specs sharing six cards is three
-	# independent sixes. But the hero himself can: roughly one draft card in
-	# four is class-wide, and `draft_card_is_class` returns TRUE unconditionally
-	# once the spec side is dry, so a hero who takes at every offer drains his
-	# spec pool and then this one. **EA's spec-pool floor was true when written
-	# and stopped being true one batch later; asserting an unemptiable class
-	# pool here would be the identical mistake one tier down.**
+	# independent sixes. But the hero himself can: a hero who takes at every
+	# offer drains what he can be shown. **EA's spec-pool floor was true when
+	# written and stopped being true one batch later; asserting an unemptiable
+	# class pool here would be the identical mistake one tier down.**
+	#
+	# **BATCH GP — THE TWO DRAFT POOLS ARE ONE POOL, AND THE GATE MAKES THE
+	# FLOOR LOWER THAN ITS DEPTH.** Emptying the chain means owning every name
+	# the hero can be OFFERED, which is his class pool less the cards that read
+	# an engine he does not hold — 22 of 34 for a Cleric holding none. The
+	# budget below is derived off the live door for that reason.
 	#
 	# WHAT HOLDS THE FLOOR UP IS ARITHMETIC, NOT STRUCTURE, AND IT IS PRINTED:
-	# emptying the chain means OWNING every name in both draft pools, and a
-	# draft offer pays at most ONE card. That is the number below.
+	# a draft offer pays at most ONE card. That is the number below.
 	var take_budget: int = 999
 	var take_spec := ""
 	for cls3 in Classes.SPEC_IDS:
 		for spec3 in Classes.SPEC_IDS[cls3]:
-			var need: int = Classes.spec_draft_pool(spec3).size() \
-				+ Classes.class_draft_pool(String(cls3)).size() \
+			var need: int = Classes.draft_pool(String(cls3)).size() \
 				- int(rune_drain.get(spec3, 0)) - int(rune_drain_cls.get(spec3, 0))
 			if need < take_budget:
 				take_budget = need
@@ -419,7 +416,7 @@ func _s2_announcement() -> void:
 	for m in run.party:
 		ok((run.roll_spec_ability_offer(m) as Array).is_empty(),
 			"§2A: %s's boss pool is exhausted, as the arm requires" % m["spec"])
-		ok(not (run.roll_spec_fallback_offer(m) as Array).is_empty(),
+		ok(not (run.roll_draft_fallback_offer(m) as Array).is_empty(),
 			"§2A: ...and the fallback has something for %s" % m["spec"])
 	scene._resolve_boss(120, false)
 	await process_frame
@@ -445,17 +442,16 @@ func _s2_announcement() -> void:
 		["berserker", "pyromancer", "inquisitor", "beastmaster"])
 	for m2 in run.party:
 		var sp := String(m2["spec"])
+		# BATCH GP — the chain is the boss pool and the CLASS pool now.
 		m2["bm_abilities"] = Classes.spec_pool(sp).duplicate() \
-			+ Classes.spec_draft_pool(sp).duplicate() \
-			+ Classes.class_draft_pool(Classes.class_of_spec(sp)).duplicate()
+			+ Classes.draft_pool(Classes.class_of_spec(sp)).duplicate()
 	# THE ARM'S OWN PREMISE, ASSERTED BEFORE IT IS DRIVEN. An arm that proves
 	# an absence has to show the absence is the award's — a hero whose chain
 	# still had something to offer would make the silence below a bug this gate
 	# reported as a pass.
 	for m_pre in run.party:
 		ok((run.roll_spec_ability_offer(m_pre) as Array).is_empty()
-				and (run.roll_spec_fallback_offer(m_pre) as Array).is_empty()
-				and (run.roll_class_fallback_offer(m_pre) as Array).is_empty(),
+				and (run.roll_draft_fallback_offer(m_pre) as Array).is_empty(),
 			"§2B: %s's chain still has something to offer — the arm is not set up" % m_pre["spec"])
 	scene2._resolve_boss(120, false)
 	await process_frame

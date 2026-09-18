@@ -260,12 +260,16 @@ func _test_offers(RunState) -> void:
 		"bm_abilities": Classes.spec_pool("berserker").duplicate()}
 	var cross: Array = run.roll_spec_ability_offer(mm)
 	ok(cross.is_empty(), "an exhausted spec pool offers nothing (got %s)" % [cross])
-	var fb: Array = run.roll_spec_fallback_offer(mm)
+	# BATCH GP — `roll_spec_fallback_offer` reads the whole CLASS pool now and is
+	# named for it; the pool merge dissolved the lineage shelves into one, so a
+	# fallback keyed through the lineage would pay a spine-taker nothing.
+	mm["awakened"] = true
+	var fb: Array = run.roll_draft_fallback_offer(mm)
 	ok(fb.size() == 3,
 		"...and the fallback still fills a full triple (got %d: %s)" % [fb.size(), fb])
 	for n in fb:
-		ok(Classes.spec_draft_pool("berserker").has(n),
-			"the fallback draws from the SPEC DRAFT pool (got %s)" % n)
+		ok(Classes.draft_pool("warrior").has(n),
+			"the fallback draws from the WARRIOR DRAFT pool (got %s)" % n)
 		ok(not mm["bm_abilities"].has(n),
 			"...and never offers %s, which the hero already holds" % n)
 	ok(run.award_ability_pick(mm),

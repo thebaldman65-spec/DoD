@@ -1,7 +1,7 @@
 # BATCH EH — THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE.
 #
-#   §1  the award chain's three tiers, DRIVEN LIVE on real zone bosses
-#   §2  every spec's depth across all three tiers, under a FULLY-HELD loadout
+#   §1  the award chain's two tiers, DRIVEN LIVE on real zone bosses (three arms)
+#   §2  every spec's depth across both tiers, under a FULLY-HELD loadout
 #   §3  the three things EG left on the record, re-derived rather than quoted
 #   §4  the `master.html` sweep — is any useful subset mechanically checkable?
 #
@@ -15,7 +15,7 @@
 # four real heroes, resolves a real zone boss, and reads the announcement off
 # the end card's own Label** — and it reads the QUEUED OFFER back to prove the
 # card that was paid came from the tier the arm was set up to reach, because an
-# announcement alone cannot tell three tiers apart.
+# announcement alone cannot tell the tiers apart.
 #
 # AND IT IS THREE ARMS RATHER THAN ONE, BECAUSE THE ORDER IS THE RULING. A
 # chain that reached the class-wide pool FIRST would pay a weaker card on every
@@ -63,12 +63,19 @@ func _initialize() -> void:
 #   must be OWED, and the victory card must NAME the hero. **This is the arm
 #   the batch exists for, and it is the one a static check cannot make.**
 func _s1_chain_live() -> void:
-	print("\n§1 — the award chain's three tiers, driven on real zone bosses")
+	print("\n§1 — the award chain's two tiers, driven on real zone bosses")
 	var run: Node = root.get_node("/root/Run")
 	var party := ["swordmaster", "cryomancer", "inquisitor", "mystic"]
+	# **BATCH GP — THREE ARMS FOR TWO TIERS, AND THAT IS DELIBERATE.** The pool
+	# merge put the spec draft pool and the class-wide pool into one, so B and C
+	# now read the SAME tier — B with the class pool untouched, C with the
+	# hero's own lineage shelf held as well. C is what EH §1's third tier was
+	# for: the arm where the cards a hero's lineage could reach are gone and the
+	# award must still pay. It pays out of the sibling lineages' shelves now
+	# instead of out of a tier of its own.
 	await _arm(run, "A", party, false, false, "spec boss pool")
-	await _arm(run, "B", party, true, false, "spec DRAFT pool")
-	await _arm(run, "C", party, true, true, "CLASS-WIDE pool")
+	await _arm(run, "B", party, true, false, "CLASS pool")
+	await _arm(run, "C", party, true, true, "CLASS pool, lineage shelf held")
 
 
 # ONE ARM. `hold_boss` and `hold_draft` say which pools the party walks in
@@ -99,8 +106,11 @@ func _arm(run: Node, arm: String, party: Array, hold_boss: bool,
 		var sp2 := String(m2["spec"])
 		ok((run.roll_spec_ability_offer(m2) as Array).is_empty() == hold_boss,
 			"§1%s: %s's boss pool is not in the state the arm requires" % [arm, sp2])
-		ok((run.roll_spec_fallback_offer(m2) as Array).is_empty() == hold_draft,
-			"§1%s: %s's spec draft pool is not in the state the arm requires" % [arm, sp2])
+		# BATCH GP — the fallback reads the CLASS pool, which holding one
+		# lineage shelf can no longer empty: the premise for arm C is that the
+		# lineage's own cards are gone, not that the tier is dry.
+		ok(not (run.roll_draft_fallback_offer(m2) as Array).is_empty(),
+			"§1%s: %s's class draft pool is dry — the arm cannot be read" % [arm, sp2])
 	scene.call("_resolve_boss", 120, false)
 	await process_frame
 
@@ -115,7 +125,7 @@ func _arm(run: Node, arm: String, party: Array, hold_boss: bool,
 			"§1%s: %s was not owed the pick the card just promised" % [arm, m3["spec"]])
 
 	# (2) AND THE CARD THAT WAS PAID CAME OUT OF THE TIER THIS ARM REACHES.
-	# The announcement cannot tell three tiers apart; the queued offer can.
+	# The announcement cannot tell the tiers apart; the queued offer can.
 	for m4 in run.party:
 		var sp4 := String(m4["spec"])
 		var q: Array = m4.get("bm_candidates", [])
@@ -124,10 +134,8 @@ func _arm(run: Node, arm: String, party: Array, hold_boss: bool,
 		if q.size() != 1:
 			continue
 		var wanted: Array = Classes.spec_pool(sp4)
-		if hold_draft:
-			wanted = Classes.class_draft_pool(Classes.class_of_spec(sp4))
-		elif hold_boss:
-			wanted = Classes.spec_draft_pool(sp4)
+		if hold_boss:
+			wanted = Classes.draft_pool(Classes.class_of_spec(sp4))
 		var stray: Array = []
 		for n in q[0]:
 			if not wanted.has(String(n)):
@@ -165,29 +173,32 @@ func _label_text(n: Node, needle: String) -> String:
 	return ""
 
 
-# ── §2 — EVERY SPEC'S DEPTH ACROSS ALL THREE TIERS, FULLY HELD ──────────────
+# ── §2 — EVERY SPEC'S DEPTH ACROSS BOTH TIERS, FULLY HELD ───────────────────
 # **DERIVED THROUGH THE LIVE ROLLERS RATHER THAN OFF A TABLE.** `check_ea` §1
 # measures the depth arithmetically and asserts the LOADOUT bound; this asks
 # the same question of the functions themselves, on a member dict built to the
 # worst case the brief names — a hero who holds his entire boss pool AND his
-# entire spec draft pool. A table can be right about a pool the code no longer
+# entire lineage shelf. A table can be right about a pool the code no longer
 # reads; a roller cannot.
 #
-# **AND IT STATES THE ANSWER PLAINLY, WHICH IS THE HALF THE BRIEF ASKED FOR.**
-# Under a fully-held loadout the class-wide tier pays a full three to every one
-# of the twelve. Under a fully-held POOL — the same hero having also taken every
-# class-wide card — the chain pays nothing, and that state is REACHABLE rather
-# than impossible. It is asserted in both directions, because "the third tier
-# closes the table" is exactly the shape of claim EA made about the second one
-# and had to give back a batch later.
+# **BATCH GP — TWO TIERS, AND THE WORST CASE IS THE SAME QUESTION.** The pool
+# merge made the second tier the whole class pool, so holding a lineage shelf no
+# longer empties it: the fallback pays out of the sibling lineages' shelves and
+# the class-wide cards together. **AND IT STATES THE ANSWER PLAINLY, WHICH IS
+# THE HALF THE BRIEF ASKED FOR.** Under a fully-held loadout the fallback pays a
+# full three to every one of the twelve. Under a fully-held POOL — the same hero
+# having also taken every card of his class — the chain pays nothing, and that
+# state is REACHABLE rather than impossible. It is asserted in both directions,
+# because "this tier closes the table" is exactly the shape of claim EA made
+# about the one before it and had to give back a batch later.
 func _s2_depth_fully_held() -> void:
-	print("\n§2 — every spec's depth across all three tiers, under a fully-held loadout")
+	print("\n§2 — every spec's depth across both tiers, under a fully-held loadout")
 	var run: Node = root.get_node("/root/Run")
 	var paid_all := 0
 	var starved := 0
 	for cls in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[cls]:
-			var wide: Array = Classes.class_draft_pool(String(cls))
+			var wide: Array = Classes.draft_pool(String(cls))
 			# FULLY-HELD LOADOUT: boss pool + spec draft pool, nothing else.
 			# `key` IS THE CLASS AND IT IS NOT OPTIONAL: `owned_ability_names`
 			# reaches `Runes.kit_names`, which builds the hero's config from it.
@@ -197,25 +208,23 @@ func _s2_depth_fully_held() -> void:
 				Classes.spec_pool(spec).duplicate()
 				+ Classes.spec_draft_pool(spec).duplicate()}
 			var t1: Array = run.roll_spec_ability_offer(m)
-			var t2: Array = run.roll_spec_fallback_offer(m)
-			var t3: Array = run.roll_class_fallback_offer(m)
+			var t2: Array = run.roll_draft_fallback_offer(m)
 			ok(t1.is_empty(), "§2: %s's boss tier is not dry under a fully-held loadout" % spec)
-			ok(t2.is_empty(), "§2: %s's spec draft tier is not dry under a fully-held loadout" % spec)
-			ok(t3.size() == 3,
-				"§2: %s's class-wide tier pays %d cards, not three, to a fully-held hero" % [
-					spec, t3.size()])
-			if t3.size() == 3:
+			ok(t2.size() == 3,
+				"§2: %s's class tier pays %d cards, not three, to a fully-held hero" % [
+					spec, t2.size()])
+			if t2.size() == 3:
 				paid_all += 1
-			# AND THE STATE THE THIRD TIER DOES *NOT* CLOSE.
+			# AND THE STATE THE FALLBACK DOES *NOT* CLOSE.
 			var m2 := {"key": String(cls), "spec": spec, "bm_abilities":
 				(m["bm_abilities"] as Array).duplicate() + wide.duplicate()}
-			var t3b: Array = run.roll_class_fallback_offer(m2)
-			ok(t3b.is_empty(),
-				"§2: %s's class-wide tier still pays a hero who holds every card in it — the filter is not reading the pool" % spec)
-			if t3b.is_empty():
+			var t2b: Array = run.roll_draft_fallback_offer(m2)
+			ok(t2b.is_empty(),
+				"§2: %s's class tier still pays a hero who holds every card in it — the filter is not reading the pool" % spec)
+			if t2b.is_empty():
 				starved += 1
-			print("    %-13s fully-held loadout → tier3 offers %d of %d class-wide; +class held → %d" % [
-				spec, t3.size(), wide.size(), t3b.size()])
+			print("    %-13s fully-held loadout → the fallback offers %d of %d in the class pool; +class held → %d" % [
+				spec, t2.size(), wide.size(), t2b.size()])
 	ok(paid_all == 12,
 		"§2: only %d of the twelve specs are paid a full three under a fully-held loadout" % paid_all)
 	ok(starved == 12,

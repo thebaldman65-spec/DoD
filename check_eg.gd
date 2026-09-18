@@ -245,9 +245,11 @@ func _s2_pool_and_loadout() -> void:
 	# through the set that is true of it.
 	ok(run.owned_ability_names(m).has("Shatterpoint"),
 		"§2: a benched card is still OWNED")
-	ok(not run.draft_pool_left(m)["spec"].has("Shatterpoint"),
+	# BATCH GP — ONE LIST, and the fallback is `roll_draft_fallback_offer` since
+	# the pool merge collapsed the chain's second and third tiers into one.
+	ok(not Array(run.draft_pool_left(m)).has("Shatterpoint"),
 		"§2: ...so the draft cannot re-present it")
-	ok(not run.roll_spec_fallback_offer(m).has("Shatterpoint"),
+	ok(not run.roll_draft_fallback_offer(m).has("Shatterpoint"),
 		"§2: ...and neither can the zone-boss fallback")
 
 	# A PROTECTED NAME CAN NEVER BE BENCHED, AND THE MECHANISM IS ITS ABSENCE

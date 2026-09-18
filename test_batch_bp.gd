@@ -299,15 +299,15 @@ func _warrior_draft_flow() -> void:
 	var m := {"key": "warrior", "spec": "swordmaster", "bm_abilities": []}
 	var offer: Array = run.roll_draft_offer(m)
 	ok(offer.size() == 3,
-		"§5: a Warrior's offer FILLS THREE now — two spec plus six class (got %d)" % offer.size())
+		"§5: a Warrior's offer FILLS THREE now (got %d)" % offer.size())
 	# RE-POINTED BY BATCH BW: the literal held BP's PAIR, and a Swordmaster now
-	# drafts from FIVE. The question — is every offered card his own spec's or
-	# his class's — is unchanged, and it is asked against the LIVE pool so it
-	# cannot go stale again.
+	# drafts from FIVE. **RE-POINTED AGAIN BY BATCH GP: it is ONE pool, his
+	# class's.** The question the check asks is the same shape and a wider
+	# boundary — every offered card is his CLASS's — and it is asked against the
+	# live pool so it cannot go stale again.
 	for c in offer:
-		ok(Classes.spec_draft_pool("swordmaster").has(String(c))
-			or Classes.class_draft_pool("warrior").has(String(c)),
-			"§5: ...and every card is his own spec's or his CLASS's (%s)" % c)
+		ok(Classes.draft_pool("warrior").has(String(c)),
+			"§5: ...and every card is in the WARRIOR pool (%s)" % c)
 	ok(run.award_draft_pick(m), "§7: a Warrior can be owed a pick")
 	ok(int(m.get("draft_picks_owed", 0)) == 1, "§7: ...exactly one")
 	var cands: Array = m["draft_candidates"][0]
@@ -334,12 +334,11 @@ func _warrior_draft_flow() -> void:
 	# it. **BATCH EB §2 CORRECTED THIS SENTENCE TWICE OVER.** It named
 	# `CLASS_POOLS`, which DY §3 deleted, and it claimed all three replacements
 	# are "in no DRAFT pool at all" — Rallying Shout is in the WARDEN's.
-	# WHAT IS TRUE IS NARROWER AND IS ENOUGH: this is a SWORDMASTER flow, and
-	# `draft_pool_left` offers his own spec pool and the WARRIOR class pool and
-	# nothing else. Sweeping Strikes and Shatterpoint are `SPEC_POOLS` boss-pick
-	# cards in no draft pool anywhere; Rallying Shout drafts from the WARDEN
-	# alone, whom no draw here can reach. That is the durable fix rather than
-	# swapping one draftable name for another. **DR's own two new cards made the collision LESS likely (the
+	# WHAT IS TRUE IS NARROWER AND IS ENOUGH: all four fillers are `SPEC_POOLS`
+	# boss-pick cards in NO draft pool anywhere, so no draw can reach them.
+	# **BATCH GP HAD TO TIGHTEN THAT FROM "the WARDEN alone, whom no draw here
+	# can reach"**: the pool merge makes a Swordmaster's draw the whole WARRIOR
+	# pool, so a Warden-shelf card is exactly what he CAN be dealt now. **DR's own two new cards made the collision LESS likely (the
 	# pool went 10 -> 12), not more; the flake predates this batch entirely.**
 	# **BATCH EG §2 — A HAND-BUILT KIT MUST CLEAR THE LOADOUT IT REPLACES, AND
 	# THIS IS THE ONE FIXTURE IN THE TREE THAT HAD TO.** The pool and the
@@ -352,16 +351,22 @@ func _warrior_draft_flow() -> void:
 	# carried.** Every other fixture in the tree stuffs `bm_abilities` on a
 	# member that has never taken a card, where the default already says that.
 	m.erase("bm_equipped")
-	# GK's FIFTH FILLER IS GUT RIP, A BERSERKER DRAFT CARD: in neither the
-	# Swordmaster's draft pool nor the Warrior class pool, so no `cands` draw can
-	# reach it — the rule DR set for the other three.
+	# **GK's FIFTH FILLER WAS GUT RIP AND GP REPLACED IT WITH INTERPOSE.** Gut
+	# Rip is a BERSERKER draft card, which the pool merge put inside a
+	# Swordmaster's own draw; Interpose is a boss-pick card in no draft pool.
 	# BATCH GN — THE FILL IS RELATIVE TO THE LIVE OPENING NOW (BO's rule): the
 	# class kit takes three of the seven, so TWO earned fill him, and Shatterpoint
 	# stays second because the bench below names it.
 	var fill: int = CAP - Classes.lineage_slots("swordmaster") \
 		- Classes.kit_slots("warrior", "swordmaster")
+	# **BATCH GP RE-POINTED THE FILLERS AND `check_eb` §2 IS WHY.** The pool
+	# merge makes a Swordmaster's draw the whole WARRIOR pool, so Rallying Shout
+	# and Gut Rip — the Warden's and the Berserker's shelves — became reachable
+	# by the draw above, which is exactly DR's one-in-eight flake arriving again.
+	# The durable property is "in NO draft pool anywhere": War Stomp and
+	# Interpose are the Warden's `SPEC_POOLS` boss-pick cards and are in none.
 	m["bm_abilities"] = ([cands[0], "Shatterpoint", "Sweeping Strikes",
-		"Rallying Shout", "Gut Rip"] as Array).slice(0, fill)
+		"War Stomp", "Interpose"] as Array).slice(0, fill)
 	ok(run.ability_slots_used(m) == CAP and fill == 2,
 		"§7: %d earned fill the cap at 7 (got %d)" % [fill, run.ability_slots_used(m)])
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
@@ -407,22 +412,26 @@ func _warrior_draft_flow() -> void:
 	for c2b in m2_offer:
 		ok(not m2_left.has(String(c2b)),
 			"§7: ...so a declined card is never offered again this run (%s)" % c2b)
-	# A WARDEN IS NEVER OFFERED ANOTHER WARDEN SPEC'S CARD. Nothing
-	# cross-pollinates between the three Warrior specs — that is what makes them
-	# SPEC pools. RE-POINTED BY BATCH BR: his CLASS six are legitimately his
-	# now, so the check names what must never appear rather than what may.
+	# **A WARDEN IS OFFERED HIS WHOLE CLASS POOL NOW, AND THE CHECK IS INVERTED
+	# RATHER THAN DELETED.** BP asserted the opposite — nothing cross-pollinates
+	# between the three Warrior specs, which is what made them SPEC pools — and
+	# BATCH GP's merge is precisely the ruling that took that apart: the three
+	# lineage shelves and the class-wide shelf of a class are one pool. What
+	# survives unchanged is the CLASS boundary, and it is asserted here as the
+	# thing that must never break; the sibling half is asserted as the thing
+	# that must now happen, because a negative anchor alone would pass the
+	# pre-merge code this check was written against.
 	var m3 := {"key": "warrior", "spec": "warden", "bm_abilities": []}
-	# RE-POINTED AGAIN BY BATCH BW: both halves read the LIVE pools now, so this
-	# check cannot go stale a third time — and the negative half got STRICTER
-	# rather than merely current, because it used to name only BP's two cards per
-	# sibling spec and now names all five.
-	for c3 in run.roll_draft_offer(m3):
-		ok(not Classes.spec_draft_pool("berserker").has(String(c3))
-			and not Classes.spec_draft_pool("swordmaster").has(String(c3)),
-			"§5: a Warden is never offered another Warrior spec's card (%s)" % c3)
-		ok(Classes.spec_draft_pool("warden").has(String(c3))
-			or Classes.class_draft_pool("warrior").has(String(c3)),
-			"§5: ...only his own spec's or his class's (%s)" % c3)
+	var sibling3 := 0
+	for _r3 in 60:
+		for c3 in run.roll_draft_offer(m3):
+			ok(Classes.draft_pool("warrior").has(String(c3)),
+				"§5: a Warden is offered %s, which is not in the WARRIOR pool" % c3)
+			if Classes.spec_draft_pool("berserker").has(String(c3)) \
+					or Classes.spec_draft_pool("swordmaster").has(String(c3)):
+				sibling3 += 1
+	ok(sibling3 > 0,
+		"§5: 60 offers showed a Warden no sibling Warrior lineage's card — the pools did not merge")
 
 
 # ---------- §2 THE BERSERKER, LIVE ----------

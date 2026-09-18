@@ -64,13 +64,18 @@ const UNGATED := ["deepening_hex", "wide_rite", "bracing_line", "long_watch",
 # agree with the class keys — `check_ez` §5 spawns exactly this way.)
 const DRIVE_ORDER := ["occultist", "warden", "sharpshooter", "beastmaster"]
 
-# **BATCH GN — THE ONE SPEC WHOSE POOL CANNOT STACK FIVE, AND WHAT IT CAN.** Three
-# DEFENSE cards left the Cleric class pool for the class kit, so an Occultist's
-# draftable pool holds two cards of any primary but DEBUFF — and DEBUFF is the tag
-# his own threshold rune named, which the stack must avoid. Two still fails both
-# retired rules (none of DEBUFF; a peak of two in two). An equality, so the day
-# the pool deepens this gate says so.
-const SHORT_BAR := {"occultist": 2}
+# **BATCH GN — THE ONE SPEC WHOSE POOL COULD NOT STACK FIVE — AND THE DAY THE
+# POOL DEEPENED CAME AT GP, WHICH IS WHAT THE EQUALITY WAS FOR.** GN's record:
+# three DEFENSE cards left the Cleric class pool for the class kit, so an
+# Occultist's draftable pool held two cards of any primary but DEBUFF — DEBUFF
+# being the tag his own threshold rune named, which the stack must avoid. **The
+# GP pool merge made a Cleric's draw his whole class pool (34 cards), and the
+# Occultist can stack a full five again**, so the exception is EMPTY rather than
+# re-pinned at a new number: an equality against 5 for every spec is the
+# stronger statement, and it is the one the table is back to. It is kept as a
+# named, empty const rather than deleted, because the next batch that thins a
+# pool will need somewhere to say so.
+const SHORT_BAR := {}
 
 # **THE CONDITIONS THEY CARRIED, RE-IMPLEMENTED HERE SO §4 CAN BUILD AN ARM THAT
 # FAILS THEM.** This is the retired rule, kept in the gate that retired it —
@@ -641,12 +646,14 @@ func _old_condition_met(cond: Dictionary, bar: Array) -> bool:
 func _spec_bar(spec: String, avoid: String) -> Array:
 	var probe := {"key": Classes.class_of_spec(spec), "spec": spec,
 		"abilities": [], "bm_abilities": [], "bm_equipped": [], "runes": []}
-	var left: Dictionary = _run.draft_pool_left(probe)
+	# BATCH GP — ONE LIST since the pool merge, and a DEEPER one: the bar is
+	# built out of everything the hero can still draft, which is his whole class
+	# pool less what the engine gate takes. `SHORT_BAR` below is re-derived
+	# against it rather than kept at its pre-merge spec.
 	var pool: Array = []
-	for src in [left.get("spec", []), left.get("class", [])]:
-		for n in src:
-			if not pool.has(String(n)):
-				pool.append(String(n))
+	for n in _run.draft_pool_left(probe):
+		if not pool.has(String(n)):
+			pool.append(String(n))
 	var best: Array = []
 	for t in Classes.TAG_ORDER:
 		var tag := String(t)

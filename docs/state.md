@@ -13,42 +13,95 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-17 (Batch GO).*
+*Last rewritten: 2026-09-17 (Batch GP).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GO — THE NINE MISSING ENGINES. IMPLEMENT ONLY, AND THE TWENTY-FIRST BATCH ON `class-merge`.** `main`
-  is untouched. Full working: **`docs/reports/GO.md`**.
-- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_go` (NEW):**
-  - **Every class holds six engine runes**, so class selection deals three of six for all four classes. The nine are
-    the designer's and are RULES — no lineage, no enabler, no payload, the flat 100 gold:
-    the Warrior's **Rune of the Reaver** (every enemy he fells, +10% damage for the fight) and **Rune of the Bastion**
-    (damage kept off him is banked; his next basic attack spends it); the Mage's **Rune of the Weaver** (every third
-    cast repeats at half strength) and **Rune of the Leech** (damage dealt returns as Mana; damage taken costs Mana
-    first); the Cleric's **Rune of the Oathkeeper** (bound to one hero, damage and healing split) and **Rune of the
-    Arbiter** (a judged enemy's wounds heal every ally); the Hunter's **Rune of the Tracker** (a tracked enemy takes
-    25% more from every ally), **Rune of the Skirmisher** (an enormous first attack, back after two unstruck turns)
-    and **Rune of the Medic** (every affliction he lays mends the most wounded hero). `Classes.RULE_ENGINES` names
-    them; the numbers are `Classes` constants and the rule texts are built from them.
-  - **The engine names are internal** (the designer's ruling): every chip, card, float and log line says the rune's
-    noun, and `check_go` sweeps all four surfaces for the nine engine names in any inflection.
-- **WHAT THE BATCH CHOSE, AND IT WAITS ON THE DESIGNER** — four magnitudes (Reaver +10%, Leech 25% and 1 Mana a
-  point, Arbiter 5%, Skirmisher +200%), what "prevented" means, which kind of repeat the Weaver makes, how the first
-  bond is chosen, where a mark moves, and the rule texts: GO's rulings below, in full in the report.
-- **WHAT MOVED:** `data/runes.json` (nine engine runes), `scripts/classes.gd`, `scripts/unit.gd`, `scripts/battle.gd`,
-  `scripts/run_state.gd` (a comment), `check_go.gd` (**NEW**), twelve instruments (`docs/reports/GO.md` §9),
-  `run_battery.sh`, `baselines.json`, `pin-manifest.json`, `CLAUDE.md` (the marker off, one rule), `docs/master.html`
-  (§6.0, the damage lists and the stamp), `docs/changelog.html`, `docs/design-notes.md`, this file, and
-  `docs/reports/GO.md` (**NEW**).
-- **VERIFICATION:** in **`docs/reports/GO.md`**, written after the acceptance run.
-- **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are done
-  — step 3 with its nine engines since GO and its class kits since GN. **The Crown's Break and freeze resistance is
-  the batch after the kits**, not built at GO by ruling. Step 4 of the running order is the pool merge.
-- **Next letter: GP.**
+- **Last batch: GP — THE POOLS MERGE. IMPLEMENT ONLY, AND THE TWENTY-SECOND BATCH ON `class-merge`.** `main`
+  is untouched. Full working: **`docs/reports/GP.md`**.
+- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_gp` (NEW):**
+  - **The three spec pools and the class-wide pool of a class are ONE POOL** (ruled). `Classes.draft_pool(class_key)`
+    is THE pool and is DERIVED off the shelves rather than being a fifth container. **Warrior 38, Mage 41, Cleric 34,
+    Hunter 36 — 149 in all.** A lineage hero drew from **13 to 18** before and a hero who took a spine from **3 to 6**.
+  - **`SPEC_DRAFT_POOLS` and `CLASS_DRAFT_POOLS` keep their names, contents and authoring headers and are SHELVES
+    now** — where a card was authored, not a channel it is drawn from. **A reader that takes `spec_draft_pool(his
+    spec)` for "what this hero can be offered" is wrong and still passes**, which is why `check_gp` §1 asserts the draw
+    reads `draft_pool` and neither accessor.
+  - **The class-wide cards lost their tier.** `CLASS_DRAFT_SHARE`, `Run.draft_card_is_class` and EH §1's third
+    zone-boss tier are DELETED; the award chain is two tiers (boss pool, then the whole class pool) and
+    `roll_spec_fallback_offer` is `roll_draft_fallback_offer`. **Boss pools are not merged and are not touched.**
+  - **A card that READS an engine is offered only to a hero who holds it** (ruled). **Thirty-four of the 149**, in
+    `Classes.ENGINE_READ` with a `why` apiece; `Classes.offerable` is the one answer and the zone-boss fallback asks it
+    too. **The population was derived at the read site and driven both ways**, and `check_gp` §2 carries a **six-card
+    control** of engine-free cards that must cast identically on both arms.
+  - **What a hero holding NO engine can be offered: 35 of 38, 29 of 41, 22 of 34, 29 of 36.** The merge did not move
+    the narrowness — the thinnest case is a Cleric at 22, against the **three** a Sanctity-taker drew from.
+  - **AND THE CLERIC IS THE ONE CLASS NO HERO CAN REACH THE WHOLE POOL OF** (GP §2e): three of his six engines gate
+    cards and `ENGINE_SLOTS` is 2, so his best pair opens 32 of 34. The other three classes have at most two gating
+    engines, so a hero holding both is offered everything. A consequence of the ruling, not a decision anybody took.
+- **WHAT MOVED:** `scripts/classes.gd`, `scripts/run_state.gd`, `scripts/run_sim.gd`, `check_gp.gd` (**NEW**),
+  fourteen instruments (`docs/reports/GP.md` §4b), `run_battery.sh`, `baselines.json`, `pin-manifest.json`,
+  `CLAUDE.md` (one standing rule, two blocks re-pointed), `docs/master.html` (§1, §6a, §6b and the stamp),
+  `docs/changelog.html`, `docs/design-notes.md`, this file, and `docs/reports/GP.md` (**NEW**).
+- **VERIFICATION:** the acceptance battery is GREEN — 113 targets, `check_de` at 473 / 0 / 0, and the only two reds are
+  the standing sanctioned ones (`check_cm_live` 13 / 4 and `check_gj` §4's Bell). Full working in
+  **`docs/reports/GP.md`**, written after the run. **It was started three times and the first two are not it:** the
+  first was killed at 43 targets because repairing a red meant editing `CLAUDE.md` behind a running battery, and the
+  second ran as a pre-pass that found `check_da` §3's three.
+- **Phase.** Steps 1 (the spines), 2 (the talent layer), 3 (engines to runes, with its nine engines at GO and its class
+  kits at GN) and **4 (the pool merge)** of the merge's running order are done. **The Crown's Break and freeze
+  resistance is still owed.** Step 5 of the running order is the 43 engine-reading runes and the engine-reading cards;
+  step 6 is the gates.
+- **Next letter: GQ.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GP's RULINGS OWED — **THREE; THE FIRST TWO ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GP.md`, NEEDS A RULING.
+
+1. **THE CLASS-WIDE CARDS ARE NOW THE WORST CARDS IN EACH POOL, AND THAT IS A REBALANCE OWED.** EB §1 ruled the
+   protected core is the baseline, and `CLASS_DRAFT_POOLS`' own authoring header says class-wide cards are written
+   **weaker than spec cards** — deliberately, because they feed no passive and at equal power would be a safe default
+   that diluted every build. **The merge removes the reason and keeps the cards:** six for the Warrior and the Hunter,
+   five for the Mage, three for the Cleric. Accepted, not repaired, and the same item as GN's ruling 7 from the kit's
+   side.
+2. **THIRTY-FOUR CARDS BECOME UNREACHABLE TO A HERO WHO HOLDS NO ENGINE.** Before the merge they were offered and did
+   nothing; a Mage who drops Runaway Resonance now loses seven cards from his offers at once. That is the ruling
+   working, and a player feels it.
+3. **THE ENGINE GATE IS THE HOLDER'S AND THE CODE'S PRODUCERS ARE PARTY-LEVEL.** Five of the eight —
+   `_living_hero_passive("permafrost")`, `_living_devout`, `_living_occultist`, the Mercy holder, the Focus holder.
+   The party is one hero per class, so the two readings coincide today; **they part the day two heroes of one class can
+   be seated**, and the gate would then be stricter than the code.
+
+### FOUND AT GP AND NOT FIXED
+
+- **PLAYER-FACING, AND FP's `block_chance` FINDING ARRIVING AS A CARD: COVERING GUARD LENDS A 0% BLOCK TO A WARRIOR WHO
+  IS NOT A WARDEN.** `_live_block_chance` is `block_chance + _plating_slice`, only the Warden declares 0.10, and the
+  slice is Heavy Plating's — so a spine-taker who drafts Covering Guard covers an ally with nothing, and a Warden who
+  dropped Heavy Plating covers with 10%. **It is NOT in the engine table**, because it reads a STAT and not an engine;
+  gating on it would be a second mechanism, and `PROTECTED_CORES`' own header already records that *the enabler concept
+  has to cover STATS, not only abilities*. **The merge makes it reachable by three times as many heroes.**
+- **BATTLE POISE AND COUNTER TIME NEED THE DEFENSIVE GUARD, AND NO WARRIOR ENGINE GIVES HIM ONE.** Four cards in the
+  same merged pool reach it — Formless satisfies both gates outright; Precision Strike, Feint and Wheeling Cut flip the
+  stance — so they are conditional on a CARD and are not gated. **A Warrior who drafts Battle Poise and nothing that
+  switches guard can never cast it.**
+- **EG's 53–55% OFFER-AT-CAP FIGURE IS STALE, AND GP IS NOT WHAT MADE IT STALE.** Re-measured at rung 2 over four
+  `--run 25` sims the same day: **74% and 76% after the merge, against 73% and 74% on HEAD.** The merge moves it by
+  nothing. The drift predates this branch — the class kits take three of seven slots since GN, so a hero reaches his
+  cap far sooner. **A batch pricing work against 53–55% would be pricing it against a number the game stopped
+  producing.** What the merge DOES move is the two short-offer figures, and it takes them to zero: a pool that came up
+  short 0.24–0.40 times a run and had nothing left to offer 0.04–0.08 times a run now never does either.
+- **THE DEBUG "ALL SPEC ABILITIES UNLOCKED" TOGGLE STILL GRANTS A LINEAGE SHELF** (`battle.gd`'s `granted_pool`), not
+  the class pool. Its scope was the spec and still is; outside the brief.
+- **`check_gj` §4's SANCTIONED RED MOVED BY ONE GOLD** — card +177 against a purse of +197, where GN recorded
+  +178/+198. GP's code moves what the gate's seeded run draws; the Tollkeeper's Bell defect itself is unchanged.
+- **ONE CONTROL COPY LEFT A USER-DATA FOLDER** under Godot's `app_userdata`: "Dawn of Decay GP head", renamed before it
+  ran so its `user://` could not reach the player's saves. It can be deleted.
+- **TWO OF THE BRIEF'S PREMISES DID NOT HOLD** (GP §0): *"a hero draws from ~24 cards instead of 8–10"* is wrong on
+  both sides, and *the class-wide pool existed because spec pools were narrow* is not the reason the code records.
 
 ### GO's RULINGS OWED — **TWELVE; ALL BUT THE LAST TWO ARE PLAYER-VISIBLE**
 
@@ -856,7 +909,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–3 BUILT (3's NINE ENGINES AT GO), 4–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–4 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP), 5–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -1130,8 +1183,13 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    OWED BUILT AT GO**, the designer's nine, transcribed.
    - **~~AND A CLASS KIT OF THREE, RULED IN GL's BRIEF~~ — BUILT AT GN.** Its recon is `docs/kit-recon.html` (GL); GN's
      brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
-4. **POOL MERGING.**
-5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.**
+4. **~~POOL MERGING~~ — BUILT AT BATCH GP.** One pool a class (38 / 41 / 34 / 36), the class-wide cards ordinary
+   cards in it, the class-wide share and EH §1's third zone-boss tier deleted, and **a card that reads an engine
+   offered only to its holder** — 34 of the 149, derived at the read site and driven both ways.
+5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.** **GP took the CARDS half at the offer door** (an
+   engine-reading card is not OFFERED to a hero who cannot use it); what step 5 still owes is the RUNES, and GM's
+   standing item — *ten live spec runes are read only under their lineage's engine, and a rune's scope is the lineage,
+   so he is still offered them* — is the same defect one layer along.
 6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks. **GK repaired the
    ones its own move broke** — the census and what is left are `docs/reports/GK.md` §3.
 

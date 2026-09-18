@@ -417,30 +417,31 @@ func _draft_flow() -> void:
 	cleric["spec"] = "occultist"
 	var hunter: Dictionary = run.party[3]
 	hunter["spec"] = "sharpshooter"
-	var mage_left: Dictionary = run.draft_pool_left(mage)
-	# BATCH GN — THREE: the Mage pool reads five and the Cleric's three since five
-	# cards moved into the class kits.
-	ok(mage_left["class"].size() >= 3,
-		"§1: a Cryomancer's class side of the draft has FALLEN to %d, below three (GN left the Mage pool at five)" % \
-			mage_left["class"].size())
-	var cleric_left: Dictionary = run.draft_pool_left(cleric)
-	ok(cleric_left["class"].size() >= 3,
-		"§1: an Occultist's class side has FALLEN below three (%d)" % cleric_left["class"].size())
-	var hunter_left: Dictionary = run.draft_pool_left(hunter)
-	# INVERTED BY BATCH BR, same reason as the pool check above: this recorded
-	# the debt in the ROLL rather than in the array, and the debt is paid.
-	ok(hunter_left["class"].size() >= 6,
-		"§0+BR: a Sharpshooter's class side has FALLEN below the six BR paid (%d)" % \
-			hunter_left["class"].size())
+	# **BATCH GP — THERE IS NO "CLASS SIDE" ANY MORE.** `draft_pool_left` returned
+	# two sides until the pool merge and returns one list now; the question these
+	# three asked — is the class-wide half really reachable — is asked of the one
+	# pool, by counting how many of a hero's class-wide shelf are still in it.
+	for pair in [[mage, "mage", 3], [cleric, "cleric", 3], [hunter, "hunter", 6]]:
+		var mem: Dictionary = pair[0]
+		var ck := String(pair[1])
+		mem["awakened"] = true
+		var left: Array = run.draft_pool_left(mem)
+		var wide := 0
+		for n in Classes.class_draft_pool(ck):
+			if left.has(String(n)):
+				wide += 1
+		ok(wide >= int(pair[2]),
+			"§1: a %s can reach %d of his class-wide cards, below the %d expected" % [
+				ck, wide, int(pair[2])])
 	# The no-return ledger covers a class card exactly as it covers a spec one.
 	# BATCH GN — THE CARD IS ONE STILL IN THE POOL. Magic Barrier left it for the
 	# class kit, and a refusal of a card the pool no longer holds passes without
 	# asking anything, so the check stands on Mirror Image, and asserts first that
 	# the pool holds it.
 	mage["draft_refused"] = ["Mirror Image"]
-	var refused_left: Dictionary = run.draft_pool_left(mage)
+	var refused_left: Array = run.draft_pool_left(mage)
 	ok(Classes.class_draft_pool("mage").has("Mirror Image")
-			and not refused_left["class"].has("Mirror Image"),
+			and not refused_left.has("Mirror Image"),
 		"§1: a refused class card does not come back this run")
 	mage["draft_refused"] = []
 	# AND A REAL OFFER NOW HOLDS THEM. Rolled many times because the seam is a
@@ -465,10 +466,10 @@ func _draft_flow() -> void:
 	var hunter_offer: Array = run.roll_draft_offer(hunter)
 	ok(hunter_offer.size() == 3,
 		"§0+BR: a Sharpshooter's offer fills THREE now (%d)" % hunter_offer.size())
+	# BATCH GP — ONE POOL, his class's.
 	for nm2 in hunter_offer:
-		ok(Classes.spec_draft_pool("sharpshooter").has(nm2)
-			or Classes.class_draft_pool("hunter").has(nm2),
-			"§0+BR: ...from his own spec or his class (%s)" % nm2)
+		ok(Classes.draft_pool("hunter").has(nm2),
+			"§0+BR: ...from the HUNTER pool (%s)" % nm2)
 	# RE-POINTED BY BATCH BV: this refused the Hunter CLASS pool to leave a
 	# Sharpshooter on his two spec cards, and BV took the three Hunter pools to
 	# FIVE — so refusing the class pool now leaves five and the check stopped
@@ -499,9 +500,13 @@ func _draft_flow() -> void:
 	# That is test_batch_bx's shape, it is the only one that cannot go stale
 	# again, and it states the rule as it actually is — an offer never pads with
 	# repeats, whatever wore the pool down.
-	var wq_spec: Array = Classes.spec_draft_pool("berserker")
-	worn_hero["draft_refused"] = Classes.class_draft_pool("warrior").duplicate()
-	worn_hero["draft_refused"].append_array(wq_spec.slice(0, wq_spec.size() - 2))
+	# **BATCH GP — WORN RELATIVE TO THE ONE POOL.** The merge made a Berserker's
+	# draw the whole WARRIOR pool, so refusing the class shelf and a lineage
+	# shelf leaves two shelves standing and the offer fills full — the same
+	# staleness CI's comment above rebuilt against, arriving through the merge.
+	# Written against `Classes.draft_pool` it cannot go stale a third time.
+	var wq_pool: Array = Classes.draft_pool("warrior")
+	worn_hero["draft_refused"] = wq_pool.slice(0, wq_pool.size() - 2)
 	var worn: Array = run.roll_draft_offer(worn_hero)
 	ok(worn.size() == 2,
 		"§1: a pool worn down to two still fills SHORT rather than padding (%d)" % worn.size())
@@ -509,28 +514,47 @@ func _draft_flow() -> void:
 
 
 func _seam() -> void:
-	# §6 — the seam fires at roughly one card in four, NOW DRAWING REAL ENTRIES
-	# on both sides. Driven through `draft_card_is_class` itself, which is the
-	# function BO extracted precisely so a test could measure the ratio.
+	# **§6 — THE SEAM IS GONE (BATCH GP), AND THIS SECTION ASKS WHAT REPLACED
+	# IT.** BQ drove `Run.draft_card_is_class` four thousand times because a
+	# shallow class shelf beside a deeper spec one needed a ratio to stay
+	# reachable. The pool merge dissolved the shelves into one pool and the
+	# class-wide cards became ordinary cards in it, so there is no ratio and no
+	# function: what has to stay true is that a class-wide card still REACHES a
+	# hero, and the only thing that could now hide one is the shuffle. So the
+	# volume stays and the door moves — it is driven through `roll_draft_offer`,
+	# which is what the game asks.
 	var run := root.get_node("/root/Run")
-	var class_cards := 0
-	var trials := 4000
+	var m := {"key": "mage", "spec": "cryomancer", "bm_abilities": [],
+		"bm_equipped": [], "draft_refused": [], "talents": {}, "tree": [],
+		"awakened": true}
+	var wide: Array = Classes.class_draft_pool("mage")
+	var sib: Array = Classes.spec_draft_pool("pyromancer")
+	var seen_wide := 0
+	var seen_sib := 0
+	var cards := 0
+	var trials := 1000
 	for _i in trials:
-		if run.draft_card_is_class(6, 6):
-			class_cards += 1
-	var share := class_cards / float(trials)
-	ok(share > 0.20 and share < 0.30,
-		"§6: the class seam fires at roughly one card in four (%.3f over %d)" % [
-			share, trials])
-	ok(Classes.CLASS_DRAFT_SHARE == 0.25,
-		"§6: ...off the one constant that decides it")
-	# The two degenerate ends are unchanged by this batch and still matter: an
-	# empty class pool never draws (the Hunter and Warrior case, today), and an
-	# empty spec pool always does.
-	ok(not run.draft_card_is_class(6, 0),
-		"§6: an empty class pool never draws — a Hunter's offer is all spec")
-	ok(run.draft_card_is_class(0, 6),
-		"§6: ...and an exhausted spec pool falls entirely to the class side")
+		var offer: Array = run.roll_draft_offer(m)
+		for c in offer:
+			cards += 1
+			if wide.has(String(c)):
+				seen_wide += 1
+			if sib.has(String(c)):
+				seen_sib += 1
+	ok(cards >= trials * 2,
+		"§6: %d offers showed only %d cards — the pool is not filling three" % [trials, cards])
+	ok(seen_wide > 0,
+		"§6: %d offers to a Cryomancer showed him NO class-wide Mage card" % trials)
+	ok(seen_sib > 0,
+		"§6: %d offers to a Cryomancer showed him NO Pyromancer card — the pools did not merge" % trials)
+	# **THE SHARE IS NOW WHAT THE POOL'S SHAPE MAKES IT, AND IT IS PRINTED
+	# RATHER THAN PINNED.** A number that falls out of the pool's proportions
+	# moves every time a card is authored; pinning it would make ordinary
+	# authoring red. The pool's own proportion is the prediction.
+	var pool: Array = Classes.draft_pool("mage")
+	print("    class-wide cards: %d of %d in the pool (%.3f), %d of %d offered (%.3f)" % [
+		wide.size(), pool.size(), wide.size() / float(pool.size()),
+		seen_wide, cards, seen_wide / float(cards)])
 
 
 # ---------- LIVE: THE MAGE SIX ----------

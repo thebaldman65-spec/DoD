@@ -240,8 +240,20 @@ func _pools() -> void:
 	for ck in ["mage", "cleric", "warrior", "hunter"]:
 		ok(Classes.class_draft_pool(ck).size() >= 3,
 			"§4: the %s class pool has FALLEN below the three GN left it at" % ck)
-	ok(is_equal_approx(Classes.CLASS_DRAFT_SHARE, CLASS_SHARE),
-		"§4: roughly one card in four is class-wide")
+	# **BATCH GP — `CLASS_DRAFT_SHARE` IS GONE AND SO IS THE SEAM IT NAMED.**
+	# The pool merge made the class-wide cards ordinary cards of the class pool,
+	# so there is no ratio to hold: the assertion is INVERTED rather than
+	# deleted (FN §2's shape), because what a later batch could get wrong is
+	# re-introducing a one-in-four seam beside a single pool.
+	# The absence of the constant is asserted where a gate can strip comments
+	# before it looks (`check_gp` §1, against `classes.gd`'s source); what this
+	# suite asserts is the thing that replaced it. **THE MERGE'S OWN CLAIM:**
+	# every class-wide card is in the pool its class draws from, which is what
+	# "they became ordinary cards" means at the door.
+	for ck2 in ["mage", "cleric", "warrior", "hunter"]:
+		for cn in Classes.class_draft_pool(ck2):
+			ok(Classes.draft_pool(ck2).has(String(cn)),
+				"§4: %s is not in the %s pool — the class-wide shelf did not dissolve" % [cn, ck2])
 	# EVERY ENTRY RESOLVES. A pool name that does not resolve is an offer that
 	# hands out nothing — the exact failure AH's resolver exists to prevent.
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
@@ -509,17 +521,22 @@ func _offer_and_ratio() -> void:
 	# SIZE now — refuse everything but two — which is test_batch_bx's shape and
 	# the only one that cannot go stale a fourth time. A later tranche that
 	# deepened a pool would move this check's setup and not its answer.
-	var bz_pool: Array = Classes.spec_draft_pool("berserker")
-	var worn: Array = Classes.class_draft_pool("warrior").duplicate()
-	worn.append_array(bz_pool.slice(0, bz_pool.size() - 2))
+	# **BATCH GP — WORN RELATIVE TO THE ONE POOL, WHICH IS THE ONLY WAY THIS
+	# CHECK STAYS ABOUT THE FILL-SHORT RULE.** The merge put the lineage shelves
+	# and the class-wide shelf into one pool, so refusing a shelf and a bit now
+	# leaves dozens standing and the offer comes up FULL — which is exactly the
+	# staleness CI's own comment above says it was rebuilding against. Written
+	# against `Classes.draft_pool` it cannot go stale a fifth time: refuse
+	# everything but two, whatever the pool is.
+	var wp: Array = Classes.draft_pool("warrior")
 	var thin := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
-		"draft_refused": worn}
+		"draft_refused": wp.slice(0, wp.size() - 2)}
 	var thin_offer: Array = run.roll_draft_offer(thin)
 	ok(thin_offer.size() == 2,
 		"§3: a pool worn down to two still fills SHORT (2 cards, not 3) — never padding (got %d)" % thin_offer.size())
 	for tc in thin_offer:
-		ok(Classes.spec_draft_pool("berserker").has(String(tc)),
-			"§3: ...and what is left is his own spec's (%s)" % tc)
+		ok(wp.has(String(tc)),
+			"§3: ...and what is left is in his class pool (%s)" % tc)
 	ok(offer.size() == offer.duplicate().size(),
 		"§3: ...and never pads")
 	var seen := {}
@@ -540,7 +557,7 @@ func _offer_and_ratio() -> void:
 	var w := {"key": "warrior", "spec": "berserker", "bm_abilities": []}
 	var w_offer: Array = run.roll_draft_offer(w)
 	ok(w_offer.size() == 3,
-		"BR: a Warrior's draft offer FILLS THREE now — two spec plus six class (got %d)" % w_offer.size())
+		"BR: a Warrior's draft offer FILLS THREE now (got %d)" % w_offer.size())
 	ok(run.award_draft_pick(w),
 		"BP: ...and awarding one succeeds rather than refusing an empty pool")
 	ok(int(w.get("draft_picks_owed", 0)) == 1,
@@ -560,24 +577,36 @@ func _offer_and_ratio() -> void:
 	# is everything else still eligible — is asked directly instead.
 	ok(offer2.size() == 3, "§3: ...and the rest of the pool still fills the offer")
 	for c2 in offer2:
-		ok(Classes.spec_draft_pool("cryomancer").has(c2) \
-				or Classes.class_draft_pool("mage").has(c2),
-			"§3: ...leaving only what is left, from one pool or the other (%s)" % c2)
-	# THE RATIO HAS ITS OWN SEAM, and it is driven a few hundred times. With
-	# every class pool empty at BO, a check on the ROLLER could only
-	# ever measure zero — and a check that can only pass is a gap (BK's
-	# zero-blacksmith lesson).
-	var class_cards := 0
-	for _i in 4000:
-		if run.draft_card_is_class(10, 10):
-			class_cards += 1
-	var share := class_cards / 4000.0
-	ok(share > 0.20 and share < 0.30,
-		"§4: roughly one card in four is class-wide (measured %.3f over 4000)" % share)
-	ok(not run.draft_card_is_class(10, 0),
-		"§4: an empty class pool never draws a class card")
-	ok(run.draft_card_is_class(0, 10),
-		"§4: an empty SPEC pool falls back to the class side rather than filling short")
+		ok(Classes.draft_pool("mage").has(c2),
+			"§3: ...leaving only what is left, from the MAGE pool (%s)" % c2)
+	# **THE RATIO HAD ITS OWN SEAM AND THE SEAM WENT WITH THE GP POOL MERGE.**
+	# `Run.draft_card_is_class` weighted a shallow class shelf against a deeper
+	# spec one; one pool has no sides. BO's reason for driving the roller a few
+	# thousand times is kept and pointed at what replaced it: a class-wide card
+	# must still REACH a hero, and with no seam the only thing that can hide one
+	# is the shuffle. Driven at volume for that reason.
+	var wide: Array = Classes.class_draft_pool("mage")
+	var seen_wide := 0
+	var rolls := 0
+	var mm := {"key": "mage", "spec": "cryomancer", "bm_abilities": [],
+		"talents": {}, "tree": [], "awakened": true}
+	for _i in 400:
+		for c3 in run.roll_draft_offer(mm):
+			rolls += 1
+			if wide.has(String(c3)):
+				seen_wide += 1
+	ok(seen_wide > 0,
+		"§4: 400 offers to a Cryomancer showed him no class-wide card at all (%d cards rolled)" % rolls)
+	# AND THE SIBLING HALF, which is the merge itself: a Cryomancer is shown
+	# another Mage lineage's cards.
+	var pyro_cards: Array = Classes.spec_draft_pool("pyromancer")
+	var seen_sib := 0
+	for _i2 in 400:
+		for c4 in run.roll_draft_offer(mm):
+			if pyro_cards.has(String(c4)):
+				seen_sib += 1
+	ok(seen_sib > 0,
+		"§4: 400 offers to a Cryomancer showed him no Pyromancer card — the pools did not merge")
 
 
 # ---------- §2 TAKE, DECLINE, DROP ----------
