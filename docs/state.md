@@ -13,50 +13,90 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-17 (Batch GP).*
+*Last rewritten: 2026-09-18 (Batch GQ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GP — THE POOLS MERGE. IMPLEMENT ONLY, AND THE TWENTY-SECOND BATCH ON `class-merge`.** `main`
-  is untouched. Full working: **`docs/reports/GP.md`**.
-- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_gp` (NEW):**
-  - **The three spec pools and the class-wide pool of a class are ONE POOL** (ruled). `Classes.draft_pool(class_key)`
-    is THE pool and is DERIVED off the shelves rather than being a fifth container. **Warrior 38, Mage 41, Cleric 34,
-    Hunter 36 — 149 in all.** A lineage hero drew from **13 to 18** before and a hero who took a spine from **3 to 6**.
-  - **`SPEC_DRAFT_POOLS` and `CLASS_DRAFT_POOLS` keep their names, contents and authoring headers and are SHELVES
-    now** — where a card was authored, not a channel it is drawn from. **A reader that takes `spec_draft_pool(his
-    spec)` for "what this hero can be offered" is wrong and still passes**, which is why `check_gp` §1 asserts the draw
-    reads `draft_pool` and neither accessor.
-  - **The class-wide cards lost their tier.** `CLASS_DRAFT_SHARE`, `Run.draft_card_is_class` and EH §1's third
-    zone-boss tier are DELETED; the award chain is two tiers (boss pool, then the whole class pool) and
-    `roll_spec_fallback_offer` is `roll_draft_fallback_offer`. **Boss pools are not merged and are not touched.**
-  - **A card that READS an engine is offered only to a hero who holds it** (ruled). **Thirty-four of the 149**, in
-    `Classes.ENGINE_READ` with a `why` apiece; `Classes.offerable` is the one answer and the zone-boss fallback asks it
-    too. **The population was derived at the read site and driven both ways**, and `check_gp` §2 carries a **six-card
-    control** of engine-free cards that must cast identically on both arms.
-  - **What a hero holding NO engine can be offered: 35 of 38, 29 of 41, 22 of 34, 29 of 36.** The merge did not move
-    the narrowness — the thinnest case is a Cleric at 22, against the **three** a Sanctity-taker drew from.
-  - **AND THE CLERIC IS THE ONE CLASS NO HERO CAN REACH THE WHOLE POOL OF** (GP §2e): three of his six engines gate
-    cards and `ENGINE_SLOTS` is 2, so his best pair opens 32 of 34. The other three classes have at most two gating
-    engines, so a hero holding both is offered everything. A consequence of the ruling, not a decision anybody took.
-- **WHAT MOVED:** `scripts/classes.gd`, `scripts/run_state.gd`, `scripts/run_sim.gd`, `check_gp.gd` (**NEW**),
-  fourteen instruments (`docs/reports/GP.md` §4b), `run_battery.sh`, `baselines.json`, `pin-manifest.json`,
-  `CLAUDE.md` (one standing rule, two blocks re-pointed), `docs/master.html` (§1, §6a, §6b and the stamp),
-  `docs/changelog.html`, `docs/design-notes.md`, this file, and `docs/reports/GP.md` (**NEW**).
-- **VERIFICATION:** the acceptance battery is GREEN — 113 targets, `check_de` at 473 / 0 / 0, and the only two reds are
-  the standing sanctioned ones (`check_cm_live` 13 / 4 and `check_gj` §4's Bell). Full working in
-  **`docs/reports/GP.md`**, written after the run. **It was started three times and the first two are not it:** the
-  first was killed at 43 targets because repairing a red meant editing `CLAUDE.md` behind a running battery, and the
-  second ran as a pre-pass that found `check_da` §3's three.
-- **Phase.** Steps 1 (the spines), 2 (the talent layer), 3 (engines to runes, with its nine engines at GO and its class
-  kits at GN) and **4 (the pool merge)** of the merge's running order are done. **The Crown's Break and freeze
-  resistance is still owed.** Step 5 of the running order is the 43 engine-reading runes and the engine-reading cards;
-  step 6 is the gates.
-- **Next letter: GQ.**
+- **Last batch: GQ — THE ENGINE CARDS SAY ONLY WHAT DIFFERS. IMPLEMENT ONLY, AND THE TWENTY-THIRD BATCH ON
+  `class-merge`.** A screen batch, outside the merge's running order. `main` is untouched. Full working:
+  **`docs/reports/GQ.md`**.
+- **BUILT, AND DRAWN ON EVERY DEAL EVERY BATTERY BY `check_gq` (NEW):**
+  - **A class-selection card is its rune's name, its engine rule and — for a rune that carries a lineage — the
+    abilities it opens with beyond the kit, BY NAME** (*"Also opens with: …"*). **That last clause is the designer's,
+    ruled mid-batch**: the brief said the rule alone, on the premise that only the rule differed, and that holds for the
+    twelve runes with no lineage (the three spines and all nine rule engines) and not for the twelve that carry one —
+    **each adds one to five abilities no other card offers, thirty-seven in all.** Where a rune's own basic takes the
+    class basic's place the card says so: *"Fireball (in place of Magic Bolt)"* — four runes, Shadowrend for Smite
+    the fourth.
+  - **The class basic and class kit appear ONCE, below the three cards,** at the figures of a hero holding no engine
+    — the class's own Attack. **A line under them names a dealt rune that would move one of those figures**, derived
+    rather than listed: only the Rune of the Warden, on a Warrior's screen (the Warden lineage attacks at 75). The
+    Occultist raises a Cleric's Attack to 100 and moves nothing shown, because Shadowrend replaces Smite, so it is not
+    named.
+  - **The archetype subtitle and the lineage blurb are gone from the card — and no other screen ever showed either**,
+    so no screen does now. `SPEC_INFO` keeps both fields; the archetype still sets a lineage's Attack through its role.
+  - **No card scrolls**: the text window is 280 pixels, the tallest rune text (the Beastmaster's) 277, and the lowest
+    line on any screen 691 of 720. Before, 22 of the 24 scrolled, the Beastmaster's by 877.
+  - **The class passive line is where it stood, ABOVE the cards**, so the kit below is not beside it (the brief put the
+    two together); the screen's own subtitle is unchanged.
+- **WHAT MOVED:** `scripts/spec_choice_screen.gd`, `check_gq.gd` (**NEW**), `run_battery.sh`, `baselines.json`,
+  `docs/master.html` (§1, §6, the screens list and the stamp), `docs/text-standard.html` (§1.2's row for this screen,
+  a §4.7 paragraph describing a defect CL §7 had fixed, and its stamp), `docs/changelog.html`, `docs/design-notes.md`,
+  this file, and `docs/reports/GQ.md` (**NEW**). **No engine, kit card, magnitude or rule moved; `CLAUDE.md` and
+  `pin-manifest.json` did not move** (the manifest regenerates byte-identical).
+- **VERIFICATION:** the acceptance battery is GREEN — 115 targets, `check_de` at 477 / 0 / 0 and `check_gq` at
+  5,112 / 0, and the only two reds are the standing sanctioned ones (`check_cm_live` 13 / 4, and `check_gj` §4's Bell
+  at the corrected +172 / +192). The unmodified battery ran green against the new screen before any gate existed or
+  was edited, so no instrument was repaired. Full working in **`docs/reports/GQ.md`**, written after the run.
+- **Phase.** Unchanged by GQ. Steps 1 (the spines), 2 (the talent layer), 3 (engines to runes, with its nine engines at
+  GO and its class kits at GN) and 4 (the pool merge) of the merge's running order are done. **The Crown's Break and
+  freeze resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
+- **Next letter: GR.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GQ's RULINGS OWED — **THREE; THE FIRST TWO ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GQ.md`, NEEDS A RULING.
+
+1. **THE CLASS-SELECTION SCREEN'S NEW WORDS ARE PROPOSED.** On a card, *"Also opens with: …"* and *"(in place of
+   Magic Bolt)"*; under the cards, *"With no engine, the Warrior opens every fight with these. A rune adds what its card
+   names."*; and on a Warrior's screen dealt the Rune of the Warden, *"Figures are for the Warrior with no engine: the
+   Rune of the Warden sets Attack to 75, and they move with it."*
+2. **THE CARD'S TEXT WINDOW IS FIXED AT 280 PIXELS**, so a deal of three short rules shows empty card space. Sized so no
+   rune's text scrolls and the kit fits the screen, with the kit and the buttons in one place on every deal; cards fitted
+   to the tallest text on the screen would move both from deal to deal, and were not taken.
+3. **`CLAUDE.md` IS PAST ITS CEILING** (FOUND AT GQ, below) — not player-facing; the move left is the subject seam,
+   which is the designer's.
+
+### FOUND AT GQ AND NOT FIXED
+
+- **`CLAUDE.md` CROSSED ITS 340 KiB CEILING AT GP: 348,868 B = 340.69 KiB** (GP added 3,894 B, from 344,974). `check_fg`
+  §2 prints its CEILING WARNING and passes; **it FAILS past 356,454 B — 7,586 B away**, less than one large batch's
+  rules. The subject seam below was carried as *"owed a ruling before the file reaches 340 KiB"*, and the file has
+  reached it. GQ added nothing to the file.
+- **PLAYER-FACING, MET ON THIS SCREEN FIRST: FOUR KIT TEXTS BREAK THE TEXT STANDARD.** Ministration's *"No stacks, no
+  shields, no marks — it simply works"* and Magic Missiles' *"Cheap, certain, and it never needs anything to be true
+  first"* are design rationale on a card; Magic Missiles restates *"12% of Attack each"* beside the line that prints it;
+  **Nexus Ward's and Ministration's 20% are plain text, not tokens**, so no surface resolves either to a number. A kit
+  card's text was outside GQ.
+- **`Classes.ARCHETYPE_DESC` AND THE TWELVE `SPEC_INFO` BLURBS HAVE NO READER IN THE GAME.** Kept: a structure orphaned
+  by a ruling is a design question (`CLAUDE.md`, DV §1). The archetype field itself is live — it sets a lineage's Attack.
+- **THE HUNTER'S CLASS PASSIVE AND A HUNTER RUNE ARE BOTH *TRACKER*,** and on a deal holding the Rune of the Tracker the
+  two stand one above the other on this screen. GO's ruling 2, re-observed.
+- **FOUR OF THE BRIEF'S PREMISES DID NOT HOLD, AND ONE HELD ONLY IN EFFECT** (GQ §0): *the one paragraph that differs*
+  (half the runes add cards); *Vanguard, Invoker, Hierophant and the Hunter's three bring no enabler* (the rule-alone
+  cards are the spines and all nine rule engines, and the test is the lineage, not the enabler); *the class passive
+  that is already there* below the cards (it is above them); *`check_map_screen` reads this surface* (it never draws it);
+  and *Heavy Plating changes his stats* (the Warden lineage's stat block does).
+- **`check_gj` §4's SANCTIONED RED READS CARD +172 AGAINST A PURSE OF +192**, on GP's own commit and on GQ's code alike —
+  once on GP's, four times on GQ's, identical every time — and this gate never draws the class-selection screen. **GP's recorded +177 / +197 does
+  not reproduce on the commit that recorded it.** The gap is still the Bell's 20 gold and the counts row did not move;
+  the figure is corrected where it was written (`baselines.json`, and GP's bullet below).
+- **ONE CONTROL COPY LEFT A USER-DATA FOLDER** under Godot's `app_userdata`: "Dawn of Decay GQ ctl", renamed before
+  anything ran in it so its `user://` could not reach the player's saves. It can be deleted.
 
 ### GP's RULINGS OWED — **THREE; THE FIRST TWO ARE PLAYER-VISIBLE**
 
@@ -98,6 +138,7 @@ Full working: `docs/reports/GP.md`, NEEDS A RULING.
   the class pool. Its scope was the spec and still is; outside the brief.
 - **`check_gj` §4's SANCTIONED RED MOVED BY ONE GOLD** — card +177 against a purse of +197, where GN recorded
   +178/+198. GP's code moves what the gate's seeded run draws; the Tollkeeper's Bell defect itself is unchanged.
+  **CORRECTED AT GQ: it reads +172 / +192 on GP's own commit** (FOUND AT GQ, above).
 - **ONE CONTROL COPY LEFT A USER-DATA FOLDER** under Godot's `app_userdata`: "Dawn of Decay GP head", renamed before it
   ran so its `user://` could not reach the player's saves. It can be deleted.
 - **TWO OF THE BRIEF'S PREMISES DID NOT HOLD** (GP §0): *"a hero draws from ~24 cards instead of 8–10"* is wrong on
@@ -1021,7 +1062,7 @@ pre-pass's one unpredicted red, because the prediction had named `check_ed` as t
   keeping is the shape of the mistake** — a finding about one gate's population was written up as a
   finding about the tree's, and the other gate that owns the half was one pre-pass away.
 
-### THE SUBJECT SEAM IN `CLAUDE.md` — **NAMED AT FU §1, OWED A RULING BEFORE THE FILE REACHES 340 KiB**
+### THE SUBJECT SEAM IN `CLAUDE.md` — **NAMED AT FU §1, OWED A RULING BEFORE THE FILE REACHES 340 KiB — AND IT REACHED IT AT GP (FOUND AT GQ, above)**
 
 **Recorded in `CLAUDE.md`'s ceiling block, where the batch at the ceiling will read it; carried here
 because it is a decision nobody has taken.** EE's split-never-prune has no seam left of its kind, and a
@@ -3452,8 +3493,8 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**GN's verification is in `docs/reports/GN.md`, written after the acceptance run.** GN moved game code in three
-files and the glossary, so the twelve kit cards, Elemental Weakness, the spine-taker's first battle and the bot were
-driven live — in scratch probes on isolated copies of HEAD and of the new code, and by `check_gn` in the battery —
-and HEAD's unmodified gates and suites were run against the new code before any instrument moved. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
+**GQ's verification is in `docs/reports/GQ.md`, written after the acceptance run.** GQ moved one screen, so the
+screen was drawn on every deal of every class — in scratch probes and windowed renders on an isolated copy, and by
+`check_gq` in the battery — and HEAD's unmodified gates and suites were run against the new screen before any
+instrument moved. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
 cell written behind the run would owe a post-run proof of its own.

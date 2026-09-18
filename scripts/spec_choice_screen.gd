@@ -10,9 +10,23 @@
 # unmerged layers still read: his opening kit, his stat block, his draft and boss
 # pools and his spec-scoped runes. A spine taken here leaves him none, and he
 # opens with his class kit. `Run.awaken` is the one door; the sim uses it too.
+#
+# **BATCH GQ — EACH CARD SAYS ONLY WHAT DIFFERS.** A card is the rune's name, its
+# engine rule, and — for a rune that carries a lineage — the abilities it opens
+# with that the kit below does not show, by name. What is true of all three is
+# drawn ONCE, below them: the class's basic attack and class kit, at the figures
+# of a hero holding no engine. The spec's archetype line and blurb are gone from
+# the card; `SPEC_INFO` keeps both fields, and the archetype still sets the
+# lineage's Attack through its role.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
+# The card's text window, sized at GQ against every rune's text so that no card
+# scrolls and the kit still fits under the cards on a 720px screen — `check_gq`
+# re-measures both on every battery. A text that outgrows it scrolls in it; the
+# text is never shrunk to fit.
+const CARD_SCROLL_H := 280
+const ROW_W := 1100
 
 
 func _ready() -> void:
@@ -90,15 +104,28 @@ func _draw_screen() -> void:
 	add_child(back)
 
 	var dealt: Array = Run.deal_engines(member)
+	# THE HERO BEFORE HE TAKES ANYTHING: his class basic and class kit, off the
+	# one builder the battle reads, at the class's own Attack. It is what every
+	# card would otherwise repeat, so it is drawn once, below the cards.
+	var base_atk := int(Classes.hero_config(key)["attack"])
+	var shared: Array = Classes.opening_kit(key, "", [])
+	# The cards and the kit stack in one column, so the kit sits under the
+	# cards however tall the card's name renders.
+	var column := VBoxContainer.new()
+	column.position = Vector2(90, 140)
+	column.add_theme_constant_override("separation", 12)
+	add_child(column)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 40)
+	column.add_child(row)
 	for i in dealt.size():
 		var rune_id := String(dealt[i])
 		var rcfg: Dictionary = Runes.config(rune_id)
 		var pid := String(rcfg.get("engine", ""))
 		var lineage := Classes.engine_spec(pid)
 		var panel := PanelContainer.new()
-		panel.position = Vector2(90 + i * 380, 140)
-		panel.custom_minimum_size = Vector2(340, 420)
-		add_child(panel)
+		panel.custom_minimum_size = Vector2(340, 0)
+		row.add_child(panel)
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 10)
 		panel.add_child(vbox)
@@ -109,53 +136,24 @@ func _draw_screen() -> void:
 		name_label.add_theme_color_override("font_color", Color(0.9, 0.82, 0.6))
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		vbox.add_child(name_label)
-		# Archetype: bold name only; the explanation lives in the tooltip. A spine
-		# carries no spec and so no archetype: it names its class instead.
-		var arch: String = String(Classes.SPEC_INFO[lineage].get("archetype", "")) \
-			if lineage != "" else "%s engine" % key.capitalize()
-		var arch_label := Label.new()
-		arch_label.text = arch
-		var bold := FontVariation.new()
-		bold.base_font = ThemeDB.fallback_font
-		bold.variation_embolden = 0.9
-		arch_label.add_theme_font_override("font", bold)
-		arch_label.add_theme_font_size_override("font_size", 16)
-		arch_label.add_theme_color_override("font_color", Color(0.82, 0.75, 0.6))
-		arch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		arch_label.mouse_filter = Control.MOUSE_FILTER_STOP
-		arch_label.tooltip_text = Classes.ARCHETYPE_DESC.get(arch, "")
-		vbox.add_child(arch_label)
-		# Long kits (Beastmaster!) scroll instead of pushing the button off
-		# screen: the text lives in a fixed-height ScrollContainer.
 		var scroll := ScrollContainer.new()
-		scroll.custom_minimum_size = Vector2(316, 320)
+		scroll.custom_minimum_size = Vector2(316, CARD_SCROLL_H)
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		vbox.add_child(scroll)
 		var body := Label.new()
-		var ability_lines := PackedStringArray()
-		var atk := Classes.spec_attack(lineage) if lineage != "" \
-			else int(Classes.hero_config(key)["attack"])
+		var atk := Classes.spec_attack(lineage) if lineage != "" else base_atk
 		# BATCH CL §1 — this screen has an Attack and no hero, so Attack tokens
-		# resolve and health tokens correctly stand as bare percentages.
+		# resolve and health tokens correctly stand as bare percentages. The
+		# rule is the rune's hero's, so it resolves at his lineage's Attack.
 		var vctx := {"attack": atk}
-		# THE KIT THIS RUNE OPENS WITH, off the one builder the battle reads: the
-		# class kit, the lineage's abilities, and the engine's enablers.
-		for ab in Classes.opening_kit(key, lineage, [pid]):
-			var line: String = "• %s" % ab.display_name
-			if ab.damage > 0:
-				# Numbers from the lineage's base Attack (damage is % of Attack).
-				var hit: float = ab.damage * 0.01 * atk
-				line += " — %d–%d %s dmg (%d%% Atk)" % [int(hit * 0.9),
-					int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.damage]
-			ability_lines.append(line)
-			ability_lines.append("   %s" % Classes.resolve_values(
-				ab.description, vctx).replace("\n", " "))
 		# BATCH CL §7 — `passive_desc` is flattened here, where it soft-wraps.
 		var engine_text := Classes.resolve_values(Classes.engine_desc(pid),
 			vctx).replace("\n", " ")
-		var blurb := String(Classes.SPEC_INFO[lineage]["blurb"]) if lineage != "" else ""
-		body.text = "%sEngine: %s\n\n%s" % ["%s\n\n" % blurb if blurb != "" else "",
-			engine_text, "\n".join(ability_lines)]
+		body.text = "Engine: %s" % engine_text
+		var adds := _adds(key, lineage, pid, shared)
+		if adds != "":
+			# PROPOSED WORDS (GQ).
+			body.text += "\n\nAlso opens with: %s" % adds
 		body.add_theme_font_size_override("font_size", 12)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		body.custom_minimum_size = Vector2(298, 0)
@@ -167,6 +165,94 @@ func _draw_screen() -> void:
 		choose.pressed.connect(_choose.bind(idx, rune_id))
 		vbox.add_child(choose)
 	# (choose buttons play the click inside _choose)
+	_draw_kit(column, key, shared, base_atk, dealt)
+
+
+# What a rune opens with that the kit below does not, by name and in the order
+# his bar holds them. A lineage's basic-attack override takes slot 0 IN PLACE
+# of the class basic, and the line says so rather than listing both — the kit
+# below shows the class basic, which that hero no longer holds.
+static func _adds(key: String, lineage: String, pid: String, shared: Array) -> String:
+	var own: Array = Classes.opening_kit(key, lineage, [pid])
+	var shared_names: Array = shared.map(func(a): return a.display_name)
+	var own_names: Array = own.map(func(a): return a.display_name)
+	var parts := PackedStringArray()
+	for j in own.size():
+		var nm: String = own[j].display_name
+		if shared_names.has(nm):
+			continue
+		if j == 0 and not own_names.has(shared_names[0]):
+			nm += " (in place of %s)" % shared_names[0]
+		parts.append(nm)
+	return ", ".join(parts)
+
+
+# One ability as this screen has always printed it: the name, its damage range
+# at `atk` with the scaling, and the description on the line under it.
+static func _ability_text(ab: Ability, atk: int) -> String:
+	var line: String = "• %s" % ab.display_name
+	if ab.damage > 0:
+		# Numbers from the given Attack (damage is % of Attack).
+		var hit: float = ab.damage * 0.01 * atk
+		line += " — %d–%d %s dmg (%d%% Atk)" % [int(hit * 0.9),
+			int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.damage]
+	return "%s\n   %s" % [line, Classes.resolve_values(ab.description,
+		{"attack": atk}).replace("\n", " ")]
+
+
+# THE KIT, ONCE, BELOW THE CARDS — true of all three, so drawn where it is true.
+# Its figures are a hero's with NO engine (the brief's basis). A dealt rune whose
+# lineage sets another Attack moves them, and then the screen says so: the note
+# is DERIVED by printing every kit card that rune's hero still holds at both
+# Attacks, so a rune that moves nothing shown is never named.
+func _draw_kit(column: VBoxContainer, key: String, shared: Array, base_atk: int,
+		dealt: Array) -> void:
+	var head := Label.new()
+	# PROPOSED WORDS (GQ).
+	head.text = "With no engine, the %s opens every fight with these. A rune adds what its card names." % key.capitalize()
+	head.add_theme_font_size_override("font_size", 14)
+	head.add_theme_color_override("font_color", Color(0.82, 0.74, 0.55))
+	head.custom_minimum_size = Vector2(ROW_W, 0)
+	head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(head)
+	var movers := PackedStringArray()
+	for rid in dealt:
+		var pid := String(Runes.config(String(rid)).get("engine", ""))
+		var lineage := Classes.engine_spec(pid)
+		if lineage == "" or Classes.spec_attack(lineage) == base_atk:
+			continue
+		var atk := Classes.spec_attack(lineage)
+		var held: Array = Classes.opening_kit(key, lineage, [pid]).map(
+			func(a): return a.display_name)
+		for ab in shared:
+			if held.has(ab.display_name) and _ability_text(ab, atk) != _ability_text(ab, base_atk):
+				movers.append("the %s sets Attack to %d" % [
+					Runes.display_name(Runes.config(String(rid))), atk])
+				break
+	if not movers.is_empty():
+		var note := Label.new()
+		# PROPOSED WORDS (GQ).
+		note.text = "Figures are for the %s with no engine: %s, and they move with it." % [
+			key.capitalize(), " and ".join(movers)]
+		note.add_theme_font_size_override("font_size", 12)
+		note.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
+		note.custom_minimum_size = Vector2(ROW_W, 0)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		column.add_child(note)
+	var kit_row := HBoxContainer.new()
+	kit_row.add_theme_constant_override("separation", 20)
+	column.add_child(kit_row)
+	var col_w := int((ROW_W - 20.0 * (shared.size() - 1)) / shared.size())
+	for ab in shared:
+		var lbl := Label.new()
+		lbl.text = _ability_text(ab, base_atk)
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl.custom_minimum_size = Vector2(col_w, 0)
+		# Top-aligned: the row is as tall as its longest column, and a short
+		# card centred in it reads as a different row.
+		lbl.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		kit_row.add_child(lbl)
 
 
 func _choose(idx: int, rune_id: String) -> void:

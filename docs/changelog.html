@@ -15,6 +15,62 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-18 &mdash; Batch GQ: THE ENGINE CARDS SAY ONLY WHAT DIFFERS</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-THIRD BATCH ON <code>class-merge</code>.</b> The class-selection
+screen deals a hero three engine runes side by side, and <b>every card repeated the class's basic attack
+and its three class-kit abilities</b>, figures and all &mdash; so a player read the same text three times to
+find what differed. <b>And the repeated figures differed between columns</b>: the Rune of the Warden's card
+priced Strike at the Warden lineage's Attack of 75 (15&ndash;19) and every other Warrior card at 100
+(20&ndash;25), which is accurate and reads as a difference when it is not. <code>main</code> is untouched.
+Full working: <code>docs/reports/GQ.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE SUBTITLE GOES.</b> The line under each rune's name &mdash; the archetype of the
+spec it carries (<i>Tank</i>, <i>Ramp</i>, <i>Healer</i>&hellip;) or, for a rune with no lineage, <i>Warrior
+engine</i> &mdash; is gone, and so is the one-sentence lineage blurb that opened the card's text. <b>Both
+rendered on this screen and on no other</b>, so no screen shows either now. <code>SPEC_INFO</code> keeps
+both fields: the archetype still sets a lineage's base Attack through its role, and nothing else reads
+the blurb.</p>
+
+<p><b>&sect;2 &mdash; EACH CARD IS THE RULE AND WHAT THE RUNE ADDS, AND THE KIT APPEARS ONCE, BELOW ALL
+THREE.</b> The brief took the kit to be the whole of what repeated. <b>That holds for twelve of the
+twenty-four runes</b> &mdash; the three spines and all nine rule engines, whose cards were the kit and
+the rule and nothing else. <b>The other twelve carry a lineage, and each opens with one to five abilities
+no other card offers</b> &mdash; thirty-seven in all, and four of them take the class basic's place: the
+Pyromancer's Fireball, the Cryomancer's Frostbolt and the Arcanist's Arcane Explosion for Magic Bolt, the
+Occultist's Shadowrend for Smite. <b>Asked, the designer ruled that such a card names them</b>, in one line
+under its rule &mdash; <i>"Also opens with: Summon Ursus, Summon Canis, Summon Aguila, Hunter's Instinct,
+Kill Command"</i>, and <i>"Fireball (in place of Magic Bolt)"</i> where a rune's own basic replaces the
+class's. The words are proposed.</p>
+<ul>
+<li><b>Below the cards, once:</b> the class basic and the class kit, each with its damage range at the
+class's own Attack &mdash; the hero before he takes anything, the brief's basis &mdash; under a line
+reading <i>"With no engine, the Warrior opens every fight with these. A rune adds what its card
+names."</i> The class passive stays where it stood, above the cards.</li>
+<li><b>Where a figure there would move, the screen says so.</b> A dealt rune whose lineage sets another
+Attack AND whose hero still holds a kit card that Attack prices differently is named in a line under the
+kit: <i>"Figures are for the Warrior with no engine: the Rune of the Warden sets Attack to 75, and they
+move with it."</i> The rule is derived, not listed, and it names only the Warden: the Rune of the
+Occultist sets a Cleric's Attack to 100 and moves nothing shown, because its Shadowrend takes the place
+of Smite, the one kit card with a figure.</li>
+<li><b>No card scrolls any more.</b> The card's text window is 280 pixels, the tallest text any rune
+shows is the Rune of the Beastmaster's at 277, and the lowest line on any screen ends at 691 of 720.
+Before, 22 of the 24 cards scrolled, the Beastmaster's by 877 pixels. The text was not shrunk.</li>
+</ul>
+<p><b>No engine, kit card, magnitude or rule changed</b>, and no other screen was touched.
+<code>docs/text-standard.html</code>'s table of what each surface shows and resolves against is corrected
+for this screen, and so is a paragraph there still describing a wrapping defect on it that CL §7 fixed.</p>
+
+<p><b>&sect;3 &mdash; NEW GATE <code>check_gq</code>, 5,112 checks, AND IT DRAWS EVERY DEAL.</b> A class has
+twenty deals of three from six, and the gate draws all eighty on the real screen: each card must be its
+rune's name and one body reading its rule and exactly what it adds, derived off the kit builder a fight
+reads; the kit must stand once below the cards at the no-engine figures, the same on every deal of a
+class; the note must stand on exactly the deals that move a figure; everything must fit the screen.
+<b>Every negative anchor has its positive arm beside it</b>, and nine controls were armed against it
+before it was trusted &mdash; HEAD's screen reads 962 failures, and the archetype line put back, a kit
+card put back on the cards, the kit priced at the wrong Attack, the note keyed on Attack alone, the note
+removed, the <i>in place of</i> clause removed, a taller window, a pronoun and an internal engine name in
+the new words each turn it red where they should.</p>
+
 <h2>2026-09-17 &mdash; Batch GP: THE POOLS MERGE</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-SECOND BATCH ON <code>class-merge</code>.</b> This is the thing
 the whole merge was for. <b>The three spec pools and the class-wide pool of a class are one pool</b>,

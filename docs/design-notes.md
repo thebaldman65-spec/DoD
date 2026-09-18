@@ -4,6 +4,43 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The engine cards say only what differs (Batch GQ) — 2026-09-18
+
+**Why the kit moved rather than shrank.** Every card repeated the class basic and the three class-kit
+abilities, because the kit is guaranteed whatever rune is taken. A thing true of all three choices is not
+information about any one of them, and printing it three times makes the player do the diffing. It belongs
+where it is true — once, below the cards — and the cards keep only what a choice changes.
+
+**Why the kit's figures are a hero's holding no engine.** One listing has to pick one Attack, and the
+repeated figures had been the misleading part: the Warden's card priced Strike at 75 Attack and the others
+at 100, which was accurate and read as a difference between the runes when it was a difference between
+stat blocks. The hero before he takes anything is the only basis that belongs to no card. Where a dealt rune
+would move a figure the kit shows, a line says so — and the line is derived rather than listed, because
+"this rune changes Attack" is not the same claim as "this rune changes a number on this screen": the
+Occultist raises a Cleric's Attack and changes nothing shown, since his Shadowrend replaces the only kit
+card that has a figure.
+
+**Why a lineage rune's card names what it adds.** The brief took the kit to be the whole of what repeated,
+and for the twelve runes with no lineage it was. The twelve that carry one each open with one to five
+abilities no other card offers — the Pack Bond summons, the Pyromancer's Fireball in place of Magic Bolt —
+and removing those with the kit would have removed exactly the difference the screen exists to show. The
+designer ruled that the card names them, by name only. Named, every difference is on the screen once and
+nothing repeats; written out in full, five abilities were most of why the Beastmaster's card scrolled 877
+pixels. Where a rune's own basic takes the class basic's place, the card says so, because the kit below
+shows the class basic that hero will not hold.
+
+**Why the subtitle and the blurb went and the data did not.** A one-word role label adds nothing a player
+can use at this choice, and "Warrior engine" on a Warrior's engine card says nothing at all. Neither
+rendered anywhere else, so both are gone from the game's screens. The fields stay: the archetype sets a
+lineage's Attack through its role, and a field that a stat reads is not a display string to delete with
+its label.
+
+**Why the card's window is fixed rather than fitted.** At 280 pixels no rune's text scrolls and the kit still
+fits the screen, and every screen puts the kit and the buttons in the same place. A card fitted to its own
+text would make three short rules look finished and three long ones look cramped, and would move the buttons
+from deal to deal. The text is never shrunk to fit; a text that outgrows the window scrolls in it, and the
+gate prints which.
+
 ## One pool a class, and the gate that keeps it playable (Batch GP) — 2026-09-17
 
 **Why the shelves survived the merge.** The three lineage lists and the class-wide list are one pool

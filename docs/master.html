@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-17 (Batch GP &mdash; the pools merge)</b></p>
+<p align="right"><b>Last updated: 2026-09-18 (Batch GQ &mdash; the engine cards say only what differs)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -109,10 +109,14 @@ rung-2 enemy is exactly as durable as a rung-1 one and only its ATTACK doubles. 
 therefore the same length — <b>rounds to resolution 7.8 against 7.4 on the same loadout</b> — and
 ask the same questions.</li>
 <li><b>Class selection:</b> before the first battle, each hero is dealt three of his class's
-engine runes and takes one (§6.0). Each card shows the rune, the <b>archetype</b> of the spec it
-carries in bold (mouseover for the archetype explanation) or its class for an engine that carries no spec, the
-blurb, the engine's text, and every ability the rune opens with and its damage. The rune can be
-dropped or swapped later; the spec it carried is the hero's lineage for the whole run.</li>
+engine runes and takes one (§6.0). <b>Each card shows only what differs between the three</b>: the
+rune's name, its engine's text, and &mdash; for a rune that carries a lineage &mdash; the abilities it
+opens with beyond the class kit, by name, with the class basic its own basic attack takes the place of.
+What is true of all three is shown <b>once, below the cards</b>: the class's basic attack and class
+kit (&sect;5.2), each with its damage at the class's own Attack, which is a hero's holding no engine.
+A dealt rune whose lineage sets another Attack and so moves one of those figures is named in a line
+under them &mdash; the Rune of the Warden, on a Warrior's screen. The rune can be dropped or swapped
+later; the spec it carried is the hero's lineage for the whole run.</li>
 <li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
 every hero 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
 Chalice of Dawn relic stacks its 10% on top for 25%). <b>No victory in a run pays a talent
@@ -1146,8 +1150,8 @@ does.</li>
 support class: he attacks with Smite and drafts damage if he wants it.</p>
 
 <h2>6. Archetypes &amp; Specializations</h2>
-<p>Archetypes are the design north star for every spec's kit. They appear in bold on the class-selection
-screen with a mouseover explanation.</p>
+<p>Archetypes are the design north star for every spec's kit. <b>No screen shows them</b>: an
+archetype's role sets the base Attack of the lineage that carries it (below).</p>
 <table border="1" cellpadding="4">
 <tr><th>Role</th><th>Archetype</th><th>Definition</th></tr>
 <tr><td rowspan="6">Damage (100 Atk)</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
@@ -3154,8 +3158,9 @@ three tiers of nine, READ-ONLY, with every node the hero wears lit and each node
 tooltip. Talents are bought between runs on the build screen. Owed ability, upgrade and rune
 picks are resolved on the map card, not here.</li>
 <li><b>Class selection screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
-along on every engine the class can take), the three engine runes dealt, and each ability the rune
-opens with and its damage with its "% Atk" scaling.
+along on every engine the class can take); the three engine runes dealt, each card its rune's name,
+its engine's text and &mdash; for a lineage &mdash; the abilities it adds, by name; and once, below the
+cards, the class basic and class kit with their damage and "% Atk" scaling at the class's own Attack.
 The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of

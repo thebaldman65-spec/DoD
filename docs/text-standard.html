@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-23 (Batch DM &mdash; &sect;4.9)</b></p>
+<p align="right"><b>Last updated: 2026-09-18 (Batch GQ &mdash; &sect;1.2 and &sect;4.7)</b></p>
 <h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
 <p><i>The rules every player-facing string is written to. Binding on every batch from CJ
 forward, including any tuning that comes out of playtesting. This document says how text is
@@ -76,9 +76,11 @@ block (CK §1): scaling, BD, hits, cost, cooldown, initiative, <b>Perfect</b></t
 by design</td><td><b>NOTHING</b></td></tr>
 <tr><td>Blacksmith commission (<code>blacksmith_screen.gd</code>)</td>
 <td><code>Run.upgrade_desc</code> + <code>description</code></td><td><b>NOTHING</b></td></tr>
-<tr><td>Spec choice (<code>spec_choice_screen.gd</code>)</td><td>blurb +
-<code>passive_desc</code> + each <code>description</code></td><td>the spec's base
-<b>Attack</b> only — nothing is specced yet, so there is no maximum health that stays true
+<tr><td>Spec choice (<code>spec_choice_screen.gd</code>)</td><td>on each card, the engine's
+<code>passive_desc</code> and the NAMES of what a lineage rune adds; once, below the cards, the
+class basic's and class kit's <code>description</code></td><td><b>Attack</b> only — the card's
+rule at the base Attack of the lineage the rune carries, the kit below at the class's own, which is
+a hero's holding no engine. Nothing is chosen yet, so there is no maximum health that stays true
 after the choice</td></tr>
 <tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>description</code> + the same
 computed block; <code>passive_desc</code> in its own block</td><td>the post-prologue
@@ -233,10 +235,8 @@ that soft-wrap</b> — the hero sheet's label and the spec-choice column — whi
 tooltip.</b> Removing them is a code batch (a custom tooltip), not a text batch. Until then
 the hand-wrap is what keeps the tooltip readable, and it is held to the ceiling below.</li>
 </ul>
-<p>One inconsistency to fix on the way past: <code>spec_choice_screen.gd</code> flattens
-<code>\n</code> to a space for ability descriptions and <b>does not do the same for
-<code>passive_desc</code> two expressions later</b>, so the passive block hard-wraps inside a
-298px column on that screen.</p>
+<p>Both of that screen's labels soft-wrap, and it flattens <code>\n</code> to a space in the
+<code>passive_desc</code> on each card and in every <code>description</code> below them.</p>
 
 <h3>4.8 The length ceiling — 44 characters, and it was measured</h3>
 <p><b>An authored line may not exceed 44 characters.</b></p>
