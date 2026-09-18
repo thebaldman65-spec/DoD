@@ -2145,6 +2145,11 @@ func note_momentum_turn() -> bool:
 # is not a floor written into the health ledger.
 func note_blow_met() -> void:
 	momentum_met += 1
+	# BATCH GO — OPENING READS THE SAME DOOR: "no enemy has struck him" is "no
+	# blow has reached him", so a blocked, parried or absorbed blow ends a quiet
+	# span and a miss does not. Its own flag, because Momentum clears its
+	# accumulators at the turn start and the two must not read each other's zero.
+	opening_struck = true
 
 
 # Momentum's payout, as a MULTIPLIER ON THE DELAY a scheduled turn costs — the
@@ -2186,11 +2191,94 @@ func sanctity_turn_bonus() -> int:
 		return 0
 	return sanctity_steps() * SANCTITY_STEP_TURNS
 
+
+# ══ BATCH GO — THE NINE RULE ENGINES: WHAT A UNIT CARRIES FOR THEM ═══════════
+#
+# **NONE OF THE NINE TAKES `second_resource`** — that field is already three
+# currencies (FT), and a hero may hold two engines. **FOUR STORE A NUMBER, AND
+# EACH HAS A FIELD OF ITS OWN HERE**: the Reaver's kills, the Bastion's bank, the
+# Weaver's cast count and the Skirmisher's quiet-turn count (with its armed flag).
+# The Oathkeeper stores a REFERENCE (who is bound); the Arbiter's and the
+# Tracker's state is a status on the enemy; the Leech and the Medic store
+# nothing. Every one is battle-scoped: a unit is built afresh for every fight, so
+# each opens at nothing, which is GH's rule for every meter.
+#
+# **THE NUMBERS ARE `Classes`'s** (`REAVER_KILL_PCT` and its neighbours), read
+# here and in `battle.gd`, so the rule text a player reads is built off the same
+# constants the arithmetic uses.
+var reaver_kills := 0        # Savage Assault: enemies his own damage felled this battle
+var redoubt_bank := 0.0      # Redoubt: damage kept off him, waiting for his basic attack (fractional cuts add up)
+var echo_casts := 0          # Echo: casts made this battle; every Nth echoes
+var opening_armed := false   # Opening: the next attack is the enormous one
+var opening_quiet := 0       # Opening: his turns begun with no blow reaching him since
+var opening_struck := false  # Opening: a blow reached him since his last turn began
+var siphon_returned := 0     # Siphon: Mana his damage has returned this battle (display only)
+# Covenant: the hero this unit shares damage and healing with, on BOTH ends of the
+# bond, and the guard that stops a shared half being shared again (One Soul's shape).
+var covenant_with: BattleUnit = null
+var _covenant_guard := false
+# The two halves are billed battle-side, because a unit cannot see the party
+# (the `vow_cb` shape). Each returns what it actually moved.
+var covenant_cb := Callable()
+var covenant_heal_cb := Callable()
+# Every death in the game passes `_die()`, including the ticks that skip
+# `battle._on_enemy_death` — so a kill, a mark to move and a bond to pass all
+# hang off this one callback.
+var died_cb := Callable()
+
+
+# SAVAGE ASSAULT's payout, read at the ONE general damage multiplier beside
+# Channel's. Uncapped by the designer's ruling.
+func reaver_bonus() -> float:
+	if not has_engine("savage_assault"):
+		return 0.0
+	return 0.01 * Classes.REAVER_KILL_PCT * reaver_kills
+
+
+func covenant_partner() -> BattleUnit:
+	if covenant_with == null or not is_instance_valid(covenant_with) or covenant_with.dead:
+		return null
+	return covenant_with
+
+
+# The live line a rule engine's chip carries under its rule text. Empty for the
+# engines whose state is not the holder's to show.
+func _rule_engine_live(pid: String) -> Array:
+	match pid:
+		"savage_assault":
+			return ["+%d%%" % (Classes.REAVER_KILL_PCT * reaver_kills),
+				"Now +%d%% from %d kill%s." % [Classes.REAVER_KILL_PCT * reaver_kills,
+					reaver_kills, "" if reaver_kills == 1 else "s"]]
+		"redoubt":
+			return ["Bank %d" % int(round(redoubt_bank)),
+				"Banked now: %d." % int(round(redoubt_bank))]
+		"cast_echo":
+			var into := echo_casts % Classes.ECHO_EVERY
+			return ["%d/%d" % [into, Classes.ECHO_EVERY],
+				"Casts toward the next repeat: %d of %d." % [into, Classes.ECHO_EVERY]]
+		"siphon":
+			return ["+%d" % siphon_returned,
+				"Mana returned this battle: %d." % siphon_returned]
+		"covenant_oath":
+			var p := covenant_partner()
+			return ["bound" if p != null else "unbound",
+				("Bound to the %s." % p.unit_name) if p != null else "Bound to nobody."]
+		"opening_strike":
+			return ["READY" if opening_armed else "%d/%d" % [
+				opening_quiet, Classes.OPENING_QUIET_TURNS],
+				"The bonus is ready." if opening_armed else \
+				"Quiet turns toward the bonus: %d of %d." % [
+					opening_quiet, Classes.OPENING_QUIET_TURNS]]
+	return []
+
+
 func setup(config: Dictionary) -> void:
 	for key in config:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
 	_sync_engine_switches()
+	# BATCH GO — the Skirmisher opens every fight with the enormous attack armed.
+	opening_armed = has_engine("opening_strike")
 	# Weaknesses: listed damage types hit this unit 25% harder.
 	for weak_type in config.get("weak", []):
 		resists[weak_type] = float(resists.get(weak_type, 0.0)) - WEAKNESS_EXTRA
@@ -2682,6 +2770,21 @@ func refresh_bars() -> void:
 					second_resource, "" if second_resource == 1 else "s",
 					int(round(dmg_pct)), int(round(taken_pct)),
 					int(round(crit_pct))]
+				_refresh_chips()
+				break
+	# BATCH GO — A RULE ENGINE'S CHIP CARRIES ITS OWN STATE, the four arms above
+	# being the pattern. The rule text is `Classes.engine_desc`'s, never restated
+	# here, and the live line sits under it.
+	for re_pid in engines:
+		if not Classes.is_rule_engine(String(re_pid)):
+			continue
+		var re_live: Array = _rule_engine_live(String(re_pid))
+		if re_live.is_empty():
+			continue
+		for s in statuses:
+			if s.id == engine_chip_id(String(re_pid)):
+				s.short = String(re_live[0])
+				s.desc = "%s\n%s" % [Classes.engine_desc(String(re_pid)), String(re_live[1])]
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
@@ -3346,6 +3449,42 @@ func _credit_bd(cut: int, term: String, src: String) -> void:
 		credit_cb.call(src, cut, term, self)
 
 
+# BATCH GO — COVENANT'S SPLIT, AT BOTH DAMAGE DOORS. Half of what reaches this
+# body is handed to the body it is bound to; the battle bills it and returns what
+# landed, and only that is taken off here. A body whose guard is up is RECEIVING a
+# half and never splits it again.
+func _covenant_split(amount: int) -> int:
+	if amount <= 1 or _covenant_guard or covenant_partner() == null \
+			or not covenant_cb.is_valid():
+		return amount
+	var half := int(amount * Classes.COVENANT_SHARE)
+	if half <= 0:
+		return amount
+	var moved: int = int(covenant_cb.call(self, half))
+	if moved > 0:
+		float_text("Oath -%d" % moved, Color(0.95, 0.82, 0.55))
+	return amount - moved
+
+
+# BATCH GO — SIPHON. Damage the Mage takes costs Mana first, at
+# `SIPHON_MANA_PER_POINT` a point, and whatever the Mana cannot cover REACHES
+# HEALTH — nothing is refused. At zero Mana the whole blow lands. **IT IS NOT MANA
+# SPENT**: Conversion, the shape it copies, books nothing to the spend ledger, so
+# Channel does not build off a blow the Mage paid for.
+func _siphon_pay(amount: int) -> int:
+	if amount <= 0 or not has_engine("siphon") or resource_name != "Mana" or resource <= 0:
+		return amount
+	var rate: int = maxi(Classes.SIPHON_MANA_PER_POINT, 1)
+	var covered: int = mini(amount, resource / rate)
+	if covered <= 0:
+		return amount
+	resource -= covered * rate
+	float_text("-%d Mana" % (covered * rate), Color(0.5, 0.7, 1.0))
+	_proc_log("Rune of the Leech — %s pays %d of the damage in Mana" % [unit_name, covered])
+	refresh_bars()
+	return amount - covered
+
+
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
@@ -3456,6 +3595,13 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		if share > 0:
 			amount -= share
 			float_text("Vow -%d" % share, Color(0.98, 0.85, 0.45))
+	# BATCH GO — COVENANT. The bound pair splits what GETS THROUGH, beside the Vow
+	# and for the Vow's reason: a barrier is this body's own and eats first. The
+	# half is billed battle-side and only what landed there is taken off here — a
+	# relocation that never landed must not also vanish. `_covenant_guard` is set
+	# on the RECEIVER, so a shared half is never shared back (One Soul's rule).
+	# Break stays on the struck body, as Unity's does.
+	amount = _covenant_split(amount)
 	# BATCH BM §2 — LAST RITES (Berserker, Fury row 8). Below a quarter health
 	# the Rage the lane spends seven rows filling starts paying for the damage
 	# the lane spends seven rows inviting: 1 Rage a point, and health is only
@@ -3472,6 +3618,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			float_text("-%d Rage" % paid, Color(0.9, 0.35, 0.3))
 			_proc_log("Talent: Pay a Lethal Hit out of Your Resource Pool — %s pays %d of the wound in Rage" % [
 				unit_name, paid])
+	# BATCH GO — SIPHON: the Mage's damage is paid from his Mana first. Beside
+	# Conversion because it is Conversion's shape at every point of the hit.
+	amount = _siphon_pay(amount)
 	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
 	# ADDITIVE — the counter is percentage POINTS of the hit (Batch AT).
 	if conversion_ranks > 0 and resource_name == "Mana" and amount > 0:
@@ -3899,6 +4048,12 @@ func set_ruin_stacks(n: int) -> void:
 
 
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
+	# BATCH GO — COVENANT AND SIPHON READ "DAMAGE TAKEN", AND A TICK IS DAMAGE
+	# TAKEN. Both run here too, in `take_hit`'s order. The half a bond hands the
+	# other body arrives through THIS function with the receiver's guard up, so it
+	# is paid in Mana by a Leech but never split again.
+	amount = _covenant_split(amount)
+	amount = _siphon_pay(amount)
 	var tick_was_above := hp > max_hp * mercy_threshold
 	var tick_hp_before := hp
 	hp = maxi(hp - amount, 0)
@@ -3944,6 +4099,12 @@ func _die() -> void:
 	if not burn_stat.is_empty():
 		burn_at_death = maxi(int(burn_stat.get("turns", 0)), 0)
 		burn_tick_at_death = maxi(int(burn_stat.get("tick", 0)), 0)
+	# BATCH GO — THE ONE PLACE EVERY DEATH PASSES. The battle decides what a death
+	# means to the rule engines: a kill for the Reaver, a mark that moves, a bond
+	# that passes. Called once `dead` is set and BEFORE the statuses are cleared,
+	# because a mark that moves is read off the body it is leaving.
+	if died_cb.is_valid():
+		died_cb.call(self)
 	statuses.clear()
 	_refresh_chips()
 	if _plate_root != null:
@@ -4059,6 +4220,16 @@ func heal_amount(amount: int, external := false) -> int:
 		if amount > 0:
 			float_text("MARTYR", Color(0.95, 0.8, 0.3))
 		return 0
+	# BATCH GO — COVENANT'S HEALING HALF. Below the absolute refusals, so a heal
+	# this body cannot take is not passed on; above the multipliers, so each body
+	# takes its half through its OWN pipeline — the other's refusals, multipliers
+	# and clamp included. What the other body refused comes back to this one (the
+	# Vow's rule, pointed at a heal).
+	if amount > 1 and not _covenant_guard and covenant_partner() != null \
+			and covenant_heal_cb.is_valid():
+		var heal_half := int(amount * Classes.COVENANT_SHARE)
+		if heal_half > 0:
+			amount -= int(covenant_heal_cb.call(self, heal_half))
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
 		mult *= 1.30

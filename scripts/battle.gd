@@ -520,6 +520,17 @@ const STATUS_INFO := {
 	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
 	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
 	"threshold_lock": ["Threshold", "Th", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
+	# ---- BATCH GO: the three statuses the nine rule engines lay ----
+	# TWO SIT ON AN ENEMY AND ARE THE HEROES' WORK, SO BOTH ARE IN `DISPEL_NEVER`
+	# AND NEITHER IS IN `DEBUFF_IDS` — a mark is not an affliction (GM §3's rule).
+	# ONE SITS ON A HERO and is the bond's display: the bond itself is the pair of
+	# references on the two units, so a chip that was taken off would take nothing.
+	# THE TEXTS CARRY NO NUMBER HERE: `_lay_engine_mark` and `_covenant_bind`
+	# restamp each chip off `Classes`'s constants as it lands, so the number a
+	# player reads is the one the arithmetic uses (CL §1).
+	"tracked": ["Tracked", "Tr", Color(0.70, 0.85, 0.40), "Tracked: every ally deals more damage\nto this enemy. When it falls, the\ntracking passes to another."],
+	"judged": ["Judged", "Jd", Color(0.95, 0.85, 0.55), "Judged: damage any ally deals to this\nenemy heals every ally. When it falls,\nanother enemy is judged in its place."],
+	"oathbound": ["Oathbound", "Ob", Color(0.95, 0.82, 0.55), "Bound to a Cleric: damage and healing\neither one takes are split between the\ntwo."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -632,6 +643,20 @@ var _penance_mirroring := false
 # terminate), but it is an unbounded chain from one cast, and one flag is
 # cheaper than reasoning about how long it runs.
 var _vigil_forking := false
+# ── BATCH GO — THE RULE ENGINES' BATTLE-SIDE STATE ──────────────────────────
+# The Weaver's armed cast: {caster, label, tally} while a third cast resolves,
+# {} otherwise. `_resolve` saves and restores it around the cast.
+var _echo_state: Dictionary = {}
+# The body the strike loop names while its mitigation terms run, if it holds
+# Redoubt — the one thing `_prev` needs to bank into it. Set and cleared in the
+# strike loop, nowhere else.
+var _redoubt_victim: BattleUnit = null
+# Re-entry locks, Downwind's shape: the Medic's mend and the Arbiter's heal each
+# run inside a door they could otherwise re-enter.
+var _field_kit_mending := false
+var _judging := false
+# The two rule engines that lay a mark on an enemy, and the status each lays.
+const ENGINE_MARKS := {"quarry_hunt": "tracked", "judgment": "judged"}
 var _clock := 0.0  # the acting unit's position on the timeline, this turn
 # HOW MANY UNIT TURNS THIS BATTLE HAS SPENT. It drives the stalemate guard and
 # the forfeit nudge, and since Batch BB it is also the clock a once-per-turn
@@ -1618,6 +1643,14 @@ func _spawn_units() -> void:
 				or h.rune_answering_pack > 0:
 			h.brunt_cb = _on_brunt_guard
 			h.answering_pack_spent = false
+	# BATCH GO — COVENANT'S TWO HOOKS, stamped on EVERY hero while any hero holds
+	# the engine, for the reason every hook above is party-wide: the split runs on
+	# whoever is hit or healed. The bond itself is laid when the fight opens
+	# (`_open_rule_engines`), once every fallen hero is already down.
+	if heroes.any(func(h): return h.has_engine("covenant_oath")):
+		for h in heroes:
+			h.covenant_cb = _on_covenant_share
+			h.covenant_heal_cb = _on_covenant_heal
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -1953,6 +1986,10 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	# reason: this is the ONE place every spawned unit passes through, and a
 	# barrier can sit on any of them.
 	u.barrier_broken_cb = _on_barrier_broken
+	# BATCH GO — THE DEATH DOOR, stamped here for the same reason as the three
+	# above. `_die()` is the one way down for every unit, a tick's kill included,
+	# which `_on_enemy_death` never sees.
+	u.died_cb = _on_unit_died
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -2631,6 +2668,10 @@ func _run_battle() -> void:
 	# runs before the opening oath below, which grants Faith. Its own function
 	# for the same standing reason.
 	_reset_faith_meters()
+	# BATCH GO — THE RULE ENGINES THAT NEED THE WHOLE FIELD BEFORE THEY CAN START:
+	# the Oathkeeper's bond. Its own function for the AR trap's reason
+	# (`_run_battle` cannot be driven headlessly), so a gate can open it.
+	_open_rule_engines()
 	# BATCH BH §2 — the Rune of the Binding Oath's re-pointed clause: the Devout
 	# opens the battle with the oath already sworn. Its own function for the
 	# standing reason (`_run_battle` cannot be driven headlessly — the AR trap),
@@ -2741,6 +2782,10 @@ func _run_battle() -> void:
 		# (FV §1) — which is what makes a Berserker and a Warden build it
 		# identically.
 		u.note_momentum_turn()
+		# BATCH GO — THE SAME MOMENT CLOSES THE SKIRMISHER'S QUIET SPAN AND TRUES
+		# UP THE OATHKEEPER'S BOND, for Momentum's reason: the span is "since this
+		# unit's last turn", so it ends when the unit is chosen to act.
+		_rule_engine_turn(u)
 		if sim:
 			if u.is_hero and not u.is_companion:
 				_cy_turns += 1
@@ -4319,6 +4364,14 @@ func _player_turn(u: BattleUnit) -> void:
 # playing these abilities well; authoring that is each ability's own tuning
 # pass, in play, per the batch's testing scope.
 func _autoplay_pick(u: BattleUnit) -> Array:
+	# BATCH GO — THE BASTION'S ONE DECISION IS WHEN TO SPEND A TURN ON THE BASIC,
+	# and no rotation below ever makes it: each prefers a card and falls back to
+	# the basic only when nothing else is worth casting. So a bank at least as
+	# large as the basic's own blow is spent before any rotation is asked — BO §5's
+	# rule that a sim must measure a hero who plays what he holds.
+	var rd_pick := _bot_redoubt_pick(u)
+	if not rd_pick.is_empty():
+		return rd_pick
 	var pick := _autoplay_pick_kit(u)
 	if pick.is_empty() or pick[0] != u.abilities[0]:
 		return pick
@@ -7907,7 +7960,12 @@ const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
 	# purpose: that list also feeds a Survivalist's breadth count and a
 	# mender's Cleansing Rite, so moving it there would move two magnitudes,
 	# and this list moves only what Dispel may take.
-	"party_mark", "arcane_echo", "rime"]
+	"party_mark", "arcane_echo", "rime",
+	# BATCH GO — the two marks the rule engines lay on an enemy (the Tracker's and
+	# the Arbiter's) are the heroes' work, so Dispel may not take them. The bond's
+	# `oathbound` chip is NOT here: it sits on a HERO, and Dispel reads this list
+	# on an enemy only — CH's convention, a hero-side status in neither list.
+	"tracked", "judged"]
 
 
 func _dispellable_buffs(u: BattleUnit) -> Array:
@@ -8290,6 +8348,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if attacker.rune_overtone > 0 \
 				and attacker.second_resource_name == "Resonance":
 			attacker.overtone_casts += 1
+	# BATCH GO — ECHO COUNTS ITS CASTS HERE, AT THE LINE EVERY CAST PASSES, and on
+	# the same definition of a cast the two riders above read (`not is_counter`):
+	# a free copy, a riposte and a retaliation are not casts. A cast that deals
+	# nothing still counts toward the third — "every third cast" — and echoes
+	# nothing when its turn comes. **THE ECHO IS ARMED HERE AND FIRED AT THE END
+	# OF THIS CALL**; while it is armed the damage door tallies what this cast
+	# deals, enemy by enemy (`_rule_engines_on_damage`). The state is saved and
+	# restored around the cast, so a nested resolve can never inherit it.
+	var echo_now := false
+	var echo_saved: Dictionary = _echo_state
+	if not is_counter and attacker.is_hero and not attacker.is_companion \
+			and attacker.has_engine("cast_echo"):
+		attacker.echo_casts += 1
+		echo_now = attacker.echo_casts % Classes.ECHO_EVERY == 0
+		attacker.refresh_bars()
+		if echo_now:
+			_echo_state = {"caster": attacker, "label": ab.display_name, "tally": {}}
 	if was_free_ability:
 		attacker.free_ability -= 1
 		_log("   → Twin Hunt: the companion's kill pays for this one (%d left)" % \
@@ -8576,6 +8651,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Exhortation: %s's attack lands %d%% harder (spent)" % [
 				attacker.unit_name, attacker.status_power("exhorted")], "#e8c860")
 			_stamp_exhort_chip(attacker, 0)
+		# BATCH GO — OPENING, ON EXHORTATION'S MODEL ONE BLOCK UP: "his first
+		# attack" is the CAST, so a volley's three arrows are one opening, and it is
+		# spent the moment the cast commits past the miss roll — a single-target
+		# attack that missed never reaches this line and keeps it armed. A counter
+		# never spends it. A handler that computes its own damage (`ab.damage == 0`)
+		# does not reach it either; that coverage is Exposed's and Exhortation's,
+		# and `docs/reports/GO.md` names it.
+		var opening_mult := 1.0
+		if attacker.opening_armed and attacker.has_engine("opening_strike") \
+				and ab.damage > 0 and not is_counter:
+			opening_mult = 1.0 + 0.01 * Classes.OPENING_BONUS_PCT
+			attacker.opening_armed = false
+			attacker.opening_quiet = 0
+			attacker.opening_struck = false
+			attacker.refresh_bars()
+			attacker.float_text("SKIRMISHER", Color(0.75, 0.95, 0.55))
+			_log("   → Rune of the Skirmisher: %s's first attack lands %d%% harder (spent)" % [
+				attacker.unit_name, Classes.OPENING_BONUS_PCT], "#b8e070")
 		# **BATCH FK — THE BOUND IS LIVE NOW, AND THE RUNE OF THE BUTCHER'S BILL
 		# IS THE ONLY THING THAT MOVES IT MID-CAST.** `for hit_i in total_hits`
 		# evaluates the range ONCE, so a strike added from inside the body — the
@@ -8790,6 +8883,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							pv_owner = strike_target.unit_name
 						_prev(pv_owner, ab.damage * 0.01 * attacker.attack
 							* (1.0 - strike_target.effective_armor()))
+						# BATCH GO — A BLOCK KEEPS THE WHOLE BLOW OFF A BASTION, so it
+						# banks the nominal blow BEFORE his armor (the armor's share is
+						# kept off him too). Batch W's idiom otherwise: variance, crits
+						# and riders cannot be known for a blow that was never rolled.
+						if strike_target.has_engine("redoubt"):
+							strike_target.redoubt_bank += ab.damage * 0.01 * attacker.attack
+							strike_target.refresh_bars()
 					_sfx("parry", -4.0, 0.6)
 					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
@@ -9307,6 +9407,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			any_crit = any_crit or is_crit
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
+			# From this line to the armor read below, every mitigation site that
+			# already books its delta through `_prev` banks it here as well —
+			# whoever the ledger credits, because the Bastion's bank is about his
+			# body, not about whose card it was. The parry cut is the first such
+			# site; the block, a barrier, armor and resistance are banked at their
+			# own lines. Cleared again below, so no later `_prev` can reach it.
+			_redoubt_victim = strike_target \
+				if strike_target.is_hero and strike_target.has_engine("redoubt") else null
 			if parried:
 				var pv_was := raw
 				raw *= 0.0 if wall_parry else 0.25
@@ -9708,6 +9817,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# than three — which is what the card says and what a per-strike
 			# consumption would quietly make false.
 			raw *= exhort_mult
+			# BATCH GO — the Skirmisher's opening, read and spent above the loop
+			# for Exhortation's reason.
+			raw *= opening_mult
 			# Overburn: the Pyromancer feeds on every TURN of fire still
 			# standing on the enemy team, capped at +40% (see _overburn_mult).
 			raw *= _overburn_mult(attacker, inferno_turns)
@@ -10040,6 +10152,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# made "every beast reads it" look covered while it was not.
 			if attacker.is_hero:
 				raw *= _party_mark_mult(strike_target)
+				# BATCH GO — QUARRY, beside the Hunter's Mark and for its reason: an
+				# ownerless read of the mark on the target, called from
+				# `_companion_hit` too, so a beast's blow is paid as a hero's is.
+				raw *= _quarry_mult(strike_target)
 			# BATCH FT — CHANNEL'S PAYOUT SITS IN THIS SUM AND NOWHERE ELSE.
 			# `dmg_bonus` is the ONE general damage multiplier in the game and
 			# this is its one read site, so a class core paying "spell damage"
@@ -10048,7 +10164,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# all of them and nothing sets it) and takes `ab.dmg_type` only so
 			# the *not physical* ruling has somewhere to live — the BUILD half
 			# in `note_resource_spent` still cannot see the ability at all.
+			# BATCH GO — SAVAGE ASSAULT'S PAYOUT JOINS THE SAME SUM, for Channel's
+			# reason: "a percentage of damage dealt" has one honest place to land.
+			# It is ADDED to the other terms, so it compounds with none of them.
 			raw *= 1.0 + attacker.dmg_bonus + attacker.channel_bonus(ab.dmg_type) \
+				+ attacker.reaver_bonus() \
 				+ float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
 			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
@@ -10621,8 +10741,31 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Aegis Reversal: the unspent shield lands as %d bonus damage" % \
 					attacker.aegis_bonus, "#e0c060")
 				attacker.aegis_bonus = 0
+			# BATCH GO — REDOUBT'S BANK IS SPENT HERE, ON AEGIS REVERSAL'S MODEL ONE
+			# BLOCK UP AND FOR ITS REASON: what was banked is damage that did not
+			# land, so it lands whole rather than through the target's armor, and it
+			# is consumed on the first strike. Only the BASIC ATTACK spends it (slot
+			# 0, the skill check's own definition), never a counter, never a blow an
+			# absolute parry zeroed — and a miss never reaches this line, so it keeps
+			# the bank.
+			if attacker.is_hero and attacker.has_engine("redoubt") and not is_counter \
+					and not wall_parry and ab == attacker.abilities[0] \
+					and attacker.redoubt_bank >= 1.0:
+				var rd_spent := int(round(attacker.redoubt_bank))
+				final += rd_spent
+				attacker.redoubt_bank = 0.0
+				attacker.refresh_bars()
+				_log("   → Rune of the Bastion: the bank lands — +%d damage (spent)" % \
+					rd_spent, "#c8b870")
 			# Armor's share, kept consistent with the displayed final number.
 			var armor_cut := maxi(int(round(raw)) - final, 0)
+			# BATCH GO — AND ARMOR AND RESISTANCE ARE BANKED HERE, the last two cuts
+			# between the blow and the body. Resistance banks only what it CUT: a
+			# weakness adds damage and is never subtracted from a bank.
+			if _redoubt_victim != null:
+				_redoubt_victim.redoubt_bank += float(armor_cut + maxi(resist_cut, 0))
+				_redoubt_victim.refresh_bars()
+				_redoubt_victim = null
 			# BATCH BM §2 — DEBT OF IRON (Warden, Plate row 8), the BANK half.
 			# Seven rows prevent damage and prevention buys nothing; this
 			# CONVERTS it into the one currency Plate cannot otherwise reach.
@@ -12639,6 +12782,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				await _wait(0.5)
 				await _resolve(attacker, _free_copy(ab), next_target, "good", true)
 				_dmg_frame(attacker, ab.display_name)
+	# BATCH GO — ECHO FIRES HERE, once the whole cast has resolved: a strike, a
+	# special handler, a heal and a miss all arrive at this line. The tally is
+	# taken and the state restored BEFORE the echo lands, so the echo's own damage
+	# is never tallied again.
+	if echo_now:
+		var echo_tally: Dictionary = _echo_state.get("tally", {})
+		_echo_state = echo_saved
+		await _echo_fire(attacker, ab, echo_tally)
+		_dmg_frame(attacker, ab.display_name)
 	if not sim and attacker.position != lunge_origin:
 		if walked and not attacker.dead:
 			await _walk_to(attacker, lunge_origin)
@@ -13439,6 +13591,19 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 						target.unit_name, dw_to.unit_name,
 						" (Rune: the Carrion)" if dw_carrion else ""], "#70d878")
 				_downwind_spreading = false
+	# BATCH GO — FIELD KIT, BESIDE DOWNWIND AND ON ITS PREDICATE: a HERO laying an
+	# affliction (Trapper's own vocabulary, `DEBUFF_IDS`) on an ENEMY, reached only
+	# once the status has taken hold — every refusal above has already returned.
+	# ABOVE the per-status branches for Creeping Death's reason: `chilled`, `burn`
+	# and `poison` return early below. A mark is not an affliction and mends
+	# nothing. The guard is a re-entry lock; the mend itself lays no status.
+	if not _field_kit_mending and not target.is_hero and src != null \
+			and src.is_hero and not src.is_companion and not src.dead \
+			and src.has_engine("field_kit") \
+			and BattleUnit.DEBUFF_IDS.has(id) and id != "broken":
+		_field_kit_mending = true
+		_field_kit_mend(src, id)
+		_field_kit_mending = false
 	# CREEPING DEATH sits HERE, above every per-status branch, because three of
 	# those branches (chilled, burn, poison) return early and a hook below them
 	# would silently miss the statuses a Cryomancer or a Pyromancer lands. It is
@@ -14212,6 +14377,380 @@ func _party_mark_mult(victim: BattleUnit) -> float:
 	if victim == null or not victim.has_status("party_mark"):
 		return 1.0
 	return 1.0 + 0.01 * victim.status_power("party_mark")
+
+
+# ══ BATCH GO — THE NINE RULE ENGINES, BATTLE-SIDE ═══════════════════════════
+#
+# **EVERY ONE OF THE NINE HANGS OFF A DOOR THE GAME ALREADY HAS**, which is what
+# lets each work for any hero of its class beside any other engine or none:
+#   · Savage Assault — the death door (`unit._die` → `_on_unit_died`), read off
+#     the attribution frame; paid in the one general damage multiplier.
+#   · Redoubt        — `_prev` and the block, barrier, armor and resistance
+#     lines of the strike loop; spent on Aegis Reversal's line.
+#   · Echo           — `_resolve`'s spend line and its end; tallied at BL's damage door.
+#   · Siphon         — `take_hit` / `take_tick_damage` (unit.gd) and the damage door.
+#   · Covenant       — the same two unit doors and `heal_amount`, billed here.
+#   · Judgment       — the damage door; the mark is laid there too.
+#   · Quarry         — the damage door (the mark); paid beside the Hunter's Mark.
+#   · Opening        — above the strike loop, beside Exhortation; re-armed at the
+#     turn start, beside Momentum.
+#   · Field Kit      — `_apply_status`, beside Downwind.
+# **A HOLDER WHO HAS FALLEN RUNS NO RULE**: a dead Arbiter judges nothing and a
+# dead Tracker's mark pays nothing, though the mark stays on its enemy — a rule is
+# the hero's, where a card's mark (the Hunter's) is ownerless.
+
+# Who dealt the damage the frame is describing: the unit, or — for a tick, whose
+# frame carries a NAME because its applier may be gone — the hero of that name.
+# Null for an enemy's tick and for anything unattributed.
+func _frame_dealer() -> BattleUnit:
+	if _dmg_src != null and is_instance_valid(_dmg_src):
+		return _dmg_src
+	if _dmg_src_name != "":
+		return _hero_named(_dmg_src_name)
+	return null
+
+
+# THE FIGHT OPENS: every Oathkeeper binds. Called from `_run_battle` once the
+# field is built and every fallen hero is already down.
+func _open_rule_engines() -> void:
+	for h in heroes:
+		if h.dead or h.is_companion:
+			continue
+		if h.has_engine("covenant_oath") and h.covenant_partner() == null:
+			_covenant_bind(h)
+		h.refresh_bars()
+
+
+# A UNIT IS CHOSEN TO ACT, beside Momentum's span. The Skirmisher's quiet span
+# closes: a span no blow reached counts toward the opening, a struck one resets
+# the count, and the opening re-arms at `OPENING_QUIET_TURNS` — a count that
+# starts only once the opening has been spent. An Oathkeeper with no living bond
+# (a revived Cleric, or one who found nobody when the fight opened) binds again.
+func _rule_engine_turn(u: BattleUnit) -> void:
+	if u == null or u.dead or not u.is_hero or u.is_companion:
+		return
+	if u.has_engine("opening_strike"):
+		if u.opening_armed or u.opening_struck:
+			u.opening_quiet = 0
+		else:
+			u.opening_quiet += 1
+			if u.opening_quiet >= Classes.OPENING_QUIET_TURNS:
+				u.opening_armed = true
+				u.opening_quiet = 0
+				u.float_text("SKIRMISHER READY", Color(0.75, 0.95, 0.55))
+				_log("Rune of the Skirmisher: %d turns unstruck — %s's bonus returns" % [
+					Classes.OPENING_QUIET_TURNS, u.unit_name], "#b8e070")
+		u.opening_struck = false
+		u.refresh_bars()
+	if u.has_engine("covenant_oath") and u.covenant_partner() == null:
+		_covenant_bind(u)
+
+
+# COVENANT — bind a Cleric to the other living hero with the LOWEST MAXIMUM
+# HEALTH, seat order breaking a tie; a hero already bound to another Cleric is
+# not taken. **THE PLAYER DOES NOT PICK IT**: the brief rules re-aiming out ("a
+# per-turn optimisation rather than a commitment"), and a pick at the opening
+# would be a modal a headless run can never answer (CQ §1). With nobody left the
+# Cleric stands unbound — a dead link is a dead engine.
+#
+# **HERO, NOT ALLY, AND BY CHOICE** — the designer's word. A companion could take
+# a share and a heal; nothing structural stops it. Widening it is a ruling.
+func _covenant_bind(cleric: BattleUnit) -> void:
+	if cleric == null or cleric.dead:
+		return
+	var pick: BattleUnit = null
+	for h in heroes:
+		if h == cleric or h.dead or h.is_companion or h.covenant_partner() != null:
+			continue
+		if pick == null or h.max_hp < pick.max_hp:
+			pick = h
+	cleric.covenant_with = pick
+	if pick == null:
+		cleric.refresh_bars()
+		return
+	pick.covenant_with = cleric
+	_apply_status(pick, "oathbound", -1, 0, 0, cleric)
+	pick.update_status("oathbound", String(STATUS_INFO["oathbound"][1]),
+		"Oathbound to the %s. Of any damage\neither one takes, and any healing either\none receives, the other carries %d%%." % [
+			cleric.unit_name, int(round(Classes.COVENANT_SHARE * 100.0))])
+	pick.float_text("OATHBOUND", Color(0.95, 0.82, 0.55))
+	_log("Rune of the Oathkeeper: %s is bound to %s" % [cleric.unit_name,
+		pick.unit_name], "#e0c880")
+	cleric.refresh_bars()
+
+
+# COVENANT'S DAMAGE HALF (`unit.covenant_cb`), billed on the other body through
+# `take_tick_damage`, the Vow's door: a bond paying out is not a blow, so it rolls
+# no parry and wakes no on-being-struck rider. **THE FRAME IS LEFT NAMING WHOEVER
+# DEALT THE WOUND**, so the recap reads one enemy blow landing on two bodies. A
+# hero's own price — a frame naming the body itself — is not a wound (BL §2) and
+# is not shared.
+func _on_covenant_share(body: BattleUnit, half: int) -> int:
+	var other := body.covenant_partner()
+	if other == null or half <= 0:
+		return 0
+	if _frame_dealer() == body:
+		return 0
+	other._covenant_guard = true
+	other.take_tick_damage(half, "-%d Oath" % half, Color(0.95, 0.82, 0.55))
+	other._covenant_guard = false
+	_log("   → Rune of the Oathkeeper: %s carries %d of %s's wound" % [
+		other.unit_name, half, body.unit_name], "#e0c880")
+	if other.dead:
+		_log("† %s falls under the oath" % other.unit_name, "#e05050")
+	return half
+
+
+# COVENANT'S HEALING HALF (`unit.covenant_heal_cb`), through the other body's own
+# heal pipeline. A heal it REFUSES comes back to the body it was meant for; a heal
+# into a full bar is simply spent there — a split is a split.
+func _on_covenant_heal(body: BattleUnit, half: int) -> int:
+	var other := body.covenant_partner()
+	if other == null or half <= 0:
+		return 0
+	other._covenant_guard = true
+	var got: int = other.heal_amount(half, true)
+	other._covenant_guard = false
+	if got <= 0:
+		return 0
+	other.float_text("+%d Oath" % got, Color(0.95, 0.82, 0.55))
+	return half
+
+
+# THE TWO MARKS. The living enemy carrying this holder's mark, or null.
+func _engine_mark_on(holder: BattleUnit, sid: String) -> BattleUnit:
+	for e in enemies:
+		if e.dead or not e.has_status(sid):
+			continue
+		if String(e.get_status(sid).get("src_name", "")) == holder.unit_name:
+			return e
+	return null
+
+
+func _lay_engine_mark(holder: BattleUnit, pid: String, target: BattleUnit) -> void:
+	if holder == null or target == null or target.dead or target.is_hero:
+		return
+	var sid: String = ENGINE_MARKS[pid]
+	_apply_status(target, sid, -1, 0, 0, holder)
+	if not target.has_status(sid):
+		return
+	var info: Array = STATUS_INFO[sid]
+	var desc := ""
+	if pid == "quarry_hunt":
+		desc = "Tracked by the %s: every ally deals\n%d%% more damage to this enemy. When it\nfalls, the tracking passes to another." % [
+			holder.unit_name, Classes.QUARRY_PCT]
+	else:
+		desc = "Judged by the %s: damage any ally deals\nto this enemy heals every ally %d%% of\nit. When it falls, another enemy is\njudged in its place." % [
+			holder.unit_name, Classes.JUDGMENT_HEAL_PCT]
+	target.update_status(sid, String(info[1]), desc)
+	target.float_text(String(info[0]).to_upper(), info[2])
+	_log("Rune of the %s: %s %s %s" % [Classes.engine_title(pid), holder.unit_name,
+		"tracks" if pid == "quarry_hunt" else "judges", target.unit_name], "#e0c880")
+
+
+# Where a mark goes when the enemy wearing it falls: the living enemy with the most
+# health left — a mark wants the body that will stand longest — the first in the
+# warband on a tie. The brief says the Tracker's MOVES; the Arbiter's is given the
+# same move so neither engine dies with its first target (NEEDS A RULING).
+func _mark_destination(fallen: BattleUnit) -> BattleUnit:
+	var best: BattleUnit = null
+	for e in enemies:
+		if e == fallen or e.dead or e.hp <= 0:
+			continue
+		if best == null or e.hp > best.hp:
+			best = e
+	return best
+
+
+# QUARRY'S PAYOUT, read by the hero strike loop and by `_companion_hit` —
+# `_party_mark_mult`'s shape, so the two damage paths cannot disagree.
+func _quarry_mult(victim: BattleUnit) -> float:
+	if victim == null or not victim.has_status("tracked"):
+		return 1.0
+	var holder := _hero_named(String(victim.get_status("tracked").get("src_name", "")))
+	if holder == null or holder.dead or not holder.has_engine("quarry_hunt"):
+		return 1.0
+	return 1.0 + 0.01 * Classes.QUARRY_PCT
+
+
+# THE DAMAGE DOOR'S FOUR READERS (`_on_damage_taken`, above its hero gate).
+func _rule_engines_on_damage(victim: BattleUnit, lost: int) -> void:
+	if victim == null or victim.is_hero or lost <= 0:
+		return
+	var dealer := _frame_dealer()
+	if dealer == null or dealer == victim or not dealer.is_hero:
+		return
+	# ECHO — what the armed cast deals, enemy by enemy.
+	if not _echo_state.is_empty() and _echo_state.get("caster") == dealer \
+			and String(_echo_state.get("label", "")) == _dmg_label:
+		var tally: Dictionary = _echo_state["tally"]
+		tally[victim] = int(tally.get(victim, 0)) + lost
+	# SIPHON — the Mage's damage returns as Mana.
+	if dealer.has_engine("siphon") and not dealer.dead and not dealer.is_companion \
+			and dealer.resource_name == "Mana":
+		var back := int(round(lost * 0.01 * Classes.SIPHON_RETURN_PCT))
+		if back > 0:
+			var was := dealer.resource
+			dealer.resource = mini(dealer.resource + back, dealer.max_resource)
+			var got := dealer.resource - was
+			if got > 0:
+				dealer.siphon_returned += got
+				dealer.float_text("+%d Mana" % got, Color(0.5, 0.7, 1.0))
+			dealer.refresh_bars()
+	# JUDGMENT — damage an ally deals the judged enemy heals every living ally.
+	# Read BEFORE a mark is laid below, so the blow that judges an enemy is not paid
+	# as a blow dealt to a judged one. "The whole party" is ALLY: a companion takes
+	# a heal (DK's measurement), and `_hero_side()` is the living of both.
+	if not _judging and victim.has_status("judged"):
+		var judge := _hero_named(String(victim.get_status("judged").get("src_name", "")))
+		if judge != null and not judge.dead and judge.has_engine("judgment"):
+			_judging = true
+			var jd_amt := maxi(int(round(lost * 0.01 * Classes.JUDGMENT_HEAL_PCT)), 1)
+			var jd_n := 0
+			for a in _hero_side():
+				var jd_got: int = a.heal_amount(jd_amt, a != judge)
+				if jd_got > 0:
+					_stat_heal(judge, jd_got, a)
+					a.float_text("+%d" % jd_got, Color(0.95, 0.88, 0.55))
+					jd_n += 1
+			_judging = false
+			if jd_n > 0:
+				_log("   → Rune of the Arbiter: the judged %s's wound mends %d all%s for %d" % [
+					victim.unit_name, jd_n, "y" if jd_n == 1 else "ies", jd_amt], "#e0c880")
+	# THE MARKS — the first enemy a holder damages is marked, and once his mark
+	# has fallen with nowhere to go, the next one he damages is. A blow that fells
+	# its target marks nothing.
+	if not dealer.is_companion and not dealer.dead and victim.hp > 0:
+		for mk_pid in ENGINE_MARKS:
+			if dealer.has_engine(String(mk_pid)) \
+					and _engine_mark_on(dealer, String(ENGINE_MARKS[mk_pid])) == null:
+				_lay_engine_mark(dealer, String(mk_pid), victim)
+
+
+# A UNIT HAS DIED (`unit._die`, called before its statuses are cleared).
+func _on_unit_died(u: BattleUnit) -> void:
+	if u == null:
+		return
+	if not u.is_hero:
+		# SAVAGE ASSAULT — the enemy's death is the Reaver's when the frame that
+		# killed it names him: his strike, his handler, his echo or a tick he laid.
+		# An ally's kill, a companion's and the enemy's own do not count.
+		var killer := _frame_dealer()
+		if killer != null and killer != u and killer.is_hero and not killer.is_companion \
+				and killer.has_engine("savage_assault"):
+			killer.reaver_kills += 1
+			killer.refresh_bars()
+			_log("   → Rune of the Reaver: %s fells %s — +%d%% damage now (%d kill%s)" % [
+				killer.unit_name, u.unit_name, Classes.REAVER_KILL_PCT * killer.reaver_kills,
+				killer.reaver_kills, "" if killer.reaver_kills == 1 else "s"], "#e07050")
+		# THE MARKS MOVE, while their holder stands.
+		for mk_pid in ENGINE_MARKS:
+			var sid := String(ENGINE_MARKS[mk_pid])
+			if not u.has_status(sid):
+				continue
+			var holder := _hero_named(String(u.get_status(sid).get("src_name", "")))
+			if holder == null or holder.dead or not holder.has_engine(String(mk_pid)):
+				continue
+			var dest := _mark_destination(u)
+			if dest != null:
+				_lay_engine_mark(holder, String(mk_pid), dest)
+		return
+	if u.is_companion:
+		return
+	# COVENANT — a bound hero has fallen. The bond PASSES when the bound hero
+	# falls and ENDS when the Cleric does.
+	var other: BattleUnit = u.covenant_with
+	if other == null or not is_instance_valid(other):
+		return
+	u.covenant_with = null
+	other.covenant_with = null
+	other.remove_status("oathbound")
+	if other.has_engine("covenant_oath") and not other.dead:
+		_log("Rune of the Oathkeeper: %s has fallen — the bond passes on" % u.unit_name,
+			"#e0c880")
+		_covenant_bind(other)
+	else:
+		_log("Rune of the Oathkeeper: %s has fallen — the bond ends" % u.unit_name,
+			"#e0c880")
+	other.refresh_bars()
+
+
+# FIELD KIT — the most wounded hero (the lowest share of health, `_lowest_hp`)
+# heals `FIELD_KIT_HEAL_PCT` of HIS OWN maximum and sheds one harmful effect.
+# **HERO, NOT ALLY, AND BY CHOICE** — the designer's word; a companion could take
+# both halves.
+func _field_kit_mend(hunter: BattleUnit, applied_id: String) -> void:
+	var pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
+	if pool.is_empty():
+		return
+	var pick: BattleUnit = _lowest_hp(pool)
+	var fk_amt := maxi(int(round(pick.max_hp * 0.01 * Classes.FIELD_KIT_HEAL_PCT)), 1)
+	var fk_got: int = pick.heal_amount(fk_amt, pick != hunter)
+	if fk_got > 0:
+		_stat_heal(hunter, fk_got, pick)
+		pick.float_text("+%d" % fk_got, Color(0.55, 0.9, 0.5))
+	var fk_shed := pick.dispel_one_debuff()
+	_log("   → Rune of the Medic: %s lays %s — %s mends %d%s" % [
+		hunter.unit_name,
+		String(STATUS_INFO[applied_id][0]) if STATUS_INFO.has(applied_id) else applied_id,
+		pick.unit_name, fk_amt,
+		(" and sheds %s" % fk_shed) if fk_shed != "" else ""], "#88d070")
+	pick.refresh_bars()
+
+
+# ECHO — each enemy the armed cast damaged is struck again for `ECHO_SHARE` of
+# what it took. **THE REPEAT IS THE DAMAGE, NOT THE CARD**: no status is laid
+# again, no heal or shield is repeated, nothing is summoned and nothing is
+# consumed a second time — a Detonation's echo is half of the blow its consumed
+# Burn already paid for, never a second consumption. It carries no Break damage,
+# Frostbind's rule for a mirrored blow. Through `take_hit`, as Arcane Echo's repeat
+# is, so a barrier, a death and the recap all read it as a blow of this cast.
+func _echo_fire(caster: BattleUnit, ab: Ability, tally: Dictionary) -> void:
+	if caster == null or caster.dead:
+		return
+	if tally.is_empty():
+		_log("   → Rune of the Weaver: the %s repeats, but it damaged nothing" % \
+			ab.display_name, "#a090e0")
+		return
+	var echoed := 0
+	for victim in tally.keys():
+		if not is_instance_valid(victim) or victim.dead:
+			continue
+		var dmg := int(round(int(tally[victim]) * Classes.ECHO_SHARE))
+		if dmg <= 0:
+			continue
+		_dmg_frame(caster, ab.display_name)
+		var res: Dictionary = victim.take_hit(dmg, 0)
+		victim.float_text("%d Repeat" % dmg, Color(0.78, 0.62, 1.0))
+		_stat("dmg_hero_" + _contrib_name(caster), dmg)
+		echoed += dmg
+		if res.died:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % victim.unit_name)
+			_log("† %s dies" % victim.unit_name, "#e05050")
+			_on_enemy_death(victim)
+	if echoed > 0:
+		_log("   → Rune of the Weaver: the %s repeats for %d" % [ab.display_name, echoed],
+			"#a090e0")
+		await _wait(0.15)
+
+
+# THE BASTION'S BOT CASE (`_autoplay_pick`): spend the bank on the basic once it
+# is at least as large as the basic's own nominal blow, at the rotation's mark.
+func _bot_redoubt_pick(u: BattleUnit) -> Array:
+	if not u.is_hero or u.is_companion or not u.has_engine("redoubt") \
+			or u.abilities.is_empty():
+		return []
+	var basic: Ability = u.abilities[0]
+	if u.redoubt_bank < maxf(basic.damage * 0.01 * u.attack, 1.0) \
+			or not _ability_usable(u, basic):
+		return []
+	var foes := enemies.filter(func(e): return not e.dead)
+	if foes.is_empty():
+		return []
+	var broken_foes := foes.filter(func(e): return e.broken)
+	return [basic, _lowest_hp(broken_foes) if not broken_foes.is_empty() else _lowest_hp(foes)]
 
 
 # Which of the two paid for that re-pick — for the log alone, so a player can
@@ -23082,6 +23621,8 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	# function the strike loop calls. A second literal here is how the two
 	# paths would eventually disagree about what a mark is worth.
 	raw *= _party_mark_mult(victim)
+	# BATCH GO — and the Tracker's quarry reaches it the same way: "every ally".
+	raw *= _quarry_mult(victim)
 	# Necrosis: poisoned enemies take more from ALL sources — a beast's jaws
 	# included. ADDITIVE (Batch BA): the counter is percentage points.
 	if victim.has_status("poison"):
@@ -27050,6 +27591,12 @@ func _contrib_name(owner) -> String:
 # (a stat block isn't a contribution; blocks, barriers, stances, Faith
 # and friends are).
 func _prev(owner, cut: float) -> void:
+	# BATCH GO — REDOUBT RIDES THIS DOOR, AND ABOVE THE `sim` GUARD ON PURPOSE:
+	# everything below is measurement, and the bank is a shipped engine
+	# (Reprisal's rule, `_stat_heal`). It banks into the body the strike loop
+	# names while its mitigation terms run, whoever the ledger credits.
+	if _redoubt_victim != null and cut > 0.0:
+		_redoubt_victim.redoubt_bank += cut
 	if not sim or cut <= 0.0:
 		return
 	var name := _contrib_name(owner)
@@ -27331,6 +27878,11 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 			_log("† %s dies" % pn_owed.unit_name, "#e05050")
 		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
 		_penance_mirroring = false
+	# BATCH GO — FOUR RULE ENGINES READ DAMAGE AN ALLY DEALS TO AN ENEMY, AND THIS
+	# IS THE DOOR THAT SEES ALL OF IT: a strike, a handler's own damage, a splash, an
+	# echo and a tick arrive here alike. Above the hero gate for Frostbind's
+	# reason — every victim they read is an enemy.
+	_rule_engines_on_damage(victim, lost)
 	# BATCH GH — THE PARTY'S HEALTH REACHES THE SAVE AS IT LEAVES, and this door is
 	# why that needs no list: every hit and every tick passes here, below every
 	# death refusal, so a hero at zero here is a hero who fell. A companion's
@@ -27470,6 +28022,13 @@ func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit,
 		divine := false) -> void:
 	if not holder.is_hero:
 		return
+	# BATCH GO — A BARRIER THAT EATS A BLOW KEEPS IT OFF THE BASTION WHO WEARS IT,
+	# whoever cast the barrier, and it is banked here rather than through `_prev`:
+	# this door is reached from inside `take_hit`, after the strike loop has
+	# stopped naming its victim.
+	if holder.has_engine("redoubt") and absorbed > 0:
+		holder.redoubt_bank += float(absorbed)
+		holder.refresh_bars()
 	_prev(src_name, float(absorbed))
 	if divine:
 		_stat("faith_prev_shield", float(absorbed))

@@ -1840,7 +1840,7 @@ as a bug.
 
 **WHAT GK BUILT, CLAUSE BY CLAUSE.** Recorded in full before a line of code, on the brief's instruction.
 It supersedes the class-core half of FT §1's block below: **no class has a core.**
-- **BUILT (GK):** the fifteen engines that exist are engine runes — `data/runes.json` names each by
+- **BUILT (GK):** the fifteen engines that existed are engine runes — `data/runes.json` names each by
   its passive id in `engine`, scoped to its class, so a Warrior can never hold Burn. The draft of three
   at class selection (`Run.deal_engines`, frozen on the member; `Run.awaken` is the one door, the
   sim's too). Two slots in `member["engines"]`, apart from the three ordinary ones. The second from the
@@ -1848,8 +1848,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   (`Run.toggle_engine`, from the map's rune pouch). The enabler travels, leaves, and sits outside the
   slot count (`Classes.opening_kit`, the one kit builder; `Classes.lineage_slots`). **`passive_id` is
   deleted**: a unit holds `engines` and every read is `has_engine(id)`.
-- **RULED, NOT BUILT: six engine runes a class** — the Warrior, Mage and Cleric hold four and the
-  Hunter three, and the nine are the designer's. **RULED, NOT BUILT: there are no specs** — the spec
+- **BUILT (GO): six engine runes a class** — the fifteen and the designer's nine rule engines (the GO
+  block below), so every deal is three of six. **RULED, NOT BUILT: there are no specs** — the spec
   id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the four
   layers GK does not merge (the opening kit, the stat block, the draft and boss pools, the spec-scoped
   runes). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
@@ -1930,6 +1930,29 @@ the block left out, spend what they were paid.
   `_apply_elem_weak`, which never writes a standing weakness down. **Its read site is the strike loop's alone**, like
   Exposed's: a card that computes its own damage, a tick and a trap do not see it (`docs/reports/GN.md` §2). **It
   stays ELEMENT-BLIND by construction**: the read asks whether the blow is physical and nothing else.
+
+## STANDING RULE — A RULE ENGINE READS A DOOR THE GAME ALREADY HAS (Batch GO)
+> **The nine rule engines (`Classes.RULE_ENGINES`) bring no lineage, no enabler and no payload, and each reads a door
+> every hero already passes. A new source of what a door carries owes that door, or the engine reading it goes silent
+> for that source — and nothing says so.**
+
+- **THE DOORS.** A death is `unit._die()`, which calls `died_cb` BEFORE the statuses clear (the Reaver's kill, a mark
+  that moves, a bond that passes). Damage is BL's `_report_taken` door, read through the attribution frame (the
+  Weaver's tally, the Leech's return, the Arbiter's heal, the marks). An effect laid on an enemy is `_apply_status`
+  (the Medic). A blow is `_resolve`'s strike loop (the Tracker's and the Skirmisher's pay, the Bastion's spend). **A
+  kill outside `_die()`, damage outside the two unit doors or a status written around `_apply_status` is invisible to
+  the nine.**
+- **WHAT A BODY IS SPARED IS `_prev`, THE BLOCK, A BARRIER'S ABSORB, ARMOR AND RESISTANCE**, and the Bastion banks all
+  five on the body the strike loop names, whoever's work it was. **A new defence that books nothing to `_prev` is one
+  the Bastion never banks.** A miss is not a blow and banks nothing.
+- **THE NINE'S ENGINE NAMES ARE INTERNAL; THE RUNE NOUN IS THE NAME (ruled).** No text a player reads carries one, in
+  any inflection: the rule text, the chips, the floats and the log say *Reaver*, *Bastion*, *Weaver*. `check_go` §0
+  and §12 sweep all four. The fifteen's texts still open with their engine names (`docs/state.md`).
+- **A REPEAT IS THE DAMAGE, NEVER THE CARD.** The Weaver's repeat lays no status, heal, summon or Break damage and
+  consumes nothing twice; a card that wants its effect repeated needs a ruling, not an arm in `_echo_fire`.
+- **SIX A CLASS IS `Classes.class_engines`**, the one list the deal, the pouch and the gates read.
+- **THE CHARTER'S *none of the three accrues anything* HOLDS FOR THE STANCES AND TRAPPER ONLY.** Heavy Plating's
+  climb accrues, +8% an unblocked hit to +40%, and a block resets it — the Standing Wall halves it (GO §0).
 
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
 **ITS CORE HALF IS SUPERSEDED BY THE ENGINE RUNE CHARTER ABOVE: NO CLASS HAS A CORE (GK).** Momentum,

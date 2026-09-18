@@ -472,8 +472,8 @@ func _s2_data() -> void:
 	for id in data:
 		if (data[id] as Dictionary).has("retired"):
 			continue
-		# BATCH GK — THE FIFTEEN ENGINE RUNES ARE LIVE AND WEAR `Rune of the …` BY
-		# THE BRIEF: counted beside the pool, never inside it.
+		# BATCH GK — THE ENGINE RUNES ARE LIVE AND WEAR `Rune of the …` BY THE
+		# BRIEF: counted beside the pool, never inside it. Twenty-four since GO.
 		if String((data[id] as Dictionary).get("engine", "")) != "":
 			engines += 1
 			if String((data[id] as Dictionary).get("name", "")).begins_with("Rune of the "):
@@ -486,8 +486,8 @@ func _s2_data() -> void:
 		"§2c: %d LIVE ordinary entries are named `Rune of the ...` — the bare convention is broken" % of_live)
 	ok(live == 60,
 		"§2c: the live pool is %d, not 60 — one out and one in was not the trade" % live)
-	ok(engines == 15 and engines_of == engines,
-		"§2c: ...and the fifteen ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
+	ok(engines == 24 and engines_of == engines,
+		"§2c: ...and the twenty-four ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
 			% [engines_of, engines])
 	ok(String(sm.get("scope", "")) == "spec:sharpshooter",
 		"§2c: the Shared Mark is scoped `%s`" % sm.get("scope", ""))

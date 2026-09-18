@@ -98,7 +98,15 @@ const SRC_FLOOR := 107
 # have, so `with_src` moves 110 -> 111 and the unstamped remainder stays 104.
 # Found by running this gate unmodified against GM's code, before it was
 # touched: it was the one red there that was not predicted.
-const CALL_SITES := 215
+#
+# **BATCH GO MOVED IT 215 -> 217, AND SAYS WHY. Net +2, two arrivals.** The
+# Rune of the Oathkeeper's bond lays its `oathbound` chip on the hero it binds
+# (`_covenant_bind`), and the Tracker's and the Arbiter's marks are laid through
+# one site that reads its status off `ENGINE_MARKS` (`_lay_engine_mark`). Both
+# pass the rune's holder as the source, so `with_src` moves 111 -> 113 and the
+# unstamped remainder stays 104. Found by running this gate unmodified against
+# GO's code, before it was touched.
+const CALL_SITES := 217
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

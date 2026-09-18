@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-17 (Batch GN &mdash; the four class kits)</b></p>
+<p align="right"><b>Last updated: 2026-09-17 (Batch GO &mdash; the nine missing engines)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -110,7 +110,7 @@ therefore the same length — <b>rounds to resolution 7.8 against 7.4 on the sam
 ask the same questions.</li>
 <li><b>Class selection:</b> before the first battle, each hero is dealt three of his class's
 engine runes and takes one (§6.0). Each card shows the rune, the <b>archetype</b> of the spec it
-carries in bold (mouseover for the archetype explanation) or its class for a class engine, the
+carries in bold (mouseover for the archetype explanation) or its class for an engine that carries no spec, the
 blurb, the engine's text, and every ability the rune opens with and its damage. The rune can be
 dropped or swapped later; the spec it carried is the hero's lineage for the whole run.</li>
 <li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
@@ -671,7 +671,8 @@ rises about <b>1.2%</b> at a fully-talented loadout and not measurably at all un
 individual blow that does land past a certainty is much larger.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
-Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +15% above half HP; relic bonuses
+Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +15% above half HP; the Reaver
++10% for every enemy the hero has felled, and the Skirmisher +200% on the first attack (&sect;6.0); relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Fireball perfects at 25% of
 Attack. <b>Neither Arcane Cannon nor Magi's Wrath
@@ -680,14 +681,14 @@ multiplier on top of it would square the escalation. Both keep their Break terms
 ride stacks on a different axis.</li>
 <li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
 carry their own damage roll and their own flat critical, and of the strike loop's terms they read
-<b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b> and &mdash; since
+<b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, the Tracker's mark (&sect;6.0) and &mdash; since
 Batch DU &mdash; <b>Cripple and Chilled</b>. <b>The rest is unreachable rather than omitted</b>:
 almost every remaining term is keyed on the ability being cast, on a specialization passive, or on
 a talent rank, and a summoned companion has none of the three. <b>Cripple was the one that
 mattered</b>: two enemy abilities land it, an enemy aims at the whole hero side including the
 companion, and until DU a Crippled companion bit at full strength &mdash; a malus the chip
 promised and the arithmetic refused.</li>
-<li><b>Target modifiers:</b> Exposed +15%; Seasoned Fighter −15% at or
+<li><b>Target modifiers:</b> Exposed +15%; Tracked +25% (&sect;6.0); Seasoned Fighter −15% at or
 below half HP; Arcanist Resonance +0.75% × N(N+1)/2 damage
 <i>taken</i> at N stacks — the same compounding curve at half the step, and uncapped
 (the glass-cannon risk, and the whole bargain); Stabilized −10% per stack
@@ -1180,8 +1181,7 @@ the board at the moment of a strike. <b>An engine rune of one class is never off
 a Warrior can never hold Burn.</p>
 <ul>
 <li><b>Class selection deals three.</b> Before the first battle each hero is dealt three of his
-class's engine runes and takes one. The Warrior, the Mage and the Cleric have four each, so one is
-left out of every deal; the Hunter has three, so his are always the same three.</li>
+class's engine runes and takes one. Every class has six, so every deal leaves three out.</li>
 <li><b>Two engine slots.</b> A hero may hold two engine runes, in two slots of their own that do
 not compete with the three ordinary rune slots. The second comes from the ordinary rune offers —
 the Peddler, an elite's cache, a bargain, an event — mixed in with everything else, and only ever
@@ -1205,32 +1205,85 @@ travelling basic attack replaces the class basic, or joins it as a second free a
 engine's already has.</li>
 <li><b>The lineage.</b> The rune taken at class selection also decides, for the whole run, the
 hero's name, his stat block, his opening abilities, the draft and boss pools he draws from and the
-spec runes he is offered — all of them the spec's it carried. A hero who takes a class engine has
-no lineage, and opens with his class's basic attack and his class kit (&sect;5.2) &mdash; four
-abilities.</li>
+spec runes he is offered — all of them the spec's it carried. A hero who takes a class engine or a
+rule engine has no lineage, and opens with his class's basic attack and his class kit (&sect;5.2)
+&mdash; four abilities.</li>
 </ul>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>Engine rune</th><th>Engine</th><th>Travels with it</th></tr>
-<tr><td rowspan="4">Warrior</td><td>Rune of the Berserker</td><td>Blood Frenzy</td><td>—</td></tr>
+<tr><td rowspan="6">Warrior</td><td>Rune of the Berserker</td><td>Blood Frenzy</td><td>—</td></tr>
 <tr><td>Rune of the Warden</td><td>Heavy Plating</td><td>—</td></tr>
 <tr><td>Rune of the Swordmaster</td><td>Seasoned Fighter (the stances)</td><td>Guard Change</td></tr>
 <tr><td>Rune of the Vanguard</td><td>Momentum</td><td>—</td></tr>
-<tr><td rowspan="4">Mage</td><td>Rune of the Pyromancer</td><td>Overburn</td><td>Fireball, Detonation</td></tr>
+<tr><td>Rune of the Reaver</td><td>Savage Assault</td><td>—</td></tr>
+<tr><td>Rune of the Bastion</td><td>Redoubt</td><td>—</td></tr>
+<tr><td rowspan="6">Mage</td><td>Rune of the Pyromancer</td><td>Overburn</td><td>Fireball, Detonation</td></tr>
 <tr><td>Rune of the Cryomancer</td><td>Glacial Hold</td><td>Frostbolt, Ice Lance</td></tr>
 <tr><td>Rune of the Arcanist</td><td>Runaway Resonance</td><td>Arcane Explosion</td></tr>
 <tr><td>Rune of the Invoker</td><td>Channel</td><td>—</td></tr>
-<tr><td rowspan="4">Cleric</td><td>Rune of the Holy</td><td>Mercy</td><td>Heal, Hymn of Hope</td></tr>
+<tr><td>Rune of the Weaver</td><td>Echo</td><td>—</td></tr>
+<tr><td>Rune of the Leech</td><td>Siphon</td><td>—</td></tr>
+<tr><td rowspan="6">Cleric</td><td>Rune of the Holy</td><td>Mercy</td><td>Heal, Hymn of Hope</td></tr>
 <tr><td>Rune of the Devout</td><td>Conviction</td><td>Divine Shield, Consecrated Ground</td></tr>
 <tr><td>Rune of the Occultist</td><td>Wrath of the Old Gods</td><td>Shadowrend, Hex of Ruin</td></tr>
 <tr><td>Rune of the Hierophant</td><td>Sanctity</td><td>—</td></tr>
-<tr><td rowspan="3">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>Summon Ursus, Summon Canis, Summon Aguila</td></tr>
+<tr><td>Rune of the Oathkeeper</td><td>Covenant</td><td>—</td></tr>
+<tr><td>Rune of the Arbiter</td><td>Judgment</td><td>—</td></tr>
+<tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>Summon Ursus, Summon Canis, Summon Aguila</td></tr>
 <tr><td>Rune of the Sharpshooter</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
 <tr><td>Rune of the Survivalist</td><td>Trapper</td><td>—</td></tr>
+<tr><td>Rune of the Tracker</td><td>Quarry</td><td>—</td></tr>
+<tr><td>Rune of the Skirmisher</td><td>Opening</td><td>—</td></tr>
+<tr><td>Rune of the Medic</td><td>Field Kit</td><td>—</td></tr>
 </table>
 <p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
 fight quicker for every exchange — a turn that deals damage and is met by the fight; <b>Channel</b>
 adds to a Mage's non-physical damage for every 42 Mana spent in a fight; <b>Sanctity</b> lengthens
 every status a Cleric applies for every 16 statuses landing on or leaving a unit in a fight.</p>
+<p><b>The nine rule engines</b> carry no spec either, and each is a rule rather than a meter. <b>The
+engine names in the table are internal: a player sees only the rune's name</b>, and every chip, card,
+float and log line says <i>Reaver</i>, <i>Bastion</i> and so on. Every figure below is read from
+<code>Classes</code>, and the rule text on the card is built from the same numbers.</p>
+<ul>
+<li><b>Reaver</b> (Warrior): every enemy that falls to the Warrior's own damage &mdash; his attacks, his
+abilities, a damage-over-time effect he laid &mdash; adds +10% to the damage he deals for the rest of
+the battle, with no limit. Another ally's kill adds nothing.</li>
+<li><b>Bastion</b> (Warrior): damage kept off the Warrior is banked, with no limit and for the whole
+battle &mdash; a blocked blow banks the whole blow, a parry the part it turned, a barrier what it
+absorbed, and armor and resistance what they cut, whoever's barrier or buff it was. A miss banks
+nothing. His next basic attack that lands adds the whole bank to its damage, through no armor, and
+spends it; an ability or a counter-attack spends none. The bot spends it once the bank is at least one
+basic attack's worth.</li>
+<li><b>Weaver</b> (Mage): every third cast, his basic attack included, repeats once it resolves &mdash; each enemy it damaged is
+struck again for 50% of the damage that enemy took. The repeat is damage alone: it lays no effect, no
+Break damage, no heal or shield, and consumes nothing a second time. A cast that dealt no damage
+repeats nothing, and a counter-attack is not a cast.</li>
+<li><b>Leech</b> (Mage): 25% of the damage the Mage deals returns as Mana. Damage he takes is paid
+from Mana first, 1 Mana a point; whatever the Mana cannot cover reaches his health. Mana paid this way
+is not Mana spent.</li>
+<li><b>Oathkeeper</b> (Cleric): when a fight opens the Cleric is bound to the other hero with the
+lowest maximum health. Damage either takes once a barrier has eaten its share is split evenly between
+the two &mdash; a price a hero pays himself and Break damage are not &mdash; and so is healing either
+receives; a heal the other cannot take stays with the one it was meant for. When the bound hero falls
+the bond passes to the next such hero; when the Cleric falls it ends, and a Cleric brought back binds
+again at his next turn. The bond is chosen by the game, not the player, and it reaches heroes, not
+companions.</li>
+<li><b>Arbiter</b> (Cleric): the first enemy the Cleric damages in a battle is judged; that blow
+heals nobody. Whenever an ally damages the judged enemy afterwards, every living ally &mdash;
+companions included &mdash; heals 5% of that damage. When it falls, the enemy with the most health is
+judged in its place. A fallen Cleric judges nothing.</li>
+<li><b>Tracker</b> (Hunter): the first enemy the Hunter damages in a battle is tracked, and every
+ally's attacks and abilities that strike it deal 25% more damage &mdash; a companion's blows included.
+Damage over time and an ability that works out its own damage do not read it, as with Exposed. When it
+falls, the tracking passes to the enemy with the most health. A fallen Hunter's mark pays nothing.</li>
+<li><b>Skirmisher</b> (Hunter): the Hunter's first attack in a battle &mdash; his basic attack or an
+ability that strikes &mdash; deals 200% more damage. A miss keeps the bonus, and so do a
+counter-attack and an ability that deals no damage. It returns once two of his turns pass without an
+enemy blow reaching him; a blow he blocks or parries reached him, and a miss did not.</li>
+<li><b>Medic</b> (Hunter): whenever the Hunter lays a harmful effect on an enemy &mdash; a trap
+springing included &mdash; the hero with the lowest share of health heals 5% of that hero's maximum
+health and sheds one harmful effect.</li>
+</ul>
 
 <h3>6a. Ability progression</h3>
 <p>Every hero <b>opens a run with its core attack, its class kit's three abilities (&sect;5.2) and

@@ -8870,3 +8870,70 @@ answered. A card narrower than its code would be the one telling a lie.
 screen this batch did not edit, and the fix is a change to what every victory card says. A batch that implements a
 ruling does not also change unrelated player-facing copy on its own judgement; the gate stays red so the defect is
 seen until it is ruled on.
+
+## Batch GO — the nine missing engines
+
+**Why the nine are rules and not meters.** The charter says an engine is a rule that changes how a hero fights, and
+a meter is only one way to build one. None of the nine needed a new resource bar: each reads something every hero
+already does — a kill, a blow kept off, a cast, a status laid — so none of them competes with the three currencies
+`second_resource` already carries.
+
+**Why each hangs off a door the game already has.** A rule that works for any hero of its class, beside any other
+engine or none, cannot live inside another engine's code. The death, damage, status and strike doors are passed by
+every hero whatever he holds, so an engine that reads one of them works the same on a Berserker, a Warden and a hero
+with no lineage at all.
+
+**Why the Reaver counts a kill by the frame that dealt it.** "Every enemy he himself fells" needs one answer to who
+felled it. The recap already answers that for every point of damage, through the attribution frame, so the kill is
+read from the same place: his strike, his handler, his repeat or a tick he laid. A kill made inside an enemy's own
+swing — a reflect, a retaliation, a trap springing — is filed to that enemy's frame, and that edge is reported
+rather than patched.
+
+**Why the Bastion banks what the body was spared, whoever spared it.** The brief lists blocked, parried, shielded and
+mitigated, and a Warrior standing behind another hero's barrier is being shielded all the same. The prevented-damage
+ledger already records every such cut at its own site, so the bank rides that ledger plus the block, the barrier and
+the two stat cuts the ledger leaves out on purpose. A miss is left out because nothing was kept off: no blow arrived.
+
+**Why the bank lands whole and only on the basic attack.** The brief names the basic attack. Adding the bank after
+armor, as Aegis Reversal's unspent shield already lands, means what was kept off returns as it was kept off rather
+than being cut a second time. A counter-attack is a swing the player did not choose, so it spends nothing.
+
+**Why the Weaver repeats the damage and not the card.** Replaying a card would re-lay its statuses, re-heal, re-summon
+and consume a second time, and a Detonation would eat a Burn that no longer exists. Repeating half of what each enemy
+took is the one reading that means the same thing on every Mage card, needs no list of exceptions, and cannot pay a
+consumption twice.
+
+**Why the Leech pays before health and never refuses.** The brief says damage costs Mana before health. A blow that
+the Mana cannot cover falls through to health, because a rule that refused damage at zero Mana would be a shield
+with a meter, not a cost. The Mana it pays is not counted as Mana spent, so the rune cannot build Channel out of
+being hit.
+
+**Why the Oathkeeper's first bond is chosen by the game.** The brief rules out re-targeting at will, and a pick when
+the fight opens would be a prompt that nobody can answer in a simulated fight. The hero with the lowest maximum health
+is the one most likely to need a partner and is the same answer every time, so the player can plan around it.
+
+**Why the bond reaches heroes and the judgment reaches allies.** The designer ruled "the whole party" for the Arbiter;
+healing a companion is something the game already does, so the heal widens to every ally. The bond names one other
+hero, and a companion is summoned mid-fight and can vanish, so the bond is kept on heroes by choice — widening it is
+a ruling, not a repair.
+
+**Why the Tracker's mark moves to the enemy with the most health, and the Arbiter's too.** The brief says the Tracker's
+mark moves on its death. The body that will stand longest is where a mark keeps paying, and it needs no choice. The
+Arbiter's judgment was given the same move so that neither engine goes dead after its first target; that half is a
+ruling owed.
+
+**Why the Skirmisher's bonus returns only after it is spent.** "Returns whenever no enemy has struck him for two
+turns" describes a bonus coming back, so the count starts once it is gone. A blocked or parried blow reached him, so it
+resets the count; a miss did not reach him, so it does not.
+
+**Why the Medic heals the most wounded hero by share of health.** A share is how the game already picks the most
+wounded, and it treats a Warrior and a Mage alike. The heal is five percent of the healed hero's own maximum, so the
+number means the same thing on any body.
+
+**Why the engine names never reach the player.** The designer ruled that only the rune names are player-facing. The
+chip, the rule text, every float and every log line say the rune's noun, and the gate sweeps all four for the engine
+names in any inflection, so "every third cast echoes" is caught as surely as "Echo".
+
+**Why the proposed numbers are proposed.** The brief ruled half strength, every third cast, 25%, 5% and halved.
+"Stronger for the rest of the fight", "returns as Mana", "heals the whole party for a share" and "enormous" came
+without a figure, so each has one line in `Classes` and is the designer's to set.

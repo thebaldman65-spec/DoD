@@ -748,8 +748,9 @@ func _rune_audit() -> void:
 	for id in Runes.ids():
 		if String(Runes.config(id).get("scope", "")) != "class:mage":
 			continue
-		# BATCH GK — the four Mage ENGINE runes are class:mage too, with an empty
-		# payload; counted apart so the three ordinary ones stay pinned.
+		# BATCH GK — the Mage ENGINE runes are class:mage too, with an empty
+		# payload; counted apart so the three ordinary ones stay pinned. Six since
+		# GO (the Weaver and the Leech), the charter's six a class.
 		if Runes.is_engine_rune(String(id)):
 			mage_engines += 1
 		else:
@@ -758,7 +759,7 @@ func _rune_audit() -> void:
 			ok(not arc_fields.has(String(f)),
 				"the Mage-wide rune %s does not write the Arcanist counter %s" % [id, f])
 	ok(mage_runes == 3, "there are 3 Mage class-wide runes (got %d)" % mage_runes)
-	ok(mage_engines == 4, "...and 4 Mage ENGINE runes beside them (GK) (got %d)" % mage_engines)
+	ok(mage_engines == 6, "...and 6 Mage ENGINE runes beside them (GK, GO) (got %d)" % mage_engines)
 
 
 func _claude_md() -> void:

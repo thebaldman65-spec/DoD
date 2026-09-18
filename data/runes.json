@@ -956,5 +956,60 @@
 		"price": 100, "engine": "trapper",
 		"desc": "The Survivalist's engine.",
 		"payload": {}
+	},
+
+	"engine_savage_assault": {
+		"name": "Rune of the Reaver", "scope": "class:warrior",
+		"price": 100, "engine": "savage_assault",
+		"desc": "A Warrior engine.",
+		"payload": {}
+	},
+	"engine_redoubt": {
+		"name": "Rune of the Bastion", "scope": "class:warrior",
+		"price": 100, "engine": "redoubt",
+		"desc": "A Warrior engine.",
+		"payload": {}
+	},
+	"engine_cast_echo": {
+		"name": "Rune of the Weaver", "scope": "class:mage",
+		"price": 100, "engine": "cast_echo",
+		"desc": "A Mage engine.",
+		"payload": {}
+	},
+	"engine_siphon": {
+		"name": "Rune of the Leech", "scope": "class:mage",
+		"price": 100, "engine": "siphon",
+		"desc": "A Mage engine.",
+		"payload": {}
+	},
+	"engine_covenant_oath": {
+		"name": "Rune of the Oathkeeper", "scope": "class:cleric",
+		"price": 100, "engine": "covenant_oath",
+		"desc": "A Cleric engine.",
+		"payload": {}
+	},
+	"engine_judgment": {
+		"name": "Rune of the Arbiter", "scope": "class:cleric",
+		"price": 100, "engine": "judgment",
+		"desc": "A Cleric engine.",
+		"payload": {}
+	},
+	"engine_quarry_hunt": {
+		"name": "Rune of the Tracker", "scope": "class:hunter",
+		"price": 100, "engine": "quarry_hunt",
+		"desc": "A Hunter engine.",
+		"payload": {}
+	},
+	"engine_opening_strike": {
+		"name": "Rune of the Skirmisher", "scope": "class:hunter",
+		"price": 100, "engine": "opening_strike",
+		"desc": "A Hunter engine.",
+		"payload": {}
+	},
+	"engine_field_kit": {
+		"name": "Rune of the Medic", "scope": "class:hunter",
+		"price": 100, "engine": "field_kit",
+		"desc": "A Hunter engine.",
+		"payload": {}
 	}
 }

@@ -346,8 +346,12 @@ func _sweep_ratchet(src: String) -> void:
 	# (`_bot_class_kit_pick`) walks `heroes` with the filter, written the way the
 	# drafted hook two functions above it is — the same correct no-op, and the
 	# count is a census of the idiom, as FK's two were.
-	ok(filtered == 26,
-		"the `is_companion`-over-`heroes` population is %d, not the 26 after GN" % filtered)
+	# **BATCH GO MOVED IT 26 -> 27.** The Rune of the Medic's mend
+	# (`_field_kit_mend`) picks its hero off a `heroes.filter` carrying the
+	# filter — the same correct no-op: the rune is HERO by choice, and the
+	# collection cannot hold a companion anyway.
+	ok(filtered == 27,
+		"the `is_companion`-over-`heroes` population is %d, not the 27 after GO" % filtered)
 	# **AND DK ASKED THE QUESTION THIS COUNT EXISTS FOR, AND THE ANSWER WAS
 	# NONE.** DK widened four ally-worded read sites to `_hero_side()`, which
 	# genuinely does hold companions — so a filter sitting on one of them would

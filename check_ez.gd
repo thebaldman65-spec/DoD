@@ -109,13 +109,15 @@ func _s0_the_pool() -> void:
 	var ez := _ez_ids()
 	ok(ez.size() == 60, "§0: %d entries carry no retirement, expected 60 live runes"
 		% ez.size())
-	ok(data.size() == 142, "§0: the authored pool is %d entries, expected 142 (GK's fifteen engine runes)" % data.size())
+	# **BATCH GO MOVED BOTH, 142 -> 151 AND 15 -> 24**: the designer's nine rule
+	# engines, so every class holds the charter's six engine runes.
+	ok(data.size() == 151, "§0: the authored pool is %d entries, expected 151 (the twenty-four engine runes)" % data.size())
 	var eng := 0
 	for id0 in data:
 		if String((data[id0] as Dictionary).get("engine", "")) != "":
 			eng += 1
-	ok(eng == 15 and ez.size() + eng == 75,
-		"§0: ...and fifteen of them are ENGINE runes (GK), live beside the sixty and outside this gate's population (%d)" % eng)
+	ok(eng == 24 and ez.size() + eng == 84,
+		"§0: ...and twenty-four of them are ENGINE runes (GK, GO), live beside the sixty and outside this gate's population (%d)" % eng)
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the

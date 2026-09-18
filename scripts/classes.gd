@@ -1306,8 +1306,8 @@ static func protected_names(spec: String) -> Array:
 # designer's charter is in `CLAUDE.md`: every spec's passive is an ENGINE RUNE,
 # a hero is dealt three of his class's engines at class selection and takes one,
 # he may hold two, and each engine's ENABLER travels with it and sits outside
-# the slot count. **FIFTEEN EXIST** — the twelve spec passives and FT's three
-# spines — against the charter's six a class.
+# the slot count. **TWENTY-FOUR EXIST, SIX A CLASS** — the twelve spec passives,
+# FT's three spines, and GO's nine rule engines (below).
 #
 # **AN ENGINE'S ID IS ITS PASSIVE ID**, the string `battle.gd` and `unit.gd`
 # already branch on (`bloodrage`, `pack`, `lethal_aim` …), so nothing below is a
@@ -1334,6 +1334,112 @@ const SPINE_INFO := {
 }
 
 
+# ══ BATCH GO — THE NINE RULE ENGINES ══════════════════════════════════════════
+#
+# **THE CHARTER'S SIX A CLASS, BUILT.** The Warrior, the Mage and the Cleric each
+# gain two, the Hunter three. **ALL NINE ARE RULES**: none carries a lineage, a
+# spec, an enabler or a stat block, so each is a spine's shape — a hero who takes
+# one at class selection opens with his basic and his class kit (GN), and a hero
+# of any lineage can hold one second. `engine_spec` answers "" for all nine and
+# `engine_enablers` answers [].
+#
+# **THE ENGINE NAMES NEVER REACH THE PLAYER** (the designer's ruling): Savage
+# Assault, Redoubt, Echo, Siphon, Covenant, Judgment, Quarry, Opening and Field
+# Kit are internal. **`name` below is the player-facing word** — the rune's own
+# noun, which is what a spec engine's chip already shows (the Rune of the
+# Berserker's chip reads *Berserker*) — and every text a player reads is built
+# from it. The ids are the engine names in snake case, except where one would
+# have equalled a live status id (`covenant`, `quarry`), a vaulted passive id
+# (`echo`) or a word forty lines of `battle.gd` already use (`opening`).
+#
+# **THE NUMBERS LIVE HERE, AND THE RULE TEXT IS BUILT FROM THEM** (CL §1's rule:
+# a number typed into prose is a second copy that drifts). `unit.gd` and
+# `battle.gd` read the same constants. The designer gave half-strength, every
+# third cast, 25%, 5% and halved; every other magnitude below is PROPOSED
+# (`docs/reports/GO.md`, NEEDS A RULING) and is one line to change.
+const REAVER_KILL_PCT := 10          # PROPOSED: +% damage dealt per enemy he fells, uncapped (ruled)
+const ECHO_EVERY := 3                # ruled: every third cast
+const ECHO_SHARE := 0.5              # ruled: at half strength
+const SIPHON_RETURN_PCT := 25        # PROPOSED: % of damage dealt that returns as Mana
+const SIPHON_MANA_PER_POINT := 1     # PROPOSED: Mana a point of damage taken costs
+const COVENANT_SHARE := 0.5          # ruled: shared, halved
+const JUDGMENT_HEAL_PCT := 5         # PROPOSED: % of the damage dealt each ally heals
+const QUARRY_PCT := 25               # ruled: every ally deals 25% more to it
+const OPENING_BONUS_PCT := 200       # PROPOSED: "enormous" — the first attack deals triple
+const OPENING_QUIET_TURNS := 2       # ruled: two turns unstruck
+const FIELD_KIT_HEAL_PCT := 5        # ruled: the most wounded hero heals 5%
+
+const RULE_ENGINES := {
+	"savage_assault": {"class": "warrior", "name": "Reaver"},
+	"redoubt": {"class": "warrior", "name": "Bastion"},
+	"cast_echo": {"class": "mage", "name": "Weaver"},
+	"siphon": {"class": "mage", "name": "Leech"},
+	"covenant_oath": {"class": "cleric", "name": "Oathkeeper"},
+	"judgment": {"class": "cleric", "name": "Arbiter"},
+	"quarry_hunt": {"class": "hunter", "name": "Tracker"},
+	"opening_strike": {"class": "hunter", "name": "Skirmisher"},
+	"field_kit": {"class": "hunter", "name": "Medic"},
+}
+
+
+static func is_rule_engine(pid: String) -> bool:
+	return RULE_ENGINES.has(pid)
+
+
+# THE RULE TEXT, built from the constants above. Every line is written to the text
+# standard: no pronoun, whose percentage is named, no line past 44 characters
+# (`check_go` measures them), and the `\n` breaks are load-bearing because the
+# chip's tooltip does not autowrap.
+static func _rule_engine_desc(pid: String) -> String:
+	var nm := String(RULE_ENGINES[pid]["name"])
+	match pid:
+		"savage_assault":
+			return ("%s: every enemy that falls to the\nWarrior's own damage adds +%d%% to the\n"
+				+ "damage the Warrior deals for the rest of\nthe battle, with no limit. Another ally's\n"
+				+ "kill adds nothing.") % [nm, REAVER_KILL_PCT]
+		"redoubt":
+			return ("%s: damage kept off the Warrior —\nblocked, parried, absorbed by a barrier,\n"
+				+ "or cut by armor and any other mitigation\n— is banked, with no limit. A miss banks\n"
+				+ "nothing. The Warrior's next basic attack\nthat lands adds the whole bank to its\n"
+				+ "damage and spends it.") % nm
+		"cast_echo":
+			return ("%s: every %s cast the Mage makes\nrepeats. Once it resolves, each enemy it\n"
+				+ "damaged is struck again for %d%% of the\ndamage it took. A cast that deals no\n"
+				+ "damage repeats nothing, and a repeat lays\nno Break damage and no effect.") % [
+				nm, _ordinal(ECHO_EVERY), int(round(ECHO_SHARE * 100.0))]
+		"siphon":
+			return ("%s: %d%% of the damage the Mage deals\nreturns as Mana. Damage the Mage takes is\n"
+				+ "paid from Mana first, %d Mana a point, and\nwhat the Mana cannot cover reaches health.") % [
+				nm, SIPHON_RETURN_PCT, SIPHON_MANA_PER_POINT]
+		"covenant_oath":
+			return ("%s: the Cleric is bound to the other\nhero with the lowest maximum health.\n"
+				+ "Damage either one takes is split evenly\nbetween the two, and so is healing either\n"
+				+ "one receives. When the bound hero falls,\nthe bond passes to the next such hero.") % nm
+		"judgment":
+			return ("%s: the first enemy the Cleric\ndamages each battle is judged. Whenever an\n"
+				+ "ally damages the judged enemy, every ally\nheals %d%% of that damage. When the judged\n"
+				+ "enemy falls, the enemy with the most\nhealth is judged in its place.") % [
+				nm, JUDGMENT_HEAL_PCT]
+		"quarry_hunt":
+			return ("%s: the first enemy the Hunter\ndamages each battle is tracked, and every\n"
+				+ "ally deals %d%% more damage to it. When the\ntracked enemy falls, the tracking passes\n"
+				+ "to the enemy with the most health.") % [nm, QUARRY_PCT]
+		"opening_strike":
+			return ("%s: the Hunter's first attack each\nbattle deals %d%% more damage. The bonus\n"
+				+ "returns whenever %d of the Hunter's turns\npass without an enemy striking the Hunter.") % [
+				nm, OPENING_BONUS_PCT, OPENING_QUIET_TURNS]
+		"field_kit":
+			return ("%s: whenever the Hunter lays a harmful\neffect on an enemy, the most wounded hero\n"
+				+ "heals %d%% of that hero's maximum health\nand sheds one harmful effect.") % [
+				nm, FIELD_KIT_HEAL_PCT]
+	return ""
+
+
+static func _ordinal(n: int) -> String:
+	var words := {2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth"}
+	return String(words.get(n, "%dth" % n))
+
+
 # The engine a spec carried, or "" for none.
 static func engine_of_spec(spec: String) -> String:
 	if spec == "" or not SPEC_INFO.has(spec):
@@ -1352,10 +1458,13 @@ static func engine_spec(pid: String) -> String:
 static func engine_class(pid: String) -> String:
 	if SPINE_INFO.has(pid):
 		return String(SPINE_INFO[pid]["class"])
+	if RULE_ENGINES.has(pid):
+		return String(RULE_ENGINES[pid]["class"])
 	return class_of_spec(engine_spec(pid))
 
 
-# Every engine a class can hold, spec engines in SPEC_IDS order, then its spine.
+# Every engine a class can hold: spec engines in SPEC_IDS order, then its spine,
+# then its rule engines (GO) — six for every class.
 static func class_engines(class_key: String) -> Array:
 	var out: Array = []
 	for spec in SPEC_IDS.get(class_key, []):
@@ -1363,13 +1472,19 @@ static func class_engines(class_key: String) -> Array:
 	for pid in SPINE_INFO:
 		if String(SPINE_INFO[pid]["class"]) == class_key:
 			out.append(String(pid))
+	for pid2 in RULE_ENGINES:
+		if String(RULE_ENGINES[pid2]["class"]) == class_key:
+			out.append(String(pid2))
 	return out
 
 
-# What a chip calls the engine: the spec's name for a spec engine, the spine's own.
+# What a chip calls the engine: the spec's name for a spec engine, the spine's own,
+# and a rule engine's rune noun — never its internal name (GO).
 static func engine_title(pid: String) -> String:
 	if SPINE_INFO.has(pid):
 		return String(SPINE_INFO[pid]["name"])
+	if RULE_ENGINES.has(pid):
+		return String(RULE_ENGINES[pid]["name"])
 	var spec := engine_spec(pid)
 	return String(SPEC_INFO[spec]["name"]) if spec != "" else ""
 
@@ -1377,6 +1492,8 @@ static func engine_title(pid: String) -> String:
 static func engine_desc(pid: String) -> String:
 	if SPINE_INFO.has(pid):
 		return String(SPINE_INFO[pid]["passive_desc"])
+	if RULE_ENGINES.has(pid):
+		return _rule_engine_desc(pid)
 	var spec := engine_spec(pid)
 	return String(SPEC_INFO[spec]["passive_desc"]) if spec != "" else ""
 

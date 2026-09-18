@@ -1486,7 +1486,8 @@ func engines_worn(member: Dictionary) -> int:
 # FD §1's rule that what a screen shows again is frozen on the run and never
 # rolled by the screen — so redrawing the screen for the next hero does not
 # re-deal this one. **A class holding fewer than three engines is dealt what it
-# has** (BO's fill-short rule): the Hunter's three are always all three.
+# has** (BO's fill-short rule). Every class holds six since GO, so every deal is
+# three of six.
 func deal_engines(member: Dictionary) -> Array:
 	var dealt: Array = member.get("engine_offer", [])
 	if not dealt.is_empty():

@@ -505,6 +505,14 @@ func _s2_to_s4_the_end_boss() -> void:
 	ok(head.ends_with("— the %s waits" % crown), "§2: the readout reads '%s'" % head)
 	ok(not head.contains(Enemies.name_after_the(String(_run.boss_kind()))),
 		"§2: the readout names the zone boss the party has already killed — '%s'" % head)
+	# **BATCH GO — THE BELL IS HELD ON PURPOSE NOW.** GN sanctioned §4's red: the
+	# card prints `Run.award_gold`'s figure and the Tollkeeper's Bell pays its +20
+	# beside it. GN's seeded road took the Bell off an event; GO's deal of three
+	# from six moved the road, the run held no relic, and the arm read green with
+	# the defect standing. The Bell is handed to the run here, before the one
+	# victory §4 reads, so the arm meets it whatever the road drew.
+	if not (_run.active_relics as Array).has("tollbell"):
+		_run.active_relics.append("tollbell")
 	var gold_before: int = int(_run.gold)
 	var relics_before: Array = _relics_on_disk()
 	var prof_before: Dictionary = _profile_on_disk()

@@ -145,8 +145,9 @@ func _s1_the_pool() -> void:
 		if String(ecfg.get("scope", "")) != "class:" + Classes.engine_class(String(ecfg.get("engine", ""))) \
 				or int(ecfg.get("price", 0)) != 100:
 			eng_bad.append(String(eid))
-	ok(engines.size() == 15 and eng_bad.is_empty(),
-		"§1: ...and beside it the fifteen ENGINE runes (GK), each scoped to its engine's class at the interim 100g (%d; wrong: %s)"
+	# BATCH GO: 15 -> 24, the designer's nine rule engines — six a class.
+	ok(engines.size() == 24 and eng_bad.is_empty(),
+		"§1: ...and beside it the twenty-four ENGINE runes (GK, GO), each scoped to its engine's class at the interim 100g (%d; wrong: %s)"
 			% [engines.size(), eng_bad])
 	print("    live by spec: %s" % [by_spec])
 

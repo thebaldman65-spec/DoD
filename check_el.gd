@@ -96,11 +96,27 @@ func _s1_mark_population() -> void:
 			marks[String(sid)] = true
 	# MOVED AT GM §3, 12 -> 15, AND THE LINE MOVES WITH ITS REASON: the two marks
 	# that stood outside the list joined it, and so did `rime`, which is not one.
-	ok(battle_gd.DISPEL_NEVER.size() == 15,
-		"DISPEL_NEVER holds fifteen ids — ten marks and five that are not (%d)"
+	# **MOVED AT GO, 15 -> 17: the Tracker's and the Arbiter's marks**, laid on an
+	# enemy by two rule engines. The Oathkeeper's `oathbound` chip is NOT in the
+	# list — it sits on a hero, where Dispel never reads.
+	ok(battle_gd.DISPEL_NEVER.size() == 17,
+		"DISPEL_NEVER holds seventeen ids — twelve marks and five that are not (%d)"
 			% battle_gd.DISPEL_NEVER.size())
-	ok(marks.size() == 10, "the game names ten marks (%d: %s)" % [
+	ok(marks.size() == 12, "the game names twelve marks (%d: %s)" % [
 		marks.size(), ", ".join(marks.keys())])
+	# **BATCH GO — TWO MARKS ARE LAID BY AN ENGINE, NOT BY A CARD.** The
+	# Tracker's and the Arbiter's go on through one site that reads its status
+	# off `battle.ENGINE_MARKS`, and an engine rune carries no tag (GK), so the
+	# card half below has nothing to resolve them to. They are read out of that
+	# table and set apart as a SET — each a mark in `DISPEL_NEVER`, each laid by
+	# a rule engine — never skipped by name.
+	var engine_marks := {}
+	for pid in battle_gd.ENGINE_MARKS:
+		engine_marks[String(battle_gd.ENGINE_MARKS[pid])] = String(pid)
+	ok(engine_marks.size() == 2
+			and engine_marks.keys().all(func(m): return marks.has(String(m)))
+			and engine_marks.values().all(func(p): return Classes.is_rule_engine(String(p))),
+		"the engine-laid marks are two rule engines' and both are marks (%s)" % str(engine_marks))
 	var absent: Array = []
 	for m in marks:
 		if not bsrc.contains("_apply_status(") or not bsrc.contains('"%s"' % m):
@@ -112,6 +128,8 @@ func _s1_mark_population() -> void:
 	var owners := {}
 	var unowned: Array = []
 	for m2 in marks:
+		if engine_marks.has(String(m2)):
+			continue
 		var sites: Array = _apply_sites(bsrc, String(m2))
 		if sites.is_empty():
 			unowned.append(String(m2))

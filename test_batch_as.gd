@@ -571,7 +571,9 @@ func _rune_audit() -> void:
 	# than deleted for that reason.
 	ok(cryo.size() == 9, "nine Cryomancer spec runes (got %d)" % cryo.size())
 	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
-	ok(mage_engines.size() == 4, "...and four Mage ENGINE runes beside them (GK) (got %d)" % mage_engines.size())
+	# **BATCH GO MOVED IT 4 -> 6: the Weaver and the Leech.** The charter gives
+	# every class six, and the count is the charter's rather than a population's.
+	ok(mage_engines.size() == 6, "...and six Mage ENGINE runes beside them (GK, GO) (got %d)" % mage_engines.size())
 	# Every lane tag must name a lane that EXISTS — the Honed Lance was tagged
 	# Shatterpoint, which stopped being a lane.
 	# BATCH FX — 3 CHECKS DELETED HERE (DG §2): "the rune X is tagged with a live

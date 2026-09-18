@@ -589,9 +589,10 @@ func _rune_audit() -> void:
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
 			continue
-		# BATCH GK — the three Hunter ENGINE runes are class:hunter too; their
-		# payload is empty, so the walk below passes them, and they are counted
-		# apart so the three ordinary ones stay pinned.
+		# BATCH GK — the Hunter ENGINE runes are class:hunter too; their payload
+		# is empty, so the walk below passes them, and they are counted apart so
+		# the three ordinary ones stay pinned. Six since GO (the Tracker, the
+		# Skirmisher and the Medic), the charter's six a class.
 		if String(pool[id].get("engine", "")) != "":
 			hunter_engines += 1
 		else:
@@ -601,7 +602,7 @@ func _rune_audit() -> void:
 			ok(not st.has(f),
 				"the class:hunter rune %s touches no Survivalist counter (writes %s)" % [id, f])
 	ok(hunter_runes == 3, "three class:hunter runes checked (got %d)" % hunter_runes)
-	ok(hunter_engines == 3, "...and three class:hunter ENGINE runes beside them (GK) (got %d)" % hunter_engines)
+	ok(hunter_engines == 6, "...and six class:hunter ENGINE runes beside them (GK, GO) (got %d)" % hunter_engines)
 	# THE FLOAT TRAP, BOTH WAYS (§6, per AZ).
 	for f in ["vulture", "coated_blades", "necrosis", "quartermaster",
 			"perfected_toxin", "force_of_nature", "deadfall_network"]:

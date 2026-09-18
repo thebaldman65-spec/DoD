@@ -13,42 +13,93 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-17 (Batch GN).*
+*Last rewritten: 2026-09-17 (Batch GO).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GN — THE FOUR CLASS KITS. IMPLEMENT ONLY, AND THE TWENTIETH BATCH ON `class-merge`.** `main` is
-  untouched. Full working: **`docs/reports/GN.md`**.
-- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_gn` (NEW):**
-  - **Every class opens with three guaranteed abilities after its basic attack**, whatever engine its hero takes, holds
-    or drops, and they count against the slot cap. The Warrior: Crushing Blow, Bloodlust, Mocking Blow. The Mage:
-    Magic Burst (new), Nexus Ward (Magic Barrier, renamed), Magic Missiles. The Cleric: Ministration, Unburden,
-    Consecration — **no damage card, by ruling**. The Hunter: Powershot, Snare Trap, Tripwire. `Classes.CLASS_KITS`
-    names them, `Classes.opening_kit` adds them, and a card the lineage already opens with is held once and counted
-    once (the Berserker, the Warden, the Sharpshooter and the Survivalist each share one or two).
-  - **Elemental Weakness is back**, laid by Magic Burst: every school but physical has its resistance cut by 15 points
-    for 3 turns, read in the strike loop. The glossary entry returned with it.
-  - **The bot has a class branch** (`battle._bot_class_kit_pick`); a live autoplay stretch casts all twelve.
-- **WHAT THE PICKS COST:** the Mage class pool is five and the Cleric's three (the Warrior's and the Hunter's six), so
-  the draft is 149 of 149. A hero opens at 3 to 6 of his 7 slots — a spine-taker at 3, an Arcanist at 6
-  (`docs/reports/GN.md` §3).
-- **FOUR KIT CARDS WERE REWORDED TO THE TEXT STANDARD**, as the brief ordered for a kit card: Nexus Ward, Tripwire,
-  Consecration and Powershot. No number moved.
-- **WHAT MOVED:** `scripts/classes.gd`, `scripts/battle.gd`, `scripts/run_state.gd`, `data/glossary.json`,
-  `check_gn.gd` (**NEW**), twenty-eight instruments (`docs/reports/GN.md` §6), `run_battery.sh`, `baselines.json`,
-  `pin-manifest.json`, `CLAUDE.md` (one rule, and the sentences the kit made false), `docs/master.html` (the kit
-  table, the pools, the census figure and the stamp), `docs/changelog.html`, `docs/design-notes.md`, this file, and
-  `docs/reports/GN.md` (**NEW**). **`data/runes.json` needed nothing** — no rune names or reads a moved card.
-- **VERIFICATION:** in **`docs/reports/GN.md`**, written after the acceptance run. **`check_gj` §4 is red on purpose,
-  and the red is right** — FOUND AT GN below.
+- **Last batch: GO — THE NINE MISSING ENGINES. IMPLEMENT ONLY, AND THE TWENTY-FIRST BATCH ON `class-merge`.** `main`
+  is untouched. Full working: **`docs/reports/GO.md`**.
+- **BUILT, AND DRIVEN LIVE EVERY BATTERY BY `check_go` (NEW):**
+  - **Every class holds six engine runes**, so class selection deals three of six for all four classes. The nine are
+    the designer's and are RULES — no lineage, no enabler, no payload, the flat 100 gold:
+    the Warrior's **Rune of the Reaver** (every enemy he fells, +10% damage for the fight) and **Rune of the Bastion**
+    (damage kept off him is banked; his next basic attack spends it); the Mage's **Rune of the Weaver** (every third
+    cast repeats at half strength) and **Rune of the Leech** (damage dealt returns as Mana; damage taken costs Mana
+    first); the Cleric's **Rune of the Oathkeeper** (bound to one hero, damage and healing split) and **Rune of the
+    Arbiter** (a judged enemy's wounds heal every ally); the Hunter's **Rune of the Tracker** (a tracked enemy takes
+    25% more from every ally), **Rune of the Skirmisher** (an enormous first attack, back after two unstruck turns)
+    and **Rune of the Medic** (every affliction he lays mends the most wounded hero). `Classes.RULE_ENGINES` names
+    them; the numbers are `Classes` constants and the rule texts are built from them.
+  - **The engine names are internal** (the designer's ruling): every chip, card, float and log line says the rune's
+    noun, and `check_go` sweeps all four surfaces for the nine engine names in any inflection.
+- **WHAT THE BATCH CHOSE, AND IT WAITS ON THE DESIGNER** — four magnitudes (Reaver +10%, Leech 25% and 1 Mana a
+  point, Arbiter 5%, Skirmisher +200%), what "prevented" means, which kind of repeat the Weaver makes, how the first
+  bond is chosen, where a mark moves, and the rule texts: GO's rulings below, in full in the report.
+- **WHAT MOVED:** `data/runes.json` (nine engine runes), `scripts/classes.gd`, `scripts/unit.gd`, `scripts/battle.gd`,
+  `scripts/run_state.gd` (a comment), `check_go.gd` (**NEW**), twelve instruments (`docs/reports/GO.md` §9),
+  `run_battery.sh`, `baselines.json`, `pin-manifest.json`, `CLAUDE.md` (the marker off, one rule), `docs/master.html`
+  (§6.0, the damage lists and the stamp), `docs/changelog.html`, `docs/design-notes.md`, this file, and
+  `docs/reports/GO.md` (**NEW**).
+- **VERIFICATION:** in **`docs/reports/GO.md`**, written after the acceptance run.
 - **Phase.** Steps 1 (the spines), 2 (the talent layer) and 3 (engines to runes) of the merge's running order are done
-  — step 3 without its nine engines, and **with the class kits built at GN**. **The Crown's Break and freeze
-  resistance is the batch after the kits.** Step 4 of the running order is the pool merge.
-- **Next letter: GO.**
+  — step 3 with its nine engines since GO and its class kits since GN. **The Crown's Break and freeze resistance is
+  the batch after the kits**, not built at GO by ruling. Step 4 of the running order is the pool merge.
+- **Next letter: GP.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GO's RULINGS OWED — **TWELVE; ALL BUT THE LAST TWO ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GO.md`, NEEDS A RULING.
+
+1. **FOUR PROPOSED MAGNITUDES** — the Reaver's +10% a kill (uncapped, as ruled), the Leech's 25% returned and 1 Mana
+   a point, the Arbiter's 5% of the damage, and the Skirmisher's +200% (*enormous*, read as triple). The ruled
+   numbers are in: every third cast, half strength, 25%, 5% and halved.
+2. **THE NAMES, SWEPT OVER 1,432.** **Rune of the Tracker is the Hunter's class passive's exact name**, so a Hunter
+   holding it wears two chips labelled *Tracker*. *Leech* is a retired Occultist rune's lane, which no screen shows.
+   Near-misses: the retired Rune of the Reaper (Reaver, Weaver), the retired Rune of the Binding Oath (Oathkeeper,
+   Oathbound), the live Long Leash (Leech), the Survivalist's own engine id `trapper` (Tracker), the glossary's
+   Bound (Oathbound), and several mechanical ones. Bastion, Skirmisher and Judged met nothing.
+3. **THE NINE RULE TEXTS AND THE THREE CHIPS** (*Tracked*, *Judged*, *Oathbound*) are the batch's words.
+4. **WHAT THE BASTION BANKS.** Every cut the prevented-damage ledger books while the strike names him, the block (the
+   whole nominal blow), any barrier's absorb, armor and resistance — whoever's work it was. A miss banks nothing; a
+   blow cut to nothing, an absolute parry and an absorbed blow each bank the whole blow. The bank lasts the fight, and
+   only a basic attack that lands spends it, after armor.
+5. **THE WEAVER REPEATS DAMAGE, NOT THE CARD** — half of what each enemy took, no status, heal, summon, Break damage
+   or second consumption. His basic attack counts as a cast; a counter does not.
+6. **THE LEECH** pays after a barrier and before Conversion, falls through to health at zero Mana, and books nothing
+   as Mana spent.
+7. **THE OATHKEEPER'S BOND** is chosen by the game — the other hero with the lowest maximum health — and never by the
+   player; it is HERO by choice; it passes on the bound hero's death, ends on the Cleric's, and binds again when a
+   revived Cleric takes a turn. Self-inflicted damage and Break damage are not shared; ticks are. A heal into a full
+   bar is spent there.
+8. **THE ARBITER** judges the first enemy the Cleric damages, heals every ally (companions included) and not on the
+   judging blow, and **moves to the healthiest enemy when the judged one falls — not in the brief**.
+9. **THE TRACKER** marks the first enemy the Hunter damages; the mark pays in the strike loop and on a companion's
+   blow, not on ticks or self-computed damage (Exposed's coverage), and moves to the healthiest enemy.
+10. **THE SKIRMISHER** is spent by the first damaging cast through the strike loop (a counter and a miss keep it) and
+    re-arms after two turn-starts no blow reached him; a block or a parry is a blow that reached him.
+11. **THE ENGINE NAMES OF THE FIFTEEN STILL REACH THE PLAYER.** Their rule texts open with them (*Momentum:*, *Blood
+    Frenzy:*…). The ruling was built for the nine; whether it reaches the fifteen is a question of its scope.
+12. **THE BOT'S BASTION CASE** (`_bot_redoubt_pick`: spend a bank at least one basic's worth) is an implementation
+    call that moves simulated figures only.
+
+### FOUND AT GO AND NOT FIXED
+
+- **A KILL, A WOUND OR A RETURN MADE INSIDE AN ENEMY'S OWN SWING IS FILED TO THAT ENEMY.** Tripwire's retaliation, a
+  Feint's reflect and a Mirror Guard return deal their damage under the enemy's attribution frame, so the Reaver does
+  not count the kill, the Leech returns no Mana, the Arbiter heals nobody and no mark is laid off them. Measured: in a
+  party with no lineage, 7 of 74 kills were filed to an enemy's frame (GO §1a).
+- **"QUARRY" IS ALREADY A PLAYER-FACING WORD** — Quarry's Mark's chip reads it. The engine name stays internal; a
+  player reading *Quarry* sees the Sharpshooter's card.
+- **EIGHT OF THE BRIEF'S PREMISES DID NOT HOLD** (GO §0) — among them *none accrues anything* (Heavy Plating's climb
+  does), *the only engine that reads kills* (Lethal Aim's kill branch, outside the Warrior's six), *nothing repeats a
+  cast* (Rampage and four more), and *Rune of Ambush … FK authored* (it is EZ's, and live).
+- **FOUR CONTROL COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GO probe", "Dawn of
+  Decay GO inject", "Dawn of Decay GO head" and "Dawn of Decay GO trace". Each was renamed so its `user://` could not
+  reach the player's saves. They can be deleted.
 
 ### GN's RULINGS OWED — **EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE**
 
@@ -238,8 +289,8 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
    climbs from zero plus its own slice.
 7. **~~A hero who takes a spine opens with his class's basic attack alone~~ — BUILT AT GN:** he opens with his basic
    and his class kit of three, four abilities (`check_gn` §3 drives it from class selection into the first battle).
-8. **The Hunter is dealt all three of his three** — no variety in the deal until his six exist.
-9. **No engine rune carries a tag** — `check_ek` exempts the fifteen as a set.
+8. **~~The Hunter is dealt all three of his three~~ — CLOSED AT GO:** every class deals three of six.
+9. **No engine rune carries a tag** — `check_ek` exempts all twenty-four as a set.
 
 ### WHAT GK LEFT BROKEN
 
@@ -805,7 +856,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–3 BUILT (3 WITHOUT ITS NINE ENGINES), 4–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–3 BUILT (3's NINE ENGINES AT GO), 4–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -1075,8 +1126,8 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    read: **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
    designer and the assistant together. **The long pole. Its recon is `docs/systems-recon.html` (FW), and the
    rulings in that document's §3 come before a node is written.**
-3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK, WITHOUT THE NINE ENGINES THE CHARTER'S SIX A
-   CLASS OWES**, which are the designer's.
+3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK; THE NINE ENGINES THE CHARTER'S SIX A CLASS
+   OWED BUILT AT GO**, the designer's nine, transcribed.
    - **~~AND A CLASS KIT OF THREE, RULED IN GL's BRIEF~~ — BUILT AT GN.** Its recon is `docs/kit-recon.html` (GL); GN's
      brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
 4. **POOL MERGING.**

@@ -15,6 +15,76 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-17 &mdash; Batch GO: THE NINE MISSING ENGINES</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-FIRST BATCH ON <code>class-merge</code>.</b> GK turned the fifteen engines that
+existed into engine runes, and the charter gives every class six. <b>The nine that were missing are built</b>, so the
+Warrior, the Mage and the Cleric hold six where they held four, the Hunter six where he held three, and class
+selection deals three of six to every hero. The nine were authored with the designer and are transcribed.
+<code>main</code> is untouched. Full working: <code>docs/reports/GO.md</code>.</p>
+
+<p><b>&sect;1 &mdash; NINE RULES, NO NEW METER.</b> Each is an engine rune on GK's shape &mdash; scoped to its class,
+the flat 100 gold, no payload &mdash; and each is a rule with no lineage and no enabler, so a hero who takes one at
+class selection opens with his basic attack and his class kit. <code>Classes.RULE_ENGINES</code> names them and every
+magnitude is a <code>Classes</code> constant the rule text is built from. <b>Each reads a door the game already had</b>
+&mdash; the death door, the damage door, the status funnel and the strike loop &mdash; which is what lets it work on
+any hero of its class beside any other engine or none.</p>
+<ul>
+<li><b>Warrior. The Rune of the Reaver:</b> every enemy that falls to the Warrior's own damage adds +10% to his damage
+for the rest of the fight, with no limit. <b>The Rune of the Bastion:</b> damage kept off him &mdash; a block, a
+parry, a barrier, armor and any other mitigation &mdash; is banked, and his next basic attack that lands adds the whole
+bank and spends it.</li>
+<li><b>Mage. The Rune of the Weaver:</b> every third cast repeats once it resolves, each enemy it damaged struck again
+for half of what it took. <b>The Rune of the Leech:</b> 25% of the damage he deals returns as Mana, and damage he takes
+is paid from Mana first, whatever the Mana cannot cover reaching his health.</li>
+<li><b>Cleric. The Rune of the Oathkeeper:</b> he is bound to the other hero with the lowest maximum health, and the two
+split the damage and the healing either receives; the bond passes when the bound hero falls. <b>The Rune of the
+Arbiter:</b> the first enemy he damages is judged, and damage any ally deals it heals every ally for 5% of it.</li>
+<li><b>Hunter. The Rune of the Tracker:</b> the first enemy he damages is tracked and takes 25% more from every ally;
+the tracking passes on its death. <b>The Rune of the Skirmisher:</b> his first attack in a fight deals 200% more, and
+the bonus returns after two of his turns no blow reaches him. <b>The Rune of the Medic:</b> every affliction he lays on
+an enemy heals the most wounded hero 5% of that hero's maximum health and takes one harmful effect off.</li>
+</ul>
+
+<p><b>&sect;2 &mdash; THE ENGINE NAMES ARE INTERNAL.</b> By the designer's ruling a player sees the rune's name alone:
+every chip, rule text, float and log line of the nine says <i>Reaver</i>, <i>Bastion</i>, <i>Weaver</i>. Three of the
+batch's first drafts carried an engine name as an ordinary word (<i>the opening returns</i>, <i>every third cast
+echoes</i>, <i>the judgment passes</i>) and were reworded before they landed. <b>The fifteen older engines' texts still
+open with their names</b>; the report asks whether the ruling reaches them.</p>
+
+<p><b>&sect;3 &mdash; WHAT WAS CHOSEN, AND WHAT IS PROPOSED.</b> The ruled numbers are in: every third cast, half
+strength, 25%, 5%, halved, two turns. <b>Four magnitudes came without a figure and are PROPOSED</b> &mdash; the Reaver's
++10% a kill, the Leech's 25% and 1 Mana a point, the Arbiter's 5%, the Skirmisher's +200% &mdash; each one line. So are
+the batch's readings of the brief's words, each measured and in the report: what <i>prevented</i> includes (a miss
+banks nothing; a blow cut to nothing, an absolute parry and an absorbed blow bank the whole blow), that the Weaver
+repeats <i>damage</i> rather than the card (no status, heal, summon or second consumption), that the Leech falls
+through to health at zero Mana, that the Oathkeeper's first bond is chosen by the game, that the Arbiter heals every
+ally and its mark moves to the healthiest enemy (not in the brief), and that a Skirmisher's blocked blow still struck
+him. <b>The Reaver's kill share was measured, not assumed:</b> over 96 live fights he landed 16% to 27% of the kills
+in a party of four, 0.5 to 0.9 a fight, at most four.</p>
+
+<p><b>&sect;4 &mdash; NOT DONE, AS RULED:</b> no engine rune cost, no card for the new engines, nothing for the Crown's
+Break or freeze resistance, no pool merge, no talent node, no kit change. <b>Found and not fixed:</b> a kill made
+inside an enemy's own swing &mdash; a reflect, a retaliation, a trap springing &mdash; is filed to that enemy, so the
+Reaver, the Leech, the Arbiter and the marks do not see it; and <i>Rune of the Tracker</i> is the Hunter's class
+passive's exact name, so a Hunter holding it wears two chips labelled <i>Tracker</i>. Both are the designer's.</p>
+
+<p><b>NEW GATE: <code>check_go.gd</code></b> reads the nine, draws the deal of three from six six hundred times a class,
+takes a rule engine for every hero on the real class-selection screen into the first battle, drives each of the nine
+alone and beside another engine of its class with every negative arm beside a positive one, drives the Bastion's bot
+case, and runs four live autoplay stretches with the enemies striking. It sweeps the rule texts, the chips, every float
+in the source and every log line the nine write for an engine name in any inflection. <b>It was armed with fifteen
+injections</b> &mdash; a break in each of the nine (two for the Leech), the bot case and four name leaks &mdash; and
+each went red in its own section. <b>The first name leak got past the gate's first draft</b>, which matched only the
+bare word; the sweep reads inflections since. <b>Twelve instruments moved with the code</b>, every one found by running the battery unmodified
+against it first: the per-class engine counts and the pool sizes that follow the charter's six, <code>check_di</code>'s
+and <code>check_dj</code>'s two censuses, <code>check_el</code>'s mark population (the two engine marks set apart as a
+set), <code>check_ek</code>'s list of tag-reading gates, and <code>check_gj</code>, whose sanctioned red had turned green
+because the new deal moved its seeded road off the Tollkeeper's Bell &mdash; the Bell is now handed to that run on
+purpose, and the red is back where GN left it. <b>One correction to the batch's own first draft:</b> the bond's chip had
+been listed where Dispel reads an enemy's statuses; it sits on a hero, and it is in neither list now. <b>A standing
+rule</b> in <code>CLAUDE.md</code>, and the marker <i>RULED, NOT BUILT: six engine runes a class</i> is off.
+<b>Rulings owed</b> are under their own heading in the report.</p>
+
 <h2>2026-09-17 &mdash; Batch GN: THE FOUR CLASS KITS</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTIETH BATCH ON <code>class-merge</code>.</b> A hero who took Momentum, Channel or
 Sanctity at class selection opened with his class's basic attack and nothing else. <b>Every class now opens with

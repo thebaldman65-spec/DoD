@@ -1856,7 +1856,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#25",
+   "g": "check_el.gd#29",
    "alt": true
   },
   {
@@ -1868,7 +1868,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#25",
+   "g": "check_el.gd#29",
    "alt": true
   },
   {
@@ -1880,7 +1880,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_el.gd#126",
+   "g": "check_el.gd#132",
    "expr": "String"
   },
   {
@@ -1892,7 +1892,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#100"
+   "g": "check_el.gd#106"
   },
   {
    "s": "check_el.gd",
@@ -1903,7 +1903,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#108"
+   "g": "check_el.gd#114"
   },
   {
    "s": "check_el.gd",
@@ -1914,7 +1914,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#124"
+   "g": "check_el.gd#130"
   },
   {
    "s": "check_el.gd",
@@ -1925,7 +1925,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_el.gd#104"
+   "g": "check_el.gd#110"
   },
   {
    "s": "check_el.gd",
@@ -1936,7 +1936,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#148"
+   "g": "check_el.gd#154"
   },
   {
    "s": "check_el.gd",
@@ -1947,7 +1947,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_el.gd#149"
+   "g": "check_el.gd#155"
   },
   {
    "s": "check_es.gd",
