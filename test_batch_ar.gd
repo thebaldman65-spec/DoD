@@ -597,8 +597,20 @@ func _kit() -> void:
 	var by_name := {}
 	for ab in kit:
 		by_name[ab.display_name] = ab
+	# BATCH GS — `spec_abilities` IS THE LINEAGE'S DEFINITION TABLE NOW, NOT WHAT HE
+	# OPENS WITH: a lineage opens with its engine's enablers alone. So this asks
+	# where each of AR's three is — Flamewave is his enabler (he opens with it and
+	# it travels with Overburn), and Detonation and Wildfire are drafted off his
+	# shelf — and that each is still defined here, once.
+	var py_open: Array = Classes.lineage_opening("pyromancer").map(
+		func(a): return a.display_name)
+	var py_shelf: Array = Classes.spec_draft_pool("pyromancer")
 	for want in ["Detonation", "Wildfire", "Flamewave"]:
-		ok(by_name.has(want), "the kit still opens with %s" % want)
+		var where_ok: bool = py_open.has(want) if want == "Flamewave" \
+			else (py_shelf.has(want) and not py_open.has(want))
+		ok(by_name.has(want) and where_ok,
+			"the Pyromancer still has %s — defined by his lineage, and %s" % [want,
+				"his enabler" if want == "Flamewave" else "on his shelf"])
 	ok(not by_name.has("Flame Shield"), "Flame Shield is not in the kit")
 	# Detonation's own numbers are unchanged (§2 says cost, cooldown and Break
 	# stay); only its Burn multiplier moved, and that lives in battle.gd.
@@ -819,7 +831,12 @@ func _rune_audit() -> void:
 
 # BATCH DO added `earned`: the five Pyromancer cards are drafted now, so a
 # suite that needs one on the bar earns it exactly as a player does.
-func _spawn(learned: Dictionary, lineup: Array, earned: Array = []) -> Node:
+# BATCH GS added `lineage` — Fireball, Detonation and Wildfire left the
+# Pyromancer's opening kit for his shelf, so a check that drives one of them
+# seats the lineage's cards as DRAFTED (the fixture's `lineage_cards`) and finds
+# the card BY NAME: they sit after the class kit, and slot 0 is Magic Bolt.
+func _spawn(learned: Dictionary, lineup: Array, earned: Array = [],
+		lineage := false) -> Node:
 	# CAPTURED, NOT GUESSED, and it is why `deterministic` is armed: before it,
 	# "Fireball lit the target" failed 1 run in 8 and Total Commitment's three
 	# checks failed together on a parried Detonation.
@@ -827,6 +844,8 @@ func _spawn(learned: Dictionary, lineup: Array, earned: Array = []) -> Node:
 		"deterministic": true}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	if lineage:
+		opts["lineage_cards"] = true
 	# BATCH FX: every id a check here learns is deleted, so the member's tree is
 	# the inline one RETIRED builds — the exact payloads, through the real
 	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
@@ -1122,7 +1141,9 @@ func _live_immolate() -> void:
 
 func _live_detonation() -> void:
 	# The trigger, and the refund behind it, driven rather than hoped for.
-	var scene := await _spawn({}, ["raider", "raider", "raider"])
+	# BATCH GS — all three spawns here seat the lineage's cards: Detonation is
+	# drafted off the Pyromancer's shelf now, not held from the opening kit.
+	var scene := await _spawn({}, ["raider", "raider", "raider"], [], true)
 	var py := _py(scene)
 	if py == null:
 		scene.queue_free()
@@ -1137,7 +1158,13 @@ func _live_detonation() -> void:
 	for ab in py.abilities:
 		if ab.display_name == "Detonation":
 			det = ab
-	ok(det != null, "Detonation is in the kit")
+	# BATCH GS — this asked whether the Pyromancer opens with Detonation. He
+	# does not any more; the GS answer to "does he have it" is his SHELF, and
+	# the seated copy reaching his bar is what the mechanics below stand on.
+	var det_shelf := Classes.spec_draft_pool("pyromancer").has("Detonation")
+	ok(det != null and det_shelf,
+		"Detonation is on the Pyromancer's shelf (%s) and on his bar once drafted (%s)"
+			% [det_shelf, det != null])
 	if det != null:
 		await scene._resolve(py, det, mark, "good")
 		ok(not mark.has_status("burn"), "Detonation consumed the target's Burn")
@@ -1148,7 +1175,7 @@ func _live_detonation() -> void:
 	scene.queue_free()
 	await process_frame
 	# Total Commitment widens WHICH banks it empties.
-	var tc := await _spawn({"py_warm_glow": 1}, ["raider", "raider", "raider"])
+	var tc := await _spawn({"py_warm_glow": 1}, ["raider", "raider", "raider"], [], true)
 	var py2 := _py(tc)
 	if py2 != null:
 		var tfoes: Array = tc.get("enemies")
@@ -1167,7 +1194,8 @@ func _live_detonation() -> void:
 	tc.queue_free()
 	await process_frame
 	# Cataclysm takes the WHOLE field.
-	var cat := await _spawn({"py_hellfire": 1}, ["raider", "raider", "raider", "raider"])
+	var cat := await _spawn({"py_hellfire": 1}, ["raider", "raider", "raider", "raider"],
+		[], true)
 	var py3 := _py(cat)
 	if py3 != null:
 		var cfoes: Array = cat.get("enemies")
@@ -1193,12 +1221,19 @@ func _live_detonation() -> void:
 
 func _live_kit_nodes() -> void:
 	# The three remaining nodes whose effect only exists at battle time.
-	var scene := await _spawn({"py_kindling": 1}, ["raider", "raider"])
+	# BATCH GS — Fireball is a DRAFTED card now and slot 0 is Magic Bolt, so the
+	# lineage's cards are seated and Fireball is cast BY NAME (never slot 0).
+	var scene := await _spawn({"py_kindling": 1}, ["raider", "raider"], [], true)
 	var py := _py(scene)
 	if py != null:
 		ok(py.cinder_trail_ranks == 1, "Cinder Trail loads +1 Fireball Burn turn")
 		var foe: BattleUnit = scene.get("enemies")[0]
-		await scene._resolve(py, py.abilities[0], foe, "good")
+		var fireball: Ability = null
+		for ab in py.abilities:
+			if ab.display_name == "Fireball":
+				fireball = ab
+		if fireball != null:
+			await scene._resolve(py, fireball, foe, "good")
 		var b: Dictionary = foe.get_status("burn")
 		ok(not b.is_empty(), "Fireball lit the target")
 		if not b.is_empty():
@@ -1244,7 +1279,8 @@ func _live_kit_nodes() -> void:
 	pb.queue_free()
 	await process_frame
 	# Twin Detonation really lands on the ability.
-	var twin := await _spawn({"py_rekindle": 1}, ["raider", "raider"])
+	# BATCH GS — Detonation is drafted now, so the lineage's cards are seated.
+	var twin := await _spawn({"py_rekindle": 1}, ["raider", "raider"], [], true)
 	var py4 := _py(twin)
 	if py4 != null:
 		for ab in py4.abilities:

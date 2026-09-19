@@ -862,9 +862,9 @@ read, which is the one channel this project has never gated.
   under suspicion.** Run the sweep over the whole population, not over the names the brief supplies.
   **THE EH INSTANCE IS THE ONE TO REMEMBER, BECAUSE THE AUDIT THAT MISSED IT WAS ITSELF A CHECK OF
   A BRIEF'S CLAIM.** EG's record reads *"all seven named enablers are in `protected_names` for their
-  spec"*, and every word is true — it audited the seven the brief listed. `PROTECTED_CORES` names
-  **sixteen, across nine specs**; the nine outside the brief's list were outside the audit. All
-  sixteen are protected, so the CONCLUSION held and only the sweep did not. **A right conclusion
+  spec"*, and every word is true — it audited the seven the brief listed. `PROTECTED_CORES` named
+  **sixteen, across nine specs** (nine across seven since GS §1); the nine outside the brief's list were
+  outside the audit. All sixteen were protected, so the CONCLUSION held and only the sweep did not. **A right conclusion
   reached over the wrong population is the hardest kind to catch, because nothing goes red.**
 - **A CLAIM ABOUT A PRIOR BATCH'S OUTCOME.** One brief stated a previous batch "left them red"
   when the battery had been green since. **Check the repo, not the brief's memory of it.**
@@ -1176,9 +1176,9 @@ and conflating them is why they sat unruled for a batch.
 
 ## THE ENUMERATION IS `Classes.ability_corpus()` AND IT IS THE ONLY ONE (STANDING, SET AT CZ §0)
 **"What are all the abilities in the game?" has exactly one answer and it lives on `Classes`, not
-in a gate.** It walks the kits and the pools (the Batch CL enumeration), applies
-`apply_kit_overrides` so the four overridden basics are reached, and resolves talent grants through
-**`Talents.granted_ability`**. **The live corpus size is in `docs/state.md`, not here.**
+in a gate.** It walks the kits and the pools (the Batch CL enumeration) — the four basics that were a
+lineage's override until GS §1 are on their lineages' shelves and are reached there — and resolves talent
+grants through **`Talents.granted_ability`**. **The live corpus size is in `docs/state.md`, not here.**
 - **DO NOT WRITE A SECOND COPY OF IT IN A GATE.** Five gates each held their own and four of them
   carried one hole for as long as they existed: **a talent node granting an ability that is in no
   pool was invisible to every one of them.**
@@ -1186,9 +1186,11 @@ in a gate.** It walks the kits and the pools (the Batch CL enumeration), applies
   second authority the game itself never consults.
 - **`check_cz.gd` KEEPS THE OLD CL WALK AS A NEGATIVE CONTROL.** Its whole job is to still be
   missing what the complete walk reaches; if it ever stops being, the gap closed itself and every
-  report about it is stale. **It asserts a SET IDENTITY, not an equality**, so a fifth kit override
+  report about it is stale. **It asserts a SET IDENTITY, not an equality**, so a new class-kit card
   is covered by doing nothing — and an ability outside every kit and pool is in NEITHER walk and
-  cannot hide inside the difference.
+  cannot hide inside the difference. **The kit-override half of that difference closed itself at GS
+  §1** (the four basics are on their shelves, which the old walk reads), and the gate asserts it empty
+  rather than dropping it.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
@@ -1770,10 +1772,28 @@ as a bug.
 > **ENGINE RUNES CAN BE DROPPED AND SWAPPED, INCLUDING TO NOTHING.** A hero with no engine has no
 > identity and that is the player's decision to make. **This is a game about good decisions.**
 >
-> **AN ENGINE'S ENABLER TRAVELS WITH IT AND SITS OUTSIDE THE SLOT COUNT.** Drafting Loyalty brings
-> the three summons; drafting Faith brings Consecrated Ground. **An engine without its enabler is a
-> brick** — Quick Shot is the only Focus generator, Consecrated Ground is 66% of all Faith, and the
-> three summons are 10 of 10 Beastmaster cards. **The enabler leaves when the engine leaves.**
+> **AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT.** Loyalty with no summon is nothing, so the
+> three summons travel. **Burn with no way to apply Burn is nothing, so ONE card travels.** Everything
+> else was that lineage's kit and **belongs in the class pool.**
+
+**THAT CLAUSE IS GS §1's, RECORDED OVER GK's *"an engine's enabler travels with it"* — RULED BY THE DESIGNER, AND
+FOUND IN PLAY: an engine that brings four cards IS choosing a spec, which is the thing the merge dissolved.** GK's
+clause took `PROTECTED_CORES`' whole sixteen, and a lineage opened with its whole opening kit beside them. **What
+travels still sits outside the slot count and still leaves when the engine leaves**: GS narrowed WHAT travels, not how.
+- **THE TEST, APPLIED PER ENGINE: WITHOUT THE CARD — WITH THE CLASS BASIC AND THE CLASS KIT EVERY HERO HOLDS — DOES
+  THE ENGINE PAY ANYTHING AT ALL?** If not, ONE card travels: the one that produces what the engine reads. If so,
+  nothing does. **Where several cards would each serve, which one travels is a ruling**, and a batch's derivation
+  stands PROPOSED until it is ruled. `Classes.PROTECTED_CORES` carries every row and its `why`;
+  `docs/reports/GS.md` §1 carries the working, and which rows were the designer's.
+- **A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
+  `Classes.lineage_opening` is the lineage's term in `Classes.opening_kit`, and `spec_abilities` is a lineage's
+  DEFINITION table, not its opening kit. The four basics that were overrides (Fireball, Frostbolt, Arcane Explosion,
+  Shadowrend) are defined in `Classes.basic_override_ability` and drafted by name.
+- **A CARD THAT STOPS TRAVELLING LANDS ON ITS LINEAGE'S SHELF IN `SPEC_DRAFT_POOLS` IN THE SAME BATCH — NEVER
+  NOWHERE.** A card that travelled and now goes nowhere is a card deleted by accident. The class pool draws it and the
+  engine gate (GP's block below) decides who is offered it, **and a card entering the pool is cast both ways before it
+  enters, never assumed**: of GS's 29, three were refused without their engine (Death Ray, Hymn of Hope, Resurrection)
+  and became rows.
 
 **WHAT GK BUILT, CLAUSE BY CLAUSE.** Recorded in full before a line of code, on the brief's instruction.
 It supersedes the class-core half of FT §1's block below: **no class has a core.**
@@ -1787,9 +1807,9 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   deleted**: a unit holds `engines` and every read is `has_engine(id)`.
 - **BUILT (GO): six engine runes a class** — the fifteen and the designer's nine rule engines (the GO
   block below), so every deal is three of six. **RULED, NOT BUILT: there are no specs** — the spec
-  id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the four
-  layers GK does not merge (the opening kit, the stat block, the draft and boss pools, the spec-scoped
-  runes). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
+  id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the layers
+  not yet merged (the opening kit — its engine's enablers alone since GS §1 — the stat block, the boss
+  pools and the spec-scoped runes; the draft pools merged at GP). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
   the flat 100g rule's, not a set price.
 - **AN ENABLER CANNOT BE A STAT, AND ONE IS**: the Warden's `block_chance` 0.10 is his lineage's stat
   block, so Heavy Plating on another Warrior climbs from zero plus its own 15% slice.
@@ -1805,21 +1825,38 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **"HAS CHOSEN" IS `awakened`, NOT A SPEC.** A hero who takes a spine at class selection has no spec and has
   chosen; a member not yet through class selection has neither. What reads the old meaning pays or offers the
   wrong member — GK's census found two such (the zone-boss bank and the two fallback draft rolls).
-- **AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES (GM §2, RULED BY THE DESIGNER).** A lineage card the
-  usability door refuses without its engine — Death Ray, Resurrection, Kill Command — is named in
-  `Classes.ENGINE_BOUND`, and `Classes.opening_kit` takes it out at the line that takes the enablers out and puts
-  it back when the engine is slotted. **A NEW LINEAGE CARD THE DOOR REFUSES WITHOUT ITS ENGINE OWES A ROW THERE IN
-  THE SAME BATCH**: `check_gm` §2 casts every lineage card with the engine gone and reds on a fourth.
-  · **IT IS NOT AN ENABLER AND MUST NOT BE MADE ONE.** An enabler is what the engine needs; a bound card is what
-    needs the engine. So a bound card does not travel to another hero who takes the engine and does not leave the
-    slot count — the slot it held stays counted, and no magnitude moved. Whether it should do either is open
-    (`docs/state.md`).
-  · **THE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE, AND THE EARNED CARDS THAT NEED ONE, ARE NOT IN IT.** A card
-    that still does something is a working card, and an earned card is never lost (EG), so neither is this rule's
-    to take. Both populations are in `docs/reports/GM.md` §2 and wait on a ruling.
+- **AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES (GM §2, RULED BY THE DESIGNER) — AND SINCE GS §1 NO
+  LINEAGE OPENS WITH ONE, SO THE RULING HOLDS BY CONSTRUCTION.** GM named the three lineage cards the usability door
+  refuses without their engine — Death Ray, Resurrection, Kill Command — in `Classes.ENGINE_BOUND`, and the kit
+  builder took them out when the engine was dropped. GS §1 took every card but the enablers out of every opening kit,
+  so the table had nothing left to act on and **is deleted, not zeroed**; the three are on their lineages' shelves.
+  **A LINEAGE CARD THE DOOR REFUSES WITHOUT ITS ENGINE IS A POOL CARD, AND IT OWES A ROW IN `ENGINE_READ` IN THE SAME
+  BATCH**: Death Ray and Resurrection are rows, and Kill Command is not, because an earned Call the Wilds opens its
+  door with no engine — conditional on a card, GP's Battle Poise shape. **THE ROW GATES THE OFFER, NOT THE HAND**: a
+  copy drafted under its engine is earned, so it stays when the engine is dropped and the door refuses it — GM's open
+  question about earned cards, three cards larger since GS (`docs/state.md`).
+  · **A BOUND CARD WAS NEVER AN ENABLER AND MUST NOT BE MADE ONE.** An enabler is what the engine needs; a bound
+    card is what needs the engine.
+  · **THE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE, AND THE EARNED CARDS THAT NEED ONE, ARE NOT GATED.** A card
+    that still does something is a working card (GP's HALF-WORKS group), and an earned card is never lost (EG). Both
+    populations are in `docs/reports/GM.md` §2.
 - **AND A FIGHT KEEPS WHAT IT OPENED WITH.** The battle reads the member's engines once, at the spawn, and nothing in
   `battle.gd` writes an engine's slot state; the pouch's door is on the map. A drop takes effect at the next fight,
   never inside one, so no card leaves while it is cooling down, chosen or resolving (`check_gm` §2).
+
+## STANDING RULE — AN ENGINE RUNE SHOWS ITS ENGINE'S RULE, READ LIVE AT ONE DOOR (Batch GS §3, ruled by the designer)
+> **Wherever a rune's text renders, an ENGINE rune renders its engine's rule — the words its class-selection card
+> shows — and never its `desc` in `data/runes.json`.** `Runes.shown_desc` is the one door every surface asks, and
+> `Runes.engine_text` is the one builder of the words.
+
+- **ONE SOURCE, SO DIVERGENCE IS IMPOSSIBLE.** Twenty-four shop strings would be twenty-four second copies of a rule,
+  the shape that produced every stale claim this project has found. **The door reads the engine at render time, never
+  the instance's field**: an instance rides the save, and a desc written onto it goes on showing the day it was built.
+- **AN ENGINE RUNE'S `desc` IS UNREAD, AND IT STAYS IN THE DATA (ruled: no data change).** Twelve read *"The <spec>'s
+  engine."* and twelve *"A <class> engine."* — a placeholder a player met FIRST until GS, ahead of the rule GK's
+  `_engine_fields` appended to it. **A surface that shows one has gone around the door.**
+- **A NEW SURFACE THAT SHOWS A RUNE'S TEXT ASKS THE DOOR**, and `check_gs` §4 drives the Peddler, the pouch, an offer
+  and the hero sheet with all twenty-four and sweeps the game's scripts for a rune's `desc` read anywhere else.
 
 ## STANDING RULE — A STATUS IS SPENT WHERE IT PAYS, NEVER WHERE AN ENGINE READS IT (Batch GM §1)
 > **A status, charge or bank a card lays is spent under the gate its payout is read under. Its countdown or its
@@ -1845,10 +1882,14 @@ the block left out, spend what they were paid.
 > **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,
 > whatever engine he takes, holds or drops; they are protected, and they count against the slot cap.**
 
-- **ONE BUILDER, ONE DEDUPE.** `Classes.opening_kit` appends the kit after the lineage's cards and skips a kit card
-  the lineage already opened with, so a Berserker holds Bloodlust once. `Classes.kit_slots` counts the kit less what
-  the lineage's slots already count, and `Run.ability_slots_used` adds it: a hero with no lineage opens at 3, a Warden
-  (two shared cards) at 4. `protected_names` and `ability_corpus` walk the kit too.
+- **ONE BUILDER, ONE DEDUPE, AND THE DEDUPE FOLLOWS THE CARD (GS §2).** `Classes.opening_kit` appends every card by
+  name and skips one the hero already holds, whichever route it came by — so a Warden holding the Rune of the
+  Berserker second holds Bloodlust once. `Classes.kit_slots` counts the kit less what the lineage's slots already
+  count, and `Run.ability_slots_used` adds it: **every hero opens at 3**, because a lineage opens with its enablers
+  alone and an enabler sits outside the count. `protected_names` and `ability_corpus` walk the kit too.
+- **THE WARRIOR'S KIT IS CRUSHING BLOW · POMMEL STRIKE · MOCKING BLOW (GS §2, RULED BY THE DESIGNER).** Bloodlust was
+  a Berserker card wearing a class card's slot; it is the Berserker's enabler, so a Warrior holds it only with the Rune
+  of the Berserker. Pommel Strike keeps its one definition in the Swordmaster's `spec_abilities`.
 - **A KIT CARD KEEPS ITS ONE DEFINITION WHERE IT WAS** — a core in `spec_abilities`, a former class-wide card in
   `draft_ability` — and `class_kit` resolves it through `pool_ability`. **A card that exists only in a kit is defined
   in `class_kit_ability`.** Never a second copy.
@@ -2531,9 +2572,9 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   tag word, which `check_ek` §3 asserts at zero for that file by name.
 · **A THRESHOLD'S MAGNITUDE MUST BE CHOSEN AGAINST THE CORE-KIT BASELINE.** Before a card is
   drafted, the cores alone already meet a 2+ threshold on **BREAK for ten of the twelve specs**
-  and on **DEBUFF for seven**; **MARK is zero for all twelve** and **TEMPO reaches 1 on exactly
-  one**. A rune asking 2+ BREAK is on from the first fight for almost everyone and no swap turns
-  it off. `check_es` §4 prints the per-spec table every battery run.
+  and on **DEBUFF for six**; **MARK and TEMPO are zero for all twelve** (since GS §1 a lineage's
+  cores are its enablers and the class kit). A rune asking 2+ BREAK is on from the first fight for
+  almost everyone and no swap turns it off. `check_es` §4 prints the per-spec table every battery run.
 · **THE COUNT MUST BE VISIBLE AND MUST MOVE ON A SWAP.** A silent threshold is a stat nobody knows
   they have. It is drawn on the loadout panel (where the swap happens) and on the hero sheet, and
   **both are driven** — `check_es` §4 through the real equip/unequip doors, `check_map_screen`
@@ -2755,7 +2796,8 @@ five reachable at once.
 - **AND THE REASON HAS TWO CASES, SO IT IS DERIVED RATHER THAN WRITTEN.** A hero's pool is empty
   because he has taken everything, **or** because what is left is gated behind an ability he has
   not drafted — `Runes.kit_names` reads `bm_abilities`, so **a rune pool DEEPENS during a run.**
-  Ten of the sixty live runes are unreachable at spawn for that reason. Telling the Pyromancer he
+  Sixteen of the sixty live runes are unreachable at spawn for that reason (ten until GS §1 took six cards they name
+  out of the lineages' opening kits). Telling the Pyromancer he
   "carries every rune written for that awakening" at three-of-five is a lie; CO §3's rule that a
   refusal names its cause is what forces the fork. **One door — `Runes.empty_offer_reason` — because
   four sites print it.**
@@ -3213,17 +3255,19 @@ lets a boss pool empty below its own depth.**
 **THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE THING A
 LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `test_batch_bo`
 asserts every named enabler is in that spec's opening kit and in NO pool. **The failure it prevents
-is SILENT: a spine that stops working because its enabler became draftable.** Holy is the only spec
-at FOUR slots (Heal, Hymn of Hope), so she has the fewest earnable slots in the game; the
-Beastmaster's three summons are FIVE ABILITIES IN THREE SLOTS, because the summon picker has been
-one bar entry since AH. **The table itself is in `classes.gd` with a `why` on every row — read it
-there rather than copying it here.** **SINCE GK THE ENABLERS TRAVEL WITH THE ENGINE RUNE**:
-`Classes.engine_enablers` reads this column for an engine's lineage, `Classes.opening_kit` hands them
-to any hero of the class who holds that engine and takes them out of a lineage kit whose engine is not
-held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less the enablers).
+is SILENT: a spine that stops working because its enabler became draftable.** **Since GS §1 a
+lineage's protected core IS its enablers** — the minimum its engine cannot run without: one card for
+five engines, the three summons for the Beastmaster (one bar entry since AH) and none for the other
+six — so `slots` is their bar entries and `lineage_slots` is zero for every lineage. **The table itself
+is in `classes.gd` with a `why` on every row — read it there rather than copying it here.** **SINCE GK
+THE ENABLERS TRAVEL WITH THE ENGINE RUNE**: `Classes.engine_enablers` reads this column for an engine's
+lineage, `Classes.opening_kit` hands them to any hero of the class who holds that engine and takes them
+out when it is not held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less
+the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 149 of 149, 129 spec + 20 class-wide — AND SINCE GP
-THAT IS FOUR POOLS OF 38 / 41 / 34 / 36.** All twelve lineage shelves hold at least TEN; the
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 178 of 178, 158 spec + 20 class-wide — FOUR POOLS OF
+43 / 51 / 43 / 41 SINCE GS** (GP's merge made them 38 / 41 / 34 / 36 of 149, and GS §1 put the 29 cards
+that stopped travelling with an engine on their lineages' shelves). All twelve lineage shelves hold at least TEN; the
 Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
 moved five class-wide cards into the class kits. **A hero drew from 13 to 18 before the merge and a
 spine-taker from 3 to 6.**
@@ -3262,19 +3306,20 @@ dominated by a basic.
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
-> all of it — 38 / 41 / 34 / 36 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> all of it — 43 / 51 / 43 / 41 — and `Classes.draft_pool(class_key)` is the only thing a draw may
 > read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
 > SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**
 >
 > **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
-> the table — 34 cards, one `why` apiece — and `Classes.offerable` is the one answer, asked by the
+> the table — 37 cards, one `why` apiece — and `Classes.offerable` is the one answer, asked by the
 > draft offer and by the zone-boss fallback so the two cannot disagree.
 
 - **THE TABLE IS AUTHORED, DERIVED AT THE READ SITE, AND DRIVEN BOTH WAYS.** A field-level test
   misjudges 137 abilities (CN); the population came from casting every one of the 149 on a hero
   holding NO engine, on a board dressed so a no-op could only be the engine's fault, and then
-  casting each candidate again with the engine held. **`check_gp` §2 drives both arms every
+  casting each candidate again with the engine held — **and GS §1's 29 were cast the same way as they
+  entered the pool**, which is where GP's 34 rows became 37. **`check_gp` §2 drives both arms every
   battery and carries a CONTROL** — six engine-free cards that must cast identically on both.
 - **A CONTROL CARD MAY NOT BE ONE THE ENGINE BUFFS IN PASSING.** Chastise under Conviction
   separates because Faith raises every cast's damage — that is the engine reading the CARD, which
@@ -3398,8 +3443,8 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   he himself owns — **but the hero himself can**, by taking at every offer. What holds the floor
   up is arithmetic, not structure: emptying the chain means OWNING every card he can be SHOWN, and
   an offer pays at most one. **AND SINCE GP WHAT HE CAN BE SHOWN IS NARROWER THAN THE POOL:** the
-  engine gate takes out the cards that read an engine he does not hold — 22 of 34 for a Cleric
-  holding none — so the floor sits below the depth. **Under a fully-held LOADOUT no hero can be
+  engine gate takes out the cards that read an engine he does not hold — a Cleric holding none is
+  shown 29 of his 43 — so the floor sits below the depth. **Under a fully-held LOADOUT no hero can be
   paid nothing; under a fully-held POOL every hero still can.** `check_eh` §2 asserts both
   directions and `check_gp` §2b prints the reachable count per class.
 
@@ -3431,10 +3476,13 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   5.0. That is a cantrip beside a nuke. **At equal initiative "faster" is impossible by
   construction, so the tempo axis that survives the control is COOLDOWN**, and a gate that asserts
   the uncontrolled form reads RED the day it is written.
-- **EXACTLY ONE CROSSOVER EXISTS AND IT IS NAMED RATHER THAN COUNTED.** Holy's **Divine Plea**
-  (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative in the heal
-  role. Against Holy's **Heal** the same card is cheaper and LONGER, which is an ordinary trade and
-  not a crossover — EA §3's two counter-cases are one crossover and one trade.
+- **EVERY CROSSOVER IS NAMED RATHER THAN COUNTED, AND SINCE GS THERE ARE THREE, EACH OWED A RULING.** EB named
+  one — Holy's **Divine Plea** (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative
+  in the heal role — and it dissolved at GS §1, because Renewal left the cores for Holy's shelf. **GS's returning
+  cards brought three**: **Fireball** and **Frostbolt** (0 Mana, cooldown 0) against **Magic Missiles** (15, cooldown
+  2) at initiative 2.0, and **Aimed Shot** (20, cooldown 1) against **Powershot** (25, cooldown 2) at 3.0 — cards
+  priced as opening cards, two of them a lineage's free basic, drafted now. **None was retuned; the rebalance is
+  the designer's**, and `check_eb` §1 names all three and asserts EB's gone, so a fourth inversion still reds.
 - **THE CAP BINDING THE TWO LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
   FINDING.** `Ability.BUFF_DELAY_CAP` reaches **29.5% of the draft layer against 12.8% of the
   cores**. Under this ruling that is what a priced layer looks like beside a baseline one: the
@@ -3462,10 +3510,10 @@ exactly the inverted card, and it would still read fine on the tooltip.
 · **stance-GATED ABILITIES WERE BUILT IN BATCH BW — see its standing rule further down.** BP
   named them a future direction and deliberately did not build them; the rule they wanted is now
   written, and it is the READERS-BRANCH-AND-FLIP / GATED-REQUIRE-AND-STAY distinction.
-· **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE** and `PROTECTED_CORES`
-  says so. It is still the Swordmaster's enabler for a sharper reason: it is the only
-  UNCONDITIONAL swap — the others are DRAFTED (he may never be offered any of them), cost Rage, and
-  sit on 3- and 4-turn cooldowns.
+· **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE**, and **since GS §1 every
+  swap is DRAFTED, Guard Change included**: the stances run on the Aggressive guard every battle opens
+  in, so the swap is a card and not the engine's enabler. It is still the only UNCONDITIONAL one —
+  the others cost Rage and sit on 3- and 4-turn cooldowns.
 
 ## STANDING RULE — AN ENGINE IS EXCLUSIVE, AN AXIS IS SHARED (Batch DR §1)
 

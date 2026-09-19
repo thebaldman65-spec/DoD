@@ -281,7 +281,15 @@ func _pools() -> void:
 			# create them.** Authoring a Perfect bonus for either is a design
 			# decision, so it is recorded as owed rather than invented here.
 			# A THIRD name reaching this loop still trips.
-			if not (n in ["Rampage", "Pyroblast"]):
+			# BATCH GS — ARCANE EXPLOSION AND DEATH RAY REACH THIS LOOP NOW, ON DO's
+			# ARGUMENT EXACTLY. GS moved both off the Arcanist's opening kit onto his
+			# shelf, so this walk sees them for the first time; it did not create
+			# them — both have been `test_batch_cp.CHECK_WITHOUT_PERFECT` names since
+			# DW, asserted there as checked-but-Perfectless. **Arcane Explosion's gap
+			# is LIVE now rather than latent**: it ran no bar as the Arcanist's slot-0
+			# basic, and drafted it stands off slot 0, so the player presses a bar
+			# with no Perfect behind it. Authoring one is the designer's; owed.
+			if not (n in ["Rampage", "Pyroblast", "Arcane Explosion", "Death Ray"]):
 				ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
 					"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
 			else:
@@ -377,8 +385,12 @@ func _cores() -> void:
 		if not Classes.PROTECTED_CORES.has(spec):
 			continue
 		var slots := Classes.core_slots(spec)
-		ok(slots >= 1 and slots <= CAP,
-			"§2: %s's core fits inside the cap (%d)" % [spec, slots])
+		# BATCH GS §1 — A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS ALONE, so its
+		# core is their bar entries (the three summons one) and six lineages carry
+		# none: 0 is a real answer now. Asked against the bar entries the lineage
+		# actually opens with (`enabler_slots`), not a floor of one.
+		ok(slots == Classes.enabler_slots(spec) and slots <= CAP,
+			"§2: %s's core is its enablers' bar entries and fits inside the cap (%d)" % [spec, slots])
 		ok(CAP - slots >= 3,
 			"§2: %s keeps at least 3 draftable slots (%d)" % [spec, CAP - slots])
 		ok(String(Classes.PROTECTED_CORES[spec].get("why", "")) != "",
@@ -391,32 +403,56 @@ func _cores() -> void:
 		for en in Classes.core_enablers(spec):
 			ok(protected.has(en),
 				"§2: %s's enabler '%s' is in the protected core" % [spec, en])
-			ok(not Classes.spec_draft_pool(spec).has(en),
+			# BATCH GS — THE CLASS POOL, NOT HIS SHELF: since GP a hero draws his
+			# whole class pool, and GS's rule is that an enabler reaches only its
+			# engine's holder — on a SIBLING's shelf it would reach every hero of
+			# the class (Bloodlust, a class kit card until GS, is the case).
+			ok(not Classes.draft_pool(Classes.class_of_spec(spec)).has(en),
 				"§2: ...and is NOT draftable (%s)" % en)
 			ok(not Classes.spec_pool(spec).has(en),
 				"§2: ...and is NOT a boss pick either (%s)" % en)
 	# The per-spec answers that the batch calls out by name.
-	ok(Classes.core_enablers("pyromancer").size() == 2,
-		"§2: Overburn needs a Burn applier AND a spender — the Pyromancer's core is larger")
-	ok(Classes.core_enablers("berserker").is_empty(),
-		"§2: ...than the Berserker's, whose passive reads nothing but his own health")
+	# BATCH GS §1 — RE-POINTED TO THE DESIGNER'S RULING, BOTH HALVES. Overburn reads
+	# Burn standing on the field and no Mage basic or kit card lays any, so the
+	# Pyromancer brings Flamewave and nothing else; Blood Frenzy reads his health
+	# and the Rage he spends, and the ruling sends Bloodlust with it.
+	ok(Classes.core_enablers("pyromancer") == ["Flamewave"],
+		"§2: Overburn needs Burn on the field — the Pyromancer brings Flamewave alone (GS §1)")
+	ok(Classes.core_enablers("berserker") == ["Bloodlust"],
+		"§2: ...and the Berserker brings Bloodlust, the designer's ruling (GS §1)")
 	# Corrected toward the code by BP: Precision Strike and Feint switch the
 	# stance too, so Guard Change is his only UNCONDITIONAL swap rather than
 	# the only one in the game. The ENABLER is unchanged and still protected.
-	ok(Classes.core_enablers("swordmaster") == ["Guard Change"],
-		"§2: the Swordmaster's stances need his one unconditional stance swap")
+	# (BATCH GS §1: it is no enabler now — see below.)
+	# BATCH GS §1 — Seasoned Fighter opens every battle Aggressive and Aggressive
+	# pays from the first blow, so the stance swap is a card: Guard Change is on
+	# his shelf and the Swordmaster's engine travels with nothing.
+	ok(Classes.core_enablers("swordmaster").is_empty()
+			and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"§2: the Swordmaster's stances need no enabler — his stance swap, Guard Change, is drafted off his shelf (GS §1)")
 	ok(Classes.core_enablers("beastmaster").size() == 3,
 		"§2: Pack Bond needs a beast — all three summons are protected")
-	ok(Classes.core_slots("beastmaster") == 3,
-		"§2: ...and they cost THREE slots, not five (the summons share one bar entry)")
-	ok(Classes.core_slots("holy") == 4,
-		"§2: Holy's four opening abilities cost four slots (Batch AV's deliberate parity break)")
+	# BATCH GS — the summons are one bar entry and nothing else opens with them, so
+	# the core is ONE slot (it was three: the summons' entry and two lineage cards).
+	ok(Classes.core_slots("beastmaster") == 1,
+		"§2: ...and they cost ONE slot — the three summons share one bar entry, and nothing else opens with them (GS §1)")
+	# BATCH GS §1 — Mercy pays on every heal she casts, the kit's Ministration among
+	# them, so the Holy opens with no card of her lineage: her four are on her shelf
+	# and cost no slot, and Batch AV's deliberate parity break ended with them.
+	var holy_four: Array = ["Heal", "Renewal", "Hymn of Hope", "Resurrection"]
+	ok(Classes.core_slots("holy") == 0
+			and holy_four.all(func(n): return Classes.spec_draft_pool("holy").has(n)),
+		"§2: Holy's four opening abilities are on her shelf now and cost no slot (GS §1)")
 	# TEN OF TWELVE ARE 3-AND-4, which is what §2 predicted.
+	# BATCH GS — ALL TWELVE ARE, counted on the live opening: every hero opens on
+	# the class kit's three whatever engine he holds (enablers sit outside the
+	# count), so each leaves four of the cap's seven for earned cards.
 	var threes := 0
 	for spec2 in specs:
-		if Classes.core_slots(spec2) == 3:
+		if Classes.lineage_slots(spec2) \
+				+ Classes.kit_slots(Classes.class_of_spec(spec2), spec2) == 3:
 			threes += 1
-	ok(threes == 11, "§2: eleven specs carry 3 protected and 4 draftable (got %d)" % threes)
+	ok(threes == 12, "§2: all twelve specs open on the kit's 3 and leave 4 draftable (got %d)" % threes)
 
 
 # ---------- §2 THE CAP ----------
@@ -434,30 +470,50 @@ func _cap_and_slots() -> void:
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter). Overburn's
 	# enablers are Fireball and Detonation, so the Pyromancer's lineage opens
 	# using TWO slots — `Classes.lineage_slots` — and five earned cards fill him.
+	# (BATCH GS §1: its enabler is Flamewave alone now — see below.)
 	# BATCH GN — AND THE CLASS KIT'S THREE ARE INSIDE THE COUNT TOO (none of them
 	# is his lineage's), so he opens at FIVE and two earned cards fill him. The
 	# walk below is the same walk, one card for every four it used to take.
-	ok(int(run.ability_slots_used(m)) == 5 and Classes.lineage_slots("pyromancer") == 2
-			and Classes.kit_slots("mage", "pyromancer") == 3,
-		"§2: a fresh Pyromancer uses 5 of 7 — his lineage's core less its enablers, and the class kit's three")
+	# **BATCH GS §1 — HE OPENS ON THE CLASS KIT'S THREE AND NOTHING OF HIS LINEAGE
+	# COUNTS**: it brings Flamewave alone, outside the count, so `lineage_slots` is
+	# 0. The FILL IS DERIVED — the live cap less the live opening — so the walk is
+	# one short of the cap and then at it whatever the kit or the ladder's first
+	# rung reads. BO's Immolate and Firestorm are the last two in, preceded by as
+	# many of his own shelf's cards as the fill needs.
+	var open := Classes.lineage_slots("pyromancer") + Classes.kit_slots("mage", "pyromancer")
+	var fill: int = int(run.ability_slot_cap()) - open
+	var earned: Array = []
+	for n0 in Classes.spec_draft_pool("pyromancer"):
+		if earned.size() >= fill - 2:
+			break
+		if not ["Immolate", "Firestorm"].has(n0):
+			earned.append(n0)
+	earned.append_array(["Immolate", "Firestorm"])
+	ok(int(run.ability_slots_used(m)) == open and open == 3
+			and Classes.lineage_slots("pyromancer") == 0,
+		"§2: a fresh Pyromancer uses 3 of 7 — the class kit's three; Flamewave sits outside the count (GS §1)")
 	ok(not run.ability_slots_full(m), "§2: ...and is not full")
-	m["bm_abilities"] = ["Immolate"]
-	ok(int(run.ability_slots_used(m)) == 6, "§2: one earned takes him to 6")
+	m["bm_abilities"] = earned.slice(0, fill - 1)
+	ok(int(run.ability_slots_used(m)) == CAP - 1,
+		"§2: %d earned take him to %d" % [fill - 1, CAP - 1])
 	ok(not run.ability_slots_full(m), "§2: ...still one slot open")
-	m["bm_abilities"] = ["Immolate", "Firestorm"]
-	ok(int(run.ability_slots_used(m)) == CAP, "§2: a second fills the kit")
+	m["bm_abilities"] = earned.duplicate()
+	ok(int(run.ability_slots_used(m)) == CAP, "§2: a %dth fills the kit" % fill)
 	ok(run.ability_slots_full(m), "§2: ...and the cap binds")
 	# A PROTECTED ABILITY CAN NEVER BE DROPPED, and the mechanism is that it is
 	# not in the drop list at all — there is no branch to get wrong.
-	ok(not run.earned_ability_names(m).has("Detonation"),
+	# BATCH GS — THE PROTECTED CARD NAMED HERE IS HIS ENABLER: Detonation is a card
+	# on his shelf now, and Flamewave is the one his engine travels with.
+	ok(not run.earned_ability_names(m).has("Flamewave")
+			and Classes.protected_names("pyromancer").has("Flamewave"),
 		"§2: a protected ability is not in the drop list")
-	ok(not run.unequip_earned_ability(m, "Detonation"),
+	ok(not run.unequip_earned_ability(m, "Flamewave"),
 		"§2: ...and benching one is REFUSED")
 	ok(int(run.ability_slots_used(m)) == CAP,
 		"§2: ...leaving the kit untouched")
 	ok(run.unequip_earned_ability(m, "Firestorm"),
 		"§2: an EARNED ability benches")
-	ok(int(run.ability_slots_used(m)) == 6, "§2: ...and frees its slot")
+	ok(int(run.ability_slots_used(m)) == CAP - 1, "§2: ...and frees its slot")
 	# **INVERTED BY BATCH EG §2, AND THE QUESTION IS KEPT.** BO asserted that a
 	# DROP wrote the no-return ledger, because a drop was permanent. Benching is
 	# not permanent — the card stays in the pool and can be carried again — so
@@ -655,22 +711,32 @@ func _take_decline_drop() -> void:
 	# BATCH GN — THE FILL IS RELATIVE TO THE LIVE OPENING (BO's rule): the
 	# class kit's two he does not already hold count too, so two earned cards
 	# fill him where four did. Pinning Shot stays first, because the bench below
-	# names it.
-	var fill3: int = CAP - Classes.lineage_slots("sharpshooter") \
-		- Classes.kit_slots("hunter", "sharpshooter")
+	# names it. (BATCH GS: he holds none of the kit as his own now, so all three
+	# count and four fill him again.)
+	# BATCH GS — THE OPENING IS THE CLASS KIT'S THREE NOW (Aimed Shot and Hold
+	# Breath are on his shelf, Quick Shot is every Hunter's basic), so the fill is
+	# the live cap less that live opening — four — and it is asserted as that
+	# relation, never as a number of cards.
+	var open3: int = Classes.lineage_slots("sharpshooter") \
+		+ Classes.kit_slots("hunter", "sharpshooter")
+	var fill3: int = int(run.ability_slot_cap()) - open3
 	var m3 := {"key": "hunter", "spec": "sharpshooter", "talents": {}, "tree": [],
 		"bm_abilities": (["Pinning Shot", "Quick Draw", "Triple Shot",
 			"Coup de Grâce"] as Array).slice(0, fill3)}
-	ok(run.ability_slots_full(m3) and fill3 == 2,
-		"§2: the Sharpshooter's kit is full at 7 — two earned on a five-slot opening (fill %d)" % fill3)
+	ok(run.ability_slots_full(m3) and (m3["bm_abilities"] as Array).size() == fill3
+			and open3 == 3,
+		"§2: the Sharpshooter's kit is full at 7 — %d earned on the class kit's three-slot opening (GS)" % fill3)
 	ok(run.award_draft_pick(m3), "§2: a full kit is still offered a draft")
 	var c3 := String(m3["draft_candidates"][0][0])
 	ok(run.take_draft_ability(m3, c3) == "the kit is full — name an ability to bench",
 		"§2: taking at the cap REQUIRES a bench before it resolves (EG §2)")
 	ok(not m3["bm_abilities"].has(c3), "§2: ...and nothing landed")
 	ok(int(m3["draft_picks_owed"]) == 1, "§2: ...and the pick is still owed")
-	ok(run.take_draft_ability(m3, c3, "Aimed Shot")
-			== "Aimed Shot cannot be benched",
+	# BATCH GS — Aimed Shot is a card on his shelf now, so the PROTECTED name here is
+	# the class kit's Powershot — in `protected_names`, and in no pool.
+	ok(Classes.protected_names("sharpshooter").has("Powershot")
+			and run.take_draft_ability(m3, c3, "Powershot")
+			== "Powershot cannot be benched",
 		"§2: naming a PROTECTED ability as the bench is refused")
 	ok(int(run.ability_slots_used(m3)) == CAP, "§2: ...leaving the kit at 7")
 	ok(run.take_draft_ability(m3, c3, "Pinning Shot") == "",
@@ -816,11 +882,14 @@ func _sources() -> void:
 
 # ---------- LIVE ----------
 
+# BATCH GS — `lineage` forwards the fixture's `lineage_cards`: the cards a lineage
+# opened with until GS, seated as DRAFTED cards the way a player gets them now,
+# for a section that drives one of them (§5's Fireball and Aimed Shot).
 func _spawn(specs: Array, granted: Dictionary, lineup: Array,
-		learned := {}) -> Node:
+		learned := {}, lineage := false) -> Node:
 	return await Fixture.spawn(self, specs,
 		{"difficulty": "wanderer", "enemies": lineup, "talents_by_spec": learned,
-		"bm_by_spec": granted, "deterministic": true})
+		"bm_by_spec": granted, "deterministic": true, "lineage_cards": lineage})
 
 
 func _hero(scene: Node, passive: String) -> BattleUnit:
@@ -838,8 +907,14 @@ func _drop(scene: Node) -> void:
 # ---------- §5 PYROMANCER ----------
 
 func _live_pyromancer() -> void:
+	# BATCH GS — FIREBALL, THE SECOND FIRE BELOW, IS A DRAFTED CARD NOW (his shelf,
+	# `basic_override_ability`), not the slot-0 basic he opened on; the lineage's
+	# former cards are seated as a player gets them, and every card here is found
+	# by name. Without it the section threw at the Fireball and never reached
+	# Cinderfall.
 	var scene := await _spawn(["berserker", "pyromancer", "holy", "mystic"],
-		{"pyromancer": ["Cinderfall", "Ember Debt"]}, ["raider", "raider", "archer"])
+		{"pyromancer": ["Cinderfall", "Ember Debt"]}, ["raider", "raider", "archer"],
+		{}, true)
 	var pyro := _hero(scene, "overburn")
 	ok(pyro != null, "the Pyromancer spawned")
 	if pyro == null:
@@ -1274,9 +1349,12 @@ func _live_beastmaster() -> void:
 # ---------- §5 SHARPSHOOTER ----------
 
 func _live_sharpshooter() -> void:
+	# BATCH GS — AIMED SHOT, THE SINGLE-TARGET SHOT THIS SECTION BUILDS AND SPENDS
+	# FOCUS WITH, IS ON HIS SHELF NOW; it is seated as a drafted card (the lineage's
+	# former cards) and found by name, and what is measured is unchanged.
 	var scene := await _spawn(["berserker", "pyromancer", "holy", "sharpshooter"],
 		{"sharpshooter": ["Called Volley", "Quarry's Mark"]},
-		["raider", "raider", "archer"])
+		["raider", "raider", "archer"], {}, true)
 	var ss := _hero(scene, "lethal_aim")
 	ok(ss != null, "the Sharpshooter spawned")
 	if ss == null:

@@ -2,8 +2,9 @@
 #
 #   §0  THE KIT, READ — every class's three through the one builder: a hero with
 #       no lineage and no engine opens with his basic and the three; a lineage
-#       that already opens with a kit card holds it once; the slots each hero
-#       opens at; the five cards that left the class pools, and the pools left
+#       that already opens with a kit card holds it once (none does since BATCH
+#       GS: one that DEFINES a kit card holds it once, through the kit); the slots
+#       each hero opens at; the five cards that left the class pools, and the pools left
 #   §1  THE TWELVE, DRIVEN — every kit card cast on a hero of its class holding
 #       NO engine, and what it promises read off the board
 #   §2  ELEMENTAL WEAKNESS — Magic Burst lays it, a hit of every school but
@@ -148,6 +149,9 @@ func _no_lineage_board() -> Node:
 func _s0_the_kit() -> void:
 	print("--- GN §0: the kit, read ---")
 	var dedupe := {}
+	# BATCH GS — the lineages whose DEFINITION table carries a kit card: the
+	# positive arm beside `dedupe`, which asks what a lineage OPENS with.
+	var defined := {}
 	for ck in CLASS_SEATS:
 		var kit: Array = Classes.class_kit_names(ck)
 		var resolved: Array = _names(Classes.class_kit(ck))
@@ -170,12 +174,23 @@ func _s0_the_kit() -> void:
 					"§0: %s (%s) holds the kit, each card once (%s)"
 						% [pid, "engine held" if not held.is_empty() else "engine dropped", str(twice)])
 			if spec != "":
+				# BATCH GS §1 — WHAT THE LINEAGE OPENS WITH, NOT WHAT IT DEFINES. The
+				# two were one list until GS; `spec_abilities` is a lineage's
+				# definition table now, and it opens with its engine's enablers
+				# alone (`lineage_opening`), so a kit card it defines reaches the
+				# hero through the class kit and costs a kit slot like anyone's.
 				var shared: Array = []
-				for ab in Classes.spec_abilities(spec):
+				for ab in Classes.lineage_opening(spec):
 					if ab != null and kit.has(ab.display_name):
 						shared.append(ab.display_name)
 				if not shared.is_empty():
 					dedupe[spec] = shared
+				var defines: Array = []
+				for ab2 in Classes.spec_abilities(spec):
+					if ab2 != null and kit.has(ab2.display_name):
+						defines.append(ab2.display_name)
+				if not defines.is_empty():
+					defined[spec] = defines
 			# THE SLOTS: the lineage's, plus the kit's less what the lineage counts.
 			var m := {"key": ck, "spec": spec, "engines": [], "bm_abilities": []}
 			var used: int = _run.ability_slots_used(m)
@@ -197,13 +212,36 @@ func _s0_the_kit() -> void:
 			and _run.unequip_earned_ability(benchy, "Mirror Image"),
 		"§0: the bench door refuses a kit card and still benches an earned one")
 	# THE DEDUPE POPULATION IS DERIVED, AND IT IS THE FOUR LINEAGES THE KITS SHARE A CORE WITH.
-	var want := {"berserker": ["Bloodlust"], "warden": ["Mocking Blow", "Crushing Blow"],
-		"sharpshooter": ["Powershot"], "mystic": ["Tripwire", "Snare Trap"]}
-	ok(dedupe == want, "§0: the lineages that already open with a kit card are the four (%s)" % str(dedupe))
+	# **BATCH GS §1 — AND IT IS EMPTY NOW.** It was the Berserker (Bloodlust), the
+	# Warden (Mocking Blow and Crushing Blow), the Sharpshooter (Powershot) and the
+	# Survivalist (Tripwire and Snare Trap): a lineage opens with its engine's
+	# enablers alone since GS, and no enabler is a kit card (Bloodlust left the
+	# kit, GS §2). The lineages that DEFINE a kit card are the arm below — the
+	# Swordmaster among them, Pommel Strike being the kit's since GS §2.
+	ok(dedupe.is_empty(),
+		"§0: no lineage opens with a kit card any more — an engine brings only its enablers (GS §1) (%s)" % str(dedupe))
+	# THE POSITIVE ARM BESIDE IT: the lineages that DEFINE a kit card still hold it,
+	# and once — through the class kit, the dedupe following the card, not the kit.
+	var held_once := not defined.is_empty()
+	for sp3 in defined:
+		var got3: Array = _names(Classes.opening_kit(Classes.class_of_spec(String(sp3)),
+			String(sp3), [Classes.engine_of_spec(String(sp3))]))
+		for k3 in defined[sp3]:
+			if got3.count(k3) != 1:
+				held_once = false
+	ok(held_once,
+		"§0: ...and a lineage that defines a kit card holds it exactly once, through the kit (%s)" % str(defined))
 	# A hero with no lineage opens at three; a Warden, sharing two, at four.
-	ok(_run.ability_slots_used({"key": "cleric", "spec": "", "engines": [], "bm_abilities": []}) == 3
-			and _run.ability_slots_used({"key": "warrior", "spec": "warden", "engines": [], "bm_abilities": []}) == 4,
-		"§0: a hero with no lineage opens at 3 and a Warden at 4")
+	# **BATCH GS — EVERY HERO OPENS AT THREE**, the Warden with them: nothing of a
+	# lineage opens inside the count any more, and its enablers sit outside it.
+	var every_three: bool = _run.ability_slots_used(
+		{"key": "cleric", "spec": "", "engines": [], "bm_abilities": []}) == 3
+	for ck4 in CLASS_SEATS:
+		for sp4 in Classes.SPEC_IDS[ck4]:
+			if _run.ability_slots_used({"key": ck4, "spec": String(sp4), "engines": [],
+					"bm_abilities": []}) != 3:
+				every_three = false
+	ok(every_three, "§0: a hero with no lineage opens at 3, and so does every lineage, a Warden too (GS)")
 	# THE POOLS: the five left, and the cards they still hold are real.
 	var in_a_pool: Array = []
 	for ck2 in CLASS_SEATS:
@@ -283,22 +321,23 @@ func _s1_the_twelve() -> void:
 		_reset_foe(e0)
 
 	# BLOODLUST — damage, and heals 30% of missing health.
-	var lust := _card(W, "Bloodlust")
-	if lust != null:
+	# **BATCH GS §2 — POMMEL STRIKE TOOK ITS PLACE IN THE KIT (ruled).** Bloodlust is
+	# the Berserker's enabler now and no card of a hero who holds no engine, so the
+	# kit's second card is driven here instead, against what it promises: a hit,
+	# 30 Break damage, a Stun for 1 turn on an enemy that is no boss, and 10 Rage
+	# built back on its cost of 20.
+	var pommel := _card(W, "Pommel Strike")
+	if pommel != null:
 		_ready_to_cast(W)
 		W.resource = 50
-		W.hp = int(W.max_hp * 0.4)
-		var missing := W.max_hp - W.hp
-		var hp_was := W.hp
-		await s._resolve(W, lust, e0, "good")
-		var healed := W.hp - hp_was
-		ok(e0.hp < e0.max_hp and absi(healed - int(round(missing * 0.3))) <= 2
-				and W.resource == 50 - 25 + 10,
-			"§1: Bloodlust hits and heals 30%% of the missing health (%d of %d missing)"
-				% [healed, missing])
-		print("    Bloodlust: %d damage, healed %d of %d missing, Rage 50 -> %d" % [
-			e0.max_hp - e0.hp, healed, missing, W.resource])
-		W.hp = W.max_hp
+		await s._resolve(W, pommel, e0, "good")
+		var stun_turns := int(e0.get_status("stunned").get("turns", 0))
+		ok(e0.hp < e0.max_hp and e0.pressure == 30 and stun_turns == 1
+				and W.resource == 50 - 20 + 10,
+			"§1: Pommel Strike hits, lands 30 Break damage (%d), Stuns for 1 turn (%d) and builds its Rage (%d)"
+				% [e0.pressure, stun_turns, W.resource])
+		print("    Pommel Strike: %d damage, %d Break damage, Stunned %d turn, Rage 50 -> %d" % [
+			e0.max_hp - e0.hp, e0.pressure, stun_turns, W.resource])
 		_reset_foe(e0)
 
 	# MOCKING BLOW — free, the target and one other enemy mocked for 4 turns.
@@ -796,16 +835,28 @@ func _s4_the_bot() -> void:
 	var picks := {}
 	# WARRIOR: hurt -> Bloodlust; whole and nobody held -> Mocking Blow; a
 	# held enemy and no Sunder -> Crushing Blow.
+	# **BATCH GS §2 — MOCKING BLOW, THEN POMMEL STRIKE, THEN CRUSHING BLOW, AND
+	# BLOODLUST HAS NO CASE** (it left the kit, and the Berserker's rotation casts
+	# it). Nobody held -> the taunt, hurt or whole; every enemy held -> Pommel
+	# Strike; every enemy held and the mark a boss not yet Broken, which would
+	# resist the Stun -> Crushing Blow, at a mark with no Sunder. The hurt board
+	# that named Bloodlust is kept, and asks the question its case left behind.
 	_ready_to_cast(W)
 	W.hp = int(W.max_hp * 0.4)
-	picks["Bloodlust"] = _pick_name(s, W)
+	var hurt_pick := _pick_name(s, W)
+	ok(hurt_pick == "Mocking Blow",
+		"§4: a hurt Warrior with nobody held is named the taunt — Bloodlust has no case in the class branch (named %s)" % hurt_pick)
 	W.hp = W.max_hp
 	picks["Mocking Blow"] = _pick_name(s, W)
 	var w_idx: int = s.get("heroes").find(W)
 	for e in foes:
 		s._apply_status(e, "mocked", 4, w_idx, 0, W)
+	picks["Pommel Strike"] = _pick_name(s, W)
+	for e in foes:
+		e.is_boss = true
 	picks["Crushing Blow"] = _pick_name(s, W)
 	for e in foes:
+		e.is_boss = false
 		_reset_foe(e)
 	# MAGE: hurt and unwarded -> Nexus Ward; then Magic Burst at a fresh enemy;
 	# every enemy weakened -> Magic Missiles.

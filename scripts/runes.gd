@@ -37,9 +37,10 @@
 # `universal` still resolves here.** The day the five are re-homed it can go.
 # Ability-payload runes MUST carry "requires_ability": Talents.apply_payload
 # matches on display_name and a rune naming an ability the hero does not own
-# applies silently and does NOTHING. The derivable kit checked here: core kit
-# + spec abilities + apply_kit_overrides renames + the member's bm_abilities
-# (boss trophies).
+# applies silently and does NOTHING. The derivable kit checked here: the one
+# opening-kit builder (`Classes.opening_kit` — the class basic, the held
+# engines' enablers and the class kit) + the member's bm_abilities (boss
+# trophies and drafted cards).
 class_name Runes
 
 const DATA_PATH := "res://data/runes.json"
@@ -1144,14 +1145,44 @@ static func build(id: String) -> Dictionary:
 # three ordinary slots and everything that counts them are untouched; an engine
 # rune's own `equipped` flag is its place in one of the two engine slots.
 
-# The instance's engine fields: the id, and a desc that is the entry's own line
-# followed by the engine's text — read off `Classes`, never copied into the data.
+# The instance's engine fields: the id, and a desc that is the engine's rule —
+# read off `Classes`, never copied into the data.
+#
+# **BATCH GS §3 — THE ENTRY'S OWN LINE IS NOT READ ANY MORE.** GK wrote the desc
+# as the entry's line FOLLOWED by the engine's text, and every one of the
+# twenty-four lines is a placeholder — *"The Occultist's engine."*, *"A Cleric
+# engine."* — so a player buying a rune met the placeholder first. The engine's
+# rule text is the whole desc now, and the placeholder stays in `runes.json`
+# unread (ruled: no data change).
 static func _engine_fields(e: Dictionary) -> Dictionary:
 	var pid := String(e.get("engine", ""))
 	if pid == "":
 		return {}
-	return {"engine": pid, "desc": "%s %s" % [String(e["desc"]),
-		Classes.resolve_values(Classes.engine_desc(pid), {}).replace("\n", " ")]}
+	return {"engine": pid, "desc": engine_text(pid)}
+
+
+# **THE ONE BUILDER OF AN ENGINE RUNE'S TEXT (GS §3)**: the engine's rule, the
+# same words the class-selection card shows, flattened for a surface that
+# soft-wraps. Nothing resolves against a hero here, so an Attack token stands as
+# its bare percentage, CL §1's rule for a surface with no one to resolve against.
+static func engine_text(pid: String) -> String:
+	return Classes.resolve_values(Classes.engine_desc(pid), {}).replace("\n", " ")
+
+
+# **WHAT A SURFACE SHOWS FOR A RUNE'S TEXT, AND THE ONE DOOR EVERY SURFACE ASKS
+# (GS §3, ruled).** An engine rune shows its engine's rule, read LIVE rather than
+# off the instance: an instance rides the save, so a desc written onto one when
+# it was built would go on showing that day's words after a constant moved — the
+# shop, the pouch, the offers and the hero sheet would each show whichever copy
+# they held. Read here, there is one source and nothing to diverge. An ordinary
+# rune shows its own desc, unchanged.
+static func shown_desc(rune: Dictionary) -> String:
+	var pid := String(rune.get("engine", ""))
+	if pid == "" and rune.has("id") and _load().has(String(rune["id"])):
+		pid = String(config(String(rune["id"])).get("engine", ""))
+	if pid != "":
+		return engine_text(pid)
+	return String(rune.get("desc", ""))
 
 
 static func is_engine_rune(id: String) -> bool:

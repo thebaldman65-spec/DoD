@@ -526,10 +526,15 @@ func _strip_comments(src: String) -> String:
 
 # ---------- live harness ----------
 
-func _spawn(spec: String, lineup: Array, learned := {}) -> Node:
-	return await Fixture.spawn(self, ["berserker", spec, "inquisitor", "beastmaster"],
-		{"enemies": lineup, "talents": {1: learned.duplicate()}, "deterministic": true,
-		"crit": -1.0})
+# BATCH GS added `lineage` — a lineage's own cards (Ice Lance among them) left
+# its opening kit for its shelf, so a check that needs one ON THE BAR seats the
+# lineage's cards as DRAFTED (the fixture's `lineage_cards`) and finds it by name.
+func _spawn(spec: String, lineup: Array, learned := {}, lineage := false) -> Node:
+	var opts := {"enemies": lineup, "talents": {1: learned.duplicate()},
+		"deterministic": true, "crit": -1.0}
+	if lineage:
+		opts["lineage_cards"] = true
+	return await Fixture.spawn(self, ["berserker", spec, "inquisitor", "beastmaster"], opts)
 
 
 func _mage(scene: Node, passive: String) -> BattleUnit:
@@ -814,8 +819,10 @@ func _live_deep_winter() -> void:
 	await process_frame
 
 
+# BATCH GS — the lineage's cards are seated: the Ice Lance control below needs
+# the card ON HIS BAR, and it is drafted off his shelf now.
 func _live_cold_iron() -> void:
-	var scene := await _spawn("cryomancer", ["raider", "raider"])
+	var scene := await _spawn("cryomancer", ["raider", "raider"], {}, true)
 	var cr := _mage(scene, "permafrost")
 	ok(cr != null, "the Cryomancer spawned for Cold Iron")
 	if cr == null:
@@ -1222,8 +1229,20 @@ func _docs() -> void:
 	# how much of the draft §6b catalogues, and check_cb has never asserted that.
 	# BATCH GN MOVED IT AGAIN, FOR THE SAME REASON: five class-wide cards went
 	# into the class kits, so the draft reads a hundred and forty-nine.
-	ok(master.contains("hundred and forty-nine"),
-		"master.html states the draft count in words")
+	# BATCH GS MOVED THE DRAFT AGAIN (29 cards onto the shelves, 149 -> 178) AND
+	# THE NEEDLE STOPS BEING A HAND-COPIED WORD. It is rendered from the live
+	# draft — every class's `draft_pool`, summed — so the question is unchanged
+	# (does master.html state the live count in words?) and a batch that moves
+	# the pools moves this with them. A leading "one" is dropped, as the old
+	# needle dropped its "a", because the document has said both.
+	var draft := 0
+	for cls in Classes.SPEC_IDS:
+		draft += Classes.draft_pool(String(cls)).size()
+	var said := _in_words(draft)
+	if said.begins_with("one hundred"):
+		said = said.trim_prefix("one ")
+	ok(master.contains(said),
+		"master.html states the draft count in words (%d, \"%s\")" % [draft, said])
 	ok(master.contains("All twelve specs draft from at least ten"),
 		"master.html records the FLOOR, which DS and DY moved to ten")
 	# The pool summary rows moved with the pools, or a player reads five where
@@ -1286,3 +1305,27 @@ func _docs() -> void:
 		ids[String(e["id"])] = true
 	for link in bond.get("see_also", []):
 		ok(ids.has(String(link)), "the bond entry links to a real entry (%s)" % link)
+
+
+# BATCH GS — A NUMBER IN WORDS, the way master.html writes a count (e.g. "two
+# hundred and six"). `_docs` renders the draft's live size through this rather
+# than pinning a hand-copied phrase that the next pool move leaves stale. It
+# covers 0-999; a draft past that would need the thousands added here.
+func _in_words(n: int) -> String:
+	const ONES := ["zero", "one", "two", "three", "four", "five", "six", "seven",
+		"eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+		"fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+	const TENS := ["", "", "twenty", "thirty", "forty", "fifty", "sixty",
+		"seventy", "eighty", "ninety"]
+	var out := ""
+	var rest := n
+	if rest >= 100:
+		out = String(ONES[rest / 100]) + " hundred"
+		rest = rest % 100
+		if rest == 0:
+			return out
+		out += " and "
+	if rest < 20:
+		return out + String(ONES[rest])
+	return out + String(TENS[rest / 10]) \
+		+ ("" if rest % 10 == 0 else "-" + String(ONES[rest % 10]))

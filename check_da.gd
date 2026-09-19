@@ -55,7 +55,13 @@ const WALK_EXEMPT := {
 	# asserts the difference between them is EXACTLY the overridden basics,
 	# derived rather than listed. The exemption itself is untouched: the reason
 	# it exists is the direct pool reads, and those have not moved.
-	"check_cz.gd": "`_cl_only_corpus` re-derives the Batch CL walk directly — since DU it asserts the two walks differ by exactly the kit overrides",
+	# **BATCH GS CORRECTED IT A THIRD TIME.** GN had already widened the
+	# difference by the class-kit cards no older structure names, and GS §1
+	# deleted the overrides and shelved the four, which the CL walk reads — so §0
+	# asserts the override half EMPTY (both walks reach the four) and the whole
+	# difference is the class-kit half. The pool reads, and so the exemption,
+	# are unchanged.
+	"check_cz.gd": "`_cl_only_corpus` re-derives the Batch CL walk directly — since GS §1 both walks reach the four shelved kit overrides, and it asserts the two walks differ by exactly the class-kit cards no pool holds",
 	# BATCH DN — THE MARK OVER-FIRES HERE, AND THE EXEMPTION RECORDS WHY RATHER
 	# THAN HIDING IT. The fingerprint is the two draft-pool calls, and it stands
 	# in for the defect "this gate re-derived the corpus and is therefore missing

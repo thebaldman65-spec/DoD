@@ -4161,8 +4161,9 @@ func _player_turn(u: BattleUnit) -> void:
 			# `runs_skill_check` — they lose their bar because a bar on the
 			# filler turn is the attention tax §2 exists to stop charging, and
 			# there are more of those turns than of any other kind. Read off
-			# SLOT 0 rather than off a name, so the four spec basics that
-			# `apply_kit_overrides` swaps in are covered without being listed.
+			# SLOT 0 rather than off a name, so whichever basic stands there is
+			# covered without being listed — the class basic, since GS §1 took the
+			# four lineage basics out of slot 0 and into the draft.
 			#
 			# THE SHARPSHOOTER IS THE ONE EXCEPTION AND IT IS READ OFF THE HERO,
 			# NOT THE ABILITY. His basic IS Quick Shot — the same object the
@@ -4408,9 +4409,6 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 		else _lowest_hp(foes)
 	match u.hero_key:
 		"warrior":
-			var ck_lust := _bot_kit_card(u, "Bloodlust")
-			if ck_lust != null and u.hp < u.max_hp * 0.5:
-				return [ck_lust, mark]
 			# The taunt is his only guard for the others; it goes up whenever
 			# no enemy is already held to him (the Warden rotation's own test).
 			var ck_mock := _bot_kit_card(u, "Mocking Blow")
@@ -4418,6 +4416,14 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 			if ck_mock != null and not foes.any(func(e): \
 					return e.has_status("mocked") and e.status_power("mocked") == ck_me):
 				return [ck_mock, mark]
+			# BATCH GS §2 — POMMEL STRIKE TOOK BLOODLUST'S PLACE IN THE KIT, AND
+			# BLOODLUST'S CASE WENT WITH IT (it is the Berserker's enabler now, and
+			# his rotation casts it). The Stun is the card's payload and a boss
+			# resists it until Broken, so it goes where the Stun can land — the
+			# Swordmaster rotation's own test.
+			var ck_pommel := _bot_kit_card(u, "Pommel Strike")
+			if ck_pommel != null and not (mark.is_boss and not mark.broken):
+				return [ck_pommel, mark]
 			var ck_crush := _bot_kit_card(u, "Crushing Blow")
 			if ck_crush != null and not mark.has_status("sunder"):
 				return [ck_crush, mark]

@@ -129,8 +129,11 @@ func _test_earned_kit() -> void:
 	# BATCH GN — THE EARNED CLASS CARD IS WARCRY, ONE THE WARRIOR CLASS POOL
 	# HOLDS. Crushing Blow has been in no pool since DY deleted `CLASS_POOLS`, and
 	# since GN every Warrior opens holding it, so an "earned" copy asked nothing.
+	# BATCH GS — the two earned cards held in one list, so the kit count below
+	# adds exactly what was earned rather than a second copy of the number.
+	var earned_two := ["Battle Shout", "Warcry"]
 	var prep := func(run):
-		run.party[0]["bm_abilities"] = ["Battle Shout", "Warcry"]
+		run.party[0]["bm_abilities"] = earned_two.duplicate()
 		run.party[0]["talents"] = {cell_id: 1}
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		["raider", "archer", "raider"], "fight", prep)
@@ -161,12 +164,20 @@ func _test_earned_kit() -> void:
 		# The trimmed three are gone unless earned.
 		ok(not names.has("Blood Price"),
 			"a trimmed ability stays out of the kit until it is earned")
-		# BATCH GN — AND THE CLASS KIT JOINS THE BAR: Crushing Blow and Mocking
-		# Blow, with Bloodlust held once because it is his lineage's own.
-		ok(names.size() == 1 + 3 + 2 + 2 and names.count("Bloodlust") == 1
-				and names.has("Crushing Blow") and names.has("Mocking Blow"),
-			"core + 3 spec + 2 class kit + 2 earned = %d abilities, Bloodlust once (got %d)" % [
-				8, names.size()])
+		# BATCH GN — AND THE CLASS KIT JOINS THE BAR. (BATCH GS: the kit is Crushing
+		# Blow · Pommel Strike · Mocking Blow, and Bloodlust is held once as his
+		# engine's enabler, outside the kit.)
+		# BATCH GS — RE-POINTED: "3 spec" is gone — his lineage opens with its
+		# enabler alone, and Wildstrikes and Hack and Slash are drafted off his
+		# shelf. The count is what `Classes.opening_kit` builds for the engines he
+		# holds (Strike, Bloodlust, the class kit's three) plus the two earned, and
+		# "Bloodlust held once" is still the property.
+		var gs_open: Array = Classes.opening_kit("warrior", "berserker", bz.engines)
+		ok(names.size() == gs_open.size() + earned_two.size()
+				and names.count("Bloodlust") == 1
+				and Classes.class_kit_names("warrior").all(func(k): return names.has(k)),
+			"core + Bloodlust + the 3-card class kit + 2 earned = %d abilities, Bloodlust once (got %d)" % [
+				gs_open.size() + earned_two.size(), names.size()])
 	scene.free()
 
 

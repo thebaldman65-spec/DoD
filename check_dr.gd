@@ -56,7 +56,8 @@ const TICK_SITES := {
 	"Answering Steel": "Swordmaster draft card — per parry",
 	"Battle Poise": "Swordmaster draft card — per parry",
 	"Blink": "MAGE CLASS-WIDE DRAFT CARD — its own comment names tempo as its axis",
-	"Blessing of Zeal": "Devout PROTECTED CORE — ticks the target's cooldowns on cast",
+	# BATCH GS — the Devout no longer opens with it: GS §1 put it on his shelf.
+	"Blessing of Zeal": "Devout draft card (his opening kit until GS) — ticks the target's cooldowns on cast",
 	"Frostbound Hours": "cr_frostbound, Cryomancer Thaw r8 — EVERY hero's cooldowns",
 	"Practised Hands": "sv_practised, Survivalist Guerilla r8",
 	"Follow-Through": "ss_follow, Sharpshooter Pace r5",
@@ -157,7 +158,8 @@ func _s2_revival() -> void:
 	ok(n == 2, "`.revive(` has %d call sites in battle.gd code, not 2 (Resurrection, the Revive Potion)" % n)
 	ok(code.contains("\"resurrection\":"),
 		"the `resurrection` handler is gone — the one ABILITY that revives")
-	# ...and it is HERS. Asserted off the kit rather than off a name.
+	# ...and it is HERS. Asserted off the kit rather than off a name. (BATCH GS:
+	# `spec_abilities` is her DEFINITION table now, no longer what she opens with.)
 	var found := ""
 	for spec in Classes.SPEC_INFO:
 		for ab in Classes.spec_abilities(spec):
@@ -166,7 +168,9 @@ func _s2_revival() -> void:
 	ok(found == REVIVE_SPEC,
 		"`resurrection` belongs to '%s', not '%s'" % [found, REVIVE_SPEC])
 	# AND NO DRAFT CARD MAY REACH IT. A pool entry with this special would hand
-	# revival to whoever drafted it.
+	# revival to whoever drafted it. (BATCH GS: Resurrection is itself drafted now —
+	# on the Holy's shelf, offered only to a Mercy holder by `ENGINE_READ` — so what
+	# this asks is that no SECOND card carries the special.)
 	var leaks: Array = []
 	for cab in Classes.ability_corpus():
 		if cab.special == "resurrection" and not Classes.spec_abilities(REVIVE_SPEC).any(
@@ -243,7 +247,15 @@ func _s4_retired() -> void:
 func _s5_new_axes() -> void:
 	print("\n§5 — the Swordmaster gains four axes on three cards")
 	var pool := Classes.spec_draft_pool("swordmaster")
-	ok(pool.size() == 12, "the Swordmaster's pool is %d, not 12" % pool.size())
+	# BATCH GS — DR's TWELVE PLUS WHAT GS §1 MOVED ONTO THE SHELF. Overpower and
+	# Guard Change stopped travelling with his engine and are drafted here now, so
+	# the equality keeps DR's 12 as the literal and derives GS's share off the one
+	# derivation of a lineage's returned cards (`lineage_cards`): a card leaving
+	# or joining the shelf for any OTHER reason still reds it.
+	var gs_back: Array = Gate.lineage_cards("swordmaster")
+	ok(pool.size() == 12 + gs_back.size(),
+		"the Swordmaster's pool is %d, not DR's 12 + the %d GS moved onto it (%s)" % [
+			pool.size(), gs_back.size(), ", ".join(gs_back)])
 	for n in NEW_AXES:
 		ok(pool.has(n), "%s is not in the Swordmaster's draft pool" % n)
 		var ab = Classes.draft_ability(n)
@@ -412,8 +424,13 @@ func _s8_recorded() -> void:
 # source or tables; this one spawns a board and casts.
 func _s9_live() -> void:
 	print("\n§9 — the three cards, driven on a live board")
+	# BATCH GS — BATTLE POISE'S FREE PIVOT IS THE GUARD CHANGE HE HOLDS: the parry
+	# hook resolves the real card off his bar and pivots nothing without it. No
+	# Swordmaster opens with Guard Change since GS §1 (it is on his shelf), so the
+	# board seats it DRAFTED (`lineage_cards`) — which is the only way a player
+	# gets the clause now: Battle Poise pays its pivot to a hero who drafted both.
 	var scene: Node = await Gate.spawn(self, ["swordmaster", "arcanist", "holy",
-		"sharpshooter"], {"deterministic": true})
+		"sharpshooter"], {"deterministic": true, "lineage_cards": true})
 	var sm: BattleUnit = null
 	for h in scene.get("heroes"):
 		if h.has_engine("seasoned"):

@@ -1,7 +1,8 @@
 # BATCH EB — THE PROTECTED CORE IS THE BASELINE, AND THE FILLERS' REAL INVARIANT.
 #
-#   §1  the EB §1 ruling, asserted as a per-pair property with ONE named
-#       crossover — not as the 13-of-17, which is the intended state
+#   §1  the EB §1 ruling, asserted as a per-pair property with its NAMED
+#       crossovers (one at EB; since BATCH GS, GS's three returning cards, and
+#       EB's one asserted gone) — not as the 13-of-17, which is the intended state
 #   §2  the invariant `test_batch_bp` §7's three hand-written fillers actually
 #       rest on, measured through the game's own door
 #
@@ -39,7 +40,21 @@ const Gate = preload("res://gate_fixture.gd")
 # is cheaper and LONGER, which is an ordinary trade). It is listed so a SECOND
 # crossover reds this gate instead of hiding inside a count, and so the day this
 # one is re-priced the row is what says the ruling has been revisited.
-const KNOWN_CROSSOVER := [["holy", "Renewal", "Divine Plea"]]
+#
+# **BATCH GS — THAT ONE DISSOLVED AND THREE ARRIVED, AND NONE OF IT IS RETUNED
+# HERE.** Renewal left Holy's opening kit for her shelf, so it is no core and the
+# pair above no longer exists — asserted below as GONE, with that reason. The
+# three below are GS's RETURNING cards: Fireball, Frostbolt and Aimed Shot were
+# opening cards until GS, priced as opening cards (Fireball and Frostbolt were
+# a lineage's free basic attack), and are draft cards now, cheaper AND shorter
+# than the kit card they sit beside. That is a real design consequence of GS,
+# not a gate fault, and the rebalance is the designer's: they are NAMED so a
+# FOURTH inversion still reds, and each is owed a ruling.
+const KNOWN_CROSSOVER := [["pyromancer", "Magic Missiles", "Fireball"],
+	["cryomancer", "Magic Missiles", "Frostbolt"],
+	["sharpshooter", "Powershot", "Aimed Shot"]]
+# The crossover EB named, kept as a row so its absence stays asserted.
+const GONE_CROSSOVER := ["holy", "Renewal", "Divine Plea"]
 
 # `test_batch_bp` §7 stuffs these three onto a hand-built SWORDMASTER kit AFTER
 # `award_draft_pick` has already rolled, so a filler that his draw can reach
@@ -150,6 +165,15 @@ func _s1_no_second_crossover() -> void:
 		ok(crossovers.has(k),
 			"§1: %s's known crossover (core %s against draft %s) is gone — the pair was re-priced, so EB §1's ruling and `docs/reports/EB.md` are stale" % [
 				k[0], k[1], k[2]])
+	# BATCH GS — EB's OWN CROSSOVER IS GONE, AND FOR THE REASON THAT DISSOLVES IT
+	# RATHER THAN A RE-PRICE: Renewal is no protected core of Holy's any more, it
+	# is a card on her shelf. Both halves asserted, so the day Renewal returns to
+	# the kit the pair is back under this gate's eye.
+	ok(not crossovers.has(GONE_CROSSOVER)
+			and not Classes.protected_names(GONE_CROSSOVER[0]).has(GONE_CROSSOVER[1])
+			and Classes.spec_draft_pool(GONE_CROSSOVER[0]).has(GONE_CROSSOVER[1]),
+		"§1: %s's crossover (core %s against draft %s) should be gone because %s left the cores for the shelf (GS §1) — the pair or its reason has moved" % [
+			GONE_CROSSOVER[0], GONE_CROSSOVER[1], GONE_CROSSOVER[2], GONE_CROSSOVER[1]])
 	ok(crossovers.size() == KNOWN_CROSSOVER.size(),
 		"§1: %d crossovers against %d named" % [crossovers.size(), KNOWN_CROSSOVER.size()])
 

@@ -297,7 +297,10 @@ const SPEC_DRAFT_POOLS := {
 	"berserker": ["Blood Offering", "Gut Rip", "Reckless Abandon", "Berserk",
 		"Blood Debt", "Unslaked", "Spite", "Boil Over",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Battle Shout", "Rampage"],
+		"Battle Shout", "Rampage",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Bloodlust and
+		# no bleed ability, so the two bleed cards are drafted here.
+		"Wildstrikes", "Hack and Slash"],
 	"warden": ["Covering Guard", "Eye of the Storm", "Shield Slam", "Vendetta",
 		"Aegis Wall", "Anvil", "Recompense", "Turn the Blade",
 		# BATCH DO — moved out of the talent tree, unchanged.
@@ -315,7 +318,9 @@ const SPEC_DRAFT_POOLS := {
 		# refuel clause exists on a BOSS card (War Stomp) — but **NOTHING IN
 		# THIS DRAFT POOL DOES EITHER**, and no card anywhere does both. It
 		# brings two axes the Warden's draft has never offered.
-		"Rallying Shout"],
+		"Rallying Shout",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: Heavy Plating reads no ability.
+		"Shieldwall"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
 		"Feigned Guard", "Discipline", "Answering Steel", "Formless",
 		# BATCH DO — moved out of the talent tree. EXECUTE IS STILL VERBATIM;
@@ -326,7 +331,10 @@ const SPEC_DRAFT_POOLS := {
 		# decisions, so a player who has drafted four has seen everything it
 		# decides. Lunge re-authored carries BREAK, Wheeling Cut carries AREA
 		# DAMAGE and SELF-MITIGATION, and Counter Time carries CONTROL.
-		"Wheeling Cut", "Counter Time"],
+		"Wheeling Cut", "Counter Time",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the stances run on the Aggressive
+		# guard every battle opens in. Pommel Strike went to the class kit (§2).
+		"Overpower", "Guard Change"],
 	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
@@ -336,7 +344,11 @@ const SPEC_DRAFT_POOLS := {
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Backdraft", "Immolate", "Pyroblast", "Firestorm", "Phoenix Rebirth"],
+		"Backdraft", "Immolate", "Pyroblast", "Firestorm", "Phoenix Rebirth",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Flamewave and
+		# nothing else. Fireball was the lineage's Magic Bolt and is a free attack
+		# drafted beside it now (`basic_override_ability`).
+		"Fireball", "Detonation", "Wildfire"],
 	# BATCH DR — FLASH FREEZE IS RETIRED. DQ's Finding 1: comments and cosmetics
 	# stripped, its handler and Glacial Prison's were the same three steps in the
 	# same order, and Glacial Prison is cheaper (25 v 30), shorter on cooldown
@@ -347,7 +359,10 @@ const SPEC_DRAFT_POOLS := {
 		"Killing Frost", "Hoarfrost Armor", "Deep Winter", "Cold Iron",
 		"Frostbind",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Rime", "Glacial Prison", "Cryoclasm", "Shatter"],
+		"Rime", "Glacial Prison", "Cryoclasm", "Shatter",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Razor Ice.
+		# Frostbolt was the lineage's Magic Bolt (`basic_override_ability`).
+		"Frostbolt", "Blizzard", "Ice Lance"],
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
 		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking",
 		# BATCH DO — moved out of the talent tree, unchanged.
@@ -369,7 +384,12 @@ const SPEC_DRAFT_POOLS := {
 		# is the only ability in the whole 227-card corpus carrying a non-zero
 		# `delay_push`, derived rather than recalled. Its damage/Break profile
 		# is ordinary; the initiative shove is the card.
-		"Arcane Surge", "Reality Fracture"],
+		"Arcane Surge", "Reality Fracture",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: Resonance builds on the Mage's own
+		# basic. Arcane Explosion was the lineage's Magic Bolt
+		# (`basic_override_ability`); Death Ray reads the engine and is offered
+		# only to its holder (`ENGINE_READ`).
+		"Arcane Explosion", "Arcane Cannon", "Arcane Barrage", "Death Ray"],
 	# CLERIC — EIGHT APIECE SINCE BATCH CE, AND THE CLERIC IS THE SECOND CLASS
 	# COMPLETE. BU took the three pools to five (tranche 2's second third); CE
 	# lands tranche 3's second third here. THE DEVOUT'S KEY IS `inquisitor` AND
@@ -381,7 +401,11 @@ const SPEC_DRAFT_POOLS := {
 	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
 		"Reprisal", "Divine Presence", "Alms", "Vespers",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Divine Plea", "Intercession"],
+		"Divine Plea", "Intercession",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: Mercy pays on every heal, the
+		# kit's Ministration among them. Hymn of Hope and Resurrection are priced
+		# in Mercy and are offered only to its holder (`ENGINE_READ`).
+		"Heal", "Renewal", "Hymn of Hope", "Resurrection"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
 		"Fortified Spirit", "Reliquary", "Elevation",
 		"Blessing of the Faithful", "Mantle",
@@ -404,11 +428,16 @@ const SPEC_DRAFT_POOLS := {
 		#     but it is a BEASTMASTER card, so the two are NOT siblings and
 		#     never meet in one offer.
 		# Reported with options in `docs/reports/DY.md` §1; ruled on nowhere.
-		"Divine Wrath"],
+		"Divine Wrath",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Divine Shield.
+		"Consecrated Ground", "Blessing of Zeal"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
 		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance",
 		# BATCH DO — moved out of the talent tree, unchanged.
-		"Mind Flay", "Mass Hysteria"],
+		"Mind Flay", "Mass Hysteria",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Hex of Ruin.
+		# Shadowrend was the lineage's Smite (`basic_override_ability`).
+		"Shadowrend", "Bewitch", "Dark Pact"],
 	# HUNTER — EIGHT APIECE SINCE BATCH CH, AND THE HUNTER IS THE THIRD CLASS
 	# COMPLETE. BV took the three pools to five (tranche 2's third third); CH
 	# lands tranche 3's third third here. THE SURVIVALIST'S KEY IS `mystic` AND
@@ -446,7 +475,10 @@ const SPEC_DRAFT_POOLS := {
 	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
 		"Ghostpack", "Last Howl", "Succession", "Unleash",
 		# BATCH DS — MIT-SELF and AMP-TEAM, both read off Loyalty.
-		"Bear the Brunt", "Bring It Down"],
+		"Bear the Brunt", "Bring It Down",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings the three
+		# summons, the ruling's stated exception, and nothing else.
+		"Hunter's Instinct", "Kill Command"],
 	"sharpshooter": ["Called Volley", "Quarry's Mark", "Crossfire",
 		"Calibrating Shot", "Trophy Shot", "Reacquire", "Fault Line",
 		"Drumfire",
@@ -455,11 +487,17 @@ const SPEC_DRAFT_POOLS := {
 		# record DISENGAGE, SUPPRESSING FIRE and PIERCING ARROW as designed and
 		# unwritten, and those three are owed to the BOSS pool rather than to
 		# the draft. Spending them here would have paid one debt with another.
-		"Dug In", "Heads Down"],
+		"Dug In", "Heads Down",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: Lethal Aim runs on the Hunter's
+		# own basic. Powershot is the class kit's.
+		"Aimed Shot", "Hold Breath"],
 	"mystic": ["Choking Smoke", "Snare Line", "Loaded Shot", "Hunt",
 		"Preparation", "Stalking Horse", "Downwind", "Cull",
 		# BATCH DS — MIT-SELF and HEAL, both read off the affliction board.
-		"Thick Hide", "Salve"],
+		"Thick Hide", "Salve",
+		# BATCH GS §1 — OUT OF THE OPENING KIT: Trapper reads no ability.
+		# Tripwire and Snare Trap are the class kit's.
+		"Shrapnel Charge"],
 }
 
 # CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class at BR,
@@ -477,8 +515,10 @@ const SPEC_DRAFT_POOLS := {
 # `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
 # one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
 #
-# **THE DRAFT IS 149 OF A TARGET 149 AS OF BATCH GN (129 spec + 20 class-wide),
-# AND NOTHING IS OWED.** GN moved five class-wide cards into the class kits
+# **THE DRAFT IS 178 AS OF BATCH GS (158 spec + 20 class-wide), AND NOTHING IS
+# OWED.** GS §1 put the 29 cards that stopped travelling with an engine on their
+# lineages' shelves, none of them authored; it was 149 of 149 at GN (129 + 20).
+# GN moved five class-wide cards into the class kits
 # (`CLASS_KITS`), so the class half went 25 -> 20 without a card being deleted;
 # it was 154 of 154 at DY (129 + 25) and 149 of 149 at DS (125 + 24). Tranche 3 closed with the Warrior third at 120 of 120,
 # every spec pool eight deep; DO's twenty-two ex-talent-grants took the spec
@@ -588,13 +628,15 @@ const CLASS_DRAFT_POOLS := {
 # channel reads which. THE MERGE JOINED THE DRAFT'S TWO, NOT THE GAME'S THREE.
 #
 # **THE DEPTHS, DERIVED** (`check_gp` §1 derives them again every battery, and
-# no figure here is authored twice): Warrior 38, Mage 41, Cleric 34, Hunter 36
-# — 149, which is `SPEC_DRAFT_POOLS`' 129 plus `CLASS_DRAFT_POOLS`' 20 with no
-# card in both. A hero drew from 13 to 18 before the merge (his lineage's shelf
-# plus his class's) and a spine-taker from 3 to 6; he draws from 34 to 41 now.
+# no figure here is authored twice): Warrior 43, Mage 51, Cleric 43, Hunter 41
+# — 178, which is `SPEC_DRAFT_POOLS`' 158 plus `CLASS_DRAFT_POOLS`' 20 with no
+# card in both. **GP's merge made them 38 / 41 / 34 / 36 and GS §1 added the 29
+# cards that stopped travelling with an engine** — 5 / 10 / 9 / 5 — each on the
+# shelf of the lineage that opened with it. A hero drew from 13 to 18 before the
+# merge (his lineage's shelf plus his class's) and a spine-taker from 3 to 6.
 # **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
-# below: holding no engine at all he is offered 35 of the Warrior's 38, 29 of
-# the Mage's 41, 22 of the Cleric's 34 and 29 of the Hunter's 36.
+# below: holding no engine at all he is offered 40 of the Warrior's 43, 38 of
+# the Mage's 51, 29 of the Cleric's 43 and 34 of the Hunter's 41.
 static func draft_pool(class_key: String) -> Array:
 	var out: Array = []
 	for spec in SPEC_IDS.get(class_key, []):
@@ -607,7 +649,7 @@ static func draft_pool(class_key: String) -> Array:
 #                 HOLDS IT ═══════════════════════════════════════════════════
 #
 # **RULED, AND IT IS WHAT KEEPS A WIDE POOL FROM BEING A POOL OF DEAD CARDS.**
-# A Warrior draws from all 38; a card that READS an engine is offered only if he
+# A Warrior draws from all 43; a card that READS an engine is offered only if he
 # holds that engine, because offering a Ruin card to a Cleric without Ruin is
 # offering a card that does nothing.
 #
@@ -615,6 +657,8 @@ static func draft_pool(class_key: String) -> Array:
 # FIELD.** CN found 137 abilities a field-level test misjudges because they
 # resolve inside a special handler, and GL's own passes disagreed on three
 # cards. Every one of the 149 was cast on a hero of its class holding NO engine,
+# **and GS §1's 29 were cast the same way when they entered the pool — three
+# rows came of it (Death Ray, Hymn of Hope, Resurrection)**,
 # on a board dressed so that a no-op could only be the engine's fault (enemies
 # burning, chilled and poisoned; allies at half health and afflicted; a
 # companion standing); then each candidate was cast again with the engine held
@@ -623,7 +667,8 @@ static func draft_pool(class_key: String) -> Array:
 #
 # **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE:**
 #   · CANNOT WORK WITHOUT THE ENGINE — refused at the usability door, or it
-#     resolves and the log says it did nothing. **Gated: these 34.**
+#     resolves and the log says it did nothing. **Gated: these 37** (GP's 34 and
+#     GS's three).
 #   · HALF-WORKS — Boil Over deals 22 against 89 and cashes no meter, Drumfire
 #     and Calibrating Shot fire and bank no Focus. **NOT gated**: a card that
 #     still does most of its job is a legitimate offer (GM's narrowing).
@@ -673,6 +718,10 @@ const ENGINE_READ := {
 	"Inner Arcane": {"engine": "resonance", "why": "banks Resonance; +0 at none"},
 	"Overcharge": {"engine": "resonance", "why": "the storm feeds on itself; +0 at none"},
 	"Resonant Field": {"engine": "resonance", "why": "shares his own bonus; \"nothing to share\""},
+	# BATCH GS §1 — out of the Arcanist's opening kit and into the pool, and
+	# refused at the door below `DEATH_RAY_STACKS` exactly as GM's bound-card
+	# table said; the gate is at the offer now rather than at the kit.
+	"Death Ray": {"engine": "resonance", "why": "refused below 8 Resonance; only the engine gives a Mage the meter"},
 	# MERCY — the same install, for the Holy Cleric. Divine Plea is priced in it
 	# (`faith_cost` 2) and refused; the rest resolve and say they hold none.
 	# Intercession's hook is stamped only when a hero carries Mercy
@@ -682,6 +731,10 @@ const ENGINE_READ := {
 	"Divine Presence": {"engine": "mercy", "why": "a Mercy drip; \"no Mercy to keep the watch for\""},
 	"Alms": {"engine": "mercy", "why": "wards the ally who earned Mercy at the cap"},
 	"Intercession": {"engine": "mercy", "why": "the refusal is paid in Mercy; unhooked without it"},
+	# BATCH GS §1 — out of the Holy's opening kit and into the pool; both are
+	# priced in Mercy and refused at the door against an absent bar (driven).
+	"Hymn of Hope": {"engine": "mercy", "why": "costs 1 Mercy; refused against an absent bar"},
+	"Resurrection": {"engine": "mercy", "why": "costs 1 Mercy; refused against an absent bar, a hero down or not"},
 	# CONVICTION — `_gain_faith` returns at once with no Devout standing, and
 	# `_grant_divine_shield` is the ONLY writer of a barrier's `divine` flag:
 	# it is reached from Divine Shield (conviction's enabler, which travels with
@@ -754,52 +807,76 @@ static func offerable(names: Array, engines: Array) -> Array:
 # derived, and test_batch_bo asserts every named enabler is still in that
 # spec's opening kit and in NO draft or spec pool.
 #
-# TWO COLUMNS, AND THE DISTINCTION IS THE WHOLE POINT:
-# · `slots` — how many of the cap's seven the opening kit occupies. Ten specs
-#   sit at 3 (leaving 4 draftable). HOLY IS 4, because Batch AV gave her a
-#   fourth opening ability on purpose. THE BEASTMASTER HOLDS FIVE ABILITIES IN
-#   THREE SLOTS: his three summons share one action-bar entry, which has been
-#   Batch AH's rule since the pools were built, and counting them as three
-#   would take a spec down to two draftable picks for a bookkeeping reason.
-# · `enablers` — the MINIMUM the passive cannot function without. IT VARIES,
-#   and it is decided per spec rather than by a rule: Overburn is meaningless
-#   without a Burn applier and without Detonation to spend it, so the
-#   Pyromancer's core is larger than the Berserker's, whose Blood Frenzy reads
-#   nothing but his own health bar. An EMPTY list is a real answer, not an
-#   omission — those specs' opening abilities are protected because they
-#   shipped in the kit, not because the passive needs them.
+# ══ BATCH GS §1 — AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT ══════════
+#
+# **RULED BY THE DESIGNER, AND FOUND IN PLAY: an engine that brings four cards IS
+# choosing a spec, which is the thing the merge dissolved.** GK's charter sent
+# every card below with its engine, and a lineage opened with its whole opening
+# kit besides — the Pyromancer took Fireball in place of Magic Bolt, Detonation,
+# Wildfire and Flamewave. **A LINEAGE NOW OPENS WITH ITS ENGINE'S ENABLERS AND
+# NOTHING ELSE** (`lineage_opening` below, read by the one kit builder), and every
+# card that stopped travelling is on its lineage's shelf in `SPEC_DRAFT_POOLS`,
+# where the class pool draws it and the engine gate decides who is offered it.
+# The basic-attack overrides went with them: no lineage replaces its class's
+# basic any more, and the four cards that did are drafted by name
+# (`basic_override_ability`).
+#
+# **THE TEST, APPLIED PER ENGINE: without the card, and with the class basic and
+# the class kit every hero holds, does the engine pay anything at all?** Where
+# the answer is no, ONE card travels — the one that produces what the engine
+# reads — and where several would each do, which one is the batch's derivation
+# and is PROPOSED (`docs/reports/GS.md` §1). Three were the designer's: Bloodlust
+# for the Berserker, Flamewave for the Pyromancer, and the Beastmaster's three
+# summons, the stated exception.
+#
+# TWO COLUMNS:
+# · `enablers` — the minimum. An EMPTY list is a real answer: the engine runs on
+#   the class basic and the class kit alone. **Quick Shot is the Sharpshooter's
+#   and is the Hunter's class basic**, so it is held by every Hunter already and
+#   nothing travels with it.
+# · `slots` — the bar entries the lineage's opening cards take, which since GS
+#   are its enablers alone, so `lineage_slots` (this less the enablers) is zero
+#   for every lineage: an enabler sits outside the slot count (the charter). THE
+#   BEASTMASTER'S THREE SUMMONS ARE ONE ENTRY, AH's rule since the pools were
+#   built.
+#
+# THE FAILURE THIS TABLE PREVENTS IS STILL SILENT — an engine that stops working
+# because its enabler became draftable — so `enablers` is AUTHORED, and
+# test_batch_bo asserts every one is in the opening kit and in NO pool.
 const PROTECTED_CORES := {
-	"berserker": {"slots": 3, "enablers": [],
-		"why": "Blood Frenzy reads his health bar and the Rage he spends; neither needs an ability."},
-	"warden": {"slots": 3, "enablers": [],
+	# RULED (GS §1): the Berserker brings Bloodlust and no bleed ability. The
+	# test alone would send nothing — Blood Frenzy reads his health bar and the
+	# Rage he spends — so this row is the ruling, not the derivation.
+	"berserker": {"slots": 1, "enablers": ["Bloodlust"],
+		"why": "The designer's ruling (GS §1). Blood Frenzy itself reads only his health bar and the Rage he spends, so Bloodlust is the card the ruling sends with it."},
+	"warden": {"slots": 0, "enablers": [],
 		"why": "Heavy Plating is a Block-chance rule; it reads no ability."},
-	# BATCH BP corrected this `why` toward the code rather than leaving it to
-	# rot: Guard Change is no longer the ONLY stance swap in the game — Precision
-	# Strike and Feint both switch. It is still the enabler, and for a sharper
-	# reason than before: it is the only UNCONDITIONAL one. The other two are
-	# DRAFTED (a Swordmaster may never be offered either), cost Rage, and sit on
-	# 3- and 4-turn cooldowns, so a passive that is half inert without a swap
-	# still cannot be left depending on them.
-	"swordmaster": {"slots": 3, "enablers": ["Guard Change"],
-		"why": "Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — the two drafted ones are neither guaranteed nor free (Batch AK, corrected BP)."},
-	"pyromancer": {"slots": 3, "enablers": ["Fireball", "Detonation"],
-		"why": "Overburn needs a Burn applier to build the field and a spender to empty it."},
-	"cryomancer": {"slots": 3, "enablers": ["Frostbolt", "Ice Lance"],
-		"why": "Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold."},
-	"arcanist": {"slots": 3, "enablers": ["Arcane Explosion"],
-		"why": "Runaway Resonance builds on damaging casts; the free core attack is what guarantees one every turn."},
-	"holy": {"slots": 4, "enablers": ["Heal", "Hymn of Hope"],
-		"why": "Mercy is earned passively and must be SPENDABLE — Hymn pays stacks outright, and Empower needs a heal to empower."},
-	"inquisitor": {"slots": 3, "enablers": ["Divine Shield", "Consecrated Ground"],
-		"why": "Conviction builds ONLY on Divine Shield absorbs, and Batch BI measured the ground's drip at 66% of all Faith."},
-	"occultist": {"slots": 3, "enablers": ["Shadowrend", "Hex of Ruin"],
-		"why": "Wrath of the Old Gods marks on debuffs HE applies; these two are the debuffs he always holds."},
-	"beastmaster": {"slots": 3,
+	# Guard Change travelled until GS as his only UNCONDITIONAL stance swap. The
+	# engine runs without one: every battle opens Aggressive, and Aggressive pays
+	# from the first blow — so the swap is a card, drafted like the others.
+	"swordmaster": {"slots": 0, "enablers": [],
+		"why": "Seasoned Fighter opens every battle Aggressive, and Aggressive pays from the first blow; a stance swap is a card, not the engine."},
+	# RULED (GS §1): the Pyromancer brings Flamewave and nothing else.
+	"pyromancer": {"slots": 1, "enablers": ["Flamewave"],
+		"why": "Overburn reads Burn standing on the field, and no Mage basic or kit card lays any. Flamewave lays it on every enemy (the designer's ruling)."},
+	"cryomancer": {"slots": 1, "enablers": ["Razor Ice"],
+		"why": "Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any. Razor Ice lays three on one target in one cast (PROPOSED, GS)."},
+	"arcanist": {"slots": 0, "enablers": [],
+		"why": "Runaway Resonance builds on every damaging cast, and the Mage's own basic is one."},
+	"holy": {"slots": 0, "enablers": [],
+		"why": "Mercy is gained when an ally falls below half health and pays on every heal she casts, the kit's Ministration among them."},
+	"inquisitor": {"slots": 1, "enablers": ["Divine Shield"],
+		"why": "Conviction builds Faith when Divine Shield absorbs, which is what its own rule says, and no Cleric basic or kit card lays a divine shield (PROPOSED, GS)."},
+	"occultist": {"slots": 1, "enablers": ["Hex of Ruin"],
+		"why": "Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one. Hex of Ruin curses three at once (PROPOSED, GS)."},
+	# RULED (GS §1): the stated exception — "only the absolutely necessary, like
+	# the Beastmaster summons."
+	"beastmaster": {"slots": 1,
 		"enablers": ["Summon Ursus", "Summon Canis", "Summon Aguila"],
-		"why": "Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all."},
-	"sharpshooter": {"slots": 3, "enablers": ["Quick Shot"],
-		"why": "Lethal Aim counts consecutive single-target attacks; the free shot is what lets him stay on a mark every turn."},
-	"mystic": {"slots": 3, "enablers": [],
+		"why": "Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no engine at all."},
+	"sharpshooter": {"slots": 0, "enablers": ["Quick Shot"],
+		"why": "Lethal Aim counts consecutive single-target attacks, and the Hunter's own basic is the free one that keeps him on a mark."},
+	"mystic": {"slots": 0, "enablers": [],
 		"why": "Trapper's poison rides being struck, and its breadth term counts statuses from ANY source — including his allies'."},
 }
 
@@ -825,18 +902,27 @@ const PROTECTED_CORES := {
 # `draft_ability`. This table names them and `class_kit` resolves them through
 # `pool_ability`, so the kit and the lineage kit are the same objects.
 #
-# **A CORE IN A KIT IS ALSO IN ITS LINEAGE'S OPENING KIT, AND IT IS HELD ONCE.**
-# `opening_kit` skips a kit card the lineage already opened with, and
-# `kit_slots` counts only the kit cards the lineage's slots do not already
-# count. Four lineages carry one: the Berserker (Bloodlust), the Warden (Mocking
-# Blow and Crushing Blow), the Sharpshooter (Powershot) and the Survivalist
-# (Tripwire and Snare Trap).
+# **A KIT CARD IS HELD ONCE, AND THE DEDUPE FOLLOWS THE CARD.** `opening_kit`
+# skips a kit card the hero already opened with, by name, whatever route it
+# arrived by. **SINCE BATCH GS NO LINEAGE OPENS WITH A KIT CARD** — a lineage
+# opens with its engine's enablers and nothing else (`PROTECTED_CORES` below),
+# and no enabler is a kit card — so the Warden's Mocking Blow and Crushing Blow,
+# the Sharpshooter's Powershot, the Survivalist's Tripwire and Snare Trap and
+# the Swordmaster's Pommel Strike are held as KIT cards by every hero of the
+# class, and `kit_slots` counts all three.
+#
+# **BATCH GS §2 — BLOODLUST LEFT THE WARRIOR'S KIT AND POMMEL STRIKE TOOK ITS
+# PLACE (ruled by the designer).** Bloodlust was a Berserker card wearing a
+# class card's slot; it is the Berserker's enabler now, so it reaches a Warrior
+# with the Rune of the Berserker and no other. Pommel Strike keeps its one
+# definition where it was, the Swordmaster's `spec_abilities`, and resolves
+# through `pool_ability` as the Warden's two always have.
 #
 # **THE CLERIC'S KIT HAS NO DAMAGE CARD, AND THAT IS THE RULING, NOT AN
 # OVERSIGHT.** He is a support class: he attacks with Smite, his basic, and
 # drafts damage if he wants it.
 const CLASS_KITS := {
-	"warrior": ["Crushing Blow", "Bloodlust", "Mocking Blow"],
+	"warrior": ["Crushing Blow", "Pommel Strike", "Mocking Blow"],
 	"mage": ["Magic Burst", "Nexus Ward", "Magic Missiles"],
 	"cleric": ["Ministration", "Unburden", "Consecration"],
 	"hunter": ["Powershot", "Snare Trap", "Tripwire"],
@@ -864,11 +950,14 @@ static func class_kit(class_key: String) -> Array:
 
 # The kit cards the lineage's slots do not already count — a card the lineage
 # opens with outside its enablers is one slot, not two. Engine-agnostic, like
-# `lineage_slots`: the slot a card holds does not move with an engine.
+# `lineage_slots`: the slot a card holds does not move with an engine. **SINCE
+# GS A LINEAGE OPENS WITH ITS ENABLERS AND NOTHING ELSE** (`lineage_opening`),
+# so it counts no kit card and every hero's kit is three slots; the walk stays
+# derived so a lineage card put back into an opening kit is counted once.
 static func kit_slots(class_key: String, spec: String) -> int:
 	var counted: Array = []
-	for ab in spec_abilities(spec):
-		if ab != null and not core_enablers(spec).has(ab.display_name):
+	for ab in lineage_opening(spec):
+		if not core_enablers(spec).has(ab.display_name):
 			counted.append(ab.display_name)
 	var n := 0
 	for nm in class_kit_names(class_key):
@@ -1473,26 +1562,20 @@ static func core_enablers(spec: String) -> Array:
 	return PROTECTED_CORES.get(spec, {}).get("enablers", [])
 
 
-# Every display name the spec's protected core covers, READ OFF THE LIVE KIT
-# so it can never drift from what the hero actually opens holding: the class
-# core attack (after `apply_kit_overrides` renames it) plus every opening spec
-# ability. This is the list the drop step refuses.
+# Every display name the spec's protected core covers, READ OFF THE ONE KIT
+# BUILDER so it can never drift from what the hero actually opens holding: what
+# a hero of this lineage opens with while he holds its engine — the class basic,
+# the lineage's enablers and the class kit (GS §1; before GS the whole lineage
+# opening kit and its basic-attack override). This is the list the drop step
+# refuses.
 static func protected_names(spec: String) -> Array:
 	var out: Array = []
 	var class_key := class_of_spec(spec)
-	if class_key != "":
-		var cfg := {"abilities": kit(class_key)}
-		apply_kit_overrides(cfg, spec)
-		for ab in cfg["abilities"]:
+	if class_key == "":
+		return out
+	for ab in opening_kit(class_key, spec, [engine_of_spec(spec)]):
+		if not out.has(ab.display_name):
 			out.append(ab.display_name)
-	for ab2 in spec_abilities(spec):
-		if ab2 != null and not out.has(ab2.display_name):
-			out.append(ab2.display_name)
-	# BATCH GN — the class kit is protected too, and a card the lineage already
-	# named is named once.
-	for nm in class_kit_names(class_key):
-		if not out.has(String(nm)):
-			out.append(String(nm))
 	return out
 
 
@@ -1702,49 +1785,33 @@ static func engine_enablers(pid: String) -> Array:
 	return core_enablers(spec) if spec != "" else []
 
 
-# ══ BATCH GM §2 — AN ENGINE'S BOUND CARDS LEAVE WHEN THE ENGINE LEAVES ═══════
-#
-# **RULED BY THE DESIGNER: "an engine's cards leave when the engine leaves,
-# exactly as its enabler does."** GK's lineage interim kept a lineage's whole
-# opening kit when its engine was dropped, and three of those cards can then
-# never be cast: the usability door refuses each one for a reason only the
-# engine can answer. They are listed here per lineage and read by the one kit
-# builder below at the exact line that already takes the enablers out.
-#
-# **THE RELATION IS THE ENABLER'S, POINTED THE OTHER WAY.** An enabler is what
-# the engine cannot work without; a bound card is what cannot work without the
-# engine. So this is its own table rather than more names in `enablers`, which
-# `test_batch_bo` asserts are in no pool, and which travel to any hero of the
-# class who holds the engine and sit outside the slot count. A bound card does
-# neither: it LEAVES, and that is all the ruling says.
-#   · Death Ray      — refused below `DEATH_RAY_STACKS` Resonance, and only
-#                      Runaway Resonance gives a Mage that meter;
-#   · Resurrection   — priced in Mercy, and only the Mercy engine gives a Cleric
-#                      a second resource to pay it from;
-#   · Kill Command   — refused with no companion, and only the Pack Bond summons
-#                      bring one into an opening kit.
-#
-# **AUTHORED, AND CHECKED IN BOTH DIRECTIONS** (`check_gm` §2): every name here
-# is refused to its lineage with the engine gone and castable with it held, on
-# the same board; and every OTHER card of a lineage's opening kit stays castable
-# with the engine gone, so a fourth bound card cannot hide.
-#
-# **WHAT IS DELIBERATELY NOT IN IT, AND WHY** (`docs/reports/GM.md` §2):
-#   · the lineage cards that HALF-work without their engine — they still do
-#     something, so taking them away takes a working card;
-#   · the EARNED cards that need an engine — a drafted or zone-boss card is
-#     never lost (EG), so "leaves" cannot mean what it means for a kit card.
-# **AND THE SLOT A BOUND CARD OCCUPIED STAYS COUNTED** — `lineage_slots` is not
-# engine-aware, so no magnitude moved; whether the slot frees is the designer's.
-const ENGINE_BOUND := {
-	"arcanist": ["Death Ray"],
-	"holy": ["Resurrection"],
-	"beastmaster": ["Kill Command"],
-}
+# **BATCH GS §1 — WHAT A LINEAGE OPENS WITH: ITS ENGINE'S ENABLERS, AND NOTHING
+# ELSE.** Each is read out of its one definition in `spec_abilities`, which is a
+# lineage's DEFINITION table now and no longer its opening kit: every other card
+# in it is on the lineage's shelf in `SPEC_DRAFT_POOLS`. Quick Shot, the
+# Sharpshooter's, is the Hunter's class basic rather than one of his definitions,
+# so it is held by every Hunter and is not in this list.
+static func lineage_opening(spec: String) -> Array:
+	var names: Array = core_enablers(spec)
+	var out: Array = []
+	for ab in spec_abilities(spec):
+		if ab != null and names.has(ab.display_name):
+			out.append(ab)
+	return out
 
 
-static func engine_bound(spec: String) -> Array:
-	return ENGINE_BOUND.get(spec, [])
+# **`ENGINE_BOUND` STOOD HERE FROM GM §2 TO GS §1, AND IT IS DELETED, NOT
+# ZEROED.** It named three lineage cards the usability door refuses without the
+# engine — Death Ray, Resurrection, Kill Command — and this builder took them out
+# of a lineage's opening kit when its engine was dropped (the designer's GM
+# ruling: *an engine's cards leave when the engine leaves*). **GS §1 took every
+# card but the enablers out of every opening kit, those three among them**, so
+# the ruling holds by construction and the table had nothing left to act on. The
+# three are on their lineages' shelves now; a card the door refuses without an
+# engine is kept from a hero who does not hold it at the OFFER, by
+# `ENGINE_READ` — Death Ray and Resurrection are rows there, and Kill Command is
+# not, because an earned Call the Wilds opens its door with no engine at all
+# (`docs/reports/GS.md` §1).
 
 
 # **THE ONE BUILDER OF A HERO'S OPENING KIT** — the battle spawn, the hero sheet,
@@ -1752,41 +1819,34 @@ static func engine_bound(spec: String) -> Array:
 # opens holding cannot be answered two ways (CK §1's rule, one layer down).
 #
 #   the class basic
-#   + the lineage's opening abilities, LESS its enablers AND its bound cards
-#     (`ENGINE_BOUND`, GM §2) when its engine is not held
-#   + the lineage's basic-attack override, only while its engine is held
-#   + the class kit (`CLASS_KITS`, GN), LESS any card the lineage already
-#     opened with — THE DEDUPE IS HERE, and a Berserker holds Bloodlust once
+#   + the lineage's enablers, while its engine is held (`lineage_opening`, GS)
+#   + the class kit (`CLASS_KITS`, GN)
 #   + every OTHER held engine's enablers
 #
-# **THE KIT GOES IN AFTER THE LINEAGE'S CARDS** so a lineage hero's bar keeps
-# the order it had, and the dedupe is one `_kit_holds` test on the line that
-# appends it.
-#
-# **A TRAVELLING BASIC-ATTACK ENABLER** (Fireball, Frostbolt, Arcane Explosion,
-# Shadowrend) takes slot 0 when the class basic still stands there, and joins the
-# kit as a second free attack when another engine's override already does. An
-# enabler that IS the class basic (Quick Shot) is already held by every Hunter.
+# **THE DEDUPE FOLLOWS THE CARD, NOT THE KIT** (GS §2): every append asks
+# `_kit_holds` by name, so a card that arrives by two routes is held once
+# whichever of them it came by. **NO ENGINE REPLACES THE CLASS BASIC ANY MORE**:
+# the four lineages that did (Fireball, Frostbolt, Arcane Explosion, Shadowrend)
+# open on Magic Bolt and Smite like every other Mage and Cleric, and the four
+# cards are drafted by name (`basic_override_ability`).
 static func opening_kit(class_key: String, spec: String, engines: Array) -> Array:
 	var cfg := {"abilities": kit(class_key)}
 	var own := engine_of_spec(spec)
-	if own != "":
-		var gone: Array = [] if engines.has(own) \
-			else core_enablers(spec) + engine_bound(spec)
-		for ab in spec_abilities(spec):
-			if ab != null and not gone.has(ab.display_name):
-				cfg["abilities"].append(ab)
-		if engines.has(own):
-			apply_kit_overrides(cfg, spec)
-	for ab in class_kit(class_key):
-		if not _kit_holds(cfg["abilities"], ab.display_name):
-			cfg["abilities"].append(ab)
+	if own != "" and engines.has(own):
+		_hold_each(cfg, lineage_opening(spec))
+	_hold_each(cfg, class_kit(class_key))
 	for pid in engines:
 		var es := engine_spec(String(pid))
 		if es == "" or es == spec:
 			continue
-		_carry_enablers(cfg, class_key, es)
+		_hold_each(cfg, lineage_opening(es))
 	return cfg["abilities"]
+
+
+static func _hold_each(cfg: Dictionary, abilities: Array) -> void:
+	for ab in abilities:
+		if ab != null and not _kit_holds(cfg["abilities"], ab.display_name):
+			cfg["abilities"].append(ab)
 
 
 static func _kit_holds(abilities: Array, name: String) -> bool:
@@ -1796,37 +1856,15 @@ static func _kit_holds(abilities: Array, name: String) -> bool:
 	return false
 
 
-static func _carry_enablers(cfg: Dictionary, class_key: String, es: String) -> void:
-	var basic: String = kit(class_key)[0].display_name
-	var over := {"abilities": kit(class_key)}
-	apply_kit_overrides(over, es)
-	var over_ab: Ability = over["abilities"][0]
-	for name in core_enablers(es):
-		if _kit_holds(cfg["abilities"], String(name)):
-			continue
-		if over_ab.display_name == String(name) and String(name) != basic:
-			if cfg["abilities"][0].display_name == basic:
-				cfg["abilities"][0] = over_ab
-			else:
-				cfg["abilities"].append(over_ab)
-			continue
-		for ab in spec_abilities(es):
-			if ab != null and ab.display_name == String(name):
-				cfg["abilities"].append(ab)
-				break
-
-
 # **THE ENABLER SITS OUTSIDE THE SLOT COUNT**, so the slots a lineage's opening
 # abilities occupy are `core_slots` less the enablers among them — derived off
-# the live kit, with the three summons one bar entry as they always were. An
-# enabler that is a basic-attack override was never in `core_slots` at all.
+# the live kit, with the three summons one bar entry as they always were. **SINCE
+# GS A LINEAGE OPENS WITH ITS ENABLERS ALONE**, so `core_slots` is this figure
+# for every lineage and `lineage_slots` is zero; `check_gs` §1 asserts both.
 static func enabler_slots(spec: String) -> int:
-	var names: Array = core_enablers(spec)
 	var n := 0
 	var summons := false
-	for ab in spec_abilities(spec):
-		if ab == null or not names.has(ab.display_name):
-			continue
+	for ab in lineage_opening(spec):
 		if ab.special == "summon":
 			summons = true
 		else:
@@ -2146,6 +2184,11 @@ static func pool_ability(display_name: String) -> Ability:
 	var kit_only := class_kit_ability(display_name)
 	if kit_only != null:
 		return kit_only
+	# BATCH GS §1 — the four cards that were a lineage's basic attack, drafted
+	# by name now.
+	var over := basic_override_ability(display_name)
+	if over != null:
+		return over
 	var beast := beastmaster_pool_ability(display_name)
 	if beast != null:
 		return beast
@@ -2231,44 +2274,17 @@ static func ability_corpus() -> Array:
 		for nm in class_draft_pool(key):
 			add.call(pool_ability(String(nm)))
 	for spec in SPEC_INFO:
-		# BATCH DU §4 — THE HOLE THAT WAS LEFT AFTER CZ CLOSED THE OTHER ONE.
-		# `apply_kit_overrides` REPLACES `abilities[0]` for FOUR SPECS at spawn,
-		# and NONE of the four sits in any pool or is returned by
-		# `spec_abilities()`. The `kit(key)` loop above reads the class kit
-		# UNOVERRIDDEN, so it got the class basic — **which is nobody's live
-		# basic attack** — and four live protected-core cards were structurally
-		# invisible to every sweep built on this walk.
-		#
-		# **BATCH DV §5 CORRECTED WHICH SPECS THEY ARE, AND IT IS NOT A COSMETIC
-		# CORRECTION.** DU recorded them as "the four MAGE specs". THERE ARE ONLY
-		# THREE MAGE SPECS. Fireball (pyromancer), Frostbolt (cryomancer) and
-		# Arcane Explosion (arcanist) override **Magic Bolt** out of
-		# `kit("mage")`; **SHADOWREND IS THE OCCULTIST'S, WHICH IS A CLERIC SPEC,
-		# AND IT OVERRIDES SMITE OUT OF `kit("cleric")`.** So TWO class kits were
-		# being misread, not one — and a later reader re-deriving the hole from
-		# DU's sentence would check the Mage kit, find it fixed, and never learn
-		# that the Cleric kit was in it too. Derived off `apply_kit_overrides`
-		# itself, not counted off the list of names.
-		#
-		# THE FIX IS `protected_names`'s OWN IDIOM, one function up: build a cfg
-		# off the class kit, apply the overrides, read what comes out. It is not
-		# a second enumeration — `kit()` returns FRESH `Ability` objects on every
-		# call, so replacing an element of that array mutates nothing shared, and
-		# the eight specs that override nothing simply re-offer names `add` has
-		# already seen and deduplicates.
-		#
-		# NOTHING WAS WRONG AT RUNTIME AND NOTHING ABOUT THE GAME CHANGES HERE.
-		# What changes is what the sweeps can SEE: this walk is the one
-		# authorised enumeration (DA §3), so every gate built on it inherited the
-		# blind spot, and `check_dr` §5's own comment still records the figure
-		# that blind spot produced — twelve INSTANCES across twelve specs, but
-		# only SEVEN distinct names.
-		var du_class := class_of_spec(spec)
-		if du_class != "":
-			var du_cfg := {"abilities": kit(du_class)}
-			apply_kit_overrides(du_cfg, spec)
-			for du_ab in du_cfg["abilities"]:
-				add.call(du_ab)
+		# BATCH DU §4 CLOSED A HOLE HERE: `apply_kit_overrides` replaced slot 0
+		# for four lineages at spawn, none of the four sat in any pool or in
+		# `spec_abilities()`, and a walk over the unoverridden class kit could
+		# not see them — Fireball, Frostbolt and Arcane Explosion out of Magic
+		# Bolt, and SHADOWREND, THE OCCULTIST'S, OUT OF SMITE (DV §5's
+		# correction: two class kits, not one). The walk that closed it built a
+		# cfg, applied the overrides and read what came out.
+		# **BATCH GS §1 DELETED THE OVERRIDES AND THE WALK WENT WITH THEM.** The
+		# four are drafted by name now, each on its lineage's shelf, so the
+		# `spec_draft_pool` loop below reaches them through `pool_ability` —
+		# the hole DU closed stays closed by a pool rather than by a replay.
 		for ab in spec_abilities(spec):
 			add.call(ab)
 		for nm in spec_pool(spec):
@@ -2305,7 +2321,13 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND FORTY-NINE OF A TARGET 149 (BO..GN) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-EIGHT OF A TARGET 178 (BO..GS) --
+#
+# BATCH GS §1 — THE DRAFT IS 178, AND THE 29 IT GAINED ARE NOT DEFINED HERE. They
+# are the cards a lineage opened with until an engine stopped bringing them; each
+# keeps its one definition where it was — `spec_abilities`, or
+# `basic_override_ability` for the four that were a lineage's basic — and
+# `pool_ability` resolves them there.
 #
 # BATCH GN — FIVE OF THE CLASS-WIDE DEFINITIONS BELOW ARE CLASS-KIT CARDS NOW
 # (Nexus Ward, Magic Missiles, Ministration, Consecration, Unburden). They left
@@ -5886,38 +5908,49 @@ static func pending_talent_ability(display_name: String) -> Ability:
 	return null
 
 
-# Spec kit corruption: the Occultist's Smite is warped into Shadowrend,
-# the Pyromancer's Magic Bolt burns as Fireball. Applied by battle spawn
-# AND the party screen.
-static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
-	if spec == "occultist":
-		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
-			"dmg_type": "shadow", "cost": 0, "damage": 25, "pressure": 16,
-			"delay": 2.0, "anim": "attack01",
-			"applies_status": {"id": "cripple", "turns": 2},
-			"perfect_id": "self_heal", "perfect_text": "{mhp:5}",
-			"description": "A rending strike of gnawing shadow:\nCripples the target for 2 turns."})
-	elif spec == "pyromancer":
-		cfg["abilities"][0] = Ability.make({"display_name": "Fireball",
-			"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
-			"delay": 2.0, "anim": "attack01",
-			"applies_status": {"id": "burn", "turns": 3},
-			"perfect_id": "", "perfect_text": "Deals {atk:25}",
-			"description": "A crackling bolt of flame: applies\n3 turns of Burn (reapplying extends\nthe burn)."})
-	elif spec == "cryomancer":
-		cfg["abilities"][0] = Ability.make({"display_name": "Frostbolt",
-			"dmg_type": "frost", "cost": 0, "damage": 20, "pressure": 15,
-			"delay": 2.0, "anim": "attack01",
-			"applies_status": {"id": "chilled", "turns": 3},
-			"perfect_id": "", "perfect_text": "Deals {atk:25}",
-			"description": "A shard of biting cold: applies 1 stack\nof Chilled. Four stacks put the enemy in\nGlacial Hold — off the turn order until\nthe Cryomancer releases it."})
-	elif spec == "arcanist":
-		cfg["abilities"][0] = Ability.make({"display_name": "Arcane Explosion",
-			"dmg_type": "arcane", "cost": 0, "damage": 10, "pressure": 10,
-			"delay": 2.0, "anim": "attack01", "random_hits": 2,
-			"perfect_extra_hit": false,
-			"perfect_id": "", "perfect_text": "",
-			"description": "Unstable magic detonates over TWO\nrandom enemies. Builds 1 Resonance\n(2 on a critical strike)."})
+# ══ BATCH GS §1 — THE FOUR CARDS THAT WERE A LINEAGE'S BASIC ATTACK ═════════
+#
+# Until GS a lineage replaced its class basic in slot 0 while its engine was
+# held — the Occultist's Smite warped into Shadowrend, the Pyromancer's Magic
+# Bolt burned as Fireball — through `apply_kit_overrides`, which stood here and
+# is DELETED with its last reader. **THE ENGINE BRINGS ONLY WHAT IT CANNOT RUN
+# WITHOUT** (the designer's ruling), and none of the four engines needs its
+# lineage's basic: every such hero opens on his class basic now. **THE FOUR CARDS
+# ARE NOT LOST** — each is on its lineage's shelf in `SPEC_DRAFT_POOLS`, a free
+# attack drafted beside the class basic, and its ONE definition is here, by name,
+# where `pool_ability` reads it. The definitions are byte-for-byte the ones the
+# override laid in slot 0.
+static func basic_override_ability(display_name: String) -> Ability:
+	match display_name:
+		"Shadowrend":
+			return Ability.make({"display_name": "Shadowrend",
+				"dmg_type": "shadow", "cost": 0, "damage": 25, "pressure": 16,
+				"delay": 2.0, "anim": "attack01",
+				"applies_status": {"id": "cripple", "turns": 2},
+				"perfect_id": "self_heal", "perfect_text": "{mhp:5}",
+				"description": "A rending strike of gnawing shadow:\nCripples the target for 2 turns."})
+		"Fireball":
+			return Ability.make({"display_name": "Fireball",
+				"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
+				"delay": 2.0, "anim": "attack01",
+				"applies_status": {"id": "burn", "turns": 3},
+				"perfect_id": "", "perfect_text": "Deals {atk:25}",
+				"description": "A crackling bolt of flame: applies\n3 turns of Burn (reapplying extends\nthe burn)."})
+		"Frostbolt":
+			return Ability.make({"display_name": "Frostbolt",
+				"dmg_type": "frost", "cost": 0, "damage": 20, "pressure": 15,
+				"delay": 2.0, "anim": "attack01",
+				"applies_status": {"id": "chilled", "turns": 3},
+				"perfect_id": "", "perfect_text": "Deals {atk:25}",
+				"description": "A shard of biting cold: applies 1 stack\nof Chilled. Four stacks put the enemy in\nGlacial Hold — off the turn order until\nthe Cryomancer releases it."})
+		"Arcane Explosion":
+			return Ability.make({"display_name": "Arcane Explosion",
+				"dmg_type": "arcane", "cost": 0, "damage": 10, "pressure": 10,
+				"delay": 2.0, "anim": "attack01", "random_hits": 2,
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Unstable magic detonates over TWO\nrandom enemies. Builds 1 Resonance\n(2 on a critical strike)."})
+	return null
 
 
 # Archetype outline (design north star for every spec's kit):
@@ -6202,8 +6235,8 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."}),
 			]
 		"pyromancer":
-			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes
-			# Fireball via apply_kit_overrides). Batch AR made Detonation the
+			# Burn-centric kit (07-16 rework; the core Magic Bolt became
+			# Fireball until GS §1 drafted it by name). Batch AR made Detonation the
 			# win condition and re-specced Flame Shield into Immolate, so the
 			# spec has no defensive option anywhere in kit or tree — that is
 			# deliberate, and it is the whole point of the commitment spec.
@@ -6246,8 +6279,8 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "A frozen spear driven deep: +5% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets. Cast on a HELD enemy it is\nthe RELEASE — the ice breaks and the\nenemy returns on 1 stack of Chilled."}),
 			]
 		"arcanist":
-			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane
-			# Explosion via apply_kit_overrides). BATCH AT: **DEATH RAY IS OUT
+			# Resonance-engine kit (07-20 rework; core Magic Bolt became Arcane
+			# Explosion until GS §1 drafted it by name). BATCH AT: **DEATH RAY IS OUT
 			# OF THE VAULT AND STABILIZE IS IN THE SPEC POOL.** Stabilize was
 			# the escape hatch from the ramp — it vents the stacks the whole
 			# spec exists to build — so it becomes something a player EARNS if

@@ -1,10 +1,10 @@
 # BATCH GQ — THE ENGINE CARDS SAY ONLY WHAT DIFFERS.
 #
 #   §0  WHAT A RUNE ADDS, DERIVED — for all twenty-four engines, what the rune's
-#       hero opens with beyond a hero holding no engine. Nothing, for exactly the
-#       runes with no lineage (the three spines and the nine rule engines); and the
-#       one card of the bare kit a rune can take away is the class basic, replaced
-#       in slot 0
+#       hero opens with beyond a hero holding no engine. Since BATCH GS that is
+#       exactly its engine's enablers: nothing, for the three spines, the nine
+#       rule engines and the six lineages whose engine runs on the bare kit; and
+#       no rune takes a card of the bare kit away (GS ended the basic overrides)
 #   §1  EVERY DEAL, DRAWN — all twenty deals of three of each class's six on the
 #       real screen: each card is its rune's name, its rule and what it adds, and
 #       nothing else — no archetype line, no blurb, no ability's figures — and
@@ -34,7 +34,8 @@
 # kit card once below; no lineage's figures in the kit beside the no-engine
 # figures there; no note on a deal that moves nothing shown beside the note on
 # every deal that does; no `in place of` on a rune that keeps the basic beside
-# the clause on every rune that replaces it.
+# the clause on every rune that replaces it. (BATCH GS: no rune replaces it now,
+# so the clause's arm reads "on no card", and §0 asserts why.)
 #
 # ── WHAT IS READ, AND WHAT IS DERIVED ────────────────────────────────────────
 # The expected card and the expected kit are derived here off
@@ -67,6 +68,10 @@ var _run: Node = null
 var _player := {}
 # rune id -> [content height, window height], the first time its card is drawn.
 var _scroll := {}
+# BATCH GS — class -> [the lowest line on any of its screens, the deal that drew
+# it]. §4 asserts every screen fits; this prints how close the tallest came,
+# because GS put Pommel Strike's five-line text in the Warrior's kit row.
+var _lowest := {}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -227,6 +232,8 @@ func _s0_what_a_rune_adds() -> void:
 	var some := 0
 	var added_total := 0
 	var lineage_less := 0
+	# BATCH GS — the runes whose engine needs no card beyond the bare kit.
+	var no_travel := 0
 	var replaced: Array = []
 	for key in SEATS:
 		var bare: Array = _names(_bare(key))
@@ -240,9 +247,25 @@ func _s0_what_a_rune_adds() -> void:
 			var gone: Array = ad[1]
 			if lineage == "":
 				lineage_less += 1
-			ok(added.is_empty() == (lineage == ""),
-				"§0: %s adds %s — and a rune adds something exactly when it carries a lineage (%s)"
-					% [pid, str(added), lineage])
+			# BATCH GS §1 — A RUNE ADDS EXACTLY ITS ENGINE'S ENABLERS. This asked
+			# "a rune adds something exactly when it carries a lineage", which held
+			# while a lineage opened with its whole kit. An engine brings only what
+			# it cannot run without now, so six lineages add nothing either: what a
+			# rune adds is `engine_enablers` less any the bare kit already holds
+			# (the Sharpshooter's is Quick Shot, every Hunter's basic). Compared as
+			# sets, read off the enabler table rather than the kit builder, so a
+			# lineage card slipping back into an opening kit reds here.
+			var travels: Array = Classes.engine_enablers(String(pid)).filter(
+				func(n): return not bare.has(n))
+			if travels.is_empty():
+				no_travel += 1
+			var added_set: Array = added.duplicate()
+			added_set.sort()
+			var travels_set: Array = travels.duplicate()
+			travels_set.sort()
+			ok(added_set == travels_set,
+				"§0: %s adds %s — exactly its engine's enablers outside the bare kit (%s), and nothing else of its lineage (%s)"
+					% [pid, str(added), str(travels), lineage])
 			ok(gone.is_empty() or gone == [basic],
 				"§0: the one bare card %s can take away is the class basic (%s)" % [pid, str(gone)])
 			if not gone.is_empty():
@@ -257,12 +280,21 @@ func _s0_what_a_rune_adds() -> void:
 				added_total += added.size()
 			print("    %-24s %s" % [Runes.display_name(Runes.config(_rid(String(pid)))),
 				"adds nothing" if added.is_empty() else ", ".join(PackedStringArray(added))])
-	ok(none == lineage_less and lineage_less == Classes.SPINE_INFO.size() + Classes.RULE_ENGINES.size(),
-		"§0: the runes that add nothing are exactly the spines and the rule engines (%d of %d)"
-			% [none, none + some])
+	# BATCH GS — THE RUNES THAT ADD NOTHING ARE THE ONES WHOSE ENGINE NEEDS NO CARD
+	# BEYOND THE BARE KIT: the spines and the rule engines (pinned as before), and
+	# the lineages whose engine runs on the class basic and kit (the rest).
+	ok(none == no_travel and lineage_less == Classes.SPINE_INFO.size() + Classes.RULE_ENGINES.size(),
+		"§0: the runes that add nothing are exactly those whose engine needs no card beyond the bare kit — the spines, the rule engines and %d lineages (%d of %d)"
+			% [no_travel - lineage_less, none, none + some])
 	# THE POSITIVE ARM of the `in place of` clause: without a replacement anywhere,
 	# the check on the card that carries one would be vacuous.
-	ok(not replaced.is_empty(), "§0: at least one rune replaces the class basic (%s)" % str(replaced))
+	# **BATCH GS §1 — INVERTED, BECAUSE THE REPLACEMENT IS GONE.** No engine replaces
+	# the class basic any more (the four overrides are draft cards defined by
+	# `Classes.basic_override_ability`), and the `(in place of …)` clause left the
+	# screen with them. §1's clause check still runs on every card drawn and now
+	# reads "no card carries it", which a screen still printing it would fail;
+	# this line asserts the reason that arm can no longer have a positive one.
+	ok(replaced.is_empty(), "§0: no rune replaces the class basic — the overrides ended with GS (%s)" % str(replaced))
 	print("  %d runes add nothing; %d add %d cards between them; %d replace the class basic: %s"
 		% [none, some, added_total, replaced.size(), "; ".join(PackedStringArray(replaced))])
 
@@ -330,6 +362,12 @@ func _s1_every_deal() -> void:
 	if tallest != "":
 		print("  §4: the tallest card text is %s's at %dpx in a %dpx window" % [tallest, int(tallest_h),
 			int(float(_scroll[tallest][1]))])
+	# BATCH GS — THE FIT, PRINTED PER CLASS: the lowest line any deal of the class
+	# drew, against the 720px screen every one of them was asserted inside.
+	for key2 in SEATS:
+		if _lowest.has(key2):
+			print("  §4: the lowest line on any %s screen ends at %dpx of %d (%s)" % [key2,
+				int(float(_lowest[key2][0])), int(SCREEN.y), String(_lowest[key2][1])])
 
 
 func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionary:
@@ -500,6 +538,9 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 			continue
 		low = maxf(low, (c as Control).get_global_rect().end.y)
 	ok(low <= SCREEN.y, "§4: %s — the lowest line ends at %dpx, inside the screen" % [tag, int(low)])
+	# BATCH GS — kept for the per-class census printed after the deals.
+	if low > float((_lowest.get(key, [0.0, ""]) as Array)[0]):
+		_lowest[key] = [low, str(deal)]
 	for rid5 in deal:
 		var b5: Button = Gate.bound_button(scene, "_choose", [seat, String(rid5)])
 		if b5 != null:

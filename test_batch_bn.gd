@@ -260,13 +260,18 @@ func _tree_with_retired(spec: String, learned: Dictionary) -> Array:
 # GRANT; a talent may not grant an ability any more, so the card is a draft
 # entry and a suite that needs it on the bar has to say so — which is what a
 # player now has to do too.
+# BATCH GS added `lineage` — Ice Lance left the Cryomancer's opening kit for his
+# shelf, so a check that drives it seats the lineage's cards as DRAFTED (the
+# fixture's `lineage_cards`) and finds the card BY NAME, after the class kit.
 func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
-		earned: Array = []) -> Node:
+		earned: Array = [], lineage := false) -> Node:
 	var opts := {"difficulty": "wanderer", "enemies": lineup, "node_type": ty,
 		"talents": {1: learned.duplicate()}, "deterministic": true,
 		"patch": {1: {"tree": _tree_with_retired("cryomancer", learned)}}}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	if lineage:
+		opts["lineage_cards"] = true
 	return await Fixture.spawn(self,
 		["berserker", "cryomancer", "inquisitor", "beastmaster"], opts)
 
@@ -363,8 +368,10 @@ func _live_eviction_completes() -> void:
 
 # The milder version of the same fault, which was never a crash: Ice Lance
 # released a hold and instantly re-took it, so the release read as a no-op.
+# BATCH GS — the lineage's cards are seated: Ice Lance is drafted off his shelf
+# now, and "holds Ice Lance" asks that the drafted copy reached his bar.
 func _live_ice_lance_no_retake() -> void:
-	var scene := await _spawn({"cr_razor_hone": 1}, ["raider", "raider"])
+	var scene := await _spawn({"cr_razor_hone": 1}, ["raider", "raider"], "fight", [], true)
 	var cryo := _cryo(scene)
 	if cryo == null:
 		scene.queue_free()

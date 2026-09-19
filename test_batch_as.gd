@@ -677,12 +677,18 @@ func _dissolved_pair() -> void:
 
 # BATCH DO added `earned`: the four Cryomancer cards are drafted now, so a
 # suite that needs one on the bar earns it exactly as a player does.
+# BATCH GS added `lineage` — Frostbolt, Blizzard and Ice Lance left the
+# Cryomancer's opening kit for his shelf, so a check that drives one of them
+# seats the lineage's cards as DRAFTED (the fixture's `lineage_cards`) and finds
+# the card BY NAME: they sit after the class kit, and slot 0 is Magic Bolt.
 func _spawn(learned: Dictionary, lineup: Array, ty := "fight",
-		earned: Array = []) -> Node:
+		earned: Array = [], lineage := false) -> Node:
 	var opts := {"enemies": lineup, "node_type": ty,
 		"talents": {1: learned.duplicate()}, "deterministic": true}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	if lineage:
+		opts["lineage_cards"] = true
 	# BATCH FX: every id a check here learns is deleted, so the member's tree is
 	# the inline one RETIRED builds — the exact payloads, through the real
 	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
@@ -762,8 +768,10 @@ func _live_hold() -> void:
 
 
 # The rule a player will test first, and the one the spec dies without.
+# BATCH GS — the lineage's cards are seated: Blizzard is drafted off his shelf
+# now, and "holds Blizzard" below asks that the drafted copy reached his bar.
 func _live_no_accidental_thaw() -> void:
-	var scene := await _spawn({}, ["raider", "raider", "raider"])
+	var scene := await _spawn({}, ["raider", "raider", "raider"], "fight", [], true)
 	var cryo := _cryo(scene)
 	if cryo == null:
 		scene.queue_free()
@@ -959,11 +967,18 @@ func _live_turn_bar() -> void:
 # The nodes whose whole existence is a battle-time read site.
 func _live_tree_nodes() -> void:
 	# Deep Chill: Frostbolt lays two stacks, not one.
-	var dc := await _spawn({"cr_emp_frostbolt": 1}, ["raider", "raider"])
+	# BATCH GS — Frostbolt is a DRAFTED card now and slot 0 is Magic Bolt, so the
+	# lineage's cards are seated and Frostbolt is cast BY NAME (never slot 0).
+	var dc := await _spawn({"cr_emp_frostbolt": 1}, ["raider", "raider"], "fight", [], true)
 	var c1 := _cryo(dc)
 	if c1 != null:
 		var foe: BattleUnit = dc.get("enemies")[0]
-		await dc.call("_resolve", c1, c1.abilities[0], foe, "good", true)
+		var frostbolt: Ability = null
+		for ab in c1.abilities:
+			if ab.display_name == "Frostbolt":
+				frostbolt = ab
+		if frostbolt != null:
+			await dc.call("_resolve", c1, frostbolt, foe, "good", true)
 		ok(foe.status_stacks("chilled") == 2 or foe.dead,
 			"Deep Chill: Frostbolt applies 2 stacks (got %d)" % foe.status_stacks("chilled"))
 	dc.queue_free()
@@ -985,7 +1000,8 @@ func _live_tree_nodes() -> void:
 	sp.queue_free()
 	await process_frame
 	# Whiteout: Blizzard lays a flat 3 on everything.
-	var wo := await _spawn({"cr_whiteout": 1}, ["raider", "raider"])
+	# BATCH GS — Blizzard is drafted now, so the lineage's cards are seated.
+	var wo := await _spawn({"cr_whiteout": 1}, ["raider", "raider"], "fight", [], true)
 	var c3 := _cryo(wo)
 	if c3 != null:
 		var bliz: Ability = null
@@ -1043,7 +1059,9 @@ func _live_tree_nodes() -> void:
 # The releases, and the two nodes that ride them.
 func _live_releases() -> void:
 	# Ice Lance IS the release.
-	var il := await _spawn({}, ["raider", "raider"])
+	# BATCH GS — Ice Lance is drafted off his shelf now, so the lineage's cards
+	# are seated; "holds Ice Lance" asks that the drafted copy reached his bar.
+	var il := await _spawn({}, ["raider", "raider"], "fight", [], true)
 	var c1 := _cryo(il)
 	if c1 != null:
 		var foe: BattleUnit = il.get("enemies")[0]

@@ -375,7 +375,12 @@ func _death_ray_numbers() -> void:
 	for ab in Classes.spec_abilities("arcanist"):
 		if ab.display_name == "Death Ray":
 			dray = ab
-	ok(dray != null, "Death Ray is still in the opening three")
+	# BATCH GS — Death Ray left the opening three for the Arcanist's shelf, gated on
+	# Resonance at the offer; its one definition is still his lineage's, and that
+	# definition is what the numbers below read.
+	ok(dray != null and Classes.spec_draft_pool("arcanist").has("Death Ray")
+			and Classes.engine_read("Death Ray") == "resonance",
+		"Death Ray is still an Arcanist card — defined by his lineage, on his shelf, offered to a Resonance holder")
 	if dray == null:
 		return
 	ok(dray.cost == 55, "Death Ray costs 55 Mana (got %d)" % dray.cost)
@@ -532,19 +537,26 @@ func _negative_control_source() -> void:
 # ---------- live: a real battle spawn ----------
 
 func _spawn(learned: Dictionary, specs: Array, member_patch := {},
-		lineup := ["raider"]) -> Node:
+		lineup := ["raider"], lineage := false) -> Node:
 	# THE CRIT ABOVE ALL ON THIS SPEC: a crit builds 2 where an ordinary hit
 	# builds 1, so one unlucky coin turns "Singularity grants 2 extra" into "it
 	# granted 4". Checks that WANT a crit set `crit_bonus` back themselves.
 	# BATCH FX: a learned node the one tree does not hold rides in on the
 	# member's tree with its retired payload (`_fx_tree`); the fixture writes
 	# `patch` after the member is built, so the spawn applies it.
+	# BATCH GS added `lineage` — Cannon and Death Ray left the Arcanist's opening
+	# kit for his shelf, so a check that drives one seats the lineage's cards as
+	# DRAFTED (the fixture's `lineage_cards`) and finds the card BY NAME. A
+	# `member_patch` naming `bm_abilities` would overwrite the seat, and no
+	# seated spawn passes one.
 	var patch: Dictionary = member_patch.duplicate()
 	if not learned.is_empty():
 		patch["tree"] = _fx_tree(learned)
-	return await Fixture.spawn(self, specs,
-		{"enemies": lineup, "talents": {1: learned.duplicate()}, "patch": {1: patch},
-		"deterministic": true, "crit": -10.0})
+	var opts := {"enemies": lineup, "talents": {1: learned.duplicate()}, "patch": {1: patch},
+		"deterministic": true, "crit": -10.0}
+	if lineage:
+		opts["lineage_cards"] = true
+	return await Fixture.spawn(self, specs, opts)
 
 
 # The live tree, plus every learned node it no longer holds, carried with the
@@ -813,11 +825,14 @@ func _live_capstones() -> void:
 	# (c) CRIT BUILDING IS ADDITIVE: base 2, Attunement 3, both 5. Driven
 	# through _resolve with the crit FORCED on, which is the one place this
 	# suite wants a crit rather than fearing it.
+	# BATCH GS — the cast is Arcane Cannon, drafted off his shelf now, so each
+	# spawn seats the lineage's cards (without them the cast threw and built 0).
 	for pair in [[{}, 2], [{"ar_mastery": 1}, 3], [{"ar_singularity": 1}, 4],
 			[{"ar_mastery": 1, "ar_singularity": 1}, 5]]:
 		var learned: Dictionary = pair[0]
 		var expect: int = pair[1]
-		var cs := await _spawn(learned, ["berserker", "arcanist", "inquisitor", "beastmaster"])
+		var cs := await _spawn(learned, ["berserker", "arcanist", "inquisitor", "beastmaster"],
+			{}, ["raider"], true)
 		var a := _hero(cs, 1)
 		var foe: BattleUnit = cs.get("enemies")[0]
 		foe.max_hp = 999999
@@ -835,11 +850,21 @@ func _live_capstones() -> void:
 
 
 # §3: the gate at 8, live, and the affordance that names it.
+# BATCH GS — the lineage's cards are seated: Death Ray is drafted now.
 func _live_death_ray_gate() -> void:
-	var scene := await _spawn({}, ["berserker", "arcanist", "inquisitor", "beastmaster"])
+	var scene := await _spawn({}, ["berserker", "arcanist", "inquisitor", "beastmaster"],
+		{}, ["raider"], true)
 	var arc := _hero(scene, 1)
 	var dray := _find(arc, "Death Ray")
-	ok(dray != null, "Death Ray is in the kit")
+	# BATCH GS — this asked whether Death Ray is in the Arcanist's kit. It left
+	# the kit for his SHELF, and what keeps it from a Mage without the engine is
+	# the OFFER now (`engine_read`, Resonance): all three halves are asked, and
+	# the seated copy is what the gate below is driven on.
+	var dray_shelf := Classes.spec_draft_pool("arcanist").has("Death Ray")
+	var dray_gate := Classes.engine_read("Death Ray") == "resonance"
+	ok(dray != null and dray_shelf and dray_gate,
+		"Death Ray is on the Arcanist's shelf (%s), offered only to a Resonance holder (%s), and on his bar once drafted (%s)"
+			% [dray_shelf, dray_gate, dray != null])
 	arc.max_resource = 9999
 	arc.resource = 9999
 	for n in [0, 5, 7]:

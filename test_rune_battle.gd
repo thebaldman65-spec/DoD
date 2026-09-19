@@ -11,6 +11,11 @@
 #       --script res://_scratch/test_rune_battle.gd
 extends SceneTree
 
+# BATCH GS — the one derivation of the cards a lineage opened with until GS
+# (`lineage_cards`) lives in the gate fixture. This suite builds its boards by
+# hand, so it reads that derivation from there rather than holding a copy.
+const GateFixture = preload("res://gate_fixture.gd")
+
 
 var _pierce_log := ""
 var _pierce_why := ""
@@ -348,6 +353,14 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(chosen[i]))
 		run.party[i]["tree"] = Talents.generate_tree(chosen[i], run.party[i]["key"])
 		run.party[i]["runes"] = []
+		# BATCH GS — THE MAGE SEAT ALONE holds his lineage's cards, as DRAFTED.
+		# The Honed Lance and the Seventh Bolt edit Ice Lance and Arcane Barrage,
+		# and the White Flame's forced hit below is Fireball; all of them left the
+		# opening kit for the shelf at GS. The Cleric seat is NOT seated: the Last
+		# Rites check asks that the RUNE grants Resurrection, and a seated copy
+		# would answer that question for it.
+		if chosen[i] == mage_spec:
+			run.party[i]["bm_abilities"] = GateFixture.lineage_cards(mage_spec)
 		run.sync_spec_hp(i)
 		equipped[chosen[i]] = _equip_all(run.party[i])
 	run.specs_chosen = true
@@ -540,9 +553,19 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		# and a hit onto a corpse exercises nothing.
 		var wf_foes: Array = scene.get("enemies").filter(func(e): return not e.dead)
 		ok(not wf_foes.is_empty(), "pyromancer: no living enemy left to force a hit onto")
-		if not wf_foes.is_empty():
+		# BATCH GS — THE FORCED HIT IS FIRE AGAIN. It was `abilities[0]`, which was
+		# Fireball until GS; slot 0 is Magic Bolt now, an ARCANE hit this warband
+		# does not resist, so the read site had nothing to thin and the check read
+		# red with `type=arcane resist=0.00`. It is Fireball, seated with the
+		# Mage seat's lineage cards above and found BY NAME.
+		var wf_ab: Ability = null
+		for ab in wf_py.abilities:
+			if ab.display_name == "Fireball":
+				wf_ab = ab
+		if wf_ab == null:
+			_pierce_why = " [forced hit: no Fireball on the Pyromancer's bar]"
+		if not wf_foes.is_empty() and wf_ab != null:
 			var wf_tgt: BattleUnit = wf_foes[0]
-			var wf_ab: Ability = wf_py.abilities[0]
 			# BANKED BEFORE THE HIT, because a failure has to be able to say
 			# which precondition was missing. Every one of these is a read.
 			_pierce_why = (" [forced hit: over=%s py_dead=%s tgt=%s hp=%d/%d dead=%s"

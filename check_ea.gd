@@ -277,7 +277,15 @@ func _s1_depth() -> void:
 			# cannot see.
 			var wide: Array = Classes.class_draft_pool(
 				Classes.class_of_spec(spec2))
-			var earn: int = cap - Classes.core_slots(spec2)
+			# BATCH GS — THE LOADOUT BOUND IS WHAT THE CAP LEAVES FOR EARNED CARDS,
+			# which is the cap less the slots the hero OPENS using: the lineage's
+			# (`lineage_slots`) and the class kit's (`kit_slots`), `ability_slots_used`'s
+			# own two terms. It read `core_slots`, which stood in for that sum
+			# while a lineage's opening kit WAS its core; GS made `core_slots` the
+			# enablers' bar entries, which sit outside the count, and the bound
+			# drifted to nine and ten earned cards against a real seven.
+			var earn: int = cap - (Classes.lineage_slots(spec2)
+				+ Classes.kit_slots(String(cls2), spec2))
 			var floor_now: int = draft.size() - earn - int(rune_drain.get(spec2, 0))
 			# **BATCH EH §1 — THE THIRD TIER'S OWN DEPTH, AND IT IS THE SAME
 			# ARITHMETIC ONE POOL WIDER.** The earnable slots drain ONE budget
@@ -328,8 +336,15 @@ func _s1_depth() -> void:
 	# A pinned population rather than a pinned count: a THIRTEENTH spec whose
 	# fallback can fill short trips, and so does the Occultist's leaving the
 	# set, which is what a repair looks like from here.
-	ok(short_specs == ["occultist"],
-		"§1: the specs whose fallback can fill SHORT are %s, not the [occultist] on record — the slot ladder has moved under this table" % [
+	# **BATCH GS — RE-DERIVED ON THE LIVE OPENING, AND THE SET IS EMPTY.** Every
+	# hero opens using the class kit's three slots whatever engine he holds, so
+	# the last rung leaves him seven earned cards against lineage shelves of
+	# eleven to sixteen (GS moved twenty-nine cards onto them): the thinnest
+	# floor is four, over three awards. [occultist] was read off `core_slots`
+	# when it still meant the opening. A spec whose fallback can fill short
+	# is a thirteenth-spec event again, and this line trips on it.
+	ok(short_specs.is_empty(),
+		"§1: the specs whose fallback can fill SHORT are %s, not the none GS left on record — the slot ladder or a shelf has moved under this table" % [
 			short_specs])
 
 	# **BATCH EG §1 — AND THE BOUND ABOVE IS NO LONGER THE ONLY ONE. REPORTED,

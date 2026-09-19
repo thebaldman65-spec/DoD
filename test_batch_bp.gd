@@ -231,11 +231,25 @@ func _pools() -> void:
 		for en in Classes.core_enablers(spec7):
 			ok(not Classes.spec_draft_pool(spec7).has(en),
 				"§5: %s's enabler '%s' is still NOT draftable" % [spec7, en])
-	ok(Classes.core_enablers("swordmaster") == ["Guard Change"],
-		"§5: Guard Change is still the Swordmaster's protected enabler")
-	ok(Classes.core_slots("berserker") == 3 and Classes.core_slots("warden") == 3
-		and Classes.core_slots("swordmaster") == 3,
-		"§5: the three Warrior cores still cost 3 slots, so 4 stay draftable")
+	# BATCH GS — RE-POINTED: THE SWORDMASTER HAS NO ENABLER. Seasoned Fighter opens
+	# every battle Aggressive, which pays from the first blow, so GS §1 took Guard
+	# Change out of his protected core and put it on his shelf — drafted like any
+	# card. Both halves are asked: the core is empty AND the card is on the shelf.
+	ok(Classes.core_enablers("swordmaster").is_empty()
+			and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"§5: the Swordmaster has NO protected enabler since GS — Guard Change is on his shelf, drafted")
+	# BATCH GS — RE-POINTED: A LINEAGE FILLS NO SLOT. The three cores cost 3 slots
+	# until GS (their opening three); each lineage now opens with its enablers
+	# alone, outside the count, so `lineage_slots` is 0 and every Warrior opens at
+	# the class kit's 3. The draftable figure is the live cap less that opening.
+	var gs_cap: int = root.get_node("/root/Run").ability_slot_cap()
+	ok(Classes.lineage_slots("berserker") == 0 and Classes.lineage_slots("warden") == 0
+		and Classes.lineage_slots("swordmaster") == 0
+		and Classes.kit_slots("warrior", "berserker") == 3
+		and Classes.kit_slots("warrior", "warden") == 3
+		and Classes.kit_slots("warrior", "swordmaster") == 3,
+		"§5: the three Warrior lineages fill no slot and open at the kit's 3, so %d stay draftable" % (
+			gs_cap - Classes.kit_slots("warrior", "swordmaster")))
 
 
 # ---------- §5 BREAK DAMAGE, ASSIGNED DELIBERATELY ----------
@@ -318,11 +332,17 @@ func _warrior_draft_flow() -> void:
 	# THE SEVEN-SLOT CAP, DRIVEN WITH A WARRIOR. **BATCH GK: his lineage counts
 	# 2, not 3** — Guard Change is the enabler his Stances need and sits outside
 	# the slot count (the charter) — so 5 earned abilities fill him and the sixth
-	# needs a drop.
+	# needs a drop. (BATCH GS: his lineage counts 0 — he has no enabler and Guard
+	# Change is a shelf card — so the class kit's 3 is his whole opening.)
 	# BATCH GN — THE CLASS KIT'S THREE COUNT TOO (none is his lineage's).
+	# BATCH GS — the message states the live figures; it read GK's "2 lineage ...
+	# = 6 of 7", which the assertion has not asked since GN and GS moved them.
 	ok(run.ability_slots_used(m) == Classes.lineage_slots("swordmaster")
 			+ Classes.kit_slots("warrior", "swordmaster") + 1,
-		"§7: 2 lineage + 3 kit + 1 earned = 6 of 7 (got %d)" % run.ability_slots_used(m))
+		"§7: %d lineage + %d kit + 1 earned = %d of %d (got %d)" % [
+			Classes.lineage_slots("swordmaster"), Classes.kit_slots("warrior", "swordmaster"),
+			Classes.lineage_slots("swordmaster") + Classes.kit_slots("warrior", "swordmaster") + 1,
+			run.ability_slot_cap(), run.ability_slots_used(m)])
 	# BATCH DR — **THE THREE FILLER NAMES MUST NOT BE DRAFTABLE, AND TWO OF
 	# THEM WERE.** This kit is hand-built to reach the cap, and §7 then TAKES
 	# `cands[1]` — a card drawn at random from his live draft pool. LUNGE and
@@ -357,7 +377,12 @@ func _warrior_draft_flow() -> void:
 	# BATCH GN — THE FILL IS RELATIVE TO THE LIVE OPENING NOW (BO's rule): the
 	# class kit takes three of the seven, so TWO earned fill him, and Shatterpoint
 	# stays second because the bench below names it.
-	var fill: int = CAP - Classes.lineage_slots("swordmaster") \
+	# BATCH GS — FOUR fill him now: his lineage takes no slot, so the class kit's
+	# three is his whole opening. The fill is the LIVE cap less the live opening
+	# slots, never a literal, and the check below pins the lineage's share at 0
+	# where it pinned GN's `fill == 2`. War Stomp is the fourth filler, and
+	# `check_eb` §2 already holds it out of every draft pool.
+	var fill: int = run.ability_slot_cap() - Classes.lineage_slots("swordmaster") \
 		- Classes.kit_slots("warrior", "swordmaster")
 	# **BATCH GP RE-POINTED THE FILLERS AND `check_eb` §2 IS WHY.** The pool
 	# merge makes a Swordmaster's draw the whole WARRIOR pool, so Rallying Shout
@@ -367,20 +392,36 @@ func _warrior_draft_flow() -> void:
 	# Interpose are the Warden's `SPEC_POOLS` boss-pick cards and are in none.
 	m["bm_abilities"] = ([cands[0], "Shatterpoint", "Sweeping Strikes",
 		"War Stomp", "Interpose"] as Array).slice(0, fill)
-	ok(run.ability_slots_used(m) == CAP and fill == 2,
-		"§7: %d earned fill the cap at 7 (got %d)" % [fill, run.ability_slots_used(m)])
+	ok(run.ability_slots_used(m) == run.ability_slot_cap()
+			and Classes.lineage_slots("swordmaster") == 0,
+		"§7: %d earned fill the cap at %d — his lineage fills no slot, so the kit's %d is his opening (got %d)" % [
+			fill, run.ability_slot_cap(), Classes.kit_slots("warrior", "swordmaster"),
+			run.ability_slots_used(m)])
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
 	# AT THE CAP A TAKE NEEDS A DROP, AND A PROTECTED ABILITY CAN NEVER BE THE
 	# ONE NAMED. Guard Change is his enabler; it is not in `bm_abilities`, so
 	# the refusal is the ABSENCE of the name rather than a branch.
+	# BATCH GS — HE HAS NO ENABLER NOW, AND GUARD CHANGE AND OVERPOWER ARE SHELF
+	# CARDS HIS OWN DRAW DEALS HIM (the first card of about one offer in twenty,
+	# measured): drawn as `cands[0]` either is EARNED and rightly benchable, so
+	# the two names had made this pair a coin flip. What is protected is what he
+	# OPENS with — `Classes.protected_names`: Strike and the class kit, in no
+	# pool — so the refusal is still the ABSENCE of the name. Pommel Strike, the
+	# one card of his lineage the class kit kept, takes the enabler's place.
 	m["draft_picks_owed"] = 1
 	m["draft_candidates"] = [[cands[1]]]
 	ok(run.take_draft_ability(m, cands[1]) != "",
 		"§7: at the cap, taking without benching is refused")
-	ok(not run.unequip_earned_ability(m, "Guard Change"),
-		"§7: his protected enabler can never be benched")
-	ok(not run.unequip_earned_ability(m, "Overpower"),
-		"§7: ...nor any other opening ability")
+	var gs_open: Array = Classes.protected_names("swordmaster")
+	ok(gs_open.has("Pommel Strike") and not run.unequip_earned_ability(m, "Pommel Strike"),
+		"§7: his protected Pommel Strike — his lineage's card, kept in the class kit at GS — can never be benched")
+	var gs_benched: Array = []
+	for gs_p in gs_open:
+		if String(gs_p) != "Pommel Strike" and run.unequip_earned_ability(m, String(gs_p)):
+			gs_benched.append(String(gs_p))
+	ok(gs_open.size() > 1 and gs_benched.is_empty(),
+		"§7: ...nor any other opening ability (%d more; benched: %s)" % [
+			gs_open.size() - 1, ", ".join(gs_benched)])
 	ok(run.take_draft_ability(m, cands[1], "Shatterpoint") == "",
 		"§7: naming an EARNED ability to bench works")
 	# **INVERTED BY BATCH EG §2**, with the question kept: the benched card is

@@ -129,10 +129,14 @@ func _pouch(pids: Array) -> Array:
 
 
 # A deterministic board with each seat holding exactly the engines named.
-func _board(specs: Array, engines: Array) -> Node:
+func _board(specs: Array, engines: Array, drafted: Dictionary = {}) -> Node:
 	var over := {}
 	for seat in 4:
 		over[seat] = {"engines": _pouch(engines[seat])}
+		# BATCH GS — a card a seat must hold that no lineage opens with any more
+		# is seated the way a player now gets it: drafted.
+		if drafted.has(seat):
+			over[seat]["bm_abilities"] = drafted[seat]
 	return await Gate.spawn(self, specs, {"deterministic": true, "party": over})
 
 
@@ -839,7 +843,13 @@ func _s4_echo() -> void:
 	var s: Node = await _board(NO_LINEAGE, [[], ["cast_echo"], [], []])
 	await _weaver_arm(s, "alone")
 	await _clear(s)
-	s = await _board(["", "pyromancer", "", ""], [[], ["overburn", "cast_echo"], [], []])
+	# BATCH GS §1 — THE PYROMANCER NO LONGER OPENS WITH DETONATION (the engine
+	# brings Flamewave and nothing else, the designer's ruling). This arm asks
+	# whether a CONSUMING card repeats its damage and not its consumption, which
+	# is a question about that card, so it seats it drafted; left unseated, the
+	# two checks below skipped themselves in silence.
+	s = await _board(["", "pyromancer", "", ""], [[], ["overburn", "cast_echo"], [], []],
+		{1: ["Detonation"]})
 	await _weaver_arm(s, "beside Overburn")
 	await _clear(s)
 
@@ -931,6 +941,8 @@ func _weaver_arm(s: Node, tag: String) -> void:
 		ok(d1 > 0 and d3 == d1 + int(round(d1 * Classes.ECHO_SHARE)) and not e0.has_status("burn"),
 			"§4 (%s): Detonation as the third cast repeats half its damage, the Burn consumed once (%d against %d)"
 				% [tag, d3, d1])
+	elif tag == "beside Overburn":
+		ok(false, "§4 (%s): the Mage holds Detonation" % tag)
 	M.refresh_bars()
 	var chip: Dictionary = M.get_status(M.engine_chip_id("cast_echo"))
 	ok(String(chip.get("label", "")) == "Weaver",
@@ -1474,7 +1486,13 @@ func _s10_field_kit() -> void:
 	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["field_kit"]])
 	await _medic_arm(s, "alone")
 	await _clear(s)
-	s = await _board(["", "", "", "mystic"], [[], [], [], ["trapper", "field_kit"]])
+	# BATCH GS §1 — THE SURVIVALIST NO LONGER OPENS WITH SHRAPNEL CHARGE (Trapper
+	# reads no ability, so nothing travels with it and the card is on his shelf).
+	# This arm's question — do a card's own afflictions mend again and again
+	# beside Trapper — is about that card, so it seats it drafted; left unseated,
+	# the arm below skipped itself in silence and the recon read one check fewer.
+	s = await _board(["", "", "", "mystic"], [[], [], [], ["trapper", "field_kit"]],
+		{3: ["Shrapnel Charge"]})
 	await _medic_arm(s, "beside Trapper")
 	await _clear(s)
 
@@ -1552,6 +1570,8 @@ func _medic_arm(s: Node, tag: String) -> void:
 		await s._resolve(H, shrapnel, e0, "good")
 		ok(W.hp - hb >= mend * 2,
 			"§10 (%s): beside Trapper, Shrapnel Charge's afflictions mend again and again (%d)" % [tag, W.hp - hb])
+	elif tag == "beside Trapper":
+		ok(false, "§10 (%s): the Hunter holds Shrapnel Charge" % tag)
 	H.refresh_bars()
 	var chip: Dictionary = H.get_status(H.engine_chip_id("field_kit"))
 	ok(String(chip.get("label", "")) == "Medic", "§10 (%s): the chip is named Medic" % tag)

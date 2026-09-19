@@ -33,6 +33,9 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+# BATCH GS — the one derivation of the cards a lineage opened with until GS
+# (`lineage_cards`); §1's offer battery seats them by hand, as the fixture does.
+const GateFixture = preload("res://gate_fixture.gd")
 
 
 # §2's design numbers, in one place.
@@ -497,8 +500,19 @@ func _the_offer_never_pairs_a_dud() -> void:
 	run.sim_run = false
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	var specs := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
+	# BATCH GS — THE SAMPLE LOST CERTAIN, AND THIS IS WHY. An offer pairs an upgrade
+	# only with a card the hero OWNS, and Certain fits exactly two cards in the
+	# game (§1's reach pin): Wildstrikes and Hack and Slash, which the Berserker
+	# opened with until GS put them on his shelf. Seated by spec alone these four
+	# hold their basic and class kit, so the battery reached seven upgrades and
+	# "ZERO duds" said nothing about the eighth. Each is seated as the fixtures'
+	# `lineage_cards` option seats a lineage — the cards it opened with until GS,
+	# as DRAFTED cards, off the one derivation — which puts every upgrade back in
+	# reach. `_never_twice_across_eight` walks this Berserker next, and gets its
+	# eight back with it.
 	for i in run.party.size():
 		run.party[i]["spec"] = specs[i]
+		run.party[i]["bm_abilities"] = GateFixture.lineage_cards(specs[i])
 	var duds := 0
 	var sizes: Dictionary = {}
 	var seen: Dictionary = {}

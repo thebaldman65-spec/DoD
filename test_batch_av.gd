@@ -11,7 +11,9 @@
 #      and damage prevented.
 #   §1 RESURRECTION IN THE OPENING KIT — present at spawn with NO talent
 #      learned, absent from SPEC_POOLS["holy"], and exactly ONE def of it in
-#      the codebase (the kit calls Classes.pending_talent_ability).
+#      the codebase (the kit calls Classes.pending_talent_ability). BATCH GS:
+#      out of the kit and onto her SHELF, gated on Mercy — held at spawn with no
+#      talent learned once drafted, and every live spawn here seats it so.
 #   §3 THE TREE: 24 ids, 7/7/7 + 3 capstones, the lane renamed VIGIL, every
 #      final magnitude on the node that owes it, and every counter ADDITIVE.
 #   §4 BOTH AUTHORED FALLBACKS (Divine Plea -> 1 Mercy, Intercession -> a
@@ -241,9 +243,15 @@ func _spawn(learned: Dictionary, member_patch := {},
 	# it sets the tree, so the fixture itself did not move.
 	var patch: Dictionary = member_patch.duplicate()
 	patch["tree"] = _member_tree(learned)
+	# BATCH GS — HER CARDS ARE DRAFTED NOW. The Holy opens on Smite and the Cleric
+	# kit; Heal, Renewal, Hymn of Hope and Resurrection are on her shelf. The live
+	# checks drive those four, so every spawn seats the lineage's cards as DRAFTED
+	# ones (`lineage_cards`) and finds each BY NAME. A patch naming its own
+	# `bm_abilities` replaces them — `_live_intercession`'s one-copy spawn alone,
+	# and it needs none of the four.
 	return await Fixture.spawn(self, ["berserker", "pyromancer", "holy", "beastmaster"],
 		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: patch},
-		"deterministic": true, "crit": -10.0})
+		"deterministic": true, "crit": -10.0, "lineage_cards": true})
 
 
 func _kill(scene: Node) -> void:
@@ -257,13 +265,29 @@ func _kit_and_pool() -> void:
 	var names: Array = []
 	for ab in kit:
 		names.append(ab.display_name)
-	ok(names.has("Resurrection"),
-		"Resurrection is in the Holy opening kit (got %s)" % str(names))
-	ok(names.size() == 4,
-		"...and the kit is FOUR abilities, the deliberate parity break (got %d)" % names.size())
+	# BATCH GS — `spec_abilities` IS THE HOLY LINEAGE'S DEFINITION TABLE NOW, NOT
+	# HER OPENING KIT: a lineage opens with its engine's enablers and the Holy's are
+	# none, so the four cards it defines are on her shelf and she opens on Smite and
+	# the Cleric kit. These three asked what her kit held and how big it was; they
+	# ask where the four are now and what she opens holding, off the one builder.
+	var opening: Array = []
+	for ab2 in Classes.opening_kit("cleric", "holy", [Classes.engine_of_spec("holy")]):
+		opening.append(ab2.display_name)
+	var plain: Array = []
+	for ab3 in Classes.opening_kit("cleric", "", []):
+		plain.append(ab3.display_name)
+	var shelf: Array = Classes.spec_draft_pool("holy")
+	ok(names.has("Resurrection") and shelf.has("Resurrection")
+			and not opening.has("Resurrection"),
+		"Resurrection is a Holy card on her SHELF, out of the kit she opens with (%s)" % str(opening))
+	ok(names.size() == 4 and opening == plain,
+		"...her lineage still defines FOUR and she opens with none of them — a Cleric's opening, the parity break gone (got %d)" % names.size())
 	for expected in ["Heal", "Renewal", "Hymn of Hope"]:
-		ok(names.has(expected), "the original three survive: %s" % expected)
-	# A boss cannot offer what she starts with.
+		ok(names.has(expected) and shelf.has(expected) and not opening.has(expected),
+			"the original three survive, on her shelf: %s" % expected)
+	# A boss does not offer it — AV took it out of her boss pool when it joined
+	# her kit. (BATCH GS: it left the kit for her shelf, and GS left the boss
+	# pools as they were, so this still holds.)
 	ok(not Classes.SPEC_POOLS["holy"].has("Resurrection"),
 		"Resurrection LEFT SPEC_POOLS[holy] (%s)" % str(Classes.SPEC_POOLS["holy"]))
 	ok(Classes.SPEC_POOLS["holy"].has("Divine Plea"),
@@ -550,10 +574,11 @@ func _rune_audit() -> void:
 			ok(not HOLY_COUNTERS.has(String(f3)),
 				"%s must not write the Holy tree counter %s" % [id, f3])
 	# LAST RITES: its grant now COLLIDES rather than granting, so its text has
-	# to stop promising an ability she already owns.
+	# to stop promising an ability she already owns. (BATCH GS: it collides for
+	# a Holy who drafted Resurrection — no Holy starts with it any more.)
 	var lr: Dictionary = Runes.config("last_rites")
 	ok(not String(lr.get("desc", "")).begins_with("Grants RESURRECTION"),
-		"the Last Rites no longer advertises granting what she starts with")
+		"the Last Rites no longer advertises granting what she already holds")
 
 
 # ---------- negative controls ----------
@@ -598,7 +623,14 @@ func _live_kit_at_spawn() -> void:
 	var c := _hero(scene, 2)
 	ok(c != null and c.second_resource_name == "Mercy", "slot 2 is the Holy Cleric")
 	var res := _find(c, "Resurrection")
-	ok(res != null, "Resurrection is in hand at spawn with NO talent learned")
+	# BATCH GS — "IN HAND AT SPAWN WITH NO TALENT LEARNED" WAS TRUE OF EVERY HOLY;
+	# SINCE GS IT IS TRUE OF ONE WHO DRAFTED IT. The card is on her shelf and gated
+	# on Mercy (`Classes.ENGINE_READ`: offered only to Mercy's holder), and `_spawn`
+	# seats it as drafted — so this asks all three, and still that no talent is
+	# needed to hold it.
+	ok(res != null and Classes.spec_draft_pool("holy").has("Resurrection")
+			and Classes.engine_read("Resurrection") == "mercy",
+		"Resurrection is on the Holy shelf, gated on Mercy, and drafted she holds it at spawn with NO talent learned")
 	if res != null:
 		ok(res.faith_cost == 1 and res.cooldown == 3,
 			"...at its unchanged 1 Mercy / 3cd")
@@ -914,8 +946,10 @@ func _swing(scene: Node, attacker: BattleUnit, target: BattleUnit, dmg: int) -> 
 # ---------- live: AU §1 reaching a rune grant ----------
 
 func _live_last_rites_rune() -> void:
-	# The Rune of the Last Rites grants Resurrection — which she now starts
-	# with. Rather than a knowingly dead Epic, AU §1's rule reaches it: runes
+	# The Rune of the Last Rites grants Resurrection — which she started with
+	# until BATCH GS, and since holds only once DRAFTED (`_spawn` seats it so; a
+	# Holy who has not drafted it is granted it). Rather than a knowingly dead
+	# Epic, AU §1's rule reaches it: runes
 	# share Talents.apply_payload, so the grant COLLIDES and takes the generic.
 	# Resurrection has no damage, so Honed is skipped and QUICKENED lands.
 	var rune: Dictionary = Runes.build("last_rites")

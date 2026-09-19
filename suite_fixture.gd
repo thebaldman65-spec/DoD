@@ -34,6 +34,10 @@
 # `Talents` is a `class_name` script class, not an autoload, and is safe.
 extends RefCounted
 
+# BATCH GS — the one derivation of a lineage's returned cards lives in the gate
+# fixture; this one reads it rather than holding a second copy.
+const GateFixture = preload("res://gate_fixture.gd")
+
 # ── THE OPTIONS, AND WHY THERE ARE THIS MANY ────────────────────────────────
 # One key per axis the 37 copies actually diverged on. They are validated below
 # rather than silently ignored, because an ignored typo in an options dictionary
@@ -70,10 +74,16 @@ extends RefCounted
 #   heal_mult     float — `healing_received_mult`, the healing suites' fourth coin.
 #   sim           bool — `scene.sim = true` and `sim_stats` cleared.
 #   slices        bool — `_b_slice` and `_b_bd_slice` cleared as well.
+#   lineage_cards bool — BATCH GS §1: seat, for every hero seated by lineage, the
+#                 cards his lineage opened with until GS as DRAFTED cards, ahead of
+#                 any `bm` the suite names (`gate_fixture.lineage_cards`, the one
+#                 derivation). A lineage opens with its engine's enablers alone
+#                 since GS, so a suite about one of its other cards seats it the
+#                 way a player now gets it.
 const KNOWN := ["difficulty", "enemies", "node_type", "talents", "talents_by_spec",
 	"bm", "bm_all", "bm_by_spec", "runes", "patch", "prep", "slot_idx", "modifier",
 	"autoplay", "frames", "fast", "deterministic", "enemies_keep_cover", "crit",
-	"heal_mult", "sim", "slices"]
+	"heal_mult", "sim", "slices", "lineage_cards"]
 
 
 # ── WHAT WAS DROPPED, AND WHY EACH ONE IS NOT A BEHAVIOUR CHANGE ────────────
@@ -121,6 +131,12 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 		run.party[i]["talents"] = talents.get(i, talents_by_spec.get(spec, {}))
 		if bm_all or bm.has(i) or bm_by_spec.has(spec):
 			run.party[i]["bm_abilities"] = bm.get(i, bm_by_spec.get(spec, []))
+		if bool(opts.get("lineage_cards", false)):
+			var lc: Array = GateFixture.lineage_cards(spec)
+			for n in run.party[i].get("bm_abilities", []):
+				if not lc.has(n):
+					lc.append(n)
+			run.party[i]["bm_abilities"] = lc
 		run.sync_spec_hp(i)
 	# AFTER `sync_spec_hp`, deliberately — see the note above `spawn`.
 	var patch: Dictionary = opts.get("patch", {})

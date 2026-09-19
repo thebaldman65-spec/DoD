@@ -261,8 +261,14 @@ func _s2_boss_depth() -> void:
 		"§2: the Holy Cleric's un-draftable boss cards are %d, not the 2 DY §2 left her" % holy_safe)
 	print("    emptiable by drafting: %s" % ", ".join(PackedStringArray(emptiable)))
 	# The slot arithmetic that prices §2's card-shaped options.
-	ok(Classes.core_slots("holy") == 4,
-		"§2: Holy no longer carries four protected cores — the slot half of the pricing has moved")
+	# BATCH GS — THE SLOT HALF MOVED, AND THIS TRIPWIRE IS RE-PINNED RATHER THAN
+	# DELETED. It read 4: Holy opened with Heal, Renewal, Hymn of Hope and
+	# Resurrection, four protected cores in four slots. GS §1 put all four on her
+	# shelf — a lineage opens with its engine's enablers alone and Mercy has none
+	# — so her core takes NO bar entry and she opens on the kit's three like every
+	# hero. The day she opens holding a lineage card again, this reads it.
+	ok(Classes.core_slots("holy") == 0,
+		"§2: Holy's protected core takes %d bar entries, not the 0 GS §1 left it — the slot half of the pricing has moved" % Classes.core_slots("holy"))
 	print("  awards=%d  pools=%d entries / %d distinct  deepest=%d  thin=%s" % [
 		awards, total, distinct.size(), deepest, ", ".join(PackedStringArray(short))])
 
@@ -549,7 +555,9 @@ func _s5_reported_not_fixed() -> void:
 	# this population is no longer "invisible to a walk built the old way". The
 	# CL walk reads `spec_abilities()` too, so it reaches 223 of 227 and misses
 	# exactly the FOUR kit overrides — which is `check_cz` §0's set identity and
-	# is asserted there, once, rather than a second time here.
+	# is asserted there, once, rather than a second time here. (BATCH GS — the
+	# four are on their shelves now and the CL walk reaches them; what it misses
+	# is the class-kit cards no older structure names, still `check_cz` §0's.)
 	var pooled := {}
 	for cls in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[cls]:
@@ -575,13 +583,20 @@ func _s5_reported_not_fixed() -> void:
 			pooled[kab.display_name] = true
 		for kab2 in Classes.class_kit(key):
 			pooled[kab2.display_name] = true
+	# **BATCH GS MOVED THIS FIGURE 37 -> 8, AND AGAIN NOTHING BECAME LESS
+	# REACHABLE.** GS §1 put the 29 cards a lineage stopped opening with on its
+	# shelf (the four basic-attack overrides among them), so all 29 left this
+	# population; Pommel Strike joined the Warrior kit and left it; Bloodlust left
+	# that kit to be the Berserker's enabler alone and joined it. **What is left is
+	# exactly the eight enablers** — an enabler is in no pool, by rule — so the
+	# day this reads nine, a card sits outside every pool that no engine carries.
 	var unseen: Array = []
 	for ab2 in Classes.ability_corpus():
 		if not pooled.has(ab2.display_name):
 			unseen.append(ab2.display_name)
 	unseen.sort()
-	ok(unseen.size() == 37,
-		"§5: %d abilities sit outside every pool and every class kit, not the 37 on record — re-derive it (%s)" % [
+	ok(unseen.size() == 8,
+		"§5: %d abilities sit outside every pool and every class kit, not the 8 on record — re-derive it (%s)" % [
 			unseen.size(), ", ".join(PackedStringArray(unseen))])
 	ok(unseen.size() > 0,
 		"§5: every ability is now in a pool or a class kit — a walk built the old way would agree with the corpus, and §5's finding is stale")
@@ -590,19 +605,24 @@ func _s5_reported_not_fixed() -> void:
 
 	# (3) THE FOUR OVERRIDES, AND WHICH CLASS KIT EACH ACTUALLY CAME OUT OF.
 	# DU recorded all four as Mage; one is the Occultist's, which is a Cleric
-	# spec. Derived off `apply_kit_overrides` itself so a fifth is covered by
-	# doing nothing, and asserted so the correction cannot go stale in prose.
+	# spec. Derived off `apply_kit_overrides` itself (until GS — below) so a fifth
+	# is covered by doing nothing, and asserted so the correction cannot go stale
+	# in prose.
+	# BATCH GS — `apply_kit_overrides` is deleted: no lineage replaces its class
+	# basic, and the four are draft cards on their lineages' shelves, defined by
+	# `Classes.basic_override_ability`. So the class each came out of is the class
+	# whose shelf holds it, derived off that one definer over every shelf — a
+	# fifth shelved override is still covered by doing nothing, and a basic that
+	# fell off every shelf takes the count below four. (`check_du` §5 asserts
+	# each is on exactly one shelf and in the corpus.)
 	var by_class := {}
 	for cls4 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[cls4]:
-			var cfg := {"abilities": Classes.kit(cls4)}
-			var was: String = cfg["abilities"][0].display_name
-			Classes.apply_kit_overrides(cfg, spec2)
-			var now: String = cfg["abilities"][0].display_name
-			if now != was:
-				by_class[now] = cls4
+			for nm5 in Classes.SPEC_DRAFT_POOLS.get(spec2, []):
+				if Classes.basic_override_ability(String(nm5)) != null:
+					by_class[String(nm5)] = cls4
 	ok(by_class.size() == 4,
-		"§5: `apply_kit_overrides` overrides %d basics, not the 4 on record" % by_class.size())
+		"§5: `basic_override_ability` defines %d shelved basics, not the 4 on record" % by_class.size())
 	ok(by_class.get("Shadowrend", "") == "cleric",
 		"§5: Shadowrend is not the CLERIC kit's override — DU's 'four Mage specs' correction is stale")
 	var mage_n := 0

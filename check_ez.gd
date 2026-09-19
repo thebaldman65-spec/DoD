@@ -467,8 +467,11 @@ func _sr_seed(scene: Node, e: BattleUnit, n: int) -> void:
 # rune is supposed to have moved.
 func _s5_the_read_sites() -> void:
 	print("\n§5 — the read sites, driven on a live board")
+	# BATCH GS — Shieldwall left the Warden's opening kit for his shelf (GS §1), so
+	# the lineages' former openers are seated DRAFTED (`lineage_cards`), the way a
+	# player now holds them; the Split Shield arm below still drives the real cast.
 	var scene: Node = await Gate.spawn(self, ["occultist", "warden",
-		"sharpshooter", "beastmaster"])
+		"sharpshooter", "beastmaster"], {"lineage_cards": true})
 	var heroes: Array = scene.get("heroes")
 	var occ: BattleUnit = heroes[0]
 	var wd: BattleUnit = heroes[1]

@@ -495,7 +495,7 @@ func _draw_detail() -> void:
 		row.add_child(state)
 		var rune_label := Label.new()
 		var equip_tag := "✦ " if is_on else ""
-		rune_label.text = "%s%s — %s" % [equip_tag, rune["name"], rune["desc"]]
+		rune_label.text = "%s%s — %s" % [equip_tag, rune["name"], Runes.shown_desc(rune)]
 		rune_label.add_theme_font_size_override("font_size", 12)
 		rune_label.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on

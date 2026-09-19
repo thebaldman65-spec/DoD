@@ -155,7 +155,14 @@ func _hooks(run: Node) -> void:
 	m["bm_abilities"] = ["Battle Shout"]
 	ok(Talents.owns_ability(m, "Battle Shout"),
 		"owns_ability: TRUE once the card is actually earned")
-	ok(Talents.owns_ability(m, "Hack and Slash"),
+	# BATCH GS — RE-POINTED: Hack and Slash is drafted off the Berserker's shelf
+	# since GS, so it is no starting-kit piece. The piece is DERIVED off the one
+	# builder of what a hero opens holding (`Classes.opening_kit`, for the engines
+	# this member holds — none, so Strike and the class kit), and the question is
+	# unchanged: owns_ability reads the starting kit, not just talents.
+	var kit_piece := String(Classes.opening_kit(String(m["key"]), String(m["spec"]),
+		Runes.held_engines(m)).back().display_name)
+	ok(Talents.owns_ability(m, kit_piece),
 		"owns_ability: true for a STARTING KIT piece (any source, not just talents)")
 	ok(not Talents.owns_ability(m, "Not An Ability"), "owns_ability: false for a stranger")
 	ok(not Talents.owns_ability({}, "Battle Shout"), "owns_ability: safe on an empty member")

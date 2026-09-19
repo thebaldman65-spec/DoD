@@ -396,10 +396,13 @@ func _weaker_half() -> void:
 		ok(chastise.pressure > smite.pressure,
 			"§2 FINDING: ...and the ONLY thing it wins on is Break (%d vs %d)" % [
 				chastise.pressure, smite.pressure])
-	# The occultist's core is the other comparison and it reads the same way.
-	var occ_cfg := {"abilities": Classes.kit("cleric")}
-	Classes.apply_kit_overrides(occ_cfg, "occultist")
-	var shadowrend: Ability = occ_cfg["abilities"][0]
+	# Shadowrend is the other comparison and it reads the same way.
+	# BATCH GS — Shadowrend was the Occultist's slot-0 basic (his Smite, overridden)
+	# until GS deleted `apply_kit_overrides`: every Cleric opens on Smite now and
+	# Shadowrend is a free DRAFT card on the Occultist's shelf, defined once by
+	# `basic_override_ability`. The finding is about the card, so it reads that one
+	# definition — the same object the override laid in slot 0.
+	var shadowrend: Ability = Classes.basic_override_ability("Shadowrend")
 	ok(shadowrend.display_name == "Shadowrend" and chastise.damage <= shadowrend.damage,
 		"§2 FINDING: ...and level with Shadowrend's %d%%, which is free and Cripples" % \
 			shadowrend.damage)
@@ -694,21 +697,31 @@ func _live_mana_well_and_blink() -> void:
 	var foes: Array = scene.get("enemies")
 	# A DRAFTED ability's cooldown (Mirror Image, earned this run) and a KIT
 	# ability's, put there by real casts rather than written in by hand.
+	# BATCH GS — THE KIT ABILITY WAS ARCANE CANNON, AND GS PUT IT ON THE ARCANIST'S
+	# SHELF: a lineage opens with its enablers alone (the Arcanist's are none), so
+	# his kit is Magic Bolt and the Mage class kit. The kit arm casts the first
+	# class-kit card on his bar that strikes and cools, found off the kit, so the
+	# two cooldowns Blink must reach still come from the two different sources.
 	await scene.call("_resolve", mage, drafted, mage, "good")
-	var cannon: Ability = scene.call("_find_ability", mage, "Arcane Cannon")
-	if cannon != null:
+	var kit_ab: Ability = null
+	for kit_name in Classes.class_kit_names("mage"):
+		var cand: Ability = scene.call("_find_ability", mage, String(kit_name))
+		if kit_ab == null and cand != null and cand.cooldown > 0 and cand.damage > 0:
+			kit_ab = cand
+	var kit_ab_name := kit_ab.display_name if kit_ab != null else ""
+	if kit_ab != null:
 		mage.resource = mage.max_resource
-		await scene.call("_resolve", mage, cannon, foes[0], "good")
+		await scene.call("_resolve", mage, kit_ab, foes[0], "good")
 	var missiles_cd := int(mage.cooldowns.get("Mirror Image", 0))
-	var cannon_cd := int(mage.cooldowns.get("Arcane Cannon", 0))
+	var kit_cd := int(mage.cooldowns.get(kit_ab_name, 0))
 	ok(missiles_cd > 0, "§6: the DRAFTED ability is on cooldown (%d)" % missiles_cd)
-	ok(cannon_cd > 0, "§6: ...and so is a kit ability (%d)" % cannon_cd)
+	ok(kit_cd > 0, "§6: ...and so is a kit ability (%s, %d)" % [kit_ab_name, kit_cd])
 	mage.resource = mage.max_resource
 	await scene.call("_resolve", mage, blink, mage, "good")
 	# BATCH CQ §3 — TWO TURNS SINCE CN §3'S FOLD, not one.
 	ok(int(mage.cooldowns.get("Mirror Image", 0)) == missiles_cd - 2,
 		"§6: Blink takes TWO turns off the DRAFTED ability's cooldown")
-	ok(int(mage.cooldowns.get("Arcane Cannon", 0)) == cannon_cd - 2,
+	ok(int(mage.cooldowns.get(kit_ab_name, 0)) == kit_cd - 2,
 		"§6: ...and off the kit ability's")
 	# AND NOT OFF ITS OWN — the other half of the same cast, so a helper that
 	# simply walked everything trips here.

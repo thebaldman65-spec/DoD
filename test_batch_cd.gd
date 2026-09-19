@@ -73,9 +73,9 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # anyway, where the failure costs one edit in one file instead of thirty-five
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
-const SPEC_TARGET := 129     # the twelve pools, summed from PER_SPEC_DEPTH
+const SPEC_TARGET := 158     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS
 const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
-const DRAFT_TARGET := 149    # 129 + 20
+const DRAFT_TARGET := 178    # 158 + 20
 const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -99,10 +99,17 @@ const PER_SPEC_DEPTH := {
 	# deleted that container behind them. **THE WARDEN WAS THE SHALLOWEST POOL
 	# IN THE GAME AT NINE AND IS NOT ANY MORE**; ten is the floor across the
 	# board now, and `SPEC_FLOOR` stays at EIGHT for the reason below.
-	"berserker": 10, "warden": 10, "swordmaster": 12,
-	"pyromancer": 13, "cryomancer": 11, "arcanist": 12,
-	"holy": 10, "inquisitor": 11, "occultist": 10,
-	"beastmaster": 10, "sharpshooter": 10, "mystic": 10,
+	# BATCH GS §1: EVERY SHELF GREW, AND NOTHING WAS AUTHORED. An engine brings
+	# only what it cannot run without, so each card a lineage opened with that is
+	# neither its engine's enabler nor a class-kit card went onto its shelf — 29,
+	# the four basics that were a lineage's override among them: the Berserker
+	# +2, the Warden +1, the Swordmaster +2, the Pyromancer +3, the Cryomancer +3,
+	# the Arcanist +4, the Holy +4, the Devout +2, the Occultist +3, the
+	# Beastmaster +2, the Sharpshooter +2 and the Survivalist +1.
+	"berserker": 12, "warden": 11, "swordmaster": 14,
+	"pyromancer": 16, "cryomancer": 14, "arcanist": 16,
+	"holy": 14, "inquisitor": 13, "occultist": 13,
+	"beastmaster": 12, "sharpshooter": 12, "mystic": 11,
 }
 # **BATCH DY §1 — THE CLASS HALF STOPPED BEING A FLAT MULTIPLE, SO IT BECAME A
 # TABLE TOO.** `CLASS_TARGET` was written `4 * 6` and asserted as such; Mana

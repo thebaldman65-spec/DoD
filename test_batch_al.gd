@@ -681,10 +681,14 @@ func _rune_repair() -> void:
 func _kit_unchanged() -> void:
 	# This batch is a TREE re-author. AH's kit split is what both re-specs
 	# depend on, so it is asserted rather than assumed.
+	# BATCH GS — `spec_abilities` IS HIS DEFINITION TABLE NOW, NOT HIS OPENING KIT:
+	# the Warden opens with Strike and the class kit (Heavy Plating carries no
+	# enabler), and Shieldwall is drafted off his shelf. What the re-specs depend
+	# on is that he can HOLD it, so the check asks where it lives now.
 	var kit := _ability_names(Classes.spec_abilities("warden"))
-	ok(kit.size() == 3, "the Warden still opens with exactly 3 spec abilities (has %d)" % kit.size())
-	ok(kit.has("Shieldwall"),
-		"Shieldwall is in the opening three — Bulwark Line keys to it")
+	ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())
+	ok(kit.has("Shieldwall") and Classes.spec_draft_pool("warden").has("Shieldwall"),
+		"Shieldwall is one of his three, drafted off his shelf since GS — Bulwark Line keys to it")
 	ok(not kit.has("War Stomp") and not kit.has("Interpose"),
 		"War Stomp and Interpose are still earnable, not opening kit")
 	var pool: Array = Classes.spec_pool("warden")
@@ -714,11 +718,16 @@ func _kit_unchanged() -> void:
 # (Provoke) and wd_tank_spank (Tank and Spank) carried — each node is deleted,
 # each field and its read site stand. With nothing learned the inline tree pays
 # nothing, which is what the live tree pays a Warden with nothing learned.
+# BATCH GS — THE WARDEN NO LONGER OPENS WITH SHIELDWALL: Heavy Plating reads no
+# ability, so GS §1 put the card on his shelf. Bulwark Line, Shield Mastery and
+# Braced all key to it, so `lineage_cards` seats it as a DRAFTED card ahead of
+# whatever `earned` names — the way a player now gets it — and every read below
+# finds it BY NAME.
 func _spawn(learned: Dictionary, lineup: Array, earned: Array = [],
 		runes: Array = []) -> Node:
 	return await Fixture.spawn(self, ["warden", "cryomancer", "holy", "mystic"],
 		{"enemies": lineup, "talents": {0: learned}, "bm": {0: earned}, "runes": {0: runes},
-			"patch": {0: {"tree": _retired_tree()}}})
+			"patch": {0: {"tree": _retired_tree()}}, "lineage_cards": true})
 
 
 func _wd(scene: Node) -> BattleUnit:
@@ -794,6 +803,8 @@ func _live_bulwark_line() -> void:
 	ok(wd != null, "the Bulwark Line Warden spawned")
 	if wd != null:
 		ok(wd.shield_mastery_ranks == 1, "Shield Mastery reached the unit")
+		# BATCH GS — the Shieldwall cast below is his DRAFTED copy (`_spawn` seats
+		# it); the stance, the cover and the fold are the card's, and unchanged.
 		await scene._resolve_special(wd, _find(wd, "Shieldwall"), wd, "good", 1.0)
 		# BATCH CQ §3 — BASE **3** SINCE CN §3'S FOLD, + Shield Mastery's 2 = 5.
 		# Shieldwall banked 2 turns and a Perfect banked a third; CN took the

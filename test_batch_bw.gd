@@ -779,12 +779,15 @@ func _docs() -> void:
 
 # ---------- live harness ----------
 
-func _spawn(warrior_spec: String, lineup: Array, learned := {}) -> Node:
+# BATCH GS — `lineage` seats the cards a lineage opened with until GS §1 as
+# DRAFTED cards (`lineage_cards`), for the one board that drives one of them.
+# Off by default, so every other board is exactly the board it was.
+func _spawn(warrior_spec: String, lineup: Array, learned := {}, lineage := false) -> Node:
 	# `_run_battle` OPENS WITH `await _wait(0.6)` ON A REAL SceneTreeTimer.
 	# `fast` scales those timers and NOTHING the battle computes.
 	return await Fixture.spawn(self, [warrior_spec, "arcanist", "holy", "sharpshooter"],
 		{"enemies": lineup, "talents": {0: learned.duplicate()}, "frames": 90, "fast": true,
-		"deterministic": true, "crit": -1.0})
+		"deterministic": true, "crit": -1.0, "lineage_cards": lineage})
 
 
 func _warrior(scene: Node, passive: String) -> BattleUnit:
@@ -890,7 +893,9 @@ func _live_berserk() -> void:
 	# ONE cast must empty a bank of three and land SIX blows. A cast-counting
 	# version leaves two charges standing and lands four — and it passes every
 	# assertion of the form "the charges went down" and "it hit more than once".
-	var scene := await _spawn("berserker", ["raider", "raider"])
+	# BATCH GS — no Berserker opens with Hack and Slash since GS §1 (the engine
+	# brings Bloodlust alone); it is on his shelf, so this board seats it DRAFTED.
+	var scene := await _spawn("berserker", ["raider", "raider"], {}, true)
 	var bz := _warrior(scene, "bloodrage")
 	if bz == null:
 		scene.queue_free()

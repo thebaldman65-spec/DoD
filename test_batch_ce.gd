@@ -499,14 +499,25 @@ func _protected_cores() -> void:
 					"%s's enabler %s is in NO boss spec pool (%s)" % [spec, name, sp3])
 	# The three Cleric cores are what this batch could most easily have broken,
 	# so they are named rather than only swept.
-	ok(Classes.core_enablers("holy") == ["Heal", "Hymn of Hope"],
-		"Holy's enablers are unchanged")
-	ok(Classes.core_enablers(DEVOUT_KEY) == ["Divine Shield", "Consecrated Ground"],
-		"the Devout's enablers are unchanged")
-	ok(Classes.core_enablers("occultist") == ["Shadowrend", "Hex of Ruin"],
-		"the Occultist's enablers are unchanged")
-	ok(Classes.core_slots("holy") == 4,
-		"HOLY STILL OPENS WITH FOUR, so her eight cards compete for THREE slots")
+	# BATCH GS — THE THREE ROWS ARE GS §1's NOW: an engine brings only what it
+	# cannot run without. The Holy brings nothing (Mercy pays on every heal, the
+	# kit's Ministration among them), the Devout Divine Shield alone and the
+	# Occultist Hex of Ruin alone; Heal, Hymn of Hope, Consecrated Ground and
+	# Shadowrend are on their shelves. Still NAMED, so a batch that moves a
+	# Cleric enabler has to come here and say so.
+	ok(Classes.core_enablers("holy") == [],
+		"Holy's enablers are GS's: none — Mercy pays on every heal, the Cleric kit's among them")
+	ok(Classes.core_enablers(DEVOUT_KEY) == ["Divine Shield"],
+		"the Devout's enablers are GS's: Divine Shield alone")
+	ok(Classes.core_enablers("occultist") == ["Hex of Ruin"],
+		"the Occultist's enablers are GS's: Hex of Ruin alone")
+	# BATCH GS — HOLY NO LONGER OPENS WITH FOUR. Her lineage opens with no card, so
+	# she opens on Smite and the Cleric kit and uses three slots like every hero.
+	# What this protected — how much of the cap her opening leaves to what she
+	# drafts — is asked of the three figures `Run.ability_slots_used` sums for her.
+	ok(Classes.core_slots("holy") == 0 and Classes.lineage_slots("holy") == 0
+			and Classes.kit_slots("cleric", "holy") == 3,
+		"HOLY OPENS USING THREE SLOTS LIKE EVERY HERO — the Cleric kit, no enabler entry and no lineage slot — so what she drafts competes for the rest of the cap")
 
 
 func _empower_split() -> void:

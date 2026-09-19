@@ -306,6 +306,15 @@ func _live(scene: Node) -> void:
 # DERIVED, NEVER LISTED. Naming the four overrides here would pass on a fifth
 # being authored and never reaching the walk, which is the defect DU §4 fixed
 # wearing a different name.
+#
+# **BATCH GS §1 DELETED `apply_kit_overrides`, AND THIS SECTION FOLLOWS THE FOUR
+# CARDS RATHER THAN THE DELETED WALK.** No lineage replaces its class basic any
+# more — slot 0 is the class basic for every hero — and Fireball, Frostbolt,
+# Arcane Explosion and Shadowrend are draft cards on their lineages' shelves,
+# defined by name in `Classes.basic_override_ability`. DU §4's question is the
+# same one: the corpus must reach every card a hero can swing. So the live kit
+# is read off the one kit builder, and the four are found by their one definer
+# and asserted drafted — on exactly one shelf each and inside the corpus.
 func _s5_corpus() -> void:
 	print("\n§5 — every spec's LIVE basic attack is in the one authorised walk")
 	var names := {}
@@ -318,9 +327,10 @@ func _s5_corpus() -> void:
 		if ck == "":
 			continue
 		var plain_kit: Array = Classes.kit(ck)
-		var cfg := {"abilities": Classes.kit(ck)}
-		Classes.apply_kit_overrides(cfg, spec)
-		var live_kit: Array = cfg["abilities"]
+		# BATCH GS — the live kit is `Classes.opening_kit` with the lineage's own
+		# engine held (what `protected_names` reads), not the class kit replayed
+		# through the deleted overrides.
+		var live_kit: Array = Classes.opening_kit(ck, spec, [Classes.engine_of_spec(spec)])
 		for i in live_kit.size():
 			var nm: String = live_kit[i].display_name
 			if not names.has(nm):
@@ -331,29 +341,67 @@ func _s5_corpus() -> void:
 		ok(false, "%s is a live protected-core ability the corpus walk cannot see (BATCH DU §4)" % m)
 	ok(missing.is_empty(),
 		"every spec's live basic attack is reachable through `Classes.ability_corpus()`")
-	ok(not overridden.is_empty(),
-		"no spec overrides its class basic any more — §5 is asserting nothing")
-	print("  %d spec(s) replace their class basic at spawn: %s" % [
-		overridden.size(), ", ".join(overridden)])
+	# BATCH GS — THIS READ `not overridden.is_empty()` AND ITS MESSAGE CAME TRUE:
+	# no spec overrides its class basic any more (GS §1). It is inverted rather
+	# than deleted, so a lineage that took slot 0 again reds here — and the four
+	# it stood guard over are asserted just below, where they live now.
+	ok(overridden.is_empty(),
+		"a spec replaces its class basic at spawn again (%s) — GS §1 opens every hero on it" % ", ".join(overridden))
+	print("  %d spec(s) replace their class basic at spawn%s" % [
+		overridden.size(), (": " + ", ".join(overridden)) if not overridden.is_empty() else ""])
+	# BATCH GS — THE FOUR THAT WERE A LINEAGE'S BASIC, FOUND BY THEIR ONE DEFINER
+	# over every name the corpus or a shelf holds, so the day one leaves every
+	# shelf it is still found and named here. Four on record (`check_dv` §5 pins
+	# the class each came out of); each on exactly one lineage's shelf; each in
+	# the corpus, which is DU §4's hole kept closed by a pool rather than a replay.
+	var candidates := names.duplicate()
+	for spec4 in Classes.SPEC_DRAFT_POOLS:
+		for nm4 in Classes.SPEC_DRAFT_POOLS[spec4]:
+			candidates[String(nm4)] = true
+	var shelved := {}
+	for nm5 in candidates:
+		if Classes.basic_override_ability(String(nm5)) != null:
+			shelved[String(nm5)] = []
+	for spec5 in Classes.SPEC_DRAFT_POOLS:
+		for nm6 in Classes.SPEC_DRAFT_POOLS[spec5]:
+			if shelved.has(String(nm6)):
+				shelved[String(nm6)].append(String(spec5))
+	var off_one: Array = []
+	var unseen: Array = []
+	for nm7 in shelved:
+		if (shelved[nm7] as Array).size() != 1:
+			off_one.append("%s %s" % [nm7, str(shelved[nm7])])
+		if not names.has(nm7):
+			unseen.append(String(nm7))
+	ok(shelved.size() == 4,
+		"`Classes.basic_override_ability` defines %d cards the corpus or a shelf holds, not the 4 GS §1 drafted (%s)" % [
+			shelved.size(), ", ".join(PackedStringArray(shelved.keys()))])
+	ok(off_one.is_empty(),
+		"a former basic is not on exactly one lineage's shelf: %s" % ", ".join(PackedStringArray(off_one)))
+	ok(unseen.is_empty(),
+		"a former basic the corpus walk cannot see: %s — BATCH DU §4's hole, reopened" % ", ".join(PackedStringArray(unseen)))
+	var homes := PackedStringArray()
+	for nm8 in shelved:
+		homes.append("%s (%s)" % [nm8, ", ".join(PackedStringArray(shelved[nm8]))])
+	print("  %d former basics drafted from a shelf: %s" % [shelved.size(), ", ".join(homes)])
 	# AND THE FIGURE THE BLIND SPOT PRODUCED, DERIVED SO IT CANNOT BE MIS-QUOTED
 	# AGAIN. "Twelve cooldown-zero abilities in the protected cores" is twelve
 	# INSTANCES across twelve specs; the DISTINCT count is what a reader hears.
+	# BATCH GS — the protected core is what `Classes.protected_names` reads: the
+	# one kit builder with the lineage's own engine held (the class basic, the
+	# engine's enablers and the class kit). It was the overridden basic plus the
+	# lineage's whole opening table, which since GS is a DEFINITION table and no
+	# longer a core.
 	var inst := 0
 	var distinct := {}
 	for spec2 in Classes.SPEC_INFO:
 		var ck2 := Classes.class_of_spec(spec2)
 		if ck2 == "":
 			continue
-		var cfg2 := {"abilities": Classes.kit(ck2)}
-		Classes.apply_kit_overrides(cfg2, spec2)
-		for ab2 in (cfg2["abilities"] as Array):
-			if ab2.cooldown == 0:
+		for ab2 in Classes.opening_kit(ck2, spec2, [Classes.engine_of_spec(spec2)]):
+			if ab2 != null and ab2.cooldown == 0:
 				inst += 1
 				distinct[ab2.display_name] = true
-		for ab3 in Classes.spec_abilities(spec2):
-			if ab3 != null and ab3.cooldown == 0:
-				inst += 1
-				distinct[ab3.display_name] = true
 	ok(distinct.size() < inst,
 		"the protected-core cooldown-zero census reads %d instances and %d distinct names — they agree now, so the correction this gate carries is stale" % [
 			inst, distinct.size()])

@@ -169,21 +169,18 @@ func _draw_screen() -> void:
 
 
 # What a rune opens with that the kit below does not, by name and in the order
-# his bar holds them. A lineage's basic-attack override takes slot 0 IN PLACE
-# of the class basic, and the line says so rather than listing both — the kit
-# below shows the class basic, which that hero no longer holds.
+# his bar holds them — since GS §1, the engine's enablers and nothing else.
+# **GQ WROTE AN "in place of" CLAUSE HERE** for a lineage whose basic-attack
+# override took slot 0 from the class basic; GS §1 ended every override, so every
+# hero opens on the class basic the kit below shows and the clause had nothing
+# left to say.
 static func _adds(key: String, lineage: String, pid: String, shared: Array) -> String:
 	var own: Array = Classes.opening_kit(key, lineage, [pid])
 	var shared_names: Array = shared.map(func(a): return a.display_name)
-	var own_names: Array = own.map(func(a): return a.display_name)
 	var parts := PackedStringArray()
-	for j in own.size():
-		var nm: String = own[j].display_name
-		if shared_names.has(nm):
-			continue
-		if j == 0 and not own_names.has(shared_names[0]):
-			nm += " (in place of %s)" % shared_names[0]
-		parts.append(nm)
+	for ab in own:
+		if not shared_names.has(ab.display_name):
+			parts.append(ab.display_name)
 	return ", ".join(parts)
 
 

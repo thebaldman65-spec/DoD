@@ -301,9 +301,14 @@ func _s3_the_record() -> void:
 	# wrong reason is the next brief's false precedent, so the reasons are
 	# pinned where they can go red.
 	var enablers := 0
+	# BATCH GS — the lineages that name any enabler at all, counted beside the
+	# names, because GS's ruling is a claim about both: nine cards, seven engines.
+	var enabler_lineages := 0
 	for cls2 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[cls2]:
 			var prot: Array = Classes.protected_names(spec2)
+			if not Classes.core_enablers(spec2).is_empty():
+				enabler_lineages += 1
 			for e in Classes.core_enablers(spec2):
 				enablers += 1
 				ok(prot.has(String(e)),
@@ -322,8 +327,16 @@ func _s3_the_record() -> void:
 	# the whole population, not over the names the brief supplies.** Pinned as
 	# the derived count so a seventeenth enabler joins the audit by being
 	# authored.
-	ok(enablers == 16,
-		"§3: %d named enablers across the twelve, not the 16 the table actually holds" % enablers)
+	# **BATCH GS §1 — NINE ACROSS SEVEN, AND THE SWEEP ABOVE IS WHAT STILL AUDITS
+	# THEM.** An engine brings only what it cannot run without: Bloodlust,
+	# Flamewave, Razor Ice, Divine Shield, Hex of Ruin, the three summons and the
+	# Sharpshooter's Quick Shot. Every other card of the sixteen is on its
+	# lineage's shelf, and five lineages name none. Re-pinned to the table GS
+	# left, so a tenth enabler — or an eighth engine carrying one — is a decision
+	# this line has to be moved for.
+	ok(enablers == 9 and enabler_lineages == 7,
+		"§3: %d named enablers across %d lineages, not the nine across seven GS left the table holding" % [
+			enablers, enabler_lineages])
 	# REASON ONE: Heal is one of FIVE Mercy outlets, not Mercy's only outlet.
 	var bs := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))

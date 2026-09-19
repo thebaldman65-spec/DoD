@@ -7,6 +7,14 @@
 #       ways, the table checked in both directions on a live board, the one
 #       earned exception, the slot count that did not move, and a drop written
 #       in the middle of a fight moving nothing in that fight
+#       (BATCH GS §1 — the bound table is DELETED and the ruling holds by
+#       construction: a lineage opens with its enablers alone, so a hero who
+#       drops his engine holds his class basic and class kit, and the three
+#       bound cards are draft cards. §2 asserts the table gone, the builder both
+#       ways, the gate at the OFFER — `Classes.ENGINE_READ` — driven both ways on
+#       a live board with the lineage cards drafted, Kill Command's exception
+#       built, and the drop mid-fight on the one thing that still leaves: an
+#       enabler)
 #   §3  THE SPLIT SHIELD'S CAST IS ITS TABLE — with the rune and without, a
 #       Warden standing alone, and a whole bot turn
 #   §4  DISPEL LEAVES THE PARTY'S WORK — the three statuses GL found, with an
@@ -23,7 +31,8 @@
 # **EVERY NEGATIVE ANCHOR HAS ITS POSITIVE ARM BESIDE IT.** "It stands after
 # none of the six" is paired with "the first shot carried it" and "that shot hit
 # harder"; "the bound card is refused with the engine gone" with "the engine is
-# what opens it"; "no ally is covered" with "the rune covers exactly one";
+# what opens it" (since GS: the `ENGINE_READ` row, drafted, refused with the
+# engine gone and opened by it); "no ally is covered" with "the rune covers exactly one";
 # "Dispel leaves the mark" with "Dispel still takes an enemy's own ward". A
 # negative anchor alone passes on a gate that stopped driving anything.
 #
@@ -120,8 +129,12 @@ func _s1_held_breath() -> void:
 	print("--- GM §1: the held breath is spent where it pays ---")
 	for held in [false, true]:
 		var over := {} if held else {SEAT_SS: {"engines": []}}
+		# BATCH GS — Hold Breath left the Sharpshooter's opening kit for his shelf,
+		# so it is seated DRAFTED (`lineage_cards`), as a player now gets it; the
+		# engine-less arm keeps it, because a drafted card never leaves with an
+		# engine. The breath's mechanics are what this section drives, unchanged.
 		var s: Node = await Gate.spawn(self, LINEAGE_SEATS[0],
-			{"deterministic": true, "party": over})
+			{"deterministic": true, "party": over, "lineage_cards": true})
 		var ss: BattleUnit = s.get("heroes")[SEAT_SS]
 		var tag := "with Lethal Aim" if held else "with no engine"
 		ok(ss.has_engine("lethal_aim") == held and (held or ss.engines.is_empty()),
@@ -129,7 +142,7 @@ func _s1_held_breath() -> void:
 		var qs: Ability = ss.abilities[0]
 		var hb := _find(ss, "Hold Breath")
 		ok(qs.display_name == "Quick Shot" and hb != null,
-			"§1 %s: the kit holds Quick Shot and Hold Breath (%s)" % [tag, str(_names(ss))])
+			"§1 %s: the bar holds Quick Shot and a drafted Hold Breath (%s)" % [tag, str(_names(ss))])
 		if hb == null:
 			await _clear(s)
 			continue
@@ -190,29 +203,70 @@ func _s1_held_breath() -> void:
 # ── §2 — THE BOUND CARDS ────────────────────────────────────────────────────
 func _s2_bound_cards() -> void:
 	print("--- GM §2: an engine's bound cards leave with it ---")
+	var run: Node = root.get_node("/root/Run")
 	# (a) the one builder, both ways, every lineage
-	var bound_seen := 0
+	# BATCH GS §1 — THE BOUND TABLE IS DELETED, NOT ZEROED, AND THE RULING HOLDS
+	# BY CONSTRUCTION. A lineage opens with its engine's enablers and nothing
+	# else, so a hero who drops his engine holds only his class basic and his
+	# class kit — the negative, every lineage — and with the engine held he holds
+	# its enablers too and nothing more: the positive arm, which is the old
+	# "nothing else leaves" asked of the new kit. The loop over the table had
+	# nothing left to walk, so its population is replaced rather than left empty
+	# (the lineages whose engine brings a card), and the table's absence is read
+	# off the source with its name split, so this file never spells it whole.
+	var brings := 0
 	for spec in Classes.SPEC_INFO:
 		var ck := Classes.class_of_spec(String(spec))
 		var own := Classes.engine_of_spec(String(spec))
 		var held: Array = _kit_names(Classes.opening_kit(ck, String(spec), [own]))
 		var dropped: Array = _kit_names(Classes.opening_kit(ck, String(spec), []))
-		var bound: Array = Classes.engine_bound(String(spec))
 		var enablers: Array = Classes.core_enablers(String(spec))
-		for b in bound:
-			bound_seen += 1
-			ok(held.has(b) and not dropped.has(b),
-				"§2: %s's %s is in the kit with the engine and gone without it" % [spec, b])
-		# NOTHING ELSE LEAVES: what the drop takes is the enablers and the bound
-		# cards, and every other card of the held kit is still there.
-		var extra: Array = held.filter(func(n): return not dropped.has(n) \
-			and not enablers.has(n) and not bound.has(n))
-		ok(extra.is_empty(), "§2: dropping %s's engine takes nothing else (%s)" % [spec, str(extra)])
-	ok(bound_seen >= 1, "§2: the bound table names a real population (%d)" % bound_seen)
-	print("    %d bound cards across %d lineages" % [bound_seen,
-		Classes.ENGINE_BOUND.size()])
+		var every: Array = _kit_names(Classes.kit(ck)) + Classes.class_kit_names(ck)
+		var got_d: Array = dropped.duplicate()
+		got_d.sort()
+		var want_d: Array = every.duplicate()
+		want_d.sort()
+		ok(got_d == want_d,
+			"§2: %s's hero who drops his engine holds only his class basic and class kit (%s)" % [spec, str(dropped)])
+		# NOTHING ELSE LEAVES: what the drop takes is the enablers, and every
+		# other card of the held kit is still there.
+		var brought: Array = held.filter(func(n): return not dropped.has(n))
+		var want_b: Array = enablers.filter(func(n): return not every.has(n))
+		brought.sort()
+		want_b.sort()
+		ok(brought == want_b,
+			"§2: with the engine held, %s's hero holds its enablers too and nothing else (%s, want %s)" % [
+				spec, str(brought), str(want_b)])
+		if not brought.is_empty():
+			brings += 1
+	ok(brings >= 1, "§2: an engine brings a card to a real population of lineages (%d)" % brings)
+	var csrc := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/classes.gd"))
+	for dead in ["ENGINE_" + "BOUND", "engine_" + "bound("]:
+		ok(not csrc.contains(dead), "§2: `%s` has code in `classes.gd` again — the bound table is back" % dead)
+	# THE CARDS IT NAMED, WHERE THEY ARE NOW. Death Ray and Resurrection are
+	# refused at the door without their engine, so they are rows of
+	# `Classes.ENGINE_READ` — gated at the OFFER, on the engine their own lineage
+	# carries. The third, Kill Command, is not a row: (c).
+	for row_card in ["Death Ray", "Resurrection"]:
+		var home := ""
+		for spec3 in Classes.SPEC_INFO:
+			if Gate.lineage_cards(String(spec3)).has(row_card):
+				home = String(spec3)
+		ok(home != "" and Classes.engine_read(row_card) == Classes.engine_of_spec(home),
+			"§2: %s is a row of `ENGINE_READ` on its own lineage's engine (%s's; it reads `%s`)" % [
+				row_card, home, Classes.engine_read(row_card)])
+	print("    the bound table is gone; %d lineages' engines bring a card, and nothing else leaves with one" % brings)
 
 	# (b) the table, both directions, on a live board
+	# BATCH GS — THE TABLE IS `ENGINE_READ` NOW, AND ITS GATE IS THE OFFER, so the
+	# cards a lineage opened with until GS are seated as a player now gets them —
+	# DRAFTED (`lineage_cards`) — and asked both ways at the door. With no engine
+	# every one stays on the bar (a drafted card never leaves with an engine), the
+	# rows are refused, and every other card casts on a board holding what no
+	# engine is needed for — Kill Command's companion among it, which an earned
+	# Call the Wilds calls with no engine ((c)). With the engine held, the rows
+	# open. And each hero's live bar is the one builder's kit and his drafted
+	# cards: nothing of the lineage without its engine, its enablers with it.
 	for with_engine in [false, true]:
 		var checked := 0
 		for seats in LINEAGE_SEATS:
@@ -220,35 +274,45 @@ func _s2_bound_cards() -> void:
 			if not with_engine:
 				for seat in 4:
 					over[seat] = {"engines": []}
+					if Classes.class_of_spec(String(seats[seat])) == "hunter":
+						over[seat]["bm_abilities"] = Gate.lineage_cards(String(seats[seat])) \
+							+ ["Call the Wilds"]
 			var s: Node = await Gate.spawn(self, seats,
-				{"deterministic": true, "party": over})
-			await _open_board(s, with_engine)
+				{"deterministic": true, "party": over, "lineage_cards": true})
 			var H: Array = s.get("heroes")
+			for i0 in 4:
+				var spec0 := String(seats[i0])
+				var want0: Array = _kit_names(Classes.opening_kit(Classes.class_of_spec(spec0), spec0,
+					[Classes.engine_of_spec(spec0)] if with_engine else [])) \
+					+ Array(run.party[i0]["bm_abilities"])
+				ok(_names(H[i0]) == want0,
+					"§2: %s %s: the bar is the builder's kit and the drafted cards, no more (%s)" % [
+						spec0, "with the engine" if with_engine else "with no engine", str(_names(H[i0]))])
+			await _open_board(s, with_engine)
 			for i in 4:
 				var u: BattleUnit = H[i]
 				var spec := String(seats[i])
-				var bound: Array = Classes.engine_bound(spec)
-				var enablers: Array = Classes.core_enablers(spec)
-				for ab in Classes.spec_abilities(spec):
-					if ab == null or enablers.has(ab.display_name):
-						continue
-					var is_bound := bound.has(ab.display_name)
-					if with_engine and not is_bound:
+				for n in Gate.lineage_cards(spec):
+					var ab := _find(u, String(n))
+					var reads := Classes.engine_read(String(n))
+					if with_engine and reads == "":
 						continue
 					checked += 1
-					var usable := await _usable_on_open_board(s, u, ab)
+					var usable := false
+					if ab != null:
+						usable = await _usable_on_open_board(s, u, ab)
 					if with_engine:
-						ok(usable and _names(u).has(ab.display_name),
+						ok(usable and _names(u).has(String(n)),
 							"§2: with the engine held, %s's %s is on the bar and castable on this board"
-								% [spec, ab.display_name])
-					elif is_bound:
-						ok(not usable and not _names(u).has(ab.display_name),
-							"§2: with no engine, %s's %s is refused on the board its kit can build, and off the bar"
-								% [spec, ab.display_name])
+								% [spec, n])
+					elif reads != "":
+						ok(ab != null and not usable,
+							"§2: with no engine, %s's %s stays on the bar — drafted — and the door refuses it: it reads %s"
+								% [spec, n, reads])
 					else:
-						ok(usable and _names(u).has(ab.display_name),
-							"§2: with no engine, %s's %s stays on the bar and castable — a fourth bound card cannot hide"
-								% [spec, ab.display_name])
+						ok(usable and _names(u).has(String(n)),
+							"§2: with no engine, %s's %s stays on the bar and castable — an engine read the table misses cannot hide"
+								% [spec, n])
 			await _clear(s)
 		ok(checked >= 3, "§2: the %s arm read a real population (%d cards)"
 			% ["engine-held" if with_engine else "engine-less", checked])
@@ -257,6 +321,8 @@ func _s2_bound_cards() -> void:
 	# says so: Call the Wilds summons with no engine, so an engine-less
 	# Beastmaster who earned it fields a companion and Kill Command's door would
 	# open. The card left anyway — the ruling names it (`docs/reports/GM.md` §2).
+	# (BATCH GS §1 — it no longer leaves: Kill Command is a Beastmaster draft
+	# card, and this door is why it is not a row of `ENGINE_READ`.)
 	var s2: Node = await Gate.spawn(self, LINEAGE_SEATS[1],
 		{"deterministic": true,
 		 "party": {3: {"engines": [], "bm_abilities": ["Call the Wilds"]}}})
@@ -273,13 +339,20 @@ func _s2_bound_cards() -> void:
 			kc = ab2
 	ok(not s2._beasts(bm).is_empty() and kc != null and s2._ability_usable(bm, kc),
 		"§2: ...which fields a companion with no engine, so Kill Command's door would open for him")
-	ok(_find(bm, "Kill Command") == null,
-		"§2: ...and Kill Command is off his bar all the same — the exception is reported, not built")
+	# BATCH GS — THIS READ "Kill Command is off his bar all the same — the
+	# exception is reported, not built", and GS §1 built it: the card is drafted
+	# now, the offer gates it on no engine because the door above opens without
+	# one, and (b) casts it drafted beside an earned Call the Wilds.
+	ok(Classes.engine_read("Kill Command") == ""
+			and Classes.offerable(["Kill Command"], []) == ["Kill Command"],
+		"§2: ...and Kill Command is not a row of `ENGINE_READ`: a Hunter holding no engine is offered it — the exception is built, not reported")
 	await _clear(s2)
 
 	# (d) THE SLOT A BOUND CARD LEFT STAYS COUNTED — no magnitude moved.
-	var run: Node = root.get_node("/root/Run")
-	for spec2 in Classes.ENGINE_BOUND:
+	# BATCH GS — the table this walked is deleted, and the ruling it priced holds
+	# for every lineage now: only an enabler leaves with an engine, and an enabler
+	# sits outside the count, so a drop frees no slot anywhere. All twelve.
+	for spec2 in Classes.SPEC_INFO:
 		var ck2 := Classes.class_of_spec(String(spec2))
 		var m_held := {"key": ck2, "spec": spec2,
 			"engines": Runes.engine_pouch_for_spec(String(spec2)), "bm_abilities": []}
@@ -288,28 +361,35 @@ func _s2_bound_cards() -> void:
 		ok(run.ability_slots_used(m_held) == run.ability_slots_used(m_drop)
 				and run.ability_slots_used(m_drop) == Classes.lineage_slots(String(spec2))
 					+ Classes.kit_slots(ck2, String(spec2)),
-			"§2: %s's slot count is %d with the engine and without (the ruling freed no slot)"
+			"§2: %s's slot count is %d with the engine and without (a drop frees no slot)"
 				% [spec2, run.ability_slots_used(m_drop)])
 
 	# (e) A DROP WRITTEN IN THE MIDDLE OF A FIGHT MOVES NOTHING IN THAT FIGHT.
 	# Only the map's rune pouch drops an engine, and the fight reads the member
 	# once, at the spawn: the unit's engines, its bar and its cooldowns are what
 	# they were, and the member's next fight is what changes.
-	var s3: Node = await Gate.spawn(self, LINEAGE_SEATS[0], {"deterministic": true})
-	var arc: BattleUnit = s3.get("heroes")[1]
-	var arc_member: Dictionary = run.party[1]
-	var kit_was: Array = _names(arc)
-	var eng_was: Array = arc.engines.duplicate()
-	arc.cooldowns["Death Ray"] = 2
-	ok(run.toggle_engine(arc_member, 0) and run.engines_worn(arc_member) == 0,
+	# BATCH GS — this was driven on the Arcanist's Death Ray, and Death Ray no
+	# longer leaves with his engine (it is drafted now, and a drafted card stays).
+	# The one thing that still leaves with an engine is its ENABLER, so the drop
+	# is driven on the Pyromancer's, read off `core_enablers` rather than named.
+	var s3: Node = await Gate.spawn(self, LINEAGE_SEATS[1], {"deterministic": true})
+	var mg_spec := String(LINEAGE_SEATS[1][1])
+	var mg: BattleUnit = s3.get("heroes")[1]
+	var mg_member: Dictionary = run.party[1]
+	var mg_en: Array = Classes.core_enablers(mg_spec)
+	var enab := String(mg_en[0]) if not mg_en.is_empty() else "(no enabler)"
+	var kit_was: Array = _names(mg)
+	var eng_was: Array = mg.engines.duplicate()
+	mg.cooldowns[enab] = 2
+	ok(run.toggle_engine(mg_member, 0) and run.engines_worn(mg_member) == 0,
 		"§2: the member's engine is dropped through the pouch's own door")
-	ok(arc.engines == eng_was and _names(arc) == kit_was
-			and int(arc.cooldowns.get("Death Ray", 0)) == 2,
-		"§2: ...and the fight in progress keeps its engine, its bar and Death Ray's cooldown")
-	ok(not run.opening_kit_names(arc_member).has("Death Ray")
-			and kit_was.has("Death Ray"),
-		"§2: ...while the member's next fight opens without Death Ray")
-	run.toggle_engine(arc_member, 0)
+	ok(mg.engines == eng_was and _names(mg) == kit_was
+			and int(mg.cooldowns.get(enab, 0)) == 2,
+		"§2: ...and the fight in progress keeps its engine, its bar and %s's cooldown" % enab)
+	ok(not run.opening_kit_names(mg_member).has(enab)
+			and kit_was.has(enab),
+		"§2: ...while the member's next fight opens without %s, which left with its engine (%s)" % [enab, mg_spec])
+	run.toggle_engine(mg_member, 0)
 	await _clear(s3)
 	var bsrc := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	var rsrc := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
@@ -322,8 +402,17 @@ func _s2_bound_cards() -> void:
 # Everything the board can hold that no engine gives: a full bar, no cooldowns,
 # a burning enemy, and — for the engine-held arm only — the meter and the
 # companion that engine's own machinery would bring.
+# BATCH GS — and, for the engine-less arm, the companion an EARNED Call the Wilds
+# calls, which needs no engine ((c)): Kill Command is a draft card since GS §1,
+# and its door is a card's, not an engine's. Cast before the bar is refilled.
 func _open_board(s: Node, with_engine: bool) -> void:
 	var H: Array = s.get("heroes")
+	if not with_engine:
+		for u0 in H:
+			var cw0 := _find(u0, "Call the Wilds")
+			if cw0 != null and s._beasts(u0).is_empty():
+				u0.resource = u0.max_resource
+				await s._resolve_special(u0, cw0, _foe(s), "good", 1.0)
 	for u in H:
 		u.resource = u.max_resource
 		u.cooldowns.clear()
@@ -443,7 +532,11 @@ func _warden_board(with_rune: bool) -> Node:
 		var r: Dictionary = Runes.build("split_shield")
 		r["equipped"] = true
 		over = {0: {"runes": [r]}}
-	return await Gate.spawn(self, LINEAGE_SEATS[0], {"deterministic": true, "party": over})
+	# BATCH GS — Shieldwall left the Warden's opening kit for his shelf, so it is
+	# seated DRAFTED (`lineage_cards`), the way the Split Shield now finds it; the
+	# wall and the rune's split are what §3 drives, unchanged.
+	return await Gate.spawn(self, LINEAGE_SEATS[0],
+		{"deterministic": true, "party": over, "lineage_cards": true})
 
 
 # ── §4 — DISPEL ─────────────────────────────────────────────────────────────

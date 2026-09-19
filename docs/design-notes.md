@@ -4,6 +4,55 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An engine brings only what it cannot run without (Batch GS) — 2026-09-18
+
+**Why the rule narrowed.** GK sent every card an engine "needed" with it, and a hero who took a rune at class
+selection also opened with his lineage's whole kit — the Pyromancer took Fireball in place of Magic Bolt,
+Detonation, Wildfire and Flamewave. The designer found it in play: an engine that brings four cards IS choosing
+a spec, and the merge exists to dissolve the spec. What a rune should bring is the least that lets it work; the
+rest of the lineage's kit is ordinary cards, drafted from the class pool like any other.
+
+**Why the test is "does it pay anything at all with the class basic and the class kit".** Every hero now opens
+with his class's basic and three kit cards whatever he holds, so an engine's minimum depends on what those
+already supply. Resonance builds on every damaging cast, and Magic Bolt is one; Mercy pays on every heal, and
+Ministration is one; the stances pay from the first blow of a battle that opens Aggressive. Those engines bring
+nothing. Burn, Chilled, a divine shield and a debuff of the Cleric's own are things no basic or kit card lays,
+so those engines bring one card each — and a companion is the whole of Pack Bond, so its three summons travel.
+
+**Why one card, and which one.** Where several cards would each serve, the one that travels is the one that
+produces what the engine reads: Flamewave lays Burn on the whole field Overburn counts (the designer's pick);
+Razor Ice puts three of Glacial Hold's four Chilled on one enemy in a cast; Divine Shield is what Conviction's
+own rule says builds Faith; Hex of Ruin curses three enemies at once for Wrath of the Old Gods. The last three
+are the batch's derivation and wait on a ruling. The Berserker's Bloodlust is the designer's ruling rather than
+the test's answer: Blood Frenzy reads only health lost and Rage spent.
+
+**Why the four basics went to the pool rather than away.** A card that stopped travelling and landed nowhere
+would be a card deleted by accident. Fireball, Frostbolt, Arcane Explosion and Shadowrend were each a lineage's
+basic attack; now every hero opens on his class's basic and those four are free attacks he can draft beside it.
+
+**Why Bloodlust left the Warrior's kit, and why Pommel Strike took the place.** The kit is what every Warrior holds
+whatever engine he takes, so a card in it has to be worth holding to all of them. Bloodlust heals by what it deals and
+feeds the band Blood Frenzy pays on: it was a Berserker card wearing a class card's slot. As the Berserker's enabler it
+goes where the engine goes and nowhere else. Pommel Strike was a Swordmaster card that reads no stance, pays any
+Warrior in Break and control, and so needs no engine to be worth its place.
+
+**Why a card that stopped travelling was cast both ways before it entered the pool.** A card that reads an
+engine is offered only to its holder, and that table was derived by casting every draft card with and without
+the engine. The 29 returning cards had never been in a draft pool, so they had never been through it: three of
+them are refused without their engine (Death Ray, Hymn of Hope, Resurrection) and joined the table; the other
+twenty-six work without one. Kill Command needs a companion, and an earned Call the Wilds brings one with no
+engine, so it is offered to any Hunter — conditional on a card, the way Battle Poise is.
+
+**Why an engine rune's text is read live, at one door.** Every rune's `desc` in the data was a placeholder, and
+GK wrote the rule after it on every instance, so a buyer met "The Occultist's engine." first. Writing twenty-four
+shop strings would be twenty-four second copies of a rule; reading the rule off the engine where a surface draws
+it leaves one source, and a saved instance cannot go on showing the day it was built.
+
+**Why the fit is reported, not repaired.** The brief asked whether the rule text fits and, if not, by how much.
+The Peddler's rune rows and the rune pouch were sized before engine runes existed, and neither fitted the rule
+text before this batch either — the placeholder made it longer. Resizing them is a layout decision with its own
+trade-offs, so the measurement goes to the designer with its numbers.
+
 ## The subject seam (Batch GR) — 2026-09-18
 
 **Why a split again, and not a prune.** The ceiling is a ceiling on the read, not on how many rules the

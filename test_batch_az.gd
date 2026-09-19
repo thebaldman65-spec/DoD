@@ -152,11 +152,18 @@ func _hero(scene: Node, idx: int) -> BattleUnit:
 # BATCH FX: a learned id the one tree no longer holds rides his `tree` as its
 # retired payload (`_worn_tree`) — the fixture's `patch`, which is written after
 # `sync_spec_hp` and before the battle reads the member.
+#
+# BATCH GS — AIMED SHOT AND HOLD BREATH LEFT HIS OPENING KIT FOR HIS SHELF: Lethal
+# Aim runs on the Hunter's own Quick Shot, so the engine brings nothing. The live
+# sections drive Aimed Shot's damage path (the crit multiplier, One Shot), so every
+# spawn seats the lineage's cards as DRAFTED ones (`lineage_cards`) — the way a
+# player now gets them — and each is found BY NAME, never by bar position.
 func _spawn(learned: Dictionary, lineup := ["raider", "raider"]) -> Node:
 	return await Fixture.spawn(self,
 		["berserker", "pyromancer", "inquisitor", "sharpshooter"],
 		{"enemies": lineup, "talents": {3: learned.duplicate()},
-		"patch": {3: {"tree": _worn_tree(learned)}}, "deterministic": true})
+		"patch": {3: {"tree": _worn_tree(learned)}}, "deterministic": true,
+		"lineage_cards": true})
 
 
 # ── BATCH FX — THE PAYLOADS THE RETIRED NODES CARRIED ───────────────────────
@@ -501,7 +508,8 @@ func _conversion_math() -> void:
 func _no_ability_grants() -> void:
 	# AU §1's rule runs BOTH ways: a tree node granting an owned ability falls
 	# back, and a boss offering a tree-granted one is filtered. HIS TREE GRANTS
-	# NOTHING — Aimed Shot, Powershot and Hold Breath are base kit, and Quick
+	# NOTHING — Powershot is the Hunter kit's, Aimed Shot and Hold Breath are
+	# drafted off his shelf (BATCH GS — they left his opening kit), and Quick
 	# Draw / Triple Shot / Coup de Grace / Pinning Shot / Called Shot are all
 	# boss-trophy pool. So the collision cannot arise, and this RECORDS it
 	# rather than leaving a reader to wonder whether his shelf was skipped.
@@ -746,7 +754,17 @@ func _live_conversion() -> void:
 	var h := _hero(scene, 3)
 	var foe: BattleUnit = scene.get("enemies")[0]
 	var aimed: Ability = scene.call("_find_ability", h, "Aimed Shot")
-	ok(aimed != null, "Aimed Shot is in the opening kit")
+	# BATCH GS — "IN THE OPENING KIT" IS NO LONGER TRUE, AND WHERE THE CARD IS NOW
+	# IS WHAT THIS ASKS: on his shelf, out of the kit the one builder opens him
+	# with (his own engine held), and in his hand once drafted, as `_spawn` seats it.
+	var ss_opening: Array = []
+	for ab in Classes.opening_kit("hunter", "sharpshooter",
+			[Classes.engine_of_spec("sharpshooter")]):
+		ss_opening.append(ab.display_name)
+	ok(aimed != null and Classes.spec_draft_pool("sharpshooter").has("Aimed Shot")
+			and not ss_opening.has("Aimed Shot"),
+		"Aimed Shot is a DRAFTED card — on his shelf, not in his opening kit %s — and drafted, it is in his hand"
+			% str(ss_opening))
 	# At 100 Focus the chance is +50% and the multiplier is still x2.
 	h.second_resource = 100
 	ok(abs(h.focus_crit_chance() - 0.50) < 0.0001

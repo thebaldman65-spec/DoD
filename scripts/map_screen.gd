@@ -692,7 +692,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		else:
 			slot_btn.text = String(rune["name"])
 			slot_btn.tooltip_text = "%s\n%s\n\nClick to manage %s's runes." % [
-				rune["name"], rune["desc"], key.capitalize()]
+				rune["name"], Runes.shown_desc(rune), key.capitalize()]
 			slot_btn.add_theme_color_override("font_color",
 				rune.get("scope_color", Color(0.8, 0.8, 0.8)))
 		slot_btn.pressed.connect(Music.click)
@@ -955,7 +955,7 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			for i in triple.size():
 				var rune: Dictionary = triple[i]
 				_pick_button(box, "%s  [%s]" % [rune["name"], rune["scope_label"]],
-					String(rune["desc"]),
+					Runes.shown_desc(rune),
 					rune.get("scope_color", Color(0.8, 0.8, 0.8)),
 					_pick_rune.bind(idx, i), overlay)
 			# ══ BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING STRANDS THE
@@ -1743,7 +1743,7 @@ func _open_rune_panel(idx: int) -> void:
 		etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
 		erow.add_child(etoggle)
 		var elbl := Label.new()
-		elbl.text = "%s%s — %s" % ["✦ " if e_on else "", er["name"], er["desc"]]
+		elbl.text = "%s%s — %s" % ["✦ " if e_on else "", er["name"], Runes.shown_desc(er)]
 		elbl.add_theme_font_size_override("font_size", 12)
 		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
 			else Color(0.62, 0.6, 0.57))
@@ -1781,7 +1781,7 @@ func _open_rune_panel(idx: int) -> void:
 		toggle.pressed.connect(_toggle_rune.bind(idx, i, overlay))
 		row.add_child(toggle)
 		var lbl := Label.new()
-		lbl.text = "%s%s — %s" % ["✦ " if is_on else "", rune["name"], rune["desc"]]
+		lbl.text = "%s%s — %s" % ["✦ " if is_on else "", rune["name"], Runes.shown_desc(rune)]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))

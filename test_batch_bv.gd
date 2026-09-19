@@ -301,8 +301,13 @@ func _pools() -> void:
 				"%s's enabler %s is not draftable" % [spec, enabler])
 	ok(Classes.core_enablers("beastmaster").size() == 3,
 		"the Beastmaster's three summons are still his protected core")
-	ok(Classes.core_slots("beastmaster") == 3,
-		"and they still occupy THREE slots, not five (the AH bar rule)")
+	# BATCH GS — "THREE SLOTS, NOT FIVE" WAS HIS WHOLE OPENING: the summons as one
+	# bar entry beside two lineage cards. GS put those two on his shelf, and an
+	# enabler sits outside the slot count, so the AH bar rule is asked of the
+	# summons themselves: ONE bar entry, not three, and no lineage slot at all.
+	ok(Classes.enabler_slots("beastmaster") == 1 and Classes.core_slots("beastmaster") == 1
+			and Classes.lineage_slots("beastmaster") == 0,
+		"and they are ONE bar entry, not three (the AH bar rule), outside the slot count — his lineage takes no slot")
 
 
 func _definitions() -> void:
@@ -426,12 +431,14 @@ func _names() -> void:
 		ok(int(seen.get(n, 0)) == 1,
 			"%s appears in exactly ONE pool (got %d)" % [n, int(seen.get(n, 0))])
 	# AND THE SWEEP THAT MATTERS: no OTHER ability in the game already carries
-	# one of these names. Every opening kit is walked.
+	# one of these names. Every opening kit is walked. (BATCH GS: every lineage's
+	# DEFINITIONS are — `spec_abilities` was its opening kit until GS put all but
+	# the enablers on its shelf; the walk and its population did not move.)
 	for spec in Classes.SPEC_IDS:
 		for cls_spec in Classes.SPEC_IDS[spec]:
 			for ab in Classes.spec_abilities(cls_spec):
 				ok(not (ab.display_name in NINE),
-					"%s is not also an opening-kit ability" % ab.display_name)
+					"%s is not also a lineage-defined ability" % ab.display_name)
 	# HUNT vs TWIN HUNT vs MARK OF THE HUNT — REPORTED, NOT RESOLVED. "Hunt" is
 	# a SUBSTRING of two existing ability names, one of them in the same CLASS
 	# (Twin Hunt is the Beastmaster's tranche-1 card). NOTHING BREAKS, because

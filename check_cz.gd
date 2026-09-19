@@ -168,26 +168,45 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 	# DERIVED off `apply_kit_overrides` itself and asserted as a set. An ability
 	# that fell outside every kit and pool would still be caught: it would be in
 	# NEITHER walk, so it cannot hide inside this difference.
-	var over_names := {}
+	#
+	# **BATCH GS §1 CLOSED THE OVERRIDE HALF, AND IT IS ASSERTED EMPTY RATHER THAN
+	# DROPPED.** `apply_kit_overrides` is deleted: no lineage replaces its class
+	# basic, and the four are draft cards on their lineages' shelves, defined by
+	# `Classes.basic_override_ability`. The CL walk reads the shelves, so it
+	# reaches all four now and the gap DU opened has closed itself — the report
+	# this half carried is stale, which is what this control exists to say. The
+	# four are derived off their one definer over every shelf and must be inside
+	# BOTH walks; one that fell back out of the CL walk would be in the
+	# difference and red below as well.
+	var shelved_basics: Array = []
 	for spec3 in Classes.SPEC_INFO:
-		var ck3 := Classes.class_of_spec(spec3)
-		if ck3 == "":
-			continue
-		var plain_kit: Array = Classes.kit(ck3)
-		var cfg3 := {"abilities": Classes.kit(ck3)}
-		Classes.apply_kit_overrides(cfg3, spec3)
-		var over_kit: Array = cfg3["abilities"]
-		for i3 in over_kit.size():
-			var nm3: String = over_kit[i3].display_name
-			if i3 >= plain_kit.size() or nm3 != String(plain_kit[i3].display_name):
-				over_names[nm3] = true
+		for nm3 in Classes.spec_draft_pool(spec3):
+			if Classes.basic_override_ability(String(nm3)) != null \
+					and not shelved_basics.has(String(nm3)):
+				shelved_basics.append(String(nm3))
+	shelved_basics.sort()
+	# Kept OUT of `expected` below on purpose: a former override that only the
+	# complete walk reached would then be in the difference and NOT expected,
+	# so the set identity reds on it as well as this line.
+	var over_left: Array = []
+	for nm3b in shelved_basics:
+		if not cl_names.has(nm3b) or not by_name.has(nm3b):
+			over_left.append(nm3b)
+	ok(shelved_basics.size() == 4,
+		"%d former basic-attack overrides are on a shelf, not the 4 GS §1 put there (%s)" % [
+			shelved_basics.size(), ", ".join(PackedStringArray(shelved_basics))])
+	ok(over_left.is_empty(),
+		"the override half of the difference is %s — GS §1 shelved the four, so both walks must reach them" % str(over_left))
+	print("  the override half: %d of %d shelved basics outside a walk — both walks reach %s" % [
+		over_left.size(), shelved_basics.size(), ", ".join(PackedStringArray(shelved_basics))])
+	var over_names := {}
 	# **BATCH GN — AND THE CLASS KITS, WHICH THE CL WALK CANNOT READ EITHER.** The
 	# complete walk reads `Classes.class_kit` beside the class draft pools; the CL
 	# walk stays frozen, so every kit card no older structure names is outside it.
-	# That half is DERIVED off `CLASS_KITS` the way the first half is derived off
+	# That half is DERIVED off `CLASS_KITS` the way the first half was derived off
 	# `apply_kit_overrides`: a kit card the CL walk still reaches (a lineage core)
 	# is not in the difference, and an ability outside every kit and pool is
-	# still in neither walk.
+	# still in neither walk. **Since GS it is the WHOLE difference.**
 	for kk in Classes.CLASS_KITS:
 		for kn in Classes.class_kit_names(String(kk)):
 			if not cl_names.has(String(kn)):
@@ -200,10 +219,10 @@ func _s0_enumeration(corpus: Array, battle_gd) -> void:
 	var expected: Array = over_names.keys()
 	expected.sort()
 	ok(only_complete == expected,
-		"the walks differ by %s; the ONLY difference may be the kit overrides and the class-kit cards no pool holds %s" % [
+		"the walks differ by %s; the ONLY difference may be the class-kit cards no pool holds %s" % [
 			str(only_complete), str(expected)])
 	ok(cl.size() + expected.size() == corpus.size(),
-		"the CL walk reaches %d and the complete walk %d — that is %d apart, not the %d overrides and kit cards" % [
+		"the CL walk reaches %d and the complete walk %d — that is %d apart, not the %d kit cards" % [
 			cl.size(), corpus.size(), corpus.size() - cl.size(), expected.size()])
 	print("  the complete walk reaches %d the CL walk cannot: %s" % [
 		expected.size(), ", ".join(expected)])
@@ -530,7 +549,9 @@ func _live(battle_gd) -> void:
 # The CL walk EXACTLY as it stood before this batch, kept here as §0's negative
 # control. Its whole job is to still be missing the five — if it ever stops
 # being, the gap `Classes.ability_corpus()` exists to close has closed itself
-# and the report above is stale.
+# and the report above is stale. (BATCH GS — what it still misses is the
+# class-kit cards no older structure names; the five since DO and the four kit
+# overrides since GS §1 are inside it, and §0 asserts both.)
 func _cl_only_corpus() -> Array:
 	var out: Array = []
 	var seen := {}
@@ -547,6 +568,8 @@ func _cl_only_corpus() -> Array:
 	# kit overrides. Measured, not assumed: the difference is DERIVED off
 	# `apply_kit_overrides` at the assertion site, so this deletion could only
 	# have been silent if it had changed nothing, and it did not change it.
+	# (BATCH GS §1 — the four are on their shelves now and this walk reaches
+	# them through the `spec_draft_pool` arm below; §0 asserts it.)
 	for key in ["warrior", "mage", "cleric", "hunter"]:
 		for ab in Classes.kit(key):
 			add.call(ab)

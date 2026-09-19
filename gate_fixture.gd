@@ -52,6 +52,13 @@ extends RefCounted
 #                           keeps its slot.
 #   run           : Node  — supply the run node instead of fetching it
 #                           (check_ct already holds it).
+#   lineage_cards : bool  — seat, for every hero seated by lineage, the cards
+#                           that lineage opened with until GS §1 and that now sit
+#                           on its draft shelf, as DRAFTED cards (`lineage_cards`
+#                           below). A check about one of those cards seats it the
+#                           way a player now gets it; the kit a lineage OPENS with
+#                           is its enablers alone, and a check about THAT seats
+#                           nothing.
 #   party         : Dict  — {seat: {key: value}} stamped onto `run.party[seat]`
 #                           AFTER the spec/tree/runes reset and BEFORE the scene
 #                           instantiates (check_fn). **THE WINDOW IS THE POINT**:
@@ -84,6 +91,9 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 		run.sync_spec_hp(i)
 	run.specs_chosen = true
 	run.active = true
+	if bool(opts.get("lineage_cards", false)):
+		for i2 in run.party.size():
+			run.party[i2]["bm_abilities"] = lineage_cards(String(specs[i2]))
 	var party_over: Dictionary = opts.get("party", {})
 	for seat in party_over:
 		var over: Dictionary = party_over[seat]
@@ -143,6 +153,29 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 # that an exemption granted to a SENTENCE blinds the rule to a real walk
 # arriving in that file later. Stripping is that ruling made mechanical: prose
 # describing a walk is not a walk.
+# **BATCH GS §1 — THE CARDS A LINEAGE OPENED WITH UNTIL GS, AS ITS SHELF NOW HOLDS
+# THEM.** An engine brings only what it cannot run without, so a lineage opens
+# with its enablers alone and every other card it opened with is on its shelf of
+# the class draft pool — the basic that was its override first, then its
+# definitions in the order they stood. **DERIVED, NEVER LISTED**: a card is one of
+# these because it is on the lineage's shelf AND is defined by the lineage (or is
+# the override `basic_override_ability` defines), so a card moved back into an
+# opening kit leaves this list by itself. The one place it is written; both
+# fixtures seat it.
+static func lineage_cards(spec: String) -> Array:
+	var out: Array = []
+	if spec == "" or not Classes.SPEC_INFO.has(spec):
+		return out
+	var shelf: Array = Classes.spec_draft_pool(spec)
+	for n in shelf:
+		if Classes.basic_override_ability(String(n)) != null:
+			out.append(String(n))
+	for ab in Classes.spec_abilities(spec):
+		if ab != null and shelf.has(ab.display_name) and not out.has(ab.display_name):
+			out.append(ab.display_name)
+	return out
+
+
 static func strip_comments(src: String) -> String:
 	var out := ""
 	for raw_line in src.split("\n"):

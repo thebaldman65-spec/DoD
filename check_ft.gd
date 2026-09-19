@@ -333,8 +333,11 @@ func _s1_channel() -> void:
 	# (b) TWO FIELDS, NOT ONE. `rage_spent` holding Mana is a name that lies,
 	# and a shared field would make Blood Frenzy's second term readable by a
 	# Mage. Driven on two real heroes rather than argued.
+	# BATCH GS — the lineage's cards are seated as drafted, for (e): Death Ray
+	# left the Arcanist's opening kit for his shelf, and (e) picks it by being
+	# the hardest-hitting card. Nothing (b)-(d) reads is on the bar.
 	var scene: Node = await Gate.spawn(self,
-		["berserker", "arcanist", "holy", "sharpshooter"])
+		["berserker", "arcanist", "holy", "sharpshooter"], {"lineage_cards": true})
 	var heroes: Array = scene.get("heroes")
 	var war: BattleUnit = heroes[0]
 	var mage: BattleUnit = heroes[1]
@@ -378,8 +381,9 @@ func _s1_channel() -> void:
 	# CANNOT STAND IN FOR. §1d asserts the arithmetic of the function; this
 	# asserts that the function's answer arrives in a health bar.
 	#
-	# **FOUR CONFOUNDS ARE CLOSED HERE RATHER THAN HOPED AWAY**, because each one
-	# on its own produces a difference that reads like a finding:
+	# **FIVE CONFOUNDS ARE CLOSED HERE RATHER THAN HOPED AWAY** (four until GS
+	# found the fifth), because each one on its own produces a difference that
+	# reads like a finding:
 	#   · THE VICTIM DIES. A body killed on the control arm cannot be struck by
 	#     the second, which reads ZERO — indistinguishable from a dead payout.
 	#     `_hit` restores health, `dead`, Pressure and the Break state.
@@ -393,6 +397,13 @@ func _s1_channel() -> void:
 	#   · THE ROLL VARIES. Six pairs are summed rather than one compared, and the
 	#     ability chosen is the HARDEST-hitting non-physical card so the band is
 	#     wide against the roll rather than inside it.
+	#   · THE CARD'S OWN STATUS MOVES THE NEXT BLOW (BATCH GS). Magic Burst lays
+	#     ELEMENTAL WEAKNESS after it lands, so every later arm strikes through
+	#     less resistance: when GS moved Death Ray to the shelf the pick fell to
+	#     Magic Burst and read x1.1628 against x1.18. The lineage's cards are
+	#     seated at the spawn so the pick is Death Ray again, which lays nothing —
+	#     closed by the SEAT, not by a filter: a harder card that lays such a
+	#     status would reopen it.
 	mage.channel_active = false
 	mage.mana_spent = 0
 	var enemies: Array = scene.get("enemies")
@@ -403,10 +414,11 @@ func _s1_channel() -> void:
 		u.block_chance = -10.0
 		u.crit_bonus = -1.0
 	foe.max_hp = 500000
-	# A NON-PHYSICAL ability, CHOSEN rather than assumed: `apply_kit_overrides`
-	# replaces `abilities[0]` for three of the four Mage specs, so "the first
-	# card" is not a fixed damage type — and Channel spares physical, so a
-	# physical pick would make both arms equal and read as a dead payout.
+	# A NON-PHYSICAL ability, CHOSEN rather than assumed: until GS deleted it,
+	# `apply_kit_overrides` replaced `abilities[0]` for three of the four Mage
+	# specs, so "the first card" was never a fixed damage type (every Mage opens
+	# on Magic Bolt since GS) — and Channel spares physical, so a physical pick
+	# would make both arms equal and read as a dead payout.
 	var ab: Ability = null
 	for cand in mage.abilities:
 		if cand != null and cand.damage > 0 and cand.dmg_type != "physical":
@@ -1197,10 +1209,11 @@ func _s5_the_floor() -> void:
 			e.max_hp = 500000
 			e.hp = 500000
 
-		# (h) MEMBERSHIP, NOT A WALK. The kit this Mage holds as spawned (overrides
-		# included), and every channel the award chain reads for his spec — the
-		# boss pool, his spec draft pool and his class-wide draft pool, FJ §1's
-		# three, all landing in `bm_abilities` through one `hold_ability()`.
+		# (h) MEMBERSHIP, NOT A WALK. The kit this Mage holds as spawned (no basic
+		# is overridden since GS), and every channel the award chain reads for
+		# his spec — the boss pool, his spec draft pool and his class-wide draft
+		# pool, FJ §1's three, all landing in `bm_abilities` through one
+		# `hold_ability()`.
 		for a in mage.abilities:
 			if a != null:
 				mage_names[String(a.display_name)] = true

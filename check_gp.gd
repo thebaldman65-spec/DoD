@@ -62,6 +62,12 @@ var _maps_read := 0
 var _battles := 0
 var _dead: Array = []
 var _offers: Dictionary = {}     # hero key -> every card offered, by name
+# BATCH GS — §4's no-engine arm, kept one (`_unslot_engines`): whether this road
+# is that arm, how many slotted engines it set aside, and any member found
+# holding one where a draft is rolled.
+var _keep_bare := false
+var _set_aside := 0
+var _engined: Array = []
 
 
 func ok(cond: bool, what: String) -> void:
@@ -272,13 +278,23 @@ func _s1_the_draw() -> void:
 
 # The state an engine itself makes, built through the game's own doors so the
 # HELD arm is the engine working rather than a field this gate wrote.
-func _arm_engine(s: Node, u: BattleUnit, eng: String) -> void:
+# BATCH GS — `card` is the row being driven, for the one engine whose state a
+# card needs more of than the others do (Death Ray, below).
+func _arm_engine(s: Node, u: BattleUnit, eng: String, card := "") -> void:
 	var foes: Array = s.get("enemies").filter(func(e): return not e.dead)
 	match eng:
 		"resonance":
+			# BATCH GS — THE METER AS `_spawn_units` INSTALLS IT FOR A HOLDER, THEN
+			# THE STACKS THROUGH `_gain_resonance`, THE DOOR EVERY SOURCE COMES
+			# THROUGH. Runaway Resonance has no ceiling (`second_max` 99, Batch AT);
+			# the 5 written here held the new DEATH RAY row — refused below
+			# `DEATH_RAY_STACKS` — dark on the held arm as well, so the pair read
+			# identical. Death Ray's arm is built to its line; every other row
+			# reads any stack at all and keeps the three it always had.
 			u.second_resource_name = "Resonance"
-			u.second_max = 5
-			u.second_resource = 3
+			u.second_max = 99
+			u.second_resource = 0
+			s._gain_resonance(u, int(s.DEATH_RAY_STACKS) if card == "Death Ray" else 3)
 		"mercy":
 			u.second_resource_name = "Mercy"
 			u.second_max = 5
@@ -356,6 +372,14 @@ func _cast(s: Node, u: BattleUnit, card: String) -> Dictionary:
 	u.max_resource = 99999
 	u.cooldowns.clear()
 	var target: BattleUnit = u if ab.target == Ability.Target.ALLY else foes[0]
+	# BATCH GS — RESURRECTION TARGETS THE FALLEN, as the battle's own targeting does
+	# for it (`ab.special == "resurrection"` picks among the dead): cast at its
+	# caster it would spend its Mercy and raise nobody. `_stage` fells one.
+	if ab.special == "resurrection":
+		for h in s.get("heroes"):
+			if h.dead and not h.is_companion:
+				target = h
+				break
 	var before := _snap(s)
 	var log_was := String(s.get("history").get_parsed_text())
 	var usable := bool(s._ability_usable(u, ab))
@@ -385,13 +409,41 @@ func _arm(eng: String, cards: Array, hold: bool) -> Dictionary:
 		# just marked — and three rows read "does nothing with the engine" for
 		# no reason but this.
 		_dress(s, u)
+		# BATCH GS — THE BOARD A CARD NEEDS, ON BOTH ARMS, BEFORE THE ENGINE IS.
+		await _stage(s, u, String(card))
 		if hold:
 			u.engines = [eng]
-			await _arm_engine(s, u, eng)
+			await _arm_engine(s, u, eng, String(card))
 		seed(20260917)
 		out[card] = await _cast(s, u, String(card))
 		await _clear(s)
 	return out
+
+
+# **BATCH GS — THE BOARD A ROW NEEDS ON BOTH ARMS.** Resurrection is refused while
+# no hero is down, with its engine or without it, so a board with nobody fallen
+# reads the pair identical whatever Mercy does. Both arms therefore stand the
+# same fallen hero before the cast — the Warrior, felled by a real enemy blow
+# (§2d's idiom), never the caster — and what separates them is then the Mercy
+# the card is priced in, which is the row's claim. Every other row: untouched.
+func _stage(s: Node, u: BattleUnit, card: String) -> void:
+	if card != "Resurrection":
+		return
+	var foes: Array = s.get("enemies").filter(func(e): return not e.dead)
+	var w: BattleUnit = _hero(s, "warrior")
+	if w == null or w == u or foes.is_empty():
+		ok(false, "§2: the Resurrection board has no Warrior to fell — the pair cannot be read")
+		return
+	w.hp = 1
+	var foe: BattleUnit = foes[0]
+	var atk_was := foe.attack
+	foe.attack = 9999
+	foe.resource = 99999
+	foe.cooldowns.clear()
+	await s._resolve(foe, foe.abilities[0], w, "good")
+	foe.attack = atk_was
+	if not w.dead:
+		ok(false, "§2: the Resurrection board stands no fallen hero — the pair cannot be read")
 
 
 func _same(a: Dictionary, b: Dictionary) -> bool:
@@ -908,6 +960,15 @@ func _fight(s: Node) -> String:
 		guard += 1
 	if guard >= FRAME_CAP:
 		return "a battle never ended in %d frames" % FRAME_CAP
+	# BATCH GS — THE NO-ENGINE ARM'S PREMISE, READ WHERE ITS DRAFTS ARE ROLLED: the
+	# victory's `award_draft_pick` reads each member's slotted engines, and no
+	# rune reaches a member during a fight, so what is slotted now is what the
+	# roll read.
+	if _keep_bare:
+		for m in _run.party:
+			if not Runes.held_engines(m).is_empty():
+				_engined.append("%s %s at %s" % [m.get("key", "?"),
+					str(Runes.held_engines(m)), _where()])
 	await Gate.frames(self, 6)
 	_battles += 1
 	if Gate.press(s, ["Continue", "Descend into", "Walk on", "Onward"]) != "":
@@ -941,6 +1002,29 @@ func _leave(s: Node, nm: String) -> String:
 	return Gate.press(s, ["Leave", "Walk on", "Onward", "Continue", "Depart"])
 
 
+# **BATCH GS — THE NO-ENGINE ARM HOLDS NO ENGINE FOR THE WHOLE ROAD.** It is the
+# arm the offer measurement is about, and after GS it stopped being one: the road
+# answers every rune pick with its first live button, and on the seeded road GS's
+# kits walk the party took ten ENGINE runes and slotted seven — the Arcanist's,
+# the Devout's and the Beastmaster's among them — because `hold_rune` slots an
+# engine while a slot is free. Every Inner Arcane, Ordination or Unleash it was
+# then shown was rolled for a hero holding that engine: `award_draft_pick` read
+# the slotted engines at each roll (probed), and the gate offered what it should.
+# §4 was reading the game working as a leak. So every engine the road hands this
+# party is unslotted through the player's own door, `Run.toggle_engine` (zero
+# engines is a legal state, and the rune is kept), at the top of every step, and
+# `_fight` asserts that none was slotted when a draft was rolled. Returns how
+# many it set aside.
+func _unslot_engines() -> int:
+	var n := 0
+	for m in _run.party:
+		var held: Array = m.get("engines", [])
+		for i in held.size():
+			if bool((held[i] as Dictionary).get("equipped", false)) and _run.toggle_engine(m, i):
+				n += 1
+	return n
+
+
 # One arm of §4: a whole run with every hero holding `engines`, drafting at
 # every offer, and the cards each of them was SHOWN recorded by name.
 func _road(label: String, per_hero: int) -> void:
@@ -948,6 +1032,10 @@ func _road(label: String, per_hero: int) -> void:
 	_battles = 0
 	_dead = []
 	_offers = {}
+	# BATCH GS — the no-engine arm is kept one (`_unslot_engines`).
+	_keep_bare = per_hero == 0
+	_set_aside = 0
+	_engined = []
 	_fresh_meta()
 	seed(ROAD_SEED)
 	_run.sim_run = false
@@ -973,6 +1061,9 @@ func _road(label: String, per_hero: int) -> void:
 	var stalled := ""
 	for _step in MAX_STEPS:
 		await Gate.frames(self, 2)
+		# BATCH GS — before anything is pressed: see `_unslot_engines`.
+		if _keep_bare:
+			_set_aside += _unslot_engines()
 		var s: Node = current_scene
 		if s == null or s.is_queued_for_deletion():
 			continue
@@ -1000,6 +1091,16 @@ func _road(label: String, per_hero: int) -> void:
 	ok(_dead.is_empty(), "§4 [%s]: a screen could not be answered — %s" % [label, _dead])
 	ok(_maps_read >= 12,
 		"§4 [%s]: the road read only %d maps — the run stopped too early to draft" % [label, _maps_read])
+	# BATCH GS — THE ARM'S PREMISE, ASSERTED: no draft this road rolled was rolled
+	# for a hero holding a slotted engine. The count set aside is printed, not
+	# asserted: how many engine runes a seeded road deals is the road's business.
+	if _keep_bare:
+		print("    [%s] the road dealt the party %d slotted engine runes; each was unslotted through `Run.toggle_engine` before the next step" % [
+			label, _set_aside])
+		ok(_engined.is_empty(),
+			"§4 [%s]: a hero held a slotted engine when a battle's draft was rolled — the arm stopped measuring a hero with no engine (%s)" % [
+				label, _engined])
+	_keep_bare = false
 
 
 func _s4_the_road() -> void:

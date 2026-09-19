@@ -585,10 +585,21 @@ func _curve_maths() -> void:
 func _kit() -> void:
 	var kit: Array = Classes.spec_abilities("arcanist")
 	var names := kit.map(func(a): return a.display_name)
-	ok(names.size() == 3, "the opening three is three (got %d)" % names.size())
+	# BATCH GS — `spec_abilities` IS THE ARCANIST LINEAGE'S DEFINITION TABLE NOW:
+	# Runaway Resonance brings nothing (it builds on every damaging cast, and his
+	# Magic Bolt is one), so the three he opened with are drafted off his shelf. The
+	# two checks ask that his lineage still defines exactly those three and that
+	# every one is on his shelf and none in the kit he opens with.
+	var ar_open: Array = Classes.opening_kit("mage", "arcanist",
+		[Classes.engine_of_spec("arcanist")]).map(func(a): return a.display_name)
+	var ar_shelf: Array = Classes.spec_draft_pool("arcanist")
+	var ar_where := names.all(func(n): return ar_shelf.has(n) and not ar_open.has(n))
+	ok(names.size() == 3 and ar_where,
+		"his lineage defines three (got %d), all on his shelf and none in his opening %s"
+			% [names.size(), str(ar_open)])
 	ok(names.has("Arcane Cannon") and names.has("Arcane Barrage")
 			and names.has("Death Ray"),
-		"the opening three is Cannon, Barrage, DEATH RAY (got %s)" % [names])
+		"the three are Cannon, Barrage, DEATH RAY (got %s)" % [names])
 	ok(not names.has("Stabilize"),
 		"STABILIZE IS OUT of the opening three — it is the escape hatch")
 	# Death Ray's own numbers, from §2 verbatim.
@@ -799,8 +810,12 @@ func _claude_md() -> void:
 # BATCH DO added `earned`. Shatter used to arrive from `cr_shatter`'s GRANT;
 # a talent may not grant an ability now, so a suite that needs the card on the
 # bar has to earn it, exactly as a player does.
+# BATCH GS added `lineage` — Arcane Explosion, Cannon, Barrage and Death Ray left
+# the Arcanist's opening kit for his shelf, so a check that drives one of them
+# seats the lineage's cards as DRAFTED (the fixture's `lineage_cards`) and finds
+# the card BY NAME: they sit after the class kit, and slot 0 is Magic Bolt.
 func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight",
-		earned: Array = []) -> Node:
+		earned: Array = [], lineage := false) -> Node:
 	# THE CRIT IS THE THIRD COIN AND ON THIS SPEC IT IS THE WORST ONE: Runaway
 	# Resonance adds +1% crit PER STACK, so a "same cast at 0 stacks vs 12"
 	# comparison silently compares 10% crit against 22% crit. A build-rate check
@@ -810,6 +825,8 @@ func _spawn(learned: Dictionary, lineup: Array, specs: Array, ty := "fight",
 		"talents": {1: learned.duplicate()}, "deterministic": true, "crit": -10.0}
 	if not earned.is_empty():
 		opts["bm"] = {1: earned}
+	if lineage:
+		opts["lineage_cards"] = true
 	# BATCH FX: every id a check here learns is deleted, so the member's tree is
 	# the inline one RETIRED builds — the exact payloads, through the real
 	# `apply_from_tree` at the spawn. Learning nothing leaves him the one tree.
@@ -869,7 +886,10 @@ func _live_curve() -> void:
 	foe.max_hp = 999999
 	foe.armor = 0.0
 	foe.resists = {}
-	var explosion: Ability = arc.abilities[0]
+	# BATCH GS — slot 0 is Magic Bolt now, not Arcane Explosion (a drafted card
+	# since GS). The curve is the engine's and pays on every damaging cast, so
+	# the class basic measures it exactly as the old basic did.
+	var basic: Ability = arc.abilities[0]
 	# The DAMAGE side: the same cast at 0 stacks and at 12 must differ by the
 	# table's +117%. Each hit still carries a +/-10% variance roll, so this SUMS
 	# TEN CASTS at each level — one pair of samples has a +/-22% envelope, which
@@ -902,12 +922,12 @@ func _live_curve() -> void:
 		arc.second_resource = 0
 		foe.hp = 999999
 		_seeded(_i)
-		await scene.call("_resolve", arc, explosion, foe, "good")
+		await scene.call("_resolve", arc, basic, foe, "good")
 		at0 += 999999 - foe.hp
 		arc.second_resource = 12
 		foe.hp = 999999
 		_seeded(_i)
-		await scene.call("_resolve", arc, explosion, foe, "good")
+		await scene.call("_resolve", arc, basic, foe, "good")
 		at12 += 999999 - foe.hp
 	ok(at0 > 0 and at12 > 0, "both casts landed")
 	if at0 > 0:
@@ -953,7 +973,9 @@ func _live_curve() -> void:
 # PASSIVE's curve alone. If a per-stack term were still on the ability the gap
 # would be the square of it.
 func _live_no_per_stack() -> void:
-	var scene := await _spawn({}, ["raider"], ["berserker", "arcanist", "inquisitor", "beastmaster"])
+	# BATCH GS — the lineage's cards are seated: Cannon is drafted off his shelf now.
+	var scene := await _spawn({}, ["raider"], ["berserker", "arcanist", "inquisitor", "beastmaster"],
+		"fight", [], true)
 	var arc := _arc(scene)
 	if arc == null:
 		scene.queue_free()
@@ -963,7 +985,13 @@ func _live_no_per_stack() -> void:
 	foe.armor = 0.0
 	foe.resists = {}
 	var cannon := _find(arc, "Arcane Cannon")
-	ok(cannon != null, "Arcane Cannon is in the kit")
+	# BATCH GS — this asked whether the Arcanist opens with Cannon. He does not
+	# any more; the GS answer to "does he have it" is his SHELF, and the seated
+	# copy reaching his bar is what the ratio below stands on.
+	var cannon_shelf := Classes.spec_draft_pool("arcanist").has("Arcane Cannon")
+	ok(cannon != null and cannon_shelf,
+		"Arcane Cannon is on the Arcanist's shelf (%s) and on his bar once drafted (%s)"
+			% [cannon_shelf, cannon != null])
 	if cannon == null:
 		scene.queue_free()
 		return
@@ -994,14 +1022,24 @@ func _live_no_per_stack() -> void:
 
 
 # §2: Death Ray's gate, and that pressing it costs him nothing but Mana.
+# BATCH GS — both spawns seat the lineage's cards: Death Ray is drafted now.
 func _live_death_ray() -> void:
-	var scene := await _spawn({}, ["raider"], ["berserker", "arcanist", "inquisitor", "beastmaster"])
+	var scene := await _spawn({}, ["raider"], ["berserker", "arcanist", "inquisitor", "beastmaster"],
+		"fight", [], true)
 	var arc := _arc(scene)
 	if arc == null:
 		scene.queue_free()
 		return
 	var dray := _find(arc, "Death Ray")
-	ok(dray != null, "Death Ray is in the opening three")
+	# BATCH GS — this asked whether Death Ray is in the Arcanist's opening three.
+	# It left them for his SHELF, and the door that kept it from a Mage without
+	# the engine is the OFFER now (`engine_read`, Resonance) rather than the kit:
+	# all three halves are asked, and the seated copy is what the gate below uses.
+	var dray_shelf := Classes.spec_draft_pool("arcanist").has("Death Ray")
+	var dray_gate := Classes.engine_read("Death Ray") == "resonance"
+	ok(dray != null and dray_shelf and dray_gate,
+		"Death Ray is on the Arcanist's shelf (%s), offered only to a Resonance holder (%s), and on his bar once drafted (%s)"
+			% [dray_shelf, dray_gate, dray != null])
 	if dray == null:
 		scene.queue_free()
 		return
@@ -1031,7 +1069,7 @@ func _live_death_ray() -> void:
 	ok(foe.hp < 999999, "...and it landed")
 	# Terminal Velocity: at 15+ the cooldown never starts.
 	var tv := await _spawn({"ar_mindfulness": 1}, ["raider"],
-		["berserker", "arcanist", "inquisitor", "beastmaster"])
+		["berserker", "arcanist", "inquisitor", "beastmaster"], "fight", [], true)
 	var arc2 := _arc(tv)
 	if arc2 != null:
 		ok(arc2.terminal_velocity == 15, "Terminal Velocity's threshold is 15")
@@ -1056,8 +1094,11 @@ func _live_death_ray() -> void:
 
 # §3's Resonance lane: every node that moves the build rate, at its read site.
 func _live_build_rate() -> void:
+	# BATCH GS — Harmonics reads Arcane Explosion BY NAME, and Explosion is a
+	# drafted card now (slot 0 is Magic Bolt): the lineage's cards are seated
+	# and it is cast by name rather than as `abilities[0]`.
 	var scene := await _spawn({"ar_harmonics": 1}, ["raider", "raider"],
-		["berserker", "arcanist", "inquisitor", "beastmaster"])
+		["berserker", "arcanist", "inquisitor", "beastmaster"], "fight", [], true)
 	var arc := _arc(scene)
 	if arc == null:
 		scene.queue_free()
@@ -1065,12 +1106,14 @@ func _live_build_rate() -> void:
 	var foe: BattleUnit = scene.get("enemies")[0]
 	foe.max_hp = 999999
 	foe.hp = 999999
-	var explosion: Ability = arc.abilities[0]
-	# Harmonics: the free basic builds 2, not 1. res_cast_this_turn is forced
+	var explosion := _find(arc, "Arcane Explosion")
+	# Harmonics: Arcane Explosion — the free basic until GS, a free drafted card
+	# since — builds 2, not 1. res_cast_this_turn is forced
 	# true so Resonant Core cannot be mistaken for this.
 	arc.second_resource = 0
 	arc.res_cast_this_turn = true
-	await scene.call("_resolve", arc, explosion, foe, "good")
+	if explosion != null:
+		await scene.call("_resolve", arc, explosion, foe, "good")
 	ok(arc.second_resource == 2,
 		"HARMONICS: Arcane Explosion builds 2 (got %d)" % arc.second_resource)
 	scene.queue_free()
@@ -1155,8 +1198,10 @@ func _live_entropy() -> void:
 	await process_frame
 	# Perfect Conversion: ALL recoil is paid as Mana. Cannon recoils 15%, so a
 	# capstone Arcanist takes a full-Mana Cannon and loses no health at all.
+	# BATCH GS — Cannon is drafted off his shelf now, so the lineage's cards are
+	# seated (without it the cast below threw and the Mana half read red).
 	var pc := await _spawn({"ar_timelord": 1}, ["raider"],
-		["berserker", "arcanist", "inquisitor", "beastmaster"])
+		["berserker", "arcanist", "inquisitor", "beastmaster"], "fight", [], true)
 	var a3 := _arc(pc)
 	if a3 != null:
 		ok(a3.perfect_conversion == 1, "Perfect Conversion landed as a capstone")

@@ -4,7 +4,8 @@
 #       --script test_batch_ak.gd
 #
 # What it pins, and why each one is here rather than left to a playtest:
-#   1. THE KIT CORRECTION — Guard Change is back in the opening three and
+#   1. THE KIT CORRECTION — Guard Change went back in the opening three (BATCH
+#      GS moved it onto his draft shelf; the live half seats it drafted) and
 #      Shatterpoint is earnable, with EXACTLY ONE definition of each. The
 #      whole batch rests on the Swordmaster being able to change stance;
 #      a silent regression here turns a quarter of the tree inert again,
@@ -293,12 +294,19 @@ func _applied_live(earned: Array = [], abilities: Array = []) -> Dictionary:
 # ---------- 1. the kit correction ----------
 
 func _kit_correction() -> void:
+	# BATCH GS — `spec_abilities` IS HIS DEFINITION TABLE NOW, NOT HIS OPENING KIT.
+	# His engine carries no enabler, so a Swordmaster opens with Strike and the
+	# class kit; Pommel Strike rides that kit and Overpower and Guard Change are
+	# drafted off his shelf. The three are still defined here and ONCE, which is
+	# what this section pins, so each check now also asks where its card lives.
 	var kit := _ability_names(Classes.spec_abilities("swordmaster"))
-	ok(kit.size() == 3, "the Swordmaster still opens with exactly 3 spec abilities (has %d)" % kit.size())
-	ok(kit.has("Overpower"), "Overpower is in the opening three")
-	ok(kit.has("Pommel Strike"), "Pommel Strike is in the opening three")
-	ok(kit.has("Guard Change"),
-		"GUARD CHANGE IS BACK IN THE OPENING THREE — the only stance swap in the game")
+	ok(kit.size() == 3, "the Swordmaster still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())
+	ok(kit.has("Overpower") and Classes.spec_draft_pool("swordmaster").has("Overpower"),
+		"Overpower is one of his three, drafted off his shelf since GS")
+	ok(kit.has("Pommel Strike") and Classes.class_kit_holds("warrior", "Pommel Strike"),
+		"Pommel Strike is one of his three, and the Warrior class kit's since GS")
+	ok(kit.has("Guard Change") and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"GUARD CHANGE IS ONE OF HIS THREE — his unconditional stance swap, drafted off his shelf since GS")
 	ok(not kit.has("Shatterpoint"), "Shatterpoint left the opening three")
 
 	var pool: Array = Classes.spec_pool("swordmaster")
@@ -472,7 +480,7 @@ func _node_values() -> void:
 # of the one tree, and each says so where it stands.
 func _member(learned: Dictionary, earned: Array = []) -> Dictionary:
 	# BATCH GK — a Swordmaster holding his engine rune, as class selection hands
-	# it: Guard Change is Stances' enabler and travels with it (the charter).
+	# it. (BATCH GS: that rune carries no enabler now — Guard Change is drafted.)
 	return {"key": "warrior", "spec": "swordmaster", "talents": learned,
 		"engines": Runes.engine_pouch_for_spec("swordmaster"),
 		"tree": _retired_tree(),
@@ -528,14 +536,20 @@ func _conditional_halves() -> void:
 		"an un-upgraded Swordmaster does not own Shatterpoint")
 	ok(Talents.owns_ability(_member({}, ["Shatterpoint"]), "Shatterpoint"),
 		"...and owns it once it is earned")
-	ok(Talents.owns_ability(_member({}), "Guard Change"),
-		"every Swordmaster owns Guard Change from the start (the §1 guarantee)")
-	# BATCH GK — THE GUARANTEE IS THE ENGINE'S NOW: the enabler leaves with the
-	# engine rune (the charter), so a Swordmaster who dropped it lacks the card.
-	var dropped := _member({})
+	# BATCH GS — RE-POINTED: THE §1 GUARANTEE IS GONE. Guard Change travelled with
+	# Seasoned Fighter until GS; the engine brings no enabler now (every battle
+	# opens Aggressive, which pays from the first blow) and the card is on his
+	# shelf. So the rune alone does NOT give it, and a DRAFTED copy is earned and
+	# stays when the rune is dropped — the pair asks who owns the card, as before.
+	ok(not Talents.owns_ability(_member({}), "Guard Change"),
+		"a Swordmaster holding his engine rune does NOT own Guard Change until he drafts it (GS)")
+	# BATCH GK — THE GUARANTEE WAS THE ENGINE'S: the enabler left with the engine
+	# rune (the charter). BATCH GS: nothing travels with this rune, and a drafted
+	# card is never lost with an engine, so the dropped-rune case now holds one.
+	var dropped := _member({}, ["Guard Change"])
 	dropped["engines"] = []
-	ok(not Talents.owns_ability(dropped, "Guard Change"),
-		"...and a Swordmaster who has dropped his engine rune does not — the enabler left with it (GK)")
+	ok(Talents.owns_ability(dropped, "Guard Change"),
+		"...and a DRAFTED Guard Change stays when he drops his engine rune — earned, not an enabler (GS)")
 
 	# --- Off Balance: the cross-row condition on has_node.
 	var solo := _applied({"sm_guarded": 1})
@@ -690,9 +704,14 @@ func _no_rune_regression() -> void:
 # (Punishment) carried — each node is deleted, each field and its read site
 # stand. With nothing learned the inline tree pays nothing, which is what the
 # live tree pays a Swordmaster with nothing learned.
+# BATCH GS — THE LIVE HALF DRIVES OVERPOWER AND GUARD CHANGE, and no Swordmaster
+# opens with either since GS §1: both are on his shelf. `lineage_cards` seats
+# them as DRAFTED cards, the way a player now gets them (after the class kit on
+# his bar, so every read below finds its card BY NAME). A `prep` that writes
+# `bm_abilities` replaces them, which is what Execute's and Lunge's boards want.
 func _spawn(specs: Array, lineup: Array, prep := Callable()) -> Node:
 	return await Fixture.spawn(self, specs, {"enemies": lineup, "prep": prep,
-		"patch": {0: {"tree": _retired_tree()}}})
+		"patch": {0: {"tree": _retired_tree()}}, "lineage_cards": true})
 
 
 func _sm(scene: Node) -> BattleUnit:
@@ -718,14 +737,24 @@ func _live_guard_change() -> void:
 	var sm := _sm(plain)
 	ok(sm != null, "the Swordmaster spawned")
 	if sm != null:
+		# BATCH GS — a DRAFTED Guard Change (the fixture seats it): the card every
+		# check below drives has to be on his bar from turn one.
 		ok(_find(sm, "Guard Change") != null,
 			"LIVE: Guard Change is on his bar from turn one")
 		ok(_find(sm, "Shatterpoint") == null,
 			"LIVE: Shatterpoint is not, until he earns it")
-		# BATCH GN — and the Warrior class kit's three, none of them his lineage's.
-		ok(sm.abilities.size() == 4 + Classes.kit_slots("warrior", "swordmaster")
+		# BATCH GN — and the Warrior class kit's three (BATCH GS: Pommel Strike, his
+		# lineage's definition, is one of them now; Bloodlust left the kit).
+		# BATCH GS — RE-POINTED: "3 spec abilities" is gone. He opens with what
+		# `Classes.opening_kit` builds for the engines he holds (Strike and the class
+		# kit — Seasoned Fighter carries no enabler), and his lineage's other two
+		# cards sit on the bar as the DRAFTED cards the fixture wrote, each once.
+		var gs_drafted: Array = root.get_node("/root/Run").party[0].get("bm_abilities", [])
+		ok(sm.abilities.size() == Classes.opening_kit("warrior", "swordmaster",
+					sm.engines).size() + gs_drafted.size()
 				and _find(sm, "Crushing Blow") != null,
-			"LIVE: core attack + 3 spec abilities + the 3-card class kit (has %d)" % sm.abilities.size())
+			"LIVE: core attack + the 3-card class kit + his %d drafted lineage cards (has %d)" % [
+				gs_drafted.size(), sm.abilities.size()])
 		var foes: Array = plain.get("enemies")
 		for e in foes:
 			e.pressure = 0
@@ -822,6 +851,10 @@ func _live_guard_change() -> void:
 # ---------- 9. a parry answers with Overpower, once ----------
 
 func _live_parry() -> void:
+	# BATCH GS — THE COUNTER IS THE OVERPOWER HE HOLDS: the parry hook looks the
+	# card up on his bar (`_find_ability`) and answers with nothing without it.
+	# Overpower is drafted off his shelf since GS, so `_spawn` seats it; the
+	# question — a parry answered once, with Overpower — is unchanged.
 	for node_id in ["sm_riposte", "sm_opportunist"]:
 		var prep := func(run):
 			run.party[0]["talents"] = {node_id: 1}

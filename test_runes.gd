@@ -9,6 +9,10 @@
 #       --script res://_scratch/test_runes.gd
 extends SceneTree
 
+# BATCH GS — the one derivation of the cards a lineage opened with until GS
+# (`lineage_cards`); `_eligibility` seats them as drafted, as the fixtures do.
+const GateFixture = preload("res://gate_fixture.gd")
+
 var checks := 0
 var fails: Array = []
 
@@ -190,6 +194,9 @@ func _requires_ability(data: Dictionary) -> void:
 # names an ability its class cannot reach.
 func _reachable(entry: Dictionary, ability_name: String) -> bool:
 	var scope := String(entry.get("scope", "universal"))
+	# BATCH GS — the draft door below is `Run`'s, fetched at runtime (a --script
+	# harness cannot name an autoload).
+	var run: Node = get_root().get_node("/root/Run")
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			if scope.begins_with("class:") and scope.trim_prefix("class:") != String(key):
@@ -201,6 +208,14 @@ func _reachable(entry: Dictionary, ability_name: String) -> bool:
 			var member := {"key": key, "spec": spec, "runes": [],
 				"engines": Runes.engine_pouch_for_spec(spec)}
 			if Runes.kit_names(member).has(ability_name):
+				return true
+			# BATCH GS — WHAT HE CAN DRAFT IS HIS DERIVABLE KIT TOO. GS moved every
+			# card a lineage opened with but its enablers onto that lineage's shelf of
+			# the class pool (`Classes.draft_pool`), so the opening kit alone no longer
+			# reaches Hack and Slash, Ice Lance or Arcane Barrage. A hero holds such a
+			# card once he drafts it, and what he can be offered is `draft_pool_left`:
+			# his class pool through the engine gate — the one door the draft reads.
+			if run.draft_pool_left(member).has(ability_name):
 				return true
 	return false
 
@@ -308,7 +323,17 @@ func _eligibility(data: Dictionary) -> void:
 			# `runes.json` and simply never offered. **The property is asserted
 			# in BOTH directions rather than exempted**, because a one-armed
 			# version would go green on the day the whole file stopped rolling.
-			var mine := {"key": owner_key, "spec": spec, "runes": []}
+			# BATCH GS — THE MEMBER HOLDS HIS LINEAGE'S RETURNED CARDS, DRAFTED, AND
+			# IT IS WHAT KEEPS THE THIRD ARM BELOW TWO-WAY. GS put every card a
+			# lineage opened with but its enablers on its shelf, so a member who has
+			# drafted nothing owns no card a live `requires_ability` names: every
+			# requiring rune fell into the refusal half and "must still roll" asked
+			# it of none. Seated as the fixtures' `lineage_cards` option seats a
+			# lineage (one derivation), a requiring rune naming one of those cards
+			# must roll (GS: offered once the card is held) and one naming anything
+			# else he does not hold must not.
+			var mine := {"key": owner_key, "spec": spec, "runes": [],
+				"bm_abilities": GateFixture.lineage_cards(spec)}
 			var rolls: bool = Runes.eligible_ids(mine, []).has(id)
 			# BATCH EZ — THE THIRD ARM, AND IT IS `requires_ability` DOING ITS
 			# JOB RATHER THAN AN EXEMPTION. This member has drafted nothing, so
@@ -316,14 +341,19 @@ func _eligibility(data: Dictionary) -> void:
 			# spec abilities plus the overrides — correctly does not roll for
 			# him. **Ambush requires Called Volley, which is a DRAFT card**, and
 			# the alternative to this arm is a rune that applies silently and
-			# does NOTHING for a hero who was offered it.
+			# does NOTHING for a hero who was offered it. (BATCH GS: he has drafted
+			# his lineage's returned cards and nothing else, and his derivable kit
+			# is his class basic and class kit plus those — Called Volley is still
+			# outside it.)
 			#
 			# **THE ARM IS TWO-WAY, WHICH IS WHAT KEEPS IT FROM BEING A SKIP.**
 			# A rune whose requirement the bare member DOES satisfy must still
 			# roll (Split Tongue, Open Wound and the Split Shield all name core
 			# kit and are asserted to roll), and one whose requirement it does
 			# not must not — so a `requires_ability` pointing at a name nothing
-			# resolves still turns this red.
+			# resolves still turns this red. (BATCH GS: Split Tongue is retired;
+			# Open Wound and the Split Shield name cards he DRAFTED, and are among
+			# the requiring runes asserted to roll now.)
 			var needs := String(Runes.config(id).get("requires_ability", ""))
 			# **THE SAME DOOR `eligible_ids` ITSELF USES.** A second reading of
 			# "does he own it" would be a second answer to the question the

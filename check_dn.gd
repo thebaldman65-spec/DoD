@@ -297,13 +297,14 @@ func _initialize() -> void:
 		# a core name through `_find` returns the BASE class ability instead of
 		# the spec's overridden one (the Occultist's Shadowrend is the cleric's
 		# Smite slot, re-made), and that under-reports the core every time.
+		# BATCH GS §1 — `apply_kit_overrides` is deleted and `protected_names`
+		# reads the ONE kit builder now: `Classes.opening_kit` with the lineage's
+		# own engine held — the class basic (no lineage replaces it any more), the
+		# engine's enablers and the class kit. The core is read off that builder,
+		# as Abilities, so it is still the core as the hero holds it.
 		var core_abs: Array = []
-		var cfg := {"abilities": Classes.kit(ck)}
-		Classes.apply_kit_overrides(cfg, spec)
-		for ab0 in cfg["abilities"]:
+		for ab0 in Classes.opening_kit(ck, spec, [Classes.engine_of_spec(spec)]):
 			core_abs.append(ab0)
-		for ab1 in Classes.spec_abilities(spec):
-			core_abs.append(ab1)
 		for b in buckets:
 			var got: Array = []
 			var objs: Array = []
