@@ -26,8 +26,9 @@
 #
 # ── WHY §0 PINS A TABLE ──────────────────────────────────────────────────────
 # **WHICH CARD TRAVELS IS CONTENT.** Three rows are the designer's (the Berserker's
-# Bloodlust, the Pyromancer's Flamewave, the Beastmaster's summons) and three are
-# the batch's derivation, PROPOSED until ruled. A table that moved without a line
+# Bloodlust, the Pyromancer's Flamewave, the Beastmaster's summons) and three were
+# the batch's derivation, PROPOSED until the designer ruled them at GT (they stand).
+# A table that moved without a line
 # changing here would be a ruling nobody took, so the gate carries its own copy of
 # `MINIMUM` on purpose — the one place a second copy is the point — and the
 # derivation of what a rune ADDS is off the kit builder a fight reads, never off
@@ -63,9 +64,9 @@ const MINIMUM := {
 	"bloodrage": ["Bloodlust"],                                  # ruled
 	"overburn": ["Flamewave"],                                   # ruled
 	"pack": ["Summon Ursus", "Summon Canis", "Summon Aguila"],   # ruled
-	"permafrost": ["Razor Ice"],                                 # PROPOSED
-	"conviction": ["Divine Shield"],                             # PROPOSED
-	"old_gods": ["Hex of Ruin"],                                 # PROPOSED
+	"permafrost": ["Razor Ice"],                                 # ruled at GT
+	"conviction": ["Divine Shield"],                             # ruled at GT
+	"old_gods": ["Hex of Ruin"],                                 # ruled at GT
 }
 const WARRIOR_KIT := ["Crushing Blow", "Pommel Strike", "Mocking Blow"]
 

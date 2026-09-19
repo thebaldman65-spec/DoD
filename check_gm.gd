@@ -261,12 +261,20 @@ func _s2_bound_cards() -> void:
 	# BATCH GS — THE TABLE IS `ENGINE_READ` NOW, AND ITS GATE IS THE OFFER, so the
 	# cards a lineage opened with until GS are seated as a player now gets them —
 	# DRAFTED (`lineage_cards`) — and asked both ways at the door. With no engine
-	# every one stays on the bar (a drafted card never leaves with an engine), the
+	# every one stays the hero's (a drafted card never leaves with an engine), the
 	# rows are refused, and every other card casts on a board holding what no
 	# engine is needed for — Kill Command's companion among it, which an earned
 	# Call the Wilds calls with no engine ((c)). With the engine held, the rows
 	# open. And each hero's live bar is the one builder's kit and his drafted
 	# cards: nothing of the lineage without its engine, its enablers with it.
+	#
+	# **BATCH GT §3 — A ROW THE DOOR REFUSES ON EVERY BOARD NOW SITS OUT (ruled).**
+	# GS left the three on the bar, dark; GT's ruling takes a card that cannot be
+	# cast without its engine out of the fight while the engine is gone and keeps
+	# it the hero's. So the bar is the kit and the drafted cards LESS what sits out
+	# for the engines he holds (`Classes.sits_out`), and each of the three is
+	# asserted kept, off the bar, and still refused by the door — the reason it
+	# sits out — rather than on the bar and refused.
 	for with_engine in [false, true]:
 		var checked := 0
 		for seats in LINEAGE_SEATS:
@@ -282,9 +290,10 @@ func _s2_bound_cards() -> void:
 			var H: Array = s.get("heroes")
 			for i0 in 4:
 				var spec0 := String(seats[i0])
+				var held0: Array = [Classes.engine_of_spec(spec0)] if with_engine else []
 				var want0: Array = _kit_names(Classes.opening_kit(Classes.class_of_spec(spec0), spec0,
-					[Classes.engine_of_spec(spec0)] if with_engine else [])) \
-					+ Array(run.party[i0]["bm_abilities"])
+					held0)) + Array(run.party[i0]["bm_abilities"]).filter(
+						func(nm): return not Classes.sits_out(String(nm), held0))
 				ok(_names(H[i0]) == want0,
 					"§2: %s %s: the bar is the builder's kit and the drafted cards, no more (%s)" % [
 						spec0, "with the engine" if with_engine else "with no engine", str(_names(H[i0]))])
@@ -305,6 +314,14 @@ func _s2_bound_cards() -> void:
 						ok(usable and _names(u).has(String(n)),
 							"§2: with the engine held, %s's %s is on the bar and castable on this board"
 								% [spec, n])
+					elif Classes.sits_out(String(n), []):
+						var fresh: Ability = Classes.pool_ability(String(n))
+						var refused := false
+						if fresh != null:
+							refused = not (await _usable_on_open_board(s, u, fresh))
+						ok(ab == null and Array(run.party[i]["bm_abilities"]).has(String(n)) and refused,
+							"§2: with no engine, %s's %s sits out — kept, off the bar, and refused by the door (GT §3): it reads %s"
+								% [spec, n, reads])
 					elif reads != "":
 						ok(ab != null and not usable,
 							"§2: with no engine, %s's %s stays on the bar — drafted — and the door refuses it: it reads %s"

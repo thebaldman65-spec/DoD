@@ -15,6 +15,43 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-19 &mdash; Batch GT: THE POUCH NEVER TRAPS THE PLAYER, THREE CARDS AT THE BASELINE, AND A CARD THAT SITS OUT</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-SIXTH BATCH ON <code>class-merge</code>.</b> A softlock, a pricing inversion and a
+dead card, each ruled by the designer. <code>main</code> is untouched. Full working: <code>docs/reports/GT.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE RUNE POUCH'S CLOSE BUTTON NEVER MOVES.</b> It was the only way out of the pouch, and it sat at
+the foot of a stack that grew with every engine rule in it: <b>below the screen for four engine runes held alone, for
+every one of the sixty pairs of one class's engines, and for every class's six</b> &mdash; a hero slots two engine
+runes but can hold all six, and the pouch lists every one. The rules now sit in one list that scrolls, above a Close
+button that no text can move, and the panel is wide enough that even six rules fit without scrolling. <b>The Peddler
+had the same fault</b>: its offers were laid a fixed distance apart whatever their text, so with the longest engine
+rules all four Buy buttons were unusable &mdash; three drawn under the next hero's offer and one below the screen.
+The offers now stack at their own heights in one scrolling column that ends above the Leave button. Nothing was
+shrunk or cut.</p>
+
+<p><b>&sect;2 &mdash; FIREBALL, FROSTBOLT AND AIMED SHOT ARE PRICED AT THE BASELINE.</b> Each was cheaper and quicker to
+come back than the kit card beside it at the same initiative, which is the one shape a drafted card must not have.
+Each now costs what that kit card costs and has its cooldown: <b>Fireball and Frostbolt 15 Mana and cooldown 2</b>
+(Magic Missiles'), from free with no cooldown; <b>Aimed Shot 25 Mana and cooldown 2</b> (Powershot's), from 20 and
+1. Nothing else about them moved. The first two moves are large because both cards were free basic attacks until
+the last batch. Every other card that came back at GS was swept for the same shape; none has it the way these did,
+and the near cases are reported for a ruling.</p>
+
+<p><b>&sect;3 &mdash; A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE.</b> Drop the Rune
+of the Arcanist and a drafted Death Ray used to stay on the bar, dark for the whole fight. Now it sits out of every
+fight until the rune is equipped again, and then it is back &mdash; <b>kept, still carried and still counted in the
+ability slots</b>; benching it frees the slot. Seventeen cards work this way, found by asking the game which cards it
+refuses on every board to a hero without their engine. The hero sheet shows such a card greyed as sitting out, and
+the map's Kit panel says which rune brings it back. Battle Poise's free Guard Change and Shatterpoint's free Overpower
+are a different case &mdash; both cards work without an engine and only a second clause needs another card &mdash; and
+are reported for a ruling.</p>
+
+<p><b>&sect;4 &mdash; A NEW GATE.</b> <code>check_gt</code> opens the pouch with every engine alone, every pair and every
+class's six, and presses Close in each; buys every Peddler offer through its own button on three deals; asks the game
+which of the 204 cards a hero can earn it refuses without an engine, and checks each answer against the ruled list;
+drops and re-equips each engine through the pouch's own door; and checks the three new prices. The unmodified
+battery ran against the new tree first.</p>
+
 <h2>2026-09-18 &mdash; Batch GS: AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-FIFTH BATCH ON <code>class-merge</code>.</b> The designer met the enabler
 rule in play and narrowed it. GK sent every card an engine needed with it, and a hero who took a rune at class

@@ -4,6 +4,13 @@ extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
+# BATCH GT §1 — the rune column's bounds. It starts where it always did (x 620,
+# clear of the Sell buttons that end at 604), runs to the screen's right margin,
+# and ends above the Leave button at y 640; a panel leaves the scrollbar room.
+const RUNE_COLUMN_W := 640
+const RUNE_COLUMN_BOTTOM := 632
+const RUNE_PANEL_W := 620
+
 # BATCH CT: the prices and the sell fraction moved to `Run`, beside ITEM_INFO
 # and the stack caps — §6's "single place these numbers are written" covers a
 # price as much as a heal. `run_sim.gd` kept a hand-copied mirror of the table
@@ -214,14 +221,35 @@ func _draw_screen() -> void:
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(620, 130)
 	add_child(rune_header)
+	# ══ BATCH GT §1 — THE OFFERS STACK, THE COLUMN SCROLLS, LEAVE STAYS PUT ═══
+	#
+	# **THE POUCH'S DEFECT ON A SECOND SURFACE, AND THE SAME FIX.** The offers
+	# were laid 130 pixels apart whatever their text, and an engine rune's rule
+	# runs far past that: with each hero offered his class's longest rule, the
+	# first three Buy buttons were drawn UNDER the next hero's panel and the
+	# fourth below the screen — none of the four could be bought — and with the
+	# shortest, one of four was covered. The cause is the pouch's (a stack whose
+	# height is its text, laid at fixed positions), and so is the fix: the offers
+	# stack at their own heights inside ONE bounded scroller that ends above the
+	# Leave button, and Leave stays where it always was, outside the scroller.
+	# The column is wider than it was (to the screen's right margin), which is
+	# what lets four ordinary offers — every seat's longest — fit unscrolled.
+	# Nothing was shrunk or cut; `docs/reports/GT.md` §1 has the measurements.
+	var rune_scroll := ScrollContainer.new()
+	rune_scroll.position = Vector2(620, 162)
+	rune_scroll.size = Vector2(RUNE_COLUMN_W, RUNE_COLUMN_BOTTOM - 162)
+	rune_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(rune_scroll)
+	var rune_list := VBoxContainer.new()
+	rune_list.add_theme_constant_override("separation", 10)
+	rune_scroll.add_child(rune_list)
 	for i in offers.size():
 		var offer: Dictionary = offers[i]
 		var member: Dictionary = Run.party[offer["member_idx"]]
 		var rune: Dictionary = offer["rune"]
 		var panel := PanelContainer.new()
-		panel.position = Vector2(620, 162 + i * 130)
-		panel.custom_minimum_size = Vector2(520, 118)
-		add_child(panel)
+		panel.custom_minimum_size = Vector2(RUNE_PANEL_W, 0)
+		rune_list.add_child(panel)
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 6)
 		panel.add_child(vbox)
@@ -268,10 +296,10 @@ func _draw_screen() -> void:
 				_hero_label(mi), Runes.empty_offer_reason(Run.party[mi])]
 			spent_label.add_theme_font_size_override("font_size", 14)
 			spent_label.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
-			spent_label.position = Vector2(620, 168 + offers.size() * 130 + si * 44)
-			spent_label.size = Vector2(520, 42)
+			# GT §1 — in the column's own stack, under the offers.
+			spent_label.custom_minimum_size = Vector2(RUNE_PANEL_W, 0)
 			spent_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			add_child(spent_label)
+			rune_list.add_child(spent_label)
 
 	var leave := Button.new()
 	leave.text = "Leave the Shop"

@@ -4,6 +4,55 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The pouch never traps the player, three cards at the baseline, and a card that sits out (Batch GT) — 2026-09-19
+
+**Why the pouch's Close is pinned rather than the text made shorter.** The rule text is the engine's own words, the
+same the class-selection card shows, and shrinking or cutting it would hide what the rune does on the screen where
+the player decides to drop it. The fault was the shape — a stack whose height was its text, with the only way out
+at its foot — so the shape is what changed: the text lives in one scroller, and Close sits below it where no text
+can reach. The panel was made wide enough that every combination a hero can hold, up to his class's six engine
+runes, fits without scrolling; scrolling is only the fallback for a long pouch of ordinary runes.
+
+**Why pairs, and then six.** A hero slots two engine runes but can hold all six of his class's — a rune he buys
+past two is kept in the pouch — and the pouch lists every one with its rule. Measuring the one engine a hero opens
+with would have missed every case that trapped the most players.
+
+**Why the Peddler got the same fix.** Its offers were laid at a fixed pitch whatever their text, so a long rule ran
+under the next hero's panel and took its Buy button with it. Same cause, same cure: the offers stack at their own
+heights in one scroller that ends above Leave, and Leave stays where it was.
+
+**Why the baseline is the price of the kit card each one undercut.** EB ruled that the protected core is the
+baseline and a drafted card pays for the slot it takes. Fireball, Frostbolt and Aimed Shot were cheaper AND quicker
+to come back than the kit card beside them, at the same initiative in the same role, which is the one shape EB
+said a drafted card must never have. Taking that card's cost and cooldown is the baseline read off the game rather
+than a number picked for it, and it moves nothing else — damage, Break damage, initiative, the status and the
+Perfect stay what they were.
+
+**Why Fireball's and Frostbolt's move is large.** They were basic attacks until GS, and a basic attack is free by
+construction; GS put them in the draft as they stood. So the size of the move measures the change of job the merge
+gave them, not a price that was wrong before it. Aimed Shot, which was always a costed card, moves by five Mana and
+one turn of cooldown.
+
+**Why a card sits out rather than leaving.** A drafted card is something the player spent an offer on, and an earned
+card is never lost. A card the game will never let him cast without its engine is not useful in hand, but it is his:
+so it steps out of the fight while the engine is gone and steps back the moment the engine is equipped again, with
+nothing written anywhere but the engine's own slot.
+
+**Why its slot stays counted.** A card that sits out is still carried. Freeing its slot would let the player fill
+it, and then the engine's return would leave a kit over its cap with no good answer; keeping the slot means the
+return is always clean, and benching the card is already the free, reversible way to take the slot back.
+
+**Why the seventeen were found by asking the game.** A card's text and its fields say what it does, not whether the
+game will let it be cast; the only reliable answer is the usability check itself, asked with no engine on a board
+dressed to allow everything an engine does not give. Ten more cards are refused on a bare board but open with
+another card or a board state — a drafted Guard Change, a heal landed, a low enemy, a companion from Call the Wilds
+— and a card the player can open without the engine must always fight.
+
+**Why Battle Poise and Shatterpoint are a separate case.** Both are cards, and both cast and do their main work with
+no engine at all; only a second clause — a free Guard Change, a free Overpower — needs the hero to own another card.
+That is a card that half-works, the shape GM left alone, not a card that cannot be cast; making the free cast work
+without owning the card would change what the card gives, which is the designer's to decide.
+
 ## An engine brings only what it cannot run without (Batch GS) — 2026-09-18
 
 **Why the rule narrowed.** GK sent every card an engine "needed" with it, and a hero who took a rune at class

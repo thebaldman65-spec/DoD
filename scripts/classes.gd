@@ -794,6 +794,70 @@ static func offerable(names: Array, engines: Array) -> Array:
 		return e == "" or engines.has(e))
 
 
+# ══ BATCH GT §3 — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE
+#                 THE ENGINE IS GONE, AND RETURNS WHEN IT COMES BACK (ruled) ══
+#
+# **`ENGINE_READ` GATES THE OFFER; THIS GATES THE SEAT.** A card earned while its
+# engine was held is the hero's for the run (EG: an earned card is never lost),
+# and since GK an engine can be dropped. A card the usability door refuses on
+# EVERY board without its engine is then a card he holds and can never cast —
+# GL's dead button, back for the drafted copy. GM §2 ruled the shape for an
+# engine's own cards (they left with it and came back when it was slotted); GT
+# rules the same for an EARNED one, and it **must not destroy it**: the card
+# stays in `bm_abilities` and, if carried, in `bm_equipped`, and the next fight
+# simply does not seat it while none of the hero's slotted engines is its own.
+# `Run.seated_ability_names` is the one door that asks.
+#
+# **THE POPULATION WAS DERIVED BY DRIVING THE DOOR, NOT BY READING `why`
+# STRINGS.** Every card a hero of the class can earn — the class draft pool and
+# every lineage's zone-boss pool, 204 cards — was asked `_ability_usable` on a
+# hero holding NO engine, on a board dressed to allow everything an engine does
+# not give. Twenty-seven were refused; TEN OF THOSE OPEN WITH NO ENGINE AT ALL
+# and are NOT rows: Battle Poise and Counter Time (a drafted Guard Change turns
+# the guard Defensive), Reprisal (a heal landed first), Execute (a target under
+# 20% health, or Broken), and Kill Command, Twin Hunt, Savage Sweep, Ghostpack,
+# Bestial Wrath and Spirit Bond (a companion from an earned Call the Wilds) —
+# conditional on a card or a board, never on an engine. The other seventeen are
+# below, each opened by its engine held (`check_gt` §3 drives both arms).
+# **Two are zone-boss cards `ENGINE_READ` never swept** (Stabilize, Primal
+# Surge); the other fifteen are rows there too, and the engines must agree.
+#
+# **THE SLOT STAYS COUNTED**, as GM §2 left a dropped bound card's: a card that
+# sits out is still CARRIED, so `Run.ability_slots_used` counts it. Benching it
+# is the player's door to free the slot, and it is free and reversible (EG).
+const SITS_OUT := {
+	"Winter's Toll": {"engine": "permafrost", "why": "bills a Glacial Hold; only a holder of the engine can hold one"},
+	"Rimebinding": {"engine": "permafrost", "why": "copies a Glacial Hold; only a holder of the engine can hold one"},
+	"Cryoclasm": {"engine": "permafrost", "why": "moves a Glacial Hold; only a holder of the engine can hold one"},
+	"Shatter": {"engine": "permafrost", "why": "releases every Glacial Hold; only a holder of the engine can hold one"},
+	"Arcane Bolt": {"engine": "resonance", "why": "priced per Resonance stack; only the engine installs the meter"},
+	"Unmaking": {"engine": "resonance", "why": "priced per Resonance stack; only the engine installs the meter"},
+	"Death Ray": {"engine": "resonance", "why": "refused below 8 Resonance; only the engine installs the meter"},
+	"Stabilize": {"engine": "resonance", "why": "vents Resonance above 2; only the engine installs the meter"},
+	"Divine Plea": {"engine": "mercy", "why": "costs 2 Mercy; only the engine installs the meter"},
+	"Hymn of Hope": {"engine": "mercy", "why": "costs 1 Mercy; only the engine installs the meter"},
+	"Resurrection": {"engine": "mercy", "why": "costs 1 Mercy; only the engine installs the meter"},
+	"Blessing of the Faithful": {"engine": "conviction", "why": "spends 3 Faith; no Faith is gained without the engine"},
+	"Aegis Reversal": {"engine": "conviction", "why": "spends a divine barrier; only the engine's Divine Shield lays one"},
+	"Transference": {"engine": "old_gods", "why": "moves a Ruin mark; no Ruin is laid without the engine"},
+	"Requiem": {"engine": "old_gods", "why": "consumes a Ruin mark; no Ruin is laid without the engine"},
+	"Unleash": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
+	"Primal Surge": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
+}
+
+
+# The engine a card cannot be cast without, or "". THE ONE ANSWER.
+static func sits_out_engine(card_name: String) -> String:
+	return String(SITS_OUT.get(card_name, {}).get("engine", ""))
+
+
+# Whether a hero whose slotted engines are `engines` leaves `card_name` out of
+# his next fight.
+static func sits_out(card_name: String, engines: Array) -> bool:
+	var e := sits_out_engine(card_name)
+	return e != "" and not engines.has(e)
+
+
 # ---------- THE PROTECTED CORE (Batch BO §2) ----------
 #
 # EVERY SPEC KEEPS A PROTECTED CORE: its passive, its basic attack, and the
@@ -825,9 +889,10 @@ static func offerable(names: Array, engines: Array) -> Array:
 # the class kit every hero holds, does the engine pay anything at all?** Where
 # the answer is no, ONE card travels — the one that produces what the engine
 # reads — and where several would each do, which one is the batch's derivation
-# and is PROPOSED (`docs/reports/GS.md` §1). Three were the designer's: Bloodlust
-# for the Berserker, Flamewave for the Pyromancer, and the Beastmaster's three
-# summons, the stated exception.
+# and stands PROPOSED until the designer rules it (`docs/reports/GS.md` §1).
+# Three were the designer's from the start: Bloodlust for the Berserker,
+# Flamewave for the Pyromancer, and the Beastmaster's three summons, the stated
+# exception; GS's three derivations were ruled at GT and stand.
 #
 # TWO COLUMNS:
 # · `enablers` — the minimum. An EMPTY list is a real answer: the engine runs on
@@ -860,15 +925,15 @@ const PROTECTED_CORES := {
 	"pyromancer": {"slots": 1, "enablers": ["Flamewave"],
 		"why": "Overburn reads Burn standing on the field, and no Mage basic or kit card lays any. Flamewave lays it on every enemy (the designer's ruling)."},
 	"cryomancer": {"slots": 1, "enablers": ["Razor Ice"],
-		"why": "Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any. Razor Ice lays three on one target in one cast (PROPOSED, GS)."},
+		"why": "Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any. Razor Ice lays three on one target in one cast (derived at GS, ruled at GT)."},
 	"arcanist": {"slots": 0, "enablers": [],
 		"why": "Runaway Resonance builds on every damaging cast, and the Mage's own basic is one."},
 	"holy": {"slots": 0, "enablers": [],
 		"why": "Mercy is gained when an ally falls below half health and pays on every heal she casts, the kit's Ministration among them."},
 	"inquisitor": {"slots": 1, "enablers": ["Divine Shield"],
-		"why": "Conviction builds Faith when Divine Shield absorbs, which is what its own rule says, and no Cleric basic or kit card lays a divine shield (PROPOSED, GS)."},
+		"why": "Conviction builds Faith when Divine Shield absorbs, which is what its own rule says, and no Cleric basic or kit card lays a divine shield (derived at GS, ruled at GT)."},
 	"occultist": {"slots": 1, "enablers": ["Hex of Ruin"],
-		"why": "Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one. Hex of Ruin curses three at once (PROPOSED, GS)."},
+		"why": "Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one. Hex of Ruin curses three at once (derived at GS, ruled at GT)."},
 	# RULED (GS §1): the stated exception — "only the absolutely necessary, like
 	# the Beastmaster summons."
 	"beastmaster": {"slots": 1,
@@ -5916,10 +5981,22 @@ static func pending_talent_ability(display_name: String) -> Ability:
 # is DELETED with its last reader. **THE ENGINE BRINGS ONLY WHAT IT CANNOT RUN
 # WITHOUT** (the designer's ruling), and none of the four engines needs its
 # lineage's basic: every such hero opens on his class basic now. **THE FOUR CARDS
-# ARE NOT LOST** — each is on its lineage's shelf in `SPEC_DRAFT_POOLS`, a free
-# attack drafted beside the class basic, and its ONE definition is here, by name,
-# where `pool_ability` reads it. The definitions are byte-for-byte the ones the
-# override laid in slot 0.
+# ARE NOT LOST** — each is on its lineage's shelf in `SPEC_DRAFT_POOLS`, drafted
+# beside the class basic, and its ONE definition is here, by name, where
+# `pool_ability` reads it. GS left all four byte-for-byte the ones the override
+# laid in slot 0, which made each a FREE attack in the draft.
+#
+# **BATCH GT §2 — FIREBALL AND FROSTBOLT ARE PRICED AT THE BASELINE NOW (ruled).**
+# EB §1: the protected core is the baseline and a drafted card pays for the slot
+# it occupies. At 0 Mana and cooldown 0 both were cheaper AND shorter than the
+# kit card they sit beside at the same initiative in the same role — Magic
+# Missiles, 15 Mana, cooldown 2, initiative 2.0 — which is EB's inversion. Each
+# takes that card's cost and cooldown and nothing else: damage, Break damage,
+# initiative, the status and the Perfect are GS's. **The move is large because
+# the card changed jobs at GS**: a basic in slot 0 is free by construction, and
+# GS put it in the pool as it stood. Shadowrend and Arcane Explosion keep their
+# GS price — the ruling named three cards, and `docs/reports/GT.md` §2 reports
+# the shape they share.
 static func basic_override_ability(display_name: String) -> Ability:
 	match display_name:
 		"Shadowrend":
@@ -5931,15 +6008,15 @@ static func basic_override_ability(display_name: String) -> Ability:
 				"description": "A rending strike of gnawing shadow:\nCripples the target for 2 turns."})
 		"Fireball":
 			return Ability.make({"display_name": "Fireball",
-				"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
-				"delay": 2.0, "anim": "attack01",
+				"dmg_type": "fire", "cost": 15, "damage": 20, "pressure": 15,
+				"delay": 2.0, "cooldown": 2, "anim": "attack01",
 				"applies_status": {"id": "burn", "turns": 3},
 				"perfect_id": "", "perfect_text": "Deals {atk:25}",
 				"description": "A crackling bolt of flame: applies\n3 turns of Burn (reapplying extends\nthe burn)."})
 		"Frostbolt":
 			return Ability.make({"display_name": "Frostbolt",
-				"dmg_type": "frost", "cost": 0, "damage": 20, "pressure": 15,
-				"delay": 2.0, "anim": "attack01",
+				"dmg_type": "frost", "cost": 15, "damage": 20, "pressure": 15,
+				"delay": 2.0, "cooldown": 2, "anim": "attack01",
 				"applies_status": {"id": "chilled", "turns": 3},
 				"perfect_id": "", "perfect_text": "Deals {atk:25}",
 				"description": "A shard of biting cold: applies 1 stack\nof Chilled. Four stacks put the enemy in\nGlacial Hold — off the turn order until\nthe Cryomancer releases it."})
@@ -6407,8 +6484,13 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "The order depends on the companion —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion.\nThe Pack: BOTH companions obey."}),
 			]
 		"sharpshooter":
+			# BATCH GT §2 — AIMED SHOT IS PRICED AT THE BASELINE (ruled). Drafted
+			# since GS, it sat beside the Hunter kit's Powershot at the same
+			# initiative 3.0 in the same role, cheaper (20 Mana against 25) AND
+			# shorter (cooldown 1 against 2) — EB §1's inversion. It takes
+			# Powershot's cost and cooldown and nothing else moves.
 			return [
-				Ability.make({"display_name": "Aimed Shot", "cooldown": 1, "cost": 20, "damage": 45,
+				Ability.make({"display_name": "Aimed Shot", "cooldown": 2, "cost": 25, "damage": 45,
 					"pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "focus20", "perfect_text": "+20 Focus",
 					"description": "A perfect line. Patient, precise, final."}),

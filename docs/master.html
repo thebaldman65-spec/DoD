@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-18 (Batch GS &mdash; an engine brings only what it cannot run without)</b></p>
+<p align="right"><b>Last updated: 2026-09-19 (Batch GT &mdash; the pouch never traps the player, three cards at the baseline, and a card that sits out)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1191,7 +1191,20 @@ runes. An unequipped rune is kept, and its engine is out of the next fight. <b>A
 engine is a legal state</b>: his class basic and class kit, the abilities he has drafted and his
 runes still fight, and nothing an engine grants is there. A card he has drafted or earned is never
 lost when an engine is dropped. <b>A drop changes the next fight, never the one in
-progress.</b></li>
+progress.</b> The pouch lists every engine rune the hero holds &mdash; two slotted, any others kept
+&mdash; each with its engine's rule, above his other runes, in one list that scrolls; its
+<b>Close</b> button sits below that list, where no rule's length can move it.</li>
+<li><b>A card that cannot be cast without its engine sits out while the engine is gone.</b> Seventeen
+drafted or earned cards are refused on every board by a hero who does not hold their engine, and
+while none of his slotted engines is theirs they sit out of every fight and come back the moment it
+is equipped again: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Hold); Arcane Bolt,
+Unmaking, Death Ray and Stabilize (Runaway Resonance); Divine Plea, Hymn of Hope and Resurrection
+(Mercy); Blessing of the Faithful and Aegis Reversal (Conviction); Transference and Requiem (Wrath
+of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>A card that sits out is kept, still
+carried and still counted in the ability slots</b>; benching it on the map frees the slot. The hero
+sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says which rune brings it
+back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a Guard Change,
+Kill Command and the companion cards on an earned Call the Wilds &mdash; always fights.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
 either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
@@ -2032,9 +2045,9 @@ cashes in. The spec chip shows the bonus he is being paid right now and how many
 Burn are paying it.<br>
 <b>Ashes of Al'ar</b>, which every Mage can EARN from a zone boss, is his one self-revive,
 and it costs him a pick he could have spent on fire.<br>
-<i>Drafted (§6b):</i> <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0,
-no cd, applies 3 turns of Burn (Perfect: hits at 25% of Attack). It is free, so he can
-always light more — including when that is the wrong move.<br>
+<i>Drafted (§6b):</i> <b>Fireball</b> — 15 Mana, 20% Atk fire / 15 BD / 2.0,
+2cd, applies 3 turns of Burn (Perfect: hits at 25% of Attack) — priced as the class kit's Magic
+Missiles.<br>
 <i>Drafted (§6b):</i> Detonation — 25 Mana, 25% Atk fire / 20 BD / 3.0, 2cd; the NARROW release valve. CONSUMES
 one target's Burn, adding 250% of its remaining damage (tick × turns left × 2.5) to the hit
 before mitigation, and Overburn refunds a Mana for every turn eaten (Perfect: also applies
@@ -2075,8 +2088,9 @@ simultaneously denial and a damage window for every hero he opens and closes. <b
 resist Frozen until Broken, and a held boss releases on its own after one turn. The spine
 carries no cost clause: his cost is tempo — every turn spent building stacks is a turn not
 spent killing, and he can hold one enemy.<br>
-<i>Drafted (§6b):</i> <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
-1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
+<i>Drafted (§6b):</i> <b>Frostbolt</b> — 15 Mana, 20% Atk frost / 15 BD / 2.0, 2cd, applies
+1 stack of Chilled (Perfect: hits at 25% of Attack) — priced as the class kit's Magic
+Missiles.<br>
 <i>Travels with the rune (§6.0):</i> Razor Ice — 25 Mana, 15% Atk frost / 10 BD / 2.5, 3cd; THREE shards driven into a SINGLE
 chosen target, every shard applying a stack of Chilled (Perfect: hits at 25% of
 Attack).<br>
@@ -2356,7 +2370,7 @@ Broken target and a talent are added &mdash; and both conversions pay him on the
 50 Focus he holds, capped at four, resolved with partial credit and paid in Focus &mdash; 8 a
 landed press, plus 20 more for a full sequence. <b>His basic attack only; no other ability of
 his changes.</b><br>
-<i>Drafted (§6b):</i> Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
+<i>Drafted (§6b):</i> Aimed Shot — 25 Mana, 45 dmg / 15 BD / 3.0, 2cd (Perfect: +20 Focus) — priced as the class kit's Powershot.<br>
 <i>Class kit (§5.2):</i> Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
 Break bar already FULL — allies break them, the marksman ends them.<br>
 <i>Drafted (§6b):</i> Hold Breath — 15 Mana, 1.5, 3cd (no skill check): +40 Focus, and the next attack is a
@@ -3163,7 +3177,9 @@ its engine's text and &mdash; for a rune whose engine has enablers &mdash; the a
 (&ldquo;Also opens with:&rdquo;); and once, below the
 cards, the class basic and class kit with their damage and "% Atk" scaling at the class's own Attack.
 The draft screen stays clean — no passive text there.</li>
-<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero;
+<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero, the offers
+stacked at their own heights in one column that scrolls and ends above the Leave button, so every
+offer's Buy button can be reached however long its rule;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
 6 greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
 §1) — the column BO §3 put below the supplies is gone and the left side of the screen is

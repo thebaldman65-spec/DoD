@@ -1674,6 +1674,29 @@ func _pick_rune(idx: int, choice: int) -> void:
 
 # ---------- the rune pouch overlay ----------
 
+# ══ BATCH GT §1 — THE POUCH'S CLOSE BUTTON NEVER MOVES ══════════════════════
+#
+# **IT COULD TRAP THE PLAYER, AND PAIRS WERE THE WORST OF IT.** The panel was a
+# fixed stack from y 120 — title, the engine rows, a 380-pixel rune scroller —
+# with Close at its foot, the ONLY way out, and an engine row is as tall as its
+# rule. Measured on HEAD's layout with the pouch empty: Close was wholly below
+# the 720-pixel screen for four engines held alone, for all sixty pairs of one
+# class's engines, and for all four classes holding their six (y 1142 at worst).
+# **A hero can HOLD up to all six of his class's engine runes** — two slotted,
+# the rest kept — and this panel lists every one with its rule.
+#
+# **THE FIX IS THE LAYOUT, AND NOTHING WAS SHRUNK OR CUT.** The panel is a fixed
+# rect inside the screen; everything whose height depends on text — the engine
+# rows, the notes, the rune rows — lives in ONE scroller that takes the room
+# between the title and Close; Close sits below the scroller, so no text can
+# push it. The panel is wider than it was, which is what lets the longest
+# combination, a class's six rules, fit with nothing scrolling (GQ's rule for
+# the class-selection cards: make room for the longest text rather than cutting
+# it). What still scrolls is a long pouch of ordinary runes, as it always did.
+const POUCH_RECT := Rect2(140, 24, 1000, 672)
+const POUCH_TEXT_W := 860
+
+
 func _open_rune_panel(idx: int) -> void:
 	if _rune_panel_for == idx:
 		return
@@ -1689,8 +1712,8 @@ func _open_rune_panel(idx: int) -> void:
 	dim.color = Color(0, 0, 0, 0.78)
 	overlay.add_child(dim)
 	var panel := PanelContainer.new()
-	panel.position = Vector2(300, 120)
-	panel.custom_minimum_size = Vector2(680, 480)
+	panel.position = POUCH_RECT.position
+	panel.custom_minimum_size = POUCH_RECT.size
 	overlay.add_child(panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
@@ -1706,6 +1729,17 @@ func _open_rune_panel(idx: int) -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 
+	# GT §1 — THE ONE SCROLLER. It fills whatever the title and Close leave, so
+	# its height is the panel's and never the text's.
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 8)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+
 	# ── BATCH GK — THE TWO ENGINE SLOTS, AND DROP AND SWAP ──────────────────
 	#
 	# **THE CHARTER'S DROP AND SWAP HAPPEN HERE**, on the pouch's own shape: an
@@ -1720,19 +1754,19 @@ func _open_rune_panel(idx: int) -> void:
 	eng_head.add_theme_font_size_override("font_size", 15)
 	eng_head.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45))
 	eng_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(eng_head)
+	list.add_child(eng_head)
 	if held_engines.is_empty():
 		var no_eng := Label.new()
 		no_eng.text = "No engine rune held. Engine runes come with the other runes."
 		no_eng.add_theme_font_size_override("font_size", 12)
 		no_eng.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		no_eng.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(no_eng)
+		list.add_child(no_eng)
 	for ei in held_engines.size():
 		var er: Dictionary = held_engines[ei]
 		var erow := HBoxContainer.new()
 		erow.add_theme_constant_override("separation", 10)
-		box.add_child(erow)
+		list.add_child(erow)
 		var e_on: bool = bool(er.get("equipped", false))
 		var etoggle := Button.new()
 		etoggle.text = "Unequip" if e_on else "Equip"
@@ -1747,7 +1781,7 @@ func _open_rune_panel(idx: int) -> void:
 		elbl.add_theme_font_size_override("font_size", 12)
 		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
 			else Color(0.62, 0.6, 0.57))
-		elbl.custom_minimum_size = Vector2(520, 20)
+		elbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		erow.add_child(elbl)
 
@@ -1757,15 +1791,10 @@ func _open_rune_panel(idx: int) -> void:
 		none.add_theme_font_size_override("font_size", 14)
 		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(none)
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(650, 380)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
+		list.add_child(none)
 	var rows := VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 5)
-	rows.custom_minimum_size = Vector2(630, 0)
-	scroll.add_child(rows)
+	list.add_child(rows)
 	for i in runes.size():
 		var rune: Dictionary = runes[i]
 		var row := HBoxContainer.new()
@@ -1785,10 +1814,12 @@ func _open_rune_panel(idx: int) -> void:
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
-		lbl.custom_minimum_size = Vector2(520, 20)
+		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(lbl)
 
+	# BELOW THE SCROLLER, NEVER INSIDE IT: the one control the player needs to
+	# leave is the one thing on this panel that no text can move.
 	var close := Button.new()
 	close.text = "Close"
 	close.custom_minimum_size = Vector2(200, 38)
@@ -1853,6 +1884,7 @@ func _open_loadout_panel(idx: int) -> void:
 	var spec := String(member.get("spec", ""))
 	var earned: Array = Run.earned_ability_names(member)
 	var carried: Array = Run.equipped_ability_names(member)
+	var sitting: Array = Run.sitting_out_names(member)
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 60
@@ -1997,6 +2029,12 @@ func _open_loadout_panel(idx: int) -> void:
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on else Color(0.62, 0.6, 0.57))
+		# BATCH GT §3 — CARRIED, AND SITTING OUT. The row says so in place of
+		# the card's own text, because this is the panel where the slot it
+		# still holds can be freed; the sentence is the hero sheet's, one door.
+		if is_on and sitting.has(aname):
+			lbl.text = "✦ %s — %s" % [aname, Run.sits_out_note(aname).replace("\n", " ")]
+			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		lbl.custom_minimum_size = Vector2(520, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(lbl)

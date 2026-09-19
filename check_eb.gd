@@ -1,8 +1,9 @@
 # BATCH EB — THE PROTECTED CORE IS THE BASELINE, AND THE FILLERS' REAL INVARIANT.
 #
 #   §1  the EB §1 ruling, asserted as a per-pair property with its NAMED
-#       crossovers (one at EB; since BATCH GS, GS's three returning cards, and
-#       EB's one asserted gone) — not as the 13-of-17, which is the intended state
+#       crossovers (one at EB, three at GS; since BATCH GT none, and all four
+#       asserted gone for their own reasons) — not as the 13-of-17, which is the
+#       intended state
 #   §2  the invariant `test_batch_bp` §7's three hand-written fillers actually
 #       rest on, measured through the game's own door
 #
@@ -50,7 +51,15 @@ const Gate = preload("res://gate_fixture.gd")
 # than the kit card they sit beside. That is a real design consequence of GS,
 # not a gate fault, and the rebalance is the designer's: they are NAMED so a
 # FOURTH inversion still reds, and each is owed a ruling.
-const KNOWN_CROSSOVER := [["pyromancer", "Magic Missiles", "Fireball"],
+#
+# **BATCH GT §2 — RULED AND RETUNED TO THE BASELINE, SO THE NAMED LIST IS EMPTY
+# AND ANY INVERSION REDS.** Each of the three takes the cost and cooldown of the
+# kit card it undercut, at the same initiative; the pair is a TIE now, which is
+# neither a crossover nor a pair favouring the core. `RETUNED` keeps all three
+# asserted gone AND for that reason — a pair that vanished because a card left a
+# pool would pass a bare "gone".
+const KNOWN_CROSSOVER := []
+const RETUNED := [["pyromancer", "Magic Missiles", "Fireball"],
 	["cryomancer", "Magic Missiles", "Frostbolt"],
 	["sharpshooter", "Powershot", "Aimed Shot"]]
 # The crossover EB named, kept as a row so its absence stays asserted.
@@ -174,6 +183,19 @@ func _s1_no_second_crossover() -> void:
 			and Classes.spec_draft_pool(GONE_CROSSOVER[0]).has(GONE_CROSSOVER[1]),
 		"§1: %s's crossover (core %s against draft %s) should be gone because %s left the cores for the shelf (GS §1) — the pair or its reason has moved" % [
 			GONE_CROSSOVER[0], GONE_CROSSOVER[1], GONE_CROSSOVER[2], GONE_CROSSOVER[1]])
+	# BATCH GT §2 — GS's THREE ARE GONE BECAUSE THEY WERE PRICED AT THE CORE: each
+	# is still on its lineage's shelf, the core is still in its protected names,
+	# and the draft card's cost and cooldown are the core's.
+	for g in RETUNED:
+		var core: Ability = Classes.pool_ability(String(g[1]))
+		var card: Ability = Classes.pool_ability(String(g[2]))
+		ok(not crossovers.has(g) and core != null and card != null
+				and Classes.protected_names(String(g[0])).has(String(g[1]))
+				and Classes.spec_draft_pool(String(g[0])).has(String(g[2]))
+				and card.cost == core.cost and card.cooldown == core.cooldown
+				and absf(card.delay - core.delay) < 0.001,
+			"§1: %s's %s was retuned at GT §2 to %s's cost and cooldown — the pair is not a tie at the baseline any more" % [
+				g[0], g[2], g[1]])
 	ok(crossovers.size() == KNOWN_CROSSOVER.size(),
 		"§1: %d crossovers against %d named" % [crossovers.size(), KNOWN_CROSSOVER.size()])
 

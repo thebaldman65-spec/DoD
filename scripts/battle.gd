@@ -1244,7 +1244,12 @@ func _spawn_units() -> void:
 			# `equipped_ability_names` reads the pool when nothing has ever
 			# been benched, so a member dict written before EG spawns
 			# exactly as it always did.
-			for bm_name in Run.equipped_ability_names(Run.party[i]):
+			#
+			# **BATCH GT §3 — LESS WHAT SITS OUT.** A carried card that cannot
+			# be cast without an engine this hero no longer holds is left out
+			# of the fight and kept (`Classes.SITS_OUT`, ruled); the hero sheet
+			# asks the same door, so the two cannot disagree.
+			for bm_name in Run.seated_ability_names(Run.party[i]):
 				var bm_ab := Classes.spec_pool_ability(spec, bm_name)
 				if bm_ab != null and not cfg["abilities"].any(
 						func(a): return a.display_name == bm_ab.display_name):

@@ -2124,6 +2124,47 @@ func benched_ability_names(member: Dictionary) -> Array:
 		func(n): return not carried.has(n))
 
 
+# ── BATCH GT §3 — WHAT THE NEXT FIGHT SEATS, AND WHAT SITS OUT OF IT ─────────
+#
+# **A THIRD QUESTION, AND IT IS ASKED IN ONE PLACE.** EG's two were *what can
+# he cast* (the loadout) and *what does he own* (the pool). Since GT a carried
+# card that cannot be cast without an engine the hero no longer holds SITS OUT
+# (`Classes.SITS_OUT`, ruled), so what the next fight seats is the loadout less
+# those cards — and the battle spawn and the hero sheet, which must agree card
+# for card, both ask HERE.
+#
+# **NOTHING IS WRITTEN.** The card stays in `bm_abilities` and `bm_equipped`, so
+# it is still owned (never re-offered), still carried (its slot still counted)
+# and still the player's to bench; the only state that decides it is the
+# engine's own `equipped` flag in `member["engines"]`, which the pouch's door
+# writes. Re-slot the engine and the card is seated at the next fight, because
+# nothing was ever taken away.
+func seated_ability_names(member: Dictionary) -> Array:
+	var held: Array = held_engines(member)
+	return equipped_ability_names(member).filter(
+		func(n): return not Classes.sits_out(String(n), held))
+
+
+# The carried cards the next fight will NOT seat, for the screens that say why.
+func sitting_out_names(member: Dictionary) -> Array:
+	var held: Array = held_engines(member)
+	return equipped_ability_names(member).filter(
+		func(n): return Classes.sits_out(String(n), held))
+
+
+# **THE ONE SENTENCE, BECAUSE TWO SCREENS SAY IT** (the hero sheet's chip and the
+# map's Kit panel): which rune brings the card back, and what it still costs. A
+# card that vanishes from the bar with no reason reads as a bug (CO §3). Broken
+# by hand at 44 characters, because the sheet shows it as a tooltip and a
+# tooltip does not wrap.
+func sits_out_note(card_name: String) -> String:
+	var rid := Runes.engine_rune_id(Classes.sits_out_engine(card_name))
+	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
+	if rune_name == "":
+		rune_name = "engine rune it needs"
+	return "Sits out of every fight while the\n%s is not equipped.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % rune_name
+
+
 func ability_slots_used(member: Dictionary) -> int:
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter), so the
 	# lineage's opening abilities count LESS their enablers.

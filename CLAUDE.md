@@ -1833,13 +1833,14 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   **A LINEAGE CARD THE DOOR REFUSES WITHOUT ITS ENGINE IS A POOL CARD, AND IT OWES A ROW IN `ENGINE_READ` IN THE SAME
   BATCH**: Death Ray and Resurrection are rows, and Kill Command is not, because an earned Call the Wilds opens its
   door with no engine — conditional on a card, GP's Battle Poise shape. **THE ROW GATES THE OFFER, NOT THE HAND**: a
-  copy drafted under its engine is earned, so it stays when the engine is dropped and the door refuses it — GM's open
-  question about earned cards, three cards larger since GS (`docs/state.md`).
+  copy drafted under its engine is earned and stays the hero's when the engine is dropped — and **since GT §3 it SITS
+  OUT of every fight until the engine is back** (the block below the next one).
   · **A BOUND CARD WAS NEVER AN ENABLER AND MUST NOT BE MADE ONE.** An enabler is what the engine needs; a bound
     card is what needs the engine.
-  · **THE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE, AND THE EARNED CARDS THAT NEED ONE, ARE NOT GATED.** A card
-    that still does something is a working card (GP's HALF-WORKS group), and an earned card is never lost (EG). Both
-    populations are in `docs/reports/GM.md` §2.
+  · **THE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE ARE NOT GATED, AND THE EARNED CARDS THAT NEED ONE ARE NEVER
+    LOST.** A card that still does something is a working card (GP's HALF-WORKS group); an earned card the door
+    refuses on every board without its engine is never lost (EG) and sits out instead (GT §3). Both populations are
+    in `docs/reports/GM.md` §2.
 - **AND A FIGHT KEEPS WHAT IT OPENED WITH.** The battle reads the member's engines once, at the spawn, and nothing in
   `battle.gd` writes an engine's slot state; the pouch's door is on the map. A drop takes effect at the next fight,
   never inside one, so no card leaves while it is cooling down, chosen or resolving (`check_gm` §2).
@@ -1857,6 +1858,43 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   `_engine_fields` appended to it. **A surface that shows one has gone around the door.**
 - **A NEW SURFACE THAT SHOWS A RUNE'S TEXT ASKS THE DOOR**, and `check_gs` §4 drives the Peddler, the pouch, an offer
   and the hero sheet with all twenty-four and sweeps the game's scripts for a rune's `desc` read anywhere else.
+
+## STANDING RULE — A CONTROL THE PLAYER NEEDS TO LEAVE NEVER MOVES WITH TEXT (Batch GT §1, ruled by the designer)
+> **Text whose height depends on what it says lives inside a bounded scroller, and the control that closes or leaves
+> the screen sits OUTSIDE it, where no text can move it.** Make room for the longest text first and shrink nothing
+> (GQ's rule for the class-selection cards); only where the longest genuinely cannot fit, scroll the text and pin the
+> button.
+
+- **THE POUCH COULD STRAND THE PLAYER, AND THE CAUSE WAS A STACK, NOT A STRING.** Its Close, the only way out, sat at
+  the foot of a fixed stack whose engine rows grew with each rule — wholly below the 720-pixel screen for four engines
+  held alone, all sixty pairs of one class's engines and every class's six. **A hero HOLDS up to all six of his
+  class's engine runes, two slotted, and the pouch lists every one with its rule**: size a screen for every
+  combination it can hold, not the one it opens with.
+- **THE PEDDLER WAS THE SAME CAUSE ON A SECOND SURFACE**: offers laid at a fixed pitch whatever their text, so a long
+  rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
+  combination and presses Close in each; §2 buys every offer through its own button.
+
+## STANDING RULE — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3, ruled by the designer)
+> **An earned card the usability door refuses on every board without its engine is left out of every fight while
+> none of the hero's slotted engines is its own, and is seated again the moment one is. It is never destroyed**: a
+> drafted card is something the player spent an offer on.
+
+- **`ENGINE_READ` GATES THE OFFER; `Classes.SITS_OUT` GATES THE SEAT.** Each row names its engine and its `why`, and a
+  card in both tables names one engine in both. **`Run.seated_ability_names` is the ONE door**: the battle spawn and
+  the hero sheet both ask it, so the two cannot disagree.
+- **THE POPULATION IS DERIVED AT THE DOOR, NEVER FROM A FIELD OR A `why`.** Every card a hero of the class can earn —
+  the draft pool and every lineage's zone-boss pool — is asked `_ability_usable` with no engine, on a board dressed
+  to allow everything an engine does not give. **A card another CARD or the board can open is never a row**: Battle
+  Poise and Counter Time (a drafted Guard Change), Reprisal (a heal landed), Execute (a low or Broken target), Kill
+  Command and the companion cards (an earned Call the Wilds). `check_gt` §3 re-derives it every battery, so a new
+  earnable card is sorted by the gate in the batch that adds it.
+- **NOTHING IS WRITTEN WHEN A CARD SITS OUT.** It stays in `bm_abilities` and `bm_equipped`, and the one state that
+  decides it is the engine rune's own `equipped` flag. **THE SLOT STAYS COUNTED**, as GM §2 left a dropped bound
+  card's, and benching it is the player's door to the slot, free and reversible (EG). **Sitting out is not
+  benching**: freeing the slot would leave a kit over its cap the day the engine returns, and what happens then is a
+  ruling, not a tidy-up.
+- **THE SCREENS SAY WHY, IN ONE SENTENCE** (`Run.sits_out_note`): the hero sheet greys the card as sitting out and the
+  map's Kit panel names the rune that brings it back. A card that leaves the bar with no reason reads as a bug (CO §3).
 
 ## STANDING RULE — A STATUS IS SPENT WHERE IT PAYS, NEVER WHERE AN ENGINE READS IT (Batch GM §1)
 > **A status, charge or bank a card lays is spent under the gate its payout is read under. Its countdown or its
@@ -3369,9 +3407,11 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
 - **RESET IT WHERE `zone_idx` IS RESET.** A second run in one session would otherwise open every
   hero at ten. This is CT's scar (the opening pouch sized off the previous run's zone) arriving at
   a second ladder; it is written down rather than re-learned.
-- **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION, AND THERE ARE ONLY TWO QUESTIONS.**
-  *What can this hero CAST?* → the loadout (`Run.equipped_ability_names`) — the battle spawn and
-  the hero sheet, and nothing else. *What does this hero OWN, so he is not offered it again?* → the
+- **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION, AND THERE ARE THREE QUESTIONS (THE THIRD
+  SINCE GT §3).** *What does this hero CARRY?* → the loadout (`Run.equipped_ability_names`) — the
+  slot count, the Kit panel and the bench. *What will the next fight SEAT?* → the loadout less what
+  sits out (`Run.seated_ability_names`) — the battle spawn and the hero sheet, and nothing else.
+  *What does this hero OWN, so he is not offered it again?* → the
   pool (`bm_abilities`) — `Runes.kit_names` → `Talents.ability_names` → `Run.owned_ability_names`,
   and through it the draft, the boss award and its fallback. **READING THE LOADOUT FOR THE SECOND
   QUESTION RE-OFFERS A BENCHED CARD AS IF IT WERE NEW**, which is the exact defect
@@ -3476,13 +3516,14 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   5.0. That is a cantrip beside a nuke. **At equal initiative "faster" is impossible by
   construction, so the tempo axis that survives the control is COOLDOWN**, and a gate that asserts
   the uncontrolled form reads RED the day it is written.
-- **EVERY CROSSOVER IS NAMED RATHER THAN COUNTED, AND SINCE GS THERE ARE THREE, EACH OWED A RULING.** EB named
-  one — Holy's **Divine Plea** (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative
-  in the heal role — and it dissolved at GS §1, because Renewal left the cores for Holy's shelf. **GS's returning
-  cards brought three**: **Fireball** and **Frostbolt** (0 Mana, cooldown 0) against **Magic Missiles** (15, cooldown
-  2) at initiative 2.0, and **Aimed Shot** (20, cooldown 1) against **Powershot** (25, cooldown 2) at 3.0 — cards
-  priced as opening cards, two of them a lineage's free basic, drafted now. **None was retuned; the rebalance is
-  the designer's**, and `check_eb` §1 names all three and asserts EB's gone, so a fourth inversion still reds.
+- **EVERY CROSSOVER IS NAMED RATHER THAN COUNTED, AND SINCE GT THERE ARE NONE.** EB named one — Holy's
+  **Divine Plea** (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative in the heal
+  role — and it dissolved at GS §1, because Renewal left the cores for Holy's shelf. **GS's returning cards brought three** —
+  **Fireball** and **Frostbolt** (0 Mana, cooldown 0) against **Magic Missiles** (15, cooldown 2) at initiative 2.0,
+  and **Aimed Shot** (20, cooldown 1) against **Powershot** (25, cooldown 2) at 3.0 — and **GT §2 RETUNED ALL THREE
+  TO THE BASELINE (ruled)**: each takes the cost and cooldown of the kit card it undercut and nothing else moves.
+  **A crossover's baseline is the core it undercuts, never a picked number.** `check_eb` §1 asserts all four named
+  pairs gone and no crossover at all, so the next inversion reds.
 - **THE CAP BINDING THE TWO LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
   FINDING.** `Ability.BUFF_DELAY_CAP` reaches **29.5% of the draft layer against 12.8% of the
   cores**. Under this ruling that is what a priced layer looks like beside a baseline one: the

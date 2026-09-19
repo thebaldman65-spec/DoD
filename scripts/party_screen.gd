@@ -168,7 +168,11 @@ func _draw_detail() -> void:
 		# whole page exists: the sheet's promise is that its numbers are the
 		# fight's numbers, so it must read exactly what `battle.gd`'s spawn
 		# reads. A benched card is listed below the runes instead.
-		for bm_name in Run.equipped_ability_names(member):
+		#
+		# BATCH GT §3 — AND LESS WHAT SITS OUT, THROUGH THE SAME DOOR THE SPAWN
+		# ASKS (`Run.seated_ability_names`). A card that sits out is drawn
+		# below the seated ones as its own greyed chip, saying why.
+		for bm_name in Run.seated_ability_names(member):
 			var bm_ab := Classes.spec_pool_ability(spec, String(bm_name))
 			if bm_ab != null and not cfg["abilities"].any(
 					func(a): return a.display_name == bm_ab.display_name):
@@ -397,6 +401,23 @@ func _draw_detail() -> void:
 			tip += "\n%s" % " · ".join(PackedStringArray(ups))
 		chip.tooltip_text = tip
 		ab_grid.add_child(chip)
+
+	# BATCH GT §3 — A CARRIED CARD THAT SITS OUT, SHOWN AND EXPLAINED. It is not
+	# in `cfg["abilities"]`, because the fight will not seat it; it is still the
+	# hero's and still counted in the header's slots, so leaving it off this page
+	# would hide a slot the player is paying for.
+	for so_name in (Run.sitting_out_names(member) if awake else []):
+		var so_chip := PanelContainer.new()
+		so_chip.custom_minimum_size = Vector2(195, 38)
+		var so_label := Label.new()
+		so_label.text = "%s — sits out" % String(so_name)
+		so_label.add_theme_font_size_override("font_size", 13)
+		so_label.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
+		so_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		so_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		so_chip.add_child(so_label)
+		so_chip.tooltip_text = Run.sits_out_note(String(so_name))
+		ab_grid.add_child(so_chip)
 
 	# ── BATCH ES §4 — THE TAG CENSUS ON THE HERO SHEET ─────────────────────
 	#

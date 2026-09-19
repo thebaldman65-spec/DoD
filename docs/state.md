@@ -13,112 +13,120 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-18 (Batch GS).*
+*Last rewritten: 2026-09-19 (Batch GT).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GS — AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT. IMPLEMENT ONLY, AND THE TWENTY-FIFTH BATCH ON
-  `class-merge`.** The designer narrowed step 3's enabler rule after meeting it in play: an engine that brings four
-  cards IS choosing a spec. `main` is untouched. Full working: **`docs/reports/GS.md`**.
-- **BUILT (§1): A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
-  `CLAUDE.md`'s charter carries the designer's clause over GK's. **Six of the twenty-four engines bring a card**: the
-  Berserker Bloodlust and the Pyromancer Flamewave (ruled), the Cryomancer Razor Ice, the Devout Divine Shield and the
-  Occultist Hex of Ruin (the batch's derivation — ruling 1), and the Beastmaster his three summons (the stated
-  exception). The Sharpshooter's Quick Shot is every Hunter's basic and adds nothing; the other seventeen bring
-  nothing. **Every hero opens at three slots**, the class kit's, where a lineage opened at four to six.
-  - **29 CARDS STOPPED TRAVELLING, AND EVERY ONE IS ON ITS LINEAGE'S SHELF** — four of them the basics that were
-    overrides (Fireball, Frostbolt, Arcane Explosion, Shadowrend), drafted now beside the class basic. The pools are
-    **43 / 51 / 43 / 41 = 178** (158 on the lineage shelves, 20 class-wide), from GP's 38 / 41 / 34 / 36.
-  - **EACH OF THE 29 WAS CAST ON A HERO OF ITS CLASS WITH NO ENGINE, AND AGAIN HOLDING IT** (GP §2's method). **Death
-    Ray, Hymn of Hope and Resurrection are refused without theirs and joined `ENGINE_READ` (37 rows)**; the other
-    twenty-six work without one. **Kill Command is refused with no companion and opens on one Call the Wilds summon
-    with no engine**, so it is offered to any Hunter, as Battle Poise is to any Warrior. A hero holding no engine is
-    shown 40 / 38 / 29 / 34 of the four pools.
-  - **DELETED, NOT ZEROED:** `Classes.ENGINE_BOUND` and `engine_bound()` — GM §2's table, with nothing left to act
-    on — and `apply_kit_overrides`. **NEW:** `Classes.lineage_opening`, a lineage's term in `opening_kit`, and
-    `Classes.basic_override_ability`, the four basics' one definition.
-- **BUILT (§2): THE WARRIOR'S KIT IS CRUSHING BLOW · POMMEL STRIKE · MOCKING BLOW (ruled).** Bloodlust is the
-  Berserker's enabler, so a Warrior holds it only with that rune — once, whichever engine slot holds it, because the
-  dedupe follows the card — and **he pays no slot for it** (ruling 2). Pommel Strike keeps its one definition in the
-  Swordmaster's table: 20 Rage, cooldown 3, 25% of Attack and 30 Break damage, a 1-turn Stun a boss resists until
-  Broken (its Perfect lands it anyway), its own 25% crit chance, +10 Rage. It reads no engine. The bot's Warrior kit
-  branch casts it where Bloodlust's case stood.
-- **BUILT (§3): AN ENGINE RUNE SHOWS ITS ENGINE'S RULE WHEREVER A RUNE'S TEXT RENDERS** — the Peddler, the pouch's
-  engine slots and rows, a rune offer, the worn-rune tooltip and the hero sheet — read live through
-  `Runes.shown_desc` (ruled). **`data/runes.json` did not move**: the twenty-four placeholders stay, unread. **The
-  fit is measured, not repaired** (ruling 3).
-- **NEW GATE `check_gs`** drives all three every battery: the twenty-four openings and the engine-less Warrior, the
-  29 on their shelves and the three rows both ways, the Berserker's one Bloodlust, the four surfaces with all
-  twenty-four runes, and a sweep for a rune's `desc` read anywhere but the door.
-- **WHAT MOVED:** `scripts/classes.gd`, `battle.gd`, `runes.gd`, `shop_screen.gd`, `map_screen.gd`, `party_screen.gd`
-  and `spec_choice_screen.gd`; both fixtures (a `lineage_cards` option); `check_gs.gd` (**NEW**) and `run_battery.sh`;
-  thirty-eight instruments repaired to intent (twenty-two suites, sixteen gates); `pin-manifest.json` and `baselines.json`;
-  `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GS.md`
-  (**NEW**).
-- **VERIFICATION:** the acceptance battery is GREEN — 116 targets in 55 minutes, `check_de` at 481 / 0 / 0 and
-  `check_gs` at 730 / 0, and the only two reds are the standing sanctioned ones (`check_cm_live` 13 / 4, its FAIL lines
-  byte-identical to HEAD's; `check_gj` §4's Bell at +169 / +189, and +172 / +192 on HEAD's code the same day). **The
-  unmodified battery ran against GS's code first** — 477 / 86, thirty-five targets red and five that no longer parsed,
-  every one an instrument and none a game defect — and a full pre-pass over the repaired tree found the 21 row moves
-  before `baselines.json` was written. Full working in **`docs/reports/GS.md`**, written after the run.
-- **Phase.** Steps 1–4 of the merge's running order are done, and GS re-cut step 3's enabler half on the designer's
-  ruling. **The Crown's Break and freeze resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is
-  the gates.
-- **Next letter: GT.**
+- **Last batch: GT — THE POUCH NEVER TRAPS THE PLAYER, THREE CARDS AT THE BASELINE, AND A CARD THAT SITS OUT.
+  IMPLEMENT ONLY, AND THE TWENTY-SIXTH BATCH ON `class-merge`.** A softlock, a pricing inversion and a dead card, each
+  ruled by the designer. `main` is untouched. Full working: **`docs/reports/GT.md`**.
+- **BUILT (§1): THE POUCH'S CLOSE BUTTON NEVER MOVES, AND THE PEDDLER'S OFFERS CANNOT COVER EACH OTHER.** The pouch is
+  a fixed panel (x 140, y 24, 1000 x 672): every engine row, note and rune row sits in ONE scroller, and Close sits
+  below it at y 658–696 in every configuration. **A hero HOLDS up to all six of his class's engine runes, two slotted,
+  and the pouch lists every one.** Measured on GS's layout with the pouch empty, Close was wholly off the 720-pixel
+  screen for 4 of 24 engines alone, **all 60 pairs** and all 4 sixes (y 1142 at worst); now it is on screen in all
+  176 configurations (each with the pouch empty and with an ordinary rune), and **nothing scrolls in any of them** —
+  the longest, a Hunter holding all six, is 431 pixels in a 583-pixel list. **The Peddler's offers stack at their own
+  heights in one scroller** (x 620–1260, y 162–632) that ends above Leave, which did not move: with every class's
+  longest engine rule all four Buy buttons had been unusable (three under the next offer, one at y 785); four
+  ordinary offers — every seat's longest — fit unscrolled, and engine-heavy deals scroll. Nothing was shrunk or cut.
+- **BUILT (§2): FIREBALL, FROSTBOLT AND AIMED SHOT AT THE BASELINE (ruled).** Each takes the cost and cooldown of the
+  kit card it undercut at the same initiative: Fireball and Frostbolt **15 Mana, cooldown 2** (Magic Missiles'), from
+  free with no cooldown; Aimed Shot **25 Mana, cooldown 2** (Powershot's), from 20 and 1. Nothing else of theirs moved.
+  **`check_eb` §1 reads no crossover.**
+- **BUILT (§3): A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (ruled).**
+  `Classes.SITS_OUT` — **17 rows**, derived by asking the usability door about all 204 cards a hero can earn with no
+  engine held: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Hold); Arcane Bolt, Unmaking, Death Ray and
+  Stabilize (Resonance); Divine Plea, Hymn of Hope and Resurrection (Mercy); Blessing of the Faithful and Aegis Reversal
+  (Conviction); Transference and Requiem (the Old Gods); Unleash and Primal Surge (Pack Bond). Ten more cards are
+  refused bare and open with a card or a board and are not rows. **`Run.seated_ability_names` is the one door**; the
+  battle spawn and the hero sheet ask it. **Nothing is written**: the card stays owned and carried, **its slot stays
+  counted** (as GM §2 left a bound card's), and benching frees it. The sheet greys it as sitting out and the Kit panel
+  names the rune that brings it back (`Run.sits_out_note`).
+- **RULED IN GT's BRIEF (§4), AND ONLY RECORDED:** GS's three derived enablers stand — **Razor Ice, Divine Shield,
+  Hex of Ruin** — and their `PROTECTED_CORES` rows say ruled where they said PROPOSED; **Bloodlust stays outside the
+  slot count**; **the four basic-attack changes stand**. No engine, kit or pool changed.
+- **NEW GATE `check_gt`** drives all three every battery: the pouch in all 176 configurations with Close pressed in
+  each; every Peddler offer bought through its own button on three deals; the census of the 204 against the ruled
+  table, the ten card routes and every row opened by its engine; each engine dropped and re-slotted through the
+  pouch's door with a live stretch of the fight; the three prices.
+- **WHAT MOVED:** `scripts/map_screen.gd`, `shop_screen.gd`, `classes.gd`, `run_state.gd`, `battle.gd` and
+  `party_screen.gd`; `check_gt.gd` (**NEW**) and `run_battery.sh`; the instruments GT's recon named; `baselines.json`
+  and `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, this file
+  and `docs/reports/GT.md` (**NEW**).
+- **VERIFICATION:** the acceptance battery is **GREEN — 117 targets in 56 minutes on a frozen tree, `check_de` at
+  485 / 0 / 0 and `check_gt` at 3,157 / 0**; the only reds are the two standing sanctioned ones (`check_cm_live` 13 / 4,
+  `check_gj` §4's Bell at +169 / +189), their FAIL lines byte-identical to HEAD's. The unmodified battery ran against
+  GT's code first — 116 targets, 113 as GS's acceptance run read them, and three red: `check_eb` (GS's three named
+  crossovers gone, as retuned), `check_gm` §2 (it pinned GS's dead card on the bar, which the ruling takes off it) and
+  `check_de` for those two; no game defect, no throw and no parse error. Both were repaired to intent. Full working in
+  **`docs/reports/GT.md`** §5.
+- **Phase.** Steps 1–4 of the merge's running order are done, and GS re-cut step 3's enabler half. **The Crown's Break
+  and freeze resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
+- **Next letter: GU.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### GS's RULINGS OWED — **FIVE, ALL PLAYER-VISIBLE**
+### GT's RULINGS OWED — **FOUR, ALL PLAYER-VISIBLE**
 
-Full working: `docs/reports/GS.md`, NEEDS A RULING.
+Full working: `docs/reports/GT.md`, NEEDS A RULING.
 
-1. **THREE ENABLERS ARE THE BATCH'S DERIVATION, PROPOSED.** The test is the charter's — without the card, with the
-   class basic and kit, does the engine pay anything? — and where several cards would serve, the one that lays what
-   the engine reads, which is how the designer's two picks read. **Razor Ice for Glacial Hold** (three Chilled on one
-   enemy in a cast; Frostbolt lays one and Blizzard one or two on everyone), **Divine Shield for Conviction** (the
-   builder its own rule names; Consecrated Ground's drip is the other builder), **Hex of Ruin for Wrath of the Old
-   Gods** (Exposed on three enemies in a cast; Shadowrend and Bewitch lay one debuff on one).
-2. **BLOODLUST COSTS THE BERSERKER NO SLOT.** The brief said *"hold Bloodlust once and pay one slot for it"*; an enabler
-   sits outside the slot count, and the brief did not overturn that clause. Paying one would make Bloodlust the one
-   enabler inside the count. He opens at three slots, like every hero.
-3. **THE RULE TEXT FITS THE OFFERS AND THE HERO SHEET, AND NOT THE PEDDLER OR THE POUCH — AND THE POUCH CAN STRAND THE
-   PLAYER.** Measured on the live screens with all twenty-four runes, and reported rather than truncated:
-   - **The pouch's Close button, its only way out, is drawn wholly below the 720-pixel screen for four engine runes
-     held alone** — the Cryomancer's, the Devout's, the Occultist's and the Beastmaster's — and partly for eighteen
-     more; with one ordinary rune beside it, one (the Beastmaster's) and three. **HEAD's placeholder made it five and
-     nineteen, so GS did not cause it**, and it is the pouch every hero opens straight after class selection.
-   - **The Peddler lays its rune offers 130 pixels apart, one a hero, and fifteen engine rules run past that by 22 to
-     137** (HEAD eighteen), so the next hero's offer is drawn over the rule and its Buy button. The fourth offer is the
-     Hunter's, and two of his six run off the bottom of the screen there — the Beastmaster's by 99, the
-     Sharpshooter's by 7, as on HEAD.
-   - **The offers fit** — the lowest panel ends at 612 of 720 — and the hero sheet's rune list scrolls, two rules
-     taller than its 168-pixel window (HEAD three). Nothing was shrunk; the layouts are the designer's.
-4. **FOUR BASICS CHANGED UNDER FOUR LINEAGES AND NO NUMBER MOVED TO DO IT** (CQ §6's shape): a Pyromancer's and a
-   Cryomancer's basic is Magic Bolt (25% of Attack, arcane) where it was Fireball or Frostbolt (20%, laying Burn or
-   Chilled); an Arcanist's is Magic Bolt where it was Arcane Explosion (10% twice); an Occultist's is Smite (44% of his
-   100 Attack, holy) where it was Shadowrend (25% and a 2-turn Cripple). It follows from the ruling, and it is
-   reported because a player feels every one.
-5. **THREE RETURNING CARDS INVERT EB §1's BASELINE.** A draft card cheaper on resource AND shorter on cooldown than a
-   comparable core pays no pick and gives none back, and GS made three: **Fireball and Frostbolt** (0 Mana, cooldown
-   0) against **Magic Missiles** (15, cooldown 2) at initiative 2.0, and **Aimed Shot** (20, cooldown 1) against
-   **Powershot** (25, cooldown 2) at 3.0 — cards priced as openers, two of them a lineage's free basic. EB's own
-   crossover (Divine Plea against Renewal) dissolved, Renewal being a draft card now. None was retuned (§4);
-   `check_eb` §1 names the three so a fourth still reds.
+1. **FIREBALL'S AND FROSTBOLT'S MOVES ARE LARGE, AND NOT FOR THE REASON THE BRIEF EXPECTED.** Free with no cooldown to
+   15 Mana and cooldown 2 — both were basic attacks until GS, and a basic is free by construction, so the size measures
+   the change of job the merge gave them, not a price that was wrong before it. Aimed Shot moved by 5 Mana and one
+   turn. **Parity on both axes is what was built** (the baseline read off the kit card); the smallest move that ends
+   EB's inversion is one axis — Fireball and Frostbolt free with cooldown 2, or 15 Mana with none — and is priced in
+   the report.
+2. **A CARD THAT SITS OUT KEEPS ITS SLOT.** Built as GM §2 left a dropped bound card's: it is still carried and still
+   counted, and benching frees the slot. Freeing it automatically would let the player fill it, and the engine's
+   return would then leave the kit over its cap — which is the ruling this would need.
+3. **BATTLE POISE AND SHATTERPOINT ARE A SEPARATE CASE, NOT THIS RULING'S.** Both are cards (not runes), both cast and
+   do their own work with no engine, and only a second clause needs another card: driven on a Warrior with no engine,
+   Shatterpoint breaks its target either way and adds its free Overpower (68 damage against 16) only with Overpower
+   carried; Battle Poise, reached through a drafted Feint, pivots on a parry only with Guard Change carried. A card that
+   half-works is GM's untouched group. Paying the clause without the card would change what the card gives.
+4. **THE SAME SHAPE ON THREE MORE RETURNING CARDS, OUTSIDE EB's CONTROL.** Under EB's control (same role, same
+   initiative) only the three are inverted. Dropping the role control, the other two former basics are cheaper and
+   shorter than a kit card at the same initiative — **Arcane Explosion** against Magic Missiles (an area attack against
+   a single-target one) and **Shadowrend** against Ministration (a strike against a heal); dropping the initiative
+   control, **Guard Change** (0 Rage, cooldown 1, 1.5) is cheaper, shorter and faster than Crushing Blow and Pommel
+   Strike. Not retuned — the ruling named three.
+
+### FOUND AT GT AND NOT FIXED
+
+- **PLAYER-FACING: A ZONE BOSS CAN OFFER A CARD THAT WILL SIT OUT.** The boss pick draws the hero's LINEAGE pool with no
+  engine filter (`Run.roll_spec_ability_offer`), so an Arcanist who dropped Resonance can be offered Stabilize, which
+  sits out until the rune is back. The draft's engine gate never offers one (`Classes.offerable`); the boss pools were
+  never merged or gated (GP).
+- **ENGINE-HEAVY PEDDLER DEALS SCROLL.** Four offers of every class's shortest engine rule stack 500 pixels in the
+  470-pixel column and the longest 799; every Buy button is reachable and none is covered. Widening the column further
+  would push it off the screen's edge.
+- **SIX OF THE BRIEF'S PREMISES DID NOT HOLD, AND ONE CHANGED WHAT WAS MEASURED** (GT §0): *a hero holds two* (he slots
+  two and can hold six, and the pouch shows all); *GS did not sweep for the shape* (`check_eb` §1 sweeps every shelf
+  card under EB's control every battery and read three); *a rune granting a free cast* (Battle Poise and Shatterpoint
+  are cards); *the Peddler spills* (worse: all four Buy buttons unusable at the longest); *three cards* named for §3
+  (seventeen cannot be cast without their engine); *four saves* (three exist; no run was in progress).
+- **TWO CONTROL COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GT ctl" and "Dawn of Decay
+  GT probe", each renamed before anything ran in it so its `user://` could not reach the player's saves. They can be
+  deleted.
+
+### ~~GS's RULINGS OWED~~ — **ALL FIVE CLOSED AT GT**
+
+1. ~~Three enablers proposed~~ — **ruled: Razor Ice, Divine Shield and Hex of Ruin stand** (GT's brief §4).
+2. ~~Bloodlust costs the Berserker no slot~~ — **ruled: it stays outside the slot count** (GT's brief §4).
+3. ~~The rule text fits neither the Peddler nor the pouch, and the pouch can strand the player~~ — **built at GT §1.**
+4. ~~Four basics changed under four lineages~~ — **ruled: the changes stand** (GT's brief §4).
+5. ~~Three returning cards invert EB §1's baseline~~ — **ruled and built at GT §2.**
 
 ### FOUND AT GS AND NOT FIXED
 
-- **PLAYER-FACING: A CARD THE ENGINE GATE OFFERS ONLY TO ITS HOLDER STAYS WHEN THE ENGINE IS DROPPED, REFUSED.** Driven
-  through the real doors: an Arcanist holding Resonance drafts Death Ray, a Holy holding Mercy drafts Resurrection and
-  Hymn of Hope, each drops the rune from the pouch — and the next fight seats all three, every one refused, the two
-  Mercy cards labelled a bare *"1"*. An earned card is never lost (EG), so this is GM's ruling 1's second group, three
-  larger, and GL's dead button back for the drafted copy: GM §2 closed it for the OPENING kit, which no longer holds any
-  of them.
-- **TWO CARDS' SECOND CLAUSES NOW NEED A DRAFTED CARD.** Battle Poise's *"a free GUARD CHANGE"* pivots only a hero
-  holding Guard Change, and Shatterpoint's free Overpower fires only for one holding Overpower (`battle.gd`, both
-  `_find_ability`); both cards were the Swordmaster's opening kit until GS. The talent branches that also answer with
-  Overpower or Pommel Strike read fields nothing writes since FX.
+- ~~**A CARD THE ENGINE GATE OFFERS ONLY TO ITS HOLDER STAYS WHEN THE ENGINE IS DROPPED, REFUSED.**~~ **BUILT AT GT §3**:
+  it sits out while the engine is gone, and the population is seventeen, not three.
+- **TWO CARDS' SECOND CLAUSES NOW NEED A DRAFTED CARD** — Battle Poise's free Guard Change and Shatterpoint's free
+  Overpower. **GT drove both and reports them a separate case** (GT's ruling 3). The talent branches that also answer
+  with Overpower or Pommel Strike read fields nothing writes since FX.
 - **FOUR ENGINE RULE TEXTS NAME CARDS THAT NO LONGER TRAVEL WITH THEM**, and every rune surface shows those texts now:
   Seasoned Fighter's *"Guard Change swaps"*, Glacial Hold's Ice Lance, Shatter and Blizzard, Mercy's *"Stacks pay for
   Hymn of Hope"*, Conviction's *"doubled under Blessing of Zeal"*. No engine text moved (§4).
@@ -390,11 +398,11 @@ Full working: `docs/reports/GM.md`, NEEDS A RULING.
      five whose payload sits in the engine's block are a different cut, and four of those five are EARNED zone-boss
      cards. **MOOT FOR THE EIGHT SINCE GS §1: none opens a kit now.** All eight are drafted off their lineages'
      shelves, offered to any hero of the class (GP's HALF-WORKS group is not gated), and earned, so they stay;
-   - **the earned cards the door refuses without their engine** — about twenty across seven lineages (Arcane Bolt,
-     Unmaking and Stabilize; Divine Plea; Blessing of the Faithful and Aegis Reversal; seven of the Beastmaster's;
-     Battle Poise and Counter Time; four of the Cryomancer's; Transference and Requiem). An earned card is never lost
-     (EG), so for these "leaves" could only mean "sits out the fight". **GS ADDED THREE — Death Ray, Hymn of Hope
-     and Resurrection** (FOUND AT GS, above).
+   - ~~**the earned cards the door refuses without their engine**~~ — **RULED AND BUILT AT GT §3: such a card SITS
+     OUT while its engine is gone.** GT asked the door about all 204 earnable cards: **seventeen** cannot be cast
+     without their engine (`Classes.SITS_OUT`), and GM's list was wider than that — Battle Poise and Counter Time open
+     on a drafted Guard Change, and the Beastmaster's companion cards on an earned Call the Wilds, so neither sits
+     out.
 2. **~~"EXACTLY AS ITS ENABLER DOES" HAS TWO MORE HALVES, AND NEITHER IS BUILT~~ — MOOT AT GS §1.** No lineage opens
    with a bound card and no lineage takes a slot: Death Ray is a draft card offered to a Resonance holder of any
    lineage, and an Arcanist opens at three slots like every hero. GM's record: an enabler travels to another hero who
@@ -2355,7 +2363,7 @@ reasoning AND its counter-reading. **`check_eb` §1 asserts the INVERSION** — 
 resource AND shorter on cooldown than a comparable core — **with exactly one crossover named
 (Divine Plea against Renewal), in both directions.** **GS dissolved that one — Renewal is a draft card now —
 and its returning cards brought three: Fireball and Frostbolt against Magic Missiles, Aimed Shot against
-Powershot, each named there and owed a ruling (GS's ruling 5).** The cap's 29.5%-against-12.8% is the same
+Powershot — ruled and RETUNED TO THE BASELINE AT GT §2, so `check_eb` §1 reads no crossover now.** The cap's 29.5%-against-12.8% is the same
 relationship through the cap and is not a second finding. **`Ability.PURE_BUFFS` was not widened
 and no magnitude moved.** The measurement below is kept because the ruling is *about* it.
 
@@ -2373,7 +2381,7 @@ would author on purpose if the core is the baseline — and nothing in the code 
 readings. **EB §1 RULED IT: the first reading is intended, and `CLAUDE.md` carries the ruling with
 the counter-reading beside it.** `check_ea` §4 pins the DIRECTION rather than the counts, so a pool
 growing does not red it, and **`check_eb` §1 pins the per-pair INVERSION the ruling does not
-cover**, with the one crossover named in both directions.
+cover** — with the one crossover named in both directions then, and none since GT §2.
 
 **Full working: `docs/reports/DZ.md` §2 (the first two) and `docs/reports/DY.md` §1 (all three as
 first raised).** DZ measured and ruled on nothing.
