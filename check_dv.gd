@@ -401,34 +401,44 @@ func _s4_the_cut() -> void:
 	# number. THE ARCHIVE KEEPS ITS EQUALITY, because that file only moves when
 	# a cut moves it, so 185 is a real invariant rather than a growing count.
 	#
-	# **BATCH FG CUT AGAIN, AT EP/EQ, AND THIS IS THAT RE-POINT.** DV's figures
+	# **BATCH GZ CUT AGAIN, AT FS/FT, AND THIS IS THAT RE-POINT.** DV's figures
 	# were 16 and 149; FG moved 36 entries out, leaving 16 plus its own = 17
-	# live and taking the archive to 185. Both numbers move ONLY in the batch
-	# that moves them, which is why the archive's is an equality and the live
-	# file's is not.
-	ok(live_span >= 17,
-		"§4: the live file holds %d entries, FEWER than the 17 the cut left — an entry has been dropped" % live_span)
-	ok(arch_span == 185, "§4: the archive holds %d entries, not the 185 the cut made" % arch_span)
-	print("  live %d entries (floor 17, +1 a batch since the cut), archive %d" % [
+	# live and taking the archive to 185; **GZ moved 29 out, leaving 31 plus its
+	# own = 32 live and taking the archive to 214.** Both numbers move ONLY in
+	# the batch that moves them, which is why the archive's is an equality and
+	# the live file's is not.
+	ok(live_span >= 32,
+		"§4: the live file holds %d entries, FEWER than the 32 the cut left — an entry has been dropped" % live_span)
+	ok(arch_span == 214, "§4: the archive holds %d entries, not the 214 the cut made" % arch_span)
+	print("  live %d entries (floor 32, +1 a batch since the cut), archive %d" % [
 		live_span, arch_span])
 
 	# THE BOUNDARY IS A BATCH BOUNDARY AND IT IS THE ONE INTENDED.
-	# **RE-POINTED AT BATCH FG FROM DF/DG TO EP/EQ.** All four literals below
-	# named DV's boundary and all four were correct until FG cut again; the
-	# cut is not done until every reader whose entry moved is re-pointed IN THE
-	# SAME BATCH, and this gate is one of exactly two readers that needed it.
+	# **RE-POINTED AT BATCH GZ FROM EP/EQ TO FS/FT**, and at FG from DF/DG
+	# before that. All five literals below named the previous boundary and all
+	# five were correct until the next cut; the cut is not done until every
+	# reader whose entry moved is re-pointed IN THE SAME BATCH, and this gate is
+	# one of exactly two readers that needed it.
 	# **THE OTHER IS `check_ec` §2**, which verifies these very pins resolve —
 	# so a boundary literal has TWO readers and re-pointing one leaves the
 	# other red.
-	ok(live.contains("<h2>2026-09-02 &mdash; Batch EQ"),
-		"§4: the live file's oldest entry, Batch EQ, is missing")
-	ok(not live.contains("<h2>2026-09-02 &mdash; Batch EP"),
-		"§4: Batch EP is still in the live file — the cut did not move it")
-	ok(arch.contains("<h2>2026-09-02 &mdash; Batch EP"),
-		"§4: Batch EP is not in the archive — an entry was DROPPED by the cut")
-	ok(not arch.contains("<h2>2026-09-02 &mdash; Batch EQ"),
-		"§4: Batch EQ is in BOTH halves — the cut duplicated an entry")
-	ok(live.contains("<h2>2026-09-06 &mdash; Batch FG"),
+	#
+	# **AND GZ MEASURED WHICH OF THEM ACTUALLY BIT.** Run unmodified against the
+	# cut tree, FOUR of the five failed and the fifth — the header arm below —
+	# PASSED on a stale pin, because the header records every cut in its own
+	# history and `Batch FG</b> at EP/EQ` is still written there. That is the
+	# same always-true shape FG took the `or` off for, arriving by another road.
+	# Reported at GZ §3, not repaired: the needle is re-pointed here and nothing
+	# else about the arm is changed.
+	ok(live.contains("<h2>2026-09-09 &mdash; Batch FT"),
+		"§4: the live file's oldest entry, Batch FT, is missing")
+	ok(not live.contains("<h2>2026-09-09 &mdash; Batch FS"),
+		"§4: Batch FS is still in the live file — the cut did not move it")
+	ok(arch.contains("<h2>2026-09-09 &mdash; Batch FS"),
+		"§4: Batch FS is not in the archive — an entry was DROPPED by the cut")
+	ok(not arch.contains("<h2>2026-09-09 &mdash; Batch FT"),
+		"§4: Batch FT is in BOTH halves — the cut duplicated an entry")
+	ok(live.contains("<h2>2026-09-20 &mdash; Batch GZ"),
 		"§4: the cutting batch's own entry is not in the live changelog")
 
 	# ZERO OVERLAP, ASSERTED OVER THE WHOLE OF BOTH HALVES rather than at the
@@ -452,9 +462,9 @@ func _s4_the_cut() -> void:
 	# whose weaker member is always true is a check that has stopped asking its
 	# question, which is exactly what `check_ec` §1 exists to read: it counted
 	# this among nine live alternations and reported it SATISFIED.
-	ok(live.contains("Batch FG</b> at EP/EQ"),
+	ok(live.contains("Batch GZ</b> at FS/FT"),
 		"§4: the live header does not record which batch made this cut")
-	print("  live %d entries (FG..EQ), archive %d entries (EP..Batch 1), 0 overlapping headings" % [
+	print("  live %d entries (GZ..FT), archive %d entries (FS..Batch 1), 0 overlapping headings" % [
 		live_span, arch_span])
 
 

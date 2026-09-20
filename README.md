@@ -47,14 +47,14 @@ Turn-based, party-based roguelike RPG. Phase 1: combat prototype.
 
 - `docs/master.html` — the authoritative design reference (current truth)
 - `docs/changelog.html` — what changed and when, newest first. **This is the RECENT
-  half only: it starts at Batch BP (2026-08-13).** Everything older lives in
+  half only: it starts at Batch FT (2026-09-09).** Everything older lives in
   `changelog-archive.html` in the archive folder below.
 - `docs/design-notes.md` — the "why" behind each batch, rationale only
 - `docs/build_docs.py` — builds the Word exports of master + changelog into `DoD/*.docx`
 
 **The archive folder is `DoD-archive/`, at the repo root** (Batch FH brought it in; it
 lived two levels up, outside the repo, until then). It holds the older half of the changelog
-(`changelog-archive.html`, Batch EP back to Batch 1) and the retired `addendum.html`. **It is
+(`changelog-archive.html`, Batch FS back to Batch 1) and the retired `addendum.html`. **It is
 in version control and backed up by GitHub now.** It is kept out of the knowledge-base sync by
 DESELECTING it in the connector's file picker — the same thing the test suites do — which is a
 different act from keeping it out of the repo, and the one that was doing both jobs before.

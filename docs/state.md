@@ -13,82 +13,153 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-20 (Batch GY).*
+*Last rewritten: 2026-09-20 (Batch GZ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GY — THE CEILING, THE CONVENTION, AND THE SHAPE GW MISSED. IMPLEMENT ONLY, AND THE THIRTY-FIRST
-  BATCH ON `class-merge`.** Three small things, none player-visible: `CLAUDE.md`'s ceiling re-derived for the third
-  time, `docs/design-notes.md`'s two conventions resolved *and the instruction that caused the drift repaired*, and a
-  sweep for the shape GX's own control found. **No `.gd` file in the tree was edited at all** — no rune, card, kit,
-  engine, pool or node, and no magnitude. `main` is untouched. Full working: **`docs/reports/GY.md`**.
-- **§1 — THE CEILING IS 410 KiB, BY EE's METHOD ON ITS THIRD RUN.** The floor is a rules-only reading of the file,
-  which since three full readings of every block have retired nothing (ED's 43 never-cited blocks, FF's 105 by what
-  each binds, GR's 113 by subject) is simply its reading — **GX's 336.63 KiB**; the headroom is ten of the largest single-batch growth on record, **+8.10 KiB**; 336.63 +
-  81.00 = **417.63, stated as 410 and rounded DOWN**. **The growth figure was re-measured, not quoted, and it did not
-  move**: over EE's own window (the 92 batches since DK) the record is still **EZ's +8,293 B**, which has stood for
-  thirty-two batches; EB's +8,287 B is the stale one and GR had already replaced it. `check_fg` §2 read 410 out of
-  the rule with no edit to the gate. **THE LIVE READING, WHICH BELONGS HERE AND NOT IN THAT FILE:** `CLAUDE.md`
-  ships at **350,836 B = 342.61 KiB**, **69,004 B = **67.39 KiB** of headroom** — about 22 batches at the rate below.
-- **§1b — WHAT THE THIRD RUN MEANS, AND WHEN A FOURTH IS DUE.** EE derived 290, FU re-derived 340, GY re-derives 410;
-  over the same span the split has been taken three times (EF, FF, GR) after CW's, which is four. **A file split four
-  times whose ceiling has moved twice grows faster than any structure contains** — nothing in it is dead and nothing
-  left in it comes away cleanly, so the re-derivation is the only move the procedure has left that costs less than it
-  buys. **A fourth is due in roughly 24 to 31 batches and no sooner than 9** (73.37 KiB of headroom at GX's reading;
-  +3,086 B a batch since GR's split, +2,383 B since FF, +8,293 B at the record), against GR's inherited 5.1-to-9.8.
-  **The rounding cost 7.63 KiB this time** — EE discarded 1.49 and FU 2.03 — so the stated ceiling carries 9.1 worst
-  batches rather than ten, and the file says so.
-- **§1c — A THIRD OPTION WAS WEIGHED AND REJECTED IN WRITING: SPLITTING THE REASONING OUT.** **97.04 KiB across 202
-  `·` sub-bullets at GX's reading, 28.8% of the file** — and **102.02 KiB across 208 at 29.8%** on the shipped tree — larger than any subject
-  seam GR measured (card law 85.89, engine law
-  41.80, rune law 38.49), so it is the best seam in the file by size and the first thing a batch at the wall reaches
-  for. It stays: a rule without its reason gets re-litigated, a batch only meets the reason by reading it, and it is
-  the half no citation count can see. **Recorded in the ceiling block so it is not re-proposed.**
-- **§2 — `docs/design-notes.md`: GV's AND GW's ENTRIES ARE AT THE TOP, AND THE INSTRUCTION THAT SENT THEM DOWN IS
-  REPAIRED.** The move is a **permutation, proved by multiset**: the same 7,826 non-blank lines before and after, a
-  byte delta of −1 (one blank line), each moved block md5'd. **Something did instruct the append, in two places**:
-  `CLAUDE.md`'s working agreement said *newest first* for the changelog at step (2) and plain *append* for the design
-  notes at step (4), and `docs/ways-of-working.md`'s merge table said *Append-only at the top* for the one and
-  *Append-only* for the other. **Both state the position now.** The changelog-habit explanation is ruled out by
-  direction: the changelog is append-at-**top**.
-- **§2b — THE FILE IS TWO BLOCKS WITH OPPOSITE CONVENTIONS, AND 73 OTHER ENTRIES ARE OUT OF ORDER.** 186 `## `
-  entries: a **111-entry newest-first block** with one inversion inside it (Batch AK sits below Batch AJ) and a
-  **75-entry OLDEST-first tail** running Batch V → GO, every one of whose 72 labelled entries is newer than the top
-  block's oldest. **Minimum entries that must move: 73** — derived twice and agreeing (it was 75 before GV and GW
-  left). Reported, not repaired.
-- **§3 — THE SWEEP FOR A GATE THAT FINDS ITS SUBJECT BY THE PROPERTY UNDER TEST: 384 SITES, 4 ARE THE SHAPE, AND
-  TWO OF THE FOUR DO NOT FAIL AT ALL.** GW swept for a gate that ARRANGES what it tests; this is the gate that FINDS
-  what it tests. **384 sites over the 121 files the battery launches** — 95 guarded locates, 283 filter-and-tally
-  loops, 6 lambda filters — with **the locator set derived rather than listed** (any function that takes a needle,
-  searches with it, and returns what matched: 151 of them). **362 key on something stable** — a binding, a z-index, a
-  `display_name`, an id, a path, a source anchor — and **22 key on a value the screen renders**, of which 18 are
-  still legitimate: the needle is a name the widget draws in *every* arm while the assertion is about geometry or a
-  count, and each has a paired arm that reds when the name moves.
-- **§3b — THE FOUR, AND THE SHAPE HAS TWO DIRECTIONS.** Where the assertion is about a PRESENT subject a wrong value
-  reads as a missing one — the arm reds naming the wrong cause and everything guarded behind it is skipped:
-  **`check_gx:412`** and **`check_gx:769`** both find a pouch row by `GT_HEAD`, the tell's own first line, so the
-  exactness and layout assertions beside them never run. **Where the assertion is that a subject is ABSENT, a wrong
-  value makes the filter match nothing and THE ARM PASSES** — **`test_batch_as:900`** counts turn-bar slots by their
-  rendered tooltip and asserts the count is zero, so a tooltip reformat passes it on a bar still full of the held
-  boss; **`check_ct_map:96`** finds the shop's draft header by its wording into a `draft_top` initialised to **1e9**,
-  so rewording the header passes the collision check on a shop whose supply column runs straight through it. **Report
-  only. Nothing is repaired** (FZ's pricing rule).
-- **WHAT MOVED:** `CLAUDE.md` (the ceiling block re-derived; the working agreement's step 4), `docs/ways-of-working.md`
-  (the merge table's design-notes row), `docs/design-notes.md` (GV and GW moved up, GY's entry added),
-  `docs/changelog.html`, this file and `docs/reports/GY.md` (**NEW**). **No `.gd`, no `.tscn`, no `data/`, no
-  `run_battery.sh`, no new gate, and `pin-manifest.json` re-derived byte-identical.** **`baselines.json` IS UNTOUCHED AND THAT IS MEASURED, NOT ASSUMED**: the count differ read **501 checks / 0 failures / 0 notices** over the acceptance run, so not one target's count moved — a baseline moves only in the batch that causes the movement.
-- **Phase.** Unchanged by this batch: steps 1–4 of the merge's running order are done and step 5's rune half is done;
-  **the Crown's Break and freeze resistance is still owed**; step 6 is the 52 engine-bound gates.
-- **Next letter: GZ.**
+- **Last batch: GZ — THE CHANGELOG CUT, ON TIME. IMPLEMENT ONLY, AND THE THIRTY-SECOND
+  BATCH ON `class-merge`.** The fifth cut of `docs/changelog.html`, **taken one batch after the watcher FG built
+  asked for it** — the first cut this file has ever had because something measured it rather than because someone
+  noticed. **No rune, card, kit, engine, pool or node moved and no magnitude was retuned**; the only `.gd` edit in
+  the tree is five literals and two counts in `check_dv` §4. `main` is untouched. Full working:
+  **`docs/reports/GZ.md`**.
+- **§1 — THE CUT, AT FS/FT. 29 ENTRIES MOVED, NOTHING DELETED, NO ENTRY EDITED.** `docs/changelog.html` goes
+  **400,021 B → 144,740 B** (144.74 KB = 141.35 KiB) and **60 → 32 entries**, running **GZ back to FT**; the archive
+  goes **1,646,949 → 1,907,462 B** and **185 → 214 entries** (FS → Batch 1); the `DoD-archive/` folder goes
+  1,680,660 → **1,941,173 B**. **The boundary is the last one that clears 150 on BOTH readings of KB with this
+  batch's own entry counted** — one entry further and the file ships at 153.6 KB — which is the shape FG's cut left
+  (147,929 B / 147.93 KB / 144.46 KiB). **THIS CUT LEAVES THE MOST ENTRIES AND THE FEWEST BYTES OF ANY CUT ON
+  RECORD**, because entries have shortened: the newest 7 average 3,669 B against the 5,863 B a batch the live file
+  actually grew at between FG's cut and GY's crossing. **The headroom reads 44 batches at that realised rate and 62
+  to 70 at the recent one; the first is the honest figure**, being the only one measured over a whole cut-to-cut
+  window.
+- **§1b — NO FILE SIZE IS ASSERTED ANYWHERE, AND THE REASON WAS RE-PROVED RATHER THAN QUOTED.** The proof is a
+  SECOND script sharing no code with the splitter, reading FROZEN copies of both originals: headings counted two
+  independent ways on all four files (60/185/31/214, agreeing), counts summing with zero overlap, the heading
+  MULTISET identical before and after, order preserved on both sides, every heading exactly once, none invented,
+  none dropped, each of the 60 original entries hashed where it now lives, both footers byte-unchanged, and **the
+  two bodies rejoined BYTE-IDENTICAL to the original** (sha256 `06f447fc…`). **THE PROOF WAS PROVED on three
+  scratch pairs the real tree never saw**: an entry dropped → **11** failures, an entry in both halves → **11**, and
+  **one word misspelt inside a kept entry → 3, all three of them byte arms**, on a file that is byte-for-byte the
+  same LENGTH and whose every heading count reads clean. **Only the rejoin sees the third.**
+- **§2 — THE CHANGELOG DOES NOT HAVE THE DESIGN NOTES' PROBLEM, AND THAT WAS ASKED BEFORE A BYTE MOVED.** All 60
+  entries strictly descending by batch code, all 60 dates non-increasing, **zero inversions, zero duplicate labels**,
+  every heading carrying both a date and a batch. The reason is structural: this file has only ever been written
+  append-at-the-**TOP**. **Four letters have no entry at all — AM, CC, CF, GD** — and a missing letter is a batch
+  never written, not an entry lost; the multiset proof is what tells those two apart.
+- **§3 — FIVE BOUNDARY LITERALS WERE OWED A RE-POINT, FOUR BIT, AND THE FIFTH PASSED.** Run unmodified against the
+  cut tree, `check_dv` read **83 checks / 4 failures**, all four in §4. The fifth arm —
+  `live.contains("Batch FG</b> at EP/EQ")`, **the one FG rewrote to kill DV's always-true alternation** — did not
+  fail, because **the live header records every cut in its own history** and FG's clause is still written there.
+  **It is the same shape arriving by a shorter road**: FG's pin asks its question for exactly one batch and is then
+  satisfied by the record again. `check_ec` §1 cannot see it — it is a single `contains` and it resolves.
+  **Re-pointed, NOT repaired** (FZ's pricing rule); the fix is a pin on the header's LAST cut rather than a named
+  one, and it is its own batch with its own two-armed control.
+- **§3b — AND A NEEDLE BROKEN BY A LINE WRAP, CAUGHT BEFORE THE GATE RAN.** The first live header wrapped
+  `<b>Batch GZ</b> at` / `FS/FT` across a newline, so the re-pointed needle was not in the file at all.
+  **`build_pin_manifest.py` returned `"r": "unresolved"` for it — the only document pin in the tree that did** —
+  and re-wrapping took it to `"r": "code"`. **The manifest is a needle instrument and it was read as one.** GY hit
+  the identical hazard on `check_fg`'s regex two batches ago.
+- **§4 — THE READER POPULATION IS DERIVED, AND THE ONE NOBODY HAS EVER COUNTED IS THE FILES THAT *STATE* THE
+  BOUNDARY.** With comments stripped: **17 files open the live changelog** (the 14 suites bb…ce, plus `check_dv` §4,
+  `check_fg` §1 and `check_ec` §2), **15 reach the archive through the live file's own header**, and **0 hardcode
+  it**; two tools read it by relative name (`docs/build_docs.py`, which is why the live file must never move, and
+  `build_pin_manifest.py`). **Not one of the 14 suites owed a re-point** — every one pins a batch archived at BZ's
+  or CX's cut — which is CD's pattern paying for itself. **But `README.md` still named Batch BP**, the boundary BZ's
+  first split left, **never re-pointed through CX, DV or FG: three cuts and 126 batches stale**, plus a second
+  claim one cut old. **Nothing in the tree opens `README.md`**, which is exactly why it could sit stale with a green
+  tree every battery. `CLAUDE.md` carried two more — the count of cuts, and the archive folder's byte size. **All
+  four corrected, and the lesson written into `docs/instrument-rules.md` under CW §4: sweep by the CLAIM, not by
+  the reader.**
+- **§5 — THE ARCHIVE NEEDS NO CEILING OF ITS OWN, AND THAT IS REPORTED, NOT RULED.** It is **1,907,462 B** and
+  nothing measures it. **A ceiling is a number with an answer behind it**: the changelog's answer is *move it to the
+  archive* and `CLAUDE.md`'s is *split it*, and both lose nothing — **the archive's only possible answer is DELETE,
+  which CW §4 forbids in the same block that would state the bar.** Its two real costs are already met elsewhere: it
+  is deselected from the knowledge sync **by name**, so it costs the sync nothing at any size, and its repo cost is
+  git's. **It is a different kind of file from the two that do have ceilings — they are read, and it is only ever
+  reached.** What it is owed is a READING in a file something asserts on, and it has one now: the folder figure is
+  in `CLAUDE.md`'s sync block and the file figure is here.
+- **§6 — WHERE THIS BATCH WENT PAST ITS BRIEF.** The brief said `CLAUDE.md` is not touched; **two live measurements
+  in it are falsified by this cut** — the number of cuts taken and the archive folder's byte size — and both were
+  corrected: **+13 B, and the file ships at 350,849 B = 342.63 KiB with 67.37 KiB of headroom**. **The ceiling block is byte-unchanged and nothing was
+  re-derived**, which is what that instruction was about. CW §4's own rule is that the cut is not done until
+  everything it invalidates is re-pointed in the same batch. **Flagged here and in `docs/reports/GZ.md` §5 rather
+  than buried; it reverts in two `sed` lines and the live figures are in both files.**
+- **WHAT MOVED:** `docs/changelog.html` (cut, header re-pointed, GZ's entry), `DoD-archive/changelog-archive.html`
+  (+29 entries, header re-pointed), `check_dv.gd` (§4 — five literals, two counts and the comment recording why),
+  `pin-manifest.json` (**re-derived: exactly four needles changed and nothing else**), `CLAUDE.md` (two stale
+  facts), `README.md` (two stale claims), `docs/instrument-rules.md` (two lessons under CW §4), this file and
+  `docs/reports/GZ.md` (**NEW**). **No game `.gd`, no `.tscn`, no `data/`, no `run_battery.sh`, no new gate.**
+  **`baselines.json` IS UNTOUCHED AND THAT IS MEASURED, NOT ASSUMED**: no arm was added or removed anywhere, and
+  the count differ read the whole battery. `docs/master.html`, `docs/design-notes.md`, `docs/combat-rules.md` and
+  `docs/ways-of-working.md` are byte-unchanged, proved off the start-of-batch freeze.
+- **Phase.** Unchanged by this batch: steps 1–4 of the merge's running order are done and step 5's rune half is
+  done; **the Crown's Break and freeze resistance is still owed**; step 6 is the 52 engine-bound gates.
+- **Next letter: HA.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+### GZ's RULINGS OWED — **TWO; NEITHER IS PLAYER-VISIBLE, AND THE FIRST IS A GATE THAT PASSES WHEN IT SHOULD NOT**
+
+Full working: `docs/reports/GZ.md`, NEEDS A RULING.
+
+1. **`check_dv` §4's HEADER ARM IS SATISFIED BY THE RECORD OF A CUT RATHER THAN BY THIS CUT, AND IT ALWAYS WILL
+   BE.** The live header names **every** cut in its own history, so `contains("Batch FG</b> at EP/EQ")` was still
+   true on a tree where FG's boundary had stopped being the boundary — **measured, not argued: four of the five
+   boundary literals failed against the cut tree and this one passed.** DV's version was an alternation whose weak
+   member was always true; FG replaced it with a pin on the cutting batch's own clause, **which asks its question
+   for exactly one batch and is then satisfied by the record again**. The difference is only that it takes a cut
+   rather than a rename to break it. **`check_ec` §1 cannot report it** — it reads alternations, and this is a
+   single `contains` that resolves. **The repair is a pin on the header's LAST cut clause, or on the boundary its
+   opening sentence states**, either of which is a different arm owing a two-armed control on a real cut, so it is
+   its own batch by FZ's pricing rule. Re-pointed to `Batch GZ</b> at FS/FT` here and not repaired.
+2. **NOTHING IN THE TREE OPENS `README.md`, AND IT SAT THREE CUTS STALE BECAUSE OF IT.** It named **Batch BP** as
+   the live file's first entry — the boundary BZ's first split left, written at `06e382c` and carried unchanged
+   through CX, DV and FG, **126 batches**. Corrected here, but **the class of defect is not**: the re-point debt
+   has always been counted over the files that OPEN the changelog, and a file no instrument reads is a file whose
+   claims can never go red. **GZ wrote the lesson into `docs/instrument-rules.md` under CW §4 and did not build the
+   instrument.** Whether `README.md` — and any other file in that class — is worth a gate that reads its factual
+   claims against the tree is the designer's; it is a different shape from every document gate now standing, all of
+   which read files something already asserts on.
+
+### FOUND AT GZ AND NOT FIXED
+
+- **THE ARCHIVE HAS NEVER GROWN INSIDE VERSION CONTROL UNTIL NOW, AND THE BRIEF'S COUNT WAS WRONG IN THE SAFE
+  DIRECTION.** It was created by **BZ**'s split and added to by **CX**, **DV** and **FG** — three additions, four
+  cuts — and **FH did not grow it**; FH moved the folder into the repo and edited one sentence of its header, which
+  is the 268 B between FH's recorded 1,646,681 B and the 1,646,949 B it actually shipped. **This batch is its first
+  growth as a tracked file**, so it is also the first addition whose recovery does not depend on a named commit.
+- **`check_fg` §1 HAS NEVER HELD A COPY OF THE CHANGELOG BAR, AND FU's RED WAS §2's.** Confirmed by reading the
+  gate rather than its header comment: the only route to the number is a pattern over
+  `docs/instrument-rules.md` that finds the FORM whatever the number is, collects every occurrence and asserts the
+  set has one member. **The defect FU repaired was shared by both form checks; the number that moved was
+  `CLAUDE.md`'s ceiling, so §2 is what went red** against a correct rule and a correct file.
+- **THE LIVE FILE'S OWN HEADER CARRIED TWO CLAIMS THIS CUT FALSIFIED, AND NEITHER IS A BOUNDARY NUMBER.** *"See the
+  **Batch FH** entry below"* pointed at an entry that is one of the 29 that moved, and the archive's *"EVERYTHING
+  BELOW WAS WRITTEN WHILE THIS FILE WAS NOT BACKED UP"* became false for the 15 newest entries in it the moment
+  they arrived. Both re-scoped. **A cut moves entries out from under prose that points at them**, and nothing
+  asserts on that class of pointer at all.
+- **TWO ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata` — **"Dawn of Decay GZ ctl head"**
+  and **"GZ ctl new"**, the two arms of `check_gj`'s HEAD control. **Each was renamed in `project.godot` before
+  anything ran in it**, so its `user://` could not reach the player's saves, and each was seeded from a
+  byte-identical copy of the live folder so the two arms started from the same state. They can be deleted.
+  **There are 100 such folders now**, GY's four among them; nothing prunes them and each batch adds a few.
+  **The player's four save files are byte-identical to the backup taken as this batch's first action**, checked
+  by md5 before the battery and again after everything had run.
+- **THE CUT LEFT 32 ENTRIES, WHICH IS THE LARGEST LIVE HALF ANY CUT HAS LEFT, AT THE SMALLEST BYTE SIZE.** CX left
+  10 at 162.1 KB, DV left 16 at 150.0 KiB, FG left 17 at 147,929 B, GZ leaves 32 at 144,740 B. **Entry size
+  is falling** — the newest 7 average 3,669 B against a 5,863 B/batch realised growth rate over FG's whole window —
+  so the entry COUNT and the byte figure are drifting apart, and `check_dv` §4's floor is on the count while
+  `check_fg` §1's bar is on the bytes. Neither is wrong; they will simply answer different questions from here.
+
 ### GY's RULINGS OWED — **THREE; NONE IS PLAYER-VISIBLE, AND THE FIRST SHAPES THE NEXT BATCH**
 
 Full working: `docs/reports/GY.md`, NEEDS A RULING.
 
-1. **`docs/changelog.html` HAS CROSSED ITS OWN THRESHOLD, AND THE CUT IS OWED AT THE NEXT BATCH BOUNDARY.** The
+1. **~~`docs/changelog.html` HAS CROSSED ITS OWN THRESHOLD, AND THE CUT IS OWED AT THE NEXT BATCH BOUNDARY~~ —
+   TAKEN AT GZ, AT THE FS/FT BOUNDARY: 29 entries moved, 400,021 B → 144,527 B, and `check_fg` §1 stopped
+   warning.** The
    file is **400,021 B against CW §4's 400,000 B bar — 21 bytes over** — and `check_fg` §1 printed its CEILING
    WARNING on the acceptance run: *"The cut is owed AT THE NEXT BATCH BOUNDARY and this gate FAILS if it is not
    taken."* **It is a WARNING and not a red by the gate's own design** (the file WITHOUT this batch's entry is
@@ -3727,46 +3798,72 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   `releases/battle` is the row that does.
 
 ### The changelog
-- **THE LIVE FILE WAS CUT AT FG, AT THE EP/EQ BOUNDARY.** It starts at **Batch EQ**.
-  **DO NOT COUNT THIS BY HAND AND DO NOT TRUST THIS LINE**: `check_dv` §4
+- **THE LIVE FILE WAS CUT AT GZ, AT THE FS/FT BOUNDARY.** It starts at **Batch FT** and the archive ends at
+  **Batch FS**. **DO NOT COUNT THIS BY HAND AND DO NOT TRUST THIS LINE**: `check_dv` §4
   prints the live figure every battery and `check_fg` §1 prints the SIZE beside the bar, and this
   sentence **has arrived stale at EE, at EO and again at FF** — three times, each time in the
   direction of reading low. **DV ASSERTED THE COUNT AS AN EQUALITY AND IT COULD ONLY PASS FOR ONE
-  BATCH** (`live_span == 16`, red on DW's own entry); **it asserts a FLOOR** now — the cut left 17
-  and entries are only ever added, so an entry VANISHING still fails — **and the ARCHIVE keeps its
-  equality at 185**, because that file only moves when a cut moves it. **DX generalised that repair
-  into a construction rule**; see `docs/instrument-rules.md` (DX §1).
-- **THE THRESHOLD IS WATCHED NOW AND THAT IS THE WHOLE POINT OF THIS BATCH.** The bar is **400 KB**
-  in the rule's own words — **the decimal reading, and the stricter of the two by 9,600 B**. The
-  live file crossed it at **FB on that reading and FC on the KiB one**, and **four batches went
-  past with a green tree** because nothing read the file against the number. `check_fg.gd` §1 does,
-  every battery, and FAILS if a second batch passes without the cut.
-- **`DoD-archive/changelog-archive.html` holds 185 entries** (Batch 1 → **EP**). **IT IS IN THE REPO AS OF BATCH FH, SO IT IS IN VERSION CONTROL AND BACKED UP BY
-  GITHUB, AND THAT EXPOSURE IS CLOSED.** It is kept out of the knowledge sync by **DESELECTION in
-  the file picker**, which is a different act from keeping it out of the repo — and the two were
-  being done with the same lever for four cuts. **The header pointer is
-  `res://DoD-archive/changelog-archive.html` now**, not an absolute path, so the fifteen readers
-  that follow it work on any machine.
+  BATCH** (`live_span == 16`, red on DW's own entry); **it asserts a FLOOR** now — GZ's cut left 31
+  plus its own = **32**, and entries are only ever added, so an entry VANISHING still fails — **and the ARCHIVE
+  keeps its equality, at 214 since this cut**, because that file only moves when a cut moves it. **DX generalised
+  that repair into a construction rule**; see `docs/instrument-rules.md` (DX §1).
+- **THE THRESHOLD IS WATCHED, AND AT GZ THE WATCHER WORKED END TO END FOR THE FIRST TIME.** The bar is **400 KB**
+  in the rule's own words — **the decimal reading, and the stricter of the two by 9,600 B**. `check_fg` §1 warned
+  on **GY**, the batch that crossed it at 400,021 B, and **GZ took the cut at the next boundary, which is exactly
+  the sequence FG designed**: the previous crossing at FB/FC ran four batches with a green tree because nothing
+  read the file against the number. The live file is **144,740 B = 144.74 KB = 141.35 KiB** with **255,260 B of
+  headroom** — **44 batches at the 5,863 B/batch the file actually grew at over FG's whole window, 62 to 70 at the
+  rate of the last 7 to 20 entries.** Use the first.
+- **`check_fg` §1 HOLDS NO COPY OF THE BAR AND THAT WAS RE-CONFIRMED BY READING THE GATE**, not its header
+  comment: its only route to the number is a pattern over `docs/instrument-rules.md` that finds the FORM whatever
+  the number is, collects every occurrence and asserts the set has one member. **FU's red was §2's** — the defect
+  was shared by both form checks, but the number that moved was `CLAUDE.md`'s ceiling.
+- **`DoD-archive/changelog-archive.html` holds 214 entries** (Batch 1 → **FS**) and is **1,907,462 B**; the folder,
+  with the retired `addendum.html`, is **1,941,173 B**. **IT IS IN THE REPO AS OF BATCH FH, SO IT IS IN VERSION
+  CONTROL AND BACKED UP BY GITHUB, AND THAT EXPOSURE IS CLOSED** — **GZ is the first cut to add to it since**, so
+  it is the first addition whose recovery does not depend on a named commit. It is kept out of the knowledge sync
+  by **DESELECTION in the file picker**, which is a different act from keeping it out of the repo — and the two
+  were being done with the same lever for four cuts. **The header pointer is
+  `res://DoD-archive/changelog-archive.html`**, not an absolute path, so the fifteen readers that follow it work
+  on any machine.
+- **IT HAS NO CEILING AND DOES NOT NEED ONE (GZ §5, REPORTED NOT RULED).** **A ceiling is a number with an answer
+  behind it.** The changelog's answer is *move it to the archive*; `CLAUDE.md`'s is *split it*; **the archive's
+  only possible answer is DELETE**, which CW §4 forbids in the same block that would state the bar. Its sync cost
+  is zero at any size because it is deselected by name, and its repo cost is git's. **It is a different kind of
+  file from the two that do have ceilings — they are read, and it is only ever reached.** What it is owed is a
+  READING in a file something asserts on, and it has one: the folder figure is in `CLAUDE.md`'s sync block and the
+  file figure is above.
 - **THE VERIFICATION IS THE THING TO REPEAT, NOT THE CUT.** A SECOND script reading untouched
   frozen copies, sharing nothing with the splitter: headings counted two independent ways on all
-  four files (52 / 149 / 16 / 185), counts summing with zero overlap, order preserved on both
+  four files (60 / 185 / 31 / 214), counts summing with zero overlap, order preserved on both
   sides, every heading exactly once, none invented, none dropped, no entry edited, and **the two
   bodies rejoined BYTE-IDENTICAL to the original**, confirmed again by sha256. **NO FILE SIZE WAS
   ASSERTED ANYWHERE** — sizes agreeing is consistent with a duplicated entry and a dropped one.
-  **AND THE PROOF WAS PROVED**: an entry dropped → 10 failures, an entry in both halves → 11, **one
-  word misspelt inside a kept entry → 3**, and the third moves the file size by zero bytes.
-- **FIFTEEN READERS RESOLVE THE ARCHIVE THROUGH THE LIVE FILE'S OWN HEADER** — the fourteen
-  suites bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx, cb, ce, **plus `check_dv` §4**. **NO
-  `.gd` FILE IN THE TREE NAMES THE ARCHIVE BY PATH**, which is why FH's move was one header edit
-  and none of the fifteen was touched. They no longer depend on a file outside version control.
-  **NONE OF THEM NEEDED RE-POINTING AT DV, AT FG OR AT FH, AND THAT IS CX's WORK**: every
-  live-changelog assertion in the tree is either the archive-path anchor or a **negative**
-  `not contains("<h2>… Batch XX")`, which a cut can only make more true. **The anchor was armed at
-  a directory that does not exist to prove they follow it rather than pass regardless: `check_dv`
-  83 / 4, `test_batch_bb` 177 → 173 with 2 failures and a throw.**
-- **THE TWO GATES THAT DID NEED RE-POINTING ARE `check_dv` §4 AND — SECOND-HAND — `check_ec` §2**,
+  **AND THE PROOF WAS PROVED AGAIN AT GZ**: an entry dropped → **11** failures, an entry in both halves → **11**,
+  **one word misspelt inside a kept entry → 3, every one of them a byte arm**, on a file that is byte-for-byte the
+  same LENGTH and whose every heading count reads clean.
+- **SEVENTEEN FILES OPEN THE LIVE CHANGELOG AND FIFTEEN RESOLVE THE ARCHIVE THROUGH ITS OWN HEADER** — the
+  fourteen suites bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx, cb, ce, **plus `check_dv` §4** for the archive,
+  and **`check_fg` §1 and `check_ec` §2** for the live file alone; **0 hardcode the archive path**, and two tools
+  read the live file by relative name (`docs/build_docs.py`, which is why the live file must never move, and
+  `build_pin_manifest.py`). **NO `.gd` FILE IN THE TREE NAMES THE ARCHIVE BY PATH**, which is why FH's move was
+  one header edit and none of the fifteen was touched. **NONE OF THEM NEEDED RE-POINTING AT DV, AT FG, AT FH OR AT
+  GZ, AND THAT IS CX's WORK**: every live-changelog assertion in the tree is either the archive-path anchor or a
+  **negative** `not contains("<h2>… Batch XX")` on a batch archived at BZ's or CX's cut, which a cut can only make
+  more true. **The anchor was armed at a directory that does not exist to prove they follow it rather than pass
+  regardless: `check_dv` 83 / 4, `test_batch_bb` 177 → 173 with 2 failures and a throw — FH's reading, taken
+  before FX moved that suite's baseline to 173 for an unrelated reason.**
+- **THE TWO GATES THAT DO NEED RE-POINTING ARE `check_dv` §4 AND — SECOND-HAND — `check_ec` §2**,
   which verifies that every document pin in the tree resolves. **A boundary literal has two
-  readers**, so a cut is not done until the gate that reads the gates has been re-run.
+  readers**, so a cut is not done until the gate that reads the gates has been re-run. **And at GZ a third
+  instrument joined them before either ran**: `build_pin_manifest.py`'s residency field, which read `"unresolved"`
+  on a re-pointed needle the header had wrapped across a newline.
+- **AND THE POPULATION THAT HAS NEVER BEEN COUNTED IS THE FILES THAT *STATE* THE BOUNDARY WITHOUT OPENING
+  ANYTHING.** `README.md` named **Batch BP** — BZ's boundary, never re-pointed through CX, DV or FG, **three cuts
+  and 126 batches stale** — plus a second claim one cut old; `CLAUDE.md` carried the count of cuts and the archive
+  folder's byte size. **All four corrected at GZ.** **Nothing in the tree opens `README.md`**: a file no instrument
+  reads is a file whose claims can never go red. Written into `docs/instrument-rules.md` under CW §4 as **sweep by
+  the CLAIM, not by the reader.**
 
 ### Knowledge sync, re-measured at EG
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.

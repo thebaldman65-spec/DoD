@@ -208,8 +208,8 @@ than moved there** — FG's, FH's, FI's, and FR §5a's as FS §1 closed it:
     *Append-only* for the same reason.
   - **THE REASON, RECORDED WITH THE RULE SO THE REBUILD IS NOT RE-PROPOSED AS A
     FIX.** `docs/build_docs.py` reads `docs/changelog.html` by relative name,
-    and that file is **the RECENT HALF only** — the changelog has been cut four
-    times (BZ at BO/BP, CX at CN/CO, DV at DF/DG, FG at EP/EQ) and everything
+    and that file is **the RECENT HALF only** — the changelog has been cut five
+    times (BZ at BO/BP, CX at CN/CO, DV at DF/DG, FG at EP/EQ, GZ at FS/FT) and everything
     older lives in `DoD-archive/changelog-archive.html`. **Rebuilding would
     overwrite `DoD Changelog.docx` with the recent half and drop the rest**,
     which is not a stale export becoming fresh; it is an archive being
@@ -537,7 +537,7 @@ them** — they move every batch.
   backup for 1,646,681 B of history that four cuts had moved there. **The picker is the tool for
   the capacity problem and the repo is the tool for the backup problem, and they were being
   solved with the same lever.** Tracked and deselected is what the 44 suites already do.
-  **DESELECT `DoD-archive/` — both files. It is 1,680,660 B**, larger than every `check_*.gd` in
+  **DESELECT `DoD-archive/` — both files. It is 1,941,173 B**, larger than every `check_*.gd` in
   the tree put together. **THE SHARE IS NOT CARRIED HERE AND THE BYTES
   ARE**, because a share moves every time any other file does: FH wrote *14.2%* and FS measured
   the same two files at **13.0%** without either of them changing by a byte. **Run

@@ -136,6 +136,21 @@ below.
     passed with the first deleted. **A cut writes its own batch into that header, so pin THAT**,
     and note that `check_ec` §1 counted this among nine live alternations and correctly reported
     it satisfied: reading a group by its operator is not the same as the group asking anything.
+  · **AND PINNING THAT IS NOT ENOUGH EITHER, BECAUSE THE HEADER KEEPS EVERY CUT.** FG replaced
+    the alternation with `contains("Batch FG</b> at EP/EQ")`, which asked its question for exactly
+    one batch: the history sentence still carries that clause after the next cut, so the arm is
+    satisfied by the RECORD again, one cut later and by a shorter road. **GZ measured it** — run
+    unmodified against the cut tree, four of `check_dv` §4's five boundary literals failed and
+    **this one passed**. Re-pointed at GZ, not repaired: the fix is to pin the header's LAST cut
+    rather than a named one, and a repair is its own batch.
+  · **THE RE-POINT DEBT HAS ALWAYS BEEN COUNTED OVER THE `.gd` READERS, AND THAT IS NOT THE
+    POPULATION.** GZ swept for every file that states the boundary rather than every file that
+    opens the changelog. **`README.md` still named Batch BP** — the boundary BZ's first split
+    left, carried unchanged through CX, DV and FG, **126 batches and three cuts stale** — and
+    `CLAUDE.md` carried two more, the number of cuts taken and the archive folder's byte size,
+    which every cut moves. **Nothing in the tree opens `README.md`**, which is the whole reason:
+    a file no instrument reads is a file whose claims can never go red. **Sweep by the CLAIM, not
+    by the reader.**
 
 ## A CEILING NOBODY MEASURES IS A CEILING THAT GETS CROSSED SILENTLY (STANDING, Batch FG §2)
 > **A THRESHOLD WITH NO INSTRUMENT IS A NOTE, NOT A GATE.** A number written into a rule is a
