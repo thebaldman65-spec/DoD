@@ -980,7 +980,47 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			# pool only ever shrinks for a hero, except through a DRAFT, which
 			# is why the reason line says which of the two it is. The button
 			# says what it does and does not pretend to be a choice.
-			if triple.is_empty():
+			# ══ BATCH GV — WHAT THE CACHE STILL HOLDS FOR AN ENGINE HE HAS NOT
+			#    EQUIPPED, SAID RATHER THAN HIDDEN ═════════════════════════════
+			#
+			# `rune_choice` hands over only what his equipped engines can use,
+			# and it keeps the rest stored (`Run.rune_choice_withheld`) rather
+			# than repairing it away: equipping the engine brings it back. A
+			# candidate that silently left the offer would read as a bug (CO
+			# §3), and a cache emptied this way is NOT "nothing can arrive" —
+			# the pouch's own button fills it — so that case has its own words.
+			var withheld: Array = Run.rune_choice_withheld(member)
+			var waits_on: String = Runes.waited_on(withheld.map(
+				func(c): return String((c as Dictionary).get("id", ""))))
+			if not triple.is_empty() and not withheld.is_empty():
+				var more := Label.new()
+				more.text = "The cache holds %d more that wait%s on %s being equipped." % [
+					withheld.size(), "s" if withheld.size() == 1 else "", waits_on]
+				more.add_theme_font_size_override("font_size", 13)
+				more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+				more.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				more.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				more.custom_minimum_size = Vector2(600, 0)
+				box.add_child(more)
+			if triple.is_empty() and not withheld.is_empty():
+				var held_back := Label.new()
+				held_back.text = "The cache holds nothing this hero can take while %s is not equipped.\nEquip it and the cache's runes return; letting the pick go spends it." % \
+					waits_on
+				held_back.add_theme_font_size_override("font_size", 14)
+				held_back.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+				held_back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				held_back.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				held_back.custom_minimum_size = Vector2(600, 0)
+				box.add_child(held_back)
+				var let_go := Button.new()
+				let_go.text = "Let it go"
+				let_go.custom_minimum_size = Vector2(200, 34)
+				let_go.pressed.connect(Music.click)
+				let_go.pressed.connect(func():
+					overlay.queue_free()
+					_dismiss_rune_pick(idx))
+				box.add_child(let_go)
+			elif triple.is_empty():
 				var none := Label.new()
 				none.text = "The cache holds nothing this hero can take — %s.\nThe pick is spent rather than held: nothing can arrive to fill it." % \
 					Runes.empty_offer_reason(member)
@@ -1648,16 +1688,24 @@ func _pick_rune(idx: int, choice: int) -> void:
 	# `rune_choice` is idempotent (it writes its repair back), so calling it
 	# here re-reads the array the buttons were built from rather than repairing
 	# a second time — and a triple that repaired to NOTHING is refused here
-	# rather than indexing an empty array. That state needs runes to have been
-	# switched off mid-run and is unreachable in play; it is guarded anyway.
+	# rather than indexing an empty array. **THAT STATE IS REACHABLE** (FM §3
+	# measured it: buy the cache's runes from the Peddler, then open the card),
+	# and since GV a cache whose every rune reads an engine he has not equipped
+	# comes back empty too; the overlay offers "Let it go" there, never a button
+	# that reaches this line.
 	var live: Array = Run.rune_choice(member)
 	var queue: Array = member.get("rune_candidates", [])
 	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() \
 			or live.is_empty():
 		return
-	var triple: Array = queue.pop_front()
+	queue.pop_front()
 	member["rune_candidates"] = queue
-	var rune: Dictionary = triple[clampi(choice, 0, triple.size() - 1)]
+	# BATCH GV — THE LIST THE BUTTONS WERE BUILT FROM, NOT THE STORED TRIPLE.
+	# The two were one array until GV: a candidate reading an engine he has not
+	# equipped now SITS OUT of what `rune_choice` returns and stays stored, so
+	# index `choice` names a rune in `live` and not in the stored triple.
+	# `_pick_upgrade` indexes its own live offer the same way (FE §2).
+	var rune: Dictionary = live[clampi(choice, 0, live.size() - 1)]
 	# Auto-equip while a slot is free — the pick already happens here; save
 	# the extra click.
 	var worn := 0

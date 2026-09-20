@@ -1753,7 +1753,7 @@ func rune_choice(member: Dictionary) -> Array:
 		kept.append(c)
 		taken.append(nm)
 	if kept.size() == triple.size():
-		return triple
+		return _engine_seated(member, triple)
 	while kept.size() < 3:
 		var fresh := generate_rune(member, taken)
 		if fresh.is_empty():
@@ -1762,7 +1762,50 @@ func rune_choice(member: Dictionary) -> Array:
 		taken.append(String(fresh.get("name", "")))
 	queue[0] = kept
 	member["rune_candidates"] = queue
-	return kept
+	return _engine_seated(member, kept)
+
+
+# ══ BATCH GV — A QUEUED RUNE WHOSE ENGINE IS NOT EQUIPPED SITS OUT OF THE ANSWER,
+#    AND IT IS NOT REPAIRED AWAY ═══════════════════════════════════════════════
+#
+# **THE GATE HOLDS AT THE ANSWER, NOT ONLY AT THE ROLL** — FD §1's rule, and the
+# reason is the brief's: a cache rolled while the engine was equipped is answered
+# a node later, and the pouch's door can take the engine out in between. A
+# candidate that reads an engine the hero's slots do not hold now is not handed
+# over.
+#
+# **BUT IT IS NOT WRITTEN BACK, AND THAT IS THE DIFFERENCE FROM A RETIRED OR AN
+# OWNED CANDIDATE.** Those two are permanent — the pool only ever shrinks for a
+# hero — so FD repairs them away and stores the repair. An unequipped engine is
+# the player's own reversible choice: repairing its runes out of the triple would
+# let one toggle before an answer cost the cache for good, and store that loss.
+# So the stored triple keeps them and this filter reads the slots each time the
+# answer is asked; re-equip the engine and they are offered again. **IT IS NOT A
+# REROLL**, which is what FD's write-back exists to stop: nothing is drawn here,
+# the same candidates come back in the same order, and the render and the pick
+# both read this same list (`map_screen._pick_rune` indexes it). GT §3's ruling
+# for a card that cannot be cast without its engine — it sits out while the
+# engine is gone and returns when it is slotted — applied to an offer.
+func _engine_seated(member: Dictionary, triple: Array) -> Array:
+	var equipped: Array = held_engines(member)
+	return triple.filter(func(c): return Runes.offerable(
+		String((c as Dictionary).get("id", "")), equipped))
+
+
+# The queued candidates the engine gate is holding back from the head triple, for
+# the overlay's sentence: what the cache still holds for this hero once the
+# engine is equipped. Asks `rune_choice` first, so the FD repair has run.
+func rune_choice_withheld(member: Dictionary) -> Array:
+	var live: Array = rune_choice(member)
+	var queue: Array = member.get("rune_candidates", [])
+	if queue.is_empty():
+		return []
+	var live_ids: Array = live.map(func(c): return String((c as Dictionary).get("id", "")))
+	var out: Array = []
+	for c in queue[0]:
+		if not live_ids.has(String((c as Dictionary).get("id", ""))):
+			out.append(c)
+	return out
 
 
 # ══ BATCH FE §2 — THE OTHER TWO FROZEN QUEUES ARE RE-ASKED TOO ═══════════════

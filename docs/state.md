@@ -13,64 +13,114 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-19 (Batch GU).*
+*Last rewritten: 2026-09-20 (Batch GV).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GU — THE LAST THREE CARDS UNDER THE BASELINE, AND THE SWEEP FOR THE SHAPE. IMPLEMENT ONLY, AND THE
-  TWENTY-SEVENTH BATCH ON `class-merge`.** GT priced three cards at the kit card beside them and named three more it
-  did not retune; GU priced those three, swept every card a hero can earn for the shape, and retuned the one genuine
-  mispricing. `main` is untouched. Full working: **`docs/reports/GU.md`**.
-- **§1 — THE THREE, AND NONE MOVED.** **Arcane Explosion and Shadowrend are FORMER BASIC ATTACKS** — the Arcanist's
-  and the Occultist's slot 0 until GS — each at the price of the class basic it replaced (0, no cooldown, 2.0), and
-  **neither class kit holds a card of its role** (the Mage kit has no area card; the Cleric kit has no damage card,
-  ruled). The nearest cards of their role in the pool: **Arcane Barrage** (20 Mana, cooldown 2, 2.5) and **Chastise**
-  (15, cooldown 2, 2.0). **Guard Change is NOT a former basic** — it opened the Swordmaster's kit from AK to GS: under
-  Crushing Blow and Pommel Strike on cost, cooldown and initiative, **under Mocking Blow (0 Rage, cooldown 1, 2.0), the
-  kit card nearest its price, on initiative alone**, and its quickness is what the swap is for. Reported, not retuned.
-- **§2 — THE SWEEP, AND ONE RETUNE (ruled: only a genuine mispricing is retuned).** All **204** earnable cards against
-  the class kit, in the same field role, with EB's initiative control dropped: **eleven** sat under a kit card on HEAD —
-  **two former basics** (Fireball and Frostbolt, under Magic Burst), **five whose advantage is what they are for**
-  (Guard Change, Charge, Kindled Mind, Primal Surge, Bola), **three the field role pairs only through its catch-all**
-  (Quarry's Mark, Hold Breath and Mark of the Hunt against Snare Trap — primary tags MARK, RESOURCE and MARK against
-  DEBUFF) and **one genuine mispricing: Sweeping Strikes**, a Swordmaster boss pick at Crushing Blow's 20 Rage and 3.0
-  with no cooldown against its 2 — and against the Berserker's Bloodlust, EB's own inversion. **It takes Crushing
-  Blow's cooldown of 2; nothing else of it moved.** Printed, not grouped: 47 same-role pairs that trade (EB allows
-  it) and 34 set aside because one side's initiative is the buff cap.
-- **`check_eb` §1 AND `check_ea` §4 WERE ASKING ABOUT THE PRE-GP SHELVES, AND BOTH ARE REPAIRED TO INTENT.** Each
-  paired a lineage's shelf (158 cards) with that lineage's cores alone, so the 20 class-wide cards of the merged pools
-  and all 26 boss-pool cards were in no pair. Both walk every card a hero of the class can earn (204) against the kit
-  and every engine's enablers (20), paired by class, the basic left out on purpose: **29 of 43 pairs favour the core,
-  0 crossovers** (21 of 30 before); on HEAD's Sweeping Strikes the repaired gate reads one crossover, against Bloodlust.
-- **NEW GATE `check_gu`**: the three; the sweep as a named table with each group's ground asked of the game; the
-  retune; and **each of the four cards priced at a kit card — GT's three and GU's one — cast in a real fight beside
-  that kit card**: the same price at the cast line, the same cooldown, the same turn, the door shut while it cools and
-  open after. GT's gate had read its three prices as data only.
-- **RULED IN GU's BRIEF, ONLY RECORDED:** Battle Poise and Shatterpoint stay as they are (GT's ruling 3), and
-  `CLAUDE.md`'s sits-out block says so.
-- **WHAT MOVED:** `scripts/classes.gd` (one cooldown); `check_eb.gd` and `check_ea.gd` (repaired to intent),
-  `check_gu.gd` (**NEW**), `check_ek.gd` (`TAG_CHECKERS`) and `run_battery.sh`; `baselines.json` and
-  `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, this file and
-  `docs/reports/GU.md` (**NEW**).
-- **VERIFICATION:** the acceptance battery is **GREEN — 118 targets in 57 minutes on a frozen tree, `check_de` at
-  489 / 0 / 0** (GT's 485 and four for `check_gu`'s row), `check_gu` at 317 / 0 and `check_eb` at 21 / 0; the only
-  reds are the two standing sanctioned ones (`check_cm_live` 13 / 4, `check_gj` §4's Bell at +169 / +189), their FAIL
-  lines byte-identical to GT's. The unmodified battery ran against GU's code first — 117 targets, 116 as GT's
-  acceptance run read them and `test_batch_an` inside its band; **nothing moved for Sweeping Strikes' cooldown**, and
-  no parse or script error. Full working in **`docs/reports/GU.md`** §5.
-- **Phase.** Steps 1–4 of the merge's running order are done. **The Crown's Break and freeze resistance is still
-  owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
-- **Next letter: GV.**
+- **Last batch: GV — THE RUNES THAT READ AN ENGINE. IMPLEMENT ONLY, AND THE TWENTY-EIGHTH BATCH ON `class-merge`.**
+  GP gated the CARDS at the offer door and the RUNES were never re-read. GV reads all sixty live ordinary runes at their
+  read sites, drives every one of them with its engine equipped and with it merely owned, and gates the thirty-five that
+  cannot pay without it. `main` is untouched. Full working: **`docs/reports/GV.md`**.
+- **§1 — THIRTY-FIVE ROWS, DERIVED AND DRIVEN.** Every payload field traced to every line that reads it with its guard
+  chain, then every rune worn on four boards — its engine equipped or merely owned, the rune worn or not, the same dice.
+  **Thirty-five move NOTHING with the engine merely owned and pay with it equipped**; the other twenty-five all move
+  something without it and none is gated: **five HALF-work** (Killing Cold on a boss at four Chilled, Glass Prison's
+  second body, Open Line's Formless, Blood Debt's bill, Second Whistle's three Loyalty), **eleven ride a card**, **four a
+  status any card lays**, **one the stance every Warrior has**, **three nothing at all**, and **one pays nobody anything
+  (the Shared Hide, below)**. **FP's 43 was the game at FP**: 33 of it are rows, ten are not, and two it did not count
+  are (Grace and Open Hand, whose cards are priced in Mercy since GS).
+- **§2 — THE GATE AT EVERY DOOR, AND IT READS WHAT IS EQUIPPED.** `Runes.ENGINE_READ` is the table and
+  `Runes.offerable` the one answer; `Runes.eligible_ids` asks it at every roll (the Peddler, the elite cache, the
+  bargain, the event verb) and `Run.rune_choice` at a queued offer's answer, where a row **sits out and stays stored**
+  rather than being repaired away. The empty-offer sentence names the engine rune when that is the cause.
+- **§3 — WHAT A HERO WITH NO ENGINE IS OFFERED, PER LINEAGE.** Of his own five: **Arcanist 0, Holy 0, Occultist 0,
+  Sharpshooter 0, Devout 1 of 4**, Warden 3, Swordmaster 3, Pyromancer 3, Survivalist 3, Berserker 4, Cryomancer 4,
+  Beastmaster 4 of 6. **A second engine opens nothing** — scope is still the lineage.
+- **NEW GATE `check_gv`**: the population and the table; every ordinary rune driven on four boards; the two whose PRICE
+  is read with no engine; what each HALF-works rune keeps only with its engine; the gate at the roll, the cache's
+  answer, the Peddler's own screen, the bargain and the event verb; the per-lineage offer table; and **four whole runs
+  through the real screens** — three with every engine unequipped (148 offers, no row) and one holding two apiece (11
+  rows among 69).
+- **WHAT MOVED:** `scripts/runes.gd` (the table, the gate, the third empty-offer cause), `scripts/run_state.gd` (the
+  answer door), `scripts/map_screen.gd` (the overlay's words and the pick's index); `check_gv.gd` (**NEW**) and
+  `run_battery.sh`; `check_es`, `check_fd`, `check_fo` and `test_runes` repaired to intent (each seated a lineage hero
+  with no engine rune); `baselines.json` and `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`,
+  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GV.md` (**NEW**).
+- **VERIFICATION:** **119 targets, `BATTERY_EXIT` 0, `check_de` 493 / 0 / 0**, on a tree stamped by md5 before and after (588 files, identical). `check_gv` 874 / 0, `check_parse` 193 / 0, `test_runes` 5,625 / 0, harness 22 / 382 / 8 throws=0; no `Parse Error` or `SCRIPT ERROR` in any of the 119 logs. **The only reds are the two standing sanctioned ones** — `check_cm_live` 13 / 4 with its four FAIL lines byte-identical to the recon's, and `check_gj` 70 / 1, whose gold figures moved to +158 / +178 with GV's rune offers (HEAD's own code in a rebuild still reads GU's +169 / +189). **Ten injected defects, one per isolated copy, each bit and each named its own defect**; the ownership injection and the no-gate injection printed the same 111 FAIL lines byte for byte. The player's four saves are unmoved.
+- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**. **The Crown's Break and
+  freeze resistance is still owed.** Step 6 is the 52 engine-bound gates.
+- **Next letter: GW.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+
+### GV's RULINGS OWED — **FIVE; FOUR ARE PLAYER-VISIBLE**
+
+Full working: `docs/reports/GV.md`, NEEDS A RULING.
+
+1. **A QUEUED ROW SITS OUT OF A CACHE'S ANSWER RATHER THAN BEING REPAIRED AWAY — THE BATCH'S CALL.** FD's rule is that a
+   frozen offer is re-asked at the answer and the repair is WRITTEN BACK; that is right for a candidate that can only
+   get worse (retired, owned). An unequipped engine is the player's own reversible choice, so the row is kept in the
+   stored triple, filtered out of the answer while the engine is out, and offered again when it is back — and
+   `map_screen._pick_rune` indexes the list the buttons were built from. **The alternative is FD's literal form**: drop
+   the row, top the triple up, store that — under which one toggle before answering a cache costs it those runes for
+   good, and can spend the pick on nothing.
+2. **THE GATE READS WHAT HE HAS EQUIPPED, AND THAT IS THE ONLY READING THAT GATES ANYTHING.** A spec rune is offered by
+   LINEAGE, the lineage is the engine taken at class selection, and nothing sells or discards an engine rune — so every
+   hero who can be offered a row owns its engine all run, and an ownership gate would withhold nothing. **What the
+   designer asked to be told**: a hero who unequips his engine is sold different runes at the Peddler (rolled as he
+   stands, re-equipping before the visit restores them), a cache or bargain ROLLED while it was out never contains its
+   rows at all, and an elite fought with it out drops a cache without them — the same reading the card draft already
+   takes at a victory.
+3. **A BOUGHT RUNE WHOSE ENGINE IS DROPPED KEEPS ITS SLOT AND PAYS NOTHING.** GT ruled it for a CARD: it sits out and
+   returns. A rune is bought with gold, and nothing was built for it here (§3 of the report): it stays equipped in one
+   of the three ordinary slots, pays nothing (measured), and nothing on any screen says why. **Two are worse than
+   nothing** — the Martyr still refuses every ally's heal and Thin Blood still stops his poison biting. The options,
+   priced and not taken: leave it (the player unequips it himself, free, on the map), sit it out with a note the way a
+   card does, unequip it automatically, or let it be sold.
+4. **THE SHARED HIDE PAYS NOBODY ANYTHING, ENGINE OR NONE (player-visible).** Found by driving it: the rune's field
+   lands on the HUNTER and `_shared_hide_mult` reads the COMPANION, which never receives it, so a 100g rune multiplies
+   a companion's blow by exactly 1.0000 for every hero who has ever bought it. Not repaired: the fix moves a magnitude
+   (CQ §6). `check_gv` §1 asserts it dead in both arms, so the day it is wired the gate says so.
+5. **THE RUNE LAYER HAS THE NARROWNESS THE CARD LAYER AVOIDED.** A hero who unequips his engine is offered none of his
+   own five runes on four lineages of twelve, and a hero holding TWO engines is offered nothing of the second's
+   lineage, because a rune's scope is still the lineage while the card pools merged at GP. Whether the rune pools merge
+   the way the draft pools did is the designer's; nothing here assumes it.
+
+### FOUND AT GV AND NOT FIXED
+
+- **THE SIM BOT NEVER SEES THE GATE AT A CACHE'S ANSWER.** `run_sim` answers a rolled triple from the member's own
+  array rather than through `Run.rune_choice`, so a sim measures the roll's gate and not the answer's. Sims only, and
+  every sim party keeps its engine equipped.
+- **`check_ez`'s SHARED HIDE ARM COULD NOT SEE THE DEFECT ABOVE**: it writes `rune_shared_hide` onto the BEAST by hand
+  and then reads the multiplier, which is the one path a real run never takes. An arm that seats a rune on the hero and
+  summons is what would have caught it.
+- **FOUR HAND-BUILT LINEAGE HEROES CARRIED NO ENGINE RUNE**, which GK's rule already forbids, and the gate exposed all
+  four at once (`check_es` §2, `check_fd`'s `_member` and §1e, `check_fo` §2b, `test_runes`' `_eligibility` and
+  `_rich_grant`). Each is repaired; **five more hand-built seats in the same files carry none and ask questions the
+  gate does not reach** (`check_fd` §1d's collision measurement, `check_et`'s, `check_fe`'s, `test_runes`' `_exhaustion`
+  and `_start_rune_pool`), and they are left as they are rather than swept.
+- **`check_gj`'s SANCTIONED RED MOVED ITS FIGURES AGAIN** — card +158 against a purse of +178, where GU recorded
+  +169 / +189. The gap is still the Tollkeeper's Bell's 20 gold and the counts row did not move; what the gate's seeded
+  run draws moves with the rune offers.
+- **TWELVE ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GV copy", "Dawn of
+  Decay GV head" and ten "Dawn of Decay GV ctl <name>", each renamed before anything ran in it so its `user://` could
+  not reach the player's saves. They can be deleted.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (GV §0): *the eleven old engines became runes* (fifteen — twelve lineage
+  engines and three spines, GK); *a Deepening Hex offered to a Cleric without the Occultist rune* (only a Cleric of that
+  lineage is ever offered it, and he owns the rune for the whole run — "without" can only mean unequipped); and FP's
+  *43* is the population FP measured rather than today's.
 
 ### GU's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE**
 
 Full working: `docs/reports/GU.md`, NEEDS A RULING.
 
-1. **WHAT "THE BASELINE" IS FOR A FORMER BASIC, AND THE FOUR SIT AT TWO.** Fireball and Frostbolt are at Magic
+1. ~~**WHAT "THE BASELINE" IS FOR A FORMER BASIC**~~ — **RULED IN GV's BRIEF: a former basic is priced against what it
+   competes with NOW.** Fireball's and Frostbolt's price is Magic Missiles' already (GT); **Arcane Explosion's and
+   Shadowrend's is RULED, NOT BUILT** — each still costs what the class basic it replaced costs, and what it competes
+   with is the pool's card of its role (below). Recorded in `CLAUDE.md`'s EB block.
+   **WHAT "THE BASELINE" WAS FOR A FORMER BASIC, AS GU LEFT IT.** Fireball and Frostbolt are at Magic
    Missiles' 15 Mana and cooldown 2 (GT, ruled); Arcane Explosion and Shadowrend are at the class basic's price, free
    with no cooldown (untouched — the brief grouped them and asked for no ruling). The two readings: the basic it
    replaced (all four free), or the nearest card of its role — for the two with no kit card of their role, the pool's
@@ -1423,10 +1473,12 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    which put the 29 cards that stopped travelling on their shelves), the class-wide cards ordinary cards in it, the
    class-wide share and EH §1's third zone-boss tier deleted, and **a card that reads an engine offered only to its
    holder** — 34 of the 149, derived at the read site and driven both ways; **37 of the 178 since GS**.
-5. **THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS.** **GP took the CARDS half at the offer door** (an
-   engine-reading card is not OFFERED to a hero who cannot use it); what step 5 still owes is the RUNES, and GM's
-   standing item — *ten live spec runes are read only under their lineage's engine, and a rune's scope is the lineage,
-   so he is still offered them* — is the same defect one layer along.
+5. **~~THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS~~ — THE CARDS AT GP, THE RUNES AT GV.** GP took the
+   CARDS half at the offer door; **GV took the RUNES half at every rune door and at a queued cache's answer**, and the
+   population is **35 of the 60 live ordinary runes** rather than FP's 43 (a rune that half-works, or reads a card, a
+   status, the stance or nothing, is not gated — GP's own groups). GM's standing item — *ten live spec runes are read
+   only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
+   it; **what the scope itself should be is GV's ruling 5.**
 6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks. **GK repaired the
    ones its own move broke** — the census and what is left are `docs/reports/GK.md` §3.
 

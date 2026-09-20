@@ -2762,6 +2762,11 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   does not reroll when a screen opens. `check_fd` §1c hands it a triple with nothing wrong with it
   and requires it back unchanged — without that arm the section passes on a function that simply
   rerolls, which satisfies every other arm and breaks the rule the cache is built on.
+- **A RE-ASK FOR A STATE THE PLAYER CAN UNDO FILTERS; IT DOES NOT REPAIR (GV).** The write-back is
+  for a candidate that is permanently illegal — retired, owned: a hero's pool only shrinks. A
+  candidate withheld because its engine is not equipped sits out of the answer and stays stored, so
+  equipping the engine brings it back; written back, one toggle before an answer would cost the
+  cache for good. It is not a reroll either: nothing is drawn.
 
 ### THE POPULATION IS FIVE, BOTH REMAINING HOLES WERE REACHABLE, AND A REFUSAL IS NOT A REPAIR (FE §2)
 
@@ -2835,14 +2840,15 @@ five reachable at once.
   exhaustive while every hero could always take a rune; it can now land on the one exhausted hero
   in a party of four and throw a bought reward away. Filter first, then apply whatever preference
   the site already had — `events.gd`'s rune verb had used that shape since it was written.
-- **AND THE REASON HAS TWO CASES, SO IT IS DERIVED RATHER THAN WRITTEN.** A hero's pool is empty
+- **AND THE REASON HAS CASES — TWO AT FM, THREE SINCE GV — SO IT IS DERIVED RATHER THAN WRITTEN.** A hero's pool is empty
   because he has taken everything, **or** because what is left is gated behind an ability he has
   not drafted — `Runes.kit_names` reads `bm_abilities`, so **a rune pool DEEPENS during a run.**
   Sixteen of the sixty live runes are unreachable at spawn for that reason (ten until GS §1 took six cards they name
   out of the lineages' opening kits). Telling the Pyromancer he
   "carries every rune written for that awakening" at three-of-five is a lie; CO §3's rule that a
   refusal names its cause is what forces the fork. **One door — `Runes.empty_offer_reason` — because
-  four sites print it.**
+  four sites print it.** The third cause is GV's: what is left reads an engine he has not equipped,
+  and the sentence names that engine's rune.
 
 ## STANDING RULE — A STEP IN FLIGHT RIDES THE SAVE, AND A RESUME PUTS THE PARTY BACK IN IT (Batch GF)
 
@@ -3389,6 +3395,27 @@ Armor contract, and **the other three are untouched** — a ruling that took a s
 name would be the failure worth catching, so `check_fd` §1f asserts the three still stand in the
 same breath as the removal. `run_sim` never bought one, so no measured figure moves.
 
+## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
+> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — thirty-five of the sixty live ordinary runes, an
+> engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
+> Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.**
+
+- **DERIVED AT THE READ SITE AND DRIVEN BOTH WAYS, NEVER TAKEN FROM A COUNT.** Every payload field traced to every line
+  that reads it, with its guard chain, and every rune worn on a board with its engine equipped and with it merely owned
+  (`check_gv` §1): a row pays equipped and moves nothing owned. GP's groups hold — a rune that HALF-works, or needs only
+  a card, a status any card lays, the stance or nothing, is not gated. **FP's 43 described the game at FP**:
+  thirty-three of them are rows, ten are not, and two it did not count are (`docs/reports/GV.md` §1).
+- **EQUIPPED, NEVER OWNED, AND THE CODE LEAVES NO OTHER READING.** A spec rune's scope is the lineage, the lineage is the
+  engine taken at class selection, and nothing sells or discards an engine rune — every hero who can be offered a row
+  owns its engine for the whole run, so a gate on ownership would withhold nothing. The fight, the card gate and a
+  rune's `requires_ability` on an enabler all read the equipped set.
+- **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (GV's call, owed a ruling).** The overlay says what
+  waits and on which rune, `map_screen._pick_rune` indexes the list the buttons were built from, and a cache emptied
+  this way can still be let go. FD's block below carries why this is not its write-back.
+- **A SECOND ENGINE OPENS NO OTHER LINEAGE'S RUNES**: scope reads the lineage, never the engines held.
+- **A NEW RUNE IS SORTED IN THE BATCH THAT AUTHORS IT.** `check_gv` §0 holds the rows and the named groups and asserts
+  that together they are the live ordinary runes; a rune in neither reds.
+
 ## STANDING RULE — THE SLOT LADDER, AND THE POOL IS NOT THE LOADOUT (Batch EG)
 > **ABILITY SLOTS GROW ON A ZONE BOSS: `Run.ABILITY_SLOTS_BY_BOSS` is `[7, 8, 9, 10]` and
 > `Run.ability_slot_cap()` is the only reader of it. AND A HERO'S POOL AND HIS LOADOUT ARE TWO
@@ -3542,7 +3569,10 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   Explosion, Shadowrend). A card **whose advantage is what it is for** — a swap priced a bargain on purpose, a
   cantrip, a card paid in another currency — **is not a defect: a card that is cheap because being cheap is its point
   is not one.** A **genuine mispricing** takes the cost and cooldown of the kit card it undercuts (GT's method) and
-  nothing else. The first two are reported and ruled on by the designer alone. **GU found a fourth shape that is none
+  nothing else. The first two are reported and ruled on by the designer alone. **A FORMER BASIC IS PRICED AGAINST WHAT
+  IT COMPETES WITH NOW (ruled in GV's brief)**: Fireball's and Frostbolt's price is Magic Missiles' already (GT), and
+  Arcane Explosion's and Shadowrend's is RULED, NOT BUILT — each is still at the price of the basic it replaced, and what
+  it competes with is the pool's card of its role (`docs/reports/GU.md` §1a). **GU found a fourth shape that is none
   of the three**: a card the field role pairs with a kit card only through its catch-all bucket, whose primary tag says
   it does another job, is not the same role at all. `check_gu` §2 holds every such card as a row with its group, so a
   new one reds in the batch that adds it, and that batch sorts it.

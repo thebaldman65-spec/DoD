@@ -448,8 +448,13 @@ func _s2_data() -> void:
 	# both reach the authored pool through it. Asserted with its POSITIVE arm
 	# beside it: a gate that only checked absence reads green on the day the
 	# whole pool stops rolling.
+	# BATCH GV — SEATED WITH HIS ENGINE RUNE EQUIPPED, as class selection hands
+	# it (GK's rule for a hand-built lineage seat). The Shared Mark reads Lethal
+	# Aim's Focus and is offered only while that engine is equipped
+	# (`Runes.ENGINE_READ`), so the member without it asked this arm of nobody.
 	var member := {"key": "hunter", "spec": "sharpshooter", "runes": [],
-		"abilities": [], "earned_abilities": [], "bm_abilities": []}
+		"abilities": [], "earned_abilities": [], "bm_abilities": [],
+		"engines": Runes.engine_pouch_for_spec("sharpshooter")}
 	var offer: Array = Runes.eligible_ids(member, [])
 	ok(not offer.has("wide_watch"),
 		"§2b: the RETIRED Wide Watch is still offerable to a Sharpshooter")

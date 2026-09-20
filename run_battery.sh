@@ -71,7 +71,8 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_es check_et check_eu check_ev check_ew check_ez check_fd
        check_fe check_ff check_fg check_fh check_fi check_fk check_fm check_fn
        check_fo check_fq check_fr check_fs check_ft check_fx check_gf check_gj
-       check_gm check_gn check_go check_gp check_gq check_gs check_gt check_gu)
+       check_gm check_gn check_go check_gp check_gq check_gs check_gt check_gu
+       check_gv)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -169,6 +170,14 @@ TMO[check_ct_map]=600
 # as `?`. So it gets its own bound at about twice the measurement, the way
 # `check_map` got its own, and the global bound stays sharp for everything else.
 TMO[check_fx]=720
+# BATCH GV — `check_gv` DRIVES EVERY ORDINARY RUNE ON FOUR BOARDS AND WALKS FOUR
+# WHOLE RUNS, AND ITS LONG WALL CLOCK IS THE WORK, NOT A HANG. Sixty runes, each
+# worn and not with its engine equipped and merely owned, is 240 battle boards
+# before its §1c, and §4 is four runs through the real screens. MEASURED at GV,
+# standalone: 608 s, at about 40% CPU. The 240 s default would kill
+# it inside §1, so it gets its own bound at about twice the measurement, the way
+# `check_fx` and `check_map` got theirs.
+TMO[check_gv]=1200
 # BATCH DE — `TMO[test_batch_cd]=2400` IS GONE AND SO IS THE REASON FOR IT.
 # DD gave that suite a 2400s bound because its §1 spawned forty-five child
 # Godots — it ran the battery inside the battery, about 22 minutes of a run

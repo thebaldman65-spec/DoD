@@ -53,9 +53,15 @@ func _initialize() -> void:
 	_g.report(self)
 
 
+# BATCH GV — A LINEAGE HERO HOLDS HIS ENGINE RUNE, EQUIPPED (GK's rule for a
+# hand-built seat). Since GV a rune that reads an engine is offered only while it
+# is equipped, so a member built without one is offered no row at all, and §1c's
+# triples — Keen Focus and Heavy Bolts, both Lethal Aim's — were answered with
+# a rune the gate rightly sat out rather than the repair this gate is about.
 func _member(class_key: String, spec: String) -> Dictionary:
 	return {"key": class_key, "spec": spec, "runes": [], "abilities": [],
-		"earned_abilities": [], "bm_abilities": []}
+		"earned_abilities": [], "bm_abilities": [],
+		"engines": Runes.engine_pouch_for_spec(spec)}
 
 
 # ── §1 — EVERY OFFER SITE, ENUMERATED AND DRIVEN ────────────────────────────
@@ -285,6 +291,8 @@ func _s1e_the_live_screen() -> void:
 	# slot is index 3.
 	run.party[3]["spec"] = "sharpshooter"
 	var member: Dictionary = run.party[3]
+	# BATCH GV — with his engine rune equipped, as `_member` seats it above.
+	member["engines"] = Runes.engine_pouch_for_spec("sharpshooter")
 	member["runes"] = [Runes.build("heavy_bolts")]
 	member["rune_candidates"] = [[Runes.build("heavy_bolts"),
 		Runes.build("deep_sight"), Runes.build("keen_focus")]]

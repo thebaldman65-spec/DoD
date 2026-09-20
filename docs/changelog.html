@@ -15,6 +15,38 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-20 &mdash; Batch GV: THE RUNES THAT READ AN ENGINE</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-EIGHTH BATCH ON <code>class-merge</code>.</b> A card that reads an engine has been
+offered only to a hero holding it since GP; the runes had never been re-read. This batch reads all sixty of them, gates
+the thirty-five that cannot pay without their engine, and drives every one both ways. <code>main</code> is untouched.
+Full working: <code>docs/reports/GV.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THIRTY-FIVE OF THE SIXTY RUNES CANNOT PAY WITHOUT THEIR ENGINE, AND THOSE ARE THE ONES THAT ARE
+GATED.</b> Every payload field of every live rune was traced to every line that reads it, and then every rune was worn
+in a real fight twice over &mdash; with its engine equipped and with it only owned &mdash; on the same dice. Thirty-five
+moved nothing at all without it: a Ruin rune with no Ruin being laid, a Focus rune with no Focus bar, the Heavy Plating
+runes that read a climb that never climbs. <b>Twenty-four others do move something</b>, and none of them is gated: five
+still do part of their job (Killing Cold still bites a boss at four Chilled, Glass Prison still freezes a second body),
+eleven ride a card, four ride a status any card lays, one rides the stance every Warrior has, and three read neither an
+engine nor anything else. <b>Two of the thirty-five are worse than nothing without their engine</b> &mdash; the Martyr
+still refuses every ally's heal and Thin Blood still stops his poison biting, while what each pays for is only read
+under the engine.</p>
+
+<p><b>&sect;2 &mdash; THE GATE IS AT EVERY DOOR, AND IT READS WHAT IS EQUIPPED.</b> The Peddler, an elite's cache, a
+bargain and an event all roll through one function, and it now withholds a rune whose engine the hero's slots do not
+hold. <b>A cache is rolled at the drop and answered a node later</b>, so the answer asks again: a rune it holds that
+reads an engine he has unequipped in between sits out of the choice, <b>stays in the cache</b>, and is offered again the
+moment the engine is equipped &mdash; the overlay names the rune it waits on, and the pick can still be let go. When
+there is nothing left to offer, the sentence every site prints names that engine's rune instead of telling him he
+already carries everything.</p>
+
+<p><b>&sect;3 &mdash; WHAT A HERO WITH NO ENGINE IS OFFERED, MEASURED.</b> An Arcanist, a Holy Cleric, an Occultist and
+a Sharpshooter who unequip their engine are offered <b>none</b> of their lineage's five runes; a Devout one of four; the
+widest are the Berserker and the Cryomancer at four. <b>A second engine opens nothing</b>: which runes a hero is offered
+still follows the lineage he took at class selection, not the engines he holds. Four whole runs were walked through the
+real screens with every engine unequipped &mdash; <b>148 rune offers, not one of them a rune the hero could not use</b>
+&mdash; and one with two engines apiece, which was shown eleven among its sixty-nine.</p>
+
 <h2>2026-09-19 &mdash; Batch GU: THE LAST THREE CARDS UNDER THE BASELINE, AND THE SWEEP FOR THE SHAPE</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-SEVENTH BATCH ON <code>class-merge</code>.</b> GT priced three cards at the kit card
 beside them and named three more it did not retune. This batch prices those three, sweeps every card a hero can earn

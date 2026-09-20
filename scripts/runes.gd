@@ -854,6 +854,119 @@ static func is_retired(id: String) -> bool:
 	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
 
 
+# ══ BATCH GV — A RUNE THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HAS IT
+#                EQUIPPED ════════════════════════════════════════════════════════
+#
+# **THE CARD GATE'S RULE, ONE LAYER OVER** (`Classes.ENGINE_READ`, GP): a rune
+# that cannot pay without its engine is not offered to a hero whose engine slots
+# do not hold it, because offering it is offering a rune that does nothing.
+#
+# **THE POPULATION WAS DERIVED AT THE READ SITE AND DRIVEN, NOT TAKEN FROM A
+# FIELD OR FROM FP's 43.** Every one of the sixty live ordinary runes had each
+# payload field traced to every line that reads it, with the guard chain above
+# that line and the callers' gates; `check_gv` §1 then drives each rune with its
+# engine equipped and without, and a row is here only if the rune pays in the
+# first arm and moves nothing in the second. **Three groups, and only the first
+# is in this table** — the rest are named, with the reading that sorts them, in
+# `docs/reports/GV.md` §1:
+#   · CANNOT WORK WITHOUT THE ENGINE — the field is read only inside the engine's
+#     block, or through a meter only the engine installs (Resonance, Mercy,
+#     Focus, Ruin, Faith, Loyalty, the holds), or it modifies a card that is
+#     itself refused without the engine. **Gated: these 35.**
+#   · HALF-WORKS — Killing Cold still bites a boss that sits on four Chilled,
+#     Glass Prison still freezes a second body for a turn, Blood Debt still
+#     bills the target. **NOT gated**, GP's reading.
+#   · WORKS WITHOUT ONE, OR FEEDS ONE — a rune reading a status any card lays
+#     (Burn, Chilled, Bleed, Poison), a stance any swap card reaches, a card the
+#     class pool offers, or a companion Call the Wilds fields. **NOT gated.**
+#
+# **TWO OF THE THIRTY-FIVE ARE WORSE THAN NOTHING WITHOUT THEIR ENGINE**, which
+# is a second reason for the row rather than the first: the Martyr's price (no
+# heal but his own) and Thin Blood's (his poison stops biting) are read with no
+# engine at all, while what each pays for is read only under it.
+#
+# **"HAS IT EQUIPPED", NEVER "OWNS IT", AND THE CODE LEAVES NO OTHER READING.** A
+# hero is offered a spec rune only for his LINEAGE (`_scope_ok`), the lineage is
+# the engine he took at class selection, and nothing sells or discards an engine
+# rune — so every hero who can be offered Deepening Hex OWNS the Rune of the
+# Occultist for the whole run. A gate reading ownership would withhold nothing.
+# The fight reads the same set (`held_engines`, the spawn's `engines`), and so do
+# the card gate and a rune's `requires_ability` on an engine's enabler.
+const ENGINE_READ := {
+	# OLD GODS — `_gain_ruin` returns at once with no Occultist equipped, and it
+	# is the one door a Ruin stack is laid through (Transference only MOVES one).
+	"deepening_hex": {"engine": "old_gods", "why": "moves the Ruin threshold; no Ruin is laid without the engine"},
+	"standing_mark": {"engine": "old_gods", "why": "raises the Ruin draught's cap; the draught reads a living Occultist"},
+	"shared_ruin": {"engine": "old_gods", "why": "a detonation's jump; `_detonate_ruin` returns with no Occultist"},
+	"wide_rite": {"engine": "old_gods", "why": "adds a stack to the passive's mark; `_old_gods_mark` reads a living Occultist"},
+	"open_wound": {"engine": "old_gods", "why": "Shadowrend marks every enemy through `_gain_ruin`; the decay reads Ruin"},
+	# MERCY — the bar is installed at the spawn only for a holder, and Divine
+	# Plea and Hymn of Hope are priced in it and refused against an absent bar.
+	"vigil": {"engine": "mercy", "why": "pays a Mercy stack; no Mercy bar without the engine"},
+	"open_hand_fk": {"engine": "mercy", "why": "widens Divine Plea, which costs 2 Mercy and is refused without the bar"},
+	"long_watch_holy": {"engine": "mercy", "why": "carries the Mercy bar between fights; there is none to carry"},
+	"grace": {"engine": "mercy", "why": "echoes Hymn of Hope, which costs 1 Mercy and is refused without the bar"},
+	"martyr_fk": {"engine": "mercy", "why": "pays a Mercy stack when struck; its price (no heal but his own) reads no engine"},
+	# CONVICTION — `_gain_faith` and the absorb's payout both read a living Devout.
+	"deep_absorb": {"engine": "conviction", "why": "adds Faith to an absorb; `_gain_faith` returns with no Devout"},
+	"fourth_stack": {"engine": "conviction", "why": "moves the Faith release; `_gain_faith` returns with no Devout"},
+	"bare_altar": {"engine": "conviction", "why": "doubles an absorb's Faith; its price lands on Divine Shield, the engine's enabler"},
+	# OVERBURN — both ride `_overburn_refund`, whose first line refuses a hero
+	# without the engine.
+	"ember_leap": {"engine": "overburn", "why": "consumed fire leaps inside `_overburn_refund`, which refuses without the engine"},
+	"pyre_debt": {"engine": "overburn", "why": "doubles the Overburn refund; the refund and its recoil both need the engine"},
+	# PERMAFROST — a hold exists only while a Glacial Hold holder stands
+	# (`_freeze_holds`); without one every freeze is ordinary ice.
+	"second_winter": {"engine": "permafrost", "why": "reads a hold's release; nothing is held without the engine"},
+	# RESONANCE — the meter is installed only for a holder, and `_gain_resonance`
+	# refuses every source without it.
+	"resonant_core_fk": {"engine": "resonance", "why": "carries Resonance between fights; there is none to carry"},
+	"half_note": {"engine": "resonance", "why": "Arcane Bolt keeps more Resonance; the bolt is refused without the meter"},
+	"overtone": {"engine": "resonance", "why": "doubles a Resonance build; `_gain_resonance` refuses without the engine"},
+	"dissonance": {"engine": "resonance", "why": "doubles the Resonance curve; the curve is zero without the meter"},
+	"overflow": {"engine": "resonance", "why": "a crit builds more Resonance; `_gain_resonance` refuses without the engine"},
+	# BLOOD FRENZY — every caller of `frenzy_bonus()` that uses its return is
+	# inside the engine's block (Unslaked's row in `Classes.ENGINE_READ`).
+	"open_vein": {"engine": "bloodrage", "why": "doubles Blood Frenzy's Rage term; the band is read only under the engine"},
+	# HEAVY PLATING — both are read inside the plating block.
+	"standing_wall": {"engine": "heavy_plating", "why": "halves the plating reset on a block; the climb is the engine's"},
+	"bracing_line": {"engine": "heavy_plating", "why": "reads the plating level; the holder must have the engine"},
+	# SEASONED FIGHTER — the stance's numbers are read only under the engine; a
+	# stance itself is every Warrior's, and the runes that read only the stance
+	# (Mirror Guard) are not here.
+	"whetstone": {"engine": "seasoned", "why": "grows the Aggressive term; the stance's numbers are read only under the engine"},
+	"naked_blade": {"engine": "seasoned", "why": "doubles both stances' terms; read only under the engine"},
+	# PACK BOND — `_gain_loyalty` returns at once without the engine, so a
+	# companion from Call the Wilds stands at the Loyalty it arrived with.
+	"long_leash": {"engine": "pack", "why": "moves the Loyalty conversion point; Loyalty does not grow without the engine"},
+	"shared_scent": {"engine": "pack", "why": "carries a fallen companion's Loyalty; Loyalty does not grow without the engine"},
+	# LETHAL AIM — Focus is installed only for a holder, and both
+	# `_sharpshooter_focus` call sites sit inside the engine's block.
+	"keen_focus": {"engine": "lethal_aim", "why": "a switch halves Focus; there is no Focus without the engine"},
+	"heavy_bolts": {"engine": "lethal_aim", "why": "moves the Focus conversion point; there is no Focus without the engine"},
+	"ambush": {"engine": "lethal_aim", "why": "Called Volley scales with Focus; there is no Focus without the engine"},
+	"shared_mark": {"engine": "lethal_aim", "why": "an ally's blow pays Focus; there is no Focus without the engine"},
+	"long_draw_press": {"engine": "lethal_aim", "why": "a press more on his sequence; the sequence is the engine's"},
+	# TRAPPER — the barb is read inside the engine's block on the struck hero.
+	"second_barb": {"engine": "trapper", "why": "a second barb on the counter-hit; the barb is the engine's"},
+	"thin_blood": {"engine": "trapper", "why": "a barb on every strike; its price (poison stops biting) reads no engine"},
+}
+
+
+# The engine a rune reads, or "" for a rune that reads none. **THE ONE ANSWER**,
+# so the offer, the re-ask at a cache's answer and `check_gv` cannot disagree.
+static func engine_read(id: String) -> String:
+	return String((ENGINE_READ.get(id, {}) as Dictionary).get("engine", ""))
+
+
+# Whether a hero whose EQUIPPED engines are `engines` may be offered rune `id`.
+# A rune reading no engine always may; one reading an engine only with it
+# equipped.
+static func offerable(id: String, engines: Array) -> bool:
+	var e := engine_read(id)
+	return e == "" or engines.has(e)
+
+
 # Authored entries this member may roll, excluding names already in their pouch
 # and every retired entry.
 #
@@ -873,6 +986,9 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 	var held_ids: Array = []
 	for r in member.get("engines", []):
 		held_ids.append(String((r as Dictionary).get("id", "")))
+	# BATCH GV — the engines his slots hold, read once: the gate below asks it
+	# per entry, and it is the set the fight itself will read.
+	var equipped := held_engines(member)
 	for id in data:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
@@ -883,6 +999,9 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 			continue
 		var req := String(e.get("requires_ability", ""))
 		if req != "" and not kit.has(req):
+			continue
+		# BATCH GV — A RUNE THAT READS AN ENGINE HE HAS NOT EQUIPPED IS NOT ROLLED.
+		if not offerable(String(id), equipped):
 			continue
 		if owned_names.has(display_name(e)):
 			continue
@@ -955,12 +1074,64 @@ static func locked_by_kit(member: Dictionary) -> Array:
 	return out
 
 
+# **BATCH GV — THE THIRD CAUSE, AND ITS OWN LIST.** A rune in the hero's scope,
+# not owned and not retired, that reads an engine his slots do not hold — kit or
+# no kit, because equipping the engine is necessary for it either way. This is
+# NOT the complement of `eligible_ids` the way `locked_by_kit` is: a rune can be
+# on both lists (Half Note waits on Arcane Bolt AND on Resonance), and the
+# sentence below says so rather than naming only one of the two.
+static func locked_by_engine(member: Dictionary) -> Array:
+	var equipped := held_engines(member)
+	var owned := owned_names(member)
+	var out: Array = []
+	var data := _load()
+	for id in data:
+		var e: Dictionary = data[id]
+		if String(e.get("retired", "")) != "":
+			continue
+		if not _scope_ok(e, member):
+			continue
+		if owned.has(display_name(e)):
+			continue
+		if not offerable(String(id), equipped):
+			out.append(id)
+	return out
+
+
+# The engine runes, by name, that the runes `ids` wait on — "the Rune of the
+# Occultist", or two joined by "or". A spec rune reads its own lineage's engine,
+# so today this is always one name; the join is for the day it is not.
+static func waited_on(ids: Array) -> String:
+	var names: Array = []
+	for id in ids:
+		var rid := engine_rune_id(engine_read(String(id)))
+		var nm := String(config(rid).get("name", "")) if rid != "" else ""
+		if nm != "" and not names.has(nm):
+			names.append(nm)
+	if names.is_empty():
+		return "the engine rune they read"
+	return "the " + " or the ".join(names)
+
+
 # The clause every empty offer site prints after its own em-dash. Kept as a
 # CLAUSE rather than a whole sentence because each site frames it differently —
 # a merchant has nothing to sell, a cache has nothing to drop — and only the
 # reason is shared.
+#
+# **BATCH GV — THREE CAUSES NOW, AND A FOURTH SENTENCE FOR TWO AT ONCE.** A hero
+# whose last runes read an engine he has not equipped has not "seen them all",
+# and telling him so would be the lie FM §2 wrote this function to stop. Each
+# sentence is true of every rune it covers: where some wait on a card and some
+# on the engine, the sentence names both doors.
 static func empty_offer_reason(member: Dictionary) -> String:
-	if not locked_by_kit(member).is_empty():
+	var by_engine := locked_by_engine(member)
+	var by_kit := not locked_by_kit(member).is_empty()
+	if not by_engine.is_empty() and by_kit:
+		return "the runes left for that awakening wait on abilities they have not earned, or on %s being equipped" % \
+			waited_on(by_engine)
+	if not by_engine.is_empty():
+		return "the runes left for that awakening wait on %s being equipped" % waited_on(by_engine)
+	if by_kit:
 		return "the runes left for that awakening wait on abilities they have not earned"
 	return "they already carry every rune written for that awakening"
 

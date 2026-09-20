@@ -332,8 +332,14 @@ func _eligibility(data: Dictionary) -> void:
 			# lineage (one derivation), a requiring rune naming one of those cards
 			# must roll (GS: offered once the card is held) and one naming anything
 			# else he does not hold must not.
+			# BATCH GV — AND HIS ENGINE RUNE, EQUIPPED, as class selection hands it
+			# (GK's rule for a hand-built seat). A rune that reads an engine is
+			# offered only while it is equipped since GV (`Runes.ENGINE_READ`), so
+			# a member holding none was refused every row and "must still roll"
+			# read thirty-two of them red for the gate working.
 			var mine := {"key": owner_key, "spec": spec, "runes": [],
-				"bm_abilities": GateFixture.lineage_cards(spec)}
+				"bm_abilities": GateFixture.lineage_cards(spec),
+				"engines": Runes.engine_pouch_for_spec(spec)}
 			var rolls: bool = Runes.eligible_ids(mine, []).has(id)
 			# BATCH EZ — THE THIRD ARM, AND IT IS `requires_ability` DOING ITS
 			# JOB RATHER THAN AN EXEMPTION. This member has drafted nothing, so
@@ -1137,7 +1143,11 @@ func _rich_grant(run: Node) -> void:
 	run.sim_run = true
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
-			var member := {"key": key, "spec": spec, "runes": []}
+			# BATCH GV — seated with his engine rune equipped, for `_eligibility`'s
+			# reason above: without it the rows sit out of his pool and this loop
+			# ran three checks fewer for each.
+			var member := {"key": key, "spec": spec, "runes": [],
+				"engines": Runes.engine_pouch_for_spec(spec)}
 			var names := {}
 			var own := 0
 			for rid in Runes.eligible_ids(member, []):

@@ -355,8 +355,11 @@ func _s2_scope_is_the_axis() -> void:
 	for ckey in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[ckey]:
 			specs_walked += 1
+			# BATCH GV — each lineage seated with its engine rune equipped (GK's
+			# rule for a hand-built seat), for the reason the whole-file arm
+			# below gives.
 			var mine := {"key": String(ckey), "spec": String(spec), "runes": [],
-				"bm_abilities": []}
+				"bm_abilities": [], "engines": Runes.engine_pouch_for_spec(String(spec))}
 			var ids: Array = Runes.eligible_ids(mine, [])
 			for u in universals:
 				if not ids.has(u) and not Runes.is_retired(u):
@@ -372,8 +375,17 @@ func _s2_scope_is_the_axis() -> void:
 	var silent: Array = []
 	for ckey3 in Classes.SPEC_IDS:
 		for spec3 in Classes.SPEC_IDS[ckey3]:
+			# BATCH GV — SEATED WITH HIS ENGINE RUNE EQUIPPED. Since GV a rune that
+			# reads an engine is offered only while it is equipped
+			# (`Runes.ENGINE_READ`), so a member built with none was offered no
+			# row, and thirty rows read here as silently absent. They are not
+			# silent: each carries its engine and a `why` in that table, and
+			# `check_gv` §2 asserts they are withheld unequipped and rolled
+			# equipped. The question this arm asks — is anything missing for a
+			# reason nobody wrote down — is asked of the hero class selection
+			# makes, which is a lineage holding its engine.
 			var mine3 := {"key": String(ckey3), "spec": String(spec3), "runes": [],
-				"bm_abilities": []}
+				"bm_abilities": [], "engines": Runes.engine_pouch_for_spec(String(spec3))}
 			var ids3: Array = Runes.eligible_ids(mine3, [])
 			for id4 in data:
 				var e4: Dictionary = data[id4]
@@ -381,6 +393,14 @@ func _s2_scope_is_the_axis() -> void:
 						String(ckey3), String(spec3)):
 					continue
 				if String(e4.get("requires_ability", "")) != "":
+					continue
+				# BATCH GV — AND THE ENGINE RUNE HE HOLDS IS NOT SILENT EITHER: it is
+				# his, and `eligible_ids` excludes an engine rune a hero already
+				# holds by GK's written rule. Seating the engine above is what put
+				# one in his hands.
+				var held_here: Array = (mine3["engines"] as Array).map(
+					func(r): return String((r as Dictionary).get("id", "")))
+				if held_here.has(String(id4)):
 					continue
 				if not ids3.has(String(id4)) and not Runes.is_retired(String(id4)):
 					silent.append("%s/%s" % [spec3, id4])
@@ -393,8 +413,9 @@ func _s2_scope_is_the_axis() -> void:
 	print("      spec            total  universal  class  spec")
 	for ckey2 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[ckey2]:
+			# BATCH GV — the same seat as the arm above: his engine equipped.
 			var mine2 := {"key": String(ckey2), "spec": String(spec2), "runes": [],
-				"bm_abilities": []}
+				"bm_abilities": [], "engines": Runes.engine_pouch_for_spec(String(spec2))}
 			var ids2: Array = Runes.eligible_ids(mine2, [])
 			var u2 := 0
 			var c2 := 0

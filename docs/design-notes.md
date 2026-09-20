@@ -9177,3 +9177,27 @@ names in any inflection, so "every third cast echoes" is caught as surely as "Ec
 **Why the proposed numbers are proposed.** The brief ruled half strength, every third cast, 25%, 5% and halved.
 "Stronger for the rest of the fight", "returns as Mana", "heals the whole party for a share" and "enormous" came
 without a figure, so each has one line in `Classes` and is the designer's to set.
+
+
+## Batch GV — the runes that read an engine
+
+**Why the gate reads what he has EQUIPPED rather than what he owns.** A rune is offered by lineage, the lineage is the
+engine taken at class selection, and nothing in the game sells or discards an engine rune — so every hero who can be
+offered one of these runes owns its engine for the whole run, and a gate on ownership would withhold nothing at all.
+Equipped is also what the fight reads: an unequipped engine pays nothing in a battle, so a rune that reads it pays
+nothing either.
+
+**Why a queued cache keeps a rune it cannot hand over yet.** A retired rune and a rune he already owns can never come
+back, so the cache repairs them away and stores the repair. An unequipped engine is the player's own choice and he can
+undo it with one press, so a cache that threw those runes away would turn a moment's experiment into a permanent loss.
+It holds them instead, says which rune they wait on, and offers them again when it comes back.
+
+**Why the half-working runes are not gated.** The card gate settled this shape already: a card that still does most of
+its job is a legitimate offer. Killing Cold still bites a boss sitting on four Chilled, Glass Prison still freezes a
+second body for a turn, and Blood Debt still sends the bill to the enemy. What they lose without the engine is the
+deeper half, and losing the deeper half is what a build decision is.
+
+**Why nothing was retuned.** Two runes are worth less than nothing to a hero whose engine is out — the Martyr's price
+and Thin Blood's are read with no engine at all, while their payouts are not — and one, the Shared Hide, pays nobody
+anything. Both are reported rather than repaired: changing what a rune pays is a magnitude, and magnitudes are the
+designer's.
