@@ -1874,7 +1874,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
   combination and presses Close in each; §2 buys every offer through its own button.
 
-## STANDING RULE — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3, ruled by the designer)
+## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
 > none of the hero's slotted engines is its own, and is seated again the moment one is. It is never destroyed**: a
 > drafted card is something the player spent an offer on.
@@ -1899,6 +1899,23 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   ruling, not a tidy-up.
 - **THE SCREENS SAY WHY, IN ONE SENTENCE** (`Run.sits_out_note`): the hero sheet greys the card as sitting out and the
   map's Kit panel names the rune that brings it back. A card that leaves the bar with no reason reads as a bug (CO §3).
+- **AND THE RUNE LAYER TAKES THE SAME ANSWER, WITH ITS OWN NOUNS (GX §1).** `Runes.ENGINE_READ` gates the OFFER;
+  `Runes.sits_out` — the same predicate through the same `engine_read`, asked of a rune he already holds — gates
+  whether a WORN rune pays, and `Run.sitting_out_rune_names` is the one door every surface asks. **FOUR SAY IT**: the
+  pouch row and the map's rune slot, which the card layer has no counterpart for, the hero sheet's state column, and
+  the battle log's opening roll call — **a rune that sits out is still equipped, so the spawn was naming it in the log
+  of a fight it paid nothing in**, where a card that sits out is simply absent. The log line takes the note's first
+  two lines rather than wording it again. **The offer surfaces get nothing**: see the bullet below. **NOTHING IS WRITTEN HERE EITHER** — the rune stays equipped, its slot stays filled and its payload is still
+  applied at the spawn, because the refusal lives inside each read site where GV put it.
+- **THE SENTENCE IS ONE SENTENCE WITH TWO NOUN SETS, NEVER TWO SENTENCES** (`Run.rune_sits_out_note` beside
+  `Run.sits_out_note`). The opening clause is byte-identical in both; a rune is WORN where a card is CARRIED, and
+  UNEQUIPPING frees the slot where BENCHING does. **A second phrasing of one idea is a second thing to keep in step** —
+  `check_gx` §5 asserts the shared clause in both and the divergent clauses apart in both directions, so collapsing
+  them or rewording either reds. Both are hand-broken at 44 characters because the sheet renders them as a tooltip and
+  a tooltip does not wrap.
+- **THE PEDDLER AND A CACHE GET NO TELL, AND THAT IS A RULING RATHER THAN AN OMISSION.** A gated rune cannot be
+  OFFERED while the engine is out, so a tell on an offer surface could never render; a cache already says what it is
+  holding back, in GV's words. **Add a tell where a rune the player ALREADY HOLDS is shown, and nowhere else.**
 
 ## STANDING RULE — A STATUS IS SPENT WHERE IT PAYS, NEVER WHERE AN ENGINE READS IT (Batch GM §1)
 > **A status, charge or bank a card lays is spent under the gate its payout is read under. Its countdown or its

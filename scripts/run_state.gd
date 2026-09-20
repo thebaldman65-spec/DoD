@@ -2208,6 +2208,52 @@ func sits_out_note(card_name: String) -> String:
 	return "Sits out of every fight while the\n%s is not equipped.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % rune_name
 
 
+# ══ BATCH GX — AND THE SAME THING ONE LAYER UP, FOR A RUNE ══════════════════
+#
+# **GV GATED THE OFFER AND LEFT THE SLOT UNSAID.** Thirty-five runes are offered
+# only to a hero whose slots hold their engine (`Runes.ENGINE_READ`), and a rune
+# bought while the engine was in is already past that door: unequip the engine
+# afterwards and the rune sits in one of the three ordinary slots paying
+# nothing. **GT's defect exactly, one layer up** — a card that vanishes from the
+# bar with no reason reads as a bug (CO §3), and so does a rune that stops
+# paying with no reason.
+#
+# **NOTHING IS WRITTEN, AS NOTHING IS WRITTEN FOR A CARD.** The rune stays in
+# `member["runes"]`, stays `equipped`, still fills its slot and is still the
+# player's to unequip or sell; the only state that decides it is the engine's
+# own `equipped` flag in `member["engines"]`, which the pouch's door writes.
+# Re-slot the engine and it pays at the next read, because nothing was taken
+# away. **The payload is still applied at the spawn** — the refusal is inside
+# each read site, where GV put it — so this pair of functions is a TELL and
+# changes no magnitude.
+func sitting_out_rune_names(member: Dictionary) -> Array:
+	var held: Array = held_engines(member)
+	var out: Array = []
+	for r in member.get("runes", []):
+		var rd: Dictionary = r
+		if bool(rd.get("equipped", false)) \
+				and Runes.sits_out(String(rd.get("id", "")), held):
+			out.append(String(rd.get("name", "")))
+	return out
+
+
+# **THE ONE SENTENCE, BECAUSE FOUR SURFACES SAY IT** (the pouch's row, the
+# map's rune slot, the hero sheet's row and the battle log's opening roll call,
+# which takes its first two lines): which engine rune brings it back,
+# and what it still costs him. **It is GT's sentence with the nouns its own
+# surfaces use** — a rune is WORN rather than carried and UNEQUIPPED rather than
+# benched, and the pouch counts slots FILLED rather than counted — because a
+# second phrasing of the same idea is a second thing to keep in step. Broken by
+# hand at 44 characters, for GT's reason: the sheet shows it as a tooltip and a
+# tooltip does not wrap.
+func rune_sits_out_note(rune_id: String) -> String:
+	var rid := Runes.engine_rune_id(Runes.engine_read(rune_id))
+	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
+	if rune_name == "":
+		rune_name = "engine rune it needs"
+	return "Sits out of every fight while the\n%s is not equipped.\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % rune_name
+
+
 func ability_slots_used(member: Dictionary) -> int:
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter), so the
 	# lineage's opening abilities count LESS their enablers.

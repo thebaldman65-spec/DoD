@@ -15,6 +15,51 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-20 &mdash; Batch GX: A RUNE SITTING OUT SAYS SO</h2>
+<p><b>IMPLEMENT ONLY, AND THE THIRTIETH BATCH ON <code>class-merge</code>.</b> GV gated thirty-five runes on their
+engine being equipped and left the other half of that state unsaid: a rune bought while the engine was in stays in its
+slot when the engine comes out, pays nothing, and nothing on any screen says why. GT had already solved the same
+problem one layer down for a card that sits out. This batch takes GT's answer up a layer, in GT's own words.
+<code>main</code> is untouched. Full working: <code>docs/reports/GX.md</code>.</p>
+
+<p><b>&sect;1 &mdash; EVERY SURFACE THAT SHOWS A WORN RUNE SAYS WHETHER IT IS SITTING OUT, AND WHICH RUNE BRINGS IT
+BACK.</b> Nine places show a rune; four of them show one the hero is already wearing, and all four say it now. <b>The pouch</b> &mdash;
+where a rune is dropped and swapped, and where the engine it waits on is re-slotted &mdash; puts the sentence in place
+of the rune's own rule, in the same amber the map's Kit panel uses for a card. <b>The map's rune slot</b> marks the
+face and carries the sentence in its tooltip; it is the only one of the three the player does not have to open
+anything to read. <b>The hero sheet</b> reads <i>sits out</i> in the column that already says whether a rune is worn,
+and hangs the sentence off the row. <b>It is one sentence, not three</b>, and it is GT's sentence with the nouns each
+surface already uses: a rune is <i>worn</i> where a card is <i>carried</i>, and <i>unequipping</i> frees the slot where
+<i>benching</i> does. <b>And the combat log's opening roll call</b>, which names every equipped rune as the fight
+starts, says it too &mdash; a rune that sits out is still equipped, so it was being named in the log of a fight it
+paid nothing in. That line is built from the same sentence rather than written again.</p>
+
+<p><b>&sect;1b &mdash; THE FIVE THAT NEEDED NOTHING, AND WHY.</b> <b>The Peddler cannot offer a gated rune at
+all</b> while the engine is out &mdash; that is GV's gate, and a tell there could never render, so none was added.
+<b>A cache already says it</b>, in GV's own words: it keeps the rows it cannot hand over, names the rune they wait on,
+and offers them again when it is back, and <b>a bargain and an event grant go through that same door</b>. The pouch's
+engine rows are not gated on an engine at all, and the run-end summary lists the whole pouch and has never said which
+runes were worn. What was missing was never the offer; it was the rune he had already bought.</p>
+
+<p><b>&sect;2 &mdash; NOTHING ABOUT ANY RUNE CHANGED.</b> No rune is retuned, re-authored or retired. A rune that sits
+out is still equipped, still fills its slot, still has its payload applied at the spawn exactly as before, and still
+pays again the moment the engine is back &mdash; the refusal stays inside each read site, where GV put it. The player
+unequips it himself if he wants the slot; nothing does it for him. <b>The Shared Hide's price stands at 100 gold</b>,
+judged in play: its deepest reading needs four separate damage effects standing on the companion at once &mdash;
+three party buffs and a stance-switch status &mdash; which is a party built around the
+companion rather than a purchase, and until GW wired it the rune had never paid anybody anything at all.</p>
+
+<p><b>&sect;3 &mdash; MEASURED, BECAUSE A TELL ADDED TO A LIST THAT ALREADY OVERFLOWED IS WORTH MEASURING.</b> GT found
+this same pouch drawing its <b>Close</b> button off the bottom of the screen for every pair of engines a class can
+hold, before it fixed the layout. With six runes held and two of them sitting out the list measures <b>298 pixels in a
+583-pixel scroller</b>, and on the panel's own worst case &mdash; a class's six engine rules <i>and</i> six runes, two
+sitting out &mdash; <b>543 of 583</b>. Nothing scrolls, both tells are drawn whole at full size, and Close is at the
+same place on the screen in all three configurations.</p>
+
+<p><b>&sect;4 &mdash; A REPAIR TO THE ENTRY ABOVE.</b> Batch GW's entry carried three unfilled placeholders where its
+three measured figures belonged. They are filled in from that batch's own measurement. A sweep of all nine tracked
+documents for the same shape finds these three and nothing else.</p>
+
 <h2>2026-09-20 &mdash; Batch GW: THREE RUNES, AND A GATE THAT WROTE WHAT IT TESTED</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-NINTH BATCH ON <code>class-merge</code>.</b> GV drove all sixty ordinary runes
 through the real door and came back with three findings it did not repair: one rune that pays nobody anything, and two
@@ -27,7 +72,7 @@ the damage buffs it is already wearing. Its flag was written onto the HUNTER, th
 that reads it reads the COMPANION &mdash; and nothing carried it across, so from the day it shipped a 100-gold rune
 multiplied a beast's blow by exactly 1.0000 for everybody who bought it. The field now crosses at the one place a
 companion is built, beside the crit chance and the companion power the beast already inherited. <b>Driven in a real
-fight</b>, across the three buff loadouts the rune was originally measured on: THIN_SWING, MID_SWING and DEEP_SWING more
+fight</b>, across the three buff loadouts the rune was originally measured on: <b>+26.5%</b>, <b>+57.6%</b> and <b>+138.3%</b> more
 damage from the same seeded blows. <b>Nothing else about the rune moved</b> &mdash; the multiplier, its list of terms
 and its price are byte-unchanged.</p>
 

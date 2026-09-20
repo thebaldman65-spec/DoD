@@ -1347,7 +1347,25 @@ func _spawn_units() -> void:
 					# talent's proc line rather than one of their own. One
 					# grep-stable "Rune:" line at spawn means every equipped
 					# rune is still visible in a log a tester pastes back.
-					_rune_roll_call.append("%s: %s" % [cfg["unit_name"], rune["name"]])
+					# BATCH GX — AND WHETHER IT IS PAYING. **THE ASYMMETRY THE
+					# CARD LAYER NEVER HAD**: a card that sits out is simply
+					# absent from the fight, so GT had nothing to mark here,
+					# but a rune that sits out is still equipped and its
+					# payload is still applied — so it was named in the log of
+					# a fight it paid nothing in. **THE CLAUSE IS TAKEN
+					# FROM `Run.rune_sits_out_note` RATHER THAN WRITTEN**:
+					# its first two lines, joined — the sentence
+					# that says it sits out and which rune brings it back. The
+					# screens show all four lines; a log line does not need the
+					# two about the slot, and building this from the note is
+					# what stops the log becoming a second phrasing to keep in
+					# step (`check_gx` §3c asserts it against the note itself).
+					var rc_id := String(rune.get("id", ""))
+					var rc_tail := ""
+					if Runes.sits_out(rc_id, Runes.held_engines(Run.party[i])):
+						var rc_lines := Run.rune_sits_out_note(rc_id).split("\n")
+						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
+					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
 			# Mini-boss ability upgrades (Batch AP) — the FIRST thing that reads
 			# `upgrades`, which Batch AN recorded and nothing acted on. It runs
 			# LAST of everything that touches an ability, and that is the point:

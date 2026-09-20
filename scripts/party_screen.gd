@@ -500,6 +500,11 @@ func _draw_detail() -> void:
 	var rune_rows := VBoxContainer.new()
 	rune_rows.add_theme_constant_override("separation", 6)
 	rune_scroll.add_child(rune_rows)
+	# BATCH GX — WHICH WORN RUNES THE NEXT FIGHT WILL NOT PAY, through the same
+	# door the pouch and the map's slot buttons ask, so the three cannot
+	# disagree. Redrawn on every `_draw_detail`, so an engine unequipped on the
+	# map is reflected the next time this page opens; there is no cached set.
+	var sitting_runes: Array = Run.sitting_out_rune_names(member) if awake else []
 	for rune_entry in held_engines + runes:
 		var rune: Dictionary = rune_entry
 		var row := HBoxContainer.new()
@@ -507,6 +512,7 @@ func _draw_detail() -> void:
 		rune_rows.add_child(row)
 		var state := Label.new()
 		var is_on: bool = rune.get("equipped", false)
+		var sits: bool = is_on and sitting_runes.has(String(rune["name"]))
 		state.text = ("ENGINE" if rune.has("engine") else "WORN") if is_on \
 			else "pouch"
 		state.custom_minimum_size = Vector2(56, 20)
@@ -521,6 +527,22 @@ func _draw_detail() -> void:
 		rune_label.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+		# BATCH GX — **GT §3'S SHEET, ONE LAYER UP.** A carried card that sits
+		# out is a greyed chip reading `— sits out` with the sentence as its
+		# tooltip; a worn rune that sits out reads the same two words in the
+		# column that already carries its state, and the sentence hangs off the
+		# row. **The state column is where this page says what a rune IS**, so
+		# a second chip beside it would be a second place to say one thing.
+		# The rune's own rule stays on the row: unlike the pouch, this page is
+		# read to study a loadout rather than to change one, so the text it
+		# came for is not replaced.
+		if sits:
+			state.text = "sits out"
+			state.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+			rune_label.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+			var note := Run.rune_sits_out_note(String(rune.get("id", "")))
+			state.tooltip_text = note
+			rune_label.tooltip_text = note
 		rune_label.custom_minimum_size = Vector2(354, 20)
 		rune_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(rune_label)

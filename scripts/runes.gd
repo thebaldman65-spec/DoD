@@ -967,6 +967,27 @@ static func offerable(id: String, engines: Array) -> bool:
 	return e == "" or engines.has(e)
 
 
+# ══ BATCH GX — A RUNE ALREADY IN A SLOT, WITH ITS ENGINE OUT ════════════════
+#
+# **THE SAME QUESTION AS `offerable`, ASKED OF A RUNE HE ALREADY HOLDS**, and it
+# goes through `engine_read` for the reason that function is THE ONE ANSWER: a
+# rune the offer withholds and a rune the pouch says is sitting out must be the
+# same rune, and two predicates deriving the engine separately is how they come
+# apart. GV gated the OFFER; a rune bought while the engine was slotted is
+# already past that door, and unequipping the engine afterwards leaves it in one
+# of the three ordinary slots paying nothing.
+#
+# **GT's RULE, ONE LAYER UP** (`Classes.sits_out`, which this mirrors clause for
+# clause): the rune is NOT taken away, NOT unequipped and NOT retired — its
+# payload is still applied at the spawn exactly as before, and every read site
+# inside it still refuses for want of the engine. **This function changes
+# nothing about what a rune does; it is what the screens ask so they can say
+# so.** Re-slot the engine and the rune pays again, because nothing was moved.
+static func sits_out(id: String, engines: Array) -> bool:
+	var e := engine_read(id)
+	return e != "" and not engines.has(e)
+
+
 # Authored entries this member may roll, excluding names already in their pouch
 # and every retired entry.
 #

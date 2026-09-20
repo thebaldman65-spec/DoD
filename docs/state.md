@@ -13,66 +13,139 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-20 (Batch GW).*
+*Last rewritten: 2026-09-20 (Batch GX).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GW — THREE RUNES, AND A GATE THAT WROTE WHAT IT TESTED. IMPLEMENT ONLY, AND THE TWENTY-NINTH BATCH
-  ON `class-merge`.** GV drove all sixty live ordinary runes through the real door and came back with three findings it
-  did not repair. GW wires the one that paid nobody, gates the two that charged for a payout their engine withholds,
-  re-points the gate that had been arranging its own subject, and sweeps every gate in the battery for that shape.
-  `main` is untouched. Full working: **`docs/reports/GW.md`**.
-- **§1 — THE SHARED HIDE CROSSES, AND IT IS THE ONLY `rune_` FIELD THAT HAS TO.** `Talents.apply_payload` writes the
-  flag onto the HUNTER and `_shared_hide_mult` reads it off the COMPANION; `_do_summon` carried it in neither the cfg
-  nor the hunter's-own-terms copies, so a 100g rune multiplied a beast's blow by exactly 1.0000 from the day it
-  shipped. One line, beside `crit_bonus` and `companion_power`. **Driven in a real fight across EZ's own three buff
-  loadouts: +26.5% / +57.6% / +138.3%**, against EZ's ×1.2500 / ×1.5625 / ×2.3359 multipliers, which this reproduces to
-  four places — EZ measured the function on a field its gate had set by hand; these are blows.
-- **§1b — ALL 120 `rune_` FIELDS TRACED TO EVERY LINE THAT READS THEM.** One has a read site whose receiver is a
-  companion; 2 could reach one and sit behind `has_engine("trapper")`, which a companion can never satisfy; 10 are read
-  off the HUNTER; 10 off a body a companion can be, for runes no Hunter can hold; 25 off the ACTING unit, and a
-  companion never acts; 72 only through a walk of `heroes`, which a companion is not in.
-- **§2 — THE SHAPE, SWEPT AND REPORTED: 92 SITES IN 9 FILES.** A gate that SETS a rune, engine or talent field rather
-  than equipping the rune, taking the engine or buying the node. **Ninety set it on the body the game writes it to; two
-  set it where the game never writes it**, and those two hid the dead rune. `check_fx` §4 is the legitimate pattern —
-  a PLUMBING half through the real door beside a READ-SITE half — and names EZ's Shared Hide in its own header as the
-  defect it was built against. **Repairing the ninety is its own batch.**
-- **§3 — THE MARTYR'S AND THIN BLOOD'S COSTS ARE GATED WITH THEIR PAYOUTS.** Both were already `Runes.ENGINE_READ`
-  rows: they did not slip GV's census, so the fix is the cost and not the table. Each price now reads its payout's own
-  predicate (`has_engine("mercy")`, `has_engine("trapper")`), copied rather than re-derived. **No engine, no cost and
-  no payout.** Swept across the other 25 ungated runes and re-derived over the other 33 gated ones: no other rune has
-  the shape.
-- **§4 — THE WITHHELD CACHE ROW IS RULED AS GV BUILT IT**, and GV had already recorded the reasoning in two of the
-  three places (`run_state._engine_seated`'s header and `CLAUDE.md`'s FD §1 block). `docs/master.html` described the
-  behaviour and not the reason; it carries it now.
-- **NEW GATE `check_gw`**: the crossing driven through the real door in both engine arms; EZ's three loadouts as
-  damage; the census's four structural facts asked of a live board with a beast standing, and the companion's single
-  carried field out of 120; the §2 sweep re-derived off `run_battery.sh`'s own target list under a ceiling; and the two
-  prices with their payouts, engine equipped and merely owned, beside a hero wearing no rune at all.
-- **WHAT MOVED:** `scripts/battle.gd` (the copy at `_do_summon`, Thin Blood's price), `scripts/unit.gd` (the Martyr's
-  price); `check_gw.gd` (**NEW**) and `run_battery.sh`; `check_ez` re-pointed (§5's hand-set arm replaced by §5b, which
-  equips; §4's writer sweep repaired to intent) and `check_gv` re-pointed (§1's DEAD row, §1b's two prices);
-  `baselines.json` and `pin-manifest.json`; `CLAUDE.md`, `docs/instrument-rules.md`, `docs/master.html`,
-  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GW.md` (**NEW**).
-- **VERIFICATION:** **120 targets, `check_de` 497 / 0, the run harness 22 / 382 / 8 with throws=0, `check_parse` 194 / 0**, on a
-  tree stamped by md5 before and after (367 files; one moved, named below), and no `Parse Error` or `SCRIPT ERROR` in any of the
-  120 logs. **Every predicted baseline was met exactly** — `check_ez` 114, `check_gv` 877, `check_gw` 76 — all written before the
-  run. **The only reds are the two standing sanctioned ones and both were diffed against an isolated rebuild of `ed35334`:
-  byte-identical FAIL lines**, `check_cm_live` 13 / 4 and `check_gj` 70 / 1 at +158 / 178, whose gold figures did not move.
-  **Six injected defects across five isolated copies, each bit and each named its own defect** — among them the brief's own
-  control, the copy at `_do_summon` deleted, which took `check_gw` to 76 / 13 and the repaired `check_ez` to 114 / 3 where
-  HEAD's `check_ez` reads 106 / 0 on a tree with the same rune dead. **The battery caught this batch's own doc edit** —
-  `test_batch_bx` 157 / 1, BX §4's ban on the common noun *beast* in `docs/master.html` — and the word is repaired, the rule
-  reproduced over the edited file at 0 strays, and **all 35 targets that read that file re-run: one reads differently from the
-  acceptance run and it is `test_batch_bx`, 157 / 0.** The player's four saves are byte-identical to the backup taken before any
-  Godot process ran.
-- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**. **The Crown's Break
-  and freeze resistance is still owed.** Step 6 is the 52 engine-bound gates.
-- **Next letter: GX.**
+- **Last batch: GX — A RUNE SITTING OUT SAYS SO. IMPLEMENT ONLY, AND THE THIRTIETH BATCH ON `class-merge`.** GV
+  gated 35 runes on their engine being equipped and closed the OFFER; GX closes the other half — a rune bought while
+  the engine was in, whose engine is now out, sitting in its slot paying nothing with nothing on any screen saying
+  why. **GT's answer one layer up, in GT's own words.** `main` is untouched. Full working: **`docs/reports/GX.md`**.
+- **§1 — FOUR SURFACES SAY IT, AND THEY SAY ONE SENTENCE.** `Runes.sits_out` is GV's `offerable` asked of a rune he
+  already holds — the same predicate through the same `engine_read`, so the offer and the tell cannot disagree — and
+  `Run.sitting_out_rune_names` is the one door every surface asks. **The pouch** puts the sentence in place of the
+  rune's own rule, in the Kit panel's amber; **the map's three rune slots** mark the face and carry the sentence in
+  the tooltip, the only surface the player need not open anything to read; **the hero sheet's state column** reads
+  `sits out` instead of `WORN`, with the sentence on the column and on the row; and **the battle log's opening roll
+  call** says it too. **`Run.rune_sits_out_note` is GT's sentence with each surface's own nouns** — worn for carried,
+  filled for counted, unequipping for benching — and the log's tail is built FROM that function rather than written,
+  so there is one phrasing and not four.
+- **§1b — THE FIVE SURFACES THAT NEEDED NOTHING, EACH FOR ITS OWN REASON**, derived by sweeping every site in
+  `scripts/` that renders a rune's name rather than from a list. **The Peddler, a cache and an event grant are offer
+  surfaces and GV's gate means none can offer a gated rune while the engine is out** — measured at the pool itself,
+  **0 of 35 with the engine out against 3 with it in**, so the emptiness is the gate and not an empty pool; a cache
+  already says what it holds back, in GV's words. The pouch's ENGINE rows read no engine. The run-end summary lists
+  the whole pouch and has never distinguished worn from carried.
+- **§1c — THE POUCH, MEASURED, BECAUSE GT FOUND ITS CLOSE BUTTON OFF-SCREEN BEFORE IT FIXED THE LAYOUT.** Six runes
+  held with two sitting out: **298 px in a 583 px scroller** (287 with the engine in — the two tells add 11 px). The
+  panel's own worst case, a class's six engine rules AND six runes with two sitting out: **543 of 583**. Nothing
+  scrolls in any of the three, both tells draw whole at size 12 inside the scroller, and **Close is at the same
+  rectangle in all three**. **40 px of headroom is what is left**, and that is the number the next batch adding
+  anything to this panel should read first.
+- **§1d — THE MAP'S SLOT CARRIES A MARKER BECAUSE NO WORD FITS, MEASURED OVER ALL 35 NAMES** at the size the button
+  draws: the name alone is **74 px** and the name with a marker **82 px** of the 92-px slot, while `(out)` is 99,
+  `— out` 105 and `— sits out` 124. The 92 is a minimum and the three slots are pitched 96 apart, so an overflowing
+  face lies over its neighbour rather than clipping; the drawn button is asserted inside the pitch in the live drive.
+- **§2 — THE SHARED HIDE'S 100 GOLD STANDS, JUDGED IN PLAY**, and the reasoning is recorded beside GW's figures so a
+  later re-measurement is not read as new: **+138.3% is the deepest of three loadouts and needs FOUR separate
+  damage effects standing on the companion at once** — a Warcry, an Empower, a Battle Shout and the Pivot, of which
+  three are party buffs and the fourth is a stance-switch status on the companion itself — which is a party built
+  around the companion rather than a purchase; the thin reading is **+26.5%**; and **until GW the rune paid nobody anything at
+  all**, so there is no play experience to weigh a raise against. GW's multipliers ×1.2500 / ×1.5625 / ×2.3359 and
+  its blows +26.5% / +57.6% / +138.3% are in `docs/reports/GX.md` §2.
+- **NOTHING WAS RETUNED, AND `check_gx` §6 ASSERTS IT FROM THE OTHER SIDE**: a rune that sits out is still equipped,
+  still fills its slot, still has its payload applied at the spawn, and its price and text are byte-identical to
+  `runes.json`. The refusal stays inside each read site where GV put it.
+- **NEW GATE `check_gx`**: the predicate over its derived population (35 gated, 25 ungated, 4 engine runes), read the
+  same through `sits_out` as through `offerable` inverted; the slot's five face widths; the four surfaces driven in
+  both arms, every row — **the map's slot found by the door it opens rather than by its face, so a WRONG face is
+  measured rather than merely missed** — beside an ungated rune and an unequipped gated rune that must NOT be marked; the pouch at six
+  held and at GT's worst case; the sentence asserted against GT's in both directions and every line under the
+  44-character break; and nothing retuned.
+- **WHAT MOVED:** `scripts/runes.gd` (`sits_out`), `scripts/run_state.gd` (`sitting_out_rune_names`,
+  `rune_sits_out_note`), `scripts/map_screen.gd` (the pouch rows, the three slot buttons), `scripts/party_screen.gd`
+  (the sheet's rune rows), `scripts/battle.gd` (the roll call); `check_gx.gd` (**NEW**) and `run_battery.sh`;
+  `baselines.json`; `CLAUDE.md` (GT's sits-out block extended, not a second block), `docs/master.html`,
+  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GX.md` (**NEW**).
+- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**; GV closed the
+  offer and GX closes the slot. **The Crown's Break and freeze resistance is still owed.** Step 6 is the 52
+  engine-bound gates.
+- **Next letter: GY.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+### GX's RULINGS OWED — **THREE; THE FIRST IS PLAYER-VISIBLE**
+
+Full working: `docs/reports/GX.md`, NEEDS A RULING.
+
+1. **THE BATTLE LOG'S ROLL CALL WAS A FOURTH SURFACE AND THE BRIEF NAMED THREE.** The brief's §1 listed the pouch,
+   the hero sheet, the Peddler and a cache offer. The census found a fifth thing that shows a held rune — the
+   `Rune:` lines the spawn writes into the combat log — and **a rune that sits out was named there in the log of a
+   fight it paid nothing in**. It says so now. **This is the one place GX went past what the brief named**, on the
+   brief's own instruction that *every* surface says it, and the asymmetry is real: a card that sits out is absent
+   from the fight, so GT had nothing to mark; a rune is still equipped and its payload is still applied. Whether a
+   log line should carry it, or the screens are enough, is the designer's.
+2. **`CLAUDE.md` IS AT 336.31 KiB WITH 3.69 KiB OF HEADROOM, AND ITS OWN BLOCK SAYS THERE IS NO SEAM LEFT.** GX
+   added 1.62 KiB by extending GT's sits-out block rather than opening a second one. `check_fg` §2 reads the file
+   under its ceiling and prints no warning. **The file's own FU §1 / GR §2 block says the next batch at this ceiling
+   is not looking for a seam**: what is left is card law, engine law and rune law, each written into by more batches
+   than combat law was, so both remaining moves are the designer's — split a subject batches read often (rune law is
+   named as the one that would come away cleanly) or re-derive the ceiling a second time. **The largest single-batch
+   growth on record is +8.10 KiB, which is more than the headroom**, so the batch that meets this is the one that
+   discovers it mid-write. Raised here rather than at the wall.
+3. **GV'S AND GW'S DESIGN-NOTES ENTRIES ARE AT THE BOTTOM OF A FILE WHOSE HEADER SAYS *"Newest first"*.**
+   `docs/design-notes.md` carries two conventions: GP through GU sit at the top under `## <Title> (Batch XX) — <date>`,
+   while GK, GM, GN, GO, GV and GW were appended at the foot under `## Batch XX — <title>`, below 9,000 lines of
+   older notes. **The two instructions genuinely conflict** — the file's header says newest first and `CLAUDE.md`'s
+   working agreement says *append* — so this is a ruling rather than a slip. GX's entry is at the top, per the
+   header. **Moving the six is a pure block move and was not taken**: the brief asked for a small batch and said what
+   was deliberately not done. Nothing asserts on position (the three suites that read this file ask only that their
+   own batch's name is present), so the move is free whenever it is ruled.
+
+### FOUND AT GX AND NOT FIXED
+
+- **`docs/changelog.html` CARRIED THREE UNRESOLVED PLACEHOLDERS IN GW's ENTRY, AND THEY ARE REPAIRED.** The line
+  describing the Shared Hide's three measured swings read *"THIN_SWING, MID_SWING and DEEP_SWING more damage from the
+  same seeded blows"* — template tokens that resolve to nothing anywhere in the tree. They carry GW's own figures now
+  (+26.5% / +57.6% / +138.3%, `docs/reports/GW.md` §1c), which is the intent the line was written to hold. **The
+  sweep that found them is the population**: every `ALL_CAPS_WITH_UNDERSCORES` token in the nine tracked documents
+  that resolves to nothing in `scripts/`, `data/`, the shell scripts or any other document, and appears in one
+  document only — **three, all on that one line, and nothing else**. This is GS's twenty-four placeholder
+  descriptions arriving in a document instead of in data, and **no instrument reads for the shape**.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (GX §0): ***"a benched card's tell"*** (a benched card has no tell; the
+  tell GX copies is the SITS-OUT one, and `CLAUDE.md` states the distinction in those words — *"Sitting out is not
+  benching"*); ***"+138% … needs a Warcry, an Empower and a Battle Shout"*** (it needs those three **and the Pivot** —
+  four, GW §1c's table, which makes the ruling's own argument stronger); and ***"Sanctity's honest text"*** (no such
+  queue item — what is queued for Sanctity is its **status-potency layer**, the largest unbuilt system the recon
+  found; the Crown's Break and freeze resistance is owed, and the engine-card text items are GQ's rulings 1 and 2).
+- **`CLAUDE.md` IS AT 336.63 KiB WITH 3.37 KiB OF HEADROOM** — GX added 1.62 KiB by extending GT's block rather than
+  opening a second one, and `check_fg` §2 reads it under the ceiling with no warning. **The largest single-batch
+  growth on record is +8.10 KiB, more than the headroom**, and the file's own block says there is no seam left; see
+  ruling 2 above.
+- **THE POUCH'S WORST CASE NOW MEASURES 543 px IN A 583 px SCROLLER.** GT sized the panel for a class's six engine
+  rules; GX put a two-line sentence into rune rows that were one line. It still does not scroll and Close never
+  moves, but **40 px is what is left**, and a further row of text on that panel is the thing to measure before it is
+  added.
+- **A GATE ARM OF GX's OWN WENT VACUOUS, AND ONE OF ITS OWN CONTROLS FOUND IT.** The map slot was read by the face
+  it EXPECTED (`_button(mp, "○ " + name)`), so a button carrying the WRONG face was not found at all — the arm
+  reported the absence and **the width assertion beside it never executed**. The `slotword` control, which puts back
+  the face the §2 measurement ruled out, printed FAIL lines byte-identical to the control that simply deletes the
+  tell: a control proving nothing. **The slot is found by the door it opens now** — every button bound to
+  `_open_rune_panel(seat)` — and its drawn width is asserted **in both arms and on whatever it drew**, before its
+  face is read. Proved two-armed on the same injection: *"the map's slot does not mark the rune as sitting out"*
+  before, *"the slot drawing `Ambush — sits out` is 99 px wide, over the 96-px pitch"* after. The live widths (99,
+  108, 118 px) also confirm §2's string measurement independently. **The general shape: an arm that locates a thing
+  by the value it is about to assert can only ever fail by absence.** The gate went 955 → **1130** checks on the repair.
+- **GX's OWN FIRST DRAFT SHIPPED A FUNCTION WITH NO CALLER AND A GATE CONSTANT WITH NO USE**, both written by this
+  batch and both removed before the verification run: `Run.rune_id_by_name` (the screens read the id off the rune
+  instance directly, so it was never needed) and `check_gx`'s `NO_LINEAGE`. Found by sweeping every name GX declared
+  for a use beyond its own declaration, with comments stripped so prose naming a function did not count as a call.
+- **AND ITS FIRST DRAFT OF THE LOG LINE WAS A FOURTH PHRASING.** It read *"— sits out, the Rune of the Occultist is
+  not equipped"* — the same two facts in different words from the sentence the three screens show, which is exactly
+  the thing this batch's own rule forbids. The tail is built from `Run.rune_sits_out_note`'s first two lines now, and
+  `check_gx` §3c asserts it against that function, so the log cannot drift from the screens.
+
 ### GW's RULINGS OWED — **FOUR; THE FIRST TWO CHANGE WHAT A RUNE IS WORTH**
 
 Full working: `docs/reports/GW.md`, NEEDS A RULING.
@@ -86,8 +159,9 @@ Full working: `docs/reports/GW.md`, NEEDS A RULING.
 2. **THE TWO PRICES ARE OFF WITH THE ENGINE OUT, WHICH MAKES AN UNEQUIPPED ENGINE STRICTLY BETTER THAN IT WAS.** Ruled
    by the brief and built. At the table: a Holy Cleric who unequips Mercy while wearing the Martyr can now be healed by
    his party, and a Survivalist who unequips Trapper while wearing Thin Blood keeps his poison's damage. Neither buys
-   anything back — the payouts stay off — so each rune is **inert rather than negative**. The alternatives nobody took
-   are GV's ruling 3: unequip the rune with the engine, or say on a screen that it is sitting out.
+   anything back — the payouts stay off — so each rune is **inert rather than negative**. Of GV's ruling 3's alternatives,
+   **the second is taken at GX §1** — four surfaces say it is sitting out — and unequipping the rune with
+   the engine is still untaken.
 3. **§2's NINETY OTHER HAND-SETS ARE REPORTED AND RULED ON BY NOBODY.** Ninety-two sites in nine files arrange a rune,
    an engine or a talent field rather than letting the game write it; two were the defect and are repaired, and the
    other ninety are on the body the game writes it to. Repairing them is a change to ninety checks across nine files.
@@ -144,7 +218,11 @@ Full working: `docs/reports/GV.md`, NEEDS A RULING.
    stands, re-equipping before the visit restores them), a cache or bargain ROLLED while it was out never contains its
    rows at all, and an elite fought with it out drops a cache without them — the same reading the card draft already
    takes at a victory.
-3. **A BOUGHT RUNE WHOSE ENGINE IS DROPPED KEEPS ITS SLOT AND PAYS NOTHING.** GT ruled it for a CARD: it sits out and
+3. ~~**A BOUGHT RUNE WHOSE ENGINE IS DROPPED KEEPS ITS SLOT AND PAYS NOTHING**~~ — **ANSWERED AT GX §1, AND THE
+   SECOND OF THE FOUR OPTIONS IS THE ONE TAKEN**: it sits out with a note, the way a card does. It still keeps its
+   slot and still pays nothing — GX moved no magnitude — but four surfaces now say so and name the engine rune that
+   brings it back, in GT's own sentence. **The other three stay untaken and stay priced below.** The original
+   finding: GT ruled it for a CARD: it sits out and
    returns. A rune is bought with gold, and nothing was built for it here (§3 of the report): it stays equipped in one
    of the three ordinary slots, pays nothing (measured), and nothing on any screen says why. **Two are worse than
    nothing** — the Martyr still refuses every ally's heal and Thin Blood still stops his poison biting. The options,

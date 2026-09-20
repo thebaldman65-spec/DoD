@@ -678,6 +678,8 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	# own button: clicking one opens this hero's pouch.
 	var runes: Array = member.get("runes", [])
 	var worn: Array = runes.filter(func(r): return r.get("equipped", false))
+	# BATCH GX — the same door the pouch and the sheet ask.
+	var sitting_runes: Array = Run.sitting_out_rune_names(member)
 	for sl in Run.rune_slots():
 		var rune: Dictionary = worn[sl] if sl < worn.size() else {}
 		var slot_btn := Button.new()
@@ -695,6 +697,27 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 				rune["name"], Runes.shown_desc(rune), key.capitalize()]
 			slot_btn.add_theme_color_override("font_color",
 				rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+			# BATCH GX — A FILLED SLOT THAT PAYS NOTHING SAYS SO ON THE MAP
+			# ITSELF, which is the only surface the player reads without
+			# opening anything. **THE MARKER IS IN THE
+			# TEXT, NOT ONLY IN THE COLOUR** — a colour is not a tell, and this
+			# button is where the eye lands before a fight. **IT IS A MARKER
+			# RATHER THAN A WORD BECAUSE NO WORD FITS, MEASURED**: the widest
+			# gated name is 74 px of the 92-px slot at font 10, which leaves
+			# room for one glyph and for none of `(out)` 99, `— out` 105 or
+			# `— sits out` 124. The 92 is a MINIMUM, so a longer face grows
+			# the button, and the three slots are pitched 96 apart — an
+			# overflowing one would lie over its neighbour rather than clip.
+			# `check_gx` §2 re-measures all four forms and the drawn button.
+			# **The sentence itself is the pouch's and the hero sheet's own,
+			# in the tooltip, which has the room.**
+			if sitting_runes.has(String(rune["name"])):
+				slot_btn.text = "○ %s" % String(rune["name"])
+				slot_btn.tooltip_text = "%s\n\n%s\n\nClick to manage %s's runes." % [
+					rune["name"],
+					Run.rune_sits_out_note(String(rune.get("id", ""))),
+					key.capitalize()]
+				slot_btn.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		slot_btn.pressed.connect(Music.click)
 		slot_btn.pressed.connect(_open_rune_panel.bind(idx))
 		add_child(slot_btn)
@@ -1751,6 +1774,11 @@ func _open_rune_panel(idx: int) -> void:
 	_rune_panel_for = idx
 	var member: Dictionary = Run.party[idx]
 	var runes: Array = member.get("runes", [])
+	# BATCH GX — read ONCE, off the same door the sheet and the slot buttons
+	# ask, so no surface can disagree with another about which rune is sitting
+	# out. It is re-read on every open, and the engine toggle below re-opens
+	# the panel, so unequipping an engine repaints its runes immediately.
+	var sitting_runes: Array = Run.sitting_out_rune_names(member)
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 60
@@ -1862,6 +1890,16 @@ func _open_rune_panel(idx: int) -> void:
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+		# BATCH GX — WORN, AND SITTING OUT. The row says so in place of the
+		# rune's own text, because this is the panel where the engine it waits
+		# on is re-slotted and where the slot it holds can be freed; the
+		# sentence is the hero sheet's, one door. **GT §3's Kit panel, one
+		# layer up** — same placement, same amber, same flattening, because a
+		# second shape for the same idea is a second thing to keep in step.
+		if is_on and sitting_runes.has(String(rune["name"])):
+			lbl.text = "✦ %s — %s" % [rune["name"],
+				Run.rune_sits_out_note(String(rune.get("id", ""))).replace("\n", " ")]
+			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(lbl)

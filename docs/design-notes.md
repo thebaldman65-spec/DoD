@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A rune sitting out says so (Batch GX) — 2026-09-20
+
+**Why a tell and not one of the other three things.** GV left four options on the table for a rune whose engine has
+been unequipped: leave it alone, sit it out with a note the way a card does, unequip it automatically, or let it be
+sold. The last two both take a decision away from the player. Unequipping it for him means a state he did not choose
+and did not ask for, and it would silently free a slot he might have been keeping; letting it be sold is a new economy
+for a problem that is only ever a missing sentence. Leaving it alone is what was already happening, and it is the one
+reading a player cannot recover from on his own, because nothing tells him anything is wrong. **The note is the only
+option that changes what he knows without changing what he has.**
+
+**Why it is GT's sentence and not a new one.** GT solved this exact problem one layer down for a card that cannot be
+cast without its engine, and it wrote one sentence for two screens on purpose. A rune sitting out is the same fact
+about a different object, so a second phrasing would be a second thing to keep in step — and the project has watched
+that go wrong often enough to have a rule about it. The opening clause is byte-identical; only the nouns move, because
+a rune is worn where a card is carried and unequipping frees its slot where benching frees the card's.
+
+**Why the map's rune slot carries a marker rather than the words.** The slot button is 92 pixels wide and the three
+slots sit 96 pixels apart, so a face that grows overlaps its neighbour rather than clipping. Measured over all
+thirty-five gated runes at the size the button draws, the widest name alone is 74 pixels and the widest name with a
+marker is 82 — both fit; every wording tried runs 99 pixels or more and does not. So the face carries the marker and
+the tooltip carries the sentence, and the sentence is the same one the other two screens show.
+
+**Why the Peddler and the cache got nothing.** Both are offer surfaces, and GV's gate means neither can offer a gated
+rune while its engine is out — a tell there would be words that never render. A cache already says which rune it is
+waiting on, because GV built that. The gap was never the offer; it was the rune he had already paid for.
+
+**Why the Shared Hide still costs a hundred gold.** GW wired it and it went from paying nothing at all to the largest
+single damage swing a companion build can buy. The measurement invites a raise and the ruling is that it stands, to be
+judged in play. The deepest of the three readings is +138%, and it needs four separate damage effects standing on the
+companion at the same time — three party buffs and a stance-switch status —
+that is a party built around the companion rather than something a hundred gold bought. The thin reading, one buff, is
++26.5%. And nobody has ever felt any of it: until GW the rune multiplied a companion's blow by exactly one, so there is
+no player experience of it being too strong to weigh against.
+
 ## The last three cards under the baseline, and the sweep for the shape (Batch GU) — 2026-09-19
 
 **Why Arcane Explosion and Shadowrend keep their price.** Both were a lineage's basic attack until GS, and a basic is
