@@ -195,8 +195,17 @@ than moved there** — FG's, FH's, FI's, and FR §5a's as FS §1 closed it:
   its "Last updated" timestamp; (2) add an entry to `docs/changelog.html`
   (newest first); (3) **the `.docx` exports STAY STALE — do NOT rebuild them
   (ruled by the designer at FG, recorded at FH §4, written here at FN §3)**;
-  (4) append a short "why" entry to docs/design-notes.md — rationale only, not
-  instructions.
+  (4) add a short "why" entry AT THE TOP of docs/design-notes.md — newest
+  first, which is that file's own header — rationale only, not instructions.
+  - **THE WORD *append* STOOD HERE UNTIL GY §2 AND IT SENT SIX ENTRIES TO THE
+    FOOT.** Step (2) says *newest first* and step (4) said *append*, so the
+    contrast read as an instruction, and GK, GM, GN, GO, GV and GW each wrote
+    their rationale below nine thousand lines of older notes where a reader
+    following the header will not find it. **Nothing asserts on position** —
+    the three suites that read that file ask only that their own batch is
+    named — so the drift was silent for six batches. The position is stated in
+    both steps now, and in `docs/ways-of-working.md`'s merge table, which said
+    *Append-only* for the same reason.
   - **THE REASON, RECORDED WITH THE RULE SO THE REBUILD IS NOT RE-PROPOSED AS A
     FIX.** `docs/build_docs.py` reads `docs/changelog.html` by relative name,
     and that file is **the RECENT HALF only** — the changelog has been cut four
@@ -343,8 +352,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   reading the rest.
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
 
-## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 340 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1)
-> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 340 KiB.**
+## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 410 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1 AND GY §1)
+> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 410 KiB.**
 > **When it is reached the answer is a SPLIT. It is never a prune.** The 3%-of-sync target this
 > replaces is retired: three readings killed it and all three are recorded below, so nobody derives
 > it again.
@@ -360,14 +369,60 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **NEVER-QUOTED IS NOT DEAD.** "Neither asserted nor quoted" is a fact about citation, not about
   load. **Nobody quotes the rule they are obeying**, so a well-obeyed rule and a dead one produce
   identical evidence under a citation count. **Do not prune this file by a reference count.**
-- **THE 340 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS (ruled by the
-  designer at FU §1).** The FLOOR is measured: FF's split left **261.03 KiB** of this file alone,
-  after ED had read every never-cited block and retired none and FF had classified all 105 by what
-  each binds — the most recent reading of this file with nothing in it but tested rules. The
-  HEADROOM is measured: the largest single-batch growth on record is **+8.10 KiB**, and **a ceiling
-  within one batch's reach fires on whoever writes the big batch rather than on the file's
-  condition**, so it is ten of those. 261.03 + 81.00 = 342.03, **stated as 340 and rounded DOWN** —
-  a ceiling above its own derivation is one nobody trusts.
+- **THE 410 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS, ON ITS THIRD RUN
+  (ruled by the designer at FU §1 and again at GY §1).** The FLOOR is measured, and since GY it is
+  this file's own reading rather than a past split's: **three audits have found nothing dead in it**
+  — ED read all 43 never-cited blocks and retired none, FF classified all 105 by what each binds,
+  GR classified all 113 by subject — so a rules-only reading of this file IS its reading, which is
+  the bullet below's *a ceiling derived from a file's own size moves with the file*. **GX's reading
+  was 336.63 KiB.** The HEADROOM is measured, and it is the term nobody should quote without
+  re-measuring:
+  the largest single-batch growth on record is **+8.10 KiB**, and **a ceiling within one batch's
+  reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten
+  of those. 336.63 + 81.00 = 417.63, **stated as 410 and rounded DOWN** — a ceiling above its own
+  derivation is one nobody trusts.
+  · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY, AND THAT WAS MEASURED RATHER THAN
+    ASSUMED.** Over EE's own window — the 92 batches since DK — the largest single-batch growth is
+    still **EZ's +8,293 B**; the largest since GR's split is GS's +5,137 B, and the largest since FF
+    is FK's +6,957 B. **EB's +8,287 B is the figure that went stale**, at GR; EZ's has stood for
+    thirty-two batches. A later batch re-running this arithmetic re-measures the term before
+    quoting it, and finds it the same way: per-batch deltas of this file across the whole history.
+  · **THIS IS THE METHOD'S THIRD RUN AND THE CEILING'S SECOND RE-DERIVATION, AND WHAT THAT MEANS IS
+    WRITTEN HERE RATHER THAN LEFT TO BE NOTICED (GY §1).** EE derived 290, FU re-derived 340, GY
+    re-derives 410 — and over the same span the split has been taken three times (EF §2, FF §1,
+    GR §2), after CW's split before them. **A file split four times whose ceiling has moved twice is
+    a file that grows faster than any structure contains**, and the two instruments say so from
+    opposite ends: nothing in it is dead (three audits, zero retirements), and nothing left in it
+    comes away cleanly (FF's and GR's measurements). **So the re-derivation is not a retreat and it
+    is not a repair — it is the only move the procedure has left that costs less than it buys**, and
+    the next one is the same arithmetic on the same two inputs.
+  · **THE ROUNDING COST MORE THIS TIME, AND IT IS STATED SO IT IS NOT READ AS A SLIP.** EE's 291.49
+    became 290 and discarded 1.49; FU's 342.03 became 340 and discarded 2.03; **GY's 417.63 becomes
+    410 and discards 7.63**, because the derived figure lands just past a ten. The stated ceiling
+    therefore carries **9.1** worst batches of headroom where EE's carried 9.8 and FU's 9.75. It is
+    still rounded DOWN, which is the rule; the multiple is reported so nobody re-derives it in the
+    belief the arithmetic slipped.
+  · **A FOURTH IS EXPECTED, AND HERE IS WHEN — GR's 5.1-to-9.8 batches is superseded.**
+    From GX's reading the headroom is 73.37 KiB: **about 24 batches** at the +3,086 B a batch this
+    file has grown over the six since GR's split, **about 31** at the +2,383 B a batch it has grown
+    over the 42 since FF, and **9.1** at the largest single batch on record. So the answer is
+    **roughly 24 to 31 batches, and no sooner than 9** — five times further out than GR's reading,
+    which is the point of moving the ceiling rather than the file. **These are GY's figures on GY's
+    window and the live headroom is smaller by whatever has been written since**; the live reading
+    belongs in `docs/state.md`, per the bullet below, and the rate is re-measured before it is
+    quoted.
+  · **AND A THIRD OPTION WAS WEIGHED AT GY AND REJECTED: SPLITTING THE REASONING OUT. DO NOT
+    RE-PROPOSE IT.** Much of this file is reasoning recorded beside a rule *so it is not
+    re-litigated* rather than rule that binds — **97.04 KiB across 202 `·` sub-bullets at GX's
+    reading**, larger than any subject seam FF or GR measured, so it is a real seam by size and it
+    is the obvious next one to reach for. *(The size of the part is here; the SHARE is not, because
+    a share and a part between them state the whole, which is the bullet below's rule broken by
+    division. The live reading is in `docs/state.md`.)* **It stays.** The reasoning is the thing that
+    stops a batch re-proposing a settled question, and a batch only meets it by reading it: moving
+    it out of the required read defeats the one purpose it was written for, and leaves behind rules
+    whose *why* is a pointer nobody follows until after they have argued. **It is also the half no
+    citation count can see** — *NEVER-QUOTED IS NOT DEAD*, above — so the seam that looks cheapest
+    under a reference count is the one that costs most.
   · **EE's 290 WAS THE SAME ARITHMETIC ON INPUTS FORTY BATCHES OLD, AND RAISING IT IS NOT A
     RETREAT.** Its floor was DZ's 210.59 KiB, taken before the instrument half left this file, and
     its headroom was ten of EB's +8,287 B. **EZ has since grown the file by +8,293 B — six bytes
@@ -392,14 +447,17 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     and engine/axis/tag) are the vocabulary every new card is authored against, so the tiebreak
     keeps both. **FF named two moves and both were the designer's: re-derive the ceiling per half
     (EF costed it and deliberately did not take it), or overturn the one-way tiebreak. FU TOOK THE
-    FIRST** — the 340 above is this file's own ceiling off this file's own post-split reading —
-    **and the second is what is left.** The classification and its per-group sizes are in
-    `docs/reports/FF.md` §1 — do not re-derive them from a proposal.
-  · **AT 340 KiB THE PROCEDURE IS EXHAUSTED, AND THE NEXT QUESTION IS NAMED HERE SO IT IS NOT
-    REDISCOVERED (FU §1).** Split-never-prune has no seam left of the kind it takes, and the ceiling
-    has been re-derived once. **A second re-derivation is not the same move made twice**: every
-    audit of this file has found nothing dead, so its next rules-only reading would be its own size
-    on the day, and a ceiling derived from a file's own size moves with the file. **THE SEAM THAT
+    FIRST** — the ceiling above is this file's own, off this file's own post-split reading; FU ran
+    it at 340 and GY re-ran it at 410 — **and the second is what is left.** The classification and
+    its per-group sizes are in `docs/reports/FF.md` §1 — do not re-derive them from a proposal.
+  · **AT THE CEILING THE PROCEDURE IS EXHAUSTED, AND THE NEXT QUESTION IS NAMED HERE SO IT IS NOT
+    REDISCOVERED (FU §1; RE-RUN AT GY §1).** Split-never-prune has no seam left of the kind it
+    takes, and the ceiling has now been re-derived **twice** (FU §1 at 340, GY §1 at 410). **Neither
+    re-derivation was the same move made twice**: every audit of this file has found nothing dead,
+    so its next rules-only reading is its own size on the day, and a ceiling derived from a file's
+    own size moves with the file. **That is what makes the move repeatable and also what makes it
+    cheap — which is the reason to say out loud that it is not free**: each run buys ten worst
+    batches and nothing else, and the bullet above says how many that is. **THE SEAM THAT
     EXISTS IS BY SUBJECT, NOT BY WHAT A RULE BINDS.** At FF's classification COMBAT RESOLUTION LAW
     was **66.74 KiB** over 24 blocks and CARD / ABILITY AUTHORING LAW **59.12 KiB** over 21, and
     either could become a reference this file points at, the way `docs/instrument-rules.md` did.
@@ -418,11 +476,20 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     files (rune law is the one that would come away cleanly, and the merge's rune step reads it every
     batch), or re-derive the ceiling a second time, which the bullet above says moves with the file.
     The measurement and the headroom this split bought are in `docs/reports/GR.md` §1 and §5.
+    · **THE DESIGNER TOOK THE SECOND AT GY §1, AND THE REASON IS GR's OWN TEST AND NOT EF's RETIRED
+      GUARANTEE.** *There are not two files a batch must read* was **retired at GR §2** and cannot
+      be the argument any more — this file says so twenty lines from its own top. What rules out
+      rune law is the test GR left in its place: **the subject a batch reads LEAST, never the
+      largest one.** Rune law is the subject batches read MOST — written into by **10** of the 38
+      batch commits since FF, against card law's 7, engine law's 7 and combat law's 4 — so it is the
+      worst candidate on GR's measurement, not the best, and the merge's rune step reads it every
+      batch on top of that. **A seam that sends the most batches to two files is the one seam this
+      procedure must not take**, and the ceiling moved instead.
   · **TAKE A SPLIT AT A MEASURED SEAM, NOT AT A REACHED CEILING (STANDING, EF §2).** EF split at
     52.50 KiB of headroom rather than at zero. **A seam is cleaner measured than reached**, and a
     split taken under a ceiling is a split taken in a hurry — which is the same argument that made
     the prune the wrong instrument.
-- **THE 340 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
+- **THE 410 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
   derived on a file that still held the instrument half, so it was conservative for this file alone
   and fired later than its own derivation would have. **FF's post-split reading carries no such
   term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` is under

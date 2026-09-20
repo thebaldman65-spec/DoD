@@ -162,7 +162,7 @@ the three anyone predicts, and the two hardest entries are not documents at all.
 |---|---|
 | `docs/state.md` | **Take the branch's wholesale.** It is rewritten every batch and has no reader. |
 | `docs/changelog.html` | **Append-only at the top; BOTH sides' entries survive, ordered by batch code.** Neither side's history is a draft. |
-| `docs/design-notes.md` | Append-only. Both sides survive. |
+| `docs/design-notes.md` | **Newest first, at the top** — its own header, and `CLAUDE.md`'s step (4). Both sides survive. |
 | `docs/reports/XX.md` | One new file per batch. Cannot conflict. |
 | `run_battery.sh` | Both sides' `GATES` / `SUITES` entries survive — it is one array and a target is a name. |
 | `pin-manifest.json` | **NEVER hand-merged. It is DERIVED.** Take either side and re-run `build_pin_manifest.py`; `check_ed` is what says the result is right. |

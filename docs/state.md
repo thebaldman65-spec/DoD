@@ -13,69 +13,157 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-20 (Batch GX).*
+*Last rewritten: 2026-09-20 (Batch GY).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GX — A RUNE SITTING OUT SAYS SO. IMPLEMENT ONLY, AND THE THIRTIETH BATCH ON `class-merge`.** GV
-  gated 35 runes on their engine being equipped and closed the OFFER; GX closes the other half — a rune bought while
-  the engine was in, whose engine is now out, sitting in its slot paying nothing with nothing on any screen saying
-  why. **GT's answer one layer up, in GT's own words.** `main` is untouched. Full working: **`docs/reports/GX.md`**.
-- **§1 — FOUR SURFACES SAY IT, AND THEY SAY ONE SENTENCE.** `Runes.sits_out` is GV's `offerable` asked of a rune he
-  already holds — the same predicate through the same `engine_read`, so the offer and the tell cannot disagree — and
-  `Run.sitting_out_rune_names` is the one door every surface asks. **The pouch** puts the sentence in place of the
-  rune's own rule, in the Kit panel's amber; **the map's three rune slots** mark the face and carry the sentence in
-  the tooltip, the only surface the player need not open anything to read; **the hero sheet's state column** reads
-  `sits out` instead of `WORN`, with the sentence on the column and on the row; and **the battle log's opening roll
-  call** says it too. **`Run.rune_sits_out_note` is GT's sentence with each surface's own nouns** — worn for carried,
-  filled for counted, unequipping for benching — and the log's tail is built FROM that function rather than written,
-  so there is one phrasing and not four.
-- **§1b — THE FIVE SURFACES THAT NEEDED NOTHING, EACH FOR ITS OWN REASON**, derived by sweeping every site in
-  `scripts/` that renders a rune's name rather than from a list. **The Peddler, a cache and an event grant are offer
-  surfaces and GV's gate means none can offer a gated rune while the engine is out** — measured at the pool itself,
-  **0 of 35 with the engine out against 3 with it in**, so the emptiness is the gate and not an empty pool; a cache
-  already says what it holds back, in GV's words. The pouch's ENGINE rows read no engine. The run-end summary lists
-  the whole pouch and has never distinguished worn from carried.
-- **§1c — THE POUCH, MEASURED, BECAUSE GT FOUND ITS CLOSE BUTTON OFF-SCREEN BEFORE IT FIXED THE LAYOUT.** Six runes
-  held with two sitting out: **298 px in a 583 px scroller** (287 with the engine in — the two tells add 11 px). The
-  panel's own worst case, a class's six engine rules AND six runes with two sitting out: **543 of 583**. Nothing
-  scrolls in any of the three, both tells draw whole at size 12 inside the scroller, and **Close is at the same
-  rectangle in all three**. **40 px of headroom is what is left**, and that is the number the next batch adding
-  anything to this panel should read first.
-- **§1d — THE MAP'S SLOT CARRIES A MARKER BECAUSE NO WORD FITS, MEASURED OVER ALL 35 NAMES** at the size the button
-  draws: the name alone is **74 px** and the name with a marker **82 px** of the 92-px slot, while `(out)` is 99,
-  `— out` 105 and `— sits out` 124. The 92 is a minimum and the three slots are pitched 96 apart, so an overflowing
-  face lies over its neighbour rather than clipping; the drawn button is asserted inside the pitch in the live drive.
-- **§2 — THE SHARED HIDE'S 100 GOLD STANDS, JUDGED IN PLAY**, and the reasoning is recorded beside GW's figures so a
-  later re-measurement is not read as new: **+138.3% is the deepest of three loadouts and needs FOUR separate
-  damage effects standing on the companion at once** — a Warcry, an Empower, a Battle Shout and the Pivot, of which
-  three are party buffs and the fourth is a stance-switch status on the companion itself — which is a party built
-  around the companion rather than a purchase; the thin reading is **+26.5%**; and **until GW the rune paid nobody anything at
-  all**, so there is no play experience to weigh a raise against. GW's multipliers ×1.2500 / ×1.5625 / ×2.3359 and
-  its blows +26.5% / +57.6% / +138.3% are in `docs/reports/GX.md` §2.
-- **NOTHING WAS RETUNED, AND `check_gx` §6 ASSERTS IT FROM THE OTHER SIDE**: a rune that sits out is still equipped,
-  still fills its slot, still has its payload applied at the spawn, and its price and text are byte-identical to
-  `runes.json`. The refusal stays inside each read site where GV put it.
-- **NEW GATE `check_gx`**: the predicate over its derived population (35 gated, 25 ungated, 4 engine runes), read the
-  same through `sits_out` as through `offerable` inverted; the slot's five face widths; the four surfaces driven in
-  both arms, every row — **the map's slot found by the door it opens rather than by its face, so a WRONG face is
-  measured rather than merely missed** — beside an ungated rune and an unequipped gated rune that must NOT be marked; the pouch at six
-  held and at GT's worst case; the sentence asserted against GT's in both directions and every line under the
-  44-character break; and nothing retuned.
-- **WHAT MOVED:** `scripts/runes.gd` (`sits_out`), `scripts/run_state.gd` (`sitting_out_rune_names`,
-  `rune_sits_out_note`), `scripts/map_screen.gd` (the pouch rows, the three slot buttons), `scripts/party_screen.gd`
-  (the sheet's rune rows), `scripts/battle.gd` (the roll call); `check_gx.gd` (**NEW**) and `run_battery.sh`;
-  `baselines.json`; `CLAUDE.md` (GT's sits-out block extended, not a second block), `docs/master.html`,
-  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GX.md` (**NEW**).
-- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**; GV closed the
-  offer and GX closes the slot. **The Crown's Break and freeze resistance is still owed.** Step 6 is the 52
-  engine-bound gates.
-- **Next letter: GY.**
+- **Last batch: GY — THE CEILING, THE CONVENTION, AND THE SHAPE GW MISSED. IMPLEMENT ONLY, AND THE THIRTY-FIRST
+  BATCH ON `class-merge`.** Three small things, none player-visible: `CLAUDE.md`'s ceiling re-derived for the third
+  time, `docs/design-notes.md`'s two conventions resolved *and the instruction that caused the drift repaired*, and a
+  sweep for the shape GX's own control found. **No `.gd` file in the tree was edited at all** — no rune, card, kit,
+  engine, pool or node, and no magnitude. `main` is untouched. Full working: **`docs/reports/GY.md`**.
+- **§1 — THE CEILING IS 410 KiB, BY EE's METHOD ON ITS THIRD RUN.** The floor is a rules-only reading of the file,
+  which since three full readings of every block have retired nothing (ED's 43 never-cited blocks, FF's 105 by what
+  each binds, GR's 113 by subject) is simply its reading — **GX's 336.63 KiB**; the headroom is ten of the largest single-batch growth on record, **+8.10 KiB**; 336.63 +
+  81.00 = **417.63, stated as 410 and rounded DOWN**. **The growth figure was re-measured, not quoted, and it did not
+  move**: over EE's own window (the 92 batches since DK) the record is still **EZ's +8,293 B**, which has stood for
+  thirty-two batches; EB's +8,287 B is the stale one and GR had already replaced it. `check_fg` §2 read 410 out of
+  the rule with no edit to the gate. **THE LIVE READING, WHICH BELONGS HERE AND NOT IN THAT FILE:** `CLAUDE.md`
+  ships at **350,836 B = 342.61 KiB**, **69,004 B = **67.39 KiB** of headroom** — about 22 batches at the rate below.
+- **§1b — WHAT THE THIRD RUN MEANS, AND WHEN A FOURTH IS DUE.** EE derived 290, FU re-derived 340, GY re-derives 410;
+  over the same span the split has been taken three times (EF, FF, GR) after CW's, which is four. **A file split four
+  times whose ceiling has moved twice grows faster than any structure contains** — nothing in it is dead and nothing
+  left in it comes away cleanly, so the re-derivation is the only move the procedure has left that costs less than it
+  buys. **A fourth is due in roughly 24 to 31 batches and no sooner than 9** (73.37 KiB of headroom at GX's reading;
+  +3,086 B a batch since GR's split, +2,383 B since FF, +8,293 B at the record), against GR's inherited 5.1-to-9.8.
+  **The rounding cost 7.63 KiB this time** — EE discarded 1.49 and FU 2.03 — so the stated ceiling carries 9.1 worst
+  batches rather than ten, and the file says so.
+- **§1c — A THIRD OPTION WAS WEIGHED AND REJECTED IN WRITING: SPLITTING THE REASONING OUT.** **97.04 KiB across 202
+  `·` sub-bullets at GX's reading, 28.8% of the file** — and **102.02 KiB across 208 at 29.8%** on the shipped tree — larger than any subject
+  seam GR measured (card law 85.89, engine law
+  41.80, rune law 38.49), so it is the best seam in the file by size and the first thing a batch at the wall reaches
+  for. It stays: a rule without its reason gets re-litigated, a batch only meets the reason by reading it, and it is
+  the half no citation count can see. **Recorded in the ceiling block so it is not re-proposed.**
+- **§2 — `docs/design-notes.md`: GV's AND GW's ENTRIES ARE AT THE TOP, AND THE INSTRUCTION THAT SENT THEM DOWN IS
+  REPAIRED.** The move is a **permutation, proved by multiset**: the same 7,826 non-blank lines before and after, a
+  byte delta of −1 (one blank line), each moved block md5'd. **Something did instruct the append, in two places**:
+  `CLAUDE.md`'s working agreement said *newest first* for the changelog at step (2) and plain *append* for the design
+  notes at step (4), and `docs/ways-of-working.md`'s merge table said *Append-only at the top* for the one and
+  *Append-only* for the other. **Both state the position now.** The changelog-habit explanation is ruled out by
+  direction: the changelog is append-at-**top**.
+- **§2b — THE FILE IS TWO BLOCKS WITH OPPOSITE CONVENTIONS, AND 73 OTHER ENTRIES ARE OUT OF ORDER.** 186 `## `
+  entries: a **111-entry newest-first block** with one inversion inside it (Batch AK sits below Batch AJ) and a
+  **75-entry OLDEST-first tail** running Batch V → GO, every one of whose 72 labelled entries is newer than the top
+  block's oldest. **Minimum entries that must move: 73** — derived twice and agreeing (it was 75 before GV and GW
+  left). Reported, not repaired.
+- **§3 — THE SWEEP FOR A GATE THAT FINDS ITS SUBJECT BY THE PROPERTY UNDER TEST: 384 SITES, 4 ARE THE SHAPE, AND
+  TWO OF THE FOUR DO NOT FAIL AT ALL.** GW swept for a gate that ARRANGES what it tests; this is the gate that FINDS
+  what it tests. **384 sites over the 121 files the battery launches** — 95 guarded locates, 283 filter-and-tally
+  loops, 6 lambda filters — with **the locator set derived rather than listed** (any function that takes a needle,
+  searches with it, and returns what matched: 151 of them). **362 key on something stable** — a binding, a z-index, a
+  `display_name`, an id, a path, a source anchor — and **22 key on a value the screen renders**, of which 18 are
+  still legitimate: the needle is a name the widget draws in *every* arm while the assertion is about geometry or a
+  count, and each has a paired arm that reds when the name moves.
+- **§3b — THE FOUR, AND THE SHAPE HAS TWO DIRECTIONS.** Where the assertion is about a PRESENT subject a wrong value
+  reads as a missing one — the arm reds naming the wrong cause and everything guarded behind it is skipped:
+  **`check_gx:412`** and **`check_gx:769`** both find a pouch row by `GT_HEAD`, the tell's own first line, so the
+  exactness and layout assertions beside them never run. **Where the assertion is that a subject is ABSENT, a wrong
+  value makes the filter match nothing and THE ARM PASSES** — **`test_batch_as:900`** counts turn-bar slots by their
+  rendered tooltip and asserts the count is zero, so a tooltip reformat passes it on a bar still full of the held
+  boss; **`check_ct_map:96`** finds the shop's draft header by its wording into a `draft_top` initialised to **1e9**,
+  so rewording the header passes the collision check on a shop whose supply column runs straight through it. **Report
+  only. Nothing is repaired** (FZ's pricing rule).
+- **WHAT MOVED:** `CLAUDE.md` (the ceiling block re-derived; the working agreement's step 4), `docs/ways-of-working.md`
+  (the merge table's design-notes row), `docs/design-notes.md` (GV and GW moved up, GY's entry added),
+  `docs/changelog.html`, this file and `docs/reports/GY.md` (**NEW**). **No `.gd`, no `.tscn`, no `data/`, no
+  `run_battery.sh`, no new gate, and `pin-manifest.json` re-derived byte-identical.** **`baselines.json` IS UNTOUCHED AND THAT IS MEASURED, NOT ASSUMED**: the count differ read **501 checks / 0 failures / 0 notices** over the acceptance run, so not one target's count moved — a baseline moves only in the batch that causes the movement.
+- **Phase.** Unchanged by this batch: steps 1–4 of the merge's running order are done and step 5's rune half is done;
+  **the Crown's Break and freeze resistance is still owed**; step 6 is the 52 engine-bound gates.
+- **Next letter: GZ.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### GX's RULINGS OWED — **THREE; THE FIRST IS PLAYER-VISIBLE**
+### GY's RULINGS OWED — **THREE; NONE IS PLAYER-VISIBLE, AND THE FIRST SHAPES THE NEXT BATCH**
+
+Full working: `docs/reports/GY.md`, NEEDS A RULING.
+
+1. **`docs/changelog.html` HAS CROSSED ITS OWN THRESHOLD, AND THE CUT IS OWED AT THE NEXT BATCH BOUNDARY.** The
+   file is **400,021 B against CW §4's 400,000 B bar — 21 bytes over** — and `check_fg` §1 printed its CEILING
+   WARNING on the acceptance run: *"The cut is owed AT THE NEXT BATCH BOUNDARY and this gate FAILS if it is not
+   taken."* **It is a WARNING and not a red by the gate's own design** (the file WITHOUT this batch's entry is
+   396,730 B, under the bar), which is FG's rule that the red never lands on a batch with no warning in front of it.
+   **GY is the batch that crossed it, so the next one owes the cut** and the one after that fails without it. The cut
+   is a batch of work by CW §4's procedure — a byte-for-byte split with a rejoin proof, which this project's rule
+   says must not share a diff with anything else — and it has been taken four times before (BZ at BO/BP, CX at
+   CN/CO, DV at DF/DG, FG at EP/EQ). **The entry was not trimmed to sit under the bar**: GY's is 3,291 B against a
+   2,871–4,838 B range over the last seven batches, so shrinking it to clear 21 bytes would have been writing to the
+   instrument rather than to the reader. Whether the next batch takes the cut or defers it is the designer's.
+2. **SEVENTY-THREE DESIGN-NOTES ENTRIES ARE OUT OF THE STATED ORDER, AND THE FILE IS TWO BLOCKS.** §2b above. The
+   top 111 entries are newest-first but for one inversion; the bottom 75 are a second, oldest-first chronological
+   log. **Moving 73 entries is a file rewrite and nothing asserts on position**, so it is free whenever it is ruled
+   and it will not decay further now the instruction is repaired. **The two entries GY moved kept the heading form
+   they were written in** (`## Batch GW — <title>`, no date) rather than the top block's `## <Title> (Batch XX) —
+   <date>`; only position was ruled, so only position moved.
+3. **FOUR ARMS FIND THEIR SUBJECT BY THE PROPERTY THEY TEST, AND TWO OF THE FOUR PASS VACUOUSLY.** §3b above and
+   `docs/reports/GY.md` §3c. `check_gx:412` and `check_gx:769` fail by absence where they should fail by
+   measurement — a red naming the wrong cause, with the assertions behind the locate skipped. **`test_batch_as:900`
+   and `check_ct_map:96` do not fail at all**: both filter by a rendered value and assert the result is empty or
+   unreached, so a reformat makes the filter match nothing and the arm passes. **Repairing them is its own batch** —
+   two need a re-point onto a stable key and two need a liveness arm, which is a different repair again, and each
+   owes a two-armed control on a live drive. FZ's pricing rule is why it was not taken here. **The cure for the
+   third is twelve lines below it in its own file**: `_live_turn_bar` runs the identical filter and asserts a
+   positive count before it asserts a zero one.
+
+### FOUND AT GY AND NOT FIXED
+
+- **THE §2 REPAIR IS A RULE WITH NO INSTRUMENT, AND THAT IS THE REASON THE DRIFT LASTED SIX BATCHES.** Nothing
+  asserts on an entry's position in `docs/design-notes.md` — the three suites that read the file (`test_batch_bn`,
+  `test_batch_bs`, `test_batch_ce`) ask only that their own batch is named — so GK, GM, GN, GO, GV and GW each wrote
+  to the foot and every battery stayed green. **A gate is buildable and was not built**: the file's top block has a
+  boundary only a reader can see, and an arm asserting order over the whole file would red on the 75-entry tail this
+  batch deliberately left standing. **It is ruling 2 that decides whether that arm can exist.**
+- **THE SWEEP'S FIRST POPULATION WAS `check_gw` §2's AND IT MISSED ONE OF THE FOUR FINDINGS.** `check_gw` §2 reads
+  its targets out of `run_battery.sh`'s `SUITES` and `GATES` — 115 files — and the runner launches four more from
+  arrays of its own (`check_de`, `check_map_screen`, `check_ct_map`, `test_run_harness`). **`check_ct_map:96` lives
+  in one of the four**, and it is the second of the two arms that pass vacuously. The population is the 121 files the
+  battery launches now, plus the two fixtures whose locators every target calls. **A population inherited from a
+  neighbouring sweep inherits its boundary**, and this one's boundary is an array in a shell script rather than
+  anything about what a target is.
+- **AND THE SWEEP'S LOCATOR SET WAS HAND-LISTED UNTIL THE LAST PASS.** A written-out list of selector names missed
+  `check_gt`'s own `_buttons_from` and missed a whole family — lambda `filter`/`any`/`all` predicates reading a drawn
+  value, which is where `check_gq`'s six sites and the closest near-miss live. The set is derived now: any function
+  that takes a needle, compares or searches with it, and returns what matched. **Three widenings, and each one moved
+  the count and the findings** — 109 → 289 → 384 sites, and 3 → 4 findings.
+- **A DOC EDIT WHOSE ANCHOR SPANNED A LINE BREAK BROKE `check_fg`'s PARSE, AND WAS CAUGHT BEFORE THE RUN.** The
+  re-written derivation put *"the largest single-batch growth on record is"* at the end of one line and
+  **+8.10 KiB** at the start of the next; the gate's regex does not cross a newline, so it read **zero** growth
+  figures and would have failed. Found by re-running both of §2's regexes over the edited file immediately after
+  writing it, and repaired by re-wrapping the sentence. **The two statements of a bar are asserted to agree; nothing
+  asserts that either is on one line.**
+- **FOUR ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata` — "Dawn of Decay GY disagree", "GY
+  low", "GY grow" and "GY raise". **Each was renamed before anything ran in it**, so its `user://` could not reach
+  the player's saves, and each holds only a `logs` directory. They can be deleted. **There are 95 such folders now**,
+  GX's nine among them; nothing prunes them and each batch adds a few.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (GY §0), all four in the same block of argument and none changing what
+  was built: ***"EF forbade that"*** (EF's *there are not two files a batch must read* was **retired at GR §2** and a
+  batch must not refuse a subject split on its strength — what rules rune law out is GR's own test, *the subject a
+  batch reads least*, and rune law is the one batches read most); ***"DL found the resulting contradiction"*** (DL's
+  contradiction is about **summarising a rule into the other file**, not about a batch opening two files);
+  ***"GQ found it held a COPY"*** (**the finding is FU's**, and GR §0's premise table already corrected this exact
+  sentence once); and ***"+138% needs four buffs"*** (four damage effects, of which **three** are buffs and the
+  fourth is a stance-switch status — GX §2's own words). **And one quote is misattributed without being wrong**:
+  *"benching has no tell; sitting out does"* is GX's report's wording; `CLAUDE.md`'s is ***"Sitting out is not
+  benching"***, wrapped across a line break at `CLAUDE.md:1961` and invisible to a one-line sweep.
+- **`check_fg`'s OWN COMMENTS STILL NARRATE THE MOVE TO 340.** Two of them (`check_fg.gd:46`, `:181`) say *"moving
+  the ceiling to 340 took it red"*, which is true as history — it is FU's event — but they are the only remaining
+  `340`s in the instrument layer and a later reader could take them for the live bar. Left as written: the gate holds
+  no copy of the number that it reads, and a comment is not a copy.
+- **GR's RULING 1 IS STILL OWED AND WAS NOT TAKEN WITH RULING 2.** `docs/combat-rules.md` has no stated ceiling; EE's
+  method on its own record gives it 70 KiB (GR §5c). It sits beside this batch's subject and is a different file and
+  a different ruling.
+
+### GX's RULINGS OWED — **ONE LEFT; THE SECOND AND THIRD ARE BOTH CLOSED AT GY**
 
 Full working: `docs/reports/GX.md`, NEEDS A RULING.
 
@@ -86,7 +174,7 @@ Full working: `docs/reports/GX.md`, NEEDS A RULING.
    brief's own instruction that *every* surface says it, and the asymmetry is real: a card that sits out is absent
    from the fight, so GT had nothing to mark; a rune is still equipped and its payload is still applied. Whether a
    log line should carry it, or the screens are enough, is the designer's.
-2. **`CLAUDE.md` IS AT 336.31 KiB WITH 3.69 KiB OF HEADROOM, AND ITS OWN BLOCK SAYS THERE IS NO SEAM LEFT.** GX
+2. **~~`CLAUDE.md` IS AT 336.31 KiB WITH 3.69 KiB OF HEADROOM~~ — CLOSED AT GY §1: THE CEILING IS 410 KiB.** *(The figure in this item was GX's mid-write reading; its own FOUND section and `docs/reports/GX.md` §6 both carry the landed 336.63.)* GX
    added 1.62 KiB by extending GT's sits-out block rather than opening a second one. `check_fg` §2 reads the file
    under its ceiling and prints no warning. **The file's own FU §1 / GR §2 block says the next batch at this ceiling
    is not looking for a seam**: what is left is card law, engine law and rune law, each written into by more batches
@@ -94,7 +182,7 @@ Full working: `docs/reports/GX.md`, NEEDS A RULING.
    named as the one that would come away cleanly) or re-derive the ceiling a second time. **The largest single-batch
    growth on record is +8.10 KiB, which is more than the headroom**, so the batch that meets this is the one that
    discovers it mid-write. Raised here rather than at the wall.
-3. **GV'S AND GW'S DESIGN-NOTES ENTRIES ARE AT THE BOTTOM OF A FILE WHOSE HEADER SAYS *"Newest first"*.**
+3. **~~GV'S AND GW'S DESIGN-NOTES ENTRIES ARE AT THE BOTTOM~~ — CLOSED AT GY §2, AND THE INSTRUCTION THAT SENT THEM THERE IS REPAIRED.** *(GY's census found the number is 73 others, not four: see GY's ruling 2.)*
    `docs/design-notes.md` carries two conventions: GP through GU sit at the top under `## <Title> (Batch XX) — <date>`,
    while GK, GM, GN, GO, GV and GW were appended at the foot under `## Batch XX — <title>`, below 9,000 lines of
    older notes. **The two instructions genuinely conflict** — the file's header says newest first and `CLAUDE.md`'s
@@ -411,7 +499,7 @@ Full working: `docs/reports/GT.md`, NEEDS A RULING.
   trace", "GS rep G1" to "G5", "GS rep G4probe", "GS rep G5 ctl" and "GS rep G5 head", each renamed before anything ran
   in it so its `user://` could not reach the player's saves. They can be deleted.
 
-### GR's RULINGS OWED — **TWO; NEITHER IS PLAYER-VISIBLE**
+### GR's RULINGS OWED — **ONE LEFT; THE SECOND IS CLOSED AT GY §1**
 
 Full working: `docs/reports/GR.md`, NEEDS A RULING.
 
@@ -419,7 +507,7 @@ Full working: `docs/reports/GR.md`, NEEDS A RULING.
    the file as split, 29.73 KiB, plus ten of the largest single-batch growth its nine blocks have ever had (+4,340 B,
    the crit rule's birth at EW) — gives 72.11 KiB, stated **70 KiB**. It has grown +19.5 B a batch since FF, so the
    figure is the designer's to adopt or not, not a wall anyone is near.
-2. **THE NEXT CEILING, AND BOTH MOVES LEFT FOR IT, ARE THE DESIGNER'S.** At FF's +4,315 B a batch `CLAUDE.md` meets 340
+2. **~~THE NEXT CEILING, AND BOTH MOVES LEFT FOR IT~~ — RULED AND TAKEN AT GY §1: THE CEILING IS RE-DERIVED, RUNE LAW STAYS.** At FF's +4,315 B a batch `CLAUDE.md` meets 340
    again in about 5.1 batches, at the +2,247 B its main half has grown since FF in about 9.8. There
    is no fourth seam that batches read rarely: card, engine and rune law are what is left, and each is written into by
    more batches than combat law was. **Rune law would come away cleanly** — 14 of its 15 blocks, 34.25 KiB, bind

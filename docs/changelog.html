@@ -15,6 +15,41 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-20 &mdash; Batch GY: THE CEILING, THE CONVENTION, AND THE SHAPE GW MISSED</h2>
+<p><b>IMPLEMENT ONLY. NOTHING A PLAYER MEETS CHANGED</b> &mdash; no rune, card, kit, engine, pool or node moved, and
+no magnitude was retuned. Three small things, all about the files a batch reads. <code>main</code> is untouched. Full
+working: <code>docs/reports/GY.md</code>.</p>
+
+<p><b>&sect;1 &mdash; <code>CLAUDE.md</code>'s CEILING IS 410 KiB, RE-DERIVED BY EE's OWN METHOD FOR THE THIRD
+TIME.</b> The file had 3.37 KiB of headroom, less than half the largest single batch on record, so the ceiling had to
+move or the file did. <b>The file does not split again</b>: what is left in it is card, engine and rune law, and the
+one that would come away cleanly &mdash; rune law &mdash; is the subject batches write into <i>most</i>, which is GR's
+own test run backwards. <b>The number is arithmetic, not judgement</b>: the floor is this file's own reading (336.63
+KiB at GX, because three separate audits have read it for dead weight and retired nothing), the headroom is ten of the
+largest single-batch growth on record (EZ's +8,293 B, re-measured here and unmoved since), and 336.63 + 81.00 = 417.63
+is stated as <b>410</b>, rounded down. <b>A fourth re-derivation is expected in roughly 25 to 30 batches</b> and no
+sooner than 9, against GR's inherited <i>5 to 10</i>. A third option &mdash; moving the recorded <i>reasoning</i> out,
+97 KiB and the largest seam in the file &mdash; was weighed and rejected in writing, because a rule whose reason lives
+in another file is a rule that gets re-argued.</p>
+
+<p><b>&sect;2 &mdash; <code>docs/design-notes.md</code> SAYS <i>newest first</i>, AND SOMETHING WAS TELLING BATCHES TO
+APPEND.</b> GV's and GW's entries are at the top now. <b>The larger half was finding what sent them to the floor</b>:
+the working agreement's four steps said <i>newest first</i> for the changelog at step (2) and plain <i>append</i> for
+the design notes at step (4), and the merge table said <i>Append-only at the top</i> for the one and <i>Append-only</i>
+for the other. Both now state the position, so the file cannot drift again by instruction. <b>Six entries were at the
+foot, not two</b> (GK, GM, GN, GO, GV, GW), and a census of the whole file found the bottom 77 entries are a second,
+oldest-first block: <b>73 entries besides the two moved are out of the stated order</b>, which is reported and not
+repaired.</p>
+
+<p><b>&sect;3 &mdash; A SWEEP FOR GATES THAT FIND THEIR SUBJECT BY THE PROPERTY UNDER TEST.</b> GX's own control found
+one: a map slot located by the face it was about to assert, so a <i>wrong</i> face read as a missing one and the width
+check beside it never ran. GW swept for gates that <i>arrange</i> what they test; this is the sweep for gates that
+<i>find</i> what they test. <b>384 sites across the 121 files the battery launches; 362 key on something
+stable &mdash; a name, an id, a path, a signal binding &mdash; and 22 key on a value the screen renders, of which
+<i>four</i> are the shape.</b> <b>Two of the four do not fail at all</b>: they count a thing by its rendered text and
+assert the count is zero, so a reformat makes the filter match nothing and the arm passes. Reported and ruled on by
+nobody: repairing them is its own batch.</p>
+
 <h2>2026-09-20 &mdash; Batch GX: A RUNE SITTING OUT SAYS SO</h2>
 <p><b>IMPLEMENT ONLY, AND THE THIRTIETH BATCH ON <code>class-merge</code>.</b> GV gated thirty-five runes on their
 engine being equipped and left the other half of that state unsaid: a rune bought while the engine was in stays in its

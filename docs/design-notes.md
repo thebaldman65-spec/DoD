@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The ceiling moves again, and a word that sent six entries to the floor (Batch GY) — 2026-09-20
+
+**Why the ceiling moved rather than the file.** `CLAUDE.md` had 3.37 KiB of headroom, which is less than half the
+largest batch on record, so something had to give. Splitting it again was the alternative and the measurement says
+not to: what is left in the file is card law, engine law and rune law, and rune law — the one subject that would come
+away cleanly — is the subject batches write into MOST, ten of the thirty-eight commits since FF against combat law's
+four. The test GR left behind is *split the subject a batch reads least*, so splitting rune law is that test run
+backwards. Every other move is spent too: three audits have read this file for dead weight and retired nothing, and
+two seams have already been taken. **When there is nothing to cut and nothing to move, the number is the only thing
+left that can honestly change** — and because every audit finds nothing dead, the file's rules-only reading is simply
+its reading, so the same arithmetic re-runs whenever it is needed. That is a cheap move, which is exactly why this
+batch wrote down what it costs rather than only what it buys.
+
+**Why the reasoning stays, though it is the biggest seam in the file.** Almost thirty per cent of `CLAUDE.md` is
+reasoning recorded beside a rule so a later batch does not re-argue it — 97 KiB, larger than any subject seam anyone
+has measured. It is the obvious thing to move and it must not be moved. A rule without its reason gets re-litigated;
+that is already a rule in this file, learned the hard way. A batch only meets the reason by reading it, so putting it
+behind a pointer leaves the rule standing with its *why* one file away, which is the same as not having written it.
+And it is the half no citation count can see: nobody quotes the rule they are obeying, so the seam that looks
+cheapest by reference count is the one that costs most.
+
+**Why the design-notes drift was a rule and not a slip.** Six batches wrote their rationale to the bottom of a file
+whose header says *newest first*, and it would be easy to call that carelessness. It was not. The working agreement
+listed four steps, and step (2) said *newest first* while step (4) said *append* — read together, the contrast is an
+instruction, and the merge table said *Append-only* for the changelog *at the top* and *Append-only* for this file
+with no position at all. Two documents said append and one header said top. **When two batches in a row do the same
+unexpected thing, the thing to fix is what told them to**, or the file drifts again next batch; moving the entries
+without changing the words would have bought exactly one batch of order.
+
 ## A rune sitting out says so (Batch GX) — 2026-09-20
 
 **Why a tell and not one of the other three things.** GV left four options on the table for a rune whose engine has
@@ -37,6 +66,60 @@ companion at the same time — three party buffs and a stance-switch status —
 that is a party built around the companion rather than something a hundred gold bought. The thin reading, one buff, is
 +26.5%. And nobody has ever felt any of it: until GW the rune multiplied a companion's blow by exactly one, so there is
 no player experience of it being too strong to weigh against.
+
+## Batch GW — three runes, and a gate that wrote what it tested
+
+**Why the Shared Hide never paid anybody.** The rune writes its flag onto the HUNTER, the way every rune writes onto
+the hero who wears it, and the code that reads it reads the COMPANION. Nothing carried it across, so for every hunter
+who ever spent a hundred gold on it the beast's blow was multiplied by exactly one. It is wired now, at the one place a
+companion is built.
+
+**Why the gate said it was working.** The check written for the rune set the flag on the BEAST by hand and then read
+the multiplier back. That is the one path a real run never takes: the game never writes that field there. So the check
+could not fail no matter how badly the rune was wired, and it read green for batches. A second gate drove the same rune
+through the real door, found it paid nothing, and wrote that down as the expected state — two instruments looking at
+one rune and disagreeing, with nothing comparing them.
+
+**Why a cost with no payout is the one shape a player cannot reason about.** The Martyr refuses every ally's heal and
+Thin Blood stops his own poison biting, and each buys something the engine pays out: a Mercy stack, a barb on every
+strike. Unequip the engine and the price still lands while the payout does not — so a hero holding either was worse off
+than a hero wearing no rune at all, and nothing on any screen said why. A price you can see and a benefit you cannot is
+not a trade, it is a bug wearing a trade's clothes. No engine, no cost and no payout.
+
+**Why the other runes needed nothing.** Every other costed rune's price is already written inside its engine's own
+block, or is paid out of a meter only the engine installs — take Overburn out and there is no refund for Pyre Debt to
+tax, take Glacial Hold out and the Glass Prison's cells were never prisons to shatter. Those prices are not gated; they
+are simply not reachable. Only two were written where the engine could not see them.
+
+**Why the sweep is a report.** Ninety-two places in the battery arrange a rune, an engine or a talent field by hand
+rather than letting the game write it. Ninety of them set it on the same body the game would have, so they still ask a
+real question about the code that READS it — what they cannot see is the field failing to arrive. Two set it somewhere
+the game never writes it at all, and those two are the ones that hid a dead rune. Sorting out the rest is its own
+batch: it is a change to ninety checks, and a batch that changes ninety checks while changing the game is a batch
+nobody can read.
+
+## Batch GV — the runes that read an engine
+
+**Why the gate reads what he has EQUIPPED rather than what he owns.** A rune is offered by lineage, the lineage is the
+engine taken at class selection, and nothing in the game sells or discards an engine rune — so every hero who can be
+offered one of these runes owns its engine for the whole run, and a gate on ownership would withhold nothing at all.
+Equipped is also what the fight reads: an unequipped engine pays nothing in a battle, so a rune that reads it pays
+nothing either.
+
+**Why a queued cache keeps a rune it cannot hand over yet.** A retired rune and a rune he already owns can never come
+back, so the cache repairs them away and stores the repair. An unequipped engine is the player's own choice and he can
+undo it with one press, so a cache that threw those runes away would turn a moment's experiment into a permanent loss.
+It holds them instead, says which rune they wait on, and offers them again when it comes back.
+
+**Why the half-working runes are not gated.** The card gate settled this shape already: a card that still does most of
+its job is a legitimate offer. Killing Cold still bites a boss sitting on four Chilled, Glass Prison still freezes a
+second body for a turn, and Blood Debt still sends the bill to the enemy. What they lose without the engine is the
+deeper half, and losing the deeper half is what a build decision is.
+
+**Why nothing was retuned.** Two runes are worth less than nothing to a hero whose engine is out — the Martyr's price
+and Thin Blood's are read with no engine at all, while their payouts are not — and one, the Shared Hide, pays nobody
+anything. Both are reported rather than repaired: changing what a rune pays is a magnitude, and magnitudes are the
+designer's.
 
 ## The last three cards under the baseline, and the sweep for the shape (Batch GU) — 2026-09-19
 
@@ -9211,58 +9294,3 @@ names in any inflection, so "every third cast echoes" is caught as surely as "Ec
 **Why the proposed numbers are proposed.** The brief ruled half strength, every third cast, 25%, 5% and halved.
 "Stronger for the rest of the fight", "returns as Mana", "heals the whole party for a share" and "enormous" came
 without a figure, so each has one line in `Classes` and is the designer's to set.
-
-
-## Batch GV — the runes that read an engine
-
-**Why the gate reads what he has EQUIPPED rather than what he owns.** A rune is offered by lineage, the lineage is the
-engine taken at class selection, and nothing in the game sells or discards an engine rune — so every hero who can be
-offered one of these runes owns its engine for the whole run, and a gate on ownership would withhold nothing at all.
-Equipped is also what the fight reads: an unequipped engine pays nothing in a battle, so a rune that reads it pays
-nothing either.
-
-**Why a queued cache keeps a rune it cannot hand over yet.** A retired rune and a rune he already owns can never come
-back, so the cache repairs them away and stores the repair. An unequipped engine is the player's own choice and he can
-undo it with one press, so a cache that threw those runes away would turn a moment's experiment into a permanent loss.
-It holds them instead, says which rune they wait on, and offers them again when it comes back.
-
-**Why the half-working runes are not gated.** The card gate settled this shape already: a card that still does most of
-its job is a legitimate offer. Killing Cold still bites a boss sitting on four Chilled, Glass Prison still freezes a
-second body for a turn, and Blood Debt still sends the bill to the enemy. What they lose without the engine is the
-deeper half, and losing the deeper half is what a build decision is.
-
-**Why nothing was retuned.** Two runes are worth less than nothing to a hero whose engine is out — the Martyr's price
-and Thin Blood's are read with no engine at all, while their payouts are not — and one, the Shared Hide, pays nobody
-anything. Both are reported rather than repaired: changing what a rune pays is a magnitude, and magnitudes are the
-designer's.
-
-## Batch GW — three runes, and a gate that wrote what it tested
-
-**Why the Shared Hide never paid anybody.** The rune writes its flag onto the HUNTER, the way every rune writes onto
-the hero who wears it, and the code that reads it reads the COMPANION. Nothing carried it across, so for every hunter
-who ever spent a hundred gold on it the beast's blow was multiplied by exactly one. It is wired now, at the one place a
-companion is built.
-
-**Why the gate said it was working.** The check written for the rune set the flag on the BEAST by hand and then read
-the multiplier back. That is the one path a real run never takes: the game never writes that field there. So the check
-could not fail no matter how badly the rune was wired, and it read green for batches. A second gate drove the same rune
-through the real door, found it paid nothing, and wrote that down as the expected state — two instruments looking at
-one rune and disagreeing, with nothing comparing them.
-
-**Why a cost with no payout is the one shape a player cannot reason about.** The Martyr refuses every ally's heal and
-Thin Blood stops his own poison biting, and each buys something the engine pays out: a Mercy stack, a barb on every
-strike. Unequip the engine and the price still lands while the payout does not — so a hero holding either was worse off
-than a hero wearing no rune at all, and nothing on any screen said why. A price you can see and a benefit you cannot is
-not a trade, it is a bug wearing a trade's clothes. No engine, no cost and no payout.
-
-**Why the other runes needed nothing.** Every other costed rune's price is already written inside its engine's own
-block, or is paid out of a meter only the engine installs — take Overburn out and there is no refund for Pyre Debt to
-tax, take Glacial Hold out and the Glass Prison's cells were never prisons to shatter. Those prices are not gated; they
-are simply not reachable. Only two were written where the engine could not see them.
-
-**Why the sweep is a report.** Ninety-two places in the battery arrange a rune, an engine or a talent field by hand
-rather than letting the game write it. Ninety of them set it on the same body the game would have, so they still ask a
-real question about the code that READS it — what they cannot see is the field failing to arrive. Two set it somewhere
-the game never writes it at all, and those two are the ones that hid a dead rune. Sorting out the rest is its own
-batch: it is a change to ninety checks, and a batch that changes ninety checks while changing the game is a batch
-nobody can read.
