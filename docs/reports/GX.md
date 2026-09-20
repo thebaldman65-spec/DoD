@@ -368,6 +368,10 @@ meant to move and nothing else.
 
 ## §6 — FOUND AT GX AND NOT FIXED
 
+- **NINE ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GX head" (the
+  rebuild of `07c6b99` the two sanctioned reds were diffed against) and eight named for their control — pouch,
+  sheet, slot, slotword, note, predicate, unworn, rollcall. **Each was renamed before anything ran in it**, so its
+  `user://` could not reach the player's saves. They can be deleted.
 - **`docs/changelog.html` CARRIED THREE UNRESOLVED PLACEHOLDERS IN GW's ENTRY — REPAIRED.** The
   line describing the Shared Hide's three measured swings read *"THIN_SWING, MID_SWING and
   DEEP_SWING more damage from the same seeded blows"*: template tokens that resolve to nothing
