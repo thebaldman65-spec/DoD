@@ -23207,6 +23207,28 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null,
 	comp.pack_master = hunter
 	comp.crit_bonus = hunter.crit_bonus
 	comp.companion_power = hunter.companion_power
+	# BATCH GW §1 — THE SHARED HIDE CROSSES HERE, AND IT HAD NEVER CROSSED
+	# ANYWHERE. `Talents.apply_payload` writes every `rune_` field onto the HERO
+	# at the spawn, and `_shared_hide_mult` reads `comp.rune_shared_hide` — so
+	# from the day the rune shipped at EZ a hunter's flag sat on the hunter, the
+	# companion's copy stayed 0, and a 100g rune multiplied a beast's blow by
+	# exactly 1.0000 for everyone who bought it (GV §3c measured it: 15 damage
+	# dealt in all four of its arms).
+	#
+	# **IT SITS WITH `crit_bonus` AND `companion_power` BECAUSE THOSE ARE THE
+	# PRECEDENT**, not beside the cfg above it: the cfg is the BODY the beast is
+	# built from (its health, its sheet, its stats) and these three lines are the
+	# hunter's own terms handed across. A field added to the cfg would also have
+	# to be declared on every other `_make_unit` caller.
+	#
+	# **AND IT IS THE ONLY `rune_` FIELD THAT CROSSES.** GW §1b traced all 120 of
+	# them to every line that reads them: this is the one whose read site takes a
+	# COMPANION as its receiver and whose rune a Hunter can hold. The others are
+	# read off the hunter (`rune_bared_fang` four screens down, `rune_second_whistle`
+	# above), or off a unit a companion can be but for a rune no Hunter can own,
+	# or behind a guard a companion can never satisfy — `has_engine` above all,
+	# because a companion holds no engine.
+	comp.rune_shared_hide = hunter.rune_shared_hide
 	# Batch AQ §4: the beast joins a fight that is ALREADY under a bargain.
 	# _apply_battle_modifier walks heroes + enemies at spawn, and a companion
 	# exists at neither moment — so before this line a summoned beast was the
@@ -23850,7 +23872,17 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	# poison from rounding away to nothing on a small Attack; overriding it after
 	# the fact is the only way to say "no damage" without teaching that floor an
 	# exception it would carry for every other caster.
-	if src.rune_thin_blood > 0:
+	#
+	# **BATCH GW §3 — AND IT IS GATED ON THE ENGINE, BECAUSE THE PAYOUT IS.**
+	# The barb this price buys is read at `_resolve`'s counter-hit behind
+	# `strike_target.has_engine("trapper")`, so a Survivalist who unequipped
+	# Trapper kept the dead poison and bought nothing with it — GV §3b drove it:
+	# a poison he lays ticked for 0 with the rune worn and 3 without it, on a
+	# board where the engine was merely owned. **No engine, no cost and no
+	# payout** — the ruling. The predicate is the payout's own, copied rather
+	# than re-derived, so the two cannot come to disagree about what Thin Blood
+	# costs and what it buys.
+	if src.rune_thin_blood > 0 and src.has_engine("trapper"):
 		tick = 0
 	var p_turns := turns
 	var sticky := false

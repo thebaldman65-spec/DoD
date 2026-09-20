@@ -9201,3 +9201,34 @@ deeper half, and losing the deeper half is what a build decision is.
 and Thin Blood's are read with no engine at all, while their payouts are not — and one, the Shared Hide, pays nobody
 anything. Both are reported rather than repaired: changing what a rune pays is a magnitude, and magnitudes are the
 designer's.
+
+## Batch GW — three runes, and a gate that wrote what it tested
+
+**Why the Shared Hide never paid anybody.** The rune writes its flag onto the HUNTER, the way every rune writes onto
+the hero who wears it, and the code that reads it reads the COMPANION. Nothing carried it across, so for every hunter
+who ever spent a hundred gold on it the beast's blow was multiplied by exactly one. It is wired now, at the one place a
+companion is built.
+
+**Why the gate said it was working.** The check written for the rune set the flag on the BEAST by hand and then read
+the multiplier back. That is the one path a real run never takes: the game never writes that field there. So the check
+could not fail no matter how badly the rune was wired, and it read green for batches. A second gate drove the same rune
+through the real door, found it paid nothing, and wrote that down as the expected state — two instruments looking at
+one rune and disagreeing, with nothing comparing them.
+
+**Why a cost with no payout is the one shape a player cannot reason about.** The Martyr refuses every ally's heal and
+Thin Blood stops his own poison biting, and each buys something the engine pays out: a Mercy stack, a barb on every
+strike. Unequip the engine and the price still lands while the payout does not — so a hero holding either was worse off
+than a hero wearing no rune at all, and nothing on any screen said why. A price you can see and a benefit you cannot is
+not a trade, it is a bug wearing a trade's clothes. No engine, no cost and no payout.
+
+**Why the other runes needed nothing.** Every other costed rune's price is already written inside its engine's own
+block, or is paid out of a meter only the engine installs — take Overburn out and there is no refund for Pyre Debt to
+tax, take Glacial Hold out and the Glass Prison's cells were never prisons to shatter. Those prices are not gated; they
+are simply not reachable. Only two were written where the engine could not see them.
+
+**Why the sweep is a report.** Ninety-two places in the battery arrange a rune, an engine or a talent field by hand
+rather than letting the game write it. Ninety of them set it on the same body the game would have, so they still ask a
+real question about the code that READS it — what they cannot see is the field failing to arrive. Two set it somewhere
+the game never writes it at all, and those two are the ones that hid a dead rune. Sorting out the rest is its own
+batch: it is a change to ninety checks, and a batch that changes ninety checks while changing the game is a batch
+nobody can read.

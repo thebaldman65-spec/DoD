@@ -3033,6 +3033,16 @@ itself, and EZ's own charter forbids moving an ability, a magnitude or a constan
   ONE function and the list is in one place, which is the most that can be done short of the
   refactor. **A batch that extracts the hero block into a callable is the one that can honour the
   ruling**, and it should re-point this rune at it rather than growing the list.
+- **AND EVERY SENTENCE ABOVE DESCRIBED A MULTIPLIER THAT RETURNED 1.0000 UNTIL BATCH GW §1.**
+  `Talents.apply_payload` writes `rune_shared_hide` onto the HUNTER, as it writes every rune field
+  onto the hero who wears it, and `_shared_hide_mult` reads it off the COMPANION — which
+  `_do_summon` handed it in neither the cfg nor the hunter's-own-terms copies below it. **The field
+  crosses at `_do_summon` now, beside `crit_bonus` and `companion_power`, and it is the ONLY
+  `rune_` field that has to cross**: GW §1b traced all 120 to every line that reads them and this
+  is the one whose read site takes a companion as its receiver. The others are read off the hunter,
+  off a body a companion can be but for a rune no Hunter can hold, or behind a guard a companion
+  can never satisfy — `has_engine` above all, because **a companion holds no engine**, which is the
+  same fact the ten unreachable passive-keyed terms above rest on.
 
 ## STANDING RULE — A RUNE IS 100g, FLAT (Batch EZ §0, ruled by the designer)
 
@@ -3409,9 +3419,20 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   engine taken at class selection, and nothing sells or discards an engine rune — every hero who can be offered a row
   owns its engine for the whole run, so a gate on ownership would withhold nothing. The fight, the card gate and a
   rune's `requires_ability` on an enabler all read the equipped set.
-- **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (GV's call, owed a ruling).** The overlay says what
+- **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (RULED AT GW §4).** The overlay says what
   waits and on which rune, `map_screen._pick_rune` indexes the list the buttons were built from, and a cache emptied
-  this way can still be let go. FD's block below carries why this is not its write-back.
+  this way can still be let go. FD's block below carries why this is not its write-back, and `docs/master.html` carries
+  the reason on the player-facing side: **a retirement can never be undone and an unequipped engine is one press from
+  being undone, so a state the player can undo is not a state to destroy.**
+- **AND A ROW'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT (RULED AT GW §3).** The offer door
+  withholds a row from a hero whose engine is out, and **it cannot reach a row he has already BOUGHT** — two of the
+  thirty-five charged him anyway. The Martyr's refusal (`heal_amount`'s absolute block) and Thin Blood's dead tick
+  (`_apply_poison`) were read with no engine at all while the Mercy stack and the barb are each read only under one, so
+  a hero who unequipped his engine holding either was playing a strictly worse game than one wearing no rune. **Each
+  price now reads its PAYOUT's own predicate** — `has_engine("mercy")` and `has_engine("trapper")`, copied rather
+  than re-derived, so the two cannot come to disagree about what a rune costs and what it buys. **The other
+  thirty-three need nothing and the twenty-five ungated ones need nothing** (GW §3c): every other price is inside its
+  engine's block, reads a meter only the engine installs, or lands on a card that sits out with the engine.
 - **A SECOND ENGINE OPENS NO OTHER LINEAGE'S RUNES**: scope reads the lineage, never the engines held.
 - **A NEW RUNE IS SORTED IN THE BATCH THAT AUTHORS IT.** `check_gv` §0 holds the rows and the named groups and asserts
   that together they are the live ordinary runes; a rune in neither reds.

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-20 (Batch GV &mdash; the runes that read an engine)</b></p>
+<p align="right"><b>Last updated: 2026-09-20 (Batch GW &mdash; three runes, and a gate that wrote what it tested)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -686,7 +686,13 @@ ride stacks on a different axis.</li>
 <li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
 carry their own damage roll and their own flat critical, and of the strike loop's terms they read
 <b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, the Tracker's mark (&sect;6.0) and &mdash; since
-Batch DU &mdash; <b>Cripple and Chilled</b>. <b>The rest is unreachable rather than omitted</b>:
+Batch DU &mdash; <b>Cripple and Chilled</b>. <b>TWO RUNES REACH IT AS WELL</b> &mdash; the <b>Bared Fang</b>'s flat +30%,
+read off the hunter, and the <b>Shared Hide</b>, which turns on eleven damage terms the companion is
+already wearing (four flat buff statuses, five that carry their own number, and the hunter's Last
+Howl and Vengeance, both of which are about a bond that already broke). <b>The Shared Hide's flag
+is written onto the HUNTER and read off the COMPANION, and the summon carries it across</b> &mdash;
+it is the only rune field in the game that crosses from one unit to another, and the multiplier is
+exactly 1.0000 for a hunter who does not hold the rune. <b>The rest is unreachable rather than omitted</b>:
 almost every remaining term is keyed on the ability being cast, on a specialization passive, or on
 a talent rank, and a summoned companion has none of the three. <b>Cripple was the one that
 mattered</b>: two enemy abilities land it, an enemy aims at the whole hero side including the
@@ -2811,10 +2817,24 @@ of the Trapper runes and both Overburn runes. <b>The roll asks first</b>, so non
 Peddler's row, a cache, a bargain or an event verb for a hero who has unequipped its engine;
 <b>the answer asks again</b>, so a queued cache hands none of them over either &mdash; it keeps them
 stored instead, names the rune they wait on, and offers them again the moment it is equipped.
+<b>KEEPING THEM IS THE POINT, AND IT IS THE ONE PLACE THE CACHE DOES NOT WRITE ITS REPAIR BACK.</b>
+A retired rune and a rune he already owns can never come back, so those are dropped from the stored
+triple and the repair is saved; but <b>unequipping an engine is one press away from being undone</b>,
+so writing that repair back would let a moment's experiment before a cache is answered destroy those
+runes for good, and save the loss. <b>A state the player can undo is not a state to destroy.</b>
 <b>A hero who has unequipped his engine is offered very little of his lineage's own set</b>: an
 Arcanist, a Holy Cleric, an Occultist and a Sharpshooter are offered none of their five, a Devout one
 of four, and the widest are the Berserker and the Cryomancer at four. The engine runes of his class
 are still offered to him, as they always were.
+<br><b>AND A RUNE'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT.</b> The offer
+door cannot reach a rune he has <b>already bought</b>, and two of the thirty-five charge him for
+something only the engine pays back. The <b>Martyr</b> can be healed by nobody but himself and gains
+Mercy when an enemy strikes him; <b>Thin Blood</b>'s own Poison deals no damage and his barb fires on
+every strike instead of a quarter. Each price reads the same condition its payout reads, so with the
+engine unequipped <b>neither the cost nor the payout lands</b> and the rune sits inert in its slot
+rather than being worse than nothing. <b>No other rune needs it</b>: every other cost in the pool is
+written inside its engine's own block, is paid out of a meter only the engine installs, or lands on
+a card that leaves the kit with the engine.
 <br><b>AND EVERY OTHER OFFER THAT IS ROLLED EARLY AND ANSWERED LATE IS RE-ASKED THE SAME WAY
 (Batch FE &sect;2).</b> Five offers in the game are rolled at one moment and answered at another,
 riding the save in between: the <b>rune cache</b>, the <b>ability draft</b>, the <b>item swap</b>,

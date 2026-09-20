@@ -41,6 +41,7 @@ func _initialize() -> void:
 	await _s3_the_lever_driven()
 	await _s4_the_payloads()
 	await _s5_the_read_sites()
+	await _s5b_the_hide_equipped()
 	_g.report(self)
 
 
@@ -411,7 +412,29 @@ func _s4_the_payloads() -> void:
 	# than claimed: every `rune_` field these twenty-one write has
 	# `data/runes.json` as its ONLY writer anywhere in the project. Derived by
 	# sweeping the comment-stripped source of every game script for a WRITE.
+	#
+	# **BATCH GW §1 — A PROPAGATION IS NOT A WRITE, AND THE SWEEP COULD NOT
+	# TELL THEM APART.** GW carries `rune_shared_hide` from the hunter onto the
+	# companion at `_do_summon`, because `Talents.apply_payload` writes every
+	# rune field onto the HERO and `_shared_hide_mult` reads this one off the
+	# COMPANION — the summon is the only place a hero's field has to cross onto
+	# another unit (GW §1b traced all 120 and this is the one). The value still
+	# comes from `runes.json` and nothing in code decides it, which is exactly
+	# what EM's charter is about; the old sweep read the assignment and accused
+	# it anyway, and it was the ONE red GW's pre-pass did not predict.
+	#
+	# **REPAIRED TO INTENT, NEVER DELETED (CQ §3).** An assignment whose
+	# right-hand side READS THE SAME FIELD off another unit is a carry; anything
+	# else — a literal, an arithmetic expression, a different field — is a
+	# script deciding a rune's magnitude, and is still accused. `rune_x = 1`
+	# reds; `comp.rune_x = hunter.rune_x` does not.
+	#
+	# **AND THE CARRIES ARE ASSERTED BY NAME, WHICH IS THE HALF THAT KEEPS THE
+	# TEETH.** An exemption with no population is an exemption that grows in the
+	# dark: a second carry appearing anywhere reds this, and the batch that
+	# writes one says why here.
 	var writers: Array = []
+	var carried: Array = []
 	for id2 in _ez_ids():
 		for f4 in (Runes.build(id2).get("payload", {}).get("stat", {}) as Dictionary):
 			var field := String(f4)
@@ -421,11 +444,24 @@ func _s4_the_payloads() -> void:
 					"scripts/classes.gd", "scripts/run_state.gd"]:
 				var src := Gate.strip_comments(
 					FileAccess.get_file_as_string("res://" + path))
-				if src.contains("%s = " % field) or src.contains("%s += " % field):
-					writers.append("%s writes %s" % [path, field])
+				for raw4 in src.split("
+"):
+					var line4 := String(raw4)
+					for op4 in [" = ", " += "]:
+						var at4 := line4.find(field + op4)
+						if at4 < 0:
+							continue
+						var rhs4 := line4.substr(at4 + field.length() + op4.length())
+						if rhs4.contains("." + field):
+							carried.append("%s carries %s" % [path, field])
+						else:
+							writers.append("%s writes %s" % [path, field])
 	ok(writers.is_empty(),
-		"§4: no script writes a rune-owned field — runes.json is the only writer (%s)"
+		"§4: a script DECIDES a rune-owned field — runes.json is the only writer (%s)"
 			% [writers])
+	ok(carried == ["scripts/battle.gd carries rune_shared_hide"],
+		"§4: ...and the only field a script CARRIES between units is the Shared Hide's, at the summon (%s)"
+			% [carried])
 	await process_frame
 
 
@@ -885,10 +921,18 @@ func _s5_the_read_sites() -> void:
 	ok(beast.has_status("empower"), "§5: Empower ATTACHES to the beast (DK's finding)")
 	ok(scene._shared_hide_mult(beast) == 1.0,
 		"§5: ...and pays exactly 1.0000 without the rune — DK's 1.0000, reproduced")
-	beast.rune_shared_hide = 1
-	ok(abs(scene._shared_hide_mult(beast) - 1.25) < 0.0001,
-		"§5: ...and 1.25 with it — the buff it was already wearing finally pays")
-	beast.rune_shared_hide = 0
+	# BATCH GW §1 — **THE ARM THAT STOOD HERE SET THE RUNE'S FIELD ON THE BEAST
+	# BY HAND AND THEN READ THE MULTIPLIER BACK**, which is the one path a real
+	# run never takes: `Talents.apply_payload` writes every rune field onto the
+	# HERO, and `_do_summon` carried nothing across until GW. So this section
+	# asserted 1.25 for batches while every hunter who bought the rune
+	# multiplied his beast's blow by exactly 1.0000 — which `check_gv` §1
+	# measured in the same tree, in all four of its arms, and recorded as the
+	# EXPECTED state. Two gates on one rune, disagreeing, both green.
+	#
+	# **THE POSITIVE ARM IS `_s5b` BELOW**, on its own board, with the rune
+	# EQUIPPED and every field read there written by the game. The two arms
+	# above stay: they are the DK reproduction and they need no rune.
 	beast.remove_status("empower")
 
 	# ---- Beastmaster: the Second Whistle, and it RAISES ----
@@ -924,3 +968,55 @@ func _s5_the_read_sites() -> void:
 	bm.rune_bared_fang = 0.0
 	scene.queue_free()
 	await process_frame
+
+
+# ── §5b — THE SHARED HIDE, EQUIPPED ─────────────────────────────────────────
+#
+# **BATCH GW §1 — THIS SECTION ONLY EVER EQUIPS.** The rune goes into
+# `party[seat]["runes"]`, which is the dict `battle.gd`'s spawn reads as it
+# builds each hero, so the field on the hunter was written by the GAME and the
+# field on the beast was carried by `_do_summon`. Breaking that copy on purpose
+# takes this section red, which is what §5's old arm could not do.
+#
+# **ITS OWN BOARD, AT THE END, DELIBERATELY.** `Gate.spawn` calls `new_run`, so
+# a second board built inside §5 would rewrite `Run.party` under the four heroes
+# the rest of that section is still driving.
+#
+# **AND BOTH ARMS ARE HERE RATHER THAN ONE.** A positive arm alone cannot tell
+# a carried 1 from a field that is 1 on every beast in the game; the not-worn
+# arm is what says the copy carries a 0 as faithfully as a 1.
+func _s5b_the_hide_equipped() -> void:
+	print("\n§5b — the Shared Hide, EQUIPPED through the real door (BATCH GW)")
+	for wear in [true, false]:
+		var label := "worn" if wear else "not worn"
+		var over := {3: {"engines": Runes.engine_pouch_for_spec("beastmaster"),
+			"runes": []}}
+		if wear:
+			var r: Dictionary = Runes.build("shared_hide")
+			r["equipped"] = true
+			over[3]["runes"] = [r]
+		var s: Node = await Gate.spawn(self, ["", "", "", "beastmaster"],
+			{"party": over})
+		var hunter: BattleUnit = null
+		for h in s.get("heroes"):
+			if not h.is_companion and h.hero_key == "hunter":
+				hunter = h
+		var want := 1 if wear else 0
+		ok(hunter != null and hunter.rune_shared_hide == want,
+			"§5b: [rune %s] the GAME wrote %d onto the hunter at the spawn" % [
+				label, hunter.rune_shared_hide if hunter != null else -1])
+		await s._do_summon(hunter, "ursus")
+		var beast: BattleUnit = s._beasts(hunter)[0]
+		ok(beast != null and beast.rune_shared_hide == want,
+			"§5b: ...and `_do_summon` carried it onto the companion (%d)" % [
+				beast.rune_shared_hide if beast != null else -1])
+		s._apply_status(beast, "empower", 3)
+		ok(beast.has_status("empower"),
+			"§5b: ...Empower attaches to the beast (rune %s)" % label)
+		var want_mult := 1.25 if wear else 1.0
+		ok(abs(s._shared_hide_mult(beast) - want_mult) < 0.0001,
+			"§5b: ...and the hide multiplier reads %.4f against %.4f" % [
+				s._shared_hide_mult(beast), want_mult])
+		s.queue_free()
+		for _i in 4:
+			await process_frame

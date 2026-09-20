@@ -4216,7 +4216,23 @@ func heal_amount(amount: int, external := false) -> int:
 	# — no second predicate, and nothing to keep in step with the rest of the
 	# heal pipeline. A self-heal that arrived with `external` true would be a
 	# bug at the CALLER and is caught there, not softened here.
-	if rune_martyr > 0 and external:
+	#
+	# **BATCH GW §3 — AND IT IS GATED ON THE ENGINE, BECAUSE THE PAYOUT IS.**
+	# `_on_martyr_struck` pays a Mercy stack and Mercy is the Holy Cleric's
+	# ENGINE, installed at the spawn for a holder and for nobody else — so a
+	# Cleric who unequipped Mercy kept the refusal and lost the bar it buys, and
+	# was playing a strictly worse game than a Cleric wearing no rune at all
+	# (GV §3b drove it: an ally's heal of 40 landed 0 with the rune worn and 46
+	# without it, on a board where the engine was merely owned). **No engine, no
+	# cost and no payout** — the ruling, and the one shape a player cannot reason
+	# about is a price with nothing behind it.
+	#
+	# **`has_engine("mercy")` RATHER THAN THE BAR ITSELF.** `second_resource_name
+	# == "Mercy"` is written at the spawn off exactly this set, so the two agree
+	# by construction; what they do NOT agree about is a FULL bar, which refuses
+	# the stack for one blow and must not take the price off with it. The engine
+	# is the thing the rune's own row in `Runes.ENGINE_READ` names.
+	if rune_martyr > 0 and external and has_engine("mercy"):
 		if amount > 0:
 			float_text("MARTYR", Color(0.95, 0.8, 0.3))
 		return 0

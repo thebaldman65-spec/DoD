@@ -1178,6 +1178,47 @@ being re-taken.
   `baselines.json` moved, which is the difference between a baseline written off the arithmetic and
   one written off whatever the code happened to do.
 
+## STANDING RULE — A GATE THAT WRITES THE STATE ITS ASSERTION IS ABOUT CANNOT FAIL WHEN THE DOOR THAT WRITES IT BREAKS (Batch GW §2)
+
+> **Arranging a board is fine — a fixture seating a hero, a probe dressing enemies, a control
+> stripping an engine to make an arm. Arranging THE VERY THING THE ASSERTION IS ABOUT is not: the
+> gate then tests the READ SITE and nothing else, and the door that should have written the state
+> can be broken, missing, or pointed at another body, for batches, while the gate reads green.
+> Pair it with a PLUMBING arm through the real door, on the SAME body, or the gate is half an
+> instrument.**
+
+**THE WORKED EXAMPLE IS THE SHARED HIDE AND IT COST TWO BATCHES OF A DEAD 100-GOLD RUNE.**
+`check_ez` §5 wrote `rune_shared_hide` onto the BEAST by hand and read `_shared_hide_mult` back at
+1.25. The game writes that field onto the HUNTER and `_do_summon` never carried it across, so the
+multiplier a real run read was 1.0000 — and the gate could not have said otherwise however badly
+the rune was wired, because it was supplying the one input the defect was in.
+
+- **THE BODY IS THE SHARP HALF OF THE RULE, AND IT IS THE HALF A SWEEP CAN FIND.** Ninety of GW's
+  ninety-two sites set the field on the same unit the game writes it to, so they still ask a real
+  question about the code that READS it; what they cannot see is the field failing to ARRIVE. Two
+  set it on a body the game never writes it to at all, and those two are the ones that hid a dead
+  rune. **A hand-set on the wrong body is not a weaker version of the same thing; it is a different
+  defect, and it is the one worth sweeping for.**
+- **`check_fx` §4 IS THE PATTERN TO COPY AND IT SAYS SO IN ITS OWN HEADER.** It splits the question
+  in two: **(a) PLUMBING** — the node's value is on the unit after the spawn, per class, through the
+  real door — and **(b) THE READ SITE** — the attached field moves the thing it is read into,
+  driven off a hand-set value. *"Neither half proves the other: a field can land and be read
+  nowhere, and a read site can be live while the spawn never writes it."* That header names EZ's
+  Shared Hide as the defect it was built against, one batch before anybody found it.
+- **A SECOND GATE READING THE OPPOSITE IS NOT A SAFETY NET.** `check_gv` §1 drove the same rune
+  through the real door, measured 15 damage in all four arms, and recorded that as the EXPECTED
+  state. So the tree held two instruments pointed at one rune, disagreeing, both green — because
+  nothing compares two gates' readings of one subject, and neither said what the other assumed.
+  **When a gate records a subject as dead, say which other gate asserts it alive.**
+- **AND THE REPAIRED GATE OWES A CONTROL IN THE DIRECTION OF THE REPAIR.** Re-pointing `check_ez`
+  to equip the rune is worth nothing until the copy is broken on purpose and the gate is watched
+  going red: a gate that could not see this defect before has to be shown seeing it now.
+- **THE SWEEP IS A REPORT WITH A CEILING, NOT A REPAIR (GW §2's ruling).** Ninety-two sites across
+  nine files is a change to ninety checks, and a batch that rewrites ninety checks while changing
+  the game is a batch nobody can read. `check_gw` §2 re-derives the count off the battery's own
+  target list every run and fails only when it GROWS — a batch adding a legitimate hand-set raises
+  the ceiling and says why in its report.
+
 ## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
 
 > **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does

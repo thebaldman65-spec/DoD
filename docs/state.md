@@ -13,53 +13,124 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-20 (Batch GV).*
+*Last rewritten: 2026-09-20 (Batch GW).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GV — THE RUNES THAT READ AN ENGINE. IMPLEMENT ONLY, AND THE TWENTY-EIGHTH BATCH ON `class-merge`.**
-  GP gated the CARDS at the offer door and the RUNES were never re-read. GV reads all sixty live ordinary runes at their
-  read sites, drives every one of them with its engine equipped and with it merely owned, and gates the thirty-five that
-  cannot pay without it. `main` is untouched. Full working: **`docs/reports/GV.md`**.
-- **§1 — THIRTY-FIVE ROWS, DERIVED AND DRIVEN.** Every payload field traced to every line that reads it with its guard
-  chain, then every rune worn on four boards — its engine equipped or merely owned, the rune worn or not, the same dice.
-  **Thirty-five move NOTHING with the engine merely owned and pay with it equipped**; the other twenty-five all move
-  something without it and none is gated: **five HALF-work** (Killing Cold on a boss at four Chilled, Glass Prison's
-  second body, Open Line's Formless, Blood Debt's bill, Second Whistle's three Loyalty), **eleven ride a card**, **four a
-  status any card lays**, **one the stance every Warrior has**, **three nothing at all**, and **one pays nobody anything
-  (the Shared Hide, below)**. **FP's 43 was the game at FP**: 33 of it are rows, ten are not, and two it did not count
-  are (Grace and Open Hand, whose cards are priced in Mercy since GS).
-- **§2 — THE GATE AT EVERY DOOR, AND IT READS WHAT IS EQUIPPED.** `Runes.ENGINE_READ` is the table and
-  `Runes.offerable` the one answer; `Runes.eligible_ids` asks it at every roll (the Peddler, the elite cache, the
-  bargain, the event verb) and `Run.rune_choice` at a queued offer's answer, where a row **sits out and stays stored**
-  rather than being repaired away. The empty-offer sentence names the engine rune when that is the cause.
-- **§3 — WHAT A HERO WITH NO ENGINE IS OFFERED, PER LINEAGE.** Of his own five: **Arcanist 0, Holy 0, Occultist 0,
-  Sharpshooter 0, Devout 1 of 4**, Warden 3, Swordmaster 3, Pyromancer 3, Survivalist 3, Berserker 4, Cryomancer 4,
-  Beastmaster 4 of 6. **A second engine opens nothing** — scope is still the lineage.
-- **NEW GATE `check_gv`**: the population and the table; every ordinary rune driven on four boards; the two whose PRICE
-  is read with no engine; what each HALF-works rune keeps only with its engine; the gate at the roll, the cache's
-  answer, the Peddler's own screen, the bargain and the event verb; the per-lineage offer table; and **four whole runs
-  through the real screens** — three with every engine unequipped (148 offers, no row) and one holding two apiece (11
-  rows among 69).
-- **WHAT MOVED:** `scripts/runes.gd` (the table, the gate, the third empty-offer cause), `scripts/run_state.gd` (the
-  answer door), `scripts/map_screen.gd` (the overlay's words and the pick's index); `check_gv.gd` (**NEW**) and
-  `run_battery.sh`; `check_es`, `check_fd`, `check_fo` and `test_runes` repaired to intent (each seated a lineage hero
-  with no engine rune); `baselines.json` and `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`,
-  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GV.md` (**NEW**).
-- **VERIFICATION:** **119 targets, `BATTERY_EXIT` 0, `check_de` 493 / 0 / 0**, on a tree stamped by md5 before and after (588 files, identical). `check_gv` 874 / 0, `check_parse` 193 / 0, `test_runes` 5,625 / 0, harness 22 / 382 / 8 throws=0; no `Parse Error` or `SCRIPT ERROR` in any of the 119 logs. **The only reds are the two standing sanctioned ones** — `check_cm_live` 13 / 4 with its four FAIL lines byte-identical to the recon's, and `check_gj` 70 / 1, whose gold figures moved to +158 / +178 with GV's rune offers (HEAD's own code in a rebuild still reads GU's +169 / +189). **Ten injected defects, one per isolated copy, each bit and each named its own defect**; the ownership injection and the no-gate injection printed the same 111 FAIL lines byte for byte. The player's four saves are unmoved.
-- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**. **The Crown's Break and
-  freeze resistance is still owed.** Step 6 is the 52 engine-bound gates.
-- **Next letter: GW.**
+- **Last batch: GW — THREE RUNES, AND A GATE THAT WROTE WHAT IT TESTED. IMPLEMENT ONLY, AND THE TWENTY-NINTH BATCH
+  ON `class-merge`.** GV drove all sixty live ordinary runes through the real door and came back with three findings it
+  did not repair. GW wires the one that paid nobody, gates the two that charged for a payout their engine withholds,
+  re-points the gate that had been arranging its own subject, and sweeps every gate in the battery for that shape.
+  `main` is untouched. Full working: **`docs/reports/GW.md`**.
+- **§1 — THE SHARED HIDE CROSSES, AND IT IS THE ONLY `rune_` FIELD THAT HAS TO.** `Talents.apply_payload` writes the
+  flag onto the HUNTER and `_shared_hide_mult` reads it off the COMPANION; `_do_summon` carried it in neither the cfg
+  nor the hunter's-own-terms copies, so a 100g rune multiplied a beast's blow by exactly 1.0000 from the day it
+  shipped. One line, beside `crit_bonus` and `companion_power`. **Driven in a real fight across EZ's own three buff
+  loadouts: +26.5% / +57.6% / +138.3%**, against EZ's ×1.2500 / ×1.5625 / ×2.3359 multipliers, which this reproduces to
+  four places — EZ measured the function on a field its gate had set by hand; these are blows.
+- **§1b — ALL 120 `rune_` FIELDS TRACED TO EVERY LINE THAT READS THEM.** One has a read site whose receiver is a
+  companion; 2 could reach one and sit behind `has_engine("trapper")`, which a companion can never satisfy; 10 are read
+  off the HUNTER; 10 off a body a companion can be, for runes no Hunter can hold; 25 off the ACTING unit, and a
+  companion never acts; 72 only through a walk of `heroes`, which a companion is not in.
+- **§2 — THE SHAPE, SWEPT AND REPORTED: 92 SITES IN 9 FILES.** A gate that SETS a rune, engine or talent field rather
+  than equipping the rune, taking the engine or buying the node. **Ninety set it on the body the game writes it to; two
+  set it where the game never writes it**, and those two hid the dead rune. `check_fx` §4 is the legitimate pattern —
+  a PLUMBING half through the real door beside a READ-SITE half — and names EZ's Shared Hide in its own header as the
+  defect it was built against. **Repairing the ninety is its own batch.**
+- **§3 — THE MARTYR'S AND THIN BLOOD'S COSTS ARE GATED WITH THEIR PAYOUTS.** Both were already `Runes.ENGINE_READ`
+  rows: they did not slip GV's census, so the fix is the cost and not the table. Each price now reads its payout's own
+  predicate (`has_engine("mercy")`, `has_engine("trapper")`), copied rather than re-derived. **No engine, no cost and
+  no payout.** Swept across the other 25 ungated runes and re-derived over the other 33 gated ones: no other rune has
+  the shape.
+- **§4 — THE WITHHELD CACHE ROW IS RULED AS GV BUILT IT**, and GV had already recorded the reasoning in two of the
+  three places (`run_state._engine_seated`'s header and `CLAUDE.md`'s FD §1 block). `docs/master.html` described the
+  behaviour and not the reason; it carries it now.
+- **NEW GATE `check_gw`**: the crossing driven through the real door in both engine arms; EZ's three loadouts as
+  damage; the census's four structural facts asked of a live board with a beast standing, and the companion's single
+  carried field out of 120; the §2 sweep re-derived off `run_battery.sh`'s own target list under a ceiling; and the two
+  prices with their payouts, engine equipped and merely owned, beside a hero wearing no rune at all.
+- **WHAT MOVED:** `scripts/battle.gd` (the copy at `_do_summon`, Thin Blood's price), `scripts/unit.gd` (the Martyr's
+  price); `check_gw.gd` (**NEW**) and `run_battery.sh`; `check_ez` re-pointed (§5's hand-set arm replaced by §5b, which
+  equips; §4's writer sweep repaired to intent) and `check_gv` re-pointed (§1's DEAD row, §1b's two prices);
+  `baselines.json` and `pin-manifest.json`; `CLAUDE.md`, `docs/instrument-rules.md`, `docs/master.html`,
+  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/GW.md` (**NEW**).
+- **VERIFICATION:** **120 targets, `check_de` 497 / 0, the run harness 22 / 382 / 8 with throws=0, `check_parse` 194 / 0**, on a
+  tree stamped by md5 before and after (367 files; one moved, named below), and no `Parse Error` or `SCRIPT ERROR` in any of the
+  120 logs. **Every predicted baseline was met exactly** — `check_ez` 114, `check_gv` 877, `check_gw` 76 — all written before the
+  run. **The only reds are the two standing sanctioned ones and both were diffed against an isolated rebuild of `ed35334`:
+  byte-identical FAIL lines**, `check_cm_live` 13 / 4 and `check_gj` 70 / 1 at +158 / 178, whose gold figures did not move.
+  **Six injected defects across five isolated copies, each bit and each named its own defect** — among them the brief's own
+  control, the copy at `_do_summon` deleted, which took `check_gw` to 76 / 13 and the repaired `check_ez` to 114 / 3 where
+  HEAD's `check_ez` reads 106 / 0 on a tree with the same rune dead. **The battery caught this batch's own doc edit** —
+  `test_batch_bx` 157 / 1, BX §4's ban on the common noun *beast* in `docs/master.html` — and the word is repaired, the rule
+  reproduced over the edited file at 0 strays, and **all 35 targets that read that file re-run: one reads differently from the
+  acceptance run and it is `test_batch_bx`, 157 / 0.** The player's four saves are byte-identical to the backup taken before any
+  Godot process ran.
+- **Phase.** Steps 1–4 of the merge's running order are done and **step 5's rune half is done**. **The Crown's Break
+  and freeze resistance is still owed.** Step 6 is the 52 engine-bound gates.
+- **Next letter: GX.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+### GW's RULINGS OWED — **FOUR; THE FIRST TWO CHANGE WHAT A RUNE IS WORTH**
 
-### GV's RULINGS OWED — **FIVE; FOUR ARE PLAYER-VISIBLE**
+Full working: `docs/reports/GW.md`, NEEDS A RULING.
+
+1. **THE SHARED HIDE IS NOW WORTH WHAT EZ PRICED IT AT, AND NOTHING HAS EVER PAID THAT.** The brief ruled the copy, so
+   it is built — but what the ruling moves is a MAGNITUDE no player has ever felt. Driven in a real fight across EZ's
+   own three buff loadouts, a companion's blow reads **+26.5% / +57.6% / +138.3%**, against a rune that has paid
+   **+0.0%** since it shipped. The rune's text, price, terms and multiplier are byte-unchanged; a 100g rune has gone
+   from dead to the largest single damage swing a Beastmaster can buy, and whether that is the intended price is the
+   designer's.
+2. **THE TWO PRICES ARE OFF WITH THE ENGINE OUT, WHICH MAKES AN UNEQUIPPED ENGINE STRICTLY BETTER THAN IT WAS.** Ruled
+   by the brief and built. At the table: a Holy Cleric who unequips Mercy while wearing the Martyr can now be healed by
+   his party, and a Survivalist who unequips Trapper while wearing Thin Blood keeps his poison's damage. Neither buys
+   anything back — the payouts stay off — so each rune is **inert rather than negative**. The alternatives nobody took
+   are GV's ruling 3: unequip the rune with the engine, or say on a screen that it is sitting out.
+3. **§2's NINETY OTHER HAND-SETS ARE REPORTED AND RULED ON BY NOBODY.** Ninety-two sites in nine files arrange a rune,
+   an engine or a talent field rather than letting the game write it; two were the defect and are repaired, and the
+   other ninety are on the body the game writes it to. Repairing them is a change to ninety checks across nine files.
+   `check_gw` §2 holds the count at a ceiling of 90 so it cannot grow in silence. **Whether that batch is worth taking
+   is the designer's**, and FZ's pricing rule applies.
+4. **`check_ez` §4's WRITER SWEEP WAS REPAIRED TO INTENT RATHER THAN EXEMPTED.** It accused the new copy — a script
+   writing a `rune_` field — and the charter it enforces is that `runes.json` decides a rune's MAGNITUDE, which a carry
+   between two units does not. The sweep now separates a propagation (a right-hand side that reads the same field off
+   another unit) from a decision, and **asserts the carries by name**, so a second one reds and the batch that writes
+   it says why. The alternative was an exemption for one file, which `check_ds` already ruled against.
+
+### FOUND AT GW AND NOT FIXED
+
+- **`docs/master.html` HAD NOT LISTED THE TWO RUNES A COMPANION'S BLOW READS SINCE EZ.** Its companion bullet named
+  Mark of the Hunt, Hunter's Mark, the Tracker's mark, Cripple and Chilled, and neither the Bared Fang nor the Shared
+  Hide. Repaired. **That document's factual prose is asserted by nothing** (EH §2), and this is another instance.
+- **GV's REPORT AND `docs/state.md` BOTH CALLED `check_ez`'s HAND-SET ARM "§4"; IT IS §5.** §4 is the payload section
+  and its arms are sound. A closed report is a file class no instrument reads (FL §2c), so the misnumbering would have
+  stood; it is corrected here rather than in GV's report, which is closed.
+- **THE §2 SWEEP'S WRONG-BODY ARM IS A PIN ON TWO SITES, NOT A GENERAL RULE**, and the gate says so in its own words.
+  *"Is this receiver a companion?"* is not a question a source sweep can answer — the receiver is a local bound three
+  statements away — so the needle is the exact spelling the repair removed and the general guard beside it is the
+  count ceiling. **Its first draft read 2 on a repaired tree** because `check_ez`'s new arm COMPARES that same
+  spelling, and a substring needle cannot tell `==` from `=`.
+- **A COMPANION'S DAMAGE CANNOT BE MEASURED OFF A WOLF OR AN INFLATED BODY**, and both were found by building the arm
+  twice. A foe given a million health reads every percentage-of-health term at a million's scale (400,198 damage over
+  twelve blows, a +0.0% swing); a Canis lays Bleed whose burst lands inside the same `await` and which the rune does
+  not multiply (×1.19 against a multiplier of ×1.2500). **The bear is the one companion whose blow can be read alone.**
+- **`rune_split_tongue` LOOKS LIKE AN ORPHAN AND IS NOT.** A first pass over `payload.stat` reported one of the 120
+  fields written by no rune; it is Split Tongue's, written from inside an `also` block, which is the nested form
+  `Talents.apply_payload` re-enters at the top. The rune is retired (FC §3) and its read site is deliberately kept and
+  reachable by nothing.
+- **ONE ISOLATED COPY PER CONTROL LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, each named "Dawn of Decay GW
+  …" before anything ran in it so its `user://` could not reach the player's saves. They can be deleted.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (GW §0): *`check_ez` §4* (it is §5); and *this is the shape FA §1b already
+  earned a rule for, pointed at gates rather than at briefs* — FA §1b is already about gates, and the §2 shape is
+  adjacent to it but distinct, so it is written as its own block pointing at FA §1b.
+
+### GV's RULINGS OWED — **THREE LEFT; THE FIRST AND THE FOURTH ARE ANSWERED AT GW**
 
 Full working: `docs/reports/GV.md`, NEEDS A RULING.
 
-1. **A QUEUED ROW SITS OUT OF A CACHE'S ANSWER RATHER THAN BEING REPAIRED AWAY — THE BATCH'S CALL.** FD's rule is that a
+1. ~~**A QUEUED ROW SITS OUT OF A CACHE'S ANSWER RATHER THAN BEING REPAIRED AWAY**~~ — **RULED AT GW §4, AS GV BUILT IT**, and the reasoning now stands beside it on the player-facing side too (`docs/master.html`): a retirement can never be undone, an unequipped engine is one press from being undone, and a state the player can undo is not a state to destroy. The working that follows is kept because it is the pricing of the alternative. FD's rule is that a
    frozen offer is re-asked at the answer and the repair is WRITTEN BACK; that is right for a candidate that can only
    get worse (retired, owned). An unequipped engine is the player's own reversible choice, so the row is kept in the
    stored triple, filtered out of the answer while the engine is out, and offered again when it is back — and
@@ -79,7 +150,7 @@ Full working: `docs/reports/GV.md`, NEEDS A RULING.
    nothing** — the Martyr still refuses every ally's heal and Thin Blood still stops his poison biting. The options,
    priced and not taken: leave it (the player unequips it himself, free, on the map), sit it out with a note the way a
    card does, unequip it automatically, or let it be sold.
-4. **THE SHARED HIDE PAYS NOBODY ANYTHING, ENGINE OR NONE (player-visible).** Found by driving it: the rune's field
+4. ~~**THE SHARED HIDE PAYS NOBODY ANYTHING, ENGINE OR NONE**~~ — **WIRED AT GW §1**, and `check_gv` §1 said so exactly as GV promised it would: the row read 18 against 15 on BOTH engine arms in GW's pre-pass, which is also what moved it out of the table's `DEAD` group and into `CARD`. What GW §1 now owes a ruling on is the MAGNITUDE it turned on — see GW's ruling 1. The original finding: Found by driving it: the rune's field
    lands on the HUNTER and `_shared_hide_mult` reads the COMPANION, which never receives it, so a 100g rune multiplies
    a companion's blow by exactly 1.0000 for every hero who has ever bought it. Not repaired: the fix moves a magnitude
    (CQ §6). `check_gv` §1 asserts it dead in both arms, so the day it is wired the gate says so.

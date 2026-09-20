@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1491,
-  "source": 1151,
-  "other": 95,
+  "total": 1494,
+  "source": 1153,
+  "other": 96,
   "document": 245
  },
  "source_residency": {
   "narrow": 39,
-  "code": 684,
+  "code": 686,
   "absent": 304,
   "runtime": 80,
   "unresolved": 1,
@@ -2025,7 +2025,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#114"
+   "g": "check_ez.gd#115"
   },
   {
    "s": "check_ez.gd",
@@ -2036,7 +2036,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#113"
+   "g": "check_ez.gd#114"
   },
   {
    "s": "check_ez.gd",
@@ -2047,7 +2047,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#114"
+   "g": "check_ez.gd#115"
   },
   {
    "s": "check_ez.gd",
@@ -2058,31 +2058,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#113"
-  },
-  {
-   "s": "check_ez.gd",
-   "fn": "_s4_the_payloads",
-   "h": "",
-   "n": "%s += ",
-   "p": "+",
-   "r": "missing-file",
-   "k": "format",
-   "how": "read",
-   "g": "check_ez.gd#191",
-   "alt": true
-  },
-  {
-   "s": "check_ez.gd",
-   "fn": "_s4_the_payloads",
-   "h": "",
-   "n": "%s = ",
-   "p": "+",
-   "r": "missing-file",
-   "k": "format",
-   "how": "read",
-   "g": "check_ez.gd#191",
-   "alt": true
+   "g": "check_ez.gd#114"
   },
   {
    "s": "check_ez.gd",
@@ -2093,7 +2069,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#322",
+   "g": "check_ez.gd#334",
    "expr": "rq_key"
   },
   {
@@ -2105,7 +2081,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#323",
+   "g": "check_ez.gd#335",
    "expr": "rq_key"
   },
   {
@@ -2117,7 +2093,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#324"
+   "g": "check_ez.gd#336"
   },
   {
    "s": "check_ez.gd",
@@ -2128,7 +2104,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#328"
+   "g": "check_ez.gd#340"
   },
   {
    "s": "check_ez.gd",
@@ -2139,7 +2115,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#327"
+   "g": "check_ez.gd#339"
   },
   {
    "s": "check_ez.gd",
@@ -2150,7 +2126,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#320"
+   "g": "check_ez.gd#332"
   },
   {
    "s": "check_fd.gd",
@@ -3372,6 +3348,61 @@
    "k": "loop-list",
    "how": "read",
    "g": "check_gs.gd#371"
+  },
+  {
+   "s": "check_gw.gd",
+   "fn": "_battery_targets",
+   "h": "run_battery.sh",
+   "n": ")",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gw.gd#247"
+  },
+  {
+   "s": "check_gw.gd",
+   "fn": "_battery_targets",
+   "h": "run_battery.sh",
+   "n": "GATES=(",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_gw.gd#244"
+  },
+  {
+   "s": "check_gw.gd",
+   "fn": "_battery_targets",
+   "h": "run_battery.sh",
+   "n": "SUITES=(",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_gw.gd#244"
+  },
+  {
+   "s": "check_gw.gd",
+   "fn": "_talent_fields",
+   "h": "scripts/talents.gd",
+   "n": "\"stat\": {",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gw.gd#227"
+  },
+  {
+   "s": "check_gw.gd",
+   "fn": "_talent_fields",
+   "h": "scripts/talents.gd",
+   "n": "}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gw.gd#229"
   },
   {
    "s": "test_batch_ah.gd",

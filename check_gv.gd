@@ -80,7 +80,10 @@ const ROWS := {
 # out: HALF-WORKS (GP's group — still does part of its job, the engine keeps the
 # rest), a CARD, a STATUS any card lays, the STANCE every Warrior has, or
 # NOTHING at all. **None is gated**; §1 asserts each moves something unequipped.
-# DEAD is the one found paying nothing to anyone, engine or none (§1).
+# **DEAD IS EMPTY SINCE GW §1 WIRED THE SHARED HIDE, AND THE ARM IS KEPT.** It is
+# the door a rune found paying nobody comes back through, and a batch that
+# deleted it would have to re-derive it; §1 prints how many rows carry it, so an
+# empty group reads as a fact rather than as a branch nobody noticed.
 const GROUPS := {
 	"killing_cold_fk": ["HALF", "bites a boss sitting on four Chilled either way; a held body only with the engine"],
 	"glass_prison": ["HALF", "a second body frozen either way; a second PRISON only with the engine"],
@@ -106,7 +109,17 @@ const GROUPS := {
 	"last_word": ["NOTHING", "his own health"],
 	"long_watch": ["NOTHING", "Break damage"],
 	"bared_plate": ["NOTHING", "Break damage"],
-	"shared_hide": ["DEAD", "the field lands on the hunter and `_shared_hide_mult` reads the companion"],
+	# BATCH GW §1 — THE SHARED HIDE WAS THE `DEAD` ROW AND IT IS NOT DEAD NOW.
+	# GV measured it paying nothing in all four arms, named it DEAD and said the
+	# day it is wired this gate would say so. GW wired it: the field crosses onto
+	# the companion at `_do_summon`, beside `crit_bonus` and `companion_power`.
+	# **IT JOINS `CARD` RATHER THAN THE TABLE**, on the same reading as the two
+	# Beastmaster runes beside it: the rune needs a COMPANION and nothing else,
+	# and an earned Call the Wilds fields one with no Pack Bond at all — so it
+	# pays with the engine merely owned exactly as it pays with it equipped,
+	# which GW's own pre-pass measured before this line moved (18 against 15 on
+	# BOTH arms) and which §1 below asserts.
+	"shared_hide": ["CARD", "a companion, which Call the Wilds fields with no engine"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -765,42 +778,68 @@ func _s1_every_rune_driven() -> void:
 				"§1: %s moved nothing with its engine equipped either — the drive does not reach it" % id)
 			if paid_bare and paid_equipped:
 				others_ok += 1
-	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped" % [
-		rows_ok, ROWS.size(), others_ok, GROUPS.size() - 1])
+	# BATCH GW — THE DENOMINATOR IS DERIVED, NEVER `GROUPS.size() - 1`. That
+	# literal meant "every group but the one DEAD row", and GW emptied DEAD — a
+	# count written against a population that has since moved is the defect this
+	# project keeps paying for.
+	var dead := 0
+	for id6 in GROUPS:
+		if String(GROUPS[id6][0]) == "DEAD":
+			dead += 1
+	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD)" % [
+		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead, dead])
 	ok(rows_ok == ROWS.size(), "§1: only %d of %d rows read clean on both arms" % [rows_ok, ROWS.size()])
 	await _s1b_the_price()
 	await _s1c_the_half()
 
 
-# ── §1b — THE TWO ROWS WHOSE PRICE READS NO ENGINE ───────────────────────────
+# ── §1b — THE TWO ROWS WHOSE PRICE IS GATED WITH ITS PAYOUT ──────────────────
 #
-# **THE MARTYR AND THIN BLOOD ARE WORSE THAN NOTHING WITHOUT THEIR ENGINE**, and
-# this is the measurement behind that sentence: the price is paid on the arm with
-# the engine merely owned, where §1 found the promise paying nothing.
+# **THEY WERE WORSE THAN NOTHING WITHOUT THEIR ENGINE, AND GW §3 RULED THAT
+# CLOSED.** GV measured the price landing on the arm with the engine merely
+# OWNED, where §1 had found the promise paying nothing — an ally's heal of 40
+# landing 0 against 46, and a poison ticking 0 against 3. Each price now reads
+# its payout's own predicate (`has_engine("mercy")`, `has_engine("trapper")`).
+#
+# **THE ARMS ARE REPAIRED TO INTENT RATHER THAN DELETED (CQ §3), AND THE
+# EQUIPPED BOARD IS WHY THERE ARE THREE OF THEM.** With the price gated, *engine
+# owned + rune worn* and *engine owned + no rune* read the SAME — so a section
+# holding only those two would assert a pair that cannot disagree, which passes
+# just as well on a price that was simply deleted. The EQUIPPED arm is what
+# still discriminates: the refusal has to land there, or this section is
+# measuring nothing. `check_gw` §3 carries the payouts beside the prices.
 func _s1b_the_price() -> void:
-	print("\n§1b — the two rows whose price is read with no engine")
-	for wear in [true, false]:
-		var s: Node = await _board("martyr_fk", false, wear)
+	print("\n§1b — the two rows whose price is gated with its payout (GW §3)")
+	for arm in [[true, true], [false, true], [false, false]]:
+		var equip: bool = arm[0]
+		var wear: bool = arm[1]
+		var s: Node = await _board("martyr_fk", equip, wear)
 		var u: BattleUnit = _hero(s, "cleric")
 		u.hp = int(u.max_hp * 0.5)
 		var got: int = u.heal_amount(40, true)
-		print("    [Martyr, engine owned, rune %s] an ally's heal of 40 lands %d" % ["worn" if wear else "not worn", got])
-		if wear:
-			ok(got == 0, "§1b: the Martyr's price did not refuse an ally's heal with its engine unequipped")
+		print("    [Martyr, engine %s, rune %s] an ally's heal of 40 lands %d" % [
+			"equipped" if equip else "owned", "worn" if wear else "not worn", got])
+		if equip and wear:
+			ok(got == 0, "§1b: the Martyr's price did not refuse an ally's heal with its engine EQUIPPED (%d)" % got)
 		else:
-			ok(got > 0, "§1b: an ally's heal was refused with no Martyr worn — the arm cannot be read")
+			ok(got > 0, "§1b: an ally's heal was refused with the engine %s and the rune %s (%d)" % [
+				"equipped" if equip else "merely owned", "worn" if wear else "not worn", got])
 		await _clear(s)
-	for wear2 in [true, false]:
-		var s2: Node = await _board("thin_blood", false, wear2)
+	for arm2 in [[true, true], [false, true], [false, false]]:
+		var equip2: bool = arm2[0]
+		var wear2: bool = arm2[1]
+		var s2: Node = await _board("thin_blood", equip2, wear2)
 		var u2: BattleUnit = _hero(s2, "hunter")
 		var f0: BattleUnit = _foes(s2)[0]
 		s2._apply_poison(u2, f0, 3)
 		var tick := int(f0.get_status("poison").get("tick", -1))
-		print("    [Thin Blood, engine owned, rune %s] a poison he lays ticks for %d" % ["worn" if wear2 else "not worn", tick])
-		if wear2:
-			ok(tick == 0, "§1b: Thin Blood's price did not stop his poison biting with the engine unequipped (%d)" % tick)
+		print("    [Thin Blood, engine %s, rune %s] a poison he lays ticks for %d" % [
+			"equipped" if equip2 else "owned", "worn" if wear2 else "not worn", tick])
+		if equip2 and wear2:
+			ok(tick == 0, "§1b: Thin Blood's price did not stop his poison biting with the engine EQUIPPED (%d)" % tick)
 		else:
-			ok(tick > 0, "§1b: his poison does not bite with no Thin Blood worn — the arm cannot be read")
+			ok(tick > 0, "§1b: his poison does not bite with the engine %s and the rune %s (%d)" % [
+				"equipped" if equip2 else "merely owned", "worn" if wear2 else "not worn", tick])
 		await _clear(s2)
 
 

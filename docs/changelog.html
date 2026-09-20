@@ -15,6 +15,49 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-20 &mdash; Batch GW: THREE RUNES, AND A GATE THAT WROTE WHAT IT TESTED</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-NINTH BATCH ON <code>class-merge</code>.</b> GV drove all sixty ordinary runes
+through the real door and came back with three findings it did not repair: one rune that pays nobody anything, and two
+that charge a price for a payout their engine withholds. This batch wires the first, gates the other two's costs with
+their payouts, repairs the gate that had been arranging its own subject, and sweeps every gate in the battery for that
+shape. <code>main</code> is untouched. Full working: <code>docs/reports/GW.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE SHARED HIDE PAYS SOMEBODY NOW.</b> The rune's promise is that a companion's blows finally read
+the damage buffs it is already wearing. Its flag was written onto the HUNTER, the way every rune's is, and the code
+that reads it reads the COMPANION &mdash; and nothing carried it across, so from the day it shipped a 100-gold rune
+multiplied a beast's blow by exactly 1.0000 for everybody who bought it. The field now crosses at the one place a
+companion is built, beside the crit chance and the companion power the beast already inherited. <b>Driven in a real
+fight</b>, across the three buff loadouts the rune was originally measured on: THIN_SWING, MID_SWING and DEEP_SWING more
+damage from the same seeded blows. <b>Nothing else about the rune moved</b> &mdash; the multiplier, its list of terms
+and its price are byte-unchanged.</p>
+
+<p><b>&sect;2 &mdash; AND THE CHECK THAT SAID IT WAS WORKING SET THE FLAG ITSELF.</b> It wrote the field onto the BEAST
+by hand and then read the multiplier back, which is the one path a real run never takes &mdash; so it could not fail
+however badly the rune was wired, and it read green for batches while a second gate drove the same rune through the
+real door, found it paid nothing, and recorded that as expected. The check is re-pointed to equip the rune and let the
+game write the field, <b>and breaking the copy on purpose now turns it red</b>. <b>Every gate in the battery was swept
+for the same shape</b> &mdash; a check that sets a rune, engine or talent field by hand rather than equipping the rune,
+taking the engine or buying the node: <b>92 places in 9 files</b>. Ninety set it on the same body the game would have,
+so they still ask a real question; two set it where the game never writes it, and those two are the ones that hid the
+dead rune. <b>Reported, not repaired</b> &mdash; that is its own batch.</p>
+
+<p><b>&sect;3 &mdash; THE MARTYR AND THIN BLOOD NO LONGER CHARGE FOR NOTHING.</b> The Martyr refuses every ally's heal
+and buys a Mercy stack with it; Thin Blood stops his own poison biting and buys a barb on every strike. Both payouts
+are read only under the engine and <b>both prices were read with no engine at all</b>, so a hero who unequipped his
+engine while holding either was playing a strictly worse game than a hero wearing no rune. <b>Each price now reads its
+payout's own condition</b>: no engine, no cost and no payout. <b>Both were already in GV's gated table</b> &mdash; the
+offer door has never offered either to a hero with his engine out &mdash; and what the door cannot reach is a rune he
+has already bought, which is the whole of this. <b>The other twenty-five ungated runes were swept for the same shape
+and none has it</b>, and so were the other thirty-three gated ones: every other price is already inside its engine's
+block or is paid out of a meter only the engine installs.</p>
+
+<p><b>&sect;4 &mdash; A CACHE STILL KEEPS THE RUNE IT CANNOT HAND OVER YET, AND NOW IT SAYS WHY.</b> Ruled as GV built
+it: a rune whose engine is unequipped sits out of a cache's choice, stays in the cache, and is offered again the moment
+the engine is back. <b>The obvious-looking alternative is the one that costs the player</b> &mdash; writing the repair
+back, the way a retired or an already-owned rune is repaired away, would let one toggle before an answer destroy those
+runes for good. A retirement cannot be undone; unequipping an engine is one press away from being undone, and a state
+the player can undo is not a state to destroy.</p>
+
 <h2>2026-09-20 &mdash; Batch GV: THE RUNES THAT READ AN ENGINE</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-EIGHTH BATCH ON <code>class-merge</code>.</b> A card that reads an engine has been
 offered only to a hero holding it since GP; the runes had never been re-read. This batch reads all sixty of them, gates
