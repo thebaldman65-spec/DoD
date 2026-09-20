@@ -38,7 +38,7 @@ var _g := Gate.new()
 # §4's table, built once inside a `-> void` section. It is NOT returned from
 # anything: `check_da` §3b's rule is that a function RETURNING a collection
 # built from two or more ability-source families is a hand-rolled corpus walk,
-# and this reads both the protected cores and the spec draft pools.
+# and this reads the protected cores, the merged class pool and the boss pools.
 var _rows: Array = []
 
 
@@ -576,12 +576,22 @@ func _s3_no_batch_code_pins() -> void:
 # the CORE, priced LOW. This section asks whether that is one card or the shape
 # of the whole layer.
 #
-# CONTROLLED THREE WAYS, BECAUSE EACH CONFOUND IS REAL. **Same spec**, so the
+# CONTROLLED THREE WAYS, BECAUSE EACH CONFOUND IS REAL. **Same class**, so the
 # cost is the same currency — Rage against Mana is not a comparison. **Same
 # role**, derived from the ability's own fields rather than authored. **Same
 # initiative**, and `PURE_BUFFS` members excluded from both sides, because
 # `Ability.make()` clamps every member to `BUFF_DELAY_CAP` and a clamped
 # initiative is not a price anyone chose — DZ's central structural finding.
+#
+# **BATCH GU — THE POPULATION FOLLOWS THE POOLS.** It paired each lineage's
+# SHELF with that lineage's cores until GU, which stopped being what a hero is
+# offered at GP: he draws from his whole class pool, so the class-wide cards
+# were in no pair, and a boss pick fills a slot as a drafted card does. It
+# walks what `check_eb` §1 walks — every card a hero of the class can earn,
+# against the class kit and every engine's enablers — because two pairings
+# that disagree make the two gates' numbers incomparable. The class basic is
+# left out on purpose, as the resolver always left it out: nothing is cheaper
+# than a free card, so it could only swell the favouring count.
 #
 # THE COUNTER-ARGUMENT IS RECORDED WITH THE NUMBER SO IT TRAVELS WITH IT: a
 # protected core arrives free with the spec and a draft card costs a pick, so
@@ -591,19 +601,26 @@ func _s4_pricing() -> void:
 	print("\n§4 — the protected cores against comparable draft cards (measurement)")
 	_rows = []
 	for cls in Classes.SPEC_IDS:
+		var basic := String(Classes.kit(cls)[0].display_name)
+		var seen := {}
 		for spec in Classes.SPEC_IDS[cls]:
-			var seen := {}
 			for nm in Classes.protected_names(spec):
-				if seen.has(nm):
+				if seen.has(nm) or String(nm) == basic:
 					continue
 				seen[nm] = true
-				_add_row(spec, "core", nm)
-			for nm2 in Classes.spec_draft_pool(spec):
-				_add_row(spec, "draft", nm2)
+				_add_row(cls, "core", nm)
+		var earned := {}
+		for nm2 in Classes.draft_pool(cls):
+			earned[nm2] = true
+		for spec2 in Classes.SPEC_IDS[cls]:
+			for nm3 in Classes.spec_pool(spec2):
+				earned[nm3] = true
+		for nm4 in earned:
+			_add_row(cls, "draft", nm4)
 	var cores: int = _rows.filter(func(r): return r["chan"] == "core").size()
 	var drafts: int = _rows.filter(func(r): return r["chan"] == "draft").size()
-	ok(cores > 30 and drafts > 100,
-		"§4: the walk read %d cores and %d draft cards — the measurement is reading the wrong thing" % [
+	ok(cores >= 16 and drafts >= 190,
+		"§4: the walk read %d cores and %d earnable cards — the measurement is reading the wrong thing" % [
 			cores, drafts])
 
 	# THE CAP BINDS THE TWO LAYERS AT DIFFERENT RATES, WHICH EXTENDS DZ's
@@ -626,30 +643,29 @@ func _s4_pricing() -> void:
 	var favours_core := 0
 	var against: Array = []
 	for cls2 in Classes.SPEC_IDS:
-		for spec2 in Classes.SPEC_IDS[cls2]:
-			for c in _rows:
-				if c["spec"] != spec2 or c["chan"] != "core" or c["capped"]:
+		for c in _rows:
+			if c["group"] != cls2 or c["chan"] != "core" or c["capped"]:
+				continue
+			for d in _rows:
+				if d["group"] != cls2 or d["chan"] != "draft" or d["capped"]:
 					continue
-				for d in _rows:
-					if d["spec"] != spec2 or d["chan"] != "draft" or d["capped"]:
-						continue
-					if c["role"] != d["role"] \
-							or absf(float(c["delay"]) - float(d["delay"])) > 0.001:
-						continue
-					pairs += 1
-					var dc: int = int(c["cost"]) - int(d["cost"])
-					var dd: int = int(c["cd"]) - int(d["cd"])
-					if dc < 0: core_cheaper += 1
-					elif dc > 0: core_dearer += 1
-					if dd < 0: core_shorter += 1
-					elif dd > 0: core_longer += 1
-					if dc <= 0 and dd <= 0 and (dc < 0 or dd < 0):
-						favours_core += 1
-					if dc > 0 or dd > 0:
-						against.append("%s: %s (%d, cd%d) vs %s (%d, cd%d)" % [
-							spec2, c["name"], int(c["cost"]), int(c["cd"]),
-							d["name"], int(d["cost"]), int(d["cd"])])
-	print("    comparable pairs (same spec, same role, same initiative, cap excluded): %d" % pairs)
+				if c["role"] != d["role"] \
+						or absf(float(c["delay"]) - float(d["delay"])) > 0.001:
+					continue
+				pairs += 1
+				var dc: int = int(c["cost"]) - int(d["cost"])
+				var dd: int = int(c["cd"]) - int(d["cd"])
+				if dc < 0: core_cheaper += 1
+				elif dc > 0: core_dearer += 1
+				if dd < 0: core_shorter += 1
+				elif dd > 0: core_longer += 1
+				if dc <= 0 and dd <= 0 and (dc < 0 or dd < 0):
+					favours_core += 1
+				if dc > 0 or dd > 0:
+					against.append("%s: %s (%d, cd%d) vs %s (%d, cd%d)" % [
+						cls2, c["name"], int(c["cost"]), int(c["cd"]),
+						d["name"], int(d["cost"]), int(d["cd"])])
+	print("    comparable pairs (same class, same role, same initiative, cap excluded): %d" % pairs)
 	print("    core cheaper on resource %d / dearer %d;  shorter on cooldown %d / longer %d" % [
 		core_cheaper, core_dearer, core_shorter, core_longer])
 	print("    pairs where the core is cheaper on an axis and dearer on neither: %d" % favours_core)
@@ -668,13 +684,11 @@ func _s4_pricing() -> void:
 			core_cheaper, core_dearer])
 
 
-func _add_row(spec: String, chan: String, nm: String) -> void:
-	var a: Ability = Classes.spec_pool_ability(spec, nm)
-	if a == null:
-		a = Classes.pool_ability(nm)
+func _add_row(group: String, chan: String, nm: String) -> void:
+	var a: Ability = Classes.pool_ability(nm)
 	if a == null:
 		return
-	_rows.append({"spec": spec, "chan": chan, "name": nm, "delay": a.delay,
+	_rows.append({"group": group, "chan": chan, "name": nm, "delay": a.delay,
 		"cost": a.cost, "cd": a.cooldown, "role": _role_of(a),
 		"capped": Ability.takes_delay_cap(a.special)})
 

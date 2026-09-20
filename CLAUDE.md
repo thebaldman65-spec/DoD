@@ -1888,6 +1888,10 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   Poise and Counter Time (a drafted Guard Change), Reprisal (a heal landed), Execute (a low or Broken target), Kill
   Command and the companion cards (an earned Call the Wilds). `check_gt` §3 re-derives it every battery, so a new
   earnable card is sorted by the gate in the batch that adds it.
+- **A CARD WHOSE SECOND CLAUSE NEEDS ANOTHER CARD IS NOT A ROW, AND IS NOT PAID THE CLAUSE WITHOUT IT (ruled at GU).**
+  Battle Poise's free Guard Change and Shatterpoint's free Overpower fire only with the named card carried; both cards
+  do their own work with no engine and no other card, so neither sits out, and paying the clause to a hero who does not
+  carry the card would change what the card gives.
 - **NOTHING IS WRITTEN WHEN A CARD SITS OUT.** It stays in `bm_abilities` and `bm_equipped`, and the one state that
   decides it is the engine rune's own `equipped` flag. **THE SLOT STAYS COUNTED**, as GM §2 left a dropped bound
   card's, and benching it is the player's door to the slot, free and reversible (EG). **Sitting out is not
@@ -3515,15 +3519,33 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   card cheaper AND faster — Kindled Mind at 15 Mana and initiative 1.5 against Death Ray at 55 and
   5.0. That is a cantrip beside a nuke. **At equal initiative "faster" is impossible by
   construction, so the tempo axis that survives the control is COOLDOWN**, and a gate that asserts
-  the uncontrolled form reads RED the day it is written.
-- **EVERY CROSSOVER IS NAMED RATHER THAN COUNTED, AND SINCE GT THERE ARE NONE.** EB named one — Holy's
+  the uncontrolled form reads RED the day it is written. **GU swept it over every card a hero can
+  earn and holds it as a NAMED TABLE, not a property**: `check_gu` §2 names each card under a kit
+  card of its class in the same role — cheaper, shorter or quicker, and dearer on none — with its
+  group (the bullet below the next).
+- **EVERY CROSSOVER IS NAMED RATHER THAN COUNTED, AND SINCE GU THERE ARE NONE.** EB named one — Holy's
   **Divine Plea** (0 Mana, cooldown 2) against **Renewal** (20 Mana, cooldown 3) at the same initiative in the heal
   role — and it dissolved at GS §1, because Renewal left the cores for Holy's shelf. **GS's returning cards brought three** —
   **Fireball** and **Frostbolt** (0 Mana, cooldown 0) against **Magic Missiles** (15, cooldown 2) at initiative 2.0,
   and **Aimed Shot** (20, cooldown 1) against **Powershot** (25, cooldown 2) at 3.0 — and **GT §2 RETUNED ALL THREE
   TO THE BASELINE (ruled)**: each takes the cost and cooldown of the kit card it undercut and nothing else moves.
-  **A crossover's baseline is the core it undercuts, never a picked number.** `check_eb` §1 asserts all four named
-  pairs gone and no crossover at all, so the next inversion reds.
+  **A crossover's baseline is the core it undercuts, never a picked number.** **GU found a fifth the gate could not
+  see**: it paired each lineage's shelf with that lineage's cores, which stopped being what a hero is offered at GP.
+  **The population is every card a hero of the class can EARN — the merged pool and every boss pool — paired by CLASS
+  against the kit and every engine's enablers**, and on it **Sweeping Strikes** (20 Rage, cooldown 0, a boss pick)
+  inverted against the Berserker's **Bloodlust** (25, cooldown 2) at 3.0 and sat under **Crushing Blow** (20, cooldown
+  2); GU §2 priced it at Crushing Blow. `check_eb` §1 asserts all five named pairs gone and no crossover at all, so the
+  next inversion reds, and `check_ea` §4 pairs the same population.
+- **A CARD UNDER A KIT CARD IS A FORMER BASIC ATTACK, A CARD WHOSE ADVANTAGE IS WHAT IT IS FOR, OR A GENUINE
+  MISPRICING — AND ONLY THE LAST IS RETUNED (GU, ruled by the designer).** A **former basic** was free by construction
+  in slot 0 until GS moved it into the pool — a category error rather than a bad price (Fireball, Frostbolt, Arcane
+  Explosion, Shadowrend). A card **whose advantage is what it is for** — a swap priced a bargain on purpose, a
+  cantrip, a card paid in another currency — **is not a defect: a card that is cheap because being cheap is its point
+  is not one.** A **genuine mispricing** takes the cost and cooldown of the kit card it undercuts (GT's method) and
+  nothing else. The first two are reported and ruled on by the designer alone. **GU found a fourth shape that is none
+  of the three**: a card the field role pairs with a kit card only through its catch-all bucket, whose primary tag says
+  it does another job, is not the same role at all. `check_gu` §2 holds every such card as a row with its group, so a
+  new one reds in the batch that adds it, and that batch sorts it.
 - **THE CAP BINDING THE TWO LAYERS AT DIFFERENT RATES IS THE SAME RELATIONSHIP, NOT A SECOND
   FINDING.** `Ability.BUFF_DELAY_CAP` reaches **29.5% of the draft layer against 12.8% of the
   cores**. Under this ruling that is what a priced layer looks like beside a baseline one: the

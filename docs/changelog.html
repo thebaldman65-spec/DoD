@@ -15,6 +15,37 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry below.</p>
 
+<h2>2026-09-19 &mdash; Batch GU: THE LAST THREE CARDS UNDER THE BASELINE, AND THE SWEEP FOR THE SHAPE</h2>
+<p><b>IMPLEMENT ONLY, AND THE TWENTY-SEVENTH BATCH ON <code>class-merge</code>.</b> GT priced three cards at the kit card
+beside them and named three more it did not retune. This batch prices those three, sweeps every card a hero can earn
+for the same shape, and retunes the one genuine mispricing it finds. <code>main</code> is untouched. Full working:
+<code>docs/reports/GU.md</code>.</p>
+
+<p><b>&sect;1 &mdash; ARCANE EXPLOSION, SHADOWREND AND GUARD CHANGE DO NOT MOVE.</b> Arcane Explosion and Shadowrend were
+the Arcanist's and the Occultist's basic attacks until GS, and each still costs exactly what the class basic it
+replaced costs: nothing, no cooldown, the same initiative. Neither class kit holds a card that does their job, so
+there is no kit card for them to undercut; the nearest cards of their kind in the pool are Arcane Barrage (20 Mana,
+cooldown 2) and Chastise (15 Mana, cooldown 2). Guard Change was never a basic attack. It is the Swordmaster's stance
+swap: cheaper, shorter and quicker than Crushing Blow and Pommel Strike, but against Mocking Blow &mdash; the kit card
+nearest its price &mdash; it is quicker and nothing else, and being quick is what the swap is for. All three are
+reported for a ruling.</p>
+
+<p><b>&sect;2 &mdash; ONE CARD MOVES: SWEEPING STRIKES HAS A COOLDOWN OF 2.</b> Every one of the 204 cards a hero can
+earn was compared with his class kit, in the same role, on cost, cooldown and initiative. Eleven sat below a kit card.
+Ten are left as they are: two former basic attacks (Fireball and Frostbolt), five whose cheapness is what they are
+for, and three that only resemble the kit card they were compared with. The eleventh, Sweeping Strikes &mdash; a
+Swordmaster zone-boss card &mdash; cost the same Rage as Crushing Blow at the same initiative with no cooldown against
+its 2, and could keep a 3-turn Daze up for good at a net 10 Rage a cast. It now has Crushing Blow's cooldown. Nothing
+else about it changed.</p>
+
+<p><b>&sect;3 &mdash; THE GATE THAT WATCHES FOR THIS SEES EVERY CARD NOW.</b> <code>check_eb</code> compared each
+lineage's shelf only with that lineage's own cards, which stopped being what a hero is offered when the pools merged:
+the twenty class-wide cards and every zone-boss card were outside it, and Sweeping Strikes against the Berserker's
+Bloodlust was exactly the case it exists to catch. It and <code>check_ea</code> now compare every card a hero can earn
+with every protected card of his class. A new gate, <code>check_gu</code>, keeps the ten named with their reasons and
+casts every card priced at a kit card in a real fight beside that kit card, so a price that changed on paper but not
+where the game charges it would show. Battle Poise and Shatterpoint stay as they are (ruled).</p>
+
 <h2>2026-09-19 &mdash; Batch GT: THE POUCH NEVER TRAPS THE PLAYER, THREE CARDS AT THE BASELINE, AND A CARD THAT SITS OUT</h2>
 <p><b>IMPLEMENT ONLY, AND THE TWENTY-SIXTH BATCH ON <code>class-merge</code>.</b> A softlock, a pricing inversion and a
 dead card, each ruled by the designer. <code>main</code> is untouched. Full working: <code>docs/reports/GT.md</code>.</p>

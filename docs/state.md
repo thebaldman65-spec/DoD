@@ -13,63 +13,107 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-19 (Batch GT).*
+*Last rewritten: 2026-09-19 (Batch GU).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GT — THE POUCH NEVER TRAPS THE PLAYER, THREE CARDS AT THE BASELINE, AND A CARD THAT SITS OUT.
-  IMPLEMENT ONLY, AND THE TWENTY-SIXTH BATCH ON `class-merge`.** A softlock, a pricing inversion and a dead card, each
-  ruled by the designer. `main` is untouched. Full working: **`docs/reports/GT.md`**.
-- **BUILT (§1): THE POUCH'S CLOSE BUTTON NEVER MOVES, AND THE PEDDLER'S OFFERS CANNOT COVER EACH OTHER.** The pouch is
-  a fixed panel (x 140, y 24, 1000 x 672): every engine row, note and rune row sits in ONE scroller, and Close sits
-  below it at y 658–696 in every configuration. **A hero HOLDS up to all six of his class's engine runes, two slotted,
-  and the pouch lists every one.** Measured on GS's layout with the pouch empty, Close was wholly off the 720-pixel
-  screen for 4 of 24 engines alone, **all 60 pairs** and all 4 sixes (y 1142 at worst); now it is on screen in all
-  176 configurations (each with the pouch empty and with an ordinary rune), and **nothing scrolls in any of them** —
-  the longest, a Hunter holding all six, is 431 pixels in a 583-pixel list. **The Peddler's offers stack at their own
-  heights in one scroller** (x 620–1260, y 162–632) that ends above Leave, which did not move: with every class's
-  longest engine rule all four Buy buttons had been unusable (three under the next offer, one at y 785); four
-  ordinary offers — every seat's longest — fit unscrolled, and engine-heavy deals scroll. Nothing was shrunk or cut.
-- **BUILT (§2): FIREBALL, FROSTBOLT AND AIMED SHOT AT THE BASELINE (ruled).** Each takes the cost and cooldown of the
-  kit card it undercut at the same initiative: Fireball and Frostbolt **15 Mana, cooldown 2** (Magic Missiles'), from
-  free with no cooldown; Aimed Shot **25 Mana, cooldown 2** (Powershot's), from 20 and 1. Nothing else of theirs moved.
-  **`check_eb` §1 reads no crossover.**
-- **BUILT (§3): A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (ruled).**
-  `Classes.SITS_OUT` — **17 rows**, derived by asking the usability door about all 204 cards a hero can earn with no
-  engine held: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Hold); Arcane Bolt, Unmaking, Death Ray and
-  Stabilize (Resonance); Divine Plea, Hymn of Hope and Resurrection (Mercy); Blessing of the Faithful and Aegis Reversal
-  (Conviction); Transference and Requiem (the Old Gods); Unleash and Primal Surge (Pack Bond). Ten more cards are
-  refused bare and open with a card or a board and are not rows. **`Run.seated_ability_names` is the one door**; the
-  battle spawn and the hero sheet ask it. **Nothing is written**: the card stays owned and carried, **its slot stays
-  counted** (as GM §2 left a bound card's), and benching frees it. The sheet greys it as sitting out and the Kit panel
-  names the rune that brings it back (`Run.sits_out_note`).
-- **RULED IN GT's BRIEF (§4), AND ONLY RECORDED:** GS's three derived enablers stand — **Razor Ice, Divine Shield,
-  Hex of Ruin** — and their `PROTECTED_CORES` rows say ruled where they said PROPOSED; **Bloodlust stays outside the
-  slot count**; **the four basic-attack changes stand**. No engine, kit or pool changed.
-- **NEW GATE `check_gt`** drives all three every battery: the pouch in all 176 configurations with Close pressed in
-  each; every Peddler offer bought through its own button on three deals; the census of the 204 against the ruled
-  table, the ten card routes and every row opened by its engine; each engine dropped and re-slotted through the
-  pouch's door with a live stretch of the fight; the three prices.
-- **WHAT MOVED:** `scripts/map_screen.gd`, `shop_screen.gd`, `classes.gd`, `run_state.gd`, `battle.gd` and
-  `party_screen.gd`; `check_gt.gd` (**NEW**) and `run_battery.sh`; the instruments GT's recon named; `baselines.json`
-  and `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, this file
-  and `docs/reports/GT.md` (**NEW**).
-- **VERIFICATION:** the acceptance battery is **GREEN — 117 targets in 56 minutes on a frozen tree, `check_de` at
-  485 / 0 / 0 and `check_gt` at 3,157 / 0**; the only reds are the two standing sanctioned ones (`check_cm_live` 13 / 4,
-  `check_gj` §4's Bell at +169 / +189), their FAIL lines byte-identical to HEAD's. The unmodified battery ran against
-  GT's code first — 116 targets, 113 as GS's acceptance run read them, and three red: `check_eb` (GS's three named
-  crossovers gone, as retuned), `check_gm` §2 (it pinned GS's dead card on the bar, which the ruling takes off it) and
-  `check_de` for those two; no game defect, no throw and no parse error. Both were repaired to intent. Full working in
-  **`docs/reports/GT.md`** §5.
-- **Phase.** Steps 1–4 of the merge's running order are done, and GS re-cut step 3's enabler half. **The Crown's Break
-  and freeze resistance is still owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
-- **Next letter: GU.**
+- **Last batch: GU — THE LAST THREE CARDS UNDER THE BASELINE, AND THE SWEEP FOR THE SHAPE. IMPLEMENT ONLY, AND THE
+  TWENTY-SEVENTH BATCH ON `class-merge`.** GT priced three cards at the kit card beside them and named three more it
+  did not retune; GU priced those three, swept every card a hero can earn for the shape, and retuned the one genuine
+  mispricing. `main` is untouched. Full working: **`docs/reports/GU.md`**.
+- **§1 — THE THREE, AND NONE MOVED.** **Arcane Explosion and Shadowrend are FORMER BASIC ATTACKS** — the Arcanist's
+  and the Occultist's slot 0 until GS — each at the price of the class basic it replaced (0, no cooldown, 2.0), and
+  **neither class kit holds a card of its role** (the Mage kit has no area card; the Cleric kit has no damage card,
+  ruled). The nearest cards of their role in the pool: **Arcane Barrage** (20 Mana, cooldown 2, 2.5) and **Chastise**
+  (15, cooldown 2, 2.0). **Guard Change is NOT a former basic** — it opened the Swordmaster's kit from AK to GS: under
+  Crushing Blow and Pommel Strike on cost, cooldown and initiative, **under Mocking Blow (0 Rage, cooldown 1, 2.0), the
+  kit card nearest its price, on initiative alone**, and its quickness is what the swap is for. Reported, not retuned.
+- **§2 — THE SWEEP, AND ONE RETUNE (ruled: only a genuine mispricing is retuned).** All **204** earnable cards against
+  the class kit, in the same field role, with EB's initiative control dropped: **eleven** sat under a kit card on HEAD —
+  **two former basics** (Fireball and Frostbolt, under Magic Burst), **five whose advantage is what they are for**
+  (Guard Change, Charge, Kindled Mind, Primal Surge, Bola), **three the field role pairs only through its catch-all**
+  (Quarry's Mark, Hold Breath and Mark of the Hunt against Snare Trap — primary tags MARK, RESOURCE and MARK against
+  DEBUFF) and **one genuine mispricing: Sweeping Strikes**, a Swordmaster boss pick at Crushing Blow's 20 Rage and 3.0
+  with no cooldown against its 2 — and against the Berserker's Bloodlust, EB's own inversion. **It takes Crushing
+  Blow's cooldown of 2; nothing else of it moved.** Printed, not grouped: 47 same-role pairs that trade (EB allows
+  it) and 34 set aside because one side's initiative is the buff cap.
+- **`check_eb` §1 AND `check_ea` §4 WERE ASKING ABOUT THE PRE-GP SHELVES, AND BOTH ARE REPAIRED TO INTENT.** Each
+  paired a lineage's shelf (158 cards) with that lineage's cores alone, so the 20 class-wide cards of the merged pools
+  and all 26 boss-pool cards were in no pair. Both walk every card a hero of the class can earn (204) against the kit
+  and every engine's enablers (20), paired by class, the basic left out on purpose: **29 of 43 pairs favour the core,
+  0 crossovers** (21 of 30 before); on HEAD's Sweeping Strikes the repaired gate reads one crossover, against Bloodlust.
+- **NEW GATE `check_gu`**: the three; the sweep as a named table with each group's ground asked of the game; the
+  retune; and **each of the four cards priced at a kit card — GT's three and GU's one — cast in a real fight beside
+  that kit card**: the same price at the cast line, the same cooldown, the same turn, the door shut while it cools and
+  open after. GT's gate had read its three prices as data only.
+- **RULED IN GU's BRIEF, ONLY RECORDED:** Battle Poise and Shatterpoint stay as they are (GT's ruling 3), and
+  `CLAUDE.md`'s sits-out block says so.
+- **WHAT MOVED:** `scripts/classes.gd` (one cooldown); `check_eb.gd` and `check_ea.gd` (repaired to intent),
+  `check_gu.gd` (**NEW**), `check_ek.gd` (`TAG_CHECKERS`) and `run_battery.sh`; `baselines.json` and
+  `pin-manifest.json`; `CLAUDE.md`, `docs/master.html`, `docs/changelog.html`, `docs/design-notes.md`, this file and
+  `docs/reports/GU.md` (**NEW**).
+- **VERIFICATION:** the acceptance battery is **GREEN — 118 targets in 57 minutes on a frozen tree, `check_de` at
+  489 / 0 / 0** (GT's 485 and four for `check_gu`'s row), `check_gu` at 317 / 0 and `check_eb` at 21 / 0; the only
+  reds are the two standing sanctioned ones (`check_cm_live` 13 / 4, `check_gj` §4's Bell at +169 / +189), their FAIL
+  lines byte-identical to GT's. The unmodified battery ran against GU's code first — 117 targets, 116 as GT's
+  acceptance run read them and `test_batch_an` inside its band; **nothing moved for Sweeping Strikes' cooldown**, and
+  no parse or script error. Full working in **`docs/reports/GU.md`** §5.
+- **Phase.** Steps 1–4 of the merge's running order are done. **The Crown's Break and freeze resistance is still
+  owed.** Step 5 is the 43 engine-reading runes; step 6 is the gates.
+- **Next letter: GV.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-### GT's RULINGS OWED — **FOUR, ALL PLAYER-VISIBLE**
+### GU's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE**
+
+Full working: `docs/reports/GU.md`, NEEDS A RULING.
+
+1. **WHAT "THE BASELINE" IS FOR A FORMER BASIC, AND THE FOUR SIT AT TWO.** Fireball and Frostbolt are at Magic
+   Missiles' 15 Mana and cooldown 2 (GT, ruled); Arcane Explosion and Shadowrend are at the class basic's price, free
+   with no cooldown (untouched — the brief grouped them and asked for no ruling). The two readings: the basic it
+   replaced (all four free), or the nearest card of its role — for the two with no kit card of their role, the pool's
+   **Arcane Barrage** (20 Mana, cooldown 2, 2.5; or Killing Frost, 20, cooldown 3, at AE's own 2.0) and **Chastise**
+   (15, cooldown 2, 2.0). Nothing moved.
+2. **GUARD CHANGE: NONE OF ITS THREE AXES MOVED.** Against Mocking Blow only its initiative is under, and that is the
+   swap's point (AK priced it a bargain on purpose). At a strike's price it would be Crushing Blow's 20 / 2 / 3.0 or
+   Pommel Strike's 20 / 3 / 2.0 — and a longer cooldown also slows Battle Poise's free pivot, which respects it.
+3. **SWEEPING STRIKES IS THE ONE MAGNITUDE GU MOVED** — cooldown 0 → 2, Crushing Blow's — on the batch's judgment that
+   it is a genuine mispricing (the brief delegated the grouping). The groupings of the other ten are the batch's
+   reading, reported and ruled on by nobody, per the brief.
+
+### FOUND AT GU AND NOT FIXED
+
+- **`check_da` §3b CANNOT SEE A WALK BUILT ON THE MERGED POOL.** Its source families predate GP: `Classes.draft_pool(`
+  is in none of them, so a function RETURNING the merged pool plus the boss pools — every card a hero can earn — counts
+  one family and is not accused. **Proved with a probe planted in a control copy**: that walk returned from a function
+  read `check_da` 43 / 0, and the same walk through the class-wide shelf's accessor was accused, 44 / 2. Widening the
+  families moves that gate; not taken.
+- **TWO SHAPES THE SWEEP SET ASIDE, REPORTED WITH THEIR COUNTS.** 47 same-role pairs trade (under on one axis, dearer
+  on another), which EB's ruling allows; 34 pairs read under on cost or cooldown against a card whose initiative is the
+  buff cap, which EB leaves out. Among the second, **Mirror Image** sits 5 Mana under the kit's **Nexus Ward** at the
+  same cooldown — both class-wide shields before GN, so it is GP's ruling 1 (the class-wide rebalance), not this one.
+- **AGAINST THE ENABLERS RATHER THAN THE KIT**, the same shape finds **19 cards under an enabler (27 pairs)** — Arcane
+  Explosion under the Pyromancer's Flamewave and Shadowrend under the Occultist's Hex of Ruin on all three axes, and
+  most of the rest 5 Mana or Rage under, several of them against the Beastmaster's three summons. An enabler is only
+  its engine's holder's, so none is in the population the brief named; `docs/reports/GU.md` §2 lists them.
+- **QUICKENED NOW FITS SWEEPING STRIKES**, as it fits Crushing Blow: the upgrade takes two turns off a cooldown, so an
+  upgraded copy is back at 0. Parity with the kit card holds; the upgrade layer is unchanged.
+- **THE SIM BOT'S SWORDMASTER ROTATION** casts Sweeping Strikes whenever it is ready at three foes or more, so a
+  Swordmaster sim holding it casts it at most one turn in three now. Sims only.
+- **SIX OF THE BRIEF'S STATEMENTS DID NOT HOLD AS WRITTEN** (GU §0), none of them changing what was built: *Shadowrun*
+  (Shadowrend); *GT did not retune them for that reason* (it did not retune them because the ruling named three); *three
+  ways under* (against the kit's Mocking Blow it is one); *neither was a sweep* (`check_eb` §1 found GS's three and GT
+  §2c swept the 29 returning cards — neither swept all 204); *`check_eb` is asking about the merged pools* (it asked the
+  lineage shelves, repaired); and *GT drove its three* (`check_gt` §4 compared their data; `check_gu` §4 drives them).
+- **FOUR SAVE FILES EXIST NOW, WHERE GT FOUND THREE**: a run is in progress (`run_save.bin`, written after GT), and
+  `profile.json` changed since GT's backup. All four were backed up and hashed before anything ran.
+- **TWO CONTROL COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: "Dawn of Decay GU copy" and "Dawn of Decay
+  GU ctl", each renamed before anything ran in it so its `user://` could not reach the player's saves. They can be
+  deleted.
+
+### GT's RULINGS OWED — **TWO LEFT; THE THIRD RULED AND THE FOURTH ANSWERED AT GU**
 
 Full working: `docs/reports/GT.md`, NEEDS A RULING.
 
@@ -82,12 +126,14 @@ Full working: `docs/reports/GT.md`, NEEDS A RULING.
 2. **A CARD THAT SITS OUT KEEPS ITS SLOT.** Built as GM §2 left a dropped bound card's: it is still carried and still
    counted, and benching frees the slot. Freeing it automatically would let the player fill it, and the engine's
    return would then leave the kit over its cap — which is the ruling this would need.
-3. **BATTLE POISE AND SHATTERPOINT ARE A SEPARATE CASE, NOT THIS RULING'S.** Both are cards (not runes), both cast and
+3. ~~**BATTLE POISE AND SHATTERPOINT ARE A SEPARATE CASE, NOT THIS RULING'S.**~~ **RULED IN GU's BRIEF: both stay
+   as they are**, and `CLAUDE.md`'s sits-out block carries it. Both are cards (not runes), both cast and
    do their own work with no engine, and only a second clause needs another card: driven on a Warrior with no engine,
    Shatterpoint breaks its target either way and adds its free Overpower (68 damage against 16) only with Overpower
    carried; Battle Poise, reached through a drafted Feint, pivots on a parry only with Guard Change carried. A card that
    half-works is GM's untouched group. Paying the clause without the card would change what the card gives.
-4. **THE SAME SHAPE ON THREE MORE RETURNING CARDS, OUTSIDE EB's CONTROL.** Under EB's control (same role, same
+4. ~~**THE SAME SHAPE ON THREE MORE RETURNING CARDS, OUTSIDE EB's CONTROL.**~~ **ANSWERED AT GU §1** — two former
+   basics and a swap whose quickness is its point, none retuned; what is still owed is GU's rulings 1 and 2. Under EB's control (same role, same
    initiative) only the three are inverted. Dropping the role control, the other two former basics are cheaper and
    shorter than a kit card at the same initiative — **Arcane Explosion** against Magic Missiles (an area attack against
    a single-target one) and **Shadowrend** against Ministration (a strike against a heal); dropping the initiative
@@ -1879,7 +1925,9 @@ refresh that also moves the definitions cannot be compared with what it replaced
   neither. **If a cooldown is ever taken anyway it is on the UNIQUENESS argument and it is 2, not
   3.** `check_dr` §5 still prints the live draft list every run and still walks the DRAFT POOLS
   ONLY, deliberately. `docs/draft-audit.html` carries the RESOLVED banner naming both halves.
-- **AND THE SAME QUESTION IS OPEN IN THE BOSS-PICK CHANNEL, WHERE IT IS TWO QUESTIONS AND NOT ONE.**
+- **AND THE SAME QUESTION WAS OPEN IN THE BOSS-PICK CHANNEL, AS TWO QUESTIONS — SWEEPING STRIKES' HALF IS CLOSED AT
+  GU §2**: it takes Crushing Blow's cooldown of 2, a genuine mispricing retuned to the kit card it sat under. Ashes of
+  Al'ar's half stands as DU left it. DU's record:
   **ASHES OF AL'AR RATE-LIMITS ITSELF** — `ashes_used` makes it once a battle by construction and
   its card text says so, so cooldown 0 costs nothing there. **SWEEPING STRIKES DOES NOT**: 20 Rage a
   cast at cooldown 0 while BUILDING 10, two swings, 12 Break, and a 3-turn Daze a repeatable card
@@ -2359,7 +2407,7 @@ removes itself from the boss offer and vice versa.**
 
 **RULED AT EB §1: THE PROTECTED CORE IS THE BASELINE AND THE DRAFT CARD PAYS FOR ITS SLOT.** The
 13-of-17 is the design working, not a mispricing, and `CLAUDE.md` carries the ruling with its
-reasoning AND its counter-reading. **`check_eb` §1 asserts the INVERSION** — a draft card cheaper on
+reasoning AND its counter-reading. **`check_eb` §1 asserts the INVERSION — over every card a hero can earn, paired by class, since GU** — a draft card cheaper on
 resource AND shorter on cooldown than a comparable core — **with exactly one crossover named
 (Divine Plea against Renewal), in both directions.** **GS dissolved that one — Renewal is a draft card now —
 and its returning cards brought three: Fireball and Frostbolt against Magic Missiles, Aimed Shot against

@@ -4,6 +4,36 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The last three cards under the baseline, and the sweep for the shape (Batch GU) — 2026-09-19
+
+**Why Arcane Explosion and Shadowrend keep their price.** Both were a lineage's basic attack until GS, and a basic is
+free by construction. Each still costs exactly what the basic it replaced costs, and neither class kit holds a card
+that does its job — the Mage kit has no area card, and the Cleric kit has no damage card by ruling — so there is no
+kit card for either to undercut. Pricing one against a card of another job would be inventing its baseline. A former
+basic is a change of job rather than a bad price, and the designer asked for that group reported, not ruled.
+
+**Why Guard Change keeps its price.** It is under Crushing Blow and Pommel Strike on all three axes, but those are
+strikes and it is the stance swap; its fields call it a damage card only because of its 15 Break damage, and its
+tag is not theirs. The kit card nearest its price, Mocking Blow, costs the same and comes back as fast, and Guard
+Change is quicker than it and nothing else. That quickness is what the card is for: it was priced a bargain on
+purpose when it opened the Swordmaster's kit, and Battle Poise's free pivot respects its one-turn cooldown.
+
+**Why Sweeping Strikes is the one that moved.** It does a kit card's job — a Warrior strike at Crushing Blow's cost and
+initiative — and nothing pays for its missing cooldown: no second currency, no condition, no limit of its own, and a
+Daze it could keep up for good at a net 10 Rage a cast. That is a genuine mispricing, and the method for one is GT's:
+take the kit card's cost and cooldown and nothing else. Only the cooldown differed.
+
+**Why the sweep is kept as a named table rather than asserted empty.** Without EB's equal-initiative control the
+comparison finds cantrips beside nukes, and a rule that no card may be cheaper on any axis would forbid the cards
+whose cheapness is their point. So each card below a kit card is a named row with its group, and a new one is sorted
+by the batch that adds it — the same shape as the cards that sit out.
+
+**Why the gate pairs by class now.** A lineage's shelf is where a card was written, not what a hero is offered: since
+the pools merged he draws from his class's whole pool, and a zone-boss pick fills a slot under the same cap. Pairing a
+shelf with its own lineage's cards left the class-wide cards and the boss picks out, and the one inversion the game
+had was in a boss pool. The class basic stays out of the pairing: nothing can be cheaper than a free card, so a pair
+against it could only swell the ratio the gate prints.
+
 ## The pouch never traps the player, three cards at the baseline, and a card that sits out (Batch GT) — 2026-09-19
 
 **Why the pouch's Close is pinned rather than the text made shorter.** The rule text is the engine's own words, the

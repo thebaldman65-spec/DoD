@@ -380,10 +380,15 @@ const TAG_DOOR := "loadout_condition_met"
 # Magic Burst and Nexus Ward — the kit's new card and its renamed one — each
 # carry a `CARD_TAGS` row. **It changes no behaviour and it is not exempted; it
 # is listed.** The pre-pass caught it, because the pre-pass ran every gate.
+# **BATCH GU ADDED `check_gu.gd`, AND FOR ONCE THE LIST WAS WRITTEN BEFORE THE
+# BATTERY RATHER THAN LEARNED FROM IT.** Its §1 and §2 ask each card's PRIMARY
+# tag: the swap and the kit's strikes do different jobs, and three cards the
+# field role pairs with Snare Trap are a MARK, a RESOURCE card and a MARK. **It
+# changes no behaviour and it is not exempted; it is listed.**
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
 	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
-	"check_go.gd", "check_map_screen.gd"]
+	"check_go.gd", "check_gu.gd", "check_map_screen.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

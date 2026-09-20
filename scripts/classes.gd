@@ -5741,9 +5741,19 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"cooldown": 4,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Throw the wall wide: EVERY ally, the\nWarden included, gains a shield charge\n— the next attack against them is\nBLOCKED."})
+		# BATCH GU §2 — PRICED AT THE BASELINE (ruled: a genuine mispricing is
+		# retuned). Earned since AH, it kept the cooldown of 0 it was given as an
+		# opening card, and since GN put Crushing Blow in every Warrior's kit it
+		# sat beside that card in the same role and at the same cost (20) and
+		# initiative (3.0) with no cooldown against its 2 — and, against the
+		# Berserker's Bloodlust, cheaper AND shorter at the same initiative, EB's
+		# inversion, in a boss pool no instrument read. Nothing limits it
+		# instead: DU §5 found the Daze kept permanently refreshed at a net 10
+		# Rage a cast. It takes Crushing Blow's cooldown; nothing else moves.
 		"Sweeping Strikes":
 			return Ability.make({"display_name": "Sweeping Strikes", "cost": 20,
 				"damage": 15, "pressure": 12, "delay": 3.0, "anim": "attack02",
+				"cooldown": 2,
 				"multi_hits": 2, "perfect_extra_hit": false, "resource_gain": 10,
 				"applies_status": {"id": "dazed", "turns": 3},
 				"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
